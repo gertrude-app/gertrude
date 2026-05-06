@@ -5,6 +5,7 @@ import Gertie
 import Queues
 import Vapor
 import XCore
+import XStripe
 
 enum SubscriptionEmail: Equatable {
   case trialEndingSoon(length: Int, remaining: Int)
@@ -13,14 +14,9 @@ enum SubscriptionEmail: Equatable {
   case paidToOverdue
 }
 
-struct SubscriptionUpdate: Equatable {
-  enum Action: Equatable {
-    case update(status: BillingStatus.Db, expiration: Date)
-    case delete(reason: String)
-  }
-
-  var action: Action
-  var email: SubscriptionEmail?
+struct TrialEmailDecision: Equatable {
+  let send: SubscriptionEmail?
+  let nextLifecycle: BillingIdentity.TrialEmailLifecycle
 }
 
 struct SubscriptionManager: AsyncScheduledJob {
@@ -32,44 +28,14 @@ struct SubscriptionManager: AsyncScheduledJob {
 
   func run(context: QueueContext) async throws {
     guard self.env.mode == .prod else { return }
-    try await self.advanceExpired()
+    try await self.tick()
   }
 
-  func advanceExpired() async throws {
+  func tick() async throws {
     var logs: [String] = []
-    let parents = try await ParentWithSubscription.all(in: self.db)
-    for parent in parents {
-      guard let update = try await self.subscriptionUpdate(for: parent) else {
-        continue
-      }
-
-      switch (update.action, parent.subscription) {
-
-      case (.update(let status, let expiration), .some(var subscription)):
-        subscription.billingStatus = status
-        subscription.statusExpiresAt = expiration
-        try await self.db.update(subscription)
-        let link = self.adminLink(for: parent.model)
-        logs.append("Updated parent \(link) to `.\(status)` until \(expiration)")
-
-      case (.delete(let reason), _):
-        try await self.db.create(DeletedEntity(
-          type: "Parent",
-          reason: reason,
-          data: JSON.encode(parent.model, [.isoDates]),
-        ))
-        logs.append("Deleted parent `\(parent.email)` reason: \(reason)")
-        try await self.db.delete(parent.model)
-
-      case (.update, .none):
-        unexpected("f3c5e1b2", parent.model.id, "should be unreachable, investigate")
-      }
-
-      if let event = update.email {
-        try await self.postmark.send(template: email(event, to: parent.email))
-        logs.append("Sent `.\(event)` email to parent \(self.adminLink(for: parent.model))")
-      }
-    }
+    try await logs.append(contentsOf: self.deleteUnverifiedParents())
+    try await logs.append(contentsOf: self.advanceTrialEmails())
+    try await logs.append(contentsOf: self.refreshStaleSubscriptions())
 
     if self.env.mode == .prod, !logs.isEmpty {
       self.postmark.toSuperAdmin(
@@ -79,97 +45,123 @@ struct SubscriptionManager: AsyncScheduledJob {
     }
   }
 
-  func subscriptionUpdate(for parent: ParentWithSubscription) async throws -> SubscriptionUpdate? {
-    if !parent.emailVerified, parent.createdAt < self.now - .days(3) {
-      return .init(
-        action: .delete(reason: "email never verified"),
-        email: nil,
-      )
+  func deleteUnverifiedParents() async throws -> [String] {
+    var logs: [String] = []
+    let cutoff = self.now - .days(3)
+    let stale = try await Parent.query()
+      .where(.emailVerifiedAt == nil)
+      .where(.createdAt < cutoff)
+      .all(in: self.db)
+    for parent in stale {
+      try await self.db.create(DeletedEntity(
+        type: "Parent",
+        reason: "email never verified",
+        data: JSON.encode(parent, [.isoDates]),
+      ))
+      try await self.db.delete(parent)
+      logs.append("Deleted parent `\(parent.email)` reason: email never verified")
     }
-
-    guard let subscription = parent.subscription else {
-      return nil
-    }
-
-    if subscription.statusExpiresAt > self.now {
-      return nil
-    }
-
-    let hasConnectedApp = try await parent.model.hasConnectedApp(self.db)
-    switch subscription.billingStatus {
-
-    case .trialing:
-      return .init(
-        action: .update(
-          status: .trialExpiringSoon,
-          expiration: self.now + Plan.Full.trialWarningDays,
-        ),
-        email: .trialEndingSoon(length: 21, remaining: 3),
-      )
-
-    case .trialExpiringSoon:
-      return .init(
-        action: .update(status: .trialExpired, expiration: self.now + Plan.Full.trialGraceDays),
-        email: hasConnectedApp ? .trialExpired(length: 21) : nil,
-      )
-
-    case .trialExpired:
-      return .init(
-        action: .update(status: .unpaid, expiration: .distantFuture),
-        email: hasConnectedApp ? .overdueToUnpaid : nil,
-      )
-
-    case .paid:
-      return try await self.updateIfPaid(subscription.stripeId) ?? .init(
-        action: .update(status: .overdue, expiration: self.now + .days(14)),
-        email: .paidToOverdue,
-      )
-
-    case .overdue:
-      return try await self.updateIfPaid(subscription.stripeId) ?? .init(
-        action: .update(status: .unpaid, expiration: .distantFuture),
-        email: hasConnectedApp ? .overdueToUnpaid : nil,
-      )
-
-    // terminal state, expiration is .distantFuture, hence unreachable
-    case .unpaid:
-      unexpected("bab0487a", parent.id)
-      return nil
-
-    // terminal state, expiration is .distantFuture, hence unreachable
-    case .cancelled:
-      unexpected("c4f2a8d1", parent.id)
-      return nil
-
-    // complimentary, expires should be .distantFuture, hence unreachable
-    case nil where subscription.tier == .full:
-      unexpected("2d1710c2", parent.id)
-      return nil
-
-    case nil:
-      unexpected("8610dd81", parent.id) // unreachable
-      return nil
-    }
+    return logs
   }
 
-  // failsafe in case webhook missed the `invoice.paid` event
-  // theoretically, we should never find a subscription active
-  private func updateIfPaid(
-    _ subscriptionId: Subscription.StripeId?,
-  ) async throws -> SubscriptionUpdate? {
-    if let subsId = subscriptionId?.rawValue,
-       let subscription = try? await self.stripe.getSubscription(subsId),
-       subscription.status == .active {
-      return .init(
-        action: .update(
-          status: .paid,
-          expiration: Date(timeIntervalSince1970: TimeInterval(subscription.currentPeriodEnd))
-            .advanced(by: .days(2)), // +2 days is for a little leeway, recommended by stripe docs
-        ),
-        email: nil,
+  func advanceTrialEmails() async throws -> [String] {
+    var logs: [String] = []
+    let identities = try await BillingIdentity.query()
+      .where(.isComplimentary == false)
+      .where(.fullTrialStartedAt != nil)
+      .where(.trialEmailLifecycle !=
+        BillingIdentity.TrialEmailLifecycle.finalSent.rawValue)
+      .where(.trialEmailLifecycle !=
+        BillingIdentity.TrialEmailLifecycle.skipped.rawValue)
+      .all(in: self.db)
+
+    for var identity in identities {
+      guard let trialStart = identity.fullTrialStartedAt else { continue }
+      let parent: Parent
+      do {
+        parent = try await self.db.find(identity.parentId) as Parent
+      } catch {
+        unexpected("c2a31be4", identity.parentId)
+        continue
+      }
+
+      let parentLink = self.adminLink(for: parent)
+      let sub = try await parent.subscription(in: self.db)
+
+      if sub?.tier == .full, sub?.stripeStatus?.isPaying == true {
+        identity.trialEmailLifecycle = .skipped
+        try await self.db.update(identity)
+        logs.append("Skipped trial email lifecycle for paid-full parent \(parentLink)")
+        continue
+      }
+
+      let onboarded = try await parent.hasConnectedApp(self.db)
+      let decision = nextTrialEmailDecision(
+        lifecycle: identity.trialEmailLifecycle,
+        trialStartedAt: trialStart,
+        hasConnectedApp: onboarded,
+        now: self.now,
       )
+      guard let decision else { continue }
+
+      if let event = decision.send {
+        try await self.postmark.send(template: emailTemplate(event, to: parent.email))
+        logs.append("Sent `.\(event)` email to parent \(parentLink)")
+      }
+      identity.trialEmailLifecycle = decision.nextLifecycle
+      try await self.db.update(identity)
     }
-    return nil
+    return logs
+  }
+
+  func refreshStaleSubscriptions() async throws -> [String] {
+    var logs: [String] = []
+    let threshold = self.now - .days(2)
+    let liveStatuses = Subscription.StripeStatus.allCases.filter { !terminal($0) }
+      .map(\.rawValue)
+    let stale = try await Subscription.query()
+      .where(.currentPeriodEnd != nil)
+      .where(.currentPeriodEnd < threshold)
+      .where(.stripeId != nil)
+      .where(.stripeStatus |=| liveStatuses)
+      .all(in: self.db)
+
+    for var sub in stale {
+      guard let oldStatus = sub.stripeStatus else { continue }
+      guard let stripeIdRaw = sub.stripeId?.rawValue else { continue }
+
+      let live: Stripe.Api.Subscription
+      do {
+        live = try await self.stripe.getSubscription(stripeIdRaw)
+      } catch {
+        continue
+      }
+
+      guard let newStatus = Subscription.StripeStatus(rawValue: live.status.rawValue) else {
+        unexpected("4d2af9c2", sub.parentId, "unknown stripe status: \(live.status.rawValue)")
+        continue
+      }
+      let newPeriodEnd = Date(timeIntervalSince1970: TimeInterval(live.currentPeriodEnd))
+      sub.stripeStatus = newStatus
+      sub.currentPeriodEnd = newPeriodEnd
+      sub.statusExpiresAt = newPeriodEnd + .days(2)
+      if let mirrored = newStatus.mirroredBillingStatus {
+        sub.billingStatus = mirrored
+      }
+      try await self.db.update(sub)
+
+      let parent = try await self.db.find(sub.parentId) as Parent
+      let onboarded = try await parent.hasConnectedApp(self.db)
+
+      if oldStatus != .pastDue, newStatus == .pastDue {
+        try await self.postmark.send(template: emailTemplate(.paidToOverdue, to: parent.email))
+        logs.append("Sent `.paidToOverdue` email to parent \(self.adminLink(for: parent))")
+      } else if !terminal(oldStatus), terminal(newStatus), onboarded {
+        try await self.postmark.send(template: emailTemplate(.overdueToUnpaid, to: parent.email))
+        logs.append("Sent `.overdueToUnpaid` email to parent \(self.adminLink(for: parent))")
+      }
+    }
+    return logs
   }
 
   func adminLink(for parent: Parent) -> String {
@@ -177,7 +169,61 @@ struct SubscriptionManager: AsyncScheduledJob {
   }
 }
 
-// helpers
+func nextTrialEmailDecision(
+  lifecycle: BillingIdentity.TrialEmailLifecycle,
+  trialStartedAt: Date,
+  hasConnectedApp: Bool,
+  now: Date,
+) -> TrialEmailDecision? {
+  let endingSoonAt = trialStartedAt + Entitlement.trialPeriod - .days(3)
+  let expiredAt = trialStartedAt + Entitlement.trialPeriod
+  let finalAt = trialStartedAt + Entitlement.trialPeriod + Entitlement.gracePeriod
+  switch lifecycle {
+  case .none where now >= endingSoonAt:
+    return .init(
+      send: .trialEndingSoon(length: 21, remaining: 3),
+      nextLifecycle: .endingSoonSent,
+    )
+  case .endingSoonSent where now >= expiredAt:
+    return .init(
+      send: hasConnectedApp ? .trialExpired(length: 21) : nil,
+      nextLifecycle: .expiredSent,
+    )
+  case .expiredSent where now >= finalAt:
+    return .init(
+      send: hasConnectedApp ? .overdueToUnpaid : nil,
+      nextLifecycle: .finalSent,
+    )
+  default:
+    return nil
+  }
+}
+
+private func terminal(_ status: Subscription.StripeStatus) -> Bool {
+  switch status {
+  case .canceled, .unpaid, .incompleteExpired: true
+  case .active, .trialing, .pastDue, .incomplete: false
+  }
+}
+
+private func emailTemplate(
+  _ event: SubscriptionEmail,
+  to address: EmailAddress,
+) -> TemplateEmail {
+  switch event {
+  case .trialEndingSoon(let length, let remaining):
+    .trialEndingSoon(
+      to: address.rawValue,
+      model: .init(length: length, remaining: remaining),
+    )
+  case .trialExpired(let length):
+    .trialExpired(to: address.rawValue, model: .init(length: length))
+  case .overdueToUnpaid:
+    .overdueToUnpaid(to: address.rawValue, model: .init())
+  case .paidToOverdue:
+    .paidToOverdue(to: address.rawValue, model: .init())
+  }
+}
 
 private extension Parent {
   func hasConnectedApp(_ db: any DuetSQL.Client) async throws -> Bool {
@@ -191,21 +237,5 @@ private extension Parent {
       try await $0.iosDevices(in: db)
     }.flatMap(\.self)
     return !iosDevices.isEmpty
-  }
-}
-
-func email(_ event: SubscriptionEmail, to address: EmailAddress) -> TemplateEmail {
-  switch event {
-  case .trialEndingSoon(let length, let remaining):
-    .trialEndingSoon(
-      to: address.rawValue,
-      model: .init(length: length, remaining: remaining),
-    )
-  case .trialExpired(let length):
-    .trialExpired(to: address.rawValue, model: .init(length: length))
-  case .overdueToUnpaid:
-    .overdueToUnpaid(to: address.rawValue, model: .init())
-  case .paidToOverdue:
-    .paidToOverdue(to: address.rawValue, model: .init())
   }
 }

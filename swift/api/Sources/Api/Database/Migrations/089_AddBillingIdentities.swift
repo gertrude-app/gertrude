@@ -24,7 +24,7 @@ struct AddBillingIdentities: GertieMigration {
           CHECK (last_paid_tier IS NULL OR last_paid_tier IN ('light', 'full')),
         trial_email_lifecycle TEXT NOT NULL DEFAULT 'none'
           CHECK (trial_email_lifecycle IN
-            ('none', 'ending_soon_sent', 'expired_sent', 'final_sent')),
+            ('none', 'ending_soon_sent', 'expired_sent', 'final_sent', 'skipped')),
         is_complimentary BOOLEAN NOT NULL DEFAULT false,
         created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()

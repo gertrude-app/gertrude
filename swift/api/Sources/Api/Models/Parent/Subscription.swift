@@ -59,6 +59,13 @@ extension Subscription {
     case canceled
     case incomplete
     case incompleteExpired = "incomplete_expired"
+
+    var isPaying: Bool {
+      switch self {
+      case .active, .pastDue: true
+      case .trialing, .unpaid, .canceled, .incomplete, .incompleteExpired: false
+      }
+    }
   }
 
   enum Tier: String, Codable, Equatable, CaseIterable, Sendable {
