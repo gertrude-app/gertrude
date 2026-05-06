@@ -163,6 +163,34 @@ private func handleInvoicePaid(
     await recordPaidAdConversion(parent: parent, db: db)
     notifyFirstPayment(parent: parent, tier: eventTier)
   }
+
+  if var identity = try await parent.billingIdentity(in: db) {
+    var changed = false
+    if let customerId, identity.stripeCustomerId?.rawValue != customerId {
+      identity.stripeCustomerId = .init(customerId)
+      changed = true
+    }
+    if identity.stripeCustomerId != nil,
+       identity.lastStripeSubscriptionId?.rawValue != eventSubscriptionId {
+      identity.lastStripeSubscriptionId = .init(eventSubscriptionId)
+      changed = true
+    }
+    if identity.stripeCustomerId != nil, identity.lastPaidTier != eventTier {
+      identity.lastPaidTier = eventTier
+      changed = true
+    }
+    if changed {
+      try await db.update(identity)
+    }
+  } else if let customerId {
+    let identity = BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init(customerId),
+      lastStripeSubscriptionId: .init(eventSubscriptionId),
+      lastPaidTier: eventTier,
+    )
+    try await db.create(identity)
+  }
 }
 
 private func handleSubscriptionUpdated(
@@ -230,6 +258,15 @@ private func handleSubscriptionUpdated(
     subscription.currentPeriodEnd = Date(timeIntervalSince1970: TimeInterval(periodEnd))
   }
   try await db.update(subscription)
+
+  if stripeStatus.isPaying {
+    let parent = try await db.find(subscription.parentId) as Parent
+    if var identity = try await parent.billingIdentity(in: db),
+       identity.lastPaidTier != eventTier {
+      identity.lastPaidTier = eventTier
+      try await db.update(identity)
+    }
+  }
 }
 
 extension Subscription.StripeStatus {

@@ -1,6 +1,8 @@
 import Foundation
+import TSCodable
 import XCore
 
+@TSCodable
 enum Entitlement: Equatable, Sendable {
   case free
   case light

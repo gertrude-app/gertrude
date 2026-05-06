@@ -160,9 +160,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     let logs = try await SubscriptionManager().advanceTrialEmails()
     expect(logs.count).toEqual(1)
 
-    let identity = try await BillingIdentity.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
     expect(self.sent.emails.count).toEqual(1)
     expect(self.sent.emails[0].to).toEqual(parent.email.rawValue)
@@ -188,9 +186,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     _ = try await SubscriptionManager().advanceTrialEmails()
 
-    let identity = try await BillingIdentity.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
     expect(self.sent.emails.count).toEqual(1)
     expect(self.sent.emails[0].template).toBe("trial-ending-soon")
@@ -215,11 +211,45 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     _ = try await SubscriptionManager().advanceTrialEmails()
 
-    let identity = try await BillingIdentity.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.skipped)
     expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testLapsedFullParentMarkedAsSkippedViaLastPaidTier() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_lapsed_full"),
+      fullTrialStartedAt: .reference - .days(50),
+      lastStripeSubscriptionId: .init("sub_old_full"),
+      lastPaidTier: .full,
+      trialEmailLifecycle: .none,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.skipped)
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testLapsedLightParentDoesNotShortCircuit() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_lapsed_light"),
+      fullTrialStartedAt: .reference - .days(18),
+      lastStripeSubscriptionId: .init("sub_old_light"),
+      lastPaidTier: .light,
+      trialEmailLifecycle: .none,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
+    expect(self.sent.emails.count).toEqual(1)
   }
 
   func testComplimentaryIdentityIgnored() async throws {
@@ -233,9 +263,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     _ = try await SubscriptionManager().advanceTrialEmails()
 
-    let identity = try await BillingIdentity.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.none)
     expect(self.sent.emails.count).toEqual(0)
   }
@@ -287,9 +315,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     _ = try await SubscriptionManager().advanceTrialEmails()
 
-    let identity = try await BillingIdentity.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.expiredSent)
     expect(self.sent.emails.count).toEqual(1)
     expect(self.sent.emails[0].template).toBe("trial-expired")
@@ -305,9 +331,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     _ = try await SubscriptionManager().advanceTrialEmails()
 
-    let identity = try await BillingIdentity.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.expiredSent)
     expect(self.sent.emails.count).toEqual(0)
   }
@@ -343,9 +367,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       _ = try await SubscriptionManager().refreshStaleSubscriptions()
     }
 
-    let sub = try await Subscription.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.active)
     expect(sub.currentPeriodEnd).toEqual(nextPeriodEnd)
     expect(sub.statusExpiresAt).toEqual(nextPeriodEnd + .days(2))
@@ -375,9 +397,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       _ = try await SubscriptionManager().refreshStaleSubscriptions()
     }
 
-    let sub = try await Subscription.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.pastDue)
     expect(sub.billingStatus).toEqual(.overdue)
     expect(self.sent.emails.count).toEqual(1)
@@ -406,9 +426,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       _ = try await SubscriptionManager().refreshStaleSubscriptions()
     }
 
-    let sub = try await Subscription.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.canceled)
     expect(sub.billingStatus).toEqual(.cancelled)
     expect(self.sent.emails.count).toEqual(1)
@@ -460,9 +478,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       _ = try await SubscriptionManager().refreshStaleSubscriptions()
     }
 
-    let sub = try await Subscription.query()
-      .where(.parentId == parent.id)
-      .first(in: self.db)
+    let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.active)
     expect(self.sent.emails.count).toEqual(0)
   }

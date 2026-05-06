@@ -139,6 +139,7 @@ private func entitle(
       tier: tier,
       billingStatus: .paid,
       stripeId: .init("sub_test"),
+      stripeStatus: .active,
       statusExpiresAt: .distantFuture,
     )
   }

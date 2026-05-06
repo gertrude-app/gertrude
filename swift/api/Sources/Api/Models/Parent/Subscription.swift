@@ -66,6 +66,18 @@ extension Subscription {
       case .trialing, .unpaid, .canceled, .incomplete, .incompleteExpired: false
       }
     }
+
+    /// True when a live Stripe subscription object backs the parent's access.
+    /// Distinct from `isPaying` in that `.trialing` is included: a trialing sub is
+    /// live substrate (Stripe object exists, user has access) even though no money
+    /// has changed hands yet. We don't currently produce `.trialing` subs (we don't
+    /// pass `trial_period_days` to checkout), but we may in the future.
+    var isLive: Bool {
+      switch self {
+      case .active, .trialing, .pastDue: true
+      case .unpaid, .canceled, .incomplete, .incompleteExpired: false
+      }
+    }
   }
 
   enum Tier: String, Codable, Equatable, CaseIterable, Sendable {

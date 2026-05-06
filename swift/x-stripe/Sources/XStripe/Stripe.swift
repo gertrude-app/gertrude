@@ -58,8 +58,10 @@ public enum Stripe {
             }
           }
 
+          public let id: String
           public let price: Price
-          public init(price: Price) {
+          public init(id: String, price: Price) {
+            self.id = id
             self.price = price
           }
         }
@@ -90,6 +92,47 @@ public enum Stripe {
         self.customer = customer
         self.currentPeriodEnd = currentPeriodEnd
         self.items = Items(data: items)
+      }
+    }
+
+    public struct UpdateSubscriptionData: Equatable {
+      public enum ProrationBehavior: String {
+        case alwaysInvoice = "always_invoice"
+        case createProrations = "create_prorations"
+        case none
+      }
+
+      public enum PaymentBehavior: String {
+        case errorIfIncomplete = "error_if_incomplete"
+        case allowIncomplete = "allow_incomplete"
+      }
+
+      public enum BillingCycleAnchor: String {
+        case now
+        case unchanged
+      }
+
+      public let subscriptionId: String
+      public let itemId: String
+      public let priceId: String
+      public let prorationBehavior: ProrationBehavior
+      public let paymentBehavior: PaymentBehavior
+      public let billingCycleAnchor: BillingCycleAnchor
+
+      public init(
+        subscriptionId: String,
+        itemId: String,
+        priceId: String,
+        prorationBehavior: ProrationBehavior = .alwaysInvoice,
+        paymentBehavior: PaymentBehavior = .errorIfIncomplete,
+        billingCycleAnchor: BillingCycleAnchor = .now,
+      ) {
+        self.subscriptionId = subscriptionId
+        self.itemId = itemId
+        self.priceId = priceId
+        self.prorationBehavior = prorationBehavior
+        self.paymentBehavior = paymentBehavior
+        self.billingCycleAnchor = billingCycleAnchor
       }
     }
 
@@ -158,6 +201,7 @@ public enum Stripe {
     public let lineItems: [LineItem]
     public let mode: Mode
     public let clientReferenceId: String?
+    public let customer: String?
     public let customerEmail: String?
     public let trialPeriodDays: Int?
     public let trialEndBehavior: TrialEndBehavior?
@@ -169,6 +213,7 @@ public enum Stripe {
       lineItems: [Stripe.CheckoutSessionData.LineItem],
       mode: Stripe.CheckoutSessionData.Mode,
       clientReferenceId: String?,
+      customer: String? = nil,
       customerEmail: String?,
       trialPeriodDays: Int?,
       trialEndBehavior: TrialEndBehavior?,
@@ -179,6 +224,7 @@ public enum Stripe {
       self.lineItems = lineItems
       self.mode = mode
       self.clientReferenceId = clientReferenceId
+      self.customer = customer
       self.customerEmail = customerEmail
       self.trialPeriodDays = trialPeriodDays
       self.trialEndBehavior = trialEndBehavior
