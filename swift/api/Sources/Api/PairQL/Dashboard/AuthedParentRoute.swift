@@ -40,9 +40,13 @@ enum AuthedParentRoute: PairRoute {
   case saveNotification(SaveNotification.Input)
   case saveUser(SaveUser.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
+  case getSubscriptionPanel
+  case openBillingPortal(OpenBillingPortal.Input)
+  case startCheckoutSession(StartCheckoutSession.Input)
   case stripeUrl_v2(StripeUrl_v2.Input)
   case securityEventsFeed
   case startFullTrial
+  case upgradeSubscriptionTier(UpgradeSubscriptionTier.Input)
   case updateUnlockRequest(UpdateUnlockRequest.Input)
   case requestPublicKeychain(RequestPublicKeychain.Input)
   case upsertBlockRule(UpsertBlockRule.Input)
@@ -201,6 +205,21 @@ extension AuthedParentRoute {
         Route(.case(Self.stripeUrl_v2)) {
           Operation(StripeUrl_v2.self)
           Body(.dashboardInput(StripeUrl_v2.self))
+        }
+        Route(.case(Self.getSubscriptionPanel)) {
+          Operation(GetSubscriptionPanel.self)
+        }
+        Route(.case(Self.openBillingPortal)) {
+          Operation(OpenBillingPortal.self)
+          Body(.dashboardInput(OpenBillingPortal.self))
+        }
+        Route(.case(Self.startCheckoutSession)) {
+          Operation(StartCheckoutSession.self)
+          Body(.dashboardInput(StartCheckoutSession.self))
+        }
+        Route(.case(Self.upgradeSubscriptionTier)) {
+          Operation(UpgradeSubscriptionTier.self)
+          Body(.dashboardInput(UpgradeSubscriptionTier.self))
         }
         Route(.case(Self.securityEventsFeed)) {
           Operation(SecurityEventsFeed.self)
@@ -367,6 +386,18 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .stripeUrl_v2(let input):
       let output = try await StripeUrl_v2.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getSubscriptionPanel:
+      let output = try await GetSubscriptionPanel.resolve(in: context)
+      return try await self.respond(with: output)
+    case .openBillingPortal(let input):
+      let output = try await OpenBillingPortal.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .startCheckoutSession(let input):
+      let output = try await StartCheckoutSession.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .upgradeSubscriptionTier(let input):
+      let output = try await UpgradeSubscriptionTier.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .securityEventsFeed:
       let output = try await SecurityEventsFeed.resolve(in: context)

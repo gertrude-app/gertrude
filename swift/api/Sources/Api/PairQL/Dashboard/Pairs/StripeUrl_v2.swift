@@ -148,6 +148,7 @@ private func billingPortalSessionUrl(
   let portal = try await stripe.createBillingPortalSession(
     subscription.customer,
     configuration,
+    nil,
   )
   return portal.url
 }

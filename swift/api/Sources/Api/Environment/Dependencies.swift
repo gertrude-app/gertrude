@@ -141,6 +141,7 @@ private enum LoggerKey: DependencyKey {
       getCheckoutSession: unimplemented("Stripe.Client.getCheckoutSession()"),
       createCheckoutSession: unimplemented("Stripe.Client.createCheckoutSession()"),
       getSubscription: unimplemented("Stripe.Client.getSubscription()"),
+      updateSubscription: unimplemented("Stripe.Client.updateSubscription()"),
       createBillingPortalSession: unimplemented("Stripe.Client.createBillingPortalSession()"),
     )
   }

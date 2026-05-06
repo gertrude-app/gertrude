@@ -115,9 +115,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.statusExpiresAt).toEqual(expectedNewStatusExpiration)
     })
   }
@@ -145,9 +143,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.billingStatus).toEqual(.cancelled)
       expect(retrieved.statusExpiresAt).toEqual(.distantFuture)
     })
@@ -195,9 +191,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.statusExpiresAt).toEqual(expectedNewStatusExpiration)
     })
   }
@@ -305,9 +299,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.tier).toEqual(.full)
       expect(retrieved.stripeStatus).toEqual(.active)
       expect(retrieved.currentPeriodEnd)
@@ -354,9 +346,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     """
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.tier).toEqual(.full)
       expect(retrieved.stripeStatus).toEqual(.pastDue)
       expect(retrieved.billingStatus).toEqual(.overdue)
@@ -394,9 +384,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     """
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.stripeStatus).toEqual(.trialing)
       expect(retrieved.billingStatus).toEqual(.paid)
     })
@@ -467,9 +455,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       }
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-        let retrieved = try await Subscription.query()
-          .where(.parentId == parent.id)
-          .first(in: self.db)
+        let retrieved = try await parent.model.subscription(in: self.db)!
         expect(retrieved.stripeId?.rawValue).toEqual(existingSubId)
       })
     }
@@ -507,9 +493,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       }
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-        let retrieved = try await Subscription.query()
-          .where(.parentId == parent.id)
-          .first(in: self.db)
+        let retrieved = try await parent.model.subscription(in: self.db)!
         expect(retrieved.stripeId?.rawValue).toEqual(incomingSubId)
         expect(retrieved.tier).toEqual(.full)
       })
@@ -547,9 +531,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       }
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-        let retrieved = try await Subscription.query()
-          .where(.parentId == parent.id)
-          .first(in: self.db)
+        let retrieved = try await parent.model.subscription(in: self.db)!
         expect(retrieved.stripeId?.rawValue).toEqual(incomingSubId)
       })
     }
@@ -577,9 +559,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       }
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-        let retrieved = try await Subscription.query()
-          .where(.parentId == parent.id)
-          .first(in: self.db)
+        let retrieved = try await parent.model.subscription(in: self.db)!
         expect(retrieved.stripeId?.rawValue).toEqual(existingSubId)
       })
     }
@@ -622,9 +602,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
-      let retrieved = try await Subscription.query()
-        .where(.parentId == parent.id)
-        .first(in: self.db)
+      let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.billingStatus).toEqual(.cancelled)
       expect(retrieved.tier).toEqual(.light)
     })

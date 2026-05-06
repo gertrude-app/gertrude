@@ -88,7 +88,8 @@ struct SubscriptionManager: AsyncScheduledJob {
       let parentLink = self.adminLink(for: parent)
       let sub = try await parent.subscription(in: self.db)
 
-      if sub?.tier == .full, sub?.stripeStatus?.isPaying == true {
+      let currentlyPaidFull = sub?.tier == .full && sub?.stripeStatus?.isPaying == true
+      if currentlyPaidFull || identity.lastPaidTier == .full {
         identity.trialEmailLifecycle = .skipped
         try await self.db.update(identity)
         logs.append("Skipped trial email lifecycle for paid-full parent \(parentLink)")

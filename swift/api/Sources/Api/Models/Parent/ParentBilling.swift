@@ -9,7 +9,12 @@ struct ParentBilling: Sendable {
       return .complimentary
     }
 
-    if self.stripeSubscription?.tier == .full {
+    let liveSub: Subscription? =
+      self.stripeSubscription?.stripeStatus?.isLive == true
+        ? self.stripeSubscription
+        : nil
+
+    if liveSub?.tier == .full {
       return .full
     }
 
@@ -24,7 +29,7 @@ struct ParentBilling: Sendable {
       }
     }
 
-    guard let sub = self.stripeSubscription else {
+    guard let sub = liveSub else {
       return .free
     }
 

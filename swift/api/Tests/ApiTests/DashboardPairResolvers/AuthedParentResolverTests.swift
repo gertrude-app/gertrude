@@ -19,7 +19,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
         expect(subId).toBe("sub_123")
         return .init(id: "sub_123", status: .active, customer: "cus_123", currentPeriodEnd: 0)
       }
-      $0.stripe.createBillingPortalSession = { cusId, _ in
+      $0.stripe.createBillingPortalSession = { cusId, _, _ in
         expect(cusId).toBe("cus_123")
         return .init(id: "bps_123", url: "bps-url")
       }
@@ -197,7 +197,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
           status: .active,
           customer: "cus_123",
           currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31)).timeIntervalSince1970),
-          items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+          items: [.init(id: "si_test", price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
         )
       }
     } operation: {
@@ -241,7 +241,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
             customer: "cus_x",
             currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31))
               .timeIntervalSince1970),
-            items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+            items: [.init(id: "si_test", price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
           )
         }
         return .init(id: id, status: .active, customer: "cus_x", currentPeriodEnd: 0)
@@ -289,7 +289,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
             customer: "cus_x",
             currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31))
               .timeIntervalSince1970),
-            items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+            items: [.init(id: "si_test", price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
           )
         }
         return .init(id: id, status: .canceled, customer: "cus_x", currentPeriodEnd: 0)
