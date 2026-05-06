@@ -42,5 +42,6 @@ extension BillingIdentity {
     case endingSoonSent = "ending_soon_sent"
     case expiredSent = "expired_sent"
     case finalSent = "final_sent"
+    case skipped
   }
 }
