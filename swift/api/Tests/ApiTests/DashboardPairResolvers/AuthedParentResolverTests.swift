@@ -214,6 +214,99 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.subscription!.statusExpiresAt).toEqual(Date.reference + .days(33))
   }
 
+  func testHandleCheckoutSuccessRejectsDuplicateAgainstActiveSub() async throws {
+    let sessionId = "cs_\("".random)"
+    let existingSubId = "sub_existing_\("".random)"
+    let incomingSubId = "sub_incoming_\("".random)"
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = .init(existingSubId)
+      $1.billingStatus = .paid
+      $1.tier = .full
+    }
+
+    let output = try await withDependencies {
+      $0.stripe.getCheckoutSession = { _ in
+        .init(
+          id: sessionId,
+          url: nil,
+          subscription: incomingSubId,
+          clientReferenceId: parent.id.lowercased,
+        )
+      }
+      $0.stripe.getSubscription = { id in
+        if id == incomingSubId {
+          return .init(
+            id: id,
+            status: .active,
+            customer: "cus_x",
+            currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31))
+              .timeIntervalSince1970),
+            items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+          )
+        }
+        return .init(id: id, status: .active, customer: "cus_x", currentPeriodEnd: 0)
+      }
+    } operation: {
+      try await HandleCheckoutSuccess.resolve(
+        with: .init(stripeCheckoutSessionId: sessionId),
+        in: context(parent.model),
+      )
+    }
+
+    expect(output).toEqual(.success)
+    let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
+    expect(retrieved.subscription!.stripeId?.rawValue).toEqual(existingSubId)
+
+    let alarms = self.sent.slacks.filter { $0.message.channel == "unexpected-errors" }
+    expect(alarms.count).toEqual(1)
+    expect(alarms[0].message.text.contains("DUPLICATE SUBSCRIPTION ATTEMPT")).toBeTrue()
+  }
+
+  func testHandleCheckoutSuccessAllowsOverwriteWhenExistingSubIsCanceled() async throws {
+    let sessionId = "cs_\("".random)"
+    let existingSubId = "sub_existing_\("".random)"
+    let incomingSubId = "sub_incoming_\("".random)"
+    let parent = try await self.parentWithSubscription {
+      $1.stripeId = .init(existingSubId)
+      $1.billingStatus = .cancelled
+      $1.tier = .light
+    }
+
+    let output = try await withDependencies {
+      $0.stripe.getCheckoutSession = { _ in
+        .init(
+          id: sessionId,
+          url: nil,
+          subscription: incomingSubId,
+          clientReferenceId: parent.id.lowercased,
+        )
+      }
+      $0.stripe.getSubscription = { id in
+        if id == incomingSubId {
+          return .init(
+            id: id,
+            status: .active,
+            customer: "cus_x",
+            currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31))
+              .timeIntervalSince1970),
+            items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+          )
+        }
+        return .init(id: id, status: .canceled, customer: "cus_x", currentPeriodEnd: 0)
+      }
+    } operation: {
+      try await HandleCheckoutSuccess.resolve(
+        with: .init(stripeCheckoutSessionId: sessionId),
+        in: context(parent.model),
+      )
+    }
+
+    expect(output).toEqual(.success)
+    let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
+    expect(retrieved.subscription!.stripeId?.rawValue).toEqual(incomingSubId)
+    expect(retrieved.subscription!.tier).toEqual(.full)
+  }
+
   func testGetParentWithNotifications() async throws {
     let parent = try await self.parentWithSubscription {
       $1.billingStatus = .paid

@@ -54,10 +54,22 @@ extension HandleCheckoutSuccess: Resolver {
       default:
         if model.stripeId == nil {
           notifyFirstPayment(parent: parent, tier: tier)
+        } else if model.stripeId?.rawValue != subscriptionId {
+          let allow = try await reconcileDuplicateSubscription(
+            parent: parent,
+            existingSubId: model.stripeId!.rawValue,
+            incomingSubId: subscriptionId,
+            context: "checkout-success",
+            audit: "checkout_session_id: \(input.stripeCheckoutSessionId)",
+            db: context.db,
+          )
+          guard allow else { return .success }
         }
         model.tier = tier
         model.billingStatus = .paid
         model.stripeId = .init(subscriptionId)
+        model.stripeStatus = .active
+        model.currentPeriodEnd = expiration
         model.statusExpiresAt = expiration + .days(2)
         try await context.db.update(model)
       }
@@ -68,6 +80,8 @@ extension HandleCheckoutSuccess: Resolver {
         tier: tier,
         billingStatus: .paid,
         stripeId: .init(subscriptionId),
+        stripeStatus: .active,
+        currentPeriodEnd: expiration,
         statusExpiresAt: expiration + .days(2),
       ))
       notifyFirstPayment(parent: parent, tier: tier)

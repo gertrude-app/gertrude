@@ -209,6 +209,8 @@ extension Subscription {
     case tier
     case billingStatus
     case stripeId
+    case stripeStatus
+    case currentPeriodEnd
     case isLegacyPrice
     case trialStartedAt
     case statusExpiresAt
@@ -449,6 +451,7 @@ extension StripeEvent {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case json
+    case stripeEventId
     case createdAt
   }
 }
