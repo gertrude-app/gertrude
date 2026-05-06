@@ -6,6 +6,8 @@ struct Subscription: Codable, Sendable {
   var tier: Tier
   var billingStatus: BillingStatus.Db?
   var stripeId: StripeId?
+  var stripeStatus: StripeStatus?
+  var currentPeriodEnd: Date?
   var isLegacyPrice: Bool
   var trialStartedAt: Date?
   var statusExpiresAt: Date
@@ -18,6 +20,8 @@ struct Subscription: Codable, Sendable {
     tier: Tier,
     billingStatus: BillingStatus.Db? = nil,
     stripeId: StripeId? = nil,
+    stripeStatus: StripeStatus? = nil,
+    currentPeriodEnd: Date? = nil,
     trialStartedAt: Date? = nil,
     statusExpiresAt: Date,
   ) {
@@ -26,6 +30,8 @@ struct Subscription: Codable, Sendable {
     self.tier = tier
     self.billingStatus = billingStatus
     self.stripeId = stripeId
+    self.stripeStatus = stripeStatus
+    self.currentPeriodEnd = currentPeriodEnd
     self.trialStartedAt = trialStartedAt
     self.statusExpiresAt = statusExpiresAt
     self.isLegacyPrice = false
@@ -45,6 +51,16 @@ extension BillingStatus {
 }
 
 extension Subscription {
+  enum StripeStatus: String, Codable, Equatable, CaseIterable, Sendable {
+    case active
+    case trialing
+    case pastDue = "past_due"
+    case unpaid
+    case canceled
+    case incomplete
+    case incompleteExpired = "incomplete_expired"
+  }
+
   enum Tier: String, Codable, Equatable, CaseIterable, Sendable {
     case light
     case full

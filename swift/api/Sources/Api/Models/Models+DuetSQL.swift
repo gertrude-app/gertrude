@@ -242,6 +242,8 @@ extension Subscription: Model {
     case .tier: .enum(self.tier)
     case .billingStatus: .enum(self.billingStatus)
     case .stripeId: .string(self.stripeId?.rawValue)
+    case .stripeStatus: .string(self.stripeStatus?.rawValue)
+    case .currentPeriodEnd: .date(self.currentPeriodEnd)
     case .isLegacyPrice: .bool(self.isLegacyPrice)
     case .trialStartedAt: .date(self.trialStartedAt)
     case .statusExpiresAt: .date(self.statusExpiresAt)
@@ -257,6 +259,8 @@ extension Subscription: Model {
       .tier: .enum(self.tier),
       .billingStatus: .enum(self.billingStatus),
       .stripeId: .string(self.stripeId?.rawValue),
+      .stripeStatus: .string(self.stripeStatus?.rawValue),
+      .currentPeriodEnd: .date(self.currentPeriodEnd),
       .isLegacyPrice: .bool(self.isLegacyPrice),
       .trialStartedAt: .date(self.trialStartedAt),
       .statusExpiresAt: .date(self.statusExpiresAt),
@@ -1126,6 +1130,7 @@ extension StripeEvent: Model {
     switch column {
     case .id: .id(self)
     case .json: .string(self.json)
+    case .stripeEventId: .string(self.stripeEventId)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1134,6 +1139,7 @@ extension StripeEvent: Model {
     [
       .id: .id(self),
       .json: .string(self.json),
+      .stripeEventId: .string(self.stripeEventId),
       .createdAt: .currentTimestamp,
     ]
   }
