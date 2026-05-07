@@ -49,7 +49,7 @@ extension IOSRoute: RouteResponder {
       }
 
     case .authed(let uuid, let authedRoute):
-      let token = try await IOSApp.Token.query()
+      let token = try await BlockerApp.Token.query()
         .where(.value == uuid)
         .first(in: context.db, orThrow: context.error(
           id: "3aecf9fd",
@@ -68,13 +68,15 @@ extension IOSRoute: RouteResponder {
           appTag: .iosDeviceTokenNotFound,
         )
       }
+      let install = try await device.install(in: context.db)
 
       context.telemetry.parentId = child.parentId
-      let childContext = IOSApp.ChildContext(
+      let childContext = BlockerApp.ChildContext(
         requestId: context.requestId,
         dashboardUrl: context.dashboardUrl,
         child: child,
         device: device,
+        install: install,
         telemetry: context.telemetry,
       )
       return try await AuthedRoute.respond(to: authedRoute, in: childContext)

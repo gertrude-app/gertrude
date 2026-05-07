@@ -9,14 +9,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_newChild_createsChildAndAssignsBlockGroups() async throws {
     let parent = try await self.parent()
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone18,1",
-      appVersion: "1.5.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -45,12 +44,12 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let updatedDevice = try await self.db.find(device.id)
     expect(updatedDevice.childId).toEqual(children[0].id)
 
-    let supervision = try await IOSApp.Supervision.query()
+    let supervision = try await BlockerApp.Supervision.query()
       .where(.deviceId == device.id)
       .first(in: self.db)
     expect(supervision.claimedAt).not.toBeNil()
 
-    let deviceBlockGroups = try await IOSApp.DeviceBlockGroup.query()
+    let deviceBlockGroups = try await BlockerApp.DeviceBlockGroup.query()
       .where(.deviceId == device.id)
       .all(in: self.db)
     expect(deviceBlockGroups.count).toEqual(8)
@@ -70,14 +69,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     expect(numPriorChildren).toEqual(1)
 
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPad14,8",
-      appVersion: "1.5.0",
       iosVersion: "26.1",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -118,14 +116,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testCodeExpired_throwsError() async throws {
     let parent = try await self.parent()
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone17,1",
-      appVersion: "1.5.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(1),
@@ -147,14 +144,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: otherChild.id,
       modelIdentifier: "iPhone17,1",
-      appVersion: "1.5.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -179,14 +175,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone17,1",
-      appVersion: "1.5.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -209,14 +204,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone18,2",
-      appVersion: "1.0.0",
       iosVersion: "18.0",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(30),

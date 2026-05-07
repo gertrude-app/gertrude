@@ -1,10 +1,10 @@
 import DuetSQL
 import GertieIOS
 
-extension IOSApp {
+extension BlockerApp {
   struct BlockRule: Codable, Sendable {
     var id: Id
-    var deviceId: Device.Id?
+    var deviceId: IOSDevice.Id?
     var rule: GertieIOS.BlockRule
     var groupId: BlockGroup.Id?
     var comment: String?
@@ -13,7 +13,7 @@ extension IOSApp {
 
     init(
       id: Id = .init(),
-      deviceId: Device.Id? = nil,
+      deviceId: IOSDevice.Id? = nil,
       rule: GertieIOS.BlockRule,
       groupId: BlockGroup.Id? = nil,
       comment: String? = nil,
@@ -27,12 +27,12 @@ extension IOSApp {
   }
 }
 
-extension IOSApp.BlockRule {
-  func device(in db: any DuetSQL.Client) async throws -> IOSApp.Device? {
+extension BlockerApp.BlockRule {
+  func device(in db: any DuetSQL.Client) async throws -> IOSDevice? {
     guard let deviceId = self.deviceId else {
       return nil
     }
-    return try await IOSApp.Device.query()
+    return try await IOSDevice.query()
       .where(.id == deviceId)
       .first(in: db)
   }

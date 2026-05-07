@@ -1,7 +1,7 @@
 import Duet
 import GertieIOS
 
-extension IOSApp {
+extension BlockerApp {
   struct BlockGroup: Codable, Sendable {
     var id: Id
     var name: String

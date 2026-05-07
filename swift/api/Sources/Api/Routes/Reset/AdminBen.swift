@@ -9,7 +9,7 @@ enum AdminBen {
   enum Ids {
     static let ben = Parent.Id.from("BE100000-0000-0000-0000-000000000000")
     static let lukesId = Child.Id.from("00000000-BE10-BE10-0000-000000000000")
-    static let lukesDevice = IOSApp.Device.Id.from("DD00BE10-0000-0000-0000-000000000000")
+    static let lukesDevice = IOSDevice.Id.from("DD00BE10-0000-0000-0000-000000000000")
   }
 
   static func create() async throws {
@@ -47,15 +47,19 @@ enum AdminBen {
       screenshotsEnabled: false,
     ))
 
-    let device = try await db.create(IOSApp.Device(
+    let device = try await db.create(IOSDevice(
       id: Ids.lukesDevice,
       childId: luke.id,
       modelIdentifier: "iPhone16,1",
-      appVersion: "1.7.0",
       iosVersion: "26.2",
     ))
 
-    try await db.create(IOSApp.Supervision(
+    try await db.create(BlockerApp.Install(
+      deviceId: device.id,
+      appVersion: "1.7.0",
+    ))
+
+    try await db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: 123_456,
       claimCodeExpiresAt: Date() + .days(30),
@@ -65,7 +69,7 @@ enum AdminBen {
       profileInstalledAt: Date() - .days(7),
     ))
 
-    let gifs = IOSApp.BlockGroup.Id(CreateBlockGroups.GroupIds().gifs)
-    try await db.create([IOSApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: gifs)])
+    let gifs = BlockerApp.BlockGroup.Id(CreateBlockGroups.GroupIds().gifs)
+    try await db.create([BlockerApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: gifs)])
   }
 }

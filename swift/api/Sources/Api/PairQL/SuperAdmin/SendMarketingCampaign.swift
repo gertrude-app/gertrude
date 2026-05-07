@@ -152,7 +152,7 @@ struct IosOnlyMacTrialAudience: CustomQueryable {
        WHERE EXISTS (
          SELECT 1 FROM parent.children c
            JOIN child.ios_devices d ON d.child_id = c.id
-           JOIN child.iosapp_tokens t ON t.device_id = d.id
+           JOIN blocker_app.tokens t ON t.device_id = d.id
           WHERE c.parent_id = p.id
        )
        AND NOT EXISTS (SELECT 1 FROM parent.computers cmp WHERE cmp.parent_id = p.id)
@@ -173,7 +173,7 @@ struct IosOnlyMacTrialAudience: CustomQueryable {
     FROM audience a
     JOIN parent.children c ON c.parent_id = a.id
     JOIN child.ios_devices d ON d.child_id = c.id
-    JOIN child.iosapp_tokens t ON t.device_id = d.id
+    JOIN blocker_app.tokens t ON t.device_id = d.id
     GROUP BY a.id, a.email, c.id, c.name, c.created_at
     ORDER BY a.email, c.created_at ASC
     """)

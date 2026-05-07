@@ -5,7 +5,7 @@ import Vapor
 
 extension CheckSupervisionFlowStatus: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
-    let supervision = try? await IOSApp.Supervision.query()
+    let supervision = try? await BlockerApp.Supervision.query()
       .where(.claimCode == input.code)
       .first(in: ctx.db)
 
@@ -28,14 +28,14 @@ extension CheckSupervisionFlowStatus: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
-    let token: IOSApp.Token
-    let existingToken = try? await IOSApp.Token.query()
+    let token: BlockerApp.Token
+    let existingToken = try? await BlockerApp.Token.query()
       .where(.deviceId == device.id)
       .first(in: ctx.db)
     if let existingToken {
       token = existingToken
     } else {
-      token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
+      token = try await ctx.db.create(BlockerApp.Token(deviceId: device.id))
     }
 
     let data = ChildIOSDeviceData_v2(

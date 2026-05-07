@@ -11,7 +11,7 @@ struct StripeUrl_v2: Pair {
     var successPath: String
     var cancelPath: String
     var tier: Subscription.Tier?
-    var associatedIosDeviceId: IOSApp.Device.Id?
+    var associatedIosDeviceId: IOSDevice.Id?
   }
 
   struct Output: PairOutput {
@@ -85,7 +85,7 @@ private func checkoutSessionUrl(
   tier: Subscription.Tier,
   successPath: String,
   cancelPath: String,
-  iosDeviceId: IOSApp.Device.Id?,
+  iosDeviceId: IOSDevice.Id?,
   in context: ParentContext,
 ) async throws -> String {
   let sessionData = Stripe.CheckoutSessionData(

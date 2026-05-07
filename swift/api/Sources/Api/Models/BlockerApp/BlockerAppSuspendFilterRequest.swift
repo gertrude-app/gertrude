@@ -2,10 +2,10 @@ import DuetSQL
 import Gertie
 import TaggedTime
 
-extension IOSApp {
+extension BlockerApp {
   struct SuspendFilterRequest: Codable, Sendable, Equatable {
     var id: Id
-    var deviceId: Device.Id
+    var deviceId: IOSDevice.Id
     var status: RequestStatus
     var duration: Seconds<Int>
     var requestComment: String?
@@ -15,7 +15,7 @@ extension IOSApp {
 
     init(
       id: Id = .init(),
-      deviceId: Device.Id,
+      deviceId: IOSDevice.Id,
       status: RequestStatus,
       duration: Seconds<Int>,
       requestComment: String? = nil,

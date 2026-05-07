@@ -295,8 +295,8 @@ struct IOSDeviceCount: CustomQueryable {
     SELECT c.\(Child.columnName(.parentId)) AS parent_id,
            COUNT(DISTINCT d.id)::int AS ios_device_count
     FROM \(table: Child.self) c
-    JOIN \(table: IOSApp.Device.self) d
-      ON d.\(IOSApp.Device.columnName(.childId)) = c.id
+    JOIN \(table: IOSDevice.self) d
+      ON d.\(IOSDevice.columnName(.childId)) = c.id
     GROUP BY c.\(Child.columnName(.parentId));
     """)
   }
@@ -309,13 +309,13 @@ struct SupervisionParents: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     .init("""
     SELECT c.\(Child.columnName(.parentId)) AS parent_id,
-           BOOL_OR(s.\(IOSApp.Supervision
+           BOOL_OR(s.\(BlockerApp.Supervision
       .columnName(.profileInstalledAt)) IS NOT NULL) AS has_completed
-    FROM \(table: IOSApp.Supervision.self) s
-    JOIN \(table: IOSApp.Device.self) d
-      ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
+    FROM \(table: BlockerApp.Supervision.self) s
+    JOIN \(table: IOSDevice.self) d
+      ON d.id = s.\(BlockerApp.Supervision.columnName(.deviceId))
     JOIN \(table: Child.self) c
-      ON c.id = d.\(IOSApp.Device.columnName(.childId))
+      ON c.id = d.\(IOSDevice.columnName(.childId))
     GROUP BY c.\(Child.columnName(.parentId));
     """)
   }

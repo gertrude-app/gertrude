@@ -7,11 +7,11 @@ import IOSRoute
 extension BlockRules_v3: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
     var disabledGroupIds = input.disabledGroups.map { Postgres.Data.uuid($0) }
-    let deviceId: IOSApp.Device.Id? = input.deviceId == .init(.zero) ? nil : .init(input.deviceId)
+    let deviceId: IOSDevice.Id? = input.deviceId == .init(.zero) ? nil : .init(input.deviceId)
     let (device, optInExclusions) = try await optInBlockGroupExclusions(deviceId, in: ctx.db)
     disabledGroupIds.append(contentsOf: optInExclusions)
 
-    let rules = try await IOSApp.BlockRule.query()
+    let rules = try await BlockerApp.BlockRule.query()
       .where(.or(
         .groupId != nil .&& .groupId |!=| disabledGroupIds,
         deviceId.map { .deviceId == $0 } ?? .never,
@@ -47,18 +47,18 @@ extension BlockRules_v3: Resolver {
 // but made them opt-in only for connected accounts, and hidden from non-connected
 // while contining to serve them to grandfathered devices, ref: a9712745
 func optInBlockGroupExclusions(
-  _ deviceId: IOSApp.Device.Id?,
+  _ deviceId: IOSDevice.Id?,
   in db: any DuetSQL.Client,
-) async throws -> (device: IOSApp.Device?, excludedGroupIds: [Postgres.Data]) {
+) async throws -> (device: IOSDevice?, excludedGroupIds: [Postgres.Data]) {
   let cutoff = ISO8601DateFormatter().date(from: "2026-04-27T12:41:29Z")!
-  let device: IOSApp.Device? = if let deviceId {
-    try? await db.find(deviceId) as IOSApp.Device
+  let device: IOSDevice? = if let deviceId {
+    try? await db.find(deviceId) as IOSDevice
   } else {
     nil
   }
   let isNewDevice = (device?.createdAt ?? .now) >= cutoff
   guard isNewDevice else { return (device, []) }
-  let optInGroups = try await IOSApp.BlockGroup.query()
+  let optInGroups = try await BlockerApp.BlockGroup.query()
     .where(.optIn == true)
     .all(in: db)
   return (device, optInGroups.map { Postgres.Data.uuid($0.id.rawValue) })

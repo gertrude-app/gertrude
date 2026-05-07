@@ -18,11 +18,11 @@ extension LogIOSEvent_v2: Resolver {
       detail = String(detail!.dropFirst("[onboarding] ".count))
     }
 
-    var deviceId: IOSApp.Device.Id?
+    var deviceId: IOSDevice.Id?
     if let vendorId = input.vendorId {
       deviceId = .init(vendorId)
-      try await IOSApp.Device.ensureExists(
-        id: deviceId!,
+      try await BlockerApp.Install.ensureExists(
+        deviceId: deviceId!,
         modelIdentifier: input.modelIdentifier,
         iosVersion: input.iOSVersion,
         appVersion: input.appVersion,

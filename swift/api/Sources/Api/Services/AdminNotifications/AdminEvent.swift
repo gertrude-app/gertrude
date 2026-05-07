@@ -30,8 +30,8 @@ enum AdminEvent: Equatable {
         requestId: MacApp.SuspendFilterRequest.Id,
       )
       case iosapp(
-        deviceId: IOSApp.Device.Id,
-        requestId: IOSApp.SuspendFilterRequest.Id,
+        deviceId: IOSDevice.Id,
+        requestId: BlockerApp.SuspendFilterRequest.Id,
       )
     }
 

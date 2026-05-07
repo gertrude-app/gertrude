@@ -44,16 +44,18 @@ struct ChildWithComputerEntities {
 @dynamicMemberLookup
 struct ChildWithIOSDeviceEntities {
   var model: Child
-  var device: IOSApp.Device
-  var token: IOSApp.Token
+  var device: IOSDevice
+  var install: BlockerApp.Install
+  var token: BlockerApp.Token
   var parent: ParentEntities
 
-  var context: IOSApp.ChildContext {
+  var context: BlockerApp.ChildContext {
     .init(
       requestId: "",
       dashboardUrl: "",
       child: self.model,
       device: self.device,
+      install: self.install,
       telemetry: TelemetryBag(),
     )
   }
@@ -182,9 +184,18 @@ extension ApiTestCase {
 
   func childWithIOSDevice() async throws -> ChildWithIOSDeviceEntities {
     let child = try await self.child()
-    let iosDevice = try await self.db.create(IOSApp.Device.mock { $0.childId = child.id })
-    let token = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
-    return .init(model: child.model, device: iosDevice, token: token, parent: child.parent)
+    let iosDevice = try await self.db.create(IOSDevice.mock { $0.childId = child.id })
+    let install = try await self.db.create(
+      BlockerApp.Install.mock { $0.deviceId = iosDevice.id },
+    )
+    let token = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
+    return .init(
+      model: child.model,
+      device: iosDevice,
+      install: install,
+      token: token,
+      parent: child.parent,
+    )
   }
 
   func childWithComputer() async throws -> ChildWithComputerEntities {

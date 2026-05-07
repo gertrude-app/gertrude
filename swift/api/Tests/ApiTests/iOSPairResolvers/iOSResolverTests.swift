@@ -34,12 +34,13 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.deviceId).toEqual(.init(vendorId))
     expect(retrieved.detail).toEqual("first launch")
 
-    let device = try await IOSApp.Device.query()
+    let device = try await IOSDevice.query()
       .where(.id == vendorId)
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone18,2")
     expect(device.iosVersion).toEqual("18.0.1")
-    expect(device.appVersion).toEqual("1.5.0")
+    let install = try await device.install(in: self.db)
+    expect(install.appVersion).toEqual("1.5.0")
   }
 
   func testLogIOSEvent_legacy() async throws {
@@ -67,18 +68,17 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.deviceId).toEqual(.init(vendorId))
     expect(retrieved.detail).toEqual("first launch")
 
-    let device = try await IOSApp.Device.query()
+    let device = try await IOSDevice.query()
       .where(.id == vendorId)
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone,unknown")
   }
 
   func testDeviceShouldUpdateModelIdentifier() {
-    func device(_ modelIdentifier: String) -> IOSApp.Device {
-      IOSApp.Device(
+    func device(_ modelIdentifier: String) -> IOSDevice {
+      IOSDevice(
         id: .init(),
         modelIdentifier: modelIdentifier,
-        appVersion: "1.0",
         iosVersion: "18.0",
       )
     }
@@ -94,10 +94,9 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testLogIOSEvent_v2_backfillsLegacyDevice() async throws {
     let vendorId = UUID()
-    try await self.db.create(IOSApp.Device(
+    try await self.db.create(IOSDevice(
       id: .init(vendorId),
       modelIdentifier: "iPhone,unknown",
-      appVersion: "1.0.0",
       iosVersion: "17.0",
     ))
 
@@ -114,7 +113,7 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
       in: .mock,
     )
 
-    let device = try await IOSApp.Device.query()
+    let device = try await IOSDevice.query()
       .where(.id == vendorId)
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone14,2")
@@ -122,10 +121,9 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testLogIOSEvent_v1_doesNotOverwriteGoodData() async throws {
     let vendorId = UUID()
-    try await self.db.create(IOSApp.Device(
+    try await self.db.create(IOSDevice(
       id: .init(vendorId),
       modelIdentifier: "iPhone14,2",
-      appVersion: "1.0.0",
       iosVersion: "17.0",
     ))
 
@@ -141,7 +139,7 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
       in: .mock,
     )
 
-    let device = try await IOSApp.Device.query()
+    let device = try await IOSDevice.query()
       .where(.id == vendorId)
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone14,2")

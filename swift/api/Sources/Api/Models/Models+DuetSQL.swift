@@ -34,8 +34,8 @@ extension DashAnnouncement: Model {
   }
 }
 
-extension IOSApp.BlockRule: Model {
-  public static let schemaName = "iosapp"
+extension BlockerApp.BlockRule: Model {
+  public static let schemaName = "blocker_app"
   public static let tableName = "block_rules"
   public typealias ColumnName = CodingKeys
 
@@ -64,8 +64,8 @@ extension IOSApp.BlockRule: Model {
   }
 }
 
-extension IOSApp.SuspendFilterRequest: Model {
-  public static let schemaName = "iosapp"
+extension BlockerApp.SuspendFilterRequest: Model {
+  public static let schemaName = "blocker_app"
   public static let tableName = "suspend_filter_requests"
   public typealias ColumnName = CodingKeys
 
@@ -96,9 +96,9 @@ extension IOSApp.SuspendFilterRequest: Model {
   }
 }
 
-extension IOSApp.Token: Model {
-  public static let schemaName = "child"
-  public static let tableName = "iosapp_tokens"
+extension BlockerApp.Token: Model {
+  public static let schemaName = "blocker_app"
+  public static let tableName = "tokens"
   public typealias ColumnName = CodingKeys
 
   public func postgresData(for column: ColumnName) -> Postgres.Data {
@@ -122,7 +122,7 @@ extension IOSApp.Token: Model {
   }
 }
 
-extension IOSApp.Device: Model {
+extension IOSDevice: Model {
   public static let schemaName = "child"
   public static let tableName = "ios_devices"
   public typealias ColumnName = CodingKeys
@@ -132,8 +132,34 @@ extension IOSApp.Device: Model {
     case .id: .id(self)
     case .childId: .uuid(self.childId)
     case .modelIdentifier: .string(self.modelIdentifier)
-    case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .childId: .uuid(self.childId),
+      .modelIdentifier: .string(self.modelIdentifier),
+      .iosVersion: .string(self.iosVersion),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension BlockerApp.Install: Model {
+  public static let schemaName = "blocker_app"
+  public static let tableName = "installs"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .deviceId: .uuid(self.deviceId)
+    case .appVersion: .string(self.appVersion)
     case .webPolicy: .string(self.webPolicy)
     case .isProfileLocked: .bool(self.isProfileLocked)
     case .allowAppRemoval: .bool(self.allowAppRemoval)
@@ -146,10 +172,8 @@ extension IOSApp.Device: Model {
   public var insertValues: [ColumnName: Postgres.Data] {
     [
       .id: .id(self),
-      .childId: .uuid(self.childId),
-      .modelIdentifier: .string(self.modelIdentifier),
+      .deviceId: .uuid(self.deviceId),
       .appVersion: .string(self.appVersion),
-      .iosVersion: .string(self.iosVersion),
       .webPolicy: .string(self.webPolicy),
       .isProfileLocked: .bool(self.isProfileLocked),
       .allowAppRemoval: .bool(self.allowAppRemoval),
@@ -160,8 +184,8 @@ extension IOSApp.Device: Model {
   }
 }
 
-extension IOSApp.Supervision: Model {
-  public static let schemaName = "iosapp"
+extension BlockerApp.Supervision: Model {
+  public static let schemaName = "blocker_app"
   public static let tableName = "supervisions"
   public typealias ColumnName = CodingKeys
 
@@ -1223,8 +1247,8 @@ extension SecurityEvent: Model {
   }
 }
 
-extension IOSApp.BlockGroup: Model {
-  public static let schemaName = "iosapp"
+extension BlockerApp.BlockGroup: Model {
+  public static let schemaName = "blocker_app"
   public static let tableName = "block_groups"
   public typealias ColumnName = CodingKeys
 
@@ -1255,8 +1279,8 @@ extension IOSApp.BlockGroup: Model {
   }
 }
 
-extension IOSApp.DeviceBlockGroup: Model {
-  public static let schemaName = "iosapp"
+extension BlockerApp.DeviceBlockGroup: Model {
+  public static let schemaName = "blocker_app"
   public static let tableName = "device_block_groups"
   public typealias ColumnName = CodingKeys
 
@@ -1279,8 +1303,8 @@ extension IOSApp.DeviceBlockGroup: Model {
   }
 }
 
-extension IOSApp.WebPolicyDomain: Model {
-  public static let schemaName = "iosapp"
+extension BlockerApp.WebPolicyDomain: Model {
+  public static let schemaName = "blocker_app"
   public static let tableName = "web_policy_domains"
   public typealias ColumnName = CodingKeys
 
@@ -1306,7 +1330,7 @@ extension IOSApp.WebPolicyDomain: Model {
 }
 
 extension PodcastEvent: Model {
-  public static let schemaName = "podcasts"
+  public static let schemaName = "podcast_app"
   public static let tableName = "events"
   public typealias ColumnName = CodingKeys
 
@@ -1342,7 +1366,7 @@ extension PodcastEvent: Model {
 }
 
 extension IOSEvent: Model {
-  public static let schemaName = "iosapp"
+  public static let schemaName = "blocker_app"
   public static let tableName = "events"
   public typealias ColumnName = CodingKeys
 

@@ -8,12 +8,12 @@ struct UpsertBlockRule: Pair {
   static let auth: ClientAuth = .parent
 
   struct Input: PairInput {
-    var id: IOSApp.BlockRule.Id?
-    var deviceId: IOSApp.Device.Id
+    var id: BlockerApp.BlockRule.Id?
+    var deviceId: IOSDevice.Id
     var rule: GertieIOS.BlockRule
   }
 
-  typealias Output = IOSApp.BlockRule.Id
+  typealias Output = BlockerApp.BlockRule.Id
 }
 
 // resolver
@@ -35,11 +35,11 @@ extension UpsertBlockRule: Resolver {
       try await ctx.db.update(blockRule)
       return id
     } else {
-      let blockRule = IOSApp.BlockRule(deviceId: input.deviceId, rule: input.rule)
+      let blockRule = BlockerApp.BlockRule(deviceId: input.deviceId, rule: input.rule)
       let rule = try await ctx.db.create(blockRule)
       return rule.id
     }
   }
 }
 
-extension IOSApp.BlockRule.Id: @retroactive PairOutput {}
+extension BlockerApp.BlockRule.Id: @retroactive PairOutput {}

@@ -26,7 +26,7 @@ enum AuthedParentRoute: PairRoute {
   case getChildren
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
-  case iosDevice(IOSApp.Device.Id)
+  case iosDevice(IOSDevice.Id)
   case latestAppVersions
   case logEvent(LogEvent.Input)
   case userActivityFeed(UserActivityFeed.Input)

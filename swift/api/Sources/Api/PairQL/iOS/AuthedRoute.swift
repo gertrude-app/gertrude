@@ -2,12 +2,13 @@ import Dependencies
 import IOSRoute
 import Vapor
 
-extension IOSApp {
+extension BlockerApp {
   struct ChildContext: ResolverContext {
     let requestId: String
     let dashboardUrl: String
     let child: Child
-    let device: IOSApp.Device
+    let device: IOSDevice
+    let install: BlockerApp.Install
     let telemetry: TelemetryBag
 
     @Dependency(\.db) var db
@@ -15,7 +16,7 @@ extension IOSApp {
 }
 
 extension AuthedRoute: RouteResponder {
-  static func respond(to route: Self, in ctx: IOSApp.ChildContext) async throws -> Response {
+  static func respond(to route: Self, in ctx: BlockerApp.ChildContext) async throws -> Response {
     switch route {
     case .connectedRules_v2(let input):
       let output = try await ConnectedRules_v2.resolve(with: input, in: ctx)

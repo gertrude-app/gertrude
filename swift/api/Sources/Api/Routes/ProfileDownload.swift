@@ -11,7 +11,7 @@ enum ProfileDownloadRoute {
       throw Abort(.badRequest)
     }
 
-    let deviceId = IOSApp.Device.Id(uuid)
+    let deviceId = IOSDevice.Id(uuid)
     guard let device = try? await req.context.db.find(deviceId) else {
       logIOSUnusual("5ec451f9", "device not found: \(deviceId.lowercased)")
       throw Abort(.notFound)
@@ -43,7 +43,8 @@ enum ProfileDownloadRoute {
       }
     }
 
-    let xml = generateProfileXml(for: device)
+    let install = try await device.install(in: req.context.db)
+    let xml = generateProfileXml(for: device, install: install)
     let signer = with(dependency: \.profileSigner)
     let signedBytes = try signer.sign(Array(xml.utf8))
 
@@ -61,13 +62,13 @@ enum ProfileDownloadRoute {
 // @see https://developer.apple.com/documentation/devicemanagement/webcontentfilter
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
-func generateProfileXml(for device: IOSApp.Device) -> String {
+func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> String {
   var restrictionKeys = """
         <key>allowAppRemoval</key>
-        <\(device.allowAppRemoval ? "true" : "false")/>
+        <\(install.allowAppRemoval ? "true" : "false")/>
 
         <key>allowEraseContentAndSettings</key>
-        <\(device.allowEraseContentAndSettings ? "true" : "false")/>
+        <\(install.allowEraseContentAndSettings ? "true" : "false")/>
   """
   // special temporary customer workaround
   if device.id.lowercased == "ed25c68a-2dba-4854-b3bd-efe0d8523e6f" {
@@ -104,7 +105,7 @@ func generateProfileXml(for device: IOSApp.Device) -> String {
       <string>This profile allows the device to be securely managed by a Gertrude account.</string>
 
       <key>PayloadRemovalDisallowed</key>
-      <\(device.isProfileLocked ? "true" : "false")/>
+      <\(install.isProfileLocked ? "true" : "false")/>
 
       <key>PayloadContent</key>
       <array>

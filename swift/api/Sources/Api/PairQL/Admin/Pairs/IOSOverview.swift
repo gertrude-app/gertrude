@@ -99,8 +99,8 @@ private struct ScreenTimeSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
@@ -113,7 +113,7 @@ private struct ScreenTimeSuccessCount: CustomCountable {
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
       AND \(deviceId) NOT IN (
-        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        SELECT \(sDeviceId) FROM \(table: BlockerApp.Supervision.self)
         WHERE \(sProfileInstalledAt) IS NOT NULL
       )
     """)
@@ -144,15 +144,15 @@ private struct GertrudeSupervisionSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
     WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = '8d35f043'
       AND \(deviceId) IN (
-        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        SELECT \(sDeviceId) FROM \(table: BlockerApp.Supervision.self)
         WHERE \(sProfileInstalledAt) IS NOT NULL
       )
       AND \(deviceId) NOT IN (
@@ -206,8 +206,8 @@ private struct RecentInstallsQuery: CustomQueryable {
     let eventId = IOSEvent.columnName(.eventId)
     let createdAt = IOSEvent.columnName(.createdAt)
     let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let profileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let profileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT
       first_launch.\(createdAt) AS date,
@@ -227,7 +227,7 @@ private struct RecentInstallsQuery: CustomQueryable {
     ) success ON first_launch.\(deviceId) = success.\(deviceId)
     LEFT JOIN (
       SELECT \(sDeviceId)
-      FROM \(table: IOSApp.Supervision.self)
+      FROM \(table: BlockerApp.Supervision.self)
       WHERE \(profileInstalledAt) IS NOT NULL
     ) sup ON first_launch.\(deviceId) = sup.\(sDeviceId)
     ORDER BY first_launch.\(createdAt) DESC

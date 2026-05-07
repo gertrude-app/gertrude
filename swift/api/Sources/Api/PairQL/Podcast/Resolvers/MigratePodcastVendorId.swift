@@ -13,7 +13,7 @@ extension MigratePodcastVendorId: Resolver {
 
     Task {
       if context.env.mode == .prod,
-         await (try? context.db.find(IOSApp.Device.Id(rawValue: input.newVendorId))) != nil {
+         await (try? context.db.find(IOSDevice.Id(rawValue: input.newVendorId))) != nil {
         await get(dependency: \.slack).internal(
           .info,
           "Podcast migration cross-correlated with iOS app device `\(input.newVendorId)`",

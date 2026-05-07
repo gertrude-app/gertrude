@@ -32,7 +32,7 @@ struct GetIOSDeviceClaimData: Pair {
 
 extension GetIOSDeviceClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let supervision = try? await IOSApp.Supervision.query()
+    let supervision = try? await BlockerApp.Supervision.query()
       .where(.claimCode == input.code)
       .first(in: context.db)
 
@@ -80,7 +80,7 @@ extension GetIOSDeviceClaimData: Resolver {
 }
 
 private func resumeStep(
-  supervision: IOSApp.Supervision,
+  supervision: BlockerApp.Supervision,
   in context: ParentContext,
 ) async throws -> GetIOSDeviceClaimData.ResumeStep {
   if supervision.supervisedAt != nil {

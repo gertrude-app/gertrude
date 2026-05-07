@@ -152,7 +152,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   func testOverdueToUnpaid_OnboardedViaIOSDevice() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    try await self.db.create(IOSApp.Device.random { $0.childId = child.id })
+    try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let subscription = Subscription(
       parentId: parent.id,
       tier: .light,

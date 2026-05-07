@@ -85,13 +85,13 @@ private struct DeviceSummaryQuery: CustomQueryable {
     let eIosVer = IOSEvent.columnName(.iosVersion)
     let eCreatedAt = IOSEvent.columnName(.createdAt)
     let eEventId = IOSEvent.columnName(.eventId)
-    let dId = IOSApp.Device.columnName(.id)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let sId = IOSApp.Supervision.columnName(.id)
-    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
-    let sSupervisedAt = IOSApp.Supervision.columnName(.supervisedAt)
-    let sClaimedAt = IOSApp.Supervision.columnName(.claimedAt)
-    let tDeviceId = IOSApp.Token.columnName(.deviceId)
+    let dId = IOSDevice.columnName(.id)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let sId = BlockerApp.Supervision.columnName(.id)
+    let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
+    let sSupervisedAt = BlockerApp.Supervision.columnName(.supervisedAt)
+    let sClaimedAt = BlockerApp.Supervision.columnName(.claimedAt)
+    let tDeviceId = BlockerApp.Token.columnName(.deviceId)
     var stmt = SQL.Statement("""
     SELECT
       fl.\(eDeviceId),
@@ -129,9 +129,9 @@ private struct DeviceSummaryQuery: CustomQueryable {
       FROM \(table: IOSEvent.self)
       WHERE \(eEventId) = 'cdb31095'
     ) oo ON fl.\(eDeviceId) = oo.\(eDeviceId)
-    LEFT JOIN \(table: IOSApp.Device.self) d ON d.\(dId) = fl.\(eDeviceId)
-    LEFT JOIN \(table: IOSApp.Supervision.self) s ON s.\(sDeviceId) = d.\(dId)
-    LEFT JOIN \(table: IOSApp.Token.self) tk ON tk.\(tDeviceId) = d.\(dId)
+    LEFT JOIN \(table: IOSDevice.self) d ON d.\(dId) = fl.\(eDeviceId)
+    LEFT JOIN \(table: BlockerApp.Supervision.self) s ON s.\(sDeviceId) = d.\(dId)
+    LEFT JOIN \(table: BlockerApp.Token.self) tk ON tk.\(tDeviceId) = d.\(dId)
     LEFT JOIN (
       SELECT DISTINCT \(eDeviceId)
       FROM \(table: IOSEvent.self)

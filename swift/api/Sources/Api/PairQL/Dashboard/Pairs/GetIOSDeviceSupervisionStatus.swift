@@ -11,7 +11,7 @@ struct GetIOSDeviceSupervisionStatus: Pair {
   }
 
   struct Output: PairOutput {
-    let deviceId: IOSApp.Device.Id
+    let deviceId: IOSDevice.Id
     let childId: Child.Id
     let childName: String
     let modelName: String
@@ -29,7 +29,7 @@ struct GetIOSDeviceSupervisionStatus: Pair {
 
 extension GetIOSDeviceSupervisionStatus: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let supervision = try? await IOSApp.Supervision.query()
+    let supervision = try? await BlockerApp.Supervision.query()
       .where(.claimCode == input.code)
       .first(in: context.db)
 

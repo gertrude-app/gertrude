@@ -102,7 +102,7 @@ extension DashboardWidgets_v2: NoInputResolver {
     async let computerUsersAsync = ComputerUser.query()
       .where(.childId |=| children.map(\.id))
       .all(in: context.db)
-    async let iosDevicesAsync = IOSApp.Device.query()
+    async let iosDevicesAsync = IOSDevice.query()
       .where(.childId |=| children.map(\.id))
       .all(in: context.db)
 
@@ -118,10 +118,10 @@ extension DashboardWidgets_v2: NoInputResolver {
     async let computersAsync = Computer.query()
       .where(.id |=| computerUsers.map(\.computerId))
       .all(in: context.db)
-    async let supervisionsAsync = IOSApp.Supervision.query()
+    async let supervisionsAsync = BlockerApp.Supervision.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
-    async let iosTokensAsync = IOSApp.Token.query()
+    async let iosTokensAsync = BlockerApp.Token.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
     async let unlockRequests = Api.UnlockRequest.query()
@@ -152,9 +152,9 @@ extension DashboardWidgets_v2: NoInputResolver {
 
     let computerMap: [Computer.Id: Computer] = try await computersAsync
       .reduce(into: [:]) { map, computer in map[computer.id] = computer }
-    let supervisionMap: [IOSApp.Device.Id: IOSApp.Supervision] = try await supervisionsAsync
+    let supervisionMap: [IOSDevice.Id: BlockerApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
-    let connectedDeviceIds: Set<IOSApp.Device.Id> = try await Set(iosTokensAsync.map(\.deviceId))
+    let connectedDeviceIds: Set<IOSDevice.Id> = try await Set(iosTokensAsync.map(\.deviceId))
 
     return try await .init(
       children: children.concurrentMap { child in
@@ -298,19 +298,19 @@ struct PendingIOSDeviceRow: CustomQueryable {
     var stmt = SQL.Statement("""
     SELECT
       c.\(Child.columnName(.name)) AS child_name,
-      d.\(IOSApp.Device.columnName(.modelIdentifier)) AS model_identifier,
-      s.\(IOSApp.Supervision.columnName(.claimCode)) AS claim_code
-    FROM \(table: IOSApp.Supervision.self) s
-    JOIN \(table: IOSApp.Device.self) d
-      ON d.id = s.\(IOSApp.Supervision.columnName(.deviceId))
+      d.\(IOSDevice.columnName(.modelIdentifier)) AS model_identifier,
+      s.\(BlockerApp.Supervision.columnName(.claimCode)) AS claim_code
+    FROM \(table: BlockerApp.Supervision.self) s
+    JOIN \(table: IOSDevice.self) d
+      ON d.id = s.\(BlockerApp.Supervision.columnName(.deviceId))
     JOIN \(table: Child.self) c
-      ON c.id = d.\(IOSApp.Device.columnName(.childId))
+      ON c.id = d.\(IOSDevice.columnName(.childId))
     WHERE c.\(Child.columnName(.parentId)) =\(" ")
     """)
     stmt.components.append(.binding(bindings[0]))
     stmt.components.append(.sql("""
-      AND s.\(IOSApp.Supervision.columnName(.claimedAt)) IS NOT NULL
-      AND s.\(IOSApp.Supervision.columnName(.supervisedAt)) IS NULL
+      AND s.\(BlockerApp.Supervision.columnName(.claimedAt)) IS NOT NULL
+      AND s.\(BlockerApp.Supervision.columnName(.supervisedAt)) IS NULL
     """))
     return stmt
   }

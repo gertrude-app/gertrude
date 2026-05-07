@@ -14,14 +14,13 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       $1.stripeId = .init("sub_123")
     }
     let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -62,14 +61,13 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),

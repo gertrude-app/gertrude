@@ -34,7 +34,7 @@ struct ParentDetail: Pair {
   }
 
   struct IOSDeviceOutput: PairNestable {
-    var id: IOSApp.Device.Id
+    var id: IOSDevice.Id
     var modelName: String
     var modelIdentifier: String
     var iosVersion: String
@@ -117,8 +117,9 @@ extension ParentDetail: Resolver {
       let devices = try await child.iosDevices(in: context.db)
       var iosDeviceOutputs: [IOSDeviceOutput] = []
       for device in devices {
+        let install = try await device.install(in: context.db)
         let supervision = try await device.supervision(in: context.db)
-        let hasToken = try await IOSApp.Token.query()
+        let hasToken = try await BlockerApp.Token.query()
           .where(.deviceId == device.id)
           .exists(in: context.db)
         let status: String? = if let supervision {
@@ -140,7 +141,7 @@ extension ParentDetail: Resolver {
           modelName: device.modelName,
           modelIdentifier: device.modelIdentifier,
           iosVersion: device.iosVersion,
-          appVersion: device.appVersion,
+          appVersion: install.appVersion,
           supervisionStatus: status,
           lastCheckin: lastCheckin?.createdAt,
           createdAt: device.createdAt,

@@ -29,7 +29,7 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(data).toEqual(.init(
       childId: child.id.rawValue,
-      token: .init(1),
+      token: .init(2),
       deviceId: vendorId,
       childName: child.name,
     ))

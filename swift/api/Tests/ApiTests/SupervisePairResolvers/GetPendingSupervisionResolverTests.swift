@@ -10,10 +10,10 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device.random {
+    let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
     })
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -46,11 +46,11 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   }
 
   func testCodeNotClaimed_throwsError() async throws {
-    let device = try await self.db.create(IOSApp.Device.random {
+    let device = try await self.db.create(IOSDevice.random {
       $0.childId = nil
     })
     let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -73,10 +73,10 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device.random {
+    let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
     })
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(1), // <-- expired

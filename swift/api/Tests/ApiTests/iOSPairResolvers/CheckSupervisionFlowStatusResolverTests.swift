@@ -9,14 +9,13 @@ import XExpect
 final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sendable {
   func testNotFound_vendorIdMismatch() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -38,14 +37,13 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testPending_codeExistsNotClaimed() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -64,14 +62,13 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testExpired() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(1),
@@ -93,14 +90,13 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -130,14 +126,13 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -160,7 +155,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     }
     expect(data.childName).toEqual(child.name)
 
-    let token = try await IOSApp.Token.query()
+    let token = try await BlockerApp.Token.query()
       .where(.deviceId == device.id)
       .first(in: self.db)
     expect(data.token).toEqual(token.value.rawValue)
@@ -171,14 +166,13 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),

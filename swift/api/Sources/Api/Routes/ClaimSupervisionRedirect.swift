@@ -11,7 +11,7 @@ enum ClaimSupervisionRedirectRoute {
       return request.redirect(to: "\(signup)?error=invalid_code", redirectType: .temporary)
     }
 
-    guard let supervision = try? await IOSApp.Supervision.query()
+    guard let supervision = try? await BlockerApp.Supervision.query()
       .where(.claimCode == code)
       .first(in: request.context.db) else {
       return request.redirect(to: "\(signup)?error=missing_code", redirectType: .temporary)

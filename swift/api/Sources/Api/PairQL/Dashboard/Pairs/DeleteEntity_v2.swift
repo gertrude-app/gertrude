@@ -96,7 +96,7 @@ extension DeleteEntity_v2: Resolver {
         .delete(in: context.db)
 
     case .blockRule:
-      let blockRule = try await context.db.find(IOSApp.BlockRule.Id(input.id))
+      let blockRule = try await context.db.find(BlockerApp.BlockRule.Id(input.id))
       guard let device = try await blockRule.device(in: context.db) else {
         throw Abort(.unauthorized)
       }
