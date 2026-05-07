@@ -2,7 +2,7 @@
 **/.build/
 **/pnpm-lock.yaml
 **/.nx/
-**/.claude/
+**/.agents/
 **/storybook/storybook-static/
 **/dash/app/build
 **/site/.next

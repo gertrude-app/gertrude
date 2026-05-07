@@ -293,4 +293,4 @@ Adding/removing a field/column to a model requires changes in three files:
 
 ### Other database tasks
 
-- see `./claude/skills/database/SKILL.md`
+- see `./.agents/skills/database/SKILL.md`

@@ -106,7 +106,7 @@ Social links, app store links, and tracking pixels are not needed for the site t
 
 ### Step 5: Database insertion (when instructed to actually create)
 
-Read the database skill at `./.claude/skills/database/SKILL.md` for connection info.
+Read the database skill at `./.agents/skills/database/SKILL.md` for connection info.
 
 Before inserting anything:
 - Query existing public keychains to understand the current schema and data shapes
@@ -123,7 +123,7 @@ reviewed and run against production after local testing.
 
 ### Step 6: Save a report
 
-Write a report file named `claude.report.<site>-keychain.md` in the project root.
+Write a report file named `agent.report.<site>-keychain.md` in the project root.
 Include: all domains found, categorization decisions, the SQL used, and any caveats
 (unstable CDN subdomains, untested auth sections, etc.).
 

@@ -123,7 +123,7 @@ Two drift-prone buckets inside this file:
 
 Current set (as of this writing): `./AGENTS.md`, `./web/AGENTS.md`, `./swift/AGENTS.md`,
 `./web/supervise/AGENTS.md`, `./swift/podcasts/AGENTS.md`. These describe paths, ports,
-commands, and architecture to Claude Code. Drifts when:
+commands, and architecture to coding agents. Drifts when:
 
 - Apps are added/removed/renamed (e.g., a new `web/*` app or `swift/*` package).
 - Dev commands change (`just` recipes renamed, ports moved).
