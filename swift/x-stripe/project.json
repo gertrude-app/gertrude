@@ -3,7 +3,7 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "command": "cd x-stripe && swift build"
+      "command": "cd x-stripe && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     },
     "test": {
       "command": "true"

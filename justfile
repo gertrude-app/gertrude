@@ -1,6 +1,8 @@
 set dotenv-filename := ".gtask-ports"
 set dotenv-required := false
 
+swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
+
 _default:
   @just --choose
 
@@ -32,6 +34,12 @@ check:
 ci-local:
   @./scripts/ci-local.sh
 
+api-build:
+  @cd swift && just api-build
+
+api-test *args:
+  @cd swift && just api-test {{args}}
+
 fix:
   @cd swift && just fix
   @cd web && just fix
@@ -43,19 +51,19 @@ codegen:
   @just codegen-macapp-appviews
 
 codegen-macapp:
-  @cd swift/macapp/App && CODEGEN_MACAPP=1 swift test --filter Codegen
+  @cd swift/macapp/App && CODEGEN_MACAPP=1 {{swiftly}} run swift test --filter Codegen
   @just swift fix
   @just codegen-macapp-appviews
 
 codegen-typescript:
-  @cd swift/macapp/App && CODEGEN_TYPESCRIPT=1 swift test --filter Codegen
+  @cd swift/macapp/App && CODEGEN_TYPESCRIPT=1 {{swiftly}} run swift test --filter Codegen
   @just web format
   @just codegen-pairql-ts-clients
 
 codegen-pairql-ts-clients:
   #!/usr/bin/env bash
   set -euo pipefail
-  (cd swift/api && swift run Run ts-codegen /tmp/codegen)
+  (cd swift/api && {{swiftly}} run swift run Run ts-codegen /tmp/codegen)
   (cd web/shared/pairql && CODEGEN_INPUT_DIR=/tmp/codegen pnpm codegen)
   printf "\nRunning 'lint-fix' and 'format' after codegen...\n"
   just web fix

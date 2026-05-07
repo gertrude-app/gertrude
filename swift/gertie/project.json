@@ -4,10 +4,10 @@
   "implicitDependencies": ["x-kit"],
   "targets": {
     "build": {
-      "command": "cd gertie && swift build"
+      "command": "cd gertie && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     },
     "test": {
-      "command": "cd gertie && SWIFT_DETERMINISTIC_HASHING=1 swift test"
+      "command": "cd gertie && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
     }
   }
 }

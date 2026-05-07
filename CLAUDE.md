@@ -108,6 +108,12 @@ Supports all 3 apps, plus dashboard and admin websites
 - never add comments when writing code
 - never remove comments when refactoring code
 
+## Continuous Improvement
+
+If during the task you overcame something non-obvious that took time and tokens to figure
+out, propose to the user to make the minimal updates to documentation/scripting to prevent
+the same failure mode for future agents.
+
 ## Database access
 
 - if i ask you to read from the database, or you need to for your task, always read the

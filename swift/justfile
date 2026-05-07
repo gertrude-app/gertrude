@@ -7,6 +7,7 @@ set dotenv-required := false
 
 api_port := env("API_PORT", "8080")
 ngrok_subdomain := env("NGROK_SUBDOMAIN", "")
+swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
 
 _default:
   @just --choose
@@ -41,7 +42,19 @@ run-api-ip: build-api
   @just exec-api serve --hostname 192.168.10.248
 
 build-api:
-  @cd api && swift build
+  @cd api && {{swiftly}} run swift build
+
+api-build:
+  @just build-api
+
+api-test *args:
+  @cd api && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
+
+macapp-test *args:
+  @cd macapp/App && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
+
+iosapp-test *args:
+  @cd iosapp/lib-ios && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 
 migrate-up: build-api
   @just exec-api migrate --yes

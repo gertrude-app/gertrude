@@ -4,7 +4,7 @@
   "implicitDependencies": ["gertie"],
   "targets": {
     "build": {
-      "command": "cd pairql && swift build"
+      "command": "cd pairql && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     }
   }
 }

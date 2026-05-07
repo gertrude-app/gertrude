@@ -8,13 +8,11 @@
 
 ## Important notes
 
-When writing code, almost NEVER leave comments, unless something is extremely non-obvious.
-
-When running any `swift test` commands, always prepend `SWIFT_DETERMINISTIC_HASHING=1`
+Never run raw `swift build` or `swift test` commands, to ensure toolchain and env
+consistency. If there is something you can't do with the `just` commands, ask for
+permission to modify and improve the justfile and agent docs.
 
 Never run `xcodebuild` for any reason.
-
-Never make git commits unless I specifically ask you to.
 
 If you need a UUID, use bash to invoke `uuid --llm` to get one, instead of making one
 yourself. Many places in this codebase we use partial identifiers (especially for
@@ -22,7 +20,7 @@ logging), like `c05ef986`, if you need one of those, invode `sid --llm`.
 
 ## Quick Reference
 
-- **Swift Version:** 6.2.1
+- **Swift Version:** 6.2.1 via Swiftly
 - **Build System:** Swift Package Manager + Nx + Just
 - **State Management:** The Composable Architecture (TCA)
 - **API Pattern:** PairQL (type-safe RPC over HTTP)
@@ -235,10 +233,14 @@ All `x-*` libraries:
 ### Build Commands (Just)
 
 ```bash
-just test     # Run all tests
-just build    # Build all packages
-just lint-fix # Fix formatting
-# more in justfile
+just build         # Build all packages
+just test          # Run all tests
+just api-build     # Build the API
+just api-test      # Run API tests
+just api-test --filter SomeTestName
+just macapp-test   # Run the macOS app package tests
+just iosapp-test   # Run the iOS library package tests
+just lint-fix      # Fix formatting
 ```
 
 ### Testing
@@ -248,10 +250,11 @@ just lint-fix # Fix formatting
 **Test Commands:**
 
 ```bash
-just test                                                     # All tests
-cd api && SWIFT_DETERMINISTIC_HASHING=1 swift test            # API tests only
-cd macapp/App && SWIFT_DETERMINISTIC_HASHING=1 swift test     # macOS app tests
-cd iosapp/lib-ios && SWIFT_DETERMINISTIC_HASHING=1 swift test # iOS app tests
+just test                           # All tests
+just api-test                       # API tests only
+just api-test --filter SomeTestName # API tests filtered by substring
+just macapp-test                    # macOS app package tests
+just iosapp-test                    # iOS library package tests
 ```
 
 ### Package Manager
