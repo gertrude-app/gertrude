@@ -48,9 +48,10 @@ swift/podcasts/GertiePodcasts.xcodeproj/
 swift/podcasts/previews
 
 # Local task files
-claude.task.md
-claude.ledger.*
-claude.plan.*
+agent.task.md
+agent.ledger.*
+agent.plan.*
+agent.report.*
 **/scheduled_tasks.lock
 .gtask-slot
 .gtask-ports
