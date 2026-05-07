@@ -1,0 +1,15 @@
+import '../watch-helpers.just'
+
+_default:
+  @just --choose
+
+gen:
+  @xcodegen -s project.yml
+  @xml-lint --fix app/Info.plist
+
+xcode:
+  @just gen
+  @open Gertie.xcodeproj
+
+clean:
+  @rm -rf Gertie.xcodeproj

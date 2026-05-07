@@ -17,6 +17,9 @@ swift *args:
 podcasts *args:
   @cd swift/podcasts && just {{args}}
 
+browser *args:
+  @cd swift/browser && just {{args}}
+
 # api shortcuts
 
 api:

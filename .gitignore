@@ -47,6 +47,9 @@ web/smoke/cypress.env.json
 swift/podcasts/GertiePodcasts.xcodeproj/
 swift/podcasts/previews
 
+# Browser app
+swift/browser/Gertie.xcodeproj/
+
 # Local task files
 agent.task.md
 agent.ledger.*

@@ -23,6 +23,9 @@ iosapp:
 iosapp-xcode-build:
   @pnpm exec nx run iosapp:xcode-build
 
+browser-xcode-build:
+  @pnpm exec nx run browser:xcode-build
+
 iosconfig:
   @echo "LOCAL_API_URL = https:/\$()/{{ngrok_subdomain}}.ngrok-free.app" > iosapp/config/Local.xcconfig
 
@@ -132,6 +135,7 @@ check:
   @just build
   @just macapp xcode-build
   @just iosapp-xcode-build
+  @just browser-xcode-build
   @just test
   @just lint
 
@@ -170,5 +174,6 @@ xmlfiles := """
 ./macapp/Xcode/Gertrude/Gertrude.entitlements \
 ./macapp/Xcode/Gertrude/Info.plist \
 ./macapp/Xcode/GertrudeRelauncher/GertrudeRelauncher.entitlements \
-./podcasts/app/Info.plist
+./podcasts/app/Info.plist \
+./browser/app/Info.plist
 """

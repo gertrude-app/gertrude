@@ -1,0 +1,19 @@
+{
+  "root": "browser",
+  "projectType": "application",
+  "namedInputs": {
+    "xcode-sources": [
+      "{projectRoot}/project.yml",
+      "{projectRoot}/app/**/*.swift",
+      "{projectRoot}/app/**/*.plist",
+      "{projectRoot}/app/**/*.entitlements"
+    ]
+  },
+  "targets": {
+    "xcode-build": {
+      "cache": true,
+      "inputs": ["xcode-sources"],
+      "command": "cd browser && xcodegen -s project.yml >/dev/null && xcodebuild -project Gertie.xcodeproj -scheme Gertie -skipMacroValidation -destination 'generic/platform=macOS' CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO build"
+    }
+  }
+}

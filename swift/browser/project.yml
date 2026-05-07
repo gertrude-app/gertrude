@@ -1,0 +1,53 @@
+name: Gertie
+options:
+  deploymentTarget:
+    macOS: "11.0"
+  developmentLanguage: en
+  knownRegions:
+    - en
+    - Base
+
+configs:
+  Debug: debug
+  Release: release
+
+targets:
+  Gertie:
+    type: application
+    platform: macOS
+    deploymentTarget: "11.0"
+    sources:
+      - path: app/sources
+        group: app
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        PRODUCT_NAME: "Gertie"
+        DEVELOPMENT_TEAM: "WFN83LM943"
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: app/Info.plist
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: 1
+        ALWAYS_SEARCH_USER_PATHS: NO
+        COMBINE_HIDPI_IMAGES: YES
+        LSApplicationCategoryType: public.app-category.utilities
+      configs:
+        Release:
+          PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.browser"
+        Debug:
+          ONLY_ACTIVE_ARCH: YES
+          PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.browser.dev"
+    info:
+      path: app/Info.plist
+      properties:
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundleDisplayName: Gertie
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        NSPrincipalClass: NSApplication
+        NSHighResolutionCapable: true
+        LSApplicationCategoryType: public.app-category.utilities
+
+packages: {}
