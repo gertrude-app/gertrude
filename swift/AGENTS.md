@@ -279,6 +279,11 @@ just iosapp-test                    # iOS library package tests
 
 - see `./docs/pairql.md`
 
+### Duet ORM
+
+If you are doing anything non-trivial in the API with the Duet database layer, read
+`../.agents/skills/duet/SKILL.md` before writing/editing queries.
+
 ### Adding a Database Migration
 
 - read several examples in `api/Sources/Api/Database/Migrations/` to see pattern

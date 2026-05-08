@@ -1,3 +1,4 @@
+import Foundation
 import Logging
 import NIOEmbedded
 import PostgresKit
@@ -202,6 +203,95 @@ final class SqlTests: XCTestCase {
 
     expect(client.stmt.prepared).toEqual(expected)
     expect(client.stmt.params).toEqual(["a"])
+  }
+
+  func testTransactionCommits() async throws {
+    let database = RecordingDatabase()
+    let client = SQLDatabaseClient(db: database)
+
+    let result = try await client.transaction { db in
+      try await db.execute(raw: "SELECT 1")
+      return 42
+    }
+
+    expect(result).toEqual(42)
+    expect(database.sqls).toEqual(["BEGIN", "SELECT 1", "COMMIT"])
+  }
+
+  func testTransactionRollsBack() async throws {
+    let database = RecordingDatabase()
+    let client = SQLDatabaseClient(db: database)
+
+    do {
+      let _: Int = try await client.transaction { db in
+        try await db.execute(raw: "SELECT 1")
+        throw TestError()
+      }
+      XCTFail("Expected transaction to throw")
+    } catch is TestError {}
+
+    expect(database.sqls).toEqual(["BEGIN", "SELECT 1", "ROLLBACK"])
+  }
+
+  func testNestedTransactionReusesOuterTransaction() async throws {
+    let database = RecordingDatabase()
+    let client = SQLDatabaseClient(db: database)
+
+    try await client.transaction { db in
+      try await db.transaction { nestedDb in
+        try await nestedDb.execute(raw: "SELECT 1")
+      }
+    }
+
+    expect(database.sqls).toEqual(["BEGIN", "SELECT 1", "COMMIT"])
+  }
+
+  func testTransactionSerializesConcurrentExecutions() async throws {
+    let database = RecordingDatabase(delay: 20_000_000)
+    let client = SQLDatabaseClient(db: database)
+
+    try await client.transaction { db in
+      try await withThrowingTaskGroup(of: Void.self) { group in
+        for _ in 0 ..< 10 {
+          group.addTask {
+            try await db.execute(raw: "SELECT 1")
+          }
+        }
+        try await group.waitForAll()
+      }
+    }
+
+    expect(database.maxActiveExecutions).toEqual(1)
+  }
+
+  func testTransactionCancelledWaiterDoesNotExecuteOrBlockNextWaiter() async throws {
+    let underlying = BlockingClient()
+    let client = TransactionClient(client: underlying)
+
+    let first = Task {
+      try await client.execute(raw: "SELECT 1")
+    }
+    await underlying.waitForFirstExecution()
+
+    let cancelled = Task {
+      try await client.execute(raw: "SELECT 2")
+    }
+    try await Task.sleep(nanoseconds: 10_000_000)
+    cancelled.cancel()
+
+    let next = Task {
+      try await client.execute(raw: "SELECT 3")
+    }
+
+    await underlying.unblockFirstExecution()
+    _ = try await first.value
+    do {
+      _ = try await cancelled.value
+      XCTFail("Expected cancelled execution to throw")
+    } catch is CancellationError {}
+    _ = try await next.value
+
+    await expect(underlying.executionCount()).toEqual(2)
   }
 
   func testForceDelete() async throws {
@@ -608,6 +698,138 @@ final class TestClient: Client, @unchecked Sendable {
 
   func execute(raw: SQLQueryString) async throws -> [SQLRow] {
     fatalError("TestClient.execute(raw:) not implemented")
+  }
+
+  nonisolated func transaction<R>(
+    _ operation: @escaping @Sendable (any Client) async throws -> R,
+  ) async throws -> R {
+    try await operation(self)
+  }
+}
+
+private actor BlockingClient: Client {
+  private var executions = 0
+  private var firstExecutionStarted = false
+  private var firstExecutionStartedContinuation: CheckedContinuation<Void, Never>?
+  private var unblockFirstExecutionContinuation: CheckedContinuation<Void, Never>?
+
+  func waitForFirstExecution() async {
+    if self.firstExecutionStarted { return }
+    await withCheckedContinuation { continuation in
+      self.firstExecutionStartedContinuation = continuation
+    }
+  }
+
+  func unblockFirstExecution() {
+    self.unblockFirstExecutionContinuation?.resume()
+    self.unblockFirstExecutionContinuation = nil
+  }
+
+  func executionCount() -> Int {
+    self.executions
+  }
+
+  func execute(statement: SQL.Statement) async throws -> [SQLRow] {
+    []
+  }
+
+  func execute<M: Model>(statement: SQL.Statement, returning: M.Type) async throws -> [M] {
+    []
+  }
+
+  func execute(raw: SQLQueryString) async throws -> [SQLRow] {
+    self.executions += 1
+    if self.executions == 1 {
+      await withCheckedContinuation { continuation in
+        self.unblockFirstExecutionContinuation = continuation
+        self.firstExecutionStarted = true
+        self.firstExecutionStartedContinuation?.resume()
+        self.firstExecutionStartedContinuation = nil
+      }
+    }
+    return []
+  }
+
+  nonisolated func transaction<R>(
+    _ operation: @escaping @Sendable (any Client) async throws -> R,
+  ) async throws -> R {
+    try await operation(self)
+  }
+}
+
+private final class RecordingDatabase: SQLDatabase, @unchecked Sendable {
+  private struct State {
+    var sqls: [String] = []
+    var activeExecutions = 0
+    var maxActiveExecutions = 0
+    var sessions = 0
+  }
+
+  private let state = Locked(State())
+  private let delay: UInt64
+  private let loop = EmbeddedEventLoop()
+
+  init(delay: UInt64 = 0) {
+    self.delay = delay
+  }
+
+  var sqls: [String] {
+    self.state.withValue { $0.sqls }
+  }
+
+  var maxActiveExecutions: Int {
+    self.state.withValue { $0.maxActiveExecutions }
+  }
+
+  var logger: Logger { Logger(label: "test") }
+  var eventLoop: any EventLoop { self.loop }
+  var dialect: any SQLDialect { PostgresDialect() }
+
+  func execute(
+    sql query: any SQLExpression,
+    _ onRow: @escaping @Sendable (any SQLRow) -> Void,
+  ) -> EventLoopFuture<Void> {
+    self.eventLoop.makeSucceededVoidFuture()
+  }
+
+  func execute(
+    sql query: any SQLExpression,
+    _ onRow: @escaping @Sendable (any SQLRow) -> Void,
+  ) async throws {
+    let sql = self.serialize(query).sql
+    self.state.withValue {
+      $0.sqls.append(sql)
+      $0.activeExecutions += 1
+      $0.maxActiveExecutions = max($0.maxActiveExecutions, $0.activeExecutions)
+    }
+    if self.delay > 0 {
+      try await Task.sleep(nanoseconds: self.delay)
+    }
+    self.state.withValue {
+      $0.activeExecutions -= 1
+    }
+  }
+
+  func withSession<R>(
+    _ closure: @escaping @Sendable (any SQLDatabase) async throws -> R,
+  ) async throws -> R {
+    self.state.withValue { $0.sessions += 1 }
+    return try await closure(self)
+  }
+}
+
+private final class Locked<Value>: @unchecked Sendable {
+  private let lock = NSLock()
+  private var value: Value
+
+  init(_ value: Value) {
+    self.value = value
+  }
+
+  func withValue<R>(_ operation: (inout Value) -> R) -> R {
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    return operation(&self.value)
   }
 }
 

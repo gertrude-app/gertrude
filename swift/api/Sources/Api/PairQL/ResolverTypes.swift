@@ -188,6 +188,13 @@ extension DuetSQLError: PqlErrorConvertible {
         debugMessage: "DuetSQL: too many results for delete one",
         showContactSupport: true,
       )
+    case .transactionUnavailable:
+      context.error(
+        id: "b4acd0d5",
+        type: .serverError,
+        debugMessage: "DuetSQL: transactions unavailable for client",
+        showContactSupport: true,
+      )
     }
   }
 }
