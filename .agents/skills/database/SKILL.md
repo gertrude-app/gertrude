@@ -18,6 +18,11 @@ Important: although this repo has some docker-related files, all local developme
 through a local install of postgres and NOT through docker. Never use `docker` commands
 when dealing with the database.
 
+## Related skills
+
+- For verifying non-trivial migrations (data backfill, column drop, transforms)
+  before merging, see `../migration-verification/SKILL.md`.
+
 ## Database Structure
 
 The database uses multiple schemas to organize tables:
