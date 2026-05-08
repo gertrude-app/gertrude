@@ -27,10 +27,7 @@ describe(`dashboard onboarding nudges`, () => {
     cy.interceptPql(`GetAccountOwner`, {
       id: betsy.id,
       email: betsy.email,
-      plan: {
-        case: `full`,
-        status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-      },
+      entitlement: { case: `full` },
       notifications: [],
       verifiedNotificationMethods: [],
     });

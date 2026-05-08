@@ -29,12 +29,14 @@ extension ConnectUser: Resolver {
     let child = try await context.db.find(childId)
     context.telemetry.parentId = child.parentId
 
-    let parent = try await ParentWithSubscription.find(child.parentId, in: context.db)
-    switch parent.plan {
-    case .full(.complimentary), .full(.trialing), .full(.paid):
+    @Dependency(\.date.now) var now
+    let parent = try await context.db.find(child.parentId) as Parent
+    let billing = try await parent.parentBilling(in: context.db)
+    switch billing.entitlement(at: now) {
+    case .full, .fullTrial, .fullTrialGrace, .complimentary:
       break
-    default:
-      unexpected("9cf4e745", parent.model.id, "mac app connection, no .full plan")
+    case .free, .light:
+      unexpected("9cf4e745", parent.id, "mac app connection, no .full entitlement")
       throw context.error(
         id: "ba2d1e75",
         type: .unauthorized,

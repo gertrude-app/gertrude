@@ -25,8 +25,8 @@ enum ProfileDownloadRoute {
 
     if let child = try await device.child(in: req.context.db) {
       let parent = try await child.parent(in: req.context.db)
-      let plan = try await parent.plan(in: req.context.db)
-      if !plan.allowsSupervision {
+      let billing = try await parent.parentBilling(in: req.context.db)
+      if !billing.allowsSupervision {
         let parentLink = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
         Task {
           await get(dependency: \.slack)

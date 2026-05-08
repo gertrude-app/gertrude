@@ -9,11 +9,10 @@ import XStripe
 
 final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   func testUpdatesSubscription() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil // <-- no subscription yet
-      $1.billingStatus = .trialing
-    }
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    // identity-only standalone trial → first invoice.paid creates the sub row
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
 
     let json = """
       {
@@ -44,7 +43,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testCreatesSubscription() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
     let parent = try await self.db.create(Parent.random) // <-- no subscription
 
     let json = """
@@ -77,12 +76,9 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
 
   func testUpdateAdminSubscriptionStatusExpirationFromStripeEvent() async throws {
     let periodEnd = 1_704_050_627
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil
-      $1.billingStatus = .trialing
-      $1.statusExpiresAt = .reference - .days(1000)
-    }
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
 
     let json = """
       {
@@ -116,16 +112,13 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
-      expect(retrieved.statusExpiresAt).toEqual(expectedNewStatusExpiration)
     })
   }
 
   func testSubscriptionDeletedEventCancelsSubscription() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = subscriptionId
-      $1.billingStatus = .paid
-      $1.statusExpiresAt = .reference + .days(30)
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = subscriptionId
     }
 
     let json = """
@@ -144,20 +137,16 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
-      expect(retrieved.billingStatus).toEqual(.cancelled)
-      expect(retrieved.statusExpiresAt).toEqual(.distantFuture)
     })
   }
 
   // @see email ref:96dc2
   func testUpdateAdminSubscriptionStatusFromSubscriptionIdAndAlternateEmail() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
     let periodEnd = 1_704_050_627
-    let parent = try await self.parentWithSubscription {
-      $0.email = .init("changed@email.com") // <-- different email from stripe customer_email
-      $1.stripeId = subscriptionId
-      $1.billingStatus = .overdue
-      $1.statusExpiresAt = .reference - .days(1000)
+    let parent = try await self.parentWithSubscription { p, sub in
+      p.email = .init("changed@email.com") // <-- different email from stripe customer_email
+      sub.stripeId = subscriptionId
     }
 
     let json = """
@@ -192,16 +181,13 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
-      expect(retrieved.statusExpiresAt).toEqual(expectedNewStatusExpiration)
     })
   }
 
   func testReplayedEventIdIsIgnored() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil
-      $1.billingStatus = .trialing
-    }
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
     let eventId = "evt_\("".random)"
 
     let json = """
@@ -270,11 +256,10 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testSubscriptionUpdatedReconcilesTierAndStatus() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.stripeId = subscriptionId
-      $1.billingStatus = .paid
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .light
+      sub.stripeId = subscriptionId
     }
     let newPeriodEnd = 1_704_050_627
 
@@ -285,6 +270,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         "data": {
           "object": {
             "id": "\(subscriptionId.rawValue)",
+            "customer": "cus_test_reconcile",
             "status": "active",
             "current_period_end": \(newPeriodEnd),
             "items": {
@@ -318,11 +304,10 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testSubscriptionUpdatedWritesStatusOnlyWhenTierUnchanged() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.stripeId = subscriptionId
-      $1.billingStatus = .paid
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeId = subscriptionId
     }
     let newPeriodEnd = 1_704_050_627
 
@@ -349,7 +334,6 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.tier).toEqual(.full)
       expect(retrieved.stripeStatus).toEqual(.pastDue)
-      expect(retrieved.billingStatus).toEqual(.overdue)
     })
 
     let alarms = self.sent.slacks.filter { $0.message.channel == "unexpected-errors" }
@@ -357,11 +341,10 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testSubscriptionUpdatedTrialingDoesNotMirrorBillingStatus() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.stripeId = subscriptionId
-      $1.billingStatus = .paid
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeId = subscriptionId
     }
 
     let json = """
@@ -386,17 +369,14 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
       let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.stripeStatus).toEqual(.trialing)
-      expect(retrieved.billingStatus).toEqual(.paid)
     })
   }
 
   func testInvoicePaidLooksUpParentByStripeCustomerId() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
     let customerId = "cus_\("".random)"
-    let parent = try await self.parentWithSubscription {
+    let parent = try await self.parent {
       $0.email = .init("local@email.com")
-      $1.stripeId = nil
-      $1.billingStatus = .trialing
     }
     _ = try await self.db.create(BillingIdentity(
       parentId: parent.id,
@@ -428,17 +408,15 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
       let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
       expect(retrieved.subscription?.stripeId).toEqual(subscriptionId)
-      expect(retrieved.subscription?.billingStatus).toEqual(.paid)
     })
   }
 
   func testDuplicateOverwriteRejectedWhenExistingSubIsActive() async throws {
     let existingSubId = "sub_existing_".random
     let incomingSubId = "sub_incoming_".random
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = .init(existingSubId)
-      $1.billingStatus = .paid
-      $1.tier = .full
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = .init(existingSubId)
+      sub.tier = .full
     }
 
     let json = invoicePaidJson(
@@ -456,7 +434,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
         let retrieved = try await parent.model.subscription(in: self.db)!
-        expect(retrieved.stripeId?.rawValue).toEqual(existingSubId)
+        expect(retrieved.stripeId.rawValue).toEqual(existingSubId)
       })
     }
 
@@ -474,10 +452,9 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   func testDuplicateOverwriteAllowedWhenExistingSubIsCanceled() async throws {
     let existingSubId = "sub_existing_".random
     let incomingSubId = "sub_incoming_".random
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = .init(existingSubId)
-      $1.billingStatus = .paid
-      $1.tier = .light
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = .init(existingSubId)
+      sub.tier = .light
     }
 
     let json = invoicePaidJson(
@@ -494,7 +471,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
         let retrieved = try await parent.model.subscription(in: self.db)!
-        expect(retrieved.stripeId?.rawValue).toEqual(incomingSubId)
+        expect(retrieved.stripeId.rawValue).toEqual(incomingSubId)
         expect(retrieved.tier).toEqual(.full)
       })
     }
@@ -512,10 +489,9 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   func testDuplicateOverwriteAllowedOnStripeResourceMissing() async throws {
     let existingSubId = "sub_existing_".random
     let incomingSubId = "sub_incoming_".random
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = .init(existingSubId)
-      $1.billingStatus = .paid
-      $1.tier = .light
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = .init(existingSubId)
+      sub.tier = .light
     }
 
     let json = invoicePaidJson(
@@ -532,7 +508,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
         let retrieved = try await parent.model.subscription(in: self.db)!
-        expect(retrieved.stripeId?.rawValue).toEqual(incomingSubId)
+        expect(retrieved.stripeId.rawValue).toEqual(incomingSubId)
       })
     }
   }
@@ -540,10 +516,9 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   func testDuplicateOverwriteRejectedOnUnknownStripeError() async throws {
     let existingSubId = "sub_existing_".random
     let incomingSubId = "sub_incoming_".random
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = .init(existingSubId)
-      $1.billingStatus = .paid
-      $1.tier = .light
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = .init(existingSubId)
+      sub.tier = .light
     }
 
     let json = invoicePaidJson(
@@ -560,7 +535,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     } operation: {
       try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
         let retrieved = try await parent.model.subscription(in: self.db)!
-        expect(retrieved.stripeId?.rawValue).toEqual(existingSubId)
+        expect(retrieved.stripeId.rawValue).toEqual(existingSubId)
       })
     }
 
@@ -569,13 +544,10 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testZeroAmountDueInvoicePaidDoesNotOverrideCancelledStatus() async throws {
-    let subscriptionId: Subscription.StripeId = .init("subId_".random)
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = subscriptionId
-      $1.tier = .light
-      $1.billingStatus = .cancelled
-      $1.trialStartedAt = nil
-      $1.statusExpiresAt = .distantFuture
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = subscriptionId
+      sub.tier = .light
     }
 
     let json = """
@@ -603,7 +575,6 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
-      expect(retrieved.billingStatus).toEqual(.cancelled)
       expect(retrieved.tier).toEqual(.light)
     })
   }

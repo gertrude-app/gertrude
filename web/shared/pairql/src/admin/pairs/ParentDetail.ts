@@ -1,5 +1,10 @@
 // auto-generated, do not edit
-import type { DeviceModelFamily, Plan } from '../shared';
+import type {
+  DeviceModelFamily,
+  Entitlement,
+  StripeSubscriptionStatus,
+  SubscriptionTier,
+} from '../shared';
 
 export namespace ParentDetail {
   export interface Input {
@@ -10,7 +15,14 @@ export namespace ParentDetail {
     id: UUID;
     email: string;
     status: string;
-    plan: Plan;
+    entitlement: Entitlement;
+    subscription?: {
+      tier: SubscriptionTier;
+      stripeStatus: StripeSubscriptionStatus;
+      stripeId: string;
+      currentPeriodEnd: ISODateString;
+      isLegacyPrice: boolean;
+    };
     createdAt: ISODateString;
     children: Array<{
       id: UUID;

@@ -55,8 +55,8 @@ final class SubscriptionPanelTests: DependencyTestCase {
 
   func testLightPaidWithUsedTrialOmitsTrialOption() {
     let billing = self.billing(
-      sub: (tier: .light, status: .active),
       trialStartedAt: .reference - .days(60),
+      sub: (tier: .light, status: .active),
     )
     let panel = panelOutput(billing: billing, now: .reference)
     expect(panel.secondary).toEqual([.openBillingPortal(config: .lightTier)])
@@ -83,8 +83,8 @@ final class SubscriptionPanelTests: DependencyTestCase {
   func testFullTrialFromLight() {
     let trialStart = Date.reference
     let billing = self.billing(
-      sub: (tier: .light, status: .active),
       trialStartedAt: trialStart,
+      sub: (tier: .light, status: .active),
     )
     let panel = panelOutput(billing: billing, now: trialStart + .days(10))
     expect(panel.primary).toEqual(.upgradeSubscriptionTier(to: .full))
@@ -94,9 +94,9 @@ final class SubscriptionPanelTests: DependencyTestCase {
   func testFullTrialFromLapsedLight() {
     let trialStart = Date.reference
     let billing = self.billing(
+      trialStartedAt: trialStart,
       lastSubId: "sub_old",
       lastPaidTier: .light,
-      trialStartedAt: trialStart,
     )
     let panel = panelOutput(billing: billing, now: trialStart + .days(10))
     expect(panel.primary).toEqual(.reactivateViaCheckout(tier: .full))
@@ -145,8 +145,8 @@ final class SubscriptionPanelTests: DependencyTestCase {
   func testFullTrialGraceFromLight() {
     let trialStart = Date.reference
     let billing = self.billing(
-      sub: (tier: .light, status: .active),
       trialStartedAt: trialStart,
+      sub: (tier: .light, status: .active),
     )
     let panel = panelOutput(billing: billing, now: trialStart + .days(24))
     expect(panel.primary).toEqual(.upgradeSubscriptionTier(to: .full))
@@ -156,11 +156,12 @@ final class SubscriptionPanelTests: DependencyTestCase {
   func testFullTrialGraceFromLapsedFullReactivatesFullOnly() {
     let trialStart = Date.reference
     let billing = self.billing(
+      trialStartedAt: trialStart,
       lastSubId: "sub_old",
       lastPaidTier: .full,
-      trialStartedAt: trialStart,
     )
     let panel = panelOutput(billing: billing, now: trialStart + .days(24))
+    expect(panel.entitlement).toEqual(.fullTrialGrace(until: trialStart + .days(28)))
     expect(panel.primary).toEqual(.reactivateViaCheckout(tier: .full))
     expect(panel.secondary).toEqual([])
   }
@@ -208,10 +209,10 @@ final class SubscriptionPanelTests: DependencyTestCase {
 extension SubscriptionPanelTests {
   func billing(
     comp: Bool = false,
-    sub: (tier: Subscription.Tier, status: Subscription.StripeStatus)? = nil,
-    lastSubId: String? = nil,
-    lastPaidTier: Subscription.Tier? = nil,
     trialStartedAt: Date? = nil,
+    sub: (tier: StripeSubscription.Tier, status: StripeSubscription.StripeStatus)? = nil,
+    lastSubId: String? = nil,
+    lastPaidTier: StripeSubscription.Tier? = nil,
   ) -> ParentBilling {
     let identity = BillingIdentity(
       parentId: .init(),
@@ -222,14 +223,12 @@ extension SubscriptionPanelTests {
       isComplimentary: comp,
     )
     let subscription = sub.map { sub in
-      var s = Subscription(
+      var s = StripeSubscription(
         parentId: identity.parentId,
         tier: sub.tier,
-        billingStatus: .paid,
         stripeId: .init("sub_test"),
         stripeStatus: sub.status,
         currentPeriodEnd: .reference + .days(30),
-        statusExpiresAt: .distantFuture,
       )
       s.isLegacyPrice = false
       return s

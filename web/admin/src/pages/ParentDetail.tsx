@@ -21,7 +21,8 @@ import {
 import LoadingState from '../components/LoadingState';
 import { formatDate, timeAgo, unCamelCase } from '../lib/format';
 
-type Plan = T.ParentDetail.Output[`plan`];
+type Subscription = NonNullable<T.ParentDetail.Output[`subscription`]>;
+type Entitlement = T.ParentDetail.Output[`entitlement`];
 type TelemetryRow = T.GetParentRecentTelemetry.Output[number];
 
 const TELEMETRY_RANGES: { label: string; hours: number }[] = [
@@ -147,14 +148,17 @@ const ParentDetail: React.FC = () => {
 
         <div className="p-4 sm:p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
-            <PlanCard plan={data.plan} />
-            <InfoCard label="Billing" value={planBillingLabel(data.plan)} />
+            <PlanCard entitlement={data.entitlement} />
+            <InfoCard
+              label="Billing"
+              value={billingLabel(data.entitlement, data.subscription)}
+            />
             <InfoCard label="Children" value={data.children.length.toString()} />
             <InfoCard label="Created" value={formatDate(data.createdAt)} />
           </div>
 
           {(() => {
-            const stripeId = extractStripeId(data.plan);
+            const stripeId = data.subscription?.stripeId ?? null;
             if (!stripeId) return null;
             return (
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
@@ -658,75 +662,40 @@ const PLAN_TIER_CONFIG: Record<string, { label: string; bg: string; text: string
   free: { label: `Free`, bg: `from-slate-300 to-slate-400`, text: `text-white` },
 };
 
-function planBillingLabel(plan: Plan): string {
-  if (plan.case === `free`) {
-    switch (plan.kind.case) {
-      case `standard`:
-        return `No subscription`;
-      case `lapsedLight`:
-        return `Lapsed (was Light)`;
-      case `lapsedFull`:
-        return `Lapsed (was Full)`;
-    }
-  } else if (plan.case === `light`) {
-    switch (plan.status.case) {
-      case `paid`:
-        return `Paid — $10/yr`;
-      case `overdue`:
-        return `Overdue`;
-    }
-  } else {
-    switch (plan.status.case) {
-      case `complimentary`:
-        return `Complimentary`;
-      case `trialing`:
-        return `Trial — ends ${formatDate(plan.status.until)}`;
-      case `trialExpired`:
-        return `Trial expired`;
-      case `paid`:
-        return `Paid — $${plan.status.monthlyPriceInCents / 100}/mo`;
-      case `overdue`:
-        return `Overdue — $${plan.status.monthlyPriceInCents / 100}/mo`;
+function billingLabel(entitlement: Entitlement, sub: Subscription | undefined): string {
+  switch (entitlement.case) {
+    case `free`:
+      return sub ? `Lapsed` : `No subscription`;
+    case `light`:
+      return sub?.stripeStatus === `pastDue` ? `Overdue — $10/yr` : `Paid — $10/yr`;
+    case `complimentary`:
+      return `Complimentary`;
+    case `fullTrial`:
+      return `Trial — ends ${formatDate(entitlement.until)}`;
+    case `fullTrialGrace`:
+      return `Trial expired`;
+    case `full`: {
+      const monthly = sub?.isLegacyPrice ? 5 : 10;
+      return sub?.stripeStatus === `pastDue`
+        ? `Overdue — $${monthly}/mo`
+        : `Paid — $${monthly}/mo`;
     }
   }
 }
 
-function extractStripeId(plan: Plan): string | null {
-  if (plan.case === `free`) {
-    if (plan.kind.case === `lapsedLight` || plan.kind.case === `lapsedFull`) {
-      return plan.kind.stripeId ?? null;
-    }
-    return null;
-  } else if (plan.case === `light`) {
-    return plan.status.stripeId;
-  } else {
-    switch (plan.status.case) {
-      case `paid`:
-      case `overdue`:
-        return plan.status.stripeId;
-      case `trialing`:
-        return plan.status.kind.case === `fromLight` ||
-          plan.status.kind.case === `fromLapsedLight`
-          ? plan.status.kind.stripeId
-          : null;
-      case `trialExpired`:
-        return plan.status.kind.case === `fromLight` ||
-          plan.status.kind.case === `fromLapsedLight`
-          ? plan.status.kind.stripeId
-          : null;
-      default:
-        return null;
-    }
-  }
-}
-
-const PlanCard: React.FC<{ plan: Plan }> = ({ plan }) => {
+const PlanCard: React.FC<{ entitlement: Entitlement }> = ({ entitlement }) => {
+  const planKey =
+    entitlement.case === `complimentary` ||
+    entitlement.case === `fullTrial` ||
+    entitlement.case === `fullTrialGrace`
+      ? `full`
+      : entitlement.case;
   const fallback = {
     label: `Free`,
     bg: `from-slate-300 to-slate-400`,
     text: `text-white`,
   };
-  const tier = PLAN_TIER_CONFIG[plan.case] ?? fallback;
+  const tier = PLAN_TIER_CONFIG[planKey] ?? fallback;
   return (
     <div className={`rounded-xl p-4 bg-gradient-to-br ${tier.bg} ${tier.text}`}>
       <div className="text-sm opacity-80">Plan</div>

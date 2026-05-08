@@ -74,14 +74,10 @@ extension Parent {
       .all(in: db)
   }
 
-  func subscription(in db: any DuetSQL.Client) async throws -> Subscription? {
-    try? await Subscription.query()
+  func subscription(in db: any DuetSQL.Client) async throws -> StripeSubscription? {
+    try? await StripeSubscription.query()
       .where(.parentId == self.id)
       .first(in: db)
-  }
-
-  func plan(in db: any DuetSQL.Client) async throws -> Plan {
-    try await .init(subscription: self.subscription(in: db))
   }
 
   func billingIdentity(in db: any DuetSQL.Client) async throws -> BillingIdentity? {

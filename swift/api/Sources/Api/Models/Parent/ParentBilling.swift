@@ -1,16 +1,17 @@
 import Foundation
+import TaggedMoney
 
 struct ParentBilling: Sendable {
   let identity: BillingIdentity
-  let stripeSubscription: Subscription?
+  let stripeSubscription: StripeSubscription?
 
   func entitlement(at now: Date) -> Entitlement {
     if self.identity.isComplimentary {
       return .complimentary
     }
 
-    let liveSub: Subscription? =
-      self.stripeSubscription?.stripeStatus?.isLive == true
+    let liveSub: StripeSubscription? =
+      self.stripeSubscription?.stripeStatus.isLive == true
         ? self.stripeSubscription
         : nil
 
@@ -36,6 +37,24 @@ struct ParentBilling: Sendable {
     switch sub.tier {
     case .light: return .light
     case .full: return .full
+    }
+  }
+
+  var allowsSupervision: Bool {
+    if self.identity.isComplimentary { return true }
+    guard let sub = self.stripeSubscription, sub.stripeStatus.isLive else {
+      return false
+    }
+    return !(sub.tier == .full && sub.stripeStatus == .pastDue)
+  }
+
+  var monthlyPrice: Cents<Int>? {
+    guard let sub = self.stripeSubscription, sub.stripeStatus.isPaying else {
+      return nil
+    }
+    switch sub.tier {
+    case .light: return Cents(83)
+    case .full: return Cents(sub.isLegacyPrice ? 500 : 1000)
     }
   }
 }

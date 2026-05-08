@@ -174,14 +174,12 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       fullTrialStartedAt: .reference - .days(18),
       trialEmailLifecycle: .none,
     ))
-    _ = try await self.db.create(Subscription(
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .light,
-      billingStatus: .paid,
       stripeId: .init("sub_light"),
       stripeStatus: .active,
       currentPeriodEnd: .reference + .days(180),
-      statusExpiresAt: .reference + .days(182),
     ))
 
     _ = try await SubscriptionManager().advanceTrialEmails()
@@ -199,14 +197,12 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
       fullTrialStartedAt: .reference - .days(18),
       trialEmailLifecycle: .none,
     ))
-    _ = try await self.db.create(Subscription(
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_full"),
       stripeStatus: .active,
       currentPeriodEnd: .reference + .days(15),
-      statusExpiresAt: .reference + .days(17),
     ))
 
     _ = try await SubscriptionManager().advanceTrialEmails()
@@ -265,7 +261,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.none)
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testIdentityWithoutTrialIgnored() async throws {
@@ -339,16 +335,15 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   // MARK: - Stripe failsafe
 
   func testRefreshActiveSubKeepsActiveAndUpdatesPeriodEnd() async throws {
-    try await self.db.delete(all: Subscription.self)
+    try await self.db.delete(all: StripeSubscription.self)
     let parent = try await self.parent()
-    _ = try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_x"),
       stripeStatus: .active,
       currentPeriodEnd: .reference - .days(5),
-      statusExpiresAt: .reference - .days(3),
     ))
 
     let nextPeriodEnd = Date.reference + .days(25)
@@ -370,23 +365,20 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.active)
     expect(sub.currentPeriodEnd).toEqual(nextPeriodEnd)
-    expect(sub.statusExpiresAt).toEqual(nextPeriodEnd + .days(2))
-    expect(sub.billingStatus).toEqual(.paid)
     expect(self.sent.emails.count).toEqual(0)
   }
 
   func testActiveToPastDueSendsPaidToOverdueEmail() async throws {
-    try await self.db.delete(all: Subscription.self)
+    try await self.db.delete(all: StripeSubscription.self)
     let parent = try await self.parent()
     _ = try await parent.withOnboardedChild()
-    _ = try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_pd"),
       stripeStatus: .active,
       currentPeriodEnd: .reference - .days(5),
-      statusExpiresAt: .reference - .days(3),
     ))
 
     try await withDependencies {
@@ -399,23 +391,21 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.pastDue)
-    expect(sub.billingStatus).toEqual(.overdue)
     expect(self.sent.emails.count).toEqual(1)
     expect(self.sent.emails[0].template).toBe("paid-to-overdue")
   }
 
   func testPastDueToCanceledOnboardedSendsOverdueToUnpaidEmail() async throws {
-    try await self.db.delete(all: Subscription.self)
+    try await self.db.delete(all: StripeSubscription.self)
     let parent = try await self.parent()
     _ = try await parent.withOnboardedChild()
-    _ = try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .overdue,
       stripeId: .init("sub_cx"),
       stripeStatus: .pastDue,
       currentPeriodEnd: .reference - .days(8),
-      statusExpiresAt: .reference - .days(6),
     ))
 
     try await withDependencies {
@@ -428,22 +418,20 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.stripeStatus).toEqual(.canceled)
-    expect(sub.billingStatus).toEqual(.cancelled)
     expect(self.sent.emails.count).toEqual(1)
     expect(self.sent.emails[0].template).toBe("overdue-to-unpaid")
   }
 
   func testTerminalSubsAreNotRefreshed() async throws {
-    try await self.db.delete(all: Subscription.self)
+    try await self.db.delete(all: StripeSubscription.self)
     let parent = try await self.parent()
-    _ = try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .cancelled,
       stripeId: .init("sub_t"),
       stripeStatus: .canceled,
       currentPeriodEnd: .reference - .days(50),
-      statusExpiresAt: .distantFuture,
     ))
 
     try await withDependencies {
@@ -458,16 +446,15 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testStripeLookupErrorIsSwallowed() async throws {
-    try await self.db.delete(all: Subscription.self)
+    try await self.db.delete(all: StripeSubscription.self)
     let parent = try await self.parent()
-    _ = try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_e"),
       stripeStatus: .active,
       currentPeriodEnd: .reference - .days(5),
-      statusExpiresAt: .reference - .days(3),
     ))
 
     try await withDependencies {

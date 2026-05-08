@@ -1,9 +1,11 @@
 // auto-generated, do not edit
-export namespace StripeUrl_v2 {
+import type { SubscriptionTier } from '../shared';
+
+export namespace StartCheckoutSession {
   export interface Input {
+    tier: SubscriptionTier;
     successPath: string;
     cancelPath: string;
-    tier?: 'light' | 'full';
     associatedIosDeviceId?: UUID;
   }
 

@@ -197,8 +197,17 @@ export const throwingClient: ApiClient = {
   startFullTrial: () => {
     throw new Error(`ApiClient.startFullTrial() not implemented`);
   },
-  stripeUrl: () => {
-    throw new Error(`ApiClient.stripeUrl() not implemented`);
+  openBillingPortal: () => {
+    throw new Error(`ApiClient.openBillingPortal() not implemented`);
+  },
+  upgradeSubscriptionTier: () => {
+    throw new Error(`ApiClient.upgradeSubscriptionTier() not implemented`);
+  },
+  getSubscriptionPanel: () => {
+    throw new Error(`ApiClient.getSubscriptionPanel() not implemented`);
+  },
+  startCheckoutSession: () => {
+    throw new Error(`ApiClient.startCheckoutSession() not implemented`);
   },
   toggleChildKeychain: () => {
     throw new Error(`ApiClient.toggleChildKeychain() not implemented`);

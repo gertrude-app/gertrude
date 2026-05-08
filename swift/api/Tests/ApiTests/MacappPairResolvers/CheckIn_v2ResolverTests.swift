@@ -42,12 +42,13 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.child().withDevice(computer: {
       $0.appReleaseChannel = .beta
     })
-    try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: child.parentId))
+    try await self.db.create(StripeSubscription(
       parentId: child.parentId,
       tier: .full,
-      billingStatus: .overdue, // <-- needs attention
       stripeId: .init("sub_123"),
-      statusExpiresAt: .distantFuture,
+      stripeStatus: .pastDue, // <-- needs attention
+      currentPeriodEnd: .reference + .days(28),
     ))
 
     let output = try await CheckIn_v2.resolve(
@@ -306,12 +307,13 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testAdminAccountStatus_FullPaid_IsActive() async throws {
     let child = try await self.child().withDevice()
-    try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: child.parentId))
+    try await self.db.create(StripeSubscription(
       parentId: child.parentId,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_123"),
-      statusExpiresAt: .distantFuture,
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
     ))
 
     let output = try await CheckIn_v2.resolve(
@@ -321,14 +323,11 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.adminAccountStatus).toEqual(.active)
   }
 
-  func testAdminAccountStatus_FullTrialing_IsActive() async throws {
+  func testAdminAccountStatus_StandaloneTrial_IsActive() async throws {
     let child = try await self.child().withDevice()
-    try await self.db.create(Subscription(
+    try await self.db.create(BillingIdentity(
       parentId: child.parentId,
-      tier: .full,
-      billingStatus: .trialing,
-      trialStartedAt: Date(),
-      statusExpiresAt: .distantFuture,
+      fullTrialStartedAt: .reference,
     ))
 
     let output = try await CheckIn_v2.resolve(
@@ -340,11 +339,9 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testAdminAccountStatus_FullComplimentary_IsActive() async throws {
     let child = try await self.child().withDevice()
-    try await self.db.create(Subscription(
+    try await self.db.create(BillingIdentity(
       parentId: child.parentId,
-      tier: .full,
-      billingStatus: nil,
-      statusExpiresAt: .distantFuture,
+      isComplimentary: true,
     ))
 
     let output = try await CheckIn_v2.resolve(
@@ -504,13 +501,11 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(keyIds.isSuperset(of: expectedIds)).toBeTrue()
   }
 
-  func testAdminAccountStatus_FullTrialExpired_IsNeedsAttention() async throws {
+  func testAdminAccountStatus_FullTrialGrace_IsNeedsAttention() async throws {
     let child = try await self.child().withDevice()
-    try await self.db.create(Subscription(
+    try await self.db.create(BillingIdentity(
       parentId: child.parentId,
-      tier: .full,
-      billingStatus: .trialExpired,
-      statusExpiresAt: .distantFuture,
+      fullTrialStartedAt: .reference - .days(25),
     ))
 
     let output = try await CheckIn_v2.resolve(

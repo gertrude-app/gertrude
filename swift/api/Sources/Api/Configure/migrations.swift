@@ -95,6 +95,7 @@ extension Configure {
     app.migrations.add(HoistClaimFieldsToDevice())
     app.migrations.add(AppIconUploadProvenance())
     app.migrations.add(AddBillingIdentities())
+    app.migrations.add(StripeSubsCleanup())
   }
 }
 

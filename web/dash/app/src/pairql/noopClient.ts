@@ -30,10 +30,7 @@ const noopClient: ApiClient = {
     return Result.success({
       id: ``,
       email: ``,
-      plan: {
-        case: `full`,
-        status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-      },
+      entitlement: { case: `full` },
       notifications: [],
       verifiedNotificationMethods: [],
     });
@@ -249,7 +246,21 @@ const noopClient: ApiClient = {
   startFullTrial: async () => {
     return Result.success(undefined);
   },
-  stripeUrl: async (_input) => {
+  openBillingPortal: async () => {
+    return Result.success({ url: `/` });
+  },
+  upgradeSubscriptionTier: async () => {
+    return Result.success({ success: true });
+  },
+  getSubscriptionPanel: async () => {
+    return Result.success({
+      entitlement: { case: `full` },
+      billing: {},
+      secondary: [],
+      availableTiers: [],
+    });
+  },
+  startCheckoutSession: async () => {
     return Result.success({ url: `/` });
   },
   securityEventsFeed: async () => {

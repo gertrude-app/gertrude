@@ -93,7 +93,7 @@ private func handleInvoicePaid(
   // a customer asked for this, he pays for himself but his "parent" is accountability
   // partner that has a different email/account, whom he did not want to have to pay
   if parent == nil {
-    let subscription = try? await Subscription.query()
+    let subscription = try? await StripeSubscription.query()
       .where(.stripeId == .init(event?.data?.object?.subscription ?? ""))
       .first(in: db)
     if let subscription {
@@ -111,7 +111,7 @@ private func handleInvoicePaid(
   }
 
   let priceId = event?.data?.object?.lines?.data?.first?.price?.id
-  guard let eventTier = priceId.flatMap(Subscription.Tier.init(stripePriceId:)) else {
+  guard let eventTier = priceId.flatMap(StripeSubscription.Tier.init(stripePriceId:)) else {
     unexpected("bf3cad72", detail: "email: \(email ?? "(nil)"), event: \(stripeEvent.id)")
     return
   }
@@ -125,16 +125,12 @@ private func handleInvoicePaid(
   let periodEnd = event?.data?.object?.lines?.data?.first?.period?.end
     .map { Date(timeIntervalSince1970: TimeInterval($0)) }
     ?? now + .days(eventTier.periodLengthInDays)
-  let statusExpiration = periodEnd + .days(2)
 
   if var subscription = try await parent.subscription(in: db) {
-    if subscription.stripeId == nil {
-      await recordPaidAdConversion(parent: parent, db: db)
-      notifyFirstPayment(parent: parent, tier: eventTier)
-    } else if subscription.stripeId?.rawValue != eventSubscriptionId {
+    if subscription.stripeId.rawValue != eventSubscriptionId {
       let allow = try await reconcileDuplicateSubscription(
         parent: parent,
-        existingSubId: subscription.stripeId!.rawValue,
+        existingSubId: subscription.stripeId.rawValue,
         incomingSubId: eventSubscriptionId,
         context: "stripe-webhook",
         audit: "stripe_event_id: \(stripeEvent.stripeEventId ?? "(nil)")",
@@ -143,22 +139,19 @@ private func handleInvoicePaid(
       guard allow else { return }
     }
     subscription.tier = eventTier
-    subscription.billingStatus = .paid
     subscription.stripeId = .init(eventSubscriptionId)
     subscription.stripeStatus = .active
     subscription.currentPeriodEnd = periodEnd
-    subscription.statusExpiresAt = statusExpiration
     try await db.update(subscription)
 
   } else {
-    try await db.create(Subscription(
+    _ = try await parent.ensureBillingIdentity(in: db)
+    try await db.create(StripeSubscription(
       parentId: parent.id,
       tier: eventTier,
-      billingStatus: .paid,
       stripeId: .init(eventSubscriptionId),
       stripeStatus: .active,
       currentPeriodEnd: periodEnd,
-      statusExpiresAt: statusExpiration,
     ))
     await recordPaidAdConversion(parent: parent, db: db)
     notifyFirstPayment(parent: parent, tier: eventTier)
@@ -203,7 +196,7 @@ private func handleSubscriptionUpdated(
     return
   }
 
-  guard var subscription = try? await Subscription.query()
+  guard var subscription = try? await StripeSubscription.query()
     .where(.stripeId == .init(stripeSubId))
     .first(in: db) else {
     unexpected(
@@ -214,7 +207,7 @@ private func handleSubscriptionUpdated(
   }
 
   let priceId = event?.data?.object?.items?.data?.first?.price?.id
-  guard let eventTier = priceId.flatMap(Subscription.Tier.init(stripePriceId:)) else {
+  guard let eventTier = priceId.flatMap(StripeSubscription.Tier.init(stripePriceId:)) else {
     unexpected(
       "8e1cb204",
       detail: "unknown price id: \(priceId ?? "(nil)"), event: \(stripeEvent.id)",
@@ -223,7 +216,7 @@ private func handleSubscriptionUpdated(
   }
 
   guard let statusRaw = event?.data?.object?.status,
-        let stripeStatus = Subscription.StripeStatus(rawValue: statusRaw) else {
+        let stripeStatus = StripeSubscription.StripeStatus(rawValue: statusRaw) else {
     unexpected(
       "33ec5b7f",
       detail: "unknown status: \(event?.data?.object?.status ?? "(nil)"), event: \(stripeEvent.id)",
@@ -251,32 +244,30 @@ private func handleSubscriptionUpdated(
   }
 
   subscription.stripeStatus = stripeStatus
-  if let mirrored = stripeStatus.mirroredBillingStatus {
-    subscription.billingStatus = mirrored
-  }
   if let periodEnd = event?.data?.object?.current_period_end {
     subscription.currentPeriodEnd = Date(timeIntervalSince1970: TimeInterval(periodEnd))
   }
   try await db.update(subscription)
 
-  if stripeStatus.isPaying {
-    let parent = try await db.find(subscription.parentId) as Parent
-    if var identity = try await parent.billingIdentity(in: db),
-       identity.lastPaidTier != eventTier {
-      identity.lastPaidTier = eventTier
-      try await db.update(identity)
+  if stripeStatus.isPaying, var identity = try await db.find(subscription.parentId)
+    .billingIdentity(in: db) {
+    var changed = false
+    if let customer = event?.data?.object?.customer,
+       identity.stripeCustomerId?.rawValue != customer {
+      identity.stripeCustomerId = .init(customer)
+      changed = true
     }
-  }
-}
-
-extension Subscription.StripeStatus {
-  var mirroredBillingStatus: BillingStatus.Db? {
-    switch self {
-    case .active: .paid
-    case .pastDue: .overdue
-    case .unpaid, .incomplete, .incompleteExpired: .unpaid
-    case .canceled: .cancelled
-    case .trialing: nil
+    if identity.stripeCustomerId != nil,
+       identity.lastStripeSubscriptionId?.rawValue != stripeSubId {
+      identity.lastStripeSubscriptionId = .init(stripeSubId)
+      changed = true
+    }
+    if identity.stripeCustomerId != nil, identity.lastPaidTier != eventTier {
+      identity.lastPaidTier = eventTier
+      changed = true
+    }
+    if changed {
+      try await db.update(identity)
     }
   }
 }
@@ -290,16 +281,14 @@ private func handleSubscriptionDeleted(
     return
   }
 
-  guard var subscription = try? await Subscription.query()
+  guard var subscription = try? await StripeSubscription.query()
     .where(.stripeId == .init(stripeSubId))
     .first(in: db) else {
     unexpected("a7c3d1e5", detail: "stripe sub id: \(stripeSubId), event: \(stripeEvent.id)")
     return
   }
 
-  subscription.billingStatus = .cancelled
   subscription.stripeStatus = .canceled
-  subscription.statusExpiresAt = .distantFuture
   try await db.update(subscription)
 
   Task {
@@ -537,7 +526,7 @@ func recordPaidAdConversion(parent: Parent, db: any DuetSQL.Client) async {
   ))
 }
 
-func notifyFirstPayment(parent: Parent, tier: Subscription.Tier) {
+func notifyFirstPayment(parent: Parent, tier: StripeSubscription.Tier) {
   let email = parent.email.rawValue
   let adminLink = AdminLink()
   let slackLink = adminLink.slack(to: .parent(parent.id), text: email)
@@ -571,8 +560,8 @@ func notifyDuplicateSubscriptionAttempt(
 
 func notifyUnexpectedTierChange(
   parentId: Parent.Id,
-  fromTier: Subscription.Tier,
-  toTier: Subscription.Tier,
+  fromTier: StripeSubscription.Tier,
+  toTier: StripeSubscription.Tier,
   source: String,
 ) {
   let adminLink = AdminLink().slack(to: .parent(parentId), text: parentId.lowercased)

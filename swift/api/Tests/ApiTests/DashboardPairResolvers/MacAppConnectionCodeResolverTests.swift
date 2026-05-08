@@ -15,10 +15,9 @@ final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable 
   }
 
   func testFullPaidUser_noGate() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.billingStatus = .paid
-      $1.stripeId = .init("sub_123")
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeStatus = .active
     }
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
@@ -43,11 +42,9 @@ final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable 
   }
 
   func testLightUserNotTrialed_getsTrialRequiredGate() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.billingStatus = .paid
-      $1.trialStartedAt = nil
-      $1.stripeId = .init("sub_123")
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .light
+      sub.stripeStatus = .active
     }
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
@@ -60,12 +57,15 @@ final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable 
   }
 
   func testLightUserAlreadyTrialed_getsPlanUpgradeRequiredGate() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.billingStatus = .paid
-      $1.stripeId = .init("sub_123")
-      $1.trialStartedAt = .reference - .days(60)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .light
+      sub.stripeStatus = .active
     }
+    let identityOpt = try await parent.model.billingIdentity(in: self.db)
+    var identity = try XCTUnwrap(identityOpt)
+    identity.fullTrialStartedAt = .reference - .days(60)
+    try await self.db.update(identity)
+
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
     let output = try await MacAppConnectionCode.resolve(
@@ -77,12 +77,13 @@ final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable 
   }
 
   func testLapsedFullUser_getsSubscriptionFixRequiredGate() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.billingStatus = .unpaid
-      $1.stripeId = .init("sub_123")
-      $1.statusExpiresAt = .reference - .days(7)
-    }
+    let parent = try await self.parent()
+    try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_123"),
+      lastStripeSubscriptionId: .init("sub_123"),
+      lastPaidTier: .full,
+    ))
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
 
     let output = try await MacAppConnectionCode.resolve(

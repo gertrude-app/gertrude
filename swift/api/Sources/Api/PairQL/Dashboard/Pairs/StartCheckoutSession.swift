@@ -8,7 +8,7 @@ struct StartCheckoutSession: Pair {
   static let auth: ClientAuth = .parent
 
   struct Input: PairInput {
-    var tier: Subscription.Tier
+    var tier: StripeSubscription.Tier
     var successPath: String
     var cancelPath: String
     var associatedIosDeviceId: IOSDevice.Id?
@@ -24,7 +24,7 @@ extension StartCheckoutSession: Resolver {
     @Dependency(\.stripe) var stripe
 
     let billing = try await context.parent.parentBilling(in: context.db)
-    if let sub = billing.stripeSubscription, sub.stripeStatus?.isLive == true {
+    if let sub = billing.stripeSubscription, sub.stripeStatus.isLive {
       throw context.error(
         "20de8a91",
         .badRequest,

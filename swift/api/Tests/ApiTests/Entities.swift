@@ -86,6 +86,16 @@ struct ParentEntities {
 }
 
 @dynamicMemberLookup
+struct ParentSubscriptionEntities: Sendable {
+  var model: Parent
+  var subscription: StripeSubscription
+
+  subscript<T>(dynamicMember keyPath: KeyPath<Parent, T>) -> T {
+    self.model[keyPath: keyPath]
+  }
+}
+
+@dynamicMemberLookup
 struct ParentWithKeychainEntities {
   var model: Parent
   var token: Parent.DashToken
@@ -147,15 +157,19 @@ extension ApiTestCase {
   }
 
   func parentWithSubscription(
-    with config: (inout Parent, inout Subscription) -> Void = { _, _ in },
-  ) async throws -> ParentWithSubscription {
+    identity: BillingIdentity? = nil,
+    with config: (inout Parent, inout StripeSubscription) -> Void = { _, _ in },
+  ) async throws -> ParentSubscriptionEntities {
     var parent = try await self.db.create(Parent.random)
-    var subscription = try await self.db.create(Subscription(
+    var identityRow = identity ?? BillingIdentity(parentId: parent.id)
+    identityRow.parentId = parent.id
+    _ = try await self.db.create(identityRow)
+    var subscription = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .trialing,
-      trialStartedAt: .reference,
-      statusExpiresAt: .reference + .days(18),
+      stripeId: "sub_test",
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
     ))
     config(&parent, &subscription)
     try await self.db.update(parent)
