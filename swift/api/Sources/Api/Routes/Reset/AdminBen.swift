@@ -21,12 +21,13 @@ enum AdminBen {
       emailVerifiedAt: Date(),
     ))
 
-    try await db.create(Subscription(
+    try await db.create(BillingIdentity(parentId: ben.id))
+    try await db.create(StripeSubscription(
       parentId: ben.id,
       tier: .light,
-      billingStatus: .paid,
       stripeId: "sub_fake_ben_ios_only_12345",
-      statusExpiresAt: Date() + .days(365),
+      stripeStatus: .active,
+      currentPeriodEnd: Date() + .days(365),
     ))
 
     try await db.create(Parent.DashToken(

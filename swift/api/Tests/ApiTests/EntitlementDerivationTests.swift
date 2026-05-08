@@ -125,7 +125,7 @@ final class EntitlementDerivationTests: DependencyTestCase {
 private func entitle(
   comp: Bool = false,
   trialStartedAt: Date? = nil,
-  sub: Subscription.Tier? = nil,
+  sub: StripeSubscription.Tier? = nil,
   at now: Date,
 ) -> Entitlement {
   let identity = BillingIdentity(
@@ -134,13 +134,12 @@ private func entitle(
     isComplimentary: comp,
   )
   let subscription = sub.map { tier in
-    Subscription(
+    StripeSubscription(
       parentId: identity.parentId,
       tier: tier,
-      billingStatus: .paid,
       stripeId: .init("sub_test"),
       stripeStatus: .active,
-      statusExpiresAt: .distantFuture,
+      currentPeriodEnd: now + .days(30),
     )
   }
   return ParentBilling(

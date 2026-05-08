@@ -4,9 +4,9 @@ import React from 'react';
 import type {
   AdminNotificationTrigger,
   ConfirmableEntityAction,
+  Entitlement,
   NewAdminNotificationMethodEvent,
   PendingNotificationMethod,
-  Plan,
   RequestState,
   Subcomponents,
 } from '@dash/types';
@@ -28,7 +28,7 @@ export type NewMethod = { id: UUID; confirmed: boolean };
 
 interface Props {
   email: string;
-  plan: Plan;
+  entitlement: Entitlement;
   billingPortalRequest: RequestState<{ url: string }>;
   pendingMethod?: PendingNotificationMethod;
   methods: Subcomponents<typeof NotificationMethod>;
@@ -42,12 +42,11 @@ interface Props {
   newMethodEventHandler(event: NewAdminNotificationMethodEvent): unknown;
   newMethodId?: NewMethod;
   setNewMethodId(id: NewMethod | undefined): unknown;
-  requestedTier?: `full` | `light` | null;
 }
 
 const Settings: React.FC<Props> = ({
   email,
-  plan,
+  entitlement,
   methods,
   notifications,
   updateNotification,
@@ -61,7 +60,6 @@ const Settings: React.FC<Props> = ({
   manageSubscription,
   newMethodId,
   setNewMethodId,
-  requestedTier,
 }) => (
   <div className="relative">
     {newMethodId && newMethodId.confirmed && (
@@ -123,33 +121,29 @@ const Settings: React.FC<Props> = ({
           Change password
         </Button>
       </div>
-      <div
-        className={cx(
-          `p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border border-slate-200 mt-4 lg:mt-0`,
-          shouldShowTrialWarning(plan) && `pt-10`,
-        )}
-      >
+      <div className="p-8 bg-slate-100 rounded-xl lg:ml-8 lg:w-1/3 flex justify-between relative border border-slate-200 mt-4 lg:mt-0">
         <div className="flex justify-end items-start flex-col mr-8">
-          <h2 className="font-bold text-xl text-slate-700">{planName(plan)}</h2>
-          <PlanPrice plan={plan} />
-          {showManageSubscriptionLink(plan, requestedTier) && (
-            <a
-              {...(billingPortalRequest.state === `succeeded`
-                ? { href: billingPortalRequest.payload.url }
-                : {})}
-              className={cx(
-                `mt-2 text-sm whitespace-nowrap cursor-pointer transition-[color] duration-100`,
-                manageSubscriptionStateClasses(billingPortalRequest),
-              )}
-              onClick={
-                billingPortalRequest.state === `idle` ? manageSubscription : void 0
-              }
-            >
-              {manageSubscriptionText(billingPortalRequest, plan, requestedTier)}
-            </a>
-          )}
+          <h2 className="font-bold text-xl text-slate-700">{planName(entitlement)}</h2>
+          <a
+            {...(billingPortalRequest.state === `succeeded`
+              ? { href: billingPortalRequest.payload.url }
+              : {})}
+            className={cx(
+              `mt-2 text-sm whitespace-nowrap cursor-pointer transition-[color] duration-100`,
+              manageSubscriptionStateClasses(billingPortalRequest),
+            )}
+            onClick={billingPortalRequest.state === `idle` ? manageSubscription : void 0}
+          >
+            Manage subscription...
+          </a>
         </div>
-        <AccountStatusBadge plan={plan} />
+        <Badge
+          type={badgeType(entitlement)}
+          size="large"
+          className="absolute right-2 top-2 border"
+        >
+          {badgeText(entitlement)}
+        </Badge>
       </div>
     </div>
     <div className="mt-12 flex flex-col space-y-12">
@@ -235,171 +229,48 @@ const Settings: React.FC<Props> = ({
 
 export default Settings;
 
-const AccountStatusBadge: React.FC<{ plan: Plan }> = ({ plan }) => (
-  <Badge type={badgeType(plan)} size="large" className="absolute right-2 top-2 border">
-    {badgeText(plan)}
-  </Badge>
-);
-
-const PlanPrice: React.FC<{ plan: Plan }> = ({ plan }) => {
-  const price = priceInfo(plan);
-  if (!price) return null;
-  return (
-    <h3 className="my-1">
-      <span className="text-slate-600 font-medium text-lg relative bottom-3">$</span>
-      <span className="text-slate-900 text-4xl font-bold">{price.dollars}</span>
-      <span className="text-slate-600 text-lg font-medium">/{price.interval}</span>
-    </h3>
-  );
-};
-
-function planName(plan: Plan): string {
-  switch (plan.case) {
+function planName(entitlement: Entitlement): string {
+  switch (entitlement.case) {
     case `free`:
       return `Free plan`;
     case `light`:
       return `Light plan`;
     case `full`:
+    case `complimentary`:
       return `Full plan`;
+    case `fullTrial`:
+    case `fullTrialGrace`:
+      return `Full trial`;
   }
 }
 
-function priceInfo(plan: Plan): { dollars: number; interval: string } | null {
-  switch (plan.case) {
+function badgeType(entitlement: Entitlement): React.ComponentProps<typeof Badge>[`type`] {
+  switch (entitlement.case) {
     case `free`:
-      return { dollars: 0, interval: `month` };
     case `light`:
-      return { dollars: 10, interval: `year` };
     case `full`:
-      switch (plan.status.case) {
-        case `trialing`:
-        case `trialExpired`:
-        case `complimentary`:
-          return { dollars: 10, interval: `month` };
-        case `paid`:
-        case `overdue`:
-          return { dollars: plan.status.monthlyPriceInCents / 100, interval: `month` };
-      }
-  }
-}
-
-function shouldShowTrialWarning(plan: Plan): boolean {
-  if (plan.case !== `full`) return false;
-  if (plan.status.case === `trialExpired`) return true;
-  if (plan.status.case !== `trialing`) return false;
-  const daysLeft = trialDaysRemaining(plan.status.until);
-  return daysLeft < 10;
-}
-
-function trialDaysRemaining(until: string): number {
-  const now = new Date();
-  const end = new Date(until);
-  const diff = end.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
-
-function showManageSubscriptionLink(
-  plan: Plan,
-  requestedTier?: `full` | `light` | null,
-): boolean {
-  if (plan.case === `free`) {
-    if (requestedTier) return true;
-    if (plan.kind.case === `lapsedFull` || plan.kind.case === `lapsedLight`) return true;
-    return false;
-  }
-  if (plan.case === `full` && plan.status.case === `complimentary`) return false;
-  return true;
-}
-
-function badgeType(plan: Plan): React.ComponentProps<typeof Badge>[`type`] {
-  switch (plan.case) {
-    case `free`:
+    case `complimentary`:
+    case `fullTrial`:
       return `ok`;
-    case `light`:
-      return plan.status.case === `overdue` ? `warning` : `ok`;
-    case `full`:
-      switch (plan.status.case) {
-        case `complimentary`:
-        case `paid`:
-          return `ok`;
-        case `trialing`: {
-          const daysLeft = trialDaysRemaining(plan.status.until);
-          return daysLeft < 10 ? `warning` : `ok`;
-        }
-        case `trialExpired`:
-        case `overdue`:
-          return `warning`;
-      }
+    case `fullTrialGrace`:
+      return `warning`;
   }
 }
 
-function badgeText(plan: Plan): string {
-  switch (plan.case) {
+function badgeText(entitlement: Entitlement): string {
+  switch (entitlement.case) {
     case `free`:
       return `free`;
     case `light`:
-      return plan.status.case === `overdue` ? `past due` : `active`;
+      return `active`;
     case `full`:
-      switch (plan.status.case) {
-        case `complimentary`:
-          return `complimentary`;
-        case `trialing`: {
-          const daysLeft = trialDaysRemaining(plan.status.until);
-          if (daysLeft === 1) return `1 day left in trial`;
-          if (daysLeft < 10) return `${daysLeft} days left in trial`;
-          return `trialing`;
-        }
-        case `trialExpired`:
-          return `trial expired`;
-        case `paid`:
-          return `active`;
-        case `overdue`:
-          return `past due`;
-      }
-  }
-}
-
-function manageSubscriptionText(
-  req: RequestState<unknown>,
-  plan: Plan,
-  requestedTier?: `full` | `light` | null,
-): string {
-  switch (req.state) {
-    case `idle`:
-      if (requestedTier === `full`) {
-        return `Subscribe to Full ($10/month)...`;
-      }
-      if (
-        plan.case === `full` &&
-        (plan.status.case === `trialing` || plan.status.case === `trialExpired`)
-      ) {
-        return `Start subscription...`;
-      }
-      if (
-        (plan.case === `light` && plan.status.case === `overdue`) ||
-        (plan.case === `full` && plan.status.case === `overdue`)
-      ) {
-        return `Resolve payment status...`;
-      }
-      if (plan.case === `free`) {
-        switch (plan.kind.case) {
-          case `lapsedLight`:
-            return `Reactivate subscription...`;
-          case `lapsedFull`:
-            return plan.kind.stripeId
-              ? `Reactivate subscription...`
-              : `Start subscription...`;
-          case `standard`:
-            return `Upgrade plan...`;
-        }
-      }
-      return `Manage subscription...`;
-    case `ongoing`:
-      return `Loading link...`;
-    case `failed`:
-      return `Failed to load`;
-    case `succeeded`:
-      return `Click here!`;
+      return `active`;
+    case `complimentary`:
+      return `complimentary`;
+    case `fullTrial`:
+      return `trialing`;
+    case `fullTrialGrace`:
+      return `trial expired`;
   }
 }
 

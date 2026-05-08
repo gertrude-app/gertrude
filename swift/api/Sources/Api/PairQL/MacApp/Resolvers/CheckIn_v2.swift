@@ -417,11 +417,14 @@ private extension CheckIn_v2 {
     for parent: Parent,
     in context: MacApp.ChildContext,
   ) async throws -> AdminAccountStatus {
-    let subscription = try await parent.subscription(in: context.db)
-    return switch Plan(subscription: subscription) {
-    case .full(.trialExpired), .full(.overdue):
+    let billing = try await parent.parentBilling(in: context.db)
+    let now = get(dependency: \.date.now)
+    return switch billing.entitlement(at: now) {
+    case .full where billing.stripeSubscription?.stripeStatus == .pastDue:
       .needsAttention
-    case .full:
+    case .fullTrialGrace:
+      .needsAttention
+    case .full, .complimentary, .fullTrial:
       .active
     case .light, .free:
       .inactive

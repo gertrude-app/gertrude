@@ -254,23 +254,20 @@ extension Parent: Model {
   }
 }
 
-extension Subscription: Model {
+extension StripeSubscription: Model {
   public typealias ColumnName = CodingKeys
   public static let schemaName = "parent"
-  public static let tableName = "subscriptions"
+  public static let tableName = "stripe_subscriptions"
 
   public func postgresData(for column: ColumnName) -> Postgres.Data {
     switch column {
     case .id: .id(self)
     case .parentId: .uuid(self.parentId)
     case .tier: .enum(self.tier)
-    case .billingStatus: .enum(self.billingStatus)
-    case .stripeId: .string(self.stripeId?.rawValue)
-    case .stripeStatus: .string(self.stripeStatus?.rawValue)
+    case .stripeId: .string(self.stripeId.rawValue)
+    case .stripeStatus: .string(self.stripeStatus.rawValue)
     case .currentPeriodEnd: .date(self.currentPeriodEnd)
     case .isLegacyPrice: .bool(self.isLegacyPrice)
-    case .trialStartedAt: .date(self.trialStartedAt)
-    case .statusExpiresAt: .date(self.statusExpiresAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -281,13 +278,10 @@ extension Subscription: Model {
       .id: .id(self),
       .parentId: .uuid(self.parentId),
       .tier: .enum(self.tier),
-      .billingStatus: .enum(self.billingStatus),
-      .stripeId: .string(self.stripeId?.rawValue),
-      .stripeStatus: .string(self.stripeStatus?.rawValue),
+      .stripeId: .string(self.stripeId.rawValue),
+      .stripeStatus: .string(self.stripeStatus.rawValue),
       .currentPeriodEnd: .date(self.currentPeriodEnd),
       .isLegacyPrice: .bool(self.isLegacyPrice),
-      .trialStartedAt: .date(self.trialStartedAt),
-      .statusExpiresAt: .date(self.statusExpiresAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

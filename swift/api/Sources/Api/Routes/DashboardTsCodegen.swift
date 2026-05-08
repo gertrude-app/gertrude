@@ -49,7 +49,9 @@ enum DashboardTsCodegenRoute {
       ("AdminNotification", GetAccountOwner.Notification.self),
       ("WebPolicy", WebContentFilterPolicy.Kind.self),
       ("SecurityEventSeverity", SecurityEventsFeed.Severity.self),
-      ("Plan", Plan.self),
+      ("Entitlement", Entitlement.self),
+      ("SubscriptionTier", StripeSubscription.Tier.self),
+      ("SubscriptionPanelAction", GetSubscriptionPanel.Action.self),
       ("IOSDeviceChildAssignment", ClaimIOSDevice.ChildAssignment.self),
     ]
   }
@@ -92,7 +94,6 @@ enum DashboardTsCodegenRoute {
       SaveUser.self,
       SendPasswordResetEmail.self,
       Signup.self,
-      StripeUrl_v2.self,
       GetSubscriptionPanel.self,
       OpenBillingPortal.self,
       StartCheckoutSession.self,
@@ -124,7 +125,7 @@ enum DashboardTsCodegenRoute {
       .init(NoInput.self, as: "void"),
       .init(Infallible.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
-      .init(Subscription.StripeId.self, as: "string"),
+      .init(StripeSubscription.StripeId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

@@ -19,7 +19,7 @@ struct GetAccountOwner: Pair {
   struct Output: PairOutput {
     var id: Parent.Id
     var email: String
-    var plan: Plan
+    var entitlement: Entitlement
     var notifications: [Notification]
     var verifiedNotificationMethods: [VerifiedNotificationMethod]
   }
@@ -29,14 +29,15 @@ struct GetAccountOwner: Pair {
 
 extension GetAccountOwner: NoInputResolver {
   static func resolve(in context: ParentContext) async throws -> Output {
+    @Dependency(\.date.now) var now
     let parent = context.parent
-    async let subscription = parent.subscription(in: context.db)
+    async let billing = parent.parentBilling(in: context.db)
     async let notifications = parent.notifications(in: context.db)
     async let methods = parent.verifiedNotificationMethods(in: context.db)
     return try await .init(
       id: parent.id,
       email: parent.email.rawValue,
-      plan: .init(subscription: subscription),
+      entitlement: billing.entitlement(at: now),
       notifications: notifications.map {
         .init(id: $0.id, trigger: $0.trigger, methodId: $0.methodId)
       },

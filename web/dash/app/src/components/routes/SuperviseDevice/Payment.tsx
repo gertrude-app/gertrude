@@ -16,10 +16,10 @@ const SuperviseDevicePayment: React.FC = () => {
   );
 
   const getStripeUrl = useMutation(() =>
-    Current.api.stripeUrl({
+    Current.api.startCheckoutSession({
+      tier: `light`,
       successPath: `/supervise-device/${code}/download-helper`,
       cancelPath: `/supervise-device/${code}/payment`,
-      tier: `light`,
       associatedIosDeviceId: deviceStatus.data?.deviceId,
     }),
   );

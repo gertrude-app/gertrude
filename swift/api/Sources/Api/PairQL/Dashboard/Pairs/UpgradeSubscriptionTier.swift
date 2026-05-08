@@ -8,7 +8,7 @@ struct UpgradeSubscriptionTier: Pair {
   static let auth: ClientAuth = .parent
 
   struct Input: PairInput {
-    var to: Subscription.Tier
+    var to: StripeSubscription.Tier
   }
 }
 
@@ -25,14 +25,7 @@ extension UpgradeSubscriptionTier: Resolver {
       )
     }
 
-    guard let stripeId = subscription.stripeId?.rawValue else {
-      throw context.error(
-        "1f2e9c44",
-        .badRequest,
-        user: "No active Stripe subscription to upgrade.",
-      )
-    }
-
+    let stripeId = subscription.stripeId.rawValue
     let fromTier = subscription.tier
     guard fromTier == .light, input.to == .full else {
       throw context.error(
@@ -56,7 +49,7 @@ extension UpgradeSubscriptionTier: Resolver {
       priceId: input.to.checkoutStripePriceId,
     ))
 
-    guard let newStatus = Subscription.StripeStatus(rawValue: updated.status.rawValue),
+    guard let newStatus = StripeSubscription.StripeStatus(rawValue: updated.status.rawValue),
           newStatus == .active || newStatus == .pastDue else {
       notifyPostUpdateStatusAnomaly(
         parentId: context.parent.id,
@@ -71,10 +64,8 @@ extension UpgradeSubscriptionTier: Resolver {
 
     let periodEnd = Date(timeIntervalSince1970: TimeInterval(updated.currentPeriodEnd))
     subscription.tier = input.to
-    subscription.billingStatus = newStatus.mirroredBillingStatus ?? .paid
     subscription.stripeStatus = newStatus
     subscription.currentPeriodEnd = periodEnd
-    subscription.statusExpiresAt = periodEnd + .days(2)
     try await context.db.update(subscription)
 
     var identity = try await context.parent.ensureBillingIdentity(in: context.db)

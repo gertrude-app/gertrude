@@ -6,8 +6,8 @@ struct BillingIdentity: Codable, Sendable {
   var parentId: Parent.Id
   var stripeCustomerId: StripeCustomerId?
   var fullTrialStartedAt: Date?
-  var lastStripeSubscriptionId: Subscription.StripeId?
-  var lastPaidTier: Subscription.Tier?
+  var lastStripeSubscriptionId: StripeSubscription.StripeId?
+  var lastPaidTier: StripeSubscription.Tier?
   var trialEmailLifecycle: TrialEmailLifecycle
   var isComplimentary: Bool
   var createdAt = Date()
@@ -18,8 +18,8 @@ struct BillingIdentity: Codable, Sendable {
     parentId: Parent.Id,
     stripeCustomerId: StripeCustomerId? = nil,
     fullTrialStartedAt: Date? = nil,
-    lastStripeSubscriptionId: Subscription.StripeId? = nil,
-    lastPaidTier: Subscription.Tier? = nil,
+    lastStripeSubscriptionId: StripeSubscription.StripeId? = nil,
+    lastPaidTier: StripeSubscription.Tier? = nil,
     trialEmailLifecycle: TrialEmailLifecycle = .none,
     isComplimentary: Bool = false,
   ) {

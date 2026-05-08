@@ -42,12 +42,13 @@ final class CheckInResolverTests: ApiTestCase, @unchecked Sendable {
       $0.appReleaseChannel = .beta
     })
 
-    try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: child.parentId))
+    try await self.db.create(StripeSubscription(
       parentId: child.parentId,
       tier: .full,
-      billingStatus: .overdue, // <-- needs attention
       stripeId: .init("sub_123"),
-      statusExpiresAt: .distantFuture,
+      stripeStatus: .pastDue, // <-- needs attention
+      currentPeriodEnd: .reference + .days(28),
     ))
 
     let output = try await CheckIn.resolve(

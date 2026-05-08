@@ -20,10 +20,7 @@ export function accountOwner(override: Partial<AccountOwner> = {}): AccountOwner
   return {
     id: uuid(),
     email: `you@example.com`,
-    plan: {
-      case: `full`,
-      status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-    },
+    entitlement: { case: `full` },
     notifications: [],
     verifiedNotificationMethods: [],
     ...override,

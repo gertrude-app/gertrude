@@ -17,10 +17,10 @@ struct GetSubscriptionPanel: Pair {
 
   @TSCodable
   enum Action: Equatable, Sendable {
-    case startCheckout(tier: Subscription.Tier)
+    case startCheckout(tier: StripeSubscription.Tier)
     case openBillingPortal(config: PortalConfig)
-    case upgradeSubscriptionTier(to: Subscription.Tier)
-    case reactivateViaCheckout(tier: Subscription.Tier)
+    case upgradeSubscriptionTier(to: StripeSubscription.Tier)
+    case reactivateViaCheckout(tier: StripeSubscription.Tier)
     case startFullTrial
     case contactSupport(reason: SupportReason)
   }
@@ -40,7 +40,7 @@ struct GetSubscriptionPanel: Pair {
     var billing: BillingState
     var primary: Action?
     var secondary: [Action]
-    var availableTiers: [Subscription.Tier]
+    var availableTiers: [StripeSubscription.Tier]
   }
 }
 
@@ -62,8 +62,8 @@ func panelOutput(
   let sub = billing.stripeSubscription
 
   let billingState = GetSubscriptionPanel.BillingState(
-    status: sub?.stripeStatus.flatMap { status in
-      switch status {
+    status: sub.flatMap { sub in
+      switch sub.stripeStatus {
       case .active: .active
       case .pastDue: .pastDue
       case .trialing, .unpaid, .canceled, .incomplete, .incompleteExpired: nil
@@ -124,8 +124,8 @@ func panelOutput(
     }
   }
 
-  let availableTiers: [Subscription.Tier] = {
-    var tiers: Set<Subscription.Tier> = []
+  let availableTiers: [StripeSubscription.Tier] = {
+    var tiers: Set<StripeSubscription.Tier> = []
     let actions = [primary].compactMap(\.self) + secondary
     for action in actions {
       switch action {
@@ -137,7 +137,7 @@ func panelOutput(
         break
       }
     }
-    return Subscription.Tier.allCases.filter { tiers.contains($0) }
+    return StripeSubscription.Tier.allCases.filter { tiers.contains($0) }
   }()
 
   return GetSubscriptionPanel.Output(

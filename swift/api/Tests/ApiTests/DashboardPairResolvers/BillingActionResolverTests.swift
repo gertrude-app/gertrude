@@ -10,18 +10,18 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
   func testUpgradeSubscriptionTierLightToFullSuccess() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let customerId = "cus_upgrade_\("".random)"
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.stripeId = .init(stripeId)
-      $1.billingStatus = .paid
-      $1.stripeStatus = .active
+    let parent = try await self.parentWithSubscription(
+      identity: BillingIdentity(
+        parentId: .init(),
+        stripeCustomerId: .init(customerId),
+        lastStripeSubscriptionId: .init(stripeId),
+        lastPaidTier: .light,
+      ),
+    ) { _, sub in
+      sub.tier = .light
+      sub.stripeId = .init(stripeId)
+      sub.stripeStatus = .active
     }
-    _ = try await self.db.create(BillingIdentity(
-      parentId: parent.id,
-      stripeCustomerId: .init(customerId),
-      lastStripeSubscriptionId: .init(stripeId),
-      lastPaidTier: .light,
-    ))
 
     let output = try await withDependencies {
       $0.stripe.getSubscription = { id in
@@ -37,7 +37,7 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
       $0.stripe.updateSubscription = { data in
         expect(data.subscriptionId).toEqual(stripeId)
         expect(data.itemId).toEqual("si_42")
-        expect(data.priceId).toEqual(Subscription.Tier.full.checkoutStripePriceId)
+        expect(data.priceId).toEqual(StripeSubscription.Tier.full.checkoutStripePriceId)
         expect(data.prorationBehavior).toEqual(.alwaysInvoice)
         expect(data.paymentBehavior).toEqual(.errorIfIncomplete)
         expect(data.billingCycleAnchor).toEqual(.now)
@@ -59,7 +59,6 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output).toEqual(.success)
     let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.tier).toEqual(.full)
-    expect(sub.billingStatus).toEqual(.paid)
     expect(sub.stripeStatus).toEqual(.active)
 
     let identity = try await parent.model.billingIdentity(in: self.db)!
@@ -75,18 +74,18 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
   func testUpgradeSubscriptionTierAlertsAndFailsOnBadStatus() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let customerId = "cus_upgrade_\("".random)"
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.stripeId = .init(stripeId)
-      $1.billingStatus = .paid
-      $1.stripeStatus = .active
+    let parent = try await self.parentWithSubscription(
+      identity: BillingIdentity(
+        parentId: .init(),
+        stripeCustomerId: .init(customerId),
+        lastStripeSubscriptionId: .init(stripeId),
+        lastPaidTier: .light,
+      ),
+    ) { _, sub in
+      sub.tier = .light
+      sub.stripeId = .init(stripeId)
+      sub.stripeStatus = .active
     }
-    _ = try await self.db.create(BillingIdentity(
-      parentId: parent.id,
-      stripeCustomerId: .init(customerId),
-      lastStripeSubscriptionId: .init(stripeId),
-      lastPaidTier: .light,
-    ))
 
     try await withDependencies {
       $0.stripe.getSubscription = { _ in
@@ -125,10 +124,9 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUpgradeSubscriptionTierRejectsAlreadyOnTier() async throws {
     let stripeId = "sub_upgrade_\("".random)"
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.stripeId = .init(stripeId)
-      $1.billingStatus = .paid
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeId = .init(stripeId)
     }
 
     try await expectErrorFrom { [self] in
@@ -141,10 +139,9 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUpgradeSubscriptionTierRejectsDownConversion() async throws {
     let stripeId = "sub_upgrade_\("".random)"
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.stripeId = .init(stripeId)
-      $1.billingStatus = .paid
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeId = .init(stripeId)
     }
 
     try await expectErrorFrom { [self] in
@@ -158,18 +155,18 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
   func testUpgradeSubscriptionTierMirrorsPastDueBillingStatus() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let customerId = "cus_upgrade_\("".random)"
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.stripeId = .init(stripeId)
-      $1.billingStatus = .paid
-      $1.stripeStatus = .active
+    let parent = try await self.parentWithSubscription(
+      identity: BillingIdentity(
+        parentId: .init(),
+        stripeCustomerId: .init(customerId),
+        lastStripeSubscriptionId: .init(stripeId),
+        lastPaidTier: .light,
+      ),
+    ) { _, sub in
+      sub.tier = .light
+      sub.stripeId = .init(stripeId)
+      sub.stripeStatus = .active
     }
-    _ = try await self.db.create(BillingIdentity(
-      parentId: parent.id,
-      stripeCustomerId: .init(customerId),
-      lastStripeSubscriptionId: .init(stripeId),
-      lastPaidTier: .light,
-    ))
 
     _ = try await withDependencies {
       $0.stripe.getSubscription = { _ in
@@ -200,7 +197,6 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     let sub = try await parent.model.subscription(in: self.db)!
     expect(sub.tier).toEqual(.full)
     expect(sub.stripeStatus).toEqual(.pastDue)
-    expect(sub.billingStatus).toEqual(.overdue)
   }
 
   func testUpgradeSubscriptionTierRejectsWithoutSubscription() async throws {
@@ -274,11 +270,10 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testStartCheckoutSessionRejectsWithLiveTrialingStripeSub() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.stripeId = .init("sub_trialing_\("".random)")
-      $1.billingStatus = .paid
-      $1.stripeStatus = .trialing
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeId = .init("sub_trialing_\("".random)")
+      sub.stripeStatus = .trialing
     }
 
     try await expectErrorFrom { [self] in

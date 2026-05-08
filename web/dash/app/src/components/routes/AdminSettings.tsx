@@ -4,7 +4,6 @@ import { parseE164, prettyE164 } from '@shared/phone-numbers';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
 import React, { useReducer, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import type { State } from '../../reducers/admin-reducer';
 import type { NewMethod } from '@dash/components';
@@ -18,18 +17,15 @@ import reducer, { initialState } from '../../reducers/admin-reducer';
 const AdminSettings: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [newMethodId, setNewMethodId] = useState<NewMethod | undefined>(undefined);
-  const [searchParams] = useSearchParams();
-  const requestedTier = searchParams.get(`plan`) as `full` | `light` | null;
 
   const query = useQuery(Key.accountOwner, Current.api.getAccountOwner, {
     onReceive: (accountOwner) => dispatch({ type: `receivedAccountOwner`, accountOwner }),
   });
 
-  const getStripeUrl = useMutation((tier: `full` | `light` | null) =>
-    Current.api.stripeUrl({
-      successPath: `/checkout-success`,
-      cancelPath: `/checkout-cancel`,
-      tier: tier ?? undefined,
+  const openBillingPortal = useMutation(() =>
+    Current.api.openBillingPortal({
+      returnPath: `/settings`,
+      configuration: `default`,
     }),
   );
 
@@ -116,8 +112,8 @@ const AdminSettings: React.FC = () => {
       newMethodId={newMethodId}
       setNewMethodId={setNewMethodId}
       email={accountOwner.email}
-      plan={accountOwner.plan}
-      billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
+      entitlement={accountOwner.entitlement}
+      billingPortalRequest={ReqState.fromMutation(openBillingPortal)}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.id,
         method: method.config.case,
@@ -139,8 +135,7 @@ const AdminSettings: React.FC = () => {
       createNotification={(methodId) =>
         dispatch({ type: `notificationCreated`, id: uuid(), methodId })
       }
-      requestedTier={requestedTier}
-      manageSubscription={() => getStripeUrl.mutate(requestedTier)}
+      manageSubscription={() => openBillingPortal.mutate(undefined)}
       newMethodEventHandler={(event) => {
         switch (event.type) {
           case `sendCodeClicked`:

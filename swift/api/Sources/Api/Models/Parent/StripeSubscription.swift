@@ -1,16 +1,13 @@
 import DuetSQL
 
-struct Subscription: Codable, Sendable {
+struct StripeSubscription: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id
   var tier: Tier
-  var billingStatus: BillingStatus.Db?
-  var stripeId: StripeId?
-  var stripeStatus: StripeStatus?
-  var currentPeriodEnd: Date?
+  var stripeId: StripeId
+  var stripeStatus: StripeStatus
+  var currentPeriodEnd: Date
   var isLegacyPrice: Bool
-  var trialStartedAt: Date?
-  var statusExpiresAt: Date
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -18,39 +15,21 @@ struct Subscription: Codable, Sendable {
     id: Id = .init(),
     parentId: Parent.Id,
     tier: Tier,
-    billingStatus: BillingStatus.Db? = nil,
-    stripeId: StripeId? = nil,
-    stripeStatus: StripeStatus? = nil,
-    currentPeriodEnd: Date? = nil,
-    trialStartedAt: Date? = nil,
-    statusExpiresAt: Date,
+    stripeId: StripeId,
+    stripeStatus: StripeStatus,
+    currentPeriodEnd: Date,
   ) {
     self.id = id
     self.parentId = parentId
     self.tier = tier
-    self.billingStatus = billingStatus
     self.stripeId = stripeId
     self.stripeStatus = stripeStatus
     self.currentPeriodEnd = currentPeriodEnd
-    self.trialStartedAt = trialStartedAt
-    self.statusExpiresAt = statusExpiresAt
     self.isLegacyPrice = false
   }
 }
 
-extension BillingStatus {
-  enum Db: String, Codable, Equatable, CaseIterable, Sendable {
-    case trialing
-    case trialExpiringSoon
-    case trialExpired
-    case paid
-    case overdue
-    case unpaid
-    case cancelled
-  }
-}
-
-extension Subscription {
+extension StripeSubscription {
   enum StripeStatus: String, Codable, Equatable, CaseIterable, Sendable {
     case active
     case trialing
@@ -112,12 +91,8 @@ extension Subscription {
   }
 }
 
-extension Subscription {
-  typealias StripeId = Tagged<Subscription, String>
-
-  var plan: Plan {
-    .init(subscription: self)
-  }
+extension StripeSubscription {
+  typealias StripeId = Tagged<StripeSubscription, String>
 
   func parent(in db: any DuetSQL.Client) async throws -> Parent {
     try await db.find(self.parentId)

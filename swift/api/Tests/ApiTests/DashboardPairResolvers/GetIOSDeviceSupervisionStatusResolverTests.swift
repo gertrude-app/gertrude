@@ -8,9 +8,7 @@ final class GetIOSDeviceSupervisionStatusResolverTests: ApiTestCase, @unchecked 
   func testPaidPlan_doesNotRequirePayment() async throws {
     let parent = try await self.parentWithSubscription {
       $1.tier = .light
-      $1.billingStatus = .paid
-      $1.stripeId = .init("sub_123")
-      $1.statusExpiresAt = .distantFuture
+      $1.stripeStatus = .active
     }
     let (code, _) = try await self.claimedDevice(parentId: parent.id)
 
@@ -22,13 +20,12 @@ final class GetIOSDeviceSupervisionStatusResolverTests: ApiTestCase, @unchecked 
     expect(output.requiresPayment).toEqual(false)
   }
 
-  func testTrialingPlan_requiresPayment() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.billingStatus = .trialing
-      $1.trialStartedAt = .reference
-      $1.statusExpiresAt = .reference + .days(18)
-    }
+  func testStandaloneTrial_requiresPayment() async throws {
+    let parent = try await self.parent()
+    try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference,
+    ))
     let (code, _) = try await self.claimedDevice(parentId: parent.id)
 
     let output = try await GetIOSDeviceSupervisionStatus.resolve(

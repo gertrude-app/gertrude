@@ -22,11 +22,11 @@ struct ParentData: Sendable {
   var hasCompletedSupervision: Bool
   var hasIncompleteSupervision: Bool
   var childActivityCount: Int
-  var plan: Plan
+  var subscription: StripeSubscription?
   var hasGclid: Bool
   var createdAt: Date
 
-  init(model: Parent, subscription: Subscription?) {
+  init(model: Parent, subscription: StripeSubscription?) {
     self.id = model.id
     self.email = model.email
     self.numComputerUsers = 0
@@ -37,9 +37,17 @@ struct ParentData: Sendable {
     self.hasCompletedSupervision = false
     self.hasIncompleteSupervision = false
     self.childActivityCount = 0
-    self.plan = Plan(subscription: subscription)
+    self.subscription = subscription
     self.hasGclid = model.gclid != nil
     self.createdAt = model.createdAt
+  }
+
+  var monthlyPrice: Cents<Int>? {
+    guard let sub = self.subscription, sub.stripeStatus.isPaying else { return nil }
+    switch sub.tier {
+    case .light: return Cents(83)
+    case .full: return Cents(sub.isLegacyPrice ? 500 : 1000)
+    }
   }
 }
 
@@ -87,7 +95,7 @@ struct AnalyticsData: Sendable {
       .where(.emailVerifiedAt != nil)
       .all(in: self.db)
 
-    let allSubscriptions = try await Subscription.query().all(in: self.db)
+    let allSubscriptions = try await StripeSubscription.query().all(in: self.db)
     let subscriptionMap = Dictionary(uniqueKeysWithValues: allSubscriptions
       .map { ($0.parentId, $0) })
 
@@ -155,7 +163,7 @@ struct AnalyticsData: Sendable {
         data.overview.childrenOfActiveParents += parent.numChildren
       }
       map[parent.id] = parent
-      if let monthlyPrice = parent.plan.monthlyPrice {
+      if let monthlyPrice = parent.monthlyPrice {
         totalAnnualCents += monthlyPrice * 12
         data.overview.payingParents += 1
       }

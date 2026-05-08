@@ -88,7 +88,7 @@ struct SubscriptionManager: AsyncScheduledJob {
       let parentLink = self.adminLink(for: parent)
       let sub = try await parent.subscription(in: self.db)
 
-      let currentlyPaidFull = sub?.tier == .full && sub?.stripeStatus?.isPaying == true
+      let currentlyPaidFull = sub?.tier == .full && sub?.stripeStatus.isPaying == true
       if currentlyPaidFull || identity.lastPaidTier == .full {
         identity.trialEmailLifecycle = .skipped
         try await self.db.update(identity)
@@ -118,37 +118,29 @@ struct SubscriptionManager: AsyncScheduledJob {
   func refreshStaleSubscriptions() async throws -> [String] {
     var logs: [String] = []
     let threshold = self.now - .days(2)
-    let liveStatuses = Subscription.StripeStatus.allCases.filter { !terminal($0) }
+    let liveStatuses = StripeSubscription.StripeStatus.allCases.filter { !terminal($0) }
       .map(\.rawValue)
-    let stale = try await Subscription.query()
-      .where(.currentPeriodEnd != nil)
+    let stale = try await StripeSubscription.query()
       .where(.currentPeriodEnd < threshold)
-      .where(.stripeId != nil)
       .where(.stripeStatus |=| liveStatuses)
       .all(in: self.db)
 
     for var sub in stale {
-      guard let oldStatus = sub.stripeStatus else { continue }
-      guard let stripeIdRaw = sub.stripeId?.rawValue else { continue }
-
+      let oldStatus = sub.stripeStatus
       let live: Stripe.Api.Subscription
       do {
-        live = try await self.stripe.getSubscription(stripeIdRaw)
+        live = try await self.stripe.getSubscription(sub.stripeId.rawValue)
       } catch {
         continue
       }
 
-      guard let newStatus = Subscription.StripeStatus(rawValue: live.status.rawValue) else {
+      guard let newStatus = StripeSubscription.StripeStatus(rawValue: live.status.rawValue) else {
         unexpected("4d2af9c2", sub.parentId, "unknown stripe status: \(live.status.rawValue)")
         continue
       }
       let newPeriodEnd = Date(timeIntervalSince1970: TimeInterval(live.currentPeriodEnd))
       sub.stripeStatus = newStatus
       sub.currentPeriodEnd = newPeriodEnd
-      sub.statusExpiresAt = newPeriodEnd + .days(2)
-      if let mirrored = newStatus.mirroredBillingStatus {
-        sub.billingStatus = mirrored
-      }
       try await self.db.update(sub)
 
       let parent = try await self.db.find(sub.parentId) as Parent
@@ -200,7 +192,7 @@ func nextTrialEmailDecision(
   }
 }
 
-private func terminal(_ status: Subscription.StripeStatus) -> Bool {
+private func terminal(_ status: StripeSubscription.StripeStatus) -> Bool {
   switch status {
   case .canceled, .unpaid, .incompleteExpired: true
   case .active, .trialing, .pastDue, .incomplete: false

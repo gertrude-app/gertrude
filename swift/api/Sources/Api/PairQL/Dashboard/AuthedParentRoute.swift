@@ -43,7 +43,6 @@ enum AuthedParentRoute: PairRoute {
   case getSubscriptionPanel
   case openBillingPortal(OpenBillingPortal.Input)
   case startCheckoutSession(StartCheckoutSession.Input)
-  case stripeUrl_v2(StripeUrl_v2.Input)
   case securityEventsFeed
   case startFullTrial
   case upgradeSubscriptionTier(UpgradeSubscriptionTier.Input)
@@ -201,10 +200,6 @@ extension AuthedParentRoute {
         Route(.case(Self.saveUser)) {
           Operation(SaveUser.self)
           Body(.dashboardInput(SaveUser.self))
-        }
-        Route(.case(Self.stripeUrl_v2)) {
-          Operation(StripeUrl_v2.self)
-          Body(.dashboardInput(StripeUrl_v2.self))
         }
         Route(.case(Self.getSubscriptionPanel)) {
           Operation(GetSubscriptionPanel.self)
@@ -383,9 +378,6 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .saveKey(let input):
       let output = try await SaveKey.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .stripeUrl_v2(let input):
-      let output = try await StripeUrl_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getSubscriptionPanel:
       let output = try await GetSubscriptionPanel.resolve(in: context)
