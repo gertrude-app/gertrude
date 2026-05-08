@@ -51,12 +51,12 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
   func testGetAllDevicesIncludesIOSDevices() async throws {
     try await self.db.delete(all: Computer.self)
     let child = try await self.child()
-    let iosDevice = try await self.db.create(IOSApp.Device.mock {
+    let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
       $0.modelIdentifier = "iPhone15,2"
       $0.iosVersion = "18.4.0"
     })
-    _ = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
+    _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
 
     try await withDependencies {
       $0.websockets.status = { _ in .offline }
@@ -79,7 +79,7 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
   func testGetAllDevicesIOSPendingSetup() async throws {
     try await self.db.delete(all: Computer.self)
     let child = try await self.child()
-    _ = try await self.db.create(IOSApp.Device.mock {
+    _ = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
     })
 
@@ -95,11 +95,11 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
   func testGetAllDevicesSupervisionClaimedButNotComplete() async throws {
     try await self.db.delete(all: Computer.self)
     let child = try await self.child()
-    let iosDevice = try await self.db.create(IOSApp.Device.mock {
+    let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
     })
-    _ = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
-    _ = try await self.db.create(IOSApp.Supervision(
+    _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
+    _ = try await self.db.create(BlockerApp.Supervision(
       deviceId: iosDevice.id,
       claimCode: 111_111,
       claimCodeExpiresAt: .reference + .days(7),
@@ -119,12 +119,12 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     try await self.db.delete(all: ComputerUser.self)
     try await self.db.delete(all: Computer.self)
     let child = try await self.child().withDevice { $0.appVersion = "2.2.2" }
-    let iosDevice = try await self.db.create(IOSApp.Device.mock {
+    let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
       $0.modelIdentifier = "iPad14,1"
       $0.iosVersion = "18.3.0"
     })
-    _ = try await self.db.create(IOSApp.Token(deviceId: iosDevice.id))
+    _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
 
     try await withDependencies {
       $0.websockets.status = { _ in .filterOn }

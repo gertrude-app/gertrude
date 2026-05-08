@@ -8,7 +8,7 @@ import XExpect
 final class MarkSupervisionProfileInstalledResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_marksProfileInstalledAndReturnsSuccess() async throws {
     let child = try await self.childWithIOSDevice()
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: child.device.id,
       claimCode: .random(in: 100_000 ... 999_999),
       claimCodeExpiresAt: .reference + .days(7),
@@ -32,7 +32,7 @@ final class MarkSupervisionProfileInstalledResolverTests: ApiTestCase, @unchecke
 
   func testIdempotent_alreadyCompleteReturnsSuccess() async throws {
     let child = try await self.childWithIOSDevice()
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: child.device.id,
       claimCode: .random(in: 100_000 ... 999_999),
       claimCodeExpiresAt: .reference + .days(7),

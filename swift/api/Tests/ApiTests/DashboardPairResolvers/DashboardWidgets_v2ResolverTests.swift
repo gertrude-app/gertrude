@@ -19,7 +19,7 @@ final class DashboardWidgets_v2ResolverTests: ApiTestCase, @unchecked Sendable {
   func testNumDevicesIncludesBothMacAndIOS() async throws {
     let childWithMac = try await self.childWithComputer()
 
-    try await self.db.create(IOSApp.Device.random {
+    try await self.db.create(IOSDevice.random {
       $0.childId = childWithMac.id
     })
 

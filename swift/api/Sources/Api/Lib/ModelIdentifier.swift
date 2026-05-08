@@ -17,7 +17,7 @@ extension IOSModelIdentifiable {
 }
 
 extension PodcastEvent: IOSModelIdentifiable {}
-extension IOSApp.Device: IOSModelIdentifiable {}
+extension IOSDevice: IOSModelIdentifiable {}
 extension IOSEvent: IOSModelIdentifiable {}
 extension LogPodcastEvent_v2.Input: IOSModelIdentifiable {}
 extension LogPodcastEvent_v3.Input: IOSModelIdentifiable {}

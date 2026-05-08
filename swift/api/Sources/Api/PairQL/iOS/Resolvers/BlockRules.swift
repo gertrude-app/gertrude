@@ -18,7 +18,7 @@ extension BlockRules: Resolver {
     if let version = input.version.flatMap({ Semver($0) }),
        version >= Semver(major: 1, minor: 2, patch: 0) {
       logger.info("1.2.x app")
-      return try await IOSApp.BlockRule.query()
+      return try await BlockerApp.BlockRule.query()
         .where(.isNull(.deviceId) .|| input.vendorId.map { .deviceId == $0 } ?? .never)
         .all(in: context.db)
         .map(\.rule)

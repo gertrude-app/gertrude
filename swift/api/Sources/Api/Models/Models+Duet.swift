@@ -66,11 +66,11 @@ extension DashAnnouncement {
   }
 }
 
-extension IOSApp.SuspendFilterRequest {
-  typealias Id = Tagged<IOSApp.SuspendFilterRequest, UUID>
+extension BlockerApp.SuspendFilterRequest {
+  typealias Id = Tagged<BlockerApp.SuspendFilterRequest, UUID>
 }
 
-extension IOSApp.SuspendFilterRequest {
+extension BlockerApp.SuspendFilterRequest {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
@@ -83,12 +83,12 @@ extension IOSApp.SuspendFilterRequest {
   }
 }
 
-extension IOSApp.Token {
-  typealias Id = Tagged<IOSApp.Token, UUID>
-  typealias Value = Tagged<(IOSApp.Token, value: ()), UUID>
+extension BlockerApp.Token {
+  typealias Id = Tagged<BlockerApp.Token, UUID>
+  typealias Value = Tagged<(BlockerApp.Token, value: ()), UUID>
 }
 
-extension IOSApp.Token {
+extension BlockerApp.Token {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
@@ -98,17 +98,30 @@ extension IOSApp.Token {
   }
 }
 
-extension IOSApp.Device: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.Device, UUID>
+extension IOSDevice: Duet.Identifiable {
+  typealias Id = Tagged<IOSDevice, UUID>
 }
 
-extension IOSApp.Device {
+extension IOSDevice {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case childId
     case modelIdentifier
-    case appVersion
     case iosVersion
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension BlockerApp.Install: Duet.Identifiable {
+  typealias Id = Tagged<BlockerApp.Install, UUID>
+}
+
+extension BlockerApp.Install {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case deviceId
+    case appVersion
     case webPolicy
     case isProfileLocked
     case allowAppRemoval
@@ -118,11 +131,11 @@ extension IOSApp.Device {
   }
 }
 
-extension IOSApp.Supervision: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.Supervision, UUID>
+extension BlockerApp.Supervision: Duet.Identifiable {
+  typealias Id = Tagged<BlockerApp.Supervision, UUID>
 }
 
-extension IOSApp.Supervision {
+extension BlockerApp.Supervision {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
@@ -137,11 +150,11 @@ extension IOSApp.Supervision {
   }
 }
 
-extension IOSApp.BlockRule: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.BlockRule, UUID>
+extension BlockerApp.BlockRule: Duet.Identifiable {
+  typealias Id = Tagged<BlockerApp.BlockRule, UUID>
 }
 
-extension IOSApp.BlockRule {
+extension BlockerApp.BlockRule {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
@@ -701,11 +714,11 @@ extension SecurityEvent {
   }
 }
 
-extension IOSApp.BlockGroup: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.BlockGroup, UUID>
+extension BlockerApp.BlockGroup: Duet.Identifiable {
+  typealias Id = Tagged<BlockerApp.BlockGroup, UUID>
 }
 
-extension IOSApp.BlockGroup {
+extension BlockerApp.BlockGroup {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case name
@@ -718,11 +731,11 @@ extension IOSApp.BlockGroup {
   }
 }
 
-extension IOSApp.DeviceBlockGroup: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.DeviceBlockGroup, UUID>
+extension BlockerApp.DeviceBlockGroup: Duet.Identifiable {
+  typealias Id = Tagged<BlockerApp.DeviceBlockGroup, UUID>
 }
 
-extension IOSApp.DeviceBlockGroup {
+extension BlockerApp.DeviceBlockGroup {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
@@ -731,11 +744,11 @@ extension IOSApp.DeviceBlockGroup {
   }
 }
 
-extension IOSApp.WebPolicyDomain: Duet.Identifiable {
-  typealias Id = Tagged<IOSApp.WebPolicyDomain, UUID>
+extension BlockerApp.WebPolicyDomain: Duet.Identifiable {
+  typealias Id = Tagged<BlockerApp.WebPolicyDomain, UUID>
 }
 
-extension IOSApp.WebPolicyDomain {
+extension BlockerApp.WebPolicyDomain {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId

@@ -35,7 +35,7 @@ struct ClaimIOSDevice: Pair {
 // existing child if they already had a gertrude account
 extension ClaimIOSDevice: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let supervision = try? await IOSApp.Supervision.query()
+    let supervision = try? await BlockerApp.Supervision.query()
       .where(.claimCode == input.code)
       .first(in: context.db)
 
@@ -80,11 +80,11 @@ extension ClaimIOSDevice: Resolver {
     try await context.db.update(supervision)
 
     // start with ALL non-opt-in block groups, parent controls from web ui
-    let groups = try await IOSApp.BlockGroup.query()
+    let groups = try await BlockerApp.BlockGroup.query()
       .where(.optIn == false)
       .all(in: context.db)
     try await context.db.create(groups.map {
-      IOSApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
+      BlockerApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
     })
 
     try await context.db.create(IOSEvent(

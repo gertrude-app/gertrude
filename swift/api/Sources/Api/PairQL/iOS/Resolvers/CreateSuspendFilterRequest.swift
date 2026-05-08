@@ -3,9 +3,9 @@ import IOSRoute
 extension CreateSuspendFilterRequest: Resolver {
   static func resolve(
     with input: Input,
-    in context: IOSApp.ChildContext,
+    in context: BlockerApp.ChildContext,
   ) async throws -> Output {
-    let req = try await context.db.create(IOSApp.SuspendFilterRequest(
+    let req = try await context.db.create(BlockerApp.SuspendFilterRequest(
       deviceId: context.device.id,
       status: .pending,
       duration: input.duration,

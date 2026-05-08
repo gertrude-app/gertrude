@@ -11,8 +11,9 @@ import XExpect
 
 final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   func testSupervisedDevice_returnsProfileWithCorrectHeaders() async throws {
-    let device = try await self.db.create(IOSApp.Device.mock)
-    try await self.db.create(IOSApp.Supervision(
+    let device = try await self.db.create(IOSDevice.mock)
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: .random(in: 100_000 ... 999_999),
       claimCodeExpiresAt: .reference + .days(7),
@@ -38,10 +39,11 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testUnlockedDevice_servesRemovableProfile() async throws {
-    var mock = IOSApp.Device.mock
-    mock.isProfileLocked = false
-    let device = try await self.db.create(mock)
-    try await self.db.create(IOSApp.Supervision(
+    let device = try await self.db.create(IOSDevice.mock)
+    var install = BlockerApp.Install.mock { $0.deviceId = device.id }
+    install.isProfileLocked = false
+    try await self.db.create(install)
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: .random(in: 100_000 ... 999_999),
       claimCodeExpiresAt: .reference + .days(7),
@@ -59,7 +61,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testNonSupervisedDevice_returns404() async throws {
-    let device = try await self.db.create(IOSApp.Device.mock)
+    let device = try await self.db.create(IOSDevice.mock)
 
     try await app.test(
       .GET,
@@ -78,14 +80,13 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
       $1.statusExpiresAt = .reference + .days(18)
     }
     let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.2",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: .random(in: 100_000 ... 999_999),
       claimCodeExpiresAt: .reference + .days(7),
@@ -121,7 +122,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
       issuerPrivateKey: .init(key),
     )
 
-    let xml = generateProfileXml(for: .mock)
+    let xml = generateProfileXml(for: .mock, install: .mock)
     let xmlBytes = Array(xml.utf8)
 
     let signedBytes = try CMS.sign(

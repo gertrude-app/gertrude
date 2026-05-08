@@ -52,8 +52,8 @@ extension GetPendingSupervision: Resolver {
 }
 
 struct ValidatedSupervisionCode {
-  let device: IOSApp.Device
-  let supervision: IOSApp.Supervision
+  let device: IOSDevice
+  let supervision: BlockerApp.Supervision
   let claimedChildId: Child.Id
 }
 
@@ -63,7 +63,7 @@ extension SuperviseRoute {
     baseId: String,
     in context: Context,
   ) async throws -> ValidatedSupervisionCode {
-    let supervision = try? await IOSApp.Supervision.query()
+    let supervision = try? await BlockerApp.Supervision.query()
       .where(.claimCode == code)
       .first(in: context.db)
 

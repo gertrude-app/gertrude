@@ -17,12 +17,15 @@ enum Reset {
 
   static func createIOSEvents() async throws {
     @Dependency(\.db) var db
-    let deviceId = IOSApp.Device.Id()
-    try await db.create(IOSApp.Device(
+    let deviceId = IOSDevice.Id()
+    try await db.create(IOSDevice(
       id: deviceId,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "26.1",
+    ))
+    try await db.create(BlockerApp.Install(
+      deviceId: deviceId,
+      appVersion: "1.0.0",
     ))
     try await db.create([
       IOSEvent(

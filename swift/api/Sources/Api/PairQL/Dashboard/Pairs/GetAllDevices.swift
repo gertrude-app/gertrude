@@ -22,7 +22,7 @@ struct GetAllDevices: Pair {
   }
 
   struct IOSDevice: PairNestable {
-    var id: IOSApp.Device.Id
+    var id: Api.IOSDevice.Id
     var childId: Api.Child.Id
     var childName: String
     var modelName: String
@@ -51,7 +51,7 @@ extension GetAllDevices: NoInputResolver {
     async let computerUsersAsync = ComputerUser.query()
       .where(.childId |=| children.map(\.id))
       .all(in: context.db)
-    async let iosDevicesAsync = IOSApp.Device.query()
+    async let iosDevicesAsync = Api.IOSDevice.query()
       .where(.childId |=| children.map(\.id))
       .all(in: context.db)
 
@@ -61,17 +61,17 @@ extension GetAllDevices: NoInputResolver {
     async let computersAsync = Computer.query()
       .where(.id |=| computerUsers.map(\.computerId))
       .all(in: context.db)
-    async let supervisionsAsync = IOSApp.Supervision.query()
+    async let supervisionsAsync = BlockerApp.Supervision.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
-    async let iosTokensAsync = IOSApp.Token.query()
+    async let iosTokensAsync = BlockerApp.Token.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
 
     let computers = try await computersAsync
-    let supervisionMap: [IOSApp.Device.Id: IOSApp.Supervision] = try await supervisionsAsync
+    let supervisionMap: [Api.IOSDevice.Id: BlockerApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
-    let connectedDeviceIds: Set<IOSApp.Device.Id> = try await Set(iosTokensAsync.map(\.deviceId))
+    let connectedDeviceIds: Set<Api.IOSDevice.Id> = try await Set(iosTokensAsync.map(\.deviceId))
 
     @Dependency(\.websockets) var websockets
 

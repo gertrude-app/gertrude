@@ -8,8 +8,8 @@ struct UpdateIOSDevice: Pair {
   static let auth: ClientAuth = .parent
 
   struct Input: PairInput {
-    var deviceId: IOSApp.Device.Id
-    var enabledBlockGroups: [IOSApp.BlockGroup.Id]
+    var deviceId: IOSDevice.Id
+    var enabledBlockGroups: [BlockerApp.BlockGroup.Id]
     var webPolicy: WebContentFilterPolicy.Kind
     var webPolicyDomains: [String]
     var isProfileLocked: Bool
@@ -20,20 +20,20 @@ struct UpdateIOSDevice: Pair {
 
 extension UpdateIOSDevice: Resolver {
   static func resolve(with input: Input, in ctx: ParentContext) async throws -> Output {
-    var device = try await ctx.db.find(input.deviceId)
+    let device: IOSDevice = try await ctx.db.find(input.deviceId)
     let children = try await ctx.children()
     guard children.first(where: { $0.id == device.childId }) != nil else {
       throw Abort(.unauthorized)
     }
-    let deletedPivots = try await IOSApp.DeviceBlockGroup.query()
+    let deletedPivots = try await BlockerApp.DeviceBlockGroup.query()
       .where(.deviceId == input.deviceId)
       .all(in: ctx.db)
-    try await IOSApp.DeviceBlockGroup.query()
+    try await BlockerApp.DeviceBlockGroup.query()
       .where(.id |=| deletedPivots.map(\.id))
       .delete(in: ctx.db)
     do {
       try await ctx.db.create(input.enabledBlockGroups.map { blockGroupId in
-        IOSApp.DeviceBlockGroup(
+        BlockerApp.DeviceBlockGroup(
           deviceId: input.deviceId,
           blockGroupId: blockGroupId,
         )
@@ -42,18 +42,19 @@ extension UpdateIOSDevice: Resolver {
       try await ctx.db.create(deletedPivots)
     }
 
-    device.webPolicy = input.webPolicy.rawValue
-    device.isProfileLocked = input.isProfileLocked
-    device.allowAppRemoval = input.allowAppRemoval
-    device.allowEraseContentAndSettings = input.allowEraseContentAndSettings
-    try await ctx.db.update(device)
+    var install = try await device.install(in: ctx.db)
+    install.webPolicy = input.webPolicy.rawValue
+    install.isProfileLocked = input.isProfileLocked
+    install.allowAppRemoval = input.allowAppRemoval
+    install.allowEraseContentAndSettings = input.allowEraseContentAndSettings
+    try await ctx.db.update(install)
 
-    try await IOSApp.WebPolicyDomain.query()
+    try await BlockerApp.WebPolicyDomain.query()
       .where(.deviceId == input.deviceId)
       .delete(in: ctx.db)
 
     try await ctx.db.create(input.webPolicyDomains.map {
-      IOSApp.WebPolicyDomain(deviceId: input.deviceId, domain: $0)
+      BlockerApp.WebPolicyDomain(deviceId: input.deviceId, domain: $0)
     })
 
     return .success

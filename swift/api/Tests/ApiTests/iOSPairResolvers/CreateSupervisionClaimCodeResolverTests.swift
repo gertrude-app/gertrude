@@ -28,15 +28,16 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
 
     expect(output.code).toEqual(fixedCode)
 
-    let device = try await IOSApp.Device.query()
+    let device = try await IOSDevice.query()
       .where(.id == deviceId)
       .first(in: self.db)
 
     expect(device.id.rawValue).toEqual(deviceId)
     expect(device.modelIdentifier).toEqual("iPhone18,2")
     expect(device.iosVersion).toEqual("18.2")
-    expect(device.appVersion).toEqual("1.0.0")
     expect(device.childId).toBeNil()
+    let install = try await device.install(in: self.db)
+    expect(install.appVersion).toEqual("1.0.0")
 
     let supervision = try await device.supervision(in: self.db)!
     expect(supervision.claimCode).toEqual(fixedCode)
@@ -59,7 +60,7 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     expect(secondOutput.code).toEqual(fixedCode)
     expect(secondOutput.expiresAt).toEqual(output.expiresAt)
 
-    let count = try await IOSApp.Device.query()
+    let count = try await IOSDevice.query()
       .where(.id == deviceId)
       .count(in: self.db)
     expect(count).toEqual(1)
@@ -67,13 +68,12 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
 
   func testExpiredCode_createsNewCode() async throws {
     let deviceId = UUID()
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
       modelIdentifier: "iPhone18,2",
-      appVersion: "0.9.0",
       iosVersion: "17.0",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: 111_111,
       claimCodeExpiresAt: .reference - .days(8),
@@ -103,10 +103,9 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
   }
 
   func testExistingDevice_noSupervision_getsSupervisionCreated() async throws {
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       modelIdentifier: "iPhone17,1",
-      appVersion: "0.8.0",
       iosVersion: "17.0",
     ))
 

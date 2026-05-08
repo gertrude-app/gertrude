@@ -6,6 +6,12 @@ func installTriggers(_ sql: SQLDatabase) async throws {
   let rows = try await sql.execute("SELECT 1 FROM pg_namespace WHERE nspname = 'parent'")
   guard !rows.isEmpty else { return }
 
+  // skip triggers during the transitional state before the iosapp -> blocker_app
+  // schema rename migration runs; they'll be installed on the next boot
+  let blockerAppRows = try await sql
+    .execute("SELECT 1 FROM pg_namespace WHERE nspname = 'blocker_app'")
+  guard !blockerAppRows.isEmpty else { return }
+
   try await preventSupervisedDataDeletion(sql)
 }
 
@@ -21,11 +27,11 @@ private func preventSupervisedDataDeletion(_ sql: SQLDatabase) async throws {
       supervised_count integer;
     BEGIN
       SELECT COUNT(*) INTO supervised_count
-      FROM \(table: IOSApp.Device.self) d
-      JOIN \(table: IOSApp.Supervision.self) s
-        ON s.\(col: IOSApp.Supervision.columnName(.deviceId)) = d.id
-      WHERE d.\(col: IOSApp.Device.columnName(.childId)) = OLD.id
-        AND s.\(col: IOSApp.Supervision.columnName(.supervisedAt)) IS NOT NULL;
+      FROM \(table: IOSDevice.self) d
+      JOIN \(table: BlockerApp.Supervision.self) s
+        ON s.\(col: BlockerApp.Supervision.columnName(.deviceId)) = d.id
+      WHERE d.\(col: IOSDevice.columnName(.childId)) = OLD.id
+        AND s.\(col: BlockerApp.Supervision.columnName(.supervisedAt)) IS NOT NULL;
 
       IF supervised_count > 0 THEN
         RAISE EXCEPTION 'Cannot delete child with supervised iOS device(s)'
@@ -53,9 +59,9 @@ private func preventSupervisedDataDeletion(_ sql: SQLDatabase) async throws {
       supervised_count integer;
     BEGIN
       SELECT COUNT(*) INTO supervised_count
-      FROM \(table: IOSApp.Supervision.self)
-      WHERE \(col: IOSApp.Supervision.columnName(.deviceId)) = OLD.id
-        AND \(col: IOSApp.Supervision.columnName(.supervisedAt)) IS NOT NULL;
+      FROM \(table: BlockerApp.Supervision.self)
+      WHERE \(col: BlockerApp.Supervision.columnName(.deviceId)) = OLD.id
+        AND \(col: BlockerApp.Supervision.columnName(.supervisedAt)) IS NOT NULL;
 
       IF supervised_count > 0 THEN
         RAISE EXCEPTION 'Cannot delete iOS device with active supervision'
@@ -69,7 +75,7 @@ private func preventSupervisedDataDeletion(_ sql: SQLDatabase) async throws {
 
   try await sql.execute("""
     CREATE OR REPLACE TRIGGER prevent_supervised_device_delete
-    BEFORE DELETE ON \(table: IOSApp.Device.self)
+    BEFORE DELETE ON \(table: IOSDevice.self)
     FOR EACH ROW
     EXECUTE FUNCTION block_supervised_device_delete();
   """)
@@ -80,7 +86,7 @@ private func preventSupervisedDataDeletion(_ sql: SQLDatabase) async throws {
     RETURNS TRIGGER
     LANGUAGE plpgsql AS $$
     BEGIN
-      IF OLD.\(col: IOSApp.Supervision.columnName(.supervisedAt)) IS NOT NULL THEN
+      IF OLD.\(col: BlockerApp.Supervision.columnName(.supervisedAt)) IS NOT NULL THEN
         RAISE EXCEPTION 'Cannot delete supervision record for a supervised device'
           USING ERRCODE = 'P0001';
       END IF;
@@ -92,7 +98,7 @@ private func preventSupervisedDataDeletion(_ sql: SQLDatabase) async throws {
 
   try await sql.execute("""
     CREATE OR REPLACE TRIGGER prevent_supervised_supervision_delete
-    BEFORE DELETE ON \(table: IOSApp.Supervision.self)
+    BEFORE DELETE ON \(table: BlockerApp.Supervision.self)
     FOR EACH ROW
     EXECUTE FUNCTION block_supervised_supervision_delete();
   """)

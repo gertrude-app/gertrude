@@ -1,3 +1,3 @@
-enum IOSApp {}
+enum BlockerApp {}
 enum MacApp {}
 enum AppStore {}

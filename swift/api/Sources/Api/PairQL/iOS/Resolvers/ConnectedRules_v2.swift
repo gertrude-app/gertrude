@@ -5,9 +5,9 @@ import GertieIOS
 import IOSRoute
 
 extension ConnectedRules_v2: Resolver {
-  static func resolve(with input: Input, in ctx: IOSApp.ChildContext) async throws -> Output {
+  static func resolve(with input: Input, in ctx: BlockerApp.ChildContext) async throws -> Output {
     let groups = try await ctx.device.blockGroups(in: ctx.db)
-    let blockRules = try await IOSApp.BlockRule.query()
+    let blockRules = try await BlockerApp.BlockRule.query()
       .where(.or(
         .groupId |=| groups.map { .uuid($0.id) },
         .deviceId == ctx.device.id,
@@ -36,10 +36,15 @@ extension ConnectedRules_v2: Resolver {
     if device.shouldUpdateModelIdentifier(to: input.modelIdentifier) {
       device.modelIdentifier = input.modelIdentifier
     }
-    device.appVersion = input.appVersion
     device.iosVersion = input.iosVersion
     if device != ctx.device {
       try await ctx.db.update(device)
+    }
+
+    var install = ctx.install
+    install.appVersion = input.appVersion
+    if install != ctx.install {
+      try await ctx.db.update(install)
     }
 
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)

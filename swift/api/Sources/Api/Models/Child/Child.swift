@@ -49,8 +49,8 @@ extension Child {
       .all(in: db)
   }
 
-  func iosDevices(in db: any DuetSQL.Client) async throws -> [IOSApp.Device] {
-    try await IOSApp.Device.query()
+  func iosDevices(in db: any DuetSQL.Client) async throws -> [IOSDevice] {
+    try await IOSDevice.query()
       .where(.childId == self.id)
       .all(in: db)
   }

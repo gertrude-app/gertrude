@@ -12,7 +12,7 @@ final class IOSFilterSuspensionResolversTests: ApiTestCase, @unchecked Sendable 
       in: child.context,
     )
 
-    let retrieved = try await self.db.find(IOSApp.SuspendFilterRequest.Id(reqId))
+    let retrieved = try await self.db.find(BlockerApp.SuspendFilterRequest.Id(reqId))
     expect(retrieved.duration).toEqual(.init(33))
 
     expect(self.sent.parentNotifications).toEqual([
@@ -32,7 +32,7 @@ final class IOSFilterSuspensionResolversTests: ApiTestCase, @unchecked Sendable 
 
   func testPollForDecision() async throws {
     let child = try await self.childWithIOSDevice()
-    var request = try await self.db.create(IOSApp.SuspendFilterRequest(
+    var request = try await self.db.create(BlockerApp.SuspendFilterRequest(
       deviceId: child.device.id,
       status: .pending,
       duration: .init(99),

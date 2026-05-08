@@ -17,8 +17,8 @@ struct IOSDeviceEvents: Pair {
     var firstLaunch: Date?
     var lastCheckin: Date?
     var reachedOptOut: Bool
-    var prevVendorId: IOSApp.Device.Id?
-    var nextVendorId: IOSApp.Device.Id?
+    var prevVendorId: IOSDevice.Id?
+    var nextVendorId: IOSDevice.Id?
     var events: [Event]
   }
 
@@ -51,8 +51,8 @@ extension IOSDeviceEvents: Resolver {
     let deviceType = ModelIdentifier.deviceType(from: modelIdentifier)
     let iosVersion = firstLaunch?.iosVersion ?? events.first?.iosVersion ?? "Unknown"
 
-    var prevVendorId: IOSApp.Device.Id?
-    var nextVendorId: IOSApp.Device.Id?
+    var prevVendorId: IOSDevice.Id?
+    var nextVendorId: IOSDevice.Id?
     if let firstLaunchDate = firstLaunch?.createdAt {
       if let prev = try? await IOSEvent.query()
         .where(.eventId == "8d35f043")

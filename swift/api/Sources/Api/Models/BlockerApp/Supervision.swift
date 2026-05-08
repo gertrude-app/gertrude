@@ -1,10 +1,10 @@
 import DuetSQL
 import Tagged
 
-extension IOSApp {
+extension BlockerApp {
   struct Supervision: Codable, Sendable, Equatable {
     var id: Id
-    var deviceId: Device.Id
+    var deviceId: IOSDevice.Id
     var claimCode: Int
     var claimCodeExpiresAt: Date
     var udid: String?
@@ -16,7 +16,7 @@ extension IOSApp {
 
     init(
       id: Id = .init(),
-      deviceId: Device.Id,
+      deviceId: IOSDevice.Id,
       claimCode: Int,
       claimCodeExpiresAt: Date,
       udid: String? = nil,
@@ -36,7 +36,7 @@ extension IOSApp {
   }
 }
 
-extension IOSApp.Supervision {
+extension BlockerApp.Supervision {
   enum Status: String, Codable, Sendable, Equatable {
     case pendingClaim
     case claimed
@@ -64,9 +64,9 @@ extension IOSApp.Supervision {
   }
 }
 
-extension IOSApp.Supervision {
-  func device(in db: any DuetSQL.Client) async throws -> IOSApp.Device {
-    try await IOSApp.Device.query()
+extension BlockerApp.Supervision {
+  func device(in db: any DuetSQL.Client) async throws -> IOSDevice {
+    try await IOSDevice.query()
       .where(.id == self.deviceId)
       .first(in: db)
   }

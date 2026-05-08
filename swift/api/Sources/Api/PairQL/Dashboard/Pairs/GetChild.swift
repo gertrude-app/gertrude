@@ -63,7 +63,7 @@ struct GetChild: Pair {
   }
 
   struct IOSDevice: PairNestable {
-    var id: IOSApp.Device.Id
+    var id: Api.IOSDevice.Id
     var modelName: String
     var deviceType: String
     var iosVersion: String

@@ -9,8 +9,8 @@ import XExpect
 final class FlowTypeWireFormatTests: ApiTestCase, @unchecked Sendable {
   func testBlockRules_v2_encodesFlowTypeIsAsLegacyObject() async throws {
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
-    try await self.db.create(IOSApp.BlockRule(
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
+    try await self.db.create(BlockerApp.BlockRule(
       rule: .flowTypeIs(value: .browser),
       groupId: .init(gifs),
     ))
@@ -32,8 +32,8 @@ final class FlowTypeWireFormatTests: ApiTestCase, @unchecked Sendable {
 
   func testDefaultBlockRules_encodesFlowTypeIsAsLegacyObject() async throws {
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
-    try await self.db.create(IOSApp.BlockRule(
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
+    try await self.db.create(BlockerApp.BlockRule(
       rule: .flowTypeIs(value: .browser),
       groupId: .init(gifs),
     ))
@@ -54,12 +54,12 @@ final class FlowTypeWireFormatTests: ApiTestCase, @unchecked Sendable {
   func testConnectedRules_v2_encodesFlowTypeIsAsLegacyObject() async throws {
     let child = try await self.childWithIOSDevice()
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.create(IOSApp.DeviceBlockGroup(
+    try await self.db.create(BlockerApp.DeviceBlockGroup(
       deviceId: child.device.id,
       blockGroupId: .init(gifs),
     ))
-    try await self.db.delete(all: IOSApp.BlockRule.self)
-    try await self.db.create(IOSApp.BlockRule(
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
+    try await self.db.create(BlockerApp.BlockRule(
       rule: .flowTypeIs(value: .browser),
       groupId: .init(gifs),
     ))

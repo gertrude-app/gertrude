@@ -7,18 +7,18 @@ import TypeScriptInterop
 struct GetIOSDevice: Pair {
   static let auth: ClientAuth = .parent
 
-  typealias Input = IOSApp.Device.Id
+  typealias Input = IOSDevice.Id
 
   struct Output: PairOutput {
     struct BlockGroup: PairNestable {
-      var id: IOSApp.BlockGroup.Id
+      var id: BlockerApp.BlockGroup.Id
       var name: String
       var description: String
       var longDescription: String
     }
 
     struct BlockRuleData: PairOutput {
-      var id: IOSApp.BlockRule.Id
+      var id: BlockerApp.BlockRule.Id
       var rule: GertieIOS.BlockRule
     }
 
@@ -26,7 +26,7 @@ struct GetIOSDevice: Pair {
     var deviceType: String
     var osVersion: String
     var allBlockGroups: [BlockGroup]
-    var enabledBlockGroups: [IOSApp.BlockGroup.Id]
+    var enabledBlockGroups: [BlockerApp.BlockGroup.Id]
     var webPolicy: WebContentFilterPolicy.Kind
     var webPolicyDomains: [String]
     var customBlockRules: [BlockRuleData]
@@ -38,14 +38,15 @@ struct GetIOSDevice: Pair {
 }
 
 extension GetIOSDevice: Resolver {
-  static func resolve(with id: IOSApp.Device.Id, in ctx: ParentContext) async throws -> Output {
-    let device = try await ctx.db.find(id)
+  static func resolve(with id: IOSDevice.Id, in ctx: ParentContext) async throws -> Output {
+    let device: IOSDevice = try await ctx.db.find(id)
     guard let childId = device.childId else {
       throw ctx.error("f8a9b3c2", .notFound, user: "Device not found")
     }
     let child = try await ctx.verifiedChild(from: childId)
+    let install = try await device.install(in: ctx.db)
     let enabledBlockGroups = try await device.blockGroups(in: ctx.db)
-    let allBlockGroups = try await IOSApp.BlockGroup.query().all(in: ctx.db)
+    let allBlockGroups = try await BlockerApp.BlockGroup.query().all(in: ctx.db)
     let domains = try await device.webPolicyDomains(in: ctx.db)
     let blockRules = try await device.blockRules(in: ctx.db)
     let supervision = try await device.supervision(in: ctx.db)
@@ -62,13 +63,13 @@ extension GetIOSDevice: Resolver {
         )
       },
       enabledBlockGroups: enabledBlockGroups.map(\.id),
-      webPolicy: .init(string: device.webPolicy) ?? .blockAll,
+      webPolicy: .init(string: install.webPolicy) ?? .blockAll,
       webPolicyDomains: domains.map(\.domain),
       customBlockRules: blockRules.map { .init(id: $0.id, rule: $0.rule) },
       isSupervised: supervision?.supervised ?? false,
-      isProfileLocked: device.isProfileLocked,
-      allowAppRemoval: device.allowAppRemoval,
-      allowEraseContentAndSettings: device.allowEraseContentAndSettings,
+      isProfileLocked: install.isProfileLocked,
+      allowAppRemoval: install.allowAppRemoval,
+      allowEraseContentAndSettings: install.allowEraseContentAndSettings,
     )
   }
 }

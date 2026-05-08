@@ -8,15 +8,16 @@ extension CreateSupervisionClaimCode: Resolver {
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)
     let now = get(dependency: \.date.now)
     let generator = get(dependency: \.verificationCode)
-    let deviceId = IOSApp.Device.Id(input.deviceId)
+    let deviceId = IOSDevice.Id(input.deviceId)
 
-    let device = try await IOSApp.Device.ensureExists(
-      id: deviceId,
+    let install = try await BlockerApp.Install.ensureExists(
+      deviceId: deviceId,
       modelIdentifier: input.modelIdentifier,
       iosVersion: input.iosVersion,
       appVersion: input.appVersion,
       in: ctx.db,
     )
+    let device = try await install.device(in: ctx.db)
 
     let existing = try await device.supervision(in: ctx.db)
     if let existing, existing.claimCodeExpiresAt > now {
@@ -27,21 +28,21 @@ extension CreateSupervisionClaimCode: Resolver {
 
     for _ in 1 ... 20 {
       let code = generator.generate()
-      let codeExists = try await IOSApp.Supervision.query()
+      let codeExists = try await BlockerApp.Supervision.query()
         .where(.claimCode == code)
         .exists(in: ctx.db)
       if codeExists {
         continue
       }
 
-      let supervision: IOSApp.Supervision
+      let supervision: BlockerApp.Supervision
       if var existing { // refresh expired supervision
         existing.claimCode = code
         existing.claimCodeExpiresAt = now + .days(7)
         supervision = existing
         try await ctx.db.update(supervision)
       } else {
-        supervision = try await ctx.db.create(IOSApp.Supervision(
+        supervision = try await ctx.db.create(BlockerApp.Supervision(
           deviceId: device.id,
           claimCode: code,
           claimCodeExpiresAt: now + .days(7),

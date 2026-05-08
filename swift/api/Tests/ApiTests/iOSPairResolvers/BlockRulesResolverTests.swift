@@ -12,10 +12,10 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV3_AllGroupsEnabled() async throws {
     let gifs = CreateBlockGroups.GroupIds().gifs
     let ads = CreateBlockGroups.GroupIds().ads
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
-      IOSApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
     ])
 
     let rules = try await BlockRules_v3.resolve(
@@ -28,10 +28,10 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV3_OneGroupDisabled() async throws {
     let gifs = CreateBlockGroups.GroupIds().gifs
     let ads = CreateBlockGroups.GroupIds().ads
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
-      IOSApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
     ])
 
     let rules = try await BlockRules_v3.resolve(
@@ -45,11 +45,11 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     let gifs = CreateBlockGroups.GroupIds().gifs
     let ads = CreateBlockGroups.GroupIds().ads
     let spotify = CreateBlockGroups.GroupIds().spotifyImages
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
-      IOSApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
-      IOSApp.BlockRule(rule: .urlContains(value: "spotify"), groupId: .init(spotify)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "ad"), groupId: .init(ads)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "spotify"), groupId: .init(spotify)),
     ])
 
     let rules = try await BlockRules_v3.resolve(
@@ -63,18 +63,17 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     let vendorId = UUID()
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(vendorId),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "2.0.0",
       iosVersion: "18.0",
     ))
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
-      IOSApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "custom")),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "custom")),
     ])
 
     let rules = try await BlockRules_v3.resolve(
@@ -91,29 +90,29 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     let otherVendorId = UUID()
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(vendorId),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.0",
     ))
-    let device2 = try await self.db.create(IOSApp.Device(
+    let device2 = try await self.db.create(IOSDevice(
       id: .init(otherVendorId),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.0",
     ))
     let gifs = CreateBlockGroups.GroupIds().gifs
     let ads = CreateBlockGroups.GroupIds().ads
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
-      IOSApp.BlockRule(rule: .urlContains(value: "cat"), groupId: .init(ads)), // <-- skip, disabled
-      IOSApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "x1")), // <-- include
-      IOSApp.BlockRule(deviceId: device2.id, rule: .urlContains(value: "x2")), // <-- skip, other
-      IOSApp.BlockRule(rule: .urlContains(value: "nope"), groupId: nil),
+      BlockerApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "cat"), groupId: .init(ads)),
+      // <-- skip, disabled
+      BlockerApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "x1")), // <-- include
+      BlockerApp.BlockRule(deviceId: device2.id, rule: .urlContains(value: "x2")),
+      // <-- skip, other
+      BlockerApp.BlockRule(rule: .urlContains(value: "nope"), groupId: nil),
     ])
 
     let rules = try await BlockRules_v2.resolve(
@@ -130,18 +129,17 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     let zeroVid = UUID("00000000-0000-0000-0000-000000000000")!
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(zeroVid),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.0.0",
       iosVersion: "18.0",
     ))
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
-      IOSApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "x1")), // <-- skip, b/c 0
+      BlockerApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(deviceId: device.id, rule: .urlContains(value: "x1")), // <-- skip, b/c 0
     ])
 
     let rules = try await BlockRules_v2.resolve(
@@ -154,11 +152,11 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testDefaultBlockRulesRetrievesAllWithGroup() async throws {
     let gifs = CreateBlockGroups.GroupIds().gifs
     let ads = CreateBlockGroups.GroupIds().ads
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
-      IOSApp.BlockRule(rule: .urlContains(value: "thing"), groupId: nil), // <-- skip, no group
-      IOSApp.BlockRule(rule: .urlContains(value: "cat"), groupId: .init(ads)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "bad"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "thing"), groupId: nil), // <-- skip, no group
+      BlockerApp.BlockRule(rule: .urlContains(value: "cat"), groupId: .init(ads)),
     ])
 
     let defaultRules = try await DefaultBlockRules.resolve(
@@ -171,11 +169,11 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV2_RetroactiveOptOut_OldVersion() async throws {
     let spotify = CreateBlockGroups.GroupIds().spotifyImages
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "spotify1"), groupId: .init(spotify)),
-      IOSApp.BlockRule(rule: .urlContains(value: "spotify2"), groupId: .init(spotify)),
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "spotify1"), groupId: .init(spotify)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "spotify2"), groupId: .init(spotify)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
     ])
 
     let rulesV130 = try await BlockRules_v2.resolve(
@@ -194,11 +192,11 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV2_NewVersion_ReceivesSpotify() async throws {
     let spotify = CreateBlockGroups.GroupIds().spotifyImages
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "spotify1"), groupId: .init(spotify)),
-      IOSApp.BlockRule(rule: .urlContains(value: "spotify2"), groupId: .init(spotify)),
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "spotify1"), groupId: .init(spotify)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "spotify2"), groupId: .init(spotify)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
     ])
 
     let rulesV150 = try await BlockRules_v2.resolve(
@@ -215,10 +213,10 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV2_NewVersion_CanOptOutOfSpotify() async throws {
     let spotify = CreateBlockGroups.GroupIds().spotifyImages
     let gifs = CreateBlockGroups.GroupIds().gifs
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
-      IOSApp.BlockRule(rule: .urlContains(value: "spotify1"), groupId: .init(spotify)),
-      IOSApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "spotify1"), groupId: .init(spotify)),
+      BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(gifs)),
     ])
 
     let rules = try await BlockRules_v2.resolve(
@@ -250,7 +248,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.seedGrandfatheringFixtures(
       deviceVendorId: vendorId,
       deviceCreatedAt: .reference,
-      extraRule: IOSApp.BlockRule(
+      extraRule: BlockerApp.BlockRule(
         rule: .urlContains(value: "non-opt-in"),
         groupId: .init(ids.gifs),
       ),
@@ -268,7 +266,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.seedGrandfatheringFixtures(
       deviceVendorId: vendorId,
       deviceCreatedAt: .distantFuture,
-      extraRule: IOSApp.BlockRule(
+      extraRule: BlockerApp.BlockRule(
         rule: .urlContains(value: "non-opt-in"),
         groupId: .init(CreateBlockGroups.GroupIds().gifs),
       ),
@@ -284,7 +282,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV3_MissingDeviceRow_TreatedAsNew() async throws {
     try await self.seedGrandfatheringFixtures(
       deviceVendorId: nil,
-      extraRule: IOSApp.BlockRule(
+      extraRule: BlockerApp.BlockRule(
         rule: .urlContains(value: "non-opt-in"),
         groupId: .init(CreateBlockGroups.GroupIds().gifs),
       ),
@@ -302,7 +300,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.seedGrandfatheringFixtures(
       deviceVendorId: vendorId,
       deviceCreatedAt: .distantFuture,
-      extraRule: IOSApp.BlockRule(
+      extraRule: BlockerApp.BlockRule(
         rule: .urlContains(value: "non-opt-in"),
         groupId: .init(CreateBlockGroups.GroupIds().gifs),
       ),
@@ -320,7 +318,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.seedGrandfatheringFixtures(
       deviceVendorId: vendorId,
       deviceCreatedAt: .reference,
-      extraRule: IOSApp.BlockRule(
+      extraRule: BlockerApp.BlockRule(
         rule: .urlContains(value: "non-opt-in"),
         groupId: .init(CreateBlockGroups.GroupIds().gifs),
       ),
@@ -352,7 +350,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.seedGrandfatheringFixtures(
       deviceVendorId: vendorId,
       deviceCreatedAt: .reference,
-      extraRule: IOSApp.BlockRule(
+      extraRule: BlockerApp.BlockRule(
         rule: .urlContains(value: "non-opt-in"),
         groupId: .init(CreateBlockGroups.GroupIds().gifs),
       ),
@@ -388,25 +386,25 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   private func seedGrandfatheringFixtures(
     deviceVendorId: UUID?,
     deviceCreatedAt: Date? = nil,
-    extraRule: IOSApp.BlockRule? = nil,
+    extraRule: BlockerApp.BlockRule? = nil,
   ) async throws {
     if let deviceVendorId, let deviceCreatedAt {
       let parent = try await self.parent()
       let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-      var device = try await self.db.create(IOSApp.Device(
+      var device = try await self.db.create(IOSDevice(
         id: .init(deviceVendorId),
         childId: child.id,
         modelIdentifier: "iPhone15,2",
-        appVersion: "2.0.0",
         iosVersion: "18.0",
       ))
+      try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
       try await device.modifyCreatedAt(.exact(deviceCreatedAt))
     }
 
     let ids = CreateBlockGroups.GroupIds()
-    try await self.db.delete(all: IOSApp.BlockRule.self)
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     var rules = [
-      IOSApp.BlockRule(
+      BlockerApp.BlockRule(
         rule: .urlContains(value: "whatsapp-rule"),
         groupId: .init(ids.whatsAppFeatures),
       ),
@@ -416,4 +414,4 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   }
 }
 
-extension IOSApp.Device: HasCreatedAt {}
+extension IOSDevice: HasCreatedAt {}

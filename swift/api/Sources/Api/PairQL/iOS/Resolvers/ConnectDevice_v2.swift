@@ -19,24 +19,25 @@ extension ConnectDevice_v2: Resolver {
 
     let child = try await ctx.db.find(childId)
     ctx.telemetry.parentId = child.parentId
-    var device = try await IOSApp.Device.ensureExists(
-      id: .init(input.vendorId),
+    let install = try await BlockerApp.Install.ensureExists(
+      deviceId: .init(input.vendorId),
       modelIdentifier: input.modelIdentifier,
       iosVersion: input.iosVersion,
       appVersion: input.appVersion,
       in: ctx.db,
     )
+    var device = try await install.device(in: ctx.db)
     if device.childId != child.id {
       device.childId = child.id
       try await ctx.db.update(device)
     }
-    let token = try await ctx.db.create(IOSApp.Token(deviceId: device.id))
+    let token = try await ctx.db.create(BlockerApp.Token(deviceId: device.id))
 
-    let groups = try await IOSApp.BlockGroup.query()
+    let groups = try await BlockerApp.BlockGroup.query()
       .where(.optIn == false)
       .all(in: ctx.db)
     try await ctx.db.create(groups.map {
-      IOSApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
+      BlockerApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
     })
 
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)

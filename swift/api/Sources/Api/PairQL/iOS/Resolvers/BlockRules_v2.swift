@@ -13,11 +13,11 @@ extension BlockRules_v2: Resolver {
     }
 
     var disabledGroupIds = disabledGroups.map { Postgres.Data.uuid($0.blockGroupId) }
-    let deviceId: IOSApp.Device.Id? = input.vendorId == .init(.zero) ? nil : .init(input.vendorId)
+    let deviceId: IOSDevice.Id? = input.vendorId == .init(.zero) ? nil : .init(input.vendorId)
     let (device, optInExclusions) = try await optInBlockGroupExclusions(deviceId, in: ctx.db)
     disabledGroupIds.append(contentsOf: optInExclusions)
 
-    let rules = try await IOSApp.BlockRule.query()
+    let rules = try await BlockerApp.BlockRule.query()
       .where(.or(
         .groupId != nil .&& .groupId |!=| disabledGroupIds,
         deviceId.map { .deviceId == $0 } ?? .never,

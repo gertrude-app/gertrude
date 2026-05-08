@@ -72,14 +72,13 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.5.0",
       iosVersion: "18.0",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
@@ -98,14 +97,13 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
   func testUnclaimedExpiredCode_throwsError() async throws {
     let parent = try await self.parent()
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.5.0",
       iosVersion: "18.0",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(1),
@@ -125,17 +123,16 @@ extension GetIOSDeviceClaimDataResolverTests {
   private func claimedDevice(
     for parent: ParentEntities,
     supervisedAt: Date? = nil,
-  ) async throws -> (device: IOSApp.Device, code: Int) {
+  ) async throws -> (device: IOSDevice, code: Int) {
     let code = Int.random(in: 100_000 ... 999_999)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let device = try await self.db.create(IOSApp.Device(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
       modelIdentifier: "iPhone15,2",
-      appVersion: "1.5.0",
       iosVersion: "18.0",
     ))
-    try await self.db.create(IOSApp.Supervision(
+    try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),

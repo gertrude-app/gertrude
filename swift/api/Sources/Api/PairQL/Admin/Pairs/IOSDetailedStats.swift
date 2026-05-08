@@ -513,8 +513,8 @@ private struct ScreenTimeSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
@@ -527,7 +527,7 @@ private struct ScreenTimeSuccessCount: CustomCountable {
         SELECT \(deviceId) FROM \(table: IOSEvent.self) WHERE \(eventId) = 'bad8adcc'
       )
       AND \(deviceId) NOT IN (
-        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        SELECT \(sDeviceId) FROM \(table: BlockerApp.Supervision.self)
         WHERE \(sProfileInstalledAt) IS NOT NULL
       )
     """)
@@ -558,15 +558,15 @@ private struct GertrudeSupervisionSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: IOSEvent.self)
     WHERE \(deviceId) IS NOT NULL
       AND \(eventId) = '8d35f043'
       AND \(deviceId) IN (
-        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        SELECT \(sDeviceId) FROM \(table: BlockerApp.Supervision.self)
         WHERE \(sProfileInstalledAt) IS NOT NULL
       )
       AND \(deviceId) NOT IN (
@@ -582,17 +582,17 @@ struct NonSupervisedConnectionSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
-    let tDeviceId = IOSApp.Token.columnName(.deviceId)
-    let sDeviceId = IOSApp.Supervision.columnName(.deviceId)
-    let sProfileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
+    let tDeviceId = BlockerApp.Token.columnName(.deviceId)
+    let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT e.\(deviceId)) AS count
     FROM \(table: IOSEvent.self) e
-    INNER JOIN \(table: IOSApp.Token.self) t ON t.\(tDeviceId) = e.\(deviceId)
+    INNER JOIN \(table: BlockerApp.Token.self) t ON t.\(tDeviceId) = e.\(deviceId)
     WHERE e.\(deviceId) IS NOT NULL
       AND e.\(eventId) = '8d35f043'
       AND e.\(deviceId) NOT IN (
-        SELECT \(sDeviceId) FROM \(table: IOSApp.Supervision.self)
+        SELECT \(sDeviceId) FROM \(table: BlockerApp.Supervision.self)
         WHERE \(sProfileInstalledAt) IS NOT NULL
       )
       AND e.\(deviceId) NOT IN (
@@ -791,9 +791,9 @@ private struct DateRangeQuery: CustomQueryable {
 
 private struct SupervisionStatusQuery: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let profileInstalledAt = IOSApp.Supervision.columnName(.profileInstalledAt)
-    let supervisedAt = IOSApp.Supervision.columnName(.supervisedAt)
-    let claimedAt = IOSApp.Supervision.columnName(.claimedAt)
+    let profileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
+    let supervisedAt = BlockerApp.Supervision.columnName(.supervisedAt)
+    let claimedAt = BlockerApp.Supervision.columnName(.claimedAt)
     return SQL.Statement("""
     SELECT
       CASE
@@ -803,7 +803,7 @@ private struct SupervisionStatusQuery: CustomQueryable {
         ELSE 'pendingClaim'
       END AS status,
       COUNT(*) AS count
-    FROM \(table: IOSApp.Supervision.self)
+    FROM \(table: BlockerApp.Supervision.self)
     GROUP BY status
     """)
   }
