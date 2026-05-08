@@ -8,10 +8,19 @@ enum ApplicationFeature {
     typealias State = AppReducer.State
     typealias Action = AppReducer.Action
 
+    @Dependency(\.uuid) var uuid
+
     func reduce(into state: inout State, action: Action) -> Effect<Action> {
       switch action {
       case .application(.didFinishLaunching):
-        state.didFinishLaunching = true
+        let tabID = self.uuid()
+        state.tabs.append(Tab.State(
+          id: tabID,
+          url: URL(string: "https://gertrude.app")!,
+        ))
+        state.selectedTabID = tabID
+        return .none
+      case .tabs:
         return .none
       }
     }

@@ -1,10 +1,12 @@
 import AppKit
+import WebKit
 
 @MainActor
 final class BrowserWindow {
   private var window: NSWindow?
+  private var webView: WKWebView?
 
-  func show() {
+  func show(initialURL: URL?) {
     if self.window == nil {
       let window = NSWindow(
         contentRect: NSRect(x: 0, y: 0, width: 900, height: 600),
@@ -16,26 +18,15 @@ final class BrowserWindow {
       window.title = "Gertie"
       window.center()
       window.isReleasedWhenClosed = false
-      window.contentView = self.makePlaceholderView()
+      let webView = WKWebView(frame: .zero)
+      window.contentView = webView
+      self.webView = webView
       self.window = window
+    }
+    if let url = initialURL {
+      self.webView?.load(URLRequest(url: url))
     }
     NSApp.activate(ignoringOtherApps: true)
     self.window?.makeKeyAndOrderFront(nil)
-  }
-
-  private func makePlaceholderView() -> NSView {
-    let label = NSTextField(labelWithString: "Gertie\n\nbrowser placeholder window")
-    label.alignment = .center
-    label.font = .systemFont(ofSize: 24, weight: .semibold)
-    label.lineBreakMode = .byWordWrapping
-    label.maximumNumberOfLines = 0
-    label.translatesAutoresizingMaskIntoConstraints = false
-    let container = NSView(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
-    container.addSubview(label)
-    NSLayoutConstraint.activate([
-      label.centerXAnchor.constraint(equalTo: container.centerXAnchor),
-      label.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-    ])
-    return container
   }
 }

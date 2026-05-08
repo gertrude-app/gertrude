@@ -6,17 +6,21 @@ import XExpect
 
 final class ApplicationFeatureTests: XCTestCase {
   @MainActor
-  func testDidFinishLaunchingFlipsFlag() async {
+  func testDidFinishLaunchingCreatesInitialTab() async {
     let store = TestStore(initialState: AppReducer.State()) {
       AppReducer()
+    } withDependencies: {
+      $0.uuid = .incrementing
     }
 
-    expect(store.state.didFinishLaunching).toEqual(false)
+    expect(store.state.tabs).toEqual([])
+    expect(store.state.selectedTabID).toBeNil()
 
     await store.send(.application(.didFinishLaunching)) {
-      $0.didFinishLaunching = true
+      $0.tabs = [
+        Tab.State(id: UUID(0), url: URL(string: "https://gertrude.app")!),
+      ]
+      $0.selectedTabID = UUID(0)
     }
-
-    expect(store.state.didFinishLaunching).toEqual(true)
   }
 }
