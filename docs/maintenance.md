@@ -201,6 +201,21 @@ Hard-coded values that must be kept in sync across multiple files. Nothing enfor
   `BGTaskSchedulerPermittedIdentifiers`. Both files carry in-line "keep in sync" comments
   but nothing automated. Drifts whenever a background task is added, removed, or renamed.
 
+## Dev DB Scrubbing — `swift run Run scrub-db`
+
+`swift/api/Sources/Api/Routes/ScrubDbCommand.swift` is the typed PII-scrubber that runs
+server-side against a freshly-loaded prod copy before it's published as a scrubbed dump
+for dev machines to pull. It's the source of truth for _what counts as PII for our dev
+flow_ — the scrubbing decisions live in code, not in a SQL script.
+
+**New fields and new tables are silent.** Whenever a model gains a column or a new model
+is added, ask: does this hold a real secret (token/credential), real PII the team
+shouldn't see in dev (free-text user content, contact info, customer-supplied
+identifiers), or third-party-provider IDs we don't want bleeding into dev? If yes, add a
+scrubber. The current explicitly-skipped set (kept in dev) includes parent emails, child
+names, computer-user usernames, IP addresses, device UDIDs, unlock-request URLs/
+hostnames, and free-text request comments — re-evaluate if the trust model changes.
+
 ## Annual: New macOS Release
 
 Apple's cadence: the next macOS version name is announced at WWDC in early June, then
