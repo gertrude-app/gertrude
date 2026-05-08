@@ -10,6 +10,10 @@ public protocol Client: Sendable {
   func execute(statement: SQL.Statement) async throws -> [SQLRow]
 
   func execute<M: Model>(statement: SQL.Statement, returning: M.Type) async throws -> [M]
+
+  @discardableResult
+  func transaction<R>(_ operation: @escaping @Sendable (any Client) async throws -> R)
+    async throws -> R
 }
 
 public extension Client {

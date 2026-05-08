@@ -45,4 +45,22 @@ public struct SQLDatabaseClient: Client {
   public func execute(raw: SQLQueryString) async throws -> [SQLRow] {
     try await self.db.raw(raw).all()
   }
+
+  @discardableResult
+  public func transaction<R>(
+    _ operation: @escaping @Sendable (any Client) async throws -> R,
+  ) async throws -> R {
+    try await self.db.withSession { db in
+      let transactionClient = TransactionClient(client: SQLDatabaseClient(db: db))
+      _ = try await transactionClient.execute(raw: "BEGIN")
+      do {
+        let result = try await operation(transactionClient)
+        _ = try await transactionClient.execute(raw: "COMMIT")
+        return result
+      } catch {
+        _ = try? await transactionClient.execute(raw: "ROLLBACK")
+        throw error
+      }
+    }
+  }
 }

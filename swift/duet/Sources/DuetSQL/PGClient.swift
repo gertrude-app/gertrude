@@ -75,6 +75,13 @@ public struct PgClient: Client {
     try await self.db.raw(raw).all()
   }
 
+  @discardableResult
+  public func transaction<R>(
+    _ operation: @escaping @Sendable (any Client) async throws -> R,
+  ) async throws -> R {
+    try await SQLDatabaseClient(db: self.db).transaction(operation)
+  }
+
   private let _shutdownHelper: ShutdownHelper
 }
 

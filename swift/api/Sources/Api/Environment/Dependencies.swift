@@ -104,6 +104,21 @@ public extension PgClient {
   }
 }
 
+extension DuetSQL.Client {
+  @discardableResult
+  func withTransaction<R>(
+    _ operation: @escaping @Sendable (any DuetSQL.Client) async throws -> R,
+  ) async throws -> R {
+    try await withEscapedDependencies { dependencies in
+      try await self.transaction { db in
+        try await dependencies.yield {
+          try await operation(db)
+        }
+      }
+    }
+  }
+}
+
 extension DatabaseConfigurationFactory {
   static func from(env: Env) -> DatabaseConfigurationFactory {
     .postgres(configuration: .init(
