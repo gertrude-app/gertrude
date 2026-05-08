@@ -59,6 +59,9 @@ macapp-test *args:
 iosapp-test *args:
   @cd iosapp/lib-ios && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 
+browser-test *args:
+  @cd browser/lib && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
+
 migrate-up: build-api
   @just exec-api migrate --yes
 

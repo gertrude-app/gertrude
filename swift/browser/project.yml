@@ -19,6 +19,9 @@ targets:
     sources:
       - path: app/sources
         group: app
+    dependencies:
+      - package: LibBrowser
+        product: BrowserApp
     settings:
       base:
         SWIFT_VERSION: "6.0"
@@ -50,4 +53,6 @@ targets:
         NSHighResolutionCapable: true
         LSApplicationCategoryType: public.app-category.utilities
 
-packages: {}
+packages:
+  LibBrowser:
+    path: ./lib
