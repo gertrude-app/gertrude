@@ -63,24 +63,29 @@ extension SuperviseRoute {
     baseId: String,
     in context: Context,
   ) async throws -> ValidatedSupervisionCode {
-    let supervision = try? await BlockerApp.Supervision.query()
+    let device = try? await IOSDevice.query()
       .where(.claimCode == code)
       .first(in: context.db)
 
     let codeNotFound = "Code not found. Double-check and try again."
-    guard let supervision else {
+    guard let device else {
       logIOSUnusual("\(baseId)-1", "supervision code not found")
       throw context.error("\(baseId)-1", .notFound, user: codeNotFound)
     }
 
-    let device = try await supervision.device(in: context.db)
     guard let claimedChildId = device.childId else {
       logIOSUnusual("\(baseId)-2", "supervision code not yet claimed")
       let msg = "This device hasn't been claimed yet. Complete the claim step in the Gertrude dashboard first."
       throw context.error("\(baseId)-2", .badRequest, user: msg)
     }
 
-    if supervision.claimCodeExpiresAt < get(dependency: \.date.now) {
+    guard let supervision = try await device.supervision(in: context.db) else {
+      logIOSUnusual("\(baseId)-1", "supervision row not found for claimed device")
+      throw context.error("\(baseId)-1", .notFound, user: codeNotFound)
+    }
+
+    if let expiresAt = device.claimCodeExpiresAt,
+       expiresAt < get(dependency: \.date.now) {
       logIOSUnusual("\(baseId)-3", "supervision code expired")
       let msg = "This code has expired. Open the Gertrude app on the \(device.deviceType) to get a new code."
       throw context.error("\(baseId)-3", .badRequest, user: msg)

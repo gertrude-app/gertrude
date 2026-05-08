@@ -14,12 +14,10 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       childId: nil,
       modelIdentifier: "iPad14,1",
       iosVersion: "17.5",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
       .GET,
@@ -45,13 +43,11 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       childId: child.id,
       modelIdentifier: "iPhone17,1",
       iosVersion: "18.0",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(30),
       claimedAt: .reference - .days(30),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
       .GET,
@@ -100,12 +96,10 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(1),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
       .GET,

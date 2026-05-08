@@ -108,6 +108,9 @@ extension IOSDevice {
     case childId
     case modelIdentifier
     case iosVersion
+    case claimCode
+    case claimCodeExpiresAt
+    case claimedAt
     case createdAt
     case updatedAt
   }
@@ -139,10 +142,7 @@ extension BlockerApp.Supervision {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case deviceId
-    case claimCode
-    case claimCodeExpiresAt
     case udid
-    case claimedAt
     case supervisedAt
     case profileInstalledAt
     case createdAt

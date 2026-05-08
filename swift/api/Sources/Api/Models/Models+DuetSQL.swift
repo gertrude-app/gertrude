@@ -133,6 +133,9 @@ extension IOSDevice: Model {
     case .childId: .uuid(self.childId)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
+    case .claimCode: .int(self.claimCode)
+    case .claimCodeExpiresAt: .date(self.claimCodeExpiresAt)
+    case .claimedAt: .date(self.claimedAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -144,6 +147,9 @@ extension IOSDevice: Model {
       .childId: .uuid(self.childId),
       .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
+      .claimCode: .int(self.claimCode),
+      .claimCodeExpiresAt: .date(self.claimCodeExpiresAt),
+      .claimedAt: .date(self.claimedAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
@@ -193,10 +199,7 @@ extension BlockerApp.Supervision: Model {
     switch column {
     case .id: .id(self)
     case .deviceId: .uuid(self.deviceId)
-    case .claimCode: .int(self.claimCode)
-    case .claimCodeExpiresAt: .date(self.claimCodeExpiresAt)
     case .udid: .string(self.udid)
-    case .claimedAt: .date(self.claimedAt)
     case .supervisedAt: .date(self.supervisedAt)
     case .profileInstalledAt: .date(self.profileInstalledAt)
     case .createdAt: .date(self.createdAt)
@@ -208,10 +211,7 @@ extension BlockerApp.Supervision: Model {
     [
       .id: .id(self),
       .deviceId: .uuid(self.deviceId),
-      .claimCode: .int(self.claimCode),
-      .claimCodeExpiresAt: .date(self.claimCodeExpiresAt),
       .udid: .string(self.udid),
-      .claimedAt: .date(self.claimedAt),
       .supervisedAt: .date(self.supervisedAt),
       .profileInstalledAt: .date(self.profileInstalledAt),
       .createdAt: .currentTimestamp,

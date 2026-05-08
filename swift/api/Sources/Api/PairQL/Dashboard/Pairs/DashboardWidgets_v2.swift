@@ -299,17 +299,18 @@ struct PendingIOSDeviceRow: CustomQueryable {
     SELECT
       c.\(Child.columnName(.name)) AS child_name,
       d.\(IOSDevice.columnName(.modelIdentifier)) AS model_identifier,
-      s.\(BlockerApp.Supervision.columnName(.claimCode)) AS claim_code
-    FROM \(table: BlockerApp.Supervision.self) s
-    JOIN \(table: IOSDevice.self) d
-      ON d.id = s.\(BlockerApp.Supervision.columnName(.deviceId))
+      d.\(IOSDevice.columnName(.claimCode)) AS claim_code
+    FROM \(table: IOSDevice.self) d
+    JOIN \(table: BlockerApp.Supervision.self) s
+      ON s.\(BlockerApp.Supervision.columnName(.deviceId)) = d.id
     JOIN \(table: Child.self) c
       ON c.id = d.\(IOSDevice.columnName(.childId))
     WHERE c.\(Child.columnName(.parentId)) =\(" ")
     """)
     stmt.components.append(.binding(bindings[0]))
     stmt.components.append(.sql("""
-      AND s.\(BlockerApp.Supervision.columnName(.claimedAt)) IS NOT NULL
+      AND d.\(IOSDevice.columnName(.claimedAt)) IS NOT NULL
+      AND d.\(IOSDevice.columnName(.claimCode)) IS NOT NULL
       AND s.\(BlockerApp.Supervision.columnName(.supervisedAt)) IS NULL
     """))
     return stmt

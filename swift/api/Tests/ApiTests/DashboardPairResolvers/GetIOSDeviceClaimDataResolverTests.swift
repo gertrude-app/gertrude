@@ -77,12 +77,10 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.0",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
@@ -102,12 +100,10 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.0",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference - .days(1),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await expectErrorFrom {
       try await withDependencies {
@@ -131,12 +127,12 @@ extension GetIOSDeviceClaimDataResolverTests {
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.0",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
       claimedAt: .reference,
+    ))
+    try await self.db.create(BlockerApp.Supervision(
+      deviceId: device.id,
       supervisedAt: supervisedAt,
     ))
     return (device, code)

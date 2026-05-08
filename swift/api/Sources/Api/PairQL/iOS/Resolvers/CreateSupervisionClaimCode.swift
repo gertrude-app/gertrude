@@ -17,44 +17,39 @@ extension CreateSupervisionClaimCode: Resolver {
       appVersion: input.appVersion,
       in: ctx.db,
     )
-    let device = try await install.device(in: ctx.db)
+    var device = try await install.device(in: ctx.db)
+    if try await device.supervision(in: ctx.db) == nil {
+      _ = try await ctx.db.create(BlockerApp.Supervision(deviceId: device.id))
+    }
 
-    let existing = try await device.supervision(in: ctx.db)
-    if let existing, existing.claimCodeExpiresAt > now {
-      return Output(code: existing.claimCode, expiresAt: existing.claimCodeExpiresAt)
-    } else if let existing, existing.claimed {
-      return Output(code: existing.claimCode, expiresAt: .distantFuture)
+    if let claimCode = device.claimCode,
+       let expiresAt = device.claimCodeExpiresAt,
+       expiresAt > now {
+      return Output(code: claimCode, expiresAt: expiresAt)
+    } else if let claimCode = device.claimCode, device.claimedAt != nil {
+      return Output(code: claimCode, expiresAt: .distantFuture)
     }
 
     for _ in 1 ... 20 {
       let code = generator.generate()
-      let codeExists = try await BlockerApp.Supervision.query()
+      let codeExists = try await IOSDevice.query()
         .where(.claimCode == code)
         .exists(in: ctx.db)
       if codeExists {
         continue
       }
 
-      let supervision: BlockerApp.Supervision
-      if var existing { // refresh expired supervision
-        existing.claimCode = code
-        existing.claimCodeExpiresAt = now + .days(7)
-        supervision = existing
-        try await ctx.db.update(supervision)
-      } else {
-        supervision = try await ctx.db.create(BlockerApp.Supervision(
-          deviceId: device.id,
-          claimCode: code,
-          claimCodeExpiresAt: now + .days(7),
-        ))
-      }
+      let expiresAt = now + .days(7)
+      device.claimCode = code
+      device.claimCodeExpiresAt = expiresAt
+      try await ctx.db.update(device)
 
       Task {
         await get(dependency: \.slack)
           .internal(.info, "*iOS supervision:* claim code `\(code)` created")
       }
 
-      return Output(code: code, expiresAt: supervision.claimCodeExpiresAt)
+      return Output(code: code, expiresAt: expiresAt)
     }
 
     let msg = "Unexpected collision failure creating supervision"

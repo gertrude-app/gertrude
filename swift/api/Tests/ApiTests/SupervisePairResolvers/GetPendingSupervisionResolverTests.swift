@@ -12,13 +12,11 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
+      $0.claimCode = code
+      $0.claimCodeExpiresAt = .reference + .days(7)
+      $0.claimedAt = .reference
     })
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
-    ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
@@ -46,16 +44,13 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   }
 
   func testCodeNotClaimed_throwsError() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = nil
+      $0.claimCode = code
+      $0.claimCodeExpiresAt = .reference + .days(7)
     })
-    let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: nil, // <-- not claimed
-    ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await expectErrorFrom {
       try await withDependencies {
@@ -75,13 +70,11 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
+      $0.claimCode = code
+      $0.claimCodeExpiresAt = .reference - .days(1) // <-- expired
+      $0.claimedAt = .reference - .days(8)
     })
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
-      claimCode: code,
-      claimCodeExpiresAt: .reference - .days(1), // <-- expired
-      claimedAt: .reference - .days(8),
-    ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await expectErrorFrom {
       try await withDependencies {

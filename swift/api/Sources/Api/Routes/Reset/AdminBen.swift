@@ -52,6 +52,9 @@ enum AdminBen {
       childId: luke.id,
       modelIdentifier: "iPhone16,1",
       iosVersion: "26.2",
+      claimCode: 123_456,
+      claimCodeExpiresAt: Date() + .days(30),
+      claimedAt: Date() - .days(7),
     ))
 
     try await db.create(BlockerApp.Install(
@@ -61,10 +64,7 @@ enum AdminBen {
 
     try await db.create(BlockerApp.Supervision(
       deviceId: device.id,
-      claimCode: 123_456,
-      claimCodeExpiresAt: Date() + .days(30),
       udid: "00008130-BE10000000BE001E",
-      claimedAt: Date() - .days(7),
       supervisedAt: Date() - .days(7),
       profileInstalledAt: Date() - .days(7),
     ))

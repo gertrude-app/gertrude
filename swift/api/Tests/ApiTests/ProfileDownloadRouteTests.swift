@@ -15,9 +15,6 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
     try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
       supervisedAt: .reference,
     ))
 
@@ -45,9 +42,6 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     try await self.db.create(install)
     try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
       supervisedAt: .reference,
     ))
 
@@ -88,9 +82,6 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     ))
     try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
       supervisedAt: .reference,
     ))
 

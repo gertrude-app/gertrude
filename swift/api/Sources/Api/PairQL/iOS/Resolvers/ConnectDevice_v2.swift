@@ -44,8 +44,8 @@ extension ConnectDevice_v2: Resolver {
 
     let supervision = try await device.supervision(in: ctx.db)
     var supervised: ChildIOSDeviceData_v2.Supervised? = nil
-    if let supervision {
-      supervised = .byGertrude(claimCode: supervision.claimCode)
+    if supervision != nil, let claimCode = device.claimCode {
+      supervised = .byGertrude(claimCode: claimCode)
     } else if try await IOSEvent.query()
       .where(.deviceId == device.id)
       .where(.eventId == "bad8adcc")

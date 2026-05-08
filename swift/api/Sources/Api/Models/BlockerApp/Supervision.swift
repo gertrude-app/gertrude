@@ -5,10 +5,7 @@ extension BlockerApp {
   struct Supervision: Codable, Sendable, Equatable {
     var id: Id
     var deviceId: IOSDevice.Id
-    var claimCode: Int
-    var claimCodeExpiresAt: Date
     var udid: String?
-    var claimedAt: Date?
     var supervisedAt: Date?
     var profileInstalledAt: Date?
     var createdAt = Date()
@@ -17,19 +14,13 @@ extension BlockerApp {
     init(
       id: Id = .init(),
       deviceId: IOSDevice.Id,
-      claimCode: Int,
-      claimCodeExpiresAt: Date,
       udid: String? = nil,
-      claimedAt: Date? = nil,
       supervisedAt: Date? = nil,
       profileInstalledAt: Date? = nil,
     ) {
       self.id = id
       self.deviceId = deviceId
-      self.claimCode = claimCode
-      self.claimCodeExpiresAt = claimCodeExpiresAt
       self.udid = udid
-      self.claimedAt = claimedAt
       self.supervisedAt = supervisedAt
       self.profileInstalledAt = profileInstalledAt
     }
@@ -44,10 +35,10 @@ extension BlockerApp.Supervision {
     case complete
   }
 
-  var status: Status {
+  func status(device: IOSDevice) -> Status {
     if self.profileInstalledAt != nil { return .complete }
     if self.supervisedAt != nil { return .supervised }
-    if self.claimedAt != nil { return .claimed }
+    if device.claimedAt != nil { return .claimed }
     return .pendingClaim
   }
 
@@ -57,10 +48,6 @@ extension BlockerApp.Supervision {
 
   var supervised: Bool {
     self.supervisedAt != nil
-  }
-
-  var claimed: Bool {
-    self.claimedAt != nil
   }
 }
 

@@ -36,11 +36,12 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     expect(device.modelIdentifier).toEqual("iPhone18,2")
     expect(device.iosVersion).toEqual("18.2")
     expect(device.childId).toBeNil()
+    expect(device.claimCode).toEqual(fixedCode)
     let install = try await device.install(in: self.db)
     expect(install.appVersion).toEqual("1.0.0")
 
     let supervision = try await device.supervision(in: self.db)!
-    expect(supervision.claimCode).toEqual(fixedCode)
+    expect(supervision.deviceId).toEqual(device.id)
 
     let secondOutput = try await withDependencies {
       $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
@@ -72,12 +73,10 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
       id: .init(deviceId),
       modelIdentifier: "iPhone18,2",
       iosVersion: "17.0",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: 111_111,
       claimCodeExpiresAt: .reference - .days(8),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let newCode = Int.random(in: 100_000 ... 999_999)
     let output = try await withDependencies {
@@ -98,8 +97,10 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     expect(output.code).toEqual(newCode)
     expect(output.code).not.toEqual(111_111)
 
-    let supervision = try await device.supervision(in: self.db)!
-    expect(supervision.claimCode).toEqual(newCode)
+    let updated = try await IOSDevice.query()
+      .where(.id == device.id)
+      .first(in: self.db)
+    expect(updated.claimCode).toEqual(newCode)
   }
 
   func testExistingDevice_noSupervision_getsSupervisionCreated() async throws {
@@ -127,7 +128,13 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
 
     expect(output.code).toEqual(newCode)
 
+    let updated = try await IOSDevice.query()
+      .where(.id == device.id)
+      .first(in: self.db)
+    expect(updated.claimCode).toEqual(newCode)
+    expect(updated.claimCodeExpiresAt).not.toBeNil()
+
     let supervision = try await device.supervision(in: self.db)!
-    expect(supervision.claimCodeExpiresAt).not.toBeNil()
+    expect(supervision.deviceId).toEqual(device.id)
   }
 }

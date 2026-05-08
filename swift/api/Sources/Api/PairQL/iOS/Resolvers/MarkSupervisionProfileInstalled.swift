@@ -23,12 +23,13 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
 
       Task {
         let parent = try await ctx.child.parent(in: ctx.db)
+        let claimCodeText = ctx.device.claimCode.map(String.init) ?? "unknown"
         await get(dependency: \.slack).internal(
           .info,
           """
           *iOS supervision complete!* filter confirmed running
           Parent: \(parent.adminSiteLink(.slack))
-          Claim code: `\(supervision.claimCode)`
+          Claim code: `\(claimCodeText)`
           """,
         )
         get(dependency: \.postmark).toSuperAdmin(
@@ -36,7 +37,7 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
           """
           Supervision profile installed and filter confirmed running.<br/>
           Parent: \(parent.adminSiteLink(.email))<br/>
-          Claim code: \(supervision.claimCode)
+          Claim code: \(claimCodeText)
           """,
         )
       }
