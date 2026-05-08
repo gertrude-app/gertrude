@@ -1580,6 +1580,8 @@ extension CatalogedApp: Model {
     case .category: .string(self.category)
     case .icon: .bytea(self.icon)
     case .iconContentHash: .string(self.iconContentHash)
+    case .iconUploadedAt: .date(self.iconUploadedAt)
+    case .iconSourceAppVersion: .string(self.iconSourceAppVersion)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -1593,6 +1595,8 @@ extension CatalogedApp: Model {
       .category: .string(self.category),
       .icon: .bytea(self.icon),
       .iconContentHash: .string(self.iconContentHash),
+      .iconUploadedAt: .date(self.iconUploadedAt),
+      .iconSourceAppVersion: .string(self.iconSourceAppVersion),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

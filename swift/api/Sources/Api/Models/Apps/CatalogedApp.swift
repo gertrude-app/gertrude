@@ -8,6 +8,8 @@ struct CatalogedApp: Codable, Sendable {
   var category: String?
   var icon: Data?
   var iconContentHash: String?
+  var iconUploadedAt: Date?
+  var iconSourceAppVersion: String?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -18,6 +20,8 @@ struct CatalogedApp: Codable, Sendable {
     category: String? = nil,
     icon: Data? = nil,
     iconContentHash: String? = nil,
+    iconUploadedAt: Date? = nil,
+    iconSourceAppVersion: String? = nil,
   ) {
     self.id = id
     self.bundleId = bundleId
@@ -25,5 +29,7 @@ struct CatalogedApp: Codable, Sendable {
     self.category = category
     self.icon = icon
     self.iconContentHash = iconContentHash
+    self.iconUploadedAt = iconUploadedAt
+    self.iconSourceAppVersion = iconSourceAppVersion
   }
 }

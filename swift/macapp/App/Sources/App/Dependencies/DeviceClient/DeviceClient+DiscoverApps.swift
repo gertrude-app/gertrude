@@ -7,6 +7,7 @@ struct DiscoveredApp: Equatable, Sendable, Codable {
   var bundleId: String
   var iconPath: String
   var category: String?
+  var appVersion: String? = nil
 }
 
 @Sendable func getInstalledApps() async -> [DiscoveredApp] {
@@ -96,6 +97,7 @@ struct DiscoveredApp: Equatable, Sendable, Codable {
         bundleId: bundleId,
         iconPath: iconFilePath,
         category: category?.replacingOccurrences(of: "public.app-category.", with: ""),
+        appVersion: bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
       ))
     }
   }

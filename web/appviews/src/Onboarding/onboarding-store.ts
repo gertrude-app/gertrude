@@ -90,6 +90,7 @@ export interface DiscoveredApp {
   bundleId: string;
   iconPath: string;
   category?: string;
+  appVersion?: string;
 }
 
 export interface PublicKeychain {

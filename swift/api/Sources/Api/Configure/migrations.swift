@@ -93,6 +93,7 @@ extension Configure {
     app.migrations.add(EnrichRouteTelemetry())
     app.migrations.add(AppInstallTables())
     app.migrations.add(HoistClaimFieldsToDevice())
+    app.migrations.add(AppIconUploadProvenance())
   }
 }
 

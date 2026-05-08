@@ -67,6 +67,7 @@ extension CheckIn_v2: Resolver {
 private extension CheckIn_v2 {
   // @see ./docs/notes/001-regex-keys-macapp.md for context
   static let lenientDecodeMacAppVersion: Semver = "2.9.3"
+  static let iconRefreshInterval: TimeInterval = .days(90)
 
   static func loadRuleKeychains(
     in context: MacApp.ChildContext,
@@ -316,16 +317,26 @@ private extension CheckIn_v2 {
 
     let iconsNeeded = upserted.compactMap { row in
       let clientHash = payload.hashLookup[row.bundleId]
-      return row.iconContentHash == nil || row.iconContentHash != clientHash ? row.bundleId : nil
+      let clientAppVersion = payload.appVersionLookup[row.bundleId]
+      return self.needsIconUpload(
+        row,
+        clientHash: clientHash,
+        clientAppVersion: clientAppVersion,
+      ) ? row.bundleId : nil
     }
     return iconsNeeded.isEmpty ? nil : iconsNeeded
   }
 
   static func catalogedAppPayload(
     from installedApps: [InstalledAppInfo],
-  ) -> (bindings: [Postgres.Data], hashLookup: [String: String]) {
+  ) -> (
+    bindings: [Postgres.Data],
+    hashLookup: [String: String],
+    appVersionLookup: [String: String],
+  ) {
     var bindings: [Postgres.Data] = []
     var hashLookup: [String: String] = [:]
+    var appVersionLookup: [String: String] = [:]
 
     for app in installedApps.uniqued(on: \.bundleId) {
       bindings.append(.uuid(UUID()))
@@ -333,9 +344,36 @@ private extension CheckIn_v2 {
       bindings.append(.string(app.name))
       bindings.append(.string(app.category))
       hashLookup[app.bundleId] = app.iconContentHash
+      if let appVersion = app.appVersion {
+        appVersionLookup[app.bundleId] = appVersion
+      }
     }
 
-    return (bindings, hashLookup)
+    return (bindings, hashLookup, appVersionLookup)
+  }
+
+  static func needsIconUpload(
+    _ row: UpsertCatalogedApps,
+    clientHash: String?,
+    clientAppVersion: String?,
+  ) -> Bool {
+    guard let serverHash = row.iconContentHash,
+          let iconUploadedAt = row.iconUploadedAt else {
+      return true
+    }
+    guard serverHash != clientHash else {
+      return false
+    }
+    guard get(dependency: \.date.now).timeIntervalSince(iconUploadedAt) >= self.iconRefreshInterval
+    else {
+      return false
+    }
+    guard let clientAppVersion,
+          let comparison = LooseAppVersion.compare(clientAppVersion, row.iconSourceAppVersion)
+    else {
+      return row.iconSourceAppVersion == nil
+    }
+    return comparison == .orderedDescending
   }
 
   static func replaceInstalledApps(
@@ -624,7 +662,9 @@ struct UpsertCatalogedApps: CustomQueryable {
       RETURNING
         \(CA.columnName(.id)),
         \(CA.columnName(.bundleId)),
-        \(CA.columnName(.iconContentHash))
+        \(CA.columnName(.iconContentHash)),
+        \(CA.columnName(.iconUploadedAt)),
+        \(CA.columnName(.iconSourceAppVersion))
     """))
     return stmt
   }
@@ -632,6 +672,48 @@ struct UpsertCatalogedApps: CustomQueryable {
   var id: UUID
   var bundleId: String
   var iconContentHash: String?
+  var iconUploadedAt: Date?
+  var iconSourceAppVersion: String?
+}
+
+enum LooseAppVersion {
+  static func compare(_ lhs: String, _ rhs: String?) -> ComparisonResult? {
+    let lhs = lhs.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !lhs.isEmpty else { return nil }
+    guard let rhs = rhs?.trimmingCharacters(in: .whitespacesAndNewlines),
+          !rhs.isEmpty else {
+      return .orderedDescending
+    }
+    guard let lhsParts = parts(lhs), let rhsParts = parts(rhs) else {
+      return lhs == rhs ? .orderedSame : .orderedDescending
+    }
+    for i in 0 ..< max(lhsParts.count, rhsParts.count) {
+      let lhs = i < lhsParts.count ? lhsParts[i] : 0
+      let rhs = i < rhsParts.count ? rhsParts[i] : 0
+      if lhs < rhs { return .orderedAscending }
+      if lhs > rhs { return .orderedDescending }
+    }
+    return .orderedSame
+  }
+
+  private static func parts(_ version: String) -> [Int]? {
+    let trimmed = version.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return nil }
+    let candidate = trimmed
+      .split(whereSeparator: { $0.isWhitespace || $0 == "(" })
+      .first?
+      .drop { $0 == "v" || $0 == "V" } ?? ""
+    let parts = candidate
+      .split(separator: ".", omittingEmptySubsequences: false)
+      .map { segment -> Int? in
+        let digits = segment.prefix { $0.isNumber }
+        return digits.isEmpty ? nil : Int(digits)
+      }
+    guard !parts.isEmpty, parts.allSatisfy({ $0 != nil }) else {
+      return nil
+    }
+    return parts.compactMap(\.self)
+  }
 }
 
 func clearScreenTimeAnnouncement(

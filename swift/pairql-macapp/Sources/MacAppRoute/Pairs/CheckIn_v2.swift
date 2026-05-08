@@ -94,17 +94,20 @@ public struct CheckIn_v2: Pair {
     public var name: String
     public var category: String?
     public var iconContentHash: String
+    public var appVersion: String?
 
     public init(
       bundleId: String,
       name: String,
       category: String?,
       iconContentHash: String,
+      appVersion: String? = nil,
     ) {
       self.bundleId = bundleId
       self.name = name
       self.category = category
       self.iconContentHash = iconContentHash
+      self.appVersion = appVersion
     }
   }
 
