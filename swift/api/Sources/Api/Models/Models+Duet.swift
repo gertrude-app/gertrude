@@ -884,6 +884,8 @@ extension CatalogedApp {
     case category
     case icon
     case iconContentHash
+    case iconUploadedAt
+    case iconSourceAppVersion
     case createdAt
     case updatedAt
   }

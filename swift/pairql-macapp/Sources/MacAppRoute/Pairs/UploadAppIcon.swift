@@ -8,11 +8,18 @@ public struct UploadAppIcon: Pair {
     public var bundleId: String
     public var iconData: Data
     public var iconContentHash: String
+    public var appVersion: String?
 
-    public init(bundleId: String, iconData: Data, iconContentHash: String) {
+    public init(
+      bundleId: String,
+      iconData: Data,
+      iconContentHash: String,
+      appVersion: String? = nil,
+    ) {
       self.bundleId = bundleId
       self.iconData = iconData
       self.iconContentHash = iconContentHash
+      self.appVersion = appVersion
     }
   }
 

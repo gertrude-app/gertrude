@@ -161,6 +161,7 @@ extension CheckInFeature.RootReducer {
               name: app.name,
               category: app.category,
               iconContentHash: data.sha256Hex,
+              appVersion: app.appVersion,
             ))
           }
         }
@@ -202,6 +203,7 @@ extension CheckInFeature.RootReducer {
             bundleId: app.bundleId,
             iconData: data,
             iconContentHash: data.sha256Hex,
+            appVersion: app.appVersion,
           ))
           uploaded.append(app.bundleId)
         } catch {}
