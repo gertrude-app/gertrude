@@ -153,6 +153,8 @@ enum ModelIdentifier {
     // iPad Air M4 (2026)
     "iPad16,7": "iPad Air 11-inch (M4)",
     "iPad16,8": "iPad Air 11-inch (M4)",
+    "iPad16,10": "iPad Air 13-inch (M4)",
+    "iPad16,11": "iPad Air 13-inch (M4)",
 
     // iPad Air M3 (2025)
     "iPad15,3": "iPad Air 11-inch (M3)",
