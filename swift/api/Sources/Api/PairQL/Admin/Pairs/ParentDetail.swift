@@ -123,7 +123,7 @@ extension ParentDetail: Resolver {
           .where(.deviceId == device.id)
           .exists(in: context.db)
         let status: String? = if let supervision {
-          supervision.status.rawValue
+          supervision.status(device: device).rawValue
         } else if hasToken {
           "connected"
         } else {

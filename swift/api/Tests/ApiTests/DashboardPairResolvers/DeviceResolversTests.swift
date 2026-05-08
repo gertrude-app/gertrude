@@ -97,14 +97,12 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.child()
     let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
+      $0.claimCode = 111_111
+      $0.claimCodeExpiresAt = .reference + .days(7)
+      $0.claimedAt = Date()
     })
     _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
-    _ = try await self.db.create(BlockerApp.Supervision(
-      deviceId: iosDevice.id,
-      claimCode: 111_111,
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: Date(),
-    ))
+    _ = try await self.db.create(BlockerApp.Supervision(deviceId: iosDevice.id))
 
     try await withDependencies {
       $0.websockets.status = { _ in .offline }

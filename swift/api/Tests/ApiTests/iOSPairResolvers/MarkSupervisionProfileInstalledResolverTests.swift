@@ -10,9 +10,6 @@ final class MarkSupervisionProfileInstalledResolverTests: ApiTestCase, @unchecke
     let child = try await self.childWithIOSDevice()
     try await self.db.create(BlockerApp.Supervision(
       deviceId: child.device.id,
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
       supervisedAt: .reference,
     ))
 
@@ -34,9 +31,6 @@ final class MarkSupervisionProfileInstalledResolverTests: ApiTestCase, @unchecke
     let child = try await self.childWithIOSDevice()
     try await self.db.create(BlockerApp.Supervision(
       deviceId: child.device.id,
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
       supervisedAt: .reference,
       profileInstalledAt: .reference,
     ))

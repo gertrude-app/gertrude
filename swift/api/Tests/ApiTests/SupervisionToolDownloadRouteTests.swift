@@ -19,12 +19,10 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
       .GET,
@@ -66,12 +64,10 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-    ))
-    try await self.db.create(BlockerApp.Supervision(
-      deviceId: device.id,
       claimCode: code,
       claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
       .GET,

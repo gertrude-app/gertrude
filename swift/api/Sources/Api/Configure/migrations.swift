@@ -92,6 +92,7 @@ extension Configure {
     app.migrations.add(AddPerfIndexes())
     app.migrations.add(EnrichRouteTelemetry())
     app.migrations.add(AppInstallTables())
+    app.migrations.add(HoistClaimFieldsToDevice())
   }
 }
 

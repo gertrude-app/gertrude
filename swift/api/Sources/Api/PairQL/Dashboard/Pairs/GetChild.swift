@@ -152,7 +152,7 @@ extension GetChild: Resolver {
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          pendingClaimCode: supervision?.supervised == false ? supervision?.claimCode : nil,
+          pendingClaimCode: supervision?.supervised == false ? device.claimCode : nil,
         )
       },
       blockedApps: blockedApps,

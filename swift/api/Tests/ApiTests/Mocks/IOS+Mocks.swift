@@ -48,26 +48,14 @@ extension BlockerApp.Install: RandomMocked {
 
 extension BlockerApp.Supervision: RandomMocked {
   public static var mock: BlockerApp.Supervision {
-    .init(
-      deviceId: .init(),
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(7),
-    )
+    .init(deviceId: .init())
   }
 
   public static var empty: BlockerApp.Supervision {
-    .init(
-      deviceId: .init(),
-      claimCode: 123_456,
-      claimCodeExpiresAt: .reference + .days(7),
-    )
+    .init(deviceId: .init())
   }
 
   public static var random: BlockerApp.Supervision {
-    .init(
-      deviceId: .init(),
-      claimCode: .random(in: 100_000 ... 999_999),
-      claimCodeExpiresAt: .reference + .days(.random(in: 1 ... 14)),
-    )
+    .init(deviceId: .init())
   }
 }

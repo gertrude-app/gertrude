@@ -287,6 +287,9 @@ If you are doing anything non-trivial in the API with the Duet database layer, r
 ### Adding a Database Migration
 
 - read several examples in `api/Sources/Api/Database/Migrations/` to see pattern
+- for any non-trivial migration (data backfill, column drop, transforms, etc.), follow
+  `./.agents/skills/migration-verification/SKILL.md` to capture a pre/post baseline
+  before merging
 
 ### Adding/Removing a Model Field
 

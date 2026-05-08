@@ -29,23 +29,23 @@ struct GetIOSDeviceSupervisionStatus: Pair {
 
 extension GetIOSDeviceSupervisionStatus: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let supervision = try? await BlockerApp.Supervision.query()
+    let device = try? await IOSDevice.query()
       .where(.claimCode == input.code)
       .first(in: context.db)
 
-    guard let supervision else {
+    guard let device else {
       logIOSUnusual("d3f8a721", "supervision status: code not found")
       let msg = "Code not found. Double-check and try again."
       throw context.error("d3f8a721", .notFound, user: msg)
     }
 
-    let device = try await supervision.device(in: context.db)
     guard let childId = device.childId else {
       logIOSUnusual("e5c2b198", "supervision status: device not yet claimed")
       let msg = "This device hasn't been claimed yet."
       throw context.error("e5c2b198", .badRequest, user: msg)
     }
 
+    let supervision = try await device.supervision(in: context.db)
     let child = try await context.verifiedChild(from: childId)
     let subscription = try await context.parent.subscription(in: context.db)
     let plan = Plan(subscription: subscription)
@@ -56,7 +56,7 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
       modelName: device.modelName,
       deviceType: device.deviceType,
       iosVersion: device.iosVersion,
-      supervisionStatus: supervision.supervised ? .supervised : .awaitingSupervision,
+      supervisionStatus: supervision?.supervised == true ? .supervised : .awaitingSupervision,
       requiresPayment: !plan.allowsSupervision,
     )
   }

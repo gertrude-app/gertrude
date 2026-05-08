@@ -32,20 +32,19 @@ struct GetIOSDeviceClaimData: Pair {
 
 extension GetIOSDeviceClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let supervision = try? await BlockerApp.Supervision.query()
+    let device = try? await IOSDevice.query()
       .where(.claimCode == input.code)
       .first(in: context.db)
 
-    guard let supervision else {
+    guard let device else {
       logIOSUnusual("7e7fb536", "supervision code not found")
       let msg = "Code not found. Double-check and try again."
       throw context.error("7e7fb536", .notFound, user: msg)
     }
 
-    let device = try await supervision.device(in: context.db)
-
     if let childId = device.childId {
       if await (try? context.verifiedChild(from: childId)) != nil {
+        let supervision = try await device.supervision(in: context.db)
         let step = try await resumeStep(supervision: supervision, in: context)
         return .init(
           children: [],
@@ -61,7 +60,8 @@ extension GetIOSDeviceClaimData: Resolver {
       }
     }
 
-    if supervision.claimCodeExpiresAt < get(dependency: \.date.now) {
+    if let expiresAt = device.claimCodeExpiresAt,
+       expiresAt < get(dependency: \.date.now) {
       logIOSUnusual("87a02411", "supervision code expired")
       let msg = "This code has expired. Please generate a new one."
       throw context.error("87a02411", .badRequest, user: msg)
@@ -80,10 +80,10 @@ extension GetIOSDeviceClaimData: Resolver {
 }
 
 private func resumeStep(
-  supervision: BlockerApp.Supervision,
+  supervision: BlockerApp.Supervision?,
   in context: ParentContext,
 ) async throws -> GetIOSDeviceClaimData.ResumeStep {
-  if supervision.supervisedAt != nil {
+  if supervision?.supervisedAt != nil {
     return .done
   }
   let plan = try await context.parent.plan(in: context.db)
