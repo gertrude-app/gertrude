@@ -7,11 +7,13 @@ packages:
   - smoke
   - admin
   - supervise
+  - ui
 
 onlyBuiltDependencies:
   - core-js-pure
   - cypress
   - esbuild
+  - lightningcss
   - nx
   - puppeteer
   - sharp
