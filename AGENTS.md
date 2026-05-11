@@ -120,17 +120,9 @@ the same failure mode for future agents.
   database skill file at `./.agents/skills/database/SKILL.md`
 - for local development we use a local postgres, NOT docker
 
-## Dev "task" concept
+## Further user-specific instructions
 
-Local dev for this monorepo takes place in individual "task" branches with separate
-directories, similar in concept to **git worktrees.** If I refer to another "task", it
-means another directory. You can list out other tasks by `ls`-ing the directory above your
-cwd. You may read data from any other task, but you may not modify code outside your
-current task unless explicity instructed.
-
-## Task-specific instructions (may not be present)
-
-- @./agent.task.md
-
-If no agent.task.md file, repond to the user saying "What's on the dockett for today,
-sir?"
+Use `whoami` to determine what additional user-specific instructions to read, as each user has their own different prefences and ways of doing things:
+- `miciah` -> `./AGENTS.kiah.md`
+- `jared` -> `./AGENTS.jared.md`
+Completely ignore and don't even read the other user's instruction file, only the one corresponding to the result you get from running `whoami`.

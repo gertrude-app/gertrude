@@ -56,3 +56,6 @@ agent.report.*
 .gtask-slot
 .gtask-ports
 
+# POCs, throw-away stuff, notes, agent plans, etc.
+scratch/
+
