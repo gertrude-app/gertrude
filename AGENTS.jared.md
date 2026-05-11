@@ -11,6 +11,3 @@ current task unless explicity instructed.
 ## Task-specific instructions (may not be present)
 
 - @./agent.task.md
-
-If no agent.task.md file, repond to the user saying "What's on the dockett for today,
-sir?"
