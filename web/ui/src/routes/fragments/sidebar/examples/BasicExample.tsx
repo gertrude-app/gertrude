@@ -1,8 +1,8 @@
-import Sidebar from '#/components/ui/sidebar/Sidebar';
-import SidebarItem from '#/components/ui/sidebar/SidebarItem';
-import SidebarLayout from '#/components/ui/sidebar/SidebarLayout';
-import SidebarSection from '#/components/ui/sidebar/SidebarSection';
-import SidebarSubItem from '#/components/ui/sidebar/SidebarSubItem';
+import Sidebar from '#/components/ui/fragments/sidebar/Sidebar';
+import SidebarItem from '#/components/ui/fragments/sidebar/SidebarItem';
+import SidebarLayout from '#/components/ui/fragments/sidebar/SidebarLayout';
+import SidebarSection from '#/components/ui/fragments/sidebar/SidebarSection';
+import SidebarSubItem from '#/components/ui/fragments/sidebar/SidebarSubItem';
 import {
   BookOpenTextIcon,
   HomeIcon,

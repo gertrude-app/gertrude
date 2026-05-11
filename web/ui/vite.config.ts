@@ -7,7 +7,11 @@ const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     tailwindcss(),
-    tanstackRouter({ target: `react`, autoCodeSplitting: true }),
+    tanstackRouter({
+      target: `react`,
+      autoCodeSplitting: true,
+      routeFileIgnorePattern: `examples`,
+    }),
     viteReact(),
   ],
 });
