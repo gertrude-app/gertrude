@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AtomsButtonRouteImport } from './routes/atoms/button'
+import { Route as FragmentsSidebarIndexRouteImport } from './routes/fragments/sidebar/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtomsButtonRoute = AtomsButtonRouteImport.update({
+  id: '/atoms/button',
+  path: '/atoms/button',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FragmentsSidebarIndexRoute = FragmentsSidebarIndexRouteImport.update({
+  id: '/fragments/sidebar/',
+  path: '/fragments/sidebar/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atoms/button': typeof AtomsButtonRoute
+  '/fragments/sidebar/': typeof FragmentsSidebarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atoms/button': typeof AtomsButtonRoute
+  '/fragments/sidebar': typeof FragmentsSidebarIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atoms/button': typeof AtomsButtonRoute
+  '/fragments/sidebar/': typeof FragmentsSidebarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/atoms/button' | '/fragments/sidebar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/atoms/button' | '/fragments/sidebar'
+  id: '__root__' | '/' | '/atoms/button' | '/fragments/sidebar/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtomsButtonRoute: typeof AtomsButtonRoute
+  FragmentsSidebarIndexRoute: typeof FragmentsSidebarIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atoms/button': {
+      id: '/atoms/button'
+      path: '/atoms/button'
+      fullPath: '/atoms/button'
+      preLoaderRoute: typeof AtomsButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fragments/sidebar/': {
+      id: '/fragments/sidebar/'
+      path: '/fragments/sidebar'
+      fullPath: '/fragments/sidebar/'
+      preLoaderRoute: typeof FragmentsSidebarIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtomsButtonRoute: AtomsButtonRoute,
+  FragmentsSidebarIndexRoute: FragmentsSidebarIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
