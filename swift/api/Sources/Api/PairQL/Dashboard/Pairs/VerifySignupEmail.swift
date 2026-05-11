@@ -44,11 +44,12 @@ extension VerifySignupEmail: Resolver {
       ))
 
       if context.env.mode == .prod, !isTestAddress(parent.email.rawValue) {
+        var body = AdminLink().email(to: .parent(parent.id), text: parent.email.rawValue)
+        if let gclid = parent.gclid {
+          body += "<br/>gclid: \(gclid)"
+        }
         with(dependency: \.postmark)
-          .toSuperAdmin(
-            "signup completed",
-            AdminLink().email(to: .parent(parent.id), text: parent.email.rawValue),
-          )
+          .toSuperAdmin("signup completed", body)
         await with(dependency: \.slack)
           .internal(.signups, "email verified: `\(parent.email.rawValue)`")
       }
