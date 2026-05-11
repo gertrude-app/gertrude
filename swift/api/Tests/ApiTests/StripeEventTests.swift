@@ -37,8 +37,8 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     """
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
-      let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
-      expect(retrieved.subscription?.stripeId).toEqual(subscriptionId)
+      let retrieved = try await parent.model.subscription(in: self.db)
+      expect(retrieved?.stripeId).toEqual(subscriptionId)
     })
   }
 
@@ -69,8 +69,8 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     """
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
-      let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
-      expect(retrieved.subscription?.stripeId).toEqual(subscriptionId)
+      let retrieved = try await parent.subscription(in: self.db)
+      expect(retrieved?.stripeId).toEqual(subscriptionId)
     })
   }
 
@@ -106,12 +106,14 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       }
     """
 
-    let expectedNewStatusExpiration = Date(timeIntervalSince1970: TimeInterval(periodEnd))
-      .advanced(by: .days(2))
-
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
+      expect(retrieved.stripeId).toEqual(subscriptionId)
+      expect(retrieved.tier).toEqual(.full)
+      expect(retrieved.stripeStatus).toEqual(.active)
+      expect(retrieved.currentPeriodEnd)
+        .toEqual(Date(timeIntervalSince1970: TimeInterval(periodEnd)))
     })
   }
 
@@ -137,6 +139,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
+      expect(retrieved.stripeStatus).toEqual(.canceled)
     })
   }
 
@@ -175,12 +178,14 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       }
     """
 
-    let expectedNewStatusExpiration = Date(timeIntervalSince1970: TimeInterval(periodEnd))
-      .advanced(by: .days(2))
-
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
       expect(res.status).toEqual(.noContent)
       let retrieved = try await parent.model.subscription(in: self.db)!
+      expect(retrieved.stripeId).toEqual(subscriptionId)
+      expect(retrieved.tier).toEqual(.full)
+      expect(retrieved.stripeStatus).toEqual(.active)
+      expect(retrieved.currentPeriodEnd)
+        .toEqual(Date(timeIntervalSince1970: TimeInterval(periodEnd)))
     })
   }
 
@@ -212,8 +217,8 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     """
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-      let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
-      expect(retrieved.subscription?.stripeId).toEqual(subscriptionId)
+      let retrieved = try await parent.model.subscription(in: self.db)
+      expect(retrieved?.stripeId).toEqual(subscriptionId)
     })
 
     let differentSubId = "subId_".random
@@ -244,8 +249,8 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       body: .init(string: replayedJsonWithDifferentBody),
       afterResponse: { res in
         expect(res.status).toEqual(.noContent)
-        let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
-        expect(retrieved.subscription?.stripeId).toEqual(subscriptionId)
+        let retrieved = try await parent.model.subscription(in: self.db)
+        expect(retrieved?.stripeId).toEqual(subscriptionId)
       },
     )
 
@@ -406,8 +411,8 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     """
 
     try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
-      let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
-      expect(retrieved.subscription?.stripeId).toEqual(subscriptionId)
+      let retrieved = try await parent.model.subscription(in: self.db)
+      expect(retrieved?.stripeId).toEqual(subscriptionId)
     })
   }
 
@@ -473,6 +478,45 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         let retrieved = try await parent.model.subscription(in: self.db)!
         expect(retrieved.stripeId.rawValue).toEqual(incomingSubId)
         expect(retrieved.tier).toEqual(.full)
+      })
+    }
+
+    let alarms = self.sent.slacks.filter { $0.message.channel == "unexpected-errors" }
+    expect(alarms.count).toEqual(0)
+
+    let interestingEvents = try await InterestingEvent.query()
+      .where(.parentId == parent.id)
+      .where(.eventId == .string("subscription_overwritten"))
+      .all(in: self.db)
+    expect(interestingEvents.count).toEqual(1)
+  }
+
+  func testDuplicateOverwriteAllowedWhenExistingSubIsIncomplete() async throws {
+    let existingSubId = "sub_existing_".random
+    let incomingSubId = "sub_incoming_".random
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = .init(existingSubId)
+      sub.tier = .light
+      sub.stripeStatus = .incomplete
+    }
+
+    let json = invoicePaidJson(
+      eventId: "evt_\("".random)",
+      email: parent.email.rawValue,
+      subscriptionId: incomingSubId,
+      priceId: "price_1RJbTrGKRdhETuKAkI5OO1NB",
+    )
+
+    try await withDependencies {
+      $0.stripe.getSubscription = { _ in
+        .init(id: existingSubId, status: .incomplete, customer: "cus_x", currentPeriodEnd: 0)
+      }
+    } operation: {
+      try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { _ in
+        let retrieved = try await parent.model.subscription(in: self.db)!
+        expect(retrieved.stripeId.rawValue).toEqual(incomingSubId)
+        expect(retrieved.tier).toEqual(.full)
+        expect(retrieved.stripeStatus).toEqual(.active)
       })
     }
 

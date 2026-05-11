@@ -25,35 +25,30 @@ enum StripeEventsRoute {
 
     let event = try? JSON.decode(json, as: EventInfo.self)
 
-    // TODO: wrap in transaction — adding a transaction helper to Duet in a separate
-    // branch, then coming back to wrap insertIdempotent + the dispatch below so a
-    // mid-handler crash rolls back the idempotency marker and Stripe can retry cleanly
-    let stripeEvent = try await StripeEvent.insertIdempotent(
-      json: json,
-      stripeEventId: event?.id,
-      in: request.context.db,
-    )
-    guard let stripeEvent else {
-      return Response(status: .noContent)
+    let stripeEvent: StripeEvent? = try await request.context.db.withTransaction { db in
+      guard let stripeEvent = try await StripeEvent.insertIdempotent(
+        json: json,
+        stripeEventId: event?.id,
+        in: db,
+      ) else {
+        return nil
+      }
+
+      switch event?.type {
+      case "invoice.paid":
+        try await handleInvoicePaid(event: event, stripeEvent: stripeEvent, db: db)
+      case "customer.subscription.updated":
+        try await handleSubscriptionUpdated(event: event, stripeEvent: stripeEvent, db: db)
+      case "customer.subscription.deleted":
+        try await handleSubscriptionDeleted(event: event, stripeEvent: stripeEvent, db: db)
+      default:
+        break
+      }
+      return stripeEvent
     }
 
-    switch event?.type {
-    case "invoice.paid":
-      try await handleInvoicePaid(event: event, stripeEvent: stripeEvent, db: request.context.db)
-    case "customer.subscription.updated":
-      try await handleSubscriptionUpdated(
-        event: event,
-        stripeEvent: stripeEvent,
-        db: request.context.db,
-      )
-    case "customer.subscription.deleted":
-      try await handleSubscriptionDeleted(
-        event: event,
-        stripeEvent: stripeEvent,
-        db: request.context.db,
-      )
-    default:
-      break
+    guard stripeEvent != nil else {
+      return Response(status: .noContent)
     }
 
     slackNotify(event)
@@ -291,11 +286,11 @@ private func handleSubscriptionDeleted(
   subscription.stripeStatus = .canceled
   try await db.update(subscription)
 
+  let parent = try await db.find(subscription.parentId) as Parent
+  let adminLink = AdminLink()
+  let slackLink = adminLink.slack(to: .parent(parent.id), text: parent.email.rawValue)
+  let emailLink = adminLink.email(to: .parent(parent.id), text: parent.email.rawValue)
   Task {
-    let parent = try await db.find(subscription.parentId) as Parent
-    let adminLink = AdminLink()
-    let slackLink = adminLink.slack(to: .parent(parent.id), text: parent.email.rawValue)
-    let emailLink = adminLink.email(to: .parent(parent.id), text: parent.email.rawValue)
     await get(dependency: \.slack)
       .internal(.info, "*Subscription cancelled* by \(slackLink)")
     get(dependency: \.postmark)
@@ -324,11 +319,11 @@ func reconcileDuplicateSubscription(
   }
   let decision: Decision = switch lookup {
   case .success(let existing):
-    switch existing.status {
-    case .active, .trialing, .pastDue, .incomplete:
-      .reject(reason: "live status", status: existing.status.rawValue)
-    case .canceled, .unpaid, .incompleteExpired:
+    if let status = StripeSubscription.StripeStatus(rawValue: existing.status.rawValue),
+       !status.isLive {
       .allow(reason: "terminal status: \(existing.status.rawValue)")
+    } else {
+      .reject(reason: "live status", status: existing.status.rawValue)
     }
   case .failure(let error as Stripe.Api.Error) where error.code == "resource_missing":
     .allow(reason: "stripe 404 (resource_missing)")
