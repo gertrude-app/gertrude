@@ -14,6 +14,7 @@ const SidebarPage: React.FC = () => {
         component={<BasicExample />}
         path="./examples/BasicExample.tsx"
         description="Basic usage of the sidebar component"
+        demoHeight="42rem"
       />
     </ComponentDemoPage>
   );

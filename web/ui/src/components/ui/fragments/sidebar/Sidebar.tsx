@@ -7,7 +7,7 @@ interface Props {
 
 const Sidebar: React.FC<Props> = ({ children, logoUrl }) => {
   return (
-    <div className="w-64 bg-stone-50 border-r border-stone-200 flex flex-col p-4 gap-8">
+    <div className="w-64 shrink-0 bg-stone-50 border-r border-stone-200 flex flex-col p-4 gap-8">
       <div>
         <img src={logoUrl} alt="Logo" className="h-8" />
       </div>
