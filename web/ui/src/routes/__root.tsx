@@ -1,11 +1,11 @@
 import React from 'react';
-import { Outlet, createRootRoute } from '@tanstack/react-router';
-import SidebarLayout from '#/components/ui/sidebar/SidebarLayout';
-import Sidebar from '#/components/ui/sidebar/Sidebar';
-import '../styles.css';
-import SidebarSection from '#/components/ui/sidebar/SidebarSection';
-import SidebarItem from '#/components/ui/sidebar/SidebarItem';
 import { SquareIcon, LayoutGridIcon } from 'lucide-react';
+import { Outlet, createRootRoute } from '@tanstack/react-router';
+import SidebarLayout from '#/components/ui/fragments/sidebar/SidebarLayout';
+import Sidebar from '#/components/ui/fragments/sidebar/Sidebar';
+import SidebarSection from '#/components/ui/fragments/sidebar/SidebarSection';
+import SidebarItem from '#/components/ui/fragments/sidebar/SidebarItem';
+import '../styles.css';
 
 const RootComponent: React.FC = () => (
   <SidebarLayout content={<Outlet />}>

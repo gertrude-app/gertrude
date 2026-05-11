@@ -28,7 +28,7 @@ const ComponentDemoPage: React.FC<Props> = ({ title, description, children }) =>
             <p className="mt-4 text-lg leading-8 text-stone-600">{description}</p>
           </header>
 
-          <div className="flex flex-col gap-8">{children}</div>
+          <div className="flex flex-col gap-14">{children}</div>
         </div>
       </div>
     </DemoPageContext.Provider>
