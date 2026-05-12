@@ -6,7 +6,7 @@ interface Props {
 
 const SidebarSubItem: React.FC<Props> = ({ title }) => {
   return (
-    <div className="rounded-xl cursor-default relative group">
+    <div className="rounded-xl cursor-pointer relative group">
       <div className="absolute left-2 top-0 h-full w-0.25 bg-stone-200 group-last:h-[80%]" />
       <div className="py-1.25 hover:bg-stone-200/30 ml-4 px-2 rounded-xl active:bg-stone-200/50 active:scale-98 transition-[scale] duration-100">
         <span className="text-sm text-stone-900 select-none">{title}</span>

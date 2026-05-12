@@ -1,5 +1,5 @@
 import React from 'react';
-import { SquareIcon, LayoutGridIcon } from 'lucide-react';
+import { LayoutGridIcon, DiamondIcon } from 'lucide-react';
 import { Outlet, createRootRoute } from '@tanstack/react-router';
 import SidebarLayout from '#/components/ui/fragments/sidebar/SidebarLayout';
 import Sidebar from '#/components/ui/fragments/sidebar/Sidebar';
@@ -14,7 +14,8 @@ const RootComponent: React.FC = () => (
         <SidebarItem title="Sidebar" icon={LayoutGridIcon} to="/fragments/sidebar" />
       </SidebarSection>
       <SidebarSection title="Atoms">
-        <SidebarItem title="Button" icon={SquareIcon} to="/atoms/button" />
+        <SidebarItem title="Button" icon={DiamondIcon} to="/atoms/button" />
+        <SidebarItem title="Input" icon={DiamondIcon} to="/atoms/input" />
       </SidebarSection>
     </Sidebar>
   </SidebarLayout>
