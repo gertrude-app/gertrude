@@ -1,0 +1,56 @@
+name: GertrudeFM
+options:
+  deploymentTarget:
+    iOS: "18.0"
+  developmentLanguage: en
+  knownRegions:
+    - en
+
+configs:
+  Debug: debug
+  Release: release
+
+targets:
+  "Gertrude FM":
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: app/sources
+        group: app
+    dependencies:
+      - package: LibViews
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_VERSION: "6.0"
+        PRODUCT_NAME: "Gertrude FM"
+        DEVELOPMENT_TEAM: "WFN83LM943"
+        CODE_SIGN_STYLE: Automatic
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        ALWAYS_SEARCH_USER_PATHS: NO
+      configs:
+        Release:
+          PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.fm"
+        Debug:
+          ONLY_ACTIVE_ARCH: YES
+          PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.fm.dev"
+    info:
+      path: app/Info.plist
+      properties:
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundleDisplayName: Gertrude FM
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+        UIRequiresFullScreen: true
+        UILaunchScreen: {}
+
+packages:
+  LibViews:
+    path: ./lib-views

@@ -1,0 +1,26 @@
+import '../watch-helpers.just'
+
+_default:
+  @just --choose
+
+gen:
+  @xcodegen -s project.yml
+  @xml-lint --fix app/Info.plist
+
+xcode:
+  @just gen
+  @open GertrudeFM.xcodeproj
+
+build-views:
+  @cd lib-views && swift build
+
+test:
+  @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
+
+fix:
+  @swiftformat --exclude '**/.build' .
+  @xml-lint --fix app/Info.plist
+
+clean:
+  @rm -rf lib-views/.build
+  @find lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
