@@ -16,7 +16,7 @@ type Props = {
 );
 
 const itemClassName =
-  'flex items-center justify-between hover:bg-stone-200/30 px-2 py-1.5 rounded-xl -mx-2 cursor-default active:bg-stone-200/50 active:scale-98 transition-[scale] duration-100 select-none';
+  'flex items-center justify-between hover:bg-stone-200/30 px-2 py-1.5 rounded-xl -mx-2 cursor-default active:bg-stone-200/50 active:scale-98 transition-[scale] duration-100 select-none cursor-pointer';
 
 const SidebarItem: React.FC<Props> = ({ title, icon: Icon, ...props }) => {
   const [isOpen, setIsOpen] = useState(false);
