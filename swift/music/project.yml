@@ -19,7 +19,8 @@ targets:
       - path: app/sources
         group: app
     dependencies:
-      - package: LibViews
+      - package: LibTCA
+        product: LibTCA
     settings:
       base:
         TARGETED_DEVICE_FAMILY: "1,2"
@@ -54,3 +55,5 @@ targets:
 packages:
   LibViews:
     path: ./lib-views
+  LibTCA:
+    path: ./lib-tca
