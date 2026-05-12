@@ -14,13 +14,24 @@ xcode:
 build-views:
   @cd lib-views && swift build
 
+build-tca:
+  @cd lib-tca && swift build
+
+build:
+  @just build-views
+  @just build-tca
+
+build-app:
+  @xcodebuild -project GertrudeFM.xcodeproj -scheme 'Gertrude FM' -configuration Debug -destination 'generic/platform=iOS Simulator' build
+
 test:
   @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
+  @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
 
 fix:
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist
 
 clean:
-  @rm -rf lib-views/.build
-  @find lib-views -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
+  @rm -rf lib-views/.build lib-tca/.build
+  @find lib-views lib-tca -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete
