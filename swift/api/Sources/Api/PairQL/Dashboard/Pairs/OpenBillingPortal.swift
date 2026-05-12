@@ -22,7 +22,7 @@ extension OpenBillingPortal: Resolver {
     @Dependency(\.stripe) var stripe
 
     let billing = try await context.parent.parentBilling(in: context.db)
-    guard let customerId = billing.identity.stripeCustomerId?.rawValue else {
+    guard let customerId = billing.identity?.stripeCustomerId?.rawValue else {
       throw context.error(
         "a4d12c75",
         .badRequest,

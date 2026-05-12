@@ -2,11 +2,11 @@ import Foundation
 import TaggedMoney
 
 struct ParentBilling: Sendable {
-  let identity: BillingIdentity
+  let identity: BillingIdentity?
   let stripeSubscription: StripeSubscription?
 
   func entitlement(at now: Date) -> Entitlement {
-    if self.identity.isComplimentary {
+    if self.identity?.isComplimentary == true {
       return .complimentary
     }
 
@@ -19,7 +19,7 @@ struct ParentBilling: Sendable {
       return .full
     }
 
-    if let trialStart = self.identity.fullTrialStartedAt {
+    if let trialStart = self.identity?.fullTrialStartedAt {
       let trialEnd = trialStart + Entitlement.trialPeriod
       if now < trialEnd {
         return .fullTrial(until: trialEnd)
@@ -41,7 +41,9 @@ struct ParentBilling: Sendable {
   }
 
   var allowsSupervision: Bool {
-    if self.identity.isComplimentary { return true }
+    if self.identity?.isComplimentary == true {
+      return true
+    }
     guard let sub = self.stripeSubscription, sub.stripeStatus.isLive else {
       return false
     }

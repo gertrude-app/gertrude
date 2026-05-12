@@ -1,5 +1,6 @@
 import DuetSQL
 
+/// current/active stripe subscription
 struct StripeSubscription: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

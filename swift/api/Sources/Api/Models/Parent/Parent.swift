@@ -90,7 +90,7 @@ extension Parent {
     async let identity = self.billingIdentity(in: db)
     async let subscription = self.subscription(in: db)
     return try await ParentBilling(
-      identity: identity ?? BillingIdentity(parentId: self.id),
+      identity: identity,
       stripeSubscription: subscription,
     )
   }

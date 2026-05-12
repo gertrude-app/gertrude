@@ -88,7 +88,7 @@ func panelOutput(
     if sub?.stripeStatus == .pastDue {
       primary = .openBillingPortal(config: .lightTier)
       secondary = [.upgradeSubscriptionTier(to: .full)]
-    } else if identity.fullTrialStartedAt == nil {
+    } else if identity?.fullTrialStartedAt == nil {
       primary = .upgradeSubscriptionTier(to: .full)
       secondary = [.openBillingPortal(config: .lightTier), .startFullTrial]
     } else {
@@ -100,9 +100,9 @@ func panelOutput(
     if sub?.tier == .light {
       primary = .upgradeSubscriptionTier(to: .full)
       secondary = [.openBillingPortal(config: .lightTier)]
-    } else if identity.lastStripeSubscriptionId != nil {
+    } else if identity?.lastStripeSubscriptionId != nil {
       primary = .reactivateViaCheckout(tier: .full)
-      secondary = identity.lastPaidTier == .full
+      secondary = identity?.lastPaidTier == .full
         ? []
         : [.reactivateViaCheckout(tier: .light)]
     } else {
@@ -111,11 +111,11 @@ func panelOutput(
     }
 
   case .free:
-    if identity.lastStripeSubscriptionId == nil {
-      let trialOption: [Action] = identity.fullTrialStartedAt == nil ? [.startFullTrial] : []
+    if identity?.lastStripeSubscriptionId == nil {
+      let trialOption: [Action] = identity?.fullTrialStartedAt == nil ? [.startFullTrial] : []
       primary = .startCheckout(tier: .full)
       secondary = [.startCheckout(tier: .light)] + trialOption
-    } else if identity.lastPaidTier == .full {
+    } else if identity?.lastPaidTier == .full {
       primary = .reactivateViaCheckout(tier: .full)
       secondary = []
     } else {

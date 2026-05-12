@@ -32,8 +32,8 @@ extension MacAppConnectionCode: Resolver {
     let entitlement = billing.entitlement(at: now)
     let identity = billing.identity
     let sub = billing.stripeSubscription
-    let trialedFull = identity.fullTrialStartedAt != nil
-    let hasHistory = identity.lastStripeSubscriptionId != nil
+    let trialedFull = identity?.fullTrialStartedAt != nil
+    let hasHistory = identity?.lastStripeSubscriptionId != nil
 
     switch entitlement {
     case .complimentary:
@@ -64,7 +64,7 @@ extension MacAppConnectionCode: Resolver {
       if !hasHistory {
         return .init(code: code, gate: .trialRequired)
       }
-      if identity.lastPaidTier == .full {
+      if identity?.lastPaidTier == .full {
         return .init(code: code, gate: .subscriptionFixRequired)
       }
       return .init(code: code, gate: trialedFull ? .planUpgradeRequired : .trialRequired)

@@ -34,7 +34,7 @@ extension StartCheckoutSession: Resolver {
 
     try await context.parent.ensureBillingIdentity(in: context.db)
 
-    let customerId = billing.identity.stripeCustomerId?.rawValue
+    let customerId = billing.identity?.stripeCustomerId?.rawValue
     let sessionData = Stripe.CheckoutSessionData(
       successUrl: "\(context.dashboardUrl)\(input.successPath)?session_id={CHECKOUT_SESSION_ID}",
       cancelUrl: "\(context.dashboardUrl)\(input.cancelPath)?session_id={CHECKOUT_SESSION_ID}",
