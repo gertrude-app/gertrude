@@ -54,6 +54,13 @@ struct HoistClaimFieldsToDevice: GertieMigration {
       WHERE d.id = s.device_id;
     """)
 
+    // some of our tests cheat and don't set claim codes during setup
+    if get(dependency: \.env.mode) != .prod {
+      try await sql.execute("""
+        DELETE FROM blocker_app.supervisions WHERE claim_code IS NULL;
+      """)
+    }
+
     try await sql.execute("""
       ALTER TABLE blocker_app.supervisions
       ALTER COLUMN claim_code SET NOT NULL,
