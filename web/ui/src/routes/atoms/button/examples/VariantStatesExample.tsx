@@ -1,5 +1,5 @@
 import Button from '#/components/ui/atoms/Button';
-import { ArrowRightIcon, MailIcon } from 'lucide-react';
+import { ArrowRightIcon, MailIcon, SearchIcon } from 'lucide-react';
 import React from 'react';
 
 type ButtonVariant = 'primary' | 'default' | 'ghost' | 'destructive';
@@ -29,7 +29,21 @@ const VariantStatesExample: React.FC = () => {
               >
                 Icon right
               </Button>
-              <Button type="button" variant={variant} loading onClick={() => undefined}>
+              <Button
+                type="button"
+                variant={variant}
+                icon={SearchIcon}
+                ariaLabel={`${variant} search`}
+                onClick={() => undefined}
+              />
+              <Button
+                type="button"
+                variant={variant}
+                icon={ArrowRightIcon}
+                iconPosition="right"
+                loading
+                onClick={() => undefined}
+              >
                 Loading
               </Button>
             </div>
