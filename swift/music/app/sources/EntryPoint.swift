@@ -1,11 +1,17 @@
-import LibViews
+import LibTCA
 import SwiftUI
 
 @main
 struct AppEntryPoint: App {
+  private let store: AppStore
+
+  init() {
+    self.store = AppStore()
+  }
+
   var body: some Scene {
     WindowGroup {
-      GertrudeFMView()
+      EntryPoint(store: self.store)
     }
   }
 }
