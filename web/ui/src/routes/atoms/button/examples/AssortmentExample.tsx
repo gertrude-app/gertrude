@@ -1,5 +1,11 @@
 import Button from '#/components/ui/atoms/Button';
-import { ArrowRightIcon, ExternalLinkIcon, MailIcon, Trash2Icon } from 'lucide-react';
+import {
+  ArrowRightIcon,
+  ExternalLinkIcon,
+  MailIcon,
+  SearchIcon,
+  Trash2Icon,
+} from 'lucide-react';
 import React from 'react';
 
 const AssortmentExample: React.FC = () => {
@@ -25,13 +31,36 @@ const AssortmentExample: React.FC = () => {
         <Button type="button" variant="ghost" size="small" onClick={() => undefined}>
           Skip
         </Button>
+        <Button
+          type="button"
+          variant="default"
+          icon={SearchIcon}
+          ariaLabel="Search"
+          onClick={() => undefined}
+        />
         <Button type="button" variant="destructive" icon={Trash2Icon} onClick={() => undefined}>
           Delete
         </Button>
-        <Button type="button" variant="default" loading onClick={() => undefined}>
+        <Button
+          type="button"
+          variant="default"
+          icon={ArrowRightIcon}
+          iconPosition="right"
+          loading
+          onClick={() => undefined}
+        >
           Saving
         </Button>
-        <Button type="link" href="/atoms/button" variant="ghost" icon={ExternalLinkIcon} iconPosition="right">
+        <Button type="button" variant="default" disabled onClick={() => undefined}>
+          Disabled
+        </Button>
+        <Button
+          type="link"
+          href="/atoms/button"
+          variant="ghost"
+          icon={ExternalLinkIcon}
+          iconPosition="right"
+        >
           Docs
         </Button>
       </div>
