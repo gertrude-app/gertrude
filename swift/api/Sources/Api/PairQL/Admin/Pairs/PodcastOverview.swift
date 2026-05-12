@@ -89,7 +89,7 @@ struct DistinctOriginalIDPaidCount: CustomCountable {
     SQL.Statement("""
     SELECT COUNT(DISTINCT \(podcastOriginalIDExprSQL)) AS count
     FROM \(table: PodcastEvent.self)
-    WHERE \(paidProductionPodcastEventPredicateSQL)
+    WHERE \(hostPurchasePodcastEventPredicateSQL)
     """)
   }
 
@@ -113,7 +113,7 @@ private struct PastTrialInstallCount: CustomCountable {
       AND NOT EXISTS (
         SELECT 1 FROM \(table: PodcastEvent.self)
         WHERE \(PodcastEvent.columnName(.deviceId)) = e.\(PodcastEvent.columnName(.deviceId))
-          AND \(paidSandboxPodcastEventPredicateSQL)
+          AND \(familySharedOrSandboxPodcastEventPredicateSQL)
       )
     """))
     return stmt
@@ -163,7 +163,7 @@ private struct RecentInstallsQuery: CustomQueryable {
     LEFT JOIN (
       SELECT DISTINCT \(deviceId)
       FROM \(table: PodcastEvent.self)
-      WHERE \(paidProductionPodcastEventPredicateSQL)
+      WHERE \(hostPurchasePodcastEventPredicateSQL)
     ) paid ON first_launch.\(deviceId) = paid.\(deviceId)
     ORDER BY first_launch.\(createdAt) DESC
     """)
@@ -184,7 +184,7 @@ private struct ActivePodcastUsersCount: CustomCountable {
     FROM \(table: PodcastEvent.self)
     WHERE (
         (\(eventId) = '27c4f26a' AND \(createdAt) >= NOW() - INTERVAL '30 days')
-        OR (\(paidProductionPodcastEventPredicateSQL))
+        OR (\(hostPurchasePodcastEventPredicateSQL))
       )
     """)
   }
