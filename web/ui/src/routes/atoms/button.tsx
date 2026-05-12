@@ -5,6 +5,7 @@ import DemoExample from '#/components/demo/DemoExample';
 import AssortmentExample from './button/examples/AssortmentExample';
 import VariantStatesExample from './button/examples/VariantStatesExample';
 import SizeScaleExample from './button/examples/SizeScaleExample';
+import LoadingTransitionExample from './button/examples/LoadingTransitionExample';
 
 const ButtonPage: React.FC = () => {
   return (
@@ -29,6 +30,12 @@ const ButtonPage: React.FC = () => {
         path="./examples/SizeScaleExample.tsx"
         description="Small, medium, and large sizes with icons and loading states."
         demoHeight="15rem"
+      />
+      <DemoExample
+        component={<LoadingTransitionExample />}
+        path="./examples/LoadingTransitionExample.tsx"
+        description="Toggle loading to check the spinner transition across icon positions and button styles."
+        demoHeight="24rem"
       />
     </ComponentDemoPage>
   );

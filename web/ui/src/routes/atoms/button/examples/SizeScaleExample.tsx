@@ -1,5 +1,5 @@
 import Button from '#/components/ui/atoms/Button';
-import { ArrowRightIcon, MailIcon } from 'lucide-react';
+import { ArrowRightIcon, MailIcon, SearchIcon } from 'lucide-react';
 import React from 'react';
 
 type ButtonSize = 'small' | 'medium' | 'large';
@@ -30,7 +30,23 @@ const SizeScaleExample: React.FC = () => {
               >
                 Icon right
               </Button>
-              <Button type="button" variant="default" size={size} loading onClick={() => undefined}>
+              <Button
+                type="button"
+                variant="default"
+                size={size}
+                icon={SearchIcon}
+                ariaLabel={`${size} search`}
+                onClick={() => undefined}
+              />
+              <Button
+                type="button"
+                variant="default"
+                size={size}
+                icon={ArrowRightIcon}
+                iconPosition="right"
+                loading
+                onClick={() => undefined}
+              >
                 Loading
               </Button>
             </div>
