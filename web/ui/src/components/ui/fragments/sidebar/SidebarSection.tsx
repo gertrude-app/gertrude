@@ -7,8 +7,8 @@ interface Props {
 
 const SidebarSection: React.FC<Props> = ({ title, children }) => {
   return (
-    <div className="flex flex-col gap-2.5">
-      <span className="text-xs font-medium text-stone-500 select-none">{title}</span>
+    <div className="flex flex-col gap-3">
+      <span className="text-[13px] font-medium text-stone-500 select-none">{title}</span>
       <div className="flex flex-col">{children}</div>
     </div>
   );
