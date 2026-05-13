@@ -16,15 +16,15 @@ type Props = {
 );
 
 const itemClassName =
-  'flex items-center justify-between hover:bg-stone-200/30 px-2 py-1.5 rounded-xl -mx-2 cursor-default active:bg-stone-200/50 active:scale-98 transition-[scale] duration-100 select-none cursor-pointer';
+  'flex items-center justify-between hover:bg-stone-200/30 px-2.5 py-2 rounded-xl -mx-2.5 cursor-default active:bg-stone-200/50 active:scale-98 transition-[scale] duration-100 select-none cursor-pointer';
 
 const SidebarItem: React.FC<Props> = ({ title, icon: Icon, ...props }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const content = (
-    <div className="flex items-center gap-2 text-stone-900">
-      <Icon className="w-4 h-4" />
-      <span className="text-sm">{title}</span>
+    <div className="flex items-center gap-2.5 text-stone-900">
+      <Icon className="w-4.5 h-4.5" />
+      <span className="text-[15px]">{title}</span>
     </div>
   );
 
@@ -40,7 +40,7 @@ const SidebarItem: React.FC<Props> = ({ title, icon: Icon, ...props }) => {
             {content}
             <ChevronRightIcon
               className={cx(
-                'w-4 h-4 transition-transform duration-100 text-stone-900',
+                'w-4.5 h-4.5 transition-transform duration-100 text-stone-900',
                 isOpen && 'rotate-90',
               )}
             />

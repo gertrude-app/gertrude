@@ -6,6 +6,7 @@ import AssortmentExample from './input/examples/AssortmentExample';
 import TypeVariantsExample from './input/examples/TypeVariantsExample';
 import PrefixSuffixExample from './input/examples/PrefixSuffixExample';
 import ButtonActionExample from './input/examples/ButtonActionExample';
+import InlineButtonExample from './input/examples/InlineButtonExample';
 import DisabledExample from './input/examples/DisabledExample';
 import HelperAndErrorExample from './input/examples/HelperAndErrorExample';
 
@@ -25,6 +26,12 @@ const InputPage: React.FC = () => {
         component={<ButtonActionExample />}
         path="./examples/ButtonActionExample.tsx"
         description="Inset action buttons for submitting, checking, copying, or applying the current value."
+        demoHeight="18rem"
+      />
+      <DemoExample
+        component={<InlineButtonExample />}
+        path="./examples/InlineButtonExample.tsx"
+        description="Inputs can sit inline with a separate button when the action should feel more explicit than an inset control."
         demoHeight="18rem"
       />
       <DemoExample
