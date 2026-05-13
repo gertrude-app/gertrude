@@ -56,7 +56,12 @@ const resolveSourcePath = (sourceBasePath: string, path: string): string => {
   return normalizeSourcePath(`${sourceBasePath}/${path}`);
 };
 
-const DemoExample: React.FC<Props> = ({ component, path, description, demoHeight = '32rem' }) => {
+const DemoExample: React.FC<Props> = ({
+  component,
+  path,
+  description,
+  demoHeight = '32rem',
+}) => {
   const { sourceBasePath } = useDemoPageContext();
   const sourcePath = resolveSourcePath(sourceBasePath, path);
   const source = sourceByPath[sourcePath];
@@ -65,7 +70,9 @@ const DemoExample: React.FC<Props> = ({ component, path, description, demoHeight
   const [highlightedSource, setHighlightedSource] = useState<string | null>(null);
   const fileName = sourcePath.split('/').slice(-2).join('/');
   const sourceFileName = sourcePath.split('/').pop() ?? path;
-  const exampleTitle = sourceFileName.replace(/\.tsx$/, '').replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+  const exampleTitle = sourceFileName
+    .replace(/\.tsx$/, '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2');
 
   useEffect(() => {
     let isCurrent = true;
@@ -116,7 +123,9 @@ const DemoExample: React.FC<Props> = ({ component, path, description, demoHeight
   return (
     <section className="flex flex-col gap-4">
       <div className="max-w-2xl">
-        <h2 className="text-xl font-semibold tracking-tight text-stone-950">{exampleTitle}</h2>
+        <h2 className="text-xl font-semibold tracking-tight text-stone-950">
+          {exampleTitle}
+        </h2>
         <p className="mt-1.5 leading-7 text-stone-600">{description}</p>
       </div>
 
@@ -136,7 +145,11 @@ const DemoExample: React.FC<Props> = ({ component, path, description, demoHeight
                   disabled={!source}
                   className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs font-medium text-stone-700 transition hover:bg-stone-50 active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <ClipboardIcon className="h-3.5 w-3.5" />}
+                  {copied ? (
+                    <CheckIcon className="h-3.5 w-3.5" />
+                  ) : (
+                    <ClipboardIcon className="h-3.5 w-3.5" />
+                  )}
                   {copied ? 'Copied' : 'Copy code'}
                 </button>
               ) : null}
