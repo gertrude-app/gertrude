@@ -49,10 +49,11 @@ extension PodcastInstallDetail: Resolver {
 
     let firstLaunch = events.first { $0.eventId == "27c4f26a" }
     let isPaid = events.contains { event in
-      guard isPaidEvent(event.eventId), let originalID = parseOriginalID(event.detail) else {
+      guard isPodcastLegacyIAPPaymentEvent(event.eventId),
+            let txnId = extractPodcastLegacyIAPTxnId(event.detail) else {
         return false
       }
-      return isProductionOriginalID(originalID)
+      return iapIdIsRootPurchase(txnId)
     }
     let modelIdentifier = firstLaunch?.modelIdentifier ?? events.first?.modelIdentifier ?? "Unknown"
     let deviceType = ModelIdentifier.deviceType(from: modelIdentifier)

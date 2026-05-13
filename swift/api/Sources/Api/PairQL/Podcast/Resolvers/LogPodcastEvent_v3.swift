@@ -19,40 +19,37 @@ extension LogPodcastEvent_v3: Resolver {
 
     ModelIdentifier.alertIfUnknown(input.modelIdentifier)
 
-    if context.env.mode == .prod {
-      let slack = get(dependency: \.slack)
-      var msg = "`\(input.label)`"
-      if let detail = input.detail {
-        msg += " - \(detail)"
-      }
-      let search = githubSearch(input.eventId)
-      let slackSuppressed = suppressedPodcastSlackEventIds.contains(input.eventId)
-      let (send, suppressed) = await PodcastSlackLimiter.shared.shouldSend(input.eventId)
-      if send, !slackSuppressed {
-        var message = "Podcast app event: \(search) \(msg)"
-        if suppressed > 0 {
-          message += " _(+\(suppressed) suppressed)_"
-        }
-        let channel: XSlack.Slack.Client.InternalChannel =
-          podcastsLogsEventIds.contains(input.eventId) ? .podcastsLogs : .podcasts
-        await slack.internal(channel, message)
-      }
+    if context.env.mode != .prod || suppressedEventIds.contains(input.eventId) {
+      return .success
+    }
 
-      if isPaidEvent(input.eventId),
-         let originalID = parseOriginalID(input.detail),
-         isProductionOriginalID(originalID) {
-        let priorPaidEventCount = try await context.db.count(
-          PaidProductionEventCountForOriginalID.self,
-          withBindings: [.string(originalID)],
-        )
-        if priorPaidEventCount == 1 {
-          await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
-          await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
-          get(dependency: \.postmark).toSuperAdmin(
-            "FIRST Podcast Subscription",
-            "device: \(input.modelName)",
+    let iapTxnId = extractPodcastLegacyIAPTxnId(input.detail)
+    let isFamilyShareIapEvent = iapTxnId.map { !iapIdIsRootPurchase($0) } ?? false
+
+    Task {
+      let slack = get(dependency: \.slack)
+
+      if isFamilyShareIapEvent {
+        if try await isPodcastFirstFamilyShareForDevice(input, in: context) {
+          await slack.internal(
+            .info,
+            "*FIRST Podcast Family-Sharing Activation* `\(input.modelName)`",
           )
         }
+        return // don't log duplicate family share txn events
+      }
+
+      let search = githubSearch(input.eventId)
+      let msg = "`\(input.label)`\(input.detail.map { " - \($0)" } ?? "")"
+      await slack.internal(.podcasts, "Podcast app event: \(search) \(msg)")
+
+      if try await isPodcastFirstPayment(input, in: context) {
+        await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
+        await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
+        get(dependency: \.postmark).toSuperAdmin(
+          "FIRST Podcast Subscription",
+          "device: \(input.modelName)",
+        )
       }
     }
 
@@ -60,19 +57,55 @@ extension LogPodcastEvent_v3: Resolver {
   }
 }
 
-let paidEventIds = ["af0a338f", "a72104d7"]
+// helpers
 
-func isPaidEvent(_ eventId: String) -> Bool {
-  paidEventIds.contains(eventId)
+private func isPodcastFirstPayment(
+  _ input: LogPodcastEvent_v3.Input,
+  in ctx: Context,
+) async throws -> Bool {
+  guard isPodcastLegacyIAPPaymentEvent(input.eventId),
+        let iapTxnId = extractPodcastLegacyIAPTxnId(input.detail),
+        iapIdIsRootPurchase(iapTxnId) else {
+    return false
+  }
+  let paidEventCount = try await ctx.db.count(
+    HostPurchaseEventCountForOriginalID.self,
+    withBindings: [.string(iapTxnId)],
+  )
+  return paidEventCount == 1
 }
 
-func isProductionOriginalID(_ originalID: String) -> Bool {
+private func isPodcastFirstFamilyShareForDevice(
+  _ input: LogPodcastEvent_v3.Input,
+  in ctx: Context,
+) async throws -> Bool {
+  guard isPodcastLegacyIAPPaymentEvent(input.eventId) else {
+    return false
+  }
+  let count = try await ctx.db.count(
+    FamilySharedOrSandboxEventCountForDevice.self,
+    withBindings: [.uuid(input.deviceId)],
+  )
+  return count == 1
+}
+
+func isPodcastLegacyIAPPaymentEvent(_ eventId: String) -> Bool {
+  ["af0a338f", "a72104d7"].contains(eventId)
+}
+
+/// We don't record StoreKit.AppStore.Environment or inAppOwnershipType, so we
+/// use originalID length as a proxy (verified against Apple's App Store Server
+/// API for every logged originalID as of 2026-05-12):
+///   - length <= 15:            host PURCHASED — the real paying customer
+///   - length 18 (typ. "505…"): FAMILY_SHARED echo of someone else's purchase
+///   - length 16 ("200000…"):   Sandbox/Xcode test transaction
+func iapIdIsRootPurchase(_ originalID: String) -> Bool {
   originalID.count <= 15
 }
 
 private let originalIdRegex = try! NSRegularExpression(pattern: #"originalID:\s*(\d+)"#)
 
-func parseOriginalID(_ detail: String?) -> String? {
+func extractPodcastLegacyIAPTxnId(_ detail: String?) -> String? {
   guard let detail else { return nil }
   let range = NSRange(detail.startIndex ..< detail.endIndex, in: detail)
   guard let match = originalIdRegex.firstMatch(in: detail, options: [], range: range),
@@ -89,22 +122,22 @@ var podcastOriginalIDExprSQL: String {
   "(regexp_match(\(PodcastEvent.columnName(.detail)), 'originalID:\\s*(\\d+)'))[1]"
 }
 
-var paidProductionPodcastEventPredicateSQL: String {
+var hostPurchasePodcastEventPredicateSQL: String {
   "\(PodcastEvent.columnName(.eventId)) IN \(paidPodcastEventIdsSQL)"
     + " AND LENGTH(\(podcastOriginalIDExprSQL)) <= 15"
 }
 
-var paidSandboxPodcastEventPredicateSQL: String {
+var familySharedOrSandboxPodcastEventPredicateSQL: String {
   "\(PodcastEvent.columnName(.eventId)) IN \(paidPodcastEventIdsSQL)"
     + " AND LENGTH(\(podcastOriginalIDExprSQL)) > 15"
 }
 
-struct PaidProductionEventCountForOriginalID: CustomCountable {
+struct HostPurchaseEventCountForOriginalID: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     var stmt = SQL.Statement("""
     SELECT COUNT(*) AS count
     FROM \(table: PodcastEvent.self)
-    WHERE \(paidProductionPodcastEventPredicateSQL)
+    WHERE \(hostPurchasePodcastEventPredicateSQL)
       AND \(podcastOriginalIDExprSQL) =\(" ")
     """)
     if let originalID = bindings.first {
@@ -116,41 +149,30 @@ struct PaidProductionEventCountForOriginalID: CustomCountable {
   var count: Int
 }
 
-private let suppressedPodcastSlackEventIds: Set<String> = [
-  "eeaa7b30",
-  "45692a47",
-  "ba664a9f",
-  "4fa186eb",
-]
-
-private let podcastsLogsEventIds: Set<String> = [
-  "4ac9084e",
-  "d299b47a",
-  "2e2c9e97",
-  "8c975d36",
-]
-
-private actor PodcastSlackLimiter {
-  static let shared = PodcastSlackLimiter()
-
-  private var recent: [String: (count: Int, lastSent: Date)] = [:]
-  private let cooldown: TimeInterval = 60
-
-  func shouldSend(_ eventId: String) -> (send: Bool, suppressed: Int) {
-    let now = Date()
-
-    guard let entry = recent[eventId] else {
-      self.recent[eventId] = (count: 0, lastSent: now)
-      return (send: true, suppressed: 0)
+struct FamilySharedOrSandboxEventCountForDevice: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+    SELECT COUNT(*) AS count
+    FROM \(table: PodcastEvent.self)
+    WHERE \(familySharedOrSandboxPodcastEventPredicateSQL)
+      AND \(PodcastEvent.columnName(.deviceId)) =\(" ")
+    """)
+    if let deviceId = bindings.first {
+      stmt.components.append(.binding(deviceId))
     }
-
-    if now.timeIntervalSince(entry.lastSent) >= self.cooldown {
-      let suppressed = entry.count
-      self.recent[eventId] = (count: 0, lastSent: now)
-      return (send: true, suppressed: suppressed)
-    }
-
-    self.recent[eventId] = (count: entry.count + 1, lastSent: entry.lastSent)
-    return (send: false, suppressed: 0)
+    return stmt
   }
+
+  var count: Int
 }
+
+private let suppressedEventIds: Set<String> = [
+  "4ac9084e", // skipped download invalidation while active
+  "d299b47a", // episode play recovered after file check
+  "2e2c9e97", // episode play recovery failed
+  "8c975d36", // download success invalidated before commit
+  "eeaa7b30", // legacy (v1.2): episode play, missing local file
+  "45692a47", // legacy (v1.2-1.3): missing file for downloaded episode
+  "ba664a9f", // legacy (v1.3): play missing file, recovered
+  "4fa186eb", // legacy (v1.3): play missing file, dl failed
+]
