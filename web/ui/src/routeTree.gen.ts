@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AtomsInputRouteImport } from './routes/atoms/input'
 import { Route as AtomsButtonRouteImport } from './routes/atoms/button'
+import { Route as AtomsBadgeRouteImport } from './routes/atoms/badge'
 import { Route as FragmentsSidebarIndexRouteImport } from './routes/fragments/sidebar/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const AtomsButtonRoute = AtomsButtonRouteImport.update({
   path: '/atoms/button',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtomsBadgeRoute = AtomsBadgeRouteImport.update({
+  id: '/atoms/badge',
+  path: '/atoms/badge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FragmentsSidebarIndexRoute = FragmentsSidebarIndexRouteImport.update({
   id: '/fragments/sidebar/',
   path: '/fragments/sidebar/',
@@ -37,12 +43,14 @@ const FragmentsSidebarIndexRoute = FragmentsSidebarIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atoms/badge': typeof AtomsBadgeRoute
   '/atoms/button': typeof AtomsButtonRoute
   '/atoms/input': typeof AtomsInputRoute
   '/fragments/sidebar/': typeof FragmentsSidebarIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atoms/badge': typeof AtomsBadgeRoute
   '/atoms/button': typeof AtomsButtonRoute
   '/atoms/input': typeof AtomsInputRoute
   '/fragments/sidebar': typeof FragmentsSidebarIndexRoute
@@ -50,18 +58,30 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atoms/badge': typeof AtomsBadgeRoute
   '/atoms/button': typeof AtomsButtonRoute
   '/atoms/input': typeof AtomsInputRoute
   '/fragments/sidebar/': typeof FragmentsSidebarIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/atoms/button' | '/atoms/input' | '/fragments/sidebar/'
+  fullPaths:
+    | '/'
+    | '/atoms/badge'
+    | '/atoms/button'
+    | '/atoms/input'
+    | '/fragments/sidebar/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/atoms/button' | '/atoms/input' | '/fragments/sidebar'
+  to:
+    | '/'
+    | '/atoms/badge'
+    | '/atoms/button'
+    | '/atoms/input'
+    | '/fragments/sidebar'
   id:
     | '__root__'
     | '/'
+    | '/atoms/badge'
     | '/atoms/button'
     | '/atoms/input'
     | '/fragments/sidebar/'
@@ -69,6 +89,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtomsBadgeRoute: typeof AtomsBadgeRoute
   AtomsButtonRoute: typeof AtomsButtonRoute
   AtomsInputRoute: typeof AtomsInputRoute
   FragmentsSidebarIndexRoute: typeof FragmentsSidebarIndexRoute
@@ -97,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AtomsButtonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/atoms/badge': {
+      id: '/atoms/badge'
+      path: '/atoms/badge'
+      fullPath: '/atoms/badge'
+      preLoaderRoute: typeof AtomsBadgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/fragments/sidebar/': {
       id: '/fragments/sidebar/'
       path: '/fragments/sidebar'
@@ -109,6 +137,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtomsBadgeRoute: AtomsBadgeRoute,
   AtomsButtonRoute: AtomsButtonRoute,
   AtomsInputRoute: AtomsInputRoute,
   FragmentsSidebarIndexRoute: FragmentsSidebarIndexRoute,

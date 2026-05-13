@@ -14,6 +14,7 @@ const RootComponent: React.FC = () => (
         <SidebarItem title="Sidebar" icon={LayoutGridIcon} to="/fragments/sidebar" />
       </SidebarSection>
       <SidebarSection title="Atoms">
+        <SidebarItem title="Badge" icon={DiamondIcon} to="/atoms/badge" />
         <SidebarItem title="Button" icon={DiamondIcon} to="/atoms/button" />
         <SidebarItem title="Input" icon={DiamondIcon} to="/atoms/input" />
       </SidebarSection>
