@@ -26,7 +26,7 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "6.0"
         PRODUCT_NAME: "Gertrude FM"
-        DEVELOPMENT_TEAM: "WFN83LM943"
+        DEVELOPMENT_TEAM: "Y63PLK783B"
         CODE_SIGN_STYLE: Automatic
         MARKETING_VERSION: 0.1.0
         CURRENT_PROJECT_VERSION: 1
@@ -36,7 +36,7 @@ targets:
           PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.fm"
         Debug:
           ONLY_ACTIVE_ARCH: YES
-          PRODUCT_BUNDLE_IDENTIFIER: "com.netrivet.gertrude.fm.dev"
+          PRODUCT_BUNDLE_IDENTIFIER: "com.innocencelabs.gertrude-fm-temp-dev"
     info:
       path: app/Info.plist
       properties:
@@ -45,6 +45,7 @@ targets:
         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)
+        NSAppleMusicUsageDescription: Gertrude FM needs access to Apple Music to play approved songs.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
