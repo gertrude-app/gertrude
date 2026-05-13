@@ -28,7 +28,28 @@ type Props = CommonProps &
       }
   );
 
-const Button: React.FC<Props> = (props) => {
+const ownPropKeys = new Set([
+  'children',
+  'ariaLabel',
+  'icon',
+  'iconPosition',
+  'variant',
+  'size',
+  'loading',
+  'disabled',
+  'type',
+  'onClick',
+  'href',
+]);
+
+const getPassThroughProps = (props: Props): React.HTMLAttributes<HTMLElement> => {
+  return Object.fromEntries(
+    Object.entries(props).filter(([key]) => !ownPropKeys.has(key)),
+  ) as React.HTMLAttributes<HTMLElement>;
+};
+
+const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
+  const passThroughProps = getPassThroughProps(props);
   const isDisabled = props.disabled || props.loading;
   const iconPosition = props.iconPosition ?? 'left';
   const hasLabel =
@@ -169,6 +190,8 @@ const Button: React.FC<Props> = (props) => {
     case 'button':
       return (
         <button
+          {...passThroughProps}
+          ref={ref as React.Ref<HTMLButtonElement>}
           type="button"
           className={buttonClasses}
           disabled={isDisabled}
@@ -182,6 +205,8 @@ const Button: React.FC<Props> = (props) => {
     case 'submit':
       return (
         <button
+          {...passThroughProps}
+          ref={ref as React.Ref<HTMLButtonElement>}
           className={buttonClasses}
           type="submit"
           disabled={isDisabled}
@@ -194,6 +219,8 @@ const Button: React.FC<Props> = (props) => {
     case 'link':
       return (
         <a
+          {...passThroughProps}
+          ref={ref as React.Ref<HTMLAnchorElement>}
           className={buttonClasses}
           href={props.href}
           aria-label={props.ariaLabel}
@@ -210,6 +237,8 @@ const Button: React.FC<Props> = (props) => {
         </a>
       );
   }
-};
+});
+
+Button.displayName = 'Button';
 
 export default Button;

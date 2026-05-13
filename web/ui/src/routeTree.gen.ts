@@ -14,6 +14,7 @@ import { Route as ComponentsSidebarRouteImport } from './routes/components/sideb
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
+import { Route as ComponentsDropdownMenuRouteImport } from './routes/components/dropdown-menu'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 
@@ -42,6 +43,11 @@ const ComponentsFormRoute = ComponentsFormRouteImport.update({
   path: '/components/form',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsDropdownMenuRoute = ComponentsDropdownMenuRouteImport.update({
+  id: '/components/dropdown-menu',
+  path: '/components/dropdown-menu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
   id: '/components/button',
   path: '/components/button',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/select': typeof ComponentsSelectRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/select': typeof ComponentsSelectRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
   '/components/select': typeof ComponentsSelectRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/badge'
     | '/components/button'
+    | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
     | '/components/select'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/badge'
     | '/components/button'
+    | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
     | '/components/select'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/components/badge'
     | '/components/button'
+    | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
     | '/components/select'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsBadgeRoute: typeof ComponentsBadgeRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
+  ComponentsDropdownMenuRoute: typeof ComponentsDropdownMenuRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsFormRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/dropdown-menu': {
+      id: '/components/dropdown-menu'
+      path: '/components/dropdown-menu'
+      fullPath: '/components/dropdown-menu'
+      preLoaderRoute: typeof ComponentsDropdownMenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/button': {
       id: '/components/button'
       path: '/components/button'
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsBadgeRoute: ComponentsBadgeRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
+  ComponentsDropdownMenuRoute: ComponentsDropdownMenuRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
