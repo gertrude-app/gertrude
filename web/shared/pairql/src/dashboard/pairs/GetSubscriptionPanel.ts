@@ -13,5 +13,7 @@ export namespace GetSubscriptionPanel {
     primary?: SubscriptionPanelAction;
     secondary: SubscriptionPanelAction[];
     availableTiers: SubscriptionTier[];
+    fullTrialStartedAt?: ISODateString;
+    lastPaidTier?: SubscriptionTier;
   }
 }

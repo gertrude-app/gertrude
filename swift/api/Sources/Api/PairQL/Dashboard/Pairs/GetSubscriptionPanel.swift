@@ -41,6 +41,8 @@ struct GetSubscriptionPanel: Pair {
     var primary: Action?
     var secondary: [Action]
     var availableTiers: [StripeSubscription.Tier]
+    var fullTrialStartedAt: Date?
+    var lastPaidTier: StripeSubscription.Tier?
   }
 }
 
@@ -117,7 +119,7 @@ func panelOutput(
       secondary = [.startCheckout(tier: .light)] + trialOption
     } else if identity?.lastPaidTier == .full {
       primary = .reactivateViaCheckout(tier: .full)
-      secondary = []
+      secondary = [.reactivateViaCheckout(tier: .light)]
     } else {
       primary = .reactivateViaCheckout(tier: .light)
       secondary = [.reactivateViaCheckout(tier: .full)]
@@ -146,5 +148,7 @@ func panelOutput(
     primary: primary,
     secondary: secondary,
     availableTiers: availableTiers,
+    fullTrialStartedAt: identity?.fullTrialStartedAt,
+    lastPaidTier: identity?.lastPaidTier,
   )
 }

@@ -15,6 +15,7 @@ export { default as RequestModal } from './Modal/RequestModal';
 export { default as NewNotificationMethodForm } from './Settings/NewNotificationMethodForm';
 export { default as NotificationCard } from './Settings/NotificationCard';
 export { default as NotificationMethod } from './Settings/NotificationMethod';
+export { default as SubscriptionPanel } from './Settings/SubscriptionPanel';
 export { default as UserInputText } from './UserInputText';
 export { default as PageHeading } from './PageHeading';
 export { default as ListKeychains } from './Keychains/ListKeychains';

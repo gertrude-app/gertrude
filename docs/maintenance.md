@@ -194,6 +194,21 @@ Hard-coded values that must be kept in sync across multiple files. Nothing enfor
   `pnpm --filter <project> build`) so they benefit from nx caching during the
   frequently-run `just check` loop.
 
+### SubscriptionPanel storybook fixtures ↔ `GetSubscriptionPanel` resolver
+
+- `web/storybook/stories/dash/Profile/SubscriptionPanel.stories.tsx` hand-mirrors every
+  branch of the resolver at
+  `swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel.swift`. The grid is
+  intended to cover all possible shapes of `GetSubscriptionPanel.Output`.
+- Drifts whenever the resolver gains, removes, or restructures a branch (new
+  entitlement state, new action shape, change to primary/secondary composition, etc.).
+  Nothing enforces the correspondence — drift silently degrades the design surface for
+  the dashboard subscription panel.
+- The story labels also embed real-world percentages (e.g. `(57.1%, n=433)`) sourced
+  from a one-off prod-sync snapshot. These are a guide, not load-bearing — refresh from
+  a current snapshot when the cohort distribution materially changes (e.g. after a
+  pricing change or major migration).
+
 ### Podcast background task identifiers
 
 - `swift/podcasts/lib-tca/Sources/Services/RegisterBgTasks.swift` defines the `BgTaskId`

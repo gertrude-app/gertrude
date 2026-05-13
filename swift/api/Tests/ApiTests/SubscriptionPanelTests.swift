@@ -33,11 +33,11 @@ final class SubscriptionPanelTests: DependencyTestCase {
     expect(panel.secondary).toEqual([.reactivateViaCheckout(tier: .full)])
   }
 
-  func testFreeLapsedFullReactivatesFullOnly() {
+  func testFreeLapsedFullOffersBothTiersForReactivation() {
     let billing = self.billing(lastSubId: "sub_old", lastPaidTier: .full)
     let panel = panelOutput(billing: billing, now: .reference)
     expect(panel.primary).toEqual(.reactivateViaCheckout(tier: .full))
-    expect(panel.secondary).toEqual([])
+    expect(panel.secondary).toEqual([.reactivateViaCheckout(tier: .light)])
   }
 
   // MARK: - light tier
