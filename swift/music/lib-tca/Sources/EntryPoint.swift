@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import Dependencies
 import SwiftUI
 
 public struct EntryPoint: View {
@@ -19,9 +18,6 @@ public struct AppStore {
   let inner: StoreOf<MusicPocFeature>
 
   public init() {
-    prepareDependencies {
-      $0.appleMusic = .mockAuthorized
-    }
     self.inner = Store(
       initialState: .init(),
       reducer: { MusicPocFeature() },
