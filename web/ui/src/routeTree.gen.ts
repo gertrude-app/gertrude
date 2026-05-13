@@ -10,89 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AtomsInputRouteImport } from './routes/atoms/input'
-import { Route as AtomsButtonRouteImport } from './routes/atoms/button'
-import { Route as AtomsBadgeRouteImport } from './routes/atoms/badge'
-import { Route as FragmentsSidebarIndexRouteImport } from './routes/fragments/sidebar/index'
+import { Route as ComponentsSidebarRouteImport } from './routes/components/sidebar'
+import { Route as ComponentsSelectRouteImport } from './routes/components/select'
+import { Route as ComponentsInputRouteImport } from './routes/components/input'
+import { Route as ComponentsFormRouteImport } from './routes/components/form'
+import { Route as ComponentsButtonRouteImport } from './routes/components/button'
+import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AtomsInputRoute = AtomsInputRouteImport.update({
-  id: '/atoms/input',
-  path: '/atoms/input',
+const ComponentsSidebarRoute = ComponentsSidebarRouteImport.update({
+  id: '/components/sidebar',
+  path: '/components/sidebar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AtomsButtonRoute = AtomsButtonRouteImport.update({
-  id: '/atoms/button',
-  path: '/atoms/button',
+const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
+  id: '/components/select',
+  path: '/components/select',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AtomsBadgeRoute = AtomsBadgeRouteImport.update({
-  id: '/atoms/badge',
-  path: '/atoms/badge',
+const ComponentsInputRoute = ComponentsInputRouteImport.update({
+  id: '/components/input',
+  path: '/components/input',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FragmentsSidebarIndexRoute = FragmentsSidebarIndexRouteImport.update({
-  id: '/fragments/sidebar/',
-  path: '/fragments/sidebar/',
+const ComponentsFormRoute = ComponentsFormRouteImport.update({
+  id: '/components/form',
+  path: '/components/form',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
+  id: '/components/button',
+  path: '/components/button',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsBadgeRoute = ComponentsBadgeRouteImport.update({
+  id: '/components/badge',
+  path: '/components/badge',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/atoms/badge': typeof AtomsBadgeRoute
-  '/atoms/button': typeof AtomsButtonRoute
-  '/atoms/input': typeof AtomsInputRoute
-  '/fragments/sidebar/': typeof FragmentsSidebarIndexRoute
+  '/components/badge': typeof ComponentsBadgeRoute
+  '/components/button': typeof ComponentsButtonRoute
+  '/components/form': typeof ComponentsFormRoute
+  '/components/input': typeof ComponentsInputRoute
+  '/components/select': typeof ComponentsSelectRoute
+  '/components/sidebar': typeof ComponentsSidebarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/atoms/badge': typeof AtomsBadgeRoute
-  '/atoms/button': typeof AtomsButtonRoute
-  '/atoms/input': typeof AtomsInputRoute
-  '/fragments/sidebar': typeof FragmentsSidebarIndexRoute
+  '/components/badge': typeof ComponentsBadgeRoute
+  '/components/button': typeof ComponentsButtonRoute
+  '/components/form': typeof ComponentsFormRoute
+  '/components/input': typeof ComponentsInputRoute
+  '/components/select': typeof ComponentsSelectRoute
+  '/components/sidebar': typeof ComponentsSidebarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/atoms/badge': typeof AtomsBadgeRoute
-  '/atoms/button': typeof AtomsButtonRoute
-  '/atoms/input': typeof AtomsInputRoute
-  '/fragments/sidebar/': typeof FragmentsSidebarIndexRoute
+  '/components/badge': typeof ComponentsBadgeRoute
+  '/components/button': typeof ComponentsButtonRoute
+  '/components/form': typeof ComponentsFormRoute
+  '/components/input': typeof ComponentsInputRoute
+  '/components/select': typeof ComponentsSelectRoute
+  '/components/sidebar': typeof ComponentsSidebarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/atoms/badge'
-    | '/atoms/button'
-    | '/atoms/input'
-    | '/fragments/sidebar/'
+    | '/components/badge'
+    | '/components/button'
+    | '/components/form'
+    | '/components/input'
+    | '/components/select'
+    | '/components/sidebar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/atoms/badge'
-    | '/atoms/button'
-    | '/atoms/input'
-    | '/fragments/sidebar'
+    | '/components/badge'
+    | '/components/button'
+    | '/components/form'
+    | '/components/input'
+    | '/components/select'
+    | '/components/sidebar'
   id:
     | '__root__'
     | '/'
-    | '/atoms/badge'
-    | '/atoms/button'
-    | '/atoms/input'
-    | '/fragments/sidebar/'
+    | '/components/badge'
+    | '/components/button'
+    | '/components/form'
+    | '/components/input'
+    | '/components/select'
+    | '/components/sidebar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AtomsBadgeRoute: typeof AtomsBadgeRoute
-  AtomsButtonRoute: typeof AtomsButtonRoute
-  AtomsInputRoute: typeof AtomsInputRoute
-  FragmentsSidebarIndexRoute: typeof FragmentsSidebarIndexRoute
+  ComponentsBadgeRoute: typeof ComponentsBadgeRoute
+  ComponentsButtonRoute: typeof ComponentsButtonRoute
+  ComponentsFormRoute: typeof ComponentsFormRoute
+  ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsSelectRoute: typeof ComponentsSelectRoute
+  ComponentsSidebarRoute: typeof ComponentsSidebarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -104,32 +130,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/atoms/input': {
-      id: '/atoms/input'
-      path: '/atoms/input'
-      fullPath: '/atoms/input'
-      preLoaderRoute: typeof AtomsInputRouteImport
+    '/components/sidebar': {
+      id: '/components/sidebar'
+      path: '/components/sidebar'
+      fullPath: '/components/sidebar'
+      preLoaderRoute: typeof ComponentsSidebarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/atoms/button': {
-      id: '/atoms/button'
-      path: '/atoms/button'
-      fullPath: '/atoms/button'
-      preLoaderRoute: typeof AtomsButtonRouteImport
+    '/components/select': {
+      id: '/components/select'
+      path: '/components/select'
+      fullPath: '/components/select'
+      preLoaderRoute: typeof ComponentsSelectRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/atoms/badge': {
-      id: '/atoms/badge'
-      path: '/atoms/badge'
-      fullPath: '/atoms/badge'
-      preLoaderRoute: typeof AtomsBadgeRouteImport
+    '/components/input': {
+      id: '/components/input'
+      path: '/components/input'
+      fullPath: '/components/input'
+      preLoaderRoute: typeof ComponentsInputRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fragments/sidebar/': {
-      id: '/fragments/sidebar/'
-      path: '/fragments/sidebar'
-      fullPath: '/fragments/sidebar/'
-      preLoaderRoute: typeof FragmentsSidebarIndexRouteImport
+    '/components/form': {
+      id: '/components/form'
+      path: '/components/form'
+      fullPath: '/components/form'
+      preLoaderRoute: typeof ComponentsFormRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/button': {
+      id: '/components/button'
+      path: '/components/button'
+      fullPath: '/components/button'
+      preLoaderRoute: typeof ComponentsButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/badge': {
+      id: '/components/badge'
+      path: '/components/badge'
+      fullPath: '/components/badge'
+      preLoaderRoute: typeof ComponentsBadgeRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -137,10 +177,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AtomsBadgeRoute: AtomsBadgeRoute,
-  AtomsButtonRoute: AtomsButtonRoute,
-  AtomsInputRoute: AtomsInputRoute,
-  FragmentsSidebarIndexRoute: FragmentsSidebarIndexRoute,
+  ComponentsBadgeRoute: ComponentsBadgeRoute,
+  ComponentsButtonRoute: ComponentsButtonRoute,
+  ComponentsFormRoute: ComponentsFormRoute,
+  ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsSelectRoute: ComponentsSelectRoute,
+  ComponentsSidebarRoute: ComponentsSidebarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
