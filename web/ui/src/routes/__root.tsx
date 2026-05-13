@@ -13,6 +13,11 @@ const RootComponent: React.FC = () => (
       <SidebarSection title="Components">
         <SidebarItem title="Badge" icon={DiamondIcon} to="/components/badge" />
         <SidebarItem title="Button" icon={DiamondIcon} to="/components/button" />
+        <SidebarItem
+          title="Dropdown Menu"
+          icon={DiamondIcon}
+          to="/components/dropdown-menu"
+        />
         <SidebarItem title="Form" icon={DiamondIcon} to="/components/form" />
         <SidebarItem title="Input" icon={DiamondIcon} to="/components/input" />
         <SidebarItem title="Select" icon={DiamondIcon} to="/components/select" />
