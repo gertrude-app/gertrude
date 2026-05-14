@@ -215,8 +215,8 @@ struct NowPlayingFeature {
     .run { [showId = show.id] _ in
       dep(\.db).tryWrite { db in
         try Show
-          .where { $0.id == showId }
-          .update { $0.playbackRate = rate }
+          .where { $0.id.eq(showId) }
+          .update { $0.playbackRate = #bind(rate) }
           .execute(db)
       }
       await self.audio.setPlaybackRate(rate)

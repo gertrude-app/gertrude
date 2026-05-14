@@ -61,7 +61,7 @@ struct SettingsFeature {
             log(.subscription("41eb271c"), "\(manage)purchase pending")
             self.database.tryWrite { db in
               try Subscription
-                .update { $0.purchasePendingSince = self.date.now }
+                .update { $0.purchasePendingSince = #bind(self.date.now) }
                 .execute(db)
             }
           case .pending:

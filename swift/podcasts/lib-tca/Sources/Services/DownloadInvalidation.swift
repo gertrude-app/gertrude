@@ -69,7 +69,7 @@ func safelyDiscardEpisodeDownloads(
 
   database.tryWrite { db in
     try Episode
-      .update { $0.downloadedAt = nil }
+      .update { $0.downloadedAt = #bind(nil) }
       .where { $0.id.in(episodes.map(\.id)) }
       .execute(db)
   }

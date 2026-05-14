@@ -1,7 +1,7 @@
 import Combine
 import Dependencies
 import Network
-import Synchronization
+import XCore
 
 struct NetworkClient: Sendable {
   var isConnected: @Sendable () -> Bool

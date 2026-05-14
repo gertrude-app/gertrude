@@ -48,12 +48,11 @@ struct NowPlaying: FetchKeyRequest {
     let result = try NowPlayingModel
       .find(NowPlayingModel.ID(1))
       .leftJoin(Episode.all) { $0.episodeId.eq($1.id) }
-      .join(Show.all) { $1.showId == $2.id }
+      .join(Show.all) { $1.showId.eq($2.id) }
+      .select { ($0, $1, $2) }
       .fetchOne(db)
 
-    guard let model = result?.0,
-          let episode = result?.1,
-          let show = result?.2 else {
+    guard let (model, episode, show) = result, let episode else {
       return nil
     }
 
@@ -83,12 +82,12 @@ extension NowPlaying.Data {
   func setProgress(_ progress: Double, sync: Bool = true) {
     dep(\.db).tryWrite { db in
       try NowPlayingModel
-        .update { $0.bufferedProgress = progress }
+        .update { $0.bufferedProgress = #bind(progress) }
         .execute(db)
       if sync {
         try Episode
-          .where { $0.id == self.episode.id }
-          .update { $0.progress = progress }
+          .where { $0.id.eq(self.episode.id) }
+          .update { $0.progress = #bind(progress) }
           .execute(db)
       }
     }
@@ -135,8 +134,8 @@ extension NowPlaying {
       try NowPlayingModel.update(model).execute(db)
       if let buffered = model.bufferedProgress {
         try Episode
-          .where { $0.id == model.episodeId }
-          .update { $0.progress = buffered }
+          .where { $0.id.eq(model.episodeId) }
+          .update { $0.progress = #bind(buffered) }
           .execute(db)
       }
     }

@@ -18,7 +18,8 @@ public struct SearchShowView: View {
     self.onResultTap = onResultTap
   }
 
-  public var body: some View {
+  @ViewBuilder
+  private var content: some View {
     VStack {
       if self.searchText.isEmpty, self.results.isEmpty {
         self.emptyState
@@ -29,7 +30,16 @@ public struct SearchShowView: View {
       }
     }
     .searchable(text: self.$searchText, prompt: Text(lstr(.searchPrompt)))
-    .searchFocused(self.$isSearchFocused)
+  }
+
+  public var body: some View {
+    Group {
+      if #available(iOS 18.0, *) {
+        self.content.searchFocused(self.$isSearchFocused)
+      } else {
+        self.content
+      }
+    }
     .onAppear {
       self.isSearchFocused = true
     }

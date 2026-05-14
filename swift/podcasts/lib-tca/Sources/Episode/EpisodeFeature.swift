@@ -36,11 +36,11 @@ extension EpisodeFeature.State {
   init(episode: Episode, show: Show) {
     self._show = FetchOne(
       wrappedValue: show,
-      Show.where { $0.id == show.id },
+      Show.where { $0.id.eq(show.id) },
     )
     self._episode = FetchOne(
       wrappedValue: episode,
-      Episode.where { $0.id == episode.id },
+      Episode.where { $0.id.eq(episode.id) },
     )
   }
 }

@@ -1,7 +1,7 @@
 name: GertiePodcastsPreviews
 options:
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "17.0"
 
 configs:
   Debug: debug
@@ -15,7 +15,7 @@ targets:
   App:
     type: application
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "17.0"
     sources:
       - path: previews/sources
       - path: previews/Assets.xcassets

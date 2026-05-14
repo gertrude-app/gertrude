@@ -1,7 +1,7 @@
 name: GertiePodcasts
 options:
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "17.0"
   developmentLanguage: en
   knownRegions:
     - en
@@ -16,7 +16,7 @@ targets:
   'Gertrude AM':
     type: application
     platform: iOS
-    deploymentTarget: "18.0"
+    deploymentTarget: "17.0"
     sources:
       - path: app/sources
         group: app

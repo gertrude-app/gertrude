@@ -18,8 +18,8 @@ private func episodeCompletedAt(_ db: Database) throws {
         .find(new.id)
         .update { $0.completedAt = #sql("datetime('subsec')") }
     } when: { _, new in
-      new.completedAt == nil
-        && new.duration != nil
+      new.completedAt.is(nil)
+        && new.duration.isNot(nil)
         && #sql("\(new.duration) - \(new.progress) <= 45")
     })
     .execute(db)

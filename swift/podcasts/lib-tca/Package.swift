@@ -3,13 +3,14 @@ import PackageDescription
 
 let package = Package(
   name: "LibTCA",
-  platforms: [.macOS(.v15), .iOS(.v18)],
+  platforms: [.macOS(.v15), .iOS(.v17)],
   products: [.library(name: "LibTCA", targets: ["LibTCA"])],
   dependencies: [
     .package(path: "../lib-core"),
     .package(path: "../lib-views"),
     .package(path: "../../pairql-podcasts"),
-    .package(url: "https://github.com/pointfreeco/sqlite-data", exact: "1.4.0"),
+    .package(path: "../../x-kit"),
+    .package(url: "https://github.com/pointfreeco/sqlite-data", exact: "1.6.1"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
     .package(
       url: "https://github.com/pointfreeco/swift-composable-architecture",
@@ -20,7 +21,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.10.0"),
     .package(
       url: "https://github.com/pointfreeco/swift-structured-queries",
-      exact: "0.25.2",
+      exact: "0.31.1",
       traits: ["StructuredQueriesTagged"],
     ),
   ],
@@ -32,6 +33,7 @@ let package = Package(
         .product(name: "LibCore", package: "lib-core"),
         .product(name: "LibViews", package: "lib-views"),
         .product(name: "PodcastRoute", package: "pairql-podcasts"),
+        .product(name: "XCore", package: "x-kit"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

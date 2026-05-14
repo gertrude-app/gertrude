@@ -157,8 +157,9 @@ struct EpisodeWithShow: FetchKeyRequest {
 
   func fetch(_ db: Database) throws -> Value {
     try Episode
-      .where { $0.id == self.episodeId }
-      .join(Show.all) { $0.showId == $1.id }
+      .where { $0.id.eq(self.episodeId) }
+      .join(Show.all) { $0.showId.eq($1.id) }
+      .select { ($0, $1) }
       .fetchOne(db)
   }
 }

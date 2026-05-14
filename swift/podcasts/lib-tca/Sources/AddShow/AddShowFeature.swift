@@ -172,7 +172,7 @@ struct AddShowFeature {
         let feed = try await self.podcasts.getFeed(feedUrl)
         let existingShow = try await self.db.read { db in
           try Show
-            .where { $0.feedUrl == feedUrl }
+            .where { $0.feedUrl.eq(feedUrl) }
             .fetchOne(db)
         }
         if existingShow != nil {
@@ -228,7 +228,7 @@ extension Date {
       try db.read { db in
         try PinAttempt
           .select(\.createdAt)
-          .where { $0.success == false }
+          .where { $0.success.eq(false) }
           .where { $0.createdAt > now.addingTimeInterval(-24 * 60 * 60 * 10) }
           .order { $0.createdAt.asc() }
           .fetchAll(db)

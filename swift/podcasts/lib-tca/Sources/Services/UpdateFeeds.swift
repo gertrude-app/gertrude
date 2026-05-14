@@ -65,21 +65,27 @@ func _prepareFeedUpdateInputData(showIds: [Show.ID]? = nil) async -> FeedUpdateI
       .fetchAll($0)
   }
 
-  let pairs = await withTaskGroup(of: (show: Show, feed: Feed)?.self) { group in
-    for show in allShows {
-      group.addTask { [podcasts] in
-        if let feed = try? await podcasts.getFeed(show.feedUrl) {
-          return (show, feed)
-        } else {
-          return nil
+  let pairs: [(show: Show, feed: Feed)]
+  if allShows.isEmpty {
+    pairs = []
+  } else {
+    let podcastsClient = podcasts // important to capture outside group
+    pairs = await withTaskGroup(of: (show: Show, feed: Feed)?.self) { group in
+      for show in allShows {
+        group.addTask {
+          if let feed = try? await podcastsClient.getFeed(show.feedUrl) {
+            (show, feed)
+          } else {
+            nil
+          }
         }
       }
+      var results: [(show: Show, feed: Feed)] = []
+      for await result in group {
+        result.map { results.append($0) }
+      }
+      return results
     }
-    var results: [(show: Show, feed: Feed)] = []
-    for await result in group {
-      result.map { results.append($0) }
-    }
-    return results
   }
 
   // we only examine shows and episodes we were able to fetch feeds for
