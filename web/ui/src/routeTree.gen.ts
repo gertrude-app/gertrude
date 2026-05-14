@@ -11,11 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsToggleRouteImport } from './routes/components/toggle'
+import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsSidebarRouteImport } from './routes/components/sidebar'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
+import { Route as ComponentsRadioGroupRouteImport } from './routes/components/radio-group'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsDropdownMenuRouteImport } from './routes/components/dropdown-menu'
+import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 
@@ -29,6 +32,11 @@ const ComponentsToggleRoute = ComponentsToggleRouteImport.update({
   path: '/components/toggle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
+  id: '/components/textarea',
+  path: '/components/textarea',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsSidebarRoute = ComponentsSidebarRouteImport.update({
   id: '/components/sidebar',
   path: '/components/sidebar',
@@ -37,6 +45,11 @@ const ComponentsSidebarRoute = ComponentsSidebarRouteImport.update({
 const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
   id: '/components/select',
   path: '/components/select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsRadioGroupRoute = ComponentsRadioGroupRouteImport.update({
+  id: '/components/radio-group',
+  path: '/components/radio-group',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
@@ -54,6 +67,11 @@ const ComponentsDropdownMenuRoute = ComponentsDropdownMenuRouteImport.update({
   path: '/components/dropdown-menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
+  id: '/components/checkbox',
+  path: '/components/checkbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
   id: '/components/button',
   path: '/components/button',
@@ -69,22 +87,28 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
 }
 export interface FileRoutesById {
@@ -92,11 +116,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
+  '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
 }
 export interface FileRouteTypes {
@@ -105,33 +132,42 @@ export interface FileRouteTypes {
     | '/'
     | '/components/badge'
     | '/components/button'
+    | '/components/checkbox'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/textarea'
     | '/components/toggle'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/components/badge'
     | '/components/button'
+    | '/components/checkbox'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/textarea'
     | '/components/toggle'
   id:
     | '__root__'
     | '/'
     | '/components/badge'
     | '/components/button'
+    | '/components/checkbox'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/textarea'
     | '/components/toggle'
   fileRoutesById: FileRoutesById
 }
@@ -139,11 +175,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsBadgeRoute: typeof ComponentsBadgeRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
+  ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsDropdownMenuRoute: typeof ComponentsDropdownMenuRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsRadioGroupRoute: typeof ComponentsRadioGroupRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidebarRoute: typeof ComponentsSidebarRoute
+  ComponentsTextareaRoute: typeof ComponentsTextareaRoute
   ComponentsToggleRoute: typeof ComponentsToggleRoute
 }
 
@@ -163,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsToggleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/textarea': {
+      id: '/components/textarea'
+      path: '/components/textarea'
+      fullPath: '/components/textarea'
+      preLoaderRoute: typeof ComponentsTextareaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/sidebar': {
       id: '/components/sidebar'
       path: '/components/sidebar'
@@ -175,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/components/select'
       fullPath: '/components/select'
       preLoaderRoute: typeof ComponentsSelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/radio-group': {
+      id: '/components/radio-group'
+      path: '/components/radio-group'
+      fullPath: '/components/radio-group'
+      preLoaderRoute: typeof ComponentsRadioGroupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/input': {
@@ -198,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsDropdownMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/checkbox': {
+      id: '/components/checkbox'
+      path: '/components/checkbox'
+      fullPath: '/components/checkbox'
+      preLoaderRoute: typeof ComponentsCheckboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/button': {
       id: '/components/button'
       path: '/components/button'
@@ -219,11 +279,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsBadgeRoute: ComponentsBadgeRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
+  ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsDropdownMenuRoute: ComponentsDropdownMenuRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsRadioGroupRoute: ComponentsRadioGroupRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidebarRoute: ComponentsSidebarRoute,
+  ComponentsTextareaRoute: ComponentsTextareaRoute,
   ComponentsToggleRoute: ComponentsToggleRoute,
 }
 export const routeTree = rootRouteImport
