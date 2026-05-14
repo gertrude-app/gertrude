@@ -28,14 +28,15 @@ extension CheckSupervisionFlowStatus: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
+    let install = try await device.install(in: ctx.db)
     let token: BlockerApp.Token
     let existingToken = try? await BlockerApp.Token.query()
-      .where(.deviceId == device.id)
+      .where(.installId == install.id)
       .first(in: ctx.db)
     if let existingToken {
       token = existingToken
     } else {
-      token = try await ctx.db.create(BlockerApp.Token(deviceId: device.id))
+      token = try await ctx.db.create(BlockerApp.Token(installId: install.id))
     }
 
     let data = ChildIOSDeviceData_v2(

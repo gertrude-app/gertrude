@@ -31,7 +31,7 @@ extension ConnectDevice_v2: Resolver {
       device.childId = child.id
       try await ctx.db.update(device)
     }
-    let token = try await ctx.db.create(BlockerApp.Token(deviceId: device.id))
+    let token = try await ctx.db.create(BlockerApp.Token(installId: install.id))
 
     let groups = try await BlockerApp.BlockGroup.query()
       .where(.optIn == false)

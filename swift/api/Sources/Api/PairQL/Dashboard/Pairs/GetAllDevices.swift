@@ -64,14 +64,15 @@ extension GetAllDevices: NoInputResolver {
     async let supervisionsAsync = BlockerApp.Supervision.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
-    async let iosTokensAsync = BlockerApp.Token.query()
-      .where(.deviceId |=| iosDevices.map(\.id))
-      .all(in: context.db)
+    async let connectedDeviceIdsAsync = BlockerApp.Token.connectedDeviceIds(
+      among: iosDevices.map(\.id),
+      in: context.db,
+    )
 
     let computers = try await computersAsync
     let supervisionMap: [Api.IOSDevice.Id: BlockerApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
-    let connectedDeviceIds: Set<Api.IOSDevice.Id> = try await Set(iosTokensAsync.map(\.deviceId))
+    let connectedDeviceIds = try await connectedDeviceIdsAsync
 
     @Dependency(\.websockets) var websockets
 

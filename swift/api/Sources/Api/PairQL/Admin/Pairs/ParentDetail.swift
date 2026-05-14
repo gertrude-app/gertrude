@@ -120,7 +120,7 @@ extension ParentDetail: Resolver {
         let install = try await device.install(in: context.db)
         let supervision = try await device.supervision(in: context.db)
         let hasToken = try await BlockerApp.Token.query()
-          .where(.deviceId == device.id)
+          .where(.installId == install.id)
           .exists(in: context.db)
         let status: String? = if let supervision {
           supervision.status(device: device).rawValue

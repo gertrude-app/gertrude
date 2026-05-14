@@ -582,13 +582,16 @@ struct NonSupervisedConnectionSuccessCount: CustomCountable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let deviceId = IOSEvent.columnName(.deviceId)
     let eventId = IOSEvent.columnName(.eventId)
-    let tDeviceId = BlockerApp.Token.columnName(.deviceId)
+    let iId = BlockerApp.Install.columnName(.id)
+    let iDeviceId = BlockerApp.Install.columnName(.deviceId)
+    let tInstallId = BlockerApp.Token.columnName(.installId)
     let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
     let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
     SELECT COUNT(DISTINCT e.\(deviceId)) AS count
     FROM \(table: IOSEvent.self) e
-    INNER JOIN \(table: BlockerApp.Token.self) t ON t.\(tDeviceId) = e.\(deviceId)
+    INNER JOIN \(table: BlockerApp.Install.self) i ON i.\(iDeviceId) = e.\(deviceId)
+    INNER JOIN \(table: BlockerApp.Token.self) t ON t.\(tInstallId) = i.\(iId)
     WHERE e.\(deviceId) IS NOT NULL
       AND e.\(eventId) = '8d35f043'
       AND e.\(deviceId) NOT IN (

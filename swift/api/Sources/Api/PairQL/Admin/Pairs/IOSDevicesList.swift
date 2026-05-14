@@ -92,7 +92,9 @@ private struct DeviceSummaryQuery: CustomQueryable {
     let sId = BlockerApp.Supervision.columnName(.id)
     let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     let sSupervisedAt = BlockerApp.Supervision.columnName(.supervisedAt)
-    let tDeviceId = BlockerApp.Token.columnName(.deviceId)
+    let iId = BlockerApp.Install.columnName(.id)
+    let iDeviceId = BlockerApp.Install.columnName(.deviceId)
+    let tInstallId = BlockerApp.Token.columnName(.installId)
     var stmt = SQL.Statement("""
     SELECT
       fl.\(eDeviceId),
@@ -105,7 +107,7 @@ private struct DeviceSummaryQuery: CustomQueryable {
         WHEN s.\(sSupervisedAt) IS NOT NULL THEN 'missingProfile'
         WHEN d.\(dClaimedAt) IS NOT NULL THEN 'claimed'
         WHEN d.\(dClaimCode) IS NOT NULL THEN 'pendingClaim'
-        WHEN tk.\(tDeviceId) IS NOT NULL AND s.\(sId) IS NULL THEN 'connected'
+        WHEN tk.\(tInstallId) IS NOT NULL AND s.\(sId) IS NULL THEN 'connected'
         WHEN cfg.\(eDeviceId) IS NOT NULL THEN 'configurated'
         WHEN st.\(eDeviceId) IS NOT NULL THEN 'screenTime'
         WHEN oo.\(eDeviceId) IS NOT NULL THEN 'complete'
@@ -132,7 +134,8 @@ private struct DeviceSummaryQuery: CustomQueryable {
     ) oo ON fl.\(eDeviceId) = oo.\(eDeviceId)
     LEFT JOIN \(table: IOSDevice.self) d ON d.\(dId) = fl.\(eDeviceId)
     LEFT JOIN \(table: BlockerApp.Supervision.self) s ON s.\(sDeviceId) = d.\(dId)
-    LEFT JOIN \(table: BlockerApp.Token.self) tk ON tk.\(tDeviceId) = d.\(dId)
+    LEFT JOIN \(table: BlockerApp.Install.self) i ON i.\(iDeviceId) = d.\(dId)
+    LEFT JOIN \(table: BlockerApp.Token.self) tk ON tk.\(tInstallId) = i.\(iId)
     LEFT JOIN (
       SELECT DISTINCT \(eDeviceId)
       FROM \(table: IOSEvent.self)

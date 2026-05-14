@@ -188,7 +188,7 @@ extension ApiTestCase {
     let install = try await self.db.create(
       BlockerApp.Install.mock { $0.deviceId = iosDevice.id },
     )
-    let token = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
+    let token = try await self.db.create(BlockerApp.Token(installId: install.id))
     return .init(
       model: child.model,
       device: iosDevice,

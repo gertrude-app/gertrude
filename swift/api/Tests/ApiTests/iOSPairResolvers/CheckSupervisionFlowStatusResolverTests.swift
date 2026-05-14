@@ -93,6 +93,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
       claimCodeExpiresAt: .reference + .days(7),
       claimedAt: .reference,
     ))
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
@@ -127,6 +128,9 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
       claimCodeExpiresAt: .reference + .days(7),
       claimedAt: .reference,
     ))
+    let install = try await self.db.create(
+      BlockerApp.Install.mock { $0.deviceId = device.id },
+    )
     try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       supervisedAt: .reference,
@@ -148,7 +152,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     expect(data.childName).toEqual(child.name)
 
     let token = try await BlockerApp.Token.query()
-      .where(.deviceId == device.id)
+      .where(.installId == install.id)
       .first(in: self.db)
     expect(data.token).toEqual(token.value.rawValue)
   }
@@ -167,6 +171,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
       claimCodeExpiresAt: .reference + .days(7),
       claimedAt: .reference,
     ))
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
     try await self.db.create(BlockerApp.Supervision(
       deviceId: device.id,
       supervisedAt: .reference,
