@@ -3,12 +3,11 @@ import React, { useState } from 'react';
 
 const AssortmentExample: React.FC = () => {
   const [child, setChild] = useState('Sally');
-  const [status, setStatus] = useState('Active');
   const [window, setWindow] = useState('After school');
 
   return (
     <div className="grid h-full place-items-center p-8">
-      <div className="grid w-full max-w-3xl gap-5 sm:grid-cols-3">
+      <div className="grid w-full max-w-3xl items-end gap-5 sm:grid-cols-3">
         <Select
           label="Child"
           selected={child}
@@ -16,16 +15,16 @@ const AssortmentExample: React.FC = () => {
           possibleValues={['Sally', 'Franny', 'Jimmy']}
         />
         <Select
-          label="Status"
-          selected={status}
-          setSelected={setStatus}
-          possibleValues={['Active', 'Paused', 'Needs review', 'Archived']}
-        />
-        <Select
-          label="Window"
           selected={window}
           setSelected={setWindow}
           possibleValues={['Morning', 'After school', 'Evening', 'Weekend']}
+        />
+        <Select
+          label="Managed setting"
+          selected="School profile"
+          setSelected={() => undefined}
+          possibleValues={['Parent setting', 'School profile']}
+          disabled
         />
       </div>
     </div>

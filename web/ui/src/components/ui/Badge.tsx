@@ -11,7 +11,7 @@ interface Props {
 
 const Badge: React.FC<Props> = ({ children, color, size, icon: Icon }) => {
   const classes = cx(
-    'border flex items-center',
+    'border flex items-center select-none',
     {
       'bg-violet-100 border-violet-400 text-violet-900': color === 'violet',
       'bg-red-100 border-red-400 text-red-900': color === 'red',
