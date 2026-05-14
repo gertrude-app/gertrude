@@ -7,7 +7,8 @@ public struct GertrudeFMView: View {
     MusicPocView(
       state: .needsAuthorization,
       onAuthorizeTap: {},
-      onPlayTap: {},
+      onPlayPauseTap: {},
+      onArtworkBlockingChanged: { _ in },
     )
   }
 }

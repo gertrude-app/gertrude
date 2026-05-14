@@ -6,14 +6,20 @@ struct MusicPocFeature: Sendable {
   @ObservableState
   struct State: Equatable {
     var status = MusicPocStatus.needsAuthorization
+    var track = DemoTrack.track
+    var blocksArtwork = false
+    var isPlaying = false
+    var isStarting = false
   }
 
   enum Action: Equatable {
     case authorizeButtonTapped
     case authorizationResponse(Bool)
     case authorizationFailed
-    case playButtonTapped
+    case artworkBlockingChanged(Bool)
+    case playPauseButtonTapped
     case playResponse
+    case pauseResponse
     case playFailed
   }
 
@@ -44,10 +50,38 @@ struct MusicPocFeature: Sendable {
         state.status = .failed(MusicPocError.authorizationFailed.message)
         return .none
 
-      case .playButtonTapped:
+      case .artworkBlockingChanged(let blocksArtwork):
+        state.blocksArtwork = blocksArtwork
+        guard state.isPlaying else {
+          return .none
+        }
+        state.isStarting = true
+        let track = state.track
         return .run { send in
           do {
-            try await self.appleMusic.playTestSong()
+            try await self.appleMusic.playSong(track.id, blocksArtwork)
+            await send(.playResponse)
+          } catch {
+            await send(.playFailed)
+          }
+        }
+
+      case .playPauseButtonTapped:
+        if state.isPlaying {
+          state.isPlaying = false
+          state.isStarting = false
+          return .run { send in
+            await self.appleMusic.pause()
+            await send(.pauseResponse)
+          }
+        }
+        state.status = .readyToPlay
+        state.isStarting = true
+        let track = state.track
+        let blocksArtwork = state.blocksArtwork
+        return .run { send in
+          do {
+            try await self.appleMusic.playSong(track.id, blocksArtwork)
             await send(.playResponse)
           } catch {
             await send(.playFailed)
@@ -55,10 +89,16 @@ struct MusicPocFeature: Sendable {
         }
 
       case .playResponse:
-        state.status = .playing
+        state.status = .readyToPlay
+        state.isPlaying = true
+        state.isStarting = false
+        return .none
+
+      case .pauseResponse:
         return .none
 
       case .playFailed:
+        state.isStarting = false
         state.status = .failed(MusicPocError.playbackFailed.message)
         return .none
       }
@@ -66,11 +106,24 @@ struct MusicPocFeature: Sendable {
   }
 }
 
+struct DemoTrack: Equatable, Sendable {
+  let id: String
+  let title: String
+  let artist: String
+  let artworkURL: URL?
+
+  static let track = Self(
+    id: "1758369112",
+    title: "See You Again",
+    artist: "The Gray Havens",
+    artworkURL: URL(string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/75/1d/a6/751da645-a25f-3545-9871-93c94cc3d658/12453.jpg/600x600bb.jpg"),
+  )
+}
+
 enum MusicPocStatus: Equatable {
   case needsAuthorization
   case authorizing
   case readyToPlay
-  case playing
   case denied
   case failed(String)
 }
