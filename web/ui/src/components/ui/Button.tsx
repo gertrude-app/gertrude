@@ -99,7 +99,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
       (props.size === 'medium' || props.size === undefined || props.size === 'large'),
   });
   const buttonClasses = cx(
-    'inline-flex items-center justify-center border font-[450] shadow outline-none transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50',
+    'inline-flex items-center justify-center border font-[450] shadow outline-none transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 select-none',
     isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
     {
       'border-violet-800 bg-violet-500 text-white shadow-violet-500/30 focus-visible:ring-violet-400/70':

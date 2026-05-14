@@ -8,6 +8,7 @@ interface Props {
   icon?: LucideIcon;
   selected?: boolean;
   active?: boolean;
+  onSelect?: () => void;
   children?: React.ReactNode; // for sub-menus
 }
 
@@ -16,6 +17,7 @@ const DropdownMenuItem: React.FC<Props> = ({
   icon: Icon,
   selected,
   active,
+  onSelect,
   children,
 }) => {
   if (children) {
@@ -53,6 +55,7 @@ const DropdownMenuItem: React.FC<Props> = ({
 
   return (
     <DM.Item
+      onSelect={() => onSelect?.()}
       className={cx(
         'flex justify-between items-center cursor-pointer outline-none hover:bg-stone-100 data-[highlighted]:bg-stone-100 px-2 py-1 rounded-lg',
         active && 'bg-stone-100',
