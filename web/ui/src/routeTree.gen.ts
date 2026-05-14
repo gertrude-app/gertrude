@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComponentsToggleRouteImport } from './routes/components/toggle'
 import { Route as ComponentsSidebarRouteImport } from './routes/components/sidebar'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
@@ -21,6 +22,11 @@ import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsToggleRoute = ComponentsToggleRouteImport.update({
+  id: '/components/toggle',
+  path: '/components/toggle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsSidebarRoute = ComponentsSidebarRouteImport.update({
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/components/input': typeof ComponentsInputRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/toggle': typeof ComponentsToggleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/components/input': typeof ComponentsInputRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/toggle': typeof ComponentsToggleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/components/input': typeof ComponentsInputRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/toggle': typeof ComponentsToggleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/components/input'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/toggle'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/components/input'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/toggle'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/components/input'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/toggle'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   ComponentsInputRoute: typeof ComponentsInputRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidebarRoute: typeof ComponentsSidebarRoute
+  ComponentsToggleRoute: typeof ComponentsToggleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/toggle': {
+      id: '/components/toggle'
+      path: '/components/toggle'
+      fullPath: '/components/toggle'
+      preLoaderRoute: typeof ComponentsToggleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/sidebar': {
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsInputRoute: ComponentsInputRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidebarRoute: ComponentsSidebarRoute,
+  ComponentsToggleRoute: ComponentsToggleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

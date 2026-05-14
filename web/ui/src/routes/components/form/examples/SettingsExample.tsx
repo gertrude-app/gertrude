@@ -3,6 +3,7 @@ import Form from '#/components/ui/form/Form';
 import FormRow from '#/components/ui/form/FormRow';
 import Input from '#/components/ui/Input';
 import Select from '#/components/ui/Select';
+import Toggle from '#/components/ui/Toggle';
 import React, { useState } from 'react';
 
 const SettingsExample: React.FC = () => {
@@ -10,6 +11,8 @@ const SettingsExample: React.FC = () => {
   const [site, setSite] = useState('khanacademy.org');
   const [limit, setLimit] = useState('45');
   const [review, setReview] = useState('Ask parent');
+  const [requestsEnabled, setRequestsEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -44,6 +47,18 @@ const SettingsExample: React.FC = () => {
                 'Allow school sites',
               ]}
             />
+          </FormRow>
+          <FormRow
+            label="Unlock requests"
+            description="Let children ask for access from the block page."
+          >
+            <Toggle checked={requestsEnabled} setChecked={setRequestsEnabled} />
+          </FormRow>
+          <FormRow
+            label="Parent notifications"
+            description="Send an alert when this rule blocks a new site."
+          >
+            <Toggle checked={notificationsEnabled} setChecked={setNotificationsEnabled} />
           </FormRow>
           <FormRow description="Actions can live in a final row without a label.">
             <div className="flex justify-end gap-2">
