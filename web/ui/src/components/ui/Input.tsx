@@ -55,7 +55,7 @@ const Input: React.FC<Props> = ({ ...props }) => {
         )}
       >
         {props.prefix && (
-          <span className="flex shrink-0 items-center border-r border-stone-300/80 bg-stone-50 px-2.5 text-[15px] text-stone-400">
+          <span className="flex shrink-0 items-center border-r border-stone-300/80 bg-stone-50 px-2.5 text-[15px] text-stone-400 select-none">
             {props.prefix}
           </span>
         )}
@@ -84,7 +84,7 @@ const Input: React.FC<Props> = ({ ...props }) => {
             disabled={props.disabled}
             onClick={props.button.onClick}
             className={cx(
-              'absolute inset-y-1 right-1 flex items-center gap-1.5 rounded-[4px] border border-stone-200 bg-stone-50 px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100',
+              'absolute inset-y-1 right-1 flex items-center gap-1.5 rounded-[4px] border border-stone-200 bg-stone-50 px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100 select-none',
               props.disabled
                 ? 'cursor-not-allowed'
                 : 'cursor-pointer hover:border-stone-300 hover:shadow-stone-300/50 focus-visible:ring-2 focus-visible:ring-violet-300/80',
@@ -101,7 +101,7 @@ const Input: React.FC<Props> = ({ ...props }) => {
               props.button ? 'pr-1' : 'pr-2.5',
             )}
           >
-            <span className="text-[15px] text-stone-400">{props.suffix}</span>
+            <span className="text-[15px] text-stone-400 select-none">{props.suffix}</span>
             {props.button && (
               <button
                 type="button"
@@ -109,7 +109,7 @@ const Input: React.FC<Props> = ({ ...props }) => {
                 disabled={props.disabled}
                 onClick={props.button.onClick}
                 className={cx(
-                  'my-1 flex self-stretch items-center gap-1.5 rounded-[4px] border border-stone-200 bg-white px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100',
+                  'my-1 flex self-stretch items-center gap-1.5 rounded-[4px] border border-stone-200 bg-white px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100 select-none',
                   props.disabled
                     ? 'cursor-not-allowed bg-stone-100'
                     : 'cursor-pointer hover:border-stone-300 hover:shadow-stone-300/50 focus-visible:ring-2 focus-visible:ring-violet-300/80',

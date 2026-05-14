@@ -14,7 +14,7 @@ const FormPage: React.FC = () => {
         component={<SettingsExample />}
         path="./examples/SettingsExample.tsx"
         description="A dashboard-shaped settings form showing labels, descriptions, selects, inputs, and an action row in one vertical stack."
-        demoHeight="27rem"
+        demoHeight="32rem"
       />
     </ComponentDemoPage>
   );

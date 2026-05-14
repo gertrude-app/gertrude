@@ -5,6 +5,7 @@ interface Props {
   trigger: React.ReactNode;
   children: React.ReactNode;
   searchable?: boolean;
+  disabled?: boolean;
 }
 
 type FilterableChildProps = {
@@ -32,7 +33,7 @@ const filterChildren = (children: React.ReactNode, query: string): React.ReactNo
   });
 };
 
-const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable }) => {
+const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled }) => {
   const [open, setOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeIndex, setActiveIndex] = React.useState(-1);
@@ -113,6 +114,11 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable }) => {
     <DM.Root
       open={open}
       onOpenChange={(nextOpen) => {
+        if (disabled) {
+          setOpen(false);
+          return;
+        }
+
         setOpen(nextOpen);
 
         if (!nextOpen) {
@@ -121,12 +127,14 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable }) => {
         }
       }}
     >
-      <DM.Trigger asChild>{trigger}</DM.Trigger>
+      <DM.Trigger asChild disabled={disabled}>
+        {trigger}
+      </DM.Trigger>
       <DM.Portal>
         <DM.Content
           align="center"
           sideOffset={4}
-          className="bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1"
+          className="bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 select-none"
         >
           {searchable && (
             <input
