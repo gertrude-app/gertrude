@@ -22,6 +22,7 @@ const RootComponent: React.FC = () => (
         <SidebarItem title="Input" icon={DiamondIcon} to="/components/input" />
         <SidebarItem title="Select" icon={DiamondIcon} to="/components/select" />
         <SidebarItem title="Sidebar" icon={DiamondIcon} to="/components/sidebar" />
+        <SidebarItem title="Toggle" icon={DiamondIcon} to="/components/toggle" />
       </SidebarSection>
     </Sidebar>
   </SidebarLayout>
