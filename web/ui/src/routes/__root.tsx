@@ -13,6 +13,7 @@ const RootComponent: React.FC = () => (
       <SidebarSection title="Components">
         <SidebarItem title="Badge" icon={DiamondIcon} to="/components/badge" />
         <SidebarItem title="Button" icon={DiamondIcon} to="/components/button" />
+        <SidebarItem title="Checkbox" icon={DiamondIcon} to="/components/checkbox" />
         <SidebarItem
           title="Dropdown Menu"
           icon={DiamondIcon}
@@ -20,8 +21,14 @@ const RootComponent: React.FC = () => (
         />
         <SidebarItem title="Form" icon={DiamondIcon} to="/components/form" />
         <SidebarItem title="Input" icon={DiamondIcon} to="/components/input" />
+        <SidebarItem
+          title="Radio Group"
+          icon={DiamondIcon}
+          to="/components/radio-group"
+        />
         <SidebarItem title="Select" icon={DiamondIcon} to="/components/select" />
         <SidebarItem title="Sidebar" icon={DiamondIcon} to="/components/sidebar" />
+        <SidebarItem title="Textarea" icon={DiamondIcon} to="/components/textarea" />
         <SidebarItem title="Toggle" icon={DiamondIcon} to="/components/toggle" />
       </SidebarSection>
     </Sidebar>
