@@ -54,16 +54,87 @@ struct MusicPocFeatureTests {
   }
 
   @Test
-  func playSuccess() async {
+  func playSuccessWithoutArtworkBlocking() async {
     let store = TestStore(initialState: .init(status: .readyToPlay)) {
       MusicPocFeature()
     } withDependencies: {
-      $0.appleMusic.playTestSong = {}
+      $0.appleMusic.playSong = { id, blocksArtwork in
+        #expect(id == "1758369112")
+        #expect(blocksArtwork == false)
+      }
     }
 
-    await store.send(.playButtonTapped)
+    await store.send(.playPauseButtonTapped) {
+      $0.isStarting = true
+    }
     await store.receive(.playResponse) {
-      $0.status = .playing
+      $0.isPlaying = true
+      $0.isStarting = false
+    }
+  }
+
+  @Test
+  func playSuccessWithArtworkBlocking() async {
+    let store = TestStore(initialState: .init(status: .readyToPlay, blocksArtwork: true)) {
+      MusicPocFeature()
+    } withDependencies: {
+      $0.appleMusic.playSong = { id, blocksArtwork in
+        #expect(id == "1758369112")
+        #expect(blocksArtwork == true)
+      }
+    }
+
+    await store.send(.playPauseButtonTapped) {
+      $0.isStarting = true
+    }
+    await store.receive(.playResponse) {
+      $0.isPlaying = true
+      $0.isStarting = false
+    }
+  }
+
+  @Test
+  func pausePlayingTrack() async {
+    let store = TestStore(initialState: .init(status: .readyToPlay, isPlaying: true)) {
+      MusicPocFeature()
+    } withDependencies: {
+      $0.appleMusic.pause = {}
+    }
+
+    await store.send(.playPauseButtonTapped) {
+      $0.isPlaying = false
+    }
+    await store.receive(.pauseResponse)
+  }
+
+  @Test
+  func toggleArtworkBlockingWhileStopped() async {
+    let store = TestStore(initialState: .init(status: .readyToPlay)) {
+      MusicPocFeature()
+    }
+
+    await store.send(.artworkBlockingChanged(true)) {
+      $0.blocksArtwork = true
+    }
+  }
+
+  @Test
+  func toggleArtworkBlockingWhilePlaying() async {
+    let store = TestStore(initialState: .init(status: .readyToPlay, isPlaying: true)) {
+      MusicPocFeature()
+    } withDependencies: {
+      $0.appleMusic.playSong = { id, blocksArtwork in
+        #expect(id == "1758369112")
+        #expect(blocksArtwork == true)
+      }
+    }
+
+    await store.send(.artworkBlockingChanged(true)) {
+      $0.blocksArtwork = true
+      $0.isStarting = true
+    }
+    await store.receive(.playResponse) {
+      $0.isStarting = false
     }
   }
 
@@ -72,11 +143,14 @@ struct MusicPocFeatureTests {
     let store = TestStore(initialState: .init(status: .readyToPlay)) {
       MusicPocFeature()
     } withDependencies: {
-      $0.appleMusic.playTestSong = { throw TestError() }
+      $0.appleMusic.playSong = { _, _ in throw TestError() }
     }
 
-    await store.send(.playButtonTapped)
+    await store.send(.playPauseButtonTapped) {
+      $0.isStarting = true
+    }
     await store.receive(.playFailed) {
+      $0.isStarting = false
       $0.status = .failed("Unable to start playback.")
     }
   }

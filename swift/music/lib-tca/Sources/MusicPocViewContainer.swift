@@ -7,24 +7,33 @@ struct MusicPocViewContainer: View {
 
   var body: some View {
     MusicPocView(
-      state: self.store.status.viewState,
+      state: self.store.viewState,
       onAuthorizeTap: { self.store.send(.authorizeButtonTapped) },
-      onPlayTap: { self.store.send(.playButtonTapped) },
+      onPlayPauseTap: { self.store.send(.playPauseButtonTapped) },
+      onArtworkBlockingChanged: { self.store.send(.artworkBlockingChanged($0)) },
     )
   }
 }
 
-private extension MusicPocStatus {
+private extension MusicPocFeature.State {
   var viewState: MusicPocViewState {
-    switch self {
+    switch self.status {
     case .needsAuthorization:
       .needsAuthorization
     case .authorizing:
       .authorizing
     case .readyToPlay:
-      .readyToPlay
-    case .playing:
-      .playing
+      .readyToPlay(
+        MusicPocTrackViewState(
+          id: self.track.id,
+          title: self.track.title,
+          artist: self.track.artist,
+          artworkURL: self.track.artworkURL,
+          blocksArtwork: self.blocksArtwork,
+          isPlaying: self.isPlaying,
+          isStarting: self.isStarting,
+        ),
+      )
     case .denied:
       .denied
     case .failed(let message):
