@@ -1,0 +1,56 @@
+import SwiftUI
+
+public struct AlbumCardView: View {
+  @Environment(\.colorScheme) var cs
+
+  private let album: AlbumData
+  private let artworkSize: CGFloat
+  private let onTap: @MainActor @Sendable () -> Void
+
+  public init(
+    album: AlbumData,
+    artworkSize: CGFloat = 148,
+    onTap: @MainActor @escaping @Sendable () -> Void = {},
+  ) {
+    self.album = album
+    self.artworkSize = artworkSize
+    self.onTap = onTap
+  }
+
+  public var body: some View {
+    Button(action: self.onTap) {
+      VStack(alignment: .leading, spacing: 10) {
+        AlbumArtworkView(album: self.album, size: self.artworkSize)
+
+        VStack(alignment: .leading, spacing: 2) {
+          Text(self.album.title)
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(Color(self.cs, light: .black, dark: .white))
+            .lineLimit(2)
+            .multilineTextAlignment(.leading)
+
+          Text(self.album.artist)
+            .font(.system(size: 12, weight: .medium))
+            .foregroundStyle(Color(
+              self.cs,
+              light: .black.opacity(0.8),
+              dark: .white.opacity(0.72),
+            ))
+            .lineLimit(1)
+        }
+      }
+      .frame(width: self.artworkSize, alignment: .leading)
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+    .accessibilityLabel("\(self.album.title), \(self.album.artist)")
+  }
+}
+
+#Preview("Album cards") {
+  HStack(alignment: .top, spacing: 16) {
+    AlbumCardView(album: [AlbumData].previewAlbums[0])
+    AlbumCardView(album: [AlbumData].previewAlbums[1])
+  }
+  .padding(24)
+}
