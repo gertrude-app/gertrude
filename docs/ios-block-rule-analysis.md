@@ -5,6 +5,9 @@ block rules in `iosapp.block_rules`, or to create new block groups. This workflo
 require using the Console.app, and allows for collaboration with an agent reviewing log
 files.
 
+For prior findings (what's been tried, what worked, what didn't), see
+[`ios-block-findings.md`](./ios-block-findings.md).
+
 ## Prerequisites
 
 - `idevicesyslog` from libimobiledevice

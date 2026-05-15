@@ -135,6 +135,8 @@ searches, and more
 - when working on refining, or adding new iOS block rules, read
   `./docs/ios-block-rule-analysis.md` for a workflow for analyzing filter logs without the
   Console.app
+- when investigating a "can we block X in <app>?" question, first read
+  `./docs/ios-block-findings.md` to see what's already been tried
 
 ### 3. API Server (`api/`)
 
