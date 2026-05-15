@@ -10,7 +10,7 @@ import Testing
 @MainActor struct ShowFeatureTests {
   @Test func `archiving during download should not invalidate active download`() async throws {
     let clock = TestClock()
-    let episode = Episode.mock(2, showId: 1)
+    let episode = Episode.mock(2, showId: 7)
     let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
     let loggedEventIds = LockIsolated<[String]>([])
 
@@ -28,7 +28,7 @@ import Testing
       $0.fileSystem.removeItem = { try FileManager.default.removeItem(at: $0) }
       $0.fileSystem.fileExists = { FileManager.default.fileExists(atPath: $0.path) }
       $0.defaultDatabase = try! appDatabase {
-        try Show.insert { [Show.mock(1)] }.execute($0)
+        try Show.insert { [Show.mock(7)] }.execute($0)
         try Episode.insert { [episode] }.execute($0)
       }
       $0.podcasts.downloadAudio = { episode in

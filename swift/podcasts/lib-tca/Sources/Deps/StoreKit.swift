@@ -4,14 +4,14 @@ import Foundation
 import LibCore
 import LibViews
 import StoreKit
-import Synchronization
+import XCore
 
 @DependencyClient
 struct StoreKitClient: Sendable {
   var purchaseSubscription: @Sendable (_ productIds: [String]) async throws -> PurchaseResult
   var finishTransaction: @Sendable (_ id: Transaction.ID) async -> Void
   var verifiedCurrentEntitlements: @Sendable () async throws -> [TransactionData]
-  var transactionUpdates: @Sendable () async throws -> any AsyncSequence<TransactionData, Never>
+  var transactionUpdates: @Sendable () async throws -> AsyncStream<TransactionData>
   var requestRating: @Sendable () async -> Void
   var requestReview: @Sendable () async -> Void
 }
@@ -106,18 +106,22 @@ extension StoreKitClient: DependencyKey {
         return transactions.map(\.data)
       },
       transactionUpdates: {
-        Transaction.updates.compactMap { result in
-          Task { dep(\.db).insertEvent(
-            kind: .subscription,
-            label: "received transaction update",
-            detail: "\(result)",
-          ) }
-          if case .verified(let transaction) = result {
-            _transactions.withLock { $0[transaction.id] = transaction }
-            return transaction.data
-          } else {
-            return nil
+        AsyncStream { continuation in
+          let task = Task {
+            for await result in Transaction.updates {
+              Task { dep(\.db).insertEvent(
+                kind: .subscription,
+                label: "received transaction update",
+                detail: "\(result)",
+              ) }
+              if case .verified(let transaction) = result {
+                _transactions.withLock { $0[transaction.id] = transaction }
+                continuation.yield(transaction.data)
+              }
+            }
+            continuation.finish()
           }
+          continuation.onTermination = { _ in task.cancel() }
         }
       },
       requestRating: {

@@ -218,9 +218,9 @@ import Testing
       $0.defaultDatabase = try! appDatabase {
         try Subscription
           .update {
-            $0.createdAt = .reference
-            $0.expiresAt = .reference + .days(30)
-            $0.status = .trialing
+            $0.createdAt = #bind(.reference)
+            $0.expiresAt = #bind(.reference + .days(30))
+            $0.status = #bind(.trialing)
           }
           .execute($0)
       }

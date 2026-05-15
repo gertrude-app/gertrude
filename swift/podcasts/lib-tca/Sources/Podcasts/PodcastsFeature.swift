@@ -114,7 +114,7 @@ struct PodcastsFeature {
         state.destination = nil
         state.downloadQueue += self.database.tryRead {
           try Episode.all
-            .where { $0.showId == show.id }
+            .where { $0.showId.eq(show.id) }
             .order { ($0.pubDate.desc(), $0.episodeNumber.desc()) }
             .limit(3)
             .fetchAll($0)

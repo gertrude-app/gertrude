@@ -33,8 +33,8 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
 
   database.tryWrite { db in
     try Episode
-      .update { $0.downloadedAt = .distantFuture }
-      .where { $0.id == episode.id }
+      .update { $0.downloadedAt = #bind(.distantFuture) }
+      .where { $0.id.eq(episode.id) }
       .execute(db)
   }
 
@@ -65,8 +65,8 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
       try? fileSystem.removeItem(at: episode.localAudioUrl)
       database.tryWrite { db in
         try Episode
-          .update { $0.downloadedAt = nil }
-          .where { $0.id == episode.id }
+          .update { $0.downloadedAt = #bind(nil) }
+          .where { $0.id.eq(episode.id) }
           .execute(db)
       }
 
@@ -77,8 +77,8 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
 
     database.tryWrite { db in
       try Episode
-        .update { $0.downloadedAt = date.now }
-        .where { $0.id == episode.id }
+        .update { $0.downloadedAt = #bind(date.now) }
+        .where { $0.id.eq(episode.id) }
         .execute(db)
     }
 
@@ -87,8 +87,8 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
     if let duration = try? await determineMissingDuration(for: episode) {
       database.tryWrite { db in
         try Episode
-          .update { $0.duration = duration }
-          .where { $0.id == episode.id }
+          .update { $0.duration = #bind(duration) }
+          .where { $0.id.eq(episode.id) }
           .execute(db)
       }
     }
@@ -96,8 +96,8 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
   } else {
     database.tryWrite { db in
       try Episode
-        .update { $0.downloadedAt = nil }
-        .where { $0.id == episode.id }
+        .update { $0.downloadedAt = #bind(nil) }
+        .where { $0.id.eq(episode.id) }
         .execute(db)
     }
 
@@ -119,8 +119,8 @@ func ensureDownloaded(episode: Episode) async -> DownloadOutcome {
     try? fileSystem.removeItem(at: currentEpisode.localAudioUrl)
     dep(\.db).tryWrite { db in
       try Episode
-        .update { $0.downloadedAt = nil }
-        .where { $0.id == currentEpisode.id }
+        .update { $0.downloadedAt = #bind(nil) }
+        .where { $0.id.eq(currentEpisode.id) }
         .execute(db)
     }
     log(

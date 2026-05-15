@@ -68,14 +68,14 @@ struct ShowFeature {
               try Episode
                 .update {
                   if episode.completedAt == nil {
-                    $0.completedAt = self.date.now
+                    $0.completedAt = #bind(self.date.now)
                   } else {
-                    $0.completedAt = nil
-                    $0.progress = 0
-                    $0.lastPlayedAt = nil
+                    $0.completedAt = #bind(nil)
+                    $0.progress = #bind(0)
+                    $0.lastPlayedAt = #bind(nil)
                   }
                 }
-                .where { $0.id == episode.id }
+                .where { $0.id.eq(episode.id) }
                 .execute(db)
             }
           }
@@ -89,12 +89,12 @@ struct ShowFeature {
                 .update {
                   $0.isArchived.toggle()
                   if episode.isArchived || !discardResult.protectedEpisodeIds.contains(episode.id) {
-                    $0.downloadedAt = nil
+                    $0.downloadedAt = #bind(nil)
                   }
-                  $0.progress = 0
-                  $0.completedAt = nil
+                  $0.progress = #bind(0)
+                  $0.completedAt = #bind(nil)
                 }
-                .where { $0.id == episode.id }
+                .where { $0.id.eq(episode.id) }
                 .execute(db)
             }
             try await state.$episodes.load(state.selectEpisodes)
@@ -108,8 +108,8 @@ struct ShowFeature {
               ? .newestToOldest : .oldestToNewest
             self.database.tryWrite { db in
               try Show
-                .update { $0.sort = sortOrder }
-                .where { $0.id == state.showId }
+                .update { $0.sort = #bind(sortOrder) }
+                .where { $0.id.eq(state.showId) }
                 .execute(db)
             }
             try await state.$episodes.load(
@@ -125,8 +125,8 @@ struct ShowFeature {
           return .run { [state] _ in
             self.database.tryWrite { db in
               try Episode
-                .update { $0.isArchived = false }
-                .where { $0.showId == state.showId }
+                .update { $0.isArchived = #bind(false) }
+                .where { $0.showId.eq(state.showId) }
                 .execute(db)
             }
             try await state.$episodes.load(state.selectEpisodes)
@@ -156,7 +156,7 @@ func episodeQuery(
   sortOrder: Show.SortOrder,
 ) -> some SelectStatementOf<Episode> {
   Episode
-    .where { $0.showId == showId }
+    .where { $0.showId.eq(showId) }
     .order {
       switch sortOrder {
       case .newestToOldest:
@@ -204,7 +204,7 @@ extension ShowFeature.State {
     )
     self._show = FetchOne(
       wrappedValue: show,
-      Show.where { $0.id == show.id },
+      Show.where { $0.id.eq(show.id) },
     )
     self._episodes = FetchAll(
       episodeQuery(showId: show.id, sortOrder: show.sort),

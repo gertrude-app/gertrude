@@ -14,7 +14,7 @@ struct Record {
 
 extension Record {
   static func find(id: ID) -> Where<Record> {
-    Record.where { $0.id == id }
+    Record.where { $0.id.eq(id) }
   }
 }
 

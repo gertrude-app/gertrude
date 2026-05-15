@@ -2,6 +2,7 @@ import CustomDump
 import Dependencies
 import DependenciesTestSupport
 import Foundation
+import SQLiteData
 import Testing
 
 @testable import LibTCA
@@ -46,7 +47,7 @@ struct AutoQueueTests {
     let show = Show.mock(1) { $0.sort = .oldestToNewest }
     let current = Episode.mock(3, showId: 1) { $0.pubDate += .days(2) }
     try await database.write { db in
-      try Show.update { $0.sort = .oldestToNewest }
+      try Show.update { $0.sort = #bind(.oldestToNewest) }
         .where { $0.id.eq(show.id) }
         .execute(db)
       try Episode

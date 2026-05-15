@@ -5,7 +5,7 @@ import DependenciesMacros
 import Foundation
 import LibCore
 import MediaPlayer
-import Synchronization
+import XCore
 
 @DependencyClient
 struct AudioPlayer: Sendable {
