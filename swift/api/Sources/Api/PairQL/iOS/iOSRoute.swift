@@ -59,7 +59,8 @@ extension IOSRoute: RouteResponder {
         ))
 
       // TODO(perf): this is a fairly hot path, should probably join here
-      let device = try await token.device(in: context.db)
+      let install = try await token.install(in: context.db)
+      let device = try await install.device(in: context.db)
       guard let child = try await device.child(in: context.db) else {
         throw context.error(
           id: "7d4e8f21",
@@ -68,7 +69,6 @@ extension IOSRoute: RouteResponder {
           appTag: .iosDeviceTokenNotFound,
         )
       }
-      let install = try await device.install(in: context.db)
 
       context.telemetry.parentId = child.parentId
       let childContext = BlockerApp.ChildContext(

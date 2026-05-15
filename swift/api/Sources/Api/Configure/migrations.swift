@@ -94,6 +94,7 @@ extension Configure {
     app.migrations.add(AppInstallTables())
     app.migrations.add(HoistClaimFieldsToDevice())
     app.migrations.add(AppIconUploadProvenance())
+    app.migrations.add(BlockerAppTokenInstallFk())
   }
 }
 

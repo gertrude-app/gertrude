@@ -56,7 +56,10 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
       $0.modelIdentifier = "iPhone15,2"
       $0.iosVersion = "18.4.0"
     })
-    _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
+    let install = try await self.db.create(
+      BlockerApp.Install.mock { $0.deviceId = iosDevice.id },
+    )
+    _ = try await self.db.create(BlockerApp.Token(installId: install.id))
 
     try await withDependencies {
       $0.websockets.status = { _ in .offline }
@@ -101,7 +104,10 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
       $0.claimCodeExpiresAt = .reference + .days(7)
       $0.claimedAt = Date()
     })
-    _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
+    let install = try await self.db.create(
+      BlockerApp.Install.mock { $0.deviceId = iosDevice.id },
+    )
+    _ = try await self.db.create(BlockerApp.Token(installId: install.id))
     _ = try await self.db.create(BlockerApp.Supervision(deviceId: iosDevice.id))
 
     try await withDependencies {
@@ -122,7 +128,10 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
       $0.modelIdentifier = "iPad14,1"
       $0.iosVersion = "18.3.0"
     })
-    _ = try await self.db.create(BlockerApp.Token(deviceId: iosDevice.id))
+    let install = try await self.db.create(
+      BlockerApp.Install.mock { $0.deviceId = iosDevice.id },
+    )
+    _ = try await self.db.create(BlockerApp.Token(installId: install.id))
 
     try await withDependencies {
       $0.websockets.status = { _ in .filterOn }

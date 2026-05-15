@@ -91,7 +91,7 @@ extension BlockerApp.Token {
 extension BlockerApp.Token {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
-    case deviceId
+    case installId
     case value
     case createdAt
     case updatedAt

@@ -104,7 +104,7 @@ extension BlockerApp.Token: Model {
   public func postgresData(for column: ColumnName) -> Postgres.Data {
     switch column {
     case .id: .id(self)
-    case .deviceId: .uuid(self.deviceId)
+    case .installId: .uuid(self.installId)
     case .value: .uuid(self.value)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
@@ -114,7 +114,7 @@ extension BlockerApp.Token: Model {
   public var insertValues: [ColumnName: Postgres.Data] {
     [
       .id: .id(self),
-      .deviceId: .uuid(self.deviceId),
+      .installId: .uuid(self.installId),
       .value: .uuid(self.value),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
