@@ -28,12 +28,9 @@ enum MonitoringFeature: Feature {
     @Dependency(\.device) var device
     @Dependency(\.monitoring) var monitoring
     @Dependency(\.network) var network
+    @Dependency(\.screenshotTimer) var screenshotTimer
     @Dependency(\.userDefaults) var userDefaults
   }
-}
-
-private enum CancelId {
-  case screenshots
 }
 
 extension MonitoringFeature.RootReducer {
@@ -97,7 +94,7 @@ extension MonitoringFeature.RootReducer {
         return self.configureMonitoring(current: suspensionMonitoring, previous: user)
 
       case .userDeleted:
-        return .cancel(id: CancelId.screenshots)
+        return .exec { _ in await screenshotTimer.stop() }
 
       default:
         return .none
@@ -164,13 +161,13 @@ extension MonitoringFeature.RootReducer {
 
     case .application(.willTerminate):
       return .merge(
-        .cancel(id: CancelId.screenshots),
+        .exec { _ in await screenshotTimer.stop() },
         self.flushKeystrokes(state.isFilterSuspended),
       )
 
     case .adminAuthed(.adminWindow(.webview(.disconnectUserClicked))),
          .history(.userConnection(.disconnectMissingUser)):
-      return .cancel(id: CancelId.screenshots)
+      return .exec { _ in await screenshotTimer.stop() }
 
     // try to catch the moment when they've fixed monitoring permissions issues
     case .adminWindow(.webview(.healthCheck(.recheckClicked))):
@@ -213,7 +210,7 @@ extension MonitoringFeature.RootReducer {
     // no user anymore, just cancel
     case (.none, .some, _):
       .merge(
-        .cancel(id: CancelId.screenshots),
+        .exec { _ in await screenshotTimer.stop() },
         .exec { _ in await monitoring.stopLoggingKeystrokes() },
       )
 
@@ -221,7 +218,6 @@ extension MonitoringFeature.RootReducer {
     case (.some(let current), .some, _),
          (.some(let current), .none, _):
       .merge(
-        .cancel(id: CancelId.screenshots),
         .exec { _ in
           guard current.keyloggingEnabled else {
             await monitoring.stopLoggingKeystrokes()
@@ -232,15 +228,18 @@ extension MonitoringFeature.RootReducer {
             : await monitoring.stopLoggingKeystrokes()
         },
         .exec { send in
-          guard current.screenshotsEnabled else {
+          guard current.screenshotsEnabled,
+                await monitoring.screenRecordingPermissionGranted() else {
+            await screenshotTimer.stop()
             return
           }
-          if await monitoring.screenRecordingPermissionGranted() {
-            for await _ in bgQueue.timer(interval: .seconds(current.screenshotFrequency)) {
-              await send(.monitoring(.timerTriggeredTakeScreenshot))
-            }
+          await screenshotTimer.reconfigure(
+            intervalSec: current.screenshotFrequency,
+            scheduler: bgQueue,
+          ) {
+            await send(.monitoring(.timerTriggeredTakeScreenshot))
           }
-        }.cancellable(id: CancelId.screenshots, cancelInFlight: true),
+        },
       )
     }
   }

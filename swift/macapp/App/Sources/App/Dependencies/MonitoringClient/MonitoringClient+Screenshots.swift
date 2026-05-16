@@ -8,7 +8,12 @@ typealias ScreenshotData = (data: Data, width: Int, height: Int, createdAt: Date
 
 @Sendable func takeScreenshot(width: Int) async throws {
   @Dependency(\.device) var device
+  @Dependency(\.date.now) var now
   guard device.currentUserHasScreen(), !device.screensaverRunning() else {
+    return
+  }
+
+  guard screenshotFloor.admit(at: now) else {
     return
   }
 
@@ -56,7 +61,6 @@ typealias ScreenshotData = (data: Data, width: Int, height: Int, createdAt: Date
 
   let height = Int(Double(fullsize.height) * (Double(width) / Double(fullsize.width)))
 
-  @Dependency(\.date.now) var now
   let screenshot = (data: jpegData, width: width, height: height, createdAt: now)
   await screenshotBuffer.append(screenshot)
 }
@@ -133,6 +137,85 @@ private func downsampleToJpeg(imageAt imageURL: URL, to maxDimension: CGFloat) -
 }
 
 private let lastImage = Mutex<CGImage?>(nil)
+
+private let minScreenshotIntervalSec: TimeInterval = 10
+private let screenshotFloor = ScreenshotFloor(minInterval: minScreenshotIntervalSec)
+
+private final class ScreenshotFloor: @unchecked Sendable {
+  private let lock = NSLock()
+  private let minInterval: TimeInterval
+  private var last: Date?
+
+  init(minInterval: TimeInterval) {
+    self.minInterval = minInterval
+  }
+
+  func admit(at now: Date) -> Bool {
+    self.lock.lock()
+    defer { self.lock.unlock() }
+    if let last = self.last, now.timeIntervalSince(last) < self.minInterval {
+      return false
+    }
+    self.last = now
+    return true
+  }
+}
+
+actor ScreenshotTimerController {
+  private var task: Task<Void, Never>?
+  private var currentIntervalSec: Int?
+  private var generation = 0
+
+  func reconfigure(
+    intervalSec: Int,
+    scheduler: AnySchedulerOf<DispatchQueue>,
+    fire: @escaping @Sendable () async -> Void,
+  ) async {
+    if self.currentIntervalSec == intervalSec, self.task != nil {
+      return
+    }
+    self.generation &+= 1
+    let myGeneration = self.generation
+    self.task?.cancel()
+    await self.task?.value
+    guard myGeneration == self.generation else {
+      return
+    }
+    self.currentIntervalSec = intervalSec
+    let ticks = scheduler.timer(interval: .seconds(intervalSec))
+    let task = Task {
+      for await _ in ticks {
+        await fire()
+      }
+    }
+    self.task = task
+    await task.value
+  }
+
+  func stop() async {
+    self.generation &+= 1
+    let myGeneration = self.generation
+    self.currentIntervalSec = nil
+    self.task?.cancel()
+    await self.task?.value
+    guard myGeneration == self.generation else {
+      return
+    }
+    self.task = nil
+  }
+}
+
+extension DependencyValues {
+  var screenshotTimer: ScreenshotTimerController {
+    get { self[ScreenshotTimerControllerKey.self] }
+    set { self[ScreenshotTimerControllerKey.self] = newValue }
+  }
+}
+
+private enum ScreenshotTimerControllerKey: DependencyKey {
+  static let liveValue = ScreenshotTimerController()
+  static var testValue: ScreenshotTimerController { ScreenshotTimerController() }
+}
 
 actor ScreenshotBuffer {
   private var buffer: [ScreenshotData] = []
