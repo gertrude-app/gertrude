@@ -23,6 +23,34 @@ leaving `group_id` NULL) on a `blocker_app.block_rules` row.
 
 ## Apple Music
 
+### 2026-05-15: artwork leak via itunescloudd (favorited artists / playlists)
+
+**Trigger:** customer reported album artwork still appearing in Apple Music after
+favoriting artists / playlists, despite the existing artwork rules being active.
+
+**Tested:** capture during favorite → navigate to album. Existing
+`com.apple.Music`-scoped rules DROPped ~786 flows to `is1-ssl.mzstatic.com`, but 2
+ALLOWs slipped through from `.com.apple.itunescloudd` (iCloud Music Library daemon).
+Artwork bytes from itunescloudd's allowed fetches appear to be cached at a
+system-level image cache shared with the Music app, so Apple Music's own DROPped
+requests still find the artwork locally and render it.
+
+**Verdict:** existing bundle scope (`com.apple.Music`) was too narrow. `itunescloudd`
+is a sibling carrier hitting the same `ssl.mzstatic.com` host.
+
+**Shipped 2026-05-15:** sibling rule added to the Apple Music group (SQL at
+`logs/apple-music-itunescloudd-artwork-rule.sql`):
+
+```json
+{"a":{"case":"bundleIdContains","value":"itunescloudd"},"b":{"case":"targetContains","value":"ssl.mzstatic.com"},"case":"both"}
+```
+
+Re-test confirmed: 83 DROPs from itunescloudd during the next favorite/navigate
+sequence, artwork no longer rendered. Note: BlockRule has no native OR, so this is a
+parallel rule rather than a broadening of the existing one. `itunescloudd` also hits
+`librarydaap`, `genius-*`, `p42-buy`, `pd.itunes.apple.com` — metadata, not artwork,
+left allowed.
+
 ### 2026-04-30 → 2026-05-01: artwork blocks cause audio playback failure
 
 **Trigger:** customer reported audio dying ~15s after song start when filter active.
