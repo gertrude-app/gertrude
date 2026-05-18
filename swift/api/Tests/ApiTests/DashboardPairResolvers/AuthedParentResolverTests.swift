@@ -1,4 +1,5 @@
 import Dependencies
+import DuetSQL
 import Gertie
 import XCore
 import XCTest
@@ -7,218 +8,60 @@ import XStripe
 
 @testable import Api
 
-final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
-  func testStripeUrlV2ForBillingPortalSession() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = .init("sub_123")
-      $1.billingStatus = .paid
-    }
-
-    let output = try await withDependencies {
-      $0.stripe.getSubscription = { subId in
-        expect(subId).toBe("sub_123")
-        return .init(id: "sub_123", status: .active, customer: "cus_123", currentPeriodEnd: 0)
-      }
-      $0.stripe.createBillingPortalSession = { cusId, _ in
-        expect(cusId).toBe("cus_123")
-        return .init(id: "bps_123", url: "bps-url")
-      }
-    } operation: {
-      try await StripeUrl_v2.resolve(
-        with: .init(successPath: "/checkout-success", cancelPath: "/checkout-cancel", tier: nil),
-        in: context(parent.model),
-      )
-    }
-
-    expect(output).toEqual(StripeUrl_v2.Output(url: "bps-url"))
-  }
-
-  func testStripeUrlV2ForCheckoutSession() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil
-      $1.billingStatus = .trialing
-    }
-
-    let output = try await withDependencies {
-      $0.stripe.createCheckoutSession = { sessionData in
-        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
-        expect(sessionData.customerEmail).toEqual(parent.email.rawValue)
-        return .init(id: "s1", url: "/checkout-url", subscription: "subsid", clientReferenceId: nil)
-      }
-    } operation: {
-      try await StripeUrl_v2.resolve(
-        with: .init(successPath: "/checkout-success", cancelPath: "/checkout-cancel", tier: nil),
-        in: context(parent.model),
-      )
-    }
-
-    expect(output).toEqual(StripeUrl_v2.Output(url: "/checkout-url"))
-  }
-
-  func testStripeUrlV2WithExplicitTierForLightUserUpgrade() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .light
-      $1.stripeId = .init("sub_light_123")
-      $1.billingStatus = .paid
-    }
-
-    let output = try await withDependencies {
-      $0.stripe.createCheckoutSession = { sessionData in
-        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
-        expect(sessionData.lineItems.first?.priceId).toEqual("price_1RJbTrGKRdhETuKAkI5OO1NB")
-        return .init(
-          id: "s1",
-          url: "/full-checkout-url",
-          subscription: "subsid",
-          clientReferenceId: nil,
-        )
-      }
-    } operation: {
-      try await StripeUrl_v2.resolve(
-        with: .init(successPath: "/checkout-success", cancelPath: "/checkout-cancel", tier: .full),
-        in: context(parent.model),
-      )
-    }
-
-    expect(output).toEqual(StripeUrl_v2.Output(url: "/full-checkout-url"))
-  }
-
-  func testStripeUrlV2ForLapsedFullTrialWithNoStripeId() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil
-      $1.billingStatus = .unpaid
-      $1.trialStartedAt = nil
-      $1.statusExpiresAt = Date(timeIntervalSince1970: 0)
-    }
-
-    let output = try await withDependencies {
-      $0.stripe.createCheckoutSession = { sessionData in
-        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
-        expect(sessionData.lineItems.first?.priceId).toEqual("price_1RJbTrGKRdhETuKAkI5OO1NB")
-        return .init(
-          id: "s1",
-          url: "/full-checkout-url",
-          subscription: "subsid",
-          clientReferenceId: nil,
-        )
-      }
-    } operation: {
-      try await StripeUrl_v2.resolve(
-        with: .init(successPath: "/checkout-success", cancelPath: "/checkout-cancel", tier: nil),
-        in: context(parent.model),
-      )
-    }
-
-    expect(output).toEqual(StripeUrl_v2.Output(url: "/full-checkout-url"))
-  }
-
-  func testStripeUrlV2ForFreeUserWithLightTier() async throws {
-    let parent = try await self.parent()
-
-    let output = try await withDependencies {
-      $0.stripe.createCheckoutSession = { sessionData in
-        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
-        expect(sessionData.lineItems.first?.priceId).toEqual("price_1SwT4IGKRdhETuKAc9wwLtsR")
-        expect(sessionData.successUrl).toContain("/supervise-device/123/download-helper")
-        expect(sessionData.cancelUrl).toContain("/supervise-device/123/payment")
-        return .init(
-          id: "s1",
-          url: "/light-checkout-url",
-          subscription: "subsid",
-          clientReferenceId: nil,
-        )
-      }
-    } operation: {
-      try await StripeUrl_v2.resolve(
-        with: .init(
-          successPath: "/supervise-device/123/download-helper",
-          cancelPath: "/supervise-device/123/payment",
-          tier: .light,
-        ),
-        in: context(parent.model),
-      )
-    }
-
-    expect(output).toEqual(StripeUrl_v2.Output(url: "/light-checkout-url"))
-  }
-
-  func testStripeUrlV2ForTrialExpiredUserWithLightTier() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil
-      $1.billingStatus = .trialExpired
-    }
-
-    let output = try await withDependencies {
-      $0.stripe.createCheckoutSession = { sessionData in
-        expect(sessionData.clientReferenceId).toEqual(parent.id.lowercased)
-        expect(sessionData.lineItems.first?.priceId).toEqual("price_1SwT4IGKRdhETuKAc9wwLtsR")
-        return .init(
-          id: "s1",
-          url: "/light-checkout-url",
-          subscription: "subsid",
-          clientReferenceId: nil,
-        )
-      }
-    } operation: {
-      try await StripeUrl_v2.resolve(
-        with: .init(
-          successPath: "/supervise-device/123/download-helper",
-          cancelPath: "/supervise-device/123/payment",
-          tier: .light,
-        ),
-        in: context(parent.model),
-      )
-    }
-
-    expect(output).toEqual(StripeUrl_v2.Output(url: "/light-checkout-url"))
-  }
-
+final class AuthedParentResolverTests: ApiTestCase, @unchecked Sendable {
   func testHandleCheckoutSuccess() async throws {
-    let sessionId = "cs_123"
-    let parent = try await self.parentWithSubscription {
-      $1.stripeId = nil
-      $1.billingStatus = .trialing
-    }
+    let sessionId = "cs_\("".random)"
+    let subId = "sub_\("".random)"
+    let customerId = "cus_\("".random)"
+    let parent = try await self.parent()
+    let periodEnd = Date.reference + .days(30)
 
     let output = try await withDependencies {
       $0.stripe.getCheckoutSession = { id in
         expect(id).toBe(sessionId)
         return .init(
-          id: "cs_123",
+          id: sessionId,
           url: nil,
-          subscription: "sub_123",
+          subscription: subId,
           clientReferenceId: parent.id.lowercased,
         )
       }
       $0.stripe.getSubscription = { id in
-        expect(id).toBe("sub_123")
+        expect(id).toBe(subId)
         return .init(
           id: id,
           status: .active,
-          customer: "cus_123",
-          currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(31)).timeIntervalSince1970),
-          items: [.init(price: .init(id: "price_1RJbTrGKRdhETuKAkI5OO1NB"))],
+          customer: customerId,
+          currentPeriodEnd: Int(periodEnd.timeIntervalSince1970),
+          items: [.init(id: "si_test", price: .init(id: self.env.stripe.priceIdLight))],
         )
       }
     } operation: {
       try await HandleCheckoutSuccess.resolve(
         with: .init(stripeCheckoutSessionId: sessionId),
-        in: context(parent.model),
+        in: context(parent),
       )
     }
 
     expect(output).toEqual(.success)
-    let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
-    expect(retrieved.subscription!.stripeId).toEqual(.init(rawValue: "sub_123"))
-    expect(retrieved.subscription!.billingStatus).toEqual(.paid)
-    expect(retrieved.subscription!.statusExpiresAt).toEqual(Date.reference + .days(33))
+
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.stripeId.rawValue).toEqual(subId)
+    expect(sub.tier).toEqual(.light)
+    expect(sub.stripeStatus).toEqual(.active)
+    expect(sub.currentPeriodEnd).toEqual(periodEnd)
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.stripeCustomerId?.rawValue).toEqual(customerId)
+    expect(identity.lastStripeSubscriptionId?.rawValue).toEqual(subId)
+    expect(identity.lastPaidTier).toEqual(.light)
+
+    let alarms = self.sent.slacks.filter { $0.message.channel == "unexpected-errors" }
+    expect(alarms.count).toEqual(0)
   }
 
   func testGetParentWithNotifications() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .paid
-      $1.stripeId = .init("sub_123")
-    }
+    let parent = try await self.parent()
     let method = Parent.NotificationMethod(
       parentId: parent.id,
       config: .email(email: "blob@blob.com"),
@@ -229,13 +72,12 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     notification.methodId = method.id
     try await self.db.create(notification)
 
-    let output = try await GetAccountOwner.resolve(in: context(parent.model))
+    let output = try await GetAccountOwner_v2.resolve(in: context(parent))
 
     expect(output).toEqual(
       .init(
         id: parent.id,
         email: parent.email.rawValue,
-        plan: .full(status: .paid(stripeId: .init("sub_123"), monthlyPriceInCents: 1000)),
         notifications: [
           .init(
             id: notification.id,
@@ -652,7 +494,7 @@ final class AuthedAdminResolverTests: ApiTestCase, @unchecked Sendable {
     )
   }
 
-  func skip_testGetSelectableKeychains() async throws {
+  func testGetSelectableKeychains() async throws {
     try await self.db.delete(all: Key.self)
     try await self.db.delete(all: Keychain.self)
 

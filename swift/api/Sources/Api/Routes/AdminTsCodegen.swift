@@ -20,7 +20,10 @@ enum AdminTsCodegenRoute {
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
       ("GertrudeApp", AppStore.GertrudeApp.self),
-      ("Plan", Plan.self),
+      ("PlanStatus", PlanStatus.self),
+      ("BillingStatus", BillingStatus.self),
+      ("SubscriptionTier", StripeSubscription.Tier.self),
+      ("StripeSubscriptionStatus", StripeSubscription.StripeStatus.self),
     ]
   }
 
@@ -56,7 +59,7 @@ enum AdminTsCodegenRoute {
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
-      .init(Subscription.StripeId.self, as: "string"),
+      .init(StripeSubscription.StripeId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

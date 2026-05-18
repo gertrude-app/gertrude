@@ -417,15 +417,9 @@ private extension CheckIn_v2 {
     for parent: Parent,
     in context: MacApp.ChildContext,
   ) async throws -> AdminAccountStatus {
-    let subscription = try await parent.subscription(in: context.db)
-    return switch Plan(subscription: subscription) {
-    case .full(.trialExpired), .full(.overdue):
-      .needsAttention
-    case .full:
-      .active
-    case .light, .free:
-      .inactive
-    }
+    let now = get(dependency: \.date.now)
+    let billing = try await parent.billingAccountSnapshot(in: context.db, at: now)
+    return billing.macAppAccessStatus
   }
 }
 

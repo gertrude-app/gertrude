@@ -29,12 +29,11 @@ extension ConnectUser: Resolver {
     let child = try await context.db.find(childId)
     context.telemetry.parentId = child.parentId
 
-    let parent = try await ParentWithSubscription.find(child.parentId, in: context.db)
-    switch parent.plan {
-    case .full(.complimentary), .full(.trialing), .full(.paid):
-      break
-    default:
-      unexpected("9cf4e745", parent.model.id, "mac app connection, no .full plan")
+    @Dependency(\.date.now) var now
+    let parent = try await context.db.find(child.parentId) as Parent
+    let account = try await parent.billingAccountSnapshot(in: context.db, at: now)
+    if !account.can(.connectMacApp) {
+      unexpected("9cf4e745", parent.id, "mac app connection, no .full entitlement")
       throw context.error(
         id: "ba2d1e75",
         type: .unauthorized,

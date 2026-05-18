@@ -292,23 +292,15 @@ private func slackPairQLRouteNotFound(_ request: Request, _ error: Error) async 
   let domain = request.parameters.get("domain") ?? ""
   let operation = request.parameters.get("operation") ?? ""
 
-  // legacy removed pairs, these should error for non-upgraded macapps
-  if [
-    "RefreshRules",
-    "CreateSuspendFilterRequest",
-    "GetAccountStatus",
-    "GetUserData",
-    "CreateUnlockRequests_v2",
-    "LatestAppVersion",
-  ].contains(operation) {
-    return
-  }
-
   if domain == "dashboard", operation == "ChildActivitySummaries" {
     return
   }
 
   if domain == "dashboard", operation == "DashboardWidgets" {
+    return
+  }
+
+  if domain == "dashboard", operation == "GetAccountOwner" {
     return
   }
 

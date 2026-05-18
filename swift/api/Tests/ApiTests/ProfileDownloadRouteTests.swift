@@ -67,12 +67,12 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testSupervisedDevice_blockedWithoutEligiblePlan() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.tier = .full
-      $1.billingStatus = .trialing
-      $1.trialStartedAt = .reference
-      $1.statusExpiresAt = .reference + .days(18)
-    }
+    // standalone trial: identity-only, no live subscription → no supervision allowed
+    let parent = try await self.parent()
+    try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference,
+    ))
     let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
     let device = try await self.db.create(IOSDevice(
       id: .init(),

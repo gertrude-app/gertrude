@@ -47,8 +47,7 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
 
     let supervision = try await device.supervision(in: context.db)
     let child = try await context.verifiedChild(from: childId)
-    let subscription = try await context.parent.subscription(in: context.db)
-    let plan = Plan(subscription: subscription)
+    let account = try await context.currentBillingAccount()
     return .init(
       deviceId: device.id,
       childId: child.id,
@@ -57,7 +56,7 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
       deviceType: device.deviceType,
       iosVersion: device.iosVersion,
       supervisionStatus: supervision?.supervised == true ? .supervised : .awaitingSupervision,
-      requiresPayment: !plan.allowsSupervision,
+      requiresPayment: !account.can(.superviseIosDevice),
     )
   }
 }

@@ -24,19 +24,22 @@ describe(`dashboard onboarding nudges`, () => {
 
   beforeEach(() => {
     cy.simulateLoggedIn();
-    cy.interceptPql(`GetAccountOwner`, {
+    cy.interceptPql(`GetAccountOwner_v2`, {
       id: betsy.id,
       email: betsy.email,
-      plan: {
-        case: `full`,
-        status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-      },
       notifications: [],
       verifiedNotificationMethods: [],
     });
     cy.interceptPql(`MacAppConnectionCode`, { code: 123456 });
     cy.interceptPql(`GetChild`, leopold);
     cy.interceptPql(`GetChildren`, [leopold]);
+    cy.interceptPql(`GetSubscriptionPanel`, {
+      planStatus: { case: `full`, status: `current` },
+      currentPeriodEnd: new Date().toISOString(),
+      primary: { case: `openBillingPortal`, config: `default` },
+      secondary: [],
+      availableTiers: [],
+    });
     cy.interceptPql(`SaveUser`, { success: true });
     cy.interceptPql(`GetSelectableKeychains`, { own: [], public: [] });
   });

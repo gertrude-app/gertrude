@@ -1,10 +1,20 @@
 import cx from 'classnames';
 import React from 'react';
 
+export type BadgeType =
+  | `green`
+  | `ok`
+  | `warning`
+  | `yellow`
+  | `red`
+  | `error`
+  | `blue`
+  | `info`;
+
 type Props = {
   className?: string;
   size?: `large` | `medium` | `small`;
-  type: `green` | `ok` | `warning` | `yellow` | `red` | `error` | `blue` | `info`;
+  type: BadgeType;
   children: React.ReactNode;
   onClick?: () => void;
 };

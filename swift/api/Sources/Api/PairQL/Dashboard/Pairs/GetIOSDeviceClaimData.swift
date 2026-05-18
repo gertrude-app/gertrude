@@ -86,8 +86,8 @@ private func resumeStep(
   if supervision?.supervisedAt != nil {
     return .done
   }
-  let plan = try await context.parent.plan(in: context.db)
-  if !plan.allowsSupervision {
+  let account = try await context.currentBillingAccount()
+  if !account.can(.superviseIosDevice) {
     return .payment
   }
   return .downloadHelper

@@ -1,3 +1,4 @@
+import Dependencies
 import PairQL
 import Vapor
 
@@ -6,33 +7,32 @@ struct StartFullTrial: Pair {
   typealias Output = Infallible
 }
 
-// resolver
-
 extension StartFullTrial: NoInputResolver {
   static func resolve(in ctx: ParentContext) async throws -> Output {
-    let now = get(dependency: \.date.now)
-    guard var subscription = try await ctx.parent.subscription(in: ctx.db) else {
-      try await ctx.db.create(Subscription(
+    @Dependency(\.date.now) var now
+
+    var identity = try await ctx.parent.ensureBillingIdentity(in: ctx.db)
+    if identity.fullTrialStartedAt != nil {
+      unexpected("14032c8b", ctx.parent.id)
+      throw ctx.error(
+        "acc9328a",
+        .badRequest,
+        user: "Trial already used, upgrade instead",
+      )
+    }
+    identity.fullTrialStartedAt = now
+    try await ctx.db.update(identity)
+
+    if identity.lastPaidTier == .full {
+      _ = try? await ctx.db.create(InterestingEvent(
+        eventId: "trial_after_prior_full_paid",
+        kind: "billing",
+        context: "dash",
         parentId: ctx.parent.id,
-        tier: .full,
-        billingStatus: .trialing,
-        trialStartedAt: now,
-        statusExpiresAt: now + Plan.Full.trialLengthDays - Plan.Full.trialWarningDays,
+        detail: "last_sub: \(identity.lastStripeSubscriptionId?.rawValue ?? "(nil)")",
       ))
-      return .success
     }
 
-    switch (subscription.tier, subscription.trialStartedAt) {
-    case (.full, _):
-      unexpected("3484f942", ctx.parent.id)
-      return .success // shouldn't get here, but app connection will catch bad subs states
-    case (.light, .none):
-      subscription.trialStartedAt = now
-      try await ctx.db.update(subscription)
-      return .success
-    case (.light, .some):
-      unexpected("14032c8b", ctx.parent.id)
-      throw ctx.error("acc9328a", .badRequest, user: "Trial already used, upgrade instead")
-    }
+    return .success
   }
 }

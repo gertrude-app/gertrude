@@ -1,287 +1,486 @@
 import Dependencies
+import DuetSQL
 import XCTest
 import XExpect
 
 @testable import Api
 
 final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
-  func testAdvanceExpiredFn() async throws {
-    try await self.db.delete(all: Parent.self)
-    try await self.db.delete(all: DeletedEntity.self)
 
-    let nonExpired = Parent.random
-    let nonExpiredSub = Subscription(
-      parentId: nonExpired.id,
-      tier: .full,
-      billingStatus: .trialing,
-      trialStartedAt: .reference,
-      statusExpiresAt: .reference + .days(18),
-    )
+  // MARK: - delete unverified parents
 
-    let trialEndingSoon = Parent.random
-    let trialEndingSoonSub = Subscription(
-      parentId: trialEndingSoon.id,
-      tier: .full,
-      billingStatus: .trialing,
-      trialStartedAt: .reference,
-      statusExpiresAt: .reference - .days(1),
-    )
+  func testDeletesUnverifiedParentsOlderThanThreeDays() async throws {
+    let stale = try await self.db.create(Parent.random {
+      $0.emailVerifiedAt = nil
+    })
+    let recent = try await self.db.create(Parent.random {
+      $0.emailVerifiedAt = nil
+    })
+    let verified = try await self.db.create(Parent.random {
+      $0.emailVerifiedAt = .reference - .days(1)
+    })
+    try await self.backdate(parent: stale.id, to: .reference - .days(4))
+    try await self.backdate(parent: recent.id, to: .reference - .days(2))
+    try await self.backdate(parent: verified.id, to: .reference - .days(10))
 
-    try await self.db.create([nonExpired, trialEndingSoon])
-    try await self.db.create([nonExpiredSub, trialEndingSoonSub])
-    try await SubscriptionManager().advanceExpired()
+    let priorDeletions = try await DeletedEntity.query().count(in: self.db)
+    let logs = try await SubscriptionManager().deleteUnverifiedParents()
+    expect(logs.count >= 1).toEqual(true)
 
-    let retrievedNonExpired = try await ParentWithSubscription.find(nonExpired.id, in: self.db)
-    expect(retrievedNonExpired.subscription!.billingStatus).toEqual(.trialing)
-    expect(retrievedNonExpired.subscription!.statusExpiresAt)
-      .toEqual(.reference + .days(18))
+    let surviving = try await Parent.query().all(in: self.db)
+    let survivingIds = surviving.map(\.id)
+    expect(survivingIds.contains(stale.id)).toEqual(false)
+    expect(survivingIds.contains(recent.id)).toEqual(true)
+    expect(survivingIds.contains(verified.id)).toEqual(true)
 
-    let retrievedTrialEndingSoon = try await ParentWithSubscription.find(
-      trialEndingSoon.id,
-      in: self.db,
-    )
-    expect(retrievedTrialEndingSoon.subscription!.billingStatus).toEqual(.trialExpiringSoon)
-    expect(retrievedTrialEndingSoon.subscription!.statusExpiresAt)
-      .toEqual(.reference + Plan.Full.trialWarningDays)
-
-    expect(sent.emails.count).toEqual(1)
-    expect(sent.emails[0].to).toEqual(trialEndingSoon.email.rawValue)
-    expect(sent.emails[0].template).toBe("trial-ending-soon")
+    let postDeletions = try await DeletedEntity.query().all(in: self.db)
+    expect(postDeletions.count > priorDeletions).toEqual(true)
+    expect(postDeletions.contains { $0.reason == "email never verified" }).toEqual(true)
   }
 
-  func testNonExpiredStateDoesNotUpdate() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .overdue
-      $1.stripeId = .init("sub-123")
-      $1.statusExpiresAt = .distantFuture
-    }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toBeNil()
+  private func backdate(parent id: Parent.Id, to date: Date) async throws {
+    var stmt = SQL.Statement("""
+    UPDATE \(table: Parent.self) SET \(Parent.columnName(.createdAt)) =
+    """)
+    stmt.components.append(.sql(" "))
+    stmt.components.append(.binding(.date(date)))
+    stmt.components.append(.sql(" WHERE \(Parent.columnName(.id)) = "))
+    stmt.components.append(.binding(.uuid(id)))
+    try await self.db.execute(statement: stmt)
   }
 
-  func testTrialExpiringSoon() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .trialing
-      $1.trialStartedAt = .reference - Plan.Full.trialLengthDays
-      $1.statusExpiresAt = .reference - .days(1)
-    }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(
-        status: .trialExpiringSoon,
-        expiration: .reference + Plan.Full.trialWarningDays,
-      ),
-      email: .trialEndingSoon(length: 21, remaining: 3),
+  // MARK: - trial email progression (pure decision)
+
+  func testNoEmailBeforeT18() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(17)
+    expect(nextTrialEmailDecision(
+      lifecycle: .none,
+      trialStartedAt: trialStart,
+      hasConnectedApp: true,
+      now: now,
+    )).toBeNil()
+  }
+
+  func testEndingSoonAtExactlyT18() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(18)
+    expect(nextTrialEmailDecision(
+      lifecycle: .none,
+      trialStartedAt: trialStart,
+      hasConnectedApp: false,
+      now: now,
+    )).toEqual(.init(
+      send: .trialEndingSoon(length: 21, remaining: 3),
+      nextLifecycle: .endingSoonSent,
     ))
   }
 
-  func testTrialEnded_NotOnboarded() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .trialExpiringSoon
-      $1.trialStartedAt = .reference - Plan.Full.trialLengthDays
-      $1.statusExpiresAt = .reference - .days(1)
-    }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .trialExpired, expiration: .reference + Plan.Full.trialGraceDays),
-      email: nil, // <-- no email, they never onboarded
+  func testTrialExpiredAtT21OnlyAfterEndingSoonSent() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(21)
+    expect(nextTrialEmailDecision(
+      lifecycle: .none,
+      trialStartedAt: trialStart,
+      hasConnectedApp: true,
+      now: now,
+    )).toEqual(.init(
+      send: .trialEndingSoon(length: 21, remaining: 3),
+      nextLifecycle: .endingSoonSent,
+    ))
+
+    expect(nextTrialEmailDecision(
+      lifecycle: .endingSoonSent,
+      trialStartedAt: trialStart,
+      hasConnectedApp: true,
+      now: now,
+    )).toEqual(.init(
+      send: .trialExpired(length: 21),
+      nextLifecycle: .expiredSent,
     ))
   }
 
-  func testTrialEnded_Onboarded() async throws {
-    let parentModel = try await self.parent()
-      .withOnboardedChild().model
-    let subscription = Subscription(
-      parentId: parentModel.id,
-      tier: .full,
-      billingStatus: .trialExpiringSoon,
-      trialStartedAt: .reference - Plan.Full.trialLengthDays,
-      statusExpiresAt: .reference - .days(1),
-    )
-    let parent = ParentWithSubscription(model: parentModel, subscription: subscription)
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .trialExpired, expiration: .reference + Plan.Full.trialGraceDays),
-      email: .trialExpired(length: 21),
+  func testTrialExpiredSkipsEmailIfNotOnboarded() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(21)
+    expect(nextTrialEmailDecision(
+      lifecycle: .endingSoonSent,
+      trialStartedAt: trialStart,
+      hasConnectedApp: false,
+      now: now,
+    )).toEqual(.init(send: nil, nextLifecycle: .expiredSent))
+  }
+
+  func testFinalSentAtT28OnboardedSendsOverdueToUnpaid() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(28)
+    expect(nextTrialEmailDecision(
+      lifecycle: .expiredSent,
+      trialStartedAt: trialStart,
+      hasConnectedApp: true,
+      now: now,
+    )).toEqual(.init(
+      send: .overdueToUnpaid,
+      nextLifecycle: .finalSent,
     ))
   }
 
-  func testTrialExpiredToUnpaid_NotOnboarded() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .trialExpired
-      $1.trialStartedAt = .reference - Plan.Full.trialLengthDays
-      $1.statusExpiresAt = .reference - .days(1)
-    }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .unpaid, expiration: .distantFuture),
-      email: nil, // <-- no email, they never onboarded
-    ))
+  func testFinalSentSkipsEmailIfNotOnboarded() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(28)
+    expect(nextTrialEmailDecision(
+      lifecycle: .expiredSent,
+      trialStartedAt: trialStart,
+      hasConnectedApp: false,
+      now: now,
+    )).toEqual(.init(send: nil, nextLifecycle: .finalSent))
   }
 
-  func testOverdueToUnpaid_NotOnboarded() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .overdue
-      $1.stripeId = .init("sub-123")
-      $1.statusExpiresAt = .epoch
-    }
-    try await withDependencies {
-      $0.stripe.getSubscription = { _ in
-        .init(id: "sub-123", status: .pastDue, customer: "cs-123", currentPeriodEnd: 0)
-      }
-    } operation: {
-      await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-        action: .update(status: .unpaid, expiration: .distantFuture),
-        email: nil, // <-- no email, they never onboarded
-      ))
-    }
+  func testFinalLifecycleNoMoreEmails() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(50)
+    expect(nextTrialEmailDecision(
+      lifecycle: .finalSent,
+      trialStartedAt: trialStart,
+      hasConnectedApp: true,
+      now: now,
+    )).toBeNil()
   }
 
-  func testOverdueToUnpaid_Onboarded() async throws {
-    let parentModel = try await self.parent()
-      .withOnboardedChild().model
-    let subscription = Subscription(
-      parentId: parentModel.id,
-      tier: .full,
-      billingStatus: .overdue,
-      trialStartedAt: .reference - .days(35),
-      statusExpiresAt: .reference - .days(1),
-    )
-    let parent = ParentWithSubscription(model: parentModel, subscription: subscription)
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .update(status: .unpaid, expiration: .distantFuture),
-      email: .overdueToUnpaid,
-    ))
-  }
+  // MARK: - trial email progression (integration)
 
-  func testOverdueToUnpaid_OnboardedViaIOSDevice() async throws {
+  func testStandaloneTrialAdvancesAtT18() async throws {
     let parent = try await self.parent()
-    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    try await self.db.create(IOSDevice.random { $0.childId = child.id })
-    let subscription = Subscription(
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(18),
+      trialEmailLifecycle: .none,
+    ))
+
+    let logs = try await SubscriptionManager().advanceTrialEmails()
+    expect(logs.count).toEqual(1)
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].to).toEqual(parent.email.rawValue)
+    expect(self.sent.emails[0].template).toBe("trial-ending-soon")
+  }
+
+  func testFromLightTrialGetsEndingSoonEmail() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(18),
+      trialEmailLifecycle: .none,
+    ))
+    _ = try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .light,
-      billingStatus: .overdue,
-      trialStartedAt: .reference - .days(35),
-      statusExpiresAt: .reference - .days(1),
-    )
-    let parentWithSub = ParentWithSubscription(model: parent.model, subscription: subscription)
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parentWithSub)).toEqual(.init(
-      action: .update(status: .unpaid, expiration: .distantFuture),
-      email: .overdueToUnpaid,
+      stripeId: .init("sub_light"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(180),
     ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].template).toBe("trial-ending-soon")
   }
 
-  func testUnpaidIsTerminalState() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .unpaid
-      $1.statusExpiresAt = .epoch
-    }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toBeNil()
-  }
-
-  func testCancelledIsTerminalState() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .cancelled
-      $1.stripeId = .init("sub-123")
-      $1.statusExpiresAt = .epoch
-    }
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toBeNil()
-  }
-
-  func testEmailUnverifiedToDeleted() async throws {
-    let parentModel = try await self.db.create(Parent.empty {
-      $0.emailVerifiedAt = nil
-      $0.createdAt = .reference - .days(4)
-    })
-    let parent = ParentWithSubscription(model: parentModel, subscription: nil)
-    await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-      action: .delete(reason: "email never verified"),
-      email: nil,
+  func testPaidFullParentMarkedAsSkipped() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(18),
+      trialEmailLifecycle: .none,
     ))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: .init("sub_full"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(15),
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.skipped)
+    expect(self.sent.emails.count).toEqual(0)
   }
 
-  func testPaidToOverdue() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .paid
-      $1.stripeId = .init("sub-123")
-      $1.statusExpiresAt = .epoch
+  func testLapsedFullParentMarkedAsSkippedViaLastPaidTier() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_lapsed_full"),
+      fullTrialStartedAt: .reference - .days(50),
+      lastStripeSubscriptionId: .init("sub_old_full"),
+      lastPaidTier: .full,
+      trialEmailLifecycle: .none,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.skipped)
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testLapsedLightParentDoesNotShortCircuit() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_lapsed_light"),
+      fullTrialStartedAt: .reference - .days(18),
+      lastStripeSubscriptionId: .init("sub_old_light"),
+      lastPaidTier: .light,
+      trialEmailLifecycle: .none,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
+    expect(self.sent.emails.count).toEqual(1)
+  }
+
+  func testComplimentaryIdentityIgnored() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(50),
+      trialEmailLifecycle: .none,
+      isComplimentary: true,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.none)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
+  }
+
+  func testIdentityWithoutTrialIgnored() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: nil,
+      trialEmailLifecycle: .none,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testFinalSentLifecycleFilteredOutByQuery() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(50),
+      trialEmailLifecycle: .finalSent,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testSkippedLifecycleFilteredOutByQuery() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(50),
+      trialEmailLifecycle: .skipped,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testTrialExpiredOnboardedSendsEmail() async throws {
+    let parent = try await self.parent()
+    _ = try await parent.withOnboardedChild()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(21),
+      trialEmailLifecycle: .endingSoonSent,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.expiredSent)
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].template).toBe("trial-expired")
+  }
+
+  func testTrialExpiredNotOnboardedAdvancesWithoutEmail() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(21),
+      trialEmailLifecycle: .endingSoonSent,
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.expiredSent)
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  // MARK: - Stripe failsafe
+
+  func testRefreshActiveSubKeepsActiveAndUpdatesPeriodEnd() async throws {
+    try await self.db.delete(all: StripeSubscription.self)
+    let parent = try await self.parent()
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: .init("sub_x"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference - .days(5),
+    ))
+
+    let nextPeriodEnd = Date.reference + .days(25)
+
+    try await withDependencies {
+      $0.stripe.getSubscription = { id in
+        expect(id).toEqual("sub_x")
+        return .init(
+          id: id,
+          status: .active,
+          customer: "cus_x",
+          currentPeriodEnd: Int(Date.epoch.distance(to: nextPeriodEnd)),
+        )
+      }
+    } operation: {
+      _ = try await SubscriptionManager().refreshStaleSubscriptions()
     }
+
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.stripeStatus).toEqual(.active)
+    expect(sub.currentPeriodEnd).toEqual(nextPeriodEnd)
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testActiveToPastDueSendsPaidToOverdueEmail() async throws {
+    try await self.db.delete(all: StripeSubscription.self)
+    let parent = try await self.parent()
+    _ = try await parent.withOnboardedChild()
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: .init("sub_pd"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference - .days(5),
+    ))
+
+    try await withDependencies {
+      $0.stripe.getSubscription = { _ in
+        .init(id: "sub_pd", status: .pastDue, customer: "cus_x", currentPeriodEnd: 0)
+      }
+    } operation: {
+      _ = try await SubscriptionManager().refreshStaleSubscriptions()
+    }
+
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.stripeStatus).toEqual(.pastDue)
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].template).toBe("paid-to-overdue")
+  }
+
+  func testPastDueToCanceledOnboardedSendsOverdueToUnpaidEmail() async throws {
+    try await self.db.delete(all: StripeSubscription.self)
+    let parent = try await self.parent()
+    _ = try await parent.withOnboardedChild()
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: .init("sub_cx"),
+      stripeStatus: .pastDue,
+      currentPeriodEnd: .reference - .days(8),
+    ))
+
+    try await withDependencies {
+      $0.stripe.getSubscription = { _ in
+        .init(id: "sub_cx", status: .canceled, customer: "cus_x", currentPeriodEnd: 0)
+      }
+    } operation: {
+      _ = try await SubscriptionManager().refreshStaleSubscriptions()
+    }
+
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.stripeStatus).toEqual(.canceled)
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].template).toBe("overdue-to-unpaid")
+  }
+
+  func testTerminalSubsAreNotRefreshed() async throws {
+    try await self.db.delete(all: StripeSubscription.self)
+    let parent = try await self.parent()
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: .init("sub_t"),
+      stripeStatus: .canceled,
+      currentPeriodEnd: .reference - .days(50),
+    ))
+
+    try await withDependencies {
+      $0.stripe.getSubscription = { _ in
+        XCTFail("Stripe should not be called for terminal subs")
+        return .init(id: "sub_t", status: .canceled, customer: "x", currentPeriodEnd: 0)
+      }
+    } operation: {
+      _ = try await SubscriptionManager().refreshStaleSubscriptions()
+    }
+    expect(self.sent.emails.count).toEqual(0)
+  }
+
+  func testStripeLookupErrorIsSwallowed() async throws {
+    try await self.db.delete(all: StripeSubscription.self)
+    let parent = try await self.parent()
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: .init("sub_e"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference - .days(5),
+    ))
+
     try await withDependencies {
       $0.stripe.getSubscription = { _ in
         throw NSError(domain: "Test", code: 1)
       }
     } operation: {
-      await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-        action: .update(status: .overdue, expiration: .reference + .days(14)),
-        email: .paidToOverdue,
-      ))
-    }
-  }
-
-  func testPaidToOverdueButStripeSaysPaid() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .paid
-      $1.stripeId = .init("sub-123")
-      $1.statusExpiresAt = .epoch
+      _ = try await SubscriptionManager().refreshStaleSubscriptions()
     }
 
-    let nextExpiration = Date.reference + .days(27)
-
-    try await withDependencies {
-      $0.stripe.getSubscription = { subsId in
-        expect(subsId).toEqual("sub-123")
-        return .init(
-          id: subsId,
-          status: .active,
-          customer: "cs-123",
-          currentPeriodEnd: Int(Date.epoch.distance(to: nextExpiration)),
-        )
-      }
-    } operation: {
-      await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-        action: .update(status: .paid, expiration: nextExpiration + .days(2)),
-        email: nil,
-      ))
-    }
-  }
-
-  func testOverdueToPaid() async throws {
-    let parent = try await self.parentWithSubscription {
-      $1.billingStatus = .overdue
-      $1.stripeId = .init("sub-123")
-      $1.statusExpiresAt = .epoch
-    }
-    let nextExpiration = Date.reference + .days(27)
-    try await withDependencies {
-      $0.stripe.getSubscription = { subsId in
-        expect(subsId).toEqual("sub-123")
-        return .init(
-          id: subsId,
-          status: .active,
-          customer: "cs-123",
-          currentPeriodEnd: Int(Date.epoch.distance(to: nextExpiration)),
-        )
-      }
-    } operation: {
-      await expect(try SubscriptionManager().subscriptionUpdate(for: parent)).toEqual(.init(
-        action: .update(status: .paid, expiration: nextExpiration + .days(2)),
-        email: nil,
-      ))
-    }
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.stripeStatus).toEqual(.active)
+    expect(self.sent.emails.count).toEqual(0)
   }
 }
 
 private extension ParentEntities {
-  func withOnboardedChild(
-    config: (inout Child, inout ComputerUser, inout Computer) -> Void = { _, _, _ in },
-  ) async throws -> ParentWithOnboardedChildEntities {
+  @discardableResult
+  func withOnboardedChild() async throws -> ParentWithOnboardedChildEntities {
     @Dependency(\.db) var db
-    var child = Child.random { $0.parentId = model.id }
-    var computer = Computer.random { $0.parentId = model.id }
-    var computerUser = ComputerUser.random {
+    let child = try await db.create(Child.random { $0.parentId = self.model.id })
+    let computer = try await db.create(Computer.random { $0.parentId = self.model.id })
+    let computerUser = try await db.create(ComputerUser.random {
       $0.childId = child.id
       $0.computerId = computer.id
-    }
-    config(&child, &computerUser, &computer)
-    try await db.create(child)
-    try await db.create(computer)
-    try await db.create(computerUser)
+    })
     return .init(
       model: self.model,
       token: self.token,

@@ -6,7 +6,7 @@ import type {
   ChildActivitySummaries,
   Device,
   FamilyActivitySummaries,
-  GetAccountOwner,
+  GetAccountOwner_v2,
   GetIdentifiedApps,
   KeychainSummary,
   SuspendFilterRequest,
@@ -14,16 +14,12 @@ import type {
 } from '@dash/types';
 import * as empty from '../../lib/empty';
 
-type AccountOwner = GetAccountOwner.Output;
+type AccountOwner = GetAccountOwner_v2.Output;
 
 export function accountOwner(override: Partial<AccountOwner> = {}): AccountOwner {
   return {
     id: uuid(),
     email: `you@example.com`,
-    plan: {
-      case: `full`,
-      status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-    },
     notifications: [],
     verifiedNotificationMethods: [],
     ...override,

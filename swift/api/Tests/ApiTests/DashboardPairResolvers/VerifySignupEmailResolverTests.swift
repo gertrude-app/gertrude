@@ -15,14 +15,13 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await VerifySignupEmail.resolve(with: .init(token: token), in: self.context)
 
-    let retrieved = try await ParentWithSubscription.find(parent.id, in: self.db)
+    let subscription = try await parent.model.subscription(in: self.db)
     let method = try await Parent.NotificationMethod.query()
       .where(.parentId == parent.id)
       .first(in: self.db)
 
     expect(output.adminId).toEqual(parent.id)
-    expect(retrieved.subscription).toBeNil()
-    expect(Plan(subscription: retrieved.subscription)).toEqual(.free(kind: .standard))
+    expect(subscription).toBeNil()
     expect(method.config).toEqual(.email(email: parent.email.rawValue))
   }
 

@@ -41,26 +41,18 @@ extension SubscriptionsOverview: NoInputResolver {
     var signups: [RecentSignupOutput] = []
 
     for parent in data.parents.values {
-      switch parent.plan {
-      case .free:
-        break
-      case .light(let status):
-        switch status {
-        case .paid, .overdue:
+      if let sub = parent.subscription, sub.stripeStatus.isLive {
+        switch sub.tier {
+        case .light:
           lightPlanCount += 1
           lightPlanAnnualCents += 83 * 12
-        }
-      case .full(let status):
-        switch status {
-        case .complimentary:
-          break
-        case .trialing:
-          trialingCount += 1
-        case .trialExpired:
-          break
-        case .paid(_, let monthlyPriceInCents), .overdue(_, let monthlyPriceInCents):
-          fullPlanCount += 1
-          fullPlanAnnualCents += monthlyPriceInCents * 12
+        case .full:
+          if sub.stripeStatus == .trialing {
+            trialingCount += 1
+          } else if sub.stripeStatus.isPaying {
+            fullPlanCount += 1
+            fullPlanAnnualCents += (sub.isLegacyPrice ? 500 : 1000) * 12
+          }
         }
       }
 

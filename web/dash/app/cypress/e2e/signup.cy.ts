@@ -104,23 +104,31 @@ describe(`payment`, () => {
     cy.contains(`Payment setup cancelled`);
   });
 
-  it(`fetching stripe url`, () => {
+  it(`fetching billing portal url`, () => {
     cy.simulateLoggedIn();
-    cy.interceptPql(`GetAccountOwner`, {
+    cy.interceptPql(`GetAccountOwner_v2`, {
       id: betsy.id,
       email: betsy.email,
-      plan: {
-        case: `full`,
-        status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-      },
       notifications: [],
       verifiedNotificationMethods: [],
     });
 
-    cy.interceptPql(`StripeUrl_v2`, { url: `/stripe-url` });
+    cy.interceptPql(`GetSubscriptionPanel`, {
+      planStatus: { case: `full`, status: `current` },
+      currentPeriodEnd: new Date().toISOString(),
+      primary: { case: `openBillingPortal`, config: `default` },
+      secondary: [],
+      availableTiers: [],
+    });
+
+    cy.interceptPql(`OpenBillingPortal`, { url: `/stripe-url` });
 
     cy.visit(`/settings`);
+    cy.contains(`Manage plan`).click();
     cy.contains(`Manage subscription`).click();
-    cy.contains(`Click here!`).should(`have.attr`, `href`, `/stripe-url`);
+
+    cy.wait(`@OpenBillingPortal`)
+      .its(`request.body`)
+      .should(`deep.eq`, { returnPath: `/settings`, configuration: `default` });
   });
 });

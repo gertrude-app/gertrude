@@ -109,9 +109,9 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public getAccountOwner = (
-    input: P.GetAccountOwner.Input,
-  ): Promise<Result<P.GetAccountOwner.Output>> => {
-    return this.query<P.GetAccountOwner.Output>(input, `GetAccountOwner`, `parent`);
+    input: P.GetAccountOwner_v2.Input,
+  ): Promise<Result<P.GetAccountOwner_v2.Output>> => {
+    return this.query<P.GetAccountOwner_v2.Output>(input, `GetAccountOwner_v2`, `parent`);
   };
 
   public getAdminKeychain = (
@@ -198,6 +198,16 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
+  public getSubscriptionPanel = (
+    input: P.GetSubscriptionPanel.Input,
+  ): Promise<Result<P.GetSubscriptionPanel.Output>> => {
+    return this.query<P.GetSubscriptionPanel.Output>(
+      input,
+      `GetSubscriptionPanel`,
+      `parent`,
+    );
+  };
+
   public getSuspendFilterRequest = (
     input: P.GetSuspendFilterRequest.Input,
   ): Promise<Result<P.GetSuspendFilterRequest.Output>> => {
@@ -276,6 +286,12 @@ export default class DashboardClient extends Client<Auth> {
       `MacAppConnectionCode`,
       `parent`,
     );
+  };
+
+  public openBillingPortal = (
+    input: P.OpenBillingPortal.Input,
+  ): Promise<Result<P.OpenBillingPortal.Output>> => {
+    return this.query<P.OpenBillingPortal.Output>(input, `OpenBillingPortal`, `parent`);
   };
 
   public prepIOSAppConnection = (
@@ -362,16 +378,20 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.Signup.Output>(input, `Signup`, `none`);
   };
 
+  public startCheckoutSession = (
+    input: P.StartCheckoutSession.Input,
+  ): Promise<Result<P.StartCheckoutSession.Output>> => {
+    return this.query<P.StartCheckoutSession.Output>(
+      input,
+      `StartCheckoutSession`,
+      `parent`,
+    );
+  };
+
   public startFullTrial = (
     input: P.StartFullTrial.Input,
   ): Promise<Result<P.StartFullTrial.Output>> => {
     return this.query<P.StartFullTrial.Output>(input, `StartFullTrial`, `parent`);
-  };
-
-  public stripeUrl = (
-    input: P.StripeUrl_v2.Input,
-  ): Promise<Result<P.StripeUrl_v2.Output>> => {
-    return this.query<P.StripeUrl_v2.Output>(input, `StripeUrl_v2`, `parent`);
   };
 
   public toggleChildKeychain = (
@@ -388,6 +408,16 @@ export default class DashboardClient extends Client<Auth> {
     input: P.UpdateIOSDevice.Input,
   ): Promise<Result<P.UpdateIOSDevice.Output>> => {
     return this.query<P.UpdateIOSDevice.Output>(input, `UpdateIOSDevice`, `parent`);
+  };
+
+  public upgradeSubscriptionTier = (
+    input: P.UpgradeSubscriptionTier.Input,
+  ): Promise<Result<P.UpgradeSubscriptionTier.Output>> => {
+    return this.query<P.UpgradeSubscriptionTier.Output>(
+      input,
+      `UpgradeSubscriptionTier`,
+      `parent`,
+    );
   };
 
   public upsertBlockRule = (

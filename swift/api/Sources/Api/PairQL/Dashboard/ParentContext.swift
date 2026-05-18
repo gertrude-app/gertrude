@@ -11,6 +11,11 @@ struct ParentContext: ResolverContext {
   @Dependency(\.db) var db
   @Dependency(\.env) var env
 
+  func currentBillingAccount() async throws -> BillingAccountSnapshot {
+    @Dependency(\.date.now) var now
+    return try await self.parent.billingAccountSnapshot(in: self.db, at: now)
+  }
+
   @discardableResult
   func verifiedChild(from id: Child.Id) async throws -> Child {
     try await Child.query()

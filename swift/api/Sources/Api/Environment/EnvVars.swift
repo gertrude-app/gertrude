@@ -50,6 +50,10 @@ public struct Env: Sendable {
 
   public struct Stripe: Sendable {
     public var secretKey: String
+    public var priceIdFull: String
+    public var priceIdLight: String
+    public var legacyPriceIdsFull: [String]
+    public var portalConfigIdLightTier: String
   }
 
   public struct Twilio: Sendable {
@@ -131,7 +135,16 @@ extension Env: DependencyKey {
         fromPhoneUS: processEnv("TWILIO_FROM_PHONE_US"),
         fromPhoneUK: processEnv("TWILIO_FROM_PHONE_UK"),
       ),
-      stripe: Stripe(secretKey: processEnv("STRIPE_SECRET_KEY")),
+      stripe: Stripe(
+        secretKey: processEnv("STRIPE_SECRET_KEY"),
+        priceIdFull: processEnv("STRIPE_PRICE_ID_FULL"),
+        priceIdLight: processEnv("STRIPE_PRICE_ID_LIGHT"),
+        legacyPriceIdsFull: processEnv("STRIPE_LEGACY_PRICE_IDS_FULL")
+          .split(separator: ",")
+          .map { $0.trimmingCharacters(in: .whitespaces) }
+          .filter { !$0.isEmpty },
+        portalConfigIdLightTier: processEnv("STRIPE_PORTAL_CONFIG_ID_LIGHT_TIER"),
+      ),
       appStoreConnect: AppStoreConnect(
         issuerId: processEnv("APPSTORE_ISSUER_ID"),
         keyId: processEnv("APPSTORE_KEY_ID"),

@@ -6,54 +6,65 @@ import XExpect
 @testable import Api
 
 final class StartFullTrialTests: ApiTestCase, @unchecked Sendable {
-  func testFreeUser_createsFullTrialingSubscription() async throws {
+  func testFreeUser_setsFullTrialStartedAtOnIdentity() async throws {
     let parent = try await self.parent()
 
     let output = try await StartFullTrial.resolve(in: parent.context)
 
     expect(output).toEqual(.success)
 
+    let identity = try await parent.model.billingIdentity(in: self.db)
+    let id = try XCTUnwrap(identity)
+    expect(id.fullTrialStartedAt).toEqual(.reference)
+
     let subscription = try await parent.model.subscription(in: self.db)
-    let sub = try XCTUnwrap(subscription)
-    expect(sub.tier).toEqual(.full)
-    expect(sub.billingStatus).toEqual(.trialing)
-    expect(sub.trialStartedAt).toEqual(.reference)
+    expect(subscription).toBeNil()
   }
 
-  func testLightUserNotTrialed_setsTrialStartedAt() async throws {
+  func testLightUser_setsTrialOnIdentityWithoutTouchingSubscription() async throws {
     let parent = try await self.parent()
-    try await self.db.create(Subscription(
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
+    try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .light,
-      billingStatus: .paid,
       stripeId: .init("sub_123"),
-      statusExpiresAt: .reference + .days(365),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(365),
     ))
 
     let output = try await StartFullTrial.resolve(in: parent.context)
 
     expect(output).toEqual(.success)
 
-    let subscription = try await parent.model.subscription(in: self.db)
-    let sub = try XCTUnwrap(subscription)
+    let identity = try await parent.model.billingIdentity(in: self.db)
+    let id = try XCTUnwrap(identity)
+    expect(id.fullTrialStartedAt).toEqual(.reference)
+
+    let subOpt = try await parent.model.subscription(in: self.db)
+    let sub = try XCTUnwrap(subOpt)
     expect(sub.tier).toEqual(.light)
-    expect(sub.billingStatus).toEqual(.paid)
-    expect(sub.trialStartedAt).toEqual(.reference)
+    expect(sub.stripeStatus).toEqual(.active)
   }
 
-  func testLightUserAlreadyTrialed_throwsError() async throws {
+  func testAlreadyTrialed_throwsError() async throws {
     let parent = try await self.parent()
-    try await self.db.create(Subscription(
+    try await self.db.create(BillingIdentity(
       parentId: parent.id,
-      tier: .light,
-      billingStatus: .paid,
-      stripeId: .init("sub_123"),
-      trialStartedAt: .reference - .days(60),
-      statusExpiresAt: .reference + .days(365),
+      fullTrialStartedAt: .reference - .days(60),
     ))
 
     try await expectErrorFrom {
       try await StartFullTrial.resolve(in: parent.context)
     }.toContain("Trial already used")
+  }
+
+  func testStandaloneTrialPanelShowsFullTrialNotFull() async throws {
+    let parent = try await self.parent()
+    _ = try await StartFullTrial.resolve(in: parent.context)
+
+    let panel = try await GetSubscriptionPanel.resolve(in: parent.context)
+    expect(panel.planStatus).toEqual(.fullTrial(until: .reference + .days(21)))
+    expect(panel.primary).toEqual(.startCheckout(tier: .full))
+    expect(panel.secondary).toEqual([.startCheckout(tier: .light)])
   }
 }

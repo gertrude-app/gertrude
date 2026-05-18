@@ -8,15 +8,9 @@ struct MacAppConnectionCode: Pair {
     var childId: Child.Id
   }
 
-  enum Gate: String, PairNestable {
-    case trialRequired
-    case planUpgradeRequired
-    case subscriptionFixRequired
-  }
-
   struct Output: PairOutput {
     var code: Int
-    var gate: Gate?
+    var gate: MacAppConnectionGate?
   }
 }
 
@@ -25,33 +19,51 @@ struct MacAppConnectionCode: Pair {
 extension MacAppConnectionCode: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let child = try await context.verifiedChild(from: input.childId)
-    let subscription = try await context.parent.subscription(in: context.db)
+    let billing = try await context.currentBillingAccount()
     let code = await with(dependency: \.ephemeral).createPendingAppConnection(child.id)
-    let plan = Plan(subscription: subscription, now: get(dependency: \.date.now))
+    return .init(code: code, gate: billing.macAppConnectionGate)
+  }
+}
 
-    switch plan {
-    case .full(.complimentary), .full(.trialing), .full(.paid):
-      return .init(code: code, gate: nil)
-    case .full(.trialExpired(kind: .fromLight)):
-      return .init(code: code, gate: .planUpgradeRequired)
-    case .full(.trialExpired(kind: .fromLapsedLight)):
-      return .init(code: code, gate: .subscriptionFixRequired)
-    case .full(.overdue), .full(.trialExpired):
-      return .init(code: code, gate: .subscriptionFixRequired)
-    case .light(.paid(_, hasTrialedFull: false)):
-      return .init(code: code, gate: .trialRequired)
-    case .light(.paid(_, hasTrialedFull: true)):
-      return .init(code: code, gate: .planUpgradeRequired)
-    case .light(.overdue):
-      return .init(code: code, gate: .subscriptionFixRequired)
-    case .free(.standard):
-      return .init(code: code, gate: .trialRequired)
-    case .free(.lapsedFull):
-      return .init(code: code, gate: .subscriptionFixRequired)
-    case .free(.lapsedLight(_, hasTrialedFull: false)):
-      return .init(code: code, gate: .trialRequired)
-    case .free(.lapsedLight(_, hasTrialedFull: true)):
-      return .init(code: code, gate: .planUpgradeRequired)
+// extensions
+
+enum MacAppConnectionGate: String, Codable, Equatable, Sendable {
+  case trialRequired
+  case planUpgradeRequired
+  case subscriptionFixRequired
+}
+
+extension BillingAccountSnapshot {
+  var macAppConnectionGate: MacAppConnectionGate? {
+    let trialedFull = self.billingIdentity?.fullTrialStartedAt != nil
+    let hasHistory = self.billingIdentity?.lastStripeSubscriptionId != nil
+
+    switch self.planStatus {
+    case .complimentary, .full(.current), .fullTrial:
+      return nil
+
+    case .full(.pastDue):
+      return .subscriptionFixRequired
+
+    case .fullTrialGrace:
+      return self.stripeSubscription?.tier == .light
+        ? .planUpgradeRequired
+        : .subscriptionFixRequired
+
+    case .light(.pastDue):
+      return .subscriptionFixRequired
+
+    case .light(.current):
+      return trialedFull ? .planUpgradeRequired : .trialRequired
+
+    case .free:
+      if !hasHistory {
+        return .trialRequired
+      }
+      if self.billingIdentity?.lastPaidTier == .full {
+        return .subscriptionFixRequired
+      }
+      return trialedFull ? .planUpgradeRequired : .trialRequired
     }
   }
 }

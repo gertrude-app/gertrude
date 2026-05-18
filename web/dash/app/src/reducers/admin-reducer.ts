@@ -4,7 +4,7 @@ import type { NotificationUpdate } from '@dash/components';
 import type {
   AdminNotification,
   CreatePendingNotificationMethod,
-  GetAccountOwner,
+  GetAccountOwner_v2,
   NewAdminNotificationMethodEvent,
   PendingNotificationMethod,
   VerifiedNotificationMethod,
@@ -22,7 +22,7 @@ export type State = {
 };
 
 type Action =
-  | { type: `receivedAccountOwner`; accountOwner: GetAccountOwner.Output }
+  | { type: `receivedAccountOwner`; accountOwner: GetAccountOwner_v2.Output }
   | { type: `notificationCreated`; id: UUID; methodId?: UUID }
   | { type: `newNotificationMethodEvent`; event: NewAdminNotificationMethodEvent }
   | { type: `updateNotification`; update: NotificationUpdate };
