@@ -31,6 +31,7 @@ import SuperviseDeviceDone from './components/routes/SuperviseDevice/Done';
 import SuperviseDeviceDownloadHelper from './components/routes/SuperviseDevice/DownloadHelper';
 import SuperviseDeviceLaunchHelper from './components/routes/SuperviseDevice/LaunchHelper';
 import SuperviseDevicePayment from './components/routes/SuperviseDevice/Payment';
+import RequirePaidSupervision from './components/routes/SuperviseDevice/RequirePaidSupervision';
 import SuperviseDeviceSupervise from './components/routes/SuperviseDevice/Supervise';
 import SuspendFilter from './components/routes/SuspendFilter';
 import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequests';
@@ -74,10 +75,12 @@ const App: React.FC = () => {
         <Route path="supervise-device/:code" element={<SuperviseDevice />}>
           <Route path="claim" element={<SuperviseDeviceClaim />} />
           <Route path="payment" element={<SuperviseDevicePayment />} />
-          <Route path="download-helper" element={<SuperviseDeviceDownloadHelper />} />
-          <Route path="launch-helper" element={<SuperviseDeviceLaunchHelper />} />
-          <Route path="supervise" element={<SuperviseDeviceSupervise />} />
-          <Route path="done" element={<SuperviseDeviceDone />} />
+          <Route element={<RequirePaidSupervision />}>
+            <Route path="download-helper" element={<SuperviseDeviceDownloadHelper />} />
+            <Route path="launch-helper" element={<SuperviseDeviceLaunchHelper />} />
+            <Route path="supervise" element={<SuperviseDeviceSupervise />} />
+            <Route path="done" element={<SuperviseDeviceDone />} />
+          </Route>
         </Route>
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
         <Route path="/checkout-cancel" element={<CheckoutCancel />} />
