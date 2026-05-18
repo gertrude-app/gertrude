@@ -109,4 +109,29 @@ final class LogFilterEventsResolverTests: ApiTestCase, @unchecked Sendable {
       .all(in: self.db)
     expect(announcementsAfter.count).toEqual(1)
   }
+
+  func testNoScreenTimeWarningEmailWhenFilteringDisabled() async throws {
+    let child = try await self.child(with: {
+      $0.filteringDisabled = true
+    }).withDevice()
+    let input = FilterLogs(
+      bundleIds: [:],
+      events: [.init(id: "933aa385", detail: "Screen Time web filter detected"): 1],
+    )
+
+    _ = try await LogFilterEvents.resolve(with: input, in: child.context)
+
+    expect(self.sent.emails.count).toEqual(0)
+
+    let emailSentEvents = try await InterestingEvent.query()
+      .where(.eventId == "screentime-email-sent")
+      .where(.computerUserId == child.computerUser.id)
+      .all(in: self.db)
+    expect(emailSentEvents.isEmpty).toEqual(true)
+
+    let announcements = try await DashAnnouncement.query()
+      .where(.parentId == child.parent.model.id)
+      .all(in: self.db)
+    expect(announcements.isEmpty).toEqual(true)
+  }
 }
