@@ -136,6 +136,8 @@ func notifyScreenTimeConflict(
   in context: MacApp.ChildContext,
 ) async {
   do {
+    guard context.child.filteringDisabled == false else { return }
+
     let existing = try await InterestingEvent.query()
       .where(.eventId == "screentime-email-sent")
       .where(.computerUserId == computerUser.id)
