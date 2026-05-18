@@ -870,3 +870,148 @@ extension ApiClient.UploadScreenshotData {
     )
   }
 }
+
+final class ScreenshotTimerControllerTests: XCTestCase {
+  @MainActor
+  func testFirstFiresAfterIntervalThenPeriodicallyUntilStopped() async {
+    let scheduler = DispatchQueue.test
+    let controller = ScreenshotTimerController()
+    let fires = LockIsolated(0)
+    let running = Task {
+      await controller.reconfigure(
+        intervalSec: 60,
+        scheduler: scheduler.eraseToAnyScheduler(),
+      ) { fires.withValue { $0 += 1 } }
+    }
+    await Task.repeatYield()
+
+    expect(fires).toEqual(0)
+
+    await scheduler.advance(by: .seconds(59))
+    await Task.repeatYield()
+    expect(fires).toEqual(0)
+
+    await scheduler.advance(by: .seconds(1))
+    await Task.repeatYield()
+    expect(fires).toEqual(1)
+
+    await scheduler.advance(by: .seconds(120))
+    await Task.repeatYield()
+    expect(fires).toEqual(3)
+
+    await controller.stop()
+    await scheduler.advance(by: .seconds(600))
+    await Task.repeatYield()
+    expect(fires).toEqual(3)
+
+    running.cancel()
+  }
+
+  @MainActor
+  func testRapidSameIntervalReconfiguresKeepExactlyOneTimer() async {
+    let scheduler = DispatchQueue.test
+    let controller = ScreenshotTimerController()
+    let fires = LockIsolated(0)
+    let flurry = (1 ... 10).map { _ in
+      Task {
+        await controller.reconfigure(
+          intervalSec: 60,
+          scheduler: scheduler.eraseToAnyScheduler(),
+        ) { fires.withValue { $0 += 1 } }
+      }
+    }
+    await Task.repeatYield(count: 50)
+
+    await scheduler.advance(by: .seconds(60))
+    await Task.repeatYield()
+    expect(fires).toEqual(1)
+
+    await scheduler.advance(by: .seconds(60))
+    await Task.repeatYield()
+    expect(fires).toEqual(2)
+
+    await controller.stop()
+    await scheduler.advance(by: .seconds(600))
+    await Task.repeatYield()
+    expect(fires).toEqual(2)
+
+    flurry.forEach { $0.cancel() }
+  }
+
+  @MainActor
+  func testReconfigureToNewIntervalReplacesTimerWithNoOverlap() async {
+    let scheduler = DispatchQueue.test
+    let controller = ScreenshotTimerController()
+    let fires = LockIsolated(0)
+    let first = Task {
+      await controller.reconfigure(
+        intervalSec: 60,
+        scheduler: scheduler.eraseToAnyScheduler(),
+      ) { fires.withValue { $0 += 1 } }
+    }
+    await Task.repeatYield()
+    await scheduler.advance(by: .seconds(60))
+    await Task.repeatYield()
+    expect(fires).toEqual(1)
+
+    let second = Task {
+      await controller.reconfigure(
+        intervalSec: 30,
+        scheduler: scheduler.eraseToAnyScheduler(),
+      ) { fires.withValue { $0 += 1 } }
+    }
+    await Task.repeatYield(count: 30)
+
+    await scheduler.advance(by: .seconds(30))
+    await Task.repeatYield()
+    expect(fires).toEqual(2)
+
+    await scheduler.advance(by: .seconds(30))
+    await Task.repeatYield()
+    expect(fires).toEqual(3)
+
+    await controller.stop()
+    await scheduler.advance(by: .seconds(600))
+    await Task.repeatYield()
+    expect(fires).toEqual(3)
+
+    first.cancel()
+    second.cancel()
+  }
+
+  @MainActor
+  func testStopRacingReconfigureLeavesNoOrphanTimer() async {
+    for _ in 0 ..< 25 {
+      let scheduler = DispatchQueue.test
+      let controller = ScreenshotTimerController()
+      let fires = LockIsolated(0)
+
+      let r0 = Task {
+        await controller.reconfigure(
+          intervalSec: 60,
+          scheduler: scheduler.eraseToAnyScheduler(),
+        ) { fires.withValue { $0 += 1 } }
+      }
+      await Task.repeatYield()
+
+      let s = Task { await controller.stop() }
+      let r1 = Task {
+        await controller.reconfigure(
+          intervalSec: 30,
+          scheduler: scheduler.eraseToAnyScheduler(),
+        ) { fires.withValue { $0 += 1 } }
+      }
+      await Task.repeatYield(count: 40)
+
+      await controller.stop()
+      let settled = fires.value
+      await scheduler.advance(by: .seconds(600))
+      await Task.repeatYield()
+      expect(fires).toEqual(settled)
+
+      r0.cancel()
+      s.cancel()
+      r1.cancel()
+    }
+  }
+}
