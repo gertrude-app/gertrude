@@ -3,35 +3,103 @@ import { Result } from '@shared/pairql';
 import { parseE164, prettyE164 } from '@shared/phone-numbers';
 import { capitalize } from '@shared/string';
 import { notNullish, typesafe } from '@shared/ts-utils';
-import React, { useReducer, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useEffect, useReducer, useState } from 'react';
+import toast from 'react-hot-toast';
 import { v4 as uuid } from 'uuid';
 import type { State } from '../../reducers/admin-reducer';
 import type { NewMethod } from '@dash/components';
-import type { VerifiedNotificationMethod } from '@dash/types';
+import type {
+  SubscriptionPanelAction,
+  SubscriptionTier,
+  VerifiedNotificationMethod,
+} from '@dash/types';
 import Current from '../../environment';
 import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
-import ReqState from '../../lib/ReqState';
 import { Req, isDirty } from '../../lib/helpers';
 import reducer, { initialState } from '../../reducers/admin-reducer';
 
 const AdminSettings: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [newMethodId, setNewMethodId] = useState<NewMethod | undefined>(undefined);
-  const [searchParams] = useSearchParams();
-  const requestedTier = searchParams.get(`plan`) as `full` | `light` | null;
+  const [pendingPanelAction, setPendingPanelAction] = useState<
+    SubscriptionPanelAction | undefined
+  >(undefined);
 
   const query = useQuery(Key.accountOwner, Current.api.getAccountOwner, {
     onReceive: (accountOwner) => dispatch({ type: `receivedAccountOwner`, accountOwner }),
   });
 
-  const getStripeUrl = useMutation((tier: `full` | `light` | null) =>
-    Current.api.stripeUrl({
-      successPath: `/checkout-success`,
-      cancelPath: `/checkout-cancel`,
-      tier: tier ?? undefined,
-    }),
+  const panelQuery = useQuery(Key.subscriptionPanel, () =>
+    Current.api.getSubscriptionPanel(undefined),
   );
+
+  const startCheckout = useMutation(
+    ({ tier }: { tier: SubscriptionTier }) =>
+      Current.api.startCheckoutSession({
+        tier,
+        successPath: `/checkout-success`,
+        cancelPath: `/checkout-cancel`,
+      }),
+    {
+      onError: () => {
+        setPendingPanelAction(undefined);
+        toast.error(`Failed to open Stripe. Please try again.`);
+      },
+    },
+  );
+
+  const openBillingPortal = useMutation(
+    ({ configuration }: { configuration: `lightTier` | `default` }) =>
+      Current.api.openBillingPortal({
+        returnPath: `/settings`,
+        configuration,
+      }),
+    {
+      onError: () => {
+        setPendingPanelAction(undefined);
+        toast.error(`Failed to open Stripe. Please try again.`);
+      },
+    },
+  );
+
+  const upgradeSubscriptionTier = useMutation(
+    ({ to }: { to: SubscriptionTier }) => Current.api.upgradeSubscriptionTier({ to }),
+    {
+      invalidating: [Key.subscriptionPanel],
+      onSuccess: () => {
+        setPendingPanelAction(undefined);
+        toast.success(`Plan updated!`);
+      },
+      onError: () => {
+        setPendingPanelAction(undefined);
+        toast.error(`Failed to update plan. Please try again.`);
+      },
+    },
+  );
+
+  const startFullTrial = useMutation(() => Current.api.startFullTrial(undefined), {
+    invalidating: [Key.subscriptionPanel],
+    onSuccess: () => {
+      setPendingPanelAction(undefined);
+      toast.success(`Free trial started!`);
+    },
+    onError: () => {
+      setPendingPanelAction(undefined);
+      toast.error(`Failed to start trial. Please try again.`);
+    },
+  });
+
+  useEffect(() => {
+    if (startCheckout.isSuccess) {
+      window.location.href = startCheckout.data.url;
+    }
+  }, [startCheckout.isSuccess, startCheckout.data?.url]);
+
+  useEffect(() => {
+    if (openBillingPortal.isSuccess) {
+      window.location.href = openBillingPortal.data.url;
+    }
+  }, [openBillingPortal.isSuccess, openBillingPortal.data?.url]);
 
   const deleteNotification = useConfirmableDelete(`parentNotification`, {
     invalidating: [Key.accountOwner],
@@ -100,7 +168,7 @@ const AdminSettings: React.FC = () => {
     },
   );
 
-  if (query.isPending) {
+  if (query.isPending || panelQuery.isPending) {
     return <Loading />;
   }
 
@@ -108,16 +176,43 @@ const AdminSettings: React.FC = () => {
     return <ApiErrorMessage error={query.error} />;
   }
 
+  if (panelQuery.isError) {
+    return <ApiErrorMessage error={panelQuery.error} />;
+  }
+
   const accountOwner = query.data;
   const notificationProps = makeNotificationProps(state, saveNotification.isPending);
+
+  const handleSubscriptionPanelAction = (action: SubscriptionPanelAction): void => {
+    switch (action.case) {
+      case `startCheckout`:
+      case `reactivateViaCheckout`:
+        setPendingPanelAction(action);
+        startCheckout.mutate({ tier: action.tier });
+        return;
+      case `openBillingPortal`:
+        setPendingPanelAction(action);
+        openBillingPortal.mutate({ configuration: action.config });
+        return;
+      case `upgradeSubscriptionTier`:
+        setPendingPanelAction(action);
+        upgradeSubscriptionTier.mutate({ to: action.to });
+        return;
+      case `startFullTrial`:
+        setPendingPanelAction(action);
+        startFullTrial.mutate(undefined);
+        return;
+    }
+  };
 
   return (
     <Settings
       newMethodId={newMethodId}
       setNewMethodId={setNewMethodId}
       email={accountOwner.email}
-      plan={accountOwner.plan}
-      billingPortalRequest={ReqState.fromMutation(getStripeUrl)}
+      subscriptionPanel={panelQuery.data}
+      onSubscriptionPanelAction={handleSubscriptionPanelAction}
+      pendingSubscriptionPanelAction={pendingPanelAction}
       methods={typesafe.objectValues(state.notificationMethods).map((method) => ({
         id: method.id,
         method: method.config.case,
@@ -139,8 +234,6 @@ const AdminSettings: React.FC = () => {
       createNotification={(methodId) =>
         dispatch({ type: `notificationCreated`, id: uuid(), methodId })
       }
-      requestedTier={requestedTier}
-      manageSubscription={() => getStripeUrl.mutate(requestedTier)}
       newMethodEventHandler={(event) => {
         switch (event.type) {
           case `sendCodeClicked`:

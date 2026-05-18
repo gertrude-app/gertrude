@@ -248,12 +248,13 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
   // helpers
 
   func addFullPaidSubscription(for parentId: Parent.Id) async throws {
-    try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parentId))
+    try await self.db.create(StripeSubscription(
       parentId: parentId,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_test"),
-      statusExpiresAt: .distantFuture,
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
     ))
   }
 

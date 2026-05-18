@@ -55,18 +55,29 @@ extension ParentsList: Resolver {
     // TODO: shouldn't have to do this, shared query should handle
     // @see https://github.com/gertrude-app/gertrude/issues/478
     let parentIds = parents.map(\.id)
-    let subscriptions = try await Subscription.query()
+    let subscriptions = try await StripeSubscription.query()
       .where(.parentId |=| parentIds)
       .all(in: context.db)
     let subscriptionMap = Dictionary(uniqueKeysWithValues: subscriptions.map { ($0.parentId, $0) })
 
+    let identityMap = try await BillingIdentity.query()
+      .where(.parentId |=| parentIds)
+      .all(in: context.db)
+      .reduce(into: [Parent.Id: BillingIdentity]()) { $0[$1.parentId] = $1 }
+
     let analyticsData = try await AnalyticsQuery.shared.data()
+    @Dependency(\.date.now) var now
 
     let summaries = parents.map { parent -> ParentSummary in
       let parentData = analyticsData.parents[parent.id]
+      let identity = identityMap[parent.id] ?? BillingIdentity(parentId: parent.id)
       let subscription = subscriptionMap[parent.id]
-      let plan = Plan(subscription: subscription)
-      let (planCase, subscriptionStatus) = self.planDisplay(plan, subscription)
+      let billing = BillingAccountSnapshot(
+        billingIdentity: identity,
+        stripeSubscription: subscription,
+        date: now,
+      )
+      let (planCase, subscriptionStatus) = self.planDisplay(billing.planStatus, subscription)
       return ParentSummary(
         id: parent.id,
         email: parent.email.rawValue,
@@ -89,40 +100,32 @@ extension ParentsList: Resolver {
   }
 
   private static func planDisplay(
-    _ plan: Plan,
-    _ subscription: Subscription?,
+    _ planStatus: PlanStatus,
+    _ subscription: StripeSubscription?,
   ) -> (planCase: String, subscriptionStatus: String) {
-    switch plan {
+    switch planStatus {
     case .free:
-      ("free", "free")
-    case .light(.paid):
-      ("light", "paid")
-    case .light(.overdue):
-      ("light", "overdue")
-    case .full(.complimentary):
-      ("full", "complimentary")
-    case .full(.trialing(let kind, _)):
-      switch kind {
-      case .full:
-        ("full", "trialing")
-      case .fromLight:
-        ("light", "trialingFull")
-      case .fromLapsedLight:
-        ("light", "trialingFullLapsed")
+      return ("free", "free")
+    case .light(.current):
+      return ("light", "paid")
+    case .light(.pastDue):
+      return ("light", "overdue")
+    case .fullTrial:
+      if let sub = subscription, sub.tier == .light {
+        return ("light", "trialingFull")
       }
-    case .full(.trialExpired(let kind)):
-      switch kind {
-      case .full:
-        ("full", "trialExpired")
-      case .fromLight:
-        ("light", "trialExpired")
-      case .fromLapsedLight:
-        ("light", "trialExpiredLapsed")
+      return ("full", "trialing")
+    case .fullTrialGrace:
+      if let sub = subscription, sub.tier == .light {
+        return ("light", "trialExpired")
       }
-    case .full(.paid):
-      ("full", "paid")
-    case .full(.overdue):
-      ("full", "overdue")
+      return ("full", "trialExpired")
+    case .full(.current):
+      return ("full", "paid")
+    case .full(.pastDue):
+      return ("full", "overdue")
+    case .complimentary:
+      return ("full", "complimentary")
     }
   }
 }

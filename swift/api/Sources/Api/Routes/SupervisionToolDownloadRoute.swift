@@ -24,8 +24,11 @@ enum SupervisionToolDownloadRoute {
       throw Abort(.badRequest, reason: "Device not claimed")
     }
     let parent = try await child.parent(in: request.context.db)
-    let plan = try await parent.plan(in: request.context.db)
-    guard plan.allowsSupervision else {
+    let account = try await parent.billingAccountSnapshot(
+      in: request.context.db,
+      at: with(dependency: \.date.now),
+    )
+    guard account.can(.superviseIosDevice) else {
       throw Abort(.paymentRequired, reason: "Subscription required")
     }
 

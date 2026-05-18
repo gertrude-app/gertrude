@@ -10,7 +10,7 @@ enum AuthedParentRoute: PairRoute {
   case deleteActivityItems_v2(DeleteActivityItems_v2.Input)
   case deleteEntity_v2(DeleteEntity_v2.Input)
   case flagActivityItems(FlagActivityItems.Input)
-  case getAccountOwner
+  case getAccountOwnerV2
   case getAdminKeychain(GetAdminKeychain.Input)
   case getAdminKeychains
   case getAllDevices
@@ -40,9 +40,12 @@ enum AuthedParentRoute: PairRoute {
   case saveNotification(SaveNotification.Input)
   case saveUser(SaveUser.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
-  case stripeUrl_v2(StripeUrl_v2.Input)
+  case getSubscriptionPanel
+  case openBillingPortal(OpenBillingPortal.Input)
+  case startCheckoutSession(StartCheckoutSession.Input)
   case securityEventsFeed
   case startFullTrial
+  case upgradeSubscriptionTier(UpgradeSubscriptionTier.Input)
   case updateUnlockRequest(UpdateUnlockRequest.Input)
   case requestPublicKeychain(RequestPublicKeychain.Input)
   case upsertBlockRule(UpsertBlockRule.Input)
@@ -94,8 +97,8 @@ extension AuthedParentRoute {
           Operation(FlagActivityItems.self)
           Body(.dashboardInput(FlagActivityItems.self))
         }
-        Route(.case(Self.getAccountOwner)) {
-          Operation(GetAccountOwner.self)
+        Route(.case(Self.getAccountOwnerV2)) {
+          Operation(GetAccountOwner_v2.self)
         }
         Route(.case(Self.getAdminKeychain)) {
           Operation(GetAdminKeychain.self)
@@ -198,9 +201,20 @@ extension AuthedParentRoute {
           Operation(SaveUser.self)
           Body(.dashboardInput(SaveUser.self))
         }
-        Route(.case(Self.stripeUrl_v2)) {
-          Operation(StripeUrl_v2.self)
-          Body(.dashboardInput(StripeUrl_v2.self))
+        Route(.case(Self.getSubscriptionPanel)) {
+          Operation(GetSubscriptionPanel.self)
+        }
+        Route(.case(Self.openBillingPortal)) {
+          Operation(OpenBillingPortal.self)
+          Body(.dashboardInput(OpenBillingPortal.self))
+        }
+        Route(.case(Self.startCheckoutSession)) {
+          Operation(StartCheckoutSession.self)
+          Body(.dashboardInput(StartCheckoutSession.self))
+        }
+        Route(.case(Self.upgradeSubscriptionTier)) {
+          Operation(UpgradeSubscriptionTier.self)
+          Body(.dashboardInput(UpgradeSubscriptionTier.self))
         }
         Route(.case(Self.securityEventsFeed)) {
           Operation(SecurityEventsFeed.self)
@@ -290,8 +304,8 @@ extension AuthedParentRoute: RouteResponder {
     case .combinedUsersActivityFeed(let input):
       let output = try await CombinedUsersActivityFeed.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .getAccountOwner:
-      let output = try await GetAccountOwner.resolve(in: context)
+    case .getAccountOwnerV2:
+      let output = try await GetAccountOwner_v2.resolve(in: context)
       return try await self.respond(with: output)
     case .logEvent(let input):
       let output = try await LogEvent.resolve(with: input, in: context)
@@ -365,8 +379,17 @@ extension AuthedParentRoute: RouteResponder {
     case .saveKey(let input):
       let output = try await SaveKey.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .stripeUrl_v2(let input):
-      let output = try await StripeUrl_v2.resolve(with: input, in: context)
+    case .getSubscriptionPanel:
+      let output = try await GetSubscriptionPanel.resolve(in: context)
+      return try await self.respond(with: output)
+    case .openBillingPortal(let input):
+      let output = try await OpenBillingPortal.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .startCheckoutSession(let input):
+      let output = try await StartCheckoutSession.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .upgradeSubscriptionTier(let input):
+      let output = try await UpgradeSubscriptionTier.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .securityEventsFeed:
       let output = try await SecurityEventsFeed.resolve(in: context)

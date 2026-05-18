@@ -74,14 +74,38 @@ extension Parent {
       .all(in: db)
   }
 
-  func subscription(in db: any DuetSQL.Client) async throws -> Subscription? {
-    try? await Subscription.query()
+  func subscription(in db: any DuetSQL.Client) async throws -> StripeSubscription? {
+    try? await StripeSubscription.query()
       .where(.parentId == self.id)
       .first(in: db)
   }
 
-  func plan(in db: any DuetSQL.Client) async throws -> Plan {
-    try await .init(subscription: self.subscription(in: db))
+  func billingIdentity(in db: any DuetSQL.Client) async throws -> BillingIdentity? {
+    try? await BillingIdentity.query()
+      .where(.parentId == self.id)
+      .first(in: db)
+  }
+
+  func billingAccountSnapshot(
+    in db: any DuetSQL.Client,
+    at date: Date,
+  ) async throws -> BillingAccountSnapshot {
+    async let identity = self.billingIdentity(in: db)
+    async let subscription = self.subscription(in: db)
+    return try await BillingAccountSnapshot(
+      billingIdentity: identity,
+      stripeSubscription: subscription,
+      date: date,
+    )
+  }
+
+  @discardableResult
+  func ensureBillingIdentity(in db: any DuetSQL.Client) async throws -> BillingIdentity {
+    if let existing = try await self.billingIdentity(in: db) {
+      return existing
+    }
+    let identity = BillingIdentity(parentId: self.id)
+    return try await db.create(identity)
   }
 
   func adminSiteLink(_ kind: AdminLink.Kind) -> String {

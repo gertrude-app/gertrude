@@ -107,7 +107,6 @@ final class EnumCodableFixtureTests: XCTestCase {
   func testRoundTripCanaries() throws {
     let date = Date(timeIntervalSince1970: 1_700_000_000)
     let childId = Child.Id(UUID(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!)
-    let stripeId = Subscription.StripeId("sub_123")
     let ssId = Api.Screenshot.Id(UUID(uuidString: "00000000-0000-0000-0000-000000000005")!)
     try self.assertRoundTrip(ClaimIOSDevice.ChildAssignment.existingChild(id: childId))
     try self.assertRoundTrip(DecideFilterSuspensionRequest.Decision.accepted(
@@ -121,13 +120,14 @@ final class EnumCodableFixtureTests: XCTestCase {
     )))
     try self.assertRoundTrip(ChildComputerStatus.filterSuspended(resuming: date))
     try self.assertRoundTrip(ChildComputerStatus.offline)
-    try self.assertRoundTrip(Plan.free(kind: .standard))
-    try self.assertRoundTrip(Plan.full(status: .complimentary))
-    try self.assertRoundTrip(Plan.FreeKind.lapsedLight(stripeId: stripeId, hasTrialedFull: true))
-    try self.assertRoundTrip(BillingStatus.Full.paid(stripeId: stripeId, monthlyPriceInCents: 1299))
-    try self.assertRoundTrip(BillingStatus.Full.TrialKind.fromLight(stripeId: stripeId))
-    try self.assertRoundTrip(BillingStatus.Full.TrialKind.fromLapsedLight(stripeId: stripeId))
-    try self.assertRoundTrip(BillingStatus.Light.paid(stripeId: stripeId, hasTrialedFull: false))
+    try self.assertRoundTrip(PlanStatus.free)
+    try self.assertRoundTrip(PlanStatus.complimentary)
+    try self.assertRoundTrip(PlanStatus.fullTrial(until: date))
+    try self.assertRoundTrip(PlanStatus.light(status: .current))
+    try self.assertRoundTrip(PlanStatus.full(status: .pastDue))
+    try self.assertRoundTrip(GetSubscriptionPanel.Action.startCheckout(tier: .full))
+    try self.assertRoundTrip(GetSubscriptionPanel.Action.upgradeSubscriptionTier(to: .full))
+    try self.assertRoundTrip(GetSubscriptionPanel.Action.startFullTrial)
   }
 
   private func assertRoundTrip<T: Codable & Equatable>(_ value: T) throws {

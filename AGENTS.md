@@ -88,7 +88,7 @@ Supports all 3 apps, plus dashboard and admin websites
 - only commit after running `just fix` and relevant test scripts
 - when making git commits, read last 10 commits to match style
 - all lowercase commits, with a short prefix, e.g. `dash: fix bug in xyz`
-- before opening a PR, run `just ci-local` and make sure it passes
+- before opening a PR, ensure `just fix` and targeted tests pass, then reserve `just ci-local` for the final pre-PR verification run; prefer the human to run it unless explicitly asked otherwise
 - when opening PRs, make title match commit style, and create with EMPTY body
 - commit messages MUST BE all lowercase
 

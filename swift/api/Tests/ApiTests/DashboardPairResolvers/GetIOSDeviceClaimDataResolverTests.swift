@@ -22,12 +22,13 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
 
   func testClaimedBySameParent_paidPlan_notSupervised_resumesAtDownloadHelper() async throws {
     let parent = try await self.parent()
-    try await self.db.create(Subscription(
+    _ = try? await self.db.create(BillingIdentity(parentId: parent.id))
+    try await self.db.create(StripeSubscription(
       parentId: parent.id,
       tier: .full,
-      billingStatus: .paid,
       stripeId: .init("sub_123"),
-      statusExpiresAt: .reference + .days(365),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
     ))
     let (_, code) = try await self.claimedDevice(for: parent)
 

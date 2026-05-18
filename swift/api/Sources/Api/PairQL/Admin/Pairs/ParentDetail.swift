@@ -15,11 +15,20 @@ struct ParentDetail: Pair {
     var id: Parent.Id
     var email: String
     var status: String
-    var plan: Plan
+    var planStatus: PlanStatus
+    var subscription: SubscriptionOutput?
     var createdAt: Date
     var children: [ChildOutput]
     var keychains: [KeychainOutput]
     var notifications: [NotificationOutput]
+  }
+
+  struct SubscriptionOutput: PairNestable {
+    var tier: StripeSubscription.Tier
+    var stripeStatus: StripeSubscription.StripeStatus
+    var stripeId: String
+    var currentPeriodEnd: Date
+    var isLegacyPrice: Bool
   }
 
   struct ChildOutput: PairNestable {
@@ -77,7 +86,8 @@ struct ParentDetail: Pair {
 
 extension ParentDetail: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
-    let parent = try await ParentWithSubscription.find(.init(input.id), in: context.db)
+    let parent = try await context.db.find(Parent.Id(input.id)) as Parent
+    let subscription = try await parent.subscription(in: context.db)
 
     let children = try await Child.query()
       .where(.parentId == parent.id)
@@ -199,11 +209,24 @@ extension ParentDetail: Resolver {
     let parentData = analyticsData.parents[parent.id]
     let status = parentData?.status.rawValue ?? "unknown"
 
+    @Dependency(\.date.now) var now
+    let billing = try await parent.billingAccountSnapshot(in: context.db, at: now)
+    let subscriptionOutput = subscription.map {
+      SubscriptionOutput(
+        tier: $0.tier,
+        stripeStatus: $0.stripeStatus,
+        stripeId: $0.stripeId.rawValue,
+        currentPeriodEnd: $0.currentPeriodEnd,
+        isLegacyPrice: $0.isLegacyPrice,
+      )
+    }
+
     return .init(
       id: parent.id,
       email: parent.email.rawValue,
       status: status,
-      plan: Plan(subscription: parent.subscription),
+      planStatus: billing.planStatus,
+      subscription: subscriptionOutput,
       createdAt: parent.createdAt,
       children: childOutputs,
       keychains: keychainOutputs,

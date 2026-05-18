@@ -46,8 +46,8 @@ export function interceptPql(
   output: T.FlagActivityItems.Output,
 ): void;
 export function interceptPql(
-  slug: `GetAccountOwner`,
-  output: T.GetAccountOwner.Output,
+  slug: `GetAccountOwner_v2`,
+  output: T.GetAccountOwner_v2.Output,
 ): void;
 export function interceptPql(
   slug: `GetAdminKeychain`,
@@ -81,6 +81,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetSelectableKeychains`,
   output: T.GetSelectableKeychains.Output,
+): void;
+export function interceptPql(
+  slug: `GetSubscriptionPanel`,
+  output: T.GetSubscriptionPanel.Output,
 ): void;
 export function interceptPql(
   slug: `GetSuspendFilterRequest`,
@@ -117,6 +121,10 @@ export function interceptPql(
   output: T.MacAppConnectionCode.Output,
 ): void;
 export function interceptPql(
+  slug: `OpenBillingPortal`,
+  output: T.OpenBillingPortal.Output,
+): void;
+export function interceptPql(
   slug: `PrepIOSAppConnection`,
   output: T.PrepIOSAppConnection.Output,
 ): void;
@@ -151,10 +159,13 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `Signup`, output: T.Signup.Output): void;
 export function interceptPql(
+  slug: `StartCheckoutSession`,
+  output: T.StartCheckoutSession.Output,
+): void;
+export function interceptPql(
   slug: `StartFullTrial`,
   output: T.StartFullTrial.Output,
 ): void;
-export function interceptPql(slug: `StripeUrl_v2`, output: T.StripeUrl_v2.Output): void;
 export function interceptPql(
   slug: `ToggleChildKeychain`,
   output: T.ToggleChildKeychain.Output,
@@ -162,6 +173,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `UpdateIOSDevice`,
   output: T.UpdateIOSDevice.Output,
+): void;
+export function interceptPql(
+  slug: `UpgradeSubscriptionTier`,
+  output: T.UpgradeSubscriptionTier.Output,
 ): void;
 export function interceptPql(
   slug: `UpsertBlockRule`,
@@ -195,7 +210,7 @@ export function forcePqlErr(
     | `DeleteEntity_v2`
     | `FamilyActivitySummaries`
     | `FlagActivityItems`
-    | `GetAccountOwner`
+    | `GetAccountOwner_v2`
     | `GetAdminKeychain`
     | `GetAdminKeychains`
     | `GetAllDevices`
@@ -208,6 +223,7 @@ export function forcePqlErr(
     | `GetIOSDeviceSupervisionStatus`
     | `GetIdentifiedApps`
     | `GetSelectableKeychains`
+    | `GetSubscriptionPanel`
     | `GetSuspendFilterRequest`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
@@ -218,6 +234,7 @@ export function forcePqlErr(
     | `Login`
     | `LoginMagicLink`
     | `MacAppConnectionCode`
+    | `OpenBillingPortal`
     | `PrepIOSAppConnection`
     | `RequestMagicLink`
     | `RequestPublicKeychain`
@@ -231,10 +248,11 @@ export function forcePqlErr(
     | `SecurityEventsFeed`
     | `SendPasswordResetEmail`
     | `Signup`
+    | `StartCheckoutSession`
     | `StartFullTrial`
-    | `StripeUrl_v2`
     | `ToggleChildKeychain`
     | `UpdateIOSDevice`
+    | `UpgradeSubscriptionTier`
     | `UpsertBlockRule`
     | `UserActivityFeed`
     | `VerifySignupEmail`,

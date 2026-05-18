@@ -1,5 +1,5 @@
 import { Settings } from '@dash/components';
-import type { Plan } from '@dash/types';
+import type { GetSubscriptionPanel, PlanStatus } from '@dash/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props, withIdsAnd } from '../../story-helpers';
@@ -21,50 +21,28 @@ const notificationProps = {
   saveButtonDisabled: false,
 };
 
-const plans = {
-  fullPaid: {
-    case: `full`,
-    status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
+const planStatuses = {
+  full: { case: `full`, status: `current` },
+  light: { case: `light`, status: `current` },
+  free: { case: `free` },
+  complimentary: { case: `complimentary` },
+  fullTrial: {
+    case: `fullTrial`,
+    until: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
   },
-  fullPaidLegacy: {
-    case: `full`,
-    status: { case: `paid`, stripeId: `sub_123`, monthlyPriceInCents: 500 },
+  fullTrialGrace: {
+    case: `fullTrialGrace`,
+    until: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
   },
-  fullTrialing: {
-    case: `full`,
-    status: {
-      case: `trialing`,
-      kind: { case: `full` },
-      until: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  },
-  fullTrialingExpiringSoon: {
-    case: `full`,
-    status: {
-      case: `trialing`,
-      kind: { case: `full` },
-      until: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  },
-  fullOverdue: {
-    case: `full`,
-    status: { case: `overdue`, stripeId: `sub_123`, monthlyPriceInCents: 1000 },
-  },
-  fullTrialExpired: {
-    case: `full`,
-    status: { case: `trialExpired`, kind: { case: `full` } },
-  },
-  fullComplimentary: { case: `full`, status: { case: `complimentary` } },
-  lightPaid: {
-    case: `light`,
-    status: { case: `paid`, stripeId: `sub_456`, hasTrialedFull: false },
-  },
-  lightOverdue: {
-    case: `light`,
-    status: { case: `overdue`, stripeId: `sub_456`, hasTrialedFull: false },
-  },
-  free: { case: `free`, kind: { case: `standard` } },
-} satisfies Record<string, Plan>;
+} satisfies Record<string, PlanStatus>;
+
+function panel(planStatus: PlanStatus): GetSubscriptionPanel.Output {
+  return {
+    planStatus,
+    secondary: [],
+    availableTiers: [],
+  };
+}
 
 const baseArgs = {
   newMethodId: undefined,
@@ -115,31 +93,30 @@ const baseArgs = {
   ]),
   deleteMethod: confirmableEntityAction(),
   deleteNotification: confirmableEntityAction(),
-  billingPortalRequest: { state: `idle` as const },
   updateNotification: () => {},
   saveNotification: () => {},
   createNotification: () => {},
-  manageSubscription: () => {},
+  onSubscriptionPanelAction: () => {},
   newMethodEventHandler: () => {},
 };
 
 // @screenshot: xs,md
 export const Default: Story = props({
   ...baseArgs,
-  plan: plans.fullPaid,
+  subscriptionPanel: panel(planStatuses.full),
 });
 
 // @screenshot: xs,md
 export const NoNotifications: Story = props({
   ...baseArgs,
-  plan: plans.fullPaid,
+  subscriptionPanel: panel(planStatuses.full),
   notifications: [],
 });
 
 // @screenshot: xs,md
 export const AddingMethod: Story = props({
   ...baseArgs,
-  plan: plans.fullPaid,
+  subscriptionPanel: panel(planStatuses.full),
   pendingMethod: {
     case: `email`,
     email: ``,
@@ -152,7 +129,7 @@ export const AddingMethod: Story = props({
 // @screenshot: xs,md
 export const AddingMethodVerifying: Story = props({
   ...baseArgs,
-  plan: plans.fullPaid,
+  subscriptionPanel: panel(planStatuses.full),
   pendingMethod: {
     case: `email`,
     email: ``,
@@ -165,56 +142,36 @@ export const AddingMethodVerifying: Story = props({
 // @screenshot: xs,md
 export const AfterNewMethodCreation: Story = props({
   ...baseArgs,
-  plan: plans.fullPaid,
+  subscriptionPanel: panel(planStatuses.full),
   newMethodId: {
     confirmed: true,
     id: `1`,
   },
 });
 
-export const FullTrialing: Story = props({
+export const FullTrial: Story = props({
   ...baseArgs,
-  plan: plans.fullTrialing,
+  subscriptionPanel: panel(planStatuses.fullTrial),
 });
 
-export const FullTrialingExpiringSoon: Story = props({
+export const FullTrialGrace: Story = props({
   ...baseArgs,
-  plan: plans.fullTrialingExpiringSoon,
-});
-
-export const FullOverdue: Story = props({
-  ...baseArgs,
-  plan: plans.fullOverdue,
-});
-
-export const FullTrialExpired: Story = props({
-  ...baseArgs,
-  plan: plans.fullTrialExpired,
-});
-
-export const FullPaidLegacy: Story = props({
-  ...baseArgs,
-  plan: plans.fullPaidLegacy,
+  subscriptionPanel: panel(planStatuses.fullTrialGrace),
 });
 
 export const FullComplimentary: Story = props({
   ...baseArgs,
-  plan: plans.fullComplimentary,
+  subscriptionPanel: panel(planStatuses.complimentary),
 });
 
-export const LightPaid: Story = props({
+export const Light: Story = props({
   ...baseArgs,
-  plan: plans.lightPaid,
-});
-
-export const LightOverdue: Story = props({
-  ...baseArgs,
-  plan: plans.lightOverdue,
+  subscriptionPanel: panel(planStatuses.light),
 });
 
 export const Free: Story = props({
   ...baseArgs,
-  plan: plans.free,
+  subscriptionPanel: panel(planStatuses.free),
 });
 
 export default meta;

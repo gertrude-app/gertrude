@@ -1,4 +1,3 @@
-import Dependencies
 import DuetSQL
 import GertieIOS
 import Vapor
@@ -25,8 +24,11 @@ enum ProfileDownloadRoute {
 
     if let child = try await device.child(in: req.context.db) {
       let parent = try await child.parent(in: req.context.db)
-      let plan = try await parent.plan(in: req.context.db)
-      if !plan.allowsSupervision {
+      let account = try await parent.billingAccountSnapshot(
+        in: req.context.db,
+        at: get(dependency: \.date.now),
+      )
+      if !account.can(.superviseIosDevice) {
         let parentLink = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
         Task {
           await get(dependency: \.slack)

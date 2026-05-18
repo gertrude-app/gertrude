@@ -75,7 +75,7 @@ const ConnectDeviceModal: React.FC<Props> = ({
           isOpen
           primaryButton={{
             type: `link`,
-            to: `/settings?plan=full`,
+            to: `/settings`,
             label: `Manage subscription`,
           }}
           secondaryButton={dismissAddDevice}

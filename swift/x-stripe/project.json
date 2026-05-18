@@ -6,7 +6,7 @@
       "command": "cd x-stripe && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
     },
     "test": {
-      "command": "true"
+      "command": "cd x-stripe && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
     }
   }
 }

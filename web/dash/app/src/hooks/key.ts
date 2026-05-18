@@ -3,7 +3,7 @@ import type {
   CombinedUsersActivityFeed,
   DashboardWidgets_v2,
   FamilyActivitySummaries,
-  GetAccountOwner,
+  GetAccountOwner_v2,
   GetAdminKeychain,
   GetAdminKeychains,
   GetAllDevices,
@@ -16,6 +16,7 @@ import type {
   GetIOSDeviceSupervisionStatus,
   GetIdentifiedApps,
   GetSelectableKeychains,
+  GetSubscriptionPanel,
   GetSuspendFilterRequest,
   LatestAppVersions,
   SecurityEventsFeed,
@@ -116,8 +117,12 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`suspend-filter-requests/:id`, [`suspend-filter-requests`, id]);
   }
 
-  static get accountOwner(): QueryKey<GetAccountOwner.Output> {
+  static get accountOwner(): QueryKey<GetAccountOwner_v2.Output> {
     return new QueryKey(`account-owner`, [`account-owner`]);
+  }
+
+  static get subscriptionPanel(): QueryKey<GetSubscriptionPanel.Output> {
+    return new QueryKey(`subscription-panel`, [`subscription-panel`]);
   }
 
   static get apps(): QueryKey<GetIdentifiedApps.Output> {

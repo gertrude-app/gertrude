@@ -23,13 +23,9 @@ enum AdminBetsy {
       emailVerifiedAt: Date(),
     ))
 
-    try await db.create(Subscription(
+    try await db.create(BillingIdentity(
       parentId: betsy.id,
-      tier: .full,
-      billingStatus: .trialing,
-      stripeId: nil,
-      trialStartedAt: Date(),
-      statusExpiresAt: Date() + Plan.Full.trialLengthDays - Plan.Full.trialWarningDays,
+      fullTrialStartedAt: Date(),
     ))
 
     let email = try await Reset.createNotification(

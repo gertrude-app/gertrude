@@ -7,11 +7,17 @@ import XCore
 enum Reset {
   static func run() async throws {
     @Dependency(\.db) var db
+    let client = db as! PgClient
+    try await client.db.execute("UPDATE blocker_app.supervisions SET supervised_at = NULL")
     try await Parent.query()
       .where(.id != Parent.Id.stagingPublicKeychainOwner)
       .delete(in: db, force: true)
     try await AdminBetsy.create()
     try await AdminBen.create()
+    try await AdminBella.create()
+    try await AdminBruno.create()
+    try await AdminBlanca.create()
+    try await AdminBart.create()
     try await self.createIOSEvents()
   }
 

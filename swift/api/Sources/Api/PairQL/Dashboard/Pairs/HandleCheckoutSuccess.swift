@@ -40,40 +40,51 @@ extension HandleCheckoutSuccess: Resolver {
       throw Abort(.badRequest)
     }
 
-    guard let tier = Subscription.Tier(stripePriceId: priceId) else {
+    guard let tier = StripeSubscription.Tier(stripePriceId: priceId) else {
       unexpected("2958cf22", context)
       throw Abort(.badRequest)
     }
 
     let expiration = Date(timeIntervalSince1970: TimeInterval(subscription.currentPeriodEnd))
     if var model = try await parent.subscription(in: context.db) {
-      switch model.plan {
-      case .full(.complimentary):
-        unexpected("537d360f", context)
-        throw Abort(.badRequest)
-      default:
-        if model.stripeId == nil {
-          notifyFirstPayment(parent: parent, tier: tier)
-        }
-        model.tier = tier
-        model.billingStatus = .paid
-        model.stripeId = .init(subscriptionId)
-        model.statusExpiresAt = expiration + .days(2)
-        try await context.db.update(model)
+      if model.stripeId.rawValue != subscriptionId {
+        let allow = try await reconcileDuplicateSubscription(
+          parent: parent,
+          existingSubId: model.stripeId.rawValue,
+          incomingSubId: subscriptionId,
+          context: "checkout-success",
+          audit: "checkout_session_id: \(input.stripeCheckoutSessionId)",
+          db: context.db,
+        )
+        // from parent's perspective, it's correct to show success
+        // duplication will alert us for manual reconciliation/cleanup
+        guard allow else { return .success }
       }
+      model.tier = tier
+      model.stripeId = .init(subscriptionId)
+      model.stripeStatus = .active
+      model.currentPeriodEnd = expiration
+      try await context.db.update(model)
     } else {
       // if they have no subscription record, they were on the free plan
-      try await context.db.create(Subscription(
+      _ = try await parent.ensureBillingIdentity(in: context.db)
+      try await context.db.create(StripeSubscription(
         parentId: parent.id,
         tier: tier,
-        billingStatus: .paid,
         stripeId: .init(subscriptionId),
-        statusExpiresAt: expiration + .days(2),
+        stripeStatus: .active,
+        currentPeriodEnd: expiration,
       ))
       notifyFirstPayment(parent: parent, tier: tier)
       // all full subscriptions should have come thru trial state
       if tier != .light { unexpected("d6db1ebc", context) }
     }
+
+    var identity = try await parent.ensureBillingIdentity(in: context.db)
+    identity.stripeCustomerId = .init(subscription.customer)
+    identity.lastStripeSubscriptionId = .init(subscriptionId)
+    identity.lastPaidTier = tier
+    try await context.db.update(identity)
 
     return .success
   }

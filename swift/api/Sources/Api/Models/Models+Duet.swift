@@ -7,12 +7,8 @@ extension RequestStatus: @retroactive PostgresEnum {
   public var typeName: String { "enum_shared_request_status" }
 }
 
-extension Subscription.Tier: PostgresEnum {
+extension StripeSubscription.Tier: PostgresEnum {
   public var typeName: String { "parent.subscription_tier" }
-}
-
-extension BillingStatus.Db: PostgresEnum {
-  public var typeName: String { "parent.billing_status" }
 }
 
 protocol HasCreatedAt {
@@ -198,20 +194,38 @@ extension Parent {
   }
 }
 
-extension Subscription: Duet.Identifiable {
-  typealias Id = Tagged<Subscription, UUID>
+extension StripeSubscription: Duet.Identifiable {
+  typealias Id = Tagged<StripeSubscription, UUID>
 }
 
-extension Subscription {
+extension StripeSubscription {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case parentId
     case tier
-    case billingStatus
     case stripeId
+    case stripeStatus
+    case currentPeriodEnd
     case isLegacyPrice
-    case trialStartedAt
-    case statusExpiresAt
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension BillingIdentity: Duet.Identifiable {
+  typealias Id = Tagged<BillingIdentity, UUID>
+}
+
+extension BillingIdentity {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case parentId
+    case stripeCustomerId
+    case fullTrialStartedAt
+    case lastStripeSubscriptionId
+    case lastPaidTier
+    case trialEmailLifecycle
+    case isComplimentary
     case createdAt
     case updatedAt
   }
@@ -430,6 +444,7 @@ extension StripeEvent {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case json
+    case stripeEventId
     case createdAt
   }
 }
