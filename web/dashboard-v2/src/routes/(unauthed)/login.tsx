@@ -154,6 +154,6 @@ const AppAd: React.FC<AppAdProps> = ({
   );
 };
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute('/(unauthed)/login')({
   component: LoginPage,
 });

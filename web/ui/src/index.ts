@@ -12,6 +12,5 @@ export { default as Sidebar } from './components/ui/sidebar/Sidebar';
 export { default as SidebarItem } from './components/ui/sidebar/SidebarItem';
 export { default as SidebarLayout } from './components/ui/sidebar/SidebarLayout';
 export { default as SidebarSection } from './components/ui/sidebar/SidebarSection';
-export { default as SidebarSubItem } from './components/ui/sidebar/SidebarSubItem';
 export { default as Textarea } from './components/ui/Textarea';
 export { default as Toggle } from './components/ui/Toggle';

@@ -9,86 +9,248 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppSignoutRouteImport } from './routes/_app/signout'
+import { Route as AppSettingsRouteImport } from './routes/_app/settings'
+import { Route as AppSecurityRouteImport } from './routes/_app/security'
+import { Route as AppKeychainsRouteImport } from './routes/_app/keychains'
+import { Route as AppDevicesRouteImport } from './routes/_app/devices'
+import { Route as AppChildrenRouteImport } from './routes/_app/children'
+import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
+import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSignoutRoute = AppSignoutRouteImport.update({
+  id: '/signout',
+  path: '/signout',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSecurityRoute = AppSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppKeychainsRoute = AppKeychainsRouteImport.update({
+  id: '/keychains',
+  path: '/keychains',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDevicesRoute = AppDevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppChildrenRoute = AppChildrenRouteImport.update({
+  id: '/children',
+  path: '/children',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const unauthedSignupRoute = unauthedSignupRouteImport.update({
+  id: '/(unauthed)/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
+const unauthedLoginRoute = unauthedLoginRouteImport.update({
+  id: '/(unauthed)/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/': typeof AppIndexRoute
+  '/login': typeof unauthedLoginRoute
+  '/signup': typeof unauthedSignupRoute
+  '/children': typeof AppChildrenRoute
+  '/devices': typeof AppDevicesRoute
+  '/keychains': typeof AppKeychainsRoute
+  '/security': typeof AppSecurityRoute
+  '/settings': typeof AppSettingsRoute
+  '/signout': typeof AppSignoutRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/login': typeof unauthedLoginRoute
+  '/signup': typeof unauthedSignupRoute
+  '/children': typeof AppChildrenRoute
+  '/devices': typeof AppDevicesRoute
+  '/keychains': typeof AppKeychainsRoute
+  '/security': typeof AppSecurityRoute
+  '/settings': typeof AppSettingsRoute
+  '/signout': typeof AppSignoutRoute
+  '/': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/signup': typeof SignupRoute
+  '/_app': typeof AppRouteRouteWithChildren
+  '/(unauthed)/login': typeof unauthedLoginRoute
+  '/(unauthed)/signup': typeof unauthedSignupRoute
+  '/_app/children': typeof AppChildrenRoute
+  '/_app/devices': typeof AppDevicesRoute
+  '/_app/keychains': typeof AppKeychainsRoute
+  '/_app/security': typeof AppSecurityRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/signout': typeof AppSignoutRoute
+  '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/children'
+    | '/devices'
+    | '/keychains'
+    | '/security'
+    | '/settings'
+    | '/signout'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup'
-  id: '__root__' | '/' | '/login' | '/signup'
+  to:
+    | '/login'
+    | '/signup'
+    | '/children'
+    | '/devices'
+    | '/keychains'
+    | '/security'
+    | '/settings'
+    | '/signout'
+    | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/(unauthed)/login'
+    | '/(unauthed)/signup'
+    | '/_app/children'
+    | '/_app/devices'
+    | '/_app/keychains'
+    | '/_app/security'
+    | '/_app/settings'
+    | '/_app/signout'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
-  SignupRoute: typeof SignupRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
+  unauthedLoginRoute: typeof unauthedLoginRoute
+  unauthedSignupRoute: typeof unauthedSignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/signout': {
+      id: '/_app/signout'
+      path: '/signout'
+      fullPath: '/signout'
+      preLoaderRoute: typeof AppSignoutRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/security': {
+      id: '/_app/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof AppSecurityRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/keychains': {
+      id: '/_app/keychains'
+      path: '/keychains'
+      fullPath: '/keychains'
+      preLoaderRoute: typeof AppKeychainsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/devices': {
+      id: '/_app/devices'
+      path: '/devices'
+      fullPath: '/devices'
+      preLoaderRoute: typeof AppDevicesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/children': {
+      id: '/_app/children'
+      path: '/children'
+      fullPath: '/children'
+      preLoaderRoute: typeof AppChildrenRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/(unauthed)/signup': {
+      id: '/(unauthed)/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof unauthedSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(unauthed)/login': {
+      id: '/(unauthed)/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof unauthedLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
+interface AppRouteRouteChildren {
+  AppChildrenRoute: typeof AppChildrenRoute
+  AppDevicesRoute: typeof AppDevicesRoute
+  AppKeychainsRoute: typeof AppKeychainsRoute
+  AppSecurityRoute: typeof AppSecurityRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppSignoutRoute: typeof AppSignoutRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppChildrenRoute: AppChildrenRoute,
+  AppDevicesRoute: AppDevicesRoute,
+  AppKeychainsRoute: AppKeychainsRoute,
+  AppSecurityRoute: AppSecurityRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppSignoutRoute: AppSignoutRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
-  SignupRoute: SignupRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
+  unauthedLoginRoute: unauthedLoginRoute,
+  unauthedSignupRoute: unauthedSignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

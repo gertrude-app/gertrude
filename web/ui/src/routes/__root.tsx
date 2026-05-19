@@ -9,27 +9,27 @@ import '../styles.css';
 
 const RootComponent: React.FC = () => (
   <SidebarLayout content={<Outlet />}>
-    <Sidebar logoUrl="/gertrude-ui-logo.svg">
+    <Sidebar logoUrl="/gertrude-ui-logo.svg" logoWidth={60}>
       <SidebarSection title="Components">
-        <SidebarItem title="Badge" icon={DiamondIcon} to="/components/badge" />
-        <SidebarItem title="Button" icon={DiamondIcon} to="/components/button" />
-        <SidebarItem title="Checkbox" icon={DiamondIcon} to="/components/checkbox" />
+        <SidebarItem title="Badge" icon={DiamondIcon} href="/components/badge" />
+        <SidebarItem title="Button" icon={DiamondIcon} href="/components/button" />
+        <SidebarItem title="Checkbox" icon={DiamondIcon} href="/components/checkbox" />
         <SidebarItem
           title="Dropdown Menu"
           icon={DiamondIcon}
-          to="/components/dropdown-menu"
+          href="/components/dropdown-menu"
         />
-        <SidebarItem title="Form" icon={DiamondIcon} to="/components/form" />
-        <SidebarItem title="Input" icon={DiamondIcon} to="/components/input" />
+        <SidebarItem title="Form" icon={DiamondIcon} href="/components/form" />
+        <SidebarItem title="Input" icon={DiamondIcon} href="/components/input" />
         <SidebarItem
           title="Radio Group"
           icon={DiamondIcon}
-          to="/components/radio-group"
+          href="/components/radio-group"
         />
-        <SidebarItem title="Select" icon={DiamondIcon} to="/components/select" />
-        <SidebarItem title="Sidebar" icon={DiamondIcon} to="/components/sidebar" />
-        <SidebarItem title="Textarea" icon={DiamondIcon} to="/components/textarea" />
-        <SidebarItem title="Toggle" icon={DiamondIcon} to="/components/toggle" />
+        <SidebarItem title="Select" icon={DiamondIcon} href="/components/select" />
+        <SidebarItem title="Sidebar" icon={DiamondIcon} href="/components/sidebar" />
+        <SidebarItem title="Textarea" icon={DiamondIcon} href="/components/textarea" />
+        <SidebarItem title="Toggle" icon={DiamondIcon} href="/components/toggle" />
       </SidebarSection>
     </Sidebar>
   </SidebarLayout>

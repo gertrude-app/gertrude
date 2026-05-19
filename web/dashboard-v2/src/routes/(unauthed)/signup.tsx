@@ -65,6 +65,6 @@ const SignupPage: React.FC = () => {
   );
 };
 
-export const Route = createFileRoute('/signup')({
+export const Route = createFileRoute('/(unauthed)/signup')({
   component: SignupPage,
 });
