@@ -147,6 +147,30 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     )).toBeNil()
   }
 
+  func testStaleTrialShortCircuitsToFinalSentWithoutEmail() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(36)
+    for lifecycle in [BillingIdentity.TrialEmailLifecycle.none, .endingSoonSent, .expiredSent] {
+      expect(nextTrialEmailDecision(
+        lifecycle: lifecycle,
+        trialStartedAt: trialStart,
+        hasConnectedApp: true,
+        now: now,
+      )).toEqual(.init(send: nil, nextLifecycle: .finalSent))
+    }
+  }
+
+  func testNotYetStaleAtFinalStillSendsOverdueToUnpaid() {
+    let trialStart = Date.reference
+    let now = trialStart + .days(34)
+    expect(nextTrialEmailDecision(
+      lifecycle: .expiredSent,
+      trialStartedAt: trialStart,
+      hasConnectedApp: true,
+      now: now,
+    )).toEqual(.init(send: .overdueToUnpaid, nextLifecycle: .finalSent))
+  }
+
   // MARK: - trial email progression (integration)
 
   func testStandaloneTrialAdvancesAtT18() async throws {
@@ -209,7 +233,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.skipped)
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testLapsedFullParentMarkedAsSkippedViaLastPaidTier() async throws {
@@ -227,7 +251,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.skipped)
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testLapsedLightParentDoesNotShortCircuit() async throws {
@@ -246,6 +270,31 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.endingSoonSent)
     expect(self.sent.emails.count).toEqual(1)
+  }
+
+  func testAncientLightTrialGoesTerminalWithoutEmail() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_ancient_light"),
+      fullTrialStartedAt: .reference - .days(90),
+      lastStripeSubscriptionId: .init("sub_ancient_light"),
+      lastPaidTier: .light,
+      trialEmailLifecycle: .none,
+    ))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .light,
+      stripeId: .init("sub_ancient_light"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(180),
+    ))
+
+    _ = try await SubscriptionManager().advanceTrialEmails()
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.trialEmailLifecycle).toEqual(.finalSent)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testComplimentaryIdentityIgnored() async throws {
@@ -273,7 +322,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     ))
 
     _ = try await SubscriptionManager().advanceTrialEmails()
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testFinalSentLifecycleFilteredOutByQuery() async throws {
@@ -285,7 +334,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     ))
 
     _ = try await SubscriptionManager().advanceTrialEmails()
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testSkippedLifecycleFilteredOutByQuery() async throws {
@@ -297,7 +346,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     ))
 
     _ = try await SubscriptionManager().advanceTrialEmails()
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   func testTrialExpiredOnboardedSendsEmail() async throws {
@@ -329,7 +378,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
 
     let identity = try await parent.model.billingIdentity(in: self.db)!
     expect(identity.trialEmailLifecycle).toEqual(.expiredSent)
-    expect(self.sent.emails.count).toEqual(0)
+    expect(self.sent.emails.contains(where: { $0.to == parent.email.rawValue })).toBeFalse()
   }
 
   // MARK: - Stripe failsafe
