@@ -18,6 +18,9 @@ admin:
 ui:
   @pnpm --filter @gertrude/ui exec vite dev --port ${UI_PORT:-5173} --open
 
+new-dash:
+  @pnpm --filter new-dashbaord exec vite dev --port ${NEW_DASH_PORT:-3001}
+
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"
 

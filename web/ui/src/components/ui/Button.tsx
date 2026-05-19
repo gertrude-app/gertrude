@@ -11,6 +11,7 @@ type CommonProps = {
   size?: 'small' | 'medium' | 'large';
   loading?: boolean;
   disabled?: boolean;
+  className?: string;
 };
 
 type Props = CommonProps &
@@ -37,6 +38,7 @@ const ownPropKeys = new Set([
   'size',
   'loading',
   'disabled',
+  'className',
   'type',
   'onClick',
   'href',
@@ -131,6 +133,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
             props.size === 'medium' || props.size === undefined,
           'rounded-[13px] px-2.75 py-2.75 text-base': props.size === 'large',
         },
+    props.className,
   );
 
   const iconSlot = (): React.ReactNode => {
