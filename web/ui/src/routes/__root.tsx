@@ -22,6 +22,11 @@ const RootComponent: React.FC = () => (
         <SidebarItem title="Form" icon={DiamondIcon} href="/components/form" />
         <SidebarItem title="Input" icon={DiamondIcon} href="/components/input" />
         <SidebarItem
+          title="Page Heading"
+          icon={DiamondIcon}
+          href="/components/page-heading"
+        />
+        <SidebarItem
           title="Radio Group"
           icon={DiamondIcon}
           href="/components/radio-group"

@@ -15,6 +15,7 @@ import { Route as ComponentsTextareaRouteImport } from './routes/components/text
 import { Route as ComponentsSidebarRouteImport } from './routes/components/sidebar'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsRadioGroupRouteImport } from './routes/components/radio-group'
+import { Route as ComponentsPageHeadingRouteImport } from './routes/components/page-heading'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsDropdownMenuRouteImport } from './routes/components/dropdown-menu'
@@ -50,6 +51,11 @@ const ComponentsSelectRoute = ComponentsSelectRouteImport.update({
 const ComponentsRadioGroupRoute = ComponentsRadioGroupRouteImport.update({
   id: '/components/radio-group',
   path: '/components/radio-group',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsPageHeadingRoute = ComponentsPageHeadingRouteImport.update({
+  id: '/components/page-heading',
+  path: '/components/page-heading',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/page-heading'
     | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/page-heading'
     | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/page-heading'
     | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   ComponentsDropdownMenuRoute: typeof ComponentsDropdownMenuRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsPageHeadingRoute: typeof ComponentsPageHeadingRoute
   ComponentsRadioGroupRoute: typeof ComponentsRadioGroupRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidebarRoute: typeof ComponentsSidebarRoute
@@ -228,6 +241,13 @@ declare module '@tanstack/react-router' {
       path: '/components/radio-group'
       fullPath: '/components/radio-group'
       preLoaderRoute: typeof ComponentsRadioGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/page-heading': {
+      id: '/components/page-heading'
+      path: '/components/page-heading'
+      fullPath: '/components/page-heading'
+      preLoaderRoute: typeof ComponentsPageHeadingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/input': {
@@ -283,6 +303,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsDropdownMenuRoute: ComponentsDropdownMenuRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsPageHeadingRoute: ComponentsPageHeadingRoute,
   ComponentsRadioGroupRoute: ComponentsRadioGroupRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidebarRoute: ComponentsSidebarRoute,
