@@ -10,6 +10,12 @@
   box-sizing: border-box;
 }
 
+.bg-dots {
+  background-image: url("/dot-noise-pattern.svg");
+  background-size: 1440px 1440px;
+  background-repeat: repeat;
+}
+
 html,
 body,
 #app {
