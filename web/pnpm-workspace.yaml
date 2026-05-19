@@ -8,6 +8,7 @@ packages:
   - admin
   - supervise
   - ui
+  - dashboard-v2
 
 onlyBuiltDependencies:
   - core-js-pure

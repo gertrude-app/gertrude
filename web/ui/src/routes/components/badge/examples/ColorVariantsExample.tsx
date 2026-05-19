@@ -2,9 +2,26 @@ import Badge from '#/components/ui/Badge';
 import { CheckIcon } from 'lucide-react';
 import React from 'react';
 
-type BadgeColor = 'neutral' | 'violet' | 'red' | 'green' | 'blue' | 'yellow';
+type BadgeColor =
+  | 'neutral'
+  | 'violet'
+  | 'red'
+  | 'green'
+  | 'blue'
+  | 'yellow'
+  | 'beta'
+  | 'canary';
 
-const colors: BadgeColor[] = ['neutral', 'violet', 'red', 'green', 'blue', 'yellow'];
+const colors: BadgeColor[] = [
+  'neutral',
+  'violet',
+  'red',
+  'green',
+  'blue',
+  'yellow',
+  'beta',
+  'canary',
+];
 
 const labels: Record<BadgeColor, string> = {
   neutral: 'Neutral',
@@ -13,6 +30,8 @@ const labels: Record<BadgeColor, string> = {
   green: 'Allowed',
   blue: 'Managed',
   yellow: 'Pending',
+  beta: 'Beta',
+  canary: 'Canary',
 };
 
 const ColorVariantsExample: React.FC = () => {
