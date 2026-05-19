@@ -35,6 +35,82 @@ describe(`supervise device claim flow`, () => {
     });
   });
 
+  describe(`payment gating (regression: unpaid account reached download step)`, () => {
+    const unpaidStatus = {
+      deviceId: `11300000-0000-0000-0000-000000000000`,
+      childId: `a9aa0000-0000-0000-0000-000000000000`,
+      childName: `Jacob`,
+      modelName: `iPhone 12`,
+      deviceType: `iPhone`,
+      iosVersion: `26.0`,
+      supervisionStatus: `awaitingSupervision` as const,
+      requiresPayment: true,
+    };
+
+    beforeEach(() => {
+      cy.simulateLoggedIn();
+      cy.interceptPql(`StartCheckoutSession`, { url: `https://stripe.test/checkout` });
+    });
+
+    // each protected step must be gated, not just the one the customer hit
+    for (const step of [`download-helper`, `launch-helper`, `supervise`]) {
+      it(`gates an unpaid account away from /${step} to the payment screen`, () => {
+        cy.interceptPql(`GetIOSDeviceSupervisionStatus`, unpaidStatus);
+
+        cy.visit(`/supervise-device/326590/${step}`);
+        cy.wait(`@GetIOSDeviceSupervisionStatus`);
+
+        // must NOT silently present a working-looking helper download UI
+        cy.contains(`Download the Supervision Helper App`).should(`not.exist`);
+        cy.contains(`Launch the Supervision Helper App`).should(`not.exist`);
+
+        // must redirect to payment and clearly surface "subscription required"
+        cy.location(`pathname`).should(`eq`, `/supervise-device/326590/payment`);
+        cy.contains(`Subscribe to Continue`).should(`be.visible`);
+        cy.contains(`Gertrude subscription`).should(`be.visible`);
+        cy.contains(`Subscribe`).should(`be.visible`);
+      });
+    }
+
+    it(`never fires the silently-swallowed download request for an unpaid account`, () => {
+      cy.interceptPql(`GetIOSDeviceSupervisionStatus`, unpaidStatus);
+      cy.intercept(`GET`, `**/download-supervision-app/**`, cy.spy().as(`dlReq`));
+
+      cy.visit(`/supervise-device/326590/download-helper`);
+      cy.wait(`@GetIOSDeviceSupervisionStatus`);
+
+      // surfaced as "subscription required -> here's how", not a dead button
+      cy.contains(`Subscribe to Continue`).should(`be.visible`);
+      cy.get(`@dlReq`).should(`not.have.been.called`);
+    });
+
+    it(`lets a paid account reach the download step`, () => {
+      cy.interceptPql(`GetIOSDeviceSupervisionStatus`, {
+        ...unpaidStatus,
+        requiresPayment: false,
+      });
+
+      cy.visit(`/supervise-device/326590/download-helper`);
+      cy.wait(`@GetIOSDeviceSupervisionStatus`);
+
+      cy.location(`pathname`).should(`eq`, `/supervise-device/326590/download-helper`);
+      cy.contains(`Download the Supervision Helper App`).should(`be.visible`);
+    });
+
+    it(`does not bounce a supervised (paid-then-lapsed) account away from done`, () => {
+      cy.interceptPql(`GetIOSDeviceSupervisionStatus`, {
+        ...unpaidStatus,
+        supervisionStatus: `supervised`,
+        requiresPayment: true,
+      });
+
+      cy.visit(`/supervise-device/326590/done`);
+      cy.wait(`@GetIOSDeviceSupervisionStatus`);
+
+      cy.location(`pathname`).should(`eq`, `/supervise-device/326590/done`);
+    });
+  });
+
   describe(`claim route`, () => {
     beforeEach(() => {
       cy.simulateLoggedIn();

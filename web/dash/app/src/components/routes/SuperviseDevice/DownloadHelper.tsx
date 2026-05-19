@@ -32,9 +32,13 @@ const SuperviseDeviceDownloadHelper: React.FC = () => {
     return <ApiErrorMessage error={query.error} />;
   }
 
-  const { childName, modelName, deviceType, iosVersion } = query.data;
+  const { childName, modelName, deviceType, iosVersion, requiresPayment } = query.data;
 
   const handleDownload = (platform: `mac` | `windows`): void => {
+    if (requiresPayment) {
+      navigate(`/supervise-device/${code}/payment`, { replace: true });
+      return;
+    }
     const url = `${Current.env.apiEndpoint()}/download-supervision-app/${code}/platform/${platform}`;
     const iframe = document.createElement(`iframe`);
     iframe.style.display = `none`;
