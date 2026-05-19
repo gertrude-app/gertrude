@@ -8,7 +8,7 @@ const SidebarPage: React.FC = () => {
   return (
     <ComponentDemoPage
       title="Sidebar"
-      description="A simple sidebar component with support for sections and sub-items."
+      description="A simple sidebar component with support for sections and linked items."
     >
       <DemoExample
         component={<BasicExample />}
