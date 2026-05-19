@@ -22,7 +22,7 @@ const BadgePage: React.FC = () => {
         component={<ColorVariantsExample />}
         path="./examples/ColorVariantsExample.tsx"
         description="The supported color variants, each shown with and without an icon."
-        demoHeight="18rem"
+        demoHeight="22rem"
       />
       <DemoExample
         component={<SizeScaleExample />}

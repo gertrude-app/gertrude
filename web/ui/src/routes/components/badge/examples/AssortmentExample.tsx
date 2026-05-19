@@ -22,6 +22,12 @@ const AssortmentExample: React.FC = () => {
         <Badge size="small" color="blue">
           macOS
         </Badge>
+        <Badge color="beta" icon={SparklesIcon}>
+          Beta
+        </Badge>
+        <Badge color="canary" icon={ClockIcon}>
+          Canary
+        </Badge>
         <Badge size="large" color="blue" icon={SparklesIcon}>
           Managed
         </Badge>

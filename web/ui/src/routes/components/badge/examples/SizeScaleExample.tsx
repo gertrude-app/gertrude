@@ -18,11 +18,11 @@ const SizeScaleExample: React.FC = () => {
               <Badge size={size} icon={CheckIcon}>
                 Neutral
               </Badge>
-              <Badge size={size} color="violet">
-                Setup
+              <Badge size={size} color="beta">
+                Beta
               </Badge>
-              <Badge size={size} color="violet" icon={CheckIcon}>
-                Setup
+              <Badge size={size} color="beta" icon={CheckIcon}>
+                Beta
               </Badge>
             </div>
           </div>
