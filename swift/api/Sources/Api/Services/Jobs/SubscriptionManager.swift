@@ -66,6 +66,7 @@ struct SubscriptionManager: AsyncScheduledJob {
 
   func advanceTrialEmails() async throws -> [String] {
     var logs: [String] = []
+    var skippedPaidFull = 0
     let identities = try await BillingIdentity.query()
       .where(.isComplimentary == false)
       .where(.fullTrialStartedAt != nil)
@@ -92,7 +93,7 @@ struct SubscriptionManager: AsyncScheduledJob {
       if currentlyPaidFull || identity.lastPaidTier == .full {
         identity.trialEmailLifecycle = .skipped
         try await self.db.update(identity)
-        logs.append("Skipped trial email lifecycle for paid-full parent \(parentLink)")
+        skippedPaidFull += 1
         continue
       }
 
@@ -111,6 +112,9 @@ struct SubscriptionManager: AsyncScheduledJob {
       }
       identity.trialEmailLifecycle = decision.nextLifecycle
       try await self.db.update(identity)
+    }
+    if skippedPaidFull > 0 {
+      logs.append("Skipped trial email lifecycle for \(skippedPaidFull) paid-full parent(s)")
     }
     return logs
   }
@@ -171,6 +175,14 @@ func nextTrialEmailDecision(
   let endingSoonAt = trialStartedAt + PlanStatus.trialPeriod - .days(3)
   let expiredAt = trialStartedAt + PlanStatus.trialPeriod
   let finalAt = trialStartedAt + PlanStatus.trialPeriod + PlanStatus.gracePeriod
+  if now >= finalAt + PlanStatus.gracePeriod {
+    switch lifecycle {
+    case .none, .endingSoonSent, .expiredSent:
+      return .init(send: nil, nextLifecycle: .finalSent)
+    case .finalSent, .skipped:
+      return nil
+    }
+  }
   switch lifecycle {
   case .none where now >= endingSoonAt:
     return .init(
