@@ -1,12 +1,12 @@
 import { formatDate } from '@shared/datetime';
 import type {
-  GetSubscriptionPanel,
+  GetSubscriptionPanel_v2,
   SubscriptionPanelAction,
   SubscriptionTier,
 } from '@dash/types';
 import type { BadgeType } from '@shared/components';
 
-export type Input = GetSubscriptionPanel.Output;
+export type Input = GetSubscriptionPanel_v2.Output;
 
 export interface BadgeOutput {
   text: string;
@@ -62,28 +62,26 @@ export function managePlanText(input: Input): string | undefined {
 }
 
 export function manageBlurb(input: Input): string | undefined {
-  const { planStatus, currentPeriodEnd, fullTrialStartedAt, lastPaidTier } = input;
+  const { planStatus, fullTrialStartedAt, lastPaidTier } = input;
   switch (planStatus.case) {
     case `complimentary`:
       return undefined;
 
     case `full`: {
-      if (!currentPeriodEnd) return undefined;
-      if (planStatus.status === `current`) {
-        return `Your next $10 monthly payment is scheduled for ${long(currentPeriodEnd)}. You can cancel at any time if you no longer need protection.`;
+      if (planStatus.status.case === `current`) {
+        return `Your next $10 monthly payment is scheduled for ${long(planStatus.status.renewsAt)}. You can cancel at any time if you no longer need protection.`;
       }
-      return `Your $10 monthly payment was due ${long(currentPeriodEnd)} but didn't go through. Update your payment method to keep Full access for your family.`;
+      return `Your $10 monthly payment was due ${long(planStatus.status.since)} but didn't go through. Update your payment method to keep Full access for your family.`;
     }
 
     case `light`: {
-      if (!currentPeriodEnd) return undefined;
-      if (planStatus.status === `current`) {
+      if (planStatus.status.case === `current`) {
         const cancelSuffix = fullTrialStartedAt
           ? ``
           : ` if you no longer need protection`;
-        return `Your next $10 yearly payment is scheduled for ${long(currentPeriodEnd)}. You can cancel at any time${cancelSuffix}.`;
+        return `Your next $10 yearly payment is scheduled for ${long(planStatus.status.renewsAt)}. You can cancel at any time${cancelSuffix}.`;
       }
-      return `Your $10 yearly payment was due ${long(currentPeriodEnd)} but didn't go through. Update your payment method to keep Light access for your family.`;
+      return `Your $10 yearly payment was due ${long(planStatus.status.since)} but didn't go through. Update your payment method to keep Light access for your family.`;
     }
 
     case `free`:
@@ -146,7 +144,7 @@ export function badge(input: Input): BadgeOutput {
       return { text: `Free`, type: `info` };
     case `light`:
     case `full`:
-      if (planStatus.status === `pastDue`) return { text: `Past due`, type: `red` };
+      if (planStatus.status.case === `pastDue`) return { text: `Past due`, type: `red` };
       return { text: `Paid`, type: `ok` };
   }
 }

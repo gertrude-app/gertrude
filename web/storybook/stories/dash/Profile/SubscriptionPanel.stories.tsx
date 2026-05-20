@@ -57,8 +57,7 @@ const FreeLapsedFull: PanelArgs = {
 
 const LightPaid: PanelArgs = {
   ...baseArgs,
-  planStatus: { case: `light`, status: `current` },
-  currentPeriodEnd: inDays(18),
+  planStatus: { case: `light`, status: { case: `current`, renewsAt: inDays(18) } },
   primary: { case: `upgradeSubscriptionTier`, to: `full` },
   secondary: [
     { case: `openBillingPortal`, config: `lightTier` },
@@ -70,8 +69,7 @@ const LightPaid: PanelArgs = {
 
 const LightPaidTrialUsed: PanelArgs = {
   ...baseArgs,
-  planStatus: { case: `light`, status: `current` },
-  currentPeriodEnd: inDays(22),
+  planStatus: { case: `light`, status: { case: `current`, renewsAt: inDays(22) } },
   primary: { case: `upgradeSubscriptionTier`, to: `full` },
   secondary: [{ case: `openBillingPortal`, config: `lightTier` }],
   availableTiers: [`full`],
@@ -81,8 +79,7 @@ const LightPaidTrialUsed: PanelArgs = {
 
 const LightOverdue: PanelArgs = {
   ...baseArgs,
-  planStatus: { case: `light`, status: `pastDue` },
-  currentPeriodEnd: inDays(-2),
+  planStatus: { case: `light`, status: { case: `pastDue`, since: inDays(-2) } },
   primary: { case: `openBillingPortal`, config: `lightTier` },
   secondary: [{ case: `upgradeSubscriptionTier`, to: `full` }],
   availableTiers: [`full`],
@@ -110,7 +107,6 @@ const FullTrialStandaloneExpiring: PanelArgs = {
 const FullTrialFromLight: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `fullTrial`, until: inDays(11) },
-  currentPeriodEnd: inDays(18),
   primary: { case: `upgradeSubscriptionTier`, to: `full` },
   secondary: [{ case: `openBillingPortal`, config: `lightTier` }],
   availableTiers: [`full`],
@@ -130,8 +126,7 @@ const FullTrialFromLapsedLight: PanelArgs = {
 
 const FullPaid: PanelArgs = {
   ...baseArgs,
-  planStatus: { case: `full`, status: `current` },
-  currentPeriodEnd: inDays(24),
+  planStatus: { case: `full`, status: { case: `current`, renewsAt: inDays(24) } },
   primary: { case: `openBillingPortal`, config: `default` },
   secondary: [],
   availableTiers: [],
@@ -140,8 +135,7 @@ const FullPaid: PanelArgs = {
 
 const FullOverdue: PanelArgs = {
   ...baseArgs,
-  planStatus: { case: `full`, status: `pastDue` },
-  currentPeriodEnd: inDays(-3),
+  planStatus: { case: `full`, status: { case: `pastDue`, since: inDays(-3) } },
   primary: { case: `openBillingPortal`, config: `default` },
   secondary: [],
   availableTiers: [],
@@ -168,7 +162,6 @@ const FullTrialGraceStandalone: PanelArgs = {
 const FullTrialGraceFromLight: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `fullTrialGrace`, until: inDays(3) },
-  currentPeriodEnd: inDays(20),
   primary: { case: `upgradeSubscriptionTier`, to: `full` },
   secondary: [{ case: `openBillingPortal`, config: `lightTier` }],
   availableTiers: [`full`],
@@ -233,11 +226,11 @@ export const AllStates: StoryObj<typeof SubscriptionPanel> = {
           <p>
             Every tile below is a distinct shape that{` `}
             <code className="text-xs bg-slate-100 px-1 py-0.5 rounded">
-              GetSubscriptionPanel.Output
+              GetSubscriptionPanel_v2.Output
             </code>
             {` `}can take. The matrix mirrors the branches of the resolver at{` `}
             <code className="text-xs bg-slate-100 px-1 py-0.5 rounded">
-              swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel.swift
+              swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel_v2.swift
             </code>
             . If you add or remove a branch there, mirror the change here.
           </p>

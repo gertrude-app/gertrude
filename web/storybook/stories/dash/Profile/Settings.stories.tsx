@@ -1,5 +1,5 @@
 import { Settings } from '@dash/components';
-import type { GetSubscriptionPanel, PlanStatus } from '@dash/types';
+import type { GetSubscriptionPanel_v2, PlanStatus } from '@dash/types';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props, withIdsAnd } from '../../story-helpers';
@@ -22,8 +22,20 @@ const notificationProps = {
 };
 
 const planStatuses = {
-  full: { case: `full`, status: `current` },
-  light: { case: `light`, status: `current` },
+  full: {
+    case: `full`,
+    status: {
+      case: `current`,
+      renewsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  },
+  light: {
+    case: `light`,
+    status: {
+      case: `current`,
+      renewsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+  },
   free: { case: `free` },
   complimentary: { case: `complimentary` },
   fullTrial: {
@@ -36,7 +48,7 @@ const planStatuses = {
   },
 } satisfies Record<string, PlanStatus>;
 
-function panel(planStatus: PlanStatus): GetSubscriptionPanel.Output {
+function panel(planStatus: PlanStatus): GetSubscriptionPanel_v2.Output {
   return {
     planStatus,
     secondary: [],

@@ -96,6 +96,7 @@ extension Configure {
     app.migrations.add(AppIconUploadProvenance())
     app.migrations.add(BlockerAppTokenInstallFk())
     app.migrations.add(StripeBillingOverhaul())
+    app.migrations.add(PodcastAppTablesAndLegacyAmIap())
   }
 }
 

@@ -15,13 +15,13 @@ struct AppStoreSyncJob: AsyncScheduledJob {
   }
 
   func exec() async {
-    for app in AppStore.GertrudeApp.allCases {
+    for app in GertrudeIOSApp.allCases {
       await self.syncReviews(for: app)
       await self.syncRatings(for: app)
     }
   }
 
-  private func syncReviews(for app: AppStore.GertrudeApp) async {
+  private func syncReviews(for app: GertrudeIOSApp) async {
     do {
       let reviews = try await self.appStoreConnect.fetchReviews(app)
 
@@ -57,7 +57,7 @@ struct AppStoreSyncJob: AsyncScheduledJob {
 
   // app store connect api doesn't give great data about rating-only submissions
   // only aggregate data, so we store snapshots in order to infer events
-  func syncRatings(for app: AppStore.GertrudeApp) async {
+  func syncRatings(for app: GertrudeIOSApp) async {
     do {
       let ratings = try await self.appStoreConnect.fetchRatings(app)
 
@@ -128,7 +128,7 @@ struct AppStoreSyncJob: AsyncScheduledJob {
     await self.slack.internal(.info, message)
   }
 
-  private func notifyInferredRating(app: AppStore.GertrudeApp, stars: Int) async {
+  private func notifyInferredRating(app: GertrudeIOSApp, stars: Int) async {
     let starEmoji = String(repeating: "⭐️", count: stars)
     let message = "Received new *app store rating* for `\(app.marketingName)`: \(starEmoji)"
     await self.slack.internal(.info, message)

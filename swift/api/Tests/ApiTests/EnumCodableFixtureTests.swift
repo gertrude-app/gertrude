@@ -123,11 +123,11 @@ final class EnumCodableFixtureTests: XCTestCase {
     try self.assertRoundTrip(PlanStatus.free)
     try self.assertRoundTrip(PlanStatus.complimentary)
     try self.assertRoundTrip(PlanStatus.fullTrial(until: date))
-    try self.assertRoundTrip(PlanStatus.light(status: .current))
-    try self.assertRoundTrip(PlanStatus.full(status: .pastDue))
-    try self.assertRoundTrip(GetSubscriptionPanel.Action.startCheckout(tier: .full))
-    try self.assertRoundTrip(GetSubscriptionPanel.Action.upgradeSubscriptionTier(to: .full))
-    try self.assertRoundTrip(GetSubscriptionPanel.Action.startFullTrial)
+    try self.assertRoundTrip(PlanStatus.light(status: .current(renewsAt: date)))
+    try self.assertRoundTrip(PlanStatus.full(status: .pastDue(since: date)))
+    try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.startCheckout(tier: .full))
+    try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.upgradeSubscriptionTier(to: .full))
+    try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.startFullTrial)
   }
 
   private func assertRoundTrip<T: Codable & Equatable>(_ value: T) throws {

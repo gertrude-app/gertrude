@@ -70,5 +70,6 @@ public extension PqlError {
     case connectionCodeNotFound
     case iosDeviceTokenNotFound
     case incorrectConfirmationCode
+    case amTokenNotFound
   }
 }

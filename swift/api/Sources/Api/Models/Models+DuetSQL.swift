@@ -220,6 +220,58 @@ extension BlockerApp.Supervision: Model {
   }
 }
 
+extension PodcastApp.Install: Model {
+  public static let schemaName = "podcast_app"
+  public static let tableName = "installs"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .deviceId: .uuid(self.deviceId)
+    case .appVersion: .string(self.appVersion)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .deviceId: .uuid(self.deviceId),
+      .appVersion: .string(self.appVersion),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension PodcastApp.Token: Model {
+  public static let schemaName = "podcast_app"
+  public static let tableName = "tokens"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .installId: .uuid(self.installId)
+    case .value: .uuid(self.value)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .installId: .uuid(self.installId),
+      .value: .uuid(self.value),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension GertieIOS.BlockRule: @retroactive PostgresJsonable {}
 
 extension Parent: Model {
@@ -303,6 +355,7 @@ extension BillingIdentity: Model {
     case .lastPaidTier: .string(self.lastPaidTier?.rawValue)
     case .trialEmailLifecycle: .string(self.trialEmailLifecycle.rawValue)
     case .isComplimentary: .bool(self.isComplimentary)
+    case .legacyAmIapPaidAt: .date(self.legacyAmIapPaidAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -318,6 +371,7 @@ extension BillingIdentity: Model {
       .lastPaidTier: .string(self.lastPaidTier?.rawValue),
       .trialEmailLifecycle: .string(self.trialEmailLifecycle.rawValue),
       .isComplimentary: .bool(self.isComplimentary),
+      .legacyAmIapPaidAt: .date(self.legacyAmIapPaidAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

@@ -11,6 +11,7 @@ struct BillingIdentity: Codable, Sendable {
   var lastPaidTier: StripeSubscription.Tier?
   var trialEmailLifecycle: TrialEmailLifecycle
   var isComplimentary: Bool
+  var legacyAmIapPaidAt: Date?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -23,6 +24,7 @@ struct BillingIdentity: Codable, Sendable {
     lastPaidTier: StripeSubscription.Tier? = nil,
     trialEmailLifecycle: TrialEmailLifecycle = .none,
     isComplimentary: Bool = false,
+    legacyAmIapPaidAt: Date? = nil,
   ) {
     self.id = id
     self.parentId = parentId
@@ -32,6 +34,7 @@ struct BillingIdentity: Codable, Sendable {
     self.lastPaidTier = lastPaidTier
     self.trialEmailLifecycle = trialEmailLifecycle
     self.isComplimentary = isComplimentary
+    self.legacyAmIapPaidAt = legacyAmIapPaidAt
   }
 }
 

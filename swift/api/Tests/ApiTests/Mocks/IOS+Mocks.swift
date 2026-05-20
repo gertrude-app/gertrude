@@ -59,3 +59,31 @@ extension BlockerApp.Supervision: RandomMocked {
     .init(deviceId: .init())
   }
 }
+
+extension PodcastApp.Install: RandomMocked {
+  public static var mock: PodcastApp.Install {
+    .init(deviceId: .init(), appVersion: "2.0.0")
+  }
+
+  public static var empty: PodcastApp.Install {
+    .init(deviceId: .init(), appVersion: "2.0.0")
+  }
+
+  public static var random: PodcastApp.Install {
+    .init(deviceId: .init(), appVersion: "2.0.\(Int.random(in: 0 ... 100))")
+  }
+}
+
+extension PodcastApp.Token: RandomMocked {
+  public static var mock: PodcastApp.Token {
+    .init(installId: .init())
+  }
+
+  public static var empty: PodcastApp.Token {
+    .init(installId: .init())
+  }
+
+  public static var random: PodcastApp.Token {
+    .init(installId: .init())
+  }
+}

@@ -10,21 +10,23 @@ final class PlanStatusDerivationTests: DependencyTestCase {
   }
 
   func testNoTrialLightSubReturnsLight() {
-    expect(planStatus(sub: .light, at: .reference)).toEqual(.light(status: .current))
+    expect(planStatus(sub: .light, at: .reference))
+      .toEqual(.light(status: .current(renewsAt: .reference + .days(30))))
   }
 
   func testNoTrialFullSubReturnsFull() {
-    expect(planStatus(sub: .full, at: .reference)).toEqual(.full(status: .current))
+    expect(planStatus(sub: .full, at: .reference))
+      .toEqual(.full(status: .current(renewsAt: .reference + .days(30))))
   }
 
   func testPastDueLightReturnsLightPastDue() {
     expect(planStatus(sub: .light, status: .pastDue, at: .reference))
-      .toEqual(.light(status: .pastDue))
+      .toEqual(.light(status: .pastDue(since: .reference + .days(30))))
   }
 
   func testPastDueFullReturnsFullPastDue() {
     expect(planStatus(sub: .full, status: .pastDue, at: .reference))
-      .toEqual(.full(status: .pastDue))
+      .toEqual(.full(status: .pastDue(since: .reference + .days(30))))
   }
 
   func testComplimentaryShortCircuitsWithNoSub() {
@@ -62,14 +64,14 @@ final class PlanStatusDerivationTests: DependencyTestCase {
     let trialStart = Date.reference
     let now = trialStart + .days(10)
     expect(planStatus(trialStartedAt: trialStart, sub: .full, at: now))
-      .toEqual(.full(status: .current))
+      .toEqual(.full(status: .current(renewsAt: now + .days(30))))
   }
 
   func testFullSubstrateWinsOverGraceOverlay() {
     let trialStart = Date.reference
     let now = trialStart + .days(25)
     expect(planStatus(trialStartedAt: trialStart, sub: .full, at: now))
-      .toEqual(.full(status: .current))
+      .toEqual(.full(status: .current(renewsAt: now + .days(30))))
   }
 
   func testTrialJustBeforeExpiryStillFullTrial() {
@@ -117,14 +119,14 @@ final class PlanStatusDerivationTests: DependencyTestCase {
     let trialStart = Date.reference
     let now = trialStart + .days(30)
     expect(planStatus(trialStartedAt: trialStart, sub: .light, at: now))
-      .toEqual(.light(status: .current))
+      .toEqual(.light(status: .current(renewsAt: now + .days(30))))
   }
 
   func testPastGraceWithFullSubReturnsFull() {
     let trialStart = Date.reference
     let now = trialStart + .days(30)
     expect(planStatus(trialStartedAt: trialStart, sub: .full, at: now))
-      .toEqual(.full(status: .current))
+      .toEqual(.full(status: .current(renewsAt: now + .days(30))))
   }
 
   func testPastGraceWithNoSubReturnsFree() {

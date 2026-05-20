@@ -146,6 +146,35 @@ extension BlockerApp.Supervision {
   }
 }
 
+extension PodcastApp.Install: Duet.Identifiable {
+  typealias Id = Tagged<PodcastApp.Install, UUID>
+}
+
+extension PodcastApp.Install {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case deviceId
+    case appVersion
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension PodcastApp.Token {
+  typealias Id = Tagged<PodcastApp.Token, UUID>
+  typealias Value = Tagged<(PodcastApp.Token, value: ()), UUID>
+}
+
+extension PodcastApp.Token {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case installId
+    case value
+    case createdAt
+    case updatedAt
+  }
+}
+
 extension BlockerApp.BlockRule: Duet.Identifiable {
   typealias Id = Tagged<BlockerApp.BlockRule, UUID>
 }
@@ -226,6 +255,7 @@ extension BillingIdentity {
     case lastPaidTier
     case trialEmailLifecycle
     case isComplimentary
+    case legacyAmIapPaidAt
     case createdAt
     case updatedAt
   }

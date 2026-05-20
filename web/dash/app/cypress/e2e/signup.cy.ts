@@ -113,9 +113,11 @@ describe(`payment`, () => {
       verifiedNotificationMethods: [],
     });
 
-    cy.interceptPql(`GetSubscriptionPanel`, {
-      planStatus: { case: `full`, status: `current` },
-      currentPeriodEnd: new Date().toISOString(),
+    cy.interceptPql(`GetSubscriptionPanel_v2`, {
+      planStatus: {
+        case: `full`,
+        status: { case: `current`, renewsAt: new Date().toISOString() },
+      },
       primary: { case: `openBillingPortal`, config: `default` },
       secondary: [],
       availableTiers: [],

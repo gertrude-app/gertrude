@@ -52,7 +52,7 @@ enum DashboardTsCodegenRoute {
       ("PlanStatus", PlanStatus.self),
       ("BillingStatus", BillingStatus.self),
       ("SubscriptionTier", StripeSubscription.Tier.self),
-      ("SubscriptionPanelAction", GetSubscriptionPanel.Action.self),
+      ("SubscriptionPanelAction", GetSubscriptionPanel_v2.Action.self),
       ("IOSDeviceChildAssignment", ClaimIOSDevice.ChildAssignment.self),
     ]
   }
@@ -95,7 +95,7 @@ enum DashboardTsCodegenRoute {
       SaveUser.self,
       SendPasswordResetEmail.self,
       Signup.self,
-      GetSubscriptionPanel.self,
+      GetSubscriptionPanel_v2.self,
       OpenBillingPortal.self,
       StartCheckoutSession.self,
       UpgradeSubscriptionTier.self,

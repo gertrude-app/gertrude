@@ -4,7 +4,7 @@ extension AppStore {
   struct Review: Codable, Sendable {
     var id: Id
     var appleId: String
-    var app: GertrudeApp
+    var app: GertrudeIOSApp
     var rating: Int
     var title: String?
     var body: String
@@ -16,7 +16,7 @@ extension AppStore {
     init(
       id: Id = .init(),
       appleId: String,
-      app: GertrudeApp,
+      app: GertrudeIOSApp,
       rating: Int,
       title: String?,
       body: String,

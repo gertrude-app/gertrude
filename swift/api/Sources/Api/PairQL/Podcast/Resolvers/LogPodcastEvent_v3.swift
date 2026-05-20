@@ -6,6 +6,14 @@ import XSlack
 
 extension LogPodcastEvent_v3: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
+    try await PodcastApp.Install.ensureExists(
+      deviceId: IOSDevice.Id(input.deviceId),
+      modelIdentifier: input.modelIdentifier,
+      iosVersion: input.iosVersion,
+      appVersion: input.appVersion,
+      in: context.db,
+    )
+
     try await context.db.create(PodcastEvent(
       eventId: input.eventId,
       kind: .init(rawValue: input.kind) ?? .unexpected,
@@ -164,6 +172,28 @@ struct FamilySharedOrSandboxEventCountForDevice: CustomCountable {
   }
 
   var count: Int
+}
+
+var grandfatherableLegacyIapPredicateSQL: String {
+  "\(PodcastEvent.columnName(.eventId)) IN \(paidPodcastEventIdsSQL)"
+    + " AND LENGTH(\(podcastOriginalIDExprSQL)) <> 16"
+}
+
+struct EarliestGrandfatherableLegacyIapForDevice: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    var stmt = SQL.Statement("""
+    SELECT MIN(\(PodcastEvent.columnName(.createdAt))) AS created_at
+    FROM \(table: PodcastEvent.self)
+    WHERE \(grandfatherableLegacyIapPredicateSQL)
+      AND \(PodcastEvent.columnName(.deviceId)) =\(" ")
+    """)
+    if let deviceId = bindings.first {
+      stmt.components.append(.binding(deviceId))
+    }
+    return stmt
+  }
+
+  var createdAt: Date?
 }
 
 private let suppressedEventIds: Set<String> = [

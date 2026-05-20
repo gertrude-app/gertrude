@@ -1,7 +1,9 @@
 // auto-generated, do not edit
 export type { ServerPqlError } from '../PqlError';
 
-export type BillingStatus = 'current' | 'pastDue';
+export type BillingStatus =
+  | { case: 'current'; renewsAt: ISODateString }
+  | { case: 'pastDue'; since: ISODateString };
 
 export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
 
@@ -19,8 +21,18 @@ export type DeviceModelFamily =
 export type GertrudeApp = 'blocker' | 'podcasts';
 
 export type PlanStatus =
-  | { case: 'light'; status: 'current' | 'pastDue' }
-  | { case: 'full'; status: 'current' | 'pastDue' }
+  | {
+      case: 'light';
+      status:
+        | { case: 'current'; renewsAt: ISODateString }
+        | { case: 'pastDue'; since: ISODateString };
+    }
+  | {
+      case: 'full';
+      status:
+        | { case: 'current'; renewsAt: ISODateString }
+        | { case: 'pastDue'; since: ISODateString };
+    }
   | { case: 'fullTrial'; until: ISODateString }
   | { case: 'fullTrialGrace'; until: ISODateString }
   | { case: 'free' }

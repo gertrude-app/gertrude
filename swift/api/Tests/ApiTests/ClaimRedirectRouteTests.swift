@@ -6,7 +6,7 @@ import XExpect
 
 @testable import Api
 
-final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable {
+final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidCode_redirectsWithDeviceInfo() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice(
@@ -109,6 +109,33 @@ final class ClaimSupervisionRedirectRouteTests: ApiTestCase, @unchecked Sendable
         let location = res.headers.first(name: .location)!
         expect(location).toContain("\(self.env.dashboardUrl)/signup")
         expect(location).toContain("error=expired_code")
+      },
+    )
+  }
+
+  // remaining handler logic is exercised by the supervision tests above
+  func testAmValidCode_redirectsToAmClaimFunnel() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    _ = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: nil,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+      claimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
+    ))
+
+    try await app.test(
+      .GET,
+      "claim-pending-am/\(code)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
+        expect(location).toContain("claimPendingAmDevice=\(code)")
+        expect(location).toContain("iosVersion=18.2")
+        expect(location).toContain("redirect=/claim-am-device/\(code)/claim")
+        expect(location).not.toContain("error=")
       },
     )
   }

@@ -2,8 +2,19 @@ import Dependencies
 import DuetSQL
 import Vapor
 
-enum ClaimSupervisionRedirectRoute {
-  @Sendable static func handler(_ request: Request) async throws -> Response {
+enum ClaimRedirectRoute {
+  @Sendable static func supervision(_ request: Request) async throws -> Response {
+    try await self.handle(request, app: .blocker)
+  }
+
+  @Sendable static func am(_ request: Request) async throws -> Response {
+    try await self.handle(request, app: .podcasts)
+  }
+
+  private static func handle(
+    _ request: Request,
+    app: GertrudeIOSApp,
+  ) async throws -> Response {
     let signup = "\(request.env.dashboardUrl)/signup"
 
     guard let code = Int(request.parameters.get("code") ?? ""),
@@ -25,10 +36,10 @@ enum ClaimSupervisionRedirectRoute {
 
     var components = URLComponents()
     components.queryItems = [
-      .init(name: "claimPendingSupervision", value: "\(code)"),
+      .init(name: app.claimPendingQueryKey, value: "\(code)"),
       .init(name: "modelName", value: device.modelName),
       .init(name: "iosVersion", value: device.iosVersion),
-      .init(name: "redirect", value: "/supervise-device/\(code)/claim"),
+      .init(name: "redirect", value: app.claimFunnelRedirectPath(code: code)),
     ]
     return request.redirect(to: "\(signup)\(components.string ?? "")", redirectType: .temporary)
   }

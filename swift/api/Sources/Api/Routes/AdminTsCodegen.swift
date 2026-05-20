@@ -19,11 +19,11 @@ enum AdminTsCodegenRoute {
       ("ServerPqlError", PqlError.self),
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
-      ("GertrudeApp", AppStore.GertrudeApp.self),
       ("PlanStatus", PlanStatus.self),
       ("BillingStatus", BillingStatus.self),
       ("SubscriptionTier", StripeSubscription.Tier.self),
       ("StripeSubscriptionStatus", StripeSubscription.StripeStatus.self),
+      ("GertrudeApp", GertrudeIOSApp.self),
     ]
   }
 

@@ -88,7 +88,12 @@ public extension Configure {
 
     app.get(
       "claim-pending-supervision", ":code",
-      use: ClaimSupervisionRedirectRoute.handler(_:),
+      use: ClaimRedirectRoute.supervision(_:),
+    )
+
+    app.get(
+      "claim-pending-am", ":code",
+      use: ClaimRedirectRoute.am(_:),
     )
 
     app.get(

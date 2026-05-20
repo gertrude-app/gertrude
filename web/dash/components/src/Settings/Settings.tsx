@@ -4,7 +4,7 @@ import React from 'react';
 import type {
   AdminNotificationTrigger,
   ConfirmableEntityAction,
-  GetSubscriptionPanel,
+  GetSubscriptionPanel_v2,
   NewAdminNotificationMethodEvent,
   PendingNotificationMethod,
   Subcomponents,
@@ -29,7 +29,7 @@ export type NewMethod = { id: UUID; confirmed: boolean };
 
 interface Props {
   email: string;
-  subscriptionPanel: GetSubscriptionPanel.Output;
+  subscriptionPanel: GetSubscriptionPanel_v2.Output;
   onSubscriptionPanelAction(action: SubscriptionPanelAction): unknown;
   pendingSubscriptionPanelAction?: SubscriptionPanelAction;
   pendingMethod?: PendingNotificationMethod;

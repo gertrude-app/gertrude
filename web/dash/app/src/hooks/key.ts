@@ -16,7 +16,7 @@ import type {
   GetIOSDeviceSupervisionStatus,
   GetIdentifiedApps,
   GetSelectableKeychains,
-  GetSubscriptionPanel,
+  GetSubscriptionPanel_v2,
   GetSuspendFilterRequest,
   LatestAppVersions,
   SecurityEventsFeed,
@@ -121,7 +121,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`account-owner`, [`account-owner`]);
   }
 
-  static get subscriptionPanel(): QueryKey<GetSubscriptionPanel.Output> {
+  static get subscriptionPanel(): QueryKey<GetSubscriptionPanel_v2.Output> {
     return new QueryKey(`subscription-panel`, [`subscription-panel`]);
   }
 

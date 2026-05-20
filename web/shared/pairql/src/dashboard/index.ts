@@ -24,7 +24,7 @@ export * from './pairs/GetIOSDevice';
 export * from './pairs/GetIOSDeviceClaimData';
 export * from './pairs/GetIOSDeviceSupervisionStatus';
 export * from './pairs/GetSelectableKeychains';
-export * from './pairs/GetSubscriptionPanel';
+export * from './pairs/GetSubscriptionPanel_v2';
 export * from './pairs/GetSuspendFilterRequest';
 export * from './pairs/HandleCheckoutCancel';
 export * from './pairs/HandleCheckoutSuccess';

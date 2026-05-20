@@ -253,7 +253,10 @@ const noopClient: ApiClient = {
   },
   getSubscriptionPanel: async () => {
     return Result.success({
-      planStatus: { case: `full`, status: `current` },
+      planStatus: {
+        case: `full`,
+        status: { case: `current`, renewsAt: new Date().toISOString() },
+      },
       secondary: [],
       availableTiers: [],
     });

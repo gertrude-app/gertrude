@@ -3,121 +3,64 @@ import Foundation
 import PairQL
 import TSCodable
 
+/// @deprecated safe to remove 2026-06-05
 struct GetSubscriptionPanel: Pair {
   static let auth: ClientAuth = .parent
 
-  enum PortalConfig: String, PairNestable {
-    case lightTier
-    case `default`
+  enum BillingStatusV1: String, Codable, Equatable, Sendable {
+    case current
+    case pastDue
   }
 
   @TSCodable
-  enum Action: Equatable, Sendable {
-    case startCheckout(tier: StripeSubscription.Tier)
-    case openBillingPortal(config: PortalConfig)
-    case upgradeSubscriptionTier(to: StripeSubscription.Tier)
-    case reactivateViaCheckout(tier: StripeSubscription.Tier)
-    case startFullTrial
+  enum PlanStatusV1: Equatable, Sendable {
+    case free
+    case light(status: BillingStatusV1)
+    case full(status: BillingStatusV1)
+    case fullTrial(until: Date)
+    case fullTrialGrace(until: Date)
+    case complimentary
   }
 
   struct Output: PairOutput {
-    var planStatus: PlanStatus
+    var planStatus: PlanStatusV1
     var currentPeriodEnd: Date?
-    var primary: Action?
-    var secondary: [Action]
+    var primary: GetSubscriptionPanel_v2.Action?
+    var secondary: [GetSubscriptionPanel_v2.Action]
     var availableTiers: [StripeSubscription.Tier]
     var fullTrialStartedAt: Date?
     var lastPaidTier: StripeSubscription.Tier?
   }
 }
 
-extension GetSubscriptionPanel: NoInputResolver {
-  static func resolve(in context: ParentContext) async throws -> Output {
-    try await panelOutput(billing: context.currentBillingAccount())
+extension GetSubscriptionPanel.PlanStatusV1 {
+  init(_ status: PlanStatus) {
+    switch status {
+    case .free: self = .free
+    case .light(.current): self = .light(status: .current)
+    case .light(.pastDue): self = .light(status: .pastDue)
+    case .full(.current): self = .full(status: .current)
+    case .full(.pastDue): self = .full(status: .pastDue)
+    case .fullTrial(let until): self = .fullTrial(until: until)
+    case .fullTrialGrace(let until): self = .fullTrialGrace(until: until)
+    case .complimentary: self = .complimentary
+    }
   }
 }
 
-func panelOutput(billing: BillingAccountSnapshot) -> GetSubscriptionPanel.Output {
-  typealias Action = GetSubscriptionPanel.Action
-  let planStatus = billing.planStatus
-  let identity = billing.billingIdentity
-
-  let primary: Action?
-  let secondary: [Action]
-
-  switch planStatus {
-  case .complimentary:
-    primary = nil
-    secondary = []
-
-  case .full:
-    primary = .openBillingPortal(config: .default)
-    secondary = []
-
-  case .light(.pastDue):
-    primary = .openBillingPortal(config: .lightTier)
-    secondary = [.upgradeSubscriptionTier(to: .full)]
-
-  case .light(.current):
-    if identity?.fullTrialStartedAt == nil {
-      primary = .upgradeSubscriptionTier(to: .full)
-      secondary = [.openBillingPortal(config: .lightTier), .startFullTrial]
-    } else {
-      primary = .upgradeSubscriptionTier(to: .full)
-      secondary = [.openBillingPortal(config: .lightTier)]
-    }
-
-  case .fullTrial, .fullTrialGrace:
-    if billing.stripeSubscription?.tier == .light {
-      primary = .upgradeSubscriptionTier(to: .full)
-      secondary = [.openBillingPortal(config: .lightTier)]
-    } else if identity?.lastStripeSubscriptionId != nil {
-      primary = .reactivateViaCheckout(tier: .full)
-      secondary = identity?.lastPaidTier == .full
-        ? []
-        : [.reactivateViaCheckout(tier: .light)]
-    } else {
-      primary = .startCheckout(tier: .full)
-      secondary = [.startCheckout(tier: .light)]
-    }
-
-  case .free:
-    if identity?.lastStripeSubscriptionId == nil {
-      let trialOption: [Action] = identity?.fullTrialStartedAt == nil ? [.startFullTrial] : []
-      primary = .startCheckout(tier: .full)
-      secondary = [.startCheckout(tier: .light)] + trialOption
-    } else if identity?.lastPaidTier == .full {
-      primary = .reactivateViaCheckout(tier: .full)
-      secondary = [.reactivateViaCheckout(tier: .light)]
-    } else {
-      primary = .reactivateViaCheckout(tier: .light)
-      secondary = [.reactivateViaCheckout(tier: .full)]
-    }
+extension GetSubscriptionPanel: NoInputResolver {
+  static func resolve(in context: ParentContext) async throws -> Output {
+    await context.db.logDeprecated("GetSubscriptionPanel(v1)")
+    let billing = try await context.currentBillingAccount()
+    let panel = panelOutput_v2(billing: billing)
+    return Output(
+      planStatus: PlanStatusV1(panel.planStatus),
+      currentPeriodEnd: billing.stripeSubscription?.currentPeriodEnd,
+      primary: panel.primary,
+      secondary: panel.secondary,
+      availableTiers: panel.availableTiers,
+      fullTrialStartedAt: panel.fullTrialStartedAt,
+      lastPaidTier: panel.lastPaidTier,
+    )
   }
-
-  let availableTiers: [StripeSubscription.Tier] = {
-    var tiers: Set<StripeSubscription.Tier> = []
-    let actions = [primary].compactMap(\.self) + secondary
-    for action in actions {
-      switch action {
-      case .startCheckout(let t),
-           .upgradeSubscriptionTier(let t),
-           .reactivateViaCheckout(let t):
-        tiers.insert(t)
-      case .openBillingPortal, .startFullTrial:
-        break
-      }
-    }
-    return StripeSubscription.Tier.allCases.filter { tiers.contains($0) }
-  }()
-
-  return GetSubscriptionPanel.Output(
-    planStatus: planStatus,
-    currentPeriodEnd: billing.stripeSubscription?.currentPeriodEnd,
-    primary: primary,
-    secondary: secondary,
-    availableTiers: availableTiers,
-    fullTrialStartedAt: identity?.fullTrialStartedAt,
-    lastPaidTier: identity?.lastPaidTier,
-  )
 }
