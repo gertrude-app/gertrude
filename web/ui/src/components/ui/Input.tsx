@@ -23,6 +23,7 @@ type Props = {
   helperText?: string;
   error?: string;
   disabled?: boolean;
+  className?: string;
 };
 
 const Input: React.FC<Props> = ({ ...props }) => {
@@ -32,7 +33,13 @@ const Input: React.FC<Props> = ({ ...props }) => {
   const descriptionId = props.helperText || props.error ? `${id}-description` : undefined;
 
   return (
-    <div className={cx('flex flex-col gap-1', props.disabled && 'opacity-60')}>
+    <div
+      className={cx(
+        'flex flex-col gap-1',
+        props.disabled && 'opacity-60',
+        props.className,
+      )}
+    >
       {props.label && (
         <label
           htmlFor={id}

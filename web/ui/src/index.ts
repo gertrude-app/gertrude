@@ -10,6 +10,7 @@ export { default as Input } from './components/ui/Input';
 export { default as PageHeading } from './components/ui/PageHeading';
 export { default as RadioGroup } from './components/ui/RadioGroup';
 export { default as Select } from './components/ui/Select';
+export { default as SegmentedTabs } from './components/ui/SegmentedTabs';
 export { default as Sidebar } from './components/ui/sidebar/Sidebar';
 export { default as SidebarItem } from './components/ui/sidebar/SidebarItem';
 export { default as SidebarLayout } from './components/ui/sidebar/SidebarLayout';

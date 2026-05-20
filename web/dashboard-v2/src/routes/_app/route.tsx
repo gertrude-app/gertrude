@@ -16,7 +16,9 @@ import {
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
   const isSelected = (href: string): boolean =>
-    href === '/' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+    href === '/'
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <SidebarLayout content={<Outlet />}>
@@ -63,12 +65,16 @@ const AuthedLayout: React.FC = () => {
           <SidebarItem
             title="Settings"
             icon={SettingsIcon}
-            href="/settings"
+            href="/settings/notifications"
             selected={isSelected('/settings')}
           />
         </SidebarSection>
         <SidebarSection title="Help">
-          <SidebarItem title="Docs" icon={BookOpenIcon} href="https://gertrude.app/docs" />
+          <SidebarItem
+            title="Docs"
+            icon={BookOpenIcon}
+            href="https://gertrude.app/docs"
+          />
           <SidebarItem
             title="Support"
             icon={LifeBuoyIcon}
