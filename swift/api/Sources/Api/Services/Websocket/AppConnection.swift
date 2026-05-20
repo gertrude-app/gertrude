@@ -6,6 +6,13 @@ import Vapor
 import XCore
 
 final class AppConnection: Sendable {
+  enum LogLevel {
+    case debug
+    case info
+    case warning
+    case error
+  }
+
   struct Ids: Sendable {
     let computerUser: ComputerUser.Id
     let child: Child.Id
@@ -34,27 +41,36 @@ final class AppConnection: Sendable {
       self.ws.onClose.whenComplete { result in
         switch result {
         case .success:
-          self.log("onclose success")
-          Task { await with(dependency: \.websockets).remove(self) }
+          self.log("onclose success", level: .debug)
+          Task {
+            await AppConnections.shared.recordClosed()
+            await with(dependency: \.websockets).remove(self)
+          }
         case .failure(let err):
-          self.log("onclose fail", extra: "err: \(err)")
+          self.log("onclose fail", extra: "err=\(err)", level: .warning)
         }
       }
     }
   }
 
-  func log(_ primary: String, extra: String? = nil) {
-    var childMsg = "[WS] child=\(self.ids.child.lowercased): \(primary)"
-    if let extra { childMsg += " \(extra)" }
-    with(dependency: \.logger).info("\(childMsg)")
-    var computerMsg = "[WS] compu=\(self.ids.computerUser.lowercased): \(primary)"
-    if let extra { computerMsg += " \(extra)" }
-    with(dependency: \.logger).info("\(computerMsg)")
+  func log(_ primary: String, extra: String? = nil, level: LogLevel = .info) {
+    var message = "[WS] child=\(self.ids.child.lowercased) compu=\(self.ids.computerUser.lowercased) conn=\(self.id.lowercased): \(primary)"
+    if let extra { message += " \(extra)" }
+    let logger = with(dependency: \.logger)
+    switch level {
+    case .debug:
+      logger.debug("\(message)")
+    case .info:
+      logger.info("\(message)")
+    case .warning:
+      logger.warning("\(message)")
+    case .error:
+      logger.error("\(message)")
+    }
   }
 
   func onPing() {
     self.lastActivity.withLock { $0 = Date() }
-    self.log("received ping")
   }
 
   var isAlive: Bool {
@@ -74,16 +90,17 @@ final class AppConnection: Sendable {
   func onText(_ json: String) {
     self.lastActivity.withLock { $0 = Date() }
     guard let message = try? JSON.decode(json, as: IncomingMessage.self) else {
-      self.log("ERR failed to decode msg", extra: "json=\(json)")
+      self.log("failed to decode msg", extra: "json=\(json)", level: .warning)
       return
     }
-    self.log("got message", extra: "\(message)")
+    Task { await AppConnections.shared.recordMessage() }
     switch message {
     case .currentFilterState(let filterStateWithoutTimes):
       self.filterState.withLock { $0 = .withoutTimes(filterStateWithoutTimes) }
     case .currentFilterState_v2(let filterState):
       self.filterState.withLock { $0 = .withTimes(filterState) }
     case .goingOffline:
+      self.log("going offline", level: .debug)
       Task { await with(dependency: \.websockets).remove(self) }
     }
   }
