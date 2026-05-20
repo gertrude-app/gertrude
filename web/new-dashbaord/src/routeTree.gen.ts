@@ -12,13 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
-import { Route as AppSettingsRouteImport } from './routes/_app/settings'
 import { Route as AppSecurityRouteImport } from './routes/_app/security'
 import { Route as AppKeychainsRouteImport } from './routes/_app/keychains'
 import { Route as AppDevicesRouteImport } from './routes/_app/devices'
 import { Route as AppChildrenRouteImport } from './routes/_app/children'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
+import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
+import { Route as AppSettingsNotificationsRouteImport } from './routes/_app/settings/notifications'
+import { Route as AppSettingsBillingRouteImport } from './routes/_app/settings/billing'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -32,11 +34,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppSignoutRoute = AppSignoutRouteImport.update({
   id: '/signout',
   path: '/signout',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSecurityRoute = AppSecurityRouteImport.update({
@@ -69,77 +66,105 @@ const unauthedLoginRoute = unauthedLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsRouteRoute = AppSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSettingsNotificationsRoute =
+  AppSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AppSettingsRouteRoute,
+  } as any)
+const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppSettingsRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
   '/children': typeof AppChildrenRoute
   '/devices': typeof AppDevicesRoute
   '/keychains': typeof AppKeychainsRoute
   '/security': typeof AppSecurityRoute
-  '/settings': typeof AppSettingsRoute
   '/signout': typeof AppSignoutRoute
+  '/settings/billing': typeof AppSettingsBillingRoute
+  '/settings/notifications': typeof AppSettingsNotificationsRoute
 }
 export interface FileRoutesByTo {
+  '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
   '/children': typeof AppChildrenRoute
   '/devices': typeof AppDevicesRoute
   '/keychains': typeof AppKeychainsRoute
   '/security': typeof AppSecurityRoute
-  '/settings': typeof AppSettingsRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
+  '/settings/billing': typeof AppSettingsBillingRoute
+  '/settings/notifications': typeof AppSettingsNotificationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
+  '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
   '/_app/children': typeof AppChildrenRoute
   '/_app/devices': typeof AppDevicesRoute
   '/_app/keychains': typeof AppKeychainsRoute
   '/_app/security': typeof AppSecurityRoute
-  '/_app/settings': typeof AppSettingsRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/settings/billing': typeof AppSettingsBillingRoute
+  '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/settings'
     | '/login'
     | '/signup'
     | '/children'
     | '/devices'
     | '/keychains'
     | '/security'
-    | '/settings'
     | '/signout'
+    | '/settings/billing'
+    | '/settings/notifications'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/settings'
     | '/login'
     | '/signup'
     | '/children'
     | '/devices'
     | '/keychains'
     | '/security'
-    | '/settings'
     | '/signout'
     | '/'
+    | '/settings/billing'
+    | '/settings/notifications'
   id:
     | '__root__'
     | '/_app'
+    | '/_app/settings'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
     | '/_app/children'
     | '/_app/devices'
     | '/_app/keychains'
     | '/_app/security'
-    | '/_app/settings'
     | '/_app/signout'
     | '/_app/'
+    | '/_app/settings/billing'
+    | '/_app/settings/notifications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -169,13 +194,6 @@ declare module '@tanstack/react-router' {
       path: '/signout'
       fullPath: '/signout'
       preLoaderRoute: typeof AppSignoutRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/settings': {
-      id: '/_app/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/security': {
@@ -220,25 +238,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unauthedLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/settings/notifications': {
+      id: '/_app/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AppSettingsNotificationsRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
+    }
+    '/_app/settings/billing': {
+      id: '/_app/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof AppSettingsBillingRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
+    }
   }
 }
 
+interface AppSettingsRouteRouteChildren {
+  AppSettingsBillingRoute: typeof AppSettingsBillingRoute
+  AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
+}
+
+const AppSettingsRouteRouteChildren: AppSettingsRouteRouteChildren = {
+  AppSettingsBillingRoute: AppSettingsBillingRoute,
+  AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
+}
+
+const AppSettingsRouteRouteWithChildren =
+  AppSettingsRouteRoute._addFileChildren(AppSettingsRouteRouteChildren)
+
 interface AppRouteRouteChildren {
+  AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppChildrenRoute: typeof AppChildrenRoute
   AppDevicesRoute: typeof AppDevicesRoute
   AppKeychainsRoute: typeof AppKeychainsRoute
   AppSecurityRoute: typeof AppSecurityRoute
-  AppSettingsRoute: typeof AppSettingsRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
   AppChildrenRoute: AppChildrenRoute,
   AppDevicesRoute: AppDevicesRoute,
   AppKeychainsRoute: AppKeychainsRoute,
   AppSecurityRoute: AppSecurityRoute,
-  AppSettingsRoute: AppSettingsRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
 }

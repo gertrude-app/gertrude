@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 
 interface Props {
   title: string;
+  subtitle?: string;
   buttons?: Array<{
     text: string;
     onClick: () => void;
@@ -13,7 +14,12 @@ interface Props {
   breadcrumbs?: Array<{ text: string; href: string }>;
 }
 
-const PageHeading: React.FC<Props> = ({ title, buttons = [], breadcrumbs = [] }) => {
+const PageHeading: React.FC<Props> = ({
+  title,
+  subtitle,
+  buttons = [],
+  breadcrumbs = [],
+}) => {
   return (
     <div className="border-b border-stone-200/60 pb-4">
       {breadcrumbs.length > 0 && (
@@ -37,7 +43,10 @@ const PageHeading: React.FC<Props> = ({ title, buttons = [], breadcrumbs = [] })
         </nav>
       )}
       <div className="flex justify-between items-end">
-        <h1 className="text-3xl font-medium text-stone-900 flex-grow -mb-2">{title}</h1>
+        <div className="flex flex-col gap-2">
+          <h1 className="text-3xl font-medium text-stone-900 flex-grow -mb-2">{title}</h1>
+          {subtitle && <h2 className="text-stone-600">{subtitle}</h2>}
+        </div>
         {buttons.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {buttons.map((button) => (
