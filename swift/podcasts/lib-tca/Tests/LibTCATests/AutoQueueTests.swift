@@ -95,7 +95,8 @@ struct AutoQueueTests {
     expectNoDifference(queue.map(\.episodeNumber), [5, 2])
   }
 
-  @Test func `most recently listened per show skips completed and archived candidates`() async throws {
+  @Test func `most recently listened per show skips completed and archived candidates`(
+  ) async throws {
     @Dependency(\.db) var database
     try await database.write { db in
       try Show.insert { .mock(4) }.execute(db)
