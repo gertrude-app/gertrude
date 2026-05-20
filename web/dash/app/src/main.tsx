@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { BrowserRouter } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import App from './App';
+import StaleDashboardReload from './components/StaleDashboardReload';
 import { AuthProvider } from './hooks/auth';
 
 const queryClient = new QueryClient();
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById(`root`)!).render(
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <Toaster position="top-right" />
+        <StaleDashboardReload />
         <BrowserRouter>
           <App />
         </BrowserRouter>

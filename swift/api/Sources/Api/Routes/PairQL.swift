@@ -114,7 +114,7 @@ enum PairQLRoute: Equatable, RouteResponder {
         .ok,
         numResponseBytes: output.body.count,
       )
-      return output
+      return addDashboardContractHeader(output, for: route)
     } catch {
       let domain = req.parameters.get("domain") ?? ""
       if "\(type(of: error))" == "ParsingError" {
@@ -136,7 +136,7 @@ enum PairQLRoute: Equatable, RouteResponder {
           "\(type(of: error))",
           parsingErrorSummary(req),
         )
-        return .init(PqlError(
+        return addDashboardContractHeader(.init(PqlError(
           id: "0f5a25c9",
           requestId: ctx.requestId,
           type: .notFound,
@@ -144,7 +144,7 @@ enum PairQLRoute: Equatable, RouteResponder {
             ? "PairQL routing \(error)"
             : "PairQL route not found",
           showContactSupport: true,
-        ))
+        )), forDomain: domain)
       } else if let pqlError = error as? PqlError {
         recordTelemetry(
           req,
@@ -156,7 +156,7 @@ enum PairQLRoute: Equatable, RouteResponder {
           "PqlError",
           pqlError.debugMessage,
         )
-        return .init(pqlError)
+        return addDashboardContractHeader(.init(pqlError), forDomain: domain)
       } else if let convertible = error as? PqlErrorConvertible {
         let pqlError = convertible.pqlError(in: ctx)
         recordTelemetry(
@@ -169,7 +169,7 @@ enum PairQLRoute: Equatable, RouteResponder {
           "\(type(of: error))",
           pqlError.debugMessage,
         )
-        return .init(pqlError)
+        return addDashboardContractHeader(.init(pqlError), forDomain: domain)
       } else {
         print(type(of: error), error)
         recordTelemetry(
@@ -189,6 +189,26 @@ enum PairQLRoute: Equatable, RouteResponder {
 }
 
 // helpers
+
+private func addDashboardContractHeader(_ response: Response, for route: PairQLRoute) -> Response {
+  if case .dashboard = route {
+    response.headers.replaceOrAdd(
+      name: .xDashboardPairQLContract,
+      value: DashboardTsCodegenRoute.currentContractHash,
+    )
+  }
+  return response
+}
+
+private func addDashboardContractHeader(_ response: Response, forDomain domain: String) -> Response {
+  if domain == "dashboard" {
+    response.headers.replaceOrAdd(
+      name: .xDashboardPairQLContract,
+      value: DashboardTsCodegenRoute.currentContractHash,
+    )
+  }
+  return response
+}
 
 private func logOperation(_ route: PairQLRoute, _ request: Request, _ duration: TimeInterval) {
   let operation = "\(request.parameters.get("operation") ?? "")".yellow

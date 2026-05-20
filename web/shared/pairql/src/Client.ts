@@ -36,6 +36,7 @@ export default abstract class Client<Auth> {
     try {
       const url = `${this.endpoint}/pairql/${this.domain}/${operation}`;
       const res = await fetch(url, init);
+      this.handleResponse(res);
       const text = await res.text();
       let json: unknown;
       try {
@@ -52,6 +53,8 @@ export default abstract class Client<Auth> {
       return this.errorResult(err);
     }
   }
+
+  protected handleResponse(_res: Response): void {}
 
   private isStubbedError(json: unknown): boolean {
     return typeof json === `object` && json !== null && `__cyStubbedError` in json;

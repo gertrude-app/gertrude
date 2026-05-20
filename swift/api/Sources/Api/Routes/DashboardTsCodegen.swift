@@ -1,3 +1,5 @@
+import Crypto
+import Foundation
 import Gertie
 import GertieIOS
 import PairQL
@@ -14,6 +16,12 @@ enum DashboardTsCodegenRoute {
 
     var shared: [String: String]
     var pairs: [String: Pair]
+    var contractHash: String
+  }
+
+  private struct Contract: Content {
+    var shared: [String: String]
+    var pairs: [String: Response.Pair]
   }
 
   static var sharedTypes: [(String, Any.Type)] {
@@ -121,6 +129,17 @@ enum DashboardTsCodegenRoute {
   }
 
   static func generate() throws -> Response {
+    let contract = try self.contract()
+    return Response(
+      shared: contract.shared,
+      pairs: contract.pairs,
+      contractHash: try self.hash(contract),
+    )
+  }
+
+  static let currentContractHash = try! Self.hash(Self.contract())
+
+  private static func contract() throws -> Contract {
     var shared: [String: String] = [:]
     var sharedAliases: [Config.Alias] = [
       .init(NoInput.self, as: "void"),
@@ -141,7 +160,14 @@ enum DashboardTsCodegenRoute {
       pairs[pairType.name] = try self.ts(for: pairType, with: config)
     }
 
-    return Response(shared: shared, pairs: pairs)
+    return Contract(shared: shared, pairs: pairs)
+  }
+
+  private static func hash(_ contract: Contract) throws -> String {
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys]
+    let data = try encoder.encode(contract)
+    return SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
   }
 
   @Sendable static func handler(_ request: Request) async throws -> Response {

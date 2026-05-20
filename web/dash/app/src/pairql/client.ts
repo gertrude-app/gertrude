@@ -1,10 +1,23 @@
 import DashboardClient from '@shared/pairql/dashboard';
+import { DASHBOARD_PAIRQL_CONTRACT_HASH } from '@shared/pairql/src/dashboard';
 import type { PqlError } from '@shared/pairql';
 import type { ClientAuth } from '@shared/pairql/src/dashboard';
+import { markDashboardStale } from '../stale-dashboard';
 
 const apiEndpoint = getApiEndpoint();
 
-export const liveClient = new DashboardClient(
+const DASHBOARD_CONTRACT_HEADER = `X-Dashboard-PairQL-Contract`;
+
+class StaleDetectingDashboardClient extends DashboardClient {
+  protected override handleResponse(res: Response): void {
+    const serverHash = res.headers.get(DASHBOARD_CONTRACT_HEADER);
+    if (serverHash && serverHash !== DASHBOARD_PAIRQL_CONTRACT_HASH) {
+      markDashboardStale();
+    }
+  }
+}
+
+export const liveClient = new StaleDetectingDashboardClient(
   apiEndpoint,
   createPrepareRequest(apiEndpoint),
 );

@@ -11,6 +11,7 @@ extension HTTPHeaders {
 extension HTTPHeaders.Name {
   static let xAppVersion = HTTPHeaders.Name("X-App-Version")
   static let xDashboardUrl = HTTPHeaders.Name("X-DashboardUrl")
+  static let xDashboardPairQLContract = HTTPHeaders.Name("X-Dashboard-PairQL-Contract")
   static let xAdminToken = HTTPHeaders.Name("X-AdminToken")
   static let xSuperAdminToken = HTTPHeaders.Name("X-SuperAdminToken")
   // actual header not renamed, pending careful long-term deprecation

@@ -1,4 +1,5 @@
 // auto-generated, do not edit
+export * from './contract';
 export * from './shared';
 export * from './pairs/ChildActivitySummaries';
 export * from './pairs/ClaimIOSDevice';

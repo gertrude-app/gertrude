@@ -38,6 +38,9 @@ private func corsMiddleware(_ app: Application) -> CORSMiddleware {
       .xMacAppToken,
       .xAppVersion,
     ],
+    exposedHeaders: [
+      .xDashboardPairQLContract,
+    ],
   )
 
   return CORSMiddleware(configuration: configuration)
