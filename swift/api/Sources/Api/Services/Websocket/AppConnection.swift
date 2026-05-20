@@ -54,7 +54,6 @@ final class AppConnection: Sendable {
 
   func onPing() {
     self.lastActivity.withLock { $0 = Date() }
-    self.log("received ping")
   }
 
   var isAlive: Bool {
