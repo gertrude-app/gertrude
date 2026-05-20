@@ -37,17 +37,14 @@ enum AutoQueue {
 
     // otherwise, work through most recently listened other shows, continuing
     let recent = self.mostRecentlyListenedEpisodePerShow(excluding: nowPlaying.show)
-    for episode in recent {
-      let queue = self.episodeQueue(within: episode.showId, after: episode)
-      if !queue.isEmpty {
-        return queue
-      }
+    if let episode = recent.first {
+      return [episode] + self.episodeQueue(within: episode.showId, after: episode)
     }
 
     // finally, just queue up unplayed episodes from any show
     @Dependency(\.db) var database
     return database.tryRead { db in
-      try Episode
+      try Episode.incompleteAndUnarchived
         .where { $0.lastPlayedAt.is(nil) }
         .order { $0.pubDate.desc() }
         .fetchAll(db)
@@ -57,22 +54,18 @@ enum AutoQueue {
   static func episodeQueue(within show: Show.ID, after episode: Episode) -> [Episode] {
     @Dependency(\.db) var database
     let episodes: [Episode] = database.tryRead { db in
-      let newerEpisodes = try Episode
+      let newerEpisodes = try Episode.incompleteAndUnarchived
         .where { $0.showId.eq(show) }
         .where { $0.id.neq(episode.id) }
         .where { $0.pubDate.gt(episode.pubDate) }
         .where { $0.progress.lt(2.0) }
-        .where { $0.completedAt.is(nil) }
-        .where { $0.isArchived.eq(false) }
         .order { $0.pubDate.asc() }
         .fetchAll(db)
-      let olderEpisodes = try Episode
+      let olderEpisodes = try Episode.incompleteAndUnarchived
         .where { $0.showId.eq(show) }
         .where { $0.id.neq(episode.id) }
         .where { $0.pubDate.lt(episode.pubDate) }
         .where { $0.progress.lt(2.0) }
-        .where { $0.completedAt.is(nil) }
-        .where { $0.isArchived.eq(false) }
         .order { $0.pubDate.desc() }
         .fetchAll(db)
       return newerEpisodes + olderEpisodes
@@ -83,16 +76,19 @@ enum AutoQueue {
   static func mostRecentlyListenedEpisodePerShow(excluding show: Show) -> [Episode] {
     @Dependency(\.db) var database
     let episodes: [Episode] = database.tryRead { db in
-      try Episode
+      try Episode.incompleteAndUnarchived
         .where {
-          $0.showId.neq(show.id) && $0.lastPlayedAt.is(#sql(
-            """
-            (SELECT MAX(\(raw: Episode.col.lastPlayedAt.name))
-             FROM \(Episode.self) e2
-             WHERE e2.\(raw: Episode.col.showId.name) = \(Episode.col.showId)
-               AND e2.\(raw: Episode.col.lastPlayedAt.name) IS NOT NULL)
-            """,
-          ))
+          $0.showId.neq(show.id) &&
+            $0.lastPlayedAt.is(#sql(
+              """
+              (SELECT MAX(\(raw: Episode.col.lastPlayedAt.name))
+               FROM \(Episode.self) e2
+               WHERE e2.\(raw: Episode.col.showId.name) = \(Episode.col.showId)
+                 AND e2.\(raw: Episode.col.lastPlayedAt.name) IS NOT NULL
+                 AND e2.\(raw: Episode.col.completedAt.name) IS NULL
+                 AND e2.\(raw: Episode.col.isArchived.name) = \(false, as: Bool.self))
+              """,
+            ))
         }
         .order { $0.lastPlayedAt.desc() }
         .fetchAll(db)

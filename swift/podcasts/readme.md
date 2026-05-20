@@ -2,7 +2,10 @@
 
 ## Releases
 
-- `1.5.1` (5/4/26)
+- `1.6.0` (in-progress)
+  - autoqueue should resume in-progress episode when switching shows
+  - lower minimum iOS version to 17
+- `1.5.1` (5/4/26 - rejected during review, abandonded for account)
   - updates for correct yearly subscription
 - `1.5.0` (4/21/26)
   - added an explicit airplay button to the player view
