@@ -5,11 +5,11 @@ struct AppRatings: Pair {
   static let auth: ClientAuth = .superAdmin
 
   struct Input: PairInput {
-    var app: AppStore.GertrudeApp
+    var app: GertrudeIOSApp
   }
 
   struct Output: PairOutput {
-    var app: AppStore.GertrudeApp
+    var app: GertrudeIOSApp
     var currentAverage: Double
     var totalCount: Int
     var items: [Item]

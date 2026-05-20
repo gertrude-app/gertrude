@@ -95,5 +95,7 @@ enum Capability: Hashable, Sendable, CaseIterable {
 }
 
 private func billingStatus(of sub: StripeSubscription) -> BillingStatus {
-  sub.stripeStatus == .pastDue ? .pastDue : .current
+  sub.stripeStatus == .pastDue
+    ? .pastDue(since: sub.currentPeriodEnd)
+    : .current(renewsAt: sub.currentPeriodEnd)
 }

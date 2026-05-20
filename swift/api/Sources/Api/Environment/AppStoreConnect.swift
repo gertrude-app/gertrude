@@ -8,9 +8,9 @@ import XHttp
 #endif
 
 struct AppStoreConnectClient: Sendable {
-  var fetchReviews: @Sendable (_ app: AppStore.GertrudeApp) async throws -> [CustomerReview]
-  var fetchRatings: @Sendable (_ app: AppStore.GertrudeApp) async throws -> ITunesRatings
-  var fetchAppStoreVersion: @Sendable (_ app: AppStore.GertrudeApp) async throws -> String
+  var fetchReviews: @Sendable (_ app: GertrudeIOSApp) async throws -> [CustomerReview]
+  var fetchRatings: @Sendable (_ app: GertrudeIOSApp) async throws -> ITunesRatings
+  var fetchAppStoreVersion: @Sendable (_ app: GertrudeIOSApp) async throws -> String
 }
 
 struct CustomerReview: Codable, Sendable {
@@ -33,13 +33,13 @@ extension AppStoreConnectClient: DependencyKey {
     .init(
       fetchReviews: { app in
         let token = try await generateJWT()
-        return try await fetchAllReviews(appId: app.appleId, token: token)
+        return try await fetchAllReviews(appId: app.appStoreAppleId, token: token)
       },
       fetchRatings: { app in
-        try await fetchITunesRatings(appId: app.appleId)
+        try await fetchITunesRatings(appId: app.appStoreAppleId)
       },
       fetchAppStoreVersion: { app in
-        try await fetchITunesVersion(appId: app.appleId)
+        try await fetchITunesVersion(appId: app.appStoreAppleId)
       },
     )
   }

@@ -1,6 +1,8 @@
 import PairQL
 
 public enum UnauthedRoute: PairRoute {
+  case createClaimCode(CreateClaimCode.Input)
+  case getTrialStatus(GetTrialStatus.Input)
   case logPodcastEvent(LogPodcastEvent.Input)
   case logPodcastEvent_v2(LogPodcastEvent_v2.Input)
   case logPodcastEvent_v3(LogPodcastEvent_v3.Input)
@@ -13,6 +15,14 @@ public enum UnauthedRoute: PairRoute {
 
 public extension UnauthedRoute {
   nonisolated(unsafe) static let router: AnyParserPrinter<URLRequestData, UnauthedRoute> = OneOf {
+    Route(.case(Self.createClaimCode)) {
+      Operation(CreateClaimCode.self)
+      Body(.json(CreateClaimCode.Input.self))
+    }
+    Route(.case(Self.getTrialStatus)) {
+      Operation(GetTrialStatus.self)
+      Body(.json(GetTrialStatus.Input.self))
+    }
     Route(.case(Self.logPodcastEvent)) {
       Operation(LogPodcastEvent.self)
       Body(.json(LogPodcastEvent.Input.self))

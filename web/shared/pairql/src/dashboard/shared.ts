@@ -25,7 +25,9 @@ export type AppScope =
   | { type: 'webBrowsers' }
   | { type: 'single'; single: SingleAppScope };
 
-export type BillingStatus = 'current' | 'pastDue';
+export type BillingStatus =
+  | { case: 'current'; renewsAt: ISODateString }
+  | { case: 'pastDue'; since: ISODateString };
 
 export interface BlockedApp {
   id: UUID;
@@ -157,8 +159,18 @@ export interface PlainTimeWindow {
 }
 
 export type PlanStatus =
-  | { case: 'light'; status: 'current' | 'pastDue' }
-  | { case: 'full'; status: 'current' | 'pastDue' }
+  | {
+      case: 'light';
+      status:
+        | { case: 'current'; renewsAt: ISODateString }
+        | { case: 'pastDue'; since: ISODateString };
+    }
+  | {
+      case: 'full';
+      status:
+        | { case: 'current'; renewsAt: ISODateString }
+        | { case: 'pastDue'; since: ISODateString };
+    }
   | { case: 'fullTrial'; until: ISODateString }
   | { case: 'fullTrialGrace'; until: ISODateString }
   | { case: 'free' }

@@ -33,7 +33,7 @@ final class AppStoreSyncJobTests: ApiTestCase, @unchecked Sendable {
       await AppStoreSyncJob().syncRatings(for: .blocker)
 
       let snapshots = try await AppStore.RatingSnapshot.query()
-        .where(.app == AppStore.GertrudeApp.blocker.rawValue)
+        .where(.app == GertrudeIOSApp.blocker.rawValue)
         .all(in: self.db)
 
       expect(snapshots.count).toEqual(1)
@@ -61,7 +61,7 @@ final class AppStoreSyncJobTests: ApiTestCase, @unchecked Sendable {
       await AppStoreSyncJob().syncRatings(for: .blocker)
 
       let snapshots = try await AppStore.RatingSnapshot.query()
-        .where(.app == AppStore.GertrudeApp.blocker.rawValue)
+        .where(.app == GertrudeIOSApp.blocker.rawValue)
         .orderBy(.createdAt, .asc)
         .all(in: self.db)
 
@@ -105,7 +105,7 @@ final class AppStoreSyncJobTests: ApiTestCase, @unchecked Sendable {
       await AppStoreSyncJob().syncRatings(for: .blocker)
 
       let events = try await AppStore.RatingEvent.query()
-        .where(.app == AppStore.GertrudeApp.blocker.rawValue)
+        .where(.app == GertrudeIOSApp.blocker.rawValue)
         .all(in: self.db)
 
       expect(events.count).toEqual(1)

@@ -199,11 +199,11 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public getSubscriptionPanel = (
-    input: P.GetSubscriptionPanel.Input,
-  ): Promise<Result<P.GetSubscriptionPanel.Output>> => {
-    return this.query<P.GetSubscriptionPanel.Output>(
+    input: P.GetSubscriptionPanel_v2.Input,
+  ): Promise<Result<P.GetSubscriptionPanel_v2.Output>> => {
+    return this.query<P.GetSubscriptionPanel_v2.Output>(
       input,
-      `GetSubscriptionPanel`,
+      `GetSubscriptionPanel_v2`,
       `parent`,
     );
   };

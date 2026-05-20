@@ -1,12 +1,11 @@
 // auto-generated, do not edit
 import type { PlanStatus, SubscriptionPanelAction, SubscriptionTier } from '../shared';
 
-export namespace GetSubscriptionPanel {
+export namespace GetSubscriptionPanel_v2 {
   export type Input = void;
 
   export interface Output {
     planStatus: PlanStatus;
-    currentPeriodEnd?: ISODateString;
     primary?: SubscriptionPanelAction;
     secondary: SubscriptionPanelAction[];
     availableTiers: SubscriptionTier[];

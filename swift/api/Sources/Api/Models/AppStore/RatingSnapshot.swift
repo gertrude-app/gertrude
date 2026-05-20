@@ -3,7 +3,7 @@ import Foundation
 extension AppStore {
   struct RatingSnapshot: Codable, Sendable {
     var id: Id
-    var app: GertrudeApp
+    var app: GertrudeIOSApp
     var averageRating: Double
     var totalCount: Int
     var reviewCount: Int
@@ -11,7 +11,7 @@ extension AppStore {
 
     init(
       id: Id = .init(),
-      app: GertrudeApp,
+      app: GertrudeIOSApp,
       averageRating: Double,
       totalCount: Int,
       reviewCount: Int,

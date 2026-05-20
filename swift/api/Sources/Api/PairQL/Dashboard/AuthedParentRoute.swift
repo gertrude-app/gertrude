@@ -41,6 +41,7 @@ enum AuthedParentRoute: PairRoute {
   case saveUser(SaveUser.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
   case getSubscriptionPanel
+  case getSubscriptionPanel_v2
   case openBillingPortal(OpenBillingPortal.Input)
   case startCheckoutSession(StartCheckoutSession.Input)
   case securityEventsFeed
@@ -203,6 +204,9 @@ extension AuthedParentRoute {
         }
         Route(.case(Self.getSubscriptionPanel)) {
           Operation(GetSubscriptionPanel.self)
+        }
+        Route(.case(Self.getSubscriptionPanel_v2)) {
+          Operation(GetSubscriptionPanel_v2.self)
         }
         Route(.case(Self.openBillingPortal)) {
           Operation(OpenBillingPortal.self)
@@ -381,6 +385,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getSubscriptionPanel:
       let output = try await GetSubscriptionPanel.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getSubscriptionPanel_v2:
+      let output = try await GetSubscriptionPanel_v2.resolve(in: context)
       return try await self.respond(with: output)
     case .openBillingPortal(let input):
       let output = try await OpenBillingPortal.resolve(with: input, in: context)

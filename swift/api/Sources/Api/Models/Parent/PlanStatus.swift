@@ -16,9 +16,10 @@ enum PlanStatus: Equatable, Sendable {
   case complimentary
 }
 
-enum BillingStatus: String, Codable, Equatable, Sendable {
-  case current
-  case pastDue
+@TSCodable
+enum BillingStatus: Equatable, Sendable {
+  case current(renewsAt: Date)
+  case pastDue(since: Date)
 }
 
 extension PlanStatus {

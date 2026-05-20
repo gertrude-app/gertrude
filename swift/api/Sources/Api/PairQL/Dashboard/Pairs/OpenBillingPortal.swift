@@ -9,7 +9,7 @@ struct OpenBillingPortal: Pair {
 
   struct Input: PairInput {
     var returnPath: String
-    var configuration: GetSubscriptionPanel.PortalConfig
+    var configuration: GetSubscriptionPanel_v2.PortalConfig
   }
 
   struct Output: PairOutput {

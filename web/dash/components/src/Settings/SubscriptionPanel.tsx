@@ -2,13 +2,13 @@ import { Badge, Button } from '@shared/components';
 import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import type {
-  GetSubscriptionPanel,
+  GetSubscriptionPanel_v2,
   PlanStatus,
   SubscriptionPanelAction,
 } from '@dash/types';
 import * as copy from './SubscriptionPanelCopy';
 
-interface Props extends GetSubscriptionPanel.Output {
+interface Props extends GetSubscriptionPanel_v2.Output {
   onAction(action: SubscriptionPanelAction): unknown;
   pendingAction?: SubscriptionPanelAction;
   className?: string;

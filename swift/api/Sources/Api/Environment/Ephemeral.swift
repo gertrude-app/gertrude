@@ -40,11 +40,20 @@ actor Ephemeral {
       var claimCode: String?
     }
 
+    struct PinReset: Codable {
+      var installId: PodcastApp.Install.Id
+      var expiration: Date
+    }
+
     var parentIds: [UUID: ParentId] = [:]
     var retrievedParentIds: [UUID: RetrievedParentId] = [:]
     var pendingAppConnections: [Int: ChildId] = [:]
     var pendingMethods: [Parent.NotificationMethod.Id: PendingMethod] = [:]
     var superAdminEmails: [UUID: SuperAdminEmail] = [:]
+    // optional only to survive first deploy decode; flip to non-optional `= [:]`
+    // (and drop the lazy-init dance in createPinResetCode) once persisted JSON
+    // is confirmed to contain the `pinResets` key.
+    var amPinResets: [Int: PinReset]? = nil
     var latestIOSAppStoreVersion: String?
   }
 
@@ -183,6 +192,33 @@ actor Ephemeral {
     return stored.childId
   }
 
+  func createPinResetCode(
+    forInstall installId: PodcastApp.Install.Id,
+    expiration: Date? = nil,
+  ) -> Int {
+    defer { Task { await self.persistStorage() } }
+    let code = self.verificationCode.generate()
+    if self.storage.amPinResets?[code] != nil {
+      return self.createPinResetCode(forInstall: installId, expiration: expiration)
+    }
+    var resets = self.storage.amPinResets ?? [:]
+    resets[code] = .init(
+      installId: installId,
+      expiration: expiration ?? self.now + .minutes(60),
+    )
+    self.storage.amPinResets = resets
+    return code
+  }
+
+  func consumePinResetCode(_ code: Int) -> PodcastApp.Install.Id? {
+    defer { Task { await self.persistStorage() } }
+    guard let stored = self.storage.amPinResets?.removeValue(forKey: code),
+          stored.expiration > self.now else {
+      return nil
+    }
+    return stored.installId
+  }
+
   func createSuperAdminToken(_ email: String, expiration: Date? = nil) -> UUID {
     defer { Task { await self.persistStorage() } }
     let token = self.uuid()
@@ -272,6 +308,9 @@ extension Ephemeral {
       $0.value.expiration > self.now
     }
     self.storage.superAdminEmails = self.storage.superAdminEmails.filter {
+      $0.value.expiration > self.now
+    }
+    self.storage.amPinResets = self.storage.amPinResets?.filter {
       $0.value.expiration > self.now
     }
   }

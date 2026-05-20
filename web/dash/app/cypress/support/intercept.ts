@@ -83,8 +83,8 @@ export function interceptPql(
   output: T.GetSelectableKeychains.Output,
 ): void;
 export function interceptPql(
-  slug: `GetSubscriptionPanel`,
-  output: T.GetSubscriptionPanel.Output,
+  slug: `GetSubscriptionPanel_v2`,
+  output: T.GetSubscriptionPanel_v2.Output,
 ): void;
 export function interceptPql(
   slug: `GetSuspendFilterRequest`,
@@ -223,7 +223,7 @@ export function forcePqlErr(
     | `GetIOSDeviceSupervisionStatus`
     | `GetIdentifiedApps`
     | `GetSelectableKeychains`
-    | `GetSubscriptionPanel`
+    | `GetSubscriptionPanel_v2`
     | `GetSuspendFilterRequest`
     | `HandleCheckoutCancel`
     | `HandleCheckoutSuccess`
