@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@tanstack/react-router';
 import { LoaderCircleIcon, type LucideIcon } from 'lucide-react';
 import cx from 'clsx';
 
@@ -219,8 +220,26 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           {content}
         </button>
       );
-    case 'link':
-      return (
+    case 'link': {
+      const isInternalLink = props.href.startsWith('/') && !props.href.startsWith('//');
+
+      return isInternalLink ? (
+        <Link
+          to={props.href}
+          className={buttonClasses}
+          aria-label={props.ariaLabel}
+          aria-disabled={isDisabled ? true : undefined}
+          aria-busy={props.loading ? true : undefined}
+          tabIndex={isDisabled ? -1 : undefined}
+          onClick={(event) => {
+            if (isDisabled) {
+              event.preventDefault();
+            }
+          }}
+        >
+          {content}
+        </Link>
+      ) : (
         <a
           {...passThroughProps}
           ref={ref as React.Ref<HTMLAnchorElement>}
@@ -239,6 +258,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           {content}
         </a>
       );
+    }
   }
 });
 

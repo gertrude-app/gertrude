@@ -20,6 +20,7 @@ const AssortmentExample: React.FC = () => {
         <div>
           <PageHeading
             title="Family settings"
+            subtitle="For the whole family"
             breadcrumbs={[{ text: 'Settings', href: '#' }]}
             buttons={[
               {
