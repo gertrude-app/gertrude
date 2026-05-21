@@ -201,6 +201,28 @@ func `parse empty feed`() {
 }
 
 @Test
+func `leading whitespace before xml declaration parses`() throws {
+  let xmlString = "\n  " + """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Whitespace Podcast</title>
+      <item>
+        <title>Episode 1</title>
+        <guid>ws-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://example.com/ep1.mp3" type="audio/mpeg" length="1000000"/>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.show.name == "Whitespace Podcast")
+  #expect(feed.episodes.count == 1)
+}
+
+@Test
 func `missing guid falls back to audio url`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
