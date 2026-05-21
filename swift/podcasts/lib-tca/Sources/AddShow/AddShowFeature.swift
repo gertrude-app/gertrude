@@ -189,7 +189,7 @@ struct AddShowFeature {
             .fetchOne(db)
         }
         guard let show else {
-          log(.error("98916a65"), "subscribe fail")
+          log(.error("98916a65"), "subscribe fail", detail: "db insert returned nil: \(feedUrl)")
           await send(.setScreen(.choosingMethod))
           await send(.delegate(.alert(lstr(.addShowError))))
           return
@@ -203,7 +203,7 @@ struct AddShowFeature {
         }
         await send(.subscribed(show))
       } catch {
-        log(.error("8c5abff7"), "subscribe fail")
+        log(.error("8c5abff7"), "subscribe fail", detail: "\(feedUrl): \(error)")
         await send(.setScreen(.choosingMethod))
         await send(.delegate(.alert(lstr(.addShowError))))
       }
