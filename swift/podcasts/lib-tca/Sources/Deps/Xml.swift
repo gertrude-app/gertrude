@@ -39,7 +39,7 @@ private func sanitizeFeedXML(_ xml: String) -> String {
     of: "[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F]",
     with: "",
     options: .regularExpression,
-  )
+  ).trimmingCharacters(in: .whitespacesAndNewlines)
   let parts = clean.components(separatedBy: "<![CDATA[")
   guard parts.count > 1 else {
     return escapeBareFeedAmpersands(clean)
