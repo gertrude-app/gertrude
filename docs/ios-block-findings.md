@@ -21,6 +21,34 @@ leaving `group_id` NULL) on a `blocker_app.block_rules` row.
 
 ---
 
+## Filter presence breaks app
+
+### 2026-05-21: Minecraft Bedrock hangs whenever the iOS NE filter is enabled
+
+Minecraft Bedrock hangs on launch whenever Gertrude's iOS content filter
+(`NEFilterDataProvider` socket filtering) is installed and enabled. **No filter-layer fix
+exists on iOS.**
+
+- **Root cause:** not rules / verdicts / dropped traffic / Family Controls. With the filter
+  present every Minecraft flow is _allowed_ and traffic flows _more_ heavily than when it
+  works, yet the app wedges. Cause is the per-flow verdict **gating inherent to the
+  filter's data-path presence**: at launch Minecraft fires a burst of simultaneous flows,
+  the gating serializes/stalls them, and its network-coupled UI freezes. Proven — a no-op
+  allow-everything filter still hangs; removing the filter (Family Controls retained) makes
+  it playable.
+- **Unfixable on iOS:** a content filter can only return a per-flow verdict; the most
+  permissive (`.allow()`) already hangs, and iOS has **no** flow-exclusion API
+  (`NEFilterSettings` is macOS-only). No auto-mitigation either (can't detect app launch or
+  self-disable the filter).
+- **Action / customer guidance:** treat as a hard compatibility limitation — Minecraft
+  needs the filter removed/disabled. Likely affects any iOS content-filter app, not just
+  Gertrude (unconfirmed; no public competitor reports found).
+
+**Full investigation** (all 5 states, pcap analysis, mechanism, sources):
+<https://gist.github.com/jaredh159/4931596cc733cf02a2e282bc31f75f62>
+
+---
+
 ## Apple Music
 
 ### 2026-05-15: artwork leak via itunescloudd (favorited artists / playlists)
