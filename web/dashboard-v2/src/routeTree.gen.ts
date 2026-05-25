@@ -12,10 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
-import { Route as AppSecurityRouteImport } from './routes/_app/security'
-import { Route as AppKeychainsRouteImport } from './routes/_app/keychains'
+import { Route as AppPeopleRouteImport } from './routes/_app/people'
 import { Route as AppDevicesRouteImport } from './routes/_app/devices'
-import { Route as AppChildrenRouteImport } from './routes/_app/children'
+import { Route as AppAppsRouteImport } from './routes/_app/apps'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
@@ -36,14 +35,9 @@ const AppSignoutRoute = AppSignoutRouteImport.update({
   path: '/signout',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppSecurityRoute = AppSecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppKeychainsRoute = AppKeychainsRouteImport.update({
-  id: '/keychains',
-  path: '/keychains',
+const AppPeopleRoute = AppPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppDevicesRoute = AppDevicesRouteImport.update({
@@ -51,9 +45,9 @@ const AppDevicesRoute = AppDevicesRouteImport.update({
   path: '/devices',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppChildrenRoute = AppChildrenRouteImport.update({
-  id: '/children',
-  path: '/children',
+const AppAppsRoute = AppAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const unauthedSignupRoute = unauthedSignupRouteImport.update({
@@ -88,10 +82,9 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
-  '/children': typeof AppChildrenRoute
+  '/apps': typeof AppAppsRoute
   '/devices': typeof AppDevicesRoute
-  '/keychains': typeof AppKeychainsRoute
-  '/security': typeof AppSecurityRoute
+  '/people': typeof AppPeopleRoute
   '/signout': typeof AppSignoutRoute
   '/settings/billing': typeof AppSettingsBillingRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
@@ -100,10 +93,9 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
-  '/children': typeof AppChildrenRoute
+  '/apps': typeof AppAppsRoute
   '/devices': typeof AppDevicesRoute
-  '/keychains': typeof AppKeychainsRoute
-  '/security': typeof AppSecurityRoute
+  '/people': typeof AppPeopleRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/settings/billing': typeof AppSettingsBillingRoute
@@ -115,10 +107,9 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
-  '/_app/children': typeof AppChildrenRoute
+  '/_app/apps': typeof AppAppsRoute
   '/_app/devices': typeof AppDevicesRoute
-  '/_app/keychains': typeof AppKeychainsRoute
-  '/_app/security': typeof AppSecurityRoute
+  '/_app/people': typeof AppPeopleRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
   '/_app/settings/billing': typeof AppSettingsBillingRoute
@@ -131,10 +122,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/login'
     | '/signup'
-    | '/children'
+    | '/apps'
     | '/devices'
-    | '/keychains'
-    | '/security'
+    | '/people'
     | '/signout'
     | '/settings/billing'
     | '/settings/notifications'
@@ -143,10 +133,9 @@ export interface FileRouteTypes {
     | '/settings'
     | '/login'
     | '/signup'
-    | '/children'
+    | '/apps'
     | '/devices'
-    | '/keychains'
-    | '/security'
+    | '/people'
     | '/signout'
     | '/'
     | '/settings/billing'
@@ -157,10 +146,9 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
-    | '/_app/children'
+    | '/_app/apps'
     | '/_app/devices'
-    | '/_app/keychains'
-    | '/_app/security'
+    | '/_app/people'
     | '/_app/signout'
     | '/_app/'
     | '/_app/settings/billing'
@@ -196,18 +184,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSignoutRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/security': {
-      id: '/_app/security'
-      path: '/security'
-      fullPath: '/security'
-      preLoaderRoute: typeof AppSecurityRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/keychains': {
-      id: '/_app/keychains'
-      path: '/keychains'
-      fullPath: '/keychains'
-      preLoaderRoute: typeof AppKeychainsRouteImport
+    '/_app/people': {
+      id: '/_app/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AppPeopleRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/devices': {
@@ -217,11 +198,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDevicesRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/children': {
-      id: '/_app/children'
-      path: '/children'
-      fullPath: '/children'
-      preLoaderRoute: typeof AppChildrenRouteImport
+    '/_app/apps': {
+      id: '/_app/apps'
+      path: '/apps'
+      fullPath: '/apps'
+      preLoaderRoute: typeof AppAppsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/signup': {
@@ -277,20 +258,18 @@ const AppSettingsRouteRouteWithChildren =
 
 interface AppRouteRouteChildren {
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
-  AppChildrenRoute: typeof AppChildrenRoute
+  AppAppsRoute: typeof AppAppsRoute
   AppDevicesRoute: typeof AppDevicesRoute
-  AppKeychainsRoute: typeof AppKeychainsRoute
-  AppSecurityRoute: typeof AppSecurityRoute
+  AppPeopleRoute: typeof AppPeopleRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
-  AppChildrenRoute: AppChildrenRoute,
+  AppAppsRoute: AppAppsRoute,
   AppDevicesRoute: AppDevicesRoute,
-  AppKeychainsRoute: AppKeychainsRoute,
-  AppSecurityRoute: AppSecurityRoute,
+  AppPeopleRoute: AppPeopleRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
 }

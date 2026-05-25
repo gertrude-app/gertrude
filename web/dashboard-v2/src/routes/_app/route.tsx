@@ -2,14 +2,12 @@ import React from 'react';
 import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
 import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
 import {
-  BookOpenIcon,
-  HomeIcon,
-  KeyIcon,
+  LayoutGridIcon,
   LifeBuoyIcon,
   LogOutIcon,
   MonitorSmartphoneIcon,
   SettingsIcon,
-  ShieldCheckIcon,
+  SparklesIcon,
   UsersIcon,
 } from 'lucide-react';
 
@@ -33,16 +31,10 @@ const AuthedLayout: React.FC = () => {
       >
         <SidebarSection title="Platform">
           <SidebarItem
-            title="Dashboard"
-            icon={HomeIcon}
-            href="/"
-            selected={isSelected('/')}
-          />
-          <SidebarItem
-            title="Children"
+            title="People"
             icon={UsersIcon}
-            href="/children"
-            selected={isSelected('/children')}
+            href="/people"
+            selected={isSelected('/people')}
           />
           <SidebarItem
             title="Devices"
@@ -51,16 +43,10 @@ const AuthedLayout: React.FC = () => {
             selected={isSelected('/devices')}
           />
           <SidebarItem
-            title="Keychains"
-            icon={KeyIcon}
-            href="/keychains"
-            selected={isSelected('/keychains')}
-          />
-          <SidebarItem
-            title="Security"
-            icon={ShieldCheckIcon}
-            href="/security"
-            selected={isSelected('/security')}
+            title="Apps"
+            icon={LayoutGridIcon}
+            href="/apps"
+            selected={isSelected('/apps')}
           />
           <SidebarItem
             title="Settings"
@@ -71,8 +57,8 @@ const AuthedLayout: React.FC = () => {
         </SidebarSection>
         <SidebarSection title="Help">
           <SidebarItem
-            title="Docs"
-            icon={BookOpenIcon}
+            title="Ask AI"
+            icon={SparklesIcon}
             href="https://gertrude.app/docs"
           />
           <SidebarItem
