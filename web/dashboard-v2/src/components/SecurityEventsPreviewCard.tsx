@@ -2,23 +2,33 @@ import React, { useState } from 'react';
 import cx from 'clsx';
 import type { SecurityEvent } from '#/lib/mock-data';
 import { Badge } from '@gertrude/ui';
+import { ArrowRightIcon } from 'lucide-react';
+import RightSidebarCard from './RightSidebarCard';
 
 interface Props {
-  securityEvents: Array<SecurityEvent>;
+  allSecurityEvents: Array<SecurityEvent>;
 }
 
-const SecurityEventsPreviewCard: React.FC<Props> = ({ securityEvents }) => {
+const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => {
   return (
-    <div className="bg-stone-50 border border-stone-200 rounded-2xl p-1.25 flex flex-col gap-0.75">
-      <span className="text-xs font-medium text-stone-600 ml-3">
-        Recent Security Events
-      </span>
+    <RightSidebarCard
+      title="Recent Security Events"
+      links={[
+        {
+          text: 'View all',
+          href: '#todo',
+          icon: ArrowRightIcon,
+          iconPosition: 'right',
+          variant: 'ghost',
+        },
+      ]}
+    >
       <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
-        {securityEvents.map((e) => (
+        {allSecurityEvents.slice(0, 4).map((e) => (
           <SecurityEventRow securityEvent={e} />
         ))}
       </div>
-    </div>
+    </RightSidebarCard>
   );
 };
 
