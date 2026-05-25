@@ -2,9 +2,9 @@ import Badge from '#/components/ui/Badge';
 import { CheckIcon } from 'lucide-react';
 import React from 'react';
 
-type BadgeSize = 'small' | 'medium' | 'large';
+type BadgeSize = 'xsmall' | 'small' | 'medium' | 'large';
 
-const sizes: BadgeSize[] = ['small', 'medium', 'large'];
+const sizes: BadgeSize[] = ['xsmall', 'small', 'medium', 'large'];
 
 const SizeScaleExample: React.FC = () => {
   return (

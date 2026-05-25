@@ -4,6 +4,7 @@ export { default as Button } from './components/ui/Button';
 export { default as Checkbox } from './components/ui/Checkbox';
 export { default as DropdownMenu } from './components/ui/dropdown-menu/DropdownMenu';
 export { default as DropdownMenuItem } from './components/ui/dropdown-menu/DropdownMenuItem';
+export { default as EmptyState } from './components/ui/EmptyState';
 export { default as Form } from './components/ui/form/Form';
 export { default as FormRow } from './components/ui/form/FormRow';
 export { default as Input } from './components/ui/Input';
