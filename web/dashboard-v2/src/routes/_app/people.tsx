@@ -3,10 +3,17 @@ import { PlusIcon, ScanEyeIcon } from 'lucide-react';
 import { createFileRoute } from '@tanstack/react-router';
 import { PageHeading } from '@gertrude/ui';
 import DashboardPage from '#/components/DashboardPage';
-import { mockChildren, mockSecurityEvents } from '#/lib/mock-data';
+import {
+  mockChildren,
+  mockSecurityEvents,
+  mockSuspensionRequests,
+  mockUnlockRequests,
+} from '#/lib/mock-data';
 import PersonCard from '#/components/PersonCard';
 import CardContainer from '#/components/CardContainer';
 import SecurityEventsPreviewCard from '#/components/SecurityEventsPreviewCard';
+import SuspensionRequetsPreviewCard from '#/components/SuspensionRequestsPreviewCard';
+import UnlockRequestsPreviewCard from '#/components/UnlockRequestsPreviewCard';
 
 const PeoplePage: React.FC = () => (
   <DashboardPage
@@ -37,7 +44,9 @@ const PeoplePage: React.FC = () => (
         ))}
       </CardContainer>
       <div className="w-72 shrink-0 flex flex-col gap-6">
-        <SecurityEventsPreviewCard securityEvents={mockSecurityEvents} />
+        <SuspensionRequetsPreviewCard allSuspensionRequests={mockSuspensionRequests} />
+        <UnlockRequestsPreviewCard allUnlockRequests={mockUnlockRequests} />
+        <SecurityEventsPreviewCard allSecurityEvents={mockSecurityEvents} />
       </div>
     </div>
   </DashboardPage>
