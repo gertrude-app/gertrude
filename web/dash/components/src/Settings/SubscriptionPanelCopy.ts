@@ -98,6 +98,12 @@ export function manageBlurb(input: Input): string | undefined {
 
     case `fullTrial`:
     case `fullTrialGrace`:
+      if (planStatus.substrate?.tier === `light`) {
+        if (planStatus.substrate.status.case === `pastDue`) {
+          return `Your Light payment didn't go through, so iPhone and iPad supervision is paused until you update your payment method. You're also trialing Full.`;
+        }
+        return `You're trialing Full on top of your paid Light plan. Your iPhone and iPad supervision continues no matter what — upgrade to keep Full’s Mac computer protection, or stay on Light when the trial ends.`;
+      }
       return offersLightPurchase(input)
         ? `Note: a Light subscription doesn't include Mac computer support. Subscribing to Light will diminish protection on any protected Mac computers.`
         : undefined;

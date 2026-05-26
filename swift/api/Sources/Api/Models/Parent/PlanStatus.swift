@@ -11,8 +11,8 @@ enum PlanStatus: Equatable, Sendable {
   case free
   case light(status: BillingStatus)
   case full(status: BillingStatus)
-  case fullTrial(until: Date)
-  case fullTrialGrace(until: Date)
+  case fullTrial(until: Date, substrate: PaidSubscription?)
+  case fullTrialGrace(until: Date, substrate: PaidSubscription?)
   case complimentary
 }
 
@@ -20,6 +20,11 @@ enum PlanStatus: Equatable, Sendable {
 enum BillingStatus: Equatable, Sendable {
   case current(renewsAt: Date)
   case pastDue(since: Date)
+}
+
+struct PaidSubscription: Codable, Equatable, Sendable {
+  var tier: StripeSubscription.Tier
+  var status: BillingStatus
 }
 
 extension PlanStatus {

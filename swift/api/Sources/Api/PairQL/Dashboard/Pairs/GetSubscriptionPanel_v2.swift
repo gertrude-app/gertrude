@@ -66,10 +66,16 @@ func panelOutput_v2(billing: BillingAccountSnapshot) -> GetSubscriptionPanel_v2.
       secondary = [.openBillingPortal(config: .lightTier)]
     }
 
-  case .fullTrial, .fullTrialGrace:
-    if billing.stripeSubscription?.tier == .light {
-      primary = .upgradeSubscriptionTier(to: .full)
-      secondary = [.openBillingPortal(config: .lightTier)]
+  case .fullTrial(_, let substrate), .fullTrialGrace(_, let substrate):
+    if let substrate, substrate.tier == .light {
+      switch substrate.status {
+      case .current:
+        primary = .upgradeSubscriptionTier(to: .full)
+        secondary = [.openBillingPortal(config: .lightTier)]
+      case .pastDue:
+        primary = .openBillingPortal(config: .lightTier)
+        secondary = [.upgradeSubscriptionTier(to: .full)]
+      }
     } else if identity?.lastStripeSubscriptionId != nil {
       primary = .reactivateViaCheckout(tier: .full)
       secondary = identity?.lastPaidTier == .full

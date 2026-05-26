@@ -77,7 +77,7 @@ extension ParentsList: Resolver {
         stripeSubscription: subscription,
         date: now,
       )
-      let (planCase, subscriptionStatus) = self.planDisplay(billing.planStatus, subscription)
+      let (planCase, subscriptionStatus) = self.planDisplay(billing.planStatus)
       return ParentSummary(
         id: parent.id,
         email: parent.email.rawValue,
@@ -101,7 +101,6 @@ extension ParentsList: Resolver {
 
   private static func planDisplay(
     _ planStatus: PlanStatus,
-    _ subscription: StripeSubscription?,
   ) -> (planCase: String, subscriptionStatus: String) {
     switch planStatus {
     case .free:
@@ -110,13 +109,19 @@ extension ParentsList: Resolver {
       return ("light", "paid")
     case .light(.pastDue):
       return ("light", "overdue")
-    case .fullTrial:
-      if let sub = subscription, sub.tier == .light {
+    case .fullTrial(_, let substrate):
+      if let substrate, substrate.tier == .light {
+        if case .pastDue = substrate.status {
+          return ("light", "overdue")
+        }
         return ("light", "trialingFull")
       }
       return ("full", "trialing")
-    case .fullTrialGrace:
-      if let sub = subscription, sub.tier == .light {
+    case .fullTrialGrace(_, let substrate):
+      if let substrate, substrate.tier == .light {
+        if case .pastDue = substrate.status {
+          return ("light", "overdue")
+        }
         return ("light", "trialExpired")
       }
       return ("full", "trialExpired")

@@ -2,6 +2,8 @@
 
 _Date: 2026-05-18._
 
+_EDIT:_ see also [006](./006-capabilities-from-snapshot.md) for a related follow-up
+
 ## What we changed
 
 The conflated `Plan` enum and the URL-dispenser dashboard channel are gone. Billing is now

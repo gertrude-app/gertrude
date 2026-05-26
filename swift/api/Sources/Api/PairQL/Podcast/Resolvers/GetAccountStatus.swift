@@ -23,7 +23,7 @@ extension BillingAccountSnapshot {
       .active(expiresAt: nil)
     case .full(.current(let renewalDate)), .light(.current(let renewalDate)):
       .active(expiresAt: renewalDate)
-    case .fullTrial(let trialExpiration):
+    case .fullTrial(let trialExpiration, _):
       if let iapPaidAt = self.billingIdentity?.legacyAmIapPaidAt,
          iapPaidAt + .days(365) > trialExpiration {
         .active(expiresAt: iapPaidAt + .days(365))

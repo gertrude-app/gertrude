@@ -44,6 +44,30 @@ final class CapabilityTests: DependencyTestCase {
     ).toBeFalse()
   }
 
+  func testCanSuperviseForPaidLightWhileTrialingFull() {
+    let trialStart = Date.reference
+    expect(
+      billing(
+        trialStartedAt: trialStart,
+        tier: .light,
+        status: .active,
+        date: trialStart + .days(10),
+      ).can(.superviseIosDevice),
+    ).toBeTrue()
+  }
+
+  func testCannotSuperviseForPastDueLightWhileTrialingFull() {
+    let trialStart = Date.reference
+    expect(
+      billing(
+        trialStartedAt: trialStart,
+        tier: .light,
+        status: .pastDue,
+        date: trialStart + .days(10),
+      ).can(.superviseIosDevice),
+    ).toBeFalse()
+  }
+
   func testCannotSuperviseForCanceledFullSub() {
     expect(billing(tier: .full, status: .canceled).can(.superviseIosDevice)).toBeFalse()
   }
@@ -150,6 +174,18 @@ final class CapabilityTests: DependencyTestCase {
         date: trialStart + .days(24),
       ).macAppConnectionGate,
     ).toEqual(.planUpgradeRequired)
+  }
+
+  func testGateSubscriptionFixForPastDueLightGrace() {
+    let trialStart = Date.reference
+    expect(
+      billing(
+        trialStartedAt: trialStart,
+        tier: .light,
+        status: .pastDue,
+        date: trialStart + .days(24),
+      ).macAppConnectionGate,
+    ).toEqual(.subscriptionFixRequired)
   }
 
   func testGateTrialRequiredForBrandNewFree() {

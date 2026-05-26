@@ -148,6 +148,13 @@ export interface KeychainSummary {
   numKeys: number;
 }
 
+export interface PaidSubscription {
+  tier: 'light' | 'full';
+  status:
+    | { case: 'current'; renewsAt: ISODateString }
+    | { case: 'pastDue'; since: ISODateString };
+}
+
 export interface PlainTime {
   hour: number;
   minute: number;
@@ -171,8 +178,8 @@ export type PlanStatus =
         | { case: 'current'; renewsAt: ISODateString }
         | { case: 'pastDue'; since: ISODateString };
     }
-  | { case: 'fullTrial'; until: ISODateString }
-  | { case: 'fullTrialGrace'; until: ISODateString }
+  | { case: 'fullTrial'; until: ISODateString; substrate?: PaidSubscription }
+  | { case: 'fullTrialGrace'; until: ISODateString; substrate?: PaidSubscription }
   | { case: 'free' }
   | { case: 'complimentary' };
 

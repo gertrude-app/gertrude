@@ -43,21 +43,24 @@ final class PlanStatusDerivationTests: DependencyTestCase {
   func testTrialJustStartedReturnsFullTrial() {
     let trialStart = Date.reference
     expect(planStatus(trialStartedAt: trialStart, at: trialStart))
-      .toEqual(.fullTrial(until: trialStart + .days(21)))
+      .toEqual(.fullTrial(until: trialStart + .days(21), substrate: nil))
   }
 
   func testMidTrialReturnsFullTrial() {
     let trialStart = Date.reference
     let now = trialStart + .days(10)
     expect(planStatus(trialStartedAt: trialStart, at: now))
-      .toEqual(.fullTrial(until: trialStart + .days(21)))
+      .toEqual(.fullTrial(until: trialStart + .days(21), substrate: nil))
   }
 
   func testTrialOverlayWinsOverLightSubstrate() {
     let trialStart = Date.reference
     let now = trialStart + .days(10)
     expect(planStatus(trialStartedAt: trialStart, sub: .light, at: now))
-      .toEqual(.fullTrial(until: trialStart + .days(21)))
+      .toEqual(.fullTrial(
+        until: trialStart + .days(21),
+        substrate: .init(tier: .light, status: .current(renewsAt: now + .days(30))),
+      ))
   }
 
   func testFullSubstrateWinsOverTrialOverlay() {
@@ -78,35 +81,38 @@ final class PlanStatusDerivationTests: DependencyTestCase {
     let trialStart = Date.reference
     let now = trialStart + .days(21) - 1
     expect(planStatus(trialStartedAt: trialStart, at: now))
-      .toEqual(.fullTrial(until: trialStart + .days(21)))
+      .toEqual(.fullTrial(until: trialStart + .days(21), substrate: nil))
   }
 
   func testTrialAtExactExpiryEntersGrace() {
     let trialStart = Date.reference
     let now = trialStart + .days(21)
     expect(planStatus(trialStartedAt: trialStart, at: now))
-      .toEqual(.fullTrialGrace(until: trialStart + .days(28)))
+      .toEqual(.fullTrialGrace(until: trialStart + .days(28), substrate: nil))
   }
 
   func testMidGraceReturnsFullTrialGrace() {
     let trialStart = Date.reference
     let now = trialStart + .days(25)
     expect(planStatus(trialStartedAt: trialStart, at: now))
-      .toEqual(.fullTrialGrace(until: trialStart + .days(28)))
+      .toEqual(.fullTrialGrace(until: trialStart + .days(28), substrate: nil))
   }
 
   func testGraceOverlayWinsOverLightSubstrate() {
     let trialStart = Date.reference
     let now = trialStart + .days(25)
     expect(planStatus(trialStartedAt: trialStart, sub: .light, at: now))
-      .toEqual(.fullTrialGrace(until: trialStart + .days(28)))
+      .toEqual(.fullTrialGrace(
+        until: trialStart + .days(28),
+        substrate: .init(tier: .light, status: .current(renewsAt: now + .days(30))),
+      ))
   }
 
   func testGraceJustBeforeEndStillGrace() {
     let trialStart = Date.reference
     let now = trialStart + .days(28) - 1
     expect(planStatus(trialStartedAt: trialStart, at: now))
-      .toEqual(.fullTrialGrace(until: trialStart + .days(28)))
+      .toEqual(.fullTrialGrace(until: trialStart + .days(28), substrate: nil))
   }
 
   func testAtExactGraceEndFallsThroughToSubstrateFree() {
