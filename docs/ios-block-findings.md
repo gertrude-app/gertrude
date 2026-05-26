@@ -29,17 +29,17 @@ Minecraft Bedrock hangs on launch whenever Gertrude's iOS content filter
 (`NEFilterDataProvider` socket filtering) is installed and enabled. **No filter-layer fix
 exists on iOS.**
 
-- **Root cause:** not rules / verdicts / dropped traffic / Family Controls. With the filter
-  present every Minecraft flow is _allowed_ and traffic flows _more_ heavily than when it
-  works, yet the app wedges. Cause is the per-flow verdict **gating inherent to the
-  filter's data-path presence**: at launch Minecraft fires a burst of simultaneous flows,
-  the gating serializes/stalls them, and its network-coupled UI freezes. Proven — a no-op
-  allow-everything filter still hangs; removing the filter (Family Controls retained) makes
-  it playable.
+- **Root cause:** not rules / verdicts / dropped traffic / Family Controls. With the
+  filter present every Minecraft flow is _allowed_ and traffic flows _more_ heavily than
+  when it works, yet the app wedges. Cause is the per-flow verdict **gating inherent to
+  the filter's data-path presence**: at launch Minecraft fires a burst of simultaneous
+  flows, the gating serializes/stalls them, and its network-coupled UI freezes. Proven — a
+  no-op allow-everything filter still hangs; removing the filter (Family Controls
+  retained) makes it playable.
 - **Unfixable on iOS:** a content filter can only return a per-flow verdict; the most
   permissive (`.allow()`) already hangs, and iOS has **no** flow-exclusion API
-  (`NEFilterSettings` is macOS-only). No auto-mitigation either (can't detect app launch or
-  self-disable the filter).
+  (`NEFilterSettings` is macOS-only). No auto-mitigation either (can't detect app launch
+  or self-disable the filter).
 - **Action / customer guidance:** treat as a hard compatibility limitation — Minecraft
   needs the filter removed/disabled. Likely affects any iOS content-filter app, not just
   Gertrude (unconfirmed; no public competitor reports found).
@@ -56,28 +56,30 @@ exists on iOS.**
 **Trigger:** customer reported album artwork still appearing in Apple Music after
 favoriting artists / playlists, despite the existing artwork rules being active.
 
-**Tested:** capture during favorite → navigate to album. Existing
-`com.apple.Music`-scoped rules DROPped ~786 flows to `is1-ssl.mzstatic.com`, but 2
-ALLOWs slipped through from `.com.apple.itunescloudd` (iCloud Music Library daemon).
-Artwork bytes from itunescloudd's allowed fetches appear to be cached at a
-system-level image cache shared with the Music app, so Apple Music's own DROPped
-requests still find the artwork locally and render it.
+**Tested:** capture during favorite → navigate to album. Existing `com.apple.Music`-scoped
+rules DROPped ~786 flows to `is1-ssl.mzstatic.com`, but 2 ALLOWs slipped through from
+`.com.apple.itunescloudd` (iCloud Music Library daemon). Artwork bytes from itunescloudd's
+allowed fetches appear to be cached at a system-level image cache shared with the Music
+app, so Apple Music's own DROPped requests still find the artwork locally and render it.
 
-**Verdict:** existing bundle scope (`com.apple.Music`) was too narrow. `itunescloudd`
-is a sibling carrier hitting the same `ssl.mzstatic.com` host.
+**Verdict:** existing bundle scope (`com.apple.Music`) was too narrow. `itunescloudd` is a
+sibling carrier hitting the same `ssl.mzstatic.com` host.
 
 **Shipped 2026-05-15:** sibling rule added to the Apple Music group (SQL at
 `logs/apple-music-itunescloudd-artwork-rule.sql`):
 
 ```json
-{"a":{"case":"bundleIdContains","value":"itunescloudd"},"b":{"case":"targetContains","value":"ssl.mzstatic.com"},"case":"both"}
+{
+  "a": { "case": "bundleIdContains", "value": "itunescloudd" },
+  "b": { "case": "targetContains", "value": "ssl.mzstatic.com" },
+  "case": "both"
+}
 ```
 
-Re-test confirmed: 83 DROPs from itunescloudd during the next favorite/navigate
-sequence, artwork no longer rendered. Note: BlockRule has no native OR, so this is a
-parallel rule rather than a broadening of the existing one. `itunescloudd` also hits
-`librarydaap`, `genius-*`, `p42-buy`, `pd.itunes.apple.com` — metadata, not artwork,
-left allowed.
+Re-test confirmed: 83 DROPs from itunescloudd during the next favorite/navigate sequence,
+artwork no longer rendered. Note: BlockRule has no native OR, so this is a parallel rule
+rather than a broadening of the existing one. `itunescloudd` also hits `librarydaap`,
+`genius-*`, `p42-buy`, `pd.itunes.apple.com` — metadata, not artwork, left allowed.
 
 ### 2026-04-30 → 2026-05-01: artwork blocks cause audio playback failure
 
@@ -98,6 +100,63 @@ left allowed.
 `NEDNSProxyProvider` (NXDOMAIN responses), which is a significant architectural shift.
 
 **Shipping:** original artwork rules remain. Cascade is a known limitation.
+
+---
+
+## Apple Maps
+
+### 2026-03-03 → 2026-05-26: Street View / Look Around — ship, broke nav, rolled back, narrow re-ship
+
+**Trigger:** customer (email thread ref `f25a8`) flagged Apple Maps Street View and Look
+Around as image backdoors, supplying candidate hosts under `gspe*-ssl.ls.apple.com`.
+
+**2026-03-03 — broad rule shipped, broke nav (rolled back next day):** added one
+nested-`both` rule to `Apple Maps images` matching `.com.apple.Maps` +
+`targetContains("gsp")` AND `targetContains("-ssl.ls.apple.com")` — intended as a wildcard
+for the customer's subdomain list. Within ~24 hours a customer reported Apple Maps
+navigation completely dead (forced offline). The pattern matched **every**
+`gspeN-ssl.ls.apple.com` — Apple's general location-services backbone — not just
+Street-View endpoints. Rolled back 2026-03-04, no replacement.
+
+\*\*2026-05-26 — re-investigation with `idevicesyslog` on iOS 18.6.2 with rules scoped to
+`.com.apple.Maps`:
+
+- A `hostnameEquals "gspe76-ssl.ls.apple.com"` rule blocked **only** Street View (12 DROPs
+  in a 125ms retry storm → on-device "street imagery can't be shown at this time"). Nav,
+  business search, weather overlay all worked; nav-critical flows hit `gspe21` (and
+  `gspe19` in a follow-up session) — untouched by the narrow rule.
+- Re-applying the broad 2026-03 rule as a control reproduced the prod incident exactly
+  (361 DROPs on `gspe19`, plus `gspe19-2`, `gspe76`, `gspe12`, `gsp-ssl`, all source
+  `.com.apple.Maps`) — confirms the narrow-rule nav stability isn't a fluke.
+- `gspe7-ssl.ls.apple.com` and `maps.apple.com` (other candidates from the customer's
+  list) never appeared on iOS 18.6.2 — no-ops on this version. Kept `gspe7` in the shipped
+  set for iOS 16/17 coverage; the customer's two-month proxy.pac history confirms it's
+  nav-safe there.
+
+**Shipped 2026-05-26** to the `Apple Maps images` group:
+
+```json
+// primary block — iOS 18 verified
+{"a":{"case":"bundleIdContains","value":".com.apple.Maps"},
+ "b":{"case":"hostnameEquals","value":"gspe76-ssl.ls.apple.com"},
+ "case":"both"}
+
+// iOS 16/17 fallback (per email ref f25a8); no-op on iOS 18
+{"a":{"case":"bundleIdContains","value":".com.apple.Maps"},
+ "b":{"case":"hostnameEquals","value":"gspe7-ssl.ls.apple.com"},
+ "case":"both"}
+```
+
+**Residual risks:**
+
+- Apple load-balances across the `gspeN` pool — saw `gspe12`, `gspe19`, `gspe21`,
+  `gspe76`, `gspe79` in one session. `gspe76` showed up for Street View in two separate
+  sessions (suggestive of pinning, n=2). If Apple rotates Street View off `gspe76`, the
+  block silently stops working; if Apple rotates nav onto `gspe76`, the 2026-03 incident
+  repeats.
+- **Cache gotcha** (per customer): Apple caches Street View tiles. A block can appear
+  successful via cache for hours — always test in an unbrowsed region or cache-clear
+  before declaring success.
 
 ---
 
@@ -177,9 +236,34 @@ VALUES (
 
 **Untested:**
 
-- Whether `cdn.groupme.com` is a fallback image CDN that would leak around the block.
 - Whether normal chat-receive still works with the rule enabled (couldn't test — solo test
   group, no second human).
+
+### 2026-05-26: user follow-up — rule breaks messaging and re-auth
+
+Real-world test from one customer given the `i.groupme.com` ad-hoc rule above to a
+customer device.
+
+**Confirmed blocked (goal achieved):**
+
+- Copilot
+- AI image remixing
+- Most avatars (small/tiny avatars occasionally still render; clicking shows blank)
+
+**Confirmed broken (collateral worse than expected):**
+
+- Sending messages — fails with "your message got lost, tap to retry"; retry no-op.
+- Receiving messages — push notifications fire, message body absent in-app, sometimes
+  appears later.
+- Re-authentication — GroupMe forces logouts periodically (observed: customer and spouse
+  both kicked the same week). Login PIN flow then fails ("something went wrong") and user
+  is locked out.
+
+"Log in first" workaround **falsified**: rule breaks messaging and re-auth even when
+applied after the user is fully logged in.
+
+**Status:** ad-hoc rule above is **not currently viable** for active GroupMe users. Needs
+a more surgical block target before re-offering, may not be possible.
 
 ---
 
