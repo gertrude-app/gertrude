@@ -38,6 +38,8 @@ idevicesyslog -u <UDID> -n -q -m "•]" -o ./logs/capture.log
 The `•]` match string captures both normal `[G•]` and debug `[D•]` log lines from the
 Gertrude filter proxy. The `-q` flag suppresses noisy system processes.
 
+Network mode (`-n`) has gone silent after short bursts of activity in practice — prefer USB.
+
 To also watch in real time, use a second terminal without `-o`, or use `tee`:
 
 ```bash
