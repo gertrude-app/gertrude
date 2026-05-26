@@ -2,7 +2,7 @@
 
 _Date: 2026-05-18._
 
-_EDIT:_ see also [006](./006-capabilities-from-snapshot.md) for a related follow-up
+_EDIT:_ see also [006](./006-capabilities-from-snapshot.md) for a related follow-up.
 
 ## What we changed
 
