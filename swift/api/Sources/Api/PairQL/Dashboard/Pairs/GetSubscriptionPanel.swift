@@ -41,8 +41,8 @@ extension GetSubscriptionPanel.PlanStatusV1 {
     case .light(.pastDue): self = .light(status: .pastDue)
     case .full(.current): self = .full(status: .current)
     case .full(.pastDue): self = .full(status: .pastDue)
-    case .fullTrial(let until): self = .fullTrial(until: until)
-    case .fullTrialGrace(let until): self = .fullTrialGrace(until: until)
+    case .fullTrial(let until, _): self = .fullTrial(until: until)
+    case .fullTrialGrace(let until, _): self = .fullTrialGrace(until: until)
     case .complimentary: self = .complimentary
     }
   }

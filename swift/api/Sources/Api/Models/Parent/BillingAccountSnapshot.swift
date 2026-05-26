@@ -15,28 +15,34 @@ struct BillingAccountSnapshot: Sendable {
     self.billingIdentity?.stripeCustomerId
   }
 
+  var liveSubscription: StripeSubscription? {
+    self.stripeSubscription?.stripeStatus.isLive == true
+      ? self.stripeSubscription
+      : nil
+  }
+
   var planStatus: PlanStatus {
     if self.billingIdentity?.isComplimentary == true {
       return .complimentary
     }
 
-    let liveSub: StripeSubscription? =
-      self.stripeSubscription?.stripeStatus.isLive == true
-        ? self.stripeSubscription
-        : nil
+    let liveSub = self.liveSubscription
 
     if let sub = liveSub, sub.tier == .full {
       return .full(status: billingStatus(of: sub))
     }
 
     if let trialStart = self.billingIdentity?.fullTrialStartedAt {
+      let substrate = liveSub.map {
+        PaidSubscription(tier: $0.tier, status: billingStatus(of: $0))
+      }
       let trialEnd = trialStart + PlanStatus.trialPeriod
       if self.date < trialEnd {
-        return .fullTrial(until: trialEnd)
+        return .fullTrial(until: trialEnd, substrate: substrate)
       }
       let graceEnd = trialEnd + PlanStatus.gracePeriod
       if self.date < graceEnd {
-        return .fullTrialGrace(until: graceEnd)
+        return .fullTrialGrace(until: graceEnd, substrate: substrate)
       }
     }
 
@@ -51,16 +57,18 @@ struct BillingAccountSnapshot: Sendable {
   }
 
   var capabilities: Set<Capability> {
-    switch self.planStatus {
-    case .complimentary, .full(.current):
-      [.superviseIosDevice, .connectMacApp]
-    case .light(.current):
-      [.superviseIosDevice]
-    case .fullTrial:
-      [.connectMacApp]
-    case .free, .fullTrialGrace, .full(.pastDue), .light(.pastDue):
-      []
+    if self.billingIdentity?.isComplimentary == true {
+      return [.superviseIosDevice, .connectMacApp]
     }
+    var capabilities: Set<Capability> = []
+    if let sub = self.liveSubscription, sub.stripeStatus != .pastDue {
+      capabilities.formUnion(sub.tier.capabilities)
+    }
+    if let trialStart = self.billingIdentity?.fullTrialStartedAt,
+       self.date < trialStart + PlanStatus.trialPeriod {
+      capabilities.insert(.connectMacApp)
+    }
+    return capabilities
   }
 
   func can(_ capability: Capability) -> Bool {
@@ -92,6 +100,15 @@ struct BillingAccountSnapshot: Sendable {
 enum Capability: Hashable, Sendable, CaseIterable {
   case superviseIosDevice
   case connectMacApp
+}
+
+extension StripeSubscription.Tier {
+  var capabilities: Set<Capability> {
+    switch self {
+    case .light: [.superviseIosDevice]
+    case .full: [.superviseIosDevice, .connectMacApp]
+    }
+  }
 }
 
 private func billingStatus(of sub: StripeSubscription) -> BillingStatus {

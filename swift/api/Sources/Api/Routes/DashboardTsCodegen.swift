@@ -49,6 +49,7 @@ enum DashboardTsCodegenRoute {
       ("AdminNotification", GetAccountOwner_v2.Notification.self),
       ("WebPolicy", WebContentFilterPolicy.Kind.self),
       ("SecurityEventSeverity", SecurityEventsFeed.Severity.self),
+      ("PaidSubscription", PaidSubscription.self),
       ("PlanStatus", PlanStatus.self),
       ("BillingStatus", BillingStatus.self),
       ("SubscriptionTier", StripeSubscription.Tier.self),

@@ -129,6 +129,13 @@ commands, and architecture to coding agents. Drifts when:
 - Dev commands change (`just` recipes renamed, ports moved).
 - Directory structure moves (e.g., `web/dash` → `web/dash/app`).
 
+### `docs/notes/index.md` — decision-notes menu
+
+One-line summary of every ADR-style note in `docs/notes/`. Agents researching past
+decisions read this first to find the right note to load. **Drifts whenever a new note is
+added or an existing one materially changes scope — append (or update) the matching entry
+in the same change.**
+
 ### `docs/support/*.md` — product overview docs
 
 `product-overview.md`, `mac-app.md`, `ios-app.md`, `gertrude-am.md`. These are the

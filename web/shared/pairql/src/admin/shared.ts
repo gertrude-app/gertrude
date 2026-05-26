@@ -20,6 +20,13 @@ export type DeviceModelFamily =
 
 export type GertrudeApp = 'blocker' | 'podcasts';
 
+export interface PaidSubscription {
+  tier: 'light' | 'full';
+  status:
+    | { case: 'current'; renewsAt: ISODateString }
+    | { case: 'pastDue'; since: ISODateString };
+}
+
 export type PlanStatus =
   | {
       case: 'light';
@@ -33,8 +40,8 @@ export type PlanStatus =
         | { case: 'current'; renewsAt: ISODateString }
         | { case: 'pastDue'; since: ISODateString };
     }
-  | { case: 'fullTrial'; until: ISODateString }
-  | { case: 'fullTrialGrace'; until: ISODateString }
+  | { case: 'fullTrial'; until: ISODateString; substrate?: PaidSubscription }
+  | { case: 'fullTrialGrace'; until: ISODateString; substrate?: PaidSubscription }
   | { case: 'free' }
   | { case: 'complimentary' };
 

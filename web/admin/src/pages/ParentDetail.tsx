@@ -670,10 +670,24 @@ function billingLabel(planStatus: PlanStatus, sub: Subscription | undefined): st
       return sub?.stripeStatus === `pastDue` ? `Overdue — $10/yr` : `Paid — $10/yr`;
     case `complimentary`:
       return `Complimentary`;
-    case `fullTrial`:
+    case `fullTrial`: {
+      const substrate = planStatus.substrate;
+      if (substrate?.tier === `light`) {
+        return substrate.status.case === `pastDue`
+          ? `Trialing Full — Light overdue`
+          : `Trialing Full — ends ${formatDate(planStatus.until)}`;
+      }
       return `Trial — ends ${formatDate(planStatus.until)}`;
-    case `fullTrialGrace`:
+    }
+    case `fullTrialGrace`: {
+      const substrate = planStatus.substrate;
+      if (substrate?.tier === `light`) {
+        return substrate.status.case === `pastDue`
+          ? `Full trial expired — Light overdue`
+          : `Full trial expired`;
+      }
       return `Trial expired`;
+    }
     case `full`: {
       const monthly = sub?.isLegacyPrice ? 5 : 10;
       return sub?.stripeStatus === `pastDue`
@@ -684,12 +698,17 @@ function billingLabel(planStatus: PlanStatus, sub: Subscription | undefined): st
 }
 
 const PlanCard: React.FC<{ planStatus: PlanStatus }> = ({ planStatus }) => {
+  const substrateTier =
+    planStatus.case === `fullTrial` || planStatus.case === `fullTrialGrace`
+      ? planStatus.substrate?.tier
+      : undefined;
   const planKey =
-    planStatus.case === `complimentary` ||
+    substrateTier ??
+    (planStatus.case === `complimentary` ||
     planStatus.case === `fullTrial` ||
     planStatus.case === `fullTrialGrace`
       ? `full`
-      : planStatus.case;
+      : planStatus.case);
   const fallback = {
     label: `Free`,
     bg: `from-slate-300 to-slate-400`,

@@ -19,6 +19,7 @@ enum AdminTsCodegenRoute {
       ("ServerPqlError", PqlError.self),
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
+      ("PaidSubscription", PaidSubscription.self),
       ("PlanStatus", PlanStatus.self),
       ("BillingStatus", BillingStatus.self),
       ("SubscriptionTier", StripeSubscription.Tier.self),

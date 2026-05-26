@@ -75,7 +75,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
     let trialStart = Date.reference
     let billing = self.billing(trialStartedAt: trialStart, date: trialStart + .days(10))
     let panel = panelOutput_v2(billing: billing)
-    expect(panel.planStatus).toEqual(.fullTrial(until: trialStart + .days(21)))
+    expect(panel.planStatus).toEqual(.fullTrial(until: trialStart + .days(21), substrate: nil))
     expect(panel.primary).toEqual(.startCheckout(tier: .full))
     expect(panel.secondary).toEqual([.startCheckout(tier: .light)])
   }
@@ -90,6 +90,18 @@ final class SubscriptionPanelTests: DependencyTestCase {
     let panel = panelOutput_v2(billing: billing)
     expect(panel.primary).toEqual(.upgradeSubscriptionTier(to: .full))
     expect(panel.secondary).toEqual([.openBillingPortal(config: .lightTier)])
+  }
+
+  func testFullTrialFromPastDueLightLeadsWithPortal() {
+    let trialStart = Date.reference
+    let billing = self.billing(
+      trialStartedAt: trialStart,
+      sub: (tier: .light, status: .pastDue),
+      date: trialStart + .days(10),
+    )
+    let panel = panelOutput_v2(billing: billing)
+    expect(panel.primary).toEqual(.openBillingPortal(config: .lightTier))
+    expect(panel.secondary).toEqual([.upgradeSubscriptionTier(to: .full)])
   }
 
   func testFullTrialFromLapsedLight() {
@@ -139,7 +151,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
     let trialStart = Date.reference
     let billing = self.billing(trialStartedAt: trialStart, date: trialStart + .days(24))
     let panel = panelOutput_v2(billing: billing)
-    expect(panel.planStatus).toEqual(.fullTrialGrace(until: trialStart + .days(28)))
+    expect(panel.planStatus).toEqual(.fullTrialGrace(until: trialStart + .days(28), substrate: nil))
     expect(panel.primary).toEqual(.startCheckout(tier: .full))
     expect(panel.secondary).toEqual([.startCheckout(tier: .light)])
   }
@@ -165,7 +177,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
       date: trialStart + .days(24),
     )
     let panel = panelOutput_v2(billing: billing)
-    expect(panel.planStatus).toEqual(.fullTrialGrace(until: trialStart + .days(28)))
+    expect(panel.planStatus).toEqual(.fullTrialGrace(until: trialStart + .days(28), substrate: nil))
     expect(panel.primary).toEqual(.reactivateViaCheckout(tier: .full))
     expect(panel.secondary).toEqual([])
   }

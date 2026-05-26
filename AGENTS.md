@@ -83,6 +83,9 @@ Supports all 3 apps, plus dashboard and admin websites
   decisions (alternatives considered, constraints, rationales, etc). Don't load these by
   default. Do not write these unless instructed, although you may suggest that one be
   written if a substantial decision is being made.
+- When researching _why_ a past decision was made, start with
+  [`./docs/notes/index.md`](./docs/notes/index.md) — one-line summary of every note, to
+  find the right one to load.
 
 ## Git operations
 
