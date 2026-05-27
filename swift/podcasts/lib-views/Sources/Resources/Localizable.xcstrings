@@ -474,23 +474,6 @@
         }
       }
     },
-    "settings.subscription.oneMoment" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "one moment..."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "un momento..."
-          }
-        }
-      }
-    },
     "settings.subscription.friendMessage" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -525,23 +508,6 @@
         }
       }
     },
-    "settings.subscription.renewsAutomatically" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Renews automatically"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se renueva automáticamente"
-          }
-        }
-      }
-    },
     "settings.subscription.expired" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -555,23 +521,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expirada"
-          }
-        }
-      }
-    },
-    "settings.subscription.manageSubscription" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage Subscription"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Administrar Suscripción"
           }
         }
       }
@@ -606,40 +555,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "$10/año"
-          }
-        }
-      }
-    },
-    "settings.subscription.disclosure" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "$10/year. Auto-renews unless cancelled."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "$10/año. Se renueva automáticamente a menos que se cancele."
-          }
-        }
-      }
-    },
-    "settings.subscription.terms" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terms of Use"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Términos de Uso"
           }
         }
       }

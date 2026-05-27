@@ -10,7 +10,6 @@ struct SettingsViewContainer: View {
     SettingsView(
       status: self.store.subscription.settingsViewStatus,
       expiresAt: self.store.subscription.expiresAt,
-      purchaseInProgress: self.store.purchaseInProgress,
       reclaimableStorageGb: self.reclaimableGb,
       onEvent: { self.store.send(.view($0)) },
     )

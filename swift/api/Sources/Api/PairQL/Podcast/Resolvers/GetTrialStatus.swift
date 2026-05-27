@@ -52,10 +52,9 @@ extension GetTrialStatus: Resolver {
 
     let trialEnd = install.createdAt + .days(30)
     if trialEnd > now {
-      let days = Int(ceil(trialEnd.timeIntervalSince(now) / 86400))
-      return .trial(daysRemaining: max(days, 1))
+      return .trial(expiresAt: trialEnd)
     }
 
-    return .trialExpired
+    return .trialExpired(since: trialEnd)
   }
 }
