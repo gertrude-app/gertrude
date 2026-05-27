@@ -6,17 +6,20 @@ public struct TrackRowView: View {
   private let track: TrackData
   private let artworkSize: CGFloat
   private let width: CGFloat
+  private let transitionNamespace: Namespace.ID?
   private let onTap: @MainActor @Sendable () -> Void
 
   public init(
     track: TrackData,
     artworkSize: CGFloat = 44,
     width: CGFloat = 270,
+    transitionNamespace: Namespace.ID? = nil,
     onTap: @MainActor @escaping @Sendable () -> Void = {},
   ) {
     self.track = track
     self.artworkSize = artworkSize
     self.width = width
+    self.transitionNamespace = transitionNamespace
     self.onTap = onTap
   }
 
@@ -48,6 +51,7 @@ public struct TrackRowView: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel("\(self.track.title), \(self.track.artist)")
+    .matchedTransitionSourceIfAvailable(id: self.track.id, in: self.transitionNamespace)
   }
 }
 

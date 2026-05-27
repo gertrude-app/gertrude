@@ -4,12 +4,15 @@ public struct GertrudeFMView: View {
   public init() {}
 
   public var body: some View {
-    MusicPocView(
-      state: .needsAuthorization,
-      onAuthorizeTap: {},
-      onPlayPauseTap: {},
-      onArtworkBlockingChanged: { _ in },
-    )
+    NavigationStack {
+      LibraryView(
+        state: .loaded(
+          albums: .previewAlbums,
+          artists: .previewArtists,
+          tracks: .previewTracks,
+        ),
+      )
+    }
   }
 }
 
