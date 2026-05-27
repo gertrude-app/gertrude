@@ -1,5 +1,5 @@
 import React from 'react';
-import RightSidebarCard from './RightSidebarCard';
+import RightColumnCard from './RightColumnCard';
 import type { SuspensionRequest } from '#/lib/mock-data';
 import { ArrowRightIcon } from 'lucide-react';
 
@@ -9,7 +9,7 @@ interface Props {
 
 const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }) => {
   return (
-    <RightSidebarCard
+    <RightColumnCard
       title="Suspension Requests"
       links={[
         {
@@ -39,7 +39,7 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
           </div>
         ))}
       </div>
-    </RightSidebarCard>
+    </RightColumnCard>
   );
 };
 

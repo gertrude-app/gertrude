@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowRightIcon } from 'lucide-react';
 import type { UnlockRequest } from '#/lib/mock-data';
-import RightSidebarCard from './RightSidebarCard';
+import RightColumnCard from './RightColumnCard';
 
 interface Props {
   allUnlockRequests: Array<UnlockRequest>;
@@ -9,7 +9,7 @@ interface Props {
 
 const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
   return (
-    <RightSidebarCard
+    <RightColumnCard
       title="Unlock Requests"
       links={[
         {
@@ -51,7 +51,7 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
           </div>
         ))}
       </div>
-    </RightSidebarCard>
+    </RightColumnCard>
   );
 };
 
