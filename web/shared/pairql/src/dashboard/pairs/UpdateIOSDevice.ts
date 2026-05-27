@@ -10,6 +10,7 @@ export namespace UpdateIOSDevice {
     isProfileLocked: boolean;
     allowAppRemoval: boolean;
     allowEraseContentAndSettings: boolean;
+    allowAppInstallation: boolean;
   }
 
   export type Output = SuccessOutput;

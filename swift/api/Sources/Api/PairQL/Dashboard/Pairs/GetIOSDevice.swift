@@ -34,6 +34,7 @@ struct GetIOSDevice: Pair {
     var isProfileLocked: Bool
     var allowAppRemoval: Bool
     var allowEraseContentAndSettings: Bool
+    var allowAppInstallation: Bool
   }
 }
 
@@ -70,6 +71,7 @@ extension GetIOSDevice: Resolver {
       isProfileLocked: install.isProfileLocked,
       allowAppRemoval: install.allowAppRemoval,
       allowEraseContentAndSettings: install.allowEraseContentAndSettings,
+      allowAppInstallation: install.allowAppInstallation,
     )
   }
 }

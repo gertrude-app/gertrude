@@ -10,6 +10,7 @@ export type State = {
   isProfileLocked: boolean;
   allowAppRemoval: boolean;
   allowEraseContentAndSettings: boolean;
+  allowAppInstallation: boolean;
   editingBlockRule?: EditBlockRuleProps & { id?: UUID };
 };
 
@@ -26,6 +27,7 @@ export type Action =
   | { type: `setIsProfileLocked`; value: boolean }
   | { type: `setAllowAppRemoval`; value: boolean }
   | { type: `setAllowEraseContentAndSettings`; value: boolean }
+  | { type: `setAllowAppInstallation`; value: boolean }
   | { type: `receiveData`; data: GetIOSDevice.Output };
 
 function reducer(state: State, action: Action): void {
@@ -65,6 +67,9 @@ function reducer(state: State, action: Action): void {
     case `setAllowEraseContentAndSettings`:
       state.allowEraseContentAndSettings = action.value;
       return;
+    case `setAllowAppInstallation`:
+      state.allowAppInstallation = action.value;
+      return;
     case `receiveData`:
       state.enabledBlockGroups = [...action.data.enabledBlockGroups];
       state.webPolicy = action.data.webPolicy;
@@ -72,6 +77,7 @@ function reducer(state: State, action: Action): void {
       state.isProfileLocked = action.data.isProfileLocked;
       state.allowAppRemoval = action.data.allowAppRemoval;
       state.allowEraseContentAndSettings = action.data.allowEraseContentAndSettings;
+      state.allowAppInstallation = action.data.allowAppInstallation;
       return;
     case `addBlockRule`:
       state.editingBlockRule = {

@@ -25,5 +25,6 @@ export namespace GetIOSDevice {
     isProfileLocked: boolean;
     allowAppRemoval: boolean;
     allowEraseContentAndSettings: boolean;
+    allowAppInstallation: boolean;
   }
 }

@@ -174,6 +174,7 @@ const noopClient: ApiClient = {
       isProfileLocked: true,
       allowAppRemoval: false,
       allowEraseContentAndSettings: false,
+      allowAppInstallation: true,
     });
   },
   userActivityFeed: async () => {
