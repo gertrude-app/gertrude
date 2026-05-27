@@ -142,7 +142,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
     expect(output).toEqual(.legacyGrandfathered(
       paidAt: event.createdAt,
-      expiresAt: event.createdAt + .days(365),
+      expiresAt: event.createdAt + .days(455),
     ))
   }
 
@@ -166,7 +166,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
     expect(output).toEqual(.legacyGrandfathered(
       paidAt: event.createdAt,
-      expiresAt: event.createdAt + .days(365),
+      expiresAt: event.createdAt + .days(455),
     ))
   }
 
@@ -207,7 +207,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     let output = try await withDependencies {
-      $0.date = .constant(event.createdAt + .days(366))
+      $0.date = .constant(event.createdAt + .days(456))
     } operation: {
       try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
     }
@@ -233,6 +233,10 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       iosVersion: "18.2",
       claimedAt: .reference,
     ))
+    var preInstall = try await self.db.create(
+      PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
+    )
+    try await preInstall.modifyCreatedAt(.exact(.reference - .days(2)))
 
     let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
 
@@ -241,11 +245,14 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     }
     expect(childId).toEqual(child.model.id.rawValue)
     expect(childName).toEqual(child.model.name)
-    expect(subscription).toEqual(.unpaid(remediationUrl: nil))
+    // 30-day AM trial survives claim: install ~2 days old at the test clock
+    // honors the "30 days free" promise rather than dropping to .unpaid
+    expect(subscription).toEqual(.amTrial(expiresAt: preInstall.createdAt + .days(30)))
 
     let install = try await PodcastApp.Install.query()
       .where(.deviceId == device.id)
       .first(in: self.db)
+
     let tokens = try await PodcastApp.Token.query()
       .where(.installId == install.id)
       .all(in: self.db)
