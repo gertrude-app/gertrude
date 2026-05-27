@@ -22,17 +22,10 @@ struct ArtworkImageView: View {
 
   var body: some View {
     if self.showsArtwork {
-      AsyncImage(url: self.artworkUrl) { phase in
-        switch phase {
-        case .empty:
-          self.placeholderArtwork
-        case .success(let image):
-          self.artwork(image)
-        case .failure:
-          self.placeholderArtwork
-        @unknown default:
-          self.placeholderArtwork
-        }
+      CachedArtworkImageView(url: self.artworkUrl) { image in
+        self.artwork(image)
+      } placeholder: {
+        self.placeholderArtwork
       }
     } else {
       self.hiddenArtwork
