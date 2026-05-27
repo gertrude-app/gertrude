@@ -5,15 +5,18 @@ public struct ArtistCardView: View {
 
   private let artist: ArtistData
   private let artworkSize: CGFloat
+  private let transitionNamespace: Namespace.ID?
   private let onTap: @MainActor @Sendable () -> Void
 
   public init(
     artist: ArtistData,
     artworkSize: CGFloat = 148,
+    transitionNamespace: Namespace.ID? = nil,
     onTap: @MainActor @escaping @Sendable () -> Void = {},
   ) {
     self.artist = artist
     self.artworkSize = artworkSize
+    self.transitionNamespace = transitionNamespace
     self.onTap = onTap
   }
 
@@ -35,6 +38,7 @@ public struct ArtistCardView: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel(self.artist.name)
+    .matchedTransitionSourceIfAvailable(id: self.artist.id, in: self.transitionNamespace)
   }
 }
 

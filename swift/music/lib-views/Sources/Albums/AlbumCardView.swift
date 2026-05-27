@@ -5,22 +5,30 @@ public struct AlbumCardView: View {
 
   private let album: AlbumData
   private let artworkSize: CGFloat
+  private let transitionNamespace: Namespace.ID?
   private let onTap: @MainActor @Sendable () -> Void
 
   public init(
     album: AlbumData,
     artworkSize: CGFloat = 148,
+    transitionNamespace: Namespace.ID? = nil,
     onTap: @MainActor @escaping @Sendable () -> Void = {},
   ) {
     self.album = album
     self.artworkSize = artworkSize
+    self.transitionNamespace = transitionNamespace
     self.onTap = onTap
   }
 
   public var body: some View {
     Button(action: self.onTap) {
       VStack(alignment: .leading, spacing: 10) {
-        AlbumArtworkView(album: self.album, size: self.artworkSize)
+        ZoomableAlbumArtworkView(
+          album: self.album,
+          size: self.artworkSize,
+          transitionID: self.artworkTransitionID,
+          role: .source,
+        )
 
         VStack(alignment: .leading, spacing: 2) {
           Text(self.album.title)
@@ -44,6 +52,10 @@ public struct AlbumCardView: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel("\(self.album.title), \(self.album.artist)")
+  }
+
+  private var artworkTransitionID: String {
+    albumArtworkZoomTransitionID(for: self.album.id)
   }
 }
 

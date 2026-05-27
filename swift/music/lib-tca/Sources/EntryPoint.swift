@@ -9,18 +9,18 @@ public struct EntryPoint: View {
   }
 
   public var body: some View {
-    MusicPocViewContainer(store: self.store.inner)
+    AppView(store: self.store.inner)
   }
 }
 
 @MainActor
 public struct AppStore {
-  let inner: StoreOf<MusicPocFeature>
+  let inner: StoreOf<AppFeature>
 
   public init() {
     self.inner = Store(
       initialState: .init(),
-      reducer: { MusicPocFeature() },
+      reducer: { AppFeature() },
     )
   }
 }

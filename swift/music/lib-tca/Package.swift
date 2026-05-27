@@ -10,6 +10,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
+    .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.10.0"),
   ],
   targets: [
     .target(
@@ -19,6 +20,7 @@ let package = Package(
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "LibViews", package: "lib-views"),
+        .product(name: "Tagged", package: "swift-tagged"),
       ],
     ),
     .testTarget(
