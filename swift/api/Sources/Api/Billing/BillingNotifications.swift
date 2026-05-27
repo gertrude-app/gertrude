@@ -12,6 +12,24 @@ func notifyFirstPayment(parent: Parent, tier: StripeSubscription.Tier) {
   }
 }
 
+func notifyTierUpgrade(
+  parent: Parent,
+  from: StripeSubscription.Tier,
+  to: StripeSubscription.Tier,
+) {
+  let email = parent.email.rawValue
+  let adminLink = AdminLink()
+  let slackLink = adminLink.slack(to: .parent(parent.id), text: email)
+  let emailLink = adminLink.email(to: .parent(parent.id), text: email)
+  Task {
+    let slack = get(dependency: \.slack)
+    let postmark = get(dependency: \.postmark)
+    await slack.internal(.info, "*Tier Upgrade* \(slackLink): `.\(from)` → `.\(to)`")
+    await slack.internal(.stripe, "*Tier Upgrade* \(slackLink): `.\(from)` → `.\(to)`")
+    postmark.toSuperAdmin("Tier Upgrade", "\(emailLink): .\(from) → .\(to)")
+  }
+}
+
 func notifyDuplicateSubscriptionAttempt(
   parentId: Parent.Id,
   existingSubId: String,
