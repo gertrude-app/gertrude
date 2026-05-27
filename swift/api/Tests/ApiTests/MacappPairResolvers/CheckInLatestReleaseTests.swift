@@ -105,6 +105,20 @@ final class CheckInLatestReleaseTests: ApiTestCase, @unchecked Sendable {
     expect(output.latestRelease.semver).toEqual("2.0.0")
   }
 
+  func testHidesReleaseFromSpecificRequestingVersion() async throws {
+    try await self.replaceAllReleases(with: [
+      Release("2.9.0", channel: .stable, pace: nil, createdAt: .epoch),
+      Release("2.9.1", channel: .stable, pace: nil, createdAt: .epoch.advanced(by: .days(10))),
+      Release("2.9.2", channel: .stable, pace: nil, createdAt: .epoch.advanced(by: .days(20))),
+    ])
+
+    let output = try await test(releaseChannel: .stable, currentVersion: "2.9.1")
+    expect(output).toEqual(.init(semver: "2.9.1"))
+
+    let output2 = try await test(releaseChannel: .stable, currentVersion: "2.9.0")
+    expect(output2.semver).toEqual("2.9.2")
+  }
+
   func testOnCanaryBehindStable() async throws {
     try await self.replaceAllReleases(with: [
       Release("2.0.0", channel: .stable, pace: nil, createdAt: .epoch),

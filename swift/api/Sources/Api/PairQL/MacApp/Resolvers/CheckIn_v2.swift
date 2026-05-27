@@ -492,13 +492,15 @@ func resolveLatestRelease(
   }
 
   let releases = try await query.all(in: db)
+  let hidden = AppcastRoute.hiddenReleases(forRequestingAppVersion: currentAppVersion)
 
   let currentSemver = Semver(currentAppVersion)!
   var latest = CheckIn_v2.LatestRelease(semver: currentSemver.string)
 
   for release in releases {
     if currentSemver.isBehind(release),
-       release.channel.isAtLeastAsStable(as: channel) {
+       release.channel.isAtLeastAsStable(as: channel),
+       !hidden.contains(release.semver) {
       latest.semver = release.semver
       if let pace = release.requirementPace, latest.pace == nil {
         latest.pace = .init(
