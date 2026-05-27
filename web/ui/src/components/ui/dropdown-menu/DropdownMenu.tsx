@@ -134,7 +134,7 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
         <DM.Content
           align="center"
           sideOffset={4}
-          className="bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 select-none"
+          className="bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 select-none mx-1"
         >
           {searchable && (
             <input

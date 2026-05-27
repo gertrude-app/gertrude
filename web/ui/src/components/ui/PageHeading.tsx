@@ -1,6 +1,8 @@
 import React from 'react';
 import Button from './Button';
-import type { LucideIcon } from 'lucide-react';
+import { EllipsisIcon, type LucideIcon } from 'lucide-react';
+import DropdownMenu from './dropdown-menu/DropdownMenu';
+import DropdownMenuItem from './dropdown-menu/DropdownMenuItem';
 
 interface Props {
   title: string;
@@ -21,7 +23,7 @@ const PageHeading: React.FC<Props> = ({
   breadcrumbs = [],
 }) => {
   return (
-    <div className="border-b border-stone-200/60 pb-4">
+    <div className="@2xl/main:border-b border-stone-200/60 pb-4">
       {breadcrumbs.length > 0 && (
         <nav aria-label="Breadcrumb" className="mb-2">
           <ol className="flex flex-wrap items-center gap-1.5 text-sm text-stone-500">
@@ -44,23 +46,40 @@ const PageHeading: React.FC<Props> = ({
       )}
       <div className="flex justify-between items-end">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-medium text-stone-900 flex-grow -mb-2">{title}</h1>
+          <h1 className="text-3xl font-medium text-stone-900 flex-grow @2xl/main:-mb-2">
+            {title}
+          </h1>
           {subtitle && <h2 className="text-stone-600">{subtitle}</h2>}
         </div>
         {buttons.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {buttons.map((button) => (
-              <Button
-                key={button.text}
-                type="button"
-                variant={button.variant === 'primary' ? 'primary' : 'default'}
-                onClick={button.onClick}
-                icon={button.icon}
+          <>
+            <div className="flex @2xl/main:hidden">
+              <DropdownMenu
+                trigger={<Button type="button" onClick={() => {}} icon={EllipsisIcon} />}
               >
-                {button.text}
-              </Button>
-            ))}
-          </div>
+                {buttons.map((button) => (
+                  <DropdownMenuItem
+                    title={button.text}
+                    icon={button.icon}
+                    onSelect={button.onClick}
+                  />
+                ))}
+              </DropdownMenu>
+            </div>
+            <div className="hidden @2xl/main:flex gap-2">
+              {buttons.map((button) => (
+                <Button
+                  key={button.text}
+                  type="button"
+                  variant={button.variant === 'primary' ? 'primary' : 'default'}
+                  onClick={button.onClick}
+                  icon={button.icon}
+                >
+                  {button.text}
+                </Button>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

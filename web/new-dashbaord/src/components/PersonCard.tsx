@@ -18,10 +18,13 @@ interface Props {
 const PersonCard: React.FC<Props> = ({ person }) => {
   return (
     <div className="flex flex-col border border-stone-200 rounded-2xl shadow-md shadow-stone-300/30 bg-white">
-      <div className="p-4 flex-grow flex flex-col gap-2">
-        <div className="flex gap-3">
+      <div className="p-3 @lg/main:p-4 flex-grow flex flex-col gap-2">
+        <div className="flex flex-col @2xl/main:flex-row gap-3">
           <div
-            className={cx('flex flex-col gap-3', person.screenshot ? 'w-1/2' : 'w-full')}
+            className={cx(
+              'flex flex-col gap-3',
+              person.screenshot ? '@2xl/main:w-1/2' : 'w-full',
+            )}
           >
             <span className="text-stone-900 text-lg font-medium">{person.name}</span>
             {person.devices.length > 0 ? (
@@ -45,7 +48,7 @@ const PersonCard: React.FC<Props> = ({ person }) => {
             )}
           </div>
           {person.screenshot && (
-            <div className="flex flex-col justify-center items-center w-1/2 gap-2 p-4 h-[100%]">
+            <div className="flex flex-col justify-center items-center @2xl/main:w-1/2 gap-2 p-4 h-[100%]">
               <div className="relative">
                 <img
                   src={person.screenshot.url}
@@ -58,7 +61,7 @@ const PersonCard: React.FC<Props> = ({ person }) => {
           )}
         </div>
       </div>
-      <div className="flex justify-between items-center bg-stone-50 py-2 px-4 rounded-b-2xl border-t border-stone-200">
+      <div className="flex justify-between items-center bg-stone-50 py-2 px-3 @lg/main:px-4 rounded-b-2xl border-t border-stone-200">
         {person.musicListening && (
           <MediaCard
             title={person.musicListening.trackName}
@@ -107,9 +110,9 @@ const DeviceRow: React.FC<DeviceCardProps> = ({ device }) => {
     >
       <div className="flex items-center gap-2.5 bg-stone-50 py-1.5 pl-2.5 pr-4 rounded-xl relative overflow-hidden">
         {device.type === 'mac' ? (
-          <LaptopIcon className="text-stone-700 w-4.5 h-4.5" />
+          <LaptopIcon className="text-stone-700 w-4.5 h-4.5 shrink-0" />
         ) : (
-          <SmartphoneIcon className="text-stone-700 w-4.5 h-4.5" />
+          <SmartphoneIcon className="text-stone-700 w-4.5 h-4.5 shrink-0" />
         )}
         <div className="flex flex-col flex-grow">
           <span className="font-medium text-stone-900 text-sm">
@@ -175,14 +178,14 @@ const MediaCard: React.FC<MediaCardProps> = ({
         src={artworkUrl}
         className="w-8 h-8 rounded-md border-[0.5px] border-stone-400 shadow shadow-stone-300/30"
       />
-      <div className="flex flex-col">
+      <div className="hidden @2xl/main:flex flex-col">
         <span className="text-xs font-medium text-stone-900">{title}</span>
         <span className="text-xs text-stone-600">
           {subtitle} • {recencyText}
         </span>
       </div>
       {recencyInMinutes === 0 && (
-        <div className="media-waveform ml-4" aria-hidden="true">
+        <div className="media-waveform ml-1 @2xl/main:ml-4" aria-hidden="true">
           <div className="media-waveform-bar" />
           <div className="media-waveform-bar" />
           <div className="media-waveform-bar" />

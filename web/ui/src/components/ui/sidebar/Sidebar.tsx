@@ -15,7 +15,7 @@ interface Props {
 
 const Sidebar: React.FC<Props> = ({ children, logoUrl, logoWidth, bottomButton }) => {
   return (
-    <div className="sticky top-0 flex h-screen w-68 shrink-0 flex-col justify-between border-r border-stone-200 bg-stone-50 p-5">
+    <div className="sticky top-0 flex h-screen w-68 shrink-0 flex-col justify-between border-r border-stone-300/80 min-[940px]:border-stone-200 bg-stone-50 p-5">
       <div className="flex flex-col gap-9">
         <div>
           <img src={logoUrl} alt="Logo" width={logoWidth} />
