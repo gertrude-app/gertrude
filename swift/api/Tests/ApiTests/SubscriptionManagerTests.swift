@@ -10,18 +10,18 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
   // MARK: - delete unverified parents
 
   func testDeletesUnverifiedParentsOlderThanThreeDays() async throws {
-    let stale = try await self.db.create(Parent.random {
+    var stale = try await self.db.create(Parent.random {
       $0.emailVerifiedAt = nil
     })
-    let recent = try await self.db.create(Parent.random {
+    var recent = try await self.db.create(Parent.random {
       $0.emailVerifiedAt = nil
     })
-    let verified = try await self.db.create(Parent.random {
+    var verified = try await self.db.create(Parent.random {
       $0.emailVerifiedAt = .reference - .days(1)
     })
-    try await self.backdate(parent: stale.id, to: .reference - .days(4))
-    try await self.backdate(parent: recent.id, to: .reference - .days(2))
-    try await self.backdate(parent: verified.id, to: .reference - .days(10))
+    try await stale.modifyCreatedAt(.exact(.reference - .days(4)))
+    try await recent.modifyCreatedAt(.exact(.reference - .days(2)))
+    try await verified.modifyCreatedAt(.exact(.reference - .days(10)))
 
     let priorDeletions = try await DeletedEntity.query().count(in: self.db)
     let logs = try await SubscriptionManager().deleteUnverifiedParents()
@@ -36,17 +36,6 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
     let postDeletions = try await DeletedEntity.query().all(in: self.db)
     expect(postDeletions.count > priorDeletions).toEqual(true)
     expect(postDeletions.contains { $0.reason == "email never verified" }).toEqual(true)
-  }
-
-  private func backdate(parent id: Parent.Id, to date: Date) async throws {
-    var stmt = SQL.Statement("""
-    UPDATE \(table: Parent.self) SET \(Parent.columnName(.createdAt)) =
-    """)
-    stmt.components.append(.sql(" "))
-    stmt.components.append(.binding(.date(date)))
-    stmt.components.append(.sql(" WHERE \(Parent.columnName(.id)) = "))
-    stmt.components.append(.binding(.uuid(id)))
-    try await self.db.execute(statement: stmt)
   }
 
   // MARK: - trial email progression (pure decision)

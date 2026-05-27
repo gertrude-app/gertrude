@@ -33,3 +33,7 @@ it carries dependency context across SQLKit/Postgres and avoids surprising test 
 Use transactions for rare and IMPORTANT multi-step writes that must commit or roll back together to preserve critical business invariantes. Our customer base is small, and our API almost never crashes, so we don't need to be over defensive.
 Do not wrap every resolver, single insert, or low-value cleanup by default; they add
 complexity and may cost a little performance.
+
+## Backdating `createdAt` in tests
+
+If you need to backdate `createdAt` for tests, use the `modifyCreatedAt` helper.

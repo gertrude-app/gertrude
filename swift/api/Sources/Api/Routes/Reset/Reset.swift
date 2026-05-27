@@ -189,40 +189,6 @@ enum Reset {
   }
 }
 
-enum TimestampAdjustment {
-  case subtracting(TimeInterval)
-  case adding(TimeInterval)
-  case exact(Date)
-}
-
-extension DuetSQL.Model where Self: HasCreatedAt {
-  mutating func modifyCreatedAt(
-    _ adjustment: TimestampAdjustment,
-  ) async throws {
-    switch adjustment {
-    case .subtracting(let interval):
-      createdAt = createdAt.addingTimeInterval(-interval)
-    case .adding(let interval):
-      createdAt = createdAt.addingTimeInterval(interval)
-    case .exact(let date):
-      createdAt = date
-    }
-
-    @Dependency(\.db) var db
-    guard let client = db as? PgClient else {
-      throw Abort(.internalServerError, reason: "af72eb37")
-    }
-
-    try await client.db.execute(
-      """
-      UPDATE \(unsafeRaw: Self.qualifiedTableName)
-      SET \(col: .createdAt) = '\(unsafeRaw: createdAt.isoString)'
-      WHERE id = '\(unsafeRaw: id.uuidString.lowercased())'
-      """,
-    )
-  }
-}
-
 extension Tagged where RawValue == UUID {
   static func from(_ uuidString: String) -> Self {
     .init(rawValue: .init(uuidString: uuidString) ?? .init())

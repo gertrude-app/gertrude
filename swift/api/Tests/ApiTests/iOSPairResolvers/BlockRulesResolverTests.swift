@@ -413,5 +413,3 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.create(rules)
   }
 }
-
-extension IOSDevice: HasCreatedAt {}

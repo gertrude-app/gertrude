@@ -152,8 +152,6 @@ extension ApiTestCase {
   }
 }
 
-extension Release: HasCreatedAt {}
-
 extension Release {
   init(
     _ semver: String,
