@@ -15,6 +15,7 @@ struct UpdateIOSDevice: Pair {
     var isProfileLocked: Bool
     var allowAppRemoval: Bool
     var allowEraseContentAndSettings: Bool
+    var allowAppInstallation: Bool
   }
 }
 
@@ -47,6 +48,7 @@ extension UpdateIOSDevice: Resolver {
     install.isProfileLocked = input.isProfileLocked
     install.allowAppRemoval = input.allowAppRemoval
     install.allowEraseContentAndSettings = input.allowEraseContentAndSettings
+    install.allowAppInstallation = input.allowAppInstallation
     try await ctx.db.update(install)
 
     try await BlockerApp.WebPolicyDomain.query()

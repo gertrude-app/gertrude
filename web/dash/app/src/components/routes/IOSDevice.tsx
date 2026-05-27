@@ -31,6 +31,7 @@ const IOSDevice: React.FC = () => {
     isProfileLocked: true,
     allowAppRemoval: false,
     allowEraseContentAndSettings: false,
+    allowAppInstallation: true,
   });
 
   // const deleteBlockRule = useConfirmableDelete(`blockRule`, {
@@ -64,6 +65,7 @@ const IOSDevice: React.FC = () => {
         isProfileLocked: state.isProfileLocked,
         allowAppRemoval: state.allowAppRemoval,
         allowEraseContentAndSettings: state.allowEraseContentAndSettings,
+        allowAppInstallation: state.allowAppInstallation,
       }),
     { toast: `save:ios-device`, invalidating: [Key.iOSDevice(id)] },
   );
@@ -88,7 +90,9 @@ const IOSDevice: React.FC = () => {
     isEqual(state.webPolicyDomains, deviceQuery.data.webPolicyDomains) &&
     state.isProfileLocked === deviceQuery.data.isProfileLocked &&
     state.allowAppRemoval === deviceQuery.data.allowAppRemoval &&
-    state.allowEraseContentAndSettings === deviceQuery.data.allowEraseContentAndSettings;
+    state.allowEraseContentAndSettings ===
+      deviceQuery.data.allowEraseContentAndSettings &&
+    state.allowAppInstallation === deviceQuery.data.allowAppInstallation;
 
   return (
     <div className="relative max-w-3xl">
@@ -150,6 +154,12 @@ const IOSDevice: React.FC = () => {
                   ? `The user will be able to erase the ${dt} removing Gertrude and all restrictions`
                   : undefined
               }
+            />
+            <ToggleCard
+              title="Allow installing apps"
+              description={`Allow the ${dt} user to install new apps from the App Store. Turn this off to remove the App Store icon entirely and block app installation.`}
+              enabled={state.allowAppInstallation}
+              setEnabled={(v) => dispatch({ type: `setAllowAppInstallation`, value: v })}
             />
           </div>
         )}

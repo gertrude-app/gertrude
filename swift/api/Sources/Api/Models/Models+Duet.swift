@@ -125,6 +125,7 @@ extension BlockerApp.Install {
     case isProfileLocked
     case allowAppRemoval
     case allowEraseContentAndSettings
+    case allowAppInstallation
     case createdAt
     case updatedAt
   }

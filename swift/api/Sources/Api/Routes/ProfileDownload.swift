@@ -71,15 +71,15 @@ func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> S
 
         <key>allowEraseContentAndSettings</key>
         <\(install.allowEraseContentAndSettings ? "true" : "false")/>
+
+        <key>allowAppInstallation</key>
+        <\(install.allowAppInstallation ? "true" : "false")/>
   """
   // special temporary customer workaround
   if device.id.lowercased == "ed25c68a-2dba-4854-b3bd-efe0d8523e6f" {
     restrictionKeys += """
 
           <key>allowSafari</key>
-          <false/>
-
-          <key>allowAppInstallation</key>
           <false/>
     """
   }

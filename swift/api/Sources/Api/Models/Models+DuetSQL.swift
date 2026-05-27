@@ -170,6 +170,7 @@ extension BlockerApp.Install: Model {
     case .isProfileLocked: .bool(self.isProfileLocked)
     case .allowAppRemoval: .bool(self.allowAppRemoval)
     case .allowEraseContentAndSettings: .bool(self.allowEraseContentAndSettings)
+    case .allowAppInstallation: .bool(self.allowAppInstallation)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -184,6 +185,7 @@ extension BlockerApp.Install: Model {
       .isProfileLocked: .bool(self.isProfileLocked),
       .allowAppRemoval: .bool(self.allowAppRemoval),
       .allowEraseContentAndSettings: .bool(self.allowEraseContentAndSettings),
+      .allowAppInstallation: .bool(self.allowAppInstallation),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
