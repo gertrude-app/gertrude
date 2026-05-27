@@ -3,7 +3,7 @@ import cx from 'clsx';
 import type { SecurityEvent } from '#/lib/mock-data';
 import { Badge } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
-import RightSidebarCard from './RightSidebarCard';
+import RightColumnCard from './RightColumnCard';
 
 interface Props {
   allSecurityEvents: Array<SecurityEvent>;
@@ -11,7 +11,7 @@ interface Props {
 
 const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => {
   return (
-    <RightSidebarCard
+    <RightColumnCard
       title="Recent Security Events"
       links={[
         {
@@ -28,7 +28,7 @@ const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => {
           <SecurityEventRow securityEvent={e} />
         ))}
       </div>
-    </RightSidebarCard>
+    </RightColumnCard>
   );
 };
 

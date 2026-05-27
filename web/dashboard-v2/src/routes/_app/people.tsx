@@ -37,13 +37,13 @@ const PeoplePage: React.FC = () => (
       />
     }
   >
-    <div className="flex gap-12">
-      <CardContainer className="flex flex-col gap-6 flex-grow">
+    <div className="flex flex-col @5xl/main:flex-row gap-12">
+      <CardContainer className="flex flex-col gap-4 @xl/main:gap-6 flex-grow">
         {mockChildren.map((c) => (
           <PersonCard person={c} />
         ))}
       </CardContainer>
-      <div className="w-72 shrink-0 flex flex-col gap-6">
+      <div className="@5xl/main:w-72 shrink-0 flex flex-col gap-6">
         <SuspensionRequetsPreviewCard allSuspensionRequests={mockSuspensionRequests} />
         <UnlockRequestsPreviewCard allUnlockRequests={mockUnlockRequests} />
         <SecurityEventsPreviewCard allSecurityEvents={mockSecurityEvents} />

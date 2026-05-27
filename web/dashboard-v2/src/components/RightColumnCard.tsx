@@ -14,7 +14,7 @@ interface Props {
   }>;
 }
 
-const RightSidebarCard: React.FC<Props> = ({ children, title, links }) => {
+const RightColumnCard: React.FC<Props> = ({ children, title, links }) => {
   return (
     <div className="bg-stone-50 border border-stone-200 rounded-2xl p-1.25 flex flex-col gap-0.75">
       <span className="text-xs font-medium text-stone-600 ml-3">{title}</span>
@@ -39,4 +39,4 @@ const RightSidebarCard: React.FC<Props> = ({ children, title, links }) => {
   );
 };
 
-export default RightSidebarCard;
+export default RightColumnCard;
