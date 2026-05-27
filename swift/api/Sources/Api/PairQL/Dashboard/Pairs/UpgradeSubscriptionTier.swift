@@ -83,6 +83,8 @@ extension UpgradeSubscriptionTier: Resolver {
         + "stripe_sub: \(stripeId)",
     ))
 
+    notifyTierUpgrade(parent: context.parent, from: fromTier, to: input.to)
+
     return .success
   }
 }

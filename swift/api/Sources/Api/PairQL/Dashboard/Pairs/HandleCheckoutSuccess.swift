@@ -76,8 +76,6 @@ extension HandleCheckoutSuccess: Resolver {
         currentPeriodEnd: expiration,
       ))
       notifyFirstPayment(parent: parent, tier: tier)
-      // all full subscriptions should have come thru trial state
-      if tier != .light { unexpected("d6db1ebc", context) }
     }
 
     var identity = try await parent.ensureBillingIdentity(in: context.db)
