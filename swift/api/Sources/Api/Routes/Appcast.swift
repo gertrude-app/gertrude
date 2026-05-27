@@ -8,9 +8,13 @@ enum AppcastRoute {
     "2.9.1": ["2.9.2"],
   ]
 
+  static func hiddenReleases(forRequestingAppVersion version: String?) -> Set<String> {
+    version.flatMap { self.suppressedReleases[$0] } ?? []
+  }
+
   @Sendable static func handler(_ request: Request) async throws -> Response {
     let query = try request.query.decode(AppcastQuery.self)
-    let hidden = query.requestingAppVersion.flatMap { self.suppressedReleases[$0] } ?? []
+    let hidden = Self.hiddenReleases(forRequestingAppVersion: query.requestingAppVersion)
     let releases = try await request.context.db.query(Release.self)
       .orderBy(.createdAt, .desc)
       .all(in: request.context.db)
