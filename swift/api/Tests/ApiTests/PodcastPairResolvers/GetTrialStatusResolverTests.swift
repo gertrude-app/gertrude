@@ -57,7 +57,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   // MARK: - trial window (createdAt + 30d vs now)
 
-  func testActiveTrialReturnsDaysRemaining() async throws {
+  func testActiveTrialReturnsExpiresAt() async throws {
     let deviceId = UUID()
     try await self.db.create(IOSDevice(
       id: .init(deviceId),
@@ -75,7 +75,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
     }
 
-    expect(output).toEqual(.trial(daysRemaining: 5))
+    expect(output).toEqual(.trial(expiresAt: install.createdAt + .days(30)))
   }
 
   func testTrialExpiredPastWindow() async throws {
@@ -96,7 +96,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
     }
 
-    expect(output).toEqual(.trialExpired)
+    expect(output).toEqual(.trialExpired(since: install.createdAt + .days(30)))
   }
 
   func testTrialBoundaryAtExactly30DaysIsExpired() async throws {
@@ -117,7 +117,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
     }
 
-    expect(output).toEqual(.trialExpired)
+    expect(output).toEqual(.trialExpired(since: install.createdAt + .days(30)))
   }
 
   // MARK: - legacy grandfathering (pre-claim, from podcast_app.events)

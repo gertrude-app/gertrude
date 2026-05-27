@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import LibCore
+import PodcastRoute
 import SQLiteData
 
 @Reducer
@@ -23,7 +24,6 @@ struct AppReducer: Sendable {
   enum Action: Equatable {
     case appDidLaunch
     case appInForegroundChanged(Bool)
-    case processStoreKitTransaction(TransactionData, update: Bool)
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
     case alert(PresentationAction<AlertAction>)
@@ -41,7 +41,6 @@ struct AppReducer: Sendable {
   @Dependency(\.mainQueue) var mainQueue
   @Dependency(\.date) var date
   @Dependency(\.notificationCenter) var notificationCenter
-  @Dependency(\.storekit) var storekit
   @Dependency(\.locale) var locale
 
   var body: some Reducer<State, Action> {
@@ -64,14 +63,12 @@ struct AppReducer: Sendable {
           state.mode = .onboarding(.init())
         }
         return .merge(
-          .run { [subscription = state.subscription] _ in
+          .run { _ in
             await self.ensureDeviceId()
             if isFirstLaunch {
               self.logFirstLaunch()
-            } else {
-              let updated = self.defeatRepeatFreeTrialAttempt(subscription)
-              self.expireFreeTrial(updated ?? subscription)
             }
+            await self.refreshTrialStatus()
           },
           .publisher {
             self.audio.systemEvents()
@@ -83,52 +80,11 @@ struct AppReducer: Sendable {
               .map { .appInForegroundChanged($0) }
               .receive(on: self.mainQueue)
           },
-          .run { send in
-            for txn in try await self.storekit.verifiedCurrentEntitlements() {
-              await send(.processStoreKitTransaction(txn, update: false))
-            }
-          },
-          .run { send in
-            for try await update in try await self.storekit.transactionUpdates() {
-              await send(.processStoreKitTransaction(update, update: true))
-            }
-          },
           .run { _ in
             try await self.mainQueue.sleep(for: .seconds(10))
             self.cleanupTasks()
           },
         )
-      case .processStoreKitTransaction(let txn, let isUpdate):
-        return .run { [priorStatus = state.subscription.status] _ in
-          if let revokedAt = txn.revocationDate {
-            try CurrentSubscription.set(
-              status: .unpaid,
-              expiringAt: revokedAt < self.date.now ? revokedAt : self.date.now,
-            )
-            if priorStatus != .unpaid || isUpdate {
-              log(.subscription("19620bda"), "subscription revoked", detail: "\(txn)")
-            }
-          } else if (txn.expirationDate ?? .distantFuture) < self.date.now {
-            try CurrentSubscription.set(
-              status: .unpaid,
-              expiringAt: txn.expirationDate ?? self.date.now,
-            )
-            if priorStatus != .unpaid || isUpdate {
-              log(.subscription("5c74457c"), "subscription expired", detail: "\(txn)")
-            }
-          } else {
-            try CurrentSubscription.set(
-              status: .active,
-              expiringAt: txn.expirationDate ?? self.date.now + .days(365),
-            )
-            if priorStatus != .active || isUpdate {
-              log(.subscription("a72104d7"), "subscription activated", detail: "\(txn)")
-            }
-          }
-          if isUpdate {
-            await self.storekit.finishTransaction(txn.id)
-          }
-        }
       case .appInForegroundChanged(let foregrounded):
         state.$appInForeground.withLock { $0 = foregrounded }
         return .none
@@ -184,42 +140,16 @@ struct AppReducer: Sendable {
     .ifLet(\.$alert, action: \.alert)
   }
 
-  func defeatRepeatFreeTrialAttempt(_ subscription: Subscription) -> Subscription? {
-    guard subscription.status == .trialing,
-          subscription.expiresAt > self.date.now + .days(29) else {
-      return nil
+  func refreshTrialStatus() async {
+    guard let output = try? await self.api.getTrialStatus() else { return }
+    switch output {
+    case .trial(let expiresAt):
+      _ = try? CurrentSubscription.set(status: .trialing, expiringAt: expiresAt)
+    case .trialExpired(let since):
+      _ = try? CurrentSubscription.set(status: .unpaid, expiringAt: since)
+    case .legacyGrandfathered, .claimed:
+      break
     }
-    guard let installDate = self.keychain.loadInstallDate(),
-          installDate < self.date.now - .days(3) else {
-      return nil
-    }
-
-    log(.subscription("1ace9aa6"), "defeated repeat free trial attempt")
-    let deviceId = self.keychain.loadDeviceId() ?? UUID()
-    try? self.database.write { db in
-      let records = [
-        Record(id: .installDate, createdAt: installDate),
-        Record(id: .onboardingFinished, createdAt: installDate),
-        Record(id: .deviceId, value: "\(deviceId)", createdAt: installDate),
-      ]
-      try Record.insert { records }.execute(db)
-    }
-    return try? CurrentSubscription.set(
-      status: .trialing,
-      expiringAt: installDate + .days(30),
-    )
-  }
-
-  func expireFreeTrial(_ subscription: Subscription) {
-    guard subscription.status == .trialing,
-          subscription.expiresAt <= self.date.now else {
-      return
-    }
-    log(.subscription("456c9362"), "free trial expired")
-    _ = try? CurrentSubscription.set(
-      status: .unpaid,
-      expiringAt: subscription.expiresAt,
-    )
   }
 
   func cleanupTasks() {

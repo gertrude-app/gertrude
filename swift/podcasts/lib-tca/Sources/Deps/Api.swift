@@ -14,7 +14,7 @@ struct ApiClient: Sendable {
     _ detail: String?,
   ) async throws -> Void
   var migrateDeviceId: @Sendable (_ oldDeviceId: UUID, _ newVendorId: UUID) async throws -> Void
-  var productIds: @Sendable () async throws -> [String]
+  var getTrialStatus: @Sendable () async throws -> GetTrialStatus.Output
   var createDatabaseUpload: @Sendable (_ deviceId: UUID) async throws -> URL
   var verifyPromoCode: @Sendable (_ deviceId: UUID, _ code: String) async throws -> Bool
   var verifyDbDownload: @Sendable (_ deviceId: UUID, _ downloadUrl: String) async throws -> Bool
@@ -51,8 +51,21 @@ extension ApiClient: DependencyKey {
         )
         let _: Empty = try await pairql("MigratePodcastVendorId", input: input)
       },
-      productIds: {
-        try await pairql("PodcastProducts")
+      getTrialStatus: {
+        guard let deviceId = dep(\.keychain).loadDeviceId() else {
+          throw ApiClient.ApiError.noDeviceId
+        }
+        let device = dep(\.device)
+        let (_, iosVersion, modelIdentifier) = await device.data()
+        let appVersion = Bundle.main
+          .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        let input = GetTrialStatus.Input(
+          deviceId: deviceId,
+          modelIdentifier: modelIdentifier,
+          iosVersion: iosVersion,
+          appVersion: appVersion,
+        )
+        return try await pairql("GetTrialStatus", input: input)
       },
       createDatabaseUpload: { deviceId in
         let input = CreateDatabaseUpload.Input(installId: deviceId)
@@ -101,7 +114,7 @@ func pairql<Output: Decodable>(
     throw ApiClient.ApiError.requestFailed
   }
 
-  return try JSONDecoder().decode(Output.self, from: data)
+  return try JSON.decode(data, as: Output.self, [.isoDates])
 }
 
 private struct Empty: Codable {}
@@ -109,6 +122,7 @@ private struct Empty: Codable {}
 extension ApiClient {
   enum ApiError: Error {
     case requestFailed
+    case noDeviceId
   }
 }
 

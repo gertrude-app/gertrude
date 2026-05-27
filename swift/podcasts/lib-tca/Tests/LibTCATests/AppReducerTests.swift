@@ -2,6 +2,7 @@ import Combine
 import ComposableArchitecture
 import Dependencies
 import Foundation
+import PodcastRoute
 import SQLiteData
 import Testing
 
@@ -9,9 +10,9 @@ import Testing
 
 @MainActor struct AppReducerTests {
   @Test func `reinstall with preserved db does not false onboard`() async {
-    let transactions = AsyncStream<TransactionData>.makeStream()
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
+      $0.api.getTrialStatus = { .legacyGrandfathered(paidAt: .reference, expiresAt: .reference) }
       $0.date = .constant(.reference)
       $0.locale = Locale(identifier: "en_US")
       $0.defaultDatabase = try! appDatabase {
@@ -24,8 +25,6 @@ import Testing
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
       $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
       $0.mainQueue = .immediate
-      $0.storekit.verifiedCurrentEntitlements = { [] }
-      $0.storekit.transactionUpdates = { transactions.stream }
     } operation: {
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
@@ -38,17 +37,16 @@ import Testing
         $0.mode = .onboarding(.init(screen: .areYouTheParent))
       }
 
-      transactions.continuation.finish()
       await store.finish()
     }
   }
 
   @Test func `first launch sends 27c4f26a event after device id is established`() async {
-    let transactions = AsyncStream<TransactionData>.makeStream()
     let loggedEventIds = LockIsolated<[String]>([])
     let keychainStore = LockIsolated<[String: Data]>([:])
     await withDependencies {
       $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
+      $0.api.getTrialStatus = { .legacyGrandfathered(paidAt: .reference, expiresAt: .reference) }
       $0.date = .constant(.reference)
       $0.locale = Locale(identifier: "en_US")
       $0.defaultDatabase = try! appDatabase()
@@ -58,8 +56,6 @@ import Testing
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
       $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
       $0.mainQueue = .immediate
-      $0.storekit.verifiedCurrentEntitlements = { [] }
-      $0.storekit.transactionUpdates = { transactions.stream }
     } operation: {
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
@@ -67,7 +63,6 @@ import Testing
         $0.mode = .onboarding(.init())
       }
 
-      transactions.continuation.finish()
       await store.finish()
 
       #expect(keychainStore.value[KeychainClient.Key.deviceId.rawValue] != nil)
