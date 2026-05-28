@@ -325,7 +325,7 @@ jobs:
 
   podcasts-lib:
     needs: files-changed
-    if: needs.files-changed.outputs.podcasts == 'true' && github.event_name == 'pull_request'
+    if: needs.files-changed.outputs.podcasts == 'true'
     runs-on: macos-15
     steps:
       - name: checkout
