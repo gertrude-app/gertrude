@@ -14,6 +14,7 @@ import {
 } from '../components/Icons';
 import InstallsGraph from '../components/InstallsGraph';
 import LoadingState from '../components/LoadingState';
+import MonthlySubscriptionRevenueGraph from '../components/MonthlySubscriptionRevenueGraph';
 import PodcastInstallsGraph from '../components/PodcastInstallsGraph';
 import SignupGraph from '../components/SignupGraph';
 
@@ -270,6 +271,14 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
         <div>
           <h3 className="font-display font-medium text-slate-900 mb-3">Recent Signups</h3>
           <SignupGraph signups={signupItems} />
+        </div>
+        <div>
+          <h3 className="font-display font-medium text-slate-900 mb-3">
+            Subscription Revenue
+          </h3>
+          <MonthlySubscriptionRevenueGraph
+            months={data.monthlySubscriptionRevenue ?? []}
+          />
         </div>
       </div>
     </section>
