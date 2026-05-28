@@ -7,15 +7,21 @@ struct AlbumDetailFeature {
     let album: ApprovedAlbum
     let tracks: [ApprovedTrack]
     let transitionSourceID: String?
+    var isPlaying: Bool
+    var playingTrackID: ApprovedTrack.ID?
 
     init(
       album: ApprovedAlbum,
       tracks: [ApprovedTrack],
       transitionSourceID: String? = nil,
+      isPlaying: Bool = false,
+      playingTrackID: ApprovedTrack.ID? = nil,
     ) {
       self.album = album
       self.tracks = tracks
       self.transitionSourceID = transitionSourceID
+      self.isPlaying = isPlaying
+      self.playingTrackID = playingTrackID
     }
   }
 
@@ -60,5 +66,18 @@ struct AlbumDetailFeature {
 extension AlbumDetailFeature.State {
   var pushID: String {
     self.transitionSourceID ?? self.album.id.rawValue
+  }
+
+  mutating func setPlaybackStatus(_ status: PlaybackFeature.Status) {
+    guard let currentTrackID = status.currentTrackID,
+          self.tracks.contains(where: { $0.id == currentTrackID })
+    else {
+      self.isPlaying = false
+      self.playingTrackID = nil
+      return
+    }
+
+    self.isPlaying = true
+    self.playingTrackID = currentTrackID
   }
 }

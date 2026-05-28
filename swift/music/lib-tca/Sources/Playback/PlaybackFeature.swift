@@ -59,3 +59,16 @@ struct PlaybackFeature: Sendable {
     }
   }
 }
+
+extension PlaybackFeature.Status {
+  var currentTrackID: ApprovedTrack.ID? {
+    switch self {
+    case .stopped:
+      nil
+    case .playingTrack(let item):
+      item.id
+    case .playingTracksInOrder(let items):
+      items.first?.id
+    }
+  }
+}
