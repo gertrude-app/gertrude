@@ -13,6 +13,7 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 - `1.?.?` (dev unreleased)
   - expired supervision claim code now offers regenerate or start over
+  - connecting account non-supervised clears pending supervision claim code
 - `1.8.2` (4/3/26)
   - make "connect to account" the primary button on offer screen
   - remove self-report supervision screen

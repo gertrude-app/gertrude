@@ -979,6 +979,7 @@ public struct IOSReducer {
     switch action {
     case .connectAccount(.connectionSucceeded(childData: let conn)):
       state.screen = .onboarding(.happyPath(.connectSuccess))
+      self.deps.sharedStorage.clearPendingSupervisionCode()
       return .run { [deps = self.deps] _ in
         await deps.receiveAccountConnection(conn)
       }
