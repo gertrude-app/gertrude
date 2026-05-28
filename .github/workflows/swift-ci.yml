@@ -99,11 +99,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: swift/api/.build
-          key: api-build-v3-${{ hashFiles('swift/api/Package.resolved') }}
-          restore-keys: api-build-v3-
       - name: meta
         id: meta
         uses: friends-library/dev/actions/ts-pack/actions/meta@master
@@ -127,12 +122,21 @@ jobs:
           echo "FILENAME=api_${API_ENV}_${DATESTR}_${SHORTSHA}" >> $GITHUB_ENV
       - name: build-api
         run: |
-          cd swift/api
+          # build in /prewarm (image's prebuilt deps) when available, else cold in workspace
+          if [ -d /prewarm/api/.build ] && command -v rsync >/dev/null; then
+            for p in $API_PREWARM_PKGS; do
+              rsync -a --delete --exclude='.build' --exclude='.git' --exclude='.swiftpm' "$GITHUB_WORKSPACE/swift/$p/" "/prewarm/$p/"
+            done
+            cd /prewarm/api
+          else
+            echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
+            cd "$GITHUB_WORKSPACE/swift/api"
+          fi
           XCTEST_LIB=$(dirname "$(find /root -name 'libXCTest.so' -print -quit 2>/dev/null)")
           swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}"
           BIN_PATH=$(swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}" --show-bin-path)
           echo "API_BIN_PATH=${BIN_PATH}" >> $GITHUB_ENV
-          cp "${BIN_PATH}/Run" ../../${FILENAME}
+          cp "${BIN_PATH}/Run" "$GITHUB_WORKSPACE/${FILENAME}"
       - name: verify-pairql-codegen
         if: github.event_name == 'pull_request'
         run: |
@@ -212,13 +216,19 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - uses: actions/cache/restore@v4
-        with:
-          path: swift/api/.build
-          key: api-test-v3-${{ hashFiles('swift/api/Package.resolved') }}
-          restore-keys: api-test-v3-
       - name: test-api
-        run: cd swift/api && swift test
+        run: |
+          # build in /prewarm (image's prebuilt deps) when available, else cold in workspace
+          if [ -d /prewarm/api/.build ] && command -v rsync >/dev/null; then
+            for p in $API_PREWARM_PKGS; do
+              rsync -a --delete --exclude='.build' --exclude='.git' --exclude='.swiftpm' "$GITHUB_WORKSPACE/swift/$p/" "/prewarm/$p/"
+            done
+            cd /prewarm/api
+          else
+            echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
+            cd "$GITHUB_WORKSPACE/swift/api"
+          fi
+          swift test
 
   macapp-lib:
     needs: files-changed
@@ -439,6 +449,8 @@ jobs:
               - swift/**
 
 env:
+  # api + its local path-dep closure; mirrors Dockerfile.ci COPYs (see docs/maintenance.md)
+  API_PREWARM_PKGS: "api duet gertie pairql pairql-macapp pairql-iosapp pairql-podcasts ts-interop ts-codable-macro x-aws x-postmark x-slack x-stripe x-expect x-http x-kit"
   DATABASE_NAME: vapor_database
   DATABASE_USERNAME: vapor_username
   DATABASE_PASSWORD: vapor_password

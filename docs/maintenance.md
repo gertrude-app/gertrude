@@ -179,6 +179,26 @@ names, px values). Periodic checks:
 Hard-coded values that must be kept in sync across multiple files. Nothing enforces these
 — changing one without the others creates silent drift.
 
+### API prewarm package list — `Dockerfile.ci` ↔ `swift-ci.yml` ↔ `Package.swift`
+
+The api's external dependencies are prebuilt into the CI image at `/prewarm` (so CI runs
+reuse them instead of recompiling Vapor/NIO/etc). The api + its local path-dependency
+closure is hand-listed in three places that must stay in sync:
+
+- `swift/api/Dockerfile.ci` — one `COPY <pkg> ${PREWARM}/<pkg>` line per package (these are
+  copied in and prebuilt during the image build).
+- `.github/workflows/swift-ci.yml` — the `API_PREWARM_PKGS` env var (the `build-api` and
+  `test-api` jobs rsync each one's freshly-checked-out sources into `/prewarm`).
+- `swift/api/Package.swift` — the `.package(path:)` deps are the source of truth (find them
+  with `grep '\.package(path:' swift/api/Package.swift`, then add their transitive `x-*`/
+  `pairql*` deps).
+
+Drifts whenever the api adds/removes/renames a local path dependency. Failure modes: a
+package missing from the `COPY` list breaks the **image build** (swift can't resolve the
+path dep — loud, caught early); a package present in `COPY` but missing from
+`API_PREWARM_PKGS` is **silent** — CI builds that dep from its stale image-baked sources
+instead of the checked-out code. Keep all three lists identical.
+
 ### Prettier version — CI vs `web/package.json`
 
 - `.github/workflows/swift-ci.yml` invokes `npx prettier@X.Y.Z` directly (twice, for the
