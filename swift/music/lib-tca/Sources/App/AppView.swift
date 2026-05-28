@@ -3,6 +3,8 @@ import LibViews
 import SwiftUI
 
 struct AppView: View {
+  @Environment(\.colorScheme) private var colorScheme
+
   @Bindable var store: StoreOf<AppFeature>
 
   var body: some View {
@@ -22,6 +24,13 @@ struct AppView: View {
           }
         }
         .tint(.gertrudeBrandAccent)
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .tabViewBottomAccessory {
+          self.nowPlayingAccessory
+        }
+        .sheet(isPresented: self.nowPlayingPresented) {
+          self.nowPlayingSheet
+        }
       } else {
         self.defaultTabView
       }
@@ -66,10 +75,35 @@ struct AppView: View {
     .searchable(text: self.searchText)
   }
 
+  #if os(iOS)
+    @available(iOS 26.0, *)
+    private var nowPlayingAccessory: some View {
+      NowPlayingAccessoryView(foregroundColor: self.nowPlayingForegroundColor) {
+        self.store.send(.nowPlayingPresentationChanged(true))
+      }
+    }
+  #endif
+
+  private var nowPlayingForegroundColor: Color {
+    self.colorScheme == .dark ? .white : .black
+  }
+
+  private var nowPlayingSheet: some View {
+    Text("now playing")
+      .font(.title)
+  }
+
   private var searchText: Binding<String> {
     Binding(
       get: { self.store.searchText },
       set: { self.store.send(.searchTextChanged($0)) }
+    )
+  }
+
+  private var nowPlayingPresented: Binding<Bool> {
+    Binding(
+      get: { self.store.isNowPlayingPresented },
+      set: { self.store.send(.nowPlayingPresentationChanged($0)) }
     )
   }
 }

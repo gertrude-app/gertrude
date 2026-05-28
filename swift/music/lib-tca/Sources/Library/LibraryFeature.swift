@@ -153,5 +153,20 @@ struct LibraryFeature: Sendable {
   }
 }
 
+extension LibraryFeature.State {
+  mutating func setAlbumDetailPlaybackStatus(_ status: PlaybackFeature.Status) {
+    switch self.destination {
+    case .album(var albumDetail):
+      albumDetail.setPlaybackStatus(status)
+      self.destination = .album(albumDetail)
+    case .albums(var albumList):
+      albumList.setAlbumDetailPlaybackStatus(status)
+      self.destination = .albums(albumList)
+    case .artists, .artist, .tracks, .track, .none:
+      return
+    }
+  }
+}
+
 extension LibraryFeature.Destination.State: Equatable {}
 extension LibraryFeature.Destination.Action: Equatable {}

@@ -67,5 +67,13 @@ struct AlbumListFeature: Sendable {
   }
 }
 
+extension AlbumListFeature.State {
+  mutating func setAlbumDetailPlaybackStatus(_ status: PlaybackFeature.Status) {
+    guard case .some(.album(var albumDetail)) = self.destination else { return }
+    albumDetail.setPlaybackStatus(status)
+    self.destination = .album(albumDetail)
+  }
+}
+
 extension AlbumListFeature.Destination.State: Equatable {}
 extension AlbumListFeature.Destination.Action: Equatable {}
