@@ -1,5 +1,6 @@
 import Foundation
 import LibViews
+import PodcastRoute
 import SQLiteData
 import Tagged
 
@@ -54,6 +55,23 @@ extension Subscription {
       .trialEndingSoon
     } else {
       .ok
+    }
+  }
+}
+
+extension AmSubscriptionState {
+  func toLocal(now: Date) -> (status: Subscription.Status, expiresAt: Date) {
+    switch self {
+    case .complimentary:
+      (.complimentary, now + .days(365 * 100))
+    case .active(let expiresAt):
+      (.active, expiresAt)
+    case .fullTrial(let expiresAt), .amTrial(let expiresAt):
+      (.trialing, expiresAt)
+    case .legacyGrandfathered(let accessEndsAt, _, _):
+      (.active, accessEndsAt)
+    case .unpaid, .legacyExpired:
+      (.unpaid, now)
     }
   }
 }

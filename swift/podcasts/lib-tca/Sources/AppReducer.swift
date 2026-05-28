@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import LibCore
+import PairQL
 import PodcastRoute
 import SQLiteData
 
@@ -68,7 +69,7 @@ struct AppReducer: Sendable {
             if isFirstLaunch {
               self.logFirstLaunch()
             }
-            await self.refreshTrialStatus()
+            await self.refreshEntitlement()
           },
           .publisher {
             self.audio.systemEvents()
@@ -143,6 +144,14 @@ struct AppReducer: Sendable {
     .ifLet(\.$alert, action: \.alert)
   }
 
+  func refreshEntitlement() async {
+    if self.keychain.isClaimed() {
+      await self.refreshAccountStatus()
+    } else {
+      await self.refreshTrialStatus()
+    }
+  }
+
   func refreshTrialStatus() async {
     guard let output = try? await self.api.getTrialStatus() else { return }
     switch output {
@@ -150,9 +159,30 @@ struct AppReducer: Sendable {
       _ = try? CurrentSubscription.set(status: .trialing, expiringAt: expiresAt)
     case .trialExpired(let since):
       _ = try? CurrentSubscription.set(status: .unpaid, expiringAt: since)
-    case .legacyGrandfathered, .claimed:
+    case .legacyGrandfathered:
       break
+    case .claimed(let token, _, _, let subscription):
+      self.keychain.save(amToken: token)
+      self.applyAccountStatus(subscription)
     }
+  }
+
+  func refreshAccountStatus() async {
+    do {
+      let output = try await self.api.getAccountStatus()
+      self.applyAccountStatus(output.subscription)
+    } catch let error as PqlError where error.statusCode == 401 {
+      self.keychain.deleteAmToken()
+      await self.refreshTrialStatus()
+    } catch is URLError {
+    } catch {
+      log(.error("a1f4c2d9"), "account status refresh failed", detail: "\(error)")
+    }
+  }
+
+  func applyAccountStatus(_ state: AmSubscriptionState) {
+    let mapped = state.toLocal(now: self.date.now)
+    _ = try? CurrentSubscription.set(status: mapped.status, expiringAt: mapped.expiresAt)
   }
 
   func cleanupTasks() {

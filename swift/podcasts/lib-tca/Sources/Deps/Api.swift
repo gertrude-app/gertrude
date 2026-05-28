@@ -15,6 +15,7 @@ struct ApiClient: Sendable {
   ) async throws -> Void
   var migrateDeviceId: @Sendable (_ oldDeviceId: UUID, _ newVendorId: UUID) async throws -> Void
   var getTrialStatus: @Sendable () async throws -> GetTrialStatus.Output
+  var getAccountStatus: @Sendable () async throws -> GetAccountStatus.Output
   var createDatabaseUpload: @Sendable (_ deviceId: UUID) async throws -> URL
   var verifyPromoCode: @Sendable (_ deviceId: UUID, _ code: String) async throws -> Bool
   var verifyDbDownload: @Sendable (_ deviceId: UUID, _ downloadUrl: String) async throws -> Bool
@@ -42,14 +43,20 @@ extension ApiClient: DependencyKey {
           iosVersion: iosVersion,
         )
 
-        let _: Empty = try await pairql("LogPodcastEvent_v3", input: input)
+        _ = try await output(
+          from: LogPodcastEvent_v3.self,
+          withUnauthed: .logPodcastEvent_v3(input),
+        )
       },
       migrateDeviceId: { oldDeviceId, newVendorId in
         let input = MigratePodcastVendorId.Input(
           oldDeviceId: oldDeviceId,
           newVendorId: newVendorId,
         )
-        let _: Empty = try await pairql("MigratePodcastVendorId", input: input)
+        _ = try await output(
+          from: MigratePodcastVendorId.self,
+          withUnauthed: .migratePodcastVendorId(input),
+        )
       },
       getTrialStatus: {
         guard let deviceId = dep(\.keychain).loadDeviceId() else {
@@ -65,64 +72,87 @@ extension ApiClient: DependencyKey {
           iosVersion: iosVersion,
           appVersion: appVersion,
         )
-        return try await pairql("GetTrialStatus", input: input)
+        return try await output(from: GetTrialStatus.self, withUnauthed: .getTrialStatus(input))
+      },
+      getAccountStatus: {
+        try await output(from: GetAccountStatus.self, with: .getAccountStatus)
       },
       createDatabaseUpload: { deviceId in
         let input = CreateDatabaseUpload.Input(installId: deviceId)
-        let output: CreateDatabaseUpload.Output = try await pairql(
-          "CreateDatabaseUpload",
-          input: input,
+        let result = try await output(
+          from: CreateDatabaseUpload.self,
+          withUnauthed: .createDatabaseUpload(input),
         )
-        return output.uploadUrl
+        return result.uploadUrl
       },
       verifyPromoCode: { deviceId, code in
         let input = VerifyPromoCode.Input(installId: deviceId, code: code)
-        let output: SuccessOutput = try await pairql("VerifyPromoCode", input: input)
-        return output.success
+        let result = try await output(
+          from: VerifyPromoCode.self,
+          withUnauthed: .verifyPromoCode(input),
+        )
+        return result.success
       },
       verifyDbDownload: { deviceId, downloadUrl in
         let input = VerifyDbDownload.Input(installId: deviceId, downloadUrl: downloadUrl)
-        let output: SuccessOutput = try await pairql("VerifyDbDownload", input: input)
-        return output.success
+        let result = try await output(
+          from: VerifyDbDownload.self,
+          withUnauthed: .verifyDbDownload(input),
+        )
+        return result.success
       },
     )
   }
 }
 
-@MainActor
-func pairql<Output: Decodable>(
-  _ operation: String,
-  input: (some Encodable)? = nil as Empty?,
-) async throws -> Output {
+func output<P: Pair>(
+  from pair: P.Type,
+  withUnauthed route: UnauthedRoute,
+) async throws -> P.Output {
+  try await send(.unauthed(route))
+}
+
+func output<P: Pair>(
+  from pair: P.Type,
+  with route: AuthedRoute,
+) async throws -> P.Output {
+  guard let token = dep(\.keychain).loadAmToken() else {
+    throw ApiClient.ApiError.noToken
+  }
+  return try await send(.authed(token, route))
+}
+
+private func send<Output: PairOutput>(_ route: PodcastRoute) async throws -> Output {
   let apiEndpoint = Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
     ?? "https://api.gertrude.app"
-
-  var request = URLRequest(url: URL(string: "\(apiEndpoint)/pairql/gertrude-am/\(operation)")!)
+  let router = PodcastRoute.router.baseURL("\(apiEndpoint)/pairql/gertrude-am")
+  var request = try router.request(for: route)
   request.httpMethod = "POST"
   request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
   request.timeoutInterval = 10
-  request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-  if let input {
-    request.httpBody = try JSONEncoder().encode(input)
-  }
 
   let (data, response) = try await URLSession.shared.data(for: request)
 
-  guard let httpResponse = response as? HTTPURLResponse,
-        (200 ... 299).contains(httpResponse.statusCode) else {
+  guard let httpResponse = response as? HTTPURLResponse else {
     throw ApiClient.ApiError.requestFailed
+  }
+
+  if httpResponse.statusCode >= 300 {
+    if let pqlError = try? JSON.decode(data, as: PqlError.self) {
+      throw pqlError
+    }
+    throw ApiClient.ApiError.unexpectedError(statusCode: httpResponse.statusCode)
   }
 
   return try JSON.decode(data, as: Output.self, [.isoDates])
 }
 
-private struct Empty: Codable {}
-
 extension ApiClient {
   enum ApiError: Error {
     case requestFailed
     case noDeviceId
+    case noToken
+    case unexpectedError(statusCode: Int)
   }
 }
 

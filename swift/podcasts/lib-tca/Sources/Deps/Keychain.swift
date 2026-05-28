@@ -15,6 +15,7 @@ extension KeychainClient {
     case pincode
     case installDate
     case deviceId
+    case amToken
     // @deprecated since v1.4.0 - used to hold randomly generated
     // UUID to identify install, but we switched to using deviceId
     // which is derived from identifierForVendor (deviceId) to
@@ -106,6 +107,29 @@ extension KeychainClient {
     let data = "\(pincode)".data(using: .utf8)!
     self._save(.pincode, data)
   }
+
+  func loadAmToken() -> UUID? {
+    if let data = self._load(.amToken),
+       let string = String(data: data, encoding: .utf8),
+       let uuid = UUID(uuidString: string) {
+      uuid
+    } else {
+      nil
+    }
+  }
+
+  func isClaimed() -> Bool {
+    self.loadAmToken() != nil
+  }
+
+  func save(amToken: UUID) {
+    let data = amToken.uuidString.data(using: .utf8)!
+    self._save(.amToken, data)
+  }
+
+  func deleteAmToken() {
+    self.delete(.amToken)
+  }
 }
 
 extension KeychainClient: DependencyKey {
@@ -166,6 +190,8 @@ extension DependencyValues {
           "1760103425".data(using: .utf8)!
         case .deviceId, .installId:
           "DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF".data(using: .utf8)!
+        case .amToken:
+          nil
         }
       },
       _save: { _, _ in },
