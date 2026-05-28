@@ -18,6 +18,47 @@ final class IOSReducerTestsResume: XCTestCase {
   }
 
   @MainActor
+  func testCodeExpired_getNewCode_generatesAndShowsInstructions() async throws {
+    let savedCode = LockIsolated<Int?>(nil)
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.codeExpired))),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.api.createSupervisionClaimCode = { .init(code: 654_321, expiresAt: .reference) }
+      $0.sharedStorage.savePendingSupervisionCode = { savedCode.setValue($0.code) }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.primary, "")))
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.setup(.generateSetupCode())))),
+    )) {
+      $0.screen = .onboarding(.supervision(.setup(.generateSetupCode())))
+    }
+    await store.receive(.programmatic(.supervisionCodeGenerated(code: 654_321))) {
+      $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: 654_321))))
+    }
+    expect(savedCode.value).toEqual(654_321)
+  }
+
+  @MainActor
+  func testCodeExpired_startOver_clearsCodeAndGoesToHiThere() async throws {
+    let clearedCode = LockIsolated(false)
+    let store = TestStore(initialState: IOSReducer.State(
+      screen: .onboarding(.supervision(.resume(.codeExpired))),
+    )) {
+      IOSReducer()
+    } withDependencies: {
+      $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
+    }
+
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
+      $0.screen = .onboarding(.happyPath(.hiThere))
+    }
+    expect(clearedCode.value).toEqual(true)
+  }
+
+  @MainActor
   func testClaimedNotSupervised_withCode_goesToInstructions() async throws {
     let store = TestStore(initialState: IOSReducer.State(
       screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised))),

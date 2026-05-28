@@ -42,8 +42,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
   }
 
   @MainActor
-  func testSupervisionReboot_expired_startsOver() async throws {
-    let clearedCode = LockIsolated(false)
+  func testSupervisionReboot_expired_showsExpiredCodeResume() async throws {
     let store = TestStore(initialState: IOSReducer.State()) {
       IOSReducer()
     } withDependencies: {
@@ -51,7 +50,6 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
-      $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .expired }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
@@ -64,18 +62,18 @@ final class IOSReducerTestsLaunch: XCTestCase {
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
-    await store.receive(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere))))) {
-      $0.screen = .onboarding(.happyPath(.hiThere))
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.codeExpired)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.codeExpired)))
     }
     await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
       $0.onboarding.connectFeature = .init(isEnabled: true)
     }
-    expect(clearedCode.value).toEqual(true)
   }
 
   @MainActor
-  func testSupervisionReboot_notFound_restarts() async throws {
-    let clearedCode = LockIsolated(false)
+  func testSupervisionReboot_notFound_showsExpiredCodeResume() async throws {
     let store = TestStore(initialState: IOSReducer.State()) {
       IOSReducer()
     } withDependencies: {
@@ -83,7 +81,6 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.systemExtension.filterRunning = { false }
       $0.sharedStorage.loadPendingSupervisionCode = { .mock }
       $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
-      $0.sharedStorage.clearPendingSupervisionCode = { clearedCode.setValue(true) }
       $0.api.checkSupervisionFlowStatus = { @Sendable _ in .notFound }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
@@ -96,13 +93,14 @@ final class IOSReducerTestsLaunch: XCTestCase {
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
-    await store.receive(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere))))) {
-      $0.screen = .onboarding(.happyPath(.hiThere))
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.codeExpired)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.codeExpired)))
     }
     await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
       $0.onboarding.connectFeature = .init(isEnabled: true)
     }
-    expect(clearedCode.value).toEqual(true)
   }
 
   @MainActor
