@@ -50,10 +50,11 @@ Note: The `check` job runs on all web changes without filtering — it covers li
 format-check, typecheck (via nx, across every package with a `typecheck` script), and
 vitest.
 
-**`web/supervise` is intentionally not in `files-changed`.** It has no build step
-(`main: "./src/index.ts"`, source-only) and is consumed by the external Tauri supervision
-tool, not built from this repo. The lint/format/typecheck coverage from `check` is
-sufficient. Don't add a filter unless supervise gains a real build step.
+**`web/supervise` intentionally has no dedicated `files-changed` output.** It has no build
+step (`main: "./src/index.ts"`, source-only) and is consumed by the external Tauri
+supervision tool, not built from this repo. The lint/format/typecheck coverage from
+`check` is sufficient for the package itself. It can still appear in another app's filter
+when that app imports it, such as Storybook visual coverage.
 
 ### Periodic Maintenance Steps
 

@@ -48,7 +48,7 @@ build-storybook:
   @pnpm exec nx run @storybook/app:build
 
 build-dash:
-  @pnpm --filter @dash/app build
+  @pnpm exec nx run @dash/app:build
 
 build-admin:
   @pnpm exec nx run admin:build
@@ -104,7 +104,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test build-storybook build-site build-admin
+check: lint format-check typecheck test build-storybook build-site build-dash build-admin
 
 sync-supervise-ui:
   #!/usr/bin/env bash
@@ -129,4 +129,3 @@ sync-supervise-ui:
 [private]
 hmr-comment:
   @bash -c "echo // $(date) >> './site/app/docs/[slug]/page.tsx'"
-

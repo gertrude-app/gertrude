@@ -40,6 +40,8 @@ jobs:
         run: cd swift/gertie && swift build
       - name: build-ts-interop
         run: cd swift/ts-interop && swift build
+      - name: build-x-aws
+        run: cd swift/x-aws && swift build
       - name: build-x-expect
         run: cd swift/x-expect && swift build
       - name: build-x-http
@@ -78,12 +80,16 @@ jobs:
         run: cd swift/ts-interop && swift test
       - name: test-gertie
         run: cd swift/gertie && swift test
+      - name: test-x-aws
+        run: cd swift/x-aws && swift test
       - name: test-x-http
         run: cd swift/x-http && swift test
       - name: test-x-kit
         run: cd swift/x-kit && swift test
       - name: test-x-slack
         run: cd swift/x-slack && swift test
+      - name: test-x-stripe
+        run: cd swift/x-stripe && swift test
 
   linux-api-build:
     needs: files-changed
@@ -465,4 +471,3 @@ env:
   APPSTORE_PRIVATE_KEY: not-real
   KEYCHAIN_CRAWLER_URL: not-real
   KEYCHAIN_CRAWLER_AUTH_TOKEN: not-real
-

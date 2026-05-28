@@ -158,19 +158,20 @@ const ParentDetail: React.FC = () => {
           </div>
 
           {(() => {
-            const stripeId = data.subscription?.stripeId ?? null;
-            if (!stripeId) return null;
+            const sub = data.subscription;
+            if (!sub) return null;
             return (
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-2 flex-wrap">
                 <span className="text-sm text-slate-500">Stripe: </span>
                 <a
-                  href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${stripeId}`}
+                  href={`https://dashboard.stripe.com/acct_1L8TXdGKRdhETuKA/subscriptions/${sub.stripeId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm font-mono text-brand-violet hover:text-brand-fuchsia transition-colors"
                 >
-                  {stripeId}
+                  {sub.stripeId}
                 </a>
+                <StripeStatusBadge status={sub.stripeStatus} />
               </div>
             );
           })()}
@@ -766,6 +767,67 @@ const SupervisionBadge: React.FC<{ status: string }> = ({ status }) => {
     text: `text-slate-600`,
     ring: `ring-slate-500/20`,
   };
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.text} ring-1 ring-inset ${config.ring}`}
+    >
+      {config.label}
+    </span>
+  );
+};
+
+const STRIPE_STATUS_CONFIG: Record<
+  Subscription[`stripeStatus`],
+  { label: string; bg: string; text: string; ring: string }
+> = {
+  active: {
+    label: `active`,
+    bg: `bg-emerald-100`,
+    text: `text-emerald-700`,
+    ring: `ring-emerald-500/20`,
+  },
+  trialing: {
+    label: `trialing`,
+    bg: `bg-violet-100`,
+    text: `text-violet-700`,
+    ring: `ring-violet-500/20`,
+  },
+  pastDue: {
+    label: `past due`,
+    bg: `bg-amber-100`,
+    text: `text-amber-700`,
+    ring: `ring-amber-500/20`,
+  },
+  unpaid: {
+    label: `unpaid`,
+    bg: `bg-amber-100`,
+    text: `text-amber-700`,
+    ring: `ring-amber-500/20`,
+  },
+  canceled: {
+    label: `canceled`,
+    bg: `bg-rose-100`,
+    text: `text-rose-700`,
+    ring: `ring-rose-500/20`,
+  },
+  incomplete: {
+    label: `incomplete`,
+    bg: `bg-slate-100`,
+    text: `text-slate-600`,
+    ring: `ring-slate-500/20`,
+  },
+  incompleteExpired: {
+    label: `incomplete expired`,
+    bg: `bg-slate-100`,
+    text: `text-slate-600`,
+    ring: `ring-slate-500/20`,
+  },
+};
+
+const StripeStatusBadge: React.FC<{ status: Subscription[`stripeStatus`] }> = ({
+  status,
+}) => {
+  const config = STRIPE_STATUS_CONFIG[status];
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${config.bg} ${config.text} ring-1 ring-inset ${config.ring}`}
