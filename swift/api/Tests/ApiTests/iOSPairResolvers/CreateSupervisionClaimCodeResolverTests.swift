@@ -103,6 +103,46 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     expect(updated.claimCode).toEqual(newCode)
   }
 
+  func testClaimedExpiredPendingSupervisionCode_renewsExistingCode() async throws {
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
+    let child = try await self.child()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.id,
+      modelIdentifier: "iPhone18,2",
+      iosVersion: "17.0",
+      claimCode: code,
+      claimCodeExpiresAt: .reference - .days(1),
+      claimedAt: .reference - .days(8),
+    ))
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
+      $0.date = .constant(.reference)
+    } operation: {
+      try await CreateSupervisionClaimCode.resolve(
+        with: .init(
+          deviceId: deviceId,
+          modelIdentifier: "iPhone18,2",
+          iosVersion: "18.2",
+          appVersion: "1.0.0",
+        ),
+        in: .mock,
+      )
+    }
+
+    expect(output.code).toEqual(code)
+    expect(output.expiresAt).toEqual(.reference + .days(21))
+
+    let updated = try await IOSDevice.query()
+      .where(.id == device.id)
+      .first(in: self.db)
+    expect(updated.claimCode).toEqual(code)
+    expect(updated.claimCodeExpiresAt).toEqual(.reference + .days(21))
+  }
+
   func testExistingDevice_noSupervision_getsSupervisionCreated() async throws {
     let device = try await self.db.create(IOSDevice(
       id: .init(),

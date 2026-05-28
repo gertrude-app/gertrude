@@ -64,15 +64,12 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
     }.toContain("Complete the claim step in the Gertrude dashboard first")
   }
 
-  func testCodeExpired_throwsExpiredError() async throws {
-    let parent = try await self.parent()
-    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+  func testUnclaimedCode_throwsClaimStepError() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
+      $0.childId = nil
       $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference - .days(1) // <-- expired
-      $0.claimedAt = .reference - .days(8)
+      $0.claimCodeExpiresAt = .reference - .days(1)
     })
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
@@ -85,6 +82,36 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
           in: .mock,
         )
       }
-    }.toContain("expired")
+    }.toContain("Complete the claim step in the Gertrude dashboard first")
+  }
+
+  func testClaimedExpiredCode_renewsAndReturnsPendingSupervision() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice.random {
+      $0.childId = child.id
+      $0.claimCode = code
+      $0.claimCodeExpiresAt = .reference - .days(1)
+      $0.claimedAt = .reference - .days(8)
+    })
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await GetPendingSupervision.resolve(
+        with: .init(code: code, platform: "macos"),
+        in: .mock,
+      )
+    }
+
+    expect(output.childName).toEqual(child.name)
+
+    let updated = try await IOSDevice.query()
+      .where(.id == device.id)
+      .first(in: self.db)
+    expect(updated.claimCode).toEqual(code)
+    expect(updated.claimCodeExpiresAt).toEqual(.reference + .days(21))
   }
 }

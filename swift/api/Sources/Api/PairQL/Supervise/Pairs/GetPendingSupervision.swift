@@ -68,7 +68,7 @@ extension SuperviseRoute {
       .first(in: context.db)
 
     let codeNotFound = "Code not found. Double-check and try again."
-    guard let device else {
+    guard var device else {
       logIOSUnusual("\(baseId)-1", "supervision code not found")
       throw context.error("\(baseId)-1", .notFound, user: codeNotFound)
     }
@@ -83,6 +83,8 @@ extension SuperviseRoute {
       logIOSUnusual("\(baseId)-1", "supervision row not found for claimed device")
       throw context.error("\(baseId)-1", .notFound, user: codeNotFound)
     }
+
+    try await device.renewPendingClaimCode(in: context.db, supervision: supervision)
 
     if let expiresAt = device.claimCodeExpiresAt,
        expiresAt < get(dependency: \.date.now) {
