@@ -147,12 +147,16 @@ extension GetChild: Resolver {
       computers: computers.uniqued(on: \.id),
       iosDevices: devices.concurrentMap { device in
         let supervision = try await device.supervision(in: context.db)
+        // true if parent backed out of supervision flow and authed/connected via screen time
+        let attachedViaNonSupervisionPath = device.childId != nil && device.claimedAt == nil
+        let pendingSupervision = supervision?.supervised == false
+          && !attachedViaNonSupervisionPath
         return .init(
           id: device.id,
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          pendingClaimCode: supervision?.supervised == false ? device.claimCode : nil,
+          pendingClaimCode: pendingSupervision ? device.claimCode : nil,
         )
       },
       blockedApps: blockedApps,

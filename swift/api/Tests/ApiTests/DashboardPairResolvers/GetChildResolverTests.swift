@@ -9,7 +9,7 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
   func testFetchIncludingPendingDevice() async throws {
     let child = try await self.child()
 
-    let pendingCode = 123_456
+    let pendingCode = Int.random(in: 100_000 ... 999_999)
     let pendingDevice = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
       $0.claimCode = pendingCode
@@ -23,7 +23,7 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
 
     let completedDevice = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimCode = 654_321
+      $0.claimCode = Int.random(in: 100_000 ... 999_999)
       $0.claimCodeExpiresAt = .distantFuture
       $0.claimedAt = .reference
     })
@@ -44,5 +44,31 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.iosDevices[0].pendingClaimCode).toEqual(pendingCode)
     expect(output.iosDevices[1].id).toEqual(completedDevice.id)
     expect(output.iosDevices[1].pendingClaimCode).toBeNil()
+  }
+
+  func testAbandonedSupervisionCodeAfterScreenTimeConnectDoesNotNag() async throws {
+    let child = try await self.child()
+
+    let familyConnectedDevice = try await self.db.create(IOSDevice.random {
+      $0.childId = child.id // <-- connected, must have been thru post screen-time offer
+      $0.claimCode = Int
+        .random(in: 100_000 ... 999_999) // <-- has a claim code from abaondoned supervision attempt
+      $0.claimCodeExpiresAt = .reference - .days(7)
+      $0.claimedAt = nil
+    })
+    try await self.db.create(BlockerApp.Supervision(
+      deviceId: familyConnectedDevice.id,
+      supervisedAt: nil,
+    ))
+
+    let output = try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+    } operation: {
+      try await GetChild.resolve(with: child.id, in: context(child.parent))
+    }
+
+    expect(output.iosDevices.count).toEqual(1)
+    expect(output.iosDevices[0].id).toEqual(familyConnectedDevice.id)
+    expect(output.iosDevices[0].pendingClaimCode).toBeNil() // <-- so they don't get nagged
   }
 }
