@@ -11,37 +11,54 @@ extension GetAccountStatus: NoInputResolver {
     return Output(
       childId: ctx.child.id.rawValue,
       childName: ctx.child.name,
-      subscription: account.amSubscriptionState,
+      subscription: account.amSubscriptionState(forInstall: ctx.install),
     )
   }
 }
 
 extension BillingAccountSnapshot {
-  var amSubscriptionState: AmSubscriptionState {
+  func amSubscriptionState(forInstall install: PodcastApp.Install) -> AmSubscriptionState {
+    let amTrialEnd = install.createdAt + PodcastApp.Install.trialPeriod
+    let amTrialActive = self.date < amTrialEnd
+
     switch self.planStatus {
     case .complimentary:
-      .active(expiresAt: nil)
+      return .complimentary
     case .full(.current(let renewalDate)), .light(.current(let renewalDate)):
-      .active(expiresAt: renewalDate)
-    case .fullTrial(let trialExpiration, _):
-      if let iapPaidAt = self.billingIdentity?.legacyAmIapPaidAt,
-         iapPaidAt + .days(365) > trialExpiration {
-        .active(expiresAt: iapPaidAt + .days(365))
-      } else {
-        .active(expiresAt: trialExpiration)
+      return .active(expiresAt: renewalDate)
+    case .fullTrial(let trialExpiration, let substrate):
+      if case .current(let renewalDate) = substrate?.status {
+        return .active(expiresAt: renewalDate)
       }
+      let legacyFloor = self.billingIdentity?.legacyAmIapPaidAt
+        .map { $0 + PodcastApp.LegacyIap.grantWindow } ?? .distantPast
+      // pick whichever live trial ends later, then floor to legacy if it outlasts
+      if amTrialEnd > trialExpiration {
+        return .amTrial(expiresAt: max(amTrialEnd, legacyFloor))
+      }
+      return .fullTrial(expiresAt: max(trialExpiration, legacyFloor))
     case .free, .fullTrialGrace, .full(.pastDue), .light(.pastDue):
-      if let iapPaidAt = self.billingIdentity?.legacyAmIapPaidAt {
-        self.date < iapPaidAt + .days(365)
-          ? .legacyGrandfathered(
-            paidAt: iapPaidAt,
-            expiresAt: iapPaidAt + .days(365),
-            remediationUrl: nil,
-          )
-          : .legacyExpired(paidAt: iapPaidAt, remediationUrl: nil)
-      } else {
-        .unpaid(remediationUrl: nil)
+      let legacyPaidAt = self.billingIdentity?.legacyAmIapPaidAt
+      let legacyAccessEnd = legacyPaidAt.map { $0 + PodcastApp.LegacyIap.grantWindow }
+      let legacyActive = legacyAccessEnd.map { self.date < $0 } ?? false
+
+      if legacyActive, let legacyAccessEnd, amTrialActive, amTrialEnd > legacyAccessEnd {
+        return .amTrial(expiresAt: amTrialEnd)
       }
+      if legacyActive, let legacyAccessEnd {
+        return .legacyGrandfathered(
+          accessEndsAt: legacyAccessEnd,
+          showMigrationNag: self.date >= legacyAccessEnd - PodcastApp.LegacyIap.nagWindow,
+          migrationUrl: nil,
+        )
+      }
+      if amTrialActive {
+        return .amTrial(expiresAt: amTrialEnd)
+      }
+      if let legacyPaidAt {
+        return .legacyExpired(paidAt: legacyPaidAt, remediationUrl: nil)
+      }
+      return .unpaid(remediationUrl: nil)
     }
   }
 }

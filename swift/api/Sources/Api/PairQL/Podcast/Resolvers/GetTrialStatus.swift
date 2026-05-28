@@ -37,7 +37,7 @@ extension GetTrialStatus: Resolver {
         token: token.value.rawValue,
         childId: child.id.rawValue,
         childName: child.name,
-        subscription: account.amSubscriptionState,
+        subscription: account.amSubscriptionState(forInstall: install),
       )
     }
 
@@ -46,11 +46,15 @@ extension GetTrialStatus: Resolver {
       withBindings: [.uuid(input.deviceId)],
     )
 
-    if let paidAt = legacy.first?.createdAt, now < paidAt + .days(365) {
-      return .legacyGrandfathered(paidAt: paidAt, expiresAt: paidAt + .days(365))
+    if let paidAt = legacy.first?.createdAt,
+       now < paidAt + PodcastApp.LegacyIap.grantWindow {
+      return .legacyGrandfathered(
+        paidAt: paidAt,
+        expiresAt: paidAt + PodcastApp.LegacyIap.grantWindow,
+      )
     }
 
-    let trialEnd = install.createdAt + .days(30)
+    let trialEnd = install.createdAt + PodcastApp.Install.trialPeriod
     if trialEnd > now {
       return .trial(expiresAt: trialEnd)
     }

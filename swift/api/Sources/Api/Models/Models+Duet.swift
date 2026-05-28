@@ -11,10 +11,6 @@ extension StripeSubscription.Tier: PostgresEnum {
   public var typeName: String { "parent.subscription_tier" }
 }
 
-protocol HasCreatedAt {
-  var createdAt: Date { get set }
-}
-
 protocol HasOptionalDeletedAt {
   var deletedAt: Date? { get set }
 }
@@ -29,12 +25,10 @@ extension HasOptionalDeletedAt {
   var notDeleted: Bool { !self.isDeleted }
 }
 
-extension KeystrokeLine: HasCreatedAt {}
-extension Screenshot: HasCreatedAt {}
 extension KeystrokeLine: HasOptionalDeletedAt {}
 extension Screenshot: HasOptionalDeletedAt {}
 
-extension Either where Left: HasCreatedAt, Right: HasCreatedAt {
+extension Either where Left: DuetSQL.Model, Right: DuetSQL.Model {
   var createdAt: Date {
     switch self {
     case .left(let model):

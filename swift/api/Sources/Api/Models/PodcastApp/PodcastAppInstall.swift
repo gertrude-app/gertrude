@@ -1,4 +1,5 @@
 import DuetSQL
+import Foundation
 
 extension PodcastApp {
   struct Install: Codable, Sendable, Equatable {
@@ -16,7 +17,11 @@ extension PodcastApp {
   }
 }
 
+// extensions
+
 extension PodcastApp.Install {
+  static let trialPeriod: TimeInterval = .days(30)
+
   @discardableResult
   static func ensureExists(
     deviceId: IOSDevice.Id,
@@ -75,5 +80,14 @@ extension PodcastApp.Install {
     try await IOSDevice.query()
       .where(.id == self.deviceId)
       .first(in: db)
+  }
+}
+
+extension PodcastApp {
+  enum LegacyIap {
+    static let honoredYear: TimeInterval = .days(365)
+    static let migrationApology: TimeInterval = .days(90)
+    static let grantWindow: TimeInterval = honoredYear + migrationApology
+    static let nagWindow: TimeInterval = .days(60)
   }
 }
