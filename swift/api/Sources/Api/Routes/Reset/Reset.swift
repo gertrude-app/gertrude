@@ -5,53 +5,6 @@ import Vapor
 import XCore
 
 enum Reset {
-  static func run() async throws {
-    @Dependency(\.db) var db
-    let client = db as! PgClient
-    try await client.db.execute("UPDATE blocker_app.supervisions SET supervised_at = NULL")
-    try await Parent.query()
-      .where(.id != Parent.Id.stagingPublicKeychainOwner)
-      .delete(in: db, force: true)
-    try await AdminBetsy.create()
-    try await AdminBen.create()
-    try await AdminBella.create()
-    try await AdminBruno.create()
-    try await AdminBlanca.create()
-    try await AdminBart.create()
-    try await self.createIOSEvents()
-  }
-
-  static func createIOSEvents() async throws {
-    @Dependency(\.db) var db
-    let deviceId = IOSDevice.Id()
-    try await db.create(IOSDevice(
-      id: deviceId,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "26.1",
-    ))
-    try await db.create(BlockerApp.Install(
-      deviceId: deviceId,
-      appVersion: "1.0.0",
-    ))
-    try await db.create([
-      IOSEvent(
-        eventId: "8d35f043",
-        kind: .onboarding,
-        detail: "region: `US`",
-        deviceId: deviceId,
-        modelIdentifier: "iPhone15,2",
-        iosVersion: "26.1",
-      ),
-      IOSEvent(
-        eventId: "cdb31095",
-        kind: .onboarding,
-        deviceId: deviceId,
-        modelIdentifier: "iPhone15,2",
-        iosVersion: "26.1",
-      ),
-    ])
-  }
-
   static func ensurePublicKeychainOwner() async throws {
     @Dependency(\.db) var db
     let existing = try? await db.find(Parent.Id.stagingPublicKeychainOwner)
@@ -64,139 +17,190 @@ enum Reset {
     }
   }
 
-  @discardableResult
-  static func createNotification(
-    _ admin: Parent,
-    _ config: Parent.NotificationMethod.Config,
-  ) async throws -> Parent.NotificationMethod {
-    @Dependency(\.db) var db
-    return try await db.create(Parent.NotificationMethod(parentId: admin.id, config: config))
-  }
-
   static func testEmail(_ tag: String) -> EmailAddress {
     .init(rawValue: "82uii.\(tag)@inbox.testmail.app")
   }
+}
 
-  @discardableResult
-  static func createKeychain(
-    id: Keychain.Id = .init(),
-    adminId: Parent.Id,
-    name: String,
-    isPublic: Bool = false,
-    description: String? = nil,
-    keys: [Gertie.Key] = [],
-  ) async throws -> Keychain {
-    @Dependency(\.db) var db
-    let keychain = try await db.create(Keychain(
-      id: id,
-      parentId: adminId,
-      name: name,
-      isPublic: isPublic,
-      description: description,
-    ))
-
-    var keyRecords: [Key] = []
-    for (index, key) in keys.enumerated() {
-      keyRecords.append(Key(
-        keychainId: keychain.id,
-        key: key,
-        comment: index & 3 == 0 ? "here is a lovely comment" : nil,
-      ))
+#if DEBUG
+  extension Reset {
+    static func run() async throws {
+      @Dependency(\.db) var db
+      let client = db as! PgClient
+      try await client.db.execute("UPDATE blocker_app.supervisions SET supervised_at = NULL")
+      try await Parent.query()
+        .where(.id != Parent.Id.stagingPublicKeychainOwner)
+        .delete(in: db, force: true)
+      try await AdminBetsy.create()
+      try await AdminBen.create()
+      try await AdminBella.create()
+      try await AdminBruno.create()
+      try await AdminBlanca.create()
+      try await AdminBart.create()
+      try await self.createIOSEvents()
     }
-    try await db.create(keyRecords)
-    return keychain
-  }
 
-  static func createActivityItems(
-    _ num: Int = Int.random(in: 15 ... 30),
-    _ deviceId: ComputerUser.Id,
-    subtractingDays: Int = 0,
-    percentDeleted: Int = 0,
-  ) async throws {
-    @Dependency(\.db) var db
-    let items = Array(repeating: (), count: num)
-      .map { self.createActivityItem(deviceId, subtractingDays: subtractingDays) }
-    let keystrokeLines = try await db.create(items.compactMap(\.right))
-    let screenshots = try await db.create(items.compactMap(\.left))
+    static func createIOSEvents() async throws {
+      @Dependency(\.db) var db
+      let deviceId = IOSDevice.Id()
+      try await db.create(IOSDevice(
+        id: deviceId,
+        modelIdentifier: "iPhone15,2",
+        iosVersion: "26.1",
+      ))
+      try await db.create(BlockerApp.Install(
+        deviceId: deviceId,
+        appVersion: "1.0.0",
+      ))
+      try await db.create([
+        IOSEvent(
+          eventId: "8d35f043",
+          kind: .onboarding,
+          detail: "region: `US`",
+          deviceId: deviceId,
+          modelIdentifier: "iPhone15,2",
+          iosVersion: "26.1",
+        ),
+        IOSEvent(
+          eventId: "cdb31095",
+          kind: .onboarding,
+          deviceId: deviceId,
+          modelIdentifier: "iPhone15,2",
+          iosVersion: "26.1",
+        ),
+      ])
+    }
 
-    var deleteBeforeIndex = percentDeleted == 0
-      ? -1 : Int(Double(screenshots.count) * (Double(percentDeleted) / 100))
+    @discardableResult
+    static func createNotification(
+      _ admin: Parent,
+      _ config: Parent.NotificationMethod.Config,
+    ) async throws -> Parent.NotificationMethod {
+      @Dependency(\.db) var db
+      return try await db.create(Parent.NotificationMethod(parentId: admin.id, config: config))
+    }
 
-    for (index, var screenshot) in screenshots.enumerated() {
-      if subtractingDays > 0 {
-        try await screenshot.modifyCreatedAt(.subtracting(.days(subtractingDays) + .jitter))
+    @discardableResult
+    static func createKeychain(
+      id: Keychain.Id = .init(),
+      adminId: Parent.Id,
+      name: String,
+      isPublic: Bool = false,
+      description: String? = nil,
+      keys: [Gertie.Key] = [],
+    ) async throws -> Keychain {
+      @Dependency(\.db) var db
+      let keychain = try await db.create(Keychain(
+        id: id,
+        parentId: adminId,
+        name: name,
+        isPublic: isPublic,
+        description: description,
+      ))
+
+      var keyRecords: [Key] = []
+      for (index, key) in keys.enumerated() {
+        keyRecords.append(Key(
+          keychainId: keychain.id,
+          key: key,
+          comment: index & 3 == 0 ? "here is a lovely comment" : nil,
+        ))
+      }
+      try await db.create(keyRecords)
+      return keychain
+    }
+
+    static func createActivityItems(
+      _ num: Int = Int.random(in: 15 ... 30),
+      _ deviceId: ComputerUser.Id,
+      subtractingDays: Int = 0,
+      percentDeleted: Int = 0,
+    ) async throws {
+      @Dependency(\.db) var db
+      let items = Array(repeating: (), count: num)
+        .map { self.createActivityItem(deviceId, subtractingDays: subtractingDays) }
+      let keystrokeLines = try await db.create(items.compactMap(\.right))
+      let screenshots = try await db.create(items.compactMap(\.left))
+
+      var deleteBeforeIndex = percentDeleted == 0
+        ? -1 : Int(Double(screenshots.count) * (Double(percentDeleted) / 100))
+
+      for (index, var screenshot) in screenshots.enumerated() {
+        if subtractingDays > 0 {
+          try await screenshot.modifyCreatedAt(.subtracting(.days(subtractingDays) + .jitter))
+        } else {
+          try await screenshot.modifyCreatedAt(.subtracting(.jitter))
+        }
+        if index < deleteBeforeIndex {
+          try await db.delete(screenshot)
+        }
+      }
+
+      deleteBeforeIndex = percentDeleted == 0
+        ? -1 : Int(Double(keystrokeLines.count) * (Double(percentDeleted) / 100))
+
+      for (index, var keystroke) in keystrokeLines.enumerated() {
+        if subtractingDays > 0 {
+          try await keystroke.modifyCreatedAt(.subtracting(.days(subtractingDays) + .jitter))
+        } else {
+          try await keystroke.modifyCreatedAt(.subtracting(.jitter))
+        }
+        if index < deleteBeforeIndex {
+          try await db.delete(keystroke)
+        }
+      }
+    }
+
+    private static func createActivityItem(
+      _ userDeviceId: ComputerUser.Id,
+      subtractingDays: Int = 0,
+    ) -> Either<Screenshot, KeystrokeLine> {
+      if [1, 2, 3].shuffled().first! != 1 {
+        let (width, height) = [
+          // @see web/storybook/stories/story-helpers.ts
+          (1200, 400),
+          (300, 200),
+          (400, 200),
+          (400, 600),
+          (500, 300),
+          (700, 200),
+          (800, 600),
+          (800, 900),
+        ].shuffled().first!
+        let webAssetsUrl = "https://gertrude-web-assets.nyc3.digitaloceanspaces.com"
+        return .left(Screenshot(
+          computerUserId: userDeviceId,
+          url: "\(webAssetsUrl)/placeholders-imgs/\(width)x\(height).png",
+          width: width,
+          height: height,
+        ))
       } else {
-        try await screenshot.modifyCreatedAt(.subtracting(.jitter))
-      }
-      if index < deleteBeforeIndex {
-        try await db.delete(screenshot)
-      }
-    }
-
-    deleteBeforeIndex = percentDeleted == 0
-      ? -1 : Int(Double(keystrokeLines.count) * (Double(percentDeleted) / 100))
-
-    for (index, var keystroke) in keystrokeLines.enumerated() {
-      if subtractingDays > 0 {
-        try await keystroke.modifyCreatedAt(.subtracting(.days(subtractingDays) + .jitter))
-      } else {
-        try await keystroke.modifyCreatedAt(.subtracting(.jitter))
-      }
-      if index < deleteBeforeIndex {
-        try await db.delete(keystroke)
+        let (app, line) = [
+          ("XCode", "import Foundation"),
+          ("VSCode", "let x: number = [33];"),
+          ("Zoom", "why am I the only one in this meeting?"),
+          ("Brave", "what is the average flight velocity of a sparrow?"),
+          ("Notes", "dear diary,\ni know i haven't written in a long time.\nsorry!"),
+        ].shuffled().first!
+        return .right(KeystrokeLine(
+          computerUserId: userDeviceId,
+          appName: app,
+          line: line,
+          createdAt: .init(),
+        ))
       }
     }
   }
 
-  private static func createActivityItem(
-    _ userDeviceId: ComputerUser.Id,
-    subtractingDays: Int = 0,
-  ) -> Either<Screenshot, KeystrokeLine> {
-    if [1, 2, 3].shuffled().first! != 1 {
-      let (width, height) = [
-        // @see web/storybook/stories/story-helpers.ts
-        (1200, 400),
-        (300, 200),
-        (400, 200),
-        (400, 600),
-        (500, 300),
-        (700, 200),
-        (800, 600),
-        (800, 900),
-      ].shuffled().first!
-      let webAssetsUrl = "https://gertrude-web-assets.nyc3.digitaloceanspaces.com"
-      return .left(Screenshot(
-        computerUserId: userDeviceId,
-        url: "\(webAssetsUrl)/placeholders-imgs/\(width)x\(height).png",
-        width: width,
-        height: height,
-      ))
-    } else {
-      let (app, line) = [
-        ("XCode", "import Foundation"),
-        ("VSCode", "let x: number = [33];"),
-        ("Zoom", "why am I the only one in this meeting?"),
-        ("Brave", "what is the average flight velocity of a sparrow?"),
-        ("Notes", "dear diary,\ni know i haven't written in a long time.\nsorry!"),
-      ].shuffled().first!
-      return .right(KeystrokeLine(
-        computerUserId: userDeviceId,
-        appName: app,
-        line: line,
-        createdAt: .init(),
-      ))
+  extension Tagged where RawValue == UUID {
+    static func from(_ uuidString: String) -> Self {
+      .init(rawValue: .init(uuidString: uuidString) ?? .init())
     }
   }
-}
 
-extension Tagged where RawValue == UUID {
-  static func from(_ uuidString: String) -> Self {
-    .init(rawValue: .init(uuidString: uuidString) ?? .init())
+  private extension TimeInterval {
+    static var jitter: Self {
+      .seconds(Int.random(in: 0 ... 120))
+    }
   }
-}
-
-private extension TimeInterval {
-  static var jitter: Self {
-    .seconds(Int.random(in: 0 ... 120))
-  }
-}
+#endif

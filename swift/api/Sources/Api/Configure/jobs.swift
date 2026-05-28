@@ -25,7 +25,9 @@ public extension Configure {
 
     try app.queues.startScheduledJobs()
 
-    app.asyncCommands.use(ResetCommand(), as: "reset")
+    #if DEBUG
+      app.asyncCommands.use(ResetCommand(), as: "reset")
+    #endif
     app.asyncCommands.use(SyncStagingDataCommand(), as: "sync-staging-data")
   }
 }
