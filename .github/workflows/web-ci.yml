@@ -135,6 +135,7 @@ jobs:
           filters: |
             admin:
               - web/admin/**
+              - web/dash/ambient/**
               - web/shared/**
             appviews:
               - web/appviews/**
@@ -147,8 +148,17 @@ jobs:
               - web/shared/**
             storybook:
               - web/storybook/**
+              - web/appviews/**
+              - web/supervise/**
+              - web/site/**
               - web/shared/**
+              - web/dash/ambient/**
+              - web/dash/block-rules/**
               - web/dash/components/**
+              - web/dash/datetime/**
+              - web/dash/keys/**
+              - web/dash/types/**
+              - web/dash/utils/**
 
   appviews-comment:
     needs: files-changed
