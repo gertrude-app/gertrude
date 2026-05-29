@@ -132,9 +132,10 @@ jobs:
             echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
             cd "$GITHUB_WORKSPACE/swift/api"
           fi
-          XCTEST_LIB=$(dirname "$(find /root -name 'libXCTest.so' -print -quit 2>/dev/null)")
-          swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}"
-          BIN_PATH=$(swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}" --show-bin-path)
+          TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+')
+          XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)")
+          swift build -c $CONFIGURATION --static-swift-stdlib -Xswiftc -I"${XCTEST_LIB}" -Xlinker -L"${XCTEST_LIB}"
+          BIN_PATH=$(swift build -c $CONFIGURATION --static-swift-stdlib -Xswiftc -I"${XCTEST_LIB}" -Xlinker -L"${XCTEST_LIB}" --show-bin-path)
           echo "API_BIN_PATH=${BIN_PATH}" >> $GITHUB_ENV
           cp "${BIN_PATH}/Run" "$GITHUB_WORKSPACE/${FILENAME}"
       - name: verify-pairql-codegen
@@ -228,7 +229,9 @@ jobs:
             echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
             cd "$GITHUB_WORKSPACE/swift/api"
           fi
-          swift test
+          TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+')
+          XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)")
+          swift test -Xswiftc -I"${XCTEST_LIB}"
 
   macapp-lib:
     needs: files-changed
