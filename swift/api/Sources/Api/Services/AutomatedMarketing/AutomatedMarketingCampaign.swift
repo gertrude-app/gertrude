@@ -27,6 +27,13 @@ extension AutomatedMarketingCampaign {
   var replyTo: String? { nil }
 }
 
+func automatedMarketingCampaigns(env: Env) -> [any AutomatedMarketingCampaign] {
+  [
+    MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
+    IosOnlyMacTrialCampaign(),
+  ]
+}
+
 struct AutomatedMarketingRunResult: Sendable, Equatable {
   var campaign: String
   var audienceSize: Int

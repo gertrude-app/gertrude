@@ -10,7 +10,10 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
   func testTickSendsMacSetupCampaignAndRecordsSuccessfulSend() async throws {
     var env = Env.fromProcess(mode: .testing)
     env.dashboardUrl = "https://dash.test/"
-    try await self.markCurrentMacSetupAudienceAsAlreadySent(dashboardUrl: env.dashboardUrl)
+    try await self.markCurrentAudienceAsAlreadySent(
+      MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
+    )
+    try await self.markCurrentAudienceAsAlreadySent(IosOnlyMacTrialCampaign())
 
     let now = Date()
     let child = try await self.child(with: \.name, of: "Sarah")
@@ -30,9 +33,8 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
       try await AutomatedMarketingJob().tick()
     }
 
-    let result = try XCTUnwrap(results.first)
-    expect(results.count).toEqual(1)
-    expect(result.campaign).toEqual("mac_setup_24h")
+    let result = try XCTUnwrap(results.first { $0.campaign == "mac_setup_24h" })
+    expect(results.map(\.campaign)).toEqual(["mac_setup_24h", "ios_only_mac_trial"])
     expect(result.eligible).toEqual(1)
     expect(result.sent).toEqual(1)
     expect(result.failed).toEqual(0)
@@ -55,15 +57,17 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
     expect(sends.count).toEqual(1)
   }
 
-  private func markCurrentMacSetupAudienceAsAlreadySent(dashboardUrl: String) async throws {
-    let audience = try await MacSetup24hCampaign(dashboardUrl: dashboardUrl).audience(in: self.db)
+  private func markCurrentAudienceAsAlreadySent(
+    _ campaign: any AutomatedMarketingCampaign,
+  ) async throws {
+    let audience = try await campaign.audience(in: self.db)
     let prior = try await MarketingEmailSend.query()
-      .where(.campaign == "mac_setup_24h")
+      .where(.campaign == campaign.slug)
       .all(in: self.db)
     let priorParentIds = Set(prior.map(\.parentId))
     let sends = audience
       .filter { !priorParentIds.contains($0.parentId) }
-      .map { MarketingEmailSend(parentId: $0.parentId, campaign: "mac_setup_24h") }
+      .map { MarketingEmailSend(parentId: $0.parentId, campaign: campaign.slug) }
     if !sends.isEmpty {
       try await self.db.create(sends)
     }

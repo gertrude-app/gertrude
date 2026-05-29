@@ -14,11 +14,7 @@ public struct AutomatedMarketingDryRunCommand: AsyncCommand {
 
   public func run(using context: CommandContext, signature: Signature) async throws {
     @Dependency(\.env) var env
-    let campaigns: [any AutomatedMarketingCampaign] = [
-      MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
-    ]
-
-    for campaign in campaigns {
+    for campaign in automatedMarketingCampaigns(env: env) {
       let result = try await AutomatedMarketingRunner().dryRun(campaign)
       context.console.print("campaign: \(result.campaign)")
       context.console.print("audience: \(result.audienceSize)")

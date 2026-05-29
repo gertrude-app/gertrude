@@ -16,8 +16,10 @@ struct AutomatedMarketingJob: AsyncScheduledJob {
   }
 
   func tick() async throws -> [AutomatedMarketingRunResult] {
-    let macSetup24h = MacSetup24hCampaign(dashboardUrl: self.env.dashboardUrl)
-    let result = try await AutomatedMarketingRunner().send(macSetup24h)
-    return [result]
+    var results: [AutomatedMarketingRunResult] = []
+    for campaign in automatedMarketingCampaigns(env: self.env) {
+      try await results.append(AutomatedMarketingRunner().send(campaign))
+    }
+    return results
   }
 }
