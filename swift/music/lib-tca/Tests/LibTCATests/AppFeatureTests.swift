@@ -28,29 +28,30 @@ struct AppFeatureTests {
   }
 
   @Test
-  func libraryPlayAlbumDelegateStartsTracksInOrderPlayback() async {
-    let items = [playbackItem("track-1"), playbackItem("track-2", allowsArtwork: false)]
+  func libraryPlayAlbumDelegateStartsAlbumQueuePlayback() async {
+    let items = [
+      playbackItem("track-1"),
+      playbackItem("track-2", allowsArtwork: false),
+      playbackItem("track-3"),
+    ]
     let store = TestStore(initialState: .init()) {
       AppFeature()
     }
 
-    await store.send(.library(.delegate(.playAlbum(items))))
-    await store.receive(.playback(.playTracksInOrder(items))) {
-      $0.playback.status = .playingTracksInOrder(items)
+    await store.send(.library(.delegate(.playAlbum(items: items, startIndex: 1))))
+    await store.receive(.playback(.playAlbumQueue(items: items, startIndex: 1))) {
+      $0.playback.session = .init(albumQueue: .init(items: items, currentIndex: 1))
     }
   }
 
   @Test
-  func libraryPlayTrackDelegateStartsTrackPlayback() async {
-    let item = playbackItem("track-1")
+  func libraryTogglePlayPauseDelegateTogglesPlayback() async {
     let store = TestStore(initialState: .init()) {
       AppFeature()
     }
 
-    await store.send(.library(.delegate(.playTrack(item))))
-    await store.receive(.playback(.playTrack(item))) {
-      $0.playback.status = .playingTrack(item)
-    }
+    await store.send(.library(.delegate(.togglePlayPause)))
+    await store.receive(.playback(.togglePlayPause))
   }
 
   @Test
@@ -65,21 +66,21 @@ struct AppFeatureTests {
     )
     var state = AppFeature.State()
     state.library.status = .loaded(library)
-    state.library.destination = .album(.init(
+    state.library.albumDetail = .init(
       album: album,
       tracks: library.tracks(for: album),
       transitionSourceID: album.id.rawValue,
-    ))
+    )
     let store = TestStore(initialState: state) {
       AppFeature()
     }
 
     await store.send(.playback(.playTrack(item))) {
-      $0.playback.status = .playingTrack(item)
-      guard case .some(.album(var albumDetail)) = $0.library.destination else { return }
-      albumDetail.isPlaying = true
-      albumDetail.playingTrackID = track.id
-      $0.library.destination = .album(albumDetail)
+      $0.playback.session = .init(currentItem: item)
+      guard var albumDetail = $0.library.albumDetail else { return }
+      albumDetail.playStatus = .playing
+      albumDetail.currentTrackID = track.id
+      $0.library.albumDetail = albumDetail
     }
   }
 }

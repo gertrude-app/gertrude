@@ -3,16 +3,29 @@ import SwiftUI
 
 #if os(iOS)
   @available(iOS 26.0, *)
+  public enum NowPlayingAccessoryDisplayMode: Sendable {
+    case automatic
+    case expanded
+    case inline
+  }
+
+  @available(iOS 26.0, *)
   public struct NowPlayingAccessoryView: View {
     @Environment(\.tabViewBottomAccessoryPlacement) private var placement
 
     private let title: String
     private let artist: String
     private let artworkURL: URL?
+    private let isPlaying: Bool
+    private let isEnabled: Bool
     private let foregroundColor: Color
+    private let panelTransitionID: String?
+    private let artworkTransitionID: String?
+    private let displayMode: NowPlayingAccessoryDisplayMode
+    private let showsGlassBackground: Bool
     private let onTap: @MainActor @Sendable () -> Void
     private let onPlayTap: @MainActor @Sendable () -> Void
-    private let onSkipTap: @MainActor @Sendable () -> Void
+    private let onNextTap: @MainActor @Sendable () -> Void
 
     public init(
       title: String = "Josefin’s Waltz",
@@ -21,33 +34,98 @@ import SwiftUI
         string:
           "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
       ),
+      isPlaying: Bool = false,
+      isEnabled: Bool = true,
       foregroundColor: Color = .black,
+      panelTransitionID: String? = nil,
+      artworkTransitionID: String? = nil,
+      displayMode: NowPlayingAccessoryDisplayMode = .automatic,
+      showsGlassBackground: Bool = false,
       onTap: @MainActor @escaping @Sendable () -> Void = {},
       onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
-      onSkipTap: @MainActor @escaping @Sendable () -> Void = {},
+      onNextTap: @MainActor @escaping @Sendable () -> Void = {},
     ) {
       self.title = title
       self.artist = artist
       self.artworkURL = artworkURL
+      self.isPlaying = isPlaying
+      self.isEnabled = isEnabled
       self.foregroundColor = foregroundColor
+      self.panelTransitionID = panelTransitionID
+      self.artworkTransitionID = artworkTransitionID
+      self.displayMode = displayMode
+      self.showsGlassBackground = showsGlassBackground
       self.onTap = onTap
       self.onPlayTap = onPlayTap
-      self.onSkipTap = onSkipTap
+      self.onNextTap = onNextTap
     }
 
     public var body: some View {
-      NowPlayingAccessoryContent(
-        layout: self.placement == .inline ? .inline : .expanded,
+      self.withPanelTransitionSource(
+        self.accessoryContent
+          .environment(\.backgroundMaterial, Optional<Material>.none)
+          .animation(.snappy(duration: 0.24), value: self.placement)
+      )
+    }
+
+    @ViewBuilder
+    private var accessoryContent: some View {
+      let content = NowPlayingAccessoryContent(
+        layout: self.layout,
         title: self.title,
         artist: self.artist,
         artworkURL: self.artworkURL,
+        artworkTransitionID: self.artworkTransitionID,
+        isPlaying: self.isPlaying,
+        isEnabled: self.isEnabled,
         foregroundColor: self.foregroundColor,
         onTap: self.onTap,
         onPlayTap: self.onPlayTap,
-        onSkipTap: self.onSkipTap,
+        onNextTap: self.onNextTap,
       )
-      .environment(\.backgroundMaterial, Optional<Material>.none)
-      .animation(.snappy(duration: 0.24), value: self.placement)
+      if self.showsGlassBackground {
+        content
+          .glassEffect(.regular.interactive(), in: .rect(cornerRadius: self.panelCornerRadius, style: .continuous))
+      } else {
+        content
+      }
+    }
+
+    private var layout: NowPlayingAccessoryLayout {
+      switch self.displayMode {
+      case .automatic:
+        self.placement == .inline ? .inline : .expanded
+      case .expanded:
+        .expanded
+      case .inline:
+        .inline
+      }
+    }
+
+    private var panelCornerRadius: CGFloat {
+      self.layout == .inline ? 20 : 24
+    }
+
+    private var panelHeight: CGFloat {
+      self.layout == .inline ? 40 : 46
+    }
+
+    @ViewBuilder
+    private func withPanelTransitionSource<Content: View>(_ content: Content) -> some View {
+      if let panelTransitionID {
+        NowPlayingZoomRegisteredView(
+          id: panelTransitionID,
+          role: .source,
+          cornerRadius: self.panelCornerRadius,
+          allowsInteraction: true,
+        ) {
+          content
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: self.panelHeight)
+      } else {
+        content
+      }
     }
   }
 
@@ -61,10 +139,13 @@ import SwiftUI
     let title: String
     let artist: String
     let artworkURL: URL?
+    let artworkTransitionID: String?
+    let isPlaying: Bool
+    let isEnabled: Bool
     let foregroundColor: Color
     let onTap: @MainActor @Sendable () -> Void
     let onPlayTap: @MainActor @Sendable () -> Void
-    let onSkipTap: @MainActor @Sendable () -> Void
+    let onNextTap: @MainActor @Sendable () -> Void
 
     var body: some View {
       switch self.layout {
@@ -79,7 +160,12 @@ import SwiftUI
       HStack(spacing: 12) {
         Button(action: self.onTap) {
           HStack(spacing: 10) {
-            NowPlayingArtwork(url: self.artworkURL, size: 32, cornerRadius: 7)
+            NowPlayingArtwork(
+              url: self.artworkURL,
+              size: 32,
+              cornerRadius: 7,
+              transitionID: self.artworkTransitionID
+            )
             NowPlayingAccessoryText(
               title: self.title,
               artist: self.artist,
@@ -95,16 +181,21 @@ import SwiftUI
 
         HStack(spacing: 18) {
           NowPlayingIconButton(
-            systemName: "play.fill",
+            systemName: self.isPlaying ? "pause.fill" : "play.fill",
             size: 18,
             foregroundColor: self.foregroundColor,
+            isEnabled: self.isEnabled,
+            accessibilityLabel: self.isPlaying ? "Pause" : "Play",
             action: self.onPlayTap,
           )
           NowPlayingIconButton(
             systemName: "forward.fill",
             size: 17,
             foregroundColor: self.foregroundColor,
-            action: self.onSkipTap,
+            isEnabled: self.isEnabled,
+            accessibilityLabel: "Next",
+            hitSlop: .init(width: 12, height: 8),
+            action: self.onNextTap,
           )
         }
       }
@@ -117,7 +208,12 @@ import SwiftUI
       HStack(spacing: 11) {
         Button(action: self.onTap) {
           HStack(spacing: 9) {
-            NowPlayingArtwork(url: self.artworkURL, size: 30, cornerRadius: 7)
+            NowPlayingArtwork(
+              url: self.artworkURL,
+              size: 30,
+              cornerRadius: 7,
+              transitionID: self.artworkTransitionID
+            )
             NowPlayingAccessoryText(
               title: self.title,
               artist: self.artist,
@@ -132,9 +228,11 @@ import SwiftUI
         .frame(minWidth: 0, maxWidth: .infinity)
 
         NowPlayingIconButton(
-          systemName: "play.fill",
+          systemName: self.isPlaying ? "pause.fill" : "play.fill",
           size: 17,
           foregroundColor: self.foregroundColor,
+          isEnabled: self.isEnabled,
+          accessibilityLabel: self.isPlaying ? "Pause" : "Play",
           action: self.onPlayTap,
         )
       }
@@ -186,8 +284,24 @@ import SwiftUI
     let url: URL?
     let size: CGFloat
     let cornerRadius: CGFloat
+    let transitionID: String?
 
     var body: some View {
+      if let transitionID {
+        NowPlayingZoomRegisteredView(
+          id: transitionID,
+          role: .source,
+          cornerRadius: self.cornerRadius,
+        ) {
+          self.artwork
+        }
+        .frame(width: self.size, height: self.size)
+      } else {
+        self.artwork
+      }
+    }
+
+    private var artwork: some View {
       CachedArtworkImageView(url: self.url) { image in
         image
           .resizable()
@@ -206,6 +320,9 @@ import SwiftUI
     let systemName: String
     let size: CGFloat
     let foregroundColor: Color
+    let isEnabled: Bool
+    let accessibilityLabel: String
+    var hitSlop: CGSize = .zero
     let action: @MainActor @Sendable () -> Void
 
     var body: some View {
@@ -217,7 +334,14 @@ import SwiftUI
           .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
-      .accessibilityLabel(self.systemName == "play.fill" ? "Play" : "Next")
+      .padding(.horizontal, self.hitSlop.width)
+      .padding(.vertical, self.hitSlop.height)
+      .contentShape(Rectangle())
+      .padding(.horizontal, -self.hitSlop.width)
+      .padding(.vertical, -self.hitSlop.height)
+      .disabled(!self.isEnabled)
+      .opacity(self.isEnabled ? 1 : 0.35)
+      .accessibilityLabel(self.accessibilityLabel)
     }
   }
 
@@ -230,10 +354,13 @@ import SwiftUI
         string:
           "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
       ),
+      artworkTransitionID: nil,
+      isPlaying: true,
+      isEnabled: true,
       foregroundColor: .black,
       onTap: {},
       onPlayTap: {},
-      onSkipTap: {},
+      onNextTap: {},
     )
     .padding(24)
     .background(Color(.systemGroupedBackground))
@@ -248,10 +375,13 @@ import SwiftUI
         string:
           "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
       ),
+      artworkTransitionID: nil,
+      isPlaying: false,
+      isEnabled: true,
       foregroundColor: .black,
       onTap: {},
       onPlayTap: {},
-      onSkipTap: {},
+      onNextTap: {},
     )
     .padding(24)
     .background(Color(.systemGroupedBackground))

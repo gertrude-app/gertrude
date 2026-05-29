@@ -36,18 +36,18 @@ struct AppFeature: Sendable {
         state.isNowPlayingPresented = isPresented
         return .none
 
-      case .library(.delegate(.playAlbum(let items))):
-        return .send(.playback(.playTracksInOrder(items)))
+      case .library(.delegate(.playAlbum(let items, let startIndex))):
+        return .send(.playback(.playAlbumQueue(items: items, startIndex: startIndex)))
 
-      case .library(.delegate(.playTrack(let item))):
-        return .send(.playback(.playTrack(item)))
+      case .library(.delegate(.togglePlayPause)):
+        return .send(.playback(.togglePlayPause))
 
       case .library:
-        state.library.setAlbumDetailPlaybackStatus(state.playback.status)
+        state.library.setAlbumDetailPlaybackSession(state.playback.session)
         return .none
 
       case .playback:
-        state.library.setAlbumDetailPlaybackStatus(state.playback.status)
+        state.library.setAlbumDetailPlaybackSession(state.playback.session)
         return .none
       }
     }
