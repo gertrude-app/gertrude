@@ -104,6 +104,20 @@ final class CodeGenTests: XCTestCase {
     )
   }
 
+  func testStringRawEnumUsesRawValues() throws {
+    enum StripeStatus: String, CaseIterable {
+      case active
+      case pastDue = "past_due"
+      case incompleteExpired = "incomplete_expired"
+    }
+
+    expect(try CodeGen().declaration(for: StripeStatus.self)).toEqual(
+      """
+      export type StripeStatus = 'active' | 'past_due' | 'incomplete_expired'
+      """,
+    )
+  }
+
   func testEnumWithNamedAssociatedValues() throws {
     enum Bar {
       case a

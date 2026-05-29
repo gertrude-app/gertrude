@@ -129,7 +129,7 @@ extension Node {
     case .optional:
       self = try Node(from: type.genericTypes[0])
     case .enum where type.numberOfPayloadEnumCases == 0:
-      self = .stringUnion(type.cases.map(\.name), .init(type.type))
+      self = .stringUnion(type.stringRawValues ?? type.cases.map(\.name), .init(type.type))
     case .enum:
       self = try .objectUnion(type.cases.map { try .init(caseWithValue: $0) }, .init(type.type))
     case .tuple:
@@ -215,6 +215,22 @@ extension Node.Primitive {
     case .void:
       .init(Void.self)
     }
+  }
+}
+
+extension TypeInfo {
+  var stringRawValues: [String]? {
+    func allCases<T: CaseIterable>(for type: T.Type) -> [Any] {
+      Array(T.allCases)
+    }
+
+    guard let type = self.type as? any CaseIterable.Type else {
+      return nil
+    }
+
+    let cases = allCases(for: type)
+    let rawValues = cases.compactMap { ($0 as? any RawRepresentable)?.rawValue as? String }
+    return rawValues.count == cases.count ? rawValues : nil
   }
 }
 

@@ -48,10 +48,10 @@ export type PlanStatus =
 export type StripeSubscriptionStatus =
   | 'active'
   | 'trialing'
-  | 'pastDue'
+  | 'past_due'
   | 'unpaid'
   | 'canceled'
   | 'incomplete'
-  | 'incompleteExpired';
+  | 'incomplete_expired';
 
 export type SubscriptionTier = 'light' | 'full';

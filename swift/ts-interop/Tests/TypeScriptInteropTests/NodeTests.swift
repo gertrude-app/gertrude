@@ -62,6 +62,26 @@ final class NodeTests: XCTestCase {
     expect(try Node(from: Foo.self)).toEqual(.stringUnion(["bar", "baz"], .init(Foo.self)))
   }
 
+  func testParseStringRawEnumUsesRawValues() throws {
+    enum Foo: String, CaseIterable {
+      case bar
+      case pastDue = "past_due"
+      case incompleteExpired = "incomplete_expired"
+    }
+    expect(try Node(from: Foo.self)).toEqual(.stringUnion(
+      ["bar", "past_due", "incomplete_expired"],
+      .init(Foo.self),
+    ))
+  }
+
+  func testParseNonStringRawEnumUsesCaseNames() throws {
+    enum Foo: Int, CaseIterable {
+      case bar = 1
+      case baz = 2
+    }
+    expect(try Node(from: Foo.self)).toEqual(.stringUnion(["bar", "baz"], .init(Foo.self)))
+  }
+
   func testFlattensEnumCaseWithSingleStructPayload() throws {
     enum Screen {
       struct Connected {
