@@ -109,6 +109,20 @@ struct IosOnlyMacTrial: TemplateEmailModel {
   var templateModel: [String: String] { ["deviceFragment": self.deviceFragment] }
 }
 
+struct MacSetup24h: TemplateEmailModel {
+  static var subject: String { "Finish setting up Gertrude on {{childName}}’s Mac" }
+  static var alias: String { "mac-setup-24h" }
+
+  var childName: String
+  var dashboardUrl: String
+  var primaryCtaUrl: String
+  var templateModel: [String: String] { [
+    "childName": self.childName,
+    "dashboardUrl": self.dashboardUrl,
+    "primaryCtaUrl": self.primaryCtaUrl,
+  ] }
+}
+
 struct ScreenTimeWarning: TemplateEmailModel {
   static var subject: String {
     "Action needed: Gertrude may not be fully protecting {{childName}}’s computer"
