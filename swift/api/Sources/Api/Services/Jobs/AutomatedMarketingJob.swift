@@ -6,7 +6,13 @@ struct AutomatedMarketingJob: AsyncScheduledJob {
 
   func run(context: QueueContext) async throws {
     guard self.env.mode == .prod else { return }
-    _ = try await self.tick()
+    let results = try await self.tick()
+    for result in results {
+      context.logger
+        .info(
+          "AutomatedMarketingJob \(result.campaign): audience=\(result.audienceSize) alreadySent=\(result.alreadySent) eligible=\(result.eligible) sent=\(result.sent) failed=\(result.failed)",
+        )
+    }
   }
 
   func tick() async throws -> [AutomatedMarketingRunResult] {

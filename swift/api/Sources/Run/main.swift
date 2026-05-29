@@ -21,6 +21,16 @@ if CommandLine.arguments.contains("ts-codegen") {
     app.asyncCommands.use(ScrubDbCommand(), as: "scrub-db")
     try app.run()
   }
+} else if CommandLine.arguments.contains("automated-marketing-dry-run") {
+  try withDependencies { deps in
+    deps.logger = app.logger
+    deps.uuid = UUIDGenerator { UUID() }
+    deps.env = .fromProcess(mode: app.environment)
+    deps.db = PgClient(threadCount: System.coreCount, env: deps.env)
+  } operation: {
+    app.asyncCommands.use(AutomatedMarketingDryRunCommand(), as: "automated-marketing-dry-run")
+    try app.run()
+  }
 } else {
   try withDependencies { deps in
     deps.logger = app.logger

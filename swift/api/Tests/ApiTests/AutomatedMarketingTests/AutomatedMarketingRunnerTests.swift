@@ -177,6 +177,41 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
     await expect(try self.sends(for: slug).map(\.parentId)).toEqual([parent1.id])
   }
 
+  func testSendChunksLargeAudienceAndRecordsEarlierSuccessesWhenLaterChunkFails() async throws {
+    let slug = "test_automated_marketing_chunked_send"
+    let parents = (0 ..< 501).map { index in
+      Parent.random(with: { $0.email = "chunked-\(index)@example.com" })
+    }
+    try await self.db.create(parents)
+    let campaign = TestAutomatedMarketingCampaign(
+      slug: slug,
+      recipients: parents.map { .init(parentId: $0.id, email: $0.email) },
+    )
+
+    let result = try await withDependencies {
+      $0.postmark._sendTemplateEmailBatch = { @Sendable emails in
+        XCTAssertLessThan(emails.count, 500)
+        let isFirstChunk = self.sent.emails.isEmpty
+        self.sent.emails.append(contentsOf: emails)
+        if isFirstChunk {
+          return .success(emails.map { _ in .success(()) })
+        } else {
+          return .failure(.init(statusCode: 500, errorCode: 500, message: "chunk failed"))
+        }
+      }
+    } operation: {
+      try await AutomatedMarketingRunner().send(campaign)
+    }
+
+    expect(result.audienceSize).toEqual(501)
+    expect(result.eligible).toEqual(501)
+    expect(result.sent > 0).toBeTrue()
+    expect(result.failed > 0).toBeTrue()
+    expect(result.sent + result.failed).toEqual(501)
+    expect(self.sent.emails.count).toEqual(501)
+    await expect(try self.sends(for: slug).count).toEqual(result.sent)
+  }
+
   private func sends(for slug: String) async throws -> [MarketingEmailSend] {
     try await MarketingEmailSend.query()
       .where(.campaign == slug)
