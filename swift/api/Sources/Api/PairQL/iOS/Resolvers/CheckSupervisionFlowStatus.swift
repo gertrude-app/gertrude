@@ -9,7 +9,7 @@ extension CheckSupervisionFlowStatus: Resolver {
       .where(.claimCode == input.code)
       .first(in: ctx.db)
 
-    guard let device else {
+    guard var device else {
       return .notFound
     }
 
@@ -28,6 +28,12 @@ extension CheckSupervisionFlowStatus: Resolver {
     }
 
     let child = try await ctx.db.find(childId)
+    guard let supervision = try await device.supervision(in: ctx.db) else {
+      return .notFound
+    }
+
+    try await device.renewPendingClaimCode(in: ctx.db, supervision: supervision)
+
     let install = try await device.install(in: ctx.db)
     let token: BlockerApp.Token
     let existingToken = try? await BlockerApp.Token.query()
@@ -46,10 +52,6 @@ extension CheckSupervisionFlowStatus: Resolver {
       childName: child.name,
       supervised: .byGertrude(claimCode: input.code),
     )
-
-    guard let supervision = try await device.supervision(in: ctx.db) else {
-      return .notFound
-    }
 
     if supervision.supervisedAt == nil {
       return .claimed(data)

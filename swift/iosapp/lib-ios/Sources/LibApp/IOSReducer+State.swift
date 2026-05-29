@@ -128,6 +128,7 @@ extension IOSReducer {
       // these states occur after rebooting into supervision
       public enum Resume: Equatable {
         case codeNotClaimed(code: Int)
+        case codeExpired
         case codeClaimedNotSupervised
         case retrySupervision
         case profileRemovedRecovery

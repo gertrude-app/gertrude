@@ -115,6 +115,48 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     )))
   }
 
+  func testClaimed_notYetSupervised_expiredCode_renewsAndReturnsClaimed() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let uuids = MockUUIDs()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+      claimCode: code,
+      claimCodeExpiresAt: .reference - .days(1),
+      claimedAt: .reference - .days(8),
+    ))
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+      $0.uuid = .mock(uuids)
+    } operation: {
+      try await CheckSupervisionFlowStatus.resolve(
+        with: .init(vendorId: device.id.rawValue, code: code),
+        in: .mock,
+      )
+    }
+
+    expect(output).toEqual(.claimed(.init(
+      childId: child.id.rawValue,
+      token: uuids[1],
+      deviceId: device.id.rawValue,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: code),
+    )))
+
+    let updated = try await IOSDevice.query()
+      .where(.id == device.id)
+      .first(in: self.db)
+    expect(updated.claimCode).toEqual(code)
+    expect(updated.claimCodeExpiresAt).toEqual(.reference + .days(21))
+  }
+
   func testSupervised_notYetProfileInstalled() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let parent = try await self.parent()

@@ -463,25 +463,10 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.setup(.explainNeedSomeoneElse))), .primary):
       self.deps.log(state.screen, action, "39d56d1a")
-      return .run { [deps = self.deps] send in
-        if let data = deps.sharedStorage.loadPendingSupervisionCode(),
-           data.expiresAt > deps.now {
-          await send(.programmatic(.setScreen(.onboarding(
-            .supervision(.setup(.instructionsForProtector(code: data.code))),
-          ))))
-        } else {
-          await send(.programmatic(.setScreen(.onboarding(
-            .supervision(.setup(.generateSetupCode())),
-          ))))
-          do {
-            let data = try await deps.api.createSupervisionClaimCode()
-            deps.sharedStorage.savePendingSupervisionCode(data)
-            await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
-          } catch {
-            await send(.programmatic(.supervisionCodeGenerationFailed))
-          }
-        }
-      }
+      return self.generateSupervisionClaimCode(
+        reuseExistingValidCode: true,
+        showGeneratingScreen: true,
+      )
 
     case (.onboarding(.supervision(.setup(.explainNeedSomeoneElse))), .secondary):
       self.deps.log(state.screen, action, "f0a2d33c")
@@ -496,15 +481,7 @@ public struct IOSReducer {
     // the only button on this screen is `retry` for a failure case
     case (.onboarding(.supervision(.setup(.generateSetupCode(_)))), .primary):
       self.deps.log(state.screen, action, "b530239d")
-      return .run { [deps = self.deps] send in
-        do {
-          let data = try await deps.api.createSupervisionClaimCode()
-          deps.sharedStorage.savePendingSupervisionCode(data)
-          await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
-        } catch {
-          await send(.programmatic(.supervisionCodeGenerationFailed))
-        }
-      }
+      return self.generateSupervisionClaimCode()
 
     case (.onboarding(.supervision(.setup(.instructionsForProtector(let code)))), .primary):
       self.deps.log(state.screen, action, "0aea6b12")
@@ -520,6 +497,16 @@ public struct IOSReducer {
     case (.onboarding(.supervision(.resume(.codeNotClaimed(let code)))), .primary):
       self.deps.log(state.screen, action, "ad87c533")
       state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.codeExpired))), .primary):
+      self.deps.log(state.screen, action, "b496da4b")
+      return self.generateSupervisionClaimCode(showGeneratingScreen: true)
+
+    case (.onboarding(.supervision(.resume(.codeExpired))), .secondary):
+      self.deps.log(state.screen, action, "560908e7")
+      self.deps.sharedStorage.clearPendingSupervisionCode()
+      state.screen = .onboarding(.happyPath(.hiThere))
       return .none
 
     case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised))), .primary):
@@ -769,8 +756,9 @@ public struct IOSReducer {
 
           case .gertrudeSupervisionReboot(.codeExpired), .gertrudeSupervisionReboot(.codeNotFound):
             deps.log("supervision reboot code expired/not found", "0b15e23f")
-            deps.sharedStorage.clearPendingSupervisionCode()
-            await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.codeExpired)))),
+            ))
 
           case .gertrudeSupervisionReboot(.supervisedButNeedsProfile(let conn)):
             deps.log("supervision reboot supervised but needs profile", "05a47c3a")
@@ -991,6 +979,7 @@ public struct IOSReducer {
     switch action {
     case .connectAccount(.connectionSucceeded(childData: let conn)):
       state.screen = .onboarding(.happyPath(.connectSuccess))
+      self.deps.sharedStorage.clearPendingSupervisionCode()
       return .run { [deps = self.deps] _ in
         await deps.receiveAccountConnection(conn)
       }
@@ -1018,6 +1007,36 @@ extension IOSReducer.Deps {
 }
 
 extension IOSReducer {
+  func generateSupervisionClaimCode(
+    reuseExistingValidCode: Bool = false,
+    showGeneratingScreen: Bool = false,
+  ) -> EffectOf<IOSReducer> {
+    .run { [deps = self.deps] send in
+      if reuseExistingValidCode,
+         let data = deps.sharedStorage.loadPendingSupervisionCode(),
+         data.expiresAt > deps.now {
+        await send(.programmatic(.setScreen(.onboarding(
+          .supervision(.setup(.instructionsForProtector(code: data.code))),
+        ))))
+        return
+      }
+
+      if showGeneratingScreen {
+        await send(.programmatic(.setScreen(.onboarding(
+          .supervision(.setup(.generateSetupCode())),
+        ))))
+      }
+
+      do {
+        let data = try await deps.api.createSupervisionClaimCode()
+        deps.sharedStorage.savePendingSupervisionCode(data)
+        await send(.programmatic(.supervisionCodeGenerated(code: data.code)))
+      } catch {
+        await send(.programmatic(.supervisionCodeGenerationFailed))
+      }
+    }
+  }
+
   func transitionToOptOutOrSkip(state: inout State) -> EffectOf<IOSReducer> {
     guard !state.allBlockGroups.isEmpty else {
       state.screen = .onboarding(.happyPath(.promptClearCache))

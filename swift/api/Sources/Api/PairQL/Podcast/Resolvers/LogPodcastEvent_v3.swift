@@ -197,6 +197,7 @@ struct EarliestGrandfatherableLegacyIapForDevice: CustomQueryable {
 }
 
 private let suppressedEventIds: Set<String> = [
+  "7785c87b", // subscribe event, noisy, not super interesting
   "4ac9084e", // skipped download invalidation while active
   "d299b47a", // episode play recovered after file check
   "2e2c9e97", // episode play recovery failed

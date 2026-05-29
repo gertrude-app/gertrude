@@ -3,6 +3,8 @@ import DuetSQL
 import Vapor
 
 extension IOSDevice {
+  static let pendingSupervisionClaimCodeRenewalDuration: TimeInterval = .days(21)
+
   struct ClaimCode {
     var code: Int
     var expiresAt: Date
@@ -20,6 +22,8 @@ extension IOSDevice {
        expiresAt > now {
       // already have a claim code, return it idempotently
       return ClaimCode(code: claimCode, expiresAt: expiresAt)
+    } else if let claimCode = try await self.renewPendingClaimCode(in: db) {
+      return claimCode
     } else if let claimCode = self.claimCode, self.claimedAt != nil {
       // already claimed, shouldn't be called, but prevent generating a new one
       return ClaimCode(code: claimCode, expiresAt: .distantFuture)
@@ -49,5 +53,35 @@ extension IOSDevice {
     await get(dependency: \.slack).error(msg)
     get(dependency: \.postmark).toSuperAdmin("Unexpected error", msg)
     throw Abort(.internalServerError)
+  }
+
+  @discardableResult
+  mutating func renewPendingClaimCode(
+    in db: any DuetSQL.Client,
+    supervision existingSupervision: BlockerApp.Supervision? = nil,
+  ) async throws -> ClaimCode? {
+    let now = get(dependency: \.date.now)
+    guard
+      self.claimedAt != nil,
+      let claimCode = self.claimCode,
+      let expiresAt = self.claimCodeExpiresAt,
+      expiresAt <= now
+    else {
+      return nil
+    }
+
+    let supervision = if let existingSupervision {
+      existingSupervision
+    } else {
+      try await self.supervision(in: db)
+    }
+    guard let supervision, supervision.supervisedAt == nil else {
+      return nil
+    }
+
+    let renewedExpiresAt = now + Self.pendingSupervisionClaimCodeRenewalDuration
+    self.claimCodeExpiresAt = renewedExpiresAt
+    try await db.update(self)
+    return ClaimCode(code: claimCode, expiresAt: renewedExpiresAt)
   }
 }

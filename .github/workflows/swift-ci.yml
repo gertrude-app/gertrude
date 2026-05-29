@@ -122,20 +122,11 @@ jobs:
           echo "FILENAME=api_${API_ENV}_${DATESTR}_${SHORTSHA}" >> $GITHUB_ENV
       - name: build-api
         run: |
-          # build in /prewarm (image's prebuilt deps) when available, else cold in workspace
-          if [ -d /prewarm/api/.build ] && command -v rsync >/dev/null; then
-            for p in $API_PREWARM_PKGS; do
-              rsync -a --delete --exclude='.build' --exclude='.git' --exclude='.swiftpm' "$GITHUB_WORKSPACE/swift/$p/" "/prewarm/$p/"
-            done
-            cd /prewarm/api
-          else
-            echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
-            cd "$GITHUB_WORKSPACE/swift/api"
-          fi
+          cd "$GITHUB_WORKSPACE/swift/api"
           TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+')
           XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)")
-          swift build -c $CONFIGURATION --static-swift-stdlib -Xswiftc -I"${XCTEST_LIB}" -Xlinker -L"${XCTEST_LIB}"
-          BIN_PATH=$(swift build -c $CONFIGURATION --static-swift-stdlib -Xswiftc -I"${XCTEST_LIB}" -Xlinker -L"${XCTEST_LIB}" --show-bin-path)
+          swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}"
+          BIN_PATH=$(swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}" --show-bin-path)
           echo "API_BIN_PATH=${BIN_PATH}" >> $GITHUB_ENV
           cp "${BIN_PATH}/Run" "$GITHUB_WORKSPACE/${FILENAME}"
       - name: verify-pairql-codegen
@@ -219,19 +210,8 @@ jobs:
         uses: actions/checkout@v4
       - name: test-api
         run: |
-          # build in /prewarm (image's prebuilt deps) when available, else cold in workspace
-          if [ -d /prewarm/api/.build ] && command -v rsync >/dev/null; then
-            for p in $API_PREWARM_PKGS; do
-              rsync -a --delete --exclude='.build' --exclude='.git' --exclude='.swiftpm' "$GITHUB_WORKSPACE/swift/$p/" "/prewarm/$p/"
-            done
-            cd /prewarm/api
-          else
-            echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
-            cd "$GITHUB_WORKSPACE/swift/api"
-          fi
-          TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+')
-          XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)")
-          swift test -Xswiftc -I"${XCTEST_LIB}"
+          cd "$GITHUB_WORKSPACE/swift/api"
+          swift test
 
   macapp-lib:
     needs: files-changed

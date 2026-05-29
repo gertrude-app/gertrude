@@ -335,6 +335,40 @@ final class IOSReducerTests: XCTestCase {
   }
 
   @MainActor
+  func testConnectAccountSuccess_clearsPendingSupervisionCode() async throws {
+    let clearInvocations = LockIsolated(0)
+    let savedConn = LockIsolated<ChildIOSDeviceData_v2?>(nil)
+    let setConn = LockIsolated<ChildIOSDeviceData_v2?>(nil)
+
+    var initialState = IOSReducer.State(
+      screen: .onboarding(.happyPath(.offerAccountConnect)),
+    )
+    initialState.destination = .connectAccount(.init())
+
+    let store = TestStore(initialState: initialState) {
+      IOSReducer()
+    } withDependencies: {
+      $0.sharedStorage.clearPendingSupervisionCode = {
+        clearInvocations.withValue { $0 += 1 }
+      }
+      $0.sharedStorage.saveAccountConnection = { @Sendable conn in savedConn.setValue(conn) }
+      $0.api.setAccountConnection = { @Sendable conn in setConn.setValue(conn) }
+    }
+
+    let conn = ChildIOSDeviceData_v2.mock
+    await store
+      .send(.destination(.presented(.connectAccount(.connectionSucceeded(childData: conn))))) {
+        $0.screen = .onboarding(.happyPath(.connectSuccess))
+        $0.destination = .connectAccount(.init(screen: .connected(childName: conn.childName)))
+      }
+
+    await store.finish()
+    expect(clearInvocations.value).toEqual(1)
+    expect(savedConn.value).toEqual(conn)
+    expect(setConn.value).toEqual(conn)
+  }
+
+  @MainActor
   func testUpgradeFromV110() async throws {
     let defaultBlocksInvocations = LockIsolated(0)
     let userDefaults = UserDefaults.gertrude

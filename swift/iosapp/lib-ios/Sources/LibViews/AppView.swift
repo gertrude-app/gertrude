@@ -517,6 +517,13 @@ public struct AppView: View {
             primary: self.btn(text: "Next", .primary),
           )
 
+        case .onboarding(.supervision(.resume(.codeExpired))):
+          ButtonScreenView(
+            text: "Your supervision setup code is no longer valid. No problem, we can make a fresh one and pick up from there.",
+            primary: self.btn(text: "Get a new code", .primary),
+            secondary: self.btn(text: "Start over", .secondary),
+          )
+
         case .onboarding(.supervision(.resume(.profileRemovedRecovery))):
           ButtonScreenView(
             text: "The supervision profile is no longer installed on this \(self.deviceType), preventing Gertrude from doing its job.",

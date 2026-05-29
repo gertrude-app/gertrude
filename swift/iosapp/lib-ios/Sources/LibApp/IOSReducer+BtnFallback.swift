@@ -181,6 +181,8 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     switch (self, btn) {
     case (.codeNotClaimed(let code), _):
       .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
+    case (.codeExpired, _):
+      .onboarding(.happyPath(.hiThere))
     case (.codeClaimedNotSupervised, _):
       .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
     case (.retrySupervision, _):

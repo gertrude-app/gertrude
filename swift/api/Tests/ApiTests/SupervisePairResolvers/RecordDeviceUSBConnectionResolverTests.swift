@@ -55,7 +55,7 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
     }.toContain("not found")
   }
 
-  func testCodeExpired_throwsError() async throws {
+  func testClaimedExpiredCode_renewsAndRecordsConnection() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
@@ -67,19 +67,25 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
     })
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
-    try await expectErrorFrom {
-      try await withDependencies {
-        $0.date = .constant(.reference)
-      } operation: {
-        try await RecordDeviceUSBConnection.resolve(
-          with: .init(
-            code: code,
-            udid: "fake-udid",
-            modelIdentifier: device.modelIdentifier,
-          ),
-          in: .mock,
-        )
-      }
-    }.toContain("expired")
+    _ = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await RecordDeviceUSBConnection.resolve(
+        with: .init(
+          code: code,
+          udid: "fake-udid",
+          modelIdentifier: device.modelIdentifier,
+        ),
+        in: .mock,
+      )
+    }
+
+    let updatedDevice = try await IOSDevice.query()
+      .where(.id == device.id)
+      .first(in: self.db)
+    expect(updatedDevice.claimCodeExpiresAt).toEqual(.reference + .days(21))
+
+    let updatedSupervision = try await device.supervision(in: self.db)
+    expect(updatedSupervision?.udid).toEqual("fake-udid")
   }
 }
