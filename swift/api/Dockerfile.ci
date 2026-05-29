@@ -37,7 +37,7 @@ ENV SWIFTLY_HOME_DIR=/root/.local/share/swiftly
 ENV PATH="${SWIFTLY_HOME_DIR}/bin:${PATH}"
 
 # NB: change swift version here as needed for prod build deploy
-RUN . "${SWIFTLY_HOME_DIR}/env.sh" && swiftly install 6.3.1
+RUN . "${SWIFTLY_HOME_DIR}/env.sh" && swiftly install 6.3.1 && swiftly use 6.3.1
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs && \
@@ -72,8 +72,10 @@ COPY x-expect ${PREWARM}/x-expect
 COPY x-http ${PREWARM}/x-http
 COPY x-kit ${PREWARM}/x-kit
 RUN cd ${PREWARM}/api && \
-    swift build && \
-    swift build -c release
+    TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+') && \
+    XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)") && \
+    swift build -Xswiftc -I"${XCTEST_LIB}" && \
+    swift build -c release -Xswiftc -I"${XCTEST_LIB}"
 
 WORKDIR /workspace
 
