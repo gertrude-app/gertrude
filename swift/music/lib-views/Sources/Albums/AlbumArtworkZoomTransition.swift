@@ -161,7 +161,7 @@ public struct ZoomableAlbumArtworkView: View {
       context: Context,
     ) {
       uiViewController.onResolve = self.onResolve
-      uiViewController.resolve()
+      uiViewController.resolve(force: true)
     }
   }
 
@@ -184,8 +184,8 @@ public struct ZoomableAlbumArtworkView: View {
       self.resolve()
     }
 
-    func resolve() {
-      guard self.resolvedNavigationController !== self.navigationController else { return }
+    func resolve(force: Bool = false) {
+      guard force || self.resolvedNavigationController !== self.navigationController else { return }
       self.resolvedNavigationController = self.navigationController
       self.onResolve?(self.navigationController)
     }

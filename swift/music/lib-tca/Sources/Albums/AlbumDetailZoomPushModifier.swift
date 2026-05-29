@@ -38,7 +38,7 @@ private struct AlbumDetailZoomPushModifier: ViewModifier {
             self.pushAlbumDetailIfNeeded()
           }
         }
-        .onChange(of: self.albumDetailStore?.state) { _, _ in
+        .onChange(of: self.albumDetailPushID, initial: true) { _, _ in
           self.pushAlbumDetailIfNeeded()
         }
     #else
@@ -47,6 +47,11 @@ private struct AlbumDetailZoomPushModifier: ViewModifier {
   }
 
   #if os(iOS)
+    private var albumDetailPushID: String? {
+      guard let albumDetailStore else { return nil }
+      return albumDetailStore.transitionSourceID ?? albumDetailStore.album.id.rawValue
+    }
+
     private func pushAlbumDetailIfNeeded() {
       guard let albumDetailStore else {
         self.pushedAlbumDetailID = nil

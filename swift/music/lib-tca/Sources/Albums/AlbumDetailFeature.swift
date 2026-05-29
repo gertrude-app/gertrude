@@ -7,28 +7,28 @@ struct AlbumDetailFeature {
     let album: ApprovedAlbum
     let tracks: [ApprovedTrack]
     let transitionSourceID: String?
-    var isPlaying: Bool
-    var playingTrackID: ApprovedTrack.ID?
+    var playStatus: PlaybackFeature.PlayStatus?
+    var currentTrackID: ApprovedTrack.ID?
 
     init(
       album: ApprovedAlbum,
       tracks: [ApprovedTrack],
       transitionSourceID: String? = nil,
-      isPlaying: Bool = false,
-      playingTrackID: ApprovedTrack.ID? = nil,
+      playStatus: PlaybackFeature.PlayStatus? = nil,
+      currentTrackID: ApprovedTrack.ID? = nil,
     ) {
       self.album = album
       self.tracks = tracks
       self.transitionSourceID = transitionSourceID
-      self.isPlaying = isPlaying
-      self.playingTrackID = playingTrackID
+      self.playStatus = playStatus
+      self.currentTrackID = currentTrackID
     }
   }
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
-      case playAlbum([PlaybackItem])
-      case playTrack(PlaybackItem)
+      case playAlbum(items: [PlaybackItem], startIndex: Int)
+      case togglePlayPause
     }
 
     case playTapped
@@ -40,21 +40,23 @@ struct AlbumDetailFeature {
     Reduce { state, action in
       switch action {
       case .playTapped:
-        let items = state.tracks.map { PlaybackItem(
-          track: $0,
-          artworkURL: state.album.artworkURL,
-          allowsArtwork: state.album.showsArtwork,
-        ) }
+        if state.currentTrackID != nil {
+          return .send(.delegate(.togglePlayPause))
+        }
+
+        let items = state.playbackItems
         guard !items.isEmpty else { return .none }
-        return .send(.delegate(.playAlbum(items)))
+        return .send(.delegate(.playAlbum(items: items, startIndex: 0)))
 
       case .trackTapped(let trackID):
-        guard let track = state.tracks.first(where: { $0.id == trackID }) else { return .none }
-        return .send(.delegate(.playTrack(PlaybackItem(
-          track: track,
-          artworkURL: state.album.artworkURL,
-          allowsArtwork: state.album.showsArtwork,
-        ))))
+        guard let startIndex = state.tracks.firstIndex(where: { $0.id == trackID }) else { return .none }
+        if state.currentTrackID == trackID {
+          return .send(.delegate(.togglePlayPause))
+        }
+        return .send(.delegate(.playAlbum(
+          items: state.playbackItems,
+          startIndex: startIndex
+        )))
 
       case .delegate:
         return .none
@@ -64,20 +66,32 @@ struct AlbumDetailFeature {
 }
 
 extension AlbumDetailFeature.State {
+  var isPlaying: Bool {
+    self.playStatus == .playing
+  }
+
   var pushID: String {
     self.transitionSourceID ?? self.album.id.rawValue
   }
 
-  mutating func setPlaybackStatus(_ status: PlaybackFeature.Status) {
-    guard let currentTrackID = status.currentTrackID,
-          self.tracks.contains(where: { $0.id == currentTrackID })
+  var playbackItems: [PlaybackItem] {
+    self.tracks.map { PlaybackItem(
+      track: $0,
+      artworkURL: self.album.artworkURL,
+      allowsArtwork: self.album.showsArtwork,
+    ) }
+  }
+
+  mutating func setPlaybackSession(_ session: PlaybackFeature.Session?) {
+    guard let session,
+          self.tracks.contains(where: { $0.id == session.currentTrackID })
     else {
-      self.isPlaying = false
-      self.playingTrackID = nil
+      self.playStatus = nil
+      self.currentTrackID = nil
       return
     }
 
-    self.isPlaying = true
-    self.playingTrackID = currentTrackID
+    self.playStatus = session.playStatus
+    self.currentTrackID = session.currentTrackID
   }
 }

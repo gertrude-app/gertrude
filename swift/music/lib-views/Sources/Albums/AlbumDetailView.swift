@@ -5,7 +5,7 @@ public struct AlbumDetailView: View {
     private let rows: [AlbumDetailTrackRow]
     private let transitionSourceID: String?
     private let isPlaying: Bool
-    private let playingTrackID: String?
+    private let currentTrackID: String?
     private let onPlayTap: @MainActor @Sendable () -> Void
     private let onTrackTap: @MainActor @Sendable (String) -> Void
 
@@ -14,14 +14,14 @@ public struct AlbumDetailView: View {
         tracks: [TrackData],
         transitionSourceID: String? = nil,
         isPlaying: Bool = false,
-        playingTrackID: String? = nil,
+        currentTrackID: String? = nil,
         onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
         onTrackTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     ) {
         self.album = album
         self.transitionSourceID = transitionSourceID
         self.isPlaying = isPlaying
-        self.playingTrackID = playingTrackID
+        self.currentTrackID = currentTrackID
         self.onPlayTap = onPlayTap
         self.onTrackTap = onTrackTap
         self.rows = tracks.enumerated().map { index, track in
@@ -34,30 +34,13 @@ public struct AlbumDetailView: View {
             ScrollView {
                 VStack(spacing: 30) {
                     VStack(spacing: 16) {
-                        ZStack {
-                            CachedArtworkImageView(url: self.album.artworkUrl) {
-                                image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 100, height: 100)
-                                    .clipped()
-                                    .scaleEffect(6)
-                                    .blur(radius: 60)
-                                    .opacity(0.3)
-                            } placeholder: {
-                                Color.clear
-                                    .frame(width: 100, height: 100)
-                            }
-
-                            ZoomableAlbumArtworkView(
-                                album: self.album,
-                                size: self.artworkSize(for: proxy.size.width),
-                                cornerRadius: 32,
-                                transitionID: self.artworkTransitionID,
-                                role: .destination,
-                            )
-                        }
+                        ZoomableAlbumArtworkView(
+                            album: self.album,
+                            size: self.artworkSize(for: proxy.size.width),
+                            cornerRadius: 32,
+                            transitionID: self.artworkTransitionID,
+                            role: .destination,
+                        )
 
                         VStack(spacing: 5) {
                             Text(self.album.title)
@@ -97,7 +80,10 @@ public struct AlbumDetailView: View {
                             ForEach(self.rows) { row in
                                 AlbumDetailTrackRowView(
                                     row: row,
-                                    isPlaying: row.track.id == self.playingTrackID
+                                    isCurrent: row.track.id
+                                        == self.currentTrackID,
+                                    isPlaying: self.isPlaying
+                                        && row.track.id == self.currentTrackID
                                 ) {
                                     self.onTrackTap(row.track.id)
                                 }
@@ -106,7 +92,7 @@ public struct AlbumDetailView: View {
                     }
                 }
                 .padding(.top, 18)
-                .padding(.bottom, 34)
+                .padding(.bottom, 112)
             }
             .background(.background)
         }
@@ -153,6 +139,7 @@ private struct AlbumDetailTrackRow: Identifiable, Equatable {
 
 private struct AlbumDetailTrackRowView: View {
     let row: AlbumDetailTrackRow
+    let isCurrent: Bool
     let isPlaying: Bool
     let onTap: @MainActor @Sendable () -> Void
 
@@ -160,11 +147,17 @@ private struct AlbumDetailTrackRowView: View {
         Button(action: self.onTap) {
             HStack(spacing: 12) {
                 Group {
-                    if self.isPlaying {
-                        AlbumDetailWaveformView()
+                    if self.isCurrent {
+                        AlbumDetailWaveformView(isPlaying: self.isPlaying)
                     } else {
                         Text(self.row.number, format: .number)
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(
+                                .system(
+                                    size: 14,
+                                    weight: .semibold,
+                                    design: .rounded
+                                )
+                            )
                             .monospacedDigit()
                             .foregroundStyle(.secondary)
                     }
@@ -174,7 +167,10 @@ private struct AlbumDetailTrackRowView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     Text(self.row.track.title)
                         .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(self.isPlaying ? Color.gertrudeBrandAccent : .primary)
+                        .foregroundStyle(
+                            self.isCurrent
+                                ? Color.gertrudeBrandAccent : .primary
+                        )
                         .lineLimit(2)
 
                     Text(self.row.track.artist)
@@ -188,7 +184,7 @@ private struct AlbumDetailTrackRowView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .background {
-                if self.isPlaying {
+                if self.isCurrent {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(Color.gertrudeBrandAccent.opacity(0.10))
                         .padding(.horizontal, 10)
@@ -198,27 +194,48 @@ private struct AlbumDetailTrackRowView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(
-            "\(self.isPlaying ? "Playing, " : "")\(self.row.number). \(self.row.track.title), \(self.row.track.artist)"
+            "\(self.accessibilityPlaybackPrefix)\(self.row.number). \(self.row.track.title), \(self.row.track.artist)"
         )
+    }
+
+    private var accessibilityPlaybackPrefix: String {
+        if self.isPlaying { return "Playing, " }
+        if self.isCurrent { return "Paused, " }
+        return ""
     }
 }
 
 private struct AlbumDetailWaveformView: View {
+    let isPlaying: Bool
+
     var body: some View {
-        TimelineView(.animation) { timeline in
-            HStack(alignment: .center, spacing: 2) {
-                ForEach(0..<4, id: \.self) { index in
-                    RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                        .fill(Color.gertrudeBrandAccent)
-                        .frame(width: 3, height: self.barHeight(index: index, date: timeline.date))
-                }
+        if self.isPlaying {
+            TimelineView(.animation) { timeline in
+                self.bars(date: timeline.date)
             }
-            .frame(width: 24, height: 24)
+        } else {
+            self.bars(date: nil)
         }
     }
 
-    private func barHeight(index: Int, date: Date) -> CGFloat {
-        let phase = date.timeIntervalSinceReferenceDate * 5.5 + Double(index) * 0.85
+    private func bars(date: Date?) -> some View {
+        HStack(alignment: .center, spacing: 2) {
+            ForEach(0..<4, id: \.self) { index in
+                RoundedRectangle(cornerRadius: 1.5, style: .continuous)
+                    .fill(Color.gertrudeBrandAccent)
+                    .frame(
+                        width: 3,
+                        height: self.barHeight(index: index, date: date)
+                    )
+            }
+        }
+        .frame(width: 24, height: 24)
+    }
+
+    private func barHeight(index: Int, date: Date?) -> CGFloat {
+        guard let date else { return 4 }
+        let phase =
+            date.timeIntervalSinceReferenceDate * 5.5 + Double(index) * 0.85
         let progress = (sin(phase) + 1) / 2
         return 6 + CGFloat(progress) * 10
     }
@@ -253,7 +270,7 @@ private struct AlbumDetailEmptyTracksView: View {
             album: [AlbumData].previewAlbums[0],
             tracks: .previewTracks,
             isPlaying: true,
-            playingTrackID: [TrackData].previewTracks[2].id,
+            currentTrackID: [TrackData].previewTracks[2].id,
         )
     }
 }
