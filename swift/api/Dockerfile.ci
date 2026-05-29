@@ -73,10 +73,9 @@ COPY x-expect ${PREWARM}/x-expect
 COPY x-http ${PREWARM}/x-http
 COPY x-kit ${PREWARM}/x-kit
 RUN cd ${PREWARM}/api && \
-    TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+') && \
-    XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)") && \
-    swift build -Xswiftc -I"${XCTEST_LIB}" && \
-    swift build -c release -Xswiftc -I"${XCTEST_LIB}"
+    swift build -c debug --static-swift-stdlib && \
+    swift build -c release --static-swift-stdlib && \
+    swift build --build-tests --scratch-path .build-test
 
 WORKDIR /workspace
 
