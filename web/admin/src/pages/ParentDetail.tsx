@@ -668,7 +668,7 @@ function billingLabel(planStatus: PlanStatus, sub: Subscription | undefined): st
     case `free`:
       return sub ? `Lapsed` : `No subscription`;
     case `light`:
-      return sub?.stripeStatus === `pastDue` ? `Overdue — $10/yr` : `Paid — $10/yr`;
+      return sub?.stripeStatus === `past_due` ? `Overdue — $10/yr` : `Paid — $10/yr`;
     case `complimentary`:
       return `Complimentary`;
     case `fullTrial`: {
@@ -691,7 +691,7 @@ function billingLabel(planStatus: PlanStatus, sub: Subscription | undefined): st
     }
     case `full`: {
       const monthly = sub?.isLegacyPrice ? 5 : 10;
-      return sub?.stripeStatus === `pastDue`
+      return sub?.stripeStatus === `past_due`
         ? `Overdue — $${monthly}/mo`
         : `Paid — $${monthly}/mo`;
     }
@@ -792,7 +792,7 @@ const STRIPE_STATUS_CONFIG: Record<
     text: `text-violet-700`,
     ring: `ring-violet-500/20`,
   },
-  pastDue: {
+  past_due: {
     label: `past due`,
     bg: `bg-amber-100`,
     text: `text-amber-700`,
@@ -816,7 +816,7 @@ const STRIPE_STATUS_CONFIG: Record<
     text: `text-slate-600`,
     ring: `ring-slate-500/20`,
   },
-  incompleteExpired: {
+  incomplete_expired: {
     label: `incomplete expired`,
     bg: `bg-slate-100`,
     text: `text-slate-600`,
