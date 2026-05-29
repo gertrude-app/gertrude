@@ -181,8 +181,7 @@ struct AppReducer: Sendable {
   }
 
   func applyAccountStatus(_ state: AmSubscriptionState) {
-    let mapped = state.toLocal(now: self.date.now)
-    _ = try? CurrentSubscription.set(status: mapped.status, expiringAt: mapped.expiresAt)
+    state.writeLocal(now: self.date.now)
   }
 
   func cleanupTasks() {

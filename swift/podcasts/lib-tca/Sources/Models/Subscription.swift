@@ -74,6 +74,22 @@ extension AmSubscriptionState {
       (.unpaid, now)
     }
   }
+
+  var isEntitled: Bool {
+    switch self {
+    case .active, .complimentary, .legacyGrandfathered, .fullTrial, .amTrial:
+      true
+    case .unpaid, .legacyExpired:
+      false
+    }
+  }
+
+  @discardableResult
+  func writeLocal(now: Date) -> Subscription {
+    let mapped = self.toLocal(now: now)
+    return (try? CurrentSubscription.set(status: mapped.status, expiringAt: mapped.expiresAt))
+      ?? .fallback
+  }
 }
 
 struct CurrentSubscription: FetchKeyRequest {
