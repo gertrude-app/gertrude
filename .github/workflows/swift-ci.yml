@@ -122,7 +122,16 @@ jobs:
           echo "FILENAME=api_${API_ENV}_${DATESTR}_${SHORTSHA}" >> $GITHUB_ENV
       - name: build-api
         run: |
-          cd "$GITHUB_WORKSPACE/swift/api"
+          # build in /prewarm (image's prebuilt deps) when available, else cold in workspace
+          if [ -d /prewarm/api/.build ] && command -v rsync >/dev/null; then
+            for p in $API_PREWARM_PKGS; do
+              rsync -a --delete --exclude='.build*' --exclude='.git' --exclude='.swiftpm' "$GITHUB_WORKSPACE/swift/$p/" "/prewarm/$p/"
+            done
+            cd /prewarm/api
+          else
+            echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
+            cd "$GITHUB_WORKSPACE/swift/api"
+          fi
           TC=$(grep -oE '"inUse" *: *"[^"]+"' /root/.local/share/swiftly/config.json | grep -oE '[0-9][0-9.]+')
           XCTEST_LIB=$(dirname "$(find /root/.local/share/swiftly/toolchains/$TC -name 'libXCTest.so' -print -quit 2>/dev/null)")
           swift build -c $CONFIGURATION --static-swift-stdlib -Xlinker -L"${XCTEST_LIB}"
@@ -210,8 +219,17 @@ jobs:
         uses: actions/checkout@v4
       - name: test-api
         run: |
-          cd "$GITHUB_WORKSPACE/swift/api"
-          swift test
+          # build in /prewarm (image's prebuilt deps) when available, else cold in workspace
+          if [ -d /prewarm/api/.build ] && command -v rsync >/dev/null; then
+            for p in $API_PREWARM_PKGS; do
+              rsync -a --delete --exclude='.build*' --exclude='.git' --exclude='.swiftpm' "$GITHUB_WORKSPACE/swift/$p/" "/prewarm/$p/"
+            done
+            cd /prewarm/api
+          else
+            echo "::warning::api dependency prewarm cache unavailable; building in workspace (slow path)"
+            cd "$GITHUB_WORKSPACE/swift/api"
+          fi
+          swift test --scratch-path .build-test
 
   macapp-lib:
     needs: files-changed
