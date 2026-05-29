@@ -7,6 +7,7 @@ RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get -q install -y \
     binutils \
     git \
+    rsync \
     unzip \
     gnupg2 \
     libc6-dev \
@@ -47,6 +48,32 @@ RUN git clone --depth 1 --branch 0.58.5 https://github.com/nicklockwood/SwiftFor
     cd SwiftFormat && swift build -c release && \
     cp .build/release/swiftformat /usr/local/bin/ && \
     cd .. && rm -rf SwiftFormat/
+
+# NB: prewarm the api's external dependencies into a fixed path (/prewarm) so CI runs
+# reuse them instead of recompiling Vapor/NIO/swift-syntax/etc every build. CI jobs rsync
+# the freshly-checked-out sources over /prewarm (preserving /prewarm/api/.build) and build
+# there, so swift's absolute-path build records stay valid. Rebuilt automatically by the
+# swift-docker-images workflow when swift/api/Package.resolved changes (build context: ./swift).
+ENV PREWARM=/prewarm
+COPY api ${PREWARM}/api
+COPY duet ${PREWARM}/duet
+COPY gertie ${PREWARM}/gertie
+COPY pairql ${PREWARM}/pairql
+COPY pairql-macapp ${PREWARM}/pairql-macapp
+COPY pairql-iosapp ${PREWARM}/pairql-iosapp
+COPY pairql-podcasts ${PREWARM}/pairql-podcasts
+COPY ts-interop ${PREWARM}/ts-interop
+COPY ts-codable-macro ${PREWARM}/ts-codable-macro
+COPY x-aws ${PREWARM}/x-aws
+COPY x-postmark ${PREWARM}/x-postmark
+COPY x-slack ${PREWARM}/x-slack
+COPY x-stripe ${PREWARM}/x-stripe
+COPY x-expect ${PREWARM}/x-expect
+COPY x-http ${PREWARM}/x-http
+COPY x-kit ${PREWARM}/x-kit
+RUN cd ${PREWARM}/api && \
+    swift build && \
+    swift build -c release
 
 WORKDIR /workspace
 

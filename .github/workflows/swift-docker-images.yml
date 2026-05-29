@@ -6,6 +6,8 @@ on:
       - master
     paths:
       - 'swift/api/Dockerfile.ci'
+      # rebuild so the image's prewarmed api dependencies stay in sync with the resolved graph
+      - 'swift/api/Package.resolved'
 
 jobs:
   build-ci-image:
@@ -39,7 +41,7 @@ jobs:
       - name: build and push ci image
         uses: docker/build-push-action@v5
         with:
-          context: ./swift/api
+          context: ./swift
           file: ./swift/api/Dockerfile.ci
           push: true
           tags: ${{ steps.meta.outputs.tags }}
