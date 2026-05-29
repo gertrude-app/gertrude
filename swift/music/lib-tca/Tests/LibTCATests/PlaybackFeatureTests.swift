@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import Testing
 
 @testable import LibTCA
@@ -6,40 +7,81 @@ import Testing
 @MainActor
 struct PlaybackFeatureTests {
   @Test
-  func playTrackUpdatesStatus() async {
+  func startsWithoutSession() async {
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    }
+
+    #expect(store.state.session == nil)
+  }
+
+  @Test
+  func playTrackStartsSession() async {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     }
 
     await store.send(.playTrack(item)) {
-      $0.status = .playingTrack(item)
+      $0.session = .init(currentItem: item)
     }
   }
 
   @Test
-  func playTracksInOrderUpdatesStatus() async {
-    let items = [playbackItem("track-1"), playbackItem("track-2", allowsArtwork: false)]
+  func playAlbumQueueStartsSessionAtStartIndex() async {
+    let items = [
+      playbackItem("track-1"),
+      playbackItem("track-2", allowsArtwork: false),
+      playbackItem("track-3"),
+    ]
+    let recorder = PlaybackOrderRecorder()
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.playTracksInOrder = { items in
+        await recorder.record(items)
+      }
+    }
+
+    await store.send(.playAlbumQueue(items: items, startIndex: 1)) {
+      $0.session = .init(albumQueue: .init(items: items, currentIndex: 1))
+    }
+
+    let recordedItems = await recorder.items
+    #expect(recordedItems == [items[1], items[2], items[0]])
+  }
+
+  @Test
+  func albumQueueRotatesPlaybackOrderFromCurrentIndex() {
+    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
+    let queue = PlaybackFeature.AlbumQueue(items: items, currentIndex: 1)
+
+    #expect(queue.currentItem == items[1])
+    #expect(queue.playbackOrder == [items[1], items[2], items[0]])
+    #expect(queue.upcomingItems == [items[2], items[0]])
+  }
+
+  @Test
+  func playAlbumQueueWithEmptyTracksDoesNothing() async {
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     }
 
-    await store.send(.playTracksInOrder(items)) {
-      $0.status = .playingTracksInOrder(items)
-    }
+    await store.send(.playAlbumQueue(items: [], startIndex: 0))
   }
 
   @Test
-  func playTracksInOrderWithEmptyTracksDoesNothing() async {
+  func playAlbumQueueWithInvalidStartIndexDoesNothing() async {
+    let items = [playbackItem("track-1")]
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     }
 
-    await store.send(.playTracksInOrder([]))
+    await store.send(.playAlbumQueue(items: items, startIndex: 1))
   }
 
   @Test
-  func playbackFailureStopsPlayback() async {
+  func playbackFailurePausesCurrentSession() async {
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
@@ -49,22 +91,339 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
 
     await store.send(.playTrack(item)) {
-      $0.status = .playingTrack(item)
+      $0.session = .init(currentItem: item)
     }
     await store.receive(.playbackFailed) {
-      $0.status = .stopped
+      $0.session?.playStatus = .paused
     }
   }
 
   @Test
-  func stopUpdatesStatus() async {
-    let store = TestStore(initialState: .init(status: .playingTrack(playbackItem("track-1")))) {
+  func playbackEventUpdatesCurrentSessionPlayStatus() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.playStatusChanged(.paused))) {
+      $0.session?.playStatus = .paused
+    }
+    await store.send(.playbackEvent(.playStatusChanged(.playing))) {
+      $0.session?.playStatus = .playing
+    }
+  }
+
+  @Test
+  func playbackEventUpdatesCurrentSessionProgress() async {
+    let item = playbackItem("track-1")
+    let progress = PlaybackProgress(elapsedTime: 42, duration: 180)
+    let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.progressChanged(progress))) {
+      $0.session?.progress = progress
+    }
+  }
+
+  @Test
+  func playbackEventUpdatesCurrentSessionItem() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 0),
+      progress: .init(elapsedTime: 40, duration: 180)
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.currentItemChanged(items[2].id))) {
+      $0.session?.albumQueue.currentIndex = 2
+      $0.session?.progress = .zero
+    }
+  }
+
+  @Test
+  func playbackEventWithUnknownCurrentItemDoesNothing() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2")]
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 0),
+      progress: .init(elapsedTime: 40, duration: 180)
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.currentItemChanged("track-3")))
+  }
+
+  @Test
+  func playbackEventWithSameCurrentItemDoesNothing() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2")]
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 0),
+      progress: .init(elapsedTime: 40, duration: 180)
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.currentItemChanged(items[0].id)))
+  }
+
+  @Test
+  func playbackEventWithoutSessionDoesNothing() async {
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.playStatusChanged(.paused)))
+    await store.send(.playbackEvent(.currentItemChanged("track-1")))
+    await store.send(.playbackEvent(.progressChanged(.init(elapsedTime: 42, duration: 180))))
+  }
+
+  @Test
+  func pausePausesCurrentSession() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.pause) {
+      $0.session?.playStatus = .paused
+    }
+  }
+
+  @Test
+  func resumeResumesCurrentSession() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(
+      playStatus: .paused,
+      currentItem: item
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.resume) {
+      $0.session?.playStatus = .playing
+    }
+  }
+
+  @Test
+  func togglePlayPausePausesPlayingSession() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.togglePlayPause)
+    await store.receive(.pause) {
+      $0.session?.playStatus = .paused
+    }
+  }
+
+  @Test
+  func togglePlayPauseResumesPausedSession() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(
+      playStatus: .paused,
+      currentItem: item
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.togglePlayPause)
+    await store.receive(.resume) {
+      $0.session?.playStatus = .playing
+    }
+  }
+
+  @Test
+  func seekUpdatesCurrentSessionProgress() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(
+      currentItem: item,
+      progress: .init(elapsedTime: 10, duration: 180)
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.seek(42)) {
+      $0.session?.progress = .init(elapsedTime: 42, duration: 180)
+    }
+  }
+
+  @Test
+  func seekClampsToDuration() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(
+      currentItem: item,
+      progress: .init(elapsedTime: 10, duration: 180)
+    ))) {
+      PlaybackFeature()
+    }
+
+    await store.send(.seek(240)) {
+      $0.session?.progress = .init(elapsedTime: 180, duration: 180)
+    }
+  }
+
+  @Test
+  func skipToNextAdvancesCurrentItem() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
+    let recorder = PlaybackCommandRecorder()
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 0),
+      progress: .init(elapsedTime: 42, duration: 180)
+    ))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.skipToNext = {
+        await recorder.recordSkipToNext()
+      }
+    }
+
+    await store.send(.skipToNext) {
+      $0.session?.albumQueue.currentIndex = 1
+      $0.session?.progress = .zero
+    }
+
+    #expect(await recorder.skipToNextCount == 1)
+  }
+
+  @Test
+  func skipToNextWithSingleItemRestartsCurrentItem() async {
+    let item = playbackItem("track-1")
+    let recorder = PlaybackCommandRecorder()
+    let store = TestStore(initialState: .init(session: .init(
+      currentItem: item,
+      progress: .init(elapsedTime: 42, duration: 180)
+    ))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.seek = { time in
+        await recorder.recordSeek(time)
+      }
+    }
+
+    await store.send(.skipToNext) {
+      $0.session?.progress = .init(duration: 180)
+    }
+
+    #expect(await recorder.seekTimes == [0])
+  }
+
+  @Test
+  func skipToPreviousAfterFirstThreeSecondsRestartsCurrentItem() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
+    let recorder = PlaybackCommandRecorder()
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 1),
+      progress: .init(elapsedTime: 4, duration: 180)
+    ))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.seek = { time in
+        await recorder.recordSeek(time)
+      }
+    }
+
+    await store.send(.skipToPrevious) {
+      $0.session?.progress = .init(duration: 180)
+    }
+
+    #expect(await recorder.seekTimes == [0])
+  }
+
+  @Test
+  func skipToPreviousWithinFirstThreeSecondsMovesToPreviousItem() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
+    let recorder = PlaybackCommandRecorder()
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 1),
+      progress: .init(elapsedTime: 3, duration: 180)
+    ))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.skipToPrevious = {
+        await recorder.recordSkipToPrevious()
+      }
+    }
+
+    await store.send(.skipToPrevious) {
+      $0.session?.albumQueue.currentIndex = 0
+      $0.session?.progress = .zero
+    }
+
+    #expect(await recorder.skipToPreviousCount == 1)
+  }
+
+  @Test
+  func skipToPreviousWrapsToLastItem() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
+    let recorder = PlaybackCommandRecorder()
+    let store = TestStore(initialState: .init(session: .init(
+      albumQueue: .init(items: items, currentIndex: 0),
+      progress: .init(elapsedTime: 2, duration: 180)
+    ))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.skipToPrevious = {
+        await recorder.recordSkipToPrevious()
+      }
+    }
+
+    await store.send(.skipToPrevious) {
+      $0.session?.albumQueue.currentIndex = 2
+      $0.session?.progress = .zero
+    }
+
+    #expect(await recorder.skipToPreviousCount == 1)
+  }
+
+  @Test
+  func skipWithoutSessionDoesNothing() async {
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    }
+
+    await store.send(.skipToNext)
+    await store.send(.skipToPrevious)
+  }
+
+  @Test
+  func stopPausesCurrentSession() async {
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
       PlaybackFeature()
     }
 
     await store.send(.stop) {
-      $0.status = .stopped
+      $0.session?.playStatus = .paused
     }
+  }
+}
+
+private actor PlaybackOrderRecorder {
+  var items: [PlaybackItem]?
+
+  func record(_ items: [PlaybackItem]) {
+    self.items = items
+  }
+}
+
+private actor PlaybackCommandRecorder {
+  var seekTimes: [TimeInterval] = []
+  var skipToNextCount = 0
+  var skipToPreviousCount = 0
+
+  func recordSeek(_ time: TimeInterval) {
+    self.seekTimes.append(time)
+  }
+
+  func recordSkipToNext() {
+    self.skipToNextCount += 1
+  }
+
+  func recordSkipToPrevious() {
+    self.skipToPreviousCount += 1
   }
 }
 

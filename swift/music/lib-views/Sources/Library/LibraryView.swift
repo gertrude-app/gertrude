@@ -2,7 +2,7 @@ import SwiftUI
 
 public enum LibraryViewState: Equatable, Sendable {
   case loading
-  case loaded(albums: [AlbumData], artists: [ArtistData], tracks: [TrackData])
+  case loaded(albums: [AlbumData])
   case empty
   case failed
 }
@@ -11,99 +11,74 @@ public struct LibraryView: View {
   private let state: LibraryViewState
   private let transitionNamespace: Namespace.ID?
   private let onRetryTap: @MainActor @Sendable () -> Void
-  private let onAlbumsTitleTap: @MainActor @Sendable () -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
-  private let onArtistsTitleTap: @MainActor @Sendable () -> Void
-  private let onArtistTap: @MainActor @Sendable (String) -> Void
-  private let onTracksTitleTap: @MainActor @Sendable () -> Void
-  private let onTrackTap: @MainActor @Sendable (String) -> Void
 
   public init(
     state: LibraryViewState,
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
-    onAlbumsTitleTap: @MainActor @escaping @Sendable () -> Void = {},
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistsTitleTap: @MainActor @escaping @Sendable () -> Void = {},
-    onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onTracksTitleTap: @MainActor @escaping @Sendable () -> Void = {},
-    onTrackTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
   ) {
     self.state = state
     self.transitionNamespace = transitionNamespace
     self.onRetryTap = onRetryTap
-    self.onAlbumsTitleTap = onAlbumsTitleTap
     self.onAlbumTap = onAlbumTap
-    self.onArtistsTitleTap = onArtistsTitleTap
-    self.onArtistTap = onArtistTap
-    self.onTracksTitleTap = onTracksTitleTap
-    self.onTrackTap = onTrackTap
   }
 
   public var body: some View {
-    ScrollView {
-      self.content
-        .padding(.vertical, 24)
-    }
-    .background(.background)
-    .navigationTitle("My Music")
+    self.content
+      .navigationTitle("Albums")
   }
 
   @ViewBuilder private var content: some View {
     switch self.state {
     case .loading:
-      VStack(alignment: .leading, spacing: 34) {
-        AlbumShelfView(albums: [], isLoading: true)
-        ArtistShelfView(artists: [], isLoading: true)
-        TrackShelfView(tracks: [], isLoading: true)
-      }
+      AlbumGridView(albums: [], isLoading: true)
 
-    case .loaded(let albums, let artists, let tracks):
-      VStack(alignment: .leading, spacing: 34) {
-        AlbumShelfView(
-          albums: albums,
-          transitionNamespace: self.transitionNamespace,
-          onTitleTap: self.onAlbumsTitleTap,
-          onAlbumTap: self.onAlbumTap,
-        )
-
-        ArtistShelfView(
-          artists: artists,
-          transitionNamespace: self.transitionNamespace,
-          onTitleTap: self.onArtistsTitleTap,
-          onArtistTap: self.onArtistTap,
-        )
-
-        TrackShelfView(
-          tracks: tracks,
-          transitionNamespace: self.transitionNamespace,
-          onTitleTap: self.onTracksTitleTap,
-          onTrackTap: self.onTrackTap,
-        )
-      }
+    case .loaded(let albums):
+      AlbumGridView(
+        albums: albums,
+        transitionNamespace: self.transitionNamespace,
+        onAlbumTap: self.onAlbumTap,
+      )
 
     case .empty:
-      LibraryMessageCard(
-        title: "No music yet",
-        message: "Approved songs, albums, and artists will appear here after a parent adds them in Gertrude.",
-        systemImage: "music.note.house",
-        buttonTitle: "Check again",
-        onButtonTap: self.onRetryTap,
+      self.messageContent(
+        title: "No albums yet",
+        message: "Approved albums will appear here after a parent adds them in Gertrude.",
+        systemImage: "rectangle.stack",
+        buttonTitle: "Check again"
       )
-      .padding(.horizontal, 20)
-      .padding(.top, 48)
 
     case .failed:
-      LibraryMessageCard(
-        title: "Couldn’t load music",
+      self.messageContent(
+        title: "Couldn’t load albums",
         message: "Check your connection and try again.",
         systemImage: "wifi.exclamationmark",
-        buttonTitle: "Try again",
+        buttonTitle: "Try again"
+      )
+    }
+  }
+
+  private func messageContent(
+    title: String,
+    message: String,
+    systemImage: String,
+    buttonTitle: String,
+  ) -> some View {
+    ScrollView {
+      LibraryMessageCard(
+        title: title,
+        message: message,
+        systemImage: systemImage,
+        buttonTitle: buttonTitle,
         onButtonTap: self.onRetryTap,
       )
       .padding(.horizontal, 20)
       .padding(.top, 48)
+      .padding(.bottom, 96)
     }
+    .background(.background)
   }
 }
 
@@ -152,13 +127,7 @@ private struct LibraryMessageCard: View {
 
 #Preview("Loaded") {
   NavigationStack {
-    LibraryView(
-      state: .loaded(
-        albums: .previewAlbums,
-        artists: .previewArtists,
-        tracks: .previewTracks,
-      ),
-    )
+    LibraryView(state: .loaded(albums: .previewAlbums))
   }
 }
 

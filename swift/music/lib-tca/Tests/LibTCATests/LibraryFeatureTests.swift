@@ -21,7 +21,7 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func showsEmptyStateWhenApprovedLibraryIsEmpty() async {
+  func showsEmptyStateWhenApprovedLibraryHasNoAlbums() async {
     let store = TestStore(initialState: .init()) {
       LibraryFeature()
     } withDependencies: {
@@ -66,18 +66,6 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func albumsTitleNavigatesToAlbumsScreen() async {
-    let library = ApprovedMusicLibrary.mock
-    let store = TestStore(initialState: .init(status: .loaded(library))) {
-      LibraryFeature()
-    }
-
-    await store.send(.albumsTitleTapped) {
-      $0.destination = .albums(.init(albums: library.albums, tracks: library.tracks))
-    }
-  }
-
-  @Test
   func albumTapNavigatesToAlbumScreen() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
@@ -86,44 +74,44 @@ struct LibraryFeatureTests {
     }
 
     await store.send(.albumTapped(album.id)) {
-      $0.destination = .album(.init(
+      $0.albumDetail = .init(
         album: album,
         tracks: library.tracks(for: album),
         transitionSourceID: album.id.rawValue,
-      ))
+      )
     }
   }
 
   @Test
-  func albumDetailDismissedClearsDestination() async {
+  func albumDetailDismissedClearsAlbumDetail() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     var state = LibraryFeature.State(status: .loaded(library))
-    state.destination = .album(.init(
+    state.albumDetail = .init(
       album: album,
       tracks: library.tracks(for: album),
       transitionSourceID: album.id.rawValue,
-    ))
+    )
     let store = TestStore(initialState: state) {
       LibraryFeature()
     }
 
     await store.send(.albumDetailDismissed(album.id.rawValue)) {
-      $0.destination = nil
+      $0.albumDetail = nil
     }
   }
 
   @Test
-  func staleAlbumDetailDismissalDoesNotClearNewDestination() async {
+  func staleAlbumDetailDismissalDoesNotClearNewAlbumDetail() async {
     let library = ApprovedMusicLibrary.mock
     let oldAlbum = library.albums[0]
     let newAlbum = library.albums[1]
     var state = LibraryFeature.State(status: .loaded(library))
-    state.destination = .album(.init(
+    state.albumDetail = .init(
       album: newAlbum,
       tracks: library.tracks(for: newAlbum),
       transitionSourceID: newAlbum.id.rawValue,
-    ))
+    )
     let store = TestStore(initialState: state) {
       LibraryFeature()
     }
@@ -132,100 +120,21 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func albumDetailDismissalDoesNotClearOtherDestinations() async {
-    let library = ApprovedMusicLibrary.mock
-    var state = LibraryFeature.State(status: .loaded(library))
-    state.destination = .albums(.init(albums: library.albums, tracks: library.tracks))
-    let store = TestStore(initialState: state) {
-      LibraryFeature()
-    }
-
-    await store.send(.albumDetailDismissed(library.albums[0].id.rawValue))
-  }
-
-  @Test
-  func directAlbumDetailPlayDelegateIsForwarded() async {
+  func albumDetailPlayDelegateIsForwarded() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     var state = LibraryFeature.State(status: .loaded(library))
-    state.destination = .album(.init(
+    state.albumDetail = .init(
       album: album,
       tracks: library.tracks(for: album),
-    ))
+    )
     let store = TestStore(initialState: state) {
       LibraryFeature()
     }
 
-    await store.send(.destination(.presented(.album(.delegate(.playTrack(playbackItem("track-1")))))))
-    await store.receive(.delegate(.playTrack(playbackItem("track-1"))))
-  }
-
-  @Test
-  func albumListDetailPlayDelegateIsForwarded() async {
-    let library = ApprovedMusicLibrary.mock
-    var state = LibraryFeature.State(status: .loaded(library))
-    state.destination = .albums(.init(albums: library.albums, tracks: library.tracks))
-    let store = TestStore(initialState: state) {
-      LibraryFeature()
-    }
-
-    await store.send(.destination(.presented(.albums(.delegate(.playTrack(playbackItem("track-1")))))))
-    await store.receive(.delegate(.playTrack(playbackItem("track-1"))))
-  }
-
-  @Test
-  func artistsTitleNavigatesToArtistsScreen() async {
-    let library = ApprovedMusicLibrary.mock
-    let store = TestStore(initialState: .init(status: .loaded(library))) {
-      LibraryFeature()
-    }
-
-    await store.send(.artistsTitleTapped) {
-      $0.destination = .artists(.init(artists: library.artists))
-    }
-  }
-
-  @Test
-  func artistTapNavigatesToArtistScreen() async {
-    let library = ApprovedMusicLibrary.mock
-    let artist = library.artists[0]
-    let store = TestStore(initialState: .init(status: .loaded(library))) {
-      LibraryFeature()
-    }
-
-    await store.send(.artistTapped(artist.id)) {
-      $0.destination = .artist(.init(
-        title: artist.name,
-        transitionSourceID: artist.id.rawValue,
-      ))
-    }
-  }
-
-  @Test
-  func tracksTitleNavigatesToTracksScreen() async {
-    let store = TestStore(initialState: .init(status: .loaded(.mock))) {
-      LibraryFeature()
-    }
-
-    await store.send(.tracksTitleTapped) {
-      $0.destination = .tracks(.init(title: "Tracks"))
-    }
-  }
-
-  @Test
-  func trackTapNavigatesToTrackScreen() async {
-    let library = ApprovedMusicLibrary.mock
-    let track = library.tracks[0]
-    let store = TestStore(initialState: .init(status: .loaded(library))) {
-      LibraryFeature()
-    }
-
-    await store.send(.trackTapped(track.id)) {
-      $0.destination = .track(.init(
-        title: track.title,
-        transitionSourceID: track.id.rawValue,
-        ))
-    }
+    let items = [playbackItem("track-1")]
+    await store.send(.albumDetail(.presented(.delegate(.playAlbum(items: items, startIndex: 0)))))
+    await store.receive(.delegate(.playAlbum(items: items, startIndex: 0)))
   }
 }
 

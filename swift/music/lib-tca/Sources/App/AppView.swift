@@ -7,53 +7,38 @@ struct AppView: View {
 
   @Bindable var store: StoreOf<AppFeature>
 
+  private let nowPlayingPanelTransitionID = "now-playing-panel"
+  private let nowPlayingArtworkTransitionID = "now-playing-artwork"
+
   var body: some View {
     #if os(iOS)
       if #available(iOS 26.0, *) {
-        TabView {
-          Tab("Library", systemImage: "square.grid.2x2") {
-            self.libraryView
+        self.libraryView
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            self.nowPlayingAccessoryInset
           }
-
-          Tab("Queue", systemImage: "list.bullet") {
-            self.queueView
+          .nowPlayingZoomPresentation(
+            isPresented: self.nowPlayingPresented,
+            panelSourceID: self.nowPlayingPanelTransitionID,
+            artworkID: self.nowPlayingArtworkTransitionID,
+          ) {
+            self.nowPlayingSheet
           }
-
-          Tab(role: .search) {
-            self.searchView
+          .task {
+            await self.store.send(.playback(.observePlayback)).finish()
           }
-        }
-        .tint(.gertrudeBrandAccent)
-        .tabBarMinimizeBehavior(.onScrollDown)
-        .tabViewBottomAccessory {
-          self.nowPlayingAccessory
-        }
-        .sheet(isPresented: self.nowPlayingPresented) {
-          self.nowPlayingSheet
-        }
       } else {
-        self.defaultTabView
+        self.libraryView
+          .task {
+            await self.store.send(.playback(.observePlayback)).finish()
+          }
       }
     #else
-      self.defaultTabView
+      self.libraryView
+        .task {
+          await self.store.send(.playback(.observePlayback)).finish()
+        }
     #endif
-  }
-
-  private var defaultTabView: some View {
-    TabView {
-      Tab("Library", systemImage: "square.grid.2x2") {
-        self.libraryView
-      }
-
-      Tab("Queue", systemImage: "list.bullet") {
-        self.queueView
-      }
-
-      Tab("Search", systemImage: "magnifyingglass") {
-        self.searchView
-      }
-    }
-    .tint(.gertrudeBrandAccent)
   }
 
   private var libraryView: some View {
@@ -62,25 +47,40 @@ struct AppView: View {
     )
   }
 
-  private var queueView: some View {
-    NavigationStack {
-      PlaceholderScreenView(title: "Queue")
-    }
-  }
-
-  private var searchView: some View {
-    NavigationStack {
-      PlaceholderScreenView(title: "Search")
-    }
-    .searchable(text: self.searchText)
-  }
-
   #if os(iOS)
     @available(iOS 26.0, *)
     private var nowPlayingAccessory: some View {
-      NowPlayingAccessoryView(foregroundColor: self.nowPlayingForegroundColor) {
-        self.store.send(.nowPlayingPresentationChanged(true))
-      }
+      let session = self.store.playback.session
+      return NowPlayingAccessoryView(
+        title: session?.currentItem.title ?? "Not Playing",
+        artist: session?.currentItem.artistName ?? "Choose an approved track",
+        artworkURL: session?.currentItem.allowsArtwork == true ? session?.currentItem.artworkURL : nil,
+        isPlaying: session?.isPlaying ?? false,
+        isEnabled: session != nil,
+        foregroundColor: self.nowPlayingForegroundColor,
+        panelTransitionID: self.nowPlayingPanelTransitionID,
+        artworkTransitionID: self.nowPlayingArtworkTransitionID,
+        displayMode: .expanded,
+        showsGlassBackground: true,
+        onTap: {
+          guard self.store.playback.session != nil else { return }
+          self.store.send(.nowPlayingPresentationChanged(true))
+        },
+        onPlayTap: {
+          self.store.send(.playback(.togglePlayPause))
+        },
+        onNextTap: {
+          self.store.send(.playback(.skipToNext))
+        }
+      )
+    }
+
+    @available(iOS 26.0, *)
+    private var nowPlayingAccessoryInset: some View {
+      self.nowPlayingAccessory
+        .padding(.horizontal, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 8)
     }
   #endif
 
@@ -88,17 +88,47 @@ struct AppView: View {
     self.colorScheme == .dark ? .white : .black
   }
 
-  private var nowPlayingSheet: some View {
-    Text("now playing")
-      .font(.title)
-  }
-
-  private var searchText: Binding<String> {
-    Binding(
-      get: { self.store.searchText },
-      set: { self.store.send(.searchTextChanged($0)) }
-    )
-  }
+  #if os(iOS)
+    @available(iOS 26.0, *)
+    @ViewBuilder
+    private var nowPlayingSheet: some View {
+      if let session = self.store.playback.session {
+        NowPlayingScreenView(
+          title: session.currentItem.title,
+          artist: session.currentItem.artistName,
+          artworkURL: session.currentItem.artworkURL,
+          showsArtwork: session.currentItem.allowsArtwork,
+          artworkTransitionID: self.nowPlayingArtworkTransitionID,
+          isPlaying: session.isPlaying,
+          progress: session.progress.fraction,
+          duration: session.progress.duration,
+          onPlayPauseTap: {
+            self.store.send(.playback(.togglePlayPause))
+          },
+          onPreviousTap: {
+            self.store.send(.playback(.skipToPrevious))
+          },
+          onNextTap: {
+            self.store.send(.playback(.skipToNext))
+          },
+          onScrub: { time in
+            self.store.send(.playback(.seek(time)))
+          }
+        )
+      } else {
+        NowPlayingScreenView(
+          title: "Not Playing",
+          artist: "Choose an approved track",
+          artworkURL: nil,
+          showsArtwork: false,
+          artworkTransitionID: self.nowPlayingArtworkTransitionID,
+          isPlaying: false,
+          progress: 0,
+          duration: 0
+        )
+      }
+    }
+  #endif
 
   private var nowPlayingPresented: Binding<Bool> {
     Binding(

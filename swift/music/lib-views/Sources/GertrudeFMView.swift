@@ -5,13 +5,7 @@ public struct GertrudeFMView: View {
 
   public var body: some View {
     NavigationStack {
-      LibraryView(
-        state: .loaded(
-          albums: .previewAlbums,
-          artists: .previewArtists,
-          tracks: .previewTracks,
-        ),
-      )
+      LibraryView(state: .loaded(albums: .previewAlbums))
     }
   }
 }
