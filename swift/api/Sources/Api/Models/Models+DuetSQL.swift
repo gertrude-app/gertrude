@@ -1728,3 +1728,37 @@ extension InstalledMacApp: Model {
     ]
   }
 }
+
+extension Music.ApprovedAlbum: Model {
+  public static let schemaName = "music"
+  public static let tableName = "approved_albums"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .childId: .uuid(self.childId)
+    case .appleMusicAlbumId: .string(self.appleMusicAlbumId.rawValue)
+    case .title: .string(self.title)
+    case .artistName: .string(self.artistName)
+    case .artworkUrl: .string(self.artworkUrl)
+    case .trackCount: .int(self.trackCount)
+    case .showsArtwork: .bool(self.showsArtwork)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .childId: .uuid(self.childId),
+      .appleMusicAlbumId: .string(self.appleMusicAlbumId.rawValue),
+      .title: .string(self.title),
+      .artistName: .string(self.artistName),
+      .artworkUrl: .string(self.artworkUrl),
+      .trackCount: .int(self.trackCount),
+      .showsArtwork: .bool(self.showsArtwork),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}

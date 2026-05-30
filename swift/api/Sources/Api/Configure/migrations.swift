@@ -101,6 +101,7 @@ extension Configure {
     app.migrations.add(AddMarketingEmailSendVariant())
     app.migrations.add(AddParentReferrals())
     app.migrations.add(PodcastAppTokenInstallUnique())
+    app.migrations.add(CreateMusicTables())
   }
 }
 
