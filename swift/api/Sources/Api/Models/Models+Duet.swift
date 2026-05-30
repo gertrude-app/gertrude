@@ -948,3 +948,21 @@ extension InstalledMacApp {
     case updatedAt
   }
 }
+
+extension Music.ApprovedAlbum: Duet.Identifiable {
+  typealias Id = Tagged<Music.ApprovedAlbum, UUID>
+}
+
+extension Music.ApprovedAlbum {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case childId
+    case appleMusicAlbumId
+    case title
+    case artistName
+    case artworkUrl
+    case trackCount
+    case showsArtwork
+    case createdAt
+  }
+}
