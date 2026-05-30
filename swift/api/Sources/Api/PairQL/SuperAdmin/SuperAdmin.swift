@@ -8,7 +8,6 @@ enum SuperAdminRoute: PairRoute {
 enum AuthedSuperAdminRoute: PairRoute {
   case createDashAnnouncement(CreateDashAnnouncement.Input)
   case createRelease(CreateRelease.Input)
-  case sendMarketingCampaign(SendMarketingCampaign.Input)
 
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.createDashAnnouncement)) {
@@ -18,10 +17,6 @@ enum AuthedSuperAdminRoute: PairRoute {
     Route(.case(Self.createRelease)) {
       Operation(CreateRelease.self)
       Body(.input(CreateRelease.self))
-    }
-    Route(.case(Self.sendMarketingCampaign)) {
-      Operation(SendMarketingCampaign.self)
-      Body(.input(SendMarketingCampaign.self))
     }
   }
 }
@@ -49,9 +44,6 @@ extension SuperAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .createRelease(let input):
       let output = try await CreateRelease.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .sendMarketingCampaign(let input):
-      let output = try await SendMarketingCampaign.resolve(with: input, in: context)
       return try await self.respond(with: output)
     }
   }

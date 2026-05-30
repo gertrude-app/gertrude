@@ -7,6 +7,31 @@ import XExpect
 @testable import Api
 
 final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
+  func testTickContinuesAfterCampaignFailure() async throws {
+    let parent = try await self.parent()
+    let successful = SuccessfulAutomatedMarketingCampaign(
+      parentId: parent.id,
+      email: parent.email,
+    )
+
+    let results = try await withDependencies {
+      $0.postmark._sendTemplateEmailBatch = { @Sendable emails in
+        self.sent.emails.append(contentsOf: emails)
+        return .success(emails.map { _ in .success(()) })
+      }
+    } operation: {
+      try await AutomatedMarketingJob().tick(campaigns: [
+        FailingAutomatedMarketingCampaign(),
+        successful,
+      ])
+    }
+
+    expect(results.map(\.campaign)).toEqual(["healthy_campaign"])
+    expect(self.sent.emails.map(\.to)).toEqual([parent.email.rawValue])
+    expect(self.sent.slacks).toHaveCount(1)
+    expect(self.sent.slacks[0].message.text).toContain("failing_campaign")
+  }
+
   func testTickSendsMacSetupCampaignAndRecordsSuccessfulSend() async throws {
     var env = Env.fromProcess(mode: .testing)
     env.dashboardUrl = "https://dash.test/"
@@ -83,3 +108,25 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
     try await self.db.execute(statement: stmt)
   }
 }
+
+private struct FailingAutomatedMarketingCampaign: AutomatedMarketingCampaign {
+  let slug = "failing_campaign"
+  let templateAlias = "failing-template"
+
+  func audience(in db: any DuetSQL.Client) async throws -> [AutomatedMarketingRecipient] {
+    throw TestCampaignError()
+  }
+}
+
+private struct SuccessfulAutomatedMarketingCampaign: AutomatedMarketingCampaign {
+  let slug = "healthy_campaign"
+  let templateAlias = "healthy-template"
+  let parentId: Parent.Id
+  let email: EmailAddress
+
+  func audience(in db: any DuetSQL.Client) async throws -> [AutomatedMarketingRecipient] {
+    [AutomatedMarketingRecipient(parentId: self.parentId, email: self.email)]
+  }
+}
+
+private struct TestCampaignError: Error {}
