@@ -100,6 +100,7 @@ extension Configure {
     app.migrations.add(AddAllowAppInstallation())
     app.migrations.add(AddMarketingEmailSendVariant())
     app.migrations.add(AddParentReferrals())
+    app.migrations.add(CreateMusicTables())
   }
 }
 

@@ -24,6 +24,9 @@ enum AuthedParentRoute: PairRoute {
   case getUnlockRequests
   case getChild(GetChild.Input)
   case getChildren
+  case getApprovedMusicAlbums(GetApprovedMusicAlbums.Input)
+  case approveMusicAlbum(ApproveMusicAlbum.Input)
+  case removeApprovedMusicAlbum(RemoveApprovedMusicAlbum.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice(IOSDevice.Id)
@@ -144,6 +147,18 @@ extension AuthedParentRoute {
         }
         Route(.case(Self.getChildren)) {
           Operation(GetChildren.self)
+        }
+        Route(.case(Self.getApprovedMusicAlbums)) {
+          Operation(GetApprovedMusicAlbums.self)
+          Body(.dashboardInput(GetApprovedMusicAlbums.self))
+        }
+        Route(.case(Self.approveMusicAlbum)) {
+          Operation(ApproveMusicAlbum.self)
+          Body(.dashboardInput(ApproveMusicAlbum.self))
+        }
+        Route(.case(Self.removeApprovedMusicAlbum)) {
+          Operation(RemoveApprovedMusicAlbum.self)
+          Body(.dashboardInput(RemoveApprovedMusicAlbum.self))
         }
         Route(.case(Self.handleCheckoutCancel)) {
           Operation(HandleCheckoutCancel.self)
@@ -303,6 +318,15 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getChildren:
       let output = try await GetChildren.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getApprovedMusicAlbums(let input):
+      let output = try await GetApprovedMusicAlbums.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .approveMusicAlbum(let input):
+      let output = try await ApproveMusicAlbum.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .removeApprovedMusicAlbum(let input):
+      let output = try await RemoveApprovedMusicAlbum.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .saveUser(let input):
       let output = try await SaveUser.resolve(with: input, in: context)
