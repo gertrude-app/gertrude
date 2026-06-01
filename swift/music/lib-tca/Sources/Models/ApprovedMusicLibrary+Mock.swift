@@ -8,7 +8,7 @@ extension ApprovedMusicLibrary {
         title: "Stories from the Outside",
         artistName: "Lena Jonsson Trio & Lena Jonsson",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
         trackIDs: [
           "1511628002",
@@ -24,7 +24,7 @@ extension ApprovedMusicLibrary {
         title: "Elements",
         artistName: "Lena Jonsson Trio",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1682152624",
@@ -40,7 +40,7 @@ extension ApprovedMusicLibrary {
         title: "Rule of 3",
         artistName: "Väsen",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1641791004",
@@ -56,7 +56,7 @@ extension ApprovedMusicLibrary {
         title: "Brewed",
         artistName: "Väsen",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
         showsArtwork: false,
         trackIDs: [
@@ -73,7 +73,7 @@ extension ApprovedMusicLibrary {
         title: "Månskratt",
         artistName: "Groupa Med Lena Willemark",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "337679253",
@@ -89,7 +89,7 @@ extension ApprovedMusicLibrary {
         title: "Flyt",
         artistName: "Frifot",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
         showsArtwork: false,
         trackIDs: [
@@ -106,7 +106,7 @@ extension ApprovedMusicLibrary {
         title: "Fire & Grace",
         artistName: "Alasdair Fraser & Natalie Haas",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "81005084",
@@ -122,7 +122,7 @@ extension ApprovedMusicLibrary {
         title: "Highlander's Farewell",
         artistName: "Alasdair Fraser & Natalie Haas",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "425926432",
@@ -138,7 +138,7 @@ extension ApprovedMusicLibrary {
         title: "Ports of Call",
         artistName: "Alasdair Fraser & Natalie Haas",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1215440791",
@@ -154,7 +154,7 @@ extension ApprovedMusicLibrary {
         title: "The Lonesome Touch",
         artistName: "Dennis Cahill & Martin Hayes",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "265621046",
@@ -170,7 +170,7 @@ extension ApprovedMusicLibrary {
         title: "Live In Seattle",
         artistName: "Dennis Cahill & Martin Hayes",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "264226209",
@@ -185,7 +185,7 @@ extension ApprovedMusicLibrary {
         title: "The Gloaming",
         artistName: "The Gloaming",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "767502122",
@@ -201,7 +201,7 @@ extension ApprovedMusicLibrary {
         title: "2",
         artistName: "The Gloaming",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1077568226",
@@ -217,7 +217,7 @@ extension ApprovedMusicLibrary {
         title: "Lake Effect",
         artistName: "Liz Carroll",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "265623654",
@@ -233,7 +233,7 @@ extension ApprovedMusicLibrary {
         title: "On the Offbeat",
         artistName: "Liz Carroll",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "731785393",
@@ -249,7 +249,7 @@ extension ApprovedMusicLibrary {
         title: "If the Cap Fits (Remastered)",
         artistName: "Kevin Burke",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1126907364",
@@ -265,7 +265,7 @@ extension ApprovedMusicLibrary {
         title: "In My Hands",
         artistName: "Natalie MacMaster",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1799239870",
@@ -281,7 +281,7 @@ extension ApprovedMusicLibrary {
         title: "Tromper Le Temps",
         artistName: "Le Vent du Nord",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1841433574",
@@ -297,7 +297,7 @@ extension ApprovedMusicLibrary {
         title: "Têtu",
         artistName: "Le Vent du Nord",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1841433532",
@@ -313,7 +313,7 @@ extension ApprovedMusicLibrary {
         title: "The Gap of Dreams",
         artistName: "Altan",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1345713711",
@@ -329,7 +329,7 @@ extension ApprovedMusicLibrary {
         title: "The Turning Tide",
         artistName: "Solas",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "353046724",
@@ -345,7 +345,7 @@ extension ApprovedMusicLibrary {
         title: "Some Strange Country",
         artistName: "Crooked Still",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1376942433",
@@ -361,7 +361,7 @@ extension ApprovedMusicLibrary {
         title: "Contented Must Be",
         artistName: "Bruce Molsky",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1457049742",
@@ -377,7 +377,7 @@ extension ApprovedMusicLibrary {
         title: "Outshine the Sun",
         artistName: "Foghorn Stringband",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "544499767",
@@ -393,7 +393,7 @@ extension ApprovedMusicLibrary {
         title: "Dot the Dragon's Eyes",
         artistName: "Hanneke Cassel",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "808948494",
@@ -409,7 +409,7 @@ extension ApprovedMusicLibrary {
         title: "Chasing Sparks",
         artistName: "Jeremy Kittel",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1786282480",
@@ -425,7 +425,7 @@ extension ApprovedMusicLibrary {
         title: "North",
         artistName: "Blazin' Fiddles",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
         trackIDs: [
           "1617775596",
@@ -441,7 +441,7 @@ extension ApprovedMusicLibrary {
         title: "All Hands",
         artistName: "Beòlach",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
         trackIDs: [
           "1823330674",
@@ -458,7 +458,7 @@ extension ApprovedMusicLibrary {
         id: "1501251736",
         name: "Lena Jonsson Trio & Lena Jonsson",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -484,7 +484,7 @@ extension ApprovedMusicLibrary {
         id: "64784615",
         name: "Väsen",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -510,7 +510,7 @@ extension ApprovedMusicLibrary {
         id: "273512071",
         name: "Groupa Med Lena Willemark",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -529,7 +529,7 @@ extension ApprovedMusicLibrary {
         id: "64812322",
         name: "Frifot",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -548,7 +548,7 @@ extension ApprovedMusicLibrary {
         id: "652246",
         name: "Alasdair Fraser & Natalie Haas",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -581,7 +581,7 @@ extension ApprovedMusicLibrary {
         id: "68316724",
         name: "Dennis Cahill & Martin Hayes",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -606,7 +606,7 @@ extension ApprovedMusicLibrary {
         id: "289089863",
         name: "The Gloaming",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -632,7 +632,7 @@ extension ApprovedMusicLibrary {
         id: "2614660",
         name: "Liz Carroll",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -658,7 +658,7 @@ extension ApprovedMusicLibrary {
         id: "27909953",
         name: "Kevin Burke",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -677,7 +677,7 @@ extension ApprovedMusicLibrary {
         id: "2678016",
         name: "Natalie MacMaster",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -696,7 +696,7 @@ extension ApprovedMusicLibrary {
         id: "73194550",
         name: "Le Vent du Nord",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
         isRootAllowed: true,
         albumIDs: [
@@ -722,7 +722,7 @@ extension ApprovedMusicLibrary {
         id: "652048",
         name: "Altan",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -741,7 +741,7 @@ extension ApprovedMusicLibrary {
         id: "73721590",
         name: "Solas",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -760,7 +760,7 @@ extension ApprovedMusicLibrary {
         id: "39338237",
         name: "Crooked Still",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -779,7 +779,7 @@ extension ApprovedMusicLibrary {
         id: "2468192",
         name: "Bruce Molsky",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -798,7 +798,7 @@ extension ApprovedMusicLibrary {
         id: "6306607",
         name: "Foghorn Stringband",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -817,7 +817,7 @@ extension ApprovedMusicLibrary {
         id: "73250452",
         name: "Hanneke Cassel",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -836,7 +836,7 @@ extension ApprovedMusicLibrary {
         id: "6091987",
         name: "Jeremy Kittel",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -855,7 +855,7 @@ extension ApprovedMusicLibrary {
         id: "372104300",
         name: "Blazin' Fiddles",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -874,7 +874,7 @@ extension ApprovedMusicLibrary {
         id: "254797848",
         name: "Beòlach",
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
         isRootAllowed: false,
         albumIDs: [
@@ -901,7 +901,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -914,7 +914,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -927,7 +927,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -940,7 +940,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -953,7 +953,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -966,7 +966,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/7b/8d/ee/7b8dee33-82f2-ec13-fa92-d5904e9915b8/194152231037.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -979,7 +979,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -992,7 +992,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1005,7 +1005,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1018,7 +1018,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1031,7 +1031,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1044,7 +1044,7 @@ extension ApprovedMusicLibrary {
           "1501251736",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8d/2a/de/8d2aded7-6ff7-0f92-8005-085449f4586e/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1057,7 +1057,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1070,7 +1070,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1083,7 +1083,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1096,7 +1096,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1109,7 +1109,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1122,7 +1122,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1135,7 +1135,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1148,7 +1148,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1161,7 +1161,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1174,7 +1174,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1187,7 +1187,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1200,7 +1200,7 @@ extension ApprovedMusicLibrary {
           "64784615",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1213,7 +1213,7 @@ extension ApprovedMusicLibrary {
           "273512071",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1226,7 +1226,7 @@ extension ApprovedMusicLibrary {
           "273512071",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1239,7 +1239,7 @@ extension ApprovedMusicLibrary {
           "273512071",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1252,7 +1252,7 @@ extension ApprovedMusicLibrary {
           "273512071",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1265,7 +1265,7 @@ extension ApprovedMusicLibrary {
           "273512071",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1278,7 +1278,7 @@ extension ApprovedMusicLibrary {
           "273512071",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/c5/8a/95/c58a956d-1116-bfad-fa46-2d08ba1ea7f7/dj.ynhzvvlg.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1291,7 +1291,7 @@ extension ApprovedMusicLibrary {
           "64812322",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1304,7 +1304,7 @@ extension ApprovedMusicLibrary {
           "64812322",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1317,7 +1317,7 @@ extension ApprovedMusicLibrary {
           "64812322",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1330,7 +1330,7 @@ extension ApprovedMusicLibrary {
           "64812322",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1343,7 +1343,7 @@ extension ApprovedMusicLibrary {
           "64812322",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1356,7 +1356,7 @@ extension ApprovedMusicLibrary {
           "64812322",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/60/de/53/60de531d-999b-e3ea-3bbb-de6fcf7e809a/dj.vemfnaju.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1369,7 +1369,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1382,7 +1382,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1395,7 +1395,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1408,7 +1408,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1421,7 +1421,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1434,7 +1434,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/ca/9b/bf/ca9bbff6-3bc1-cabf-cce4-006ed518b285/mzi.rntmujxz.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1447,7 +1447,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1460,7 +1460,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1473,7 +1473,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1486,7 +1486,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1499,7 +1499,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1512,7 +1512,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1525,7 +1525,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1538,7 +1538,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1551,7 +1551,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1564,7 +1564,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1577,7 +1577,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1590,7 +1590,7 @@ extension ApprovedMusicLibrary {
           "652246",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/a1/e0/cf/a1e0cfc3-46f9-d67c-d7a8-2a13a00c7ab0/755997012528.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1603,7 +1603,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1616,7 +1616,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1629,7 +1629,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1642,7 +1642,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1655,7 +1655,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1668,7 +1668,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/7c/cc/d1/mzi.lkdflxsw.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1681,7 +1681,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1694,7 +1694,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1707,7 +1707,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1720,7 +1720,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1733,7 +1733,7 @@ extension ApprovedMusicLibrary {
           "68316724",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/72/3c/88/mzi.gvdputxf.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1746,7 +1746,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1759,7 +1759,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1772,7 +1772,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1785,7 +1785,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1798,7 +1798,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1811,7 +1811,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/00/5d/6c/005d6c6b-aeb9-41c0-ad0f-10b0e2edd328/632662558768.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1824,7 +1824,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1837,7 +1837,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1850,7 +1850,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1863,7 +1863,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1876,7 +1876,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1889,7 +1889,7 @@ extension ApprovedMusicLibrary {
           "289089863",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music69/v4/e9/b6/86/e9b68616-59dd-f86a-4cd1-38df05675ca3/632662560235.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1902,7 +1902,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1915,7 +1915,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1928,7 +1928,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1941,7 +1941,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1954,7 +1954,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1967,7 +1967,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/c7/fd/db/mzi.umotolux.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1980,7 +1980,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -1993,7 +1993,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2006,7 +2006,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2019,7 +2019,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2032,7 +2032,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2045,7 +2045,7 @@ extension ApprovedMusicLibrary {
           "2614660",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/df/b9/b3/dfb9b343-2517-7c94-f559-133c7e5b87d4/884501979375.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2058,7 +2058,7 @@ extension ApprovedMusicLibrary {
           "27909953",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2071,7 +2071,7 @@ extension ApprovedMusicLibrary {
           "27909953",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2084,7 +2084,7 @@ extension ApprovedMusicLibrary {
           "27909953",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2097,7 +2097,7 @@ extension ApprovedMusicLibrary {
           "27909953",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2110,7 +2110,7 @@ extension ApprovedMusicLibrary {
           "27909953",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2123,7 +2123,7 @@ extension ApprovedMusicLibrary {
           "27909953",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music30/v4/86/f5/b3/86f5b3ee-d447-1bac-2bd9-423c74968142/766397302126-square_copy.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2136,7 +2136,7 @@ extension ApprovedMusicLibrary {
           "2678016",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2149,7 +2149,7 @@ extension ApprovedMusicLibrary {
           "2678016",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2162,7 +2162,7 @@ extension ApprovedMusicLibrary {
           "2678016",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2175,7 +2175,7 @@ extension ApprovedMusicLibrary {
           "2678016",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2188,7 +2188,7 @@ extension ApprovedMusicLibrary {
           "2678016",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2201,7 +2201,7 @@ extension ApprovedMusicLibrary {
           "2678016",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d7/b6/b4/d7b6b4c0-e34a-a106-39a6-7aa1b4477921/011661702523_cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2214,7 +2214,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2227,7 +2227,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2240,7 +2240,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2253,7 +2253,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2266,7 +2266,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2279,7 +2279,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d8/6b/16/d86b16cd-f693-2c9b-4cf5-9b9b13adaecb/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2292,7 +2292,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2305,7 +2305,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2318,7 +2318,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2331,7 +2331,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2344,7 +2344,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2357,7 +2357,7 @@ extension ApprovedMusicLibrary {
           "73194550",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1c/7a/79/1c7a799c-e773-cc91-0e87-9eb477cfe6fe/cover.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2370,7 +2370,7 @@ extension ApprovedMusicLibrary {
           "652048",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2383,7 +2383,7 @@ extension ApprovedMusicLibrary {
           "652048",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2396,7 +2396,7 @@ extension ApprovedMusicLibrary {
           "652048",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2409,7 +2409,7 @@ extension ApprovedMusicLibrary {
           "652048",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2422,7 +2422,7 @@ extension ApprovedMusicLibrary {
           "652048",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2435,7 +2435,7 @@ extension ApprovedMusicLibrary {
           "652048",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/ac/1d/d5/ac1dd5b8-be0d-4a91-316c-1b3230301cb8/679.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2448,7 +2448,7 @@ extension ApprovedMusicLibrary {
           "73721590",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2461,7 +2461,7 @@ extension ApprovedMusicLibrary {
           "73721590",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2474,7 +2474,7 @@ extension ApprovedMusicLibrary {
           "73721590",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2487,7 +2487,7 @@ extension ApprovedMusicLibrary {
           "73721590",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2500,7 +2500,7 @@ extension ApprovedMusicLibrary {
           "73721590",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2513,7 +2513,7 @@ extension ApprovedMusicLibrary {
           "73721590",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/2a/bb/00/2abb00cc-5b81-9d35-95d7-9da3f65d2875/mzi.ftntdnur.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2526,7 +2526,7 @@ extension ApprovedMusicLibrary {
           "39338237",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2539,7 +2539,7 @@ extension ApprovedMusicLibrary {
           "39338237",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2552,7 +2552,7 @@ extension ApprovedMusicLibrary {
           "39338237",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2565,7 +2565,7 @@ extension ApprovedMusicLibrary {
           "39338237",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2578,7 +2578,7 @@ extension ApprovedMusicLibrary {
           "39338237",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2591,7 +2591,7 @@ extension ApprovedMusicLibrary {
           "39338237",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/5c/75/76/5c75766d-aaa0-4946-fb6b-b711db72bcb6/Some_Strange_Country_3000x3000px.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2604,7 +2604,7 @@ extension ApprovedMusicLibrary {
           "2468192",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2617,7 +2617,7 @@ extension ApprovedMusicLibrary {
           "2468192",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2630,7 +2630,7 @@ extension ApprovedMusicLibrary {
           "2468192",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2643,7 +2643,7 @@ extension ApprovedMusicLibrary {
           "2468192",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2656,7 +2656,7 @@ extension ApprovedMusicLibrary {
           "2468192",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2669,7 +2669,7 @@ extension ApprovedMusicLibrary {
           "2468192",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/1b/8a/36/1b8a3639-61f7-b563-d0d1-4f5735c38347/00888072088757.rgb.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2682,7 +2682,7 @@ extension ApprovedMusicLibrary {
           "6306607",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2695,7 +2695,7 @@ extension ApprovedMusicLibrary {
           "6306607",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2708,7 +2708,7 @@ extension ApprovedMusicLibrary {
           "6306607",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2721,7 +2721,7 @@ extension ApprovedMusicLibrary {
           "6306607",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2734,7 +2734,7 @@ extension ApprovedMusicLibrary {
           "6306607",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2747,7 +2747,7 @@ extension ApprovedMusicLibrary {
           "6306607",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/d5/4d/6e/d54d6e24-24ef-1eec-079c-363eaa13e265/885767190191.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2760,7 +2760,7 @@ extension ApprovedMusicLibrary {
           "73250452",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2773,7 +2773,7 @@ extension ApprovedMusicLibrary {
           "73250452",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2786,7 +2786,7 @@ extension ApprovedMusicLibrary {
           "73250452",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2799,7 +2799,7 @@ extension ApprovedMusicLibrary {
           "73250452",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2812,7 +2812,7 @@ extension ApprovedMusicLibrary {
           "73250452",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2825,7 +2825,7 @@ extension ApprovedMusicLibrary {
           "73250452",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/75/cd/23/75cd23d9-dfd9-e589-577b-199a65222ee8/888295014083.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2838,7 +2838,7 @@ extension ApprovedMusicLibrary {
           "6091987",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2851,7 +2851,7 @@ extension ApprovedMusicLibrary {
           "6091987",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2864,7 +2864,7 @@ extension ApprovedMusicLibrary {
           "6091987",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2877,7 +2877,7 @@ extension ApprovedMusicLibrary {
           "6091987",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2890,7 +2890,7 @@ extension ApprovedMusicLibrary {
           "6091987",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2903,7 +2903,7 @@ extension ApprovedMusicLibrary {
           "6091987",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/94/53/9f/94539ff7-7290-4f0d-e025-23072e5e07c7/artwork.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2916,7 +2916,7 @@ extension ApprovedMusicLibrary {
           "372104300",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2929,7 +2929,7 @@ extension ApprovedMusicLibrary {
           "372104300",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2942,7 +2942,7 @@ extension ApprovedMusicLibrary {
           "372104300",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2955,7 +2955,7 @@ extension ApprovedMusicLibrary {
           "372104300",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2968,7 +2968,7 @@ extension ApprovedMusicLibrary {
           "372104300",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2981,7 +2981,7 @@ extension ApprovedMusicLibrary {
           "372104300",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0b/c0/9c/0bc09c8a-bc59-403f-4b3c-140a98d6f974/5052442011613.png/600x600bb.jpg",
         ),
       ),
       .init(
@@ -2994,7 +2994,7 @@ extension ApprovedMusicLibrary {
           "254797848",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -3007,7 +3007,7 @@ extension ApprovedMusicLibrary {
           "254797848",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -3020,7 +3020,7 @@ extension ApprovedMusicLibrary {
           "254797848",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -3033,7 +3033,7 @@ extension ApprovedMusicLibrary {
           "254797848",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -3046,7 +3046,7 @@ extension ApprovedMusicLibrary {
           "254797848",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
       ),
       .init(
@@ -3059,7 +3059,7 @@ extension ApprovedMusicLibrary {
           "254797848",
         ],
         artworkURL: URL(
-          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg"
+          string: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/68/eb/5868ebeb-9939-97c7-31f9-5cf243fd5867/118.jpg/600x600bb.jpg",
         ),
       ),
     ],

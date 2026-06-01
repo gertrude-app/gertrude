@@ -2,334 +2,333 @@ import Foundation
 import SwiftUI
 
 public struct NowPlayingScreenView: View {
-    private let title: String
-    private let artist: String
-    private let artworkURL: URL?
-    private let showsArtwork: Bool
-    private let artworkTransitionID: String?
-    private let isPlaying: Bool
-    private let progress: Double
-    private let duration: TimeInterval
-    private let onPlayPauseTap: @MainActor @Sendable () -> Void
-    private let onPreviousTap: @MainActor @Sendable () -> Void
-    private let onNextTap: @MainActor @Sendable () -> Void
-    private let onScrub: @MainActor @Sendable (TimeInterval) -> Void
+  private let title: String
+  private let artist: String
+  private let artworkURL: URL?
+  private let showsArtwork: Bool
+  private let artworkTransitionID: String?
+  private let isPlaying: Bool
+  private let progress: Double
+  private let duration: TimeInterval
+  private let onPlayPauseTap: @MainActor @Sendable () -> Void
+  private let onPreviousTap: @MainActor @Sendable () -> Void
+  private let onNextTap: @MainActor @Sendable () -> Void
+  private let onScrub: @MainActor @Sendable (TimeInterval) -> Void
 
-    public init(
-        title: String = "Josefin’s Waltz",
-        artist: String = "Alasdair Fraser & Natalie Haas",
-        artworkURL: URL? = URL(
-            string:
-                "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
-        ),
-        showsArtwork: Bool = true,
-        artworkTransitionID: String? = nil,
-        isPlaying: Bool = true,
-        progress: Double = 0.38,
-        duration: TimeInterval = 214,
-        onPlayPauseTap: @MainActor @escaping @Sendable () -> Void = {},
-        onPreviousTap: @MainActor @escaping @Sendable () -> Void = {},
-        onNextTap: @MainActor @escaping @Sendable () -> Void = {},
-        onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void = { _ in }
-    ) {
-        self.title = title
-        self.artist = artist
-        self.artworkURL = artworkURL
-        self.showsArtwork = showsArtwork
-        self.artworkTransitionID = artworkTransitionID
-        self.isPlaying = isPlaying
-        self.progress = progress
-        self.duration = duration
-        self.onPlayPauseTap = onPlayPauseTap
-        self.onPreviousTap = onPreviousTap
-        self.onNextTap = onNextTap
-        self.onScrub = onScrub
-    }
+  public init(
+    title: String = "Josefin’s Waltz",
+    artist: String = "Alasdair Fraser & Natalie Haas",
+    artworkURL: URL? = URL(
+      string:
+      "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
+    ),
+    showsArtwork: Bool = true,
+    artworkTransitionID: String? = nil,
+    isPlaying: Bool = true,
+    progress: Double = 0.38,
+    duration: TimeInterval = 214,
+    onPlayPauseTap: @MainActor @escaping @Sendable () -> Void = {},
+    onPreviousTap: @MainActor @escaping @Sendable () -> Void = {},
+    onNextTap: @MainActor @escaping @Sendable () -> Void = {},
+    onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void = { _ in },
+  ) {
+    self.title = title
+    self.artist = artist
+    self.artworkURL = artworkURL
+    self.showsArtwork = showsArtwork
+    self.artworkTransitionID = artworkTransitionID
+    self.isPlaying = isPlaying
+    self.progress = progress
+    self.duration = duration
+    self.onPlayPauseTap = onPlayPauseTap
+    self.onPreviousTap = onPreviousTap
+    self.onNextTap = onNextTap
+    self.onScrub = onScrub
+  }
 
-    public var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                Color.black
-                    .ignoresSafeArea()
+  public var body: some View {
+    GeometryReader { proxy in
+      ZStack {
+        Color.black
+          .ignoresSafeArea()
 
-                CachedArtworkImageView(
-                    url: self.showsArtwork ? self.artworkURL : nil
-                ) { image in
-                    image
-                        .resizable()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .scaleEffect(1.2)
-                        .clipped()
-                        .ignoresSafeArea()
-                        .blur(radius: 80)
-                        .opacity(0.7)
-                } placeholder: {
-                    Color.clear
-                        .frame(width: 100, height: 100)
-                }
-
-                VStack(spacing: 0) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(.white.opacity(0.3))
-                        .frame(width: 60, height: 4)
-
-                    Spacer(minLength: 18)
-
-                    self.artworkView(size: self.artworkSize(for: proxy.size))
-
-                    VStack(spacing: 4) {
-                        Text(self.title)
-                            .font(
-                                .system(
-                                    size: 24,
-                                    weight: .bold,
-                                    design: .rounded
-                                )
-                            )
-                            .foregroundStyle(.white)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-
-                        Text(self.artist)
-                            .font(
-                                .system(
-                                    size: 17,
-                                    weight: .semibold,
-                                    design: .rounded
-                                )
-                            )
-                            .foregroundStyle(.white.opacity(0.7))
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.top, 20)
-
-                    NowPlayingTransportControls(
-                        isPlaying: self.isPlaying,
-                        onPlayPauseTap: self.onPlayPauseTap,
-                        onPreviousTap: self.onPreviousTap,
-                        onNextTap: self.onNextTap
-                    )
-                    .padding(.top, 36)
-                    .padding(.bottom, 36)
-
-                    NowPlayingProgressBar(
-                        progress: self.progress,
-                        duration: self.duration,
-                        onScrub: self.onScrub
-                    )
-                    .padding(.horizontal, 2)
-
-                    Spacer(minLength: 22)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.horizontal, 32)
-                .padding(.vertical, 8)
-            }
+        CachedArtworkImageView(
+          url: self.showsArtwork ? self.artworkURL : nil,
+        ) { image in
+          image
+            .resizable()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .scaleEffect(1.2)
+            .clipped()
+            .ignoresSafeArea()
+            .blur(radius: 80)
+            .opacity(0.7)
+        } placeholder: {
+          Color.clear
+            .frame(width: 100, height: 100)
         }
-    }
 
-    @ViewBuilder
-    private func artworkView(size: CGFloat) -> some View {
-        let artwork = AlbumArtworkView(
-            artworkUrl: self.artworkURL,
-            showsArtwork: self.showsArtwork,
-            size: size,
-            cornerRadius: 34
-        )
-        #if os(iOS)
-            if let artworkTransitionID {
-                NowPlayingZoomRegisteredView(
-                    id: artworkTransitionID,
-                    role: .destination,
-                    cornerRadius: 34
-                ) {
-                    artwork
-                }
-                .frame(width: size, height: size)
-            } else {
-                artwork
-            }
-        #else
-            artwork
-        #endif
-    }
+        VStack(spacing: 0) {
+          RoundedRectangle(cornerRadius: 2)
+            .fill(.white.opacity(0.3))
+            .frame(width: 60, height: 4)
 
-    private func artworkSize(for size: CGSize) -> CGFloat {
-        min(330, max(210, min(size.width - 72, size.height * 0.43)))
-    }
+          Spacer(minLength: 18)
 
+          self.artworkView(size: self.artworkSize(for: proxy.size))
+
+          VStack(spacing: 4) {
+            Text(self.title)
+              .font(
+                .system(
+                  size: 24,
+                  weight: .bold,
+                  design: .rounded,
+                ),
+              )
+              .foregroundStyle(.white)
+              .multilineTextAlignment(.center)
+              .lineLimit(2)
+
+            Text(self.artist)
+              .font(
+                .system(
+                  size: 17,
+                  weight: .semibold,
+                  design: .rounded,
+                ),
+              )
+              .foregroundStyle(.white.opacity(0.7))
+              .multilineTextAlignment(.center)
+              .lineLimit(2)
+          }
+          .padding(.horizontal, 12)
+          .padding(.top, 20)
+
+          NowPlayingTransportControls(
+            isPlaying: self.isPlaying,
+            onPlayPauseTap: self.onPlayPauseTap,
+            onPreviousTap: self.onPreviousTap,
+            onNextTap: self.onNextTap,
+          )
+          .padding(.top, 36)
+          .padding(.bottom, 36)
+
+          NowPlayingProgressBar(
+            progress: self.progress,
+            duration: self.duration,
+            onScrub: self.onScrub,
+          )
+          .padding(.horizontal, 2)
+
+          Spacer(minLength: 22)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 32)
+        .padding(.vertical, 8)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func artworkView(size: CGFloat) -> some View {
+    let artwork = AlbumArtworkView(
+      artworkUrl: self.artworkURL,
+      showsArtwork: self.showsArtwork,
+      size: size,
+      cornerRadius: 34,
+    )
+    #if os(iOS)
+      if let artworkTransitionID {
+        NowPlayingZoomRegisteredView(
+          id: artworkTransitionID,
+          role: .destination,
+          cornerRadius: 34,
+        ) {
+          artwork
+        }
+        .frame(width: size, height: size)
+      } else {
+        artwork
+      }
+    #else
+      artwork
+    #endif
+  }
+
+  private func artworkSize(for size: CGSize) -> CGFloat {
+    min(330, max(210, min(size.width - 72, size.height * 0.43)))
+  }
 }
 
 private struct NowPlayingTransportControls: View {
-    let isPlaying: Bool
-    let onPlayPauseTap: @MainActor @Sendable () -> Void
-    let onPreviousTap: @MainActor @Sendable () -> Void
-    let onNextTap: @MainActor @Sendable () -> Void
+  let isPlaying: Bool
+  let onPlayPauseTap: @MainActor @Sendable () -> Void
+  let onPreviousTap: @MainActor @Sendable () -> Void
+  let onNextTap: @MainActor @Sendable () -> Void
 
-    var body: some View {
-        HStack(spacing: 34) {
-            NowPlayingSecondaryControlButton(
-                systemName: "backward.fill",
-                accessibilityLabel: "Previous",
-                action: self.onPreviousTap
-            )
+  var body: some View {
+    HStack(spacing: 34) {
+      NowPlayingSecondaryControlButton(
+        systemName: "backward.fill",
+        accessibilityLabel: "Previous",
+        action: self.onPreviousTap,
+      )
 
-            Button(action: self.onPlayPauseTap) {
-                Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
-                    .font(.system(size: 42, weight: .black))
-                    .foregroundStyle(.white)
-                    .frame(width: 58, height: 58)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(self.isPlaying ? "Pause" : "Play")
+      Button(action: self.onPlayPauseTap) {
+        Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
+          .font(.system(size: 42, weight: .black))
+          .foregroundStyle(.white)
+          .frame(width: 58, height: 58)
+          .contentShape(Circle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(self.isPlaying ? "Pause" : "Play")
 
-            NowPlayingSecondaryControlButton(
-                systemName: "forward.fill",
-                accessibilityLabel: "Next",
-                action: self.onNextTap
-            )
-        }
+      NowPlayingSecondaryControlButton(
+        systemName: "forward.fill",
+        accessibilityLabel: "Next",
+        action: self.onNextTap,
+      )
     }
+  }
 }
 
 private struct NowPlayingSecondaryControlButton: View {
-    let systemName: String
-    let accessibilityLabel: String
-    let action: @MainActor @Sendable () -> Void
+  let systemName: String
+  let accessibilityLabel: String
+  let action: @MainActor @Sendable () -> Void
 
-    var body: some View {
-        Button(action: self.action) {
-            Image(systemName: self.systemName)
-                .font(.system(size: 27, weight: .black))
-                .foregroundStyle(.white)
-                .frame(width: 58, height: 58)
-                .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(self.accessibilityLabel)
+  var body: some View {
+    Button(action: self.action) {
+      Image(systemName: self.systemName)
+        .font(.system(size: 27, weight: .black))
+        .foregroundStyle(.white)
+        .frame(width: 58, height: 58)
+        .contentShape(Circle())
     }
+    .buttonStyle(.plain)
+    .accessibilityLabel(self.accessibilityLabel)
+  }
 }
 
 private struct NowPlayingProgressBar: View {
-    let progress: Double
-    let duration: TimeInterval
-    let onScrub: @MainActor @Sendable (TimeInterval) -> Void
+  let progress: Double
+  let duration: TimeInterval
+  let onScrub: @MainActor @Sendable (TimeInterval) -> Void
 
-    @State private var scrubbedProgress: Double?
-    @State private var isScrubbing = false
+  @State private var scrubbedProgress: Double?
+  @State private var isScrubbing = false
 
-    var body: some View {
-        VStack(spacing: 9) {
-            GeometryReader { proxy in
-                ZStack(alignment: .center) {
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(.white.opacity(0.18))
+  var body: some View {
+    VStack(spacing: 9) {
+      GeometryReader { proxy in
+        ZStack(alignment: .center) {
+          ZStack(alignment: .leading) {
+            Capsule()
+              .fill(.white.opacity(0.18))
 
-                        Capsule()
-                            .fill(.white)
-                            .frame(width: proxy.size.width * self.displayedProgress)
-                    }
-                    .frame(height: 9)
-                    .clipShape(Capsule())
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .gesture(self.dragGesture(width: proxy.size.width))
-            }
-            .frame(height: 28)
-
-            HStack {
-                Text(self.formattedTime(self.elapsedTime))
-
-                Spacer(minLength: 12)
-
-                Text("-\(self.formattedTime(self.remainingTime))")
-            }
-            .font(.system(size: 12, weight: .semibold, design: .rounded))
-            .monospacedDigit()
-            .foregroundStyle(.white.opacity(0.7))
+            Capsule()
+              .fill(.white)
+              .frame(width: proxy.size.width * self.displayedProgress)
+          }
+          .frame(height: 9)
+          .clipShape(Capsule())
         }
-        .onChange(of: self.progress) { _, _ in
-            if !self.isScrubbing {
-                self.scrubbedProgress = nil
-            }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
+        .gesture(self.dragGesture(width: proxy.size.width))
+      }
+      .frame(height: 28)
+
+      HStack {
+        Text(self.formattedTime(self.elapsedTime))
+
+        Spacer(minLength: 12)
+
+        Text("-\(self.formattedTime(self.remainingTime))")
+      }
+      .font(.system(size: 12, weight: .semibold, design: .rounded))
+      .monospacedDigit()
+      .foregroundStyle(.white.opacity(0.7))
+    }
+    .onChange(of: self.progress) { _, _ in
+      if !self.isScrubbing {
+        self.scrubbedProgress = nil
+      }
+    }
+  }
+
+  private func dragGesture(width: CGFloat) -> some Gesture {
+    DragGesture(minimumDistance: 0)
+      .onChanged { value in
+        guard self.canScrub, width > 0 else { return }
+        let progress = self.progress(for: value.location.x, width: width)
+        self.isScrubbing = true
+        self.scrubbedProgress = progress
+        self.onScrub(self.time(for: progress))
+      }
+      .onEnded { value in
+        guard self.canScrub, width > 0 else {
+          self.isScrubbing = false
+          self.scrubbedProgress = nil
+          return
         }
-    }
+        let progress = self.progress(for: value.location.x, width: width)
+        self.scrubbedProgress = progress
+        self.onScrub(self.time(for: progress))
+        self.isScrubbing = false
+      }
+  }
 
-    private func dragGesture(width: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 0)
-            .onChanged { value in
-                guard self.canScrub, width > 0 else { return }
-                let progress = self.progress(for: value.location.x, width: width)
-                self.isScrubbing = true
-                self.scrubbedProgress = progress
-                self.onScrub(self.time(for: progress))
-            }
-            .onEnded { value in
-                guard self.canScrub, width > 0 else {
-                    self.isScrubbing = false
-                    self.scrubbedProgress = nil
-                    return
-                }
-                let progress = self.progress(for: value.location.x, width: width)
-                self.scrubbedProgress = progress
-                self.onScrub(self.time(for: progress))
-                self.isScrubbing = false
-            }
-    }
+  private var canScrub: Bool {
+    self.duration.isFinite && self.duration > 0
+  }
 
-    private var canScrub: Bool {
-        self.duration.isFinite && self.duration > 0
-    }
+  private var displayedProgress: Double {
+    self.scrubbedProgress ?? self.clampedProgress
+  }
 
-    private var displayedProgress: Double {
-        self.scrubbedProgress ?? self.clampedProgress
-    }
+  private var clampedProgress: Double {
+    min(1, max(0, self.progress))
+  }
 
-    private var clampedProgress: Double {
-        min(1, max(0, self.progress))
-    }
+  private var elapsedTime: TimeInterval {
+    max(0, self.duration) * self.displayedProgress
+  }
 
-    private var elapsedTime: TimeInterval {
-        max(0, self.duration) * self.displayedProgress
-    }
+  private var remainingTime: TimeInterval {
+    max(0, max(0, self.duration) - self.elapsedTime)
+  }
 
-    private var remainingTime: TimeInterval {
-        max(0, max(0, self.duration) - self.elapsedTime)
-    }
+  private func progress(for locationX: CGFloat, width: CGFloat) -> Double {
+    min(1, max(0, Double(locationX / width)))
+  }
 
-    private func progress(for locationX: CGFloat, width: CGFloat) -> Double {
-        min(1, max(0, Double(locationX / width)))
-    }
+  private func time(for progress: Double) -> TimeInterval {
+    max(0, self.duration) * min(1, max(0, progress))
+  }
 
-    private func time(for progress: Double) -> TimeInterval {
-        max(0, self.duration) * min(1, max(0, progress))
-    }
-
-    private func formattedTime(_ time: TimeInterval) -> String {
-        let rounded = max(0, Int(time.rounded()))
-        return "\(rounded / 60):\(String(format: "%02d", rounded % 60))"
-    }
+  private func formattedTime(_ time: TimeInterval) -> String {
+    let rounded = max(0, Int(time.rounded()))
+    return "\(rounded / 60):\(String(format: "%02d", rounded % 60))"
+  }
 }
 
 #Preview("Now playing") {
-    NowPlayingScreenView()
+  NowPlayingScreenView()
 }
 
 #Preview("Now playing paused") {
-    NowPlayingScreenView(isPlaying: false, progress: 0.62)
+  NowPlayingScreenView(isPlaying: false, progress: 0.62)
 }
 
 #Preview("Now playing no artwork") {
-    NowPlayingScreenView(
-        title: "A Long Tune Title That Wraps Gracefully",
-        artist: "Unknown Artist",
-        artworkURL: nil,
-        isPlaying: false,
-        progress: 0
-    )
+  NowPlayingScreenView(
+    title: "A Long Tune Title That Wraps Gracefully",
+    artist: "Unknown Artist",
+    artworkURL: nil,
+    isPlaying: false,
+    progress: 0,
+  )
 }

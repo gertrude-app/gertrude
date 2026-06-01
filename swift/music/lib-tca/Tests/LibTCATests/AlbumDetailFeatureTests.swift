@@ -17,7 +17,7 @@ struct AlbumDetailFeatureTests {
     await store.send(.playTapped)
     await store.receive(.delegate(.playAlbum(
       items: playbackItems(album: album, tracks: tracks),
-      startIndex: 0
+      startIndex: 0,
     )))
   }
 
@@ -34,7 +34,7 @@ struct AlbumDetailFeatureTests {
     await store.send(.trackTapped(track.id))
     await store.receive(.delegate(.playAlbum(
       items: playbackItems(album: album, tracks: tracks),
-      startIndex: 2
+      startIndex: 2,
     )))
   }
 
@@ -47,7 +47,7 @@ struct AlbumDetailFeatureTests {
       album: album,
       tracks: tracks,
       playStatus: .playing,
-      currentTrackID: tracks[1].id
+      currentTrackID: tracks[1].id,
     )) {
       AlbumDetailFeature()
     }
@@ -66,7 +66,7 @@ struct AlbumDetailFeatureTests {
       album: album,
       tracks: tracks,
       playStatus: .paused,
-      currentTrackID: track.id
+      currentTrackID: track.id,
     )) {
       AlbumDetailFeature()
     }
@@ -76,7 +76,7 @@ struct AlbumDetailFeatureTests {
   }
 
   @Test
-  func pausedSessionKeepsCurrentTrackWithoutPlaying() async {
+  func pausedSessionKeepsCurrentTrackWithoutPlaying() {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     let tracks = library.tracks(for: album)
@@ -87,8 +87,8 @@ struct AlbumDetailFeatureTests {
       currentItem: PlaybackItem(
         track: tracks[0],
         artworkURL: album.artworkURL,
-        allowsArtwork: album.showsArtwork
-      )
+        allowsArtwork: album.showsArtwork,
+      ),
     ))
 
     #expect(state.isPlaying == false)

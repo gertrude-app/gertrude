@@ -34,7 +34,7 @@ struct LibraryFeature: Sendable {
         state.status = .loading
         return .run { send in
           do {
-            await send(.approvedLibraryLoaded(try await self.approvedMusic.loadApprovedLibrary()))
+            try await send(.approvedLibraryLoaded(self.approvedMusic.loadApprovedLibrary()))
           } catch {
             await send(.approvedLibraryLoadFailed)
           }
@@ -70,10 +70,9 @@ struct LibraryFeature: Sendable {
   }
 
   private func albumDetail(_ albumID: ApprovedAlbum.ID, in state: State) -> AlbumDetailFeature
-    .State?
-  {
+    .State? {
     guard case .loaded(let library) = state.status,
-      let album = library.album(id: albumID)
+          let album = library.album(id: albumID)
     else { return nil }
 
     return .init(

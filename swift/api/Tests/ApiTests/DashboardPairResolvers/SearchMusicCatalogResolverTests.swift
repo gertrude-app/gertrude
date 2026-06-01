@@ -47,7 +47,12 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
     let highLimit = try await withDependencies {
       $0.appleMusic.searchAlbums = { search in
-        [.init(id: .init(rawValue: "1"), title: "Album", artistName: "Artist", trackCount: search.limit)]
+        [.init(
+          id: .init(rawValue: "1"),
+          title: "Album",
+          artistName: "Artist",
+          trackCount: search.limit,
+        )]
       }
     } operation: {
       try await SearchMusicCatalog.resolve(
@@ -58,7 +63,12 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
     let lowLimit = try await withDependencies {
       $0.appleMusic.searchAlbums = { search in
-        [.init(id: .init(rawValue: "1"), title: "Album", artistName: "Artist", trackCount: search.limit)]
+        [.init(
+          id: .init(rawValue: "1"),
+          title: "Album",
+          artistName: "Artist",
+          trackCount: search.limit,
+        )]
       }
     } operation: {
       try await SearchMusicCatalog.resolve(
@@ -75,7 +85,8 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
 
     let output = try await withDependencies {
-      $0.appleMusic.searchAlbums = { _ in throw SearchMusicCatalogResolverTestError.unexpectedSearch }
+      $0.appleMusic
+        .searchAlbums = { _ in throw SearchMusicCatalogResolverTestError.unexpectedSearch }
     } operation: {
       try await SearchMusicCatalog.resolve(
         with: .init(query: "   ", limit: 10),

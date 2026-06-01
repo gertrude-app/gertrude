@@ -63,11 +63,11 @@ import SwiftUI
   }
 
   public extension View {
-    func nowPlayingZoomPresentation<Presented: View>(
+    func nowPlayingZoomPresentation(
       isPresented: Binding<Bool>,
       panelSourceID: String,
       artworkID: String,
-      @ViewBuilder content: @escaping () -> Presented,
+      @ViewBuilder content: @escaping () -> some View,
     ) -> some View {
       self.background {
         NowPlayingZoomPresentationBridge(
@@ -213,7 +213,8 @@ import SwiftUI
       }
       guard
         let artworkSourceView = NowPlayingZoomRegistry.shared.sourceView(for: self.artworkID),
-        let artworkDestinationView = NowPlayingZoomRegistry.shared.destinationView(for: self.artworkID)
+        let artworkDestinationView = NowPlayingZoomRegistry.shared
+        .destinationView(for: self.artworkID)
       else {
         if attemptsRemaining > 0 {
           Task { @MainActor in
@@ -231,7 +232,10 @@ import SwiftUI
 
       let panelSourceView = NowPlayingZoomRegistry.shared.sourceView(for: self.panelSourceID)
       let artworkSourceFrame = artworkSourceView.convert(artworkSourceView.bounds, to: window)
-      let artworkDestinationFrame = artworkDestinationView.convert(artworkDestinationView.bounds, to: window)
+      let artworkDestinationFrame = artworkDestinationView.convert(
+        artworkDestinationView.bounds,
+        to: window,
+      )
       let panelSourceFrame = panelSourceView?.convert(panelSourceView?.bounds ?? .zero, to: window)
         ?? artworkSourceFrame.insetBy(dx: -16, dy: -8)
       guard
@@ -326,7 +330,8 @@ import SwiftUI
       }
       guard
         let artworkSourceView = NowPlayingZoomRegistry.shared.sourceView(for: self.artworkID),
-        let artworkDestinationView = NowPlayingZoomRegistry.shared.destinationView(for: self.artworkID),
+        let artworkDestinationView = NowPlayingZoomRegistry.shared
+        .destinationView(for: self.artworkID),
         let artworkSnapshot = artworkDestinationView.snapshotView(afterScreenUpdates: false)
       else {
         self.fadeOut(controller, updatesState: updatesState)
@@ -335,7 +340,10 @@ import SwiftUI
 
       let panelSourceView = NowPlayingZoomRegistry.shared.sourceView(for: self.panelSourceID)
       let artworkSourceFrame = artworkSourceView.convert(artworkSourceView.bounds, to: window)
-      let artworkDestinationFrame = artworkDestinationView.convert(artworkDestinationView.bounds, to: window)
+      let artworkDestinationFrame = artworkDestinationView.convert(
+        artworkDestinationView.bounds,
+        to: window,
+      )
       let panelSourceFrame = panelSourceView?.convert(panelSourceView?.bounds ?? .zero, to: window)
         ?? artworkSourceFrame.insetBy(dx: -16, dy: -8)
       guard
@@ -386,7 +394,8 @@ import SwiftUI
     }
 
     private func layout(_ controller: NowPlayingZoomHostingController) {
-      controller.view.frame = controller.view.window?.bounds ?? self.view.window?.bounds ?? UIScreen.main.bounds
+      controller.view.frame = controller.view.window?.bounds ?? self.view.window?.bounds ?? UIScreen
+        .main.bounds
       controller.view.setNeedsLayout()
       controller.view.layoutIfNeeded()
     }
@@ -514,7 +523,7 @@ import SwiftUI
 
     @available(*, unavailable)
     @MainActor
-    required dynamic init?(coder aDecoder: NSCoder) {
+    dynamic required init?(coder aDecoder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
   }
@@ -532,6 +541,7 @@ import SwiftUI
       self.layer.cornerCurve = .continuous
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
@@ -595,7 +605,8 @@ import SwiftUI
 
     func unregister(_ view: UIView) {
       self.sourceViews = self.sourceViews.filter { $0.value.view !== view && $0.value.view != nil }
-      self.destinationViews = self.destinationViews.filter { $0.value.view !== view && $0.value.view != nil }
+      self.destinationViews = self.destinationViews
+        .filter { $0.value.view !== view && $0.value.view != nil }
     }
 
     func sourceView(for id: String) -> UIView? {

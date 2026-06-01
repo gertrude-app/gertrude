@@ -141,7 +141,7 @@ extension PlaybackClient {
         while !Task.isCancelled {
           let player = ApplicationMusicPlayer.shared
           if let event = self.playbackEvent(
-            for: player.state.playbackStatus
+            for: player.state.playbackStatus,
           ), event != lastPlayStatusEvent {
             lastPlayStatusEvent = event
             continuation.yield(event)
@@ -152,8 +152,7 @@ extension PlaybackClient {
               continuation.yield(.currentItemChanged(currentItemID))
               #if os(iOS)
                 if PlaybackNowPlayingContext.shared.hidesArtwork,
-                   let item = PlaybackNowPlayingContext.shared.item(for: currentItemID)
-                {
+                   let item = PlaybackNowPlayingContext.shared.item(for: currentItemID) {
                   await self.updateNowPlayingInfo(for: item, hidesArtwork: true)
                 }
               #endif
@@ -211,11 +210,11 @@ extension PlaybackClient {
   }
 
   @MainActor
-  private static func playbackDuration(for entry: MusicKit.MusicPlayer.Queue.Entry?) -> TimeInterval? {
+  private static func playbackDuration(for entry: MusicKit.MusicPlayer.Queue
+    .Entry?) -> TimeInterval? {
     guard let entry else { return nil }
     if let startTime = entry.startTime,
-       let endTime = entry.endTime
-    {
+       let endTime = entry.endTime {
       let duration = endTime - startTime
       if duration.isFinite, duration > 0 {
         return duration
@@ -293,12 +292,11 @@ extension PlaybackClient {
       hidesArtwork: Bool,
     ) async {
       let loadedArtwork = if !hidesArtwork,
-        item.allowsArtwork,
-        let artworkURL = item.artworkURL
-      {
+                             item.allowsArtwork,
+                             let artworkURL = item.artworkURL {
         await self.artwork(for: artworkURL)
       } else {
-        Optional<LoadedArtwork>.none
+        LoadedArtwork?.none
       }
 
       MediaRemotePrivateClient.shared.setNowPlayingInfo(
@@ -375,7 +373,7 @@ extension PlaybackClient {
     private let handle: UnsafeMutableRawPointer?
 
     private init() {
-      handle = dlopen(
+      self.handle = dlopen(
         "/System/Library/PrivateFrameworks/MediaRemote.framework/MediaRemote",
         RTLD_NOW,
       )
@@ -420,7 +418,11 @@ extension PlaybackClient {
       self.set("kMRMediaRemoteNowPlayingInfoDuration", NSNumber(value: 0), in: &info)
       if let artwork {
         self.set("kMRMediaRemoteNowPlayingInfoArtworkData", artwork.data as NSData, in: &info)
-        self.set("kMRMediaRemoteNowPlayingInfoArtworkMIMEType", artwork.mimeType as NSString, in: &info)
+        self.set(
+          "kMRMediaRemoteNowPlayingInfoArtworkMIMEType",
+          artwork.mimeType as NSString,
+          in: &info,
+        )
       }
 
       typealias Function = @convention(c) (CFDictionary) -> Void

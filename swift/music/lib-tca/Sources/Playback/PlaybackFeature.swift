@@ -105,7 +105,7 @@ struct PlaybackFeature: Sendable {
       self.init(
         playStatus: playStatus,
         albumQueue: .init(items: [currentItem]),
-        progress: progress
+        progress: progress,
       )
     }
   }
