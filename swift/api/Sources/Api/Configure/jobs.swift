@@ -9,7 +9,7 @@ public extension Configure {
     app.queues.schedule(CleanupJob()).daily().at(2, 30, .am)
     app.queues.schedule(SubscriptionManager()).daily().at(6, 30, .am)
     app.queues.schedule(DiskSpaceJob()).hourly().at(0)
-    app.queues.schedule(AutomatedMarketingJob()).hourly().at(15)
+    app.queues.schedule(ScheduledMarketingCampaignJob()).hourly().at(15)
     app.queues.schedule(CrashReporterJob()).hourly().at(25)
 
     // sync job runs twice hourly to preserve inferred new rating granularity

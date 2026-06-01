@@ -5,19 +5,19 @@ import XExpect
 
 @testable import Api
 
-final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
+final class MarketingCampaignRunnerTests: ApiTestCase, @unchecked Sendable {
   func testPrepareRecipientsSeparatesAlreadySentFromToSend() {
     let parent1 = Parent.Id(UUID())
     let parent2 = Parent.Id(UUID())
     let parent3 = Parent.Id(UUID())
     let audience = [
-      AutomatedMarketingRecipient(parentId: parent1, email: "one@example.com"),
-      AutomatedMarketingRecipient(parentId: parent2, email: "two@example.com"),
-      AutomatedMarketingRecipient(parentId: parent3, email: "three@example.com"),
+      MarketingCampaignRecipient(parentId: parent1, email: "one@example.com"),
+      MarketingCampaignRecipient(parentId: parent2, email: "two@example.com"),
+      MarketingCampaignRecipient(parentId: parent3, email: "three@example.com"),
     ]
     let priorSends = [MarketingEmailSend(parentId: parent2, campaign: "test_campaign")]
 
-    let prepared = prepareAutomatedMarketingRecipients(
+    let prepared = prepareMarketingCampaignRecipients(
       audience: audience,
       priorSends: priorSends,
     )
@@ -30,19 +30,19 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
   func testPrepareRecipientsDeduplicatesAudienceByParentKeepingFirst() {
     let parent = Parent.Id(UUID())
     let audience = [
-      AutomatedMarketingRecipient(
+      MarketingCampaignRecipient(
         parentId: parent,
         email: "first@example.com",
         templateModel: ["version": "first"],
       ),
-      AutomatedMarketingRecipient(
+      MarketingCampaignRecipient(
         parentId: parent,
         email: "second@example.com",
         templateModel: ["version": "second"],
       ),
     ]
 
-    let prepared = prepareAutomatedMarketingRecipients(
+    let prepared = prepareMarketingCampaignRecipients(
       audience: audience,
       priorSends: [],
     )
@@ -57,7 +57,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
     let slug = "test_automated_marketing_dry_run"
     let parent1 = try await self.parent()
     let parent2 = try await self.parent()
-    let campaign = TestAutomatedMarketingCampaign(
+    let campaign = TestMarketingCampaign(
       slug: slug,
       recipients: [
         .init(parentId: parent1.id, email: parent1.email),
@@ -69,7 +69,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
       campaign: slug,
     ))
 
-    let result = try await AutomatedMarketingRunner().dryRun(campaign)
+    let result = try await MarketingCampaignRunner().dryRun(campaign)
 
     expect(result).toEqual(.init(
       campaign: slug,
@@ -83,12 +83,65 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
     ))
   }
 
+  func testDryRunLimitOnlyLimitsToSendList() async throws {
+    let slug = "test_marketing_campaign_dry_run_limit"
+    let parent1 = try await self.parent()
+    let parent2 = try await self.parent()
+    let parent3 = try await self.parent()
+    let campaign = TestMarketingCampaign(
+      slug: slug,
+      recipients: [
+        .init(parentId: parent1.id, email: parent1.email),
+        .init(parentId: parent2.id, email: parent2.email),
+        .init(parentId: parent3.id, email: parent3.email),
+      ],
+    )
+
+    let result = try await MarketingCampaignRunner().dryRun(campaign, limit: 2)
+
+    expect(result.audienceSize).toEqual(3)
+    expect(result.eligible).toEqual(3)
+    expect(result.toSend).toEqual([parent1.email.rawValue, parent2.email.rawValue])
+  }
+
+  func testSendHonorsLimit() async throws {
+    let slug = "test_marketing_campaign_send_limit"
+    let parent1 = try await self.parent()
+    let parent2 = try await self.parent()
+    let parent3 = try await self.parent()
+    let campaign = TestMarketingCampaign(
+      slug: slug,
+      recipients: [
+        .init(parentId: parent1.id, email: parent1.email),
+        .init(parentId: parent2.id, email: parent2.email),
+        .init(parentId: parent3.id, email: parent3.email),
+      ],
+    )
+
+    let result = try await withDependencies {
+      $0.postmark._sendTemplateEmailBatch = { @Sendable emails in
+        self.sent.emails.append(contentsOf: emails)
+        return .success(emails.map { _ in .success(()) })
+      }
+    } operation: {
+      try await MarketingCampaignRunner().send(campaign, limit: 2)
+    }
+
+    expect(result.audienceSize).toEqual(3)
+    expect(result.eligible).toEqual(3)
+    expect(result.sent).toEqual(2)
+    expect(result.failed).toEqual(0)
+    expect(result.toSend).toEqual([parent1.email.rawValue, parent2.email.rawValue])
+    expect(self.sent.emails.map(\.to)).toEqual([parent1.email.rawValue, parent2.email.rawValue])
+    await expect(try self.sends(for: slug).map(\.parentId)).toEqual([parent1.id, parent2.id])
+  }
+
   func testSendUsesMarketingBatchAndRecordsSuccessfulSends() async throws {
     let slug = "test_automated_marketing_send"
     let parent1 = try await self.parent()
     let parent2 = try await self.parent()
     let parent3 = try await self.parent()
-    let campaign = TestAutomatedMarketingCampaign(
+    let campaign = TestMarketingCampaign(
       slug: slug,
       templateAlias: "test-template-send",
       from: "Jared from Gertrude <jared@gertrude.app>",
@@ -110,7 +163,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await AutomatedMarketingRunner().send(campaign)
+      try await MarketingCampaignRunner().send(campaign)
     }
 
     expect(result).toEqual(.init(
@@ -151,7 +204,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
     let slug = "test_automated_marketing_partial_failure"
     let parent1 = try await self.parent()
     let parent2 = try await self.parent()
-    let campaign = TestAutomatedMarketingCampaign(
+    let campaign = TestMarketingCampaign(
       slug: slug,
       recipients: [
         .init(parentId: parent1.id, email: parent1.email),
@@ -168,7 +221,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
         ])
       }
     } operation: {
-      try await AutomatedMarketingRunner().send(campaign)
+      try await MarketingCampaignRunner().send(campaign)
     }
 
     expect(result.sent).toEqual(1)
@@ -183,7 +236,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
       Parent.random(with: { $0.email = "chunked-\(index)@example.com" })
     }
     try await self.db.create(parents)
-    let campaign = TestAutomatedMarketingCampaign(
+    let campaign = TestMarketingCampaign(
       slug: slug,
       recipients: parents.map { .init(parentId: $0.id, email: $0.email) },
     )
@@ -200,7 +253,7 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
         }
       }
     } operation: {
-      try await AutomatedMarketingRunner().send(campaign)
+      try await MarketingCampaignRunner().send(campaign)
     }
 
     expect(result.audienceSize).toEqual(501)
@@ -219,14 +272,14 @@ final class AutomatedMarketingRunnerTests: ApiTestCase, @unchecked Sendable {
   }
 }
 
-private struct TestAutomatedMarketingCampaign: AutomatedMarketingCampaign {
+private struct TestMarketingCampaign: MarketingCampaign {
   var slug: String
   var templateAlias = "test-template"
   var from = "Gertrude App <noreply@gertrude.app>"
   var replyTo: String?
-  var recipients: [AutomatedMarketingRecipient]
+  var recipients: [MarketingCampaignRecipient]
 
-  func audience(in db: any DuetSQL.Client) async throws -> [AutomatedMarketingRecipient] {
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
     self.recipients
   }
 }

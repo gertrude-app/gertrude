@@ -1,7 +1,7 @@
 import Dependencies
 import Vapor
 
-public struct AutomatedMarketingDryRunCommand: AsyncCommand {
+public struct ScheduledMarketingCampaignDryRunCommand: AsyncCommand {
   public struct Signature: CommandSignature {
     public init() {}
   }
@@ -9,13 +9,13 @@ public struct AutomatedMarketingDryRunCommand: AsyncCommand {
   public init() {}
 
   public var help: String {
-    "Dry-run automated marketing campaigns without sending emails or recording sends"
+    "Dry-run scheduled marketing campaigns without sending emails or recording sends"
   }
 
   public func run(using context: CommandContext, signature: Signature) async throws {
     @Dependency(\.env) var env
-    for campaign in automatedMarketingCampaigns(env: env) {
-      let result = try await AutomatedMarketingRunner().dryRun(campaign)
+    for campaign in scheduledMarketingCampaigns(env: env) {
+      let result = try await MarketingCampaignRunner().dryRun(campaign)
       context.console.print("campaign: \(result.campaign)")
       context.console.print("audience: \(result.audienceSize)")
       context.console.print("already sent: \(result.alreadySent)")

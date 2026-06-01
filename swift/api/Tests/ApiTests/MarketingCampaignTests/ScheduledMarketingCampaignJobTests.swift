@@ -6,10 +6,10 @@ import XExpect
 
 @testable import Api
 
-final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
+final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable {
   func testTickContinuesAfterCampaignFailure() async throws {
     let parent = try await self.parent()
-    let successful = SuccessfulAutomatedMarketingCampaign(
+    let successful = SuccessfulMarketingCampaign(
       parentId: parent.id,
       email: parent.email,
     )
@@ -20,8 +20,8 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await AutomatedMarketingJob().tick(campaigns: [
-        FailingAutomatedMarketingCampaign(),
+      try await ScheduledMarketingCampaignJob().tick(campaigns: [
+        FailingMarketingCampaign(),
         successful,
       ])
     }
@@ -55,7 +55,7 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await AutomatedMarketingJob().tick()
+      try await ScheduledMarketingCampaignJob().tick()
     }
 
     let result = try XCTUnwrap(results.first { $0.campaign == "mac_setup_24h" })
@@ -83,7 +83,7 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
   }
 
   private func markCurrentAudienceAsAlreadySent(
-    _ campaign: any AutomatedMarketingCampaign,
+    _ campaign: any MarketingCampaign,
   ) async throws {
     let audience = try await campaign.audience(in: self.db)
     let prior = try await MarketingEmailSend.query()
@@ -109,23 +109,23 @@ final class AutomatedMarketingJobTests: ApiTestCase, @unchecked Sendable {
   }
 }
 
-private struct FailingAutomatedMarketingCampaign: AutomatedMarketingCampaign {
+private struct FailingMarketingCampaign: MarketingCampaign {
   let slug = "failing_campaign"
   let templateAlias = "failing-template"
 
-  func audience(in db: any DuetSQL.Client) async throws -> [AutomatedMarketingRecipient] {
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
     throw TestCampaignError()
   }
 }
 
-private struct SuccessfulAutomatedMarketingCampaign: AutomatedMarketingCampaign {
+private struct SuccessfulMarketingCampaign: MarketingCampaign {
   let slug = "healthy_campaign"
   let templateAlias = "healthy-template"
   let parentId: Parent.Id
   let email: EmailAddress
 
-  func audience(in db: any DuetSQL.Client) async throws -> [AutomatedMarketingRecipient] {
-    [AutomatedMarketingRecipient(parentId: self.parentId, email: self.email)]
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
+    [MarketingCampaignRecipient(parentId: self.parentId, email: self.email)]
   }
 }
 

@@ -40,8 +40,8 @@ api-build:
 api-test *args:
   @cd swift && just api-test {{args}}
 
-automated-marketing-dry-run:
-  @cd swift && just automated-marketing-dry-run
+scheduled-marketing-dry-run:
+  @cd swift && just scheduled-marketing-dry-run
 
 fix:
   @cd swift && just fix
