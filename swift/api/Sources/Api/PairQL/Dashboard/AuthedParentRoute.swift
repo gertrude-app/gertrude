@@ -24,6 +24,7 @@ enum AuthedParentRoute: PairRoute {
   case getUnlockRequests
   case getChild(GetChild.Input)
   case getChildren
+  case searchMusicCatalog(SearchMusicCatalog.Input)
   case getApprovedMusicAlbums(GetApprovedMusicAlbums.Input)
   case approveMusicAlbum(ApproveMusicAlbum.Input)
   case removeApprovedMusicAlbum(RemoveApprovedMusicAlbum.Input)
@@ -147,6 +148,10 @@ extension AuthedParentRoute {
         }
         Route(.case(Self.getChildren)) {
           Operation(GetChildren.self)
+        }
+        Route(.case(Self.searchMusicCatalog)) {
+          Operation(SearchMusicCatalog.self)
+          Body(.dashboardInput(SearchMusicCatalog.self))
         }
         Route(.case(Self.getApprovedMusicAlbums)) {
           Operation(GetApprovedMusicAlbums.self)
@@ -318,6 +323,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getChildren:
       let output = try await GetChildren.resolve(in: context)
+      return try await self.respond(with: output)
+    case .searchMusicCatalog(let input):
+      let output = try await SearchMusicCatalog.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getApprovedMusicAlbums(let input):
       let output = try await GetApprovedMusicAlbums.resolve(with: input, in: context)
