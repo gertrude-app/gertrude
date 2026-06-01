@@ -109,6 +109,7 @@ public struct ZoomableAlbumArtworkView: View {
       self.isUserInteractionEnabled = false
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
@@ -121,7 +122,7 @@ public struct ZoomableAlbumArtworkView: View {
     ) {
       let content = AnyView(
         AlbumArtworkView(album: album, size: size, cornerRadius: cornerRadius)
-          .environment(\.colorScheme, colorScheme)
+          .environment(\.colorScheme, colorScheme),
       )
 
       if let hostingController {
@@ -169,17 +170,17 @@ public struct ZoomableAlbumArtworkView: View {
     var onResolve: ((UINavigationController?) -> Void)?
     private weak var resolvedNavigationController: UINavigationController?
 
-    public override func viewDidLoad() {
+    override public func viewDidLoad() {
       super.viewDidLoad()
       self.view.backgroundColor = .clear
     }
 
-    public override func viewDidAppear(_ animated: Bool) {
+    override public func viewDidAppear(_ animated: Bool) {
       super.viewDidAppear(animated)
       self.resolve()
     }
 
-    public override func didMove(toParent parent: UIViewController?) {
+    override public func didMove(toParent parent: UIViewController?) {
       super.didMove(toParent: parent)
       self.resolve()
     }
@@ -210,7 +211,8 @@ public struct ZoomableAlbumArtworkView: View {
     override func viewDidDisappear(_ animated: Bool) {
       super.viewDidDisappear(animated)
       guard !self.didPop else { return }
-      guard self.isMovingFromParent || self.navigationController?.viewControllers.contains(self) != true else {
+      guard self.isMovingFromParent || self.navigationController?.viewControllers
+        .contains(self) != true else {
         return
       }
       self.didPop = true
@@ -219,7 +221,7 @@ public struct ZoomableAlbumArtworkView: View {
 
     @available(*, unavailable)
     @MainActor
-    required dynamic init?(coder aDecoder: NSCoder) {
+    dynamic required init?(coder aDecoder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
   }
@@ -227,17 +229,16 @@ public struct ZoomableAlbumArtworkView: View {
   public enum AlbumDetailZoomPusher {
     @discardableResult
     @MainActor
-    public static func push<Content: View>(
+    public static func push(
       pushID: String,
       transitionSourceID: String?,
-      rootView: Content,
+      rootView: some View,
       in navigationController: UINavigationController?,
       onPop: @MainActor @escaping () -> Void,
     ) -> Bool {
       guard let navigationController else { return false }
       if let topDetail = navigationController.topViewController as? AlbumDetailHostingController,
-         topDetail.pushID == pushID
-      {
+         topDetail.pushID == pushID {
         return true
       }
 
@@ -254,10 +255,14 @@ public struct ZoomableAlbumArtworkView: View {
         options.alignmentRectProvider = { context in
           MainActor.assumeIsolated {
             context.zoomedViewController.view.layoutIfNeeded()
-            guard let destinationView = AlbumArtworkZoomRegistry.shared.destinationView(for: transitionID) else {
+            guard let destinationView = AlbumArtworkZoomRegistry.shared
+              .destinationView(for: transitionID) else {
               return .null
             }
-            return destinationView.convert(destinationView.bounds, to: context.zoomedViewController.view)
+            return destinationView.convert(
+              destinationView.bounds,
+              to: context.zoomedViewController.view,
+            )
           }
         }
 
@@ -292,7 +297,8 @@ public struct ZoomableAlbumArtworkView: View {
 
     func unregister(_ view: UIView) {
       self.sourceViews = self.sourceViews.filter { $0.value.view !== view && $0.value.view != nil }
-      self.destinationViews = self.destinationViews.filter { $0.value.view !== view && $0.value.view != nil }
+      self.destinationViews = self.destinationViews
+        .filter { $0.value.view !== view && $0.value.view != nil }
     }
 
     func sourceView(for id: String) -> UIView? {

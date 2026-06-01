@@ -47,7 +47,7 @@ public struct LibraryView: View {
         title: "No albums yet",
         message: "Approved albums will appear here after a parent adds them in Gertrude.",
         systemImage: "rectangle.stack",
-        buttonTitle: "Check again"
+        buttonTitle: "Check again",
       )
 
     case .failed:
@@ -55,7 +55,7 @@ public struct LibraryView: View {
         title: "Couldn’t load albums",
         message: "Check your connection and try again.",
         systemImage: "wifi.exclamationmark",
-        buttonTitle: "Try again"
+        buttonTitle: "Try again",
       )
     }
   }

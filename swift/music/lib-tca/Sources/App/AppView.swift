@@ -43,7 +43,7 @@ struct AppView: View {
 
   private var libraryView: some View {
     LibraryViewContainer(
-      store: self.store.scope(state: \.library, action: \.library)
+      store: self.store.scope(state: \.library, action: \.library),
     )
   }
 
@@ -54,7 +54,8 @@ struct AppView: View {
       return NowPlayingAccessoryView(
         title: session?.currentItem.title ?? "Not Playing",
         artist: session?.currentItem.artistName ?? "Choose an approved track",
-        artworkURL: session?.currentItem.allowsArtwork == true ? session?.currentItem.artworkURL : nil,
+        artworkURL: session?.currentItem.allowsArtwork == true ? session?.currentItem
+          .artworkURL : nil,
         isPlaying: session?.isPlaying ?? false,
         isEnabled: session != nil,
         foregroundColor: self.nowPlayingForegroundColor,
@@ -71,7 +72,7 @@ struct AppView: View {
         },
         onNextTap: {
           self.store.send(.playback(.skipToNext))
-        }
+        },
       )
     }
 
@@ -113,7 +114,7 @@ struct AppView: View {
           },
           onScrub: { time in
             self.store.send(.playback(.seek(time)))
-          }
+          },
         )
       } else {
         NowPlayingScreenView(
@@ -124,7 +125,7 @@ struct AppView: View {
           artworkTransitionID: self.nowPlayingArtworkTransitionID,
           isPlaying: false,
           progress: 0,
-          duration: 0
+          duration: 0,
         )
       }
     }
@@ -133,7 +134,7 @@ struct AppView: View {
   private var nowPlayingPresented: Binding<Bool> {
     Binding(
       get: { self.store.isNowPlayingPresented },
-      set: { self.store.send(.nowPlayingPresentationChanged($0)) }
+      set: { self.store.send(.nowPlayingPresentationChanged($0)) },
     )
   }
 }

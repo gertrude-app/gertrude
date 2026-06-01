@@ -60,7 +60,7 @@ private struct AlbumShelfSkeletonView: View {
   var body: some View {
     ScrollView(.horizontal) {
       LazyHStack(alignment: .top, spacing: 16) {
-        ForEach(0..<5, id: \.self) { _ in
+        ForEach(0 ..< 5, id: \.self) { _ in
           VStack(alignment: .leading, spacing: 10) {
             SkeletonBlock(width: 148, height: 148, cornerRadius: 20)
 

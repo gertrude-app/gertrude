@@ -3,9 +3,11 @@ import SwiftUI
 
 #if os(iOS)
   import UIKit
+
   typealias PlatformArtworkImage = UIImage
 #elseif os(macOS)
   import AppKit
+
   typealias PlatformArtworkImage = NSImage
 #endif
 
@@ -94,7 +96,8 @@ struct CachedArtworkImageView<Content: View, Placeholder: View>: View {
       return
     }
 
-    guard let image = await ArtworkImageCache.shared.image(for: url), !Task.isCancelled else { return }
+    guard let image = await ArtworkImageCache.shared.image(for: url),
+          !Task.isCancelled else { return }
     self.loadedArtwork = .init(url: url, image: image)
   }
 }

@@ -32,7 +32,7 @@ import SwiftUI
       artist: String = "Alasdair Fraser & Natalie Haas",
       artworkURL: URL? = URL(
         string:
-          "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+        "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
       ),
       isPlaying: Bool = false,
       isEnabled: Bool = true,
@@ -63,8 +63,8 @@ import SwiftUI
     public var body: some View {
       self.withPanelTransitionSource(
         self.accessoryContent
-          .environment(\.backgroundMaterial, Optional<Material>.none)
-          .animation(.snappy(duration: 0.24), value: self.placement)
+          .environment(\.backgroundMaterial, Material?.none)
+          .animation(.snappy(duration: 0.24), value: self.placement),
       )
     }
 
@@ -85,7 +85,10 @@ import SwiftUI
       )
       if self.showsGlassBackground {
         content
-          .glassEffect(.regular.interactive(), in: .rect(cornerRadius: self.panelCornerRadius, style: .continuous))
+          .glassEffect(
+            .regular.interactive(),
+            in: .rect(cornerRadius: self.panelCornerRadius, style: .continuous),
+          )
       } else {
         content
       }
@@ -111,7 +114,7 @@ import SwiftUI
     }
 
     @ViewBuilder
-    private func withPanelTransitionSource<Content: View>(_ content: Content) -> some View {
+    private func withPanelTransitionSource(_ content: some View) -> some View {
       if let panelTransitionID {
         NowPlayingZoomRegisteredView(
           id: panelTransitionID,
@@ -164,7 +167,7 @@ import SwiftUI
               url: self.artworkURL,
               size: 32,
               cornerRadius: 7,
-              transitionID: self.artworkTransitionID
+              transitionID: self.artworkTransitionID,
             )
             NowPlayingAccessoryText(
               title: self.title,
@@ -212,7 +215,7 @@ import SwiftUI
               url: self.artworkURL,
               size: 30,
               cornerRadius: 7,
-              transitionID: self.artworkTransitionID
+              transitionID: self.artworkTransitionID,
             )
             NowPlayingAccessoryText(
               title: self.title,
@@ -352,7 +355,7 @@ import SwiftUI
       artist: "Alasdair Fraser & Natalie Haas",
       artworkURL: URL(
         string:
-          "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+        "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
       ),
       artworkTransitionID: nil,
       isPlaying: true,
@@ -373,7 +376,7 @@ import SwiftUI
       artist: "Alasdair Fraser & Natalie Haas",
       artworkURL: URL(
         string:
-          "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg"
+        "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
       ),
       artworkTransitionID: nil,
       isPlaying: false,

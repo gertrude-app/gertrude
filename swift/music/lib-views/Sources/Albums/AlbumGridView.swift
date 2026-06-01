@@ -66,7 +66,7 @@ struct AlbumGridView: View {
 
   private func loadingGrid(containerWidth: CGFloat) -> some View {
     LazyVGrid(columns: self.columns, alignment: .leading, spacing: 24) {
-      ForEach(0..<6, id: \.self) { _ in
+      ForEach(0 ..< 6, id: \.self) { _ in
         VStack(alignment: .leading, spacing: 10) {
           SkeletonBlock(
             width: self.artworkSize(for: containerWidth),

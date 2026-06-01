@@ -66,7 +66,7 @@ private struct TrackShelfSkeletonView: View {
   var body: some View {
     ScrollView(.horizontal) {
       LazyHGrid(rows: self.rows, alignment: .top, spacing: 14) {
-        ForEach(0..<10, id: \.self) { index in
+        ForEach(0 ..< 10, id: \.self) { index in
           TrackRowSkeletonView(titleWidth: index.isMultiple(of: 2) ? 178 : 132)
         }
       }
