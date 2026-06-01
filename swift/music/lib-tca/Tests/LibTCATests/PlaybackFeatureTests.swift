@@ -7,7 +7,7 @@ import Testing
 @MainActor
 struct PlaybackFeatureTests {
   @Test
-  func startsWithoutSession() async {
+  func startsWithoutSession() {
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     }
@@ -131,7 +131,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 0),
-      progress: .init(elapsedTime: 40, duration: 180)
+      progress: .init(elapsedTime: 40, duration: 180),
     ))) {
       PlaybackFeature()
     }
@@ -147,7 +147,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 0),
-      progress: .init(elapsedTime: 40, duration: 180)
+      progress: .init(elapsedTime: 40, duration: 180),
     ))) {
       PlaybackFeature()
     }
@@ -160,7 +160,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 0),
-      progress: .init(elapsedTime: 40, duration: 180)
+      progress: .init(elapsedTime: 40, duration: 180),
     ))) {
       PlaybackFeature()
     }
@@ -196,7 +196,7 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init(session: .init(
       playStatus: .paused,
-      currentItem: item
+      currentItem: item,
     ))) {
       PlaybackFeature()
     }
@@ -224,7 +224,7 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init(session: .init(
       playStatus: .paused,
-      currentItem: item
+      currentItem: item,
     ))) {
       PlaybackFeature()
     }
@@ -240,7 +240,7 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init(session: .init(
       currentItem: item,
-      progress: .init(elapsedTime: 10, duration: 180)
+      progress: .init(elapsedTime: 10, duration: 180),
     ))) {
       PlaybackFeature()
     }
@@ -255,7 +255,7 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init(session: .init(
       currentItem: item,
-      progress: .init(elapsedTime: 10, duration: 180)
+      progress: .init(elapsedTime: 10, duration: 180),
     ))) {
       PlaybackFeature()
     }
@@ -271,7 +271,7 @@ struct PlaybackFeatureTests {
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 0),
-      progress: .init(elapsedTime: 42, duration: 180)
+      progress: .init(elapsedTime: 42, duration: 180),
     ))) {
       PlaybackFeature()
     } withDependencies: {
@@ -294,7 +294,7 @@ struct PlaybackFeatureTests {
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
       currentItem: item,
-      progress: .init(elapsedTime: 42, duration: 180)
+      progress: .init(elapsedTime: 42, duration: 180),
     ))) {
       PlaybackFeature()
     } withDependencies: {
@@ -316,7 +316,7 @@ struct PlaybackFeatureTests {
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 1),
-      progress: .init(elapsedTime: 4, duration: 180)
+      progress: .init(elapsedTime: 4, duration: 180),
     ))) {
       PlaybackFeature()
     } withDependencies: {
@@ -338,7 +338,7 @@ struct PlaybackFeatureTests {
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 1),
-      progress: .init(elapsedTime: 3, duration: 180)
+      progress: .init(elapsedTime: 3, duration: 180),
     ))) {
       PlaybackFeature()
     } withDependencies: {
@@ -361,7 +361,7 @@ struct PlaybackFeatureTests {
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
       albumQueue: .init(items: items, currentIndex: 0),
-      progress: .init(elapsedTime: 2, duration: 180)
+      progress: .init(elapsedTime: 2, duration: 180),
     ))) {
       PlaybackFeature()
     } withDependencies: {

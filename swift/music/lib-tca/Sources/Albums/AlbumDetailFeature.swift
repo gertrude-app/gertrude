@@ -49,13 +49,14 @@ struct AlbumDetailFeature {
         return .send(.delegate(.playAlbum(items: items, startIndex: 0)))
 
       case .trackTapped(let trackID):
-        guard let startIndex = state.tracks.firstIndex(where: { $0.id == trackID }) else { return .none }
+        guard let startIndex = state.tracks.firstIndex(where: { $0.id == trackID })
+        else { return .none }
         if state.currentTrackID == trackID {
           return .send(.delegate(.togglePlayPause))
         }
         return .send(.delegate(.playAlbum(
           items: state.playbackItems,
-          startIndex: startIndex
+          startIndex: startIndex,
         )))
 
       case .delegate:

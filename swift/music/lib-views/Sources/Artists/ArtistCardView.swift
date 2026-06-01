@@ -28,7 +28,7 @@ public struct ArtistCardView: View {
         Text(self.artist.name)
           .font(.system(size: 14, weight: .semibold))
           .foregroundStyle(
-            Color(self.cs, light: .black, dark: .white)
+            Color(self.cs, light: .black, dark: .white),
           )
           .lineLimit(2)
           .multilineTextAlignment(.leading)
