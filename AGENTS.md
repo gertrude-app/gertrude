@@ -79,10 +79,16 @@ Supports all 3 apps, plus dashboard and admin websites
 
 ## Decision notes
 
-- `./docs/notes/` holds lightweight ADR-style notes capturing the _why_ behind notable
-  decisions (alternatives considered, constraints, rationales, etc). Don't load these by
-  default. Do not write these unless instructed, although you may suggest that one be
-  written if a substantial decision is being made.
+- `./docs/notes/` holds lightweight ADR-style notes capturing the _why_ behind a
+  decision **already made and implemented**, when that _why_ can't be reconstructed from
+  the code itself. Don't load these by default.
+- Don't write one unless instructed. Only _suggest_ one when **all** hold: (1) a real
+  choice was made among genuine alternatives, (2) the _why_ is non-obvious enough that a
+  future reader would wonder "why is it like this?" or assume a mistake, (3) that _why_
+  has no durable home in the code, comments, commit, or PR, and (4) it's settled, not
+  proposed. Never suggest one for an idea, TODO, future task, or routine choice — those
+  are tasks, not notes. When unsure, don't: a missed borderline note costs little; notes
+  for non-decisions erode the ones that matter.
 - When researching _why_ a past decision was made, start with
   [`./docs/notes/index.md`](./docs/notes/index.md) — one-line summary of every note, to
   find the right one to load.
