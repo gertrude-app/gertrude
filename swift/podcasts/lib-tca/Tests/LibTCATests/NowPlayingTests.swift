@@ -596,6 +596,80 @@ import Testing
     }
   }
 
+  @Test func `audio route removed saves progress and pauses`() async throws {
+    await withDependencies {
+      $0.defaultInMemoryStorage = .init()
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+      $0.audio.pause = {}
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      var nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 3 && nowPlaying?.isPlaying == true)
+
+      await store.send(.system(.audioRouteRemoved(position: 60)))
+
+      nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.bufferedProgress == 60)
+      let (episode, _) = dep(\.db).episodeWithShow(3)!
+      #expect(episode.progress == 60)
+    }
+  }
+
+  @Test func `background progress update syncs when moved past threshold`() async throws {
+    await withDependencies {
+      $0.defaultInMemoryStorage = .init()
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+    } operation: {
+      let state = NowPlayingFeature.State()
+      state.$appInForeground.withLock { $0 = false }
+      let store = TestStore(initialState: state, reducer: NowPlayingFeature.init)
+
+      await store.send(.system(.progressUpdated(13.0)))
+
+      let nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.bufferedProgress == 13.0)
+      let (episode, _) = dep(\.db).episodeWithShow(3)!
+      #expect(episode.progress == 13.0)
+    }
+  }
+
+  @Test func `app backgrounded saves current playing position`() async throws {
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+      $0.audio.getPlayingPosition = { 42 }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      await store.send(.appBackgrounded)
+      await store.finish()
+
+      let nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.bufferedProgress == 42)
+      let (episode, _) = dep(\.db).episodeWithShow(3)!
+      #expect(episode.progress == 42)
+    }
+  }
+
   @Test func `interruption ended with shouldResume rewinds 3s and resumes`() async throws {
     let playInvocations = LockIsolated<[Episode.ID]>([])
     let seekInvocations = LockIsolated<[Double]>([])

@@ -51,10 +51,36 @@ import SwiftUI
 
   public let AVAudioSessionInterruptionOptionKey = ""
   public let AVAudioSessionInterruptionTypeKey = ""
+  public let AVAudioSessionRouteChangeReasonKey = ""
 
   public struct AVAudioSession {
     public enum Category { case playback, NOT_REAL_CHECK_XCODE }
     public enum Mode { case spokenAudio, NOT_REAL_CHECK_XCODE }
+    public enum RouteChangeReason {
+      case unknown
+      case newDeviceAvailable
+      case oldDeviceUnavailable
+      case categoryChange
+      case override
+      case wakeFromSleep
+      case noSuitableRouteForCategory
+      case routeConfigurationChange
+
+      public init?(rawValue: UInt) {
+        switch rawValue {
+        case 0: self = .unknown
+        case 1: self = .newDeviceAvailable
+        case 2: self = .oldDeviceUnavailable
+        case 3: self = .categoryChange
+        case 4: self = .override
+        case 6: self = .wakeFromSleep
+        case 7: self = .noSuitableRouteForCategory
+        case 8: self = .routeConfigurationChange
+        default: return nil
+        }
+      }
+    }
+
     public enum InterruptionType {
       case began
       case ended
@@ -81,6 +107,10 @@ import SwiftUI
     public var NOT_REAL_CHECK_XCODE: String { "" }
 
     public static var interruptionNotification: Notification.Name {
+      Notification.Name("")
+    }
+
+    public static var routeChangeNotification: Notification.Name {
       Notification.Name("")
     }
 

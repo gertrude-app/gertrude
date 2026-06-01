@@ -87,6 +87,9 @@ struct AppReducer: Sendable {
         )
       case .appInForegroundChanged(let foregrounded):
         state.$appInForeground.withLock { $0 = foregrounded }
+        if !foregrounded {
+          return .send(.nowPlaying(.appBackgrounded))
+        }
         return .none
       case .mode(.presented(.onboarding(.finished(let pincode)))):
         state.mode = .podcasts(.init())

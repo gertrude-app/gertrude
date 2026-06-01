@@ -21,6 +21,7 @@ struct AudioPlayer: Sendable {
 
 extension AudioPlayer {
   enum SystemEvent: Equatable, Sendable {
+    case audioRouteRemoved(position: Double?)
     case play(Double?)
     case pause(Double?)
     case scrubbed(to: Double)
@@ -80,18 +81,21 @@ private final class Player: Sendable {
   private let subject = Mutex(PassthroughSubject<AudioPlayer.SystemEvent, Never>())
   private let completionObserver: Locked<Any?> = Locked(nil)
   private let interruptionObserver: Locked<Any?> = Locked(nil)
+  private let routeChangeObserver: Locked<Any?> = Locked(nil)
 
   init() {
     let session = AVAudioSession.sharedInstance()
     try? session.setCategory(.playback, mode: .spokenAudio, policy: .longFormAudio)
     self.setupRemoteCommands()
     self.setupInterruptionObserver()
+    self.setupRouteChangeObserver()
   }
 
   deinit {
     self.player.stopTimeUpdates()
     self.removeCompletionObserver()
     self.removeInterruptionObserver()
+    self.removeRouteChangeObserver()
   }
 
   func play(_ episode: Episode, _ show: Show) throws {
@@ -342,6 +346,45 @@ private final class Player: Sendable {
       }
     }
     self.interruptionObserver.replace(with: nil)
+  }
+
+  private func setupRouteChangeObserver() {
+    let observer = NotificationCenter.default.addObserver(
+      forName: AVAudioSession.routeChangeNotification,
+      object: AVAudioSession.sharedInstance(),
+      queue: .main,
+    ) { [weak self] notification in
+      guard let userInfo = notification.userInfo,
+            let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+            let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+        return
+      }
+
+      switch reason {
+      case .oldDeviceUnavailable:
+        self?.emit(.audioRouteRemoved(position: self?.player.currentTime))
+      case .unknown,
+           .newDeviceAvailable,
+           .categoryChange,
+           .override,
+           .wakeFromSleep,
+           .noSuitableRouteForCategory,
+           .routeConfigurationChange:
+        break
+      @unknown default:
+        break
+      }
+    }
+    self.routeChangeObserver.replace(with: observer)
+  }
+
+  private func removeRouteChangeObserver() {
+    self.routeChangeObserver.withValue {
+      if let observer = $0 {
+        NotificationCenter.default.removeObserver(observer)
+      }
+    }
+    self.routeChangeObserver.replace(with: nil)
   }
 }
 
