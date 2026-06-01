@@ -10,6 +10,16 @@ export default class DashboardClient extends Client<Auth> {
     super(endpoint, `dashboard`, prepareRequest);
   }
 
+  public changeSubscriptionTier = (
+    input: P.ChangeSubscriptionTier.Input,
+  ): Promise<Result<P.ChangeSubscriptionTier.Output>> => {
+    return this.query<P.ChangeSubscriptionTier.Output>(
+      input,
+      `ChangeSubscriptionTier`,
+      `parent`,
+    );
+  };
+
   public childActivitySummaries = (
     input: P.ChildActivitySummaries.Input,
   ): Promise<Result<P.ChildActivitySummaries.Output>> => {
@@ -408,16 +418,6 @@ export default class DashboardClient extends Client<Auth> {
     input: P.UpdateIOSDevice.Input,
   ): Promise<Result<P.UpdateIOSDevice.Output>> => {
     return this.query<P.UpdateIOSDevice.Output>(input, `UpdateIOSDevice`, `parent`);
-  };
-
-  public upgradeSubscriptionTier = (
-    input: P.UpgradeSubscriptionTier.Input,
-  ): Promise<Result<P.UpgradeSubscriptionTier.Output>> => {
-    return this.query<P.UpgradeSubscriptionTier.Output>(
-      input,
-      `UpgradeSubscriptionTier`,
-      `parent`,
-    );
   };
 
   public upsertBlockRule = (

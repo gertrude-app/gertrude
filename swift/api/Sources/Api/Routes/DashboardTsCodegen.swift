@@ -99,7 +99,7 @@ enum DashboardTsCodegenRoute {
       GetSubscriptionPanel_v2.self,
       OpenBillingPortal.self,
       StartCheckoutSession.self,
-      UpgradeSubscriptionTier.self,
+      ChangeSubscriptionTier.self,
       ToggleChildKeychain.self,
       DecideFilterSuspensionRequest.self,
       VerifySignupEmail.self,

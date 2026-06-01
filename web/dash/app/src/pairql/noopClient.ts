@@ -249,7 +249,7 @@ const noopClient: ApiClient = {
   openBillingPortal: async () => {
     return Result.success({ url: `/` });
   },
-  upgradeSubscriptionTier: async () => {
+  changeSubscriptionTier: async () => {
     return Result.success({ success: true });
   },
   getSubscriptionPanel: async () => {

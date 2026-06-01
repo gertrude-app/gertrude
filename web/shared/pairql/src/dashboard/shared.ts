@@ -218,7 +218,7 @@ export type SingleAppScope =
 export type SubscriptionPanelAction =
   | { case: 'startCheckout'; tier: SubscriptionTier }
   | { case: 'openBillingPortal'; config: 'lightTier' | 'default' }
-  | { case: 'upgradeSubscriptionTier'; to: SubscriptionTier }
+  | { case: 'changeSubscriptionTier'; to: SubscriptionTier }
   | { case: 'reactivateViaCheckout'; tier: SubscriptionTier }
   | { case: 'startFullTrial' };
 

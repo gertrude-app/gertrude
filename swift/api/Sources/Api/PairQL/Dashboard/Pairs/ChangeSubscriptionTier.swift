@@ -4,7 +4,7 @@ import PairQL
 import Vapor
 import XStripe
 
-struct UpgradeSubscriptionTier: Pair {
+struct ChangeSubscriptionTier: Pair {
   static let auth: ClientAuth = .parent
 
   struct Input: PairInput {
@@ -12,28 +12,41 @@ struct UpgradeSubscriptionTier: Pair {
   }
 }
 
-extension UpgradeSubscriptionTier: Resolver {
+extension ChangeSubscriptionTier: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    @Dependency(\.date.now) var now
     @Dependency(\.stripe) var stripe
 
     guard var subscription = try await context.parent.subscription(in: context.db) else {
       throw context.error(
         "5d3a8b7c",
         .badRequest,
-        user: "No active subscription to upgrade.",
+        user: "No active subscription to change.",
       )
     }
 
     let stripeId = subscription.stripeId.rawValue
     let fromTier = subscription.tier
-    guard fromTier == .light, input.to == .full else {
+    guard fromTier != input.to else {
       throw context.error(
         "8a3b9e21",
         .badRequest,
-        user: fromTier == input.to
-          ? "Already on the requested tier."
-          : "Only upgrades from Light to Full are supported.",
+        user: "Already on the requested tier.",
+      )
+    }
+
+    if fromTier == .full, input.to == .light {
+      guard try await context.parent.canDowngradeFullSubToLight(in: context.db) else {
+        throw context.error(
+          "1d145a5e",
+          .badRequest,
+          user: "Switching to Light is only available when no Macs are registered.",
+        )
+      }
+    } else if !(fromTier == .light && input.to == .full) {
+      throw context.error(
+        "c65f260c",
+        .badRequest,
+        user: "Only changes between Light and Full are supported.",
       )
     }
 
@@ -47,6 +60,9 @@ extension UpgradeSubscriptionTier: Resolver {
       subscriptionId: stripeId,
       itemId: item.id,
       priceId: input.to.checkoutStripePriceId,
+      prorationBehavior: .alwaysInvoice,
+      paymentBehavior: .errorIfIncomplete,
+      billingCycleAnchor: .now,
     ))
 
     guard let newStatus = StripeSubscription.StripeStatus(rawValue: updated.status.rawValue),
@@ -75,7 +91,7 @@ extension UpgradeSubscriptionTier: Resolver {
     try await context.db.update(identity)
 
     _ = try? await context.db.create(InterestingEvent(
-      eventId: "tier_upgraded",
+      eventId: input.to == .full ? "tier_upgraded" : "tier_downgraded",
       kind: "billing",
       context: "dash",
       parentId: context.parent.id,
@@ -83,7 +99,7 @@ extension UpgradeSubscriptionTier: Resolver {
         + "stripe_sub: \(stripeId)",
     ))
 
-    notifyTierUpgrade(parent: context.parent, from: fromTier, to: input.to)
+    notifyTierChange(parent: context.parent, from: fromTier, to: input.to)
 
     return .success
   }

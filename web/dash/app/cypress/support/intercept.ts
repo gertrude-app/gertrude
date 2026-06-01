@@ -2,6 +2,10 @@
 import type * as T from '@dash/types';
 
 export function interceptPql(
+  slug: `ChangeSubscriptionTier`,
+  output: T.ChangeSubscriptionTier.Output,
+): void;
+export function interceptPql(
   slug: `ChildActivitySummaries`,
   output: T.ChildActivitySummaries.Output,
 ): void;
@@ -175,10 +179,6 @@ export function interceptPql(
   output: T.UpdateIOSDevice.Output,
 ): void;
 export function interceptPql(
-  slug: `UpgradeSubscriptionTier`,
-  output: T.UpgradeSubscriptionTier.Output,
-): void;
-export function interceptPql(
   slug: `UpsertBlockRule`,
   output: T.UpsertBlockRule.Output,
 ): void;
@@ -199,6 +199,7 @@ export function interceptPql(slug: string, output: any): void {
 
 export function forcePqlErr(
   slug:
+    | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimIOSDevice`
     | `CombinedUsersActivityFeed`
@@ -252,7 +253,6 @@ export function forcePqlErr(
     | `StartFullTrial`
     | `ToggleChildKeychain`
     | `UpdateIOSDevice`
-    | `UpgradeSubscriptionTier`
     | `UpsertBlockRule`
     | `UserActivityFeed`
     | `VerifySignupEmail`,

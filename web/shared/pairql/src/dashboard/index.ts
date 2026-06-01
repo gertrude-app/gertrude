@@ -1,5 +1,6 @@
 // auto-generated, do not edit
 export * from './shared';
+export * from './pairs/ChangeSubscriptionTier';
 export * from './pairs/ChildActivitySummaries';
 export * from './pairs/ClaimIOSDevice';
 export * from './pairs/CombinedUsersActivityFeed';
@@ -53,7 +54,6 @@ export * from './pairs/StartCheckoutSession';
 export * from './pairs/StartFullTrial';
 export * from './pairs/ToggleChildKeychain';
 export * from './pairs/UpdateIOSDevice';
-export * from './pairs/UpgradeSubscriptionTier';
 export * from './pairs/UpsertBlockRule';
 export * from './pairs/UserActivityFeed';
 export * from './pairs/VerifySignupEmail';

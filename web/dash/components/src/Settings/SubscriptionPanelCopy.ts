@@ -123,7 +123,7 @@ export function actionLabel(action: SubscriptionPanelAction, input: Input): stri
       const verb = previouslyHadThisTier ? `Reactivate` : `Subscribe to`;
       return `${verb} ${tierName(action.tier)}`;
     }
-    case `upgradeSubscriptionTier`:
+    case `changeSubscriptionTier`:
       return action.to === `full` ? `Upgrade to Full` : `Switch to Light`;
     case `openBillingPortal`:
       return `Manage subscription...`;

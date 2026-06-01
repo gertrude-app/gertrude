@@ -58,7 +58,7 @@ const FreeLapsedFull: PanelArgs = {
 const LightPaid: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `light`, status: { case: `current`, renewsAt: inDays(18) } },
-  primary: { case: `upgradeSubscriptionTier`, to: `full` },
+  primary: { case: `changeSubscriptionTier`, to: `full` },
   secondary: [
     { case: `openBillingPortal`, config: `lightTier` },
     { case: `startFullTrial` },
@@ -70,7 +70,7 @@ const LightPaid: PanelArgs = {
 const LightPaidTrialUsed: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `light`, status: { case: `current`, renewsAt: inDays(22) } },
-  primary: { case: `upgradeSubscriptionTier`, to: `full` },
+  primary: { case: `changeSubscriptionTier`, to: `full` },
   secondary: [{ case: `openBillingPortal`, config: `lightTier` }],
   availableTiers: [`full`],
   lastPaidTier: `light`,
@@ -81,7 +81,7 @@ const LightOverdue: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `light`, status: { case: `pastDue`, since: inDays(-2) } },
   primary: { case: `openBillingPortal`, config: `lightTier` },
-  secondary: [{ case: `upgradeSubscriptionTier`, to: `full` }],
+  secondary: [{ case: `changeSubscriptionTier`, to: `full` }],
   availableTiers: [`full`],
   lastPaidTier: `light`,
 };
@@ -107,7 +107,7 @@ const FullTrialStandaloneExpiring: PanelArgs = {
 const FullTrialFromLight: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `fullTrial`, until: inDays(11) },
-  primary: { case: `upgradeSubscriptionTier`, to: `full` },
+  primary: { case: `changeSubscriptionTier`, to: `full` },
   secondary: [{ case: `openBillingPortal`, config: `lightTier` }],
   availableTiers: [`full`],
   lastPaidTier: `light`,
@@ -131,6 +131,12 @@ const FullPaid: PanelArgs = {
   secondary: [],
   availableTiers: [],
   lastPaidTier: `full`,
+};
+
+const FullPaidNoMacs: PanelArgs = {
+  ...FullPaid,
+  secondary: [{ case: `changeSubscriptionTier`, to: `light` }],
+  availableTiers: [`light`],
 };
 
 const FullOverdue: PanelArgs = {
@@ -162,7 +168,7 @@ const FullTrialGraceStandalone: PanelArgs = {
 const FullTrialGraceFromLight: PanelArgs = {
   ...baseArgs,
   planStatus: { case: `fullTrialGrace`, until: inDays(3) },
-  primary: { case: `upgradeSubscriptionTier`, to: `full` },
+  primary: { case: `changeSubscriptionTier`, to: `full` },
   secondary: [{ case: `openBillingPortal`, config: `lightTier` }],
   availableTiers: [`full`],
   lastPaidTier: `light`,
@@ -183,6 +189,7 @@ const ALL_PANELS: Array<{ label: string; args: PanelArgs }> = [
   { label: `Free — trial expired (57.1%, n=433)`, args: FreeStandardTrialUsed },
   { label: `Free — brand new (18.2%, n=138)`, args: FreeStandard },
   { label: `Full — paid (11.1%, n=84)`, args: FullPaid },
+  { label: `Full — paid, no Macs (sub-state)`, args: FullPaidNoMacs },
   { label: `Light — paid (5.7%, n=43)`, args: LightPaid },
   { label: `Full — complimentary (3.4%, n=26)`, args: FullComplimentary },
   { label: `Free — lapsed Full (2.9%, n=22)`, args: FreeLapsedFull },
@@ -210,7 +217,7 @@ const ALL_PANELS: Array<{ label: string; args: PanelArgs }> = [
 export const Pending: StoryObj<typeof SubscriptionPanel> = {
   args: {
     ...LightPaid,
-    pendingAction: { case: `upgradeSubscriptionTier`, to: `full` },
+    pendingAction: { case: `changeSubscriptionTier`, to: `full` },
   },
 };
 
