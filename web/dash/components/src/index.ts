@@ -68,6 +68,7 @@ export { default as UserActivityHeader } from './Users/Activity/UserActivityHead
 export { default as Loading } from './Loading';
 export { default as GenericError } from './GenericError';
 export { default as ApiErrorMessage } from './ApiErrorMessage';
+export { default as BetaBadge } from './BetaBadge';
 export { default as EmptyState } from './EmptyState';
 export { ICONS as GRADIENT_ICONS, default as GradientIcon } from './GradientIcon';
 export { default as SuspendFilterRequestForm } from './Users/SuspendFilterRequestForm';

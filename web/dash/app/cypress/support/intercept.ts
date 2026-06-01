@@ -2,6 +2,10 @@
 import type * as T from '@dash/types';
 
 export function interceptPql(
+  slug: `ApproveMusicAlbum`,
+  output: T.ApproveMusicAlbum.Output,
+): void;
+export function interceptPql(
   slug: `ChangeSubscriptionTier`,
   output: T.ChangeSubscriptionTier.Output,
 ): void;
@@ -66,6 +70,10 @@ export function interceptPql(slug: `GetAllDevices`, output: T.GetAllDevices.Outp
 export function interceptPql(
   slug: `GetAmClaimData`,
   output: T.GetAmClaimData.Output,
+): void;
+export function interceptPql(
+  slug: `GetApprovedMusicAlbums`,
+  output: T.GetApprovedMusicAlbums.Output,
 ): void;
 export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
@@ -141,6 +149,10 @@ export function interceptPql(
   output: T.PrepIOSAppConnection.Output,
 ): void;
 export function interceptPql(
+  slug: `RemoveApprovedMusicAlbum`,
+  output: T.RemoveApprovedMusicAlbum.Output,
+): void;
+export function interceptPql(
   slug: `RequestAmPinReset`,
   output: T.RequestAmPinReset.Output,
 ): void;
@@ -165,6 +177,10 @@ export function interceptPql(
   output: T.SaveNotification.Output,
 ): void;
 export function interceptPql(slug: `SaveUser`, output: T.SaveUser.Output): void;
+export function interceptPql(
+  slug: `SearchMusicCatalog`,
+  output: T.SearchMusicCatalog.Output,
+): void;
 export function interceptPql(
   slug: `SecurityEventsFeed`,
   output: T.SecurityEventsFeed.Output,
@@ -211,6 +227,7 @@ export function interceptPql(slug: string, output: any): void {
 
 export function forcePqlErr(
   slug:
+    | `ApproveMusicAlbum`
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimAmDevice`
@@ -229,6 +246,7 @@ export function forcePqlErr(
     | `GetAdminKeychains`
     | `GetAllDevices`
     | `GetAmClaimData`
+    | `GetApprovedMusicAlbums`
     | `GetBatchUnlockRequestData`
     | `GetChild`
     | `GetChildren`
@@ -251,6 +269,7 @@ export function forcePqlErr(
     | `MacAppConnectionCode`
     | `OpenBillingPortal`
     | `PrepIOSAppConnection`
+    | `RemoveApprovedMusicAlbum`
     | `RequestAmPinReset`
     | `RequestMagicLink`
     | `RequestPublicKeychain`
@@ -261,6 +280,7 @@ export function forcePqlErr(
     | `SaveKeychain`
     | `SaveNotification`
     | `SaveUser`
+    | `SearchMusicCatalog`
     | `SecurityEventsFeed`
     | `SendPasswordResetEmail`
     | `Signup`

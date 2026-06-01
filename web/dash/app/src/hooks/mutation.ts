@@ -120,6 +120,9 @@ type ToastId =
   | `delete:key`
   | `delete:activity-items`
   | `flag:activity-item`
+  | `approve:music-album`
+  | `remove:music-album`
+  | `update:music-artwork`
   | `update:suspend-filter-request`
   | `create:pending-notification-method`
   | `confirm:pending-notification-method`
@@ -155,6 +158,13 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
 
     case `flag:activity-item`:
       return { verb: `update`, entity: `item` };
+
+    case `approve:music-album`:
+      return { verb: `allow`, entity: `album` };
+    case `remove:music-album`:
+      return { verb: `remove`, entity: `album` };
+    case `update:music-artwork`:
+      return { verb: `update`, entity: `artwork setting` };
 
     case `delete:user`:
     case `save:user`:

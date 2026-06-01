@@ -9,6 +9,7 @@ import ChildActivityFeed from './components/routes/ChildActivityFeed';
 import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
 import ChildIOSDevicesRoute from './components/routes/ChildIOSDevices';
 import ChildMac from './components/routes/ChildMac';
+import ChildMusic from './components/routes/ChildMusic';
 import ClaimAmDeviceClaim from './components/routes/ClaimAmDevice/Claim';
 import ClaimAmDeviceDone from './components/routes/ClaimAmDevice/Done';
 import Computer from './components/routes/Computer';
@@ -116,6 +117,7 @@ const App: React.FC = () => {
           <Route path=":userId">
             <Route index element={<UserRoute />} />
             <Route path="mac" element={<ChildMac />} />
+            <Route path="music" element={<ChildMusic />} />
 
             <Route path="ios-devices">
               <Route index element={<ChildIOSDevicesRoute />} />
