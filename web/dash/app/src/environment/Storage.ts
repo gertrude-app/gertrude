@@ -36,18 +36,3 @@ export class ThrowingStorage implements StorageClient {
     throw new Error(`StorageClient<${this.type}>.clear() not implemented`);
   }
 }
-
-export class NoopStorage implements StorageClient {
-  public getItem(_key: string): string | null {
-    return null;
-  }
-  public setItem(_key: string, _value: string): void {
-    return;
-  }
-  public removeItem(_key: string): void {
-    return;
-  }
-  public clear(): void {
-    return;
-  }
-}
