@@ -80,6 +80,7 @@ enum DashboardTsCodegenRoute {
       HandleUnlockRequests.self,
       GetChild.self,
       GetChildren.self,
+      SearchMusicCatalog.self,
       GetApprovedMusicAlbums.self,
       ApproveMusicAlbum.self,
       RemoveApprovedMusicAlbum.self,
