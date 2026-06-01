@@ -8,6 +8,7 @@ import type {
   GetAdminKeychains,
   GetAllDevices,
   GetAmClaimData,
+  GetApprovedMusicAlbums,
   GetBatchUnlockRequestData,
   GetChild,
   GetChildren,
@@ -50,6 +51,14 @@ export class Key extends QueryKey<never> {
 
   static child(id: UUID): QueryKey<GetChild.Output> {
     return new QueryKey(`children/:id`, [`children`, id], id);
+  }
+
+  static approvedMusicAlbums(id: UUID): QueryKey<GetApprovedMusicAlbums.Output> {
+    return new QueryKey(
+      `children/:id/music`,
+      [`children`, id, `music`, `approved-albums`],
+      id,
+    );
   }
 
   static get latestAppVersions(): QueryKey<LatestAppVersions.Output> {
