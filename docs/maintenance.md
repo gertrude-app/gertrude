@@ -137,6 +137,13 @@ decisions read this first to find the right note to load. **Drifts whenever a ne
 added or an existing one materially changes scope — append (or update) the matching entry
 in the same change.**
 
+### `.agents/skills/database/SKILL.md` — DB schema orientation
+
+The database skill carries a hand-authored, one-line-per-schema orientation map. Table
+detail is discovered live, so it can't drift — but the schema list and purpose
+descriptions can. Re-sync after any schema is added, removed, or renamed: run `\dn` and
+reconcile against the map.
+
 ### `docs/support/*.md` — product overview docs
 
 `product-overview.md`, `mac-app.md`, `ios-app.md`, `gertrude-am.md`. These are the

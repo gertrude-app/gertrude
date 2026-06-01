@@ -12,7 +12,9 @@ You have access to the Gertrude PostgreSQL database for querying and analysis.
 
 For connection info, read `./swift/api/.env` and use the values there.
 
-You may READ any data, but you may never write data unless EXPLICITLY instructed to.
+You may READ and write to the LOCAL task database, as it is a task-specific,
+PII-scrubbed local snapshot. You may NEVER try to discover how to ssh into production
+or read/write remote databases for any reason.
 
 Important: although this repo has some docker-related files, all local development goes
 through a local install of postgres and NOT through docker. Never use `docker` commands
@@ -25,13 +27,16 @@ when dealing with the database.
 
 ## Database Structure
 
-The database uses multiple schemas to organize tables:
+Data is spread across multiple non-`public` Postgres schemas (don't assume `public`). The
+map below is orientation for *where to look* — discover the live tables/columns yourself
+(`\dn`, `\dt <schema>.*`), since table-level detail drifts.
 
-- **parent**: Parent accounts, children, computers, keychains, keys, notifications, etc.
-- **child**: Computer users, blocked apps, iOS devices, tokens, screenshots
-- **macapp**: Keystroke lines, releases, unlock requests
-- **iosapp**: Block groups, rules, device configurations, suspend requests
-- **macos**: App bundle IDs, categories, browsers, identified/unidentified apps
-- **system**: Deleted entities, interesting events, security events, Stripe events
-- **public**: Fluent migrations, jobs metadata
-- **podcasts**: Podcast-related tables
+- **parent** — parent accounts, children, computers, keychains, keys, billing, notifications
+- **child** — per-child device data: mac computer users, iOS devices, screenshots, app tokens
+- **macapp** — macOS app: keystroke lines, releases, unlock & suspend-filter requests
+- **blocker_app** — iOS blocker/filter app: block groups & rules, installs, supervisions, tokens, events
+- **podcast_app** — Gertrude AM podcast app: installs, tokens, events
+- **macos** — macOS app reference catalog: bundle ids, categories, browsers, identified/unidentified apps
+- **appstore** — App Store ratings & reviews data
+- **system** — cross-cutting: deleted entities, telemetry, security/interesting events, sms, stripe events, short urls
+- **public** — Fluent migration tracking and jobs metadata
