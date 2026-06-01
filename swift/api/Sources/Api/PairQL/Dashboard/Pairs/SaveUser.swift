@@ -56,12 +56,6 @@ extension SaveUser: Resolver {
         id: input.id,
         parentId: context.parent.id,
         name: input.name,
-        // vvv--- these are our recommended defaults
-        keyloggingEnabled: true,
-        screenshotsEnabled: true,
-        screenshotsResolution: 1000,
-        screenshotsFrequency: 180,
-        showSuspensionActivity: true,
         filteringDisabled: filteringDisabled,
         downtime: input.downtime,
       ))
