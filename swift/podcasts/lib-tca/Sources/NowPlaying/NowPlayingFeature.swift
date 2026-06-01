@@ -16,6 +16,7 @@ struct NowPlayingFeature {
       case alert(String)
     }
 
+    case appBackgrounded
     case view(NowPlayingView.Event)
     case system(AudioPlayer.SystemEvent)
     case episodePlayPauseTapped(Episode, Show)
@@ -31,6 +32,13 @@ struct NowPlayingFeature {
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
+      case .appBackgrounded:
+        guard let nowPlaying = state.data, nowPlaying.isPlaying else { return .none }
+        return .run { _ in
+          if let position = await self.audio.getPlayingPosition() {
+            nowPlaying.setProgress(position)
+          }
+        }
       case .view(let viewAction):
         guard let nowPlaying = state.data else {
           unexpected(id: "70012cf6", assert: true)
@@ -69,6 +77,10 @@ struct NowPlayingFeature {
           return .none
         }
         switch event {
+        case .audioRouteRemoved(let position):
+          position.map { nowPlaying.setProgress($0) }
+          NowPlaying.updateSyncingProgress { $0.isPlaying = false }
+          return .none
         case .play(let time):
           NowPlaying.updateSyncingProgress { $0.isPlaying = true }
           time.map { nowPlaying.setProgress($0) }
@@ -78,11 +90,11 @@ struct NowPlayingFeature {
           time.map { nowPlaying.setProgress($0) }
           return .none
         case .progressUpdated(let progress):
-          let oneOutOfTen = progress.truncatingRemainder(dividingBy: 10.0) < 0.1
-          if !state.appInForeground, !oneOutOfTen {
+          let shouldSync = abs(progress - nowPlaying.episode.progress) >= 10.0
+          if !state.appInForeground, !shouldSync {
             return .none
           }
-          nowPlaying.setProgress(progress, sync: oneOutOfTen)
+          nowPlaying.setProgress(progress, sync: shouldSync)
           return .run { _ in
             if nowPlaying.shouldDownloadNext(at: progress) {
               NowPlaying.updateSyncingProgress { $0.nextDownloaded = true }

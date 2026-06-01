@@ -7,6 +7,7 @@
   - lower minimum iOS version to 17
   - add 0.5× playback speed option
   - protect against whitespace padding in feed xml
+  - harden progress save (headphone yank, backgrounding, skip/starvation)
 - `1.5.1` (5/4/26 - rejected during review, abandonded for account)
   - updates for correct yearly subscription
 - `1.5.0` (4/21/26)
