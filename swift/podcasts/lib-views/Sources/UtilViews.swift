@@ -1,17 +1,11 @@
 import SwiftUI
 
-struct BaseScreenView<Content: View>: View {
+struct ScreenGradientBackground: ViewModifier {
   @Environment(\.colorScheme) var cs
-
-  let content: Content
 
   @State private var showBg = false
 
-  init(@ViewBuilder content: () -> Content) {
-    self.content = content()
-  }
-
-  var body: some View {
+  func body(content: Content) -> some View {
     ZStack {
       Rectangle()
         .fill(
@@ -28,12 +22,57 @@ struct BaseScreenView<Content: View>: View {
           }
         }
 
-      VStack(spacing: 20) {
-        self.content
-      }
-      .frame(maxWidth: 500)
-      .padding(30)
+      content
     }
+  }
+}
+
+extension View {
+  func screenGradientBackground() -> some View {
+    self.modifier(ScreenGradientBackground())
+  }
+}
+
+struct WaitingStatus: View {
+  @Environment(\.colorScheme) var cs
+
+  let label: String
+  let delay: Duration
+
+  @State private var show = false
+
+  var body: some View {
+    HStack(spacing: 8) {
+      ProgressView()
+        .scaleEffect(0.7)
+        .tint(Color(self.cs, light: .violet500, dark: .violet400))
+      Text(self.label)
+        .font(.system(size: 14, weight: .medium))
+        .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+    }
+    .frame(maxWidth: .infinity, alignment: .center)
+    .opacity(self.show ? 1 : 0)
+    .task {
+      try? await Task.sleep(for: self.delay)
+      withAnimation(.backgroundFadeSmooth) { self.show = true }
+    }
+  }
+}
+
+struct BaseScreenView<Content: View>: View {
+  let content: Content
+
+  init(@ViewBuilder content: () -> Content) {
+    self.content = content()
+  }
+
+  var body: some View {
+    VStack(spacing: 20) {
+      self.content
+    }
+    .frame(maxWidth: 500)
+    .padding(30)
+    .screenGradientBackground()
   }
 }
 

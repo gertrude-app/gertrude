@@ -8,12 +8,9 @@ struct ClaimFlow {
   struct State: Equatable {
     var childName: String?
     var claimCode: Int?
-    var claimCodeExpiresAt: Date?
     var claimCodeFailed = false
     var context: Context
     var entitlement: AmSubscriptionState?
-    var isRefreshing = false
-    var refreshFailed = false
     var step: Step
 
     init(
@@ -43,17 +40,15 @@ struct ClaimFlow {
   }
 
   enum Action: Equatable {
-    case accountStatusFailed
     case accountStatusResponse(GetAccountStatus.Output)
     case cancelTapped
     case claimCodeFailed
-    case claimCodeResponse(code: Int, expiresAt: Date)
+    case claimCodeResponse(code: Int)
     case doneTapped
     case nextTapped
     case notNowTapped
     case onAppear
     case polled(GetTrialStatus.Output)
-    case refreshTapped
     case retryTapped
   }
 
@@ -72,16 +67,21 @@ struct ClaimFlow {
       switch action {
       case .onAppear:
         log(.info("6ba6a016"), "claim flow opened", detail: "\(state.context)/\(state.step)")
-        guard state.step == .showingCode else { return .none }
-        return self.startShowingCode(&state)
+        switch state.step {
+        case .showingCode:
+          return self.startShowingCode(&state)
+        case .payment:
+          return self.startPayment()
+        case .success:
+          return .none
+        }
 
       case .retryTapped:
         return self.startShowingCode(&state)
 
-      case .claimCodeResponse(let code, let expiresAt):
+      case .claimCodeResponse(let code):
         log(.info("de4909f1"), "claim code shown")
         state.claimCode = code
-        state.claimCodeExpiresAt = expiresAt
         state.claimCodeFailed = false
         return .none
 
@@ -105,22 +105,9 @@ struct ClaimFlow {
       case .nextTapped:
         log(.info("82b8e4c0"), "claim advanced to payment")
         state.step = .payment
-        return .none
-
-      case .refreshTapped:
-        state.isRefreshing = true
-        state.refreshFailed = false
-        return .run { send in
-          do {
-            let output = try await self.api.getAccountStatus()
-            await send(.accountStatusResponse(output))
-          } catch {
-            await send(.accountStatusFailed)
-          }
-        }
+        return self.startPayment()
 
       case .accountStatusResponse(let output):
-        state.isRefreshing = false
         state.entitlement = output.subscription
         output.subscription.writeLocal(now: self.now)
         guard output.subscription.isEntitled else { return .none }
@@ -129,13 +116,7 @@ struct ClaimFlow {
           "payment remediation succeeded",
           detail: "\(output.subscription)",
         )
-        return .run { _ in await self.dismiss() }
-
-      case .accountStatusFailed:
-        log(.error("8a7bef61"), "claim payment refresh failed")
-        state.isRefreshing = false
-        state.refreshFailed = true
-        return .none
+        return self.dismissFlow()
 
       case .cancelTapped:
         log(.info("c4ef5b66"), "claim flow cancelled", detail: "\(state.step)")
@@ -165,7 +146,7 @@ struct ClaimFlow {
       .run { send in
         do {
           let output = try await self.api.createClaimCode()
-          await send(.claimCodeResponse(code: output.code, expiresAt: output.expiresAt))
+          await send(.claimCodeResponse(code: output.code))
         } catch {
           await send(.claimCodeFailed)
         }
@@ -180,5 +161,17 @@ struct ClaimFlow {
       }
       .cancellable(id: CancelID.poll, cancelInFlight: true),
     )
+  }
+
+  func startPayment() -> EffectOf<ClaimFlow> {
+    .run { send in
+      while !Task.isCancelled {
+        try await self.clock.sleep(for: .seconds(5))
+        if let output = try? await self.api.getAccountStatus() {
+          await send(.accountStatusResponse(output))
+        }
+      }
+    }
+    .cancellable(id: CancelID.poll, cancelInFlight: true)
   }
 }

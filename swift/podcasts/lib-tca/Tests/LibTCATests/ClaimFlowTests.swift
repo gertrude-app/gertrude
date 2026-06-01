@@ -84,9 +84,15 @@ import Testing
   }
 
   @Test func `entering at payment mints no claim code`() async {
+    let clock = TestClock()
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
+      $0.api.getAccountStatus = {
+        .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
+      }
+      $0.continuousClock = clock
       $0.date = .constant(.reference)
+      $0.dismiss = DismissEffect {}
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]))
     } operation: {
@@ -100,13 +106,16 @@ import Testing
       store.exhaustivity = .off
 
       await store.send(.onAppear)
-      await store.finish()
       #expect(store.state.step == .payment)
       #expect(store.state.claimCode == nil)
+
+      await store.send(.notNowTapped)
+      await store.finish()
     }
   }
 
-  @Test func `payment refresh into entitled state writes row and dismisses`() async {
+  @Test func `payment poll into entitled state writes row and dismisses`() async {
+    let clock = TestClock()
     let isDismissed = LockIsolated(false)
     let loggedEventIds = LockIsolated<[String]>([])
     await withDependencies {
@@ -116,6 +125,7 @@ import Testing
           expiresAt: .reference + .days(365),
         ))
       }
+      $0.continuousClock = clock
       $0.date = .constant(.reference)
       $0.dismiss = DismissEffect { isDismissed.setValue(true) }
       $0.defaultDatabase = try! appDatabase()
@@ -131,7 +141,8 @@ import Testing
       ) { ClaimFlow() }
       store.exhaustivity = .off
 
-      await store.send(.refreshTapped)
+      await store.send(.onAppear)
+      await clock.advance(by: .seconds(5))
       await store.receive(\.accountStatusResponse)
       await store.finish()
       #expect(dep(\.db).subscription().status == .active)
@@ -141,13 +152,15 @@ import Testing
     }
   }
 
-  @Test func `payment refresh still unpaid stays on payment without dismiss`() async {
+  @Test func `payment poll still unpaid stays on payment without dismiss`() async {
+    let clock = TestClock()
     let isDismissed = LockIsolated(false)
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
       }
+      $0.continuousClock = clock
       $0.date = .constant(.reference)
       $0.dismiss = DismissEffect { isDismissed.setValue(true) }
       $0.defaultDatabase = try! appDatabase()
@@ -162,18 +175,26 @@ import Testing
       ) { ClaimFlow() }
       store.exhaustivity = .off
 
-      await store.send(.refreshTapped)
+      await store.send(.onAppear)
+      await clock.advance(by: .seconds(5))
       await store.receive(\.accountStatusResponse)
-      await store.finish()
       #expect(store.state.step == .payment)
       #expect(!isDismissed.value)
+
+      await store.send(.notNowTapped)
+      await store.finish()
     }
   }
 
-  @Test func `payment not now dismisses`() async {
+  @Test func `payment not now cancels poll and dismisses`() async {
+    let clock = TestClock()
     let isDismissed = LockIsolated(false)
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
+      $0.api.getAccountStatus = {
+        .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
+      }
+      $0.continuousClock = clock
       $0.date = .constant(.reference)
       $0.dismiss = DismissEffect { isDismissed.setValue(true) }
       $0.defaultDatabase = try! appDatabase()
@@ -188,6 +209,7 @@ import Testing
       ) { ClaimFlow() }
       store.exhaustivity = .off
 
+      await store.send(.onAppear)
       await store.send(.notNowTapped)
       await store.finish()
       #expect(isDismissed.value)
