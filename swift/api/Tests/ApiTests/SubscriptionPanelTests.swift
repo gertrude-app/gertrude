@@ -46,7 +46,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
     let billing = self.billing(sub: (tier: .light, status: .active))
     let panel = panelOutput_v2(billing: billing)
     expect(panel.planStatus).toEqual(.light(status: .current(renewsAt: .reference + .days(30))))
-    expect(panel.primary).toEqual(.upgradeSubscriptionTier(to: .full))
+    expect(panel.primary).toEqual(.changeSubscriptionTier(to: .full))
     expect(panel.secondary).toEqual([
       .openBillingPortal(config: .lightTier),
       .startFullTrial,
@@ -66,7 +66,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
     let billing = self.billing(sub: (tier: .light, status: .pastDue))
     let panel = panelOutput_v2(billing: billing)
     expect(panel.primary).toEqual(.openBillingPortal(config: .lightTier))
-    expect(panel.secondary).toEqual([.upgradeSubscriptionTier(to: .full)])
+    expect(panel.secondary).toEqual([.changeSubscriptionTier(to: .full)])
   }
 
   // MARK: - full trial (within trial window)
@@ -88,7 +88,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
       date: trialStart + .days(10),
     )
     let panel = panelOutput_v2(billing: billing)
-    expect(panel.primary).toEqual(.upgradeSubscriptionTier(to: .full))
+    expect(panel.primary).toEqual(.changeSubscriptionTier(to: .full))
     expect(panel.secondary).toEqual([.openBillingPortal(config: .lightTier)])
   }
 
@@ -101,7 +101,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
     )
     let panel = panelOutput_v2(billing: billing)
     expect(panel.primary).toEqual(.openBillingPortal(config: .lightTier))
-    expect(panel.secondary).toEqual([.upgradeSubscriptionTier(to: .full)])
+    expect(panel.secondary).toEqual([.changeSubscriptionTier(to: .full)])
   }
 
   func testFullTrialFromLapsedLight() {
@@ -164,7 +164,7 @@ final class SubscriptionPanelTests: DependencyTestCase {
       date: trialStart + .days(24),
     )
     let panel = panelOutput_v2(billing: billing)
-    expect(panel.primary).toEqual(.upgradeSubscriptionTier(to: .full))
+    expect(panel.primary).toEqual(.changeSubscriptionTier(to: .full))
     expect(panel.secondary).toEqual([.openBillingPortal(config: .lightTier)])
   }
 
@@ -219,6 +219,37 @@ final class SubscriptionPanelTests: DependencyTestCase {
     let billing = self.billing(sub: (tier: .full, status: .incomplete))
     let panel = panelOutput_v2(billing: billing)
     expect(panel.planStatus).toEqual(.free)
+  }
+}
+
+final class SubscriptionPanelResolverTests: ApiTestCase, @unchecked Sendable {
+  func testFullPaidWithNoMacsOffersSwitchToLight() async throws {
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeStatus = .active
+    }
+
+    let panel = try await GetSubscriptionPanel_v2.resolve(in: context(parent.model))
+
+    expect(panel.primary).toEqual(.openBillingPortal(config: .default))
+    expect(panel.secondary).toEqual([.changeSubscriptionTier(to: .light)])
+    expect(panel.availableTiers).toEqual([.light])
+  }
+
+  func testFullPaidWithRegisteredMacOmitsSwitchToLight() async throws {
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeStatus = .active
+    }
+    _ = try await self.db.create(Computer.random {
+      $0.parentId = parent.id
+    })
+
+    let panel = try await GetSubscriptionPanel_v2.resolve(in: context(parent.model))
+
+    expect(panel.primary).toEqual(.openBillingPortal(config: .default))
+    expect(panel.secondary).toEqual([])
+    expect(panel.availableTiers).toEqual([])
   }
 }
 

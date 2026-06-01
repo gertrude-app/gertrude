@@ -200,8 +200,8 @@ export const throwingClient: ApiClient = {
   openBillingPortal: () => {
     throw new Error(`ApiClient.openBillingPortal() not implemented`);
   },
-  upgradeSubscriptionTier: () => {
-    throw new Error(`ApiClient.upgradeSubscriptionTier() not implemented`);
+  changeSubscriptionTier: () => {
+    throw new Error(`ApiClient.changeSubscriptionTier() not implemented`);
   },
   getSubscriptionPanel: () => {
     throw new Error(`ApiClient.getSubscriptionPanel() not implemented`);

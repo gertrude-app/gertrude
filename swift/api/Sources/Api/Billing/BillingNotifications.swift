@@ -12,7 +12,7 @@ func notifyFirstPayment(parent: Parent, tier: StripeSubscription.Tier) {
   }
 }
 
-func notifyTierUpgrade(
+func notifyTierChange(
   parent: Parent,
   from: StripeSubscription.Tier,
   to: StripeSubscription.Tier,
@@ -21,12 +21,13 @@ func notifyTierUpgrade(
   let adminLink = AdminLink()
   let slackLink = adminLink.slack(to: .parent(parent.id), text: email)
   let emailLink = adminLink.email(to: .parent(parent.id), text: email)
+  let change = to == .full ? "Upgrade" : "Downgrade"
   Task {
     let slack = get(dependency: \.slack)
     let postmark = get(dependency: \.postmark)
-    await slack.internal(.info, "*Tier Upgrade* \(slackLink): `.\(from)` → `.\(to)`")
-    await slack.internal(.stripe, "*Tier Upgrade* \(slackLink): `.\(from)` → `.\(to)`")
-    postmark.toSuperAdmin("Tier Upgrade", "\(emailLink): .\(from) → .\(to)")
+    await slack.internal(.info, "*Tier \(change)* \(slackLink): `.\(from)` → `.\(to)`")
+    await slack.internal(.stripe, "*Tier \(change)* \(slackLink): `.\(from)` → `.\(to)`")
+    postmark.toSuperAdmin("Tier \(change)", "\(emailLink): .\(from) → .\(to)")
   }
 }
 

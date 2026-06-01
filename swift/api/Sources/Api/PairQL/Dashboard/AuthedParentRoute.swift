@@ -46,7 +46,7 @@ enum AuthedParentRoute: PairRoute {
   case startCheckoutSession(StartCheckoutSession.Input)
   case securityEventsFeed
   case startFullTrial
-  case upgradeSubscriptionTier(UpgradeSubscriptionTier.Input)
+  case changeSubscriptionTier(ChangeSubscriptionTier.Input)
   case updateUnlockRequest(UpdateUnlockRequest.Input)
   case requestPublicKeychain(RequestPublicKeychain.Input)
   case upsertBlockRule(UpsertBlockRule.Input)
@@ -216,9 +216,9 @@ extension AuthedParentRoute {
           Operation(StartCheckoutSession.self)
           Body(.dashboardInput(StartCheckoutSession.self))
         }
-        Route(.case(Self.upgradeSubscriptionTier)) {
-          Operation(UpgradeSubscriptionTier.self)
-          Body(.dashboardInput(UpgradeSubscriptionTier.self))
+        Route(.case(Self.changeSubscriptionTier)) {
+          Operation(ChangeSubscriptionTier.self)
+          Body(.dashboardInput(ChangeSubscriptionTier.self))
         }
         Route(.case(Self.securityEventsFeed)) {
           Operation(SecurityEventsFeed.self)
@@ -395,8 +395,8 @@ extension AuthedParentRoute: RouteResponder {
     case .startCheckoutSession(let input):
       let output = try await StartCheckoutSession.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .upgradeSubscriptionTier(let input):
-      let output = try await UpgradeSubscriptionTier.resolve(with: input, in: context)
+    case .changeSubscriptionTier(let input):
+      let output = try await ChangeSubscriptionTier.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .securityEventsFeed:
       let output = try await SecurityEventsFeed.resolve(in: context)

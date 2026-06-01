@@ -1,4 +1,5 @@
 import Dependencies
+import DuetSQL
 import Foundation
 import PairQL
 import TSCodable
@@ -15,7 +16,7 @@ struct GetSubscriptionPanel_v2: Pair {
   enum Action: Equatable, Sendable {
     case startCheckout(tier: StripeSubscription.Tier)
     case openBillingPortal(config: PortalConfig)
-    case upgradeSubscriptionTier(to: StripeSubscription.Tier)
+    case changeSubscriptionTier(to: StripeSubscription.Tier)
     case reactivateViaCheckout(tier: StripeSubscription.Tier)
     case startFullTrial
   }
@@ -32,8 +33,34 @@ struct GetSubscriptionPanel_v2: Pair {
 
 extension GetSubscriptionPanel_v2: NoInputResolver {
   static func resolve(in context: ParentContext) async throws -> Output {
-    try await panelOutput_v2(billing: context.currentBillingAccount())
+    let billing = try await context.currentBillingAccount()
+    var output = panelOutput_v2(billing: billing)
+    if let action = try await fullSubscriptionDowngradeAction(
+      parent: context.parent,
+      billing: billing,
+      in: context.db,
+    ) {
+      output.secondary.append(action)
+      output.availableTiers = availableTiers(
+        primary: output.primary,
+        secondary: output.secondary,
+      )
+    }
+    return output
   }
+}
+
+func fullSubscriptionDowngradeAction(
+  parent: Parent,
+  billing: BillingAccountSnapshot,
+  in db: any DuetSQL.Client,
+) async throws -> GetSubscriptionPanel_v2.Action? {
+  guard case .full = billing.planStatus else {
+    return nil
+  }
+  return try await parent.canDowngradeFullSubToLight(in: db)
+    ? .changeSubscriptionTier(to: .light)
+    : nil
 }
 
 func panelOutput_v2(billing: BillingAccountSnapshot) -> GetSubscriptionPanel_v2.Output {
@@ -55,14 +82,14 @@ func panelOutput_v2(billing: BillingAccountSnapshot) -> GetSubscriptionPanel_v2.
 
   case .light(.pastDue):
     primary = .openBillingPortal(config: .lightTier)
-    secondary = [.upgradeSubscriptionTier(to: .full)]
+    secondary = [.changeSubscriptionTier(to: .full)]
 
   case .light(.current):
     if identity?.fullTrialStartedAt == nil {
-      primary = .upgradeSubscriptionTier(to: .full)
+      primary = .changeSubscriptionTier(to: .full)
       secondary = [.openBillingPortal(config: .lightTier), .startFullTrial]
     } else {
-      primary = .upgradeSubscriptionTier(to: .full)
+      primary = .changeSubscriptionTier(to: .full)
       secondary = [.openBillingPortal(config: .lightTier)]
     }
 
@@ -70,11 +97,11 @@ func panelOutput_v2(billing: BillingAccountSnapshot) -> GetSubscriptionPanel_v2.
     if let substrate, substrate.tier == .light {
       switch substrate.status {
       case .current:
-        primary = .upgradeSubscriptionTier(to: .full)
+        primary = .changeSubscriptionTier(to: .full)
         secondary = [.openBillingPortal(config: .lightTier)]
       case .pastDue:
         primary = .openBillingPortal(config: .lightTier)
-        secondary = [.upgradeSubscriptionTier(to: .full)]
+        secondary = [.changeSubscriptionTier(to: .full)]
       }
     } else if identity?.lastStripeSubscriptionId != nil {
       primary = .reactivateViaCheckout(tier: .full)
@@ -100,28 +127,31 @@ func panelOutput_v2(billing: BillingAccountSnapshot) -> GetSubscriptionPanel_v2.
     }
   }
 
-  let availableTiers: [StripeSubscription.Tier] = {
-    var tiers: Set<StripeSubscription.Tier> = []
-    let actions = [primary].compactMap(\.self) + secondary
-    for action in actions {
-      switch action {
-      case .startCheckout(let t),
-           .upgradeSubscriptionTier(let t),
-           .reactivateViaCheckout(let t):
-        tiers.insert(t)
-      case .openBillingPortal, .startFullTrial:
-        break
-      }
-    }
-    return StripeSubscription.Tier.allCases.filter { tiers.contains($0) }
-  }()
-
   return GetSubscriptionPanel_v2.Output(
     planStatus: planStatus,
     primary: primary,
     secondary: secondary,
-    availableTiers: availableTiers,
+    availableTiers: availableTiers(primary: primary, secondary: secondary),
     fullTrialStartedAt: identity?.fullTrialStartedAt,
     lastPaidTier: identity?.lastPaidTier,
   )
+}
+
+func availableTiers(
+  primary: GetSubscriptionPanel_v2.Action?,
+  secondary: [GetSubscriptionPanel_v2.Action],
+) -> [StripeSubscription.Tier] {
+  var tiers: Set<StripeSubscription.Tier> = []
+  let actions = [primary].compactMap(\.self) + secondary
+  for action in actions {
+    switch action {
+    case .startCheckout(let t),
+         .changeSubscriptionTier(let t),
+         .reactivateViaCheckout(let t):
+      tiers.insert(t)
+    case .openBillingPortal, .startFullTrial:
+      break
+    }
+  }
+  return StripeSubscription.Tier.allCases.filter { tiers.contains($0) }
 }

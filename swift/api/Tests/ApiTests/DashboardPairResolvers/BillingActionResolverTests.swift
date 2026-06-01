@@ -7,7 +7,7 @@ import XStripe
 @testable import Api
 
 final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
-  func testUpgradeSubscriptionTierLightToFullSuccess() async throws {
+  func testChangeSubscriptionTierLightToFullSuccess() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let customerId = "cus_upgrade_\("".random)"
     let parent = try await self.parentWithSubscription(
@@ -50,7 +50,7 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
         )
       }
     } operation: {
-      try await UpgradeSubscriptionTier.resolve(
+      try await ChangeSubscriptionTier.resolve(
         with: .init(to: .full),
         in: context(parent.model),
       )
@@ -71,7 +71,72 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     expect(events.contains { $0.eventId == "tier_upgraded" }).toBeTrue()
   }
 
-  func testUpgradeSubscriptionTierAlertsAndFailsOnBadStatus() async throws {
+  func testChangeSubscriptionTierFullToLightSuccessWhenNoMacs() async throws {
+    let stripeId = "sub_downgrade_\("".random)"
+    let customerId = "cus_downgrade_\("".random)"
+    let parent = try await self.parentWithSubscription(
+      identity: BillingIdentity(
+        parentId: .init(),
+        stripeCustomerId: .init(customerId),
+        lastStripeSubscriptionId: .init(stripeId),
+        lastPaidTier: .full,
+      ),
+    ) { _, sub in
+      sub.tier = .full
+      sub.stripeId = .init(stripeId)
+      sub.stripeStatus = .active
+    }
+
+    let output = try await withDependencies {
+      $0.stripe.getSubscription = { id in
+        expect(id).toEqual(stripeId)
+        return .init(
+          id: stripeId,
+          status: .active,
+          customer: customerId,
+          currentPeriodEnd: 0,
+          items: [.init(id: "si_42", price: .init(id: "price_old"))],
+        )
+      }
+      $0.stripe.updateSubscription = { data in
+        expect(data.subscriptionId).toEqual(stripeId)
+        expect(data.itemId).toEqual("si_42")
+        expect(data.priceId).toEqual(StripeSubscription.Tier.light.checkoutStripePriceId)
+        expect(data.prorationBehavior).toEqual(.alwaysInvoice)
+        expect(data.paymentBehavior).toEqual(.errorIfIncomplete)
+        expect(data.billingCycleAnchor).toEqual(.now)
+        return .init(
+          id: stripeId,
+          status: .active,
+          customer: customerId,
+          currentPeriodEnd: Int(Date.reference.addingTimeInterval(.days(365))
+            .timeIntervalSince1970),
+          items: [.init(id: "si_42", price: .init(id: data.priceId))],
+        )
+      }
+    } operation: {
+      try await ChangeSubscriptionTier.resolve(
+        with: .init(to: .light),
+        in: context(parent.model),
+      )
+    }
+
+    expect(output).toEqual(.success)
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.tier).toEqual(.light)
+    expect(sub.stripeStatus).toEqual(.active)
+
+    let identity = try await parent.model.billingIdentity(in: self.db)!
+    expect(identity.lastPaidTier).toEqual(.light)
+    expect(identity.lastStripeSubscriptionId?.rawValue).toEqual(stripeId)
+
+    let events = try await InterestingEvent.query()
+      .where(.parentId == parent.id)
+      .all(in: self.db)
+    expect(events.contains { $0.eventId == "tier_downgraded" }).toBeTrue()
+  }
+
+  func testChangeSubscriptionTierAlertsAndFailsOnBadStatus() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let customerId = "cus_upgrade_\("".random)"
     let parent = try await self.parentWithSubscription(
@@ -108,7 +173,7 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
       }
     } operation: { [self] in
       try await expectErrorFrom { [self] in
-        try await UpgradeSubscriptionTier.resolve(
+        try await ChangeSubscriptionTier.resolve(
           with: .init(to: .full),
           in: context(parent.model),
         )
@@ -122,7 +187,7 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     expect(alarms.contains { $0.message.text.contains("Post-update status anomaly") }).toBeTrue()
   }
 
-  func testUpgradeSubscriptionTierRejectsAlreadyOnTier() async throws {
+  func testChangeSubscriptionTierRejectsAlreadyOnTier() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let parent = try await self.parentWithSubscription { _, sub in
       sub.tier = .full
@@ -130,29 +195,32 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     }
 
     try await expectErrorFrom { [self] in
-      try await UpgradeSubscriptionTier.resolve(
+      try await ChangeSubscriptionTier.resolve(
         with: .init(to: .full),
         in: context(parent.model),
       )
     }.toContain("Already on the requested tier")
   }
 
-  func testUpgradeSubscriptionTierRejectsDownConversion() async throws {
+  func testChangeSubscriptionTierRejectsDowngradeWithRegisteredMac() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let parent = try await self.parentWithSubscription { _, sub in
       sub.tier = .full
       sub.stripeId = .init(stripeId)
     }
+    _ = try await self.db.create(Computer.random {
+      $0.parentId = parent.id
+    })
 
     try await expectErrorFrom { [self] in
-      try await UpgradeSubscriptionTier.resolve(
+      try await ChangeSubscriptionTier.resolve(
         with: .init(to: .light),
         in: context(parent.model),
       )
-    }.toContain("Only upgrades from Light to Full are supported")
+    }.toContain("only available when no Macs are registered")
   }
 
-  func testUpgradeSubscriptionTierMirrorsPastDueBillingStatus() async throws {
+  func testChangeSubscriptionTierMirrorsPastDueBillingStatus() async throws {
     let stripeId = "sub_upgrade_\("".random)"
     let customerId = "cus_upgrade_\("".random)"
     let parent = try await self.parentWithSubscription(
@@ -188,7 +256,7 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
         )
       }
     } operation: {
-      try await UpgradeSubscriptionTier.resolve(
+      try await ChangeSubscriptionTier.resolve(
         with: .init(to: .full),
         in: context(parent.model),
       )
@@ -199,14 +267,14 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     expect(sub.stripeStatus).toEqual(.pastDue)
   }
 
-  func testUpgradeSubscriptionTierRejectsWithoutSubscription() async throws {
+  func testChangeSubscriptionTierRejectsWithoutSubscription() async throws {
     let parent = try await self.parent()
     try await expectErrorFrom { [self] in
-      try await UpgradeSubscriptionTier.resolve(
+      try await ChangeSubscriptionTier.resolve(
         with: .init(to: .full),
         in: context(parent.model),
       )
-    }.toContain("No active subscription to upgrade")
+    }.toContain("No active subscription to change")
   }
 
   func testOpenBillingPortalWiresReturnUrlToStripe() async throws {

@@ -130,7 +130,7 @@ final class EnumCodableFixtureTests: XCTestCase {
     try self.assertRoundTrip(PlanStatus.light(status: .current(renewsAt: date)))
     try self.assertRoundTrip(PlanStatus.full(status: .pastDue(since: date)))
     try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.startCheckout(tier: .full))
-    try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.upgradeSubscriptionTier(to: .full))
+    try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.changeSubscriptionTier(to: .full))
     try self.assertRoundTrip(GetSubscriptionPanel_v2.Action.startFullTrial)
   }
 

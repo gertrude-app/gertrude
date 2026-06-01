@@ -62,8 +62,8 @@ const AdminSettings: React.FC = () => {
     },
   );
 
-  const upgradeSubscriptionTier = useMutation(
-    ({ to }: { to: SubscriptionTier }) => Current.api.upgradeSubscriptionTier({ to }),
+  const changeSubscriptionTier = useMutation(
+    ({ to }: { to: SubscriptionTier }) => Current.api.changeSubscriptionTier({ to }),
     {
       invalidating: [Key.subscriptionPanel],
       onSuccess: () => {
@@ -194,9 +194,9 @@ const AdminSettings: React.FC = () => {
         setPendingPanelAction(action);
         openBillingPortal.mutate({ configuration: action.config });
         return;
-      case `upgradeSubscriptionTier`:
+      case `changeSubscriptionTier`:
         setPendingPanelAction(action);
-        upgradeSubscriptionTier.mutate({ to: action.to });
+        changeSubscriptionTier.mutate({ to: action.to });
         return;
       case `startFullTrial`:
         setPendingPanelAction(action);
