@@ -129,20 +129,12 @@ import Testing
       }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
-      $0.keychain = KeychainClient(
-        _load: { key in keychainStore.value[key.rawValue] },
-        _save: { key, data in keychainStore.withValue { $0[key.rawValue] = data } },
-        delete: { key in keychainStore.withValue { $0[key.rawValue] = nil } },
-      )
+      $0.keychain = dictKeychain(keychainStore, pincode: 111_111, installDate: .reference)
       $0.device.vendorId = { nil }
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
       $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
       $0.mainQueue = .immediate
     } operation: {
-      keychainStore.withValue {
-        $0[KeychainClient.Key.pincode.rawValue] = "111111".data(using: .utf8)!
-        $0[KeychainClient.Key.installDate.rawValue] = "1760103425".data(using: .utf8)!
-      }
       try CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(2))
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
       store.exhaustivity = .off
@@ -305,21 +297,4 @@ import Testing
       #expect(sub.expiresAt == .reference + .days(200))
     }
   }
-}
-
-private func claimedKeychain(
-  token: UUID,
-  store: LockIsolated<[String: Data]>,
-) -> KeychainClient {
-  store.withValue {
-    $0[KeychainClient.Key.pincode.rawValue] = "111111".data(using: .utf8)!
-    $0[KeychainClient.Key.installDate.rawValue] = "1760103425".data(using: .utf8)!
-    $0[KeychainClient.Key.deviceId.rawValue] = UUID().uuidString.data(using: .utf8)!
-    $0[KeychainClient.Key.amToken.rawValue] = token.uuidString.data(using: .utf8)!
-  }
-  return KeychainClient(
-    _load: { key in store.value[key.rawValue] },
-    _save: { key, data in store.withValue { $0[key.rawValue] = data } },
-    delete: { key in store.withValue { $0[key.rawValue] = nil } },
-  )
 }

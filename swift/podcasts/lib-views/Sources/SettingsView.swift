@@ -58,17 +58,20 @@ public struct SettingsView: View {
   let status: SubscriptionStatus
   let expiresAt: Date
   let reclaimableStorageGb: Double?
+  let isClaimed: Bool
   let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
     status: SubscriptionStatus,
     expiresAt: Date,
     reclaimableStorageGb: Double? = nil,
+    isClaimed: Bool = false,
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.status = status
     self.expiresAt = expiresAt
     self.reclaimableStorageGb = reclaimableStorageGb
+    self.isClaimed = isClaimed
     self.onEvent = onEvent
   }
 

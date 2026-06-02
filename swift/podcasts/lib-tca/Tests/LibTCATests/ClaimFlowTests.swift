@@ -241,14 +241,3 @@ import Testing
     }
   }
 }
-
-private func dictKeychain(_ store: LockIsolated<[String: Data]>) -> KeychainClient {
-  store.withValue {
-    $0[KeychainClient.Key.deviceId.rawValue] = UUID().uuidString.data(using: .utf8)!
-  }
-  return KeychainClient(
-    _load: { key in store.value[key.rawValue] },
-    _save: { key, data in store.withValue { $0[key.rawValue] = data } },
-    delete: { key in store.withValue { $0[key.rawValue] = nil } },
-  )
-}

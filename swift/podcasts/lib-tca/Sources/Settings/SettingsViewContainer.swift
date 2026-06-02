@@ -5,15 +5,52 @@ import SwiftUI
 
 struct SettingsViewContainer: View {
   @Bindable var store: StoreOf<SettingsFeature>
+  @Dependency(\.keychain) var keychain
+  @Dependency(\.haptics) var haptics
 
   var body: some View {
     SettingsView(
       status: self.store.subscription.settingsViewStatus,
       expiresAt: self.store.subscription.expiresAt,
       reclaimableStorageGb: self.reclaimableGb,
+      isClaimed: self.store.isClaimed,
       onEvent: { self.store.send(.view($0)) },
     )
     .onAppear { self.store.send(.onAppear) }
+    .sheet(
+      item: self.$store.scope(state: \.claimFlow, action: \.claimFlow),
+      content: { store in
+        ClaimFlowView(store: store)
+      },
+    )
+    .sheet(
+      isPresented: Binding(
+        get: { self.store.pinChallenge != nil },
+        set: { if !$0 { self.store.send(.pincodeCancelled) } },
+      ),
+      onDismiss: { self.store.send(.pinChallengeDismissed) },
+      content: {
+        PinCodeView(
+          mode: .verify(
+            self.pincode,
+            lockout: self.store.pinChallenge?.lockout,
+            onVerify: { self.store.send(.pincodeVerified) },
+            onFail: { self.store.send(.pincodeFailed) },
+          ),
+          onCancel: { self.store.send(.pincodeCancelled) },
+          onPrepHaptics: self.haptics.prepare,
+        )
+      },
+    )
+  }
+
+  private var pincode: Int {
+    if let pin = self.keychain.loadPincode() {
+      return pin
+    } else {
+      log(.error("a58eb83d"), "missing pincode")
+      return Int.random(in: 100_000 ... 999_999)
+    }
   }
 
   private var reclaimableGb: Double? {
