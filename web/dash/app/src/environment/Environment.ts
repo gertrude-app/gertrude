@@ -94,60 +94,6 @@ export class LiveEnvironment implements EnvironmentClient {
   }
 }
 
-export class ThrowingEnvironment implements EnvironmentClient {
-  public apiEndpoint(): string {
-    throw new Error(`EnvironmentClient.graphQLEndpoint() not implemented.`);
-  }
-  public turnstileSitekey(): string {
-    throw new Error(`EnvironmentClient.turnstileSitekey() not implemented.`);
-  }
-  public mode(): Mode {
-    throw new Error(`EnvironmentClient.mode() not implemented.`);
-  }
-  public isDev(): boolean {
-    throw new Error(`EnvironmentClient.isDev() not implemented.`);
-  }
-  public isStaging(): boolean {
-    throw new Error(`EnvironmentClient.isStaging() not implemented.`);
-  }
-  public isProd(): boolean {
-    throw new Error(`EnvironmentClient.isProd() not implemented.`);
-  }
-  public requiredVar(_varName: RequiredVar): string {
-    throw new Error(`EnvironmentClient.requiredVar() not implemented.`);
-  }
-  public optionalVar(_varName: OptionalVar): string | undefined {
-    throw new Error(`EnvironmentClient.optionalVar() not implemented.`);
-  }
-}
-
-export class NoopEnvironment implements EnvironmentClient {
-  public apiEndpoint(): string {
-    return ``;
-  }
-  public turnstileSitekey(): string {
-    return ``;
-  }
-  public mode(): Mode {
-    return Mode.Dev;
-  }
-  public isDev(): boolean {
-    return true;
-  }
-  public isStaging(): boolean {
-    return false;
-  }
-  public isProd(): boolean {
-    return false;
-  }
-  public requiredVar(_varName: RequiredVar): string {
-    return ``;
-  }
-  public optionalVar(_varName: OptionalVar): string | undefined {
-    return undefined;
-  }
-}
-
 // helpers
 
 function requireVar(
