@@ -291,24 +291,20 @@ private func handleSubscriptionDeleted(
   try await db.update(subscription)
 
   let parent = try await db.find(subscription.parentId) as Parent
-  let adminLink = AdminLink()
-  let slackLink = adminLink.slack(to: .parent(parent.id), text: parent.email.rawValue)
-  let emailLink = adminLink.email(to: .parent(parent.id), text: parent.email.rawValue)
-  Task {
-    await get(dependency: \.slack)
-      .internal(.info, "*Subscription cancelled* by \(slackLink)")
-    get(dependency: \.postmark)
-      .toSuperAdmin("Subscription Cancelled", "by \(emailLink)")
-  }
+  notifySubscriptionCancelled(parent: parent, details: event?.data?.object?.cancellation_details)
 }
 
 private func slackNotify(_ event: EventInfo?) {
+  var message = """
+    *Received Gertrude Stripe Event:*
+    - type: `\(event?.type ?? "(nil)")`
+    - customer email: `\(event?.data?.object?.customer_email ?? "(nil)")`
+  """
+  if event?.type == "customer.subscription.deleted" {
+    message += "\n- cancellation: `\(event?.data?.object?.cancellation_details?.reason ?? "(nil)")`"
+  }
   Task {
-    await get(dependency: \.slack).internal(.stripe, """
-      *Received Gertrude Stripe Event:*
-      - type: `\(event?.type ?? "(nil)")`
-      - customer email: `\(event?.data?.object?.customer_email ?? "(nil)")`
-    """)
+    await get(dependency: \.slack).internal(.stripe, message)
   }
 }
 
@@ -316,6 +312,12 @@ private struct EventInfo: Decodable {
   struct Data: Decodable {
     struct Object: Decodable {
       var id: String?
+
+      struct CancellationDetails: Decodable {
+        var comment: String?
+        var feedback: String?
+        var reason: String?
+      }
 
       struct Lines: Decodable {
         struct Line: Decodable {
@@ -349,6 +351,7 @@ private struct EventInfo: Decodable {
       var amount_due: Int?
       var customer: String?
       var customer_email: String?
+      var cancellation_details: CancellationDetails?
       var lines: Lines?
       var items: Items?
       var subscription: String?
@@ -378,4 +381,27 @@ func recordPaidAdConversion(parent: Parent, db: any DuetSQL.Client) async {
     parentId: parent.id,
     detail: "gclid=\(gclid)",
   ))
+}
+
+private func notifySubscriptionCancelled(
+  parent: Parent,
+  details: EventInfo.Data.Object.CancellationDetails?,
+) {
+  let adminLink = AdminLink()
+  let slackLink = adminLink.slack(to: .parent(parent.id), text: parent.email.rawValue)
+  let emailLink = adminLink.email(to: .parent(parent.id), text: parent.email.rawValue)
+  let reason = details?.reason ?? "(nil)"
+  var body = "by \(emailLink)<br>stripe reason: \(reason)"
+  if let feedback = details?.feedback, !feedback.isEmpty {
+    body += "<br>feedback: \(feedback)"
+  }
+  if let comment = details?.comment, !comment.isEmpty {
+    body += "<br>comment: \(comment)"
+  }
+  Task {
+    await get(dependency: \.slack)
+      .internal(.info, "*Subscription cancelled* (`\(reason)`) by \(slackLink)")
+    get(dependency: \.postmark)
+      .toSuperAdmin("Subscription Cancelled (\(reason))", body)
+  }
 }
