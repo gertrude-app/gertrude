@@ -23,6 +23,7 @@ const RightColumnCard: React.FC<Props> = ({ children, title, links }) => {
         <div className="flex justify-end">
           {links.map((l) => (
             <Button
+              key={`${l.href}-${l.text}`}
               type="link"
               href={l.href}
               variant={l.variant}

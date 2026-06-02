@@ -9,6 +9,15 @@ interface Props {
   allSecurityEvents: Array<SecurityEvent>;
 }
 
+const getSecurityEventKey = (event: SecurityEvent): string => {
+  const source =
+    event.type === 'mac-app'
+      ? `${event.personName}-${event.deviceName}`
+      : event.ipAddress;
+
+  return `${event.type}-${event.title}-${event.time}-${event.date}-${source}`;
+};
+
 const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => {
   return (
     <RightColumnCard
@@ -25,7 +34,7 @@ const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => {
     >
       <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
         {allSecurityEvents.slice(0, 4).map((e) => (
-          <SecurityEventRow securityEvent={e} />
+          <SecurityEventRow key={getSecurityEventKey(e)} securityEvent={e} />
         ))}
       </div>
     </RightColumnCard>

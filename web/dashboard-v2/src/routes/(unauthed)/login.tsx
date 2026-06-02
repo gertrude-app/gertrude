@@ -135,7 +135,7 @@ const AppAd: React.FC<AppAdProps> = ({
       <div className="pt-10 px-8 pb-8 flex flex-col items-center">
         <div className="flex justify-center gap-2 flex-wrap">
           {badges.map((b) => (
-            <Badge color="neutral" size="small">
+            <Badge key={b} color="neutral" size="small">
               {b}
             </Badge>
           ))}

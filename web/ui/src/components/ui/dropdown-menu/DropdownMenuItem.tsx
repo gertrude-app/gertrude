@@ -45,7 +45,7 @@ const DropdownMenuItem: React.FC<Props> = ({
           <ChevronRightIcon className="w-4 h-4 text-stone-500" />
         </DM.SubTrigger>
         <DM.Portal>
-          <DM.SubContent className="bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 mx-0 -mt-1">
+          <DM.SubContent className="z-[60] bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 mx-0 -mt-1">
             {children}
           </DM.SubContent>
         </DM.Portal>

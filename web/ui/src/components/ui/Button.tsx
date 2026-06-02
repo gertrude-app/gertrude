@@ -1,18 +1,34 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
-import { LoaderCircleIcon, type LucideIcon } from 'lucide-react';
+import { ChevronDownIcon, LoaderCircleIcon, type LucideIcon } from 'lucide-react';
 import cx from 'clsx';
+import DropdownMenu from './dropdown-menu/DropdownMenu';
+import DropdownMenuItem from './dropdown-menu/DropdownMenuItem';
+
+type ButtonVariant = 'primary' | 'default' | 'ghost' | 'destructive';
+type ButtonSize = 'small' | 'medium' | 'large';
+
+type DropdownItem = {
+  title: string;
+  icon?: LucideIcon;
+  selected?: boolean;
+  onSelect?: () => void;
+  children?: React.ReactNode;
+};
 
 type CommonProps = {
   children?: React.ReactNode;
   ariaLabel?: string;
   icon?: LucideIcon;
   iconPosition?: 'left' | 'right';
-  variant?: 'primary' | 'default' | 'ghost' | 'destructive';
-  size?: 'small' | 'medium' | 'large';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   loading?: boolean;
   disabled?: boolean;
   className?: string;
+  dropdownItems?: DropdownItem[];
+  dropdownAriaLabel?: string;
+  dropdownSearchable?: boolean;
 };
 
 type Props = CommonProps &
@@ -40,6 +56,9 @@ const ownPropKeys = new Set([
   'loading',
   'disabled',
   'className',
+  'dropdownItems',
+  'dropdownAriaLabel',
+  'dropdownSearchable',
   'type',
   'onClick',
   'href',
@@ -51,12 +70,62 @@ const getPassThroughProps = (props: Props): React.HTMLAttributes<HTMLElement> =>
   ) as React.HTMLAttributes<HTMLElement>;
 };
 
+const getRoundedClasses = (
+  size: ButtonSize | undefined,
+  splitPart: 'main' | 'dropdown' | undefined,
+): string => {
+  if (splitPart === 'main') {
+    return cx({
+      'rounded-l-[7px] rounded-r-none': size === 'small',
+      'rounded-l-[9px] rounded-r-none': size === 'medium' || size === undefined,
+      'rounded-l-[13px] rounded-r-none': size === 'large',
+    });
+  }
+
+  if (splitPart === 'dropdown') {
+    return cx('-ml-px', {
+      'rounded-l-none rounded-r-[7px]': size === 'small',
+      'rounded-l-none rounded-r-[9px]': size === 'medium' || size === undefined,
+      'rounded-l-none rounded-r-[13px]': size === 'large',
+    });
+  }
+
+  return cx({
+    'rounded-[7px]': size === 'small',
+    'rounded-[9px]': size === 'medium' || size === undefined,
+    'rounded-[13px]': size === 'large',
+  });
+};
+
+const getSizeClasses = (
+  size: ButtonSize | undefined,
+  hasLabel: boolean,
+  splitPart?: 'main' | 'dropdown',
+): string => {
+  return cx(
+    hasLabel
+      ? {
+          'px-2 py-1 text-[13px]': size === 'small',
+          'px-2.5 py-1.5 text-[15px]': size === 'medium' || size === undefined,
+          'px-3.5 py-2.75 text-base': size === 'large',
+        }
+      : {
+          'px-1.5 py-1 text-[13px]': size === 'small' && splitPart === 'dropdown',
+          'px-1 py-1 text-[13px]': size === 'small' && splitPart !== 'dropdown',
+          'px-1.5 py-1.5 text-[15px]': size === 'medium' || size === undefined,
+          'px-2.75 py-2.75 text-base': size === 'large',
+        },
+    getRoundedClasses(size, splitPart),
+  );
+};
+
 const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
   const passThroughProps = getPassThroughProps(props);
   const isDisabled = props.disabled || props.loading;
   const iconPosition = props.iconPosition ?? 'left';
   const hasLabel =
     props.children !== undefined && props.children !== null && props.children !== '';
+  const hasDropdown = props.dropdownItems !== undefined && props.dropdownItems.length > 0;
   const [showLoaderSlot, setShowLoaderSlot] = React.useState(false);
   const [loaderSlotOpen, setLoaderSlotOpen] = React.useState(false);
 
@@ -101,41 +170,36 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
       iconPosition === 'right' &&
       (props.size === 'medium' || props.size === undefined || props.size === 'large'),
   });
-  const buttonClasses = cx(
-    'inline-flex items-center justify-center border font-[450] shadow outline-none transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 select-none',
-    isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
-    {
-      'border-violet-800 bg-violet-500 text-white shadow-violet-500/30 focus-visible:ring-violet-400/70':
-        props.variant === 'primary',
-      'border-stone-300/80 bg-white text-stone-800 shadow-stone-300/30 focus-visible:ring-stone-400/70':
-        props.variant === 'default' || props.variant === undefined,
-      'border-transparent bg-transparent text-stone-600 shadow-transparent focus-visible:ring-stone-400/70':
-        props.variant === 'ghost',
-      'border-red-800/20 bg-red-600/3 text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
-        props.variant === 'destructive',
-    },
-    !isDisabled && {
-      'hover:border-violet-900 hover:shadow-violet-500/50': props.variant === 'primary',
-      'hover:border-stone-400/70 hover:shadow-stone-300/80':
-        props.variant === 'default' || props.variant === undefined,
-      'hover:bg-stone-200/70': props.variant === 'ghost',
-      'hover:border-red-600/50': props.variant === 'destructive',
-    },
-    hasLabel
-      ? {
-          'rounded-[7px] px-2 py-1 text-[13px]': props.size === 'small',
-          'rounded-[9px] px-2.5 py-1.5 text-[15px]':
-            props.size === 'medium' || props.size === undefined,
-          'rounded-[13px] px-3.5 py-2.75 text-base': props.size === 'large',
-        }
-      : {
-          'rounded-[7px] px-1 py-1 text-[13px]': props.size === 'small',
-          'rounded-[9px] px-1.5 py-1.5 text-[15px]':
-            props.size === 'medium' || props.size === undefined,
-          'rounded-[13px] px-2.75 py-2.75 text-base': props.size === 'large',
-        },
-    props.className,
-  );
+
+  const getButtonClasses = (
+    contentHasLabel: boolean,
+    splitPart?: 'main' | 'dropdown',
+  ): string =>
+    cx(
+      'relative inline-flex items-center justify-center border font-[450] shadow outline-none transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 select-none',
+      isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+      {
+        'border-violet-800 bg-violet-500 text-white shadow-violet-500/30 focus-visible:ring-violet-400/70':
+          props.variant === 'primary',
+        'border-stone-300/80 bg-white text-stone-800 shadow-stone-300/30 focus-visible:ring-stone-400/70':
+          props.variant === 'default' || props.variant === undefined,
+        'border-transparent bg-transparent text-stone-600 shadow-transparent focus-visible:ring-stone-400/70':
+          props.variant === 'ghost',
+        'border-[#E9C8C7] bg-red-600/3 text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
+          props.variant === 'destructive',
+      },
+      !isDisabled && {
+        'hover:z-10 hover:border-violet-900 hover:shadow-violet-500/50':
+          props.variant === 'primary',
+        'hover:z-10 hover:border-stone-400/70 hover:shadow-stone-300/80':
+          props.variant === 'default' || props.variant === undefined,
+        'hover:bg-stone-200/70': props.variant === 'ghost',
+        'hover:z-10 hover:border-red-600/35 hover:shadow-red-700/20':
+          props.variant === 'destructive',
+      },
+      getSizeClasses(props.size, contentHasLabel, splitPart),
+      splitPart === undefined && props.className,
+    );
 
   const iconSlot = (): React.ReactNode => {
     const shouldRender = props.icon || props.loading || showLoaderSlot;
@@ -190,76 +254,123 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
     </>
   );
 
-  switch (props.type) {
-    case 'button':
-      return (
-        <button
-          {...passThroughProps}
-          ref={ref as React.Ref<HTMLButtonElement>}
-          type="button"
-          className={buttonClasses}
-          disabled={isDisabled}
-          aria-label={props.ariaLabel}
-          aria-busy={props.loading ? true : undefined}
-          onClick={props.onClick}
-        >
-          {content}
-        </button>
-      );
-    case 'submit':
-      return (
-        <button
-          {...passThroughProps}
-          ref={ref as React.Ref<HTMLButtonElement>}
-          className={buttonClasses}
-          type="submit"
-          disabled={isDisabled}
-          aria-label={props.ariaLabel}
-          aria-busy={props.loading ? true : undefined}
-        >
-          {content}
-        </button>
-      );
-    case 'link': {
-      const isInternalLink = props.href.startsWith('/') && !props.href.startsWith('//');
+  const mainButtonClasses = getButtonClasses(hasLabel, hasDropdown ? 'main' : undefined);
 
-      return isInternalLink ? (
-        <Link
-          to={props.href}
-          className={buttonClasses}
-          aria-label={props.ariaLabel}
-          aria-disabled={isDisabled ? true : undefined}
-          aria-busy={props.loading ? true : undefined}
-          tabIndex={isDisabled ? -1 : undefined}
-          onClick={(event) => {
-            if (isDisabled) {
-              event.preventDefault();
-            }
-          }}
-        >
-          {content}
-        </Link>
-      ) : (
-        <a
-          {...passThroughProps}
-          ref={ref as React.Ref<HTMLAnchorElement>}
-          className={buttonClasses}
-          href={props.href}
-          aria-label={props.ariaLabel}
-          aria-disabled={isDisabled ? true : undefined}
-          aria-busy={props.loading ? true : undefined}
-          tabIndex={isDisabled ? -1 : undefined}
-          onClick={(event) => {
-            if (isDisabled) {
-              event.preventDefault();
-            }
-          }}
-        >
-          {content}
-        </a>
-      );
+  const renderMainAction = (): React.ReactNode => {
+    switch (props.type) {
+      case 'button':
+        return (
+          <button
+            {...passThroughProps}
+            ref={ref as React.Ref<HTMLButtonElement>}
+            type="button"
+            className={mainButtonClasses}
+            disabled={isDisabled}
+            aria-label={props.ariaLabel}
+            aria-busy={props.loading ? true : undefined}
+            onClick={props.onClick}
+          >
+            {content}
+          </button>
+        );
+      case 'submit':
+        return (
+          <button
+            {...passThroughProps}
+            ref={ref as React.Ref<HTMLButtonElement>}
+            className={mainButtonClasses}
+            type="submit"
+            disabled={isDisabled}
+            aria-label={props.ariaLabel}
+            aria-busy={props.loading ? true : undefined}
+          >
+            {content}
+          </button>
+        );
+      case 'link': {
+        const isInternalLink = props.href.startsWith('/') && !props.href.startsWith('//');
+
+        return isInternalLink ? (
+          <Link
+            to={props.href}
+            className={mainButtonClasses}
+            aria-label={props.ariaLabel}
+            aria-disabled={isDisabled ? true : undefined}
+            aria-busy={props.loading ? true : undefined}
+            tabIndex={isDisabled ? -1 : undefined}
+            onClick={(event) => {
+              if (isDisabled) {
+                event.preventDefault();
+              }
+            }}
+          >
+            {content}
+          </Link>
+        ) : (
+          <a
+            {...passThroughProps}
+            ref={ref as React.Ref<HTMLAnchorElement>}
+            className={mainButtonClasses}
+            href={props.href}
+            aria-label={props.ariaLabel}
+            aria-disabled={isDisabled ? true : undefined}
+            aria-busy={props.loading ? true : undefined}
+            tabIndex={isDisabled ? -1 : undefined}
+            onClick={(event) => {
+              if (isDisabled) {
+                event.preventDefault();
+              }
+            }}
+          >
+            {content}
+          </a>
+        );
+      }
     }
+  };
+
+  if (!hasDropdown) {
+    return renderMainAction();
   }
+
+  return (
+    <span className={cx('inline-flex items-stretch', props.className)}>
+      {renderMainAction()}
+      <DropdownMenu
+        disabled={isDisabled}
+        searchable={props.dropdownSearchable}
+        trigger={
+          <button
+            type="button"
+            className={cx(getButtonClasses(false, 'dropdown'), 'group')}
+            disabled={isDisabled}
+            aria-label={props.dropdownAriaLabel ?? 'More actions'}
+            aria-busy={props.loading ? true : undefined}
+          >
+            <ChevronDownIcon
+              className={cx(
+                iconClasses,
+                'transition-transform duration-150 group-hover:translate-y-0.5',
+              )}
+              aria-hidden="true"
+            />
+          </button>
+        }
+      >
+        {props.dropdownItems?.map((item, index) => (
+          <DropdownMenuItem
+            key={`${item.title}-${index}`}
+            title={item.title}
+            icon={item.icon}
+            selected={item.selected}
+            onSelect={item.onSelect}
+          >
+            {item.children}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenu>
+    </span>
+  );
 });
 
 Button.displayName = 'Button';
