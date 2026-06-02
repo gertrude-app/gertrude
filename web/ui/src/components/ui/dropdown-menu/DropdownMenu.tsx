@@ -1,5 +1,5 @@
 import React from 'react';
-import * as DM from '@radix-ui/react-dropdown-menu';
+import { Menu } from '@base-ui/react/menu';
 
 interface Props {
   trigger: React.ReactNode;
@@ -49,6 +49,7 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
           : child,
       )
     : visibleChildren;
+  const triggerElement = React.isValidElement(trigger) ? trigger : undefined;
 
   React.useEffect(() => {
     if (!open || !searchable) {
@@ -111,7 +112,7 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
   };
 
   return (
-    <DM.Root
+    <Menu.Root
       open={open}
       onOpenChange={(nextOpen) => {
         if (disabled) {
@@ -126,48 +127,50 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
           setActiveIndex(-1);
         }
       }}
+      disabled={disabled}
+      modal={false}
     >
-      <DM.Trigger asChild disabled={disabled}>
-        {trigger}
-      </DM.Trigger>
-      <DM.Portal>
-        <DM.Content
-          align="center"
-          sideOffset={4}
-          className="z-[60] bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 select-none mx-1"
-        >
-          {searchable && (
-            <input
-              ref={searchInputRef}
-              value={searchQuery}
-              className="outline-none placeholder:text-stone-400/70 border border-stone-200 text-sm px-2 py-1.25 rounded-lg bg-stone-100/50"
-              placeholder="Type to search..."
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (menuNavigationKeys.includes(event.key)) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  moveActiveItem(event.key);
-                  return;
-                }
+      {triggerElement ? (
+        <Menu.Trigger render={triggerElement} disabled={disabled} />
+      ) : (
+        <Menu.Trigger disabled={disabled}>{trigger}</Menu.Trigger>
+      )}
+      <Menu.Portal>
+        <Menu.Positioner sideOffset={4} align="center" className="z-[60]">
+          <Menu.Popup className="z-[60] bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 select-none mx-1 outline-none">
+            {searchable && (
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                className="outline-none placeholder:text-stone-400/70 border border-stone-200 text-sm px-2 py-1.25 rounded-lg bg-stone-100/50"
+                placeholder="Type to search..."
+                onChange={(event) => setSearchQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (menuNavigationKeys.includes(event.key)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    moveActiveItem(event.key);
+                    return;
+                  }
 
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  selectActiveItem();
-                  return;
-                }
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    selectActiveItem();
+                    return;
+                  }
 
-                if (event.key !== 'Escape') {
-                  event.stopPropagation();
-                }
-              }}
-            />
-          )}
-          <div>{renderedChildren.length > 0 ? renderedChildren : null}</div>
-        </DM.Content>
-      </DM.Portal>
-    </DM.Root>
+                  if (event.key !== 'Escape') {
+                    event.stopPropagation();
+                  }
+                }}
+              />
+            )}
+            <div>{renderedChildren.length > 0 ? renderedChildren : null}</div>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
   );
 };
 
