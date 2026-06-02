@@ -40,7 +40,7 @@ const PeoplePage: React.FC = () => (
     <div className="flex flex-col @5xl/main:flex-row gap-12">
       <CardContainer className="flex flex-col gap-4 @xl/main:gap-6 flex-grow">
         {mockChildren.map((c) => (
-          <PersonCard person={c} />
+          <PersonCard key={c.name} person={c} />
         ))}
       </CardContainer>
       <div className="@5xl/main:w-72 shrink-0 flex flex-col gap-6">
@@ -52,6 +52,6 @@ const PeoplePage: React.FC = () => (
   </DashboardPage>
 );
 
-export const Route = createFileRoute('/_app/people')({
+export const Route = createFileRoute('/_app/people/')({
   component: PeoplePage,
 });

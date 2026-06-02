@@ -6,6 +6,7 @@ import AssortmentExample from './button/examples/AssortmentExample';
 import VariantStatesExample from './button/examples/VariantStatesExample';
 import SizeScaleExample from './button/examples/SizeScaleExample';
 import LoadingTransitionExample from './button/examples/LoadingTransitionExample';
+import SplitActionExample from './button/examples/SplitActionExample';
 
 const ButtonPage: React.FC = () => {
   return (
@@ -30,6 +31,12 @@ const ButtonPage: React.FC = () => {
         path="./examples/SizeScaleExample.tsx"
         description="Small, medium, and large sizes with icons and loading states."
         demoHeight="15rem"
+      />
+      <DemoExample
+        component={<SplitActionExample />}
+        path="./examples/SplitActionExample.tsx"
+        description="Split action buttons keep a primary default action on the left and a dropdown of alternate actions on the right."
+        demoHeight="21rem"
       />
       <DemoExample
         component={<LoadingTransitionExample />}

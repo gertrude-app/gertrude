@@ -16,9 +16,11 @@ import { Route as ComponentsSidebarRouteImport } from './routes/components/sideb
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsRadioGroupRouteImport } from './routes/components/radio-group'
 import { Route as ComponentsPageHeadingRouteImport } from './routes/components/page-heading'
+import { Route as ComponentsModalRouteImport } from './routes/components/modal'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsDropdownMenuRouteImport } from './routes/components/dropdown-menu'
+import { Route as ComponentsConfirmationDialogRouteImport } from './routes/components/confirmation-dialog'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
 import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
@@ -58,6 +60,11 @@ const ComponentsPageHeadingRoute = ComponentsPageHeadingRouteImport.update({
   path: '/components/page-heading',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsModalRoute = ComponentsModalRouteImport.update({
+  id: '/components/modal',
+  path: '/components/modal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
   id: '/components/input',
   path: '/components/input',
@@ -73,6 +80,12 @@ const ComponentsDropdownMenuRoute = ComponentsDropdownMenuRouteImport.update({
   path: '/components/dropdown-menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsConfirmationDialogRoute =
+  ComponentsConfirmationDialogRouteImport.update({
+    id: '/components/confirmation-dialog',
+    path: '/components/confirmation-dialog',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsCheckboxRoute = ComponentsCheckboxRouteImport.update({
   id: '/components/checkbox',
   path: '/components/checkbox',
@@ -94,9 +107,11 @@ export interface FileRoutesByFullPath {
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/modal': typeof ComponentsModalRoute
   '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
@@ -109,9 +124,11 @@ export interface FileRoutesByTo {
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/modal': typeof ComponentsModalRoute
   '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
@@ -125,9 +142,11 @@ export interface FileRoutesById {
   '/components/badge': typeof ComponentsBadgeRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
+  '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/modal': typeof ComponentsModalRoute
   '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
@@ -142,9 +161,11 @@ export interface FileRouteTypes {
     | '/components/badge'
     | '/components/button'
     | '/components/checkbox'
+    | '/components/confirmation-dialog'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/modal'
     | '/components/page-heading'
     | '/components/radio-group'
     | '/components/select'
@@ -157,9 +178,11 @@ export interface FileRouteTypes {
     | '/components/badge'
     | '/components/button'
     | '/components/checkbox'
+    | '/components/confirmation-dialog'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/modal'
     | '/components/page-heading'
     | '/components/radio-group'
     | '/components/select'
@@ -172,9 +195,11 @@ export interface FileRouteTypes {
     | '/components/badge'
     | '/components/button'
     | '/components/checkbox'
+    | '/components/confirmation-dialog'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/modal'
     | '/components/page-heading'
     | '/components/radio-group'
     | '/components/select'
@@ -188,9 +213,11 @@ export interface RootRouteChildren {
   ComponentsBadgeRoute: typeof ComponentsBadgeRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
+  ComponentsConfirmationDialogRoute: typeof ComponentsConfirmationDialogRoute
   ComponentsDropdownMenuRoute: typeof ComponentsDropdownMenuRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsModalRoute: typeof ComponentsModalRoute
   ComponentsPageHeadingRoute: typeof ComponentsPageHeadingRoute
   ComponentsRadioGroupRoute: typeof ComponentsRadioGroupRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
@@ -250,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsPageHeadingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/modal': {
+      id: '/components/modal'
+      path: '/components/modal'
+      fullPath: '/components/modal'
+      preLoaderRoute: typeof ComponentsModalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/input': {
       id: '/components/input'
       path: '/components/input'
@@ -269,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/components/dropdown-menu'
       fullPath: '/components/dropdown-menu'
       preLoaderRoute: typeof ComponentsDropdownMenuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/confirmation-dialog': {
+      id: '/components/confirmation-dialog'
+      path: '/components/confirmation-dialog'
+      fullPath: '/components/confirmation-dialog'
+      preLoaderRoute: typeof ComponentsConfirmationDialogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/checkbox': {
@@ -300,9 +341,11 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsBadgeRoute: ComponentsBadgeRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
+  ComponentsConfirmationDialogRoute: ComponentsConfirmationDialogRoute,
   ComponentsDropdownMenuRoute: ComponentsDropdownMenuRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsModalRoute: ComponentsModalRoute,
   ComponentsPageHeadingRoute: ComponentsPageHeadingRoute,
   ComponentsRadioGroupRoute: ComponentsRadioGroupRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
