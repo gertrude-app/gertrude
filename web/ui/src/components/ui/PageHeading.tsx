@@ -59,6 +59,7 @@ const PageHeading: React.FC<Props> = ({
               >
                 {buttons.map((button) => (
                   <DropdownMenuItem
+                    key={button.text}
                     title={button.text}
                     icon={button.icon}
                     onSelect={button.onClick}

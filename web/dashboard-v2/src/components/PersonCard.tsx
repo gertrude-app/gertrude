@@ -15,6 +15,14 @@ interface Props {
   person: Person;
 }
 
+const getDeviceKey = (device: Device, index: number): string => {
+  if (device.type === 'mac') {
+    return `${device.type}-${device.name ?? ''}-${device.modelName}-${device.macOSVersion}-${index}`;
+  }
+
+  return `${device.type}-${device.modelName}-${device.iOSVersion}-${index}`;
+};
+
 const PersonCard: React.FC<Props> = ({ person }) => {
   return (
     <div className="flex flex-col border border-stone-200 rounded-2xl shadow-md shadow-stone-300/30 bg-white">
@@ -29,8 +37,8 @@ const PersonCard: React.FC<Props> = ({ person }) => {
             <span className="text-stone-900 text-lg font-medium">{person.name}</span>
             {person.devices.length > 0 ? (
               <div className="flex flex-col gap-2">
-                {person.devices.map((d) => (
-                  <DeviceRow device={d} />
+                {person.devices.map((d, index) => (
+                  <DeviceRow key={getDeviceKey(d, index)} device={d} />
                 ))}
               </div>
             ) : (

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@tanstack/react-router';
 import RightColumnCard from './RightColumnCard';
 import type { SuspensionRequest } from '#/lib/mock-data';
 import { ArrowRightIcon } from 'lucide-react';
@@ -14,7 +15,7 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
       links={[
         {
           text: 'View all',
-          href: '#todo',
+          href: '/people/requests/suspension',
           icon: ArrowRightIcon,
           iconPosition: 'right',
           variant: 'ghost',
@@ -23,8 +24,9 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
     >
       <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
         {allSuspensionRequests.slice(0, 3).map((r) => (
-          <div
+          <Link
             key={`${r.personName}-${r.duration}-${r.reason ?? ''}`}
+            to="/people/requests/suspension"
             className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer gap-1.5"
           >
             <div className="flex flex-col">
@@ -36,7 +38,7 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
                 {r.reason}
               </p>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </RightColumnCard>

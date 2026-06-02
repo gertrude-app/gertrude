@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from '@tanstack/react-router';
 import { ArrowRightIcon } from 'lucide-react';
 import type { UnlockRequest } from '#/lib/mock-data';
 import RightColumnCard from './RightColumnCard';
@@ -14,7 +15,7 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
       links={[
         {
           text: 'View all',
-          href: '#todo',
+          href: '/people/requests/unlock',
           icon: ArrowRightIcon,
           iconPosition: 'right',
           variant: 'ghost',
@@ -23,8 +24,9 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
     >
       <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
         {allUnlockRequests.slice(0, 3).map((r) => (
-          <div
+          <Link
             key={`${r.personName}-${r.domains.join(',')}`}
+            to="/people/requests/unlock"
             className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer"
           >
             <span className="text-sm font-medium text-stone-900">{r.personName}</span>
@@ -48,7 +50,7 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
                 {r.reason}
               </p>
             )}
-          </div>
+          </Link>
         ))}
       </div>
     </RightColumnCard>

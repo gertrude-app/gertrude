@@ -15,12 +15,18 @@ const RootComponent: React.FC = () => (
         <SidebarItem title="Button" icon={DiamondIcon} href="/components/button" />
         <SidebarItem title="Checkbox" icon={DiamondIcon} href="/components/checkbox" />
         <SidebarItem
+          title="Confirmation Dialog"
+          icon={DiamondIcon}
+          href="/components/confirmation-dialog"
+        />
+        <SidebarItem
           title="Dropdown Menu"
           icon={DiamondIcon}
           href="/components/dropdown-menu"
         />
         <SidebarItem title="Form" icon={DiamondIcon} href="/components/form" />
         <SidebarItem title="Input" icon={DiamondIcon} href="/components/input" />
+        <SidebarItem title="Modal" icon={DiamondIcon} href="/components/modal" />
         <SidebarItem
           title="Page Heading"
           icon={DiamondIcon}
