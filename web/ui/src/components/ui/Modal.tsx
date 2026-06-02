@@ -1,5 +1,5 @@
 import React from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
+import { Dialog } from '@base-ui/react/dialog';
 import { Drawer } from 'vaul';
 import cx from 'clsx';
 
@@ -56,29 +56,41 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const hasBody = children !== undefined && children !== null && children !== false;
+  const triggerElement = React.isValidElement(trigger) ? trigger : undefined;
 
   if (isDesktop) {
     return (
-      <Dialog.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-        {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
+      <Dialog.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={(nextOpen, eventDetails) => {
+          if (
+            !dismissible &&
+            !nextOpen &&
+            (eventDetails.reason === 'outside-press' ||
+              eventDetails.reason === 'escape-key')
+          ) {
+            eventDetails.cancel();
+            return;
+          }
+
+          onOpenChange?.(nextOpen);
+        }}
+        disablePointerDismissal={!dismissible}
+      >
+        {triggerElement ? (
+          <Dialog.Trigger render={triggerElement} />
+        ) : trigger ? (
+          <Dialog.Trigger>{trigger}</Dialog.Trigger>
+        ) : null}
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-stone-950/35 backdrop-blur-[2px]" />
-          <Dialog.Content
+          <Dialog.Backdrop className="fixed inset-0 z-50 bg-stone-950/35 backdrop-blur-[2px]" />
+          <Dialog.Popup
             className={cx(
               'fixed left-1/2 top-1/2 z-50 flex max-h-[min(82vh,720px)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl shadow-stone-950/20 outline-none',
               sizeClasses[size],
               className,
             )}
-            onEscapeKeyDown={(event) => {
-              if (!dismissible) {
-                event.preventDefault();
-              }
-            }}
-            onPointerDownOutside={(event) => {
-              if (!dismissible) {
-                event.preventDefault();
-              }
-            }}
           >
             <div className="flex flex-col gap-1 px-5 pb-4 pt-5">
               <Dialog.Title className="text-xl font-medium text-stone-950">
@@ -100,7 +112,7 @@ const Modal: React.FC<ModalProps> = ({
                 {footer}
               </div>
             )}
-          </Dialog.Content>
+          </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
     );
@@ -113,7 +125,11 @@ const Modal: React.FC<ModalProps> = ({
       onOpenChange={onOpenChange}
       dismissible={dismissible}
     >
-      {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
+      {triggerElement ? (
+        <Drawer.Trigger asChild>{triggerElement}</Drawer.Trigger>
+      ) : trigger ? (
+        <Drawer.Trigger>{trigger}</Drawer.Trigger>
+      ) : null}
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-50 bg-stone-950/35 backdrop-blur-[2px]" />
         <Drawer.Content
