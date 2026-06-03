@@ -15,7 +15,7 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
       links={[
         {
           text: 'View all',
-          href: '/people/requests/suspension',
+          href: '/requests/suspension',
           icon: ArrowRightIcon,
           iconPosition: 'right',
           variant: 'ghost',
@@ -26,7 +26,7 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
         {allSuspensionRequests.slice(0, 3).map((r) => (
           <Link
             key={`${r.personName}-${r.duration}-${r.reason ?? ''}`}
-            to="/people/requests/suspension"
+            to="/requests/suspension"
             className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer gap-1.5"
           >
             <div className="flex flex-col">

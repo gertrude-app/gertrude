@@ -2,14 +2,19 @@ import React from 'react';
 import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
 import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
 import {
-  LayoutGridIcon,
-  LifeBuoyIcon,
+  InboxIcon,
+  KeyIcon,
+  LaptopIcon,
   LogOutIcon,
-  MonitorSmartphoneIcon,
+  MusicIcon,
+  ScanEyeIcon,
   SettingsIcon,
-  SparklesIcon,
+  SmartphoneIcon,
   UsersIcon,
 } from 'lucide-react';
+import { mockSuspensionRequests, mockUnlockRequests } from '#/lib/mock-data';
+
+const requestCount = mockSuspensionRequests.length + mockUnlockRequests.length;
 
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
@@ -29,24 +34,12 @@ const AuthedLayout: React.FC = () => {
           icon: LogOutIcon,
         }}
       >
-        <SidebarSection title="Platform">
+        <SidebarSection>
           <SidebarItem
             title="People"
             icon={UsersIcon}
             href="/people"
             selected={isSelected('/people')}
-          />
-          <SidebarItem
-            title="Devices"
-            icon={MonitorSmartphoneIcon}
-            href="/devices"
-            selected={isSelected('/devices')}
-          />
-          <SidebarItem
-            title="Apps"
-            icon={LayoutGridIcon}
-            href="/apps"
-            selected={isSelected('/apps')}
           />
           <SidebarItem
             title="Settings"
@@ -55,16 +48,45 @@ const AuthedLayout: React.FC = () => {
             selected={isSelected('/settings')}
           />
         </SidebarSection>
-        <SidebarSection title="Help">
+        <SidebarSection title="Computers">
           <SidebarItem
-            title="Ask AI"
-            icon={SparklesIcon}
-            href="https://gertrude.app/docs"
+            title="Macs"
+            icon={LaptopIcon}
+            href="/macs"
+            selected={isSelected('/macs')}
           />
           <SidebarItem
-            title="Support"
-            icon={LifeBuoyIcon}
-            href="https://gertrude.app/contact"
+            title="Requests"
+            icon={InboxIcon}
+            href="/requests"
+            selected={isSelected('/requests')}
+            badgeCount={requestCount}
+          />
+          <SidebarItem
+            title="Activity"
+            icon={ScanEyeIcon}
+            href="/activity"
+            selected={isSelected('/activity')}
+          />
+          <SidebarItem
+            title="Keychains"
+            icon={KeyIcon}
+            href="/keychains"
+            selected={isSelected('/keychains')}
+          />
+        </SidebarSection>
+        <SidebarSection title="iPhones & iPads">
+          <SidebarItem
+            title="Devices"
+            icon={SmartphoneIcon}
+            href="/ios-devices"
+            selected={isSelected('/ios-devices')}
+          />
+          <SidebarItem
+            title="Media"
+            icon={MusicIcon}
+            href="/media"
+            selected={isSelected('/media')}
           />
         </SidebarSection>
       </Sidebar>

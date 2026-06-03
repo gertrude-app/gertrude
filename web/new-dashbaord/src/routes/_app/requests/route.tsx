@@ -4,18 +4,11 @@ import { PageHeading, SegmentedTabs } from '@gertrude/ui';
 import DashboardPage from '#/components/DashboardPage';
 import { mockSuspensionRequests, mockUnlockRequests } from '#/lib/mock-data';
 
-const PeopleRequestsPage: React.FC = () => {
+const RequestsPage: React.FC = () => {
   return (
-    <DashboardPage
-      heading={
-        <PageHeading
-          title="Requests"
-          breadcrumbs={[{ text: 'People', href: '/people' }]}
-        />
-      }
-    >
+    <DashboardPage heading={<PageHeading title="Requests" />}>
       <SegmentedTabs
-        basePath="/people/requests"
+        basePath="/requests"
         tabs={[
           {
             label: 'Unlock Requests',
@@ -33,6 +26,6 @@ const PeopleRequestsPage: React.FC = () => {
   );
 };
 
-export const Route = createFileRoute('/_app/people/requests')({
-  component: PeopleRequestsPage,
+export const Route = createFileRoute('/_app/requests')({
+  component: RequestsPage,
 });

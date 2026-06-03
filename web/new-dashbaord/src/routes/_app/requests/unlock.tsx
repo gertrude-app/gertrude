@@ -15,6 +15,6 @@ const UnlockRequestsPage: React.FC = () => (
   </CardContainer>
 );
 
-export const Route = createFileRoute('/_app/people/requests/unlock')({
+export const Route = createFileRoute('/_app/requests/unlock')({
   component: UnlockRequestsPage,
 });
