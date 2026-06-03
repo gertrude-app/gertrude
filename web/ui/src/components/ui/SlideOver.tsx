@@ -1,6 +1,8 @@
+import { useLocation, useNavigate } from '@tanstack/react-router';
+import cx from 'clsx';
 import React from 'react';
 import { Drawer } from 'vaul';
-import cx from 'clsx';
+import { OverlayPortalProvider } from './OverlayPortalContext';
 
 export interface SlideOverProps {
   children: React.ReactNode;
@@ -8,7 +10,9 @@ export interface SlideOverProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  size?: 'small' | 'medium' | 'large';
+  path?: string;
+  closeTo?: string;
+  size?: `small` | `medium` | `large`;
   dismissible?: boolean;
   ariaLabel?: string;
   className?: string;
@@ -23,18 +27,32 @@ const useMediaQuery = (query: string): boolean => {
     const updateMatches = (): void => setMatches(mediaQueryList.matches);
 
     updateMatches();
-    mediaQueryList.addEventListener('change', updateMatches);
+    mediaQueryList.addEventListener(`change`, updateMatches);
 
-    return () => mediaQueryList.removeEventListener('change', updateMatches);
+    return () => mediaQueryList.removeEventListener(`change`, updateMatches);
   }, [query]);
 
   return matches;
 };
 
 const sizeClasses = {
-  small: 'md:w-[24rem]',
-  medium: 'md:w-[30rem]',
-  large: 'md:w-[38rem]',
+  small: `md:w-[24rem]`,
+  medium: `md:w-[30rem]`,
+  large: `md:w-[38rem]`,
+};
+
+const normalizePath = (path: string): string => {
+  const withLeadingSlash = path.startsWith(`/`) ? path : `/${path}`;
+  return withLeadingSlash === `/`
+    ? withLeadingSlash
+    : withLeadingSlash.replace(/\/+$/, ``);
+};
+
+const getParentPath = (path: string): string => {
+  const normalizedPath = normalizePath(path);
+  const parentPath = normalizedPath.split(`/`).slice(0, -1).join(`/`);
+
+  return parentPath || `/`;
 };
 
 const SlideOver: React.FC<SlideOverProps> = ({
@@ -43,22 +61,53 @@ const SlideOver: React.FC<SlideOverProps> = ({
   open,
   defaultOpen,
   onOpenChange,
-  size = 'medium',
+  path,
+  closeTo,
+  size = `medium`,
   dismissible = true,
-  ariaLabel = 'Slide over panel',
+  ariaLabel = `Slide over panel`,
   className,
   overlayClassName,
 }) => {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery(`(min-width: 768px)`);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
   const triggerElement = React.isValidElement(trigger) ? trigger : undefined;
+  const normalizedPath = path ? normalizePath(path) : undefined;
+  const resolvedCloseTo = normalizedPath
+    ? normalizePath(closeTo ?? getParentPath(normalizedPath))
+    : undefined;
+  const pathOpen = normalizedPath
+    ? pathname === normalizedPath || pathname.startsWith(`${normalizedPath}/`)
+    : undefined;
+  const resolvedOpen = normalizedPath ? pathOpen : open;
+  const [overlayPortalContainer, setOverlayPortalContainer] =
+    React.useState<HTMLElement | null>(null);
+  const setContentRef = React.useCallback((node: HTMLDivElement | null) => {
+    setOverlayPortalContainer(node);
+  }, []);
+
+  const handleOpenChange = (nextOpen: boolean): void => {
+    if (normalizedPath && resolvedCloseTo) {
+      if (nextOpen && !pathOpen) {
+        void navigate({ to: normalizedPath });
+      }
+
+      if (!nextOpen && pathOpen) {
+        void navigate({ to: resolvedCloseTo });
+      }
+    }
+
+    onOpenChange?.(nextOpen);
+  };
 
   return (
     <Drawer.Root
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
+      open={resolvedOpen}
+      defaultOpen={normalizedPath ? undefined : defaultOpen}
+      onOpenChange={handleOpenChange}
       dismissible={dismissible}
-      direction={isDesktop ? 'right' : 'bottom'}
+      direction={isDesktop ? `right` : `bottom`}
       autoFocus
     >
       {triggerElement ? (
@@ -69,25 +118,30 @@ const SlideOver: React.FC<SlideOverProps> = ({
       <Drawer.Portal>
         <Drawer.Overlay
           className={cx(
-            'fixed inset-0 z-50 bg-stone-950/25 backdrop-blur-[1px]',
+            `fixed inset-0 z-50 bg-stone-950/25 backdrop-blur-[1px]`,
             overlayClassName,
           )}
         />
         <Drawer.Content
+          ref={setContentRef}
           aria-describedby={undefined}
           className={cx(
-            'fixed z-50 flex overflow-hidden border border-stone-200 bg-stone-50 shadow-2xl shadow-stone-950/20 outline-none',
+            `fixed z-50 flex overflow-visible border border-stone-200 bg-stone-50 shadow-2xl shadow-stone-950/20 outline-none`,
             isDesktop
               ? cx(
-                  'inset-y-0 right-0 h-dvh max-w-[calc(100vw-1rem)] border-y-0 border-r-0',
+                  `inset-y-0 right-0 h-dvh max-w-[calc(100vw-1rem)] border-y-0 border-r-0`,
                   sizeClasses[size],
                 )
-              : 'inset-x-0 bottom-0 h-[calc(100svh-1rem)] rounded-t-[28px] border-b-0',
+              : `inset-x-0 bottom-0 h-[calc(100svh-1rem)] rounded-t-[28px] border-b-0`,
             className,
           )}
         >
           <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
-          {children}
+          <OverlayPortalProvider container={overlayPortalContainer}>
+            <div className="h-full w-full overflow-hidden rounded-[inherit] @container/slide">
+              {children}
+            </div>
+          </OverlayPortalProvider>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

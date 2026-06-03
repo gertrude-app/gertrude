@@ -1,5 +1,5 @@
-import React from 'react';
 import { useLocation } from '@tanstack/react-router';
+import React from 'react';
 import { DemoPageContext } from './DemoPageContext';
 
 interface Props {
@@ -9,8 +9,8 @@ interface Props {
 }
 
 const routePathToSourceBasePath = (pathname: string): string => {
-  const routePath = pathname.replace(/\/$/, '');
-  return `/src/routes${routePath === '' ? '' : routePath}`;
+  const routePath = pathname.replace(/\/$/, ``);
+  return `/src/routes${routePath === `` ? `` : routePath}`;
 };
 
 const ComponentDemoPage: React.FC<Props> = ({ title, description, children }) => {

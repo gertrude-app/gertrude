@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import cx from 'clsx';
-import type { SecurityEvent } from '#/lib/mock-data';
 import { Badge } from '@gertrude/ui';
+import cx from 'clsx';
 import { ArrowRightIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import type { SecurityEvent } from '#/lib/mock-data';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {
@@ -11,35 +11,33 @@ interface Props {
 
 const getSecurityEventKey = (event: SecurityEvent): string => {
   const source =
-    event.type === 'mac-app'
+    event.type === `mac-app`
       ? `${event.personName}-${event.deviceName}`
       : event.ipAddress;
 
   return `${event.type}-${event.title}-${event.time}-${event.date}-${source}`;
 };
 
-const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => {
-  return (
-    <RightColumnCard
-      title="Recent Security Events"
-      links={[
-        {
-          text: 'View all',
-          href: '#todo',
-          icon: ArrowRightIcon,
-          iconPosition: 'right',
-          variant: 'ghost',
-        },
-      ]}
-    >
-      <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
-        {allSecurityEvents.slice(0, 4).map((e) => (
-          <SecurityEventRow key={getSecurityEventKey(e)} securityEvent={e} />
-        ))}
-      </div>
-    </RightColumnCard>
-  );
-};
+const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => (
+  <RightColumnCard
+    title="Recent Security Events"
+    links={[
+      {
+        text: `View all`,
+        href: `#todo`,
+        icon: ArrowRightIcon,
+        iconPosition: `right`,
+        variant: `ghost`,
+      },
+    ]}
+  >
+    <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
+      {allSecurityEvents.slice(0, 4).map((e) => (
+        <SecurityEventRow key={getSecurityEventKey(e)} securityEvent={e} />
+      ))}
+    </div>
+  </RightColumnCard>
+);
 
 export default SecurityEventsPreviewCard;
 
@@ -47,7 +45,9 @@ type SecurityEventProps = {
   securityEvent: SecurityEvent;
 };
 
-const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent: e }) => {
+const SecurityEventRow: React.FC<SecurityEventProps> = ({
+  securityEvent: e,
+}): React.ReactElement => {
   const [showExplanation, setShowExplanation] = useState(false);
 
   return (
@@ -60,32 +60,33 @@ const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent: e }) =>
           {e.time} • {e.date}
         </span>
         <div
-          className={cx('w-2 h-2 rounded-full mr-1', {
-            'bg-red-500': e.severity === 'high',
-            'bg-yellow-500': e.severity === 'medium',
-            'bg-stone-200': e.severity === 'low',
+          className={cx(`w-2 h-2 rounded-full mr-1`, {
+            'bg-red-500': e.severity === `high`,
+            'bg-yellow-500': e.severity === `medium`,
+            'bg-stone-200': e.severity === `low`,
           })}
         />
       </div>
       <div className="flex items-center gap-1.5">
         <Badge size="xsmall">
-          {e.type === 'mac-app' ? 'Mac App' : 'Admin Dashboard'}
+          {e.type === `mac-app` ? `Mac App` : `Admin Dashboard`}
         </Badge>
-        {e.type === 'mac-app' && (
+        {e.type === `mac-app` && (
           <span
             className="min-w-0 truncate text-xs text-stone-600"
             title={`${e.personName} on ${e.deviceName}`}
           >
             <a className="hover:text-stone-900 hover:underline" href="#todo">
               {e.personName}
-            </a>{' '}
-            on{' '}
+            </a>
+            {` `}
+            on{` `}
             <a className="hover:text-stone-900 hover:underline" href="#todo">
               {e.deviceName}
             </a>
           </span>
         )}
-        {e.type === 'admin-dashboard' && (
+        {e.type === `admin-dashboard` && (
           <a
             className="text-xs text-stone-600 hover:text-stone-900 hover:underline"
             href={`https://whatismyipaddress.com/ip/${e.ipAddress}`}
@@ -98,8 +99,8 @@ const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent: e }) =>
       {e.subtitle && <span className="text-xs text-stone-500">{e.subtitle}</span>}
       <p
         className={cx(
-          'overflow-hidden text-xs text-stone-600 transition-[height,margin,opacity] duration-150',
-          showExplanation ? 'mt-2 opacity-100 h-auto' : 'mt-0 opacity-0 h-0',
+          `overflow-hidden text-xs text-stone-600 transition-[height,margin,opacity] duration-150`,
+          showExplanation ? `mt-2 opacity-100 h-auto` : `mt-0 opacity-0 h-0`,
         )}
       >
         {e.explanation}

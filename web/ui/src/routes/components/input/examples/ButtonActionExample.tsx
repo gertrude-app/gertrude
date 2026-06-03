@@ -1,12 +1,12 @@
-import Input from '#/components/ui/Input';
 import { ArrowRightIcon, CheckIcon, CopyIcon, SearchIcon } from 'lucide-react';
 import React, { useState } from 'react';
+import Input from '#/components/ui/Input';
 
 const ButtonActionExample: React.FC = () => {
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [unlockUrl, setUnlockUrl] = useState('wikipedia.org');
-  const [claimCode, setClaimCode] = useState('184920');
-  const [minutes, setMinutes] = useState('');
+  const [inviteEmail, setInviteEmail] = useState(``);
+  const [unlockUrl, setUnlockUrl] = useState(`wikipedia.org`);
+  const [claimCode, setClaimCode] = useState(`184920`);
+  const [minutes, setMinutes] = useState(``);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -20,7 +20,7 @@ const ButtonActionExample: React.FC = () => {
           placeholder="you@example.com"
           value={inviteEmail}
           setValue={setInviteEmail}
-          button={{ label: 'Send', icon: ArrowRightIcon, onClick: () => undefined }}
+          button={{ label: `Send`, icon: ArrowRightIcon, onClick: () => undefined }}
         />
         <div className="sm:pt-5">
           <Input
@@ -28,7 +28,7 @@ const ButtonActionExample: React.FC = () => {
             prefix="https://"
             value={unlockUrl}
             setValue={setUnlockUrl}
-            button={{ label: 'Review', icon: SearchIcon, onClick: () => undefined }}
+            button={{ label: `Review`, icon: SearchIcon, onClick: () => undefined }}
           />
         </div>
         <Input
@@ -39,7 +39,7 @@ const ButtonActionExample: React.FC = () => {
           setValue={setClaimCode}
           button={{
             icon: CopyIcon,
-            ariaLabel: 'Copy claim code',
+            ariaLabel: `Copy claim code`,
             onClick: () => undefined,
           }}
         />
@@ -50,7 +50,7 @@ const ButtonActionExample: React.FC = () => {
             suffix="minutes"
             value={minutes}
             setValue={setMinutes}
-            button={{ label: 'Apply', icon: CheckIcon, onClick: () => undefined }}
+            button={{ label: `Apply`, icon: CheckIcon, onClick: () => undefined }}
           />
         </div>
       </div>

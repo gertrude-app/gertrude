@@ -1,7 +1,8 @@
-import React from 'react';
 import { Dialog } from '@base-ui/react/dialog';
-import { Drawer } from 'vaul';
 import cx from 'clsx';
+import React from 'react';
+import { Drawer } from 'vaul';
+import { OverlayPortalProvider } from './OverlayPortalContext';
 
 export interface ModalProps {
   children?: React.ReactNode;
@@ -12,7 +13,7 @@ export interface ModalProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: `small` | `medium` | `large`;
   dismissible?: boolean;
   className?: string;
   bodyClassName?: string;
@@ -26,18 +27,18 @@ const useMediaQuery = (query: string): boolean => {
     const updateMatches = (): void => setMatches(mediaQueryList.matches);
 
     updateMatches();
-    mediaQueryList.addEventListener('change', updateMatches);
+    mediaQueryList.addEventListener(`change`, updateMatches);
 
-    return () => mediaQueryList.removeEventListener('change', updateMatches);
+    return () => mediaQueryList.removeEventListener(`change`, updateMatches);
   }, [query]);
 
   return matches;
 };
 
 const sizeClasses = {
-  small: 'md:max-w-md',
-  medium: 'md:max-w-lg',
-  large: 'md:max-w-2xl',
+  small: `md:max-w-md`,
+  medium: `md:max-w-lg`,
+  large: `md:max-w-2xl`,
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -49,14 +50,19 @@ const Modal: React.FC<ModalProps> = ({
   open,
   defaultOpen,
   onOpenChange,
-  size = 'medium',
+  size = `medium`,
   dismissible = true,
   className,
   bodyClassName,
 }) => {
-  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const isDesktop = useMediaQuery(`(min-width: 768px)`);
   const hasBody = children !== undefined && children !== null && children !== false;
   const triggerElement = React.isValidElement(trigger) ? trigger : undefined;
+  const [overlayPortalContainer, setOverlayPortalContainer] =
+    React.useState<HTMLElement | null>(null);
+  const setContentRef = React.useCallback((node: HTMLDivElement | null) => {
+    setOverlayPortalContainer(node);
+  }, []);
 
   if (isDesktop) {
     return (
@@ -67,8 +73,8 @@ const Modal: React.FC<ModalProps> = ({
           if (
             !dismissible &&
             !nextOpen &&
-            (eventDetails.reason === 'outside-press' ||
-              eventDetails.reason === 'escape-key')
+            (eventDetails.reason === `outside-press` ||
+              eventDetails.reason === `escape-key`)
           ) {
             eventDetails.cancel();
             return;
@@ -86,32 +92,37 @@ const Modal: React.FC<ModalProps> = ({
         <Dialog.Portal>
           <Dialog.Backdrop className="fixed inset-0 z-50 bg-stone-950/35 backdrop-blur-[2px]" />
           <Dialog.Popup
+            ref={setContentRef}
             className={cx(
-              'fixed left-1/2 top-1/2 z-50 flex max-h-[min(82vh,720px)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl shadow-stone-950/20 outline-none',
+              `fixed left-1/2 top-1/2 z-50 flex max-h-[min(82vh,720px)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-visible rounded-2xl border border-stone-200 bg-white shadow-2xl shadow-stone-950/20 outline-none`,
               sizeClasses[size],
               className,
             )}
           >
-            <div className="flex flex-col gap-1 px-5 pb-4 pt-5">
-              <Dialog.Title className="text-xl font-medium text-stone-950">
-                {title}
-              </Dialog.Title>
-              {description && (
-                <Dialog.Description className="text-sm leading-6 text-stone-600">
-                  {description}
-                </Dialog.Description>
-              )}
-            </div>
-            {hasBody && (
-              <div className={cx('overflow-auto px-5 pb-5', bodyClassName)}>
-                {children}
+            <OverlayPortalProvider container={overlayPortalContainer}>
+              <div className="flex max-h-[min(82vh,720px)] w-full flex-col overflow-hidden rounded-[inherit] bg-white">
+                <div className="flex flex-col gap-1 px-5 pb-4 pt-5">
+                  <Dialog.Title className="text-xl font-medium text-stone-950">
+                    {title}
+                  </Dialog.Title>
+                  {description && (
+                    <Dialog.Description className="text-sm leading-6 text-stone-600">
+                      {description}
+                    </Dialog.Description>
+                  )}
+                </div>
+                {hasBody && (
+                  <div className={cx(`overflow-auto px-5 pb-5`, bodyClassName)}>
+                    {children}
+                  </div>
+                )}
+                {footer && (
+                  <div className="flex justify-end gap-2 border-t border-stone-200 bg-stone-50 px-5 py-3">
+                    {footer}
+                  </div>
+                )}
               </div>
-            )}
-            {footer && (
-              <div className="flex justify-end gap-2 border-t border-stone-200 bg-stone-50 px-5 py-3">
-                {footer}
-              </div>
-            )}
+            </OverlayPortalProvider>
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
@@ -134,32 +145,37 @@ const Modal: React.FC<ModalProps> = ({
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-50 bg-stone-950/35 backdrop-blur-[2px]" />
         <Drawer.Content
+          ref={setContentRef}
           className={cx(
-            'fixed inset-x-0 bottom-0 z-50 flex max-h-[calc(100svh-1rem)] flex-col overflow-hidden rounded-t-[28px] border border-b-0 border-stone-200 bg-white shadow-2xl shadow-stone-950/20 outline-none',
+            `fixed inset-x-0 bottom-0 z-50 flex max-h-[calc(100svh-1rem)] flex-col overflow-visible rounded-t-[28px] border border-b-0 border-stone-200 bg-white shadow-2xl shadow-stone-950/20 outline-none`,
             className,
           )}
         >
-          <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-stone-300" />
-          <div className="flex flex-col gap-1 px-5 pb-4 pt-4">
-            <Drawer.Title className="text-xl font-medium text-stone-950">
-              {title}
-            </Drawer.Title>
-            {description && (
-              <Drawer.Description className="text-sm leading-6 text-stone-600">
-                {description}
-              </Drawer.Description>
-            )}
-          </div>
-          {hasBody && (
-            <div className={cx('overflow-auto px-5 pb-5', bodyClassName)}>
-              {children}
+          <OverlayPortalProvider container={overlayPortalContainer}>
+            <div className="flex max-h-[calc(100svh-1rem)] w-full flex-col overflow-hidden rounded-[inherit] bg-white">
+              <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-stone-300" />
+              <div className="flex flex-col gap-1 px-5 pb-4 pt-4">
+                <Drawer.Title className="text-xl font-medium text-stone-950">
+                  {title}
+                </Drawer.Title>
+                {description && (
+                  <Drawer.Description className="text-sm leading-6 text-stone-600">
+                    {description}
+                  </Drawer.Description>
+                )}
+              </div>
+              {hasBody && (
+                <div className={cx(`overflow-auto px-5 pb-5`, bodyClassName)}>
+                  {children}
+                </div>
+              )}
+              {footer && (
+                <div className="flex justify-end gap-2 border-t border-stone-200 bg-stone-50 px-5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+                  {footer}
+                </div>
+              )}
             </div>
-          )}
-          {footer && (
-            <div className="flex justify-end gap-2 border-t border-stone-200 bg-stone-50 px-5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-              {footer}
-            </div>
-          )}
+          </OverlayPortalProvider>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

@@ -4,8 +4,8 @@ interface Props {
   children: React.ReactNode;
 }
 
-const Form: React.FC<Props> = ({ children }) => {
-  return <div className="flex flex-col">{children}</div>;
-};
+const Form: React.FC<Props> = ({ children }) => (
+  <div className="flex flex-col">{children}</div>
+);
 
 export default Form;

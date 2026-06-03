@@ -1,6 +1,5 @@
-import React from 'react';
-import { createFileRoute, Outlet, useLocation } from '@tanstack/react-router';
 import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
+import { Outlet, createFileRoute, useLocation } from '@tanstack/react-router';
 import {
   InboxIcon,
   KeyIcon,
@@ -12,6 +11,7 @@ import {
   SmartphoneIcon,
   UsersIcon,
 } from 'lucide-react';
+import React from 'react';
 import { mockSuspensionRequests, mockUnlockRequests } from '#/lib/mock-data';
 
 const requestCount = mockSuspensionRequests.length + mockUnlockRequests.length;
@@ -19,7 +19,7 @@ const requestCount = mockSuspensionRequests.length + mockUnlockRequests.length;
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
   const isSelected = (href: string): boolean =>
-    href === '/'
+    href === `/`
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
@@ -29,8 +29,8 @@ const AuthedLayout: React.FC = () => {
         logoUrl="/logo-wordmark.svg"
         logoWidth={140}
         bottomButton={{
-          text: 'Sign out',
-          href: '/signout',
+          text: `Sign out`,
+          href: `/signout`,
           icon: LogOutIcon,
         }}
       >
@@ -39,13 +39,13 @@ const AuthedLayout: React.FC = () => {
             title="People"
             icon={UsersIcon}
             href="/people"
-            selected={isSelected('/people')}
+            selected={isSelected(`/people`)}
           />
           <SidebarItem
             title="Settings"
             icon={SettingsIcon}
             href="/settings/notifications"
-            selected={isSelected('/settings')}
+            selected={isSelected(`/settings`)}
           />
         </SidebarSection>
         <SidebarSection title="Computers">
@@ -53,26 +53,26 @@ const AuthedLayout: React.FC = () => {
             title="Macs"
             icon={LaptopIcon}
             href="/macs"
-            selected={isSelected('/macs')}
+            selected={isSelected(`/macs`)}
           />
           <SidebarItem
             title="Requests"
             icon={InboxIcon}
             href="/requests"
-            selected={isSelected('/requests')}
+            selected={isSelected(`/requests`)}
             badgeCount={requestCount}
           />
           <SidebarItem
             title="Activity"
             icon={ScanEyeIcon}
             href="/activity"
-            selected={isSelected('/activity')}
+            selected={isSelected(`/activity`)}
           />
           <SidebarItem
             title="Keychains"
             icon={KeyIcon}
             href="/keychains"
-            selected={isSelected('/keychains')}
+            selected={isSelected(`/keychains`)}
           />
         </SidebarSection>
         <SidebarSection title="iPhones & iPads">
@@ -80,13 +80,13 @@ const AuthedLayout: React.FC = () => {
             title="Devices"
             icon={SmartphoneIcon}
             href="/ios-devices"
-            selected={isSelected('/ios-devices')}
+            selected={isSelected(`/ios-devices`)}
           />
           <SidebarItem
             title="Media"
             icon={MusicIcon}
             href="/media"
-            selected={isSelected('/media')}
+            selected={isSelected(`/media`)}
           />
         </SidebarSection>
       </Sidebar>
@@ -94,6 +94,6 @@ const AuthedLayout: React.FC = () => {
   );
 };
 
-export const Route = createFileRoute('/_app')({
+export const Route = createFileRoute(`/_app`)({
   component: AuthedLayout,
 });

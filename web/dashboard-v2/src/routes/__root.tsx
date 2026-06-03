@@ -6,19 +6,19 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: `utf-8`,
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: `viewport`,
+        content: `width=device-width, initial-scale=1`,
       },
       {
-        title: 'TanStack Start Starter',
+        title: `TanStack Start Starter`,
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: `stylesheet`,
         href: appCss,
       },
     ],
@@ -26,7 +26,7 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 });
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <html lang="en">
       <head>

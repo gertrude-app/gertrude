@@ -1,25 +1,23 @@
-import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import React from 'react';
+import AssortmentExample from './select/examples/AssortmentExample';
 import ComponentDemoPage from '#/components/demo/ComponentDemoPage';
 import DemoExample from '#/components/demo/DemoExample';
-import AssortmentExample from './select/examples/AssortmentExample';
 
-const SelectPage: React.FC = () => {
-  return (
-    <ComponentDemoPage
-      title="Select"
-      description="Chooses one string value from a fixed list, with optional built-in labeling."
-    >
-      <DemoExample
-        component={<AssortmentExample />}
-        path="./examples/AssortmentExample.tsx"
-        description="Labeled, unlabeled, and disabled selects."
-        demoHeight="17rem"
-      />
-    </ComponentDemoPage>
-  );
-};
+const SelectPage: React.FC = () => (
+  <ComponentDemoPage
+    title="Select"
+    description="Chooses one string value from a fixed list, with small and medium sizes plus optional top or left labels, icons, and item descriptions."
+  >
+    <DemoExample
+      component={<AssortmentExample />}
+      path="./examples/AssortmentExample.tsx"
+      description="Small, medium, disabled, top-labeled, left-labeled, and label/value selects with dropdown icons and descriptions."
+      demoHeight="21rem"
+    />
+  </ComponentDemoPage>
+);
 
-export const Route = createFileRoute('/components/select')({
+export const Route = createFileRoute(`/components/select`)({
   component: SelectPage,
 });

@@ -1,28 +1,27 @@
-import React from 'react';
 import { Button, Input, Modal, Select, Textarea, inflect } from '@gertrude/ui';
 import { ClockIcon } from 'lucide-react';
+import React from 'react';
 import type { SuspensionRequest } from '#/lib/mock-data';
 
 interface Props {
   request: SuspensionRequest;
 }
 
-type DurationUnit = 'minutes' | 'hours';
+type DurationUnit = `minutes` | `hours`;
 
-const durationUnits: DurationUnit[] = ['minutes', 'hours'];
+const durationUnits: DurationUnit[] = [`minutes`, `hours`];
 
 const parseDuration = (duration: string): { amount: string; unit: DurationUnit } => {
-  const [amount = '', unit = 'minutes'] = duration.split(' ');
+  const [amount = ``, unit = `minutes`] = duration.split(` `);
 
   return {
     amount,
-    unit: unit.startsWith('hour') ? 'hours' : 'minutes',
+    unit: unit.startsWith(`hour`) ? `hours` : `minutes`,
   };
 };
 
-const formatDuration = (amount: number, unit: DurationUnit): string => {
-  return `${amount} ${inflect(unit === 'hours' ? 'hour' : 'minute', amount)}`;
-};
+const formatDuration = (amount: number, unit: DurationUnit): string =>
+  `${amount} ${inflect(unit === `hours` ? `hour` : `minute`, amount)}`;
 
 const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
   const parsedRequestDuration = parseDuration(request.duration);
@@ -34,19 +33,19 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
     parsedRequestDuration.unit,
   );
   const [denyModalOpen, setDenyModalOpen] = React.useState(false);
-  const [denyReason, setDenyReason] = React.useState('');
+  const [denyReason, setDenyReason] = React.useState(``);
   const numericCustomDurationAmount = Number(customDurationAmount);
   const canGrantCustomDuration =
     Number.isFinite(numericCustomDurationAmount) && numericCustomDurationAmount > 0;
   const customDurationText = canGrantCustomDuration
     ? formatDuration(numericCustomDurationAmount, customDurationUnit)
-    : 'custom duration';
+    : `custom duration`;
 
   const handleDenyModalOpenChange = (open: boolean): void => {
     setDenyModalOpen(open);
 
     if (!open) {
-      setDenyReason('');
+      setDenyReason(``);
     }
   };
 
@@ -78,11 +77,11 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
           size="small"
           dropdownAriaLabel="Grant with another duration"
           dropdownItems={[
-            { title: 'Grant 5 minutes', icon: ClockIcon, onSelect: () => {} },
-            { title: 'Grant 30 minutes', icon: ClockIcon, onSelect: () => {} },
-            { title: 'Grant 1 hour', icon: ClockIcon, onSelect: () => {} },
+            { title: `Grant 5 minutes`, icon: ClockIcon, onSelect: () => {} },
+            { title: `Grant 30 minutes`, icon: ClockIcon, onSelect: () => {} },
+            { title: `Grant 1 hour`, icon: ClockIcon, onSelect: () => {} },
             {
-              title: 'Custom duration…',
+              title: `Custom duration…`,
               icon: ClockIcon,
               onSelect: () => setCustomDurationOpen(true),
             },
@@ -160,7 +159,7 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
           <Select
             label="Unit"
             selected={customDurationUnit}
-            setSelected={(unit) => setCustomDurationUnit(unit as DurationUnit)}
+            setSelected={setCustomDurationUnit}
             possibleValues={durationUnits}
           />
         </div>

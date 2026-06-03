@@ -1,12 +1,12 @@
-import Button from '#/components/ui/Button';
-import Input from '#/components/ui/Input';
 import { ArrowRightIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import React, { useState } from 'react';
+import Button from '#/components/ui/Button';
+import Input from '#/components/ui/Input';
 
 const InlineButtonExample: React.FC = () => {
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [allowedSite, setAllowedSite] = useState('khanacademy.org');
-  const [unlockRequest, setUnlockRequest] = useState('minecraft.net');
+  const [inviteEmail, setInviteEmail] = useState(``);
+  const [allowedSite, setAllowedSite] = useState(`khanacademy.org`);
+  const [unlockRequest, setUnlockRequest] = useState(`minecraft.net`);
 
   return (
     <div className="grid h-full place-items-center p-8">

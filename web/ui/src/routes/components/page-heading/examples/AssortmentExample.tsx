@@ -1,8 +1,8 @@
-import PageHeading from '#/components/ui/PageHeading';
 import React, { useState } from 'react';
+import PageHeading from '#/components/ui/PageHeading';
 
 const AssortmentExample: React.FC = () => {
-  const [status, setStatus] = useState('No action yet');
+  const [status, setStatus] = useState(`No action yet`);
 
   return (
     <div className="flex h-full items-center justify-center p-8">
@@ -12,8 +12,8 @@ const AssortmentExample: React.FC = () => {
         <PageHeading
           title="Sally's iPhone"
           breadcrumbs={[
-            { text: 'Devices', href: '#' },
-            { text: 'Mobile devices', href: '#' },
+            { text: `Devices`, href: `#` },
+            { text: `Mobile devices`, href: `#` },
           ]}
         />
 
@@ -21,17 +21,17 @@ const AssortmentExample: React.FC = () => {
           <PageHeading
             title="Family settings"
             subtitle="For the whole family"
-            breadcrumbs={[{ text: 'Settings', href: '#' }]}
+            breadcrumbs={[{ text: `Settings`, href: `#` }]}
             buttons={[
               {
-                text: 'Cancel',
-                variant: 'secondary',
-                onClick: () => setStatus('Cancelled'),
+                text: `Cancel`,
+                variant: `secondary`,
+                onClick: () => setStatus(`Cancelled`),
               },
               {
-                text: 'Save changes',
-                variant: 'primary',
-                onClick: () => setStatus('Saved changes'),
+                text: `Save changes`,
+                variant: `primary`,
+                onClick: () => setStatus(`Saved changes`),
               },
             ]}
           />

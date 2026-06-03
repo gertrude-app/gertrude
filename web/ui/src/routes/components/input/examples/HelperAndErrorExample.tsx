@@ -1,12 +1,12 @@
-import Input from '#/components/ui/Input';
 import { ArrowRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
+import Input from '#/components/ui/Input';
 
 const HelperAndErrorExample: React.FC = () => {
-  const [email, setEmail] = useState('parent@example.com');
-  const [password, setPassword] = useState('short');
-  const [website, setWebsite] = useState('');
-  const [minutes, setMinutes] = useState('0');
+  const [email, setEmail] = useState(`parent@example.com`);
+  const [password, setPassword] = useState(`short`);
+  const [website, setWebsite] = useState(``);
+  const [minutes, setMinutes] = useState(`0`);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -32,7 +32,7 @@ const HelperAndErrorExample: React.FC = () => {
           value={website}
           setValue={setWebsite}
           helperText="Enter a hostname without the protocol."
-          button={{ label: 'Add', icon: ArrowRightIcon, onClick: () => undefined }}
+          button={{ label: `Add`, icon: ArrowRightIcon, onClick: () => undefined }}
         />
         <Input
           type="number"

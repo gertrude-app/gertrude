@@ -1,5 +1,5 @@
-import React from 'react';
 import cx from 'clsx';
+import React from 'react';
 
 interface Props {
   selected: string;
@@ -7,7 +7,7 @@ interface Props {
   possibleValues: string[];
   label?: string;
   disabled?: boolean;
-  direction?: 'vertical' | 'horizontal';
+  direction?: `vertical` | `horizontal`;
   name?: string;
   ariaLabel?: string;
 }
@@ -18,7 +18,7 @@ const RadioGroup: React.FC<Props> = ({
   possibleValues,
   label,
   disabled,
-  direction = 'vertical',
+  direction = `vertical`,
   name,
   ariaLabel,
 }) => {
@@ -29,13 +29,13 @@ const RadioGroup: React.FC<Props> = ({
     <fieldset
       disabled={disabled}
       aria-label={!label ? ariaLabel : undefined}
-      className={cx('flex flex-col gap-2', disabled && 'opacity-60')}
+      className={cx(`flex flex-col gap-2`, disabled && `opacity-60`)}
     >
       {label && <legend className="mb-1.5 text-[13px] text-stone-500">{label}</legend>}
       <div
         className={cx(
-          'flex gap-3',
-          direction === 'vertical' ? 'flex-col' : 'flex-row flex-wrap items-center',
+          `flex gap-3`,
+          direction === `vertical` ? `flex-col` : `flex-row flex-wrap items-center`,
         )}
       >
         {possibleValues.map((value, index) => {
@@ -47,8 +47,8 @@ const RadioGroup: React.FC<Props> = ({
               key={value}
               htmlFor={id}
               className={cx(
-                'inline-flex items-center gap-2.5 select-none',
-                disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+                `inline-flex items-center gap-2.5 select-none`,
+                disabled ? `cursor-not-allowed` : `cursor-pointer`,
               )}
             >
               <input
@@ -64,16 +64,16 @@ const RadioGroup: React.FC<Props> = ({
               <span
                 aria-hidden="true"
                 className={cx(
-                  'flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm transition-[border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50',
+                  `flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm transition-[border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
                   checked
-                    ? 'border-violet-800 shadow-violet-500/20'
-                    : 'border-stone-300/80 shadow-stone-300/30',
+                    ? `border-violet-800 shadow-violet-500/20`
+                    : `border-stone-300/80 shadow-stone-300/30`,
                 )}
               >
                 <span
                   className={cx(
-                    'h-2.25 w-2.25 rounded-full bg-violet-500 transition-[opacity,scale] duration-150',
-                    checked ? 'scale-100 opacity-100' : 'scale-50 opacity-0',
+                    `h-2.25 w-2.25 rounded-full bg-violet-500 transition-[opacity,scale] duration-150`,
+                    checked ? `scale-100 opacity-100` : `scale-50 opacity-0`,
                   )}
                 />
               </span>

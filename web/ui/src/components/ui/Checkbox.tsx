@@ -1,6 +1,6 @@
-import React from 'react';
 import cx from 'clsx';
 import { CheckIcon, MinusIcon } from 'lucide-react';
+import React from 'react';
 
 interface Props {
   checked: boolean;
@@ -42,8 +42,8 @@ const Checkbox: React.FC<Props> = ({
     <label
       htmlFor={inputId}
       className={cx(
-        'inline-flex items-start gap-2.5 select-none',
-        disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+        `inline-flex items-start gap-2.5 select-none`,
+        disabled ? `cursor-not-allowed opacity-60` : `cursor-pointer`,
       )}
     >
       <input
@@ -56,17 +56,17 @@ const Checkbox: React.FC<Props> = ({
         disabled={disabled}
         aria-label={!label ? ariaLabel : undefined}
         aria-describedby={descriptionId}
-        aria-checked={indeterminate ? 'mixed' : checked}
+        aria-checked={indeterminate ? `mixed` : checked}
         onChange={(event) => setChecked(event.target.checked)}
         className="peer sr-only"
       />
       <span
         aria-hidden="true"
         className={cx(
-          'mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-[5px] border shadow-sm transition-[background-color,border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50',
+          `mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-[5px] border shadow-sm transition-[background-color,border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
           checked || indeterminate
-            ? 'border-violet-800 bg-violet-500 text-white shadow-violet-500/20'
-            : 'border-stone-300/80 bg-white text-transparent shadow-stone-300/30',
+            ? `border-violet-800 bg-violet-500 text-white shadow-violet-500/20`
+            : `border-stone-300/80 bg-white text-transparent shadow-stone-300/30`,
         )}
       >
         {indeterminate ? (

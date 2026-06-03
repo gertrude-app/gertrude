@@ -7,6 +7,7 @@ export type {
   ConfirmationDialogAction,
   ConfirmationDialogProps,
 } from './components/ui/ConfirmationDialog';
+export { default as DateTimePicker } from './components/ui/DateTimePicker.tsx';
 export { default as DropdownMenu } from './components/ui/dropdown-menu/DropdownMenu';
 export { default as DropdownMenuItem } from './components/ui/dropdown-menu/DropdownMenuItem';
 export { default as EmptyState } from './components/ui/EmptyState';
@@ -30,3 +31,6 @@ export { default as Toggle } from './components/ui/Toggle';
 
 // utils
 export { inflect } from './lib/utils';
+
+// types
+export type { SelectOption } from './components/ui/Select';

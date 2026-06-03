@@ -3,7 +3,7 @@ import type { LucideIcon } from 'lucide-react';
 import Button from './Button';
 import Modal from './Modal';
 
-type ButtonVariant = 'primary' | 'default' | 'ghost' | 'destructive';
+type ButtonVariant = `primary` | `default` | `ghost` | `destructive`;
 
 export interface ConfirmationDialogAction {
   text: string;
@@ -22,7 +22,7 @@ export interface ConfirmationDialogProps {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  size?: 'small' | 'medium' | 'large';
+  size?: `small` | `medium` | `large`;
 }
 
 const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -32,7 +32,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   trigger,
   open,
   onOpenChange,
-  size = 'small',
+  size = `small`,
 }) => {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const [pendingActionIndex, setPendingActionIndex] = React.useState<number | null>(null);
@@ -72,7 +72,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         <Button
           key={`${action.text}-${index}`}
           type="button"
-          variant={action.variant ?? 'default'}
+          variant={action.variant ?? `default`}
           icon={action.icon}
           disabled={action.disabled || pendingActionIndex !== null}
           loading={action.loading || pendingActionIndex === index}

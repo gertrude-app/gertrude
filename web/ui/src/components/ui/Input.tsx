@@ -1,9 +1,9 @@
-import React from 'react';
 import cx from 'clsx';
 import { ArrowRightIcon, type LucideIcon } from 'lucide-react';
+import React from 'react';
 
 type Props = {
-  type: 'text' | 'password' | 'email' | 'number';
+  type: `text` | `password` | `email` | `number` | `time`;
   value: string;
   setValue: (value: string) => void;
   label?: string;
@@ -35,8 +35,8 @@ const Input: React.FC<Props> = ({ ...props }) => {
   return (
     <div
       className={cx(
-        'flex flex-col gap-1',
-        props.disabled && 'opacity-60',
+        `flex flex-col gap-1`,
+        props.disabled && `opacity-60`,
         props.className,
       )}
     >
@@ -44,8 +44,8 @@ const Input: React.FC<Props> = ({ ...props }) => {
         <label
           htmlFor={id}
           className={cx(
-            'ml-2.5 text-[13px] text-stone-500',
-            props.disabled && 'cursor-not-allowed',
+            `ml-2.5 text-[13px] text-stone-500`,
+            props.disabled && `cursor-not-allowed`,
           )}
         >
           {props.label}
@@ -53,12 +53,12 @@ const Input: React.FC<Props> = ({ ...props }) => {
       )}
       <div
         className={cx(
-          'relative flex min-h-[36.5px] items-stretch overflow-hidden rounded-[9px] border border-stone-300/80 bg-white shadow shadow-stone-300/30 transition-[border-color,box-shadow] duration-150',
+          `relative flex min-h-[36.5px] items-stretch overflow-hidden rounded-[9px] border border-stone-300/80 bg-white shadow shadow-stone-300/30 transition-[border-color,box-shadow] duration-150`,
           props.disabled
-            ? 'cursor-not-allowed bg-stone-100 shadow-none'
+            ? `cursor-not-allowed bg-stone-100 shadow-none`
             : props.error
-              ? 'border-red-300 focus-within:border-red-400 focus-within:shadow-red-200/70 focus-within:ring-2 focus-within:ring-red-200/70'
-              : 'focus-within:border-violet-300 focus-within:shadow-violet-200/70 focus-within:ring-2 focus-within:ring-violet-200/70',
+              ? `border-red-300 focus-within:border-red-400 focus-within:shadow-red-200/70 focus-within:ring-2 focus-within:ring-red-200/70`
+              : `focus-within:border-violet-300 focus-within:shadow-violet-200/70 focus-within:ring-2 focus-within:ring-violet-200/70`,
         )}
       >
         {props.prefix && (
@@ -70,12 +70,14 @@ const Input: React.FC<Props> = ({ ...props }) => {
           id={id}
           name={props.name}
           className={cx(
-            'min-w-0 flex-grow bg-white px-2.5 py-1.25 placeholder:text-stone-400/70 focus:outline-none',
-            props.disabled && 'cursor-not-allowed bg-stone-100 text-stone-500',
-            props.button && !props.suffix && (props.button.label ? 'pr-28' : 'pr-12'),
+            `min-w-0 flex-grow bg-white px-2.5 py-1.25 placeholder:text-stone-400/70 focus:outline-none`,
+            props.type === `time` && `tabular-nums [color-scheme:light]`,
+            props.disabled && `cursor-not-allowed bg-stone-100 text-stone-500`,
+            props.button && !props.suffix && (props.button.label ? `pr-28` : `pr-12`),
           )}
           placeholder={props.placeholder}
           type={props.type}
+          step={props.type === `time` ? 60 : undefined}
           value={props.value}
           disabled={props.disabled}
           required={props.required}
@@ -91,10 +93,10 @@ const Input: React.FC<Props> = ({ ...props }) => {
             disabled={props.disabled}
             onClick={props.button.onClick}
             className={cx(
-              'absolute inset-y-1 right-1 flex items-center gap-1.5 rounded-[4px] border border-stone-200 bg-stone-50 px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100 select-none',
+              `absolute inset-y-1 right-1 flex items-center gap-1.5 rounded-[4px] border border-stone-200 bg-stone-50 px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100 select-none`,
               props.disabled
-                ? 'cursor-not-allowed'
-                : 'cursor-pointer hover:border-stone-300 hover:shadow-stone-300/50 focus-visible:ring-2 focus-visible:ring-violet-300/80',
+                ? `cursor-not-allowed`
+                : `cursor-pointer hover:border-stone-300 hover:shadow-stone-300/50 focus-visible:ring-2 focus-visible:ring-violet-300/80`,
             )}
           >
             {props.button.icon && <Icon className="h-4 w-4 shrink-0" />}
@@ -104,8 +106,8 @@ const Input: React.FC<Props> = ({ ...props }) => {
         {props.suffix && (
           <div
             className={cx(
-              'flex shrink-0 items-center gap-2.5 border-l border-stone-300/80 bg-stone-50 pl-2.5',
-              props.button ? 'pr-1' : 'pr-2.5',
+              `flex shrink-0 items-center gap-2.5 border-l border-stone-300/80 bg-stone-50 pl-2.5`,
+              props.button ? `pr-1` : `pr-2.5`,
             )}
           >
             <span className="text-[15px] text-stone-400 select-none">{props.suffix}</span>
@@ -116,10 +118,10 @@ const Input: React.FC<Props> = ({ ...props }) => {
                 disabled={props.disabled}
                 onClick={props.button.onClick}
                 className={cx(
-                  'my-1 flex self-stretch items-center gap-1.5 rounded-[4px] border border-stone-200 bg-white px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100 select-none',
+                  `my-1 flex self-stretch items-center gap-1.5 rounded-[4px] border border-stone-200 bg-white px-2.5 text-stone-600 shadow-sm shadow-stone-300/30 outline-none transition-[box-shadow,border-color] duration-100 select-none`,
                   props.disabled
-                    ? 'cursor-not-allowed bg-stone-100'
-                    : 'cursor-pointer hover:border-stone-300 hover:shadow-stone-300/50 focus-visible:ring-2 focus-visible:ring-violet-300/80',
+                    ? `cursor-not-allowed bg-stone-100`
+                    : `cursor-pointer hover:border-stone-300 hover:shadow-stone-300/50 focus-visible:ring-2 focus-visible:ring-violet-300/80`,
                 )}
               >
                 {props.button.icon && <Icon className="h-4 w-4 shrink-0" />}
@@ -135,8 +137,8 @@ const Input: React.FC<Props> = ({ ...props }) => {
         <p
           id={descriptionId}
           className={cx(
-            'ml-2.5 text-[13px] leading-5',
-            props.error ? 'text-red-500' : 'text-stone-500',
+            `ml-2.5 text-[13px] leading-5`,
+            props.error ? `text-red-500` : `text-stone-500`,
           )}
         >
           {props.error ?? props.helperText}

@@ -1,12 +1,12 @@
-import Input from '#/components/ui/Input';
 import { CheckIcon, SearchIcon } from 'lucide-react';
 import React, { useState } from 'react';
+import Input from '#/components/ui/Input';
 
 const PrefixSuffixExample: React.FC = () => {
-  const [url, setUrl] = useState('');
-  const [subdomain, setSubdomain] = useState('support');
-  const [downtime, setDowntime] = useState('30');
-  const [version, setVersion] = useState('');
+  const [url, setUrl] = useState(``);
+  const [subdomain, setSubdomain] = useState(`support`);
+  const [downtime, setDowntime] = useState(`30`);
+  const [version, setVersion] = useState(``);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -20,7 +20,7 @@ const PrefixSuffixExample: React.FC = () => {
           setValue={setUrl}
           button={{
             icon: SearchIcon,
-            ariaLabel: 'Check website',
+            ariaLabel: `Check website`,
             onClick: () => undefined,
           }}
         />
@@ -39,7 +39,7 @@ const PrefixSuffixExample: React.FC = () => {
           suffix="minutes"
           value={downtime}
           setValue={setDowntime}
-          button={{ label: 'Set', icon: CheckIcon, onClick: () => undefined }}
+          button={{ label: `Set`, icon: CheckIcon, onClick: () => undefined }}
         />
         <div className="sm:pt-5">
           <Input

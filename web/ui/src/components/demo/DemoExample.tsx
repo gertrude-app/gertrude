@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
 import { CheckIcon, ClipboardIcon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { createHighlighterCore } from 'shiki/core';
 import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
 import tsx from 'shiki/langs/tsx.mjs';
 import githubLightDefault from 'shiki/themes/github-light-default.mjs';
 import { useDemoPageContext } from './DemoPageContext';
 
-const sourceByPath = import.meta.glob<string>('/src/routes/**/examples/*.tsx', {
-  query: '?raw',
-  import: 'default',
+const sourceByPath = import.meta.glob<string>(`/src/routes/**/examples/*.tsx`, {
+  query: `?raw`,
+  import: `default`,
   eager: true,
 }) as Record<string, string | undefined>;
 
@@ -22,18 +22,18 @@ interface Props {
   component: React.ReactNode;
   path: string;
   description: string;
-  demoHeight?: React.CSSProperties['height'];
+  demoHeight?: React.CSSProperties[`height`];
 }
 
 const normalizeSourcePath = (path: string): string => {
   const parts: string[] = [];
 
-  for (const part of path.split('/')) {
-    if (part === '' || part === '.') {
+  for (const part of path.split(`/`)) {
+    if (part === `` || part === `.`) {
       continue;
     }
 
-    if (part === '..') {
+    if (part === `..`) {
       parts.pop();
       continue;
     }
@@ -41,15 +41,15 @@ const normalizeSourcePath = (path: string): string => {
     parts.push(part);
   }
 
-  return `/${parts.join('/')}`;
+  return `/${parts.join(`/`)}`;
 };
 
 const resolveSourcePath = (sourceBasePath: string, path: string): string => {
-  if (path.startsWith('/src/')) {
+  if (path.startsWith(`/src/`)) {
     return normalizeSourcePath(path);
   }
 
-  if (path.startsWith('/')) {
+  if (path.startsWith(`/`)) {
     return normalizeSourcePath(`/src/routes${path}`);
   }
 
@@ -60,7 +60,7 @@ const DemoExample: React.FC<Props> = ({
   component,
   path,
   description,
-  demoHeight = '32rem',
+  demoHeight = `32rem`,
 }) => {
   const { sourceBasePath } = useDemoPageContext();
   const sourcePath = resolveSourcePath(sourceBasePath, path);
@@ -68,11 +68,11 @@ const DemoExample: React.FC<Props> = ({
   const [copied, setCopied] = useState(false);
   const [isCodeVisible, setIsCodeVisible] = useState(false);
   const [highlightedSource, setHighlightedSource] = useState<string | null>(null);
-  const fileName = sourcePath.split('/').slice(-2).join('/');
-  const sourceFileName = sourcePath.split('/').pop() ?? path;
+  const fileName = sourcePath.split(`/`).slice(-2).join(`/`);
+  const sourceFileName = sourcePath.split(`/`).pop() ?? path;
   const exampleTitle = sourceFileName
-    .replace(/\.tsx$/, '')
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+    .replace(/\.tsx$/, ``)
+    .replace(/([a-z0-9])([A-Z])/g, `$1 $2`);
 
   useEffect(() => {
     let isCurrent = true;
@@ -86,8 +86,8 @@ const DemoExample: React.FC<Props> = ({
     void highlighterPromise
       .then((highlighter) =>
         highlighter.codeToHtml(source, {
-          lang: 'tsx',
-          theme: 'github-light-default',
+          lang: `tsx`,
+          theme: `github-light-default`,
         }),
       )
       .then((html) => {
@@ -150,7 +150,7 @@ const DemoExample: React.FC<Props> = ({
                   ) : (
                     <ClipboardIcon className="h-3.5 w-3.5" />
                   )}
-                  {copied ? 'Copied' : 'Copy code'}
+                  {copied ? `Copied` : `Copy code`}
                 </button>
               ) : null}
               <button
@@ -158,7 +158,7 @@ const DemoExample: React.FC<Props> = ({
                 onClick={() => setIsCodeVisible((visible) => !visible)}
                 className="inline-flex rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-xs font-medium text-stone-800 transition hover:bg-stone-200 active:scale-98"
               >
-                {isCodeVisible ? 'Hide code' : 'Show code'}
+                {isCodeVisible ? `Hide code` : `Show code`}
               </button>
             </div>
           </div>
