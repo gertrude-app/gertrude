@@ -225,6 +225,13 @@ private func _play(episode: Episode, show: Show) async throws {
       nowPlaying: nowPlaying,
       downloadInFlight: downloadInFlight,
     )
+    if episode.downloaded {
+      log(
+        .error("93bc1333"),
+        "downloaded episode missing local file before playback recovery",
+        detail: detail,
+      )
+    }
     NowPlaying.updateSyncingProgress { $0.isPlaying = false }
     safelyDiscardEpisodeDownloads([episode.id], source: .playbackRecovery)
     if dep(\.network).isConnected() {
@@ -273,6 +280,13 @@ private func missingPlaybackFileDetail(
 
   let downloadedAt = episode.downloadedAt.map { "\($0)" } ?? "nil"
   let domain = URL(string: episode.audioUrl)?.host ?? "unknown"
+  let cause = if episode.downloaded {
+    "completedDownloadMissing"
+  } else if episode.downloading || downloadInFlight {
+    "activeDownload"
+  } else {
+    "notDownloaded"
+  }
   let episodeState = if episode.downloaded {
     "downloaded"
   } else if episode.downloading {
@@ -284,5 +298,5 @@ private func missingPlaybackFileDetail(
     "ep:\($0.episode.id),playing:\($0.isPlaying),nextDownloaded:\($0.nextDownloaded)"
   } ?? "nil"
 
-  return "ep:\(episode.id) show:\(show.id) state:\(episodeState) inFlight:\(downloadInFlight) file:\(fileState) expected:\(episode.sizeInBytes)b downloadedAt:\(downloadedAt) nowPlaying:\(nowPlayingState) domain:\(domain)"
+  return "cause:\(cause) ep:\(episode.id) show:\(show.id) state:\(episodeState) inFlight:\(downloadInFlight) file:\(fileState) expected:\(episode.sizeInBytes)b downloadedAt:\(downloadedAt) nowPlaying:\(nowPlayingState) domain:\(domain)"
 }
