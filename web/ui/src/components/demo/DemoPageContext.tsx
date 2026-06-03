@@ -10,7 +10,7 @@ export const useDemoPageContext = (): DemoPageContextValue => {
   const context = React.useContext(DemoPageContext);
 
   if (!context) {
-    throw new Error('DemoExample must be rendered inside ComponentDemoPage');
+    throw new Error(`DemoExample must be rendered inside ComponentDemoPage`);
   }
 
   return context;

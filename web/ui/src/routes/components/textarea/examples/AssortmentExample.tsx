@@ -1,12 +1,12 @@
-import Textarea from '#/components/ui/Textarea';
 import React, { useState } from 'react';
+import Textarea from '#/components/ui/Textarea';
 
 const AssortmentExample: React.FC = () => {
   const [note, setNote] = useState(
-    'Sally can use research sites until the science project is done.',
+    `Sally can use research sites until the science project is done.`,
   );
-  const [reason, setReason] = useState('');
-  const [supportMessage, setSupportMessage] = useState('');
+  const [reason, setReason] = useState(``);
+  const [supportMessage, setSupportMessage] = useState(``);
 
   return (
     <div className="grid h-full place-items-center p-8">

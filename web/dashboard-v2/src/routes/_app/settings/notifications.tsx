@@ -1,5 +1,5 @@
-import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import React from 'react';
 import CardContainer from '#/components/CardContainer';
 
 const NotificationSettingsPage: React.FC = () => (
@@ -20,6 +20,6 @@ const NotificationSettingsPage: React.FC = () => (
   </div>
 );
 
-export const Route = createFileRoute('/_app/settings/notifications')({
+export const Route = createFileRoute(`/_app/settings/notifications`)({
   component: NotificationSettingsPage,
 });

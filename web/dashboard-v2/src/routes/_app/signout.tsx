@@ -3,6 +3,6 @@ import React from 'react';
 
 const SignoutPage: React.FC = () => <div>Sign out</div>;
 
-export const Route = createFileRoute('/_app/signout')({
+export const Route = createFileRoute(`/_app/signout`)({
   component: SignoutPage,
 });

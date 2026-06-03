@@ -1,5 +1,5 @@
-import Toggle from '#/components/ui/Toggle';
 import React, { useState } from 'react';
+import Toggle from '#/components/ui/Toggle';
 
 const StatesExample: React.FC = () => {
   const [enabled, setEnabled] = useState(true);

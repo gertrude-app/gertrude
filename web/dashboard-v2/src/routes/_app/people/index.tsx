@@ -1,19 +1,19 @@
-import React from 'react';
-import { PlusIcon, ScanEyeIcon } from 'lucide-react';
-import { createFileRoute } from '@tanstack/react-router';
 import { PageHeading } from '@gertrude/ui';
+import { createFileRoute } from '@tanstack/react-router';
+import { PlusIcon, ScanEyeIcon } from 'lucide-react';
+import React from 'react';
+import CardContainer from '#/components/CardContainer';
 import DashboardPage from '#/components/DashboardPage';
+import PersonCard from '#/components/PersonCard';
+import SecurityEventsPreviewCard from '#/components/SecurityEventsPreviewCard';
+import SuspensionRequetsPreviewCard from '#/components/SuspensionRequestsPreviewCard';
+import UnlockRequestsPreviewCard from '#/components/UnlockRequestsPreviewCard';
 import {
   mockChildren,
   mockSecurityEvents,
   mockSuspensionRequests,
   mockUnlockRequests,
 } from '#/lib/mock-data';
-import PersonCard from '#/components/PersonCard';
-import CardContainer from '#/components/CardContainer';
-import SecurityEventsPreviewCard from '#/components/SecurityEventsPreviewCard';
-import SuspensionRequetsPreviewCard from '#/components/SuspensionRequestsPreviewCard';
-import UnlockRequestsPreviewCard from '#/components/UnlockRequestsPreviewCard';
 
 const PeoplePage: React.FC = () => (
   <DashboardPage
@@ -22,15 +22,15 @@ const PeoplePage: React.FC = () => (
         title="Protected People"
         buttons={[
           {
-            text: 'Add Child',
+            text: `Add Child`,
             onClick: () => {},
-            variant: 'secondary',
+            variant: `secondary`,
             icon: PlusIcon,
           },
           {
-            text: 'Monitor',
+            text: `Monitor`,
             onClick: () => {},
-            variant: 'primary',
+            variant: `primary`,
             icon: ScanEyeIcon,
           },
         ]}
@@ -52,6 +52,6 @@ const PeoplePage: React.FC = () => (
   </DashboardPage>
 );
 
-export const Route = createFileRoute('/_app/people/')({
+export const Route = createFileRoute(`/_app/people/`)({
   component: PeoplePage,
 });

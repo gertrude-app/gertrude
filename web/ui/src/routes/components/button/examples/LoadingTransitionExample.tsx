@@ -1,4 +1,3 @@
-import Button from '#/components/ui/Button';
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -7,6 +6,7 @@ import {
   SearchIcon,
 } from 'lucide-react';
 import React, { useState } from 'react';
+import Button from '#/components/ui/Button';
 
 const LoadingTransitionExample: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,7 @@ const LoadingTransitionExample: React.FC = () => {
             variant="primary"
             onClick={() => setLoading((value) => !value)}
           >
-            {loading ? 'Stop loading' : 'Start loading'}
+            {loading ? `Stop loading` : `Start loading`}
           </Button>
         </div>
         <div className="flex flex-col items-start gap-3">
