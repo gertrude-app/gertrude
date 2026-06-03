@@ -1,16 +1,23 @@
+import React, { useState } from 'react';
 import Button from '#/components/ui/Button';
-import Form from '#/components/ui/form/Form';
-import FormRow from '#/components/ui/form/FormRow';
 import Input from '#/components/ui/Input';
 import Select from '#/components/ui/Select';
 import Toggle from '#/components/ui/Toggle';
-import React, { useState } from 'react';
+import Form from '#/components/ui/form/Form';
+import FormRow from '#/components/ui/form/FormRow';
+
+const modeOptions = [`Homework first`, `Bedtime`, `Weekend`, `Custom`] as const;
+const reviewOptions = [
+  `Ask parent`,
+  `Block until tomorrow`,
+  `Allow school sites`,
+] as const;
 
 const SettingsExample: React.FC = () => {
-  const [mode, setMode] = useState('Homework first');
-  const [site, setSite] = useState('khanacademy.org');
-  const [limit, setLimit] = useState('45');
-  const [review, setReview] = useState('Ask parent');
+  const [mode, setMode] = useState<(typeof modeOptions)[number]>(`Homework first`);
+  const [site, setSite] = useState(`khanacademy.org`);
+  const [limit, setLimit] = useState(`45`);
+  const [review, setReview] = useState<(typeof reviewOptions)[number]>(`Ask parent`);
   const [requestsEnabled, setRequestsEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
@@ -22,11 +29,7 @@ const SettingsExample: React.FC = () => {
             label="Rule mode"
             description="Start with a preset, then tune individual controls below."
           >
-            <Select
-              selected={mode}
-              setSelected={setMode}
-              possibleValues={['Homework first', 'Bedtime', 'Weekend', 'Custom']}
-            />
+            <Select selected={mode} setSelected={setMode} possibleValues={modeOptions} />
           </FormRow>
           <FormRow
             label="Allowed site"
@@ -41,11 +44,7 @@ const SettingsExample: React.FC = () => {
             <Select
               selected={review}
               setSelected={setReview}
-              possibleValues={[
-                'Ask parent',
-                'Block until tomorrow',
-                'Allow school sites',
-              ]}
+              possibleValues={reviewOptions}
             />
           </FormRow>
           <FormRow

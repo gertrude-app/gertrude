@@ -1,5 +1,5 @@
-import Checkbox from '#/components/ui/Checkbox';
 import React, { useState } from 'react';
+import Checkbox from '#/components/ui/Checkbox';
 
 const AssortmentExample: React.FC = () => {
   const [requestsEnabled, setRequestsEnabled] = useState(true);

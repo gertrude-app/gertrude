@@ -41,7 +41,7 @@ const TestimonialColumn: React.FC<TestimonialColumnProps> = ({ column, columnInd
     }
 
     const speed = testimonialColumnSpeeds[columnIndex] ?? testimonialColumnSpeeds[0];
-    const updateDuration = () => {
+    const updateDuration = (): void => {
       const nextDuration = `${Math.round((element.offsetHeight / speed) * 10) / 10}s`;
       setDuration((currentDuration) =>
         currentDuration === nextDuration ? currentDuration : nextDuration,
@@ -50,7 +50,7 @@ const TestimonialColumn: React.FC<TestimonialColumnProps> = ({ column, columnInd
 
     updateDuration();
 
-    if (typeof ResizeObserver === 'undefined') {
+    if (typeof ResizeObserver === `undefined`) {
       return;
     }
 
@@ -93,20 +93,14 @@ const TestimonialColumn: React.FC<TestimonialColumnProps> = ({ column, columnInd
   );
 };
 
-const RotatingTestimonials: React.FC = () => {
-  return (
-    <div className="relative mt-10 min-h-0 flex-1 w-[120%] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_10%,black)]">
-      <div className="absolute -left-30 right-30 -top-16 bottom-0 flex origin-bottom-left rotate-12 gap-3">
-        {testimonialColumns.map((column, columnIndex) => (
-          <TestimonialColumn
-            key={columnIndex}
-            column={column}
-            columnIndex={columnIndex}
-          />
-        ))}
-      </div>
+const RotatingTestimonials: React.FC = () => (
+  <div className="relative mt-10 min-h-0 flex-1 w-[120%] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_10%,black)]">
+    <div className="absolute -left-30 right-30 -top-16 bottom-0 flex origin-bottom-left rotate-12 gap-3">
+      {testimonialColumns.map((column, columnIndex) => (
+        <TestimonialColumn key={columnIndex} column={column} columnIndex={columnIndex} />
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
 export default RotatingTestimonials;

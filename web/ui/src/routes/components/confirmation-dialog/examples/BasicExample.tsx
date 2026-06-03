@@ -16,8 +16,8 @@ const BasicExample: React.FC = () => {
         confirmationQuestion="Grant this suspension request?"
         description="Sally will be notified that the filter is suspended for 15 minutes. Monitoring will continue during the suspension."
         actions={[
-          { text: 'Cancel', variant: 'ghost' },
-          { text: 'Grant 15 minutes', variant: 'primary', onClick: () => undefined },
+          { text: `Cancel`, variant: `ghost` },
+          { text: `Grant 15 minutes`, variant: `primary`, onClick: () => undefined },
         ]}
       />
     </div>

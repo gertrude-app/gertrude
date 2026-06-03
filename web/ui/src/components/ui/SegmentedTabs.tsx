@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link, Outlet, useLocation } from '@tanstack/react-router';
 import cx from 'clsx';
+import React from 'react';
 
 interface Tab {
   label: string;
@@ -15,15 +15,13 @@ interface Props {
 }
 
 const normalizePath = (path: string): string => {
-  const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
-  return withLeadingSlash === '/'
+  const withLeadingSlash = path.startsWith(`/`) ? path : `/${path}`;
+  return withLeadingSlash === `/`
     ? withLeadingSlash
-    : withLeadingSlash.replace(/\/+$/, '');
+    : withLeadingSlash.replace(/\/+$/, ``);
 };
 
-const normalizeSegment = (segment: string): string => {
-  return segment.replace(/^\/+|\/+$/g, '');
-};
+const normalizeSegment = (segment: string): string => segment.replace(/^\/+|\/+$/g, ``);
 
 const getTabPath = (basePath: string, segment: string): string => {
   const normalizedBasePath = normalizePath(basePath);
@@ -33,7 +31,7 @@ const getTabPath = (basePath: string, segment: string): string => {
     return normalizedBasePath;
   }
 
-  return normalizedBasePath === '/'
+  return normalizedBasePath === `/`
     ? `/${normalizedSegment}`
     : `${normalizedBasePath}/${normalizedSegment}`;
 };
@@ -75,48 +73,53 @@ const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className={cx('relative overflow-hidden rounded-xl bg-stone-100 p-1.5', className)}>
+      <div
+        className={cx(
+          `relative overflow-hidden rounded-xl bg-stone-100 p-1.5`,
+          className,
+        )}
+      >
         <nav
           ref={scrollRef}
           className="flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           onScroll={updateScrollState}
         >
           {tabs.map((tab, index) => {
-          const href = getTabPath(normalizedBasePath, tab.segment);
-          const isSelected =
-            pathname === href ||
-            pathname.startsWith(`${href}/`) ||
-            (index === 0 && pathname === normalizedBasePath);
+            const href = getTabPath(normalizedBasePath, tab.segment);
+            const isSelected =
+              pathname === href ||
+              pathname.startsWith(`${href}/`) ||
+              (index === 0 && pathname === normalizedBasePath);
 
-          return (
-            <Link
-              key={`${tab.segment}-${tab.label}`}
-              to={href}
-              className={cx(
-                'flex shrink-0 justify-center rounded-lg border px-3 py-1 text-center whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow,color] duration-100 select-none @sm/main:flex-grow',
-                isSelected
-                  ? 'border-stone-200 bg-white text-stone-900 shadow shadow-stone-300/30'
-                  : 'border-transparent text-stone-600 hover:bg-stone-200/50 focus-visible:bg-stone-200/50',
-              )}
-              aria-current={isSelected ? 'page' : undefined}
-            >
-              <span className="inline-flex items-center gap-2">
-                <span>{tab.label}</span>
-                {tab.badgeCount !== undefined && (
-                  <span
-                    className={cx(
-                      'min-w-5 rounded-full px-1.5 py-0.25 text-xs font-medium tabular-nums',
-                      isSelected
-                        ? 'bg-stone-100 text-stone-700'
-                        : 'bg-stone-200/70 text-stone-600',
-                    )}
-                  >
-                    {tab.badgeCount}
-                  </span>
+            return (
+              <Link
+                key={`${tab.segment}-${tab.label}`}
+                to={href}
+                className={cx(
+                  `flex shrink-0 justify-center rounded-lg border px-3 py-1 text-center whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow,color] duration-100 select-none @sm/main:flex-grow`,
+                  isSelected
+                    ? `border-stone-200 bg-white text-stone-900 shadow shadow-stone-300/30`
+                    : `border-transparent text-stone-600 hover:bg-stone-200/50 focus-visible:bg-stone-200/50`,
                 )}
-              </span>
-            </Link>
-          );
+                aria-current={isSelected ? `page` : undefined}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <span>{tab.label}</span>
+                  {tab.badgeCount !== undefined && (
+                    <span
+                      className={cx(
+                        `min-w-5 rounded-full px-1.5 py-0.25 text-xs font-medium tabular-nums`,
+                        isSelected
+                          ? `bg-stone-100 text-stone-700`
+                          : `bg-stone-200/70 text-stone-600`,
+                      )}
+                    >
+                      {tab.badgeCount}
+                    </span>
+                  )}
+                </span>
+              </Link>
+            );
           })}
         </nav>
         {canScrollLeft && (

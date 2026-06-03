@@ -1,19 +1,23 @@
-import React from 'react';
 import { Menu } from '@base-ui/react/menu';
+import cx from 'clsx';
+import React from 'react';
+import { useOverlayPortalContainer } from '../OverlayPortalContext';
 
 interface Props {
   trigger: React.ReactNode;
   children: React.ReactNode;
   searchable?: boolean;
   disabled?: boolean;
+  contentClassName?: string;
 }
 
 type FilterableChildProps = {
   title?: unknown;
+  description?: unknown;
   active?: boolean;
 };
 
-const menuNavigationKeys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
+const menuNavigationKeys = [`ArrowDown`, `ArrowUp`, `Home`, `End`];
 
 const filterChildren = (children: React.ReactNode, query: string): React.ReactNode[] => {
   const childArray = React.Children.toArray(children);
@@ -27,17 +31,27 @@ const filterChildren = (children: React.ReactNode, query: string): React.ReactNo
       return true;
     }
 
-    return typeof child.props.title === 'string'
-      ? child.props.title.toLowerCase().includes(query)
-      : true;
+    const searchableText = [child.props.title, child.props.description]
+      .filter((value): value is string => typeof value === `string`)
+      .join(` `)
+      .toLowerCase();
+
+    return searchableText ? searchableText.includes(query) : true;
   });
 };
 
-const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled }) => {
+const DropdownMenu: React.FC<Props> = ({
+  trigger,
+  children,
+  searchable,
+  disabled,
+  contentClassName = `w-60`,
+}) => {
   const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [searchQuery, setSearchQuery] = React.useState(``);
   const [activeIndex, setActiveIndex] = React.useState(-1);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const overlayPortalContainer = useOverlayPortalContainer();
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const visibleChildren = searchable
     ? filterChildren(children, normalizedSearchQuery)
@@ -80,15 +94,15 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
     }
 
     setActiveIndex((currentIndex) => {
-      if (key === 'Home') {
+      if (key === `Home`) {
         return 0;
       }
 
-      if (key === 'End') {
+      if (key === `End`) {
         return visibleChildren.length - 1;
       }
 
-      if (key === 'ArrowUp') {
+      if (key === `ArrowUp`) {
         return currentIndex <= 0 ? visibleChildren.length - 1 : currentIndex - 1;
       }
 
@@ -100,7 +114,7 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
 
   const selectActiveItem = (): void => {
     const menuItems = Array.from(
-      document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+      document.querySelectorAll<HTMLElement>(`[role="menuitem"]`),
     );
     const activeMenuItem = menuItems[activeIndex];
 
@@ -123,7 +137,7 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
         setOpen(nextOpen);
 
         if (!nextOpen) {
-          setSearchQuery('');
+          setSearchQuery(``);
           setActiveIndex(-1);
         }
       }}
@@ -135,9 +149,14 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
       ) : (
         <Menu.Trigger disabled={disabled}>{trigger}</Menu.Trigger>
       )}
-      <Menu.Portal>
+      <Menu.Portal container={overlayPortalContainer ?? undefined}>
         <Menu.Positioner sideOffset={4} align="center" className="z-[60]">
-          <Menu.Popup className="z-[60] bg-white shadow-md shadow-stone-300/50 p-1 rounded-xl border border-stone-200 w-60 flex flex-col gap-1 select-none mx-1 outline-none">
+          <Menu.Popup
+            className={cx(
+              `z-[60] mx-1 flex flex-col gap-1 rounded-xl border border-stone-200 bg-white p-1 shadow-md shadow-stone-300/50 outline-none select-none`,
+              contentClassName,
+            )}
+          >
             {searchable && (
               <input
                 ref={searchInputRef}
@@ -153,14 +172,14 @@ const DropdownMenu: React.FC<Props> = ({ trigger, children, searchable, disabled
                     return;
                   }
 
-                  if (event.key === 'Enter') {
+                  if (event.key === `Enter`) {
                     event.preventDefault();
                     event.stopPropagation();
                     selectActiveItem();
                     return;
                   }
 
-                  if (event.key !== 'Escape') {
+                  if (event.key !== `Escape`) {
                     event.stopPropagation();
                   }
                 }}

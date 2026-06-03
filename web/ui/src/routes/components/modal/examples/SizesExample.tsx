@@ -2,9 +2,9 @@ import React from 'react';
 import Button from '#/components/ui/Button';
 import Modal from '#/components/ui/Modal';
 
-type ModalSize = 'small' | 'medium' | 'large';
+type ModalSize = `small` | `medium` | `large`;
 
-const modalSizes: ModalSize[] = ['small', 'medium', 'large'];
+const modalSizes: ModalSize[] = [`small`, `medium`, `large`];
 
 const SizesExample: React.FC = () => {
   const [openSize, setOpenSize] = React.useState<ModalSize | null>(null);

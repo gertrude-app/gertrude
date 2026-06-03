@@ -1,12 +1,12 @@
-import Input from '#/components/ui/Input';
 import { ArrowRightIcon, SearchIcon } from 'lucide-react';
 import React, { useState } from 'react';
+import Input from '#/components/ui/Input';
 
 const AssortmentExample: React.FC = () => {
-  const [childName, setChildName] = useState('Sally');
-  const [email, setEmail] = useState('');
-  const [site, setSite] = useState('school.edu');
-  const [dailyLimit, setDailyLimit] = useState('');
+  const [childName, setChildName] = useState(`Sally`);
+  const [email, setEmail] = useState(``);
+  const [site, setSite] = useState(`school.edu`);
+  const [dailyLimit, setDailyLimit] = useState(``);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -29,7 +29,7 @@ const AssortmentExample: React.FC = () => {
             placeholder="parent@example.com"
             value={email}
             setValue={setEmail}
-            button={{ label: 'Invite', icon: ArrowRightIcon, onClick: () => undefined }}
+            button={{ label: `Invite`, icon: ArrowRightIcon, onClick: () => undefined }}
           />
         </div>
         <Input
@@ -39,7 +39,7 @@ const AssortmentExample: React.FC = () => {
           placeholder="example.com"
           value={site}
           setValue={setSite}
-          button={{ label: 'Check', icon: SearchIcon, onClick: () => undefined }}
+          button={{ label: `Check`, icon: SearchIcon, onClick: () => undefined }}
         />
         <div className="sm:pt-5">
           <Input

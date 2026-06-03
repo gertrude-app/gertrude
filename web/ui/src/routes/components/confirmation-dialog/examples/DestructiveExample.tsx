@@ -1,5 +1,5 @@
-import React from 'react';
 import { Trash2Icon } from 'lucide-react';
+import React from 'react';
 import Button from '#/components/ui/Button';
 import ConfirmationDialog from '#/components/ui/ConfirmationDialog';
 
@@ -22,10 +22,10 @@ const DestructiveExample: React.FC = () => {
         confirmationQuestion="Delete this keychain?"
         description="This will remove the keychain from every child using it. This action cannot be undone."
         actions={[
-          { text: 'Cancel', variant: 'ghost' },
+          { text: `Cancel`, variant: `ghost` },
           {
-            text: 'Delete keychain',
-            variant: 'destructive',
+            text: `Delete keychain`,
+            variant: `destructive`,
             icon: Trash2Icon,
             onClick: () => new Promise((resolve) => window.setTimeout(resolve, 700)),
           },

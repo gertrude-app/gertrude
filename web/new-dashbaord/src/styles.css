@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "../../ui/src/styles.css";
+@import 'tailwindcss';
+@import '../../ui/src/styles.css';
 @source "../../ui/src";
 
 @theme {
@@ -15,7 +15,7 @@
 }
 
 .bg-dots {
-  background-image: url("/dot-noise-pattern.svg");
+  background-image: url('/dot-noise-pattern.svg');
   background-size: 1440px 1440px;
   background-repeat: repeat;
 }
@@ -113,4 +113,3 @@ body {
     opacity: 0.85;
   }
 }
-

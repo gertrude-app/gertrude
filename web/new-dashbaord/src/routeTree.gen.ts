@@ -26,6 +26,7 @@ import { Route as AppSettingsNotificationsRouteImport } from './routes/_app/sett
 import { Route as AppSettingsBillingRouteImport } from './routes/_app/settings/billing'
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
+import { Route as AppRequestsUnlockRequestIdRouteImport } from './routes/_app/requests/unlock/$requestId'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -112,6 +113,12 @@ const AppRequestsSuspensionRoute = AppRequestsSuspensionRouteImport.update({
   path: '/suspension',
   getParentRoute: () => AppRequestsRouteRoute,
 } as any)
+const AppRequestsUnlockRequestIdRoute =
+  AppRequestsUnlockRequestIdRouteImport.update({
+    id: '/$requestId',
+    path: '/$requestId',
+    getParentRoute: () => AppRequestsUnlockRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -125,11 +132,12 @@ export interface FileRoutesByFullPath {
   '/devices': typeof AppDevicesRoute
   '/signout': typeof AppSignoutRoute
   '/requests/suspension': typeof AppRequestsSuspensionRoute
-  '/requests/unlock': typeof AppRequestsUnlockRoute
+  '/requests/unlock': typeof AppRequestsUnlockRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/people/': typeof AppPeopleIndexRoute
   '/requests/': typeof AppRequestsIndexRoute
+  '/requests/unlock/$requestId': typeof AppRequestsUnlockRequestIdRoute
 }
 export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRouteRouteWithChildren
@@ -141,11 +149,12 @@ export interface FileRoutesByTo {
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/requests/suspension': typeof AppRequestsSuspensionRoute
-  '/requests/unlock': typeof AppRequestsUnlockRoute
+  '/requests/unlock': typeof AppRequestsUnlockRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/people': typeof AppPeopleIndexRoute
   '/requests': typeof AppRequestsIndexRoute
+  '/requests/unlock/$requestId': typeof AppRequestsUnlockRequestIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,11 +170,12 @@ export interface FileRoutesById {
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRoute
-  '/_app/requests/unlock': typeof AppRequestsUnlockRoute
+  '/_app/requests/unlock': typeof AppRequestsUnlockRouteWithChildren
   '/_app/settings/billing': typeof AppSettingsBillingRoute
   '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/_app/people/': typeof AppPeopleIndexRoute
   '/_app/requests/': typeof AppRequestsIndexRoute
+  '/_app/requests/unlock/$requestId': typeof AppRequestsUnlockRequestIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/people/'
     | '/requests/'
+    | '/requests/unlock/$requestId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/settings'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/people'
     | '/requests'
+    | '/requests/unlock/$requestId'
   id:
     | '__root__'
     | '/_app'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
     | '/_app/settings/notifications'
     | '/_app/people/'
     | '/_app/requests/'
+    | '/_app/requests/unlock/$requestId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -350,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRequestsSuspensionRouteImport
       parentRoute: typeof AppRequestsRouteRoute
     }
+    '/_app/requests/unlock/$requestId': {
+      id: '/_app/requests/unlock/$requestId'
+      path: '/$requestId'
+      fullPath: '/requests/unlock/$requestId'
+      preLoaderRoute: typeof AppRequestsUnlockRequestIdRouteImport
+      parentRoute: typeof AppRequestsUnlockRoute
+    }
   }
 }
 
@@ -365,15 +385,26 @@ const AppPeopleRouteRouteWithChildren = AppPeopleRouteRoute._addFileChildren(
   AppPeopleRouteRouteChildren,
 )
 
+interface AppRequestsUnlockRouteChildren {
+  AppRequestsUnlockRequestIdRoute: typeof AppRequestsUnlockRequestIdRoute
+}
+
+const AppRequestsUnlockRouteChildren: AppRequestsUnlockRouteChildren = {
+  AppRequestsUnlockRequestIdRoute: AppRequestsUnlockRequestIdRoute,
+}
+
+const AppRequestsUnlockRouteWithChildren =
+  AppRequestsUnlockRoute._addFileChildren(AppRequestsUnlockRouteChildren)
+
 interface AppRequestsRouteRouteChildren {
   AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRoute
-  AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
+  AppRequestsUnlockRoute: typeof AppRequestsUnlockRouteWithChildren
   AppRequestsIndexRoute: typeof AppRequestsIndexRoute
 }
 
 const AppRequestsRouteRouteChildren: AppRequestsRouteRouteChildren = {
   AppRequestsSuspensionRoute: AppRequestsSuspensionRoute,
-  AppRequestsUnlockRoute: AppRequestsUnlockRoute,
+  AppRequestsUnlockRoute: AppRequestsUnlockRouteWithChildren,
   AppRequestsIndexRoute: AppRequestsIndexRoute,
 }
 

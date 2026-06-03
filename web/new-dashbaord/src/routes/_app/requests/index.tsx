@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/_app/requests/')({
+export const Route = createFileRoute(`/_app/requests/`)({
   beforeLoad: () => {
-    throw redirect({ to: '/requests/unlock' });
+    throw redirect({ to: `/requests/unlock` });
   },
 });

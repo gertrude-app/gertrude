@@ -1,12 +1,12 @@
-import Input from '#/components/ui/Input';
 import { LockIcon, SearchIcon } from 'lucide-react';
 import React, { useState } from 'react';
+import Input from '#/components/ui/Input';
 
 const DisabledExample: React.FC = () => {
-  const [email, setEmail] = useState('parent@example.com');
-  const [site, setSite] = useState('gertrude.app');
-  const [pin, setPin] = useState('184920');
-  const [minutes, setMinutes] = useState('30');
+  const [email, setEmail] = useState(`parent@example.com`);
+  const [site, setSite] = useState(`gertrude.app`);
+  const [pin, setPin] = useState(`184920`);
+  const [minutes, setMinutes] = useState(`30`);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -27,7 +27,7 @@ const DisabledExample: React.FC = () => {
             disabled
             button={{
               icon: SearchIcon,
-              ariaLabel: 'Check website',
+              ariaLabel: `Check website`,
               onClick: () => undefined,
             }}
           />
@@ -38,7 +38,7 @@ const DisabledExample: React.FC = () => {
           value={pin}
           setValue={setPin}
           disabled
-          button={{ label: 'Locked', icon: LockIcon, onClick: () => undefined }}
+          button={{ label: `Locked`, icon: LockIcon, onClick: () => undefined }}
         />
         <div className="sm:pt-5">
           <Input
@@ -47,7 +47,7 @@ const DisabledExample: React.FC = () => {
             value={minutes}
             setValue={setMinutes}
             disabled
-            button={{ label: 'Apply', onClick: () => undefined }}
+            button={{ label: `Apply`, onClick: () => undefined }}
           />
         </div>
       </div>

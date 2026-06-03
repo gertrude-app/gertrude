@@ -1,7 +1,7 @@
-import React from 'react';
 import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
 import { type LucideIcon } from 'lucide-react';
+import React from 'react';
 import { useSidebarContext } from './SidebarContext';
 
 interface Props {
@@ -20,12 +20,12 @@ const SidebarItem: React.FC<Props> = ({
   badgeCount,
 }) => {
   const { close } = useSidebarContext();
-  const isInternalLink = href.startsWith('/') && !href.startsWith('//');
+  const isInternalLink = href.startsWith(`/`) && !href.startsWith(`//`);
   const linkClassName = cx(
-    'flex min-h-9 items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-stone-900 transition-[background-color,scale] duration-100 outline-none select-none cursor-pointer border relative',
+    `flex min-h-9 items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-stone-900 transition-[background-color,scale] duration-100 outline-none select-none cursor-pointer border relative`,
     selected
-      ? 'bg-white border-stone-200 min-[940px]:rounded-r-none min-[940px]:-mr-2.5'
-      : 'hover:bg-stone-200/50 focus-visible:bg-stone-200/50 active:bg-stone-200/70 border-transparent active:scale-98',
+      ? `bg-white border-stone-200 min-[940px]:rounded-r-none min-[940px]:-mr-2.5`
+      : `hover:bg-stone-200/50 focus-visible:bg-stone-200/50 active:bg-stone-200/70 border-transparent active:scale-98`,
   );
   const content = (
     <>
@@ -46,10 +46,8 @@ const SidebarItem: React.FC<Props> = ({
         {badgeCount !== undefined && (
           <span
             className={cx(
-              'min-w-5 shrink-0 rounded-full px-1.5 py-0.25 text-center text-xs font-medium leading-5 tabular-nums',
-              selected
-                ? 'bg-stone-100 text-stone-700'
-                : 'bg-stone-200/70 text-stone-600',
+              `min-w-5 shrink-0 rounded-full px-1.5 py-0.25 text-center text-xs font-medium leading-5 tabular-nums`,
+              selected ? `bg-stone-100 text-stone-700` : `bg-stone-200/70 text-stone-600`,
             )}
           >
             {badgeCount}
@@ -62,8 +60,8 @@ const SidebarItem: React.FC<Props> = ({
   return (
     <div
       className={cx(
-        'relative -mx-2.5 transition-[margin] duration-150',
-        selected ? 'my-2 z-0' : 'z-10',
+        `relative -mx-2.5 transition-[margin] duration-150`,
+        selected ? `my-2 z-0` : `z-10`,
       )}
     >
       {selected && (
@@ -76,7 +74,7 @@ const SidebarItem: React.FC<Props> = ({
         <Link
           to={href}
           className={linkClassName}
-          aria-current={selected ? 'page' : undefined}
+          aria-current={selected ? `page` : undefined}
           onClick={close}
         >
           {content}
@@ -85,7 +83,7 @@ const SidebarItem: React.FC<Props> = ({
         <a
           href={href}
           className={linkClassName}
-          aria-current={selected ? 'page' : undefined}
+          aria-current={selected ? `page` : undefined}
           onClick={close}
         >
           {content}

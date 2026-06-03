@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react';
 import cx from 'clsx';
-import Button from '../Button';
 import { SidebarIcon } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Button from '../Button';
 import { SidebarContext } from './SidebarContext';
 
 interface Props {
@@ -14,21 +14,56 @@ const SidebarLayout: React.FC<Props> = ({ content, children }) => {
   const close = useCallback(() => setOpen(false), []);
   const sidebarContext = useMemo(() => ({ close }), [close]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const { body, documentElement } = document;
+    const scrollY = window.scrollY;
+    const previousBodyPosition = body.style.position;
+    const previousBodyTop = body.style.top;
+    const previousBodyLeft = body.style.left;
+    const previousBodyRight = body.style.right;
+    const previousBodyWidth = body.style.width;
+    const previousBodyOverflow = body.style.overflow;
+    const previousDocumentOverflow = documentElement.style.overflow;
+
+    body.style.position = `fixed`;
+    body.style.top = `-${scrollY}px`;
+    body.style.left = `0`;
+    body.style.right = `0`;
+    body.style.width = `100%`;
+    body.style.overflow = `hidden`;
+    documentElement.style.overflow = `hidden`;
+
+    return () => {
+      body.style.position = previousBodyPosition;
+      body.style.top = previousBodyTop;
+      body.style.left = previousBodyLeft;
+      body.style.right = previousBodyRight;
+      body.style.width = previousBodyWidth;
+      body.style.overflow = previousBodyOverflow;
+      documentElement.style.overflow = previousDocumentOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [open]);
+
   return (
     <SidebarContext.Provider value={sidebarContext}>
       <div className="flex min-h-screen relative">
         <div className="hidden min-[940px]:block">{children}</div>
         <div
           className={cx(
-            'absolute inset-0 bg-stone-200/80 z-50 transition-[opacity,filter] duration-150 min-[940px]:hidden',
-            open ? 'opacity-100 backdrop-blur' : 'opacity-0 pointer-events-none',
+            `fixed inset-0 z-50 bg-stone-200/80 transition-[opacity,filter] duration-150 min-[940px]:hidden`,
+            open ? `opacity-100 backdrop-blur` : `pointer-events-none opacity-0`,
           )}
           onClick={close}
         />
         <div
           className={cx(
-            'absolute left-0 top-0 h-screen w-64 z-100 bg-white min-[940px]:hidden transition-transform duration-150 shadow-xl',
-            open ? 'translate-x-0' : '-translate-x-68',
+            `fixed left-0 top-0 z-100 h-dvh w-68 overflow-y-auto overscroll-contain bg-white shadow-xl transition-transform duration-150 min-[940px]:hidden`,
+            open ? `translate-x-0` : `-translate-x-68`,
           )}
         >
           {children}

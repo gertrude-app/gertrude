@@ -1,11 +1,12 @@
-import Input from '#/components/ui/Input';
 import React, { useState } from 'react';
+import Input from '#/components/ui/Input';
 
 const TypeVariantsExample: React.FC = () => {
-  const [text, setText] = useState('Family MacBook');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('super-secret');
-  const [number, setNumber] = useState('');
+  const [text, setText] = useState(`Family MacBook`);
+  const [email, setEmail] = useState(``);
+  const [password, setPassword] = useState(`super-secret`);
+  const [number, setNumber] = useState(``);
+  const [time, setTime] = useState(`20:30`);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -39,6 +40,7 @@ const TypeVariantsExample: React.FC = () => {
         <div className="sm:pt-5">
           <Input type="number" placeholder="7" value={number} setValue={setNumber} />
         </div>
+        <Input type="time" label="Time" value={time} setValue={setTime} />
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ import { Route as ComponentsModalRouteImport } from './routes/components/modal'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsDropdownMenuRouteImport } from './routes/components/dropdown-menu'
+import { Route as ComponentsDateTimePickerRouteImport } from './routes/components/date-time-picker'
 import { Route as ComponentsConfirmationDialogRouteImport } from './routes/components/confirmation-dialog'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
@@ -86,6 +87,12 @@ const ComponentsDropdownMenuRoute = ComponentsDropdownMenuRouteImport.update({
   path: '/components/dropdown-menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsDateTimePickerRoute =
+  ComponentsDateTimePickerRouteImport.update({
+    id: '/components/date-time-picker',
+    path: '/components/date-time-picker',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComponentsConfirmationDialogRoute =
   ComponentsConfirmationDialogRouteImport.update({
     id: '/components/confirmation-dialog',
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
+  '/components/date-time-picker': typeof ComponentsDateTimePickerRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
+  '/components/date-time-picker': typeof ComponentsDateTimePickerRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
@@ -151,6 +160,7 @@ export interface FileRoutesById {
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
+  '/components/date-time-picker': typeof ComponentsDateTimePickerRoute
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/components/button'
     | '/components/checkbox'
     | '/components/confirmation-dialog'
+    | '/components/date-time-picker'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/components/button'
     | '/components/checkbox'
     | '/components/confirmation-dialog'
+    | '/components/date-time-picker'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
@@ -207,6 +219,7 @@ export interface FileRouteTypes {
     | '/components/button'
     | '/components/checkbox'
     | '/components/confirmation-dialog'
+    | '/components/date-time-picker'
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
@@ -226,6 +239,7 @@ export interface RootRouteChildren {
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsConfirmationDialogRoute: typeof ComponentsConfirmationDialogRoute
+  ComponentsDateTimePickerRoute: typeof ComponentsDateTimePickerRoute
   ComponentsDropdownMenuRoute: typeof ComponentsDropdownMenuRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
@@ -325,6 +339,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsDropdownMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/date-time-picker': {
+      id: '/components/date-time-picker'
+      path: '/components/date-time-picker'
+      fullPath: '/components/date-time-picker'
+      preLoaderRoute: typeof ComponentsDateTimePickerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/confirmation-dialog': {
       id: '/components/confirmation-dialog'
       path: '/components/confirmation-dialog'
@@ -362,6 +383,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsConfirmationDialogRoute: ComponentsConfirmationDialogRoute,
+  ComponentsDateTimePickerRoute: ComponentsDateTimePickerRoute,
   ComponentsDropdownMenuRoute: ComponentsDropdownMenuRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,

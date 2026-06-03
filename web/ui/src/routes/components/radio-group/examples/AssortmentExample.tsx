@@ -1,10 +1,10 @@
-import RadioGroup from '#/components/ui/RadioGroup';
 import React, { useState } from 'react';
+import RadioGroup from '#/components/ui/RadioGroup';
 
 const AssortmentExample: React.FC = () => {
-  const [schedule, setSchedule] = useState('Homework first');
-  const [duration, setDuration] = useState('Today');
-  const [managed, setManaged] = useState('School profile');
+  const [schedule, setSchedule] = useState(`Homework first`);
+  const [duration, setDuration] = useState(`Today`);
+  const [managed, setManaged] = useState(`School profile`);
 
   return (
     <div className="grid h-full place-items-center p-8">
@@ -13,20 +13,20 @@ const AssortmentExample: React.FC = () => {
           label="Rule mode"
           selected={schedule}
           setSelected={setSchedule}
-          possibleValues={['Homework first', 'Bedtime', 'Weekend']}
+          possibleValues={[`Homework first`, `Bedtime`, `Weekend`]}
         />
         <RadioGroup
           label="Duration"
           direction="horizontal"
           selected={duration}
           setSelected={setDuration}
-          possibleValues={['Today', 'This week', 'Always']}
+          possibleValues={[`Today`, `This week`, `Always`]}
         />
         <RadioGroup
           label="Managed setting"
           selected={managed}
           setSelected={setManaged}
-          possibleValues={['Parent setting', 'School profile']}
+          possibleValues={[`Parent setting`, `School profile`]}
           disabled
         />
       </div>

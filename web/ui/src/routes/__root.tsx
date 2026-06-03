@@ -1,10 +1,10 @@
-import React from 'react';
-import { DiamondIcon } from 'lucide-react';
 import { Outlet, createRootRoute } from '@tanstack/react-router';
-import SidebarLayout from '#/components/ui/sidebar/SidebarLayout';
+import { DiamondIcon } from 'lucide-react';
+import React from 'react';
 import Sidebar from '#/components/ui/sidebar/Sidebar';
-import SidebarSection from '#/components/ui/sidebar/SidebarSection';
 import SidebarItem from '#/components/ui/sidebar/SidebarItem';
+import SidebarLayout from '#/components/ui/sidebar/SidebarLayout';
+import SidebarSection from '#/components/ui/sidebar/SidebarSection';
 import '../styles.css';
 
 const RootComponent: React.FC = () => (
@@ -18,6 +18,11 @@ const RootComponent: React.FC = () => (
           title="Confirmation Dialog"
           icon={DiamondIcon}
           href="/components/confirmation-dialog"
+        />
+        <SidebarItem
+          title="DateTimePicker"
+          icon={DiamondIcon}
+          href="/components/date-time-picker"
         />
         <SidebarItem
           title="Dropdown Menu"
@@ -39,7 +44,11 @@ const RootComponent: React.FC = () => (
         />
         <SidebarItem title="Select" icon={DiamondIcon} href="/components/select" />
         <SidebarItem title="Sidebar" icon={DiamondIcon} href="/components/sidebar" />
-        <SidebarItem title="Slide Over" icon={DiamondIcon} href="/components/slide-over" />
+        <SidebarItem
+          title="Slide Over"
+          icon={DiamondIcon}
+          href="/components/slide-over"
+        />
         <SidebarItem title="Textarea" icon={DiamondIcon} href="/components/textarea" />
         <SidebarItem title="Toggle" icon={DiamondIcon} href="/components/toggle" />
       </SidebarSection>
