@@ -15,7 +15,7 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
       links={[
         {
           text: 'View all',
-          href: '/people/requests/unlock',
+          href: '/requests/unlock',
           icon: ArrowRightIcon,
           iconPosition: 'right',
           variant: 'ghost',
@@ -26,7 +26,7 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ allUnlockRequests }) => {
         {allUnlockRequests.slice(0, 3).map((r) => (
           <Link
             key={`${r.personName}-${r.domains.join(',')}`}
-            to="/people/requests/unlock"
+            to="/requests/unlock"
             className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer"
           >
             <span className="text-sm font-medium text-stone-900">{r.personName}</span>

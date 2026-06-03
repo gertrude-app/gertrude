@@ -359,3 +359,34 @@ export const mockUnlockRequests: UnlockRequest[] = [
     reason: 'Watching the volcano experiment video for school.',
   },
 ];
+
+/// --- keys ---
+
+export type Key = {
+  domain: string;
+  addressType: 'standard' | 'strict' | 'ipAddress' | 'regExp';
+  scope:
+    | {
+        type: 'allApps';
+      }
+    | {
+        type: 'webBrowsers';
+      }
+    | {
+        type: 'singleApp';
+        bundleId: string;
+      };
+  expiration?: Date;
+  comment?: string;
+};
+
+export function defaultKeyFromDomain(domain: string): Key {
+  const hasSubdomain = domain.split('.').length > 2;
+  return {
+    domain,
+    addressType: hasSubdomain ? 'strict' : 'standard',
+    scope: {
+      type: 'allApps',
+    },
+  };
+}

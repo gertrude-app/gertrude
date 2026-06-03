@@ -124,6 +124,7 @@ const Modal: React.FC<ModalProps> = ({
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
       dismissible={dismissible}
+      autoFocus
     >
       {triggerElement ? (
         <Drawer.Trigger asChild>{triggerElement}</Drawer.Trigger>

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsToggleRouteImport } from './routes/components/toggle'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
+import { Route as ComponentsSlideOverRouteImport } from './routes/components/slide-over'
 import { Route as ComponentsSidebarRouteImport } from './routes/components/sidebar'
 import { Route as ComponentsSelectRouteImport } from './routes/components/select'
 import { Route as ComponentsRadioGroupRouteImport } from './routes/components/radio-group'
@@ -38,6 +39,11 @@ const ComponentsToggleRoute = ComponentsToggleRouteImport.update({
 const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
   id: '/components/textarea',
   path: '/components/textarea',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsSlideOverRoute = ComponentsSlideOverRouteImport.update({
+  id: '/components/slide-over',
+  path: '/components/slide-over',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsSidebarRoute = ComponentsSidebarRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
 }
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
 }
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/components/radio-group': typeof ComponentsRadioGroupRoute
   '/components/select': typeof ComponentsSelectRoute
   '/components/sidebar': typeof ComponentsSidebarRoute
+  '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
 }
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/slide-over'
     | '/components/textarea'
     | '/components/toggle'
   fileRoutesByTo: FileRoutesByTo
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/slide-over'
     | '/components/textarea'
     | '/components/toggle'
   id:
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/components/radio-group'
     | '/components/select'
     | '/components/sidebar'
+    | '/components/slide-over'
     | '/components/textarea'
     | '/components/toggle'
   fileRoutesById: FileRoutesById
@@ -222,6 +234,7 @@ export interface RootRouteChildren {
   ComponentsRadioGroupRoute: typeof ComponentsRadioGroupRoute
   ComponentsSelectRoute: typeof ComponentsSelectRoute
   ComponentsSidebarRoute: typeof ComponentsSidebarRoute
+  ComponentsSlideOverRoute: typeof ComponentsSlideOverRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
   ComponentsToggleRoute: typeof ComponentsToggleRoute
 }
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/components/textarea'
       fullPath: '/components/textarea'
       preLoaderRoute: typeof ComponentsTextareaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/slide-over': {
+      id: '/components/slide-over'
+      path: '/components/slide-over'
+      fullPath: '/components/slide-over'
+      preLoaderRoute: typeof ComponentsSlideOverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/sidebar': {
@@ -350,6 +370,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsRadioGroupRoute: ComponentsRadioGroupRoute,
   ComponentsSelectRoute: ComponentsSelectRoute,
   ComponentsSidebarRoute: ComponentsSidebarRoute,
+  ComponentsSlideOverRoute: ComponentsSlideOverRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
   ComponentsToggleRoute: ComponentsToggleRoute,
 }

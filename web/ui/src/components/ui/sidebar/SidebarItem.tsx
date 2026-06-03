@@ -9,9 +9,16 @@ interface Props {
   icon: LucideIcon;
   href: string;
   selected?: boolean;
+  badgeCount?: number;
 }
 
-const SidebarItem: React.FC<Props> = ({ title, icon: Icon, href, selected = false }) => {
+const SidebarItem: React.FC<Props> = ({
+  title,
+  icon: Icon,
+  href,
+  selected = false,
+  badgeCount,
+}) => {
   const { close } = useSidebarContext();
   const isInternalLink = href.startsWith('/') && !href.startsWith('//');
   const linkClassName = cx(
@@ -34,7 +41,21 @@ const SidebarItem: React.FC<Props> = ({ title, icon: Icon, href, selected = fals
         </>
       )}
       <Icon className="h-4.5 w-4.5 shrink-0" />
-      <span className="truncate text-[15px] leading-5">{title}</span>
+      <span className="flex min-w-0 items-center gap-2">
+        <span className="min-w-0 truncate text-[15px] leading-5">{title}</span>
+        {badgeCount !== undefined && (
+          <span
+            className={cx(
+              'min-w-5 shrink-0 rounded-full px-1.5 py-0.25 text-center text-xs font-medium leading-5 tabular-nums',
+              selected
+                ? 'bg-stone-100 text-stone-700'
+                : 'bg-stone-200/70 text-stone-600',
+            )}
+          >
+            {badgeCount}
+          </span>
+        )}
+      </span>
     </>
   );
 

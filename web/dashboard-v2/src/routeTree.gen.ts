@@ -14,17 +14,18 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppDevicesRouteImport } from './routes/_app/devices'
 import { Route as AppAppsRouteImport } from './routes/_app/apps'
+import { Route as AppActivityRouteImport } from './routes/_app/activity'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
+import { Route as AppRequestsRouteRouteImport } from './routes/_app/requests/route'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
+import { Route as AppRequestsIndexRouteImport } from './routes/_app/requests/index'
 import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
 import { Route as AppSettingsNotificationsRouteImport } from './routes/_app/settings/notifications'
 import { Route as AppSettingsBillingRouteImport } from './routes/_app/settings/billing'
-import { Route as AppPeopleRequestsRouteRouteImport } from './routes/_app/people/requests/route'
-import { Route as AppPeopleRequestsIndexRouteImport } from './routes/_app/people/requests/index'
-import { Route as AppPeopleRequestsUnlockRouteImport } from './routes/_app/people/requests/unlock'
-import { Route as AppPeopleRequestsSuspensionRouteImport } from './routes/_app/people/requests/suspension'
+import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
+import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -50,6 +51,11 @@ const AppAppsRoute = AppAppsRouteImport.update({
   path: '/apps',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppActivityRoute = AppActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const unauthedSignupRoute = unauthedSignupRouteImport.update({
   id: '/(unauthed)/signup',
   path: '/signup',
@@ -65,10 +71,20 @@ const AppSettingsRouteRoute = AppSettingsRouteRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppRequestsRouteRoute = AppRequestsRouteRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppPeopleRouteRoute = AppPeopleRouteRouteImport.update({
   id: '/people',
   path: '/people',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const AppRequestsIndexRoute = AppRequestsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRequestsRouteRoute,
 } as any)
 const AppPeopleIndexRoute = AppPeopleIndexRouteImport.update({
   id: '/',
@@ -86,130 +102,125 @@ const AppSettingsBillingRoute = AppSettingsBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => AppSettingsRouteRoute,
 } as any)
-const AppPeopleRequestsRouteRoute = AppPeopleRequestsRouteRouteImport.update({
-  id: '/requests',
-  path: '/requests',
-  getParentRoute: () => AppPeopleRouteRoute,
-} as any)
-const AppPeopleRequestsIndexRoute = AppPeopleRequestsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppPeopleRequestsRouteRoute,
-} as any)
-const AppPeopleRequestsUnlockRoute = AppPeopleRequestsUnlockRouteImport.update({
+const AppRequestsUnlockRoute = AppRequestsUnlockRouteImport.update({
   id: '/unlock',
   path: '/unlock',
-  getParentRoute: () => AppPeopleRequestsRouteRoute,
+  getParentRoute: () => AppRequestsRouteRoute,
 } as any)
-const AppPeopleRequestsSuspensionRoute =
-  AppPeopleRequestsSuspensionRouteImport.update({
-    id: '/suspension',
-    path: '/suspension',
-    getParentRoute: () => AppPeopleRequestsRouteRoute,
-  } as any)
+const AppRequestsSuspensionRoute = AppRequestsSuspensionRouteImport.update({
+  id: '/suspension',
+  path: '/suspension',
+  getParentRoute: () => AppRequestsRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/people': typeof AppPeopleRouteRouteWithChildren
+  '/requests': typeof AppRequestsRouteRouteWithChildren
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/activity': typeof AppActivityRoute
   '/apps': typeof AppAppsRoute
   '/devices': typeof AppDevicesRoute
   '/signout': typeof AppSignoutRoute
-  '/people/requests': typeof AppPeopleRequestsRouteRouteWithChildren
+  '/requests/suspension': typeof AppRequestsSuspensionRoute
+  '/requests/unlock': typeof AppRequestsUnlockRoute
   '/settings/billing': typeof AppSettingsBillingRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/people/': typeof AppPeopleIndexRoute
-  '/people/requests/suspension': typeof AppPeopleRequestsSuspensionRoute
-  '/people/requests/unlock': typeof AppPeopleRequestsUnlockRoute
-  '/people/requests/': typeof AppPeopleRequestsIndexRoute
+  '/requests/': typeof AppRequestsIndexRoute
 }
 export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/activity': typeof AppActivityRoute
   '/apps': typeof AppAppsRoute
   '/devices': typeof AppDevicesRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
+  '/requests/suspension': typeof AppRequestsSuspensionRoute
+  '/requests/unlock': typeof AppRequestsUnlockRoute
   '/settings/billing': typeof AppSettingsBillingRoute
   '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/people': typeof AppPeopleIndexRoute
-  '/people/requests/suspension': typeof AppPeopleRequestsSuspensionRoute
-  '/people/requests/unlock': typeof AppPeopleRequestsUnlockRoute
-  '/people/requests': typeof AppPeopleRequestsIndexRoute
+  '/requests': typeof AppRequestsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/people': typeof AppPeopleRouteRouteWithChildren
+  '/_app/requests': typeof AppRequestsRouteRouteWithChildren
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
+  '/_app/activity': typeof AppActivityRoute
   '/_app/apps': typeof AppAppsRoute
   '/_app/devices': typeof AppDevicesRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/people/requests': typeof AppPeopleRequestsRouteRouteWithChildren
+  '/_app/requests/suspension': typeof AppRequestsSuspensionRoute
+  '/_app/requests/unlock': typeof AppRequestsUnlockRoute
   '/_app/settings/billing': typeof AppSettingsBillingRoute
   '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/_app/people/': typeof AppPeopleIndexRoute
-  '/_app/people/requests/suspension': typeof AppPeopleRequestsSuspensionRoute
-  '/_app/people/requests/unlock': typeof AppPeopleRequestsUnlockRoute
-  '/_app/people/requests/': typeof AppPeopleRequestsIndexRoute
+  '/_app/requests/': typeof AppRequestsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/people'
+    | '/requests'
     | '/settings'
     | '/login'
     | '/signup'
+    | '/activity'
     | '/apps'
     | '/devices'
     | '/signout'
-    | '/people/requests'
+    | '/requests/suspension'
+    | '/requests/unlock'
     | '/settings/billing'
     | '/settings/notifications'
     | '/people/'
-    | '/people/requests/suspension'
-    | '/people/requests/unlock'
-    | '/people/requests/'
+    | '/requests/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/settings'
     | '/login'
     | '/signup'
+    | '/activity'
     | '/apps'
     | '/devices'
     | '/signout'
     | '/'
+    | '/requests/suspension'
+    | '/requests/unlock'
     | '/settings/billing'
     | '/settings/notifications'
     | '/people'
-    | '/people/requests/suspension'
-    | '/people/requests/unlock'
-    | '/people/requests'
+    | '/requests'
   id:
     | '__root__'
     | '/_app'
     | '/_app/people'
+    | '/_app/requests'
     | '/_app/settings'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
+    | '/_app/activity'
     | '/_app/apps'
     | '/_app/devices'
     | '/_app/signout'
     | '/_app/'
-    | '/_app/people/requests'
+    | '/_app/requests/suspension'
+    | '/_app/requests/unlock'
     | '/_app/settings/billing'
     | '/_app/settings/notifications'
     | '/_app/people/'
-    | '/_app/people/requests/suspension'
-    | '/_app/people/requests/unlock'
-    | '/_app/people/requests/'
+    | '/_app/requests/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -255,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAppsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/activity': {
+      id: '/_app/activity'
+      path: '/activity'
+      fullPath: '/activity'
+      preLoaderRoute: typeof AppActivityRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/(unauthed)/signup': {
       id: '/(unauthed)/signup'
       path: '/signup'
@@ -276,12 +294,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/requests': {
+      id: '/_app/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof AppRequestsRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/people': {
       id: '/_app/people'
       path: '/people'
       fullPath: '/people'
       preLoaderRoute: typeof AppPeopleRouteRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/_app/requests/': {
+      id: '/_app/requests/'
+      path: '/'
+      fullPath: '/requests/'
+      preLoaderRoute: typeof AppRequestsIndexRouteImport
+      parentRoute: typeof AppRequestsRouteRoute
     }
     '/_app/people/': {
       id: '/_app/people/'
@@ -304,68 +336,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsBillingRouteImport
       parentRoute: typeof AppSettingsRouteRoute
     }
-    '/_app/people/requests': {
-      id: '/_app/people/requests'
-      path: '/requests'
-      fullPath: '/people/requests'
-      preLoaderRoute: typeof AppPeopleRequestsRouteRouteImport
-      parentRoute: typeof AppPeopleRouteRoute
-    }
-    '/_app/people/requests/': {
-      id: '/_app/people/requests/'
-      path: '/'
-      fullPath: '/people/requests/'
-      preLoaderRoute: typeof AppPeopleRequestsIndexRouteImport
-      parentRoute: typeof AppPeopleRequestsRouteRoute
-    }
-    '/_app/people/requests/unlock': {
-      id: '/_app/people/requests/unlock'
+    '/_app/requests/unlock': {
+      id: '/_app/requests/unlock'
       path: '/unlock'
-      fullPath: '/people/requests/unlock'
-      preLoaderRoute: typeof AppPeopleRequestsUnlockRouteImport
-      parentRoute: typeof AppPeopleRequestsRouteRoute
+      fullPath: '/requests/unlock'
+      preLoaderRoute: typeof AppRequestsUnlockRouteImport
+      parentRoute: typeof AppRequestsRouteRoute
     }
-    '/_app/people/requests/suspension': {
-      id: '/_app/people/requests/suspension'
+    '/_app/requests/suspension': {
+      id: '/_app/requests/suspension'
       path: '/suspension'
-      fullPath: '/people/requests/suspension'
-      preLoaderRoute: typeof AppPeopleRequestsSuspensionRouteImport
-      parentRoute: typeof AppPeopleRequestsRouteRoute
+      fullPath: '/requests/suspension'
+      preLoaderRoute: typeof AppRequestsSuspensionRouteImport
+      parentRoute: typeof AppRequestsRouteRoute
     }
   }
 }
-
-interface AppPeopleRequestsRouteRouteChildren {
-  AppPeopleRequestsSuspensionRoute: typeof AppPeopleRequestsSuspensionRoute
-  AppPeopleRequestsUnlockRoute: typeof AppPeopleRequestsUnlockRoute
-  AppPeopleRequestsIndexRoute: typeof AppPeopleRequestsIndexRoute
-}
-
-const AppPeopleRequestsRouteRouteChildren: AppPeopleRequestsRouteRouteChildren =
-  {
-    AppPeopleRequestsSuspensionRoute: AppPeopleRequestsSuspensionRoute,
-    AppPeopleRequestsUnlockRoute: AppPeopleRequestsUnlockRoute,
-    AppPeopleRequestsIndexRoute: AppPeopleRequestsIndexRoute,
-  }
-
-const AppPeopleRequestsRouteRouteWithChildren =
-  AppPeopleRequestsRouteRoute._addFileChildren(
-    AppPeopleRequestsRouteRouteChildren,
-  )
 
 interface AppPeopleRouteRouteChildren {
-  AppPeopleRequestsRouteRoute: typeof AppPeopleRequestsRouteRouteWithChildren
   AppPeopleIndexRoute: typeof AppPeopleIndexRoute
 }
 
 const AppPeopleRouteRouteChildren: AppPeopleRouteRouteChildren = {
-  AppPeopleRequestsRouteRoute: AppPeopleRequestsRouteRouteWithChildren,
   AppPeopleIndexRoute: AppPeopleIndexRoute,
 }
 
 const AppPeopleRouteRouteWithChildren = AppPeopleRouteRoute._addFileChildren(
   AppPeopleRouteRouteChildren,
 )
+
+interface AppRequestsRouteRouteChildren {
+  AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRoute
+  AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
+  AppRequestsIndexRoute: typeof AppRequestsIndexRoute
+}
+
+const AppRequestsRouteRouteChildren: AppRequestsRouteRouteChildren = {
+  AppRequestsSuspensionRoute: AppRequestsSuspensionRoute,
+  AppRequestsUnlockRoute: AppRequestsUnlockRoute,
+  AppRequestsIndexRoute: AppRequestsIndexRoute,
+}
+
+const AppRequestsRouteRouteWithChildren =
+  AppRequestsRouteRoute._addFileChildren(AppRequestsRouteRouteChildren)
 
 interface AppSettingsRouteRouteChildren {
   AppSettingsBillingRoute: typeof AppSettingsBillingRoute
@@ -382,7 +395,9 @@ const AppSettingsRouteRouteWithChildren =
 
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
+  AppRequestsRouteRoute: typeof AppRequestsRouteRouteWithChildren
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
+  AppActivityRoute: typeof AppActivityRoute
   AppAppsRoute: typeof AppAppsRoute
   AppDevicesRoute: typeof AppDevicesRoute
   AppSignoutRoute: typeof AppSignoutRoute
@@ -391,7 +406,9 @@ interface AppRouteRouteChildren {
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
+  AppRequestsRouteRoute: AppRequestsRouteRouteWithChildren,
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
+  AppActivityRoute: AppActivityRoute,
   AppAppsRoute: AppAppsRoute,
   AppDevicesRoute: AppDevicesRoute,
   AppSignoutRoute: AppSignoutRoute,
