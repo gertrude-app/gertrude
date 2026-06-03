@@ -15,6 +15,6 @@ const SuspensionRequestsPage: React.FC = () => (
   </CardContainer>
 );
 
-export const Route = createFileRoute('/_app/people/requests/suspension')({
+export const Route = createFileRoute('/_app/requests/suspension')({
   component: SuspensionRequestsPage,
 });

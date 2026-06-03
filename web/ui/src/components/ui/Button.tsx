@@ -189,7 +189,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           props.variant === 'destructive',
       },
       !isDisabled && {
-        'hover:z-10 hover:border-violet-900 hover:shadow-violet-500/50':
+        'hover:z-10 hover:border-violet-900 hover:bg-violet-600 hover:shadow-violet-500/50':
           props.variant === 'primary',
         'hover:z-10 hover:border-stone-400/70 hover:shadow-stone-300/80':
           props.variant === 'default' || props.variant === undefined,

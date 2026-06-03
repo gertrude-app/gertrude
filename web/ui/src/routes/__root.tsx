@@ -39,6 +39,7 @@ const RootComponent: React.FC = () => (
         />
         <SidebarItem title="Select" icon={DiamondIcon} href="/components/select" />
         <SidebarItem title="Sidebar" icon={DiamondIcon} href="/components/sidebar" />
+        <SidebarItem title="Slide Over" icon={DiamondIcon} href="/components/slide-over" />
         <SidebarItem title="Textarea" icon={DiamondIcon} href="/components/textarea" />
         <SidebarItem title="Toggle" icon={DiamondIcon} href="/components/toggle" />
       </SidebarSection>
