@@ -27,11 +27,8 @@ extension MarketingCampaign {
   var replyTo: String? { nil }
 }
 
-func scheduledMarketingCampaigns(env: Env) -> [any MarketingCampaign] {
-  [
-    MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
-    IosOnlyMacTrialCampaign(),
-  ]
+func scheduledMarketingCampaigns(env _: Env) -> [any MarketingCampaign] {
+  []
 }
 
 func manualMarketingCampaigns(env _: Env) -> [any MarketingCampaign] {
