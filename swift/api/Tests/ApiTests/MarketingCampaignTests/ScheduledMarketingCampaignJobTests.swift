@@ -38,7 +38,6 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
     try await self.markCurrentAudienceAsAlreadySent(
       MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
     )
-    try await self.markCurrentAudienceAsAlreadySent(IosOnlyMacTrialCampaign())
 
     let now = Date()
     let child = try await self.child(with: \.name, of: "Sarah")
@@ -55,11 +54,13 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await ScheduledMarketingCampaignJob().tick()
+      try await ScheduledMarketingCampaignJob().tick(campaigns: [
+        MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
+      ])
     }
 
     let result = try XCTUnwrap(results.first { $0.campaign == "mac_setup_24h" })
-    expect(results.map(\.campaign)).toEqual(["mac_setup_24h", "ios_only_mac_trial"])
+    expect(results.map(\.campaign)).toEqual(["mac_setup_24h"])
     expect(result.eligible).toEqual(1)
     expect(result.sent).toEqual(1)
     expect(result.failed).toEqual(0)
