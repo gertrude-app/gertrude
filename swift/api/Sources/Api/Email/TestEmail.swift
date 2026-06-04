@@ -126,6 +126,16 @@ import Vapor
           model: .init(deviceFragment: "Franny's iPhone"),
         ))
 
+      case "mac-setup-24h":
+        try await postmark.send(template: .macSetup24h(
+          to: to,
+          model: .init(
+            childName: "Franny",
+            dashboardUrl: localDash,
+            primaryCtaUrl: "\(localDash)/children/abc/mac",
+          ),
+        ))
+
       case "admin-trial-ending-soon":
         try await postmark
           .send(template: .trialEndingSoon(to: to, model: .init(length: 21, remaining: 3)))
@@ -182,6 +192,8 @@ import Vapor
         return write(template: V2_9_1_Announce.self)
       case "marketing-ios-only-mac-trial":
         return write(template: IosOnlyMacTrial.self)
+      case "mac-setup-24h":
+        return write(template: MacSetup24h.self)
       case "admin-trial-ending-soon":
         return write(template: AccountLifecycle.TrialEndingSoon.self)
       case "admin-trial-expired":

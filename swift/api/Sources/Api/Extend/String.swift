@@ -14,4 +14,12 @@ extension String {
   var singular: String {
     regexReplace("ies$", "y").regexReplace("s$", "")
   }
+
+  var withoutTrailingSlashes: String {
+    var copy = self
+    while copy.hasSuffix("/") {
+      copy.removeLast()
+    }
+    return copy
+  }
 }

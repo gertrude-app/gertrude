@@ -38,6 +38,12 @@ public extension Client {
     public let statusCode: Int
     public let errorCode: Int
     public let message: String
+
+    public init(statusCode: Int, errorCode: Int, message: String) {
+      self.statusCode = statusCode
+      self.errorCode = errorCode
+      self.message = message
+    }
   }
 
   static func live(apiKey: String) -> Self {

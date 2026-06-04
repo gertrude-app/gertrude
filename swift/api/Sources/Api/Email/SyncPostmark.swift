@@ -26,6 +26,7 @@ import XHttp
       await self.syncTemplate(V2_7_0_Announce.self)
       await self.syncTemplate(V2_9_1_Announce.self)
       await self.syncTemplate(IosOnlyMacTrial.self)
+      await self.syncTemplate(MacSetup24h.self)
       await self.syncTemplate(AccountLifecycle.TrialEndingSoon.self)
       await self.syncTemplate(AccountLifecycle.TrialExpired.self)
       await self.syncTemplate(AccountLifecycle.OverdueToUnpaid.self)
@@ -67,8 +68,9 @@ import XHttp
 
   extension TemplateEmailModel {
     static func pmTemplateInput() -> EditTemplate.Input {
-      let templateDir = FileManager.default
-        .currentDirectoryPath + "/Sources/Api/Email/Templates/\(Self.name)"
+      let templateDir =
+        FileManager.default
+          .currentDirectoryPath + "/Sources/Api/Email/Templates/\(Self.name)"
       let html = try! String(contentsOfFile: templateDir + "/template.html", encoding: .utf8)
       let text = try! String(contentsOfFile: templateDir + "/template.md", encoding: .utf8)
       return EditTemplate.Input(

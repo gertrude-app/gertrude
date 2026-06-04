@@ -14,6 +14,7 @@ enum TemplateEmail {
   case v2_7_0_Announce(to: [String], model: V2_7_0_Announce, dryRun: Bool)
   case v2_9_1_Announce(to: [String], model: V2_9_1_Announce, dryRun: Bool)
   case iosOnlyMacTrial(to: String, model: IosOnlyMacTrial)
+  case macSetup24h(to: String, model: MacSetup24h)
   case trialEndingSoon(to: String, model: AccountLifecycle.TrialEndingSoon)
   case trialExpired(to: String, model: AccountLifecycle.TrialExpired)
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
@@ -33,6 +34,7 @@ protocol TemplateEmailModel: Sendable {
   static var subject: String { get }
   static var layout: EmailLayout { get }
   static var displayName: String { get }
+  static var alias: String { get }
 }
 
 extension TemplateEmailModel {
@@ -71,6 +73,7 @@ extension TemplateEmail {
     case .v2_7_0_Announce(_, let model, _): model
     case .v2_9_1_Announce(_, let model, _): model
     case .iosOnlyMacTrial(_, let model): model
+    case .macSetup24h(_, let model): model
     case .trialEndingSoon(_, let model): model
     case .trialExpired(_, let model): model
     case .overdueToUnpaid(_, let model): model
