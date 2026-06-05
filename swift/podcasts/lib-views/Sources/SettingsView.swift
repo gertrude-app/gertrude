@@ -10,10 +10,10 @@ public struct SettingsView: View {
   }
 
   public enum SubscriptionStatus: Equatable {
-    case trialing(purchasePending: Bool = false)
+    case trialing
     case active
     case complimentary
-    case unpaid(purchasePending: Bool = false)
+    case unpaid
 
     var displayName: String {
       switch self {
@@ -21,15 +21,6 @@ public struct SettingsView: View {
       case .active: lstr(.settingsSubscriptionStatusActive)
       case .complimentary: lstr(.settingsSubscriptionStatusFreeForever)
       case .unpaid: lstr(.settingsSubscriptionStatusUnpaid)
-      }
-    }
-
-    var hasPendingPurchase: Bool {
-      switch self {
-      case .trialing(let purchasePending), .unpaid(let purchasePending):
-        purchasePending
-      default:
-        false
       }
     }
 
@@ -176,21 +167,6 @@ public struct SettingsView: View {
                 .font(.subheadline)
                 .fontWeight(.semibold)
                 .foregroundColor(self.subscriptionColor)
-
-              if self.status.hasPendingPurchase {
-                HStack(spacing: 4) {
-                  ProgressView()
-                    .scaleEffect(0.7)
-                  Text(lstr(.settingsSubscriptionPurchasePending))
-                    .font(.caption)
-                    .italic()
-                }
-                .foregroundColor(Color(
-                  self.cs,
-                  light: .black.opacity(0.5),
-                  dark: .white.opacity(0.5),
-                ))
-              }
             }
           }
 
@@ -322,7 +298,7 @@ public struct SettingsView: View {
 
 #Preview("Trialing") {
   SettingsView(
-    status: .trialing(purchasePending: false),
+    status: .trialing,
     expiresAt: Date().addingTimeInterval(.days(25)),
     reclaimableStorageGb: 2.4,
   )
@@ -330,7 +306,7 @@ public struct SettingsView: View {
 
 #Preview("Trialing (Dark)") {
   SettingsView(
-    status: .trialing(purchasePending: false),
+    status: .trialing,
     expiresAt: Date().addingTimeInterval(.days(25)),
     reclaimableStorageGb: 2.4,
   )
@@ -377,7 +353,7 @@ public struct SettingsView: View {
 
 #Preview("Trial Expiring Soon") {
   SettingsView(
-    status: .trialing(purchasePending: false),
+    status: .trialing,
     expiresAt: Date().addingTimeInterval(.days(3)),
     reclaimableStorageGb: 2.4,
   )
@@ -385,7 +361,7 @@ public struct SettingsView: View {
 
 #Preview("Trial Expiring Soon (Dark)") {
   SettingsView(
-    status: .trialing(purchasePending: false),
+    status: .trialing,
     expiresAt: Date().addingTimeInterval(.days(3)),
     reclaimableStorageGb: 2.4,
   )
@@ -394,7 +370,7 @@ public struct SettingsView: View {
 
 #Preview("Unpaid — Unclaimed") {
   SettingsView(
-    status: .unpaid(purchasePending: false),
+    status: .unpaid,
     expiresAt: Date().addingTimeInterval(.days(-5)),
     reclaimableStorageGb: 2.4,
   )
@@ -402,7 +378,7 @@ public struct SettingsView: View {
 
 #Preview("Unpaid — Unclaimed (Dark)") {
   SettingsView(
-    status: .unpaid(purchasePending: false),
+    status: .unpaid,
     expiresAt: Date().addingTimeInterval(.days(-5)),
     reclaimableStorageGb: 2.4,
   )
@@ -411,7 +387,7 @@ public struct SettingsView: View {
 
 #Preview("Unpaid — Claimed") {
   SettingsView(
-    status: .unpaid(purchasePending: false),
+    status: .unpaid,
     expiresAt: Date().addingTimeInterval(.days(-5)),
     reclaimableStorageGb: 2.4,
     isClaimed: true,
@@ -420,24 +396,10 @@ public struct SettingsView: View {
 
 #Preview("Unpaid — Claimed (Dark)") {
   SettingsView(
-    status: .unpaid(purchasePending: false),
+    status: .unpaid,
     expiresAt: Date().addingTimeInterval(.days(-5)),
     reclaimableStorageGb: 2.4,
     isClaimed: true,
   )
   .preferredColorScheme(.dark)
-}
-
-#Preview("Trialing (Purchase Pending)") {
-  SettingsView(
-    status: .trialing(purchasePending: true),
-    expiresAt: Date().addingTimeInterval(.days(25)),
-  )
-}
-
-#Preview("Unpaid (Purchase Pending)") {
-  SettingsView(
-    status: .unpaid(purchasePending: true),
-    expiresAt: Date().addingTimeInterval(.days(-5)),
-  )
 }

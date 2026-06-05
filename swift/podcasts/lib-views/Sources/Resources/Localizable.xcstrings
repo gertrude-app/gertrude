@@ -457,23 +457,6 @@
         }
       }
     },
-    "settings.subscription.purchasePending" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "purchase pending"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "compra pendiente"
-          }
-        }
-      }
-    },
     "settings.subscription.friendMessage" : {
       "extractionState" : "manual",
       "localizations" : {

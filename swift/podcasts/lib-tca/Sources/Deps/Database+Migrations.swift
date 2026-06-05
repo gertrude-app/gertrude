@@ -152,4 +152,12 @@ enum Migrations {
       """,
     ).execute(db)
   }
+
+  @Sendable static func dropPurchasePending(_ db: Database) throws {
+    try #sql(
+      """
+      ALTER TABLE subscription DROP COLUMN purchasePendingSince;
+      """,
+    ).execute(db)
+  }
 }

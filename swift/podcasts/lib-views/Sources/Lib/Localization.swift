@@ -78,7 +78,6 @@ enum LocalizedStringKey: String {
   case settingsSubscriptionLabel = "settings.subscription.label"
   case settingsSubscriptionPrice = "settings.subscription.price"
   case settingsSubscriptionPrivacy = "settings.subscription.privacy"
-  case settingsSubscriptionPurchasePending = "settings.subscription.purchasePending"
   case settingsSubscriptionStatus = "settings.subscription.status"
   case settingsSubscriptionStatusActive = "settings.subscription.status.active"
   case settingsSubscriptionStatusFreeForever = "settings.subscription.status.freeForever"

@@ -9,7 +9,6 @@ struct Subscription: Equatable {
   typealias ID = Tagged<Self, Int>
   let id: ID
   var status: Status
-  var purchasePendingSince: Date?
   var expiresAt: Date
   var updatedAt: Date = .init()
   var createdAt: Date = .init()
@@ -33,7 +32,6 @@ extension Subscription {
   static let fallback = Subscription(
     id: 1,
     status: .trialing,
-    purchasePendingSince: nil,
     expiresAt: .now + .days(10),
     updatedAt: .now,
     createdAt: .now,
@@ -41,10 +39,10 @@ extension Subscription {
 
   var settingsViewStatus: SettingsView.SubscriptionStatus {
     switch self.status {
-    case .trialing: .trialing(purchasePending: self.purchasePendingSince != nil)
+    case .trialing: .trialing
     case .active: .active
     case .complimentary: .complimentary
-    case .unpaid: .unpaid(purchasePending: self.purchasePendingSince != nil)
+    case .unpaid: .unpaid
     }
   }
 
@@ -109,7 +107,6 @@ struct CurrentSubscription: FetchKeyRequest {
   @discardableResult
   static func set(
     status: Subscription.Status,
-    purchasePendingSince: Date? = nil,
     expiringAt: Date,
   ) throws -> Subscription {
     dep(\.db).tryWrite { db in
@@ -117,7 +114,6 @@ struct CurrentSubscription: FetchKeyRequest {
         .find(Subscription.ID(1))
         .update {
           $0.status = status
-          $0.purchasePendingSince = purchasePendingSince
           $0.expiresAt = expiringAt
         }
         .returning { $0.self }
