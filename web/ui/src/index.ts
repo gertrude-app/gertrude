@@ -28,6 +28,8 @@ export { default as SidebarLayout } from './components/ui/sidebar/SidebarLayout'
 export { default as SidebarSection } from './components/ui/sidebar/SidebarSection';
 export { default as Textarea } from './components/ui/Textarea';
 export { default as Toggle } from './components/ui/Toggle';
+export { TooltipProvider, default as Tooltip } from './components/ui/Tooltip';
+export type { TooltipProps, TooltipProviderProps } from './components/ui/Tooltip';
 
 // utils
 export { inflect } from './lib/utils';

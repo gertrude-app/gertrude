@@ -1,7 +1,7 @@
 import { Button, Input, Modal, Select, Textarea, inflect } from '@gertrude/ui';
 import { ClockIcon } from 'lucide-react';
 import React from 'react';
-import type { SuspensionRequest } from '#/lib/mock-data';
+import type { SuspensionRequest } from '#/lib/mock-data/suspension-requests';
 
 interface Props {
   request: SuspensionRequest;

@@ -51,6 +51,7 @@ const RootComponent: React.FC = () => (
         />
         <SidebarItem title="Textarea" icon={DiamondIcon} href="/components/textarea" />
         <SidebarItem title="Toggle" icon={DiamondIcon} href="/components/toggle" />
+        <SidebarItem title="Tooltip" icon={DiamondIcon} href="/components/tooltip" />
       </SidebarSection>
     </Sidebar>
   </SidebarLayout>

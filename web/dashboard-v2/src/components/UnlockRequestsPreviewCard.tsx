@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
-import type { UnlockRequest } from '#/lib/mock-data';
+import type { UnlockRequest } from '#/lib/mock-data/unlock-requests';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {

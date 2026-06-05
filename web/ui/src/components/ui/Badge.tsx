@@ -7,10 +7,11 @@ interface Props {
   color?: `violet` | `red` | `green` | `blue` | `yellow` | `neutral` | `beta` | `canary`; // defaults to neutral
   size?: `xsmall` | `small` | `medium` | `large`; // defaults to medium
   icon?: LucideIcon;
+  className?: string;
 }
 
-const Badge: React.FC<Props> = ({ children, color, size, icon: Icon }) => {
-  const commonClasses = `flex items-center select-none shrink-0`;
+const Badge: React.FC<Props> = ({ children, color, size, icon: Icon, className }) => {
+  const commonClasses = `flex items-center select-none shrink-0 ${className}`;
   const colorClasses = cx({
     border: true,
     'bg-violet-100 border-violet-400 text-violet-900': color === `violet`,

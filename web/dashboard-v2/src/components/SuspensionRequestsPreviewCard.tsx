@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
-import type { SuspensionRequest } from '#/lib/mock-data';
+import type { SuspensionRequest } from '#/lib/mock-data/suspension-requests';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {

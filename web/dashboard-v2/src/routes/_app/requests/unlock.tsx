@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import CardContainer from '#/components/CardContainer';
 import UnlockRequestCard from '#/components/UnlockRequestCard';
-import { mockUnlockRequests } from '#/lib/mock-data';
+import { mockUnlockRequests } from '#/lib/mock-data/unlock-requests';
 
 export const UnlockRequestsPage: React.FC = () => (
   <CardContainer className="grid grid-cols-1 gap-4 @3xl/main:grid-cols-2 @5xl/main:grid-cols-3">
