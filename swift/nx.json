@@ -10,11 +10,21 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "inputs": ["sources", "^sources"]
+      "inputs": [
+        "sources",
+        "^sources",
+        { "env": "CI" },
+        { "env": "SWIFT_WARNINGS_AS_ERRORS" }
+      ]
     },
     "test": {
       "cache": true,
-      "inputs": ["tests", "^sources"]
+      "inputs": [
+        "tests",
+        "^sources",
+        { "env": "CI" },
+        { "env": "SWIFT_WARNINGS_AS_ERRORS" }
+      ]
     }
   },
   "defaultBase": "master",

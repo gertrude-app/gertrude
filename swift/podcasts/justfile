@@ -52,7 +52,7 @@ check:
 fix:
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist app/LaunchScreen.storyboard
-  @prettier --write '**/*.json' 
+  @prettier --write '**/*.json' '!**/.build/**'
 
 build-app:
   xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \

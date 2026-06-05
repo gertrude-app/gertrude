@@ -184,12 +184,12 @@ extension EpisodeDetailView: EpisodeArtworkProvider {
   var episode: EpisodeData { self.episodeDetail.data }
 }
 
-extension EpisodeDetailView.EpisodeDetail {
+public extension EpisodeDetailView.EpisodeDetail {
   subscript<T>(dynamicMember keyPath: KeyPath<EpisodeData, T>) -> T {
     self.data[keyPath: keyPath]
   }
 
-  public init(episode: EpisodeData, websiteUrl: URL?, sizeInBytes: Int) {
+  init(episode: EpisodeData, websiteUrl: URL?, sizeInBytes: Int) {
     self.data = episode
     self.websiteUrl = websiteUrl
     self.sizeInBytes = sizeInBytes

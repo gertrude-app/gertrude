@@ -82,7 +82,8 @@ let package = Package(
 
 import Foundation
 
-if ProcessInfo.processInfo.environment["CI"] != nil {
+if ProcessInfo.processInfo.environment["CI"] != nil
+  || ProcessInfo.processInfo.environment["SWIFT_WARNINGS_AS_ERRORS"] != nil {
   package.targets[0].swiftSettings?.append(
     .unsafeFlags(["-Xfrontend", "-warnings-as-errors"]),
   )
