@@ -33,6 +33,11 @@ func dictKeychain(
   )
 }
 
+public extension Date {
+  static let epoch = Date(timeIntervalSince1970: 0)
+  static let reference = Date(timeIntervalSinceReferenceDate: 0)
+}
+
 func claimedKeychain(
   token: UUID,
   store: LockIsolated<[String: Data]> = .init([:]),
