@@ -58,10 +58,7 @@ extension BillingAccountSnapshot {
       return trialedFull ? .planUpgradeRequired : .trialRequired
 
     case .free:
-      if !hasHistory {
-        return .trialRequired
-      }
-      if self.billingIdentity?.lastPaidTier == .full {
+      if hasHistory, self.billingIdentity?.lastPaidTier == .full {
         return .subscriptionFixRequired
       }
       return trialedFull ? .planUpgradeRequired : .trialRequired
