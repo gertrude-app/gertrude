@@ -3,6 +3,7 @@ import DuetSQL
 struct IosOnlyMacTrialCampaign: MarketingCampaign {
   let slug = "ios_only_mac_trial"
   let templateAlias = IosOnlyMacTrial.alias
+  let variant = "v2"
   let from = "Jared Henderson <jared@gertrude.app>"
   let replyTo: String? = "jared@netrivet.com"
 

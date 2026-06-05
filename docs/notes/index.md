@@ -32,3 +32,9 @@ all notes.
   — capabilities come from `BillingAccountSnapshot` as a union of entitlements (per-tier
   table), not the lossy `PlanStatus` projection; `substrate: PaidSubscription?` added to
   trial cases to make the projection lossless; Medium-tier-ready by design.
+
+- **[007 — Measuring marketing campaigns without a held-back cohort](./007-marketing-campaign-measurement.md)**
+  — deliberately no holdout/cohort or A/B machinery: at ~800 accounts / ~117 backlog a
+  control arm can't reach significance, so we throttle (manual waves, daily cadence),
+  capture a `variant` for copy reconstruction, and lean on near-zero base rates + replies
+  for directional, judgment-based reads.

@@ -98,6 +98,7 @@ extension Configure {
     app.migrations.add(StripeBillingOverhaul())
     app.migrations.add(PodcastAppTablesAndLegacyAmIap())
     app.migrations.add(AddAllowAppInstallation())
+    app.migrations.add(AddMarketingEmailSendVariant())
   }
 }
 

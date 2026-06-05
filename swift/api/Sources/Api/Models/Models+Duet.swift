@@ -675,6 +675,7 @@ extension MarketingEmailSend {
     case id
     case parentId
     case campaign
+    case variant
     case createdAt
   }
 }

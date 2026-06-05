@@ -16,6 +16,7 @@ struct MarketingCampaignRecipient: Sendable, Equatable {
 protocol MarketingCampaign: Sendable {
   var slug: String { get }
   var templateAlias: String { get }
+  var variant: String { get }
   var from: String { get }
   var replyTo: String? { get }
 
@@ -23,16 +24,17 @@ protocol MarketingCampaign: Sendable {
 }
 
 extension MarketingCampaign {
+  var variant: String { "v1" }
   var from: String { "Gertrude App <noreply@gertrude.app>" }
   var replyTo: String? { nil }
 }
 
-func scheduledMarketingCampaigns(env _: Env) -> [any MarketingCampaign] {
-  []
+func scheduledMarketingCampaigns(env: Env) -> [any MarketingCampaign] {
+  [MacSetup24hCampaign(dashboardUrl: env.dashboardUrl)]
 }
 
 func manualMarketingCampaigns(env _: Env) -> [any MarketingCampaign] {
-  []
+  [IosOnlyMacTrialCampaign()]
 }
 
 struct MarketingCampaignRunResult: Sendable, Equatable {
@@ -106,6 +108,7 @@ struct MarketingCampaignRunner {
           MarketingEmailSend(
             parentId: recipient.parentId,
             campaign: campaign.slug,
+            variant: campaign.variant,
           ))
       case .failure:
         failed += 1
