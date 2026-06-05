@@ -95,6 +95,27 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     }
   }
 
+  func testGetAllDevicesAmOnlyDeviceNotPendingSetup() async throws {
+    try await self.db.delete(all: Computer.self)
+    let child = try await self.child()
+    let iosDevice = try await self.db.create(IOSDevice.mock {
+      $0.childId = child.id
+      $0.claimedAt = Date()
+    })
+    let install = try await self.db.create(
+      PodcastApp.Install(deviceId: iosDevice.id, appVersion: "1.6.0"),
+    )
+    _ = try await self.db.create(PodcastApp.Token(installId: install.id))
+
+    try await withDependencies {
+      $0.websockets.status = { _ in .offline }
+    } operation: {
+      let output = try await GetAllDevices.resolve(in: context(child.parent))
+      expect(output.iosDevices.count).toEqual(1)
+      expect(output.iosDevices[0].pendingSetup).toEqual(false)
+    }
+  }
+
   func testGetAllDevicesSupervisionClaimedButNotComplete() async throws {
     try await self.db.delete(all: Computer.self)
     let child = try await self.child()

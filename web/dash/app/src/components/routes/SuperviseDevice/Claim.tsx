@@ -1,11 +1,10 @@
-import { ApiErrorMessage, Loading } from '@dash/components';
+import { ApiErrorMessage, ClaimScreen, Loading, ScreenShell } from '@dash/components';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { ChildSelection } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
 import Current from '../../../environment';
 import { Key, useQuery } from '../../../hooks';
-import { ClaimScreen, ScreenShell } from './screens';
 
 const SuperviseDeviceClaim: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();

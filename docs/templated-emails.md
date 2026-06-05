@@ -68,3 +68,31 @@ Templates use Postmark's `{{variable}}` syntax. Variables are defined in the Swi
    - Set the alias to match (e.g. `screen-time-warning`)
    - No layout, no content needed—first sync will set everything correctly
 6. Run `just swift sync-email-templates`
+
+## Gotchas
+
+### Optional vars in a section: use `{{.}}`, not `{{var}}`
+
+Mustachio makes the section value the context, so `{{var}}` inside `{{#var}}`
+resolves against the string and renders **empty**:
+
+```
+✗  {{#redirect}}?redirect={{redirect}}{{/redirect}}   → "?redirect="
+✓  {{#redirect}}?redirect={{.}}{{/redirect}}          → "?redirect=<value>"
+```
+
+Fails silently, and only when the var is non-nil — a nil/empty test renders
+identically to a correct one, so always test with the value populated.
+
+### Render without sending
+
+`/templates/validate` renders a body against a test model (nothing sent, no stored
+template touched):
+
+```bash
+KEY=$(grep '^POSTMARK_API_KEY=' swift/api/.env | cut -d= -f2- | tr -d '"')
+curl -s https://api.postmarkapp.com/templates/validate \
+  -H "X-Postmark-Server-Token: $KEY" -H "Content-Type: application/json" \
+  -d '{"HtmlBody":"<p>x</p>","TextBody":"{{#redirect}}?redirect={{.}}{{/redirect}}","TestRenderModel":{"redirect":"abc"}}' \
+  | python3 -c "import sys,json;print(repr(json.load(sys.stdin)['TextBody']['RenderedContent']))"
+```

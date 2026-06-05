@@ -4,6 +4,7 @@ import GertieIOS
 import PairQL
 import TypeScriptInterop
 
+/// @deprecated safe to remove 2026-06-11
 struct GetIOSDevice: Pair {
   static let auth: ClientAuth = .parent
 
@@ -40,22 +41,16 @@ struct GetIOSDevice: Pair {
 
 extension GetIOSDevice: Resolver {
   static func resolve(with id: IOSDevice.Id, in ctx: ParentContext) async throws -> Output {
-    let device: IOSDevice = try await ctx.db.find(id)
-    guard let childId = device.childId else {
-      throw ctx.error("f8a9b3c2", .notFound, user: "Device not found")
+    await ctx.db.logDeprecated("GetIOSDevice(v1)")
+    let v2 = try await GetIOSDevice_v2.resolve(with: id, in: ctx)
+    guard let blocker = v2.blocker else {
+      throw ctx.error("e3f1a8b7", .notFound, user: "Device not found")
     }
-    let child = try await ctx.verifiedChild(from: childId)
-    let install = try await device.install(in: ctx.db)
-    let enabledBlockGroups = try await device.blockGroups(in: ctx.db)
-    let allBlockGroups = try await BlockerApp.BlockGroup.query().all(in: ctx.db)
-    let domains = try await device.webPolicyDomains(in: ctx.db)
-    let blockRules = try await device.blockRules(in: ctx.db)
-    let supervision = try await device.supervision(in: ctx.db)
-    return .init(
-      childName: child.name,
-      deviceType: device.deviceType,
-      osVersion: device.iosVersion,
-      allBlockGroups: allBlockGroups.map {
+    return Output(
+      childName: v2.childName,
+      deviceType: v2.deviceType,
+      osVersion: v2.osVersion,
+      allBlockGroups: blocker.allBlockGroups.map {
         .init(
           id: $0.id,
           name: $0.name,
@@ -63,17 +58,15 @@ extension GetIOSDevice: Resolver {
           longDescription: $0.longDescription,
         )
       },
-      enabledBlockGroups: enabledBlockGroups.map(\.id),
-      webPolicy: .init(string: install.webPolicy) ?? .blockAll,
-      webPolicyDomains: domains.map(\.domain),
-      customBlockRules: blockRules.map { .init(id: $0.id, rule: $0.rule) },
-      isSupervised: supervision?.supervised ?? false,
-      isProfileLocked: install.isProfileLocked,
-      allowAppRemoval: install.allowAppRemoval,
-      allowEraseContentAndSettings: install.allowEraseContentAndSettings,
-      allowAppInstallation: install.allowAppInstallation,
+      enabledBlockGroups: blocker.enabledBlockGroups,
+      webPolicy: blocker.webPolicy,
+      webPolicyDomains: blocker.webPolicyDomains,
+      customBlockRules: blocker.customBlockRules.map { .init(id: $0.id, rule: $0.rule) },
+      isSupervised: blocker.isSupervised,
+      isProfileLocked: blocker.isProfileLocked,
+      allowAppRemoval: blocker.allowAppRemoval,
+      allowEraseContentAndSettings: blocker.allowEraseContentAndSettings,
+      allowAppInstallation: blocker.allowAppInstallation,
     )
   }
 }
-
-extension GertieIOS.BlockRule: @retroactive TypeScriptAliased {}

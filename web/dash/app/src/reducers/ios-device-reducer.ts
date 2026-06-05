@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
-import type { GetIOSDevice, WebPolicy } from '@dash/types';
+import type { GetIOSDevice_v2, WebPolicy } from '@dash/types';
 
 export type State = {
   enabledBlockGroups: UUID[];
@@ -28,7 +28,7 @@ export type Action =
   | { type: `setAllowAppRemoval`; value: boolean }
   | { type: `setAllowEraseContentAndSettings`; value: boolean }
   | { type: `setAllowAppInstallation`; value: boolean }
-  | { type: `receiveData`; data: GetIOSDevice.Output };
+  | { type: `receiveData`; data: GetIOSDevice_v2.Output };
 
 function reducer(state: State, action: Action): void {
   switch (action.type) {
@@ -70,15 +70,18 @@ function reducer(state: State, action: Action): void {
     case `setAllowAppInstallation`:
       state.allowAppInstallation = action.value;
       return;
-    case `receiveData`:
-      state.enabledBlockGroups = [...action.data.enabledBlockGroups];
-      state.webPolicy = action.data.webPolicy;
-      state.webPolicyDomains = [...action.data.webPolicyDomains];
-      state.isProfileLocked = action.data.isProfileLocked;
-      state.allowAppRemoval = action.data.allowAppRemoval;
-      state.allowEraseContentAndSettings = action.data.allowEraseContentAndSettings;
-      state.allowAppInstallation = action.data.allowAppInstallation;
+    case `receiveData`: {
+      const blocker = action.data.blocker;
+      if (!blocker) return;
+      state.enabledBlockGroups = [...blocker.enabledBlockGroups];
+      state.webPolicy = blocker.webPolicy;
+      state.webPolicyDomains = [...blocker.webPolicyDomains];
+      state.isProfileLocked = blocker.isProfileLocked;
+      state.allowAppRemoval = blocker.allowAppRemoval;
+      state.allowEraseContentAndSettings = blocker.allowEraseContentAndSettings;
+      state.allowAppInstallation = blocker.allowAppInstallation;
       return;
+    }
     case `addBlockRule`:
       state.editingBlockRule = {
         type: `app`,

@@ -2,6 +2,7 @@ import {
   DeviceContextBanner,
   EmailInputForm,
   FullscreenModalForm,
+  detectClaimPending,
 } from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -17,7 +18,9 @@ const Signup: React.FC = () => {
   const [password, setPassword] = useState(``);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const queryString = window.location.search;
-  const claimCode = getQueryParam(`claimPendingSupervision`);
+  const pendingClaim = detectClaimPending(new URLSearchParams(queryString));
+  const claimCode = pendingClaim?.claimCode;
+  const app = pendingClaim?.app;
   const modelName = getQueryParam(`modelName`);
   const iosVersion = getQueryParam(`iosVersion`);
   const signup = useMutation(
@@ -29,6 +32,7 @@ const Signup: React.FC = () => {
         abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
         turnstileToken: turnstileToken ?? undefined,
         claimCode,
+        app,
       }),
     { onSuccess: ({ admin }) => admin && login(admin.adminId, admin.token) },
   );
@@ -79,7 +83,11 @@ const Signup: React.FC = () => {
         }
         beforeInputs={
           claimCode && modelName ? (
-            <DeviceContextBanner modelName={modelName} iosVersion={iosVersion} />
+            <DeviceContextBanner
+              modelName={modelName}
+              iosVersion={iosVersion}
+              app={app}
+            />
           ) : undefined
         }
         email={email}

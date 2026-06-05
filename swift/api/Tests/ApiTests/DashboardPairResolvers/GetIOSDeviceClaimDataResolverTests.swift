@@ -114,6 +114,43 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
       }
     }.toContain("expired")
   }
+
+  func testClaimedMissingBlockGroups_resumeCreatesThem() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.0",
+      claimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
+      claimedAt: .reference,
+    ))
+
+    let before = try await BlockerApp.DeviceBlockGroup.query()
+      .where(.deviceId == device.id)
+      .all(in: self.db)
+    expect(before.isEmpty).toBeTrue()
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await GetIOSDeviceClaimData.resolve(with: .init(code: code), in: parent.context)
+    }
+
+    expect(output.resumeStep).not.toBeNil()
+
+    let nonOptIn = try await BlockerApp.BlockGroup.query()
+      .where(.optIn == false)
+      .all(in: self.db)
+    let after = try await BlockerApp.DeviceBlockGroup.query()
+      .where(.deviceId == device.id)
+      .all(in: self.db)
+    expect(after.isEmpty).toBeFalse()
+    expect(after.count).toEqual(nonOptIn.count)
+  }
 }
 
 extension GetIOSDeviceClaimDataResolverTests {

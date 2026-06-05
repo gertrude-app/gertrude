@@ -616,6 +616,9 @@ importers:
       '@shared/datetime':
         specifier: workspace:*
         version: link:../shared/datetime
+      '@shared/string':
+        specifier: workspace:*
+        version: link:../shared/string
       '@shared/tailwind':
         specifier: workspace:*
         version: link:../shared/tailwind

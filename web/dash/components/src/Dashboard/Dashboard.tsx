@@ -9,6 +9,7 @@ import type {
   RequestState,
 } from '@dash/types';
 import { UndoMainPadding } from '../Chrome/Chrome';
+import CodeChip from '../CodeChip';
 import PageHeading from '../PageHeading';
 import SmartLink from '../SmartLink';
 import AddDeviceInstructions from '../Users/AddDeviceInstructions';
@@ -316,9 +317,7 @@ export const IOSConnectionCodeScreen: React.FC<{ childName: string; code: number
     <h1 className="font-inter text-2xl xs:text-3xl lg:text-4xl text-center">
       Protect {posessive(childName)} iPhone or iPad
     </h1>
-    <code className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 px-6 py-3 rounded-xl mt-8">
-      {String(code).padStart(6, `0`)}
-    </code>
+    <CodeChip code={String(code).padStart(6, `0`)} pill="lg" className="mt-8" />
     <p className="text-sm text-slate-500 mt-2">Connection code</p>
     <ol className="mt-8 space-y-4 text-base sm:text-lg text-slate-700 max-w-xl">
       <li className="flex gap-3">

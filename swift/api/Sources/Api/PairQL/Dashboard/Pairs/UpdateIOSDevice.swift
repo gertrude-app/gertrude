@@ -43,7 +43,7 @@ extension UpdateIOSDevice: Resolver {
       try await ctx.db.create(deletedPivots)
     }
 
-    var install = try await device.install(in: ctx.db)
+    var install = try await device.blockerInstall(in: ctx.db)
     install.webPolicy = input.webPolicy.rawValue
     install.isProfileLocked = input.isProfileLocked
     install.allowAppRemoval = input.allowAppRemoval

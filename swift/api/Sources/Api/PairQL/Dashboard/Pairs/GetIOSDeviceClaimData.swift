@@ -32,49 +32,34 @@ struct GetIOSDeviceClaimData: Pair {
 
 extension GetIOSDeviceClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let device = try? await IOSDevice.query()
-      .where(.claimCode == input.code)
-      .first(in: context.db)
-
-    guard let device else {
-      logIOSUnusual("7e7fb536", "supervision code not found")
-      let msg = "Code not found. Double-check and try again."
-      throw context.error("7e7fb536", .notFound, user: msg)
-    }
-
-    if let childId = device.childId {
-      if await (try? context.verifiedChild(from: childId)) != nil {
+    try await resolveClaimData(
+      code: input.code,
+      app: .blocker,
+      baseId: "7321ce12", // 7321ce12-1, 7321ce12-2, 7321ce12-3
+      in: context,
+      onResume: { device, _ in
+        if device.claimedAt != nil {
+          try await device.ensureBlockerBlockGroups(in: context.db)
+        }
         let supervision = try await device.supervision(in: context.db)
         let step = try await resumeStep(supervision: supervision, in: context)
-        return .init(
+        return Output(
           children: [],
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
           resumeStep: step,
         )
-      } else {
-        logIOSUnexpected("b6bf7016", "attempt to claim device from different parent")
-        let msg = "Code not found. Double-check and try again."
-        throw context.error("b6bf7016", .notFound, user: msg)
-      }
-    }
-
-    if let expiresAt = device.claimCodeExpiresAt,
-       expiresAt < get(dependency: \.date.now) {
-      logIOSUnusual("87a02411", "supervision code expired")
-      let msg = "This code has expired. Please generate a new one."
-      throw context.error("87a02411", .badRequest, user: msg)
-    }
-
-    return try await .init(
-      children: (context.parent.children(in: context.db)).map {
-        .init(id: $0.id, name: $0.name)
       },
-      modelName: device.modelName,
-      deviceType: device.deviceType,
-      iosVersion: device.iosVersion,
-      resumeStep: nil,
+      onUnclaimed: { device, children in
+        Output(
+          children: children.map { ChildOption(id: $0.id, name: $0.name) },
+          modelName: device.modelName,
+          deviceType: device.deviceType,
+          iosVersion: device.iosVersion,
+          resumeStep: nil,
+        )
+      },
     )
   }
 }

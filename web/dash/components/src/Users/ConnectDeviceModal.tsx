@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { MacAppConnectionCode, RequestState } from '@dash/types';
+import CodeChip from '../CodeChip';
 import { RequestModal } from '../Modal';
 import Modal from '../Modal/Modal';
 
@@ -114,12 +115,7 @@ const ConnectionCodeContent: React.FC<{ code: number }> = ({ code }) => (
       {` `}
       <b>Gertrude Mac App</b>:
     </div>
-    <code
-      data-test="connection-code"
-      className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 w-fit self-center px-4 py-1 rounded-lg"
-    >
-      {code}
-    </code>
+    <CodeChip code={code} testId="connection-code" />
     <div>
       Download the app from{` `}
       <code className="text-fuchsia-700">https://gertrude.app/download</code>.

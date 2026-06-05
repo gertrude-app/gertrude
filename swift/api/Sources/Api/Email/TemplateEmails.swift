@@ -5,9 +5,11 @@ struct InitialSignup: TemplateEmailModel {
   static var layout: EmailLayout { .topLogo }
   var dashboardUrl: String
   var token: UUID
+  var redirect: String?
   var templateModel: [String: String] { [
     "dashboardUrl": self.dashboardUrl,
     "token": self.token.lowercased,
+    "redirect": self.redirect ?? "",
   ] }
 }
 

@@ -1,10 +1,10 @@
-import { ApiErrorMessage, Loading } from '@dash/components';
+import { ApiErrorMessage, Loading, ScreenShell } from '@dash/components';
 import { Result } from '@shared/pairql';
 import React from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Current from '../../../environment';
 import { Key, useFireAndForget, useQuery } from '../../../hooks';
-import { DownloadHelperScreen, ScreenShell } from './screens';
+import { DownloadHelperScreen } from './screens';
 
 const SuperviseDeviceDownloadHelper: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();

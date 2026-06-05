@@ -27,6 +27,7 @@ enum AuthedParentRoute: PairRoute {
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice(IOSDevice.Id)
+  case iosDevice_v2(IOSDevice.Id)
   case latestAppVersions
   case logEvent(LogEvent.Input)
   case userActivityFeed(UserActivityFeed.Input)
@@ -53,6 +54,9 @@ enum AuthedParentRoute: PairRoute {
   case updateIOSDevice(UpdateIOSDevice.Input)
   case claimIOSDevice(ClaimIOSDevice.Input)
   case getIOSDeviceClaimData(GetIOSDeviceClaimData.Input)
+  case getAmClaimData(GetAmClaimData.Input)
+  case claimAmDevice(ClaimAmDevice.Input)
+  case requestAmPinReset(RequestAmPinReset.Input)
   case getIOSDeviceSupervisionStatus(GetIOSDeviceSupervisionStatus.Input)
   case prepIOSAppConnection(PrepIOSAppConnection.Input)
   case iosAppConnectionCode(IOSAppConnectionCode.Input)
@@ -152,6 +156,10 @@ extension AuthedParentRoute {
         Route(.case(Self.iosDevice)) {
           Operation(GetIOSDevice.self)
           Body(.dashboardInput(GetIOSDevice.self))
+        }
+        Route(.case(Self.iosDevice_v2)) {
+          Operation(GetIOSDevice_v2.self)
+          Body(.dashboardInput(GetIOSDevice_v2.self))
         }
         Route(.case(Self.logEvent)) {
           Operation(LogEvent.self)
@@ -254,6 +262,18 @@ extension AuthedParentRoute {
           Operation(GetIOSDeviceClaimData.self)
           Body(.dashboardInput(GetIOSDeviceClaimData.self))
         }
+        Route(.case(Self.getAmClaimData)) {
+          Operation(GetAmClaimData.self)
+          Body(.dashboardInput(GetAmClaimData.self))
+        }
+        Route(.case(Self.claimAmDevice)) {
+          Operation(ClaimAmDevice.self)
+          Body(.dashboardInput(ClaimAmDevice.self))
+        }
+        Route(.case(Self.requestAmPinReset)) {
+          Operation(RequestAmPinReset.self)
+          Body(.dashboardInput(RequestAmPinReset.self))
+        }
         Route(.case(Self.getIOSDeviceSupervisionStatus)) {
           Operation(GetIOSDeviceSupervisionStatus.self)
           Body(.dashboardInput(GetIOSDeviceSupervisionStatus.self))
@@ -347,6 +367,9 @@ extension AuthedParentRoute: RouteResponder {
     case .iosDevice(let input):
       let output = try await GetIOSDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .iosDevice_v2(let input):
+      let output = try await GetIOSDevice_v2.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .latestAppVersions:
       let output = try await LatestAppVersions.resolve(in: context)
       return try await self.respond(with: output)
@@ -427,6 +450,15 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getIOSDeviceClaimData(let input):
       let output = try await GetIOSDeviceClaimData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getAmClaimData(let input):
+      let output = try await GetAmClaimData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .claimAmDevice(let input):
+      let output = try await ClaimAmDevice.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .requestAmPinReset(let input):
+      let output = try await RequestAmPinReset.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getIOSDeviceSupervisionStatus(let input):
       let output = try await GetIOSDeviceSupervisionStatus.resolve(with: input, in: context)

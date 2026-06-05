@@ -106,3 +106,24 @@ describe(`dashboard app login`, () => {
     });
   });
 });
+
+describe(`app-aware claim glue`, () => {
+  it(`shows the Gertrude AM app card + "Login to connect:" for an AM claim`, () => {
+    cy.visit(
+      `/login?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
+    );
+    cy.contains(`Login to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`For app:`);
+    cy.contains(`Gertrude AM`);
+  });
+
+  it(`still shows the Gertrude Blocker app card for a supervision claim`, () => {
+    cy.visit(
+      `/login?claimPendingSupervision=123456&modelName=iPhone+15+Pro&iosVersion=18.2`,
+    );
+    cy.contains(`Login to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`Gertrude Blocker`);
+  });
+});

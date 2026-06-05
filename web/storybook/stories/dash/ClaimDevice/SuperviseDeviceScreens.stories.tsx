@@ -1,12 +1,11 @@
+import { ClaimScreen, ScreenShell } from '@dash/components';
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
-  ClaimScreen,
   DoneScreen,
   DownloadHelperScreen,
   LaunchHelperScreen,
   PaymentGateScreen,
-  ScreenShell,
   SuperviseScreen,
   WindowsSmartScreenModal,
 } from '../../../../dash/app/src/components/routes/SuperviseDevice/screens';

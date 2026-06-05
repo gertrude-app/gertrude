@@ -30,6 +30,12 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
+  public claimAmDevice = (
+    input: P.ClaimAmDevice.Input,
+  ): Promise<Result<P.ClaimAmDevice.Output>> => {
+    return this.query<P.ClaimAmDevice.Output>(input, `ClaimAmDevice`, `parent`);
+  };
+
   public claimIOSDevice = (
     input: P.ClaimIOSDevice.Input,
   ): Promise<Result<P.ClaimIOSDevice.Output>> => {
@@ -142,6 +148,12 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAllDevices.Output>(input, `GetAllDevices`, `parent`);
   };
 
+  public getAmClaimData = (
+    input: P.GetAmClaimData.Input,
+  ): Promise<Result<P.GetAmClaimData.Output>> => {
+    return this.query<P.GetAmClaimData.Output>(input, `GetAmClaimData`, `parent`);
+  };
+
   public getBatchUnlockRequestData = (
     input: P.GetBatchUnlockRequestData.Input,
   ): Promise<Result<P.GetBatchUnlockRequestData.Output>> => {
@@ -167,9 +179,9 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public getIOSDevice = (
-    input: P.GetIOSDevice.Input,
-  ): Promise<Result<P.GetIOSDevice.Output>> => {
-    return this.query<P.GetIOSDevice.Output>(input, `GetIOSDevice`, `parent`);
+    input: P.GetIOSDevice_v2.Input,
+  ): Promise<Result<P.GetIOSDevice_v2.Output>> => {
+    return this.query<P.GetIOSDevice_v2.Output>(input, `GetIOSDevice_v2`, `parent`);
   };
 
   public getIOSDeviceClaimData = (
@@ -312,6 +324,12 @@ export default class DashboardClient extends Client<Auth> {
       `PrepIOSAppConnection`,
       `parent`,
     );
+  };
+
+  public requestAmPinReset = (
+    input: P.RequestAmPinReset.Input,
+  ): Promise<Result<P.RequestAmPinReset.Output>> => {
+    return this.query<P.RequestAmPinReset.Output>(input, `RequestAmPinReset`, `parent`);
   };
 
   public requestMagicLink = (

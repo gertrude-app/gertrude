@@ -1,6 +1,8 @@
 // import { convert, validate } from '@dash/block-rules';
 import {
   // BlockRuleEditor,
+  AmDeviceSection,
+  AppHeader,
   BlockGroupList,
   // EditBlockRules,
   Loading,
@@ -17,9 +19,18 @@ import isEqual from 'lodash.isequal';
 import React, { useReducer } from 'react';
 import { useParams } from 'react-router-dom';
 // import type { WebPolicy } from '@dash/types';
+import type { AmRunwayTier } from '../../amSubscriptionRunway';
+import type { AmStatus } from '@dash/components';
+import { amSubscriptionRunway } from '../../amSubscriptionRunway';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
 import reducer from '../../reducers/ios-device-reducer';
+
+const TIER_TO_STATUS: Record<AmRunwayTier, AmStatus> = {
+  active: `active`,
+  expiring: `approaching`,
+  lapsed: `paused`,
+};
 
 const IOSDevice: React.FC = () => {
   const { deviceId: id = `` } = useParams<{ deviceId: string }>();
@@ -83,87 +94,110 @@ const IOSDevice: React.FC = () => {
   }
 
   const dt = deviceQuery.data.deviceType;
+  const blocker = deviceQuery.data.blocker;
+  const am = deviceQuery.data.am;
+  const amRunway = am ? amSubscriptionRunway(am.subscription) : undefined;
 
-  const isDirty =
-    isEqual(state.enabledBlockGroups, deviceQuery.data.enabledBlockGroups) &&
-    state.webPolicy === deviceQuery.data.webPolicy &&
-    isEqual(state.webPolicyDomains, deviceQuery.data.webPolicyDomains) &&
-    state.isProfileLocked === deviceQuery.data.isProfileLocked &&
-    state.allowAppRemoval === deviceQuery.data.allowAppRemoval &&
-    state.allowEraseContentAndSettings ===
-      deviceQuery.data.allowEraseContentAndSettings &&
-    state.allowAppInstallation === deviceQuery.data.allowAppInstallation;
+  const requestPinCode = async (): Promise<number | null> => {
+    const result = await Current.api.requestAmPinReset({ deviceId: id });
+    return result.isError ? null : (result.value?.code ?? null);
+  };
+
+  const isDirty = blocker
+    ? isEqual(state.enabledBlockGroups, blocker.enabledBlockGroups) &&
+      state.webPolicy === blocker.webPolicy &&
+      isEqual(state.webPolicyDomains, blocker.webPolicyDomains) &&
+      state.isProfileLocked === blocker.isProfileLocked &&
+      state.allowAppRemoval === blocker.allowAppRemoval &&
+      state.allowEraseContentAndSettings === blocker.allowEraseContentAndSettings &&
+      state.allowAppInstallation === blocker.allowAppInstallation
+    : true;
 
   return (
     <div className="relative max-w-3xl">
       <PageHeading icon="phone">
         {deviceQuery.data.childName}'s {deviceQuery.data.deviceType}
       </PageHeading>
-      <div className="mt-8">
-        <div className="max-w-3xl">
-          <BlockGroupList
-            groups={deviceQuery.data.allBlockGroups}
-            enabledGroupIds={state.enabledBlockGroups}
-            onToggle={(id) => dispatch({ type: `toggleBlockGroup`, id })}
+      <div className="mt-8 space-y-16">
+        {am && amRunway && (
+          <AmDeviceSection
+            status={TIER_TO_STATUS[amRunway.tier]}
+            childName={deviceQuery.data.childName}
+            deviceType={dt}
+            accessEndsAt={amRunway.accessEndsAt}
+            trialDaysRemaining={amRunway.trialDaysRemaining}
+            requestPinCode={requestPinCode}
           />
-        </div>
-        {deviceQuery.data.isSupervised && (
-          <div className="mt-12 max-w-3xl">
-            <h2 className="text-lg font-bold text-slate-700">
-              Supervision Profile Settings
-            </h2>
-            <div className="mt-2 mb-4 flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
-              <i className="fa-solid fa-circle-info text-amber-500 mt-0.5 shrink-0" />
-              <span>
-                After changing any setting below, you&rsquo;ll need to sync the profile on
-                the {dt} by opening the Gertrude app and going to{` `}
-                <b>Info &rarr; Sync Profile</b>.
-              </span>
-            </div>
-            <ToggleCard
-              title="Prevent protection removal"
-              description={`Make it impossible for the ${dt} user to remove Gertrude’s protection.`}
-              enabled={state.isProfileLocked}
-              setEnabled={(v) => dispatch({ type: `setIsProfileLocked`, value: v })}
-              warning={
-                !state.isProfileLocked
-                  ? `The ${dt} user may remove the profile in order to stop Gertrude’s protection and uninstall.`
-                  : undefined
-              }
-            />
-            <ToggleCard
-              title="Allow deleting apps"
-              description={`Keeping this off prevents the ${dt} user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps from the ${dt}, then re-enable.`}
-              enabled={state.allowAppRemoval}
-              setEnabled={(v) => dispatch({ type: `setAllowAppRemoval`, value: v })}
-              warning={
-                state.allowAppRemoval
-                  ? `The user can delete apps (including Gertrude) from their ${dt}`
-                  : undefined
-              }
-            />
-            <ToggleCard
-              title="Allow factory reset"
-              description={`Allow the ${dt} to be erased and reset to factory settings, bypassing protection.`}
-              enabled={state.allowEraseContentAndSettings}
-              setEnabled={(v) =>
-                dispatch({ type: `setAllowEraseContentAndSettings`, value: v })
-              }
-              warning={
-                state.allowEraseContentAndSettings
-                  ? `The user will be able to erase the ${dt} removing Gertrude and all restrictions`
-                  : undefined
-              }
-            />
-            <ToggleCard
-              title="Allow installing apps"
-              description={`Allow the ${dt} user to install new apps from the App Store. Turn this off to remove the App Store icon entirely and block app installation.`}
-              enabled={state.allowAppInstallation}
-              setEnabled={(v) => dispatch({ type: `setAllowAppInstallation`, value: v })}
-            />
-          </div>
         )}
-        {/* <div className="mt-12 max-w-3xl">
+        {blocker && (
+          <div className="max-w-3xl">
+            <AppHeader app="blocker" />
+            <div className="mt-6">
+              <BlockGroupList
+                groups={blocker.allBlockGroups}
+                enabledGroupIds={state.enabledBlockGroups}
+                onToggle={(id) => dispatch({ type: `toggleBlockGroup`, id })}
+              />
+            </div>
+            {blocker.isSupervised && (
+              <div className="mt-12 max-w-3xl">
+                <h2 className="text-lg font-bold text-slate-700">
+                  Supervision Profile Settings
+                </h2>
+                <div className="mt-2 mb-4 flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                  <i className="fa-solid fa-circle-info text-amber-500 mt-0.5 shrink-0" />
+                  <span>
+                    After changing any setting below, you&rsquo;ll need to sync the
+                    profile on the {dt} by opening the Gertrude app and going to{` `}
+                    <b>Info &rarr; Sync Profile</b>.
+                  </span>
+                </div>
+                <ToggleCard
+                  title="Prevent protection removal"
+                  description={`Make it impossible for the ${dt} user to remove Gertrude’s protection.`}
+                  enabled={state.isProfileLocked}
+                  setEnabled={(v) => dispatch({ type: `setIsProfileLocked`, value: v })}
+                  warning={
+                    !state.isProfileLocked
+                      ? `The ${dt} user may remove the profile in order to stop Gertrude’s protection and uninstall.`
+                      : undefined
+                  }
+                />
+                <ToggleCard
+                  title="Allow deleting apps"
+                  description={`Keeping this off prevents the ${dt} user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps from the ${dt}, then re-enable.`}
+                  enabled={state.allowAppRemoval}
+                  setEnabled={(v) => dispatch({ type: `setAllowAppRemoval`, value: v })}
+                  warning={
+                    state.allowAppRemoval
+                      ? `The user can delete apps (including Gertrude) from their ${dt}`
+                      : undefined
+                  }
+                />
+                <ToggleCard
+                  title="Allow factory reset"
+                  description={`Allow the ${dt} to be erased and reset to factory settings, bypassing protection.`}
+                  enabled={state.allowEraseContentAndSettings}
+                  setEnabled={(v) =>
+                    dispatch({ type: `setAllowEraseContentAndSettings`, value: v })
+                  }
+                  warning={
+                    state.allowEraseContentAndSettings
+                      ? `The user will be able to erase the ${dt} removing Gertrude and all restrictions`
+                      : undefined
+                  }
+                />
+                <ToggleCard
+                  title="Allow installing apps"
+                  description={`Allow the ${dt} user to install new apps from the App Store. Turn this off to remove the App Store icon entirely and block app installation.`}
+                  enabled={state.allowAppInstallation}
+                  setEnabled={(v) =>
+                    dispatch({ type: `setAllowAppInstallation`, value: v })
+                  }
+                />
+              </div>
+            )}
+            {/* <div className="mt-12 max-w-3xl">
           <h2 className="text-lg font-bold text-slate-700">Web Content Filter Policy</h2>
           <div className="bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl relative">
             <SelectMenu
@@ -233,7 +267,7 @@ const IOSDevice: React.FC = () => {
             )}
           </div>
         </div> */}
-        {/* <div className="mt-12 max-w-3xl mb-12">
+            {/* <div className="mt-12 max-w-3xl mb-12">
           <h2 className="text-lg font-bold text-slate-700 mb-2">Block Rules</h2>
           <div className="bg-slate-100 mt-3 p-4 sm:p-6 rounded-xl">
             <EditBlockRules
@@ -259,17 +293,19 @@ const IOSDevice: React.FC = () => {
           </div>
         </div> */}
 
-        <div className="flex mt-8 justify-end border-slate-200 pt-8 border-t-2">
-          <Button
-            className="ScrollTop"
-            type="button"
-            disabled={isDirty || saveDevice.isPending}
-            onClick={() => saveDevice.mutate(undefined)}
-            color="primary"
-          >
-            Save settings
-          </Button>
-        </div>
+            <div className="flex mt-8 justify-end border-slate-200 pt-8 border-t-2">
+              <Button
+                className="ScrollTop"
+                type="button"
+                disabled={isDirty || saveDevice.isPending}
+                onClick={() => saveDevice.mutate(undefined)}
+                color="primary"
+              >
+                Save settings
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
       {/* <Modal
         icon="location"

@@ -1,14 +1,13 @@
 // auto-generated, do not edit
+import type { ClaimChildOption } from '../shared';
+
 export namespace GetIOSDeviceClaimData {
   export interface Input {
     code: number;
   }
 
   export interface Output {
-    children: Array<{
-      id: UUID;
-      name: string;
-    }>;
+    children: ClaimChildOption[];
     modelName: string;
     deviceType: string;
     iosVersion: string;
