@@ -14,7 +14,7 @@ For connection info, read `./swift/api/.env` and use the values there.
 
 You may READ and write to the LOCAL task database, as it is a task-specific,
 PII-scrubbed local snapshot. You may NEVER try to discover how to ssh into production
-or read/write remote databases for any reason.
+or read/write remote databases for any reason. The snapshot is complete, not a subset of prod.
 
 Important: although this repo has some docker-related files, all local development goes
 through a local install of postgres and NOT through docker. Never use `docker` commands
