@@ -41,6 +41,22 @@ final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable 
     expect(output).toEqual(.init(code: 123_456, gate: .trialRequired))
   }
 
+  func testTrialConsumedNeverPaid_getsPlanUpgradeRequiredGate() async throws {
+    let parent = try await self.parent()
+    try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      fullTrialStartedAt: .reference - .days(60),
+    ))
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+
+    let output = try await MacAppConnectionCode.resolve(
+      with: .init(childId: child.id),
+      in: parent.context,
+    )
+
+    expect(output).toEqual(.init(code: 123_456, gate: .planUpgradeRequired))
+  }
+
   func testLightUserNotTrialed_getsTrialRequiredGate() async throws {
     let parent = try await self.parentWithSubscription { _, sub in
       sub.tier = .light
