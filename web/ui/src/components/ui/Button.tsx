@@ -5,7 +5,7 @@ import React from 'react';
 import DropdownMenu from './dropdown-menu/DropdownMenu';
 import DropdownMenuItem from './dropdown-menu/DropdownMenuItem';
 
-type ButtonVariant = `primary` | `default` | `ghost` | `destructive`;
+type ButtonVariant = `primary` | `default` | `ghost` | `destructive` | `selected`;
 type ButtonSize = `small` | `medium` | `large`;
 
 type DropdownItem = {
@@ -22,6 +22,7 @@ type CommonProps = {
   ariaLabel?: string;
   icon?: LucideIcon;
   iconPosition?: `left` | `right`;
+  fillIcon?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
   loading?: boolean;
@@ -52,6 +53,7 @@ const ownPropKeys = new Set([
   `ariaLabel`,
   `icon`,
   `iconPosition`,
+  `fillIcon`,
   `variant`,
   `size`,
   `loading`,
@@ -186,6 +188,8 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           props.variant === `ghost`,
         'border-[#E9C8C7] bg-red-600/3 text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
           props.variant === `destructive`,
+        'border-amber-300 bg-amber-100 text-amber-950 shadow-amber-700/15 focus-visible:ring-amber-400/70':
+          props.variant === `selected`,
       },
       !isDisabled && {
         'hover:z-10 hover:border-violet-900 hover:bg-violet-600 hover:shadow-violet-500/50':
@@ -195,6 +199,8 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
         'hover:bg-stone-200/70': props.variant === `ghost`,
         'hover:z-10 hover:border-red-600/35 hover:shadow-red-700/20':
           props.variant === `destructive`,
+        'hover:z-10 hover:border-amber-400 hover:bg-amber-200/70 hover:shadow-amber-700/20':
+          props.variant === `selected`,
       },
       getSizeClasses(props.size, contentHasLabel, splitPart),
       splitPart === undefined && props.className,
@@ -224,6 +230,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
             className={cx(
               `absolute transition-[opacity,transform,filter] duration-[400ms] ease-out`,
               iconClasses,
+              props.fillIcon && `fill-current`,
               props.loading
                 ? `scale-0 opacity-0 blur-[1px]`
                 : `scale-100 opacity-100 blur-none`,

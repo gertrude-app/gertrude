@@ -17,13 +17,13 @@ const ButtonPage: React.FC = () => (
       component={<AssortmentExample />}
       path="./examples/AssortmentExample.tsx"
       description="A quick mixed set of buttons across variants, sizes, icons, links, and loading states."
-      demoHeight="13rem"
+      demoHeight="14rem"
     />
     <DemoExample
       component={<VariantStatesExample />}
       path="./examples/VariantStatesExample.tsx"
       description="Each color variant shown as plain text, icon left, icon right, and loading."
-      demoHeight="18rem"
+      demoHeight="22rem"
     />
     <DemoExample
       component={<SizeScaleExample />}

@@ -1,7 +1,7 @@
 import { Button, Modal, SlideOver, Textarea } from '@gertrude/ui';
 import React, { useState } from 'react';
+import type { UnlockRequest } from '#/lib/mock-data/unlock-requests';
 import UnlockRequstResponsePanel from './UnlockRequestResponsePanel';
-import { type UnlockRequest } from '#/lib/mock-data';
 
 interface Props {
   request: UnlockRequest;

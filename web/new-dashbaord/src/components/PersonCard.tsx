@@ -9,7 +9,8 @@ import {
   SmartphoneIcon,
 } from 'lucide-react';
 import React from 'react';
-import type { Device, Person } from '#/lib/mock-data';
+import type { Device, Person } from '#/lib/mock-data/people-and-devices';
+import { personActivityHref } from '#/lib/activity-helpers';
 
 interface Props {
   person: Person;
@@ -17,7 +18,9 @@ interface Props {
 
 const getDeviceKey = (device: Device, index: number): string => {
   if (device.type === `mac`) {
-    return `${device.type}-${device.name ?? ``}-${device.modelName}-${device.macOSVersion}-${index}`;
+    return `${device.type}-${device.name ?? ``}-${device.modelName}-${
+      device.macOSVersion
+    }-${index}`;
   }
 
   return `${device.type}-${device.modelName}-${device.iOSVersion}-${index}`;
@@ -97,7 +100,7 @@ const PersonCard: React.FC<Props> = ({ person }) => (
           Settings
         </Button>
         {person.devices.some((d) => d.type === `mac`) && (
-          <Button type="link" href="/people" icon={ScanEyeIcon}>
+          <Button type="link" href={personActivityHref(person.id)} icon={ScanEyeIcon}>
             Monitor
           </Button>
         )}

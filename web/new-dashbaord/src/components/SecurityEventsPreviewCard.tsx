@@ -2,7 +2,7 @@ import { Badge } from '@gertrude/ui';
 import cx from 'clsx';
 import { ArrowRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import type { SecurityEvent } from '#/lib/mock-data';
+import type { SecurityEvent } from '#/lib/mock-data/security';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {

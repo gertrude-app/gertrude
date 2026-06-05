@@ -2,9 +2,15 @@ import { ArrowRightIcon, MailIcon, SearchIcon } from 'lucide-react';
 import React from 'react';
 import Button from '#/components/ui/Button';
 
-type ButtonVariant = `primary` | `default` | `ghost` | `destructive`;
+type ButtonVariant = `primary` | `default` | `ghost` | `destructive` | `selected`;
 
-const variants: ButtonVariant[] = [`primary`, `default`, `ghost`, `destructive`];
+const variants: ButtonVariant[] = [
+  `primary`,
+  `default`,
+  `ghost`,
+  `destructive`,
+  `selected`,
+];
 
 const VariantStatesExample: React.FC = () => (
   <div className="flex h-full items-center justify-center p-8">

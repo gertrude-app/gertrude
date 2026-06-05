@@ -8,12 +8,10 @@ import PersonCard from '#/components/PersonCard';
 import SecurityEventsPreviewCard from '#/components/SecurityEventsPreviewCard';
 import SuspensionRequetsPreviewCard from '#/components/SuspensionRequestsPreviewCard';
 import UnlockRequestsPreviewCard from '#/components/UnlockRequestsPreviewCard';
-import {
-  mockChildren,
-  mockSecurityEvents,
-  mockSuspensionRequests,
-  mockUnlockRequests,
-} from '#/lib/mock-data';
+import { mockChildren } from '#/lib/mock-data/people-and-devices';
+import { mockSecurityEvents } from '#/lib/mock-data/security';
+import { mockSuspensionRequests } from '#/lib/mock-data/suspension-requests';
+import { mockUnlockRequests } from '#/lib/mock-data/unlock-requests';
 
 const PeoplePage: React.FC = () => (
   <DashboardPage

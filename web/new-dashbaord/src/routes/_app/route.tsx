@@ -12,7 +12,8 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import React from 'react';
-import { mockSuspensionRequests, mockUnlockRequests } from '#/lib/mock-data';
+import { mockSuspensionRequests } from '#/lib/mock-data/suspension-requests';
+import { mockUnlockRequests } from '#/lib/mock-data/unlock-requests';
 
 const requestCount = mockSuspensionRequests.length + mockUnlockRequests.length;
 
