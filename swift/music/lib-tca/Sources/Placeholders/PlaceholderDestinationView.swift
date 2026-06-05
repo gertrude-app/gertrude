@@ -8,7 +8,7 @@ struct PlaceholderDestinationView: View {
 
   var body: some View {
     #if os(iOS)
-      if let transitionSourceID, let transitionNamespace {
+      if #available(iOS 18.0, *), let transitionSourceID, let transitionNamespace {
         self.content
           .navigationTransition(.zoom(sourceID: transitionSourceID, in: transitionNamespace))
       } else {
