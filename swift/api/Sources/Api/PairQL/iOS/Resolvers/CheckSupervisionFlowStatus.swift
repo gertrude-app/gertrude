@@ -34,7 +34,7 @@ extension CheckSupervisionFlowStatus: Resolver {
 
     try await device.renewPendingClaimCode(in: ctx.db, supervision: supervision)
 
-    let install = try await device.install(in: ctx.db)
+    let install = try await device.blockerInstall(in: ctx.db)
     let token: BlockerApp.Token
     let existingToken = try? await BlockerApp.Token.query()
       .where(.installId == install.id)

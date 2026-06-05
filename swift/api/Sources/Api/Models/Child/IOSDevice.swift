@@ -48,10 +48,17 @@ extension IOSDevice {
       .first(in: db)
   }
 
-  func install(in db: any DuetSQL.Client) async throws -> BlockerApp.Install {
+  func blockerInstall(in db: any DuetSQL.Client) async throws -> BlockerApp.Install {
     try await BlockerApp.Install.query()
       .where(.deviceId == self.id)
       .first(in: db)
+  }
+
+  func podcastInstall(in db: any DuetSQL.Client) async throws -> PodcastApp.Install? {
+    try await PodcastApp.Install.query()
+      .where(.deviceId == self.id)
+      .all(in: db)
+      .first
   }
 
   func blockGroups(in db: any DuetSQL.Client) async throws -> [BlockerApp.BlockGroup] {

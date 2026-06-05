@@ -45,7 +45,7 @@ enum ProfileDownloadRoute {
       }
     }
 
-    let install = try await device.install(in: req.context.db)
+    let install = try await device.blockerInstall(in: req.context.db)
     let xml = generateProfileXml(for: device, install: install)
     let signer = with(dependency: \.profileSigner)
     let signedBytes = try signer.sign(Array(xml.utf8))

@@ -35,77 +35,39 @@ struct ClaimIOSDevice: Pair {
 // existing child if they already had a gertrude account
 extension ClaimIOSDevice: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let device = try? await IOSDevice.query()
-      .where(.claimCode == input.code)
-      .first(in: context.db)
+    try await claimDevice(
+      for: .blocker,
+      code: input.code,
+      child: input.child,
+      baseId: "f71dcb51", // f71dcb51-1, f71dcb51-2, f71dcb51-3
+      in: context,
+      onResume: { device, child in
+        self.output(device: device, child: child, code: input.code)
+      },
+      onFresh: { device, child in
+        // start with ALL non-opt-in block groups, parent controls from web ui
+        try await device.ensureBlockerBlockGroups(in: context.db)
 
-    guard var device else {
-      logIOSUnusual("4083a77f", "supervision code not found")
-      let msg = "Code not found. Double-check and try again."
-      throw context.error("4083a77f", .notFound, user: msg)
-    }
-
-    if let childId = device.childId {
-      if let child = try? await context.verifiedChild(from: childId) {
-        return .init(
-          childName: child.name,
-          modelName: device.modelName,
+        try await context.db.create(IOSEvent(
+          eventId: "f2c3863b",
+          kind: .supervision,
+          detail: "code_claimed: code=\(input.code)",
+          deviceId: device.id,
+          modelIdentifier: device.modelIdentifier,
           iosVersion: device.iosVersion,
-          code: input.code,
-        )
-      } else {
-        logIOSUnusual("3ac80159", "attempt to claim device from different parent")
-        let msg = "Code not found. Double-check and try again."
-        throw context.error("3ac80159", .notFound, user: msg)
-      }
-    }
+        ))
 
-    if let expiresAt = device.claimCodeExpiresAt,
-       expiresAt <= get(dependency: \.date.now) {
-      logIOSUnusual("25bef9db", "supervision code expired")
-      let msg = "This code has expired. Open the Gertrude app on the \(device.deviceType) to get a new one."
-      throw context.error("25bef9db", .badRequest, user: msg)
-    }
+        return self.output(device: device, child: child, code: input.code)
+      },
+    )
+  }
 
-    let child = switch input.child {
-    case .existingChild(id: let id):
-      try await context.verifiedChild(from: id)
-    case .newChild(name: let name):
-      try await context.db.create(Child(parentId: context.parent.id, name: name))
-    }
-
-    device.childId = child.id
-    device.claimedAt = get(dependency: \.date.now)
-    try await context.db.update(device)
-
-    // start with ALL non-opt-in block groups, parent controls from web ui
-    let groups = try await BlockerApp.BlockGroup.query()
-      .where(.optIn == false)
-      .all(in: context.db)
-    try await context.db.create(groups.map {
-      BlockerApp.DeviceBlockGroup(deviceId: device.id, blockGroupId: $0.id)
-    })
-
-    try await context.db.create(IOSEvent(
-      eventId: "f2c3863b",
-      kind: .supervision,
-      detail: "code_claimed: code=\(input.code)",
-      deviceId: device.id,
-      modelIdentifier: device.modelIdentifier,
-      iosVersion: device.iosVersion,
-    ))
-
-    Task {
-      let email = context.parent.email.rawValue
-      await get(dependency: \.slack)
-        .internal(.info, "*iOS supervision:* code `\(input.code)` claimed by `\(email)`")
-    }
-
-    return .init(
+  static func output(device: IOSDevice, child: Child, code: Int) -> Output {
+    .init(
       childName: child.name,
       modelName: device.modelName,
       iosVersion: device.iosVersion,
-      code: input.code,
+      code: code,
     )
   }
 }

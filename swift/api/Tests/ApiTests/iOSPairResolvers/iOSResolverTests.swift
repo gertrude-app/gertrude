@@ -39,7 +39,7 @@ final class iOSResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
     expect(device.modelIdentifier).toEqual("iPhone18,2")
     expect(device.iosVersion).toEqual("18.0.1")
-    let install = try await device.install(in: self.db)
+    let install = try await device.blockerInstall(in: self.db)
     expect(install.appVersion).toEqual("1.5.0")
   }
 

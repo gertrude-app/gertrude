@@ -127,7 +127,7 @@ extension ParentDetail: Resolver {
       let devices = try await child.iosDevices(in: context.db)
       var iosDeviceOutputs: [IOSDeviceOutput] = []
       for device in devices {
-        let install = try await device.install(in: context.db)
+        let install = try await device.blockerInstall(in: context.db)
         let supervision = try await device.supervision(in: context.db)
         let hasToken = try await BlockerApp.Token.query()
           .where(.installId == install.id)

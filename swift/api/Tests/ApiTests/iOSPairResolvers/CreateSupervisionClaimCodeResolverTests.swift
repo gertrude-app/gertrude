@@ -37,7 +37,7 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     expect(device.iosVersion).toEqual("18.2")
     expect(device.childId).toBeNil()
     expect(device.claimCode).toEqual(fixedCode)
-    let install = try await device.install(in: self.db)
+    let install = try await device.blockerInstall(in: self.db)
     expect(install.appVersion).toEqual("1.0.0")
 
     let supervision = try await device.supervision(in: self.db)!
