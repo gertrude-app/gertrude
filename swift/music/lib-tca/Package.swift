@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "LibTCA",
-  platforms: [.macOS(.v15), .iOS(.v18)],
+  platforms: [.macOS(.v15), .iOS(.v17)],
   products: [.library(name: "LibTCA", targets: ["LibTCA"])],
   dependencies: [
     .package(path: "../lib-views"),

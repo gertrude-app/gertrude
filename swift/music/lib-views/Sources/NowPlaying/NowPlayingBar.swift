@@ -2,17 +2,13 @@ import Foundation
 import SwiftUI
 
 #if os(iOS)
-  @available(iOS 26.0, *)
-  public enum NowPlayingAccessoryDisplayMode: Sendable {
+  public enum NowPlayingBarDisplayMode: Sendable {
     case automatic
     case expanded
     case inline
   }
 
-  @available(iOS 26.0, *)
-  public struct NowPlayingAccessoryView: View {
-    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
-
+  public struct NowPlayingBar: View {
     private let title: String
     private let artist: String
     private let artworkURL: URL?
@@ -21,8 +17,8 @@ import SwiftUI
     private let foregroundColor: Color
     private let panelTransitionID: String?
     private let artworkTransitionID: String?
-    private let displayMode: NowPlayingAccessoryDisplayMode
-    private let showsGlassBackground: Bool
+    private let displayMode: NowPlayingBarDisplayMode
+    private let showsBackground: Bool
     private let onTap: @MainActor @Sendable () -> Void
     private let onPlayTap: @MainActor @Sendable () -> Void
     private let onNextTap: @MainActor @Sendable () -> Void
@@ -39,8 +35,8 @@ import SwiftUI
       foregroundColor: Color = .black,
       panelTransitionID: String? = nil,
       artworkTransitionID: String? = nil,
-      displayMode: NowPlayingAccessoryDisplayMode = .automatic,
-      showsGlassBackground: Bool = false,
+      displayMode: NowPlayingBarDisplayMode = .automatic,
+      showsBackground: Bool = false,
       onTap: @MainActor @escaping @Sendable () -> Void = {},
       onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
       onNextTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -54,23 +50,26 @@ import SwiftUI
       self.panelTransitionID = panelTransitionID
       self.artworkTransitionID = artworkTransitionID
       self.displayMode = displayMode
-      self.showsGlassBackground = showsGlassBackground
+      self.showsBackground = showsBackground
       self.onTap = onTap
       self.onPlayTap = onPlayTap
       self.onNextTap = onNextTap
     }
 
     public var body: some View {
-      self.withPanelTransitionSource(
-        self.accessoryContent
-          .environment(\.backgroundMaterial, Material?.none)
-          .animation(.snappy(duration: 0.24), value: self.placement),
-      )
+      if #available(iOS 26.0, *) {
+        self.withPanelTransitionSource(
+          self.barContent
+            .environment(\.backgroundMaterial, Material?.none),
+        )
+      } else {
+        self.withPanelTransitionSource(self.barContent)
+      }
     }
 
     @ViewBuilder
-    private var accessoryContent: some View {
-      let content = NowPlayingAccessoryContent(
+    private var barContent: some View {
+      let content = NowPlayingBarContent(
         layout: self.layout,
         title: self.title,
         artist: self.artist,
@@ -83,22 +82,34 @@ import SwiftUI
         onPlayTap: self.onPlayTap,
         onNextTap: self.onNextTap,
       )
-      if self.showsGlassBackground {
-        content
-          .glassEffect(
-            .regular.interactive(),
-            in: .rect(cornerRadius: self.panelCornerRadius, style: .continuous),
-          )
+      if self.showsBackground {
+        if #available(iOS 26.0, *) {
+          content
+            .glassEffect(
+              .regular.interactive(),
+              in: RoundedRectangle(cornerRadius: self.panelCornerRadius, style: .continuous),
+            )
+        } else {
+          content
+            .background {
+              RoundedRectangle(cornerRadius: self.panelCornerRadius, style: .continuous)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.16), radius: 16, x: 0, y: 7)
+                .shadow(color: .black.opacity(0.08), radius: 3, x: 0, y: 1)
+            }
+            .overlay {
+              RoundedRectangle(cornerRadius: self.panelCornerRadius, style: .continuous)
+                .strokeBorder(.black.opacity(0.06), lineWidth: 1)
+            }
+        }
       } else {
         content
       }
     }
 
-    private var layout: NowPlayingAccessoryLayout {
+    private var layout: NowPlayingBarLayout {
       switch self.displayMode {
-      case .automatic:
-        self.placement == .inline ? .inline : .expanded
-      case .expanded:
+      case .automatic, .expanded:
         .expanded
       case .inline:
         .inline
@@ -132,13 +143,13 @@ import SwiftUI
     }
   }
 
-  private enum NowPlayingAccessoryLayout {
+  private enum NowPlayingBarLayout {
     case expanded
     case inline
   }
 
-  private struct NowPlayingAccessoryContent: View {
-    let layout: NowPlayingAccessoryLayout
+  private struct NowPlayingBarContent: View {
+    let layout: NowPlayingBarLayout
     let title: String
     let artist: String
     let artworkURL: URL?
@@ -169,7 +180,7 @@ import SwiftUI
               cornerRadius: 7,
               transitionID: self.artworkTransitionID,
             )
-            NowPlayingAccessoryText(
+            NowPlayingBarText(
               title: self.title,
               artist: self.artist,
               foregroundColor: self.foregroundColor,
@@ -217,7 +228,7 @@ import SwiftUI
               cornerRadius: 7,
               transitionID: self.artworkTransitionID,
             )
-            NowPlayingAccessoryText(
+            NowPlayingBarText(
               title: self.title,
               artist: self.artist,
               foregroundColor: self.foregroundColor,
@@ -245,7 +256,7 @@ import SwiftUI
     }
   }
 
-  private struct NowPlayingAccessoryText: View {
+  private struct NowPlayingBarText: View {
     let title: String
     let artist: String
     let foregroundColor: Color
@@ -310,7 +321,7 @@ import SwiftUI
           .resizable()
           .scaledToFill()
           .frame(width: self.size, height: self.size)
-          .clipShape(.rect(cornerRadius: self.cornerRadius, style: .continuous))
+          .clipShape(RoundedRectangle(cornerRadius: self.cornerRadius, style: .continuous))
       } placeholder: {
         RoundedRectangle(cornerRadius: self.cornerRadius, style: .continuous)
           .fill(.secondary.opacity(0.18))
@@ -349,7 +360,7 @@ import SwiftUI
   }
 
   #Preview("Expanded") {
-    NowPlayingAccessoryContent(
+    NowPlayingBarContent(
       layout: .expanded,
       title: "Josefin’s Waltz",
       artist: "Alasdair Fraser & Natalie Haas",
@@ -370,7 +381,7 @@ import SwiftUI
   }
 
   #Preview("Inline") {
-    NowPlayingAccessoryContent(
+    NowPlayingBarContent(
       layout: .inline,
       title: "Josefin’s Waltz",
       artist: "Alasdair Fraser & Natalie Haas",

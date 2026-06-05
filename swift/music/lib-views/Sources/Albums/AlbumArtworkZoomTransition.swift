@@ -34,7 +34,7 @@ public struct ZoomableAlbumArtworkView: View {
 
   public var body: some View {
     #if os(iOS)
-      if let transitionID {
+      if #available(iOS 18.0, *), let transitionID {
         HostedZoomableAlbumArtworkView(
           album: self.album,
           size: self.size,
@@ -250,7 +250,7 @@ public struct ZoomableAlbumArtworkView: View {
       )
       detailViewController.view.backgroundColor = .systemBackground
 
-      if let transitionID {
+      if #available(iOS 18.0, *), let transitionID {
         let options = UIViewController.Transition.ZoomOptions()
         options.alignmentRectProvider = { context in
           MainActor.assumeIsolated {

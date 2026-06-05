@@ -3,8 +3,6 @@ import LibViews
 import SwiftUI
 
 struct AppView: View {
-  @Environment(\.colorScheme) private var colorScheme
-
   @Bindable var store: StoreOf<AppFeature>
 
   private let nowPlayingPanelTransitionID = "now-playing-panel"
@@ -12,27 +10,10 @@ struct AppView: View {
 
   var body: some View {
     #if os(iOS)
-      if #available(iOS 26.0, *) {
-        self.libraryView
-          .safeAreaInset(edge: .bottom, spacing: 0) {
-            self.nowPlayingAccessoryInset
-          }
-          .nowPlayingZoomPresentation(
-            isPresented: self.nowPlayingPresented,
-            panelSourceID: self.nowPlayingPanelTransitionID,
-            artworkID: self.nowPlayingArtworkTransitionID,
-          ) {
-            self.nowPlayingSheet
-          }
-          .task {
-            await self.store.send(.playback(.observePlayback)).finish()
-          }
-      } else {
-        self.libraryView
-          .task {
-            await self.store.send(.playback(.observePlayback)).finish()
-          }
-      }
+      self.iOSContent
+        .task {
+          await self.store.send(.playback(.observePlayback)).finish()
+        }
     #else
       self.libraryView
         .task {
@@ -48,21 +29,56 @@ struct AppView: View {
   }
 
   #if os(iOS)
-    @available(iOS 26.0, *)
-    private var nowPlayingAccessory: some View {
+    @ViewBuilder
+    private var iOSContent: some View {
+      if #available(iOS 26.0, *) {
+        self.libraryView
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            self.nowPlayingBarInset(showsBackground: true)
+          }
+          .nowPlayingZoomPresentation(
+            isPresented: self.nowPlayingPresented,
+            panelSourceID: self.nowPlayingPanelTransitionID,
+            artworkID: self.nowPlayingArtworkTransitionID,
+          ) {
+            self.nowPlayingSheet
+          }
+      } else {
+        self.libraryView
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            self.nowPlayingBarInset(showsBackground: true)
+          }
+          .nowPlayingZoomPresentation(
+            isPresented: self.nowPlayingPresented,
+            panelSourceID: self.nowPlayingPanelTransitionID,
+            artworkID: self.nowPlayingArtworkTransitionID,
+          ) {
+            self.nowPlayingSheet
+          }
+      }
+    }
+
+    private func nowPlayingBarInset(showsBackground: Bool) -> some View {
+      self.nowPlayingBar(showsBackground: showsBackground)
+        .padding(.horizontal, 12)
+        .padding(.top, 6)
+        .padding(.bottom, 8)
+    }
+
+    private func nowPlayingBar(showsBackground: Bool) -> some View {
       let session = self.store.playback.session
-      return NowPlayingAccessoryView(
+      return NowPlayingBar(
         title: session?.currentItem.title ?? "Not Playing",
         artist: session?.currentItem.artistName ?? "Choose an approved track",
         artworkURL: session?.currentItem.allowsArtwork == true ? session?.currentItem
           .artworkURL : nil,
         isPlaying: session?.isPlaying ?? false,
         isEnabled: session != nil,
-        foregroundColor: self.nowPlayingForegroundColor,
+        foregroundColor: .black,
         panelTransitionID: self.nowPlayingPanelTransitionID,
         artworkTransitionID: self.nowPlayingArtworkTransitionID,
         displayMode: .expanded,
-        showsGlassBackground: true,
+        showsBackground: showsBackground,
         onTap: {
           guard self.store.playback.session != nil else { return }
           self.store.send(.nowPlayingPresentationChanged(true))
@@ -75,22 +91,9 @@ struct AppView: View {
         },
       )
     }
-
-    @available(iOS 26.0, *)
-    private var nowPlayingAccessoryInset: some View {
-      self.nowPlayingAccessory
-        .padding(.horizontal, 12)
-        .padding(.top, 6)
-        .padding(.bottom, 8)
-    }
   #endif
 
-  private var nowPlayingForegroundColor: Color {
-    self.colorScheme == .dark ? .white : .black
-  }
-
   #if os(iOS)
-    @available(iOS 26.0, *)
     @ViewBuilder
     private var nowPlayingSheet: some View {
       if let session = self.store.playback.session {
