@@ -20,6 +20,20 @@ export type AdminNotificationTrigger =
   | 'securityEventsMedium'
   | 'securityEventsRecommended';
 
+export type AmSubscriptionState =
+  | { case: 'active'; expiresAt: ISODateString }
+  | { case: 'fullTrial'; expiresAt: ISODateString }
+  | { case: 'amTrial'; expiresAt: ISODateString }
+  | { case: 'unpaid'; remediationUrl?: string }
+  | {
+      case: 'legacyGrandfathered';
+      accessEndsAt: ISODateString;
+      showMigrationNag: boolean;
+      migrationUrl?: string;
+    }
+  | { case: 'legacyExpired'; paidAt: ISODateString; remediationUrl?: string }
+  | { case: 'complimentary' };
+
 export type AppScope =
   | { type: 'unrestricted' }
   | { type: 'webBrowsers' }
@@ -99,6 +113,11 @@ export interface ChildIOSDevice {
   deviceType: string;
   iosVersion: string;
   pendingClaimCode?: number;
+}
+
+export interface ClaimChildOption {
+  id: UUID;
+  name: string;
 }
 
 export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';

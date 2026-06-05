@@ -41,6 +41,28 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
     expect(sent.emails.count).toEqual(1)
     expect(sent.emails[0].to).toEqual(email)
     expect(sent.emails[0].template).toBe("initial-signup")
+    expect(sent.emails[0].templateModel["redirect"]).toEqual("")
+  }
+
+  func testSignupWithAmClaimBakesFunnelRedirectIntoEmail() async throws {
+    let email = "signup".random + "@example.com"
+    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .podcasts)
+    _ = try await Signup.resolve(with: input, in: self.context)
+
+    expect(sent.emails.count).toEqual(1)
+    expect(sent.emails[0].template).toBe("initial-signup")
+    expect(sent.emails[0].templateModel["redirect"])
+      .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
+  }
+
+  func testSignupWithBlockerClaimBakesSupervisionRedirectIntoEmail() async throws {
+    let email = "signup".random + "@example.com"
+    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .blocker)
+    _ = try await Signup.resolve(with: input, in: self.context)
+
+    expect(sent.emails.count).toEqual(1)
+    expect(sent.emails[0].templateModel["redirect"])
+      .toEqual("%2Fsupervise-device%2F123456%2Fclaim")
   }
 
   func testInitiateSignupWithGclidAndABVariant() async throws {

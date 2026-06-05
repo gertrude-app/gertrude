@@ -7,6 +7,7 @@ export namespace Signup {
     abTestVariant?: string;
     turnstileToken?: string;
     claimCode?: string;
+    app?: 'blocker' | 'podcasts';
   }
 
   export interface Output {

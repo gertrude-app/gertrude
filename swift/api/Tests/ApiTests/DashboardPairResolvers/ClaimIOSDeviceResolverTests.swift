@@ -186,6 +186,44 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     }.toContain("notFound")
   }
 
+  func testLegacyIapCustomerClaimsViaBlockerFunnel_stampsLegacyPaidAt() async throws {
+    let parent = try await self.parent()
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice.random {
+      $0.claimCode = code
+      $0.claimCodeExpiresAt = .reference + .days(7)
+    })
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+    try await self.db.create(PodcastEvent(
+      eventId: "af0a338f",
+      kind: .subscription,
+      label: "subscribe success",
+      detail: "originalID: 123456789012345",
+      deviceId: device.id.rawValue,
+      modelIdentifier: device.modelIdentifier,
+      appVersion: "1.4.0",
+      iosVersion: device.iosVersion,
+    ))
+
+    _ = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await ClaimIOSDevice.resolve(
+        with: .init(code: code, child: .newChild(name: "Luke")),
+        in: parent.context,
+      )
+    }
+
+    let event = try await PodcastEvent.query()
+      .where(.deviceId == device.id.rawValue)
+      .first(in: self.db)
+    let identity = try await BillingIdentity.query()
+      .where(.parentId == parent.id)
+      .first(in: self.db)
+    let stamped = try XCTUnwrap(identity.legacyAmIapPaidAt)
+    expect(abs(stamped.timeIntervalSince(event.createdAt)) < 1).toBeTrue()
+  }
+
   func testClaimedCodeDoesNotExpire_andIsIdempotent() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })

@@ -64,7 +64,11 @@ extension GetAllDevices: NoInputResolver {
     async let supervisionsAsync = BlockerApp.Supervision.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
-    async let connectedDeviceIdsAsync = BlockerApp.Token.connectedDeviceIds(
+    async let blockerConnectedDeviceIdsAsync = BlockerApp.Token.connectedDeviceIds(
+      among: iosDevices.map(\.id),
+      in: context.db,
+    )
+    async let amConnectedDeviceIdsAsync = PodcastApp.Token.connectedDeviceIds(
       among: iosDevices.map(\.id),
       in: context.db,
     )
@@ -72,7 +76,8 @@ extension GetAllDevices: NoInputResolver {
     let computers = try await computersAsync
     let supervisionMap: [Api.IOSDevice.Id: BlockerApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
-    let connectedDeviceIds = try await connectedDeviceIdsAsync
+    let blockerConnectedDeviceIds = try await blockerConnectedDeviceIdsAsync
+    let amConnectedDeviceIds = try await amConnectedDeviceIdsAsync
 
     @Dependency(\.websockets) var websockets
 
@@ -95,11 +100,10 @@ extension GetAllDevices: NoInputResolver {
 
     let iosDeviceItems: [IOSDevice] = iosDevices.compactMap { device in
       guard let childId = device.childId else { return nil }
-      let isConnected = connectedDeviceIds.contains(device.id)
       let pendingSetup: Bool = if let supervision = supervisionMap[device.id] {
         !supervision.profileInstalled
       } else {
-        !isConnected
+        !blockerConnectedDeviceIds.contains(device.id) && !amConnectedDeviceIds.contains(device.id)
       }
       return IOSDevice(
         id: device.id,

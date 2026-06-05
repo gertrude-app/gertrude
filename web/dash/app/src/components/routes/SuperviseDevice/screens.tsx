@@ -1,94 +1,18 @@
 import {
-  ChildAssignmentPicker,
-  DeviceContextBanner,
-  PageHeading,
+  CodeChip,
+  HighlightableCard,
+  LightPlanTeaser,
+  ScreenHeader,
 } from '@dash/components';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React, { useState } from 'react';
-import type { ChildSelection } from '@dash/components';
 
 type DeviceInfo = {
   childName: string;
   modelName: string;
   iosVersion: string;
 };
-
-export const ScreenShell: React.FC<{
-  title: string;
-  children: React.ReactNode;
-}> = ({ title, children }) => (
-  <div className="relative max-w-3xl">
-    <PageHeading icon="phone">{title}</PageHeading>
-    <div className="mt-8 bg-white rounded-2xl border border-slate-200 p-6">
-      {children}
-    </div>
-  </div>
-);
-
-export const ClaimScreen: React.FC<{
-  children: Array<{ id: string; name: string }>;
-  deviceType: string;
-  modelName: string;
-  iosVersion: string;
-  onSubmit: (selection: ChildSelection) => void;
-  onCancel: () => void;
-  isSubmitting: boolean;
-  error?: string;
-}> = ({
-  children,
-  deviceType,
-  modelName,
-  iosVersion,
-  onSubmit,
-  onCancel,
-  isSubmitting,
-  error,
-}) => (
-  <>
-    <div className="mb-8">
-      <DeviceContextBanner
-        modelName={modelName}
-        iosVersion={iosVersion}
-        deviceType={deviceType as `iPhone` | `iPad`}
-        label={`Adding ${deviceType}:`}
-      />
-    </div>
-    <ChildAssignmentPicker
-      children={children}
-      deviceType={deviceType}
-      onSubmit={onSubmit}
-      onCancel={onCancel}
-      isSubmitting={isSubmitting}
-      error={error}
-    />
-  </>
-);
-
-const ScreenHeader: React.FC<{
-  icon: string;
-  title: string;
-  subtitle?: string;
-  step?: { current: number; total: number };
-}> = ({ icon, title, subtitle, step }) => (
-  <div className="flex items-start gap-4 mb-6">
-    <div className="w-14 h-14 rounded-xl bg-violet-100 flex items-center justify-center flex-shrink-0">
-      <i className={`fa-solid fa-${icon} text-violet-600 text-2xl`} />
-    </div>
-    <div className="flex-1">
-      {step && (
-        <div className="flex items-center justify-between mb-1">
-          <p className="text-sm font-medium text-violet-600">
-            Step {step.current} of {step.total}
-          </p>
-          <ProgressDots current={step.current} total={step.total} />
-        </div>
-      )}
-      <h1 className="text-xl font-bold text-slate-800">{title}</h1>
-      {subtitle && <p className="text-slate-500 text-sm mt-1">{subtitle}</p>}
-    </div>
-  </div>
-);
 
 export const MobileDetectedScreen: React.FC<{ onThisIsComputer: () => void }> = ({
   onThisIsComputer,
@@ -374,9 +298,7 @@ export const SuperviseScreen: React.FC<
             <p className="text-xs text-fuchsia-600 font-medium mb-1">
               Enter this code in the helper app:
             </p>
-            <code className="text-2xl text-fuchsia-700 tracking-widest font-bold">
-              {codeString}
-            </code>
+            <CodeChip code={codeString} size="md" pill={false} />
           </div>
           <button
             onClick={handleCopyCode}
@@ -415,22 +337,6 @@ export const SuperviseScreen: React.FC<
     </div>
   );
 };
-
-export const HighlightableCard: React.FC<{
-  highlighted: boolean;
-  className?: string;
-  children: React.ReactNode;
-}> = ({ highlighted, className, children }) => (
-  <div
-    className={`rounded-2xl p-[2px] ${className ?? ``} ${
-      highlighted ? `bg-gradient-to-r from-violet-500 to-fuchsia-500` : `bg-slate-100`
-    }`}
-  >
-    <div className={`rounded-[14px] p-5 ${highlighted ? `bg-white` : `bg-slate-50/50`}`}>
-      {children}
-    </div>
-  </div>
-);
 
 const DownloadButton: React.FC<{
   platform: `mac` | `windows`;
@@ -576,27 +482,10 @@ export const PaymentGateScreen: React.FC<
       <b>Gertrude subscription.</b>
     </p>
 
-    <HighlightableCard highlighted className="mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-800">Light Plan</h3>
-        <span className="text-lg font-bold text-violet-700">$10/year</span>
-      </div>
-      <ul className="space-y-2">
-        {[
-          `Supervise iPhones and iPads for 18+ users`,
-          `All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`,
-          `Unlimited devices for your family with one subscription`,
-        ].map((feature) => (
-          <li key={feature} className="flex items-center gap-2 text-sm text-slate-600">
-            <i className="fa-solid fa-check text-violet-500 text-xs" />
-            {feature}
-          </li>
-        ))}
-      </ul>
-      <p className="text-xs text-slate-400 mt-3">
-        This is a one-time annual payment. No trial period.
-      </p>
-    </HighlightableCard>
+    <LightPlanTeaser
+      className="mb-6"
+      extraBullets={[`All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`]}
+    />
 
     {checkoutCancelled && (
       <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6 text-sm text-amber-700">
@@ -614,26 +503,5 @@ export const PaymentGateScreen: React.FC<
         {isRedirecting ? `Redirecting...` : `Subscribe \u2014 $10/year`}
       </Button>
     </div>
-  </div>
-);
-
-export const ProgressDots: React.FC<{
-  current: number;
-  total: number;
-  className?: string;
-}> = ({ current, total, className }) => (
-  <div className={`flex items-center justify-center gap-2 ${className ?? ``}`}>
-    {Array.from({ length: total }, (_, i) => (
-      <div
-        key={i}
-        className={`rounded-full transition-all ${
-          i + 1 === current
-            ? `w-2.5 h-2.5 bg-violet-600`
-            : i + 1 < current
-              ? `w-2 h-2 bg-violet-400`
-              : `w-2 h-2 bg-slate-200`
-        }`}
-      />
-    ))}
   </div>
 );

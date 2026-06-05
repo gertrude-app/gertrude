@@ -17,6 +17,7 @@
     "@supervise/ui": "workspace:*",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
+    "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@shared/ts-utils": "workspace:*",
     "@storybook/nextjs": "10.1.10",

@@ -3,6 +3,7 @@ import {
   DeviceContextBanner,
   FullscreenModalForm,
   LoginForm,
+  detectClaimPending,
 } from '@dash/components';
 import React, { useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
@@ -16,7 +17,9 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState(``);
   const [searchParams] = useSearchParams();
   const fromPage = searchParams.get(`from`);
-  const claimCode = searchParams.get(`claimPendingSupervision`);
+  const pendingClaim = detectClaimPending(searchParams);
+  const claimCode = pendingClaim?.claimCode;
+  const app = pendingClaim?.app;
   const modelName = searchParams.get(`modelName`);
   const iosVersion = searchParams.get(`iosVersion`);
 
@@ -78,7 +81,8 @@ export const Login: React.FC = () => {
             <DeviceContextBanner
               modelName={modelName}
               iosVersion={iosVersion ?? undefined}
-              label="Login to supervise:"
+              app={app}
+              label="Login to connect:"
             />
           ) : undefined
         }

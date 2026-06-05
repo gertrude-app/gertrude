@@ -1,5 +1,6 @@
 import React from 'react';
 import type { IOSAppConnectionCode, RequestState } from '@dash/types';
+import CodeChip from '../CodeChip';
 import { RequestModal } from '../Modal';
 import Modal from '../Modal/Modal';
 
@@ -36,9 +37,7 @@ const ConnectIOSAppModal: React.FC<Props> = ({ request, dismissModal, childName 
           Download the <b>Gertrude Blocker</b> app on an iPhone or iPad, then when
           prompted, enter the code below to connect it to {childName}:
         </div>
-        <code className="block text-3xl text-fuchsia-700 tracking-widest font-bold bg-fuchsia-50 w-fit self-center px-4 py-1 rounded-lg">
-          {request.payload.code}
-        </code>
+        <CodeChip code={request.payload.code} />
       </div>
     </Modal>
   );

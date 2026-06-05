@@ -1,9 +1,9 @@
-import { ApiErrorMessage, Loading } from '@dash/components';
+import { ApiErrorMessage, Loading, ScreenShell } from '@dash/components';
 import React, { useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Current from '../../../environment';
 import { Key, useMutation, useQuery } from '../../../hooks';
-import { PaymentGateScreen, ScreenShell } from './screens';
+import { PaymentGateScreen } from './screens';
 
 const SuperviseDevicePayment: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();

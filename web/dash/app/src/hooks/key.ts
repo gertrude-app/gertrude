@@ -7,13 +7,14 @@ import type {
   GetAdminKeychain,
   GetAdminKeychains,
   GetAllDevices,
+  GetAmClaimData,
   GetBatchUnlockRequestData,
   GetChild,
   GetChildren,
   GetDevice,
-  GetIOSDevice,
   GetIOSDeviceClaimData,
   GetIOSDeviceSupervisionStatus,
+  GetIOSDevice_v2,
   GetIdentifiedApps,
   GetSelectableKeychains,
   GetSubscriptionPanel_v2,
@@ -63,7 +64,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`computers/:id`, [`computers`, id], id);
   }
 
-  static iOSDevice(id: UUID): QueryKey<GetIOSDevice.Output> {
+  static iOSDevice(id: UUID): QueryKey<GetIOSDevice_v2.Output> {
     return new QueryKey(`ios-devices/:id`, [`ios-devices`, id], id);
   }
 
@@ -135,6 +136,10 @@ export class Key extends QueryKey<never> {
 
   static claimDeviceData(code: string): QueryKey<GetIOSDeviceClaimData.Output> {
     return new QueryKey(`claim-device/:code`, [`claim-device`, code]);
+  }
+
+  static amClaimData(code: string): QueryKey<GetAmClaimData.Output> {
+    return new QueryKey(`am-claim-device/:code`, [`am-claim-device`, code]);
   }
 
   static supervisionDeviceStatus(

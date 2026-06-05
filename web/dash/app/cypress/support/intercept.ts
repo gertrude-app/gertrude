@@ -9,6 +9,7 @@ export function interceptPql(
   slug: `ChildActivitySummaries`,
   output: T.ChildActivitySummaries.Output,
 ): void;
+export function interceptPql(slug: `ClaimAmDevice`, output: T.ClaimAmDevice.Output): void;
 export function interceptPql(
   slug: `ClaimIOSDevice`,
   output: T.ClaimIOSDevice.Output,
@@ -63,13 +64,16 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `GetAllDevices`, output: T.GetAllDevices.Output): void;
 export function interceptPql(
+  slug: `GetAmClaimData`,
+  output: T.GetAmClaimData.Output,
+): void;
+export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
   output: T.GetBatchUnlockRequestData.Output,
 ): void;
 export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
-export function interceptPql(slug: `GetIOSDevice`, output: T.GetIOSDevice.Output): void;
 export function interceptPql(
   slug: `GetIOSDeviceClaimData`,
   output: T.GetIOSDeviceClaimData.Output,
@@ -77,6 +81,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetIOSDeviceSupervisionStatus`,
   output: T.GetIOSDeviceSupervisionStatus.Output,
+): void;
+export function interceptPql(
+  slug: `GetIOSDevice_v2`,
+  output: T.GetIOSDevice_v2.Output,
 ): void;
 export function interceptPql(
   slug: `GetIdentifiedApps`,
@@ -131,6 +139,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `PrepIOSAppConnection`,
   output: T.PrepIOSAppConnection.Output,
+): void;
+export function interceptPql(
+  slug: `RequestAmPinReset`,
+  output: T.RequestAmPinReset.Output,
 ): void;
 export function interceptPql(
   slug: `RequestMagicLink`,
@@ -201,6 +213,7 @@ export function forcePqlErr(
   slug:
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
+    | `ClaimAmDevice`
     | `ClaimIOSDevice`
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
@@ -215,13 +228,14 @@ export function forcePqlErr(
     | `GetAdminKeychain`
     | `GetAdminKeychains`
     | `GetAllDevices`
+    | `GetAmClaimData`
     | `GetBatchUnlockRequestData`
     | `GetChild`
     | `GetChildren`
     | `GetDevice`
-    | `GetIOSDevice`
     | `GetIOSDeviceClaimData`
     | `GetIOSDeviceSupervisionStatus`
+    | `GetIOSDevice_v2`
     | `GetIdentifiedApps`
     | `GetSelectableKeychains`
     | `GetSubscriptionPanel_v2`
@@ -237,6 +251,7 @@ export function forcePqlErr(
     | `MacAppConnectionCode`
     | `OpenBillingPortal`
     | `PrepIOSAppConnection`
+    | `RequestAmPinReset`
     | `RequestMagicLink`
     | `RequestPublicKeychain`
     | `ResetPassword`

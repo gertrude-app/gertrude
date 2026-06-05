@@ -14,6 +14,7 @@ struct Signup: Pair {
     var abTestVariant: String?
     var turnstileToken: String?
     var claimCode: String?
+    var app: GertrudeIOSApp?
   }
 
   struct Output: PairOutput {
@@ -39,12 +40,12 @@ extension Signup: Resolver {
       try await verifyTurnstileToken(input.turnstileToken, cloudflare)
     }
 
-    let existing = try? await Parent.query()
+    let existingParent = try? await Parent.query()
       .where(.email == email)
       .first(in: context.db)
 
-    if let existing {
-      if existing.emailVerified, let creds = try? await Login.resolve(
+    if let existingParent {
+      if existingParent.emailVerified, let creds = try? await Login.resolve(
         with: .init(email: input.email, password: input.password),
         in: context,
       ) {
@@ -55,8 +56,8 @@ extension Signup: Resolver {
         postmark.toSuperAdmin("signup [exists]", email)
       }
 
-      if !existing.emailVerified {
-        try await sendVerificationEmail(to: existing, in: context, claimCode: input.claimCode)
+      if !existingParent.emailVerified {
+        try await sendVerificationEmail(to: existingParent, from: input, in: context)
       } else {
         try await postmark.send(template: .reSignup(
           to: email,
@@ -83,7 +84,7 @@ extension Signup: Resolver {
       """)
     }
 
-    try await sendVerificationEmail(to: parent, in: context, claimCode: input.claimCode)
+    try await sendVerificationEmail(to: parent, from: input, in: context)
     return .init(admin: nil)
   }
 }
@@ -92,20 +93,26 @@ extension Signup: Resolver {
 
 func sendVerificationEmail(
   to admin: Parent,
+  from input: Signup.Input? = nil,
   in context: Context,
-  claimCode: String? = nil,
 ) async throws {
   let token = await with(dependency: \.ephemeral)
     .createParentIdToken(
       admin.id,
       expiration: get(dependency: \.date.now) + .hours(24),
-      claimCode: claimCode,
+      claimCode: input?.claimCode,
     )
+
+  var redirect: String?
+  if let app = input?.app, let claimCode = input?.claimCode, let code = Int(claimCode) {
+    redirect = app.claimFunnelRedirectPath(code: code)
+      .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
+  }
 
   try await with(dependency: \.postmark)
     .send(template: .initialSignup(
       to: admin.email.rawValue,
-      model: .init(dashboardUrl: context.dashboardUrl, token: token),
+      model: .init(dashboardUrl: context.dashboardUrl, token: token, redirect: redirect),
     ))
 }
 

@@ -1,6 +1,7 @@
 import Gertie
 import GertieIOS
 import PairQL
+import PodcastRoute
 import Tagged
 import TypeScriptInterop
 import Vapor
@@ -54,7 +55,9 @@ enum DashboardTsCodegenRoute {
       ("BillingStatus", BillingStatus.self),
       ("SubscriptionTier", StripeSubscription.Tier.self),
       ("SubscriptionPanelAction", GetSubscriptionPanel_v2.Action.self),
+      ("AmSubscriptionState", AmSubscriptionState.self),
       ("IOSDeviceChildAssignment", ClaimIOSDevice.ChildAssignment.self),
+      ("ClaimChildOption", GetIOSDeviceClaimData.ChildOption.self),
     ]
   }
 
@@ -108,10 +111,13 @@ enum DashboardTsCodegenRoute {
       StartFullTrial.self,
       RequestPublicKeychain.self,
       FlagActivityItems.self,
-      GetIOSDevice.self,
+      GetIOSDevice_v2.self,
       UpsertBlockRule.self,
       UpdateIOSDevice.self,
       GetIOSDeviceClaimData.self,
+      GetAmClaimData.self,
+      ClaimAmDevice.self,
+      RequestAmPinReset.self,
       ClaimIOSDevice.self,
       GetIOSDeviceSupervisionStatus.self,
       MacAppConnectionCode.self,
@@ -128,6 +134,7 @@ enum DashboardTsCodegenRoute {
       .init(Infallible.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
       .init(StripeSubscription.StripeId.self, as: "string"),
+      .init(URL.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

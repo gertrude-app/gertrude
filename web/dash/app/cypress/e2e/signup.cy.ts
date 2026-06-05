@@ -77,6 +77,76 @@ describe(`signup`, () => {
   });
 });
 
+describe(`app-aware claim glue`, () => {
+  it(`shows the Gertrude AM app card + "Signup to connect:" for an AM claim`, () => {
+    cy.visit(
+      `/signup?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
+    );
+    cy.contains(`Signup to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`For app:`);
+    cy.contains(`Gertrude AM`);
+  });
+
+  it(`still shows the Gertrude Blocker app card for a supervision claim`, () => {
+    cy.visit(
+      `/signup?claimPendingSupervision=123456&modelName=iPhone+15+Pro&iosVersion=18.2`,
+    );
+    cy.contains(`Signup to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`Gertrude Blocker`);
+  });
+});
+
+describe(`verify-signup-email post-verify routing`, () => {
+  it(`routes to the AM funnel when a redirect param is present`, () => {
+    cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
+    cy.interceptPql(`GetAmClaimData`, {
+      children: [],
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `18.2`,
+    });
+
+    cy.visit(
+      `/verify-signup-email/verify-token-123?redirect=${encodeURIComponent(
+        `/claim-am-device/778899/claim`,
+      )}`,
+    );
+
+    cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
+  });
+
+  it(`falls back to the supervision funnel for a legacy claimCode-only verify`, () => {
+    cy.interceptPql(`VerifySignupEmail`, {
+      adminId: `admin-123`,
+      token: `token-123`,
+      claimCode: `123456`,
+    });
+    cy.interceptPql(`GetIOSDeviceClaimData`, {
+      children: [],
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `18.2`,
+    });
+
+    cy.visit(`/verify-signup-email/verify-token-123`);
+
+    cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/supervise-device/123456/claim`);
+  });
+
+  it(`routes to /use-case when there is neither a redirect nor a claimCode`, () => {
+    cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
+
+    cy.visit(`/verify-signup-email/verify-token-123`);
+
+    cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/use-case`);
+  });
+});
+
 describe(`payment`, () => {
   it(`return from stripe success`, () => {
     cy.simulateLoggedIn();

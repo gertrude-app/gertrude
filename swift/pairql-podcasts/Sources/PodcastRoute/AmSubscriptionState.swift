@@ -1,6 +1,8 @@
 import Foundation
 import PairQL
+import TSCodable
 
+@TSCodable
 public enum AmSubscriptionState: PairNestable {
   case complimentary
   case active(expiresAt: Date)

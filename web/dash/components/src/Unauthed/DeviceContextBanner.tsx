@@ -1,47 +1,79 @@
 import { iosDeviceType } from '@dash/utils';
 import React from 'react';
+import type { GertrudeIOSApp } from '../gertrudeApps';
 import type { IOSDeviceType } from '@dash/utils';
+import { APP_META } from '../gertrudeApps';
 
 type Props = {
   modelName: string;
   iosVersion?: string;
   label?: string;
   deviceType?: IOSDeviceType;
+  app?: GertrudeIOSApp;
 };
 
 const DeviceContextBanner: React.FC<Props> = ({
   modelName,
   iosVersion,
-  label = `Signup to supervise:`,
+  label = `Signup to connect:`,
   deviceType: deviceTypeProp,
+  app,
 }) => {
   const deviceType = deviceTypeProp ?? iosDeviceType(modelName);
+  const appMeta = app ? APP_META[app] : null;
   return (
-    <div className="my-1 relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 p-[1px] shadow-lg shadow-violet-500/20">
-      <div className="relative rounded-[15px] bg-white px-4 py-3">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 blur-sm opacity-40" />
-            <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md">
-              {deviceType === `iPad` ? (
-                <IPadIcon className="w-6 h-6 text-white" />
-              ) : (
-                <IPhoneIcon className="w-6 h-6 text-white" />
-              )}
+    <div className="my-1 @container">
+      <div className="flex flex-col gap-4 @xl:flex-row @xl:gap-3">
+        <div className="flex-1 relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 p-[1px] shadow-lg shadow-violet-500/20">
+          <div className="relative rounded-[15px] bg-white px-4 py-3 h-full">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 blur-sm opacity-40" />
+                <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-md">
+                  {deviceType === `iPad` ? (
+                    <IPadIcon className="w-6 h-6 text-white" />
+                  ) : (
+                    <IPhoneIcon className="w-6 h-6 text-white" />
+                  )}
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-violet-500">
+                  {label}
+                </p>
+                <p className="text-slate-800 font-semibold truncate">
+                  {modelName}
+                  {iosVersion && (
+                    <span className="text-slate-400 font-normal">
+                      {` `}· iOS {iosVersion}
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-violet-500">
-              {label}
-            </p>
-            <p className="text-slate-800 font-semibold truncate">
-              {modelName}
-              {iosVersion && (
-                <span className="text-slate-400 font-normal"> · iOS {iosVersion}</span>
-              )}
-            </p>
-          </div>
         </div>
+        {appMeta && (
+          <div className="flex-1 relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 p-[1px] shadow-lg shadow-violet-500/20">
+            <div className="relative rounded-[15px] bg-white px-4 py-3 h-full">
+              <div className="flex items-center gap-4">
+                <div className="relative w-11 h-11 rounded-xl overflow-hidden shadow-md flex-shrink-0">
+                  <img
+                    src={appMeta.iconSrc}
+                    alt={`${appMeta.name} app icon`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-violet-500">
+                    For app:
+                  </p>
+                  <p className="text-slate-800 font-semibold truncate">{appMeta.name}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
