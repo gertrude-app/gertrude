@@ -1143,6 +1143,7 @@ extension MarketingEmailSend: Model {
     case .id: .id(self)
     case .parentId: .uuid(self.parentId)
     case .campaign: .string(self.campaign)
+    case .variant: .string(self.variant)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1152,6 +1153,7 @@ extension MarketingEmailSend: Model {
       .id: .id(self),
       .parentId: .uuid(self.parentId),
       .campaign: .string(self.campaign),
+      .variant: .string(self.variant),
       .createdAt: .currentTimestamp,
     ]
   }
