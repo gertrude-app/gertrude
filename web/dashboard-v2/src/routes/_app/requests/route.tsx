@@ -2,7 +2,8 @@ import { PageHeading, SegmentedTabs } from '@gertrude/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import DashboardPage from '#/components/DashboardPage';
-import { mockSuspensionRequests, mockUnlockRequests } from '#/lib/mock-data';
+import { mockSuspensionRequests } from '#/lib/mock-data/suspension-requests';
+import { mockUnlockRequests } from '#/lib/mock-data/unlock-requests';
 
 const RequestsPage: React.FC = () => (
   <DashboardPage heading={<PageHeading title="Requests" />}>

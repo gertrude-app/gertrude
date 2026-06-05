@@ -16,7 +16,7 @@ import {
   ShieldIcon,
 } from 'lucide-react';
 import React, { useState } from 'react';
-import { type Key, defaultKeyFromDomain } from '#/lib/mock-data';
+import { type Key, defaultKeyFromDomain } from '#/lib/mock-data/keys';
 
 interface Props {
   domains: string[];

@@ -27,6 +27,10 @@ import { Route as AppSettingsBillingRouteImport } from './routes/_app/settings/b
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as AppRequestsUnlockRequestIdRouteImport } from './routes/_app/requests/unlock/$requestId'
+import { Route as AppActivityDayDayRouteImport } from './routes/_app/activity_/day/$day'
+import { Route as AppActivityPersonPersonIdRouteRouteImport } from './routes/_app/activity_/person/$personId/route'
+import { Route as AppActivityPersonPersonIdIndexRouteImport } from './routes/_app/activity_/person/$personId/index'
+import { Route as AppActivityPersonPersonIdDayDayRouteImport } from './routes/_app/activity_/person/$personId/day/$day'
 
 const AppRouteRoute = AppRouteRouteImport.update({
   id: '/_app',
@@ -119,6 +123,29 @@ const AppRequestsUnlockRequestIdRoute =
     path: '/$requestId',
     getParentRoute: () => AppRequestsUnlockRoute,
   } as any)
+const AppActivityDayDayRoute = AppActivityDayDayRouteImport.update({
+  id: '/activity_/day/$day',
+  path: '/activity/day/$day',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppActivityPersonPersonIdRouteRoute =
+  AppActivityPersonPersonIdRouteRouteImport.update({
+    id: '/activity_/person/$personId',
+    path: '/activity/person/$personId',
+    getParentRoute: () => AppRouteRoute,
+  } as any)
+const AppActivityPersonPersonIdIndexRoute =
+  AppActivityPersonPersonIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AppActivityPersonPersonIdRouteRoute,
+  } as any)
+const AppActivityPersonPersonIdDayDayRoute =
+  AppActivityPersonPersonIdDayDayRouteImport.update({
+    id: '/day/$day',
+    path: '/day/$day',
+    getParentRoute: () => AppActivityPersonPersonIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -137,7 +164,11 @@ export interface FileRoutesByFullPath {
   '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/people/': typeof AppPeopleIndexRoute
   '/requests/': typeof AppRequestsIndexRoute
+  '/activity/person/$personId': typeof AppActivityPersonPersonIdRouteRouteWithChildren
+  '/activity/day/$day': typeof AppActivityDayDayRoute
   '/requests/unlock/$requestId': typeof AppRequestsUnlockRequestIdRoute
+  '/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
+  '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRouteRouteWithChildren
@@ -154,7 +185,10 @@ export interface FileRoutesByTo {
   '/settings/notifications': typeof AppSettingsNotificationsRoute
   '/people': typeof AppPeopleIndexRoute
   '/requests': typeof AppRequestsIndexRoute
+  '/activity/day/$day': typeof AppActivityDayDayRoute
   '/requests/unlock/$requestId': typeof AppRequestsUnlockRequestIdRoute
+  '/activity/person/$personId': typeof AppActivityPersonPersonIdIndexRoute
+  '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -175,7 +209,11 @@ export interface FileRoutesById {
   '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
   '/_app/people/': typeof AppPeopleIndexRoute
   '/_app/requests/': typeof AppRequestsIndexRoute
+  '/_app/activity_/person/$personId': typeof AppActivityPersonPersonIdRouteRouteWithChildren
+  '/_app/activity_/day/$day': typeof AppActivityDayDayRoute
   '/_app/requests/unlock/$requestId': typeof AppRequestsUnlockRequestIdRoute
+  '/_app/activity_/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
+  '/_app/activity_/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -196,7 +234,11 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/people/'
     | '/requests/'
+    | '/activity/person/$personId'
+    | '/activity/day/$day'
     | '/requests/unlock/$requestId'
+    | '/activity/person/$personId/'
+    | '/activity/person/$personId/day/$day'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/settings'
@@ -213,7 +255,10 @@ export interface FileRouteTypes {
     | '/settings/notifications'
     | '/people'
     | '/requests'
+    | '/activity/day/$day'
     | '/requests/unlock/$requestId'
+    | '/activity/person/$personId'
+    | '/activity/person/$personId/day/$day'
   id:
     | '__root__'
     | '/_app'
@@ -233,7 +278,11 @@ export interface FileRouteTypes {
     | '/_app/settings/notifications'
     | '/_app/people/'
     | '/_app/requests/'
+    | '/_app/activity_/person/$personId'
+    | '/_app/activity_/day/$day'
     | '/_app/requests/unlock/$requestId'
+    | '/_app/activity_/person/$personId/'
+    | '/_app/activity_/person/$personId/day/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -370,6 +419,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRequestsUnlockRequestIdRouteImport
       parentRoute: typeof AppRequestsUnlockRoute
     }
+    '/_app/activity_/day/$day': {
+      id: '/_app/activity_/day/$day'
+      path: '/activity/day/$day'
+      fullPath: '/activity/day/$day'
+      preLoaderRoute: typeof AppActivityDayDayRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/activity_/person/$personId': {
+      id: '/_app/activity_/person/$personId'
+      path: '/activity/person/$personId'
+      fullPath: '/activity/person/$personId'
+      preLoaderRoute: typeof AppActivityPersonPersonIdRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/activity_/person/$personId/': {
+      id: '/_app/activity_/person/$personId/'
+      path: '/'
+      fullPath: '/activity/person/$personId/'
+      preLoaderRoute: typeof AppActivityPersonPersonIdIndexRouteImport
+      parentRoute: typeof AppActivityPersonPersonIdRouteRoute
+    }
+    '/_app/activity_/person/$personId/day/$day': {
+      id: '/_app/activity_/person/$personId/day/$day'
+      path: '/day/$day'
+      fullPath: '/activity/person/$personId/day/$day'
+      preLoaderRoute: typeof AppActivityPersonPersonIdDayDayRouteImport
+      parentRoute: typeof AppActivityPersonPersonIdRouteRoute
+    }
   }
 }
 
@@ -424,6 +501,22 @@ const AppSettingsRouteRouteChildren: AppSettingsRouteRouteChildren = {
 const AppSettingsRouteRouteWithChildren =
   AppSettingsRouteRoute._addFileChildren(AppSettingsRouteRouteChildren)
 
+interface AppActivityPersonPersonIdRouteRouteChildren {
+  AppActivityPersonPersonIdIndexRoute: typeof AppActivityPersonPersonIdIndexRoute
+  AppActivityPersonPersonIdDayDayRoute: typeof AppActivityPersonPersonIdDayDayRoute
+}
+
+const AppActivityPersonPersonIdRouteRouteChildren: AppActivityPersonPersonIdRouteRouteChildren =
+  {
+    AppActivityPersonPersonIdIndexRoute: AppActivityPersonPersonIdIndexRoute,
+    AppActivityPersonPersonIdDayDayRoute: AppActivityPersonPersonIdDayDayRoute,
+  }
+
+const AppActivityPersonPersonIdRouteRouteWithChildren =
+  AppActivityPersonPersonIdRouteRoute._addFileChildren(
+    AppActivityPersonPersonIdRouteRouteChildren,
+  )
+
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppRequestsRouteRoute: typeof AppRequestsRouteRouteWithChildren
@@ -433,6 +526,8 @@ interface AppRouteRouteChildren {
   AppDevicesRoute: typeof AppDevicesRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppActivityPersonPersonIdRouteRoute: typeof AppActivityPersonPersonIdRouteRouteWithChildren
+  AppActivityDayDayRoute: typeof AppActivityDayDayRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -444,6 +539,9 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDevicesRoute: AppDevicesRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
+  AppActivityPersonPersonIdRouteRoute:
+    AppActivityPersonPersonIdRouteRouteWithChildren,
+  AppActivityDayDayRoute: AppActivityDayDayRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(

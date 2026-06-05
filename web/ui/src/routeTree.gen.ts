@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
 import { Route as ComponentsToggleRouteImport } from './routes/components/toggle'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsSlideOverRouteImport } from './routes/components/slide-over'
@@ -30,6 +31,11 @@ import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsTooltipRoute = ComponentsTooltipRouteImport.update({
+  id: '/components/tooltip',
+  path: '/components/tooltip',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsToggleRoute = ComponentsToggleRouteImport.update({
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
+  '/components/tooltip': typeof ComponentsTooltipRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
+  '/components/tooltip': typeof ComponentsTooltipRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
   '/components/toggle': typeof ComponentsToggleRoute
+  '/components/tooltip': typeof ComponentsTooltipRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/components/slide-over'
     | '/components/textarea'
     | '/components/toggle'
+    | '/components/tooltip'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/components/slide-over'
     | '/components/textarea'
     | '/components/toggle'
+    | '/components/tooltip'
   id:
     | '__root__'
     | '/'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/components/slide-over'
     | '/components/textarea'
     | '/components/toggle'
+    | '/components/tooltip'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   ComponentsSlideOverRoute: typeof ComponentsSlideOverRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
   ComponentsToggleRoute: typeof ComponentsToggleRoute
+  ComponentsTooltipRoute: typeof ComponentsTooltipRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -260,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/tooltip': {
+      id: '/components/tooltip'
+      path: '/components/tooltip'
+      fullPath: '/components/tooltip'
+      preLoaderRoute: typeof ComponentsTooltipRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/toggle': {
@@ -395,6 +415,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSlideOverRoute: ComponentsSlideOverRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
   ComponentsToggleRoute: ComponentsToggleRoute,
+  ComponentsTooltipRoute: ComponentsTooltipRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

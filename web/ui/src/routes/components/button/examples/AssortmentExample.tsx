@@ -1,6 +1,7 @@
 import {
   ArrowRightIcon,
   ExternalLinkIcon,
+  FlagIcon,
   MailIcon,
   SearchIcon,
   Trash2Icon,
@@ -37,6 +38,15 @@ const AssortmentExample: React.FC = () => (
         ariaLabel="Search"
         onClick={() => undefined}
       />
+      <Button
+        type="button"
+        variant="selected"
+        icon={FlagIcon}
+        fillIcon
+        onClick={() => undefined}
+      >
+        Flagged
+      </Button>
       <Button
         type="button"
         variant="destructive"
