@@ -12,6 +12,9 @@ enum LocalizedStringKey: String {
   case addShowShowArtworkQuestion = "addShow.showArtworkQuestion"
   case addShowSubscribe = "addShow.subscribe"
   case addShowSubscribing = "addShow.subscribing"
+  case claimDeviceName = "claim.deviceName"
+  case claimDismissSkip = "claim.dismiss.skip"
+  case claimNotNow = "claim.notNow"
   case episodeDownloadFailed = "episode.downloadFailed"
   case episodeDownloadNoInternet = "episode.downloadNoInternet"
   case onboardingAllSet = "onboarding.allSet"
@@ -35,6 +38,9 @@ enum LocalizedStringKey: String {
   case podcastsRequestReviewMessage = "podcasts.requestReview.message"
   case podcastsRequestReviewNoThanks = "podcasts.requestReview.noThanks"
   case showsDelete = "shows.delete"
+  case trialAlertMessage = "trial.alert.message"
+  case trialAlertSubscribe = "trial.alert.subscribe"
+  case trialAlertTitle = "trial.alert.title"
 }
 
 func lstr(_ key: LocalizedStringKey) -> String {

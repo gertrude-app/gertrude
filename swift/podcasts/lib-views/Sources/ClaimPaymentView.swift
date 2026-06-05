@@ -16,6 +16,7 @@ public struct ClaimPaymentView: View {
   let shareUrl: String
   let need: Need
   let dismissLabel: String
+  let deviceType: String
   let statusDelay: Duration
   let onEvent: @MainActor @Sendable (Event) -> Void
 
@@ -23,12 +24,14 @@ public struct ClaimPaymentView: View {
     shareUrl: String,
     need: Need,
     dismissLabel: String,
+    deviceType: String,
     statusDelay: Duration = .seconds(45),
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.shareUrl = shareUrl
     self.need = need
     self.dismissLabel = dismissLabel
+    self.deviceType = deviceType
     self.statusDelay = statusDelay
     self.onEvent = onEvent
   }
@@ -43,7 +46,7 @@ public struct ClaimPaymentView: View {
       Spacer()
       Spacer()
 
-      WaitingStatus(label: "Waiting for your subscription…", delay: self.statusDelay)
+      WaitingStatus(label: lstr(.claimPaymentWatching), delay: self.statusDelay)
 
       Spacer()
 
@@ -66,7 +69,7 @@ public struct ClaimPaymentView: View {
       )
 
       BigButton(
-        "Send link",
+        lstr(.claimSendLink),
         type: .share(self.shareUrl),
         variant: .primary,
         icon: "square.and.arrow.up",
@@ -81,11 +84,11 @@ public struct ClaimPaymentView: View {
   private var bodyText: String {
     switch self.need {
     case .subscribe:
-      "Gertrude AM needs a Gertrude plan: light ($10/yr) or higher. Your account is connected but doesn't have one yet. Open this link on a parent's own device to subscribe:"
+      String(format: lstr(.claimPaymentSubscribe), self.deviceType)
     case .renew:
-      "Gertrude AM needs an active Gertrude plan: light ($10/yr) or higher. Open this link on a parent's own device to renew:"
+      String(format: lstr(.claimPaymentRenew), self.deviceType)
     case .updatePayment:
-      "Gertrude AM needs a payment update to keep your plan active. Open this link on a parent's own device to update payment:"
+      String(format: lstr(.claimPaymentUpdatePayment), self.deviceType)
     }
   }
 }
@@ -95,6 +98,7 @@ public struct ClaimPaymentView: View {
     shareUrl: "https://gertrude.app/r/9f21ab",
     need: .subscribe,
     dismissLabel: "Not now",
+    deviceType: "iPhone",
     statusDelay: .seconds(2),
   )
 }
@@ -104,6 +108,7 @@ public struct ClaimPaymentView: View {
     shareUrl: "https://gertrude.app/r/9f21ab",
     need: .renew,
     dismissLabel: "Not now",
+    deviceType: "iPhone",
     statusDelay: .seconds(2),
   )
 }
@@ -113,6 +118,7 @@ public struct ClaimPaymentView: View {
     shareUrl: "https://gertrude.app/r/9f21ab",
     need: .updatePayment,
     dismissLabel: "Not now",
+    deviceType: "iPhone",
     statusDelay: .seconds(2),
   )
 }
@@ -122,6 +128,7 @@ public struct ClaimPaymentView: View {
     shareUrl: "https://parents.gertrude.app/settings",
     need: .subscribe,
     dismissLabel: "Not now",
+    deviceType: "iPad",
     statusDelay: .seconds(2),
   )
   .preferredColorScheme(.dark)

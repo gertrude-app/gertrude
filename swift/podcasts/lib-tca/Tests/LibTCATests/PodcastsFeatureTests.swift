@@ -23,25 +23,11 @@ import Testing
       let store = TestStore(initialState: .init(), reducer: PodcastsFeature.init)
       store.exhaustivity = .off
 
-      await store.send(.onAppear) {
-        $0.destination = .confirm(
-          .init(titleVisibility: .visible) {
-            TextState("Your free trial is ending soon!")
-          } actions: {
-            ButtonState(action: .confirmTrialEnding) {
-              TextState("Subscribe now")
-            }
-            ButtonState(role: .cancel) {
-              TextState("Dismiss")
-            }
-          } message: {
-            TextState("Subscribe to continue using the app.")
-          },
-        )
-      }
+      await store.send(.onAppear)
 
       record = dep(\.db).record(id: .trialEndingAlertShown)
       #expect(record != nil)
+      #expect(store.state.destination?.confirm != nil)
 
       await store.send(.destination(.presented(.confirm(.confirmTrialEnding)))) {
         $0.destination = .settings(.init())

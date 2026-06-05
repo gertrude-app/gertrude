@@ -181,16 +181,16 @@ struct PodcastsFeature {
        self.database.record(id: .trialEndingAlertShown) == nil {
       state.destination = .confirm(
         .init(titleVisibility: .visible) {
-          TextState("Your free trial is ending soon!")
+          TextState(lstr(.trialAlertTitle))
         } actions: {
           ButtonState(action: .confirmTrialEnding) {
-            TextState("Subscribe now")
+            TextState(lstr(.trialAlertSubscribe))
           }
           ButtonState(role: .cancel) {
-            TextState("Dismiss")
+            TextState(lstr(.claimNotNow))
           }
         } message: {
-          TextState("Subscribe to continue using the app.")
+          TextState(lstr(.trialAlertMessage))
         },
       )
       self.database.insertRecord(id: .trialEndingAlertShown)

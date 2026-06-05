@@ -30,12 +30,12 @@ public struct ClaimSuccessView: View {
         .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
 
       VStack(spacing: 8) {
-        Text(self.isTerminal ? "You're all set" : "Account connected")
+        Text(self.isTerminal ? lstr(.claimSuccessTerminalTitle) : lstr(.claimSuccessNeutralTitle))
           .font(.system(size: 24, weight: .bold))
           .multilineTextAlignment(.center)
 
         if self.isTerminal {
-          Text("Subscription active")
+          Text(lstr(.claimSuccessTerminalSubtitle))
             .font(.system(size: 16, weight: .regular))
             .foregroundStyle(Color(
               self.cs,
@@ -53,7 +53,7 @@ public struct ClaimSuccessView: View {
       Spacer()
 
       BigButton(
-        self.isTerminal ? "Done" : "Next",
+        self.isTerminal ? lstr(.claimDone) : lstr(.claimNext),
         type: .button { self.onEvent(.continueTapped) },
         variant: .primary,
       )
@@ -74,10 +74,10 @@ public struct ClaimSuccessView: View {
 }
 
 #Preview("Neutral") {
-  ClaimSuccessView(isTerminal: false, deviceName: "Bobby's iPhone")
+  ClaimSuccessView(isTerminal: false, deviceName: "Bobby’s iPhone")
 }
 
 #Preview("Neutral (Dark)") {
-  ClaimSuccessView(isTerminal: false, deviceName: "Bobby's iPhone")
+  ClaimSuccessView(isTerminal: false, deviceName: "Bobby’s iPhone")
     .preferredColorScheme(.dark)
 }

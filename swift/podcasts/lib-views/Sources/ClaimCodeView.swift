@@ -11,6 +11,7 @@ public struct ClaimCodeView: View {
   let code: Int?
   let failed: Bool
   let dismissLabel: String
+  let deviceType: String
   let statusDelay: Duration
   let onEvent: @MainActor @Sendable (Event) -> Void
 
@@ -18,12 +19,14 @@ public struct ClaimCodeView: View {
     code: Int?,
     failed: Bool = false,
     dismissLabel: String,
+    deviceType: String,
     statusDelay: Duration = .seconds(45),
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.code = code
     self.failed = failed
     self.dismissLabel = dismissLabel
+    self.deviceType = deviceType
     self.statusDelay = statusDelay
     self.onEvent = onEvent
   }
@@ -44,7 +47,7 @@ public struct ClaimCodeView: View {
         Spacer()
         Spacer()
 
-        WaitingStatus(label: "Waiting for connection…", delay: self.statusDelay)
+        WaitingStatus(label: lstr(.claimCodeWatching), delay: self.statusDelay)
 
         Spacer()
 
@@ -64,7 +67,7 @@ public struct ClaimCodeView: View {
 
       if !self.failed, let code = self.code {
         BigButton(
-          "Send link",
+          lstr(.claimSendLink),
           type: .share(self.claimUrl(code)),
           variant: .primary,
           icon: "square.and.arrow.up",
@@ -73,7 +76,7 @@ public struct ClaimCodeView: View {
 
       if self.failed {
         BigButton(
-          "Try again",
+          lstr(.claimTryAgain),
           type: .button { self.onEvent(.retryTapped) },
           variant: .primary,
         )
@@ -87,7 +90,7 @@ public struct ClaimCodeView: View {
 
   @ViewBuilder private func codeContent(_ code: Int) -> some View {
     Text(
-      "Open this link on a parent's own device (phone or computer) to connect your Gertrude account:",
+      String(format: lstr(.claimCodeInstructions), self.deviceType),
     )
     .font(.system(size: 17, weight: .medium))
     .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
@@ -107,19 +110,19 @@ public struct ClaimCodeView: View {
       .tint(Color(self.cs, light: .violet500, dark: .violet400))
       .frame(maxWidth: .infinity, alignment: .center)
 
-    Text("Creating a connection code…")
+    Text(lstr(.claimCodeGenerating))
       .font(.system(size: 16, weight: .medium))
       .foregroundStyle(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
       .frame(maxWidth: .infinity, alignment: .center)
   }
 
   @ViewBuilder private var errorContent: some View {
-    Text("Couldn't create a connection code")
+    Text(lstr(.claimCodeErrorTitle))
       .font(.system(size: 20, weight: .bold))
       .frame(maxWidth: .infinity, alignment: .center)
       .multilineTextAlignment(.center)
 
-    Text("Check your internet connection and try again.")
+    Text(lstr(.claimCodeErrorBody))
       .font(.system(size: 16, weight: .medium))
       .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
       .frame(maxWidth: .infinity, alignment: .center)
@@ -136,18 +139,28 @@ public struct ClaimCodeView: View {
 }
 
 #Preview("Polling") {
-  ClaimCodeView(code: 123_456, dismissLabel: "Cancel", statusDelay: .seconds(2))
+  ClaimCodeView(
+    code: 123_456,
+    dismissLabel: "Cancel",
+    deviceType: "iPhone",
+    statusDelay: .seconds(2),
+  )
 }
 
 #Preview("Polling (Dark)") {
-  ClaimCodeView(code: 123_456, dismissLabel: "Skip for now", statusDelay: .seconds(2))
-    .preferredColorScheme(.dark)
+  ClaimCodeView(
+    code: 123_456,
+    dismissLabel: "Skip for now",
+    deviceType: "iPad",
+    statusDelay: .seconds(2),
+  )
+  .preferredColorScheme(.dark)
 }
 
 #Preview("Loading") {
-  ClaimCodeView(code: nil, dismissLabel: "Cancel")
+  ClaimCodeView(code: nil, dismissLabel: "Cancel", deviceType: "iPhone")
 }
 
 #Preview("Error") {
-  ClaimCodeView(code: nil, failed: true, dismissLabel: "Cancel")
+  ClaimCodeView(code: nil, failed: true, dismissLabel: "Cancel", deviceType: "iPhone")
 }

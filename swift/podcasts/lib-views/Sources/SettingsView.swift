@@ -115,11 +115,41 @@ public struct SettingsView: View {
         .buttonStyle(.plain)
       }
 
+      if let gb = self.reclaimableStorageGb {
+        VStack(spacing: 12) {
+          HStack(spacing: 6) {
+            Image(systemName: "internaldrive")
+              .font(.subheadline)
+            Text(lstr(.settingsStorageHeader))
+              .font(.subheadline)
+              .fontWeight(.medium)
+          }
+          .foregroundColor(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
+          .frame(maxWidth: .infinity, alignment: .leading)
+
+          Button {
+            self.onEvent(.reclaimStorageTapped)
+          } label: {
+            HStack {
+              Image(systemName: "trash")
+                .font(.subheadline)
+              Text(String(format: lstr(.settingsStorageReclaim), gb))
+                .font(.headline)
+              Spacer()
+            }
+            .padding(16)
+            .background(Color(self.cs, light: .violet100, dark: .violet900))
+            .cornerRadius(12)
+          }
+          .buttonStyle(.plain)
+        }
+      }
+
       VStack(spacing: 12) {
         HStack(spacing: 6) {
-          Image(systemName: "creditcard")
+          Image(systemName: "person.crop.circle")
             .font(.subheadline)
-          Text(lstr(.settingsSubscriptionHeader))
+          Text(lstr(.accountHeader))
             .font(.subheadline)
             .fontWeight(.medium)
         }
@@ -127,35 +157,25 @@ public struct SettingsView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
 
         VStack(spacing: 12) {
+          HStack {
+            Text(lstr(.accountStatus))
+              .font(.headline)
+            Spacer()
+            Text(self.isClaimed ? lstr(.accountConnected) : lstr(.accountNotConnected))
+              .font(.subheadline)
+              .fontWeight(.semibold)
+              .foregroundColor(self.connectionColor)
+          }
+
           HStack(alignment: .top) {
-            Text(lstr(
-              self.status == .complimentary
-                ? .settingsSubscriptionLabel
-                : .settingsSubscriptionStatus,
-            ))
-            .font(.headline)
+            Text(lstr(.accountSubscription))
+              .font(.headline)
             Spacer()
             VStack(alignment: .trailing, spacing: 4) {
-              HStack(spacing: 6) {
-                if self.status.isTrialing {
-                  Image(systemName: "clock")
-                    .font(.subheadline)
-                } else if self.status == .active {
-                  Image(systemName: "checkmark")
-                    .font(.subheadline)
-                } else if self.status.isUnpaid {
-                  Image(systemName: "exclamationmark.triangle")
-                    .font(.subheadline)
-                }
-                Text(self.status.displayName)
-                  .font(.subheadline)
-                  .fontWeight(.semibold)
-              }
-              .padding(.horizontal, 12)
-              .padding(.vertical, 6)
-              .background(self.status.badgeBgColor)
-              .foregroundColor(self.status.badgeTextColor)
-              .cornerRadius(8)
+              Text(self.subscriptionText)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(self.subscriptionColor)
 
               if self.status.hasPendingPurchase {
                 HStack(spacing: 4) {
@@ -206,11 +226,10 @@ public struct SettingsView: View {
         if self.status.isTrialing || self.status.isUnpaid {
           VStack(spacing: 16) {
             VStack(spacing: 8) {
-              // TODO: subtask 07 — route to the Gertrude account connect flow
               Button {
                 self.onEvent(.subscribeNowTapped)
               } label: {
-                Text(lstr(.settingsSubscriptionSubscribeNow))
+                Text(self.isClaimed ? lstr(.accountCtaSubscribe) : lstr(.accountCtaConnect))
                   .font(.headline)
                   .foregroundColor(.white)
                   .frame(maxWidth: .infinity)
@@ -219,23 +238,13 @@ public struct SettingsView: View {
                   .cornerRadius(10)
               }
 
-              Text(lstr(.settingsSubscriptionPrice))
+              Text(lstr(.accountPrice))
                 .font(.subheadline)
                 .foregroundColor(Color(
                   self.cs,
                   light: .black.opacity(0.6),
                   dark: .white.opacity(0.6),
                 ))
-            }
-
-            if self.status != .active, self.status != .complimentary {
-              HStack(spacing: 16) {
-                Link(
-                  lstr(.settingsSubscriptionPrivacy),
-                  destination: URL(string: "https://gertrude.app/docs/am-privacy")!,
-                )
-              }
-              .font(.caption)
             }
 
             if self.status.isUnpaid {
@@ -248,39 +257,39 @@ public struct SettingsView: View {
         }
       }
 
-      if let gb = self.reclaimableStorageGb {
-        VStack(spacing: 12) {
-          HStack(spacing: 6) {
-            Image(systemName: "internaldrive")
-              .font(.subheadline)
-            Text(lstr(.settingsStorageHeader))
-              .font(.subheadline)
-              .fontWeight(.medium)
-          }
-          .foregroundColor(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
-          .frame(maxWidth: .infinity, alignment: .leading)
-
-          Button {
-            self.onEvent(.reclaimStorageTapped)
-          } label: {
-            HStack {
-              Image(systemName: "trash")
-                .font(.subheadline)
-              Text(String(format: lstr(.settingsStorageReclaim), gb))
-                .font(.headline)
-              Spacer()
-            }
-            .padding(16)
-            .background(Color(self.cs, light: .violet100, dark: .violet900))
-            .cornerRadius(12)
-          }
-          .buttonStyle(.plain)
-        }
-      }
-
       Spacer()
+
+      Link(
+        lstr(.settingsSubscriptionPrivacy),
+        destination: URL(string: "https://gertrude.app/docs/am-privacy")!,
+      )
+      .font(.caption)
+      .frame(maxWidth: .infinity, alignment: .center)
     }
     .padding(20)
+  }
+
+  private var connectionColor: Color {
+    self.isClaimed
+      ? Color(red: 0.2, green: 0.6, blue: 0.3)
+      : Color(self.cs, light: .black.opacity(0.5), dark: .white.opacity(0.5))
+  }
+
+  private var subscriptionText: String {
+    switch self.status {
+    case .trialing: lstr(.accountValueFreeTrial)
+    case .active: lstr(.accountValueActive)
+    case .complimentary: lstr(.accountValueFreeForever)
+    case .unpaid: self.isClaimed ? lstr(.accountValueUnpaid) : lstr(.accountValueNone)
+    }
+  }
+
+  private var subscriptionColor: Color {
+    switch self.status {
+    case .active, .complimentary: Color(red: 0.2, green: 0.6, blue: 0.3)
+    case .trialing: Color(red: 0.2, green: 0.4, blue: 0.8)
+    case .unpaid: Color(red: 0.8, green: 0.2, blue: 0.2)
+    }
   }
 
   private var expirationLabel: String {
@@ -315,6 +324,7 @@ public struct SettingsView: View {
   SettingsView(
     status: .trialing(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(25)),
+    reclaimableStorageGb: 2.4,
   )
 }
 
@@ -322,6 +332,7 @@ public struct SettingsView: View {
   SettingsView(
     status: .trialing(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(25)),
+    reclaimableStorageGb: 2.4,
   )
   .preferredColorScheme(.dark)
 }
@@ -330,6 +341,8 @@ public struct SettingsView: View {
   SettingsView(
     status: .active,
     expiresAt: Date().addingTimeInterval(.days(180)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
   )
 }
 
@@ -337,6 +350,8 @@ public struct SettingsView: View {
   SettingsView(
     status: .active,
     expiresAt: Date().addingTimeInterval(.days(180)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
   )
   .preferredColorScheme(.dark)
 }
@@ -345,6 +360,8 @@ public struct SettingsView: View {
   SettingsView(
     status: .complimentary,
     expiresAt: Date().addingTimeInterval(.days(365)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
   )
 }
 
@@ -352,6 +369,8 @@ public struct SettingsView: View {
   SettingsView(
     status: .complimentary,
     expiresAt: Date().addingTimeInterval(.days(365)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
   )
   .preferredColorScheme(.dark)
 }
@@ -360,6 +379,7 @@ public struct SettingsView: View {
   SettingsView(
     status: .trialing(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(3)),
+    reclaimableStorageGb: 2.4,
   )
 }
 
@@ -367,21 +387,43 @@ public struct SettingsView: View {
   SettingsView(
     status: .trialing(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(3)),
+    reclaimableStorageGb: 2.4,
   )
   .preferredColorScheme(.dark)
 }
 
-#Preview("Unpaid") {
+#Preview("Unpaid — Unclaimed") {
   SettingsView(
     status: .unpaid(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(-5)),
+    reclaimableStorageGb: 2.4,
   )
 }
 
-#Preview("Unpaid (Dark)") {
+#Preview("Unpaid — Unclaimed (Dark)") {
   SettingsView(
     status: .unpaid(purchasePending: false),
     expiresAt: Date().addingTimeInterval(.days(-5)),
+    reclaimableStorageGb: 2.4,
+  )
+  .preferredColorScheme(.dark)
+}
+
+#Preview("Unpaid — Claimed") {
+  SettingsView(
+    status: .unpaid(purchasePending: false),
+    expiresAt: Date().addingTimeInterval(.days(-5)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
+  )
+}
+
+#Preview("Unpaid — Claimed (Dark)") {
+  SettingsView(
+    status: .unpaid(purchasePending: false),
+    expiresAt: Date().addingTimeInterval(.days(-5)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
   )
   .preferredColorScheme(.dark)
 }
@@ -398,21 +440,4 @@ public struct SettingsView: View {
     status: .unpaid(purchasePending: true),
     expiresAt: Date().addingTimeInterval(.days(-5)),
   )
-}
-
-#Preview("With Reclaimable Storage") {
-  SettingsView(
-    status: .active,
-    expiresAt: Date().addingTimeInterval(.days(180)),
-    reclaimableStorageGb: 3.3,
-  )
-}
-
-#Preview("With Reclaimable Storage (Dark)") {
-  SettingsView(
-    status: .active,
-    expiresAt: Date().addingTimeInterval(.days(180)),
-    reclaimableStorageGb: 3.3,
-  )
-  .preferredColorScheme(.dark)
 }

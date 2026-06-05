@@ -15,6 +15,7 @@ struct ClaimFlowView: View {
           code: self.store.claimCode,
           failed: self.store.claimCodeFailed,
           dismissLabel: self.dismissLabel,
+          deviceType: self.deviceFormFactor,
           onEvent: { event in
             switch event {
             case .retryTapped: self.store.send(.retryTapped)
@@ -36,7 +37,8 @@ struct ClaimFlowView: View {
         ClaimPaymentView(
           shareUrl: self.remediationUrl,
           need: self.paymentNeed,
-          dismissLabel: "Not now",
+          dismissLabel: lstr(.claimNotNow),
+          deviceType: self.deviceFormFactor,
           onEvent: { _ in self.store.send(.notNowTapped) },
         )
       }
@@ -45,11 +47,11 @@ struct ClaimFlowView: View {
   }
 
   private var dismissLabel: String {
-    self.store.context == .modal ? "Cancel" : "Skip for now"
+    self.store.context == .modal ? lstr(.pinCancel) : lstr(.claimDismissSkip)
   }
 
   private var deviceName: String? {
-    self.store.childName.map { "\($0)'s \(self.deviceFormFactor)" }
+    self.store.childName.map { String(format: lstr(.claimDeviceName), $0, self.deviceFormFactor) }
   }
 
   private var deviceFormFactor: String {
