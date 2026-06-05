@@ -7,17 +7,31 @@ extension View {
     in namespace: Namespace.ID?,
     cornerRadius: CGFloat? = nil,
   ) -> some View {
-    if let namespace {
-      if let cornerRadius {
-        self.matchedTransitionSource(id: id, in: namespace) { source in
-          source.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    #if os(iOS)
+      if #available(iOS 18.0, *), let namespace {
+        if let cornerRadius {
+          self.matchedTransitionSource(id: id, in: namespace) { source in
+            source.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+          }
+        } else {
+          self.matchedTransitionSource(id: id, in: namespace)
         }
       } else {
-        self.matchedTransitionSource(id: id, in: namespace)
+        self
       }
-    } else {
-      self
-    }
+    #else
+      if let namespace {
+        if let cornerRadius {
+          self.matchedTransitionSource(id: id, in: namespace) { source in
+            source.clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+          }
+        } else {
+          self.matchedTransitionSource(id: id, in: namespace)
+        }
+      } else {
+        self
+      }
+    #endif
   }
 
   @ViewBuilder
@@ -26,7 +40,7 @@ extension View {
     in namespace: Namespace.ID?,
   ) -> some View {
     #if os(iOS)
-      if let sourceID, let namespace {
+      if #available(iOS 18.0, *), let sourceID, let namespace {
         self.navigationTransition(.zoom(sourceID: sourceID, in: namespace))
       } else {
         self

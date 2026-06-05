@@ -28,7 +28,12 @@ struct PlaybackClient: Sendable {
 }
 
 extension PlaybackClient: DependencyKey {
-  static let liveValue = Self.live
+  #if os(iOS) && targetEnvironment(simulator)
+    static let liveValue = Self.simulator
+  #else
+    static let liveValue = Self.live
+  #endif
+
   static let testValue = Self.noop
 }
 
@@ -81,6 +86,41 @@ extension PlaybackClient {
     stop: {},
     events: { AsyncStream { $0.finish() } },
   )
+
+  #if os(iOS) && targetEnvironment(simulator)
+    static let simulator: Self = {
+      let state = SimulatorPlaybackState()
+      return Self(
+        playTrack: { item in
+          await state.play(items: [item], repeats: false)
+        },
+        playTracksInOrder: { items in
+          await state.play(items: items, repeats: true)
+        },
+        pause: {
+          await state.pause()
+        },
+        resume: {
+          await state.resume()
+        },
+        seek: { time in
+          await state.seek(to: time)
+        },
+        skipToNext: {
+          await state.skipToNext()
+        },
+        skipToPrevious: {
+          await state.skipToPrevious()
+        },
+        stop: {
+          await state.stop()
+        },
+        events: {
+          state.events()
+        },
+      )
+    }()
+  #endif
 
   private static func requestAuthorization() async -> Bool {
     switch MusicAuthorization.currentStatus {
@@ -335,6 +375,202 @@ extension PlaybackClient {
     return songs
   }
 }
+
+#if os(iOS) && targetEnvironment(simulator)
+  private actor SimulatorPlaybackState {
+    private let defaultDuration: TimeInterval = 180
+    private var continuations: [UUID: AsyncStream<PlaybackEvent>.Continuation] = [:]
+    private var currentIndex = 0
+    private var duration: TimeInterval = 180
+    private var elapsedTime: TimeInterval = 0
+    private var items: [PlaybackItem] = []
+    private var playStatus: PlaybackFeature.PlayStatus = .paused
+    private var repeats = false
+    private var ticker: Task<Void, Never>?
+
+    nonisolated func events() -> AsyncStream<PlaybackEvent> {
+      AsyncStream { continuation in
+        let id = UUID()
+        Task {
+          await self.addContinuation(continuation, id: id)
+        }
+        continuation.onTermination = { _ in
+          Task {
+            await self.removeContinuation(id: id)
+          }
+        }
+      }
+    }
+
+    func play(items: [PlaybackItem], repeats: Bool) {
+      guard !items.isEmpty else {
+        self.stop()
+        return
+      }
+      self.items = items
+      self.currentIndex = 0
+      self.repeats = repeats
+      self.duration = self.defaultDuration
+      self.elapsedTime = 0
+      self.playStatus = .playing
+      self.sendSnapshot()
+      self.startTickerIfNeeded()
+    }
+
+    func pause() {
+      guard self.playStatus != .paused else { return }
+      self.playStatus = .paused
+      self.send(.playStatusChanged(.paused))
+      self.stopTicker()
+    }
+
+    func resume() {
+      guard !self.items.isEmpty else { return }
+      guard self.playStatus != .playing else { return }
+      if self.elapsedTime >= self.duration {
+        self.elapsedTime = 0
+      }
+      self.playStatus = .playing
+      self.send(.playStatusChanged(.playing))
+      self.send(.progressChanged(self.progress))
+      self.startTickerIfNeeded()
+    }
+
+    func seek(to time: TimeInterval) {
+      guard time.isFinite else { return }
+      self.elapsedTime = min(self.duration, max(0, time))
+      self.send(.progressChanged(self.progress))
+    }
+
+    func skipToNext() {
+      guard !self.items.isEmpty else { return }
+      if self.currentIndex < self.items.index(before: self.items.endIndex) {
+        self.currentIndex += 1
+      } else if self.repeats {
+        self.currentIndex = 0
+      }
+      self.restartCurrentItem()
+    }
+
+    func skipToPrevious() {
+      guard !self.items.isEmpty else { return }
+      if self.currentIndex > self.items.startIndex {
+        self.currentIndex -= 1
+      } else if self.repeats {
+        self.currentIndex = self.items.index(before: self.items.endIndex)
+      }
+      self.restartCurrentItem()
+    }
+
+    func stop() {
+      self.playStatus = .paused
+      self.elapsedTime = 0
+      self.send(.playStatusChanged(.paused))
+      self.send(.progressChanged(self.progress))
+      self.stopTicker()
+    }
+
+    private var currentItem: PlaybackItem? {
+      guard self.items.indices.contains(self.currentIndex) else { return nil }
+      return self.items[self.currentIndex]
+    }
+
+    private var progress: PlaybackProgress {
+      .init(elapsedTime: self.elapsedTime, duration: self.duration)
+    }
+
+    private func addContinuation(
+      _ continuation: AsyncStream<PlaybackEvent>.Continuation,
+      id: UUID,
+    ) {
+      self.continuations[id] = continuation
+      self.sendSnapshot(to: continuation)
+    }
+
+    private func removeContinuation(id: UUID) {
+      self.continuations[id] = nil
+    }
+
+    private func restartCurrentItem() {
+      self.duration = self.defaultDuration
+      self.elapsedTime = 0
+      self.sendCurrentItem()
+      self.send(.progressChanged(self.progress))
+      if self.playStatus == .playing {
+        self.startTickerIfNeeded()
+      }
+    }
+
+    private func sendSnapshot() {
+      self.sendCurrentItem()
+      self.send(.playStatusChanged(self.playStatus))
+      self.send(.progressChanged(self.progress))
+    }
+
+    private func sendSnapshot(to continuation: AsyncStream<PlaybackEvent>.Continuation) {
+      if let currentItem {
+        continuation.yield(.currentItemChanged(currentItem.id))
+      }
+      continuation.yield(.playStatusChanged(self.playStatus))
+      continuation.yield(.progressChanged(self.progress))
+    }
+
+    private func sendCurrentItem() {
+      guard let currentItem else { return }
+      self.send(.currentItemChanged(currentItem.id))
+    }
+
+    private func send(_ event: PlaybackEvent) {
+      for continuation in self.continuations.values {
+        continuation.yield(event)
+      }
+    }
+
+    private func startTickerIfNeeded() {
+      guard self.ticker == nil else { return }
+      self.ticker = Task.detached {
+        while !Task.isCancelled {
+          try? await Task.sleep(nanoseconds: 250_000_000)
+          await self.tick()
+        }
+      }
+    }
+
+    private func stopTicker() {
+      self.ticker?.cancel()
+      self.ticker = nil
+    }
+
+    private func tick() {
+      guard self.playStatus == .playing, !self.items.isEmpty else {
+        self.stopTicker()
+        return
+      }
+      self.elapsedTime += 0.25
+      if self.elapsedTime >= self.duration {
+        self.finishCurrentItem()
+      } else {
+        self.send(.progressChanged(self.progress))
+      }
+    }
+
+    private func finishCurrentItem() {
+      if self.items.count > 1, self.currentIndex < self.items.index(before: self.items.endIndex) {
+        self.currentIndex += 1
+        self.restartCurrentItem()
+      } else if self.repeats {
+        self.currentIndex = 0
+        self.restartCurrentItem()
+      } else {
+        self.elapsedTime = self.duration
+        self.playStatus = .paused
+        self.send(.progressChanged(self.progress))
+        self.send(.playStatusChanged(.paused))
+        self.stopTicker()
+      }
+    }
+  }
+#endif
 
 #if os(iOS)
   private struct LoadedArtwork {
