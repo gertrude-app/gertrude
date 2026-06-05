@@ -51,8 +51,7 @@ import Testing
       $0.locale = Locale(identifier: "en_US")
       $0.defaultDatabase = try! appDatabase()
       $0.device.vendorId = { UUID() }
-      $0.keychain._load = { key in keychainStore.value[key.rawValue] }
-      $0.keychain._save = { key, data in keychainStore.withValue { $0[key.rawValue] = data } }
+      $0.keychain = dictKeychain(keychainStore)
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
       $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
       $0.mainQueue = .immediate

@@ -1,5 +1,6 @@
 import Foundation
 import LibViews
+import PodcastRoute
 import SQLiteData
 import Tagged
 
@@ -8,7 +9,6 @@ struct Subscription: Equatable {
   typealias ID = Tagged<Self, Int>
   let id: ID
   var status: Status
-  var purchasePendingSince: Date?
   var expiresAt: Date
   var updatedAt: Date = .init()
   var createdAt: Date = .init()
@@ -32,7 +32,6 @@ extension Subscription {
   static let fallback = Subscription(
     id: 1,
     status: .trialing,
-    purchasePendingSince: nil,
     expiresAt: .now + .days(10),
     updatedAt: .now,
     createdAt: .now,
@@ -40,10 +39,10 @@ extension Subscription {
 
   var settingsViewStatus: SettingsView.SubscriptionStatus {
     switch self.status {
-    case .trialing: .trialing(purchasePending: self.purchasePendingSince != nil)
+    case .trialing: .trialing
     case .active: .active
     case .complimentary: .complimentary
-    case .unpaid: .unpaid(purchasePending: self.purchasePendingSince != nil)
+    case .unpaid: .unpaid
     }
   }
 
@@ -55,6 +54,39 @@ extension Subscription {
     } else {
       .ok
     }
+  }
+}
+
+extension AmSubscriptionState {
+  func toLocal(now: Date) -> (status: Subscription.Status, expiresAt: Date) {
+    switch self {
+    case .complimentary:
+      (.complimentary, now + .days(365 * 100))
+    case .active(let expiresAt):
+      (.active, expiresAt)
+    case .fullTrial(let expiresAt), .amTrial(let expiresAt):
+      (.trialing, expiresAt)
+    case .legacyGrandfathered(let accessEndsAt, _, _):
+      (.active, accessEndsAt)
+    case .unpaid, .legacyExpired:
+      (.unpaid, now)
+    }
+  }
+
+  var isEntitled: Bool {
+    switch self {
+    case .active, .complimentary, .legacyGrandfathered, .fullTrial, .amTrial:
+      true
+    case .unpaid, .legacyExpired:
+      false
+    }
+  }
+
+  @discardableResult
+  func writeLocal(now: Date) -> Subscription {
+    let mapped = self.toLocal(now: now)
+    return (try? CurrentSubscription.set(status: mapped.status, expiringAt: mapped.expiresAt))
+      ?? .fallback
   }
 }
 
@@ -75,7 +107,6 @@ struct CurrentSubscription: FetchKeyRequest {
   @discardableResult
   static func set(
     status: Subscription.Status,
-    purchasePendingSince: Date? = nil,
     expiringAt: Date,
   ) throws -> Subscription {
     dep(\.db).tryWrite { db in
@@ -83,7 +114,6 @@ struct CurrentSubscription: FetchKeyRequest {
         .find(Subscription.ID(1))
         .update {
           $0.status = status
-          $0.purchasePendingSince = purchasePendingSince
           $0.expiresAt = expiringAt
         }
         .returning { $0.self }
