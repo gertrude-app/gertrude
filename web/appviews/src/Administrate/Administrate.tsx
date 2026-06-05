@@ -38,8 +38,8 @@ export const Administrate: React.FC<Props> = ({
         <HealthCheckScreen
           {...healthCheck}
           installedAppVersion={installedAppVersion}
-          screenshotMonitoringEnabled={user?.keystrokeMonitoringEnabled ?? false}
-          keystrokeMonitoringEnabled={user?.screenshotMonitoringEnabled ?? false}
+          screenshotMonitoringEnabled={user?.screenshotMonitoringEnabled ?? false}
+          keystrokeMonitoringEnabled={user?.keystrokeMonitoringEnabled ?? false}
           osVersionMajor={osVersionMajor}
           emit={(action) => emit({ case: `healthCheck`, action })}
         />
