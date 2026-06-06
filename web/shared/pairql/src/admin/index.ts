@@ -14,6 +14,7 @@ export * from './pairs/IOSOverview';
 export * from './pairs/MacOverview';
 export * from './pairs/ParentDetail';
 export * from './pairs/ParentsList';
+export * from './pairs/PlatformVersionStats';
 export * from './pairs/PodcastInstallDetail';
 export * from './pairs/PodcastInstallsList';
 export * from './pairs/PodcastOverview';
