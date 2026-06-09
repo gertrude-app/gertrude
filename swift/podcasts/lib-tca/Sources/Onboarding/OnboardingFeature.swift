@@ -7,6 +7,7 @@ struct OnboardingFeature {
   struct State: Equatable {
     var screen: OnboardingScreen = .hiThere
     var showingPasscodeSheet: Bool = false
+    var resumedAfterClaim: Bool = false
     @Presents var claimFlow: ClaimFlow.State?
   }
 
