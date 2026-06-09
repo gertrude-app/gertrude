@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import BreakdownBar from '../components/BreakdownBar';
+import CohortHealthSection from '../components/CohortHealthSection';
 import ErrorState from '../components/ErrorState';
 import {
   ArrowRightIcon,
@@ -51,6 +52,7 @@ const Dashboard: React.FC = () => {
     useState<T.PlatformVersionStats.Output | null>(null);
   const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
   const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
+  const [cohortData, setCohortData] = useState<T.CohortAnalysis.Output | null>(null);
   const [appNamingCount, setAppNamingCount] = useState<number | null>(null);
   const [appNamingStats, setAppNamingStats] = useState<{
     total: number;
@@ -73,6 +75,7 @@ const Dashboard: React.FC = () => {
         iosResult,
         podcastResult,
         platformVersionResult,
+        cohortResult,
         appNamingResult,
         apps50k,
         apps10k,
@@ -84,6 +87,7 @@ const Dashboard: React.FC = () => {
         client.iOSOverview(),
         client.podcastOverview(),
         client.platformVersionStats(),
+        client.cohortAnalysis(),
         client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
         client.getUnidentifiedApps({ threshold: 50_000, limit: 1 }),
         client.getUnidentifiedApps({ threshold: 10_000, limit: 1 }),
@@ -110,6 +114,7 @@ const Dashboard: React.FC = () => {
       setIosData(iosResult.value ?? null);
       setPodcastData(podcastResult.value ?? null);
       setPlatformVersionData(platformVersionResult.value ?? null);
+      setCohortData(cohortResult.value ?? null);
       if (!appNamingResult.isError && appNamingResult.value) {
         setAppNamingCount(appNamingResult.value.totalAboveThreshold);
       }
@@ -178,6 +183,7 @@ const Dashboard: React.FC = () => {
           platformVersionData={platformVersionData}
         />
       )}
+      {cohortData && <CohortHealthSection data={cohortData} />}
       {macData && <MacSection data={macData} />}
       {iosData && <IOSSection data={iosData} />}
       {podcastData && <PodcastSection data={podcastData} />}

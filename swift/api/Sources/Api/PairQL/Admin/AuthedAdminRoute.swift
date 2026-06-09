@@ -3,6 +3,7 @@ import Vapor
 
 enum AuthedAdminRoute: PairRoute {
   case subscriptionsOverview
+  case cohortAnalysis
   case macOverview
   case iOSOverview
   case platformVersionStats
@@ -27,6 +28,9 @@ enum AuthedAdminRoute: PairRoute {
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.subscriptionsOverview)) {
       Operation(SubscriptionsOverview.self)
+    }
+    Route(.case(Self.cohortAnalysis)) {
+      Operation(CohortAnalysis.self)
     }
     Route(.case(Self.macOverview)) {
       Operation(MacOverview.self)
@@ -110,6 +114,9 @@ extension AuthedAdminRoute: RouteResponder {
     switch route {
     case .subscriptionsOverview:
       let output = try await SubscriptionsOverview.resolve(in: context)
+      return try await self.respond(with: output)
+    case .cohortAnalysis:
+      let output = try await CohortAnalysis.resolve(in: context)
       return try await self.respond(with: output)
     case .macOverview:
       let output = try await MacOverview.resolve(in: context)

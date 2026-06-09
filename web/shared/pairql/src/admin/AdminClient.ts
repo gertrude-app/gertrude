@@ -16,6 +16,12 @@ export default class AdminClient extends Client<Auth> {
     return this.query<P.AppRatings.Output>(input, `AppRatings`, `superAdmin`);
   };
 
+  public cohortAnalysis = (
+    input: P.CohortAnalysis.Input,
+  ): Promise<Result<P.CohortAnalysis.Output>> => {
+    return this.query<P.CohortAnalysis.Output>(input, `CohortAnalysis`, `superAdmin`);
+  };
+
   public deleteParent = (
     input: P.DeleteParent.Input,
   ): Promise<Result<P.DeleteParent.Output>> => {
