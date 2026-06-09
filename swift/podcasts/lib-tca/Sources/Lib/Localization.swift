@@ -21,6 +21,7 @@ enum LocalizedStringKey: String {
   case onboardingAreYouParent = "onboarding.areYouParent"
   case onboardingConnectNow = "onboarding.connectNow"
   case onboardingConnectOrSkip = "onboarding.connectOrSkip"
+  case onboardingConnecting = "onboarding.connecting"
   case onboardingContinue = "onboarding.continue"
   case onboardingExplainAccount = "onboarding.explainAccount"
   case onboardingExplainPin = "onboarding.explainPin"

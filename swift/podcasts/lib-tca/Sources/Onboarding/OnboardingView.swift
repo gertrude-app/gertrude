@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import Foundation
+import LibCore
 import LibViews
+import PodcastRoute
 import SwiftUI
 
 struct OnboardingView: View {
@@ -31,6 +33,17 @@ struct OnboardingView: View {
             primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped),
           )
 
+        case .connecting:
+          LoadingScreenView(text: lstr(.onboardingConnecting))
+
+        case .accountDetected:
+          ClaimSuccessView(
+            isTerminal: false,
+            deviceName: self.autoDetectDeviceName,
+            buttonLabel: lstr(.claimContinue),
+            onEvent: { _ in self.store.send(.primaryBtnTapped) },
+          )
+
         case .explainAccountRequired:
           ButtonScreenView(
             text: lstr(.onboardingExplainAccount),
@@ -59,6 +72,7 @@ struct OnboardingView: View {
       }
     }
     .navigationBarBackButtonHidden(true)
+    .task { self.store.send(.onAppear) }
     .sheet(isPresented: self.$store.showingPasscodeSheet.sending(\.setShowingPasscodeSheet)) {
       self.store.send(.setShowingPasscodeSheet(false))
     } content: {
@@ -81,5 +95,15 @@ struct OnboardingView: View {
     .init(text, animate: animate) {
       self.store.send(action)
     }
+  }
+
+  private var autoDetectDeviceName: String? {
+    self.store.trialStatus?.claimedChildName.map {
+      String(format: lstr(.claimDeviceName), $0, self.deviceFormFactor)
+    }
+  }
+
+  private var deviceFormFactor: String {
+    UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
   }
 }

@@ -188,6 +188,23 @@
         }
       }
     },
+    "onboarding.connecting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connecting…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conectando…"
+          }
+        }
+      }
+    },
     "onboarding.explainAccount" : {
       "extractionState" : "manual",
       "localizations" : {
