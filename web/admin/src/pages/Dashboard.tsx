@@ -18,11 +18,37 @@ import MonthlySubscriptionRevenueGraph from '../components/MonthlySubscriptionRe
 import PodcastInstallsGraph from '../components/PodcastInstallsGraph';
 import SignupGraph from '../components/SignupGraph';
 
+const MACOS_VERSION_NAMES: Record<string, string> = {
+  '10.15': `Catalina`,
+  '11': `Big Sur`,
+  '12': `Monterey`,
+  '13': `Ventura`,
+  '14': `Sonoma`,
+  '15': `Sequoia`,
+  '26': `Tahoe`,
+};
+
+const colorForVersion = (version: string, seed: number): string => {
+  const parsed = Number.parseInt(version, 10);
+  const value = Number.isNaN(parsed)
+    ? [...version].reduce((hash, char) => hash + char.charCodeAt(0), 0)
+    : parsed;
+  const hue = (value * 47 + seed) % 360;
+  return `hsl(${hue}deg 72% 48%)`;
+};
+
+const macOSVersionLabel = (version: string): string => {
+  const name = MACOS_VERSION_NAMES[version];
+  return name ? `macOS ${version} ${name}` : `macOS ${version}`;
+};
+
 const Dashboard: React.FC = () => {
   const [overviewData, setOverviewData] = useState<T.SubscriptionsOverview.Output | null>(
     null,
   );
   const [macData, setMacData] = useState<T.MacOverview.Output | null>(null);
+  const [platformVersionData, setPlatformVersionData] =
+    useState<T.PlatformVersionStats.Output | null>(null);
   const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
   const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
   const [appNamingCount, setAppNamingCount] = useState<number | null>(null);
@@ -46,6 +72,7 @@ const Dashboard: React.FC = () => {
         macResult,
         iosResult,
         podcastResult,
+        platformVersionResult,
         appNamingResult,
         apps50k,
         apps10k,
@@ -56,6 +83,7 @@ const Dashboard: React.FC = () => {
         client.macOverview(),
         client.iOSOverview(),
         client.podcastOverview(),
+        client.platformVersionStats(),
         client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
         client.getUnidentifiedApps({ threshold: 50_000, limit: 1 }),
         client.getUnidentifiedApps({ threshold: 10_000, limit: 1 }),
@@ -81,6 +109,7 @@ const Dashboard: React.FC = () => {
       setMacData(macResult.value ?? null);
       setIosData(iosResult.value ?? null);
       setPodcastData(podcastResult.value ?? null);
+      setPlatformVersionData(platformVersionResult.value ?? null);
       if (!appNamingResult.isError && appNamingResult.value) {
         setAppNamingCount(appNamingResult.value.totalAboveThreshold);
       }
@@ -146,6 +175,7 @@ const Dashboard: React.FC = () => {
           macData={macData}
           iosData={iosData}
           podcastData={podcastData}
+          platformVersionData={platformVersionData}
         />
       )}
       {macData && <MacSection data={macData} />}
@@ -161,6 +191,7 @@ interface OverviewSectionProps {
   macData: T.MacOverview.Output | null;
   iosData: T.IOSOverview.Output | null;
   podcastData: T.PodcastOverview.Output | null;
+  platformVersionData: T.PlatformVersionStats.Output | null;
 }
 
 const OverviewSection: React.FC<OverviewSectionProps> = ({
@@ -168,6 +199,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
   macData,
   iosData,
   podcastData,
+  platformVersionData,
 }) => {
   const protectedPeople =
     (macData?.childrenOfActiveParents ?? 0) +
@@ -280,8 +312,96 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
             months={data.monthlySubscriptionRevenue ?? []}
           />
         </div>
+        {platformVersionData && <PlatformVersionBars data={platformVersionData} />}
       </div>
     </section>
+  );
+};
+
+interface PlatformVersionBarsProps {
+  data: T.PlatformVersionStats.Output;
+}
+
+const PlatformVersionBars: React.FC<PlatformVersionBarsProps> = ({ data }) => (
+  <div>
+    <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+      <h3 className="font-display font-medium text-slate-900">OS Versions</h3>
+      <span className="text-sm text-slate-500">
+        Active in the last {data.activeDays} days
+      </span>
+    </div>
+    <div className="bg-slate-50 rounded-xl p-5 border border-slate-100 space-y-5">
+      <PlatformVersionBar
+        name="macOS"
+        totalLabel="active computers"
+        platform={data.macos}
+        colorSeed={19}
+        versionLabel={macOSVersionLabel}
+      />
+      <PlatformVersionBar
+        name="iOS"
+        totalLabel="active devices"
+        platform={data.ios}
+        colorSeed={211}
+      />
+    </div>
+  </div>
+);
+
+interface PlatformVersionBarProps {
+  name: string;
+  totalLabel: string;
+  platform: T.PlatformVersionStats.Output[`macos`];
+  colorSeed: number;
+  versionLabel?: (version: string) => string;
+}
+
+const PlatformVersionBar: React.FC<PlatformVersionBarProps> = ({
+  name,
+  totalLabel,
+  platform,
+  colorSeed,
+  versionLabel,
+}) => {
+  const percentages = platform.versions.map((version) =>
+    platform.total > 0 ? (version.count / platform.total) * 100 : 0,
+  );
+
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-3 mb-2">
+        <div className="font-medium text-slate-800">{name}</div>
+        <div className="text-xs text-slate-500">
+          {platform.total.toLocaleString()} {totalLabel}
+        </div>
+      </div>
+      <div className="h-4 bg-white rounded-full overflow-hidden flex gap-px">
+        {platform.versions.map((version, index) => (
+          <div
+            key={version.version}
+            className="h-full"
+            style={{
+              width: `${percentages[index]}%`,
+              backgroundColor: colorForVersion(version.version, colorSeed),
+            }}
+          />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3 text-sm">
+        {platform.versions.map((version, index) => (
+          <div key={version.version} className="flex items-center gap-1.5">
+            <div
+              className="w-3 h-3 rounded-full shrink-0"
+              style={{ backgroundColor: colorForVersion(version.version, colorSeed) }}
+            />
+            <span className="text-slate-600">
+              {versionLabel?.(version.version) ?? `${name} ${version.version}`} (
+              {version.count.toLocaleString()} · {percentages[index]?.toFixed(1)}%)
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

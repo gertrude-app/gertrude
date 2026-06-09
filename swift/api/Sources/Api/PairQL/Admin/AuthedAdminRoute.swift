@@ -5,6 +5,7 @@ enum AuthedAdminRoute: PairRoute {
   case subscriptionsOverview
   case macOverview
   case iOSOverview
+  case platformVersionStats
   case iOSDetailedStats
   case iOSDevicesList(IOSDevicesList.Input)
   case iOSDeviceEvents(IOSDeviceEvents.Input)
@@ -32,6 +33,9 @@ enum AuthedAdminRoute: PairRoute {
     }
     Route(.case(Self.iOSOverview)) {
       Operation(IOSOverview.self)
+    }
+    Route(.case(Self.platformVersionStats)) {
+      Operation(PlatformVersionStats.self)
     }
     Route(.case(Self.iOSDetailedStats)) {
       Operation(IOSDetailedStats.self)
@@ -112,6 +116,9 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .iOSOverview:
       let output = try await IOSOverview.resolve(in: context)
+      return try await self.respond(with: output)
+    case .platformVersionStats:
+      let output = try await PlatformVersionStats.resolve(in: context)
       return try await self.respond(with: output)
     case .iOSDetailedStats:
       let output = try await IOSDetailedStats.resolve(in: context)

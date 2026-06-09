@@ -35,6 +35,7 @@ enum AdminTsCodegenRoute {
       SubscriptionsOverview.self,
       MacOverview.self,
       IOSOverview.self,
+      PlatformVersionStats.self,
       IOSDetailedStats.self,
       IOSDevicesList.self,
       IOSDeviceEvents.self,
