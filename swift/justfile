@@ -132,10 +132,11 @@ fix:
   @just format
 
 check:
-  @just build
-  @just macapp xcode-build
-  @just iosapp-xcode-build
-  @just test
+  @SWIFT_WARNINGS_AS_ERRORS=1 just build
+  @SWIFT_WARNINGS_AS_ERRORS=1 just macapp xcode-build
+  @SWIFT_WARNINGS_AS_ERRORS=1 just iosapp-xcode-build
+  @SWIFT_WARNINGS_AS_ERRORS=1 just test
+  @cd podcasts && SWIFT_WARNINGS_AS_ERRORS=1 just check
   @just lint
 
 nx-reset:

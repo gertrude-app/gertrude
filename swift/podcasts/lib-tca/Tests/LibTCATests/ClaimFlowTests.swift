@@ -114,11 +114,11 @@ import Testing
     }
   }
 
-  @Test func `payment poll into entitled state writes row and dismisses`() async {
+  @Test func `payment poll into entitled state writes row and dismisses`() async throws {
     let clock = TestClock()
     let isDismissed = LockIsolated(false)
     let loggedEventIds = LockIsolated<[String]>([])
-    await withDependencies {
+    try await withDependencies {
       $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .active(
@@ -131,7 +131,7 @@ import Testing
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]))
     } operation: {
-      try? CurrentSubscription.set(status: .unpaid, expiringAt: .reference)
+      try CurrentSubscription.set(status: .unpaid, expiringAt: .reference)
       let store = TestStore(
         initialState: .init(
           context: .modal,

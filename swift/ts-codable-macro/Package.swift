@@ -1,5 +1,6 @@
 // swift-tools-version: 6.0
 import CompilerPluginSupport
+import Foundation
 import PackageDescription
 
 let package = Package(
@@ -43,3 +44,12 @@ let package = Package(
     ),
   )
 #endif
+
+if ProcessInfo.processInfo.environment["CI"] != nil
+  || ProcessInfo.processInfo.environment["SWIFT_WARNINGS_AS_ERRORS"] != nil {
+  for target in package.targets {
+    target.swiftSettings = (target.swiftSettings ?? []) + [
+      .unsafeFlags(["-Xfrontend", "-warnings-as-errors"]),
+    ]
+  }
+}
