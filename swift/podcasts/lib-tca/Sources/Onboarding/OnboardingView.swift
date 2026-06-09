@@ -9,42 +9,53 @@ struct OnboardingView: View {
 
   var body: some View {
     Group {
-      switch self.store.screen {
-      case .hiThere:
-        WelcomeView {
-          self.store.send(.primaryBtnTapped)
+      if let claimStore = self.store.scope(state: \.claimFlow, action: \.claimFlow.presented) {
+        ClaimFlowView(store: claimStore)
+      } else {
+        switch self.store.screen {
+        case .hiThere:
+          WelcomeView {
+            self.store.send(.primaryBtnTapped)
+          }
+
+        case .areYouTheParent:
+          ButtonScreenView(
+            text: lstr(.onboardingAreYouParent),
+            primary: self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
+            secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped),
+          )
+
+        case .parentRequired:
+          ButtonScreenView(
+            text: lstr(.onboardingParentRequired),
+            primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped),
+          )
+
+        case .explainAccountRequired:
+          ButtonScreenView(
+            text: lstr(.onboardingExplainAccount),
+            primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
+          )
+
+        case .connectAccountOrSkip:
+          ButtonScreenView(
+            text: lstr(.onboardingConnectOrSkip),
+            primary: self.btn(lstr(.onboardingConnectNow), action: .primaryBtnTapped),
+            secondary: self.btn(lstr(.onboardingSkipForNow), action: .secondaryBtnTapped),
+          )
+
+        case .explainSetPasscode:
+          ButtonScreenView(
+            text: lstr(.onboardingExplainPin),
+            primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
+          )
+
+        case .strongPasscode:
+          ButtonScreenView(
+            text: lstr(.onboardingStrongPin),
+            primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped),
+          )
         }
-
-      case .areYouTheParent:
-        ButtonScreenView(
-          text: lstr(.onboardingAreYouParent),
-          primary: self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
-          secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped),
-        )
-
-      case .parentRequired:
-        ButtonScreenView(
-          text: lstr(.onboardingParentRequired),
-          primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped),
-        )
-
-      case .explainSetPasscode:
-        ButtonScreenView(
-          text: lstr(.onboardingExplainPin),
-          primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
-        )
-
-      case .strongPasscode:
-        ButtonScreenView(
-          text: lstr(.onboardingStrongPin),
-          primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped),
-        )
-
-      case .passcodeSet(let passcode):
-        ButtonScreenView(
-          text: lstr(.onboardingAllSet),
-          primary: self.btn(lstr(.onboardingGotItNext), action: .finished(passcode)),
-        )
       }
     }
     .navigationBarBackButtonHidden(true)

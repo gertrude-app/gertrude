@@ -25,7 +25,7 @@ struct ClaimFlow {
 
     enum Context: Equatable {
       case modal
-      case wizard
+      case onboarding
     }
 
     enum Step: Equatable {
@@ -103,6 +103,9 @@ struct ClaimFlow {
         return .cancel(id: CancelID.poll)
 
       case .nextTapped:
+        if state.context == .onboarding {
+          return self.dismissFlow()
+        }
         log(.info("82b8e4c0"), "claim advanced to payment")
         state.step = .payment
         return self.startPayment()

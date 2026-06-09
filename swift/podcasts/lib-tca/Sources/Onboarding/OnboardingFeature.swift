@@ -7,6 +7,7 @@ struct OnboardingFeature {
   struct State: Equatable {
     var screen: OnboardingScreen = .hiThere
     var showingPasscodeSheet: Bool = false
+    @Presents var claimFlow: ClaimFlow.State?
   }
 
   enum Action: Equatable {
@@ -20,6 +21,7 @@ struct OnboardingFeature {
     case setShowingPasscodeSheet(Bool)
     case passcodeSet(Int)
     case passcodeConfirmFailed
+    case claimFlow(PresentationAction<ClaimFlow.Action>)
     case delegate(DelegateAction)
   }
 
@@ -34,7 +36,7 @@ struct OnboardingFeature {
         state.screen = .areYouTheParent
         return self.shouldNotBeOnboarding() ? .send(.delegate(.shouldNotBeOnboarding)) : .none
       case (.areYouTheParent, .primaryBtnTapped):
-        state.screen = .explainSetPasscode
+        state.screen = .explainAccountRequired
         return .none
       case (.areYouTheParent, .secondaryBtnTapped):
         state.screen = .parentRequired
@@ -42,6 +44,20 @@ struct OnboardingFeature {
         return .none
       case (.parentRequired, .primaryBtnTapped):
         state.screen = .hiThere
+        return .none
+      case (.explainAccountRequired, .primaryBtnTapped):
+        state.screen = .connectAccountOrSkip
+        return .none
+      case (.connectAccountOrSkip, .primaryBtnTapped):
+        state.claimFlow = ClaimFlow.State(context: .onboarding, initialStep: .showingCode)
+        return .none
+      case (.connectAccountOrSkip, .secondaryBtnTapped):
+        state.screen = .explainSetPasscode
+        return .none
+      case (_, .claimFlow(.dismiss)):
+        state.screen = .explainSetPasscode
+        return .none
+      case (_, .claimFlow):
         return .none
       case (.explainSetPasscode, .primaryBtnTapped):
         state.screen = .strongPasscode
@@ -57,12 +73,12 @@ struct OnboardingFeature {
           await self.haptics.notification(.error)
         }
       case (_, .passcodeSet(let passcode)):
-        state.screen = .passcodeSet(passcode)
         state.showingPasscodeSheet = false
-        return .run { _ in
+        return .run { send in
           await self.haptics.notification(.success)
+          await send(.finished(passcode))
         }
-      case (.passcodeSet, .finished):
+      case (_, .finished):
         return .none // handled by root reducer
       case (_, .delegate):
         return .none
@@ -73,6 +89,9 @@ struct OnboardingFeature {
           return .none
         #endif
       }
+    }
+    .ifLet(\.$claimFlow, action: \.claimFlow) {
+      ClaimFlow()
     }
   }
 
@@ -85,7 +104,8 @@ enum OnboardingScreen: Equatable {
   case hiThere
   case areYouTheParent
   case parentRequired
+  case explainAccountRequired
+  case connectAccountOrSkip
   case explainSetPasscode
   case strongPasscode
-  case passcodeSet(Int)
 }

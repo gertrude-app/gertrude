@@ -92,13 +92,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The way this works is you create a PIN that only you (the parent) know. Searching for and subscribing to new podcasts will require this PIN."
+            "value" : "Next we need you to create a PIN that only you (the parent) know. Searching for and subscribing to new podcasts will require this PIN."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Así funciona: creas un PIN que solo tú (el padre/madre) conoces. Buscar y suscribirse a nuevos podcasts requerirá este PIN."
+            "value" : "Ahora necesitamos que crees un PIN que solo tú (el padre/madre) conozcas. Buscar y suscribirse a nuevos podcasts requerirá este PIN."
           }
         }
       }
@@ -154,19 +154,70 @@
         }
       }
     },
-    "onboarding.allSet" : {
+    "onboarding.connectNow" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All set! You'll need that PIN whenever you want to add new podcasts. Gertrude AM will work unrestricted for 30 days, then requires a yearly subscription of less than $1 dollar per month."
+            "value" : "Connect now"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¡Todo listo! Necesitarás ese PIN cada vez que quieras agregar nuevos podcasts. Gertrude AM funcionará sin restricciones durante 30 días, luego requerirá una suscripción anual de menos de $1 USD por mes."
+            "value" : "Conectar ahora"
+          }
+        }
+      }
+    },
+    "onboarding.connectOrSkip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connect a Gertrude account now, or skip and set it up later."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conecta una cuenta de Gertrude ahora, u omítelo y configúralo más tarde."
+          }
+        }
+      }
+    },
+    "onboarding.explainAccount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gertrude AM is free to try for 30 days. After you try it, you'll need a Gertrude account. Just $10/year for all your family's devices."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gertrude AM es gratis para probar durante 30 días. Después de probarlo, necesitarás una cuenta de Gertrude. Solo $10 al año para todos los dispositivos de tu familia."
+          }
+        }
+      }
+    },
+    "onboarding.skipForNow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip for now"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omitir por ahora"
           }
         }
       }
@@ -575,6 +626,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Para cambiar tu PIN, confirma el PIN actual una vez, luego crea uno nuevo"
+          }
+        }
+      }
+    },
+    "claim.continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
           }
         }
       }
