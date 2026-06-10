@@ -36,9 +36,7 @@ public extension Configure {
     app.on(
       .POST,
       "pairql", ":domain", ":operation",
-      // TEMP: bumped from 512kb to clear a wedged 10mb keystroke buffer
-      // stuck retrying CreateKeystrokeLines (MeshKids, 2026-06-09) — revert after
-      body: .collect(maxSize: "15mb"),
+      body: .collect(maxSize: "512kb"),
       use: PairQLRoute.handler(_:),
     )
 
