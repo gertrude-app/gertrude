@@ -43,9 +43,11 @@ const VerifySignupEmail: React.FC = () => {
   }
 
   const claimCode = verification.data?.claimCode;
-  const redirectTo =
-    redirect ?? (claimCode ? `/supervise-device/${claimCode}/claim` : `/use-case`);
-  return <Navigate to={redirectTo} replace />;
+  const destination =
+    redirect ?? (claimCode ? `/supervise-device/${claimCode}/claim` : `/`);
+  return (
+    <Navigate to={`/referral-survey?next=${encodeURIComponent(destination)}`} replace />
+  );
 };
 
 export default VerifySignupEmail;

@@ -27,10 +27,10 @@ extension LogEvent: Resolver {
     ))
 
     let slack = get(dependency: \.slack)
-    if input.detail.contains("use-case survey") {
+    if input.eventId == "e7b3a1c9" {
       await slack.internal(.signups, """
-        *Signup use-case survey:*
-        id: `\(context.parent.id.lowercased)`
+        *How did you hear about us?*
+        parent: `\(context.parent.email)`
         \(input.detail)
       """)
     } else {

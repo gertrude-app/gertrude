@@ -92,6 +92,14 @@ const EditChild: React.FC<Props> = ({
               data-test="user-name"
               autoFocus
             />
+            <p className="text-slate-500 text-sm md:text-base ml-6 md:ml-9 mt-3 max-w-xl">
+              Helping a spouse, friend, or accountability partner? Gertrude uses{` `}
+              <span className="font-semibold text-slate-600">“parent”</span> and{` `}
+              <span className="font-semibold text-slate-600">“child”</span> language, but
+              it works for other relationships too &mdash;{` `}
+              <span className="font-semibold text-slate-600">“child”</span> simply means
+              the person who is being protected.
+            </p>
           </div>
         </div>
         <footer className="flex flex-col sm:flex-row justify-end gap-4">
