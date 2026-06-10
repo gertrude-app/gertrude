@@ -12,7 +12,9 @@ import Testing
   @Test func `reinstall with preserved db does not false onboard`() async {
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
-      $0.api.getTrialStatus = { .legacyGrandfathered(paidAt: .reference, expiresAt: .reference) }
+      $0.api.getTrialStatus = {
+        .legacyGrandfathered(accessEndsAt: .reference, showMigrationNag: false, migrationUrl: nil)
+      }
       $0.date = .constant(.reference)
       $0.locale = Locale(identifier: "en_US")
       $0.defaultDatabase = try! appDatabase {
@@ -46,7 +48,9 @@ import Testing
     let keychainStore = LockIsolated<[String: Data]>([:])
     await withDependencies {
       $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
-      $0.api.getTrialStatus = { .legacyGrandfathered(paidAt: .reference, expiresAt: .reference) }
+      $0.api.getTrialStatus = {
+        .legacyGrandfathered(accessEndsAt: .reference, showMigrationNag: false, migrationUrl: nil)
+      }
       $0.date = .constant(.reference)
       $0.locale = Locale(identifier: "en_US")
       $0.defaultDatabase = try! appDatabase()

@@ -120,8 +120,8 @@ public func appDatabase(
   migrator.registerMigration("playback-rate") {
     try Migrations.playbackRate($0)
   }
-  migrator.registerMigration("drop-purchase-pending") {
-    try Migrations.dropPurchasePending($0)
+  migrator.registerMigration("account-subscription-conversion") {
+    try Migrations.accountSubscriptionConversion($0)
   }
   try migrator.migrate(database)
 

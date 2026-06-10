@@ -26,7 +26,7 @@ public struct GetTrialStatus: Pair {
   public enum Output: PairOutput {
     case trial(expiresAt: Date)
     case trialExpired(since: Date)
-    case legacyGrandfathered(paidAt: Date, expiresAt: Date)
+    case legacyGrandfathered(accessEndsAt: Date, showMigrationNag: Bool, migrationUrl: URL?)
     case claimed(
       token: UUID,
       childId: UUID,

@@ -1956,6 +1956,57 @@
           }
         }
       }
+    },
+    "home.legacyNag.banner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subscriptions are moving to Gertrude accounts — your access runs through %@. Tap to connect and keep listening."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las suscripciones se están cambiando a cuentas de Gertrude — tu acceso continúa hasta el %@. Toca para vincular y seguir escuchando."
+          }
+        }
+      }
+    },
+    "settings.legacy.explainer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gertrude AM is moving from Apple in-app purchases to Gertrude accounts. Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep AM after %@, connect a free Gertrude account. (Apple won't charge you again.)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gertrude AM se está cambiando de las compras dentro de la app de Apple a cuentas de Gertrude. Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, vincula una cuenta gratuita de Gertrude. (Apple no te volverá a cobrar.)"
+          }
+        }
+      }
+    },
+    "settings.subscription.activeUntil" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active until"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activo hasta"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -153,10 +153,16 @@ enum Migrations {
     ).execute(db)
   }
 
-  @Sendable static func dropPurchasePending(_ db: Database) throws {
+  @Sendable static func accountSubscriptionConversion(_ db: Database) throws {
     try #sql(
       """
       ALTER TABLE subscription DROP COLUMN purchasePendingSince;
+      """,
+    ).execute(db)
+    try #sql(
+      """
+      ALTER TABLE subscription ADD COLUMN legacyMigrationNag INTEGER NOT NULL
+        CHECK (legacyMigrationNag IN (0, 1)) DEFAULT 0;
       """,
     ).execute(db)
   }

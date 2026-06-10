@@ -48,9 +48,14 @@ extension GetTrialStatus: Resolver {
 
     if let paidAt = legacy.first?.createdAt,
        now < paidAt + PodcastApp.LegacyIap.grantWindow {
+      let accessEndsAt = paidAt + PodcastApp.LegacyIap.grantWindow
       return .legacyGrandfathered(
-        paidAt: paidAt,
-        expiresAt: paidAt + PodcastApp.LegacyIap.grantWindow,
+        accessEndsAt: accessEndsAt,
+        showMigrationNag: PodcastApp.LegacyIap.showMigrationNag(
+          accessEndsAt: accessEndsAt,
+          now: now,
+        ),
+        migrationUrl: nil,
       )
     }
 

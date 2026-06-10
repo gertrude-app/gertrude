@@ -14,6 +14,7 @@ struct SettingsViewContainer: View {
       expiresAt: self.store.subscription.expiresAt,
       reclaimableStorageGb: self.reclaimableGb,
       isClaimed: self.store.isClaimed,
+      legacyMigrationNag: self.store.subscription.legacyMigrationNag,
       onEvent: { self.store.send(.view($0)) },
     )
     .onAppear { self.store.send(.onAppear) }
