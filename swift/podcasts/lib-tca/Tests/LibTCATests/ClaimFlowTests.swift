@@ -52,6 +52,41 @@ import Testing
     }
   }
 
+  @Test func `claim in onboarding context dismisses on next instead of paying`() async {
+    let clock = TestClock()
+    let isDismissed = LockIsolated(false)
+    await withDependencies {
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.api.createClaimCode = { .init(code: 222_333, expiresAt: .reference + .days(1)) }
+      $0.api.getTrialStatus = {
+        .claimed(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
+          remediationUrl: nil,
+        ))
+      }
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.dismiss = DismissEffect { isDismissed.setValue(true) }
+      $0.defaultDatabase = try! appDatabase()
+      $0.keychain = dictKeychain(LockIsolated([:]))
+    } operation: {
+      let store = TestStore(initialState: .init(context: .onboarding, initialStep: .showingCode)) {
+        ClaimFlow()
+      }
+      store.exhaustivity = .off
+
+      await store.send(.onAppear)
+      await clock.advance(by: .seconds(5))
+      await store.receive(\.polled)
+      #expect(store.state.step == .success)
+      #expect(!store.state.successIsTerminal)
+
+      await store.send(.nextTapped)
+      #expect(store.state.step == .success)
+      await store.finish()
+      #expect(isDismissed.value)
+    }
+  }
+
   @Test func `claim into unpaid shows neutral success advancing to payment`() async {
     let clock = TestClock()
     await withDependencies {

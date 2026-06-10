@@ -9,15 +9,18 @@ public struct ClaimSuccessView: View {
 
   let isTerminal: Bool
   let deviceName: String?
+  let buttonLabel: String?
   let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
     isTerminal: Bool,
     deviceName: String? = nil,
+    buttonLabel: String? = nil,
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.isTerminal = isTerminal
     self.deviceName = deviceName
+    self.buttonLabel = buttonLabel
     self.onEvent = onEvent
   }
 
@@ -53,7 +56,7 @@ public struct ClaimSuccessView: View {
       Spacer()
 
       BigButton(
-        self.isTerminal ? lstr(.claimDone) : lstr(.claimNext),
+        self.buttonLabel ?? (self.isTerminal ? lstr(.claimDone) : lstr(.claimNext)),
         type: .button { self.onEvent(.continueTapped) },
         variant: .primary,
       )

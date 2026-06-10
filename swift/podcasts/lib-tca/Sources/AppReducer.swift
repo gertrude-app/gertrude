@@ -60,6 +60,8 @@ struct AppReducer: Sendable {
 
         if self.keychain.hasPincode() {
           state.mode = .podcasts(.init())
+        } else if self.keychain.isClaimed() {
+          state.mode = .onboarding(.init(screen: .explainSetPasscode, resumedAfterClaim: true))
         } else {
           state.mode = .onboarding(.init())
         }
@@ -91,13 +93,21 @@ struct AppReducer: Sendable {
         if !foregrounded {
           return .send(.nowPlaying(.appBackgrounded))
         }
-        return .none
+        return .run { _ in await self.refreshEntitlement() }
       case .mode(.presented(.onboarding(.finished(let pincode)))):
+        let resumedAfterClaim: Bool = if case .onboarding(let onboarding) = state.mode {
+          onboarding.resumedAfterClaim
+        } else {
+          false
+        }
         state.mode = .podcasts(.init())
         return .run { _ in
           self.keychain.save(pincode: pincode)
           self.database.insertRecord(id: .onboardingFinished)
           log(.info("ba182b20"), "set pincode", detail: "\(pincode.redacted)")
+          if resumedAfterClaim {
+            log(.info("c3e9a1f4"), "pin set after mid-claim relaunch")
+          }
         }
       case .mode(.presented(.podcasts(.destination(.presented(.show(let showAction)))))):
         switch showAction {

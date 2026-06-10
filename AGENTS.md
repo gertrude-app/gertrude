@@ -29,7 +29,8 @@ below.
 - `./swift/podcasts`
 - if relevant, read `./swift/podcasts/AGENTS.md`
 
-> **Coming soon:** Gertrude FM, a parent-curated music-playing iOS app, is under active development.
+> **Coming soon:** Gertrude FM, a parent-curated music-playing iOS app, is under active
+> development.
 
 ## Production Websites:
 
@@ -79,9 +80,9 @@ Supports all 3 apps, plus dashboard and admin websites
 
 ## Decision notes
 
-- `./docs/notes/` holds lightweight ADR-style notes capturing the _why_ behind a
-  decision **already made and implemented**, when that _why_ can't be reconstructed from
-  the code itself. Don't load these by default.
+- `./docs/notes/` holds lightweight ADR-style notes capturing the _why_ behind a decision
+  **already made and implemented**, when that _why_ can't be reconstructed from the code
+  itself. Don't load these by default.
 - Don't write one unless instructed. Only _suggest_ one when **all** hold: (1) a real
   choice was made among genuine alternatives, (2) the _why_ is non-obvious enough that a
   future reader would wonder "why is it like this?" or assume a mistake, (3) that _why_
@@ -99,7 +100,9 @@ Supports all 3 apps, plus dashboard and admin websites
 - only commit after running `just fix` and relevant test scripts
 - when making git commits, read last 10 commits to match style
 - all lowercase commits, with a short prefix, e.g. `dash: fix bug in xyz`
-- before opening a PR, ensure `just fix` and targeted tests pass, then reserve `just ci-local` for the final pre-PR verification run; prefer the human to run it unless explicitly asked otherwise
+- before opening a PR, ensure `just fix` and targeted tests pass, then reserve
+  `just ci-local` for the final pre-PR verification run; prefer the human to run it unless
+  explicitly asked otherwise
 - when opening PRs, make title match commit style, and create with EMPTY body
 - commit messages MUST BE all lowercase
 
@@ -118,6 +121,8 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - never add comments when writing code
 - never remove comments when refactoring code
+- in test files, DO sometimes add small (usually line-end) comments to help separate
+  critical, load-bearing setup and assertion details from the rest of test
 
 ## Continuous Improvement
 
@@ -133,7 +138,10 @@ the same failure mode for future agents.
 
 ## Further user-specific instructions
 
-Use `whoami` to determine what additional user-specific instructions to read, as each user has their own different prefences and ways of doing things:
+Use `whoami` to determine what additional user-specific instructions to read, as each user
+has their own different prefences and ways of doing things:
+
 - `miciah` -> `./AGENTS.kiah.md`
-- `jared` -> `./AGENTS.jared.md`
-Completely ignore and don't even read the other user's instruction file, only the one corresponding to the result you get from running `whoami`.
+- `jared` -> `./AGENTS.jared.md` Completely ignore and don't even read the other user's
+  instruction file, only the one corresponding to the result you get from running
+  `whoami`.

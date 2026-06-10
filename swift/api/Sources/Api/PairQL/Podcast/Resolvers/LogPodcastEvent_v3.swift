@@ -59,6 +59,10 @@ extension LogPodcastEvent_v3: Resolver {
           "device: \(input.modelName)",
         )
       }
+
+      if input.eventId == midClaimPinSetEventId {
+        try await alertSuperAdminOfMidClaimPinSet(input, in: context)
+      }
     }
 
     return .success
@@ -99,6 +103,23 @@ private func isPodcastFirstFamilyShareForDevice(
 
 func isPodcastLegacyIAPPaymentEvent(_ eventId: String) -> Bool {
   ["af0a338f", "a72104d7"].contains(eventId)
+}
+
+let midClaimPinSetEventId = "c3e9a1f4"
+
+private func alertSuperAdminOfMidClaimPinSet(
+  _ input: LogPodcastEvent_v3.Input,
+  in ctx: Context,
+) async throws {
+  let device = try await ctx.db.find(IOSDevice.Id(input.deviceId))
+  guard let child = try await device.child(in: ctx.db) else { return }
+  let parent = try await child.parent(in: ctx.db)
+  get(dependency: \.postmark).toSuperAdmin(
+    "AM podcast PIN set after mid-claim relaunch",
+    "device: \(input.modelName), child: \(child.name), parent: \(parent.email.rawValue) — "
+      + "the AM PIN may have been set by someone other than the parent (app killed between "
+      + "claim and PIN setup). Consider emailing the parent about a dashboard PIN reset.",
+  )
 }
 
 /// We don't record StoreKit.AppStore.Environment or inAppOwnershipType, so we

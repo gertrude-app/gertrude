@@ -28,6 +28,7 @@ struct ClaimFlowView: View {
         ClaimSuccessView(
           isTerminal: self.store.successIsTerminal,
           deviceName: self.deviceName,
+          buttonLabel: self.store.context == .onboarding ? lstr(.claimContinue) : nil,
           onEvent: { _ in
             self.store.send(self.store.successIsTerminal ? .doneTapped : .nextTapped)
           },
