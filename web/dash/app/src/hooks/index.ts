@@ -28,11 +28,7 @@ export function useApps(): QueryResult<GetIdentifiedApps.Output> {
 
 export function useLoginRedirect(): string | null {
   const [searchParams] = useSearchParams();
-  const encodedPath = searchParams.get(`redirect`);
-  if (encodedPath) {
-    return decodeURIComponent(encodedPath);
-  }
-  return null;
+  return searchParams.get(`redirect`);
 }
 
 export function useChild(id: UUID): QueryResult<Child> {
