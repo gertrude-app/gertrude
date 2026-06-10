@@ -153,4 +153,39 @@ import Testing
       #expect(!loggedEventIds.value.contains("c3e9a1f4"))
     }
   }
+
+  @Test func `foregrounding silently flips a skip user to active once claimed`() async {
+    let keychainStore = LockIsolated<[String: Data]>([:])
+    await withDependencies {
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.api.getTrialStatus = {
+        .claimed(
+          token: UUID(),
+          childId: UUID(),
+          childName: "Sally",
+          subscription: .active(expiresAt: .reference + .days(300)),
+        )
+      }
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.keychain = dictKeychain(
+        keychainStore,
+        pincode: 111_111, // ← has a PIN (went through PIN setup)
+        installDate: .reference,
+        deviceId: UUID(),
+        // ← no amToken passed → NOT claimed (they skipped connecting an account)
+      )
+    } operation: {
+      _ = try? CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(20))
+      let store = TestStore(initialState: .init(), reducer: AppReducer.init)
+      store.exhaustivity = .off
+
+      await store.send(.appInForegroundChanged(true))
+      await store.finish()
+
+      #expect(dep(\.db).subscription().status == .active)
+      #expect(keychainStore.value[KeychainClient.Key.amToken.rawValue] != nil)
+      #expect(store.state.alert == nil)
+    }
+  }
 }

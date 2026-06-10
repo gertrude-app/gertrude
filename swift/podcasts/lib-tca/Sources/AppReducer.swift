@@ -93,7 +93,7 @@ struct AppReducer: Sendable {
         if !foregrounded {
           return .send(.nowPlaying(.appBackgrounded))
         }
-        return .none
+        return .run { _ in await self.refreshEntitlement() }
       case .mode(.presented(.onboarding(.finished(let pincode)))):
         let resumedAfterClaim: Bool = if case .onboarding(let onboarding) = state.mode {
           onboarding.resumedAfterClaim
