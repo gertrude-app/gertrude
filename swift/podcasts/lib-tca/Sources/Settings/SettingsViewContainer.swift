@@ -26,7 +26,7 @@ struct SettingsViewContainer: View {
     .sheet(
       isPresented: Binding(
         get: { self.store.pinChallenge != nil },
-        set: { if !$0 { self.store.send(.pincodeCancelled) } },
+        set: { if !$0 { self.store.send(.pinChallenge(.pincodeCancelled)) } },
       ),
       onDismiss: { self.store.send(.pinChallengeDismissed) },
       content: {
@@ -34,10 +34,10 @@ struct SettingsViewContainer: View {
           mode: .verify(
             self.pincode,
             lockout: self.store.pinChallenge?.lockout,
-            onVerify: { self.store.send(.pincodeVerified) },
-            onFail: { self.store.send(.pincodeFailed) },
+            onVerify: { self.store.send(.pinChallenge(.pincodeVerified)) },
+            onFail: { self.store.send(.pinChallenge(.pincodeFailed)) },
           ),
-          onCancel: { self.store.send(.pincodeCancelled) },
+          onCancel: { self.store.send(.pinChallenge(.pincodeCancelled)) },
           onPrepHaptics: self.haptics.prepare,
         )
       },

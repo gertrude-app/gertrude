@@ -66,7 +66,8 @@ import Testing
       await store.send(.view(.subscribeNowTapped))
       #expect(store.state.pinChallenge != nil)
 
-      await store.send(.pincodeVerified)
+      await store.send(.pinChallenge(.pincodeVerified))
+      await store.receive(.pinChallenge(.delegate(.verified)))
       #expect(store.state.pinChallenge == nil)
       #expect(store.state.claimFlow == nil)
 
@@ -92,7 +93,8 @@ import Testing
       await store.send(.view(.subscribeNowTapped))
       #expect(store.state.pinChallenge != nil)
 
-      await store.send(.pincodeCancelled)
+      await store.send(.pinChallenge(.pincodeCancelled))
+      await store.receive(.pinChallenge(.delegate(.cancelled)))
       #expect(store.state.pinChallenge == nil)
 
       await store.send(.pinChallengeDismissed)
@@ -117,7 +119,7 @@ import Testing
 
       await store.send(.onAppear)
       await store.send(.view(.subscribeNowTapped))
-      await store.send(.pincodeFailed)
+      await store.send(.pinChallenge(.pincodeFailed))
       #expect(store.state.pinChallenge != nil)
       #expect(store.state.claimFlow == nil)
     }
@@ -163,7 +165,8 @@ import Testing
 
       await store.send(.onAppear)
       await store.send(.view(.subscribeNowTapped))
-      await store.send(.pincodeVerified)
+      await store.send(.pinChallenge(.pincodeVerified))
+      await store.receive(.pinChallenge(.delegate(.verified)))
       await store.send(.pinChallengeDismissed)
       #expect(store.state.claimFlow?.step == .showingCode)
 

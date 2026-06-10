@@ -14,11 +14,11 @@ struct AddShowView: View {
         PinCodeView(
           mode: .verify(
             self.pincode,
-            lockout: self.store.lockout,
-            onVerify: { self.store.send(.pincodeVerified) },
-            onFail: { self.store.send(.pincodeFailed) },
+            lockout: self.store.pinChallenge.lockout,
+            onVerify: { self.store.send(.pinChallenge(.pincodeVerified)) },
+            onFail: { self.store.send(.pinChallenge(.pincodeFailed)) },
           ),
-          onCancel: { self.store.send(.pincodeCancelled) },
+          onCancel: { self.store.send(.pinChallenge(.pincodeCancelled)) },
           onPrepHaptics: self.haptics.prepare,
         )
 
@@ -35,9 +35,9 @@ struct AddShowView: View {
         PinCodeView(
           mode: .set(
             onComplete: { self.store.send(.newPinSubmitted($0)) },
-            onConfirmFail: { self.store.send(.pincodeCancelled) },
+            onConfirmFail: { self.store.send(.newPinCancelled) },
           ),
-          onCancel: { self.store.send(.pincodeCancelled) },
+          onCancel: { self.store.send(.newPinCancelled) },
           onPrepHaptics: self.haptics.prepare,
         )
 

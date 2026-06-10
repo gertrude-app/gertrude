@@ -10,13 +10,9 @@ struct SettingsFeature {
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
     var reclaimableBytes: Int = 0
     var isClaimed = false
-    var pinChallenge: PinChallenge?
+    var pinChallenge: PinChallengeFeature.State?
     var pendingClaimAfterPin = false
     @Presents var claimFlow: ClaimFlow.State?
-
-    struct PinChallenge: Equatable {
-      var lockout: Date?
-    }
   }
 
   enum Action: Equatable {
@@ -24,9 +20,7 @@ struct SettingsFeature {
     case onAppear
     case delegate(DelegateAction)
     case claimFlow(PresentationAction<ClaimFlow.Action>)
-    case pincodeVerified
-    case pincodeFailed
-    case pincodeCancelled
+    case pinChallenge(PinChallengeFeature.Action)
     case pinChallengeDismissed
   }
 
@@ -37,7 +31,6 @@ struct SettingsFeature {
   @Dependency(\.date) var date
   @Dependency(\.db) var database
   @Dependency(\.keychain) var keychain
-  @Dependency(\.haptics) var haptics
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -57,32 +50,20 @@ struct SettingsFeature {
         if state.isClaimed {
           state.claimFlow = ClaimFlow.State(context: .modal, initialStep: .payment)
         } else {
-          state.pinChallenge = State.PinChallenge(lockout: .pinLockout())
+          state.pinChallenge = PinChallengeFeature.State()
         }
         return .none
 
-      case .pincodeVerified:
-        self.insertAttempt(success: true)
-        let wasLockedOut = state.pinChallenge?.lockout != nil
+      case .pinChallenge(.delegate(.verified)):
         state.pendingClaimAfterPin = true
         state.pinChallenge = nil
-        return .run { _ in
-          await self.haptics.notification(.success)
-          if wasLockedOut { log(.info("9899b3f4"), "pin lockout cleared") }
-        }
+        return .none
 
-      case .pincodeFailed:
-        self.insertAttempt(success: false)
-        let lockout = Date.pinLockout()
-        let newlyLockedOut = lockout != nil && state.pinChallenge?.lockout == nil
-        state.pinChallenge?.lockout = lockout
-        return .run { _ in
-          await self.haptics.notification(.error)
-          if newlyLockedOut { log(.info("129a84fd"), "pin lockout set") }
-        }
-
-      case .pincodeCancelled:
+      case .pinChallenge(.delegate(.cancelled)):
         state.pinChallenge = nil
+        return .none
+
+      case .pinChallenge:
         return .none
 
       case .pinChallengeDismissed:
@@ -105,16 +86,11 @@ struct SettingsFeature {
         return .none
       }
     }
+    .ifLet(\.pinChallenge, action: \.pinChallenge) {
+      PinChallengeFeature(logBaseId: "8ed78e84") // 8ed78e84-1, 8ed78e84-2
+    }
     .ifLet(\.$claimFlow, action: \.claimFlow) {
       ClaimFlow()
-    }
-  }
-
-  func insertAttempt(success: Bool) {
-    self.database.tryWrite { db in
-      try PinAttempt.insert {
-        PinAttempt.Draft(success: success, createdAt: self.date.now)
-      }.execute(db)
     }
   }
 
