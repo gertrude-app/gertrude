@@ -24,6 +24,7 @@ import LinkExpired from './components/routes/LinkExpired';
 import Login from './components/routes/Login';
 import Logout from './components/routes/Logout';
 import MagicLink from './components/routes/MagicLink';
+import ReferralSurvey from './components/routes/ReferralSurvey';
 import RequestPasswordReset from './components/routes/RequestPasswordReset';
 import SecurityEventsFeed from './components/routes/SecurityEventsFeed';
 import Signup from './components/routes/Signup';
@@ -37,7 +38,6 @@ import RequirePaidSupervision from './components/routes/SuperviseDevice/RequireP
 import SuperviseDeviceSupervise from './components/routes/SuperviseDevice/Supervise';
 import SuspendFilter from './components/routes/SuspendFilter';
 import UserUnlockRequests from './components/routes/UnlockRequest/UserUnlockRequests';
-import UseCaseSurvey from './components/routes/UseCaseSurvey';
 import UserRoute from './components/routes/User';
 import Users from './components/routes/Users';
 import VerifySignupEmail from './components/routes/VerifySignupEmail';
@@ -64,7 +64,7 @@ const App: React.FC = () => {
       <Route path="/logout" element={<Logout />} />
       <Route path="/otp/:token" element={<MagicLink />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/use-case" element={<UseCaseSurvey />} />
+      <Route path="/referral-survey" element={<ReferralSurvey />} />
       <Route path="/verify-signup-email/:token" element={<VerifySignupEmail />} />
       <Route path="/reset-password" element={<RequestPasswordReset />} />
       <Route path="/reset-password/:token" element={<ChangePassword />} />

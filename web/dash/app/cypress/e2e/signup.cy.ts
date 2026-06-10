@@ -39,10 +39,10 @@ describe(`signup`, () => {
 
     cy.interceptPql(`LogEvent`, { success: true });
 
-    cy.contains(`I’m a parent`).click();
+    cy.contains(`A friend or family member`).click();
 
     cy.wait(`@LogEvent`).then(({ request }) => {
-      expect(request.body.detail).to.contain(`PARENT-CHILD`);
+      expect(request.body.detail).to.contain(`friend_family`);
     });
 
     cy.wait(`@DashboardWidgets_v2`)
@@ -53,27 +53,6 @@ describe(`signup`, () => {
       expect(localStorage.getItem(`admin_id`)).to.eq(`admin-123`);
       expect(localStorage.getItem(`admin_token`)).to.eq(`token-123`);
     });
-  });
-
-  it(`handles account deletion for wrong use case`, () => {
-    cy.interceptPql(`LogEvent`, { success: true });
-    cy.interceptPql(`DeleteEntity_v2`, { success: true });
-    cy.simulateLoggedIn();
-    cy.visit(`/use-case`);
-
-    cy.contains(`help myself`).click();
-
-    cy.wait(`@LogEvent`).then(({ request }) => {
-      expect(request.body.detail).to.contain(`SELF`);
-    });
-
-    cy.contains(`Delete my account`).click();
-
-    cy.wait(`@DeleteEntity_v2`)
-      .its(`request.body`)
-      .should(`deep.eq`, { id: betsy.id, type: `parent` });
-
-    cy.contains(`Account deleted!`);
   });
 });
 
@@ -99,7 +78,7 @@ describe(`app-aware claim glue`, () => {
 });
 
 describe(`verify-signup-email post-verify routing`, () => {
-  it(`routes to the AM funnel when a redirect param is present`, () => {
+  it(`continues to the AM funnel through the referral survey when a redirect param is present`, () => {
     cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
     cy.interceptPql(`GetAmClaimData`, {
       children: [],
@@ -115,10 +94,12 @@ describe(`verify-signup-email post-verify routing`, () => {
     );
 
     cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/referral-survey`);
+    cy.contains(`Skip`).click();
     cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
   });
 
-  it(`falls back to the supervision funnel for a legacy claimCode-only verify`, () => {
+  it(`continues to the supervision funnel through the referral survey for a legacy claimCode-only verify`, () => {
     cy.interceptPql(`VerifySignupEmail`, {
       adminId: `admin-123`,
       token: `token-123`,
@@ -134,16 +115,18 @@ describe(`verify-signup-email post-verify routing`, () => {
     cy.visit(`/verify-signup-email/verify-token-123`);
 
     cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/referral-survey`);
+    cy.contains(`Skip`).click();
     cy.location(`pathname`).should(`eq`, `/supervise-device/123456/claim`);
   });
 
-  it(`routes to /use-case when there is neither a redirect nor a claimCode`, () => {
+  it(`routes to the referral survey when there is neither a redirect nor a claimCode`, () => {
     cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
 
     cy.visit(`/verify-signup-email/verify-token-123`);
 
     cy.wait(`@VerifySignupEmail`);
-    cy.location(`pathname`).should(`eq`, `/use-case`);
+    cy.location(`pathname`).should(`eq`, `/referral-survey`);
   });
 });
 
