@@ -166,4 +166,15 @@ enum Migrations {
       """,
     ).execute(db)
   }
+
+  @Sendable static func crossPromoDismissals(_ db: Database) throws {
+    try #sql(
+      """
+      CREATE TABLE crossPromoDismissals (
+        id TEXT PRIMARY KEY NOT NULL,
+        dismissedAt TEXT NOT NULL
+      ) STRICT;
+      """,
+    ).execute(db)
+  }
 }

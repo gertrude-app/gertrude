@@ -58,6 +58,16 @@ public struct ButtonScreenView: View {
     }
   }
 
+  public struct RemoteImage: Sendable {
+    var url: String
+    var label: String?
+
+    public init(url: String, label: String? = nil) {
+      self.url = url
+      self.label = label
+    }
+  }
+
   let text: String
   let primaryButtonConfig: Config?
   let secondaryButtonConfig: Config?
@@ -65,6 +75,7 @@ public struct ButtonScreenView: View {
   let primaryLooksLikeSecondary: Bool
   let listItems: [String]?
   let image: String?
+  let remoteImage: RemoteImage?
   let screenType: ScreenType
   let urlInputConfig: UrlInputConfig?
   let ignoreKeyboard: Bool
@@ -84,6 +95,7 @@ public struct ButtonScreenView: View {
     case .info: "info.circle"
     case .question: "questionmark.circle"
     case .error: "exclamationmark.circle"
+    case .announcement: "sparkles"
     }
   }
 
@@ -94,6 +106,7 @@ public struct ButtonScreenView: View {
     tertiary: Config? = nil,
     listItems: [String]? = nil,
     image: String? = nil,
+    remoteImage: RemoteImage? = nil,
     screenType: ScreenType = .info,
     primaryLooksLikeSecondary: Bool = false,
     urlInput: UrlInputConfig? = nil,
@@ -104,6 +117,7 @@ public struct ButtonScreenView: View {
     self.screenType = screenType
     self.listItems = listItems
     self.image = image
+    self.remoteImage = remoteImage
     self.primaryButtonConfig = primary
     self.secondaryButtonConfig = secondary
     self.tertiaryButtonConfig = tertiary
@@ -159,6 +173,26 @@ public struct ButtonScreenView: View {
             .frame(maxWidth: .infinity)
             .padding(.bottom, 20)
             .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+        }
+
+        if let remoteImage = self.remoteImage, let url = URL(string: remoteImage.url) {
+          AsyncImage(url: url) { phase in
+            switch phase {
+            case .success(let image):
+              image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxHeight: 270)
+                .accessibilityLabel(remoteImage.label ?? "")
+            case .empty:
+              ProgressView()
+            default:
+              EmptyView()
+            }
+          }
+          .frame(maxWidth: .infinity)
+          .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+          Spacer()
         }
 
         Text(self.text)
@@ -382,6 +416,7 @@ public struct ButtonScreenView: View {
     case info
     case question
     case error
+    case announcement
   }
 }
 

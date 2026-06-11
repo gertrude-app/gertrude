@@ -13,6 +13,8 @@ struct AppReducer: Sendable {
     var nowPlaying = NowPlayingFeature.State()
     @Shared(.appInForeground) var appInForeground
     @Presents var alert: AlertState<AlertAction>?
+    @Presents var crossPromo: CrossPromoFeature.State?
+    var crossPromos = CrossPromos.Output(promos: [])
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
   }
 
@@ -25,6 +27,8 @@ struct AppReducer: Sendable {
   enum Action: Equatable {
     case appDidLaunch
     case appInForegroundChanged(Bool)
+    case crossPromo(PresentationAction<CrossPromoFeature.Action>)
+    case receivedCrossPromos(CrossPromos.Output)
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
     case alert(PresentationAction<AlertAction>)
@@ -33,6 +37,36 @@ struct AppReducer: Sendable {
   enum AlertAction: Equatable {
     case dismiss
   }
+
+  enum CrossPromoTrigger: Equatable {
+    case postOnboarding
+    case childHome
+
+    var placement: CrossPromoPlacement {
+      switch self {
+      case .postOnboarding:
+        .amOnboardingParent
+      case .childHome:
+        .amChildHome
+      }
+    }
+  }
+
+  enum CrossPromoEvent: String {
+    case impression
+    case cta
+    case dismiss
+
+    var id: String {
+      switch self {
+      case .impression: "fa1c7e93"
+      case .cta: "b62d4a8f"
+      case .dismiss: "c9e35b21"
+      }
+    }
+  }
+
+  static let amCrossPromoThrottle: TimeInterval = 60 * 60 * 72
 
   @Dependency(\.api) var api
   @Dependency(\.db) var database
@@ -66,12 +100,15 @@ struct AppReducer: Sendable {
           state.mode = .onboarding(.init())
         }
         return .merge(
-          .run { _ in
+          .run { send in
             await self.ensureDeviceId()
             if isFirstLaunch {
               self.logFirstLaunch()
             }
             await self.refreshEntitlement()
+            if let crossPromos = try? await self.api.crossPromos(), !crossPromos.promos.isEmpty {
+              await send(.receivedCrossPromos(crossPromos))
+            }
           },
           .publisher {
             self.audio.systemEvents()
@@ -88,12 +125,24 @@ struct AppReducer: Sendable {
             self.cleanupTasks()
           },
         )
+      case .receivedCrossPromos(let crossPromos):
+        let dropped = crossPromos.promos.filter { !self.hasGuaranteedExit($0) }
+        state.crossPromos = .init(promos: crossPromos.promos.filter(self.hasGuaranteedExit))
+        return .merge(
+          self.logUnpresentable(dropped),
+          self.presentCrossPromo(&state, for: .childHome),
+        )
       case .appInForegroundChanged(let foregrounded):
+        let wasInForeground = state.appInForeground
         state.$appInForeground.withLock { $0 = foregrounded }
         if !foregrounded {
           return .send(.nowPlaying(.appBackgrounded))
         }
-        return .run { _ in await self.refreshEntitlement() }
+        var effects: [EffectOf<Self>] = [.run { _ in await self.refreshEntitlement() }]
+        if !wasInForeground {
+          effects.append(self.presentCrossPromo(&state, for: .childHome))
+        }
+        return .merge(effects)
       case .mode(.presented(.onboarding(.finished(let pincode)))):
         let resumedAfterClaim: Bool = if case .onboarding(let onboarding) = state.mode {
           onboarding.resumedAfterClaim
@@ -101,14 +150,21 @@ struct AppReducer: Sendable {
           false
         }
         state.mode = .podcasts(.init())
-        return .run { _ in
-          self.keychain.save(pincode: pincode)
-          self.database.insertRecord(id: .onboardingFinished)
-          log(.info("ba182b20"), "set pincode", detail: "\(pincode.redacted)")
-          if resumedAfterClaim {
-            log(.info("c3e9a1f4"), "pin set after mid-claim relaunch")
-          }
-        }
+        return .merge(
+          self.presentCrossPromo(&state, for: .postOnboarding),
+          .run { _ in
+            self.keychain.save(pincode: pincode)
+            self.database.insertRecord(id: .onboardingFinished)
+            log(.info("ba182b20"), "set pincode", detail: "\(pincode.redacted)")
+            if resumedAfterClaim {
+              log(.info("c3e9a1f4"), "pin set after mid-claim relaunch")
+            }
+          },
+        )
+      case .crossPromo(.presented(.delegate(.ctaTapped(let slot)))):
+        return self.closeCrossPromo(&state, event: .cta, ctaSlot: slot)
+      case .crossPromo(.dismiss), .crossPromo(.presented(.delegate(.dismissed))):
+        return self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
       case .mode(.presented(.podcasts(.destination(.presented(.show(let showAction)))))):
         switch showAction {
         case .delegate(.episodePlayPauseTapped(let episode, let show)),
@@ -144,6 +200,8 @@ struct AppReducer: Sendable {
         return .none
       case .alert:
         return .none
+      case .crossPromo:
+        return .none
       case .nowPlaying:
         return .none
       case .mode:
@@ -152,6 +210,109 @@ struct AppReducer: Sendable {
     }
     .ifLet(\.$mode, action: \.mode)
     .ifLet(\.$alert, action: \.alert)
+    .ifLet(\.$crossPromo, action: \.crossPromo) {
+      CrossPromoFeature()
+    }
+  }
+
+  func presentCrossPromo(
+    _ state: inout State,
+    for trigger: CrossPromoTrigger,
+  ) -> EffectOf<Self> {
+    guard state.crossPromo == nil,
+          state.alert == nil,
+          case .some(.podcasts(let podcasts)) = state.mode,
+          podcasts.destination == nil
+    else { return .none }
+    let candidates = state.crossPromos.promos.filter { $0.placement == trigger.placement }
+    let dismissed = self.database.dismissedCrossPromoIds()
+    guard let campaign = candidates.first(where: { !dismissed.contains($0.campaignId) })
+    else { return .none }
+    let now = self.date.now
+    switch trigger {
+    case .postOnboarding:
+      state.crossPromo = .init(campaign: campaign)
+      return .merge(
+        .run { _ in self.database.upsertRecord(id: .amCrossPromoLastShownAt, at: now) },
+        self.logCrossPromoEvent(.impression, campaign),
+      )
+    case .childHome:
+      if let last = self.database.record(id: .amCrossPromoLastShownAt)?.updatedAt,
+         now.timeIntervalSince(last) < Self.amCrossPromoThrottle {
+        return .none
+      }
+      state.crossPromo = .init(campaign: campaign)
+      return .merge(
+        .run { _ in self.database.upsertRecord(id: .amCrossPromoLastShownAt, at: now) },
+        self.logCrossPromoEvent(.impression, campaign),
+      )
+    }
+  }
+
+  func hasGuaranteedExit(_ campaign: CrossPromoCampaign) -> Bool {
+    if campaign.style == .sheet, campaign.dismissable { return true }
+    let ctas = [campaign.primaryCta] + [campaign.secondaryCta, campaign.tertiaryCta]
+      .compactMap(\.self)
+    return ctas.contains { if case .dismiss = $0.action { true } else { false } }
+  }
+
+  func logUnpresentable(_ campaigns: [CrossPromoCampaign]) -> EffectOf<Self> {
+    .merge(campaigns.map { campaign in
+      .run { _ in
+        await log(
+          .unexpected("b9e1a7c4"),
+          "cross promo dropped: no guaranteed exit",
+          detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement.rawValue)",
+        ).value
+      }
+    })
+  }
+
+  func closeCrossPromo(
+    _ state: inout State,
+    event: CrossPromoEvent,
+    ctaSlot: CrossPromoFeature.CtaSlot?,
+  ) -> EffectOf<Self> {
+    guard let campaign = state.crossPromo?.campaign else {
+      state.crossPromo = nil
+      return .none
+    }
+    state.crossPromo = nil
+    let now = self.date.now
+    let extra = ctaSlot.map { slot in
+      "slot=\(slot.rawValue) action=\(self.ctaAction(slot, in: campaign)?.analyticsLabel ?? "-")"
+    }
+    return .merge(
+      self.logCrossPromoEvent(event, campaign, extra: extra),
+      .run { _ in
+        self.database.insertCrossPromoDismissal(campaignId: campaign.campaignId, at: now)
+      },
+    )
+  }
+
+  func ctaAction(
+    _ slot: CrossPromoFeature.CtaSlot,
+    in campaign: CrossPromoCampaign,
+  ) -> CrossPromoAction? {
+    switch slot {
+    case .primary: campaign.primaryCta.action
+    case .secondary: campaign.secondaryCta?.action
+    case .tertiary: campaign.tertiaryCta?.action
+    }
+  }
+
+  func logCrossPromoEvent(
+    _ event: CrossPromoEvent,
+    _ campaign: CrossPromoCampaign,
+    extra: String? = nil,
+  ) -> EffectOf<Self> {
+    let base = "campaign=\(campaign.campaignId)"
+      + " variant=\(campaign.variant ?? "-")"
+      + " placement=\(campaign.placement.rawValue)"
+    let detail = extra.map { "\(base) \($0)" } ?? base
+    return .run { _ in
+      await log(.info(event.id), "cross promo \(event.rawValue)", detail: detail).value
+    }
   }
 
   func refreshEntitlement() async {
