@@ -596,6 +596,40 @@
         }
       }
     },
+    "pin.reset.unavailable.body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN recovery needs a connected Gertrude account. Get in touch and we'll help you reset it."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La recuperación del PIN requiere una cuenta de Gertrude vinculada. Contáctanos y te ayudaremos a restablecerlo."
+          }
+        }
+      }
+    },
+    "pin.reset.contactSupport" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact support"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contáctanos"
+          }
+        }
+      }
+    },
     "pin.changeSuccess" : {
       "extractionState" : "manual",
       "localizations" : {

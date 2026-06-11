@@ -1980,13 +1980,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM is moving from Apple in-app purchases to Gertrude accounts. Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep AM after %@, connect a free Gertrude account. (Apple won't charge you again.)"
+            "value" : "Gertrude AM is moving from Apple in-app purchases to Gertrude accounts. Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep AM after %@, connect a Gertrude account. (Apple won't charge you again.)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM se está cambiando de las compras dentro de la app de Apple a cuentas de Gertrude. Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, vincula una cuenta gratuita de Gertrude. (Apple no te volverá a cobrar.)"
+            "value" : "Gertrude AM se está cambiando de las compras dentro de la app de Apple a cuentas de Gertrude. Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, vincula una cuenta de Gertrude. (Apple no te volverá a cobrar.)"
           }
         }
       }
@@ -2004,6 +2004,108 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Activo hasta"
+          }
+        }
+      }
+    },
+    "pin.reset.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset PIN"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecer PIN"
+          }
+        }
+      }
+    },
+    "pin.reset.subtitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the 6-digit code from the Gertrude account website."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresa el código de 6 dígitos del sitio web de la cuenta de Gertrude."
+          }
+        }
+      }
+    },
+    "pin.reset.codePlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter 6-digit code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingresa el código de 6 dígitos"
+          }
+        }
+      }
+    },
+    "pin.reset.continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuar"
+          }
+        }
+      }
+    },
+    "pin.reset.codeError" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "That code is incorrect or has expired."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ese código es incorrecto o ha expirado."
+          }
+        }
+      }
+    },
+    "settings.forgotPin" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot PIN?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Olvidaste tu PIN?"
           }
         }
       }

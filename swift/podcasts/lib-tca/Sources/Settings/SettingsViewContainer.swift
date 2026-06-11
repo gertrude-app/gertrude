@@ -25,6 +25,12 @@ struct SettingsViewContainer: View {
       },
     )
     .sheet(
+      item: self.$store.scope(state: \.pinReset, action: \.pinReset),
+      content: { store in
+        PinResetView(store: store)
+      },
+    )
+    .sheet(
       isPresented: Binding(
         get: { self.store.pinChallenge != nil },
         set: { if !$0 { self.store.send(.pinChallenge(.pincodeCancelled)) } },

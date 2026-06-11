@@ -16,6 +16,7 @@ struct ApiClient: Sendable {
   var migrateDeviceId: @Sendable (_ oldDeviceId: UUID, _ newVendorId: UUID) async throws -> Void
   var getTrialStatus: @Sendable () async throws -> GetTrialStatus.Output
   var getAccountStatus: @Sendable () async throws -> GetAccountStatus.Output
+  var consumePinResetCode: @Sendable (_ code: Int) async throws -> Void
   var createClaimCode: @Sendable () async throws -> CreateClaimCode.Output
   var createDatabaseUpload: @Sendable (_ deviceId: UUID) async throws -> URL
   var verifyPromoCode: @Sendable (_ deviceId: UUID, _ code: String) async throws -> Bool
@@ -77,6 +78,12 @@ extension ApiClient: DependencyKey {
       },
       getAccountStatus: {
         try await output(from: GetAccountStatus.self, with: .getAccountStatus)
+      },
+      consumePinResetCode: { code in
+        _ = try await output(
+          from: ConsumePinResetCode.self,
+          with: .consumePinResetCode(.init(code: code)),
+        )
       },
       createClaimCode: {
         guard let deviceId = dep(\.keychain).loadDeviceId() else {

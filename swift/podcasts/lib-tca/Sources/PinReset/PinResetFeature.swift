@@ -1,0 +1,89 @@
+import ComposableArchitecture
+import PairQL
+
+@Reducer
+struct PinResetFeature {
+  @ObservableState
+  struct State: Equatable {
+    enum Step: Equatable {
+      case enterCode
+      case setNewPin
+      case unclaimed
+    }
+
+    var step: Step
+    var pinChallenge = PinChallengeFeature.State()
+    var showCodeError = false
+
+    init(isClaimed: Bool) {
+      self.step = isClaimed ? .enterCode : .unclaimed
+    }
+  }
+
+  enum Action: Equatable {
+    case codeSubmitted(Int)
+    case consumeSucceeded
+    case consumeFailed
+    case consumeErrored
+    case newPinSubmitted(Int)
+    case cancelTapped
+    case pinChallenge(PinChallengeFeature.Action)
+  }
+
+  @Dependency(\.api) var api
+  @Dependency(\.keychain) var keychain
+  @Dependency(\.dismiss) var dismiss
+
+  var body: some ReducerOf<Self> {
+    Scope(state: \.pinChallenge, action: \.pinChallenge) {
+      PinChallengeFeature(logBaseId: "b3d9f1a7") // b3d9f1a7-1, b3d9f1a7-2
+    }
+    Reduce { state, action in
+      switch action {
+      case .codeSubmitted(let code):
+        state.showCodeError = false
+        return .run { send in
+          do {
+            try await self.api.consumePinResetCode(code)
+            await send(.consumeSucceeded)
+          } catch let error as PqlError where error.appTag == .incorrectConfirmationCode {
+            await send(.consumeFailed)
+          } catch {
+            await send(.consumeErrored)
+          }
+        }
+
+      case .consumeSucceeded:
+        return .send(.pinChallenge(.pincodeVerified))
+
+      case .consumeFailed:
+        state.showCodeError = true
+        return .send(.pinChallenge(.pincodeFailed))
+
+      case .consumeErrored:
+        state.showCodeError = true
+        return .none
+
+      case .pinChallenge(.delegate(.verified)):
+        state.step = .setNewPin
+        return .none
+
+      case .pinChallenge(.delegate(.cancelled)):
+        return .run { _ in await self.dismiss() }
+
+      case .pinChallenge:
+        return .none
+
+      case .newPinSubmitted(let pin):
+        return .run { _ in
+          self.keychain.save(pincode: pin)
+          log(.info("5f2c8e04"), "pin reset", detail: "to: \(pin.redacted)")
+          await self.dismiss()
+        }
+
+      case .cancelTapped:
+        return .run { _ in await self.dismiss() }
+      }
+    }
+  }
+}

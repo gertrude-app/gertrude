@@ -6,6 +6,7 @@ public struct SettingsView: View {
   public enum Event: Equatable, Sendable {
     case subscribeNowTapped
     case changePinTapped
+    case forgotPinTapped
     case reclaimStorageTapped
   }
 
@@ -109,6 +110,17 @@ public struct SettingsView: View {
               .cornerRadius(12)
             }
             .buttonStyle(.plain)
+
+            Button {
+              self.onEvent(.forgotPinTapped)
+            } label: {
+              Text(lstr(.settingsForgotPin))
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(Color(self.cs, light: .violet600, dark: .violet400))
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .center)
           }
 
           if let gb = self.reclaimableStorageGb {

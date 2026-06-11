@@ -13,6 +13,7 @@ struct SettingsFeature {
     var pinChallenge: PinChallengeFeature.State?
     var pendingClaimAfterPin = false
     @Presents var claimFlow: ClaimFlow.State?
+    @Presents var pinReset: PinResetFeature.State?
   }
 
   enum Action: Equatable {
@@ -22,6 +23,7 @@ struct SettingsFeature {
     case claimFlow(PresentationAction<ClaimFlow.Action>)
     case pinChallenge(PinChallengeFeature.Action)
     case pinChallengeDismissed
+    case pinReset(PresentationAction<PinResetFeature.Action>)
   }
 
   enum DelegateAction: Equatable {
@@ -75,6 +77,13 @@ struct SettingsFeature {
       case .view(.changePinTapped):
         return .send(.delegate(.changePinRequested))
 
+      case .view(.forgotPinTapped):
+        state.pinReset = PinResetFeature.State(isClaimed: self.keychain.isClaimed())
+        return .none
+
+      case .pinReset:
+        return .none
+
       case .delegate:
         return .none
 
@@ -91,6 +100,9 @@ struct SettingsFeature {
     }
     .ifLet(\.$claimFlow, action: \.claimFlow) {
       ClaimFlow()
+    }
+    .ifLet(\.$pinReset, action: \.pinReset) {
+      PinResetFeature()
     }
   }
 
