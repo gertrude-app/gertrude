@@ -1,11 +1,17 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import ReferralAttribution from '@/components/ReferralAttribution';
 import '@/styles/globals.css';
 
 const RootLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(storeGoogleClickId, []);
-  return <>{children}</>;
+  return (
+    <>
+      <ReferralAttribution />
+      {children}
+    </>
+  );
 };
 
 export default RootLayout;

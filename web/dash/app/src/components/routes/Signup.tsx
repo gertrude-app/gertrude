@@ -30,6 +30,7 @@ const Signup: React.FC = () => {
         password,
         gclid: getCookieValue(`gclid`),
         abTestVariant: getQueryParam(`v`) ?? getCookieValue(`ab_variant`),
+        referralCode: getQueryParam(`ref`) ?? getCookieValue(`referral_code`),
         turnstileToken: turnstileToken ?? undefined,
         claimCode,
         app,
