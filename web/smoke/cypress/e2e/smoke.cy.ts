@@ -31,8 +31,8 @@ describe(`Smoke test`, () => {
 
   it(`critical flows`, () => {
     cy.intercept(`POST`, `**/pairql/dashboard/Signup`).as(`signup`);
-    cy.visit(`https://gertrude.app/?ref=${referralCode}`);
     cy.origin(`https://gertrude.app`, { args: { referralCode } }, ({ referralCode }) => {
+      cy.visit(`https://gertrude.app/?ref=${referralCode}`);
       cy.location(`search`).should(`include`, `ref=${referralCode}`);
       cy.getCookie(`referral_code`).its(`value`).should(`eq`, referralCode);
       cy.get(`a[href*="parents.gertrude.app/signup"]`)
