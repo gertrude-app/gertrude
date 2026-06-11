@@ -40,7 +40,22 @@ func formatRelativeDate(_ date: Date, lang: Lang) -> String {
   }
 
   let formatter = DateFormatter()
-  formatter.dateFormat = "MMM d"
+  formatter.dateFormat = DateFormatter.dateFormat(
+    fromTemplate: "MMMd",
+    options: 0,
+    locale: .current,
+  )
+  formatter.locale = Locale.current
+  return formatter.string(from: date)
+}
+
+func formatLegacyAccessDate(_ date: Date, includeYear: Bool) -> String {
+  let formatter = DateFormatter()
+  formatter.dateFormat = DateFormatter.dateFormat(
+    fromTemplate: includeYear ? "MMMdyyyy" : "MMMd",
+    options: 0,
+    locale: .current,
+  )
   formatter.locale = Locale.current
   return formatter.string(from: date)
 }

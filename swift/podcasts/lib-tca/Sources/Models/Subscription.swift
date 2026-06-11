@@ -10,6 +10,7 @@ struct Subscription: Equatable {
   let id: ID
   var status: Status
   var expiresAt: Date
+  var legacyMigrationNag: Bool = false
   var updatedAt: Date = .init()
   var createdAt: Date = .init()
 }
@@ -33,6 +34,7 @@ extension Subscription {
     id: 1,
     status: .trialing,
     expiresAt: .now + .days(10),
+    legacyMigrationNag: false,
     updatedAt: .now,
     createdAt: .now,
   )
@@ -49,6 +51,8 @@ extension Subscription {
   var homeViewStatus: PodcastsHomeView.SubscriptionStatus {
     if self.status == .unpaid {
       .unpaid
+    } else if self.legacyMigrationNag {
+      .legacyNag(accessEndsAt: self.expiresAt)
     } else if self.trialEndingSoon() {
       .trialEndingSoon
     } else {
@@ -108,6 +112,7 @@ struct CurrentSubscription: FetchKeyRequest {
   static func set(
     status: Subscription.Status,
     expiringAt: Date,
+    legacyMigrationNag: Bool = false,
   ) throws -> Subscription {
     dep(\.db).tryWrite { db in
       try Subscription
@@ -115,6 +120,7 @@ struct CurrentSubscription: FetchKeyRequest {
         .update {
           $0.status = status
           $0.expiresAt = expiringAt
+          $0.legacyMigrationNag = legacyMigrationNag
         }
         .returning { $0.self }
         .fetchOne(db)

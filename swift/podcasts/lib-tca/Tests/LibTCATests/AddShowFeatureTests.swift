@@ -75,7 +75,8 @@ import Testing
         $0.resettingPin = true
       }
 
-      await store.send(.pincodeVerified) {
+      await store.send(.pinChallenge(.pincodeVerified))
+      await store.receive(.pinChallenge(.delegate(.verified))) {
         $0.screen = .settingNewPin
       }
 

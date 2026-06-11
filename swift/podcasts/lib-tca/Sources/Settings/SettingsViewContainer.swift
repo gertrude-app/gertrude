@@ -14,6 +14,7 @@ struct SettingsViewContainer: View {
       expiresAt: self.store.subscription.expiresAt,
       reclaimableStorageGb: self.reclaimableGb,
       isClaimed: self.store.isClaimed,
+      legacyMigrationNag: self.store.subscription.legacyMigrationNag,
       onEvent: { self.store.send(.view($0)) },
     )
     .onAppear { self.store.send(.onAppear) }
@@ -24,9 +25,15 @@ struct SettingsViewContainer: View {
       },
     )
     .sheet(
+      item: self.$store.scope(state: \.pinReset, action: \.pinReset),
+      content: { store in
+        PinResetView(store: store)
+      },
+    )
+    .sheet(
       isPresented: Binding(
         get: { self.store.pinChallenge != nil },
-        set: { if !$0 { self.store.send(.pincodeCancelled) } },
+        set: { if !$0 { self.store.send(.pinChallenge(.pincodeCancelled)) } },
       ),
       onDismiss: { self.store.send(.pinChallengeDismissed) },
       content: {
@@ -34,10 +41,10 @@ struct SettingsViewContainer: View {
           mode: .verify(
             self.pincode,
             lockout: self.store.pinChallenge?.lockout,
-            onVerify: { self.store.send(.pincodeVerified) },
-            onFail: { self.store.send(.pincodeFailed) },
+            onVerify: { self.store.send(.pinChallenge(.pincodeVerified)) },
+            onFail: { self.store.send(.pinChallenge(.pincodeFailed)) },
           ),
-          onCancel: { self.store.send(.pincodeCancelled) },
+          onCancel: { self.store.send(.pinChallenge(.pincodeCancelled)) },
           onPrepHaptics: self.haptics.prepare,
         )
       },

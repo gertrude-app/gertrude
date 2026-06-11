@@ -48,7 +48,10 @@ extension BillingAccountSnapshot {
       if legacyActive, let legacyAccessEnd {
         return .legacyGrandfathered(
           accessEndsAt: legacyAccessEnd,
-          showMigrationNag: self.date >= legacyAccessEnd - PodcastApp.LegacyIap.nagWindow,
+          showMigrationNag: PodcastApp.LegacyIap.showMigrationNag(
+            accessEndsAt: legacyAccessEnd,
+            now: self.date,
+          ),
           migrationUrl: nil,
         )
       }

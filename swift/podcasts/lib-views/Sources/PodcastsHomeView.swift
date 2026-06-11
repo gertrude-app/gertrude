@@ -11,10 +11,11 @@ public struct PodcastsHomeView: View {
   @Environment(\.miniNowPlayingVisible) var miniNowPlayingVisible
   @Environment(\.lang) var lang
 
-  public enum SubscriptionStatus {
+  public enum SubscriptionStatus: Equatable {
     case ok
     case trialEndingSoon
     case unpaid
+    case legacyNag(accessEndsAt: Date)
   }
 
   @dynamicMemberLookup
@@ -118,6 +119,8 @@ public struct PodcastsHomeView: View {
 
       if self.subscriptionStatus == .unpaid {
         self.unpaidBanner
+      } else if case .legacyNag(let accessEndsAt) = self.subscriptionStatus {
+        self.legacyNagBanner(accessEndsAt: accessEndsAt)
       }
 
       ZStack {
@@ -147,6 +150,31 @@ public struct PodcastsHomeView: View {
       }
       .padding(.horizontal, 20)
       .padding(.vertical, 24)
+      .background(Color(self.cs, light: .violet100, dark: .violet950))
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(PlainButtonStyle())
+  }
+
+  private func legacyNagBanner(accessEndsAt: Date) -> some View {
+    Button {
+      self.onSettingsTap()
+    } label: {
+      HStack(spacing: 12) {
+        Image(systemName: "arrow.right.circle.fill")
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+        Text(String(
+          format: lstr(.homeLegacyNagBanner),
+          formatLegacyAccessDate(accessEndsAt, includeYear: false),
+        ))
+        .font(.system(size: 14, weight: .medium))
+        .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
+        .multilineTextAlignment(.leading)
+        Spacer()
+      }
+      .padding(.horizontal, 20)
+      .padding(.vertical, 20)
       .background(Color(self.cs, light: .violet100, dark: .violet950))
       .contentShape(Rectangle())
     }
@@ -404,6 +432,44 @@ func showWithStats(
       },
     ],
     subscriptionStatus: .unpaid,
+  )
+  .preferredColorScheme(.dark)
+}
+
+#Preview("Legacy Nag") {
+  PodcastsHomeView(
+    shows: [
+      showWithStats(id: 1) {
+        $0.data.name = "Wow in the World"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+      showWithStats(id: 2) {
+        $0.data.name = "Tumble Science"
+        $0.data.artworkUrl = .sombrero
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.days(2))
+        $0.unplayedEpisodes = 15
+        $0.totalEpisodes = 87
+      },
+    ],
+    subscriptionStatus: .legacyNag(accessEndsAt: Date().addingTimeInterval(.days(58))),
+  )
+}
+
+#Preview("Legacy Nag (Dark)") {
+  PodcastsHomeView(
+    shows: [
+      showWithStats(id: 1) {
+        $0.data.name = "Wow in the World"
+        $0.data.artworkUrl = .ancientPath
+        $0.mostRecentPubDate = Date().addingTimeInterval(-TimeInterval.hours(8))
+        $0.unplayedEpisodes = 3
+        $0.totalEpisodes = 125
+      },
+    ],
+    subscriptionStatus: .legacyNag(accessEndsAt: Date().addingTimeInterval(.days(58))),
   )
   .preferredColorScheme(.dark)
 }

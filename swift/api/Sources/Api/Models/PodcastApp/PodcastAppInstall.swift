@@ -89,5 +89,9 @@ extension PodcastApp {
     static let migrationApology: TimeInterval = .days(90)
     static let grantWindow: TimeInterval = honoredYear + migrationApology
     static let nagWindow: TimeInterval = .days(60)
+
+    static func showMigrationNag(accessEndsAt: Date, now: Date) -> Bool {
+      now >= accessEndsAt - self.nagWindow
+    }
   }
 }

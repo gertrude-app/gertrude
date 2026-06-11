@@ -169,8 +169,12 @@ struct AppReducer: Sendable {
       _ = try? CurrentSubscription.set(status: .trialing, expiringAt: expiresAt)
     case .trialExpired(let since):
       _ = try? CurrentSubscription.set(status: .unpaid, expiringAt: since)
-    case .legacyGrandfathered:
-      break
+    case .legacyGrandfathered(let accessEndsAt, let showMigrationNag, _):
+      _ = try? CurrentSubscription.set(
+        status: .active,
+        expiringAt: accessEndsAt,
+        legacyMigrationNag: showMigrationNag,
+      )
     case .claimed(let token, _, _, let subscription):
       self.keychain.save(amToken: token)
       self.applyAccountStatus(subscription)

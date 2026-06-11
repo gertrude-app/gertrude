@@ -141,8 +141,9 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.deviceId == deviceId)
       .first(in: self.db)
     expect(output).toEqual(.legacyGrandfathered(
-      paidAt: event.createdAt,
-      expiresAt: event.createdAt + .days(455),
+      accessEndsAt: event.createdAt + .days(455),
+      showMigrationNag: false, // fresh purchase, far from window end
+      migrationUrl: nil,
     ))
   }
 
@@ -165,8 +166,68 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.deviceId == deviceId)
       .first(in: self.db)
     expect(output).toEqual(.legacyGrandfathered(
-      paidAt: event.createdAt,
-      expiresAt: event.createdAt + .days(455),
+      accessEndsAt: event.createdAt + .days(455),
+      showMigrationNag: false, // fresh purchase, far from window end
+      migrationUrl: nil,
+    ))
+  }
+
+  func testLegacyNagFiresAtExactNagWindowBoundary() async throws {
+    let deviceId = UUID()
+    try await self.db.create(PodcastEvent(
+      eventId: "af0a338f",
+      kind: .subscription,
+      label: "subscribe success",
+      detail: "originalID: 123456789012345",
+      deviceId: deviceId,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.4.0",
+      iosVersion: "18.2",
+    ))
+    let event = try await PodcastEvent.query()
+      .where(.deviceId == deviceId)
+      .first(in: self.db)
+
+    // accessEndsAt = paidAt + 455d; nag boundary = accessEndsAt - 60d = paidAt + 395d
+    let output = try await withDependencies {
+      $0.date = .constant(event.createdAt + .days(395))
+    } operation: {
+      try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+    }
+
+    expect(output).toEqual(.legacyGrandfathered(
+      accessEndsAt: event.createdAt + .days(455),
+      showMigrationNag: true,
+      migrationUrl: nil,
+    ))
+  }
+
+  func testLegacyNagSilentJustOutsideNagWindow() async throws {
+    let deviceId = UUID()
+    try await self.db.create(PodcastEvent(
+      eventId: "af0a338f",
+      kind: .subscription,
+      label: "subscribe success",
+      detail: "originalID: 123456789012345",
+      deviceId: deviceId,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.4.0",
+      iosVersion: "18.2",
+    ))
+    let event = try await PodcastEvent.query()
+      .where(.deviceId == deviceId)
+      .first(in: self.db)
+
+    let output = try await withDependencies {
+      $0.date = .constant(event.createdAt + .days(394)) // one day shy of the nag boundary
+    } operation: {
+      try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+    }
+
+    expect(output).toEqual(.legacyGrandfathered(
+      accessEndsAt: event.createdAt + .days(455),
+      showMigrationNag: false,
+      migrationUrl: nil,
     ))
   }
 

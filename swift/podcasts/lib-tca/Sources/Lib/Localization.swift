@@ -36,6 +36,8 @@ enum LocalizedStringKey: String {
   case pinChangeSuccess = "pin.changeSuccess"
   case pinChangeProceed = "pin.changeProceed"
   case pinChangeInstructions = "pin.changeInstructions"
+  case pinResetContactSupport = "pin.reset.contactSupport"
+  case pinResetUnavailableBody = "pin.reset.unavailable.body"
   case podcastsDeleteConfirm = "podcasts.deleteConfirm"
   case podcastsDeleteWarning = "podcasts.deleteWarning"
   case podcastsRequestReviewGiveRating = "podcasts.requestReview.giveRating"

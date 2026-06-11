@@ -19,7 +19,7 @@ struct AddShowFeature {
     }
 
     var screen: Screen = .enteringPin
-    var lockout: Date? = .pinLockout()
+    var pinChallenge = PinChallengeFeature.State()
     var resettingPin: Bool = false
     var searchText: String = ""
     var searchResults: [SearchResult] = []
@@ -30,9 +30,8 @@ struct AddShowFeature {
       case alert(String)
     }
 
-    case pincodeVerified
-    case pincodeFailed
-    case pincodeCancelled
+    case pinChallenge(PinChallengeFeature.Action)
+    case newPinCancelled
     case changePinInstructionsOkTapped
     case newPinSubmitted(Int)
     case selectSearchTapped
@@ -53,7 +52,6 @@ struct AddShowFeature {
   @Dependency(\.db) var db
   @Dependency(\.date.now) var now
   @Dependency(\.podcasts) var podcasts
-  @Dependency(\.haptics) var haptics
   @Dependency(\.api) var api
   @Dependency(\.keychain) var keychain
   @Dependency(\.continuousClock) var clock
@@ -61,6 +59,9 @@ struct AddShowFeature {
   private enum CancelID { case search }
 
   var body: some Reducer<State, Action> {
+    Scope(state: \.pinChallenge, action: \.pinChallenge) {
+      PinChallengeFeature(logBaseId: "e86bd7f3") // e86bd7f3-1, e86bd7f3-2
+    }
     Reduce { state, action in
       switch action {
       case .setSearchText(let text):
@@ -86,27 +87,19 @@ struct AddShowFeature {
         state.searchResults = results
         return .none
 
-      case .pincodeVerified:
-        self.insertAttempt(success: true)
+      case .pinChallenge(.delegate(.verified)):
         state.screen = state.resettingPin ? .settingNewPin : .choosingMethod
-        let wasLockedOut = state.lockout != nil
-        state.lockout = .pinLockout()
+        return .none
+
+      case .pinChallenge(.delegate(.cancelled)):
         return .run { _ in
-          await self.haptics.notification(.success)
-          if wasLockedOut { log(.info("c6f27bad"), "pin lockout cleared") }
+          await self.dismiss()
         }
 
-      case .pincodeFailed:
-        self.insertAttempt(success: false)
-        let lockout = Date.pinLockout()
-        let newlyLockedOut = lockout != nil && state.lockout == nil
-        state.lockout = lockout
-        return .run { _ in
-          await self.haptics.notification(.error)
-          if newlyLockedOut { log(.info("7e312b0f"), "pin lockout set") }
-        }
+      case .pinChallenge:
+        return .none
 
-      case .pincodeCancelled:
+      case .newPinCancelled:
         return .run { _ in
           await self.dismiss()
         }
@@ -208,39 +201,5 @@ struct AddShowFeature {
         await send(.delegate(.alert(lstr(.addShowError))))
       }
     }
-  }
-
-  func insertAttempt(success: Bool) {
-    self.db.tryWrite { db in
-      try PinAttempt.insert {
-        PinAttempt.Draft(success: success, createdAt: self.now)
-      }.execute(db)
-    }
-  }
-}
-
-extension Date {
-  static func pinLockout() -> Date? {
-    @Dependency(\.db) var db
-    @Dependency(\.date.now) var now
-
-    let attempts: [Date] = withErrorReporting {
-      try db.read { db in
-        try PinAttempt
-          .select(\.createdAt)
-          .where { $0.success.eq(false) }
-          .where { $0.createdAt > now.addingTimeInterval(-24 * 60 * 60 * 10) }
-          .order { $0.createdAt.asc() }
-          .fetchAll(db)
-      }
-    } ?? []
-
-    guard let last = attempts.last, attempts.count >= 5 else {
-      return nil
-    }
-
-    // 5 minute lockout for 5-10 failed attempts, 20 minute lockout for more than 10
-    let lockout = last.addingTimeInterval(60 * 5 * (attempts.count > 10 ? 4 : 1))
-    return lockout > now ? lockout : nil
   }
 }
