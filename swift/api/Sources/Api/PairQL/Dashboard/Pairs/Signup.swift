@@ -12,6 +12,7 @@ struct Signup: Pair {
     var password: String
     var gclid: String?
     var abTestVariant: String?
+    var referralCode: String?
     var turnstileToken: String?
     var claimCode: String?
     var app: GertrudeIOSApp?
@@ -68,20 +69,27 @@ extension Signup: Resolver {
       return .init(admin: nil)
     }
 
+    let referralCode = input.referralCode?
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+      .uppercased()
+    let referrer: Parent? = if let referralCode, !referralCode.isEmpty {
+      try await Parent.query()
+        .where(.referralCode == referralCode)
+        .all(in: context.db)
+        .first
+    } else {
+      nil
+    }
     let parent = try await context.db.create(Parent(
       email: .init(rawValue: email),
       password: context.env.mode == .test ? input.password : Bcrypt.hash(input.password),
       gclid: input.gclid,
       abTestVariant: input.abTestVariant,
+      referredByParentId: referrer?.id,
     ))
 
     if context.env.mode == .prod, !isTestAddress(email) {
-      await slack.internal(.signups, """
-        *New signup:*
-        id: `\(parent.id.lowercased)`
-        email: `\(email)`
-        g-ad: `\(input.gclid != nil)`
-      """)
+      await slack.internal(.signups, newSignupSlackMessage(parent, input.gclid, referrer))
     }
 
     try await sendVerificationEmail(to: parent, from: input, in: context)
@@ -90,6 +98,20 @@ extension Signup: Resolver {
 }
 
 // helpers
+
+func newSignupSlackMessage(_ parent: Parent, _ gclid: String?, _ referrer: Parent?) -> String {
+  var message = """
+    *New signup:*
+    id: `\(parent.id.lowercased)`
+    email: `\(parent.email.rawValue)`
+    g-ad: `\(gclid != nil)`
+  """
+  if let referrer {
+    let link = AdminLink().slack(to: .parent(referrer.id), text: referrer.email.rawValue)
+    message += "\nreferral: `\(referrer.referralCode ?? "(unknown)")` from \(link)"
+  }
+  return message
+}
 
 func sendVerificationEmail(
   to admin: Parent,

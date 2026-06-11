@@ -3,6 +3,7 @@ describe(`Smoke test`, () => {
   const namespace = Cypress.env(`SMOKE_TEST_TESTMAIL_NAMESPACE`);
   const email = `${namespace}.smoke-test-${Date.now()}@inbox.testmail.app`;
   const password = `_pw_${Date.now()}`;
+  const referralCode = `JARED-SMOKE`;
 
   it(`verify download dmg is reachable`, () => {
     cy.request({
@@ -29,10 +30,29 @@ describe(`Smoke test`, () => {
   });
 
   it(`critical flows`, () => {
+    cy.intercept(`POST`, `**/pairql/dashboard/Signup`).as(`signup`);
+    cy.visit(`https://gertrude.app/?ref=${referralCode}`);
+    cy.origin(`https://gertrude.app`, { args: { referralCode } }, ({ referralCode }) => {
+      cy.location(`search`).should(`include`, `ref=${referralCode}`);
+      cy.getCookie(`referral_code`).its(`value`).should(`eq`, referralCode);
+      cy.get(`a[href*="parents.gertrude.app/signup"]`)
+        .filter(`:visible`)
+        .first()
+        .as(`signupLink`);
+      cy.get(`@signupLink`)
+        .should(`have.attr`, `href`)
+        .and(`include`, `ref=${referralCode}`);
+      cy.get(`@signupLink`).click();
+    });
+
     // signup
-    cy.visit(`/signup`);
+    cy.location(`origin`).should(`eq`, `https://parents.gertrude.app`);
+    cy.location(`pathname`).should(`eq`, `/signup`);
+    cy.location(`search`).should(`include`, `ref=${referralCode}`);
+    cy.getCookie(`referral_code`).its(`value`).should(`eq`, referralCode);
     cy.get(`input[name=email]`).type(email);
     cy.get(`input[name=password]`).type(`${password}{enter}`);
+    cy.wait(`@signup`).its(`request.body.referralCode`).should(`eq`, referralCode);
     cy.contains(`Verification email sent`);
     cy.wait(Cypress.env(`CI`) ? 60000 : 7500);
 

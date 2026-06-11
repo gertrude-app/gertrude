@@ -213,6 +213,8 @@ extension Parent {
     case emailVerifiedAt
     case gclid
     case abTestVariant
+    case referralCode
+    case referredByParentId
     case createdAt
     case updatedAt
   }

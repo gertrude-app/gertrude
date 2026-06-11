@@ -75,7 +75,8 @@ extension HandleCheckoutSuccess: Resolver {
         stripeStatus: .active,
         currentPeriodEnd: expiration,
       ))
-      notifyFirstPayment(parent: parent, tier: tier)
+      let referrer = try await parent.referrer(in: context.db)
+      notifyFirstPayment(parent, tier, referrer)
     }
 
     var identity = try await parent.ensureBillingIdentity(in: context.db)

@@ -99,6 +99,7 @@ extension Configure {
     app.migrations.add(PodcastAppTablesAndLegacyAmIap())
     app.migrations.add(AddAllowAppInstallation())
     app.migrations.add(AddMarketingEmailSendVariant())
+    app.migrations.add(AddParentReferrals())
   }
 }
 

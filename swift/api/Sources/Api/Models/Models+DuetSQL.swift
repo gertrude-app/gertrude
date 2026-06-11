@@ -289,6 +289,8 @@ extension Parent: Model {
     case .emailVerifiedAt: .date(self.emailVerifiedAt)
     case .gclid: .string(self.gclid)
     case .abTestVariant: .string(self.abTestVariant)
+    case .referralCode: .string(self.referralCode)
+    case .referredByParentId: .uuid(self.referredByParentId?.rawValue)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -302,6 +304,8 @@ extension Parent: Model {
       .emailVerifiedAt: .date(emailVerifiedAt),
       .gclid: .string(gclid),
       .abTestVariant: .string(abTestVariant),
+      .referralCode: .string(referralCode),
+      .referredByParentId: .uuid(referredByParentId?.rawValue),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
