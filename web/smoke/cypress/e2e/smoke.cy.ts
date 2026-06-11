@@ -51,7 +51,8 @@ describe(`Smoke test`, () => {
     cy.get(`@verifyLink`).then((verifyLink) => {
       cy.visit({ url: verifyLink as any });
     });
-    cy.contains(`I’m a parent`).click();
+    cy.contains(`How did you hear about us?`);
+    cy.contains(`Skip`).click();
     cy.contains(`Welcome to Gertrude!`);
 
     // log out, then attempt to re-signup
