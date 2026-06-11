@@ -5,6 +5,7 @@ export namespace Signup {
     password: string;
     gclid?: string;
     abTestVariant?: string;
+    referralCode?: string;
     turnstileToken?: string;
     claimCode?: string;
     app?: 'blocker' | 'podcasts';

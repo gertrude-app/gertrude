@@ -153,7 +153,8 @@ private func handleInvoicePaid(
       currentPeriodEnd: periodEnd,
     ))
     await recordPaidAdConversion(parent: parent, db: db)
-    notifyFirstPayment(parent: parent, tier: eventTier)
+    let referrer = try await parent.referrer(in: db)
+    notifyFirstPayment(parent, eventTier, referrer)
   }
 
   if var identity = try await parent.billingIdentity(in: db) {
@@ -226,10 +227,10 @@ private func handleSubscriptionUpdated(
   if subscription.tier != eventTier {
     let fromTier = subscription.tier
     notifyUnexpectedTierChange(
-      parentId: subscription.parentId,
-      fromTier: fromTier,
-      toTier: eventTier,
-      source: "customer.subscription.updated",
+      subscription.parentId,
+      fromTier,
+      eventTier,
+      "customer.subscription.updated",
     )
     _ = try? await db.create(InterestingEvent(
       eventId: "tier_upgraded",

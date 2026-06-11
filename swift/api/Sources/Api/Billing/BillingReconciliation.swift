@@ -38,12 +38,7 @@ func reconcileDuplicateSubscription(
 
   switch decision {
   case .reject(let reason, let status):
-    notifyDuplicateSubscriptionAttempt(
-      parentId: parent.id,
-      existingSubId: existingSubId,
-      incomingSubId: incomingSubId,
-      existingStatus: status,
-    )
+    notifyDuplicateSubscriptionAttempt(parent.id, existingSubId, incomingSubId, status)
     _ = try? await db.create(InterestingEvent(
       eventId: "duplicate_subscription_rejected",
       kind: "billing",

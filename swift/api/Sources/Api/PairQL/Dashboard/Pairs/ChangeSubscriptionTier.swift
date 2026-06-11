@@ -67,10 +67,7 @@ extension ChangeSubscriptionTier: Resolver {
 
     guard let newStatus = StripeSubscription.StripeStatus(rawValue: updated.status.rawValue),
           newStatus == .active || newStatus == .pastDue else {
-      notifyPostUpdateStatusAnomaly(
-        parentId: context.parent.id,
-        status: updated.status.rawValue,
-      )
+      notifyPostUpdateStatusAnomaly(context.parent.id, updated.status.rawValue)
       throw context.error(
         "f73c2a18",
         .serverError,
@@ -99,7 +96,7 @@ extension ChangeSubscriptionTier: Resolver {
         + "stripe_sub: \(stripeId)",
     ))
 
-    notifyTierChange(parent: context.parent, from: fromTier, to: input.to)
+    notifyTierChange(context.parent, fromTier, input.to)
 
     return .success
   }

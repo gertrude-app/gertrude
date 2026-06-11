@@ -1,21 +1,53 @@
-func notifyFirstPayment(parent: Parent, tier: StripeSubscription.Tier) {
+func notifyFirstPayment(
+  _ parent: Parent,
+  _ tier: StripeSubscription.Tier,
+  _ referrer: Parent? = nil,
+) {
   let email = parent.email.rawValue
   let adminLink = AdminLink()
   let slackLink = adminLink.slack(to: .parent(parent.id), text: email)
   let emailLink = adminLink.email(to: .parent(parent.id), text: email)
+  let slackMessage = firstPaymentSlackMessage(slackLink, tier, referrer)
+  let emailMessage = firstPaymentEmailMessage(emailLink, tier, referrer)
   Task {
     let slack = get(dependency: \.slack)
     let postmark = get(dependency: \.postmark)
-    await slack.internal(.info, "*FIRST Payment* from \(slackLink), plan: `.\(tier)`")
-    await slack.internal(.stripe, "*FIRST Payment* from \(slackLink), plan: `.\(tier)`")
-    postmark.toSuperAdmin("FIRST Payment", "from \(emailLink), plan: .\(tier)")
+    await slack.internal(.info, slackMessage)
+    await slack.internal(.stripe, slackMessage)
+    postmark.toSuperAdmin("FIRST Payment", emailMessage)
   }
 }
 
+func firstPaymentSlackMessage(
+  _ customerLink: String,
+  _ tier: StripeSubscription.Tier,
+  _ referrer: Parent?,
+) -> String {
+  var message = "*FIRST Payment* from \(customerLink), plan: `.\(tier)`"
+  if let referrer {
+    let link = AdminLink().slack(to: .parent(referrer.id), text: referrer.email.rawValue)
+    message += "\nreferral: `\(referrer.referralCode ?? "(unknown)")` from \(link)"
+  }
+  return message
+}
+
+func firstPaymentEmailMessage(
+  _ customerLink: String,
+  _ tier: StripeSubscription.Tier,
+  _ referrer: Parent?,
+) -> String {
+  var message = "from \(customerLink), plan: .\(tier)"
+  if let referrer {
+    let link = AdminLink().email(to: .parent(referrer.id), text: referrer.email.rawValue)
+    message += "<br>referral: \(referrer.referralCode ?? "(unknown)") from \(link)"
+  }
+  return message
+}
+
 func notifyTierChange(
-  parent: Parent,
-  from: StripeSubscription.Tier,
-  to: StripeSubscription.Tier,
+  _ parent: Parent,
+  _ from: StripeSubscription.Tier,
+  _ to: StripeSubscription.Tier,
 ) {
   let email = parent.email.rawValue
   let adminLink = AdminLink()
@@ -32,10 +64,10 @@ func notifyTierChange(
 }
 
 func notifyDuplicateSubscriptionAttempt(
-  parentId: Parent.Id,
-  existingSubId: String,
-  incomingSubId: String,
-  existingStatus: String,
+  _ parentId: Parent.Id,
+  _ existingSubId: String,
+  _ incomingSubId: String,
+  _ existingStatus: String,
 ) {
   let adminLink = AdminLink().slack(to: .parent(parentId), text: parentId.lowercased)
   Task {
@@ -50,10 +82,10 @@ func notifyDuplicateSubscriptionAttempt(
 }
 
 func notifyUnexpectedTierChange(
-  parentId: Parent.Id,
-  fromTier: StripeSubscription.Tier,
-  toTier: StripeSubscription.Tier,
-  source: String,
+  _ parentId: Parent.Id,
+  _ fromTier: StripeSubscription.Tier,
+  _ toTier: StripeSubscription.Tier,
+  _ source: String,
 ) {
   let adminLink = AdminLink().slack(to: .parent(parentId), text: parentId.lowercased)
   Task {
@@ -66,7 +98,7 @@ func notifyUnexpectedTierChange(
   }
 }
 
-func notifyPostUpdateStatusAnomaly(parentId: Parent.Id, status: String) {
+func notifyPostUpdateStatusAnomaly(_ parentId: Parent.Id, _ status: String) {
   let adminLink = AdminLink().slack(to: .parent(parentId), text: parentId.lowercased)
   Task {
     await get(dependency: \.slack).internal(.unexpectedErrors, """

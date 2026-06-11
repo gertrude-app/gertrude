@@ -8,6 +8,8 @@ struct Parent: Codable, Sendable {
   var emailVerifiedAt: Date?
   var gclid: String?
   var abTestVariant: String?
+  var referralCode: String?
+  var referredByParentId: Id?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -22,6 +24,8 @@ struct Parent: Codable, Sendable {
     emailVerifiedAt: Date? = nil,
     gclid: String? = nil,
     abTestVariant: String? = nil,
+    referralCode: String? = nil,
+    referredByParentId: Id? = nil,
     createdAt: Date = Date(),
   ) {
     self.id = id
@@ -30,6 +34,8 @@ struct Parent: Codable, Sendable {
     self.emailVerifiedAt = emailVerifiedAt
     self.gclid = gclid
     self.abTestVariant = abTestVariant
+    self.referralCode = referralCode
+    self.referredByParentId = referredByParentId
     self.createdAt = createdAt
   }
 }
@@ -90,6 +96,14 @@ extension Parent {
     try? await BillingIdentity.query()
       .where(.parentId == self.id)
       .first(in: db)
+  }
+
+  func referrer(in db: any DuetSQL.Client) async throws -> Parent? {
+    guard let referredByParentId else { return nil }
+    return try await Parent.query()
+      .where(.id == referredByParentId)
+      .all(in: db)
+      .first
   }
 
   func billingAccountSnapshot(

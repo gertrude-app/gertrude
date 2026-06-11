@@ -84,6 +84,55 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
     expect(parent.abTestVariant).toEqual("old_site")
   }
 
+  func testSignupStoresValidReferral() async throws {
+    let referrer = try await self.db.create(Parent.random {
+      $0.referralCode = "PARENT-ONE"
+    })
+    let email = "referred".random + "@example.com"
+
+    _ = try await Signup.resolve(
+      with: .init(
+        email: email,
+        password: "pass",
+        referralCode: "  PARENT-ONE ",
+      ),
+      in: self.context,
+    )
+
+    let referred = try await Parent.query()
+      .where(.email == email)
+      .first(in: self.db)
+
+    expect(referred.referredByParentId).toEqual(referrer.id)
+  }
+
+  func testSignupIgnoresUnknownReferralCode() async throws {
+    let email = "unknown-referral".random + "@example.com"
+
+    _ = try await Signup.resolve(
+      with: .init(email: email, password: "pass", referralCode: "does-not-exist"),
+      in: self.context,
+    )
+
+    let referred = try await Parent.query()
+      .where(.email == email)
+      .first(in: self.db)
+
+    expect(referred.referredByParentId).toBeNil()
+  }
+
+  func testSignupSlackMessageIncludesReferralContext() {
+    let parent = Parent.random
+    let referrer = Parent.random(with: {
+      $0.referralCode = "PARENT-ONE"
+    })
+
+    let message = newSignupSlackMessage(parent, nil, referrer)
+
+    expect(message).toContain("referral: `PARENT-ONE`")
+    expect(message).toContain(referrer.email.rawValue)
+  }
+
   func testSigningUpWhenAlreadyVerifiedReturnsAuthCreds() async throws {
     let uuids = MockUUIDs()
     let existing = try await self.parent {
