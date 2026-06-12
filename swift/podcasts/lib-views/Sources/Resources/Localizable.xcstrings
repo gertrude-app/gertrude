@@ -2031,13 +2031,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enter the 6-digit code from the Gertrude account website."
+            "value" : "Log in to the Gertrude website, find this device, and click Reset PIN to get a 6-digit code."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ingresa el código de 6 dígitos del sitio web de la cuenta de Gertrude."
+            "value" : "Inicia sesión en el sitio web de Gertrude, busca este dispositivo y haz clic en Restablecer PIN para obtener un código de 6 dígitos."
           }
         }
       }

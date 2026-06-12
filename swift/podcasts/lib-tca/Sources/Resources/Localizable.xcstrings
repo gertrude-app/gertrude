@@ -126,13 +126,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Make sure your PIN is not something you've used before, and never let your child watch you enter it. Write it down somewhere because there's no way to recover it if you forget it."
+            "value" : "Make sure your PIN is not something you’ve used before, and never let your child watch you enter it. Write it down somewhere because there’s no way to recover it if you forget it."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Asegúrate de que tu PIN no sea algo que hayas usado antes, y nunca permitas que tu hijo te vea ingresarlo. Anótalo en algún lugar porque no hay forma de recuperarlo si lo olvidas."
+          }
+        }
+      }
+    },
+    "onboarding.strongPin.connected" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make sure your PIN is not something you’ve used before, and never let your child watch you enter it. If you forget it, you can reset it from your Gertrude account."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asegúrate de que tu PIN no sea algo que hayas usado antes, y nunca permitas que tu hijo te vea ingresarlo. Si lo olvidas, puedes restablecerlo desde tu cuenta de Gertrude."
           }
         }
       }
@@ -211,7 +228,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM is free to try for 30 days. After you try it, you'll need a Gertrude account. Just $10/year for all your family's devices."
+            "value" : "Gertrude AM is free to try for 30 days. After you try it, you’ll need a Gertrude account. Just $10/year for all your family’s devices."
           }
         },
         "es" : {

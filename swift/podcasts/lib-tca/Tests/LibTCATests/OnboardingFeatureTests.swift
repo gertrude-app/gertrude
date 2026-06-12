@@ -38,6 +38,7 @@ import Testing
 
       await store.send(.secondaryBtnTapped) { $0.screen = .explainSetPasscode }
       #expect(store.state.claimFlow == nil)
+      #expect(store.state.pinRecoveryAvailable == false)
     }
   }
 
@@ -75,6 +76,37 @@ import Testing
 
       await store.send(.primaryBtnTapped) { $0.screen = .accountDetected }
       await store.send(.primaryBtnTapped) { $0.screen = .explainSetPasscode }
+      #expect(store.state.pinRecoveryAvailable)
+    }
+  }
+
+  @Test func `successful claim enables PIN recovery copy`() async {
+    let output = GetTrialStatus.Output.claimed(
+      token: UUID(),
+      childId: UUID(),
+      childName: "Sally",
+      subscription: .active(expiresAt: .reference + .days(300)),
+    )
+    await withDependencies {
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.keychain = dictKeychain(LockIsolated([:]))
+    } operation: {
+      let store = TestStore(initialState: .init(
+        screen: .connectAccountOrSkip,
+        claimFlow: .init(context: .onboarding),
+      )) {
+        OnboardingFeature()
+      }
+      store.exhaustivity = .off
+
+      await store.send(.claimFlow(.presented(.polled(output))))
+      #expect(store.state.pinRecoveryAvailable)
+
+      await store.send(.claimFlow(.dismiss))
+      #expect(store.state.screen == .explainSetPasscode)
+      #expect(store.state.pinRecoveryAvailable)
     }
   }
 

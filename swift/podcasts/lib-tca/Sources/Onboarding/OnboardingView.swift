@@ -65,7 +65,11 @@ struct OnboardingView: View {
 
         case .strongPasscode:
           ButtonScreenView(
-            text: lstr(.onboardingStrongPin),
+            text: lstr(
+              self.store.pinRecoveryAvailable
+                ? .onboardingStrongPinConnected
+                : .onboardingStrongPin,
+            ),
             primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped),
           )
         }
