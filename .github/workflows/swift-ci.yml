@@ -343,12 +343,15 @@ jobs:
             swift/podcasts/lib-views/.build
           key: podcasts-xc26.1.1-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
           restore-keys: podcasts-xc26.1.1-
-      - name: setup just
-        uses: extractions/setup-just@v2
       - name: build
-        run: cd swift/podcasts && just build
+        run: |
+          cd swift/podcasts/lib-tca && swift build
+          cd ../lib-core && swift build
+          cd ../lib-views && swift build
       - name: test
-        run: cd swift/podcasts && just test
+        run: |
+          cd swift/podcasts/lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
+          cd ../lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
 
   swift-lint:
     needs: files-changed

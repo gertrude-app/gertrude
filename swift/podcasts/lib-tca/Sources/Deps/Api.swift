@@ -7,6 +7,7 @@ import PodcastRoute
 
 @DependencyClient
 struct ApiClient: Sendable {
+  var crossPromos: @Sendable () async throws -> CrossPromos.Output
   var logEvent: @Sendable (
     _ id: String,
     _ kind: EventKind,
@@ -24,25 +25,41 @@ struct ApiClient: Sendable {
 }
 
 extension ApiClient: DependencyKey {
+  static var testValue: ApiClient {
+    var client = ApiClient()
+    client.crossPromos = { .init(promos: []) }
+    return client
+  }
+
   static var liveValue: ApiClient {
     .init(
-      logEvent: { id, kind, label, detail in
-        guard let deviceId = dep(\.keychain).loadDeviceId() else { return }
-        let device = dep(\.device)
-        let (_, iosVersion, modelIdentifier) = await device.data()
+      crossPromos: {
+        guard let metadata = await podcastDeviceMetadata() else {
+          return .init(promos: [])
+        }
 
-        let appVersion = Bundle.main
-          .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        let input = CrossPromos.Input(
+          deviceId: metadata.deviceId,
+          appVersion: metadata.appVersion,
+          modelIdentifier: metadata.modelIdentifier,
+          iosVersion: metadata.iosVersion,
+          locale: dep(\.locale).identifier,
+        )
+
+        return try await output(from: CrossPromos.self, withUnauthed: .crossPromos(input))
+      },
+      logEvent: { id, kind, label, detail in
+        guard let metadata = await podcastDeviceMetadata() else { return }
 
         let input = LogPodcastEvent_v3.Input(
           eventId: id,
           kind: kind.string,
           label: label,
           detail: detail,
-          deviceId: deviceId,
-          modelIdentifier: modelIdentifier,
-          appVersion: appVersion,
-          iosVersion: iosVersion,
+          deviceId: metadata.deviceId,
+          modelIdentifier: metadata.modelIdentifier,
+          appVersion: metadata.appVersion,
+          iosVersion: metadata.iosVersion,
         )
 
         _ = try await output(
@@ -162,6 +179,20 @@ private func send<Output: PairOutput>(_ route: PodcastRoute) async throws -> Out
   }
 
   return try JSON.decode(data, as: Output.self, [.isoDates])
+}
+
+private func podcastDeviceMetadata() async -> (
+  deviceId: UUID,
+  appVersion: String,
+  modelIdentifier: String,
+  iosVersion: String,
+)? {
+  guard let deviceId = dep(\.keychain).loadDeviceId() else { return nil }
+  let device = dep(\.device)
+  let (_, iosVersion, modelIdentifier) = await device.data()
+  let appVersion = Bundle.main
+    .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+  return (deviceId, appVersion, modelIdentifier, iosVersion)
 }
 
 extension ApiClient {

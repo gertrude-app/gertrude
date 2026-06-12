@@ -7,6 +7,7 @@ public enum UnauthedRoute: PairRoute {
   case logPodcastEvent_v2(LogPodcastEvent_v2.Input)
   case logPodcastEvent_v3(LogPodcastEvent_v3.Input)
   case podcastProducts
+  case crossPromos(CrossPromos.Input)
   case createDatabaseUpload(CreateDatabaseUpload.Input)
   case verifyPromoCode(VerifyPromoCode.Input)
   case verifyDbDownload(VerifyDbDownload.Input)
@@ -37,6 +38,10 @@ public extension UnauthedRoute {
     }
     Route(.case(Self.podcastProducts)) {
       Operation(PodcastProducts.self)
+    }
+    Route(.case(Self.crossPromos)) {
+      Operation(CrossPromos.self)
+      Body(.json(CrossPromos.Input.self))
     }
     Route(.case(Self.createDatabaseUpload)) {
       Operation(CreateDatabaseUpload.self)

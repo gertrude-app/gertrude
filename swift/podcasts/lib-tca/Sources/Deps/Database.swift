@@ -44,6 +44,13 @@ extension DatabaseReader {
       try Record.find(id: id).fetchOne(db)
     }
   }
+
+  func dismissedCrossPromoIds() -> Set<String> {
+    let ids: [CrossPromoDismissal.ID] = self.tryRead { db in
+      try CrossPromoDismissal.all.fetchAll(db).map(\.id)
+    }
+    return Set(ids.map(\.rawValue))
+  }
 }
 
 extension DatabaseWriter {
@@ -72,6 +79,22 @@ extension DatabaseWriter {
     self.tryWrite { db in
       try Record
         .insert { Record.Draft(id: id, value: value, detail: detail) }
+        .execute(db)
+    }
+  }
+
+  func upsertRecord(id: Record.ID, value: String = "", at date: Date = .init()) {
+    self.tryWrite { db in
+      try Record
+        .upsert { Record(id: id, value: value, updatedAt: date, createdAt: date) }
+        .execute(db)
+    }
+  }
+
+  func insertCrossPromoDismissal(campaignId: String, at date: Date = .init()) {
+    self.tryWrite { db in
+      try CrossPromoDismissal
+        .upsert { CrossPromoDismissal(id: .init(rawValue: campaignId), dismissedAt: date) }
         .execute(db)
     }
   }
@@ -122,6 +145,9 @@ public func appDatabase(
   }
   migrator.registerMigration("account-subscription-conversion") {
     try Migrations.accountSubscriptionConversion($0)
+  }
+  migrator.registerMigration("cross-promo-dismissals") {
+    try Migrations.crossPromoDismissals($0)
   }
   try migrator.migrate(database)
 
