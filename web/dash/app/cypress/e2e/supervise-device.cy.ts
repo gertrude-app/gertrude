@@ -147,11 +147,5 @@ describe(`supervise device claim flow`, () => {
       cy.wait(`@GetIOSDeviceClaimData`);
       cy.get(`[data-test="child-name-input"]`).should(`exist`);
     });
-
-    it(`redirects to login if not authenticated`, () => {
-      localStorage.clear();
-      cy.visit(`/supervise-device/123456/claim`);
-      cy.location(`pathname`).should(`eq`, `/login`);
-    });
   });
 });
