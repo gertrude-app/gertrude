@@ -11,6 +11,10 @@ struct OnboardingFeature {
     var resumedAfterClaim: Bool = false
     var trialStatus: GetTrialStatus.Output?
     @Presents var claimFlow: ClaimFlow.State?
+
+    var pinRecoveryAvailable: Bool {
+      self.resumedAfterClaim || self.trialStatus?.isClaimed == true
+    }
   }
 
   enum Action: Equatable {
@@ -97,6 +101,9 @@ struct OnboardingFeature {
         return .none
       case (.connectAccountOrSkip, .secondaryBtnTapped):
         state.screen = .explainSetPasscode
+        return .none
+      case (_, .claimFlow(.presented(.polled(let output)))):
+        state.trialStatus = output
         return .none
       case (_, .claimFlow(.dismiss)):
         state.screen = .explainSetPasscode
