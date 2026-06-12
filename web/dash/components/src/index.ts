@@ -9,6 +9,7 @@ export { default as DeviceContextBanner } from './Unauthed/DeviceContextBanner';
 export type { GertrudeIOSApp } from './gertrudeApps';
 export {
   CLAIM_REDIRECT_ROUTE,
+  claimFunnelPath,
   detectClaimFunnelPath,
   detectClaimPending,
 } from './gertrudeApps';

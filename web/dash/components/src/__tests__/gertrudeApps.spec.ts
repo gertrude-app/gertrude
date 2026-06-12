@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { detectClaimFunnelPath, detectClaimPending } from '../gertrudeApps';
+import {
+  claimFunnelPath,
+  detectClaimFunnelPath,
+  detectClaimPending,
+} from '../gertrudeApps';
 
 describe(`detectClaimPending()`, () => {
   it(`maps claimPendingAmDevice to the podcasts app`, () => {
@@ -18,6 +22,23 @@ describe(`detectClaimPending()`, () => {
 
   it(`ignores an empty claim param value`, () => {
     expect(detectClaimPending(new URLSearchParams(`claimPendingAmDevice=`))).toBeNull();
+  });
+});
+
+describe(`claimFunnelPath()`, () => {
+  it(`builds the AM funnel path for the podcasts app`, () => {
+    expect(claimFunnelPath(`podcasts`, `778899`)).toBe(`/claim-am-device/778899/claim`);
+  });
+
+  it(`builds the supervision funnel path for the blocker app`, () => {
+    expect(claimFunnelPath(`blocker`, `123456`)).toBe(`/supervise-device/123456/claim`);
+  });
+
+  it(`round-trips with detectClaimFunnelPath`, () => {
+    expect(detectClaimFunnelPath(claimFunnelPath(`podcasts`, `778899`))).toEqual({
+      app: `podcasts`,
+      claimCode: `778899`,
+    });
   });
 });
 

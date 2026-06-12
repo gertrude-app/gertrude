@@ -9,9 +9,24 @@ class EphemeralTests: DependencyTestCase {
     let parent = Parent.mock
     let token = await ephemeral.createParentIdToken(parent.id)
     let retrieved = await ephemeral.parentIdFromToken(token)
-    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: nil))
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: nil, claimApp: nil))
     let retrievedAgain = await ephemeral.parentIdFromToken(token)
-    expect(retrievedAgain).toEqual(.previouslyRetrieved(parent.id))
+    expect(retrievedAgain).toEqual(.previouslyRetrieved(parent.id, claimCode: nil, claimApp: nil))
+  }
+
+  func testParentTokenRoundTripsClaimCodeAndApp() async {
+    let ephemeral = Ephemeral()
+    let parent = Parent.mock
+    let token = await ephemeral.createParentIdToken(
+      parent.id,
+      claimCode: "123456",
+      claimApp: .podcasts,
+    )
+    let retrieved = await ephemeral.parentIdFromToken(token)
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimApp: .podcasts))
+    let retrievedAgain = await ephemeral.parentIdFromToken(token) // <-- claim survives retrieval
+    expect(retrievedAgain)
+      .toEqual(.previouslyRetrieved(parent.id, claimCode: "123456", claimApp: .podcasts))
   }
 
   func testExpiredParentTokenReturnsNil() async {
@@ -22,10 +37,23 @@ class EphemeralTests: DependencyTestCase {
       expiration: Date.reference - .days(5),
     )
     var retrieved = await ephemeral.parentIdFromToken(token)
-    expect(retrieved).toEqual(.expired(parent.id))
+    expect(retrieved).toEqual(.expired(parent.id, claimCode: nil, claimApp: nil))
     // can retrieve expired multiple times
     retrieved = await ephemeral.parentIdFromToken(token)
-    expect(retrieved).toEqual(.expired(parent.id))
+    expect(retrieved).toEqual(.expired(parent.id, claimCode: nil, claimApp: nil))
+  }
+
+  func testExpiredParentTokenPreservesClaimContext() async {
+    let ephemeral = Ephemeral()
+    let parent = Parent.mock
+    let token = await ephemeral.createParentIdToken(
+      parent.id,
+      expiration: Date.reference - .days(5),
+      claimCode: "123456",
+      claimApp: .podcasts,
+    )
+    let retrieved = await ephemeral.parentIdFromToken(token)
+    expect(retrieved).toEqual(.expired(parent.id, claimCode: "123456", claimApp: .podcasts))
   }
 
   func testUnknownParentTokenReturnsNotFound() async {

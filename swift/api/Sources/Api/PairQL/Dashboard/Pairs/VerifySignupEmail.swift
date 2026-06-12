@@ -7,6 +7,7 @@ struct AdminAuth: PairOutput {
   var token: Parent.DashToken.Value
   var adminId: Parent.Id
   var claimCode: String?
+  var claimApp: GertrudeIOSApp?
 }
 
 struct VerifySignupEmail: Pair {
@@ -26,12 +27,17 @@ extension VerifySignupEmail: Resolver {
     switch await with(dependency: \.ephemeral).parentIdFromToken(input.token) {
 
     // happy path: verification is successful
-    case .notExpired(let parentId, let claimCode):
+    case .notExpired(let parentId, let claimCode, let claimApp):
       context.telemetry.parentId = parentId
       var parent = try await context.db.find(parentId)
       let token = try await context.db.create(Parent.DashToken(parentId: parent.id))
       if parent.emailVerified {
-        return .init(token: token.value, adminId: parent.id, claimCode: claimCode)
+        return .init(
+          token: token.value,
+          adminId: parent.id,
+          claimCode: claimCode,
+          claimApp: claimApp,
+        )
       }
 
       parent.emailVerifiedAt = get(dependency: \.date.now)
@@ -54,16 +60,26 @@ extension VerifySignupEmail: Resolver {
           .internal(.signups, "email verified: `\(parent.email.rawValue)`")
       }
 
-      return Output(token: token.value, adminId: parent.id, claimCode: claimCode)
+      return Output(
+        token: token.value,
+        adminId: parent.id,
+        claimCode: claimCode,
+        claimApp: claimApp,
+      )
 
     case .notFound:
       throw Abort(.notFound)
 
-    case .expired(let parentId):
+    case .expired(let parentId, let claimCode, let claimApp):
       context.telemetry.parentId = parentId
       let parent = try await context.db.find(parentId)
       if !parent.emailVerified {
-        try await sendVerificationEmail(to: parent, in: context)
+        try await sendVerificationEmail(
+          to: parent,
+          claimCode: claimCode,
+          claimApp: claimApp,
+          in: context,
+        )
         throw context.error("84a6c609", .badRequest, user: EXPIRED_TOKEN_MSG)
       } else {
         throw context.error(
@@ -74,11 +90,16 @@ extension VerifySignupEmail: Resolver {
         )
       }
 
-    case .previouslyRetrieved(let parentId):
+    case .previouslyRetrieved(let parentId, let claimCode, let claimApp):
       context.telemetry.parentId = parentId
       let parent = try await context.db.find(parentId)
       if !parent.emailVerified {
-        try await sendVerificationEmail(to: parent, in: context)
+        try await sendVerificationEmail(
+          to: parent,
+          claimCode: claimCode,
+          claimApp: claimApp,
+          in: context,
+        )
         throw context.error("6257bfb9", .badRequest, user: UNEXPECTED_RESEND_MSG)
       } else {
         throw context.error(

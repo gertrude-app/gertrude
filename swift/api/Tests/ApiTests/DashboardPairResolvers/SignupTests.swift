@@ -55,6 +55,20 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
       .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
   }
 
+  func testSignupWithClaimMintsAppAwareVerificationToken() async throws {
+    let email = "signup".random + "@example.com"
+    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .podcasts)
+    _ = try await Signup.resolve(with: input, in: self.context)
+
+    let parent = try await Parent.query()
+      .where(.email == email)
+      .first(in: self.db)
+    let token = UUID(uuidString: sent.emails[0].templateModel["token"] ?? "")!
+    let retrieved = await with(dependency: \.ephemeral).parentIdFromToken(token)
+
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimApp: .podcasts))
+  }
+
   func testSignupWithBlockerClaimBakesSupervisionRedirectIntoEmail() async throws {
     let email = "signup".random + "@example.com"
     let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .blocker)

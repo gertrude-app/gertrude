@@ -1,4 +1,4 @@
-import { FullscreenModalForm } from '@dash/components';
+import { FullscreenModalForm, claimFunnelPath } from '@dash/components';
 import { Button } from '@shared/components';
 import React from 'react';
 import { Navigate, useParams } from 'react-router-dom';
@@ -43,8 +43,9 @@ const VerifySignupEmail: React.FC = () => {
   }
 
   const claimCode = verification.data?.claimCode;
+  const claimApp = verification.data?.claimApp ?? `blocker`;
   const destination =
-    redirect ?? (claimCode ? `/supervise-device/${claimCode}/claim` : `/`);
+    redirect ?? (claimCode ? claimFunnelPath(claimApp, claimCode) : `/`);
   return (
     <Navigate to={`/referral-survey?next=${encodeURIComponent(destination)}`} replace />
   );

@@ -26,6 +26,10 @@ const CLAIM_FUNNEL_PATH_SEGMENT: Record<GertrudeIOSApp, string> = {
   podcasts: `claim-am-device`,
 };
 
+export function claimFunnelPath(app: GertrudeIOSApp, claimCode: string): string {
+  return `/${CLAIM_FUNNEL_PATH_SEGMENT[app]}/${claimCode}/claim`;
+}
+
 export function detectClaimFunnelPath(
   pathname: string,
 ): { app: GertrudeIOSApp; claimCode: string } | null {

@@ -154,6 +154,28 @@ describe(`verify-signup-email post-verify routing`, () => {
     cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
   });
 
+  it(`continues to the AM funnel from token claim data when the redirect param is missing`, () => {
+    cy.interceptPql(`VerifySignupEmail`, {
+      adminId: `admin-123`,
+      token: `token-123`,
+      claimCode: `778899`,
+      claimApp: `podcasts`,
+    });
+    cy.interceptPql(`GetAmClaimData`, {
+      children: [],
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `18.2`,
+    });
+
+    cy.visit(`/verify-signup-email/verify-token-123`);
+
+    cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/referral-survey`);
+    cy.contains(`Skip`).click();
+    cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
+  });
+
   it(`continues to the supervision funnel through the referral survey for a legacy claimCode-only verify`, () => {
     cy.interceptPql(`VerifySignupEmail`, {
       adminId: `admin-123`,
