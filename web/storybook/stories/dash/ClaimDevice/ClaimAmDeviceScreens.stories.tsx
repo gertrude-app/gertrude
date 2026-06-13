@@ -16,6 +16,7 @@ const ClaimAmDeviceScreen: React.FC<{
   doneVariant?: AmDoneVariant;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
+  showSubscribe?: boolean;
   error?: string;
 }> = ({
   modelName,
@@ -26,6 +27,7 @@ const ClaimAmDeviceScreen: React.FC<{
   doneVariant = `notEntitled`,
   accessEndsAt,
   trialDaysRemaining,
+  showSubscribe,
   error,
 }) => {
   const [step, setStep] = useState<ScreenStep>(initialStep);
@@ -65,6 +67,7 @@ const ClaimAmDeviceScreen: React.FC<{
         variant={doneVariant}
         accessEndsAt={accessEndsAt}
         trialDaysRemaining={trialDaysRemaining}
+        showSubscribe={showSubscribe}
         onBackToDashboard={() => {}}
         onSubscribe={() => {}}
         onMaybeLater={() => {}}

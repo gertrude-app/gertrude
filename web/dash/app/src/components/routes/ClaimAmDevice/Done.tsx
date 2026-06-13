@@ -25,7 +25,7 @@ const ClaimAmDeviceDone: React.FC = () => {
 
   const { subscription, childName, modelName, iosVersion } = state;
   const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
-  const { variant, accessEndsAt, trialDaysRemaining, subscribeUrl } =
+  const { variant, accessEndsAt, trialDaysRemaining, subscribeUrl, showSubscribe } =
     amDoneVariant(subscription);
 
   const handleSubscribe = (): void => {
@@ -46,6 +46,7 @@ const ClaimAmDeviceDone: React.FC = () => {
         variant={variant}
         accessEndsAt={accessEndsAt}
         trialDaysRemaining={trialDaysRemaining}
+        showSubscribe={showSubscribe}
         onBackToDashboard={() => navigate(`/`)}
         onSubscribe={handleSubscribe}
         onMaybeLater={() => navigate(`/`)}
