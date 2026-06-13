@@ -55,6 +55,29 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(installs[0].createdAt).toEqual(first.createdAt)
   }
 
+  func testConcurrentRequestsCreateSingleInstall() async throws {
+    let deviceId = UUID()
+
+    let outputs = try await withThrowingTaskGroup(of: GetTrialStatus.Output.self) { group in
+      for _ in 0 ..< 10 {
+        group.addTask {
+          try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+        }
+      }
+      return try await group.reduce(into: []) { $0.append($1) }
+    }
+
+    expect(outputs.count).toEqual(10)
+    let devices = try await IOSDevice.query()
+      .where(.id == IOSDevice.Id(deviceId))
+      .all(in: self.db)
+    expect(devices.count).toEqual(1)
+    let installs = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .all(in: self.db)
+    expect(installs.count).toEqual(1)
+  }
+
   // MARK: - trial window (createdAt + 30d vs now)
 
   func testActiveTrialReturnsExpiresAt() async throws {
