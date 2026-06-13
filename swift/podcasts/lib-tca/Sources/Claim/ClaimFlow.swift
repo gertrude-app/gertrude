@@ -35,7 +35,7 @@ struct ClaimFlow {
     }
 
     var successIsTerminal: Bool {
-      self.entitlement?.isEntitled ?? false
+      self.entitlement?.claimSuccessEntitlement != nil
     }
   }
 

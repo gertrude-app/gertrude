@@ -26,7 +26,7 @@ struct ClaimFlowView: View {
 
       case .success:
         ClaimSuccessView(
-          isTerminal: self.store.successIsTerminal,
+          entitlement: self.store.entitlement?.claimSuccessEntitlement,
           deviceName: self.deviceName,
           buttonLabel: self.store.context == .onboarding ? lstr(.claimContinue) : nil,
           onEvent: { _ in

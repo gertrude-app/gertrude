@@ -86,6 +86,16 @@ extension AmSubscriptionState {
     }
   }
 
+  var claimSuccessEntitlement: ClaimSuccessView.Entitlement? {
+    switch self {
+    case .active: .paid
+    case .fullTrial, .amTrial: .trial
+    case .complimentary: .complimentary
+    case .legacyGrandfathered: .legacy
+    case .unpaid, .legacyExpired: nil
+    }
+  }
+
   @discardableResult
   func writeLocal(now: Date) -> Subscription {
     let mapped = self.toLocal(now: now)

@@ -38,7 +38,7 @@ struct OnboardingView: View {
 
         case .accountDetected:
           ClaimSuccessView(
-            isTerminal: false,
+            entitlement: nil,
             deviceName: self.autoDetectDeviceName,
             buttonLabel: lstr(.claimContinue),
             onEvent: { _ in self.store.send(.primaryBtnTapped) },

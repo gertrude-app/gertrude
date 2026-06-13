@@ -1617,6 +1617,57 @@
         }
       }
     },
+    "claim.success.terminal.subtitle.complimentary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free forever"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis para siempre"
+          }
+        }
+      }
+    },
+    "claim.success.terminal.subtitle.legacy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access active"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso activo"
+          }
+        }
+      }
+    },
+    "claim.success.terminal.subtitle.trial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free trial active"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba gratuita activa"
+          }
+        }
+      }
+    },
     "claim.done" : {
       "extractionState" : "manual",
       "localizations" : {
