@@ -58,7 +58,12 @@ extension Signup: Resolver {
       }
 
       if !existingParent.emailVerified {
-        try await sendVerificationEmail(to: existingParent, from: input, in: context)
+        try await sendVerificationEmail(
+          to: existingParent,
+          claimCode: input.claimCode,
+          claimApp: input.app,
+          in: context,
+        )
       } else {
         try await postmark.send(template: .reSignup(
           to: email,
@@ -92,7 +97,12 @@ extension Signup: Resolver {
       await slack.internal(.signups, newSignupSlackMessage(parent, input.gclid, referrer))
     }
 
-    try await sendVerificationEmail(to: parent, from: input, in: context)
+    try await sendVerificationEmail(
+      to: parent,
+      claimCode: input.claimCode,
+      claimApp: input.app,
+      in: context,
+    )
     return .init(admin: nil)
   }
 }
@@ -115,18 +125,20 @@ func newSignupSlackMessage(_ parent: Parent, _ gclid: String?, _ referrer: Paren
 
 func sendVerificationEmail(
   to admin: Parent,
-  from input: Signup.Input? = nil,
+  claimCode: String? = nil,
+  claimApp: GertrudeIOSApp? = nil,
   in context: Context,
 ) async throws {
   let token = await with(dependency: \.ephemeral)
     .createParentIdToken(
       admin.id,
       expiration: get(dependency: \.date.now) + .hours(24),
-      claimCode: input?.claimCode,
+      claimCode: claimCode,
+      claimApp: claimApp,
     )
 
   var redirect: String?
-  if let app = input?.app, let claimCode = input?.claimCode, let code = Int(claimCode) {
+  if let app = claimApp, let claimCode, let code = Int(claimCode) {
     redirect = app.claimFunnelRedirectPath(code: code)
       .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
   }

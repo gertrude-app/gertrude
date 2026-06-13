@@ -121,7 +121,11 @@ extension DashboardWidgets_v2: NoInputResolver {
     async let supervisionsAsync = BlockerApp.Supervision.query()
       .where(.deviceId |=| iosDevices.map(\.id))
       .all(in: context.db)
-    async let connectedDeviceIdsAsync = BlockerApp.Token.connectedDeviceIds(
+    async let blockerConnectedDeviceIdsAsync = BlockerApp.Token.connectedDeviceIds(
+      among: iosDevices.map(\.id),
+      in: context.db,
+    )
+    async let amConnectedDeviceIdsAsync = PodcastApp.Token.connectedDeviceIds(
       among: iosDevices.map(\.id),
       in: context.db,
     )
@@ -155,7 +159,8 @@ extension DashboardWidgets_v2: NoInputResolver {
       .reduce(into: [:]) { map, computer in map[computer.id] = computer }
     let supervisionMap: [IOSDevice.Id: BlockerApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
-    let connectedDeviceIds = try await connectedDeviceIdsAsync
+    let connectedDeviceIds = try await blockerConnectedDeviceIdsAsync
+      .union(amConnectedDeviceIdsAsync)
 
     return try await .init(
       children: children.concurrentMap { child in

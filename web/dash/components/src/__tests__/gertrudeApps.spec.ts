@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { detectClaimPending } from '../gertrudeApps';
+import {
+  claimFunnelPath,
+  detectClaimFunnelPath,
+  detectClaimPending,
+} from '../gertrudeApps';
 
 describe(`detectClaimPending()`, () => {
   it(`maps claimPendingAmDevice to the podcasts app`, () => {
@@ -18,5 +22,70 @@ describe(`detectClaimPending()`, () => {
 
   it(`ignores an empty claim param value`, () => {
     expect(detectClaimPending(new URLSearchParams(`claimPendingAmDevice=`))).toBeNull();
+  });
+});
+
+describe(`claimFunnelPath()`, () => {
+  it(`builds the AM funnel path for the podcasts app`, () => {
+    expect(claimFunnelPath(`podcasts`, `778899`)).toBe(`/claim-am-device/778899/claim`);
+  });
+
+  it(`builds the supervision funnel path for the blocker app`, () => {
+    expect(claimFunnelPath(`blocker`, `123456`)).toBe(`/supervise-device/123456/claim`);
+  });
+
+  it(`round-trips with detectClaimFunnelPath`, () => {
+    expect(detectClaimFunnelPath(claimFunnelPath(`podcasts`, `778899`))).toEqual({
+      app: `podcasts`,
+      claimCode: `778899`,
+    });
+  });
+});
+
+describe(`detectClaimFunnelPath()`, () => {
+  it(`maps a claim-am-device path to the podcasts app`, () => {
+    expect(detectClaimFunnelPath(`/claim-am-device/778899/claim`)).toEqual({
+      app: `podcasts`,
+      claimCode: `778899`,
+    });
+  });
+
+  it(`maps a supervise-device path to the blocker app`, () => {
+    expect(detectClaimFunnelPath(`/supervise-device/123456/claim`)).toEqual({
+      app: `blocker`,
+      claimCode: `123456`,
+    });
+  });
+
+  it(`matches funnel subroutes`, () => {
+    expect(detectClaimFunnelPath(`/supervise-device/123456/payment`)).toEqual({
+      app: `blocker`,
+      claimCode: `123456`,
+    });
+    expect(detectClaimFunnelPath(`/claim-am-device/778899/done`)).toEqual({
+      app: `podcasts`,
+      claimCode: `778899`,
+    });
+  });
+
+  it(`matches a bare funnel path with no subroute`, () => {
+    expect(detectClaimFunnelPath(`/supervise-device/123456`)).toEqual({
+      app: `blocker`,
+      claimCode: `123456`,
+    });
+  });
+
+  it(`returns null for non-funnel paths`, () => {
+    expect(detectClaimFunnelPath(`/`)).toBeNull();
+    expect(detectClaimFunnelPath(`/children`)).toBeNull();
+    expect(detectClaimFunnelPath(`/children/123/ios-devices/456`)).toBeNull();
+  });
+
+  it(`returns null for a non-numeric claim code`, () => {
+    expect(detectClaimFunnelPath(`/claim-am-device/abc123/claim`)).toBeNull();
+  });
+
+  it(`returns null when the funnel segment is not at the path root`, () => {
+    expect(detectClaimFunnelPath(`/foo/claim-am-device/778899/claim`)).toBeNull();
   });
 });

@@ -77,6 +77,61 @@ describe(`app-aware claim glue`, () => {
   });
 });
 
+describe(`logged-out claim deep-link bounce`, () => {
+  it(`recovers an AM claim deep-link via the api claim redirect`, () => {
+    cy.intercept(`**/claim-pending-am/778899`, {
+      statusCode: 307,
+      headers: {
+        location: `${Cypress.config().baseUrl}/signup?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2&redirect=${encodeURIComponent(
+          `/claim-am-device/778899/claim`,
+        )}`,
+      },
+    });
+
+    cy.visit(`/claim-am-device/778899/claim`);
+
+    cy.location(`pathname`).should(`eq`, `/signup`);
+    cy.contains(`Signup to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`Gertrude AM`);
+
+    cy.interceptPql(`Signup`, {});
+    cy.get(`input[name=email]`).type(`am-claim@example.com`);
+    cy.get(`input[name=password]`).type(`bobbobbob{enter}`);
+
+    cy.wait(`@Signup`) // claim context must reach the signup payload
+      .its(`request.body`)
+      .should(`include`, { claimCode: `778899`, app: `podcasts` });
+    cy.contains(`Verification email sent`);
+  });
+
+  it(`recovers a supervision claim deep-link via the api claim redirect`, () => {
+    cy.intercept(`**/claim-pending-supervision/123456`, {
+      statusCode: 307,
+      headers: {
+        location: `${Cypress.config().baseUrl}/signup?claimPendingSupervision=123456&modelName=iPhone+15+Pro&iosVersion=18.2&redirect=${encodeURIComponent(
+          `/supervise-device/123456/claim`,
+        )}`,
+      },
+    });
+
+    cy.visit(`/supervise-device/123456/claim`);
+
+    cy.location(`pathname`).should(`eq`, `/signup`);
+    cy.contains(`Signup to connect:`);
+    cy.contains(`Gertrude Blocker`);
+
+    cy.interceptPql(`Signup`, {});
+    cy.get(`input[name=email]`).type(`supervision-claim@example.com`);
+    cy.get(`input[name=password]`).type(`bobbobbob{enter}`);
+
+    cy.wait(`@Signup`)
+      .its(`request.body`)
+      .should(`include`, { claimCode: `123456`, app: `blocker` });
+    cy.contains(`Verification email sent`);
+  });
+});
+
 describe(`verify-signup-email post-verify routing`, () => {
   it(`continues to the AM funnel through the referral survey when a redirect param is present`, () => {
     cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
@@ -92,6 +147,28 @@ describe(`verify-signup-email post-verify routing`, () => {
         `/claim-am-device/778899/claim`,
       )}`,
     );
+
+    cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/referral-survey`);
+    cy.contains(`Skip`).click();
+    cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
+  });
+
+  it(`continues to the AM funnel from token claim data when the redirect param is missing`, () => {
+    cy.interceptPql(`VerifySignupEmail`, {
+      adminId: `admin-123`,
+      token: `token-123`,
+      claimCode: `778899`,
+      claimApp: `podcasts`,
+    });
+    cy.interceptPql(`GetAmClaimData`, {
+      children: [],
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `18.2`,
+    });
+
+    cy.visit(`/verify-signup-email/verify-token-123`);
 
     cy.wait(`@VerifySignupEmail`);
     cy.location(`pathname`).should(`eq`, `/referral-survey`);

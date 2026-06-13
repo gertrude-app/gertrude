@@ -8,5 +8,6 @@ export namespace LoginMagicLink {
     token: UUID;
     adminId: UUID;
     claimCode?: string;
+    claimApp?: 'blocker' | 'podcasts';
   }
 }

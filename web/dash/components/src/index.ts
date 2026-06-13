@@ -7,7 +7,12 @@ export { default as EmailInputForm } from './Unauthed/EmailInputForm';
 export { default as LoginForm } from './Unauthed/LoginForm';
 export { default as DeviceContextBanner } from './Unauthed/DeviceContextBanner';
 export type { GertrudeIOSApp } from './gertrudeApps';
-export { detectClaimPending } from './gertrudeApps';
+export {
+  CLAIM_REDIRECT_ROUTE,
+  claimFunnelPath,
+  detectClaimFunnelPath,
+  detectClaimPending,
+} from './gertrudeApps';
 export { default as CodeChip } from './CodeChip';
 export { default as AppHeader } from './iOS/AppHeader';
 export { default as ResetPinModal } from './iOS/ResetPinModal';

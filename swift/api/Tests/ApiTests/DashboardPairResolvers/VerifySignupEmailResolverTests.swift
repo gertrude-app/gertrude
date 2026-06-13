@@ -25,6 +25,21 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     expect(method.config).toEqual(.email(email: parent.email.rawValue))
   }
 
+  func testVerifySignupEmailReturnsClaimCodeAndApp() async throws {
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
+    let token = await with(dependency: \.ephemeral).createParentIdToken(
+      parent.id,
+      claimCode: "123456",
+      claimApp: .podcasts,
+    )
+
+    let output = try await VerifySignupEmail.resolve(with: .init(token: token), in: self.context)
+
+    expect(output.adminId).toEqual(parent.id)
+    expect(output.claimCode).toEqual("123456")
+    expect(output.claimApp).toEqual(.podcasts)
+  }
+
   func testVerifyingWithExpiredTokenErrorsButSendsNewVerification() async throws {
     let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let token = await with(dependency: \.ephemeral).createParentIdToken(
@@ -38,6 +53,29 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     expect(sent.emails).toHaveCount(1)
     expect(sent.emails[0].to).toEqual(parent.email.rawValue)
     expect(sent.emails[0].template).toBe("initial-signup")
+  }
+
+  func testExpiredTokenResendPreservesClaimContext() async throws {
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
+    let ephemeral = with(dependency: \.ephemeral)
+    let token = await ephemeral.createParentIdToken(
+      parent.id,
+      expiration: Date.reference - .days(1),
+      claimCode: "123456",
+      claimApp: .podcasts,
+    )
+
+    let result = await VerifySignupEmail.result(with: .init(token: token), in: self.context)
+
+    expect(result).toBeError(containing: "expired, but we sent a new verification email")
+    expect(sent.emails).toHaveCount(1)
+    expect(sent.emails[0].template).toBe("initial-signup")
+    expect(sent.emails[0].templateModel["redirect"]) // <-- replacement email keeps funnel
+      .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
+
+    let newToken = UUID(uuidString: sent.emails[0].templateModel["token"] ?? "")!
+    let retrieved = await ephemeral.parentIdFromToken(newToken)
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimApp: .podcasts))
   }
 
   func testExpiredTokenForAlreadyVerifiedParentErrorsWithHelpfulMessage() async throws {
@@ -71,7 +109,11 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
   func testPreviouslyRetrievedTokenForStillPendingParentResendsEmail() async throws {
     let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let ephemeral = with(dependency: \.ephemeral)
-    let token = await ephemeral.createParentIdToken(parent.id)
+    let token = await ephemeral.createParentIdToken(
+      parent.id,
+      claimCode: "123456",
+      claimApp: .podcasts,
+    )
 
     // simulate token being retrieved but parent somehow still pending
     _ = await ephemeral.parentIdFromToken(token)
@@ -84,6 +126,8 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     let result = await VerifySignupEmail.result(with: .init(token: token), in: self.context)
     expect(result).toBeError(containing: "we sent a new verification email")
     expect(sent.emails).toHaveCount(1)
+    expect(sent.emails[0].templateModel["redirect"]) // <-- resend keeps funnel
+      .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
   }
 
   func testVerifySignupEmailDoesntChangeAdminUserSubscriptionStatusWhenNotPending() async throws {
