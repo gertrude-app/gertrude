@@ -42,6 +42,12 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.ClaimAmDevice.Output>(input, `ClaimAmDevice`, `parent`);
   };
 
+  public claimMusicDevice = (
+    input: P.ClaimMusicDevice.Input,
+  ): Promise<Result<P.ClaimMusicDevice.Output>> => {
+    return this.query<P.ClaimMusicDevice.Output>(input, `ClaimMusicDevice`, `parent`);
+  };
+
   public claimIOSDevice = (
     input: P.ClaimIOSDevice.Input,
   ): Promise<Result<P.ClaimIOSDevice.Output>> => {
@@ -192,6 +198,12 @@ export default class DashboardClient extends Client<Auth> {
 
   public getDevice = (input: P.GetDevice.Input): Promise<Result<P.GetDevice.Output>> => {
     return this.query<P.GetDevice.Output>(input, `GetDevice`, `parent`);
+  };
+
+  public getMusicClaimData = (
+    input: P.GetMusicClaimData.Input,
+  ): Promise<Result<P.GetMusicClaimData.Output>> => {
+    return this.query<P.GetMusicClaimData.Output>(input, `GetMusicClaimData`, `parent`);
   };
 
   public getIOSDevice = (

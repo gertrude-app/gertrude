@@ -15,7 +15,7 @@ struct AppStoreSyncJob: AsyncScheduledJob {
   }
 
   func exec() async {
-    for app in GertrudeIOSApp.allCases {
+    for app in GertrudeIOSApp.appStoreSyncedCases {
       await self.syncReviews(for: app)
       await self.syncRatings(for: app)
     }

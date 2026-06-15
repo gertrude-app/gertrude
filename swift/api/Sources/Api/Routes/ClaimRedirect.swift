@@ -11,6 +11,10 @@ enum ClaimRedirectRoute {
     try await self.handle(request, app: .podcasts)
   }
 
+  @Sendable static func music(_ request: Request) async throws -> Response {
+    try await self.handle(request, app: .music)
+  }
+
   private static func handle(
     _ request: Request,
     app: GertrudeIOSApp,

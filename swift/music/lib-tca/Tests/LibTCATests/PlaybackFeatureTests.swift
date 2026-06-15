@@ -23,7 +23,10 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.playTrack(item)) {
-      $0.session = .init(currentItem: item)
+      $0.session = .init(playStatus: .loading, currentItem: item)
+    }
+    await store.receive(.playbackStarted) {
+      $0.session?.playStatus = .playing
     }
   }
 
@@ -44,7 +47,13 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.playAlbumQueue(items: items, startIndex: 1)) {
-      $0.session = .init(albumQueue: .init(items: items, currentIndex: 1))
+      $0.session = .init(
+        playStatus: .loading,
+        albumQueue: .init(items: items, currentIndex: 1),
+      )
+    }
+    await store.receive(.playbackStarted) {
+      $0.session?.playStatus = .playing
     }
 
     let recordedItems = await recorder.items
@@ -91,7 +100,7 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
 
     await store.send(.playTrack(item)) {
-      $0.session = .init(currentItem: item)
+      $0.session = .init(playStatus: .loading, currentItem: item)
     }
     await store.receive(.playbackFailed) {
       $0.session?.playStatus = .paused

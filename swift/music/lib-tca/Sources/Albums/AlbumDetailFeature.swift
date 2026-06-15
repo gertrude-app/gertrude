@@ -71,6 +71,10 @@ extension AlbumDetailFeature.State {
     self.playStatus == .playing
   }
 
+  var isLoading: Bool {
+    self.playStatus == .loading
+  }
+
   var pushID: String {
     self.transitionSourceID ?? self.album.id.rawValue
   }

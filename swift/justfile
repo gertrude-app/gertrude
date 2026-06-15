@@ -6,6 +6,7 @@ set dotenv-filename := "../.gtask-ports"
 set dotenv-required := false
 
 api_port := env("API_PORT", "8080")
+api_host := env("API_HOST", "0.0.0.0")
 ngrok_subdomain := env("NGROK_SUBDOMAIN", "")
 swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
 
@@ -36,7 +37,7 @@ watch-api:
   @just watch-swift . 'just run-api' 'macapp/**/*'
 
 run-api: build-api
-  @just exec-api serve --port {{api_port}}
+  @just exec-api serve --hostname {{api_host}} --port {{api_port}}
 
 run-api-ip: build-api
   @just exec-api serve --hostname 192.168.10.248

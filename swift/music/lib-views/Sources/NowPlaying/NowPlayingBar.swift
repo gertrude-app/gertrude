@@ -13,6 +13,7 @@ import SwiftUI
     private let artist: String
     private let artworkURL: URL?
     private let isPlaying: Bool
+    private let isLoading: Bool
     private let isEnabled: Bool
     private let foregroundColor: Color
     private let panelTransitionID: String?
@@ -31,6 +32,7 @@ import SwiftUI
         "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
       ),
       isPlaying: Bool = false,
+      isLoading: Bool = false,
       isEnabled: Bool = true,
       foregroundColor: Color = .black,
       panelTransitionID: String? = nil,
@@ -45,6 +47,7 @@ import SwiftUI
       self.artist = artist
       self.artworkURL = artworkURL
       self.isPlaying = isPlaying
+      self.isLoading = isLoading
       self.isEnabled = isEnabled
       self.foregroundColor = foregroundColor
       self.panelTransitionID = panelTransitionID
@@ -76,6 +79,7 @@ import SwiftUI
         artworkURL: self.artworkURL,
         artworkTransitionID: self.artworkTransitionID,
         isPlaying: self.isPlaying,
+        isLoading: self.isLoading,
         isEnabled: self.isEnabled,
         foregroundColor: self.foregroundColor,
         onTap: self.onTap,
@@ -155,6 +159,7 @@ import SwiftUI
     let artworkURL: URL?
     let artworkTransitionID: String?
     let isPlaying: Bool
+    var isLoading = false
     let isEnabled: Bool
     let foregroundColor: Color
     let onTap: @MainActor @Sendable () -> Void
@@ -198,8 +203,9 @@ import SwiftUI
             systemName: self.isPlaying ? "pause.fill" : "play.fill",
             size: 18,
             foregroundColor: self.foregroundColor,
-            isEnabled: self.isEnabled,
-            accessibilityLabel: self.isPlaying ? "Pause" : "Play",
+            isLoading: self.isLoading,
+            isEnabled: self.isEnabled && !self.isLoading,
+            accessibilityLabel: self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play",
             action: self.onPlayTap,
           )
           NowPlayingIconButton(
@@ -245,8 +251,9 @@ import SwiftUI
           systemName: self.isPlaying ? "pause.fill" : "play.fill",
           size: 17,
           foregroundColor: self.foregroundColor,
-          isEnabled: self.isEnabled,
-          accessibilityLabel: self.isPlaying ? "Pause" : "Play",
+          isLoading: self.isLoading,
+          isEnabled: self.isEnabled && !self.isLoading,
+          accessibilityLabel: self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play",
           action: self.onPlayTap,
         )
       }
@@ -334,6 +341,7 @@ import SwiftUI
     let systemName: String
     let size: CGFloat
     let foregroundColor: Color
+    var isLoading = false
     let isEnabled: Bool
     let accessibilityLabel: String
     var hitSlop: CGSize = .zero
@@ -341,11 +349,19 @@ import SwiftUI
 
     var body: some View {
       Button(action: self.action) {
-        Image(systemName: self.systemName)
-          .font(.system(size: self.size, weight: .black))
-          .foregroundStyle(self.foregroundColor)
-          .frame(width: max(28, self.size + 8), height: 30)
-          .contentShape(Rectangle())
+        Group {
+          if self.isLoading {
+            ProgressView()
+              .controlSize(.small)
+              .tint(self.foregroundColor)
+          } else {
+            Image(systemName: self.systemName)
+              .font(.system(size: self.size, weight: .black))
+          }
+        }
+        .foregroundStyle(self.foregroundColor)
+        .frame(width: max(28, self.size + 8), height: 30)
+        .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
       .padding(.horizontal, self.hitSlop.width)

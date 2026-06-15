@@ -29,7 +29,7 @@ below.
 - `./swift/podcasts`
 - if relevant, read `./swift/podcasts/AGENTS.md`
 
-> **Coming soon:** Gertrude FM, a parent-curated music-playing iOS app, is under active
+> **Coming soon:** Gertrude Music, a parent-curated music-playing iOS app, is under active
 > development.
 
 ## Production Websites:

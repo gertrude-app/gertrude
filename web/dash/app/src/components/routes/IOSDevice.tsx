@@ -2,7 +2,10 @@
 import {
   // BlockRuleEditor,
   AmDeviceSection,
+  ApiErrorMessage,
+  /*ConfirmDeleteEntity*/
   AppHeader,
+  BetaBadge,
   BlockGroupList,
   // EditBlockRules,
   Loading,
@@ -10,7 +13,6 @@ import {
   ToggleCard,
   // TrashBtn,
 } from '@dash/components';
-import { ApiErrorMessage /*ConfirmDeleteEntity*/ } from '@dash/components';
 // import { PlusIcon } from '@heroicons/react/24/solid';
 import { Button /* SelectMenu */ } from '@shared/components';
 // import { Result } from '@shared/pairql';
@@ -25,6 +27,7 @@ import { amSubscriptionRunway } from '../../amSubscriptionRunway';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
 import reducer from '../../reducers/ios-device-reducer';
+import MusicCuration from './MusicCuration';
 
 const TIER_TO_STATUS: Record<AmRunwayTier, AmStatus> = {
   active: `active`,
@@ -33,7 +36,10 @@ const TIER_TO_STATUS: Record<AmRunwayTier, AmStatus> = {
 };
 
 const IOSDevice: React.FC = () => {
-  const { deviceId: id = `` } = useParams<{ deviceId: string }>();
+  const { userId: childId = ``, deviceId: id = `` } = useParams<{
+    userId: string;
+    deviceId: string;
+  }>();
   const [state, dispatch] = useReducer(reducer, {
     enabledBlockGroups: [],
     webPolicyDomains: [],
@@ -128,6 +134,9 @@ const IOSDevice: React.FC = () => {
             trialDaysRemaining={amRunway.trialDaysRemaining}
             requestPinCode={requestPinCode}
           />
+        )}
+        {deviceQuery.data.musicConnected && (
+          <MusicDeviceSection childId={childId} childName={deviceQuery.data.childName} />
         )}
         {blocker && (
           <div className="max-w-3xl">
@@ -340,6 +349,18 @@ const IOSDevice: React.FC = () => {
     </div>
   );
 };
+
+const MusicDeviceSection: React.FC<{
+  childId: string;
+  childName: string;
+}> = ({ childId, childName }) => (
+  <div className="max-w-3xl">
+    <AppHeader app="music">
+      <BetaBadge />
+    </AppHeader>
+    <MusicCuration childId={childId} childName={childName} className="mt-6" />
+  </div>
+);
 
 export default IOSDevice;
 

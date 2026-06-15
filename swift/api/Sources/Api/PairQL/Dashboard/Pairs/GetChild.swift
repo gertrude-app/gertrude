@@ -68,6 +68,7 @@ struct GetChild: Pair {
     var deviceType: String
     var iosVersion: String
     var pendingClaimCode: Int?
+    var musicConnected: Bool
   }
 
   typealias Input = Api.Child.Id
@@ -120,6 +121,10 @@ extension GetChild: Resolver {
     let versions = pairs.map(\.1)
 
     let devices = try await child.iosDevices(in: context.db)
+    async let musicConnectedDeviceIdsAsync = MusicApp.Token.connectedDeviceIds(
+      among: devices.map(\.id),
+      in: context.db,
+    )
 
     var blockedApps: [UserBlockedApp.DTO]?
     if versions.contains(where: { $0 >= .init("2.6.0")! }) {
@@ -131,6 +136,8 @@ extension GetChild: Resolver {
 
     let supportsAlwaysBlocked = !versions.isEmpty
       && versions.allSatisfy { $0 >= .init("2.9.1")! }
+
+    let musicConnectedDeviceIds = try await musicConnectedDeviceIdsAsync
 
     return try await .init(
       id: child.id,
@@ -157,6 +164,7 @@ extension GetChild: Resolver {
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
           pendingClaimCode: pendingSupervision ? device.claimCode : nil,
+          musicConnected: musicConnectedDeviceIds.contains(device.id),
         )
       },
       blockedApps: blockedApps,

@@ -8,6 +8,7 @@ public struct NowPlayingScreenView: View {
   private let showsArtwork: Bool
   private let artworkTransitionID: String?
   private let isPlaying: Bool
+  private let isLoading: Bool
   private let progress: Double
   private let duration: TimeInterval
   private let onPlayPauseTap: @MainActor @Sendable () -> Void
@@ -25,6 +26,7 @@ public struct NowPlayingScreenView: View {
     showsArtwork: Bool = true,
     artworkTransitionID: String? = nil,
     isPlaying: Bool = true,
+    isLoading: Bool = false,
     progress: Double = 0.38,
     duration: TimeInterval = 214,
     onPlayPauseTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -38,6 +40,7 @@ public struct NowPlayingScreenView: View {
     self.showsArtwork = showsArtwork
     self.artworkTransitionID = artworkTransitionID
     self.isPlaying = isPlaying
+    self.isLoading = isLoading
     self.progress = progress
     self.duration = duration
     self.onPlayPauseTap = onPlayPauseTap
@@ -107,6 +110,7 @@ public struct NowPlayingScreenView: View {
 
           NowPlayingTransportControls(
             isPlaying: self.isPlaying,
+            isLoading: self.isLoading,
             onPlayPauseTap: self.onPlayPauseTap,
             onPreviousTap: self.onPreviousTap,
             onNextTap: self.onNextTap,
@@ -163,6 +167,7 @@ public struct NowPlayingScreenView: View {
 
 private struct NowPlayingTransportControls: View {
   let isPlaying: Bool
+  let isLoading: Bool
   let onPlayPauseTap: @MainActor @Sendable () -> Void
   let onPreviousTap: @MainActor @Sendable () -> Void
   let onNextTap: @MainActor @Sendable () -> Void
@@ -176,14 +181,23 @@ private struct NowPlayingTransportControls: View {
       )
 
       Button(action: self.onPlayPauseTap) {
-        Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
-          .font(.system(size: 42, weight: .black))
-          .foregroundStyle(.white)
-          .frame(width: 58, height: 58)
-          .contentShape(Circle())
+        Group {
+          if self.isLoading {
+            ProgressView()
+              .controlSize(.large)
+              .tint(.white)
+          } else {
+            Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
+              .font(.system(size: 42, weight: .black))
+          }
+        }
+        .foregroundStyle(.white)
+        .frame(width: 58, height: 58)
+        .contentShape(Circle())
       }
       .buttonStyle(.plain)
-      .accessibilityLabel(self.isPlaying ? "Pause" : "Play")
+      .disabled(self.isLoading)
+      .accessibilityLabel(self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play")
 
       NowPlayingSecondaryControlButton(
         systemName: "forward.fill",

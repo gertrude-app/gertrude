@@ -5,5 +5,5 @@ import Testing
 @MainActor
 @Test
 func packageLoads() {
-  _ = GertrudeFMView()
+  _ = GertrudeMusicView()
 }

@@ -3,6 +3,7 @@ import Tagged
 
 extension Music {
   typealias AlbumId = Tagged<(Music, albumId: ()), String>
+  typealias TrackId = Tagged<(Music, trackId: ()), String>
 
   struct ApprovedAlbum: Codable, Sendable {
     var id: Id

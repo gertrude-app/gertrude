@@ -1,4 +1,6 @@
 import ComposableArchitecture
+import Foundation
+import MusicRoute
 import Testing
 
 @testable import LibTCA
@@ -28,6 +30,47 @@ struct AppFeatureTests {
   }
 
   @Test
+  func onAppearShowsClaimCodeWhenUnclaimed() async {
+    let expiresAt = Date(timeIntervalSince1970: 123)
+    let store = TestStore(initialState: .init()) {
+      AppFeature()
+    } withDependencies: {
+      $0.api.getMusicAppStatus = { .unclaimed(code: 123_456, expiresAt: expiresAt) }
+      $0.keychain._load = { _ in nil }
+      $0.keychain._save = { _, _ in }
+      $0.keychain.delete = { _ in }
+    }
+
+    await store.send(.onAppear)
+    await store.receive(.musicAppStatusLoaded(.unclaimed(code: 123_456, expiresAt: expiresAt))) {
+      $0.connection = .unclaimed(code: 123_456, expiresAt: expiresAt)
+    }
+  }
+
+  @Test
+  func onAppearUsesStoredConnectionWhenStatusCheckFails() async throws {
+    let connection = MusicAppConnection(
+      token: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+      childId: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
+      childName: "Harriet",
+    )
+    let connectionData = try JSONEncoder().encode(connection)
+    let store = TestStore(initialState: .init()) {
+      AppFeature()
+    } withDependencies: {
+      $0.api.getMusicAppStatus = { throw TestError.offline }
+      $0.keychain._load = { key in key == .connection ? connectionData : nil }
+      $0.keychain._save = { _, _ in }
+      $0.keychain.delete = { _ in }
+    }
+
+    await store.send(.onAppear) {
+      $0.connection = .claimed(childName: "Harriet")
+    }
+    await store.receive(.musicAppStatusFailed(hasStoredConnection: true))
+  }
+
+  @Test
   func libraryPlayAlbumDelegateStartsAlbumQueuePlayback() async {
     let items = [
       playbackItem("track-1"),
@@ -40,7 +83,13 @@ struct AppFeatureTests {
 
     await store.send(.library(.delegate(.playAlbum(items: items, startIndex: 1))))
     await store.receive(.playback(.playAlbumQueue(items: items, startIndex: 1))) {
-      $0.playback.session = .init(albumQueue: .init(items: items, currentIndex: 1))
+      $0.playback.session = .init(
+        playStatus: .loading,
+        albumQueue: .init(items: items, currentIndex: 1),
+      )
+    }
+    await store.receive(.playback(.playbackStarted)) {
+      $0.playback.session?.playStatus = .playing
     }
   }
 
@@ -76,13 +125,23 @@ struct AppFeatureTests {
     }
 
     await store.send(.playback(.playTrack(item))) {
-      $0.playback.session = .init(currentItem: item)
+      $0.playback.session = .init(playStatus: .loading, currentItem: item)
       guard var albumDetail = $0.library.albumDetail else { return }
-      albumDetail.playStatus = .playing
+      albumDetail.playStatus = .loading
       albumDetail.currentTrackID = track.id
       $0.library.albumDetail = albumDetail
     }
+    await store.receive(.playback(.playbackStarted)) {
+      $0.playback.session?.playStatus = .playing
+      guard var albumDetail = $0.library.albumDetail else { return }
+      albumDetail.playStatus = .playing
+      $0.library.albumDetail = albumDetail
+    }
   }
+}
+
+private enum TestError: Error {
+  case offline
 }
 
 private func playbackItem(

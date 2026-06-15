@@ -1,13 +1,6 @@
-import {
-  ApiErrorMessage,
-  BetaBadge,
-  EmptyState,
-  Loading,
-  PageHeading,
-} from '@dash/components';
+import { ApiErrorMessage, EmptyState, Loading } from '@dash/components';
 import { Button, TextInput, Toggle } from '@shared/components';
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import type { GetApprovedMusicAlbums, SearchMusicCatalog } from '@dash/types';
 import Current from '../../environment';
 import { Key, useMutation, useQuery } from '../../hooks';
@@ -15,13 +8,15 @@ import { Key, useMutation, useQuery } from '../../hooks';
 type SearchAlbum = SearchMusicCatalog.Output[`albums`][number];
 type ApprovedAlbum = GetApprovedMusicAlbums.Output[`albums`][number];
 
-const ChildMusic: React.FC = () => {
-  const { userId: childId = `` } = useParams<{ userId: string }>();
+const MusicCuration: React.FC<{
+  childId: string;
+  childName: string;
+  className?: string;
+}> = ({ childId, childName, className }) => {
   const [searchQuery, setSearchQuery] = useState(``);
   const [hasSearched, setHasSearched] = useState(false);
   const approvedAlbumsKey = Key.approvedMusicAlbums(childId);
 
-  const childQuery = useQuery(Key.child(childId), () => Current.api.getChild(childId));
   const approvedAlbumsQuery = useQuery(approvedAlbumsKey, () =>
     Current.api.getApprovedMusicAlbums(childId),
   );
@@ -83,29 +78,9 @@ const ChildMusic: React.FC = () => {
     searchAlbums.mutate({ query, limit: 10 });
   };
 
-  if (childQuery.isPending) {
-    return <Loading />;
-  }
-
-  if (childQuery.isError) {
-    return <ApiErrorMessage error={childQuery.error} />;
-  }
-
-  const childName = childQuery.data.name;
-
   return (
-    <div className="max-w-4xl">
-      <div className="flex items-center gap-3 md:mt-3">
-        <PageHeading icon="music" className="md:mt-0">
-          {childName}&rsquo;s Music
-        </PageHeading>
-        <BetaBadge />
-      </div>
-
-      <form
-        onSubmit={onSubmit}
-        className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-end"
-      >
+    <div className={className}>
+      <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3 sm:items-end">
         <TextInput
           type="text"
           name="music-search"
@@ -300,4 +275,4 @@ const AlbumInfo: React.FC<{
   );
 };
 
-export default ChildMusic;
+export default MusicCuration;

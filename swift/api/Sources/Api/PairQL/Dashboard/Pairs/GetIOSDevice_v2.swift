@@ -46,6 +46,7 @@ struct GetIOSDevice_v2: Pair {
     var osVersion: String
     var blocker: Blocker?
     var am: AmInstall?
+    var musicConnected: Bool
   }
 }
 
@@ -62,6 +63,7 @@ extension GetIOSDevice_v2: Resolver {
       osVersion: device.iosVersion,
       blocker: self.blocker(for: device, in: ctx),
       am: self.amInstall(for: device, in: ctx),
+      musicConnected: self.musicConnected(for: device, in: ctx),
     )
   }
 
@@ -110,6 +112,15 @@ extension GetIOSDevice_v2: Resolver {
     guard tokenExists else { return nil }
     let account = try await ctx.currentBillingAccount()
     return Output.AmInstall(subscription: account.amSubscriptionState(forInstall: install))
+  }
+
+  static func musicConnected(for device: IOSDevice, in ctx: ParentContext) async throws -> Bool {
+    guard let install = try await device.musicInstall(in: ctx.db) else {
+      return false
+    }
+    return try await MusicApp.Token.query()
+      .where(.installId == install.id)
+      .exists(in: ctx.db)
   }
 }
 
