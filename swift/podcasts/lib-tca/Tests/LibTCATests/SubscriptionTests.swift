@@ -250,7 +250,7 @@ import Testing
     try await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
-        .claimed(token: token, childId: UUID(), childName: "Sally", subscription: .active(
+        .connected(token: token, childId: UUID(), childName: "Sally", subscription: .active(
           expiresAt: .reference + .days(300),
         ))
       }
@@ -398,7 +398,7 @@ import Testing
         throw PqlError(id: "a", requestId: "b", type: .unauthorized, debugMessage: "no token")
       }
       $0.api.getTrialStatus = {
-        .claimed(token: reclaimToken, childId: UUID(), childName: "Sally", subscription: .active(
+        .connected(token: reclaimToken, childId: UUID(), childName: "Sally", subscription: .active(
           expiresAt: .reference + .days(200),
         ))
       }

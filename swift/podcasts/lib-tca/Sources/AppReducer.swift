@@ -336,7 +336,7 @@ struct AppReducer: Sendable {
         expiringAt: accessEndsAt,
         legacyMigrationNag: showMigrationNag,
       )
-    case .claimed(let token, _, _, let subscription):
+    case .connected(let token, _, _, let subscription):
       self.keychain.save(amToken: token)
       self.applyAccountStatus(subscription)
     }

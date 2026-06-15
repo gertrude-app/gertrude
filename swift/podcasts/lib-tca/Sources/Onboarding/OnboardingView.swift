@@ -102,7 +102,7 @@ struct OnboardingView: View {
   }
 
   private var autoDetectDeviceName: String? {
-    self.store.trialStatus?.claimedChildName.map {
+    self.store.trialStatus?.connectedChildName.map {
       String(format: lstr(.claimDeviceName), $0, self.deviceFormFactor)
     }
   }

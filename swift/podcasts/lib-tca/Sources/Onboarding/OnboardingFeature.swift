@@ -13,7 +13,7 @@ struct OnboardingFeature {
     @Presents var claimFlow: ClaimFlow.State?
 
     var pinRecoveryAvailable: Bool {
-      self.resumedAfterClaim || self.trialStatus?.isClaimed == true
+      self.resumedAfterClaim || self.trialStatus?.isConnected == true
     }
   }
 
@@ -55,7 +55,7 @@ struct OnboardingFeature {
       case (_, .trialStatusResponse(let output)):
         state.trialStatus = output
         guard state.screen == .connecting else { return .none }
-        state.screen = output.isClaimed ? .accountDetected : .explainAccountRequired
+        state.screen = output.isConnected ? .accountDetected : .explainAccountRequired
         return .cancel(id: CancelID.connecting)
       case (_, .connectingTimedOut):
         guard state.screen == .connecting else { return .none }
@@ -66,7 +66,7 @@ struct OnboardingFeature {
         return self.shouldNotBeOnboarding() ? .send(.delegate(.shouldNotBeOnboarding)) : .none
       case (.areYouTheParent, .primaryBtnTapped):
         switch state.trialStatus {
-        case .claimed:
+        case .connected:
           state.screen = .accountDetected
           return .none
         case .some:
@@ -153,7 +153,7 @@ struct OnboardingFeature {
   func fetchTrialStatus() -> EffectOf<OnboardingFeature> {
     .run { send in
       guard let output = try? await self.api.getTrialStatus() else { return }
-      if case .claimed(let token, _, _, let subscription) = output {
+      if case .connected(let token, _, _, let subscription) = output {
         self.keychain.save(amToken: token)
         subscription.writeLocal(now: self.now)
       }
@@ -163,12 +163,12 @@ struct OnboardingFeature {
 }
 
 extension GetTrialStatus.Output {
-  var isClaimed: Bool {
-    if case .claimed = self { true } else { false }
+  var isConnected: Bool {
+    if case .connected = self { true } else { false }
   }
 
-  var claimedChildName: String? {
-    if case .claimed(_, _, let childName, _) = self { childName } else { nil }
+  var connectedChildName: String? {
+    if case .connected(_, _, let childName, _) = self { childName } else { nil }
   }
 }
 

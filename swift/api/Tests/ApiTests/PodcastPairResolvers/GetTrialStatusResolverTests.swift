@@ -304,12 +304,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     }
   }
 
-  // MARK: - claim detection / cross-app auto-detect
+  // MARK: - cross-app auto-detect (device bound to a child)
 
-  func testCrossAppAutoDetectMintsTokenAndReturnsClaimed() async throws {
+  func testDashboardClaimedDeviceMintsTokenAndReturnsConnected() async throws {
     let child = try await self.child()
     let deviceId = UUID()
-    // simulates a Blocker claim on the same vendor id: claimedAt + childId set
+    // dashboard/supervision claim on the same vendor id: childId AND claimedAt set
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
       childId: child.model.id,
@@ -324,12 +324,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
 
-    guard case .claimed(let token, let childId, let childName, let subscription) = output else {
-      return XCTFail("expected .claimed, got \(output)")
+    guard case .connected(let token, let childId, let childName, let subscription) = output else {
+      return XCTFail("expected .connected, got \(output)")
     }
     expect(childId).toEqual(child.model.id.rawValue)
     expect(childName).toEqual(child.model.name)
-    // 30-day AM trial survives claim: install ~2 days old at the test clock
+    // 30-day AM trial survives detection: install ~2 days old at the test clock
     // honors the "30 days free" promise rather than dropping to .unpaid
     expect(subscription).toEqual(.amTrial(expiresAt: preInstall.createdAt + .days(30)))
 
@@ -345,8 +345,8 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     // idempotent: a second poll reuses the same token, does not mint a duplicate
     let again = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
-    guard case .claimed(let token2, _, _, _) = again else {
-      return XCTFail("expected .claimed on second poll, got \(again)")
+    guard case .connected(let token2, _, _, _) = again else {
+      return XCTFail("expected .connected on second poll, got \(again)")
     }
     expect(token2).toEqual(token)
     let tokensAfter = try await PodcastApp.Token.query()
@@ -355,7 +355,83 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(tokensAfter.count).toEqual(1)
   }
 
-  func testClaimedDeviceMissingChildThrows() async throws {
+  func testConnectedViaNonSupervisionPathAutoDetects() async throws {
+    let child = try await self.child()
+    let deviceId = UUID()
+    // normal in-app Blocker connect: childId set, claimedAt NIL (the reproducer state)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.model.id,
+      modelIdentifier: "iPhone13,1",
+      iosVersion: "18.2",
+      claimedAt: nil, // NOT a supervision/dashboard claim
+    ))
+    var preInstall = try await self.db.create(
+      PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
+    )
+    try await preInstall.modifyCreatedAt(.exact(.reference - .days(2)))
+
+    let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+
+    guard case .connected(let token, let childId, _, let subscription) = output else {
+      return XCTFail("expected .connected for connected-but-unclaimed device, got \(output)")
+    }
+    expect(childId).toEqual(child.model.id.rawValue)
+    // free account on a live install trial -> trial floor, not a re-connect prompt or .unpaid
+    expect(subscription).toEqual(.amTrial(expiresAt: preInstall.createdAt + .days(30)))
+
+    let install = try await PodcastApp.Install.query()
+      .where(.deviceId == device.id)
+      .first(in: self.db)
+    let tokens = try await PodcastApp.Token.query()
+      .where(.installId == install.id)
+      .all(in: self.db)
+    expect(tokens.count).toEqual(1)
+    expect(token).toEqual(tokens[0].value.rawValue)
+  }
+
+  func testConnectedDeviceHonorsLegacyStampFromBillingIdentity() async throws {
+    let child = try await self.child()
+    let deviceId = UUID()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.model.id,
+      modelIdentifier: "iPhone13,1",
+      iosVersion: "18.2",
+      claimedAt: nil,
+    ))
+    // install old enough that the 30-day install trial has lapsed, so legacy access governs
+    var preInstall = try await self.db.create(
+      PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
+    )
+    try await preInstall.modifyCreatedAt(.exact(.reference - .days(40)))
+    // the bridge: parent billing identity carries the legacy floor (stamped at bind time)
+    var identity = try await self.db.create(BillingIdentity(parentId: child.parent.model.id))
+    identity.legacyAmIapPaidAt = .reference - .days(10)
+    try await self.db.update(identity)
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+    }
+
+    guard case .connected(_, _, _, let subscription) = output else {
+      return XCTFail("expected .connected, got \(output)")
+    }
+    let legacyEnd = (Date.reference - .days(10)) + PodcastApp.LegacyIap.grantWindow
+    expect(subscription).toEqual(.legacyGrandfathered(
+      accessEndsAt: legacyEnd,
+      showMigrationNag: PodcastApp.LegacyIap.showMigrationNag(
+        accessEndsAt: legacyEnd,
+        now: .reference,
+      ),
+      migrationUrl: nil,
+    ))
+  }
+
+  func testClaimedAtWithoutChildIdFallsThroughToTrial() async throws {
+    // childId — not claimedAt — drives detection; a claimedAt-only row is ignored
     let deviceId = UUID()
     try await self.db.create(IOSDevice(
       id: .init(deviceId),
@@ -365,11 +441,10 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       claimedAt: .reference,
     ))
 
-    do {
-      _ = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
-      XCTFail("expected resolve to throw for claimed device with no child")
-    } catch {
-      // expected: Abort(.internalServerError)
+    let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+
+    guard case .trial = output else {
+      return XCTFail("expected .trial (no child bound), got \(output)")
     }
   }
 }

@@ -66,7 +66,7 @@ import Testing
     } operation: {
       let store = TestStore(initialState: .init(
         screen: .areYouTheParent,
-        trialStatus: .claimed(
+        trialStatus: .connected(
           token: UUID(),
           childId: UUID(),
           childName: "Sally",
@@ -81,7 +81,7 @@ import Testing
   }
 
   @Test func `successful claim enables PIN recovery copy`() async {
-    let output = GetTrialStatus.Output.claimed(
+    let output = GetTrialStatus.Output.connected(
       token: UUID(),
       childId: UUID(),
       childName: "Sally",
@@ -129,7 +129,7 @@ import Testing
     let keychainStore = LockIsolated<[String: Data]>([:])
     await withDependencies {
       $0.api.getTrialStatus = {
-        .claimed(
+        .connected(
           token: token,
           childId: UUID(),
           childName: "Sally",
@@ -191,14 +191,14 @@ import Testing
       }
       store.exhaustivity = .off
 
-      await store.send(.trialStatusResponse(.claimed(
+      await store.send(.trialStatusResponse(.connected(
         token: UUID(),
         childId: UUID(),
         childName: "Sally",
         subscription: .active(expiresAt: .reference + .days(300)),
       )))
       #expect(store.state.screen == .explainAccountRequired)
-      #expect(store.state.trialStatus?.isClaimed == true)
+      #expect(store.state.trialStatus?.isConnected == true)
     }
   }
 }
