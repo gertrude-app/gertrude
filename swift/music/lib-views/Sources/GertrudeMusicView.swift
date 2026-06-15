@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct GertrudeFMView: View {
+public struct GertrudeMusicView: View {
   public init() {}
 
   public var body: some View {
@@ -11,5 +11,5 @@ public struct GertrudeFMView: View {
 }
 
 #Preview {
-  GertrudeFMView()
+  GertrudeMusicView()
 }

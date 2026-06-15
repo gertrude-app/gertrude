@@ -17,6 +17,7 @@ import type {
   GetIOSDeviceSupervisionStatus,
   GetIOSDevice_v2,
   GetIdentifiedApps,
+  GetMusicClaimData,
   GetSelectableKeychains,
   GetSubscriptionPanel_v2,
   GetSuspendFilterRequest,
@@ -55,7 +56,7 @@ export class Key extends QueryKey<never> {
 
   static approvedMusicAlbums(id: UUID): QueryKey<GetApprovedMusicAlbums.Output> {
     return new QueryKey(
-      `children/:id/music`,
+      `children/:id/approved-music-albums`,
       [`children`, id, `music`, `approved-albums`],
       id,
     );
@@ -149,6 +150,10 @@ export class Key extends QueryKey<never> {
 
   static amClaimData(code: string): QueryKey<GetAmClaimData.Output> {
     return new QueryKey(`am-claim-device/:code`, [`am-claim-device`, code]);
+  }
+
+  static musicClaimData(code: string): QueryKey<GetMusicClaimData.Output> {
+    return new QueryKey(`music-claim-device/:code`, [`music-claim-device`, code]);
   }
 
   static supervisionDeviceStatus(

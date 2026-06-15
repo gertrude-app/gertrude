@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>API_ENDPOINT</key>
+    <string>$(API_ENDPOINT)</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>Gertrude FM</string>
+    <string>Gertrude Music</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -20,8 +22,15 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsLocalNetworking</key>
+      <true/>
+    </dict>
     <key>NSAppleMusicUsageDescription</key>
-    <string>Gertrude FM needs access to Apple Music to play approved songs.</string>
+    <string>Gertrude Music needs access to Apple Music to play approved songs.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Gertrude Music connects to the local development API while debugging.</string>
     <key>UILaunchScreen</key>
     <dict/>
     <key>UIRequiresFullScreen</key>

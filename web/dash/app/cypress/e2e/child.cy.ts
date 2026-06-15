@@ -44,6 +44,71 @@ describe(`children screen`, () => {
     });
   });
 
+  describe(`music settings`, () => {
+    it(`hides music settings until Gertrude Music is connected`, () => {
+      cy.interceptPql(
+        `GetChild`,
+        mock.child({
+          id: `user-123`,
+          iosDevices: [
+            {
+              id: `ios-device-123`,
+              modelName: `iPhone 15 Pro`,
+              deviceType: `iPhone`,
+              iosVersion: `18.2`,
+              musicConnected: false,
+            },
+          ],
+        }),
+      );
+      cy.visit(`/children/user-123`);
+
+      cy.contains(/^Music$/).should(`not.exist`);
+    });
+
+    it(`does not show separate music settings once Gertrude Music is connected`, () => {
+      cy.interceptPql(
+        `GetChild`,
+        mock.child({
+          id: `user-123`,
+          iosDevices: [
+            {
+              id: `ios-device-123`,
+              modelName: `iPhone 15 Pro`,
+              deviceType: `iPhone`,
+              iosVersion: `18.2`,
+              musicConnected: true,
+            },
+          ],
+        }),
+      );
+      cy.visit(`/children/user-123`);
+
+      cy.contains(/^Music$/).should(`not.exist`);
+      cy.contains(`For iPhones and iPads`).should(`exist`);
+    });
+  });
+
+  describe(`iOS device details`, () => {
+    it(`shows Gertrude Music curation for a music-only device`, () => {
+      cy.interceptPql(`GetIOSDevice_v2`, {
+        childName: `Huck`,
+        deviceType: `iPhone`,
+        osVersion: `18.2`,
+        musicConnected: true,
+      });
+      cy.interceptPql(`GetApprovedMusicAlbums`, { albums: [] });
+
+      cy.visit(`/children/user-123/ios-devices/ios-device-123`);
+
+      cy.contains(`Huck's iPhone`);
+      cy.contains(`Gertrude Music`);
+      cy.contains(`Search Apple Music albums`);
+      cy.contains(/Huck.s allowed albums/);
+      cy.contains(`No allowed albums yet`);
+    });
+  });
+
   describe(`child deletion`, () => {
     it(`redirects to /children path`, () => {
       cy.interceptPql(`GetChild`, mock.child({ id: `user-123` }));

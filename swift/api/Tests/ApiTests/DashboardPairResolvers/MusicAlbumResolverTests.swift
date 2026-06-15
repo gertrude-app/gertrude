@@ -7,6 +7,7 @@ import XExpect
 final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
   func testApproveAndGetApprovedMusicAlbums() async throws {
     let child = try await self.child()
+    try await self.connectMusicApp(for: child)
 
     let output = try await ApproveMusicAlbum.resolve(
       with: self.input(child: child),
@@ -50,6 +51,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testApproveMusicAlbumIsIdempotent() async throws {
     let child = try await self.child()
+    try await self.connectMusicApp(for: child)
     let input = self.input(child: child)
 
     _ = try await ApproveMusicAlbum.resolve(with: input, in: child.parent.context)
@@ -75,6 +77,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testApproveMusicAlbumUpdatesCachedMetadata() async throws {
     let child = try await self.child()
+    try await self.connectMusicApp(for: child)
 
     _ = try await ApproveMusicAlbum.resolve(
       with: self.input(
@@ -108,6 +111,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testRemoveApprovedMusicAlbum() async throws {
     let child = try await self.child()
+    try await self.connectMusicApp(for: child)
     let input = self.input(child: child)
     _ = try await ApproveMusicAlbum.resolve(with: input, in: child.parent.context)
 
@@ -123,6 +127,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testRemoveMissingApprovedMusicAlbumIsNoop() async throws {
     let child = try await self.child()
+    try await self.connectMusicApp(for: child)
 
     let output = try await RemoveApprovedMusicAlbum.resolve(
       with: .init(childId: child.id, appleMusicAlbumId: .init(rawValue: "1440935467")),
@@ -162,6 +167,42 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
       .count(in: self.db)
 
     expect(count).toEqual(0)
+  }
+
+  func testRejectsMusicManagementWithoutConnectedMusic() async throws {
+    let child = try await self.child()
+
+    do {
+      _ = try await ApproveMusicAlbum.resolve(
+        with: self.input(child: child),
+        in: child.parent.context,
+      )
+      XCTFail("expected approval to fail")
+    } catch {}
+
+    do {
+      _ = try await GetApprovedMusicAlbums.resolve(with: child.id, in: child.parent.context)
+      XCTFail("expected list to fail")
+    } catch {}
+
+    do {
+      _ = try await RemoveApprovedMusicAlbum.resolve(
+        with: .init(childId: child.id, appleMusicAlbumId: .init(rawValue: "1440935467")),
+        in: child.parent.context,
+      )
+      XCTFail("expected removal to fail")
+    } catch {}
+  }
+
+  private func connectMusicApp(for child: ChildEntities) async throws {
+    let device = try await self.db.create(IOSDevice.random {
+      $0.childId = child.id
+      $0.claimedAt = .reference
+    })
+    let install = try await self.db.create(
+      MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
+    )
+    try await self.db.create(MusicApp.Token(installId: install.id))
   }
 
   private func input(

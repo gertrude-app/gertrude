@@ -61,6 +61,13 @@ extension IOSDevice {
       .first
   }
 
+  func musicInstall(in db: any DuetSQL.Client) async throws -> MusicApp.Install? {
+    try await MusicApp.Install.query()
+      .where(.deviceId == self.id)
+      .all(in: db)
+      .first
+  }
+
   func blockGroups(in db: any DuetSQL.Client) async throws -> [BlockerApp.BlockGroup] {
     let pivots = try await BlockerApp.DeviceBlockGroup.query()
       .where(.deviceId == self.id)

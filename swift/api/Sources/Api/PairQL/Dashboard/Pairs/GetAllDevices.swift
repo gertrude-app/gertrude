@@ -72,12 +72,17 @@ extension GetAllDevices: NoInputResolver {
       among: iosDevices.map(\.id),
       in: context.db,
     )
+    async let musicConnectedDeviceIdsAsync = MusicApp.Token.connectedDeviceIds(
+      among: iosDevices.map(\.id),
+      in: context.db,
+    )
 
     let computers = try await computersAsync
     let supervisionMap: [Api.IOSDevice.Id: BlockerApp.Supervision] = try await supervisionsAsync
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
     let blockerConnectedDeviceIds = try await blockerConnectedDeviceIdsAsync
     let amConnectedDeviceIds = try await amConnectedDeviceIdsAsync
+    let musicConnectedDeviceIds = try await musicConnectedDeviceIdsAsync
 
     @Dependency(\.websockets) var websockets
 
@@ -103,7 +108,9 @@ extension GetAllDevices: NoInputResolver {
       let pendingSetup: Bool = if let supervision = supervisionMap[device.id] {
         !supervision.profileInstalled
       } else {
-        !blockerConnectedDeviceIds.contains(device.id) && !amConnectedDeviceIds.contains(device.id)
+        !blockerConnectedDeviceIds.contains(device.id)
+          && !amConnectedDeviceIds.contains(device.id)
+          && !musicConnectedDeviceIds.contains(device.id)
       }
       return IOSDevice(
         id: device.id,

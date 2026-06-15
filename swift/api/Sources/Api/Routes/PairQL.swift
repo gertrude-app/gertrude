@@ -1,6 +1,7 @@
 import Dependencies
 import IOSRoute
 import MacAppRoute
+import MusicRoute
 import PodcastRoute
 import URLRouting
 import Vapor
@@ -22,6 +23,7 @@ enum PairQLRoute: Equatable, RouteResponder {
   case superAdmin(SuperAdminRoute)
   case iOS(IOSRoute)
   case podcast(PodcastRoute)
+  case music(MusicRoute)
   case admin(AdminRoute)
   case supervise(SuperviseRoute)
 
@@ -40,6 +42,11 @@ enum PairQLRoute: Equatable, RouteResponder {
       Method("POST")
       Path { "gertrude-am" }
       PodcastRoute.router
+    }
+    Route(.case(PairQLRoute.music)) {
+      Method("POST")
+      Path { "gertrude-music" }
+      MusicRoute.router
     }
     Route(.case(PairQLRoute.dashboard)) {
       Method("POST")
@@ -75,6 +82,8 @@ enum PairQLRoute: Equatable, RouteResponder {
       try await IOSRoute.respond(to: iosAppRoute, in: context)
     case .podcast(let podcastRoute):
       try await PodcastRoute.respond(to: podcastRoute, in: context)
+    case .music(let musicRoute):
+      try await MusicRoute.respond(to: musicRoute, in: context)
     case .admin(let adminRoute):
       try await AdminRoute.respond(to: adminRoute, in: context)
     case .supervise(let superviseRoute):
@@ -215,6 +224,9 @@ private func logOperation(_ route: PairQLRoute, _ request: Request, _ duration: 
   case .podcast:
     request.logger
       .notice("PairQL request: \("Podcast".yellow) \(operation) \(elapsed)")
+  case .music:
+    request.logger
+      .notice("PairQL request: \("Music".yellow) \(operation) \(elapsed)")
   case .admin:
     request.logger
       .notice("PairQL request: \("Admin".red) \(operation) \(elapsed)")
@@ -281,6 +293,7 @@ private func domain(of route: PairQLRoute) -> String {
   case .macApp: "macos-app"
   case .iOS: "ios-app"
   case .podcast: "gertrude-am"
+  case .music: "gertrude-music"
   case .dashboard: "dashboard"
   case .superAdmin: "super-admin"
   case .admin: "admin"

@@ -99,6 +99,11 @@ public extension Configure {
     )
 
     app.get(
+      "claim-pending-music", ":code",
+      use: ClaimRedirectRoute.music(_:),
+    )
+
+    app.get(
       "short-url", ":shortId",
       use: ShortUrlRedirectRoute.handler(_:),
     )

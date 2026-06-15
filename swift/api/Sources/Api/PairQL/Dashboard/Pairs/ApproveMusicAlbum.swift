@@ -17,7 +17,7 @@ struct ApproveMusicAlbum: Pair {
 
 extension ApproveMusicAlbum: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let child = try await context.verifiedChild(from: input.childId)
+    let child = try await verifiedChildWithConnectedMusicApp(from: input.childId, in: context)
     let existingAlbums = try await Music.ApprovedAlbum.query()
       .where(.childId == child.id)
       .where(.appleMusicAlbumId == input.appleMusicAlbumId.rawValue)

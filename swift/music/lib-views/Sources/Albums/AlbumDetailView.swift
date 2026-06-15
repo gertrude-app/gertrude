@@ -5,6 +5,7 @@ public struct AlbumDetailView: View {
   private let rows: [AlbumDetailTrackRow]
   private let transitionSourceID: String?
   private let isPlaying: Bool
+  private let isLoading: Bool
   private let currentTrackID: String?
   private let onPlayTap: @MainActor @Sendable () -> Void
   private let onTrackTap: @MainActor @Sendable (String) -> Void
@@ -14,6 +15,7 @@ public struct AlbumDetailView: View {
     tracks: [TrackData],
     transitionSourceID: String? = nil,
     isPlaying: Bool = false,
+    isLoading: Bool = false,
     currentTrackID: String? = nil,
     onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
     onTrackTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -21,6 +23,7 @@ public struct AlbumDetailView: View {
     self.album = album
     self.transitionSourceID = transitionSourceID
     self.isPlaying = isPlaying
+    self.isLoading = isLoading
     self.currentTrackID = currentTrackID
     self.onPlayTap = onPlayTap
     self.onTrackTap = onTrackTap
@@ -65,6 +68,7 @@ public struct AlbumDetailView: View {
 
             AlbumDetailPlayButton(
               isPlaying: self.isPlaying,
+              isLoading: self.isLoading,
               onTap: self.onPlayTap,
             )
             .padding(.horizontal, 20)
@@ -112,14 +116,22 @@ public struct AlbumDetailView: View {
 
 private struct AlbumDetailPlayButton: View {
   let isPlaying: Bool
+  let isLoading: Bool
   let onTap: @MainActor @Sendable () -> Void
 
   var body: some View {
     Button(action: self.onTap) {
-      Label(
-        self.isPlaying ? "Playing" : "Play",
-        systemImage: self.isPlaying ? "pause.fill" : "play.fill",
-      )
+      HStack(spacing: 8) {
+        if self.isLoading {
+          ProgressView()
+            .controlSize(.small)
+            .tint(.white)
+        } else {
+          Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
+        }
+
+        Text(self.title)
+      }
       .font(.system(size: 17, weight: .bold, design: .rounded))
       .frame(maxWidth: .infinity)
       .frame(height: 52)
@@ -127,6 +139,12 @@ private struct AlbumDetailPlayButton: View {
       .background(Color.gertrudeBrandAccent, in: Capsule())
     }
     .buttonStyle(.plain)
+    .disabled(self.isLoading)
+  }
+
+  private var title: String {
+    if self.isLoading { return "Loading" }
+    return self.isPlaying ? "Playing" : "Play"
   }
 }
 
