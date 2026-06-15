@@ -12,6 +12,7 @@ struct PodcastsFeature {
     var downloadQueue: [Episode] = []
     @Presents var destination: Destination.State?
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
+    var isClaimed = false
   }
 
   @Selection
@@ -57,11 +58,13 @@ struct PodcastsFeature {
   @Dependency(\.db) var database
   @Dependency(\.continuousClock) var clock
   @Dependency(\.date) var date
+  @Dependency(\.keychain) var keychain
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
       case .onAppear:
+        state.isClaimed = self.keychain.isClaimed()
         self.maybeShowTrialEndingDialogue(state: &state)
         return .run { send in
           await self.updateFeedsAndDownload(with: send)
@@ -160,6 +163,10 @@ struct PodcastsFeature {
 
       case .promptReview:
         state.destination = .requestReview(.init())
+        return .none
+
+      case .destination(.dismiss):
+        state.isClaimed = self.keychain.isClaimed()
         return .none
 
       case .destination:

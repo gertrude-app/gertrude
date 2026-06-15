@@ -332,7 +332,7 @@ struct AppReducer: Sendable {
       _ = try? CurrentSubscription.set(status: .unpaid, expiringAt: since)
     case .legacyGrandfathered(let accessEndsAt, let showMigrationNag, _):
       _ = try? CurrentSubscription.set(
-        status: .active,
+        status: .legacy,
         expiringAt: accessEndsAt,
         legacyMigrationNag: showMigrationNag,
       )

@@ -149,6 +149,9 @@ public func appDatabase(
   migrator.registerMigration("cross-promo-dismissals") {
     try Migrations.crossPromoDismissals($0)
   }
+  migrator.registerMigration("subscription-legacy-status") {
+    try Migrations.subscriptionLegacyStatus($0)
+  }
   try migrator.migrate(database)
 
   try database.write { db in

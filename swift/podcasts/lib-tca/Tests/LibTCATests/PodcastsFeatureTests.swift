@@ -14,6 +14,7 @@ import Testing
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.continuousClock = clock
+      $0.keychain = .mock
     } operation: {
       try CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(4))
 
@@ -44,6 +45,7 @@ import Testing
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.continuousClock = TestClock()
+      $0.keychain = .mock
     } operation: {
       try CurrentSubscription.set(status: .trialing, expiringAt: .reference + .days(4))
       dep(\.db).insertRecord(id: .trialEndingAlertShown)
@@ -74,6 +76,30 @@ import Testing
       await store.send(.destination(.presented(.settings(.delegate(.changePinRequested))))) {
         $0.destination = .addShow(.init(screen: .changePinInstructions))
       }
+    }
+  }
+
+  @Test func `claiming in settings refreshes claimed state when the sheet dismisses`() async {
+    let keychainStore = LockIsolated<[String: Data]>([:]) // starts unclaimed
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.continuousClock = TestClock()
+      $0.keychain = dictKeychain(keychainStore)
+    } operation: {
+      var state = PodcastsFeature.State()
+      state.destination = .settings(.init()) // settings sheet open
+      let store = TestStore(initialState: state, reducer: PodcastsFeature.init)
+      store.exhaustivity = .off
+
+      #expect(store.state.isClaimed == false)
+
+      keychainStore.withValue { // simulate a successful claim inside settings
+        $0[KeychainClient.Key.amToken.rawValue] = UUID().uuidString.data(using: .utf8)!
+      }
+
+      await store.send(.destination(.dismiss))
+      #expect(store.state.isClaimed == true) // home banner now uses "subscribe" copy
     }
   }
 

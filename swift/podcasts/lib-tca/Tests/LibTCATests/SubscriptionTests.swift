@@ -88,7 +88,7 @@ import Testing
       await store.finish()
 
       let sub = dep(\.db).subscription()
-      #expect(sub.status == .active) // badge stays Active
+      #expect(sub.status == .legacy) // distinct legacy status (badge still renders Active)
       #expect(sub.expiresAt == .reference + .days(40)) // server accessEndsAt, not the stale +100
       #expect(sub.legacyMigrationNag == true)
     }
@@ -120,7 +120,7 @@ import Testing
       await store.finish()
 
       let sub = dep(\.db).subscription()
-      #expect(sub.status == .active)
+      #expect(sub.status == .legacy)
       #expect(sub.expiresAt == .reference + .days(300))
       #expect(sub.legacyMigrationNag == false)
     }
@@ -160,10 +160,47 @@ import Testing
     }
   }
 
+  @Test func `claimed legacy grandfathered preserves server migration nag`() async throws {
+    let keychainStore = LockIsolated<[String: Data]>([:])
+    try await withDependencies {
+      $0.api.logEvent = { _, _, _, _ in }
+      $0.api.getAccountStatus = {
+        .init(
+          childId: UUID(),
+          childName: "Sally",
+          subscription: .legacyGrandfathered(
+            accessEndsAt: .reference + .days(58),
+            showMigrationNag: true,
+            migrationUrl: nil,
+          ),
+        )
+      }
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.keychain = claimedKeychain(token: UUID(), store: keychainStore)
+      $0.device.vendorId = { nil }
+      $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
+      $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
+      $0.mainQueue = .immediate
+    } operation: {
+      try CurrentSubscription.set(status: .active, expiringAt: .reference + .days(100))
+      let store = TestStore(initialState: .init(), reducer: AppReducer.init)
+      store.exhaustivity = .off
+
+      await store.send(.appDidLaunch)
+      await store.finish()
+
+      let sub = dep(\.db).subscription()
+      #expect(sub.status == .legacy)
+      #expect(sub.expiresAt == .reference + .days(58))
+      #expect(sub.legacyMigrationNag == true) // claimed path no longer drops the server nag
+    }
+  }
+
   @Test func `home view status surfaces legacy nag with access end date`() {
     let sub = Subscription(
       id: 1,
-      status: .active,
+      status: .legacy,
       expiresAt: .reference + .days(40),
       legacyMigrationNag: true,
       updatedAt: .reference,
@@ -196,8 +233,9 @@ import Testing
     let legacy = AmSubscriptionState
       .legacyGrandfathered(accessEndsAt: exp, showMigrationNag: true, migrationUrl: nil)
       .toLocal(now: now)
-    #expect(legacy.status == .active)
+    #expect(legacy.status == .legacy)
     #expect(legacy.expiresAt == exp)
+    #expect(legacy.legacyMigrationNag == true)
 
     #expect(AmSubscriptionState.unpaid(remediationUrl: nil).toLocal(now: now).status == .unpaid)
     #expect(
