@@ -274,6 +274,58 @@ extension PodcastApp.Token: Model {
   }
 }
 
+extension MusicApp.Install: Model {
+  public static let schemaName = "music_app"
+  public static let tableName = "installs"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .deviceId: .uuid(self.deviceId)
+    case .appVersion: .string(self.appVersion)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .deviceId: .uuid(self.deviceId),
+      .appVersion: .string(self.appVersion),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension MusicApp.Token: Model {
+  public static let schemaName = "music_app"
+  public static let tableName = "tokens"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .installId: .uuid(self.installId)
+    case .value: .uuid(self.value)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .installId: .uuid(self.installId),
+      .value: .uuid(self.value),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension GertieIOS.BlockRule: @retroactive PostgresJsonable {}
 
 extension Parent: Model {

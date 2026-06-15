@@ -9,9 +9,10 @@ import ChildActivityFeed from './components/routes/ChildActivityFeed';
 import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
 import ChildIOSDevicesRoute from './components/routes/ChildIOSDevices';
 import ChildMac from './components/routes/ChildMac';
-import ChildMusic from './components/routes/ChildMusic';
 import ClaimAmDeviceClaim from './components/routes/ClaimAmDevice/Claim';
 import ClaimAmDeviceDone from './components/routes/ClaimAmDevice/Done';
+import ClaimMusicDeviceClaim from './components/routes/ClaimMusicDevice/Claim';
+import ClaimMusicDeviceDone from './components/routes/ClaimMusicDevice/Done';
 import Computer from './components/routes/Computer';
 import Computers from './components/routes/Computers';
 import ConferenceEmailForm from './components/routes/ConferenceEmail';
@@ -87,6 +88,11 @@ const App: React.FC = () => {
         </Route>
         <Route path="claim-am-device/:code/claim" element={<ClaimAmDeviceClaim />} />
         <Route path="claim-am-device/:code/done" element={<ClaimAmDeviceDone />} />
+        <Route
+          path="claim-music-device/:code/claim"
+          element={<ClaimMusicDeviceClaim />}
+        />
+        <Route path="claim-music-device/:code/done" element={<ClaimMusicDeviceDone />} />
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
         <Route path="/checkout-cancel" element={<CheckoutCancel />} />
         <Route path="settings" element={<AdminSettings />} />
@@ -117,7 +123,6 @@ const App: React.FC = () => {
           <Route path=":userId">
             <Route index element={<UserRoute />} />
             <Route path="mac" element={<ChildMac />} />
-            <Route path="music" element={<ChildMusic />} />
 
             <Route path="ios-devices">
               <Route index element={<ChildIOSDevicesRoute />} />

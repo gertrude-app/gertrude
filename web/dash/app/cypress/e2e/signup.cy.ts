@@ -67,6 +67,16 @@ describe(`app-aware claim glue`, () => {
     cy.contains(`Gertrude AM`);
   });
 
+  it(`shows the Gertrude Music app card + "Signup to connect:" for a Music claim`, () => {
+    cy.visit(
+      `/signup?claimPendingMusicDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
+    );
+    cy.contains(`Signup to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`For app:`);
+    cy.contains(`Gertrude Music`);
+  });
+
   it(`still shows the Gertrude Blocker app card for a supervision claim`, () => {
     cy.visit(
       `/signup?claimPendingSupervision=123456&modelName=iPhone+15+Pro&iosVersion=18.2`,
@@ -152,6 +162,27 @@ describe(`verify-signup-email post-verify routing`, () => {
     cy.location(`pathname`).should(`eq`, `/referral-survey`);
     cy.contains(`Skip`).click();
     cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
+  });
+
+  it(`routes to the Music funnel through the referral survey when a redirect param is present`, () => {
+    cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
+    cy.interceptPql(`GetMusicClaimData`, {
+      children: [],
+      modelName: `iPhone 15 Pro`,
+      deviceType: `iPhone`,
+      iosVersion: `18.2`,
+    });
+
+    cy.visit(
+      `/verify-signup-email/verify-token-123?redirect=${encodeURIComponent(
+        `/claim-music-device/778899/claim`,
+      )}`,
+    );
+
+    cy.wait(`@VerifySignupEmail`);
+    cy.location(`pathname`).should(`eq`, `/referral-survey`);
+    cy.contains(`Skip`).click();
+    cy.location(`pathname`).should(`eq`, `/claim-music-device/778899/claim`);
   });
 
   it(`continues to the AM funnel from token claim data when the redirect param is missing`, () => {

@@ -17,7 +17,6 @@ import type {
   PrepIOSAppConnection,
   RequestState,
 } from '@dash/types';
-import BetaBadge from '../BetaBadge';
 import { IOSConnectionCodeScreen, PlatformOption } from '../Dashboard/Dashboard';
 import EmptyState from '../EmptyState';
 import GradientIcon from '../GradientIcon';
@@ -285,17 +284,6 @@ const EditChild: React.FC<Props> = ({
                     <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
                   </Link>
                 </div>
-                <Link
-                  to={`/children/${id}/music`}
-                  className="flex items-center rounded-xl px-5 py-4 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
-                >
-                  <GradientIcon icon="music" size="medium" className="mr-4 shrink-0" />
-                  <div className="flex items-center gap-2 flex-grow">
-                    <h3 className="text-lg font-semibold text-slate-700">Music</h3>
-                    <BetaBadge />
-                  </div>
-                  <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
-                </Link>
               </div>
             </div>
 

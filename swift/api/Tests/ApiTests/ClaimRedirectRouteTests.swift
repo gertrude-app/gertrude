@@ -139,4 +139,30 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       },
     )
   }
+
+  func testMusicValidCode_redirectsToMusicClaimFunnel() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    _ = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: nil,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+      claimCode: code,
+      claimCodeExpiresAt: .reference + .days(7),
+    ))
+
+    try await app.test(
+      .GET,
+      "claim-pending-music/\(code)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
+        expect(location).toContain("claimPendingMusicDevice=\(code)")
+        expect(location).toContain("iosVersion=18.2")
+        expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
+        expect(location).not.toContain("error=")
+      },
+    )
+  }
 }

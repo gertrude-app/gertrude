@@ -42,8 +42,10 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.iosDevices.count).toEqual(2)
     expect(output.iosDevices[0].id).toEqual(pendingDevice.id)
     expect(output.iosDevices[0].pendingClaimCode).toEqual(pendingCode)
+    expect(output.iosDevices[0].musicConnected).toEqual(false)
     expect(output.iosDevices[1].id).toEqual(completedDevice.id)
     expect(output.iosDevices[1].pendingClaimCode).toBeNil()
+    expect(output.iosDevices[1].musicConnected).toEqual(false)
   }
 
   func testAbandonedSupervisionCodeAfterScreenTimeConnectDoesNotNag() async throws {
@@ -70,5 +72,28 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.iosDevices.count).toEqual(1)
     expect(output.iosDevices[0].id).toEqual(familyConnectedDevice.id)
     expect(output.iosDevices[0].pendingClaimCode).toBeNil() // <-- so they don't get nagged
+    expect(output.iosDevices[0].musicConnected).toEqual(false)
+  }
+
+  func testFetchMarksMusicConnectedDevices() async throws {
+    let child = try await self.child()
+    let device = try await self.db.create(IOSDevice.random {
+      $0.childId = child.id
+      $0.claimedAt = .reference
+    })
+    let install = try await self.db.create(
+      MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
+    )
+    try await self.db.create(MusicApp.Token(installId: install.id))
+
+    let output = try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+    } operation: {
+      try await GetChild.resolve(with: child.id, in: context(child.parent))
+    }
+
+    expect(output.iosDevices.count).toEqual(1)
+    expect(output.iosDevices[0].id).toEqual(device.id)
+    expect(output.iosDevices[0].musicConnected).toEqual(true)
   }
 }

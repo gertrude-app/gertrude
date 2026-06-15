@@ -1,4 +1,4 @@
-export type GertrudeIOSApp = `blocker` | `podcasts`;
+export type GertrudeIOSApp = `blocker` | `podcasts` | `music`;
 
 export const APP_META: Record<GertrudeIOSApp, { name: string; iconSrc: string }> = {
   blocker: {
@@ -9,21 +9,28 @@ export const APP_META: Record<GertrudeIOSApp, { name: string; iconSrc: string }>
     name: `Gertrude AM`,
     iconSrc: `/gertrude-am-app-icon.png`,
   },
+  music: {
+    name: `Gertrude Music`,
+    iconSrc: `/gertrude-music-app-icon.png`,
+  },
 };
 
 export const CLAIM_PENDING_QUERY_KEY: Record<GertrudeIOSApp, string> = {
   blocker: `claimPendingSupervision`,
   podcasts: `claimPendingAmDevice`,
+  music: `claimPendingMusicDevice`,
 };
 
 export const CLAIM_REDIRECT_ROUTE: Record<GertrudeIOSApp, string> = {
   blocker: `claim-pending-supervision`,
   podcasts: `claim-pending-am`,
+  music: `claim-pending-music`,
 };
 
 const CLAIM_FUNNEL_PATH_SEGMENT: Record<GertrudeIOSApp, string> = {
   blocker: `supervise-device`,
   podcasts: `claim-am-device`,
+  music: `claim-music-device`,
 };
 
 export function claimFunnelPath(app: GertrudeIOSApp, claimCode: string): string {

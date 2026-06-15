@@ -12,13 +12,11 @@ struct AppView: View {
     #if os(iOS)
       self.iOSContent
         .task {
-          await self.store.send(.playback(.observePlayback)).finish()
+          _ = self.store.send(.playback(.observePlayback))
+          await self.store.send(.onAppear).finish()
         }
     #else
       self.libraryView
-        .task {
-          await self.store.send(.playback(.observePlayback)).finish()
-        }
     #endif
   }
 
@@ -31,6 +29,29 @@ struct AppView: View {
   #if os(iOS)
     @ViewBuilder
     private var iOSContent: some View {
+      switch self.store.connection {
+      case .claimed:
+        self.iOSLibraryContent
+      case .checking:
+        MusicAppConnectionView(
+          state: .checking,
+          onRetryTap: { self.store.send(.refreshConnectionTapped) },
+        )
+      case .unclaimed(let code, let expiresAt):
+        MusicAppConnectionView(
+          state: .unclaimed(code: code, expiresAt: expiresAt),
+          onRetryTap: { self.store.send(.refreshConnectionTapped) },
+        )
+      case .failed:
+        MusicAppConnectionView(
+          state: .failed,
+          onRetryTap: { self.store.send(.refreshConnectionTapped) },
+        )
+      }
+    }
+
+    @ViewBuilder
+    private var iOSLibraryContent: some View {
       if #available(iOS 26.0, *) {
         self.libraryView
           .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -73,6 +94,7 @@ struct AppView: View {
         artworkURL: session?.currentItem.allowsArtwork == true ? session?.currentItem
           .artworkURL : nil,
         isPlaying: session?.isPlaying ?? false,
+        isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
         foregroundColor: .black,
         panelTransitionID: self.nowPlayingPanelTransitionID,
@@ -104,6 +126,7 @@ struct AppView: View {
           showsArtwork: session.currentItem.allowsArtwork,
           artworkTransitionID: self.nowPlayingArtworkTransitionID,
           isPlaying: session.isPlaying,
+          isLoading: session.isLoading,
           progress: session.progress.fraction,
           duration: session.progress.duration,
           onPlayPauseTap: {

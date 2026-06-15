@@ -9,7 +9,7 @@ gen:
 
 xcode:
   @just gen
-  @open GertrudeFM.xcodeproj
+  @open GertrudeMusic.xcodeproj
 
 build-views:
   @cd lib-views && swift build
@@ -22,7 +22,7 @@ build:
   @just build-tca
 
 build-app:
-  @xcodebuild -project GertrudeFM.xcodeproj -scheme 'Gertrude FM' -configuration Debug -destination 'generic/platform=iOS Simulator' build
+  @xcodebuild -project GertrudeMusic.xcodeproj -scheme 'Gertrude Music' -configuration Debug -destination 'generic/platform=iOS Simulator' build
 
 test:
   @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test

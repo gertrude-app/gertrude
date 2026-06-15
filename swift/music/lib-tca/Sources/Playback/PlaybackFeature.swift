@@ -111,6 +111,7 @@ struct PlaybackFeature: Sendable {
   }
 
   enum PlayStatus: Equatable, Sendable {
+    case loading
     case playing
     case paused
   }
@@ -127,6 +128,7 @@ struct PlaybackFeature: Sendable {
     case skipToNext
     case skipToPrevious
     case stop
+    case playbackStarted
     case playbackFailed
   }
 
@@ -161,10 +163,11 @@ struct PlaybackFeature: Sendable {
         return .none
 
       case .playTrack(let item):
-        state.session = .init(currentItem: item)
+        state.session = .init(playStatus: .loading, currentItem: item)
         return .run { send in
           do {
             try await self.playback.playTrack(item)
+            await send(.playbackStarted)
           } catch {
             await send(.playbackFailed)
           }
@@ -174,10 +177,11 @@ struct PlaybackFeature: Sendable {
         guard items.indices.contains(startIndex) else { return .none }
         let albumQueue = AlbumQueue(items: items, currentIndex: startIndex)
         let playbackOrder = albumQueue.playbackOrder
-        state.session = .init(albumQueue: albumQueue)
+        state.session = .init(playStatus: .loading, albumQueue: albumQueue)
         return .run { send in
           do {
             try await self.playback.playTracksInOrder(playbackOrder)
+            await send(.playbackStarted)
           } catch {
             await send(.playbackFailed)
           }
@@ -189,7 +193,7 @@ struct PlaybackFeature: Sendable {
           return .send(.pause)
         case .paused:
           return .send(.resume)
-        case nil:
+        case .loading, nil:
           return .none
         }
 
@@ -258,6 +262,10 @@ struct PlaybackFeature: Sendable {
         return .run { _ in
           await self.playback.stop()
         }
+
+      case .playbackStarted:
+        state.resumeSession()
+        return .none
 
       case .playbackFailed:
         state.pauseSession()
@@ -329,6 +337,10 @@ extension PlaybackFeature.Session {
 
   var isPlaying: Bool {
     self.playStatus == .playing
+  }
+
+  var isLoading: Bool {
+    self.playStatus == .loading
   }
 
   var currentTrackID: ApprovedTrack.ID {

@@ -11,6 +11,7 @@ struct AlbumDetailViewContainer: View {
       tracks: self.store.tracks.map(TrackData.init),
       transitionSourceID: self.store.transitionSourceID,
       isPlaying: self.store.isPlaying,
+      isLoading: self.store.isLoading,
       currentTrackID: self.store.currentTrackID?.rawValue,
       onPlayTap: { self.store.send(.playTapped) },
       onTrackTap: { self.store.send(.trackTapped(.init($0))) },

@@ -91,5 +91,6 @@ export { default as HighlightableCard } from './ClaimDevice/HighlightableCard';
 export { default as ClaimScreen } from './ClaimDevice/ClaimScreen';
 export { default as AmDoneScreen } from './ClaimDevice/AmDoneScreen';
 export type { AmDoneVariant } from './ClaimDevice/AmDoneScreen';
+export { default as MusicDoneScreen } from './ClaimDevice/MusicDoneScreen';
 export { default as SecurityEventsFeed } from './SecurityEventsFeed';
 export type { IpLocation, SecurityEvent } from './SecurityEventsFeed';

@@ -103,6 +103,7 @@ extension Configure {
     app.migrations.add(PodcastAppTokenInstallUnique())
     app.migrations.add(AddDashboardPerfIndexes())
     app.migrations.add(CreateMusicTables())
+    app.migrations.add(CreateMusicAppTables())
   }
 }
 
