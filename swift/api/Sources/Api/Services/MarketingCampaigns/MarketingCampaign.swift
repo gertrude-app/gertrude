@@ -30,7 +30,10 @@ extension MarketingCampaign {
 }
 
 func scheduledMarketingCampaigns(env: Env) -> [any MarketingCampaign] {
-  [MacSetup24hCampaign(dashboardUrl: env.dashboardUrl)]
+  [
+    MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
+    IosOnlyMacTrialCampaign(),
+  ]
 }
 
 func manualMarketingCampaigns(env _: Env) -> [any MarketingCampaign] {
