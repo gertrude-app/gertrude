@@ -2,7 +2,8 @@
 
 ## Releases
 
-- `1.6.0` (in-progress)
+- `1.6.0` (submitted to review 6/16/26)
+  - switch from Apple IAP subscriptions to Gertrude accounts
   - autoqueue should resume in-progress episode when switching shows
   - lower minimum iOS version to 17
   - add 0.5× playback speed option
