@@ -104,10 +104,30 @@ struct AppFeatureTests {
   }
 
   @Test
+  func libraryActionPropagatesExistingPlaybackFailureToAlbumDetail() async {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[0]
+    var state = AppFeature.State()
+    state.library.status = .loaded(library)
+    state.playback.failure = .musicAccessDenied
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.library(.albumTapped(album.id))) {
+      $0.library.albumDetail = .init(
+        album: album,
+        transitionSourceID: album.id.rawValue,
+        playbackFailure: .musicAccessDenied,
+      )
+    }
+  }
+
+  @Test
   func playbackStateUpdatesDirectAlbumDetailPlayingState() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
-    let track = library.tracks(for: album)[1]
+    let track = album.tracks[1]
     let item = PlaybackItem(
       track: track,
       artworkURL: album.artworkURL,
@@ -117,7 +137,6 @@ struct AppFeatureTests {
     state.library.status = .loaded(library)
     state.library.albumDetail = .init(
       album: album,
-      tracks: library.tracks(for: album),
       transitionSourceID: album.id.rawValue,
     )
     let store = TestStore(initialState: state) {

@@ -130,16 +130,53 @@ extension PlaybackClient {
   #endif
 
   #if canImport(MusicKit)
-    private static func requestAuthorization() async -> Bool {
+    private static func requestAuthorization() async throws {
       switch MusicAuthorization.currentStatus {
       case .authorized:
-        return true
-      case .denied, .restricted:
-        return false
+        return
+      case .denied:
+        throw PlaybackClientError.musicAccessDenied
+      case .restricted:
+        throw PlaybackClientError.musicAccessRestricted
       case .notDetermined:
-        return await MusicAuthorization.request() == .authorized
+        switch await MusicAuthorization.request() {
+        case .authorized:
+          return
+        case .denied:
+          throw PlaybackClientError.musicAccessDenied
+        case .restricted:
+          throw PlaybackClientError.musicAccessRestricted
+        case .notDetermined:
+          throw PlaybackClientError.musicAccessDenied
+        @unknown default:
+          throw PlaybackClientError.playbackFailed
+        }
       @unknown default:
-        return false
+        throw PlaybackClientError.playbackFailed
+      }
+    }
+
+    private static func ensureSubscriptionAllowsPlayback() async throws {
+      do {
+        let subscription = try await MusicSubscription.current
+        guard subscription.canPlayCatalogContent else {
+          throw PlaybackClientError.appleMusicSubscriptionRequired
+        }
+      } catch let error as MusicSubscription.Error {
+        switch error {
+        case .permissionDenied:
+          throw PlaybackClientError.musicAccessDenied
+        case .privacyAcknowledgementRequired:
+          throw PlaybackClientError.privacyAcknowledgementRequired
+        case .unknown:
+          return
+        @unknown default:
+          return
+        }
+      } catch let error as PlaybackClientError {
+        throw error
+      } catch {
+        return
       }
     }
 
@@ -149,9 +186,9 @@ extension PlaybackClient {
       repeats: Bool,
     ) async throws {
       guard !items.isEmpty else { return }
-      guard await self.requestAuthorization() else {
-        throw PlaybackClientError.notAuthorized
-      }
+      try await self.requestAuthorization()
+      try await self.ensureSubscriptionAllowsPlayback()
+      let songs = try await self.songs(for: items)
 
       #if os(iOS)
         self.activateAudioSession()
@@ -165,13 +202,18 @@ extension PlaybackClient {
           MediaRemotePrivateClient.shared.clearNowPlayingInfo()
         }
       #endif
-
-      let songs = try await self.songs(for: items)
       let player = ApplicationMusicPlayer.shared
       player.queue = ApplicationMusicPlayer.Queue(for: songs)
       let repeatMode: MusicKit.MusicPlayer.RepeatMode = repeats ? .all : .none
       player.state.repeatMode = repeatMode
-      try await player.play()
+      do {
+        try await player.play()
+      } catch {
+        #if os(iOS)
+          self.clearNowPlayingContext()
+        #endif
+        throw PlaybackClientError.playbackFailed
+      }
 
       #if os(iOS)
         if hidesArtwork {
@@ -288,7 +330,11 @@ extension PlaybackClient {
 
     @MainActor
     private static func resumePlayback() async throws {
-      try await ApplicationMusicPlayer.shared.play()
+      do {
+        try await ApplicationMusicPlayer.shared.play()
+      } catch {
+        throw PlaybackClientError.playbackFailed
+      }
     }
 
     @MainActor
@@ -310,9 +356,7 @@ extension PlaybackClient {
     @MainActor
     private static func stopPlayback() async {
       #if os(iOS)
-        PlaybackNowPlayingContext.shared.clear()
-        MediaRemotePrivateClient.shared.clearNowPlayingInfo()
-        MediaRemotePrivateClient.shared.setNowPlayingApplicationOverrideEnabled(false)
+        self.clearNowPlayingContext()
       #endif
       ApplicationMusicPlayer.shared.stop()
     }
@@ -322,6 +366,13 @@ extension PlaybackClient {
         let session = AVAudioSession.sharedInstance()
         try? session.setCategory(.playback, mode: .default)
         try? session.setActive(true)
+      }
+
+      @MainActor
+      private static func clearNowPlayingContext() {
+        PlaybackNowPlayingContext.shared.clear()
+        MediaRemotePrivateClient.shared.clearNowPlayingInfo()
+        MediaRemotePrivateClient.shared.setNowPlayingApplicationOverrideEnabled(false)
       }
 
       @MainActor
@@ -375,11 +426,22 @@ extension PlaybackClient {
           matching: \.id,
           equalTo: songId,
         )
-        let response = try await request.response()
-        guard let song = response.items.first else {
-          throw PlaybackClientError.trackNotFound
+        do {
+          let response = try await request.response()
+          guard let song = response.items.first else {
+            throw PlaybackClientError.trackUnavailable
+          }
+          songs.append(song)
+        } catch let error as MusicDataRequest.Error {
+          if error.status == 404 {
+            throw PlaybackClientError.trackUnavailable
+          }
+          throw PlaybackClientError.catalogLookupFailed
+        } catch let error as PlaybackClientError {
+          throw error
+        } catch {
+          throw PlaybackClientError.catalogLookupFailed
         }
-        songs.append(song)
       }
       return songs
     }
@@ -705,7 +767,12 @@ extension PlaybackClient {
   }
 #endif
 
-private enum PlaybackClientError: Error {
-  case notAuthorized
-  case trackNotFound
+enum PlaybackClientError: Error, Equatable, Sendable {
+  case appleMusicSubscriptionRequired
+  case catalogLookupFailed
+  case musicAccessDenied
+  case musicAccessRestricted
+  case playbackFailed
+  case privacyAcknowledgementRequired
+  case trackUnavailable
 }

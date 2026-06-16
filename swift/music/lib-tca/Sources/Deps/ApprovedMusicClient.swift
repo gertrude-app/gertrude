@@ -17,7 +17,7 @@ extension ApprovedMusicClient: DependencyKey {
         throw ApprovedMusicClientError.missingConnection
       }
       let output = try await api.getApprovedMusicLibrary(connection.token)
-      return await ApprovedMusicLibrary(remote: output)
+      return ApprovedMusicLibrary(remote: output)
     })
   }
 }
@@ -40,31 +40,32 @@ extension ApprovedMusicClient {
 }
 
 private extension ApprovedMusicLibrary {
-  init(remote output: GetApprovedMusicLibrary.Output) async {
-    let albums = output.albums.map { remoteAlbum in
-      ApprovedAlbum(
-        id: .init(rawValue: remoteAlbum.id),
-        title: remoteAlbum.title,
-        artistName: remoteAlbum.artistName,
-        artworkURL: remoteAlbum.artworkURL,
-        showsArtwork: remoteAlbum.showsArtwork,
-        trackIDs: remoteAlbum.trackIds.map { .init(rawValue: $0) },
-      )
-    }
-    let tracks = output.tracks.map { remoteTrack in
-      ApprovedTrack(
-        id: .init(rawValue: remoteTrack.id),
-        title: remoteTrack.title,
-        artistName: remoteTrack.artistName,
-        albumTitle: remoteTrack.albumTitle,
-        albumID: .init(rawValue: remoteTrack.albumId),
-        artistIDs: [],
-        artworkURL: remoteTrack.artworkURL,
-        showsArtwork: remoteTrack.showsArtwork,
-      )
-    }
+  init(remote output: GetApprovedMusicLibrary.Output) {
+    self.init(albums: output.albums.map(ApprovedAlbum.init))
+  }
+}
 
-    self.init(albums: albums, tracks: tracks)
+private extension ApprovedAlbum {
+  init(remote album: GetApprovedMusicLibrary.Output.Album) {
+    self.init(
+      id: .init(rawValue: album.id),
+      title: album.title,
+      artistName: album.artistName,
+      artworkURL: album.artworkURL,
+      showsArtwork: album.showsArtwork,
+      tracks: album.tracks.map(ApprovedTrack.init),
+    )
+  }
+}
+
+private extension ApprovedTrack {
+  init(remote track: GetApprovedMusicLibrary.Output.Track) {
+    self.init(
+      id: .init(rawValue: track.id),
+      title: track.title,
+      artistName: track.artistName,
+      artworkURL: track.artworkURL,
+    )
   }
 }
 

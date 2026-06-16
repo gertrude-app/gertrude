@@ -17,6 +17,9 @@ swift *args:
 podcasts *args:
   @cd swift/podcasts && just {{args}}
 
+music *args:
+  @cd swift/music && just {{args}}
+
 # api shortcuts
 
 api:

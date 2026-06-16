@@ -76,7 +76,6 @@ struct LibraryFeatureTests {
     await store.send(.albumTapped(album.id)) {
       $0.albumDetail = .init(
         album: album,
-        tracks: library.tracks(for: album),
         transitionSourceID: album.id.rawValue,
       )
     }
@@ -89,7 +88,6 @@ struct LibraryFeatureTests {
     var state = LibraryFeature.State(status: .loaded(library))
     state.albumDetail = .init(
       album: album,
-      tracks: library.tracks(for: album),
       transitionSourceID: album.id.rawValue,
     )
     let store = TestStore(initialState: state) {
@@ -109,7 +107,6 @@ struct LibraryFeatureTests {
     var state = LibraryFeature.State(status: .loaded(library))
     state.albumDetail = .init(
       album: newAlbum,
-      tracks: library.tracks(for: newAlbum),
       transitionSourceID: newAlbum.id.rawValue,
     )
     let store = TestStore(initialState: state) {
@@ -124,10 +121,7 @@ struct LibraryFeatureTests {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     var state = LibraryFeature.State(status: .loaded(library))
-    state.albumDetail = .init(
-      album: album,
-      tracks: library.tracks(for: album),
-    )
+    state.albumDetail = .init(album: album)
     let store = TestStore(initialState: state) {
       LibraryFeature()
     }

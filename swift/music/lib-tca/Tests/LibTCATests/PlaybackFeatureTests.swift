@@ -90,11 +90,11 @@ struct PlaybackFeatureTests {
   }
 
   @Test
-  func playbackFailurePausesCurrentSession() async {
+  func playbackFailurePausesCurrentSessionAndShowsFailure() async {
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.playTrack = { _ in throw TestError() }
+      $0.playback.playTrack = { _ in throw PlaybackClientError.musicAccessDenied }
     }
 
     let item = playbackItem("track-1")
@@ -102,9 +102,36 @@ struct PlaybackFeatureTests {
     await store.send(.playTrack(item)) {
       $0.session = .init(playStatus: .loading, currentItem: item)
     }
-    await store.receive(.playbackFailed) {
+    await store.receive(.playbackFailed(.musicAccessDenied)) {
       $0.session?.playStatus = .paused
+      $0.failure = .musicAccessDenied
     }
+  }
+
+  @Test
+  func dismissPlaybackFailureClearsFailure() async {
+    let store = TestStore(initialState: .init(failure: .trackUnavailable)) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackFailureDismissed) {
+      $0.failure = nil
+    }
+  }
+
+  @Test
+  func playbackFailureActionOpensSettingsWhenAvailable() async {
+    let recorder = PlaybackCommandRecorder()
+    let store = TestStore(initialState: .init(failure: .musicAccessDenied)) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.systemSettings.openAppSettings = {
+        await recorder.recordOpenSettings()
+      }
+    }
+
+    await store.send(.playbackFailureActionTapped)
+    #expect(await recorder.openSettingsCount == 1)
   }
 
   @Test
@@ -422,6 +449,7 @@ private actor PlaybackCommandRecorder {
   var seekTimes: [TimeInterval] = []
   var skipToNextCount = 0
   var skipToPreviousCount = 0
+  var openSettingsCount = 0
 
   func recordSeek(_ time: TimeInterval) {
     self.seekTimes.append(time)
@@ -434,9 +462,11 @@ private actor PlaybackCommandRecorder {
   func recordSkipToPrevious() {
     self.skipToPreviousCount += 1
   }
-}
 
-private struct TestError: Error {}
+  func recordOpenSettings() {
+    self.openSettingsCount += 1
+  }
+}
 
 private func playbackItem(
   _ id: ApprovedTrack.ID,
