@@ -18,6 +18,9 @@ admin:
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"
 
+hmr-blog:
+  @watchexec --watch site/markdoc/articles/blog --exts .md "just hmr-blog-comment"
+
 storybook:
   @PORT=${STORYBOOK_PORT:-6006} pnpm --filter @storybook/app start
 
@@ -129,3 +132,7 @@ sync-supervise-ui:
 [private]
 hmr-comment:
   @bash -c "echo // $(date) >> './site/app/docs/[slug]/page.tsx'"
+
+[private]
+hmr-blog-comment:
+  @bash -c "echo // $(date) >> './site/app/(marketing)/blog/[slug]/page.tsx'"

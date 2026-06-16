@@ -5,6 +5,7 @@
   "scripts": {
     "start": "next dev --turbopack --port ${PORT:-3000}",
     "build": "next build && cp _redirects _headers ./out",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
