@@ -10,6 +10,7 @@ import EmbeddedVideo from '@/components/articles/EmbeddedVideo';
 import Figure from '@/components/articles/Figure';
 import NewFeatureBadge from '@/components/articles/NewFeatureBadge';
 import { QuickLink, QuickLinks } from '@/components/articles/QuickLinks';
+import ReferralShareLink from '@/components/articles/ReferralShareLink';
 
 export const config: Config = {
   nodes,
@@ -27,4 +28,5 @@ export const components = {
   NewFeatureBadge: NewFeatureBadge,
   QuickLink: QuickLink,
   QuickLinks: QuickLinks,
+  ReferralShareLink: ReferralShareLink,
 };

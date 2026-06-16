@@ -79,6 +79,10 @@ const tags: Config[`tags`] = {
     inline: true,
     render: `NewFeatureBadge`,
   },
+  'referral-share-link': {
+    selfClosing: true,
+    render: `ReferralShareLink`,
+  },
 };
 
 export default tags;
