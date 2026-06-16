@@ -1,0 +1,69 @@
+{
+  "originHash" : "3279ce62ee7d6baad799eed4d1ad60279454e2ac3494a2017c3b1bd5d5aa45b4",
+  "pins" : [
+    {
+      "identity" : "skip",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip.git",
+      "state" : {
+        "revision" : "356106b67937af41dfdf649a39d0351ed6e167b0",
+        "version" : "1.7.8"
+      }
+    },
+    {
+      "identity" : "skip-av",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip-av.git",
+      "state" : {
+        "revision" : "a5554ee722f09a2dfbbc39d8547aa5f94c5b870c",
+        "version" : "0.6.2"
+      }
+    },
+    {
+      "identity" : "skip-foundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip-foundation.git",
+      "state" : {
+        "revision" : "eebb0a36da5fcdff86d4baebf3817134e817dfd4",
+        "version" : "1.3.15"
+      }
+    },
+    {
+      "identity" : "skip-lib",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip-lib.git",
+      "state" : {
+        "revision" : "112874f0222f4815798c924e2b299ba23eb53111",
+        "version" : "1.3.8"
+      }
+    },
+    {
+      "identity" : "skip-model",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip-model.git",
+      "state" : {
+        "revision" : "400a13cf64387a0ae81403084c61eb15ca151096",
+        "version" : "1.7.2"
+      }
+    },
+    {
+      "identity" : "skip-ui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip-ui.git",
+      "state" : {
+        "revision" : "08fd7a92e0e06c42cf626702816adb311588ba73",
+        "version" : "1.50.2"
+      }
+    },
+    {
+      "identity" : "skip-unit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://source.skip.tools/skip-unit.git",
+      "state" : {
+        "revision" : "9a7b4d2aa4c5d5784f3294fba24cf606ac109c75",
+        "version" : "1.6.0"
+      }
+    }
+  ],
+  "version" : 3
+}
