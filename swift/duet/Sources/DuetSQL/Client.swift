@@ -54,12 +54,85 @@ public extension Client {
   }
 
   @discardableResult
-  func upsert<M: Model>(_ model: M) async throws -> M {
-    if await (try? self.find(M.self, byId: model.id)) == nil {
-      try await self.create(model)
-    } else {
-      try await self.update(model)
+  func upsert<M: Model>(
+    _ model: M,
+    conflictOn targets: [M.ColumnName],
+    do action: SQL.ConflictAction<M> = .updateAllExcept([]),
+  ) async throws -> M {
+    let upserted = try await self.upsert([model], conflictOn: targets, do: action)
+    guard let model = upserted.first else {
+      throw DuetSQLError.notFound("\(M.self)")
     }
+    return model
+  }
+
+  @discardableResult
+  func upsert<M: Model>(
+    _ models: [M],
+    conflictOn targets: [M.ColumnName],
+    do action: SQL.ConflictAction<M> = .updateAllExcept([]),
+  ) async throws -> [M] {
+    guard !models.isEmpty else { return [] }
+    let stmt = try SQL.Statement.create(
+      models,
+      onConflict: targets,
+      do: action,
+      returning: .all,
+    )
+    return try await self.execute(statement: stmt, returning: M.self)
+  }
+
+  @discardableResult
+  func upsert<M: Model, Row: Decodable & Sendable>(
+    _ models: [M],
+    conflictOn targets: [M.ColumnName],
+    do action: SQL.ConflictAction<M> = .updateAllExcept([]),
+    returning columns: [M.ColumnName],
+    as _: Row.Type,
+  ) async throws -> [Row] {
+    guard !models.isEmpty else { return [] }
+    let stmt = try SQL.Statement.create(
+      models,
+      onConflict: targets,
+      do: action,
+      returning: .columns(columns),
+    )
+    let rows = try await self.execute(statement: stmt)
+    return try rows.compactMap { row in
+      try row.decode(model: Row.self, prefix: nil, keyDecodingStrategy: .convertFromSnakeCase)
+    }
+  }
+
+  @discardableResult
+  func create<M: Model>(
+    _ model: M,
+    ignoringConflictOn targets: [M.ColumnName],
+  ) async throws -> M? {
+    let stmt = try SQL.Statement.create([model], ignoringConflictOn: targets, returning: .all)
+    return try await self.execute(statement: stmt, returning: M.self).first
+  }
+
+  // no-op DO UPDATE (set conflict key to itself), not DO NOTHING: DO NOTHING returns no row
+  // on conflict, and a fallback SELECT can miss a row another txn just committed under READ
+  // COMMITTED — so we update-to-self purely to always get the surviving row back atomically.
+  @discardableResult
+  func findOrCreate<M: Model>(
+    _ model: M,
+    conflictOn targets: [M.ColumnName],
+  ) async throws -> M {
+    guard let firstTarget = targets.first else {
+      throw DuetSQLError.emptyConflictTarget
+    }
+    let stmt = try SQL.Statement.create(
+      [model],
+      onConflict: targets,
+      do: .update(set: [firstTarget]),
+      returning: .all,
+    )
+    guard let model = try await self.execute(statement: stmt, returning: M.self).first else {
+      throw DuetSQLError.notFound("\(M.self)")
+    }
+    return model
   }
 
   @discardableResult
