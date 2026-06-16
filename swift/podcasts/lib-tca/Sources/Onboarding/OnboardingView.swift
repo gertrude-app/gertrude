@@ -38,7 +38,7 @@ struct OnboardingView: View {
 
         case .accountDetected:
           ClaimSuccessView(
-            isTerminal: false,
+            entitlement: nil,
             deviceName: self.autoDetectDeviceName,
             buttonLabel: lstr(.claimContinue),
             onEvent: { _ in self.store.send(.primaryBtnTapped) },
@@ -102,7 +102,7 @@ struct OnboardingView: View {
   }
 
   private var autoDetectDeviceName: String? {
-    self.store.trialStatus?.claimedChildName.map {
+    self.store.trialStatus?.connectedChildName.map {
       String(format: lstr(.claimDeviceName), $0, self.deviceFormFactor)
     }
   }

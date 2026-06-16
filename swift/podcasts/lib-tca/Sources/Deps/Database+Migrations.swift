@@ -177,4 +177,39 @@ enum Migrations {
       """,
     ).execute(db)
   }
+
+  @Sendable static func subscriptionLegacyStatus(_ db: Database) throws {
+    try #sql(
+      """
+      CREATE TABLE subscription_new (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        status TEXT NOT NULL
+          CHECK (status IN ('trialing', 'active', 'legacy', 'complimentary', 'unpaid')),
+        expiresAt TEXT NOT NULL,
+        legacyMigrationNag INTEGER NOT NULL
+          CHECK (legacyMigrationNag IN (0, 1)) DEFAULT 0,
+        updatedAt TEXT NOT NULL,
+        createdAt TEXT NOT NULL
+      ) STRICT;
+      """,
+    ).execute(db)
+    try #sql(
+      """
+      INSERT INTO subscription_new
+        (id, status, expiresAt, legacyMigrationNag, updatedAt, createdAt)
+        SELECT id, status, expiresAt, legacyMigrationNag, updatedAt, createdAt
+        FROM subscription;
+      """,
+    ).execute(db)
+    try #sql(
+      """
+      DROP TABLE subscription;
+      """,
+    ).execute(db)
+    try #sql(
+      """
+      ALTER TABLE subscription_new RENAME TO subscription;
+      """,
+    ).execute(db)
+  }
 }

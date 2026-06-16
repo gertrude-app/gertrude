@@ -19,6 +19,7 @@ extension Subscription {
   enum Status: String, QueryBindable {
     case trialing
     case active
+    case legacy
     case complimentary
     case unpaid
   }
@@ -43,6 +44,7 @@ extension Subscription {
     switch self.status {
     case .trialing: .trialing
     case .active: .active
+    case .legacy: .legacy
     case .complimentary: .complimentary
     case .unpaid: .unpaid
     }
@@ -62,18 +64,19 @@ extension Subscription {
 }
 
 extension AmSubscriptionState {
-  func toLocal(now: Date) -> (status: Subscription.Status, expiresAt: Date) {
+  func toLocal(now: Date)
+    -> (status: Subscription.Status, expiresAt: Date, legacyMigrationNag: Bool) {
     switch self {
     case .complimentary:
-      (.complimentary, now + .days(365 * 100))
+      (.complimentary, now + .days(365 * 100), false)
     case .active(let expiresAt):
-      (.active, expiresAt)
+      (.active, expiresAt, false)
     case .fullTrial(let expiresAt), .amTrial(let expiresAt):
-      (.trialing, expiresAt)
-    case .legacyGrandfathered(let accessEndsAt, _, _):
-      (.active, accessEndsAt)
+      (.trialing, expiresAt, false)
+    case .legacyGrandfathered(let accessEndsAt, let showMigrationNag, _):
+      (.legacy, accessEndsAt, showMigrationNag)
     case .unpaid, .legacyExpired:
-      (.unpaid, now)
+      (.unpaid, now, false)
     }
   }
 
@@ -86,11 +89,24 @@ extension AmSubscriptionState {
     }
   }
 
+  var claimSuccessEntitlement: ClaimSuccessView.Entitlement? {
+    switch self {
+    case .active: .paid
+    case .fullTrial, .amTrial: .trial
+    case .complimentary: .complimentary
+    case .legacyGrandfathered: .legacy
+    case .unpaid, .legacyExpired: nil
+    }
+  }
+
   @discardableResult
   func writeLocal(now: Date) -> Subscription {
     let mapped = self.toLocal(now: now)
-    return (try? CurrentSubscription.set(status: mapped.status, expiringAt: mapped.expiresAt))
-      ?? .fallback
+    return (try? CurrentSubscription.set(
+      status: mapped.status,
+      expiringAt: mapped.expiresAt,
+      legacyMigrationNag: mapped.legacyMigrationNag,
+    )) ?? .fallback
   }
 }
 

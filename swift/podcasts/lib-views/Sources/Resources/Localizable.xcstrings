@@ -355,6 +355,23 @@
         }
       }
     },
+    "settings.subscription.renews" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renews"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se renueva"
+          }
+        }
+      }
+    },
     "settings.subscription.status" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1617,6 +1634,57 @@
         }
       }
     },
+    "claim.success.terminal.subtitle.complimentary" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free forever"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gratis para siempre"
+          }
+        }
+      }
+    },
+    "claim.success.terminal.subtitle.legacy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access active"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso activo"
+          }
+        }
+      }
+    },
+    "claim.success.terminal.subtitle.trial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free trial active"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba gratuita activa"
+          }
+        }
+      }
+    },
     "claim.done" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1974,6 +2042,23 @@
         }
       }
     },
+    "home.legacyNag.banner.subscribe" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Gertrude AM access runs through %@. Tap to subscribe and keep listening."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu acceso a Gertrude AM continúa hasta el %@. Toca para suscribirte y seguir escuchando."
+          }
+        }
+      }
+    },
     "settings.legacy.explainer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1987,6 +2072,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gertrude AM se está cambiando de las compras dentro de la app de Apple a cuentas de Gertrude. Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, vincula una cuenta de Gertrude. (Apple no te volverá a cobrar.)"
+          }
+        }
+      }
+    },
+    "settings.legacy.explainer.subscribe" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep AM after %@, subscribe. (Apple won't charge you again.)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, suscríbete. (Apple no te volverá a cobrar.)"
           }
         }
       }

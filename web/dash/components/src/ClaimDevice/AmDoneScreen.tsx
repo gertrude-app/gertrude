@@ -13,6 +13,7 @@ const AmDoneScreen: React.FC<{
   variant: AmDoneVariant;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
+  showSubscribe?: boolean;
   onBackToDashboard: () => void;
   onSubscribe: () => void;
   onMaybeLater: () => void;
@@ -44,6 +45,7 @@ const AmDoneScreen: React.FC<{
       childName={props.childName}
       deviceType={deviceType}
       trialDaysRemaining={props.trialDaysRemaining}
+      showSubscribe={props.showSubscribe}
       onBackToDashboard={props.onBackToDashboard}
       onSubscribe={props.onSubscribe}
     />
@@ -133,9 +135,17 @@ const AmDoneActive: React.FC<{
   childName: string;
   deviceType: string;
   trialDaysRemaining?: number;
+  showSubscribe?: boolean;
   onBackToDashboard: () => void;
   onSubscribe: () => void;
-}> = ({ childName, deviceType, trialDaysRemaining, onBackToDashboard, onSubscribe }) => (
+}> = ({
+  childName,
+  deviceType,
+  trialDaysRemaining,
+  showSubscribe,
+  onBackToDashboard,
+  onSubscribe,
+}) => (
   <div>
     <ScreenHeader
       icon="check"
@@ -160,9 +170,11 @@ const AmDoneActive: React.FC<{
     )}
 
     <div className="flex justify-end items-center gap-3">
-      <Button type="button" color="secondary" onClick={onSubscribe}>
-        Subscribe to Light &rarr;
-      </Button>
+      {showSubscribe && (
+        <Button type="button" color="secondary" onClick={onSubscribe}>
+          Subscribe to Light &rarr;
+        </Button>
+      )}
       <Button type="button" color="primary" onClick={onBackToDashboard}>
         Back to Dashboard
       </Button>

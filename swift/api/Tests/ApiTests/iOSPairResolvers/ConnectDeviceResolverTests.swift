@@ -1,4 +1,5 @@
 import Dependencies
+import DuetSQL
 import IOSRoute
 import XCTest
 import XExpect
@@ -67,5 +68,69 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     expect(data.deviceId).toEqual(vendorId)
     expect(data.childName).toEqual(child.name)
     expect(data.supervised).toBeNil()
+  }
+
+  func testConnectStampsLegacyAmIapWhenDeviceHasQualifyingPurchase() async throws {
+    let child = try await self.child()
+    let vendorId = UUID()
+    // a qualifying historical AM IAP recorded against this physical device
+    var event = try await self.db.create(PodcastEvent(
+      eventId: "af0a338f",
+      kind: .subscription,
+      label: "subscribe success",
+      detail: "originalID: 123456789012345", // len 15 -> host purchase
+      deviceId: vendorId,
+      modelIdentifier: "iPhone14,2",
+      appVersion: "1.4.0",
+      iosVersion: "18.4.0",
+    ))
+    try await event.modifyCreatedAt(.exact(.reference)) // clean whole-second timestamp
+
+    _ = try await withDependencies {
+      $0.verificationCode = .liveValue
+    } operation: {
+      let code = await with(dependency: \.ephemeral)
+        .createPendingAppConnection(child.id)
+      return try await ConnectDevice_v2.resolve(
+        with: .init(
+          verificationCode: code,
+          vendorId: vendorId,
+          modelIdentifier: "iPhone14,2",
+          appVersion: "1.5.0",
+          iosVersion: "18.4.0",
+        ),
+        in: .mock,
+      )
+    }
+
+    // stamped at connect time so AM cross-app detection later honors grandfathering
+    // instead of silently dropping a legacy customer's access
+    let identity = try await child.parent.model.ensureBillingIdentity(in: self.db)
+    expect(identity.legacyAmIapPaidAt).toEqual(.reference)
+  }
+
+  func testConnectDoesNotStampLegacyWhenNoQualifyingPurchase() async throws {
+    let child = try await self.child()
+    let vendorId = UUID()
+
+    _ = try await withDependencies {
+      $0.verificationCode = .liveValue
+    } operation: {
+      let code = await with(dependency: \.ephemeral)
+        .createPendingAppConnection(child.id)
+      return try await ConnectDevice_v2.resolve(
+        with: .init(
+          verificationCode: code,
+          vendorId: vendorId,
+          modelIdentifier: "iPhone14,2",
+          appVersion: "1.5.0",
+          iosVersion: "18.4.0",
+        ),
+        in: .mock,
+      )
+    }
+
+    let identity = try await child.parent.model.billingIdentity(in: self.db)
+    expect(identity?.legacyAmIapPaidAt).toBeNil()
   }
 }

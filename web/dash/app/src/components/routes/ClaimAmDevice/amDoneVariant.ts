@@ -8,6 +8,7 @@ export interface AmDonePresentation {
   accessEndsAt?: string;
   trialDaysRemaining?: number;
   subscribeUrl?: string;
+  showSubscribe: boolean;
 }
 
 const TIER_TO_VARIANT: Record<AmRunwayTier, AmDoneVariant> = {
@@ -25,5 +26,7 @@ export function amDoneVariant(
     accessEndsAt: runway.accessEndsAt,
     trialDaysRemaining: runway.trialDaysRemaining,
     subscribeUrl: runway.subscribeUrl,
+    showSubscribe:
+      runway.tier !== `active` || sub.case === `amTrial` || sub.case === `fullTrial`,
   };
 }

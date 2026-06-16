@@ -13,13 +13,14 @@ public struct SettingsView: View {
   public enum SubscriptionStatus: Equatable {
     case trialing
     case active
+    case legacy
     case complimentary
     case unpaid
 
     var displayName: String {
       switch self {
       case .trialing: lstr(.settingsSubscriptionStatusFreeTrial)
-      case .active: lstr(.settingsSubscriptionStatusActive)
+      case .active, .legacy: lstr(.settingsSubscriptionStatusActive)
       case .complimentary: lstr(.settingsSubscriptionStatusFreeForever)
       case .unpaid: lstr(.settingsSubscriptionStatusUnpaid)
       }
@@ -36,7 +37,7 @@ public struct SettingsView: View {
     var badgeBgColor: Color {
       switch self {
       case .trialing: Color(red: 0.2, green: 0.4, blue: 0.8)
-      case .active: Color(red: 0.2, green: 0.6, blue: 0.3)
+      case .active, .legacy: Color(red: 0.2, green: 0.6, blue: 0.3)
       case .complimentary: Color(red: 0.5, green: 0.3, blue: 0.7)
       case .unpaid: Color(red: 0.8, green: 0.2, blue: 0.2)
       }
@@ -216,7 +217,9 @@ public struct SettingsView: View {
                 }
                 if self.legacyMigrationNag {
                   Text(String(
-                    format: lstr(.settingsLegacyExplainer),
+                    format: lstr(
+                      self.isClaimed ? .settingsLegacyExplainerSubscribe : .settingsLegacyExplainer,
+                    ),
                     formatLegacyAccessDate(self.expiresAt, includeYear: false),
                   ))
                   .font(.subheadline)
@@ -270,7 +273,7 @@ public struct SettingsView: View {
               Button {
                 self.onEvent(.subscribeNowTapped)
               } label: {
-                Text(lstr(.accountCtaConnect))
+                Text(self.isClaimed ? lstr(.accountCtaSubscribe) : lstr(.accountCtaConnect))
                   .font(.headline)
                   .foregroundColor(.white)
                   .frame(maxWidth: .infinity)
@@ -305,7 +308,7 @@ public struct SettingsView: View {
   private var subscriptionText: String {
     switch self.status {
     case .trialing: lstr(.accountValueFreeTrial)
-    case .active: lstr(.accountValueActive)
+    case .active, .legacy: lstr(.accountValueActive)
     case .complimentary: lstr(.accountValueFreeForever)
     case .unpaid: self.isClaimed ? lstr(.accountValueUnpaid) : lstr(.accountValueNone)
     }
@@ -313,24 +316,23 @@ public struct SettingsView: View {
 
   private var subscriptionColor: Color {
     switch self.status {
-    case .active, .complimentary: Color(red: 0.2, green: 0.6, blue: 0.3)
+    case .active, .legacy, .complimentary: Color(red: 0.2, green: 0.6, blue: 0.3)
     case .trialing: Color(red: 0.2, green: 0.4, blue: 0.8)
     case .unpaid: Color(red: 0.8, green: 0.2, blue: 0.2)
     }
   }
 
   private var expirationLabel: String {
-    if self.legacyMigrationNag {
-      return lstr(.settingsSubscriptionActiveUntil)
-    }
     switch self.status {
-    case .unpaid: return lstr(.settingsSubscriptionExpired)
-    case .active, .trialing, .complimentary: return lstr(.settingsSubscriptionExpires)
+    case .legacy: lstr(.settingsSubscriptionActiveUntil)
+    case .unpaid: lstr(.settingsSubscriptionExpired)
+    case .active: lstr(.settingsSubscriptionRenews)
+    case .trialing, .complimentary: lstr(.settingsSubscriptionExpires)
     }
   }
 
   private var expirationText: String {
-    if self.legacyMigrationNag {
+    if self.status == .legacy {
       return formatLegacyAccessDate(self.expiresAt, includeYear: true)
     }
     let now = Date()
@@ -408,11 +410,30 @@ public struct SettingsView: View {
   .preferredColorScheme(.dark)
 }
 
-#Preview("Legacy Nag") {
+#Preview("Legacy Silent") {
   SettingsView(
-    status: .active,
+    status: .legacy,
+    expiresAt: Date().addingTimeInterval(.days(220)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
+  )
+}
+
+#Preview("Legacy Nag — Unclaimed") {
+  SettingsView(
+    status: .legacy,
     expiresAt: Date().addingTimeInterval(.days(58)),
     reclaimableStorageGb: 2.4,
+    legacyMigrationNag: true,
+  )
+}
+
+#Preview("Legacy Nag — Claimed") {
+  SettingsView(
+    status: .legacy,
+    expiresAt: Date().addingTimeInterval(.days(58)),
+    reclaimableStorageGb: 2.4,
+    isClaimed: true,
     legacyMigrationNag: true,
   )
 }

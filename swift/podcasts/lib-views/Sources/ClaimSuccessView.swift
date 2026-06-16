@@ -7,21 +7,33 @@ public struct ClaimSuccessView: View {
     case continueTapped
   }
 
-  let isTerminal: Bool
+  public enum Entitlement: Equatable, Sendable {
+    case paid
+    case trial
+    case complimentary
+    case legacy
+  }
+
+  let entitlement: Entitlement?
   let deviceName: String?
   let buttonLabel: String?
   let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
-    isTerminal: Bool,
+    entitlement: Entitlement?,
     deviceName: String? = nil,
     buttonLabel: String? = nil,
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
-    self.isTerminal = isTerminal
+    self.entitlement = entitlement
     self.deviceName = deviceName
     self.buttonLabel = buttonLabel
     self.onEvent = onEvent
+  }
+
+  // an entitled (terminal) claim needs no follow-on payment step
+  private var isTerminal: Bool {
+    self.entitlement != nil
   }
 
   public var body: some View {
@@ -37,8 +49,8 @@ public struct ClaimSuccessView: View {
           .font(.system(size: 24, weight: .bold))
           .multilineTextAlignment(.center)
 
-        if self.isTerminal {
-          Text(lstr(.claimSuccessTerminalSubtitle))
+        if let entitlement = self.entitlement {
+          Text(self.subtitle(for: entitlement))
             .font(.system(size: 16, weight: .regular))
             .foregroundStyle(Color(
               self.cs,
@@ -65,22 +77,43 @@ public struct ClaimSuccessView: View {
     .padding(30)
     .screenGradientBackground()
   }
+
+  private func subtitle(for entitlement: Entitlement) -> String {
+    switch entitlement {
+    case .paid: lstr(.claimSuccessTerminalSubtitle)
+    case .trial: lstr(.claimSuccessTerminalSubtitleTrial)
+    case .complimentary: lstr(.claimSuccessTerminalSubtitleComplimentary)
+    case .legacy: lstr(.claimSuccessTerminalSubtitleLegacy)
+    }
+  }
 }
 
-#Preview("Terminal") {
-  ClaimSuccessView(isTerminal: true)
+#Preview("Paid") {
+  ClaimSuccessView(entitlement: .paid)
 }
 
-#Preview("Terminal (Dark)") {
-  ClaimSuccessView(isTerminal: true)
+#Preview("Paid (Dark)") {
+  ClaimSuccessView(entitlement: .paid)
     .preferredColorScheme(.dark)
 }
 
+#Preview("Trial") {
+  ClaimSuccessView(entitlement: .trial)
+}
+
+#Preview("Complimentary") {
+  ClaimSuccessView(entitlement: .complimentary)
+}
+
+#Preview("Legacy") {
+  ClaimSuccessView(entitlement: .legacy)
+}
+
 #Preview("Neutral") {
-  ClaimSuccessView(isTerminal: false, deviceName: "Bobby’s iPhone")
+  ClaimSuccessView(entitlement: nil, deviceName: "Bobby’s iPhone")
 }
 
 #Preview("Neutral (Dark)") {
-  ClaimSuccessView(isTerminal: false, deviceName: "Bobby’s iPhone")
+  ClaimSuccessView(entitlement: nil, deviceName: "Bobby’s iPhone")
     .preferredColorScheme(.dark)
 }

@@ -33,6 +33,7 @@ public struct PodcastsHomeView: View {
   let onSettingsTap: @MainActor @Sendable () -> Void
   let onDebugMenuTap: @MainActor @Sendable (DebugMenuAction) -> Void
   let subscriptionStatus: SubscriptionStatus
+  let isClaimed: Bool
 
   public enum DebugMenuAction {
     case setTrialExpiringSoon
@@ -48,6 +49,7 @@ public struct PodcastsHomeView: View {
     onSettingsTap: @MainActor @escaping @Sendable () -> Void = {},
     onDebugMenuTap: @MainActor @escaping @Sendable (DebugMenuAction) -> Void = { _ in },
     subscriptionStatus: SubscriptionStatus = .ok,
+    isClaimed: Bool = false,
   ) {
     self.shows = shows
     self.onAddShowTap = onAddShowTap
@@ -56,6 +58,7 @@ public struct PodcastsHomeView: View {
     self.onSettingsTap = onSettingsTap
     self.onDebugMenuTap = onDebugMenuTap
     self.subscriptionStatus = subscriptionStatus
+    self.isClaimed = isClaimed
   }
 
   public var body: some View {
@@ -165,7 +168,7 @@ public struct PodcastsHomeView: View {
           .font(.system(size: 16, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
         Text(String(
-          format: lstr(.homeLegacyNagBanner),
+          format: lstr(self.isClaimed ? .homeLegacyNagBannerSubscribe : .homeLegacyNagBanner),
           formatLegacyAccessDate(accessEndsAt, includeYear: false),
         ))
         .font(.system(size: 14, weight: .medium))
@@ -436,7 +439,7 @@ func showWithStats(
   .preferredColorScheme(.dark)
 }
 
-#Preview("Legacy Nag") {
+#Preview("Legacy Nag — Unclaimed") {
   PodcastsHomeView(
     shows: [
       showWithStats(id: 1) {
@@ -458,7 +461,7 @@ func showWithStats(
   )
 }
 
-#Preview("Legacy Nag (Dark)") {
+#Preview("Legacy Nag — Claimed") {
   PodcastsHomeView(
     shows: [
       showWithStats(id: 1) {
@@ -470,6 +473,7 @@ func showWithStats(
       },
     ],
     subscriptionStatus: .legacyNag(accessEndsAt: Date().addingTimeInterval(.days(58))),
+    isClaimed: true,
   )
   .preferredColorScheme(.dark)
 }

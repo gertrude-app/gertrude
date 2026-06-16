@@ -549,7 +549,7 @@ import Testing
     await withDependencies {
       $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
-        .claimed(
+        .connected(
           token: UUID(),
           childId: UUID(),
           childName: "Sally",

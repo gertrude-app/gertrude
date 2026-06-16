@@ -2,7 +2,6 @@ import Dependencies
 import DuetSQL
 import Foundation
 import PodcastRoute
-import Vapor
 
 extension GetTrialStatus: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
@@ -16,12 +15,7 @@ extension GetTrialStatus: Resolver {
     let device = try await install.device(in: ctx.db)
     let now = get(dependency: \.date.now)
 
-    if device.claimedAt != nil {
-      guard let child = try await device.child(in: ctx.db) else {
-        logIOSUnusual("c1f4a9d2", "podcast device claimedAt w/ no child, device=\(device.id)")
-        throw Abort(.internalServerError)
-      }
-
+    if let child = try await device.child(in: ctx.db) {
       let token: PodcastApp.Token = if let existing = try? await PodcastApp.Token.query()
         .where(.installId == install.id)
         .first(in: ctx.db) {
@@ -33,7 +27,7 @@ extension GetTrialStatus: Resolver {
       let parent = try await child.parent(in: ctx.db)
       let account = try await parent.billingAccountSnapshot(in: ctx.db, at: now)
 
-      return .claimed(
+      return .connected(
         token: token.value.rawValue,
         childId: child.id.rawValue,
         childName: child.name,

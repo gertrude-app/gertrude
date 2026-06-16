@@ -16,11 +16,15 @@ extension IOSDevice {
     })
   }
 
-  mutating func claim(for child: Child, in db: any DuetSQL.Client) async throws {
+  mutating func bindChild(_ child: Child, in db: any DuetSQL.Client) async throws {
     self.childId = child.id
-    self.claimedAt = get(dependency: \.date.now)
     try await self.stampLegacyAmIapIfQualifying(for: child, in: db)
     try await db.update(self)
+  }
+
+  mutating func claim(for child: Child, in db: any DuetSQL.Client) async throws {
+    self.claimedAt = get(dependency: \.date.now)
+    try await self.bindChild(child, in: db)
   }
 
   private func stampLegacyAmIapIfQualifying(

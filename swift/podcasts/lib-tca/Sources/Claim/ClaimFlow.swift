@@ -35,7 +35,7 @@ struct ClaimFlow {
     }
 
     var successIsTerminal: Bool {
-      self.entitlement?.isEntitled ?? false
+      self.entitlement?.claimSuccessEntitlement != nil
     }
   }
 
@@ -91,7 +91,7 @@ struct ClaimFlow {
         return .none
 
       case .polled(let output):
-        guard case .claimed(let token, _, let childName, let subscription) = output else {
+        guard case .connected(let token, _, let childName, let subscription) = output else {
           return .none
         }
         self.keychain.save(amToken: token)

@@ -17,7 +17,7 @@ import Testing
       $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.api.createClaimCode = { .init(code: 123_456, expiresAt: .reference + .days(1)) }
       $0.api.getTrialStatus = {
-        .claimed(token: token, childId: UUID(), childName: "Sally", subscription: .active(
+        .connected(token: token, childId: UUID(), childName: "Sally", subscription: .active(
           expiresAt: .reference + .days(300),
         ))
       }
@@ -59,7 +59,7 @@ import Testing
       $0.api.logEvent = { _, _, _, _ in }
       $0.api.createClaimCode = { .init(code: 222_333, expiresAt: .reference + .days(1)) }
       $0.api.getTrialStatus = {
-        .claimed(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
+        .connected(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
           remediationUrl: nil,
         ))
       }
@@ -93,7 +93,7 @@ import Testing
       $0.api.logEvent = { _, _, _, _ in }
       $0.api.createClaimCode = { .init(code: 654_321, expiresAt: .reference + .days(1)) }
       $0.api.getTrialStatus = {
-        .claimed(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
+        .connected(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
           remediationUrl: nil,
         ))
       }

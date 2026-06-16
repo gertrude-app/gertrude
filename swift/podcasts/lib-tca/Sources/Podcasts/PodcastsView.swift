@@ -15,6 +15,7 @@ struct PodcastsView: View {
       onSettingsTap: { self.store.send(.settingsTapped) },
       onDebugMenuTap: { self.store.send(.debugMenuTapped($0)) },
       subscriptionStatus: self.store.subscription.homeViewStatus,
+      isClaimed: self.store.isClaimed,
     )
     .navigationBarBackButtonHidden(true)
     .navigationDestination(
