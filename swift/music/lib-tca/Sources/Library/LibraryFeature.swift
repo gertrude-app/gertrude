@@ -77,13 +77,18 @@ struct LibraryFeature: Sendable {
 
     return .init(
       album: album,
-      tracks: library.tracks(for: album),
       transitionSourceID: albumID.rawValue,
     )
   }
 }
 
 extension LibraryFeature.State {
+  mutating func setAlbumDetailPlaybackFailure(_ failure: PlaybackFailure?) {
+    guard var albumDetail = self.albumDetail else { return }
+    albumDetail.setPlaybackFailure(failure)
+    self.albumDetail = albumDetail
+  }
+
   mutating func setAlbumDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
     guard var albumDetail = self.albumDetail else { return }
     albumDetail.setPlaybackSession(session)

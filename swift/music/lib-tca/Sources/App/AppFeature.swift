@@ -89,6 +89,12 @@ struct AppFeature: Sendable {
         state.isNowPlayingPresented = isPresented
         return .none
 
+      case .library(.delegate(.dismissPlaybackFailure)):
+        return .send(.playback(.playbackFailureDismissed))
+
+      case .library(.delegate(.playbackFailureActionTapped)):
+        return .send(.playback(.playbackFailureActionTapped))
+
       case .library(.delegate(.playAlbum(let items, let startIndex))):
         return .send(.playback(.playAlbumQueue(items: items, startIndex: startIndex)))
 
@@ -97,10 +103,12 @@ struct AppFeature: Sendable {
 
       case .library:
         state.library.setAlbumDetailPlaybackSession(state.playback.session)
+        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
         return .none
 
       case .playback:
         state.library.setAlbumDetailPlaybackSession(state.playback.session)
+        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
         return .none
       }
     }

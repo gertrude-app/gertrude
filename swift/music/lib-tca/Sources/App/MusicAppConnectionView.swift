@@ -61,7 +61,7 @@ struct MusicAppConnectionView: View {
       ProgressView()
         .padding(.top, 8)
 
-    case .unclaimed(let code, let expiresAt):
+    case .unclaimed(let code, _):
       let displayUrl = Self.displayClaimUrl(code)
       let shareUrl = URL(string: Self.claimUrl(code))!
       VStack(spacing: 16) {
@@ -91,10 +91,6 @@ struct MusicAppConnectionView: View {
         .padding(.horizontal, 18)
         .padding(.vertical, 14)
         .background(.primary.opacity(0.05), in: .rect(cornerRadius: 18, style: .continuous))
-
-        Text("Expires \(expiresAt.formatted(date: .omitted, time: .shortened))")
-          .font(.system(size: 14, weight: .semibold))
-          .foregroundStyle(.secondary)
 
         ShareLink(item: shareUrl) {
           Label("Send link", systemImage: "square.and.arrow.up")

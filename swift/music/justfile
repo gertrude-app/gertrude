@@ -1,5 +1,7 @@
 import '../watch-helpers.just'
 
+swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
+
 _default:
   @just --choose
 
@@ -12,10 +14,10 @@ xcode:
   @open GertrudeMusic.xcodeproj
 
 build-views:
-  @cd lib-views && swift build
+  @cd lib-views && {{swiftly}} run swift build
 
 build-tca:
-  @cd lib-tca && swift build
+  @cd lib-tca && {{swiftly}} run swift build
 
 build:
   @just build-views
@@ -25,12 +27,21 @@ build-app:
   @xcodebuild -project GertrudeMusic.xcodeproj -scheme 'Gertrude Music' -configuration Debug -destination 'generic/platform=iOS Simulator' build
 
 test:
-  @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
-  @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
+  @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test
+  @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test
+
+lint:
+  @swiftformat --exclude '**/.build' --lint .
+
+check:
+  @just build
+  @just test
+  @just lint
 
 fix:
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist
+  @prettier --write '**/*.json' '!**/.build/**'
 
 clean:
   @rm -rf lib-views/.build lib-tca/.build

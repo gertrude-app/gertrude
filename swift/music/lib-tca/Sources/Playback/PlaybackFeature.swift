@@ -21,11 +21,117 @@ struct PlaybackProgress: Equatable, Sendable {
   }
 }
 
+enum PlaybackFailure: Equatable, Sendable {
+  case appleMusicSubscriptionRequired
+  case catalogLookupFailed
+  case musicAccessDenied
+  case musicAccessRestricted
+  case playbackFailed
+  case privacyAcknowledgementRequired
+  case trackUnavailable
+
+  init(error: any Error) {
+    switch error as? PlaybackClientError {
+    case .appleMusicSubscriptionRequired:
+      self = .appleMusicSubscriptionRequired
+    case .catalogLookupFailed:
+      self = .catalogLookupFailed
+    case .musicAccessDenied:
+      self = .musicAccessDenied
+    case .musicAccessRestricted:
+      self = .musicAccessRestricted
+    case .playbackFailed:
+      self = .playbackFailed
+    case .privacyAcknowledgementRequired:
+      self = .privacyAcknowledgementRequired
+    case .trackUnavailable:
+      self = .trackUnavailable
+    case nil:
+      self = .playbackFailed
+    }
+  }
+
+  var title: String {
+    switch self {
+    case .appleMusicSubscriptionRequired:
+      "Apple Music subscription required"
+    case .catalogLookupFailed:
+      "Couldn’t load song"
+    case .musicAccessDenied:
+      "Apple Music access needed"
+    case .musicAccessRestricted:
+      "Apple Music is restricted"
+    case .playbackFailed:
+      "Couldn’t start playback"
+    case .privacyAcknowledgementRequired:
+      "Apple Music needs attention"
+    case .trackUnavailable:
+      "Song unavailable"
+    }
+  }
+
+  var message: String {
+    switch self {
+    case .appleMusicSubscriptionRequired:
+      "This device needs an active Apple Music subscription to play approved songs."
+    case .catalogLookupFailed:
+      "Gertrude Music couldn’t load this song from Apple Music. Try another approved track."
+    case .musicAccessDenied:
+      "Allow Gertrude Music to use Apple Music so approved songs can play."
+    case .musicAccessRestricted:
+      "Apple Music access appears to be restricted on this device."
+    case .playbackFailed:
+      "Check your connection and try again."
+    case .privacyAcknowledgementRequired:
+      "Open Apple Music and finish any required privacy prompts, then try again."
+    case .trackUnavailable:
+      "This song isn’t available from Apple Music right now. Try another approved track."
+    }
+  }
+
+  var systemImage: String {
+    switch self {
+    case .appleMusicSubscriptionRequired:
+      "person.crop.circle.badge.exclamationmark"
+    case .catalogLookupFailed:
+      "icloud.slash.fill"
+    case .musicAccessDenied:
+      "music.note.list"
+    case .musicAccessRestricted:
+      "lock.fill"
+    case .playbackFailed:
+      "wifi.exclamationmark"
+    case .privacyAcknowledgementRequired:
+      "exclamationmark.bubble.fill"
+    case .trackUnavailable:
+      "exclamationmark.triangle.fill"
+    }
+  }
+
+  var actionTitle: String? {
+    switch self {
+    case .musicAccessDenied, .musicAccessRestricted:
+      "Open Settings"
+    case .appleMusicSubscriptionRequired,
+         .catalogLookupFailed,
+         .playbackFailed,
+         .privacyAcknowledgementRequired,
+         .trackUnavailable:
+      nil
+    }
+  }
+
+  var opensSettings: Bool {
+    self.actionTitle != nil
+  }
+}
+
 @Reducer
 struct PlaybackFeature: Sendable {
   @ObservableState
   struct State: Equatable {
     var session: Session?
+    var failure: PlaybackFailure?
   }
 
   struct AlbumQueue: Equatable, Sendable {
@@ -118,18 +224,20 @@ struct PlaybackFeature: Sendable {
 
   enum Action: Equatable {
     case observePlayback
-    case playbackEvent(PlaybackEvent)
-    case playTrack(PlaybackItem)
-    case playAlbumQueue(items: [PlaybackItem], startIndex: Int)
-    case togglePlayPause
     case pause
+    case playAlbumQueue(items: [PlaybackItem], startIndex: Int)
+    case playbackEvent(PlaybackEvent)
+    case playbackFailed(PlaybackFailure)
+    case playbackFailureActionTapped
+    case playbackFailureDismissed
+    case playbackStarted
+    case playTrack(PlaybackItem)
     case resume
     case seek(TimeInterval)
     case skipToNext
     case skipToPrevious
     case stop
-    case playbackStarted
-    case playbackFailed
+    case togglePlayPause
   }
 
   enum CancelID: Hashable {
@@ -138,6 +246,7 @@ struct PlaybackFeature: Sendable {
   }
 
   @Dependency(\.playback) var playback
+  @Dependency(\.systemSettings) var systemSettings
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -163,18 +272,20 @@ struct PlaybackFeature: Sendable {
         return .none
 
       case .playTrack(let item):
+        state.failure = nil
         state.session = .init(playStatus: .loading, currentItem: item)
         return .run { send in
           do {
             try await self.playback.playTrack(item)
             await send(.playbackStarted)
           } catch {
-            await send(.playbackFailed)
+            await send(.playbackFailed(.init(error: error)))
           }
         }
 
       case .playAlbumQueue(let items, let startIndex):
         guard items.indices.contains(startIndex) else { return .none }
+        state.failure = nil
         let albumQueue = AlbumQueue(items: items, currentIndex: startIndex)
         let playbackOrder = albumQueue.playbackOrder
         state.session = .init(playStatus: .loading, albumQueue: albumQueue)
@@ -183,7 +294,7 @@ struct PlaybackFeature: Sendable {
             try await self.playback.playTracksInOrder(playbackOrder)
             await send(.playbackStarted)
           } catch {
-            await send(.playbackFailed)
+            await send(.playbackFailed(.init(error: error)))
           }
         }
 
@@ -206,12 +317,13 @@ struct PlaybackFeature: Sendable {
 
       case .resume:
         guard state.session?.playStatus == .paused else { return .none }
+        state.failure = nil
         state.resumeSession()
         return .run { send in
           do {
             try await self.playback.resume()
           } catch {
-            await send(.playbackFailed)
+            await send(.playbackFailed(.init(error: error)))
           }
         }
 
@@ -264,12 +376,24 @@ struct PlaybackFeature: Sendable {
         }
 
       case .playbackStarted:
+        state.failure = nil
         state.resumeSession()
         return .none
 
-      case .playbackFailed:
+      case .playbackFailed(let failure):
+        state.failure = failure
         state.pauseSession()
         return .none
+
+      case .playbackFailureDismissed:
+        state.failure = nil
+        return .none
+
+      case .playbackFailureActionTapped:
+        guard state.failure?.opensSettings == true else { return .none }
+        return .run { _ in
+          await self.systemSettings.openAppSettings()
+        }
       }
     }
   }

@@ -6,6 +6,25 @@ public struct GetApprovedMusicLibrary: Pair {
   public typealias Input = NoInput
 
   public struct Output: PairOutput {
+    public struct Track: PairNestable {
+      public var id: String
+      public var title: String
+      public var artistName: String
+      public var artworkUrl: String?
+
+      public init(
+        id: String,
+        title: String,
+        artistName: String,
+        artworkUrl: String?,
+      ) {
+        self.id = id
+        self.title = title
+        self.artistName = artistName
+        self.artworkUrl = artworkUrl
+      }
+    }
+
     public struct Album: PairNestable {
       public var id: String
       public var title: String
@@ -13,7 +32,7 @@ public struct GetApprovedMusicLibrary: Pair {
       public var artworkUrl: String?
       public var trackCount: Int?
       public var showsArtwork: Bool
-      public var trackIds: [String]
+      public var tracks: [Track]
 
       public init(
         id: String,
@@ -22,7 +41,7 @@ public struct GetApprovedMusicLibrary: Pair {
         artworkUrl: String?,
         trackCount: Int?,
         showsArtwork: Bool,
-        trackIds: [String],
+        tracks: [Track],
       ) {
         self.id = id
         self.title = title
@@ -30,44 +49,14 @@ public struct GetApprovedMusicLibrary: Pair {
         self.artworkUrl = artworkUrl
         self.trackCount = trackCount
         self.showsArtwork = showsArtwork
-        self.trackIds = trackIds
-      }
-    }
-
-    public struct Track: PairNestable {
-      public var id: String
-      public var title: String
-      public var artistName: String
-      public var albumId: String
-      public var albumTitle: String
-      public var artworkUrl: String?
-      public var showsArtwork: Bool
-
-      public init(
-        id: String,
-        title: String,
-        artistName: String,
-        albumId: String,
-        albumTitle: String,
-        artworkUrl: String?,
-        showsArtwork: Bool,
-      ) {
-        self.id = id
-        self.title = title
-        self.artistName = artistName
-        self.albumId = albumId
-        self.albumTitle = albumTitle
-        self.artworkUrl = artworkUrl
-        self.showsArtwork = showsArtwork
+        self.tracks = tracks
       }
     }
 
     public var albums: [Album]
-    public var tracks: [Track]
 
-    public init(albums: [Album], tracks: [Track]) {
+    public init(albums: [Album]) {
       self.albums = albums
-      self.tracks = tracks
     }
   }
 }
