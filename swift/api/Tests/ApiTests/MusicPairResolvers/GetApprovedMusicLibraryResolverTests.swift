@@ -69,7 +69,20 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
         artworkUrl: "https://example.com/stories.jpg",
         trackCount: 12,
         showsArtwork: true,
-        trackIds: ["1440935468", "1440935469"],
+        tracks: [
+          .init(
+            id: "1440935468",
+            title: "Sommarsvärta",
+            artistName: "Lena Jonsson Trio",
+            artworkUrl: "https://example.com/stories.jpg",
+          ),
+          .init(
+            id: "1440935469",
+            title: "Snowstorm",
+            artistName: "Lena Jonsson Trio",
+            artworkUrl: "https://example.com/snowstorm.jpg",
+          ),
+        ],
       ),
       .init(
         id: "1733742320",
@@ -78,36 +91,14 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
         artworkUrl: nil,
         trackCount: nil,
         showsArtwork: false,
-        trackIds: ["1733742321"],
-      ),
-    ])
-    expect(output.tracks).toEqual([
-      .init(
-        id: "1440935468",
-        title: "Sommarsvärta",
-        artistName: "Lena Jonsson Trio",
-        albumId: "1440935467",
-        albumTitle: "Stories from the Outside",
-        artworkUrl: "https://example.com/stories.jpg",
-        showsArtwork: true,
-      ),
-      .init(
-        id: "1440935469",
-        title: "Snowstorm",
-        artistName: "Lena Jonsson Trio",
-        albumId: "1440935467",
-        albumTitle: "Stories from the Outside",
-        artworkUrl: "https://example.com/snowstorm.jpg",
-        showsArtwork: true,
-      ),
-      .init(
-        id: "1733742321",
-        title: "Elements",
-        artistName: "Lena Jonsson Trio",
-        albumId: "1733742320",
-        albumTitle: "Elements",
-        artworkUrl: "https://example.com/elements.jpg",
-        showsArtwork: false,
+        tracks: [
+          .init(
+            id: "1733742321",
+            title: "Elements",
+            artistName: "Lena Jonsson Trio",
+            artworkUrl: "https://example.com/elements.jpg",
+          ),
+        ],
       ),
     ])
   }
@@ -143,8 +134,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       from: response.body.data!,
     )
     expect(output.albums.map(\.id)).toEqual(["1440935467"])
-    expect(output.albums.map(\.trackIds)).toEqual([["1440935468", "1440935469"]])
-    expect(output.tracks.map(\.id)).toEqual(["1440935468", "1440935469"])
+    expect(output.albums.map { $0.tracks.map(\.id) }).toEqual([["1440935468", "1440935469"]])
   }
 
   func testUnauthorizedAfterTokenRowDeleted() async throws {

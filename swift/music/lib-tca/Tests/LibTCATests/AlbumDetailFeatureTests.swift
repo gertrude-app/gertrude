@@ -7,47 +7,40 @@ import Testing
 struct AlbumDetailFeatureTests {
   @Test
   func playTappedRequestsAlbumQueuePlaybackFromFirstTrack() async {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let tracks = library.tracks(for: album)
-    let store = TestStore(initialState: .init(album: album, tracks: tracks)) {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let store = TestStore(initialState: .init(album: album)) {
       AlbumDetailFeature()
     }
 
     await store.send(.playTapped)
     await store.receive(.delegate(.playAlbum(
-      items: playbackItems(album: album, tracks: tracks),
+      items: playbackItems(album: album),
       startIndex: 0,
     )))
   }
 
   @Test
   func trackTappedRequestsAlbumQueuePlaybackFromTrackIndex() async {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let tracks = library.tracks(for: album)
-    let track = tracks[2]
-    let store = TestStore(initialState: .init(album: album, tracks: tracks)) {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let track = album.tracks[2]
+    let store = TestStore(initialState: .init(album: album)) {
       AlbumDetailFeature()
     }
 
     await store.send(.trackTapped(track.id))
     await store.receive(.delegate(.playAlbum(
-      items: playbackItems(album: album, tracks: tracks),
+      items: playbackItems(album: album),
       startIndex: 2,
     )))
   }
 
   @Test
   func playTappedWithCurrentSessionTogglesPlayPause() async {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let tracks = library.tracks(for: album)
+    let album = ApprovedMusicLibrary.mock.albums[0]
     let store = TestStore(initialState: .init(
       album: album,
-      tracks: tracks,
       playStatus: .playing,
-      currentTrackID: tracks[1].id,
+      currentTrackID: album.tracks[1].id,
     )) {
       AlbumDetailFeature()
     }
@@ -58,13 +51,10 @@ struct AlbumDetailFeatureTests {
 
   @Test
   func currentTrackTapTogglesPlayPause() async {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let tracks = library.tracks(for: album)
-    let track = tracks[2]
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let track = album.tracks[2]
     let store = TestStore(initialState: .init(
       album: album,
-      tracks: tracks,
       playStatus: .paused,
       currentTrackID: track.id,
     )) {
@@ -77,30 +67,26 @@ struct AlbumDetailFeatureTests {
 
   @Test
   func pausedSessionKeepsCurrentTrackWithoutPlaying() {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let tracks = library.tracks(for: album)
-    var state = AlbumDetailFeature.State(album: album, tracks: tracks)
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    var state = AlbumDetailFeature.State(album: album)
 
     state.setPlaybackSession(.init(
       playStatus: .paused,
       currentItem: PlaybackItem(
-        track: tracks[0],
+        track: album.tracks[0],
         artworkURL: album.artworkURL,
         allowsArtwork: album.showsArtwork,
       ),
     ))
 
     #expect(state.isPlaying == false)
-    #expect(state.currentTrackID == tracks[0].id)
+    #expect(state.currentTrackID == album.tracks[0].id)
   }
 
   @Test
   func invalidTrackTapDoesNothing() async {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let tracks = library.tracks(for: album)
-    let store = TestStore(initialState: .init(album: album, tracks: tracks)) {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let store = TestStore(initialState: .init(album: album)) {
       AlbumDetailFeature()
     }
 
@@ -113,9 +99,8 @@ struct AlbumDetailFeatureTests {
       id: "empty-album",
       title: "Empty Album",
       artistName: "Nobody",
-      trackIDs: [],
     )
-    let store = TestStore(initialState: .init(album: album, tracks: [])) {
+    let store = TestStore(initialState: .init(album: album)) {
       AlbumDetailFeature()
     }
 
@@ -123,11 +108,8 @@ struct AlbumDetailFeatureTests {
   }
 }
 
-private func playbackItems(
-  album: ApprovedAlbum,
-  tracks: [ApprovedTrack],
-) -> [PlaybackItem] {
-  tracks.map { PlaybackItem(
+private func playbackItems(album: ApprovedAlbum) -> [PlaybackItem] {
+  album.tracks.map { PlaybackItem(
     track: $0,
     artworkURL: album.artworkURL,
     allowsArtwork: album.showsArtwork,

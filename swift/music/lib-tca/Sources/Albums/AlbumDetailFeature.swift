@@ -5,35 +5,39 @@ struct AlbumDetailFeature {
   @ObservableState
   struct State: Equatable {
     let album: ApprovedAlbum
-    let tracks: [ApprovedTrack]
     let transitionSourceID: String?
     var playStatus: PlaybackFeature.PlayStatus?
     var currentTrackID: ApprovedTrack.ID?
+    var playbackFailure: PlaybackFailure?
 
     init(
       album: ApprovedAlbum,
-      tracks: [ApprovedTrack],
       transitionSourceID: String? = nil,
       playStatus: PlaybackFeature.PlayStatus? = nil,
       currentTrackID: ApprovedTrack.ID? = nil,
+      playbackFailure: PlaybackFailure? = nil,
     ) {
       self.album = album
-      self.tracks = tracks
       self.transitionSourceID = transitionSourceID
       self.playStatus = playStatus
       self.currentTrackID = currentTrackID
+      self.playbackFailure = playbackFailure
     }
   }
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
+      case dismissPlaybackFailure
+      case playbackFailureActionTapped
       case playAlbum(items: [PlaybackItem], startIndex: Int)
       case togglePlayPause
     }
 
+    case delegate(DelegateAction)
+    case playbackFailureActionTapped
+    case playbackFailureDismissed
     case playTapped
     case trackTapped(ApprovedTrack.ID)
-    case delegate(DelegateAction)
   }
 
   var body: some ReducerOf<Self> {
@@ -59,6 +63,12 @@ struct AlbumDetailFeature {
           startIndex: startIndex,
         )))
 
+      case .playbackFailureDismissed:
+        return .send(.delegate(.dismissPlaybackFailure))
+
+      case .playbackFailureActionTapped:
+        return .send(.delegate(.playbackFailureActionTapped))
+
       case .delegate:
         return .none
       }
@@ -67,6 +77,10 @@ struct AlbumDetailFeature {
 }
 
 extension AlbumDetailFeature.State {
+  var tracks: [ApprovedTrack] {
+    self.album.tracks
+  }
+
   var isPlaying: Bool {
     self.playStatus == .playing
   }
@@ -85,6 +99,10 @@ extension AlbumDetailFeature.State {
       artworkURL: self.album.artworkURL,
       allowsArtwork: self.album.showsArtwork,
     ) }
+  }
+
+  mutating func setPlaybackFailure(_ failure: PlaybackFailure?) {
+    self.playbackFailure = failure
   }
 
   mutating func setPlaybackSession(_ session: PlaybackFeature.Session?) {

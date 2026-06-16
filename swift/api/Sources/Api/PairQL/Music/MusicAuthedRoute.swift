@@ -39,23 +39,17 @@ extension GetApprovedMusicLibrary: NoInputResolver {
         artworkUrl: album.artworkUrl,
         trackCount: album.trackCount,
         showsArtwork: album.showsArtwork,
-        trackIds: tracks.map(\.id.rawValue),
+        tracks: tracks.map { track in
+          Output.Track(
+            id: track.id.rawValue,
+            title: track.title,
+            artistName: track.artistName,
+            artworkUrl: track.artworkUrl ?? album.artworkUrl,
+          )
+        },
       )
     }
-    let outputTracks = albums.flatMap { album in
-      (tracksByAlbum[album.appleMusicAlbumId.rawValue] ?? []).map { track in
-        Output.Track(
-          id: track.id.rawValue,
-          title: track.title,
-          artistName: track.artistName,
-          albumId: album.appleMusicAlbumId.rawValue,
-          albumTitle: track.albumTitle ?? album.title,
-          artworkUrl: track.artworkUrl ?? album.artworkUrl,
-          showsArtwork: album.showsArtwork,
-        )
-      }
-    }
-    return .init(albums: outputAlbums, tracks: outputTracks)
+    return .init(albums: outputAlbums)
   }
 
   private static func tracksByAlbum(
