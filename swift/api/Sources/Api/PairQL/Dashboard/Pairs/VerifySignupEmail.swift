@@ -50,12 +50,18 @@ extension VerifySignupEmail: Resolver {
       ))
 
       if context.env.mode == .prod, !isTestAddress(parent.email.rawValue) {
+        let referrer = try await parent.referrer(in: context.db)
         var body = AdminLink().email(to: .parent(parent.id), text: parent.email.rawValue)
         if let gclid = parent.gclid {
           body += "<br/>gclid: \(gclid)"
         }
+        if let referrer {
+          let referrerLink = AdminLink()
+            .email(to: .parent(referrer.id), text: referrer.email.rawValue)
+          body += "<br/>referral: \(referrer.referralCode ?? "(unknown)") from \(referrerLink)"
+        }
         with(dependency: \.postmark)
-          .toSuperAdmin("signup completed", body)
+          .toSuperAdmin(referrer != nil ? "REFERRED signup completed" : "signup completed", body)
         await with(dependency: \.slack)
           .internal(.signups, "email verified: `\(parent.email.rawValue)`")
       }
