@@ -8,7 +8,7 @@ struct IosOnlyMacTrialCampaign: MarketingCampaign {
   let replyTo: String? = "jared@netrivet.com"
 
   func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
-    let rows = try await db.customQuery(IosOnlyMacTrial7dAudienceRow.self)
+    let rows = try await db.customQuery(IosOnlyMacTrialAudienceRow.self)
     var order: [Parent.Id] = []
     var byParent: [Parent.Id: (email: EmailAddress, kids: [IosOnlyMacTrialKid])] = [:]
     for row in rows {
@@ -37,7 +37,7 @@ struct IosOnlyMacTrialCampaign: MarketingCampaign {
   }
 }
 
-private struct IosOnlyMacTrial7dAudienceRow: CustomQueryable {
+private struct IosOnlyMacTrialAudienceRow: CustomQueryable {
   var parentId: Parent.Id
   var email: EmailAddress
   var childName: String
@@ -89,7 +89,7 @@ private struct IosOnlyMacTrial7dAudienceRow: CustomQueryable {
           GROUP BY c.\(childParentId)
         ) ios ON ios.parent_id = p.\(parentId)
         WHERE p.\(parentEmailVerifiedAt) IS NOT NULL
-          AND ios.first_ios_connected_at <= NOW() - INTERVAL '7 days'
+          AND ios.first_ios_connected_at <= NOW() - INTERVAL '3 days'
           AND NOT EXISTS (
             SELECT 1
             FROM \(table: BillingIdentity.self) bi

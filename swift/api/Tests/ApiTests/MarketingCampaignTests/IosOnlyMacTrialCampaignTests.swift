@@ -9,7 +9,7 @@ final class IosOnlyMacTrialCampaignTests: ApiTestCase, @unchecked Sendable {
   func testAudienceIncludesVerifiedIosOnlyParentsWithOldConnectedCheckin() async throws {
     let now = Date()
     let eligible = try await self.verifiedIOSChild(tokenCreatedAt: now - .days(8))
-    let tooRecent = try await self.verifiedIOSChild(tokenCreatedAt: now - .days(6))
+    let tooRecent = try await self.verifiedIOSChild(tokenCreatedAt: now - .days(2))
     let noCheckin = try await self.verifiedIOSChild(
       tokenCreatedAt: now - .days(8),
       createCheckin: false,
