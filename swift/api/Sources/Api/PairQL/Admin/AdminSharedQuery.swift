@@ -17,6 +17,7 @@ struct ParentData: Sendable {
   var numComputerUsers: Int
   var numChildren: Int
   var numNonEmptyKeychains: Int
+  var numFilteringDisabledMacChildren: Int
   var numNotifications: Int
   var numIOSDevices: Int
   var hasCompletedSupervision: Bool
@@ -32,6 +33,7 @@ struct ParentData: Sendable {
     self.numComputerUsers = 0
     self.numChildren = 0
     self.numNonEmptyKeychains = 0
+    self.numFilteringDisabledMacChildren = 0
     self.numNotifications = 0
     self.numIOSDevices = 0
     self.hasCompletedSupervision = false
@@ -119,6 +121,13 @@ struct AnalyticsData: Sendable {
       map[row.parentId] = row.computerUserCount
     }
 
+    let filteringDisabledMacChildren = try await self.db
+      .customQuery(FilteringDisabledMacChildren.self)
+    let filteringDisabledMacChildMap: [Parent.Id: Int] = filteringDisabledMacChildren
+      .reduce(into: [:]) { map, row in
+        map[row.parentId] = row.childCount
+      }
+
     let iosDeviceCount = try await self.db.customQuery(IOSDeviceCount.self)
     let iosDeviceMap: [Parent.Id: Int] = iosDeviceCount.reduce(into: [:]) { map, row in
       map[row.parentId] = row.iosDeviceCount
@@ -153,6 +162,7 @@ struct AnalyticsData: Sendable {
       parent.numChildren = childMap[model.id] ?? 0
       parent.numNotifications = notificationsMap[model.id] ?? 0
       parent.numComputerUsers = computerUserMap[model.id] ?? 0
+      parent.numFilteringDisabledMacChildren = filteringDisabledMacChildMap[model.id] ?? 0
       parent.numIOSDevices = iosDeviceMap[model.id] ?? 0
       parent.hasCompletedSupervision = completedSupervisionSet.contains(model.id)
       parent.hasIncompleteSupervision = incompleteSupervisionSet.contains(model.id)
@@ -180,7 +190,11 @@ extension ParentData {
   var isActive: Bool {
     self.numComputerUsers > 0
       && self.numNotifications > 0
-      && (self.numNonEmptyKeychains > 0 || self.childActivityCount > 0)
+      && (
+        self.numNonEmptyKeychains > 0
+          || self.childActivityCount > 0
+          || self.numFilteringDisabledMacChildren > 0
+      )
   }
 
   var hasConnectedFreeIOSDevice: Bool {
@@ -260,6 +274,23 @@ struct ComputerUserCount: CustomQueryable {
 
   var parentId: Parent.Id
   var computerUserCount: Int
+}
+
+struct FilteringDisabledMacChildren: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    .init("""
+    SELECT c.\(Child.columnName(.parentId)) AS parent_id,
+           COUNT(DISTINCT c.id)::int AS child_count
+    FROM \(table: Child.self) c
+    JOIN \(table: ComputerUser.self) cu
+      ON cu.\(ComputerUser.columnName(.childId)) = c.id
+    WHERE c.\(Child.columnName(.filteringDisabled)) = true
+    GROUP BY c.\(Child.columnName(.parentId));
+    """)
+  }
+
+  var parentId: Parent.Id
+  var childCount: Int
 }
 
 struct ActivityCounts: CustomQueryable {

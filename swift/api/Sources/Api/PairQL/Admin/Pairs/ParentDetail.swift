@@ -36,6 +36,7 @@ struct ParentDetail: Pair {
     var name: String
     var keyloggingEnabled: Bool
     var screenshotsEnabled: Bool
+    var filteringDisabled: Bool
     var createdAt: Date
     var installations: [InstallationOutput]
     var iosDevices: [IOSDeviceOutput]
@@ -177,6 +178,7 @@ extension ParentDetail: Resolver {
         name: child.name,
         keyloggingEnabled: child.keyloggingEnabled,
         screenshotsEnabled: child.screenshotsEnabled,
+        filteringDisabled: child.filteringDisabled,
         createdAt: child.createdAt,
         installations: installations,
         iosDevices: iosDeviceOutputs,

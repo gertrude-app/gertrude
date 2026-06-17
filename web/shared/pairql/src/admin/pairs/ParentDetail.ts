@@ -29,6 +29,7 @@ export namespace ParentDetail {
       name: string;
       keyloggingEnabled: boolean;
       screenshotsEnabled: boolean;
+      filteringDisabled: boolean;
       createdAt: ISODateString;
       installations: Array<{
         id: UUID;

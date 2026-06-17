@@ -69,6 +69,27 @@ final class CohortAnalysisResolverTests: ApiTestCase, @unchecked Sendable {
     expect(row.currentlyPayingCount).toEqual(1)
   }
 
+  func testFilteringDisabledMacChildCountsAsMacProtectedWithoutKeys() async throws {
+    let cohortDate = Date(timeIntervalSince1970: 947_894_400)
+    let monthKey = "2000-01"
+
+    let child = try await self.childWithComputer()
+    var childModel = child.model
+    childModel.filteringDisabled = true
+    try await self.db.update(childModel)
+    var screenshot = Screenshot.random
+    screenshot.computerUserId = child.computerUser.id
+    try await self.db.create(screenshot)
+    try await self.placeParentInCohort(child.parent.model.id, at: cohortDate)
+
+    let output = try await CohortAnalysis.resolve(in: .mock)
+    let row = try XCTUnwrap(output.cohorts.first { $0.month == monthKey })
+
+    expect(row.verifiedSignups).toEqual(1)
+    expect(row.protectedCount).toEqual(1)
+    expect(row.macProtectedCount).toEqual(1)
+  }
+
   private func placeParentInCohort(_ id: Parent.Id, at date: Date) async throws {
     var stmt = SQL.Statement("""
     UPDATE \(table: Parent.self) SET \(Parent.columnName(.createdAt)) =
