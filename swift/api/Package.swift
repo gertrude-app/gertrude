@@ -44,6 +44,7 @@ let package = Package(
         .product(name: "DuetSQL", package: "duet"),
         .product(name: "TypeScriptInterop", package: "ts-interop"),
         .product(name: "Gertie", package: "gertie"),
+        .product(name: "GertieApp", package: "gertie"),
         .product(name: "PairQL", package: "pairql"),
         .product(name: "MacAppRoute", package: "pairql-macapp"),
         .product(name: "IOSRoute", package: "pairql-iosapp"),
