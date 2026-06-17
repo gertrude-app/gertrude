@@ -182,7 +182,7 @@ const PodcastsBlock: React.FC = () => {
               {` `}after 30-day trial
             </p>
             <p className="text-white/50 text-[0.65rem] xs:text-xs md:text-sm">
-              Covers your entire Apple Family
+              One Gertrude account covers your whole family
             </p>
           </div>
         </div>

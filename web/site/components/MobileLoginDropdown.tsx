@@ -30,7 +30,7 @@ const MobileLoginDropdown: React.FC<{
         )}
       >
         <div className="px-4 py-2 text-xs font-medium uppercase tracking-wider text-slate-400">
-          Mac App
+          Account
         </div>
         <DropdownLink href={`${PARENTS_APP_URL}/signup?v=new_site`}>Sign up</DropdownLink>
         <DropdownLink href={PARENTS_APP_URL}>Log in</DropdownLink>

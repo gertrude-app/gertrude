@@ -56,7 +56,7 @@ listen, this is it.
 
 ### Pricing: 30 days free, then $10/year for the whole family, no ads ever
 
-Gertrude AM is free to download and use for 30 days. After that, a yearly subscription of
-$10.00/year is required to continue updating shows and receiving new episodes. One
-subscription will cover all members of your Apple Family, and will help us continue to
-develop tools for parents.
+Gertrude AM is free to download and use for 30 days. After that, a $10.00/year
+subscription is required to continue updating shows and receiving new episodes. Gertrude
+AM connects to a Gertrude account, and a single subscription covers your whole
+family&mdash;helping us continue to develop tools for parents.

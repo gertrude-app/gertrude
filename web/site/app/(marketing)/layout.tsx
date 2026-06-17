@@ -13,8 +13,6 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const isIOSPage = path === `/iphone-and-ipad`;
   const theme = path.includes(`blog`) || isHomePage ? `white` : `violet`;
   const lang = path.includes(`bloquear`) ? `es` : `en`;
-  const showAuthButtons =
-    path !== `/` && path !== `/contact` && !path.startsWith(`/blog`) && !isIOSPage;
   const isMacPage =
     path === `/mac` || path === `/download-mac-app` || path.startsWith(`/docs`);
   const badge = isMacPage ? `For Mac` : isIOSPage ? `For iOS` : undefined;
@@ -35,7 +33,6 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
       >
         <MainHeader
           theme={theme}
-          showAuthButtons={showAuthButtons}
           overlay={overlay}
           badge={badge}
           linkVariant={linkVariant}
