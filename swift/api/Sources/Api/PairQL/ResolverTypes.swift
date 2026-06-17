@@ -195,6 +195,13 @@ extension DuetSQLError: PqlErrorConvertible {
         debugMessage: "DuetSQL: transactions unavailable for client",
         showContactSupport: true,
       )
+    case .emptyConflictTarget, .emptyConflictUpdate:
+      context.error(
+        id: "8a6bacaa",
+        type: .serverError,
+        debugMessage: "DuetSQL: \(self)",
+        showContactSupport: true,
+      )
     }
   }
 }

@@ -54,74 +54,37 @@ extension PodcastApp.Install {
     }
   }
 
-  // TODO: generalize duet upsert
   private static func insertDeviceIfNeeded(
     id: IOSDevice.Id,
     modelIdentifier: String,
     iosVersion: String,
     in db: any DuetSQL.Client,
   ) async throws {
-    typealias D = IOSDevice
-    var stmt = SQL.Statement("""
-      INSERT INTO \(table: D.self) (
-        \(D.columnName(.id)),
-        \(D.columnName(.modelIdentifier)),
-        \(D.columnName(.iosVersion)),
-        \(D.columnName(.createdAt)),
-        \(D.columnName(.updatedAt))
-      ) VALUES (
-    """)
-    stmt.components.append(.binding(.uuid(id)))
-    stmt.components.append(.sql(", "))
-    stmt.components.append(.binding(.string(modelIdentifier)))
-    stmt.components.append(.sql(", "))
-    stmt.components.append(.binding(.string(iosVersion)))
-    stmt.components.append(.sql(", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"))
-    stmt.components.append(.sql("""
-      ON CONFLICT (\(D.columnName(.id))) DO NOTHING
-    """))
-    try await db.execute(statement: stmt)
+    try await db.create(
+      IOSDevice(id: id, modelIdentifier: modelIdentifier, iosVersion: iosVersion),
+      ignoringConflictOn: [.id],
+    )
   }
 
-  // TODO: generalize duet upsert
   private static func upsert(
     deviceId: IOSDevice.Id,
     appVersion: String,
     in db: any DuetSQL.Client,
   ) async throws -> PodcastApp.Install {
-    typealias I = PodcastApp.Install
-    let install = I(deviceId: deviceId, appVersion: appVersion)
-    var stmt = SQL.Statement("""
-      INSERT INTO \(table: I.self) AS existing (
-        \(I.columnName(.id)),
-        \(I.columnName(.deviceId)),
-        \(I.columnName(.appVersion)),
-        \(I.columnName(.createdAt)),
-        \(I.columnName(.updatedAt))
-      ) VALUES (
-    """)
-    stmt.components.append(.binding(.id(install)))
-    stmt.components.append(.sql(", "))
-    stmt.components.append(.binding(.uuid(deviceId)))
-    stmt.components.append(.sql(", "))
-    stmt.components.append(.binding(.string(appVersion)))
-    stmt.components.append(.sql(", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"))
-    stmt.components.append(.sql("""
-      ON CONFLICT (\(I.columnName(.deviceId)))
-      DO UPDATE SET
-        \(I.columnName(.appVersion)) = EXCLUDED.\(I.columnName(.appVersion)),
-        \(I.columnName(.updatedAt)) = CASE
-          WHEN existing.\(I.columnName(.appVersion))
-            IS DISTINCT FROM EXCLUDED.\(I.columnName(.appVersion))
+    try await db.upsert(
+      PodcastApp.Install(deviceId: deviceId, appVersion: appVersion),
+      conflictOn: [.deviceId],
+      do: .updateRaw { c in
+        """
+        \(c.col(.appVersion)) = \(c.excluded(.appVersion)),
+        \(c.col(.updatedAt)) = CASE
+          WHEN \(c.target(.appVersion)) IS DISTINCT FROM \(c.excluded(.appVersion))
           THEN CURRENT_TIMESTAMP
-          ELSE existing.\(I.columnName(.updatedAt))
+          ELSE \(c.target(.updatedAt))
         END
-      RETURNING *
-    """))
-    guard let install = try await db.execute(statement: stmt, returning: I.self).first else {
-      throw DuetSQLError.notFound("\(I.self)")
-    }
-    return install
+        """
+      },
+    )
   }
 
   func device(in db: any DuetSQL.Client) async throws -> IOSDevice {

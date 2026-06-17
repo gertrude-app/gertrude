@@ -16,13 +16,10 @@ extension GetTrialStatus: Resolver {
     let now = get(dependency: \.date.now)
 
     if let child = try await device.child(in: ctx.db) {
-      let token: PodcastApp.Token = if let existing = try? await PodcastApp.Token.query()
-        .where(.installId == install.id)
-        .first(in: ctx.db) {
-        existing
-      } else {
-        try await ctx.db.create(PodcastApp.Token(installId: install.id))
-      }
+      let token = try await ctx.db.findOrCreate(
+        PodcastApp.Token(installId: install.id),
+        conflictOn: [.installId],
+      )
 
       let parent = try await child.parent(in: ctx.db)
       let account = try await parent.billingAccountSnapshot(in: ctx.db, at: now)

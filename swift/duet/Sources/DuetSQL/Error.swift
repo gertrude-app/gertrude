@@ -5,6 +5,8 @@ public enum DuetSQLError: Error, Equatable, LocalizedError {
   case decodingFailed
   case nonUniformBulkInsertInput
   case emptyBulkInsertInput
+  case emptyConflictTarget
+  case emptyConflictUpdate
   case tooManyResultsForDeleteOne
   case invalidEntity
   case missingExpectedColumn(String)
@@ -21,6 +23,10 @@ public enum DuetSQLError: Error, Equatable, LocalizedError {
       "Database error: Non-uniform bulk insert input"
     case .emptyBulkInsertInput:
       "Database error: Empty bulk insert input"
+    case .emptyConflictTarget:
+      "Database error: ON CONFLICT requires at least one target column"
+    case .emptyConflictUpdate:
+      "Database error: ON CONFLICT DO UPDATE requires at least one column to set"
     case .tooManyResultsForDeleteOne:
       "Database error: Too many results for delete one"
     case .invalidEntity:

@@ -78,6 +78,30 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(installs.count).toEqual(1)
   }
 
+  func testReinstallUpdatesAppVersionAndBumpsUpdatedAtOnlyOnChange() async throws {
+    let deviceId = UUID()
+
+    _ = try await GetTrialStatus.resolve(with: self.input(deviceId, appVersion: "1.6.0"), in: .mock)
+    let afterInsert = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .first(in: self.db)
+
+    _ = try await GetTrialStatus.resolve(with: self.input(deviceId, appVersion: "1.6.0"), in: .mock)
+    let afterSameVersion = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .first(in: self.db)
+    expect(afterSameVersion.appVersion).toEqual("1.6.0")
+    expect(afterSameVersion.updatedAt).toEqual(afterInsert.updatedAt) // unchanged: CASE -> ELSE
+
+    _ = try await GetTrialStatus.resolve(with: self.input(deviceId, appVersion: "2.0.0"), in: .mock)
+    let afterNewVersion = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .all(in: self.db)
+    expect(afterNewVersion.count).toEqual(1) // reused row, not a duplicate
+    expect(afterNewVersion[0].appVersion).toEqual("2.0.0")
+    expect(afterNewVersion[0].updatedAt > afterInsert.updatedAt).toBeTrue() // bumped: CASE -> THEN
+  }
+
   // MARK: - trial window (createdAt + 30d vs now)
 
   func testActiveTrialReturnsExpiresAt() async throws {
@@ -353,6 +377,43 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.installId == install.id)
       .all(in: self.db)
     expect(tokensAfter.count).toEqual(1)
+  }
+
+  func testConcurrentConnectedRequestsMintSingleToken() async throws {
+    let child = try await self.child()
+    let deviceId = UUID()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.model.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+      claimedAt: .reference,
+    ))
+    try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
+
+    let outputs = try await withThrowingTaskGroup(of: GetTrialStatus.Output.self) { group in
+      for _ in 0 ..< 10 {
+        group.addTask {
+          try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+        }
+      }
+      return try await group.reduce(into: []) { $0.append($1) }
+    }
+
+    expect(outputs.count).toEqual(10)
+    let install = try await PodcastApp.Install.query()
+      .where(.deviceId == device.id)
+      .first(in: self.db)
+    let tokens = try await PodcastApp.Token.query()
+      .where(.installId == install.id)
+      .all(in: self.db)
+    expect(tokens.count).toEqual(1) // the race fix: exactly one token under concurrent mints
+
+    let mintedValues = Set(outputs.compactMap { output -> UUID? in
+      guard case .connected(let token, _, _, _) = output else { return nil }
+      return token
+    })
+    expect(mintedValues).toEqual([tokens[0].value.rawValue]) // every caller sees the one token
   }
 
   func testConnectedViaNonSupervisionPathAutoDetects() async throws {

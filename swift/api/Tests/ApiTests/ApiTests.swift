@@ -42,6 +42,39 @@ final class ApiTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.event).toEqual("foo'bar")
   }
 
+  func testDuetUpsertReturningProjectionDecodesIntoCustomType() async throws {
+    let existing = CatalogedApp(
+      bundleId: "com.test.existing.".random,
+      name: "Existing",
+      icon: Data("pretend-icon-bytes".utf8),
+      iconContentHash: "hash-abc",
+      iconUploadedAt: .reference,
+    )
+    try await self.db.create(existing)
+    let newBundleId = "com.test.new.".random
+
+    let rows = try await self.db.upsert(
+      [
+        CatalogedApp(bundleId: existing.bundleId, name: "Renamed"), // conflicts -> updates
+        CatalogedApp(bundleId: newBundleId, name: "New"), // brand-new insert
+      ],
+      conflictOn: [.bundleId],
+      do: .update(set: [.name]),
+      returning: [.id, .bundleId, .iconContentHash, .iconUploadedAt, .iconSourceAppVersion],
+      as: CatalogedAppIconInfo.self,
+    )
+
+    let byBundle = Dictionary(uniqueKeysWithValues: rows.map { ($0.bundleId, $0) })
+    expect(rows.count).toEqual(2)
+    // conflicting row returns the existing id (updated, not duplicated) ...
+    expect(byBundle[existing.bundleId]?.id).toEqual(existing.id)
+    // ... and the projection decodes the preserved icon metadata
+    expect(byBundle[existing.bundleId]?.iconContentHash).toEqual("hash-abc")
+    expect(byBundle[existing.bundleId]?.iconUploadedAt).toEqual(.reference)
+    // brand-new row decodes its (absent) icon metadata as nil
+    expect(byBundle[newBundleId]?.iconContentHash).toBeNil()
+  }
+
   func testDateDecodingInPairQL() async throws {
     let input = SaveKey.Input(
       isNew: true,

@@ -46,31 +46,6 @@ extension LogFilterEvents: Resolver {
 
 // helpers
 
-struct UpsertUnidentifiedApps: CustomQueryable {
-  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    let tableName = UnidentifiedApp.qualifiedTableName
-    let count = UnidentifiedApp.columnName(.count)
-    let bundleId = UnidentifiedApp.columnName(.bundleId)
-    var stmt = SQL.Statement("""
-    INSERT INTO \(tableName) (id, \(bundleId), \(count), created_at) VALUES (
-    """)
-    for i in (0 ..< bindings.count).striding(by: 2) {
-      stmt.components.append(.sql("'\(UUID().lowercased)', "))
-      stmt.components.append(.binding(bindings[i]))
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 1]))
-      stmt.components.append(.sql(", CURRENT_TIMESTAMP), ("))
-    }
-    stmt.components.removeLast()
-    stmt.components.append(.sql(", CURRENT_TIMESTAMP)\n"))
-    stmt.components.append(.sql("""
-    ON CONFLICT (\(bundleId))
-    DO UPDATE SET \(count) = \(tableName).\(count) + EXCLUDED.\(count)
-    """))
-    return stmt
-  }
-}
-
 struct UpsertAppBundleIdCounts: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let tableName = AppBundleId.qualifiedTableName
@@ -206,7 +181,7 @@ private func storeUnidentifiedApps(
 
   let rows = try await context.db.customQuery(IdentifiedBundleIds.self)
   let identifiedBundleIds = Set(rows.map(\.bundleId))
-  var unidentifiedBindings: [Postgres.Data] = []
+  var unidentifiedApps: [UnidentifiedApp] = []
   var identifiedBindings: [Postgres.Data] = []
 
   for (bundleId, count) in bundleIds {
@@ -214,15 +189,17 @@ private func storeUnidentifiedApps(
       identifiedBindings.append(.string(bundleId))
       identifiedBindings.append(.int(count))
     } else {
-      unidentifiedBindings.append(.string(bundleId))
-      unidentifiedBindings.append(.int(count))
+      unidentifiedApps.append(UnidentifiedApp(bundleId: bundleId, count: count))
     }
   }
 
-  if !unidentifiedBindings.isEmpty {
-    _ = try await context.db.customQuery(
-      UpsertUnidentifiedApps.self,
-      withBindings: unidentifiedBindings,
+  if !unidentifiedApps.isEmpty {
+    try await context.db.upsert(
+      unidentifiedApps,
+      conflictOn: [.bundleId],
+      do: .updateRaw { c in
+        "\(c.col(.count)) = \(c.target(.count)) + \(c.excluded(.count))"
+      },
     )
   }
 

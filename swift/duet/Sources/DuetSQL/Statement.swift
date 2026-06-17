@@ -41,13 +41,90 @@ public extension SQL.Statement {
     return stmt
   }
 
-  internal static func create<M: Model>(_ models: [M]) -> SQL.Statement {
+  internal static func create(_ models: [some Model]) -> SQL.Statement {
+    self.insert(models, as: nil)
+  }
+
+  internal static func create<M: Model>(
+    _ models: [M],
+    onConflict targets: [M.ColumnName],
+    do action: SQL.ConflictAction<M>,
+    returning: SQL.Returning<M> = .none,
+  ) throws -> SQL.Statement {
+    let targetList = try self.conflictTargetSQL(targets, M.self)
+    let assignments: String
+    switch action {
+    case .update(let columns):
+      assignments = columns
+        .map { "\"\(M.columnName($0))\" = EXCLUDED.\"\(M.columnName($0))\"" }
+        .list
+    case .updateAllExcept(let except):
+      let excluded = Set(except.map { M.columnName($0) }).union(["id", "created_at"])
+      assignments = models[0].insertValues.keys
+        .map { M.columnName($0) }
+        .filter { !excluded.contains($0) }
+        .sorted()
+        .map { "\"\($0)\" = EXCLUDED.\"\($0)\"" }
+        .list
+    case .updateRaw(let build):
+      assignments = build(SQL.ConflictColumns(alias: "existing"))
+    }
+    guard !assignments.isEmpty else {
+      throw DuetSQLError.emptyConflictUpdate
+    }
+    var stmt = self.insert(models, as: action.aliasesTarget ? "existing" : nil)
+    stmt.components.append(.sql("\nON CONFLICT (\(targetList)) DO UPDATE SET \(assignments)"))
+    if let clause = self.returningClause(returning) {
+      stmt.components.append(.sql("\n\(clause)"))
+    }
+    return stmt
+  }
+
+  internal static func create<M: Model>(
+    _ models: [M],
+    ignoringConflictOn targets: [M.ColumnName],
+    returning: SQL.Returning<M> = .none,
+  ) throws -> SQL.Statement {
+    let targetList = try self.conflictTargetSQL(targets, M.self)
+    var stmt = self.insert(models, as: nil)
+    stmt.components.append(.sql("\nON CONFLICT (\(targetList)) DO NOTHING"))
+    if let clause = self.returningClause(returning) {
+      stmt.components.append(.sql("\n\(clause)"))
+    }
+    return stmt
+  }
+
+  private static func returningClause<M: Model>(_ returning: SQL.Returning<M>) -> String? {
+    switch returning {
+    case .none:
+      nil
+    case .all:
+      "RETURNING *"
+    case .columns(let columns) where columns.isEmpty:
+      nil
+    case .columns(let columns):
+      "RETURNING \(columns.map { "\"\(M.columnName($0))\"" }.list)"
+    }
+  }
+
+  private static func conflictTargetSQL<M: Model>(
+    _ targets: [M.ColumnName],
+    _: M.Type,
+  ) throws -> String {
+    guard !targets.isEmpty else {
+      throw DuetSQLError.emptyConflictTarget
+    }
+    return targets.map { "\"\(M.columnName($0))\"" }.list
+  }
+
+  private static func insert<M: Model>(_ models: [M], as alias: String?) -> SQL.Statement {
     let first = models[0]
     let insert = first.insertValues
     let sorted = insert.keys.map { ($0, M.columnName($0)) }.sorted { $0.1 < $1.1 }
     let colList: String = sorted.map(\.1).quotedList
     let columns: [M.ColumnName] = sorted.map(\.0)
-    var stmt = SQL.Statement("INSERT INTO \(table: M.self)\n(\(colList))\nVALUES\n")
+    let aliasClause = alias.map { " AS \($0)" } ?? ""
+    var stmt = SQL.Statement("INSERT INTO \(table: M.self)\(aliasClause)\n(\(colList))\nVALUES\n")
     for model in models {
       stmt.components.append(.sql("("))
       for column in columns {
@@ -233,6 +310,42 @@ public extension SQL.Statement {
       }
     }
   #endif
+}
+
+extension SQL {
+  enum Returning<M: Model> {
+    case none
+    case all
+    case columns([M.ColumnName])
+  }
+}
+
+public extension SQL {
+  enum ConflictAction<M: Model> {
+    case update(set: [M.ColumnName])
+    case updateAllExcept([M.ColumnName])
+    case updateRaw(@Sendable (SQL.ConflictColumns<M>) -> String)
+
+    var aliasesTarget: Bool {
+      if case .updateRaw = self { true } else { false }
+    }
+  }
+
+  struct ConflictColumns<M: Model> {
+    let alias: String
+
+    public func col(_ column: M.ColumnName) -> String {
+      "\"\(M.columnName(column))\""
+    }
+
+    public func excluded(_ column: M.ColumnName) -> String {
+      "EXCLUDED.\"\(M.columnName(column))\""
+    }
+
+    public func target(_ column: M.ColumnName) -> String {
+      "\(self.alias).\"\(M.columnName(column))\""
+    }
+  }
 }
 
 extension Sequence<String> {
