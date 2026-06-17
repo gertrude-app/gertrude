@@ -5,21 +5,14 @@ import SwiftUI
 struct AddShowView: View {
   @Bindable var store: StoreOf<AddShowFeature>
   @Dependency(\.haptics) var haptics
-  @Dependency(\.keychain) var keychain
 
   var body: some View {
     Group {
       switch self.store.screen {
       case .enteringPin:
-        PinCodeView(
-          mode: .verify(
-            self.pincode,
-            lockout: self.store.pinChallenge.lockout,
-            onVerify: { self.store.send(.pinChallenge(.pincodeVerified)) },
-            onFail: { self.store.send(.pinChallenge(.pincodeFailed)) },
-          ),
-          onCancel: { self.store.send(.pinChallenge(.pincodeCancelled)) },
-          onPrepHaptics: self.haptics.prepare,
+        PinChallengeView(
+          store: self.store.scope(state: \.pinChallenge, action: \.pinChallenge),
+          context: .addShow,
         )
 
       case .changePinInstructions:
@@ -92,15 +85,6 @@ struct AddShowView: View {
           animateBtnEntry: false,
         )
       }
-    }
-  }
-
-  var pincode: Int {
-    if let pin = self.keychain.loadPincode() {
-      return pin
-    } else {
-      log(.error("17cb36cc"), "missing pincode")
-      return Int.random(in: 100_000 ... 999_999)
     }
   }
 }

@@ -5,8 +5,6 @@ import SwiftUI
 
 struct SettingsViewContainer: View {
   @Bindable var store: StoreOf<SettingsFeature>
-  @Dependency(\.keychain) var keychain
-  @Dependency(\.haptics) var haptics
 
   var body: some View {
     SettingsView(
@@ -37,27 +35,11 @@ struct SettingsViewContainer: View {
       ),
       onDismiss: { self.store.send(.pinChallengeDismissed) },
       content: {
-        PinCodeView(
-          mode: .verify(
-            self.pincode,
-            lockout: self.store.pinChallenge?.lockout,
-            onVerify: { self.store.send(.pinChallenge(.pincodeVerified)) },
-            onFail: { self.store.send(.pinChallenge(.pincodeFailed)) },
-          ),
-          onCancel: { self.store.send(.pinChallenge(.pincodeCancelled)) },
-          onPrepHaptics: self.haptics.prepare,
-        )
+        if let store = self.store.scope(state: \.pinChallenge, action: \.pinChallenge) {
+          PinChallengeView(store: store, context: .settings)
+        }
       },
     )
-  }
-
-  private var pincode: Int {
-    if let pin = self.keychain.loadPincode() {
-      return pin
-    } else {
-      log(.error("a58eb83d"), "missing pincode")
-      return Int.random(in: 100_000 ... 999_999)
-    }
   }
 
   private var reclaimableGb: Double? {
