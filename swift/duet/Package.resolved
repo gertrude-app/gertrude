@@ -1,4 +1,5 @@
 {
+  "originHash" : "574b32e1f09081849224e39bad21def64b420a8cd345b820669bada55742b10f",
   "pins" : [
     {
       "identity" : "async-kit",
@@ -185,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jaredh159/swift-tagged.git",
       "state" : {
-        "revision" : "cb4284055f6e9cc5576ff9be13723b3a039905a5",
-        "version" : "0.8.2"
+        "revision" : "37124db72a34b6c10c9b86554a11f5b921578845",
+        "version" : "0.10.1"
       }
     },
     {
@@ -199,5 +200,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

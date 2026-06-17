@@ -8,7 +8,7 @@ let package = Package(
     .library(name: "IOSRoute", targets: ["IOSRoute"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/jaredh159/swift-tagged", exact: "0.8.2"),
+    .package(url: "https://github.com/jaredh159/swift-tagged", exact: "0.10.1"),
     .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.2"),
     .package(path: "../pairql"),
     .package(path: "../gertie"),

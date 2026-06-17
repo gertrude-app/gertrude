@@ -25,7 +25,7 @@ let package = Package(
     .github("pointfreeco/swift-composable-architecture", from: "1.2.0"),
     .github("pointfreeco/swift-dependencies", from: "1.0.0"),
     .github("pointfreeco/combine-schedulers", from: "1.0.0"),
-    .github("jaredh159/swift-tagged", from: "0.8.2"),
+    .github("jaredh159/swift-tagged", from: "0.10.1"),
     .github("daltoniam/Starscream", from: "4.0.4"),
     .github("sindresorhus/LaunchAtLogin", from: "5.0.0"),
     // @see: https://gist.github.com/jaredh159/5fafcdc04de9234ab4bab52897da7334

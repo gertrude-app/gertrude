@@ -1,5 +1,5 @@
 {
-  "originHash" : "90145fcc4d2020c035195134742b55d88d3370c5ceaabf5d5e30f1369c3510bb",
+  "originHash" : "26f48f83ac39259d6969abe8f6b32b7b49bb42f9df476927fba4493a41beef66",
   "pins" : [
     {
       "identity" : "swift-case-paths",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/jaredh159/swift-tagged.git",
       "state" : {
-        "revision" : "cb4284055f6e9cc5576ff9be13723b3a039905a5",
-        "version" : "0.8.2"
+        "revision" : "37124db72a34b6c10c9b86554a11f5b921578845",
+        "version" : "0.10.1"
       }
     },
     {

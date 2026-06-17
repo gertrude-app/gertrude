@@ -10,7 +10,7 @@ let package = Package(
     .package("vapor/jwt@5.1.2"),
     .package("vapor/fluent-postgres-driver@2.9.2"),
     .package("onevcat/Rainbow@4.0.1"),
-    .package("jaredh159/swift-tagged@0.8.2"),
+    .package("jaredh159/swift-tagged@0.10.1"),
     .package("pointfreeco/swift-dependencies@1.0.0"),
     .package("pointfreeco/swift-concurrency-extras@1.1.0"),
     .package("m-barthelemy/vapor-queues-fluent-driver@3.0.0-beta1"),

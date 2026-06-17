@@ -10,7 +10,7 @@ let package = Package(
     .library(name: "GertieApp", targets: ["GertieApp"]),
   ],
   dependencies: [
-    .package("jaredh159/swift-tagged@0.8.2"),
+    .package("jaredh159/swift-tagged@0.10.1"),
     .package(path: "../x-kit"),
     .package(path: "../x-expect"),
     .package(path: "../ts-codable-macro"),
