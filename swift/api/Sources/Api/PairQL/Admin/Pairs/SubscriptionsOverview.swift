@@ -55,7 +55,7 @@ extension SubscriptionsOverview: NoInputResolver {
         switch sub.tier {
         case .light:
           lightPlanCount += 1
-          lightPlanAnnualCents += 83 * 12
+          lightPlanAnnualCents += 1000
         case .full:
           if sub.stripeStatus == .trialing {
             trialingCount += 1
