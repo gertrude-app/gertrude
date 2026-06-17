@@ -1,11 +1,11 @@
 import DuetSQL
-import GertieIOS
+import GertieBlocker
 
 extension BlockerApp {
   struct BlockRule: Codable, Sendable {
     var id: Id
     var deviceId: IOSDevice.Id?
-    var rule: GertieIOS.BlockRule
+    var rule: GertieBlocker.BlockRule
     var groupId: BlockGroup.Id?
     var comment: String?
     var createdAt = Date()
@@ -14,7 +14,7 @@ extension BlockerApp {
     init(
       id: Id = .init(),
       deviceId: IOSDevice.Id? = nil,
-      rule: GertieIOS.BlockRule,
+      rule: GertieBlocker.BlockRule,
       groupId: BlockGroup.Id? = nil,
       comment: String? = nil,
     ) {

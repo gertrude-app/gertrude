@@ -1,7 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 import LibCore
 import os.log

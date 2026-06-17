@@ -1,5 +1,5 @@
 import Gertie
-import GertieIOS
+import GertieBlocker
 import PairQL
 import PodcastRoute
 import Tagged
@@ -40,7 +40,7 @@ enum DashboardTsCodegenRoute {
       ("RuleSchedule", RuleSchedule.self),
       ("BlockedApp", UserBlockedApp.DTO.self),
       ("UserKeychainSummary", UserKeychainSummary.self),
-      ("BlockRule", GertieIOS.BlockRule.self),
+      ("BlockRule", GertieBlocker.BlockRule.self),
       ("Child", GetChild.Child.self),
       ("SuspendFilterRequest", GetSuspendFilterRequest.Output.self),
       ("AdminKeychain", GetAdminKeychains.AdminKeychain.self),

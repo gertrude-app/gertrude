@@ -1,6 +1,6 @@
 import DuetSQL
 import Gertie
-import GertieIOS
+import GertieBlocker
 
 extension DashAnnouncement: Model {
   public static let schemaName = "parent"
@@ -326,7 +326,7 @@ extension MusicApp.Token: Model {
   }
 }
 
-extension GertieIOS.BlockRule: @retroactive PostgresJsonable {}
+extension GertieBlocker.BlockRule: @retroactive PostgresJsonable {}
 
 extension Parent: Model {
   public typealias ColumnName = CodingKeys

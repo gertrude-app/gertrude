@@ -1,5 +1,5 @@
 import DuetSQL
-import GertieIOS
+import GertieBlocker
 
 extension BlockerApp {
   struct Install: Codable, Sendable, Equatable {

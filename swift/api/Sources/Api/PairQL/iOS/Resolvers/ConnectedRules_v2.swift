@@ -1,7 +1,7 @@
 import Crypto
 import Dependencies
 import DuetSQL
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 
 extension ConnectedRules_v2: Resolver {
@@ -58,7 +58,7 @@ extension ConnectedRules_v2: Resolver {
   }
 }
 
-func iosBlockRulesHash(_ rules: [GertieIOS.BlockRule]) -> String {
+func iosBlockRulesHash(_ rules: [GertieBlocker.BlockRule]) -> String {
   let data = try! JSONEncoder().encode(rules)
   let digest = SHA256.hash(data: data)
   return digest.prefix(4).map { String(format: "%02x", $0) }.joined()

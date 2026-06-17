@@ -6,7 +6,8 @@ let package = Package(
   platforms: [.macOS(.v10_15), .iOS(.v17)],
   products: [
     .library(name: "Gertie", targets: ["Gertie"]),
-    .library(name: "GertieIOS", targets: ["GertieIOS"]),
+    .library(name: "GertieBlocker", targets: ["GertieBlocker"]),
+    .library(name: "GertieApp", targets: ["GertieApp"]),
   ],
   dependencies: [
     .package("jaredh159/swift-tagged@0.8.2"),
@@ -32,7 +33,7 @@ let package = Package(
       ],
     ),
     .target(
-      name: "GertieIOS",
+      name: "GertieBlocker",
       dependencies: [
         "Gertie",
         .product(name: "TSCodable", package: "ts-codable-macro"),
@@ -40,11 +41,19 @@ let package = Package(
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
     ),
     .testTarget(
-      name: "GertieIOSTests",
+      name: "GertieBlockerTests",
       dependencies: [
-        "GertieIOS",
+        "GertieBlocker",
         .product(name: "XExpect", package: "x-expect"),
       ],
+    ),
+    .target(
+      name: "GertieApp",
+      swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
+    ),
+    .testTarget(
+      name: "GertieAppTests",
+      dependencies: ["GertieApp"],
     ),
   ],
 )

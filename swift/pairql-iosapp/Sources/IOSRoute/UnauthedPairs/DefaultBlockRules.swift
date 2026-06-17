@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import PairQL
 
 /// in use: v1.3.0 - present
@@ -16,5 +16,5 @@ public struct DefaultBlockRules: Pair {
     }
   }
 
-  public typealias Output = [GertieIOS.BlockRule.Legacy]
+  public typealias Output = [GertieBlocker.BlockRule.Legacy]
 }

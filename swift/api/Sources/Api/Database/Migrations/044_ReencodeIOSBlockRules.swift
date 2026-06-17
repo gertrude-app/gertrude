@@ -1,7 +1,7 @@
 import DuetSQL
 import FluentSQL
 import Foundation
-import GertieIOS
+import GertieBlocker
 import XCore
 
 struct ReencodeIOSBlockRules: GertieMigration {

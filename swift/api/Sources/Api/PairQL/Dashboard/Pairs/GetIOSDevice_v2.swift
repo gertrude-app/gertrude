@@ -1,7 +1,7 @@
 import DuetSQL
 import Foundation
 import Gertie
-import GertieIOS
+import GertieBlocker
 import PairQL
 import PodcastRoute
 import TypeScriptInterop
@@ -21,7 +21,7 @@ struct GetIOSDevice_v2: Pair {
 
     struct BlockRuleData: PairNestable {
       var id: BlockerApp.BlockRule.Id
-      var rule: GertieIOS.BlockRule
+      var rule: GertieBlocker.BlockRule
     }
 
     struct Blocker: PairNestable {
@@ -137,4 +137,4 @@ extension GetIOSDevice_v2: Resolver {
   }
 }
 
-extension GertieIOS.BlockRule: @retroactive TypeScriptAliased {}
+extension GertieBlocker.BlockRule: @retroactive TypeScriptAliased {}

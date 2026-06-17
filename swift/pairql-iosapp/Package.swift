@@ -20,7 +20,7 @@ let package = Package(
         .product(name: "URLRouting", package: "swift-url-routing"),
         .product(name: "PairQL", package: "pairql"),
         .product(name: "Gertie", package: "gertie"),
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "TaggedTime", package: "swift-tagged"),
       ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],

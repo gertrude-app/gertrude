@@ -1,5 +1,5 @@
 import Duet
-import GertieIOS
+import GertieBlocker
 
 extension BlockerApp {
   struct DeviceBlockGroup: Codable, Sendable {

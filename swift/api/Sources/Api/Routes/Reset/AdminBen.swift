@@ -2,7 +2,7 @@
   import Dependencies
   import DuetSQL
   import Gertie
-  import GertieIOS
+  import GertieBlocker
   import Vapor
   import XCore
 

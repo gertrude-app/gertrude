@@ -1,4 +1,4 @@
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 
 extension ConnectAccountFeatureFlag: NoInputResolver {

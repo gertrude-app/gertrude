@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import PairQL
 import Tagged
 import Vapor
@@ -10,7 +10,7 @@ struct UpsertBlockRule: Pair {
   struct Input: PairInput {
     var id: BlockerApp.BlockRule.Id?
     var deviceId: IOSDevice.Id
-    var rule: GertieIOS.BlockRule
+    var rule: GertieBlocker.BlockRule
   }
 
   typealias Output = BlockerApp.BlockRule.Id

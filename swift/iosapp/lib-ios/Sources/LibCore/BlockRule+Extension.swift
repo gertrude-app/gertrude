@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 
 public extension BlockRule {
   func blocksFlow(_ flow: FilterFlow) -> Bool {

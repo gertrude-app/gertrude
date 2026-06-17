@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import XCTest
 import XExpect
 

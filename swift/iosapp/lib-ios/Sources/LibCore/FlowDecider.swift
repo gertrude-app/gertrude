@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import NetworkExtension
 
 public struct FilterFlow: Sendable {

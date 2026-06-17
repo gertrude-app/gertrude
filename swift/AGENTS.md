@@ -175,7 +175,7 @@ searches, and more
 ### `gertie/` - Domain Models
 
 - **Purpose:** Core domain types shared across macOS, iOS, and API
-- **Products:** `Gertie`, `GertieIOS`
+- **Products:** `Gertie`, `GertieBlocker`
 
 ### `duet/` - Custom ORM
 

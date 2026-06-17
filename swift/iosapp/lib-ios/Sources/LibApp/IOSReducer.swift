@@ -4,7 +4,7 @@ import IOSRoute
 import LibClients
 import os.log
 
-@_exported import GertieIOS
+@_exported import GertieBlocker
 @_exported import PairQL
 @_exported import XCore
 

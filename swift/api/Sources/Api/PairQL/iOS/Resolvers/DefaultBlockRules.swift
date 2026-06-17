@@ -1,7 +1,7 @@
 import Dependencies
 import DuetSQL
 import Gertie
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 
 extension DefaultBlockRules: Resolver {

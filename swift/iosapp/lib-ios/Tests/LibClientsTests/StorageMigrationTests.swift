@@ -1,6 +1,6 @@
 import Dependencies
 import Foundation
-import GertieIOS
+import GertieBlocker
 import LibCore
 import Testing
 
