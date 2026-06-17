@@ -2,6 +2,7 @@ import Combine
 import ComposableArchitecture
 import Dependencies
 import Foundation
+import GertieTcaFeatures
 import PodcastRoute
 import SQLiteData
 import Testing
@@ -50,7 +51,7 @@ import Testing
     let crossPromos = CrossPromos.Output(promos: [
       .init(
         campaignId: "test-campaign",
-        placement: .amOnboardingParent,
+        placement: "amOnboardingParent",
         style: .screen,
         headline: "Headline",
         body: "Body",
@@ -133,7 +134,7 @@ import Testing
   @Test func `inescapable campaign is dropped at the fetch boundary and logged`() async {
     let trapped = CrossPromoCampaign(
       campaignId: "no-exit",
-      placement: .amChildHome,
+      placement: "amChildHome",
       style: .screen, // fullScreenCover has no swipe-to-dismiss on iOS
       headline: "Meet Gertrude FM",
       body: "Parent-curated music.",
@@ -346,7 +347,7 @@ import Testing
     let campaign = CrossPromoCampaign(
       campaignId: "fm-teaser",
       variant: "B", // the A/B arm — must survive into the logged event
-      placement: .amChildHome,
+      placement: "amChildHome",
       style: .sheet,
       headline: "Meet Gertrude FM",
       body: "Parent-curated music.",
@@ -390,7 +391,7 @@ import Testing
     let now = Date.reference
     let campaign = CrossPromoCampaign(
       campaignId: "fm-teaser",
-      placement: .amChildHome,
+      placement: "amChildHome",
       style: .sheet,
       headline: "Meet Gertrude FM",
       body: "Parent-curated music.",
@@ -426,7 +427,7 @@ import Testing
     let keychainStore = LockIsolated<[String: Data]>([:])
     let campaign = CrossPromoCampaign(
       campaignId: "already-dismissed",
-      placement: .amOnboardingParent,
+      placement: "amOnboardingParent",
       style: .screen,
       headline: "Headline",
       body: "Body",
@@ -461,7 +462,7 @@ import Testing
     let crossPromos = CrossPromos.Output(promos: [
       .init(
         campaignId: "test-campaign",
-        placement: .amOnboardingParent,
+        placement: "amOnboardingParent",
         style: .screen,
         headline: "Headline",
         body: "Body",
@@ -583,7 +584,7 @@ import Testing
 private func childHomeCampaign(id: String) -> CrossPromoCampaign {
   CrossPromoCampaign(
     campaignId: id,
-    placement: .amChildHome,
+    placement: "amChildHome",
     style: .sheet,
     headline: "Meet Gertrude FM",
     body: "Parent-curated music.",

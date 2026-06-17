@@ -11,6 +11,8 @@ let package = Package(
     .package(path: "../lib-views"),
     .package(path: "../../pairql-podcasts"),
     .package(path: "../../x-kit"),
+    .package(path: "../../gertie"),
+    .package(path: "../../gertie-tca-features"),
     .package(url: "https://github.com/pointfreeco/sqlite-data", exact: "1.6.1"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
     .package(
@@ -19,7 +21,7 @@ let package = Package(
       traits: ["ComposableArchitecture2Deprecations"],
     ),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
-    .package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.10.0"),
+    .package(url: "https://github.com/jaredh159/swift-tagged", exact: "0.10.1"),
     .package(
       url: "https://github.com/pointfreeco/swift-structured-queries",
       exact: "0.31.1",
@@ -35,6 +37,8 @@ let package = Package(
         .product(name: "LibViews", package: "lib-views"),
         .product(name: "PodcastRoute", package: "pairql-podcasts"),
         .product(name: "XCore", package: "x-kit"),
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
