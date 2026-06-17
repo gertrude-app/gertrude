@@ -250,34 +250,37 @@ private extension CheckIn_v2 {
 
     let identifiedRows = try await context.db.customQuery(IdentifiedBundleIds.self)
     let identifiedBundleIds = Set(identifiedRows.map(\.bundleId))
-    let bindings = self.namedAppBindings(from: namedApps, identifiedBundleIds: identifiedBundleIds)
+    let apps = self.namedApps(from: namedApps, identifiedBundleIds: identifiedBundleIds)
 
-    guard !bindings.isEmpty else {
+    guard !apps.isEmpty else {
       return
     }
 
-    _ = try await context.db.customQuery(
-      UpsertNamedApps.self,
-      withBindings: bindings,
+    try await context.db.upsert(
+      apps,
+      conflictOn: [.bundleId],
+      do: .update(set: [.bundleName, .localizedName, .launchable]),
     )
   }
 
-  static func namedAppBindings(
+  static func namedApps(
     from namedApps: [RunningApp],
     identifiedBundleIds: Set<String>,
-  ) -> [Postgres.Data] {
-    var bindings: [Postgres.Data] = []
+  ) -> [UnidentifiedApp] {
+    var apps: [UnidentifiedApp] = []
 
     for var namedApp in namedApps.uniqued(on: \.bundleId) {
       guard !identifiedBundleIds.contains(namedApp.bundleId) else { continue }
       namedApp.dbPrepare()
-      bindings.append(.string(namedApp.bundleId))
-      bindings.append(.string(namedApp.bundleName))
-      bindings.append(.string(namedApp.localizedName))
-      bindings.append(.bool(namedApp.launchable))
+      apps.append(UnidentifiedApp(
+        bundleId: namedApp.bundleId,
+        bundleName: namedApp.bundleName,
+        localizedName: namedApp.localizedName,
+        launchable: namedApp.launchable,
+      ))
     }
 
-    return bindings
+    return apps
   }
 
   static func syncInstalledAppsAndIcons(
@@ -302,13 +305,16 @@ private extension CheckIn_v2 {
     }
 
     let payload = self.catalogedAppPayload(from: installedApps)
-    guard !payload.bindings.isEmpty else {
+    guard !payload.apps.isEmpty else {
       return nil
     }
 
-    let upserted = try await context.db.customQuery(
-      UpsertCatalogedApps.self,
-      withBindings: payload.bindings,
+    let upserted = try await context.db.upsert(
+      payload.apps,
+      conflictOn: [.bundleId],
+      do: .update(set: [.name, .category, .updatedAt]),
+      returning: [.id, .bundleId, .iconContentHash, .iconUploadedAt, .iconSourceAppVersion],
+      as: CatalogedAppIconInfo.self,
     )
 
     if !upserted.isEmpty {
@@ -330,30 +336,31 @@ private extension CheckIn_v2 {
   static func catalogedAppPayload(
     from installedApps: [InstalledAppInfo],
   ) -> (
-    bindings: [Postgres.Data],
+    apps: [CatalogedApp],
     hashLookup: [String: String],
     appVersionLookup: [String: String],
   ) {
-    var bindings: [Postgres.Data] = []
+    var apps: [CatalogedApp] = []
     var hashLookup: [String: String] = [:]
     var appVersionLookup: [String: String] = [:]
 
     for app in installedApps.uniqued(on: \.bundleId) {
-      bindings.append(.uuid(UUID()))
-      bindings.append(.string(app.bundleId))
-      bindings.append(.string(app.name))
-      bindings.append(.string(app.category))
+      apps.append(CatalogedApp(
+        bundleId: app.bundleId,
+        name: app.name,
+        category: app.category,
+      ))
       hashLookup[app.bundleId] = app.iconContentHash
       if let appVersion = app.appVersion {
         appVersionLookup[app.bundleId] = appVersion
       }
     }
 
-    return (bindings, hashLookup, appVersionLookup)
+    return (apps, hashLookup, appVersionLookup)
   }
 
   static func needsIconUpload(
-    _ row: UpsertCatalogedApps,
+    _ row: CatalogedAppIconInfo,
     clientHash: String?,
     clientAppVersion: String?,
   ) -> Bool {
@@ -377,7 +384,7 @@ private extension CheckIn_v2 {
   }
 
   static func replaceInstalledApps(
-    _ upserted: [UpsertCatalogedApps],
+    _ upserted: [CatalogedAppIconInfo],
     for computerUser: ComputerUser,
     in context: MacApp.ChildContext,
   ) async throws {
@@ -388,7 +395,7 @@ private extension CheckIn_v2 {
       InstalledMacApp(
         childId: computerUser.childId,
         computerId: computerUser.computerId,
-        macAppId: .init(row.id),
+        macAppId: row.id,
       )
     })
   }
@@ -514,50 +521,6 @@ func resolveLatestRelease(
   return latest
 }
 
-struct UpsertNamedApps: CustomQueryable {
-  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    typealias UA = UnidentifiedApp
-    var stmt = SQL.Statement("""
-      INSERT INTO \(table: UA.self) (
-        id,
-        \(UA.columnName(.bundleId)),
-        \(UA.columnName(.bundleName)),
-        \(UA.columnName(.localizedName)),
-        \(UA.columnName(.launchable)),
-        \(UA.columnName(.count)),
-        created_at
-      ) VALUES (
-    """)
-    for i in (0 ..< bindings.count).striding(by: 4) {
-      // id
-      stmt.components.append(.sql("'\(UUID().lowercased)', "))
-      // bundle id
-      stmt.components.append(.binding(bindings[i]))
-      // bundle name
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 1]))
-      // localized name
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 2]))
-      // launchable
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 3]))
-      // count, created_at
-      stmt.components.append(.sql(", 1, CURRENT_TIMESTAMP), ("))
-    }
-    stmt.components.removeLast()
-    stmt.components.append(.sql(", 1, CURRENT_TIMESTAMP)\n"))
-    stmt.components.append(.sql("""
-      ON CONFLICT (\(UA.columnName(.bundleId)))
-      DO UPDATE SET
-        \(UA.columnName(.bundleName))    = EXCLUDED.\(UA.columnName(.bundleName)),
-        \(UA.columnName(.localizedName)) = EXCLUDED.\(UA.columnName(.localizedName)),
-        \(UA.columnName(.launchable))    = EXCLUDED.\(UA.columnName(.launchable))
-    """))
-    return stmt
-  }
-}
-
 extension RunningApp {
   mutating func dbPrepare() {
     if self.bundleName == self.bundleId {
@@ -624,48 +587,8 @@ struct ParentWarningAnnouncement: CustomQueryable {
   var parentId: Parent.Id
 }
 
-struct UpsertCatalogedApps: CustomQueryable {
-  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    typealias CA = CatalogedApp
-    var stmt = SQL.Statement("""
-      INSERT INTO \(table: CA.self) (
-        \(CA.columnName(.id)),
-        \(CA.columnName(.bundleId)),
-        \(CA.columnName(.name)),
-        \(CA.columnName(.category)),
-        created_at,
-        updated_at
-      ) VALUES (
-    """)
-    for i in stride(from: 0, to: bindings.count, by: 4) {
-      stmt.components.append(.binding(bindings[i]))
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 1]))
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 2]))
-      stmt.components.append(.sql(", "))
-      stmt.components.append(.binding(bindings[i + 3]))
-      stmt.components.append(.sql(", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), ("))
-    }
-    stmt.components.removeLast()
-    stmt.components.append(.sql(", CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)\n"))
-    stmt.components.append(.sql("""
-      ON CONFLICT (\(CA.columnName(.bundleId)))
-      DO UPDATE SET
-        \(CA.columnName(.name))     = EXCLUDED.\(CA.columnName(.name)),
-        \(CA.columnName(.category)) = EXCLUDED.\(CA.columnName(.category)),
-        \(CA.columnName(.updatedAt)) = CURRENT_TIMESTAMP
-      RETURNING
-        \(CA.columnName(.id)),
-        \(CA.columnName(.bundleId)),
-        \(CA.columnName(.iconContentHash)),
-        \(CA.columnName(.iconUploadedAt)),
-        \(CA.columnName(.iconSourceAppVersion))
-    """))
-    return stmt
-  }
-
-  var id: UUID
+struct CatalogedAppIconInfo: Decodable, Sendable {
+  var id: CatalogedApp.Id
   var bundleId: String
   var iconContentHash: String?
   var iconUploadedAt: Date?

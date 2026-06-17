@@ -78,6 +78,30 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(installs.count).toEqual(1)
   }
 
+  func testReinstallUpdatesAppVersionAndBumpsUpdatedAtOnlyOnChange() async throws {
+    let deviceId = UUID()
+
+    _ = try await GetTrialStatus.resolve(with: self.input(deviceId, appVersion: "1.6.0"), in: .mock)
+    let afterInsert = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .first(in: self.db)
+
+    _ = try await GetTrialStatus.resolve(with: self.input(deviceId, appVersion: "1.6.0"), in: .mock)
+    let afterSameVersion = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .first(in: self.db)
+    expect(afterSameVersion.appVersion).toEqual("1.6.0")
+    expect(afterSameVersion.updatedAt).toEqual(afterInsert.updatedAt) // unchanged: CASE -> ELSE
+
+    _ = try await GetTrialStatus.resolve(with: self.input(deviceId, appVersion: "2.0.0"), in: .mock)
+    let afterNewVersion = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .all(in: self.db)
+    expect(afterNewVersion.count).toEqual(1) // reused row, not a duplicate
+    expect(afterNewVersion[0].appVersion).toEqual("2.0.0")
+    expect(afterNewVersion[0].updatedAt > afterInsert.updatedAt).toBeTrue() // bumped: CASE -> THEN
+  }
+
   // MARK: - trial window (createdAt + 30d vs now)
 
   func testActiveTrialReturnsExpiresAt() async throws {
