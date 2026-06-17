@@ -379,6 +379,43 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(tokensAfter.count).toEqual(1)
   }
 
+  func testConcurrentConnectedRequestsMintSingleToken() async throws {
+    let child = try await self.child()
+    let deviceId = UUID()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.model.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+      claimedAt: .reference,
+    ))
+    try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
+
+    let outputs = try await withThrowingTaskGroup(of: GetTrialStatus.Output.self) { group in
+      for _ in 0 ..< 10 {
+        group.addTask {
+          try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
+        }
+      }
+      return try await group.reduce(into: []) { $0.append($1) }
+    }
+
+    expect(outputs.count).toEqual(10)
+    let install = try await PodcastApp.Install.query()
+      .where(.deviceId == device.id)
+      .first(in: self.db)
+    let tokens = try await PodcastApp.Token.query()
+      .where(.installId == install.id)
+      .all(in: self.db)
+    expect(tokens.count).toEqual(1) // the race fix: exactly one token under concurrent mints
+
+    let mintedValues = Set(outputs.compactMap { output -> UUID? in
+      guard case .connected(let token, _, _, _) = output else { return nil }
+      return token
+    })
+    expect(mintedValues).toEqual([tokens[0].value.rawValue]) // every caller sees the one token
+  }
+
   func testConnectedViaNonSupervisionPathAutoDetects() async throws {
     let child = try await self.child()
     let deviceId = UUID()
