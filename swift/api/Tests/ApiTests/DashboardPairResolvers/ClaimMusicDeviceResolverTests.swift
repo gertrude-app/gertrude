@@ -1,4 +1,5 @@
 import DuetSQL
+import PairQL
 import XCTest
 import XExpect
 
@@ -24,6 +25,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFreshClaimNewChildSetsDeviceFields() async throws {
     let parent = try await self.parent()
+    try await self.grantMusicAccess(to: parent.id)
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.unclaimedMusicDevice(code: code)
 
@@ -49,6 +51,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFreshClaimExistingChildSetsDeviceFields() async throws {
     let parent = try await self.parent()
+    try await self.grantMusicAccess(to: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.unclaimedMusicDevice(code: code)
@@ -67,6 +70,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testResumeClaimBySameParentReturnsOutput() async throws {
     let parent = try await self.parent()
+    try await self.grantMusicAccess(to: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
@@ -83,6 +87,31 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output.childName).toEqual(child.name)
     expect(output.modelName).toEqual(device.modelName)
+  }
+
+  func testFreshClaimWithoutMusicAccessRequiresPaymentAndDoesNotClaim() async throws {
+    let parent = try await self.parent()
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.unclaimedMusicDevice(code: code)
+
+    do {
+      _ = try await ClaimMusicDevice.resolve(
+        with: .init(code: code, child: .newChild(name: "Luke")),
+        in: parent.context,
+      )
+      XCTFail("expected payment required")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.paymentRequired)
+    }
+
+    let children = try await Child.query()
+      .where(.parentId == parent.id)
+      .all(in: self.db)
+    expect(children).toHaveCount(0)
+
+    let updated = try await self.db.find(device.id)
+    expect(updated.childId).toBeNil()
+    expect(updated.claimedAt).toBeNil()
   }
 
   func testClaimWithoutMusicInstallThrowsNotFound() async throws {
@@ -129,9 +158,39 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       )
     }.toContain("not found")
   }
+
+  func testClaimByDifferentParentWithoutMusicInstallThrowsCodeNotFound() async throws {
+    let otherParent = try await self.parent()
+    let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
+    let code = Int.random(in: 100_000 ... 999_999)
+    _ = try await self.db.create(IOSDevice.random {
+      $0.childId = otherChild.id
+      $0.claimCode = code
+      $0.claimedAt = .reference
+    })
+    let parent = try await self.parent()
+
+    try await expectErrorFrom {
+      try await ClaimMusicDevice.resolve(
+        with: .init(code: code, child: .newChild(name: "Luke")),
+        in: parent.context,
+      )
+    }.toContain("not found")
+  }
 }
 
 extension ClaimMusicDeviceResolverTests {
+  private func grantMusicAccess(to parentId: Parent.Id) async throws {
+    try await self.db.create(BillingIdentity(parentId: parentId))
+    try await self.db.create(StripeSubscription(
+      parentId: parentId,
+      tier: .light,
+      stripeId: .init("sub_\(parentId.rawValue.uuidString.prefix(8))"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
+  }
+
   @discardableResult
   private func unclaimedMusicDevice(code: Int) async throws -> IOSDevice {
     let device = try await self.db.create(IOSDevice.random {

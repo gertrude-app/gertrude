@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { ClaimChildOption } from '../shared';
+import type { ClaimChildOption, SubscriptionPanelAction } from '../shared';
 
 export namespace GetMusicClaimData {
   export interface Input {
@@ -15,5 +15,6 @@ export namespace GetMusicClaimData {
       case: 'done';
       childName: string;
     };
+    paymentAction?: SubscriptionPanelAction;
   }
 }

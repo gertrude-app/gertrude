@@ -62,13 +62,10 @@ extension GetMusicAppStatus: Resolver {
         throw Abort(.internalServerError)
       }
 
-      let token: MusicApp.Token = if let existing = try? await MusicApp.Token.query()
-        .where(.installId == install.id)
-        .first(in: ctx.db) {
-        existing
-      } else {
-        try await ctx.db.create(MusicApp.Token(installId: install.id))
-      }
+      let token = try await ctx.db.findOrCreate(
+        MusicApp.Token(installId: install.id),
+        conflictOn: [.installId],
+      )
 
       return .claimed(
         token: token.value.rawValue,

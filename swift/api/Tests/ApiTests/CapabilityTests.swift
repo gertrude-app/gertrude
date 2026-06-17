@@ -72,6 +72,70 @@ final class CapabilityTests: DependencyTestCase {
     expect(billing(tier: .full, status: .canceled).can(.superviseIosDevice)).toBeFalse()
   }
 
+  func testCanUseMusicForActiveLight() {
+    expect(billing(tier: .light, status: .active).can(.useGertrudeMusic)).toBeTrue()
+  }
+
+  func testCanUseMusicForActiveFull() {
+    expect(billing(tier: .full, status: .active).can(.useGertrudeMusic)).toBeTrue()
+  }
+
+  func testCanUseMusicForStandaloneFullTrial() {
+    let trialStart = Date.reference
+    expect(
+      billing(trialStartedAt: trialStart, date: trialStart + .days(10))
+        .can(.useGertrudeMusic),
+    ).toBeTrue()
+  }
+
+  func testCannotUseMusicForFullTrialGraceWithoutPaidSubstrate() {
+    let trialStart = Date.reference
+    expect(
+      billing(trialStartedAt: trialStart, date: trialStart + .days(24))
+        .can(.useGertrudeMusic),
+    ).toBeFalse()
+  }
+
+  func testCanUseMusicForCurrentLightDuringFullTrialGrace() {
+    let trialStart = Date.reference
+    expect(
+      billing(
+        trialStartedAt: trialStart,
+        tier: .light,
+        status: .active,
+        date: trialStart + .days(24),
+      ).can(.useGertrudeMusic),
+    ).toBeTrue()
+  }
+
+  func testCannotUseMusicForPastDueLightDuringFullTrialGrace() {
+    let trialStart = Date.reference
+    expect(
+      billing(
+        trialStartedAt: trialStart,
+        tier: .light,
+        status: .pastDue,
+        date: trialStart + .days(24),
+      ).can(.useGertrudeMusic),
+    ).toBeFalse()
+  }
+
+  func testCannotUseMusicForPastDueFull() {
+    expect(billing(tier: .full, status: .pastDue).can(.useGertrudeMusic)).toBeFalse()
+  }
+
+  func testCanUseMusicForComplimentary() {
+    expect(billing(comp: true).can(.useGertrudeMusic)).toBeTrue()
+  }
+
+  func testCannotUseMusicForFree() {
+    expect(billing().can(.useGertrudeMusic)).toBeFalse()
+  }
+
+  func testLightPlanPaymentActionIgnoresMacAppCapability() {
+    expect(billing().lightPlanPaymentAction(toEnable: .connectMacApp)).toBeNil()
+  }
+
   func testCanConnectMacAppForFull() {
     expect(billing(tier: .full, status: .active).can(.connectMacApp)).toBeTrue()
   }

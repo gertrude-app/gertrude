@@ -18,6 +18,7 @@ final class GetIOSDeviceSupervisionStatusResolverTests: ApiTestCase, @unchecked 
     )
 
     expect(output.requiresPayment).toEqual(false)
+    expect(output.paymentAction).toBeNil()
   }
 
   func testStandaloneTrial_requiresPayment() async throws {
@@ -34,6 +35,7 @@ final class GetIOSDeviceSupervisionStatusResolverTests: ApiTestCase, @unchecked 
     )
 
     expect(output.requiresPayment).toEqual(true)
+    expect(output.paymentAction).toEqual(.startCheckout(tier: .light))
   }
 
   func testFreePlan_requiresPayment() async throws {
@@ -46,6 +48,23 @@ final class GetIOSDeviceSupervisionStatusResolverTests: ApiTestCase, @unchecked 
     )
 
     expect(output.requiresPayment).toEqual(true)
+    expect(output.paymentAction).toEqual(.startCheckout(tier: .light))
+  }
+
+  func testPastDueFullRequiresBillingPortal() async throws {
+    let parent = try await self.parentWithSubscription {
+      $1.tier = .full
+      $1.stripeStatus = .pastDue
+    }
+    let (code, _) = try await self.claimedDevice(parentId: parent.id)
+
+    let output = try await GetIOSDeviceSupervisionStatus.resolve(
+      with: .init(code: code),
+      in: self.context(parent.model),
+    )
+
+    expect(output.requiresPayment).toEqual(true)
+    expect(output.paymentAction).toEqual(.openBillingPortal(config: .default))
   }
 }
 

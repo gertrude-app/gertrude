@@ -22,12 +22,16 @@ struct GetMusicClaimData: Pair {
     let deviceType: String
     let iosVersion: String
     let resumeStep: ResumeStep?
+    let paymentAction: GetSubscriptionPanel_v2.Action?
   }
 }
 
 extension GetMusicClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    try await resolveClaimData(
+    let account = try await context.currentBillingAccount()
+    let paymentAction = account.lightPlanPaymentAction(toEnable: .useGertrudeMusic)
+
+    return try await resolveClaimData(
       code: input.code,
       app: .music,
       baseId: "5052a8c5",
@@ -43,7 +47,8 @@ extension GetMusicClaimData: Resolver {
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: .done(childName: child.name),
+          resumeStep: paymentAction == nil ? .done(childName: child.name) : nil,
+          paymentAction: paymentAction,
         )
       },
       onUnclaimed: { device, children in
@@ -53,11 +58,14 @@ extension GetMusicClaimData: Resolver {
           throw context.error("4e4b135e", .notFound, user: msg)
         }
         return Output(
-          children: children.map { GetIOSDeviceClaimData.ChildOption(id: $0.id, name: $0.name) },
+          children: paymentAction == nil
+            ? children.map { GetIOSDeviceClaimData.ChildOption(id: $0.id, name: $0.name) }
+            : [],
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
           resumeStep: nil,
+          paymentAction: paymentAction,
         )
       },
     )

@@ -28,6 +28,13 @@ extension AuthedRoute: RouteResponder {
 
 extension GetApprovedMusicLibrary: NoInputResolver {
   static func resolve(in ctx: MusicApp.InstallContext) async throws -> Output {
+    let parent = try await ctx.child.parent(in: ctx.db)
+    let account = try await parent.billingAccountSnapshot(
+      in: ctx.db,
+      at: get(dependency: \.date.now),
+    )
+    try requireGertrudeMusicAccess(in: ctx, billing: account)
+
     let albums = try await ctx.child.approvedMusicAlbums(in: ctx.db)
     let tracksByAlbum = try await self.tracksByAlbum(for: albums)
     let outputAlbums = albums.map { album in

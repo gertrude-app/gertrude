@@ -26,50 +26,61 @@ extension MusicApp.Install {
     appVersion: String,
     in db: any DuetSQL.Client,
   ) async throws -> MusicApp.Install {
-    var device: IOSDevice
-    var saveDevice = false
-    var install: MusicApp.Install
-    var saveInstall = false
-
-    if var existing = try? await db.find(deviceId) {
-      if existing.shouldUpdateModelIdentifier(to: modelIdentifier) {
-        existing.modelIdentifier = modelIdentifier
-        saveDevice = true
-      }
-      if existing.iosVersion != iosVersion {
-        existing.iosVersion = iosVersion
-        saveDevice = true
-      }
-      device = existing
-    } else {
-      saveDevice = true
-      device = IOSDevice(
+    try await db.withTransaction { txn in
+      try await self.insertDeviceIfNeeded(
         id: deviceId,
         modelIdentifier: modelIdentifier,
         iosVersion: iosVersion,
+        in: txn,
       )
+      var device = try await txn.find(deviceId)
+      var saveDevice = false
+      if device.shouldUpdateModelIdentifier(to: modelIdentifier) {
+        device.modelIdentifier = modelIdentifier
+        saveDevice = true
+      }
+      if device.iosVersion != iosVersion {
+        device.iosVersion = iosVersion
+        saveDevice = true
+      }
+      if saveDevice {
+        try await txn.update(device)
+      }
+      return try await self.upsert(deviceId: deviceId, appVersion: appVersion, in: txn)
     }
+  }
 
-    if var existing = try? await MusicApp.Install.query()
-      .where(.deviceId == deviceId)
-      .first(in: db) {
-      saveInstall = existing.appVersion != appVersion
-      existing.appVersion = appVersion
-      install = existing
-    } else {
-      install = MusicApp.Install(deviceId: deviceId, appVersion: appVersion)
-      saveInstall = true
-    }
+  private static func insertDeviceIfNeeded(
+    id: IOSDevice.Id,
+    modelIdentifier: String,
+    iosVersion: String,
+    in db: any DuetSQL.Client,
+  ) async throws {
+    try await db.create(
+      IOSDevice(id: id, modelIdentifier: modelIdentifier, iosVersion: iosVersion),
+      ignoringConflictOn: [.id],
+    )
+  }
 
-    if !saveDevice, !saveInstall {
-      return install
-    }
-
-    return try await db.transaction { [saveDevice, saveInstall, device, install] txn in
-      if saveDevice { try await txn.upsert(device) }
-      if saveInstall { try await txn.upsert(install) }
-      return install
-    }
+  private static func upsert(
+    deviceId: IOSDevice.Id,
+    appVersion: String,
+    in db: any DuetSQL.Client,
+  ) async throws -> MusicApp.Install {
+    try await db.upsert(
+      MusicApp.Install(deviceId: deviceId, appVersion: appVersion),
+      conflictOn: [.deviceId],
+      do: .updateRaw { c in
+        """
+        \(c.col(.appVersion)) = \(c.excluded(.appVersion)),
+        \(c.col(.updatedAt)) = CASE
+          WHEN \(c.target(.appVersion)) IS DISTINCT FROM \(c.excluded(.appVersion))
+          THEN CURRENT_TIMESTAMP
+          ELSE \(c.target(.updatedAt))
+        END
+        """
+      },
+    )
   }
 
   func device(in db: any DuetSQL.Client) async throws -> IOSDevice {

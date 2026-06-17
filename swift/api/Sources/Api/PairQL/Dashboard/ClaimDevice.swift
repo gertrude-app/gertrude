@@ -9,6 +9,7 @@ func claimDevice<Output>(
   baseId: String,
   in context: ParentContext,
   onResume: (IOSDevice, Child) async throws -> Output,
+  beforeFreshClaim: ((IOSDevice) async throws -> Void)? = nil,
   onFresh: (IOSDevice, Child) async throws -> Output,
 ) async throws -> Output {
   let found = try? await IOSDevice.query()
@@ -39,6 +40,10 @@ func claimDevice<Output>(
     logIOSUnusual("\(baseId)-3", "\(app.claimLogLabel) claim code expired")
     let msg = "This code has expired. Open \(app.marketingName) on the \(device.deviceType) to get a new one."
     throw context.error("\(baseId)-3", .badRequest, user: msg)
+  }
+
+  if let beforeFreshClaim {
+    try await beforeFreshClaim(device)
   }
 
   let child = switch childAssignment {

@@ -1,38 +1,74 @@
 import { ApiErrorMessage, ClaimScreen, Loading, ScreenShell } from '@dash/components';
+import { Result } from '@shared/pairql';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { MusicDoneNavState } from './Done';
 import type { ChildSelection } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
 import Current from '../../../environment';
-import { Key, useQuery } from '../../../hooks';
+import { Key, useFireAndForget, useQuery } from '../../../hooks';
 
 const ClaimMusicDeviceClaim: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get(`session_id`);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | undefined>();
 
-  const query = useQuery(Key.musicClaimData(code), () =>
-    Current.api.getMusicClaimData({ code: parseInt(code, 10) }),
+  const checkoutSuccess = useFireAndForget(
+    () => {
+      if (!sessionId) return Result.resolveUnexpected(`df13e60f`);
+      return Current.api.handleCheckoutSuccess({ stripeCheckoutSessionId: sessionId });
+    },
+    { when: !!sessionId },
+  );
+
+  const query = useQuery(
+    Key.musicClaimData(code),
+    () => Current.api.getMusicClaimData({ code: parseInt(code, 10) }),
+    { enabled: !sessionId || checkoutSuccess.isSuccess },
   );
 
   useEffect(() => {
-    if (!query.isSuccess || !query.data.resumeStep) return;
-    const state: MusicDoneNavState = {
-      childName: query.data.resumeStep.childName,
-      modelName: query.data.modelName,
-      iosVersion: query.data.iosVersion,
-    };
-    navigate(`/claim-music-device/${code}/done`, { replace: true, state });
+    if (checkoutSuccess.isSuccess) {
+      navigate(`/claim-music-device/${code}/claim`, { replace: true });
+    }
+  }, [checkoutSuccess.isSuccess, navigate, code]);
+
+  useEffect(() => {
+    if (!query.isSuccess) return;
+
+    if (query.data.paymentAction) {
+      navigate(`/claim-music-device/${code}/payment`, { replace: true });
+      return;
+    }
+
+    if (query.data.resumeStep) {
+      const state: MusicDoneNavState = {
+        childName: query.data.resumeStep.childName,
+        modelName: query.data.modelName,
+        iosVersion: query.data.iosVersion,
+      };
+      navigate(`/claim-music-device/${code}/done`, { replace: true, state });
+    }
   }, [
     query.isSuccess,
+    query.data?.paymentAction,
     query.data?.resumeStep,
     query.data?.modelName,
     query.data?.iosVersion,
     navigate,
     code,
   ]);
+
+  if (sessionId && checkoutSuccess.isPending) {
+    return <Loading />;
+  }
+
+  if (checkoutSuccess.isError) {
+    return <ApiErrorMessage error={checkoutSuccess.error} />;
+  }
 
   if (query.isPending) {
     return <Loading />;

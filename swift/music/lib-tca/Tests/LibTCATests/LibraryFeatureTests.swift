@@ -49,6 +49,20 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func showsSubscriptionRequiredWhenApprovedLibraryRequiresPayment() async {
+    let store = TestStore(initialState: .init()) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic.loadApprovedLibrary = { throw ApprovedMusicClientError.subscriptionRequired }
+    }
+
+    await store.send(.onAppear)
+    await store.receive(.approvedLibrarySubscriptionRequired) {
+      $0.status = .subscriptionRequired
+    }
+  }
+
+  @Test
   func retryReturnsToLoading() async {
     let library = ApprovedMusicLibrary.mock
     let store = TestStore(initialState: .init(status: .failed)) {

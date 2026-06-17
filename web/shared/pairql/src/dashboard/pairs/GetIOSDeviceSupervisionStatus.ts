@@ -1,4 +1,6 @@
 // auto-generated, do not edit
+import type { SubscriptionPanelAction } from '../shared';
+
 export namespace GetIOSDeviceSupervisionStatus {
   export interface Input {
     code: number;
@@ -13,5 +15,6 @@ export namespace GetIOSDeviceSupervisionStatus {
     iosVersion: string;
     supervisionStatus: 'awaitingSupervision' | 'supervised';
     requiresPayment: boolean;
+    paymentAction?: SubscriptionPanelAction;
   }
 }

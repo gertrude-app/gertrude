@@ -15,12 +15,12 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `ClaimAmDevice`, output: T.ClaimAmDevice.Output): void;
 export function interceptPql(
-  slug: `ClaimMusicDevice`,
-  output: T.ClaimMusicDevice.Output,
-): void;
-export function interceptPql(
   slug: `ClaimIOSDevice`,
   output: T.ClaimIOSDevice.Output,
+): void;
+export function interceptPql(
+  slug: `ClaimMusicDevice`,
+  output: T.ClaimMusicDevice.Output,
 ): void;
 export function interceptPql(
   slug: `CombinedUsersActivityFeed`,
@@ -87,10 +87,6 @@ export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
 export function interceptPql(
-  slug: `GetMusicClaimData`,
-  output: T.GetMusicClaimData.Output,
-): void;
-export function interceptPql(
   slug: `GetIOSDeviceClaimData`,
   output: T.GetIOSDeviceClaimData.Output,
 ): void;
@@ -105,6 +101,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetIdentifiedApps`,
   output: T.GetIdentifiedApps.Output,
+): void;
+export function interceptPql(
+  slug: `GetMusicClaimData`,
+  output: T.GetMusicClaimData.Output,
 ): void;
 export function interceptPql(
   slug: `GetSelectableKeychains`,
@@ -239,8 +239,8 @@ export function forcePqlErr(
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimAmDevice`
-    | `ClaimMusicDevice`
     | `ClaimIOSDevice`
+    | `ClaimMusicDevice`
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
     | `CreatePendingNotificationMethod`
@@ -260,11 +260,11 @@ export function forcePqlErr(
     | `GetChild`
     | `GetChildren`
     | `GetDevice`
-    | `GetMusicClaimData`
     | `GetIOSDeviceClaimData`
     | `GetIOSDeviceSupervisionStatus`
     | `GetIOSDevice_v2`
     | `GetIdentifiedApps`
+    | `GetMusicClaimData`
     | `GetSelectableKeychains`
     | `GetSubscriptionPanel_v2`
     | `GetSuspendFilterRequest`

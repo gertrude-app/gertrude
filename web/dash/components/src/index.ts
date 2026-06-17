@@ -85,6 +85,7 @@ export type { BlockGroupData } from './iOS/BlockGroupList';
 export { default as ChildAssignmentPicker } from './ClaimDevice/ChildAssignmentPicker';
 export type { ChildSelection } from './ClaimDevice/ChildAssignmentPicker';
 export { default as LightPlanTeaser } from './ClaimDevice/LightPlanTeaser';
+export { default as LightPlanGateScreen } from './ClaimDevice/LightPlanGateScreen';
 export { default as ScreenShell } from './ClaimDevice/ScreenShell';
 export { default as ScreenHeader } from './ClaimDevice/ScreenHeader';
 export { default as HighlightableCard } from './ClaimDevice/HighlightableCard';

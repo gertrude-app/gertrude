@@ -45,6 +45,7 @@ describe(`supervise device claim flow`, () => {
       iosVersion: `26.0`,
       supervisionStatus: `awaitingSupervision` as const,
       requiresPayment: true,
+      paymentAction: { case: `startCheckout`, tier: `light` } as const,
     };
 
     beforeEach(() => {

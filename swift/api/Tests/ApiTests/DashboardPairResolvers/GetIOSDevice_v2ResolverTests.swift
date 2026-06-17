@@ -1,4 +1,3 @@
-import Dependencies
 import DuetSQL
 import PodcastRoute
 import XCTest
@@ -32,6 +31,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
 
+    expect(output.music).toBeNil()
     expect(output.musicConnected).toEqual(false)
   }
 
@@ -49,6 +49,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
 
+    expect(output.music?.requiresPayment).toEqual(true)
     expect(output.musicConnected).toEqual(true)
   }
 

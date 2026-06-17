@@ -160,6 +160,7 @@ const PLAN_FEATURES: Record<CurrentPlan, { name: string; features: string[] }> =
     features: [
       `Everything in Free`,
       `Supervise and protect iPhones and iPads for adults 18+ with the Gertrude iOS app`,
+      `Enable Gertrude Music for parent-approved Apple Music albums`,
       `Enable additional supervision-only restrictions`,
     ],
   },

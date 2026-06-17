@@ -5,6 +5,9 @@ func verifiedChildWithConnectedMusicApp(
   in context: ParentContext,
 ) async throws -> Child {
   let child = try await context.verifiedChild(from: childId)
+  let account = try await context.currentBillingAccount()
+  try requireGertrudeMusicAccess(in: context, billing: account)
+
   let devices = try await child.iosDevices(in: context.db)
   let connectedDeviceIds = try await MusicApp.Token.connectedDeviceIds(
     among: devices.map(\.id),

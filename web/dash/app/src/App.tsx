@@ -13,6 +13,7 @@ import ClaimAmDeviceClaim from './components/routes/ClaimAmDevice/Claim';
 import ClaimAmDeviceDone from './components/routes/ClaimAmDevice/Done';
 import ClaimMusicDeviceClaim from './components/routes/ClaimMusicDevice/Claim';
 import ClaimMusicDeviceDone from './components/routes/ClaimMusicDevice/Done';
+import ClaimMusicDevicePayment from './components/routes/ClaimMusicDevice/Payment';
 import Computer from './components/routes/Computer';
 import Computers from './components/routes/Computers';
 import ConferenceEmailForm from './components/routes/ConferenceEmail';
@@ -91,6 +92,10 @@ const App: React.FC = () => {
         <Route
           path="claim-music-device/:code/claim"
           element={<ClaimMusicDeviceClaim />}
+        />
+        <Route
+          path="claim-music-device/:code/payment"
+          element={<ClaimMusicDevicePayment />}
         />
         <Route path="claim-music-device/:code/done" element={<ClaimMusicDeviceDone />} />
         <Route path="/checkout-success" element={<CheckoutSuccess />} />

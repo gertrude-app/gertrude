@@ -2,6 +2,7 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import MusicRoute
+import PairQL
 
 @DependencyClient
 struct ApprovedMusicClient: Sendable {
@@ -16,8 +17,12 @@ extension ApprovedMusicClient: DependencyKey {
       guard let connection = keychain.loadConnection() else {
         throw ApprovedMusicClientError.missingConnection
       }
-      let output = try await api.getApprovedMusicLibrary(connection.token)
-      return ApprovedMusicLibrary(remote: output)
+      do {
+        let output = try await api.getApprovedMusicLibrary(connection.token)
+        return ApprovedMusicLibrary(remote: output)
+      } catch let error as PqlError where error.type == .paymentRequired {
+        throw ApprovedMusicClientError.subscriptionRequired
+      }
     })
   }
 }
@@ -83,6 +88,7 @@ private extension GetApprovedMusicLibrary.Output.Track {
   }
 }
 
-private enum ApprovedMusicClientError: Error {
+enum ApprovedMusicClientError: Error {
   case missingConnection
+  case subscriptionRequired
 }

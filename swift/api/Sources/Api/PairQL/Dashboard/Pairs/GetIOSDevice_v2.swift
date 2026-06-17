@@ -41,11 +41,16 @@ struct GetIOSDevice_v2: Pair {
       var subscription: AmSubscriptionState
     }
 
+    struct MusicInstall: PairNestable {
+      var requiresPayment: Bool
+    }
+
     var childName: String
     var deviceType: String
     var osVersion: String
     var blocker: Blocker?
     var am: AmInstall?
+    var music: MusicInstall?
     var musicConnected: Bool
   }
 }
@@ -57,13 +62,15 @@ extension GetIOSDevice_v2: Resolver {
       throw ctx.error("f8a9b3c2", .notFound, user: "Device not found")
     }
     let child = try await ctx.verifiedChild(from: childId)
+    let music = try await self.musicInstall(for: device, in: ctx)
     return try await Output(
       childName: child.name,
       deviceType: device.deviceType,
       osVersion: device.iosVersion,
       blocker: self.blocker(for: device, in: ctx),
       am: self.amInstall(for: device, in: ctx),
-      musicConnected: self.musicConnected(for: device, in: ctx),
+      music: music,
+      musicConnected: music != nil,
     )
   }
 
@@ -114,13 +121,19 @@ extension GetIOSDevice_v2: Resolver {
     return Output.AmInstall(subscription: account.amSubscriptionState(forInstall: install))
   }
 
-  static func musicConnected(for device: IOSDevice, in ctx: ParentContext) async throws -> Bool {
+  static func musicInstall(for device: IOSDevice, in ctx: ParentContext) async throws -> Output
+    .MusicInstall? {
     guard let install = try await device.musicInstall(in: ctx.db) else {
-      return false
+      return nil
     }
-    return try await MusicApp.Token.query()
+    let tokenExists = try await MusicApp.Token.query()
       .where(.installId == install.id)
       .exists(in: ctx.db)
+    guard tokenExists else { return nil }
+    let account = try await ctx.currentBillingAccount()
+    return Output.MusicInstall(
+      requiresPayment: account.lightPlanPaymentAction(toEnable: .useGertrudeMusic) != nil,
+    )
   }
 }
 

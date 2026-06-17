@@ -1,11 +1,10 @@
-import { ClaimScreen, ScreenShell } from '@dash/components';
+import { ClaimScreen, LightPlanGateScreen, ScreenShell } from '@dash/components';
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
   DoneScreen,
   DownloadHelperScreen,
   LaunchHelperScreen,
-  PaymentGateScreen,
   SuperviseScreen,
   WindowsSmartScreenModal,
 } from '../../../../dash/app/src/components/routes/SuperviseDevice/screens';
@@ -66,12 +65,18 @@ const SuperviseDeviceScreen: React.FC<{
   if (step === `payment`) {
     return (
       <ScreenShell title={`Continue ${deviceType} Setup`}>
-        <PaymentGateScreen
-          childName={childName}
-          modelName={modelName}
-          iosVersion={iosVersion}
-          deviceType={deviceType}
-          onSubscribe={() => setStep(`download`)}
+        <LightPlanGateScreen
+          icon="credit-card"
+          subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
+          message={
+            <>
+              To supervise and manage {childName}'s {deviceType}, you’ll need a{` `}
+              <b>Gertrude subscription.</b>
+            </>
+          }
+          extraBullets={[`All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`]}
+          onPrimary={() => setStep(`download`)}
+          primaryLabel="Subscribe — $10/year"
           checkoutCancelled={checkoutCancelled}
         />
       </ScreenShell>

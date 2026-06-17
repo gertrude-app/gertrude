@@ -61,6 +61,33 @@ final class MusicAppInstallTests: ApiTestCase, @unchecked Sendable {
     expect(device.iosVersion).toEqual("18.3")
   }
 
+  func testTokensAreUniquePerInstall() async throws {
+    let constraintRows = try await self.db.customQuery(MusicAppTokenInstallIdUnique.self)
+    expect(constraintRows.first?.constraintCount).toEqual(1)
+
+    let install = try await MusicApp.Install.ensureExists(
+      deviceId: .init(UUID()),
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+      appVersion: "1.0.0",
+      in: self.db,
+    )
+    let first = try await self.db.findOrCreate(
+      MusicApp.Token(installId: install.id),
+      conflictOn: [.installId],
+    )
+    let second = try await self.db.findOrCreate(
+      MusicApp.Token(installId: install.id),
+      conflictOn: [.installId],
+    )
+
+    expect(second.id).toEqual(first.id)
+    let tokens = try await MusicApp.Token.query()
+      .where(.installId == install.id)
+      .all(in: self.db)
+    expect(tokens).toHaveCount(1)
+  }
+
   func testConnectedDeviceIdsReturnsOnlyDevicesWithTokens() async throws {
     let connectedDeviceId = IOSDevice.Id(UUID())
     let unconnectedDeviceId = IOSDevice.Id(UUID())
@@ -88,5 +115,21 @@ final class MusicAppInstallTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(connected).toEqual(Set([connectedDeviceId]))
+  }
+}
+
+private struct MusicAppTokenInstallIdUnique: CustomQueryable {
+  var constraintCount: Int
+
+  static func query(bindings _: [Postgres.Data]) -> SQL.Statement {
+    .init("""
+    SELECT COUNT(*)::int AS constraint_count
+    FROM pg_constraint c
+    JOIN pg_namespace n ON n.oid = c.connamespace
+    JOIN pg_class t ON t.oid = c.conrelid
+    WHERE n.nspname = 'music_app'
+      AND t.relname = 'tokens'
+      AND c.conname = 'uq_tokens_install_id';
+    """)
   }
 }

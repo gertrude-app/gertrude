@@ -5,6 +5,7 @@ public enum LibraryViewState: Equatable, Sendable {
   case loaded(albums: [AlbumData])
   case empty
   case failed
+  case subscriptionRequired
 }
 
 public struct LibraryView: View {
@@ -56,6 +57,14 @@ public struct LibraryView: View {
         message: "Check your connection and try again.",
         systemImage: "wifi.exclamationmark",
         buttonTitle: "Try again",
+      )
+
+    case .subscriptionRequired:
+      self.messageContent(
+        title: "Subscription required",
+        message: "A parent needs Gertrude Light or Full before approved music can play on this device.",
+        systemImage: "creditcard",
+        buttonTitle: "Check again",
       )
     }
   }
@@ -140,6 +149,12 @@ private struct LibraryMessageCard: View {
 #Preview("Empty") {
   NavigationStack {
     LibraryView(state: .empty)
+  }
+}
+
+#Preview("Subscription required") {
+  NavigationStack {
+    LibraryView(state: .subscriptionRequired)
   }
 }
 

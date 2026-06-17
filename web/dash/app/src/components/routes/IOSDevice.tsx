@@ -8,6 +8,7 @@ import {
   BetaBadge,
   BlockGroupList,
   // EditBlockRules,
+  LightPlanTeaser,
   Loading,
   PageHeading,
   ToggleCard,
@@ -102,6 +103,7 @@ const IOSDevice: React.FC = () => {
   const dt = deviceQuery.data.deviceType;
   const blocker = deviceQuery.data.blocker;
   const am = deviceQuery.data.am;
+  const music = deviceQuery.data.music;
   const amRunway = am ? amSubscriptionRunway(am.subscription) : undefined;
 
   const requestPinCode = async (): Promise<number | null> => {
@@ -136,7 +138,11 @@ const IOSDevice: React.FC = () => {
           />
         )}
         {deviceQuery.data.musicConnected && (
-          <MusicDeviceSection childId={childId} childName={deviceQuery.data.childName} />
+          <MusicDeviceSection
+            childId={childId}
+            childName={deviceQuery.data.childName}
+            requiresPayment={music?.requiresPayment ?? false}
+          />
         )}
         {blocker && (
           <div className="max-w-3xl">
@@ -353,12 +359,28 @@ const IOSDevice: React.FC = () => {
 const MusicDeviceSection: React.FC<{
   childId: string;
   childName: string;
-}> = ({ childId, childName }) => (
+  requiresPayment: boolean;
+}> = ({ childId, childName, requiresPayment }) => (
   <div className="max-w-3xl">
     <AppHeader app="music">
       <BetaBadge />
     </AppHeader>
-    <MusicCuration childId={childId} childName={childName} className="mt-6" />
+    {requiresPayment ? (
+      <div className="mt-4">
+        <p className="text-slate-500 mb-4">
+          Paused — your Gertrude account needs Light or higher to manage Gertrude Music.
+        </p>
+        <LightPlanTeaser
+          className="mb-4"
+          extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
+        />
+        <Button type="link" to="/settings" color="primary" size="small">
+          Manage subscription
+        </Button>
+      </div>
+    ) : (
+      <MusicCuration childId={childId} childName={childName} className="mt-6" />
+    )}
   </div>
 );
 
