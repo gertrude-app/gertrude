@@ -24,7 +24,10 @@ struct SearchMusicCatalog: Pair {
 }
 
 extension SearchMusicCatalog: Resolver {
-  static func resolve(with input: Input, in _: ParentContext) async throws -> Output {
+  static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
+    let account = try await context.currentBillingAccount()
+    try requireGertrudeMusicAccess(in: context, billing: account)
+
     let query = input.query.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !query.isEmpty else {
       return .init(albums: [])

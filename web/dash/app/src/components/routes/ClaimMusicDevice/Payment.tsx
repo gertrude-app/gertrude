@@ -4,7 +4,6 @@ import {
   Loading,
   ScreenShell,
 } from '@dash/components';
-import { posessive } from '@shared/string';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { SubscriptionPanelAction } from '@dash/types';
@@ -12,24 +11,23 @@ import Current from '../../../environment';
 import { Key, useMutation, useQuery } from '../../../hooks';
 import { lightPlanPaymentButtonLabel } from '../../../lib/subscriptionActions';
 
-const SuperviseDevicePayment: React.FC = () => {
+const ClaimMusicDevicePayment: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const checkoutCancelled = searchParams.has(`session_id`);
   const [paymentError, setPaymentError] = useState<string | undefined>();
 
-  const deviceStatus = useQuery(Key.supervisionDeviceStatus(code), () =>
-    Current.api.getIOSDeviceSupervisionStatus({ code: parseInt(code ?? `0`, 10) }),
+  const query = useQuery(Key.musicClaimData(code), () =>
+    Current.api.getMusicClaimData({ code: parseInt(code, 10) }),
   );
 
   const startCheckout = useMutation(
     (tier: `light` | `full`) =>
       Current.api.startCheckoutSession({
         tier,
-        successPath: `/supervise-device/${code}/download-helper`,
-        cancelPath: `/supervise-device/${code}/payment`,
-        associatedIosDeviceId: deviceStatus.data?.deviceId,
+        successPath: `/claim-music-device/${code}/claim`,
+        cancelPath: `/claim-music-device/${code}/payment`,
       }),
     {
       onError: () => setPaymentError(`Failed to open Stripe. Please try again.`),
@@ -39,7 +37,7 @@ const SuperviseDevicePayment: React.FC = () => {
   const openBillingPortal = useMutation(
     (configuration: `lightTier` | `default`) =>
       Current.api.openBillingPortal({
-        returnPath: `/supervise-device/${code}/payment`,
+        returnPath: `/claim-music-device/${code}/payment`,
         configuration,
       }),
     {
@@ -48,10 +46,10 @@ const SuperviseDevicePayment: React.FC = () => {
   );
 
   useEffect(() => {
-    if (deviceStatus.isSuccess && !deviceStatus.data.requiresPayment) {
-      navigate(`/supervise-device/${code}/download-helper`, { replace: true });
+    if (query.isSuccess && !query.data.paymentAction) {
+      navigate(`/claim-music-device/${code}/claim`, { replace: true });
     }
-  }, [deviceStatus.isSuccess, deviceStatus.data?.requiresPayment, navigate, code]);
+  }, [query.isSuccess, query.data?.paymentAction, navigate, code]);
 
   useEffect(() => {
     if (startCheckout.isSuccess) {
@@ -65,24 +63,21 @@ const SuperviseDevicePayment: React.FC = () => {
     }
   }, [openBillingPortal.isSuccess, openBillingPortal.data?.url]);
 
-  if (deviceStatus.isPending) {
+  if (query.isPending) {
     return <Loading />;
   }
 
-  if (deviceStatus.isError) {
-    return <ApiErrorMessage error={deviceStatus.error} />;
+  if (query.isError) {
+    return <ApiErrorMessage error={query.error} />;
   }
 
-  if (!deviceStatus.data.requiresPayment) {
-    return <Loading />;
-  }
-
-  const { childName, modelName, deviceType, iosVersion, paymentAction } =
-    deviceStatus.data;
+  const { modelName, iosVersion, paymentAction } = query.data;
 
   if (!paymentAction) {
-    return <ApiErrorMessage />;
+    return <Loading />;
   }
+
+  const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
 
   const handlePaymentAction = (action: SubscriptionPanelAction): void => {
     setPaymentError(undefined);
@@ -102,26 +97,27 @@ const SuperviseDevicePayment: React.FC = () => {
   };
 
   return (
-    <ScreenShell title={`Continue ${deviceType} Setup`}>
+    <ScreenShell title={`Connect ${deviceType}`}>
       <LightPlanGateScreen
-        icon="credit-card"
-        subtitle={`Setting up ${posessive(childName)} ${modelName} · iOS ${iosVersion}`}
+        icon="music"
+        subtitle={`${modelName} · iOS ${iosVersion}`}
         message={
           <>
-            To supervise and manage {posessive(childName)} {deviceType}, you’ll need a
-            {` `}
-            <b>Gertrude subscription.</b>
+            Gertrude Music requires a <b>Gertrude Light or Full subscription</b> before
+            this {deviceType} can be connected.
           </>
         }
-        extraBullets={[`All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`]}
-        onPrimary={() => handlePaymentAction(paymentAction)}
-        primaryLabel={lightPlanPaymentButtonLabel(paymentAction)}
-        isWorking={startCheckout.isPending || openBillingPortal.isPending}
+        extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
+        priceSize="emphasized"
         checkoutCancelled={checkoutCancelled}
         error={paymentError}
+        primaryLabel={lightPlanPaymentButtonLabel(paymentAction)}
+        isWorking={startCheckout.isPending || openBillingPortal.isPending}
+        onPrimary={() => handlePaymentAction(paymentAction)}
+        secondary={{ label: `Maybe later`, onClick: () => navigate(`/`) }}
       />
     </ScreenShell>
   );
 };
 
-export default SuperviseDevicePayment;
+export default ClaimMusicDevicePayment;

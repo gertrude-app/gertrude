@@ -31,6 +31,9 @@ export namespace GetIOSDevice_v2 {
     am?: {
       subscription: AmSubscriptionState;
     };
+    music?: {
+      requiresPayment: boolean;
+    };
     musicConnected: boolean;
   }
 }

@@ -58,7 +58,7 @@ struct BillingAccountSnapshot: Sendable {
 
   var capabilities: Set<Capability> {
     if self.billingIdentity?.isComplimentary == true {
-      return [.superviseIosDevice, .connectMacApp]
+      return Set(Capability.allCases)
     }
     var capabilities: Set<Capability> = []
     if let sub = self.liveSubscription, sub.stripeStatus != .pastDue {
@@ -67,6 +67,7 @@ struct BillingAccountSnapshot: Sendable {
     if let trialStart = self.billingIdentity?.fullTrialStartedAt,
        self.date < trialStart + PlanStatus.trialPeriod {
       capabilities.insert(.connectMacApp)
+      capabilities.insert(.useGertrudeMusic)
     }
     return capabilities
   }
@@ -100,13 +101,14 @@ struct BillingAccountSnapshot: Sendable {
 enum Capability: Hashable, Sendable, CaseIterable {
   case superviseIosDevice
   case connectMacApp
+  case useGertrudeMusic
 }
 
 extension StripeSubscription.Tier {
   var capabilities: Set<Capability> {
     switch self {
-    case .light: [.superviseIosDevice]
-    case .full: [.superviseIosDevice, .connectMacApp]
+    case .light: [.superviseIosDevice, .useGertrudeMusic]
+    case .full: [.superviseIosDevice, .connectMacApp, .useGertrudeMusic]
     }
   }
 }

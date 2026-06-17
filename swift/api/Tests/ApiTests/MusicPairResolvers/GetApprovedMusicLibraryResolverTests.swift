@@ -27,6 +27,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
 
   func testReturnsApprovedAlbumsForAuthedChild() async throws {
     let child = try await self.child()
+    try await self.grantMusicAccess(to: child.parent.model.id)
     let (device, install) = try await self.claimedInstall(for: child)
     let ctx = MusicApp.InstallContext(
       requestId: "mock-req-id",
@@ -105,6 +106,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
 
   func testAuthedRouteResolvesTokenAndReturnsApprovedLibrary() async throws {
     let child = try await self.child()
+    try await self.grantMusicAccess(to: child.parent.model.id)
     let (_, install) = try await self.claimedInstall(for: child)
     let token = try await self.db.create(MusicApp.Token(installId: install.id))
     try await self.db.create(Music.ApprovedAlbum(
@@ -137,6 +139,27 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     expect(output.albums.map { $0.tracks.map(\.id) }).toEqual([["1440935468", "1440935469"]])
   }
 
+  func testRequiresMusicAccess() async throws {
+    let child = try await self.child()
+    let (_, install) = try await self.claimedInstall(for: child)
+    _ = try await self.db.create(MusicApp.Token(installId: install.id))
+    let ctx = try await MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: install.device(in: self.db),
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+
+    do {
+      _ = try await GetApprovedMusicLibrary.resolve(in: ctx)
+      XCTFail("expected payment required")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.paymentRequired)
+    }
+  }
+
   func testUnauthorizedAfterTokenRowDeleted() async throws {
     let child = try await self.child()
     let (_, install) = try await self.claimedInstall(for: child)
@@ -156,6 +179,17 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     } catch let error as PqlError {
       expect(error.type).toEqual(.unauthorized)
     }
+  }
+
+  private func grantMusicAccess(to parentId: Parent.Id) async throws {
+    try await self.db.create(BillingIdentity(parentId: parentId))
+    try await self.db.create(StripeSubscription(
+      parentId: parentId,
+      tier: .light,
+      stripeId: .init("sub_\(parentId.rawValue.uuidString.prefix(8))"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
   }
 
   private func claimedInstall(for child: ChildEntities) async throws

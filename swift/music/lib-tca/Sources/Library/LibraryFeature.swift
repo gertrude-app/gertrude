@@ -13,12 +13,14 @@ struct LibraryFeature: Sendable {
     case loaded(ApprovedMusicLibrary)
     case empty
     case failed
+    case subscriptionRequired
   }
 
   enum Action: Equatable {
     case onAppear
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
+    case approvedLibrarySubscriptionRequired
     case albumTapped(ApprovedAlbum.ID)
     case albumDetailDismissed(String)
     case delegate(AlbumDetailFeature.Action.DelegateAction)
@@ -35,6 +37,8 @@ struct LibraryFeature: Sendable {
         return .run { send in
           do {
             try await send(.approvedLibraryLoaded(self.approvedMusic.loadApprovedLibrary()))
+          } catch ApprovedMusicClientError.subscriptionRequired {
+            await send(.approvedLibrarySubscriptionRequired)
           } catch {
             await send(.approvedLibraryLoadFailed)
           }
@@ -46,6 +50,10 @@ struct LibraryFeature: Sendable {
 
       case .approvedLibraryLoadFailed:
         state.status = .failed
+        return .none
+
+      case .approvedLibrarySubscriptionRequired:
+        state.status = .subscriptionRequired
         return .none
 
       case .albumTapped(let albumID):

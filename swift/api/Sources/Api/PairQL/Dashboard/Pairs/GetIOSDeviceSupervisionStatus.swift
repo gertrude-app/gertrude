@@ -19,6 +19,7 @@ struct GetIOSDeviceSupervisionStatus: Pair {
     let iosVersion: String
     let supervisionStatus: SupervisionStatus
     let requiresPayment: Bool
+    let paymentAction: GetSubscriptionPanel_v2.Action?
   }
 
   enum SupervisionStatus: String, Codable, Equatable, Sendable {
@@ -48,6 +49,7 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
     let supervision = try await device.supervision(in: context.db)
     let child = try await context.verifiedChild(from: childId)
     let account = try await context.currentBillingAccount()
+    let paymentAction = account.lightPlanPaymentAction(toEnable: .superviseIosDevice)
     return .init(
       deviceId: device.id,
       childId: child.id,
@@ -56,7 +58,8 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
       deviceType: device.deviceType,
       iosVersion: device.iosVersion,
       supervisionStatus: supervision?.supervised == true ? .supervised : .awaitingSupervision,
-      requiresPayment: !account.can(.superviseIosDevice),
+      requiresPayment: paymentAction != nil,
+      paymentAction: paymentAction,
     )
   }
 }

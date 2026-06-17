@@ -71,6 +71,35 @@ struct AppFeatureTests {
   }
 
   @Test
+  func onAppearStoresClaimedConnection() async {
+    let token = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
+    let childId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    let store = TestStore(initialState: .init()) {
+      AppFeature()
+    } withDependencies: {
+      $0.api.getMusicAppStatus = {
+        .claimed(
+          token: token,
+          childId: childId,
+          childName: "Harriet",
+        )
+      }
+      $0.keychain._load = { _ in nil }
+      $0.keychain._save = { _, _ in }
+      $0.keychain.delete = { _ in }
+    }
+
+    await store.send(.onAppear)
+    await store.receive(.musicAppStatusLoaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+    ))) {
+      $0.connection = .claimed(childName: "Harriet")
+    }
+  }
+
+  @Test
   func libraryPlayAlbumDelegateStartsAlbumQueuePlayback() async {
     let items = [
       playbackItem("track-1"),

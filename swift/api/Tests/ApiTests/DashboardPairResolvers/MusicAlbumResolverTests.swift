@@ -171,6 +171,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testRejectsMusicManagementWithoutConnectedMusic() async throws {
     let child = try await self.child()
+    try await self.grantMusicAccess(to: child.parent.model.id)
 
     do {
       _ = try await ApproveMusicAlbum.resolve(
@@ -195,6 +196,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   private func connectMusicApp(for child: ChildEntities) async throws {
+    try await self.grantMusicAccess(to: child.parent.model.id)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
       $0.claimedAt = .reference
@@ -203,6 +205,17 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
       MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
     )
     try await self.db.create(MusicApp.Token(installId: install.id))
+  }
+
+  private func grantMusicAccess(to parentId: Parent.Id) async throws {
+    try await self.db.create(BillingIdentity(parentId: parentId))
+    try await self.db.create(StripeSubscription(
+      parentId: parentId,
+      tier: .light,
+      stripeId: .init("sub_\(parentId.rawValue.uuidString.prefix(8))"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
   }
 
   private func input(

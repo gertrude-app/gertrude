@@ -65,9 +65,9 @@ extension MusicApp.Install {
       return install
     }
 
-    return try await db.transaction { [saveDevice, saveInstall, device, install] txn in
-      if saveDevice { try await txn.upsert(device) }
-      if saveInstall { try await txn.upsert(install) }
+    return try await db.withTransaction { [saveDevice, saveInstall, device, install] txn in
+      if saveDevice { try await txn.upsert(device, conflictOn: [.id]) }
+      if saveInstall { try await txn.upsert(install, conflictOn: [.deviceId]) }
       return install
     }
   }
