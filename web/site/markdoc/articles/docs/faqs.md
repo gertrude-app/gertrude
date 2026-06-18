@@ -35,26 +35,24 @@ description:
 
 ## Does it work on iPhones or iPads? {% id="ios" %}
 
-No. It currently only works for _Mac computers._ This is primarily because I built
-Gertrude originally for myself, and I only needed a solution for the computers where my
-kids did their homework. I already had a very reliable way of keeping them safe on a
-phone&mdash;don't give them one. When I finally got my 16+ year old a phone, I protected
-it using the Apple Screen Time feature, which is very effective, although difficult to
-setup. Check out our
-[guide to locking down an iPhone](/blog/definitive-guide-to-locking-down-an-iphone) for
-more information.
+For years Gertrude was Mac-only, but we're doing more and more work on iPhones and iPads.
 
-{% callout title="UPDATE: 10/2024" %}
+On iOS we currently have two apps. The first is a **blocker app** (_Gertrude Blocker_ in
+the App Store) that plugs gaps in Apple's Screen Time. Apple keeps leaving holes open,
+like `#images` GIF search in Messages, Spotlight image search, Apple Maps photos, App
+Store images, and Spotify artwork, and the blocker closes them. It's free to start, and
+you can connect an iPhone or iPad to your Gertrude account to manage what it blocks from
+the parent dashboard. It won't lock down a phone the way the Mac app locks down a computer
+(iOS doesn't allow that), but it covers the parts of Screen Time that leak.
 
-Due to the [increasing difficulty](/blog/ios18-screentime-what-parents-should-know) of
-locking down iPhones and iPads with the most recent versions of iOS, and due to numerous
-requests from Gertrude parents, we recently released the first version of a Gertrude
-[iOS app that blocks GIFs](/blog/how-parents-can-block-images-gif-search-ios-18) and
-closes other loopholes in Apple's Screen Time parental controls. We are exploring the
-possibility of growing this into a more full-featured complement to Gertrude on macOS in
-the months to come.
+The second is **Gertrude AM**, a parent-curated podcast app that lets kids listen only to
+shows you approve, and we're working on a music app to go alongside it.
 
-{% /callout %}
+If you're setting up an iPhone, our
+[guide to locking down an iPhone](/blog/definitive-guide-to-locking-down-an-iphone) is a
+good place to start. The [iPhone and iPad page](/iphone-and-ipad) covers the blocker in
+more detail, and you can read about the podcast app in
+[this post on Gertrude AM](/blog/safe-podcast-app-for-kids).
 
 ## Is it just for kids? Or can adults use it too? {% id="adults" %}
 
@@ -85,10 +83,10 @@ that their computer user is protected by a password the other child does not kno
 
 ## Does the parent need an Apple device? {% id="apple-device" %}
 
-Nope. While the Gertrude app itself is only installed on Mac computers, the parent can
-manage all aspects of the Gertrude app from any kind of phone, computer, or device, as
-long as it can access the internet with a browser. Parents control their kids protections
-from a parents-only website, and can receive notifications via text, email, or Slack.
+Nope. While the Gertrude Mac app runs on the child's Mac, the parent can manage all
+aspects of the Gertrude app from any kind of phone, computer, or device, as long as it can
+access the internet with a browser. Parents control their kids protections from a
+parents-only website, and can receive notifications via text, email, or Slack.
 
 ## Can kids request websites to be unblocked? {% id="unlock-requests" %}
 
