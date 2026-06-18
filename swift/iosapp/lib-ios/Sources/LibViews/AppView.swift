@@ -1,4 +1,6 @@
 import ComposableArchitecture
+import GertieApp
+import GertieTcaFeatures
 import LibApp
 import SwiftUI
 
@@ -637,6 +639,27 @@ public struct AppView: View {
         .onShake { store.send(.receivedShake) }
         .pageSheet()
     }
+    .sheet(item: self.crossPromoStore(style: .sheet)) { store in
+      CrossPromoView(store: store)
+    }
+    #if os(iOS)
+    .fullScreenCover(item: self.crossPromoStore(style: .screen)) { store in
+      CrossPromoView(store: store)
+    }
+    #endif
+  }
+
+  private func crossPromoStore(
+    style: CrossPromoStyle,
+  ) -> Binding<StoreOf<CrossPromoFeature>?> {
+    let base = self.$store.scope(
+      state: \.destination?.crossPromo,
+      action: \.destination.crossPromo,
+    )
+    return Binding(
+      get: { base.wrappedValue.flatMap { $0.campaign.style == style ? $0 : nil } },
+      set: { base.wrappedValue = $0 },
+    )
   }
 
   func btn(

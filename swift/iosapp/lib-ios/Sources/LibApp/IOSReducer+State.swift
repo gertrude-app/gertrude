@@ -1,5 +1,6 @@
 // swiftformat:disable extensionAccessControl
 import ComposableArchitecture
+import GertieTcaFeatures
 import IOSRoute
 import LibClients
 import TaggedTime
@@ -9,6 +10,7 @@ extension IOSReducer {
   public enum Destination {
     case connectAccount(ConnectAccount)
     case info(InfoFeature)
+    case crossPromo(CrossPromoFeature)
   }
 
   @ObservableState
@@ -17,6 +19,7 @@ extension IOSReducer {
     public var allBlockGroups: [GetBlockGroups.BlockGroupInfo] = []
     public var disabledBlockGroupIds: [UUID] = []
     public var onboarding: OnboardingState = .init()
+    public var crossPromos: CrossPromos.Output = .init(promos: [])
 
     @Presents
     public var destination: Destination.State?

@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "LibIOS",
-  platforms: [.macOS(.v14), .iOS(.v17)],
+  platforms: [.macOS(.v15), .iOS(.v17)],
   products: [
     .library(name: "LibCore", targets: ["LibCore"]),
     .library(name: "LibFilter", targets: ["LibFilter"]),
@@ -28,6 +28,7 @@ let package = Package(
     ),
     .package(path: "../../pairql-iosapp"),
     .package(path: "../../gertie"),
+    .package(path: "../../gertie-tca-features"),
     .package(path: "../../x-expect"),
     .package(path: "../../x-kit"),
   ],
@@ -54,6 +55,8 @@ let package = Package(
         "LibCore",
         "LibClients",
         .product(name: "GertieBlocker", package: "gertie"),
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "XCore", package: "x-kit"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -70,6 +73,8 @@ let package = Package(
       dependencies: [
         "LibCore",
         "LibApp",
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ],
     ),

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import GertieTcaFeatures
 import IOSRoute
 import LibClients
 import os.log
@@ -38,6 +39,12 @@ public struct IOSReducer {
         self.programmatic(state: &state, action: programmaticAction)
       case .destination(.presented(let destinationAction)):
         self.destination(state: &state, action: destinationAction)
+      case .destination(.dismiss):
+        if state.destination?.crossPromo != nil {
+          self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
+        } else {
+          .none
+        }
       case .destination:
         .none
       }
@@ -846,6 +853,20 @@ public struct IOSReducer {
         .run { [deps = self.deps] send in
           await deps.device.deleteCacheFillDir()
         },
+        // fetch cross-promo campaigns for later presentation
+        .run { [deps = self.deps] send in
+          if let output = try? await deps.api.crossPromos(), !output.promos.isEmpty {
+            await send(.programmatic(.receivedCrossPromos(output)))
+          }
+        },
+      )
+
+    case .receivedCrossPromos(let output):
+      let dropped = output.promos.filter { !$0.hasGuaranteedExit }
+      state.crossPromos = .init(promos: output.promos.filter(\.hasGuaranteedExit))
+      return .merge(
+        self.logUnpresentableCrossPromos(dropped),
+        self.presentCrossPromos(&state),
       )
 
     case .appWillTerminate:
@@ -857,6 +878,9 @@ public struct IOSReducer {
 
     case .setScreen(let screen):
       state.screen = screen
+      if screen.isRunning {
+        return self.presentCrossPromos(&state)
+      }
       return .none
 
     case .setProfileRecovery:
@@ -968,7 +992,7 @@ public struct IOSReducer {
       return .none
 
     case .appDidEnterForeground:
-      return .none
+      return self.presentCrossPromos(&state)
 
     case .appDidEnterBackground:
       return .none
@@ -983,6 +1007,10 @@ public struct IOSReducer {
       return .run { [deps = self.deps] _ in
         await deps.receiveAccountConnection(conn)
       }
+    case .crossPromo(.delegate(.ctaTapped(let slot))):
+      return self.closeCrossPromo(&state, event: .cta, ctaSlot: slot)
+    case .crossPromo(.delegate(.dismissed)):
+      return self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
     default:
       return .none
     }

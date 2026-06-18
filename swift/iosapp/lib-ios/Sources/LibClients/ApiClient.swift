@@ -35,10 +35,16 @@ public struct ApiClient: Sendable {
     async throws -> CheckSupervisionFlowStatus.Output
   public var markSupervisionProfileInstalled: @Sendable ()
     async throws -> Void
+  public var crossPromos: @Sendable ()
+    async throws -> CrossPromos.Output
 }
 
 extension ApiClient: TestDependencyKey {
-  public static let testValue = ApiClient()
+  public static var testValue: ApiClient {
+    var client = ApiClient()
+    client.crossPromos = { .init(promos: []) }
+    return client
+  }
 }
 
 extension ApiClient: DependencyKey {
@@ -181,6 +187,24 @@ extension ApiClient: DependencyKey {
         _ = try await output(
           from: MarkSupervisionProfileInstalled.self,
           with: .markSupervisionProfileInstalled,
+        )
+      },
+      crossPromos: {
+        @Dependency(\.device) var device
+        @Dependency(\.locale) var locale
+        let deviceData = await device.data()
+        guard let deviceId = deviceData.deviceId else {
+          return .init(promos: [])
+        }
+        return try await output(
+          from: CrossPromos.self,
+          withUnauthed: .crossPromos(.init(
+            deviceId: deviceId,
+            appVersion: version,
+            modelIdentifier: deviceData.modelIdentifier,
+            iosVersion: deviceData.iOSVersion,
+            locale: locale.identifier,
+          )),
         )
       },
     )

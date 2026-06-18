@@ -28,6 +28,7 @@ public extension IOSReducer {
 
     public enum Programmatic: Equatable {
       case appDidLaunch
+      case receivedCrossPromos(CrossPromos.Output)
       case appWillTerminate
       case appDidEnterForeground
       case appDidEnterBackground
