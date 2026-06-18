@@ -25,9 +25,17 @@ func claimDevice<Output>(
     if let child = try? await context.verifiedChild(from: childId) {
       return try await onResume(device, child)
     } else {
+      let ownerChild = try? await Child.query()
+        .where(.id == childId)
+        .first(in: context.db)
+      let ownerParent: Parent? = if let ownerChild {
+        try? await ownerChild.parent(in: context.db)
+      } else {
+        nil
+      }
       logIOSUnusual(
         "\(baseId)-2",
-        "attempt to claim \(app.claimLogLabel) device from different parent",
+        differentParentClaimLogDetail(app, code, context.parent, device, ownerChild, ownerParent),
       )
       let msg = "Code not found. Double-check and try again."
       throw context.error("\(baseId)-2", .notFound, user: msg)
@@ -56,4 +64,31 @@ func claimDevice<Output>(
   }
 
   return try await onFresh(device, child)
+}
+
+func differentParentClaimLogDetail(
+  _ app: GertrudeIOSApp,
+  _ code: Int,
+  _ parent: Parent,
+  _ device: IOSDevice,
+  _ ownerChild: Child?,
+  _ ownerParent: Parent?,
+) -> String {
+  let ownerParentDetail = if let ownerParent {
+    "\(ownerParent.email.rawValue) id=\(ownerParent.id)"
+  } else if let ownerChild {
+    "unknown id=\(ownerChild.parentId)"
+  } else {
+    "unknown"
+  }
+
+  let ownerChildId = ownerChild?.id ?? device.childId
+  return [
+    "attempt to claim \(app.claimLogLabel) device from different parent",
+    "code=\(code)",
+    "requestingParent=\(parent.email.rawValue) id=\(parent.id)",
+    "matchedDeviceId=\(device.id)",
+    "ownerParent=\(ownerParentDetail)",
+    "ownerChildId=\(ownerChildId.map { "\($0)" } ?? "unknown")",
+  ].joined(separator: ", ")
 }
