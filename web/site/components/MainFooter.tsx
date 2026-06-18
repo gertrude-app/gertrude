@@ -19,6 +19,7 @@ const MainFooter: React.FC = () => (
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
             <FooterLink href="/">Home</FooterLink>
+            <FooterLink href="/pricing">Pricing</FooterLink>
             <FooterLink href="/contact">Contact</FooterLink>
             <FooterLink href="/blog">Blog</FooterLink>
           </ul>

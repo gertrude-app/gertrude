@@ -1,4 +1,5 @@
-import { RocketIcon, RouteIcon } from 'lucide-react';
+import { ArrowRightIcon, RocketIcon, RouteIcon } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 import FancyLink from './FancyLink';
 import { PARENTS_APP_URL } from '@/lib/urls';
@@ -34,6 +35,13 @@ const CTABlock: React.FC = () => (
           Step-by-step guide
         </FancyLink>
       </div>
+      <Link
+        href="/pricing"
+        className="group mt-10 inline-flex items-center gap-1.5 font-medium text-violet-200/80 hover:text-white transition-colors"
+      >
+        See all plans
+        <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
+      </Link>
     </div>
   </section>
 );
