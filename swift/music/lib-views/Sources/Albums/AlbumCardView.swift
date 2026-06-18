@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct AlbumCardView: View {
-  @Environment(\.colorScheme) var cs
+  @Environment(\.colorScheme) private var colorScheme
 
   private let album: AlbumData
   private let artworkSize: CGFloat
@@ -33,14 +33,14 @@ public struct AlbumCardView: View {
         VStack(alignment: .leading, spacing: 2) {
           Text(self.album.title)
             .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(Color(self.cs, light: .black, dark: .white))
+            .foregroundStyle(Color(self.colorScheme, light: .black, dark: .white))
             .lineLimit(2)
             .multilineTextAlignment(.leading)
 
           Text(self.album.artist)
             .font(.system(size: 12, weight: .medium))
             .foregroundStyle(Color(
-              self.cs,
+              self.colorScheme,
               light: .black.opacity(0.8),
               dark: .white.opacity(0.72),
             ))

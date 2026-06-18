@@ -1,16 +1,24 @@
 import SwiftUI
 
-struct MusicAppConnectionView: View {
-  enum State: Equatable {
+public struct MusicAppConnectionView: View {
+  public enum State: Equatable, Sendable {
     case checking
-    case unclaimed(code: Int, expiresAt: Date)
+    case unclaimed(code: Int)
     case failed
   }
 
-  let state: State
-  let onRetryTap: @MainActor @Sendable () -> Void
+  private let state: State
+  private let onRetryTap: @MainActor @Sendable () -> Void
 
-  var body: some View {
+  public init(
+    state: State,
+    onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
+  ) {
+    self.state = state
+    self.onRetryTap = onRetryTap
+  }
+
+  public var body: some View {
     NavigationStack {
       ScrollView {
         VStack(spacing: 20) {
@@ -25,6 +33,7 @@ struct MusicAppConnectionView: View {
       }
       .background(.background)
       .navigationTitle("Gertrude Music")
+      .navigationBarTitleDisplayMode(.inline)
     }
   }
 
@@ -61,7 +70,7 @@ struct MusicAppConnectionView: View {
       ProgressView()
         .padding(.top, 8)
 
-    case .unclaimed(let code, _):
+    case .unclaimed(let code):
       let displayUrl = Self.displayClaimUrl(code)
       let shareUrl = URL(string: Self.claimUrl(code))!
       VStack(spacing: 16) {
@@ -158,7 +167,7 @@ struct MusicAppConnectionView: View {
 
 #Preview("Claim code") {
   MusicAppConnectionView(
-    state: .unclaimed(code: 123_456, expiresAt: .now + 900),
+    state: .unclaimed(code: 123_456),
     onRetryTap: {},
   )
 }

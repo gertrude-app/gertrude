@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ArtworkImageView: View {
-  @Environment(\.colorScheme) var cs
+  @Environment(\.colorScheme) private var colorScheme
 
   let artworkUrl: URL?
   let showsArtwork: Bool
@@ -53,7 +53,7 @@ struct ArtworkImageView: View {
           RoundedRectangle(cornerRadius: self.strokeCornerRadius, style: .continuous)
             .stroke(
               Gradient(colors: [
-                Color(self.cs, light: .white.opacity(0.5), dark: .white.opacity(0.2)),
+                Color(self.colorScheme, light: .white.opacity(0.5), dark: .white.opacity(0.2)),
                 .clear,
                 .black.opacity(0.1),
               ]),
@@ -101,7 +101,7 @@ struct ArtworkImageView: View {
 
   private var placeholderColor: Color {
     Color(
-      self.cs,
+      self.colorScheme,
       light: Color(red: 0.90, green: 0.90, blue: 0.92),
       dark: Color(red: 0.14, green: 0.14, blue: 0.16),
     )
@@ -109,7 +109,7 @@ struct ArtworkImageView: View {
 
   private var hiddenArtworkForeground: Color {
     Color(
-      self.cs,
+      self.colorScheme,
       light: Color(red: 0.58, green: 0.58, blue: 0.62),
       dark: Color(red: 0.46, green: 0.46, blue: 0.50),
     )

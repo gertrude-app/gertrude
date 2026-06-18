@@ -9,7 +9,6 @@ struct AppFeature: Sendable {
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
     var connection = ConnectionStatus.checking
-    var searchText = ""
     var isNowPlayingPresented = false
 
     enum ConnectionStatus: Equatable {
@@ -27,7 +26,6 @@ struct AppFeature: Sendable {
     case musicAppStatusFailed(hasStoredConnection: Bool)
     case library(LibraryFeature.Action)
     case playback(PlaybackFeature.Action)
-    case searchTextChanged(String)
     case nowPlayingPresentationChanged(Bool)
   }
 
@@ -79,10 +77,6 @@ struct AppFeature: Sendable {
         if !hasStoredConnection {
           state.connection = .failed
         }
-        return .none
-
-      case .searchTextChanged(let searchText):
-        state.searchText = searchText
         return .none
 
       case .nowPlayingPresentationChanged(let isPresented):

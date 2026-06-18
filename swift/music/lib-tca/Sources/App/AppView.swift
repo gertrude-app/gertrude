@@ -44,9 +44,9 @@ struct AppView: View {
           state: .checking,
           onRetryTap: { self.store.send(.refreshConnectionTapped) },
         )
-      case .unclaimed(let code, let expiresAt):
+      case .unclaimed(let code, _):
         MusicAppConnectionView(
-          state: .unclaimed(code: code, expiresAt: expiresAt),
+          state: .unclaimed(code: code),
           onRetryTap: { self.store.send(.refreshConnectionTapped) },
         )
       case .failed:
@@ -57,33 +57,18 @@ struct AppView: View {
       }
     }
 
-    @ViewBuilder
     private var iOSLibraryContent: some View {
-      if #available(iOS 26.0, *) {
-        self.libraryView
-          .safeAreaInset(edge: .bottom, spacing: 0) {
-            self.nowPlayingBarInset(showsBackground: true)
-          }
-          .nowPlayingZoomPresentation(
-            isPresented: self.nowPlayingPresented,
-            panelSourceID: self.nowPlayingPanelTransitionID,
-            artworkID: self.nowPlayingArtworkTransitionID,
-          ) {
-            self.nowPlayingSheet
-          }
-      } else {
-        self.libraryView
-          .safeAreaInset(edge: .bottom, spacing: 0) {
-            self.nowPlayingBarInset(showsBackground: true)
-          }
-          .nowPlayingZoomPresentation(
-            isPresented: self.nowPlayingPresented,
-            panelSourceID: self.nowPlayingPanelTransitionID,
-            artworkID: self.nowPlayingArtworkTransitionID,
-          ) {
-            self.nowPlayingSheet
-          }
-      }
+      self.libraryView
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+          self.nowPlayingBarInset(showsBackground: true)
+        }
+        .nowPlayingZoomPresentation(
+          isPresented: self.nowPlayingPresented,
+          panelSourceID: self.nowPlayingPanelTransitionID,
+          artworkID: self.nowPlayingArtworkTransitionID,
+        ) {
+          self.nowPlayingSheet
+        }
     }
 
     private func nowPlayingBarInset(showsBackground: Bool) -> some View {
@@ -95,11 +80,13 @@ struct AppView: View {
 
     private func nowPlayingBar(showsBackground: Bool) -> some View {
       let session = self.store.playback.session
+      let artworkURL = session?.currentItem.allowsArtwork == true
+        ? session?.currentItem.artworkURL
+        : nil
       return NowPlayingBar(
         title: session?.currentItem.title ?? "Not Playing",
         artist: session?.currentItem.artistName ?? "Choose an approved track",
-        artworkURL: session?.currentItem.allowsArtwork == true ? session?.currentItem
-          .artworkURL : nil,
+        artworkURL: artworkURL,
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
@@ -186,9 +173,6 @@ struct AppView: View {
   #endif
 
   private var nowPlayingPresented: Binding<Bool> {
-    Binding(
-      get: { self.store.isNowPlayingPresented },
-      set: { self.store.send(.nowPlayingPresentationChanged($0)) },
-    )
+    self.$store.isNowPlayingPresented.sending(\.nowPlayingPresentationChanged)
   }
 }

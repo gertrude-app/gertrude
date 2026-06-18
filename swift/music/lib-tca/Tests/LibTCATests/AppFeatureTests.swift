@@ -8,17 +8,6 @@ import Testing
 @MainActor
 struct AppFeatureTests {
   @Test
-  func updatesSearchText() async {
-    let store = TestStore(initialState: .init()) {
-      AppFeature()
-    }
-
-    await store.send(.searchTextChanged("Väsen")) {
-      $0.searchText = "Väsen"
-    }
-  }
-
-  @Test
   func updatesNowPlayingPresentation() async {
     let store = TestStore(initialState: .init()) {
       AppFeature()
