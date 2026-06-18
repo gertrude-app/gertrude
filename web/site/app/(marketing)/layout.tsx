@@ -17,7 +17,7 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     path === `/mac` || path === `/download-mac-app` || path.startsWith(`/docs`);
   const badge = isMacPage ? `For Mac` : isIOSPage ? `For iOS` : undefined;
   const linkVariant = isMacPage || isIOSPage ? `flat` : `default`;
-  const overlay = isHomePage || isIOSPage;
+  const overlay = isHomePage || isIOSPage || path === `/pricing`;
   return (
     <html lang={lang}>
       <GoogleTagManager gtmId="GTM-KRRP8HFW" />

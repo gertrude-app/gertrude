@@ -88,7 +88,7 @@ const PricingPage: NextPage = () => (
     <div className="[background:radial-gradient(#c4b5fd55,transparent_70%)] w-176 h-176 absolute -right-72 -top-72 pointer-events-none" />
     <div className="[background:radial-gradient(#e879f944,transparent_70%)] w-176 h-176 absolute -left-80 top-96 pointer-events-none" />
 
-    <section className="relative px-5 xs:px-8 sm:px-12 md:px-20 pt-14 xs:pt-20 md:pt-28 pb-12 text-center">
+    <section className="relative px-5 xs:px-8 sm:px-12 md:px-20 pt-36 xs:pt-40 md:pt-48 pb-12 text-center">
       <div
         className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20 animate-fadeIn opacity-0"
         style={{ animationDelay: `100ms`, animationFillMode: `forwards` }}
