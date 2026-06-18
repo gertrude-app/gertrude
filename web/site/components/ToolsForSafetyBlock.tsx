@@ -115,6 +115,15 @@ const ToolsForSafetyBlock: React.FC = () => {
             href="#podcasts"
           />
         </div>
+
+        <p
+          className="mt-24 xs:mt-28 max-w-xl px-8 xs:px-10 sm:px-0 text-center text-slate-500 text-xs xs:text-sm md:text-base leading-snug antialiased animate-fadeIn opacity-0"
+          style={{ animationDelay: `1100ms`, animationFillMode: `forwards` }}
+        >
+          iPhone, iPad, and Mac all connect to{` `}
+          <span className="font-semibold text-fuchsia-600">one Gertrude account</span>
+          {` `}for your family.
+        </p>
       </div>
     </section>
   );
