@@ -9,22 +9,14 @@ import {
   SmartphoneIcon,
 } from 'lucide-react';
 import React from 'react';
-import type { Device, Person } from '#/lib/mock-data/people-and-devices';
+import type { Device, PersonWithDevices } from '#/lib/mock';
 import { personActivityHref } from '#/lib/activity-helpers';
 
 interface Props {
-  person: Person;
+  person: PersonWithDevices;
 }
 
-const getDeviceKey = (device: Device, index: number): string => {
-  if (device.type === `mac`) {
-    return `${device.type}-${device.name ?? ``}-${device.modelName}-${
-      device.macOSVersion
-    }-${index}`;
-  }
-
-  return `${device.type}-${device.modelName}-${device.iOSVersion}-${index}`;
-};
+const getDeviceKey = (device: Device): string => device.id;
 
 const PersonCard: React.FC<Props> = ({ person }) => (
   <div className="flex flex-col border border-stone-200 rounded-2xl shadow-md shadow-stone-300/30 bg-white">
@@ -39,8 +31,8 @@ const PersonCard: React.FC<Props> = ({ person }) => (
           <span className="text-stone-900 text-lg font-medium">{person.name}</span>
           {person.devices.length > 0 ? (
             <div className="flex flex-col gap-2">
-              {person.devices.map((d, index) => (
-                <DeviceRow key={getDeviceKey(d, index)} device={d} />
+              {person.devices.map((d) => (
+                <DeviceRow key={getDeviceKey(d)} device={d} />
               ))}
             </div>
           ) : (
@@ -50,6 +42,7 @@ const PersonCard: React.FC<Props> = ({ person }) => (
               description={`Add a device to get started protecting ${person.name}.`}
               button={{
                 text: `Add Device`,
+                type: `link`,
                 href: `/people`,
                 icon: PlusIcon,
                 variant: `primary`,
@@ -96,7 +89,12 @@ const PersonCard: React.FC<Props> = ({ person }) => (
       )}
       <div />
       <div className="flex items-center gap-2">
-        <Button type="link" href="/people" icon={SettingsIcon} variant="ghost">
+        <Button
+          type="link"
+          href={`/people/${person.id}`}
+          icon={SettingsIcon}
+          variant="ghost"
+        >
           Settings
         </Button>
         {person.devices.some((d) => d.type === `mac`) && (

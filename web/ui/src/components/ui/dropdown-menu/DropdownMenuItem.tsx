@@ -12,12 +12,14 @@ interface Props {
   active?: boolean;
   onSelect?: () => void;
   children?: React.ReactNode; // for sub-menus
+  destructive?: boolean;
 }
 
-const itemClasses = (active?: boolean): string =>
+const itemClasses = (active?: boolean, destructive?: boolean): string =>
   cx(
     `flex justify-between items-start cursor-pointer outline-none hover:bg-stone-100 data-[highlighted]:bg-stone-100 px-2 py-1.5 rounded-lg gap-3`,
     active && `bg-stone-100`,
+    destructive && `hover:!bg-red-100/50`,
   );
 
 const DropdownMenuItem: React.FC<Props> = ({
@@ -28,15 +30,29 @@ const DropdownMenuItem: React.FC<Props> = ({
   active,
   onSelect,
   children,
+  destructive,
 }) => {
   const overlayPortalContainer = useOverlayPortalContainer();
   const textContent = (
     <div className="flex min-w-0 flex-col">
-      <span className={cx(`truncate`, selected ? `text-violet-800` : `text-stone-800`)}>
+      <span
+        className={cx(
+          `truncate`,
+          selected ? `text-violet-800` : `text-stone-800`,
+          destructive && `!text-red-800`,
+        )}
+      >
         {title}
       </span>
       {description && (
-        <span className="-mt-0.25 text-xs leading-4 text-stone-500">{description}</span>
+        <span
+          className={cx(
+            `-mt-0.25 text-xs leading-4 text-stone-500`,
+            destructive && `!text-red-900/70`,
+          )}
+        >
+          {description}
+        </span>
       )}
     </div>
   );
@@ -48,6 +64,7 @@ const DropdownMenuItem: React.FC<Props> = ({
             className={cx(
               `mt-1.25 w-3.5 h-3.5 shrink-0`,
               selected ? `text-violet-800` : `text-stone-500`,
+              destructive && `!text-red-700`,
             )}
           />
         )}
@@ -67,7 +84,7 @@ const DropdownMenuItem: React.FC<Props> = ({
   if (children) {
     return (
       <Menu.SubmenuRoot>
-        <Menu.SubmenuTrigger className={itemClasses(active)}>
+        <Menu.SubmenuTrigger className={itemClasses(active, destructive)}>
           <div className="flex min-w-0 items-start gap-2">
             {Icon && (
               <Icon
@@ -93,7 +110,7 @@ const DropdownMenuItem: React.FC<Props> = ({
   }
 
   return (
-    <Menu.Item onClick={() => onSelect?.()} className={itemClasses(active)}>
+    <Menu.Item onClick={() => onSelect?.()} className={itemClasses(active, destructive)}>
       {content}
     </Menu.Item>
   );

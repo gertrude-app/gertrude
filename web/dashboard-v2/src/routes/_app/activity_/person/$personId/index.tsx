@@ -4,15 +4,12 @@ import React from 'react';
 import ActivityOverviewList from '#/components/ActivityOverviewList';
 import DashboardPage from '#/components/DashboardPage';
 import { personActivityDayHref } from '#/lib/activity-helpers';
-import { mockActivity } from '#/lib/mock-data/activity';
-import { getMockChildById } from '#/lib/mock-data/people-and-devices';
+import { getPersonActivityPage, useMockDataSelector } from '#/lib/mock';
 
 const PersonActivityPage: React.FC = () => {
   const { personId } = Route.useParams();
-  const person = getMockChildById(personId);
-  const personName = person?.name ?? `Child`;
-  const personActivity = mockActivity.filter(
-    (activity) => activity.personId === personId,
+  const { activities, personName } = useMockDataSelector((db) =>
+    getPersonActivityPage(db, personId),
   );
 
   return (
@@ -26,7 +23,7 @@ const PersonActivityPage: React.FC = () => {
       }
     >
       <ActivityOverviewList
-        activities={personActivity}
+        activities={activities}
         dayHref={(date) => personActivityDayHref(personId, date)}
         emptyText={`No activity to review for ${personName}.`}
       />

@@ -12,13 +12,11 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import React from 'react';
-import { mockSuspensionRequests } from '#/lib/mock-data/suspension-requests';
-import { mockUnlockRequests } from '#/lib/mock-data/unlock-requests';
-
-const requestCount = mockSuspensionRequests.length + mockUnlockRequests.length;
+import { getAppChrome, useMockDataSelector } from '#/lib/mock';
 
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
+  const { requestCount } = useMockDataSelector(getAppChrome);
   const isSelected = (href: string): boolean =>
     href === `/`
       ? pathname === href

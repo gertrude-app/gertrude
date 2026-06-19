@@ -3,13 +3,23 @@ import { FlagIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 
 interface Props {
+  id: string;
   text: string;
   applicationName: string;
   date: Date;
   flagged: boolean;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-const KeylogActivityItem: React.FC<Props> = ({ text, applicationName, flagged }) => (
+const KeylogActivityItem: React.FC<Props> = ({
+  id,
+  text,
+  applicationName,
+  flagged,
+  onToggleFlag,
+  onDelete,
+}) => (
   <div className="border border-stone-200 bg-white rounded-xl shadow shadow-stone-300/30 flex flex-col overflow-hidden">
     <p className="text-sm @lg/main:text-base font-mono text-stone-800 p-3 bg-stone-50 border-b border-stone-200 flex flex-col">
       {text.split(`\n`).map((line) => (
@@ -33,7 +43,7 @@ const KeylogActivityItem: React.FC<Props> = ({ text, applicationName, flagged })
         >
           <Button
             type="button"
-            onClick={() => {}}
+            onClick={() => onToggleFlag?.(id)}
             icon={FlagIcon}
             fillIcon={flagged}
             variant={flagged ? `selected` : `ghost`}
@@ -41,7 +51,7 @@ const KeylogActivityItem: React.FC<Props> = ({ text, applicationName, flagged })
             {flagged ? `Flagged` : `Flag`}
           </Button>
         </Tooltip>
-        <Button type="button" onClick={() => {}} icon={TrashIcon}>
+        <Button type="button" onClick={() => onDelete?.(id)} icon={TrashIcon}>
           Delete
         </Button>
       </div>

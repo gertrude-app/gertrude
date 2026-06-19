@@ -12,6 +12,7 @@ const RootComponent: React.FC = () => (
     <Sidebar logoUrl="/gertrude-ui-logo.svg" logoWidth={60}>
       <SidebarSection title="Components">
         <SidebarItem title="Badge" icon={DiamondIcon} href="/components/badge" />
+        <SidebarItem title="Banner" icon={DiamondIcon} href="/components/banner" />
         <SidebarItem title="Button" icon={DiamondIcon} href="/components/button" />
         <SidebarItem title="Checkbox" icon={DiamondIcon} href="/components/checkbox" />
         <SidebarItem
