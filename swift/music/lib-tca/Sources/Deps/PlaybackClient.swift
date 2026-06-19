@@ -8,6 +8,9 @@ import Foundation
 
 #if os(iOS)
   import AVFoundation
+#endif
+
+#if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
   import Darwin
 #endif
 
@@ -192,15 +195,17 @@ extension PlaybackClient {
 
       #if os(iOS)
         self.activateAudioSession()
-        let hidesArtwork = items.contains { !$0.allowsArtwork }
-        PlaybackNowPlayingContext.shared.set(items: items, hidesArtwork: hidesArtwork)
-        MediaRemotePrivateClient.shared.setCanBeNowPlayingApplication(true)
-        MediaRemotePrivateClient.shared.setNowPlayingApplicationOverrideEnabled(hidesArtwork)
-        if hidesArtwork {
-          await self.updateNowPlayingInfo(for: items[0], hidesArtwork: true)
-        } else {
-          MediaRemotePrivateClient.shared.clearNowPlayingInfo()
-        }
+        #if GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
+          let hidesArtwork = items.contains { !$0.allowsArtwork }
+          PlaybackNowPlayingContext.shared.set(items: items, hidesArtwork: hidesArtwork)
+          MediaRemotePrivateClient.shared.setCanBeNowPlayingApplication(true)
+          MediaRemotePrivateClient.shared.setNowPlayingApplicationOverrideEnabled(hidesArtwork)
+          if hidesArtwork {
+            await self.updateNowPlayingInfo(for: items[0], hidesArtwork: true)
+          } else {
+            MediaRemotePrivateClient.shared.clearNowPlayingInfo()
+          }
+        #endif
       #endif
       let player = ApplicationMusicPlayer.shared
       player.queue = ApplicationMusicPlayer.Queue(for: songs)
@@ -209,14 +214,14 @@ extension PlaybackClient {
       do {
         try await player.play()
       } catch {
-        #if os(iOS)
+        #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
           self.clearNowPlayingContext()
         #endif
         throw PlaybackClientError.playbackFailed
       }
 
-      #if os(iOS)
-        if hidesArtwork {
+      #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
+        if items.contains(where: { !$0.allowsArtwork }) {
           await self.refreshNowPlayingInfo(for: items[0], hidesArtwork: true)
         }
       #endif
@@ -240,7 +245,7 @@ extension PlaybackClient {
               if currentItemID != lastCurrentItemID {
                 lastCurrentItemID = currentItemID
                 continuation.yield(.currentItemChanged(currentItemID))
-                #if os(iOS)
+                #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
                   if PlaybackNowPlayingContext.shared.hidesArtwork,
                      let item = PlaybackNowPlayingContext.shared.item(for: currentItemID) {
                     await self.updateNowPlayingInfo(for: item, hidesArtwork: true)
@@ -355,7 +360,7 @@ extension PlaybackClient {
 
     @MainActor
     private static func stopPlayback() async {
-      #if os(iOS)
+      #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
         self.clearNowPlayingContext()
       #endif
       ApplicationMusicPlayer.shared.stop()
@@ -367,7 +372,9 @@ extension PlaybackClient {
         try? session.setCategory(.playback, mode: .default)
         try? session.setActive(true)
       }
+    #endif
 
+    #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
       @MainActor
       private static func clearNowPlayingContext() {
         PlaybackNowPlayingContext.shared.clear()
@@ -644,7 +651,7 @@ extension PlaybackClient {
   }
 #endif
 
-#if os(iOS)
+#if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
   private struct LoadedArtwork {
     let data: Data
     let mimeType: String

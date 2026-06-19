@@ -1,5 +1,5 @@
 import { ApiErrorMessage, EmptyState, Loading } from '@dash/components';
-import { Button, TextInput, Toggle } from '@shared/components';
+import { Button, TextInput } from '@shared/components';
 import React, { useState } from 'react';
 import type { GetApprovedMusicAlbums, SearchMusicCatalog } from '@dash/types';
 import Current from '../../environment';
@@ -51,19 +51,24 @@ const MusicCuration: React.FC<{
     { invalidating: [approvedAlbumsKey], toast: `remove:music-album` },
   );
 
-  const updateAlbumArtwork = useMutation(
-    (album: ApprovedAlbum) =>
-      Current.api.approveMusicAlbum({
-        childId,
-        appleMusicAlbumId: album.id,
-        title: album.title,
-        artistName: album.artistName,
-        artworkUrl: album.artworkUrl,
-        trackCount: album.trackCount,
-        showsArtwork: !album.showsArtwork,
-      }),
-    { invalidating: [approvedAlbumsKey], toast: `update:music-artwork` },
-  );
+  // TEMP(app-review): the "show album artwork" toggle drives the iOS app's lock-screen /
+  // control-center artwork suppression, which relies on the private MediaRemote framework
+  // (App Store 2.5.1 risk) and is compiled out for the TestFlight/review build. Hidden so
+  // reviewers don't see a non-functioning control. Re-enable alongside the
+  // GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE flag in swift/music/lib-tca after review.
+  // const updateAlbumArtwork = useMutation(
+  //   (album: ApprovedAlbum) =>
+  //     Current.api.approveMusicAlbum({
+  //       childId,
+  //       appleMusicAlbumId: album.id,
+  //       title: album.title,
+  //       artistName: album.artistName,
+  //       artworkUrl: album.artworkUrl,
+  //       trackCount: album.trackCount,
+  //       showsArtwork: !album.showsArtwork,
+  //     }),
+  //   { invalidating: [approvedAlbumsKey], toast: `update:music-artwork` },
+  // );
 
   const approvedAlbums = approvedAlbumsQuery.data?.albums ?? [];
   const approvedAlbumIds = new Set(approvedAlbums.map((album) => album.id));
@@ -151,12 +156,7 @@ const MusicCuration: React.FC<{
                 key={album.id}
                 album={album}
                 isRemoving={removeAlbum.isPending && removeAlbum.variables === album.id}
-                isUpdatingArtwork={
-                  updateAlbumArtwork.isPending &&
-                  updateAlbumArtwork.variables?.id === album.id
-                }
                 onRemove={() => removeAlbum.mutate(album.id)}
-                onToggleArtwork={() => updateAlbumArtwork.mutate(album)}
               />
             ))}
           </div>
@@ -205,10 +205,11 @@ const SearchResultAlbumCard: React.FC<{
 const ApprovedAlbumCard: React.FC<{
   album: ApprovedAlbum;
   isRemoving: boolean;
-  isUpdatingArtwork: boolean;
   onRemove(): void;
-  onToggleArtwork(): void;
-}> = ({ album, isRemoving, isUpdatingArtwork, onRemove, onToggleArtwork }) => (
+  // TEMP(app-review): re-enable with the artwork-suppression toggle, see above
+  // isUpdatingArtwork: boolean;
+  // onToggleArtwork(): void;
+}> = ({ album, isRemoving, onRemove }) => (
   <div className="min-w-0 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200">
     <div className="min-w-0 flex gap-4">
       <AlbumArtwork
@@ -218,6 +219,7 @@ const ApprovedAlbumCard: React.FC<{
       <AlbumInfo album={album} />
     </div>
     <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {/* TEMP(app-review): artwork-suppression toggle hidden, see updateAlbumArtwork above
       <label className="flex items-center gap-2 text-sm font-medium text-slate-600">
         <Toggle
           enabled={album.showsArtwork}
@@ -227,6 +229,7 @@ const ApprovedAlbumCard: React.FC<{
         />
         {isUpdatingArtwork ? `Updating artwork...` : `Show album artwork`}
       </label>
+      */}
       <Button
         type="button"
         color="warning"
