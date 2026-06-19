@@ -17,6 +17,7 @@ import type {
   PrepIOSAppConnection,
   RequestState,
 } from '@dash/types';
+import MacDeviceImage from '../Computers/MacDeviceImage';
 import { IOSConnectionCodeScreen, PlatformOption } from '../Dashboard/Dashboard';
 import EmptyState from '../EmptyState';
 import GradientIcon from '../GradientIcon';
@@ -304,8 +305,13 @@ const EditChild: React.FC<Props> = ({
                       <div key={computer.id} className="flex items-center mt-3">
                         <DeviceCard
                           to={`/devices/${computer.computerId}`}
-                          imageSrc={`/macs/${computer.modelIdentifier}.png`}
-                          imageAlt={computer.modelTitle}
+                          image={
+                            <MacDeviceImage
+                              modelTitle={computer.modelTitle}
+                              modelIdentifier={computer.modelIdentifier}
+                              className="max-w-[60%] max-h-[60%] grayscale-[50%]"
+                            />
+                          }
                           title={computer.customName || computer.modelTitle}
                           subtitle={computer.customName ? computer.modelTitle : undefined}
                           status={{ case: `computerStatus`, status: computer.status }}
