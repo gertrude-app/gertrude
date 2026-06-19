@@ -29,13 +29,13 @@ const HeroBlock: React.FC = () => (
       </FancyLink>
       <FancyLink
         type="link"
-        href="/blog/how-parents-can-block-images-gif-search-ios-18"
+        href="/blog/how-parents-can-block-images-gif-search-ios-18#step-by-step"
         size="lg"
         color="secondary"
         inverted
         variant="flat"
       >
-        Learn More
+        How to set it up
       </FancyLink>
     </div>
   </DeviceMockupBlock>

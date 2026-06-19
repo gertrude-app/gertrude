@@ -54,6 +54,31 @@
   }
 }
 
+@keyframes cent-waggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  12% {
+    transform: rotate(-16deg);
+  }
+  28% {
+    transform: rotate(13deg);
+  }
+  44% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(7deg);
+  }
+  76% {
+    transform: rotate(-4deg);
+  }
+  88% {
+    transform: rotate(2deg);
+  }
+}
+
 /* tighten up lists inside of markdown docs */
 .prose :where(ul > li):not(:where([class~='not-prose'] *)) {
   font-size: 95%;

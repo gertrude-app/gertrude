@@ -1,5 +1,6 @@
 import { Logo } from '@shared/components';
 import cx from 'classnames';
+import Link from 'next/link';
 import React from 'react';
 import FancyLink from './FancyLink';
 import MobileLoginDropdown from './MobileLoginDropdown';
@@ -33,7 +34,22 @@ const MainHeader: React.FC<{
     </a>
     <MobileLoginDropdown theme={theme} alwaysShow={!showAuthButtons} />
     {showAuthButtons && (
-      <div className={cx(`gap-4 transition-opacity duration-500 hidden sm:flex`)}>
+      <div
+        className={cx(
+          `gap-4 items-center transition-opacity duration-500 hidden sm:flex`,
+        )}
+      >
+        <Link
+          href="/pricing"
+          className={cx(
+            `mr-2 text-lg font-semibold transition-colors duration-200`,
+            theme === `violet`
+              ? `text-white hover:text-violet-200`
+              : `text-violet-600 hover:text-violet-800`,
+          )}
+        >
+          Pricing
+        </Link>
         <FancyLink
           type="link"
           href={PARENTS_APP_URL}

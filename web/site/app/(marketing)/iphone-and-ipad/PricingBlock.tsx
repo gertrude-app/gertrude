@@ -64,6 +64,16 @@ const PricingBlock: React.FC = () => (
       <p className="text-slate-500 text-sm mt-8 max-w-lg mx-auto">
         Works with iPhone and iPad running iOS 17+.
       </p>
+      <p className="text-slate-400 text-base mt-6 max-w-lg mx-auto">
+        Looking for Mac filtering or kid-safe podcasts?{` `}
+        <a
+          href="/pricing"
+          className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
+        >
+          See all plans
+        </a>
+        .
+      </p>
     </div>
   </section>
 );

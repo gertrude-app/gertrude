@@ -25,15 +25,18 @@ const MobileLoginDropdown: React.FC<{
     <DropdownMenu.Portal>
       <DropdownMenu.Content
         className={cx(
-          `rounded-xl p-1 mt-2 mr-8`,
-          theme === `white` ? `bg-violet-100/50` : `bg-white`,
+          `rounded-xl p-1 mt-2 mr-8 shadow-xl shadow-black/10 backdrop-blur-md`,
+          theme === `white` ? `bg-white/70 border border-violet-100` : `bg-white/70`,
         )}
       >
-        <div className="px-4 py-2 text-xs font-medium uppercase tracking-wider text-slate-400">
-          Mac App
-        </div>
-        <DropdownLink href={`${PARENTS_APP_URL}/signup?v=new_site`}>Sign up</DropdownLink>
         <DropdownLink href={PARENTS_APP_URL}>Log in</DropdownLink>
+        <DropdownLink href={`${PARENTS_APP_URL}/signup?v=new_site`}>Sign up</DropdownLink>
+        <DropdownMenu.Separator className="mx-2 my-1 h-px bg-violet-100" />
+        <DropdownLink href="/mac">Mac</DropdownLink>
+        <DropdownLink href="/iphone-and-ipad">iPhone &amp; iPad</DropdownLink>
+        <DropdownLink href="/#podcasts">Gertrude Podcasts</DropdownLink>
+        <DropdownLink href="/pricing">Pricing</DropdownLink>
+        <DropdownLink href="/docs/faqs">FAQ</DropdownLink>
       </DropdownMenu.Content>
     </DropdownMenu.Portal>
   </DropdownMenu.Root>
@@ -48,7 +51,7 @@ const DropdownLink: React.FC<{ href: string; children: React.ReactNode }> = ({
   <DropdownMenu.Item>
     <Link
       href={href}
-      className="block px-4 py-2 hover:bg-violet-100 hover:text-violet-600 rounded-lg font-medium text-slate-600 transition-[background-color,color,transform] duration-200 active:scale-95 active:bg-violet-200 active:text-violet-700"
+      className="block px-6 py-2 hover:bg-violet-100 hover:text-violet-600 rounded-lg font-medium text-slate-600 transition-[background-color,color,transform] duration-200 active:scale-95 active:bg-violet-200 active:text-violet-700"
     >
       {children}
     </Link>

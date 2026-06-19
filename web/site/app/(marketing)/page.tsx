@@ -1,3 +1,5 @@
+import { ArrowRightIcon } from 'lucide-react';
+import Link from 'next/link';
 import type { NextPage } from 'next';
 import GertrudeForIOS from '@/components/GertrudeForIOS';
 import GertrudeForMac from '@/components/GertrudeForMac';
@@ -21,6 +23,22 @@ const HomePage: NextPage = () => (
     <GertrudeForMac />
     <GertrudeForIOS />
     <PodcastsBlock />
+    <section className="relative overflow-hidden bg-violet-900 px-6 py-10 sm:py-12">
+      <div className="[background:radial-gradient(#e879f933,transparent_70%)] pointer-events-none absolute -right-32 -top-32 h-80 w-80" />
+      <div className="[background:radial-gradient(#a78bfa2e,transparent_70%)] pointer-events-none absolute -bottom-32 -left-32 h-80 w-80" />
+      <div className="relative mx-auto flex max-w-3xl flex-col items-center justify-center gap-x-6 gap-y-5 sm:flex-row">
+        <p className="text-white text-lg sm:text-xl font-semibold text-center sm:text-left">
+          One account, your whole family, every device.
+        </p>
+        <Link
+          href="/pricing"
+          className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 py-3 font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition-transform hover:scale-105 whitespace-nowrap"
+        >
+          See all plans
+          <ArrowRightIcon className="size-5 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+    </section>
     <HiImJared />
   </main>
 );

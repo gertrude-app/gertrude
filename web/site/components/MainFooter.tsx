@@ -12,27 +12,35 @@ const MainFooter: React.FC = () => (
           <Logo type="inverted" />
         </a>
       </div>
-      <div className="flex gap-12 sm:gap-16 mt-12 sm:mt-0 self-center sm:self-start">
+      <div className="flex gap-8 sm:gap-16 mt-12 sm:mt-0 self-center sm:self-start">
         <div className="flex flex-col items-center sm:items-start gap-2">
           <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
             General
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
             <FooterLink href="/">Home</FooterLink>
+            <FooterLink href="/pricing">Pricing</FooterLink>
             <FooterLink href="/contact">Contact</FooterLink>
             <FooterLink href="/blog">Blog</FooterLink>
-            <FooterLink href="/iphone-and-ipad">iOS</FooterLink>
           </ul>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-2">
           <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
-            Mac App
+            Apps
+          </h4>
+          <ul className="flex flex-col items-center sm:items-start gap-1">
+            <FooterLink href="/mac">Mac</FooterLink>
+            <FooterLink href="/iphone-and-ipad">iPhone &amp; iPad</FooterLink>
+            <FooterLink href="/#podcasts">Gertrude AM</FooterLink>
+          </ul>
+        </div>
+        <div className="flex flex-col items-center sm:items-start gap-2">
+          <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
+            Account
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
             <FooterLink href={`${PARENTS_APP_URL}/signup?v=new_site`}>Sign up</FooterLink>
             <FooterLink href={PARENTS_APP_URL}>Log in</FooterLink>
-            <FooterLink href="/download-mac-app">Download</FooterLink>
-            <FooterLink href="/docs/getting-started">Docs</FooterLink>
           </ul>
         </div>
       </div>
