@@ -5,9 +5,10 @@ interface Props {
   checked: boolean;
   setChecked: (checked: boolean) => void;
   disabled?: boolean;
+  small?: boolean;
 }
 
-const Toggle: React.FC<Props> = ({ checked, setChecked, disabled }) => (
+const Toggle: React.FC<Props> = ({ checked, setChecked, disabled, small }) => (
   <button
     type="button"
     role="switch"
@@ -15,7 +16,8 @@ const Toggle: React.FC<Props> = ({ checked, setChecked, disabled }) => (
     disabled={disabled}
     onClick={() => setChecked(!checked)}
     className={cx(
-      `rounded-full w-12 h-5.5 relative cursor-pointer overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-violet-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50`,
+      `rounded-full relative cursor-pointer overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-violet-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 shrink-0`,
+      small ? `w-8 h-4` : `w-12 h-5.5`,
       disabled && `!cursor-not-allowed opacity-50`,
     )}
   >
@@ -31,8 +33,13 @@ const Toggle: React.FC<Props> = ({ checked, setChecked, disabled }) => (
     </span>
     <span
       className={cx(
-        `absolute h-3.5 w-6 bg-white rounded-full top-1 left-1 shadow-sm transition-[translate,box-shadow] duration-150`,
-        checked ? `translate-x-4 shadow-violet-700` : `shadow-stone-300`,
+        `absolute bg-white rounded-full shadow-sm transition-[translate,box-shadow] duration-150`,
+        small ? `h-2.75 w-4 top-[2.5px] left-[3px]` : `h-3.5 w-6 top-1 left-1`,
+        checked
+          ? small
+            ? `translate-x-[10px] shadow-violet-700`
+            : `translate-x-4 shadow-violet-700`
+          : `shadow-stone-300`,
       )}
     />
   </button>

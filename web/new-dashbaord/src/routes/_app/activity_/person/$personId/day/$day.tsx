@@ -4,20 +4,14 @@ import React from 'react';
 import ActivityFeed from '#/components/ActivityFeed';
 import DashboardPage from '#/components/DashboardPage';
 import { dateFromDayParam, personActivityHref } from '#/lib/activity-helpers';
-import { mockActivity } from '#/lib/mock-data/activity';
-import { getMockChildById } from '#/lib/mock-data/people-and-devices';
+import { getPersonActivityDayPage, useMockData } from '#/lib/mock';
 import { formatDate } from '#/lib/utils';
 
 const PersonActivityDayRoute: React.FC = () => {
   const { personId, day } = Route.useParams();
-  const person = getMockChildById(personId);
-  const personName = person?.name ?? `Child`;
+  const { db, dispatch } = useMockData();
   const dayDate = dateFromDayParam(day);
-  const personDayItems = mockActivity.filter(
-    (activity) =>
-      activity.personId === personId &&
-      activity.date.toDateString() === dayDate.toDateString(),
-  );
+  const { items, personName } = getPersonActivityDayPage(db, personId, dayDate);
 
   return (
     <DashboardPage
@@ -32,9 +26,14 @@ const PersonActivityDayRoute: React.FC = () => {
       }
     >
       <ActivityFeed
-        items={personDayItems}
+        items={items}
         personName={personName}
         showPersonHeading={false}
+        onToggleFlag={(id) => dispatch({ type: `activity.toggleFlag`, id })}
+        onDelete={(id) => dispatch({ type: `activity.delete`, id })}
+        onDeletePersonActivity={(deletePersonId) =>
+          dispatch({ type: `activity.deleteForPerson`, personId: deletePersonId })
+        }
       />
     </DashboardPage>
   );

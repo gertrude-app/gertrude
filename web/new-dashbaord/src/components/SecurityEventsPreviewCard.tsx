@@ -2,21 +2,12 @@ import { Badge } from '@gertrude/ui';
 import cx from 'clsx';
 import { ArrowRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import type { SecurityEvent } from '#/lib/mock-data/security';
+import type { SecurityEvent } from '#/lib/mock';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {
   allSecurityEvents: Array<SecurityEvent>;
 }
-
-const getSecurityEventKey = (event: SecurityEvent): string => {
-  const source =
-    event.type === `mac-app`
-      ? `${event.personName}-${event.deviceName}`
-      : event.ipAddress;
-
-  return `${event.type}-${event.title}-${event.time}-${event.date}-${source}`;
-};
 
 const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => (
   <RightColumnCard
@@ -33,7 +24,7 @@ const SecurityEventsPreviewCard: React.FC<Props> = ({ allSecurityEvents }) => (
   >
     <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
       {allSecurityEvents.slice(0, 4).map((e) => (
-        <SecurityEventRow key={getSecurityEventKey(e)} securityEvent={e} />
+        <SecurityEventRow key={e.id} securityEvent={e} />
       ))}
     </div>
   </RightColumnCard>

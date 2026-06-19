@@ -26,6 +26,7 @@ import { Route as ComponentsDateTimePickerRouteImport } from './routes/component
 import { Route as ComponentsConfirmationDialogRouteImport } from './routes/components/confirmation-dialog'
 import { Route as ComponentsCheckboxRouteImport } from './routes/components/checkbox'
 import { Route as ComponentsButtonRouteImport } from './routes/components/button'
+import { Route as ComponentsBannerRouteImport } from './routes/components/banner'
 import { Route as ComponentsBadgeRouteImport } from './routes/components/badge'
 
 const IndexRoute = IndexRouteImport.update({
@@ -115,6 +116,11 @@ const ComponentsButtonRoute = ComponentsButtonRouteImport.update({
   path: '/components/button',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComponentsBannerRoute = ComponentsBannerRouteImport.update({
+  id: '/components/banner',
+  path: '/components/banner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentsBadgeRoute = ComponentsBadgeRouteImport.update({
   id: '/components/badge',
   path: '/components/badge',
@@ -124,6 +130,7 @@ const ComponentsBadgeRoute = ComponentsBadgeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
+  '/components/banner': typeof ComponentsBannerRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
+  '/components/banner': typeof ComponentsBannerRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/components/badge': typeof ComponentsBadgeRoute
+  '/components/banner': typeof ComponentsBannerRoute
   '/components/button': typeof ComponentsButtonRoute
   '/components/checkbox': typeof ComponentsCheckboxRoute
   '/components/confirmation-dialog': typeof ComponentsConfirmationDialogRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/components/badge'
+    | '/components/banner'
     | '/components/button'
     | '/components/checkbox'
     | '/components/confirmation-dialog'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/components/badge'
+    | '/components/banner'
     | '/components/button'
     | '/components/checkbox'
     | '/components/confirmation-dialog'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/components/badge'
+    | '/components/banner'
     | '/components/button'
     | '/components/checkbox'
     | '/components/confirmation-dialog'
@@ -248,6 +260,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentsBadgeRoute: typeof ComponentsBadgeRoute
+  ComponentsBannerRoute: typeof ComponentsBannerRoute
   ComponentsButtonRoute: typeof ComponentsButtonRoute
   ComponentsCheckboxRoute: typeof ComponentsCheckboxRoute
   ComponentsConfirmationDialogRoute: typeof ComponentsConfirmationDialogRoute
@@ -387,6 +400,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComponentsButtonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/components/banner': {
+      id: '/components/banner'
+      path: '/components/banner'
+      fullPath: '/components/banner'
+      preLoaderRoute: typeof ComponentsBannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/components/badge': {
       id: '/components/badge'
       path: '/components/badge'
@@ -400,6 +420,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentsBadgeRoute: ComponentsBadgeRoute,
+  ComponentsBannerRoute: ComponentsBannerRoute,
   ComponentsButtonRoute: ComponentsButtonRoute,
   ComponentsCheckboxRoute: ComponentsCheckboxRoute,
   ComponentsConfirmationDialogRoute: ComponentsConfirmationDialogRoute,

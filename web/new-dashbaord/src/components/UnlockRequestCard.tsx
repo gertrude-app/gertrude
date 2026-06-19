@@ -1,13 +1,15 @@
 import { Button, Modal, SlideOver, Textarea } from '@gertrude/ui';
 import React, { useState } from 'react';
-import type { UnlockRequest } from '#/lib/mock-data/unlock-requests';
+import type { UnlockRequest } from '#/lib/mock';
 import UnlockRequstResponsePanel from './UnlockRequestResponsePanel';
 
 interface Props {
   request: UnlockRequest;
+  onDeny: (id: string) => void;
+  onAllow: (id: string) => void;
 }
 
-const UnlockRequestCard: React.FC<Props> = ({ request }) => {
+const UnlockRequestCard: React.FC<Props> = ({ request, onDeny, onAllow }) => {
   const [denyModalOpen, setDenyModalOpen] = useState(false);
   const [denyReason, setDenyReason] = useState(``);
 
@@ -17,6 +19,11 @@ const UnlockRequestCard: React.FC<Props> = ({ request }) => {
     if (!open) {
       setDenyReason(``);
     }
+  };
+
+  const handleDenyRequest = (): void => {
+    handleDenyModalOpenChange(false);
+    onDeny(request.id);
   };
 
   return (
@@ -75,11 +82,7 @@ const UnlockRequestCard: React.FC<Props> = ({ request }) => {
             >
               Cancel
             </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => handleDenyModalOpenChange(false)}
-            >
+            <Button type="button" variant="destructive" onClick={handleDenyRequest}>
               Deny request
             </Button>
           </>
@@ -98,11 +101,14 @@ const UnlockRequestCard: React.FC<Props> = ({ request }) => {
         path={`/requests/unlock/${request.id}`}
         closeTo="/requests/unlock"
         ariaLabel={`Review ${request.personName}'s unlock request`}
+        heading={`Create keys for ${request.personName}`}
+        subheading="We pre-filled some sensible defaults for you, but make sure to check that everything looks good before saving!"
         size="large"
       >
         <UnlockRequstResponsePanel
           domains={request.domains}
-          personName={request.personName}
+          onDenyAll={() => onDeny(request.id)}
+          onSave={() => onAllow(request.id)}
         />
       </SlideOver>
     </div>

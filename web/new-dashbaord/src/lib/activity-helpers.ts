@@ -1,4 +1,4 @@
-import type { ActivityItem } from '#/lib/mock-data/activity';
+import type { ActivityItem } from '#/lib/mock';
 
 export type ActivityChunk =
   | {

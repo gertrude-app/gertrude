@@ -1,22 +1,11 @@
-export type ActivityItem = {
-  id: string;
-  personId: string;
-  personName: string;
-  duringSuspension: boolean;
-  date: Date;
-  flagged: boolean;
-  deleted: boolean;
-} & (
-  | { type: `screenshot`; url: string }
-  | { type: `keylog`; text: string; applicationName: string }
-);
+import type { ActivityRecord } from './types';
 
-const people = {
-  jimmy: { personId: `jimmy`, personName: `Jimmy` },
-  sally: { personId: `sally`, personName: `Sally` },
-  franny: { personId: `franny`, personName: `Franny` },
-  theo: { personId: `theo`, personName: `Theo` },
-  maggie: { personId: `maggie`, personName: `Maggie` },
+const personIds = {
+  jimmy: `jimmy`,
+  sally: `sally`,
+  franny: `franny`,
+  theo: `theo`,
+  maggie: `maggie`,
 } as const;
 
 const screenshotUrls = {
@@ -26,7 +15,7 @@ const screenshotUrls = {
   google: `/example-screenshots/google.png`,
 } as const;
 
-type PersonKey = keyof typeof people;
+type PersonKey = keyof typeof personIds;
 
 const flaggedActivityIds = new Set([
   `activity-002`,
@@ -71,10 +60,10 @@ function screenshotActivity(
   duringSuspension = false,
   flagged = false,
   deleted = false,
-): ActivityItem {
+): ActivityRecord {
   return {
     id,
-    ...people[personKey],
+    personId: personIds[personKey],
     duringSuspension,
     flagged: flagged || flaggedActivityIds.has(id),
     deleted: deleted || deletedActivityIds.has(id),
@@ -93,10 +82,10 @@ function keylogActivity(
   duringSuspension = false,
   flagged = false,
   deleted = false,
-): ActivityItem {
+): ActivityRecord {
   return {
     id,
-    ...people[personKey],
+    personId: personIds[personKey],
     duringSuspension,
     flagged: flagged || flaggedActivityIds.has(id),
     deleted: deleted || deletedActivityIds.has(id),
@@ -111,7 +100,7 @@ function multiline(...lines: string[]): string {
   return lines.join(`\n`);
 }
 
-export const mockActivity: ActivityItem[] = [
+export const activityItems: ActivityRecord[] = [
   keylogActivity(
     `activity-001`,
     `sally`,
