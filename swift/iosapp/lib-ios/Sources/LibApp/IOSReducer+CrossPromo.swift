@@ -5,18 +5,6 @@ import GertieTcaFeatures
 import IOSRoute
 
 extension IOSReducer {
-  enum CrossPromoTrigger {
-    case postOnboarding
-    case home
-
-    var placement: String {
-      switch self {
-      case .postOnboarding: "iosBlockerPostOnboarding"
-      case .home: "iosBlockerHome"
-      }
-    }
-  }
-
   enum CrossPromoEvent: String {
     case impression
     case cta
@@ -31,28 +19,58 @@ extension IOSReducer {
     }
   }
 
+  static let onboardingCrossPromoPlacement = "iosBlockerOnboarding"
+  static let homeCrossPromoPlacement = "iosBlockerHome"
   static let crossPromoThrottle: TimeInterval = 60 * 60 * 72
 
-  func presentCrossPromos(_ state: inout State) -> EffectOf<IOSReducer> {
-    guard state.screen.isRunning else { return .none }
+  func presentOnboardingCrossPromo(_ state: inout State) -> EffectOf<IOSReducer> {
+    let placement = Self.onboardingCrossPromoPlacement
+    guard state.crossPromos.promos
+      .contains(where: { $0.placement == placement && $0.hasDismissCta })
+    else {
+      state.screen = .onboarding(.happyPath(.doneQuit))
+      return .none
+    }
+    let dismissed = Set(self.deps.sharedStorage.loadDismissedCrossPromoIds() ?? [])
+    guard let campaign = state.crossPromos.promos
+      .filter(\.hasDismissCta)
+      .firstEligible(at: placement, excluding: dismissed)
+    else {
+      state.screen = .onboarding(.happyPath(.doneQuit))
+      return .none
+    }
+    let now = self.deps.now
+    state.onboarding.crossPromo = .init(campaign: campaign)
     return .merge(
-      self.presentCrossPromo(&state, for: .postOnboarding),
-      self.presentCrossPromo(&state, for: .home),
+      .run { [deps = self.deps] _ in deps.sharedStorage.saveCrossPromoLastShownAt(now) },
+      self.logCrossPromoEvent(.impression, campaign),
     )
   }
 
-  func presentCrossPromo(
+  func closeOnboardingCrossPromo(
     _ state: inout State,
-    for trigger: CrossPromoTrigger,
+    event: CrossPromoEvent,
+    ctaSlot: CrossPromoFeature.CtaSlot?,
   ) -> EffectOf<IOSReducer> {
-    guard state.destination == nil else { return .none }
-    let candidates = state.crossPromos.promos.filter { $0.placement == trigger.placement }
-    guard !candidates.isEmpty else { return .none }
-    let dismissed = Set(self.deps.sharedStorage.loadDismissedCrossPromoIds() ?? [])
-    guard let campaign = candidates.first(where: { !dismissed.contains($0.campaignId) })
+    let campaign = state.onboarding.crossPromo?.campaign
+    state.onboarding.crossPromo = nil
+    state.screen = .onboarding(.happyPath(.doneQuit))
+    guard let campaign else { return .none }
+    return .merge(
+      self.logCrossPromoEvent(event, campaign, extra: self.eventExtra(campaign, ctaSlot)),
+      self.burnCrossPromo(campaign),
+    )
+  }
+
+  func presentHomeCrossPromo(_ state: inout State) -> EffectOf<IOSReducer> {
+    guard state.screen.isRunning, state.destination == nil else { return .none }
+    let placement = Self.homeCrossPromoPlacement
+    guard state.crossPromos.promos.contains(where: { $0.placement == placement })
     else { return .none }
-    if trigger == .home,
-       let last = self.deps.sharedStorage.loadCrossPromoLastShownAt(),
+    let dismissed = Set(self.deps.sharedStorage.loadDismissedCrossPromoIds() ?? [])
+    guard let campaign = state.crossPromos.promos.firstEligible(at: placement, excluding: dismissed)
+    else { return .none }
+    if let last = self.deps.sharedStorage.loadCrossPromoLastShownAt(),
        self.deps.now.timeIntervalSince(last) < Self.crossPromoThrottle {
       return .none
     }
@@ -72,19 +90,29 @@ extension IOSReducer {
     guard let promo = state.destination?.crossPromo else { return .none }
     let campaign = promo.campaign
     state.destination = nil
-    let extra = ctaSlot.map { slot in
+    return .merge(
+      self.logCrossPromoEvent(event, campaign, extra: self.eventExtra(campaign, ctaSlot)),
+      self.burnCrossPromo(campaign),
+    )
+  }
+
+  func burnCrossPromo(_ campaign: CrossPromoCampaign) -> EffectOf<IOSReducer> {
+    .run { [deps = self.deps] _ in
+      var dismissed = deps.sharedStorage.loadDismissedCrossPromoIds() ?? []
+      if !dismissed.contains(campaign.campaignId) {
+        dismissed.append(campaign.campaignId)
+      }
+      deps.sharedStorage.saveDismissedCrossPromoIds(dismissed)
+    }
+  }
+
+  func eventExtra(
+    _ campaign: CrossPromoCampaign,
+    _ ctaSlot: CrossPromoFeature.CtaSlot?,
+  ) -> String? {
+    ctaSlot.map { slot in
       "slot=\(slot.rawValue) action=\(campaign.action(for: slot)?.analyticsLabel ?? "-")"
     }
-    return .merge(
-      self.logCrossPromoEvent(event, campaign, extra: extra),
-      .run { [deps = self.deps] _ in
-        var dismissed = deps.sharedStorage.loadDismissedCrossPromoIds() ?? []
-        if !dismissed.contains(campaign.campaignId) {
-          dismissed.append(campaign.campaignId)
-        }
-        deps.sharedStorage.saveDismissedCrossPromoIds(dismissed)
-      },
-    )
   }
 
   func logUnpresentableCrossPromos(_ campaigns: [CrossPromoCampaign]) -> EffectOf<IOSReducer> {

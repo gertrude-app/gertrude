@@ -30,6 +30,11 @@ public struct AppView: View {
           clearedBtnLabel: "Next",
         )
         .onAppear { clearCacheStore.send(.onAppear) }
+      } else if let crossPromoStore = self.store.scope(
+        state: \.onboarding.crossPromo,
+        action: \.interactive.onboardingCrossPromo,
+      ) {
+        CrossPromoView(store: crossPromoStore)
       } else {
         switch self.store.screen {
         case .launching: EmptyView()

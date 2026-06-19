@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieTcaFeatures
 import IOSRoute
 import LibClients
 
@@ -19,6 +20,7 @@ public extension IOSReducer {
       }
 
       case onboardingClearCache(ClearCacheFeature.Action)
+      case onboardingCrossPromo(CrossPromoFeature.Action)
       case onboardingBtnTapped(OnboardingBtn, String)
       case blockGroupToggled(UUID)
       case sheetDismissed

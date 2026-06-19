@@ -42,6 +42,7 @@ extension IOSReducer {
       public var deviceSupervised: Bool = false
       public var isProfileRecovery: Bool = false
       public var clearCache: ClearCacheFeature.State?
+      public var crossPromo: CrossPromoFeature.State?
       public var connectFeature = ConnectAccountFeatureFlag.Output(isEnabled: false)
 
       public init(

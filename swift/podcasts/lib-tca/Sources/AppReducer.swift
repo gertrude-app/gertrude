@@ -225,10 +225,11 @@ struct AppReducer: Sendable {
           case .some(.podcasts(let podcasts)) = state.mode,
           podcasts.destination == nil
     else { return .none }
-    let candidates = state.crossPromos.promos.filter { $0.placement == trigger.placement }
     let dismissed = self.database.dismissedCrossPromoIds()
-    guard let campaign = candidates.first(where: { !dismissed.contains($0.campaignId) })
-    else { return .none }
+    guard let campaign = state.crossPromos.promos.firstEligible(
+      at: trigger.placement,
+      excluding: dismissed,
+    ) else { return .none }
     let now = self.date.now
     switch trigger {
     case .postOnboarding:

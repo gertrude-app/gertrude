@@ -53,6 +53,9 @@ public struct IOSReducer {
     .ifLet(\.onboarding.clearCache, action: \.interactive.onboardingClearCache) {
       ClearCacheFeature()
     }
+    .ifLet(\.onboarding.crossPromo, action: \.interactive.onboardingCrossPromo) {
+      CrossPromoFeature()
+    }
   }
 
   func interactive(state: inout State, action: Action.Interactive) -> EffectOf<IOSReducer> {
@@ -103,6 +106,15 @@ public struct IOSReducer {
       }
 
     case .onboardingClearCache:
+      return .none
+
+    case .onboardingCrossPromo(.delegate(.ctaTapped(let slot))):
+      return self.closeOnboardingCrossPromo(&state, event: .cta, ctaSlot: slot)
+
+    case .onboardingCrossPromo(.delegate(.dismissed)):
+      return self.closeOnboardingCrossPromo(&state, event: .dismiss, ctaSlot: nil)
+
+    case .onboardingCrossPromo:
       return .none
 
     case .receivedShake:
@@ -288,22 +300,21 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.requestAppStoreRating)), .primary):
       self.deps.log(state.screen, action, "4fc0b1bf")
-      state.screen = .onboarding(.happyPath(.doneQuit))
-      return .run { [deps = self.deps] _ in
-        await deps.appStore.requestRating()
-      }
+      return .merge(
+        .run { [deps = self.deps] _ in await deps.appStore.requestRating() },
+        self.presentOnboardingCrossPromo(&state),
+      )
 
     case (.onboarding(.happyPath(.requestAppStoreRating)), .secondary):
       self.deps.log(state.screen, action, "a9480aa2")
-      state.screen = .onboarding(.happyPath(.doneQuit))
-      return .run { [deps = self.deps] _ in
-        await deps.appStore.requestReview()
-      }
+      return .merge(
+        .run { [deps = self.deps] _ in await deps.appStore.requestReview() },
+        self.presentOnboardingCrossPromo(&state),
+      )
 
     case (.onboarding(.happyPath(.requestAppStoreRating)), .tertiary):
       self.deps.log(state.screen, action, "0dddc87c")
-      state.screen = .onboarding(.happyPath(.doneQuit))
-      return .none
+      return self.presentOnboardingCrossPromo(&state)
 
       // MARK: - apple family
 
@@ -866,7 +877,7 @@ public struct IOSReducer {
       state.crossPromos = .init(promos: output.promos.filter(\.hasGuaranteedExit))
       return .merge(
         self.logUnpresentableCrossPromos(dropped),
-        self.presentCrossPromos(&state),
+        self.presentHomeCrossPromo(&state),
       )
 
     case .appWillTerminate:
@@ -879,7 +890,7 @@ public struct IOSReducer {
     case .setScreen(let screen):
       state.screen = screen
       if screen.isRunning {
-        return self.presentCrossPromos(&state)
+        return self.presentHomeCrossPromo(&state)
       }
       return .none
 
@@ -992,7 +1003,7 @@ public struct IOSReducer {
       return .none
 
     case .appDidEnterForeground:
-      return self.presentCrossPromos(&state)
+      return self.presentHomeCrossPromo(&state)
 
     case .appDidEnterBackground:
       return .none
