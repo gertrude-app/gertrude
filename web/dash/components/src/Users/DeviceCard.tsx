@@ -8,18 +8,23 @@ export type DeviceCardStatus =
   | { case: `computerStatus`; status: ChildComputerStatus }
   | { case: `pendingSetup` };
 
-type Props = {
+type BaseProps = {
   to: string;
-  imageSrc: string;
-  imageAlt: string;
   title: string;
   subtitle?: string;
   status?: DeviceCardStatus;
   className?: string;
 };
 
+type Props = BaseProps &
+  (
+    | { image: React.ReactNode; imageSrc?: never; imageAlt?: never }
+    | { image?: never; imageSrc: string; imageAlt: string }
+  );
+
 const DeviceCard: React.FC<Props> = ({
   to,
+  image,
   imageSrc,
   imageAlt,
   title,
@@ -36,11 +41,13 @@ const DeviceCard: React.FC<Props> = ({
   >
     <div className="flex items-center gap-3 xs:gap-4 sm:gap-6">
       <div className="rounded-full bg-slate-100 w-8 xs:w-14 h-8 xs:h-14 shrink-0 flex justify-center items-center">
-        <img
-          src={imageSrc}
-          alt={imageAlt}
-          className="max-w-[60%] max-h-[60%] grayscale-[50%]"
-        />
+        {image ?? (
+          <img
+            src={imageSrc}
+            alt={imageAlt ?? ``}
+            className="max-w-[60%] max-h-[60%] grayscale-[50%]"
+          />
+        )}
       </div>
       <div>
         <h3 className="text-slate-900 xs:text-lg font-bold line-clamp-1 -mb-0.5 xs:mb-0">

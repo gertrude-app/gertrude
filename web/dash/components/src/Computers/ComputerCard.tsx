@@ -2,6 +2,7 @@ import { Button } from '@shared/components';
 import React from 'react';
 import type { ChildComputerStatus } from '@dash/types';
 import UserStatus from '../UserStatus';
+import MacDeviceImage from './MacDeviceImage';
 
 interface Props {
   name?: string;
@@ -33,9 +34,9 @@ const ComputerCard: React.FC<Props> = ({
         {name && <h3 className="text-sm text-slate-500">{modelTitle}</h3>}
       </div>
       <div className="w-20 h-20 flex justify-center items-center shrink-0">
-        <img
-          alt={modelTitle}
-          src={`/macs/${modelIdentifier}.png`}
+        <MacDeviceImage
+          modelTitle={modelTitle}
+          modelIdentifier={modelIdentifier}
           className="max-h-full max-w-full"
         />
       </div>
