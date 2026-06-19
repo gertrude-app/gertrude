@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import GertieTcaFeatures
 import LibCore
 import PairQL
 import PodcastRoute
@@ -42,12 +43,12 @@ struct AppReducer: Sendable {
     case postOnboarding
     case childHome
 
-    var placement: CrossPromoPlacement {
+    var placement: String {
       switch self {
       case .postOnboarding:
-        .amOnboardingParent
+        "amOnboardingParent"
       case .childHome:
-        .amChildHome
+        "amChildHome"
       }
     }
   }
@@ -126,8 +127,8 @@ struct AppReducer: Sendable {
           },
         )
       case .receivedCrossPromos(let crossPromos):
-        let dropped = crossPromos.promos.filter { !self.hasGuaranteedExit($0) }
-        state.crossPromos = .init(promos: crossPromos.promos.filter(self.hasGuaranteedExit))
+        let dropped = crossPromos.promos.filter { !$0.hasGuaranteedExit }
+        state.crossPromos = .init(promos: crossPromos.promos.filter(\.hasGuaranteedExit))
         return .merge(
           self.logUnpresentable(dropped),
           self.presentCrossPromo(&state, for: .childHome),
@@ -224,10 +225,11 @@ struct AppReducer: Sendable {
           case .some(.podcasts(let podcasts)) = state.mode,
           podcasts.destination == nil
     else { return .none }
-    let candidates = state.crossPromos.promos.filter { $0.placement == trigger.placement }
     let dismissed = self.database.dismissedCrossPromoIds()
-    guard let campaign = candidates.first(where: { !dismissed.contains($0.campaignId) })
-    else { return .none }
+    guard let campaign = state.crossPromos.promos.firstEligible(
+      at: trigger.placement,
+      excluding: dismissed,
+    ) else { return .none }
     let now = self.date.now
     switch trigger {
     case .postOnboarding:
@@ -249,20 +251,13 @@ struct AppReducer: Sendable {
     }
   }
 
-  func hasGuaranteedExit(_ campaign: CrossPromoCampaign) -> Bool {
-    if campaign.style == .sheet, campaign.dismissable { return true }
-    let ctas = [campaign.primaryCta] + [campaign.secondaryCta, campaign.tertiaryCta]
-      .compactMap(\.self)
-    return ctas.contains { if case .dismiss = $0.action { true } else { false } }
-  }
-
   func logUnpresentable(_ campaigns: [CrossPromoCampaign]) -> EffectOf<Self> {
     .merge(campaigns.map { campaign in
       .run { _ in
         await log(
           .unexpected("b9e1a7c4"),
           "cross promo dropped: no guaranteed exit",
-          detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement.rawValue)",
+          detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement)",
         ).value
       }
     })
@@ -280,7 +275,7 @@ struct AppReducer: Sendable {
     state.crossPromo = nil
     let now = self.date.now
     let extra = ctaSlot.map { slot in
-      "slot=\(slot.rawValue) action=\(self.ctaAction(slot, in: campaign)?.analyticsLabel ?? "-")"
+      "slot=\(slot.rawValue) action=\(campaign.action(for: slot)?.analyticsLabel ?? "-")"
     }
     return .merge(
       self.logCrossPromoEvent(event, campaign, extra: extra),
@@ -290,17 +285,6 @@ struct AppReducer: Sendable {
     )
   }
 
-  func ctaAction(
-    _ slot: CrossPromoFeature.CtaSlot,
-    in campaign: CrossPromoCampaign,
-  ) -> CrossPromoAction? {
-    switch slot {
-    case .primary: campaign.primaryCta.action
-    case .secondary: campaign.secondaryCta?.action
-    case .tertiary: campaign.tertiaryCta?.action
-    }
-  }
-
   func logCrossPromoEvent(
     _ event: CrossPromoEvent,
     _ campaign: CrossPromoCampaign,
@@ -308,7 +292,7 @@ struct AppReducer: Sendable {
   ) -> EffectOf<Self> {
     let base = "campaign=\(campaign.campaignId)"
       + " variant=\(campaign.variant ?? "-")"
-      + " placement=\(campaign.placement.rawValue)"
+      + " placement=\(campaign.placement)"
     let detail = extra.map { "\(base) \($0)" } ?? base
     return .run { _ in
       await log(.info(event.id), "cross promo \(event.rawValue)", detail: detail).value

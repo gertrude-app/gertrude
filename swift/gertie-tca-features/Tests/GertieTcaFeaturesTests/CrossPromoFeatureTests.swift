@@ -1,10 +1,9 @@
 import ComposableArchitecture
 import Dependencies
 import Foundation
-import PodcastRoute
+import GertieApp
+import GertieTcaFeatures
 import Testing
-
-@testable import LibTCA
 
 @MainActor struct CrossPromoFeatureTests {
   @Test func `primary cta opens url and reports the tap`() async {
@@ -118,6 +117,53 @@ import Testing
   }
 }
 
+struct CrossPromoCampaignBehaviorTests {
+  @Test func `a dismissable sheet has a guaranteed exit`() {
+    #expect(campaign(.openUrl("https://gertrude.app")).hasGuaranteedExit) // sheet + dismissable
+  }
+
+  @Test func `an un-dismissable screen with no dismiss cta has no guaranteed exit`() {
+    let noExit = CrossPromoCampaign(
+      campaignId: "x",
+      placement: "p",
+      style: .screen,
+      headline: "H",
+      body: "B",
+      primaryCta: .init(label: "Go", action: .openUrl("https://gertrude.app")),
+      dismissable: false,
+    )
+    #expect(!noExit.hasGuaranteedExit)
+  }
+
+  @Test func `an un-dismissable screen escapes via a dismiss cta in any slot`() {
+    let withExit = CrossPromoCampaign(
+      campaignId: "x",
+      placement: "p",
+      style: .screen,
+      headline: "H",
+      body: "B",
+      primaryCta: .init(label: "Go", action: .openUrl("https://gertrude.app")),
+      tertiaryCta: .init(label: "No thanks", action: .dismiss),
+      dismissable: false,
+    )
+    #expect(withExit.hasGuaranteedExit)
+  }
+
+  @Test func `action(for:) maps each slot to its cta action`() {
+    let c = campaign(.dismiss, secondary: .share("x"), tertiary: .openUrl("y"))
+    #expect(c.action(for: .primary) == .dismiss)
+    #expect(c.action(for: .secondary) == .share("x"))
+    #expect(c.action(for: .tertiary) == .openUrl("y"))
+  }
+
+  @Test func `analyticsLabel describes each action`() {
+    #expect(CrossPromoAction.openUrl("x").analyticsLabel == "open-url")
+    #expect(CrossPromoAction.openAppStoreProduct("1").analyticsLabel == "open-app-store-product")
+    #expect(CrossPromoAction.share("x").analyticsLabel == "share")
+    #expect(CrossPromoAction.dismiss.analyticsLabel == "dismiss")
+  }
+}
+
 private func campaign(
   _ primary: CrossPromoAction,
   secondary: CrossPromoAction? = nil,
@@ -125,7 +171,7 @@ private func campaign(
 ) -> CrossPromoCampaign {
   CrossPromoCampaign(
     campaignId: "fm-launch",
-    placement: .amOnboardingParent,
+    placement: "amOnboardingParent",
     style: .sheet,
     headline: "Meet Gertrude FM",
     body: "Parent-curated music.",

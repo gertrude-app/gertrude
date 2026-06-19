@@ -1,31 +1,40 @@
 import ComposableArchitecture
 import Foundation
-import PodcastRoute
-import SwiftUI
+import GertieApp
 
 @Reducer
-struct CrossPromoFeature {
+public struct CrossPromoFeature: Sendable {
   @ObservableState
-  struct State: Equatable, Identifiable {
-    var campaign: CrossPromoCampaign
-    var share: Share?
-    var id: String { self.campaign.campaignId }
+  public struct State: Equatable, Identifiable {
+    public var campaign: CrossPromoCampaign
+    public var share: Share?
+    public var id: String { self.campaign.campaignId }
+
+    public init(campaign: CrossPromoCampaign, share: Share? = nil) {
+      self.campaign = campaign
+      self.share = share
+    }
   }
 
-  struct Share: Equatable, Identifiable, Sendable {
-    var text: String
-    var slot: CtaSlot
-    var id: String { self.text }
+  public struct Share: Equatable, Identifiable, Sendable {
+    public var text: String
+    public var slot: CtaSlot
+    public var id: String { self.text }
+
+    public init(text: String, slot: CtaSlot) {
+      self.text = text
+      self.slot = slot
+    }
   }
 
-  enum CtaSlot: String, Equatable, Sendable {
+  public enum CtaSlot: String, Equatable, Sendable {
     case primary
     case secondary
     case tertiary
   }
 
-  enum Action: Equatable {
-    enum DelegateAction: Equatable {
+  public enum Action: Equatable {
+    public enum DelegateAction: Equatable {
       case ctaTapped(CtaSlot)
       case dismissed
     }
@@ -39,7 +48,9 @@ struct CrossPromoFeature {
 
   @Dependency(\.openURL) var openURL
 
-  var body: some Reducer<State, Action> {
+  public init() {}
+
+  public var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
       case .primaryBtnTapped:
@@ -95,7 +106,7 @@ struct CrossPromoFeature {
   }
 }
 
-extension CrossPromoAction {
+public extension CrossPromoAction {
   var analyticsLabel: String {
     switch self {
     case .openUrl: "open-url"

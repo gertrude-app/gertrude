@@ -1,5 +1,5 @@
 import Dependencies
-import GertieIOS
+import GertieBlocker
 import LibClients
 import LibCore
 import os.log
@@ -157,5 +157,5 @@ private func isGertrude(_ bundleId: String?) -> Bool {
 
 // "exports" for filter
 
-public typealias BlockRule = GertieIOS.BlockRule
-public typealias FlowType = GertieIOS.FlowType
+public typealias BlockRule = GertieBlocker.BlockRule
+public typealias FlowType = GertieBlocker.FlowType

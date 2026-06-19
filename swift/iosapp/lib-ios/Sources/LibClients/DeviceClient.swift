@@ -125,7 +125,11 @@ extension DeviceClient: DependencyKey {
 }
 
 extension DeviceClient: TestDependencyKey {
-  public static let testValue = DeviceClient()
+  public static var testValue: DeviceClient {
+    var client = DeviceClient()
+    client.deviceId = { nil }
+    return client
+  }
 }
 
 #if DEBUG

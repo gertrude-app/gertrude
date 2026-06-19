@@ -1,6 +1,6 @@
 import Foundation
 import Gertie
-import GertieIOS
+import GertieBlocker
 import PairQL
 import TypeScriptInterop
 
@@ -20,7 +20,7 @@ struct GetIOSDevice: Pair {
 
     struct BlockRuleData: PairOutput {
       var id: BlockerApp.BlockRule.Id
-      var rule: GertieIOS.BlockRule
+      var rule: GertieBlocker.BlockRule
     }
 
     var childName: String

@@ -1,7 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 import LibCore
 import os.log
@@ -29,6 +29,11 @@ public struct SharedStorageClient: Sendable {
   public var savePendingSupervisionCode: @Sendable (CreateSupervisionClaimCode.Output) -> Void
   public var clearPendingSupervisionCode: @Sendable () -> Void
 
+  public var loadDismissedCrossPromoIds: @Sendable () -> [String]?
+  public var saveDismissedCrossPromoIds: @Sendable ([String]) -> Void
+  public var loadCrossPromoLastShownAt: @Sendable () -> Date?
+  public var saveCrossPromoLastShownAt: @Sendable (Date) -> Void
+
   public var migrateLegacyData: @Sendable () async -> Bool = { false }
 }
 
@@ -52,6 +57,8 @@ private enum Key: String {
   case legacyV1StorageKey = "blockRules.v1"
   case firstLaunchDate
   case pendingSupervisionCode = "v1.7.0--pending-supervision-code"
+  case dismissedCrossPromoIds = "v1.9.0--dismissed-cross-promo-ids"
+  case crossPromoLastShownAt = "v1.9.0--cross-promo-last-shown-at"
 }
 
 extension SharedStorageClient: DependencyKey {
@@ -73,6 +80,10 @@ extension SharedStorageClient: DependencyKey {
       loadPendingSupervisionCode: { loadCodable(forKey: .pendingSupervisionCode) },
       savePendingSupervisionCode: { saveCodable($0, forKey: .pendingSupervisionCode) },
       clearPendingSupervisionCode: { removeKey(.pendingSupervisionCode) },
+      loadDismissedCrossPromoIds: { loadCodable(forKey: .dismissedCrossPromoIds) },
+      saveDismissedCrossPromoIds: { saveCodable($0, forKey: .dismissedCrossPromoIds) },
+      loadCrossPromoLastShownAt: { loadDate(forKey: .crossPromoLastShownAt) },
+      saveCrossPromoLastShownAt: { saveDate($0, forKey: .crossPromoLastShownAt) },
       migrateLegacyData: { await migrateLegacyStorage() },
     )
   }

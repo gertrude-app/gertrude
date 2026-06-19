@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "LibIOS",
-  platforms: [.macOS(.v14), .iOS(.v17)],
+  platforms: [.macOS(.v15), .iOS(.v17)],
   products: [
     .library(name: "LibCore", targets: ["LibCore"]),
     .library(name: "LibFilter", targets: ["LibFilter"]),
@@ -28,6 +28,7 @@ let package = Package(
     ),
     .package(path: "../../pairql-iosapp"),
     .package(path: "../../gertie"),
+    .package(path: "../../gertie-tca-features"),
     .package(path: "../../x-expect"),
     .package(path: "../../x-kit"),
   ],
@@ -35,7 +36,7 @@ let package = Package(
     .target(
       name: "LibCore",
       dependencies: [
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
       ],
     ),
     .target(
@@ -44,7 +45,7 @@ let package = Package(
         "LibCore",
         "LibClients",
         .product(name: "XCore", package: "x-kit"),
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "Dependencies", package: "swift-dependencies"),
       ],
     ),
@@ -53,7 +54,9 @@ let package = Package(
       dependencies: [
         "LibCore",
         "LibClients",
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "XCore", package: "x-kit"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
@@ -70,6 +73,8 @@ let package = Package(
       dependencies: [
         "LibCore",
         "LibApp",
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ],
     ),
@@ -77,7 +82,7 @@ let package = Package(
       name: "LibClients",
       dependencies: [
         "LibCore",
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "IOSRoute", package: "pairql-iosapp"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
@@ -88,7 +93,7 @@ let package = Package(
       dependencies: [
         "LibFilter",
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "XExpect", package: "x-expect"),
       ],
     ),
@@ -104,7 +109,7 @@ let package = Package(
       dependencies: [
         "LibClients",
         "LibCore",
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
       ],
     ),
     .testTarget(
@@ -113,7 +118,7 @@ let package = Package(
         "LibController",
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
-        .product(name: "GertieIOS", package: "gertie"),
+        .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "XExpect", package: "x-expect"),
       ],
     ),

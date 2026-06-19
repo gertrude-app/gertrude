@@ -1,7 +1,7 @@
 import Dependencies
 import DuetSQL
 import Gertie
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 
 extension ConnectDevice_v2: Resolver {

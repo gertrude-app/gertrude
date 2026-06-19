@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import PairQL
 
 /// deprecated: v1.3.1 - v1.5.x

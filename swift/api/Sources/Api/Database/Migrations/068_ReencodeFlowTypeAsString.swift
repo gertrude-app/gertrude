@@ -1,7 +1,7 @@
 import DuetSQL
 import FluentSQL
 import Foundation
-import GertieIOS
+import GertieBlocker
 import XCore
 
 struct ReencodeFlowTypeAsString: GertieMigration {
@@ -16,7 +16,7 @@ struct ReencodeFlowTypeAsString: GertieMigration {
     let records = try rows.map { row in
       let id: UUID = try row.decode(column: "id")
       let json: String = try row.decode(column: "rule")
-      let rule = try JSON.decode(json, as: GertieIOS.BlockRule.self)
+      let rule = try JSON.decode(json, as: GertieBlocker.BlockRule.self)
       return (id: id, rule: rule)
     }
 
@@ -43,7 +43,7 @@ struct ReencodeFlowTypeAsString: GertieMigration {
     let records = try rows.map { row in
       let id: UUID = try row.decode(column: "id")
       let json: String = try row.decode(column: "rule")
-      let rule = try JSON.decode(json, as: GertieIOS.BlockRule.self)
+      let rule = try JSON.decode(json, as: GertieBlocker.BlockRule.self)
       return (id: id, rule: rule)
     }
 

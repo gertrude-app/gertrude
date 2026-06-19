@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import PairQL
 
 public struct ChildIOSDeviceData_v2: PairOutput {

@@ -1,4 +1,4 @@
-import GertieIOS
+import GertieBlocker
 
 public indirect enum ProtectionMode {
   case onboarding([BlockRule])

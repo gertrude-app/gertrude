@@ -1,7 +1,7 @@
 import Dependencies
 import DuetSQL
 import Gertie
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 
 extension BlockRules_v2: Resolver {
@@ -50,7 +50,7 @@ extension BlockRules_v2: Resolver {
 
 // extensions
 
-public extension GertieIOS.BlockGroup {
+public extension GertieBlocker.BlockGroup {
   var blockGroupId: UUID {
     let ids = CreateBlockGroups.GroupIds()
     return switch self {

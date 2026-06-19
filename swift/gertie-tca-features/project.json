@@ -1,0 +1,13 @@
+{
+  "root": "gertie-tca-features",
+  "projectType": "library",
+  "implicitDependencies": ["gertie"],
+  "targets": {
+    "build": {
+      "command": "cd gertie-tca-features && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd gertie-tca-features && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

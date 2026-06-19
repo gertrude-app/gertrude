@@ -1,5 +1,5 @@
 import Foundation
-import GertieIOS
+import GertieBlocker
 import PairQL
 
 /// in use: v1.8.0 - present
@@ -18,7 +18,7 @@ public struct BlockRules_v3: Pair {
     }
   }
 
-  public typealias Output = [GertieIOS.BlockRule]
+  public typealias Output = [GertieBlocker.BlockRule]
 }
 
 extension BlockRule: @retroactive PairOutput {}

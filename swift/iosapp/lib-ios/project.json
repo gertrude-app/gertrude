@@ -1,7 +1,7 @@
 {
   "root": "iosapp/lib-ios",
   "projectType": "library",
-  "implicitDependencies": ["gertie", "pairql-iosapp"],
+  "implicitDependencies": ["gertie", "gertie-tca-features", "pairql-iosapp"],
   "targets": {
     "build": {
       "command": "cd iosapp/lib-ios && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"

@@ -1,6 +1,6 @@
 @preconcurrency import Combine
 import ComposableArchitecture
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 import LibCore
 import XCTest

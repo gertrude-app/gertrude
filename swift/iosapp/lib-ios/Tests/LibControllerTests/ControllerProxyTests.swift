@@ -1,6 +1,6 @@
 import ConcurrencyExtras
 import Dependencies
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 import LibCore
 import NetworkExtension

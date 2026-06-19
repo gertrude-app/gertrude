@@ -22,6 +22,9 @@ extension IOSRoute: RouteResponder {
       case .createSupervisionClaimCode(let input):
         let output = try await CreateSupervisionClaimCode.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .crossPromos(let input):
+        let output = try await CrossPromos.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .defaultBlockRules(let input):
         let output = try await DefaultBlockRules.resolve(with: input, in: context)
         return try await self.respond(with: output)

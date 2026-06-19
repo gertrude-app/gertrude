@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import GertieIOS
+import GertieBlocker
 import IOSRoute
 import XCTest
 import XExpect

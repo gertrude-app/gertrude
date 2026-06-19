@@ -12,7 +12,7 @@ let package = Package(
     .package(path: "../x-kit"),
     .package(path: "../x-expect"),
     .package("vapor/fluent-postgres-driver@2.9.2"),
-    .package("jaredh159/swift-tagged@0.8.2"),
+    .package("jaredh159/swift-tagged@0.10.1"),
   ],
   targets: [
     .target(
