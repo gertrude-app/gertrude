@@ -34,7 +34,15 @@ ios-tunnel:
 # api
 
 watch-api:
-  @just watch-swift . 'just run-api' 'macapp/**/*'
+  @watchexec --project-origin . --clear --restart --watch . --exts swift,html \
+  --ignore '**/.build/*/**' \
+  --ignore '**/index.html' \
+  --ignore 'macapp/**/*' \
+  --ignore 'iosapp/**/*' \
+  --ignore 'podcasts/**/*' \
+  --ignore 'music/**/*' \
+  --ignore 'gertie-tca-features/**/*' \
+  just run-api
 
 run-api: build-api
   @just exec-api serve --hostname {{api_host}} --port {{api_port}}
