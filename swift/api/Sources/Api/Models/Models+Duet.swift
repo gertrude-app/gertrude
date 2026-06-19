@@ -170,6 +170,35 @@ extension PodcastApp.Token {
   }
 }
 
+extension MusicApp.Install: Duet.Identifiable {
+  typealias Id = Tagged<MusicApp.Install, UUID>
+}
+
+extension MusicApp.Install {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case deviceId
+    case appVersion
+    case createdAt
+    case updatedAt
+  }
+}
+
+extension MusicApp.Token {
+  typealias Id = Tagged<MusicApp.Token, UUID>
+  typealias Value = Tagged<(MusicApp.Token, value: ()), UUID>
+}
+
+extension MusicApp.Token {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case installId
+    case value
+    case createdAt
+    case updatedAt
+  }
+}
+
 extension BlockerApp.BlockRule: Duet.Identifiable {
   typealias Id = Tagged<BlockerApp.BlockRule, UUID>
 }
@@ -946,5 +975,23 @@ extension InstalledMacApp {
     case macAppId
     case createdAt
     case updatedAt
+  }
+}
+
+extension Music.ApprovedAlbum: Duet.Identifiable {
+  typealias Id = Tagged<Music.ApprovedAlbum, UUID>
+}
+
+extension Music.ApprovedAlbum {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case childId
+    case appleMusicAlbumId
+    case title
+    case artistName
+    case artworkUrl
+    case trackCount
+    case showsArtwork
+    case createdAt
   }
 }

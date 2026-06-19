@@ -56,6 +56,7 @@ export const Default: Story = props({
       deviceType: `iPhone`,
       iosVersion: `iOS 18.2`,
       pendingClaimCode: 123456,
+      musicConnected: false,
     },
   ],
 });

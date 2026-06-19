@@ -18,7 +18,7 @@ export type DeviceModelFamily =
   | 'pro'
   | 'unknown';
 
-export type GertrudeApp = 'blocker' | 'podcasts';
+export type GertrudeApp = 'blocker' | 'podcasts' | 'music';
 
 export interface PaidSubscription {
   tier: 'light' | 'full';

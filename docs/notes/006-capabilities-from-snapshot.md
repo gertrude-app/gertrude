@@ -44,7 +44,7 @@ complimentary). You cannot union a scalar.
   server-internal (never crosses the wire), so the capability fix has zero wire impact and
   belongs at the source of truth, not bolted onto a display projection.
 - **Substrate is a struct (`PaidSubscription{tier,status}`), not a bare tier.** A **Medium
-  tier is expected within ~6-8 weeks for Gertrude FM**, which makes the substrate's tier
+  tier is expected within ~6-8 weeks for Gertrude Music**, which makes the substrate's tier
   load-bearing (a Medium subscriber can trial Full → the substrate is Medium, not Light).
   Status is needed too, to distinguish a paying Light (grants supervision) from a past-due
   Light (grants nothing). A bare tier enum answers neither.

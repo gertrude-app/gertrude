@@ -1,9 +1,4 @@
-import {
-  CodeChip,
-  HighlightableCard,
-  LightPlanTeaser,
-  ScreenHeader,
-} from '@dash/components';
+import { CodeChip, HighlightableCard, ScreenHeader } from '@dash/components';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React, { useState } from 'react';
@@ -453,55 +448,3 @@ export const DoneScreen: React.FC<
     </div>
   );
 };
-
-export const PaymentGateScreen: React.FC<
-  DeviceInfo & {
-    deviceType: string;
-    onSubscribe: () => void;
-    isRedirecting?: boolean;
-    checkoutCancelled?: boolean;
-  }
-> = ({
-  childName,
-  modelName,
-  iosVersion,
-  deviceType,
-  onSubscribe,
-  isRedirecting = false,
-  checkoutCancelled = false,
-}) => (
-  <div>
-    <ScreenHeader
-      icon="credit-card"
-      title="Subscribe to Continue"
-      subtitle={`Setting up ${posessive(childName)} ${modelName} · iOS ${iosVersion}`}
-    />
-
-    <p className="text-slate-600 mb-5">
-      To supervise and manage {posessive(childName)} {deviceType}, you’ll need a{` `}
-      <b>Gertrude subscription.</b>
-    </p>
-
-    <LightPlanTeaser
-      className="mb-6"
-      extraBullets={[`All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`]}
-    />
-
-    {checkoutCancelled && (
-      <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6 text-sm text-amber-700">
-        Checkout was cancelled. You can try again when you're ready.
-      </div>
-    )}
-
-    <div className="flex justify-end">
-      <Button
-        type="button"
-        color="primary"
-        onClick={onSubscribe}
-        disabled={isRedirecting}
-      >
-        {isRedirecting ? `Redirecting...` : `Subscribe \u2014 $10/year`}
-      </Button>
-    </div>
-  </div>
-);

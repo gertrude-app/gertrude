@@ -113,6 +113,7 @@ export interface ChildIOSDevice {
   deviceType: string;
   iosVersion: string;
   pendingClaimCode?: number;
+  musicConnected: boolean;
 }
 
 export interface ClaimChildOption {

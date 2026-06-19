@@ -2,6 +2,10 @@
 import type * as T from '@dash/types';
 
 export function interceptPql(
+  slug: `ApproveMusicAlbum`,
+  output: T.ApproveMusicAlbum.Output,
+): void;
+export function interceptPql(
   slug: `ChangeSubscriptionTier`,
   output: T.ChangeSubscriptionTier.Output,
 ): void;
@@ -13,6 +17,10 @@ export function interceptPql(slug: `ClaimAmDevice`, output: T.ClaimAmDevice.Outp
 export function interceptPql(
   slug: `ClaimIOSDevice`,
   output: T.ClaimIOSDevice.Output,
+): void;
+export function interceptPql(
+  slug: `ClaimMusicDevice`,
+  output: T.ClaimMusicDevice.Output,
 ): void;
 export function interceptPql(
   slug: `CombinedUsersActivityFeed`,
@@ -68,6 +76,10 @@ export function interceptPql(
   output: T.GetAmClaimData.Output,
 ): void;
 export function interceptPql(
+  slug: `GetApprovedMusicAlbums`,
+  output: T.GetApprovedMusicAlbums.Output,
+): void;
+export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
   output: T.GetBatchUnlockRequestData.Output,
 ): void;
@@ -89,6 +101,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetIdentifiedApps`,
   output: T.GetIdentifiedApps.Output,
+): void;
+export function interceptPql(
+  slug: `GetMusicClaimData`,
+  output: T.GetMusicClaimData.Output,
 ): void;
 export function interceptPql(
   slug: `GetSelectableKeychains`,
@@ -141,6 +157,10 @@ export function interceptPql(
   output: T.PrepIOSAppConnection.Output,
 ): void;
 export function interceptPql(
+  slug: `RemoveApprovedMusicAlbum`,
+  output: T.RemoveApprovedMusicAlbum.Output,
+): void;
+export function interceptPql(
   slug: `RequestAmPinReset`,
   output: T.RequestAmPinReset.Output,
 ): void;
@@ -165,6 +185,10 @@ export function interceptPql(
   output: T.SaveNotification.Output,
 ): void;
 export function interceptPql(slug: `SaveUser`, output: T.SaveUser.Output): void;
+export function interceptPql(
+  slug: `SearchMusicCatalog`,
+  output: T.SearchMusicCatalog.Output,
+): void;
 export function interceptPql(
   slug: `SecurityEventsFeed`,
   output: T.SecurityEventsFeed.Output,
@@ -211,10 +235,12 @@ export function interceptPql(slug: string, output: any): void {
 
 export function forcePqlErr(
   slug:
+    | `ApproveMusicAlbum`
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimAmDevice`
     | `ClaimIOSDevice`
+    | `ClaimMusicDevice`
     | `CombinedUsersActivityFeed`
     | `ConfirmPendingNotificationMethod`
     | `CreatePendingNotificationMethod`
@@ -229,6 +255,7 @@ export function forcePqlErr(
     | `GetAdminKeychains`
     | `GetAllDevices`
     | `GetAmClaimData`
+    | `GetApprovedMusicAlbums`
     | `GetBatchUnlockRequestData`
     | `GetChild`
     | `GetChildren`
@@ -237,6 +264,7 @@ export function forcePqlErr(
     | `GetIOSDeviceSupervisionStatus`
     | `GetIOSDevice_v2`
     | `GetIdentifiedApps`
+    | `GetMusicClaimData`
     | `GetSelectableKeychains`
     | `GetSubscriptionPanel_v2`
     | `GetSuspendFilterRequest`
@@ -251,6 +279,7 @@ export function forcePqlErr(
     | `MacAppConnectionCode`
     | `OpenBillingPortal`
     | `PrepIOSAppConnection`
+    | `RemoveApprovedMusicAlbum`
     | `RequestAmPinReset`
     | `RequestMagicLink`
     | `RequestPublicKeychain`
@@ -261,6 +290,7 @@ export function forcePqlErr(
     | `SaveKeychain`
     | `SaveNotification`
     | `SaveUser`
+    | `SearchMusicCatalog`
     | `SecurityEventsFeed`
     | `SendPasswordResetEmail`
     | `Signup`

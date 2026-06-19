@@ -2,15 +2,18 @@
 import {
   // BlockRuleEditor,
   AmDeviceSection,
+  ApiErrorMessage,
+  /*ConfirmDeleteEntity*/
   AppHeader,
+  BetaBadge,
   BlockGroupList,
   // EditBlockRules,
+  LightPlanTeaser,
   Loading,
   PageHeading,
   ToggleCard,
   // TrashBtn,
 } from '@dash/components';
-import { ApiErrorMessage /*ConfirmDeleteEntity*/ } from '@dash/components';
 // import { PlusIcon } from '@heroicons/react/24/solid';
 import { Button /* SelectMenu */ } from '@shared/components';
 // import { Result } from '@shared/pairql';
@@ -25,6 +28,7 @@ import { amSubscriptionRunway } from '../../amSubscriptionRunway';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
 import reducer from '../../reducers/ios-device-reducer';
+import MusicCuration from './MusicCuration';
 
 const TIER_TO_STATUS: Record<AmRunwayTier, AmStatus> = {
   active: `active`,
@@ -33,7 +37,10 @@ const TIER_TO_STATUS: Record<AmRunwayTier, AmStatus> = {
 };
 
 const IOSDevice: React.FC = () => {
-  const { deviceId: id = `` } = useParams<{ deviceId: string }>();
+  const { userId: childId = ``, deviceId: id = `` } = useParams<{
+    userId: string;
+    deviceId: string;
+  }>();
   const [state, dispatch] = useReducer(reducer, {
     enabledBlockGroups: [],
     webPolicyDomains: [],
@@ -96,6 +103,7 @@ const IOSDevice: React.FC = () => {
   const dt = deviceQuery.data.deviceType;
   const blocker = deviceQuery.data.blocker;
   const am = deviceQuery.data.am;
+  const music = deviceQuery.data.music;
   const amRunway = am ? amSubscriptionRunway(am.subscription) : undefined;
 
   const requestPinCode = async (): Promise<number | null> => {
@@ -127,6 +135,13 @@ const IOSDevice: React.FC = () => {
             accessEndsAt={amRunway.accessEndsAt}
             trialDaysRemaining={amRunway.trialDaysRemaining}
             requestPinCode={requestPinCode}
+          />
+        )}
+        {deviceQuery.data.musicConnected && (
+          <MusicDeviceSection
+            childId={childId}
+            childName={deviceQuery.data.childName}
+            requiresPayment={music?.requiresPayment ?? false}
           />
         )}
         {blocker && (
@@ -340,6 +355,34 @@ const IOSDevice: React.FC = () => {
     </div>
   );
 };
+
+const MusicDeviceSection: React.FC<{
+  childId: string;
+  childName: string;
+  requiresPayment: boolean;
+}> = ({ childId, childName, requiresPayment }) => (
+  <div className="max-w-3xl">
+    <AppHeader app="music">
+      <BetaBadge />
+    </AppHeader>
+    {requiresPayment ? (
+      <div className="mt-4">
+        <p className="text-slate-500 mb-4">
+          Paused — your Gertrude account needs Light or higher to manage Gertrude Music.
+        </p>
+        <LightPlanTeaser
+          className="mb-4"
+          extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
+        />
+        <Button type="link" to="/settings" color="primary" size="small">
+          Manage subscription
+        </Button>
+      </div>
+    ) : (
+      <MusicCuration childId={childId} childName={childName} className="mt-6" />
+    )}
+  </div>
+);
 
 export default IOSDevice;
 

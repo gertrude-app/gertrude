@@ -274,6 +274,58 @@ extension PodcastApp.Token: Model {
   }
 }
 
+extension MusicApp.Install: Model {
+  public static let schemaName = "music_app"
+  public static let tableName = "installs"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .deviceId: .uuid(self.deviceId)
+    case .appVersion: .string(self.appVersion)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .deviceId: .uuid(self.deviceId),
+      .appVersion: .string(self.appVersion),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension MusicApp.Token: Model {
+  public static let schemaName = "music_app"
+  public static let tableName = "tokens"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .installId: .uuid(self.installId)
+    case .value: .uuid(self.value)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .installId: .uuid(self.installId),
+      .value: .uuid(self.value),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension GertieIOS.BlockRule: @retroactive PostgresJsonable {}
 
 extension Parent: Model {
@@ -1725,6 +1777,40 @@ extension InstalledMacApp: Model {
       .macAppId: .uuid(self.macAppId),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
+extension Music.ApprovedAlbum: Model {
+  public static let schemaName = "music"
+  public static let tableName = "approved_albums"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .childId: .uuid(self.childId)
+    case .appleMusicAlbumId: .string(self.appleMusicAlbumId.rawValue)
+    case .title: .string(self.title)
+    case .artistName: .string(self.artistName)
+    case .artworkUrl: .string(self.artworkUrl)
+    case .trackCount: .int(self.trackCount)
+    case .showsArtwork: .bool(self.showsArtwork)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .childId: .uuid(self.childId),
+      .appleMusicAlbumId: .string(self.appleMusicAlbumId.rawValue),
+      .title: .string(self.title),
+      .artistName: .string(self.artistName),
+      .artworkUrl: .string(self.artworkUrl),
+      .trackCount: .int(self.trackCount),
+      .showsArtwork: .bool(self.showsArtwork),
+      .createdAt: .currentTimestamp,
     ]
   }
 }

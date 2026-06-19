@@ -36,6 +36,86 @@ extension IOSDevice {
       && !incoming.hasSuffix(",unknown")
       && self.modelIdentifier != incoming
   }
+
+  @discardableResult
+  static func ensureAppInstallDevice(
+    id: Id,
+    modelIdentifier: String,
+    iosVersion: String,
+    in db: any DuetSQL.Client,
+  ) async throws -> IOSDevice {
+    var device = try await db.findOrCreate(
+      IOSDevice(id: id, modelIdentifier: modelIdentifier, iosVersion: iosVersion),
+      conflictOn: [.id],
+    )
+    var saveDevice = false
+    if device.shouldUpdateModelIdentifier(to: modelIdentifier) {
+      device.modelIdentifier = modelIdentifier
+      saveDevice = true
+    }
+    if device.iosVersion != iosVersion {
+      device.iosVersion = iosVersion
+      saveDevice = true
+    }
+    if saveDevice {
+      try await db.update(device)
+    }
+    return device
+  }
+}
+
+protocol IOSAppInstall: Model {
+  var deviceId: IOSDevice.Id { get set }
+  var appVersion: String { get set }
+
+  init(deviceId: IOSDevice.Id, appVersion: String)
+
+  static var deviceIdColumn: ColumnName { get }
+  static var appVersionColumn: ColumnName { get }
+  static var updatedAtColumn: ColumnName { get }
+}
+
+extension IOSAppInstall {
+  @discardableResult
+  static func ensureExists(
+    deviceId: IOSDevice.Id,
+    modelIdentifier: String,
+    iosVersion: String,
+    appVersion: String,
+    in db: any DuetSQL.Client,
+  ) async throws -> Self {
+    try await db.withTransaction { txn in
+      try await IOSDevice.ensureAppInstallDevice(
+        id: deviceId,
+        modelIdentifier: modelIdentifier,
+        iosVersion: iosVersion,
+        in: txn,
+      )
+      let conflictTarget = deviceIdColumn
+      let appVersionTarget = appVersionColumn
+      let updatedAtTarget = updatedAtColumn
+      return try await txn.upsert(
+        Self(deviceId: deviceId, appVersion: appVersion),
+        conflictOn: [conflictTarget],
+        do: .updateRaw { c in
+          """
+          \(c.col(appVersionTarget)) = \(c.excluded(appVersionTarget)),
+          \(c.col(updatedAtTarget)) = CASE
+            WHEN \(c.target(appVersionTarget)) IS DISTINCT FROM \(c.excluded(appVersionTarget))
+            THEN CURRENT_TIMESTAMP
+            ELSE \(c.target(updatedAtTarget))
+          END
+          """
+        },
+      )
+    }
+  }
+
+  func device(in db: any DuetSQL.Client) async throws -> IOSDevice {
+    try await IOSDevice.query()
+      .where(.id == self.deviceId)
+      .first(in: db)
+  }
 }
 
 // loaders
@@ -56,6 +136,13 @@ extension IOSDevice {
 
   func podcastInstall(in db: any DuetSQL.Client) async throws -> PodcastApp.Install? {
     try await PodcastApp.Install.query()
+      .where(.deviceId == self.id)
+      .all(in: db)
+      .first
+  }
+
+  func musicInstall(in db: any DuetSQL.Client) async throws -> MusicApp.Install? {
+    try await MusicApp.Install.query()
       .where(.deviceId == self.id)
       .all(in: db)
       .first

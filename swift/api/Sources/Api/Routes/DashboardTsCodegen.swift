@@ -80,6 +80,10 @@ enum DashboardTsCodegenRoute {
       HandleUnlockRequests.self,
       GetChild.self,
       GetChildren.self,
+      SearchMusicCatalog.self,
+      GetApprovedMusicAlbums.self,
+      ApproveMusicAlbum.self,
+      RemoveApprovedMusicAlbum.self,
       HandleCheckoutCancel.self,
       HandleCheckoutSuccess.self,
       LatestAppVersions.self,
@@ -117,6 +121,8 @@ enum DashboardTsCodegenRoute {
       GetIOSDeviceClaimData.self,
       GetAmClaimData.self,
       ClaimAmDevice.self,
+      GetMusicClaimData.self,
+      ClaimMusicDevice.self,
       RequestAmPinReset.self,
       ClaimIOSDevice.self,
       GetIOSDeviceSupervisionStatus.self,
@@ -135,6 +141,7 @@ enum DashboardTsCodegenRoute {
       .init(Date.self, as: "ISODateString"),
       .init(StripeSubscription.StripeId.self, as: "string"),
       .init(URL.self, as: "string"),
+      .init(Music.AlbumId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 

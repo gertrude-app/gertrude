@@ -1,0 +1,48 @@
+import '../watch-helpers.just'
+
+swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
+
+_default:
+  @just --choose
+
+gen debug_api_endpoint=env("GERTRUDE_MUSIC_DEBUG_API_ENDPOINT"):
+  @GERTRUDE_MUSIC_DEBUG_API_ENDPOINT='{{debug_api_endpoint}}' xcodegen -s project.yml
+  @xml-lint --fix app/Info.plist
+
+xcode:
+  @just gen
+  @open GertrudeMusic.xcodeproj
+
+build-views:
+  @cd lib-views && {{swiftly}} run swift build
+
+build-tca:
+  @cd lib-tca && {{swiftly}} run swift build
+
+build:
+  @just build-views
+  @just build-tca
+
+build-app:
+  @xcodebuild -project GertrudeMusic.xcodeproj -scheme 'Gertrude Music' -configuration Debug -destination 'generic/platform=iOS Simulator' build
+
+test:
+  @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test
+  @cd lib-tca && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test
+
+lint:
+  @swiftformat --exclude '**/.build' --lint .
+
+check:
+  @just build
+  @just test
+  @just lint
+
+fix:
+  @swiftformat --exclude '**/.build' .
+  @xml-lint --fix app/Info.plist
+  @prettier --write '**/*.json' '!**/.build/**'
+
+clean:
+  @rm -rf lib-views/.build lib-tca/.build
+  @find lib-views lib-tca -type f \( -name '*.o' -o -name '*.d' -o -name '*.swiftdeps' -o -name '*.swiftdeps~' \) -delete

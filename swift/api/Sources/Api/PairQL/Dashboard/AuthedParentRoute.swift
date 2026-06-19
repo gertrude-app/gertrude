@@ -24,6 +24,10 @@ enum AuthedParentRoute: PairRoute {
   case getUnlockRequests
   case getChild(GetChild.Input)
   case getChildren
+  case searchMusicCatalog(SearchMusicCatalog.Input)
+  case getApprovedMusicAlbums(GetApprovedMusicAlbums.Input)
+  case approveMusicAlbum(ApproveMusicAlbum.Input)
+  case removeApprovedMusicAlbum(RemoveApprovedMusicAlbum.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice(IOSDevice.Id)
@@ -56,6 +60,8 @@ enum AuthedParentRoute: PairRoute {
   case getIOSDeviceClaimData(GetIOSDeviceClaimData.Input)
   case getAmClaimData(GetAmClaimData.Input)
   case claimAmDevice(ClaimAmDevice.Input)
+  case getMusicClaimData(GetMusicClaimData.Input)
+  case claimMusicDevice(ClaimMusicDevice.Input)
   case requestAmPinReset(RequestAmPinReset.Input)
   case getIOSDeviceSupervisionStatus(GetIOSDeviceSupervisionStatus.Input)
   case prepIOSAppConnection(PrepIOSAppConnection.Input)
@@ -144,6 +150,22 @@ extension AuthedParentRoute {
         }
         Route(.case(Self.getChildren)) {
           Operation(GetChildren.self)
+        }
+        Route(.case(Self.searchMusicCatalog)) {
+          Operation(SearchMusicCatalog.self)
+          Body(.dashboardInput(SearchMusicCatalog.self))
+        }
+        Route(.case(Self.getApprovedMusicAlbums)) {
+          Operation(GetApprovedMusicAlbums.self)
+          Body(.dashboardInput(GetApprovedMusicAlbums.self))
+        }
+        Route(.case(Self.approveMusicAlbum)) {
+          Operation(ApproveMusicAlbum.self)
+          Body(.dashboardInput(ApproveMusicAlbum.self))
+        }
+        Route(.case(Self.removeApprovedMusicAlbum)) {
+          Operation(RemoveApprovedMusicAlbum.self)
+          Body(.dashboardInput(RemoveApprovedMusicAlbum.self))
         }
         Route(.case(Self.handleCheckoutCancel)) {
           Operation(HandleCheckoutCancel.self)
@@ -270,6 +292,14 @@ extension AuthedParentRoute {
           Operation(ClaimAmDevice.self)
           Body(.dashboardInput(ClaimAmDevice.self))
         }
+        Route(.case(Self.getMusicClaimData)) {
+          Operation(GetMusicClaimData.self)
+          Body(.dashboardInput(GetMusicClaimData.self))
+        }
+        Route(.case(Self.claimMusicDevice)) {
+          Operation(ClaimMusicDevice.self)
+          Body(.dashboardInput(ClaimMusicDevice.self))
+        }
         Route(.case(Self.requestAmPinReset)) {
           Operation(RequestAmPinReset.self)
           Body(.dashboardInput(RequestAmPinReset.self))
@@ -303,6 +333,18 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getChildren:
       let output = try await GetChildren.resolve(in: context)
+      return try await self.respond(with: output)
+    case .searchMusicCatalog(let input):
+      let output = try await SearchMusicCatalog.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getApprovedMusicAlbums(let input):
+      let output = try await GetApprovedMusicAlbums.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .approveMusicAlbum(let input):
+      let output = try await ApproveMusicAlbum.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .removeApprovedMusicAlbum(let input):
+      let output = try await RemoveApprovedMusicAlbum.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .saveUser(let input):
       let output = try await SaveUser.resolve(with: input, in: context)
@@ -456,6 +498,12 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .claimAmDevice(let input):
       let output = try await ClaimAmDevice.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getMusicClaimData(let input):
+      let output = try await GetMusicClaimData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .claimMusicDevice(let input):
+      let output = try await ClaimMusicDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .requestAmPinReset(let input):
       let output = try await RequestAmPinReset.resolve(with: input, in: context)

@@ -43,8 +43,11 @@ web/smoke/cypress.env.json
 **/cypress/videos
 .playwright-mcp/
 
-# Podcasts app
+# Generated Xcode projects
 swift/podcasts/GertiePodcasts.xcodeproj/
+swift/music/GertrudeMusic.xcodeproj/
+
+# Podcasts app
 swift/podcasts/previews
 
 # Local task files

@@ -257,31 +257,33 @@ const EditChild: React.FC<Props> = ({
               <h2 className="text-lg font-bold text-slate-700 mb-3">
                 Protection settings:
               </h2>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  to={`/children/${id}/mac`}
-                  className="flex items-center rounded-xl px-5 py-8 sm:w-1/2 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
-                >
-                  <GradientIcon icon="laptop" size="large" className="mr-4 shrink-0" />
-                  <h3 className="text-lg font-semibold text-slate-700 flex-grow">
-                    For Mac Computers
-                  </h3>
-                  <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
-                </Link>
-                <Link
-                  to={
-                    iosDevices.length === 1
-                      ? `/children/${id}/ios-devices/${iosDevices[0]?.id || ``}`
-                      : `/children/${id}/ios-devices`
-                  }
-                  className="flex items-center rounded-xl px-5 py-8 sm:w-1/2 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
-                >
-                  <GradientIcon icon="phone" size="large" className="mr-4 shrink-0" />
-                  <h3 className="text-lg font-semibold text-slate-700 flex-grow">
-                    For iPhones and iPads
-                  </h3>
-                  <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
-                </Link>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
+                    to={`/children/${id}/mac`}
+                    className="flex items-center rounded-xl px-5 py-8 sm:w-1/2 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
+                  >
+                    <GradientIcon icon="laptop" size="large" className="mr-4 shrink-0" />
+                    <h3 className="text-lg font-semibold text-slate-700 flex-grow">
+                      For Mac Computers
+                    </h3>
+                    <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
+                  </Link>
+                  <Link
+                    to={
+                      iosDevices.length === 1
+                        ? `/children/${id}/ios-devices/${iosDevices[0]?.id || ``}`
+                        : `/children/${id}/ios-devices`
+                    }
+                    className="flex items-center rounded-xl px-5 py-8 sm:w-1/2 bg-violet-50 hover:bg-violet-100 transition duration-200 border border-violet-200"
+                  >
+                    <GradientIcon icon="phone" size="large" className="mr-4 shrink-0" />
+                    <h3 className="text-lg font-semibold text-slate-700 flex-grow">
+                      For iPhones and iPads
+                    </h3>
+                    <i className="fa-solid fa-chevron-right text-violet-400 ml-2" />
+                  </Link>
+                </div>
               </div>
             </div>
 
