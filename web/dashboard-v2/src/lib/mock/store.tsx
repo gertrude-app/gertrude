@@ -7,6 +7,8 @@ import type {
 import { initialMockDb } from './seed';
 
 export type MockDataAction =
+  | { type: `person.updateName`; id: string; name: string }
+  | { type: `person.delete`; id: string }
   | { type: `unlockRequest.resolve`; id: string }
   | { type: `suspensionRequest.resolve`; id: string }
   | { type: `activity.toggleFlag`; id: string }
@@ -32,6 +34,29 @@ const MockDataContext = React.createContext<MockDataStore | null>(null);
 
 function mockDataReducer(db: MockDb, action: MockDataAction): MockDb {
   switch (action.type) {
+    case `person.updateName`:
+      return {
+        ...db,
+        people: db.people.map((person) =>
+          person.id === action.id ? { ...person, name: action.name } : person,
+        ),
+      };
+    case `person.delete`:
+      return {
+        ...db,
+        people: db.people.filter((person) => person.id !== action.id),
+        devices: db.devices.filter((device) => device.personId !== action.id),
+        activity: db.activity.filter((activity) => activity.personId !== action.id),
+        unlockRequests: db.unlockRequests.filter(
+          (request) => request.personId !== action.id,
+        ),
+        suspensionRequests: db.suspensionRequests.filter(
+          (request) => request.personId !== action.id,
+        ),
+        macSettings: db.macSettings.filter((settings) => settings.personId !== action.id),
+        iosSettings: db.iosSettings.filter((settings) => settings.personId !== action.id),
+        installedMacApps: db.installedMacApps.filter((app) => app.personId !== action.id),
+      };
     case `unlockRequest.resolve`:
       return {
         ...db,
