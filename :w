@@ -1,0 +1,220 @@
+import { Badge, Toggle } from '@gertrude/ui';
+import { createFileRoute } from '@tanstack/react-router';
+import cx from 'clsx';
+import { ChevronRightIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import CardContainer from '#/components/CardContainer';
+import {
+  type PersonMacSettingsConfiguration,
+  getPersonMacSettingsPage,
+  useMockData,
+} from '#/lib/mock';
+import { formatTime } from '#/lib/utils';
+
+const MacSettingsPage: React.FC = () => {
+  const { personId } = Route.useParams();
+  const { db, dispatch } = useMockData();
+  const { config, macDevices } = getPersonMacSettingsPage(db, personId);
+  const patchConfig = (patch: Partial<PersonMacSettingsConfiguration>): void => {
+    dispatch({ type: `macSettings.patch`, personId, patch });
+  };
+
+  if (!config || macDevices.length === 0) {
+    return (
+      <CardContainer className="flex flex-col gap-4">
+        <span className="text-center text-sm text-stone-500">
+          No Mac settings to configure.
+        </span>
+      </CardContainer>
+    );
+  }
+
+  const alwaysBlockedGroupCount = Object.values(config.alwaysBlockedGroups).filter(
+    Boolean,
+  ).length;
+  const alwaysBlockedTotal =
+    alwaysBlockedGroupCount + config.customAlwaysBlockedDomains.length;
+
+  return (
+    <CardContainer className="flex flex-col gap-4">
+      <MacSettingsExpandableSection
+        title="Monitoring"
+        preview={
+          <div className="flex items-center gap-2">
+            <PreviewChip
+              label="Keylogging"
+              value={config.keyloggingEnabled ? `On` : `Off`}
+              color={config.keyloggingEnabled ? `violet` : `neutral`}
+            />
+            <PreviewChip
+              label="Screenshots"
+              value={
+                config.screenshots ? `Every ${config.screenshots.frequency}s` : `Off`
+              }
+              color={config.screenshots ? `violet` : `neutral`}
+            />
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          <ToggleRow
+            title="Enable Keylogging"
+            description="Sends reports of all keystrokes to your review."
+            enabled={config.keyloggingEnabled}
+            setEnabled={(enabled) => patchConfig({ keyloggingEnabled: enabled })}
+          />
+          <ToggleRow
+            title="Enable Screenshots"
+            description={
+              config.filteringOn
+                ? `Periodically take a screenshot and upload for your review.`
+                : `Screenshots are required when internet filtering is disabled.`
+            }
+            enabled={config.screenshots !== undefined}
+            setEnabled={(enabled) =>
+              patchConfig({
+                screenshots: enabled
+                  ? (config.screenshots ?? { resolution: 1080, frequency: 120 })
+                  : undefined,
+              })
+            }
+          />
+        </div>
+      </MacSettingsExpandableSection>
+      <MacSettingsExpandableSection
+        title="Internet Filtering"
+        preview={
+          <div className="flex items-center gap-2">
+            <PreviewChip
+              label="Filter"
+              value={config.filteringOn ? `On` : `Off`}
+              color={config.filteringOn ? `violet` : `neutral`}
+            />
+            {config.downtime && (
+              <PreviewChip
+                label="Downtime"
+                value={`${formatTime(config.downtime.start)} – ${formatTime(
+                  config.downtime.end,
+                )}`}
+                color="violet"
+              />
+            )}
+            {config.filteringOn && (
+              <PreviewChip
+                label="Keychains"
+                value={`${config.keychainIds.length}`}
+                color={config.keychainIds.length > 0 ? `violet` : `neutral`}
+              />
+            )}
+          </div>
+        }
+      >
+        hi
+      </MacSettingsExpandableSection>
+      <MacSettingsExpandableSection
+        title="Apps"
+        preview={
+          <div className="flex items-center gap-2">
+            <PreviewChip
+              label="Blocked Apps"
+              value={`${config.blockedApps.length}`}
+              color={config.blockedApps.length > 0 ? `violet` : `neutral`}
+            />
+            <PreviewChip
+              label="Always Blocked"
+              value={`${alwaysBlockedTotal}`}
+              color={alwaysBlockedTotal > 0 ? `violet` : `neutral`}
+            />
+          </div>
+        }
+      >
+        hi
+      </MacSettingsExpandableSection>
+    </CardContainer>
+  );
+};
+
+export const Route = createFileRoute(`/_app/people/$personId/mac-settings`)({
+  component: MacSettingsPage,
+});
+
+type SectionProps = {
+  title: string;
+  preview: React.ReactNode;
+  children: React.ReactNode;
+};
+
+const MacSettingsExpandableSection: React.FC<SectionProps> = ({
+  title,
+  preview,
+  children,
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="flex flex-col bg-white border border-stone-200 rounded-xl shadow shadow-stone-300/30">
+      <div
+        className="flex justify-between p-3 items-center cursor-pointer select-none"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <div className="flex items-center gap-4">
+          <span className="text-lg font-medium text-stone-900">{title}</span>
+          <div
+            className={cx(
+              `transition-[opacity,scale] duration-150`,
+              expanded ? `opacity-0` : `opacity-100 translate-y-0`,
+            )}
+          >
+            {preview}
+          </div>
+        </div>
+        <ChevronRightIcon
+          className={cx(
+            `w-5 h-5 text-stone-600 transition-[rotate] duration-200`,
+            expanded && `rotate-90`,
+          )}
+        />
+      </div>
+      <div
+        className={cx(
+          expanded ? `h-auto opacity-100` : `h-0 opacity-0`,
+          `overflow-hidden transition-[height,opacity] duration-200`,
+        )}
+      >
+        <div className="p-3 border-t border-stone-200">{children}</div>
+      </div>
+    </div>
+  );
+};
+
+const PreviewChip: React.FC<{
+  label: string;
+  value: string;
+  color: `neutral` | `violet`;
+}> = ({ label, value, color }) => (
+  <div className="border border-stone-200 rounded-lg p-0.75 pl-2 flex items-center gap-2 bg-stone-50">
+    <span className="text-xs text-stone-700">{label}</span>
+    <Badge size="small" color={color}>
+      {value}
+    </Badge>
+  </div>
+);
+
+const ToggleRow: React.FC<{
+  title: string;
+  description: string;
+  enabled: boolean;
+  setEnabled: (enabled: boolean) => void;
+  children?: React.ReactNode;
+}> = ({ title, description, enabled, setEnabled, children }) => (
+  <div className="bg-stone-50 border border-stone-200 rounded-md p-3 flex flex-col">
+    <div className="flex justify-between items-center pr-2">
+      <div className="flex flex-col">
+        <span className="text-sm font-medium text-stone-800">{title}</span>
+        <span className="text-sm text-stone-600">{description}</span>
+      </div>
+      <Toggle checked={enabled} setChecked={setEnabled} />
+    </div>
+    {children && <div>{children}</div>}
+  </div>
+);

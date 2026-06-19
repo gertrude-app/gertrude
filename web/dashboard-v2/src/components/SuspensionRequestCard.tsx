@@ -1,10 +1,12 @@
 import { Button, Input, Modal, Select, Textarea, inflect } from '@gertrude/ui';
 import { ClockIcon } from 'lucide-react';
 import React from 'react';
-import type { SuspensionRequest } from '#/lib/mock-data/suspension-requests';
+import type { SuspensionRequest } from '#/lib/mock';
 
 interface Props {
   request: SuspensionRequest;
+  onDeny: (id: string) => void;
+  onGrant: (id: string) => void;
 }
 
 type DurationUnit = `minutes` | `hours`;
@@ -23,7 +25,7 @@ const parseDuration = (duration: string): { amount: string; unit: DurationUnit }
 const formatDuration = (amount: number, unit: DurationUnit): string =>
   `${amount} ${inflect(unit === `hours` ? `hour` : `minute`, amount)}`;
 
-const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
+const SuspensionRequestCard: React.FC<Props> = ({ request, onDeny, onGrant }) => {
   const parsedRequestDuration = parseDuration(request.duration);
   const [customDurationOpen, setCustomDurationOpen] = React.useState(false);
   const [customDurationAmount, setCustomDurationAmount] = React.useState(
@@ -47,6 +49,20 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
     if (!open) {
       setDenyReason(``);
     }
+  };
+
+  const handleDenyRequest = (): void => {
+    handleDenyModalOpenChange(false);
+    onDeny(request.id);
+  };
+
+  const handleGrantRequest = (): void => {
+    onGrant(request.id);
+  };
+
+  const handleGrantCustomDuration = (): void => {
+    setCustomDurationOpen(false);
+    onGrant(request.id);
   };
 
   return (
@@ -73,13 +89,13 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
         </Button>
         <Button
           type="button"
-          onClick={() => {}}
+          onClick={handleGrantRequest}
           size="small"
           dropdownAriaLabel="Grant with another duration"
           dropdownItems={[
-            { title: `Grant 5 minutes`, icon: ClockIcon, onSelect: () => {} },
-            { title: `Grant 30 minutes`, icon: ClockIcon, onSelect: () => {} },
-            { title: `Grant 1 hour`, icon: ClockIcon, onSelect: () => {} },
+            { title: `Grant 5 minutes`, icon: ClockIcon, onSelect: handleGrantRequest },
+            { title: `Grant 30 minutes`, icon: ClockIcon, onSelect: handleGrantRequest },
+            { title: `Grant 1 hour`, icon: ClockIcon, onSelect: handleGrantRequest },
             {
               title: `Custom duration…`,
               icon: ClockIcon,
@@ -105,11 +121,7 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
             >
               Cancel
             </Button>
-            <Button
-              type="button"
-              onClick={() => handleDenyModalOpenChange(false)}
-              variant="destructive"
-            >
+            <Button type="button" onClick={handleDenyRequest} variant="destructive">
               Deny request
             </Button>
           </>
@@ -140,7 +152,7 @@ const SuspensionRequestCard: React.FC<Props> = ({ request }) => {
             </Button>
             <Button
               type="button"
-              onClick={() => setCustomDurationOpen(false)}
+              onClick={handleGrantCustomDuration}
               variant="primary"
               disabled={!canGrantCustomDuration}
             >

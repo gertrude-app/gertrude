@@ -1,5 +1,7 @@
 // components
 export { default as Badge } from './components/ui/Badge';
+export { default as Banner } from './components/ui/Banner';
+export type { BannerProps, BannerVariant } from './components/ui/Banner';
 export { default as Button } from './components/ui/Button';
 export { default as Checkbox } from './components/ui/Checkbox';
 export { default as ConfirmationDialog } from './components/ui/ConfirmationDialog';

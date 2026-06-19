@@ -4,9 +4,12 @@ import { FlagIcon, GripVerticalIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 
 interface Props {
+  id: string;
   screenshotUrl: string;
   date: Date;
   flagged: boolean;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 type ControlsCorner = `topLeft` | `topRight` | `bottomLeft` | `bottomRight`;
@@ -24,7 +27,13 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), Math.max(min, max));
 }
 
-const ScreenshotActivityItem: React.FC<Props> = ({ screenshotUrl, flagged }) => {
+const ScreenshotActivityItem: React.FC<Props> = ({
+  id,
+  screenshotUrl,
+  flagged,
+  onToggleFlag,
+  onDelete,
+}) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const controlsRef = React.useRef<HTMLDivElement>(null);
@@ -53,8 +62,8 @@ const ScreenshotActivityItem: React.FC<Props> = ({ screenshotUrl, flagged }) => 
         ? `topLeft`
         : `topRight`
       : isLeft
-      ? `bottomLeft`
-      : `bottomRight`;
+        ? `bottomLeft`
+        : `bottomRight`;
   };
 
   const updateControlsCorner = (clientX: number, clientY: number): void => {
@@ -261,7 +270,7 @@ const ScreenshotActivityItem: React.FC<Props> = ({ screenshotUrl, flagged }) => 
           >
             <Button
               type="button"
-              onClick={() => {}}
+              onClick={() => onToggleFlag?.(id)}
               icon={FlagIcon}
               fillIcon={flagged}
               variant={flagged ? `selected` : `ghost`}
@@ -269,7 +278,7 @@ const ScreenshotActivityItem: React.FC<Props> = ({ screenshotUrl, flagged }) => 
               {flagged ? `Flagged` : `Flag`}
             </Button>
           </Tooltip>
-          <Button type="button" onClick={() => {}} icon={TrashIcon}>
+          <Button type="button" onClick={() => onDelete?.(id)} icon={TrashIcon}>
             Delete
           </Button>
         </div>

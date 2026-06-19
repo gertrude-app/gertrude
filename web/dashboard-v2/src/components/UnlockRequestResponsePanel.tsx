@@ -16,11 +16,12 @@ import {
   ShieldIcon,
 } from 'lucide-react';
 import React, { useState } from 'react';
-import { type Key, defaultKeyFromDomain } from '#/lib/mock-data/keys';
+import { type Key, defaultKeyFromDomain } from '#/lib/mock';
 
 interface Props {
   domains: string[];
-  personName: string;
+  onDenyAll: () => void;
+  onSave: () => void;
 }
 
 const addressTypeOptions: Array<SelectOption<Key[`addressType`]>> = [
@@ -55,7 +56,7 @@ const unlockedForOptions: Array<SelectOption<Key[`scope`][`type`]>> = [
 
 const keyChainOptions = [`School stuff`, `Games`, `Music`, `Jimmy's stuff`] as const;
 
-const UnlockRequstResponsePanel: React.FC<Props> = ({ domains, personName }) => {
+const UnlockRequstResponsePanel: React.FC<Props> = ({ domains, onDenyAll, onSave }) => {
   const [keys, setKeys] = useState<
     Array<{
       allowed: boolean;
@@ -98,14 +99,9 @@ const UnlockRequstResponsePanel: React.FC<Props> = ({ domains, personName }) => 
 
   const allowedKeysCount = keys.filter((k) => k.allowed).length;
   return (
-    <div className="h-full w-full flex flex-col px-3 @lg/slide:px-6 pb-3 @lg/slide:pb-6 pt-6 @lg/slide:pt-8 justify-between overflow-scroll gap-8">
+    <div className="h-full w-full flex flex-col px-3 @lg/slide:px-6 pb-3 @lg/slide:pb-6 justify-between overflow-scroll gap-8">
       <div>
-        <h2 className="text-xl font-medium">Create keys for {personName}</h2>
-        <p className="text-sm text-stone-600 mt-2">
-          We pre-filled some sensible defaults for you, but make sure to check that
-          everything looks good before saving!
-        </p>
-        <div className="flex flex-col mt-4 border-y @lg/slide:border-x border-stone-200 bg-white -mx-3 @lg/slide:mx-0 px-3 @lg/slide:rounded-xl shadow shadow-stone-300/30">
+        <div className="flex flex-col border-y @lg/slide:border-x border-stone-200 bg-white -mx-3 @lg/slide:mx-0 px-3 @lg/slide:rounded-xl shadow shadow-stone-300/30">
           {keys.map((k) => (
             <div
               key={k.key.domain}
@@ -253,12 +249,12 @@ const UnlockRequstResponsePanel: React.FC<Props> = ({ domains, personName }) => 
         </div>
       </div>
       <div className="flex justify-end gap-2">
-        <Button type="button" onClick={() => {}} variant="ghost">
+        <Button type="button" onClick={onDenyAll} variant="ghost">
           Deny all
         </Button>
         <Button
           type="button"
-          onClick={() => {}}
+          onClick={onSave}
           variant="primary"
           disabled={allowedKeysCount === 0}
         >

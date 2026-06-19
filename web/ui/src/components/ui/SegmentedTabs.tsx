@@ -39,6 +39,7 @@ const getTabPath = (basePath: string, segment: string): string => {
 const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
   const { pathname } = useLocation();
   const normalizedBasePath = normalizePath(basePath);
+  const hasBasePathTab = tabs.some((tab) => normalizeSegment(tab.segment) === ``);
   const scrollRef = React.useRef<HTMLElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
@@ -75,21 +76,24 @@ const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
     <div className="flex flex-col gap-4">
       <div
         className={cx(
-          `relative overflow-hidden rounded-xl bg-stone-100 p-1.5`,
+          `relative overflow-hidden rounded-xl bg-stone-100 px-1.5`,
           className,
         )}
       >
         <nav
           ref={scrollRef}
-          className="flex overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex py-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           onScroll={updateScrollState}
         >
           {tabs.map((tab, index) => {
+            const normalizedSegment = normalizeSegment(tab.segment);
             const href = getTabPath(normalizedBasePath, tab.segment);
             const isSelected =
-              pathname === href ||
-              pathname.startsWith(`${href}/`) ||
-              (index === 0 && pathname === normalizedBasePath);
+              normalizedSegment === ``
+                ? pathname === normalizedBasePath
+                : pathname === href ||
+                  pathname.startsWith(`${href}/`) ||
+                  (!hasBasePathTab && index === 0 && pathname === normalizedBasePath);
 
             return (
               <Link

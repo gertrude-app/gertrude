@@ -2,7 +2,7 @@ import { Button } from '@gertrude/ui';
 import cx from 'clsx';
 import { TrashIcon } from 'lucide-react';
 import React from 'react';
-import type { ActivityItem } from '#/lib/mock-data/activity';
+import type { ActivityItem } from '#/lib/mock';
 import CardContainer from './CardContainer';
 import KeylogActivityItem from './KeylogActivityItem';
 import ScreenshotActivityItem from './ScreenshotActivityItem';
@@ -12,14 +12,21 @@ interface Props {
   personName: string;
   items: ActivityItem[];
   showHeading?: boolean;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDeleteAll?: (personId: string) => void;
 }
 
 const ActivityPersonSection: React.FC<Props> = ({
   personName,
   items,
   showHeading = true,
+  onToggleFlag,
+  onDelete,
+  onDeleteAll,
 }) => {
   const chunkedItems = chunkActivityBySuspension(items);
+  const personId = items[0]?.personId;
 
   return (
     <div className="flex flex-col gap-3">
@@ -31,10 +38,16 @@ const ActivityPersonSection: React.FC<Props> = ({
           <ActivitySuspensionChunk
             key={`${chunk.type}-${index}-${chunk.items[0]?.id ?? `empty`}`}
             chunk={chunk}
+            onToggleFlag={onToggleFlag}
+            onDelete={onDelete}
           />
         ))}
         <div className="flex justify-center">
-          <Button type="button" onClick={() => {}} icon={TrashIcon}>
+          <Button
+            type="button"
+            onClick={() => personId && onDeleteAll?.(personId)}
+            icon={TrashIcon}
+          >
             Delete all {personName}'s activity
           </Button>
         </div>
@@ -45,9 +58,15 @@ const ActivityPersonSection: React.FC<Props> = ({
 
 interface ActivitySuspensionChunkProps {
   chunk: ActivityChunk;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
-const ActivitySuspensionChunk: React.FC<ActivitySuspensionChunkProps> = ({ chunk }) => (
+const ActivitySuspensionChunk: React.FC<ActivitySuspensionChunkProps> = ({
+  chunk,
+  onToggleFlag,
+  onDelete,
+}) => (
   <div
     className={cx(
       chunk.type === `duringSuspension` &&
@@ -71,17 +90,23 @@ const ActivitySuspensionChunk: React.FC<ActivitySuspensionChunkProps> = ({ chunk
           item.type === `screenshot` ? (
             <ScreenshotActivityItem
               key={item.id}
+              id={item.id}
               screenshotUrl={item.url}
               date={item.date}
               flagged={item.flagged}
+              onToggleFlag={onToggleFlag}
+              onDelete={onDelete}
             />
           ) : (
             <KeylogActivityItem
               key={item.id}
+              id={item.id}
               text={item.text}
               applicationName={item.applicationName}
               date={item.date}
               flagged={item.flagged}
+              onToggleFlag={onToggleFlag}
+              onDelete={onDelete}
             />
           ),
         )}

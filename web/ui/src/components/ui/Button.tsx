@@ -41,6 +41,7 @@ type Props = CommonProps &
       }
     | {
         type: `submit`;
+        form?: string;
       }
     | {
         type: `link`;

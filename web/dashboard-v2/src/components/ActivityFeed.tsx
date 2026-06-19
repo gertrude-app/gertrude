@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ActivityItem } from '#/lib/mock-data/activity';
+import type { ActivityItem } from '#/lib/mock';
 import ActivityPersonSection from '#/components/ActivityPersonSection';
 import CardContainer from '#/components/CardContainer';
 import { groupBy } from '#/lib/utils';
@@ -8,12 +8,18 @@ interface Props {
   items: ActivityItem[];
   personName?: string;
   showPersonHeading?: boolean;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDeletePersonActivity?: (personId: string) => void;
 }
 
 const ActivityFeed: React.FC<Props> = ({
   items,
   personName,
   showPersonHeading = true,
+  onToggleFlag,
+  onDelete,
+  onDeletePersonActivity,
 }) => {
   const visibleItems = items.filter((item) => !item.deleted);
 
@@ -37,6 +43,9 @@ const ActivityFeed: React.FC<Props> = ({
           personName={groupPersonName}
           items={groupItems}
           showHeading={personName ? showPersonHeading : true}
+          onToggleFlag={onToggleFlag}
+          onDelete={onDelete}
+          onDeleteAll={onDeletePersonActivity}
         />
       ))}
     </div>

@@ -15,6 +15,8 @@ export interface SlideOverProps {
   size?: `small` | `medium` | `large`;
   dismissible?: boolean;
   ariaLabel?: string;
+  heading?: React.ReactNode;
+  subheading?: React.ReactNode;
   className?: string;
   overlayClassName?: string;
 }
@@ -66,6 +68,8 @@ const SlideOver: React.FC<SlideOverProps> = ({
   size = `medium`,
   dismissible = true,
   ariaLabel = `Slide over panel`,
+  heading,
+  subheading,
   className,
   overlayClassName,
 }) => {
@@ -81,6 +85,7 @@ const SlideOver: React.FC<SlideOverProps> = ({
     ? pathname === normalizedPath || pathname.startsWith(`${normalizedPath}/`)
     : undefined;
   const resolvedOpen = normalizedPath ? pathOpen : open;
+  const hasHeading = heading !== undefined || subheading !== undefined;
   const [overlayPortalContainer, setOverlayPortalContainer] =
     React.useState<HTMLElement | null>(null);
   const setContentRef = React.useCallback((node: HTMLDivElement | null) => {
@@ -136,10 +141,30 @@ const SlideOver: React.FC<SlideOverProps> = ({
             className,
           )}
         >
-          <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
           <OverlayPortalProvider container={overlayPortalContainer}>
             <div className="h-full w-full overflow-hidden rounded-[inherit] @container/slide">
-              {children}
+              {hasHeading ? (
+                <div className="flex h-full flex-col">
+                  <div className="shrink-0 px-3 pt-6 pb-4 @lg/slide:px-6 @lg/slide:pt-8">
+                    {heading ? (
+                      <Drawer.Title className="text-xl font-medium text-stone-900">
+                        {heading}
+                      </Drawer.Title>
+                    ) : (
+                      <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
+                    )}
+                    {subheading && (
+                      <p className="mt-2 text-sm text-stone-600">{subheading}</p>
+                    )}
+                  </div>
+                  <div className="min-h-0 flex-1">{children}</div>
+                </div>
+              ) : (
+                <>
+                  <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
+                  {children}
+                </>
+              )}
             </div>
           </OverlayPortalProvider>
         </Drawer.Content>

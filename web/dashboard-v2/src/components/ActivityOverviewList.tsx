@@ -1,7 +1,7 @@
 import { Badge, inflect } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
 import React from 'react';
-import type { ActivityItem } from '#/lib/mock-data/activity';
+import type { ActivityItem } from '#/lib/mock';
 import CardContainer from '#/components/CardContainer';
 import { type ActivityReviewStats, getActivityReviewStats } from '#/lib/activity-helpers';
 import { formatDate, groupBy } from '#/lib/utils';

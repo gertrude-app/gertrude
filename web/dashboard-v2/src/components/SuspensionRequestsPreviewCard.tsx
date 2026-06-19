@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
-import type { SuspensionRequest } from '#/lib/mock-data/suspension-requests';
+import type { SuspensionRequest } from '#/lib/mock';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {
@@ -24,7 +24,7 @@ const SuspensionRequetsPreviewCard: React.FC<Props> = ({ allSuspensionRequests }
     <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
       {allSuspensionRequests.slice(0, 3).map((r) => (
         <Link
-          key={`${r.personName}-${r.duration}-${r.reason ?? ``}`}
+          key={r.id}
           to="/requests/suspension"
           className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer gap-1.5"
         >

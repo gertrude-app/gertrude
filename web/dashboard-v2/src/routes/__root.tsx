@@ -1,6 +1,6 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
-
 import appCss from '../styles.css?url';
+import { MockDataProvider } from '#/lib/mock';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -13,13 +13,19 @@ export const Route = createRootRoute({
         content: `width=device-width, initial-scale=1`,
       },
       {
-        title: `TanStack Start Starter`,
+        title: `Gertrude`,
       },
     ],
     links: [
       {
         rel: `stylesheet`,
         href: appCss,
+      },
+      // favicon:
+      {
+        rel: `icon`,
+        href: `/favicon.png`,
+        type: `image/png`,
       },
     ],
   }),
@@ -33,7 +39,7 @@ function RootDocument({ children }: { children: React.ReactNode }): React.ReactE
         <HeadContent />
       </head>
       <body>
-        {children}
+        <MockDataProvider>{children}</MockDataProvider>
         <Scripts />
       </body>
     </html>
