@@ -1,4 +1,5 @@
 import Dependencies
+import DuetSQL
 import Foundation
 import PairQL
 
@@ -19,6 +20,8 @@ struct GetAccountOwner_v2: Pair {
   struct Output: PairOutput {
     var id: Parent.Id
     var email: String
+    var dailyReviewEmail: Bool
+    var hasMacScreenshotUsers: Bool
     var notifications: [Notification]
     var verifiedNotificationMethods: [VerifiedNotificationMethod]
   }
@@ -29,9 +32,21 @@ extension GetAccountOwner_v2: NoInputResolver {
     let parent = context.parent
     async let notifications = parent.notifications(in: context.db)
     async let methods = parent.verifiedNotificationMethods(in: context.db)
+
+    let children = try await parent.children(in: context.db)
+    let screenshotChildIds = children.filter(\.screenshotsEnabled).map(\.id)
+    var hasMacScreenshotUsers = false
+    if !screenshotChildIds.isEmpty {
+      hasMacScreenshotUsers = try await ComputerUser.query()
+        .where(.childId |=| screenshotChildIds)
+        .count(in: context.db) > 0
+    }
+
     return try await .init(
       id: parent.id,
       email: parent.email.rawValue,
+      dailyReviewEmail: parent.dailyReviewEmail,
+      hasMacScreenshotUsers: hasMacScreenshotUsers,
       notifications: notifications.map {
         .init(id: $0.id, trigger: $0.trigger, methodId: $0.methodId)
       },

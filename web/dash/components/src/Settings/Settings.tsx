@@ -11,6 +11,7 @@ import type {
   SubscriptionPanelAction,
 } from '@dash/types';
 import EmptyState from '../EmptyState';
+import ToggleCard from '../Forms/ToggleCard';
 import Modal, { ConfirmDeleteEntity } from '../Modal';
 import PageHeading from '../PageHeading';
 import NewNotificationMethodSidebar from './NewNotificationMethodForm';
@@ -29,6 +30,9 @@ export type NewMethod = { id: UUID; confirmed: boolean };
 
 interface Props {
   email: string;
+  dailyReviewEmail: boolean;
+  setDailyReviewEmail(enabled: boolean): unknown;
+  hasMacScreenshotUsers: boolean;
   subscriptionPanel: GetSubscriptionPanel_v2.Output;
   onSubscriptionPanelAction(action: SubscriptionPanelAction): unknown;
   pendingSubscriptionPanelAction?: SubscriptionPanelAction;
@@ -47,6 +51,9 @@ interface Props {
 
 const Settings: React.FC<Props> = ({
   email,
+  dailyReviewEmail,
+  setDailyReviewEmail,
+  hasMacScreenshotUsers,
   subscriptionPanel,
   onSubscriptionPanelAction,
   pendingSubscriptionPanelAction,
@@ -130,6 +137,18 @@ const Settings: React.FC<Props> = ({
       />
     </div>
     <div className="mt-12 flex flex-col space-y-12">
+      {hasMacScreenshotUsers && (
+        <div className="xs:bg-white xs:border border-slate-200 p-2 xs:p-8 rounded-3xl">
+          <h2 className="text-2xl font-bold text-slate-800">Email reminders</h2>
+          <ToggleCard
+            className="mt-4"
+            title="Daily review reminder"
+            description="An email reminding you to review your kids’ screenshots, only on days they’re active."
+            enabled={dailyReviewEmail}
+            setEnabled={setDailyReviewEmail}
+          />
+        </div>
+      )}
       <div className="xs:bg-white xs:border border-slate-200 p-2 xs:p-8 rounded-3xl">
         <h2 className="text-2xl font-bold text-slate-800">Notification methods</h2>
         <p className="text-slate-500 mt-1">

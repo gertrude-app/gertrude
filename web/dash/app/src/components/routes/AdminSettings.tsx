@@ -109,6 +109,11 @@ const AdminSettings: React.FC = () => {
     invalidating: [Key.accountOwner],
   });
 
+  const toggleDailyReviewEmail = useMutation(
+    (enabled: boolean) => Current.api.setDailyReviewEmail({ enabled }),
+    { invalidating: [Key.accountOwner] },
+  );
+
   const saveNotification = useMutation(
     (id: UUID) => {
       const notification = state.notifications[id];
@@ -210,6 +215,9 @@ const AdminSettings: React.FC = () => {
       newMethodId={newMethodId}
       setNewMethodId={setNewMethodId}
       email={accountOwner.email}
+      dailyReviewEmail={accountOwner.dailyReviewEmail}
+      setDailyReviewEmail={(enabled) => toggleDailyReviewEmail.mutate(enabled)}
+      hasMacScreenshotUsers={accountOwner.hasMacScreenshotUsers}
       subscriptionPanel={panelQuery.data}
       onSubscriptionPanelAction={handleSubscriptionPanelAction}
       pendingSubscriptionPanelAction={pendingPanelAction}

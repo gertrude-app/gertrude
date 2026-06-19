@@ -155,6 +155,25 @@ import Vapor
           model: .init(childName: "Billy", computerName: "Test MacBook Pro"),
         ))
 
+      case "daily-review-digest":
+        try await postmark.send(template: .dailyReviewDigest(
+          to: to,
+          model: .init(
+            subjectSummary: "12 new screenshots",
+            intro: "Gertrude has new screenshots of Emma and Caleb’s activity, ready for your review:",
+            childRows: """
+            <p class="centered"><strong>Emma</strong>: 8 new screenshots · 23 awaiting review · <a href="\(
+              localDash
+            )/children/abc/activity">review →</a></p>
+            <p class="centered"><strong>Caleb</strong>: 4 new screenshots · 18 awaiting review · <a href="\(
+              localDash
+            )/children/def/activity">review →</a></p>
+            """,
+            reviewUrl: "\(localDash)/children/activity",
+            manageUrl: "\(localDash)/settings",
+          ),
+        ))
+
       default:
         throw Abort(.badRequest, reason: "unknown template email")
       }
@@ -204,6 +223,8 @@ import Vapor
         return write(template: AccountLifecycle.PaidToOverdue.self)
       case "screen-time-warning":
         return write(template: ScreenTimeWarning.self)
+      case "daily-review-digest":
+        return write(template: DailyReviewDigest.self)
       default:
         throw Abort(.badRequest, reason: "unknown template email")
       }

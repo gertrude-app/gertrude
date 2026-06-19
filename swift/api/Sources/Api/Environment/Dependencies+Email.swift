@@ -75,7 +75,8 @@ extension PostmarkClient {
          .verifyNotificationEmail(let recipient, _),
          .screenTimeWarning(let recipient, _),
          .iosOnlyMacTrial(let recipient, _),
-         .macSetup24h(let recipient, _):
+         .macSetup24h(let recipient, _),
+         .dailyReviewDigest(let recipient, _):
       templateEmail.to = recipient
       templateEmail.templateModel["subjref"] = "".withEmailSubjectDisambiguator
       try await self._sendTemplateEmail(templateEmail)

@@ -343,6 +343,9 @@ extension Parent: Model {
     case .abTestVariant: .string(self.abTestVariant)
     case .referralCode: .string(self.referralCode)
     case .referredByParentId: .uuid(self.referredByParentId?.rawValue)
+    case .timeZone: .string(self.timeZone)
+    case .dailyReviewEmail: .bool(self.dailyReviewEmail)
+    case .lastReviewEmailAt: .date(self.lastReviewEmailAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -358,6 +361,9 @@ extension Parent: Model {
       .abTestVariant: .string(abTestVariant),
       .referralCode: .string(referralCode),
       .referredByParentId: .uuid(referredByParentId?.rawValue),
+      .timeZone: .string(timeZone),
+      .dailyReviewEmail: .bool(dailyReviewEmail),
+      .lastReviewEmailAt: .date(lastReviewEmailAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

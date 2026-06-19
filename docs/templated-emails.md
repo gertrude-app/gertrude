@@ -28,8 +28,12 @@ swift/api/Sources/Api/Email/
 3. Preview changes locally:
 
    ```bash
-   just swift api                              # start the API server
-   just swift web-email admin-{template-name}  # preview in browser
+   # fast: render with sample data to a screenshot, no API needed
+   just swift preview-email {alias} [--dark] [--mobile]
+
+   # or live in the browser (needs the API running, renders literal {{vars}})
+   just swift api
+   just swift web-email admin-{template-name}
    ```
 
 4. Test sending:
@@ -50,24 +54,40 @@ Templates use Postmark's `{{variable}}` syntax. Variables are defined in the Swi
 
 ## Available Test Commands
 
-| Command                                  | Purpose                 |
-| ---------------------------------------- | ----------------------- |
-| `just swift send-email admin-{template}` | Send test email         |
-| `just swift web-email admin-{template}`  | Preview HTML in browser |
-| `just swift sync-email-templates`        | Sync all templates      |
+| Command                                  | Purpose                            |
+| ---------------------------------------- | ---------------------------------- |
+| `just swift preview-email {alias}`       | Screenshot w/ sample data (no API) |
+| `just swift send-email admin-{template}` | Send test email                    |
+| `just swift web-email admin-{template}`  | Preview HTML in browser            |
+| `just swift sync-email-templates`        | Sync all templates                 |
+
+### Preview with sample data (no API)
+
+`just swift preview-email {alias} [--dark] [--mobile]` renders a template populated with
+sample data and writes an HTML file + screenshot to a temp dir (path is printed). Unlike
+`web-email`, it needs no running API and shows real content instead of literal `{{vars}}`
+— handy for fast visual iteration and for agents (who can read the PNG).
+
+The script lives at `web/storybook/visual-tests/preview-email.mts` (that package has the
+puppeteer dependency). It's a plain `.mts` run by `node` via type-stripping — no `ts-node`.
+Its `SAMPLES` map mirrors the sample models in `TestEmail.swift`, which is the source of
+truth — when you add a template, add a `SAMPLES` entry there too (see the next section).
 
 ## Adding a New Template
 
 1. Create `Templates/{NewName}/template.html` and `template.md`
 2. Add Swift model struct to `TemplateEmails.swift`
 3. Add case to `Email+Types.swift`
-4. Add test alias to `TestEmail.swift`
-5. Create the template in Postmark web UI first (the sync tool only updates, doesn't
+4. Add test alias to `TestEmail.swift`, plus a matching `SAMPLES` entry in
+   `web/storybook/visual-tests/preview-email.mts` (enables `just swift preview-email`)
+5. Register it in `SyncPostmark.swift`'s `syncAll()` with `syncTemplate(NewName.self)` —
+   easy to miss; without it the sync silently skips your template
+6. Create the template in Postmark web UI first (the sync tool only updates, doesn't
    create):
    - Go to Templates → New Template
    - Set the alias to match (e.g. `screen-time-warning`)
    - No layout, no content needed—first sync will set everything correctly
-6. Run `just swift sync-email-templates`
+7. Run `just swift sync-email-templates`
 
 ## Gotchas
 
@@ -83,6 +103,22 @@ resolves against the string and renders **empty**:
 
 Fails silently, and only when the var is non-nil — a nil/empty test renders
 identically to a correct one, so always test with the value populated.
+
+### Gmail strips `margin`/`inline-block` gaps — the preview won't catch it
+
+`just swift preview-email` renders in Chromium, which faithfully draws CSS `margin` and
+`inline-block` spacing. **Gmail silently drops both on small elements**, so a layout that
+relies on them looks perfect in the preview but **merges/clips in Gmail** (e.g. a row of
+`inline-block` tiles collapses into one bar; margin-stacked lines smear together).
+
+```
+✗  <span style="display:inline-block; margin:0 5px 0 0">  → gaps vanish in Gmail
+✓  <table cellspacing="5"><tr><td>…</td><td>…</td></tr>   → real gaps everywhere
+```
+
+Space inner layout with **table cell-spacing / spacer rows/cells**, not margins. Treat the
+preview as layout-correctness only — for Gmail-specific rendering, send a real test
+(`?for=<email>`) and inspect in Gmail itself.
 
 ### Render without sending
 

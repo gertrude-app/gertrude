@@ -44,6 +44,7 @@ enum AuthedParentRoute: PairRoute {
   case saveKeychain(SaveKeychain.Input)
   case saveNotification(SaveNotification.Input)
   case saveUser(SaveUser.Input)
+  case setDailyReviewEmail(SetDailyReviewEmail.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
   case getSubscriptionPanel
   case getSubscriptionPanel_v2
@@ -232,6 +233,10 @@ extension AuthedParentRoute {
           Operation(SaveUser.self)
           Body(.dashboardInput(SaveUser.self))
         }
+        Route(.case(Self.setDailyReviewEmail)) {
+          Operation(SetDailyReviewEmail.self)
+          Body(.dashboardInput(SetDailyReviewEmail.self))
+        }
         Route(.case(Self.getSubscriptionPanel)) {
           Operation(GetSubscriptionPanel.self)
         }
@@ -381,6 +386,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .saveNotification(let input):
       let output = try await SaveNotification.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .setDailyReviewEmail(let input):
+      let output = try await SetDailyReviewEmail.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getIdentifiedApps:
       let output = try await GetIdentifiedApps.resolve(in: context)

@@ -197,6 +197,10 @@ export function interceptPql(
   slug: `SendPasswordResetEmail`,
   output: T.SendPasswordResetEmail.Output,
 ): void;
+export function interceptPql(
+  slug: `SetDailyReviewEmail`,
+  output: T.SetDailyReviewEmail.Output,
+): void;
 export function interceptPql(slug: `Signup`, output: T.Signup.Output): void;
 export function interceptPql(
   slug: `StartCheckoutSession`,
@@ -293,6 +297,7 @@ export function forcePqlErr(
     | `SearchMusicCatalog`
     | `SecurityEventsFeed`
     | `SendPasswordResetEmail`
+    | `SetDailyReviewEmail`
     | `Signup`
     | `StartCheckoutSession`
     | `StartFullTrial`

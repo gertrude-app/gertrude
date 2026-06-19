@@ -29,6 +29,7 @@ extension ChildActivitySummaries: Resolver {
     with input: Input,
     in context: ParentContext,
   ) async throws -> Output {
+    await context.persistTimeZone(input.timeZone)
     let child = try await context.verifiedChild(from: input.childId)
     let computerUserIds = try await child.computerUsers(in: context.db).map(\.id)
     let days = try await ChildActivitySummaries.days(

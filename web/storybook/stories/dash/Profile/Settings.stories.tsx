@@ -60,6 +60,9 @@ const baseArgs = {
   newMethodId: undefined,
   setNewMethodId: () => {},
   email: `johndoe@example.com`,
+  dailyReviewEmail: false,
+  setDailyReviewEmail: () => {},
+  hasMacScreenshotUsers: true,
   methods: withIdsAnd({ deletable: false }, [
     { method: `email` as const, value: `me@example.com`, inUse: true },
     { method: `slack` as const, value: `#Gertrude`, inUse: true },

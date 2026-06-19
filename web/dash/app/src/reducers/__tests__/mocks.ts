@@ -20,6 +20,8 @@ export function accountOwner(override: Partial<AccountOwner> = {}): AccountOwner
   return {
     id: uuid(),
     email: `you@example.com`,
+    dailyReviewEmail: false,
+    hasMacScreenshotUsers: true,
     notifications: [],
     verifiedNotificationMethods: [],
     ...override,

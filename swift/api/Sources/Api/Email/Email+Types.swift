@@ -20,6 +20,7 @@ enum TemplateEmail {
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
   case paidToOverdue(to: String, model: AccountLifecycle.PaidToOverdue)
   case screenTimeWarning(to: String, model: ScreenTimeWarning)
+  case dailyReviewDigest(to: String, model: DailyReviewDigest)
 }
 
 enum EmailLayout: String, CaseIterable {
@@ -87,6 +88,7 @@ extension TemplateEmail {
     case .notifySecurityEvent(_, let model): model
     case .verifyNotificationEmail(_, let model): model
     case .screenTimeWarning(_, let model): model
+    case .dailyReviewDigest(_, let model): model
     }
   }
 }

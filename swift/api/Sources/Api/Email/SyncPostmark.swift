@@ -27,6 +27,7 @@ import XHttp
       await self.syncTemplate(V2_9_1_Announce.self)
       await self.syncTemplate(IosOnlyMacTrial.self)
       await self.syncTemplate(MacSetup24h.self)
+      await self.syncTemplate(DailyReviewDigest.self)
       await self.syncTemplate(AccountLifecycle.TrialEndingSoon.self)
       await self.syncTemplate(AccountLifecycle.TrialExpired.self)
       await self.syncTemplate(AccountLifecycle.OverdueToUnpaid.self)
