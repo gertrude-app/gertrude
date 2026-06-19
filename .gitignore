@@ -45,7 +45,7 @@ web/smoke/cypress.env.json
 
 # Generated Xcode projects
 swift/podcasts/GertiePodcasts.xcodeproj/
-swift/music/GertrudeFM.xcodeproj/
+swift/music/GertrudeMusic.xcodeproj/
 
 # Podcasts app
 swift/podcasts/previews

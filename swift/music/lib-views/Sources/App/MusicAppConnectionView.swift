@@ -33,7 +33,9 @@ public struct MusicAppConnectionView: View {
       }
       .background(.background)
       .navigationTitle("Gertrude Music")
-      .navigationBarTitleDisplayMode(.inline)
+      #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+      #endif
     }
   }
 

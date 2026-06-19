@@ -22,7 +22,7 @@ struct GetApprovedMusicAlbums: Pair {
 
 extension GetApprovedMusicAlbums: Resolver {
   static func resolve(with childId: Child.Id, in context: ParentContext) async throws -> Output {
-    let child = try await verifiedChildWithConnectedMusicApp(from: childId, in: context)
+    let child = try await context.verifiedChildWithConnectedMusicApp(from: childId)
     let albums = try await child.approvedMusicAlbums(in: context.db)
     return .init(albums: albums.map {
       .init(

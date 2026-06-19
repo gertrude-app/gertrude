@@ -1,5 +1,6 @@
 import DuetSQL
 import MusicRoute
+import PairQL
 import Vapor
 
 extension MusicRoute: RouteResponder {
@@ -42,6 +43,19 @@ extension MusicRoute: RouteResponder {
         return try await self.respond(with: output)
       }
     }
+  }
+}
+
+func requireGertrudeMusicAccess(
+  in context: some ResolverContext,
+  billing: BillingAccountSnapshot,
+) throws {
+  guard billing.can(.useGertrudeMusic) else {
+    throw context.error(
+      "ad0437fe",
+      .paymentRequired,
+      user: "Gertrude Music requires a Gertrude Light or Full subscription.",
+    )
   }
 }
 

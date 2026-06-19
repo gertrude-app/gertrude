@@ -41,17 +41,19 @@ public struct AlbumArtworkView: View {
   }
 }
 
-#Preview("Album artwork") {
-  VStack(spacing: 24) {
-    AlbumArtworkView(album: [AlbumData].previewAlbums[0])
-    AlbumArtworkView(album: [AlbumData].previewAlbums[1])
-    AlbumArtworkView(
-      album: AlbumData(
-        id: "missing-artwork",
-        title: "Missing Artwork",
-        artist: "Preview",
-      ),
-    )
+#if DEBUG
+  #Preview("Album artwork") {
+    VStack(spacing: 24) {
+      AlbumArtworkView(album: [AlbumData].previewAlbums[0])
+      AlbumArtworkView(album: [AlbumData].previewAlbums[1])
+      AlbumArtworkView(
+        album: AlbumData(
+          id: "missing-artwork",
+          title: "Missing Artwork",
+          artist: "Preview",
+        ),
+      )
+    }
+    .padding(24)
   }
-  .padding(24)
-}
+#endif

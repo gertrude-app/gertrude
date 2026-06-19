@@ -5,11 +5,15 @@ public struct GertrudeMusicView: View {
 
   public var body: some View {
     NavigationStack {
-      LibraryView(state: .loaded(albums: .previewAlbums))
+      LibraryView(state: .empty)
     }
   }
 }
 
-#Preview {
-  GertrudeMusicView()
-}
+#if DEBUG
+  #Preview {
+    NavigationStack {
+      LibraryView(state: .loaded(albums: .previewAlbums))
+    }
+  }
+#endif

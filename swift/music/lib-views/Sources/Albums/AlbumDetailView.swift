@@ -273,22 +273,24 @@ private struct AlbumDetailEmptyTracksView: View {
   }
 }
 
-#Preview("Album detail") {
-  NavigationStack {
-    AlbumDetailView(
-      album: [AlbumData].previewAlbums[0],
-      tracks: .previewTracks,
-    )
+#if DEBUG
+  #Preview("Album detail") {
+    NavigationStack {
+      AlbumDetailView(
+        album: [AlbumData].previewAlbums[0],
+        tracks: .previewTracks,
+      )
+    }
   }
-}
 
-#Preview("Album detail playing") {
-  NavigationStack {
-    AlbumDetailView(
-      album: [AlbumData].previewAlbums[0],
-      tracks: .previewTracks,
-      isPlaying: true,
-      currentTrackID: [TrackData].previewTracks[2].id,
-    )
+  #Preview("Album detail playing") {
+    NavigationStack {
+      AlbumDetailView(
+        album: [AlbumData].previewAlbums[0],
+        tracks: .previewTracks,
+        isPlaying: true,
+        currentTrackID: [TrackData].previewTracks[2].id,
+      )
+    }
   }
-}
+#endif

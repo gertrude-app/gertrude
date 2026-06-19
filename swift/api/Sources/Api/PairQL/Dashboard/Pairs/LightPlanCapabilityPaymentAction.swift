@@ -1,5 +1,7 @@
 extension BillingAccountSnapshot {
-  func lightPlanPaymentAction(toEnable capability: Capability) -> GetSubscriptionPanel_v2.Action? {
+  func paymentActionForMissingLightPlanCapability(
+    _ capability: Capability,
+  ) -> GetSubscriptionPanel_v2.Action? {
     guard !self.can(capability), capability != .connectMacApp else { return nil }
 
     if let sub = self.stripeSubscription, sub.stripeStatus == .pastDue {

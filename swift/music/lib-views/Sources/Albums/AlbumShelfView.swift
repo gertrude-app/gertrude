@@ -81,34 +81,36 @@ private struct AlbumShelfSkeletonView: View {
   }
 }
 
-#Preview("Album shelf") {
-  ScrollView {
-    AlbumShelfView(albums: .previewAlbums)
-      .padding(.vertical, 24)
+#if DEBUG
+  #Preview("Album shelf") {
+    ScrollView {
+      AlbumShelfView(albums: .previewAlbums)
+        .padding(.vertical, 24)
+    }
+    .background(.background)
   }
-  .background(.background)
-}
 
-#Preview("Long names") {
-  ScrollView {
-    AlbumShelfView(albums: .longNamePreviewAlbums)
-      .padding(.vertical, 24)
+  #Preview("Long names") {
+    ScrollView {
+      AlbumShelfView(albums: .longNamePreviewAlbums)
+        .padding(.vertical, 24)
+    }
+    .background(.background)
   }
-  .background(.background)
-}
 
-#Preview("Album shelf empty") {
-  ScrollView {
-    AlbumShelfView(albums: [])
-      .padding(.vertical, 24)
+  #Preview("Album shelf empty") {
+    ScrollView {
+      AlbumShelfView(albums: [])
+        .padding(.vertical, 24)
+    }
+    .background(.background)
   }
-  .background(.background)
-}
 
-#Preview("Album shelf loading") {
-  ScrollView {
-    AlbumShelfView(albums: [], isLoading: true)
-      .padding(.vertical, 24)
+  #Preview("Album shelf loading") {
+    ScrollView {
+      AlbumShelfView(albums: [], isLoading: true)
+        .padding(.vertical, 24)
+    }
+    .background(.background)
   }
-  .background(.background)
-}
+#endif

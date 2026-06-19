@@ -17,22 +17,19 @@ public struct NowPlayingScreenView: View {
   private let onScrub: @MainActor @Sendable (TimeInterval) -> Void
 
   public init(
-    title: String = "Josefin’s Waltz",
-    artist: String = "Alasdair Fraser & Natalie Haas",
-    artworkURL: URL? = URL(
-      string:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
-    ),
-    showsArtwork: Bool = true,
-    artworkTransitionID: String? = nil,
-    isPlaying: Bool = true,
-    isLoading: Bool = false,
-    progress: Double = 0.38,
-    duration: TimeInterval = 214,
-    onPlayPauseTap: @MainActor @escaping @Sendable () -> Void = {},
-    onPreviousTap: @MainActor @escaping @Sendable () -> Void = {},
-    onNextTap: @MainActor @escaping @Sendable () -> Void = {},
-    onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void = { _ in },
+    title: String,
+    artist: String,
+    artworkURL: URL?,
+    showsArtwork: Bool,
+    artworkTransitionID: String?,
+    isPlaying: Bool,
+    isLoading: Bool,
+    progress: Double,
+    duration: TimeInterval,
+    onPlayPauseTap: @MainActor @escaping @Sendable () -> Void,
+    onPreviousTap: @MainActor @escaping @Sendable () -> Void,
+    onNextTap: @MainActor @escaping @Sendable () -> Void,
+    onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void,
   ) {
     self.title = title
     self.artist = artist
@@ -329,20 +326,58 @@ private struct NowPlayingProgressBar: View {
   }
 }
 
-#Preview("Now playing") {
-  NowPlayingScreenView()
-}
+#if DEBUG
+  #Preview("Now playing") {
+    NowPlayingScreenView(
+      title: PreviewMusicData.nowPlayingTitle,
+      artist: PreviewMusicData.nowPlayingArtist,
+      artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+      showsArtwork: true,
+      artworkTransitionID: nil,
+      isPlaying: true,
+      isLoading: false,
+      progress: 0.38,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+  }
 
-#Preview("Now playing paused") {
-  NowPlayingScreenView(isPlaying: false, progress: 0.62)
-}
+  #Preview("Now playing paused") {
+    NowPlayingScreenView(
+      title: PreviewMusicData.nowPlayingTitle,
+      artist: PreviewMusicData.nowPlayingArtist,
+      artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+      showsArtwork: true,
+      artworkTransitionID: nil,
+      isPlaying: false,
+      isLoading: false,
+      progress: 0.62,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+  }
 
-#Preview("Now playing no artwork") {
-  NowPlayingScreenView(
-    title: "A Long Tune Title That Wraps Gracefully",
-    artist: "Unknown Artist",
-    artworkURL: nil,
-    isPlaying: false,
-    progress: 0,
-  )
-}
+  #Preview("Now playing no artwork") {
+    NowPlayingScreenView(
+      title: "A Long Tune Title That Wraps Gracefully",
+      artist: "Unknown Artist",
+      artworkURL: nil,
+      showsArtwork: false,
+      artworkTransitionID: nil,
+      isPlaying: false,
+      isLoading: false,
+      progress: 0,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+  }
+#endif

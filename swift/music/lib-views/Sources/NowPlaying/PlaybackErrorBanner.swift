@@ -80,68 +80,84 @@ public struct PlaybackErrorBanner: View {
   }
 }
 
-#Preview("Apple Music access") {
-  VStack(spacing: 18) {
-    PlaybackErrorBanner(
-      title: "Apple Music access needed",
-      message: "Allow Gertrude Music to use Apple Music so approved songs can play.",
-      systemImage: "music.note.list",
-      actionTitle: "Open Settings",
-    )
-
-    PlaybackErrorBanner(
-      title: "Song unavailable",
-      message: "This song isn’t available from Apple Music right now. Try another approved track.",
-      systemImage: "exclamationmark.triangle.fill",
-    )
-  }
-  .padding(20)
-  .background(.background)
-}
-
-#Preview("Over now playing") {
-  ZStack(alignment: .top) {
-    NowPlayingScreenView()
-
-    PlaybackErrorBanner(
-      title: "Couldn’t start playback",
-      message: "Check your connection and try again.",
-      systemImage: "wifi.exclamationmark",
-      actionTitle: "Try Again",
-    )
-    .padding(.horizontal, 18)
-    .padding(.top, 18)
-  }
-}
-
-#Preview("Over album detail") {
-  NavigationStack {
-    ZStack(alignment: .top) {
-      AlbumDetailView(
-        album: [AlbumData].previewAlbums[0],
-        tracks: .previewTracks,
-      )
-
+#if DEBUG
+  #Preview("Apple Music access") {
+    VStack(spacing: 18) {
       PlaybackErrorBanner(
         title: "Apple Music access needed",
         message: "Allow Gertrude Music to use Apple Music so approved songs can play.",
         systemImage: "music.note.list",
         actionTitle: "Open Settings",
       )
+
+      PlaybackErrorBanner(
+        title: "Song unavailable",
+        message: "This song isn’t available from Apple Music right now. Try another approved track.",
+        systemImage: "exclamationmark.triangle.fill",
+      )
+    }
+    .padding(20)
+    .background(.background)
+  }
+
+  #Preview("Over now playing") {
+    ZStack(alignment: .top) {
+      NowPlayingScreenView(
+        title: PreviewMusicData.nowPlayingTitle,
+        artist: PreviewMusicData.nowPlayingArtist,
+        artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+        showsArtwork: true,
+        artworkTransitionID: nil,
+        isPlaying: true,
+        isLoading: false,
+        progress: 0.38,
+        duration: 214,
+        onPlayPauseTap: {},
+        onPreviousTap: {},
+        onNextTap: {},
+        onScrub: { _ in },
+      )
+
+      PlaybackErrorBanner(
+        title: "Couldn’t start playback",
+        message: "Check your connection and try again.",
+        systemImage: "wifi.exclamationmark",
+        actionTitle: "Try Again",
+      )
       .padding(.horizontal, 18)
-      .padding(.top, 12)
+      .padding(.top, 18)
     }
   }
-}
 
-#Preview("Dark") {
-  PlaybackErrorBanner(
-    title: "Apple Music subscription required",
-    message: "This device needs an active Apple Music subscription to play approved songs.",
-    systemImage: "person.crop.circle.badge.exclamationmark",
-    actionTitle: "Learn More",
-  )
-  .padding(20)
-  .background(Color.black)
-  .preferredColorScheme(.dark)
-}
+  #Preview("Over album detail") {
+    NavigationStack {
+      ZStack(alignment: .top) {
+        AlbumDetailView(
+          album: [AlbumData].previewAlbums[0],
+          tracks: .previewTracks,
+        )
+
+        PlaybackErrorBanner(
+          title: "Apple Music access needed",
+          message: "Allow Gertrude Music to use Apple Music so approved songs can play.",
+          systemImage: "music.note.list",
+          actionTitle: "Open Settings",
+        )
+        .padding(.horizontal, 18)
+        .padding(.top, 12)
+      }
+    }
+  }
+
+  #Preview("Dark") {
+    PlaybackErrorBanner(
+      title: "Apple Music subscription required",
+      message: "This device needs an active Apple Music subscription to play approved songs.",
+      systemImage: "person.crop.circle.badge.exclamationmark",
+      actionTitle: "Learn More",
+    )
+    .padding(20)
+    .background(Color.black)
+    .preferredColorScheme(.dark)
+  }
+#endif

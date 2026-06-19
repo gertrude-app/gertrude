@@ -59,10 +59,12 @@ public struct AlbumCardView: View {
   }
 }
 
-#Preview("Album cards") {
-  HStack(alignment: .top, spacing: 16) {
-    AlbumCardView(album: [AlbumData].previewAlbums[0])
-    AlbumCardView(album: [AlbumData].previewAlbums[1])
+#if DEBUG
+  #Preview("Album cards") {
+    HStack(alignment: .top, spacing: 16) {
+      AlbumCardView(album: [AlbumData].previewAlbums[0])
+      AlbumCardView(album: [AlbumData].previewAlbums[1])
+    }
+    .padding(24)
   }
-  .padding(24)
-}
+#endif

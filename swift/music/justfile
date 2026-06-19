@@ -5,8 +5,8 @@ swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
 _default:
   @just --choose
 
-gen:
-  @xcodegen -s project.yml
+gen debug_api_endpoint=env("GERTRUDE_MUSIC_DEBUG_API_ENDPOINT"):
+  @GERTRUDE_MUSIC_DEBUG_API_ENDPOINT='{{debug_api_endpoint}}' xcodegen -s project.yml
   @xml-lint --fix app/Info.plist
 
 xcode:

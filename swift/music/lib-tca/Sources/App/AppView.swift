@@ -145,8 +145,13 @@ struct AppView: View {
             showsArtwork: false,
             artworkTransitionID: self.nowPlayingArtworkTransitionID,
             isPlaying: false,
+            isLoading: false,
             progress: 0,
             duration: 0,
+            onPlayPauseTap: {},
+            onPreviousTap: {},
+            onNextTap: {},
+            onScrub: { _ in },
           )
         }
 

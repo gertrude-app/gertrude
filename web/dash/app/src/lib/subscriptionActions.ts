@@ -1,6 +1,6 @@
 import type { SubscriptionPanelAction } from '@dash/types';
 
-export function lightPlanPaymentButtonLabel(action: SubscriptionPanelAction): string {
+export function lightPlanGatePrimaryLabel(action: SubscriptionPanelAction): string {
   switch (action.case) {
     case `openBillingPortal`:
       return `Update payment →`;

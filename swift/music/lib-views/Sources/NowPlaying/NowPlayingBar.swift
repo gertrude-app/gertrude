@@ -25,23 +25,20 @@ import SwiftUI
     private let onNextTap: @MainActor @Sendable () -> Void
 
     public init(
-      title: String = "Josefin’s Waltz",
-      artist: String = "Alasdair Fraser & Natalie Haas",
-      artworkURL: URL? = URL(
-        string:
-        "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
-      ),
-      isPlaying: Bool = false,
-      isLoading: Bool = false,
-      isEnabled: Bool = true,
-      foregroundColor: Color = .black,
-      panelTransitionID: String? = nil,
-      artworkTransitionID: String? = nil,
-      displayMode: NowPlayingBarDisplayMode = .automatic,
-      showsBackground: Bool = false,
-      onTap: @MainActor @escaping @Sendable () -> Void = {},
-      onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
-      onNextTap: @MainActor @escaping @Sendable () -> Void = {},
+      title: String,
+      artist: String,
+      artworkURL: URL?,
+      isPlaying: Bool,
+      isLoading: Bool,
+      isEnabled: Bool,
+      foregroundColor: Color,
+      panelTransitionID: String?,
+      artworkTransitionID: String?,
+      displayMode: NowPlayingBarDisplayMode,
+      showsBackground: Bool,
+      onTap: @MainActor @escaping @Sendable () -> Void,
+      onPlayTap: @MainActor @escaping @Sendable () -> Void,
+      onNextTap: @MainActor @escaping @Sendable () -> Void,
     ) {
       self.title = title
       self.artist = artist
@@ -375,45 +372,41 @@ import SwiftUI
     }
   }
 
-  #Preview("Expanded") {
-    NowPlayingBarContent(
-      layout: .expanded,
-      title: "Josefin’s Waltz",
-      artist: "Alasdair Fraser & Natalie Haas",
-      artworkURL: URL(
-        string:
-        "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
-      ),
-      artworkTransitionID: nil,
-      isPlaying: true,
-      isEnabled: true,
-      foregroundColor: .black,
-      onTap: {},
-      onPlayTap: {},
-      onNextTap: {},
-    )
-    .padding(24)
-    .background(Color(.systemGroupedBackground))
-  }
+  #if DEBUG
+    #Preview("Expanded") {
+      NowPlayingBarContent(
+        layout: .expanded,
+        title: PreviewMusicData.nowPlayingTitle,
+        artist: PreviewMusicData.nowPlayingArtist,
+        artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+        artworkTransitionID: nil,
+        isPlaying: true,
+        isEnabled: true,
+        foregroundColor: .black,
+        onTap: {},
+        onPlayTap: {},
+        onNextTap: {},
+      )
+      .padding(24)
+      .background(Color(.systemGroupedBackground))
+    }
 
-  #Preview("Inline") {
-    NowPlayingBarContent(
-      layout: .inline,
-      title: "Josefin’s Waltz",
-      artist: "Alasdair Fraser & Natalie Haas",
-      artworkURL: URL(
-        string:
-        "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0c/52/75/0c527506-8b79-5abd-0b03-8d93f5303ced/755997012320.jpg/600x600bb.jpg",
-      ),
-      artworkTransitionID: nil,
-      isPlaying: false,
-      isEnabled: true,
-      foregroundColor: .black,
-      onTap: {},
-      onPlayTap: {},
-      onNextTap: {},
-    )
-    .padding(24)
-    .background(Color(.systemGroupedBackground))
-  }
+    #Preview("Inline") {
+      NowPlayingBarContent(
+        layout: .inline,
+        title: PreviewMusicData.nowPlayingTitle,
+        artist: PreviewMusicData.nowPlayingArtist,
+        artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+        artworkTransitionID: nil,
+        isPlaying: false,
+        isEnabled: true,
+        foregroundColor: .black,
+        onTap: {},
+        onPlayTap: {},
+        onNextTap: {},
+      )
+      .padding(24)
+      .background(Color(.systemGroupedBackground))
+    }
+  #endif
 #endif

@@ -10,7 +10,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { SubscriptionPanelAction } from '@dash/types';
 import Current from '../../../environment';
 import { Key, useMutation, useQuery } from '../../../hooks';
-import { lightPlanPaymentButtonLabel } from '../../../lib/subscriptionActions';
+import { lightPlanGatePrimaryLabel } from '../../../lib/subscriptionActions';
 
 const SuperviseDevicePayment: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -115,7 +115,7 @@ const SuperviseDevicePayment: React.FC = () => {
         }
         extraBullets={[`All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`]}
         onPrimary={() => handlePaymentAction(paymentAction)}
-        primaryLabel={lightPlanPaymentButtonLabel(paymentAction)}
+        primaryLabel={lightPlanGatePrimaryLabel(paymentAction)}
         isWorking={startCheckout.isPending || openBillingPortal.isPending}
         checkoutCancelled={checkoutCancelled}
         error={paymentError}

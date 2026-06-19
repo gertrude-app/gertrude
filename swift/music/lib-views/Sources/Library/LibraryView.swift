@@ -134,32 +134,34 @@ private struct LibraryMessageCard: View {
   }
 }
 
-#Preview("Loaded") {
-  NavigationStack {
-    LibraryView(state: .loaded(albums: .previewAlbums))
+#if DEBUG
+  #Preview("Loaded") {
+    NavigationStack {
+      LibraryView(state: .loaded(albums: .previewAlbums))
+    }
   }
-}
 
-#Preview("Loading") {
-  NavigationStack {
-    LibraryView(state: .loading)
+  #Preview("Loading") {
+    NavigationStack {
+      LibraryView(state: .loading)
+    }
   }
-}
 
-#Preview("Empty") {
-  NavigationStack {
-    LibraryView(state: .empty)
+  #Preview("Empty") {
+    NavigationStack {
+      LibraryView(state: .empty)
+    }
   }
-}
 
-#Preview("Subscription required") {
-  NavigationStack {
-    LibraryView(state: .subscriptionRequired)
+  #Preview("Subscription required") {
+    NavigationStack {
+      LibraryView(state: .subscriptionRequired)
+    }
   }
-}
 
-#Preview("Failed") {
-  NavigationStack {
-    LibraryView(state: .failed)
+  #Preview("Failed") {
+    NavigationStack {
+      LibraryView(state: .failed)
+    }
   }
-}
+#endif

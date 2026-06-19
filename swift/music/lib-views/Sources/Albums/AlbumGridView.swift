@@ -115,10 +115,12 @@ private struct AlbumGridEmptyStateView: View {
   }
 }
 
-#Preview("Album grid") {
-  AlbumGridView(albums: .previewAlbums)
-}
+#if DEBUG
+  #Preview("Album grid") {
+    AlbumGridView(albums: .previewAlbums)
+  }
 
-#Preview("Album grid empty") {
-  AlbumGridView(albums: [])
-}
+  #Preview("Album grid empty") {
+    AlbumGridView(albums: [])
+  }
+#endif

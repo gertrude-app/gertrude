@@ -9,7 +9,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { SubscriptionPanelAction } from '@dash/types';
 import Current from '../../../environment';
 import { Key, useMutation, useQuery } from '../../../hooks';
-import { lightPlanPaymentButtonLabel } from '../../../lib/subscriptionActions';
+import { lightPlanGatePrimaryLabel } from '../../../lib/subscriptionActions';
 
 const ClaimMusicDevicePayment: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -111,7 +111,7 @@ const ClaimMusicDevicePayment: React.FC = () => {
         priceSize="emphasized"
         checkoutCancelled={checkoutCancelled}
         error={paymentError}
-        primaryLabel={lightPlanPaymentButtonLabel(paymentAction)}
+        primaryLabel={lightPlanGatePrimaryLabel(paymentAction)}
         isWorking={startCheckout.isPending || openBillingPortal.isPending}
         onPrimary={() => handlePaymentAction(paymentAction)}
         secondary={{ label: `Maybe later`, onClick: () => navigate(`/`) }}

@@ -132,8 +132,8 @@ final class CapabilityTests: DependencyTestCase {
     expect(billing().can(.useGertrudeMusic)).toBeFalse()
   }
 
-  func testLightPlanPaymentActionIgnoresMacAppCapability() {
-    expect(billing().lightPlanPaymentAction(toEnable: .connectMacApp)).toBeNil()
+  func testPaymentActionForMissingLightPlanCapabilityIgnoresMacAppCapability() {
+    expect(billing().paymentActionForMissingLightPlanCapability(.connectMacApp)).toBeNil()
   }
 
   func testCanConnectMacAppForFull() {

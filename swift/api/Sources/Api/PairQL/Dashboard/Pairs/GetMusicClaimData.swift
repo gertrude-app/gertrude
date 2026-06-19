@@ -29,7 +29,7 @@ struct GetMusicClaimData: Pair {
 extension GetMusicClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let account = try await context.currentBillingAccount()
-    let paymentAction = account.lightPlanPaymentAction(toEnable: .useGertrudeMusic)
+    let paymentAction = account.paymentActionForMissingLightPlanCapability(.useGertrudeMusic)
 
     return try await resolveClaimData(
       code: input.code,
