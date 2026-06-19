@@ -187,7 +187,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           props.variant === `default` || props.variant === undefined,
         'border-transparent bg-transparent text-stone-600 shadow-transparent focus-visible:ring-stone-400/70':
           props.variant === `ghost`,
-        'border-[#E9C8C7] bg-red-600/3 text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
+        'border-[#E9C8C7] bg-[#FCF6F5] text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
           props.variant === `destructive`,
         'border-amber-300 bg-amber-100 text-amber-950 shadow-amber-700/15 focus-visible:ring-amber-400/70':
           props.variant === `selected`,
