@@ -19,10 +19,6 @@ current task unless explicity instructed.
   enterprisey overengineered code always wrapped in a transaction etc. If the risk is low,
   just keep it very simple. I don't like to SFTP sql files to prod, I prefer to copy paste
   from the terminal.
-- Proactively copy complex URLs and other likely copy-paste values (email text, SQL, or
-  commands) to my macOS clipboard when I will use them in a browser, another app, or another
-  terminal. Mark the rendered value with 📋 only; don't mention it in prose. I use clipboard
-  history, so copying multiple values is fine.
 
 ## Task-specific instructions (may not be present)
 
