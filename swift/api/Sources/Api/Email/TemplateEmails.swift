@@ -125,6 +125,24 @@ struct MacSetup24h: TemplateEmailModel {
   ] }
 }
 
+struct DailyReviewDigest: TemplateEmailModel {
+  static var subject: String { "{{subjectSummary}} to review on Gertrude" }
+  static var layout: EmailLayout { .topLogo }
+
+  var subjectSummary: String
+  var intro: String
+  var childRows: String
+  var reviewUrl: String
+  var manageUrl: String
+  var templateModel: [String: String] { [
+    "subjectSummary": self.subjectSummary,
+    "intro": self.intro,
+    "childRows": self.childRows,
+    "reviewUrl": self.reviewUrl,
+    "manageUrl": self.manageUrl,
+  ] }
+}
+
 struct ScreenTimeWarning: TemplateEmailModel {
   static var subject: String {
     "Action needed: Gertrude may not be fully protecting {{childName}}’s computer"

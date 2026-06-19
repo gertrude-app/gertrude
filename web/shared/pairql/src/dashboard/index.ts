@@ -58,6 +58,7 @@ export * from './pairs/SaveUser';
 export * from './pairs/SearchMusicCatalog';
 export * from './pairs/SecurityEventsFeed';
 export * from './pairs/SendPasswordResetEmail';
+export * from './pairs/SetDailyReviewEmail';
 export * from './pairs/Signup';
 export * from './pairs/StartCheckoutSession';
 export * from './pairs/StartFullTrial';

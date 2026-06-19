@@ -7,6 +7,8 @@ export namespace GetAccountOwner_v2 {
   export interface Output {
     id: UUID;
     email: string;
+    dailyReviewEmail: boolean;
+    hasMacScreenshotUsers: boolean;
     notifications: AdminNotification[];
     verifiedNotificationMethods: VerifiedNotificationMethod[];
   }

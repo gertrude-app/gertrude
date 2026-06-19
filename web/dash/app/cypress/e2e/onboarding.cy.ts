@@ -27,6 +27,8 @@ describe(`dashboard onboarding nudges`, () => {
     cy.interceptPql(`GetAccountOwner_v2`, {
       id: betsy.id,
       email: betsy.email,
+      dailyReviewEmail: false,
+      hasMacScreenshotUsers: true,
       notifications: [],
       verifiedNotificationMethods: [],
     });

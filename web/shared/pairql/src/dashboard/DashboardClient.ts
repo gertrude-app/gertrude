@@ -446,6 +446,16 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
+  public setDailyReviewEmail = (
+    input: P.SetDailyReviewEmail.Input,
+  ): Promise<Result<P.SetDailyReviewEmail.Output>> => {
+    return this.query<P.SetDailyReviewEmail.Output>(
+      input,
+      `SetDailyReviewEmail`,
+      `parent`,
+    );
+  };
+
   public signup = (input: P.Signup.Input): Promise<Result<P.Signup.Output>> => {
     return this.query<P.Signup.Output>(input, `Signup`, `none`);
   };

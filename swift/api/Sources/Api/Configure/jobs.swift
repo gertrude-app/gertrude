@@ -11,6 +11,7 @@ public extension Configure {
     app.queues.schedule(DiskSpaceJob()).hourly().at(0)
     app.queues.schedule(ScheduledMarketingCampaignJob()).daily().at(10, 30, .am)
     app.queues.schedule(CrashReporterJob()).hourly().at(25)
+    app.queues.schedule(DailyReviewEmailJob()).hourly().at(15)
 
     // sync job runs twice hourly to preserve inferred new rating granularity
     app.queues.schedule(AppStoreSyncJob()).hourly().at(05)

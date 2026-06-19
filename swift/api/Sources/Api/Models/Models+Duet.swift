@@ -244,6 +244,9 @@ extension Parent {
     case abTestVariant
     case referralCode
     case referredByParentId
+    case timeZone
+    case dailyReviewEmail
+    case lastReviewEmailAt
     case createdAt
     case updatedAt
   }

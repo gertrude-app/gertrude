@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import Foundation
 
 struct ParentContext: ResolverContext {
   let requestId: String
@@ -55,5 +56,14 @@ struct ParentContext: ResolverContext {
     return try await ComputerUser.query()
       .where(.childId |=| children.map(\.id))
       .all(in: self.db)
+  }
+
+  func persistTimeZone(_ timeZone: String) async {
+    guard TimeZone(identifier: timeZone) != nil, self.parent.timeZone != timeZone else {
+      return
+    }
+    var parent = self.parent
+    parent.timeZone = timeZone
+    _ = try? await self.db.update(parent)
   }
 }

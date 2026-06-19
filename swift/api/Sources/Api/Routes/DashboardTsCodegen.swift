@@ -101,6 +101,7 @@ enum DashboardTsCodegenRoute {
       SaveKeychain.self,
       SaveNotification.self,
       SaveUser.self,
+      SetDailyReviewEmail.self,
       SendPasswordResetEmail.self,
       Signup.self,
       GetSubscriptionPanel_v2.self,

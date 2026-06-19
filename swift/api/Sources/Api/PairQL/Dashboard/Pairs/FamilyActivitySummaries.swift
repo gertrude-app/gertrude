@@ -14,6 +14,7 @@ struct FamilyActivitySummaries: Pair {
 
 extension FamilyActivitySummaries: Resolver {
   static func resolve(with input: Input, in ctx: ParentContext) async throws -> Output {
+    await ctx.persistTimeZone(input.timeZone)
     let computerUserIds = try await ctx.computerUsers().map(\.id)
     return try await ChildActivitySummaries.days(
       computerUserIds,

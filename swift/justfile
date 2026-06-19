@@ -99,6 +99,10 @@ watch-web-email template:
     "bash -c 'while true; do just web-email {{template}}; sleep 2; done;'" \
     "cd dev-emails && npm run dev"
 
+# screenshot a template w/ sample data, no API needed (see docs/templated-emails.md)
+preview-email template *args:
+  @cd ../web/storybook/visual-tests && node preview-email.mts {{template}} {{args}}
+
 # infra
 
 db-sync:

@@ -78,6 +78,8 @@ final class AuthedParentResolverTests: ApiTestCase, @unchecked Sendable {
       .init(
         id: parent.id,
         email: parent.email.rawValue,
+        dailyReviewEmail: false,
+        hasMacScreenshotUsers: false,
         notifications: [
           .init(
             id: notification.id,
