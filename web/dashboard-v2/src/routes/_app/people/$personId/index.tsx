@@ -1,15 +1,16 @@
-import { Button, ConfirmationDialog, EmptyState, Input, inflect } from '@gertrude/ui';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import cx from 'clsx';
 import {
-  LaptopIcon,
-  MonitorSmartphoneIcon,
-  PlusIcon,
-  SmartphoneIcon,
-  TrashIcon,
-} from 'lucide-react';
+  Badge,
+  Button,
+  ConfirmationDialog,
+  EmptyState,
+  Input,
+  inflect,
+} from '@gertrude/ui';
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { MonitorSmartphoneIcon, PlusIcon, SmartphoneIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import CardContainer from '#/components/CardContainer';
+import { macImageUrl } from '#/lib/device-images';
 import { type Device, getPerson, useMockData } from '#/lib/mock';
 
 const deviceTitle = (device: Device): string =>
@@ -177,61 +178,42 @@ interface DeviceListRowProps {
   device: Device;
 }
 
-const DeviceListRow: React.FC<DeviceListRowProps> = ({ device }) => {
-  const Icon = device.type === `mac` ? LaptopIcon : SmartphoneIcon;
-
-  return (
-    <div className="flex flex-col gap-3 rounded-xl border border-stone-200 bg-white p-3 shadow shadow-stone-300/30 @2xl/main:flex-row @2xl/main:items-center @2xl/main:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <div
-          className={cx(
-            `flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border`,
-            device.type === `mac` && device.online
-              ? `border-violet-200 bg-violet-50 text-violet-700`
-              : `border-stone-200 bg-stone-50 text-stone-700`,
-          )}
-        >
-          <Icon className="h-5 w-5" />
-        </div>
-        <div className="min-w-0 flex flex-col">
-          <span className="truncate font-medium text-stone-900">
-            {deviceTitle(device)}
-          </span>
-          <span className="truncate text-sm text-stone-500">
-            {deviceSubtitle(device)}
-          </span>
-        </div>
-      </div>
-      <div className="flex items-center justify-between gap-3 @2xl/main:justify-end">
+const DeviceListRow: React.FC<DeviceListRowProps> = ({ device }) => (
+  <Link
+    to={deviceSettingsHref(device)}
+    className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-3 pr-6 shadow shadow-stone-300/30 transition-[border-color,box-shadow] duration-100 hover:border-stone-300 hover:shadow-stone-300/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/80"
+  >
+    <div className="flex min-w-0 items-center gap-3">
+      <div className="flex h-10 w-12 shrink-0 items-center justify-center text-stone-700">
         {device.type === `mac` ? (
-          <span
-            className={cx(
-              `inline-flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium`,
-              device.online
-                ? `bg-violet-100 text-violet-700`
-                : `bg-stone-100 text-stone-500`,
-            )}
-          >
-            <span
-              className={cx(
-                `h-1.5 w-1.5 rounded-full`,
-                device.online ? `bg-violet-500` : `bg-stone-300`,
-              )}
-            />
-            {device.online ? `Online` : `Offline`}
-          </span>
+          <img
+            src={macImageUrl(device.modelIdentifier)}
+            alt=""
+            className="h-9 w-11 object-contain drop-shadow-sm"
+          />
         ) : (
-          <span className="rounded-full bg-stone-100 px-2 py-1 text-xs font-medium text-stone-500">
-            {device.type === `iphone` ? `iPhone` : `iPad`}
-          </span>
+          <SmartphoneIcon className="h-5 w-5" />
         )}
-        <Button type="link" href={deviceSettingsHref(device)} size="small">
-          Settings
-        </Button>
+      </div>
+      <div className="min-w-0 flex flex-col">
+        <span className="truncate font-medium text-stone-900">{deviceTitle(device)}</span>
+        <span className="truncate text-sm text-stone-500">{deviceSubtitle(device)}</span>
       </div>
     </div>
-  );
-};
+    <Badge
+      size="small"
+      color={device.type === `mac` && device.online ? `green` : `neutral`}
+    >
+      {device.type === `mac`
+        ? device.online
+          ? `Online`
+          : `Offline`
+        : device.type === `iphone`
+          ? `iPhone`
+          : `iPad`}
+    </Badge>
+  </Link>
+);
 
 export const Route = createFileRoute(`/_app/people/$personId/`)({
   component: BasicSettingsPage,

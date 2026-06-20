@@ -1,7 +1,6 @@
-import { Button, EmptyState, inflect } from '@gertrude/ui';
+import { Badge, Button, EmptyState, inflect } from '@gertrude/ui';
 import cx from 'clsx';
 import {
-  LaptopIcon,
   MonitorSmartphoneIcon,
   PlusIcon,
   ScanEyeIcon,
@@ -11,6 +10,7 @@ import {
 import React from 'react';
 import type { Device, PersonWithDevices } from '#/lib/mock';
 import { personActivityHref } from '#/lib/activity-helpers';
+import { macImageUrl } from '#/lib/device-images';
 
 interface Props {
   person: PersonWithDevices;
@@ -112,56 +112,35 @@ interface DeviceCardProps {
 }
 
 const DeviceRow: React.FC<DeviceCardProps> = ({ device }) => (
-  <div
-    className={cx(
-      `p-0.25 rounded-[13px]`,
-      device.type === `mac` && device.online
-        ? `bg-gradient-to-r from-stone-200 via-stone-200 to-violet-300/80`
-        : `bg-stone-200`,
-    )}
-  >
-    <div className="flex items-center gap-2.5 bg-stone-50 py-1.5 pl-2.5 pr-4 rounded-xl relative overflow-hidden">
+  <div className="flex items-center gap-2.5 rounded-xl border border-stone-200 bg-stone-50 py-1.5 pl-2.5 pr-4">
+    <div className="flex h-5.5 w-7 shrink-0 items-center justify-center">
       {device.type === `mac` ? (
-        <LaptopIcon className="text-stone-700 w-4.5 h-4.5 shrink-0" />
+        <img
+          src={macImageUrl(device.modelIdentifier)}
+          alt=""
+          className="h-5.5 w-7 object-contain drop-shadow-sm"
+        />
       ) : (
-        <SmartphoneIcon className="text-stone-700 w-4.5 h-4.5 shrink-0" />
-      )}
-      <div className="flex flex-col flex-grow">
-        <span className="font-medium text-stone-900 text-sm">
-          {device.type === `mac`
-            ? (device.name ?? device.modelName)
-            : `${device.modelName}`}
-        </span>
-        <span className="text-xs text-stone-500">
-          {device.type === `mac`
-            ? `${device.name ? `${device.modelName} • ` : ``}macOS ${device.macOSVersion}`
-            : `${device.type === `iphone` ? `iOS` : `iPadOS`} ${device.iOSVersion}`}
-        </span>
-      </div>
-      {device.type === `mac` && (
-        <>
-          <div className="flex items-center gap-1.5">
-            <div
-              className={cx(
-                `w-1.5 h-1.5 rounded-full`,
-                device.online ? `bg-violet-500` : `bg-stone-300`,
-              )}
-            />
-            <span
-              className={cx(
-                `text-xs font-medium`,
-                device.online ? `text-violet-600` : `text-stone-400`,
-              )}
-            >
-              {device.online ? `Online` : `Offline`}
-            </span>
-          </div>
-          {device.online && (
-            <div className="w-40 h-30 absolute bg-violet-500 -right-10 rounded-full blur-[40px] opacity-10" />
-          )}
-        </>
+        <SmartphoneIcon className="text-stone-700 w-4.5 h-4.5" />
       )}
     </div>
+    <div className="flex flex-col flex-grow">
+      <span className="font-medium text-stone-900 text-sm">
+        {device.type === `mac`
+          ? (device.name ?? device.modelName)
+          : `${device.modelName}`}
+      </span>
+      <span className="text-xs text-stone-500">
+        {device.type === `mac`
+          ? `${device.name ? `${device.modelName} • ` : ``}macOS ${device.macOSVersion}`
+          : `${device.type === `iphone` ? `iOS` : `iPadOS`} ${device.iOSVersion}`}
+      </span>
+    </div>
+    {device.type === `mac` && (
+      <Badge size="small" color={device.online ? `green` : `neutral`}>
+        {device.online ? `Online` : `Offline`}
+      </Badge>
+    )}
   </div>
 );
 
