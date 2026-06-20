@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComponentsTooltipRouteImport } from './routes/components/tooltip'
 import { Route as ComponentsToggleRouteImport } from './routes/components/toggle'
+import { Route as ComponentsToastRouteImport } from './routes/components/toast'
 import { Route as ComponentsTextareaRouteImport } from './routes/components/textarea'
 import { Route as ComponentsSlideOverRouteImport } from './routes/components/slide-over'
 import { Route as ComponentsSidebarRouteImport } from './routes/components/sidebar'
@@ -19,6 +20,7 @@ import { Route as ComponentsSelectRouteImport } from './routes/components/select
 import { Route as ComponentsRadioGroupRouteImport } from './routes/components/radio-group'
 import { Route as ComponentsPageHeadingRouteImport } from './routes/components/page-heading'
 import { Route as ComponentsModalRouteImport } from './routes/components/modal'
+import { Route as ComponentsLoadingDotsRouteImport } from './routes/components/loading-dots'
 import { Route as ComponentsInputRouteImport } from './routes/components/input'
 import { Route as ComponentsFormRouteImport } from './routes/components/form'
 import { Route as ComponentsDropdownMenuRouteImport } from './routes/components/dropdown-menu'
@@ -42,6 +44,11 @@ const ComponentsTooltipRoute = ComponentsTooltipRouteImport.update({
 const ComponentsToggleRoute = ComponentsToggleRouteImport.update({
   id: '/components/toggle',
   path: '/components/toggle',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsToastRoute = ComponentsToastRouteImport.update({
+  id: '/components/toast',
+  path: '/components/toast',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsTextareaRoute = ComponentsTextareaRouteImport.update({
@@ -77,6 +84,11 @@ const ComponentsPageHeadingRoute = ComponentsPageHeadingRouteImport.update({
 const ComponentsModalRoute = ComponentsModalRouteImport.update({
   id: '/components/modal',
   path: '/components/modal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComponentsLoadingDotsRoute = ComponentsLoadingDotsRouteImport.update({
+  id: '/components/loading-dots',
+  path: '/components/loading-dots',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentsInputRoute = ComponentsInputRouteImport.update({
@@ -138,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/loading-dots': typeof ComponentsLoadingDotsRoute
   '/components/modal': typeof ComponentsModalRoute
   '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
@@ -145,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/components/sidebar': typeof ComponentsSidebarRoute
   '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/toast': typeof ComponentsToastRoute
   '/components/toggle': typeof ComponentsToggleRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
 }
@@ -159,6 +173,7 @@ export interface FileRoutesByTo {
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/loading-dots': typeof ComponentsLoadingDotsRoute
   '/components/modal': typeof ComponentsModalRoute
   '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
@@ -166,6 +181,7 @@ export interface FileRoutesByTo {
   '/components/sidebar': typeof ComponentsSidebarRoute
   '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/toast': typeof ComponentsToastRoute
   '/components/toggle': typeof ComponentsToggleRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
 }
@@ -181,6 +197,7 @@ export interface FileRoutesById {
   '/components/dropdown-menu': typeof ComponentsDropdownMenuRoute
   '/components/form': typeof ComponentsFormRoute
   '/components/input': typeof ComponentsInputRoute
+  '/components/loading-dots': typeof ComponentsLoadingDotsRoute
   '/components/modal': typeof ComponentsModalRoute
   '/components/page-heading': typeof ComponentsPageHeadingRoute
   '/components/radio-group': typeof ComponentsRadioGroupRoute
@@ -188,6 +205,7 @@ export interface FileRoutesById {
   '/components/sidebar': typeof ComponentsSidebarRoute
   '/components/slide-over': typeof ComponentsSlideOverRoute
   '/components/textarea': typeof ComponentsTextareaRoute
+  '/components/toast': typeof ComponentsToastRoute
   '/components/toggle': typeof ComponentsToggleRoute
   '/components/tooltip': typeof ComponentsTooltipRoute
 }
@@ -204,6 +222,7 @@ export interface FileRouteTypes {
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/loading-dots'
     | '/components/modal'
     | '/components/page-heading'
     | '/components/radio-group'
@@ -211,6 +230,7 @@ export interface FileRouteTypes {
     | '/components/sidebar'
     | '/components/slide-over'
     | '/components/textarea'
+    | '/components/toast'
     | '/components/toggle'
     | '/components/tooltip'
   fileRoutesByTo: FileRoutesByTo
@@ -225,6 +245,7 @@ export interface FileRouteTypes {
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/loading-dots'
     | '/components/modal'
     | '/components/page-heading'
     | '/components/radio-group'
@@ -232,6 +253,7 @@ export interface FileRouteTypes {
     | '/components/sidebar'
     | '/components/slide-over'
     | '/components/textarea'
+    | '/components/toast'
     | '/components/toggle'
     | '/components/tooltip'
   id:
@@ -246,6 +268,7 @@ export interface FileRouteTypes {
     | '/components/dropdown-menu'
     | '/components/form'
     | '/components/input'
+    | '/components/loading-dots'
     | '/components/modal'
     | '/components/page-heading'
     | '/components/radio-group'
@@ -253,6 +276,7 @@ export interface FileRouteTypes {
     | '/components/sidebar'
     | '/components/slide-over'
     | '/components/textarea'
+    | '/components/toast'
     | '/components/toggle'
     | '/components/tooltip'
   fileRoutesById: FileRoutesById
@@ -268,6 +292,7 @@ export interface RootRouteChildren {
   ComponentsDropdownMenuRoute: typeof ComponentsDropdownMenuRoute
   ComponentsFormRoute: typeof ComponentsFormRoute
   ComponentsInputRoute: typeof ComponentsInputRoute
+  ComponentsLoadingDotsRoute: typeof ComponentsLoadingDotsRoute
   ComponentsModalRoute: typeof ComponentsModalRoute
   ComponentsPageHeadingRoute: typeof ComponentsPageHeadingRoute
   ComponentsRadioGroupRoute: typeof ComponentsRadioGroupRoute
@@ -275,6 +300,7 @@ export interface RootRouteChildren {
   ComponentsSidebarRoute: typeof ComponentsSidebarRoute
   ComponentsSlideOverRoute: typeof ComponentsSlideOverRoute
   ComponentsTextareaRoute: typeof ComponentsTextareaRoute
+  ComponentsToastRoute: typeof ComponentsToastRoute
   ComponentsToggleRoute: typeof ComponentsToggleRoute
   ComponentsTooltipRoute: typeof ComponentsTooltipRoute
 }
@@ -300,6 +326,13 @@ declare module '@tanstack/react-router' {
       path: '/components/toggle'
       fullPath: '/components/toggle'
       preLoaderRoute: typeof ComponentsToggleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/toast': {
+      id: '/components/toast'
+      path: '/components/toast'
+      fullPath: '/components/toast'
+      preLoaderRoute: typeof ComponentsToastRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/textarea': {
@@ -349,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/components/modal'
       fullPath: '/components/modal'
       preLoaderRoute: typeof ComponentsModalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/components/loading-dots': {
+      id: '/components/loading-dots'
+      path: '/components/loading-dots'
+      fullPath: '/components/loading-dots'
+      preLoaderRoute: typeof ComponentsLoadingDotsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/components/input': {
@@ -428,6 +468,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsDropdownMenuRoute: ComponentsDropdownMenuRoute,
   ComponentsFormRoute: ComponentsFormRoute,
   ComponentsInputRoute: ComponentsInputRoute,
+  ComponentsLoadingDotsRoute: ComponentsLoadingDotsRoute,
   ComponentsModalRoute: ComponentsModalRoute,
   ComponentsPageHeadingRoute: ComponentsPageHeadingRoute,
   ComponentsRadioGroupRoute: ComponentsRadioGroupRoute,
@@ -435,6 +476,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComponentsSidebarRoute: ComponentsSidebarRoute,
   ComponentsSlideOverRoute: ComponentsSlideOverRoute,
   ComponentsTextareaRoute: ComponentsTextareaRoute,
+  ComponentsToastRoute: ComponentsToastRoute,
   ComponentsToggleRoute: ComponentsToggleRoute,
   ComponentsTooltipRoute: ComponentsTooltipRoute,
 }
