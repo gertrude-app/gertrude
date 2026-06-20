@@ -138,6 +138,13 @@ the same failure mode for future agents.
   database skill file at `./.agents/skills/database/SKILL.md`
 - for local development we use a local postgres, NOT docker
 
+## Proactively copy relevant values to clipboard
+
+Proactively copy complex URLs and other likely copy-paste values (email text, SQL, or
+commands) to my macOS clipboard when I will use them in a browser, another app, or another
+terminal. Mark the rendered value with 📋 only; don't mention it in prose. I use clipboard
+history, so copying multiple values is fine.
+
 ## Further user-specific instructions
 
 Use `whoami` to determine what additional user-specific instructions to read, as each user

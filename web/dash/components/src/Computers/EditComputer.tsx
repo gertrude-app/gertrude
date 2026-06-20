@@ -3,6 +3,7 @@ import React from 'react';
 import type { ChildComputerStatus, ReleaseChannel } from '@dash/types';
 import PageHeading from '../PageHeading';
 import UserStatus from '../UserStatus';
+import MacDeviceImage from './MacDeviceImage';
 
 interface Props {
   name: string;
@@ -58,9 +59,9 @@ const EditComputer: React.FC<Props> = ({
             </div>
           </div>
           <div className="w-32 h-28 justify-center items-center lg:hidden flex">
-            <img
-              alt={modelTitle}
-              src={`/macs/${modelIdentifier}.png`}
+            <MacDeviceImage
+              modelTitle={modelTitle}
+              modelIdentifier={modelIdentifier}
               className="max-w-full max-h-full"
             />
           </div>
@@ -76,9 +77,9 @@ const EditComputer: React.FC<Props> = ({
         />
       </div>
       <div className="shrink-0 w-40 xl:w-52 h-40 xl:h-52 hidden lg:flex justify-center items-center bg-white">
-        <img
-          alt={modelTitle}
-          src={`/macs/${modelIdentifier}.png`}
+        <MacDeviceImage
+          modelTitle={modelTitle}
+          modelIdentifier={modelIdentifier}
           className="max-w-full max-h-full"
         />
       </div>

@@ -2,6 +2,7 @@ import { Button } from '@shared/components';
 import { inflect } from '@shared/string';
 import React from 'react';
 import type { ChildComputer, ChildIOSDevice } from '@dash/types';
+import MacDeviceImage from '../Computers/MacDeviceImage';
 import DeviceCard from './DeviceCard';
 
 type Props = {
@@ -39,8 +40,13 @@ const ChildCard: React.FC<Props> = ({ id, name, computers, iosDevices, addDevice
               <DeviceCard
                 key={computer.id}
                 to={`/devices/${computer.computerId}`}
-                imageSrc={`/macs/${computer.modelIdentifier}.png`}
-                imageAlt={computer.modelTitle}
+                image={
+                  <MacDeviceImage
+                    modelTitle={computer.modelTitle}
+                    modelIdentifier={computer.modelIdentifier}
+                    className="max-w-[60%] max-h-[60%] grayscale-[50%]"
+                  />
+                }
                 title={computer.customName || computer.modelTitle}
                 subtitle={computer.customName ? computer.modelTitle : undefined}
                 status={{ case: `computerStatus`, status: computer.status }}
