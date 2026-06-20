@@ -1,4 +1,13 @@
-const macImageBaseUrl = `https://parents.gertrude.app/macs`;
+const deviceImageBaseUrls = {
+  mac: `/devices/macs`,
+  iphone: `/devices/iphones`,
+  ipad: `/devices/ipads`,
+};
+
+export const deviceImageUrl = (
+  deviceType: keyof typeof deviceImageBaseUrls,
+  modelIdentifier: string,
+): string => `${deviceImageBaseUrls[deviceType]}/${modelIdentifier}.png`;
 
 export const macImageUrl = (modelIdentifier: string): string =>
-  `${macImageBaseUrl}/${encodeURIComponent(modelIdentifier)}.png`;
+  deviceImageUrl(`mac`, modelIdentifier);

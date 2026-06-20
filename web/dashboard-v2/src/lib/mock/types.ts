@@ -15,6 +15,7 @@ export type Device =
       type: `iphone` | `ipad`;
       iOSVersion: string;
       modelName: string;
+      modelIdentifier: string;
     };
 
 export type Person = {

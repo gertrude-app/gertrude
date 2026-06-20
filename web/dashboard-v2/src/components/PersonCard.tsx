@@ -5,12 +5,11 @@ import {
   PlusIcon,
   ScanEyeIcon,
   SettingsIcon,
-  SmartphoneIcon,
 } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonWithDevices } from '#/lib/mock';
 import { personActivityHref } from '#/lib/activity-helpers';
-import { macImageUrl } from '#/lib/device-images';
+import { deviceImageUrl } from '#/lib/device-images';
 
 interface Props {
   person: PersonWithDevices;
@@ -114,15 +113,11 @@ interface DeviceCardProps {
 const DeviceRow: React.FC<DeviceCardProps> = ({ device }) => (
   <div className="flex items-center gap-2.5 rounded-xl border border-stone-200 bg-stone-50 py-1.5 pl-2.5 pr-4">
     <div className="flex h-5.5 w-7 shrink-0 items-center justify-center">
-      {device.type === `mac` ? (
-        <img
-          src={macImageUrl(device.modelIdentifier)}
-          alt=""
-          className="h-5.5 w-7 object-contain drop-shadow-sm"
-        />
-      ) : (
-        <SmartphoneIcon className="text-stone-700 w-4.5 h-4.5" />
-      )}
+      <img
+        src={deviceImageUrl(device.type, device.modelIdentifier)}
+        alt=""
+        className="h-5.5 w-7 object-contain drop-shadow-sm"
+      />
     </div>
     <div className="flex flex-col flex-grow">
       <span className="font-medium text-stone-900 text-sm">
