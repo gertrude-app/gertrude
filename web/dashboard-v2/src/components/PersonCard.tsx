@@ -1,11 +1,6 @@
 import { Badge, Button, EmptyState, inflect } from '@gertrude/ui';
 import cx from 'clsx';
-import {
-  MonitorSmartphoneIcon,
-  PlusIcon,
-  ScanEyeIcon,
-  SettingsIcon,
-} from 'lucide-react';
+import { MonitorSmartphoneIcon, PlusIcon, ScanEyeIcon, SettingsIcon } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonWithDevices } from '#/lib/mock';
 import { personActivityHref } from '#/lib/activity-helpers';

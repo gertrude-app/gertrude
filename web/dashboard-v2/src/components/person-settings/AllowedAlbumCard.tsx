@@ -30,7 +30,10 @@ const getCardClasses = (
         ? `cursor-pointer border-violet-300 bg-violet-50 shadow-violet-300/30 hover:border-violet-400 hover:shadow-violet-300/50`
         : `border-stone-200 bg-white shadow-stone-300/30`,
     !disabled && selectable && `cursor-pointer`,
-    !disabled && !selected && `hover:border-stone-400/70 hover:shadow-stone-300/70`,
+    !disabled &&
+      selectable &&
+      !selected &&
+      `hover:border-stone-400/70 hover:shadow-stone-300/70`,
   );
 
 const AllowedAlbumCard: React.FC<Props> = ({
