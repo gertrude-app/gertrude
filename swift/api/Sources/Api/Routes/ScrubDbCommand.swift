@@ -56,7 +56,15 @@ private func scrubTokens(pg: PgClient, console: Console) async throws {
     UPDATE \(table: SuperAdminToken.self)
     SET \(col: SuperAdminToken.columnName(.value)) = gen_random_uuid()
   """)
-  console.print("[scrub-db] 4 token tables → gen_random_uuid()")
+  try await pg.db.execute("""
+    UPDATE \(table: PodcastApp.Token.self)
+    SET \(col: PodcastApp.Token.columnName(.value)) = gen_random_uuid()
+  """)
+  try await pg.db.execute("""
+    UPDATE \(table: MusicApp.Token.self)
+    SET \(col: MusicApp.Token.columnName(.value)) = gen_random_uuid()
+  """)
+  console.print("[scrub-db] 6 token tables → gen_random_uuid()")
 }
 
 private func scrubKeystrokeLines(pg: PgClient, console: Console) async throws {

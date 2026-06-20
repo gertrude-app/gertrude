@@ -41,8 +41,8 @@ private struct CrossPromoSheetPreviewHost<Content: View>: View {
   CrossPromoSheetPreviewHost { dismiss in
     ButtonScreenView(
       text:
-      "Looking for kid-safe music?\n\nGertrude FM is a parent-curated music app for kids — no ads, no autoplay rabbit holes.",
-      primary: .init("Get Gertrude FM", animate: false) { dismiss() },
+      "Looking for kid-safe music?\n\nGertrude Music is a parent-curated music app for kids — no ads, no autoplay rabbit holes.",
+      primary: .init("Get Gertrude Music", animate: false) { dismiss() },
       secondary: .init("No thanks", animate: false) { dismiss() },
       screenType: .announcement,
     )
@@ -64,8 +64,8 @@ private struct CrossPromoSheetPreviewHost<Content: View>: View {
   CrossPromoSheetPreviewHost { dismiss in
     ButtonScreenView(
       text:
-      "Meet Gertrude FM\n\nKid-safe, parent-curated music — no ads, no autoplay rabbit holes.",
-      primary: .init("Get Gertrude FM", animate: false) { dismiss() },
+      "Meet Gertrude Music\n\nKid-safe, parent-curated music — no ads, no autoplay rabbit holes.",
+      primary: .init("Get Gertrude Music", animate: false) { dismiss() },
       secondary: .init("No thanks", animate: false) { dismiss() },
       remoteImage: .init(
         url: "https://raw.githubusercontent.com/gertrude-app/gertrude/master/web/dash/app/public/og-image.jpg",

@@ -10,7 +10,7 @@ fuchsia gradients, creating a confident and tech-forward brand identity.
 ### Primary Colors
 
 - **Violet-500**: `#8B5CF6` - Main brand color
-- **Fuchsia-500**: `#D846EF` - Accent brand color
+- **Fuchsia-500**: `#D946EF` - Accent brand color
 - **Violet to Fuchsia Gradient**: Primary brand gradient used throughout
 
 ### Background Colors

@@ -77,7 +77,7 @@ targets:
           - fetch
           - processing
         BGTaskSchedulerPermittedIdentifiers:
-          # NB: keep in sync with keys in BackgroundTasks.swift
+          # NB: keep in sync with keys in RegisterBgTasks.swift
           - com.netrivet.gertrude.am.refresh-feed
           - com.netrivet.gertrude.am.download-episodes
 

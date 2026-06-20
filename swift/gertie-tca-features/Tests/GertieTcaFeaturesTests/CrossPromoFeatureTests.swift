@@ -81,19 +81,20 @@ import Testing
 
   @Test func `share primary opens the share sheet`() async {
     let store = TestStore(
-      initialState: CrossPromoFeature.State(campaign: campaign(.share("Ask a parent for FM"))),
+      initialState: CrossPromoFeature
+        .State(campaign: campaign(.share("Ask a parent for Gertrude Music"))),
     ) { CrossPromoFeature() }
 
     await store.send(.primaryBtnTapped) {
-      $0.share = .init(text: "Ask a parent for FM", slot: .primary)
+      $0.share = .init(text: "Ask a parent for Gertrude Music", slot: .primary)
     }
   }
 
   @Test func `completing a share reports the tap and closes`() async {
     let store = TestStore(
       initialState: CrossPromoFeature.State(
-        campaign: campaign(.share("Ask a parent for FM")),
-        share: .init(text: "Ask a parent for FM", slot: .primary),
+        campaign: campaign(.share("Ask a parent for Gertrude Music")),
+        share: .init(text: "Ask a parent for Gertrude Music", slot: .primary),
       ),
     ) { CrossPromoFeature() }
 
@@ -106,8 +107,8 @@ import Testing
   @Test func `cancelling a share leaves the promo open`() async {
     let store = TestStore(
       initialState: CrossPromoFeature.State(
-        campaign: campaign(.share("Ask a parent for FM")),
-        share: .init(text: "Ask a parent for FM", slot: .primary),
+        campaign: campaign(.share("Ask a parent for Gertrude Music")),
+        share: .init(text: "Ask a parent for Gertrude Music", slot: .primary),
       ),
     ) { CrossPromoFeature() }
 
@@ -173,7 +174,7 @@ private func campaign(
     campaignId: "fm-launch",
     placement: "amOnboardingParent",
     style: .sheet,
-    headline: "Meet Gertrude FM",
+    headline: "Meet Gertrude Music",
     body: "Parent-curated music.",
     primaryCta: .init(label: "Check it out", action: primary),
     secondaryCta: secondary.map { .init(label: "Secondary", action: $0) },

@@ -136,7 +136,7 @@ import Testing
       campaignId: "no-exit",
       placement: "amChildHome",
       style: .screen, // fullScreenCover has no swipe-to-dismiss on iOS
-      headline: "Meet Gertrude FM",
+      headline: "Meet Gertrude Music",
       body: "Parent-curated music.",
       primaryCta: .init(label: "Check it out", action: .openUrl("https://gertrude.app/fm")),
       dismissable: false, // no dismiss-action cta and not a dismissable sheet → no way out
@@ -349,7 +349,7 @@ import Testing
       variant: "B", // the A/B arm — must survive into the logged event
       placement: "amChildHome",
       style: .sheet,
-      headline: "Meet Gertrude FM",
+      headline: "Meet Gertrude Music",
       body: "Parent-curated music.",
       primaryCta: .init(label: "Check it out", action: .dismiss),
       dismissable: true,
@@ -393,7 +393,7 @@ import Testing
       campaignId: "fm-teaser",
       placement: "amChildHome",
       style: .sheet,
-      headline: "Meet Gertrude FM",
+      headline: "Meet Gertrude Music",
       body: "Parent-curated music.",
       primaryCta: .init(label: "Check it out", action: .openUrl("https://gertrude.app")),
       secondaryCta: .init(label: "No thanks", action: .dismiss),
@@ -586,7 +586,7 @@ private func childHomeCampaign(id: String) -> CrossPromoCampaign {
     campaignId: id,
     placement: "amChildHome",
     style: .sheet,
-    headline: "Meet Gertrude FM",
+    headline: "Meet Gertrude Music",
     body: "Parent-curated music.",
     primaryCta: .init(label: "Check it out", action: .dismiss),
     secondaryCta: .init(label: "No thanks", action: .dismiss),
