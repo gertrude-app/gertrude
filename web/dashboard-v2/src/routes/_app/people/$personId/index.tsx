@@ -7,10 +7,10 @@ import {
   inflect,
 } from '@gertrude/ui';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { MonitorSmartphoneIcon, PlusIcon, SmartphoneIcon, TrashIcon } from 'lucide-react';
+import { MonitorSmartphoneIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import CardContainer from '#/components/CardContainer';
-import { macImageUrl } from '#/lib/device-images';
+import { deviceImageUrl } from '#/lib/device-images';
 import { type Device, getPerson, useMockData } from '#/lib/mock';
 
 const deviceTitle = (device: Device): string =>
@@ -185,15 +185,11 @@ const DeviceListRow: React.FC<DeviceListRowProps> = ({ device }) => (
   >
     <div className="flex min-w-0 items-center gap-3">
       <div className="flex h-10 w-12 shrink-0 items-center justify-center text-stone-700">
-        {device.type === `mac` ? (
-          <img
-            src={macImageUrl(device.modelIdentifier)}
-            alt=""
-            className="h-9 w-11 object-contain drop-shadow-sm"
-          />
-        ) : (
-          <SmartphoneIcon className="h-5 w-5" />
-        )}
+        <img
+          src={deviceImageUrl(device.type, device.modelIdentifier)}
+          alt=""
+          className="h-9 w-11 object-contain drop-shadow-sm"
+        />
       </div>
       <div className="min-w-0 flex flex-col">
         <span className="truncate font-medium text-stone-900">{deviceTitle(device)}</span>

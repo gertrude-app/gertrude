@@ -83,6 +83,7 @@ const devices: Device[] = [
     type: `ipad`,
     iOSVersion: `18.4`,
     modelName: `iPad (10th generation)`,
+    modelIdentifier: `iPad13,18`,
   },
   {
     id: `jimmy-school-macbook`,
@@ -99,6 +100,7 @@ const devices: Device[] = [
     type: `iphone`,
     iOSVersion: `18.3`,
     modelName: `iPhone 14`,
+    modelIdentifier: `iPhone14,7`,
   },
   {
     id: `sally-family-ipad`,
@@ -106,6 +108,7 @@ const devices: Device[] = [
     type: `ipad`,
     iOSVersion: `18.4`,
     modelName: `iPad (10th generation)`,
+    modelIdentifier: `iPad13,18`,
   },
   {
     id: `sally-kitchen-imac`,
@@ -123,6 +126,7 @@ const devices: Device[] = [
     type: `ipad`,
     iOSVersion: `17.7`,
     modelName: `iPad mini (6th generation)`,
+    modelIdentifier: `iPad14,1`,
   },
   {
     id: `maggie-iphone`,
@@ -130,6 +134,7 @@ const devices: Device[] = [
     type: `iphone`,
     iOSVersion: `18.4`,
     modelName: `iPhone SE (3rd generation)`,
+    modelIdentifier: `iPhone14,6`,
   },
   {
     id: `maggie-school-macbook`,
