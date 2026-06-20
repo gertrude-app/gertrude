@@ -90,6 +90,7 @@ const devices: Device[] = [
     type: `mac`,
     macOSVersion: `15.4`,
     modelName: `MacBook Air 13-inch, M2`,
+    modelIdentifier: `Mac14,2`,
     online: true,
   },
   {
@@ -113,6 +114,7 @@ const devices: Device[] = [
     name: `Kitchen iMac`,
     macOSVersion: `14.7`,
     modelName: `iMac 24-inch, M1`,
+    modelIdentifier: `iMac21,1`,
     online: false,
   },
   {
@@ -135,6 +137,7 @@ const devices: Device[] = [
     type: `mac`,
     macOSVersion: `15.4`,
     modelName: `MacBook Air 13-inch, M2`,
+    modelIdentifier: `Mac14,2`,
     online: true,
   },
   {
@@ -144,6 +147,7 @@ const devices: Device[] = [
     name: `Kitchen iMac`,
     macOSVersion: `14.7`,
     modelName: `iMac 24-inch, M1`,
+    modelIdentifier: `iMac21,1`,
     online: false,
   },
 ];

@@ -6,6 +6,7 @@ export type Device =
       name?: string;
       macOSVersion: string;
       modelName: string;
+      modelIdentifier: string;
       online: boolean;
     }
   | {
