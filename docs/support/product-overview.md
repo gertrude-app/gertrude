@@ -1,9 +1,11 @@
 # Product Overview
 
 Gertrude has three customer-facing apps and one supporting parent dashboard. The main
-products are the Mac app, the iOS app, and Gertrude AM, an iOS podcast app. The parent
-dashboard at `https://parents.gertrude.app` is important, but it is better understood as
-the management surface for the main apps rather than a separate standalone product.
+products are the Mac app, the iOS app, and Gertrude AM, an iOS podcast app. A fourth iOS
+app, Gertrude Music, exists in the codebase (`swift/music`) but is in private beta (App
+Store review) and not yet released — don't treat it as a shipped product. The parent
+dashboard at `https://parents.gertrude.app` is important, but it is better understood as the
+management surface for the main apps rather than a separate standalone product.
 
 ## Main Products
 

@@ -82,6 +82,14 @@ extension GetIOSDevice_v2: Resolver {
       .first else {
       return nil
     }
+
+    let tokenExists = try await BlockerApp.Token.query()
+      .where(.installId == install.id)
+      .exists(in: ctx.db)
+    guard tokenExists else {
+      return nil
+    }
+
     let enabledBlockGroups = try await device.blockGroups(in: ctx.db)
     let allBlockGroups = try await BlockerApp.BlockGroup.query().all(in: ctx.db)
     let domains = try await device.webPolicyDomains(in: ctx.db)

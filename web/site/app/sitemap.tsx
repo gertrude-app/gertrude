@@ -9,6 +9,7 @@ const STATIC_ROUTES = [
   ``,
   `/mac`,
   `/iphone-and-ipad`,
+  `/pricing`,
   `/download-mac-app`,
   `/blog`,
   `/contact`,

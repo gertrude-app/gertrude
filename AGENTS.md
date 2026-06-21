@@ -29,8 +29,10 @@ below.
 - `./swift/podcasts`
 - if relevant, read `./swift/podcasts/AGENTS.md`
 
-> **Coming soon:** Gertrude Music, a parent-curated music-playing iOS app, is under active
-> development.
+> **Private beta (not yet released):** Gertrude Music, a parent-curated music-playing iOS
+> app, now lives in `./swift/music`. It's in App Store review for a private beta while we
+> validate the business model with Apple — hopefully coming soon. Don't present it as a
+> shipped or public product (e.g. in marketing copy or `llms.txt`).
 
 ## Production Websites:
 

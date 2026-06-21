@@ -229,12 +229,12 @@ instead of the checked-out code. Keep all three lists identical.
   `pnpm --filter <project> build`) so they benefit from nx caching during the
   frequently-run `just check` loop.
 
-### SubscriptionPanel storybook fixtures ↔ `GetSubscriptionPanel` resolver
+### SubscriptionPanel storybook fixtures ↔ `GetSubscriptionPanel_v2` resolver
 
 - `web/storybook/stories/dash/Profile/SubscriptionPanel.stories.tsx` hand-mirrors every
   branch of the resolver at
-  `swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel.swift`. The grid is
-  intended to cover all possible shapes of `GetSubscriptionPanel.Output`.
+  `swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel_v2.swift`. The grid is
+  intended to cover all possible shapes of `GetSubscriptionPanel_v2.Output`.
 - Drifts whenever the resolver gains, removes, or restructures a branch (new
   entitlement state, new action shape, change to primary/secondary composition, etc.).
   Nothing enforces the correspondence — drift silently degrades the design surface for
