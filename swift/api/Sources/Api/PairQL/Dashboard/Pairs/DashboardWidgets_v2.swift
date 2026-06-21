@@ -129,6 +129,10 @@ extension DashboardWidgets_v2: NoInputResolver {
       among: iosDevices.map(\.id),
       in: context.db,
     )
+    async let musicConnectedDeviceIdsAsync = MusicApp.Token.connectedDeviceIds(
+      among: iosDevices.map(\.id),
+      in: context.db,
+    )
     async let unlockRequests = Api.UnlockRequest.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
       .where(.status == .enum(RequestStatus.pending))
@@ -161,6 +165,7 @@ extension DashboardWidgets_v2: NoInputResolver {
       .reduce(into: [:]) { map, s in map[s.deviceId] = s }
     let connectedDeviceIds = try await blockerConnectedDeviceIdsAsync
       .union(amConnectedDeviceIdsAsync)
+      .union(musicConnectedDeviceIdsAsync)
 
     return try await .init(
       children: children.concurrentMap { child in
