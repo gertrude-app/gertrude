@@ -141,13 +141,15 @@ export type Key = {
   note?: string;
 };
 
-export type NotificationMethod =
+export type NotificationMethod = {
+  id: string;
+} & (
   | {
       type: `email`;
       emailAddress: string;
     }
   | {
-      type: `sms`;
+      type: `text`;
       phoneNumber: string;
     }
   | {
@@ -162,7 +164,26 @@ export type NotificationMethod =
     }
   | {
       type: `push`;
-    };
+    }
+);
+
+export type NotificationTrigger =
+  | `unlockRequestSubmitted`
+  | `suspendFilterRequestSubmitted`
+  | `securityEventsAll`
+  | `securityEventsMedium`
+  | `securityEventsRecommended`;
+
+export type NotificationRecord = {
+  id: string;
+  methodId: string;
+  trigger: NotificationTrigger;
+  enabled: boolean;
+};
+
+export type Notification = NotificationRecord & {
+  method: NotificationMethod;
+};
 
 export type PersonMacSettingsConfiguration = {
   keyloggingEnabled: boolean;
@@ -263,6 +284,8 @@ export type MockDb = {
   unlockRequests: UnlockRequestRecord[];
   suspensionRequests: SuspensionRequestRecord[];
   securityEvents: SecurityEvent[];
+  notificationMethods: NotificationMethod[];
+  notifications: NotificationRecord[];
   keychains: Keychain[];
   macSettings: PersonMacSettingsRecord[];
   iosSettings: PersonIosSettingsRecord[];

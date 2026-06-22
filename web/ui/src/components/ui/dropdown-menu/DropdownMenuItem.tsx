@@ -4,14 +4,16 @@ import { CheckIcon, ChevronRightIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
 import { useOverlayPortalContainer } from '../OverlayPortalContext';
 
+export type DropdownMenuItemIcon = LucideIcon | React.ReactNode;
+
 interface Props {
   title: string;
   description?: React.ReactNode;
-  icon?: LucideIcon;
+  icon?: DropdownMenuItemIcon;
   selected?: boolean;
   active?: boolean;
   onSelect?: () => void;
-  children?: React.ReactNode; // for sub-menus
+  children?: React.ReactNode;
   destructive?: boolean;
 }
 
@@ -22,10 +24,33 @@ const itemClasses = (active?: boolean, destructive?: boolean): string =>
     destructive && `hover:!bg-red-100/50`,
   );
 
+const renderIcon = (
+  icon: DropdownMenuItemIcon | undefined,
+  className: string,
+): React.ReactNode => {
+  if (!icon) {
+    return null;
+  }
+
+  if (React.isValidElement<{ className?: string }>(icon)) {
+    return React.cloneElement(icon, {
+      className: cx(className, icon.props.className),
+    });
+  }
+
+  if (typeof icon === `function` || (typeof icon === `object` && `render` in icon)) {
+    return React.createElement(icon as React.ElementType<{ className?: string }>, {
+      className,
+    });
+  }
+
+  return <span className={className}>{icon}</span>;
+};
+
 const DropdownMenuItem: React.FC<Props> = ({
   title,
   description,
-  icon: Icon,
+  icon,
   selected,
   active,
   onSelect,
@@ -59,14 +84,13 @@ const DropdownMenuItem: React.FC<Props> = ({
   const content = (
     <>
       <div className="flex min-w-0 items-start gap-2">
-        {Icon && (
-          <Icon
-            className={cx(
-              `mt-1.25 w-3.5 h-3.5 shrink-0`,
-              selected ? `text-violet-800` : `text-stone-500`,
-              destructive && `!text-red-700`,
-            )}
-          />
+        {renderIcon(
+          icon,
+          cx(
+            `mt-1.25 w-3.5 h-3.5 shrink-0`,
+            selected ? `text-violet-800` : `text-stone-500`,
+            destructive && `!text-red-700`,
+          ),
         )}
         {textContent}
       </div>
@@ -86,13 +110,12 @@ const DropdownMenuItem: React.FC<Props> = ({
       <Menu.SubmenuRoot>
         <Menu.SubmenuTrigger className={itemClasses(active, destructive)}>
           <div className="flex min-w-0 items-start gap-2">
-            {Icon && (
-              <Icon
-                className={cx(
-                  `mt-0.5 w-3.5 h-3.5 shrink-0`,
-                  selected ? `text-violet-800` : `text-stone-500`,
-                )}
-              />
+            {renderIcon(
+              icon,
+              cx(
+                `mt-0.5 w-3.5 h-3.5 shrink-0`,
+                selected ? `text-violet-800` : `text-stone-500`,
+              ),
             )}
             {textContent}
           </div>

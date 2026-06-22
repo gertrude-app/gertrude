@@ -17,6 +17,7 @@ export interface SlideOverProps {
   ariaLabel?: string;
   heading?: React.ReactNode;
   subheading?: React.ReactNode;
+  withPx?: boolean;
   className?: string;
   overlayClassName?: string;
 }
@@ -42,6 +43,8 @@ const sizeClasses = {
   medium: `md:w-[30rem]`,
   large: `md:w-[38rem]`,
 };
+
+const horizontalPaddingClasses = `px-4 @lg/slide:px-6`;
 
 const normalizePath = (path: string): string => {
   const withLeadingSlash = path.startsWith(`/`) ? path : `/${path}`;
@@ -70,6 +73,7 @@ const SlideOver: React.FC<SlideOverProps> = ({
   ariaLabel = `Slide over panel`,
   heading,
   subheading,
+  withPx,
   className,
   overlayClassName,
 }) => {
@@ -145,7 +149,12 @@ const SlideOver: React.FC<SlideOverProps> = ({
             <div className="h-full w-full overflow-hidden rounded-[inherit] @container/slide">
               {hasHeading ? (
                 <div className="flex h-full flex-col">
-                  <div className="shrink-0 px-3 pt-6 pb-4 @lg/slide:px-6 @lg/slide:pt-8">
+                  <div
+                    className={cx(
+                      `shrink-0 pt-6 pb-4 @lg/slide:pt-8`,
+                      horizontalPaddingClasses,
+                    )}
+                  >
                     {heading ? (
                       <Drawer.Title className="text-xl font-medium text-stone-900">
                         {heading}
@@ -157,12 +166,22 @@ const SlideOver: React.FC<SlideOverProps> = ({
                       <p className="mt-2 text-sm text-stone-600">{subheading}</p>
                     )}
                   </div>
-                  <div className="min-h-0 flex-1">{children}</div>
+                  <div
+                    className={cx(`min-h-0 flex-1`, withPx && horizontalPaddingClasses)}
+                  >
+                    {children}
+                  </div>
                 </div>
               ) : (
                 <>
                   <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
-                  {children}
+                  {withPx ? (
+                    <div className={cx(`h-full`, horizontalPaddingClasses)}>
+                      {children}
+                    </div>
+                  ) : (
+                    children
+                  )}
                 </>
               )}
             </div>

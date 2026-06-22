@@ -3,7 +3,9 @@ import cx from 'clsx';
 import { ChevronDownIcon, LoaderCircleIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
 import DropdownMenu from './dropdown-menu/DropdownMenu';
-import DropdownMenuItem from './dropdown-menu/DropdownMenuItem';
+import DropdownMenuItem, {
+  type DropdownMenuItemIcon,
+} from './dropdown-menu/DropdownMenuItem';
 
 type ButtonVariant = `primary` | `default` | `ghost` | `destructive` | `selected`;
 type ButtonSize = `small` | `medium` | `large`;
@@ -11,7 +13,7 @@ type ButtonSize = `small` | `medium` | `large`;
 type DropdownItem = {
   title: string;
   description?: React.ReactNode;
-  icon?: LucideIcon;
+  icon?: DropdownMenuItemIcon;
   selected?: boolean;
   onSelect?: () => void;
   children?: React.ReactNode;
