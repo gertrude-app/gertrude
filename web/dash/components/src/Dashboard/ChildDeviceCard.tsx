@@ -59,7 +59,7 @@ function iosStatusInfo(status: `setupComplete` | `pendingSetup`): {
 } {
   switch (status) {
     case `setupComplete`:
-      return { pillClasses: `bg-green-50 text-green-700`, text: `Protected` };
+      return { pillClasses: `bg-green-200/50 text-green-700`, text: `Connected` };
     case `pendingSetup`:
       return { pillClasses: `bg-amber-50 text-amber-700`, text: `Pending setup` };
   }
