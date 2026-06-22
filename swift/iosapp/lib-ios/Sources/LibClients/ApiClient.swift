@@ -6,6 +6,7 @@ import IOSRoute
 import LibCore
 import os.log
 import PairQL
+import PairQLClient
 import TaggedTime
 import XCore
 
@@ -55,9 +56,9 @@ extension ApiClient: DependencyKey {
       connectDevice: { code, deviceId in
         @Dependency(\.device) var device
         let deviceData = await device.data()
-        return try await output(
-          from: ConnectDevice_v2.self,
-          withUnauthed: .connectDevice_v2(.init(
+        return try await pairql.call(
+          ConnectDevice_v2.self,
+          unauthed: .connectDevice_v2(.init(
             verificationCode: code,
             vendorId: deviceId,
             modelIdentifier: deviceData.modelIdentifier,
@@ -72,9 +73,9 @@ extension ApiClient: DependencyKey {
           throw ApiClient.Error.missingAccountConnection
         }
         let deviceData = await device.data()
-        let result = try await output(
-          from: ConnectedRules_v2.self,
-          with: .connectedRules_v2(.init(
+        let result = try await authed(
+          ConnectedRules_v2.self,
+          .connectedRules_v2(.init(
             deviceId: conn.deviceId,
             modelIdentifier: deviceData.modelIdentifier,
             appVersion: version,
@@ -85,15 +86,15 @@ extension ApiClient: DependencyKey {
         return .init(blockRules: result.blockRules.map(\.current), webPolicy: result.webPolicy)
       },
       fetchAllBlockGroups: { deviceId in
-        try await output(
-          from: GetBlockGroups.self,
-          withUnauthed: .getBlockGroups(.init(deviceId: deviceId)),
+        try await pairql.call(
+          GetBlockGroups.self,
+          unauthed: .getBlockGroups(.init(deviceId: deviceId)),
         )
       },
       fetchBlockRules: { deviceId, disabledGroups in
-        try await output(
-          from: BlockRules_v3.self,
-          withUnauthed: .blockRules_v3(.init(
+        try await pairql.call(
+          BlockRules_v3.self,
+          unauthed: .blockRules_v3(.init(
             deviceId: deviceId,
             appVersion: version,
             disabledGroups: disabledGroups,
@@ -101,9 +102,9 @@ extension ApiClient: DependencyKey {
         )
       },
       fetchDefaultBlockRules: { deviceId in
-        let legacyRules = try await output(
-          from: DefaultBlockRules.self,
-          withUnauthed: .defaultBlockRules(.init(
+        let legacyRules = try await pairql.call(
+          DefaultBlockRules.self,
+          unauthed: .defaultBlockRules(.init(
             vendorId: deviceId,
             version: version,
           )),
@@ -114,9 +115,9 @@ extension ApiClient: DependencyKey {
         @Dependency(\.device) var device
         let deviceData = await device.data()
         do {
-          _ = try await output(
-            from: LogIOSEvent_v2.self,
-            withUnauthed: .logIOSEvent_v2(.init(
+          _ = try await pairql.call(
+            LogIOSEvent_v2.self,
+            unauthed: .logIOSEvent_v2(.init(
               eventId: id,
               kind: "ios",
               modelIdentifier: deviceData.modelIdentifier,
@@ -134,9 +135,9 @@ extension ApiClient: DependencyKey {
         @Dependency(\.locale) var locale
         @Dependency(\.device) var device
         let deviceData = await device.data()
-        let result = try await output(
-          from: RecoveryDirective.self,
-          withUnauthed: .recoveryDirective(.init(
+        let result = try await pairql.call(
+          RecoveryDirective.self,
+          unauthed: .recoveryDirective(.init(
             vendorId: deviceData.deviceId,
             deviceType: deviceData.type.rawValue,
             iOSVersion: deviceData.iOSVersion,
@@ -150,9 +151,9 @@ extension ApiClient: DependencyKey {
         _accountConnection.withLock { $0 = conn }
       },
       connectAccountFeatureFlag: {
-        try await output(
-          from: ConnectAccountFeatureFlag.self,
-          withUnauthed: .connectAccountFeatureFlag,
+        try await pairql.call(
+          ConnectAccountFeatureFlag.self,
+          unauthed: .connectAccountFeatureFlag,
         )
       },
       createSupervisionClaimCode: {
@@ -160,9 +161,9 @@ extension ApiClient: DependencyKey {
         guard let deviceId = await device.deviceId() else {
           throw ApiClient.Error.missingVendorId
         }
-        return try await output(
-          from: CreateSupervisionClaimCode.self,
-          withUnauthed: .createSupervisionClaimCode(.init(
+        return try await pairql.call(
+          CreateSupervisionClaimCode.self,
+          unauthed: .createSupervisionClaimCode(.init(
             deviceId: deviceId,
             modelIdentifier: device.modelIdentifier(),
             iosVersion: device.iOSVersion(),
@@ -175,18 +176,18 @@ extension ApiClient: DependencyKey {
         guard let deviceId = await device.deviceId() else {
           throw ApiClient.Error.missingVendorId
         }
-        return try await output(
-          from: CheckSupervisionFlowStatus.self,
-          withUnauthed: .checkSupervisionFlowStatus(.init(
+        return try await pairql.call(
+          CheckSupervisionFlowStatus.self,
+          unauthed: .checkSupervisionFlowStatus(.init(
             vendorId: deviceId,
             code: code,
           )),
         )
       },
       markSupervisionProfileInstalled: {
-        _ = try await output(
-          from: MarkSupervisionProfileInstalled.self,
-          with: .markSupervisionProfileInstalled,
+        _ = try await authed(
+          MarkSupervisionProfileInstalled.self,
+          .markSupervisionProfileInstalled,
         )
       },
       crossPromos: {
@@ -196,9 +197,9 @@ extension ApiClient: DependencyKey {
         guard let deviceId = deviceData.deviceId else {
           return .init(promos: [])
         }
-        return try await output(
-          from: CrossPromos.self,
-          withUnauthed: .crossPromos(.init(
+        return try await pairql.call(
+          CrossPromos.self,
+          unauthed: .crossPromos(.init(
             deviceId: deviceId,
             appVersion: version,
             modelIdentifier: deviceData.modelIdentifier,
@@ -213,39 +214,18 @@ extension ApiClient: DependencyKey {
 
 private let _accountConnection = Mutex<ChildIOSDeviceData_v2?>(nil)
 
-func output<T: Pair>(
-  from pair: T.Type,
-  with route: AuthedRoute,
+private let pairql = PairQLClient<IOSRoute>(
+  endpoint: { URL(string: .gertrudeApi)! },
+)
+
+func authed<T: Pair>(
+  _ pair: T.Type,
+  _ route: AuthedRoute,
 ) async throws -> T.Output {
   guard let token = _accountConnection.withLock({ $0?.token }) else {
     throw ApiClient.Error.missingAccountConnection
   }
-  let (data, res) = try await request(route: .authed(token, route))
-  if let httpResponse = res as? HTTPURLResponse,
-     httpResponse.statusCode >= 300 {
-    if let pqlError = try? JSON.decode(data, as: PqlError.self) {
-      throw pqlError
-    } else {
-      throw ApiClient.Error.unexpectedError(statusCode: httpResponse.statusCode)
-    }
-  }
-  return try JSON.decode(data, as: T.Output.self, [.isoDates])
-}
-
-func output<T: Pair>(
-  from pair: T.Type,
-  withUnauthed route: UnauthedRoute,
-) async throws -> T.Output {
-  let (data, res) = try await request(route: .unauthed(route))
-  if let httpResponse = res as? HTTPURLResponse,
-     httpResponse.statusCode >= 300 {
-    if let pqlError = try? JSON.decode(data, as: PqlError.self) {
-      throw pqlError
-    } else {
-      throw ApiClient.Error.unexpectedError(statusCode: httpResponse.statusCode)
-    }
-  }
-  return try JSON.decode(data, as: T.Output.self, [.isoDates])
+  return try await pairql.call(pair, authed: route, token: token)
 }
 
 public extension ApiClient {
@@ -255,15 +235,6 @@ public extension ApiClient {
     case missingDataOrResponse
     case unexpectedError(statusCode: Int)
   }
-}
-
-@discardableResult
-private func request(route: IOSRoute) async throws -> (Data, URLResponse) {
-  let router = IOSRoute.router.baseURL(.pairqlBase)
-  var request = try router.request(for: route)
-  request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-  request.httpMethod = "POST"
-  return try await URLSession.shared.data(for: request)
 }
 
 public extension DependencyValues {

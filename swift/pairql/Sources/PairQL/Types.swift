@@ -5,6 +5,18 @@ import Foundation
 
 public protocol PairRoute: Equatable {}
 
+public protocol PairQLClientRoute: PairRoute {
+  static var domain: String { get }
+  static var router: AnyParserPrinter<URLRequestData, Self> { get }
+}
+
+public protocol AuthSplitRoute: PairQLClientRoute {
+  associatedtype Authed
+  associatedtype Unauthed
+  static func authed(_ token: UUID, _ route: Authed) -> Self
+  static func unauthed(_ route: Unauthed) -> Self
+}
+
 public typealias PairNestable = Codable & Equatable & Sendable
 
 public protocol PairInput: Codable, Equatable, Sendable {}

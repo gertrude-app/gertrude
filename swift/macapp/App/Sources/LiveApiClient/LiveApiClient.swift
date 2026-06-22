@@ -7,100 +7,100 @@ import MacAppRoute
 extension ApiClient: @retroactive DependencyKey {
   public static let liveValue = Self(
     checkIn: { input in
-      try await output(
-        from: CheckIn_v2.self,
-        with: .checkIn_v2(input),
+      try await authed(
+        CheckIn_v2.self,
+        .checkIn_v2(input),
       )
     },
     clearUserToken: {
       await userToken.setValue(nil)
     },
     confirmOnboardingNotificationCode: { input in
-      _ = try await output(
-        from: ConfirmOnboardingNotificationCode.self,
-        with: .confirmOnboardingNotificationCode(input),
+      _ = try await authed(
+        ConfirmOnboardingNotificationCode.self,
+        .confirmOnboardingNotificationCode(input),
       )
     },
     connectUser: { input in
-      try await output(
-        from: ConnectUser.self,
-        withUnauthed: .connectUser(input),
+      try await pairql.call(
+        ConnectUser.self,
+        unauthed: .connectUser(input),
       )
     },
     createOnboardingAppKeys: { input in
-      _ = try await output(
-        from: CreateOnboardingAppKeys.self,
-        with: .createOnboardingAppKeys(input),
+      _ = try await authed(
+        CreateOnboardingAppKeys.self,
+        .createOnboardingAppKeys(input),
       )
     },
     createOnboardingBlockedApps: { input in
-      _ = try await output(
-        from: CreateOnboardingBlockedApps.self,
-        with: .createOnboardingBlockedApps(input),
+      _ = try await authed(
+        CreateOnboardingBlockedApps.self,
+        .createOnboardingBlockedApps(input),
       )
     },
     createOnboardingKeychain: { input in
-      try await output(
-        from: CreateOnboardingKeychain.self,
-        with: .createOnboardingKeychain(input),
+      try await authed(
+        CreateOnboardingKeychain.self,
+        .createOnboardingKeychain(input),
       ).success
     },
     disableFilterForChild: {
-      _ = try await output(
-        from: DisableFilterForChild.self,
-        with: .disableFilterForChild,
+      _ = try await authed(
+        DisableFilterForChild.self,
+        .disableFilterForChild,
       )
     },
     getOnboardingConfig: {
-      try await output(
-        from: GetOnboardingConfig.self,
-        with: .getOnboardingConfig,
+      try await authed(
+        GetOnboardingConfig.self,
+        .getOnboardingConfig,
       )
     },
     selectAlwaysBlockedGroups: { input in
-      _ = try await output(
-        from: SelectAlwaysBlockedGroups.self,
-        with: .selectAlwaysBlockedGroups(input),
+      _ = try await authed(
+        SelectAlwaysBlockedGroups.self,
+        .selectAlwaysBlockedGroups(input),
       )
     },
     selectPublicKeychains: { input in
-      _ = try await output(
-        from: SelectPublicKeychains.self,
-        with: .selectPublicKeychains(input),
+      _ = try await authed(
+        SelectPublicKeychains.self,
+        .selectPublicKeychains(input),
       )
     },
     sendOnboardingNotificationCode: { input in
-      try await output(
-        from: SendOnboardingNotificationCode.self,
-        with: .sendOnboardingNotificationCode(input),
+      try await authed(
+        SendOnboardingNotificationCode.self,
+        .sendOnboardingNotificationCode(input),
       )
     },
     setDowntimeSchedule: { input in
-      _ = try await output(
-        from: SetDowntimeSchedule.self,
-        with: .setDowntimeSchedule(input),
+      _ = try await authed(
+        SetDowntimeSchedule.self,
+        .setDowntimeSchedule(input),
       )
     },
     createKeystrokeLines: { input in
       guard await accountActive.value else { return }
       // always produces `.success` if it doesn't throw
-      _ = try await output(
-        from: CreateKeystrokeLines.self,
-        with: .createKeystrokeLines(input),
+      _ = try await authed(
+        CreateKeystrokeLines.self,
+        .createKeystrokeLines(input),
       )
     },
     createSuspendFilterRequest: { input in
       guard await accountActive.value else { return .init() }
-      return try await output(
-        from: CreateSuspendFilterRequest_v2.self,
-        with: .createSuspendFilterRequest_v2(input),
+      return try await authed(
+        CreateSuspendFilterRequest_v2.self,
+        .createSuspendFilterRequest_v2(input),
       )
     },
     createUnlockRequests: { input in
       guard await accountActive.value else { return [] }
-      return try await output(
-        from: CreateUnlockRequests_v3.self,
-        with: .createUnlockRequests_v3(input),
+      return try await authed(
+        CreateUnlockRequests_v3.self,
+        .createUnlockRequests_v3(input),
       )
     },
     getUserToken: {
@@ -108,15 +108,15 @@ extension ApiClient: @retroactive DependencyKey {
     },
     logFilterEvents: { input in
       guard await accountActive.value else { return }
-      _ = try? await output(
-        from: LogFilterEvents.self,
-        with: .logFilterEvents(input),
+      _ = try? await authed(
+        LogFilterEvents.self,
+        .logFilterEvents(input),
       )
     },
     logInterestingEvent: { input in
-      _ = try? await output(
-        from: LogInterestingEvent.self,
-        withUnauthed: .logInterestingEvent(input),
+      _ = try? await pairql.call(
+        LogInterestingEvent.self,
+        unauthed: .logInterestingEvent(input),
       )
     },
     logSecurityEvent: { input, bufferedToken in
@@ -131,45 +131,45 @@ extension ApiClient: @retroactive DependencyKey {
       // NB: prefer bufferedToken
       let token = bufferedToken ?? currentToken
       guard token != nil else { return }
-      _ = try? await output(
-        from: LogSecurityEvent.self,
-        with: .logSecurityEvent(input),
+      _ = try? await authed(
+        LogSecurityEvent.self,
+        .logSecurityEvent(input),
         using: token,
       )
     },
     recentAppVersions: {
-      try await output(
-        from: RecentAppVersions.self,
-        withUnauthed: .recentAppVersions,
+      try await pairql.call(
+        RecentAppVersions.self,
+        unauthed: .recentAppVersions,
       )
     },
     reportBrowsers: { input in
       guard await accountActive.value else { return }
-      _ = try await output(
-        from: ReportBrowsers.self,
-        with: .reportBrowsers(input),
+      _ = try await authed(
+        ReportBrowsers.self,
+        .reportBrowsers(input),
       )
     },
     setAccountActive: { await accountActive.setValue($0) },
     setUserToken: { await userToken.setValue($0) },
     trustedNetworkTimestamp: {
-      try await output(
-        from: TrustedTime.self,
-        withUnauthed: .trustedTime,
+      try await pairql.call(
+        TrustedTime.self,
+        unauthed: .trustedTime,
       )
     },
     uploadAppIcon: { input in
       guard await accountActive.value else { return }
-      _ = try await output(
-        from: UploadAppIcon.self,
-        with: .uploadAppIcon(input),
+      _ = try await authed(
+        UploadAppIcon.self,
+        .uploadAppIcon(input),
       )
     },
     uploadScreenshot: { data in
       guard await accountActive.value else { throw Error.accountInactive }
-      let signed = try await output(
-        from: CreateSignedScreenshotUpload_v2.self,
-        with: .createSignedScreenshotUpload_v2(.init(
+      let signed = try await authed(
+        CreateSignedScreenshotUpload_v2.self,
+        .createSignedScreenshotUpload_v2(.init(
           width: data.width,
           height: data.height,
           filterSuspended: data.filterSuspended,

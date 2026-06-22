@@ -31,6 +31,7 @@ let package = Package(
     // @see: https://gist.github.com/jaredh159/5fafcdc04de9234ab4bab52897da7334
     .package(url: "https://github.com/jaredh159/Sparkle", exact: "2.2.557"),
     .package(path: "../../x-kit"),
+    .package(path: "../../pairql"),
     .package(path: "../../pairql-macapp"),
     .package(path: "../../x-expect"),
     .package(path: "../../gertie"),
@@ -60,7 +61,7 @@ let package = Package(
     ),
     .checkedTarget(
       name: "LiveApiClient",
-      dependencies: [.dependencies, "x-kit" => "XCore", "ClientInterfaces"],
+      dependencies: [.dependencies, "pairql" => "PairQLClient", "ClientInterfaces"],
     ),
     .checkedTarget(
       name: "LiveAppClient",

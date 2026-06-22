@@ -67,7 +67,7 @@ const HiddenAdvancedScreen: React.FC<Props> = ({
       </div>
       <div className="flex items-end gap-x-2">
         <TextInput
-          label="API PairQL endpoint override:"
+          label="API PairQL base URL override:"
           type="url"
           value={pqlOverride}
           placeholder={pairqlEndpointDefault}

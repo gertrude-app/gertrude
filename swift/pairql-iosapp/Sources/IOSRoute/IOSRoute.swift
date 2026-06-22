@@ -6,6 +6,12 @@ public enum IOSRoute: PairRoute {
   case unauthed(UnauthedRoute)
 }
 
+extension IOSRoute: AuthSplitRoute {
+  public static let domain = "ios-app"
+  public typealias Authed = AuthedRoute
+  public typealias Unauthed = UnauthedRoute
+}
+
 public extension IOSRoute {
   nonisolated(unsafe) static let router: AnyParserPrinter<URLRequestData, IOSRoute> = OneOf {
     Route(.case(Self.authed)) {

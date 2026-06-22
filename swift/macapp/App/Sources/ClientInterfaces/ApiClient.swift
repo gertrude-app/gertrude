@@ -106,7 +106,7 @@ public struct ApiClient: Sendable {
 }
 
 extension ApiClient: EndpointOverridable {
-  public static let endpointDefault = AppConfiguration.apiBaseURL.appendingPathComponent("pairql")
+  public static let endpointDefault = AppConfiguration.apiBaseURL
 
   public static let endpointOverride = LockIsolated<URL?>(nil)
 }
