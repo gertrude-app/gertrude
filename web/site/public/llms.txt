@@ -10,8 +10,9 @@ filter paired with optional screenshot and keystroke monitoring, managed by
 parents from a web dashboard. The iPhone/iPad app is a focused tool that plugs
 holes in Apple's Screen Time — blocking `#images` GIF search in Messages,
 Spotlight image search, Maps business-listing images, and similar loopholes.
-Gertrude AM is a standalone podcast app that lets kids listen to parent-approved
-shows while gating the ability to add new podcasts behind a PIN.
+Gertrude AM is a podcast app that lets kids listen to parent-approved shows
+while gating the ability to add new podcasts behind a PIN; it connects to a
+Gertrude parent account for subscription and PIN management.
 
 ## Products
 
@@ -30,9 +31,9 @@ shows while gating the ability to add new podcasts behind a PIN.
   Supervised Mode. See the [Supervised Mode setup
   guide](https://gertrude.app/blog/gertrude-ios-supervised-mode) for details.
 - [Gertrude AM](https://gertrude.app/#podcasts): A kid-friendly podcast app
-  where adding new shows requires a parent-set 6-digit PIN. $10/year after a
-  30-day free trial via Apple in-app purchase; one subscription covers an
-  Apple Family.
+  where adding new shows requires a parent-set 6-digit PIN. Connects to a
+  Gertrude parent account; free to try for 30 days, then requires at least a
+  Light plan ($10/year for the whole family) to keep adding and updating shows.
 
 ## Documentation
 
