@@ -2,9 +2,9 @@
 watch_swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
 
 [private]
-watch-swift dir cmd ignore1="•" ignore2="•":
+watch-swift dir cmd:
   @watchexec --project-origin . --clear --restart --watch {{dir}} --exts swift,html \
-  --ignore '**/.build/*/**' --ignore '**/index.html' --ignore '{{ignore1}}' --ignore '{{ignore2}}' \
+  --ignore '**/.build/*/**' --ignore '**/index.html' \
   {{cmd}}
 
 watch-build dir:
