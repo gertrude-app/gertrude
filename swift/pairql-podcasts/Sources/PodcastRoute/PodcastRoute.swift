@@ -6,6 +6,12 @@ public enum PodcastRoute: PairRoute {
   case unauthed(UnauthedRoute)
 }
 
+extension PodcastRoute: AuthSplitRoute {
+  public static let domain = "gertrude-am"
+  public typealias Authed = AuthedRoute
+  public typealias Unauthed = UnauthedRoute
+}
+
 public extension PodcastRoute {
   nonisolated(unsafe) static let router: AnyParserPrinter<URLRequestData, PodcastRoute> = OneOf {
     Route(.case(Self.authed)) {

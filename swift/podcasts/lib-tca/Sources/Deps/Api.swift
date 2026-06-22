@@ -3,6 +3,7 @@ import DependenciesMacros
 import Foundation
 import LibCore
 import PairQL
+import PairQLClient
 import PodcastRoute
 
 @DependencyClient
@@ -46,7 +47,7 @@ extension ApiClient: DependencyKey {
           locale: dep(\.locale).identifier,
         )
 
-        return try await output(from: CrossPromos.self, withUnauthed: .crossPromos(input))
+        return try await pairql.call(CrossPromos.self, unauthed: .crossPromos(input))
       },
       logEvent: { id, kind, label, detail in
         guard let metadata = await podcastDeviceMetadata() else { return }
@@ -62,9 +63,9 @@ extension ApiClient: DependencyKey {
           iosVersion: metadata.iosVersion,
         )
 
-        _ = try await output(
-          from: LogPodcastEvent_v3.self,
-          withUnauthed: .logPodcastEvent_v3(input),
+        _ = try await pairql.call(
+          LogPodcastEvent_v3.self,
+          unauthed: .logPodcastEvent_v3(input),
         )
       },
       migrateDeviceId: { oldDeviceId, newVendorId in
@@ -72,9 +73,9 @@ extension ApiClient: DependencyKey {
           oldDeviceId: oldDeviceId,
           newVendorId: newVendorId,
         )
-        _ = try await output(
-          from: MigratePodcastVendorId.self,
-          withUnauthed: .migratePodcastVendorId(input),
+        _ = try await pairql.call(
+          MigratePodcastVendorId.self,
+          unauthed: .migratePodcastVendorId(input),
         )
       },
       getTrialStatus: {
@@ -91,47 +92,47 @@ extension ApiClient: DependencyKey {
           iosVersion: iosVersion,
           appVersion: appVersion,
         )
-        return try await output(from: GetTrialStatus.self, withUnauthed: .getTrialStatus(input))
+        return try await pairql.call(GetTrialStatus.self, unauthed: .getTrialStatus(input))
       },
       getAccountStatus: {
-        try await output(from: GetAccountStatus.self, with: .getAccountStatus)
+        try await authed(GetAccountStatus.self, .getAccountStatus)
       },
       consumePinResetCode: { code in
-        _ = try await output(
-          from: ConsumePinResetCode.self,
-          with: .consumePinResetCode(.init(code: code)),
+        _ = try await authed(
+          ConsumePinResetCode.self,
+          .consumePinResetCode(.init(code: code)),
         )
       },
       createClaimCode: {
         guard let deviceId = dep(\.keychain).loadDeviceId() else {
           throw ApiClient.ApiError.noDeviceId
         }
-        return try await output(
-          from: CreateClaimCode.self,
-          withUnauthed: .createClaimCode(.init(deviceId: deviceId)),
+        return try await pairql.call(
+          CreateClaimCode.self,
+          unauthed: .createClaimCode(.init(deviceId: deviceId)),
         )
       },
       createDatabaseUpload: { deviceId in
         let input = CreateDatabaseUpload.Input(installId: deviceId)
-        let result = try await output(
-          from: CreateDatabaseUpload.self,
-          withUnauthed: .createDatabaseUpload(input),
+        let result = try await pairql.call(
+          CreateDatabaseUpload.self,
+          unauthed: .createDatabaseUpload(input),
         )
         return result.uploadUrl
       },
       verifyPromoCode: { deviceId, code in
         let input = VerifyPromoCode.Input(installId: deviceId, code: code)
-        let result = try await output(
-          from: VerifyPromoCode.self,
-          withUnauthed: .verifyPromoCode(input),
+        let result = try await pairql.call(
+          VerifyPromoCode.self,
+          unauthed: .verifyPromoCode(input),
         )
         return result.success
       },
       verifyDbDownload: { deviceId, downloadUrl in
         let input = VerifyDbDownload.Input(installId: deviceId, downloadUrl: downloadUrl)
-        let result = try await output(
-          from: VerifyDbDownload.self,
-          withUnauthed: .verifyDbDownload(input),
+        let result = try await pairql.call(
+          VerifyDbDownload.self,
+          unauthed: .verifyDbDownload(input),
         )
         return result.success
       },
@@ -139,46 +140,24 @@ extension ApiClient: DependencyKey {
   }
 }
 
-func output<P: Pair>(
-  from pair: P.Type,
-  withUnauthed route: UnauthedRoute,
-) async throws -> P.Output {
-  try await send(.unauthed(route))
-}
+private let pairql = PairQLClient<PodcastRoute>(
+  endpoint: { URL(string: podcastApiEndpoint())! },
+  timeout: 10,
+)
 
-func output<P: Pair>(
-  from pair: P.Type,
-  with route: AuthedRoute,
+func authed<P: Pair>(
+  _ pair: P.Type,
+  _ route: AuthedRoute,
 ) async throws -> P.Output {
   guard let token = dep(\.keychain).loadAmToken() else {
     throw ApiClient.ApiError.noToken
   }
-  return try await send(.authed(token, route))
+  return try await pairql.call(pair, authed: route, token: token)
 }
 
-private func send<Output: PairOutput>(_ route: PodcastRoute) async throws -> Output {
-  let apiEndpoint = Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
+private func podcastApiEndpoint() -> String {
+  Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
     ?? "https://api.gertrude.app"
-  let router = PodcastRoute.router.baseURL("\(apiEndpoint)/pairql/gertrude-am")
-  var request = try router.request(for: route)
-  request.httpMethod = "POST"
-  request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-  request.timeoutInterval = 10
-
-  let (data, response) = try await URLSession.shared.data(for: request)
-
-  guard let httpResponse = response as? HTTPURLResponse else {
-    throw ApiClient.ApiError.requestFailed
-  }
-
-  if httpResponse.statusCode >= 300 {
-    if let pqlError = try? JSON.decode(data, as: PqlError.self) {
-      throw pqlError
-    }
-    throw ApiClient.ApiError.unexpectedError(statusCode: httpResponse.statusCode)
-  }
-
-  return try JSON.decode(data, as: Output.self, [.isoDates])
 }
 
 private func podcastDeviceMetadata() async -> (

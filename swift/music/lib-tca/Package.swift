@@ -8,6 +8,7 @@ let package = Package(
   products: [.library(name: "LibTCA", targets: ["LibTCA"])],
   dependencies: [
     .package(path: "../lib-views"),
+    .package(path: "../../pairql"),
     .package(path: "../../pairql-music"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
@@ -23,6 +24,7 @@ let package = Package(
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "LibViews", package: "lib-views"),
         .product(name: "MusicRoute", package: "pairql-music"),
+        .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Tagged", package: "swift-tagged"),
       ],
       // To re-enable the iOS lock-screen / control-center artwork suppression after App

@@ -6,6 +6,12 @@ public enum MusicRoute: PairRoute {
   case unauthed(UnauthedRoute)
 }
 
+extension MusicRoute: AuthSplitRoute {
+  public static let domain = "gertrude-music"
+  public typealias Authed = AuthedRoute
+  public typealias Unauthed = UnauthedRoute
+}
+
 public extension MusicRoute {
   nonisolated(unsafe) static let router: AnyParserPrinter<URLRequestData, MusicRoute> = OneOf {
     Route(.case(Self.authed)) {
