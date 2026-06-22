@@ -1,3 +1,4 @@
+import { Toaster } from '@gertrude/ui';
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router';
 import appCss from '../styles.css?url';
 import { MockDataProvider } from '#/lib/mock';
@@ -39,7 +40,10 @@ function RootDocument({ children }: { children: React.ReactNode }): React.ReactE
         <HeadContent />
       </head>
       <body>
-        <MockDataProvider>{children}</MockDataProvider>
+        <MockDataProvider>
+          {children}
+          <Toaster />
+        </MockDataProvider>
         <Scripts />
       </body>
     </html>

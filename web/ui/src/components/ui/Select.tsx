@@ -1,14 +1,21 @@
 import cx from 'clsx';
-import { ChevronDownIcon, type LucideIcon } from 'lucide-react';
+import { ChevronDownIcon } from 'lucide-react';
 import React from 'react';
 import DropdownMenu from './dropdown-menu/DropdownMenu';
-import DropdownMenuItem from './dropdown-menu/DropdownMenuItem';
+import DropdownMenuItem, {
+  type DropdownMenuItemIcon,
+} from './dropdown-menu/DropdownMenuItem';
 
 type NoInferValue<T> = [T][T extends unknown ? 0 : never];
 
 export type SelectOption<Value extends string> =
   | Value
-  | { value: Value; label: string; description?: React.ReactNode; icon?: LucideIcon };
+  | {
+      value: Value;
+      label: string;
+      description?: React.ReactNode;
+      icon?: DropdownMenuItemIcon;
+    };
 type SelectOptionValue<Option> = Option extends { value: infer Value extends string }
   ? Value
   : Option extends string
@@ -41,7 +48,31 @@ const getOptionDescription = <Value extends string>(
 
 const getOptionIcon = <Value extends string>(
   option: SelectOption<Value>,
-): LucideIcon | undefined => (typeof option === `string` ? undefined : option.icon);
+): DropdownMenuItemIcon | undefined =>
+  typeof option === `string` ? undefined : option.icon;
+
+const renderIcon = (
+  icon: DropdownMenuItemIcon | undefined,
+  className: string,
+): React.ReactNode => {
+  if (!icon) {
+    return null;
+  }
+
+  if (React.isValidElement<{ className?: string }>(icon)) {
+    return React.cloneElement(icon, {
+      className: cx(className, icon.props.className),
+    });
+  }
+
+  if (typeof icon === `function` || (typeof icon === `object` && `render` in icon)) {
+    return React.createElement(icon as React.ElementType<{ className?: string }>, {
+      className,
+    });
+  }
+
+  return <span className={className}>{icon}</span>;
+};
 
 const Select = <const Options extends readonly SelectOption<string>[]>({
   selected,
@@ -108,13 +139,12 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
                 disabled ? `bg-stone-100 text-stone-500` : `bg-white text-stone-900`,
               )}
             >
-              {SelectedIcon && (
-                <SelectedIcon
-                  className={cx(
-                    `shrink-0 text-stone-500 mb-0.25`,
-                    size === `small` ? `h-3 w-3` : `h-3.5 w-3.5`,
-                  )}
-                />
+              {renderIcon(
+                SelectedIcon,
+                cx(
+                  `shrink-0 text-stone-500 mb-0.25`,
+                  size === `small` ? `h-3 w-3` : `h-3.5 w-3.5`,
+                ),
               )}
               <span className="truncate">{selectedLabel}</span>
             </span>

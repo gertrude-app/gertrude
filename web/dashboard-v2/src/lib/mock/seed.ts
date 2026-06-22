@@ -3,6 +3,8 @@ import type {
   InstalledMacApp,
   Keychain,
   MockDb,
+  NotificationMethod,
+  NotificationRecord,
   Person,
   PersonIosSettingsRecord,
   PersonMacSettingsRecord,
@@ -841,6 +843,68 @@ const suspensionRequests: SuspensionRequestRecord[] = [
   },
 ];
 
+const notificationMethods: NotificationMethod[] = [
+  {
+    id: `method-email-primary`,
+    type: `email`,
+    emailAddress: `parent@example.com`,
+  },
+  {
+    id: `method-text-kiah`,
+    type: `text`,
+    phoneNumber: `+15555550142`,
+  },
+  {
+    id: `method-slack-family`,
+    type: `slack`,
+    channelName: `gertrude-alerts`,
+    channelId: `C08GERTRUDE`,
+    botToken: `xoxb-example-token`,
+  },
+  {
+    id: `method-ntfy-urgent`,
+    type: `ntfy`,
+    topicId: `gertrude-family-alerts`,
+  },
+  {
+    id: `method-push-iphone`,
+    type: `push`,
+  },
+];
+
+const notifications: NotificationRecord[] = [
+  {
+    id: `notification-unlock-email`,
+    methodId: `method-email-primary`,
+    trigger: `unlockRequestSubmitted`,
+    enabled: true,
+  },
+  {
+    id: `notification-suspension-text`,
+    methodId: `method-text-kiah`,
+    trigger: `suspendFilterRequestSubmitted`,
+    enabled: true,
+  },
+  {
+    id: `notification-security-recommended-slack`,
+    methodId: `method-slack-family`,
+    trigger: `securityEventsRecommended`,
+    enabled: true,
+  },
+  {
+    id: `notification-security-medium-ntfy`,
+    methodId: `method-ntfy-urgent`,
+    trigger: `securityEventsMedium`,
+    enabled: true,
+  },
+  {
+    id: `notification-security-all-push`,
+    methodId: `method-push-iphone`,
+    trigger: `securityEventsAll`,
+    enabled: false,
+  },
+];
+
 const securityEvents: SecurityEvent[] = [
   {
     id: `security-1`,
@@ -931,6 +995,8 @@ export const initialMockDb: MockDb = {
   unlockRequests,
   suspensionRequests,
   securityEvents,
+  notificationMethods,
+  notifications,
   keychains,
   macSettings,
   iosSettings,

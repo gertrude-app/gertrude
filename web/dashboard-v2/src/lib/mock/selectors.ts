@@ -5,6 +5,7 @@ import type {
   InstalledMacApp,
   Keychain,
   MockDb,
+  Notification,
   Person,
   PersonIosSettingsRecord,
   PersonMacSettingsRecord,
@@ -55,6 +56,17 @@ function withActivityPersonName(db: MockDb, activity: ActivityRecord): ActivityI
   };
 }
 
+function withNotificationMethod(
+  db: MockDb,
+  notification: MockDb[`notifications`][number],
+): Notification | null {
+  const method = db.notificationMethods.find(
+    (candidate) => candidate.id === notification.methodId,
+  );
+
+  return method ? { ...notification, method } : null;
+}
+
 export function getPeople(db: MockDb): PersonWithDevices[] {
   return db.people.map((person) => withDevices(db, person));
 }
@@ -78,6 +90,12 @@ export function getActivityItems(db: MockDb): ActivityItem[] {
   return db.activity.map((activity) => withActivityPersonName(db, activity));
 }
 
+export function getNotifications(db: MockDb): Notification[] {
+  return db.notifications
+    .map((notification) => withNotificationMethod(db, notification))
+    .filter((notification): notification is Notification => notification !== null);
+}
+
 export function getAppChrome(db: MockDb): { requestCount: number } {
   return {
     requestCount: db.unlockRequests.length + db.suspensionRequests.length,
@@ -95,6 +113,16 @@ export function getPeoplePage(db: MockDb): {
     unlockRequests: getUnlockRequests(db),
     suspensionRequests: getSuspensionRequests(db),
     securityEvents: db.securityEvents,
+  };
+}
+
+export function getNotificationSettingsPage(db: MockDb): {
+  notificationMethods: MockDb[`notificationMethods`];
+  notifications: Notification[];
+} {
+  return {
+    notificationMethods: db.notificationMethods,
+    notifications: getNotifications(db),
   };
 }
 
