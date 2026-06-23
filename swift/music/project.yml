@@ -59,6 +59,22 @@ targets:
           - UIInterfaceOrientationPortrait
         UIRequiresFullScreen: true
         UILaunchScreen: {}
+    postBuildScripts:
+      - name: Add debug local API Info.plist keys
+        script: |
+          if [ "$CONFIGURATION" != "Debug" ]; then
+            exit 0
+          fi
+          case "$API_ENDPOINT" in
+            http://*) ;;
+            *) exit 0 ;;
+          esac
+          plist="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" "$plist" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsLocalNetworking true" "$plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true" "$plist"
+          /usr/libexec/PlistBuddy -c "Set :NSLocalNetworkUsageDescription Gertrude Music connects to a local development API while testing." "$plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSLocalNetworkUsageDescription string Gertrude Music connects to a local development API while testing." "$plist"
+        basedOnDependencyAnalysis: false
+        showEnvVars: false
 
 schemes:
   "Gertrude Music":

@@ -35,9 +35,11 @@ extension DependencyValues {
 }
 
 extension ApprovedMusicClient {
-  static let mock = Self(
-    loadApprovedLibrary: { .mock },
-  )
+  #if DEBUG
+    static let mock = Self(
+      loadApprovedLibrary: { .mock },
+    )
+  #endif
 
   static let empty = Self(
     loadApprovedLibrary: { .empty },
