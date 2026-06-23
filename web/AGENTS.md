@@ -20,6 +20,9 @@ Next.js, Vite, Tailwind.
 ## Marketing Site
 
 - When working on design-related tasks, read `./site/docs/design.md`.
+- When asked to run or design a usability/UX eval of the site, read
+  `./site/docs/usability-personas.md` (the marketing persona set; it uses the shared
+  method in `../.agents/skills/usability-eval/SKILL.md`).
 
 ## Key Packages
 
