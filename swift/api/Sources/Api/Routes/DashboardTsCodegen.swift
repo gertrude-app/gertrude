@@ -29,7 +29,7 @@ enum DashboardTsCodegenRoute {
       ("ClientAuth", ClientAuth.self),
       ("DeviceModelFamily", DeviceModelFamily.self),
       ("RequestStatus", RequestStatus.self),
-      ("UnlockRequest", GetUnlockRequest.Output.self),
+      ("UnlockRequest", GetBatchUnlockRequestData.UnlockRequestData.self),
       ("KeychainSummary", KeychainSummary.self),
       ("ChildComputerStatus", ChildComputerStatus.self),
       ("ChildComputer", GetChild.Computer.self),

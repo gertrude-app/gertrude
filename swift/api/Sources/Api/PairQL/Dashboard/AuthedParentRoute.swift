@@ -21,8 +21,6 @@ enum AuthedParentRoute: PairRoute {
   case getIdentifiedApps
   case getSelectableKeychains
   case getSuspendFilterRequest(GetSuspendFilterRequest.Input)
-  case getUnlockRequest(GetUnlockRequest.Input)
-  case getUnlockRequests
   case getChild(GetChild.Input)
   case getChildren
   case searchMusicCatalog(SearchMusicCatalog.Input)
@@ -31,7 +29,6 @@ enum AuthedParentRoute: PairRoute {
   case removeApprovedMusicAlbum(RemoveApprovedMusicAlbum.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
-  case iosDevice(IOSDevice.Id)
   case iosDevice_v2(IOSDevice.Id)
   case latestAppVersions
   case logEvent(LogEvent.Input)
@@ -39,7 +36,6 @@ enum AuthedParentRoute: PairRoute {
   case childActivitySummaries(ChildActivitySummaries.Input)
   case combinedUsersActivityFeed(CombinedUsersActivityFeed.Input)
   case familyActivitySummaries(FamilyActivitySummaries.Input)
-  case getUserUnlockRequests(GetUserUnlockRequests.Input)
   case saveDevice(SaveDevice.Input)
   case saveKey(SaveKey.Input)
   case saveKeychain(SaveKeychain.Input)
@@ -47,14 +43,12 @@ enum AuthedParentRoute: PairRoute {
   case saveUser(SaveUser.Input)
   case setDailyReviewEmail(SetDailyReviewEmail.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
-  case getSubscriptionPanel
   case getSubscriptionPanel_v2
   case openBillingPortal(OpenBillingPortal.Input)
   case startCheckoutSession(StartCheckoutSession.Input)
   case securityEventsFeed
   case startFullTrial
   case changeSubscriptionTier(ChangeSubscriptionTier.Input)
-  case updateUnlockRequest(UpdateUnlockRequest.Input)
   case requestPublicKeychain(RequestPublicKeychain.Input)
   case upsertBlockRule(UpsertBlockRule.Input)
   case updateIOSDevice(UpdateIOSDevice.Input)
@@ -142,13 +136,6 @@ extension AuthedParentRoute {
           Operation(GetSuspendFilterRequest.self)
           Body(.dashboardInput(GetSuspendFilterRequest.self))
         }
-        Route(.case(Self.getUnlockRequest)) {
-          Operation(GetUnlockRequest.self)
-          Body(.dashboardInput(GetUnlockRequest.self))
-        }
-        Route(.case(Self.getUnlockRequests)) {
-          Operation(GetUnlockRequests.self)
-        }
         Route(.case(Self.getChild)) {
           Operation(GetChild.self)
           Body(.dashboardInput(GetChild.self))
@@ -180,10 +167,6 @@ extension AuthedParentRoute {
           Operation(HandleCheckoutSuccess.self)
           Body(.dashboardInput(HandleCheckoutSuccess.self))
         }
-        Route(.case(Self.iosDevice)) {
-          Operation(GetIOSDevice.self)
-          Body(.dashboardInput(GetIOSDevice.self))
-        }
         Route(.case(Self.iosDevice_v2)) {
           Operation(GetIOSDevice_v2.self)
           Body(.dashboardInput(GetIOSDevice_v2.self))
@@ -203,10 +186,6 @@ extension AuthedParentRoute {
         Route(.case(Self.getBatchUnlockRequestData)) {
           Operation(GetBatchUnlockRequestData.self)
           Body(.dashboardInput(GetBatchUnlockRequestData.self))
-        }
-        Route(.case(Self.getUserUnlockRequests)) {
-          Operation(GetUserUnlockRequests.self)
-          Body(.dashboardInput(GetUserUnlockRequests.self))
         }
         Route(.case(Self.handleUnlockRequests)) {
           Operation(HandleUnlockRequests.self)
@@ -241,9 +220,6 @@ extension AuthedParentRoute {
           Operation(SetDailyReviewEmail.self)
           Body(.dashboardInput(SetDailyReviewEmail.self))
         }
-        Route(.case(Self.getSubscriptionPanel)) {
-          Operation(GetSubscriptionPanel.self)
-        }
         Route(.case(Self.getSubscriptionPanel_v2)) {
           Operation(GetSubscriptionPanel_v2.self)
         }
@@ -268,10 +244,6 @@ extension AuthedParentRoute {
         Route(.case(Self.toggleChildKeychain)) {
           Operation(ToggleChildKeychain.self)
           Body(.dashboardInput(ToggleChildKeychain.self))
-        }
-        Route(.case(Self.updateUnlockRequest)) {
-          Operation(UpdateUnlockRequest.self)
-          Body(.dashboardInput(UpdateUnlockRequest.self))
         }
         Route(.case(Self.requestPublicKeychain)) {
           Operation(RequestPublicKeychain.self)
@@ -421,9 +393,6 @@ extension AuthedParentRoute: RouteResponder {
     case .handleCheckoutSuccess(let input):
       let output = try await HandleCheckoutSuccess.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .iosDevice(let input):
-      let output = try await GetIOSDevice.resolve(with: input, in: context)
-      return try await self.respond(with: output)
     case .iosDevice_v2(let input):
       let output = try await GetIOSDevice_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -436,17 +405,8 @@ extension AuthedParentRoute: RouteResponder {
     case .confirmPendingNotificationMethod(let input):
       let output = try await ConfirmPendingNotificationMethod.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .getUnlockRequest(let input):
-      let output = try await GetUnlockRequest.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .getUnlockRequests:
-      let output = try await GetUnlockRequests.resolve(in: context)
-      return try await self.respond(with: output)
     case .getBatchUnlockRequestData(let input):
       let output = try await GetBatchUnlockRequestData.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .getUserUnlockRequests(let input):
-      let output = try await GetUserUnlockRequests.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .handleUnlockRequests(let input):
       let output = try await HandleUnlockRequests.resolve(with: input, in: context)
@@ -457,14 +417,8 @@ extension AuthedParentRoute: RouteResponder {
     case .createPendingNotificationMethod(let input):
       let output = try await CreatePendingNotificationMethod.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .updateUnlockRequest(let input):
-      let output = try await UpdateUnlockRequest.resolve(with: input, in: context)
-      return try await self.respond(with: output)
     case .saveKey(let input):
       let output = try await SaveKey.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .getSubscriptionPanel:
-      let output = try await GetSubscriptionPanel.resolve(in: context)
       return try await self.respond(with: output)
     case .getSubscriptionPanel_v2:
       let output = try await GetSubscriptionPanel_v2.resolve(in: context)

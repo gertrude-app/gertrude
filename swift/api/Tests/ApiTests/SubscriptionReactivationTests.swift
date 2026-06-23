@@ -79,7 +79,7 @@ final class SubscriptionReactivationTests: ApiTestCase, @unchecked Sendable {
       },
     )
 
-    let panel = try await GetSubscriptionPanel.resolve(in: context(parent))
+    let panel = try await GetSubscriptionPanel_v2.resolve(in: context(parent))
     expect(panel.planStatus).toEqual(.free)
     expect(panel.primary).toEqual(.reactivateViaCheckout(tier: .full))
     expect(panel.secondary).toEqual([.reactivateViaCheckout(tier: .light)])

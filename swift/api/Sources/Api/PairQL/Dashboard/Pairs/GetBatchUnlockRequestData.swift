@@ -6,8 +6,24 @@ struct GetBatchUnlockRequestData: Pair {
   static let auth: ClientAuth = .parent
   typealias Input = Child.Id
 
+  struct UnlockRequestData: PairOutput {
+    let id: Api.UnlockRequest.Id
+    let userId: Api.Child.Id
+    let userName: String
+    let status: RequestStatus
+    let url: String?
+    let domain: String?
+    let ipAddress: String?
+    let requestComment: String?
+    let appName: String?
+    let appSlug: String?
+    let appBundleId: String?
+    let appCategories: [String]
+    let createdAt: Date
+  }
+
   struct Output: PairOutput {
-    var requests: [GetUnlockRequest.Output]
+    var requests: [UnlockRequestData]
     var keychains: [KeychainSummary]
   }
 }
@@ -50,6 +66,33 @@ extension GetBatchUnlockRequestData: Resolver {
     return try await Output(
       requests: allRequests.concurrentMap { try await .init(from: $0, in: context) },
       keychains: sortedKeychains.concurrentMap { try await .init(from: $0) },
+    )
+  }
+}
+
+extension GetBatchUnlockRequestData.UnlockRequestData {
+  init(from request: UnlockRequest, in context: ParentContext) async throws {
+    let userDevice = try await request.computerUser(in: context.db)
+    let user = try await context.verifiedChild(from: userDevice.childId)
+
+    let idManifest = try await getCachedAppIdManifest()
+    let factory = AppDescriptorFactory(appIdManifest: idManifest)
+    let app = factory.appDescriptor(for: request.appBundleId)
+
+    self.init(
+      id: request.id,
+      userId: user.id,
+      userName: user.name,
+      status: request.status,
+      url: request.url,
+      domain: request.hostname,
+      ipAddress: request.ipAddress,
+      requestComment: request.requestComment,
+      appName: app.displayName,
+      appSlug: app.slug,
+      appBundleId: request.appBundleId,
+      appCategories: Array(app.categories),
+      createdAt: request.createdAt,
     )
   }
 }
