@@ -1,11 +1,11 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import type { DashboardWidgets_v2 } from '@dash/types';
+import type { DashboardWidgets_v3 } from '@dash/types';
 import UserStatus from '../UserStatus';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
-type Child = DashboardWidgets_v2.Output[`children`][number];
+type Child = DashboardWidgets_v3.Output[`children`][number];
 
 type Props = {
   className?: string;

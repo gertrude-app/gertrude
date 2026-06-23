@@ -1,13 +1,13 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import type { DashboardWidgets_v2 } from '@dash/types';
+import type { DashboardWidgets_v3 } from '@dash/types';
 import ChildDeviceCard from './ChildDeviceCard';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  children: DashboardWidgets_v2.Output[`children`];
+  children: DashboardWidgets_v3.Output[`children`];
 };
 
 const ChildrenDevicesWidget: React.FC<Props> = ({ className, children }) => {

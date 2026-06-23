@@ -132,7 +132,7 @@ describe(`batch unlock requests flow`, () => {
   });
 
   it(`redirects top-level /unlock-requests to dashboard`, () => {
-    cy.interceptPql(`DashboardWidgets_v2`, {
+    cy.interceptPql(`DashboardWidgets_v3`, {
       children: [],
       childActivitySummaries: [],
       unlockRequests: [],

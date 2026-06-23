@@ -22,7 +22,7 @@ describe(`signup`, () => {
       token: `token-123`,
     });
 
-    cy.interceptPql(`DashboardWidgets_v2`, {
+    cy.interceptPql(`DashboardWidgets_v3`, {
       children: [],
       unlockRequests: [],
       childActivitySummaries: [],
@@ -45,7 +45,7 @@ describe(`signup`, () => {
       expect(request.body.detail).to.contain(`friend_family`);
     });
 
-    cy.wait(`@DashboardWidgets_v2`)
+    cy.wait(`@DashboardWidgets_v3`)
       .its(`request.headers.${`X-AdminToken`.toLowerCase()}`)
       .should(`eq`, `token-123`);
 

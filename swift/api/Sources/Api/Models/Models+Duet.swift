@@ -50,7 +50,7 @@ extension DashAnnouncement {
     case kind
     case icon
     case html
-    case learnMoreUrl
+    case action
     case createdAt
     case deletedAt
   }

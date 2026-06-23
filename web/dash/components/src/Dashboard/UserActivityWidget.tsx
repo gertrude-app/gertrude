@@ -3,12 +3,12 @@ import { Button } from '@shared/components';
 import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { DashboardWidgets_v2 } from '@dash/types';
+import type { DashboardWidgets_v3 } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
-  userActivity: DashboardWidgets_v2.Output[`childActivitySummaries`];
+  userActivity: DashboardWidgets_v3.Output[`childActivitySummaries`];
   className?: string;
 };
 

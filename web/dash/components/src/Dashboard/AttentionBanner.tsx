@@ -10,7 +10,7 @@ type Props = {
   html?: string;
   linkTo?: string;
   linkText?: string;
-  learnMoreUrl?: string;
+  action?: { label: string; url: string };
   onDismiss?: () => void;
   className?: string;
 };
@@ -23,7 +23,7 @@ const AttentionBanner: React.FC<Props> = ({
   html,
   linkTo,
   linkText,
-  learnMoreUrl,
+  action,
   onDismiss,
   className,
 }) => (
@@ -84,21 +84,34 @@ const AttentionBanner: React.FC<Props> = ({
         </div>
       )}
       <div className="flex gap-2 justify-center @xl:justify-end whitespace-nowrap">
-        {learnMoreUrl && (
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href={learnMoreUrl}
-            className={cx(
-              `px-3 py-1 rounded-md border`,
-              kind === `warning`
-                ? `text-amber-600 hover:text-amber-800 border-amber-400`
-                : `text-violet-500 hover:text-violet-800 border-violet-400`,
-            )}
-          >
-            Learn more
-          </a>
-        )}
+        {action &&
+          (action.url.startsWith(`/`) ? (
+            <Link
+              to={action.url}
+              className={cx(
+                `px-3 py-1 rounded-md border`,
+                kind === `warning`
+                  ? `text-amber-600 hover:text-amber-800 border-amber-400`
+                  : `text-violet-500 hover:text-violet-800 border-violet-400`,
+              )}
+            >
+              {action.label} <i className="fa-solid fa-arrow-right ml-1" />
+            </Link>
+          ) : (
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={action.url}
+              className={cx(
+                `px-3 py-1 rounded-md border`,
+                kind === `warning`
+                  ? `text-amber-600 hover:text-amber-800 border-amber-400`
+                  : `text-violet-500 hover:text-violet-800 border-violet-400`,
+              )}
+            >
+              {action.label}
+            </a>
+          ))}
         {linkTo && linkText && (
           <Link
             to={linkTo}

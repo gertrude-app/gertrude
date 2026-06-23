@@ -104,6 +104,7 @@ extension Configure {
     app.migrations.add(AddDashboardPerfIndexes())
     app.migrations.add(CreateMusicTables())
     app.migrations.add(AddParentDailyReviewEmail())
+    app.migrations.add(DashAnnouncementAction())
   }
 }
 

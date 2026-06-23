@@ -1,8 +1,8 @@
 import cx from 'classnames';
 import React from 'react';
-import type { ChildComputerStatus, DashboardWidgets_v2 } from '@dash/types';
+import type { ChildComputerStatus, DashboardWidgets_v3 } from '@dash/types';
 
-type Child = DashboardWidgets_v2.Output[`children`][number];
+type Child = DashboardWidgets_v3.Output[`children`][number];
 type DeviceInfo = Child[`devices`][number];
 
 type Props = Child;
