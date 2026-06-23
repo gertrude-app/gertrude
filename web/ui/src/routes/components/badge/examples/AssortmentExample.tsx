@@ -1,0 +1,37 @@
+import { CheckIcon, ClockIcon, ShieldAlertIcon, SparklesIcon } from 'lucide-react';
+import React from 'react';
+import Badge from '#/components/ui/Badge';
+
+const AssortmentExample: React.FC = () => (
+  <div className="flex h-full items-center justify-center p-8">
+    <div className="flex max-w-3xl flex-wrap items-center justify-center gap-3">
+      <Badge color="neutral">Draft</Badge>
+      <Badge color="violet" icon={SparklesIcon}>
+        New
+      </Badge>
+      <Badge color="green" icon={CheckIcon}>
+        Active
+      </Badge>
+      <Badge color="yellow" icon={ClockIcon}>
+        Waiting
+      </Badge>
+      <Badge color="red" icon={ShieldAlertIcon}>
+        Needs review
+      </Badge>
+      <Badge size="small" color="blue">
+        macOS
+      </Badge>
+      <Badge color="beta" icon={SparklesIcon}>
+        Beta
+      </Badge>
+      <Badge color="canary" icon={ClockIcon}>
+        Canary
+      </Badge>
+      <Badge size="large" color="blue" icon={SparklesIcon}>
+        Managed
+      </Badge>
+    </div>
+  </div>
+);
+
+export default AssortmentExample;

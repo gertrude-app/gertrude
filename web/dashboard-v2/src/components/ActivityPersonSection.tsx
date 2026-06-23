@@ -1,0 +1,123 @@
+import { Button } from '@gertrude/ui';
+import cx from 'clsx';
+import { TrashIcon } from 'lucide-react';
+import React from 'react';
+import type { ActivityItem } from '#/lib/mock';
+import CardContainer from './CardContainer';
+import KeylogActivityItem from './KeylogActivityItem';
+import ScreenshotActivityItem from './ScreenshotActivityItem';
+import { type ActivityChunk, chunkActivityBySuspension } from '#/lib/activity-helpers';
+
+interface Props {
+  personName: string;
+  items: ActivityItem[];
+  showHeading?: boolean;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDeleteAll?: (personId: string) => void;
+}
+
+const ActivityPersonSection: React.FC<Props> = ({
+  personName,
+  items,
+  showHeading = true,
+  onToggleFlag,
+  onDelete,
+  onDeleteAll,
+}) => {
+  const chunkedItems = chunkActivityBySuspension(items);
+  const personId = items[0]?.personId;
+
+  return (
+    <div className="flex flex-col gap-3">
+      {showHeading && (
+        <span className="text-lg font-medium">{personName}'s activity</span>
+      )}
+      <CardContainer className="flex flex-col gap-6">
+        {chunkedItems.map((chunk, index) => (
+          <ActivitySuspensionChunk
+            key={`${chunk.type}-${index}-${chunk.items[0]?.id ?? `empty`}`}
+            chunk={chunk}
+            onToggleFlag={onToggleFlag}
+            onDelete={onDelete}
+          />
+        ))}
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            onClick={() => personId && onDeleteAll?.(personId)}
+            icon={TrashIcon}
+          >
+            Delete all {personName}'s activity
+          </Button>
+        </div>
+      </CardContainer>
+    </div>
+  );
+};
+
+interface ActivitySuspensionChunkProps {
+  chunk: ActivityChunk;
+  onToggleFlag?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}
+
+const ActivitySuspensionChunk: React.FC<ActivitySuspensionChunkProps> = ({
+  chunk,
+  onToggleFlag,
+  onDelete,
+}) => (
+  <div
+    className={cx(
+      chunk.type === `duringSuspension` &&
+        `pl-2.25 @lg/main:pl-2.5 @xl/main:pl-3.5 @3xl/main:pl-0`,
+    )}
+  >
+    {chunk.type === `duringSuspension` && (
+      <div className="flex items-end -ml-3.5 gap-2">
+        <div className="rounded-tl-full w-5 h-5 border-t-3 border-l-3 border-red-600 -mb-0.25" />
+        <span className="text-red-700/80 font-medium relative -top-1.25">
+          During suspension
+        </span>
+      </div>
+    )}
+    <div className="flex items-stretch">
+      {chunk.type === `duringSuspension` && (
+        <div className="top-0 bottom-0 w-0.75 bg-red-600 relative -mr-1 -left-3.5 shrink-0" />
+      )}
+      <div className="flex flex-col gap-6 flex-grow">
+        {chunk.items.map((item) =>
+          item.type === `screenshot` ? (
+            <ScreenshotActivityItem
+              key={item.id}
+              id={item.id}
+              screenshotUrl={item.url}
+              date={item.date}
+              flagged={item.flagged}
+              onToggleFlag={onToggleFlag}
+              onDelete={onDelete}
+            />
+          ) : (
+            <KeylogActivityItem
+              key={item.id}
+              id={item.id}
+              text={item.text}
+              applicationName={item.applicationName}
+              date={item.date}
+              flagged={item.flagged}
+              onToggleFlag={onToggleFlag}
+              onDelete={onDelete}
+            />
+          ),
+        )}
+      </div>
+    </div>
+    {chunk.type === `duringSuspension` && (
+      <div className="flex items-end -ml-3.5 gap-2">
+        <div className="rounded-bl-full w-8 h-5 border-b-3 border-l-3 border-red-600 -mt-0.25" />
+      </div>
+    )}
+  </div>
+);
+
+export default ActivityPersonSection;

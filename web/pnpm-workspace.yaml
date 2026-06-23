@@ -7,11 +7,14 @@ packages:
   - smoke
   - admin
   - supervise
+  - ui
+  - dashboard-v2
 
 onlyBuiltDependencies:
   - core-js-pure
   - cypress
   - esbuild
+  - lightningcss
   - nx
   - puppeteer
   - sharp
