@@ -43,7 +43,7 @@ files-changed:
     appviews: ... # triggers appviews-comment job
     dashboard: ... # triggers dashboard job
     site: ... # triggers site job
-    storybook: ... # triggers storybook job
+    storybook: ... # storybook job PAUSED — see "Paused: Argos Visual Regression" below
 ```
 
 Note: The `check` job runs on all web changes without filtering — it covers lint,
@@ -83,6 +83,19 @@ when that app imports it, such as Storybook visual coverage.
 
 5. **Check for moved/renamed packages** - If a package path changes, update filters
    accordingly.
+
+## Paused: Argos Visual Regression
+
+**Paused 2026-06-23.** Removed the `storybook` job from `web-ci.yml` — it built
+Storybook, ran `just visual-test`, uploaded to [Argos](https://argos-ci.com), and opened
+automated "update screenshots from CI" PRs. Too noisy (flaky diffs, agent-driven PR
+volume) and over the Argos free tier.
+
+Kept (restorable): `web/storybook/visual-tests/`, the `visual-test` / `build-storybook`
+justfile recipes, the `@argos-ci/puppeteer` dep, and the `storybook` `files-changed`
+output + filter. To restore, re-add the job from git history and check the `ARGOS_TOKEN`
+secret + branch-protection required checks. **If not restored before long, delete the
+kept machinery and rip it all out.**
 
 ## Agent/LLM-Facing Content
 
