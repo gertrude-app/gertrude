@@ -97,7 +97,6 @@ extension AlbumDetailFeature.State {
     self.tracks.map { PlaybackItem(
       track: $0,
       artworkURL: self.album.artworkURL,
-      allowsArtwork: self.album.showsArtwork,
     ) }
   }
 

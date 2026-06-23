@@ -59,6 +59,8 @@ targets:
           - UIInterfaceOrientationPortrait
         UIRequiresFullScreen: true
         UILaunchScreen: {}
+        UIBackgroundModes:
+          - audio
     postBuildScripts:
       - name: Add debug local API Info.plist keys
         script: |

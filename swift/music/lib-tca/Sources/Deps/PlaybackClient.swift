@@ -3,15 +3,12 @@ import DependenciesMacros
 import Foundation
 
 #if canImport(MusicKit)
+  import Combine
   import MusicKit
 #endif
 
 #if os(iOS)
   import AVFoundation
-#endif
-
-#if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-  import Darwin
 #endif
 
 enum PlaybackEvent: Equatable, Sendable {
@@ -23,8 +20,9 @@ enum PlaybackEvent: Equatable, Sendable {
 @DependencyClient
 struct PlaybackClient: Sendable {
   var playTrack: @Sendable (_ item: PlaybackItem) async throws -> Void
-  var playTracksInOrder: @Sendable (_ items: [PlaybackItem]) async throws -> Void
+  var playAlbum: @Sendable (_ items: [PlaybackItem], _ startIndex: Int) async throws -> Void
   var pause: @Sendable () async -> Void
+  var restartCurrentEntry: @Sendable () async -> Void
   var resume: @Sendable () async throws -> Void
   var seek: @Sendable (_ time: TimeInterval) async -> Void
   var skipToNext: @Sendable () async throws -> Void
@@ -56,13 +54,16 @@ extension PlaybackClient {
   #if canImport(MusicKit)
     static let live = Self(
       playTrack: { item in
-        try await Self.play(items: [item], repeats: false)
+        try await Self.play(items: [item], startIndex: 0, repeats: false)
       },
-      playTracksInOrder: { items in
-        try await Self.play(items: items, repeats: true)
+      playAlbum: { items, startIndex in
+        try await Self.play(items: items, startIndex: startIndex, repeats: true)
       },
       pause: {
         await Self.pausePlayback()
+      },
+      restartCurrentEntry: {
+        await Self.restartPlaybackCurrentEntry()
       },
       resume: {
         try await Self.resumePlayback()
@@ -87,8 +88,9 @@ extension PlaybackClient {
 
   static let noop = Self(
     playTrack: { _ in },
-    playTracksInOrder: { _ in },
+    playAlbum: { _, _ in },
     pause: {},
+    restartCurrentEntry: {},
     resume: {},
     seek: { _ in },
     skipToNext: {},
@@ -102,13 +104,16 @@ extension PlaybackClient {
       let state = SimulatorPlaybackState()
       return Self(
         playTrack: { item in
-          await state.play(items: [item], repeats: false)
+          await state.play(items: [item], startIndex: 0, repeats: false)
         },
-        playTracksInOrder: { items in
-          await state.play(items: items, repeats: true)
+        playAlbum: { items, startIndex in
+          await state.play(items: items, startIndex: startIndex, repeats: true)
         },
         pause: {
           await state.pause()
+        },
+        restartCurrentEntry: {
+          await state.restartCurrentEntry()
         },
         resume: {
           await state.resume()
@@ -186,84 +191,81 @@ extension PlaybackClient {
     @MainActor
     private static func play(
       items: [PlaybackItem],
+      startIndex: Int,
       repeats: Bool,
     ) async throws {
-      guard !items.isEmpty else { return }
+      guard !items.isEmpty, items.indices.contains(startIndex) else { return }
       try await self.requestAuthorization()
       try await self.ensureSubscriptionAllowsPlayback()
       let songs = try await self.songs(for: items)
 
       #if os(iOS)
-        self.activateAudioSession()
-        #if GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-          let hidesArtwork = items.contains { !$0.allowsArtwork }
-          PlaybackNowPlayingContext.shared.set(items: items, hidesArtwork: hidesArtwork)
-          MediaRemotePrivateClient.shared.setCanBeNowPlayingApplication(true)
-          MediaRemotePrivateClient.shared.setNowPlayingApplicationOverrideEnabled(hidesArtwork)
-          if hidesArtwork {
-            await self.updateNowPlayingInfo(for: items[0], hidesArtwork: true)
-          } else {
-            MediaRemotePrivateClient.shared.clearNowPlayingInfo()
-          }
-        #endif
+        await self.activateAudioSession()
       #endif
       let player = ApplicationMusicPlayer.shared
-      player.queue = ApplicationMusicPlayer.Queue(for: songs)
+      player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: songs[startIndex])
       let repeatMode: MusicKit.MusicPlayer.RepeatMode = repeats ? .all : .none
       player.state.repeatMode = repeatMode
       do {
         try await player.play()
       } catch {
-        #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-          self.clearNowPlayingContext()
-        #endif
         throw PlaybackClientError.playbackFailed
       }
-
-      #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-        if items.contains(where: { !$0.allowsArtwork }) {
-          await self.refreshNowPlayingInfo(for: items[0], hidesArtwork: true)
-        }
-      #endif
     }
 
     private static func playbackEvents() -> AsyncStream<PlaybackEvent> {
       AsyncStream { continuation in
-        let task = Task { @MainActor in
+        let stateTask = Task { @MainActor in
+          let player = ApplicationMusicPlayer.shared
           var lastPlayStatusEvent: PlaybackEvent?
+          @MainActor
+          func yieldPlaybackStatus() {
+            guard let event = Self.playbackEvent(for: player.state.playbackStatus),
+                  event != lastPlayStatusEvent else { return }
+            lastPlayStatusEvent = event
+            continuation.yield(event)
+          }
+          yieldPlaybackStatus()
+          for await _ in player.state.objectWillChange.values {
+            await Task.yield()
+            yieldPlaybackStatus()
+          }
+        }
+        let queueTask = Task { @MainActor in
+          let player = ApplicationMusicPlayer.shared
           var lastCurrentItemID: ApprovedTrack.ID?
-          var lastProgress: PlaybackProgress?
-          while !Task.isCancelled {
-            let player = ApplicationMusicPlayer.shared
-            if let event = self.playbackEvent(
-              for: player.state.playbackStatus,
-            ), event != lastPlayStatusEvent {
-              lastPlayStatusEvent = event
-              continuation.yield(event)
-            }
-            if let currentItemID = self.currentItemID(for: player) {
-              if currentItemID != lastCurrentItemID {
-                lastCurrentItemID = currentItemID
-                continuation.yield(.currentItemChanged(currentItemID))
-                #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-                  if PlaybackNowPlayingContext.shared.hidesArtwork,
-                     let item = PlaybackNowPlayingContext.shared.item(for: currentItemID) {
-                    await self.updateNowPlayingInfo(for: item, hidesArtwork: true)
-                  }
-                #endif
-              }
+          @MainActor
+          func yieldCurrentItem() {
+            if let currentItemID = Self.currentItemID(for: player) {
+              guard currentItemID != lastCurrentItemID else { return }
+              lastCurrentItemID = currentItemID
+              continuation.yield(.currentItemChanged(currentItemID))
             } else {
               lastCurrentItemID = nil
             }
-            if let progress = self.playbackProgress(for: player), progress != lastProgress {
+          }
+          yieldCurrentItem()
+          for await _ in player.queue.objectWillChange.values {
+            await Task.yield()
+            yieldCurrentItem()
+          }
+        }
+        let progressTask = Task { @MainActor in
+          let player = ApplicationMusicPlayer.shared
+          var lastProgress: PlaybackProgress?
+          while !Task.isCancelled {
+            if let progress = Self.playbackProgress(for: player), progress != lastProgress {
               lastProgress = progress
               continuation.yield(.progressChanged(progress))
             }
             try? await Task.sleep(nanoseconds: 250_000_000)
           }
-          continuation.finish()
         }
-        continuation.onTermination = { _ in task.cancel() }
+        continuation.onTermination = { _ in
+          stateTask.cancel()
+          queueTask.cancel()
+          progressTask.cancel()
+        }
       }
     }
 
@@ -349,6 +351,11 @@ extension PlaybackClient {
     }
 
     @MainActor
+    private static func restartPlaybackCurrentEntry() async {
+      ApplicationMusicPlayer.shared.restartCurrentEntry()
+    }
+
+    @MainActor
     private static func skipToNextEntry() async throws {
       try await ApplicationMusicPlayer.shared.skipToNextEntry()
     }
@@ -360,97 +367,45 @@ extension PlaybackClient {
 
     @MainActor
     private static func stopPlayback() async {
-      #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-        self.clearNowPlayingContext()
-      #endif
       ApplicationMusicPlayer.shared.stop()
     }
 
     #if os(iOS)
-      private static func activateAudioSession() {
-        let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, mode: .default)
-        try? session.setActive(true)
+      private static func activateAudioSession() async {
+        await Task.detached(priority: .userInitiated) {
+          let session = AVAudioSession.sharedInstance()
+          try? session.setCategory(.playback, mode: .default)
+          try? session.setActive(true)
+        }.value
       }
-    #endif
-
-    #if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-      @MainActor
-      private static func clearNowPlayingContext() {
-        PlaybackNowPlayingContext.shared.clear()
-        MediaRemotePrivateClient.shared.clearNowPlayingInfo()
-        MediaRemotePrivateClient.shared.setNowPlayingApplicationOverrideEnabled(false)
-      }
-
-      @MainActor
-      private static func refreshNowPlayingInfo(
-        for item: PlaybackItem,
-        hidesArtwork: Bool,
-      ) async {
-        try? await Task.sleep(nanoseconds: 250_000_000)
-        await self.updateNowPlayingInfo(for: item, hidesArtwork: hidesArtwork)
-        try? await Task.sleep(nanoseconds: 750_000_000)
-        await self.updateNowPlayingInfo(for: item, hidesArtwork: hidesArtwork)
-      }
-
-      @MainActor
-      private static func updateNowPlayingInfo(
-        for item: PlaybackItem,
-        hidesArtwork: Bool,
-      ) async {
-        let loadedArtwork = if !hidesArtwork,
-                               item.allowsArtwork,
-                               let artworkURL = item.artworkURL {
-          await self.artwork(for: artworkURL)
-        } else {
-          LoadedArtwork?.none
-        }
-
-        MediaRemotePrivateClient.shared.setNowPlayingInfo(
-          title: item.title,
-          artist: item.artistName,
-          artwork: loadedArtwork,
-        )
-      }
-
-      private static func artwork(for url: URL) async -> LoadedArtwork? {
-        do {
-          let (data, response) = try await URLSession.shared.data(from: url)
-          let mimeType = response.mimeType ?? "image/jpeg"
-          return LoadedArtwork(data: data, mimeType: mimeType)
-        } catch {
-          return nil
-        }
-      }
-
     #endif
 
     private static func songs(for items: [PlaybackItem]) async throws -> [Song] {
-      var songs: [Song] = []
-      for item in items {
-        let songId = MusicItemID(item.id.rawValue)
-        let request = MusicCatalogResourceRequest<Song>(
-          matching: \.id,
-          equalTo: songId,
-        )
-        do {
-          let response = try await request.response()
-          guard let song = response.items.first else {
+      let songIds = items.map { MusicItemID($0.id.rawValue) }
+      let request = MusicCatalogResourceRequest<Song>(
+        matching: \.id,
+        memberOf: songIds,
+      )
+      do {
+        let response = try await request.response()
+        let songsByID = Dictionary(uniqueKeysWithValues: response.items
+          .map { ($0.id.rawValue, $0) })
+        return try items.map { item in
+          guard let song = songsByID[item.id.rawValue] else {
             throw PlaybackClientError.trackUnavailable
           }
-          songs.append(song)
-        } catch let error as MusicDataRequest.Error {
-          if error.status == 404 {
-            throw PlaybackClientError.trackUnavailable
-          }
-          throw PlaybackClientError.catalogLookupFailed
-        } catch let error as PlaybackClientError {
-          throw error
-        } catch {
-          throw PlaybackClientError.catalogLookupFailed
+          return song
         }
+      } catch let error as MusicDataRequest.Error {
+        if error.status == 404 {
+          throw PlaybackClientError.trackUnavailable
+        }
+        throw PlaybackClientError.catalogLookupFailed
+      } catch let error as PlaybackClientError {
+        throw error
+      } catch {
+        throw PlaybackClientError.catalogLookupFailed
       }
-      return songs
     }
   #endif
 }
@@ -465,7 +420,7 @@ extension PlaybackClient {
     private var items: [PlaybackItem] = []
     private var playStatus: PlaybackFeature.PlayStatus = .paused
     private var repeats = false
-    private var ticker: Task<Void, Never>?
+    private var progressTicker: Task<Void, Never>?
 
     nonisolated func events() -> AsyncStream<PlaybackEvent> {
       AsyncStream { continuation in
@@ -481,26 +436,26 @@ extension PlaybackClient {
       }
     }
 
-    func play(items: [PlaybackItem], repeats: Bool) {
+    func play(items: [PlaybackItem], startIndex: Int, repeats: Bool) {
       guard !items.isEmpty else {
         self.stop()
         return
       }
       self.items = items
-      self.currentIndex = 0
+      self.currentIndex = items.indices.contains(startIndex) ? startIndex : 0
       self.repeats = repeats
       self.duration = self.defaultDuration
       self.elapsedTime = 0
       self.playStatus = .playing
-      self.sendSnapshot()
-      self.startTickerIfNeeded()
+      self.sendCurrentState()
+      self.startProgressTickerIfNeeded()
     }
 
     func pause() {
       guard self.playStatus != .paused else { return }
       self.playStatus = .paused
       self.send(.playStatusChanged(.paused))
-      self.stopTicker()
+      self.stopProgressTicker()
     }
 
     func resume() {
@@ -512,7 +467,7 @@ extension PlaybackClient {
       self.playStatus = .playing
       self.send(.playStatusChanged(.playing))
       self.send(.progressChanged(self.progress))
-      self.startTickerIfNeeded()
+      self.startProgressTickerIfNeeded()
     }
 
     func seek(to time: TimeInterval) {
@@ -528,7 +483,7 @@ extension PlaybackClient {
       } else if self.repeats {
         self.currentIndex = 0
       }
-      self.restartCurrentItem()
+      self.restartCurrentEntry()
     }
 
     func skipToPrevious() {
@@ -538,7 +493,7 @@ extension PlaybackClient {
       } else if self.repeats {
         self.currentIndex = self.items.index(before: self.items.endIndex)
       }
-      self.restartCurrentItem()
+      self.restartCurrentEntry()
     }
 
     func stop() {
@@ -546,7 +501,7 @@ extension PlaybackClient {
       self.elapsedTime = 0
       self.send(.playStatusChanged(.paused))
       self.send(.progressChanged(self.progress))
-      self.stopTicker()
+      self.stopProgressTicker()
     }
 
     private var currentItem: PlaybackItem? {
@@ -563,30 +518,30 @@ extension PlaybackClient {
       id: UUID,
     ) {
       self.continuations[id] = continuation
-      self.sendSnapshot(to: continuation)
+      self.sendCurrentState(to: continuation)
     }
 
     private func removeContinuation(id: UUID) {
       self.continuations[id] = nil
     }
 
-    private func restartCurrentItem() {
+    func restartCurrentEntry() {
       self.duration = self.defaultDuration
       self.elapsedTime = 0
       self.sendCurrentItem()
       self.send(.progressChanged(self.progress))
       if self.playStatus == .playing {
-        self.startTickerIfNeeded()
+        self.startProgressTickerIfNeeded()
       }
     }
 
-    private func sendSnapshot() {
+    private func sendCurrentState() {
       self.sendCurrentItem()
       self.send(.playStatusChanged(self.playStatus))
       self.send(.progressChanged(self.progress))
     }
 
-    private func sendSnapshot(to continuation: AsyncStream<PlaybackEvent>.Continuation) {
+    private func sendCurrentState(to continuation: AsyncStream<PlaybackEvent>.Continuation) {
       if let currentItem {
         continuation.yield(.currentItemChanged(currentItem.id))
       }
@@ -605,9 +560,9 @@ extension PlaybackClient {
       }
     }
 
-    private func startTickerIfNeeded() {
-      guard self.ticker == nil else { return }
-      self.ticker = Task.detached {
+    private func startProgressTickerIfNeeded() {
+      guard self.progressTicker == nil else { return }
+      self.progressTicker = Task.detached {
         while !Task.isCancelled {
           try? await Task.sleep(nanoseconds: 250_000_000)
           await self.tick()
@@ -615,14 +570,14 @@ extension PlaybackClient {
       }
     }
 
-    private func stopTicker() {
-      self.ticker?.cancel()
-      self.ticker = nil
+    private func stopProgressTicker() {
+      self.progressTicker?.cancel()
+      self.progressTicker = nil
     }
 
     private func tick() {
       guard self.playStatus == .playing, !self.items.isEmpty else {
-        self.stopTicker()
+        self.stopProgressTicker()
         return
       }
       self.elapsedTime += 0.25
@@ -636,140 +591,17 @@ extension PlaybackClient {
     private func finishCurrentItem() {
       if self.items.count > 1, self.currentIndex < self.items.index(before: self.items.endIndex) {
         self.currentIndex += 1
-        self.restartCurrentItem()
+        self.restartCurrentEntry()
       } else if self.repeats {
         self.currentIndex = 0
-        self.restartCurrentItem()
+        self.restartCurrentEntry()
       } else {
         self.elapsedTime = self.duration
         self.playStatus = .paused
         self.send(.progressChanged(self.progress))
         self.send(.playStatusChanged(.paused))
-        self.stopTicker()
+        self.stopProgressTicker()
       }
-    }
-  }
-#endif
-
-#if os(iOS) && GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE
-  private struct LoadedArtwork {
-    let data: Data
-    let mimeType: String
-  }
-
-  @MainActor
-  private final class PlaybackNowPlayingContext {
-    static let shared = PlaybackNowPlayingContext()
-
-    private var itemsByID: [ApprovedTrack.ID: PlaybackItem] = [:]
-    private(set) var hidesArtwork = false
-
-    func set(items: [PlaybackItem], hidesArtwork: Bool) {
-      self.hidesArtwork = hidesArtwork
-      self.itemsByID = items.reduce(into: [:]) { itemsByID, item in
-        itemsByID[item.id] = item
-      }
-    }
-
-    func item(for id: ApprovedTrack.ID) -> PlaybackItem? {
-      self.itemsByID[id]
-    }
-
-    func clear() {
-      self.hidesArtwork = false
-      self.itemsByID = [:]
-    }
-  }
-
-  @MainActor
-  private final class MediaRemotePrivateClient {
-    static let shared = MediaRemotePrivateClient()
-
-    private let handle: UnsafeMutableRawPointer?
-
-    private init() {
-      self.handle = dlopen(
-        "/System/Library/PrivateFrameworks/MediaRemote.framework/MediaRemote",
-        RTLD_NOW,
-      )
-    }
-
-    func setCanBeNowPlayingApplication(_ canBeNowPlaying: Bool) {
-      guard let handle,
-            let symbol = dlsym(handle, "MRMediaRemoteSetCanBeNowPlayingApplication")
-      else {
-        return
-      }
-      typealias Function = @convention(c) (UInt8) -> Void
-      unsafeBitCast(symbol, to: Function.self)(canBeNowPlaying ? 1 : 0)
-    }
-
-    func setNowPlayingApplicationOverrideEnabled(_ enabled: Bool) {
-      guard let handle,
-            let symbol = dlsym(handle, "MRMediaRemoteSetNowPlayingApplicationOverrideEnabled")
-      else {
-        return
-      }
-      typealias Function = @convention(c) (UInt8) -> Void
-      unsafeBitCast(symbol, to: Function.self)(enabled ? 1 : 0)
-    }
-
-    func setNowPlayingInfo(
-      title: String,
-      artist: String,
-      artwork: LoadedArtwork?,
-    ) {
-      guard let handle,
-            let symbol = dlsym(handle, "MRMediaRemoteSetNowPlayingInfo")
-      else {
-        return
-      }
-
-      var info: [CFString: Any] = [:]
-      self.set("kMRMediaRemoteNowPlayingInfoTitle", title as NSString, in: &info)
-      self.set("kMRMediaRemoteNowPlayingInfoArtist", artist as NSString, in: &info)
-      self.set("kMRMediaRemoteNowPlayingInfoPlaybackRate", NSNumber(value: 1), in: &info)
-      self.set("kMRMediaRemoteNowPlayingInfoElapsedTime", NSNumber(value: 0), in: &info)
-      self.set("kMRMediaRemoteNowPlayingInfoDuration", NSNumber(value: 0), in: &info)
-      if let artwork {
-        self.set("kMRMediaRemoteNowPlayingInfoArtworkData", artwork.data as NSData, in: &info)
-        self.set(
-          "kMRMediaRemoteNowPlayingInfoArtworkMIMEType",
-          artwork.mimeType as NSString,
-          in: &info,
-        )
-      }
-
-      typealias Function = @convention(c) (CFDictionary) -> Void
-      unsafeBitCast(symbol, to: Function.self)(info as CFDictionary)
-    }
-
-    func clearNowPlayingInfo() {
-      guard let handle,
-            let symbol = dlsym(handle, "MRMediaRemoteSetNowPlayingInfo")
-      else {
-        return
-      }
-      typealias Function = @convention(c) (CFDictionary) -> Void
-      unsafeBitCast(symbol, to: Function.self)([:] as CFDictionary)
-    }
-
-    private func set(
-      _ symbolName: String,
-      _ value: Any,
-      in info: inout [CFString: Any],
-    ) {
-      guard let key = self.cfString(symbolName) else { return }
-      info[key] = value
-    }
-
-    private func cfString(_ symbolName: String) -> CFString? {
-      guard let handle,
-            let symbol = dlsym(handle, symbolName)
-      else {
-        return nil
-      }
-      return symbol.assumingMemoryBound(to: CFString?.self).pointee
     }
   }
 #endif

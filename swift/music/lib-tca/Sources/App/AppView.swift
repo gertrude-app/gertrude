@@ -80,13 +80,10 @@ struct AppView: View {
 
     private func nowPlayingBar(showsBackground: Bool) -> some View {
       let session = self.store.playback.session
-      let artworkURL = session?.currentItem.allowsArtwork == true
-        ? session?.currentItem.artworkURL
-        : nil
       return NowPlayingBar(
         title: session?.currentItem.title ?? "Not Playing",
         artist: session?.currentItem.artistName ?? "Choose an approved track",
-        artworkURL: artworkURL,
+        artworkURL: session?.currentItem.artworkURL,
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
@@ -118,7 +115,6 @@ struct AppView: View {
             title: session.currentItem.title,
             artist: session.currentItem.artistName,
             artworkURL: session.currentItem.artworkURL,
-            showsArtwork: session.currentItem.allowsArtwork,
             artworkTransitionID: self.nowPlayingArtworkTransitionID,
             isPlaying: session.isPlaying,
             isLoading: session.isLoading,
@@ -142,7 +138,6 @@ struct AppView: View {
             title: "Not Playing",
             artist: "Choose an approved track",
             artworkURL: nil,
-            showsArtwork: false,
             artworkTransitionID: self.nowPlayingArtworkTransitionID,
             isPlaying: false,
             isLoading: false,

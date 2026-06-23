@@ -92,7 +92,7 @@ struct AppFeatureTests {
   func libraryPlayAlbumDelegateStartsAlbumQueuePlayback() async {
     let items = [
       playbackItem("track-1"),
-      playbackItem("track-2", allowsArtwork: false),
+      playbackItem("track-2"),
       playbackItem("track-3"),
     ]
     let store = TestStore(initialState: .init()) {
@@ -149,7 +149,6 @@ struct AppFeatureTests {
     let item = PlaybackItem(
       track: track,
       artworkURL: album.artworkURL,
-      allowsArtwork: album.showsArtwork,
     )
     var state = AppFeature.State()
     state.library.status = .loaded(library)
@@ -181,15 +180,11 @@ private enum TestError: Error {
   case offline
 }
 
-private func playbackItem(
-  _ id: ApprovedTrack.ID,
-  allowsArtwork: Bool = true,
-) -> PlaybackItem {
+private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
   PlaybackItem(
     id: id,
     title: "Track \(id.rawValue)",
     artistName: "Artist",
     artworkURL: nil,
-    allowsArtwork: allowsArtwork,
   )
 }

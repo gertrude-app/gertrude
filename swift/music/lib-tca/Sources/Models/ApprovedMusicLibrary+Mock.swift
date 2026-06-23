@@ -70,7 +70,6 @@
         artworkURL: URL(
           string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/b0/b9/5c/b0b95c7d-732e-dd4c-facc-4132de44d3a4/9ec6d7b8-2049-4a53-92cd-4f19acdd8968.jpg/600x600bb.jpg",
         ),
-        showsArtwork: false,
         tracks: [
           .init(
             id: "1641851259",

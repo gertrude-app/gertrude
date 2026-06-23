@@ -34,15 +34,15 @@ struct PlaybackFeatureTests {
   func playAlbumQueueStartsSessionAtStartIndex() async {
     let items = [
       playbackItem("track-1"),
-      playbackItem("track-2", allowsArtwork: false),
+      playbackItem("track-2"),
       playbackItem("track-3"),
     ]
-    let recorder = PlaybackOrderRecorder()
+    let recorder = PlaybackAlbumRecorder()
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.playTracksInOrder = { items in
-        await recorder.record(items)
+      $0.playback.playAlbum = { items, startIndex in
+        await recorder.record(items: items, startIndex: startIndex)
       }
     }
 
@@ -56,17 +56,16 @@ struct PlaybackFeatureTests {
       $0.session?.playStatus = .playing
     }
 
-    let recordedItems = await recorder.items
-    #expect(recordedItems == [items[1], items[2], items[0]])
+    #expect(await recorder.items == items)
+    #expect(await recorder.startIndex == 1)
   }
 
   @Test
-  func albumQueueRotatesPlaybackOrderFromCurrentIndex() {
+  func albumQueueTracksCurrentAndUpcomingItems() {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let queue = PlaybackFeature.AlbumQueue(items: items, currentIndex: 1)
 
     #expect(queue.currentItem == items[1])
-    #expect(queue.playbackOrder == [items[1], items[2], items[0]])
     #expect(queue.upcomingItems == [items[2], items[0]])
   }
 
@@ -302,7 +301,7 @@ struct PlaybackFeatureTests {
   }
 
   @Test
-  func skipToNextAdvancesCurrentItem() async {
+  func skipToNextRequestsMusicKitNextEntry() async {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
@@ -316,16 +315,13 @@ struct PlaybackFeatureTests {
       }
     }
 
-    await store.send(.skipToNext) {
-      $0.session?.albumQueue.currentIndex = 1
-      $0.session?.progress = .zero
-    }
+    await store.send(.skipToNext)
 
     #expect(await recorder.skipToNextCount == 1)
   }
 
   @Test
-  func skipToNextWithSingleItemRestartsCurrentItem() async {
+  func skipToNextWithSingleItemRequestsMusicKitNextEntry() async {
     let item = playbackItem("track-1")
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
@@ -334,16 +330,14 @@ struct PlaybackFeatureTests {
     ))) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.seek = { time in
-        await recorder.recordSeek(time)
+      $0.playback.skipToNext = {
+        await recorder.recordSkipToNext()
       }
     }
 
-    await store.send(.skipToNext) {
-      $0.session?.progress = .init(duration: 180)
-    }
+    await store.send(.skipToNext)
 
-    #expect(await recorder.seekTimes == [0])
+    #expect(await recorder.skipToNextCount == 1)
   }
 
   @Test
@@ -356,16 +350,14 @@ struct PlaybackFeatureTests {
     ))) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.seek = { time in
-        await recorder.recordSeek(time)
+      $0.playback.restartCurrentEntry = {
+        await recorder.recordRestartCurrentEntry()
       }
     }
 
-    await store.send(.skipToPrevious) {
-      $0.session?.progress = .init(duration: 180)
-    }
+    await store.send(.skipToPrevious)
 
-    #expect(await recorder.seekTimes == [0])
+    #expect(await recorder.restartCurrentEntryCount == 1)
   }
 
   @Test
@@ -383,10 +375,7 @@ struct PlaybackFeatureTests {
       }
     }
 
-    await store.send(.skipToPrevious) {
-      $0.session?.albumQueue.currentIndex = 0
-      $0.session?.progress = .zero
-    }
+    await store.send(.skipToPrevious)
 
     #expect(await recorder.skipToPreviousCount == 1)
   }
@@ -406,10 +395,7 @@ struct PlaybackFeatureTests {
       }
     }
 
-    await store.send(.skipToPrevious) {
-      $0.session?.albumQueue.currentIndex = 2
-      $0.session?.progress = .zero
-    }
+    await store.send(.skipToPrevious)
 
     #expect(await recorder.skipToPreviousCount == 1)
   }
@@ -437,22 +423,24 @@ struct PlaybackFeatureTests {
   }
 }
 
-private actor PlaybackOrderRecorder {
+private actor PlaybackAlbumRecorder {
   var items: [PlaybackItem]?
+  var startIndex: Int?
 
-  func record(_ items: [PlaybackItem]) {
+  func record(items: [PlaybackItem], startIndex: Int) {
     self.items = items
+    self.startIndex = startIndex
   }
 }
 
 private actor PlaybackCommandRecorder {
-  var seekTimes: [TimeInterval] = []
+  var restartCurrentEntryCount = 0
   var skipToNextCount = 0
   var skipToPreviousCount = 0
   var openSettingsCount = 0
 
-  func recordSeek(_ time: TimeInterval) {
-    self.seekTimes.append(time)
+  func recordRestartCurrentEntry() {
+    self.restartCurrentEntryCount += 1
   }
 
   func recordSkipToNext() {
@@ -468,15 +456,11 @@ private actor PlaybackCommandRecorder {
   }
 }
 
-private func playbackItem(
-  _ id: ApprovedTrack.ID,
-  allowsArtwork: Bool = true,
-) -> PlaybackItem {
+private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
   PlaybackItem(
     id: id,
     title: "Track \(id.rawValue)",
     artistName: "Artist",
     artworkURL: nil,
-    allowsArtwork: allowsArtwork,
   )
 }

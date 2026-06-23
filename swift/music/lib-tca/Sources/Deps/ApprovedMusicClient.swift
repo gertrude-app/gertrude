@@ -59,7 +59,6 @@ private extension ApprovedAlbum {
       title: album.title,
       artistName: album.artistName,
       artworkURL: album.artworkURL,
-      showsArtwork: album.showsArtwork,
       tracks: album.tracks.map(ApprovedTrack.init),
     )
   }

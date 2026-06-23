@@ -78,7 +78,6 @@
         title: "Brewed",
         artist: "Väsen",
         artworkUrl: PreviewMusicData.brewedArtworkURL,
-        showsArtwork: false,
       ),
       .init(
         id: "3",
@@ -91,7 +90,6 @@
         title: "Flyt",
         artist: "Frifot",
         artworkUrl: PreviewMusicData.frifotArtworkURL,
-        showsArtwork: false,
       ),
       .init(
         id: "5",
@@ -131,7 +129,6 @@
         title: "För världen älskar vad som är brokot",
         artist: "Ranarim",
         artworkUrl: PreviewMusicData.ranarimArtworkURL,
-        showsArtwork: false,
       ),
       .init(
         id: "3",
@@ -173,7 +170,6 @@
         title: "Byss-Calle",
         artist: "Ahlberg, Ek & Roswall",
         artworkUrl: PreviewMusicData.aerArtworkURL,
-        showsArtwork: false,
       ),
       .init(
         id: "5",
@@ -209,7 +205,6 @@
         title: "Väsen Street",
         artist: "Väsen",
         artworkUrl: PreviewMusicData.vasenStreetArtworkURL,
-        showsArtwork: false,
       ),
       .init(
         id: "11",

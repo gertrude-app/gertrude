@@ -5,7 +5,6 @@ public struct NowPlayingScreenView: View {
   private let title: String
   private let artist: String
   private let artworkURL: URL?
-  private let showsArtwork: Bool
   private let artworkTransitionID: String?
   private let isPlaying: Bool
   private let isLoading: Bool
@@ -20,7 +19,6 @@ public struct NowPlayingScreenView: View {
     title: String,
     artist: String,
     artworkURL: URL?,
-    showsArtwork: Bool,
     artworkTransitionID: String?,
     isPlaying: Bool,
     isLoading: Bool,
@@ -34,7 +32,6 @@ public struct NowPlayingScreenView: View {
     self.title = title
     self.artist = artist
     self.artworkURL = artworkURL
-    self.showsArtwork = showsArtwork
     self.artworkTransitionID = artworkTransitionID
     self.isPlaying = isPlaying
     self.isLoading = isLoading
@@ -53,7 +50,7 @@ public struct NowPlayingScreenView: View {
           .ignoresSafeArea()
 
         CachedArtworkImageView(
-          url: self.showsArtwork ? self.artworkURL : nil,
+          url: self.artworkURL,
         ) { image in
           image
             .resizable()
@@ -135,7 +132,6 @@ public struct NowPlayingScreenView: View {
   private func artworkView(size: CGFloat) -> some View {
     let artwork = AlbumArtworkView(
       artworkUrl: self.artworkURL,
-      showsArtwork: self.showsArtwork,
       size: size,
       cornerRadius: 34,
     )
@@ -332,7 +328,6 @@ private struct NowPlayingProgressBar: View {
       title: PreviewMusicData.nowPlayingTitle,
       artist: PreviewMusicData.nowPlayingArtist,
       artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-      showsArtwork: true,
       artworkTransitionID: nil,
       isPlaying: true,
       isLoading: false,
@@ -350,7 +345,6 @@ private struct NowPlayingProgressBar: View {
       title: PreviewMusicData.nowPlayingTitle,
       artist: PreviewMusicData.nowPlayingArtist,
       artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-      showsArtwork: true,
       artworkTransitionID: nil,
       isPlaying: false,
       isLoading: false,
@@ -368,7 +362,6 @@ private struct NowPlayingProgressBar: View {
       title: "A Long Tune Title That Wraps Gracefully",
       artist: "Unknown Artist",
       artworkURL: nil,
-      showsArtwork: false,
       artworkTransitionID: nil,
       isPlaying: false,
       isLoading: false,
