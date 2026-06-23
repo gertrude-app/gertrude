@@ -593,24 +593,17 @@ final class AuthedParentResolverTests: ApiTestCase, @unchecked Sendable {
     request.appBundleId = "com.rofl.biz"
     try await self.db.create(request)
 
-    let output = try await GetUnlockRequest.resolve(
-      with: request.id,
+    let output = try await GetBatchUnlockRequestData.resolve(
+      with: child.id,
       in: context(child.parent),
     )
 
-    expect(output.id).toEqual(request.id)
-    expect(output.userId).toEqual(child.id)
-    expect(output.userName).toEqual(child.name)
-    expect(output.requestComment).toEqual("please dad")
-    expect(output.appBundleId).toEqual("com.rofl.biz")
-
-    let list = try await GetUnlockRequests.resolve(in: context(child.parent))
-    expect(list).toEqual([output])
-
-    let childList =
-      try await GetUserUnlockRequests
-        .resolve(with: child.id, in: context(child.parent))
-    expect(childList).toEqual([output])
+    let unlockRequest = try XCTUnwrap(output.requests.first)
+    expect(unlockRequest.id).toEqual(request.id)
+    expect(unlockRequest.userId).toEqual(child.id)
+    expect(unlockRequest.userName).toEqual(child.name)
+    expect(unlockRequest.requestComment).toEqual("please dad")
+    expect(unlockRequest.appBundleId).toEqual("com.rofl.biz")
   }
 
   func testLatestAppVersions() async throws {
