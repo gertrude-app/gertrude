@@ -14,6 +14,14 @@ export type MockDataAction =
   | { type: `activity.toggleFlag`; id: string }
   | { type: `activity.delete`; id: string }
   | { type: `activity.deleteForPerson`; personId: string }
+  | { type: `notificationMethod.delete`; id: string }
+  | { type: `notification.create`; notification: MockDb[`notifications`][number] }
+  | {
+      type: `notification.update`;
+      id: string;
+      patch: Pick<MockDb[`notifications`][number], `methodId` | `trigger`>;
+    }
+  | { type: `notification.delete`; id: string }
   | {
       type: `macSettings.patch`;
       personId: string;
@@ -92,6 +100,37 @@ function mockDataReducer(db: MockDb, action: MockDataAction): MockDb {
           activity.personId === action.personId
             ? { ...activity, deleted: true }
             : activity,
+        ),
+      };
+    case `notificationMethod.delete`:
+      return {
+        ...db,
+        notificationMethods: db.notificationMethods.filter(
+          (method) => method.id !== action.id,
+        ),
+        notifications: db.notifications.filter(
+          (notification) => notification.methodId !== action.id,
+        ),
+      };
+    case `notification.create`:
+      return {
+        ...db,
+        notifications: [...db.notifications, action.notification],
+      };
+    case `notification.update`:
+      return {
+        ...db,
+        notifications: db.notifications.map((notification) =>
+          notification.id === action.id
+            ? { ...notification, ...action.patch }
+            : notification,
+        ),
+      };
+    case `notification.delete`:
+      return {
+        ...db,
+        notifications: db.notifications.filter(
+          (notification) => notification.id !== action.id,
         ),
       };
     case `macSettings.patch`:
