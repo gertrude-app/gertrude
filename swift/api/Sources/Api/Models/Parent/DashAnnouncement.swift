@@ -7,7 +7,7 @@ struct DashAnnouncement: Codable, Sendable {
   var kind: Kind
   var icon: String?
   var html: String
-  var learnMoreUrl: String?
+  var action: Action?
   var createdAt = Date()
   var deletedAt: Date
 
@@ -16,13 +16,18 @@ struct DashAnnouncement: Codable, Sendable {
     case warning
   }
 
+  struct Action: Codable, Equatable, Sendable {
+    var label: String
+    var url: String
+  }
+
   init(
     id: Id? = nil,
     parentId: Parent.Id,
     kind: Kind = .news,
     icon: String? = nil,
     html: String,
-    learnMoreUrl: String? = nil,
+    action: Action? = nil,
     deletedAt: Date? = nil,
   ) {
     self.id = id ?? .init(get(dependency: \.uuid)())
@@ -30,7 +35,7 @@ struct DashAnnouncement: Codable, Sendable {
     self.kind = kind
     self.icon = icon
     self.html = html
-    self.learnMoreUrl = learnMoreUrl
+    self.action = action
     self.deletedAt = deletedAt ?? Date(addingDays: 30)
   }
 }

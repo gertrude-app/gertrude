@@ -1,7 +1,7 @@
 // auto-generated, do not edit
 import type { ChildComputerStatus } from '../shared';
 
-export namespace DashboardWidgets_v2 {
+export namespace DashboardWidgets_v3 {
   export type Input = void;
 
   export interface Output {
@@ -41,7 +41,10 @@ export namespace DashboardWidgets_v2 {
       kind: 'news' | 'warning';
       icon?: string;
       html: string;
-      learnMoreUrl?: string;
+      action?: {
+        label: string;
+        url: string;
+      };
     };
     pendingIOSDevices: Array<{
       childName: string;

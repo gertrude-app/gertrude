@@ -154,7 +154,10 @@ func notifyScreenTimeConflict(
         Gertrude’s ability to protect your child. \
         Disable Screen Time’s “Restrictions” &rarr; “Content &amp; Privacy” section to fix.
         """,
-        learnMoreUrl: "https://gertrude.app/blog/screen-time-web-filter-conflict",
+        action: .init(
+          label: "Learn more",
+          url: "https://gertrude.app/blog/screen-time-web-filter-conflict",
+        ),
       ))
     }
 

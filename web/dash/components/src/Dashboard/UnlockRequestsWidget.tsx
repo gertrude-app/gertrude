@@ -1,16 +1,16 @@
 import { Button } from '@shared/components';
 import { inflect } from '@shared/string';
 import React from 'react';
-import type { DashboardWidgets_v2 } from '@dash/types';
+import type { DashboardWidgets_v3 } from '@dash/types';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
 type Props = {
   className?: string;
-  unlockRequests: DashboardWidgets_v2.Output[`unlockRequests`];
+  unlockRequests: DashboardWidgets_v3.Output[`unlockRequests`];
 };
 
-type UnlockReq = DashboardWidgets_v2.Output[`unlockRequests`][number];
+type UnlockReq = DashboardWidgets_v3.Output[`unlockRequests`][number];
 
 type ChildGroup = {
   childId: UUID;
@@ -20,7 +20,7 @@ type ChildGroup = {
 };
 
 function groupByChild(
-  requests: DashboardWidgets_v2.Output[`unlockRequests`],
+  requests: DashboardWidgets_v3.Output[`unlockRequests`],
 ): ChildGroup[] {
   const map = new Map<UUID, { group: ChildGroup; all: UnlockReq[] }>();
   for (const req of requests) {

@@ -85,11 +85,11 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public dashboardWidgets = (
-    input: P.DashboardWidgets_v2.Input,
-  ): Promise<Result<P.DashboardWidgets_v2.Output>> => {
-    return this.query<P.DashboardWidgets_v2.Output>(
+    input: P.DashboardWidgets_v3.Input,
+  ): Promise<Result<P.DashboardWidgets_v3.Output>> => {
+    return this.query<P.DashboardWidgets_v3.Output>(
       input,
-      `DashboardWidgets_v2`,
+      `DashboardWidgets_v3`,
       `parent`,
     );
   };

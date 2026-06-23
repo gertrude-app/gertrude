@@ -49,7 +49,7 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`create first user from dashboard nudge`, () => {
-    cy.interceptPql(`DashboardWidgets_v2`, {
+    cy.interceptPql(`DashboardWidgets_v3`, {
       // no users OR devices, so should see create first user prompt
       children: [],
       unlockRequests: [],
@@ -73,7 +73,7 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`connect device from dashboard nudge`, () => {
-    cy.interceptPql(`DashboardWidgets_v2`, {
+    cy.interceptPql(`DashboardWidgets_v3`, {
       children: [
         {
           name: leopold.name,
@@ -96,7 +96,7 @@ describe(`dashboard onboarding nudges`, () => {
   });
 
   it(`recommends that you add a notification if there aren't any`, () => {
-    cy.interceptPql(`DashboardWidgets_v2`, {
+    cy.interceptPql(`DashboardWidgets_v3`, {
       children: [
         {
           name: leopold.name,

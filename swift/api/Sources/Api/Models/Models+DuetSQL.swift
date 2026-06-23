@@ -14,7 +14,7 @@ extension DashAnnouncement: Model {
     case .kind: .string(self.kind.rawValue)
     case .icon: .varchar(self.icon)
     case .html: .string(self.html)
-    case .learnMoreUrl: .varchar(self.learnMoreUrl)
+    case .action: .json(self.action?.toPostgresJson)
     case .createdAt: .date(self.createdAt)
     case .deletedAt: .date(self.deletedAt)
     }
@@ -27,7 +27,7 @@ extension DashAnnouncement: Model {
       .kind: .string(self.kind.rawValue),
       .icon: .varchar(self.icon),
       .html: .string(self.html),
-      .learnMoreUrl: .varchar(self.learnMoreUrl),
+      .action: .json(self.action?.toPostgresJson),
       .createdAt: .currentTimestamp,
       .deletedAt: .date(self.deletedAt),
     ]
@@ -1022,6 +1022,7 @@ extension ChildKeychain: Model {
 
 extension RuleSchedule: @retroactive PostgresJsonable {}
 extension PlainTimeWindow: @retroactive PostgresJsonable {}
+extension DashAnnouncement.Action: PostgresJsonable {}
 
 extension AlwaysBlockedGroup: Model {
   public static let schemaName = "macapp"

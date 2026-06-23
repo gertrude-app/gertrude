@@ -3,7 +3,7 @@ import { posessive } from '@shared/string';
 import cx from 'classnames';
 import React, { useState } from 'react';
 import type {
-  DashboardWidgets_v2,
+  DashboardWidgets_v3,
   MacAppConnectionCode,
   PrepIOSAppConnection,
   RequestState,
@@ -33,9 +33,9 @@ type Props = {
   prepIOSConnection?(input: PrepIOSAppConnection.Input): unknown;
   iosSetupRequest?: RequestState<PrepIOSAppConnection.Output>;
   resetIOSSetup?(): unknown;
-  childData: DashboardWidgets_v2.Output[`children`];
-  pendingIosDevices?: DashboardWidgets_v2.Output[`pendingIOSDevices`];
-} & Omit<DashboardWidgets_v2.Output, `children` | `pendingIOSDevices`>;
+  childData: DashboardWidgets_v3.Output[`children`];
+  pendingIosDevices?: DashboardWidgets_v3.Output[`pendingIOSDevices`];
+} & Omit<DashboardWidgets_v3.Output, `children` | `pendingIOSDevices`>;
 
 const Dashboard: React.FC<Props> = ({
   unlockRequests,
@@ -94,7 +94,7 @@ const Dashboard: React.FC<Props> = ({
             kind={announcement.kind}
             icon={announcement.icon ?? `fa fa-bolt`}
             html={announcement.html}
-            learnMoreUrl={announcement.learnMoreUrl}
+            action={announcement.action}
             onDismiss={() => {
               dismissAnnouncement(announcement.id);
               setAnnouncementDismissed(true);
@@ -351,7 +351,7 @@ export const IOSConnectionCodeScreen: React.FC<{ childName: string; code: number
 );
 
 interface ConnectFirstDeviceScreenProps {
-  firstUser: DashboardWidgets_v2.Output[`children`][number];
+  firstUser: DashboardWidgets_v3.Output[`children`][number];
   startAddDevice(childId: UUID): unknown;
   dismissAddDevice(): unknown;
   onStartTrial(): unknown;

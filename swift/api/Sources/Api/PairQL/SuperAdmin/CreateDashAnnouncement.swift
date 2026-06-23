@@ -9,7 +9,7 @@ struct CreateDashAnnouncement: Pair {
     let kind: DashAnnouncement.Kind
     let icon: String? // default: `fa fa-bolt` in web
     let html: String
-    let learnMoreUrl: String?
+    let action: DashAnnouncement.Action?
   }
 }
 
@@ -27,7 +27,7 @@ extension CreateDashAnnouncement: Resolver {
         kind: input.kind,
         icon: input.icon,
         html: input.html,
-        learnMoreUrl: input.learnMoreUrl,
+        action: input.action,
       )
     })
 
