@@ -3,12 +3,12 @@ title: Gertrude AM Privacy Policy
 description: Privacy policy for the Gertrude AM podcast app.
 ---
 
-Last updated: _5/4/2026_
+Last updated: _6/22/2026_
 
 Gertrude AM is a podcast app managed by parents or accountability partners restricting
-access to a select set of podcasts. It does not require a Gertrude account, and we do not
-collect names, email addresses, contact information, location, contacts, or advertising
-identifiers.
+access to a select set of podcasts. It connects to a Gertrude account for subscription
+management and PIN reset. The app itself does not collect names, email addresses, contact
+information, location, contacts, or advertising identifiers.
 
 ### Information the App Sends to Gertrude
 
@@ -22,8 +22,9 @@ keep subscriptions working, and fix bugs. This can include:
 - Short details needed to understand a problem, such as a podcast feed URL entered in the
   app or the result of a subscription purchase attempt.
 
-We use this information only to operate and improve Gertrude AM. It is not tied to a
-Gertrude account, and we do not use it for advertising.
+We use this information only to operate and improve Gertrude AM, and we do not use it for
+advertising. Once a device is connected to a Gertrude account, this data is associated
+with that account.
 
 ### Podcast and Purchase Data
 
@@ -31,9 +32,10 @@ Gertrude AM downloads podcast feeds, artwork, and audio from Apple podcast searc
 the podcast providers you choose. Those providers may receive ordinary network information
 when the app fetches their content.
 
-Subscriptions are handled by Apple. The app records limited StoreKit purchase status
-details so it can tell whether your free trial, subscription, or complimentary access is
-active.
+Subscriptions are managed through your Gertrude account. The app records limited
+subscription status details so it can tell whether your free trial, subscription, or
+complimentary access is active. Legacy subscriptions purchased through Apple before
+version 1.6.0 are honored during a migration period.
 
 ### Support Actions
 
