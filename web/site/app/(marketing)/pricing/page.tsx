@@ -1,9 +1,8 @@
 import cx from 'classnames';
 import { CheckIcon, MinusIcon, RocketIcon } from 'lucide-react';
-import Link from 'next/link';
 import React from 'react';
 import type { NextPage } from 'next';
-import FancyLink from '@/components/FancyLink';
+import Button from '@/components/Button';
 import { createMetadata } from '@/lib/seo';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
@@ -116,8 +115,8 @@ const PricingPage: NextPage = () => (
       </p>
     </section>
 
-    <section className="relative px-5 xs:px-8 sm:px-12 md:px-20 pb-6">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-5 xs:gap-6 items-stretch">
+    <section className="relative px-5 xs:px-8 sm:px-12 lg:px-20 pb-6">
+      <div className="max-w-md lg:max-w-6xl mx-auto grid gap-5 xs:gap-6 lg:grid-cols-3 items-stretch">
         {TIERS.map((tier, index) => (
           <TierCard key={tier.name} tier={tier} index={index} />
         ))}
@@ -132,12 +131,12 @@ const PricingPage: NextPage = () => (
       </ul>
     </section>
 
-    <section className="relative px-4 sm:px-12 md:px-20 pt-14 pb-4 hidden md:block">
+    <section className="relative px-5 xs:px-8 sm:px-12 lg:px-20 pt-14 pb-4">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-center text-2xl font-semibold text-white mb-8">
           Compare plans
         </h2>
-        <div className="rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 px-6 sm:px-8 py-5 shadow-xl shadow-black/20">
+        <div className="rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 px-4 xs:px-5 sm:px-8 py-5 shadow-xl shadow-black/20">
           <ComparisonTable />
         </div>
       </div>
@@ -156,7 +155,7 @@ const PricingPage: NextPage = () => (
           whole family, and you can upgrade, switch, or cancel anytime.
         </p>
         <div className="mt-10 flex flex-col xs:flex-row items-center justify-center gap-4">
-          <FancyLink
+          <Button
             type="link"
             href={SIGNUP_URL}
             color="primary"
@@ -165,8 +164,8 @@ const PricingPage: NextPage = () => (
             className="w-full xs:w-auto"
           >
             Get started free
-          </FancyLink>
-          <FancyLink
+          </Button>
+          <Button
             type="link"
             href={PARENTS_APP_URL}
             color="secondary"
@@ -176,7 +175,7 @@ const PricingPage: NextPage = () => (
             className="w-full xs:w-auto"
           >
             Log in
-          </FancyLink>
+          </Button>
         </div>
       </div>
     </section>
@@ -253,73 +252,88 @@ const TierCard: React.FC<{ tier: Tier; index: number }> = ({ tier, index }) => (
       </ul>
       <div className="mt-auto">
         {tier.trial && <p className="text-xs text-violet-300/60 mb-3">{tier.trial}</p>}
-        <Link
+        <Button
+          type="link"
           href={SIGNUP_URL}
-          className={cx(
-            `block w-full text-center font-semibold py-3 rounded-2xl transition-all duration-200`,
-            tier.cta.variant === `primary`
-              ? `bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(168,85,247,0.35)]`
-              : `bg-white/10 hover:bg-white/15 text-white border border-white/15`,
-          )}
+          size="sm"
+          color={tier.cta.variant}
+          inverted={tier.cta.variant === `secondary`}
+          className="w-full"
         >
           {tier.cta.label}
-        </Link>
+        </Button>
       </div>
     </div>
   </div>
 );
 
 const ComparisonTable: React.FC = () => (
-  <table className="w-full border-collapse text-left">
-    <thead>
-      <tr>
-        <th className="w-2/5" />
-        {TIERS.map((tier) => (
-          <th
-            key={tier.name}
-            className={cx(`py-4 px-3 text-center align-bottom`, {
-              'bg-violet-500/40 rounded-t-2xl': tier.featured,
-            })}
-          >
-            <div
-              className={cx(
-                `font-semibold`,
-                tier.featured ? `text-white` : `text-white/55`,
-              )}
+  <>
+    <table className="hidden md:table w-full border-collapse text-left">
+      <thead>
+        <tr>
+          <th className="w-2/5" />
+          {TIERS.map((tier) => (
+            <th
+              key={tier.name}
+              className={cx(`py-4 px-3 text-center align-bottom`, {
+                'bg-violet-500/40 rounded-t-2xl': tier.featured,
+              })}
             >
-              {tier.name}
-            </div>
-            <div
-              className={cx(
-                `text-sm font-medium`,
-                tier.featured ? `text-violet-100` : `text-violet-200/50`,
-              )}
-            >
-              {tier.free
-                ? `$0`
-                : `${tier.priceMain}${tier.priceAccent ?? ``}${tier.pricePeriod}`}
-            </div>
-          </th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {MATRIX.map((row) => (
-        <tr key={row.label} className="border-t border-white/10">
-          <td className="py-4 pr-3 text-violet-100/70 text-sm">{row.label}</td>
-          <MatrixCell value={row.free} />
-          <MatrixCell value={row.light} />
-          <MatrixCell value={row.full} featured />
+              <div
+                className={cx(
+                  `font-semibold`,
+                  tier.featured ? `text-white` : `text-white/55`,
+                )}
+              >
+                {tier.name}
+              </div>
+              <div
+                className={cx(
+                  `text-sm font-medium`,
+                  tier.featured ? `text-violet-100` : `text-violet-200/50`,
+                )}
+              >
+                {tier.free
+                  ? `$0`
+                  : `${tier.priceMain}${tier.priceAccent ?? ``}${tier.pricePeriod}`}
+              </div>
+            </th>
+          ))}
         </tr>
+      </thead>
+      <tbody>
+        {MATRIX.map((row) => (
+          <tr key={row.label} className="border-t border-white/10">
+            <td className="py-4 pr-3 text-violet-100/70 text-sm">{row.label}</td>
+            <MatrixCell value={row.free} />
+            <MatrixCell value={row.light} />
+            <MatrixCell value={row.full} featured />
+          </tr>
+        ))}
+        <tr aria-hidden="true">
+          <td />
+          <td />
+          <td />
+          <td className="h-4 bg-violet-500/40 rounded-b-2xl" />
+        </tr>
+      </tbody>
+    </table>
+    <div className="md:hidden divide-y divide-white/10">
+      {MATRIX.map((row) => (
+        <div key={row.label} className="py-4 first:pt-0 last:pb-0">
+          <h3 className="text-center text-sm font-semibold text-violet-50">
+            {row.label}
+          </h3>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <MobileMatrixCell plan="Free" value={row.free} />
+            <MobileMatrixCell plan="Light" value={row.light} />
+            <MobileMatrixCell plan="Full" value={row.full} featured />
+          </div>
+        </div>
       ))}
-      <tr aria-hidden="true">
-        <td />
-        <td />
-        <td />
-        <td className="h-4 bg-violet-500/40 rounded-b-2xl" />
-      </tr>
-    </tbody>
-  </table>
+    </div>
+  </>
 );
 
 const MatrixCell: React.FC<{ value: boolean | string; featured?: boolean }> = ({
@@ -327,18 +341,57 @@ const MatrixCell: React.FC<{ value: boolean | string; featured?: boolean }> = ({
   featured,
 }) => (
   <td className={cx(`py-4 px-3 text-center`, { 'bg-violet-500/40': featured })}>
-    {typeof value === `string` ? (
+    <MatrixValue value={value} featured={featured} />
+  </td>
+);
+
+const MobileMatrixCell: React.FC<{
+  plan: string;
+  value: boolean | string;
+  featured?: boolean;
+}> = ({ plan, value, featured }) => (
+  <div
+    className={cx(
+      `px-2 py-2.5 text-center`,
+      featured && `rounded-2xl bg-white/10 shadow-inner shadow-white/5`,
+    )}
+  >
+    <div
+      className={cx(
+        `text-[0.65rem] font-bold uppercase tracking-wider`,
+        featured ? `text-white` : `text-violet-200/55`,
+      )}
+    >
+      {plan}
+    </div>
+    <div className="mt-1.5 flex min-h-5 items-center justify-center">
+      <MatrixValue value={value} featured={featured} />
+    </div>
+  </div>
+);
+
+const MatrixValue: React.FC<{ value: boolean | string; featured?: boolean }> = ({
+  value,
+  featured,
+}) => {
+  if (typeof value === `string`) {
+    return (
       <span
-        className={cx(`text-xs`, featured ? `text-violet-100/90` : `text-violet-200/55`)}
+        className={cx(
+          `text-[0.7rem] font-medium leading-tight`,
+          featured ? `text-violet-100/90` : `text-violet-200/65`,
+        )}
       >
         {value}
       </span>
-    ) : value ? (
+    );
+  }
+  if (value) {
+    return (
       <CheckIcon
         className={cx(`size-5 mx-auto`, featured ? `text-white` : `text-fuchsia-300/70`)}
       />
-    ) : (
-      <MinusIcon className="size-4 mx-auto text-white/20" />
-    )}
-  </td>
-);
+    );
+  }
+  return <MinusIcon className="size-4 mx-auto text-white/20" />;
+};

@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { CheckIcon, Loader2Icon, SendIcon, XIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import Turnstile from 'react-turnstile';
-import FancyLink from './FancyLink';
+import Button from './Button';
 import * as env from '@/lib/env';
 
 const ContactForm: React.FC = () => {
@@ -110,7 +110,7 @@ const ContactForm: React.FC = () => {
         onVerify={setTurnstileToken}
       />
       {state === `idle` && (
-        <FancyLink
+        <Button
           type="submit"
           className="self-end mt-8"
           Icon={SendIcon}
@@ -118,7 +118,7 @@ const ContactForm: React.FC = () => {
           size="lg"
         >
           Submit
-        </FancyLink>
+        </Button>
       )}
       {state === `ongoing` && (
         <Loader2Icon className="self-end mt-8 mr-8 animate-spin text-slate-700" />

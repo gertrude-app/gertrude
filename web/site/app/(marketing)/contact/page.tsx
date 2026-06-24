@@ -1,7 +1,7 @@
-import { Logo } from '@shared/components';
 import React from 'react';
 import type { NextPage } from 'next';
 import ContactForm from '@/components/ContactForm';
+import Logo from '@/components/Logo';
 import * as seo from '@/lib/seo';
 
 export const metadata = seo.createMetadata(

@@ -11,10 +11,10 @@ import {
   ShieldCheckIcon,
   UsersIcon,
 } from '@heroicons/react/24/solid';
-import { Logo } from '@shared/components';
 import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from '../Logo';
 import SidebarOption from './SidebarOption';
 
 interface Props {
@@ -37,9 +37,10 @@ const SidebarNav: React.FC<Props> = ({
     <nav className={cx(`flex flex-col`, collapsed ? `py-4 px-2` : `px-4`)}>
       <a href="/">
         <Logo
+          size={collapsed ? 40 : 53}
           className={cx(
-            `mb-4 sm:mb-6 scale-[0.8] sm:scale-100 Logo`,
-            collapsed ? `mt-3 ml-[0.87em]` : `mt-8 -ml-2 sm:ml-4`,
+            `mb-4 sm:mb-6 Logo`,
+            collapsed ? `mx-auto mt-4` : `mt-8 -ml-2 sm:ml-4 scale-[0.8] sm:scale-100`,
           )}
           type="inverted"
           iconOnly={collapsed}

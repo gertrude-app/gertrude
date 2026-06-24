@@ -1,5 +1,6 @@
-import { Button } from '@shared/components';
+import { XIcon } from 'lucide-react';
 import React from 'react';
+import Button from './Button';
 
 type Props = {
   videoId: string;
@@ -28,10 +29,12 @@ const VideoModal: React.FC<Props> = ({ onDismiss, videoId }) => (
     <Button
       className="antialiased absolute top-0 right-0 m-7"
       color="secondary"
+      inverted
       onClick={onDismiss}
       type="button"
+      size="sm"
+      Icon={XIcon}
     >
-      <i className="fas fa-times mr-2" />
       Close
     </Button>
   </div>

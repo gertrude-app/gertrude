@@ -1,5 +1,6 @@
-import { Button, Logo, TextInput } from '@shared/components';
+import { Button, TextInput } from '@shared/components';
 import React from 'react';
+import Logo from '../Logo';
 
 type Props = {
   id?: string;
@@ -32,7 +33,7 @@ const EmailInputForm: React.FC<Props> = ({
       onSubmit();
     }}
   >
-    <Logo size={110} iconOnly className="-mt-6 mb-0" />
+    <Logo size={84} iconOnly className="-mt-4 mb-0" />
     <h2 className="text-center mt-4 text-3xl font-inter">{title}</h2>
     <h3 className="text-center text-slate-500 mt-3">{subTitle}</h3>
     {beforeInputs && <div className="mt-4 self-stretch">{beforeInputs}</div>}

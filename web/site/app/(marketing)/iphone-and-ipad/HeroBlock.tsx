@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { APP_STORE_URL, BlockedIcon } from './shared';
+import Button from '@/components/Button';
 import DeviceMockupBlock from '@/components/DeviceMockupBlock';
-import FancyLink from '@/components/FancyLink';
 
 const HeroBlock: React.FC = () => (
   <DeviceMockupBlock
@@ -24,10 +24,10 @@ const HeroBlock: React.FC = () => (
       should have included.
     </p>
     <div className="flex flex-wrap gap-4">
-      <FancyLink type="link" href={APP_STORE_URL} size="lg" color="primary" inverted>
+      <Button type="link" href={APP_STORE_URL} size="lg" color="primary" inverted>
         Download Now&nbsp;&rarr;
-      </FancyLink>
-      <FancyLink
+      </Button>
+      <Button
         type="link"
         href="/blog/how-parents-can-block-images-gif-search-ios-18#step-by-step"
         size="lg"
@@ -36,7 +36,7 @@ const HeroBlock: React.FC = () => (
         variant="flat"
       >
         How to set it up
-      </FancyLink>
+      </Button>
     </div>
   </DeviceMockupBlock>
 );

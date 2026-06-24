@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Turnstile from 'react-turnstile';
-import FancyLink from '@/components/FancyLink';
+import Button from '@/components/Button';
 import * as env from '@/lib/env';
 
 interface Props {
@@ -80,9 +80,9 @@ const ArticleFeedbackForm: React.FC<Props> = ({ name, lang }) => {
           />
         </fieldset>
         <fieldset>
-          <FancyLink type="submit" color="primary">
+          <Button type="submit" color="primary">
             {lang === `en` ? `Submit` : `Enviar`} →
-          </FancyLink>
+          </Button>
         </fieldset>
       </form>
     </div>

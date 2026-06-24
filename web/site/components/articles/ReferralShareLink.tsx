@@ -1,9 +1,9 @@
 'use client';
 
-import cx from 'classnames';
 import { CheckIcon, CopyIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { copyToClipboard, friendShareUrl } from './referralLink';
+import Button from '@/components/Button';
 
 const ReferralShareLink: React.FC = () => {
   const [shareUrl, setShareUrl] = useState<string | undefined>(undefined);
@@ -44,26 +44,16 @@ const ReferralShareLink: React.FC = () => {
           <code className="flex-auto select-all break-all rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm text-slate-700 sm:text-base">
             {shareUrl}
           </code>
-          <button
+          <Button
             type="button"
             onClick={onCopy}
-            className={cx(
-              `flex flex-none items-center justify-center gap-2 rounded-2xl px-5 py-3 font-semibold text-white transition-[transform,background-color] duration-200`,
-              status === `copied`
-                ? `bg-green-500`
-                : `bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:-translate-y-0.5 active:translate-y-0.5`,
-            )}
+            color={status === `copied` ? `success` : `primary`}
+            size="sm"
+            Icon={status === `copied` ? CheckIcon : CopyIcon}
+            className="flex-none"
           >
-            {status === `copied` ? (
-              <>
-                <CheckIcon className="h-5 w-5" /> Copied
-              </>
-            ) : (
-              <>
-                <CopyIcon className="h-5 w-5" /> Copy link
-              </>
-            )}
-          </button>
+            {status === `copied` ? `Copied` : `Copy link`}
+          </Button>
         </div>
         {status === `failed` && (
           <p className="mt-3 text-sm text-slate-500">

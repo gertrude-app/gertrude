@@ -1,6 +1,7 @@
-import { Button, Logo, TextInput } from '@shared/components';
+import { Button, TextInput } from '@shared/components';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from '../Logo';
 
 type Props = {
   password: string;
@@ -32,7 +33,7 @@ const LoginForm: React.FC<Props> = ({
       onSubmit();
     }}
   >
-    <Logo className="-mt-6 mb-0" size={110} iconOnly />
+    <Logo className="-mt-4 mb-0" size={84} iconOnly />
     <h2 className="text-center mt-4 text-3xl font-inter">Parent Login</h2>
     {fromPasswordReset ? (
       <div className="w-full bg-fuchsia-50 rounded-2xl p-6 mt-4">

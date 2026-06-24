@@ -1,4 +1,3 @@
-import { Logo } from '@shared/components';
 import cx from 'classnames';
 import React, { useEffect, useState } from 'react';
 import Computer from './Computer';
@@ -7,6 +6,7 @@ import Envelope from './Envelope';
 import Phone from './Phone';
 import PhoneScreen from './PhoneScreen';
 import { type Step, compareTo, initializeStep } from './utils';
+import Logo from '@/components/Logo';
 
 interface Props {
   step: number;

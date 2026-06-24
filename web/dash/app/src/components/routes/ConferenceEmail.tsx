@@ -1,5 +1,5 @@
-import { FullscreenModalForm } from '@dash/components';
-import { Button, Loading, Logo, TextInput } from '@shared/components';
+import { FullscreenModalForm, Logo } from '@dash/components';
+import { Button, Loading, TextInput } from '@shared/components';
 import cx from 'classnames';
 import React from 'react';
 import Current from '../../environment';
@@ -14,7 +14,7 @@ const ConferenceEmailForm: React.FC<{ source: `workshop` | `booth` }> = ({ sourc
     <FullscreenModalForm state="idle">
       <div className="flex flex-col items-center relative">
         <div className="flex items-center">
-          <Logo className="" iconOnly size={75} />
+          <Logo iconOnly size={56} />
           <div className="flex flex-col ml-3">
             <span className="text-4xl font-lato">
               <span className="text-slate-800">Gertrude</span>
