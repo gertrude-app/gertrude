@@ -6,7 +6,6 @@ interface Props {
   iconOnly?: boolean;
   className?: string;
   type?: `default` | `inverted`;
-  withForParents?: boolean | `condensed`;
   badge?: string;
   textSize?: string;
 }
@@ -18,7 +17,6 @@ const Logo: React.FC<Props> = ({
   iconOnly,
   className,
   type = `default`,
-  withForParents = false,
   badge,
 }) => {
   const src = type === `inverted` ? `/gertrude-logo-white.svg` : `/gertrude-logo.svg`;
@@ -57,19 +55,6 @@ const Logo: React.FC<Props> = ({
             </span>
           )}
         </span>
-        {withForParents && (
-          <span
-            className={cx(
-              type === `inverted`
-                ? `from-indigo-400 to-fuchsia-400`
-                : `from-indigo-500 to-fuchsia-500`,
-              `mt-1 w-fit bg-gradient-to-r bg-clip-text text-sm font-medium uppercase tracking-wider text-transparent [-webkit-background-clip:text]`,
-              withForParents === `condensed` && `-mt-0.5 border border-slate-900`,
-            )}
-          >
-            For parents
-          </span>
-        )}
       </span>
     </span>
   );
