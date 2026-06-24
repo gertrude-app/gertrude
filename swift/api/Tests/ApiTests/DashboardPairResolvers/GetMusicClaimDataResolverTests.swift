@@ -24,7 +24,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testResumeClaimedBySameParentReturnsDone() async throws {
     let parent = try await self.parent()
-    try await self.grantMusicAccess(to: parent.id)
+    try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
@@ -45,7 +45,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testResumeClaimedBySameParentWithoutMusicInstallThrowsNotFound() async throws {
     let parent = try await self.parent()
-    try await self.grantMusicAccess(to: parent.id)
+    try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
     _ = try await self.db.create(IOSDevice.random {
@@ -61,7 +61,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUnclaimedValidCodeReturnsChildrenAndNoResumeStep() async throws {
     let parent = try await self.parent()
-    try await self.grantMusicAccess(to: parent.id)
+    try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice.random {
@@ -146,18 +146,5 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     try await expectErrorFrom {
       try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
     }.toContain("not found")
-  }
-}
-
-extension GetMusicClaimDataResolverTests {
-  private func grantMusicAccess(to parentId: Parent.Id) async throws {
-    try await self.db.create(BillingIdentity(parentId: parentId))
-    try await self.db.create(StripeSubscription(
-      parentId: parentId,
-      tier: .light,
-      stripeId: .init("sub_\(parentId.rawValue.uuidString.prefix(8))"),
-      stripeStatus: .active,
-      currentPeriodEnd: .reference + .days(30),
-    ))
   }
 }

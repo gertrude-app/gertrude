@@ -9,7 +9,7 @@ func claimDevice<Output>(
   baseId: String,
   in context: ParentContext,
   onResume: (IOSDevice, Child) async throws -> Output,
-  beforeFreshClaim: ((IOSDevice) async throws -> Void)? = nil,
+  beforeClaim: ((IOSDevice) async throws -> Void)? = nil,
   onFresh: (IOSDevice, Child) async throws -> Output,
 ) async throws -> Output {
   let found = try? await IOSDevice.query()
@@ -24,6 +24,12 @@ func claimDevice<Output>(
 
   if let childId = device.childId {
     if let child = try? await context.verifiedChild(from: childId) {
+      if device.claimedAt == nil {
+        if let beforeClaim {
+          try await beforeClaim(device)
+        }
+        try await device.claim(for: child, in: context.db)
+      }
       return try await onResume(device, child)
     } else {
       let ownerChild = try? await Child.query()
@@ -50,8 +56,8 @@ func claimDevice<Output>(
     throw context.error("\(baseId)-3", .badRequest, user: msg)
   }
 
-  if let beforeFreshClaim {
-    try await beforeFreshClaim(device)
+  if let beforeClaim {
+    try await beforeClaim(device)
   }
 
   let child = switch childAssignment {
