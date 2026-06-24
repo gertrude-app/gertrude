@@ -28,7 +28,7 @@ extension ClaimMusicDevice: Resolver {
       onResume: { device, child in
         try await self.output(device: device, child: child, code: input.code, in: context)
       },
-      beforeFreshClaim: { device in
+      beforeClaim: { device in
         try await self.requireMusicInstall(for: device, eventId: "11369678", in: context)
         let account = try await context.currentBillingAccount()
         try requireGertrudeMusicAccess(in: context, billing: account)

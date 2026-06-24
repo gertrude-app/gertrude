@@ -141,6 +141,17 @@ struct ParentWithOnboardedChildEntities {
 }
 
 extension ApiTestCase {
+  func addLightPaidSubscription(for parentId: Parent.Id) async throws {
+    try await self.db.create(BillingIdentity(parentId: parentId))
+    try await self.db.create(StripeSubscription(
+      parentId: parentId,
+      tier: .light,
+      stripeId: .init("sub_\(parentId.rawValue.uuidString.prefix(8))"),
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
+  }
+
   func parent(
     with config: (inout Parent) -> Void = { _ in },
   ) async throws -> ParentEntities {

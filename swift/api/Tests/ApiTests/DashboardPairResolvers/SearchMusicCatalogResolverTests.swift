@@ -8,7 +8,7 @@ import XExpect
 final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
   func testSearchesAppleMusicAlbums() async throws {
     let parent = try await self.parent()
-    try await self.grantMusicAccess(to: parent.id)
+    try await self.addLightPaidSubscription(for: parent.id)
 
     let output = try await withDependencies {
       $0.appleMusic.searchAlbums = { search in
@@ -46,7 +46,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testClampsSearchLimit() async throws {
     let parent = try await self.parent()
-    try await self.grantMusicAccess(to: parent.id)
+    try await self.addLightPaidSubscription(for: parent.id)
 
     let highLimit = try await withDependencies {
       $0.appleMusic.searchAlbums = { search in
@@ -86,7 +86,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testBlankQueryReturnsNoAlbumsWithoutSearching() async throws {
     let parent = try await self.parent()
-    try await self.grantMusicAccess(to: parent.id)
+    try await self.addLightPaidSubscription(for: parent.id)
 
     let output = try await withDependencies {
       $0.appleMusic
@@ -113,17 +113,6 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
     } catch let error as PqlError {
       expect(error.type).toEqual(.paymentRequired)
     }
-  }
-
-  private func grantMusicAccess(to parentId: Parent.Id) async throws {
-    try await self.db.create(BillingIdentity(parentId: parentId))
-    try await self.db.create(StripeSubscription(
-      parentId: parentId,
-      tier: .light,
-      stripeId: .init("sub_\(parentId.rawValue.uuidString.prefix(8))"),
-      stripeStatus: .active,
-      currentPeriodEnd: .reference + .days(30),
-    ))
   }
 }
 
