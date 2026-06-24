@@ -21,7 +21,7 @@ const IOSStats: React.FC = () => {
       const result = await client.iOSDetailedStats();
 
       if (result.isError) {
-        setError(result.error?.debugMessage ?? `Failed to load iOS stats`);
+        setError(result.error?.debugMessage ?? `Failed to load blocker stats`);
         setLoading(false);
         return;
       }
@@ -34,11 +34,11 @@ const IOSStats: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <LoadingState context="iOS stats" gradient="blue" />;
+    return <LoadingState context="blocker stats" gradient="blue" />;
   }
 
   if (error || !data) {
-    return <ErrorState context="iOS stats" error={error ?? `Unknown error`} />;
+    return <ErrorState context="blocker stats" error={error ?? `Unknown error`} />;
   }
 
   const formatDateRange = (): string => {
@@ -78,7 +78,7 @@ const IOSStats: React.FC = () => {
           </div>
           <div>
             <h1 className="font-display font-semibold text-slate-900 text-2xl">
-              iOS App Stats
+              Blocker App Stats
             </h1>
             <p className="text-sm text-slate-500">{formatDateRange()}</p>
           </div>

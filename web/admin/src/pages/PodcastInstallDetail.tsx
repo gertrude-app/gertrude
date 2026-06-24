@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import type { TimelineEvent } from '../lib/format';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
+import ConnectedAccountBadge from '../components/ConnectedAccountBadge';
 import DetailPageHeader from '../components/DetailPageHeader';
 import ErrorState from '../components/ErrorState';
 import EventTimeline from '../components/EventTimeline';
@@ -95,10 +96,17 @@ const PodcastInstallDetail: React.FC = () => {
           </>
         }
         badge={
-          data.isPaid && (
-            <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-700">
-              Paid Subscriber
-            </span>
+          (data.connectedAccount || data.isPaid) && (
+            <div className="flex flex-wrap items-center gap-2">
+              {data.connectedAccount && (
+                <ConnectedAccountBadge account={data.connectedAccount} />
+              )}
+              {data.isPaid && (
+                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
+                  Legacy IAP
+                </span>
+              )}
+            </div>
           )
         }
       />

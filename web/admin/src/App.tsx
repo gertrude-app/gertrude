@@ -56,9 +56,9 @@ const App: React.FC = () => {
         <Route path="/app-naming" element={<AppNaming />} />
         <Route path="/app-naming/scan" element={<AppNamingScan />} />
         <Route path="/app-naming/:bundleId" element={<AppNamingDetail />} />
-        <Route path="/ios-stats" element={<IOSStats />} />
-        <Route path="/ios-devices" element={<IOSDevicesList />} />
-        <Route path="/ios/:vendorId/events" element={<IOSDeviceEvents />} />
+        <Route path="/blocker-stats" element={<IOSStats />} />
+        <Route path="/blocker" element={<IOSDevicesList />} />
+        <Route path="/blocker/:vendorId/events" element={<IOSDeviceEvents />} />
         <Route path="/podcasts" element={<PodcastInstallsList />} />
         <Route path="/podcasts/:deviceId/detail" element={<PodcastInstallDetail />} />
         <Route path="/ratings/:app" element={<AppRatings />} />

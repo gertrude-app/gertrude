@@ -143,7 +143,7 @@ const CohortHealthSection: React.FC<{ data: T.CohortAnalysis.Output }> = ({ data
               <StatCard
                 label="Paid-intent → paying"
                 value={`${pctLabel(intentPaying, intent)}`}
-                subvalue={`${intentPaying} of ${intent} who tried Mac or iOS supervision`}
+                subvalue={`${intentPaying} of ${intent} who tried Mac, iOS supervision, or Podcasts`}
                 highlight="green"
               />
               <StatCard

@@ -11,6 +11,11 @@ export namespace PodcastInstallDetail {
     appVersion: string;
     firstLaunch?: ISODateString;
     isPaid: boolean;
+    connectedAccount?: {
+      parentId: UUID;
+      parentEmail: string;
+      childName: string;
+    };
     events: Array<{
       id: string;
       eventId: string;

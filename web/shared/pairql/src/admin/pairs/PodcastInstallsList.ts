@@ -9,12 +9,12 @@ export namespace PodcastInstallsList {
     installs: Array<{
       deviceId: UUID;
       deviceType: string;
+      modelName: string;
       iosVersion: string;
       appVersion: string;
       firstLaunch: ISODateString;
-      eventCount: number;
       feedCount: number;
-      isPaid: boolean;
+      status: string;
     }>;
     totalCount: number;
     page: number;

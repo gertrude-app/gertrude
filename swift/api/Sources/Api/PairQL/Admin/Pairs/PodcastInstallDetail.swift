@@ -16,6 +16,7 @@ struct PodcastInstallDetail: Pair {
     var appVersion: String
     var firstLaunch: Date?
     var isPaid: Bool
+    var connectedAccount: IOSDevice.ConnectedAccount?
     var events: [Event]
     var subscribedFeeds: [SubscribedFeed]
   }
@@ -92,6 +93,11 @@ extension PodcastInstallDetail: Resolver {
         return SubscribedFeed(url: url, subscribedAt: event.createdAt)
       }
 
+    let connectedAccount = try await Self.connectedAccount(
+      deviceId: input.deviceId,
+      in: context,
+    )
+
     return .init(
       deviceId: input.deviceId,
       deviceType: deviceType,
@@ -99,8 +105,19 @@ extension PodcastInstallDetail: Resolver {
       appVersion: appVersion,
       firstLaunch: firstLaunch?.createdAt,
       isPaid: isPaid,
+      connectedAccount: connectedAccount,
       events: outputEvents,
       subscribedFeeds: subscribedFeeds,
     )
+  }
+
+  static func connectedAccount(
+    deviceId: UUID,
+    in context: Context,
+  ) async throws -> IOSDevice.ConnectedAccount? {
+    guard let device = try? await context.db.find(IOSDevice.Id(deviceId)) as IOSDevice else {
+      return nil
+    }
+    return try await device.connectedAccount(in: context.db)
   }
 }

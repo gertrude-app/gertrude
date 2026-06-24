@@ -12,6 +12,11 @@ export namespace IOSDeviceEvents {
     firstLaunch?: ISODateString;
     lastCheckin?: ISODateString;
     reachedOptOut: boolean;
+    connectedAccount?: {
+      parentId: UUID;
+      parentEmail: string;
+      childName: string;
+    };
     prevVendorId?: UUID;
     nextVendorId?: UUID;
     events: Array<{

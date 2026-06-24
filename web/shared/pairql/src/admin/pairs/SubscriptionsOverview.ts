@@ -17,7 +17,6 @@ export namespace SubscriptionsOverview {
     fullPlanAnnualRevenue: number;
     lightPlanCount: number;
     lightPlanAnnualRevenue: number;
-    podcastAnnualRevenue: number;
     trialingCount: number;
     totalAccounts: number;
     recentSignups: Array<{

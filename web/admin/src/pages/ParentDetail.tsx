@@ -24,6 +24,19 @@ import { formatDate, timeAgo, unCamelCase } from '../lib/format';
 type Subscription = NonNullable<T.ParentDetail.Output[`subscription`]>;
 type PlanStatus = T.ParentDetail.Output[`planStatus`];
 type TelemetryRow = T.GetParentRecentTelemetry.Output[number];
+type IOSDeviceRow = T.ParentDetail.Output[`children`][number][`iosDevices`][number];
+type DeviceApp = IOSDeviceRow[`apps`][number];
+
+function appDetailLink(deviceId: string, app: string): string | null {
+  switch (app) {
+    case `blocker`:
+      return `/blocker/${deviceId.toLowerCase()}/events`;
+    case `am`:
+      return `/podcasts/${deviceId.toLowerCase()}/detail`;
+    default:
+      return null; // music has no admin detail page yet
+  }
+}
 
 const TELEMETRY_RANGES: { label: string; hours: number }[] = [
   { label: `24h`, hours: 24 },
@@ -293,10 +306,9 @@ const ParentDetail: React.FC = () => {
                       </div>
                       <div className="grid gap-2">
                         {child.iosDevices.map((device) => (
-                          <Link
+                          <div
                             key={device.id}
-                            to={`/ios/${device.id.toLowerCase()}/events`}
-                            className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex gap-3 sm:gap-4 hover:bg-slate-100 hover:border-slate-200 transition-colors"
+                            className="bg-slate-50 rounded-xl p-3 sm:p-4 border border-slate-100 flex gap-3 sm:gap-4"
                           >
                             <div className="flex-shrink-0 w-14 h-14 sm:w-20 sm:h-20 bg-white rounded-lg border border-slate-200 flex items-center justify-center p-1.5 sm:p-2">
                               <img
@@ -318,6 +330,13 @@ const ParentDetail: React.FC = () => {
                                   {device.modelName}
                                 </span>
                                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 sm:mt-0 sm:flex-shrink-0">
+                                  {device.apps.map((app) => (
+                                    <AppBadge
+                                      key={app.app}
+                                      app={app}
+                                      to={appDetailLink(device.id, app.app)}
+                                    />
+                                  ))}
                                   {device.supervisionStatus && (
                                     <SupervisionBadge status={device.supervisionStatus} />
                                   )}
@@ -330,7 +349,6 @@ const ParentDetail: React.FC = () => {
                                 {device.modelIdentifier}
                               </p>
                               <div className="text-sm text-slate-600 mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                                <span>App v{device.appVersion}</span>
                                 <span>iOS {device.iosVersion}</span>
                                 {device.lastCheckin && (
                                   <span className="text-slate-400">
@@ -339,7 +357,7 @@ const ParentDetail: React.FC = () => {
                                 )}
                               </div>
                             </div>
-                          </Link>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -726,6 +744,64 @@ const PlanCard: React.FC<{ planStatus: PlanStatus }> = ({ planStatus }) => {
       <div className="text-sm opacity-80">Plan</div>
       <div className="text-lg font-display font-semibold mt-1">{tier.label}</div>
     </div>
+  );
+};
+
+const APP_CONFIG: Record<
+  string,
+  { label: string; bg: string; text: string; ring: string }
+> = {
+  blocker: {
+    label: `Blocker`,
+    bg: `bg-sky-50`,
+    text: `text-sky-700`,
+    ring: `ring-sky-600/20`,
+  },
+  am: {
+    label: `Podcasts`,
+    bg: `bg-emerald-50`,
+    text: `text-emerald-700`,
+    ring: `ring-emerald-600/20`,
+  },
+  music: {
+    label: `Music`,
+    bg: `bg-fuchsia-50`,
+    text: `text-fuchsia-700`,
+    ring: `ring-fuchsia-600/20`,
+  },
+};
+
+const APP_ICON: Record<string, string> = {
+  blocker: `https://parents.gertrude.app/gertrude-blocker-app-icon.png`,
+  am: `https://parents.gertrude.app/gertrude-am-app-icon.png`,
+  music: `https://parents.gertrude.app/gertrude-music-app-icon.png`,
+};
+
+const AppBadge: React.FC<{ app: DeviceApp; to?: string | null }> = ({ app, to }) => {
+  const label = APP_CONFIG[app.app]?.label ?? app.app;
+  const icon = APP_ICON[app.app];
+  const className = `inline-flex items-center gap-1.5 ${
+    icon ? `pl-1` : `pl-2`
+  } pr-2 py-0.5 rounded-md text-xs font-medium bg-white text-slate-700 ring-1 ring-inset ring-slate-200 ${
+    app.connected ? `` : `opacity-50`
+  }${to ? ` hover:bg-slate-50 hover:ring-slate-300 transition-all` : ``}`;
+  const content = (
+    <>
+      {icon && <img src={icon} alt="" className="w-4 h-4 rounded" />}
+      {label} v{app.appVersion}
+      {!app.connected && (
+        <span className="text-[10px] uppercase tracking-wide text-slate-400">
+          pending
+        </span>
+      )}
+    </>
+  );
+  return to ? (
+    <Link to={to} className={className}>
+      {content}
+    </Link>
+  ) : (
+    <span className={className}>{content}</span>
   );
 };
 

@@ -6,6 +6,7 @@ import ErrorState from '../components/ErrorState';
 import { IPadIcon, IPhoneIcon, SmartphoneIcon } from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 import Pagination from '../components/Pagination';
+import StatusPill from '../components/StatusPill';
 import { formatDateTime } from '../lib/format';
 
 const IOSDevicesList: React.FC = () => {
@@ -25,7 +26,7 @@ const IOSDevicesList: React.FC = () => {
       const result = await client.iOSDevicesList({ page, pageSize: 30 });
 
       if (result.isError) {
-        setError(result.error?.debugMessage ?? `Failed to load iOS devices`);
+        setError(result.error?.debugMessage ?? `Failed to load blocker devices`);
         setLoading(false);
         return;
       }
@@ -42,11 +43,11 @@ const IOSDevicesList: React.FC = () => {
   };
 
   if (loading) {
-    return <LoadingState context="iOS devices" gradient="blue" />;
+    return <LoadingState context="blocker devices" gradient="blue" />;
   }
 
   if (error) {
-    return <ErrorState context="iOS devices" error={error} />;
+    return <ErrorState context="blocker devices" error={error} />;
   }
 
   if (!data) {
@@ -62,7 +63,7 @@ const IOSDevicesList: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-display font-semibold text-slate-900 tracking-tight">
-              iOS Devices
+              Blocker Devices
             </h1>
             <p className="text-sm text-slate-500">
               {data.totalCount.toLocaleString()} unique devices
@@ -104,7 +105,9 @@ const IOSDevicesList: React.FC = () => {
             {data.devices.map((device) => (
               <tr
                 key={device.vendorId}
-                onClick={() => navigate(`/ios/${device.vendorId.toLowerCase()}/events`)}
+                onClick={() =>
+                  navigate(`/blocker/${device.vendorId.toLowerCase()}/events`)
+                }
                 className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
               >
                 <td className="pl-5 pr-4 py-4">
@@ -113,7 +116,14 @@ const IOSDevicesList: React.FC = () => {
                   </code>
                 </td>
                 <td className="px-4 py-4">
-                  <DeviceStatusBadge status={device.status} />
+                  <StatusPill
+                    status={device.status}
+                    styles={STATUS_CONFIG}
+                    fallback={{
+                      label: `Incomplete`,
+                      className: `bg-slate-100 text-slate-500`,
+                    }}
+                  />
                 </td>
                 <td className="px-4 py-4 hidden sm:table-cell">
                   <span
@@ -159,32 +169,16 @@ const IOSDevicesList: React.FC = () => {
   );
 };
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  supervised: { label: `Supervised`, bg: `bg-blue-100`, text: `text-blue-700` },
-  connected: { label: `Connected`, bg: `bg-cyan-100`, text: `text-cyan-700` },
-  configurated: { label: `Configurated`, bg: `bg-violet-100`, text: `text-violet-700` },
-  screenTime: { label: `Screen Time`, bg: `bg-green-100`, text: `text-green-700` },
-  complete: { label: `Complete`, bg: `bg-green-100`, text: `text-green-700` },
-  missingProfile: {
-    label: `Missing Profile`,
-    bg: `bg-amber-100`,
-    text: `text-amber-700`,
-  },
-  claimed: { label: `Claimed`, bg: `bg-amber-100`, text: `text-amber-700` },
-  pendingClaim: { label: `Pending Claim`, bg: `bg-amber-100`, text: `text-amber-700` },
-  incomplete: { label: `Incomplete`, bg: `bg-slate-100`, text: `text-slate-500` },
-};
-
-const DeviceStatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const fallback = { label: `Incomplete`, bg: `bg-slate-100`, text: `text-slate-500` };
-  const config = STATUS_CONFIG[status] ?? fallback;
-  return (
-    <span
-      className={`inline-flex items-center px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium whitespace-nowrap ${config.bg} ${config.text}`}
-    >
-      {config.label}
-    </span>
-  );
+const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+  supervised: { label: `Supervised`, className: `bg-blue-100 text-blue-700` },
+  connected: { label: `Connected`, className: `bg-cyan-100 text-cyan-700` },
+  configurated: { label: `Configurated`, className: `bg-violet-100 text-violet-700` },
+  screenTime: { label: `Screen Time`, className: `bg-green-100 text-green-700` },
+  complete: { label: `Complete`, className: `bg-green-100 text-green-700` },
+  missingProfile: { label: `Missing Profile`, className: `bg-amber-100 text-amber-700` },
+  claimed: { label: `Claimed`, className: `bg-amber-100 text-amber-700` },
+  pendingClaim: { label: `Pending Claim`, className: `bg-amber-100 text-amber-700` },
+  incomplete: { label: `Incomplete`, className: `bg-slate-100 text-slate-500` },
 };
 
 export default IOSDevicesList;

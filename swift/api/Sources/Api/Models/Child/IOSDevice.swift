@@ -1,4 +1,5 @@
 import DuetSQL
+import PairQL
 
 struct IOSDevice: Codable, Sendable, Equatable {
   var id: Id
@@ -121,11 +122,27 @@ extension IOSAppInstall {
 // loaders
 
 extension IOSDevice {
+  struct ConnectedAccount: PairNestable {
+    var parentId: Parent.Id
+    var parentEmail: String
+    var childName: String
+  }
+
   func child(in db: any DuetSQL.Client) async throws -> Child? {
     guard let childId = self.childId else { return nil }
     return try await Child.query()
       .where(.id == childId)
       .first(in: db)
+  }
+
+  func connectedAccount(in db: any DuetSQL.Client) async throws -> ConnectedAccount? {
+    guard let child = try await self.child(in: db) else { return nil }
+    let parent = try await child.parent(in: db)
+    return ConnectedAccount(
+      parentId: parent.id,
+      parentEmail: parent.email.rawValue,
+      childName: child.name,
+    )
   }
 
   func blockerInstall(in db: any DuetSQL.Client) async throws -> BlockerApp.Install {

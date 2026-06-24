@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import type { TimelineEvent } from '../lib/format';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
+import ConnectedAccountBadge from '../components/ConnectedAccountBadge';
 import DetailPageHeader from '../components/DetailPageHeader';
 import ErrorState from '../components/ErrorState';
 import EventTimeline from '../components/EventTimeline';
@@ -125,7 +126,7 @@ const IOSDeviceEvents: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       <DetailPageHeader
-        backTo="/ios-devices"
+        backTo="/blocker"
         icon={SmartphoneIcon}
         iconGradient="from-sky-400 to-blue-500"
         iconShadow="shadow-sky-500/20"
@@ -140,20 +141,25 @@ const IOSDeviceEvents: React.FC = () => {
           </>
         }
         badge={
-          <div className="flex flex-col items-end gap-1.5">
-            {data.reachedOptOut && (
-              <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-700">
-                Successfully Onboarded
-              </span>
+          <div className="flex flex-col items-end gap-2">
+            {data.connectedAccount && (
+              <ConnectedAccountBadge account={data.connectedAccount} />
             )}
-            {data.lastCheckin ? (
-              <span className="text-xs text-slate-400">
-                Last check-in:{` `}
-                <span className="text-purple-400">{timeAgo(data.lastCheckin)}</span>
-              </span>
-            ) : (
-              <span className="text-xs text-slate-300">No check-ins yet</span>
-            )}
+            <div className="flex items-center gap-2.5">
+              {data.reachedOptOut && (
+                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                  Successfully Onboarded
+                </span>
+              )}
+              {data.lastCheckin ? (
+                <span className="text-xs text-slate-400">
+                  Last check-in:{` `}
+                  <span className="text-purple-400">{timeAgo(data.lastCheckin)}</span>
+                </span>
+              ) : (
+                <span className="text-xs text-slate-300">No check-ins yet</span>
+              )}
+            </div>
           </div>
         }
       />
@@ -178,7 +184,7 @@ const NavButton: React.FC<{ vendorId?: string; direction: `prev` | `next` }> = (
   if (vendorId) {
     return (
       <Link
-        to={`/ios/${vendorId.toLowerCase()}/events`}
+        to={`/blocker/${vendorId.toLowerCase()}/events`}
         className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all"
       >
         {label}

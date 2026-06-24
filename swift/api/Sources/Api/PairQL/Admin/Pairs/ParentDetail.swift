@@ -48,10 +48,16 @@ struct ParentDetail: Pair {
     var modelName: String
     var modelIdentifier: String
     var iosVersion: String
-    var appVersion: String
+    var apps: [DeviceAppOutput]
     var supervisionStatus: String?
     var lastCheckin: Date?
     var createdAt: Date
+  }
+
+  struct DeviceAppOutput: PairNestable {
+    var app: String
+    var appVersion: String
+    var connected: Bool
   }
 
   struct ChildKeychainOutput: PairNestable {
@@ -128,14 +134,61 @@ extension ParentDetail: Resolver {
       let devices = try await child.iosDevices(in: context.db)
       var iosDeviceOutputs: [IOSDeviceOutput] = []
       for device in devices {
-        let install = try await device.blockerInstall(in: context.db)
+        var apps: [DeviceAppOutput] = []
+
+        let blockerInstall = try await BlockerApp.Install.query()
+          .where(.deviceId == device.id)
+          .all(in: context.db)
+          .first
+        if let blockerInstall {
+          let connected = try await BlockerApp.Token.query()
+            .where(.installId == blockerInstall.id)
+            .exists(in: context.db)
+          apps.append(DeviceAppOutput(
+            app: "blocker",
+            appVersion: blockerInstall.appVersion,
+            connected: connected,
+          ))
+        }
+
+        if let podcastInstall = try await device.podcastInstall(in: context.db) {
+          let connected = try await PodcastApp.Token.query()
+            .where(.installId == podcastInstall.id)
+            .exists(in: context.db)
+          apps.append(DeviceAppOutput(
+            app: "am",
+            appVersion: podcastInstall.appVersion,
+            connected: connected,
+          ))
+        } else if let latestPodcastEvent = try await PodcastEvent.query()
+          .where(.deviceId == device.id.rawValue)
+          .orderBy(.createdAt, .desc)
+          .limit(1)
+          .all(in: context.db)
+          .first {
+          apps.append(DeviceAppOutput(
+            app: "am",
+            appVersion: latestPodcastEvent.appVersion,
+            connected: false,
+          ))
+        }
+
+        if let musicInstall = try await device.musicInstall(in: context.db) {
+          let connected = try await MusicApp.Token.query()
+            .where(.installId == musicInstall.id)
+            .exists(in: context.db)
+          apps.append(DeviceAppOutput(
+            app: "music",
+            appVersion: musicInstall.appVersion,
+            connected: connected,
+          ))
+        }
+
         let supervision = try await device.supervision(in: context.db)
-        let hasToken = try await BlockerApp.Token.query()
-          .where(.installId == install.id)
-          .exists(in: context.db)
+        let blockerConnected = apps.contains { $0.app == "blocker" && $0.connected }
         let status: String? = if let supervision {
           supervision.status(device: device).rawValue
-        } else if hasToken {
+        } else if blockerConnected {
           "connected"
         } else {
           nil
@@ -152,7 +205,7 @@ extension ParentDetail: Resolver {
           modelName: device.modelName,
           modelIdentifier: device.modelIdentifier,
           iosVersion: device.iosVersion,
-          appVersion: install.appVersion,
+          apps: apps,
           supervisionStatus: status,
           lastCheckin: lastCheckin?.createdAt,
           createdAt: device.createdAt,
