@@ -17,6 +17,7 @@ struct IOSDeviceEvents: Pair {
     var firstLaunch: Date?
     var lastCheckin: Date?
     var reachedOptOut: Bool
+    var connectedAccount: IOSDevice.ConnectedAccount?
     var prevVendorId: IOSDevice.Id?
     var nextVendorId: IOSDevice.Id?
     var events: [Event]
@@ -72,6 +73,11 @@ extension IOSDeviceEvents: Resolver {
       }
     }
 
+    var connectedAccount: IOSDevice.ConnectedAccount?
+    if let device = try? await context.db.find(IOSDevice.Id(input.vendorId)) as IOSDevice {
+      connectedAccount = try await device.connectedAccount(in: context.db)
+    }
+
     let filteredEvents = events.filter { !["b977cfdc", "06329f27"].contains($0.eventId) }
     var outputEvents: [Event] = []
     for (index, event) in filteredEvents.enumerated() {
@@ -100,6 +106,7 @@ extension IOSDeviceEvents: Resolver {
       firstLaunch: firstLaunch?.createdAt,
       lastCheckin: lastCheckin?.createdAt,
       reachedOptOut: reachedOptOut,
+      connectedAccount: connectedAccount,
       prevVendorId: prevVendorId,
       nextVendorId: nextVendorId,
       events: outputEvents,

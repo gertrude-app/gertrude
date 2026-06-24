@@ -16,7 +16,6 @@ struct SubscriptionsOverview: Pair {
     var fullPlanAnnualRevenue: Int
     var lightPlanCount: Int
     var lightPlanAnnualRevenue: Int
-    var podcastAnnualRevenue: Int
     var trialingCount: Int
     var totalAccounts: Int
     var recentSignups: [RecentSignupOutput]
@@ -85,8 +84,6 @@ extension SubscriptionsOverview: NoInputResolver {
         ))
     }
 
-    let podcastSubscriptions = try await context.db.count(DistinctOriginalIDPaidCount.self)
-    let podcastAnnualCents = podcastSubscriptions * 850
     let monthlySubscriptionRevenue = try await context.db
       .customQuery(MonthlySubscriptionRevenue.self)
       .map { row in
@@ -100,7 +97,7 @@ extension SubscriptionsOverview: NoInputResolver {
         )
       }
 
-    let totalAnnualCents = fullPlanAnnualCents + lightPlanAnnualCents + podcastAnnualCents
+    let totalAnnualCents = fullPlanAnnualCents + lightPlanAnnualCents
     return .init(
       monthlyRevenue: totalAnnualCents / 100 / 12,
       annualRevenue: totalAnnualCents / 100,
@@ -109,7 +106,6 @@ extension SubscriptionsOverview: NoInputResolver {
       fullPlanAnnualRevenue: fullPlanAnnualCents / 100,
       lightPlanCount: lightPlanCount,
       lightPlanAnnualRevenue: lightPlanAnnualCents / 100,
-      podcastAnnualRevenue: podcastAnnualCents / 100,
       trialingCount: trialingCount,
       totalAccounts: data.overview.allTimeSignups,
       recentSignups: signups,

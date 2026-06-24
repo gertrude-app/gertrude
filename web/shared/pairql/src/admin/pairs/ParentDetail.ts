@@ -46,7 +46,11 @@ export namespace ParentDetail {
         modelName: string;
         modelIdentifier: string;
         iosVersion: string;
-        appVersion: string;
+        apps: Array<{
+          app: string;
+          appVersion: string;
+          connected: boolean;
+        }>;
         supervisionStatus?: string;
         lastCheckin?: ISODateString;
         createdAt: ISODateString;

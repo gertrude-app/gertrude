@@ -1,3 +1,4 @@
+import Dependencies
 import DuetSQL
 import PairQL
 
@@ -6,12 +7,20 @@ struct PodcastOverview: Pair {
 
   struct Output: PairOutput {
     var totalInstalls: Int
-    var successfulSubscriptions: Int
     var activePodcastUsers: Int
-    var conversionRate: Double
     var iPhoneInstalls: Int
     var iPadInstalls: Int
+    var statusBreakdown: StatusBreakdown
     var recentInstalls: [RecentInstall]
+  }
+
+  struct StatusBreakdown: PairNestable {
+    var paid: Int
+    var complimentary: Int
+    var connected: Int
+    var trial: Int
+    var expired: Int
+    var iap: Int
   }
 
   struct RecentInstall: PairNestable {
@@ -23,15 +32,8 @@ struct PodcastOverview: Pair {
 
 extension PodcastOverview: NoInputResolver {
   static func resolve(in context: Context) async throws -> Output {
-    let totalInstalls = try await context.db.count(
-      DistinctDeviceEventCount.self,
-      withBindings: [.string("27c4f26a")],
-    )
-    let subscriptionCount = try await context.db.count(DistinctOriginalIDPaidCount.self)
-    let pastTrialInstallCount = try await context.db.count(
-      PastTrialInstallCount.self,
-      withBindings: [.string("27c4f26a")],
-    )
+    @Dependency(\.date.now) var now
+
     let iPhoneInstalls = try await context.db.count(
       DeviceTypeInstallCount.self,
       withBindings: [.string("27c4f26a"), .string("%iPhone%")],
@@ -43,9 +45,33 @@ extension PodcastOverview: NoInputResolver {
 
     let activePodcastUsers = try await context.db.count(ActivePodcastUsersCount.self)
 
-    let rate = pastTrialInstallCount > 0
-      ? (Double(subscriptionCount) / Double(pastTrialInstallCount) * 1000).rounded() / 10
-      : 0.0
+    let statusRows = try await context.db.customQuery(InstallStatusRowsQuery.self)
+    var breakdown = StatusBreakdown(
+      paid: 0,
+      complimentary: 0,
+      connected: 0,
+      trial: 0,
+      expired: 0,
+      iap: 0,
+    )
+    for row in statusRows {
+      switch try await PodcastInstallsList.status(
+        deviceId: row.deviceId,
+        firstLaunch: row.firstLaunch,
+        connected: row.connected,
+        isPaid: row.isPaid,
+        at: now,
+        in: context,
+      ) {
+      case "paid": breakdown.paid += 1
+      case "complimentary": breakdown.complimentary += 1
+      case "connected": breakdown.connected += 1
+      case "trial": breakdown.trial += 1
+      case "expired": breakdown.expired += 1
+      case "iap": breakdown.iap += 1
+      default: break
+      }
+    }
 
     let recentInstalls = try await context.db.customQuery(RecentInstallsQuery.self)
       .map { row in
@@ -57,69 +83,48 @@ extension PodcastOverview: NoInputResolver {
       }
 
     return .init(
-      totalInstalls: totalInstalls,
-      successfulSubscriptions: subscriptionCount,
+      totalInstalls: statusRows.count,
       activePodcastUsers: activePodcastUsers,
-      conversionRate: rate,
       iPhoneInstalls: iPhoneInstalls,
       iPadInstalls: iPadInstalls,
+      statusBreakdown: breakdown,
       recentInstalls: recentInstalls,
     )
   }
 }
 
-struct DistinctDeviceEventCount: CustomCountable {
+private struct InstallStatusRowsQuery: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
-    FROM \(table: PodcastEvent.self)
-    WHERE \(PodcastEvent.columnName(.eventId)) =
+    let deviceId = PodcastEvent.columnName(.deviceId)
+    let eventId = PodcastEvent.columnName(.eventId)
+    let createdAt = PodcastEvent.columnName(.createdAt)
+    let devPk = IOSDevice.columnName(.id)
+    let devChildId = IOSDevice.columnName(.childId)
+    return SQL.Statement("""
+    SELECT
+      first_launch.\(deviceId),
+      first_launch.\(createdAt) AS first_launch,
+      CASE WHEN paid.\(deviceId) IS NOT NULL THEN true ELSE false END AS is_paid,
+      CASE WHEN dev.\(devChildId) IS NOT NULL THEN true ELSE false END AS connected
+    FROM (
+      SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt)
+      FROM \(table: PodcastEvent.self)
+      WHERE \(eventId) = '27c4f26a'
+      ORDER BY \(deviceId), \(createdAt) ASC
+    ) first_launch
+    LEFT JOIN (
+      SELECT DISTINCT \(deviceId)
+      FROM \(table: PodcastEvent.self)
+      WHERE \(hostPurchasePodcastEventPredicateSQL)
+    ) paid ON first_launch.\(deviceId) = paid.\(deviceId)
+    LEFT JOIN \(table: IOSDevice.self) dev ON dev.\(devPk) = first_launch.\(deviceId)
     """)
-    if let eventId = bindings.first {
-      stmt.components.append(.binding(eventId))
-    }
-    return stmt
   }
 
-  var count: Int
-}
-
-struct DistinctOriginalIDPaidCount: CustomCountable {
-  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    SQL.Statement("""
-    SELECT COUNT(DISTINCT \(podcastOriginalIDExprSQL)) AS count
-    FROM \(table: PodcastEvent.self)
-    WHERE \(hostPurchasePodcastEventPredicateSQL)
-    """)
-  }
-
-  var count: Int
-}
-
-private struct PastTrialInstallCount: CustomCountable {
-  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    var stmt = SQL.Statement("""
-    SELECT COUNT(DISTINCT e.\(PodcastEvent.columnName(.deviceId))) AS count
-    FROM \(table: PodcastEvent.self) AS e
-    WHERE
-      e.\(PodcastEvent.columnName(.createdAt)) < NOW() - INTERVAL '30 days'
-      AND e.\(PodcastEvent.columnName(.eventId)) =\(" ")
-    """)
-    if let eventId = bindings.first {
-      stmt.components.append(.binding(eventId))
-    }
-    stmt.components.append(.sql("""
-
-      AND NOT EXISTS (
-        SELECT 1 FROM \(table: PodcastEvent.self)
-        WHERE \(PodcastEvent.columnName(.deviceId)) = e.\(PodcastEvent.columnName(.deviceId))
-          AND \(familySharedOrSandboxPodcastEventPredicateSQL)
-      )
-    """))
-    return stmt
-  }
-
-  var count: Int
+  var deviceId: UUID
+  var firstLaunch: Date
+  var isPaid: Bool
+  var connected: Bool
 }
 
 private struct DeviceTypeInstallCount: CustomCountable {

@@ -4,11 +4,17 @@ export namespace PodcastOverview {
 
   export interface Output {
     totalInstalls: number;
-    successfulSubscriptions: number;
     activePodcastUsers: number;
-    conversionRate: number;
     iPhoneInstalls: number;
     iPadInstalls: number;
+    statusBreakdown: {
+      paid: number;
+      complimentary: number;
+      connected: number;
+      trial: number;
+      expired: number;
+      iap: number;
+    };
     recentInstalls: Array<{
       date: ISODateString;
       deviceType: string;

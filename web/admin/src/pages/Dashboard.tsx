@@ -504,18 +504,20 @@ const IOSSection: React.FC<IOSSectionProps> = ({ data }) => (
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
             <SmartphoneIcon className="w-5 h-5 text-white" />
           </div>
-          <h2 className="font-display font-semibold text-slate-900 text-xl">iOS App</h2>
+          <h2 className="font-display font-semibold text-slate-900 text-xl">
+            Blocker App
+          </h2>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            to="/ios-devices"
+            to="/blocker"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
           >
             <span>Devices</span>
             <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <Link
-            to="/ios-stats"
+            to="/blocker-stats"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-sky-600 hover:text-sky-700 bg-sky-50 hover:bg-sky-100 rounded-lg transition-all group"
           >
             <span>Stats</span>
@@ -605,7 +607,7 @@ interface PodcastSectionProps {
 }
 
 const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
-  const yearlyRevenue = Math.round(data.successfulSubscriptions * 10 * 0.85);
+  const breakdown = data.statusBreakdown;
 
   return (
     <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
@@ -638,32 +640,78 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
         </div>
       </div>
       <div className="p-4 sm:p-6 space-y-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
           <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
             <div className="text-2xl font-display font-semibold text-slate-900">
               {data.totalInstalls.toLocaleString()}
             </div>
             <div className="text-sm mt-1 text-slate-500">Total Installs</div>
           </div>
-          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
-            <div className="text-2xl font-display font-semibold text-slate-900">
-              {data.successfulSubscriptions.toLocaleString()}
-            </div>
-            <div className="text-sm mt-1 text-slate-500">Subscriptions</div>
-          </div>
           <div className="bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl p-4">
             <div className="text-2xl font-display font-semibold text-white">
-              {data.conversionRate}%
+              {breakdown.paid.toLocaleString()}
             </div>
-            <div className="text-sm mt-1 text-white/80">Conversion</div>
+            <div className="text-sm mt-1 text-white/80">Subscribers</div>
           </div>
           <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
             <div className="text-2xl font-display font-semibold text-slate-900">
-              ${yearlyRevenue.toLocaleString()}
+              {breakdown.complimentary.toLocaleString()}
             </div>
-            <div className="text-sm mt-1 text-slate-500">Yearly Revenue</div>
+            <div className="text-sm mt-1 text-slate-500">Complimentary</div>
+          </div>
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {(breakdown.connected + breakdown.trial).toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Trialing</div>
+          </div>
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {breakdown.iap.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Legacy IAP</div>
+            <div className="text-xs mt-0.5 text-slate-400">
+              ≈${(breakdown.iap * 10).toLocaleString()}/yr potential
+            </div>
           </div>
         </div>
+
+        <BreakdownBar
+          title="Subscription Status"
+          total={data.totalInstalls}
+          segments={[
+            {
+              label: `Paid`,
+              value: breakdown.paid,
+              gradient: `from-emerald-400 to-green-500`,
+            },
+            {
+              label: `Complimentary`,
+              value: breakdown.complimentary,
+              gradient: `from-rose-400 to-pink-500`,
+            },
+            {
+              label: `Connected`,
+              value: breakdown.connected,
+              gradient: `from-violet-400 to-purple-500`,
+            },
+            {
+              label: `Trial`,
+              value: breakdown.trial,
+              gradient: `from-sky-400 to-blue-500`,
+            },
+            {
+              label: `Legacy IAP`,
+              value: breakdown.iap,
+              gradient: `from-amber-400 to-orange-500`,
+            },
+            {
+              label: `Expired`,
+              value: breakdown.expired,
+              gradient: `from-slate-300 to-slate-400`,
+            },
+          ]}
+        />
 
         <BreakdownBar
           title="Device Breakdown"
