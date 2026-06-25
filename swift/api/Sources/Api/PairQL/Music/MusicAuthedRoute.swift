@@ -65,10 +65,17 @@ extension GetApprovedMusicLibrary: NoInputResolver {
     let appleMusic = get(dependency: \.appleMusic)
     var tracksByAlbum: [String: [AppleMusicCatalogTrack]] = [:]
     for album in albums {
-      tracksByAlbum[album.appleMusicAlbumId.rawValue] = try await appleMusic.albumTracks(.init(
-        albumId: album.appleMusicAlbumId,
-        storefront: "us",
-      ))
+      do {
+        tracksByAlbum[album.appleMusicAlbumId.rawValue] = try await appleMusic.albumTracks(.init(
+          albumId: album.appleMusicAlbumId,
+          storefront: "us",
+        ))
+      } catch {
+        with(dependency: \.logger).error(
+          "Apple Music album tracks lookup failed for album `\(album.appleMusicAlbumId.rawValue)`: \(error)",
+        )
+        tracksByAlbum[album.appleMusicAlbumId.rawValue] = []
+      }
     }
     return tracksByAlbum
   }
