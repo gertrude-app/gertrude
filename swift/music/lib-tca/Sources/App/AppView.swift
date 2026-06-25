@@ -75,7 +75,6 @@ struct AppView: View {
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
-        foregroundColor: .black,
         panelTransitionID: self.nowPlayingPanelTransitionID,
         artworkTransitionID: self.nowPlayingArtworkTransitionID,
         displayMode: .expanded,
