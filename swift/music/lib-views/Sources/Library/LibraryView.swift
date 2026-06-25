@@ -13,17 +13,20 @@ public struct LibraryView: View {
   private let transitionNamespace: Namespace.ID?
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
+  private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   public init(
     state: LibraryViewState,
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.state = state
     self.transitionNamespace = transitionNamespace
     self.onRetryTap = onRetryTap
     self.onAlbumTap = onAlbumTap
+    self.onDebugResetTap = onDebugResetTap
   }
 
   public var body: some View {
@@ -41,12 +44,13 @@ public struct LibraryView: View {
         albums: albums,
         transitionNamespace: self.transitionNamespace,
         onAlbumTap: self.onAlbumTap,
+        onDebugResetTap: self.onDebugResetTap,
       )
 
     case .empty:
       self.messageContent(
         title: "No albums yet",
-        message: "Approved albums will appear here after a parent adds them in Gertrude.",
+        message: "Approved albums will appear here after they’re added in Gertrude.",
         systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
@@ -62,7 +66,7 @@ public struct LibraryView: View {
     case .subscriptionRequired:
       self.messageContent(
         title: "Subscription required",
-        message: "A parent needs Gertrude Light or Full before approved music can play on this device.",
+        message: "The Gertrude account needs Light or Full before approved music can play on this device.",
         systemImage: "creditcard",
         buttonTitle: "Check again",
       )
@@ -76,13 +80,21 @@ public struct LibraryView: View {
     buttonTitle: String,
   ) -> some View {
     ScrollView {
-      LibraryMessageCard(
-        title: title,
-        message: message,
-        systemImage: systemImage,
-        buttonTitle: buttonTitle,
-        onButtonTap: self.onRetryTap,
-      )
+      VStack(spacing: 14) {
+        LibraryMessageCard(
+          title: title,
+          message: message,
+          systemImage: systemImage,
+          buttonTitle: buttonTitle,
+          onButtonTap: self.onRetryTap,
+        )
+
+        #if DEBUG
+          if let onDebugResetTap = self.onDebugResetTap {
+            LibraryDebugResetOnboardingButton(onTap: onDebugResetTap)
+          }
+        #endif
+      }
       .padding(.horizontal, 20)
       .padding(.top, 48)
       .padding(.bottom, 96)
@@ -90,6 +102,22 @@ public struct LibraryView: View {
     .background(.background)
   }
 }
+
+#if DEBUG
+  private struct LibraryDebugResetOnboardingButton: View {
+    let onTap: @MainActor @Sendable () -> Void
+
+    var body: some View {
+      Button("Reset onboarding", action: self.onTap)
+        .font(.system(size: 12, weight: .semibold, design: .rounded))
+        .buttonStyle(.bordered)
+        .tint(.secondary)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.regularMaterial, in: Capsule())
+    }
+  }
+#endif
 
 private struct LibraryMessageCard: View {
   let title: String
@@ -137,7 +165,7 @@ private struct LibraryMessageCard: View {
 #if DEBUG
   #Preview("Loaded") {
     NavigationStack {
-      LibraryView(state: .loaded(albums: .previewAlbums))
+      LibraryView(state: .loaded(albums: .previewAlbums), onDebugResetTap: {})
     }
   }
 
@@ -161,7 +189,7 @@ private struct LibraryMessageCard: View {
 
   #Preview("Failed") {
     NavigationStack {
-      LibraryView(state: .failed)
+      LibraryView(state: .failed, onDebugResetTap: {})
     }
   }
 #endif

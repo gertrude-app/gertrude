@@ -18,9 +18,9 @@ struct AppView: View {
           }
         }
         .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
-        .task {
+        .task(id: self.store.setup.isReady) {
+          guard self.store.setup.isReady else { return }
           _ = self.store.send(.playback(.observePlayback))
-          await self.store.send(.onAppear).finish()
         }
     #else
       self.libraryView
@@ -36,23 +36,11 @@ struct AppView: View {
   #if os(iOS)
     @ViewBuilder
     private var iOSContent: some View {
-      switch self.store.connection {
-      case .claimed:
+      if self.store.setup.isReady {
         self.iOSLibraryContent
-      case .checking:
-        MusicAppConnectionView(
-          state: .checking,
-          onRetryTap: { self.store.send(.refreshConnectionTapped) },
-        )
-      case .unclaimed(let code, _):
-        MusicAppConnectionView(
-          state: .unclaimed(code: code),
-          onRetryTap: { self.store.send(.refreshConnectionTapped) },
-        )
-      case .failed:
-        MusicAppConnectionView(
-          state: .failed,
-          onRetryTap: { self.store.send(.refreshConnectionTapped) },
+      } else {
+        MusicSetupViewContainer(
+          store: self.store.scope(state: \.setup, action: \.setup),
         )
       }
     }

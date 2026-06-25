@@ -10,6 +10,7 @@ let package = Package(
     .target(
       name: "LibViews",
       exclude: ["FakeEntry.swift"],
+      resources: [.process("Resources")],
     ),
     .testTarget(
       name: "LibViewsTests",

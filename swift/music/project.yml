@@ -52,7 +52,7 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)
         API_ENDPOINT: $(API_ENDPOINT)
-        NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved songs.
+        NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved music.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
