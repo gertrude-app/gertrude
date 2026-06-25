@@ -18,6 +18,10 @@ If you need a UUID, use bash to invoke `uuid --llm` to get one, instead of makin
 yourself. Many places in this codebase we use partial identifiers (especially for
 logging), like `c05ef986`, if you need one of those, invode `sid --llm`.
 
+When adding new functions and extensions, avoid creating small single-function files.
+Group related functions and extensions in an existing file by default, breaking out new
+files when a file grows too large or when a clear organizational seam emerges.
+
 ## Quick Reference
 
 - **Swift Version:** 6.2.1 via Swiftly
@@ -259,6 +263,9 @@ just macapp-test                    # macOS app package tests
 just iosapp-test                    # iOS library package tests
 ```
 
+When writing swift unit test helpers, check if existing helpers already exist, or should
+be generalized and moved to a shared location before creating duplicates.
+
 ### Package Manager
 
 - **SPM** - Primary package manager
@@ -290,8 +297,8 @@ If you are doing anything non-trivial in the API with the Duet database layer, r
 
 - read several examples in `api/Sources/Api/Database/Migrations/` to see pattern
 - for any non-trivial migration (data backfill, column drop, transforms, etc.), follow
-  `./.agents/skills/migration-verification/SKILL.md` to capture a pre/post baseline
-  before merging
+  `./.agents/skills/migration-verification/SKILL.md` to capture a pre/post baseline before
+  merging
 
 ### Adding/Removing a Model Field
 
