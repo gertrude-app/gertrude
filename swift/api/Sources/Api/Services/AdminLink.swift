@@ -12,7 +12,7 @@ struct AdminLink {
       case .parent(let id):
         "parents/\(id.lowercased)"
       case .iosDeviceEvents(let vendorId):
-        "ios/\(vendorId.lowercased)/events"
+        "blocker/\(vendorId.lowercased)/events"
       case .verify(let token):
         "verify/\(token.uuidString.lowercased())"
       }
