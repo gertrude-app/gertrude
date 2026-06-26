@@ -15,7 +15,7 @@ struct Signup: Pair {
     var referralCode: String?
     var turnstileToken: String?
     var claimCode: String?
-    var app: GertrudeIOSApp?
+    var intent: ClaimIntent?
   }
 
   struct Output: PairOutput {
@@ -61,7 +61,7 @@ extension Signup: Resolver {
         try await sendVerificationEmail(
           to: existingParent,
           claimCode: input.claimCode,
-          claimApp: input.app,
+          claimIntent: input.intent,
           in: context,
         )
       } else {
@@ -100,7 +100,7 @@ extension Signup: Resolver {
     try await sendVerificationEmail(
       to: parent,
       claimCode: input.claimCode,
-      claimApp: input.app,
+      claimIntent: input.intent,
       in: context,
     )
     return .init(admin: nil)
@@ -126,7 +126,7 @@ func newSignupSlackMessage(_ parent: Parent, _ gclid: String?, _ referrer: Paren
 func sendVerificationEmail(
   to admin: Parent,
   claimCode: String? = nil,
-  claimApp: GertrudeIOSApp? = nil,
+  claimIntent: ClaimIntent? = nil,
   in context: Context,
 ) async throws {
   let token = await with(dependency: \.ephemeral)
@@ -134,12 +134,12 @@ func sendVerificationEmail(
       admin.id,
       expiration: get(dependency: \.date.now) + .hours(24),
       claimCode: claimCode,
-      claimApp: claimApp,
+      claimIntent: claimIntent,
     )
 
   var redirect: String?
-  if let app = claimApp, let claimCode, let code = Int(claimCode) {
-    redirect = app.claimFunnelRedirectPath(code: code)
+  if let claimIntent, let claimCode, let code = Int(claimCode) {
+    redirect = claimIntent.claimFunnelPath(code: code)
       .addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)
   }
 

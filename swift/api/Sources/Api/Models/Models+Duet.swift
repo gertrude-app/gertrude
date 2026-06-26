@@ -88,6 +88,24 @@ extension BlockerApp.Token {
   }
 }
 
+extension Claim: Duet.Identifiable {
+  typealias Id = Tagged<Claim, UUID>
+}
+
+extension Claim {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case code
+    case intent
+    case deviceId
+    case childId
+    case expiresAt
+    case claimedAt
+    case createdAt
+    case updatedAt
+  }
+}
+
 extension IOSDevice: Duet.Identifiable {
   typealias Id = Tagged<IOSDevice, UUID>
 }
@@ -98,9 +116,6 @@ extension IOSDevice {
     case childId
     case modelIdentifier
     case iosVersion
-    case claimCode
-    case claimCodeExpiresAt
-    case claimedAt
     case createdAt
     case updatedAt
   }

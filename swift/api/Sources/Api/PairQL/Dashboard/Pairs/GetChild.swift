@@ -154,8 +154,14 @@ extension GetChild: Resolver {
       computers: computers.uniqued(on: \.id),
       iosDevices: devices.concurrentMap { device in
         let supervision = try await device.supervision(in: context.db)
+        let superviseClaim = try await Claim.find(
+          device.id,
+          intent: .blockerSupervise,
+          in: context.db,
+        )
         // true if parent backed out of supervision flow and authed/connected via screen time
-        let attachedViaNonSupervisionPath = device.childId != nil && device.claimedAt == nil
+        let attachedViaNonSupervisionPath = device.childId != nil && superviseClaim?
+          .claimedAt == nil
         let pendingSupervision = supervision?.supervised == false
           && !attachedViaNonSupervisionPath
         return .init(
@@ -163,7 +169,7 @@ extension GetChild: Resolver {
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          pendingClaimCode: pendingSupervision ? device.claimCode : nil,
+          pendingClaimCode: pendingSupervision ? superviseClaim?.code : nil,
           musicConnected: musicConnectedDeviceIds.contains(device.id),
         )
       },

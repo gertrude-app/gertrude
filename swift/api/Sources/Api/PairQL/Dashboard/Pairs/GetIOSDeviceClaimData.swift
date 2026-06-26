@@ -34,11 +34,12 @@ extension GetIOSDeviceClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     try await resolveClaimData(
       code: input.code,
-      app: .blocker,
-      baseId: "7321ce12", // 7321ce12-1, 7321ce12-2, 7321ce12-3
+      intent: .blockerSupervise,
+      baseId: "7321ce12", // 7321ce12-1, 7321ce12-2, 7321ce12-3, 7321ce12-4
       in: context,
       onResume: { device, _ in
-        if device.claimedAt != nil {
+        let claim = try await Claim.find(code: input.code, in: context.db)
+        if claim?.claimedAt != nil {
           try await device.ensureBlockerBlockGroups(in: context.db)
         }
         let supervision = try await device.supervision(in: context.db)

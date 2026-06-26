@@ -100,7 +100,6 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.child()
     let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
-      $0.claimedAt = Date()
     })
     let install = try await self.db.create(
       PodcastApp.Install(deviceId: iosDevice.id, appVersion: "1.6.0"),
@@ -121,7 +120,6 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.child()
     let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
-      $0.claimedAt = Date()
     })
     let install = try await self.db.create(
       MusicApp.Install(deviceId: iosDevice.id, appVersion: "1.0.0"),
@@ -140,12 +138,14 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
   func testGetAllDevicesSupervisionClaimedButNotComplete() async throws {
     try await self.db.delete(all: Computer.self)
     let child = try await self.child()
-    let iosDevice = try await self.db.create(IOSDevice.mock {
-      $0.childId = child.id
-      $0.claimCode = 111_111
-      $0.claimCodeExpiresAt = .reference + .days(7)
-      $0.claimedAt = Date()
-    })
+    let iosDevice = try await self.db.create(IOSDevice.mock { $0.childId = child.id })
+    try await self.createClaim(
+      .blockerSupervise,
+      iosDevice.id,
+      child.id,
+      code: 111_111,
+      claimedAt: .reference,
+    )
     let install = try await self.db.create(
       BlockerApp.Install.mock { $0.deviceId = iosDevice.id },
     )

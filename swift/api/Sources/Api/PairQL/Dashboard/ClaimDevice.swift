@@ -3,7 +3,7 @@ import Foundation
 import PairQL
 
 func claimDevice<Output>(
-  for app: GertrudeIOSApp,
+  intent: ClaimIntent,
   code: Int,
   child childAssignment: ClaimIOSDevice.ChildAssignment,
   baseId: String,
@@ -12,23 +12,27 @@ func claimDevice<Output>(
   beforeClaim: ((IOSDevice) async throws -> Void)? = nil,
   onFresh: (IOSDevice, Child) async throws -> Output,
 ) async throws -> Output {
-  let found = try? await IOSDevice.query()
-    .where(.claimCode == code)
-    .first(in: context.db)
-
-  guard var device = found else {
-    logIOSUnusual("\(baseId)-1", "\(app.claimLogLabel) claim code not found")
+  guard let claim = try await Claim.find(code: code, in: context.db) else {
+    logIOSUnusual("\(baseId)-1", "\(intent.claimLogLabel) claim code not found")
     let msg = "Code not found. Double-check and try again."
     throw context.error("\(baseId)-1", .notFound, user: msg)
   }
 
+  if claim.intent != intent {
+    logIOSUnusual("\(baseId)-4", "claim intent mismatch: code is \(claim.intent), funnel \(intent)")
+    let msg = "That code is for \(claim.intent.app.marketingName), not \(intent.app.marketingName)."
+    throw context.error("\(baseId)-4", .notFound, user: msg)
+  }
+
+  var device = try await claim.device(in: context.db)
+
   if let childId = device.childId {
     if let child = try? await context.verifiedChild(from: childId) {
-      if device.claimedAt == nil {
+      if claim.claimedAt == nil {
         if let beforeClaim {
           try await beforeClaim(device)
         }
-        try await device.claim(for: child, in: context.db)
+        try await finalizeClaim(&device, claim: claim, for: child, in: context.db)
       }
       return try await onResume(device, child)
     } else {
@@ -42,17 +46,23 @@ func claimDevice<Output>(
       }
       logIOSUnusual(
         "\(baseId)-2",
-        differentParentClaimLogDetail(app, code, context.parent, device, ownerChild, ownerParent),
+        differentParentClaimLogDetail(
+          intent,
+          code,
+          context.parent,
+          device,
+          ownerChild,
+          ownerParent,
+        ),
       )
       let msg = "Code not found. Double-check and try again."
       throw context.error("\(baseId)-2", .notFound, user: msg)
     }
   }
 
-  if let expiresAt = device.claimCodeExpiresAt,
-     expiresAt <= get(dependency: \.date.now) {
-    logIOSUnusual("\(baseId)-3", "\(app.claimLogLabel) claim code expired")
-    let msg = "This code has expired. Open \(app.marketingName) on the \(device.deviceType) to get a new one."
+  if claim.expiresAt <= get(dependency: \.date.now) {
+    logIOSUnusual("\(baseId)-3", "\(intent.claimLogLabel) claim code expired")
+    let msg = "This code has expired. Open \(intent.app.marketingName) on the \(device.deviceType) to get a new one."
     throw context.error("\(baseId)-3", .badRequest, user: msg)
   }
 
@@ -67,18 +77,32 @@ func claimDevice<Output>(
     try await context.db.create(Child(parentId: context.parent.id, name: name))
   }
 
-  try await device.claim(for: child, in: context.db)
+  try await finalizeClaim(&device, claim: claim, for: child, in: context.db)
 
   Task { [email = context.parent.email.rawValue] in
     await get(dependency: \.slack)
-      .internal(app.slackChannel, "*\(app.claimLogLabel):* code `\(code)` claimed by `\(email)`")
+      .internal(
+        intent.app.slackChannel,
+        "*\(intent.claimLogLabel):* code `\(code)` claimed by `\(email)`",
+      )
   }
 
   return try await onFresh(device, child)
 }
 
+private func finalizeClaim(
+  _ device: inout IOSDevice,
+  claim: Claim,
+  for child: Child,
+  in db: any DuetSQL.Client,
+) async throws {
+  try await device.bindChild(child, in: db)
+  var claim = claim
+  try await claim.complete(childId: child.id, in: db)
+}
+
 func differentParentClaimLogDetail(
-  _ app: GertrudeIOSApp,
+  _ intent: ClaimIntent,
   _ code: Int,
   _ parent: Parent,
   _ device: IOSDevice,
@@ -95,7 +119,7 @@ func differentParentClaimLogDetail(
 
   let ownerChildId = ownerChild?.id ?? device.childId
   return [
-    "attempt to claim \(app.claimLogLabel) device from different parent",
+    "attempt to claim \(intent.claimLogLabel) device from different parent",
     "code=\(code)",
     "requestingParent=\(parent.email.rawValue) id=\(parent.id)",
     "matchedDeviceId=\(device.id)",

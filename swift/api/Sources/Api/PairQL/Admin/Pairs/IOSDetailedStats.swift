@@ -796,15 +796,22 @@ private struct SupervisionStatusQuery: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
     let profileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     let supervisedAt = BlockerApp.Supervision.columnName(.supervisedAt)
-    let claimedAt = IOSDevice.columnName(.claimedAt)
     let dId = IOSDevice.columnName(.id)
     let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let clDeviceId = Claim.columnName(.deviceId)
+    let clIntent = Claim.columnName(.intent)
+    let clClaimedAt = Claim.columnName(.claimedAt)
     return SQL.Statement("""
     SELECT
       CASE
         WHEN s.\(profileInstalledAt) IS NOT NULL THEN 'complete'
         WHEN s.\(supervisedAt) IS NOT NULL THEN 'supervised'
-        WHEN d.\(claimedAt) IS NOT NULL THEN 'claimed'
+        WHEN EXISTS (
+          SELECT 1 FROM \(table: Claim.self) cl
+          WHERE cl.\(clDeviceId) = d.\(dId)
+            AND cl.\(clIntent) = '\(ClaimIntent.blockerSupervise.rawValue)'
+            AND cl.\(clClaimedAt) IS NOT NULL
+        ) THEN 'claimed'
         ELSE 'pendingClaim'
       END AS status,
       COUNT(*) AS count

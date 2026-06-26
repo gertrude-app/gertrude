@@ -124,6 +124,8 @@ enum DashboardTsCodegenRoute {
       ClaimAmDevice.self,
       GetMusicClaimData.self,
       ClaimMusicDevice.self,
+      GetBlockerClaimData.self,
+      ClaimBlockerDevice.self,
       RequestAmPinReset.self,
       ClaimIOSDevice.self,
       GetIOSDeviceSupervisionStatus.self,

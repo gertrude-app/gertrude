@@ -10,23 +10,29 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.child()
 
     let pendingCode = Int.random(in: 100_000 ... 999_999)
-    let pendingDevice = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = pendingCode
-      $0.claimCodeExpiresAt = .distantFuture
-      $0.claimedAt = .reference
-    })
+    let pendingDevice = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    try await self.createClaim(
+      .blockerSupervise,
+      pendingDevice.id,
+      child.id,
+      code: pendingCode,
+      expiresAt: .distantFuture,
+      claimedAt: .reference,
+    )
     try await self.db.create(BlockerApp.Supervision(
       deviceId: pendingDevice.id,
       supervisedAt: nil, // <-- pending
     ))
 
-    let completedDevice = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = Int.random(in: 100_000 ... 999_999)
-      $0.claimCodeExpiresAt = .distantFuture
-      $0.claimedAt = .reference
-    })
+    let completedDevice = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    try await self.createClaim(
+      .blockerSupervise,
+      completedDevice.id,
+      child.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      expiresAt: .distantFuture,
+      claimedAt: .reference,
+    )
     try await self.db.create(BlockerApp.Supervision(
       deviceId: completedDevice.id,
       supervisedAt: .reference, // <-- not pending
@@ -53,11 +59,14 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
 
     let familyConnectedDevice = try await self.db.create(IOSDevice.random {
       $0.childId = child.id // <-- connected, must have been thru post screen-time offer
-      $0.claimCode = Int
-        .random(in: 100_000 ... 999_999) // <-- has a claim code from abaondoned supervision attempt
-      $0.claimCodeExpiresAt = .reference - .days(7)
-      $0.claimedAt = nil
     })
+    // an unclaimed claim code from an abandoned supervision attempt
+    try await self.createClaim(
+      .blockerSupervise,
+      familyConnectedDevice.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      expiresAt: .reference - .days(7),
+    )
     try await self.db.create(BlockerApp.Supervision(
       deviceId: familyConnectedDevice.id,
       supervisedAt: nil,
@@ -77,10 +86,7 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFetchMarksMusicConnectedDevices() async throws {
     let child = try await self.child()
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let install = try await self.db.create(
       MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
     )

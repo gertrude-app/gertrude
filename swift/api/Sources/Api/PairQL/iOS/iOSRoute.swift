@@ -13,11 +13,17 @@ extension IOSRoute: RouteResponder {
       case .blockRules_v2(let input):
         let output = try await BlockRules_v2.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .checkBlockerConnectionStatus(let input):
+        let output = try await CheckBlockerConnectionStatus.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .checkSupervisionFlowStatus(let input):
         let output = try await CheckSupervisionFlowStatus.resolve(with: input, in: context)
         return try await self.respond(with: output)
       case .connectDevice_v2(let input):
         let output = try await ConnectDevice_v2.resolve(with: input, in: context)
+        return try await self.respond(with: output)
+      case .createBlockerClaimCode(let input):
+        let output = try await CreateBlockerClaimCode.resolve(with: input, in: context)
         return try await self.respond(with: output)
       case .createSupervisionClaimCode(let input):
         let output = try await CreateSupervisionClaimCode.resolve(with: input, in: context)

@@ -3,8 +3,10 @@ import PairQL
 public enum UnauthedRoute: PairRoute {
   case blockRules(BlockRules.Input)
   case blockRules_v2(BlockRules_v2.Input)
+  case checkBlockerConnectionStatus(CheckBlockerConnectionStatus.Input)
   case checkSupervisionFlowStatus(CheckSupervisionFlowStatus.Input)
   case connectDevice_v2(ConnectDevice_v2.Input)
+  case createBlockerClaimCode(CreateBlockerClaimCode.Input)
   case createSupervisionClaimCode(CreateSupervisionClaimCode.Input)
   case crossPromos(CrossPromos.Input)
   case defaultBlockRules(DefaultBlockRules.Input)
@@ -27,6 +29,10 @@ public extension UnauthedRoute {
       Operation(BlockRules_v2.self)
       Body(.json(BlockRules_v2.Input.self))
     }
+    Route(.case(Self.checkBlockerConnectionStatus)) {
+      Operation(CheckBlockerConnectionStatus.self)
+      Body(.json(CheckBlockerConnectionStatus.Input.self))
+    }
     Route(.case(Self.checkSupervisionFlowStatus)) {
       Operation(CheckSupervisionFlowStatus.self)
       Body(.json(CheckSupervisionFlowStatus.Input.self))
@@ -34,6 +40,10 @@ public extension UnauthedRoute {
     Route(.case(Self.connectDevice_v2)) {
       Operation(ConnectDevice_v2.self)
       Body(.json(ConnectDevice_v2.Input.self))
+    }
+    Route(.case(Self.createBlockerClaimCode)) {
+      Operation(CreateBlockerClaimCode.self)
+      Body(.json(CreateBlockerClaimCode.Input.self))
     }
     Route(.case(Self.createSupervisionClaimCode)) {
       Operation(CreateSupervisionClaimCode.self)

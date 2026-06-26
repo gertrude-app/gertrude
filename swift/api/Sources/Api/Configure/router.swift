@@ -88,20 +88,21 @@ public extension Configure {
       use: TestEmailInboxRoute.handler(_:),
     )
 
-    app.get(
-      "claim-pending-supervision", ":code",
-      use: ClaimRedirectRoute.supervision(_:),
-    )
+    app.get("claim-pending-supervision", ":code", use: { (req: Request) in
+      try await ClaimRedirectRoute.handle(req, intent: .blockerSupervise)
+    })
 
-    app.get(
-      "claim-pending-am", ":code",
-      use: ClaimRedirectRoute.am(_:),
-    )
+    app.get("claim-pending-blocker", ":code", use: { (req: Request) in
+      try await ClaimRedirectRoute.handle(req, intent: .blockerConnect)
+    })
 
-    app.get(
-      "claim-pending-music", ":code",
-      use: ClaimRedirectRoute.music(_:),
-    )
+    app.get("claim-pending-am", ":code", use: { (req: Request) in
+      try await ClaimRedirectRoute.handle(req, intent: .podcasts)
+    })
+
+    app.get("claim-pending-music", ":code", use: { (req: Request) in
+      try await ClaimRedirectRoute.handle(req, intent: .music)
+    })
 
     app.get(
       "short-url", ":shortId",

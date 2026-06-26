@@ -30,15 +30,12 @@ struct GetIOSDeviceSupervisionStatus: Pair {
 
 extension GetIOSDeviceSupervisionStatus: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let device = try? await IOSDevice.query()
-      .where(.claimCode == input.code)
-      .first(in: context.db)
-
-    guard let device else {
+    guard let claim = try await Claim.find(code: input.code, in: context.db) else {
       logIOSUnusual("d3f8a721", "supervision status: code not found")
       let msg = "Code not found. Double-check and try again."
       throw context.error("d3f8a721", .notFound, user: msg)
     }
+    let device = try await claim.device(in: context.db)
 
     guard let childId = device.childId else {
       logIOSUnusual("e5c2b198", "supervision status: device not yet claimed")

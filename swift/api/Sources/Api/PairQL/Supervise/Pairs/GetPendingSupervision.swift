@@ -22,7 +22,7 @@ extension GetPendingSupervision: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "7863605f", // 7863605f-1, 7863605f-2, 7863605f-3
+      baseId: "7863605f", // 7863605f-1, 7863605f-2, 7863605f-3, 7863605f-4, 7863605f-5
       in: context,
     )
 
@@ -63,14 +63,16 @@ extension SuperviseRoute {
     baseId: String,
     in context: Context,
   ) async throws -> ValidatedSupervisionCode {
-    let device = try? await IOSDevice.query()
-      .where(.claimCode == code)
-      .first(in: context.db)
-
     let codeNotFound = "Code not found. Double-check and try again."
-    guard var device else {
+    guard var claim = try await Claim.find(code: code, in: context.db) else {
       logIOSUnusual("\(baseId)-1", "supervision code not found")
       throw context.error("\(baseId)-1", .notFound, user: codeNotFound)
+    }
+    let device = try await claim.device(in: context.db)
+
+    guard claim.intent == .blockerSupervise else {
+      logIOSUnusual("\(baseId)-4", "non-supervision code used: intent=\(claim.intent)")
+      throw context.error("\(baseId)-4", .notFound, user: codeNotFound)
     }
 
     guard let claimedChildId = device.childId else {
@@ -80,14 +82,13 @@ extension SuperviseRoute {
     }
 
     guard let supervision = try await device.supervision(in: context.db) else {
-      logIOSUnusual("\(baseId)-1", "supervision row not found for claimed device")
-      throw context.error("\(baseId)-1", .notFound, user: codeNotFound)
+      logIOSUnusual("\(baseId)-5", "supervision row not found for claimed device")
+      throw context.error("\(baseId)-5", .notFound, user: codeNotFound)
     }
 
-    try await device.renewPendingClaimCode(in: context.db, supervision: supervision)
+    try await claim.renewIfPendingSupervision(supervision: supervision, in: context.db)
 
-    if let expiresAt = device.claimCodeExpiresAt,
-       expiresAt < get(dependency: \.date.now) {
+    if claim.expiresAt < get(dependency: \.date.now) {
       logIOSUnusual("\(baseId)-3", "supervision code expired")
       let msg = "This code has expired. Open the Gertrude app on the \(device.deviceType) to get a new code."
       throw context.error("\(baseId)-3", .badRequest, user: msg)

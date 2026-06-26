@@ -38,3 +38,9 @@ all notes.
   control arm can't reach significance, so we throttle (manual waves, daily cadence),
   capture a `variant` for copy reconstruction, and lean on near-zero base rates + replies
   for directional, judgment-based reads.
+
+- **[008 — `child.claims` table and `ClaimIntent`: first-class claim model](./008-claims-table-and-intent.md)**
+  — replaces three `ios_devices` columns with a dedicated claims table carrying a
+  `ClaimIntent` enum; enables per-funnel intent verification and helpful cross-app rejection
+  messages; partial unique index enforces at most one active unclaimed code per
+  (device, intent).

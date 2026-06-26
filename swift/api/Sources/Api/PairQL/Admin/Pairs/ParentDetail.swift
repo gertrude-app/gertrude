@@ -185,9 +185,10 @@ extension ParentDetail: Resolver {
         }
 
         let supervision = try await device.supervision(in: context.db)
+        let claim = try await Claim.find(device.id, intent: .blockerSupervise, in: context.db)
         let blockerConnected = apps.contains { $0.app == "blocker" && $0.connected }
         let status: String? = if let supervision {
-          supervision.status(device: device).rawValue
+          supervision.status(claimedAt: claim?.claimedAt).rawValue
         } else if blockerConnected {
           "connected"
         } else {

@@ -18,8 +18,14 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
       childId: child.model.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
+    try await self.createClaim(
+      .podcasts,
+      device.id,
+      child.model.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
     var install = try await self.db.create(
       PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
     )

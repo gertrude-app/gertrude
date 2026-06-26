@@ -23,7 +23,8 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
 
       Task {
         let parent = try await ctx.child.parent(in: ctx.db)
-        let claimCodeText = ctx.device.claimCode.map(String.init) ?? "unknown"
+        let claim = try? await Claim.find(ctx.device.id, intent: .blockerSupervise, in: ctx.db)
+        let claimCodeText = claim.map { String($0.code) } ?? "unknown"
         await get(dependency: \.slack).internal(
           .info,
           """

@@ -122,6 +122,40 @@ extension BlockerApp.Token: Model {
   }
 }
 
+extension Claim: Model {
+  public static let schemaName = "child"
+  public static let tableName = "claims"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .code: .int(self.code)
+    case .intent: .string(self.intent.rawValue)
+    case .deviceId: .uuid(self.deviceId)
+    case .childId: .uuid(self.childId)
+    case .expiresAt: .date(self.expiresAt)
+    case .claimedAt: .date(self.claimedAt)
+    case .createdAt: .date(self.createdAt)
+    case .updatedAt: .date(self.updatedAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .code: .int(self.code),
+      .intent: .string(self.intent.rawValue),
+      .deviceId: .uuid(self.deviceId),
+      .childId: .uuid(self.childId),
+      .expiresAt: .date(self.expiresAt),
+      .claimedAt: .date(self.claimedAt),
+      .createdAt: .currentTimestamp,
+      .updatedAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension IOSDevice: Model {
   public static let schemaName = "child"
   public static let tableName = "ios_devices"
@@ -133,9 +167,6 @@ extension IOSDevice: Model {
     case .childId: .uuid(self.childId)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
-    case .claimCode: .int(self.claimCode)
-    case .claimCodeExpiresAt: .date(self.claimCodeExpiresAt)
-    case .claimedAt: .date(self.claimedAt)
     case .createdAt: .date(self.createdAt)
     case .updatedAt: .date(self.updatedAt)
     }
@@ -147,9 +178,6 @@ extension IOSDevice: Model {
       .childId: .uuid(self.childId),
       .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
-      .claimCode: .int(self.claimCode),
-      .claimCodeExpiresAt: .date(self.claimCodeExpiresAt),
-      .claimedAt: .date(self.claimedAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

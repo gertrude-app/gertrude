@@ -20,7 +20,7 @@ extension MarkSupervisionVerified: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "1f768983", // 1f768983-1, 1f768983-2, 1f768983-3
+      baseId: "1f768983", // 1f768983-1, 1f768983-2, 1f768983-3, 1f768983-4, 1f768983-5
       in: context,
     )
 

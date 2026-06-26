@@ -20,10 +20,10 @@ struct ClaimMusicDevice: Pair {
 extension ClaimMusicDevice: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     try await claimDevice(
-      for: .music,
+      intent: .music,
       code: input.code,
       child: input.child,
-      baseId: "43ecc09c",
+      baseId: "43ecc09c", // 43ecc09c-1, 43ecc09c-2, 43ecc09c-3, 43ecc09c-4
       in: context,
       onResume: { device, child in
         try await self.output(device: device, child: child, code: input.code, in: context)

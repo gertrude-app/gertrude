@@ -17,7 +17,7 @@ extension LogSupervisionEvent: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "f91992ac", // f91992ac-1, f91992ac-2, f91992ac-3
+      baseId: "f91992ac", // f91992ac-1, f91992ac-2, f91992ac-3, f91992ac-4, f91992ac-5
       in: context,
     )
 

@@ -26,15 +26,14 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
     try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = code
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(.music, device.id, child.id, claimedAt: .reference)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
-    let output = try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: parent.context,
+    )
 
     expect(output.children).toEqual([])
     expect(output.modelName).toEqual(device.modelName)
@@ -47,15 +46,11 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
     try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    _ = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = code
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(.music, device.id, child.id, claimedAt: .reference)
 
     try await expectErrorFrom {
-      try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
+      try await GetMusicClaimData.resolve(with: .init(code: claim.code), in: parent.context)
     }.toContain("not found")
   }
 
@@ -63,14 +58,14 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
     try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
-    let output = try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: parent.context,
+    )
 
     expect(output.resumeStep).toBeNil()
     expect(output.children.map(\.id)).toEqual([child.id])
@@ -81,14 +76,14 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
   func testUnclaimedWithoutMusicAccessReturnsPaymentActionAndNoChildren() async throws {
     let parent = try await self.parent()
     _ = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
-    let output = try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: parent.context,
+    )
 
     expect(output.resumeStep).toBeNil()
     expect(output.children).toEqual([])
@@ -101,15 +96,12 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
       $1.stripeStatus = .pastDue
     }
     _ = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
     let output = try await GetMusicClaimData.resolve(
-      with: .init(code: code),
+      with: .init(code: claim.code),
       in: self.context(parent.model),
     )
 
@@ -120,31 +112,24 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUnclaimedWithoutMusicInstallThrowsNotFound() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
-    try await self.db.create(IOSDevice.random {
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.music, device.id)
 
     try await expectErrorFrom {
-      try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
+      try await GetMusicClaimData.resolve(with: .init(code: claim.code), in: parent.context)
     }.toContain("not found")
   }
 
   func testClaimedByDifferentParentThrowsCodeNotFound() async throws {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = otherChild.id
-      $0.claimCode = code
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = otherChild.id })
+    let claim = try await self.createClaim(.music, device.id, otherChild.id, claimedAt: .reference)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
     let parent = try await self.parent()
 
     try await expectErrorFrom {
-      try await GetMusicClaimData.resolve(with: .init(code: code), in: parent.context)
+      try await GetMusicClaimData.resolve(with: .init(code: claim.code), in: parent.context)
     }.toContain("not found")
   }
 }

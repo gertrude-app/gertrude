@@ -20,7 +20,6 @@ final class DashboardWidgets_v3ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.child()
     let iosDevice = try await self.db.create(IOSDevice.mock {
       $0.childId = child.id
-      $0.claimedAt = Date()
     })
     let install = try await self.db.create(
       PodcastApp.Install(deviceId: iosDevice.id, appVersion: "1.6.0"),

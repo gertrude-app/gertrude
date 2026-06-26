@@ -199,8 +199,14 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.addLightPaidSubscription(for: child.parent.model.id)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
+    try await self.createClaim(
+      .music,
+      device.id,
+      child.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
     let install = try await self.db.create(
       MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
     )

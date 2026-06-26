@@ -14,9 +14,8 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       childId: nil,
       modelIdentifier: "iPhone18,1",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.createClaim(.blockerSupervise, device.id, code: code)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
@@ -41,7 +40,8 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     let updatedDevice = try await self.db.find(device.id)
     expect(updatedDevice.childId).toEqual(children[0].id)
-    expect(updatedDevice.claimedAt).not.toBeNil()
+    let claim = try await Claim.find(code: code, in: self.db)
+    expect(claim?.claimedAt).not.toBeNil()
 
     let deviceBlockGroups = try await BlockerApp.DeviceBlockGroup.query()
       .where(.deviceId == device.id)
@@ -62,22 +62,20 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       .count(in: self.db)
     expect(numPriorChildren).toEqual(1)
 
-    let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPad14,8",
       iosVersion: "26.1",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    let claim = try await self.createClaim(.blockerSupervise, device.id)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await ClaimIOSDevice.resolve(
-        with: .init(code: code, child: .existingChild(id: existingChild.id)),
+        with: .init(code: claim.code, child: .existingChild(id: existingChild.id)),
         in: parent.context,
       )
     }
@@ -107,15 +105,17 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testCodeExpired_throwsError() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone17,1",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference - .days(1),
     ))
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      expiresAt: .reference - .days(1),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await expectErrorFrom {
@@ -123,7 +123,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
         $0.date = .constant(.reference)
       } operation: {
         try await ClaimIOSDevice.resolve(
-          with: .init(code: code, child: .newChild(name: "Test")),
+          with: .init(code: claim.code, child: .newChild(name: "Test")),
           in: parent.context,
         )
       }
@@ -133,16 +133,18 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testCodeAlreadyClaimedByOtherParent_throwsError() async throws {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: otherChild.id,
       modelIdentifier: "iPhone17,1",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
-      claimedAt: .reference,
     ))
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      otherChild.id,
+      claimedAt: .reference,
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let parent = try await self.parent()
@@ -152,7 +154,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
         $0.date = .constant(.reference)
       } operation: {
         try await ClaimIOSDevice.resolve(
-          with: .init(code: code, child: .newChild(name: "Test")),
+          with: .init(code: claim.code, child: .newChild(name: "Test")),
           in: parent.context,
         )
       }
@@ -162,15 +164,13 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testExistingChildBelongsToOtherParent_throwsError() async throws {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone17,1",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    let claim = try await self.createClaim(.blockerSupervise, device.id)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
     let parent = try await self.parent()
 
@@ -179,7 +179,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
         $0.date = .constant(.reference)
       } operation: {
         try await ClaimIOSDevice.resolve(
-          with: .init(code: code, child: .existingChild(id: otherChild.id)),
+          with: .init(code: claim.code, child: .existingChild(id: otherChild.id)),
           in: parent.context,
         )
       }
@@ -188,11 +188,8 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testLegacyIapCustomerClaimsViaBlockerFunnel_stampsLegacyPaidAt() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.blockerSupervise, device.id)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
     try await self.db.create(PodcastEvent(
       eventId: "af0a338f",
@@ -209,7 +206,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       $0.date = .constant(.reference)
     } operation: {
       try await ClaimIOSDevice.resolve(
-        with: .init(code: code, child: .newChild(name: "Luke")),
+        with: .init(code: claim.code, child: .newChild(name: "Luke")),
         in: parent.context,
       )
     }
@@ -233,10 +230,15 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       childId: child.id,
       modelIdentifier: "iPhone18,2",
       iosVersion: "18.0",
-      claimCode: code,
-      claimCodeExpiresAt: .reference - .days(30),
-      claimedAt: .reference - .days(30),
     ))
+    try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      code: code,
+      expiresAt: .reference - .days(30),
+      claimedAt: .reference - .days(30),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {

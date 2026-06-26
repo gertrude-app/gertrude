@@ -9,20 +9,20 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   func testHappyPath_validClaimedCode_returnsChildAndDeviceInfo() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      claimedAt: .reference,
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await GetPendingSupervision.resolve(
-        with: .init(code: code, platform: "macos"),
+        with: .init(code: claim.code, platform: "macos"),
         in: .mock,
       )
     }
@@ -45,11 +45,8 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
 
   func testCodeNotClaimed_throwsError() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = nil
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = nil })
+    try await self.createClaim(.blockerSupervise, device.id, code: code)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await expectErrorFrom {
@@ -66,11 +63,13 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
 
   func testUnclaimedCode_throwsClaimStepError() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = nil
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference - .days(1)
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = nil })
+    try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      code: code,
+      expiresAt: .reference - .days(1),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await expectErrorFrom {
@@ -88,30 +87,29 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   func testClaimedExpiredCode_renewsAndReturnsPendingSupervision() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference - .days(1)
-      $0.claimedAt = .reference - .days(8)
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      expiresAt: .reference - .days(1),
+      claimedAt: .reference - .days(8),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let output = try await withDependencies {
       $0.date = .constant(.reference)
     } operation: {
       try await GetPendingSupervision.resolve(
-        with: .init(code: code, platform: "macos"),
+        with: .init(code: claim.code, platform: "macos"),
         in: .mock,
       )
     }
 
     expect(output.childName).toEqual(child.name)
 
-    let updated = try await IOSDevice.query()
-      .where(.id == device.id)
-      .first(in: self.db)
-    expect(updated.claimCode).toEqual(code)
-    expect(updated.claimCodeExpiresAt).toEqual(.reference + .days(21))
+    let updatedClaim = try await Claim.find(code: claim.code, in: self.db)
+    expect(updatedClaim?.code).toEqual(claim.code)
+    expect(updatedClaim?.expiresAt).toEqual(.reference + .days(21)) // renewed
   }
 }

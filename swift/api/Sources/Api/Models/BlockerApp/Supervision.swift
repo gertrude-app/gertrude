@@ -35,10 +35,10 @@ extension BlockerApp.Supervision {
     case complete
   }
 
-  func status(device: IOSDevice) -> Status {
+  func status(claimedAt: Date?) -> Status {
     if self.profileInstalledAt != nil { return .complete }
     if self.supervisedAt != nil { return .supervised }
-    if device.claimedAt != nil { return .claimed }
+    if claimedAt != nil { return .claimed }
     return .pendingClaim
   }
 

@@ -30,14 +30,14 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     let token = await with(dependency: \.ephemeral).createParentIdToken(
       parent.id,
       claimCode: "123456",
-      claimApp: .podcasts,
+      claimIntent: .podcasts,
     )
 
     let output = try await VerifySignupEmail.resolve(with: .init(token: token), in: self.context)
 
     expect(output.adminId).toEqual(parent.id)
     expect(output.claimCode).toEqual("123456")
-    expect(output.claimApp).toEqual(.podcasts)
+    expect(output.claimIntent).toEqual(.podcasts)
   }
 
   func testVerifyingWithExpiredTokenErrorsButSendsNewVerification() async throws {
@@ -62,7 +62,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
       parent.id,
       expiration: Date.reference - .days(1),
       claimCode: "123456",
-      claimApp: .podcasts,
+      claimIntent: .podcasts,
     )
 
     let result = await VerifySignupEmail.result(with: .init(token: token), in: self.context)
@@ -75,7 +75,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
 
     let newToken = UUID(uuidString: sent.emails[0].templateModel["token"] ?? "")!
     let retrieved = await ephemeral.parentIdFromToken(newToken)
-    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimApp: .podcasts))
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimIntent: .podcasts))
   }
 
   func testExpiredTokenForAlreadyVerifiedParentErrorsWithHelpfulMessage() async throws {
@@ -112,7 +112,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     let token = await ephemeral.createParentIdToken(
       parent.id,
       claimCode: "123456",
-      claimApp: .podcasts,
+      claimIntent: .podcasts,
     )
 
     // simulate token being retrieved but parent somehow still pending

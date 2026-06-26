@@ -34,6 +34,7 @@ ios-tunnel:
 # api
 
 watch-api:
+  @just clean-api-port
   @watchexec --project-origin . --clear --restart --watch . --exts swift,html \
   --ignore '**/.build/*/**' \
   --ignore '**/index.html' \
@@ -42,7 +43,7 @@ watch-api:
   --ignore 'podcasts/**/*' \
   --ignore 'music/**/*' \
   --ignore 'gertie-tca-features/**/*' \
-  just run-api
+  'just clean-api-port && just run-api'
 
 run-api: build-api
   @just exec-api serve --hostname {{api_host}} --port {{api_port}}
@@ -169,6 +170,10 @@ clean: nx-reset
 [private]
 exec-api cmd *args:
   @cd api && ./.build/debug/Run {{cmd}} {{args}}
+
+[private]
+clean-api-port:
+  @lsof -ti tcp:{{api_port}} | xargs kill -9 2>/dev/null || true
 
 [private]
 nx-run-many targets:
