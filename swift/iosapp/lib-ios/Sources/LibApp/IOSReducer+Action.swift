@@ -21,6 +21,7 @@ public extension IOSReducer {
 
       case onboardingClearCache(ClearCacheFeature.Action)
       case onboardingCrossPromo(CrossPromoFeature.Action)
+      case onboardingConnect(ConnectAccount.Action)
       case onboardingBtnTapped(OnboardingBtn, String)
       case blockGroupToggled(UUID)
       case sheetDismissed

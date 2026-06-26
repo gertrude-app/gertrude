@@ -133,6 +133,7 @@ const SuperviseDeviceScreen: React.FC<{
         modelName={modelName}
         iosVersion={iosVersion}
         deviceId="mock-device-id"
+        childId="mock-child-id"
       />
     </ScreenShell>
   );

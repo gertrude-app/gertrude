@@ -8,7 +8,7 @@ export namespace Signup {
     referralCode?: string;
     turnstileToken?: string;
     claimCode?: string;
-    app?: 'blocker' | 'podcasts' | 'music';
+    intent?: 'blockerSupervise' | 'blockerConnect' | 'podcasts' | 'music';
   }
 
   export interface Output {

@@ -7,23 +7,28 @@ import LibClients
 public struct ConnectAccount {
   @ObservableState
   public struct State: Equatable {
-    public var screen: SubScreen = .enteringCode
+    public var screen: SubScreen = .generatingCode
 
-    public init(screen: SubScreen = .enteringCode) {
+    public init(screen: SubScreen = .generatingCode) {
       self.screen = screen
     }
   }
 
   public enum Action: Equatable {
-    case codeSubmitted(Int)
-    case receivedConnectionError(String)
+    case cancelTapped
+    case codeGenerationFailed
+    case codeResponse(code: Int)
     case connectionSucceeded(childData: ChildIOSDeviceData_v2)
-    case setScreen(State.SubScreen)
+    case onAppear
+    case polled(CheckBlockerConnectionStatus.Output)
+    case retryTapped
   }
+
+  enum CancelID { case poll }
 
   struct Deps: Sendable {
     @Dependency(\.api) var api
-    @Dependency(\.device) var device
+    @Dependency(\.continuousClock) var clock
   }
 
   @ObservationIgnored
@@ -32,31 +37,64 @@ public struct ConnectAccount {
   public var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
-      case .setScreen(let screen):
-        state.screen = screen
+      case .cancelTapped:
         return .none
-      case .receivedConnectionError(let error):
-        state.screen = .connectionFailed(error: error)
+
+      case .onAppear:
+        guard state.screen == .generatingCode else { return .none }
+        return self.startGeneratingCode(&state)
+
+      case .retryTapped:
+        return self.startGeneratingCode(&state)
+
+      case .codeResponse(let code):
+        state.screen = .showingCode(code: code)
         return .none
+
+      case .codeGenerationFailed:
+        state.screen = .codeGenerationFailed
+        return .none
+
+      case .polled(let status):
+        switch status {
+        case .connected(let data):
+          return .merge(
+            .cancel(id: CancelID.poll),
+            .send(.connectionSucceeded(childData: data)),
+          )
+        case .expired, .notFound:
+          state.screen = .codeGenerationFailed
+          return .cancel(id: CancelID.poll)
+        case .pending:
+          return .none
+        }
+
       case .connectionSucceeded(childData: let data):
         state.screen = .connected(childName: data.childName)
         return .none
-      case .codeSubmitted(let code):
-        state.screen = .connecting
-        return .run { [deps = self.deps] send in
-          guard let deviceId = await deps.device.deviceId() else {
-            await send(.setScreen(.connectionFailed(error: "No device ID found")))
-            return
-          }
-          do {
-            let childData = try await deps.api.connectDevice(code: code, deviceId: deviceId)
-            await send(.connectionSucceeded(childData: childData))
-          } catch {
-            await send(.setScreen(.connectionFailed(error: error.localizedDescription)))
-          }
+      }
+    }
+  }
+
+  func startGeneratingCode(_ state: inout State) -> EffectOf<ConnectAccount> {
+    state.screen = .generatingCode
+    return .run { [deps = self.deps] send in
+      let code: Int
+      do {
+        code = try await deps.api.createBlockerClaimCode().code
+      } catch {
+        await send(.codeGenerationFailed)
+        return
+      }
+      await send(.codeResponse(code: code))
+      while !Task.isCancelled {
+        try await deps.clock.sleep(for: .seconds(5))
+        if let status = try? await deps.api.checkBlockerConnectionStatus(code) {
+          await send(.polled(status))
         }
       }
     }
+    .cancellable(id: CancelID.poll, cancelInFlight: true)
   }
 
   public init() {}
@@ -64,9 +102,9 @@ public struct ConnectAccount {
 
 public extension ConnectAccount.State {
   enum SubScreen: Equatable {
-    case enteringCode
-    case connecting
-    case connectionFailed(error: String)
+    case generatingCode
+    case showingCode(code: Int)
+    case codeGenerationFailed
     case connected(childName: String)
   }
 }

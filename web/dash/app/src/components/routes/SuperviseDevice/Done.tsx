@@ -20,7 +20,7 @@ const SuperviseDeviceDone: React.FC = () => {
     return <ApiErrorMessage error={query.error} />;
   }
 
-  const { deviceId, childName, modelName, deviceType, iosVersion } = query.data;
+  const { deviceId, childId, childName, modelName, deviceType, iosVersion } = query.data;
 
   return (
     <ScreenShell title={`${deviceType} Setup Complete`}>
@@ -29,6 +29,7 @@ const SuperviseDeviceDone: React.FC = () => {
         modelName={modelName}
         iosVersion={iosVersion}
         deviceId={deviceId}
+        childId={childId}
       />
     </ScreenShell>
   );

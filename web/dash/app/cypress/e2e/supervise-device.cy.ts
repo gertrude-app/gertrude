@@ -149,4 +149,40 @@ describe(`supervise device claim flow`, () => {
       cy.get(`[data-test="child-name-input"]`).should(`exist`);
     });
   });
+
+  describe(`done screen`, () => {
+    beforeEach(() => {
+      cy.simulateLoggedIn();
+    });
+
+    // regression: button linked to /ios-devices/:id, which redirects to /devices
+    it(`Manage button deep-links to the device settings page`, () => {
+      cy.interceptPql(`GetIOSDeviceSupervisionStatus`, {
+        deviceId: `11300000-0000-0000-0000-000000000000`,
+        childId: `a9aa0000-0000-0000-0000-000000000000`,
+        childName: `Jacob`,
+        modelName: `iPhone 12`,
+        deviceType: `iPhone`,
+        iosVersion: `26.0`,
+        supervisionStatus: `supervised`,
+        requiresPayment: false,
+        paymentAction: { case: `startCheckout`, tier: `light` },
+      });
+      cy.interceptPql(`GetIOSDevice_v2`, {
+        childName: `Jacob`,
+        deviceType: `iPhone`,
+        osVersion: `26.0`,
+        musicConnected: false,
+      });
+
+      cy.visit(`/supervise-device/326590/done`);
+      cy.wait(`@GetIOSDeviceSupervisionStatus`);
+
+      cy.contains(`Manage iPhone`).click();
+      cy.location(`pathname`).should(
+        `eq`,
+        `/children/a9aa0000-0000-0000-0000-000000000000/ios-devices/11300000-0000-0000-0000-000000000000`,
+      );
+    });
+  });
 });

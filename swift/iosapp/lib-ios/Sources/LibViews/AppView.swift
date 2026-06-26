@@ -35,6 +35,15 @@ public struct AppView: View {
         action: \.interactive.onboardingCrossPromo,
       ) {
         CrossPromoView(store: crossPromoStore)
+      } else if let connectStore = self.store.scope(
+        state: \.onboarding.connect,
+        action: \.interactive.onboardingConnect,
+      ) {
+        ConnectingView(
+          store: connectStore,
+          infoBlurb: self.store.onboarding.connectFeature.connectAccountSheetInfoBlurb,
+          deviceType: self.deviceType,
+        )
       } else {
         switch self.store.screen {
         case .launching: EmptyView()
@@ -131,7 +140,6 @@ public struct AppView: View {
               text: self.store.onboarding.connectFeature.offerScreenConnectBtnText ??
                 "Connect to account",
               .primary,
-              animate: false,
             ),
             secondary: self.btn(
               text: self.store.onboarding.connectFeature.offerScreenSkipBtnText ?? "No thanks",
@@ -625,15 +633,6 @@ public struct AppView: View {
             .onShake { self.store.send(.interactive(.receivedShake)) }
         }
       }
-    }
-    .sheet(item: self.$store.scope(
-      state: \.destination?.connectAccount,
-      action: \.destination.connectAccount,
-    )) {
-      ConnectingView(
-        store: $0,
-        infoBlurb: self.store.onboarding.connectFeature.connectAccountSheetInfoBlurb,
-      )
     }
     .sheet(item: self.$store.scope(
       state: \.destination?.info,

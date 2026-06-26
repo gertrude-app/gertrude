@@ -6,10 +6,11 @@ export { default as FullscreenGradientBg } from './Unauthed/FullscreenGradientBg
 export { default as EmailInputForm } from './Unauthed/EmailInputForm';
 export { default as LoginForm } from './Unauthed/LoginForm';
 export { default as DeviceContextBanner } from './Unauthed/DeviceContextBanner';
-export type { GertrudeIOSApp } from './gertrudeApps';
+export type { ClaimIntent, GertrudeIOSApp } from './gertrudeApps';
 export {
   CLAIM_REDIRECT_ROUTE,
   claimFunnelPath,
+  claimIntentApp,
   detectClaimFunnelPath,
   detectClaimPending,
 } from './gertrudeApps';
@@ -95,5 +96,6 @@ export { default as ClaimScreen } from './ClaimDevice/ClaimScreen';
 export { default as AmDoneScreen } from './ClaimDevice/AmDoneScreen';
 export type { AmDoneVariant } from './ClaimDevice/AmDoneScreen';
 export { default as MusicDoneScreen } from './ClaimDevice/MusicDoneScreen';
+export { default as BlockerDoneScreen } from './ClaimDevice/BlockerDoneScreen';
 export { default as SecurityEventsFeed } from './SecurityEventsFeed';
 export type { IpLocation, SecurityEvent } from './SecurityEventsFeed';

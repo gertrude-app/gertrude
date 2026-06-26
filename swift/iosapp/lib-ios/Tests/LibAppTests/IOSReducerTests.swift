@@ -322,11 +322,11 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.destination = .connectAccount(.init())
+      $0.onboarding.connect = .init()
     }
 
-    await store.send(.destination(.dismiss)) {
-      $0.destination = nil
+    await store.send(.interactive(.onboardingConnect(.cancelTapped))) {
+      $0.onboarding.connect = nil
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
@@ -343,7 +343,7 @@ final class IOSReducerTests: XCTestCase {
     var initialState = IOSReducer.State(
       screen: .onboarding(.happyPath(.offerAccountConnect)),
     )
-    initialState.destination = .connectAccount(.init())
+    initialState.onboarding.connect = .init()
 
     let store = TestStore(initialState: initialState) {
       IOSReducer()
@@ -357,9 +357,9 @@ final class IOSReducerTests: XCTestCase {
 
     let conn = ChildIOSDeviceData_v2.mock
     await store
-      .send(.destination(.presented(.connectAccount(.connectionSucceeded(childData: conn))))) {
+      .send(.interactive(.onboardingConnect(.connectionSucceeded(childData: conn)))) {
+        $0.onboarding.connect = nil
         $0.screen = .onboarding(.happyPath(.connectSuccess))
-        $0.destination = .connectAccount(.init(screen: .connected(childName: conn.childName)))
       }
 
     await store.finish()

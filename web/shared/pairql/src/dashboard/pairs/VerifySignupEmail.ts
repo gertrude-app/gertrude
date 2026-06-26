@@ -8,6 +8,6 @@ export namespace VerifySignupEmail {
     token: UUID;
     adminId: UUID;
     claimCode?: string;
-    claimApp?: 'blocker' | 'podcasts' | 'music';
+    claimIntent?: 'blockerSupervise' | 'blockerConnect' | 'podcasts' | 'music';
   }
 }

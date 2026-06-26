@@ -400,8 +400,9 @@ export const UsbConnectionIllustration: React.FC = () => (
 export const DoneScreen: React.FC<
   DeviceInfo & {
     deviceId: string;
+    childId: string;
   }
-> = ({ childName, modelName, iosVersion, deviceId }) => {
+> = ({ childName, modelName, iosVersion, deviceId, childId }) => {
   const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   return (
     <div>
@@ -441,7 +442,11 @@ export const DoneScreen: React.FC<
       </div>
 
       <div className="flex justify-end">
-        <Button type="link" to={`/ios-devices/${deviceId}`} color="primary">
+        <Button
+          type="link"
+          to={`/children/${childId}/ios-devices/${deviceId}`}
+          color="primary"
+        >
           Manage {deviceType} &rarr;
         </Button>
       </div>

@@ -34,6 +34,10 @@ public struct ApiClient: Sendable {
     async throws -> CreateSupervisionClaimCode.Output
   public var checkSupervisionFlowStatus: @Sendable (_ code: Int)
     async throws -> CheckSupervisionFlowStatus.Output
+  public var createBlockerClaimCode: @Sendable ()
+    async throws -> CreateBlockerClaimCode.Output
+  public var checkBlockerConnectionStatus: @Sendable (_ code: Int)
+    async throws -> CheckBlockerConnectionStatus.Output
   public var markSupervisionProfileInstalled: @Sendable ()
     async throws -> Void
   public var crossPromos: @Sendable ()
@@ -179,6 +183,34 @@ extension ApiClient: DependencyKey {
         return try await pairql.call(
           CheckSupervisionFlowStatus.self,
           unauthed: .checkSupervisionFlowStatus(.init(
+            vendorId: deviceId,
+            code: code,
+          )),
+        )
+      },
+      createBlockerClaimCode: {
+        @Dependency(\.device) var device
+        guard let deviceId = await device.deviceId() else {
+          throw ApiClient.Error.missingVendorId
+        }
+        return try await pairql.call(
+          CreateBlockerClaimCode.self,
+          unauthed: .createBlockerClaimCode(.init(
+            deviceId: deviceId,
+            modelIdentifier: device.modelIdentifier(),
+            iosVersion: device.iOSVersion(),
+            appVersion: version,
+          )),
+        )
+      },
+      checkBlockerConnectionStatus: { code in
+        @Dependency(\.device) var device
+        guard let deviceId = await device.deviceId() else {
+          throw ApiClient.Error.missingVendorId
+        }
+        return try await pairql.call(
+          CheckBlockerConnectionStatus.self,
+          unauthed: .checkBlockerConnectionStatus(.init(
             vendorId: deviceId,
             code: code,
           )),

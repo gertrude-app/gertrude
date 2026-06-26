@@ -1,5 +1,7 @@
 export type GertrudeIOSApp = `blocker` | `podcasts` | `music`;
 
+export type ClaimIntent = `blockerSupervise` | `blockerConnect` | `podcasts` | `music`;
+
 export const APP_META: Record<GertrudeIOSApp, { name: string; iconSrc: string }> = {
   blocker: {
     name: `Gertrude Blocker`,
@@ -15,36 +17,50 @@ export const APP_META: Record<GertrudeIOSApp, { name: string; iconSrc: string }>
   },
 };
 
-export const CLAIM_PENDING_QUERY_KEY: Record<GertrudeIOSApp, string> = {
-  blocker: `claimPendingSupervision`,
+const CLAIM_INTENT_APP: Record<ClaimIntent, GertrudeIOSApp> = {
+  blockerSupervise: `blocker`,
+  blockerConnect: `blocker`,
+  podcasts: `podcasts`,
+  music: `music`,
+};
+
+export function claimIntentApp(intent: ClaimIntent): GertrudeIOSApp {
+  return CLAIM_INTENT_APP[intent];
+}
+
+export const CLAIM_PENDING_QUERY_KEY: Record<ClaimIntent, string> = {
+  blockerSupervise: `claimPendingSupervision`,
+  blockerConnect: `claimPendingBlocker`,
   podcasts: `claimPendingAmDevice`,
   music: `claimPendingMusicDevice`,
 };
 
-export const CLAIM_REDIRECT_ROUTE: Record<GertrudeIOSApp, string> = {
-  blocker: `claim-pending-supervision`,
+export const CLAIM_REDIRECT_ROUTE: Record<ClaimIntent, string> = {
+  blockerSupervise: `claim-pending-supervision`,
+  blockerConnect: `claim-pending-blocker`,
   podcasts: `claim-pending-am`,
   music: `claim-pending-music`,
 };
 
-const CLAIM_FUNNEL_PATH_SEGMENT: Record<GertrudeIOSApp, string> = {
-  blocker: `supervise-device`,
+const CLAIM_FUNNEL_PATH_SEGMENT: Record<ClaimIntent, string> = {
+  blockerSupervise: `supervise-device`,
+  blockerConnect: `claim-blocker-device`,
   podcasts: `claim-am-device`,
   music: `claim-music-device`,
 };
 
-export function claimFunnelPath(app: GertrudeIOSApp, claimCode: string): string {
-  return `/${CLAIM_FUNNEL_PATH_SEGMENT[app]}/${claimCode}/claim`;
+export function claimFunnelPath(intent: ClaimIntent, claimCode: string): string {
+  return `/${CLAIM_FUNNEL_PATH_SEGMENT[intent]}/${claimCode}/claim`;
 }
 
 export function detectClaimFunnelPath(
   pathname: string,
-): { app: GertrudeIOSApp; claimCode: string } | null {
-  const entries = Object.entries(CLAIM_FUNNEL_PATH_SEGMENT) as [GertrudeIOSApp, string][];
-  for (const [app, segment] of entries) {
+): { intent: ClaimIntent; claimCode: string } | null {
+  const entries = Object.entries(CLAIM_FUNNEL_PATH_SEGMENT) as [ClaimIntent, string][];
+  for (const [intent, segment] of entries) {
     const match = pathname.match(new RegExp(`^/${segment}/(\\d+)(/|$)`));
     if (match?.[1]) {
-      return { app, claimCode: match[1] };
+      return { intent, claimCode: match[1] };
     }
   }
   return null;
@@ -52,12 +68,12 @@ export function detectClaimFunnelPath(
 
 export function detectClaimPending(
   params: URLSearchParams,
-): { app: GertrudeIOSApp; claimCode: string } | null {
-  const entries = Object.entries(CLAIM_PENDING_QUERY_KEY) as [GertrudeIOSApp, string][];
-  for (const [app, key] of entries) {
+): { intent: ClaimIntent; claimCode: string } | null {
+  const entries = Object.entries(CLAIM_PENDING_QUERY_KEY) as [ClaimIntent, string][];
+  for (const [intent, key] of entries) {
     const claimCode = params.get(key);
     if (claimCode) {
-      return { app, claimCode };
+      return { intent, claimCode };
     }
   }
   return null;

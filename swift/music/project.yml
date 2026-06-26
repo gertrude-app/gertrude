@@ -41,6 +41,7 @@ targets:
           API_ENDPOINT: "https://api.gertrude.app"
         Debug:
           ONLY_ACTIVE_ARCH: YES
+          CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES
           PRODUCT_BUNDLE_IDENTIFIER: "com.innocencelabs.gertrude-fm-temp-dev"
           API_ENDPOINT: "${GERTRUDE_MUSIC_DEBUG_API_ENDPOINT}"
     info:

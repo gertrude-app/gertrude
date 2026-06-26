@@ -10,6 +10,7 @@ import type {
   GetAmClaimData,
   GetApprovedMusicAlbums,
   GetBatchUnlockRequestData,
+  GetBlockerClaimData,
   GetChild,
   GetChildren,
   GetDevice,
@@ -154,6 +155,10 @@ export class Key extends QueryKey<never> {
 
   static musicClaimData(code: string): QueryKey<GetMusicClaimData.Output> {
     return new QueryKey(`music-claim-device/:code`, [`music-claim-device`, code]);
+  }
+
+  static blockerClaimData(code: string): QueryKey<GetBlockerClaimData.Output> {
+    return new QueryKey(`blocker-claim-device/:code`, [`blocker-claim-device`, code]);
   }
 
   static supervisionDeviceStatus(
