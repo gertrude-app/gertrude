@@ -2,18 +2,15 @@ import SwiftUI
 
 public struct AlbumArtworkView: View {
   private let artworkUrl: URL?
-  private let showsArtwork: Bool
   private let size: CGFloat
   private let cornerRadius: CGFloat
 
   public init(
     artworkUrl: URL?,
-    showsArtwork: Bool = true,
     size: CGFloat = 148,
     cornerRadius: CGFloat = 20,
   ) {
     self.artworkUrl = artworkUrl
-    self.showsArtwork = showsArtwork
     self.size = size
     self.cornerRadius = cornerRadius
   }
@@ -25,7 +22,6 @@ public struct AlbumArtworkView: View {
   ) {
     self.init(
       artworkUrl: album.artworkUrl,
-      showsArtwork: album.showsArtwork,
       size: size,
       cornerRadius: cornerRadius,
     )
@@ -34,7 +30,6 @@ public struct AlbumArtworkView: View {
   public var body: some View {
     ArtworkImageView(
       artworkUrl: self.artworkUrl,
-      showsArtwork: self.showsArtwork,
       size: self.size,
       cornerRadius: self.cornerRadius,
     )

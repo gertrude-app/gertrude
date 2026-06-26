@@ -27,14 +27,6 @@ let package = Package(
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Tagged", package: "swift-tagged"),
       ],
-      // To re-enable the iOS lock-screen / control-center artwork suppression after App
-      // Review, uncomment the define below. It is compiled out by default so the private
-      // MediaRemote framework symbols (MRMediaRemote*) never enter the shipped binary
-      // (App Store guideline 2.5.1 risk). Also re-enable the dashboard toggle in
-      // web/dash/app/src/components/routes/MusicCuration.tsx.
-      swiftSettings: [
-        // .define("GERTRUDE_MUSIC_NOW_PLAYING_OVERRIDE"),
-      ],
     ),
     .testTarget(
       name: "LibTCATests",

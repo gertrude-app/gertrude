@@ -10,7 +10,7 @@ struct AlbumDetailViewContainer: View {
       AlbumDetailView(
         album: AlbumData(album: self.store.album),
         tracks: self.store.album.tracks.map {
-          TrackData(track: $0, showsArtwork: self.store.album.showsArtwork)
+          TrackData(track: $0)
         },
         transitionSourceID: self.store.transitionSourceID,
         isPlaying: self.store.isPlaying,

@@ -126,7 +126,7 @@ public struct MusicAppConnectionView: View {
     case .checking:
       "Checking connection"
     case .unclaimed:
-      "Connect with a parent"
+      "Connect with account owner"
     case .failed:
       "Couldn’t connect"
     }
@@ -135,9 +135,9 @@ public struct MusicAppConnectionView: View {
   private var message: String {
     switch self.state {
     case .checking:
-      "We’re checking whether this device is connected to a Gertrude parent account."
+      "We’re checking whether this device is connected to a Gertrude account."
     case .unclaimed:
-      "Send this link to a parent so they can connect this device in the Gertrude dashboard."
+      "Send this link to the Gertrude account owner so they can connect this device in the dashboard."
     case .failed:
       "Check your internet connection and try again."
     }

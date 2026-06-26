@@ -85,7 +85,7 @@ public struct PlaybackErrorBanner: View {
     VStack(spacing: 18) {
       PlaybackErrorBanner(
         title: "Apple Music access needed",
-        message: "Allow Gertrude Music to use Apple Music so approved songs can play.",
+        message: "Allow Gertrude Music to use Apple Music so approved music can play.",
         systemImage: "music.note.list",
         actionTitle: "Open Settings",
       )
@@ -106,7 +106,6 @@ public struct PlaybackErrorBanner: View {
         title: PreviewMusicData.nowPlayingTitle,
         artist: PreviewMusicData.nowPlayingArtist,
         artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-        showsArtwork: true,
         artworkTransitionID: nil,
         isPlaying: true,
         isLoading: false,
@@ -139,7 +138,7 @@ public struct PlaybackErrorBanner: View {
 
         PlaybackErrorBanner(
           title: "Apple Music access needed",
-          message: "Allow Gertrude Music to use Apple Music so approved songs can play.",
+          message: "Allow Gertrude Music to use Apple Music so approved music can play.",
           systemImage: "music.note.list",
           actionTitle: "Open Settings",
         )
@@ -152,7 +151,7 @@ public struct PlaybackErrorBanner: View {
   #Preview("Dark") {
     PlaybackErrorBanner(
       title: "Apple Music subscription required",
-      message: "This device needs an active Apple Music subscription to play approved songs.",
+      message: "This device needs an active Apple Music subscription to play approved music.",
       systemImage: "person.crop.circle.badge.exclamationmark",
       actionTitle: "Learn More",
     )

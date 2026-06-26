@@ -23,6 +23,7 @@ struct LibraryFeature: Sendable {
     case approvedLibrarySubscriptionRequired
     case albumTapped(ApprovedAlbum.ID)
     case albumDetailDismissed(String)
+    case debugResetOnboardingButtonTapped
     case delegate(AlbumDetailFeature.Action.DelegateAction)
     case albumDetail(PresentationAction<AlbumDetailFeature.Action>)
   }
@@ -68,7 +69,7 @@ struct LibraryFeature: Sendable {
       case .albumDetail(.presented(.delegate(let delegateAction))):
         return .send(.delegate(delegateAction))
 
-      case .delegate, .albumDetail:
+      case .debugResetOnboardingButtonTapped, .delegate, .albumDetail:
         return .none
       }
     }

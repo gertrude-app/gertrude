@@ -5,17 +5,20 @@ struct AlbumGridView: View {
   private let isLoading: Bool
   private let transitionNamespace: Namespace.ID?
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
+  private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   init(
     albums: [AlbumData],
     isLoading: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.albums = albums
     self.isLoading = isLoading
     self.transitionNamespace = transitionNamespace
     self.onAlbumTap = onAlbumTap
+    self.onDebugResetTap = onDebugResetTap
   }
 
   var body: some View {
@@ -30,6 +33,16 @@ struct AlbumGridView: View {
             .padding(.bottom, self.bottomContentPadding)
         } else {
           self.albumGrid(containerWidth: proxy.size.width)
+
+          #if DEBUG
+            if let onDebugResetTap = self.onDebugResetTap {
+              DebugResetOnboardingButton(onTap: onDebugResetTap)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, self.horizontalPadding)
+                .padding(.top, 4)
+                .padding(.bottom, self.bottomContentPadding)
+            }
+          #endif
         }
       }
       .background(.background)
@@ -61,7 +74,7 @@ struct AlbumGridView: View {
     }
     .padding(.horizontal, self.horizontalPadding)
     .padding(.top, 16)
-    .padding(.bottom, self.bottomContentPadding)
+    .padding(.bottom, self.albumGridBottomPadding)
   }
 
   private func loadingGrid(containerWidth: CGFloat) -> some View {
@@ -90,10 +103,34 @@ struct AlbumGridView: View {
 
   private let bottomContentPadding: CGFloat = 96
 
+  private var albumGridBottomPadding: CGFloat {
+    #if DEBUG
+      self.onDebugResetTap == nil ? self.bottomContentPadding : 8
+    #else
+      self.bottomContentPadding
+    #endif
+  }
+
   private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
     max(148, floor((containerWidth - self.horizontalPadding * 2 - self.columnSpacing) / 2))
   }
 }
+
+#if DEBUG
+  private struct DebugResetOnboardingButton: View {
+    let onTap: @MainActor @Sendable () -> Void
+
+    var body: some View {
+      Button("Reset onboarding", action: self.onTap)
+        .font(.system(size: 12, weight: .semibold, design: .rounded))
+        .buttonStyle(.bordered)
+        .tint(.secondary)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.regularMaterial, in: Capsule())
+    }
+  }
+#endif
 
 private struct AlbumGridEmptyStateView: View {
   var body: some View {
@@ -117,7 +154,7 @@ private struct AlbumGridEmptyStateView: View {
 
 #if DEBUG
   #Preview("Album grid") {
-    AlbumGridView(albums: .previewAlbums)
+    AlbumGridView(albums: .previewAlbums, onDebugResetTap: {})
   }
 
   #Preview("Album grid empty") {

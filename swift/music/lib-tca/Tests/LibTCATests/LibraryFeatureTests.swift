@@ -148,15 +148,11 @@ struct LibraryFeatureTests {
 
 private struct TestError: Error {}
 
-private func playbackItem(
-  _ id: ApprovedTrack.ID,
-  allowsArtwork: Bool = true,
-) -> PlaybackItem {
+private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
   PlaybackItem(
     id: id,
     title: "Track \(id.rawValue)",
     artistName: "Artist",
     artworkURL: nil,
-    allowsArtwork: allowsArtwork,
   )
 }

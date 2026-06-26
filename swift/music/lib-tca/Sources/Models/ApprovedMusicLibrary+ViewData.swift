@@ -7,19 +7,17 @@ extension AlbumData {
       title: album.title,
       artist: album.artistName,
       artworkUrl: album.artworkURL,
-      showsArtwork: album.showsArtwork,
     )
   }
 }
 
 extension TrackData {
-  init(track: ApprovedTrack, showsArtwork: Bool) {
+  init(track: ApprovedTrack) {
     self.init(
       id: track.id.rawValue,
       title: track.title,
       artist: track.artistName,
       artworkUrl: track.artworkURL,
-      showsArtwork: showsArtwork,
     )
   }
 }

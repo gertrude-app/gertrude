@@ -89,13 +89,10 @@ struct PlaybackFeature: Sendable {
       self.items[self.currentIndex]
     }
 
-    var playbackOrder: [PlaybackItem] {
-      guard !self.items.isEmpty else { return [] }
-      return Array(self.items[self.currentIndex...]) + Array(self.items[..<self.currentIndex])
-    }
-
     var upcomingItems: [PlaybackItem] {
-      Array(self.playbackOrder.dropFirst())
+      guard !self.items.isEmpty else { return [] }
+      let nextIndex = self.items.index(after: self.currentIndex)
+      return Array(self.items[nextIndex...]) + Array(self.items[..<self.currentIndex])
     }
 
     mutating func moveToItem(id: ApprovedTrack.ID) -> Bool {
@@ -103,19 +100,6 @@ struct PlaybackFeature: Sendable {
         return false
       }
       return self.moveToIndex(index)
-    }
-
-    mutating func moveToNextItem() -> Bool {
-      guard !self.items.isEmpty else { return false }
-      return self.moveToIndex((self.currentIndex + 1) % self.items.count)
-    }
-
-    mutating func moveToPreviousItem() -> Bool {
-      guard !self.items.isEmpty else { return false }
-      let previousIndex = self.currentIndex == self.items.startIndex
-        ? self.items.index(before: self.items.endIndex)
-        : self.items.index(before: self.currentIndex)
-      return self.moveToIndex(previousIndex)
     }
 
     private mutating func moveToIndex(_ index: Int) -> Bool {
@@ -226,11 +210,10 @@ struct PlaybackFeature: Sendable {
         guard items.indices.contains(startIndex) else { return .none }
         state.failure = nil
         let albumQueue = AlbumQueue(items: items, currentIndex: startIndex)
-        let playbackOrder = albumQueue.playbackOrder
         state.session = .init(playStatus: .loading, albumQueue: albumQueue)
         return .run { send in
           do {
-            try await self.playback.playTracksInOrder(playbackOrder)
+            try await self.playback.playAlbum(items, startIndex)
             await send(.playbackStarted)
           } catch {
             await send(.playbackFailed(.init(error: error)))
@@ -277,36 +260,20 @@ struct PlaybackFeature: Sendable {
 
       case .skipToNext:
         guard state.session != nil else { return .none }
-        if state.moveToNextItem() {
-          return .run { _ in
-            try? await self.playback.skipToNext()
-          }
-        }
-        state.restartCurrentItem()
         return .run { _ in
-          await self.playback.seek(0)
+          try? await self.playback.skipToNext()
         }
-        .cancellable(id: CancelID.seek, cancelInFlight: true)
 
       case .skipToPrevious:
         guard let elapsedTime = state.session?.progress.elapsedTime else { return .none }
         if elapsedTime > 3 {
-          state.restartCurrentItem()
           return .run { _ in
-            await self.playback.seek(0)
-          }
-          .cancellable(id: CancelID.seek, cancelInFlight: true)
-        }
-        if state.moveToPreviousItem() {
-          return .run { _ in
-            try? await self.playback.skipToPrevious()
+            await self.playback.restartCurrentEntry()
           }
         }
-        state.restartCurrentItem()
         return .run { _ in
-          await self.playback.seek(0)
+          try? await self.playback.skipToPrevious()
         }
-        .cancellable(id: CancelID.seek, cancelInFlight: true)
 
       case .stop:
         state.pauseSession()
@@ -363,28 +330,6 @@ extension PlaybackFeature.State {
     guard var session = self.session else { return }
     guard session.albumQueue.moveToItem(id: id) else { return }
     session.progress = .zero
-    self.session = session
-  }
-
-  mutating func moveToNextItem() -> Bool {
-    guard var session = self.session else { return false }
-    guard session.albumQueue.moveToNextItem() else { return false }
-    session.progress = .zero
-    self.session = session
-    return true
-  }
-
-  mutating func moveToPreviousItem() -> Bool {
-    guard var session = self.session else { return false }
-    guard session.albumQueue.moveToPreviousItem() else { return false }
-    session.progress = .zero
-    self.session = session
-    return true
-  }
-
-  mutating func restartCurrentItem() {
-    guard var session = self.session else { return }
-    session.progress = .init(duration: session.progress.duration)
     self.session = session
   }
 }

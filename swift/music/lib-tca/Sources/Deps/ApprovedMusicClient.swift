@@ -35,9 +35,11 @@ extension DependencyValues {
 }
 
 extension ApprovedMusicClient {
-  static let mock = Self(
-    loadApprovedLibrary: { .mock },
-  )
+  #if DEBUG
+    static let mock = Self(
+      loadApprovedLibrary: { .mock },
+    )
+  #endif
 
   static let empty = Self(
     loadApprovedLibrary: { .empty },
@@ -57,7 +59,6 @@ private extension ApprovedAlbum {
       title: album.title,
       artistName: album.artistName,
       artworkURL: album.artworkURL,
-      showsArtwork: album.showsArtwork,
       tracks: album.tracks.map(ApprovedTrack.init),
     )
   }

@@ -31,7 +31,7 @@ targets:
         PRODUCT_NAME: "Gertrude Music"
         DEVELOPMENT_TEAM: "Y63PLK783B"
         CODE_SIGN_STYLE: Automatic
-        MARKETING_VERSION: 0.1.0
+        MARKETING_VERSION: 0.2.0
         CURRENT_PROJECT_VERSION: 1
         ALWAYS_SEARCH_USER_PATHS: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -52,13 +52,31 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)
         API_ENDPOINT: $(API_ENDPOINT)
-        NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved songs.
+        NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved music.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
         UIRequiresFullScreen: true
         UILaunchScreen: {}
+        UIBackgroundModes:
+          - audio
+    postBuildScripts:
+      - name: Add debug local API Info.plist keys
+        script: |
+          if [ "$CONFIGURATION" != "Debug" ]; then
+            exit 0
+          fi
+          case "$API_ENDPOINT" in
+            http://*) ;;
+            *) exit 0 ;;
+          esac
+          plist="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
+          /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" "$plist" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsLocalNetworking true" "$plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true" "$plist"
+          /usr/libexec/PlistBuddy -c "Set :NSLocalNetworkUsageDescription Gertrude Music connects to a local development API while testing." "$plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSLocalNetworkUsageDescription string Gertrude Music connects to a local development API while testing." "$plist"
+        basedOnDependencyAnalysis: false
+        showEnvVars: false
 
 schemes:
   "Gertrude Music":

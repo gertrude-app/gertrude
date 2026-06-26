@@ -18,9 +18,9 @@ struct AppView: View {
           }
         }
         .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
-        .task {
+        .task(id: self.store.setup.isReady) {
+          guard self.store.setup.isReady else { return }
           _ = self.store.send(.playback(.observePlayback))
-          await self.store.send(.onAppear).finish()
         }
     #else
       self.libraryView
@@ -36,23 +36,11 @@ struct AppView: View {
   #if os(iOS)
     @ViewBuilder
     private var iOSContent: some View {
-      switch self.store.connection {
-      case .claimed:
+      if self.store.setup.isReady {
         self.iOSLibraryContent
-      case .checking:
-        MusicAppConnectionView(
-          state: .checking,
-          onRetryTap: { self.store.send(.refreshConnectionTapped) },
-        )
-      case .unclaimed(let code, _):
-        MusicAppConnectionView(
-          state: .unclaimed(code: code),
-          onRetryTap: { self.store.send(.refreshConnectionTapped) },
-        )
-      case .failed:
-        MusicAppConnectionView(
-          state: .failed,
-          onRetryTap: { self.store.send(.refreshConnectionTapped) },
+      } else {
+        MusicSetupViewContainer(
+          store: self.store.scope(state: \.setup, action: \.setup),
         )
       }
     }
@@ -80,17 +68,13 @@ struct AppView: View {
 
     private func nowPlayingBar(showsBackground: Bool) -> some View {
       let session = self.store.playback.session
-      let artworkURL = session?.currentItem.allowsArtwork == true
-        ? session?.currentItem.artworkURL
-        : nil
       return NowPlayingBar(
         title: session?.currentItem.title ?? "Not Playing",
         artist: session?.currentItem.artistName ?? "Choose an approved track",
-        artworkURL: artworkURL,
+        artworkURL: session?.currentItem.artworkURL,
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
-        foregroundColor: .black,
         panelTransitionID: self.nowPlayingPanelTransitionID,
         artworkTransitionID: self.nowPlayingArtworkTransitionID,
         displayMode: .expanded,
@@ -118,7 +102,6 @@ struct AppView: View {
             title: session.currentItem.title,
             artist: session.currentItem.artistName,
             artworkURL: session.currentItem.artworkURL,
-            showsArtwork: session.currentItem.allowsArtwork,
             artworkTransitionID: self.nowPlayingArtworkTransitionID,
             isPlaying: session.isPlaying,
             isLoading: session.isLoading,
@@ -142,7 +125,6 @@ struct AppView: View {
             title: "Not Playing",
             artist: "Choose an approved track",
             artworkURL: nil,
-            showsArtwork: false,
             artworkTransitionID: self.nowPlayingArtworkTransitionID,
             isPlaying: false,
             isLoading: false,

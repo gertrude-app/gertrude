@@ -15,6 +15,7 @@ struct LibraryViewContainer: View {
         transitionNamespace: self.zoomNamespace,
         onRetryTap: { self.store.send(.onAppear) },
         onAlbumTap: { self.store.send(.albumTapped(.init($0))) },
+        onDebugResetTap: { self.store.send(.debugResetOnboardingButtonTapped) },
       )
       .albumDetailZoomPush(
         store: albumDetailStore,

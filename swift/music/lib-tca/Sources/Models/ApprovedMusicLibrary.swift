@@ -22,7 +22,6 @@ struct ApprovedAlbum: Equatable, Identifiable, Sendable {
   let title: String
   let artistName: String
   let artworkURL: URL?
-  let showsArtwork: Bool
   let tracks: [ApprovedTrack]
 
   init(
@@ -30,14 +29,12 @@ struct ApprovedAlbum: Equatable, Identifiable, Sendable {
     title: String,
     artistName: String,
     artworkURL: URL? = nil,
-    showsArtwork: Bool = true,
     tracks: [ApprovedTrack] = [],
   ) {
     self.id = id
     self.title = title
     self.artistName = artistName
     self.artworkURL = artworkURL
-    self.showsArtwork = showsArtwork
     self.tracks = tracks
   }
 }

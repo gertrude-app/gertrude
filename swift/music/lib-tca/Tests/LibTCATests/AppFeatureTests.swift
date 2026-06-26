@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import Foundation
-import MusicRoute
 import Testing
 
 @testable import LibTCA
@@ -19,72 +18,41 @@ struct AppFeatureTests {
   }
 
   @Test
-  func onAppearShowsClaimCodeWhenUnclaimed() async {
-    let expiresAt = Date(timeIntervalSince1970: 123)
-    let store = TestStore(initialState: .init()) {
+  func setupDelegateCompletedIsHandled() async {
+    var state = AppFeature.State()
+    state.setup.screen = .ready(childName: "Harriet")
+    let store = TestStore(initialState: state) {
       AppFeature()
-    } withDependencies: {
-      $0.api.getMusicAppStatus = { .unclaimed(code: 123_456, expiresAt: expiresAt) }
-      $0.keychain._load = { _ in nil }
-      $0.keychain._save = { _, _ in }
-      $0.keychain.delete = { _ in }
     }
 
-    await store.send(.onAppear)
-    await store.receive(.musicAppStatusLoaded(.unclaimed(code: 123_456, expiresAt: expiresAt))) {
-      $0.connection = .unclaimed(code: 123_456, expiresAt: expiresAt)
-    }
+    await store.send(.setup(.delegate(.completed(childName: "Harriet"))))
   }
 
   @Test
-  func onAppearUsesStoredConnectionWhenStatusCheckFails() async throws {
-    let connection = MusicAppConnection(
-      token: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
-      childId: UUID(uuidString: "22222222-2222-2222-2222-222222222222")!,
-      childName: "Harriet",
-    )
-    let connectionData = try JSONEncoder().encode(connection)
-    let store = TestStore(initialState: .init()) {
+  func debugResetOnboardingRotatesDeviceConnectionAndShowsWelcome() async {
+    let item = playbackItem("track-1")
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(.mock)
+    state.playback.session = .init(currentItem: item)
+    state.setup.screen = .ready(childName: "Harriet")
+    let store = TestStore(initialState: state) {
       AppFeature()
     } withDependencies: {
-      $0.api.getMusicAppStatus = { throw TestError.offline }
-      $0.keychain._load = { key in key == .connection ? connectionData : nil }
       $0.keychain._save = { _, _ in }
       $0.keychain.delete = { _ in }
-    }
-
-    await store.send(.onAppear) {
-      $0.connection = .claimed(childName: "Harriet")
-    }
-    await store.receive(.musicAppStatusFailed(hasStoredConnection: true))
-  }
-
-  @Test
-  func onAppearStoresClaimedConnection() async {
-    let token = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-    let childId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
-    let store = TestStore(initialState: .init()) {
-      AppFeature()
-    } withDependencies: {
-      $0.api.getMusicAppStatus = {
-        .claimed(
-          token: token,
-          childId: childId,
-          childName: "Harriet",
-        )
+      $0.playback.stop = {}
+      $0.uuid = UUIDGenerator {
+        UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
       }
-      $0.keychain._load = { _ in nil }
-      $0.keychain._save = { _, _ in }
-      $0.keychain.delete = { _ in }
     }
 
-    await store.send(.onAppear)
-    await store.receive(.musicAppStatusLoaded(.claimed(
-      token: token,
-      childId: childId,
-      childName: "Harriet",
-    ))) {
-      $0.connection = .claimed(childName: "Harriet")
+    await store.send(.library(.debugResetOnboardingButtonTapped)) {
+      $0.isNowPlayingPresented = false
+      $0.library = .init()
+      $0.playback = .init()
+      $0.setup = .init()
+      $0.setup.screen = .welcome
     }
   }
 
@@ -92,7 +60,7 @@ struct AppFeatureTests {
   func libraryPlayAlbumDelegateStartsAlbumQueuePlayback() async {
     let items = [
       playbackItem("track-1"),
-      playbackItem("track-2", allowsArtwork: false),
+      playbackItem("track-2"),
       playbackItem("track-3"),
     ]
     let store = TestStore(initialState: .init()) {
@@ -149,7 +117,6 @@ struct AppFeatureTests {
     let item = PlaybackItem(
       track: track,
       artworkURL: album.artworkURL,
-      allowsArtwork: album.showsArtwork,
     )
     var state = AppFeature.State()
     state.library.status = .loaded(library)
@@ -177,19 +144,11 @@ struct AppFeatureTests {
   }
 }
 
-private enum TestError: Error {
-  case offline
-}
-
-private func playbackItem(
-  _ id: ApprovedTrack.ID,
-  allowsArtwork: Bool = true,
-) -> PlaybackItem {
+private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
   PlaybackItem(
     id: id,
     title: "Track \(id.rawValue)",
     artistName: "Artist",
     artworkURL: nil,
-    allowsArtwork: allowsArtwork,
   )
 }
