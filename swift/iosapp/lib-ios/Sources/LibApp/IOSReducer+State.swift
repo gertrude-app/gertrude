@@ -8,7 +8,6 @@ import TaggedTime
 extension IOSReducer {
   @Reducer
   public enum Destination {
-    case connectAccount(ConnectAccount)
     case info(InfoFeature)
     case crossPromo(CrossPromoFeature)
   }
@@ -43,6 +42,7 @@ extension IOSReducer {
       public var isProfileRecovery: Bool = false
       public var clearCache: ClearCacheFeature.State?
       public var crossPromo: CrossPromoFeature.State?
+      public var connect: ConnectAccount.State?
       public var connectFeature = ConnectAccountFeatureFlag.Output(isEnabled: false)
 
       public init(

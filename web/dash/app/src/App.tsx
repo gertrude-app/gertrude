@@ -11,6 +11,8 @@ import ChildIOSDevicesRoute from './components/routes/ChildIOSDevices';
 import ChildMac from './components/routes/ChildMac';
 import ClaimAmDeviceClaim from './components/routes/ClaimAmDevice/Claim';
 import ClaimAmDeviceDone from './components/routes/ClaimAmDevice/Done';
+import ClaimBlockerDeviceClaim from './components/routes/ClaimBlockerDevice/Claim';
+import ClaimBlockerDeviceDone from './components/routes/ClaimBlockerDevice/Done';
 import ClaimMusicDeviceClaim from './components/routes/ClaimMusicDevice/Claim';
 import ClaimMusicDeviceDone from './components/routes/ClaimMusicDevice/Done';
 import ClaimMusicDevicePayment from './components/routes/ClaimMusicDevice/Payment';
@@ -89,6 +91,14 @@ const App: React.FC = () => {
         </Route>
         <Route path="claim-am-device/:code/claim" element={<ClaimAmDeviceClaim />} />
         <Route path="claim-am-device/:code/done" element={<ClaimAmDeviceDone />} />
+        <Route
+          path="claim-blocker-device/:code/claim"
+          element={<ClaimBlockerDeviceClaim />}
+        />
+        <Route
+          path="claim-blocker-device/:code/done"
+          element={<ClaimBlockerDeviceDone />}
+        />
         <Route
           path="claim-music-device/:code/claim"
           element={<ClaimMusicDeviceClaim />}

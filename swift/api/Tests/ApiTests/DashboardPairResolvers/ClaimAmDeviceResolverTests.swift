@@ -29,7 +29,8 @@ final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     let updated = try await self.db.find(device.id)
     expect(updated.childId).toEqual(children[0].id)
-    expect(updated.claimedAt).not.toBeNil()
+    let claim = try await Claim.find(code: code, in: self.db)
+    expect(claim?.claimedAt).not.toBeNil()
 
     let install = try await device.podcastInstall(in: self.db)
     let createdAt = try XCTUnwrap(install?.createdAt)
@@ -94,18 +95,19 @@ final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testClaimByDifferentParent_throwsCodeNotFound() async throws {
     let otherParent = try await self.parent()
     let otherChild = try await self.db.create(Child.random { $0.parentId = otherParent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = otherChild.id
-      $0.claimCode = code
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = otherChild.id })
+    let claim = try await self.createClaim(
+      .podcasts,
+      device.id,
+      otherChild.id,
+      claimedAt: .reference,
+    )
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
     let parent = try await self.parent()
 
     try await expectErrorFrom {
       try await ClaimAmDevice.resolve(
-        with: .init(code: code, child: .newChild(name: "Test")),
+        with: .init(code: claim.code, child: .newChild(name: "Test")),
         in: parent.context,
       )
     }.toContain("not found")
@@ -115,10 +117,8 @@ final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 extension ClaimAmDeviceResolverTests {
   @discardableResult
   private func unclaimedAmDevice(code: Int) async throws -> IOSDevice {
-    let device = try await self.db.create(IOSDevice.random {
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-    })
+    let device = try await self.db.create(IOSDevice.random)
+    try await self.createClaim(.podcasts, device.id, code: code)
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
     return device
   }

@@ -24,10 +24,10 @@ struct ClaimAmDevice: Pair {
 extension ClaimAmDevice: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     try await claimDevice(
-      for: .podcasts,
+      intent: .podcasts,
       code: input.code,
       child: input.child,
-      baseId: "894c4af3", // 894c4af3-1, 894c4af3-2, 894c4af3-3
+      baseId: "894c4af3", // 894c4af3-1, 894c4af3-2, 894c4af3-3, 894c4af3-4
       in: context,
       onResume: { device, child in
         try await self.output(device: device, child: child, code: input.code, in: context)

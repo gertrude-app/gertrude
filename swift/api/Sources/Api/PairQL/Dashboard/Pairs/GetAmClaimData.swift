@@ -30,8 +30,8 @@ extension GetAmClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     try await resolveClaimData(
       code: input.code,
-      app: .podcasts,
-      baseId: "50c00d4d", // 50c00d4d-1, 50c00d4d-2, 50c00d4d-3
+      intent: .podcasts,
+      baseId: "50c00d4d", // 50c00d4d-1, 50c00d4d-2, 50c00d4d-3, 50c00d4d-4
       in: context,
       onResume: { device, child in
         guard let install = try await device.podcastInstall(in: context.db) else {

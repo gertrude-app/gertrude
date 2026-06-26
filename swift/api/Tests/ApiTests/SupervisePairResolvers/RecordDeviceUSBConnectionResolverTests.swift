@@ -9,13 +9,13 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
   func testHappyPath_setsUdidAndInsertsEvent() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference + .days(7)
-      $0.claimedAt = .reference
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      claimedAt: .reference,
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     _ = try await withDependencies {
@@ -23,7 +23,7 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
     } operation: {
       try await RecordDeviceUSBConnection.resolve(
         with: .init(
-          code: code,
+          code: claim.code,
           udid: "00008030-001234567890802E",
           modelIdentifier: device.modelIdentifier,
         ),
@@ -58,13 +58,14 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
   func testClaimedExpiredCode_renewsAndRecordsConnection() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
-    let device = try await self.db.create(IOSDevice.random {
-      $0.childId = child.id
-      $0.claimCode = code
-      $0.claimCodeExpiresAt = .reference - .days(1) // <-- expired
-      $0.claimedAt = .reference - .days(8)
-    })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      expiresAt: .reference - .days(1), // <-- expired
+      claimedAt: .reference - .days(8),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     _ = try await withDependencies {
@@ -72,7 +73,7 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
     } operation: {
       try await RecordDeviceUSBConnection.resolve(
         with: .init(
-          code: code,
+          code: claim.code,
           udid: "fake-udid",
           modelIdentifier: device.modelIdentifier,
         ),
@@ -80,10 +81,8 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
       )
     }
 
-    let updatedDevice = try await IOSDevice.query()
-      .where(.id == device.id)
-      .first(in: self.db)
-    expect(updatedDevice.claimCodeExpiresAt).toEqual(.reference + .days(21))
+    let updatedClaim = try await Claim.find(code: claim.code, in: self.db)
+    expect(updatedClaim?.expiresAt).toEqual(.reference + .days(21)) // renewed
 
     let updatedSupervision = try await device.supervision(in: self.db)
     expect(updatedSupervision?.udid).toEqual("fake-udid")

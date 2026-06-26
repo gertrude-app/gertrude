@@ -21,7 +21,7 @@ extension ReportSupervisionFailed: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "e29b7f89", // e29b7f89-1, e29b7f89-2, e29b7f89-3
+      baseId: "e29b7f89", // e29b7f89-1, e29b7f89-2, e29b7f89-3, e29b7f89-4, e29b7f89-5
       in: context,
     )
 

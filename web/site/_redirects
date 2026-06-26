@@ -113,6 +113,7 @@
 /iosapp-connect-help https://gertrude.app/docs/ios-account-connection-help 302
 /s/:code https://api.gertrude.app/claim-pending-supervision/:code 302
 /a/:code https://api.gertrude.app/claim-pending-am/:code 302
+/b/:code https://api.gertrude.app/claim-pending-blocker/:code 302
 /m/:code https://api.gertrude.app/claim-pending-music/:code 302
 /u/:shortid https://api.gertrude.app/short-url/:shortid 302
 

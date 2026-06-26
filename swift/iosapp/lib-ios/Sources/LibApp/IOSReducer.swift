@@ -56,6 +56,9 @@ public struct IOSReducer {
     .ifLet(\.onboarding.crossPromo, action: \.interactive.onboardingCrossPromo) {
       CrossPromoFeature()
     }
+    .ifLet(\.onboarding.connect, action: \.interactive.onboardingConnect) {
+      ConnectAccount()
+    }
   }
 
   func interactive(state: inout State, action: Action.Interactive) -> EffectOf<IOSReducer> {
@@ -115,6 +118,21 @@ public struct IOSReducer {
       return self.closeOnboardingCrossPromo(&state, event: .dismiss, ctaSlot: nil)
 
     case .onboardingCrossPromo:
+      return .none
+
+    case .onboardingConnect(.connectionSucceeded(childData: let conn)):
+      state.onboarding.connect = nil
+      state.screen = .onboarding(.happyPath(.connectSuccess))
+      self.deps.sharedStorage.clearPendingSupervisionCode()
+      return .run { [deps = self.deps] _ in
+        await deps.receiveAccountConnection(conn)
+      }
+
+    case .onboardingConnect(.cancelTapped):
+      state.onboarding.connect = nil
+      return .none
+
+    case .onboardingConnect:
       return .none
 
     case .receivedShake:
@@ -237,7 +255,7 @@ public struct IOSReducer {
 
     case (.onboarding(.happyPath(.offerAccountConnect)), .primary):
       self.deps.log(state.screen, action, "b93bb543")
-      state.destination = .connectAccount(.init())
+      state.onboarding.connect = .init()
       return .none
 
     case (.onboarding(.happyPath(.offerAccountConnect)), .secondary):
@@ -1012,18 +1030,12 @@ public struct IOSReducer {
 
   func destination(state: inout State, action: Destination.Action) -> EffectOf<IOSReducer> {
     switch action {
-    case .connectAccount(.connectionSucceeded(childData: let conn)):
-      state.screen = .onboarding(.happyPath(.connectSuccess))
-      self.deps.sharedStorage.clearPendingSupervisionCode()
-      return .run { [deps = self.deps] _ in
-        await deps.receiveAccountConnection(conn)
-      }
     case .crossPromo(.delegate(.ctaTapped(let slot))):
-      return self.closeCrossPromo(&state, event: .cta, ctaSlot: slot)
+      self.closeCrossPromo(&state, event: .cta, ctaSlot: slot)
     case .crossPromo(.delegate(.dismissed)):
-      return self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
+      self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
     default:
-      return .none
+      .none
     }
   }
 }

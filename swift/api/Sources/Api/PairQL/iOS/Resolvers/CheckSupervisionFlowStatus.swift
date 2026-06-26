@@ -5,22 +5,23 @@ import Vapor
 
 extension CheckSupervisionFlowStatus: Resolver {
   static func resolve(with input: Input, in ctx: Context) async throws -> Output {
-    let device = try? await IOSDevice.query()
-      .where(.claimCode == input.code)
-      .first(in: ctx.db)
-
-    guard var device else {
+    guard var claim = try await Claim.find(code: input.code, in: ctx.db) else {
       return .notFound
     }
+    let device = try await claim.device(in: ctx.db)
 
     if device.id.rawValue != input.vendorId {
       logIOSUnusual("233c41a8", "vendorId mismatch, c=\(input.code), v=\(input.vendorId)")
       return .notFound
     }
 
+    if claim.intent != .blockerSupervise {
+      logIOSUnusual("e7b25c80", "intent mismatch, c=\(input.code), intent=\(claim.intent)")
+      return .notFound
+    }
+
     guard let childId = device.childId else {
-      if let expiresAt = device.claimCodeExpiresAt,
-         expiresAt < get(dependency: \.date.now) {
+      if claim.expiresAt < get(dependency: \.date.now) {
         logIOSUnusual("92fe7bb1", "expired, code=\(input.code)")
         return .expired
       }
@@ -32,18 +33,13 @@ extension CheckSupervisionFlowStatus: Resolver {
       return .notFound
     }
 
-    try await device.renewPendingClaimCode(in: ctx.db, supervision: supervision)
+    try await claim.renewIfPendingSupervision(supervision: supervision, in: ctx.db)
 
     let install = try await device.blockerInstall(in: ctx.db)
-    let token: BlockerApp.Token
-    let existingToken = try? await BlockerApp.Token.query()
-      .where(.installId == install.id)
-      .first(in: ctx.db)
-    if let existingToken {
-      token = existingToken
-    } else {
-      token = try await ctx.db.create(BlockerApp.Token(installId: install.id))
-    }
+    let token = try await ctx.db.findOrCreate(
+      BlockerApp.Token(installId: install.id),
+      conflictOn: [.installId],
+    )
 
     let data = ChildIOSDeviceData_v2(
       childId: child.id.rawValue,

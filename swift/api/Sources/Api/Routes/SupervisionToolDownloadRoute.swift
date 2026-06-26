@@ -14,9 +14,12 @@ enum SupervisionToolDownloadRoute {
       throw Abort(.badRequest, reason: "Invalid platform (must be 'mac' or 'windows')")
     }
 
-    guard let device = try? await IOSDevice.query()
-      .where(.claimCode == code)
-      .first(in: request.context.db) else {
+    guard let claim = try await Claim.find(code: code, in: request.context.db) else {
+      throw Abort(.notFound, reason: "Device not found for claim code")
+    }
+    let device = try await claim.device(in: request.context.db)
+
+    guard claim.intent == .blockerSupervise else {
       throw Abort(.notFound, reason: "Device not found for claim code")
     }
 

@@ -2,6 +2,7 @@ import {
   DeviceContextBanner,
   EmailInputForm,
   FullscreenModalForm,
+  claimIntentApp,
   detectClaimPending,
 } from '@dash/components';
 import React, { useState } from 'react';
@@ -20,7 +21,8 @@ const Signup: React.FC = () => {
   const queryString = window.location.search;
   const pendingClaim = detectClaimPending(new URLSearchParams(queryString));
   const claimCode = pendingClaim?.claimCode;
-  const app = pendingClaim?.app;
+  const intent = pendingClaim?.intent;
+  const app = intent ? claimIntentApp(intent) : undefined;
   const modelName = getQueryParam(`modelName`);
   const iosVersion = getQueryParam(`iosVersion`);
   const signup = useMutation(
@@ -33,7 +35,7 @@ const Signup: React.FC = () => {
         referralCode: getQueryParam(`ref`) ?? getCookieValue(`referral_code`),
         turnstileToken: turnstileToken ?? undefined,
         claimCode,
-        app,
+        intent,
       }),
     { onSuccess: ({ admin }) => admin && login(admin.adminId, admin.token) },
   );

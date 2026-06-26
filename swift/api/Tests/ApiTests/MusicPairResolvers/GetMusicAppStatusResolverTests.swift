@@ -52,8 +52,10 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
     let device = try await self.db.find(IOSDevice.Id(deviceId))
     expect(device.modelIdentifier).toEqual("iPhone15,2")
     expect(device.iosVersion).toEqual("18.2")
-    expect(device.claimCode).toEqual(code)
-    expect(device.claimCodeExpiresAt).toEqual(.reference + .days(7))
+    let claim = try await Claim.find(code: code, in: self.db)
+    expect(claim?.intent).toEqual(.music)
+    expect(claim?.deviceId).toEqual(device.id)
+    expect(claim?.expiresAt).toEqual(.reference + .days(7))
 
     let install = try await MusicApp.Install.query()
       .where(.deviceId == device.id)
@@ -98,8 +100,14 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
+    try await self.createClaim(
+      .music,
+      device.id,
+      child.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
     let output = try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
@@ -128,8 +136,14 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
+    try await self.createClaim(
+      .music,
+      device.id,
+      child.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
     let install = try await self.db.create(
       MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
     )

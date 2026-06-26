@@ -59,15 +59,23 @@
         childId: luke.id,
         modelIdentifier: "iPhone16,1",
         iosVersion: "26.2",
-        claimCode: 123_456,
-        claimCodeExpiresAt: Date() + .days(30),
+      ))
+
+      try await db.create(Claim(
+        code: 123_456,
+        intent: .blockerSupervise,
+        deviceId: device.id,
+        childId: luke.id,
+        expiresAt: Date() + .days(30),
         claimedAt: Date() - .days(7),
       ))
 
-      try await db.create(BlockerApp.Install(
+      let install = try await db.create(BlockerApp.Install(
         deviceId: device.id,
         appVersion: "1.7.0",
       ))
+
+      try await db.create(BlockerApp.Token(installId: install.id))
 
       try await db.create(BlockerApp.Supervision(
         deviceId: device.id,

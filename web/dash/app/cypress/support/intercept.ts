@@ -15,6 +15,10 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `ClaimAmDevice`, output: T.ClaimAmDevice.Output): void;
 export function interceptPql(
+  slug: `ClaimBlockerDevice`,
+  output: T.ClaimBlockerDevice.Output,
+): void;
+export function interceptPql(
   slug: `ClaimIOSDevice`,
   output: T.ClaimIOSDevice.Output,
 ): void;
@@ -82,6 +86,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
   output: T.GetBatchUnlockRequestData.Output,
+): void;
+export function interceptPql(
+  slug: `GetBlockerClaimData`,
+  output: T.GetBlockerClaimData.Output,
 ): void;
 export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
@@ -243,6 +251,7 @@ export function forcePqlErr(
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimAmDevice`
+    | `ClaimBlockerDevice`
     | `ClaimIOSDevice`
     | `ClaimMusicDevice`
     | `CombinedUsersActivityFeed`
@@ -261,6 +270,7 @@ export function forcePqlErr(
     | `GetAmClaimData`
     | `GetApprovedMusicAlbums`
     | `GetBatchUnlockRequestData`
+    | `GetBlockerClaimData`
     | `GetChild`
     | `GetChildren`
     | `GetDevice`

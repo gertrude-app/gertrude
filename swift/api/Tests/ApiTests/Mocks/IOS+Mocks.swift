@@ -1,7 +1,29 @@
+import Dependencies
 import Foundation
 import Gertie
 
 @testable import Api
+
+extension ApiTestCase {
+  @discardableResult
+  func createClaim(
+    _ intent: ClaimIntent,
+    _ deviceId: IOSDevice.Id,
+    _ childId: Child.Id? = nil,
+    code: Int = Int.random(in: 100_000 ... 999_999),
+    expiresAt: Date = .reference + .days(7),
+    claimedAt: Date? = nil,
+  ) async throws -> Claim {
+    try await self.db.create(Claim(
+      code: code,
+      intent: intent,
+      deviceId: deviceId,
+      childId: childId,
+      expiresAt: expiresAt,
+      claimedAt: claimedAt,
+    ))
+  }
+}
 
 extension IOSDevice: RandomMocked {
   public static var mock: IOSDevice {

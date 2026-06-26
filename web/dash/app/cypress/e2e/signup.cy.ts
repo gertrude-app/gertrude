@@ -111,7 +111,7 @@ describe(`logged-out claim deep-link bounce`, () => {
 
     cy.wait(`@Signup`) // claim context must reach the signup payload
       .its(`request.body`)
-      .should(`include`, { claimCode: `778899`, app: `podcasts` });
+      .should(`include`, { claimCode: `778899`, intent: `podcasts` });
     cy.contains(`Verification email sent`);
   });
 
@@ -137,7 +137,7 @@ describe(`logged-out claim deep-link bounce`, () => {
 
     cy.wait(`@Signup`)
       .its(`request.body`)
-      .should(`include`, { claimCode: `123456`, app: `blocker` });
+      .should(`include`, { claimCode: `123456`, intent: `blockerSupervise` });
     cy.contains(`Verification email sent`);
   });
 });
@@ -190,7 +190,7 @@ describe(`verify-signup-email post-verify routing`, () => {
       adminId: `admin-123`,
       token: `token-123`,
       claimCode: `778899`,
-      claimApp: `podcasts`,
+      claimIntent: `podcasts`,
     });
     cy.interceptPql(`GetAmClaimData`, {
       children: [],

@@ -5,146 +5,51 @@ import SwiftUI
 
 struct ConnectingView: View {
   @Bindable var store: StoreOf<ConnectAccount>
-  let infoBlurb: String?
-
-  var body: some View {
-    switch self.store.state.screen {
-    case .enteringCode:
-      EnterCodeView(infoBlurb: self.infoBlurb) {
-        self.store.send(.codeSubmitted($0))
-      }
-    case .connected(childName: let childName):
-      ConnectedStateView(childName: childName)
-    case .connecting:
-      ConnectingStateView()
-    case .connectionFailed(error: let error):
-      ConnectionFailedView(error: error)
-    }
-  }
-}
-
-struct EnterCodeView: View {
   @Environment(\.colorScheme) var cs
-  @FocusState private var isFocused: Bool
-  @State private var input: String = ""
-  @State private var showBg = false
-  @State private var titleOffset = Vector(x: 0, y: 20)
-  @State private var descriptionOffset = Vector(x: 0, y: 20)
-  @State private var inputOffset = Vector(x: 0, y: 20)
-  @State private var buttonOffset = Vector(x: 0, y: 20)
-  @State private var helpButtonOffset = Vector(x: 0, y: 20)
-
   let infoBlurb: String?
-  let submit: (Int) -> Void
+  let deviceType: String
 
-  var code: Int? {
-    guard let code = Int(self.input) else { return nil }
-    return code >= 100_000 && code <= 999_999 ? code : nil
-  }
-
-  var codeIsValid: Bool {
-    self.code != nil
+  var showsBackButton: Bool {
+    if case .connected = self.store.state.screen { false } else { true }
   }
 
   var body: some View {
     ZStack {
-      Color(self.cs, light: .violet100, dark: .violet950.opacity(0.4))
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.5)) {
-            self.showBg = true
-          }
-        }
-
-      VStack(spacing: 20) {
-        Spacer()
-
-        VStack(spacing: 16) {
-          Text("Connect device")
-            .font(.system(size: 28, weight: .bold))
-            .multilineTextAlignment(.center)
-            .swooshIn(
-              tracking: self.$titleOffset,
-              to: .zero,
-              after: .zero,
-              for: .seconds(0.6),
-            )
-
-          Text(
-            self.infoBlurb ??
-              "Enter a 6-digit connection code from the Gertrude parents website for the child you want to protect:",
-          )
-          .font(.system(size: 16, weight: .medium))
-          .multilineTextAlignment(.center)
-          .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
-          .swooshIn(
-            tracking: self.$descriptionOffset,
-            to: .zero,
-            after: .seconds(0.1),
-            for: .seconds(0.6),
-          )
-        }
-        .padding(.horizontal, 30)
-
-        VStack(spacing: 16) {
-          TextField("Enter 6-digit code", text: self.$input)
-            .keyboardType(.numberPad)
-            .focused(self.$isFocused)
-            .font(.system(size: 18, weight: .medium))
-            .multilineTextAlignment(.center)
-            .padding(16)
-            .background(Color(self.cs, light: .white, dark: .white.opacity(0.1)))
-            .cornerRadius(12)
-            .overlay {
-              RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                  Color(self.cs, light: .violet300, dark: .violet700.opacity(0.5)),
-                  lineWidth: 2,
-                )
-            }
-            .swooshIn(
-              tracking: self.$inputOffset,
-              to: .zero,
-              after: .seconds(0.2),
-              for: .seconds(0.6),
-            )
-
-          BigButton(
-            "Connect device",
-            type: .button { self.submit(self.code ?? 111_111) },
-            disabled: !self.codeIsValid,
-          )
-          .swooshIn(
-            tracking: self.$buttonOffset,
-            to: .zero,
-            after: .seconds(0.3),
-            for: .seconds(0.6),
-          )
-
-          BigButton(
-            "Help me find the code...",
-            type: .link(URL(string: "https://gertrude.app/iosapp-connect-help")!),
-            variant: .secondary,
-          )
-          .swooshIn(
-            tracking: self.$helpButtonOffset,
-            to: .zero,
-            after: .seconds(0.4),
-            for: .seconds(0.6),
-          )
-        }
-        .padding(.horizontal, 30)
-
-        Spacer()
+      switch self.store.state.screen {
+      case .generatingCode:
+        GeneratingCodeView()
+          .transition(.opacity)
+      case .showingCode(code: let code):
+        ShowCodeView(code: code, infoBlurb: self.infoBlurb, deviceType: self.deviceType)
+          .transition(.opacity)
+      case .codeGenerationFailed:
+        CodeGenerationFailedView { self.store.send(.retryTapped) }
+          .transition(.opacity)
+      case .connected(childName: let childName):
+        ConnectedStateView(childName: childName)
+          .transition(.opacity)
       }
-      .frame(maxWidth: 500)
-      .onAppear { self.isFocused = true }
     }
+    .animation(.smooth(duration: 0.4), value: self.store.state.screen)
+    .overlay(alignment: .topLeading) {
+      if self.showsBackButton {
+        Button {
+          self.store.send(.cancelTapped)
+        } label: {
+          Image(systemName: "chevron.left")
+            .font(.system(size: 18, weight: .semibold))
+            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+            .padding(12)
+        }
+        .padding(.leading, 8)
+        .padding(.top, 8)
+      }
+    }
+    .onAppear { self.store.send(.onAppear) }
   }
 }
 
-struct ConnectingStateView: View {
+struct GeneratingCodeView: View {
   @Environment(\.colorScheme) var cs
   @State private var showBg = false
 
@@ -164,10 +69,128 @@ struct ConnectingStateView: View {
           .scaleEffect(1.5)
           .tint(Color(self.cs, light: .violet500, dark: .violet400))
 
-        Text("Connecting...")
+        Text("Generating code...")
           .font(.system(size: 20, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
       }
+    }
+  }
+}
+
+struct ShowCodeView: View {
+  @Environment(\.colorScheme) var cs
+  @State private var showBg = false
+  @State private var iconOffset = Vector(x: 0, y: -20)
+  @State private var blurbOffset = Vector(x: 0, y: 20)
+  @State private var urlOffset = Vector(x: 0, y: 20)
+  @State private var showWaiting = false
+  @State private var sendBtnOffset = Vector(x: 0, y: 20)
+  @State private var helpBtnOffset = Vector(x: 0, y: 20)
+
+  let code: Int
+  let infoBlurb: String?
+  let deviceType: String
+
+  var codeString: String {
+    String(format: "%06d", self.code)
+  }
+
+  var connectUrl: String {
+    "https://gertrude.app/b/\(self.codeString)"
+  }
+
+  var body: some View {
+    ZStack {
+      Rectangle()
+        .fill(
+          Gradient(colors: [
+            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
+            .clear,
+          ]),
+        )
+        .ignoresSafeArea()
+        .opacity(self.showBg ? 1 : 0)
+        .onAppear {
+          withAnimation(.smooth(duration: 0.7)) {
+            self.showBg = true
+          }
+        }
+
+      VStack(alignment: .leading, spacing: 16) {
+        Image(systemName: "link.circle")
+          .font(.system(size: 40, weight: .regular))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .milliseconds(800))
+          .frame(maxWidth: .infinity, alignment: .center)
+
+        Spacer()
+
+        Text(
+          self.infoBlurb ??
+            "Open this link on YOUR phone or computer (not this \(self.deviceType)) to connect to a Gertrude account:",
+        )
+        .font(.system(size: 18, weight: .medium))
+        .swooshIn(tracking: self.$blurbOffset, to: .zero, after: .zero, for: .milliseconds(800))
+
+        Text(self.connectUrl)
+          .font(.system(size: 20, weight: .semibold, design: .monospaced))
+          .minimumScaleFactor(0.7)
+          .lineLimit(1)
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.vertical, 8)
+          .swooshIn(
+            tracking: self.$urlOffset,
+            to: .zero,
+            after: .milliseconds(100),
+            for: .milliseconds(800),
+          )
+
+        HStack(spacing: 12) {
+          ProgressView()
+            .tint(Color(self.cs, light: .violet500, dark: .violet400))
+          Text("Watching for connection…")
+            .font(.system(size: 15, weight: .medium))
+            .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+        .opacity(self.showWaiting ? 1 : 0)
+        .task {
+          try? await Task.sleep(for: .seconds(45))
+          withAnimation(.smooth(duration: 0.5)) { self.showWaiting = true }
+        }
+
+        Spacer()
+          .frame(height: 40)
+
+        BigButton(
+          "Send link",
+          type: .share(self.connectUrl),
+          variant: .primary,
+          icon: "square.and.arrow.up",
+        )
+        .swooshIn(
+          tracking: self.$sendBtnOffset,
+          to: .zero,
+          after: .milliseconds(300),
+          for: .milliseconds(800),
+        )
+
+        BigButton(
+          "Help me connect...",
+          type: .link(URL(string: "https://gertrude.app/iosapp-connect-help")!),
+          variant: .secondary,
+        )
+        .swooshIn(
+          tracking: self.$helpBtnOffset,
+          to: .zero,
+          after: .milliseconds(400),
+          for: .milliseconds(800),
+        )
+      }
+      .frame(maxWidth: 500)
+      .padding(30)
+      .padding(.top, 50)
     }
   }
 }
@@ -224,13 +247,14 @@ struct ConnectedStateView: View {
   }
 }
 
-struct ConnectionFailedView: View {
+struct CodeGenerationFailedView: View {
   @Environment(\.colorScheme) var cs
   @State private var showBg = false
   @State private var iconOffset = Vector(x: 0, y: 20)
   @State private var textOffset = Vector(x: 0, y: 20)
+  @State private var buttonOffset = Vector(x: 0, y: 20)
 
-  let error: String
+  let retry: () -> Void
 
   var body: some View {
     ZStack {
@@ -255,11 +279,11 @@ struct ConnectionFailedView: View {
           )
 
         VStack(spacing: 8) {
-          Text("Connection failed")
+          Text("Couldn't generate a code")
             .font(.system(size: 24, weight: .bold))
             .multilineTextAlignment(.center)
 
-          Text(self.error)
+          Text("Please check your internet connection and try again.")
             .font(.system(size: 16, weight: .medium))
             .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
             .multilineTextAlignment(.center)
@@ -270,46 +294,48 @@ struct ConnectionFailedView: View {
           after: .seconds(0.1),
           for: .seconds(0.6),
         )
+
+        BigButton("Try again", type: .button { self.retry() })
+          .padding(.horizontal, 30)
+          .swooshIn(
+            tracking: self.$buttonOffset,
+            to: .zero,
+            after: .seconds(0.2),
+            for: .seconds(0.6),
+          )
       }
       .padding(.horizontal, 30)
     }
   }
 }
 
-#Preview("Enter code") {
+#Preview("Generating code") {
   ConnectingView(
-    store: .init(initialState: .init(screen: .enteringCode)) {
+    store: .init(initialState: .init(screen: .generatingCode)) {
       ConnectAccount()
     },
     infoBlurb: nil,
+    deviceType: "iPhone",
   )
 }
 
-#Preview("Enter code (dark)") {
+#Preview("Showing code") {
   ConnectingView(
-    store: .init(initialState: .init(screen: .enteringCode)) {
+    store: .init(initialState: .init(screen: .showingCode(code: 123_456))) {
       ConnectAccount()
     },
     infoBlurb: nil,
-  )
-  .preferredColorScheme(.dark)
-}
-
-#Preview("Connecting") {
-  ConnectingView(
-    store: .init(initialState: .init(screen: .connecting)) {
-      ConnectAccount()
-    },
-    infoBlurb: nil,
+    deviceType: "iPhone",
   )
 }
 
-#Preview("Connecting (dark)") {
+#Preview("Showing code (dark)") {
   ConnectingView(
-    store: .init(initialState: .init(screen: .connecting)) {
+    store: .init(initialState: .init(screen: .showingCode(code: 123_456))) {
       ConnectAccount()
     },
     infoBlurb: nil,
+    deviceType: "iPhone",
   )
   .preferredColorScheme(.dark)
 }
@@ -320,38 +346,16 @@ struct ConnectionFailedView: View {
       ConnectAccount()
     },
     infoBlurb: nil,
+    deviceType: "iPhone",
   )
 }
 
-#Preview("Connected (dark)") {
+#Preview("Code generation failed") {
   ConnectingView(
-    store: .init(initialState: .init(screen: .connected(childName: "Emma"))) {
+    store: .init(initialState: .init(screen: .codeGenerationFailed)) {
       ConnectAccount()
     },
     infoBlurb: nil,
+    deviceType: "iPhone",
   )
-  .preferredColorScheme(.dark)
-}
-
-#Preview("Connection failed") {
-  ConnectingView(
-    store: .init(initialState: .init(screen: .connectionFailed(
-      error: "Invalid code. Please check the code and try again.",
-    ))) {
-      ConnectAccount()
-    },
-    infoBlurb: nil,
-  )
-}
-
-#Preview("Connection failed (dark)") {
-  ConnectingView(
-    store: .init(initialState: .init(screen: .connectionFailed(
-      error: "Invalid code. Please check the code and try again.",
-    ))) {
-      ConnectAccount()
-    },
-    infoBlurb: nil,
-  )
-  .preferredColorScheme(.dark)
 }

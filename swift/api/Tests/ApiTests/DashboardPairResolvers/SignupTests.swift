@@ -46,7 +46,7 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
 
   func testSignupWithAmClaimBakesFunnelRedirectIntoEmail() async throws {
     let email = "signup".random + "@example.com"
-    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .podcasts)
+    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", intent: .podcasts)
     _ = try await Signup.resolve(with: input, in: self.context)
 
     expect(sent.emails.count).toEqual(1)
@@ -57,7 +57,7 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
 
   func testSignupWithClaimMintsAppAwareVerificationToken() async throws {
     let email = "signup".random + "@example.com"
-    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .podcasts)
+    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", intent: .podcasts)
     _ = try await Signup.resolve(with: input, in: self.context)
 
     let parent = try await Parent.query()
@@ -66,12 +66,17 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
     let token = UUID(uuidString: sent.emails[0].templateModel["token"] ?? "")!
     let retrieved = await with(dependency: \.ephemeral).parentIdFromToken(token)
 
-    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimApp: .podcasts))
+    expect(retrieved).toEqual(.notExpired(parent.id, claimCode: "123456", claimIntent: .podcasts))
   }
 
   func testSignupWithBlockerClaimBakesSupervisionRedirectIntoEmail() async throws {
     let email = "signup".random + "@example.com"
-    let input = Signup.Input(email: email, password: "pass", claimCode: "123456", app: .blocker)
+    let input = Signup.Input(
+      email: email,
+      password: "pass",
+      claimCode: "123456",
+      intent: .blockerSupervise,
+    )
     _ = try await Signup.resolve(with: input, in: self.context)
 
     expect(sent.emails.count).toEqual(1)

@@ -14,12 +14,19 @@ extension CreateSupervisionClaimCode: Resolver {
       appVersion: input.appVersion,
       in: ctx.db,
     )
-    var device = try await install.device(in: ctx.db)
-    if try await device.supervision(in: ctx.db) == nil {
-      _ = try await ctx.db.create(BlockerApp.Supervision(deviceId: device.id))
+    let device = try await install.device(in: ctx.db)
+    var supervision = try await device.supervision(in: ctx.db)
+    if supervision == nil {
+      supervision = try await ctx.db.create(BlockerApp.Supervision(deviceId: device.id))
     }
 
-    let claimCode = try await device.ensureClaimCode(for: .blocker, in: ctx.db)
-    return Output(code: claimCode.code, expiresAt: claimCode.expiresAt)
+    if var claimed = try await Claim.find(device.id, intent: .blockerSupervise, in: ctx.db),
+       claimed.claimedAt != nil, supervision?.supervisedAt == nil {
+      try await claimed.renewIfPendingSupervision(supervision: supervision, in: ctx.db)
+      return Output(code: claimed.code, expiresAt: claimed.expiresAt)
+    }
+
+    let claim = try await device.ensureClaim(intent: .blockerSupervise, in: ctx.db)
+    return Output(code: claim.code, expiresAt: claim.expiresAt)
   }
 }

@@ -188,8 +188,14 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       childId: child.model.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
+    try await self.createClaim(
+      .music,
+      device.id,
+      child.model.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
     let install = try await self.db.create(
       MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
     )

@@ -42,6 +42,12 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.ClaimAmDevice.Output>(input, `ClaimAmDevice`, `parent`);
   };
 
+  public claimBlockerDevice = (
+    input: P.ClaimBlockerDevice.Input,
+  ): Promise<Result<P.ClaimBlockerDevice.Output>> => {
+    return this.query<P.ClaimBlockerDevice.Output>(input, `ClaimBlockerDevice`, `parent`);
+  };
+
   public claimIOSDevice = (
     input: P.ClaimIOSDevice.Input,
   ): Promise<Result<P.ClaimIOSDevice.Output>> => {
@@ -182,6 +188,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetBatchUnlockRequestData.Output>(
       input,
       `GetBatchUnlockRequestData`,
+      `parent`,
+    );
+  };
+
+  public getBlockerClaimData = (
+    input: P.GetBlockerClaimData.Input,
+  ): Promise<Result<P.GetBlockerClaimData.Output>> => {
+    return this.query<P.GetBlockerClaimData.Output>(
+      input,
+      `GetBlockerClaimData`,
       `parent`,
     );
   };

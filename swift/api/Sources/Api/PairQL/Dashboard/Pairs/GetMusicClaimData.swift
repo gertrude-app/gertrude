@@ -33,8 +33,8 @@ extension GetMusicClaimData: Resolver {
 
     return try await resolveClaimData(
       code: input.code,
-      app: .music,
-      baseId: "5052a8c5",
+      intent: .music,
+      baseId: "5052a8c5", // 5052a8c5-1, 5052a8c5-2, 5052a8c5-3, 5052a8c5-4
       in: context,
       onResume: { device, child in
         guard try await device.musicInstall(in: context.db) != nil else {

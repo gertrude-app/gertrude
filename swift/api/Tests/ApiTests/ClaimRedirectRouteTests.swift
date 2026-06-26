@@ -14,9 +14,8 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       childId: nil,
       modelIdentifier: "iPad14,1",
       iosVersion: "17.5",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.createClaim(.blockerSupervise, device.id, code: code)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
@@ -43,10 +42,15 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       childId: child.id,
       modelIdentifier: "iPhone17,1",
       iosVersion: "18.0",
-      claimCode: code,
-      claimCodeExpiresAt: .reference - .days(30),
-      claimedAt: .reference - .days(30),
     ))
+    try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      code: code,
+      expiresAt: .reference - .days(30),
+      claimedAt: .reference - .days(30),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
@@ -96,9 +100,13 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference - .days(1),
     ))
+    try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      code: code,
+      expiresAt: .reference - .days(1),
+    )
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
@@ -116,14 +124,13 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   // remaining handler logic is exercised by the supervision tests above
   func testAmValidCode_redirectsToAmClaimFunnel() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    _ = try await self.db.create(IOSDevice(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.createClaim(.podcasts, device.id, code: code)
 
     try await app.test(
       .GET,
@@ -140,16 +147,40 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
     )
   }
 
-  func testMusicValidCode_redirectsToMusicClaimFunnel() async throws {
+  func testBlockerConnectValidCode_redirectsToBlockerClaimFunnel() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
-    _ = try await self.db.create(IOSDevice(
+    let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.createClaim(.blockerConnect, device.id, code: code)
+
+    try await app.test(
+      .GET,
+      "claim-pending-blocker/\(code)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
+        expect(location).toContain("claimPendingBlocker=\(code)")
+        expect(location).toContain("iosVersion=18.2")
+        expect(location).toContain("redirect=/claim-blocker-device/\(code)/claim")
+        expect(location).not.toContain("error=")
+      },
+    )
+  }
+
+  func testMusicValidCode_redirectsToMusicClaimFunnel() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: nil,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    try await self.createClaim(.music, device.id, code: code)
 
     try await app.test(
       .GET,
@@ -161,6 +192,63 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
         expect(location).toContain("claimPendingMusicDevice=\(code)")
         expect(location).toContain("iosVersion=18.2")
         expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
+        expect(location).not.toContain("error=")
+      },
+    )
+  }
+
+  func testNewStyleClaim_selfCorrectsMismatchedRedirectRoute() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: nil,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    try await self.db.create(Claim(
+      code: code,
+      intent: .music, // <- a music code...
+      deviceId: device.id,
+      expiresAt: .reference + .days(7),
+    ))
+
+    try await app.test(
+      .GET,
+      "claim-pending-blocker/\(code)", // ...reached through the blocker redirect route
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("claimPendingMusicDevice=\(code)") // routed by claim intent
+        expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
+        expect(location).not.toContain("claimPendingBlocker")
+        expect(location).not.toContain("error=")
+      },
+    )
+  }
+
+  func testNewStyleClaim_matchingRouteUsesClaimIntent() async throws {
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: nil,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    try await self.db.create(Claim(
+      code: code,
+      intent: .blockerConnect,
+      deviceId: device.id,
+      expiresAt: .reference + .days(7),
+    ))
+
+    try await app.test(
+      .GET,
+      "claim-pending-blocker/\(code)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("claimPendingBlocker=\(code)")
+        expect(location).toContain("redirect=/claim-blocker-device/\(code)/claim")
         expect(location).not.toContain("error=")
       },
     )

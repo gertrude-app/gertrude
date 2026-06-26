@@ -36,10 +36,10 @@ struct ClaimIOSDevice: Pair {
 extension ClaimIOSDevice: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     try await claimDevice(
-      for: .blocker,
+      intent: .blockerSupervise,
       code: input.code,
       child: input.child,
-      baseId: "f71dcb51", // f71dcb51-1, f71dcb51-2, f71dcb51-3
+      baseId: "f71dcb51", // f71dcb51-1, f71dcb51-2, f71dcb51-3, f71dcb51-4
       in: context,
       onResume: { device, child in
         self.output(device: device, child: child, code: input.code)

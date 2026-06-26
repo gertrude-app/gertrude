@@ -64,8 +64,14 @@ extension RequestAmPinResetResolverTests {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
+    try await self.createClaim(
+      .podcasts,
+      device.id,
+      child.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
     let install = try await self.db.create(
       PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
     )

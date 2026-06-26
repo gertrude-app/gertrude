@@ -18,9 +18,8 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.createClaim(.blockerSupervise, device.id, child.id, code: code)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(
@@ -63,9 +62,8 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       childId: child.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimCode: code,
-      claimCodeExpiresAt: .reference + .days(7),
     ))
+    try await self.createClaim(.blockerSupervise, device.id, child.id, code: code)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     try await app.test(

@@ -6,14 +6,28 @@ import {
 } from '../gertrudeApps';
 
 describe(`detectClaimPending()`, () => {
-  it(`maps claimPendingAmDevice to the podcasts app`, () => {
+  it(`maps claimPendingAmDevice to the podcasts intent`, () => {
     const params = new URLSearchParams(`claimPendingAmDevice=778899`);
-    expect(detectClaimPending(params)).toEqual({ app: `podcasts`, claimCode: `778899` });
+    expect(detectClaimPending(params)).toEqual({
+      intent: `podcasts`,
+      claimCode: `778899`,
+    });
   });
 
-  it(`maps claimPendingSupervision to the blocker app`, () => {
+  it(`maps claimPendingSupervision to the blockerSupervise intent`, () => {
     const params = new URLSearchParams(`claimPendingSupervision=123456`);
-    expect(detectClaimPending(params)).toEqual({ app: `blocker`, claimCode: `123456` });
+    expect(detectClaimPending(params)).toEqual({
+      intent: `blockerSupervise`,
+      claimCode: `123456`,
+    });
+  });
+
+  it(`maps claimPendingBlocker to the blockerConnect intent`, () => {
+    const params = new URLSearchParams(`claimPendingBlocker=123456`);
+    expect(detectClaimPending(params)).toEqual({
+      intent: `blockerConnect`,
+      claimCode: `123456`,
+    });
   });
 
   it(`returns null when no claim param is present`, () => {
@@ -26,51 +40,66 @@ describe(`detectClaimPending()`, () => {
 });
 
 describe(`claimFunnelPath()`, () => {
-  it(`builds the AM funnel path for the podcasts app`, () => {
+  it(`builds the AM funnel path for the podcasts intent`, () => {
     expect(claimFunnelPath(`podcasts`, `778899`)).toBe(`/claim-am-device/778899/claim`);
   });
 
-  it(`builds the supervision funnel path for the blocker app`, () => {
-    expect(claimFunnelPath(`blocker`, `123456`)).toBe(`/supervise-device/123456/claim`);
+  it(`builds the supervision funnel path for the blockerSupervise intent`, () => {
+    expect(claimFunnelPath(`blockerSupervise`, `123456`)).toBe(
+      `/supervise-device/123456/claim`,
+    );
+  });
+
+  it(`builds the connect funnel path for the blockerConnect intent`, () => {
+    expect(claimFunnelPath(`blockerConnect`, `123456`)).toBe(
+      `/claim-blocker-device/123456/claim`,
+    );
   });
 
   it(`round-trips with detectClaimFunnelPath`, () => {
     expect(detectClaimFunnelPath(claimFunnelPath(`podcasts`, `778899`))).toEqual({
-      app: `podcasts`,
+      intent: `podcasts`,
       claimCode: `778899`,
     });
   });
 });
 
 describe(`detectClaimFunnelPath()`, () => {
-  it(`maps a claim-am-device path to the podcasts app`, () => {
+  it(`maps a claim-am-device path to the podcasts intent`, () => {
     expect(detectClaimFunnelPath(`/claim-am-device/778899/claim`)).toEqual({
-      app: `podcasts`,
+      intent: `podcasts`,
       claimCode: `778899`,
     });
   });
 
-  it(`maps a supervise-device path to the blocker app`, () => {
+  it(`maps a supervise-device path to the blockerSupervise intent`, () => {
     expect(detectClaimFunnelPath(`/supervise-device/123456/claim`)).toEqual({
-      app: `blocker`,
+      intent: `blockerSupervise`,
+      claimCode: `123456`,
+    });
+  });
+
+  it(`maps a claim-blocker-device path to the blockerConnect intent`, () => {
+    expect(detectClaimFunnelPath(`/claim-blocker-device/123456/claim`)).toEqual({
+      intent: `blockerConnect`,
       claimCode: `123456`,
     });
   });
 
   it(`matches funnel subroutes`, () => {
     expect(detectClaimFunnelPath(`/supervise-device/123456/payment`)).toEqual({
-      app: `blocker`,
+      intent: `blockerSupervise`,
       claimCode: `123456`,
     });
     expect(detectClaimFunnelPath(`/claim-am-device/778899/done`)).toEqual({
-      app: `podcasts`,
+      intent: `podcasts`,
       claimCode: `778899`,
     });
   });
 
   it(`matches a bare funnel path with no subroute`, () => {
     expect(detectClaimFunnelPath(`/supervise-device/123456`)).toEqual({
-      app: `blocker`,
+      intent: `blockerSupervise`,
       claimCode: `123456`,
     });
   });

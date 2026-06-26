@@ -28,7 +28,10 @@ extension ConnectDevice_v2: Resolver {
     )
     var device = try await install.device(in: ctx.db)
     try await device.bindChild(child, in: ctx.db)
-    let token = try await ctx.db.create(BlockerApp.Token(installId: install.id))
+    let token = try await ctx.db.findOrCreate(
+      BlockerApp.Token(installId: install.id),
+      conflictOn: [.installId],
+    )
 
     let groups = try await BlockerApp.BlockGroup.query()
       .where(.optIn == false)
@@ -41,7 +44,8 @@ extension ConnectDevice_v2: Resolver {
 
     let supervision = try await device.supervision(in: ctx.db)
     var supervised: ChildIOSDeviceData_v2.Supervised? = nil
-    if supervision?.supervisedAt != nil, let claimCode = device.claimCode {
+    let superviseClaim = try await Claim.find(device.id, intent: .blockerSupervise, in: ctx.db)
+    if supervision?.supervisedAt != nil, let claimCode = superviseClaim?.code {
       supervised = .byGertrude(claimCode: claimCode)
     } else if try await IOSEvent.query()
       .where(.deviceId == device.id)

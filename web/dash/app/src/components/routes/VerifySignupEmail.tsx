@@ -43,9 +43,9 @@ const VerifySignupEmail: React.FC = () => {
   }
 
   const claimCode = verification.data?.claimCode;
-  const claimApp = verification.data?.claimApp ?? `blocker`;
+  const claimIntent = verification.data?.claimIntent ?? `blockerSupervise`;
   const destination =
-    redirect ?? (claimCode ? claimFunnelPath(claimApp, claimCode) : `/`);
+    redirect ?? (claimCode ? claimFunnelPath(claimIntent, claimCode) : `/`);
   return (
     <Navigate to={`/referral-survey?next=${encodeURIComponent(destination)}`} replace />
   );

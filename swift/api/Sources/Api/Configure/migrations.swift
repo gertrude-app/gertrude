@@ -105,6 +105,7 @@ extension Configure {
     app.migrations.add(CreateMusicTables())
     app.migrations.add(AddParentDailyReviewEmail())
     app.migrations.add(DashAnnouncementAction())
+    app.migrations.add(ClaimsCutover())
   }
 }
 

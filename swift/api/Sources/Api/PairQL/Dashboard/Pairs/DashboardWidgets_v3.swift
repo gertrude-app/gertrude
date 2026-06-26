@@ -310,8 +310,12 @@ struct PendingIOSDeviceRow: CustomQueryable {
     SELECT
       c.\(Child.columnName(.name)) AS child_name,
       d.\(IOSDevice.columnName(.modelIdentifier)) AS model_identifier,
-      d.\(IOSDevice.columnName(.claimCode)) AS claim_code
+      cl.\(Claim.columnName(.code)) AS claim_code
     FROM \(table: IOSDevice.self) d
+    JOIN \(table: Claim.self) cl
+      ON cl.\(Claim.columnName(.deviceId)) = d.id
+      AND cl.\(Claim.columnName(.intent)) = '\(ClaimIntent.blockerSupervise.rawValue)'
+      AND cl.\(Claim.columnName(.claimedAt)) IS NOT NULL
     JOIN \(table: BlockerApp.Supervision.self) s
       ON s.\(BlockerApp.Supervision.columnName(.deviceId)) = d.id
     JOIN \(table: Child.self) c
@@ -320,8 +324,6 @@ struct PendingIOSDeviceRow: CustomQueryable {
     """)
     stmt.components.append(.binding(bindings[0]))
     stmt.components.append(.sql("""
-      AND d.\(IOSDevice.columnName(.claimedAt)) IS NOT NULL
-      AND d.\(IOSDevice.columnName(.claimCode)) IS NOT NULL
       AND s.\(BlockerApp.Supervision.columnName(.supervisedAt)) IS NULL
     """))
     return stmt

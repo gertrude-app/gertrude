@@ -22,7 +22,7 @@ extension RecordDeviceUSBConnection: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let validated = try await SuperviseRoute.validatedSupervisionCode(
       code: input.code,
-      baseId: "421f7e7d", // 421f7e7d-1, 421f7e7d-2, 421f7e7d-3
+      baseId: "421f7e7d", // 421f7e7d-1, 421f7e7d-2, 421f7e7d-3, 421f7e7d-4, 421f7e7d-5
       in: context,
     )
 

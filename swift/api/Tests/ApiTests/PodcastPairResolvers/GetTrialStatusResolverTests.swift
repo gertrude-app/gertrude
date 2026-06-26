@@ -31,7 +31,7 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       return XCTFail("expected .trial, got \(output)")
     }
     let device = try await self.db.find(IOSDevice.Id(deviceId))
-    expect(device.claimedAt).toBeNil()
+    expect(device.childId).toBeNil()
     let install = try await PodcastApp.Install.query()
       .where(.deviceId == device.id)
       .first(in: self.db)
@@ -333,13 +333,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
   func testDashboardClaimedDeviceMintsTokenAndReturnsConnected() async throws {
     let child = try await self.child()
     let deviceId = UUID()
-    // dashboard/supervision claim on the same vendor id: childId AND claimedAt set
+    // dashboard/supervision claim on the same vendor id: childId bound
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
       childId: child.model.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
     var preInstall = try await self.db.create(
       PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
@@ -387,7 +386,6 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       childId: child.model.id,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
 
@@ -419,13 +417,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
   func testConnectedViaNonSupervisionPathAutoDetects() async throws {
     let child = try await self.child()
     let deviceId = UUID()
-    // normal in-app Blocker connect: childId set, claimedAt NIL (the reproducer state)
+    // normal in-app Blocker connect: childId set, no completed supervise claim (the reproducer state)
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
       childId: child.model.id,
       modelIdentifier: "iPhone13,1",
       iosVersion: "18.2",
-      claimedAt: nil, // NOT a supervision/dashboard claim
     ))
     var preInstall = try await self.db.create(
       PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
@@ -459,7 +456,6 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
       childId: child.model.id,
       modelIdentifier: "iPhone13,1",
       iosVersion: "18.2",
-      claimedAt: nil,
     ))
     // install old enough that the 30-day install trial has lapsed, so legacy access governs
     var preInstall = try await self.db.create(
@@ -491,15 +487,14 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     ))
   }
 
-  func testClaimedAtWithoutChildIdFallsThroughToTrial() async throws {
-    // childId — not claimedAt — drives detection; a claimedAt-only row is ignored
+  func testUnboundDeviceFallsThroughToTrial() async throws {
+    // childId drives detection; an unbound device falls through to trial
     let deviceId = UUID()
     try await self.db.create(IOSDevice(
       id: .init(deviceId),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
-      claimedAt: .reference,
     ))
 
     let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)

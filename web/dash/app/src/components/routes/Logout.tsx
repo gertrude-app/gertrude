@@ -15,7 +15,7 @@ const Logout: React.FC = () => {
   const redirect = new URLSearchParams(window.location.search).get(`redirect`);
   const pendingClaim = redirect ? detectClaimFunnelPath(redirect) : null;
   const claimRedirectUrl = pendingClaim
-    ? `${Current.env.apiEndpoint()}/${CLAIM_REDIRECT_ROUTE[pendingClaim.app]}/${pendingClaim.claimCode}`
+    ? `${Current.env.apiEndpoint()}/${CLAIM_REDIRECT_ROUTE[pendingClaim.intent]}/${pendingClaim.claimCode}`
     : null;
 
   useEffect(() => {

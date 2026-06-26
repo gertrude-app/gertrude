@@ -86,8 +86,10 @@ private struct DeviceSummaryQuery: CustomQueryable {
     let eCreatedAt = IOSEvent.columnName(.createdAt)
     let eEventId = IOSEvent.columnName(.eventId)
     let dId = IOSDevice.columnName(.id)
-    let dClaimCode = IOSDevice.columnName(.claimCode)
-    let dClaimedAt = IOSDevice.columnName(.claimedAt)
+    let clDeviceId = Claim.columnName(.deviceId)
+    let clIntent = Claim.columnName(.intent)
+    let clClaimedAt = Claim.columnName(.claimedAt)
+    let superviseIntent = ClaimIntent.blockerSupervise.rawValue
     let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
     let sId = BlockerApp.Supervision.columnName(.id)
     let sProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
@@ -105,8 +107,17 @@ private struct DeviceSummaryQuery: CustomQueryable {
       CASE
         WHEN s.\(sProfileInstalledAt) IS NOT NULL THEN 'supervised'
         WHEN s.\(sSupervisedAt) IS NOT NULL THEN 'missingProfile'
-        WHEN d.\(dClaimedAt) IS NOT NULL THEN 'claimed'
-        WHEN d.\(dClaimCode) IS NOT NULL THEN 'pendingClaim'
+        WHEN EXISTS (
+          SELECT 1 FROM \(table: Claim.self) cl
+          WHERE cl.\(clDeviceId) = d.\(dId)
+            AND cl.\(clIntent) = '\(superviseIntent)'
+            AND cl.\(clClaimedAt) IS NOT NULL
+        ) THEN 'claimed'
+        WHEN EXISTS (
+          SELECT 1 FROM \(table: Claim.self) cl
+          WHERE cl.\(clDeviceId) = d.\(dId)
+            AND cl.\(clIntent) = '\(superviseIntent)'
+        ) THEN 'pendingClaim'
         WHEN tk.\(tInstallId) IS NOT NULL AND s.\(sId) IS NULL THEN 'connected'
         WHEN cfg.\(eDeviceId) IS NOT NULL THEN 'configurated'
         WHEN st.\(eDeviceId) IS NOT NULL THEN 'screenTime'

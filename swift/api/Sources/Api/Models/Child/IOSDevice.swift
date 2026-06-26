@@ -6,9 +6,6 @@ struct IOSDevice: Codable, Sendable, Equatable {
   var childId: Child.Id?
   var modelIdentifier: String
   var iosVersion: String
-  var claimCode: Int?
-  var claimCodeExpiresAt: Date?
-  var claimedAt: Date?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -17,17 +14,11 @@ struct IOSDevice: Codable, Sendable, Equatable {
     childId: Child.Id? = nil,
     modelIdentifier: String,
     iosVersion: String,
-    claimCode: Int? = nil,
-    claimCodeExpiresAt: Date? = nil,
-    claimedAt: Date? = nil,
   ) {
     self.id = id
     self.childId = childId
     self.modelIdentifier = modelIdentifier
     self.iosVersion = iosVersion
-    self.claimCode = claimCode
-    self.claimCodeExpiresAt = claimCodeExpiresAt
-    self.claimedAt = claimedAt
   }
 }
 

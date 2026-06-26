@@ -16,7 +16,7 @@ actor Ephemeral {
       var parentId: Parent.Id
       var expiration: Date
       var claimCode: String?
-      var claimApp: GertrudeIOSApp?
+      var claimIntent: ClaimIntent?
     }
 
     struct ChildId: Codable {
@@ -39,7 +39,7 @@ actor Ephemeral {
       var parentId: Parent.Id
       var retrievedAt: Date
       var claimCode: String?
-      var claimApp: GertrudeIOSApp?
+      var claimIntent: ClaimIntent?
     }
 
     struct PinReset: Codable {
@@ -63,9 +63,9 @@ actor Ephemeral {
 
   enum ParentId: Equatable {
     case notFound
-    case notExpired(Parent.Id, claimCode: String?, claimApp: GertrudeIOSApp?)
-    case expired(Parent.Id, claimCode: String?, claimApp: GertrudeIOSApp?)
-    case previouslyRetrieved(Parent.Id, claimCode: String?, claimApp: GertrudeIOSApp?)
+    case notExpired(Parent.Id, claimCode: String?, claimIntent: ClaimIntent?)
+    case expired(Parent.Id, claimCode: String?, claimIntent: ClaimIntent?)
+    case previouslyRetrieved(Parent.Id, claimCode: String?, claimIntent: ClaimIntent?)
 
     var notExpired: Parent.Id? {
       guard case .notExpired(let parentId, _, _) = self else { return nil }
@@ -77,7 +77,7 @@ actor Ephemeral {
     _ parentId: Parent.Id,
     expiration: Date? = nil,
     claimCode: String? = nil,
-    claimApp: GertrudeIOSApp? = nil,
+    claimIntent: ClaimIntent? = nil,
   ) -> UUID {
     defer { Task { await self.persistStorage() } }
     let token = self.uuid()
@@ -85,7 +85,7 @@ actor Ephemeral {
       parentId: parentId,
       expiration: expiration ?? self.now + .minutes(60),
       claimCode: claimCode,
-      claimApp: claimApp,
+      claimIntent: claimIntent,
     )
     return token
   }
@@ -107,19 +107,27 @@ actor Ephemeral {
           parentId: stored.parentId,
           retrievedAt: self.now,
           claimCode: stored.claimCode,
-          claimApp: stored.claimApp,
+          claimIntent: stored.claimIntent,
         )
-        return .notExpired(stored.parentId, claimCode: stored.claimCode, claimApp: stored.claimApp)
+        return .notExpired(
+          stored.parentId,
+          claimCode: stored.claimCode,
+          claimIntent: stored.claimIntent,
+        )
       } else {
         // put back, so if they try again, they know it's expired, not missing
         self.storage.parentIds[token] = stored
-        return .expired(stored.parentId, claimCode: stored.claimCode, claimApp: stored.claimApp)
+        return .expired(
+          stored.parentId,
+          claimCode: stored.claimCode,
+          claimIntent: stored.claimIntent,
+        )
       }
     } else if let retrieved = self.storage.retrievedParentIds[token] {
       return .previouslyRetrieved(
         retrieved.parentId,
         claimCode: retrieved.claimCode,
-        claimApp: retrieved.claimApp,
+        claimIntent: retrieved.claimIntent,
       )
     } else {
       return .notFound

@@ -11,7 +11,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
 
@@ -25,7 +24,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
@@ -40,7 +38,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     let install = try await self.db.create(
       MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
@@ -58,7 +55,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     // bare install, no token -> a ghost from app events, never really connected
     try await self.db.create(BlockerApp.Install(deviceId: device.id, appVersion: "1.0.0"))
@@ -73,7 +69,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     try await self.db.create(BlockerApp.Install(deviceId: device.id, appVersion: "1.0.0"))
     // parent-claim seeds an install + supervision row, but the token isn't minted
@@ -90,7 +85,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     let install = try await self.db.create(
       BlockerApp.Install(deviceId: device.id, appVersion: "1.0.0"),
@@ -107,7 +101,6 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
-      $0.claimedAt = .reference
     })
     let install = try await self.db.create(
       PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),

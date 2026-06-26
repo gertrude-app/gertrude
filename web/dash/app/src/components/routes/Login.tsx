@@ -3,6 +3,7 @@ import {
   DeviceContextBanner,
   FullscreenModalForm,
   LoginForm,
+  claimIntentApp,
   detectClaimPending,
 } from '@dash/components';
 import React, { useState } from 'react';
@@ -19,7 +20,8 @@ export const Login: React.FC = () => {
   const fromPage = searchParams.get(`from`);
   const pendingClaim = detectClaimPending(searchParams);
   const claimCode = pendingClaim?.claimCode;
-  const app = pendingClaim?.app;
+  const intent = pendingClaim?.intent;
+  const app = intent ? claimIntentApp(intent) : undefined;
   const modelName = searchParams.get(`modelName`);
   const iosVersion = searchParams.get(`iosVersion`);
 

@@ -58,6 +58,8 @@ enum AuthedParentRoute: PairRoute {
   case claimAmDevice(ClaimAmDevice.Input)
   case getMusicClaimData(GetMusicClaimData.Input)
   case claimMusicDevice(ClaimMusicDevice.Input)
+  case getBlockerClaimData(GetBlockerClaimData.Input)
+  case claimBlockerDevice(ClaimBlockerDevice.Input)
   case requestAmPinReset(RequestAmPinReset.Input)
   case getIOSDeviceSupervisionStatus(GetIOSDeviceSupervisionStatus.Input)
   case prepIOSAppConnection(PrepIOSAppConnection.Input)
@@ -281,6 +283,14 @@ extension AuthedParentRoute {
           Operation(ClaimMusicDevice.self)
           Body(.dashboardInput(ClaimMusicDevice.self))
         }
+        Route(.case(Self.getBlockerClaimData)) {
+          Operation(GetBlockerClaimData.self)
+          Body(.dashboardInput(GetBlockerClaimData.self))
+        }
+        Route(.case(Self.claimBlockerDevice)) {
+          Operation(ClaimBlockerDevice.self)
+          Body(.dashboardInput(ClaimBlockerDevice.self))
+        }
         Route(.case(Self.requestAmPinReset)) {
           Operation(RequestAmPinReset.self)
           Body(.dashboardInput(RequestAmPinReset.self))
@@ -473,6 +483,12 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .claimMusicDevice(let input):
       let output = try await ClaimMusicDevice.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getBlockerClaimData(let input):
+      let output = try await GetBlockerClaimData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .claimBlockerDevice(let input):
+      let output = try await ClaimBlockerDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .requestAmPinReset(let input):
       let output = try await RequestAmPinReset.resolve(with: input, in: context)

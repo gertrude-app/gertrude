@@ -25,35 +25,11 @@ enum GertrudeIOSApp: String, Sendable, Codable, CaseIterable {
     }
   }
 
-  var claimLogLabel: String {
-    switch self {
-    case .blocker: "iOS supervision"
-    case .podcasts: "Gertrude AM"
-    case .music: "Gertrude Music"
-    }
-  }
-
   var slackChannel: XSlack.Slack.Client.InternalChannel {
     switch self {
     case .blocker: .info
     case .podcasts: .podcasts
     case .music: .info
-    }
-  }
-
-  var claimPendingQueryKey: String {
-    switch self {
-    case .blocker: "claimPendingSupervision"
-    case .podcasts: "claimPendingAmDevice"
-    case .music: "claimPendingMusicDevice"
-    }
-  }
-
-  func claimFunnelRedirectPath(code: Int) -> String {
-    switch self {
-    case .blocker: "/supervise-device/\(code)/claim"
-    case .podcasts: "/claim-am-device/\(code)/claim"
-    case .music: "/claim-music-device/\(code)/claim"
     }
   }
 }

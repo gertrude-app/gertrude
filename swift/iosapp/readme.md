@@ -11,7 +11,8 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
-- `1.?.?` (dev unreleased)
+- `1.8.3` (6/26/26)
+  - connect free account uses claim-based flow, not code entry
   - expired supervision claim code now offers regenerate or start over
   - connecting account non-supervised clears pending supervision claim code
 - `1.8.2` (4/3/26)
