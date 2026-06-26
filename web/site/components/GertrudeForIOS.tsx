@@ -3,7 +3,7 @@
 import { ExternalLinkIcon, StarIcon } from 'lucide-react';
 import React, { useRef } from 'react';
 import AnimatedUnderline from './AnimatedUnderline';
-import FancyLink from './FancyLink';
+import Button from './Button';
 import Phone from './super-scroller-illustration/Phone';
 import { useIntersectionVisibility, useScrollProgress } from '@/lib/hooks';
 
@@ -307,7 +307,7 @@ const GertrudeForIOS: React.FC = () => {
                     }),
                   }}
                 >
-                  <FancyLink
+                  <Button
                     type="link"
                     href="https://apps.apple.com/us/app/gertrude-blocker/id6736368820"
                     size="sm"
@@ -315,8 +315,8 @@ const GertrudeForIOS: React.FC = () => {
                     className="xs:hidden"
                   >
                     Download&nbsp;&rarr;
-                  </FancyLink>
-                  <FancyLink
+                  </Button>
+                  <Button
                     type="link"
                     href="https://apps.apple.com/us/app/gertrude-blocker/id6736368820"
                     size="lg"
@@ -324,8 +324,8 @@ const GertrudeForIOS: React.FC = () => {
                     className="hidden xs:inline-flex"
                   >
                     Download&nbsp;&rarr;
-                  </FancyLink>
-                  <FancyLink
+                  </Button>
+                  <Button
                     type="link"
                     href="/iphone-and-ipad"
                     size="sm"
@@ -333,8 +333,8 @@ const GertrudeForIOS: React.FC = () => {
                     className="xs:hidden"
                   >
                     Learn&nbsp;More
-                  </FancyLink>
-                  <FancyLink
+                  </Button>
+                  <Button
                     type="link"
                     href="/iphone-and-ipad"
                     size="lg"
@@ -342,7 +342,7 @@ const GertrudeForIOS: React.FC = () => {
                     className="hidden xs:inline-flex"
                   >
                     Learn&nbsp;More
-                  </FancyLink>
+                  </Button>
                 </div>
               </div>
 

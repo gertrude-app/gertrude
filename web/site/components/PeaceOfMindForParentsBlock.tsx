@@ -3,7 +3,7 @@
 import { RocketIcon, VideoIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { useIntersectionObserver, useScrollY, useWindowDimensions } from '../lib/hooks';
-import FancyLink from './FancyLink';
+import Button from './Button';
 import VideoModal from './VideoModal';
 import WebsiteGraphic from './WebsiteGraphic';
 import { PARENTS_APP_URL } from '@/lib/urls';
@@ -39,7 +39,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
           or phone. Mac parental controls have never been this good.
         </p>
         <div className="flex flex-col md:flex-row gap-6 mt-12 self-stretch sm:self-center min-[1450px]:self-start">
-          <FancyLink
+          <Button
             id="peace-of-mind-cta"
             type="link"
             href={`${PARENTS_APP_URL}/signup?v=new_site`}
@@ -49,8 +49,8 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
             size="lg"
           >
             Get started
-          </FancyLink>
-          <FancyLink
+          </Button>
+          <Button
             type="button"
             onClick={() => setShowingVideo(true)}
             Icon={VideoIcon}
@@ -59,7 +59,7 @@ const PeaceOfMindForParentsBlock: React.FC = () => {
             variant="flat"
           >
             Watch demo video
-          </FancyLink>
+          </Button>
         </div>
       </div>
       <div

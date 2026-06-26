@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from 'lucide-react';
-import Link from 'next/link';
 import type { NextPage } from 'next';
+import Button from '@/components/Button';
 import GertrudeForIOS from '@/components/GertrudeForIOS';
 import GertrudeForMac from '@/components/GertrudeForMac';
 import HiImJared from '@/components/HiImJared';
@@ -30,13 +30,17 @@ const HomePage: NextPage = () => (
         <p className="text-white text-lg sm:text-xl font-semibold text-center sm:text-left">
           One account, your whole family, every device.
         </p>
-        <Link
+        <Button
+          type="link"
           href="/pricing"
-          className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 px-6 py-3 font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition-transform hover:scale-105 whitespace-nowrap"
+          color="primary"
+          size="sm"
+          Icon={ArrowRightIcon}
+          iconPosition="right"
+          className="whitespace-nowrap"
         >
           See all plans
-          <ArrowRightIcon className="size-5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        </Button>
       </div>
     </section>
     <HiImJared />

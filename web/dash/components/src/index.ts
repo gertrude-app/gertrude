@@ -66,6 +66,7 @@ export { default as ReviewDayWrapper } from './Users/Activity/ReviewDayWrapper';
 export { default as FamilyActivityFeed } from './Users/Activity/FamilyActivityFeed';
 export { default as UserActivityHeader } from './Users/Activity/UserActivityHeader';
 export { default as Loading } from './Loading';
+export { default as Logo } from './Logo';
 export { default as GenericError } from './GenericError';
 export { default as ApiErrorMessage } from './ApiErrorMessage';
 export { default as BetaBadge } from './BetaBadge';

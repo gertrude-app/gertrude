@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React from 'react';
 import type { NextPage } from 'next';
 import type { StaticImageData } from 'next/image';
-import FancyLink from '@/components/FancyLink';
+import Button from '@/components/Button';
 import Computer from '@/components/super-scroller-illustration/Computer';
 import * as seo from '@/lib/seo';
 import { MACAPP_DMG_URL } from '@/lib/urls';
@@ -39,7 +39,7 @@ const DownloadPage: NextPage = () => (
             clicking here.
           </Link>
         </p>
-        <FancyLink
+        <Button
           size="lg"
           color="primary"
           type="link"
@@ -48,7 +48,7 @@ const DownloadPage: NextPage = () => (
           className="mt-8 mb-12"
         >
           Download
-        </FancyLink>
+        </Button>
         <div className="w-full sm:bg-violet-50 p-0 sm:p-8 lg:p-12 rounded-3xl">
           <h2 className="text-xl font-medium text-center text-violet-800/40 mb-4">
             Supported operating systems:

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import AnimatedUnderline from './AnimatedUnderline';
+import Button from './Button';
 import Computer from './super-scroller-illustration/Computer';
 import {
   useDelayedVisibility,
@@ -214,16 +215,9 @@ const GertrudeForMac: React.FC = () => {
                 }),
               }}
             >
-              <a
-                href="/mac"
-                className="group relative px-10 py-5 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-2xl text-white text-xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(168,85,247,0.4)] active:scale-100"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-400 to-fuchsia-400 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative flex items-center gap-3">
-                  <RocketIcon size={28} />
-                  Get started
-                </span>
-              </a>
+              <Button type="link" href="/mac" color="primary" size="lg" Icon={RocketIcon}>
+                Get started
+              </Button>
               <p className="text-violet-300/60 text-xs xs:text-sm sm:text-base">
                 $10/month for the whole family, 21 day free trial
               </p>

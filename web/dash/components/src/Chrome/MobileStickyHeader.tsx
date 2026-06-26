@@ -1,8 +1,8 @@
 import { Bars3Icon } from '@heroicons/react/24/solid';
-import { Logo } from '@shared/components';
 import cx from 'classnames';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from '../Logo';
 
 interface MobileStickyHeaderProps {
   className?: string;

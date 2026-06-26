@@ -17,7 +17,7 @@ const MobileLoginDropdown: React.FC<{
         `hover:scale-105 active:scale-95 transition-transform duration-200`,
         `w-10 h-10 rounded-full flex justify-center items-center`,
         theme === `white` ? `bg-violet-50 text-violet-400` : `bg-white text-slate-400`,
-        alwaysShow ? `block` : `sm:hidden block`,
+        alwaysShow ? `block` : `md:hidden block`,
       )}
     >
       <MenuIcon />
@@ -36,7 +36,8 @@ const MobileLoginDropdown: React.FC<{
         <DropdownLink href="/iphone-and-ipad">iPhone &amp; iPad</DropdownLink>
         <DropdownLink href="/#podcasts">Gertrude Podcasts</DropdownLink>
         <DropdownLink href="/pricing">Pricing</DropdownLink>
-        <DropdownLink href="/docs/faqs">FAQ</DropdownLink>
+        <DropdownLink href="/blog">Blog</DropdownLink>
+        <DropdownLink href="/contact">Contact</DropdownLink>
       </DropdownMenu.Content>
     </DropdownMenu.Portal>
   </DropdownMenu.Root>

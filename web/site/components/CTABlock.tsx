@@ -1,7 +1,7 @@
 import { ArrowRightIcon, RocketIcon, RouteIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-import FancyLink from './FancyLink';
+import Button from './Button';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
 const CTABlock: React.FC = () => (
@@ -14,7 +14,7 @@ const CTABlock: React.FC = () => (
         21 day free trial.
       </h3>
       <div className="flex flex-col md:flex-row justify-center self-stretch md:items-center gap-6 md:gap-4 mt-12">
-        <FancyLink
+        <Button
           id="cta-signup"
           type="link"
           href={`${PARENTS_APP_URL}/signup?v=new_site`}
@@ -23,8 +23,8 @@ const CTABlock: React.FC = () => (
           size="lg"
         >
           Start free trial
-        </FancyLink>
-        <FancyLink
+        </Button>
+        <Button
           type="link"
           href="/docs/getting-started"
           Icon={RouteIcon}
@@ -33,7 +33,7 @@ const CTABlock: React.FC = () => (
           variant="flat"
         >
           Step-by-step guide
-        </FancyLink>
+        </Button>
       </div>
       <Link
         href="/pricing"

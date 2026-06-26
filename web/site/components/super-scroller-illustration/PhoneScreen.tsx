@@ -1,8 +1,8 @@
-import { Logo } from '@shared/components';
 import cx from 'classnames';
 import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import React from 'react';
 import ComputerScreen from './ComputerScreen';
+import Logo from '@/components/Logo';
 
 interface PhoneScreenProps {
   loginScreenOpened: boolean;

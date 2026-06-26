@@ -1,8 +1,8 @@
-import { Logo } from '@shared/components';
 import { ArrowRightIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
-import FancyLink from './FancyLink';
+import Button from './Button';
+import Logo from './Logo';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
 interface Props {
@@ -20,7 +20,7 @@ const PageBottomCTA: React.FC<Props> = ({ clickId }) => (
       <b>own computer or phone,</b> plus remote monitoring of screenshots and keylogging.
       $10/mo, with a 21 day free trial.
     </p>
-    <FancyLink
+    <Button
       type="link"
       id={clickId}
       href={`${PARENTS_APP_URL}/signup`}
@@ -30,7 +30,7 @@ const PageBottomCTA: React.FC<Props> = ({ clickId }) => (
       Icon={ArrowRightIcon}
     >
       Start free trial
-    </FancyLink>
+    </Button>
   </div>
 );
 

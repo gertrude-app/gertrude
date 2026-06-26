@@ -1,6 +1,7 @@
 'use client';
 
-import { LaptopIcon, PodcastIcon, TabletSmartphoneIcon } from 'lucide-react';
+import cx from 'classnames';
+import { LaptopIcon, MusicIcon, PodcastIcon, TabletSmartphoneIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useScrollY } from '../lib/hooks';
 
@@ -92,7 +93,7 @@ const ToolsForSafetyBlock: React.FC = () => {
           </h1>
         </div>
 
-        <div className="mt-12 xs:mt-16 md:mt-20 grid grid-cols-1 sm:grid-cols-3 gap-6 xs:gap-8 md:gap-12 w-full max-w-4xl justify-items-center sm:justify-items-stretch">
+        <div className="mt-12 xs:mt-16 md:mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xs:gap-8 lg:gap-6 xl:gap-8 w-full max-w-6xl justify-items-center sm:justify-items-stretch">
           <ProductCard
             icon={TabletSmartphoneIcon}
             label="iPhone & iPad"
@@ -114,11 +115,18 @@ const ToolsForSafetyBlock: React.FC = () => {
             delay={900}
             href="#podcasts"
           />
+          <ProductCard
+            icon={MusicIcon}
+            label="Music"
+            description="Only approved music, nothing else"
+            delay={1100}
+            comingSoon
+          />
         </div>
 
         <p
           className="mt-24 xs:mt-28 max-w-xl px-8 xs:px-10 sm:px-0 text-center text-slate-500 text-xs xs:text-sm md:text-base leading-snug antialiased animate-fadeIn opacity-0"
-          style={{ animationDelay: `1100ms`, animationFillMode: `forwards` }}
+          style={{ animationDelay: `1300ms`, animationFillMode: `forwards` }}
         >
           iPhone, iPad, and Mac all connect to{` `}
           <span className="font-semibold text-fuchsia-600">one Gertrude account</span>
@@ -134,7 +142,8 @@ interface ProductCardProps {
   label: string;
   description: string;
   delay: number;
-  href: string;
+  href?: string;
+  comingSoon?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
@@ -143,31 +152,82 @@ const ProductCard: React.FC<ProductCardProps> = ({
   description,
   delay,
   href,
-}) => (
-  <a
-    href={href}
-    onClick={(e) => {
-      const target = document.querySelector(href);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: `smooth` });
-      }
-    }}
-    className="flex flex-row sm:flex-col items-center sm:text-center group animate-fadeIn opacity-0 gap-4 sm:gap-0"
-    style={{ animationDelay: `${delay}ms`, animationFillMode: `forwards` }}
-  >
-    <div className="relative shrink-0 bg-white/80 backdrop-blur-sm rounded-2xl xs:rounded-3xl p-4 xs:p-6 md:p-8 sm:mb-4 md:mb-6 transition-all duration-300 group-hover:scale-105 border border-fuchsia-200 group-hover:border-fuchsia-400 shadow-lg shadow-fuchsia-100 group-hover:shadow-xl group-hover:shadow-fuchsia-200">
-      <Icon className="size-10 xs:size-12 sm:size-10 md:size-16 [&_*]:stroke-[url(#icon-gradient)] [&_circle]:fill-[url(#icon-gradient)] transition-transform duration-300 group-hover:scale-110" />
-    </div>
-    <div>
-      <h3 className="text-lg xs:text-xl md:text-3xl font-semibold text-slate-800 mb-0.5 xs:mb-1 md:mb-2 transition-colors duration-300 group-hover:text-fuchsia-600">
-        {label}
-      </h3>
-      <p className="text-slate-500 text-xs xs:text-sm md:text-base leading-snug max-w-[200px] sm:max-w-none antialiased">
-        {description}
-      </p>
-    </div>
-  </a>
-);
+  comingSoon = false,
+}) => {
+  const isDisabled = !href;
+  const content = (
+    <>
+      <div
+        className={cx(
+          `relative shrink-0 bg-white/80 backdrop-blur-sm rounded-2xl xs:rounded-3xl p-4 xs:p-6 md:p-8 sm:mb-4 md:mb-6 border border-fuchsia-200 shadow-lg shadow-fuchsia-100`,
+          !isDisabled &&
+            `transition-all duration-300 group-hover:scale-105 group-hover:border-fuchsia-400 group-hover:shadow-xl group-hover:shadow-fuchsia-200`,
+          isDisabled && `border-violet-200 shadow-violet-100`,
+        )}
+      >
+        {comingSoon && (
+          <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-white shadow-lg shadow-fuchsia-300/40 xs:px-3 xs:text-[10px]">
+            Coming soon!
+          </div>
+        )}
+        <Icon
+          className={cx(
+            `size-10 xs:size-12 sm:size-10 md:size-16 [&_*]:stroke-[url(#icon-gradient)] [&_circle]:fill-[url(#icon-gradient)]`,
+            !isDisabled && `transition-transform duration-300 group-hover:scale-110`,
+            isDisabled && `opacity-60 grayscale`,
+          )}
+        />
+      </div>
+      <div>
+        <h3
+          className={cx(
+            `text-lg xs:text-xl md:text-3xl font-semibold text-slate-800 mb-0.5 xs:mb-1 md:mb-2 transition-colors duration-300`,
+            !isDisabled && `group-hover:text-fuchsia-600`,
+            isDisabled && `text-slate-500`,
+          )}
+        >
+          {label}
+        </h3>
+        <p
+          className={cx(
+            `text-slate-500 text-xs xs:text-sm md:text-base leading-snug max-w-[200px] sm:max-w-none antialiased`,
+            isDisabled && `text-slate-400`,
+          )}
+        >
+          {description}
+        </p>
+      </div>
+    </>
+  );
+
+  if (isDisabled) {
+    return (
+      <div
+        aria-disabled="true"
+        className="flex flex-row sm:flex-col items-center sm:text-center animate-fadeIn opacity-0 gap-4 sm:gap-0 cursor-default"
+        style={{ animationDelay: `${delay}ms`, animationFillMode: `forwards` }}
+      >
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={href}
+      onClick={(e) => {
+        const target = document.querySelector(href);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: `smooth` });
+        }
+      }}
+      className="flex flex-row sm:flex-col items-center sm:text-center group animate-fadeIn opacity-0 gap-4 sm:gap-0"
+      style={{ animationDelay: `${delay}ms`, animationFillMode: `forwards` }}
+    >
+      {content}
+    </a>
+  );
+};
 
 export default ToolsForSafetyBlock;

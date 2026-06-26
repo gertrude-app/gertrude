@@ -1,12 +1,12 @@
 'use client';
 
-import { Logo } from '@shared/components';
 import cx from 'classnames';
 import { DotIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import FancyLink from '@/components/FancyLink';
+import Button from '@/components/Button';
+import Logo from '@/components/Logo';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
 interface Props {
@@ -57,15 +57,15 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
             Blog
           </Link>
         </div>
-        <FancyLink
+        <Button
           type="link"
           href={PARENTS_APP_URL}
           size="sm"
           className="flex-grow mb-4 mt-6"
         >
           Log in
-        </FancyLink>
-        <FancyLink
+        </Button>
+        <Button
           type="link"
           href={`${PARENTS_APP_URL}/signup`}
           size="sm"
@@ -73,7 +73,7 @@ const Sidebar: React.FC<Props> = ({ open, setOpen }) => (
           className="flex-grow"
         >
           Sign up
-        </FancyLink>
+        </Button>
       </div>
     </div>
   </nav>

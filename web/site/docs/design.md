@@ -53,10 +53,10 @@ fuchsia gradients, creating a confident and tech-forward brand identity.
 - Usage: Documentation pages
 - Applied via: `font-docs-inter`
 
-**Lato** (Logo and headings)
+**Lato** (Legacy headings)
 
 - Weight: 900
-- Usage: Logo wordmark, specific headings
+- Usage: Specific legacy headings
 - Applied via: `font-lato`
 
 **Inter** (Shared components)
@@ -97,12 +97,14 @@ Headings use responsive sizing:
 - Inline gradients: `bg-gradient-to-r` (left to right)
 - Text gradients: `bg-gradient-to-r bg-clip-text text-transparent`
 
-### Logo Gradient
+### Logo
 
-Linear gradient in SVG:
+The site uses static SVG wordmarks from `public/gertrude-logo.svg` and
+`public/gertrude-logo-white.svg` through `components/Logo.tsx`. Icon-only placements use
+`public/logo-icon.svg`.
 
-- Start: `#8B5CF6` (Violet-500)
-- End: `#D846EF` (Fuchsia-500)
+The default logo uses a violet-to-fuchsia icon with black wordmark text; the white variant
+is used on violet or dark backgrounds.
 
 ## Spacing
 
@@ -142,29 +144,27 @@ Custom breakpoints (in addition to Tailwind defaults):
 
 ## Components
 
-### Buttons (FancyLink)
+### Buttons (`Button`)
+
+Use `web/site/components/Button.tsx` for site CTAs, form submits, and button-styled links.
 
 **Primary Button**
 
 - Gradient background: `from-violet-500 to-fuchsia-500`
-- White text
-- Drop shadow effect with gradient shadow layer
+- White text, with subtle fuchsia shadow and shine on hover
 - Hover: Translates up slightly (-0.5)
-- Active: Translates down (0.5)
-- Animated shine effect on hover
-- Sizes: `lg` (px-8 py-4), `sm` (px-6 py-3)
+- Sizes: `lg` (px-8 py-4), `sm` (px-6 py-3), `xs` (px-4 py-2)
 
 **Secondary Button**
 
-- Light background: `bg-violet-100` (normal) or `bg-white/10` (inverted)
-- Gradient text: `from-violet-600 to-fuchsia-500`
-- Hover: Darker background
-- Active: Scale down to 98%
+- Light background: `bg-violet-100` (normal) or translucent white (inverted)
+- Violet text on light surfaces, white text on dark/brand surfaces
+- Subtle border to keep secondary actions legible
 
 **Inverted Variants**
 
-- Primary: White background with gradient text
-- Secondary: White with opacity (10%/20%/30%)
+- Primary: White background with violet text
+- Secondary: Translucent white background with white text
 
 ### Cards
 
