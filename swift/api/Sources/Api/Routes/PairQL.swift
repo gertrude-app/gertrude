@@ -26,6 +26,7 @@ enum PairQLRoute: Equatable, RouteResponder {
   case music(MusicRoute)
   case admin(AdminRoute)
   case supervise(SuperviseRoute)
+  case account(AccountRoute)
 
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(PairQLRoute.macApp)) {
@@ -68,6 +69,11 @@ enum PairQLRoute: Equatable, RouteResponder {
       Path { "supervise" }
       SuperviseRoute.router
     }
+    Route(.case(PairQLRoute.account)) {
+      Method("POST")
+      Path { "account" }
+      AccountRoute.router
+    }
   }
 
   static func respond(to route: PairQLRoute, in context: Context) async throws -> Response {
@@ -88,6 +94,13 @@ enum PairQLRoute: Equatable, RouteResponder {
       try await AdminRoute.respond(to: adminRoute, in: context)
     case .supervise(let superviseRoute):
       try await SuperviseRoute.respond(to: superviseRoute, in: context)
+    case .account(let accountRoute):
+      try await AccountRoute.respond(to: accountRoute, in: Context(
+        requestId: context.requestId,
+        dashboardUrl: context.env.accountDashboardUrl,
+        ipAddress: context.ipAddress,
+        telemetry: context.telemetry,
+      ))
     }
   }
 
@@ -233,6 +246,9 @@ private func logOperation(_ route: PairQLRoute, _ request: Request, _ duration: 
   case .supervise:
     request.logger
       .notice("PairQL request: \("Supervise".magenta.bold) \(operation) \(elapsed)")
+  case .account:
+    request.logger
+      .notice("PairQL request: \("Account".green.bold) \(operation) \(elapsed)")
   }
 }
 
@@ -298,6 +314,7 @@ private func domain(of route: PairQLRoute) -> String {
   case .superAdmin: "super-admin"
   case .admin: "admin"
   case .supervise: "supervise"
+  case .account: "account"
   }
 }
 

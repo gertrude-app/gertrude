@@ -236,6 +236,7 @@ export default defineConfig([
   ]),
   {
     files: [
+      `shared/pairql/src/account/**`,
       `shared/pairql/src/admin/**`,
       `shared/pairql/src/dashboard/**`,
       `shared/pairql/src/supervise/**`,
@@ -268,6 +269,10 @@ export default defineConfig([
       `storybook/tailwind.config.ts`,
       `shared/tailwind/src/preset.js`,
       `supervise/tailwind.config.cjs`,
+      `appviews/postcss.config.cjs`,
+      `dash/app/postcss.config.cjs`,
+      `site/postcss.config.js`,
+      `storybook/postcss.config.js`,
     ],
     rules: {
       '@typescript-eslint/no-require-imports': `off`,

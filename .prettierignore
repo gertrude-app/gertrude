@@ -9,6 +9,7 @@
 **/site/out
 **/appviews/dist
 **/admin/dist
+**/account/dist
 **/appviews/src/main.tsx
 **/next-env.d.ts
 **/routeTree.gen.ts

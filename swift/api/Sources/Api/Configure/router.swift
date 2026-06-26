@@ -28,6 +28,11 @@ public extension Configure {
       use: SuperviseTsCodegenRoute.handler(_:),
     )
 
+    app.get(
+      "account-ts-codegen",
+      use: AccountTsCodegenRoute.handler(_:),
+    )
+
     app.post(
       "site-forms",
       use: SiteFormsRoute.handler(_:),
