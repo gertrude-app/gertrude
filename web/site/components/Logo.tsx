@@ -10,7 +10,7 @@ interface Props {
   textSize?: string;
 }
 
-const LOGO_ASPECT_RATIO = 668 / 116;
+const LOGO_ASPECT_RATIO = 640 / 116;
 
 const Logo: React.FC<Props> = ({
   size = 32,

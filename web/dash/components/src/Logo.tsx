@@ -9,7 +9,7 @@ interface Props {
   withForParents?: boolean | `condensed`;
 }
 
-const LOGO_WIDTH = 670;
+const LOGO_WIDTH = 640;
 const LOGO_HEIGHT = 194;
 const Logo: React.FC<Props> = ({ size = 53, iconOnly, className, type = `default` }) => {
   if (iconOnly) {
