@@ -21,14 +21,14 @@ const PeoplePage: React.FC = () => {
           title="Protected People"
           buttons={[
             {
-              text: `Add Child`,
-              onClick: () => {},
+              text: `Add Person`,
+              href: `/people/new`,
               variant: `secondary`,
               icon: PlusIcon,
             },
             {
               text: `Monitor`,
-              onClick: () => {},
+              href: `/activity`,
               variant: `primary`,
               icon: ScanEyeIcon,
             },

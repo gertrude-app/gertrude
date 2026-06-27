@@ -26,6 +26,7 @@ import { Route as AppSettingsNotificationsRouteImport } from './routes/_app/sett
 import { Route as AppSettingsBillingRouteImport } from './routes/_app/settings/billing'
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
+import { Route as AppPeopleNewRouteImport } from './routes/_app/people/new'
 import { Route as AppPeoplePersonIdRouteRouteImport } from './routes/_app/people/$personId/route'
 import { Route as AppPeoplePersonIdIndexRouteImport } from './routes/_app/people/$personId/index'
 import { Route as AppRequestsUnlockRequestIdRouteImport } from './routes/_app/requests/unlock/$requestId'
@@ -121,6 +122,11 @@ const AppRequestsSuspensionRoute = AppRequestsSuspensionRouteImport.update({
   path: '/suspension',
   getParentRoute: () => AppRequestsRouteRoute,
 } as any)
+const AppPeopleNewRoute = AppPeopleNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppPeopleRouteRoute,
+} as any)
 const AppPeoplePersonIdRouteRoute = AppPeoplePersonIdRouteRouteImport.update({
   id: '/$personId',
   path: '/$personId',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/devices': typeof AppDevicesRoute
   '/signout': typeof AppSignoutRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
+  '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRoute
   '/requests/unlock': typeof AppRequestsUnlockRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/devices': typeof AppDevicesRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
+  '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRoute
   '/requests/unlock': typeof AppRequestsUnlockRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRoute
@@ -237,6 +245,7 @@ export interface FileRoutesById {
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
+  '/_app/people/new': typeof AppPeopleNewRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRoute
   '/_app/requests/unlock': typeof AppRequestsUnlockRouteWithChildren
   '/_app/settings/billing': typeof AppSettingsBillingRoute
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/devices'
     | '/signout'
     | '/people/$personId'
+    | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
     | '/settings/billing'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/devices'
     | '/signout'
     | '/'
+    | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
     | '/settings/billing'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/_app/signout'
     | '/_app/'
     | '/_app/people/$personId'
+    | '/_app/people/new'
     | '/_app/requests/suspension'
     | '/_app/requests/unlock'
     | '/_app/settings/billing'
@@ -460,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRequestsSuspensionRouteImport
       parentRoute: typeof AppRequestsRouteRoute
     }
+    '/_app/people/new': {
+      id: '/_app/people/new'
+      path: '/new'
+      fullPath: '/people/new'
+      preLoaderRoute: typeof AppPeopleNewRouteImport
+      parentRoute: typeof AppPeopleRouteRoute
+    }
     '/_app/people/$personId': {
       id: '/_app/people/$personId'
       path: '/$personId'
@@ -546,11 +565,13 @@ const AppPeoplePersonIdRouteRouteWithChildren =
 
 interface AppPeopleRouteRouteChildren {
   AppPeoplePersonIdRouteRoute: typeof AppPeoplePersonIdRouteRouteWithChildren
+  AppPeopleNewRoute: typeof AppPeopleNewRoute
   AppPeopleIndexRoute: typeof AppPeopleIndexRoute
 }
 
 const AppPeopleRouteRouteChildren: AppPeopleRouteRouteChildren = {
   AppPeoplePersonIdRouteRoute: AppPeoplePersonIdRouteRouteWithChildren,
+  AppPeopleNewRoute: AppPeopleNewRoute,
   AppPeopleIndexRoute: AppPeopleIndexRoute,
 }
 

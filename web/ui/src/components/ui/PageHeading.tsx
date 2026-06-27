@@ -4,17 +4,36 @@ import Button from './Button';
 import DropdownMenu from './dropdown-menu/DropdownMenu';
 import DropdownMenuItem from './dropdown-menu/DropdownMenuItem';
 
+type PageHeadingButtonBase = {
+  text: string;
+  variant?: `primary` | `secondary`;
+  icon?: LucideIcon;
+};
+
+type PageHeadingButton =
+  | (PageHeadingButtonBase & { onClick: () => void; href?: never })
+  | (PageHeadingButtonBase & { href: string; onClick?: never });
+
 interface Props {
   title: string;
   subtitle?: string;
-  buttons?: Array<{
-    text: string;
-    onClick: () => void;
-    variant?: `primary` | `secondary`;
-    icon?: LucideIcon;
-  }>;
+  buttons?: PageHeadingButton[];
   breadcrumbs?: Array<{ text: string; href: string }>;
 }
+
+const isLinkButton = (
+  button: PageHeadingButton,
+): button is PageHeadingButtonBase & { href: string; onClick?: never } =>
+  `href` in button;
+
+const handleDropdownSelect = (button: PageHeadingButton): void => {
+  if (isLinkButton(button)) {
+    window.location.href = button.href;
+    return;
+  }
+
+  button.onClick();
+};
 
 const PageHeading: React.FC<Props> = ({
   title,
@@ -61,23 +80,35 @@ const PageHeading: React.FC<Props> = ({
                   key={button.text}
                   title={button.text}
                   icon={button.icon}
-                  onSelect={button.onClick}
+                  onSelect={() => handleDropdownSelect(button)}
                 />
               ))}
             </DropdownMenu>
           </div>
           <div className="hidden @2xl/main:flex gap-2">
-            {buttons.map((button) => (
-              <Button
-                key={button.text}
-                type="button"
-                variant={button.variant === `primary` ? `primary` : `default`}
-                onClick={button.onClick}
-                icon={button.icon}
-              >
-                {button.text}
-              </Button>
-            ))}
+            {buttons.map((button) =>
+              isLinkButton(button) ? (
+                <Button
+                  key={button.text}
+                  type="link"
+                  href={button.href}
+                  variant={button.variant === `primary` ? `primary` : `default`}
+                  icon={button.icon}
+                >
+                  {button.text}
+                </Button>
+              ) : (
+                <Button
+                  key={button.text}
+                  type="button"
+                  variant={button.variant === `primary` ? `primary` : `default`}
+                  onClick={button.onClick}
+                  icon={button.icon}
+                >
+                  {button.text}
+                </Button>
+              ),
+            )}
           </div>
         </>
       )}
