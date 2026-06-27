@@ -21,6 +21,7 @@ private func corsMiddleware(_ app: Application) -> CORSMiddleware {
         "https://www.gertrude.app",
         "tauri://localhost",
         "http://tauri.localhost",
+        app.env.accountDashboardUrl,
       ]) : .all,
     allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
     allowedHeaders: [
@@ -34,6 +35,7 @@ private func corsMiddleware(_ app: Application) -> CORSMiddleware {
       .referer,
       .xDashboardUrl,
       .xAdminToken,
+      .xAccountToken,
       .xSuperAdminToken,
       .xMacAppToken,
       .xAppVersion,

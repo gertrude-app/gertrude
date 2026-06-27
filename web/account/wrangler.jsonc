@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "account",
+  "compatibility_date": "2025-12-22",
+  "build": {
+    // --ignore-scripts prevents long postinstall scripts like cypress, puppeteer
+    "command": "cd .. && pnpm install --frozen-lockfile --ignore-scripts && cd account && pnpm build",
+    "cwd": ".",
+  },
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "single-page-application",
+  },
+  // without this cloudflare complains when building for account-preview
+  "env": {
+    "preview": {},
+  },
+}

@@ -1,6 +1,6 @@
 import type { PqlError } from './PqlError';
 
-export type Domain = `dashboard` | `admin` | `supervise`;
+export type Domain = `dashboard` | `admin` | `supervise` | `account`;
 
 /**
  * Hook called before each request. Receives the mutable RequestInit (after body is set)

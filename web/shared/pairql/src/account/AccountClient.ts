@@ -1,0 +1,92 @@
+// auto-generated, do not edit
+import type * as P from '.';
+import type Result from '../Result';
+import type { PrepareRequest } from '../types';
+import type { ClientAuth as Auth } from './shared';
+import Client from '../Client';
+
+export default class AccountClient extends Client<Auth> {
+  public constructor(endpoint: string, prepareRequest: PrepareRequest<Auth>) {
+    super(endpoint, `account`, prepareRequest);
+  }
+
+  public accountLogin = (
+    input: P.AccountLogin.Input,
+  ): Promise<Result<P.AccountLogin.Output>> => {
+    return this.query<P.AccountLogin.Output>(input, `AccountLogin`, `none`);
+  };
+
+  public accountLoginMagicLink = (
+    input: P.AccountLoginMagicLink.Input,
+  ): Promise<Result<P.AccountLoginMagicLink.Output>> => {
+    return this.query<P.AccountLoginMagicLink.Output>(
+      input,
+      `AccountLoginMagicLink`,
+      `none`,
+    );
+  };
+
+  public accountRequestMagicLink = (
+    input: P.AccountRequestMagicLink.Input,
+  ): Promise<Result<P.AccountRequestMagicLink.Output>> => {
+    return this.query<P.AccountRequestMagicLink.Output>(
+      input,
+      `AccountRequestMagicLink`,
+      `none`,
+    );
+  };
+
+  public deleteActivity = (
+    input: P.DeleteActivity.Input,
+  ): Promise<Result<P.DeleteActivity.Output>> => {
+    return this.query<P.DeleteActivity.Output>(input, `DeleteActivity`, `parent`);
+  };
+
+  public getActivitySummaries = (
+    input: P.GetActivitySummaries.Input,
+  ): Promise<Result<P.GetActivitySummaries.Output>> => {
+    return this.query<P.GetActivitySummaries.Output>(
+      input,
+      `GetActivitySummaries`,
+      `parent`,
+    );
+  };
+
+  public getDayActivity = (
+    input: P.GetDayActivity.Input,
+  ): Promise<Result<P.GetDayActivity.Output>> => {
+    return this.query<P.GetDayActivity.Output>(input, `GetDayActivity`, `parent`);
+  };
+
+  public getPeople = (input: P.GetPeople.Input): Promise<Result<P.GetPeople.Output>> => {
+    return this.query<P.GetPeople.Output>(input, `GetPeople`, `parent`);
+  };
+
+  public getPersonActivitySummaries = (
+    input: P.GetPersonActivitySummaries.Input,
+  ): Promise<Result<P.GetPersonActivitySummaries.Output>> => {
+    return this.query<P.GetPersonActivitySummaries.Output>(
+      input,
+      `GetPersonActivitySummaries`,
+      `parent`,
+    );
+  };
+
+  public getPersonDayActivity = (
+    input: P.GetPersonDayActivity.Input,
+  ): Promise<Result<P.GetPersonDayActivity.Output>> => {
+    return this.query<P.GetPersonDayActivity.Output>(
+      input,
+      `GetPersonDayActivity`,
+      `parent`,
+    );
+  };
+
+  public toggleActivityFlag = (
+    input: P.ToggleActivityFlag.Input,
+  ): Promise<Result<P.ToggleActivityFlag.Output>> => {
+    return this.query<P.ToggleActivityFlag.Output>(input, `ToggleActivityFlag`, `parent`);
+  };
+}
+
+export type { P };

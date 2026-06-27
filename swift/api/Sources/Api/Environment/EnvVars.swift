@@ -8,6 +8,7 @@ public struct Env: Sendable {
   public var postmark: Postmark
   public var database: Database
   public var dashboardUrl: String
+  public var accountDashboardUrl: String
   public var twilio: Twilio
   public var stripe: Stripe
   public var appStoreConnect: AppStoreConnect
@@ -129,6 +130,7 @@ extension Env: DependencyKey {
         password: processEnv("DATABASE_PASSWORD"),
       ),
       dashboardUrl: processEnv("DASHBOARD_URL"),
+      accountDashboardUrl: processEnv("ACCOUNT_DASHBOARD_URL"),
       twilio: Twilio(
         accountSid: processEnv("TWILIO_ACCOUNT_SID"),
         authToken: processEnv("TWILIO_AUTH_TOKEN"),

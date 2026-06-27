@@ -21,6 +21,7 @@ public struct TsCodegenCommand: AsyncCommand {
       ("dashboard", encoder.encode(DashboardTsCodegenRoute.generate())),
       ("admin", encoder.encode(AdminTsCodegenRoute.generate())),
       ("supervise", encoder.encode(SuperviseTsCodegenRoute.generate())),
+      ("account", encoder.encode(AccountTsCodegenRoute.generate())),
     ] {
       try data.write(to: dir.appendingPathComponent("\(name).json"))
       context.console.print("wrote \(name).json")

@@ -8,9 +8,11 @@
     "./admin": "./admin.ts",
     "./dashboard": "./dashboard.ts",
     "./supervise": "./supervise.ts",
+    "./account": "./account.ts",
     "./src/dashboard": "./src/dashboard/index.ts",
     "./src/admin": "./src/admin/index.ts",
     "./src/supervise": "./src/supervise/index.ts",
+    "./src/account": "./src/account/index.ts",
     "./src/PqlError": "./src/PqlError.ts"
   },
   "scripts": {
