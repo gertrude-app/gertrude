@@ -46,8 +46,7 @@ export type ViewState = {
 };
 
 export type ViewAction =
-  | { type: `requestsPausedToggled` }
-  | { type: `explanationUpdated`; text: string };
+  { type: `requestsPausedToggled` } | { type: `explanationUpdated`; text: string };
 
 export type Action = ActionOf<AppState, AppEvent, ViewAction>;
 export type State = AppState & ViewState;

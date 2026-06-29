@@ -143,7 +143,7 @@ jobs:
         run: |
           ${API_BIN_PATH}/Run ts-codegen /tmp/codegen
           (cd web/shared/pairql && pnpm install --frozen-lockfile && CODEGEN_INPUT_DIR=/tmp/codegen pnpm codegen)
-          npx prettier@3.5.3 --config .prettierrc.json --write web/
+          npx prettier@3.9.3 --config .prettierrc.json --ignore-path .prettierignore --write web/
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git checkout -- swift/api/Package.resolved
           if ! git diff --exit-code -- web/; then
@@ -260,7 +260,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           (cd swift/macapp/App && CODEGEN_TYPESCRIPT=1 swift test --filter Codegen)
-          npx prettier@3.5.3 --config .prettierrc.json --write web/appviews/src/
+          npx prettier@3.9.3 --config .prettierrc.json --ignore-path .prettierignore --write web/appviews/src/
           git checkout -- swift/macapp/App/Package.resolved
           if ! git diff --exit-code -- web/appviews/src/; then
             echo "::error::Macapp TypeScript store types are out of date. Run 'just codegen-typescript' and commit the changes."

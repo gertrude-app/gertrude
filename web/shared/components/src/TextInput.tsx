@@ -31,13 +31,7 @@ type InputProps = {
 };
 
 type InputType =
-  | `email`
-  | `text`
-  | `url`
-  | `positiveInteger`
-  | `password`
-  | `date`
-  | `time`;
+  `email` | `text` | `url` | `positiveInteger` | `password` | `date` | `time`;
 
 type Props =
   | ({ type: InputType } & InputProps & CommonProps)

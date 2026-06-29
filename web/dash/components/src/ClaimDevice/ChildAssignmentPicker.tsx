@@ -2,8 +2,7 @@ import { Button, SelectMenu, TextInput } from '@shared/components';
 import React, { useState } from 'react';
 
 export type ChildSelection =
-  | { type: `existing`; id: UUID }
-  | { type: `new`; name: string };
+  { type: `existing`; id: UUID } | { type: `new`; name: string };
 
 type Props = {
   children: Array<{ id: UUID; name: string }>;

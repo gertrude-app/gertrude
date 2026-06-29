@@ -7,9 +7,7 @@ import type { AdminNotificationTrigger, VerifiedNotificationMethod } from '@dash
 import GradientIcon from '../GradientIcon';
 
 type TriggerCategory =
-  | `suspendFilterRequestSubmitted`
-  | `unlockRequestSubmitted`
-  | `securityEvents`;
+  `suspendFilterRequestSubmitted` | `unlockRequestSubmitted` | `securityEvents`;
 type SecurityEventLevel = `recommended` | `medium` | `all`;
 
 type Props = {

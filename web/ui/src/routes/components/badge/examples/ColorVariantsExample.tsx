@@ -3,14 +3,7 @@ import React from 'react';
 import Badge from '#/components/ui/Badge';
 
 type BadgeColor =
-  | `neutral`
-  | `violet`
-  | `red`
-  | `green`
-  | `blue`
-  | `yellow`
-  | `beta`
-  | `canary`;
+  `neutral` | `violet` | `red` | `green` | `blue` | `yellow` | `beta` | `canary`;
 
 const colors: BadgeColor[] = [
   `neutral`,
