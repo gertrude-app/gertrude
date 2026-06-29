@@ -253,6 +253,7 @@ export interface SuspendFilterRequest {
   deviceId: UUID;
   status: RequestStatus;
   userName: string;
+  deviceName?: string;
   requestedDurationInSeconds: number;
   requestComment?: string;
   responseComment?: string;

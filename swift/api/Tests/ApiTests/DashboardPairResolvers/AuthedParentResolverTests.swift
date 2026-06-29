@@ -581,6 +581,45 @@ final class AuthedParentResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.userName).toEqual(child.name)
     expect(output.requestedDurationInSeconds).toEqual(request.duration.rawValue)
     expect(output.status).toEqual(request.status)
+    expect(output.deviceName).toBeNil() // child on a single computer -> no disambiguation
+  }
+
+  func testGetSuspendFilterRequestPrefersCustomDeviceNameWhenChildOnMultipleComputers(
+  ) async throws {
+    let child = try await self.child()
+    let requesting = try await child.withDevice(computer: { $0.customName = "Joey's MacBook" })
+    _ = try await child.withDevice() // second computer makes the request ambiguous
+
+    var request = MacApp.SuspendFilterRequest.random
+    request.computerUserId = requesting.computerUser.id
+    try await self.db.create(request)
+
+    let output = try await GetSuspendFilterRequest.resolve(
+      with: request.id,
+      in: context(child.parent),
+    )
+
+    expect(output.deviceName).toEqual("Joey's MacBook")
+  }
+
+  func testGetSuspendFilterRequestFallsBackToModelNameWhenNoCustomName() async throws {
+    let child = try await self.child()
+    let requesting = try await child.withDevice(computer: {
+      $0.customName = nil
+      $0.modelIdentifier = "Mac16,10"
+    })
+    _ = try await child.withDevice() // second computer makes the request ambiguous
+
+    var request = MacApp.SuspendFilterRequest.random
+    request.computerUserId = requesting.computerUser.id
+    try await self.db.create(request)
+
+    let output = try await GetSuspendFilterRequest.resolve(
+      with: request.id,
+      in: context(child.parent),
+    )
+
+    expect(output.deviceName).toEqual(requesting.computer.model.shortDescription)
   }
 
   func testGetUnlockRequests() async throws {

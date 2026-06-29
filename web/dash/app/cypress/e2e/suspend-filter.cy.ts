@@ -72,4 +72,14 @@ describe(`suspend filter request flow`, () => {
     cy.testId(`select-suspension-duration`).contains(`custom duration`);
     cy.contains(`Custom duration (minutes):`);
   });
+
+  it(`shows the originating device when the request is device-ambiguous`, () => {
+    cy.interceptPql(
+      `GetSuspendFilterRequest`,
+      mock.suspendFilterRequest({ id: `1`, deviceName: `Mac mini` }),
+    );
+    cy.visit(`children/user-1/suspend-filter-requests/1`);
+    cy.contains(`on`);
+    cy.contains(`Mac mini`);
+  });
 });

@@ -1,3 +1,4 @@
+import DuetSQL
 import Foundation
 import Gertie
 import PairQL
@@ -11,6 +12,7 @@ struct GetSuspendFilterRequest: Pair {
     var deviceId: Api.ComputerUser.Id
     var status: RequestStatus
     var userName: String
+    var deviceName: String?
     var requestedDurationInSeconds: Int
     var requestComment: String?
     var responseComment: String?
@@ -30,11 +32,12 @@ extension GetSuspendFilterRequest: Resolver {
     if Semver(userDevice.appVersion)! >= .init("2.1.0")! {
       extraMonitoringOptions = user.extraMonitoringOptions.mapKeys(\.magicString)
     }
-    return Output(
+    return try await Output(
       id: id,
       deviceId: userDevice.id,
       status: request.status,
       userName: user.name,
+      deviceName: disambiguatingDeviceName(for: userDevice, in: context),
       requestedDurationInSeconds: request.duration.rawValue,
       requestComment: request.requestComment,
       responseComment: request.responseComment,
@@ -42,4 +45,16 @@ extension GetSuspendFilterRequest: Resolver {
       createdAt: request.createdAt,
     )
   }
+}
+
+private func disambiguatingDeviceName(
+  for userDevice: ComputerUser,
+  in context: ParentContext,
+) async throws -> String? {
+  let childComputerUsers = try await ComputerUser.query()
+    .where(.childId == userDevice.childId)
+    .all(in: context.db)
+  guard Set(childComputerUsers.map(\.computerId)).count > 1 else { return nil }
+  let computer = try await userDevice.computer(in: context.db)
+  return computer.customName ?? computer.model.shortDescription
 }
