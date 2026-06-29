@@ -9,8 +9,8 @@
     "@eslint/js": "9.28.0",
     "@stylistic/eslint-plugin": "4.4.1",
     "@types/react": "19.2.14",
-    "@typescript-eslint/eslint-plugin": "8.33.1",
-    "@typescript-eslint/parser": "8.33.1",
+    "@typescript-eslint/eslint-plugin": "8.62.1",
+    "@typescript-eslint/parser": "8.62.1",
     "concurrently": "8.2.2",
     "cypress": "14.4.1",
     "eslint": "9.28.0",
@@ -23,8 +23,13 @@
     "next": "16.1.1",
     "nx": "22.3.3",
     "prettier": "3.5.3",
-    "typescript": "5.8.3",
+    "typescript": "6.0.3",
     "vitest": "3.2.1",
     "x-chalk": "^1.0.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "typescript": "6.0.3"
+    }
   }
 }

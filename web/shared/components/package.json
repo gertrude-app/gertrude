@@ -12,8 +12,8 @@
     "@heroicons/react": "2.0.17",
     "@shared/datetime": "workspace:*",
     "classnames": "2.5.1",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
     "react-router-dom": "6.22.3"
   }
 }

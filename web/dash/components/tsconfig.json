@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["dash-ambient"]
   }
 }

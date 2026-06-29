@@ -10,6 +10,8 @@
 **/appviews/dist
 **/admin/dist
 **/account/dist
+**/dashboard-v2/dist
+**/ui/dist
 **/appviews/src/main.tsx
 **/next-env.d.ts
 **/routeTree.gen.ts
