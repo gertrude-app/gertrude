@@ -24,7 +24,7 @@
     "nx": "23.0.1",
     "prettier": "3.9.3",
     "typescript": "6.0.3",
-    "vitest": "3.2.1",
+    "vitest": "4.1.9",
     "x-chalk": "^1.0.1"
   },
   "pnpm": {
