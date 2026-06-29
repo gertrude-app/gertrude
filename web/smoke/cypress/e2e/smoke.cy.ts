@@ -34,11 +34,13 @@ describe(`Smoke test`, () => {
     cy.origin(`https://gertrude.app`, { args: { referralCode } }, ({ referralCode }) => {
       cy.visit(`https://gertrude.app/?ref=${referralCode}`);
       cy.location(`search`).should(`include`, `ref=${referralCode}`);
-      cy.getCookie(`referral_code`).its(`value`).should(`eq`, referralCode);
-      cy.get(`a[href*="parents.gertrude.app/signup"]`)
+      cy.get(`a[href*="parents.gertrude.app/signup"][href*="ref=${referralCode}"]`, {
+        timeout: 15000,
+      })
         .filter(`:visible`)
         .first()
         .as(`signupLink`);
+      cy.getCookie(`referral_code`).its(`value`).should(`eq`, referralCode);
       cy.get(`@signupLink`)
         .should(`have.attr`, `href`)
         .and(`include`, `ref=${referralCode}`);
