@@ -68,4 +68,24 @@ final class DashboardWidgets_v3ResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output.children[0].devices.count).toEqual(2)
   }
+
+  func testChildActivitySummariesOmitsChildrenWithoutMacApp() async throws {
+    let macChild = try await self.childWithComputer()
+    try await self.db.create(Screenshot.random {
+      $0.computerUserId = macChild.computerUser.id // unreviewed mac activity
+    })
+    try await self.db.create(Child.random {
+      $0.parentId = macChild.parent.model.id // phone-only sibling, never used the mac app
+    })
+
+    let output = try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+      $0.aws._signedS3GetUrl = { _ in URL(string: "https://signed.test/img.jpg")! }
+    } operation: {
+      try await DashboardWidgets_v3.resolve(in: context(macChild.parent))
+    }
+
+    expect(output.childActivitySummaries.map(\.id)).toEqual([macChild.model.id])
+    expect(output.childActivitySummaries.first?.numUnreviewed).toEqual(1)
+  }
 }

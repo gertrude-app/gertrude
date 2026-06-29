@@ -286,7 +286,9 @@ private func childActivitySummaries(
   keystrokes: [KeystrokeLine],
   screenshots: [Screenshot],
 ) -> [DashboardWidgets_v3.ChildActivitySummary] {
-  children.map { user in
+  let childIdsWithComputerUser = Set(map.values.map(\.id))
+  return children.compactMap { user in
+    guard childIdsWithComputerUser.contains(user.id) else { return nil }
     let userScreenshots = screenshots.filter { map[$0.computerUserId]?.id == user.id }
     let userKeystrokes = keystrokes.filter { map[$0.computerUserId]?.id == user.id }
     return .init(
