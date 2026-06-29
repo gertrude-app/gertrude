@@ -111,6 +111,7 @@ const SuspendFilter: React.FC = () => {
     >
       <SuspendFilterRequestForm
         username={request.userName}
+        deviceName={request.deviceName}
         requestedDurationInSeconds={request.requestedDurationInSeconds}
         requestComment={request.requestComment}
         durationInSeconds={state.grantedDurationInSeconds}

@@ -6,6 +6,7 @@ import UserInputText from '../UserInputText';
 
 type Props = {
   username: string;
+  deviceName?: string;
   requestComment?: string;
   requestedDurationInSeconds: number;
   durationInSeconds: string;
@@ -22,6 +23,7 @@ type Props = {
 
 const SuspendFilterRequestForm: React.FC<Props> = ({
   username,
+  deviceName,
   requestedDurationInSeconds,
   requestComment,
   durationInSeconds,
@@ -53,6 +55,11 @@ const SuspendFilterRequestForm: React.FC<Props> = ({
       <UserInputText small>{Math.floor(requestedDurationInSeconds / 60)}</UserInputText>
       {` `}
       minutes
+      {deviceName && (
+        <>
+          {` `}on <UserInputText small>{deviceName}</UserInputText>
+        </>
+      )}
       {requestComment ? `, with the comment:` : `.`}
     </div>
     {requestComment && (

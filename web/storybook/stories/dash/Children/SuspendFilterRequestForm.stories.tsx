@@ -64,4 +64,10 @@ export const CustomDuration: Story = props({
   customDurationInMinutes: `77`,
 });
 
+// @screenshot: xs,md
+export const WithDeviceName: Story = props({
+  ...Default.args,
+  deviceName: `Mac mini`,
+});
+
 export default meta;
