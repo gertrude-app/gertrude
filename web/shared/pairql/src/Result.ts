@@ -1,8 +1,7 @@
 import type { PqlError } from './PqlError';
 
 export type ResultData<T, E = PqlError> =
-  | { type: `success`; value: T }
-  | { type: `error`; error: E };
+  { type: `success`; value: T } | { type: `error`; error: E };
 
 export default class Result<T, E = PqlError> {
   protected constructor(public data: ResultData<T, E>) {}

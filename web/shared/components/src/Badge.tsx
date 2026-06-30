@@ -2,14 +2,7 @@ import cx from 'classnames';
 import React from 'react';
 
 export type BadgeType =
-  | `green`
-  | `ok`
-  | `warning`
-  | `yellow`
-  | `red`
-  | `error`
-  | `blue`
-  | `info`;
+  `green` | `ok` | `warning` | `yellow` | `red` | `error` | `blue` | `info`;
 
 type Props = {
   className?: string;

@@ -147,8 +147,7 @@ export type DeviceModelFamily =
   | 'unknown';
 
 export type IOSDeviceChildAssignment =
-  | { case: 'newChild'; name: string }
-  | { case: 'existingChild'; id: UUID };
+  { case: 'newChild'; name: string } | { case: 'existingChild'; id: UUID };
 
 export interface Key {
   id: UUID;
@@ -322,8 +321,4 @@ export interface VerifiedNotificationMethod {
 }
 
 export type WebPolicy =
-  | 'allowAll'
-  | 'blockAdult'
-  | 'blockAdultAnd'
-  | 'blockAllExcept'
-  | 'blockAll';
+  'allowAll' | 'blockAdult' | 'blockAdultAnd' | 'blockAllExcept' | 'blockAll';

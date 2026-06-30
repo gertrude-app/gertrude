@@ -6,10 +6,7 @@ export type EditBlockRuleProps = {
 };
 
 export type BlockCondition =
-  | `always`
-  | `whenAddressContains`
-  | `whenIsBrowser`
-  | `unlessAddressContains`;
+  `always` | `whenAddressContains` | `whenIsBrowser` | `unlessAddressContains`;
 
 export type EditEvent =
   | { type: `setPrimaryValue`; value: string }

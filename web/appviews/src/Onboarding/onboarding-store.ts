@@ -61,12 +61,7 @@ export interface MacOSVersion {
 }
 
 export type UserRemediationStep =
-  | 'create'
-  | 'switch'
-  | 'demote'
-  | 'choose'
-  | 'createForm'
-  | 'createSuccess';
+  'create' | 'switch' | 'demote' | 'choose' | 'createForm' | 'createSuccess';
 
 export interface MacOSUser {
   id: number;

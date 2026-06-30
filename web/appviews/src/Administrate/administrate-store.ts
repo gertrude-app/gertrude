@@ -26,8 +26,7 @@ export interface HealthCheck {
   keystrokeRecordingPermissionOk?: boolean;
   fullDiskAccessPermissionOk?: boolean;
   macOsUserType?:
-    | { case: 'ok'; value: 'admin' | 'standard' }
-    | { case: 'error'; message?: string };
+    { case: 'ok'; value: 'admin' | 'standard' } | { case: 'error'; message?: string };
   notificationsSetting?: 'none' | 'banner' | 'alert';
   screenTimeWebFilterActive?: boolean;
 }

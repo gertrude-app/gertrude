@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "ignoreDeprecations": "5.0",
+    "target": "ES2022",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -11,12 +10,12 @@
     "esModuleInterop": true,
     "noUncheckedIndexedAccess": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "types": ["dash-ambient", "node"],
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"

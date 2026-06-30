@@ -1,9 +1,7 @@
 import type { NotificationTrigger } from '#/lib/mock';
 
 export type NotificationTriggerCategory =
-  | `suspendFilterRequestSubmitted`
-  | `unlockRequestSubmitted`
-  | `securityEvents`;
+  `suspendFilterRequestSubmitted` | `unlockRequestSubmitted` | `securityEvents`;
 export type SecurityEventLevel = `recommended` | `medium` | `all`;
 
 export function notificationTriggerText(trigger: NotificationTrigger): string {

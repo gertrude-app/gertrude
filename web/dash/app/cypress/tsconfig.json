@@ -1,9 +1,8 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["es2015", "dom"],
-    "types": ["cypress", "node"],
+    "jsx": "react-jsx",
+    "types": ["cypress", "node", "dash-ambient"],
     "resolveJsonModule": true
   },
   "include": ["**/*.ts"]

@@ -13,23 +13,24 @@
     "@docsearch/react": "4.4.0",
     "@headlessui/react": "2.2.9",
     "@markdoc/markdoc": "0.4.0",
-    "@next/third-parties": "16.1.1",
+    "@next/third-parties": "16.2.9",
     "@radix-ui/react-dropdown-menu": "2.1.16",
     "@shared/components": "workspace:*",
     "@shared/datetime": "workspace:*",
     "@shared/string": "workspace:*",
     "@shared/tailwind": "workspace:*",
     "@sindresorhus/slugify": "^2.1.0",
-    "@tailwindcss/typography": "^0.5.7",
+    "@tailwindcss/typography": "0.5.19",
     "classnames": "2.5.1",
     "lucide-react": "0.427.0",
-    "next": "16.1.1",
+    "next": "16.2.9",
     "prismjs": "1.29.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
     "react-turnstile": "1.1.4"
   },
   "devDependencies": {
+    "@types/dash-ambient": "workspace:*",
     "@types/glob": "8.1.0",
     "@types/js-yaml": "4.0.5",
     "@types/node": "22.19.3",
@@ -40,6 +41,7 @@
     "gray-matter": "4.0.3",
     "js-yaml": "4.1.0",
     "seedrandom": "3.0.5",
-    "tailwindcss": "3.4.17"
+    "tailwindcss": "3.4.17",
+    "typescript": "6.0.3"
   }
 }

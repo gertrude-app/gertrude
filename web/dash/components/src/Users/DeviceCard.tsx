@@ -5,8 +5,7 @@ import type { ChildComputerStatus } from '@dash/types';
 import UserStatus from '../UserStatus';
 
 export type DeviceCardStatus =
-  | { case: `computerStatus`; status: ChildComputerStatus }
-  | { case: `pendingSetup` };
+  { case: `computerStatus`; status: ChildComputerStatus } | { case: `pendingSetup` };
 
 type BaseProps = {
   to: string;
