@@ -12,8 +12,12 @@ struct LibraryViewContainer: View {
     NavigationStack {
       LibraryView(
         state: self.store.viewState,
+        isRefreshing: self.store.isRefreshingRemoteLibrary,
         transitionNamespace: self.zoomNamespace,
-        onRetryTap: { self.store.send(.onAppear) },
+        onRetryTap: { self.store.send(.retryButtonTapped) },
+        onRefresh: {
+          self.store.send(.refreshPulled)
+        },
         onAlbumTap: { self.store.send(.albumTapped(.init($0))) },
         onDebugResetTap: { self.store.send(.debugResetOnboardingButtonTapped) },
       )

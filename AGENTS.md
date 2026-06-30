@@ -34,6 +34,16 @@ below.
 > validate the business model with Apple — hopefully coming soon. Don't present it as a
 > shipped or public product (e.g. in marketing copy or `llms.txt`).
 
+## Apple OS version numbering
+
+Starting at WWDC 2025, Apple switched all platform OSes to year-based version
+numbers. The releases after iOS/iPadOS 18, macOS 15 Sequoia, watchOS 11, tvOS 18,
+and visionOS 2 were iOS/iPadOS 26, macOS 26 Tahoe, watchOS 26, tvOS 26, and
+visionOS 26. Do not invent intermediate major versions that don't exist: for example,
+there is no iOS/iPadOS 19-25, macOS 16-25, watchOS 12-25, tvOS 19-25, or
+visionOS 3-25. When someone says "iOS 17-27", interpret that as the actual versions
+in that span, not a continuous numeric set.
+
 ## Production Websites:
 
 ### Dashboard (Gertrude for Parents)

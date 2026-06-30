@@ -5,6 +5,8 @@ struct LibraryFeature: Sendable {
   @ObservableState
   struct State: Equatable {
     var status = Status.loading
+    var isRefreshingRemoteLibrary = false
+    var hasStartedInitialLibraryLoad = false
     @Presents var albumDetail: AlbumDetailFeature.State?
   }
 
@@ -16,11 +18,19 @@ struct LibraryFeature: Sendable {
     case subscriptionRequired
   }
 
+  enum CancelID: Hashable, Sendable {
+    case approvedLibraryRefresh
+  }
+
   enum Action: Equatable {
     case onAppear
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
     case approvedLibrarySubscriptionRequired
+    case cachedApprovedLibraryLoaded(ApprovedMusicLibrary)
+    case refreshPresentationFinished
+    case refreshPulled
+    case retryButtonTapped
     case albumTapped(ApprovedAlbum.ID)
     case albumDetailDismissed(String)
     case debugResetOnboardingButtonTapped
@@ -29,33 +39,54 @@ struct LibraryFeature: Sendable {
   }
 
   @Dependency(\.approvedMusic) var approvedMusic
+  @Dependency(\.continuousClock) var clock
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        state.status = .loading
-        return .run { send in
-          do {
-            try await send(.approvedLibraryLoaded(self.approvedMusic.loadApprovedLibrary()))
-          } catch ApprovedMusicClientError.subscriptionRequired {
-            await send(.approvedLibrarySubscriptionRequired)
-          } catch {
-            await send(.approvedLibraryLoadFailed)
-          }
+        guard !state.hasStartedInitialLibraryLoad else { return .none }
+        state.hasStartedInitialLibraryLoad = true
+        state.isRefreshingRemoteLibrary = true
+        if !state.status.isDisplayingLibrary {
+          state.status = .loading
         }
+        return self.refreshRemoteApprovedLibrary(loadCache: true)
 
       case .approvedLibraryLoaded(let library):
         state.status = library.albums.isEmpty ? .empty : .loaded(library)
         return .none
 
       case .approvedLibraryLoadFailed:
+        guard !state.status.isDisplayingLibrary else { return .none }
         state.status = .failed
         return .none
 
       case .approvedLibrarySubscriptionRequired:
         state.status = .subscriptionRequired
         return .none
+
+      case .cachedApprovedLibraryLoaded(let library):
+        state.status = library.albums.isEmpty ? .empty : .loaded(library)
+        return .none
+
+      case .refreshPresentationFinished:
+        state.isRefreshingRemoteLibrary = false
+        return .none
+
+      case .refreshPulled:
+        state.isRefreshingRemoteLibrary = true
+        if !state.status.isDisplayingLibrary {
+          state.status = .loading
+        }
+        return self.refreshRemoteApprovedLibrary(loadCache: false)
+
+      case .retryButtonTapped:
+        state.isRefreshingRemoteLibrary = true
+        if !state.status.isDisplayingLibrary {
+          state.status = .loading
+        }
+        return self.refreshRemoteApprovedLibrary(loadCache: true)
 
       case .albumTapped(let albumID):
         state.albumDetail = self.albumDetail(albumID, in: state)
@@ -78,6 +109,26 @@ struct LibraryFeature: Sendable {
     }
   }
 
+  private func refreshRemoteApprovedLibrary(loadCache: Bool) -> EffectOf<Self> {
+    .run { send in
+      async let minimumDisplayDuration: Void = self.clock.sleep(for: .milliseconds(1500))
+      if loadCache,
+         let cachedLibrary = await self.approvedMusic.loadCachedApprovedLibrary() {
+        await send(.cachedApprovedLibraryLoaded(cachedLibrary))
+      }
+      do {
+        try await send(.approvedLibraryLoaded(self.approvedMusic.loadRemoteApprovedLibrary()))
+      } catch ApprovedMusicClientError.subscriptionRequired {
+        await send(.approvedLibrarySubscriptionRequired)
+      } catch {
+        await send(.approvedLibraryLoadFailed)
+      }
+      try await minimumDisplayDuration
+      await send(.refreshPresentationFinished)
+    }
+    .cancellable(id: CancelID.approvedLibraryRefresh, cancelInFlight: true)
+  }
+
   private func albumDetail(_ albumID: ApprovedAlbum.ID, in state: State) -> AlbumDetailFeature
     .State? {
     guard case .loaded(let library) = state.status,
@@ -88,6 +139,17 @@ struct LibraryFeature: Sendable {
       album: album,
       transitionSourceID: albumID.rawValue,
     )
+  }
+}
+
+private extension LibraryFeature.Status {
+  var isDisplayingLibrary: Bool {
+    switch self {
+    case .loaded, .empty:
+      true
+    case .loading, .failed, .subscriptionRequired:
+      false
+    }
   }
 }
 
