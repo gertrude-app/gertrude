@@ -59,34 +59,67 @@ final class IOSReducerTestsResume: XCTestCase {
   }
 
   @MainActor
-  func testClaimedNotSupervised_withCode_goesToInstructions() async throws {
+  func testClaimedNotSupervised_reChecksServerAndAdvancesWhenSupervised() async throws {
     let store = TestStore(initialState: IOSReducer.State(
       screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised))),
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.sharedStorage.loadPendingSupervisionCode = {
-        .init(code: 456, expiresAt: .reference)
-      }
+      $0.device.deleteCacheFillDir = {}
+      $0.systemExtension.filterRunning = { false }
+      $0.sharedStorage.loadPendingSupervisionCode = { .mock }
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
+      $0.api
+        .checkSupervisionFlowStatus = { @Sendable _ in .missingProfile(.mock) } // now supervised
+      $0.api.setAccountConnection = { @Sendable _ in }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
     }
+    store.exhaustivity = .off
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: 456))))
+      $0.screen = .launching // re-checks server instead of re-walking instructions
+    }
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.promptInstallProfile)))
     }
   }
 
   @MainActor
-  func testClaimedNotSupervised_noCode_fallsBackToExplain() async throws {
+  func testRequiresSubscription_tryAgain_reChecksServerAfterPaying() async throws {
     let store = TestStore(initialState: IOSReducer.State(
-      screen: .onboarding(.supervision(.resume(.codeClaimedNotSupervised))),
+      screen: .onboarding(.supervision(.resume(.requiresSubscription))),
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.sharedStorage.loadPendingSupervisionCode = { nil }
+      $0.device.deleteCacheFillDir = {}
+      $0.systemExtension.filterRunning = { false }
+      $0.sharedStorage.loadPendingSupervisionCode = { .mock }
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .claimed(.mock) } // now paid
+      $0.api.setAccountConnection = { @Sendable _ in }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
     }
+    store.exhaustivity = .off
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
-      $0.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
+      $0.screen = .launching
+    }
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised)))
     }
   }
 

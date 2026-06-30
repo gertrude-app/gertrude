@@ -79,6 +79,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testClaimed_notYetSupervised() async throws {
     let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
     let device = try await self.db.create(IOSDevice(
@@ -115,8 +116,87 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
     )))
   }
 
+  func testRequiresSubscription_claimedButUnpaid() async throws {
+    let parent = try await self.parent() // no paid subscription
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let uuids = MockUUIDs()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      claimedAt: .reference,
+    )
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+      $0.uuid = .mock(uuids)
+    } operation: {
+      try await CheckSupervisionFlowStatus.resolve(
+        // appVersion non-nil => client knows the .requiresSubscription case
+        with: .init(vendorId: device.id.rawValue, code: claim.code, appVersion: "1.6.0"),
+        in: .mock,
+      )
+    }
+
+    expect(output).toEqual(.requiresSubscription(.init(
+      childId: child.id.rawValue,
+      token: uuids[1],
+      deviceId: device.id.rawValue,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: claim.code),
+    )))
+  }
+
+  // old clients (no appVersion) can't decode .requiresSubscription, so keep returning .claimed
+  func testClaimedButUnpaid_oldClientWithoutAppVersion_staysClaimed() async throws {
+    let parent = try await self.parent() // no paid subscription
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let uuids = MockUUIDs()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      claimedAt: .reference,
+    )
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+      $0.uuid = .mock(uuids)
+    } operation: {
+      try await CheckSupervisionFlowStatus.resolve(
+        with: .init(vendorId: device.id.rawValue, code: claim.code), // appVersion nil
+        in: .mock,
+      )
+    }
+
+    expect(output).toEqual(.claimed(.init(
+      childId: child.id.rawValue,
+      token: uuids[1],
+      deviceId: device.id.rawValue,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: claim.code),
+    )))
+  }
+
   func testClaimed_notYetSupervised_expiredCode_renewsAndReturnsClaimed() async throws {
     let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
     let device = try await self.db.create(IOSDevice(
@@ -160,6 +240,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testSupervised_notYetProfileInstalled() async throws {
     let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice(
       id: .init(),
@@ -185,7 +266,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
       $0.date = .constant(.reference)
     } operation: {
       try await CheckSupervisionFlowStatus.resolve(
-        with: .init(vendorId: device.id.rawValue, code: claim.code),
+        with: .init(vendorId: device.id.rawValue, code: claim.code, appVersion: "1.6.0"),
         in: .mock,
       )
     }
@@ -200,6 +281,86 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
       .where(.installId == install.id)
       .first(in: self.db)
     expect(data.token).toEqual(token.value.rawValue)
+  }
+
+  // supervised but profile not installed + lapsed plan: the profile artifact is
+  // payment-gated (ProfileDownload), so gate here too rather than dead-end in Safari
+  func testRequiresSubscription_supervisedButUnpaidNeedsProfile() async throws {
+    let parent = try await self.parent() // no paid subscription
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let uuids = MockUUIDs()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      claimedAt: .reference,
+    )
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
+    try await self.db.create(BlockerApp.Supervision(
+      deviceId: device.id,
+      supervisedAt: .reference, // supervised, but profileInstalledAt still nil
+    ))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+      $0.uuid = .mock(uuids)
+    } operation: {
+      try await CheckSupervisionFlowStatus.resolve(
+        with: .init(vendorId: device.id.rawValue, code: claim.code, appVersion: "1.6.0"),
+        in: .mock,
+      )
+    }
+
+    expect(output).toEqual(.requiresSubscription(.init(
+      childId: child.id.rawValue,
+      token: uuids[1],
+      deviceId: device.id.rawValue,
+      childName: child.name,
+      supervised: .byGertrude(claimCode: claim.code),
+    )))
+  }
+
+  // old clients (no appVersion) can't decode .requiresSubscription, so keep returning .missingProfile
+  func testMissingProfile_unpaidButOldClient_staysMissingProfile() async throws {
+    let parent = try await self.parent() // no paid subscription
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      child.id,
+      claimedAt: .reference,
+    )
+    try await self.db.create(BlockerApp.Install.mock { $0.deviceId = device.id })
+    try await self.db.create(BlockerApp.Supervision(
+      deviceId: device.id,
+      supervisedAt: .reference,
+    ))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await CheckSupervisionFlowStatus.resolve(
+        with: .init(vendorId: device.id.rawValue, code: claim.code), // appVersion nil
+        in: .mock,
+      )
+    }
+
+    guard case .missingProfile = output else {
+      XCTFail("Expected .missingProfile, got \(output)")
+      return
+    }
   }
 
   func testComplete_allFieldsSet() async throws {

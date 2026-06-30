@@ -11,6 +11,7 @@ extension IOSReducer.Deps {
       case codeNotClaimed(code: Int)
       case codeExpired
       case codeNotFound
+      case requiresSubscription(ChildIOSDeviceData_v2)
       case codeClaimedNotSupervised(ChildIOSDeviceData_v2)
       case supervisedButNeedsProfile(ChildIOSDeviceData_v2)
       // anomaly: api says "fully supervised", but filter is not running
@@ -45,6 +46,8 @@ extension IOSReducer.Deps {
           return .gertrudeSupervisionReboot(.codeExpired)
         case .notFound:
           return .gertrudeSupervisionReboot(.codeNotFound)
+        case .requiresSubscription(let conn):
+          return .gertrudeSupervisionReboot(.requiresSubscription(conn))
         case .claimed(let conn):
           return .gertrudeSupervisionReboot(.codeClaimedNotSupervised(conn))
         case .missingProfile(let conn):

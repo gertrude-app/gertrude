@@ -212,7 +212,7 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     case (.networkError, _):
       .onboarding(.supervision(.resume(.networkError)))
     case (.requiresSubscription, _):
-      .onboarding(.supervision(.resume(.codeClaimedNotSupervised)))
+      .onboarding(.supervision(.resume(.requiresSubscription)))
     }
   }
 }

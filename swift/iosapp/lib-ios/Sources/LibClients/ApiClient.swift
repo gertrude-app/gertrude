@@ -185,6 +185,7 @@ extension ApiClient: DependencyKey {
           unauthed: .checkSupervisionFlowStatus(.init(
             vendorId: deviceId,
             code: code,
+            appVersion: version,
           )),
         )
       },

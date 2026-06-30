@@ -546,14 +546,9 @@ public struct IOSReducer {
       return .none
 
     case (.onboarding(.supervision(.resume(.codeClaimedNotSupervised))), .primary):
-      self.deps.log(state.screen, action, "f2729c3c")
-      if let code = self.deps.sharedStorage.loadPendingSupervisionCode()?.code {
-        state.screen = .onboarding(.supervision(.setup(.instructionsForProtector(code: code))))
-      } else {
-        self.deps.log(state.screen, action, "00b0c478", extra: "unreachable missing code")
-        state.screen = .onboarding(.supervision(.setup(.explainNeedSomeoneElse)))
-      }
-      return .none
+      self.deps.log(state.screen, action, "6dd407cb")
+      state.screen = .launching
+      return .send(.programmatic(.appDidLaunch))
 
     case (.onboarding(.supervision(.resume(.retrySupervision))), .primary):
       self.deps.log(state.screen, action, "d664b520")
@@ -649,8 +644,8 @@ public struct IOSReducer {
 
     case (.onboarding(.supervision(.resume(.requiresSubscription))), .primary):
       self.deps.log(state.screen, action, "b5e8076e")
-      state.screen = .onboarding(.supervision(.resume(.codeClaimedNotSupervised)))
-      return .none
+      state.screen = .launching
+      return .send(.programmatic(.appDidLaunch))
 
     // MARK: - error paths
 
@@ -781,6 +776,13 @@ public struct IOSReducer {
             deps.log("supervision reboot code not claimed", "e9b86e6b")
             await send(.programmatic(
               .setScreen(.onboarding(.supervision(.resume(.codeNotClaimed(code: code))))),
+            ))
+
+          case .gertrudeSupervisionReboot(.requiresSubscription(let conn)):
+            deps.log("supervision reboot requires subscription", "a7d41f0e")
+            await deps.receiveAccountConnection(conn)
+            await send(.programmatic(
+              .setScreen(.onboarding(.supervision(.resume(.requiresSubscription)))),
             ))
 
           case .gertrudeSupervisionReboot(.codeClaimedNotSupervised(let conn)):
