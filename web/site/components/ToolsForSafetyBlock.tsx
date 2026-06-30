@@ -58,7 +58,7 @@ const ToolsForSafetyBlock: React.FC = () => {
   const scrollProgress = Math.min(scrollY / 600, 1);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-white via-white via-55% to-fuchsia-200 px-4 xs:px-6 sm:px-8 md:px-20 pt-4 xs:pt-16 sm:pt-20 md:pt-24 pb-12 xs:pb-16 sm:pb-20 md:pb-24 flex flex-col items-center justify-center relative overflow-hidden">
+    <section className="min-h-screen bg-gradient-to-br from-white via-white via-55% to-fuchsia-200 px-4 xs:px-6 sm:px-8 md:px-20 pt-24 xs:pt-28 sm:pt-24 md:pt-28 pb-12 xs:pb-16 sm:pb-20 md:pb-24 flex flex-col items-center justify-start sm:justify-center relative overflow-x-hidden md:overflow-hidden">
       <div
         className="absolute inset-0 bg-gradient-to-b from-white to-fuchsia-600 pointer-events-none"
         style={{ opacity: scrollProgress * 0.7 }}
