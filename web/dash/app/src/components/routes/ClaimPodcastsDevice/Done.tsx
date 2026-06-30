@@ -1,32 +1,32 @@
-import { AmDoneScreen, ScreenShell } from '@dash/components';
+import { PodcastsDoneScreen, ScreenShell } from '@dash/components';
 import React from 'react';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/dashboard';
-import { amDoneVariant } from './amDoneVariant';
+import { podcastsDoneVariant } from './podcastsDoneVariant';
 
-export interface AmDoneNavState {
+export interface PodcastsDoneNavState {
   subscription: T.ClaimAmDevice.Output[`subscription`];
   childName: string;
   modelName: string;
   iosVersion: string;
 }
 
-const ClaimAmDeviceDone: React.FC = () => {
+const ClaimPodcastsDeviceDone: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as AmDoneNavState | null;
+  const state = location.state as PodcastsDoneNavState | null;
 
   // reached without nav state (e.g. refresh / direct link) — bounce back through
   // claim, which re-fetches and re-routes here with the carried subscription state
   if (!state) {
-    return <Navigate to={`/claim-am-device/${code}/claim`} replace />;
+    return <Navigate to={`/claim-podcasts-device/${code}/claim`} replace />;
   }
 
   const { subscription, childName, modelName, iosVersion } = state;
   const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   const { variant, accessEndsAt, trialDaysRemaining, subscribeUrl, showSubscribe } =
-    amDoneVariant(subscription);
+    podcastsDoneVariant(subscription);
 
   const handleSubscribe = (): void => {
     const url = subscribeUrl ?? `/settings`;
@@ -39,7 +39,7 @@ const ClaimAmDeviceDone: React.FC = () => {
 
   return (
     <ScreenShell title={`${deviceType} Connected`}>
-      <AmDoneScreen
+      <PodcastsDoneScreen
         childName={childName}
         modelName={modelName}
         iosVersion={iosVersion}
@@ -55,4 +55,4 @@ const ClaimAmDeviceDone: React.FC = () => {
   );
 };
 
-export default ClaimAmDeviceDone;
+export default ClaimPodcastsDeviceDone;

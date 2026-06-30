@@ -31,7 +31,7 @@ const MainFooter: React.FC = () => (
           <ul className="flex flex-col items-center sm:items-start gap-1">
             <FooterLink href="/mac">Mac</FooterLink>
             <FooterLink href="/iphone-and-ipad">iPhone &amp; iPad</FooterLink>
-            <FooterLink href="/#podcasts">Gertrude AM</FooterLink>
+            <FooterLink href="/#podcasts">Gertrude Podcasts</FooterLink>
           </ul>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-2">

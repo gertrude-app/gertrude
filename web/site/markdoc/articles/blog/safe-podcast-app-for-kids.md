@@ -1,5 +1,5 @@
 ---
-title: Gertrude AM - A Safe Podcast App For Kids
+title: Gertrude Podcasts (formerly Gertrude AM) - A Safe Podcast App For Kids
 date: '2025-10-23T19:38:18.000Z'
 image: /docs/images/gertrude-am-3.png
 description:
@@ -9,11 +9,11 @@ category: ios
 ---
 
 {% .lead .mb-12 %} Today we're excited to announce the release of
-**[Gertrude AM](https://apps.apple.com/us/app/gertrude-am/id6753187429)**, a podcast app
-with parental controls for iOS. It works like a normal podcast app, with one key
-difference: parents set a **PIN code at setup** that's required to search for and add new
-shows. Kids can listen to approved podcasts and get new episodes automatically, but they
-can't search for or subscribe to inappropriate content.
+**[Gertrude Podcasts](https://apps.apple.com/us/app/gertrude-podcasts/id6753187429)**
+(formerly Gertrude AM), a podcast app with parental controls for iOS. It works like a
+normal podcast app, with one key difference: parents set a **PIN code at setup** that's
+required to search for and add new shows. Kids can listen to approved podcasts and get new
+episodes automatically, but they can't search for or subscribe to inappropriate content.
 
 {% image src="gertrude-am-3.png" noBorder=true alt="A safe podcast app for kids" /%}
 
@@ -30,9 +30,9 @@ not to mention perusing suggestive or explicit show and episode artwork.
 
 ## A Simple Solution: Searching and Subscribing Requires a PIN
 
-Gertrude AM solves this with one simple feature: When you first set it up, you create a
-PIN code. From then on, that PIN is required any time someone wants to search for or add a
-new podcast.
+Gertrude Podcasts solves this with one simple feature: When you first set it up, you
+create a PIN code. From then on, that PIN is required any time someone wants to search for
+or add a new podcast.
 
 Once you've approved a show, it works normally. Kids can browse episodes, play what they
 want, download for offline listening. When new episodes come out, they show up
@@ -47,8 +47,8 @@ settings, no workarounds, just a safe way for kids to listen to podcasts on thei
 
 ## Try It Today
 
-Gertrude AM is available now in the
-[App Store](https://apps.apple.com/us/app/gertrude-am/id6753187429). If you've been
+Gertrude Podcasts is available now in the
+[App Store](https://apps.apple.com/us/app/gertrude-podcasts/id6753187429). If you've been
 looking for a password protected podcast app or a way to approve podcasts before kids
 listen, this is it.
 
@@ -56,7 +56,7 @@ listen, this is it.
 
 ### Pricing: 30 days free, then $10/year for the whole family, no ads ever
 
-Gertrude AM is free to download and use for 30 days. After that, a $10.00/year
+Gertrude Podcasts is free to download and use for 30 days. After that, a $10.00/year
 subscription is required to continue updating shows and receiving new episodes. Gertrude
-AM connects to a Gertrude account, and a single subscription covers your whole
+Podcasts connects to a Gertrude account, and a single subscription covers your whole
 family&mdash;helping us continue to develop tools for parents.

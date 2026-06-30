@@ -52,7 +52,7 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
     expect(sent.emails.count).toEqual(1)
     expect(sent.emails[0].template).toBe("initial-signup")
     expect(sent.emails[0].templateModel["redirect"])
-      .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
+      .toEqual("%2Fclaim-podcasts-device%2F123456%2Fclaim")
   }
 
   func testSignupWithClaimMintsAppAwareVerificationToken() async throws {

@@ -1,25 +1,25 @@
 import { formatDate } from '@dash/datetime';
 import type { T } from '@shared/pairql/dashboard';
 
-type AmSubscription = T.ClaimAmDevice.Output[`subscription`];
+type PodcastsSubscription = T.ClaimAmDevice.Output[`subscription`];
 
-export type AmRunwayTier = `active` | `expiring` | `lapsed`;
+export type PodcastsRunwayTier = `active` | `expiring` | `lapsed`;
 
 // The effective access *runway*, derived once from the entitlement enum and reused by
-// every AM surface (funnel Done screen, iOS-device page section). `active` = paying or a
+// every Podcasts surface (funnel Done screen, iOS-device page section). `active` = paying or a
 // trial with comfortable runway (no push); `expiring` = a trial nearing its end, or a
 // legacy window the server flags for migration (soft push); `lapsed` = unpaid/expired
 // (hard push). Keyed off runway, not raw case names.
 const SOFT_PUSH_WINDOW_DAYS = 7;
 
-export interface AmRunway {
-  tier: AmRunwayTier;
+export interface PodcastsRunway {
+  tier: PodcastsRunwayTier;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
   subscribeUrl?: string;
 }
 
-export function amSubscriptionRunway(sub: AmSubscription): AmRunway {
+export function podcastsSubscriptionRunway(sub: PodcastsSubscription): PodcastsRunway {
   switch (sub.case) {
     case `active`:
     case `complimentary`:

@@ -106,7 +106,7 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
     // the blocker supervision funnel rejects the AM code (#737)
     try await expectErrorFrom {
       try await GetIOSDeviceClaimData.resolve(with: .init(code: code), in: parent.context)
-    }.toContain("Gertrude AM")
+    }.toContain("Gertrude Podcasts")
   }
 
   func testClaimCode_rejectedInWrongAppFunnel() async throws {
@@ -136,7 +136,7 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
       } operation: {
         try await GetIOSDeviceClaimData.resolve(with: .init(code: amCode), in: parent.context)
       }
-    }.toContain("Gertrude AM")
+    }.toContain("Gertrude Podcasts")
   }
 
   func testMusicCode_rejectedInBlockerConnectFunnel() async throws {

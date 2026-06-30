@@ -35,7 +35,7 @@ extension GetAmClaimData: Resolver {
       in: context,
       onResume: { device, child in
         guard let install = try await device.podcastInstall(in: context.db) else {
-          logIOSUnusual("03eaf14e", "AM claim resume on device with no podcast install")
+          logIOSUnusual("03eaf14e", "Podcasts claim resume on device with no podcast install")
           let msg = "Code not found. Double-check and try again."
           throw context.error("03eaf14e", .notFound, user: msg)
         }

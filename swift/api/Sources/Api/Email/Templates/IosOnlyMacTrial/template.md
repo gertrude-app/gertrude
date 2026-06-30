@@ -22,4 +22,4 @@ https://gertrude.app/try-mac
 - Jared
 
 (PS: Did you know we also have the world's safest PODCAST app? Yup, built it first for my
-daughter Harriet, it's called "Gertrude AM")
+daughter Harriet, it's called "Gertrude Podcasts")

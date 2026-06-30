@@ -40,7 +40,7 @@ nothing as a package — copying was the only option (the M1 "Option A: harvest"
 
 ## Copied assets — `public/` (M1)
 
-`bg.svg`, `dot-noise-pattern.svg`, `favicon.png`, `gertrude-am-app-icon.webp`,
+`bg.svg`, `dot-noise-pattern.svg`, `favicon.png`, `gertrude-podcasts-app-icon.webp`,
 `gertrude-blocker-app-icon.webp`, `logo-icon.svg`, `logo-wordmark.svg`,
 `mac-app-screenshot.png` — duplicated from dashboard-v2. Brand assets (logos/favicon) are
 candidates for a shared location; the 3 marketing login images are the most optional.

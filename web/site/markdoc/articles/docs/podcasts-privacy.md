@@ -1,14 +1,14 @@
 ---
-title: Gertrude AM Privacy Policy
-description: Privacy policy for the Gertrude AM podcast app.
+title: Gertrude Podcasts Privacy Policy
+description: Privacy policy for the Gertrude Podcasts podcast app.
 ---
 
 Last updated: _6/22/2026_
 
-Gertrude AM is a podcast app managed by parents or accountability partners restricting
-access to a select set of podcasts. It connects to a Gertrude account for subscription
-management and PIN reset. The app itself does not collect names, email addresses, contact
-information, location, contacts, or advertising identifiers.
+Gertrude Podcasts is a podcast app managed by parents or accountability partners
+restricting access to a select set of podcasts. It connects to a Gertrude account for
+subscription management and PIN reset. The app itself does not collect names, email
+addresses, contact information, location, contacts, or advertising identifiers.
 
 ### Information the App Sends to Gertrude
 
@@ -22,15 +22,15 @@ keep subscriptions working, and fix bugs. This can include:
 - Short details needed to understand a problem, such as a podcast feed URL entered in the
   app or the result of a subscription purchase attempt.
 
-We use this information only to operate and improve Gertrude AM, and we do not use it for
-advertising. Once a device is connected to a Gertrude account, this data is associated
-with that account.
+We use this information only to operate and improve Gertrude Podcasts, and we do not use
+it for advertising. Once a device is connected to a Gertrude account, this data is
+associated with that account.
 
 ### Podcast and Purchase Data
 
-Gertrude AM downloads podcast feeds, artwork, and audio from Apple podcast search and from
-the podcast providers you choose. Those providers may receive ordinary network information
-when the app fetches their content.
+Gertrude Podcasts downloads podcast feeds, artwork, and audio from Apple podcast search
+and from the podcast providers you choose. Those providers may receive ordinary network
+information when the app fetches their content.
 
 Subscriptions are managed through your Gertrude account. The app records limited
 subscription status details so it can tell whether your free trial, subscription, or
@@ -45,8 +45,8 @@ command entered into the app.
 
 ### No Selling or Marketing Sharing
 
-We never sell Gertrude AM data. We do not provide it to third-party services, customers,
-advertisers, or marketing platforms.
+We never sell Gertrude Podcasts data. We do not provide it to third-party services,
+customers, advertisers, or marketing platforms.
 
 ### Changes to This Privacy Policy
 

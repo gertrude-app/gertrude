@@ -45,14 +45,14 @@ you can connect an iPhone or iPad to your Gertrude account to manage what it blo
 the parent dashboard. It won't lock down a phone the way the Mac app locks down a computer
 (iOS doesn't allow that), but it covers the parts of Screen Time that leak.
 
-The second is **Gertrude AM**, a parent-curated podcast app that lets kids listen only to
-shows you approve, and we're working on a music app to go alongside it.
+The second is **Gertrude Podcasts**, a parent-curated podcast app that lets kids listen
+only to shows you approve, and we're working on a music app to go alongside it.
 
 If you're setting up an iPhone, our
 [guide to locking down an iPhone](/blog/definitive-guide-to-locking-down-an-iphone) is a
 good place to start. The [iPhone and iPad page](/iphone-and-ipad) covers the blocker in
 more detail, and you can read about the podcast app in
-[this post on Gertrude AM](/blog/safe-podcast-app-for-kids).
+[this post on Gertrude Podcasts](/blog/safe-podcast-app-for-kids).
 
 ## Is it just for kids? Or can adults use it too? {% id="adults" %}
 

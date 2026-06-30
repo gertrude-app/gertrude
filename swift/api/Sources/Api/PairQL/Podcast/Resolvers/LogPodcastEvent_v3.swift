@@ -115,9 +115,9 @@ private func alertSuperAdminOfMidClaimPinSet(
   guard let child = try await device.child(in: ctx.db) else { return }
   let parent = try await child.parent(in: ctx.db)
   get(dependency: \.postmark).toSuperAdmin(
-    "AM podcast PIN set after mid-claim relaunch",
+    "Podcasts PIN set after mid-claim relaunch",
     "device: \(input.modelName), child: \(child.name), parent: \(parent.email.rawValue) — "
-      + "the AM PIN may have been set by someone other than the parent (app killed between "
+      + "the Podcasts PIN may have been set by someone other than the parent (app killed between "
       + "claim and PIN setup). Consider emailing the parent about a dashboard PIN reset.",
   )
 }

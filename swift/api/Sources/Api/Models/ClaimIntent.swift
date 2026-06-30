@@ -20,7 +20,7 @@ enum ClaimIntent: String, Codable, Sendable, Equatable, CaseIterable {
     switch self {
     case .blockerSupervise: "iOS supervision"
     case .blockerConnect: "iOS connect"
-    case .podcasts: "Gertrude AM"
+    case .podcasts: "Gertrude Podcasts"
     case .music: "Gertrude Music"
     }
   }
@@ -29,17 +29,8 @@ enum ClaimIntent: String, Codable, Sendable, Equatable, CaseIterable {
     switch self {
     case .blockerSupervise: "supervise-device"
     case .blockerConnect: "claim-blocker-device"
-    case .podcasts: "claim-am-device"
+    case .podcasts: "claim-podcasts-device"
     case .music: "claim-music-device"
-    }
-  }
-
-  var redirectRoute: String {
-    switch self {
-    case .blockerSupervise: "claim-pending-supervision"
-    case .blockerConnect: "claim-pending-blocker"
-    case .podcasts: "claim-pending-am"
-    case .music: "claim-pending-music"
     }
   }
 
@@ -47,7 +38,7 @@ enum ClaimIntent: String, Codable, Sendable, Equatable, CaseIterable {
     switch self {
     case .blockerSupervise: "claimPendingSupervision"
     case .blockerConnect: "claimPendingBlocker"
-    case .podcasts: "claimPendingAmDevice"
+    case .podcasts: "claimPendingPodcastsDevice"
     case .music: "claimPendingMusicDevice"
     }
   }

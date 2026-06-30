@@ -1,15 +1,15 @@
 import {
-  AmDeviceSection,
   AppHeader,
   BlockGroupList,
   PageHeading,
+  PodcastsDeviceSection,
   ResetPinModal,
   ToggleCard,
 } from '@dash/components';
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React, { useState } from 'react';
-import type { AmStatus } from '@dash/components';
+import type { PodcastsStatus } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
@@ -119,18 +119,18 @@ const BlockerSection: React.FC<{ deviceType: string }> = ({ deviceType: dt }) =>
   );
 };
 
-const IOSDevicePageWithAm: React.FC<{
+const IOSDevicePageWithPodcasts: React.FC<{
   childName: string;
   modelName: string;
   hasBlocker: boolean;
-  amStatus: AmStatus;
+  podcastsStatus: PodcastsStatus;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
 }> = ({
   childName,
   modelName,
   hasBlocker,
-  amStatus,
+  podcastsStatus,
   accessEndsAt,
   trialDaysRemaining,
 }) => {
@@ -141,8 +141,8 @@ const IOSDevicePageWithAm: React.FC<{
         {posessive(childName)} {dt}
       </PageHeading>
       <div className="mt-8 space-y-16">
-        <AmDeviceSection
-          status={amStatus}
+        <PodcastsDeviceSection
+          status={podcastsStatus}
           childName={childName}
           deviceType={dt}
           accessEndsAt={accessEndsAt}
@@ -156,41 +156,41 @@ const IOSDevicePageWithAm: React.FC<{
 };
 
 const meta = {
-  title: 'Dashboard/iOS/IOSDevice AM Section', // eslint-disable-line
-  component: IOSDevicePageWithAm,
+  title: 'Dashboard/iOS/IOSDevice Podcasts Section', // eslint-disable-line
+  component: IOSDevicePageWithPodcasts,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
   argTypes: {
-    amStatus: {
+    podcastsStatus: {
       control: `select`,
       options: [`active`, `approaching`, `paused`],
-      description: `AM subscription runway tier (flip to see all status-line variants)`,
+      description: `Podcasts subscription runway tier (flip to see all status-line variants)`,
     },
     accessEndsAt: { control: `text` },
     trialDaysRemaining: { control: `number` },
     hasBlocker: { control: false },
   },
-} satisfies Meta<typeof IOSDevicePageWithAm>;
+} satisfies Meta<typeof IOSDevicePageWithPodcasts>;
 
 type Story = StoryObj<typeof meta>;
 
-export const AmOnly: Story = {
+export const PodcastsOnly: Story = {
   args: {
     childName: `Emma`,
     modelName: `iPhone 14 Pro`,
     hasBlocker: false,
-    amStatus: `active`,
+    podcastsStatus: `active`,
     trialDaysRemaining: 24,
     accessEndsAt: `June 27, 2026`,
   },
 };
 
-export const BlockerAndAm: Story = {
+export const BlockerAndPodcasts: Story = {
   args: {
     childName: `Luke`,
     modelName: `iPhone 14 Pro`,
     hasBlocker: true,
-    amStatus: `approaching`,
+    podcastsStatus: `approaching`,
     accessEndsAt: `June 27, 2026`,
   },
 };
@@ -218,7 +218,7 @@ export const ResetPin: Story = {
     childName: `Emma`,
     modelName: `iPhone 14 Pro`,
     hasBlocker: false,
-    amStatus: `active`,
+    podcastsStatus: `active`,
   },
   render: () => <ResetPinModalPreview />,
 };

@@ -246,7 +246,7 @@ private func testCampaign(
     campaignId: id,
     placement: placement,
     style: style,
-    headline: "Check out Gertrude AM",
+    headline: "Check out Gertrude Podcasts",
     body: "A podcast app the whole family will love.",
     primaryCta: .init(label: "Get it", action: .openUrl("https://gertrude.app")),
     tertiaryCta: dismissCta ? .init(label: "No thanks", action: .dismiss) : nil,

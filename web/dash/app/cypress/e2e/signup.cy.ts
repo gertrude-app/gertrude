@@ -57,14 +57,14 @@ describe(`signup`, () => {
 });
 
 describe(`app-aware claim glue`, () => {
-  it(`shows the Gertrude AM app card + "Signup to connect:" for an AM claim`, () => {
+  it(`shows the Gertrude Podcasts app card + "Signup to connect:" for a podcasts claim`, () => {
     cy.visit(
-      `/signup?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
+      `/signup?claimPendingPodcastsDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
     );
     cy.contains(`Signup to connect:`);
     cy.contains(`iPhone 15 Pro`);
     cy.contains(`For app:`);
-    cy.contains(`Gertrude AM`);
+    cy.contains(`Gertrude Podcasts`);
   });
 
   it(`shows the Gertrude Music app card + "Signup to connect:" for a Music claim`, () => {
@@ -88,8 +88,8 @@ describe(`app-aware claim glue`, () => {
 });
 
 describe(`logged-out claim deep-link bounce`, () => {
-  it(`recovers an AM claim deep-link via the api claim redirect`, () => {
-    cy.intercept(`**/claim-pending-am/778899`, {
+  it(`recovers a legacy AM claim deep-link via the api claim redirect (backwards compat)`, () => {
+    cy.intercept(`**/claim-pending-podcasts/778899`, {
       statusCode: 307,
       headers: {
         location: `${Cypress.config().baseUrl}/signup?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2&redirect=${encodeURIComponent(
@@ -103,7 +103,7 @@ describe(`logged-out claim deep-link bounce`, () => {
     cy.location(`pathname`).should(`eq`, `/signup`);
     cy.contains(`Signup to connect:`);
     cy.contains(`iPhone 15 Pro`);
-    cy.contains(`Gertrude AM`);
+    cy.contains(`Gertrude Podcasts`);
 
     cy.interceptPql(`Signup`, {});
     cy.get(`input[name=email]`).type(`am-claim@example.com`);
@@ -185,7 +185,7 @@ describe(`verify-signup-email post-verify routing`, () => {
     cy.location(`pathname`).should(`eq`, `/claim-music-device/778899/claim`);
   });
 
-  it(`continues to the AM funnel from token claim data when the redirect param is missing`, () => {
+  it(`continues to the podcasts funnel from token claim data when the redirect param is missing`, () => {
     cy.interceptPql(`VerifySignupEmail`, {
       adminId: `admin-123`,
       token: `token-123`,
@@ -204,7 +204,7 @@ describe(`verify-signup-email post-verify routing`, () => {
     cy.wait(`@VerifySignupEmail`);
     cy.location(`pathname`).should(`eq`, `/referral-survey`);
     cy.contains(`Skip`).click();
-    cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
+    cy.location(`pathname`).should(`eq`, `/claim-podcasts-device/778899/claim`);
   });
 
   it(`continues to the supervision funnel through the referral survey for a legacy claimCode-only verify`, () => {

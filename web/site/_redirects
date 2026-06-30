@@ -8,6 +8,7 @@
 /docs/definitive-guide-to-locking-down-an-iphone /blog/definitive-guide-to-locking-down-an-iphone 301
 /docs/five-things-you-forgot-when-locking-down-your-kids-iphone /blog/five-things-you-forgot-when-locking-down-your-kids-iphone 301
 /docs/guia-definitiva-para-bloquear-un-iphone /blog/guia-definitiva-para-bloquear-un-iphone 301
+/docs/am-privacy /docs/podcasts-privacy 301
 
 ###################
 # temp conference #
@@ -113,6 +114,7 @@
 /iosapp-connect-help https://gertrude.app/docs/ios-account-connection-help 302
 /s/:code https://api.gertrude.app/claim-pending-supervision/:code 302
 /a/:code https://api.gertrude.app/claim-pending-am/:code 302
+/p/:code https://api.gertrude.app/claim-pending-podcasts/:code 302
 /b/:code https://api.gertrude.app/claim-pending-blocker/:code 302
 /m/:code https://api.gertrude.app/claim-pending-music/:code 302
 /u/:shortid https://api.gertrude.app/short-url/:shortid 302

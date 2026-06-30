@@ -20,7 +20,7 @@ enum GertrudeIOSApp: String, Sendable, Codable, CaseIterable {
   var marketingName: String {
     switch self {
     case .blocker: "Gertrude Blocker"
-    case .podcasts: "Gertrude AM"
+    case .podcasts: "Gertrude Podcasts"
     case .music: "Gertrude Music"
     }
   }

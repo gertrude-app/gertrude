@@ -82,8 +82,8 @@ was clear.
 ## Maintenance
 
 These personas encode Gertrude's audience and current surfaces (the free iOS blocker, the
-Mac filter, Gertrude AM podcasts, and the layered Free / Light / Full plans). Update them
-as the product changes - e.g. when Gertrude FM / Music ships, or the "Gertrude AM" ->
+Mac filter, Gertrude Podcasts, and the layered Free / Light / Full plans). Update them as
+the product changes - e.g. when Gertrude FM / Music ships, or the "Gertrude AM" ->
 "Gertrude Podcasts" rename lands - so the eval keeps measuring the real thing. Prefer
 adding a persona for a new audience over overloading an existing one. Reuse the wording
 byte-identical between the before and after runs so the score diff is real.

@@ -9,13 +9,13 @@ import ChildActivityFeed from './components/routes/ChildActivityFeed';
 import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
 import ChildIOSDevicesRoute from './components/routes/ChildIOSDevices';
 import ChildMac from './components/routes/ChildMac';
-import ClaimAmDeviceClaim from './components/routes/ClaimAmDevice/Claim';
-import ClaimAmDeviceDone from './components/routes/ClaimAmDevice/Done';
 import ClaimBlockerDeviceClaim from './components/routes/ClaimBlockerDevice/Claim';
 import ClaimBlockerDeviceDone from './components/routes/ClaimBlockerDevice/Done';
 import ClaimMusicDeviceClaim from './components/routes/ClaimMusicDevice/Claim';
 import ClaimMusicDeviceDone from './components/routes/ClaimMusicDevice/Done';
 import ClaimMusicDevicePayment from './components/routes/ClaimMusicDevice/Payment';
+import ClaimPodcastsDeviceClaim from './components/routes/ClaimPodcastsDevice/Claim';
+import ClaimPodcastsDeviceDone from './components/routes/ClaimPodcastsDevice/Done';
 import Computer from './components/routes/Computer';
 import Computers from './components/routes/Computers';
 import ConferenceEmailForm from './components/routes/ConferenceEmail';
@@ -89,8 +89,19 @@ const App: React.FC = () => {
             <Route path="done" element={<SuperviseDeviceDone />} />
           </Route>
         </Route>
-        <Route path="claim-am-device/:code/claim" element={<ClaimAmDeviceClaim />} />
-        <Route path="claim-am-device/:code/done" element={<ClaimAmDeviceDone />} />
+        <Route
+          path="claim-podcasts-device/:code/claim"
+          element={<ClaimPodcastsDeviceClaim />}
+        />
+        <Route
+          path="claim-podcasts-device/:code/done"
+          element={<ClaimPodcastsDeviceDone />}
+        />
+        <Route
+          path="claim-am-device/:code/claim"
+          element={<ClaimPodcastsDeviceClaim />}
+        />
+        <Route path="claim-am-device/:code/done" element={<ClaimPodcastsDeviceDone />} />
         <Route
           path="claim-blocker-device/:code/claim"
           element={<ClaimBlockerDeviceClaim />}
