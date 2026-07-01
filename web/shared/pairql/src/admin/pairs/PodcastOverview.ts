@@ -18,7 +18,7 @@ export namespace PodcastOverview {
     recentInstalls: Array<{
       date: ISODateString;
       deviceType: string;
-      isPaid: boolean;
+      status: string;
     }>;
   }
 }

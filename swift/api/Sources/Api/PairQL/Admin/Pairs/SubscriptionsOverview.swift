@@ -68,7 +68,8 @@ extension SubscriptionsOverview: NoInputResolver {
       let engagement =
         if parent.isActive
           || parent.hasCompletedSupervision
-          || parent.hasConnectedFreeIOSDevice {
+          || parent.hasConnectedFreeIOSDevice
+          || parent.hasConnectedPodcastApp {
           "engaged"
         } else if parent.numComputerUsers > 0 || parent.hasIncompleteSupervision {
           "partial"

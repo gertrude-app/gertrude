@@ -4,7 +4,7 @@ import TimeSeriesGraph from './TimeSeriesGraph';
 interface Install {
   date: string;
   deviceType: string;
-  isPaid: boolean;
+  status: string;
 }
 
 interface PodcastInstallsGraphProps {
@@ -14,7 +14,7 @@ interface PodcastInstallsGraphProps {
 const PodcastInstallsGraph: React.FC<PodcastInstallsGraphProps> = ({ installs }) => {
   const items = installs.map((install) => ({
     date: install.date,
-    status: install.isPaid ? `paid` : `free`,
+    status: install.status,
     label: install.deviceType,
   }));
 
@@ -25,7 +25,7 @@ const PodcastInstallsGraph: React.FC<PodcastInstallsGraphProps> = ({ installs })
       gradient="green"
       statusConfig={{
         isSuccess: (status) => status === `paid`,
-        isWarning: () => false,
+        isWarning: (status) => status === `connected`,
       }}
       twoColumnTooltip
     />

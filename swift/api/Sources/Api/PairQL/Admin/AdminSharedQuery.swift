@@ -20,6 +20,7 @@ struct ParentData: Sendable {
   var numFilteringDisabledMacChildren: Int
   var numNotifications: Int
   var numIOSDevices: Int
+  var numConnectedPodcastApps: Int
   var hasCompletedSupervision: Bool
   var hasIncompleteSupervision: Bool
   var childActivityCount: Int
@@ -36,6 +37,7 @@ struct ParentData: Sendable {
     self.numFilteringDisabledMacChildren = 0
     self.numNotifications = 0
     self.numIOSDevices = 0
+    self.numConnectedPodcastApps = 0
     self.hasCompletedSupervision = false
     self.hasIncompleteSupervision = false
     self.childActivityCount = 0
@@ -133,6 +135,12 @@ struct AnalyticsData: Sendable {
       map[row.parentId] = row.iosDeviceCount
     }
 
+    let connectedPodcastAppCount = try await self.db.customQuery(ConnectedPodcastAppCount.self)
+    let connectedPodcastAppMap: [Parent.Id: Int] = connectedPodcastAppCount
+      .reduce(into: [:]) { map, row in
+        map[row.parentId] = row.connectedPodcastAppCount
+      }
+
     let activityCounts = try await self.db.customQuery(ActivityCounts.self)
     let activityMap: [Parent.Id: Int] = activityCounts.reduce(into: [:]) { map, row in
       map[row.parentId] = row.screenshotCount + row.keystrokeLineCount
@@ -164,6 +172,7 @@ struct AnalyticsData: Sendable {
       parent.numComputerUsers = computerUserMap[model.id] ?? 0
       parent.numFilteringDisabledMacChildren = filteringDisabledMacChildMap[model.id] ?? 0
       parent.numIOSDevices = iosDeviceMap[model.id] ?? 0
+      parent.numConnectedPodcastApps = connectedPodcastAppMap[model.id] ?? 0
       parent.hasCompletedSupervision = completedSupervisionSet.contains(model.id)
       parent.hasIncompleteSupervision = incompleteSupervisionSet.contains(model.id)
         && !completedSupervisionSet.contains(model.id)
@@ -199,6 +208,10 @@ extension ParentData {
 
   var hasConnectedFreeIOSDevice: Bool {
     self.numIOSDevices > 0 && !self.hasIncompleteSupervision
+  }
+
+  var hasConnectedPodcastApp: Bool {
+    self.numConnectedPodcastApps > 0
   }
 
   var status: ParentAnalyticsStatus {
@@ -342,6 +355,24 @@ struct IOSDeviceCount: CustomQueryable {
 
   var parentId: Parent.Id
   var iosDeviceCount: Int
+}
+
+struct ConnectedPodcastAppCount: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    .init("""
+    SELECT c.\(Child.columnName(.parentId)) AS parent_id,
+           COUNT(DISTINCT d.id)::int AS connected_podcast_app_count
+    FROM \(table: PodcastApp.Install.self) pai
+    JOIN \(table: IOSDevice.self) d
+      ON d.id = pai.\(PodcastApp.Install.columnName(.deviceId))
+    JOIN \(table: Child.self) c
+      ON c.id = d.\(IOSDevice.columnName(.childId))
+    GROUP BY c.\(Child.columnName(.parentId));
+    """)
+  }
+
+  var parentId: Parent.Id
+  var connectedPodcastAppCount: Int
 }
 
 struct SupervisionParents: CustomQueryable {
