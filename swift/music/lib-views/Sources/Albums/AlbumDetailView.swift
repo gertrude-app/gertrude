@@ -69,6 +69,7 @@ public struct AlbumDetailView: View {
             AlbumDetailPlayButton(
               isPlaying: self.isPlaying,
               isLoading: self.isLoading,
+              artworkUrl: self.album.artworkUrl,
               onTap: self.onPlayTap,
             )
             .padding(.horizontal, 20)
@@ -117,26 +118,57 @@ public struct AlbumDetailView: View {
 private struct AlbumDetailPlayButton: View {
   let isPlaying: Bool
   let isLoading: Bool
+  let artworkUrl: URL?
   let onTap: @MainActor @Sendable () -> Void
 
   var body: some View {
     Button(action: self.onTap) {
-      HStack(spacing: 8) {
-        if self.isLoading {
-          ProgressView()
-            .controlSize(.small)
-            .tint(.white)
-        } else {
-          Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
+      ZStack {
+        if let artworkUrl = self.artworkUrl {
+          GeometryReader { proxy in
+            CachedArtworkImageView(
+              url: artworkUrl,
+            ) { image in
+              image
+                .resizable()
+                .scaledToFill()
+                .frame(
+                  width: proxy.size.width * 1.35,
+                )
+                .position(
+                  x: proxy.size.width / 2,
+                  y: proxy.size.height / 2,
+                )
+                .blur(radius: 50)
+                .opacity(0.85)
+            } placeholder: {
+              Color.clear
+            }
+          }
+          .frame(height: 52)
         }
+        HStack(spacing: 8) {
+          if self.isLoading {
+            ProgressView()
+              .controlSize(.small)
+              .tint(.white)
+          } else {
+            Image(
+              systemName: self.isPlaying
+                ? "pause.fill" : "play.fill",
+            )
+          }
 
-        Text(self.title)
+          Text(self.title)
+        }
       }
       .font(.system(size: 17, weight: .bold, design: .rounded))
       .frame(maxWidth: .infinity)
       .frame(height: 52)
       .foregroundStyle(.white)
-      .background(Color.gertrudeBrandAccent, in: Capsule())
+      .background(.black, in: Capsule())
+      .clipShape(Capsule())
+      .contentShape(Capsule())
     }
     .buttonStyle(.plain)
     .disabled(self.isLoading)
