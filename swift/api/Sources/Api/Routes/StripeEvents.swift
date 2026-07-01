@@ -109,7 +109,14 @@ private func handleInvoicePaid(
     return
   }
 
-  let priceId = event?.data?.object?.lines?.data?.first?.price?.id
+  // proration invoices can list the old plan's credit line before the new plan's charge;
+  // pick the tier-recognized line, preferring non-proration among matches
+  let lines = event?.data?.object?.lines?.data ?? []
+  let planLines = lines
+    .filter { $0.price?.id.flatMap(StripeSubscription.Tier.init(stripePriceId:)) != nil }
+  let currentPlanLine = planLines.first(where: { $0.proration != true }) ?? planLines.first
+
+  let priceId = currentPlanLine?.price?.id
   guard let eventTier = priceId.flatMap(StripeSubscription.Tier.init(stripePriceId:)) else {
     unexpected("bf3cad72", detail: "email: \(email ?? "(nil)"), event: \(stripeEvent.id)")
     return
@@ -121,7 +128,7 @@ private func handleInvoicePaid(
   }
 
   let now = get(dependency: \.date.now)
-  let periodEnd = event?.data?.object?.lines?.data?.first?.period?.end
+  let periodEnd = currentPlanLine?.period?.end
     .map { Date(timeIntervalSince1970: TimeInterval($0)) }
     ?? now + .days(eventTier.periodLengthInDays)
 
@@ -332,6 +339,7 @@ private struct EventInfo: Decodable {
 
           var period: Period?
           var price: Price?
+          var proration: Bool?
         }
 
         var data: [Line]?
