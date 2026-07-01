@@ -406,7 +406,7 @@ jobs:
               - swift/ts-codable-macro/**
             iosapp:
               - swift/iosapp/**
-              - swift/pairql-iosapp/**
+              - swift/pairql-blocker/**
               - swift/pairql/**
               - swift/gertie/**
               - swift/x-kit/**
@@ -437,7 +437,7 @@ jobs:
               - swift/duet/**
               - swift/pairql/**
               - swift/pairql-macapp/**
-              - swift/pairql-iosapp/**
+              - swift/pairql-blocker/**
               - swift/pairql-podcasts/**
               - swift/pairql-music/**
               - swift/gertie/**
@@ -455,7 +455,7 @@ jobs:
 
 env:
   # api + its local path-dep closure; mirrors Dockerfile.ci COPYs (see docs/maintenance.md)
-  API_PREWARM_PKGS: "api duet gertie pairql pairql-macapp pairql-iosapp pairql-podcasts pairql-music ts-interop ts-codable-macro x-aws x-postmark x-slack x-stripe x-expect x-http x-kit"
+  API_PREWARM_PKGS: "api duet gertie pairql pairql-macapp pairql-blocker pairql-podcasts pairql-music ts-interop ts-codable-macro x-aws x-postmark x-slack x-stripe x-expect x-http x-kit"
   DATABASE_NAME: vapor_database
   DATABASE_USERNAME: vapor_username
   DATABASE_PASSWORD: vapor_password

@@ -1,0 +1,10 @@
+{
+  "root": "pairql-blocker",
+  "projectType": "library",
+  "implicitDependencies": ["pairql"],
+  "targets": {
+    "build": {
+      "command": "cd pairql-blocker && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    }
+  }
+}

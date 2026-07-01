@@ -1,4 +1,4 @@
-POST {{API_URL}}/pairql/ios-app/ConnectedRules
+POST {{API_URL}}/pairql/blocker/ConnectedRules
 X-DeviceToken: 718b3f18-02cb-4835-bf8a-dbf1e8454ed8
 {
   "vendorId": "deadbeef-dead-beef-dead-beefdeadbeef",

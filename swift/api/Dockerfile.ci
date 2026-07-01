@@ -61,7 +61,7 @@ COPY duet ${PREWARM}/duet
 COPY gertie ${PREWARM}/gertie
 COPY pairql ${PREWARM}/pairql
 COPY pairql-macapp ${PREWARM}/pairql-macapp
-COPY pairql-iosapp ${PREWARM}/pairql-iosapp
+COPY pairql-blocker ${PREWARM}/pairql-blocker
 COPY pairql-podcasts ${PREWARM}/pairql-podcasts
 COPY pairql-music ${PREWARM}/pairql-music
 COPY ts-interop ${PREWARM}/ts-interop

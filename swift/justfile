@@ -161,7 +161,7 @@ clean: nx-reset
   @rm -rf node_modules/.cache
   @rm -rf api/.build duet/.build gertie/.build
   @rm -rf macapp/App/.build iosapp/lib-ios/.build
-  @rm -rf pairql/.build pairql-macapp/.build pairql-iosapp/.build
+  @rm -rf pairql/.build pairql-macapp/.build pairql-blocker/.build
   @rm -rf ts-interop/.build x-aws/.build x-http/.build
   @rm -rf x-kit/.build x-postmark/.build x-slack/.build x-stripe/.build
 

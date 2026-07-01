@@ -42,7 +42,7 @@ Each client type has its own package defining available operations:
   `LogSecurityEvent`, `ReportBrowsers`, `CreateScreenshotUpload`, etc.
 - Auth via `X-UserToken` header (UUID)
 
-#### `pairql-iosapp/` - iOS Application Routes
+#### `pairql-blocker/` - Blocker App Routes
 
 - **UnauthedRoute:** `ConnectDevice`, `BlockRules`, `DefaultBlockRules`, `LogIOSEvent`,
   `RecoveryDirective`
@@ -78,7 +78,7 @@ Routes to `PairQLRoute.handler()` which dispatches to domain-specific handlers.
 2. **Route matching:** URLRouting parses request into typed `PairQLRoute` enum:
 
    - `.macApp(MacAppRoute)` - domain: `macos-app`
-   - `.iOS(IOSRoute)` - domain: `ios-app`
+   - `.blocker(BlockerRoute)` - domain: `blocker`
    - `.dashboard(DashboardRoute)` - domain: `dashboard`
    - `.podcast(PodcastRoute)` - domain: `gertrude-am`
    - `.superAdmin(SuperAdminRoute)` - domain: `super-admin`
@@ -91,7 +91,7 @@ Routes to `PairQLRoute.handler()` which dispatches to domain-specific handlers.
 5. **Authentication:** Each domain responder extracts auth headers and validates tokens:
 
    - MacApp: Looks up `X-UserToken` → finds `MacAppToken` → loads child/user
-   - iOS: Looks up `X-DeviceToken` → finds `IOSApp.Token` → loads device/child
+   - Blocker: Looks up `X-DeviceToken` → finds `BlockerApp.Token` → loads device/child
    - Dashboard: Looks up `X-AdminToken` → finds `Parent.DashToken` → loads parent
 
 6. **Resolver execution:** Calls domain-specific `Resolver.resolve(with:in:)` with
@@ -129,10 +129,13 @@ The API serves 5 distinct domains on a single endpoint:
 | Domain        | Path Prefix            | Auth Header         | Client Type     |
 | ------------- | ---------------------- | ------------------- | --------------- |
 | `macos-app`   | `/pairql/macos-app/`   | `X-UserToken`       | Mac application |
-| `ios-app`     | `/pairql/ios-app/`     | `X-DeviceToken`     | iOS application |
+| `blocker`     | `/pairql/blocker/`     | `X-DeviceToken`     | Blocker app     |
 | `dashboard`   | `/pairql/dashboard/`   | `X-AdminToken`      | Web dashboard   |
 | `gertrude-am` | `/pairql/gertrude-am/` | None                | Podcast app     |
 | `super-admin` | `/pairql/super-admin/` | `X-SuperAdminToken` | Admin tools     |
+
+The legacy `/pairql/ios-app/` domain is still accepted for blocker app clients already in
+the wild.
 
 ## How to Add a New PairQL Pair
 

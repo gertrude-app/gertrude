@@ -1,4 +1,4 @@
-POST {{API_URL}}/pairql/ios-app/ConnectDevice_v2
+POST {{API_URL}}/pairql/blocker/ConnectDevice_v2
 {
   "verificationCode": 999999,
   "vendorId": "deadbeef-dead-beef-dead-beefdeadbeef",

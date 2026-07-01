@@ -53,7 +53,7 @@ setup is complete.
 
 ## PairQL Endpoints by Domain
 
-### iOS App Domain (`pairql-iosapp`)
+### Blocker App Domain (`pairql-blocker`)
 
 | Endpoint                          | Auth  | Purpose                                          |
 | --------------------------------- | ----- | ------------------------------------------------ |
