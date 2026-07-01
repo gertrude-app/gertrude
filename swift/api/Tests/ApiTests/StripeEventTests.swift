@@ -587,6 +587,94 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     expect(alarms.count).toEqual(1)
   }
 
+  func testUpgradeProrationInvoiceUsesNewPlanNotCreditLine() async throws {
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .light
+      sub.stripeId = subscriptionId
+    }
+    let newPeriodEnd = 1_704_050_627
+    let oldPeriodEnd = 1_800_000_000
+
+    let json = """
+      {
+        "type": "invoice.paid",
+        "data": {
+          "object": {
+            "amount_due": 155,
+            "customer_email": "\(parent.email)",
+            "subscription": "\(subscriptionId.rawValue)",
+            "lines": {
+              "data": [
+                {
+                  "price": { "id": "\(self.env.stripe.priceIdLight)" },
+                  "period": { "end": \(oldPeriodEnd), "start": 1701372227 },
+                  "proration": true
+                },
+                {
+                  "price": { "id": "\(self.env.stripe.priceIdFull)" },
+                  "period": { "end": \(newPeriodEnd), "start": 1701372227 },
+                  "proration": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await parent.model.subscription(in: self.db)!
+      expect(retrieved.tier).toEqual(.full) // <-- not .light, from the credit line
+      expect(retrieved.currentPeriodEnd)
+        .toEqual(Date(timeIntervalSince1970: TimeInterval(newPeriodEnd)))
+    })
+  }
+
+  func testUnrelatedNonProrationLineDoesNotMaskThePlanLine() async throws {
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .light
+      sub.stripeId = subscriptionId
+    }
+    let periodEnd = 1_704_050_627
+
+    let json = """
+      {
+        "type": "invoice.paid",
+        "data": {
+          "object": {
+            "amount_due": 1155,
+            "customer_email": "\(parent.email)",
+            "subscription": "\(subscriptionId.rawValue)",
+            "lines": {
+              "data": [
+                {
+                  "price": { "id": "price_unrelated_addon" },
+                  "proration": false
+                },
+                {
+                  "price": { "id": "\(self.env.stripe.priceIdFull)" },
+                  "period": { "end": \(periodEnd), "start": 1701372227 },
+                  "proration": false
+                }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await parent.model.subscription(in: self.db)!
+      expect(retrieved.tier).toEqual(.full) // <-- not bailed out on the unrelated add-on line
+      expect(retrieved.currentPeriodEnd)
+        .toEqual(Date(timeIntervalSince1970: TimeInterval(periodEnd)))
+    })
+  }
+
   func testZeroAmountDueInvoicePaidDoesNotOverrideCancelledStatus() async throws {
     let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
     let parent = try await self.parentWithSubscription { _, sub in
