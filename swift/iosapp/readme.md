@@ -11,6 +11,8 @@ LOCAL_API_URL = https:/$()/REPLACE.ngrok-free.app
 
 ## Release notes
 
+- `x.x.x` (dev)
+  - surface supervision payment gate helper screens
 - `1.8.3` (6/26/26)
   - connect free account uses claim-based flow, not code entry
   - expired supervision claim code now offers regenerate or start over

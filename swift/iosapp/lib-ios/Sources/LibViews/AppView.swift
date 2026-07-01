@@ -515,8 +515,8 @@ public struct AppView: View {
 
         case .onboarding(.supervision(.resume(.codeClaimedNotSupervised))):
           ButtonScreenView(
-            text: "We haven’t been able to confirm that this \(self.deviceType) is supervised yet. Supervision is required for Gertrude to manage this device — there’s no way to skip this step. If you’re having trouble, please contact us for help.",
-            primary: self.btn(text: "Retry supervision", .primary),
+            text: "We haven’t been able to confirm that this \(self.deviceType) is supervised yet. To finish, a parent needs to connect this \(self.deviceType) to a computer and complete supervision with the Gertrude supervision tool. Once that’s done, tap below to check again, or contact us if you’re stuck.",
+            primary: self.btn(text: "Check again", .primary),
             secondary: .init(text: "Contact support", type: .link(.support), animate: false),
           )
 

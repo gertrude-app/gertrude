@@ -104,6 +104,42 @@ final class IOSReducerTestsLaunch: XCTestCase {
   }
 
   @MainActor
+  func testSupervisionReboot_requiresSubscription() async throws {
+    let accountSet = LockIsolated(false)
+    let store = TestStore(initialState: IOSReducer.State()) {
+      IOSReducer()
+    } withDependencies: {
+      $0.device.deleteCacheFillDir = {}
+      $0.systemExtension.filterRunning = { false }
+      $0.sharedStorage.loadPendingSupervisionCode = { .mock }
+      $0.sharedStorage.loadFirstLaunchDate = { @Sendable in .distantPast }
+      $0.sharedStorage.saveAccountConnection = { @Sendable _ in }
+      $0.api.checkSupervisionFlowStatus = { @Sendable _ in .requiresSubscription(.mock) }
+      $0.api.setAccountConnection = { @Sendable _ in accountSet.setValue(true) }
+      $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
+      $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
+      $0.sharedStorage.migrateLegacyData = { @Sendable in false }
+      $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
+      $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in nil }
+      $0.sharedStorage.clearPendingSupervisionCode = { fatalError("not cleared") }
+    }
+
+    await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
+      $0.onboarding.firstLaunch = .distantPast
+    }
+    await store.receive(.programmatic(
+      .setScreen(.onboarding(.supervision(.resume(.requiresSubscription)))),
+    )) {
+      $0.screen = .onboarding(.supervision(.resume(.requiresSubscription)))
+    }
+    await store.receive(.programmatic(.receivedConnectAccountFeatureFlag(.init(isEnabled: true)))) {
+      $0.onboarding.connectFeature = .init(isEnabled: true)
+    }
+    expect(accountSet.value).toEqual(true)
+  }
+
+  @MainActor
   func testSupervisionReboot_claimedNotSupervised() async throws {
     let accountSet = LockIsolated(false)
     let store = TestStore(initialState: IOSReducer.State()) {

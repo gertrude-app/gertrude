@@ -49,6 +49,19 @@ extension CheckSupervisionFlowStatus: Resolver {
       supervised: .byGertrude(claimCode: input.code),
     )
 
+    if supervision.supervisedAt == nil || supervision.profileInstalledAt == nil {
+      let parent = try await child.parent(in: ctx.db)
+      let billing = try await parent.billingAccountSnapshot(
+        in: ctx.db,
+        at: get(dependency: \.date.now),
+      )
+      let clientSupportsRequiresSubscription = input.appVersion != nil
+      if clientSupportsRequiresSubscription,
+         billing.paymentActionForMissingLightPlanCapability(.superviseIosDevice) != nil {
+        return .requiresSubscription(data)
+      }
+    }
+
     if supervision.supervisedAt == nil {
       return .claimed(data)
     }

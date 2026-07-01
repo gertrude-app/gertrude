@@ -225,8 +225,10 @@ extension IOSDeviceEvents: Resolver {
     case "ad87c533": #"Code Not Claimed → "Continue""#
     case "b496da4b": #"Code Expired → "Get a new code""#
     case "560908e7": #"Code Expired → "Start over""#
-    case "f2729c3c": #"Claimed Not Supervised → "Retry supervision""#
+    case "6dd407cb": #"Claimed Not Supervised → "Check again" (re-polls)"#
+    case "f2729c3c": #"Claimed Not Supervised → "Retry supervision" (deprecated, re-walked instructions)"#
     case "36d7be7c": #"Claimed Not Supervised → "Retry" (deprecated, self-report)"#
+    case "b5e8076e": #"Requires Subscription → "Try Again" (re-polls)"#
     case "d664b520": #"Retry Supervision → "Continue""#
     case "00b0c478": "⚠ Unreachable: missing supervision code"
     case "4693f615": #"Profile Removed Recovery → "Install""#
@@ -248,6 +250,7 @@ extension IOSDeviceEvents: Resolver {
     // --- Supervision Boot-Up Detection ---
     case "e9b86e6b": "Supervision reboot: code not claimed"
     case "80580cd5": "Supervision reboot: claimed not supervised"
+    case "a7d41f0e": "Supervision reboot: requires subscription"
     case "0b15e23f": "Supervision reboot: code expired/not found"
     case "05a47c3a": "Supervision reboot: needs profile"
     case "94991de7": "⚠ Supervision reboot: state disagreement"
