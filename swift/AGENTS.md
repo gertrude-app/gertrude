@@ -34,17 +34,21 @@ files when a file grows too large or when a clear organizational seam emerges.
 
 ```
 swift/
-├── api/               # Vapor 4 API server (PostgreSQL db)
-├── macapp/            # macOS app
-├── iosapp/            # iOS app
-├── gertie/            # Core domain models (shared across platforms)
-├── duet/              # Custom lightweight ORM
-├── pairql/            # Type-safe RPC core library
-├── pairql-macapp/     # macOS API pairql route definitions
-├── pairql-iosapp/     # iOS API pairql route definitions
-├── pairql-podcasts/   # Podcast app (not in monorepo) pairql API routes
-├── ts-interop/        # TypeScript code generation
-└── docs/              # Documentation
+├── api/                  # Vapor 4 API server (PostgreSQL db)
+├── macapp/               # macOS app
+├── iosapp/               # iOS content-filter app (the "blocker")
+├── podcasts/             # Gertrude AM podcast app
+├── music/                # Gertrude Music app (private beta)
+├── gertie/               # Shared data/types: Gertie, GertieBlocker, GertieApp targets
+├── gertie-tca-features/  # Shared TCA reducers/behavior (client apps only, not the api)
+├── duet/                 # Custom lightweight ORM
+├── pairql/               # Type-safe RPC core library
+├── pairql-macapp/        # macOS API pairql route definitions
+├── pairql-iosapp/        # iOS (blocker) API pairql route definitions
+├── pairql-podcasts/      # Podcast app (Gertrude AM) pairql route definitions
+├── pairql-music/         # Music app pairql route definitions
+├── ts-interop/           # TypeScript code generation
+└── docs/                 # Documentation
 ```
 
 ## The Three Main Applications
@@ -176,10 +180,29 @@ searches, and more
 
 ## Core Shared Libraries
 
-### `gertie/` - Domain Models
+> **Where does a shared type or feature go? When should you mint a new SPM package vs a new
+> target?** Read
+> [`../docs/notes/009-gertie-shared-module-structure.md`](../docs/notes/009-gertie-shared-module-structure.md)
+> before adding a shared module or if you're unsure where something belongs. In short: new
+> shared _types_ default to a new **target** under `gertie`; a new **package** is only for
+> code needing a dependency or platform floor you don't want imposed on every consumer
+> (especially the API server) — which is why the TCA features live in their own package.
 
-- **Purpose:** Core domain types shared across macOS, iOS, and API
-- **Products:** `Gertie`, `GertieBlocker`
+### `gertie/` - Shared data / types
+
+- **Purpose:** The cross-cutting container for shared Swift _data types_ — dependency-light,
+  server-safe, TCA-free. One package, several independent targets; add new targets freely.
+- **Products:** `Gertie` (core cross-platform parental-controls domain), `GertieBlocker`
+  (blocker-app domain; re-exports `Gertie`), `GertieApp` (cross-app wire types shared by all
+  apps + the server).
+
+### `gertie-tca-features/` - Shared TCA behavior
+
+- **Purpose:** Shared TCA reducers/features for the client apps (e.g. `CrossPromoFeature`,
+  `SharePresenter`). A separate package because it depends on TCA — kept out of `gertie` so
+  the API server and macapp never resolve it. Consumed by client TCA apps only, **never the
+  `api`.**
+- **Product:** `GertieTcaFeatures`
 
 ### `duet/` - Custom ORM
 
