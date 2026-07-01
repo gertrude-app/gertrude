@@ -5,15 +5,18 @@ public struct SearchShowView: View {
   @FocusState private var isSearchFocused: Bool
 
   @Binding var searchText: String
+  let isSearching: Bool
   let results: [SearchResult]
   let onResultTap: @MainActor @Sendable (SearchResult) -> Void
 
   public init(
     searchText: Binding<String>,
+    isSearching: Bool = false,
     results: [SearchResult],
     onResultTap: @MainActor @escaping @Sendable (SearchResult) -> Void,
   ) {
     self._searchText = searchText
+    self.isSearching = isSearching
     self.results = results
     self.onResultTap = onResultTap
   }
@@ -21,9 +24,11 @@ public struct SearchShowView: View {
   @ViewBuilder
   private var content: some View {
     VStack {
-      if self.searchText.isEmpty, self.results.isEmpty {
+      if self.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
         self.emptyState
-      } else if !self.searchText.isEmpty, self.results.isEmpty {
+      } else if self.isSearching {
+        self.searchingState
+      } else if self.results.isEmpty {
         self.noResultsState
       } else {
         self.resultsList
@@ -63,6 +68,21 @@ public struct SearchShowView: View {
     }
   }
 
+  private var searchingState: some View {
+    VStack(spacing: 24) {
+      Spacer()
+
+      ProgressView()
+        .tint(Color(self.cs, light: .violet500, dark: .violet400))
+
+      Text(lstr(.searching))
+        .font(.system(size: 16, weight: .medium))
+        .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+
+      Spacer()
+    }
+  }
+
   private var noResultsState: some View {
     VStack(spacing: 24) {
       Spacer()
@@ -76,11 +96,14 @@ public struct SearchShowView: View {
           .font(.system(size: 28, weight: .bold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
 
-        Text(String(format: lstr(.searchNoResultsMessage), self.searchText))
-          .font(.system(size: 16, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
-          .multilineTextAlignment(.center)
-          .padding(.horizontal, 40)
+        Text(String(
+          format: lstr(.searchNoResultsMessage),
+          self.searchText.trimmingCharacters(in: .whitespacesAndNewlines),
+        ))
+        .font(.system(size: 16, weight: .medium))
+        .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 40)
       }
 
       Spacer()

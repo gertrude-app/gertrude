@@ -1,12 +1,48 @@
 import ComposableArchitecture
 import Dependencies
 import Foundation
+import LibViews
 import SQLiteData
 import Testing
 
 @testable import LibTCA
 
 @MainActor struct AddShowFeatureTests {
+  @Test func `search shows pending state while results load`() async throws {
+    let result = SearchResult(
+      id: 1,
+      title: "This American Life",
+      artistName: "This American Life",
+      feedUrl: "https://feeds.simplecast.com/EmVW7VGp",
+      episodeCount: 800,
+    )
+
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.podcasts.search = { query in
+        #expect(query == "This")
+        return [result]
+      }
+    } operation: {
+      let store = TestStore(
+        initialState: .init(screen: .searching),
+        reducer: AddShowFeature.init,
+      )
+
+      await store.send(.setSearchText("This")) {
+        $0.searchText = "This"
+        $0.searchInFlight = true
+      }
+
+      await store.send(.searchSetDebounced)
+      await store.receive(.setSearchResults([result])) {
+        $0.searchResults = [result]
+        $0.searchInFlight = false
+      }
+    }
+  }
+
   @Test func `duplicate show subscription fails gracefully`() async throws {
     let dupeFeed = "https://example.com/feed.rss"
     let clock = TestClock()

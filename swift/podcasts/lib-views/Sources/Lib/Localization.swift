@@ -73,6 +73,7 @@ enum LocalizedStringKey: String {
   case searchNoResultsMessage = "search.noResults.message"
   case searchNoResultsTitle = "search.noResults.title"
   case searchPrompt = "search.prompt"
+  case searching = "search.searching"
   case settingsChangePin = "settings.changePin"
   case settingsExpirationDaysAgo = "settings.expiration.daysAgo"
   case settingsExpirationInDays = "settings.expiration.inDays"

@@ -48,6 +48,7 @@ struct AddShowView: View {
       case .searching:
         SearchShowView(
           searchText: self.$store.searchText.sending(\.setSearchText),
+          isSearching: self.store.searchInFlight,
           results: self.store.searchResults,
           onResultTap: { self.store.send(.selectShow($0)) },
         )
