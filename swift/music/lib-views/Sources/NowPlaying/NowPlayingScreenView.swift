@@ -182,6 +182,7 @@ private struct NowPlayingTransportControls: View {
           } else {
             Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
               .font(.system(size: 42, weight: .black))
+              .nowPlayingPlayPauseSymbolTransition(value: self.isPlaying)
           }
         }
         .foregroundStyle(.white)
@@ -197,6 +198,21 @@ private struct NowPlayingTransportControls: View {
         accessibilityLabel: "Next",
         action: self.onNextTap,
       )
+    }
+  }
+}
+
+private extension View {
+  @ViewBuilder
+  func nowPlayingPlayPauseSymbolTransition(value: Bool) -> some View {
+    if #available(iOS 18.0, macOS 15.0, *) {
+      self
+        .contentTransition(.symbolEffect(.replace.magic(fallback: .replace), options: .speed(2.2)))
+        .animation(.easeInOut(duration: 0.12), value: value)
+    } else {
+      self
+        .contentTransition(.symbolEffect(.replace, options: .speed(2.2)))
+        .animation(.easeInOut(duration: 0.12), value: value)
     }
   }
 }
@@ -226,6 +242,7 @@ private struct NowPlayingProgressBar: View {
 
   @State private var scrubbedProgress: Double?
   @State private var isScrubbing = false
+  @State private var scrubStartProgress: Double?
 
   var body: some View {
     VStack(spacing: 9) {
@@ -233,18 +250,23 @@ private struct NowPlayingProgressBar: View {
         ZStack(alignment: .center) {
           ZStack(alignment: .leading) {
             Capsule()
-              .fill(.white.opacity(0.18))
+              .fill(.white.opacity(self.isScrubbing ? 0.3 : 0.18))
 
             Capsule()
               .fill(.white)
               .frame(width: proxy.size.width * self.displayedProgress)
           }
-          .frame(height: 9)
+          .frame(height: self.isScrubbing ? 13 : 9)
           .clipShape(Capsule())
+          .shadow(
+            color: .white.opacity(self.isScrubbing ? 0.24 : 0),
+            radius: self.isScrubbing ? 9 : 0,
+          )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .contentShape(Rectangle())
         .gesture(self.dragGesture(width: proxy.size.width))
+        .animation(.easeOut(duration: 0.18), value: self.isScrubbing)
       }
       .frame(height: 28)
 
@@ -270,22 +292,36 @@ private struct NowPlayingProgressBar: View {
     DragGesture(minimumDistance: 0)
       .onChanged { value in
         guard self.canScrub, width > 0 else { return }
-        let progress = self.progress(for: value.location.x, width: width)
-        self.isScrubbing = true
-        self.scrubbedProgress = progress
-        self.onScrub(self.time(for: progress))
+        if !self.isScrubbing {
+          self.isScrubbing = true
+          self.scrubStartProgress = self.clampedProgress
+        }
+        self.scrubbedProgress = self.relativeScrubProgress(
+          for: value.translation.width,
+          width: width,
+        )
       }
       .onEnded { value in
         guard self.canScrub, width > 0 else {
           self.isScrubbing = false
           self.scrubbedProgress = nil
+          self.scrubStartProgress = nil
           return
         }
-        let progress = self.progress(for: value.location.x, width: width)
+        let progress = self.relativeScrubProgress(
+          for: value.translation.width,
+          width: width,
+        )
         self.scrubbedProgress = progress
         self.onScrub(self.time(for: progress))
         self.isScrubbing = false
+        self.scrubStartProgress = nil
       }
+  }
+
+  private func relativeScrubProgress(for translationX: CGFloat, width: CGFloat) -> Double {
+    let startingProgress = self.scrubStartProgress ?? self.clampedProgress
+    return min(1, max(0, startingProgress + Double(translationX / width)))
   }
 
   private var canScrub: Bool {
