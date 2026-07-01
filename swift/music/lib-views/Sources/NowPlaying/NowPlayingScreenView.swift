@@ -14,6 +14,7 @@ public struct NowPlayingScreenView: View {
   private let onPreviousTap: @MainActor @Sendable () -> Void
   private let onNextTap: @MainActor @Sendable () -> Void
   private let onScrub: @MainActor @Sendable (TimeInterval) -> Void
+  private let onAlbumInfoTap: (@MainActor @Sendable () -> Void)?
 
   public init(
     title: String,
@@ -28,6 +29,7 @@ public struct NowPlayingScreenView: View {
     onPreviousTap: @MainActor @escaping @Sendable () -> Void,
     onNextTap: @MainActor @escaping @Sendable () -> Void,
     onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void,
+    onAlbumInfoTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.title = title
     self.artist = artist
@@ -41,6 +43,7 @@ public struct NowPlayingScreenView: View {
     self.onPreviousTap = onPreviousTap
     self.onNextTap = onNextTap
     self.onScrub = onScrub
+    self.onAlbumInfoTap = onAlbumInfoTap
   }
 
   public var body: some View {
@@ -74,33 +77,9 @@ public struct NowPlayingScreenView: View {
 
           self.artworkView(size: self.artworkSize(for: proxy.size))
 
-          VStack(spacing: 4) {
-            Text(self.title)
-              .font(
-                .system(
-                  size: 24,
-                  weight: .bold,
-                  design: .rounded,
-                ),
-              )
-              .foregroundStyle(.white)
-              .multilineTextAlignment(.center)
-              .lineLimit(2)
-
-            Text(self.artist)
-              .font(
-                .system(
-                  size: 17,
-                  weight: .semibold,
-                  design: .rounded,
-                ),
-              )
-              .foregroundStyle(.white.opacity(0.7))
-              .multilineTextAlignment(.center)
-              .lineLimit(2)
-          }
-          .padding(.horizontal, 12)
-          .padding(.top, 20)
+          self.albumInfoView
+            .padding(.horizontal, 12)
+            .padding(.top, 20)
 
           NowPlayingTransportControls(
             isPlaying: self.isPlaying,
@@ -129,18 +108,60 @@ public struct NowPlayingScreenView: View {
   }
 
   @ViewBuilder
+  private var albumInfoView: some View {
+    if let onAlbumInfoTap {
+      Button(action: onAlbumInfoTap) {
+        self.albumInfoText
+          .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityHint("Open album")
+    } else {
+      self.albumInfoText
+    }
+  }
+
+  private var albumInfoText: some View {
+    VStack(spacing: 4) {
+      Text(self.title)
+        .font(
+          .system(
+            size: 24,
+            weight: .bold,
+            design: .rounded,
+          ),
+        )
+        .foregroundStyle(.white)
+        .multilineTextAlignment(.center)
+        .lineLimit(2)
+
+      Text(self.artist)
+        .font(
+          .system(
+            size: 17,
+            weight: .semibold,
+            design: .rounded,
+          ),
+        )
+        .foregroundStyle(.white.opacity(0.7))
+        .multilineTextAlignment(.center)
+        .lineLimit(2)
+    }
+  }
+
+  @ViewBuilder
   private func artworkView(size: CGFloat) -> some View {
     let artwork = AlbumArtworkView(
       artworkUrl: self.artworkURL,
       size: size,
-      cornerRadius: 34,
+      cornerRadius: 16,
     )
     #if os(iOS)
       if let artworkTransitionID {
         NowPlayingZoomRegisteredView(
           id: artworkTransitionID,
           role: .destination,
-          cornerRadius: 34,
+          cornerRadius: 16,
         ) {
           artwork
         }
@@ -180,9 +201,14 @@ private struct NowPlayingTransportControls: View {
               .controlSize(.large)
               .tint(.white)
           } else {
-            Image(systemName: self.isPlaying ? "pause.fill" : "play.fill")
-              .font(.system(size: 42, weight: .black))
-              .nowPlayingPlayPauseSymbolTransition(value: self.isPlaying)
+            Image(
+              systemName: self.isPlaying
+                ? "pause.fill" : "play.fill",
+            )
+            .font(.system(size: 42, weight: .black))
+            .nowPlayingPlayPauseSymbolTransition(
+              value: self.isPlaying,
+            )
           }
         }
         .foregroundStyle(.white)
@@ -191,7 +217,9 @@ private struct NowPlayingTransportControls: View {
       }
       .buttonStyle(.plain)
       .disabled(self.isLoading)
-      .accessibilityLabel(self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play")
+      .accessibilityLabel(
+        self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play",
+      )
 
       NowPlayingSecondaryControlButton(
         systemName: "forward.fill",
@@ -204,14 +232,22 @@ private struct NowPlayingTransportControls: View {
 
 private extension View {
   @ViewBuilder
-  func nowPlayingPlayPauseSymbolTransition(value: Bool) -> some View {
+  func nowPlayingPlayPauseSymbolTransition(value: Bool)
+    -> some View {
     if #available(iOS 18.0, macOS 15.0, *) {
       self
-        .contentTransition(.symbolEffect(.replace.magic(fallback: .replace), options: .speed(2.2)))
+        .contentTransition(
+          .symbolEffect(
+            .replace.magic(fallback: .replace),
+            options: .speed(2.2),
+          ),
+        )
         .animation(.easeInOut(duration: 0.12), value: value)
     } else {
       self
-        .contentTransition(.symbolEffect(.replace, options: .speed(2.2)))
+        .contentTransition(
+          .symbolEffect(.replace, options: .speed(2.2)),
+        )
         .animation(.easeInOut(duration: 0.12), value: value)
     }
   }
@@ -254,7 +290,9 @@ private struct NowPlayingProgressBar: View {
 
             Capsule()
               .fill(.white)
-              .frame(width: proxy.size.width * self.displayedProgress)
+              .frame(
+                width: proxy.size.width * self.displayedProgress,
+              )
           }
           .frame(height: self.isScrubbing ? 13 : 9)
           .clipShape(Capsule())
@@ -319,7 +357,10 @@ private struct NowPlayingProgressBar: View {
       }
   }
 
-  private func relativeScrubProgress(for translationX: CGFloat, width: CGFloat) -> Double {
+  private func relativeScrubProgress(
+    for translationX: CGFloat,
+    width: CGFloat,
+  ) -> Double {
     let startingProgress = self.scrubStartProgress ?? self.clampedProgress
     return min(1, max(0, startingProgress + Double(translationX / width)))
   }
@@ -342,10 +383,6 @@ private struct NowPlayingProgressBar: View {
 
   private var remainingTime: TimeInterval {
     max(0, max(0, self.duration) - self.elapsedTime)
-  }
-
-  private func progress(for locationX: CGFloat, width: CGFloat) -> Double {
-    min(1, max(0, Double(locationX / width)))
   }
 
   private func time(for progress: Double) -> TimeInterval {

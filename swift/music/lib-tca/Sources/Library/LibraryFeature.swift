@@ -7,6 +7,7 @@ struct LibraryFeature: Sendable {
     var status = Status.loading
     var isRefreshingRemoteLibrary = false
     var hasStartedInitialLibraryLoad = false
+    var pendingAlbumDetail: AlbumDetailFeature.State?
     @Presents var albumDetail: AlbumDetailFeature.State?
   }
 
@@ -89,12 +90,21 @@ struct LibraryFeature: Sendable {
         return self.refreshRemoteApprovedLibrary(loadCache: true)
 
       case .albumTapped(let albumID):
-        state.albumDetail = self.albumDetail(albumID, in: state)
+        state.presentAlbumDetail(
+          albumID: albumID,
+          transitionSourceID: albumID.rawValue,
+          replacingCurrent: false,
+        )
         return .none
 
       case .albumDetailDismissed(let pushID):
         guard state.albumDetail?.pushID == pushID else { return .none }
-        state.albumDetail = nil
+        if let pendingAlbumDetail = state.pendingAlbumDetail {
+          state.albumDetail = pendingAlbumDetail
+          state.pendingAlbumDetail = nil
+        } else {
+          state.albumDetail = nil
+        }
         return .none
 
       case .albumDetail(.presented(.delegate(let delegateAction))):
@@ -128,18 +138,6 @@ struct LibraryFeature: Sendable {
     }
     .cancellable(id: CancelID.approvedLibraryRefresh, cancelInFlight: true)
   }
-
-  private func albumDetail(_ albumID: ApprovedAlbum.ID, in state: State) -> AlbumDetailFeature
-    .State? {
-    guard case .loaded(let library) = state.status,
-          let album = library.album(id: albumID)
-    else { return nil }
-
-    return .init(
-      album: album,
-      transitionSourceID: albumID.rawValue,
-    )
-  }
 }
 
 private extension LibraryFeature.Status {
@@ -154,13 +152,47 @@ private extension LibraryFeature.Status {
 }
 
 extension LibraryFeature.State {
+  @discardableResult
+  mutating func presentAlbumDetail(
+    albumID: ApprovedAlbum.ID,
+    transitionSourceID: String?,
+    replacingCurrent: Bool,
+  ) -> Bool {
+    guard case .loaded(let library) = self.status,
+          let album = library.album(id: albumID)
+    else { return false }
+
+    let albumDetail = AlbumDetailFeature.State(
+      album: album,
+      transitionSourceID: transitionSourceID,
+    )
+
+    if replacingCurrent,
+       let currentAlbumDetail = self.albumDetail,
+       currentAlbumDetail.pushID != albumDetail.pushID {
+      self.pendingAlbumDetail = albumDetail
+    } else {
+      self.pendingAlbumDetail = nil
+      self.albumDetail = albumDetail
+    }
+    return true
+  }
+
   mutating func setAlbumDetailPlaybackFailure(_ failure: PlaybackFailure?) {
+    if var pendingAlbumDetail = self.pendingAlbumDetail {
+      pendingAlbumDetail.setPlaybackFailure(failure)
+      self.pendingAlbumDetail = pendingAlbumDetail
+    }
     guard var albumDetail = self.albumDetail else { return }
     albumDetail.setPlaybackFailure(failure)
     self.albumDetail = albumDetail
   }
 
   mutating func setAlbumDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+    if var pendingAlbumDetail = self.pendingAlbumDetail {
+      pendingAlbumDetail.setPlaybackSession(session)
+      self.pendingAlbumDetail = pendingAlbumDetail
+    }
     guard var albumDetail = self.albumDetail else { return }
     albumDetail.setPlaybackSession(session)
     self.albumDetail = albumDetail

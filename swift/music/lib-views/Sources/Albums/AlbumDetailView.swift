@@ -40,7 +40,7 @@ public struct AlbumDetailView: View {
             ZoomableAlbumArtworkView(
               album: self.album,
               size: self.artworkSize(for: proxy.size.width),
-              cornerRadius: 32,
+              cornerRadius: 16,
               transitionID: self.artworkTransitionID,
               role: .destination,
             )

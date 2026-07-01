@@ -119,6 +119,9 @@ struct AppView: View {
             onScrub: { time in
               self.store.send(.playback(.seek(time)))
             },
+            onAlbumInfoTap: session.currentItem.albumID == nil ? nil : {
+              self.store.send(.nowPlayingAlbumInfoTapped)
+            },
           )
         } else {
           NowPlayingScreenView(

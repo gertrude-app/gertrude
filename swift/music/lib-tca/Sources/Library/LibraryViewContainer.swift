@@ -23,6 +23,7 @@ struct LibraryViewContainer: View {
       )
       .albumDetailZoomPush(
         store: albumDetailStore,
+        queuedReplacementPushID: self.store.pendingAlbumDetail?.pushID,
         onDismiss: { self.store.send(.albumDetailDismissed($0)) },
       )
       .onAppear {

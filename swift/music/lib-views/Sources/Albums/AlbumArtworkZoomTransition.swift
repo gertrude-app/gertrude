@@ -21,7 +21,7 @@ public struct ZoomableAlbumArtworkView: View {
   public init(
     album: AlbumData,
     size: CGFloat = 148,
-    cornerRadius: CGFloat = 20,
+    cornerRadius: CGFloat = 12,
     transitionID: String? = nil,
     role: AlbumArtworkZoomRole = .source,
   ) {
@@ -237,9 +237,8 @@ public struct ZoomableAlbumArtworkView: View {
       onPop: @MainActor @escaping () -> Void,
     ) -> Bool {
       guard let navigationController else { return false }
-      if let topDetail = navigationController.topViewController as? AlbumDetailHostingController,
-         topDetail.pushID == pushID {
-        return true
+      if let topDetail = navigationController.topViewController as? AlbumDetailHostingController {
+        return topDetail.pushID == pushID
       }
 
       let transitionID = transitionSourceID.map(albumArtworkZoomTransitionID)
@@ -249,32 +248,59 @@ public struct ZoomableAlbumArtworkView: View {
         onPop: onPop,
       )
       detailViewController.view.backgroundColor = .systemBackground
-
-      if #available(iOS 18.0, *), let transitionID {
-        let options = UIViewController.Transition.ZoomOptions()
-        options.alignmentRectProvider = { context in
-          MainActor.assumeIsolated {
-            context.zoomedViewController.view.layoutIfNeeded()
-            guard let destinationView = AlbumArtworkZoomRegistry.shared
-              .destinationView(for: transitionID) else {
-              return .null
-            }
-            return destinationView.convert(
-              destinationView.bounds,
-              to: context.zoomedViewController.view,
-            )
-          }
-        }
-
-        detailViewController.preferredTransition = .zoom(options: options) { _ in
-          MainActor.assumeIsolated {
-            AlbumArtworkZoomRegistry.shared.sourceView(for: transitionID)
-          }
-        }
-      }
+      self.configureTransition(for: detailViewController, transitionID: transitionID)
 
       navigationController.pushViewController(detailViewController, animated: true)
       return true
+    }
+
+    @MainActor
+    public static func topDetailPushID(in navigationController: UINavigationController?)
+      -> String? {
+      (navigationController?.topViewController as? AlbumDetailHostingController)?.pushID
+    }
+
+    @discardableResult
+    @MainActor
+    public static func popTopDetail(in navigationController: UINavigationController?) -> Bool {
+      guard let navigationController,
+            navigationController.topViewController is AlbumDetailHostingController
+      else { return false }
+      navigationController.popViewController(animated: true)
+      return true
+    }
+
+    @MainActor
+    private static func configureTransition(
+      for detailViewController: AlbumDetailHostingController,
+      transitionID: String?,
+    ) {
+      guard #available(iOS 18.0, *) else { return }
+      guard let transitionID else {
+        detailViewController.preferredTransition = nil
+        return
+      }
+
+      let options = UIViewController.Transition.ZoomOptions()
+      options.alignmentRectProvider = { context in
+        MainActor.assumeIsolated {
+          context.zoomedViewController.view.layoutIfNeeded()
+          guard let destinationView = AlbumArtworkZoomRegistry.shared
+            .destinationView(for: transitionID) else {
+            return .null
+          }
+          return destinationView.convert(
+            destinationView.bounds,
+            to: context.zoomedViewController.view,
+          )
+        }
+      }
+
+      detailViewController.preferredTransition = .zoom(options: options) { _ in
+        MainActor.assumeIsolated {
+          AlbumArtworkZoomRegistry.shared.sourceView(for: transitionID)
+        }
+      }
     }
   }
 
