@@ -107,7 +107,8 @@ const JSON_LD = {
     },
     {
       '@type': `SoftwareApplication`,
-      name: `Gertrude AM`,
+      name: `Gertrude Podcasts`,
+      alternateName: `Gertrude AM`,
       operatingSystem: `iOS`,
       applicationCategory: `EntertainmentApplication`,
       description: `A safe podcast app for kids with PIN-protected content control.`,

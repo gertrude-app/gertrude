@@ -4,13 +4,13 @@ import React from 'react';
 import LightPlanTeaser from './LightPlanTeaser';
 import ScreenHeader from './ScreenHeader';
 
-export type AmDoneVariant = `active` | `approachingExpiry` | `notEntitled`;
+export type PodcastsDoneVariant = `active` | `approachingExpiry` | `notEntitled`;
 
-const AmDoneScreen: React.FC<{
+const PodcastsDoneScreen: React.FC<{
   childName: string;
   modelName: string;
   iosVersion: string;
-  variant: AmDoneVariant;
+  variant: PodcastsDoneVariant;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
   showSubscribe?: boolean;
@@ -21,7 +21,7 @@ const AmDoneScreen: React.FC<{
   const deviceType = props.modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   if (props.variant === `notEntitled`) {
     return (
-      <AmDoneNotEntitled
+      <PodcastsDoneNotEntitled
         childName={props.childName}
         deviceType={deviceType}
         onSubscribe={props.onSubscribe}
@@ -31,7 +31,7 @@ const AmDoneScreen: React.FC<{
   }
   if (props.variant === `approachingExpiry`) {
     return (
-      <AmDoneApproachingExpiry
+      <PodcastsDoneApproachingExpiry
         childName={props.childName}
         deviceType={deviceType}
         accessEndsAt={props.accessEndsAt ?? `soon`}
@@ -41,7 +41,7 @@ const AmDoneScreen: React.FC<{
     );
   }
   return (
-    <AmDoneActive
+    <PodcastsDoneActive
       childName={props.childName}
       deviceType={deviceType}
       trialDaysRemaining={props.trialDaysRemaining}
@@ -52,9 +52,9 @@ const AmDoneScreen: React.FC<{
   );
 };
 
-export default AmDoneScreen;
+export default PodcastsDoneScreen;
 
-const AmDoneNotEntitled: React.FC<{
+const PodcastsDoneNotEntitled: React.FC<{
   childName: string;
   deviceType: string;
   onSubscribe: () => void;
@@ -68,8 +68,8 @@ const AmDoneNotEntitled: React.FC<{
     />
 
     <p className="text-slate-600 mb-5">
-      To keep Gertrude AM working on {posessive(childName)} {deviceType}, your Gertrude
-      account needs a <b>Light subscription</b>.
+      To keep Gertrude Podcasts working on {posessive(childName)} {deviceType}, your
+      Gertrude account needs a <b>Light subscription</b>.
     </p>
 
     <LightPlanTeaser
@@ -89,7 +89,7 @@ const AmDoneNotEntitled: React.FC<{
   </div>
 );
 
-const AmDoneApproachingExpiry: React.FC<{
+const PodcastsDoneApproachingExpiry: React.FC<{
   childName: string;
   deviceType: string;
   accessEndsAt: string;
@@ -104,13 +104,13 @@ const AmDoneApproachingExpiry: React.FC<{
     />
 
     <p className="text-slate-600 mb-5">
-      Gertrude AM is now active on {posessive(childName)} {deviceType}.
+      Gertrude Podcasts is now active on {posessive(childName)} {deviceType}.
     </p>
 
     <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4">
       <p className="text-amber-900 font-semibold">Access ends {accessEndsAt}</p>
       <p className="text-amber-800/90 text-sm mt-1">
-        Subscribe to <b>Gertrude Light</b> to keep Gertrude AM going past that date.
+        Subscribe to <b>Gertrude Light</b> to keep Gertrude Podcasts going past that date.
       </p>
     </div>
 
@@ -131,7 +131,7 @@ const AmDoneApproachingExpiry: React.FC<{
   </div>
 );
 
-const AmDoneActive: React.FC<{
+const PodcastsDoneActive: React.FC<{
   childName: string;
   deviceType: string;
   trialDaysRemaining?: number;
@@ -154,7 +154,7 @@ const AmDoneActive: React.FC<{
     />
 
     <p className="text-slate-600 mb-5">
-      Gertrude AM is now active on {posessive(childName)} {deviceType}.
+      Gertrude Podcasts is now active on {posessive(childName)} {deviceType}.
     </p>
 
     {trialDaysRemaining !== undefined && (
@@ -163,8 +163,8 @@ const AmDoneActive: React.FC<{
           You have {trialDaysRemaining} days of free trial.
         </p>
         <p className="text-slate-600 text-sm mt-1">
-          Subscribe to <b>Gertrude Light</b> any time to keep AM going after your trial
-          ends — no waiting for the deadline.
+          Subscribe to <b>Gertrude Light</b> any time to keep Gertrude Podcasts going
+          after your trial ends — no waiting for the deadline.
         </p>
       </div>
     )}

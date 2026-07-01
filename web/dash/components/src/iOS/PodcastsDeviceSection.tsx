@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 import AppHeader from './AppHeader';
 import ResetPinModal from './ResetPinModal';
 
-export type AmStatus = `active` | `approaching` | `paused`;
+export type PodcastsStatus = `active` | `approaching` | `paused`;
 
-function amStatusLine(
-  status: AmStatus,
+function podcastsStatusLine(
+  status: PodcastsStatus,
   accessEndsAt?: string,
   trialDaysRemaining?: number,
 ): string {
@@ -22,8 +22,8 @@ function amStatusLine(
   return `Active.`;
 }
 
-const AmDeviceSection: React.FC<{
-  status: AmStatus;
+const PodcastsDeviceSection: React.FC<{
+  status: PodcastsStatus;
   childName: string;
   deviceType: string;
   accessEndsAt?: string;
@@ -57,7 +57,7 @@ const AmDeviceSection: React.FC<{
     <div className="max-w-3xl">
       <AppHeader app="podcasts" />
       <p className="mt-4 text-slate-500">
-        {amStatusLine(status, accessEndsAt, trialDaysRemaining)}
+        {podcastsStatusLine(status, accessEndsAt, trialDaysRemaining)}
       </p>
       <div className="mt-4">
         <Button
@@ -83,4 +83,4 @@ const AmDeviceSection: React.FC<{
   );
 };
 
-export default AmDeviceSection;
+export default PodcastsDeviceSection;

@@ -44,7 +44,7 @@ const PodcastsBlock: React.FC = () => {
                 </span>
                 {` `}
                 <span className="text-orange-300 tracking-tight sm:animate-[glow-pulse_3s_ease-in-out_infinite]">
-                  AM
+                  Podcasts
                 </span>
               </h2>
             </div>
@@ -131,7 +131,7 @@ const PodcastsBlock: React.FC = () => {
         </div>
 
         <a
-          href="https://apps.apple.com/us/app/gertrude-am/id6753187429?see-all=reviews&platform=iphone"
+          href="https://apps.apple.com/us/app/gertrude-podcasts/id6753187429?see-all=reviews&platform=iphone"
           target="_blank"
           rel="noopener noreferrer"
           className={`hidden md:flex flex-col items-center justify-center gap-1.5 my-8 md:mt-12 md:mb-16 text-white/50 text-sm hover:text-white/70 transition-all duration-500 antialiased relative z-10 ${
@@ -161,7 +161,7 @@ const PodcastsBlock: React.FC = () => {
           style={{ transitionDelay: isVisible ? `850ms` : `0ms` }}
         >
           <a
-            href="https://apps.apple.com/us/app/gertrude-am/id6753187429"
+            href="https://apps.apple.com/us/app/gertrude-podcasts/id6753187429"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-transform duration-200 hover:scale-105"

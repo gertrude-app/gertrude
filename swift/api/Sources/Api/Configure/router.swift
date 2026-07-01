@@ -105,6 +105,10 @@ public extension Configure {
       try await ClaimRedirectRoute.handle(req, intent: .podcasts)
     })
 
+    app.get("claim-pending-podcasts", ":code", use: { (req: Request) in
+      try await ClaimRedirectRoute.handle(req, intent: .podcasts)
+    })
+
     app.get("claim-pending-music", ":code", use: { (req: Request) in
       try await ClaimRedirectRoute.handle(req, intent: .music)
     })

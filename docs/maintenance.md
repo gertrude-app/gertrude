@@ -159,7 +159,7 @@ reconcile against the map.
 
 ### `docs/support/*.md` — product overview docs
 
-`product-overview.md`, `mac-app.md`, `ios-app.md`, `gertrude-am.md`. These are the
+`product-overview.md`, `mac-app.md`, `ios-app.md`, `podcasts.md`. These are the
 agent-facing source of truth for how the product works. Drift whenever features ship, are
 renamed, or are removed. Review after any significant feature launch.
 

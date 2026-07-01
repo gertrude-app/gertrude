@@ -64,7 +64,7 @@ const AppRatings: React.FC = () => {
     return <ErrorState context="ratings" error={error ?? `Unknown error`} />;
   }
 
-  const appName = app === `blocker` ? `Gertrude Blocker` : `Gertrude AM`;
+  const appName = app === `blocker` ? `Gertrude Blocker` : `Gertrude Podcasts`;
   const Icon = app === `blocker` ? SmartphoneIcon : MicIcon;
   const gradientClass =
     app === `blocker` ? `from-sky-400 to-blue-500` : `from-emerald-400 to-green-500`;

@@ -115,8 +115,8 @@ const LoginPage: React.FC = () => {
             />
             <AppAd
               screenshot="/mac-app-screenshot.png"
-              appIcon="/gertrude-am-app-icon.webp"
-              heading="Gertrude AM"
+              appIcon="/gertrude-podcasts-app-icon.webp"
+              heading="Gertrude Podcasts"
               subheading="Parent-curated & pin-protected podcasts"
               badges={[`iOS`, `iPadOS`]}
             />

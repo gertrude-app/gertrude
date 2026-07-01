@@ -122,7 +122,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   // remaining handler logic is exercised by the supervision tests above
-  func testAmValidCode_redirectsToAmClaimFunnel() async throws {
+  func testPodcastClaimRoutes_redirectToPodcastFunnel() async throws {
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.db.create(IOSDevice(
       id: .init(),
@@ -132,6 +132,8 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
     ))
     try await self.createClaim(.podcasts, device.id, code: code)
 
+    // legacy route: shipped app builds still emit /a/ -> claim-pending-am, so it must keep
+    // resolving — and now redirects into the new podcast-named funnel
     try await app.test(
       .GET,
       "claim-pending-am/\(code)",
@@ -139,10 +141,22 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
         expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("claimPendingAmDevice=\(code)")
+        expect(location).toContain("claimPendingPodcastsDevice=\(code)")
         expect(location).toContain("iosVersion=18.2")
-        expect(location).toContain("redirect=/claim-am-device/\(code)/claim")
+        expect(location).toContain("redirect=/claim-podcasts-device/\(code)/claim")
         expect(location).not.toContain("error=")
+      },
+    )
+
+    // new canonical route (/p/ -> claim-pending-podcasts)
+    try await app.test(
+      .GET,
+      "claim-pending-podcasts/\(code)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("claimPendingPodcastsDevice=\(code)")
+        expect(location).toContain("redirect=/claim-podcasts-device/\(code)/claim")
       },
     )
   }

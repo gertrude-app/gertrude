@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'vitest';
 import type { T } from '@shared/pairql/dashboard';
-import { amDoneVariant } from './amDoneVariant';
+import { podcastsDoneVariant } from './podcastsDoneVariant';
 
 type Subscription = T.ClaimAmDevice.Output[`subscription`];
 
-describe(`amDoneVariant()`, () => {
+describe(`podcastsDoneVariant()`, () => {
   test(`does not offer light to an active subscriber`, () => {
-    const result = amDoneVariant({
+    const result = podcastsDoneVariant({
       case: `active`,
       expiresAt: `2027-06-13T15:15:52.000Z`,
     });
@@ -16,14 +16,14 @@ describe(`amDoneVariant()`, () => {
   });
 
   test(`does not offer light to a complimentary account`, () => {
-    const result = amDoneVariant({ case: `complimentary` });
+    const result = podcastsDoneVariant({ case: `complimentary` });
 
     expect(result.variant).toBe(`active`);
     expect(result.showSubscribe).toBe(false);
   });
 
   test(`offers light during an active trial`, () => {
-    const result = amDoneVariant({
+    const result = podcastsDoneVariant({
       case: `amTrial`,
       expiresAt: futureDate(30),
     } satisfies Subscription);

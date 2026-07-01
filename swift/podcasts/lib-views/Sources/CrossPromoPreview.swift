@@ -30,7 +30,7 @@ private struct CrossPromoSheetPreviewHost<Content: View>: View {
   CrossPromoSheetPreviewHost { dismiss in
     ButtonScreenView(
       text:
-      "Did you know about Gertrude Blocker?\n\nThe iOS parental controls app from the makers of Gertrude AM — block apps, websites, and more.",
+      "Did you know about Gertrude Blocker?\n\nThe iOS parental controls app from the makers of Gertrude Podcasts — block apps, websites, and more.",
       primary: .init("Check it out", animate: false) { dismiss() },
       screenType: .announcement,
     )
@@ -80,12 +80,12 @@ private struct CrossPromoSheetPreviewHost<Content: View>: View {
   CrossPromoSheetPreviewHost { dismiss in
     ButtonScreenView(
       text:
-      "Try Gertrude AM\n\nKid-safe podcasts for the whole family.",
+      "Try Gertrude Podcasts\n\nKid-safe podcasts for the whole family.",
       primary: .init("Get the app", animate: false) { dismiss() },
       secondary: .init("Maybe later", animate: false) { dismiss() },
       remoteImage: .init(
         url: "https://raw.githubusercontent.com/gertrude-app/gertrude/master/swift/podcasts/app/Assets.xcassets/AppIcon.appiconset/radio-1024.png",
-        label: "Gertrude AM app icon",
+        label: "Gertrude Podcasts app icon",
       ),
       screenType: .announcement,
     )

@@ -134,7 +134,7 @@ public struct ClaimCodeView: View {
   }
 
   private func claimUrl(_ code: Int) -> String {
-    "https://gertrude.app/a/\(self.codeString(code))"
+    "https://gertrude.app/p/\(self.codeString(code))"
   }
 }
 

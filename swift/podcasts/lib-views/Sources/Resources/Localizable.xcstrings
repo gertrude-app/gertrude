@@ -1164,13 +1164,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM lets parents or accountability partners give access to only selected, approved podcasts."
+            "value" : "Gertrude Podcasts lets parents or accountability partners give access to only selected, approved podcasts."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM permite a padres o compañeros de responsabilidad dar acceso solo a podcasts seleccionados y aprobados."
+            "value" : "Gertrude Podcasts permite a padres o compañeros de responsabilidad dar acceso solo a podcasts seleccionados y aprobados."
           }
         }
       }
@@ -2048,13 +2048,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your Gertrude AM access runs through %@. Tap to subscribe and keep listening."
+            "value" : "Your Gertrude Podcasts access runs through %@. Tap to subscribe and keep listening."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu acceso a Gertrude AM continúa hasta el %@. Toca para suscribirte y seguir escuchando."
+            "value" : "Tu acceso a Gertrude Podcasts continúa hasta el %@. Toca para suscribirte y seguir escuchando."
           }
         }
       }
@@ -2065,13 +2065,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM is moving from Apple in-app purchases to Gertrude accounts. Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep AM after %@, connect a Gertrude account. (Apple won't charge you again.)"
+            "value" : "Gertrude Podcasts is moving from Apple in-app purchases to Gertrude accounts. Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep Gertrude Podcasts after %@, connect a Gertrude account. (Apple won't charge you again.)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude AM se está cambiando de las compras dentro de la app de Apple a cuentas de Gertrude. Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, vincula una cuenta de Gertrude. (Apple no te volverá a cobrar.)"
+            "value" : "Gertrude Podcasts se está cambiando de las compras dentro de la app de Apple a cuentas de Gertrude. Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando Gertrude Podcasts después del %@, vincula una cuenta de Gertrude. (Apple no te volverá a cobrar.)"
           }
         }
       }
@@ -2082,13 +2082,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep AM after %@, subscribe. (Apple won't charge you again.)"
+            "value" : "Your original purchase is fully honored — and we've added 3 extra months as thanks for the switch. To keep Gertrude Podcasts after %@, subscribe. (Apple won't charge you again.)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando AM después del %@, suscríbete. (Apple no te volverá a cobrar.)"
+            "value" : "Tu compra original se respeta por completo, y hemos añadido 3 meses adicionales como agradecimiento por el cambio. Para seguir usando Gertrude Podcasts después del %@, suscríbete. (Apple no te volverá a cobrar.)"
           }
         }
       }

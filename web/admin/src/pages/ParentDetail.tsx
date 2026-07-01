@@ -773,7 +773,7 @@ const APP_CONFIG: Record<
 
 const APP_ICON: Record<string, string> = {
   blocker: `https://parents.gertrude.app/gertrude-blocker-app-icon.png`,
-  am: `https://parents.gertrude.app/gertrude-am-app-icon.png`,
+  am: `https://parents.gertrude.app/gertrude-podcasts-app-icon.png`,
   music: `https://parents.gertrude.app/gertrude-music-app-icon.png`,
 };
 

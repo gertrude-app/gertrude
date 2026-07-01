@@ -13,7 +13,7 @@ configs:
   Release: release
 
 targets:
-  'Gertrude AM':
+  'Gertrude Podcasts':
     type: application
     platform: iOS
     deploymentTarget: "17.0"
@@ -35,12 +35,12 @@ targets:
       base:
         TARGETED_DEVICE_FAMILY: "1,2" # iPhone and iPad
         SWIFT_VERSION: "6.0"
-        PRODUCT_NAME: "Gertrude AM"
+        PRODUCT_NAME: "Gertrude Podcasts"
         DEVELOPMENT_TEAM: "WFN83LM943"
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_FILE: app/Info.plist
-        MARKETING_VERSION: 1.6.0
-        CURRENT_PROJECT_VERSION: 25
+        MARKETING_VERSION: 1.6.2
+        CURRENT_PROJECT_VERSION: 27
         ALWAYS_SEARCH_USER_PATHS: NO
       configs:
         Release:
@@ -58,7 +58,7 @@ targets:
       path: app/Info.plist
       properties:
         CFBundleName: $(PRODUCT_NAME)
-        CFBundleDisplayName: Gertrude AM
+        CFBundleDisplayName: Gertrude Podcasts
         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)

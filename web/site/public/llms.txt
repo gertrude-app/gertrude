@@ -10,7 +10,7 @@ filter paired with optional screenshot and keystroke monitoring, managed by
 parents from a web dashboard. The iPhone/iPad app is a focused tool that plugs
 holes in Apple's Screen Time — blocking `#images` GIF search in Messages,
 Spotlight image search, Maps business-listing images, and similar loopholes.
-Gertrude AM is a podcast app that lets kids listen to parent-approved shows
+Gertrude Podcasts is a podcast app that lets kids listen to parent-approved shows
 while gating the ability to add new podcasts behind a PIN; it connects to a
 Gertrude parent account for subscription and PIN management.
 
@@ -30,10 +30,10 @@ Gertrude parent account for subscription and PIN management.
   supervision tool (Mac and Windows) that places a device into Apple
   Supervised Mode. See the [Supervised Mode setup
   guide](https://gertrude.app/blog/gertrude-ios-supervised-mode) for details.
-- [Gertrude AM](https://gertrude.app/#podcasts): A kid-friendly podcast app
-  where adding new shows requires a parent-set 6-digit PIN. Connects to a
-  Gertrude parent account; free to try for 30 days, then requires at least a
-  Light plan ($10/year for the whole family) to keep adding and updating shows.
+- [Gertrude Podcasts](https://gertrude.app/#podcasts) (formerly Gertrude AM):
+  A kid-friendly podcast app where adding new shows requires a parent-set 6-digit PIN.
+  Connects to a Gertrude parent account; free to try for 30 days, then requires at
+  least a Light plan ($10/year for the whole family) to keep adding and updating shows.
 
 ## Documentation
 
@@ -42,8 +42,8 @@ Gertrude parent account for subscription and PIN management.
 - [iOS app privacy policy](https://gertrude.app/docs/iosapp-privacy): Privacy
   policy for the Gertrude Blocker iOS app. Gertrude collects no personal data
   from the iOS app — only anonymous error logs and install counts.
-- [Gertrude AM privacy policy](https://gertrude.app/docs/am-privacy): Privacy
-  policy for the Gertrude AM podcast app. The app sends a small amount of
+- [Gertrude Podcasts privacy policy](https://gertrude.app/docs/podcasts-privacy): Privacy
+  policy for the Gertrude Podcasts podcast app. The app sends a small amount of
   anonymous usage and diagnostic data to operate subscriptions, understand usage
   patterns, and fix bugs.
 

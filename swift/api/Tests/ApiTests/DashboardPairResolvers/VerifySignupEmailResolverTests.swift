@@ -71,7 +71,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     expect(sent.emails).toHaveCount(1)
     expect(sent.emails[0].template).toBe("initial-signup")
     expect(sent.emails[0].templateModel["redirect"]) // <-- replacement email keeps funnel
-      .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
+      .toEqual("%2Fclaim-podcasts-device%2F123456%2Fclaim")
 
     let newToken = UUID(uuidString: sent.emails[0].templateModel["token"] ?? "")!
     let retrieved = await ephemeral.parentIdFromToken(newToken)
@@ -127,7 +127,7 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     expect(result).toBeError(containing: "we sent a new verification email")
     expect(sent.emails).toHaveCount(1)
     expect(sent.emails[0].templateModel["redirect"]) // <-- resend keeps funnel
-      .toEqual("%2Fclaim-am-device%2F123456%2Fclaim")
+      .toEqual("%2Fclaim-podcasts-device%2F123456%2Fclaim")
   }
 
   func testVerifySignupEmailDoesntChangeAdminUserSubscriptionStatusWhenNotPending() async throws {

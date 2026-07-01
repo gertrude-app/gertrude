@@ -1,19 +1,19 @@
-import { AmDoneScreen, ClaimScreen, ScreenShell } from '@dash/components';
+import { ClaimScreen, PodcastsDoneScreen, ScreenShell } from '@dash/components';
 import React, { useState } from 'react';
-import type { AmDoneVariant } from '@dash/components';
+import type { PodcastsDoneVariant } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 import { withStatefulChrome } from '../../decorators/StatefulChrome';
 
 type ScreenStep = `claim` | `done`;
 
-const ClaimAmDeviceScreen: React.FC<{
+const ClaimPodcastsDeviceScreen: React.FC<{
   code: string;
   modelName: string;
   iosVersion: string;
   childName: string;
   children: Array<{ id: string; name: string }>;
   initialStep: ScreenStep;
-  doneVariant?: AmDoneVariant;
+  doneVariant?: PodcastsDoneVariant;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
   showSubscribe?: boolean;
@@ -60,7 +60,7 @@ const ClaimAmDeviceScreen: React.FC<{
 
   return (
     <ScreenShell title={`${deviceType} Connected`}>
-      <AmDoneScreen
+      <PodcastsDoneScreen
         childName={childName}
         modelName={modelName}
         iosVersion={iosVersion}
@@ -77,13 +77,13 @@ const ClaimAmDeviceScreen: React.FC<{
 };
 
 const meta = {
-  title: 'Dashboard/ClaimAmDevice/Screens', // eslint-disable-line
-  component: ClaimAmDeviceScreen,
+  title: 'Dashboard/ClaimPodcastsDevice/Screens', // eslint-disable-line
+  component: ClaimPodcastsDeviceScreen,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },
-} satisfies Meta<typeof ClaimAmDeviceScreen>;
+} satisfies Meta<typeof ClaimPodcastsDeviceScreen>;
 
-type Story = StoryObj<typeof ClaimAmDeviceScreen>;
+type Story = StoryObj<typeof ClaimPodcastsDeviceScreen>;
 
 export const ClaimWithChildren: Story = {
   args: {

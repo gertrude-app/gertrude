@@ -6,8 +6,16 @@ import {
 } from '../gertrudeApps';
 
 describe(`detectClaimPending()`, () => {
-  it(`maps claimPendingAmDevice to the podcasts intent`, () => {
-    const params = new URLSearchParams(`claimPendingAmDevice=778899`);
+  it(`maps claimPendingPodcastsDevice to the podcasts intent`, () => {
+    const params = new URLSearchParams(`claimPendingPodcastsDevice=778899`);
+    expect(detectClaimPending(params)).toEqual({
+      intent: `podcasts`,
+      claimCode: `778899`,
+    });
+  });
+
+  it(`still maps the legacy claimPendingAmDevice param to podcasts`, () => {
+    const params = new URLSearchParams(`claimPendingAmDevice=778899`); // backwards compat
     expect(detectClaimPending(params)).toEqual({
       intent: `podcasts`,
       claimCode: `778899`,
@@ -35,13 +43,17 @@ describe(`detectClaimPending()`, () => {
   });
 
   it(`ignores an empty claim param value`, () => {
-    expect(detectClaimPending(new URLSearchParams(`claimPendingAmDevice=`))).toBeNull();
+    expect(
+      detectClaimPending(new URLSearchParams(`claimPendingPodcastsDevice=`)),
+    ).toBeNull();
   });
 });
 
 describe(`claimFunnelPath()`, () => {
-  it(`builds the AM funnel path for the podcasts intent`, () => {
-    expect(claimFunnelPath(`podcasts`, `778899`)).toBe(`/claim-am-device/778899/claim`);
+  it(`builds the podcasts funnel path for the podcasts intent`, () => {
+    expect(claimFunnelPath(`podcasts`, `778899`)).toBe(
+      `/claim-podcasts-device/778899/claim`,
+    );
   });
 
   it(`builds the supervision funnel path for the blockerSupervise intent`, () => {
@@ -65,8 +77,16 @@ describe(`claimFunnelPath()`, () => {
 });
 
 describe(`detectClaimFunnelPath()`, () => {
-  it(`maps a claim-am-device path to the podcasts intent`, () => {
+  it(`maps a claim-podcasts-device path to the podcasts intent`, () => {
+    expect(detectClaimFunnelPath(`/claim-podcasts-device/778899/claim`)).toEqual({
+      intent: `podcasts`,
+      claimCode: `778899`,
+    });
+  });
+
+  it(`still maps the legacy claim-am-device path to the podcasts intent`, () => {
     expect(detectClaimFunnelPath(`/claim-am-device/778899/claim`)).toEqual({
+      // backwards compat
       intent: `podcasts`,
       claimCode: `778899`,
     });
@@ -91,7 +111,7 @@ describe(`detectClaimFunnelPath()`, () => {
       intent: `blockerSupervise`,
       claimCode: `123456`,
     });
-    expect(detectClaimFunnelPath(`/claim-am-device/778899/done`)).toEqual({
+    expect(detectClaimFunnelPath(`/claim-podcasts-device/778899/done`)).toEqual({
       intent: `podcasts`,
       claimCode: `778899`,
     });
@@ -111,10 +131,10 @@ describe(`detectClaimFunnelPath()`, () => {
   });
 
   it(`returns null for a non-numeric claim code`, () => {
-    expect(detectClaimFunnelPath(`/claim-am-device/abc123/claim`)).toBeNull();
+    expect(detectClaimFunnelPath(`/claim-podcasts-device/abc123/claim`)).toBeNull();
   });
 
   it(`returns null when the funnel segment is not at the path root`, () => {
-    expect(detectClaimFunnelPath(`/foo/claim-am-device/778899/claim`)).toBeNull();
+    expect(detectClaimFunnelPath(`/foo/claim-podcasts-device/778899/claim`)).toBeNull();
   });
 });

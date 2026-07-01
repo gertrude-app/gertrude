@@ -28,7 +28,11 @@ extension RequestAmPinReset: Resolver {
     }
 
     guard let install = try await device.podcastInstall(in: context.db) else {
-      throw context.error("efaeb74c", .notFound, user: "Gertrude AM is not set up on this device.")
+      throw context.error(
+        "efaeb74c",
+        .notFound,
+        user: "Gertrude Podcasts is not set up on this device.",
+      )
     }
 
     let expiresAt = get(dependency: \.date.now) + .minutes(60)
@@ -39,7 +43,7 @@ extension RequestAmPinReset: Resolver {
       let email = context.parent.email.rawValue
       await get(dependency: \.slack).internal(
         .podcasts,
-        "*AM PIN reset:* code generated for install `\(install.id)` by `\(email)`",
+        "*Podcasts PIN reset:* code generated for install `\(install.id)` by `\(email)`",
       )
     }
 

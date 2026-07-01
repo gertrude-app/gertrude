@@ -1,6 +1,6 @@
-# Gertrude AM
+# Gertrude Podcasts
 
-Gertrude AM is a separate iOS podcast app for kids and accountability partners. It started
+Gertrude Podcasts (formerly **Gertrude AM**) is a separate iOS podcast app for kids and accountability partners. It started
 life as an anonymous standalone app using IAP that did **not** connect to a Gertrude
 account, but since v1.6.0 (June 2026) it now connects to a Gertrude parent account,
 requiring at least a Light subscription after a 30-day free trial.
@@ -40,7 +40,7 @@ requiring at least a Light subscription after a 30-day free trial.
 
 ## Subscription
 
-- Gertrude AM is free to try without a subscription (or with a Free account) for 30 days.
+- Gertrude Podcasts is free to try without a subscription (or with a Free account) for 30 days.
   After that, the account must have at least a Light subscription to continue updating
   shows and adding new shows.
 - Prior to version 1.6.0, the app used Apple IAP for a $10/year subscription, but Jared
@@ -52,7 +52,7 @@ requiring at least a Light subscription after a 30-day free trial.
 
 - Support volume is relatively low compared with the Mac app and main iOS app.
 - Older installs from before account connection shipped can still exist unconnected in the
-  wild, so don't assume every AM user is connected.
+  wild, so don't assume every Gertrude Podcasts user is connected.
 - The most likely support topics are:
   - setting or changing the PIN
   - recovering a forgotten PIN (and whether the app is connected to a Gertrude account,

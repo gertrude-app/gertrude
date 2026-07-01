@@ -108,14 +108,14 @@ describe(`dashboard app login`, () => {
 });
 
 describe(`app-aware claim glue`, () => {
-  it(`shows the Gertrude AM app card + "Login to connect:" for an AM claim`, () => {
+  it(`shows the Gertrude Podcasts app card + "Login to connect:" for a podcasts claim`, () => {
     cy.visit(
-      `/login?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
+      `/login?claimPendingPodcastsDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
     );
     cy.contains(`Login to connect:`);
     cy.contains(`iPhone 15 Pro`);
     cy.contains(`For app:`);
-    cy.contains(`Gertrude AM`);
+    cy.contains(`Gertrude Podcasts`);
   });
 
   it(`still shows the Gertrude Blocker app card for a supervision claim`, () => {

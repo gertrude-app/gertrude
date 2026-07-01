@@ -1,7 +1,5 @@
 // import { convert, validate } from '@dash/block-rules';
 import {
-  // BlockRuleEditor,
-  AmDeviceSection,
   ApiErrorMessage,
   /*ConfirmDeleteEntity*/
   AppHeader,
@@ -11,6 +9,8 @@ import {
   LightPlanTeaser,
   Loading,
   PageHeading,
+  // BlockRuleEditor,
+  PodcastsDeviceSection,
   ToggleCard,
   // TrashBtn,
 } from '@dash/components';
@@ -22,15 +22,15 @@ import isEqual from 'lodash.isequal';
 import React, { useReducer } from 'react';
 import { useParams } from 'react-router-dom';
 // import type { WebPolicy } from '@dash/types';
-import type { AmRunwayTier } from '../../amSubscriptionRunway';
-import type { AmStatus } from '@dash/components';
-import { amSubscriptionRunway } from '../../amSubscriptionRunway';
+import type { PodcastsRunwayTier } from '../../podcastsSubscriptionRunway';
+import type { PodcastsStatus } from '@dash/components';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
+import { podcastsSubscriptionRunway } from '../../podcastsSubscriptionRunway';
 import reducer from '../../reducers/ios-device-reducer';
 import MusicCuration from './MusicCuration';
 
-const TIER_TO_STATUS: Record<AmRunwayTier, AmStatus> = {
+const TIER_TO_STATUS: Record<PodcastsRunwayTier, PodcastsStatus> = {
   active: `active`,
   expiring: `approaching`,
   lapsed: `paused`,
@@ -104,7 +104,7 @@ const IOSDevice: React.FC = () => {
   const blocker = deviceQuery.data.blocker;
   const am = deviceQuery.data.am;
   const music = deviceQuery.data.music;
-  const amRunway = am ? amSubscriptionRunway(am.subscription) : undefined;
+  const podcastsRunway = am ? podcastsSubscriptionRunway(am.subscription) : undefined;
 
   const requestPinCode = async (): Promise<number | null> => {
     const result = await Current.api.requestAmPinReset({ deviceId: id });
@@ -127,13 +127,13 @@ const IOSDevice: React.FC = () => {
         {deviceQuery.data.childName}'s {deviceQuery.data.deviceType}
       </PageHeading>
       <div className="mt-8 space-y-16">
-        {am && amRunway && (
-          <AmDeviceSection
-            status={TIER_TO_STATUS[amRunway.tier]}
+        {am && podcastsRunway && (
+          <PodcastsDeviceSection
+            status={TIER_TO_STATUS[podcastsRunway.tier]}
             childName={deviceQuery.data.childName}
             deviceType={dt}
-            accessEndsAt={amRunway.accessEndsAt}
-            trialDaysRemaining={amRunway.trialDaysRemaining}
+            accessEndsAt={podcastsRunway.accessEndsAt}
+            trialDaysRemaining={podcastsRunway.trialDaysRemaining}
             requestPinCode={requestPinCode}
           />
         )}

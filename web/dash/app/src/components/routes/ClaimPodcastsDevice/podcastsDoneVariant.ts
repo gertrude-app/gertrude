@@ -1,26 +1,26 @@
-import type { AmRunwayTier } from '../../../amSubscriptionRunway';
-import type { AmDoneVariant } from '@dash/components';
+import type { PodcastsRunwayTier } from '../../../podcastsSubscriptionRunway';
+import type { PodcastsDoneVariant } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
-import { amSubscriptionRunway } from '../../../amSubscriptionRunway';
+import { podcastsSubscriptionRunway } from '../../../podcastsSubscriptionRunway';
 
-export interface AmDonePresentation {
-  variant: AmDoneVariant;
+export interface PodcastsDonePresentation {
+  variant: PodcastsDoneVariant;
   accessEndsAt?: string;
   trialDaysRemaining?: number;
   subscribeUrl?: string;
   showSubscribe: boolean;
 }
 
-const TIER_TO_VARIANT: Record<AmRunwayTier, AmDoneVariant> = {
+const TIER_TO_VARIANT: Record<PodcastsRunwayTier, PodcastsDoneVariant> = {
   active: `active`,
   expiring: `approachingExpiry`,
   lapsed: `notEntitled`,
 };
 
-export function amDoneVariant(
+export function podcastsDoneVariant(
   sub: T.ClaimAmDevice.Output[`subscription`],
-): AmDonePresentation {
-  const runway = amSubscriptionRunway(sub);
+): PodcastsDonePresentation {
+  const runway = podcastsSubscriptionRunway(sub);
   return {
     variant: TIER_TO_VARIANT[runway.tier],
     accessEndsAt: runway.accessEndsAt,

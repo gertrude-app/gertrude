@@ -18,8 +18,8 @@ private struct FormData: Codable {
     var display: String {
       switch self {
       case .mac: "Gertrude Mac"
-      case .ios: "Gertrude iOS"
-      case .podcasts: "Gertrude AM"
+      case .ios: "Gertrude Blocker (iOS)"
+      case .podcasts: "Gertrude Podcasts"
       case .unsure: "(not sure)"
       }
     }

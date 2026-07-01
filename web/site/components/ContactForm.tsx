@@ -78,7 +78,7 @@ const ContactForm: React.FC = () => {
               { value: ``, label: `Please select...` },
               { value: `mac`, label: `Gertrude for Mac` },
               { value: `ios`, label: `Gertrude Blocker for iPhone/iPad` },
-              { value: `podcasts`, label: `Gertrude AM (Podcasts)` },
+              { value: `podcasts`, label: `Gertrude Podcasts` },
               { value: `unsure`, label: `I’m not sure / something else` },
             ]}
             required

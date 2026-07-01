@@ -13,21 +13,24 @@ below.
 - if relevant, read `./swift/AGENTS.md`
 - UI is implemented with webviews and embedded react apps from `./web/appviews`
 
-### iOS App
+### iOS Blocker app
 
 - `./swift/iosapp`
 - if relevant, read `./swift/AGENTS.md`
 
-### Supervision Tool
+#### Supervision Tool
 
-- UI only for cross-platform (Windows/Mac) ios device supervision tool
+- UI only for cross-platform (Windows/Mac) ios device supervision tool. Supervision is
+  required for the Blocker app's content-filter on devices owned by people over 18
 - `./web/supervise/`
 - if relevant, read `./web/supervise/AGENTS.md`
 
-### Podcast app (Gertrude AM)
+### iOS Podcast app (Gertrude Podcasts)
 
 - `./swift/podcasts`
 - if relevant, read `./swift/podcasts/AGENTS.md`
+
+### iOS Music app (Gertrude Music)
 
 > **Private beta (not yet released):** Gertrude Music, a parent-curated music-playing iOS
 > app, now lives in `./swift/music`. It's in App Store review for a private beta while we
@@ -51,6 +54,11 @@ below.
 - `./web/admin`
 - if relevant, read `./web/AGENTS.md`
 - only used by Gertrude staff
+
+#### "Account" Site
+
+- WIP replacement for Dashboard, being stood up in `./web/account`. Not yet used in
+  production, but will eventually replace Dashboard.
 
 ## API
 

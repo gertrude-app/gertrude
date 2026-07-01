@@ -1,7 +1,7 @@
 # Product Overview
 
 Gertrude has three customer-facing apps and one supporting parent dashboard. The main
-products are the Mac app, the iOS app, and Gertrude AM, an iOS podcast app. A fourth iOS
+products are the Mac app, the iOS app, and Gertrude Podcasts, an iOS podcast app. A fourth iOS
 app, Gertrude Music, exists in the codebase (`swift/music`) and is in private beta (App
 Store review); it is connecting a small number of test devices but is not yet generally
 released, so don't treat it as a shipped product yet. It is expected to release soon and,
@@ -16,7 +16,7 @@ surface for the main apps rather than a separate standalone product.
 - **iOS app:** a more limited iPhone/iPad product. It helps parents apply internet
   restrictions on iOS, but it does not offer the same depth of control or monitoring as
   the Mac app.
-- **Gertrude AM:** a separate iOS podcast app with lightweight parental controls around
+- **Gertrude Podcasts:** a separate iOS podcast app with lightweight parental controls around
   podcast listening (adding new podcasts is gated by a PIN). Connects to a Gertrude
   account, requires Light subscription after 30-day free trial.
 - **Gertrude Music:** a fourth iOS app, in private beta and expected to ship soon. It also
@@ -32,7 +32,7 @@ surface for the main apps rather than a separate standalone product.
 - The **iOS app** is a separate product with a more constrained feature set because of iOS
   platform limits; its relationship to the dashboard is newer and more limited than the
   Mac app's, though it is growing.
-- **Gertrude AM** connects to a Gertrude account for subscription management and PIN
+- **Gertrude Podcasts** connects to a Gertrude account for subscription management and PIN
   reset.
 - **Gertrude Music** (private beta) likewise connects to a Gertrude account.
 - The **Dashboard** (https://parents.gertrude.app) is the parent's control center across
@@ -42,4 +42,4 @@ surface for the main apps rather than a separate standalone product.
 
 - [Mac app](./mac-app.md)
 - [iOS app](./ios-app.md)
-- [Gertrude AM](./gertrude-am.md)
+- [Gertrude Podcasts](./podcasts.md)

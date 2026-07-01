@@ -45,8 +45,8 @@ extension ClaimAmDevice: Resolver {
     in context: ParentContext,
   ) async throws -> Output {
     guard let install = try await device.podcastInstall(in: context.db) else {
-      logIOSUnusual("7487a3d4", "AM claim on device with no podcast install")
-      let msg = "Gertrude AM is not set up on this device."
+      logIOSUnusual("7487a3d4", "Podcasts claim on device with no podcast install")
+      let msg = "Gertrude Podcasts is not set up on this device."
       throw context.error("7487a3d4", .notFound, user: msg)
     }
     let account = try await context.currentBillingAccount()

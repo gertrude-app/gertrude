@@ -1,13 +1,13 @@
 import { ApiErrorMessage, ClaimScreen, Loading, ScreenShell } from '@dash/components';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { AmDoneNavState } from './Done';
+import type { PodcastsDoneNavState } from './Done';
 import type { ChildSelection } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
 import Current from '../../../environment';
 import { Key, useQuery } from '../../../hooks';
 
-const ClaimAmDeviceClaim: React.FC = () => {
+const ClaimPodcastsDeviceClaim: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,13 +19,13 @@ const ClaimAmDeviceClaim: React.FC = () => {
 
   useEffect(() => {
     if (!query.isSuccess || !query.data.resumeStep) return;
-    const state: AmDoneNavState = {
+    const state: PodcastsDoneNavState = {
       subscription: query.data.resumeStep.amSubscription,
       childName: query.data.resumeStep.childName,
       modelName: query.data.modelName,
       iosVersion: query.data.iosVersion,
     };
-    navigate(`/claim-am-device/${code}/done`, { replace: true, state });
+    navigate(`/claim-podcasts-device/${code}/done`, { replace: true, state });
   }, [
     query.isSuccess,
     query.data?.resumeStep,
@@ -64,13 +64,13 @@ const ClaimAmDeviceClaim: React.FC = () => {
     }
 
     const output = result.valueOrThrow();
-    const state: AmDoneNavState = {
+    const state: PodcastsDoneNavState = {
       subscription: output.subscription,
       childName: output.childName,
       modelName: output.modelName,
       iosVersion: output.iosVersion,
     };
-    navigate(`/claim-am-device/${code}/done`, { state });
+    navigate(`/claim-podcasts-device/${code}/done`, { state });
   };
 
   return (
@@ -90,4 +90,4 @@ const ClaimAmDeviceClaim: React.FC = () => {
   );
 };
 
-export default ClaimAmDeviceClaim;
+export default ClaimPodcastsDeviceClaim;

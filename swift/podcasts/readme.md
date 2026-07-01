@@ -1,8 +1,12 @@
-# Gertrude AM
+# Gertrude Podcasts
 
 ## Releases
 
-- `1.6.0` (submitted to review 6/16/26)
+- `1.6.2` (7/1/26)
+  - finish/fix rename in ASC web ui for official listing name
+- `1.6.1` (6/30/26)
+  - renamed from "Gertrude AM" to "Gertrude Podcasts" (edit: forgot to change name in ASC)
+- `1.6.0` (6/20/26)
   - switch from Apple IAP subscriptions to Gertrude accounts
   - autoqueue should resume in-progress episode when switching shows
   - lower minimum iOS version to 17
