@@ -58,6 +58,10 @@ struct AppView: View {
     }
     .environment(\.miniNowPlayingVisible, self.miniNowPlayingVisible)
     .environment(\.lang, Lang(locale: self.locale))
+    .appUpdateGate(
+      store: self.store.scope(state: \.appUpdate, action: \.appUpdate),
+      suggestedUpdatesEnabled: self.store.canPresentSuggestedAppUpdate,
+    )
   }
 
   private var miniNowPlayingVisible: Bool {

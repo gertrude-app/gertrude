@@ -1,7 +1,15 @@
 {
   "root": "api",
   "projectType": "app",
-  "implicitDependencies": ["duet", "gertie", "pairql", "pairql-macapp", "ts-interop"],
+  "implicitDependencies": [
+    "duet",
+    "gertie",
+    "pairql",
+    "pairql-macapp",
+    "pairql-blocker",
+    "pairql-ios-apps",
+    "ts-interop"
+  ],
   "targets": {
     "build": {
       "outputs": ["{projectRoot}/.build/debug/Run"],

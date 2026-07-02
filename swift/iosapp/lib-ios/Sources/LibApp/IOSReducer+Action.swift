@@ -8,6 +8,7 @@ public extension IOSReducer {
   enum Action: Equatable {
     case interactive(Interactive)
     case programmatic(Programmatic)
+    case appUpdate(AppUpdateGateFeature.Action)
     case destination(PresentationAction<Destination.Action>)
 
     @CasePathable

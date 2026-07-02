@@ -1,5 +1,6 @@
 import BlockerRoute
 import Dependencies
+import IOSAppsRoute
 import MacAppRoute
 import MusicRoute
 import PodcastRoute
@@ -23,6 +24,7 @@ enum PairQLRoute: Equatable, RouteResponder {
   case superAdmin(SuperAdminRoute)
   case blocker(BlockerRoute)
   case legacyBlocker(BlockerRoute)
+  case iOSApps(IOSAppsRoute)
   case podcast(PodcastRoute)
   case music(MusicRoute)
   case admin(AdminRoute)
@@ -45,6 +47,11 @@ enum PairQLRoute: Equatable, RouteResponder {
       // Legacy domain for blocker app clients already in the wild.
       Path { "ios-app" }
       BlockerRoute.router
+    }
+    Route(.case(PairQLRoute.iOSApps)) {
+      Method("POST")
+      Path { "ios-apps" }
+      IOSAppsRoute.router
     }
     Route(.case(PairQLRoute.podcast)) {
       Method("POST")
@@ -95,6 +102,8 @@ enum PairQLRoute: Equatable, RouteResponder {
       try await BlockerRoute.respond(to: blockerRoute, in: context)
     case .legacyBlocker(let blockerRoute):
       try await BlockerRoute.respond(to: blockerRoute, in: context)
+    case .iOSApps(let iosAppsRoute):
+      try await IOSAppsRoute.respond(to: iosAppsRoute, in: context)
     case .podcast(let podcastRoute):
       try await PodcastRoute.respond(to: podcastRoute, in: context)
     case .music(let musicRoute):
@@ -243,6 +252,9 @@ private func logOperation(_ route: PairQLRoute, _ request: Request, _ duration: 
   case .blocker, .legacyBlocker:
     request.logger
       .notice("PairQL request: \("Blocker".blue) \(operation) \(elapsed)")
+  case .iOSApps:
+    request.logger
+      .notice("PairQL request: \("iOS Apps".blue) \(operation) \(elapsed)")
   case .podcast:
     request.logger
       .notice("PairQL request: \("Podcast".yellow) \(operation) \(elapsed)")
@@ -318,6 +330,7 @@ private func domain(of route: PairQLRoute) -> String {
   case .macApp: "macos-app"
   case .blocker: "blocker"
   case .legacyBlocker: "ios-app"
+  case .iOSApps: "ios-apps"
   case .podcast: "gertrude-am"
   case .music: "gertrude-music"
   case .dashboard: "dashboard"

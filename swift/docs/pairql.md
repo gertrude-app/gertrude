@@ -50,6 +50,11 @@ Each client type has its own package defining available operations:
   `PollFilterSuspensionDecision`, `ScreenshotUploadUrl`
 - Auth via `X-DeviceToken` header (UUID)
 
+#### `pairql-ios-apps/` - Shared iOS App Routes
+
+- **UnauthedRoute:** `AppUpdateCheck`
+- Domain: `ios-apps`
+
 #### `pairql-podcasts/` - Podcast Application Routes
 
 - Currently only unauthed routes
@@ -79,6 +84,7 @@ Routes to `PairQLRoute.handler()` which dispatches to domain-specific handlers.
 
    - `.macApp(MacAppRoute)` - domain: `macos-app`
    - `.blocker(BlockerRoute)` - domain: `blocker`
+   - `.iOSApps(IOSAppsRoute)` - domain: `ios-apps`
    - `.dashboard(DashboardRoute)` - domain: `dashboard`
    - `.podcast(PodcastRoute)` - domain: `gertrude-am`
    - `.superAdmin(SuperAdminRoute)` - domain: `super-admin`
@@ -130,6 +136,7 @@ The API serves 5 distinct domains on a single endpoint:
 | ------------- | ---------------------- | ------------------- | --------------- |
 | `macos-app`   | `/pairql/macos-app/`   | `X-UserToken`       | Mac application |
 | `blocker`     | `/pairql/blocker/`     | `X-DeviceToken`     | Blocker app     |
+| `ios-apps`    | `/pairql/ios-apps/`    | None                | Shared iOS apps |
 | `dashboard`   | `/pairql/dashboard/`   | `X-AdminToken`      | Web dashboard   |
 | `gertrude-am` | `/pairql/gertrude-am/` | None                | Podcast app     |
 | `super-admin` | `/pairql/super-admin/` | `X-SuperAdminToken` | Admin tools     |

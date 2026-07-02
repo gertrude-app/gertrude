@@ -8,6 +8,8 @@ let package = Package(
   products: [.library(name: "LibTCA", targets: ["LibTCA"])],
   dependencies: [
     .package(path: "../lib-views"),
+    .package(path: "../../gertie"),
+    .package(path: "../../gertie-tca-features"),
     .package(path: "../../pairql"),
     .package(path: "../../pairql-music"),
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
@@ -22,6 +24,8 @@ let package = Package(
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "LibViews", package: "lib-views"),
         .product(name: "MusicRoute", package: "pairql-music"),
         .product(name: "PairQLClient", package: "pairql"),

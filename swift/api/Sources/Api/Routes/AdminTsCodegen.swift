@@ -1,4 +1,5 @@
 import Gertie
+import GertieApp
 import PairQL
 import TypeScriptInterop
 import Vapor

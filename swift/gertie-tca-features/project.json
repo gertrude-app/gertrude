@@ -1,7 +1,7 @@
 {
   "root": "gertie-tca-features",
   "projectType": "library",
-  "implicitDependencies": ["gertie"],
+  "implicitDependencies": ["gertie", "pairql", "pairql-ios-apps"],
   "targets": {
     "build": {
       "command": "cd gertie-tca-features && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"

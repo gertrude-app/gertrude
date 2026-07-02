@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import GertieApp
 import Queues
 import Vapor
 

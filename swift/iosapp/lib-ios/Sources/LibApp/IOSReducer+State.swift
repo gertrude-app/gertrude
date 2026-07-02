@@ -17,6 +17,7 @@ extension IOSReducer {
   public struct State: Equatable {
     public var screen: Screen = .launching
     public var allBlockGroups: [GetBlockGroups.BlockGroupInfo] = []
+    public var appUpdate = AppUpdateGateFeature.State()
     public var disabledBlockGroupIds: [UUID] = []
     public var onboarding: OnboardingState = .init()
     public var crossPromos: CrossPromos.Output = .init(promos: [])
@@ -186,7 +187,7 @@ extension IOSReducer {
     case supervisionSuccessFirstLaunch
     case running(state: RunningState = .notConnected)
 
-    var isRunning: Bool {
+    public var isRunning: Bool {
       if case .running = self { return true }
       return false
     }

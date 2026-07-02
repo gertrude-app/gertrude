@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import GertieApp
 import GertieTcaFeatures
 import LibCore
 import PairQL
@@ -14,9 +15,14 @@ struct AppReducer: Sendable {
     var nowPlaying = NowPlayingFeature.State()
     @Shared(.appInForeground) var appInForeground
     @Presents var alert: AlertState<AlertAction>?
+    var appUpdate = AppUpdateGateFeature.State()
     @Presents var crossPromo: CrossPromoFeature.State?
     var crossPromos = CrossPromos.Output(promos: [])
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
+
+    var canPresentSuggestedAppUpdate: Bool {
+      if case .some(.podcasts) = self.mode { true } else { false }
+    }
   }
 
   @Reducer
@@ -28,6 +34,7 @@ struct AppReducer: Sendable {
   enum Action: Equatable {
     case appDidLaunch
     case appInForegroundChanged(Bool)
+    case appUpdate(AppUpdateGateFeature.Action)
     case crossPromo(PresentationAction<CrossPromoFeature.Action>)
     case receivedCrossPromos(CrossPromos.Output)
     case nowPlaying(NowPlayingFeature.Action)
@@ -80,6 +87,15 @@ struct AppReducer: Sendable {
   @Dependency(\.locale) var locale
 
   var body: some Reducer<State, Action> {
+    Scope(state: \.appUpdate, action: \.appUpdate) {
+      AppUpdateGateFeature(app: .podcasts) {
+        await self.ensureDeviceId()
+        guard let deviceId = self.keychain.loadDeviceId() else {
+          throw AppUpdateDeviceIdError.missingDeviceId
+        }
+        return deviceId
+      }
+    }
     Scope(state: \.nowPlaying, action: \.nowPlaying) {
       NowPlayingFeature()
     }
@@ -126,6 +142,8 @@ struct AppReducer: Sendable {
             self.cleanupTasks()
           },
         )
+      case .appUpdate:
+        return .none
       case .receivedCrossPromos(let crossPromos):
         let dropped = crossPromos.promos.filter { !$0.hasGuaranteedExit }
         state.crossPromos = .init(promos: crossPromos.promos.filter(\.hasGuaranteedExit))

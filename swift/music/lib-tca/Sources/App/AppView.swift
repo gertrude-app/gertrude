@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieTcaFeatures
 import LibViews
 import SwiftUI
 
@@ -39,6 +40,10 @@ struct AppView: View {
         break
       }
     }
+    .appUpdateGate(
+      store: self.store.scope(state: \.appUpdate, action: \.appUpdate),
+      suggestedUpdatesEnabled: self.store.setup.isReady,
+    )
   }
 
   private var libraryView: some View {

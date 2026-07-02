@@ -651,6 +651,10 @@ public struct AppView: View {
       CrossPromoView(store: store)
     }
     #endif
+    .appUpdateGate(
+      store: self.store.scope(state: \.appUpdate, action: \.appUpdate),
+      suggestedUpdatesEnabled: self.store.screen.isRunning,
+    )
   }
 
   private func crossPromoStore(

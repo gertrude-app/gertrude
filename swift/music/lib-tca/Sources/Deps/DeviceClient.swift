@@ -1,6 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
+import GertieApp
 
 #if os(iOS)
   import UIKit
@@ -31,7 +32,7 @@ extension DeviceClient: DependencyKey {
           "18.0.1"
         #endif
       },
-      modelIdentifier: getModelIdentifier,
+      modelIdentifier: { IOSDeviceInfo.modelIdentifier() },
       appVersion: {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
       },
@@ -62,16 +63,6 @@ extension DependencyValues {
     keychain.save(deviceId: current)
   }
   return current
-}
-
-@Sendable private func getModelIdentifier() -> String {
-  var systemInfo = utsname()
-  uname(&systemInfo)
-  let mirror = Mirror(reflecting: systemInfo.machine)
-  return mirror.children.reduce("") { identifier, element in
-    guard let value = element.value as? Int8, value != 0 else { return identifier }
-    return identifier + String(UnicodeScalar(UInt8(value)))
-  }
 }
 
 #if DEBUG

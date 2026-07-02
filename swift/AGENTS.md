@@ -45,6 +45,7 @@ swift/
 ├── pairql/               # Type-safe RPC core library
 ├── pairql-macapp/        # macOS API pairql route definitions
 ├── pairql-blocker/       # iOS (blocker) API pairql route definitions
+├── pairql-ios-apps/      # Shared iOS app pairql route definitions
 ├── pairql-podcasts/      # Podcast app (Gertrude AM) pairql route definitions
 ├── pairql-music/         # Music app pairql route definitions
 ├── ts-interop/           # TypeScript code generation
@@ -162,6 +163,7 @@ searches, and more
 - `macos-app` - Mac app routes
 - `blocker` - Blocker app routes
 - `ios-app` - legacy alias for Blocker app routes
+- `ios-apps` - shared iOS app routes
 - `dashboard` - Web dashboard routes
 - `gertrude-am` - Podcast app routes
 - `super-admin` - Admin tools

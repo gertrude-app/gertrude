@@ -84,6 +84,7 @@ let package = Package(
       dependencies: [
         "LibCore",
         .product(name: "GertieBlocker", package: "gertie"),
+        .product(name: "GertieApp", package: "gertie"),
         .product(name: "BlockerRoute", package: "pairql-blocker"),
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Dependencies", package: "swift-dependencies"),

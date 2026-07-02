@@ -1,9 +1,12 @@
 import ComposableArchitecture
+import GertieApp
+import GertieTcaFeatures
 
 @Reducer
 struct AppFeature: Sendable {
   @ObservableState
   struct State: Equatable {
+    var appUpdate = AppUpdateGateFeature.State()
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
     var setup = MusicSetupFeature.State()
@@ -11,6 +14,7 @@ struct AppFeature: Sendable {
   }
 
   enum Action: Equatable {
+    case appUpdate(AppUpdateGateFeature.Action)
     case library(LibraryFeature.Action)
     case nowPlayingAlbumInfoTapped
     case nowPlayingPresentationChanged(Bool)
@@ -19,10 +23,20 @@ struct AppFeature: Sendable {
   }
 
   @Dependency(\.keychain) var keychain
+  @Dependency(\.device) var device
   @Dependency(\.playback) var playback
   @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
+    Scope(state: \.appUpdate, action: \.appUpdate) {
+      AppUpdateGateFeature(app: .music) {
+        guard let deviceId = await self.device.vendorId() else {
+          throw AppUpdateDeviceIdError.missingDeviceId
+        }
+        return deviceId
+      }
+    }
+
     Scope(state: \.library, action: \.library) {
       LibraryFeature()
     }
@@ -47,6 +61,9 @@ struct AppFeature: Sendable {
         state.isNowPlayingPresented = false
         state.library.setAlbumDetailPlaybackSession(state.playback.session)
         state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
+        return .none
+
+      case .appUpdate:
         return .none
 
       case .nowPlayingPresentationChanged(let isPresented):
