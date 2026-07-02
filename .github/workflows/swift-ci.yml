@@ -328,6 +328,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.podcasts == 'true'
     runs-on: macos-15
+    timeout-minutes: 20
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -349,6 +350,7 @@ jobs:
           cd ../lib-core && swift build
           cd ../lib-views && swift build
       - name: test
+        timeout-minutes: 12
         run: |
           cd swift/podcasts/lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
           cd ../lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
