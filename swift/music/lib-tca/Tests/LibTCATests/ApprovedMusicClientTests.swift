@@ -137,8 +137,8 @@ private struct SavedCacheWrite: Equatable {
 }
 
 private let approvedMusicClientConnection = MusicAppConnection(
-  token: UUID(uuidString: "2E256D99-CAB5-4C71-81BF-87590A22B382")!,
-  childId: UUID(uuidString: "46FAF3DE-6A7A-4C72-9275-1297D10F8A89")!,
+  token: UUID(1),
+  childId: UUID(2),
   childName: "Harriet",
 )
 
@@ -177,5 +177,3 @@ private let approvedMusicLibrary = ApprovedMusicLibrary(albums: [
     ],
   ),
 ])
-
-private struct TestError: Error {}

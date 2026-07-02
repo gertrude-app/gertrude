@@ -32,7 +32,7 @@ struct ApprovedMusicLibraryCacheClientTests {
   func returnsNilForMalformedCache() async throws {
     let directory = try temporaryDirectory(named: "returnsNilForMalformedCache")
     defer { try? FileManager.default.removeItem(at: directory) }
-    let diskCache = ApprovedMusicLibraryDiskCache(directory: directory)
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(directory: directory)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
     try Data("not json".utf8).write(to: diskCache.fileURL(childId: childId))
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
@@ -46,9 +46,9 @@ struct ApprovedMusicLibraryCacheClientTests {
   func returnsNilForUnsupportedCacheVersion() async throws {
     let directory = try temporaryDirectory(named: "returnsNilForUnsupportedCacheVersion")
     defer { try? FileManager.default.removeItem(at: directory) }
-    let diskCache = ApprovedMusicLibraryDiskCache(directory: directory)
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(directory: directory)
     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    try Data(#"{"version":0,"library":{"albums":[]}}"#.utf8)
+    try Data(#"{"version":0,"value":{"albums":[]}}"#.utf8)
       .write(to: diskCache.fileURL(childId: childId))
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
 
@@ -72,18 +72,4 @@ struct ApprovedMusicLibraryCacheClientTests {
     expectNoDifference(deleted, nil)
     expectNoDifference(preserved, .empty)
   }
-}
-
-private let childId = UUID(uuidString: "CAFEBABE-CAFE-BABE-CAFE-BABECAFEBABE")!
-private let otherChildId = UUID(uuidString: "DEADBEEF-DEAD-BEEF-DEAD-BEEFDEADBEEF")!
-
-private func temporaryDirectory(named name: String) throws -> URL {
-  let root = FileManager.default.temporaryDirectory.appendingPathComponent(
-    "ApprovedMusicLibraryCacheClientTests",
-    isDirectory: true,
-  )
-  try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-  let directory = root.appendingPathComponent(name, isDirectory: true)
-  try? FileManager.default.removeItem(at: directory)
-  return directory
 }

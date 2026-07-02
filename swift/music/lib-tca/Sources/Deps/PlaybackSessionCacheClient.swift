@@ -25,7 +25,9 @@ extension PlaybackSessionCacheClient {
 
 extension PlaybackSessionCacheClient: DependencyKey {
   static var liveValue: Self {
-    .live(directory: PlaybackSessionDiskCache.defaultDirectory)
+    .live(directory: ChildScopedDiskJSONCache<CachedPlaybackSession>.directory(
+      named: "PlaybackSessionCache",
+    ))
   }
 
   static let testValue = Self.noop
@@ -40,7 +42,10 @@ extension DependencyValues {
 
 extension PlaybackSessionCacheClient {
   static func live(directory: URL) -> Self {
-    let diskCache = PlaybackSessionDiskCache(directory: directory)
+    let diskCache = ChildScopedDiskJSONCache<CachedPlaybackSession>(
+      directory: directory,
+      isValid: { $0.playbackSession != nil },
+    )
     return Self(
       _load: {
         @Dependency(\.keychain) var keychain
@@ -107,65 +112,4 @@ struct CachedPlaybackSession: Codable, Equatable, Sendable {
       ),
     )
   }
-}
-
-struct PlaybackSessionDiskCache: Sendable {
-  static let version = 1
-
-  static var defaultDirectory: URL {
-    let applicationSupportDirectory = FileManager.default.urls(
-      for: .applicationSupportDirectory,
-      in: .userDomainMask,
-    ).first ?? FileManager.default.temporaryDirectory
-
-    return applicationSupportDirectory
-      .appendingPathComponent("GertrudeMusic", isDirectory: true)
-      .appendingPathComponent("PlaybackSessionCache", isDirectory: true)
-  }
-
-  let directory: URL
-
-  func load(childId: UUID) throws -> CachedPlaybackSession? {
-    let fileURL = self.fileURL(childId: childId)
-    guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
-    let data = try Data(contentsOf: fileURL)
-    guard let envelope = try? JSONDecoder().decode(
-      PlaybackSessionCacheEnvelope.self,
-      from: data,
-    ), envelope.version == Self.version,
-    envelope.session.playbackSession != nil else {
-      return nil
-    }
-    return envelope.session
-  }
-
-  func save(_ session: CachedPlaybackSession, childId: UUID) throws {
-    try FileManager.default.createDirectory(
-      at: self.directory,
-      withIntermediateDirectories: true,
-    )
-    let envelope = PlaybackSessionCacheEnvelope(version: Self.version, session: session)
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys]
-    let data = try encoder.encode(envelope)
-    try data.write(to: self.fileURL(childId: childId), options: [.atomic])
-  }
-
-  func delete(childId: UUID) throws {
-    let fileURL = self.fileURL(childId: childId)
-    guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
-    try FileManager.default.removeItem(at: fileURL)
-  }
-
-  func fileURL(childId: UUID) -> URL {
-    self.directory.appendingPathComponent(
-      "\(childId.uuidString.lowercased()).json",
-      isDirectory: false,
-    )
-  }
-}
-
-private struct PlaybackSessionCacheEnvelope: Codable {
-  var version: Int
-  var session: CachedPlaybackSession
 }

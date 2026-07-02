@@ -349,29 +349,3 @@ struct LibraryFeatureTests {
     await store.receive(.delegate(.playAlbum(items: items, startIndex: 0)))
   }
 }
-
-private struct TestError: Error {}
-
-private let cachedApprovedMusicLibrary = ApprovedMusicLibrary(albums: [
-  .init(
-    id: "cached-album",
-    title: "Cached Album",
-    artistName: "Cached Artist",
-    tracks: [
-      .init(
-        id: "cached-track",
-        title: "Cached Track",
-        artistName: "Cached Artist",
-      ),
-    ],
-  ),
-])
-
-private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
-  PlaybackItem(
-    id: id,
-    title: "Track \(id.rawValue)",
-    artistName: "Artist",
-    artworkURL: nil,
-  )
-}

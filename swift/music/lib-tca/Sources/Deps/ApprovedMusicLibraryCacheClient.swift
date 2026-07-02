@@ -25,7 +25,9 @@ extension ApprovedMusicLibraryCacheClient {
 
 extension ApprovedMusicLibraryCacheClient: DependencyKey {
   static var liveValue: Self {
-    .live(directory: ApprovedMusicLibraryDiskCache.defaultDirectory)
+    .live(directory: ChildScopedDiskJSONCache<ApprovedMusicLibrary>.directory(
+      named: "ApprovedMusicLibraryCache",
+    ))
   }
 
   static let testValue = Self.noop
@@ -40,7 +42,7 @@ extension DependencyValues {
 
 extension ApprovedMusicLibraryCacheClient {
   static func live(directory: URL) -> Self {
-    let diskCache = ApprovedMusicLibraryDiskCache(directory: directory)
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(directory: directory)
     return Self(
       _load: { childId in
         try await Task.detached(priority: .utility) {
@@ -65,64 +67,4 @@ extension ApprovedMusicLibraryCacheClient {
     _save: { _, _ in },
     _delete: { _ in },
   )
-}
-
-struct ApprovedMusicLibraryDiskCache: Sendable {
-  static let version = 1
-
-  static var defaultDirectory: URL {
-    let applicationSupportDirectory = FileManager.default.urls(
-      for: .applicationSupportDirectory,
-      in: .userDomainMask,
-    ).first ?? FileManager.default.temporaryDirectory
-
-    return applicationSupportDirectory
-      .appendingPathComponent("GertrudeMusic", isDirectory: true)
-      .appendingPathComponent("ApprovedMusicLibraryCache", isDirectory: true)
-  }
-
-  let directory: URL
-
-  func load(childId: UUID) throws -> ApprovedMusicLibrary? {
-    let fileURL = self.fileURL(childId: childId)
-    guard FileManager.default.fileExists(atPath: fileURL.path) else { return nil }
-    let data = try Data(contentsOf: fileURL)
-    guard let envelope = try? JSONDecoder().decode(
-      ApprovedMusicLibraryCacheEnvelope.self,
-      from: data,
-    ), envelope.version == Self.version else {
-      return nil
-    }
-    return envelope.library
-  }
-
-  func save(_ library: ApprovedMusicLibrary, childId: UUID) throws {
-    try FileManager.default.createDirectory(
-      at: self.directory,
-      withIntermediateDirectories: true,
-    )
-    let envelope = ApprovedMusicLibraryCacheEnvelope(version: Self.version, library: library)
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys]
-    let data = try encoder.encode(envelope)
-    try data.write(to: self.fileURL(childId: childId), options: [.atomic])
-  }
-
-  func delete(childId: UUID) throws {
-    let fileURL = self.fileURL(childId: childId)
-    guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
-    try FileManager.default.removeItem(at: fileURL)
-  }
-
-  func fileURL(childId: UUID) -> URL {
-    self.directory.appendingPathComponent(
-      "\(childId.uuidString.lowercased()).json",
-      isDirectory: false,
-    )
-  }
-}
-
-private struct ApprovedMusicLibraryCacheEnvelope: Codable {
-  var version: Int
-  var library: ApprovedMusicLibrary
 }

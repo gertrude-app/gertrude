@@ -131,7 +131,7 @@ struct AppFeatureTests {
       $0.keychain.delete = { _ in }
       $0.playback.stop = {}
       $0.uuid = UUIDGenerator {
-        UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
+        UUID(3)
       }
     }
 
@@ -230,13 +230,4 @@ struct AppFeatureTests {
       $0.library.albumDetail = albumDetail
     }
   }
-}
-
-private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
-  PlaybackItem(
-    id: id,
-    title: "Track \(id.rawValue)",
-    artistName: "Artist",
-    artworkURL: nil,
-  )
 }

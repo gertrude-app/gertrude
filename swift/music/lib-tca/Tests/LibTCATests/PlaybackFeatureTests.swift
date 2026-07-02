@@ -573,12 +573,3 @@ private actor PlaybackCommandRecorder {
     self.openSettingsCount += 1
   }
 }
-
-private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
-  PlaybackItem(
-    id: id,
-    title: "Track \(id.rawValue)",
-    artistName: "Artist",
-    artworkURL: nil,
-  )
-}
