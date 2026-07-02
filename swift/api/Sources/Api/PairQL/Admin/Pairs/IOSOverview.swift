@@ -49,9 +49,7 @@ extension IOSOverview: NoInputResolver {
 
     let recentInstalls = try await context.db.customQuery(RecentInstallsQuery.self)
       .map { row in
-        let status = if row.supervised {
-          "supervised"
-        } else if row.succeeded {
+        let status = if row.succeeded || row.configurated || row.supervised || row.connected {
           "success"
         } else {
           "incomplete"
@@ -206,6 +204,9 @@ private struct RecentInstallsQuery: CustomQueryable {
     let eventId = IOSEvent.columnName(.eventId)
     let createdAt = IOSEvent.columnName(.createdAt)
     let modelIdentifier = IOSEvent.columnName(.modelIdentifier)
+    let iId = BlockerApp.Install.columnName(.id)
+    let iDeviceId = BlockerApp.Install.columnName(.deviceId)
+    let tInstallId = BlockerApp.Token.columnName(.installId)
     let sDeviceId = BlockerApp.Supervision.columnName(.deviceId)
     let profileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
     return SQL.Statement("""
@@ -213,7 +214,9 @@ private struct RecentInstallsQuery: CustomQueryable {
       first_launch.\(createdAt) AS date,
       first_launch.\(modelIdentifier) AS model_identifier,
       CASE WHEN success.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS succeeded,
-      CASE WHEN sup.\(sDeviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS supervised
+      CASE WHEN cfg.\(deviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS configurated,
+      CASE WHEN sup.\(sDeviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS supervised,
+      CASE WHEN token_installs.\(iDeviceId) IS NOT NULL THEN TRUE ELSE FALSE END AS connected
     FROM (
       SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt), \(modelIdentifier)
       FROM \(table: IOSEvent.self)
@@ -226,10 +229,20 @@ private struct RecentInstallsQuery: CustomQueryable {
       WHERE \(deviceId) IS NOT NULL AND \(eventId) = 'cdb31095'
     ) success ON first_launch.\(deviceId) = success.\(deviceId)
     LEFT JOIN (
+      SELECT DISTINCT \(deviceId)
+      FROM \(table: IOSEvent.self)
+      WHERE \(deviceId) IS NOT NULL AND \(eventId) = 'bad8adcc'
+    ) cfg ON first_launch.\(deviceId) = cfg.\(deviceId)
+    LEFT JOIN (
       SELECT \(sDeviceId)
       FROM \(table: BlockerApp.Supervision.self)
       WHERE \(profileInstalledAt) IS NOT NULL
     ) sup ON first_launch.\(deviceId) = sup.\(sDeviceId)
+    LEFT JOIN (
+      SELECT DISTINCT i.\(iDeviceId)
+      FROM \(table: BlockerApp.Install.self) i
+      INNER JOIN \(table: BlockerApp.Token.self) t ON t.\(tInstallId) = i.\(iId)
+    ) token_installs ON first_launch.\(deviceId) = token_installs.\(iDeviceId)
     ORDER BY first_launch.\(createdAt) DESC
     """)
   }
@@ -237,5 +250,7 @@ private struct RecentInstallsQuery: CustomQueryable {
   var date: Date
   var modelIdentifier: String
   var succeeded: Bool
+  var configurated: Bool
   var supervised: Bool
+  var connected: Bool
 }
