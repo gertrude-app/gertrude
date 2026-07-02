@@ -46,7 +46,7 @@ public struct SharedStorageReaderClient: Sendable {
   public var loadDebugLogs: @Sendable () -> [String]?
 }
 
-private enum Key: String {
+package enum Key: String {
   case accountConnection_v2 = "v1.7.0--account-connection-v2"
   case debugLogs = "v1.5.0--debug-logs"
   case legacyProtectionMode = "ProtectionMode.v1.3.0"
@@ -116,10 +116,11 @@ extension SharedStorageReaderClient: TestDependencyKey {
 }
 
 func migrateLegacyStorage() async -> Bool {
-  if UserDefaults.gertrude.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
+  @Dependency(\.groupDefaults) var defaults
+  if defaults.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
     let legacyGroups: [BlockGroup]? = loadCodable(forKey: .disabledBlockGroups)
     let isUpgrader = legacyGroups != nil
-      || UserDefaults.gertrude.data(forKey: Key.legacyV1StorageKey.rawValue) != nil
+      || defaults.data(forKey: Key.legacyV1StorageKey.rawValue) != nil
     if isUpgrader {
       var uuids = (legacyGroups ?? []).map(\.legacyUUID)
       // don't auto opt-in upgraders to new Apple Music group released March 2026
@@ -130,7 +131,7 @@ func migrateLegacyStorage() async -> Bool {
     }
   }
 
-  if UserDefaults.gertrude.data(forKey: Key.protectionMode.rawValue) != nil {
+  if defaults.data(forKey: Key.protectionMode.rawValue) != nil {
     return false // fast path, they have current data, we're done
   }
 
@@ -149,12 +150,12 @@ func migrateLegacyStorage() async -> Bool {
     return true
   }
 
-  if UserDefaults.gertrude.data(forKey: Key.legacyProtectionMode.rawValue) != nil {
+  if defaults.data(forKey: Key.legacyProtectionMode.rawValue) != nil {
     await api.logEvent(id: "fdab6cff", detail: "unexpected migration error")
     return false
   }
 
-  if UserDefaults.gertrude.data(forKey: Key.legacyV1StorageKey.rawValue) == nil {
+  if defaults.data(forKey: Key.legacyV1StorageKey.rawValue) == nil {
     // no data, nothing to migrate, probably initial launch
     return false
   }
@@ -177,26 +178,31 @@ func migrateLegacyStorage() async -> Bool {
 }
 
 private func saveCodable(_ value: some Codable, forKey key: Key) {
+  @Dependency(\.groupDefaults) var defaults
   if let data = try? JSONEncoder().encode(value) {
-    UserDefaults.gertrude.set(data, forKey: key.rawValue)
+    defaults.setData(data: data, forKey: key.rawValue)
   }
 }
 
 private func loadCodable<T: Codable>(forKey key: Key) -> T? {
-  guard let data = UserDefaults.gertrude.data(forKey: key.rawValue) else { return nil }
+  @Dependency(\.groupDefaults) var defaults
+  guard let data = defaults.data(forKey: key.rawValue) else { return nil }
   return try? JSONDecoder().decode(T.self, from: data)
 }
 
 private func saveDate(_ date: Date, forKey key: Key) {
-  UserDefaults.gertrude.set(date, forKey: key.rawValue)
+  @Dependency(\.groupDefaults) var defaults
+  defaults.setDate(date: date, forKey: key.rawValue)
 }
 
 private func loadDate(forKey key: Key) -> Date? {
-  UserDefaults.gertrude.object(forKey: key.rawValue) as? Date
+  @Dependency(\.groupDefaults) var defaults
+  return defaults.date(forKey: key.rawValue)
 }
 
 private func removeKey(_ key: Key) {
-  UserDefaults.gertrude.removeObject(forKey: key.rawValue)
+  @Dependency(\.groupDefaults) var defaults
+  defaults.remove(forKey: key.rawValue)
 }
 
 public extension DependencyValues {
@@ -227,7 +233,7 @@ extension SharedStorageClient {
   }
 }
 
-extension ProtectionMode {
+package extension ProtectionMode {
   enum Legacy: Codable {
     case onboarding([BlockRule.Legacy])
     case normal([BlockRule.Legacy])

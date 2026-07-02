@@ -12,6 +12,7 @@ import Testing
     $0.api.logEvent = { _, _ in }
     $0.api.fetchDefaultBlockRules = { _ in [.targetContains(value: "def.com")] }
     $0.device.deviceId = { UUID() }
+    $0.groupDefaults = .liveValue
   } operation: {
     try await `block group enum strings migrate to UUIDs`()
     try await `fresh install migration does not write block group ids`()

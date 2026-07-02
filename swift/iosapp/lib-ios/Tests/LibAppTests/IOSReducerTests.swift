@@ -386,10 +386,11 @@ final class IOSReducerTests: XCTestCase {
       }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
+      $0.groupDefaults = .liveValue
       $0.sharedStorage = .liveValue
-      $0.sharedStorage.saveFirstLaunchDate(.reference)
       $0.systemExtension.filterRunning = { true } // <-- filter running
     }
+    userDefaults.set(Date.reference, forKey: "firstLaunchDate")
 
     await store.send(.programmatic(.appDidLaunch))
 
@@ -443,10 +444,11 @@ final class IOSReducerTests: XCTestCase {
       $0.api.logEvent = { @Sendable _, _ in }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
+      $0.groupDefaults = .liveValue
       $0.sharedStorage = .liveValue
-      $0.sharedStorage.saveFirstLaunchDate(.reference)
       $0.systemExtension.filterRunning = { true }
     }
+    userDefaults.set(Date.reference, forKey: "firstLaunchDate")
 
     await store.send(.programmatic(.appDidLaunch))
 

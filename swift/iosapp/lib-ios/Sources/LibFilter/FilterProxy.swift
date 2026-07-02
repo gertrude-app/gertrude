@@ -56,6 +56,7 @@ public struct FilterProxy {
     #endif
     self.logger.setPrefix("FILTER PROXY")
     self.logger.log("Initialized filter proxy")
+    Witness.filterProxyInit.emit()
   }
 
   mutating func shouldRequestUpdate() -> Bool {
@@ -92,16 +93,18 @@ public struct FilterProxy {
     return self.decideFilterFlow(flow)
   }
 
-  mutating func decideFilterFlow(_ flow: FilterFlow) -> FlowVerdict {
+  package mutating func decideFilterFlow(_ flow: FilterFlow) -> FlowVerdict {
     self.count &+= 1 // wrapping add
 
     if flow.hostname == MagicStrings.readRulesSentinalHostname {
+      Witness.filterSentinel.emit("read-rules")
       self.loadAndSetRules()
       return .drop
     }
 
     if flow.hostname == MagicStrings.refreshRulesSentinalHostname {
       self.logger.log("refresh rules requested from app")
+      Witness.filterSentinel.emit("refresh-rules")
       return .needRules
     }
 
@@ -119,6 +122,7 @@ public struct FilterProxy {
 
     if self.shouldRequestUpdate() {
       self.logger.log("request update, count: \(self.count)")
+      Witness.filterNeedRules.emit("count=\(self.count)")
       return .needRules
     }
 
@@ -127,15 +131,19 @@ public struct FilterProxy {
 
   public mutating func handleRulesChanged() {
     self.logger.log(".handleRulesChanged() called")
+    Witness.filterRulesChanged.emit()
     self.loadAndSetRules()
   }
 
   public mutating func startFilter() {
     self.logger.log("Starting filter")
+    Witness.filterStart.emit()
     self.loadAndSetRules()
   }
 
-  public func stopFilter(reason: NEProviderStopReason) {}
+  public func stopFilter(reason: NEProviderStopReason) {
+    Witness.filterStop.emit(String(describing: reason))
+  }
 }
 
 extension FilterProxy: FlowDecider {

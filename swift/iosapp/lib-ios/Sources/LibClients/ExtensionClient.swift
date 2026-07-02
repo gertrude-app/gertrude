@@ -1,5 +1,6 @@
 import Dependencies
 import FamilyControls
+import LibCore
 import NetworkExtension
 import os.log
 
@@ -22,6 +23,7 @@ extension ExtensionClient: DependencyKey {
           #else
             try await AuthorizationCenter.shared.requestAuthorization(for: .child)
           #endif
+          Witness.appAuthorized.emit()
           return .success(())
         } catch let familyError as FamilyControlsError {
           switch familyError {
@@ -72,6 +74,7 @@ extension ExtensionClient: DependencyKey {
         NEFilterManager.shared().isEnabled = true
         do {
           try await NEFilterManager.shared().saveToPreferences()
+          Witness.appInstalledFilter.emit()
           return .success(())
         } catch {
           switch NEFilterManagerError(rawValue: (error as NSError).code) {

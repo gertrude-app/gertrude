@@ -38,7 +38,7 @@ public final class ControllerProxy: Sendable {
   public let notifyRulesChanged = LockIsolated<() -> Void>(unimplemented("notifyRulesChanged"))
 
   #if DEBUG
-    let migrateTask = LockIsolated<Task<Void, Never>?>(nil)
+    package let migrateTask = LockIsolated<Task<Void, Never>?>(nil)
   #endif
 
   public init() {
@@ -50,14 +50,16 @@ public final class ControllerProxy: Sendable {
       }
     #endif
     self.deps.logger.log("Initialized ControllerProxy")
+    Witness.controllerProxyInit.emit()
 
     // proxy init handles migration, b/c app target might never launch after update
     // app target .appDidLaunch also attempts migration, but it's idempotent
     let task = Task {
       if await self.deps.storage.migrateLegacyData() {
         self.deps.logger.log("migration performed by controller")
+        Witness.controllerMigrated.emit()
         await self.deps.api.logEvent(id: "99bacaaa", detail: "migration performed by controller")
-        self.notifyRulesChanged.withValue { $0() }
+        self.fireNotifyRulesChanged()
       }
     }
 
@@ -66,8 +68,14 @@ public final class ControllerProxy: Sendable {
     #endif
   }
 
+  func fireNotifyRulesChanged() {
+    Witness.controllerNotifiedRulesChanged.emit()
+    self.notifyRulesChanged.withValue { $0() }
+  }
+
   public func startFilter() -> Task<Void, Never> {
     self.deps.logger.log("starting filter")
+    Witness.controllerStart.emit()
     return Task {
       await self.deps.api.logEvent(id: "00ec3909", detail: "controller proxy: filter started")
       self.deps.logger.log("start filter refresh rules 1")
@@ -126,7 +134,7 @@ public final class ControllerProxy: Sendable {
       if apiRules != savedRules {
         self.deps.logger.log("saving changed rules")
         self.deps.storage.saveProtectionMode(.normal(apiRules))
-        self.notifyRulesChanged.withValue { $0() }
+        self.fireNotifyRulesChanged()
         return true
       } else {
         self.deps.logger.log("rules unchanged")
@@ -155,7 +163,7 @@ public final class ControllerProxy: Sendable {
       }
       self.deps.logger.log("saving changed rules (connected)")
       self.deps.storage.saveProtectionMode(config.protectionMode)
-      self.notifyRulesChanged.withValue { $0() }
+      self.fireNotifyRulesChanged()
       self.deps.logger.log("web policy: \(String(describing: config.webPolicy))")
       self.managedSettings.withValue {
         if config.webPolicy == nil {
@@ -183,6 +191,7 @@ public final class ControllerProxy: Sendable {
   @discardableResult
   public func stopFilter(reason: NEProviderStopReason) -> Task<Void, Never> {
     self.deps.logger.log("stopping filter")
+    Witness.controllerStop.emit(String(describing: reason))
     return Task { [api = self.deps.api] in
       await api.logEvent(id: "8e23bea2", detail: "filter stopped, reason: \(reason)")
     }
@@ -196,14 +205,18 @@ public final class ControllerProxy: Sendable {
     return await self.handleFilterFlow(flow)
   }
 
-  func handleFilterFlow(_ flow: FilterFlow) async -> NEFilterControlVerdict {
+  package func handleFilterFlow(_ flow: FilterFlow) async -> NEFilterControlVerdict {
+    Witness.controllerReceivedFlow.emit("target=\(flow.target ?? "(nil)")")
     if flow.hostname == MagicStrings.refreshRulesSentinalHostname {
       self.deps.logger.log("refresh rules requested from app, info sheet presented")
       let rulesChanged = await self.refreshRules(reason: .infoSheetPresented)
+      Witness.controllerVerdict.emit("DROP update=\(rulesChanged)")
       return .drop(withUpdateRules: rulesChanged)
     }
     let rulesChanged = await self.refreshRules(reason: .fauxHeartbeat)
-    return switch self.decideNewFlow(flow) {
+    let verdict = self.decideNewFlow(flow)
+    Witness.controllerVerdict.emit("\(verdict.description) update=\(rulesChanged)")
+    return switch verdict {
     case .allow:
       .allow(withUpdateRules: rulesChanged)
     case .drop:
