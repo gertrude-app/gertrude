@@ -21,9 +21,39 @@ public struct SearchShowView: View {
     self.onResultTap = onResultTap
   }
 
+  public var body: some View {
+    Group {
+      if #available(iOS 26.0, *) {
+        self.nativeSearch
+      } else {
+        self.legacySearch
+      }
+    }
+    .task {
+      try? await Task.sleep(for: .milliseconds(250))
+      self.isSearchFocused = true
+    }
+  }
+
+  @available(iOS 26.0, *)
+  private var nativeSearch: some View {
+    self.stateContent
+      .searchable(text: self.$searchText, prompt: Text(lstr(.searchPrompt)))
+      .textInputAutocapitalization(.never)
+      .autocorrectionDisabled(true)
+      .searchFocused(self.$isSearchFocused)
+  }
+
+  private var legacySearch: some View {
+    VStack(spacing: 0) {
+      self.searchField
+      self.stateContent
+    }
+  }
+
   @ViewBuilder
-  private var content: some View {
-    VStack {
+  private var stateContent: some View {
+    VStack(spacing: 0) {
       if self.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
         self.emptyState
       } else if self.isSearching {
@@ -34,20 +64,38 @@ public struct SearchShowView: View {
         self.resultsList
       }
     }
-    .searchable(text: self.$searchText, prompt: Text(lstr(.searchPrompt)))
   }
 
-  public var body: some View {
-    Group {
-      if #available(iOS 18.0, *) {
-        self.content.searchFocused(self.$isSearchFocused)
-      } else {
-        self.content
-      }
+  private var searchField: some View {
+    HStack(spacing: 12) {
+      Image(systemName: "magnifyingglass")
+        .font(.system(size: 18, weight: .semibold))
+        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+
+      TextField(lstr(.searchPrompt), text: self.$searchText)
+        .textInputAutocapitalization(.never)
+        .disableAutocorrection(true)
+        .submitLabel(.search)
+        .focused(self.$isSearchFocused)
+        .accessibilityIdentifier("podcast-search-field")
     }
-    .onAppear {
-      self.isSearchFocused = true
-    }
+    .font(.system(size: 18, weight: .medium))
+    .padding(.horizontal, 18)
+    .padding(.vertical, 14)
+    .background(
+      RoundedRectangle(cornerRadius: 16)
+        .fill(Color(self.cs, light: .white, dark: .black)),
+    )
+    .overlay(
+      RoundedRectangle(cornerRadius: 16)
+        .stroke(
+          Color(self.cs, light: .violet200, dark: .violet800),
+          lineWidth: 1,
+        ),
+    )
+    .padding(.horizontal, 20)
+    .padding(.top, 16)
+    .padding(.bottom, 8)
   }
 
   private var emptyState: some View {
@@ -66,6 +114,7 @@ public struct SearchShowView: View {
 
       Spacer()
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 
   private var searchingState: some View {
@@ -81,6 +130,7 @@ public struct SearchShowView: View {
 
       Spacer()
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 
   private var noResultsState: some View {
@@ -108,6 +158,7 @@ public struct SearchShowView: View {
 
       Spacer()
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 
   private var resultsList: some View {
@@ -120,10 +171,12 @@ public struct SearchShowView: View {
             self.resultRow(result)
           }
           .buttonStyle(PlainButtonStyle())
+          .accessibilityIdentifier("podcast-search-result-\(result.id)")
         }
       }
       .padding(.top, 20)
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 
   private func resultRow(_ result: SearchResult) -> some View {
