@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 public enum LibraryViewState: Equatable, Sendable {
@@ -9,6 +10,8 @@ public enum LibraryViewState: Equatable, Sendable {
 }
 
 public struct LibraryView: View {
+  @Binding private var searchText: String
+
   private let state: LibraryViewState
   private let isRefreshing: Bool
   private let transitionNamespace: Namespace.ID?
@@ -19,6 +22,7 @@ public struct LibraryView: View {
 
   public init(
     state: LibraryViewState,
+    searchText: Binding<String> = .constant(""),
     isRefreshing: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -26,6 +30,7 @@ public struct LibraryView: View {
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
+    self._searchText = searchText
     self.state = state
     self.isRefreshing = isRefreshing
     self.transitionNamespace = transitionNamespace
@@ -93,12 +98,7 @@ public struct LibraryView: View {
       AlbumGridView(albums: [], isLoading: true)
 
     case .loaded(let albums):
-      AlbumGridView(
-        albums: albums,
-        transitionNamespace: self.transitionNamespace,
-        onAlbumTap: self.onAlbumTap,
-        onDebugResetTap: self.onDebugResetTap,
-      )
+      self.loadedContent(albums: albums)
 
     case .empty:
       self.messageContent(
@@ -125,6 +125,61 @@ public struct LibraryView: View {
         systemImage: "creditcard",
         buttonTitle: "Check again",
       )
+    }
+  }
+
+  private func loadedContent(albums: [AlbumData]) -> some View {
+    let filteredAlbums = self.filteredAlbums(from: albums)
+
+    return Group {
+      if filteredAlbums.isEmpty, self.hasActiveSearch {
+        self.searchEmptyContent
+      } else {
+        AlbumGridView(
+          albums: filteredAlbums,
+          transitionNamespace: self.transitionNamespace,
+          onAlbumTap: self.onAlbumTap,
+          onDebugResetTap: self.onDebugResetTap,
+        )
+      }
+    }
+  }
+
+  private var searchEmptyContent: some View {
+    ScrollView {
+      LibraryMessageCard(
+        title: "No matching albums",
+        message: "No albums matched “\(self.trimmedSearchText)”. Try another title or artist.",
+        systemImage: "magnifyingglass",
+        buttonTitle: "Clear search",
+        onButtonTap: { self.searchText = "" },
+      )
+      .padding(.horizontal, 20)
+      .padding(.top, 24)
+      .padding(.bottom, 96)
+    }
+    .background(.background)
+  }
+
+  private var trimmedSearchText: String {
+    self.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+
+  private var searchTerms: [String] {
+    self.trimmedSearchText.split(whereSeparator: \.isWhitespace).map(String.init)
+  }
+
+  private var hasActiveSearch: Bool {
+    !self.searchTerms.isEmpty
+  }
+
+  private func filteredAlbums(from albums: [AlbumData]) -> [AlbumData] {
+    let terms = self.searchTerms
+    guard !terms.isEmpty else { return albums }
+
+    return albums.filter { album in
+      let searchableText = "\(album.title) \(album.artist)"
+      return terms.allSatisfy { searchableText.localizedStandardContains($0) }
     }
   }
 
