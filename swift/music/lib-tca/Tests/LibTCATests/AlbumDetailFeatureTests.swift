@@ -75,6 +75,7 @@ struct AlbumDetailFeatureTests {
       currentItem: PlaybackItem(
         track: album.tracks[0],
         artworkURL: album.artworkURL,
+        albumID: album.id,
       ),
     ))
 
@@ -105,11 +106,4 @@ struct AlbumDetailFeatureTests {
 
     await store.send(.playTapped)
   }
-}
-
-private func playbackItems(album: ApprovedAlbum) -> [PlaybackItem] {
-  album.tracks.map { PlaybackItem(
-    track: $0,
-    artworkURL: album.artworkURL,
-  ) }
 }

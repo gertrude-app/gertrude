@@ -39,8 +39,8 @@ struct MusicSetupFeatureTests {
 
   @Test
   func authorizedSubscribedAndClaimedCompletesSetup() async {
-    let token = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-    let childId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    let token = UUID(1)
+    let childId = UUID(2)
     let store = TestStore(initialState: .init()) {
       MusicSetupFeature()
     } withDependencies: {
@@ -96,8 +96,8 @@ struct MusicSetupFeatureTests {
 
   @Test
   func dismissingSubscriptionOfferRechecksAppleMusicAndGertrudeConnection() async {
-    let token = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-    let childId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    let token = UUID(1)
+    let childId = UUID(2)
     var state = MusicSetupFeature.State()
     state.isSubscriptionOfferPresented = true
     state.screen = .appleMusicSubscriptionRequired(canShowOffer: true)
@@ -138,8 +138,8 @@ struct MusicSetupFeatureTests {
   func unclaimedConnectionPollsUntilClaimed() async {
     let clock = TestClock()
     let expiresAt = Date(timeIntervalSince1970: 123)
-    let token = UUID(uuidString: "11111111-1111-1111-1111-111111111111")!
-    let childId = UUID(uuidString: "22222222-2222-2222-2222-222222222222")!
+    let token = UUID(1)
+    let childId = UUID(2)
     let statusProvider = MusicAppStatusProvider(outputs: [
       .unclaimed(code: 123_456, expiresAt: expiresAt),
       .claimed(token: token, childId: childId, childName: "Harriet"),
@@ -210,5 +210,3 @@ private actor SettingsRecorder {
     self.openSettingsCount += 1
   }
 }
-
-private struct TestError: Error {}

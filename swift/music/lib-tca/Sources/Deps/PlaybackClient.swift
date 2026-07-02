@@ -21,6 +21,11 @@ enum PlaybackEvent: Equatable, Sendable {
 struct PlaybackClient: Sendable {
   var playTrack: @Sendable (_ item: PlaybackItem) async throws -> Void
   var playAlbum: @Sendable (_ items: [PlaybackItem], _ startIndex: Int) async throws -> Void
+  var playAlbumFromPosition: @Sendable (
+    _ items: [PlaybackItem],
+    _ startIndex: Int,
+    _ position: TimeInterval,
+  ) async throws -> Void
   var pause: @Sendable () async -> Void
   var restartCurrentEntry: @Sendable () async -> Void
   var resume: @Sendable () async throws -> Void
@@ -59,6 +64,14 @@ extension PlaybackClient {
       playAlbum: { items, startIndex in
         try await Self.play(items: items, startIndex: startIndex, repeats: true)
       },
+      playAlbumFromPosition: { items, startIndex, position in
+        try await Self.play(
+          items: items,
+          startIndex: startIndex,
+          repeats: items.count > 1,
+          startTime: position,
+        )
+      },
       pause: {
         await Self.pausePlayback()
       },
@@ -89,6 +102,7 @@ extension PlaybackClient {
   static let noop = Self(
     playTrack: { _ in },
     playAlbum: { _, _ in },
+    playAlbumFromPosition: { _, _, _ in },
     pause: {},
     restartCurrentEntry: {},
     resume: {},
@@ -108,6 +122,14 @@ extension PlaybackClient {
         },
         playAlbum: { items, startIndex in
           await state.play(items: items, startIndex: startIndex, repeats: true)
+        },
+        playAlbumFromPosition: { items, startIndex, position in
+          await state.play(
+            items: items,
+            startIndex: startIndex,
+            repeats: items.count > 1,
+            startTime: position,
+          )
         },
         pause: {
           await state.pause()
@@ -193,6 +215,7 @@ extension PlaybackClient {
       items: [PlaybackItem],
       startIndex: Int,
       repeats: Bool,
+      startTime: TimeInterval? = nil,
     ) async throws {
       guard !items.isEmpty, items.indices.contains(startIndex) else { return }
       try await self.requestAuthorization()
@@ -204,10 +227,21 @@ extension PlaybackClient {
       #endif
       let player = ApplicationMusicPlayer.shared
       player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: songs[startIndex])
+      let seekTime: TimeInterval? = if let startTime, startTime.isFinite {
+        max(0, startTime)
+      } else {
+        nil
+      }
+      if let seekTime {
+        player.playbackTime = seekTime
+      }
       let repeatMode: MusicKit.MusicPlayer.RepeatMode = repeats ? .all : .none
       player.state.repeatMode = repeatMode
       do {
         try await player.play()
+        if let seekTime {
+          player.playbackTime = seekTime
+        }
       } catch {
         throw PlaybackClientError.playbackFailed
       }
@@ -436,7 +470,12 @@ extension PlaybackClient {
       }
     }
 
-    func play(items: [PlaybackItem], startIndex: Int, repeats: Bool) {
+    func play(
+      items: [PlaybackItem],
+      startIndex: Int,
+      repeats: Bool,
+      startTime: TimeInterval = 0,
+    ) {
       guard !items.isEmpty else {
         self.stop()
         return
@@ -445,7 +484,7 @@ extension PlaybackClient {
       self.currentIndex = items.indices.contains(startIndex) ? startIndex : 0
       self.repeats = repeats
       self.duration = self.defaultDuration
-      self.elapsedTime = 0
+      self.elapsedTime = min(self.duration, max(0, startTime))
       self.playStatus = .playing
       self.sendCurrentState()
       self.startProgressTickerIfNeeded()

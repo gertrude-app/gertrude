@@ -158,6 +158,7 @@ struct PlaybackFeatureTests {
 
     await store.send(.playbackEvent(.progressChanged(progress))) {
       $0.session?.progress = progress
+      $0.lastCachedProgressBucket = 8
     }
   }
 
@@ -411,6 +412,103 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func restoreCachedSessionLoadsPausedSession() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2")]
+    let progress = PlaybackProgress(elapsedTime: 42, duration: 180)
+    let cachedSession = CachedPlaybackSession(
+      items: items,
+      currentIndex: 1,
+      progress: progress,
+    )
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playbackSessionCache._load = { cachedSession }
+    }
+
+    await store.send(.restoreCachedSession)
+    await store.receive(.cachedSessionLoaded(cachedSession)) {
+      $0.session = .init(
+        playStatus: .paused,
+        albumQueue: .init(items: items, currentIndex: 1),
+        progress: progress,
+      )
+      $0.requiresPlayerRestore = true
+    }
+  }
+
+  @Test
+  func restoreCachedSessionDoesNotReplaceExistingSession() async {
+    let existingItem = playbackItem("track-1")
+    let cachedSession = CachedPlaybackSession(
+      items: [playbackItem("track-2")],
+      currentIndex: 0,
+      progress: .init(elapsedTime: 42, duration: 180),
+    )
+    let store = TestStore(initialState: .init(session: .init(currentItem: existingItem))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playbackSessionCache._load = { cachedSession }
+    }
+
+    await store.send(.restoreCachedSession)
+  }
+
+  @Test
+  func resumeRestoredSessionReloadsQueueFromCachedPosition() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2")]
+    let progress = PlaybackProgress(elapsedTime: 42, duration: 180)
+    let recorder = PlaybackRestoreRecorder()
+    var state = PlaybackFeature.State(session: .init(
+      playStatus: .paused,
+      albumQueue: .init(items: items, currentIndex: 1),
+      progress: progress,
+    ))
+    state.requiresPlayerRestore = true
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.playAlbumFromPosition = { items, startIndex, position in
+        await recorder.record(items: items, startIndex: startIndex, position: position)
+      }
+    }
+
+    await store.send(.resume) {
+      $0.session?.playStatus = .loading
+    }
+    await store.receive(.playbackStarted) {
+      $0.requiresPlayerRestore = false
+      $0.session?.playStatus = .playing
+    }
+
+    #expect(await recorder.items == items)
+    #expect(await recorder.startIndex == 1)
+    #expect(await recorder.position == 42)
+  }
+
+  @Test
+  func saveCachedSessionPersistsCurrentSession() async {
+    let item = playbackItem("track-1")
+    let session = PlaybackFeature.Session(
+      playStatus: .paused,
+      currentItem: item,
+      progress: .init(elapsedTime: 42, duration: 180),
+    )
+    let recorder = PlaybackSessionCacheRecorder()
+    let store = TestStore(initialState: .init(session: session)) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playbackSessionCache._save = { session in
+        await recorder.record(session)
+      }
+    }
+
+    await store.send(.saveCachedSession)
+
+    #expect(await recorder.session == CachedPlaybackSession(session: session))
+  }
+
+  @Test
   func stopPausesCurrentSession() async {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
@@ -430,6 +528,26 @@ private actor PlaybackAlbumRecorder {
   func record(items: [PlaybackItem], startIndex: Int) {
     self.items = items
     self.startIndex = startIndex
+  }
+}
+
+private actor PlaybackRestoreRecorder {
+  var items: [PlaybackItem]?
+  var position: TimeInterval?
+  var startIndex: Int?
+
+  func record(items: [PlaybackItem], startIndex: Int, position: TimeInterval) {
+    self.items = items
+    self.position = position
+    self.startIndex = startIndex
+  }
+}
+
+private actor PlaybackSessionCacheRecorder {
+  var session: CachedPlaybackSession?
+
+  func record(_ session: CachedPlaybackSession) {
+    self.session = session
   }
 }
 
@@ -454,13 +572,4 @@ private actor PlaybackCommandRecorder {
   func recordOpenSettings() {
     self.openSettingsCount += 1
   }
-}
-
-private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
-  PlaybackItem(
-    id: id,
-    title: "Track \(id.rawValue)",
-    artistName: "Artist",
-    artworkURL: nil,
-  )
 }

@@ -18,6 +18,94 @@ struct AppFeatureTests {
   }
 
   @Test
+  func nowPlayingAlbumInfoTapDismissesNowPlayingAndPresentsCurrentAlbum() async {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[0]
+    let track = album.tracks[1]
+    let item = PlaybackItem(
+      track: track,
+      artworkURL: album.artworkURL,
+      albumID: album.id,
+    )
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(library)
+    state.playback.session = .init(playStatus: .playing, currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAlbumInfoTapped) {
+      $0.isNowPlayingPresented = false
+      $0.library.albumDetail = .init(
+        album: album,
+        playStatus: .playing,
+        currentTrackID: track.id,
+      )
+    }
+  }
+
+  @Test
+  func nowPlayingAlbumInfoTapFromAnotherAlbumDetailQueuesReplacement() async {
+    let library = ApprovedMusicLibrary.mock
+    let currentAlbum = library.albums[0]
+    let visibleAlbum = library.albums[1]
+    let track = currentAlbum.tracks[1]
+    let item = PlaybackItem(
+      track: track,
+      artworkURL: currentAlbum.artworkURL,
+      albumID: currentAlbum.id,
+    )
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(library)
+    state.library.albumDetail = .init(
+      album: visibleAlbum,
+      transitionSourceID: visibleAlbum.id.rawValue,
+    )
+    state.playback.session = .init(playStatus: .playing, currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAlbumInfoTapped) {
+      $0.isNowPlayingPresented = false
+      $0.library.pendingAlbumDetail = .init(
+        album: currentAlbum,
+        playStatus: .playing,
+        currentTrackID: track.id,
+      )
+    }
+
+    await store.send(.library(.albumDetailDismissed(visibleAlbum.id.rawValue))) {
+      $0.library.albumDetail = .init(
+        album: currentAlbum,
+        playStatus: .playing,
+        currentTrackID: track.id,
+      )
+      $0.library.pendingAlbumDetail = nil
+    }
+  }
+
+  @Test
+  func nowPlayingAlbumInfoTapWithoutAlbumIDDoesNothing() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let item = PlaybackItem(
+      track: album.tracks[0],
+      artworkURL: album.artworkURL,
+    )
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(.mock)
+    state.playback.session = .init(currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAlbumInfoTapped)
+  }
+
+  @Test
   func setupDelegateCompletedIsHandled() async {
     var state = AppFeature.State()
     state.setup.screen = .ready(childName: "Harriet")
@@ -43,7 +131,7 @@ struct AppFeatureTests {
       $0.keychain.delete = { _ in }
       $0.playback.stop = {}
       $0.uuid = UUIDGenerator {
-        UUID(uuidString: "33333333-3333-3333-3333-333333333333")!
+        UUID(3)
       }
     }
 
@@ -142,13 +230,4 @@ struct AppFeatureTests {
       $0.library.albumDetail = albumDetail
     }
   }
-}
-
-private func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
-  PlaybackItem(
-    id: id,
-    title: "Track \(id.rawValue)",
-    artistName: "Artist",
-    artworkURL: nil,
-  )
 }

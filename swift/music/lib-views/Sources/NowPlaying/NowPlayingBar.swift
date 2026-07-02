@@ -174,7 +174,7 @@ import SwiftUI
             NowPlayingArtwork(
               url: self.artworkURL,
               size: 32,
-              cornerRadius: 7,
+              cornerRadius: 4,
               transitionID: self.artworkTransitionID,
             )
             NowPlayingBarText(

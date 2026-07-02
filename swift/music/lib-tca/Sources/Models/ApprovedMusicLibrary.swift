@@ -1,7 +1,7 @@
 import Foundation
 import Tagged
 
-struct ApprovedMusicLibrary: Equatable, Sendable {
+struct ApprovedMusicLibrary: Codable, Equatable, Sendable {
   var albums: [ApprovedAlbum]
 
   init(albums: [ApprovedAlbum] = []) {
@@ -15,7 +15,7 @@ struct ApprovedMusicLibrary: Equatable, Sendable {
   static let empty = Self()
 }
 
-struct ApprovedAlbum: Equatable, Identifiable, Sendable {
+struct ApprovedAlbum: Codable, Equatable, Identifiable, Sendable {
   typealias ID = Tagged<Self, String>
 
   let id: ID
@@ -39,7 +39,7 @@ struct ApprovedAlbum: Equatable, Identifiable, Sendable {
   }
 }
 
-struct ApprovedTrack: Equatable, Identifiable, Sendable {
+struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
   typealias ID = Tagged<Self, String>
 
   let id: ID
