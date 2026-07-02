@@ -163,6 +163,7 @@ private func podcastApiEndpoint() -> String {
 private func podcastDeviceMetadata() async -> (
   deviceId: UUID,
   appVersion: String,
+  buildNumber: String?,
   modelIdentifier: String,
   iosVersion: String,
 )? {
@@ -171,7 +172,8 @@ private func podcastDeviceMetadata() async -> (
   let (_, iosVersion, modelIdentifier) = await device.data()
   let appVersion = Bundle.main
     .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
-  return (deviceId, appVersion, modelIdentifier, iosVersion)
+  let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+  return (deviceId, appVersion, buildNumber, modelIdentifier, iosVersion)
 }
 
 extension ApiClient {

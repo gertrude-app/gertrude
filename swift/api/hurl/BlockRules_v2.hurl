@@ -1,4 +1,4 @@
-POST {{API_URL}}/pairql/ios-app/BlockRules_v2
+POST {{API_URL}}/pairql/blocker/BlockRules_v2
 {
   "disabledGroups": [],
   "vendorId": "deadbeef-dead-beef-dead-beefdeadbeef",

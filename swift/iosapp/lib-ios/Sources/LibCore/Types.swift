@@ -25,7 +25,7 @@ public extension UserDefaults {
 
 public extension String {
   static var pairqlBase: String {
-    "\(String.gertrudeApi)/pairql/ios-app"
+    "\(String.gertrudeApi)/pairql/blocker"
   }
 
   static var gertrudeApi: String {

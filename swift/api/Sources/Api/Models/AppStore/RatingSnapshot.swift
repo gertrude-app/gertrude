@@ -1,4 +1,5 @@
 import Foundation
+import GertieApp
 
 extension AppStore {
   struct RatingSnapshot: Codable, Sendable {

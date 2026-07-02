@@ -1,4 +1,4 @@
-POST {{API_URL}}/pairql/ios-app/CreateSupervisionClaimCode
+POST {{API_URL}}/pairql/blocker/CreateSupervisionClaimCode
 {
   "deviceId": "deadbeef-dead-beef-dead-beefdeadbeef",
   "modelIdentifier": "iPhone18,2",

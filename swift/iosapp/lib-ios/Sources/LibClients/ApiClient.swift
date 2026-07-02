@@ -1,8 +1,8 @@
+import BlockerRoute
 import Dependencies
 import DependenciesMacros
 import Foundation
 import GertieBlocker
-import IOSRoute
 import LibCore
 import os.log
 import PairQL
@@ -247,7 +247,7 @@ extension ApiClient: DependencyKey {
 
 private let _accountConnection = Mutex<ChildIOSDeviceData_v2?>(nil)
 
-private let pairql = PairQLClient<IOSRoute>(
+private let pairql = PairQLClient<BlockerRoute>(
   endpoint: { URL(string: .gertrudeApi)! },
 )
 

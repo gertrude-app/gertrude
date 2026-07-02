@@ -1,10 +1,7 @@
+import GertieApp
 import XSlack
 
-enum GertrudeIOSApp: String, Sendable, Codable, CaseIterable {
-  case blocker
-  case podcasts
-  case music
-
+extension GertrudeIOSApp {
   static var appStoreSyncedCases: [Self] {
     [.blocker, .podcasts]
   }

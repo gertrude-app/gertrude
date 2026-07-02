@@ -2,6 +2,7 @@ import Combine
 import Dependencies
 import DependenciesMacros
 import Foundation
+import GertieApp
 
 #if os(iOS)
   import UIKit
@@ -75,13 +76,13 @@ extension DeviceClient: DependencyKey {
         deviceId: {
           await getFrozenVendorId()
         },
-        modelIdentifier: getModelIdentifier,
+        modelIdentifier: { IOSDeviceInfo.modelIdentifier() },
         installedVersion: {
           Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
         },
         data: {
           let deviceId = await getFrozenVendorId()
-          let modelIdentifier = getModelIdentifier()
+          let modelIdentifier = IOSDeviceInfo.modelIdentifier()
           return await MainActor.run { .init(
             type: UIDevice.current.userInterfaceIdiom == .pad ? .iPad : .iPhone,
             iOSVersion: UIDevice.current.systemVersion,
@@ -170,18 +171,6 @@ extension DeviceClient: TestDependencyKey {
     keychain.save(vendorId: current)
   }
   return current
-}
-
-// NB: currently duplicated, grep: af6ce6fd
-@Sendable func getModelIdentifier() -> String {
-  var systemInfo = utsname()
-  uname(&systemInfo)
-  let mirror = Mirror(reflecting: systemInfo.machine)
-  let identifier = mirror.children.reduce("") { identifier, element in
-    guard let value = element.value as? Int8, value != 0 else { return identifier }
-    return identifier + String(UnicodeScalar(UInt8(value)))
-  }
-  return identifier
 }
 
 @Sendable func getAvailableDiskSpaceInBytes() -> Int? {

@@ -44,7 +44,8 @@ swift/
 ├── duet/                 # Custom lightweight ORM
 ├── pairql/               # Type-safe RPC core library
 ├── pairql-macapp/        # macOS API pairql route definitions
-├── pairql-iosapp/        # iOS (blocker) API pairql route definitions
+├── pairql-blocker/       # iOS (blocker) API pairql route definitions
+├── pairql-ios-apps/      # Shared iOS app pairql route definitions
 ├── pairql-podcasts/      # Podcast app (Gertrude AM) pairql route definitions
 ├── pairql-music/         # Music app pairql route definitions
 ├── ts-interop/           # TypeScript code generation
@@ -160,7 +161,9 @@ searches, and more
 **API PairQL Domains:**
 
 - `macos-app` - Mac app routes
-- `ios-app` - iOS app routes
+- `blocker` - Blocker app routes
+- `ios-app` - legacy alias for Blocker app routes
+- `ios-apps` - shared iOS app routes
 - `dashboard` - Web dashboard routes
 - `gertrude-am` - Podcast app routes
 - `super-admin` - Admin tools
@@ -224,7 +227,7 @@ searches, and more
 
 **Architecture:** See `./docs/pairql.md` for comprehensive documentation
 
-### `pairql-macapp/` & `pairql-iosapp/`
+### `pairql-macapp/` & `pairql-blocker/`
 
 **Purpose:** Platform-specific API route definitions **Shared Between:** API server and
 client apps

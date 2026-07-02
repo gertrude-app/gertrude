@@ -328,6 +328,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.podcasts == 'true'
     runs-on: macos-15
+    timeout-minutes: 20
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -349,6 +350,7 @@ jobs:
           cd ../lib-core && swift build
           cd ../lib-views && swift build
       - name: test
+        timeout-minutes: 12
         run: |
           cd swift/podcasts/lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
           cd ../lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
@@ -406,7 +408,8 @@ jobs:
               - swift/ts-codable-macro/**
             iosapp:
               - swift/iosapp/**
-              - swift/pairql-iosapp/**
+              - swift/pairql-blocker/**
+              - swift/pairql-ios-apps/**
               - swift/pairql/**
               - swift/gertie/**
               - swift/x-kit/**
@@ -437,7 +440,8 @@ jobs:
               - swift/duet/**
               - swift/pairql/**
               - swift/pairql-macapp/**
-              - swift/pairql-iosapp/**
+              - swift/pairql-blocker/**
+              - swift/pairql-ios-apps/**
               - swift/pairql-podcasts/**
               - swift/pairql-music/**
               - swift/gertie/**
@@ -455,7 +459,7 @@ jobs:
 
 env:
   # api + its local path-dep closure; mirrors Dockerfile.ci COPYs (see docs/maintenance.md)
-  API_PREWARM_PKGS: "api duet gertie pairql pairql-macapp pairql-iosapp pairql-podcasts pairql-music ts-interop ts-codable-macro x-aws x-postmark x-slack x-stripe x-expect x-http x-kit"
+  API_PREWARM_PKGS: "api duet gertie pairql pairql-macapp pairql-blocker pairql-ios-apps pairql-podcasts pairql-music ts-interop ts-codable-macro x-aws x-postmark x-slack x-stripe x-expect x-http x-kit"
   DATABASE_NAME: vapor_database
   DATABASE_USERNAME: vapor_username
   DATABASE_PASSWORD: vapor_password

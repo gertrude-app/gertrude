@@ -1,6 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
+import GertieApp
 import LibCore
 
 @DependencyClient
@@ -21,7 +22,7 @@ extension DeviceClient: DependencyKey {
     .init(
       vendorId: { await MainActor.run { UIDevice.current.identifierForVendor } },
       systemVersion: { await MainActor.run { UIDevice.current.systemVersion } },
-      modelIdentifier: getModelIdentifier,
+      modelIdentifier: { IOSDeviceInfo.modelIdentifier() },
     )
   }
 }
@@ -30,17 +31,6 @@ extension DependencyValues {
   var device: DeviceClient {
     get { self[DeviceClient.self] }
     set { self[DeviceClient.self] = newValue }
-  }
-}
-
-// NB: currently duplicated, grep: af6ce6fd
-private func getModelIdentifier() -> String {
-  var systemInfo = utsname()
-  uname(&systemInfo)
-  let mirror = Mirror(reflecting: systemInfo.machine)
-  return mirror.children.reduce("") { identifier, element in
-    guard let value = element.value as? Int8, value != 0 else { return identifier }
-    return identifier + String(UnicodeScalar(UInt8(value)))
   }
 }
 

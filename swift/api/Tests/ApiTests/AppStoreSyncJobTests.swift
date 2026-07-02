@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import GertieApp
 import XCTest
 import XExpect
 

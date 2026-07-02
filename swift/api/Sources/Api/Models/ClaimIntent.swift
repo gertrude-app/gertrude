@@ -1,3 +1,5 @@
+import GertieApp
+
 enum ClaimIntent: String, Codable, Sendable, Equatable, CaseIterable {
   case blockerSupervise
   case blockerConnect

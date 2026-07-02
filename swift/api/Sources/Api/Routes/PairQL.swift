@@ -1,5 +1,6 @@
+import BlockerRoute
 import Dependencies
-import IOSRoute
+import IOSAppsRoute
 import MacAppRoute
 import MusicRoute
 import PodcastRoute
@@ -21,7 +22,9 @@ enum PairQLRoute: Equatable, RouteResponder {
   case dashboard(DashboardRoute)
   case macApp(MacAppRoute)
   case superAdmin(SuperAdminRoute)
-  case iOS(IOSRoute)
+  case blocker(BlockerRoute)
+  case legacyBlocker(BlockerRoute)
+  case iOSApps(IOSAppsRoute)
   case podcast(PodcastRoute)
   case music(MusicRoute)
   case admin(AdminRoute)
@@ -34,10 +37,21 @@ enum PairQLRoute: Equatable, RouteResponder {
       Path { "macos-app" }
       MacAppRoute.router
     }
-    Route(.case(PairQLRoute.iOS)) {
+    Route(.case(PairQLRoute.blocker)) {
       Method("POST")
+      Path { "blocker" }
+      BlockerRoute.router
+    }
+    Route(.case(PairQLRoute.legacyBlocker)) {
+      Method("POST")
+      // Legacy domain for blocker app clients already in the wild.
       Path { "ios-app" }
-      IOSRoute.router
+      BlockerRoute.router
+    }
+    Route(.case(PairQLRoute.iOSApps)) {
+      Method("POST")
+      Path { "ios-apps" }
+      IOSAppsRoute.router
     }
     Route(.case(PairQLRoute.podcast)) {
       Method("POST")
@@ -84,8 +98,12 @@ enum PairQLRoute: Equatable, RouteResponder {
       try await DashboardRoute.respond(to: dashboardRoute, in: context)
     case .superAdmin(let superAdminRoute):
       try await SuperAdminRoute.respond(to: superAdminRoute, in: context)
-    case .iOS(let iosAppRoute):
-      try await IOSRoute.respond(to: iosAppRoute, in: context)
+    case .blocker(let blockerRoute):
+      try await BlockerRoute.respond(to: blockerRoute, in: context)
+    case .legacyBlocker(let blockerRoute):
+      try await BlockerRoute.respond(to: blockerRoute, in: context)
+    case .iOSApps(let iosAppsRoute):
+      try await IOSAppsRoute.respond(to: iosAppsRoute, in: context)
     case .podcast(let podcastRoute):
       try await PodcastRoute.respond(to: podcastRoute, in: context)
     case .music(let musicRoute):
@@ -231,9 +249,12 @@ private func logOperation(_ route: PairQLRoute, _ request: Request, _ duration: 
   case .superAdmin:
     request.logger
       .notice("PairQL request: \("SuperAdmin".cyan) \(operation) \(elapsed)")
-  case .iOS:
+  case .blocker, .legacyBlocker:
     request.logger
-      .notice("PairQL request: \("iOS".blue) \(operation) \(elapsed)")
+      .notice("PairQL request: \("Blocker".blue) \(operation) \(elapsed)")
+  case .iOSApps:
+    request.logger
+      .notice("PairQL request: \("iOS Apps".blue) \(operation) \(elapsed)")
   case .podcast:
     request.logger
       .notice("PairQL request: \("Podcast".yellow) \(operation) \(elapsed)")
@@ -307,7 +328,9 @@ private func parsingErrorSummary(_ req: Request) -> String {
 private func domain(of route: PairQLRoute) -> String {
   switch route {
   case .macApp: "macos-app"
-  case .iOS: "ios-app"
+  case .blocker: "blocker"
+  case .legacyBlocker: "ios-app"
+  case .iOSApps: "ios-apps"
   case .podcast: "gertrude-am"
   case .music: "gertrude-music"
   case .dashboard: "dashboard"

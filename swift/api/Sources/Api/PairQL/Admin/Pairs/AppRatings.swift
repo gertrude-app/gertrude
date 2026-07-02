@@ -1,4 +1,5 @@
 import DuetSQL
+import GertieApp
 import PairQL
 
 struct AppRatings: Pair {

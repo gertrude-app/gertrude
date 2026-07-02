@@ -1,7 +1,8 @@
+import BlockerRoute
 import ComposableArchitecture
 import Foundation
+import GertieApp
 import GertieTcaFeatures
-import IOSRoute
 import LibClients
 import os.log
 
@@ -10,7 +11,7 @@ import os.log
 @_exported import XCore
 
 @Reducer
-public struct IOSReducer {
+public struct IOSReducer: Sendable {
   struct Deps: Sendable {
     @Dependency(\.api) var api
     @Dependency(\.appStore) var appStore
@@ -31,12 +32,22 @@ public struct IOSReducer {
   public init() {}
 
   public var body: some ReducerOf<Self> {
+    Scope(state: \.appUpdate, action: \.appUpdate) {
+      AppUpdateGateFeature(app: .blocker) {
+        guard let deviceId = await self.deps.device.deviceId() else {
+          throw AppUpdateDeviceIdError.missingDeviceId
+        }
+        return deviceId
+      }
+    }
     Reduce { state, action in
       switch action {
       case .interactive(let interactiveAction):
         self.interactive(state: &state, action: interactiveAction)
       case .programmatic(let programmaticAction):
         self.programmatic(state: &state, action: programmaticAction)
+      case .appUpdate:
+        .none
       case .destination(.presented(let destinationAction)):
         self.destination(state: &state, action: destinationAction)
       case .destination(.dismiss):

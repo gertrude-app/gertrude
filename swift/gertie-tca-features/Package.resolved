@@ -1,5 +1,5 @@
 {
-  "originHash" : "8efe5ceb7e3f42bd484a50f58d239fade7af2dfde6d3765fa9cd5134a0e99bf7",
+  "originHash" : "8b946d89e3259b062233343c7ad209e16c35285bb6bb6a9258c52ff6c61c0312",
   "pins" : [
     {
       "identity" : "combine-schedulers",
@@ -92,6 +92,15 @@
       }
     },
     {
+      "identity" : "swift-parsing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-parsing",
+      "state" : {
+        "revision" : "42161b785368386648af8bc595d51aed9d316320",
+        "version" : "0.15.0"
+      }
+    },
+    {
       "identity" : "swift-perception",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-perception",
@@ -125,6 +134,15 @@
       "state" : {
         "revision" : "37124db72a34b6c10c9b86554a11f5b921578845",
         "version" : "0.10.1"
+      }
+    },
+    {
+      "identity" : "swift-url-routing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-url-routing",
+      "state" : {
+        "revision" : "1cfd564259ecb1d324bb718a8f03e513dab738d2",
+        "version" : "0.6.2"
       }
     },
     {
