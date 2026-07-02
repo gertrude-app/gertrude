@@ -69,7 +69,7 @@ struct AddShowFeature {
         state.searchText = text
         state.searchResults = []
         state.searchInFlight = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        return state.searchInFlight ? .none : .cancel(id: CancelID.search)
+        return .cancel(id: CancelID.search)
 
       case .setScreen(let screen):
         state.screen = screen
