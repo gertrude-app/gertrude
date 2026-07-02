@@ -1,7 +1,7 @@
 import Foundation
 import Tagged
 
-struct PlaybackItem: Equatable, Identifiable, Sendable {
+struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
   let id: ApprovedTrack.ID
   let title: String
   let artistName: String

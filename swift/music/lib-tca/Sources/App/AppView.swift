@@ -4,27 +4,41 @@ import SwiftUI
 
 struct AppView: View {
   @Bindable var store: StoreOf<AppFeature>
+  @Environment(\.scenePhase) private var scenePhase
 
   private let nowPlayingPanelTransitionID = "now-playing-panel"
   private let nowPlayingArtworkTransitionID = "now-playing-artwork"
 
   var body: some View {
-    #if os(iOS)
-      self.iOSContent
-        .overlay(alignment: .top) {
-          if self.store.library.albumDetail == nil,
-             let failure = self.store.playback.failure {
-            self.playbackFailureBanner(failure)
+    Group {
+      #if os(iOS)
+        self.iOSContent
+          .overlay(alignment: .top) {
+            if self.store.library.albumDetail == nil,
+               let failure = self.store.playback.failure {
+              self.playbackFailureBanner(failure)
+            }
           }
-        }
-        .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
-        .task(id: self.store.setup.isReady) {
-          guard self.store.setup.isReady else { return }
-          _ = self.store.send(.playback(.observePlayback))
-        }
-    #else
-      self.libraryView
-    #endif
+          .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
+          .task(id: self.store.setup.isReady) {
+            guard self.store.setup.isReady else { return }
+            await self.store.send(.playback(.restoreCachedSession)).finish()
+            _ = self.store.send(.playback(.observePlayback))
+          }
+      #else
+        self.libraryView
+      #endif
+    }
+    .onChange(of: self.scenePhase) { _, scenePhase in
+      switch scenePhase {
+      case .background, .inactive:
+        self.store.send(.playback(.saveCachedSession))
+      case .active:
+        break
+      @unknown default:
+        break
+      }
+    }
   }
 
   private var libraryView: some View {

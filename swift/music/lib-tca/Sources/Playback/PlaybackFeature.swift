@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Foundation
 
-struct PlaybackProgress: Equatable, Sendable {
+struct PlaybackProgress: Codable, Equatable, Sendable {
   var elapsedTime: TimeInterval
   var duration: TimeInterval
 
@@ -71,6 +71,8 @@ struct PlaybackFeature: Sendable {
   struct State: Equatable {
     var session: Session?
     var failure: PlaybackFailure?
+    var lastCachedProgressBucket: Int?
+    var requiresPlayerRestore = false
   }
 
   struct AlbumQueue: Equatable, Sendable {
@@ -146,6 +148,7 @@ struct PlaybackFeature: Sendable {
   }
 
   enum Action: Equatable {
+    case cachedSessionLoaded(CachedPlaybackSession?)
     case observePlayback
     case pause
     case playAlbumQueue(items: [PlaybackItem], startIndex: Int)
@@ -155,7 +158,9 @@ struct PlaybackFeature: Sendable {
     case playbackFailureDismissed
     case playbackStarted
     case playTrack(PlaybackItem)
+    case restoreCachedSession
     case resume
+    case saveCachedSession
     case seek(TimeInterval)
     case skipToNext
     case skipToPrevious
@@ -169,11 +174,21 @@ struct PlaybackFeature: Sendable {
   }
 
   @Dependency(\.playback) var playback
+  @Dependency(\.playbackSessionCache) var playbackSessionCache
   @Dependency(\.systemSettings) var systemSettings
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+      case .cachedSessionLoaded(let cachedSession):
+        guard state.session == nil,
+              let session = cachedSession?.playbackSession else { return .none }
+        state.failure = nil
+        state.lastCachedProgressBucket = nil
+        state.requiresPlayerRestore = true
+        state.session = session
+        return .none
+
       case .observePlayback:
         return .run { send in
           for await event in self.playback.events() {
@@ -184,18 +199,21 @@ struct PlaybackFeature: Sendable {
 
       case .playbackEvent(.playStatusChanged(let playStatus)):
         state.setPlayStatus(playStatus)
-        return .none
+        return self.saveCachedSession(state.session)
 
       case .playbackEvent(.currentItemChanged(let itemID)):
-        state.setCurrentItem(id: itemID)
-        return .none
+        guard state.setCurrentItem(id: itemID) else { return .none }
+        return self.saveCachedSession(state.session)
 
       case .playbackEvent(.progressChanged(let progress)):
         state.setProgress(progress)
-        return .none
+        guard state.shouldCacheProgressSnapshot() else { return .none }
+        return self.saveCachedSession(state.session)
 
       case .playTrack(let item):
         state.failure = nil
+        state.lastCachedProgressBucket = nil
+        state.requiresPlayerRestore = false
         state.session = .init(playStatus: .loading, currentItem: item)
         return .run { send in
           do {
@@ -209,6 +227,8 @@ struct PlaybackFeature: Sendable {
       case .playAlbumQueue(let items, let startIndex):
         guard items.indices.contains(startIndex) else { return .none }
         state.failure = nil
+        state.lastCachedProgressBucket = nil
+        state.requiresPlayerRestore = false
         let albumQueue = AlbumQueue(items: items, currentIndex: startIndex)
         state.session = .init(playStatus: .loading, albumQueue: albumQueue)
         return .run { send in
@@ -233,30 +253,62 @@ struct PlaybackFeature: Sendable {
       case .pause:
         guard state.session?.playStatus == .playing else { return .none }
         state.pauseSession()
-        return .run { _ in
-          await self.playback.pause()
+        return .merge(
+          self.saveCachedSession(state.session),
+          .run { _ in
+            await self.playback.pause()
+          },
+        )
+
+      case .restoreCachedSession:
+        guard state.session == nil else { return .none }
+        return .run { send in
+          await send(.cachedSessionLoaded(try? self.playbackSessionCache.load()))
         }
 
       case .resume:
-        guard state.session?.playStatus == .paused else { return .none }
+        guard let session = state.session,
+              session.playStatus == .paused else { return .none }
         state.failure = nil
-        state.resumeSession()
-        return .run { send in
-          do {
-            try await self.playback.resume()
-          } catch {
-            await send(.playbackFailed(.init(error: error)))
+        if state.requiresPlayerRestore {
+          state.setPlayStatus(.loading)
+          return .run { send in
+            do {
+              try await self.playback.playAlbumFromPosition(
+                session.albumQueue.items,
+                session.albumQueue.currentIndex,
+                session.progress.elapsedTime,
+              )
+              await send(.playbackStarted)
+            } catch {
+              await send(.playbackFailed(.init(error: error)))
+            }
           }
         }
+        state.resumeSession()
+        return .merge(
+          self.saveCachedSession(state.session),
+          .run { send in
+            do {
+              try await self.playback.resume()
+            } catch {
+              await send(.playbackFailed(.init(error: error)))
+            }
+          },
+        )
+
+      case .saveCachedSession:
+        return self.saveCachedSession(state.session)
 
       case .seek(let time):
         guard let duration = state.session?.progress.duration, duration > 0 else { return .none }
         let clampedTime = min(duration, max(0, time))
         state.setProgress(.init(elapsedTime: clampedTime, duration: duration))
-        return .run { _ in
+        let seekEffect: EffectOf<Self> = .run { _ in
           await self.playback.seek(clampedTime)
         }
         .cancellable(id: CancelID.seek, cancelInFlight: true)
+        return .merge(self.saveCachedSession(state.session), seekEffect)
 
       case .skipToNext:
         guard state.session != nil else { return .none }
@@ -277,14 +329,18 @@ struct PlaybackFeature: Sendable {
 
       case .stop:
         state.pauseSession()
-        return .run { _ in
-          await self.playback.stop()
-        }
+        return .merge(
+          self.saveCachedSession(state.session),
+          .run { _ in
+            await self.playback.stop()
+          },
+        )
 
       case .playbackStarted:
         state.failure = nil
+        state.requiresPlayerRestore = false
         state.resumeSession()
-        return .none
+        return self.saveCachedSession(state.session)
 
       case .playbackFailed(let failure):
         state.failure = failure
@@ -301,6 +357,14 @@ struct PlaybackFeature: Sendable {
           await self.systemSettings.openAppSettings()
         }
       }
+    }
+  }
+
+  private func saveCachedSession(_ session: PlaybackFeature.Session?) -> EffectOf<Self> {
+    guard let session else { return .none }
+    let cachedSession = CachedPlaybackSession(session: session)
+    return .run { _ in
+      try? await self.playbackSessionCache.save(cachedSession)
     }
   }
 }
@@ -326,11 +390,21 @@ extension PlaybackFeature.State {
     self.session = session
   }
 
-  mutating func setCurrentItem(id: ApprovedTrack.ID) {
-    guard var session = self.session else { return }
-    guard session.albumQueue.moveToItem(id: id) else { return }
+  mutating func setCurrentItem(id: ApprovedTrack.ID) -> Bool {
+    guard var session = self.session else { return false }
+    guard session.albumQueue.moveToItem(id: id) else { return false }
     session.progress = .zero
+    self.lastCachedProgressBucket = nil
     self.session = session
+    return true
+  }
+
+  mutating func shouldCacheProgressSnapshot() -> Bool {
+    guard let elapsedTime = self.session?.progress.elapsedTime else { return false }
+    let bucket = Int(elapsedTime / 5)
+    guard bucket != self.lastCachedProgressBucket else { return false }
+    self.lastCachedProgressBucket = bucket
+    return true
   }
 }
 
