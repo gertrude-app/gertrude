@@ -4,6 +4,8 @@
 
 - `x.x.x` (dev)
   - improve podcast search ux, branch pre ios 26
+- `1.6.3` (7/2/26)
+  - metadata only release, add "Gertrude AM" to searchable fields for findability
 - `1.6.2` (7/1/26)
   - finish/fix rename in ASC web ui for official listing name
 - `1.6.1` (6/30/26)

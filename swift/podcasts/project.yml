@@ -39,8 +39,8 @@ targets:
         DEVELOPMENT_TEAM: "WFN83LM943"
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_FILE: app/Info.plist
-        MARKETING_VERSION: 1.6.2
-        CURRENT_PROJECT_VERSION: 27
+        MARKETING_VERSION: 1.6.3
+        CURRENT_PROJECT_VERSION: 28
         ALWAYS_SEARCH_USER_PATHS: NO
       configs:
         Release:
