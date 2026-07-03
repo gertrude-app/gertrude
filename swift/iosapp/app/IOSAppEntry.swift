@@ -62,4 +62,12 @@ private class AppDelegate: NSObject, UIApplicationDelegate {
   func applicationWillTerminate(_ application: UIApplication) {
     self.onTerminate?()
   }
+
+  func application(
+    _ application: UIApplication,
+    handleEventsForBackgroundURLSession identifier: String,
+    completionHandler: @escaping () -> Void,
+  ) {
+    ScreenshotUploader.shared.handleBackgroundSessionEvents(completionHandler: completionHandler)
+  }
 }

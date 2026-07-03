@@ -268,11 +268,7 @@ extension ApiClient: DependencyKey {
             createdAt: screenshot.createdAt,
           )),
         )
-        var request = URLRequest(url: output.uploadUrl, cachePolicy: .reloadIgnoringCacheData)
-        request.httpMethod = "PUT"
-        request.addValue("public-read", forHTTPHeaderField: "x-amz-acl")
-        request.addValue("image/jpeg", forHTTPHeaderField: "Content-Type")
-        _ = try await URLSession.shared.upload(for: request, from: screenshot.data)
+        try await ScreenshotUploader.shared.upload(screenshot, to: output.uploadUrl)
       },
     )
   }
