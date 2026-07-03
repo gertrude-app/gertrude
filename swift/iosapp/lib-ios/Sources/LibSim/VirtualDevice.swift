@@ -25,11 +25,6 @@ public final class VirtualDevice {
   public let screenshotDisk = LockIsolated<[ScreenshotData]>([])
   public let api: ScriptedApi
   public let clock = TestClock<Duration>()
-  /// CONDUCTOR SIMPLIFICATION: the recorder process gets its own clock so that
-  /// `quiesce`'s run-to-idle on the shared clock doesn't spin forever on the
-  /// recorder's infinite periodic upload loop; both clocks (and the date) are
-  /// advanced together by `advanceTime`.
-  public let recorderClock = TestClock<Duration>()
   public let currentDate: LockIsolated<Date>
   public let deviceId: UUID
   public let filterInstalled: LockIsolated<Bool>
@@ -41,6 +36,7 @@ public final class VirtualDevice {
   public private(set) var recorder: RecorderProcess?
 
   private let pendingRulesChanged = LockIsolated<[RulesChangedTrigger]>([])
+  private let pendingRecorderEvents = LockIsolated<[RecorderEvent]>([])
 
   public init(
     disk: [String: GroupDefaultsClient.Entry] = [:],
@@ -221,6 +217,30 @@ public extension VirtualDevice {
     return process
   }
 
+  /// OS RULE R11 (darwin notifications): a darwin notification is delivered
+  /// promptly to running, non-suspended observer processes; nothing is queued
+  /// for a process that isn't running. A *suspended* app receives one coalesced
+  /// delivery on resume — CONDUCTOR SIMPLIFICATION: the sim has no app-suspended
+  /// state (only alive/dead), so posts with no live app process are dropped;
+  /// revisit if modeling coalesced-on-resume matters to a scenario. Evidence:
+  /// notify(3) semantics; used by the Apr 2025 recording prototype
+  /// (`bak-swift` `ios-test-rewrite`).
+  private func drainRecorderEvents() async {
+    let events = self.pendingRecorderEvents.withValue { queued in
+      let drained = queued
+      queued = []
+      return drained
+    }
+    for event in events {
+      if let app = self.app {
+        self.trace.withValue { $0.append(.recorderEventDelivered(event)) }
+        await app.store.send(.programmatic(.receivedRecorderEvent(event)))
+      } else {
+        self.trace.withValue { $0.append(.recorderEventDropped(event)) }
+      }
+    }
+  }
+
   /// OS RULE R10: one video sample buffer reaching `processSampleBuffer`;
   /// `changed: false` models a buffer whose pixels are (nearly) identical to
   /// the previous processed frame.
@@ -246,8 +266,9 @@ public extension VirtualDevice {
     await self.quiesce()
   }
 
-  /// User (or system) ends the recording: `broadcastFinished` runs, the
-  /// recorder drains any pending uploads, then the process exits.
+  /// User ends the recording gracefully: `broadcastFinished` runs (tombstoning
+  /// the liveness timestamp and posting the darwin event), then the process
+  /// exits.
   func stopBroadcast() async {
     guard let recorder = self.recorder else { return }
     self.trace.withValue { $0.append(.broadcastFinished) }
@@ -392,6 +413,7 @@ public extension VirtualDevice {
     for _ in 0 ..< 10 {
       await Task.megaYield()
       self.drainRulesChanged()
+      await self.drainRecorderEvents()
     }
   }
 
@@ -401,6 +423,7 @@ public extension VirtualDevice {
     for _ in 0 ..< 10 {
       await Task.megaYield()
       self.drainRulesChanged()
+      await self.drainRecorderEvents()
       await self.clock.run(timeout: .seconds(5))
     }
     if let task = self.controller?.startupTask {
@@ -413,6 +436,7 @@ public extension VirtualDevice {
     }
     await Task.megaYield()
     self.drainRulesChanged()
+    await self.drainRecorderEvents()
   }
 
   /// Advances wall-clock time and the shared test clock together, keeping
@@ -425,7 +449,6 @@ public extension VirtualDevice {
   func advanceTime(seconds: Int) async {
     self.currentDate.withValue { $0 += TimeInterval(seconds) }
     await self.clock.advance(by: .seconds(seconds))
-    await self.recorderClock.advance(by: .seconds(seconds))
   }
 }
 
@@ -435,13 +458,13 @@ extension VirtualDevice {
   private func dependencies(for target: SimTarget) -> @Sendable (inout DependencyValues)
     -> Void {
     let clock = self.clock
-    let recorderClock = self.recorderClock
     let currentDate = self.currentDate
     let disk = self.disk
     let screenshotDisk = self.screenshotDisk
     let trace = self.trace
     let deviceId = self.deviceId
     let filterInstalled = self.filterInstalled
+    let pendingRecorderEvents = self.pendingRecorderEvents
     let apiClient = self.api.client(for: target)
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "UTC")!
@@ -449,10 +472,6 @@ extension VirtualDevice {
     let sendSentinel: @Sendable (FilterClient.Notification) async throws -> Void =
       { [weak self] notification in
         await self?.deliverSentinel(notification)
-      }
-    let sendRecorderSentinel: @Sendable (FilterClient.Notification) async throws -> Void =
-      { [weak self] notification in
-        await self?.deliverSentinel(notification, from: .gertrudeRecorderBundleIdShort)
       }
     let providersStarted: @Sendable () async -> Void = { [weak self] in
       await self?.osStartsProviders()
@@ -479,14 +498,15 @@ extension VirtualDevice {
         deps.device.deviceId = { deviceId }
 
       case .recorder:
-        deps.continuousClock = recorderClock
-        deps.suspendingClock = recorderClock
         deps.sharedStorage = .liveValue
         deps.screenshotRepo = .inMemory(screenshotDisk)
-        deps.filter.send = sendRecorderSentinel
+        deps.recorderEvents.emit = { event in
+          pendingRecorderEvents.withValue { $0.append(event) }
+        }
 
       case .app:
         deps.sharedStorage = .liveValue
+        deps.screenshotRepo = .inMemory(screenshotDisk)
         deps.device.deviceId = { deviceId }
         deps.device.installedVersion = { "1.9.0" }
         deps.device.deleteCacheFillDir = {}

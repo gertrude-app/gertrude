@@ -31,6 +31,7 @@ public enum Witness: String, Sendable {
   case recorderStop = "recorder-stop"
   case recorderScreenshotSaved = "recorder-screenshot-saved"
   case screenshotsDrained = "screenshots-drained"
+  case appReceivedRecorderEvent = "app-received-recorder-event"
 
   @inline(__always)
   public func emit(_ detail: @autoclosure () -> String = "") {

@@ -62,23 +62,67 @@ private func connectedDevice(
   #expect(app.state.destination == .requestSuspension(.granted(duration: 300, comment: nil)))
 
   await app.store.send(.destination(.presented(.requestSuspension(.startRecordingTapped))))
-  await device.startBroadcast() // suspend sentinel flows to filter
+  await device.startBroadcast() // darwin event -> app writes expiration + suspend sentinel
   #expect(device.filter?.suspension != nil)
+  #expect(app.state.destination == .requestSuspension(.recording))
 
   #expect(await device.browse("blocked.com") == .allow) // blocking lifted
   await device.record(seconds: 25)
   #expect(await device.browse("blocked.com") == .allow) // stays lifted while frames flow
+  #expect(device.api.uploadedScreenshots.value.isEmpty) // no uploads while app sleeps
+  #expect(device.screenshotDisk.value.count > 0) // evidence accumulates on disk
+
+  await device.stopBroadcast() // darwin event -> app resumes filter + drains uploads
   #expect(device.api.uploadedScreenshots.value.count > 0) // parent got evidence
-
-  await device.stopBroadcast() // user ends recording, final upload drains
   #expect(device.screenshotDisk.value.isEmpty)
+  #expect(app.state.destination == nil)
 
-  await device.advanceTime(seconds: 7) // liveness window lapses
-  #expect(await device.browse("blocked.com") == .drop) // protection restored
-  #expect(device.trace.value.contains(.log(
-    .filter,
-    "filter resumed: expired-or-recording-stopped",
+  #expect(await device.browse("blocked.com") == .drop) // immediate, no liveness wait
+  #expect(device.trace.value.contains(.log(.filter, "filter resumed: requested")))
+  #expect(device.diskSuspensionExpiration == nil)
+}
+
+// MARK: - grant clock starts at broadcast start, not at parent approval
+
+@Test @MainActor func expirationAnchoredAtBroadcastStartNotGrant() async throws {
+  let device = connectedDevice(suspensionDecision: .accepted(duration: 300, parentComment: nil))
+  await device.reboot()
+  await device.quiesce()
+
+  let app = await device.launchApp()
+  await device.quiesce()
+  await app.store.send(.interactive(.requestSuspensionBtnTapped))
+  await app.store.send(.destination(.presented(
+    .requestSuspension(.submitRequest(duration: 300, comment: nil)),
   )))
+  await device.settle()
+  await device.advanceTime(seconds: 5)
+  await device.quiesce()
+  #expect(app.state.destination == .requestSuspension(.granted(duration: 300, comment: nil)))
+  #expect(device.diskSuspensionExpiration == nil) // grant alone writes nothing
+
+  await device.advanceTime(minutes: 2) // kid dawdles before starting the recording
+  await app.store.send(.destination(.presented(.requestSuspension(.startRecordingTapped))))
+  await device.startBroadcast()
+
+  // the full 5 minutes starts when recording starts
+  #expect(device.diskSuspensionExpiration == device.currentDate.value + 300)
+  #expect(await device.browse("blocked.com") == .allow)
+}
+
+// MARK: - darwin events die with the app: no live app, no suspension
+
+@Test @MainActor func broadcastWhileAppDeadNeverSuspends() async throws {
+  let device = connectedDevice()
+  await device.reboot()
+  await device.quiesce() // app never launched (or was killed after the grant)
+
+  await device.startBroadcast() // kid starts a recording from control center
+  await device.record(seconds: 10)
+
+  #expect(device.trace.value.contains(.recorderEventDropped(.broadcastStarted)))
+  #expect(device.filter?.suspension == nil) // nobody wrote the expiration
+  #expect(await device.browse("blocked.com") == .drop)
 }
 
 // MARK: - fail-safe: blocking never stays lifted without screenshots flowing
@@ -90,16 +134,17 @@ private func connectedDevice(
   device.seedSuspensionExpiration(secondsFromNow: 300)
 
   await device.startBroadcast()
+  await device.deliverSentinel(.suspendFilter) // as the app does on broadcastStarted
   await device.record(seconds: 10)
   #expect(await device.browse("blocked.com") == .allow)
 
-  await device.kill(.recorder) // os enforces ~50MB memory limit, no final upload
+  await device.kill(.recorder) // os enforces ~50MB memory limit; no darwin, no tombstone
 
   #expect(await device.browse("blocked.com") == .allow) // within liveness window
   await device.advanceTime(seconds: 7)
   #expect(await device.browse("blocked.com") == .drop) // fail-safe resumed blocking
 
-  // leftover screenshots the dead recorder never uploaded get drained by controller
+  // leftover screenshots the dead recorder stranded get drained by the controller
   let leftovers = device.screenshotDisk.value.count
   #expect(leftovers > 0)
   await device.deliverSentinel(.refreshRules) // next rule refresh drains them
@@ -133,6 +178,7 @@ private func connectedDevice(
   device.seedSuspensionExpiration(secondsFromNow: 300)
 
   await device.startBroadcast()
+  await device.deliverSentinel(.suspendFilter)
   await device.record(seconds: 10)
   #expect(await device.browse("blocked.com") == .allow)
 
@@ -143,9 +189,8 @@ private func connectedDevice(
   #expect(device.trace.value.contains(.launchedOnDemand(.filter)))
   #expect(device.filter?.suspension != nil)
 
-  await device.stopBroadcast()
-  await device.advanceTime(seconds: 7)
-  #expect(await device.browse("blocked.com") == .drop)
+  await device.stopBroadcast() // graceful stop tombstones the liveness timestamp
+  #expect(await device.browse("blocked.com") == .drop) // immediate, no 6s lapse needed
 }
 
 // MARK: - reboot mid-suspension
@@ -158,6 +203,7 @@ private func connectedDevice(
     device.seedSuspensionExpiration(secondsFromNow: 900)
 
     await device.startBroadcast()
+    await device.deliverSentinel(.suspendFilter)
     await device.record(seconds: 10)
     #expect(await device.browse("blocked.com") == .allow)
 
@@ -179,6 +225,7 @@ private func connectedDevice(
   device.seedSuspensionExpiration(secondsFromNow: 60)
 
   await device.startBroadcast()
+  await device.deliverSentinel(.suspendFilter)
   await device.record(seconds: 30)
   #expect(await device.browse("blocked.com") == .allow)
 
@@ -187,7 +234,7 @@ private func connectedDevice(
 
   await device.record(seconds: 20)
   #expect(await device.browse("blocked.com") == .drop) // more frames don't revive it
-  #expect(device.api.uploadedScreenshots.value.count > 0) // evidence kept flowing
+  #expect(device.screenshotDisk.value.count > 0) // evidence kept accumulating
 }
 
 // MARK: - no grant, no suspension
@@ -211,11 +258,13 @@ private func connectedDevice(
   await device.startBroadcast() // kid starts a recording anyway
   await device.record(seconds: 10)
 
-  #expect(await device.browse("blocked.com") == .drop) // no expiration key, no suspension
+  // darwin event delivered, but with no grant the app writes nothing
+  #expect(device.trace.value.contains(.recorderEventDelivered(.broadcastStarted)))
+  #expect(await device.browse("blocked.com") == .drop)
   #expect(device.filter?.suspension == nil)
 }
 
-// MARK: - static screen: liveness without redundant uploads
+// MARK: - static screen: liveness without redundant screenshots
 
 @Test @MainActor func unchangedFramesMaintainLivenessWithoutUploads() async throws {
   let device = connectedDevice()
@@ -224,39 +273,40 @@ private func connectedDevice(
   device.seedSuspensionExpiration(secondsFromNow: 300)
 
   await device.startBroadcast()
+  await device.deliverSentinel(.suspendFilter)
   await device.record(seconds: 5) // one real frame
-  let uploadedAfterFirst = device.api.uploadedScreenshots.value.count
-    + device.screenshotDisk.value.count
-  #expect(uploadedAfterFirst == 1)
+  #expect(device.screenshotDisk.value.count == 1)
 
   await device.record(seconds: 60, changed: false) // kid leaves screen static
   #expect(await device.browse("blocked.com") == .allow) // suspension persists
 
-  let totalSaved = device.api.uploadedScreenshots.value.count
-    + device.screenshotDisk.value.count
-  #expect(totalSaved == 1) // no duplicate screenshots saved or uploaded
+  #expect(device.screenshotDisk.value.count == 1) // no duplicate screenshots saved
 }
 
-// MARK: - upload failures retry until network recovers
+// MARK: - upload failures retry on the next wake
 
 @Test @MainActor func failedUploadsAreRetainedAndRetried() async throws {
   let device = connectedDevice()
   await device.reboot()
   await device.quiesce()
-  device.seedSuspensionExpiration(secondsFromNow: 600)
-  device.api.config.withValue { $0.screenshotUploadsFailing = true }
+
+  let app = await device.launchApp()
+  await device.quiesce()
 
   await device.startBroadcast()
-  await device.record(seconds: 45) // two upload cycles fail
+  await device.record(seconds: 20) // frames accumulate on disk
+
+  device.api.config.withValue { $0.screenshotUploadsFailing = true }
+  await device.stopBroadcast() // broadcastFinished drain fails
   #expect(device.api.uploadedScreenshots.value.isEmpty)
-  #expect(device.screenshotDisk.value.count > 0) // retained on disk for retry
+  let retained = device.screenshotDisk.value.count
+  #expect(retained > 0) // retained on disk for retry
 
   device.api.config.withValue { $0.screenshotUploadsFailing = false }
-  await device.record(seconds: 20) // next cycle uploads the backlog
-  #expect(device.api.uploadedScreenshots.value.count >= 3)
-
-  await device.stopBroadcast() // final drain gets the tail frames
+  await app.store.send(.programmatic(.appDidEnterForeground)) // next wake point
+  await device.quiesce()
   #expect(device.screenshotDisk.value.isEmpty)
+  #expect(device.api.uploadedScreenshots.value.count == retained)
 }
 
 // MARK: - parent never answers
@@ -299,7 +349,6 @@ private func connectedDevice(
   await device.advanceTime(seconds: 5)
   await device.quiesce()
   #expect(app.state.destination == .requestSuspension(.granted(duration: 900, comment: nil)))
-  #expect(device.diskSuspensionExpiration != nil) // grant recorded to disk
 
   await app.store.send(.destination(.presented(.requestSuspension(.startRecordingTapped))))
   await device.startBroadcast()
@@ -307,9 +356,10 @@ private func connectedDevice(
   #expect(await device.browse("blocked.com") == .allow)
 
   await app.store.send(.destination(.presented(.requestSuspension(.endSuspensionTapped))))
-  await device.quiesce() // resume sentinel + expiration cleared
+  await device.quiesce() // resume sentinel + expiration cleared + uploads drained
 
   #expect(await device.browse("blocked.com") == .drop) // blocked though recording continues
   #expect(device.diskSuspensionExpiration == nil)
+  #expect(device.api.uploadedScreenshots.value.count > 0)
   #expect(device.trace.value.contains(.log(.filter, "filter resumed: requested")))
 }

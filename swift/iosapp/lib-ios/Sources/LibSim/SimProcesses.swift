@@ -34,6 +34,8 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case broadcastStarted
   case broadcastFinished
   case broadcastErrored(String)
+  case recorderEventDelivered(RecorderEvent)
+  case recorderEventDropped(RecorderEvent)
   case log(SimTarget, String)
 
   public var description: String {
@@ -51,6 +53,8 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
     case .broadcastStarted: "user started broadcast"
     case .broadcastFinished: "user stopped broadcast"
     case .broadcastErrored(let error): "broadcast finished with error: \(error)"
+    case .recorderEventDelivered(let event): "darwin event .\(event) delivered to app"
+    case .recorderEventDropped(let event): "darwin event .\(event) dropped, no app running"
     case .log(let target, let message): "[\(target.rawValue)] \(message)"
     }
   }
@@ -204,9 +208,6 @@ public final class RecorderProcess {
 
   func osKill() {
     self.isBroadcasting = false
-    self.proxy.suspendTask?.cancel()
-    self.proxy.uploadTask?.cancel()
-    self.proxy.finalUploadTask?.cancel()
   }
 }
 

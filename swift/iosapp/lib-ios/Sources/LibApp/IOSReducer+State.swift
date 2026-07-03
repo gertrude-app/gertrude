@@ -20,6 +20,7 @@ extension IOSReducer {
     public var disabledBlockGroupIds: [UUID] = []
     public var onboarding: OnboardingState = .init()
     public var crossPromos: CrossPromos.Output = .init(promos: [])
+    public var grantedSuspension: Seconds<Int>?
 
     @Presents
     public var destination: Destination.State?

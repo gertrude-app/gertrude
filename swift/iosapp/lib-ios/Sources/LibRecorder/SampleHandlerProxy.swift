@@ -32,46 +32,39 @@ public struct SampleHandlerProxy {
     @Dependency(\.date.now) var now
     @Dependency(\.sharedStorage) var storage
     @Dependency(\.screenshotRepo) var repo
-    @Dependency(\.filter) var filter
+    @Dependency(\.recorderEvents) var events
     @Dependency(\.osLog) var logger
   }
 
   let deps = Deps()
   let finisher: any FinishableBroadcast
   var lastSampleTime: Date?
-  public private(set) var suspendTask: Task<Void, Never>?
-  public private(set) var uploadTask: Task<Void, Never>?
-  public private(set) var finalUploadTask: Task<Void, Never>?
 
   public init(finisher: any FinishableBroadcast) {
     self.finisher = finisher
     self.deps.logger.setPrefix("RECORDER")
   }
 
-  public mutating func broadcastStarted() {
+  public func broadcastStarted() {
     self.deps.logger.log("broadcast started")
     Witness.recorderStart.emit()
-    self.suspendTask = Task { [filter = self.deps.filter] in
-      try? await filter.send(.suspendFilter)
-    }
-    self.uploadTask = recurringUploadTask()
+    self.deps.events.emit(.broadcastStarted)
   }
 
-  public mutating func broadcastPaused() {
-    self.uploadTask?.cancel()
+  public func broadcastPaused() {
+    self.deps.events.emit(.broadcastPaused)
   }
 
-  public mutating func broadcastResumed() {
-    self.uploadTask = recurringUploadTask()
+  public func broadcastResumed() {
+    self.deps.events.emit(.broadcastResumed)
   }
 
-  public mutating func broadcastFinished() {
+  public func broadcastFinished() {
     self.deps.logger.log("broadcast finished")
     Witness.recorderStop.emit()
-    self.uploadTask?.cancel()
-    self.finalUploadTask = Task {
-      await uploadPendingScreenshots()
-    }
+    self.deps.storage
+      .saveScreenshotLastSaved(self.deps.now - RecordingSuspension.livenessWindow)
+    self.deps.events.emit(.broadcastFinished)
   }
 
   public mutating func shouldProcessBuffer() -> Bool {
@@ -104,17 +97,6 @@ public struct SampleHandlerProxy {
       self.deps.storage.saveScreenshotLastSaved(self.deps.now)
     } else {
       self.finisher.finishWithError(failedToSave)
-    }
-  }
-}
-
-func recurringUploadTask() -> Task<Void, Never> {
-  Task {
-    @Dependency(\.suspendingClock) var clock
-    while !Task.isCancelled {
-      try? await clock.sleep(for: .seconds(20))
-      guard !Task.isCancelled else { break }
-      await uploadPendingScreenshots()
     }
   }
 }

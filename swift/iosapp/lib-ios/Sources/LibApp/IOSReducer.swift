@@ -1039,7 +1039,10 @@ public struct IOSReducer {
       return .none
 
     case .appDidEnterForeground:
-      return self.presentHomeCrossPromo(&state)
+      return .merge(
+        self.presentHomeCrossPromo(&state),
+        .run { _ in await uploadPendingScreenshots() },
+      )
 
     case .appDidEnterBackground:
       return .none
@@ -1060,19 +1063,52 @@ public struct IOSReducer {
 
     case .receivedSuspensionUpdate(.accepted(let duration, let comment)):
       self.deps.log(action, "22b6502f")
+      state.grantedSuspension = duration
       if state.destination?.requestSuspension != nil {
         state.destination = .requestSuspension(.granted(duration: duration, comment: comment))
       }
-      return .run { [deps = self.deps] _ in
-        deps.sharedStorage
-          .saveSuspensionExpiration(deps.now.addingTimeInterval(TimeInterval(duration.rawValue)))
-      }
+      return .none
 
     case .suspensionRequestExpired:
       self.deps.log(action, "808e2be1")
       if state.destination?.requestSuspension == .waitingForDecision {
         state.destination = .requestSuspension(.requestExpired)
       }
+      return .none
+
+    case .receivedRecorderEvent(.broadcastStarted):
+      Witness.appReceivedRecorderEvent.emit("broadcastStarted")
+      guard let duration = state.grantedSuspension else {
+        self.deps.log("broadcast started with no granted suspension", "052dbc62")
+        return .none
+      }
+      self.deps.log(action, "697841f9")
+      if state.destination?.requestSuspension != nil {
+        state.destination = .requestSuspension(.recording)
+      }
+      return .run { [deps = self.deps] _ in
+        deps.sharedStorage
+          .saveSuspensionExpiration(deps.now.addingTimeInterval(TimeInterval(duration.rawValue)))
+        try? await deps.filter.send(.suspendFilter)
+      }
+
+    case .receivedRecorderEvent(.broadcastFinished):
+      Witness.appReceivedRecorderEvent.emit("broadcastFinished")
+      self.deps.log(action, "46eb912d")
+      state.grantedSuspension = nil
+      if state.destination?.requestSuspension == .recording {
+        state.destination = nil
+      }
+      return .merge(
+        .run { [deps = self.deps] _ in
+          deps.sharedStorage.clearSuspensionExpiration()
+          try? await deps.filter.send(.resumeFilter)
+        },
+        .run { _ in await uploadPendingScreenshots() },
+      )
+
+    case .receivedRecorderEvent(.broadcastPaused),
+         .receivedRecorderEvent(.broadcastResumed):
       return .none
     }
   }
@@ -1116,10 +1152,14 @@ public struct IOSReducer {
   func endSuspension(state: inout State) -> EffectOf<IOSReducer> {
     self.deps.log("suspension ended by user", "641df8b7")
     state.destination = nil
-    return .run { [deps = self.deps] _ in
-      deps.sharedStorage.clearSuspensionExpiration()
-      try? await deps.filter.send(.resumeFilter)
-    }
+    state.grantedSuspension = nil
+    return .merge(
+      .run { [deps = self.deps] _ in
+        deps.sharedStorage.clearSuspensionExpiration()
+        try? await deps.filter.send(.resumeFilter)
+      },
+      .run { _ in await uploadPendingScreenshots() },
+    )
   }
 }
 

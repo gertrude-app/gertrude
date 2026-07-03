@@ -166,10 +166,19 @@ checkPairs(
 
 checkPairs(
   `R10 broadcast → suspend`,
-  `recorder broadcast start sends the suspend sentinel through the filter`,
+  `broadcast start leads (via app darwin handling) to the suspend sentinel`,
   of(`recorder-start`),
   (e) => e.event === `filter-sentinel` && e.detail === `suspend-filter`,
   10_000,
+);
+
+checkPairs(
+  `R11 darwin → app`,
+  `recorder darwin events reach the app promptly (misses expected iff app suspended/dead)`,
+  of(`recorder-start`),
+  (e) => e.event === `app-received-recorder-event`,
+  10_000,
+  { informational: true },
 );
 
 checkPairs(

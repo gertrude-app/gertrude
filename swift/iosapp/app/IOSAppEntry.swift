@@ -1,5 +1,7 @@
 import ComposableArchitecture
+import Dependencies
 import LibApp
+import LibClients
 import LibViews
 import SwiftUI
 
@@ -8,6 +10,7 @@ struct IOSAppEntry: App {
   let store: StoreOf<IOSReducer>
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
   @Environment(\.scenePhase) private var scenePhase
+  @Dependency(\.recorderEvents) private var recorderEvents
 
   var osMajorVersion: Int {
     ProcessInfo.processInfo.operatingSystemVersion.majorVersion
@@ -32,6 +35,11 @@ struct IOSAppEntry: App {
       AppView(store: self.store, osMajorVersion: self.osMajorVersion, deviceType: self.deviceType)
         .onAppear {
           self.store.send(.programmatic(.appDidLaunch))
+        }
+        .task { [store = self.store, events = self.recorderEvents] in
+          for await event in events.events() {
+            store.send(.programmatic(.receivedRecorderEvent(event)))
+          }
         }
         .onChange(of: self.scenePhase) { _, newPhase in
           switch newPhase {

@@ -26,6 +26,7 @@ and observed device behavior disagree.
 | R8 | successful install starts both providers | `app-installed-filter` → both `*-proxy-init` | fresh onboarding install |
 | R9 | processes die anytime; only app-group storage survives | `filter-stop` / `controller-stop` → later `*-proxy-init` (new pid); informational — a stop with no later init is expected for the session's last stop | memory pressure (many Safari tabs / camera), observe re-inits |
 | R10 | broadcast picker launches recorder; suspend sentinel arrives as a flow; screenshots follow suspension; stopping recording resumes filter on next flow; ~50MB memory cap; never auto-relaunched | `recorder-start` → `filter-sentinel suspend-filter`; `filter-suspended` → `recorder-screenshot-saved`; `recorder-stop` → `filter-resumed` | request + grant suspension from dashboard, start recording in app, browse, stop recording, browse again |
+| R11 | darwin notifications delivered promptly to running observers; suspended app gets one coalesced delivery on resume; nothing queued for dead processes | `recorder-start` → `app-received-recorder-event` (informational) | start/stop recording with app foregrounded, then again after force-quitting the app |
 
 ## Capturing
 
@@ -90,6 +91,7 @@ delete+reinstall legitimately contains migrations from both sides, far apart.
 | R8 | 2026-07-03 | — | install→both providers confirmed x1 (collect, onboarding); both-inits-then-both-starts pattern confirmed |
 | R9 | 2026-07-03 | — | zero filter-stop/controller-stop witnesses across 4 reboots — reboots kill extensions outright without stopFilter callback (validates "can die without notice" caveat). Relaunch-after-death half UNEXERCISED — needs deliberate memory pressure (weekend soak) |
 | R10 | never | — | drafted 2026-07-02 from RPBroadcastSampleHandler docs + observations from the 2025 recording experiment (`bak-swift` branch `chris`); no campaign run yet |
+| R11 | never | — | drafted 2026-07-03 from notify(3) semantics + the Apr 2025 darwin xpc prototype (`bak-swift` branch `ios-test-rewrite`); key open question: real coalesced-on-resume latency for a suspended app |
 
 ## Maintenance
 
