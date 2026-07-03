@@ -3,17 +3,23 @@ import Foundation
 public enum MagicStrings {
   public static let gertrudeBundleIdLong: String = .gertrudeBundleIdLong
   public static let gertrudeBundleIdShort: String = .gertrudeBundleIdShort
+  public static let gertrudeRecorderBundleIdLong: String = .gertrudeRecorderBundleIdLong
+  public static let gertrudeRecorderBundleIdShort: String = .gertrudeRecorderBundleIdShort
   public static let gertrudeGroupId: String = .gertrudeGroupId
 
   // sentinal hostnames
   public static let readRulesSentinalHostname: String = "read-rules.xpc.gertrude.app"
   public static let refreshRulesSentinalHostname: String = "refresh-rules.xpc.gertrude.app"
   public static let dumpLogsSentinalHostname: String = "dump-logs.xpc.gertrude.app"
+  public static let suspendFilterSentinalHostname: String = "suspend-filter.xpc.gertrude.app"
+  public static let resumeFilterSentinalHostname: String = "resume-filter.xpc.gertrude.app"
 }
 
 public extension String {
   static let gertrudeBundleIdLong = "WFN83LM943.com.netrivet.gertrude-ios.app"
   static let gertrudeBundleIdShort = "com.netrivet.gertrude-ios.app"
+  static let gertrudeRecorderBundleIdLong = "WFN83LM943.com.netrivet.gertrude-ios.app.recorder"
+  static let gertrudeRecorderBundleIdShort = "com.netrivet.gertrude-ios.app.recorder"
   static let gertrudeGroupId = "group.com.netrivet.gertrude-ios.app"
 }
 

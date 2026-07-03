@@ -25,6 +25,7 @@ and observed device behavior disagree.
 | R7 | app sentinel requests arrive as filter flows | `app-sentinel-sent` → `filter-sentinel` | open info sheet / trigger rule refresh in app |
 | R8 | successful install starts both providers | `app-installed-filter` → both `*-proxy-init` | fresh onboarding install |
 | R9 | processes die anytime; only app-group storage survives | `filter-stop` / `controller-stop` → later `*-proxy-init` (new pid); informational — a stop with no later init is expected for the session's last stop | memory pressure (many Safari tabs / camera), observe re-inits |
+| R10 | broadcast picker launches recorder; suspend sentinel arrives as a flow; screenshots follow suspension; stopping recording resumes filter on next flow; ~50MB memory cap; never auto-relaunched | `recorder-start` → `filter-sentinel suspend-filter`; `filter-suspended` → `recorder-screenshot-saved`; `recorder-stop` → `filter-resumed` | request + grant suspension from dashboard, start recording in app, browse, stop recording, browse again |
 
 ## Capturing
 
@@ -88,6 +89,7 @@ delete+reinstall legitimately contains migrations from both sides, far apart.
 | R7 | 2026-07-03 | — | CONFIRMED x6 (collect): `app-sentinel-sent` → `filter-sentinel` pairing fully confirmed with clean main-branch build. Earlier "0 app-sentinel-sent" had two independent sufficient causes: a wrong-branch build (screen-recording branch, lacks the witness) AND the idevicesyslog app-process blind spot (see Capturing). Observed fan-out: each single send produced 6-8 `filter-sentinel` deliveries (one HTTPS request → multiple flows); sim models 1:1 — documented simplification |
 | R8 | 2026-07-03 | — | install→both providers confirmed x1 (collect, onboarding); both-inits-then-both-starts pattern confirmed |
 | R9 | 2026-07-03 | — | zero filter-stop/controller-stop witnesses across 4 reboots — reboots kill extensions outright without stopFilter callback (validates "can die without notice" caveat). Relaunch-after-death half UNEXERCISED — needs deliberate memory pressure (weekend soak) |
+| R10 | never | — | drafted 2026-07-02 from RPBroadcastSampleHandler docs + observations from the 2025 recording experiment (`bak-swift` branch `chris`); no campaign run yet |
 
 ## Maintenance
 

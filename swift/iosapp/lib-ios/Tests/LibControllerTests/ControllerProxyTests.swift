@@ -92,6 +92,7 @@ func setup(
     $0.sharedStorage.saveProtectionMode = { mode in
       test.savedProtectionModes.withValue { $0.append(mode) }
     }
+    $0.screenshotRepo.pendingCount = { 0 }
   } operation: {
     test._proxy.withValue { $0 = ControllerProxy() }
     test.proxy.notifyRulesChanged.withValue { $0 = {

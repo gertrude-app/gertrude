@@ -6,11 +6,13 @@ import LibClients
 import LibController
 import LibCore
 import LibFilter
+import LibRecorder
 
 public enum SimTarget: String, Sendable, Equatable {
   case app
   case controller
   case filter
+  case recorder
 }
 
 public enum RulesChangedTrigger: String, Sendable, Equatable {
@@ -29,6 +31,9 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case sentinelSent(FilterClient.Notification)
   case rulesChangedDelivered(RulesChangedTrigger)
   case rulesChangedDropped(RulesChangedTrigger)
+  case broadcastStarted
+  case broadcastFinished
+  case broadcastErrored(String)
   case log(SimTarget, String)
 
   public var description: String {
@@ -43,6 +48,9 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
     case .sentinelSent(let notification): "app sent sentinel .\(notification)"
     case .rulesChangedDelivered(let trigger): "os delivered handleRulesChanged (\(trigger.rawValue))"
     case .rulesChangedDropped(let trigger): "os dropped handleRulesChanged (\(trigger.rawValue))"
+    case .broadcastStarted: "user started broadcast"
+    case .broadcastFinished: "user stopped broadcast"
+    case .broadcastErrored(let error): "broadcast finished with error: \(error)"
     case .log(let target, let message): "[\(target.rawValue)] \(message)"
     }
   }
@@ -64,6 +72,10 @@ public final class FilterProcess {
 
   public var protectionMode: ProtectionMode {
     self.proxy.protectionMode
+  }
+
+  public var suspension: RecordingSuspension? {
+    self.proxy.suspension
   }
 
   func osStartFilter() {
@@ -129,6 +141,72 @@ public final class ControllerProcess {
     #if DEBUG
       self.proxy.migrateTask.value?.cancel()
     #endif
+  }
+}
+
+@MainActor
+public final class RecorderProcess {
+  final class Finisher: FinishableBroadcast, Sendable {
+    let errors = LockIsolated<[String]>([])
+    func finishWithError(_ error: any Error) {
+      self.errors.withValue { $0.append(error.localizedDescription) }
+    }
+  }
+
+  private let dependencies: @Sendable (inout DependencyValues) -> Void
+  private var proxy: SampleHandlerProxy
+  let finisher = Finisher()
+  private var frameCount = 0
+  public private(set) var isBroadcasting = false
+
+  /// Mirrors `recorder/SampleHandler.swift`: the extension constructs its
+  /// `SampleHandlerProxy` at process init, wired to itself as finisher.
+  init(dependencies: @escaping @Sendable (inout DependencyValues) -> Void) {
+    self.dependencies = dependencies
+    let finisher = self.finisher
+    self.proxy = withDependencies(dependencies) {
+      SampleHandlerProxy(finisher: finisher)
+    }
+  }
+
+  var broadcastErrors: [String] {
+    self.finisher.errors.value
+  }
+
+  func osBroadcastStarted() {
+    self.isBroadcasting = true
+    withDependencies(self.dependencies) {
+      self.proxy.broadcastStarted()
+    }
+  }
+
+  func osDeliverSample(changed: Bool) {
+    self.frameCount += 1
+    let frame = Frame(
+      jpeg: Data("frame-\(self.frameCount)".utf8),
+      width: 585,
+      height: 1266,
+      unchanged: !changed,
+    )
+    withDependencies(self.dependencies) {
+      if self.proxy.shouldProcessBuffer() {
+        self.proxy.processFrame(frame)
+      }
+    }
+  }
+
+  func osBroadcastFinished() {
+    self.isBroadcasting = false
+    withDependencies(self.dependencies) {
+      self.proxy.broadcastFinished()
+    }
+  }
+
+  func osKill() {
+    self.isBroadcasting = false
+    self.proxy.suspendTask?.cancel()
+    self.proxy.uploadTask?.cancel()
+    self.proxy.finalUploadTask?.cancel()
   }
 }
 

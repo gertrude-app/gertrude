@@ -27,6 +27,7 @@ public extension IOSReducer {
       case sheetDismissed
       case receivedShake
       case infoBtnTapped
+      case requestSuspensionBtnTapped
     }
 
     public enum Programmatic: Equatable {
@@ -49,6 +50,8 @@ public extension IOSReducer {
       case setProfileRecovery
       case filterVerified
       case filterVerificationFailed
+      case receivedSuspensionUpdate(PollFilterSuspensionDecision.Output)
+      case suspensionRequestExpired
     }
   }
 }

@@ -34,6 +34,12 @@ public struct SharedStorageClient: Sendable {
   public var loadCrossPromoLastShownAt: @Sendable () -> Date?
   public var saveCrossPromoLastShownAt: @Sendable (Date) -> Void
 
+  public var loadSuspensionExpiration: @Sendable () -> Date?
+  public var saveSuspensionExpiration: @Sendable (Date) -> Void
+  public var clearSuspensionExpiration: @Sendable () -> Void
+  public var loadScreenshotLastSaved: @Sendable () -> Date?
+  public var saveScreenshotLastSaved: @Sendable (Date) -> Void
+
   public var migrateLegacyData: @Sendable () async -> Bool = { false }
 }
 
@@ -44,6 +50,8 @@ public struct SharedStorageReaderClient: Sendable {
   public var loadDisabledBlockGroupIds: @Sendable () -> [UUID]?
   public var loadFirstLaunchDate: @Sendable () -> Date?
   public var loadDebugLogs: @Sendable () -> [String]?
+  public var loadSuspensionExpiration: @Sendable () -> Date?
+  public var loadScreenshotLastSaved: @Sendable () -> Date?
 }
 
 package enum Key: String {
@@ -59,6 +67,8 @@ package enum Key: String {
   case pendingSupervisionCode = "v1.7.0--pending-supervision-code"
   case dismissedCrossPromoIds = "v1.9.0--dismissed-cross-promo-ids"
   case crossPromoLastShownAt = "v1.9.0--cross-promo-last-shown-at"
+  case suspensionExpiration = "v1.10.0--suspension-expiration"
+  case screenshotLastSaved = "v1.10.0--screenshot-last-saved"
 }
 
 extension SharedStorageClient: DependencyKey {
@@ -84,6 +94,11 @@ extension SharedStorageClient: DependencyKey {
       saveDismissedCrossPromoIds: { saveCodable($0, forKey: .dismissedCrossPromoIds) },
       loadCrossPromoLastShownAt: { loadDate(forKey: .crossPromoLastShownAt) },
       saveCrossPromoLastShownAt: { saveDate($0, forKey: .crossPromoLastShownAt) },
+      loadSuspensionExpiration: reader.loadSuspensionExpiration,
+      saveSuspensionExpiration: { saveDate($0, forKey: .suspensionExpiration) },
+      clearSuspensionExpiration: { removeKey(.suspensionExpiration) },
+      loadScreenshotLastSaved: reader.loadScreenshotLastSaved,
+      saveScreenshotLastSaved: { saveDate($0, forKey: .screenshotLastSaved) },
       migrateLegacyData: { await migrateLegacyStorage() },
     )
   }
@@ -108,6 +123,8 @@ extension SharedStorageReaderClient: DependencyKey {
     loadDisabledBlockGroupIds: { loadCodable(forKey: .disabledBlockGroupIds) },
     loadFirstLaunchDate: { loadDate(forKey: .firstLaunchDate) },
     loadDebugLogs: { loadCodable(forKey: .debugLogs) },
+    loadSuspensionExpiration: { loadDate(forKey: .suspensionExpiration) },
+    loadScreenshotLastSaved: { loadDate(forKey: .screenshotLastSaved) },
   )
 }
 

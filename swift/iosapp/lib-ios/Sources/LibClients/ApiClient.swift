@@ -42,6 +42,12 @@ public struct ApiClient: Sendable {
     async throws -> Void
   public var crossPromos: @Sendable ()
     async throws -> CrossPromos.Output
+  public var createSuspendFilterRequest: @Sendable (_ duration: Seconds<Int>, _ comment: String?)
+    async throws -> UUID
+  public var pollSuspensionDecision: @Sendable (_ id: UUID)
+    async throws -> PollFilterSuspensionDecision.Output
+  public var uploadScreenshot: @Sendable (ScreenshotData)
+    async throws -> Void
 }
 
 extension ApiClient: TestDependencyKey {
@@ -240,6 +246,33 @@ extension ApiClient: DependencyKey {
             locale: locale.identifier,
           )),
         )
+      },
+      createSuspendFilterRequest: { duration, comment in
+        try await authed(
+          CreateSuspendFilterRequest.self,
+          .createSuspendFilterRequest(.init(duration: duration, comment: comment)),
+        )
+      },
+      pollSuspensionDecision: { id in
+        try await authed(
+          PollFilterSuspensionDecision.self,
+          .pollFilterSuspensionDecision(id),
+        )
+      },
+      uploadScreenshot: { screenshot in
+        let output = try await authed(
+          ScreenshotUploadUrl.self,
+          .screenshotUploadUrl(.init(
+            width: screenshot.width,
+            height: screenshot.height,
+            createdAt: screenshot.createdAt,
+          )),
+        )
+        var request = URLRequest(url: output.uploadUrl, cachePolicy: .reloadIgnoringCacheData)
+        request.httpMethod = "PUT"
+        request.addValue("public-read", forHTTPHeaderField: "x-amz-acl")
+        request.addValue("image/jpeg", forHTTPHeaderField: "Content-Type")
+        _ = try await URLSession.shared.upload(for: request, from: screenshot.data)
       },
     )
   }

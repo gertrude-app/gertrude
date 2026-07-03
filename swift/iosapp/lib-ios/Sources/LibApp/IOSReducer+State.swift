@@ -10,6 +10,7 @@ extension IOSReducer {
   public enum Destination {
     case info(InfoFeature)
     case crossPromo(CrossPromoFeature)
+    case requestSuspension(RequestSuspension)
   }
 
   @ObservableState

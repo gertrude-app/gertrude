@@ -105,6 +105,8 @@ func setup(
       test.loadProtectionModeCalls.withValue { $0 += 1 }
       return storedProtectionMode
     }
+    $0.sharedStorageReader.loadSuspensionExpiration = { @Sendable in nil }
+    $0.sharedStorageReader.loadScreenshotLastSaved = { @Sendable in nil }
   } operation: {
     FilterProxy(protectionMode: initialProtectionMode)
   }

@@ -10,6 +10,8 @@ public struct FilterClient: Sendable {
     case rulesChanged
     case refreshRules
     case dumpLogs
+    case suspendFilter
+    case resumeFilter
   }
 
   /// send "notifications" via special sentinal http requests, from app to filter
@@ -33,6 +35,14 @@ extension FilterClient: DependencyKey {
         case .refreshRules:
           await fireAndForget(
             url: URL(string: "https://\(MagicStrings.refreshRulesSentinalHostname)")!,
+          )
+        case .suspendFilter:
+          await fireAndForget(
+            url: URL(string: "https://\(MagicStrings.suspendFilterSentinalHostname)")!,
+          )
+        case .resumeFilter:
+          await fireAndForget(
+            url: URL(string: "https://\(MagicStrings.resumeFilterSentinalHostname)")!,
           )
         }
       },

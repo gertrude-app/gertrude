@@ -44,6 +44,7 @@ public struct FilterProxy {
   #endif
 
   public private(set) var protectionMode: ProtectionMode = .emergencyLockdown
+  public private(set) var suspension: RecordingSuspension?
 
   public init(protectionMode: ProtectionMode) {
     self.protectionMode = protectionMode
@@ -108,6 +109,38 @@ public struct FilterProxy {
       return .needRules
     }
 
+    if flow.hostname == MagicStrings.suspendFilterSentinalHostname {
+      Witness.filterSentinel.emit("suspend-filter")
+      if isGertrude(flow.bundleId),
+         let suspension = RecordingSuspension.entered(
+           expiration: self.storage.loadSuspensionExpiration(),
+           now: self.now,
+         ) {
+        self.suspension = suspension
+        self.logger.log("filter suspended until \(suspension.expiration)")
+        Witness.filterSuspended.emit("until=\(suspension.expiration)")
+      }
+      return .drop
+    }
+
+    if flow.hostname == MagicStrings.resumeFilterSentinalHostname {
+      Witness.filterSentinel.emit("resume-filter")
+      if isGertrude(flow.bundleId), self.suspension != nil {
+        self.endSuspension(reason: "requested")
+      }
+      return .drop
+    }
+
+    if let suspension = self.suspension {
+      if suspension.isValid(
+        lastScreenshot: self.storage.loadScreenshotLastSaved(),
+        now: self.now,
+      ) {
+        return .allow
+      }
+      self.endSuspension(reason: "expired-or-recording-stopped")
+    }
+
     #if DEBUG
       if flow.hostname == MagicStrings.dumpLogsSentinalHostname {
         for (i, logs) in self.memoryLogs.withValue({ $0 }).chunked(into: 6).enumerated() {
@@ -139,6 +172,21 @@ public struct FilterProxy {
     self.logger.log("Starting filter")
     Witness.filterStart.emit()
     self.loadAndSetRules()
+    if let suspension = RecordingSuspension.rederived(
+      expiration: self.storage.loadSuspensionExpiration(),
+      lastScreenshot: self.storage.loadScreenshotLastSaved(),
+      now: self.now,
+    ) {
+      self.suspension = suspension
+      self.logger.log("filter suspension rederived, until \(suspension.expiration)")
+      Witness.filterSuspended.emit("rederived until=\(suspension.expiration)")
+    }
+  }
+
+  private mutating func endSuspension(reason: String) {
+    self.suspension = nil
+    self.logger.log("filter resumed: \(reason)")
+    Witness.filterResumed.emit(reason)
   }
 
   public func stopFilter(reason: NEProviderStopReason) {
@@ -161,6 +209,7 @@ extension FilterProxy: FlowDecider {
 private func isGertrude(_ bundleId: String?) -> Bool {
   guard let bundleId else { return false }
   return bundleId == .gertrudeBundleIdLong || bundleId == .gertrudeBundleIdShort
+    || bundleId == .gertrudeRecorderBundleIdLong || bundleId == .gertrudeRecorderBundleIdShort
 }
 
 // "exports" for filter

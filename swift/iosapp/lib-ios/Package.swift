@@ -11,6 +11,7 @@ let package = Package(
     .library(name: "LibClients", targets: ["LibClients"]),
     .library(name: "LibApp", targets: ["LibApp"]),
     .library(name: "LibViews", targets: ["LibViews"]),
+    .library(name: "LibRecorder", targets: ["LibRecorder"]),
     .library(name: "LibSim", targets: ["LibSim"]),
   ],
   dependencies: [
@@ -96,6 +97,14 @@ let package = Package(
       ],
     ),
     .target(
+      name: "LibRecorder",
+      dependencies: [
+        "LibClients",
+        "LibCore",
+        .product(name: "Dependencies", package: "swift-dependencies"),
+      ],
+    ),
+    .target(
       name: "LibSim",
       dependencies: [
         "LibApp",
@@ -103,6 +112,7 @@ let package = Package(
         "LibController",
         "LibCore",
         "LibFilter",
+        "LibRecorder",
         .product(name: "Clocks", package: "swift-clocks"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
@@ -119,6 +129,7 @@ let package = Package(
         "LibApp",
         "LibClients",
         "LibCore",
+        "LibRecorder",
         .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "IOSRoute", package: "pairql-iosapp"),
         .product(name: "XExpect", package: "x-expect"),

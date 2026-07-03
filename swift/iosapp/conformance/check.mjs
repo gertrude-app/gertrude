@@ -164,6 +164,31 @@ checkPairs(
   { informational: true },
 );
 
+checkPairs(
+  `R10 broadcast → suspend`,
+  `recorder broadcast start sends the suspend sentinel through the filter`,
+  of(`recorder-start`),
+  (e) => e.event === `filter-sentinel` && e.detail === `suspend-filter`,
+  10_000,
+);
+
+checkPairs(
+  `R10 suspend → screenshots`,
+  `an entered suspension sees screenshots saved within the liveness window`,
+  of(`filter-suspended`),
+  (e) => e.event === `recorder-screenshot-saved`,
+  10_000,
+);
+
+checkPairs(
+  `R10 stop → resume`,
+  `after recording stops, the next flow decision resumes the filter (needs traffic)`,
+  of(`recorder-stop`),
+  (e) => e.event === `filter-resumed`,
+  60_000,
+  { informational: true },
+);
+
 console.log(`\n${events.length} witness events, ${fmt(events[0].t)} → ${fmt(events.at(-1).t)}\n`);
 
 for (const r of results) {

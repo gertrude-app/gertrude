@@ -646,6 +646,13 @@ public struct AppView: View {
     .sheet(item: self.crossPromoStore(style: .sheet)) { store in
       CrossPromoView(store: store)
     }
+    .sheet(item: self.$store.scope(
+      state: \.destination?.requestSuspension,
+      action: \.destination.requestSuspension,
+    )) { store in
+      RequestSuspensionView(store: store)
+        .pageSheet()
+    }
     #if os(iOS)
     .fullScreenCover(item: self.crossPromoStore(style: .screen)) { store in
       CrossPromoView(store: store)

@@ -14,6 +14,8 @@ public final class ScriptedApi: Sendable {
     public var connected: ConnectedRules.Output?
     public var connectFeatureFlag = ConnectAccountFeatureFlag.Output(isEnabled: false)
     public var supervisionStatus: CheckSupervisionFlowStatus.Output?
+    public var suspensionDecision: PollFilterSuspensionDecision.Output = .pending
+    public var screenshotUploadsFailing = false
 
     public init() {}
   }
@@ -22,10 +24,22 @@ public final class ScriptedApi: Sendable {
     public init() {}
   }
 
+  public struct SuspensionRequest: Sendable, Equatable {
+    public var duration: Int
+    public var comment: String?
+
+    public init(duration: Int, comment: String? = nil) {
+      self.duration = duration
+      self.comment = comment
+    }
+  }
+
   public let config: LockIsolated<Config>
   public let loggedEvents = LockIsolated<[String]>([])
   public let calls = LockIsolated<[String]>([])
   public let accountConnections = LockIsolated<[ChildIOSDeviceData_v2?]>([])
+  public let suspensionRequests = LockIsolated<[SuspensionRequest]>([])
+  public let uploadedScreenshots = LockIsolated<[ScreenshotData]>([])
 
   public init(_ config: Config = .init()) {
     self.config = LockIsolated(config)
@@ -78,6 +92,24 @@ public final class ScriptedApi: Sendable {
       return nil
     }
     client.crossPromos = { .init(promos: []) }
+    client.createSuspendFilterRequest = { [self] duration, comment in
+      try self.checkReachable(target, "createSuspendFilterRequest")
+      self.suspensionRequests.withValue {
+        $0.append(.init(duration: duration.rawValue, comment: comment))
+      }
+      return UUID(9)
+    }
+    client.pollSuspensionDecision = { [self] _ in
+      try self.checkReachable(target, "pollSuspensionDecision")
+      return self.config.value.suspensionDecision
+    }
+    client.uploadScreenshot = { [self] screenshot in
+      try self.checkReachable(target, "uploadScreenshot")
+      guard !self.config.value.screenshotUploadsFailing else {
+        throw NetworkDown()
+      }
+      self.uploadedScreenshots.withValue { $0.append(screenshot) }
+    }
     return client
   }
 

@@ -22,8 +22,14 @@ import XCore
 @MainActor
 public final class VirtualDevice {
   public let disk: LockIsolated<[String: GroupDefaultsClient.Entry]>
+  public let screenshotDisk = LockIsolated<[ScreenshotData]>([])
   public let api: ScriptedApi
   public let clock = TestClock<Duration>()
+  /// CONDUCTOR SIMPLIFICATION: the recorder process gets its own clock so that
+  /// `quiesce`'s run-to-idle on the shared clock doesn't spin forever on the
+  /// recorder's infinite periodic upload loop; both clocks (and the date) are
+  /// advanced together by `advanceTime`.
+  public let recorderClock = TestClock<Duration>()
   public let currentDate: LockIsolated<Date>
   public let deviceId: UUID
   public let filterInstalled: LockIsolated<Bool>
@@ -32,6 +38,7 @@ public final class VirtualDevice {
   public private(set) var filter: FilterProcess?
   public private(set) var controller: ControllerProcess?
   public private(set) var app: AppProcess?
+  public private(set) var recorder: RecorderProcess?
 
   private let pendingRulesChanged = LockIsolated<[RulesChangedTrigger]>([])
 
@@ -145,21 +152,26 @@ public extension VirtualDevice {
     case .app:
       await self.app?.osKill()
       self.app = nil
+    case .recorder:
+      self.recorder?.osKill()
+      self.recorder = nil
     }
   }
 
   /// OS RULE R6 (reboot): after a device restart the system relaunches both
   /// providers of an enabled filter configuration on its own schedule. The host
-  /// app never relaunches automatically. Device-verified 2026-07-03: the OS
-  /// spawns both provider processes (init) before starting either; the START
-  /// order is the indeterminate part the `order` parameter exercises. Scenarios
-  /// should be run with both start orders. NOTE: across 6 observed launches
-  /// (2 onboarding + 4 reboots) the filter (data provider) has ALWAYS
-  /// initialized first (160-574ms before the controller), never controller-
-  /// first — the "indeterminate" claim is unverified and may be deterministically
-  /// filter-first. Both orders are still tested conservatively.
+  /// app never relaunches automatically. A live broadcast dies with the reboot
+  /// and the recorder extension is never relaunched by the system (see OS RULE
+  /// R10). Device-verified 2026-07-03: the OS spawns both provider processes
+  /// (init) before starting either; the START order is the indeterminate part
+  /// the `order` parameter exercises. Scenarios should be run with both start
+  /// orders. NOTE: across 6 observed launches (2 onboarding + 4 reboots) the
+  /// filter (data provider) has ALWAYS initialized first (160-574ms before the
+  /// controller), never controller-first — the "indeterminate" claim is
+  /// unverified and may be deterministically filter-first. Both orders are
+  /// still tested conservatively.
   func reboot(order: [SimTarget] = [.filter, .controller]) async {
-    for target in [SimTarget.app, .controller, .filter] where self.isRunning(target) {
+    for target in [SimTarget.app, .recorder, .controller, .filter] where self.isRunning(target) {
       await self.kill(target)
     }
     self.trace.withValue { $0.append(.rebooted) }
@@ -170,6 +182,7 @@ public extension VirtualDevice {
       case .filter: self.startFilterProcess()
       case .controller: self.startControllerProcess()
       case .app: await self.launchApp()
+      case .recorder: break
       }
     }
   }
@@ -179,7 +192,68 @@ public extension VirtualDevice {
     case .filter: self.filter != nil
     case .controller: self.controller != nil
     case .app: self.app != nil
+    case .recorder: self.recorder != nil
     }
+  }
+}
+
+// broadcast (screen recording) lifecycle
+
+public extension VirtualDevice {
+  /// OS RULE R10 (broadcast lifecycle): when the user confirms Gertrude's
+  /// recorder in the system broadcast picker, the system launches the recorder
+  /// extension process and calls `broadcastStarted`, then delivers video sample
+  /// buffers continuously (many per second) while the recording is live;
+  /// stopping the recording calls `broadcastFinished` but the process may
+  /// linger briefly afterward. The extension runs under a strict ~50MB memory
+  /// limit and can be killed by the system at any moment; a reboot always kills
+  /// it, and the system never relaunches it on its own. Evidence: Apple
+  /// RPBroadcastSampleHandler docs + on-device observation during the 2025
+  /// recording experiment (`bak-swift` branch `chris`).
+  @discardableResult
+  func startBroadcast() async -> RecorderProcess {
+    let process = RecorderProcess(dependencies: self.dependencies(for: .recorder))
+    self.recorder = process
+    self.trace.withValue { $0.append(.launched(.recorder)) }
+    self.trace.withValue { $0.append(.broadcastStarted) }
+    process.osBroadcastStarted()
+    await self.quiesce()
+    return process
+  }
+
+  /// OS RULE R10: one video sample buffer reaching `processSampleBuffer`;
+  /// `changed: false` models a buffer whose pixels are (nearly) identical to
+  /// the previous processed frame.
+  func deliverSample(changed: Bool = true) async {
+    guard let recorder = self.recorder, recorder.isBroadcasting else { return }
+    recorder.osDeliverSample(changed: changed)
+    if let error = recorder.broadcastErrors.first {
+      self.trace.withValue { $0.append(.broadcastErrored(error)) }
+      await self.stopBroadcast()
+    }
+  }
+
+  /// Models the passage of recording time: every 5 sim-seconds the throttle
+  /// admits one sample buffer for processing.
+  func record(seconds: Int, changed: Bool = true) async {
+    var remaining = seconds
+    while remaining > 0 {
+      await self.deliverSample(changed: changed)
+      let step = min(5, remaining)
+      await self.advanceTime(seconds: step)
+      remaining -= step
+    }
+    await self.quiesce()
+  }
+
+  /// User (or system) ends the recording: `broadcastFinished` runs, the
+  /// recorder drains any pending uploads, then the process exits.
+  func stopBroadcast() async {
+    guard let recorder = self.recorder else { return }
+    self.trace.withValue { $0.append(.broadcastFinished) }
+    recorder.osBroadcastFinished()
+    await self.quiesce()
+    await self.kill(.recorder)
   }
 }
 
@@ -244,24 +318,30 @@ public extension VirtualDevice {
   }
 
   /// OS RULE R7 (sentinel channel): `FilterClient.send` fires a real HTTPS request
-  /// to a magic hostname from the app process; it reaches the filter as an
-  /// ordinary socket flow, subject to the same delivery rules as any flow.
-  /// SIMPLIFICATION: modeled as one send → one flow. Device-verified 2026-07-03
-  /// (collect campaign `witnesses-20260703-142112.ndjson`): each single send
-  /// produced 6-8 `filter-sentinel` flow deliveries (one HTTPS request fans out
-  /// into multiple flows — retries/connection attempts). Harmless for rule
+  /// to a magic hostname from the app (or recorder) process; it reaches the
+  /// filter as an ordinary socket flow, subject to the same delivery rules as
+  /// any flow, and carrying the sending process's bundle id. SIMPLIFICATION:
+  /// modeled as one send → one flow. Device-verified 2026-07-03 (collect
+  /// campaign `witnesses-20260703-142112.ndjson`): each single send produced
+  /// 6-8 `filter-sentinel` flow deliveries (one HTTPS request fans out into
+  /// multiple flows — retries/connection attempts). Harmless for rule
   /// semantics (sentinel handling is idempotent per notification kind); the
   /// fan-out is not modeled.
-  func deliverSentinel(_ notification: FilterClient.Notification) async {
+  func deliverSentinel(
+    _ notification: FilterClient.Notification,
+    from bundleId: String = .gertrudeBundleIdShort,
+  ) async {
     self.trace.withValue { $0.append(.sentinelSent(notification)) }
     let hostname = switch notification {
     case .rulesChanged: MagicStrings.readRulesSentinalHostname
     case .refreshRules: MagicStrings.refreshRulesSentinalHostname
     case .dumpLogs: MagicStrings.dumpLogsSentinalHostname
+    case .suspendFilter: MagicStrings.suspendFilterSentinalHostname
+    case .resumeFilter: MagicStrings.resumeFilterSentinalHostname
     }
     await self.flow(FilterFlow(
       hostname: hostname,
-      bundleId: .gertrudeBundleIdShort,
+      bundleId: bundleId,
       flowType: .socket,
     ))
   }
@@ -304,13 +384,24 @@ public extension VirtualDevice {
     if needController { self.startControllerProcess() }
   }
 
+  /// Lets in-flight async work land without running the shared clock to idle;
+  /// use instead of `quiesce` while an unresolved periodic effect (like the
+  /// app's suspension-decision polling) is scheduled on the shared clock, which
+  /// would make `quiesce`'s run-to-idle spin forever.
+  func settle() async {
+    for _ in 0 ..< 10 {
+      await Task.megaYield()
+      self.drainRulesChanged()
+    }
+  }
+
   /// Drains all pending async work deterministically: unstructured tasks,
   /// queued OS deliveries, and every sleep scheduled on the shared test clock.
   func quiesce() async {
     for _ in 0 ..< 10 {
       await Task.megaYield()
       self.drainRulesChanged()
-      await self.clock.run()
+      await self.clock.run(timeout: .seconds(5))
     }
     if let task = self.controller?.startupTask {
       await task.value
@@ -328,8 +419,13 @@ public extension VirtualDevice {
   /// `Date`-based logic (debounce intervals) and `Clock`-based logic (sleeps)
   /// on one timeline.
   func advanceTime(minutes: Int) async {
-    self.currentDate.withValue { $0 += TimeInterval(minutes * 60) }
-    await self.clock.advance(by: .minutes(minutes))
+    await self.advanceTime(seconds: minutes * 60)
+  }
+
+  func advanceTime(seconds: Int) async {
+    self.currentDate.withValue { $0 += TimeInterval(seconds) }
+    await self.clock.advance(by: .seconds(seconds))
+    await self.recorderClock.advance(by: .seconds(seconds))
   }
 }
 
@@ -339,8 +435,10 @@ extension VirtualDevice {
   private func dependencies(for target: SimTarget) -> @Sendable (inout DependencyValues)
     -> Void {
     let clock = self.clock
+    let recorderClock = self.recorderClock
     let currentDate = self.currentDate
     let disk = self.disk
+    let screenshotDisk = self.screenshotDisk
     let trace = self.trace
     let deviceId = self.deviceId
     let filterInstalled = self.filterInstalled
@@ -351,6 +449,10 @@ extension VirtualDevice {
     let sendSentinel: @Sendable (FilterClient.Notification) async throws -> Void =
       { [weak self] notification in
         await self?.deliverSentinel(notification)
+      }
+    let sendRecorderSentinel: @Sendable (FilterClient.Notification) async throws -> Void =
+      { [weak self] notification in
+        await self?.deliverSentinel(notification, from: .gertrudeRecorderBundleIdShort)
       }
     let providersStarted: @Sendable () async -> Void = { [weak self] in
       await self?.osStartsProviders()
@@ -373,7 +475,15 @@ extension VirtualDevice {
 
       case .controller:
         deps.sharedStorage = .liveValue
+        deps.screenshotRepo = .inMemory(screenshotDisk)
         deps.device.deviceId = { deviceId }
+
+      case .recorder:
+        deps.continuousClock = recorderClock
+        deps.suspendingClock = recorderClock
+        deps.sharedStorage = .liveValue
+        deps.screenshotRepo = .inMemory(screenshotDisk)
+        deps.filter.send = sendRecorderSentinel
 
       case .app:
         deps.sharedStorage = .liveValue
@@ -422,6 +532,20 @@ public extension VirtualDevice {
       return nil
     }
     return try? JSONDecoder().decode(ProtectionMode.self, from: data)
+  }
+
+  var diskSuspensionExpiration: Date? {
+    guard case .date(let date) = self.disk.value[Key.suspensionExpiration.rawValue] else {
+      return nil
+    }
+    return date
+  }
+
+  /// Seeds the app-group disk with a suspension expiration, as the app would
+  /// write on receiving a parent's grant.
+  func seedSuspensionExpiration(secondsFromNow seconds: Int) {
+    let expiration = self.currentDate.value + TimeInterval(seconds)
+    self.disk.withValue { $0[Key.suspensionExpiration.rawValue] = .date(expiration) }
   }
 
   func logs(for target: SimTarget) -> [String] {

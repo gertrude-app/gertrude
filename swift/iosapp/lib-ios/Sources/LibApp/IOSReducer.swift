@@ -29,6 +29,10 @@ public struct IOSReducer {
   @ObservationIgnored
   let deps = Deps()
 
+  enum CancelId {
+    case suspensionDecisionPolling
+  }
+
   public init() {}
 
   public var body: some ReducerOf<Self> {
@@ -43,6 +47,8 @@ public struct IOSReducer {
       case .destination(.dismiss):
         if state.destination?.crossPromo != nil {
           self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
+        } else if state.destination?.requestSuspension != nil {
+          .cancel(id: CancelId.suspensionDecisionPolling)
         } else {
           .none
         }
@@ -77,6 +83,14 @@ public struct IOSReducer {
       return .none
 
     case .sheetDismissed:
+      return .none
+
+    case .requestSuspensionBtnTapped:
+      self.deps.log("request suspension tapped", "38e33a91")
+      guard state.screen == .running(state: .connected) else {
+        return .none
+      }
+      state.destination = .requestSuspension(.customizing)
       return .none
 
     case .infoBtnTapped:
@@ -1029,6 +1043,37 @@ public struct IOSReducer {
 
     case .appDidEnterBackground:
       return .none
+
+    case .receivedSuspensionUpdate(.pending):
+      return .none
+
+    case .receivedSuspensionUpdate(.denied(let comment)):
+      self.deps.log(action, "6fc2bebc")
+      if state.destination?.requestSuspension != nil {
+        state.destination = .requestSuspension(.denied(comment: comment))
+      }
+      return .none
+
+    case .receivedSuspensionUpdate(.notFound):
+      self.deps.log("filter suspension id not found", "ceec0d93")
+      return .none
+
+    case .receivedSuspensionUpdate(.accepted(let duration, let comment)):
+      self.deps.log(action, "22b6502f")
+      if state.destination?.requestSuspension != nil {
+        state.destination = .requestSuspension(.granted(duration: duration, comment: comment))
+      }
+      return .run { [deps = self.deps] _ in
+        deps.sharedStorage
+          .saveSuspensionExpiration(deps.now.addingTimeInterval(TimeInterval(duration.rawValue)))
+      }
+
+    case .suspensionRequestExpired:
+      self.deps.log(action, "808e2be1")
+      if state.destination?.requestSuspension == .waitingForDecision {
+        state.destination = .requestSuspension(.requestExpired)
+      }
+      return .none
     }
   }
 
@@ -1038,8 +1083,42 @@ public struct IOSReducer {
       self.closeCrossPromo(&state, event: .cta, ctaSlot: slot)
     case .crossPromo(.delegate(.dismissed)):
       self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
+    case .requestSuspension(.requestSucceeded(let id)):
+      self.pollSuspensionDecision(id: id)
+    case .requestSuspension(.endSuspensionTapped):
+      self.endSuspension(state: &state)
     default:
       .none
+    }
+  }
+
+  func pollSuspensionDecision(id: UUID) -> EffectOf<IOSReducer> {
+    .run { [deps = self.deps] send in
+      var count = 0
+      for await _ in deps.clock.timer(interval: .seconds(5)) {
+        count += 1
+        if count > 60 {
+          await send(.programmatic(.suspensionRequestExpired))
+          return
+        }
+        guard let decision = try? await deps.api.pollSuspensionDecision(id: id) else {
+          continue
+        }
+        await send(.programmatic(.receivedSuspensionUpdate(decision)))
+        if decision != .pending {
+          return
+        }
+      }
+    }
+    .cancellable(id: CancelId.suspensionDecisionPolling, cancelInFlight: true)
+  }
+
+  func endSuspension(state: inout State) -> EffectOf<IOSReducer> {
+    self.deps.log("suspension ended by user", "641df8b7")
+    state.destination = nil
+    return .run { [deps = self.deps] _ in
+      deps.sharedStorage.clearSuspensionExpiration()
+      try? await deps.filter.send(.resumeFilter)
     }
   }
 }

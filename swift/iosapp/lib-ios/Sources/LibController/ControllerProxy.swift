@@ -22,6 +22,7 @@ public final class ControllerProxy: Sendable {
     @Dependency(\.suspendingClock) var clock
     @Dependency(\.device) var device
     @Dependency(\.sharedStorage) var storage
+    @Dependency(\.screenshotRepo) var screenshotRepo
     @Dependency(\.date.now) var now
     @Dependency(\.calendar) var calendar
   }
@@ -104,6 +105,8 @@ public final class ControllerProxy: Sendable {
       self.lastRefresh.withValue { $0 = self.deps.now }
     }
 
+    await self.drainLeftoverScreenshots()
+
     if let conn {
       return await self.refreshConnectedRules(conn)
     } else if let deviceId = await self.deps.device.deviceId() {
@@ -112,6 +115,18 @@ public final class ControllerProxy: Sendable {
       self.deps.logger.log("no vendor id, skipping rule update")
       return false
     }
+  }
+
+  func drainLeftoverScreenshots() async {
+    let pending = self.deps.screenshotRepo.pendingCount()
+    guard pending > 0 else { return }
+    guard !RecordingSuspension.recordingIsLive(
+      lastScreenshot: self.deps.storage.loadScreenshotLastSaved(),
+      now: self.deps.now,
+    ) else { return }
+    self.deps.logger.log("draining \(pending) leftover screenshots")
+    Witness.screenshotsDrained.emit("count=\(pending)")
+    await uploadPendingScreenshots()
   }
 
   func refreshNormalRules(_ vendorId: UUID) async -> Bool {

@@ -25,6 +25,12 @@ public enum Witness: String, Sendable {
   case appInstalledFilter = "app-installed-filter"
   case appMigrated = "app-migrated"
   case appSentinelSent = "app-sentinel-sent"
+  case filterSuspended = "filter-suspended"
+  case filterResumed = "filter-resumed"
+  case recorderStart = "recorder-start"
+  case recorderStop = "recorder-stop"
+  case recorderScreenshotSaved = "recorder-screenshot-saved"
+  case screenshotsDrained = "screenshots-drained"
 
   @inline(__always)
   public func emit(_ detail: @autoclosure () -> String = "") {

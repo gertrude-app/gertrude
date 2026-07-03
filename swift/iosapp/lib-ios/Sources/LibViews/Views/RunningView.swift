@@ -75,6 +75,18 @@ struct RunningView: View {
 
         Spacer()
 
+        if self.store.screen == .running(state: .connected) {
+          Button(action: { self.store.send(.interactive(.requestSuspensionBtnTapped)) }) {
+            HStack(spacing: 6) {
+              Image(systemName: "pause.circle")
+                .font(.system(size: 14, weight: .regular))
+              Text("Ask to pause blocking")
+                .font(.system(size: 15, weight: .regular))
+            }
+          }
+          .padding(.bottom, 12)
+        }
+
         Button(action: { self.store.send(.interactive(.infoBtnTapped)) }) {
           HStack(spacing: 6) {
             Image(systemName: "gearshape")
