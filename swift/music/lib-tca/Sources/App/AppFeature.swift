@@ -6,7 +6,7 @@ import GertieTcaFeatures
 struct AppFeature: Sendable {
   @ObservableState
   struct State: Equatable {
-    var appUpdate = AppUpdateGateFeature.State()
+    var killSwitch = KillSwitchFeature.State()
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
     var setup = MusicSetupFeature.State()
@@ -14,7 +14,7 @@ struct AppFeature: Sendable {
   }
 
   enum Action: Equatable {
-    case appUpdate(AppUpdateGateFeature.Action)
+    case killSwitch(KillSwitchFeature.Action)
     case library(LibraryFeature.Action)
     case nowPlayingAlbumInfoTapped
     case nowPlayingPresentationChanged(Bool)
@@ -28,10 +28,10 @@ struct AppFeature: Sendable {
   @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
-    Scope(state: \.appUpdate, action: \.appUpdate) {
-      AppUpdateGateFeature(app: .music) {
+    Scope(state: \.killSwitch, action: \.killSwitch) {
+      KillSwitchFeature(app: .music) {
         guard let deviceId = await self.device.vendorId() else {
-          throw AppUpdateDeviceIdError.missingDeviceId
+          throw KillSwitchDeviceIdError.missingDeviceId
         }
         return deviceId
       }
@@ -63,7 +63,7 @@ struct AppFeature: Sendable {
         state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
         return .none
 
-      case .appUpdate:
+      case .killSwitch:
         return .none
 
       case .nowPlayingPresentationChanged(let isPresented):

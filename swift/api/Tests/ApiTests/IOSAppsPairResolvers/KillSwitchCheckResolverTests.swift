@@ -6,9 +6,9 @@ import XExpect
 
 @testable import Api
 
-final class AppUpdateCheckResolverTests: ApiTestCase, @unchecked Sendable {
+final class KillSwitchCheckResolverTests: ApiTestCase, @unchecked Sendable {
   func testReturnsStatusWithoutWritingInstallMetadata() async throws {
-    let input = AppUpdateCheckRequest(
+    let input = KillSwitchCheckRequest(
       app: .blocker,
       deviceId: UUID(11),
       appVersion: "1.8.0",
@@ -18,9 +18,9 @@ final class AppUpdateCheckResolverTests: ApiTestCase, @unchecked Sendable {
       locale: "en_US",
     )
 
-    let output = try await AppUpdateCheck.resolve(with: input, in: .mock)
+    let output = try await KillSwitchCheck.resolve(with: input, in: .mock)
 
-    let expected: AppUpdateStatus = .current(.init(nextCheckAfter: .reference + .hours(12)))
+    let expected: KillSwitchStatus = .current(.init(nextCheckAfter: .reference + .hours(12)))
     expect(output.status).toEqual(expected)
     let json = try output.json()
     expect(json.contains("\"nextCheckAfter\":\"2001-01-01T12:00:00Z\"")).toEqual(true)

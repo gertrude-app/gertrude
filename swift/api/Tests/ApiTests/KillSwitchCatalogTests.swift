@@ -6,9 +6,9 @@ import XExpect
 
 @testable import Api
 
-final class AppUpdateCatalogTests: XCTestCase {
+final class KillSwitchCatalogTests: XCTestCase {
   func testNoPolicyReturnsCurrent() {
-    let status = AppUpdateCatalog.resolve(
+    let status = KillSwitchCatalog.resolve(
       app: .blocker,
       device: self.device(appVersion: "1.2.3"),
       now: .reference,
@@ -19,7 +19,7 @@ final class AppUpdateCatalogTests: XCTestCase {
   }
 
   func testSuggestedPolicy() {
-    let status = AppUpdateCatalog.resolve(
+    let status = KillSwitchCatalog.resolve(
       app: .podcasts,
       device: self.device(appVersion: "1.2.9"),
       now: .reference,
@@ -46,7 +46,7 @@ final class AppUpdateCatalogTests: XCTestCase {
   }
 
   func testRequiredBeatsSuggested() {
-    let status = AppUpdateCatalog.resolve(
+    let status = KillSwitchCatalog.resolve(
       app: .music,
       device: self.device(appVersion: "1.1.0"),
       now: .reference,
@@ -76,7 +76,7 @@ final class AppUpdateCatalogTests: XCTestCase {
   }
 
   func testOtherAppPoliciesAreIgnored() {
-    let status = AppUpdateCatalog.resolve(
+    let status = KillSwitchCatalog.resolve(
       app: .blocker,
       device: self.device(appVersion: "1.0.0"),
       now: .reference,
@@ -86,7 +86,7 @@ final class AppUpdateCatalogTests: XCTestCase {
     expect(status).toEqual(.current(.init(nextCheckAfter: .reference + .hours(12))))
   }
 
-  private func device(appVersion: String) -> AppUpdateCatalog.Device {
+  private func device(appVersion: String) -> KillSwitchCatalog.Device {
     .init(
       deviceId: UUID(1),
       appVersion: appVersion,
@@ -104,7 +104,7 @@ final class AppUpdateCatalogTests: XCTestCase {
     latestVersion: String? = nil,
     minimumVersion: String? = nil,
     requiredOn: Date? = nil,
-  ) -> AppUpdateCatalog.Policy {
+  ) -> KillSwitchCatalog.Policy {
     .init(
       policyId: "policy",
       app: app,

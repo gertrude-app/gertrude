@@ -52,7 +52,7 @@ public struct MusicSetupView: View {
     case .appleMusicPermission:
       ButtonScreenView(
         text: "Gertrude Music needs permission to use Apple Music so approved albums can play.",
-        primary: .init("Allow Apple Music Access", animate: false, asyncAction: true) {
+        primary: .init("Continue", animate: false, asyncAction: true) {
           self.onEvent(.appleMusicPermissionTapped)
         },
         screenType: .music,

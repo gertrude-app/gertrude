@@ -11,19 +11,19 @@ import SwiftUI
 #endif
 
 @Reducer
-public struct AppUpdateGateFeature: Sendable {
+public struct KillSwitchFeature: Sendable {
   @ObservableState
   public struct State: Equatable {
     public var canPresentSuggested = true
     public var isChecking = false
-    public var required: AppUpdateDirective?
-    public var suggested: AppUpdateDirective?
+    public var required: KillSwitchDirective?
+    public var suggested: KillSwitchDirective?
 
     public init(
       canPresentSuggested: Bool = true,
       isChecking: Bool = false,
-      required: AppUpdateDirective? = nil,
-      suggested: AppUpdateDirective? = nil,
+      required: KillSwitchDirective? = nil,
+      suggested: KillSwitchDirective? = nil,
     ) {
       self.canPresentSuggested = canPresentSuggested
       self.isChecking = isChecking
@@ -35,10 +35,10 @@ public struct AppUpdateGateFeature: Sendable {
   public enum Action: Equatable {
     case appDidEnterForeground(suggestedPresentationEnabled: Bool)
     case checkFailed
-    case checkSucceeded(AppUpdateStatus)
+    case checkSucceeded(KillSwitchStatus)
     case suggestedDismissButtonTapped
     case suggestedPresentationAvailabilityChanged(Bool)
-    case updateButtonTapped(AppUpdateDirective)
+    case updateButtonTapped(KillSwitchDirective)
     case viewAppeared(suggestedPresentationEnabled: Bool)
   }
 
@@ -53,8 +53,8 @@ public struct AppUpdateGateFeature: Sendable {
     self.deviceId = deviceId
   }
 
-  @Dependency(\.appUpdateClient) var client
-  @Dependency(\.appUpdateStorage) var storage
+  @Dependency(\.killSwitchClient) var client
+  @Dependency(\.killSwitchStorage) var storage
   @Dependency(\.date.now) var now
   @Dependency(\.openURL) var openURL
 
@@ -165,8 +165,8 @@ public struct AppUpdateGateFeature: Sendable {
   }
 
   func canPresentSuggestion(
-    _ directive: AppUpdateDirective,
-    cache: AppUpdateCache? = nil,
+    _ directive: KillSwitchDirective,
+    cache: KillSwitchCache? = nil,
   ) -> Bool {
     let cache = cache ?? self.storage.load()
     guard cache?.dismissedSuggestedPolicyId == directive.policyId else { return true }
@@ -188,7 +188,7 @@ public struct AppUpdateGateFeature: Sendable {
     return true
   }
 
-  private func cacheMatchesCurrentBuild(_ cache: AppUpdateCache) -> Bool {
+  private func cacheMatchesCurrentBuild(_ cache: KillSwitchCache) -> Bool {
     let current = self.client.currentBuild()
     return cache.cachedRequiredAppVersion == current.version
       && cache.cachedRequiredBuild == current.build
@@ -199,11 +199,11 @@ public struct AppUpdateGateFeature: Sendable {
   static let defaultSuggestionReminderInterval: TimeInterval = 60 * 60 * 24 * 3
 }
 
-public enum AppUpdateDeviceIdError: Error, Equatable {
+public enum KillSwitchDeviceIdError: Error, Equatable {
   case missingDeviceId
 }
 
-public struct AppUpdateBuild: Equatable, Sendable {
+public struct KillSwitchBuild: Equatable, Sendable {
   public var version: String
   public var build: String?
 
@@ -213,20 +213,20 @@ public struct AppUpdateBuild: Equatable, Sendable {
   }
 }
 
-public struct AppUpdateClient: Sendable {
-  public var check: @Sendable (GertrudeIOSApp, UUID) async throws -> AppUpdateStatus
-  public var currentBuild: @Sendable () -> AppUpdateBuild
+public struct KillSwitchClient: Sendable {
+  public var check: @Sendable (GertrudeIOSApp, UUID) async throws -> KillSwitchStatus
+  public var currentBuild: @Sendable () -> KillSwitchBuild
 
   public init(
-    check: @escaping @Sendable (GertrudeIOSApp, UUID) async throws -> AppUpdateStatus,
-    currentBuild: @escaping @Sendable () -> AppUpdateBuild,
+    check: @escaping @Sendable (GertrudeIOSApp, UUID) async throws -> KillSwitchStatus,
+    currentBuild: @escaping @Sendable () -> KillSwitchBuild,
   ) {
     self.check = check
     self.currentBuild = currentBuild
   }
 }
 
-extension AppUpdateClient: TestDependencyKey {
+extension KillSwitchClient: TestDependencyKey {
   public static var testValue: Self {
     .init(
       check: { _, _ in .current() },
@@ -235,13 +235,13 @@ extension AppUpdateClient: TestDependencyKey {
   }
 }
 
-extension AppUpdateClient: DependencyKey {
+extension KillSwitchClient: DependencyKey {
   public static var liveValue: Self {
     .init(
       check: { app, deviceId in
         @Dependency(\.locale) var locale
         let iosVersion = await Self.iosVersion()
-        let request = AppUpdateCheckRequest(
+        let request = KillSwitchCheckRequest(
           app: app,
           deviceId: deviceId,
           appVersion: Self.appVersion,
@@ -251,7 +251,7 @@ extension AppUpdateClient: DependencyKey {
           locale: locale.identifier,
         )
         return try await Self.pairql
-          .call(AppUpdateCheck.self, .unauthed(.appUpdateCheck(request)))
+          .call(KillSwitchCheck.self, .unauthed(.killSwitchCheck(request)))
           .status
       },
       currentBuild: { .init(version: Self.appVersion, build: Self.buildNumber) },
@@ -260,17 +260,17 @@ extension AppUpdateClient: DependencyKey {
 }
 
 public extension DependencyValues {
-  var appUpdateClient: AppUpdateClient {
-    get { self[AppUpdateClient.self] }
-    set { self[AppUpdateClient.self] = newValue }
+  var killSwitchClient: KillSwitchClient {
+    get { self[KillSwitchClient.self] }
+    set { self[KillSwitchClient.self] = newValue }
   }
 }
 
-public struct AppUpdateCache: Codable, Equatable, Sendable {
+public struct KillSwitchCache: Codable, Equatable, Sendable {
   public var lastCheckedAt: Date?
   public var nextCheckAfter: Date?
-  public var lastStatus: AppUpdateStatus?
-  public var cachedRequired: AppUpdateDirective?
+  public var lastStatus: KillSwitchStatus?
+  public var cachedRequired: KillSwitchDirective?
   public var cachedRequiredAppVersion: String?
   public var cachedRequiredBuild: String?
   public var dismissedSuggestedPolicyId: String?
@@ -279,8 +279,8 @@ public struct AppUpdateCache: Codable, Equatable, Sendable {
   public init(
     lastCheckedAt: Date? = nil,
     nextCheckAfter: Date? = nil,
-    lastStatus: AppUpdateStatus? = nil,
-    cachedRequired: AppUpdateDirective? = nil,
+    lastStatus: KillSwitchStatus? = nil,
+    cachedRequired: KillSwitchDirective? = nil,
     cachedRequiredAppVersion: String? = nil,
     cachedRequiredBuild: String? = nil,
     dismissedSuggestedPolicyId: String? = nil,
@@ -303,32 +303,32 @@ public struct AppUpdateCache: Codable, Equatable, Sendable {
   }
 }
 
-public struct AppUpdateStorage: Sendable {
-  public var load: @Sendable () -> AppUpdateCache?
-  public var save: @Sendable (AppUpdateCache) -> Void
+public struct KillSwitchStorage: Sendable {
+  public var load: @Sendable () -> KillSwitchCache?
+  public var save: @Sendable (KillSwitchCache) -> Void
 
   public init(
-    load: @escaping @Sendable () -> AppUpdateCache?,
-    save: @escaping @Sendable (AppUpdateCache) -> Void,
+    load: @escaping @Sendable () -> KillSwitchCache?,
+    save: @escaping @Sendable (KillSwitchCache) -> Void,
   ) {
     self.load = load
     self.save = save
   }
 }
 
-extension AppUpdateStorage: TestDependencyKey {
+extension KillSwitchStorage: TestDependencyKey {
   public static var testValue: Self {
     .init(load: { nil }, save: { _ in })
   }
 }
 
-extension AppUpdateStorage: DependencyKey {
+extension KillSwitchStorage: DependencyKey {
   public static var liveValue: Self {
     let box = UserDefaultsBox(defaults: .standard)
     return .init(
       load: {
         guard let data = box.defaults.data(forKey: Self.key) else { return nil }
-        return try? JSONDecoder().decode(AppUpdateCache.self, from: data)
+        return try? JSONDecoder().decode(KillSwitchCache.self, from: data)
       },
       save: { cache in
         guard let data = try? JSONEncoder().encode(cache) else { return }
@@ -337,13 +337,13 @@ extension AppUpdateStorage: DependencyKey {
     )
   }
 
-  private static let key = "app-update-gate-cache-v1"
+  private static let key = "kill-switch-cache-v1"
 }
 
 public extension DependencyValues {
-  var appUpdateStorage: AppUpdateStorage {
-    get { self[AppUpdateStorage.self] }
-    set { self[AppUpdateStorage.self] = newValue }
+  var killSwitchStorage: KillSwitchStorage {
+    get { self[KillSwitchStorage.self] }
+    set { self[KillSwitchStorage.self] = newValue }
   }
 }
 
@@ -355,7 +355,7 @@ private final class UserDefaultsBox: @unchecked Sendable {
   }
 }
 
-private extension AppUpdateClient {
+private extension KillSwitchClient {
   static var apiBaseURL: URL {
     URL(
       string:

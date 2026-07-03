@@ -6,7 +6,7 @@ public enum GertrudeIOSApp: String, Codable, CaseIterable, Sendable {
   case podcasts
 }
 
-public struct AppUpdateCheckTiming: Codable, Equatable, Sendable {
+public struct KillSwitchCheckTiming: Codable, Equatable, Sendable {
   public var nextCheckAfter: Date?
 
   public init(nextCheckAfter: Date? = nil) {
@@ -14,13 +14,13 @@ public struct AppUpdateCheckTiming: Codable, Equatable, Sendable {
   }
 }
 
-public enum AppUpdateStatus: Codable, Equatable, Sendable {
-  case current(AppUpdateCheckTiming = .init())
-  case suggested(AppUpdateDirective)
-  case required(AppUpdateDirective)
+public enum KillSwitchStatus: Codable, Equatable, Sendable {
+  case current(KillSwitchCheckTiming = .init())
+  case suggested(KillSwitchDirective)
+  case required(KillSwitchDirective)
 }
 
-public struct AppUpdateCheckRequest: Codable, Equatable, Sendable {
+public struct KillSwitchCheckRequest: Codable, Equatable, Sendable {
   public var app: GertrudeIOSApp
   public var deviceId: UUID
   public var appVersion: String
@@ -48,15 +48,15 @@ public struct AppUpdateCheckRequest: Codable, Equatable, Sendable {
   }
 }
 
-public struct AppUpdateCheckResponse: Codable, Equatable, Sendable {
-  public var status: AppUpdateStatus
+public struct KillSwitchCheckResponse: Codable, Equatable, Sendable {
+  public var status: KillSwitchStatus
 
-  public init(status: AppUpdateStatus) {
+  public init(status: KillSwitchStatus) {
     self.status = status
   }
 }
 
-public struct AppUpdateDirective: Codable, Equatable, Identifiable, Sendable {
+public struct KillSwitchDirective: Codable, Equatable, Identifiable, Sendable {
   public var policyId: String
   public var latestVersion: String?
   public var minimumVersion: String?

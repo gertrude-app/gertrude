@@ -15,12 +15,12 @@ struct AppReducer: Sendable {
     var nowPlaying = NowPlayingFeature.State()
     @Shared(.appInForeground) var appInForeground
     @Presents var alert: AlertState<AlertAction>?
-    var appUpdate = AppUpdateGateFeature.State()
+    var killSwitch = KillSwitchFeature.State()
     @Presents var crossPromo: CrossPromoFeature.State?
     var crossPromos = CrossPromos.Output(promos: [])
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
 
-    var canPresentSuggestedAppUpdate: Bool {
+    var canPresentSuggestedKillSwitch: Bool {
       if case .some(.podcasts) = self.mode { true } else { false }
     }
   }
@@ -34,7 +34,7 @@ struct AppReducer: Sendable {
   enum Action: Equatable {
     case appDidLaunch
     case appInForegroundChanged(Bool)
-    case appUpdate(AppUpdateGateFeature.Action)
+    case killSwitch(KillSwitchFeature.Action)
     case crossPromo(PresentationAction<CrossPromoFeature.Action>)
     case receivedCrossPromos(CrossPromos.Output)
     case nowPlaying(NowPlayingFeature.Action)
@@ -87,11 +87,11 @@ struct AppReducer: Sendable {
   @Dependency(\.locale) var locale
 
   var body: some Reducer<State, Action> {
-    Scope(state: \.appUpdate, action: \.appUpdate) {
-      AppUpdateGateFeature(app: .podcasts) {
+    Scope(state: \.killSwitch, action: \.killSwitch) {
+      KillSwitchFeature(app: .podcasts) {
         await self.ensureDeviceId()
         guard let deviceId = self.keychain.loadDeviceId() else {
-          throw AppUpdateDeviceIdError.missingDeviceId
+          throw KillSwitchDeviceIdError.missingDeviceId
         }
         return deviceId
       }
@@ -142,7 +142,7 @@ struct AppReducer: Sendable {
             self.cleanupTasks()
           },
         )
-      case .appUpdate:
+      case .killSwitch:
         return .none
       case .receivedCrossPromos(let crossPromos):
         let dropped = crossPromos.promos.filter { !$0.hasGuaranteedExit }

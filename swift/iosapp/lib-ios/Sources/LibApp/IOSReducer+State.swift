@@ -17,7 +17,7 @@ extension IOSReducer {
   public struct State: Equatable {
     public var screen: Screen = .launching
     public var allBlockGroups: [GetBlockGroups.BlockGroupInfo] = []
-    public var appUpdate = AppUpdateGateFeature.State()
+    public var killSwitch = KillSwitchFeature.State()
     public var disabledBlockGroupIds: [UUID] = []
     public var onboarding: OnboardingState = .init()
     public var crossPromos: CrossPromos.Output = .init(promos: [])

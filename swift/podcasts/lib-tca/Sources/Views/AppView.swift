@@ -58,9 +58,9 @@ struct AppView: View {
     }
     .environment(\.miniNowPlayingVisible, self.miniNowPlayingVisible)
     .environment(\.lang, Lang(locale: self.locale))
-    .appUpdateGate(
-      store: self.store.scope(state: \.appUpdate, action: \.appUpdate),
-      suggestedUpdatesEnabled: self.store.canPresentSuggestedAppUpdate,
+    .killSwitch(
+      store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
+      suggestedUpdatesEnabled: self.store.canPresentSuggestedKillSwitch,
     )
   }
 
