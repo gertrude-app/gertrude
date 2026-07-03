@@ -150,8 +150,6 @@ check:
   @SWIFT_WARNINGS_AS_ERRORS=1 just macapp xcode-build
   @SWIFT_WARNINGS_AS_ERRORS=1 just iosapp-xcode-build
   @SWIFT_WARNINGS_AS_ERRORS=1 just test
-  @cd podcasts && SWIFT_WARNINGS_AS_ERRORS=1 just check
-  @cd music && SWIFT_WARNINGS_AS_ERRORS=1 just check
   @just lint
 
 nx-reset:

@@ -1,0 +1,11 @@
+{
+  "name": "pairql-music",
+  "root": "pairql-music",
+  "projectType": "library",
+  "implicitDependencies": ["pairql"],
+  "targets": {
+    "build": {
+      "command": "cd pairql-music && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    }
+  }
+}

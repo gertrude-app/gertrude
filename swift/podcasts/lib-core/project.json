@@ -1,0 +1,10 @@
+{
+  "name": "podcasts-lib-core",
+  "root": "podcasts/lib-core",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "cd podcasts/lib-core && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    }
+  }
+}
