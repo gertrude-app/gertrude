@@ -24,7 +24,7 @@ const SizesExample: React.FC = () => {
           open={openSize === size}
           onOpenChange={(open) => setOpenSize(open ? size : null)}
           size={size}
-          title={`${size[0].toUpperCase()}${size.slice(1)} modal`}
+          title={`${size.charAt(0).toUpperCase()}${size.slice(1)} modal`}
           description="The same component switches from dialog to drawer automatically on narrow screens."
           footer={
             <Button type="button" variant="primary" onClick={() => setOpenSize(null)}>

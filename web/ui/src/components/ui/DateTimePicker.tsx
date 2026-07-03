@@ -231,7 +231,12 @@ const DateTimePicker: React.FC<Props> = (props) => {
   const setTime = (time: string): void => {
     const [hours, minutes] = time.split(`:`).map(Number);
 
-    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+    if (
+      hours === undefined ||
+      minutes === undefined ||
+      !Number.isFinite(hours) ||
+      !Number.isFinite(minutes)
+    ) {
       return;
     }
 

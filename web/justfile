@@ -33,6 +33,9 @@ hmr-blog:
 storybook:
   @PORT=${STORYBOOK_PORT:-6006} pnpm --filter @storybook/app start
 
+storybook-v2:
+  @PORT=${STORYBOOK_V2_PORT:-6007} pnpm --filter storybook-v2 start
+
 dev:
   pnpm concurrently \
   -n ds,st,sb \

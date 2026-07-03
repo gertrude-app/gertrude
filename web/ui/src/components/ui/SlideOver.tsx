@@ -163,7 +163,7 @@ const SlideOver: React.FC<SlideOverProps> = ({
                       <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
                     )}
                     {subheading && (
-                      <p className="mt-2 text-sm text-stone-600">{subheading}</p>
+                      <p className="mt-1 text-sm text-stone-600">{subheading}</p>
                     )}
                   </div>
                   <div

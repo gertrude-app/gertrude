@@ -33,13 +33,13 @@ const EmptyState: React.FC<Props> = ({
 }) => (
   <div
     className={cx(
-      `flex flex-col items-center rounded-xl bg-stone-50 py-6 bg-dots border border-stone-200`,
+      `flex flex-col items-center justify-center rounded-xl bg-stone-50 px-6 py-6 text-center bg-dots border border-stone-200`,
       className,
     )}
   >
     <Icon className="h-6 w-6 text-stone-600" />
     <span className="mt-2 font-medium text-stone-900">{title}</span>
-    <span className="mb-4 text-sm text-stone-500">{description}</span>
+    <span className={cx(`text-sm text-stone-500`, button && `mb-4`)}>{description}</span>
     {button &&
       (button.type === `link` ? (
         <Button

@@ -32,7 +32,6 @@ const RootComponent: React.FC = () => (
             icon={DiamondIcon}
             href="/components/dropdown-menu"
           />
-          <SidebarItem title="Form" icon={DiamondIcon} href="/components/form" />
           <SidebarItem title="Input" icon={DiamondIcon} href="/components/input" />
           <SidebarItem
             title="LoadingDots"

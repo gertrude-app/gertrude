@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
-import { ChevronDownIcon, LoaderCircleIcon, type LucideIcon } from 'lucide-react';
+import { ChevronDownIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
+import LoadingDots from './LoadingDots';
 import DropdownMenu from './dropdown-menu/DropdownMenu';
 import DropdownMenuItem, {
   type DropdownMenuItemIcon,
@@ -162,6 +163,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
     'w-4': hasLabel && (props.size === `medium` || props.size === undefined),
     'w-4.5': hasLabel && props.size === `large`,
   });
+  const loadingSlotWidthClasses = `w-5`;
   const iconSlotGapClasses = cx({
     'mr-1.25': hasLabel && iconPosition === `left` && props.size === `small`,
     'mr-2':
@@ -218,13 +220,17 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
 
     const Icon = props.icon;
     const slotOpen = !!props.icon || loaderSlotOpen;
+    const slotWidthClasses = props.loading
+      ? loadingSlotWidthClasses
+      : iconSlotWidthClasses;
+    const loadingDotsVariant = props.variant === `primary` ? `inverted` : `default`;
 
     return (
       <span
         className={cx(
           `relative inline-flex shrink-0 items-center justify-center overflow-hidden transition-[width,margin,opacity,filter] duration-[400ms] ease-out`,
           iconSlotSizeClasses,
-          slotOpen ? iconSlotWidthClasses : `w-0 opacity-0 blur-[1px]`,
+          slotOpen ? slotWidthClasses : `w-0 opacity-0 blur-[1px]`,
           slotOpen && iconSlotGapClasses,
         )}
       >
@@ -241,15 +247,16 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
             aria-hidden="true"
           />
         )}
-        <LoaderCircleIcon
+        <LoadingDots
+          size="xsmall"
+          variant={loadingDotsVariant}
+          ariaHidden
           className={cx(
-            `absolute animate-spin transition-[opacity,transform,filter] duration-[400ms] ease-out`,
-            iconClasses,
+            `absolute transition-[opacity,transform,filter] duration-[400ms] ease-out`,
             props.loading
               ? `scale-100 opacity-100 blur-none`
               : `scale-0 opacity-0 blur-[1px]`,
           )}
-          aria-hidden="true"
         />
       </span>
     );

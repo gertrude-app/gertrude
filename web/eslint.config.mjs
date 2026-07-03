@@ -279,6 +279,12 @@ export default defineConfig([
     },
   },
   {
+    files: [`**/*.stories.ts`, `**/*.stories.tsx`],
+    rules: {
+      '@stylistic/quotes': `off`,
+    },
+  },
+  {
     files: [`**/*.stories.tsx`, `**/cypress/**/*.cy.ts`],
     rules: {
       '@typescript-eslint/explicit-module-boundary-types': `off`,

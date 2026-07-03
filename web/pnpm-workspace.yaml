@@ -5,6 +5,7 @@ packages:
   - site
   - shared/*
   - storybook
+  - storybook-v2
   - smoke
   - admin
   - supervise
