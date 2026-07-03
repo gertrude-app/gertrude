@@ -5,19 +5,19 @@ import GertieApp
 import GertieTcaFeatures
 import Testing
 
-@MainActor struct AppUpdateGateFeatureTests {
+@MainActor struct KillSwitchFeatureTests {
   @Test func `view appeared fetches and presents a required update`() async {
-    let saved = LockIsolated<AppUpdateCache?>(nil)
+    let saved = LockIsolated<KillSwitchCache?>(nil)
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateClient.check = { _, _ in .required(requiredDirective) }
-      $0.appUpdateStorage = .init(
+      $0.killSwitchClient.check = { _, _ in .required(requiredDirective) }
+      $0.killSwitchStorage = .init(
         load: { saved.value },
         save: { saved.setValue($0) },
       )
     } operation: {
-      let store = TestStore(initialState: AppUpdateGateFeature.State()) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+      let store = TestStore(initialState: KillSwitchFeature.State()) {
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.viewAppeared(suggestedPresentationEnabled: true)) {
@@ -34,22 +34,22 @@ import Testing
 
   @Test func `next check after suppresses launch fetch`() async {
     let called = LockIsolated(false)
-    let saved = LockIsolated<AppUpdateCache?>(.init(
+    let saved = LockIsolated<KillSwitchCache?>(.init(
       nextCheckAfter: referenceDate.addingTimeInterval(60),
     ))
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateClient.check = { _, _ in
+      $0.killSwitchClient.check = { _, _ in
         called.setValue(true)
         return .required(requiredDirective)
       }
-      $0.appUpdateStorage = .init(
+      $0.killSwitchStorage = .init(
         load: { saved.value },
         save: { saved.setValue($0) },
       )
     } operation: {
-      let store = TestStore(initialState: AppUpdateGateFeature.State()) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+      let store = TestStore(initialState: KillSwitchFeature.State()) {
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.viewAppeared(suggestedPresentationEnabled: true))
@@ -59,17 +59,17 @@ import Testing
   }
 
   @Test func `suggested updates are fetched during onboarding but presented later`() async {
-    let saved = LockIsolated<AppUpdateCache?>(nil)
+    let saved = LockIsolated<KillSwitchCache?>(nil)
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateClient.check = { _, _ in .suggested(suggestedDirective) }
-      $0.appUpdateStorage = .init(
+      $0.killSwitchClient.check = { _, _ in .suggested(suggestedDirective) }
+      $0.killSwitchStorage = .init(
         load: { saved.value },
         save: { saved.setValue($0) },
       )
     } operation: {
-      let store = TestStore(initialState: AppUpdateGateFeature.State()) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+      let store = TestStore(initialState: KillSwitchFeature.State()) {
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.viewAppeared(suggestedPresentationEnabled: false)) {
@@ -87,19 +87,19 @@ import Testing
   }
 
   @Test func `foregrounding re-syncs the suggested gate and presents`() async {
-    let saved = LockIsolated<AppUpdateCache?>(nil)
+    let saved = LockIsolated<KillSwitchCache?>(nil)
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateClient.check = { _, _ in .suggested(suggestedDirective) }
-      $0.appUpdateStorage = .init(
+      $0.killSwitchClient.check = { _, _ in .suggested(suggestedDirective) }
+      $0.killSwitchStorage = .init(
         load: { saved.value },
         save: { saved.setValue($0) },
       )
     } operation: {
       let store = TestStore(
-        initialState: AppUpdateGateFeature.State(canPresentSuggested: false), // stale from launch
+        initialState: KillSwitchFeature.State(canPresentSuggested: false), // stale from launch
       ) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.appDidEnterForeground(suggestedPresentationEnabled: true)) {
@@ -115,7 +115,7 @@ import Testing
 
   @Test func `a matching cached required respects the throttle`() async {
     let checked = LockIsolated(false)
-    let saved = LockIsolated<AppUpdateCache?>(.init(
+    let saved = LockIsolated<KillSwitchCache?>(.init(
       nextCheckAfter: referenceDate.addingTimeInterval(60 * 60), // 1h out, suppresses the check
       cachedRequired: requiredDirective,
       cachedRequiredAppVersion: "1.0.0", // matches the test client's current build
@@ -123,14 +123,14 @@ import Testing
     ))
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateClient.check = { _, _ in
+      $0.killSwitchClient.check = { _, _ in
         checked.setValue(true)
         return .required(requiredDirective)
       }
-      $0.appUpdateStorage = .init(load: { saved.value }, save: { saved.setValue($0) })
+      $0.killSwitchStorage = .init(load: { saved.value }, save: { saved.setValue($0) })
     } operation: {
-      let store = TestStore(initialState: AppUpdateGateFeature.State()) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+      let store = TestStore(initialState: KillSwitchFeature.State()) {
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.appDidEnterForeground(suggestedPresentationEnabled: true)) {
@@ -143,7 +143,7 @@ import Testing
 
   @Test func `a required cached under a different build is discarded`() async {
     let checked = LockIsolated(false)
-    let saved = LockIsolated<AppUpdateCache?>(.init(
+    let saved = LockIsolated<KillSwitchCache?>(.init(
       nextCheckAfter: referenceDate.addingTimeInterval(60 * 60),
       cachedRequired: requiredDirective,
       cachedRequiredAppVersion: "0.9.0", // stale: predates the running build ("1.0.0")
@@ -151,14 +151,14 @@ import Testing
     ))
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateClient.check = { _, _ in
+      $0.killSwitchClient.check = { _, _ in
         checked.setValue(true)
         return .current()
       }
-      $0.appUpdateStorage = .init(load: { saved.value }, save: { saved.setValue($0) })
+      $0.killSwitchStorage = .init(load: { saved.value }, save: { saved.setValue($0) })
     } operation: {
-      let store = TestStore(initialState: AppUpdateGateFeature.State()) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+      let store = TestStore(initialState: KillSwitchFeature.State()) {
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.appDidEnterForeground(suggestedPresentationEnabled: true)) {
@@ -174,18 +174,18 @@ import Testing
   }
 
   @Test func `dismissing a suggested update stores a reminder window`() async {
-    let saved = LockIsolated<AppUpdateCache?>(nil)
+    let saved = LockIsolated<KillSwitchCache?>(nil)
     await withDependencies {
       $0.date.now = referenceDate
-      $0.appUpdateStorage = .init(
+      $0.killSwitchStorage = .init(
         load: { saved.value },
         save: { saved.setValue($0) },
       )
     } operation: {
-      let store = TestStore(initialState: AppUpdateGateFeature.State(
+      let store = TestStore(initialState: KillSwitchFeature.State(
         suggested: suggestedDirective,
       )) {
-        AppUpdateGateFeature(app: .blocker, deviceId: { UUID(1) })
+        KillSwitchFeature(app: .blocker, deviceId: { UUID(1) })
       }
 
       await store.send(.suggestedDismissButtonTapped) {
@@ -198,7 +198,7 @@ import Testing
   }
 }
 
-private let requiredDirective = AppUpdateDirective(
+private let requiredDirective = KillSwitchDirective(
   policyId: "required",
   latestVersion: "2.0.0",
   minimumVersion: "1.5.0",
@@ -208,7 +208,7 @@ private let requiredDirective = AppUpdateDirective(
   nextCheckAfter: referenceDate.addingTimeInterval(60 * 60 * 12),
 )
 
-private let suggestedDirective = AppUpdateDirective(
+private let suggestedDirective = KillSwitchDirective(
   policyId: "suggested",
   latestVersion: "2.0.0",
   title: "Update available",

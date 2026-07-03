@@ -52,7 +52,7 @@ Each client type has its own package defining available operations:
 
 #### `pairql-ios-apps/` - Shared iOS App Routes
 
-- **UnauthedRoute:** `AppUpdateCheck`
+- **UnauthedRoute:** `KillSwitchCheck`
 - Domain: `ios-apps`
 
 #### `pairql-podcasts/` - Podcast Application Routes

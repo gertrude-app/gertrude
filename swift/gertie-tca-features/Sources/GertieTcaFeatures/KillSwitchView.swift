@@ -2,13 +2,13 @@ import ComposableArchitecture
 import GertieApp
 import SwiftUI
 
-public struct AppUpdateGateModifier: ViewModifier {
-  @Bindable var store: StoreOf<AppUpdateGateFeature>
+public struct KillSwitchModifier: ViewModifier {
+  @Bindable var store: StoreOf<KillSwitchFeature>
   @Environment(\.scenePhase) var scenePhase
   let suggestedUpdatesEnabled: Bool
 
   public init(
-    store: StoreOf<AppUpdateGateFeature>,
+    store: StoreOf<KillSwitchFeature>,
     suggestedUpdatesEnabled: Bool = true,
   ) {
     self.store = store
@@ -31,7 +31,7 @@ public struct AppUpdateGateModifier: ViewModifier {
       }
     #if os(iOS)
       .fullScreenCover(item: self.requiredBinding) { directive in
-        AppUpdatePromptView(
+        KillSwitchPromptView(
           directive: directive,
           isRequired: true,
           onUpdate: { self.store.send(.updateButtonTapped(directive)) },
@@ -41,7 +41,7 @@ public struct AppUpdateGateModifier: ViewModifier {
       }
     #else
       .sheet(item: self.requiredBinding) { directive in
-          AppUpdatePromptView(
+          KillSwitchPromptView(
             directive: directive,
             isRequired: true,
             onUpdate: { self.store.send(.updateButtonTapped(directive)) },
@@ -51,7 +51,7 @@ public struct AppUpdateGateModifier: ViewModifier {
         }
     #endif
         .sheet(item: self.suggestedBinding) { directive in
-          AppUpdatePromptView(
+          KillSwitchPromptView(
             directive: directive,
             isRequired: false,
             onUpdate: { self.store.send(.updateButtonTapped(directive)) },
@@ -64,11 +64,11 @@ public struct AppUpdateGateModifier: ViewModifier {
         }
   }
 
-  private var requiredBinding: Binding<AppUpdateDirective?> {
+  private var requiredBinding: Binding<KillSwitchDirective?> {
     Binding(get: { self.store.required }, set: { _ in })
   }
 
-  private var suggestedBinding: Binding<AppUpdateDirective?> {
+  private var suggestedBinding: Binding<KillSwitchDirective?> {
     Binding(
       get: { self.store.required == nil ? self.store.suggested : nil },
       set: { newValue in
@@ -79,20 +79,20 @@ public struct AppUpdateGateModifier: ViewModifier {
 }
 
 public extension View {
-  func appUpdateGate(
-    store: StoreOf<AppUpdateGateFeature>,
+  func killSwitch(
+    store: StoreOf<KillSwitchFeature>,
     suggestedUpdatesEnabled: Bool = true,
   ) -> some View {
-    self.modifier(AppUpdateGateModifier(
+    self.modifier(KillSwitchModifier(
       store: store,
       suggestedUpdatesEnabled: suggestedUpdatesEnabled,
     ))
   }
 }
 
-struct AppUpdatePromptView: View {
+struct KillSwitchPromptView: View {
   @Environment(\.colorScheme) var scheme
-  let directive: AppUpdateDirective
+  let directive: KillSwitchDirective
   let isRequired: Bool
   let onUpdate: () -> Void
   let onDismiss: (() -> Void)?
@@ -193,7 +193,7 @@ private extension Color {
 }
 
 #if DEBUG
-  private extension AppUpdateDirective {
+  private extension KillSwitchDirective {
     static let previewRequired = Self(
       policyId: "preview-required",
       latestVersion: "2.4.0",
@@ -213,7 +213,7 @@ private extension Color {
     )
   }
 
-  private struct AppUpdatePreviewContent: View {
+  private struct KillSwitchPreviewContent: View {
     var body: some View {
       NavigationStack {
         List {
@@ -236,9 +236,9 @@ private extension Color {
     @State private var presented = true
 
     var body: some View {
-      AppUpdatePreviewContent()
+      KillSwitchPreviewContent()
         .sheet(isPresented: self.$presented) {
-          AppUpdatePromptView(
+          KillSwitchPromptView(
             directive: .previewSuggested,
             isRequired: false,
             onUpdate: {},
@@ -253,7 +253,7 @@ private extension Color {
   }
 
   #Preview("Required (full screen)") {
-    AppUpdatePromptView(
+    KillSwitchPromptView(
       directive: .previewRequired,
       isRequired: true,
       onUpdate: {},

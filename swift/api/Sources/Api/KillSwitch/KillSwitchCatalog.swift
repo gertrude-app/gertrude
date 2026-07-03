@@ -2,7 +2,7 @@ import Foundation
 import Gertie
 import GertieApp
 
-enum AppUpdateCatalog {
+enum KillSwitchCatalog {
   struct Device: Sendable {
     var deviceId: UUID
     var appVersion: String
@@ -62,7 +62,7 @@ enum AppUpdateCatalog {
     device: Device,
     now: Date,
     policies: [Policy] = Self.policies,
-  ) -> AppUpdateStatus {
+  ) -> KillSwitchStatus {
     guard let appVersion = Semver(device.appVersion) else {
       return .current(.init(nextCheckAfter: now + .hours(12)))
     }
@@ -83,7 +83,7 @@ enum AppUpdateCatalog {
     return .current(.init(nextCheckAfter: now + .hours(12)))
   }
 
-  private static func directive(_ policy: Policy, now: Date) -> AppUpdateDirective {
+  private static func directive(_ policy: Policy, now: Date) -> KillSwitchDirective {
     .init(
       policyId: policy.policyId,
       latestVersion: policy.latestVersion,

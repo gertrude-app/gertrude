@@ -7,17 +7,17 @@ extension IOSAppsRoute: RouteResponder {
     switch route {
     case .unauthed(let unauthed):
       switch unauthed {
-      case .appUpdateCheck(let input):
-        let output = try await AppUpdateCheck.resolve(with: input, in: context)
+      case .killSwitchCheck(let input):
+        let output = try await KillSwitchCheck.resolve(with: input, in: context)
         return try await self.respond(with: output)
       }
     }
   }
 }
 
-extension AppUpdateCheck: Resolver {
+extension KillSwitchCheck: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
-    AppUpdateCheckResponse(status: AppUpdateCatalog.resolve(
+    KillSwitchCheckResponse(status: KillSwitchCatalog.resolve(
       app: input.app,
       device: .init(
         deviceId: input.deviceId,

@@ -651,8 +651,8 @@ public struct AppView: View {
       CrossPromoView(store: store)
     }
     #endif
-    .appUpdateGate(
-      store: self.store.scope(state: \.appUpdate, action: \.appUpdate),
+    .killSwitch(
+      store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.screen.isRunning,
     )
   }

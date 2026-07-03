@@ -32,10 +32,10 @@ public struct IOSReducer: Sendable {
   public init() {}
 
   public var body: some ReducerOf<Self> {
-    Scope(state: \.appUpdate, action: \.appUpdate) {
-      AppUpdateGateFeature(app: .blocker) {
+    Scope(state: \.killSwitch, action: \.killSwitch) {
+      KillSwitchFeature(app: .blocker) {
         guard let deviceId = await self.deps.device.deviceId() else {
-          throw AppUpdateDeviceIdError.missingDeviceId
+          throw KillSwitchDeviceIdError.missingDeviceId
         }
         return deviceId
       }
@@ -46,7 +46,7 @@ public struct IOSReducer: Sendable {
         self.interactive(state: &state, action: interactiveAction)
       case .programmatic(let programmaticAction):
         self.programmatic(state: &state, action: programmaticAction)
-      case .appUpdate:
+      case .killSwitch:
         .none
       case .destination(.presented(let destinationAction)):
         self.destination(state: &state, action: destinationAction)
