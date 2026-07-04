@@ -111,3 +111,48 @@ whether the background-session chain sustains ~5s-cadence file drops; real darwi
 delivery latency to a suspended app across start/stop; whether `broadcastFinished` even
 runs when the recorder is memory-killed; BGAppRefreshTask grant frequency on a
 child-usage-profile device.
+
+## Device findings — hinge experiments, 2026-07-04
+
+One 28.6-min recording session (iPhone, iOS 18, DEBUG build, app backgrounded ~15s in,
+stopped from Control Center; capture `witnesses-20260704-121535.ndjson`, analysis
+`check.mjs --hinges`; instrumentation + method in `conformance/hinge-experiments.md`).
+Three questions were posed; all three answered decisively.
+
+**1. Liveness propagation (recorder write → filter read): PASS, exactly zero staleness.**
+325 recorder bumps, 215 filter flow-decision reads; in every single read the filter saw
+the freshest value the recorder had written (read-staleness p50/p99/max = 0ms). Shared
+`UserDefaults` via cfprefsd is effectively instantaneous cross-process. The 6s liveness
+window (5s cadence + 1s wiggle) is sound as a staleness bound; no widening needed.
+
+**2. App bg-URLSession upload chain: FAIL as primary evidence path.** 292 frames saved
+during the recording; the suspended app uploaded essentially none of them (2 bg-session
+wakes in the whole session, both *after* recording ended; max inter-upload gap 1733s ≈
+the entire recording). Backlog hit 291 files, drained only to 269 on app reopen (a 500
+from the API broke the drain loop, retries at +6 and +16 min each moved it barely).
+Evidence latency under app-owned uploads is unbounded — "whenever the app is next
+opened." The chain is a backstop, not a primary.
+
+**3. Controller-as-uploader (filter summons via needRules): PASS on every axis.** 26/26
+spike uploads succeeded end-to-end (presigned-URL fetch + 150KB PUT from inside the
+control provider), median 378ms, memory headroom flat at 44-45MB across the session (no
+leak; the NE budget is far larger than the assumed ~15MB), zero controller crashes.
+This is the primary evidence path going forward.
+
+**4. (Unplanned) The one-way suspension trapdoor — the session's biggest finding.** At
+4.5 min in, an 18s gap in liveness bumps (screen off/locked pauses ReplayKit buffer
+delivery entirely) coincided with a background flow: the filter's level-triggered check
+correctly saw stale evidence and ended the suspension — but nothing ever re-entered it.
+The kid spent the remaining 24 minutes recording *and blocked*, because suspension entry
+is edge-triggered (sentinel at broadcast start) while exit is level-triggered, and
+`rederived` runs only at filter relaunch. Meanwhile the controller — which re-derives
+suspension from disk on every flow it happens to receive — recovered automatically after
+every gap and kept uploading until 11:53. The asymmetry is the bug: entry must be
+level-triggered too (re-derive on flow decisions while the expiration key is live), with
+the sentinel kept only as the fast edge. Two more >10s bump gaps later in the session
+would have re-tripped the same trapdoor. This also retroactively resolves the "is
+re-suspension after filter relaunch intended?" question: yes — it is *required*.
+
+Consequences: upload vectors 1/2/3/5 above demote to backlog cleanup; vector 4 inverts
+from backstop to primary (summoned during recording, not just when recording is dead).
+Protocol spec capturing all of this: `docs/ios-recording-protocol.md`.
