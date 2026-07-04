@@ -43,6 +43,9 @@ web/smoke/cypress.env.json
 **/cypress/videos
 .playwright-mcp/
 
+# iOS conformance campaign captures (real device hostnames/activity)
+swift/iosapp/conformance/logs/
+
 # Generated Xcode projects
 swift/podcasts/GertiePodcasts.xcodeproj/
 swift/music/GertrudeMusic.xcodeproj/

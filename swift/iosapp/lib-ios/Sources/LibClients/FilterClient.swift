@@ -20,6 +20,7 @@ extension FilterClient: DependencyKey {
   public static var liveValue: FilterClient {
     FilterClient(
       send: { notification in
+        Witness.appSentinelSent.emit(String(describing: notification))
         switch notification {
         case .dumpLogs:
           await fireAndForget(

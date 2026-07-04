@@ -53,26 +53,54 @@ public final class VirtualDevice {
 // process lifecycle
 
 public extension VirtualDevice {
-  /// OS RULE R1 (extension launch): the system launches the data provider process
-  /// and immediately calls `startFilter` after init; the two calls are not
-  /// separated by other provider callbacks. Evidence: `[G•] FILTER init` /
-  /// `[G•] FILTER start` always adjacent in on-device os_log capture.
+  /// OS RULE R1 (extension launch): the system spawns the data provider process
+  /// (proxy constructed → `filter-proxy-init` witness) and calls `startFilter`
+  /// (`filter-start` witness). Device-verified 2026-07-03 (collect campaign
+  /// `witnesses-20260703-120635.ndjson`): on a JOINT launch (install/reboot) both
+  /// proxy-inits precede both *-start witnesses — the OS spawns both processes
+  /// first, then starts both (controller-init interleaves between filter-init
+  /// and filter-start). For on-demand single launches (a flow arrives with the
+  /// filter dead) init and start are adjacent for that one process, so
+  /// `launchFilter` bundles them; `osStartsProviders`/`reboot` use the split
+  /// `initFilter` + `startFilterProcess` to model the joint sequence.
   @discardableResult
   func launchFilter() -> FilterProcess {
-    let process = FilterProcess(dependencies: self.dependencies(for: .filter))
-    self.filter = process
-    self.trace.withValue { $0.append(.launched(.filter)) }
-    process.osStartFilter()
+    let process = self.initFilter()
+    self.startFilterProcess()
     return process
   }
 
-  /// OS RULE R2 (extension launch): same shape as the filter — init, then
-  /// `startFilter`. CONDUCTOR SIMPLIFICATION: the proxy's init-time migration
-  /// task is awaited before `startFilter` runs; on a real device the two
-  /// interleave nondeterministically. Revisit when exploring migration
-  /// interleavings specifically.
+  @discardableResult
+  func initFilter() -> FilterProcess {
+    let process = FilterProcess(dependencies: self.dependencies(for: .filter))
+    self.filter = process
+    self.trace.withValue { $0.append(.launched(.filter)) }
+    return process
+  }
+
+  func startFilterProcess() {
+    self.filter?.osStartFilter()
+  }
+
+  /// OS RULE R2 (extension launch): same spawn-then-start shape as the filter.
+  /// The controller proxy's init kicks off legacy-data migration as a
+  /// fire-and-forget Task (production code, `ControllerProxy.init`);
+  /// `startFilter` is called separately and does NOT await it — migration runs
+  /// concurrently with the startup refresh-rules loop. Device-verified
+  /// 2026-07-03: controller-init interleaves between filter-init and
+  /// filter-start on a joint launch. The sim previously serialized migration
+  /// before start (`awaitMigration()`); it no longer does — `quiesce` awaits
+  /// both the startup and migration tasks so assertions read a settled world
+  /// while the interleaving during the run is real.
   @discardableResult
   func launchController() async -> ControllerProcess {
+    let process = self.initController()
+    self.startControllerProcess()
+    return process
+  }
+
+  @discardableResult
+  func initController() -> ControllerProcess {
     let pending = self.pendingRulesChanged
     let process = ControllerProcess(
       dependencies: self.dependencies(for: .controller),
@@ -82,9 +110,11 @@ public extension VirtualDevice {
     )
     self.controller = process
     self.trace.withValue { $0.append(.launched(.controller)) }
-    await process.awaitMigration()
-    process.osStartFilter()
     return process
+  }
+
+  func startControllerProcess() {
+    self.controller?.osStartFilter()
   }
 
   /// The host app only ever launches when a user opens it; the OS never
@@ -119,18 +149,26 @@ public extension VirtualDevice {
   }
 
   /// OS RULE R6 (reboot): after a device restart the system relaunches both
-  /// providers of an enabled filter configuration on its own schedule, in an
-  /// order we cannot rely on; the host app never relaunches automatically.
-  /// Scenarios should be run with both orders.
+  /// providers of an enabled filter configuration on its own schedule. The host
+  /// app never relaunches automatically. Device-verified 2026-07-03: the OS
+  /// spawns both provider processes (init) before starting either; the START
+  /// order is the indeterminate part the `order` parameter exercises. Scenarios
+  /// should be run with both start orders. NOTE: across 6 observed launches
+  /// (2 onboarding + 4 reboots) the filter (data provider) has ALWAYS
+  /// initialized first (160-574ms before the controller), never controller-
+  /// first — the "indeterminate" claim is unverified and may be deterministically
+  /// filter-first. Both orders are still tested conservatively.
   func reboot(order: [SimTarget] = [.filter, .controller]) async {
     for target in [SimTarget.app, .controller, .filter] where self.isRunning(target) {
       await self.kill(target)
     }
     self.trace.withValue { $0.append(.rebooted) }
+    self.initFilter()
+    self.initController()
     for target in order {
       switch target {
-      case .filter: self.launchFilter()
-      case .controller: await self.launchController()
+      case .filter: self.startFilterProcess()
+      case .controller: self.startControllerProcess()
       case .app: await self.launchApp()
       }
     }
@@ -159,6 +197,12 @@ public extension VirtualDevice {
   /// and `withUpdateRules: true` causes the system to call the data provider's
   /// `handleRulesChanged()`. Evidence: Apple NEFilterProvider docs + the
   /// production convention documented in `ControllerProxy.handleNewFlow`.
+  /// SIMPLIFICATION: the sim models this as 1:1 (every needRules gets a
+  /// controller delivery). Device-verified 2026-07-03: 72/73 paired in a
+  /// 40-min session; the one miss was a 35ms burst of 4 needRules verdicts
+  /// where the OS coalesced them into a single controller delivery. This is
+  /// an OS-level flow-batching optimization, not a correctness issue — the
+  /// steady-state 1:1 model is correct and the burst edge is not modeled.
   @discardableResult
   func flow(_ flow: FilterFlow) async -> FlowVerdict {
     guard self.filterInstalled.value else {
@@ -202,6 +246,12 @@ public extension VirtualDevice {
   /// OS RULE R7 (sentinel channel): `FilterClient.send` fires a real HTTPS request
   /// to a magic hostname from the app process; it reaches the filter as an
   /// ordinary socket flow, subject to the same delivery rules as any flow.
+  /// SIMPLIFICATION: modeled as one send → one flow. Device-verified 2026-07-03
+  /// (collect campaign `witnesses-20260703-142112.ndjson`): each single send
+  /// produced 6-8 `filter-sentinel` flow deliveries (one HTTPS request fans out
+  /// into multiple flows — retries/connection attempts). Harmless for rule
+  /// semantics (sentinel handling is idempotent per notification kind); the
+  /// fan-out is not modeled.
   func deliverSentinel(_ notification: FilterClient.Notification) async {
     self.trace.withValue { $0.append(.sentinelSent(notification)) }
     let hostname = switch notification {
@@ -243,14 +293,15 @@ public extension VirtualDevice {
 
   /// OS RULE R8 (install): once the app successfully saves an enabled filter
   /// configuration (`saveToPreferences`), the system starts both providers
-  /// without further user interaction.
+  /// without further user interaction. Device-verified 2026-07-03: both
+  /// processes are spawned (init) before either is started.
   private func osStartsProviders() async {
-    if self.filter == nil {
-      self.launchFilter()
-    }
-    if self.controller == nil {
-      await self.launchController()
-    }
+    let needFilter = self.filter == nil
+    let needController = self.controller == nil
+    if needFilter { self.initFilter() }
+    if needController { self.initController() }
+    if needFilter { self.startFilterProcess() }
+    if needController { self.startControllerProcess() }
   }
 
   /// Drains all pending async work deterministically: unstructured tasks,
@@ -264,6 +315,7 @@ public extension VirtualDevice {
     if let task = self.controller?.startupTask {
       await task.value
     }
+    await self.controller?.awaitMigration()
     if let app = self.app {
       await app.store.finish()
       await app.store.skipReceivedActions(strict: false)

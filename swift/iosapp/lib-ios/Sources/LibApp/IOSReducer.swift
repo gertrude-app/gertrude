@@ -3,6 +3,7 @@ import Foundation
 import GertieTcaFeatures
 import IOSRoute
 import LibClients
+import LibCore
 import os.log
 
 @_exported import GertieBlocker
@@ -756,6 +757,7 @@ public struct IOSReducer {
           // controller proxy also tries to migrate, but we do it here as safeguard
           if await deps.sharedStorage.migrateLegacyData() {
             deps.log("migration performed by app", "5258e97c")
+            Witness.appMigrated.emit()
           }
 
           switch await deps.launchState() {

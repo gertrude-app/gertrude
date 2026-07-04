@@ -23,6 +23,8 @@ public enum Witness: String, Sendable {
   case controllerMigrated = "controller-migrated"
   case appAuthorized = "app-authorized"
   case appInstalledFilter = "app-installed-filter"
+  case appMigrated = "app-migrated"
+  case appSentinelSent = "app-sentinel-sent"
 
   @inline(__always)
   public func emit(_ detail: @autoclosure () -> String = "") {

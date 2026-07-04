@@ -39,9 +39,11 @@ function parseLine(line) {
       detail: m[2].trim(),
     };
   }
-  // idevicesyslog: `Jul  2 13:45:01 device process(Lib)[pid] <Notice>: message`
+  // idevicesyslog: `Jul  3 12:11:13.982465 filter(filter.debug.dylib)[pid] <Notice>: message`
+  // (no hostname field, fractional seconds; hostname made optional in case a future
+  // libimobiledevice version adds one back)
   const m = line.match(
-    /^(\w{3})\s+(\d+)\s+(\d\d:\d\d:\d\d)\s+\S+\s+([^([\s]+)(?:\([^)]*\))?\[(\d+)\].*?\[G•\] WITNESS (\S+) ?(.*)/,
+    /^(\w{3})\s+(\d+)\s+(\d\d:\d\d:\d\d)(?:\.\d+)?\s+(?:\S+\s+)?([^([\s]+)(?:\([^)]*\))?\[(\d+)\].*?\[G•\] WITNESS (\S+) ?(.*)/,
   );
   if (!m) return null;
   const [, mon, day, time, proc, pid, event, detail] = m;
@@ -130,10 +132,10 @@ checkPairs(
 
 checkPairs(
   `R7 sentinel channel`,
-  `app sentinel requests reach the filter as flows`,
-  of(`filter-sentinel`),
-  () => true,
-  0,
+  `app-sentinel-sent (real HTTPS round-trip) is followed by filter-sentinel receipt`,
+  of(`app-sentinel-sent`),
+  (e) => e.event === `filter-sentinel`,
+  10_000,
 );
 
 checkPairs(
@@ -142,6 +144,24 @@ checkPairs(
   of(`app-installed-filter`),
   (e) => e.event === `filter-proxy-init`,
   60_000,
+);
+
+checkPairs(
+  `R9 filter dies → relaunches`,
+  `filter-stop is eventually followed by a new filter-proxy-init (misses expected iff the stop was the session's last, e.g. user disabled protection)`,
+  of(`filter-stop`),
+  (e) => e.event === `filter-proxy-init`,
+  24 * 60 * 60 * 1000,
+  { informational: true },
+);
+
+checkPairs(
+  `R9 controller dies → relaunches`,
+  `controller-stop is eventually followed by a new controller-proxy-init (misses expected iff the stop was the session's last)`,
+  of(`controller-stop`),
+  (e) => e.event === `controller-proxy-init`,
+  24 * 60 * 60 * 1000,
+  { informational: true },
 );
 
 console.log(`\n${events.length} witness events, ${fmt(events[0].t)} → ${fmt(events.at(-1).t)}\n`);
@@ -160,6 +180,31 @@ for (const r of results) {
     console.log(`  ! unmatched at ${fmt(v.t)}  ${v.event} ${v.detail} [pid ${v.pid}]`);
   }
 }
+
+// R2 migration race: idempotent, so exactly one side should perform it PER update.
+// Both witnesses in one capture can be legitimate — the doc's provocation runs the
+// update race twice (both orders), and a delete+reinstall re-migrates — so only
+// cross-pairs close in time (both sides racing the same launch) count as violations;
+// occurrences far apart are separate migration events, each a valid exercise.
+const RACE_WINDOW = 5 * 60 * 1000;
+const appMigrated = of(`app-migrated`);
+const controllerMigrated = of(`controller-migrated`);
+const racingPairs = appMigrated.flatMap((a) =>
+  controllerMigrated
+    .filter((c) => Math.abs(c.t - a.t) <= RACE_WINDOW)
+    .map((c) => `${fmt(a.t)} (app) / ${fmt(c.t)} (controller)`),
+);
+const migrationVerdict = racingPairs.length > 0
+  ? `VIOLATED — both sides migrated within 5min: ${racingPairs.join(`, `)}`
+  : appMigrated.length + controllerMigrated.length === 0
+    ? `UNEXERCISED`
+    : `CONFIRMED — ` +
+      [
+        appMigrated.length ? `app x${appMigrated.length}` : ``,
+        controllerMigrated.length ? `controller x${controllerMigrated.length}` : ``,
+      ].filter(Boolean).join(`, `) + `, no cross-pair within 5min`;
+console.log(`R2 migration race (mutual exclusion)`.padEnd(28) + ` ${migrationVerdict}`);
+console.log(`  migration is idempotent — app and controller never both migrate the same update\n`);
 
 // R6 boot-order evidence: launch-event timeline, sessions split on >5min gaps
 const launches = events.filter((e) =>
