@@ -29,7 +29,10 @@ public struct ScreenshotData: Sendable, Equatable {
 @DependencyClient
 public struct ScreenshotRepoClient: Sendable {
   public var save: @Sendable (ScreenshotData) -> Bool = { _ in true }
-  public var nextUnprocessed: @Sendable () -> ScreenshotData? = { nil }
+  public var nextUnprocessed: @Sendable (_ excluding: Set<String>) -> ScreenshotData? = { _ in
+    nil
+  }
+
   public var markProcessed: @Sendable (_ id: String) -> Void
   public var pendingCount: @Sendable () -> Int = { 0 }
 }
@@ -68,7 +71,7 @@ extension ScreenshotRepoClient: DependencyKey {
         }
         return true
       },
-      nextUnprocessed: { nextUnprocessedFile(depth: 0) },
+      nextUnprocessed: { excluding in nextUnprocessedFile(excluding: excluding, depth: 0) },
       markProcessed: { filename in
         guard let dir = URL.screenshotsDir else { return }
         @Dependency(\.groupDefaults) var defaults
@@ -98,7 +101,7 @@ private func ensureDirExists(_ dir: URL) -> Bool {
   }
 }
 
-private func nextUnprocessedFile(depth: Int) -> ScreenshotData? {
+private func nextUnprocessedFile(excluding: Set<String>, depth: Int) -> ScreenshotData? {
   guard let dir = URL.screenshotsDir, depth < 50 else {
     return nil
   }
@@ -109,6 +112,7 @@ private func nextUnprocessedFile(depth: Int) -> ScreenshotData? {
   } catch {
     return nil
   }
+  files.removeAll { excluding.contains($0.lastPathComponent) }
   files.sort { $0.lastPathComponent < $1.lastPathComponent }
   guard let file = files.first else {
     return nil
@@ -121,7 +125,7 @@ private func nextUnprocessedFile(depth: Int) -> ScreenshotData? {
     os_log("[G•] failed to load screenshot data for file: %{public}s", file.path)
     try? fm.removeItem(at: file)
     defaults.remove(forKey: file.lastPathComponent)
-    return nextUnprocessedFile(depth: depth + 1)
+    return nextUnprocessedFile(excluding: excluding, depth: depth + 1)
   }
 
   return ScreenshotData(
@@ -144,8 +148,10 @@ public extension ScreenshotRepoClient {
         store.withValue { $0.append(screenshot) }
         return true
       },
-      nextUnprocessed: {
-        store.value.min { $0.createdAt < $1.createdAt }
+      nextUnprocessed: { excluding in
+        store.value
+          .filter { !excluding.contains($0.id) }
+          .min { $0.createdAt < $1.createdAt }
       },
       markProcessed: { id in
         store.withValue { $0.removeAll { $0.id == id } }
@@ -155,7 +161,9 @@ public extension ScreenshotRepoClient {
   }
 }
 
-@Sendable public func uploadPendingScreenshots() async {
+@Sendable public func uploadPendingScreenshots(
+  using transport: (@Sendable (ScreenshotData) async throws -> Void)? = nil,
+) async {
   @Dependency(\.sharedStorage) var storage
   @Dependency(\.api) var api
   @Dependency(\.screenshotRepo) var repo
@@ -165,17 +173,23 @@ public extension ScreenshotRepoClient {
     return
   }
   await api.setAccountConnection(connection)
+  let upload = transport ?? api.uploadScreenshot
+  Witness.screenshotDrain.emit("pending=\(repo.pendingCount())")
   var uploaded = 0
-  while let screenshot = repo.nextUnprocessed(), uploaded < 500 {
+  var failed: Set<String> = []
+  while failed.count < 3, uploaded < 500,
+        let screenshot = repo.nextUnprocessed(excluding: failed) {
     do {
-      try await api.uploadScreenshot(screenshot)
+      try await upload(screenshot)
       repo.markProcessed(id: screenshot.id)
       uploaded += 1
     } catch {
       logger.log("failed to upload screenshot: \(String(reflecting: error))")
-      break
+      failed.insert(screenshot.id)
     }
   }
+  Witness.screenshotDrainDone
+    .emit("uploaded=\(uploaded) failed=\(failed.count) pending=\(repo.pendingCount())")
 }
 
 public extension DependencyValues {

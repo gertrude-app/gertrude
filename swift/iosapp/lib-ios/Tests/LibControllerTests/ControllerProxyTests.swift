@@ -75,6 +75,8 @@ func setup(
       test.loadDisabledBlockGroupIdsCalls.withValue { $0 += 1 }
       return disabledBlockGroupIds
     }
+    $0.sharedStorage.loadSuspensionExpiration = { nil }
+    $0.sharedStorage.loadScreenshotLastSaved = { nil }
     $0.sharedStorage.loadProtectionMode = {
       test.loadProtectionModeCalls.withValue { $0 += 1 }
       return storedProtectionMode

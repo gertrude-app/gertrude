@@ -48,6 +48,8 @@ public struct ApiClient: Sendable {
     async throws -> PollFilterSuspensionDecision.Output
   public var uploadScreenshot: @Sendable (ScreenshotData)
     async throws -> Void
+  public var uploadScreenshotDirect: @Sendable (ScreenshotData)
+    async throws -> Void
 }
 
 extension ApiClient: TestDependencyKey {
@@ -269,6 +271,25 @@ extension ApiClient: DependencyKey {
           )),
         )
         try await ScreenshotUploader.shared.upload(screenshot, to: output.uploadUrl)
+      },
+      uploadScreenshotDirect: { screenshot in
+        let output = try await authed(
+          ScreenshotUploadUrl.self,
+          .screenshotUploadUrl(.init(
+            width: screenshot.width,
+            height: screenshot.height,
+            createdAt: screenshot.createdAt,
+          )),
+        )
+        var request = URLRequest(url: output.uploadUrl, cachePolicy: .reloadIgnoringCacheData)
+        request.httpMethod = "PUT"
+        request.addValue("public-read", forHTTPHeaderField: "x-amz-acl")
+        request.addValue("image/jpeg", forHTTPHeaderField: "Content-Type")
+        let (_, response) = try await URLSession.shared.upload(for: request, from: screenshot.data)
+        let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        guard status < 300 else {
+          throw Error.unexpectedError(statusCode: status)
+        }
       },
     )
   }

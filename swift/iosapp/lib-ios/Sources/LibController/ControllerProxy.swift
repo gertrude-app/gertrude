@@ -42,6 +42,8 @@ public final class ControllerProxy: Sendable {
     package let migrateTask = LockIsolated<Task<Void, Never>?>(nil)
   #endif
 
+  let evidenceDraining = LockIsolated(false)
+
   public init() {
     self.deps.logger.setPrefix("CONTROLLER PROXY")
     #if DEBUG
@@ -126,7 +128,7 @@ public final class ControllerProxy: Sendable {
     ) else { return }
     self.deps.logger.log("draining \(pending) leftover screenshots")
     Witness.screenshotsDrained.emit("count=\(pending)")
-    await uploadPendingScreenshots()
+    await uploadPendingScreenshots(using: self.deps.api.uploadScreenshotDirect)
   }
 
   func refreshNormalRules(_ vendorId: UUID) async -> Bool {
@@ -203,6 +205,19 @@ public final class ControllerProxy: Sendable {
     }
   }
 
+  func drainEvidence() {
+    let alreadyRunning = self.evidenceDraining.withValue { running in
+      if running { return true }
+      running = true
+      return false
+    }
+    guard !alreadyRunning else { return }
+    Task {
+      defer { self.evidenceDraining.setValue(false) }
+      await uploadPendingScreenshots(using: self.deps.api.uploadScreenshotDirect)
+    }
+  }
+
   @discardableResult
   public func stopFilter(reason: NEProviderStopReason) -> Task<Void, Never> {
     self.deps.logger.log("stopping filter")
@@ -227,6 +242,15 @@ public final class ControllerProxy: Sendable {
       let rulesChanged = await self.refreshRules(reason: .infoSheetPresented)
       Witness.controllerVerdict.emit("DROP update=\(rulesChanged)")
       return .drop(withUpdateRules: rulesChanged)
+    }
+    if RecordingSuspension.rederived(
+      expiration: self.deps.storage.loadSuspensionExpiration(),
+      lastScreenshot: self.deps.storage.loadScreenshotLastSaved(),
+      now: self.deps.now,
+    ) != nil {
+      self.drainEvidence()
+      Witness.controllerVerdict.emit("ALLOW recording=true")
+      return .allow(withUpdateRules: false)
     }
     let rulesChanged = await self.refreshRules(reason: .fauxHeartbeat)
     let verdict = self.decideNewFlow(flow)
