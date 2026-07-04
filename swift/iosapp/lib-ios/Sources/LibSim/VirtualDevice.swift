@@ -314,12 +314,16 @@ public extension VirtualDevice {
     await self.quiesce()
   }
 
-  /// OS RULE R10 (refinement, device-verified 2026-07-04): while the screen is
-  /// off or locked, ReplayKit delivers NO sample buffers at all — the broadcast
-  /// stays alive but the liveness heartbeat pauses (observed as 10-19s bump
-  /// gaps in the hinge session, one of which tripped the pre-D2 suspension
-  /// trapdoor). Models the gap: time passes, recorder lives, nothing is
-  /// processed.
+  /// OS RULE R10 (refinement, corrected 2026-07-04 lock/static validation):
+  /// models a frame-delivery pause — the broadcast stays alive but the
+  /// liveness heartbeat stops (system pause / memory pressure; the
+  /// `broadcastPaused` callback exists for this). NOT what a device lock does:
+  /// on device, locking cleanly FINISHES the broadcast within ~3s, and static
+  /// screens keep delivering (unchanged) buffers. The hinge session's 10-19s
+  /// bump gaps — one of which tripped the pre-D2 suspension trapdoor — were
+  /// the spike bumping liveness only on saves, starved by a static screen.
+  /// Misnamed pending model inversion (see protocol doc open items): a lock
+  /// should be `stopBroadcast()`, not this.
   func screenOff(seconds: Int) async {
     await self.advanceTime(seconds: seconds)
     await self.quiesce()

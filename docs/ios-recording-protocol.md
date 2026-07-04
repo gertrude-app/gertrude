@@ -8,8 +8,8 @@ reconciliation with edge-triggered hints** — durable facts on shared disk each
 single writer, derivation rules applied by each process at its own decision points, and
 best-effort events that only accelerate convergence, never carry authority.
 
-Device evidence citations refer to the 2026-07-04 hinge session (design doc §Device
-findings).
+Device evidence citations refer to the 2026-07-04 hinge session and the same-day
+lock/static validation session (design doc §Device findings, both sections).
 
 ## Processes
 
@@ -70,7 +70,7 @@ invariant may ever reference `screenshotInterval`.
 - **Filter** — evaluates suspension state on EVERY flow decision, symmetrically:
   - suspension held & `live()` fails → end it (blocking resumes). *(exit, shipped)*
   - no suspension held & `live()` holds → re-enter it (blocking lifts). *(entry — D2,
-    the trapdoor fix; today `rederived` runs only at `startFilter`, which is the bug)*
+    the trapdoor fix, shipped: `rederived` runs on every no-suspension flow decision)*
   - suspend sentinel (any Gertrude bundle id) & expiration future → enter with a
     `livenessWindow` grace, covering the moments before the first frame lands. The
     sentinel is an accelerator only; with D2 it is no longer load-bearing.
@@ -131,7 +131,8 @@ drain: skip-and-continue with bounded attempts, not break).
 | Failure at t                         | Required behavior                                                                  |
 | ------------------------------------ | ----------------------------------------------------------------------------------- |
 | recorder memory-killed mid-recording | no tombstone, no darwin; L1 re-blocks ≤6s; leftovers drained by controller *        |
-| screen off / static ≥6s mid-recording| L1 re-blocks (correct: no evidence); L2 re-lifts when frames resume (device-found gap) |
+| device locked mid-recording          | iOS *finishes* the broadcast within ~3s (device-verified, side-button and auto-lock alike) → normal graceful-stop path: tombstone, darwin finish, grant consumed |
+| frame delivery pauses ≥6s (system pause / memory pressure; NOT static screens — those keep delivering, D6 bumps them) | L1 re-blocks (correct: no evidence); L2 re-lifts when frames resume |
 | app killed/suspended mid-recording   | zero protocol impact except UX + expiration-clear latency; registers converge *     |
 | filter killed mid-suspension         | on-demand relaunch re-derives from disk (special case of D2/L2) *                   |
 | controller killed mid-drain          | at-least-once uploads make partial drains safe; next summon resumes                 |
@@ -147,13 +148,18 @@ drain: skip-and-continue with bounded attempts, not break).
   backlog cleanup. (Hinge 2 vs hinge 3, head-to-head on device.)
 - **D2** Suspension entry becomes level-triggered like exit: filter re-derives on flow
   decisions whenever it holds no suspension (cheap: two register reads, 0ms observed
-  cost), sentinel retained as accelerator + grace provider. (Trapdoor finding.)
+  cost), sentinel retained as accelerator + grace provider. (Trapdoor finding.) The
+  lock/static validation showed normal use never gaps a live broadcast (locks end it,
+  static screens keep bumping), so D2 is defense-in-depth for system pauses and filter
+  relaunch, not a daily path — it stays, per S1/L2.
 - **D3** A future expiration lingering after app death is intended, not a leak: it is
   exactly what makes L2 recovery and filter-relaunch re-derivation work, and it is
   gated by liveness at every instant. (Formerly an open "non-determinism" question;
-  the screen-off finding settled it.)
-- **D4** `livenessWindow` stays 6s; propagation contributes ~0 of it. Liveness gaps are
-  a normal user behavior (screen off), handled by L1+L2 symmetry, not by widening.
+  the trapdoor finding settled it.)
+- **D4** `livenessWindow` stays 6s; propagation contributes ~0 of it. Liveness gaps
+  while a broadcast lives are rarer than first thought (locks end the broadcast;
+  static screens keep bumping under D6) but remain possible (system pause, memory
+  pressure); handled by L1+L2 symmetry, not by widening.
 - **D5** Uploads are at-least-once, filename-deduped; no cross-process drain locking.
 - **D6** Liveness heartbeat (protocol, fixed 5s) and screenshot save cadence (policy,
   parent-configurable) are separate frequencies; the recorder bumps liveness per
@@ -167,7 +173,11 @@ drain: skip-and-continue with bounded attempts, not break).
 - Whether the app's bg-session uploader earns its complexity at all once D1 lands, or
   gets deleted in favor of plain foreground drains.
 - Silent push as a grant-time accelerator (design doc vector 2) — unexamined.
-- Sim honesty upgrades required to model this spec: app-suspended process state with
-  darwin coalescing (R11 gap), screen-off sample-delivery pauses (R10 gap — the sim's
-  `record()` never pauses, which is why the trapdoor survived 13 scenarios), and a
-  bg-URLSession OS actor if the uploader is kept.
+- Grant consumption policy: a device lock cleanly finishes the broadcast and burns the
+  grant (device-verified), forcing a fresh parent request to continue. Restart-within-
+  grant is representable on the current registers; undecided.
+- Sim honesty upgrades still owed: the R10 lock model must invert — on device a lock
+  *finishes* the broadcast (validation session) rather than pausing delivery, so
+  `screenOff()` as-is models a system pause, not a lock; and a bg-URLSession OS actor
+  if the uploader is kept. (App-suspension/darwin-coalescing R11-R12 gaps landed
+  2026-07-04.)

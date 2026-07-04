@@ -140,8 +140,10 @@ leak; the NE budget is far larger than the assumed ~15MB), zero controller crash
 This is the primary evidence path going forward.
 
 **4. (Unplanned) The one-way suspension trapdoor — the session's biggest finding.** At
-4.5 min in, an 18s gap in liveness bumps (screen off/locked pauses ReplayKit buffer
-delivery entirely) coincided with a background flow: the filter's level-triggered check
+4.5 min in, an 18s gap in liveness bumps (attributed at the time to screen off/locked
+pausing ReplayKit buffer delivery; the 07-04 validation session below corrected this —
+the spike bumped liveness only on *saved* frames, so a static screen starved liveness
+while buffers kept arriving) coincided with a background flow: the filter's level-triggered check
 correctly saw stale evidence and ended the suspension — but nothing ever re-entered it.
 The kid spent the remaining 24 minutes recording *and blocked*, because suspension entry
 is edge-triggered (sentinel at broadcast start) while exit is level-triggered, and
@@ -156,3 +158,42 @@ re-suspension after filter relaunch intended?" question: yes — it is *required
 Consequences: upload vectors 1/2/3/5 above demote to backlog cleanup; vector 4 inverts
 from backstop to primary (summoned during recording, not just when recording is dead).
 Protocol spec capturing all of this: `docs/ios-recording-protocol.md`.
+
+## Device findings — lock/static validation, 2026-07-04 (post-redesign build)
+
+Four short recordings on the same device with the productionized protocol (capture
+`witnesses-20260704-142038.ndjson`), exercising side-button lock, idle auto-lock, and a
+~100s untouched static screen followed by active browsing.
+
+**1. Locking the device ENDS the broadcast — it does not pause it.** Both side-button
+lock and idle auto-lock produced a clean `broadcastFinished` within ~1-3s of the lock
+(one preceded by `broadcastPaused` 1s earlier; the others went straight to finish). No
+memory-kill, no pause-and-survive, no `broadcastResumed` anywhere in the session. The
+fail-safe chain behaved per spec after every stop: tombstone → `filter-resumed` on the
+next flow (15-26s later only because a locked phone generates no traffic) → grant
+consumed when the darwin finish reached the app (once 9 min later, coalesced on app
+resume — R11 observed in the wild again).
+
+**2. A static screen does NOT gap liveness on this build.** Liveness bumps arrived
+every ~5s for the entire session (max inter-bump gap 5.1s < 6s window), 10 of 35 of
+them `kind=unchanged` — ReplayKit keeps delivering buffers for static content; the
+frames simply aren't worth saving. Blocking stayed lifted throughout, matching user
+experience. The spike's 10-19s gaps were self-inflicted: it bumped liveness only on
+saves, so unchanged-frame stretches starved the heartbeat. D6's bump-on-every-
+processed-frame is what closed that hole.
+
+**3. Reinterpretation of the trapdoor gap (§finding 4 above).** The device never locked
+during the hinge session (owner's auto-lock is disabled), so the 18s gap was a static
+screen starving the spike's save-only liveness bumps — not screen-off pausing ReplayKit.
+Consequence: with D6 in place, a live broadcast has no liveness gaps in normal use, so
+D2's level-triggered re-entry was not (and could not be) exercised on device this
+session. D2 stands as defense-in-depth for genuine frame-delivery pauses (system pause,
+memory pressure — `broadcastPaused` exists as a callback) and for filter relaunch, not
+as a daily-path fix. The sim's `screenOff()` model (broadcast survives, delivery
+pauses) no longer matches what a lock does on device and needs inverting — see the
+protocol doc's open items.
+
+**4. Open product question surfaced.** A lock mid-suspension cleanly finishes the
+recording and burns the grant; continuing requires a fresh parent grant. Restart-
+within-grant (don't consume the grant until expiration) is representable on the current
+registers but is an undecided policy choice.
