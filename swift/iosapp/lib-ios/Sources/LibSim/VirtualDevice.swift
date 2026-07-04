@@ -24,6 +24,8 @@ public final class VirtualDevice {
   public let disk: LockIsolated<[String: GroupDefaultsClient.Entry]>
   public let screenshotDisk = LockIsolated<[ScreenshotData]>([])
   public let screenshotsEverSaved = LockIsolated<Set<String>>([])
+  public let openConnections = LockIsolated<[OpenConnection]>([])
+  private let connectionIds = LockIsolated(0)
   public let api: ScriptedApi
   public let clock = TestClock<Duration>()
   public let currentDate: LockIsolated<Date>
@@ -213,6 +215,7 @@ public extension VirtualDevice {
     for target in [SimTarget.app, .recorder, .controller, .filter] where self.isRunning(target) {
       await self.kill(target)
     }
+    self.openConnections.setValue([])
     self.trace.withValue { $0.append(.rebooted) }
     self.initFilter()
     self.initController()
@@ -417,6 +420,41 @@ public extension VirtualDevice {
   func browse(_ hostname: String, from bundleId: String = "com.apple.mobilesafari") async
     -> FlowVerdict {
     await self.flow(FilterFlow(hostname: hostname, bundleId: bundleId, flowType: .socket))
+  }
+
+  /// OS RULE R13 (flow verdict finality): the filter's verdict is final for the
+  /// socket's lifetime — once a flow is allowed, subsequent data on that
+  /// connection NEVER re-consults the filter, so a long-lived connection
+  /// (HTTP/2, QUIC) opened during a suspension keeps carrying data after
+  /// blocking resumes, until the socket dies naturally (modeled: at reboot
+  /// only). Existing flows cannot be enumerated or killed by the extension.
+  /// Evidence: NEFilterDataProvider verdict semantics + on-device observation
+  /// during the 2025 recording experiment (YouTube remained moderately
+  /// functional after suspension ended — the leak that killed the feature;
+  /// see docs/ios-shields-protocol.md).
+  @discardableResult
+  func openConnection(
+    to hostname: String,
+    from bundleId: String = "com.apple.mobilesafari",
+  ) async -> Int? {
+    let verdict = await self
+      .flow(FilterFlow(hostname: hostname, bundleId: bundleId, flowType: .socket))
+    guard verdict == .allow else { return nil }
+    let id = self.connectionIds.withValue { id in
+      id += 1
+      return id
+    }
+    self.openConnections.withValue {
+      $0.append(OpenConnection(id: id, hostname: hostname, bundleId: bundleId))
+    }
+    self.trace.withValue { $0.append(.connectionOpened(id: id, target: hostname)) }
+    return id
+  }
+
+  /// Data moving over an already-verdicted connection: succeeds iff the socket
+  /// is still open; the filter is not consulted (OS RULE R13).
+  func connectionCarriesData(_ id: Int) -> Bool {
+    self.openConnections.value.contains { $0.id == id }
   }
 
   /// OS RULE R7 (sentinel channel): `FilterClient.send` fires a real HTTPS request

@@ -42,6 +42,8 @@ public enum ExplorerAction: Equatable, Sendable, Codable, CustomStringConvertibl
   case sendSuspendSentinel
   case sendResumeSentinel
   case spoofSuspendSentinel
+  case openBlockedConnection
+  case useBlockedConnection
   case startBroadcast
   case beginGrantedRecording(grantSeconds: Int)
   case recordFrames(seconds: Int)
@@ -65,6 +67,8 @@ public enum ExplorerAction: Equatable, Sendable, Codable, CustomStringConvertibl
     case .sendSuspendSentinel: "sendSuspendSentinel"
     case .sendResumeSentinel: "sendResumeSentinel"
     case .spoofSuspendSentinel: "spoofSuspendSentinel"
+    case .openBlockedConnection: "openBlockedConnection"
+    case .useBlockedConnection: "useBlockedConnection"
     case .startBroadcast: "startBroadcast"
     case .beginGrantedRecording(let s): "beginGrantedRecording(grant \(s)s)"
     case .recordFrames(let s): "recordFrames(\(s)s)"
@@ -132,6 +136,11 @@ struct SpecOracle: Sendable {
   mutating func onFilterDeath() {
     self.held = nil
   }
+
+  func peekActive(expiration: Date?, lastScreenshot: Date?, now: Date) -> Bool {
+    var copy = self
+    return copy.onRegularFlow(expiration: expiration, lastScreenshot: lastScreenshot, now: now)
+  }
 }
 
 public extension RecordingExplorer {
@@ -156,6 +165,8 @@ public extension RecordingExplorer {
     public var broadcasts = 0
     public var screenshotsCreated = 0
     public var uploadedDistinct = 0
+    public var connectionsOpened = 0
+    public var leakedConnectionUses = 0
   }
 
   struct RunResult: Sendable, Codable {
@@ -174,9 +185,13 @@ public extension RecordingExplorer {
   }
 
   @MainActor
-  static func run(seed: UInt64, steps: Int = 40) async -> RunResult {
+  static func run(
+    seed: UInt64,
+    steps: Int = 40,
+    strictSocketLeak: Bool = false,
+  ) async -> RunResult {
     var rng = SeededRNG(seed: seed)
-    let run = ExplorerRun()
+    let run = ExplorerRun(strictSocketLeak: strictSocketLeak)
     await run.bootstrap()
     var actions: [ExplorerAction] = []
     var violation: Violation?
@@ -201,8 +216,12 @@ public extension RecordingExplorer {
   }
 
   @MainActor
-  static func replay(_ script: [ExplorerAction], converge: Bool = true) async -> RunResult {
-    let run = ExplorerRun()
+  static func replay(
+    _ script: [ExplorerAction],
+    converge: Bool = true,
+    strictSocketLeak: Bool = false,
+  ) async -> RunResult {
+    let run = ExplorerRun(strictSocketLeak: strictSocketLeak)
     await run.bootstrap()
     var actions: [ExplorerAction] = []
     var violation: Violation?
@@ -235,6 +254,7 @@ public extension RecordingExplorer {
     _ script: [ExplorerAction],
     expecting kind: String,
     budget: Int = 250,
+    strictSocketLeak: Bool = false,
   ) async -> [ExplorerAction] {
     var current = script
     var remaining = budget
@@ -246,7 +266,7 @@ public extension RecordingExplorer {
         var candidate = current
         candidate.remove(at: index)
         remaining -= 1
-        let result = await self.replay(candidate)
+        let result = await self.replay(candidate, strictSocketLeak: strictSocketLeak)
         if result.violation?.kind == kind {
           current = candidate
           changed = true
@@ -261,10 +281,12 @@ public extension RecordingExplorer {
 @MainActor
 final class ExplorerRun {
   let device: VirtualDevice
+  let strictSocketLeak: Bool
   var oracle = SpecOracle()
   var stats = RecordingExplorer.Stats()
 
-  init() {
+  init(strictSocketLeak: Bool = false) {
+    self.strictSocketLeak = strictSocketLeak
     var api = ScriptedApi.Config()
     api.blockRules = [.targetContains(value: "blocked.com")]
     api.connected = .init(blockRules: [.targetContains(value: "blocked.com")], webPolicy: nil)
@@ -291,8 +313,14 @@ final class ExplorerRun {
     await self.device.quiesce()
   }
 
+  var openBlockedConnection: OpenConnection? {
+    self.device.openConnections.value.first { $0.hostname == "blocked.com" }
+  }
+
   func isEnabled(_ action: ExplorerAction) -> Bool {
     switch action {
+    case .useBlockedConnection:
+      self.openBlockedConnection != nil
     case .startBroadcast, .beginGrantedRecording:
       self.device.recorder == nil
     case .recordFrames, .recordStatic, .pauseFrameDelivery, .stopBroadcast, .lockDevice,
@@ -317,6 +345,7 @@ final class ExplorerRun {
       (7, .sendSuspendSentinel),
       (3, .sendResumeSentinel),
       (2, .spoofSuspendSentinel),
+      (6, .openBlockedConnection),
       (4, .quiesce),
       (3, .reboot(controllerFirst: rng.next() % 2 == 0)),
     ]
@@ -331,6 +360,7 @@ final class ExplorerRun {
       menu.append((4, .lockDevice))
       menu.append((3, .killRecorder))
     }
+    if self.openBlockedConnection != nil { menu.append((7, .useBlockedConnection)) }
     if self.device.filter != nil { menu.append((3, .killFilter)) }
     if self.device.controller != nil { menu.append((2, .killController)) }
     return weightedPick(menu, &rng)
@@ -395,6 +425,45 @@ final class ExplorerRun {
 
     case .spoofSuspendSentinel:
       await self.device.deliverSentinel(.suspendFilter, from: "com.evil.imposter")
+
+    case .openBlockedConnection:
+      let expectLifted = self.oracle.onRegularFlow(
+        expiration: self.device.diskSuspensionExpiration,
+        lastScreenshot: self.device.diskScreenshotLastSaved,
+        now: self.device.currentDate.value,
+      )
+      let opened = await self.device.openConnection(to: "blocked.com")
+      if opened != nil { self.stats.connectionsOpened += 1 }
+      if expectLifted, opened == nil {
+        return self.violation(
+          "L2-blocking-stuck", step, action,
+          "registers say suspension is live but connection was refused",
+        )
+      }
+      if !expectLifted, opened != nil {
+        return self.violation(
+          "S1-unexpected-allow", step, action,
+          "registers say no valid suspension but blocked connection was opened",
+        )
+      }
+
+    case .useBlockedConnection:
+      guard let connection = self.openBlockedConnection else { break }
+      let carries = self.device.connectionCarriesData(connection.id)
+      let active = self.oracle.peekActive(
+        expiration: self.device.diskSuspensionExpiration,
+        lastScreenshot: self.device.diskScreenshotLastSaved,
+        now: self.device.currentDate.value,
+      )
+      if carries, !active {
+        self.stats.leakedConnectionUses += 1
+        if self.strictSocketLeak {
+          return self.violation(
+            "S1P-socket-leak", step, action,
+            "connection \(connection.id) to blocked.com still carries data while unrecorded (opened during a suspension, never re-verdicted: OS RULE R13)",
+          )
+        }
+      }
 
     case .startBroadcast:
       self.stats.broadcasts += 1

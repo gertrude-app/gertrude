@@ -20,6 +20,12 @@ public enum RulesChangedTrigger: String, Sendable, Equatable {
   case withUpdateRules
 }
 
+public struct OpenConnection: Sendable, Equatable {
+  public let id: Int
+  public let hostname: String
+  public let bundleId: String
+}
+
 public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case launched(SimTarget)
   case launchedOnDemand(SimTarget)
@@ -38,6 +44,7 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case recorderEventDropped(RecorderEvent)
   case appSuspended
   case appResumed(coalescedEvents: [RecorderEvent])
+  case connectionOpened(id: Int, target: String)
   case log(SimTarget, String)
 
   public var description: String {
@@ -59,6 +66,7 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
     case .recorderEventDropped(let event): "darwin event .\(event) dropped, no app running"
     case .appSuspended: "os suspended app"
     case .appResumed(let events): "app resumed, coalesced darwin events: \(events)"
+    case .connectionOpened(let id, let target): "connection \(id) opened to `\(target)`"
     case .log(let target, let message): "[\(target.rawValue)] \(message)"
     }
   }

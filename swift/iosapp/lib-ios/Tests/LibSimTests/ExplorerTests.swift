@@ -32,6 +32,8 @@ private var corpusSteps: Int {
     aggregate.broadcasts += result.stats.broadcasts
     aggregate.screenshotsCreated += result.stats.screenshotsCreated
     aggregate.uploadedDistinct += result.stats.uploadedDistinct
+    aggregate.connectionsOpened += result.stats.connectionsOpened
+    aggregate.leakedConnectionUses += result.stats.leakedConnectionUses
   }
   #expect(aggregate.blockedAllowed > 20) // corpus actually lifts blocking
   #expect(aggregate.blockedDropped > 100) // and blocks
@@ -39,6 +41,33 @@ private var corpusSteps: Int {
   #expect(aggregate.rederivedEntries > 5) // and via D2 level-trigger
   #expect(aggregate.screenshotsCreated > 50) // evidence flows
   #expect(aggregate.uploadedDistinct > 50) // and uploads
+  #expect(aggregate.connectionsOpened > 10) // persistent connections exercised
+}
+
+// The persistent-socket leak (OS RULE R13, docs/ios-shields-protocol.md): a connection
+// verdicted during a suspension keeps carrying data after blocking resumes. This is a
+// REAL property of the shipped design — the corpus above tolerates it (strict flag
+// off); this test proves the explorer surfaces it unaided. It flips to expecting NO
+// violation once the shields extension lands and closes S1′.
+@Test @MainActor func explorerFindsPersistentSocketLeak() async throws {
+  for seed in 1 ... UInt64(50) {
+    let result = await RecordingExplorer.run(seed: seed, steps: 40, strictSocketLeak: true)
+    guard let violation = result.violation else { continue }
+    guard violation.kind == "S1P-socket-leak" else {
+      Issue.record("unexpected violation hunting the leak: \(violation)")
+      return
+    }
+    let shrunk = await RecordingExplorer.shrink(
+      result.actions,
+      expecting: violation.kind,
+      strictSocketLeak: true,
+    )
+    print("=== SOCKET LEAK (seed \(seed)) ===")
+    print(shrunk.map(\.description).joined(separator: " → "))
+    #expect(shrunk.count <= 8) // shrinks to a human-readable recipe
+    return
+  }
+  Issue.record("explorer never found the socket leak in 50 seeds — detector too weak")
 }
 
 @Test @MainActor func explorerIsDeterministic() async throws {
