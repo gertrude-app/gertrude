@@ -29,9 +29,19 @@ public enum Witness: String, Sendable {
   case filterResumed = "filter-resumed"
   case recorderStart = "recorder-start"
   case recorderStop = "recorder-stop"
+  case recorderPaused = "recorder-paused"
+  case recorderResumed = "recorder-resumed"
   case recorderScreenshotSaved = "recorder-screenshot-saved"
+  case recorderLivenessBump = "recorder-liveness-bump"
   case screenshotsDrained = "screenshots-drained"
   case appReceivedRecorderEvent = "app-received-recorder-event"
+  case filterLivenessCheck = "filter-liveness-check"
+  case filterSummonedController = "filter-summoned-controller"
+  case appUploadEnqueued = "app-upload-enqueued"
+  case appUploadCompleted = "app-upload-completed"
+  case appBgSessionWake = "app-bg-session-wake"
+  case screenshotDrain = "screenshot-drain"
+  case screenshotDrainDone = "screenshot-drain-done"
 
   @inline(__always)
   public func emit(_ detail: @autoclosure () -> String = "") {

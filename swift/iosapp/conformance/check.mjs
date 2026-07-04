@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 // Checks captured witness logs against the LibSim OS model rules.
 // Input: output of ./capture.sh — either ndjson (log show) or text (idevicesyslog).
-// Usage: node check.mjs <witnesses-file> [--timeline]
-// See docs/ios-conformance.md for the rule definitions and campaign workflow.
+// Usage: node check.mjs <witnesses-file> [--timeline] [--hinges]
+// --hinges analyzes the recording-feature hinge experiments (liveness propagation,
+// app bg-session upload chain, controller-as-uploader spike); requires a `collect`
+// capture (ndjson) since app-process witnesses never appear in `stream`.
+// See docs/ios-conformance.md and conformance/hinge-experiments.md.
 
 import fs from "node:fs";
 
 const file = process.argv[2];
 const showTimeline = process.argv.includes(`--timeline`);
+const showHinges = process.argv.includes(`--hinges`);
 if (!file) {
-  console.error(`usage: node check.mjs <witnesses-file> [--timeline]`);
+  console.error(`usage: node check.mjs <witnesses-file> [--timeline] [--hinges]`);
   process.exit(1);
 }
 
@@ -250,6 +254,122 @@ for (const e of launches) {
   if (e.t - lastT > 300_000 && lastT !== 0) console.log(`  --- gap ---`);
   console.log(`  ${fmt(e.t)}  ${e.event} [pid ${e.pid}]`);
   lastT = e.t;
+}
+
+if (showHinges) {
+  const kv = (detail, key) => {
+    const m = detail.match(new RegExp(`(?:^| )${key}=(\\S+)`));
+    return m ? m[1] : null;
+  };
+  const num = (detail, key) => {
+    const v = kv(detail, key);
+    return v === null || v === `nil` ? null : Number(v);
+  };
+  const pcts = (values) => {
+    if (values.length === 0) return `(none)`;
+    const s = [...values].sort((a, b) => a - b);
+    const at = (p) => s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))];
+    return `p50=${at(50)} p90=${at(90)} p99=${at(99)} max=${s[s.length - 1]}`;
+  };
+  const fmtT = (t) => new Date(t).toISOString().slice(11, 23);
+
+  // recording windows: recorder-start .. recorder-stop (or end of capture)
+  const windows = [];
+  for (const start of of(`recorder-start`)) {
+    const stop = events.find((e) => e.event === `recorder-stop` && e.t > start.t);
+    windows.push({ from: start.t, to: stop ? stop.t : events.at(-1).t });
+  }
+  const inWindow = (t, slop = 0) =>
+    windows.some((w) => t >= w.from - slop && t <= w.to + slop);
+
+  console.log(`\n${`=`.repeat(64)}`);
+  console.log(`HINGE ANALYSIS — ${windows.length} recording window(s)`);
+  for (const w of windows) {
+    console.log(`  ${fmtT(w.from)} → ${fmtT(w.to)}  (${Math.round((w.to - w.from) / 1000)}s)`);
+  }
+
+  // HINGE 1 — liveness propagation: recorder write -> filter read
+  const bumps = of(`recorder-liveness-bump`)
+    .map((e) => ({ ...e, ts: num(e.detail, `ts`) * 1000, kind: kv(e.detail, `kind`) }))
+    .filter((e) => Number.isFinite(e.ts));
+  const checks = of(`filter-liveness-check`).map((e) => ({
+    ...e,
+    sawTs: num(e.detail, `sawTs`) === null ? null : num(e.detail, `sawTs`) * 1000,
+    elapsedMs: num(e.detail, `elapsedMs`),
+    valid: kv(e.detail, `valid`) === `true`,
+  }));
+  const lags = [];
+  const staleReads = [];
+  const falseInvalid = [];
+  for (const c of checks) {
+    const before = bumps.filter((b) => b.t <= c.t && b.kind !== `tombstone`);
+    if (before.length === 0) continue;
+    const freshest = Math.max(...before.map((b) => b.ts));
+    if (c.sawTs !== null) {
+      const lag = freshest - c.sawTs;
+      lags.push(lag);
+      if (lag > 1_500) staleReads.push(c);
+    }
+    if (!c.valid && c.t - freshest < 6_000) falseInvalid.push(c);
+  }
+  console.log(`\nHINGE 1 — liveness propagation (recorder write → filter read)`);
+  console.log(`  bumps: ${bumps.length} (${bumps.filter((b) => b.kind === `saved`).length} saved, ${bumps.filter((b) => b.kind === `unchanged`).length} unchanged, ${of(`recorder-liveness-bump`).filter((e) => kv(e.detail, `kind`) === `tombstone`).length} tombstone)`);
+  console.log(`  filter checks: ${checks.length}  elapsedMs ${pcts(checks.map((c) => c.elapsedMs).filter((v) => v !== null))}`);
+  console.log(`  read-staleness ms (freshest write vs value filter saw): ${pcts(lags.map(Math.round))}`);
+  console.log(`  stale reads (>1.5s behind freshest write): ${staleReads.length}`);
+  console.log(`  false-invalid (check failed though fresh write existed): ${falseInvalid.length}`);
+  for (const c of [...staleReads, ...falseInvalid].slice(0, 5)) {
+    console.log(`  ! ${fmtT(c.t)}  ${c.detail}`);
+  }
+  console.log(`  PASS looks like: stale reads ≈ 0, false-invalid = 0, elapsedMs max < 6500`);
+
+  // HINGE 2 — app background-session upload chain
+  const enq = of(`app-upload-enqueued`);
+  const completed = of(`app-upload-completed`);
+  const okUploads = completed.filter((e) => kv(e.detail, `ok`) === `true`);
+  const stranded = completed.filter((e) => kv(e.detail, `stranded`) === `true`);
+  const wakes = of(`app-bg-session-wake`);
+  const saves = bumps.filter((b) => b.kind === `saved`);
+  console.log(`\nHINGE 2 — app bg URLSession chain (drains while app suspended)`);
+  console.log(`  frames saved: ${saves.length}   uploads enqueued: ${enq.length}   completed ok: ${okUploads.length}   failed: ${completed.length - okUploads.length}`);
+  console.log(`  bg-session wakes: ${wakes.length}   stranded completions: ${stranded.length}`);
+  for (const w of windows) {
+    const savedIn = saves.filter((b) => b.t >= w.from && b.t <= w.to).length;
+    const upIn = okUploads.filter((e) => e.t >= w.from && e.t <= w.to + 120_000);
+    const gaps = [];
+    for (let i = 1; i < upIn.length; i++) gaps.push(Math.round((upIn[i].t - upIn[i - 1].t) / 1000));
+    console.log(`  window ${fmtT(w.from)}: saved=${savedIn} uploaded(+2min)=${upIn.length} upload-gap-s ${pcts(gaps)}`);
+  }
+  const drains = of(`screenshot-drain`);
+  if (drains.length > 0) {
+    console.log(`  drain events (backlog over time):`);
+    for (const d of drains.slice(0, 20)) {
+      console.log(`    ${fmtT(d.t)}  ${d.process}  ${d.detail}`);
+    }
+  }
+  console.log(`  PASS looks like: uploads track saves (backlog bounded), gaps < 60s, wakes > 0`);
+
+  // HINGE 3 — controller-as-uploader spike (filter summons via needRules)
+  const summons = of(`filter-summoned-controller`);
+  const spikes = of(`controller-spike-upload`);
+  const spikeOk = spikes.filter((e) => kv(e.detail, `ok`) === `true`);
+  const summonGaps = [];
+  for (let i = 1; i < summons.length; i++) {
+    const gap = (summons[i].t - summons[i - 1].t) / 1000;
+    if (gap < 120) summonGaps.push(Math.round(gap));
+  }
+  const memFloor = spikes.map((e) => num(e.detail, `memMB`)).filter((v) => v !== null);
+  const controllerCrashes = of(`controller-proxy-init`).filter((e) => inWindow(e.t) && e.t !== events[0].t);
+  console.log(`\nHINGE 3 — controller-as-uploader (summoned by filter needRules)`);
+  console.log(`  summons: ${summons.length}   summon-gap-s ${pcts(summonGaps)}`);
+  console.log(`  spike uploads: ${spikes.length}   ok: ${spikeOk.length}   failed: ${spikes.length - spikeOk.length}`);
+  console.log(`  upload duration ms ${pcts(spikes.map((e) => num(e.detail, `ms`)).filter((v) => v !== null))}`);
+  console.log(`  controller mem headroom MB: min=${memFloor.length ? Math.min(...memFloor) : `?`} ${pcts(memFloor)}`);
+  console.log(`  controller re-inits during recording (crash indicator): ${controllerCrashes.length}`);
+  for (const e of spikes.filter((s) => kv(s.detail, `ok`) !== `true`).slice(0, 5)) {
+    console.log(`  ! ${fmtT(e.t)}  ${e.detail}`);
+  }
+  console.log(`  PASS looks like: summon gaps ≈ 5s under traffic, ok-rate ≈ 100%, mem min > 5MB, re-inits = 0`);
 }
 
 if (showTimeline) {

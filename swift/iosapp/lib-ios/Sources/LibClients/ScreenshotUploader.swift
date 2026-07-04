@@ -1,5 +1,6 @@
 import Dependencies
 import Foundation
+import LibCore
 import os.log
 import XCore
 
@@ -31,6 +32,7 @@ public final class ScreenshotUploader: NSObject, @unchecked Sendable {
     let fileUrl = try self.stageFile(for: screenshot)
     let task = self.session.uploadTask(with: request, fromFile: fileUrl)
     task.taskDescription = screenshot.id
+    Witness.appUploadEnqueued.emit("id=\(screenshot.id)")
     try await withCheckedThrowingContinuation {
       (continuation: CheckedContinuation<Void, any Error>) in
       self.state.withLock { $0.continuations[task.taskIdentifier] = continuation }
@@ -75,6 +77,10 @@ extension ScreenshotUploader: URLSessionTaskDelegate {
     let continuation = self.state.withLock {
       $0.continuations.removeValue(forKey: task.taskIdentifier)
     }
+    Witness.appUploadCompleted.emit({
+      let id = task.taskDescription ?? "(nil)"
+      return "id=\(id) ok=\(success) status=\(status) stranded=\(continuation == nil)"
+    }())
     if let continuation {
       if success {
         continuation.resume()
@@ -90,6 +96,7 @@ extension ScreenshotUploader: URLSessionTaskDelegate {
   }
 
   public func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+    Witness.appBgSessionWake.emit()
     let handler = self.state.withLock { state in
       let handler = state.onEventsFinished
       state.onEventsFinished = nil
