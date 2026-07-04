@@ -34,8 +34,8 @@ public extension RecordingSuspension {
     return elapsed >= 0 && elapsed < self.livenessWindow
   }
 
-  func isValid(lastScreenshot: Date?, now: Date) -> Bool {
-    guard self.expiration > now else { return false }
+  func isValid(expiration: Date?, lastScreenshot: Date?, now: Date) -> Bool {
+    guard let expiration, expiration > now else { return false }
     return now < self.graceUntil
       || Self.recordingIsLive(lastScreenshot: lastScreenshot, now: now)
   }

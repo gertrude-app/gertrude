@@ -341,6 +341,31 @@ private func connectedDevice(
   #expect(await device.browse("blocked.com") == .drop) // tombstone: immediate re-block
 }
 
+// MARK: - expiration register is re-read on every check, never snapshotted at entry
+
+// (found by RecordingExplorer seed 2: filter honored a stale entry-time expiration
+// while the controller re-read the shortened register, dropping summoned flows)
+
+@Test @MainActor func shortenedExpirationRegisterHonoredWhileRecording() async throws {
+  let device = connectedDevice()
+  await device.reboot()
+  await device.quiesce()
+  device.seedSuspensionExpiration(secondsFromNow: 600)
+
+  await device.startBroadcast()
+  await device.deliverSentinel(.suspendFilter)
+  await device.record(seconds: 10)
+  #expect(await device.browse("blocked.com") == .allow)
+
+  device.seedSuspensionExpiration(secondsFromNow: 5) // register shortened mid-hold
+  await device.record(seconds: 10) // liveness stays fresh, but expiration passes
+  #expect(await device.browse("blocked.com") == .drop) // register wins over snapshot
+
+  device.disk.withValue { $0[Key.suspensionExpiration.rawValue] = nil } // cleared mid-hold
+  await device.record(seconds: 5)
+  #expect(await device.browse("blocked.com") == .drop) // no register, no suspension
+}
+
 // MARK: - device lock finishes the broadcast; expiration lingers, restart re-lifts
 
 @Test @MainActor func lockFinishesBroadcastReblocksAndRestartRelifts() async throws {

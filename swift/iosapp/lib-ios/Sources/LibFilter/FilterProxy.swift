@@ -145,7 +145,11 @@ public struct FilterProxy {
 
     if let suspension = self.suspension {
       let lastScreenshot = self.storage.loadScreenshotLastSaved()
-      let valid = suspension.isValid(lastScreenshot: lastScreenshot, now: self.now)
+      let valid = suspension.isValid(
+        expiration: self.storage.loadSuspensionExpiration(),
+        lastScreenshot: lastScreenshot,
+        now: self.now,
+      )
       Witness.filterLivenessCheck.emit({
         let saw = lastScreenshot.map { "\($0.timeIntervalSince1970)" } ?? "nil"
         let elapsed = lastScreenshot
