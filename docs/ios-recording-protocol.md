@@ -67,7 +67,9 @@ sparse evidence (say every 60s) changes nothing about how fast blocking returns 
 recording stops or how fast a glitched session recovers. No safety or liveness
 invariant may ever reference `screenshotInterval`.
 
-- **Filter** — evaluates suspension state on EVERY flow decision, symmetrically:
+- **Filter** — evaluates suspension state on EVERY flow decision, symmetrically,
+  re-reading BOTH registers each time — the expiration is never snapshotted at entry
+  (D7):
   - suspension held & `live()` fails → end it (blocking resumes). *(exit, shipped)*
   - no suspension held & `live()` holds → re-enter it (blocking lifts). *(entry — D2,
     the trapdoor fix, shipped: `rederived` runs on every no-suspension flow decision)*
@@ -107,7 +109,12 @@ server side must treat re-PUTs as idempotent. A failed upload must not wedge a d
 loop's successors (observed: one 500 stranded 269 files — fix when productionizing the
 drain: skip-and-continue with bounded attempts, not break).
 
-## Invariants (checked by scenarios; explorer-enforced later)
+## Invariants
+
+Checked by named scenarios, and enforced across seeded random interleavings by the
+explorer (`LibSim/Explorer.swift`): S1/L1/L2 as a register-math oracle consulted on
+every flow, S2/C1 at end-of-run convergence. A violating run shrinks to a minimal
+action script and replays by seed.
 
 - **S1 (safety):** a flow matching block rules is allowed only while a held suspension
   is valid: expiration in the future AND (evidence fresh within `livenessWindow` OR
@@ -165,6 +172,13 @@ drain: skip-and-continue with bounded attempts, not break).
   parent-configurable) are separate frequencies; the recorder bumps liveness per
   processed frame regardless of whether it saved. Safety/liveness math references only
   the heartbeat. (Prompted by making evidence density a parent setting.)
+- **D7** Every `live()` evaluation re-reads the expiration register; holding an
+  entry-time snapshot is forbidden. Found by the explorer on its first corpus run
+  (seed 2, four actions): the filter's held snapshot outlived a shortened/cleared
+  register, so the filter allowed + summoned while the register-reading controller
+  dropped the same delegated flow — a filter/controller split brain reachable via a
+  lost resume sentinel or a re-grant. Held suspension state now carries only the
+  entry grace; expiration validity always comes from the register.
 
 ## Open (deliberately)
 

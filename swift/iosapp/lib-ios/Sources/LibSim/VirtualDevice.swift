@@ -23,6 +23,7 @@ import XCore
 public final class VirtualDevice {
   public let disk: LockIsolated<[String: GroupDefaultsClient.Entry]>
   public let screenshotDisk = LockIsolated<[ScreenshotData]>([])
+  public let screenshotsEverSaved = LockIsolated<Set<String>>([])
   public let api: ScriptedApi
   public let clock = TestClock<Duration>()
   public let currentDate: LockIsolated<Date>
@@ -541,6 +542,7 @@ extension VirtualDevice {
     let currentDate = self.currentDate
     let disk = self.disk
     let screenshotDisk = self.screenshotDisk
+    let screenshotsEverSaved = self.screenshotsEverSaved
     let trace = self.trace
     let deviceId = self.deviceId
     let filterInstalled = self.filterInstalled
@@ -580,6 +582,11 @@ extension VirtualDevice {
       case .recorder:
         deps.sharedStorage = .liveValue
         deps.screenshotRepo = .inMemory(screenshotDisk)
+        let save = deps.screenshotRepo.save
+        deps.screenshotRepo.save = { screenshot in
+          screenshotsEverSaved.withValue { $0.insert(screenshot.id) }
+          return save(screenshot)
+        }
         deps.recorderEvents.emit = { event in
           pendingRecorderEvents.withValue { $0.append(event) }
         }
