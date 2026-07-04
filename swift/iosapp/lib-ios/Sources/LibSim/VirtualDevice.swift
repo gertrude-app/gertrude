@@ -622,7 +622,7 @@ extension VirtualDevice {
         deps.screenshotRepo = .inMemory(screenshotDisk)
         let save = deps.screenshotRepo.save
         deps.screenshotRepo.save = { screenshot in
-          screenshotsEverSaved.withValue { $0.insert(screenshot.id) }
+          screenshotsEverSaved.withValue { _ = $0.insert(screenshot.id) }
           return save(screenshot)
         }
         deps.recorderEvents.emit = { event in

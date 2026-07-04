@@ -42,6 +42,10 @@ public enum Witness: String, Sendable {
   case appBgSessionWake = "app-bg-session-wake"
   case screenshotDrain = "screenshot-drain"
   case screenshotDrainDone = "screenshot-drain-done"
+  case appShieldWrite = "app-shield-write"
+  case controllerShieldWrite = "controller-shield-write"
+  case shieldSelectionSaved = "shield-selection-saved"
+  case shieldsLabAuthorization = "shields-lab-authorization"
 
   @inline(__always)
   public func emit(_ detail: @autoclosure () -> String = "") {

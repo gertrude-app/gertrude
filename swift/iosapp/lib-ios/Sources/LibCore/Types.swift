@@ -13,6 +13,13 @@ public enum MagicStrings {
   public static let dumpLogsSentinalHostname: String = "dump-logs.xpc.gertrude.app"
   public static let suspendFilterSentinalHostname: String = "suspend-filter.xpc.gertrude.app"
   public static let resumeFilterSentinalHostname: String = "resume-filter.xpc.gertrude.app"
+
+  // shields conformance spike (DEBUG-only paths, see conformance/shields-spike.md)
+  public static let shieldsUpSentinalHostname: String = "shields-up.xpc.gertrude.app"
+  public static let shieldsAllSentinalHostname: String = "shields-all.xpc.gertrude.app"
+  public static let shieldsWebSentinalHostname: String = "shields-web.xpc.gertrude.app"
+  public static let shieldsDownSentinalHostname: String = "shields-down.xpc.gertrude.app"
+  public static let shieldsLabSelectionKey: String = "debug--shields-lab-selection"
 }
 
 public extension String {

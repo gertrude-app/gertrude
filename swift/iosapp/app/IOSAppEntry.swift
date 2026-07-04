@@ -33,6 +33,9 @@ struct IOSAppEntry: App {
   var body: some Scene {
     WindowGroup {
       AppView(store: self.store, osMajorVersion: self.osMajorVersion, deviceType: self.deviceType)
+      #if DEBUG
+        .shieldsLabOverlay()
+      #endif
         .onAppear {
           self.store.send(.programmatic(.appDidLaunch))
         }

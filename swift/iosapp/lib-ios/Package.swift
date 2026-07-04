@@ -80,6 +80,7 @@ let package = Package(
       dependencies: [
         "LibCore",
         "LibApp",
+        "LibClients",
         .product(name: "GertieApp", package: "gertie"),
         .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),

@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // Checks captured witness logs against the LibSim OS model rules.
 // Input: output of ./capture.sh — either ndjson (log show) or text (idevicesyslog).
-// Usage: node check.mjs <witnesses-file> [--timeline] [--hinges]
+// Usage: node check.mjs <witnesses-file> [--timeline] [--hinges] [--shields]
 // --hinges analyzes the recording-feature hinge experiments (liveness propagation,
 // app bg-session upload chain, controller-as-uploader spike); requires a `collect`
 // capture (ndjson) since app-process witnesses never appear in `stream`.
+// --shields analyzes the ManagedSettings conformance spike (shields-spike.md);
+// also requires a `collect` capture (app-process witnesses).
 // See docs/ios-conformance.md and conformance/hinge-experiments.md.
 
 import fs from "node:fs";
@@ -12,8 +14,9 @@ import fs from "node:fs";
 const file = process.argv[2];
 const showTimeline = process.argv.includes(`--timeline`);
 const showHinges = process.argv.includes(`--hinges`);
+const showShields = process.argv.includes(`--shields`);
 if (!file) {
-  console.error(`usage: node check.mjs <witnesses-file> [--timeline] [--hinges]`);
+  console.error(`usage: node check.mjs <witnesses-file> [--timeline] [--hinges] [--shields]`);
   process.exit(1);
 }
 
@@ -370,6 +373,46 @@ if (showHinges) {
     console.log(`  ! ${fmtT(e.t)}  ${e.detail}`);
   }
   console.log(`  PASS looks like: summon gaps ≈ 5s under traffic, ok-rate ≈ 100%, mem min > 5MB, re-inits = 0`);
+}
+
+if (showShields) {
+  const fmtT = (t) => new Date(t).toISOString().slice(11, 23);
+  const auth = of(`shields-lab-authorization`);
+  const selections = of(`shield-selection-saved`);
+  const appWrites = of(`app-shield-write`);
+  const sentinels = of(`filter-sentinel`).filter((e) => e.detail.startsWith(`shields-lab`));
+  const controllerWrites = of(`controller-shield-write`);
+
+  console.log(`\n${`=`.repeat(64)}`);
+  console.log(`SHIELDS SPIKE ANALYSIS (see conformance/shields-spike.md)`);
+
+  console.log(`\nauthorization status readings: ${auth.length}`);
+  for (const e of auth) console.log(`  ${fmtT(e.t)}  ${e.detail}`);
+
+  console.log(`\nselection saves (token round-trip register): ${selections.length}`);
+  for (const e of selections) console.log(`  ${fmtT(e.t)}  ${e.detail}`);
+
+  console.log(`\napp-context shield writes: ${appWrites.length}`);
+  for (const e of appWrites) console.log(`  ${fmtT(e.t)}  ${e.detail}`);
+
+  console.log(`\ncontroller-context shield writes (THE spike question): ${controllerWrites.length}`);
+  const errWrites = controllerWrites.filter((e) => e.detail.includes(`ERR`));
+  for (const e of controllerWrites) console.log(`  ${fmtT(e.t)}  [pid ${e.pid}]  ${e.detail}`);
+  console.log(`  errors: ${errWrites.length} of ${controllerWrites.length}`);
+
+  console.log(`\nsentinel → controller-write delivery latency:`);
+  const latencies = [];
+  for (const s of sentinels) {
+    const write = controllerWrites.find((w) => w.t >= s.t && w.t - s.t < 30_000);
+    const lag = write ? write.t - s.t : null;
+    if (lag !== null) latencies.push(lag);
+    console.log(`  ${fmtT(s.t)}  ${s.detail.replace(`shields-lab `, ``)} → ${lag === null ? `NO WRITE within 30s` : `${lag}ms`}`);
+  }
+  const delivered = latencies.length;
+  console.log(`  delivered: ${delivered}/${sentinels.length}${delivered ? `, max ${Math.max(...latencies)}ms` : ``}`);
+  console.log(`\nPASS looks like: auth=approved, selection bytes>2, controller writes error-free,`);
+  console.log(`every sentinel answered <5000ms. Shield VISIBILITY (icon dimmed, shield screen on`);
+  console.log(`launch) is human-observed — note observations in the runbook as you go.`);
 }
 
 if (showTimeline) {

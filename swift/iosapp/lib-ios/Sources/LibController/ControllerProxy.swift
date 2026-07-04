@@ -237,6 +237,11 @@ public final class ControllerProxy: Sendable {
 
   package func handleFilterFlow(_ flow: FilterFlow) async -> NEFilterControlVerdict {
     Witness.controllerReceivedFlow.emit("target=\(flow.target ?? "(nil)")")
+    #if DEBUG
+      if let verdict = self.handleShieldsLabSentinel(flow) {
+        return verdict
+      }
+    #endif
     if flow.hostname == MagicStrings.refreshRulesSentinalHostname {
       self.deps.logger.log("refresh rules requested from app, info sheet presented")
       let rulesChanged = await self.refreshRules(reason: .infoSheetPresented)
@@ -264,6 +269,43 @@ public final class ControllerProxy: Sendable {
       .drop(withUpdateRules: true) // should be unreachable
     }
   }
+
+  #if DEBUG
+    /// Shields conformance spike (see conformance/shields-spike.md): the app's
+    /// lab screen fires shields-* sentinels, the filter forwards them here via
+    /// needRules, and THIS process performs the ManagedSettings write — the
+    /// spike's central question is whether shield writes work reliably from
+    /// the control provider's extension context. Wall-clock `Date()` on
+    /// purpose: measuring real write latency, not simulated time.
+    func handleShieldsLabSentinel(_ flow: FilterFlow) -> NEFilterControlVerdict? {
+      @Dependency(\.managedSettings) var managedSettings
+      @Dependency(\.groupDefaults) var groupDefaults
+      let selection = { groupDefaults.data(forKey: MagicStrings.shieldsLabSelectionKey) }
+      let started = Date()
+      let outcome: String
+      switch flow.hostname {
+      case MagicStrings.shieldsUpSentinalHostname:
+        outcome = selection().map { "up " + managedSettings.shieldApps(selection: $0) }
+          ?? "up ERR no-saved-selection"
+      case MagicStrings.shieldsAllSentinalHostname:
+        outcome = selection().map { "all " + managedSettings.shieldAllExcept(selection: $0) }
+          ?? "all ERR no-saved-selection"
+      case MagicStrings.shieldsWebSentinalHostname:
+        outcome = selection().map { "web " + managedSettings.shieldWebDomains(selection: $0) }
+          ?? "web ERR no-saved-selection"
+      case MagicStrings.shieldsDownSentinalHostname:
+        managedSettings.clearShields()
+        outcome = "down cleared"
+      default:
+        return nil
+      }
+      let elapsedMs = Int(Date().timeIntervalSince(started) * 1000)
+      let state = managedSettings.shieldsDescription()
+      Witness.controllerShieldWrite.emit("\(outcome) ms=\(elapsedMs) state=[\(state)]")
+      self.deps.logger.log("shields lab: \(outcome) (\(elapsedMs)ms) state=[\(state)]")
+      return .drop(withUpdateRules: false)
+    }
+  #endif
 }
 
 extension ControllerProxy: FlowDecider {

@@ -132,6 +132,13 @@ public struct FilterProxy {
       return .drop
     }
 
+    #if DEBUG
+      if isShieldsLabSentinel(flow.hostname) {
+        Witness.filterSentinel.emit("shields-lab \(flow.hostname ?? "")")
+        return .needRules
+      }
+    #endif
+
     if self.suspension == nil,
        let rederived = RecordingSuspension.rederived(
          expiration: self.storage.loadSuspensionExpiration(),
@@ -238,6 +245,15 @@ private func isGertrude(_ bundleId: String?) -> Bool {
   return bundleId == .gertrudeBundleIdLong || bundleId == .gertrudeBundleIdShort
     || bundleId == .gertrudeRecorderBundleIdLong || bundleId == .gertrudeRecorderBundleIdShort
 }
+
+#if DEBUG
+  private func isShieldsLabSentinel(_ hostname: String?) -> Bool {
+    hostname == MagicStrings.shieldsUpSentinalHostname
+      || hostname == MagicStrings.shieldsAllSentinalHostname
+      || hostname == MagicStrings.shieldsWebSentinalHostname
+      || hostname == MagicStrings.shieldsDownSentinalHostname
+  }
+#endif
 
 // "exports" for filter
 
