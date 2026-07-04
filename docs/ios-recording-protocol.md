@@ -116,9 +116,14 @@ explorer (`LibSim/Explorer.swift`): S1/L1/L2 as a register-math oracle consulted
 every flow, S2/C1 at end-of-run convergence. A violating run shrinks to a minimal
 action script and replays by seed.
 
-- **S1 (safety):** a flow matching block rules is allowed only while a held suspension
-  is valid: expiration in the future AND (evidence fresh within `livenessWindow` OR
-  within the entry grace).
+- **S1 (safety):** a NEW flow matching block rules is allowed only while a held
+  suspension is valid: expiration in the future AND (evidence fresh within
+  `livenessWindow` OR within the entry grace). S1 says nothing about data on
+  connections verdicted during the suspension — NE verdicts are final per socket, so
+  those connections keep working after blocking resumes (OS RULE R13). That leak is
+  real, was a principal reason the 2025 feature was backed out, and is closed at the
+  app-usability layer by the shields extension: `docs/ios-shields-protocol.md`
+  (DRAFT), invariant S1′.
 - **S2 (evidence):** every interval during which blocking was lifted has screenshots
   on disk covering it (≤5s granularity while the screen was on), each eventually
   uploaded exactly-once-per-filename to the parent.
@@ -189,7 +194,11 @@ action script and replays by seed.
 - Silent push as a grant-time accelerator (design doc vector 2) — unexamined.
 - Grant consumption policy: a device lock cleanly finishes the broadcast and burns the
   grant (device-verified), forcing a fresh parent request to continue. Restart-within-
-  grant is representable on the current registers; undecided.
+  grant is representable on the current registers; leaning yes (2026-07-04), decide
+  with the shields implementation (see shields doc §restart-within-grant).
+- Shields (ManagedSettings) extension to close the persistent-socket leak:
+  `docs/ios-shields-protocol.md` (DRAFT) — S3/L4/S1′, controller-primary
+  reconciliation (D8), authorization sharp edges.
 - Sim honesty upgrades still owed: a bg-URLSession OS actor if the uploader is kept.
   (App-suspension/darwin-coalescing R11-R12 gaps landed 2026-07-04; the R10 lock model
   was inverted same day after the validation session — `lockDevice()` finishes the
