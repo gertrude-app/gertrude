@@ -45,6 +45,7 @@ public struct FilterProxy {
 
   public private(set) var protectionMode: ProtectionMode = .emergencyLockdown
   public private(set) var suspension: RecordingSuspension?
+  var lastSummon = Date.distantPast
 
   public init(protectionMode: ProtectionMode) {
     self.protectionMode = protectionMode
@@ -131,11 +132,33 @@ public struct FilterProxy {
       return .drop
     }
 
+    if self.suspension == nil,
+       let rederived = RecordingSuspension.rederived(
+         expiration: self.storage.loadSuspensionExpiration(),
+         lastScreenshot: self.storage.loadScreenshotLastSaved(),
+         now: self.now,
+       ) {
+      self.suspension = rederived
+      self.logger.log("filter suspension rederived, until \(rederived.expiration)")
+      Witness.filterSuspended.emit("rederived until=\(rederived.expiration)")
+    }
+
     if let suspension = self.suspension {
-      if suspension.isValid(
-        lastScreenshot: self.storage.loadScreenshotLastSaved(),
-        now: self.now,
-      ) {
+      let lastScreenshot = self.storage.loadScreenshotLastSaved()
+      let valid = suspension.isValid(lastScreenshot: lastScreenshot, now: self.now)
+      Witness.filterLivenessCheck.emit({
+        let saw = lastScreenshot.map { "\($0.timeIntervalSince1970)" } ?? "nil"
+        let elapsed = lastScreenshot
+          .map { "\(Int(self.now.timeIntervalSince($0) * 1000))" } ?? "nil"
+        return "sawTs=\(saw) elapsedMs=\(elapsed) valid=\(valid)"
+      }())
+      if valid {
+        if RecordingSuspension.recordingIsLive(lastScreenshot: lastScreenshot, now: self.now),
+           self.now.timeIntervalSince(self.lastSummon) >= RecordingSuspension.heartbeatInterval {
+          self.lastSummon = self.now
+          Witness.filterSummonedController.emit()
+          return .needRules
+        }
         return .allow
       }
       self.endSuspension(reason: "expired-or-recording-stopped")

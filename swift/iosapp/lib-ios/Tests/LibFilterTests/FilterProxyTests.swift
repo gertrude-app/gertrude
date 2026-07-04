@@ -250,12 +250,15 @@ func setup(
     nil,
   ])
   var proxy = withDependencies {
+    $0.date = .constant(.reference)
     $0.osLog = .noop
     $0.osLog.log = { msg in test.osLogs.withValue { $0.append(msg) } }
     $0.sharedStorageReader.loadProtectionMode = { @Sendable in
       test.loadProtectionModeCalls.withValue { $0 += 1 }
       return reads.withValue { $0.isEmpty ? nil : $0.removeFirst() }
     }
+    $0.sharedStorageReader.loadSuspensionExpiration = { @Sendable in nil }
+    $0.sharedStorageReader.loadScreenshotLastSaved = { @Sendable in nil }
   } operation: {
     FilterProxy(protectionMode: .emergencyLockdown)
   }
