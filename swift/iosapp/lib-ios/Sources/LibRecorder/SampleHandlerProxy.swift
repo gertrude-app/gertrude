@@ -39,9 +39,15 @@ public struct SampleHandlerProxy {
   let deps = Deps()
   let finisher: any FinishableBroadcast
   var lastSampleTime: Date?
+  var lastSaveTime: Date?
+  public var screenshotInterval: TimeInterval
 
-  public init(finisher: any FinishableBroadcast) {
+  public init(
+    finisher: any FinishableBroadcast,
+    screenshotInterval: TimeInterval = RecordingSuspension.defaultScreenshotInterval,
+  ) {
     self.finisher = finisher
+    self.screenshotInterval = screenshotInterval
     self.deps.logger.setPrefix("RECORDER")
   }
 
@@ -52,18 +58,24 @@ public struct SampleHandlerProxy {
   }
 
   public func broadcastPaused() {
+    self.deps.logger.log("broadcast paused")
+    Witness.recorderPaused.emit()
     self.deps.events.emit(.broadcastPaused)
   }
 
   public func broadcastResumed() {
+    self.deps.logger.log("broadcast resumed")
+    Witness.recorderResumed.emit()
     self.deps.events.emit(.broadcastResumed)
   }
 
   public func broadcastFinished() {
     self.deps.logger.log("broadcast finished")
     Witness.recorderStop.emit()
-    self.deps.storage
-      .saveScreenshotLastSaved(self.deps.now - RecordingSuspension.livenessWindow)
+    let tombstone = self.deps.now - RecordingSuspension.livenessWindow
+    self.deps.storage.saveScreenshotLastSaved(tombstone)
+    Witness.recorderLivenessBump
+      .emit("ts=\(tombstone.timeIntervalSince1970) kind=tombstone")
     self.deps.events.emit(.broadcastFinished)
   }
 
@@ -72,29 +84,40 @@ public struct SampleHandlerProxy {
       self.lastSampleTime = self.deps.now
       return true
     }
-    if self.deps.now.timeIntervalSince(lastTime) >= RecordingSuspension.screenshotInterval {
+    if self.deps.now.timeIntervalSince(lastTime) >= RecordingSuspension.heartbeatInterval {
       self.lastSampleTime = self.deps.now
       return true
     }
     return false
   }
 
-  public func processFrame(_ frame: Frame) {
+  public mutating func processFrame(_ frame: Frame) {
+    let now = self.deps.now
     if frame.unchanged {
       self.deps.logger.debug("ignoring unchanged screen")
-      self.deps.storage.saveScreenshotLastSaved(self.deps.now)
+      self.deps.storage.saveScreenshotLastSaved(now)
+      Witness.recorderLivenessBump.emit("ts=\(now.timeIntervalSince1970) kind=unchanged")
+      return
+    }
+    if let lastSave = self.lastSaveTime,
+       now.timeIntervalSince(lastSave) < self.screenshotInterval {
+      self.deps.logger.debug("screen changed, but within screenshot interval")
+      self.deps.storage.saveScreenshotLastSaved(now)
+      Witness.recorderLivenessBump.emit("ts=\(now.timeIntervalSince1970) kind=throttled")
       return
     }
     let saved = self.deps.repo.save(.init(
       data: frame.jpeg,
       width: frame.width,
       height: frame.height,
-      createdAt: self.deps.now,
+      createdAt: now,
     ))
     if saved {
       self.deps.logger.log("saved screenshot for upload: \(frame.width)x\(frame.height)")
       Witness.recorderScreenshotSaved.emit("\(frame.width)x\(frame.height)")
-      self.deps.storage.saveScreenshotLastSaved(self.deps.now)
+      self.lastSaveTime = now
+      self.deps.storage.saveScreenshotLastSaved(now)
+      Witness.recorderLivenessBump.emit("ts=\(now.timeIntervalSince1970) kind=saved")
     } else {
       self.finisher.finishWithError(failedToSave)
     }

@@ -11,9 +11,10 @@ public struct RecordingSuspension: Equatable, Sendable {
 }
 
 public extension RecordingSuspension {
-  static let screenshotInterval: TimeInterval = 5
+  static let heartbeatInterval: TimeInterval = 5
   static let livenessWiggle: TimeInterval = 1
-  static let livenessWindow: TimeInterval = screenshotInterval + livenessWiggle
+  static let livenessWindow: TimeInterval = heartbeatInterval + livenessWiggle
+  static let defaultScreenshotInterval: TimeInterval = 5
 
   static func entered(expiration: Date?, now: Date) -> RecordingSuspension? {
     guard let expiration, expiration > now else { return nil }
