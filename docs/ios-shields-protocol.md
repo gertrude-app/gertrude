@@ -143,14 +143,71 @@ would change; decide when implementing.
   and socket use from a shielded app do not happen; background-refresh traffic may.
   This coupling is what lets the explorer find entry-deadlock/exit-starvation.
 
+## Device findings — spike session 1, 2026-07-04 (iPhone, iOS 26.5.1)
+
+DEBUG build, `.individual` authorization, runbook `conformance/shields-spike.md`,
+capture `witnesses-20260704-163920.ndjson` + `check.mjs --shields`. All provocations
+run except the addendum items (runbook §Addendum). Numbers below are device-measured.
+
+1. **Controller-context shield writes: PROVEN.** 75/75 writes, zero errors, write
+   latency 0–26ms, sentinel-arrival→applied-shield ≤36ms, store read-back consistent
+   after every write, shield visibility behaviorally instant. Spike question 1 could
+   not have gone better; D8's controller-primary reconciler is viable.
+2. **Idempotency is load-bearing, empirically.** Every sentinel press fanned out into
+   2–8 controller writes (the known R7 one-send→many-flows fan-out). The idempotent
+   reconcile absorbed all of it; an edge-triggered design would have double-fired 75
+   times in the first real session.
+3. **Token round-trip: PROVEN.** `FamilyActivitySelection` (1 app + 1 web domain,
+   580 bytes) encoded by the app into group defaults, decoded and applied inside the
+   controller extension. The allowlist register mechanism works as specced.
+4. **`.all(except:)` is category-based and exempts system apps.** Shielded: every
+   third-party app, plus categorized first-party (Music, Mail). NOT shielded: Phone,
+   Settings, Messages, Safari, Maps, Find My, Clock. Phone/Settings exemptions are
+   desirable (emergency/anti-abuse); **Safari and Messages are the named residual
+   surfaces** — Safari must be covered by the web path below (or by explicit token,
+   untested), Messages is a product-level question (communication limits).
+5. **Web-domain shields work from the controller** — restricted screen renders inside
+   Safari. BUT tokens are picker-only (the picker offered a list, seemingly from the
+   user's Safari context; no arbitrary domain entry), so production cannot
+   dynamically shield arbitrary domains. Options: parent-pre-picked domains, the
+   shipped `webContent.blockedByFilter` path, or accept the bounded leak.
+   Mid-playback behavior untested (addendum).
+6. **Shields kill in-progress background audio immediately** (WhatsApp mp3 died the
+   moment shields went up); no auto-resume on clear. No audio residue weakens S1′.
+7. **Shields persist across reboot** (device policy, as hoped). Wrinkle: on the first
+   reboot WhatsApp appeared UNshielded for ~1.5–2s after springboard before the
+   shield applied; on a deliberate second reboot it was shielded immediately. Whether
+   an app is actually *launchable* in that window is unconfirmed (addendum probe).
+   Even if real, a ≤2s boot window is far smaller than the filter's own boot-time
+   story and is bounded by L1 semantics.
+8. **Revocation (weak proxy — dev device, `.individual`):** Face ID (device-level
+   auth) sufficed to remove Screen Time access; iOS cleared the shield store
+   silently; **the filter did NOT die** (no stop/relaunch witnesses, blocking
+   continued). The supervised-adult revocation story — the actual sharp-edge case —
+   still needs its own test on a supervised configuration; this device runs 26.5.1,
+   past the reported device-passcode-bug fix window.
+9. **`AuthorizationCenter.authorizationStatus` reads are unreliable** — returned
+   `notDetermined` twice mid-session while writes were demonstrably working (stale
+   async reads). Production must never gate shield behavior on a synchronous status
+   read; authorization truth is "do writes take effect."
+
+Still open after session 1: mid-playback web shielding, Safari-by-token, the
+post-boot window probe (runbook §Addendum); supervised-adult revocation (needs a
+supervised device); exit-starvation timing (needs the recording feature integrated).
+
 ## Conformance spike questions (device, before implementation)
 
 1. Controller-written `ManagedSettingsStore`: reliability, write latency, behavior
-   under both auth paths (child + supervised adult).
-2. Shield persistence across reboot; who can clear it besides us.
-3. `shield.webDomains` viability for the Safari leak.
-4. Background audio behavior under a freshly-raised shield.
-5. Exact iOS 26 build that fixed the device-passcode revocation bug.
+   under both auth paths (child + supervised adult). *(session 1: ANSWERED for
+   `.individual` — 75/75, ≤36ms; child + supervised-adult paths still owed)*
+2. Shield persistence across reboot; who can clear it besides us. *(session 1:
+   persists; revocation clears it; ~2s first-boot application lag to probe)*
+3. `shield.webDomains` viability for the Safari leak. *(session 1: works from
+   controller, but tokens are picker-only — no dynamic domain shielding)*
+4. Background audio behavior under a freshly-raised shield. *(session 1: audio dies
+   immediately)*
+5. Exact iOS 26 build that fixed the device-passcode revocation bug. *(open — needs a
+   supervised configuration; test device is 26.5.1)*
 6. Post-suspension traffic availability (exit-starvation reality check): with all
    non-allowlisted apps shielded, how quickly does the controller actually receive a
-   flow?
+   flow? *(open — needs the recording feature integrated)*

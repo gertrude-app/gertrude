@@ -87,6 +87,30 @@ Only if the picker offered website selection in Setup 4:
 3. If removal succeeded: what happened to the filter? To the lab shields? Re-onboard
    afterward.
 
+## Addendum — session 2 (items missed in session 1, 2026-07-04)
+
+Session 1 findings are recorded in `docs/ios-shields-protocol.md` §Device findings.
+These four remain; same setup (WhatsApp + changelog.com selection saved), same
+capture/analysis flow at the end.
+
+1. **Safari mid-playback web shield:** start podcast audio (or video) playing on
+   changelog.com in Safari → controller `shields-web` mid-playback. Does playback
+   stop? (Closest analog to post-suspension web-socket leakage; page-level shielding
+   may kill in-flight streams that socket semantics can't.)
+2. **Safari-by-token:** open the picker → is Safari itself pickable as an app? If
+   yes: add it, save, `shields-up`, launch Safari. Does a token shield stick despite
+   the category exemption? Afterward re-pick WhatsApp-only and save.
+3. **Post-boot window probe:** `shields-up` → confirm shielded → reboot → within the
+   first ~2 seconds of springboard, try to actually LAUNCH and USE WhatsApp (session
+   1 saw it *appear* unshielded ~1.5–2s after first boot, immediately-shielded after
+   second boot). Repeat 2–3x. Question: is the window visual-only, or usable?
+   `shields-down` after.
+4. **(extra credit) Shields sentinels during a live recording suspension:** grant +
+   record (SQL flow from hinge-experiments.md), then fire `shields-up`/`shields-down`
+   mid-recording. Confirms the lab channel — and by extension the production
+   reconcile path — is unaffected by suspension state (the filter forwards shields
+   sentinels ahead of its suspension logic).
+
 ## Capture & analysis
 
 Timestamps matter more than perfection — jot rough wall-clock times per step. Then:
