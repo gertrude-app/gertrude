@@ -315,9 +315,9 @@ private func connectedDevice(
   #expect(device.api.uploadedScreenshots.value.count == retained)
 }
 
-// MARK: - screen off mid-recording: fail-safe blocks, recovery re-lifts (no app needed)
+// MARK: - frame-delivery pause mid-recording: fail-safe blocks, recovery re-lifts (no app needed)
 
-@Test @MainActor func screenOffGlitchReblocksThenRecoversWithoutApp() async throws {
+@Test @MainActor func framePauseGlitchReblocksThenRecoversWithoutApp() async throws {
   let device = connectedDevice()
   await device.reboot()
   await device.quiesce()
@@ -328,17 +328,41 @@ private func connectedDevice(
   await device.record(seconds: 10)
   #expect(await device.browse("blocked.com") == .allow)
 
-  await device.screenOff(seconds: 15) // locked screen: ReplayKit stops delivering buffers
+  await device.pauseFrameDelivery(seconds: 15) // system pause: buffers stop, broadcast lives
   #expect(await device.browse("blocked.com") == .drop) // no live evidence, no free pass
   #expect(device.trace.value
     .contains(.log(.filter, "filter resumed: expired-or-recording-stopped")))
 
-  await device.record(seconds: 5) // screen back on, frames flow again
+  await device.record(seconds: 5) // pause ends, frames flow again
   #expect(await device.browse("blocked.com") == .allow) // session recovered, not thrown away
   #expect(device.filter?.suspension != nil)
 
   await device.stopBroadcast()
   #expect(await device.browse("blocked.com") == .drop) // tombstone: immediate re-block
+}
+
+// MARK: - device lock finishes the broadcast; expiration lingers, restart re-lifts
+
+@Test @MainActor func lockFinishesBroadcastReblocksAndRestartRelifts() async throws {
+  let device = connectedDevice()
+  await device.reboot()
+  await device.quiesce()
+  device.seedSuspensionExpiration(secondsFromNow: 600)
+
+  await device.startBroadcast()
+  await device.deliverSentinel(.suspendFilter)
+  await device.record(seconds: 10)
+  #expect(await device.browse("blocked.com") == .allow)
+
+  await device.lockDevice() // side-button or auto-lock: iOS cleanly finishes the broadcast
+  #expect(device.trace.value.contains(.broadcastFinished))
+  #expect(!device.isRunning(.recorder))
+  #expect(await device.browse("blocked.com") == .drop) // tombstone: immediate re-block
+
+  await device.advanceTime(seconds: 30)
+  await device.startBroadcast() // kid restarts recording from picker, no app involvement
+  await device.record(seconds: 5)
+  #expect(await device.browse("blocked.com") == .allow) // expiration lingers → D2 re-entry
 }
 
 // MARK: - suspended app misses the finish darwin event; coalesced delivery cleans up

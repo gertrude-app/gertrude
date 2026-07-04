@@ -176,8 +176,7 @@ drain: skip-and-continue with bounded attempts, not break).
 - Grant consumption policy: a device lock cleanly finishes the broadcast and burns the
   grant (device-verified), forcing a fresh parent request to continue. Restart-within-
   grant is representable on the current registers; undecided.
-- Sim honesty upgrades still owed: the R10 lock model must invert — on device a lock
-  *finishes* the broadcast (validation session) rather than pausing delivery, so
-  `screenOff()` as-is models a system pause, not a lock; and a bg-URLSession OS actor
-  if the uploader is kept. (App-suspension/darwin-coalescing R11-R12 gaps landed
-  2026-07-04.)
+- Sim honesty upgrades still owed: a bg-URLSession OS actor if the uploader is kept.
+  (App-suspension/darwin-coalescing R11-R12 gaps landed 2026-07-04; the R10 lock model
+  was inverted same day after the validation session — `lockDevice()` finishes the
+  broadcast, `pauseFrameDelivery()` models system pauses.)

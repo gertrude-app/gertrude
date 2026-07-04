@@ -315,18 +315,35 @@ public extension VirtualDevice {
   }
 
   /// OS RULE R10 (refinement, corrected 2026-07-04 lock/static validation):
-  /// models a frame-delivery pause — the broadcast stays alive but the
-  /// liveness heartbeat stops (system pause / memory pressure; the
-  /// `broadcastPaused` callback exists for this). NOT what a device lock does:
-  /// on device, locking cleanly FINISHES the broadcast within ~3s, and static
-  /// screens keep delivering (unchanged) buffers. The hinge session's 10-19s
-  /// bump gaps — one of which tripped the pre-D2 suspension trapdoor — were
-  /// the spike bumping liveness only on saves, starved by a static screen.
-  /// Misnamed pending model inversion (see protocol doc open items): a lock
-  /// should be `stopBroadcast()`, not this.
-  func screenOff(seconds: Int) async {
+  /// models a frame-delivery pause — the broadcast stays alive but no sample
+  /// buffers arrive, so the liveness heartbeat starves (system pause / memory
+  /// pressure; ReplayKit's `broadcastPaused` callback exists for some of
+  /// these, modeled here as a bare gap since no pause callback was observed
+  /// on device outside a lock). NOT what a device lock does — locking cleanly
+  /// FINISHES the broadcast (`lockDevice()`) — and NOT what a static screen
+  /// does: buffers keep arriving for static content and the recorder bumps
+  /// liveness with kind=unchanged. The hinge session's 10-19s bump gaps — one
+  /// of which tripped the pre-D2 suspension trapdoor — were the spike bumping
+  /// liveness only on saves, starved by a static screen. Kept because L1/L2
+  /// must survive delivery gaps whatever their cause.
+  func pauseFrameDelivery(seconds: Int) async {
     await self.advanceTime(seconds: seconds)
     await self.quiesce()
+  }
+
+  /// OS RULE R10 (lock, device-verified 2026-07-04 lock/static validation):
+  /// locking the device — side-button press or idle auto-lock alike — cleanly
+  /// FINISHES a live broadcast within ~3s: `broadcastPaused` immediately
+  /// followed by `broadcastFinished` (tombstone + darwin), then process exit.
+  /// A lock never pauses-and-survives. The app (if running) suspends with the
+  /// lock, so the finish darwin event is held for coalesced delivery on
+  /// resume — observed on device arriving 9 minutes later, on reopen.
+  func lockDevice() async {
+    self.suspendApp()
+    if let recorder = self.recorder, recorder.isBroadcasting {
+      recorder.osBroadcastPaused()
+      await self.stopBroadcast()
+    }
   }
 
   /// User ends the recording gracefully: `broadcastFinished` runs (tombstoning

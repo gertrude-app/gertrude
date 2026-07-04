@@ -206,6 +206,12 @@ public final class RecorderProcess {
     }
   }
 
+  func osBroadcastPaused() {
+    withDependencies(self.dependencies) {
+      self.proxy.broadcastPaused()
+    }
+  }
+
   func osBroadcastFinished() {
     self.isBroadcasting = false
     withDependencies(self.dependencies) {

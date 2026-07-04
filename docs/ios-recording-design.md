@@ -189,9 +189,9 @@ Consequence: with D6 in place, a live broadcast has no liveness gaps in normal u
 D2's level-triggered re-entry was not (and could not be) exercised on device this
 session. D2 stands as defense-in-depth for genuine frame-delivery pauses (system pause,
 memory pressure — `broadcastPaused` exists as a callback) and for filter relaunch, not
-as a daily-path fix. The sim's `screenOff()` model (broadcast survives, delivery
-pauses) no longer matches what a lock does on device and needs inverting — see the
-protocol doc's open items.
+as a daily-path fix. The sim's model was inverted to match: `lockDevice()` finishes
+the broadcast (app suspended, finish darwin held), `pauseFrameDelivery()` (né
+`screenOff()`) models system frame-delivery pauses.
 
 **4. Open product question surfaced.** A lock mid-suspension cleanly finishes the
 recording and burns the grant; continuing requires a fresh parent grant. Restart-
