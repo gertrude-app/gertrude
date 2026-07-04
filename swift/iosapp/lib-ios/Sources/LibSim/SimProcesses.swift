@@ -36,6 +36,8 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case broadcastErrored(String)
   case recorderEventDelivered(RecorderEvent)
   case recorderEventDropped(RecorderEvent)
+  case appSuspended
+  case appResumed(coalescedEvents: [RecorderEvent])
   case log(SimTarget, String)
 
   public var description: String {
@@ -55,6 +57,8 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
     case .broadcastErrored(let error): "broadcast finished with error: \(error)"
     case .recorderEventDelivered(let event): "darwin event .\(event) delivered to app"
     case .recorderEventDropped(let event): "darwin event .\(event) dropped, no app running"
+    case .appSuspended: "os suspended app"
+    case .appResumed(let events): "app resumed, coalesced darwin events: \(events)"
     case .log(let target, let message): "[\(target.rawValue)] \(message)"
     }
   }
@@ -165,11 +169,14 @@ public final class RecorderProcess {
 
   /// Mirrors `recorder/SampleHandler.swift`: the extension constructs its
   /// `SampleHandlerProxy` at process init, wired to itself as finisher.
-  init(dependencies: @escaping @Sendable (inout DependencyValues) -> Void) {
+  init(
+    dependencies: @escaping @Sendable (inout DependencyValues) -> Void,
+    screenshotInterval: TimeInterval = RecordingSuspension.defaultScreenshotInterval,
+  ) {
     self.dependencies = dependencies
     let finisher = self.finisher
     self.proxy = withDependencies(dependencies) {
-      SampleHandlerProxy(finisher: finisher)
+      SampleHandlerProxy(finisher: finisher, screenshotInterval: screenshotInterval)
     }
   }
 

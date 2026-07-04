@@ -34,6 +34,7 @@ public final class VirtualDevice {
   public private(set) var controller: ControllerProcess?
   public private(set) var app: AppProcess?
   public private(set) var recorder: RecorderProcess?
+  public private(set) var appIsSuspended = false
 
   private let pendingRulesChanged = LockIsolated<[RulesChangedTrigger]>([])
   private let pendingRecorderEvents = LockIsolated<[RecorderEvent]>([])
@@ -126,9 +127,49 @@ public extension VirtualDevice {
   func launchApp() async -> AppProcess {
     let process = AppProcess(dependencies: self.dependencies(for: .app))
     self.app = process
+    self.appIsSuspended = false
     self.trace.withValue { $0.append(.launched(.app)) }
     await process.store.send(.programmatic(.appDidLaunch))
     return process
+  }
+
+  /// OS RULE R12 (app suspension): seconds after the user backgrounds the app,
+  /// the OS suspends it — the process stays alive with its in-memory state, but
+  /// gets no CPU: timers freeze, effects stall, and darwin notifications are
+  /// held for coalesced delivery on resume (see OS RULE R11). Device-verified
+  /// 2026-07-04 (hinge session): the suspended app performed zero uploads and
+  /// received zero darwin deliveries for a full 28-min recording; the
+  /// `broadcastFinished` event arrived only on reopen. SIMPLIFICATION: effects
+  /// already in flight on the shared test clock still tick in the sim; what is
+  /// modeled is event delivery (queued) and the resume boundary.
+  func suspendApp() {
+    guard self.app != nil, !self.appIsSuspended else { return }
+    self.appIsSuspended = true
+    self.trace.withValue { $0.append(.appSuspended) }
+  }
+
+  /// Resuming delivers held darwin events COALESCED — one delivery per distinct
+  /// notification name, since each `RecorderEvent` kind is its own darwin name
+  /// (notify(3) semantics; OS RULE R11). `foreground: true` models the normal
+  /// resume path (user reopens the app → scenePhase active); `false` models a
+  /// brief background wake (e.g. a bg-URLSession completion).
+  func resumeApp(foreground: Bool = true) async {
+    guard let app = self.app, self.appIsSuspended else { return }
+    self.appIsSuspended = false
+    let coalesced = self.pendingRecorderEvents.withValue { queued in
+      var seen = Set<RecorderEvent>()
+      let unique = queued.filter { seen.insert($0).inserted }
+      queued = []
+      return unique
+    }
+    self.trace.withValue { $0.append(.appResumed(coalescedEvents: coalesced)) }
+    for event in coalesced {
+      self.trace.withValue { $0.append(.recorderEventDelivered(event)) }
+      await app.store.send(.programmatic(.receivedRecorderEvent(event)))
+    }
+    if foreground {
+      await app.store.send(.programmatic(.appDidEnterForeground))
+    }
   }
 
   /// OS RULE R9 (process death): a process can be killed at any moment (memory
@@ -148,6 +189,7 @@ public extension VirtualDevice {
     case .app:
       await self.app?.osKill()
       self.app = nil
+      self.appIsSuspended = false
     case .recorder:
       self.recorder?.osKill()
       self.recorder = nil
@@ -207,8 +249,13 @@ public extension VirtualDevice {
   /// RPBroadcastSampleHandler docs + on-device observation during the 2025
   /// recording experiment (`bak-swift` branch `chris`).
   @discardableResult
-  func startBroadcast() async -> RecorderProcess {
-    let process = RecorderProcess(dependencies: self.dependencies(for: .recorder))
+  func startBroadcast(
+    screenshotInterval: TimeInterval = RecordingSuspension.defaultScreenshotInterval,
+  ) async -> RecorderProcess {
+    let process = RecorderProcess(
+      dependencies: self.dependencies(for: .recorder),
+      screenshotInterval: screenshotInterval,
+    )
     self.recorder = process
     self.trace.withValue { $0.append(.launched(.recorder)) }
     self.trace.withValue { $0.append(.broadcastStarted) }
@@ -219,13 +266,13 @@ public extension VirtualDevice {
 
   /// OS RULE R11 (darwin notifications): a darwin notification is delivered
   /// promptly to running, non-suspended observer processes; nothing is queued
-  /// for a process that isn't running. A *suspended* app receives one coalesced
-  /// delivery on resume — CONDUCTOR SIMPLIFICATION: the sim has no app-suspended
-  /// state (only alive/dead), so posts with no live app process are dropped;
-  /// revisit if modeling coalesced-on-resume matters to a scenario. Evidence:
-  /// notify(3) semantics; used by the Apr 2025 recording prototype
-  /// (`bak-swift` `ios-test-rewrite`).
+  /// for a process that isn't running. A *suspended* app holds its
+  /// registrations and receives one COALESCED delivery per distinct
+  /// notification name on resume (see `resumeApp`). Evidence: notify(3)
+  /// semantics; device-verified 2026-07-04 — zero deliveries to the suspended
+  /// app during a 28-min recording, `broadcastFinished` arrived on reopen.
   private func drainRecorderEvents() async {
+    if self.app != nil, self.appIsSuspended { return }
     let events = self.pendingRecorderEvents.withValue { queued in
       let drained = queued
       queued = []
@@ -253,16 +300,28 @@ public extension VirtualDevice {
     }
   }
 
-  /// Models the passage of recording time: every 5 sim-seconds the throttle
-  /// admits one sample buffer for processing.
+  /// Models the passage of recording time: every heartbeat interval the
+  /// throttle admits one sample buffer for processing.
   func record(seconds: Int, changed: Bool = true) async {
+    let step = Int(RecordingSuspension.heartbeatInterval)
     var remaining = seconds
     while remaining > 0 {
       await self.deliverSample(changed: changed)
-      let step = min(5, remaining)
-      await self.advanceTime(seconds: step)
-      remaining -= step
+      let advance = min(step, remaining)
+      await self.advanceTime(seconds: advance)
+      remaining -= advance
     }
+    await self.quiesce()
+  }
+
+  /// OS RULE R10 (refinement, device-verified 2026-07-04): while the screen is
+  /// off or locked, ReplayKit delivers NO sample buffers at all — the broadcast
+  /// stays alive but the liveness heartbeat pauses (observed as 10-19s bump
+  /// gaps in the hinge session, one of which tripped the pre-D2 suspension
+  /// trapdoor). Models the gap: time passes, recorder lives, nothing is
+  /// processed.
+  func screenOff(seconds: Int) async {
+    await self.advanceTime(seconds: seconds)
     await self.quiesce()
   }
 

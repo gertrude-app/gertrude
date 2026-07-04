@@ -110,6 +110,13 @@ public final class ScriptedApi: Sendable {
       }
       self.uploadedScreenshots.withValue { $0.append(screenshot) }
     }
+    client.uploadScreenshotDirect = { [self] screenshot in
+      try self.checkReachable(target, "uploadScreenshotDirect")
+      guard !self.config.value.screenshotUploadsFailing else {
+        throw NetworkDown()
+      }
+      self.uploadedScreenshots.withValue { $0.append(screenshot) }
+    }
     return client
   }
 
