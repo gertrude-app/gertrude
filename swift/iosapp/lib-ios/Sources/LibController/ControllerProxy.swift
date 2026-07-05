@@ -80,6 +80,7 @@ public final class ControllerProxy: Sendable {
     self.deps.logger.log("starting filter")
     Witness.controllerStart.emit()
     return Task {
+      self.reconcileShields()
       await self.deps.api.logEvent(id: "00ec3909", detail: "controller proxy: filter started")
       self.deps.logger.log("start filter refresh rules 1")
       await self.refreshRules(reason: .startup)
@@ -235,8 +236,42 @@ public final class ControllerProxy: Sendable {
     return await self.handleFilterFlow(flow)
   }
 
+  /// The shields reconciler (docs/ios-shields-protocol.md, D8): on every flow
+  /// this process receives and at startup, re-derive the shield projection
+  /// from the registers and write it UNCONDITIONALLY. No last-written cache:
+  /// the app is a second legitimate writer (entry edge), so any memory this
+  /// process keeps of its own writes goes stale the moment the app writes —
+  /// found by the explorer on its first shields corpus run (seed 6: the app's
+  /// entry-edge drop invalidated the cache, then the controller skipped the
+  /// post-suspension raising write — S3 violated). Writes are cheap and
+  /// idempotent (spike session 1, 2026-07-04: 75/75 controller-context
+  /// writes, ≤36ms, idempotency empirically required under R7 fan-out).
+  /// Feature-gated on the allowlist register existing; the app (from parent
+  /// config) is that register's sole writer.
+  func reconcileShields() {
+    guard let allowlist = self.deps.storage.loadShieldAllowlist() else { return }
+    let desired = ShieldsProjection.derive(
+      expiration: self.deps.storage.loadSuspensionExpiration(),
+      lastScreenshot: self.deps.storage.loadScreenshotLastSaved(),
+      now: self.deps.now,
+      allowlist: allowlist,
+    )
+    @Dependency(\.managedSettings) var managedSettings
+    switch desired {
+    case .down:
+      managedSettings.clearShields()
+      Witness.controllerShieldWrite.emit("reconcile down")
+      self.deps.logger.debug("shields reconciled: down")
+    case .up(let allowlist):
+      let outcome = managedSettings.shieldAllExcept(selection: allowlist)
+      Witness.controllerShieldWrite.emit("reconcile up \(outcome)")
+      self.deps.logger.debug("shields reconciled: up (\(outcome))")
+    }
+  }
+
   package func handleFilterFlow(_ flow: FilterFlow) async -> NEFilterControlVerdict {
     Witness.controllerReceivedFlow.emit("target=\(flow.target ?? "(nil)")")
+    self.reconcileShields()
     #if DEBUG
       if let verdict = self.handleShieldsLabSentinel(flow) {
         return verdict

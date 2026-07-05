@@ -24,6 +24,7 @@ public struct IOSReducer {
     @Dependency(\.locale) var locale
     @Dependency(\.mainQueue) var mainQueue
     @Dependency(\.keychain) var keychain
+    @Dependency(\.grantPolicy) var grantPolicy
   }
 
   @ObservationIgnored
@@ -1087,21 +1088,33 @@ public struct IOSReducer {
         state.destination = .requestSuspension(.recording)
       }
       return .run { [deps = self.deps] _ in
-        deps.sharedStorage
-          .saveSuspensionExpiration(deps.now.addingTimeInterval(TimeInterval(duration.rawValue)))
+        let existing = deps.sharedStorage.loadSuspensionExpiration()
+        if deps.grantPolicy == .burnOnFinish || existing == nil || existing! <= deps.now {
+          deps.sharedStorage
+            .saveSuspensionExpiration(deps.now.addingTimeInterval(TimeInterval(duration.rawValue)))
+        }
+        deps.applyShields(.down, witnessDetail: "entry-edge down")
         try? await deps.filter.send(.suspendFilter)
       }
 
     case .receivedRecorderEvent(.broadcastFinished):
       Witness.appReceivedRecorderEvent.emit("broadcastFinished")
       self.deps.log(action, "46eb912d")
-      state.grantedSuspension = nil
+      let expiration = self.deps.sharedStorage.loadSuspensionExpiration()
+      let restartable = self.deps.grantPolicy == .restartWithinGrant
+        && expiration.map { $0 > self.deps.now } == true
+      if !restartable {
+        state.grantedSuspension = nil
+      }
       if state.destination?.requestSuspension == .recording {
         state.destination = nil
       }
       return .merge(
         .run { [deps = self.deps] _ in
-          deps.sharedStorage.clearSuspensionExpiration()
+          if !restartable {
+            deps.sharedStorage.clearSuspensionExpiration()
+          }
+          deps.reconcileShieldsFromApp(witnessDetail: "exit-edge")
           try? await deps.filter.send(.resumeFilter)
         },
         .run { _ in await uploadPendingScreenshots() },
@@ -1156,9 +1169,43 @@ public struct IOSReducer {
     return .merge(
       .run { [deps = self.deps] _ in
         deps.sharedStorage.clearSuspensionExpiration()
+        deps.reconcileShieldsFromApp(witnessDetail: "early-end")
         try? await deps.filter.send(.resumeFilter)
       },
       .run { _ in await uploadPendingScreenshots() },
+    )
+  }
+}
+
+extension IOSReducer.Deps {
+  /// App-side shield writes (docs/ios-shields-protocol.md): the entry edge at
+  /// `broadcastStarted` is NOT optional — a shielded app cannot generate the
+  /// flow that would summon the controller's reconciler (entry deadlock), and
+  /// the app is foreground at "start recording" anyway. Exit writes are the
+  /// same projection the controller reconciles toward; the app hearing the
+  /// finish just accelerates. Feature-gated on the allowlist register.
+  func applyShields(_ projection: ShieldsProjection, witnessDetail: String) {
+    guard self.sharedStorage.loadShieldAllowlist() != nil else { return }
+    @Dependency(\.managedSettings) var managedSettings
+    switch projection {
+    case .down:
+      managedSettings.clearShields()
+    case .up(let allowlist):
+      _ = managedSettings.shieldAllExcept(selection: allowlist)
+    }
+    Witness.appShieldWrite.emit(witnessDetail)
+  }
+
+  func reconcileShieldsFromApp(witnessDetail: String) {
+    guard let allowlist = self.sharedStorage.loadShieldAllowlist() else { return }
+    self.applyShields(
+      ShieldsProjection.derive(
+        expiration: self.sharedStorage.loadSuspensionExpiration(),
+        lastScreenshot: self.sharedStorage.loadScreenshotLastSaved(),
+        now: self.now,
+        allowlist: allowlist,
+      ),
+      witnessDetail: witnessDetail,
     )
   }
 }

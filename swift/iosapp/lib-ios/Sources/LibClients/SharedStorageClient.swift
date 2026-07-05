@@ -40,6 +40,10 @@ public struct SharedStorageClient: Sendable {
   public var loadScreenshotLastSaved: @Sendable () -> Date?
   public var saveScreenshotLastSaved: @Sendable (Date) -> Void
 
+  public var loadShieldAllowlist: @Sendable () -> Data?
+  public var saveShieldAllowlist: @Sendable (Data) -> Void
+  public var clearShieldAllowlist: @Sendable () -> Void
+
   public var migrateLegacyData: @Sendable () async -> Bool = { false }
 }
 
@@ -69,6 +73,7 @@ package enum Key: String {
   case crossPromoLastShownAt = "v1.9.0--cross-promo-last-shown-at"
   case suspensionExpiration = "v1.10.0--suspension-expiration"
   case screenshotLastSaved = "v1.10.0--screenshot-last-saved"
+  case shieldAllowlist = "v1.11.0--shield-allowlist"
 }
 
 extension SharedStorageClient: DependencyKey {
@@ -99,6 +104,9 @@ extension SharedStorageClient: DependencyKey {
       clearSuspensionExpiration: { removeKey(.suspensionExpiration) },
       loadScreenshotLastSaved: reader.loadScreenshotLastSaved,
       saveScreenshotLastSaved: { saveDate($0, forKey: .screenshotLastSaved) },
+      loadShieldAllowlist: { loadData(forKey: .shieldAllowlist) },
+      saveShieldAllowlist: { saveData($0, forKey: .shieldAllowlist) },
+      clearShieldAllowlist: { removeKey(.shieldAllowlist) },
       migrateLegacyData: { await migrateLegacyStorage() },
     )
   }
@@ -210,6 +218,16 @@ private func loadCodable<T: Codable>(forKey key: Key) -> T? {
 private func saveDate(_ date: Date, forKey key: Key) {
   @Dependency(\.groupDefaults) var defaults
   defaults.setDate(date: date, forKey: key.rawValue)
+}
+
+private func saveData(_ data: Data, forKey key: Key) {
+  @Dependency(\.groupDefaults) var defaults
+  defaults.setData(data: data, forKey: key.rawValue)
+}
+
+private func loadData(forKey key: Key) -> Data? {
+  @Dependency(\.groupDefaults) var defaults
+  return defaults.data(forKey: key.rawValue)
 }
 
 private func loadDate(forKey key: Key) -> Date? {

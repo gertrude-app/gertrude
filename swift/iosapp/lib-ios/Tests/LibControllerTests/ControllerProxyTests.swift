@@ -77,6 +77,7 @@ func setup(
     }
     $0.sharedStorage.loadSuspensionExpiration = { nil }
     $0.sharedStorage.loadScreenshotLastSaved = { nil }
+    $0.sharedStorage.loadShieldAllowlist = { nil } // shields feature off
     $0.sharedStorage.loadProtectionMode = {
       test.loadProtectionModeCalls.withValue { $0 += 1 }
       return storedProtectionMode
