@@ -31,7 +31,24 @@ public final class VirtualDevice {
   public let currentDate: LockIsolated<Date>
   public let deviceId: UUID
   public let filterInstalled: LockIsolated<Bool>
+  public let grantPolicy: RecordingSuspension.GrantPolicy
   public let trace = LockIsolated<[TraceEvent]>([])
+
+  /// OS RULE R14 (ManagedSettings persistence): shield state written to a
+  /// named `ManagedSettingsStore` is device policy, not process state — it
+  /// survives the writing process's death AND reboot until overwritten or the
+  /// Screen Time authorization is revoked. Only processes holding the
+  /// authorization (here: app, controller) can write it; the sim withholds
+  /// the `managedSettings` dependency from the filter and recorder so an
+  /// unauthorized write attempt fails the test. Device-verified 2026-07-04
+  /// (spike session 1, iOS 26.5.1): 75/75 controller-context writes applied
+  /// ≤36ms; shields persisted a reboot; revocation cleared the store
+  /// silently. The ~1.5-2s post-boot window where an app briefly APPEARS
+  /// unshielded is UI lag only — probed 2026-07-05 (session 2): tapping the
+  /// app inside the window opened it restricted, so enforcement is continuous
+  /// across reboot and the sim rightly doesn't model the window.
+  /// SIMPLIFICATION: revocation is not modeled.
+  public let shields = LockIsolated<SimShields>(.init())
 
   public private(set) var filter: FilterProcess?
   public private(set) var controller: ControllerProcess?
@@ -48,12 +65,103 @@ public final class VirtualDevice {
     filterInstalled: Bool = false,
     deviceId: UUID = UUID(1),
     now: Date = Date(timeIntervalSinceReferenceDate: 0),
+    grantPolicy: RecordingSuspension.GrantPolicy = .burnOnFinish,
   ) {
     self.disk = LockIsolated(disk)
     self.api = ScriptedApi(api)
     self.filterInstalled = LockIsolated(filterInstalled)
     self.deviceId = deviceId
     self.currentDate = LockIsolated(now)
+    self.grantPolicy = grantPolicy
+  }
+}
+
+// shields (ManagedSettings) world state
+
+public extension VirtualDevice {
+  /// OS RULE R14 (`.all(except:)` scope): the category-based shield policy
+  /// covers every third-party app and categorized first-party apps, but
+  /// EXEMPTS uncategorized system apps AND the managing app itself.
+  /// Device-verified 2026-07-04 (spike session 1): shielded — all
+  /// third-party plus Music and Mail; not shielded — Phone, Settings,
+  /// Messages, Safari, Maps, Find My, Clock. Phone/Settings exemptions are
+  /// desirable (emergency/anti-abuse); Safari and Messages are the named
+  /// residual surfaces (shields doc §Known bounded leaks). Owner exemption
+  /// device-verified 2026-07-05 (session 2 follow-up, human-observed, both
+  /// writer contexts): with shields-all up, Gertrude itself stayed
+  /// launchable and usable without being in the exception set — so no entry
+  /// deadlock and no allowlist-onboarding requirement for Gertrude
+  /// (see scenario `gertrudeIsExemptFromItsOwnShields`).
+  static let shieldExemptSystemApps: Set<String> = [
+    "com.apple.mobilephone",
+    "com.apple.Preferences",
+    "com.apple.MobileSMS",
+    "com.apple.mobilesafari",
+    "com.apple.Maps",
+    "com.apple.findmy",
+    "com.apple.mobiletimer",
+  ]
+
+  func appIsShielded(_ bundleId: String) -> Bool {
+    let shields = self.shields.value
+    guard shields.raised else { return false }
+    guard !Self.shieldExemptSystemApps.contains(bundleId) else { return false }
+    guard bundleId != .gertrudeBundleIdShort, bundleId != .gertrudeBundleIdLong
+    else { return false }
+    return !shields.exemptBundleIds.contains(bundleId)
+  }
+
+  /// Seeds the shield allowlist register, as the app would write from parent
+  /// config. The sim's stand-in for encoded `FamilyActivitySelection` data is
+  /// a JSON array of bundle ids (production tokens are opaque and
+  /// device-bound; both round-trip through the register as `Data`).
+  func seedShieldAllowlist(_ bundleIds: [String]) {
+    let data = try! JSONEncoder().encode(bundleIds)
+    self.disk.withValue { $0[Key.shieldAllowlist.rawValue] = .data(data) }
+  }
+
+  var diskShieldAllowlistData: Data? {
+    guard case .data(let data) = self.disk.value[Key.shieldAllowlist.rawValue] else {
+      return nil
+    }
+    return data
+  }
+
+  /// Models the app's non-optional shield entry edge (shields doc §the
+  /// traffic-coupling hazard) without a live `AppProcess`: on
+  /// `broadcastStarted` the foreground app drops shields alongside writing
+  /// the expiration, because a shielded app cannot generate the flow that
+  /// would summon the controller's reconciler. Scenarios with a real app
+  /// exercise the actual reducer edge; the explorer uses this when it plays
+  /// the app's register-writing role directly.
+  func appDropsShieldsEntryEdge() {
+    guard self.diskShieldAllowlistData != nil else { return }
+    self.simManagedSettings(for: .app).clearShields()
+  }
+
+  private func simManagedSettings(for target: SimTarget) -> ManagedSettingsClient {
+    let shields = self.shields
+    let trace = self.trace
+    return ManagedSettingsClient(
+      shieldApps: { _ in "sim-unsupported" },
+      shieldAllExcept: { data in
+        let exempt = (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        shields.setValue(SimShields(raised: true, exemptBundleIds: Set(exempt)))
+        trace.withValue {
+          $0.append(.shieldsChanged(by: target, raised: true, exemptCount: exempt.count))
+        }
+        return "all-except=\(exempt.count)"
+      },
+      shieldWebDomains: { _ in "sim-unsupported" },
+      clearShields: {
+        shields.setValue(SimShields(raised: false, exemptBundleIds: []))
+        trace.withValue { $0.append(.shieldsChanged(by: target, raised: false, exemptCount: 0)) }
+      },
+      shieldsDescription: {
+        let value = shields.value
+        return value.raised ? "up exempt=\(value.exemptBundleIds.count)" : "down"
+      },
+    )
   }
 }
 
@@ -382,8 +490,26 @@ public extension VirtualDevice {
   /// where the OS coalesced them into a single controller delivery. This is
   /// an OS-level flow-batching optimization, not a correctness issue — the
   /// steady-state 1:1 model is correct and the burst edge is not modeled.
+  ///
+  /// OS RULE R15 (shields gate app usability): a shielded app cannot be used
+  /// by the person holding the device — its UI is covered by the system
+  /// shield — so user-initiated flows and socket use from it simply do not
+  /// happen (`nil` return: the flow never existed; the filter was never
+  /// consulted). Background traffic (`background: true` — app refresh,
+  /// push-driven fetches) may still flow from a shielded app. This coupling
+  /// is what lets the explorer probe shield entry-deadlock and
+  /// exit-starvation: shields suppress the very traffic that grants the
+  /// protocol CPU. Evidence: ManagedSettings shield semantics + spike
+  /// session 1 (shield visibility behaviorally instant; in-progress
+  /// background audio killed the moment shields went up).
   @discardableResult
-  func flow(_ flow: FilterFlow) async -> FlowVerdict {
+  func flow(_ flow: FilterFlow, background: Bool = false) async -> FlowVerdict? {
+    if !background, let bundleId = flow.bundleId, self.appIsShielded(bundleId) {
+      self.trace.withValue {
+        $0.append(.flowSuppressedByShield(bundleId: bundleId, target: flow.target))
+      }
+      return nil
+    }
     guard self.filterInstalled.value else {
       self.trace.withValue { $0.append(.unfilteredFlow(target: flow.target)) }
       return .allow
@@ -418,8 +544,22 @@ public extension VirtualDevice {
 
   @discardableResult
   func browse(_ hostname: String, from bundleId: String = "com.apple.mobilesafari") async
-    -> FlowVerdict {
+    -> FlowVerdict? {
     await self.flow(FilterFlow(hostname: hostname, bundleId: bundleId, flowType: .socket))
+  }
+
+  /// OS RULE R15: background app refresh traffic from a shielded app still
+  /// reaches the filter — shields gate the person's use of the app, not the
+  /// process's background scheduling.
+  @discardableResult
+  func backgroundRefreshFlow(
+    to hostname: String,
+    from bundleId: String,
+  ) async -> FlowVerdict? {
+    await self.flow(
+      FilterFlow(hostname: hostname, bundleId: bundleId, flowType: .socket),
+      background: true,
+    )
   }
 
   /// OS RULE R13 (flow verdict finality): the filter's verdict is final for the
@@ -452,9 +592,15 @@ public extension VirtualDevice {
   }
 
   /// Data moving over an already-verdicted connection: succeeds iff the socket
-  /// is still open; the filter is not consulted (OS RULE R13).
+  /// is still open (OS RULE R13 — the filter is not consulted) AND the owning
+  /// app is not currently shielded (OS RULE R15 — a shielded app cannot be
+  /// used, so its leaked sockets are unusable; this is precisely the S1′
+  /// closure the shields extension exists for). The socket itself survives
+  /// shielding: drop the shields and data flows again.
   func connectionCarriesData(_ id: Int) -> Bool {
-    self.openConnections.value.contains { $0.id == id }
+    guard let connection = self.openConnections.value.first(where: { $0.id == id })
+    else { return false }
+    return !self.appIsShielded(connection.bundleId)
   }
 
   /// OS RULE R7 (sentinel channel): `FilterClient.send` fires a real HTTPS request
@@ -586,6 +732,8 @@ extension VirtualDevice {
     let filterInstalled = self.filterInstalled
     let pendingRecorderEvents = self.pendingRecorderEvents
     let apiClient = self.api.client(for: target)
+    let managedSettings = self.simManagedSettings(for: target)
+    let grantPolicy = self.grantPolicy
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "UTC")!
     let fixedCalendar = calendar
@@ -616,6 +764,7 @@ extension VirtualDevice {
         deps.sharedStorage = .liveValue
         deps.screenshotRepo = .inMemory(screenshotDisk)
         deps.device.deviceId = { deviceId }
+        deps.managedSettings = managedSettings
 
       case .recorder:
         deps.sharedStorage = .liveValue
@@ -633,6 +782,8 @@ extension VirtualDevice {
         deps.sharedStorage = .liveValue
         deps.screenshotRepo = .inMemory(screenshotDisk)
         deps.device.deviceId = { deviceId }
+        deps.managedSettings = managedSettings
+        deps.grantPolicy = grantPolicy
         deps.device.installedVersion = { "1.9.0" }
         deps.device.deleteCacheFillDir = {}
         deps.device.data = { .init(
@@ -691,6 +842,13 @@ public extension VirtualDevice {
   func seedSuspensionExpiration(secondsFromNow seconds: Int) {
     let expiration = self.currentDate.value + TimeInterval(seconds)
     self.disk.withValue { $0[Key.suspensionExpiration.rawValue] = .date(expiration) }
+  }
+
+  var diskShieldAllowlist: [String]? {
+    guard case .data(let data) = self.disk.value[Key.shieldAllowlist.rawValue] else {
+      return nil
+    }
+    return try? JSONDecoder().decode([String].self, from: data)
   }
 
   func logs(for target: SimTarget) -> [String] {

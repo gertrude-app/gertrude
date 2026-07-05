@@ -26,6 +26,16 @@ public struct OpenConnection: Sendable, Equatable {
   public let bundleId: String
 }
 
+public struct SimShields: Sendable, Equatable {
+  public var raised = false
+  public var exemptBundleIds: Set<String> = []
+
+  public init(raised: Bool = false, exemptBundleIds: Set<String> = []) {
+    self.raised = raised
+    self.exemptBundleIds = exemptBundleIds
+  }
+}
+
 public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case launched(SimTarget)
   case launchedOnDemand(SimTarget)
@@ -45,6 +55,8 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
   case appSuspended
   case appResumed(coalescedEvents: [RecorderEvent])
   case connectionOpened(id: Int, target: String)
+  case shieldsChanged(by: SimTarget, raised: Bool, exemptCount: Int)
+  case flowSuppressedByShield(bundleId: String, target: String?)
   case log(SimTarget, String)
 
   public var description: String {
@@ -67,6 +79,10 @@ public enum TraceEvent: Sendable, Equatable, CustomStringConvertible {
     case .appSuspended: "os suspended app"
     case .appResumed(let events): "app resumed, coalesced darwin events: \(events)"
     case .connectionOpened(let id, let target): "connection \(id) opened to `\(target)`"
+    case .shieldsChanged(let by, let raised, let exemptCount):
+      "\(by.rawValue) wrote shields \(raised ? "UP (exempt: \(exemptCount))" : "DOWN")"
+    case .flowSuppressedByShield(let bundleId, let target):
+      "shield suppressed flow from \(bundleId) to `\(target ?? "(nil)")`"
     case .log(let target, let message): "[\(target.rawValue)] \(message)"
     }
   }

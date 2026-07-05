@@ -44,6 +44,13 @@ public enum ExplorerAction: Equatable, Sendable, Codable, CustomStringConvertibl
   case spoofSuspendSentinel
   case openBlockedConnection
   case useBlockedConnection
+  case browseBlockedFromApp
+  case openAppConnection
+  case useAppConnection
+  case backgroundRefresh
+  case refreshRulesSentinel
+  case editAllowlist(includeApp: Bool)
+  case stopRecordingViaApp
   case startBroadcast
   case beginGrantedRecording(grantSeconds: Int)
   case recordFrames(seconds: Int)
@@ -69,6 +76,13 @@ public enum ExplorerAction: Equatable, Sendable, Codable, CustomStringConvertibl
     case .spoofSuspendSentinel: "spoofSuspendSentinel"
     case .openBlockedConnection: "openBlockedConnection"
     case .useBlockedConnection: "useBlockedConnection"
+    case .browseBlockedFromApp: "browseBlockedFromApp"
+    case .openAppConnection: "openAppConnection"
+    case .useAppConnection: "useAppConnection"
+    case .backgroundRefresh: "backgroundRefresh"
+    case .refreshRulesSentinel: "refreshRulesSentinel"
+    case .editAllowlist(let include): "editAllowlist(\(include ? "with" : "without") app)"
+    case .stopRecordingViaApp: "stopRecordingViaApp"
     case .startBroadcast: "startBroadcast"
     case .beginGrantedRecording(let s): "beginGrantedRecording(grant \(s)s)"
     case .recordFrames(let s): "recordFrames(\(s)s)"
@@ -167,6 +181,13 @@ public extension RecordingExplorer {
     public var uploadedDistinct = 0
     public var connectionsOpened = 0
     public var leakedConnectionUses = 0
+    public var flowsSuppressedByShield = 0
+    public var leaksClosedByShield = 0
+    public var safariLeakedUses = 0
+    public var shieldsRaisedWrites = 0
+    public var shieldsDroppedWrites = 0
+    public var entryShieldGapMaxSeconds = 0
+    public var exitShieldGapMaxSeconds = 0
   }
 
   struct RunResult: Sendable, Codable {
@@ -189,9 +210,15 @@ public extension RecordingExplorer {
     seed: UInt64,
     steps: Int = 40,
     strictSocketLeak: Bool = false,
+    shields: Bool = false,
+    grantPolicy: RecordingSuspension.GrantPolicy = .burnOnFinish,
   ) async -> RunResult {
     var rng = SeededRNG(seed: seed)
-    let run = ExplorerRun(strictSocketLeak: strictSocketLeak)
+    let run = ExplorerRun(
+      strictSocketLeak: strictSocketLeak,
+      shields: shields,
+      grantPolicy: grantPolicy,
+    )
     await run.bootstrap()
     var actions: [ExplorerAction] = []
     var violation: Violation?
@@ -220,8 +247,14 @@ public extension RecordingExplorer {
     _ script: [ExplorerAction],
     converge: Bool = true,
     strictSocketLeak: Bool = false,
+    shields: Bool = false,
+    grantPolicy: RecordingSuspension.GrantPolicy = .burnOnFinish,
   ) async -> RunResult {
-    let run = ExplorerRun(strictSocketLeak: strictSocketLeak)
+    let run = ExplorerRun(
+      strictSocketLeak: strictSocketLeak,
+      shields: shields,
+      grantPolicy: grantPolicy,
+    )
     await run.bootstrap()
     var actions: [ExplorerAction] = []
     var violation: Violation?
@@ -255,6 +288,8 @@ public extension RecordingExplorer {
     expecting kind: String,
     budget: Int = 250,
     strictSocketLeak: Bool = false,
+    shields: Bool = false,
+    grantPolicy: RecordingSuspension.GrantPolicy = .burnOnFinish,
   ) async -> [ExplorerAction] {
     var current = script
     var remaining = budget
@@ -266,7 +301,12 @@ public extension RecordingExplorer {
         var candidate = current
         candidate.remove(at: index)
         remaining -= 1
-        let result = await self.replay(candidate, strictSocketLeak: strictSocketLeak)
+        let result = await self.replay(
+          candidate,
+          strictSocketLeak: strictSocketLeak,
+          shields: shields,
+          grantPolicy: grantPolicy,
+        )
         if result.violation?.kind == kind {
           current = candidate
           changed = true
@@ -280,13 +320,26 @@ public extension RecordingExplorer {
 
 @MainActor
 final class ExplorerRun {
+  static let shieldableApp = "com.google.ios.youtube"
+
   let device: VirtualDevice
   let strictSocketLeak: Bool
+  let shieldsEnabled: Bool
+  let grantPolicy: RecordingSuspension.GrantPolicy
   var oracle = SpecOracle()
   var stats = RecordingExplorer.Stats()
+  var controllerOpportunitySinceInactive = false
+  var entryShieldGap: TimeInterval = 0
+  var exitShieldGap: TimeInterval = 0
 
-  init(strictSocketLeak: Bool = false) {
+  init(
+    strictSocketLeak: Bool = false,
+    shields: Bool = false,
+    grantPolicy: RecordingSuspension.GrantPolicy = .burnOnFinish,
+  ) {
     self.strictSocketLeak = strictSocketLeak
+    self.shieldsEnabled = shields
+    self.grantPolicy = grantPolicy
     var api = ScriptedApi.Config()
     api.blockRules = [.targetContains(value: "blocked.com")]
     api.connected = .init(blockRules: [.targetContains(value: "blocked.com")], webPolicy: nil)
@@ -305,7 +358,11 @@ final class ExplorerRun {
       ),
       api: api,
       filterInstalled: true,
+      grantPolicy: grantPolicy,
     )
+    if shields {
+      self.device.seedShieldAllowlist([.gertrudeBundleIdShort])
+    }
   }
 
   func bootstrap() async {
@@ -314,17 +371,28 @@ final class ExplorerRun {
   }
 
   var openBlockedConnection: OpenConnection? {
-    self.device.openConnections.value.first { $0.hostname == "blocked.com" }
+    self.device.openConnections.value
+      .first { $0.hostname == "blocked.com" && $0.bundleId == "com.apple.mobilesafari" }
+  }
+
+  var openAppConnection: OpenConnection? {
+    self.device.openConnections.value
+      .first { $0.hostname == "blocked.com" && $0.bundleId == Self.shieldableApp }
   }
 
   func isEnabled(_ action: ExplorerAction) -> Bool {
     switch action {
     case .useBlockedConnection:
       self.openBlockedConnection != nil
+    case .useAppConnection:
+      self.shieldsEnabled && self.openAppConnection != nil
+    case .browseBlockedFromApp, .openAppConnection, .backgroundRefresh, .refreshRulesSentinel,
+         .editAllowlist:
+      self.shieldsEnabled
     case .startBroadcast, .beginGrantedRecording:
       self.device.recorder == nil
     case .recordFrames, .recordStatic, .pauseFrameDelivery, .stopBroadcast, .lockDevice,
-         .killRecorder:
+         .killRecorder, .stopRecordingViaApp:
       self.device.recorder != nil
     case .killFilter:
       self.device.filter != nil
@@ -357,8 +425,17 @@ final class ExplorerRun {
       menu.append((4, .recordStatic(seconds: pick(&rng, from: [5, 15]))))
       menu.append((4, .pauseFrameDelivery(seconds: pick(&rng, from: [3, 7, 15]))))
       menu.append((4, .stopBroadcast))
+      menu.append((4, .stopRecordingViaApp))
       menu.append((4, .lockDevice))
       menu.append((3, .killRecorder))
+    }
+    if self.shieldsEnabled {
+      menu.append((12, .browseBlockedFromApp))
+      menu.append((5, .openAppConnection))
+      menu.append((6, .backgroundRefresh))
+      menu.append((3, .refreshRulesSentinel))
+      menu.append((2, .editAllowlist(includeApp: rng.next() % 2 == 0)))
+      if self.openAppConnection != nil { menu.append((7, .useAppConnection)) }
     }
     if self.openBlockedConnection != nil { menu.append((7, .useBlockedConnection)) }
     if self.device.filter != nil { menu.append((3, .killFilter)) }
@@ -367,6 +444,23 @@ final class ExplorerRun {
   }
 
   func perform(_ action: ExplorerAction, step: Int) async -> RecordingExplorer.Violation? {
+    let traceCountBefore = self.device.trace.value.count
+    let nowBefore = self.device.currentDate.value
+    if let violation = await self.execute(action, step: step) {
+      return violation
+    }
+    if let violation = self.postActionShieldChecks(
+      step, action, traceCountBefore: traceCountBefore, nowBefore: nowBefore,
+    ) {
+      return violation
+    }
+    return self.checkEvidenceConsistency(step, action)
+  }
+
+  private func execute(
+    _ action: ExplorerAction,
+    step: Int,
+  ) async -> RecordingExplorer.Violation? {
     switch action {
     case .browseBlocked:
       let expectLifted = self.oracle.onRegularFlow(
@@ -456,12 +550,16 @@ final class ExplorerRun {
         now: self.device.currentDate.value,
       )
       if carries, !active {
-        self.stats.leakedConnectionUses += 1
-        if self.strictSocketLeak {
-          return self.violation(
-            "S1P-socket-leak", step, action,
-            "connection \(connection.id) to blocked.com still carries data while unrecorded (opened during a suspension, never re-verdicted: OS RULE R13)",
-          )
+        if self.shieldsEnabled {
+          self.stats.safariLeakedUses += 1
+        } else {
+          self.stats.leakedConnectionUses += 1
+          if self.strictSocketLeak {
+            return self.violation(
+              "S1P-socket-leak", step, action,
+              "connection \(connection.id) to blocked.com still carries data while unrecorded (opened during a suspension, never re-verdicted: OS RULE R13)",
+            )
+          }
         }
       }
 
@@ -473,6 +571,7 @@ final class ExplorerRun {
       self.device.seedSuspensionExpiration(secondsFromNow: grantSeconds)
       self.stats.broadcasts += 1
       await self.device.startBroadcast()
+      self.device.appDropsShieldsEntryEdge()
       self.oracle.onSuspendSentinel(
         expiration: self.device.diskSuspensionExpiration,
         now: self.device.currentDate.value,
@@ -513,8 +612,213 @@ final class ExplorerRun {
 
     case .quiesce:
       await self.device.quiesce()
+
+    case .browseBlockedFromApp:
+      if self.device.appIsShielded(Self.shieldableApp) {
+        await self.device.browse("blocked.com", from: Self.shieldableApp)
+        self.stats.flowsSuppressedByShield += 1
+      } else {
+        let expectLifted = self.oracle.onRegularFlow(
+          expiration: self.device.diskSuspensionExpiration,
+          lastScreenshot: self.device.diskScreenshotLastSaved,
+          now: self.device.currentDate.value,
+        )
+        let verdict = await self.device.browse("blocked.com", from: Self.shieldableApp)
+        if verdict == .allow { self.stats.blockedAllowed += 1 }
+        else { self.stats.blockedDropped += 1 }
+        if expectLifted, verdict != .allow {
+          return self.violation(
+            "L2-blocking-stuck", step, action,
+            "registers say suspension is live but blocked app flow got \(String(describing: verdict))",
+          )
+        }
+        if !expectLifted, verdict != .drop {
+          return self.violation(
+            "S1-unexpected-allow", step, action,
+            "registers say no valid suspension but blocked app flow got \(String(describing: verdict))",
+          )
+        }
+      }
+
+    case .openAppConnection:
+      if self.device.appIsShielded(Self.shieldableApp) {
+        _ = await self.device.openConnection(to: "blocked.com", from: Self.shieldableApp)
+        self.stats.flowsSuppressedByShield += 1
+      } else {
+        let expectLifted = self.oracle.onRegularFlow(
+          expiration: self.device.diskSuspensionExpiration,
+          lastScreenshot: self.device.diskScreenshotLastSaved,
+          now: self.device.currentDate.value,
+        )
+        let opened = await self.device.openConnection(to: "blocked.com", from: Self.shieldableApp)
+        if opened != nil { self.stats.connectionsOpened += 1 }
+        if expectLifted, opened == nil {
+          return self.violation(
+            "L2-blocking-stuck", step, action,
+            "registers say suspension is live but app connection was refused",
+          )
+        }
+        if !expectLifted, opened != nil {
+          return self.violation(
+            "S1-unexpected-allow", step, action,
+            "registers say no valid suspension but blocked app connection was opened",
+          )
+        }
+      }
+
+    case .useAppConnection:
+      guard let connection = self.openAppConnection else { break }
+      let carries = self.device.connectionCarriesData(connection.id)
+      let active = self.oracle.peekActive(
+        expiration: self.device.diskSuspensionExpiration,
+        lastScreenshot: self.device.diskScreenshotLastSaved,
+        now: self.device.currentDate.value,
+      )
+      let allowlisted = (self.device.diskShieldAllowlist ?? []).contains(connection.bundleId)
+      if carries, !active {
+        self.stats.leakedConnectionUses += 1
+        if self.shieldsEnabled, self.controllerOpportunitySinceInactive, !allowlisted {
+          return self.violation(
+            "S1P-socket-leak", step, action,
+            "connection \(connection.id) from \(connection.bundleId) still usable while unrecorded, after a reconcile opportunity had passed (S1′: the shield should have made it moot)",
+          )
+        }
+        if self.strictSocketLeak {
+          return self.violation(
+            "S1P-socket-leak", step, action,
+            "connection \(connection.id) from \(connection.bundleId) still carries data while unrecorded (opened during a suspension, never re-verdicted: OS RULE R13)",
+          )
+        }
+      }
+      if !carries, !active { self.stats.leaksClosedByShield += 1 }
+
+    case .backgroundRefresh:
+      _ = self.oracle.onRegularFlow(
+        expiration: self.device.diskSuspensionExpiration,
+        lastScreenshot: self.device.diskScreenshotLastSaved,
+        now: self.device.currentDate.value,
+      )
+      let verdict = await self.device
+        .backgroundRefreshFlow(to: "safe.com", from: Self.shieldableApp)
+      if verdict != .allow {
+        return self.violation(
+          "S1-safe-flow-blocked", step, action,
+          "background refresh flow got \(String(describing: verdict))",
+        )
+      }
+
+    case .refreshRulesSentinel:
+      if self.device.appIsShielded(.gertrudeBundleIdShort) {
+        self.stats.flowsSuppressedByShield += 1
+      }
+      await self.device.deliverSentinel(.refreshRules)
+
+    case .editAllowlist(let includeApp):
+      self.device.seedShieldAllowlist(
+        includeApp
+          ? [.gertrudeBundleIdShort, Self.shieldableApp]
+          : [.gertrudeBundleIdShort],
+      )
+
+    case .stopRecordingViaApp:
+      await self.device.stopBroadcast()
+      let restartable = self.grantPolicy == .restartWithinGrant
+        && self.device.diskSuspensionExpiration
+        .map { $0 > self.device.currentDate.value } == true
+      if !restartable {
+        self.device.disk.withValue { $0[Key.suspensionExpiration.rawValue] = nil }
+      }
+      self.oracle.onResumeSentinel()
+      await self.device.deliverSentinel(.resumeFilter)
     }
-    return self.checkEvidenceConsistency(step, action)
+    return nil
+  }
+
+  /// The shields oracle (docs/ios-shields-protocol.md §Invariants): after any
+  /// action that provably gave the controller CPU (a delegated flow, or a
+  /// reboot's startup reconcile) without advancing the clock afterward, the
+  /// written shield state must equal the spec's projection of the registers —
+  /// S3 (shields up while unrecorded) and L4 (shields down while live) as a
+  /// level check. Between opportunities nothing is asserted (both invariants
+  /// are traffic-bounded, per §the traffic-coupling hazard); the entry/exit
+  /// gap stats quantify that exposure so starvation shows up in corpus
+  /// numbers rather than being assumed away.
+  private func postActionShieldChecks(
+    _ step: Int,
+    _ action: ExplorerAction,
+    traceCountBefore: Int,
+    nowBefore: Date,
+  ) -> RecordingExplorer.Violation? {
+    let trace = self.device.trace.value
+    let sawControllerFlow = trace.count > traceCountBefore
+      && trace[traceCountBefore...].contains { event in
+        if case .controlVerdict = event { return true }
+        return false
+      }
+    let now = self.device.currentDate.value
+    let active = self.oracle.peekActive(
+      expiration: self.device.diskSuspensionExpiration,
+      lastScreenshot: self.device.diskScreenshotLastSaved,
+      now: now,
+    )
+    let rebooted = if case .reboot = action { true } else { false }
+    let opportunity = sawControllerFlow || (rebooted && self.shieldsEnabled)
+    if active {
+      self.controllerOpportunitySinceInactive = false
+    } else if opportunity {
+      self.controllerOpportunitySinceInactive = true
+    }
+    guard self.shieldsEnabled, let allowlist = self.device.diskShieldAllowlistData else {
+      return nil
+    }
+    let raised = self.device.shields.value.raised
+    let dt = now.timeIntervalSince(nowBefore)
+    if active, raised {
+      self.entryShieldGap += dt
+      self.stats.entryShieldGapMaxSeconds =
+        max(self.stats.entryShieldGapMaxSeconds, Int(self.entryShieldGap))
+    } else {
+      self.entryShieldGap = 0
+    }
+    if !active, !raised {
+      self.exitShieldGap += dt
+      self.stats.exitShieldGapMaxSeconds =
+        max(self.stats.exitShieldGapMaxSeconds, Int(self.exitShieldGap))
+    } else {
+      self.exitShieldGap = 0
+    }
+    guard opportunity, now == nowBefore else { return nil }
+    let projection = ShieldsProjection.derive(
+      expiration: self.device.diskSuspensionExpiration,
+      lastScreenshot: self.device.diskScreenshotLastSaved,
+      now: now,
+      allowlist: allowlist,
+    )
+    let shields = self.device.shields.value
+    switch projection {
+    case .down:
+      if shields.raised {
+        return self.violation(
+          "L4-shields-stuck-up", step, action,
+          "suspension is live and a reconcile opportunity just passed, but shields are raised",
+        )
+      }
+    case .up(let data):
+      let expected = Set((try? JSONDecoder().decode([String].self, from: data)) ?? [])
+      if !shields.raised {
+        return self.violation(
+          "S3-shields-stuck-down", step, action,
+          "no live suspension and a reconcile opportunity just passed, but shields are down",
+        )
+      }
+      if shields.exemptBundleIds != expected {
+        return self.violation(
+          "S3-shields-stale-allowlist", step, action,
+          "shields raised exempting \(shields.exemptBundleIds.sorted()) but the register allowlist is \(expected.sorted())",
+        )
+      }
+    }
+    return nil
   }
 
   /// C1 (convergence) + S2 (evidence conservation), checked at the end of
@@ -569,6 +873,13 @@ final class ExplorerRun {
         "\(lost.count) of \(everSaved.count) saved screenshots never uploaded",
       )
     }
+    if self.shieldsEnabled, self.device.diskShieldAllowlistData != nil,
+       !self.device.shields.value.raised {
+      return self.violation(
+        "C1-shields-not-raised", step, action,
+        "converged with shields down while no suspension is live (C1 extended)",
+      )
+    }
     return self.checkEvidenceConsistency(step, action)
   }
 
@@ -593,6 +904,11 @@ final class ExplorerRun {
     stats.rederivedEntries = self.oracle.rederivedEntries
     stats.screenshotsCreated = self.device.screenshotsEverSaved.value.count
     stats.uploadedDistinct = Set(self.device.api.uploadedScreenshots.value.map(\.id)).count
+    for event in self.device.trace.value {
+      if case .shieldsChanged(_, let raised, _) = event {
+        if raised { stats.shieldsRaisedWrites += 1 } else { stats.shieldsDroppedWrites += 1 }
+      }
+    }
     return stats
   }
 
