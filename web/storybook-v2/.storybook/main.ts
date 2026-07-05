@@ -3,7 +3,10 @@ import { mergeConfig } from 'vite';
 import type { StorybookConfig } from '@storybook/tanstack-react';
 
 const config: StorybookConfig = {
-  stories: [`../../ui/src/**/*.stories.@(ts|tsx)`],
+  stories: [
+    `../../ui/src/**/*.stories.@(ts|tsx)`,
+    `../../account/src/**/*.stories.@(ts|tsx)`,
+  ],
   staticDirs: [`../../account/public`],
   addons: [],
   framework: `@storybook/tanstack-react`,

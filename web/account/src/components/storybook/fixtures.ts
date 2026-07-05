@@ -1,0 +1,464 @@
+import type {
+  AllowedAlbum,
+  Device,
+  InstalledMacApp,
+  Keychain,
+  Notification,
+  NotificationMethod,
+  PersonCardPerson,
+  PersonIosSettingsConfiguration,
+  PersonMacSettingsConfiguration,
+  Schedule,
+  SecurityEvent,
+  SuspensionRequest,
+  UnlockRequest,
+} from '#/components/types';
+import type { Testimonial } from '#/components/unauthed/RotatingTestimonials';
+import type { ActivityItem, DaySummary } from '#/lib/activity';
+
+export const weekdaySchedule: Schedule = {
+  type: `active`,
+  days: {
+    sunday: false,
+    monday: true,
+    tuesday: true,
+    wednesday: true,
+    thursday: true,
+    friday: true,
+    saturday: false,
+  },
+  startTime: { hour: 8, minute: 0 },
+  endTime: { hour: 16, minute: 0 },
+};
+
+export const macDevice: Device = {
+  id: `mac-1`,
+  personId: `person-1`,
+  type: `mac`,
+  name: `Jude's MacBook`,
+  macOSVersion: `15.6`,
+  modelName: `MacBook Air`,
+  modelIdentifier: `MacBookAir10,1`,
+  online: true,
+};
+
+export const iphoneDevice: Device = {
+  id: `iphone-1`,
+  personId: `person-1`,
+  type: `iphone`,
+  iOSVersion: `18.5`,
+  modelName: `iPhone 15 Pro`,
+  modelIdentifier: `iPhone16,1`,
+};
+
+export const ipadDevice: Device = {
+  id: `ipad-1`,
+  personId: `person-2`,
+  type: `ipad`,
+  iOSVersion: `18.5`,
+  modelName: `iPad Air`,
+  modelIdentifier: `iPad13,16`,
+};
+
+export const devices: Device[] = [macDevice, iphoneDevice, ipadDevice];
+
+export const people: PersonCardPerson[] = [
+  {
+    id: `person-1`,
+    name: `Jude`,
+    devices: devices.slice(0, 2),
+    screenshot: {
+      url: `/example-screenshots/kid-school.png`,
+      recency: `Captured 4 minutes ago`,
+    },
+    musicListening: {
+      trackName: `Here Comes the Sun`,
+      artistName: `The Beatles`,
+      albumArtUrl: `https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/df/db/61/dfdb615d-47f8-06e9-9533-b96daccc029f/18UMGIM31076.rgb.jpg/300x300bb.jpg`,
+      recencyInMinutes: 0,
+    },
+    podcastListening: null,
+  },
+  {
+    id: `person-2`,
+    name: `Mabel`,
+    devices: [ipadDevice],
+    screenshot: null,
+    musicListening: null,
+    podcastListening: {
+      title: `Space facts for kids`,
+      podcastName: `Science Hour`,
+      artworkUrl: `https://picsum.photos/seed/science-hour/300/300`,
+      recencyInMinutes: 12,
+    },
+  },
+  {
+    id: `person-3`,
+    name: `Caleb`,
+    devices: [],
+    screenshot: null,
+    musicListening: null,
+    podcastListening: null,
+  },
+];
+
+export const keychains: Keychain[] = [
+  {
+    id: `keychain-school`,
+    name: `School stuff`,
+    description: `Research, homework, and class resources.`,
+    numKeys: 43,
+    isPublic: false,
+  },
+  {
+    id: `keychain-games`,
+    name: `Games`,
+    description: `Approved game sites and launchers.`,
+    numKeys: 12,
+    isPublic: false,
+  },
+  {
+    id: `keychain-music`,
+    name: `Music`,
+    description: `Streaming and lyrics sites with safer defaults.`,
+    numKeys: 18,
+    isPublic: true,
+  },
+];
+
+export const installedMacApps: InstalledMacApp[] = [
+  {
+    id: `app-safari`,
+    name: `Safari`,
+    bundleId: `com.apple.Safari`,
+    appIconUrl: `/example-app-icons/safari.webp`,
+  },
+  {
+    id: `app-chrome`,
+    name: `Google Chrome`,
+    bundleId: `com.google.Chrome`,
+    appIconUrl: `/example-app-icons/chrome.webp`,
+  },
+  {
+    id: `app-minecraft`,
+    name: `Minecraft`,
+    bundleId: `com.mojang.minecraftlauncher`,
+    appIconUrl: `/example-app-icons/minecraft.webp`,
+  },
+  {
+    id: `app-discord`,
+    name: `Discord`,
+    bundleId: `com.hnc.Discord`,
+    appIconUrl: `/example-app-icons/discord.webp`,
+  },
+  {
+    id: `app-scratch`,
+    name: `Scratch`,
+    bundleId: `edu.mit.scratch`,
+    appIconUrl: `/example-app-icons/scratch.webp`,
+  },
+];
+
+export const albums: AllowedAlbum[] = [
+  {
+    title: `Abbey Road`,
+    artist: `The Beatles`,
+    artworkUrl: `https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/df/db/61/dfdb615d-47f8-06e9-9533-b96daccc029f/18UMGIM31076.rgb.jpg/300x300bb.jpg`,
+    showAlbumArt: true,
+  },
+  {
+    title: `The Muppet Movie`,
+    artist: `Kermit the Frog`,
+    artworkUrl: `https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/0f/d8/15/0fd815cb-45f4-b334-e26d-0ea9875795e3/00050087348533.rgb.jpg/300x300bb.jpg`,
+    showAlbumArt: true,
+  },
+  {
+    title: `The Planets`,
+    artist: `Gustav Holst`,
+    artworkUrl: `https://picsum.photos/seed/the-planets/300/300`,
+    showAlbumArt: false,
+  },
+  {
+    title: `Minecraft Volume Alpha`,
+    artist: `C418`,
+    artworkUrl: `https://picsum.photos/seed/minecraft-volume-alpha/300/300`,
+    showAlbumArt: true,
+  },
+];
+
+export const macSettings: PersonMacSettingsConfiguration = {
+  keyloggingEnabled: true,
+  screenshots: { resolution: 1080, frequency: 120 },
+  emphasizeSuspensionActivity: true,
+  downtime: { start: { hour: 21, minute: 0 }, end: { hour: 7, minute: 0 } },
+  filteringOn: true,
+  keychainIds: [`keychain-school`, `keychain-games`],
+  keychainSchedules: { 'keychain-games': weekdaySchedule },
+  alwaysBlockedGroups: {
+    adultContent: true,
+    messagesGifSearch: true,
+    socialMedia: false,
+    spotlightSearch: true,
+  },
+  customAlwaysBlockedDomains: [`reddit.com`, `discord.com`],
+  blockedApps: [
+    {
+      nameOrBundleId: `Minecraft`,
+      appIconUrl: `/example-app-icons/minecraft.webp`,
+      schedule: weekdaySchedule,
+    },
+    {
+      nameOrBundleId: `Discord`,
+      appIconUrl: `/example-app-icons/discord.webp`,
+    },
+  ],
+  unrestrictedApps: [
+    {
+      nameOrBundleId: `Khan Academy`,
+      appIconUrl: `/example-app-icons/khan-academy.webp`,
+    },
+  ],
+};
+
+export const iosSettings: PersonIosSettingsConfiguration = {
+  blockedGroups: {
+    appleMusic: true,
+    whatsApp: true,
+    musicRecognition: true,
+    gifs: true,
+    appleMapsImages: false,
+    aiFeatures: true,
+    appStoreImages: false,
+    spotlight: true,
+    ads: true,
+    appleDotCom: false,
+    spotifyImages: true,
+  },
+  preventProtectionRemoval: true,
+  allowDeletingApps: false,
+  allowFactoryReset: false,
+  allowInstallingApps: true,
+  allowedAlbums: albums.slice(0, 3),
+};
+
+export const unlockRequests: UnlockRequest[] = [
+  {
+    id: `unlock-1`,
+    personName: `Jude`,
+    domains: [
+      `wikipedia.org`,
+      `khanacademy.org`,
+      `nasa.gov`,
+      `scratch.mit.edu`,
+      `mit.edu`,
+    ],
+    reason: `I need these for my science report.`,
+    reviewHref: `/requests/unlock/unlock-1`,
+  },
+  {
+    id: `unlock-2`,
+    personName: `Mabel`,
+    domains: [`lego.com`, `pbs.org`],
+  },
+];
+
+export const suspensionRequests: SuspensionRequest[] = [
+  {
+    id: `suspension-1`,
+    personName: `Jude`,
+    duration: `30 minutes`,
+    reason: `I need to download a school project from Google Drive.`,
+  },
+  {
+    id: `suspension-2`,
+    personName: `Mabel`,
+    duration: `5 minutes`,
+  },
+];
+
+export const securityEvents: SecurityEvent[] = [
+  {
+    id: `security-1`,
+    type: `mac-app`,
+    title: `Filter disabled from the menu bar`,
+    subtitle: `A suspension began without a request.`,
+    explanation: `Gertrude saw the filter disabled directly on this Mac. Check whether this was expected.`,
+    time: `9:42 AM`,
+    date: `Today`,
+    severity: `high`,
+    personName: `Jude`,
+    deviceName: `Jude's MacBook`,
+    personHref: `/people/person-1`,
+    deviceHref: `/people/person-1/mac-settings`,
+  },
+  {
+    id: `security-2`,
+    type: `admin-dashboard`,
+    title: `New dashboard sign-in`,
+    explanation: `A parent dashboard session started from a new IP address.`,
+    time: `7:15 PM`,
+    date: `Yesterday`,
+    severity: `medium`,
+    ipAddress: `203.0.113.42`,
+  },
+];
+
+export const emailNotificationMethod: NotificationMethod = {
+  id: `method-email`,
+  type: `email`,
+  emailAddress: `parent@example.com`,
+};
+
+export const textNotificationMethod: NotificationMethod = {
+  id: `method-text`,
+  type: `text`,
+  phoneNumber: `+15555550142`,
+};
+
+export const slackNotificationMethod: NotificationMethod = {
+  id: `method-slack`,
+  type: `slack`,
+  channelName: `gertrude-alerts`,
+  channelId: `C08GERTRUDE`,
+  botToken: `xoxb-example`,
+};
+
+export const ntfyNotificationMethod: NotificationMethod = {
+  id: `method-ntfy`,
+  type: `ntfy`,
+  topicId: `gertrude-family-alerts-8k4tq9`,
+};
+
+export const pushNotificationMethod: NotificationMethod = {
+  id: `method-push`,
+  type: `push`,
+};
+
+export const notificationMethods: NotificationMethod[] = [
+  emailNotificationMethod,
+  textNotificationMethod,
+  slackNotificationMethod,
+  ntfyNotificationMethod,
+  pushNotificationMethod,
+];
+
+export const notifications: Notification[] = [
+  {
+    id: `notification-1`,
+    methodId: `method-email`,
+    trigger: `unlockRequestSubmitted`,
+    enabled: true,
+    method: emailNotificationMethod,
+  },
+  {
+    id: `notification-2`,
+    methodId: `method-ntfy`,
+    trigger: `securityEventsRecommended`,
+    enabled: true,
+    method: ntfyNotificationMethod,
+  },
+];
+
+export const daySummaries: DaySummary[] = [
+  {
+    date: new Date(2026, 6, 3),
+    stats: {
+      totalCount: 42,
+      deletedCount: 12,
+      flaggedCount: 3,
+      reviewedCount: 15,
+      reviewedPercent: 35.7,
+    },
+  },
+  {
+    date: new Date(2026, 6, 2),
+    stats: {
+      totalCount: 18,
+      deletedCount: 18,
+      flaggedCount: 0,
+      reviewedCount: 18,
+      reviewedPercent: 100,
+    },
+  },
+];
+
+export const activityItems: ActivityItem[] = [
+  {
+    id: `activity-1`,
+    personId: `person-1`,
+    personName: `Jude`,
+    duringSuspension: false,
+    date: new Date(2026, 6, 3, 9, 30),
+    flagged: false,
+    deleted: false,
+    type: `screenshot`,
+    url: `/example-screenshots/kid-school.png`,
+    width: 1200,
+    height: 760,
+  },
+  {
+    id: `activity-2`,
+    personId: `person-1`,
+    personName: `Jude`,
+    duringSuspension: true,
+    date: new Date(2026, 6, 3, 9, 42),
+    flagged: true,
+    deleted: false,
+    type: `keylog`,
+    text: `searched: minecraft server mods\nopened discord invite`,
+    applicationName: `Google Chrome`,
+  },
+  {
+    id: `activity-2b`,
+    personId: `person-1`,
+    personName: `Jude`,
+    duringSuspension: true,
+    date: new Date(2026, 6, 3, 9, 44),
+    flagged: false,
+    deleted: false,
+    type: `screenshot`,
+    url: `/example-screenshots/programmer.png`,
+    width: 1200,
+    height: 760,
+  },
+  {
+    id: `activity-3`,
+    personId: `person-2`,
+    personName: `Mabel`,
+    duringSuspension: false,
+    date: new Date(2026, 6, 3, 10, 5),
+    flagged: false,
+    deleted: false,
+    type: `screenshot`,
+    url: `/example-screenshots/programmer.png`,
+    width: 1200,
+    height: 760,
+  },
+];
+
+export const testimonials: Testimonial[] = [
+  {
+    quote: `Thanks for the hard work you put into making this app. An absolute masterpiece and likely the greatest blessing an app has had on our lives.`,
+    name: `Austin944`,
+  },
+  {
+    quote: `Saved my young son from looking at porn through the maps app. You are a lifesaver.`,
+    name: `GratefulMom55`,
+  },
+  {
+    quote: `Finally a way to block GIFS!!! Thank you, thank you, thank you!!!`,
+    name: `HAAS1988`,
+  },
+  {
+    quote: `Using this for my kids’ iPhones with Apple Configurator and screen time controls has made the phones far safer.`,
+    name: `sraragan`,
+  },
+  {
+    quote: `This app is meeting a great need since Apple has not allowed parents to properly protect their children.`,
+    name: `Apple280`,
+  },
+  {
+    quote: `Apple Screen Time has some helpful features, but Gertrude Blocker plugs the holes Apple missed.`,
+    name: `Henderjay`,
+  },
+];

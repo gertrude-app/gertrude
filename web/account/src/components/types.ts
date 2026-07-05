@@ -1,0 +1,270 @@
+import type { LucideIcon } from 'lucide-react';
+import type React from 'react';
+
+export type Device =
+  | {
+      id: string;
+      personId: string;
+      type: `mac`;
+      name?: string;
+      macOSVersion: string;
+      modelName: string;
+      modelIdentifier: string;
+      online: boolean;
+    }
+  | {
+      id: string;
+      personId: string;
+      type: `iphone` | `ipad`;
+      iOSVersion: string;
+      modelName: string;
+      modelIdentifier: string;
+    };
+
+export type RecentMusicListening = {
+  trackName: string;
+  artistName: string;
+  albumArtUrl: string;
+  recencyInMinutes: number;
+};
+
+export type RecentPodcastListening = {
+  title: string;
+  podcastName: string;
+  artworkUrl: string;
+  recencyInMinutes: number;
+};
+
+export type PersonCardPerson = {
+  id: string;
+  name: string;
+  devices: Device[];
+  screenshot: {
+    url: string;
+    recency: string;
+  } | null;
+  musicListening: RecentMusicListening | null;
+  podcastListening: RecentPodcastListening | null;
+};
+
+export type SecurityEvent = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  explanation: string;
+  time: string;
+  date: string;
+  severity: `high` | `medium` | `low`;
+} & (
+  | {
+      type: `mac-app`;
+      personName: string;
+      deviceName: string;
+      personHref?: string;
+      deviceHref?: string;
+    }
+  | {
+      type: `admin-dashboard`;
+      ipAddress: string;
+      ipAddressHref?: string;
+    }
+);
+
+export type UnlockRequest = {
+  id: string;
+  personName: string;
+  domains: string[];
+  reason?: string;
+  reviewHref?: string;
+};
+
+export type SuspensionRequest = {
+  id: string;
+  personName: string;
+  duration: string;
+  reason?: string;
+};
+
+export type TimeOfDay = {
+  hour: number;
+  minute: number;
+};
+
+export type Schedule = {
+  type: `active` | `inactive`;
+  days: {
+    sunday: boolean;
+    monday: boolean;
+    tuesday: boolean;
+    wednesday: boolean;
+    thursday: boolean;
+    friday: boolean;
+    saturday: boolean;
+  };
+  startTime: TimeOfDay;
+  endTime: TimeOfDay;
+};
+
+export type Keychain = {
+  id: string;
+  name: string;
+  description?: string;
+  numKeys: number;
+  isPublic: boolean;
+};
+
+export type InstalledMacApp = {
+  id: string;
+  personId?: string;
+  name: string;
+  bundleId: string;
+  appIconUrl: string;
+};
+
+export type ConfiguredMacApp = {
+  nameOrBundleId: string;
+  appIconUrl: string;
+  schedule?: Schedule;
+};
+
+export type AllowedAlbum = {
+  title: string;
+  artist: string;
+  artworkUrl: string;
+  showAlbumArt: boolean;
+};
+
+export type NotificationMethod = {
+  id: string;
+} & (
+  | {
+      type: `email`;
+      emailAddress: string;
+    }
+  | {
+      type: `text`;
+      phoneNumber: string;
+    }
+  | {
+      type: `slack`;
+      channelName: string;
+      channelId: string;
+      botToken: string;
+    }
+  | {
+      type: `ntfy`;
+      topicId: string;
+    }
+  | {
+      type: `push`;
+    }
+);
+
+export type NotificationTrigger =
+  | `unlockRequestSubmitted`
+  | `suspendFilterRequestSubmitted`
+  | `securityEventsAll`
+  | `securityEventsMedium`
+  | `securityEventsRecommended`;
+
+export type Notification = {
+  id: string;
+  methodId: string;
+  trigger: NotificationTrigger;
+  enabled: boolean;
+  method: NotificationMethod;
+};
+
+export type PersonMacSettingsConfiguration = {
+  keyloggingEnabled: boolean;
+  screenshots?: {
+    resolution: number;
+    frequency: number;
+  };
+  emphasizeSuspensionActivity: boolean;
+  downtime?: {
+    start: TimeOfDay;
+    end: TimeOfDay;
+  };
+  filteringOn: boolean;
+  keychainIds: string[];
+  keychainSchedules?: Record<string, Schedule | undefined>;
+  alwaysBlockedGroups: {
+    adultContent: boolean;
+    messagesGifSearch: boolean;
+    socialMedia: boolean;
+    spotlightSearch: boolean;
+  };
+  customAlwaysBlockedDomains: string[];
+  blockedApps: ConfiguredMacApp[];
+  unrestrictedApps: Array<{
+    nameOrBundleId: string;
+    appIconUrl: string;
+  }>;
+};
+
+export type PersonIosSettingsConfiguration = {
+  blockedGroups: {
+    appleMusic: boolean;
+    whatsApp: boolean;
+    musicRecognition: boolean;
+    gifs: boolean;
+    appleMapsImages: boolean;
+    aiFeatures: boolean;
+    appStoreImages: boolean;
+    spotlight: boolean;
+    ads: boolean;
+    appleDotCom: boolean;
+    spotifyImages: boolean;
+  };
+  preventProtectionRemoval: boolean;
+  allowDeletingApps: boolean;
+  allowFactoryReset: boolean;
+  allowInstallingApps: boolean;
+  allowedAlbums: AllowedAlbum[];
+};
+
+export type BlockGroupState = {
+  id: string;
+  title: string;
+  shortDescription: string;
+  longExplanation: string;
+  blocked: boolean;
+};
+
+export type KeyAddressType = `standard` | `strict` | `ipAddress` | `regExp`;
+
+export type KeyScopeType = `allApps` | `webBrowsers` | `singleApp`;
+
+export type UnlockKey = {
+  domain: string;
+  addressType: KeyAddressType;
+  scope: {
+    type: KeyScopeType;
+    bundleId?: string;
+  };
+  expiration?: Date;
+  note?: string;
+};
+
+export type UnlockRequestKeyDraft = {
+  id: string;
+  allowed: boolean;
+  key: UnlockKey;
+  moreOptionsExpanded: boolean;
+  keychainId: string;
+};
+
+export type ButtonLink = {
+  text: string;
+  href: string;
+  variant?: `ghost` | `default`;
+  icon?: LucideIcon;
+  iconPosition?: `left` | `right`;
+};
+
+export type CreationFlowStep = {
+  element: React.ReactNode;
+  title: string;
+  nextEnabled: boolean;
+};

@@ -15,14 +15,8 @@ site:
 admin:
   @PORT=${ADMIN_PORT:-4243} pnpm --filter admin start
 
-ui:
-  @pnpm --filter @gertrude/ui exec vite dev --port ${UI_PORT:-5173} --open
-
 account:
   @pnpm --filter account exec vite dev --port ${ACCOUNT_PORT:-9347}
-
-dashboard-v2:
-  @pnpm --filter dashboard-v2 exec vite dev --port ${DASHBOARD_V2_PORT:-9348}
 
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"

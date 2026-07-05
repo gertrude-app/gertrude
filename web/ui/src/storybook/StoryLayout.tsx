@@ -23,9 +23,32 @@ export const StoryCanvas: React.FC<StoryCanvasProps> = ({
   className,
   innerClassName,
 }) => (
-  <div className={cx(`min-h-screen bg-stone-100 p-12 text-stone-950`, className)}>
-    <div className={cx(`mx-auto flex max-w-5xl flex-col gap-12`, innerClassName)}>
-      {children}
+  <div className="@container/main">
+    <div className={cx(`min-h-screen bg-stone-100 p-12 text-stone-950`, className)}>
+      <div
+        className={cx(`mx-auto flex w-full max-w-5xl flex-col gap-12`, innerClassName)}
+      >
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+export const StoryScreen: React.FC<StoryCanvasProps> = ({
+  children,
+  className,
+  innerClassName,
+}) => (
+  <div className="@container/main">
+    <div className={cx(`min-h-screen bg-white text-stone-950`, className)}>
+      <div
+        className={cx(
+          `mx-auto flex w-full flex-col`,
+          innerClassName ?? `max-w-none gap-0`,
+        )}
+      >
+        {children}
+      </div>
     </div>
   </div>
 );
@@ -43,9 +66,9 @@ export const StorySection: React.FC<StorySectionProps> = ({
   className,
   contentClassName,
 }) => (
-  <section className={cx(`flex flex-col gap-3`, className)}>
+  <section className={cx(`flex w-full flex-col gap-3`, className)}>
     <h2 className="text-xs text-stone-500">{title}</h2>
-    <div className={cx(`flex flex-wrap items-center gap-3`, contentClassName)}>
+    <div className={cx(`flex w-full flex-wrap items-center gap-3`, contentClassName)}>
       {children}
     </div>
   </section>
