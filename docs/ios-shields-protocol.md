@@ -1,9 +1,14 @@
 # iOS Shields (ManagedSettings) — Protocol Extension
 
-> **STATUS: DRAFT — not implemented.** Extends `docs/ios-recording-protocol.md` to
-> close the persistent-socket leak. Invariant S1′ below is expected to be VIOLATED by
-> the current shipped design; the sim models the leak (OS RULE R13) and the explorer
-> demonstrates it. Nothing in this doc is normative until the shield actuator lands.
+> **STATUS: DRAFT — sim-prototyped 2026-07-04, not device-integrated.** Extends
+> `docs/ios-recording-protocol.md` to close the persistent-socket leak. The shield
+> actuator now exists as a prototype: sim model (OS RULES R14/R15), controller
+> reconciler + app edges in the production proxies (feature-gated on the allowlist
+> register, which nothing in production writes yet), and the explorer's S3/L4/S1′
+> oracle. In the sim, S1′ HOLDS with shields on (`explorerShieldsCloseTheSocketLeak`)
+> and is violated without them (`explorerFindsPersistentSocketLeak`) — the flip
+> promised when R13 landed. See §Prototype findings. Not normative until
+> device-integrated and conformance-verified.
 
 ## The leak this closes
 
@@ -45,13 +50,22 @@ shieldsDerived(now) = live(now) ? down : up     // for non-allowlisted apps
 ```
 
 - **Controller (primary reconciler, D8):** on every flow it receives and at startup,
-  compare derived state to last-written state; write when they differ. The controller
-  is the right home: less sandboxed than the filter, relaunched by the OS at boot
-  (R6), reliably granted CPU while traffic flows, and ManagedSettings writes from the
-  control provider are already prototype-proven under both authorization paths
-  (Jared, 2026). Startup reconcile covers reboot-with-shields-down.
+  re-derive the projection and write it UNCONDITIONALLY. An earlier draft said
+  "compare derived state to last-written state; write when they differ" — the
+  explorer refuted that on its first shields corpus run (seed 6, shrunk to 3
+  actions): with two writers, the controller's memory of its own last write goes
+  stale the moment the app writes, and the post-suspension raise was skipped (S3
+  violated). Any skip optimization must come from reading the store back, never from
+  caching own writes; until measured as needed, don't skip (spike: writes are 0-26ms
+  and idempotent). The controller is the right home: less sandboxed than the filter,
+  relaunched by the OS at boot (R6), reliably granted CPU while traffic flows, and
+  ManagedSettings writes from the control provider are already prototype-proven under
+  both authorization paths (Jared, 2026). Startup reconcile covers
+  reboot-with-shields-down.
 - **App (entry edge):** drops shields at `broadcastStarted` alongside writing the
-  expiration. This edge is NOT optional — see the entry deadlock below.
+  expiration. This edge is NOT optional — see the entry deadlock below. The app also
+  writes the strict projection when it hears `broadcastFinished` / early-end (an
+  exit accelerator only; the controller remains the guarantee).
 - Two writers to one store deliberately violates the single-writer rule; it is safe
   only because both compute the same idempotent projection from the same registers
   and writes reconcile toward it (last writer converges). No other writer may exist.
@@ -115,33 +129,85 @@ Two proven paths (both prototyped by Jared in spike apps):
 
 - **Safari/web:** Safari is presumably allowlisted (or the device loses browsing),
   so a web-YouTube socket opened during suspension leaks post-suspension with no app
-  shield to catch it. `shield.webDomains` may cover it — conformance question. Until
-  then: known, bounded (dies at reboot/network transition; new page loads are S1-blocked).
-- **Background audio:** whether shielding halts already-playing background audio is
-  unverified — conformance question.
+  shield to catch it. Session 2 sized the closable options: `shield.webDomains`
+  blocks page re-renders but NOT in-flight playback (and domain tokens are
+  picker-only); Safari-by-token from the controller works but likewise leaves
+  already-playing audio running. Either narrows the leak to passive continuation of
+  already-playing media — no navigation, no new use; dies at page re-render or
+  reboot; new loads are S1-blocked.
+- **Background audio:** split by app (session 2): WhatsApp audio dies instantly
+  under an app shield; already-playing Safari/web audio survives every shield
+  variant. The bounded passive-audio leak above is the accepted residue.
 
 ## Interaction with restart-within-grant
 
-Jared leans yes (2026-07-04). Shields make it cleaner, not harder: if the grant is
-register-authoritative (D7 already forced this) and shields are a projection of
-`live()`, restart-within-grant falls out — a lock finishes the broadcast, `live()`
-fails, shields rise on reconcile; the kid restarts the recording within the grant,
-`live()` holds, shields drop again. No app-side grant state machine required. The
-app-side grant-consumption logic (`broadcastFinished` clearing the register) is what
-would change; decide when implementing.
+Jared leans yes (2026-07-04); UNDECIDED. Both policies are now modeled behind the
+`\.grantPolicy` dependency (default `.burnOnFinish`, the shipped behavior) so the
+decision can be made against passing evidence rather than speculation:
+
+- `.burnOnFinish`: `broadcastFinished` clears the register; a lock consumes the
+  grant; restarting the broadcast does not re-lift
+  (`lockBurnsGrantUnderBurnOnFinishPolicy`).
+- `.restartWithinGrant`: `broadcastFinished` leaves a still-future register in place
+  (the tombstone re-blocks via L1 regardless); the kid restarts within the ORIGINAL
+  window — `broadcastStarted` never rewrites a still-future register, so the window
+  is preserved, not extended; once it lapses (or the app hears a finish after lapse)
+  the grant is consumed (`lockPreservesGrantUnderRestartWithinGrantPolicy`).
+
+Shields cycle correctly under both (explorer corpus runs both policies green). As
+predicted, restart-within-grant falls out of register-authority (D7) + shields as a
+projection of `live()`; no app-side grant state machine was required beyond a
+policy check at the two write points.
 
 ## Sim model requirements (honesty clause)
 
-- **R13 — flow verdict finality / socket persistence** *(landing with this doc)*:
-  an `allow()`ed flow becomes a persistent connection; data over it never consults
-  the filter; connections die at reboot. Lets the explorer demonstrate S1′ violation
-  against the CURRENT design — the motivating counterexample.
-- **R14 — ManagedSettings persistence** *(with implementation)*: shield state as
-  world state surviving process death and reboot; written only by authorized
-  processes (app, controller).
-- **R15 — shields gate app usability** *(with implementation)*: user-initiated flows
+- **R13 — flow verdict finality / socket persistence** *(landed)*: an `allow()`ed
+  flow becomes a persistent connection; data over it never consults the filter;
+  connections die at reboot. Lets the explorer demonstrate S1′ violation against
+  the WITHOUT-SHIELDS design — the motivating counterexample.
+- **R14 — ManagedSettings persistence** *(landed 2026-07-04, evidence: spike
+  session 1)*: shield state as world state surviving process death and reboot;
+  written only by authorized processes (app, controller — the sim withholds the
+  dependency from filter/recorder so a stray write fails); `.all(except:)` exempts
+  the spike's observed system-app class. Not modeled: the ~2s first-boot
+  application lag (unconfirmed exploitability — addendum probe), revocation.
+- **R15 — shields gate app usability** *(landed 2026-07-04)*: user-initiated flows
   and socket use from a shielded app do not happen; background-refresh traffic may.
-  This coupling is what lets the explorer find entry-deadlock/exit-starvation.
+  This coupling is what lets the explorer probe entry-deadlock/exit-starvation
+  (measured as entry/exit gap stats rather than asserted invariants — both are
+  traffic-bounded by design).
+
+## Prototype findings — sim, 2026-07-04
+
+What landed: sim world state + OS RULES R14/R15 (`VirtualDevice.swift`), controller
+reconciler + app entry/exit edges in the production proxies (feature-gated on the
+allowlist register; nothing writes that register in production yet), the explorer's
+shields oracle (S3/L4 level checks at every reconcile opportunity, S1′ leak
+detector, C1-extended convergence, entry/exit gap stats), 8 named scenarios
+(`ShieldScenarioTests.swift`), and both grant policies. Findings:
+
+1. **The explorer found a real protocol bug on its first shields corpus run** (the
+   D7 story repeating itself, now for D8): the reconciler's last-written cache is
+   unsound under two writers. Fixed to unconditional writes; regression scenario
+   `appEntryEdgeDoesNotStaleControllerReconcile`; spec text amended above.
+2. **Allowlisted apps' leaked sockets stay usable while unrecorded — by design.**
+   The explorer flagged it (seed 37: parent adds an app to the allowlist
+   mid-suspension); S1′ scopes to non-allowlisted apps, so the detector was refined,
+   not the design. Parents own that tradeoff when they allowlist an app.
+3. **Gertrude must be exempt from its own shields or the feature deadlocks** — a
+   shielded Gertrude can't be opened to request a suspension and its sentinels are
+   R15-suppressed. The sim initially modeled Gertrude as shieldable
+   (conservative); the device answered on 2026-07-05: `.all(except:)` EXEMPTS the
+   managing app (conformance Q7), so the deadlock is unreachable and no
+   allowlist-onboarding guarantee is needed. Sim model updated to match
+   (`gertrudeIsExemptFromItsOwnShields`).
+4. **Starvation exposure, quantified:** across the 25-seed corpus (both policies),
+   max entry gap 15s (live suspension waiting for a reconcile to drop shields — the
+   app edge kept the common path instant), max exit gap 255s (shields down while
+   unrecorded, no traffic to summon the controller). The exit number is the one to
+   watch on device: it is exactly the "bounded by traffic" clause of S3, and the
+   `DeviceActivityMonitor` escape hatch exists if real-device traffic patterns make
+   it materially worse.
 
 ## Device findings — spike session 1, 2026-07-04 (iPhone, iOS 26.5.1)
 
@@ -174,12 +240,15 @@ run except the addendum items (runbook §Addendum). Numbers below are device-mea
    Mid-playback behavior untested (addendum).
 6. **Shields kill in-progress background audio immediately** (WhatsApp mp3 died the
    moment shields went up); no auto-resume on clear. No audio residue weakens S1′.
+   *(CORRECTED by session 2: this is app-specific, not general — already-playing
+   Safari/web audio survives every shield variant; see session 2 finding 4.)*
 7. **Shields persist across reboot** (device policy, as hoped). Wrinkle: on the first
    reboot WhatsApp appeared UNshielded for ~1.5–2s after springboard before the
    shield applied; on a deliberate second reboot it was shielded immediately. Whether
    an app is actually *launchable* in that window is unconfirmed (addendum probe).
    Even if real, a ≤2s boot window is far smaller than the filter's own boot-time
-   story and is bounded by L1 semantics.
+   story and is bounded by L1 semantics. *(RESOLVED by session 2: the window is UI
+   lag only — a tap inside it opened the app restricted; see session 2 finding 5.)*
 8. **Revocation (weak proxy — dev device, `.individual`):** Face ID (device-level
    auth) sufficed to remove Screen Time access; iOS cleared the shield store
    silently; **the filter did NOT die** (no stop/relaunch witnesses, blocking
@@ -191,23 +260,86 @@ run except the addendum items (runbook §Addendum). Numbers below are device-mea
    async reads). Production must never gate shield behavior on a synchronous status
    read; authorization truth is "do writes take effect."
 
-Still open after session 1: mid-playback web shielding, Safari-by-token, the
-post-boot window probe (runbook §Addendum); supervised-adult revocation (needs a
-supervised device); exit-starvation timing (needs the recording feature integrated).
+## Device findings — spike session 2, 2026-07-05 (same device, addendum)
+
+Runbook §Addendum items 1-5, capture `witnesses-20260705-075826.ndjson` +
+`check.mjs --shields`. Controller writes this session: 106, zero errors,
+sentinel→write latency 2-40ms. Detailed per-item results live inline in the runbook;
+the protocol-level conclusions:
+
+1. **The two-writer design is VALID on device (cross-context clear probe, both
+   directions).** App clears controller-raised shields; controller clears
+   app-raised. Same effective store despite separate processes — the app entry edge
+   over a controller-reconciled store works as specced. This was run because of an
+   alarming apparent divergence (controller token write shielded WhatsApp but not
+   Safari while an app write shielded both) which turned out to be a STALE REGISTER,
+   not writer context: the two-app selection hadn't been re-saved to group defaults,
+   so the controller decoded the old one-app selection — witness-confirmed
+   (controller wrote `applications=1` at 11:23:55, app wrote `applications=2` at
+   11:24:12; after the save, controller wrote `applications=2`). An accidental
+   proof of the register discipline: writers reading different register states
+   compute different projections.
+2. **Cross-process store READ-BACK is stale/lazy** — the app-process store instance
+   read `apps=0` immediately after a controller write while both apps were visibly
+   shielded (its own writes read back fine). Same class as finding 9. Rule
+   confirmed from a second direction: never gate on read-backs; write the
+   projection unconditionally (the sim explorer independently forced the same rule
+   — §Prototype findings 1).
+3. **Safari-by-token from the controller WORKS** (once the register is fresh) —
+   reopens token-shielding Safari as a residual-leak option, with the audio caveat
+   below. Safari is pickable in the picker.
+4. **Web/audio enforcement is weaker than app shields, for already-playing media:**
+   `shield.webDomains` mid-playback did NOT stop background audio (≥15-20s observed;
+   died only when Safari was foregrounded and the restricted screen replaced the
+   page); token-shielding Safari-the-app ALSO left playing audio running — even
+   foregrounded AT the restricted screen. Session 1's "shields kill background
+   audio" was WhatsApp-specific. Net: already-playing web streams are a leak no
+   shield variant closes; bounded to passive continuation (no navigation, no new
+   use — S1′'s *usable data path* is closed for everything interactive).
+5. **Post-boot window RESOLVED: UI lag only.** Two reboots; the ~1s "unshielded"
+   appearance was tappable and the app opened RESTRICTED. Shield enforcement is
+   continuous across reboot — no boot window exists in the enforcement layer.
+6. **Reconcile path is suspension-proof (extra credit, witness-verified):**
+   mid-recording, the suspended filter forwarded shields sentinels ahead of its
+   suspension logic; controller shield writes landed 0-23ms interleaved with
+   evidence drains; suspension held; stop → clean resume. The production
+   reconciler will work identically during and after recordings.
+7. **`.all(except:)` exempts the managing app (Q7 ANSWERED, follow-up probe):**
+   with shields-all up — written from either context — Gertrude itself stayed
+   launchable and usable without being in the exception set. No entry deadlock; no
+   Gertrude-allowlist onboarding requirement. Human-observed (shield visibility
+   has no witness line); sim model updated from the conservative assumption to
+   match (`gertrudeIsExemptFromItsOwnShields`).
+
+Still open after session 2: supervised-adult revocation (needs a supervised
+device); exit-starvation timing (needs the recording feature integrated); Q7 below.
 
 ## Conformance spike questions (device, before implementation)
 
 1. Controller-written `ManagedSettingsStore`: reliability, write latency, behavior
    under both auth paths (child + supervised adult). *(session 1: ANSWERED for
-   `.individual` — 75/75, ≤36ms; child + supervised-adult paths still owed)*
-2. Shield persistence across reboot; who can clear it besides us. *(session 1:
-   persists; revocation clears it; ~2s first-boot application lag to probe)*
-3. `shield.webDomains` viability for the Safari leak. *(session 1: works from
-   controller, but tokens are picker-only — no dynamic domain shielding)*
-4. Background audio behavior under a freshly-raised shield. *(session 1: audio dies
-   immediately)*
+   `.individual` — 75/75, ≤36ms; session 2 added 106/106 incl. mid-suspension;
+   child + supervised-adult paths still owed)*
+2. Shield persistence across reboot; who can clear it besides us. *(ANSWERED:
+   persists; revocation clears it; session 2 — the ~2s first-boot "window" is UI
+   lag only, enforcement continuous; cross-context clears work both directions,
+   same effective store)*
+3. `shield.webDomains` viability for the Safari leak. *(session 2: weak — works
+   from controller but does not stop in-flight playback, and domain tokens are
+   picker-only; Safari-by-token now proven as an alternative, with the same
+   already-playing-audio caveat)*
+4. Background audio behavior under a freshly-raised shield. *(ANSWERED, split:
+   WhatsApp audio dies instantly; already-playing Safari/web audio survives all
+   shield variants until page re-render — bounded passive leak, accepted)*
 5. Exact iOS 26 build that fixed the device-passcode revocation bug. *(open — needs a
    supervised configuration; test device is 26.5.1)*
 6. Post-suspension traffic availability (exit-starvation reality check): with all
    non-allowlisted apps shielded, how quickly does the controller actually receive a
-   flow? *(open — needs the recording feature integrated)*
+   flow? *(open — needs the recording feature integrated; sim corpus measured a
+   255s worst case under its action mix — see §Prototype findings)*
+7. Does `.all(except:)` shield the store-owning app (Gertrude itself)? *(ANSWERED
+   2026-07-05, session 2 follow-up: NO — with shields-all up from either writer
+   context, Gertrude stayed launchable and usable without being in the exception
+   set. iOS exempts the managing app; no entry deadlock, no Gertrude-allowlist
+   onboarding requirement. Human-observed — shield visibility has no witness line —
+   one device/26.5.1/`.individual`; re-verify on new iOS majors like every OS RULE)*

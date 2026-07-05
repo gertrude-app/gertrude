@@ -194,11 +194,14 @@ action script and replays by seed.
 - Silent push as a grant-time accelerator (design doc vector 2) — unexamined.
 - Grant consumption policy: a device lock cleanly finishes the broadcast and burns the
   grant (device-verified), forcing a fresh parent request to continue. Restart-within-
-  grant is representable on the current registers; leaning yes (2026-07-04), decide
-  with the shields implementation (see shields doc §restart-within-grant).
+  grant is representable on the current registers; leaning yes (2026-07-04). BOTH
+  policies are now modeled behind the `\.grantPolicy` dependency (default: shipped
+  burn-on-finish) with scenarios + explorer corpus green under each — decide with the
+  shields integration (see shields doc §restart-within-grant).
 - Shields (ManagedSettings) extension to close the persistent-socket leak:
-  `docs/ios-shields-protocol.md` (DRAFT) — S3/L4/S1′, controller-primary
-  reconciliation (D8), authorization sharp edges.
+  `docs/ios-shields-protocol.md` (DRAFT, sim-prototyped 2026-07-04) — S3/L4/S1′,
+  controller-primary reconciliation (D8, amended: unconditional writes),
+  authorization sharp edges.
 - Sim honesty upgrades still owed: a bg-URLSession OS actor if the uploader is kept.
   (App-suspension/darwin-coalescing R11-R12 gaps landed 2026-07-04; the R10 lock model
   was inverted same day after the validation session — `lockDevice()` finishes the
