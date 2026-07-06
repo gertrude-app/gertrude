@@ -53,15 +53,20 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
     let pending = try await Claim.find(code: code, in: self.db)
     expect(pending?.claimedAt).toBeNil()
 
-    _ = try await ClaimMusicDevice.resolve(
+    let output = try await ClaimMusicDevice.resolve(
       with: .init(code: code, child: .newChild(name: "Ignored")),
       in: parent.context,
     )
 
+    expect(output.childName).toEqual(child.name)
     let completed = try await Claim
       .find(code: code, in: self.db) // resume path must complete the claim
     expect(completed?.claimedAt).not.toBeNil()
     expect(completed?.childId).toEqual(child.id)
+    let children = try await Child.query()
+      .where(.parentId == parent.id)
+      .all(in: self.db)
+    expect(children).toHaveCount(1)
   }
 
   func testMusicClaimAfterBlockerConnectWithoutAccessDoesNotSetClaimedAt() async throws {

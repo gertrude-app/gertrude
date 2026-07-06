@@ -25,16 +25,11 @@ func claimDevice<Output>(
   }
 
   var device = try await claim.device(in: context.db)
+  let deviceChild: Child?
 
   if let childId = device.childId {
     if let child = try? await context.verifiedChild(from: childId) {
-      if claim.claimedAt == nil {
-        if let beforeClaim {
-          try await beforeClaim(device)
-        }
-        try await finalizeClaim(&device, claim: claim, for: child, in: context.db)
-      }
-      return try await onResume(device, child)
+      deviceChild = child
     } else {
       let ownerChild = try? await Child.query()
         .where(.id == childId)
@@ -58,6 +53,12 @@ func claimDevice<Output>(
       let msg = "Code not found. Double-check and try again."
       throw context.error("\(baseId)-2", .notFound, user: msg)
     }
+  } else {
+    deviceChild = nil
+  }
+
+  if claim.claimedAt != nil, let child = deviceChild {
+    return try await onResume(device, child)
   }
 
   if claim.expiresAt <= get(dependency: \.date.now) {
@@ -70,11 +71,15 @@ func claimDevice<Output>(
     try await beforeClaim(device)
   }
 
-  let child = switch childAssignment {
-  case .existingChild(id: let id):
-    try await context.verifiedChild(from: id)
-  case .newChild(name: let name):
-    try await context.db.create(Child(parentId: context.parent.id, name: name))
+  let child = if let deviceChild {
+    deviceChild
+  } else {
+    switch childAssignment {
+    case .existingChild(id: let id):
+      try await context.verifiedChild(from: id)
+    case .newChild(name: let name):
+      try await context.db.create(Child(parentId: context.parent.id, name: name))
+    }
   }
 
   try await finalizeClaim(&device, claim: claim, for: child, in: context.db)
@@ -97,6 +102,14 @@ private func finalizeClaim(
   in db: any DuetSQL.Client,
 ) async throws {
   try await device.bindChild(child, in: db)
+  try await completeClaim(claim, for: child, in: db)
+}
+
+func completeClaim(
+  _ claim: Claim,
+  for child: Child,
+  in db: any DuetSQL.Client,
+) async throws {
   var claim = claim
   try await claim.complete(childId: child.id, in: db)
 }

@@ -38,19 +38,7 @@ extension GetIOSDeviceClaimData: Resolver {
       baseId: "7321ce12", // 7321ce12-1, 7321ce12-2, 7321ce12-3, 7321ce12-4
       in: context,
       onResume: { device, _ in
-        let claim = try await Claim.find(code: input.code, in: context.db)
-        if claim?.claimedAt != nil {
-          try await device.ensureBlockerBlockGroups(in: context.db)
-        }
-        let supervision = try await device.supervision(in: context.db)
-        let step = try await resumeStep(supervision: supervision, in: context)
-        return Output(
-          children: [],
-          modelName: device.modelName,
-          deviceType: device.deviceType,
-          iosVersion: device.iosVersion,
-          resumeStep: step,
-        )
+        try await claimedOutput(for: device, in: context)
       },
       onUnclaimed: { device, children in
         Output(
@@ -61,8 +49,28 @@ extension GetIOSDeviceClaimData: Resolver {
           resumeStep: nil,
         )
       },
+      onUnclaimedBound: { claim, device, child in
+        try await completeClaim(claim, for: child, in: context.db)
+        return try await claimedOutput(for: device, in: context)
+      },
     )
   }
+}
+
+private func claimedOutput(
+  for device: IOSDevice,
+  in context: ParentContext,
+) async throws -> GetIOSDeviceClaimData.Output {
+  try await device.ensureBlockerBlockGroups(in: context.db)
+  let supervision = try await device.supervision(in: context.db)
+  let step = try await resumeStep(supervision: supervision, in: context)
+  return GetIOSDeviceClaimData.Output(
+    children: [],
+    modelName: device.modelName,
+    deviceType: device.deviceType,
+    iosVersion: device.iosVersion,
+    resumeStep: step,
+  )
 }
 
 private func resumeStep(

@@ -161,4 +161,72 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .all(in: self.db)
     expect(tokens).toHaveCount(1)
   }
+
+  func testAlreadyBoundDeviceCompletesMusicClaimAndReturnsChildContext() async throws {
+    let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+
+    let output = try await withDependencies {
+      $0.verificationCode = .init(generate: { code })
+      $0.date = .constant(.reference)
+    } operation: {
+      try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
+    }
+
+    guard case .claimed(let token, let childId, let childName) = output else {
+      return XCTFail("expected .claimed, got \(output)")
+    }
+    expect(childId).toEqual(child.id.rawValue)
+    expect(childName).toEqual(child.name)
+
+    let claim = try await Claim.find(code: code, in: self.db)
+    expect(claim?.intent).toEqual(.music)
+    expect(claim?.deviceId).toEqual(device.id)
+    expect(claim?.childId).toEqual(child.id)
+    expect(claim?.claimedAt).toEqual(.reference)
+
+    let install = try await MusicApp.Install.query()
+      .where(.deviceId == device.id)
+      .first(in: self.db)
+    let tokens = try await MusicApp.Token.query()
+      .where(.installId == install.id)
+      .all(in: self.db)
+    expect(tokens).toHaveCount(1)
+    expect(token).toEqual(tokens[0].value.rawValue)
+  }
+
+  func testAlreadyBoundDeviceWithoutMusicAccessReturnsClaimCodeAndDoesNotClaim() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let deviceId = UUID()
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+
+    let output = try await withDependencies {
+      $0.verificationCode = .init(generate: { code })
+      $0.date = .constant(.reference)
+    } operation: {
+      try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
+    }
+
+    expect(output).toEqual(.unclaimed(code: code, expiresAt: .reference + .days(7)))
+    let claim = try await Claim.find(code: code, in: self.db)
+    expect(claim?.deviceId).toEqual(device.id)
+    expect(claim?.childId).toBeNil()
+    expect(claim?.claimedAt).toBeNil()
+  }
 }

@@ -49,6 +49,17 @@ extension GetBlockerClaimData: Resolver {
           resumeStep: nil,
         )
       },
+      onUnclaimedBound: { claim, device, child in
+        try await completeClaim(claim, for: child, in: context.db)
+        try await device.ensureBlockerBlockGroups(in: context.db)
+        return Output(
+          children: [],
+          modelName: device.modelName,
+          deviceType: device.deviceType,
+          iosVersion: device.iosVersion,
+          resumeStep: .done(childName: child.name, childId: child.id, deviceId: device.id),
+        )
+      },
     )
   }
 }

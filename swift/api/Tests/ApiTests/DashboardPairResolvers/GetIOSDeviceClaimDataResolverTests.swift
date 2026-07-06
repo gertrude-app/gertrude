@@ -91,6 +91,37 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
     expect(output.children.map(\.id)).toEqual([child.id])
   }
 
+  func testUnclaimedAlreadyBoundCode_completesClaimAndReturnsResumeStep() async throws {
+    let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.0",
+    ))
+    let claim = try await self.createClaim(.blockerSupervise, device.id)
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await GetIOSDeviceClaimData.resolve(with: .init(code: claim.code), in: parent.context)
+    }
+
+    expect(output.resumeStep).toEqual(.downloadHelper)
+    expect(output.children).toEqual([])
+    let completed = try await Claim.find(code: claim.code, in: self.db)
+    expect(completed?.childId).toEqual(child.id)
+    expect(completed?.claimedAt).toEqual(.reference)
+
+    let blockGroups = try await BlockerApp.DeviceBlockGroup.query()
+      .where(.deviceId == device.id)
+      .all(in: self.db)
+    expect(blockGroups.isEmpty).toBeFalse()
+  }
+
   func testUnclaimedExpiredCode_throwsError() async throws {
     let parent = try await self.parent()
     let device = try await self.db.create(IOSDevice(

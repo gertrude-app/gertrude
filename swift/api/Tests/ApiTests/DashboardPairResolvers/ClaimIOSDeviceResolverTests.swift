@@ -92,6 +92,44 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     expect(countAfter).toEqual(1)
   }
 
+  func testAlreadyBoundUnclaimedCodeCompletesForExistingChildAndLogsClaimedEvent() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let code = Int.random(in: 100_000 ... 999_999)
+    let device = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: child.id,
+      modelIdentifier: "iPhone18,1",
+      iosVersion: "18.2",
+    ))
+    try await self.createClaim(.blockerSupervise, device.id, code: code)
+    try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
+
+    let output = try await withDependencies {
+      $0.date = .constant(.reference)
+    } operation: {
+      try await ClaimIOSDevice.resolve(
+        with: .init(code: code, child: .newChild(name: "Ignored")),
+        in: parent.context,
+      )
+    }
+
+    expect(output.childName).toEqual(child.name)
+    let children = try await Child.query()
+      .where(.parentId == parent.id)
+      .all(in: self.db)
+    expect(children).toHaveCount(1)
+
+    let claim = try await Claim.find(code: code, in: self.db)
+    expect(claim?.childId).toEqual(child.id)
+    expect(claim?.claimedAt).toEqual(.reference)
+
+    let events = try await IOSEvent.query()
+      .where(.deviceId == device.id)
+      .all(in: self.db)
+    expect(events.filter { $0.detail?.contains("code_claimed") == true }).toHaveCount(1)
+  }
+
   func testCodeNotFound_throwsError() async throws {
     let parent = try await self.parent()
 

@@ -73,6 +73,26 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.paymentAction).toBeNil()
   }
 
+  func testUnclaimedCodeForAlreadyBoundDeviceCompletesClaimAndReturnsDone() async throws {
+    let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(.music, device.id)
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: parent.context,
+    )
+
+    expect(output.resumeStep).toEqual(.done(childName: child.name))
+    expect(output.children).toEqual([])
+    let completed = try await Claim.find(code: claim.code, in: self.db)
+    expect(completed?.childId).toEqual(child.id)
+    expect(completed?.claimedAt).not.toBeNil()
+  }
+
   func testUnclaimedWithoutMusicAccessReturnsPaymentActionAndNoChildren() async throws {
     let parent = try await self.parent()
     _ = try await self.db.create(Child.random { $0.parentId = parent.id })
@@ -88,6 +108,26 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.resumeStep).toBeNil()
     expect(output.children).toEqual([])
     expect(output.paymentAction).toEqual(.startCheckout(tier: .light))
+  }
+
+  func testUnclaimedBoundDeviceWithoutMusicAccessReturnsPaymentActionAndDoesNotClaim() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(.music, device.id)
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: parent.context,
+    )
+
+    expect(output.resumeStep).toBeNil()
+    expect(output.children).toEqual([])
+    expect(output.paymentAction).toEqual(.startCheckout(tier: .light))
+    let unchanged = try await Claim.find(code: claim.code, in: self.db)
+    expect(unchanged?.claimedAt).toBeNil()
+    expect(unchanged?.childId).toBeNil()
   }
 
   func testUnclaimedPastDueFullReturnsBillingPortalAction() async throws {
