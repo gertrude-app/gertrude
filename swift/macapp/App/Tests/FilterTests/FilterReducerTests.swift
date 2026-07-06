@@ -105,6 +105,23 @@ final class FilterReducerTests: XCTestCase {
   }
 
   @MainActor
+  func testFilterToAppMessagesAreBestEffort() async {
+    let (store, _) = Filter.testStore {
+      $0.suspensions = [502: .init(scope: .unrestricted, duration: 600)]
+      $0.blockListeners = [502: .epoch + .minutes(5)]
+    }
+    store.deps.filterExtension = .mock
+    store.deps.xpc.notifyFilterSuspensionEnded = { _ in throw XPCErr.noConnection }
+    store.deps.xpc.sendBlockedRequest = { _, _ in throw XPCErr.noConnection }
+
+    // when the app is unreachable, neither send may throw unhandled out of the effect
+    await store.send(.staleSuspensionFound(502)) {
+      $0.suspensions[502] = nil
+    }
+    await store.send(.flowBlocked(FilterFlow(userId: 502), .mock))
+  }
+
+  @MainActor
   func testReceivingRulesWithAtLeastOneKeyClearsExemptStatus() async {
     let (store, _) = Filter.testStore {
       $0.exemptUsers = [501, 504]
