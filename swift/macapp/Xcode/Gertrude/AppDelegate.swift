@@ -13,6 +13,7 @@ class AppDelegate: NSViewController, NSApplicationDelegate, NSWindowDelegate {
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     self.app.send(.didFinishLaunching)
+    UDSSpikeClient.shared.startIfEnabled()
 
     // NB: wake/sleep notifications are NOT posted to NotificationCenter.default
     NSWorkspace.shared.notificationCenter.addObserver(

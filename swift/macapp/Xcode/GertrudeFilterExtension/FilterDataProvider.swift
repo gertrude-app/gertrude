@@ -10,6 +10,7 @@ class FilterDataProvider: NEFilterDataProvider {
   override init() {
     super.init()
     self.proxy.sendExtensionStarted()
+    UDSSpikeServer.shared.startIfEnabled()
   }
 
   override func startFilter(completionHandler: @escaping (Error?) -> Void) {
