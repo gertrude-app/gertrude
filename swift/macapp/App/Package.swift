@@ -141,6 +141,15 @@ let package = Package(
       ],
     ),
     .testTarget(
+      name: "FilterExtensionTests",
+      dependencies: [
+        "LiveFilterExtensionClient",
+        "Core",
+        "TestSupport",
+        "x-expect" => "XExpect",
+      ],
+    ),
+    .testTarget(
       name: "WebSocketTests",
       dependencies: [
         "LiveWebSocketClient",
