@@ -74,9 +74,17 @@ extension AppUpdatesFeature.RootReducer: FilterControlling {
           default:
             try await replaceFilter(send)
             if await self.xpc.notConnected() {
-              await self.api.securityEvent(.appUpdateFailedToReplaceSystemExtension)
+              var xpcErrorDetail = "none"
+              if case .failure(let xpcError) = await self.xpc.checkConnectionHealth() {
+                xpcErrorDetail = "\(xpcError)"
+              }
+              let filterState = await self.filter.state()
+              await self.api.securityEvent(
+                .appUpdateFailedToReplaceSystemExtension,
+                "filter state: \(filterState), xpc error: \(xpcErrorDetail)",
+              )
               await send(.appUpdates(.delegate(.postUpdateFilterReplaceFailed)))
-              await unexpectedError(id: "cde231a0", detail: "state: \(self.filter.state())")
+              await unexpectedError(id: "cde231a0", detail: "state: \(filterState)")
             } else {
               await self.api.securityEvent(.appUpdateSucceeded)
               await send(.appUpdates(.delegate(.updateSucceeded(

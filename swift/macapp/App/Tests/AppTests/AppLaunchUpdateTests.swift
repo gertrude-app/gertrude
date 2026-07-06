@@ -171,11 +171,24 @@ final class UpdateTests: XCTestCase {
     store.deps.filterXpc.checkConnectionHealth = mockFn(always: .failure(.noConnection))
     store.deps.filterXpc.establishConnection = mockFn(always: .failure(.noConnection))
 
+    let securityEvent = spy2(on: (LogSecurityEvent.Input.self, UUID?.self), returning: ())
+    store.deps.api.logSecurityEvent = securityEvent.fn
+
     await store.send(.application(.didFinishLaunching))
     await store.receive(.appUpdates(.delegate(.postUpdateFilterReplaceFailed)))
 
     // ...so open up the health check screen, so they can repair/restart
     expect(store.state.adminWindow.windowOpen).toEqual(true)
     expect(store.state.adminWindow.screen).toEqual(.healthCheck)
+
+    // ...and the security event carries wedge forensics for field diagnosis
+    let eventCalls = await securityEvent.calls
+    expect(eventCalls.contains(Both(
+      .init(
+        .appUpdateFailedToReplaceSystemExtension,
+        "filter state: installedAndRunning, xpc error: noConnection",
+      ),
+      nil,
+    ))).toEqual(true)
   }
 }
