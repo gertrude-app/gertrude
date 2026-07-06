@@ -130,6 +130,21 @@ let package = Package(
       ],
     ),
     .testTarget(
+      name: "MacSimTests",
+      dependencies: [
+        .tca,
+        "App",
+        "Filter",
+        "Core",
+        "ClientInterfaces",
+        "TestSupport",
+        "x-expect" => "XExpect",
+        "x-kit" => "XCore",
+        "gertie" => "Gertie",
+        "pairql-macapp" => "MacAppRoute",
+      ],
+    ),
+    .testTarget(
       name: "WebSocketTests",
       dependencies: [
         "LiveWebSocketClient",
