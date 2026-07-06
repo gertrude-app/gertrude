@@ -188,26 +188,55 @@ health telemetry, and let the fleet's chronic-wedge machines render the verdict
 XPC can't be acquitted of locally. Do the cheap XPC hardening now regardless;
 it hedges the migration window.
 
-## Production adoption cost (estimate)
+## Production adoption plan — phased dark-ship (agreed shape, 2026-07-06)
 
-The spike is ~500 lines including logging and both test hooks. A production
-channel is a different, larger job:
+The spike is ~500 lines including logging and both test hooks. The adoption
+plan exploits the fact that both sides already talk to *interfaces*, not to
+XPC: the app's TCA layer only knows the `FilterXPCClient` dependency struct,
+and the filter reducer only consumes `XPCEvent.Filter` actions fed from
+`xpcEventSubject`. Both phases happen *under* those seams; reducer logic never
+changes.
 
-1. **Protocol**: replace the toy messages with the existing app↔filter message
-   surface (`XPCInterfaces`/`XPCTypes` already traffic in Codable DTOs — the
-   payload types port unchanged; request/response correlation ids + reply
-   timeouts needed, ~1-2 days).
-2. **Server hardening**: per-uid connection maps (fixes the last-wins
-   single-connection XPC bug for free — each uid has its *own socket*),
-   backpressure/write-queue instead of usleep retry, connection limits,
-   `SecRequirement`-based peer validation. (~2-3 days)
-3. **Client integration**: implement `FilterXPCClient` interface over UDS so
-   the entire TCA layer is untouched; keep XPC as fallback during migration
-   (dual-stack, prefer UDS, health-check both). (~2-4 days)
-4. **Rollout safety**: ship dark alongside XPC, compare channel health
-   telemetry in the field (we already have `system.security_events` plumbing),
-   flip the default once UDS wedge-rate < XPC wedge-rate is demonstrated on
-   real fleet data. (calendar time, little code)
+### Phase A — shadow (the dark ship, ~1 week of code)
+
+- **Wire layer** (~1-2 days): promote the spike framing to a production
+  envelope — `{correlationId, payload}` where payload reuses the existing
+  Codable DTOs that already cross XPC (`XPC+Codable` types port unchanged).
+  Request/reply matching + per-request timeouts replace the hand-rolled
+  `withTimeout` ack polling.
+- **Filter side** (~2-3 days): hardened server — per-uid connection map (fixes
+  the last-wins single-connection XPC bug for free; each uid has its *own
+  socket*), real write queue instead of usleep retry, connection limits,
+  `SecRequirement`-based peer validation — started alongside the XPC listener
+  in `.extensionStarted`. Shadow-received messages are **not applied**: logged
+  and compared against what XPC delivered.
+- **App side** (~2 days): `LiveFilterXPCClient` stays live; a small tap
+  duplicates every outbound message onto the UDS channel and runs a parallel
+  heartbeat.
+- **Telemetry — the entire point**: one new event via the existing
+  `system.security_events` plumbing (+ the ledger-10 wedge-forensics detail):
+  *at the moment the XPC health check fails, was the UDS channel alive?* The
+  fleet's chronic-wedge machines — unreproducible locally (40/40 clean VM
+  attempts) — answer directly. "XPC dead / UDS alive and round-tripping" on
+  those machines closes the case with field evidence.
+- **Payload-size validation (do early in phase A)**: `userRules` with full
+  keychains is the largest message crossing the channel; the write queue must
+  be tested against real kernel socket-buffer limits (burst of large frames +
+  slow reader), not the spike's toy retry. The spike only ever moved <1KB
+  frames — this is the one untested wire-level behavior.
+
+### Phase B — flip (small code, gated on field data)
+
+Reimplement `FilterXPCClient.liveValue` as a router: prefer UDS when healthy,
+fall back to XPC; both transports feed the same `xpcEventSubject` on each
+side, the filter now applying the primary channel's messages. Correlation ids
+make dedup trivial if both ever run hot, though primary+fallback avoids that
+entirely. App code above the dependency: zero diff. Flip only after phase-A
+telemetry shows UDS wedge-rate < XPC wedge-rate on real fleet data.
+
+### Phase C — retire or demote
+
+Keep XPC as permanent fallback or remove it, decided on phase-B telemetry.
 
 No OS-version floor issues: everything used is macOS 11-era API or older
 except LOCAL_PEERTOKEN (present in current SDK; verify the floor —
