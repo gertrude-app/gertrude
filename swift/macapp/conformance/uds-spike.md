@@ -132,6 +132,62 @@ requirement, not just bundle id string) — same token, same API family.
 - VM `/tmp` is wiped on reboot: re-upload tarballs/scripts after any reboot
   witness.
 
+## UDS vs XPC — comparative assessment (post-spike, discussed with Jared)
+
+Not *strictly* better — better on exactly the axis costing us field reliability,
+at the cost of owning plumbing Apple currently owns.
+
+Structurally superior:
+
+1. **Liveness is observed, not inferred.** Peer state is kernel truth: process
+   death ⇒ EOF/EPIPE at the other end *at that instant*, both directions
+   (witnessed). XPC gives nothing by default; the current code infers health by
+   polling random-int acks through hand-rolled timeouts, and field telemetry
+   says 77% of wedges are "filter alive, channel dead" — a state UDS cannot
+   silently occupy, because a dead channel announces itself and the remedy
+   (reconnect) is a dumb loop we own.
+2. **No stateful broker to go stale.** XPC rendezvous runs through launchd
+   mach-service registration; extension replacement invalidates it while the
+   app's `NSXPCConnection` object lives on pointing at nothing, and
+   interrupted-vs-invalidated semantics are subtle enough that production code
+   (ours included) gets them wrong. UDS rendezvous is a filesystem path; the
+   complete failure vocabulary is ENOENT / ECONNREFUSED / EOF — all three
+   witnessed, one retry loop handles all uniformly. 7/7 replacements produced a
+   fresh channel with zero special-casing.
+3. **Per-uid channels fall out of the design.** The last-wins single-connection
+   XPC bug disappears structurally: each user has their own socket, gated by
+   file permissions *before* accept, plus audit-token/SecCode after — stronger
+   peer auth than the current accept-anyone listener.
+4. **Filter-initiated push is symmetric and boring.** Filter→app over XPC rides
+   the retained reverse proxy — exactly the object that goes stale. Over UDS
+   it's bytes on the same accepted connection.
+5. **Serves the meta-goal.** The channel runs in plain processes — local tests
+   exercise real client + real server + real framing in seconds. The XPC mach
+   layer is untestable by construction. Switching shrinks the mocked seam in
+   any future multi-target harness to nearly nothing.
+
+Honest costs / risks:
+
+- **We inherit the plumbing** (framing, partial writes, backpressure, reconnect
+  policy, fd hygiene, SIGPIPE) that XPC does invisibly; every bug there becomes
+  ours. Mitigating: it's bounded, enumerable, unit-testable work, vs the XPC
+  wedge which has been unbounded and undiagnosable for months.
+- **Blessed-path risk.** Apple documents XPC as *the* app↔extension channel.
+  BSD sockets are POSIX and effectively un-deprecatable, but a future macOS
+  could tighten what NE processes may touch (/var/run writes by a root sysext:
+  very low risk; the real exposure is if the *app* is ever sandboxed, which
+  forces a socket-path rethink).
+- **The honest gap:** the chronic per-machine wedge was never reproduced, so
+  "UDS is immune" is a structural argument (no registration to go stale), not a
+  witnessed one. Also untested: fast-user-switching with two live GUI sessions;
+  behavior under real load (block-streaming bursts vs kernel socket buffers).
+
+Position: switch, but via the dark-ship route — implement the
+`FilterXPCClient` interface over UDS, run both channels side by side reporting
+health telemetry, and let the fleet's chronic-wedge machines render the verdict
+XPC can't be acquitted of locally. Do the cheap XPC hardening now regardless;
+it hedges the migration window.
+
 ## Production adoption cost (estimate)
 
 The spike is ~500 lines including logging and both test hooks. A production
