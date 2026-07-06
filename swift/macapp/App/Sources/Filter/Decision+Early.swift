@@ -45,7 +45,7 @@ public extension NetworkFilter {
 
     if !hasAlwaysBlocked,
        let suspension = self.state.suspensions[userId],
-       suspension.isActive,
+       suspension.isActive(at: self.now),
        suspension.scope == .unrestricted,
        self.state.macappsAliveUntil[userId] != nil {
       return self.logDecision(.allow(.filterSuspended(userId)))

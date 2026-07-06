@@ -239,7 +239,7 @@ public extension NetworkFilter {
     for userId: uid_t,
     permits app: AppDescriptor,
   ) -> Bool {
-    guard let suspension = state.suspensions[userId], suspension.isActive else {
+    guard let suspension = state.suspensions[userId], suspension.isActive(at: self.now) else {
       return false
     }
     return suspension.scope.permits(app)
