@@ -96,6 +96,7 @@ public struct Filter: Reducer, Sendable {
 
     case .loadedPersistentState(.some(let persisted)):
       state.userKeychains = persisted.userKeychains
+      state.userDowntime = persisted.userDowntime.mapValues { Downtime(window: $0) }
       var manifest = persisted.appIdManifest
       manifest.normalizeBundleIds()
       state.appIdManifest = manifest

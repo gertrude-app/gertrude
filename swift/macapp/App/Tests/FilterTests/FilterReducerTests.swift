@@ -86,6 +86,25 @@ final class FilterReducerTests: XCTestCase {
   }
 
   @MainActor
+  func testLoadedPersistentStateRestoresDowntime() async {
+    let (store, _) = Filter.testStore()
+    let window = PlainTimeWindow(
+      start: .init(hour: 22, minute: 0),
+      end: .init(hour: 5, minute: 0),
+    )
+
+    await store.send(.loadedPersistentState(.init(
+      userKeychains: [502: [.mock]],
+      userDowntime: [502: window], // <-- persisted downtime...
+      appIdManifest: .init(),
+      exemptUsers: [],
+    ))) {
+      $0.userKeychains = [502: [.mock]]
+      $0.userDowntime = [502: Downtime(window: window)] // <-- ...survives respawn
+    }
+  }
+
+  @MainActor
   func testReceivingRulesWithAtLeastOneKeyClearsExemptStatus() async {
     let (store, _) = Filter.testStore {
       $0.exemptUsers = [501, 504]
