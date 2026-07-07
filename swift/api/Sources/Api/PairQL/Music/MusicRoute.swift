@@ -90,6 +90,27 @@ extension GetMusicAppStatus: Resolver {
       )
     }
 
+    if let child = try await device.child(in: ctx.db) {
+      let parent = try await child.parent(in: ctx.db)
+      let account = try await parent.billingAccountSnapshot(
+        in: ctx.db,
+        at: get(dependency: \.date.now),
+      )
+      if account.can(.useGertrudeMusic) {
+        let claim = try await device.ensureClaim(intent: .music, in: ctx.db)
+        try await completeClaim(claim, for: child, in: ctx.db)
+        let token = try await ctx.db.findOrCreate(
+          MusicApp.Token(installId: install.id),
+          conflictOn: [.installId],
+        )
+        return .claimed(
+          token: token.value.rawValue,
+          childId: child.id.rawValue,
+          childName: child.name,
+        )
+      }
+    }
+
     let claim = try await device.ensureClaim(intent: .music, in: ctx.db)
     return .unclaimed(code: claim.code, expiresAt: claim.expiresAt)
   }

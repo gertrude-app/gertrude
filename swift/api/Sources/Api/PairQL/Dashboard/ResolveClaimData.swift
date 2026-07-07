@@ -9,6 +9,7 @@ func resolveClaimData<Output>(
   in context: ParentContext,
   onResume: (IOSDevice, Child) async throws -> Output,
   onUnclaimed: (IOSDevice, [Child]) async throws -> Output,
+  onUnclaimedBound: ((Claim, IOSDevice, Child) async throws -> Output)? = nil,
 ) async throws -> Output {
   guard let claim = try await Claim.find(code: code, in: context.db) else {
     logIOSUnusual("\(baseId)-1", "\(intent.claimLogLabel) claim code not found")
@@ -23,10 +24,11 @@ func resolveClaimData<Output>(
   }
 
   let device = try await claim.device(in: context.db)
+  let deviceChild: Child?
 
   if let childId = device.childId {
     if let child = try? await context.verifiedChild(from: childId) {
-      return try await onResume(device, child)
+      deviceChild = child
     } else {
       let ownerChild = try? await Child.query()
         .where(.id == childId)
@@ -36,7 +38,7 @@ func resolveClaimData<Output>(
       } else {
         nil
       }
-      logIOSUnexpected(
+      logIOSUnusual(
         "\(baseId)-2",
         differentParentClaimLogDetail(
           intent,
@@ -50,12 +52,22 @@ func resolveClaimData<Output>(
       let msg = "Code not found. Double-check and try again."
       throw context.error("\(baseId)-2", .notFound, user: msg)
     }
+  } else {
+    deviceChild = nil
   }
 
-  if claim.expiresAt < get(dependency: \.date.now) {
+  if claim.claimedAt != nil, let child = deviceChild {
+    return try await onResume(device, child)
+  }
+
+  if claim.expiresAt <= get(dependency: \.date.now) {
     logIOSUnusual("\(baseId)-3", "\(intent.claimLogLabel) claim code expired")
     let msg = "This code has expired. Please generate a new one."
     throw context.error("\(baseId)-3", .badRequest, user: msg)
+  }
+
+  if let child = deviceChild, let onUnclaimedBound {
+    return try await onUnclaimedBound(claim, device, child)
   }
 
   let children = try await context.parent.children(in: context.db)

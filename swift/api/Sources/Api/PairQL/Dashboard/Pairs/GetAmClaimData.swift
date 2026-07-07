@@ -60,6 +60,25 @@ extension GetAmClaimData: Resolver {
           resumeStep: nil,
         )
       },
+      onUnclaimedBound: { claim, device, child in
+        guard let install = try await device.podcastInstall(in: context.db) else {
+          logIOSUnusual("ac9edc1e", "Podcasts claim data on bound device with no podcast install")
+          let msg = "Code not found. Double-check and try again."
+          throw context.error("ac9edc1e", .notFound, user: msg)
+        }
+        try await completeClaim(claim, for: child, in: context.db)
+        let account = try await context.currentBillingAccount()
+        return Output(
+          children: [],
+          modelName: device.modelName,
+          deviceType: device.deviceType,
+          iosVersion: device.iosVersion,
+          resumeStep: .done(
+            amSubscription: account.amSubscriptionState(forInstall: install),
+            childName: child.name,
+          ),
+        )
+      },
     )
   }
 }

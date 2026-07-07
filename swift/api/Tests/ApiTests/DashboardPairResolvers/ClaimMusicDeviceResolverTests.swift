@@ -70,6 +70,29 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     expect(claim?.claimedAt).not.toBeNil()
   }
 
+  func testAlreadyBoundExpiredClaimThrowsExpiredAndDoesNotClaim() async throws {
+    let parent = try await self.parent()
+    try await self.addLightPaidSubscription(for: parent.id)
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(
+      .music,
+      device.id,
+      expiresAt: .reference - .days(1),
+    )
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    try await expectErrorFrom {
+      try await ClaimMusicDevice.resolve(
+        with: .init(code: claim.code, child: .newChild(name: "Ignored")),
+        in: parent.context,
+      )
+    }.toContain("expired")
+
+    let unchanged = try await Claim.find(code: claim.code, in: self.db)
+    expect(unchanged?.claimedAt).toBeNil()
+  }
+
   func testResumeClaimBySameParentReturnsOutput() async throws {
     let parent = try await self.parent()
     try await self.addLightPaidSubscription(for: parent.id)

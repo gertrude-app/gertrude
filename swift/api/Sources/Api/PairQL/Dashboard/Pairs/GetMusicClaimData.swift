@@ -68,6 +68,24 @@ extension GetMusicClaimData: Resolver {
           paymentAction: paymentAction,
         )
       },
+      onUnclaimedBound: { claim, device, child in
+        guard try await device.musicInstall(in: context.db) != nil else {
+          logIOSUnusual("12ec95d0", "Music claim data on bound device with no music install")
+          let msg = "Code not found. Double-check and try again."
+          throw context.error("12ec95d0", .notFound, user: msg)
+        }
+        if paymentAction == nil {
+          try await completeClaim(claim, for: child, in: context.db)
+        }
+        return Output(
+          children: [],
+          modelName: device.modelName,
+          deviceType: device.deviceType,
+          iosVersion: device.iosVersion,
+          resumeStep: paymentAction == nil ? .done(childName: child.name) : nil,
+          paymentAction: paymentAction,
+        )
+      },
     )
   }
 }
