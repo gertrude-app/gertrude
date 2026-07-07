@@ -23,6 +23,7 @@ struct AddShowFeature {
     var resettingPin: Bool = false
     var searchText: String = ""
     var searchResults: [SearchResult] = []
+    var searchInFlight: Bool = false
   }
 
   enum Action: Equatable {
@@ -66,25 +67,28 @@ struct AddShowFeature {
       switch action {
       case .setSearchText(let text):
         state.searchText = text
-        return .none
+        state.searchResults = []
+        state.searchInFlight = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        return .cancel(id: CancelID.search)
 
       case .setScreen(let screen):
         state.screen = screen
         return .none
 
       case .searchSetDebounced:
-        guard !state.searchText.isEmpty else {
+        let query = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else {
+          state.searchInFlight = false
           return .none
         }
-        return .run { [text = state.searchText] send in
-          if let results = try? await self.podcasts.search(text) {
-            await send(.setSearchResults(results))
-          }
+        return .run { send in
+          await send(.setSearchResults((try? self.podcasts.search(query)) ?? []))
         }
-        .cancellable(id: CancelID.search)
+        .cancellable(id: CancelID.search, cancelInFlight: true)
 
       case .setSearchResults(let results):
         state.searchResults = results
+        state.searchInFlight = false
         return .none
 
       case .pinChallenge(.delegate(.verified)):
