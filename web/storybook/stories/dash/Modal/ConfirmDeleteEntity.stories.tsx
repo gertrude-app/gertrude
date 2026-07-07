@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Modal/ConfirmDeleteEntity', // eslint-disable-line
+  title: 'Dashboard/Modal/ConfirmDeleteEntity',
   component: ConfirmDeleteEntity,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof ConfirmDeleteEntity>;

@@ -1,4 +1,4 @@
-import { Banner, Button, EmptyState } from '@gertrude/ui';
+import { Banner, Button, Card, EmptyState, HStack, Text, VStack } from '@gertrude/ui';
 import { MusicIcon, PlusIcon } from 'lucide-react';
 import React from 'react';
 import type { AllowedAlbum, PersonIosSettingsConfiguration } from '#/components/types';
@@ -97,9 +97,9 @@ const IosSettingsPage: React.FC<Props> = ({
   if (!config || !hasIosDevices) {
     return (
       <CardContainer className="flex flex-col gap-4">
-        <span className="text-center text-sm text-stone-500">
+        <Text variant="bodyMuted" className="text-center">
           No iPhone/iPad settings to configure.
-        </span>
+        </Text>
       </CardContainer>
     );
   }
@@ -129,7 +129,7 @@ const IosSettingsPage: React.FC<Props> = ({
             title="Blocked Groups"
             description="These content categories are blocked on iPhones and iPads."
           >
-            <div className="bg-white border border-stone-200 rounded-xl shadow shadow-stone-300/30 flex flex-col overflow-hidden">
+            <Card padding={0} className="overflow-hidden">
               {iosBlockGroups.map((group) => (
                 <BlockGroup
                   key={group.id}
@@ -147,7 +147,7 @@ const IosSettingsPage: React.FC<Props> = ({
                   }
                 />
               ))}
-            </div>
+            </Card>
           </SettingsRow>
           <div className="flex items-center gap-3 mt-8 mb-4">
             <div className="h-[1.5px] flex-grow bg-stone-200 rounded-full" />
@@ -161,7 +161,7 @@ const IosSettingsPage: React.FC<Props> = ({
             iPhone by opening the Gertrude app and going to{` `}
             <strong>Info → Sync Profile</strong>.
           </Banner>
-          <div className="flex flex-col gap-3 mt-3">
+          <VStack gap={3} className="mt-3">
             <SettingsRow
               title="Prevent Protection Removal"
               description="Make it impossible for the iPhone user to remove Gertrude’s protection."
@@ -196,7 +196,7 @@ const IosSettingsPage: React.FC<Props> = ({
               enabled={config.allowInstallingApps}
               setEnabled={(enabled) => patchConfig({ allowInstallingApps: enabled })}
             />
-          </div>
+          </VStack>
         </PersonSettingsExpandableSection>
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/music.png"
@@ -219,7 +219,7 @@ const IosSettingsPage: React.FC<Props> = ({
             type="alwaysOn"
           >
             {config.allowedAlbums.length > 0 ? (
-              <div className="flex flex-col gap-3">
+              <VStack gap={3}>
                 <div className="grid grid-cols-1 @lg/main:grid-cols-2 @3xl/main:grid-cols-3 @5xl/main:grid-cols-4 gap-4">
                   {config.allowedAlbums.map((album) => (
                     <AllowedAlbumCard
@@ -247,7 +247,7 @@ const IosSettingsPage: React.FC<Props> = ({
                     />
                   ))}
                 </div>
-                <div className="flex justify-end">
+                <HStack justify="end">
                   <Button
                     type="button"
                     onClick={() => setAddAlbumSlideOverOpen(true)}
@@ -255,8 +255,8 @@ const IosSettingsPage: React.FC<Props> = ({
                   >
                     Add Album
                   </Button>
-                </div>
-              </div>
+                </HStack>
+              </VStack>
             ) : (
               <EmptyState
                 icon={MusicIcon}

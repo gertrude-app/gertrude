@@ -1,10 +1,15 @@
 import {
   Button,
+  Card,
   DateTimePicker,
+  HStack,
   Input,
   Select,
   type SelectOption,
+  Stack,
+  Text,
   Toggle,
+  VStack,
   inflect,
 } from '@gertrude/ui';
 import cx from 'clsx';
@@ -125,172 +130,190 @@ const UnlockRequestResponsePanel: React.FC<Props> = ({
   }));
 
   return (
-    <div className="h-full w-full flex flex-col px-3 @lg/slide:px-6 pb-3 @lg/slide:pb-6 justify-between overflow-scroll gap-8">
+    <VStack
+      justify="between"
+      gap={8}
+      className="h-full w-full px-3 @lg/slide:px-6 pb-3 @lg/slide:pb-6 overflow-scroll"
+    >
       <div>
-        <div className="flex flex-col border-y @lg/slide:border-x border-stone-200 bg-white -mx-3 @lg/slide:mx-0 px-3 @lg/slide:rounded-xl shadow shadow-stone-300/30">
-          {keys.map((keyDraft) => (
-            <div
-              key={keyDraft.key.domain}
-              className="py-5 flex flex-col border-b border-stone-200 gap-2 last:border-b-0"
-            >
-              <div className="flex justify-between items-center gap-2">
-                <span
-                  className={cx(
-                    `font-medium text-stone-800`,
-                    !keyDraft.allowed && `opacity-30 line-through`,
-                  )}
-                >
-                  {keyDraft.key.domain}
-                </span>
-                <Toggle
-                  checked={keyDraft.allowed}
-                  setChecked={() => {
-                    setKeys((currentKeys) =>
-                      currentKeys.map((currentKeyDraft) =>
-                        currentKeyDraft.key.domain === keyDraft.key.domain
-                          ? {
-                              ...currentKeyDraft,
-                              allowed: !currentKeyDraft.allowed,
-                            }
-                          : currentKeyDraft,
-                      ),
-                    );
-                  }}
-                />
-              </div>
-              <div className={cx(`flex flex-col gap-3`, !keyDraft.allowed && `hidden`)}>
-                <div className="flex items-center gap-4">
-                  <Select
-                    label="Which keychain:"
-                    labelPosition="left"
-                    selected={keyDraft.keychainId}
-                    setSelected={(keychainId) =>
-                      setKeys((currentKeys) =>
-                        currentKeys.map((currentKeyDraft) =>
-                          currentKeyDraft.key.domain === keyDraft.key.domain
-                            ? { ...currentKeyDraft, keychainId }
-                            : currentKeyDraft,
-                        ),
-                      )
-                    }
-                    possibleValues={keychainSelectOptions}
-                    size="small"
-                  />
-                </div>
-                <div
-                  className={cx(
-                    `flex flex-col border-y border-x border-stone-200 bg-stone-50 shadow shadow-stone-300/30 rounded-xl transition-[margin,border-radius] duration-150`,
-                    keyDraft.moreOptionsExpanded &&
-                      `!border-x-0 @lg/slide:!border-x !rounded-none @lg/slide:!rounded-xl -mx-3 @lg/slide:mx-0`,
-                  )}
-                >
-                  <button
-                    type="button"
-                    className="flex justify-between items-center cursor-pointer py-2 px-3"
-                    onClick={() =>
+        <Card
+          padding={0}
+          className="border-y @lg/slide:border-x -mx-3 @lg/slide:mx-0 @lg/slide:rounded-xl"
+        >
+          <VStack>
+            {keys.map((keyDraft) => (
+              <VStack
+                key={keyDraft.key.domain}
+                gap={2}
+                className="py-5 px-3 border-b border-stone-200 last:border-b-0"
+              >
+                <HStack justify="between" gap={2}>
+                  <Text
+                    variant="bodyStrong"
+                    className={cx(!keyDraft.allowed && `opacity-30 line-through`)}
+                  >
+                    {keyDraft.key.domain}
+                  </Text>
+                  <Toggle
+                    checked={keyDraft.allowed}
+                    setChecked={() => {
                       setKeys((currentKeys) =>
                         currentKeys.map((currentKeyDraft) =>
                           currentKeyDraft.key.domain === keyDraft.key.domain
                             ? {
                                 ...currentKeyDraft,
-                                moreOptionsExpanded: !currentKeyDraft.moreOptionsExpanded,
+                                allowed: !currentKeyDraft.allowed,
                               }
                             : currentKeyDraft,
                         ),
-                      )
-                    }
-                  >
-                    <span className="text-sm text-stone-600">More options</span>
-                    <ChevronRightIcon
-                      className={cx(
-                        `h-4 w-4 text-stone-500 transition-[rotate] duration-150`,
-                        keyDraft.moreOptionsExpanded && `rotate-90`,
-                      )}
+                      );
+                    }}
+                  />
+                </HStack>
+                <VStack gap={3} className={cx(!keyDraft.allowed && `hidden`)}>
+                  <HStack gap={4}>
+                    <Select
+                      label="Which keychain:"
+                      labelPosition="left"
+                      selected={keyDraft.keychainId}
+                      setSelected={(keychainId) =>
+                        setKeys((currentKeys) =>
+                          currentKeys.map((currentKeyDraft) =>
+                            currentKeyDraft.key.domain === keyDraft.key.domain
+                              ? { ...currentKeyDraft, keychainId }
+                              : currentKeyDraft,
+                          ),
+                        )
+                      }
+                      possibleValues={keychainSelectOptions}
+                      size="small"
                     />
-                  </button>
-                  <div
+                  </HStack>
+                  <VStack
                     className={cx(
-                      keyDraft.moreOptionsExpanded ? `h-auto` : `h-0`,
-                      `overflow-hidden transition-[height] duration-150`,
+                      `border-y border-x border-stone-200 bg-stone-50 shadow shadow-stone-300/30 rounded-xl transition-[margin,border-radius] duration-150`,
+                      keyDraft.moreOptionsExpanded &&
+                        `!border-x-0 @lg/slide:!border-x !rounded-none @lg/slide:!rounded-xl -mx-3 @lg/slide:mx-0`,
                     )}
                   >
+                    <HStack
+                      as="button"
+                      type="button"
+                      justify="between"
+                      className="cursor-pointer py-2 px-3"
+                      onClick={() =>
+                        setKeys((currentKeys) =>
+                          currentKeys.map((currentKeyDraft) =>
+                            currentKeyDraft.key.domain === keyDraft.key.domain
+                              ? {
+                                  ...currentKeyDraft,
+                                  moreOptionsExpanded:
+                                    !currentKeyDraft.moreOptionsExpanded,
+                                }
+                              : currentKeyDraft,
+                          ),
+                        )
+                      }
+                    >
+                      <Text variant="bodySubtle">More options</Text>
+                      <ChevronRightIcon
+                        className={cx(
+                          `h-4 w-4 text-stone-500 transition-[rotate] duration-150`,
+                          keyDraft.moreOptionsExpanded && `rotate-90`,
+                        )}
+                      />
+                    </HStack>
                     <div
                       className={cx(
-                        `p-3 transition-opacity druation-150 flex flex-col gap-3`,
-                        !keyDraft.moreOptionsExpanded && `opacity-0`,
+                        keyDraft.moreOptionsExpanded ? `h-auto` : `h-0`,
+                        `overflow-hidden transition-[height] duration-150`,
                       )}
                     >
-                      <div className="flex flex-col @md/slide:flex-row gap-3 @md/slide:gap-2">
-                        <Select
-                          label="Address type:"
-                          selected={keyDraft.key.addressType}
-                          setSelected={(addressType) =>
-                            updateKeyAddressType(keyDraft.key.domain, addressType)
-                          }
-                          possibleValues={addressTypeOptions}
-                          className="@md/slide:w-1/2"
-                        />
-                        <Select
-                          label="Unlocked for:"
-                          selected={keyDraft.key.scope.type}
-                          setSelected={(unlockedFor) =>
-                            updateKeyUnlockedFor(keyDraft.key.domain, unlockedFor)
-                          }
-                          possibleValues={unlockedForOptions}
-                          className="@md/slide:w-1/2"
-                        />
-                      </div>
-                      <div className="flex flex-col @md/slide:flex-row gap-3 @md/slide:gap-2">
-                        <Input
-                          label="Note"
-                          placeholder="Optional note..."
-                          type="text"
-                          value={keyDraft.key.note ?? ``}
-                          setValue={(value) => {
-                            setKeys((currentKeys) =>
-                              currentKeys.map((currentKeyDraft) =>
-                                currentKeyDraft.key.domain === keyDraft.key.domain
-                                  ? {
-                                      ...currentKeyDraft,
-                                      key: { ...currentKeyDraft.key, note: value },
-                                    }
-                                  : currentKeyDraft,
-                              ),
-                            );
-                          }}
-                          className="@md/slide:w-1/2"
-                        />
-                        <DateTimePicker
-                          date={keyDraft.key.expiration}
-                          notRequred
-                          setDate={(date) => {
-                            setKeys((currentKeys) =>
-                              currentKeys.map((currentKeyDraft) =>
-                                currentKeyDraft.key.domain === keyDraft.key.domain
-                                  ? {
-                                      ...currentKeyDraft,
-                                      key: {
-                                        ...currentKeyDraft.key,
-                                        expiration: date,
-                                      },
-                                    }
-                                  : currentKeyDraft,
-                              ),
-                            );
-                          }}
-                          label="Expiration date"
-                          className="@md/slide:w-1/2"
-                        />
-                      </div>
+                      <VStack
+                        gap={3}
+                        className={cx(
+                          `p-3 transition-opacity druation-150`,
+                          !keyDraft.moreOptionsExpanded && `opacity-0`,
+                        )}
+                      >
+                        <Stack
+                          direction={{ default: `vertical`, '@md/slide': `horizontal` }}
+                          gap={{ default: 3, '@md/slide': 2 }}
+                        >
+                          <Select
+                            label="Address type:"
+                            selected={keyDraft.key.addressType}
+                            setSelected={(addressType) =>
+                              updateKeyAddressType(keyDraft.key.domain, addressType)
+                            }
+                            possibleValues={addressTypeOptions}
+                            className="@md/slide:w-1/2"
+                          />
+                          <Select
+                            label="Unlocked for:"
+                            selected={keyDraft.key.scope.type}
+                            setSelected={(unlockedFor) =>
+                              updateKeyUnlockedFor(keyDraft.key.domain, unlockedFor)
+                            }
+                            possibleValues={unlockedForOptions}
+                            className="@md/slide:w-1/2"
+                          />
+                        </Stack>
+                        <Stack
+                          direction={{ default: `vertical`, '@md/slide': `horizontal` }}
+                          gap={{ default: 3, '@md/slide': 2 }}
+                        >
+                          <Input
+                            label="Note"
+                            placeholder="Optional note..."
+                            type="text"
+                            value={keyDraft.key.note ?? ``}
+                            setValue={(value) => {
+                              setKeys((currentKeys) =>
+                                currentKeys.map((currentKeyDraft) =>
+                                  currentKeyDraft.key.domain === keyDraft.key.domain
+                                    ? {
+                                        ...currentKeyDraft,
+                                        key: { ...currentKeyDraft.key, note: value },
+                                      }
+                                    : currentKeyDraft,
+                                ),
+                              );
+                            }}
+                            className="@md/slide:w-1/2"
+                          />
+                          <DateTimePicker
+                            date={keyDraft.key.expiration}
+                            notRequred
+                            setDate={(date) => {
+                              setKeys((currentKeys) =>
+                                currentKeys.map((currentKeyDraft) =>
+                                  currentKeyDraft.key.domain === keyDraft.key.domain
+                                    ? {
+                                        ...currentKeyDraft,
+                                        key: {
+                                          ...currentKeyDraft.key,
+                                          expiration: date,
+                                        },
+                                      }
+                                    : currentKeyDraft,
+                                ),
+                              );
+                            }}
+                            label="Expiration date"
+                            className="@md/slide:w-1/2"
+                          />
+                        </Stack>
+                      </VStack>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                  </VStack>
+                </VStack>
+              </VStack>
+            ))}
+          </VStack>
+        </Card>
       </div>
-      <div className="flex justify-end gap-2">
+      <HStack justify="end" gap={2}>
         <Button type="button" onClick={onDenyAll} variant="ghost">
           Deny all
         </Button>
@@ -302,8 +325,8 @@ const UnlockRequestResponsePanel: React.FC<Props> = ({
         >
           Save {allowedKeysCount} {inflect(`key`, allowedKeysCount)}
         </Button>
-      </div>
-    </div>
+      </HStack>
+    </VStack>
   );
 };
 

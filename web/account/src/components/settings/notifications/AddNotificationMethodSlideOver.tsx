@@ -1,4 +1,14 @@
-import { Banner, Button, Input, Select, SlideOver } from '@gertrude/ui';
+import {
+  Banner,
+  Button,
+  HStack,
+  Input,
+  Select,
+  SlideOver,
+  Stack,
+  Text,
+  VStack,
+} from '@gertrude/ui';
 import {
   BellDotIcon,
   CheckIcon,
@@ -196,9 +206,9 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
       size="medium"
       withPx
     >
-      <div className="flex h-full flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto pb-6">
-          <div className="flex max-w-xl flex-col gap-5">
+      <VStack className="h-full">
+        <SlideOver.Body>
+          <VStack gap={5} className="max-w-xl">
             <Select
               label="Method"
               selected={methodType}
@@ -228,13 +238,13 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
                 setSlackBotToken={setSlackBotToken}
               />
             )}
-          </div>
-        </div>
-        <div className="-mx-4 flex shrink-0 items-center justify-between gap-3 border-t border-stone-200 bg-stone-50/95 px-4 py-3 @lg/slide:-mx-6 @lg/slide:px-6 @lg/slide:py-4">
+          </VStack>
+        </SlideOver.Body>
+        <SlideOver.Footer bleedX>
           <Button type="button" variant="ghost" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <div className="flex items-center gap-2">
+          <HStack gap={2}>
             {flowState === `codeSent` && (
               <Button
                 type="button"
@@ -254,9 +264,9 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
             >
               {primaryButtonLabel}
             </Button>
-          </div>
-        </div>
-      </div>
+          </HStack>
+        </SlideOver.Footer>
+      </VStack>
     </SlideOver>
   );
 };
@@ -317,7 +327,7 @@ const MethodFields: React.FC<{
       );
     case `slack`:
       return (
-        <div className="flex flex-col gap-4">
+        <VStack gap={4}>
           <Input
             type="text"
             value={slackChannelName}
@@ -343,7 +353,7 @@ const MethodFields: React.FC<{
             placeholder="xoxb-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx-xxxxxxxxxx"
             required
           />
-        </div>
+        </VStack>
       );
     case `ntfy`:
       return <NtfyIntro />;
@@ -357,7 +367,7 @@ const VerificationCodeForm: React.FC<{
   confirmationCode: string;
   setConfirmationCode: (value: string) => void;
 }> = ({ methodType, confirmationCode, setConfirmationCode }) => (
-  <div className="flex flex-col gap-4">
+  <VStack gap={4}>
     <Banner>
       We sent a six-digit code to your {verificationDestination(methodType)}. Enter it
       here to finish adding this method.
@@ -371,15 +381,15 @@ const VerificationCodeForm: React.FC<{
       autoComplete="one-time-code"
       required
     />
-  </div>
+  </VStack>
 );
 
 const NtfyIntro: React.FC = () => {
   const platform = detectPlatform();
 
   return (
-    <div className="flex flex-col gap-3 text-sm leading-6 text-stone-600">
-      <p>
+    <VStack gap={3}>
+      <Text as="p" variant="proseSubtle">
         <a
           href="https://ntfy.sh"
           target="_blank"
@@ -391,8 +401,8 @@ const NtfyIntro: React.FC = () => {
         {` `}
         is a free push notification service. Install the app, then create a private topic
         for Gertrude notifications.
-      </p>
-      <div className="flex flex-col gap-2 @md/slide:flex-row">
+      </Text>
+      <Stack direction={{ default: `vertical`, '@md/slide': `horizontal` }} gap={2}>
         {(platform === `ios` || platform === `unknown`) && (
           <Button
             type="link"
@@ -415,8 +425,8 @@ const NtfyIntro: React.FC = () => {
             Download for Android
           </Button>
         )}
-      </div>
-    </div>
+      </Stack>
+    </VStack>
   );
 };
 
@@ -435,14 +445,23 @@ const NtfySuccess: React.FC<{ topic: string }> = ({ topic }) => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <VStack gap={4}>
       <Banner>
-        <div className="flex flex-col gap-3">
-          <p>Subscribe to this topic in the ntfy app to start receiving notifications.</p>
-          <div className="flex items-center gap-2 rounded-lg border border-stone-300/80 bg-white p-2 shadow-sm shadow-stone-300/30">
-            <code className="min-w-0 flex-grow break-all font-mono text-sm text-stone-800 select-all">
+        <VStack gap={3}>
+          <Text as="p" variant="prose">
+            Subscribe to this topic in the ntfy app to start receiving notifications.
+          </Text>
+          <HStack
+            gap={2}
+            className="rounded-lg border border-stone-300/80 bg-white p-2 shadow-sm shadow-stone-300/30"
+          >
+            <Text
+              as="code"
+              variant="code"
+              className="min-w-0 flex-grow break-all select-all"
+            >
               {topic}
-            </code>
+            </Text>
             <Button
               type="button"
               variant="ghost"
@@ -450,10 +469,10 @@ const NtfySuccess: React.FC<{ topic: string }> = ({ topic }) => {
               onClick={copyTopic}
               icon={copied ? CheckIcon : CopyIcon}
             />
-          </div>
-        </div>
+          </HStack>
+        </VStack>
       </Banner>
-      <p className="text-sm leading-6 text-stone-500">
+      <Text as="p" variant="bodyMuted">
         You can also view the topic in a browser at{` `}
         <a
           href={webUrl}
@@ -464,21 +483,21 @@ const NtfySuccess: React.FC<{ topic: string }> = ({ topic }) => {
           ntfy.sh/{topic}
         </a>
         .
-      </p>
-    </div>
+      </Text>
+    </VStack>
   );
 };
 
 const PushIntro: React.FC = () => (
-  <div className="text-sm leading-6 text-stone-600">
-    <p>
+  <VStack>
+    <Text as="p" variant="proseSubtle">
       Push notifications send Gertrude alerts directly to this browser or device. The
       browser will ask for permission when you enable this method.
-    </p>
-    <p className="mt-3 text-xs leading-5 text-stone-500">
+    </Text>
+    <Text as="p" variant="bodyMuted" className="mt-3">
       If you use multiple browsers or devices, add each one separately.
-    </p>
-  </div>
+    </Text>
+  </VStack>
 );
 
 function detectPlatform(): Platform {

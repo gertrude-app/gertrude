@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, testImgUrl, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/Activity/ScreenshotViewer', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/ScreenshotViewer',
   component: ScreenshotViewer,
 } satisfies Meta<typeof ScreenshotViewer>;
 

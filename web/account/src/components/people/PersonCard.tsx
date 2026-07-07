@@ -1,5 +1,15 @@
-import { Badge, Button, EmptyState, inflect } from '@gertrude/ui';
-import cx from 'clsx';
+import {
+  Badge,
+  Button,
+  Card,
+  EmptyState,
+  HStack,
+  Spacer,
+  Stack,
+  Text,
+  VStack,
+  inflect,
+} from '@gertrude/ui';
 import { MonitorSmartphoneIcon, PlusIcon, ScanEyeIcon, SettingsIcon } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonCardPerson } from '#/components/types';
@@ -18,22 +28,17 @@ const PersonCard: React.FC<Props> = ({
   monitorHref,
   addDeviceHref,
 }) => (
-  <div className="flex flex-col border border-stone-200 rounded-2xl shadow-md shadow-stone-300/30 bg-white">
-    <div className="p-3 @lg/main:p-4 flex-grow flex flex-col gap-2">
-      <div className="flex flex-col @2xl/main:flex-row gap-3">
-        <div
-          className={cx(
-            `flex flex-col gap-3`,
-            person.screenshot ? `@2xl/main:w-1/2` : `w-full`,
-          )}
-        >
-          <span className="text-stone-900 text-lg font-medium">{person.name}</span>
+  <Card preset="big" padding={0}>
+    <Card.Body padding={{ default: 3, '@lg/main': 4 }}>
+      <Stack direction={{ default: `vertical`, '@2xl/main': `horizontal` }} gap={3}>
+        <VStack gap={3} className={person.screenshot ? `@2xl/main:w-1/2` : `w-full`}>
+          <Text variant="heading">{person.name}</Text>
           {person.devices.length > 0 ? (
-            <div className="flex flex-col gap-2">
+            <VStack gap={2}>
               {person.devices.map((device) => (
                 <DeviceRow key={device.id} device={device} />
               ))}
-            </div>
+            </VStack>
           ) : (
             <EmptyState
               icon={MonitorSmartphoneIcon}
@@ -52,9 +57,14 @@ const PersonCard: React.FC<Props> = ({
               }
             />
           )}
-        </div>
+        </VStack>
         {person.screenshot && (
-          <div className="flex flex-col justify-center items-center @2xl/main:w-1/2 gap-2 p-4 h-[100%]">
+          <VStack
+            justify="center"
+            align="center"
+            gap={2}
+            className="@2xl/main:w-1/2 p-4 h-[100%]"
+          >
             <div className="relative">
               <img
                 src={person.screenshot.url}
@@ -68,12 +78,12 @@ const PersonCard: React.FC<Props> = ({
                 className="rounded relative"
               />
             </div>
-            <span className="text-xs text-stone-600">{person.screenshot.recency}</span>
-          </div>
+            <Text variant="caption">{person.screenshot.recency}</Text>
+          </VStack>
         )}
-      </div>
-    </div>
-    <div className="flex justify-between items-center bg-stone-50 py-2 px-3 @lg/main:px-4 rounded-b-2xl border-t border-stone-200">
+      </Stack>
+    </Card.Body>
+    <Card.Footer className="flex items-center @lg/main:px-4">
       {person.musicListening && (
         <MediaCard
           title={person.musicListening.trackName}
@@ -90,8 +100,8 @@ const PersonCard: React.FC<Props> = ({
           recencyInMinutes={person.podcastListening.recencyInMinutes}
         />
       )}
-      <div />
-      <div className="flex items-center gap-2">
+      <Spacer />
+      <HStack gap={2}>
         <Button type="link" href={settingsHref} icon={SettingsIcon} variant="ghost">
           Settings
         </Button>
@@ -100,9 +110,9 @@ const PersonCard: React.FC<Props> = ({
             Monitor
           </Button>
         )}
-      </div>
-    </div>
-  </div>
+      </HStack>
+    </Card.Footer>
+  </Card>
 );
 
 interface DeviceRowProps {
@@ -110,32 +120,36 @@ interface DeviceRowProps {
 }
 
 const DeviceRow: React.FC<DeviceRowProps> = ({ device }) => (
-  <div className="flex items-center gap-2.5 rounded-xl border border-stone-200 bg-stone-50 py-1.5 pl-2.5 pr-4">
-    <div className="flex h-5.5 w-7 shrink-0 items-center justify-center">
+  <HStack
+    align="center"
+    gap={2.5}
+    className="rounded-xl border border-stone-200 bg-stone-50 py-1.5 pl-2.5 pr-4"
+  >
+    <HStack justify="center" align="center" className="h-5.5 w-7 shrink-0">
       <img
         src={deviceImageUrl(device.type, device.modelIdentifier)}
         alt=""
         className="h-5.5 w-7 object-contain drop-shadow-sm"
       />
-    </div>
-    <div className="flex flex-col flex-grow">
-      <span className="font-medium text-stone-900 text-sm">
+    </HStack>
+    <VStack className="flex-grow">
+      <Text variant="bodyStrong">
         {device.type === `mac`
           ? (device.name ?? device.modelName)
           : `${device.modelName}`}
-      </span>
-      <span className="text-xs text-stone-500">
+      </Text>
+      <Text variant="captionMuted">
         {device.type === `mac`
           ? `${device.name ? `${device.modelName} • ` : ``}macOS ${device.macOSVersion}`
           : `${device.type === `iphone` ? `iOS` : `iPadOS`} ${device.iOSVersion}`}
-      </span>
-    </div>
+      </Text>
+    </VStack>
     {device.type === `mac` && (
       <Badge size="small" color={device.online ? `green` : `neutral`}>
         {device.online ? `Online` : `Offline`}
       </Badge>
     )}
-  </div>
+  </HStack>
 );
 
 interface MediaCardProps {
@@ -157,18 +171,18 @@ const MediaCard: React.FC<MediaCardProps> = ({
       : `${recencyInMinutes} ${inflect(`minute`, recencyInMinutes)} ago`;
 
   return (
-    <div className="flex items-center gap-2">
+    <HStack align="center" gap={2}>
       <img
         src={artworkUrl}
         alt={`${title} artwork`}
         className="w-8 h-8 rounded-md border-[0.5px] border-stone-400 shadow shadow-stone-300/30"
       />
-      <div className="hidden @2xl/main:flex flex-col">
-        <span className="text-xs font-medium text-stone-900">{title}</span>
-        <span className="text-xs text-stone-600">
+      <VStack hideBelow="@2xl/main">
+        <Text variant="captionStrong">{title}</Text>
+        <Text variant="captionMuted">
           {subtitle} • {recencyText}
-        </span>
-      </div>
+        </Text>
+      </VStack>
       {recencyInMinutes === 0 && (
         <div className="media-waveform ml-1 @2xl/main:ml-4" aria-hidden="true">
           <div className="media-waveform-bar" />
@@ -177,7 +191,7 @@ const MediaCard: React.FC<MediaCardProps> = ({
           <div className="media-waveform-bar" />
         </div>
       )}
-    </div>
+    </HStack>
   );
 };
 

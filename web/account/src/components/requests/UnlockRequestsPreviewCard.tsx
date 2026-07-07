@@ -1,6 +1,8 @@
+import { Card, HStack, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import type { UnlockRequest } from '#/components/types';
+import RequestReasonBubble from './RequestReasonBubble';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {
@@ -21,37 +23,37 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ unlockRequests, viewAllHre
       },
     ]}
   >
-    <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
-      {unlockRequests.slice(0, 3).map((request) => (
-        <a
-          key={request.id}
-          href={request.reviewHref ?? viewAllHref}
-          className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer"
-        >
-          <span className="text-sm font-medium text-stone-900">{request.personName}</span>
-          <div className="flex flex-wrap gap-1 mt-0.5">
-            {request.domains.slice(0, 4).map((domain) => (
-              <span
-                key={domain}
-                className="text-[10px] font-medium text-stone-600 bg-stone-50 border border-stone-200 px-1 rounded"
-              >
-                {domain}
-              </span>
-            ))}
-            {request.domains.length > 4 && (
-              <span className="text-stone-500 text-[10px]">
-                + {request.domains.length - 4} more
-              </span>
+    <Card padding={3}>
+      <VStack>
+        {unlockRequests.slice(0, 3).map((request) => (
+          <VStack
+            as="a"
+            key={request.id}
+            href={request.reviewHref ?? viewAllHref}
+            className="border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer"
+          >
+            <Text variant="bodyStrong">{request.personName}</Text>
+            <HStack wrap gap={1} className="mt-0.5">
+              {request.domains.slice(0, 4).map((domain) => (
+                <Text
+                  key={domain}
+                  variant="captionSubtleStrong"
+                  className="bg-stone-50 border border-stone-200 px-1 rounded"
+                >
+                  {domain}
+                </Text>
+              ))}
+              {request.domains.length > 4 && (
+                <Text variant="captionMuted">+ {request.domains.length - 4} more</Text>
+              )}
+            </HStack>
+            {request.reason && (
+              <RequestReasonBubble className="mt-3">{request.reason}</RequestReasonBubble>
             )}
-          </div>
-          {request.reason && (
-            <p className="text-stone-800 bg-stone-200 px-3.5 py-2.5 rounded-2xl rounded-tl w-fit self-start text-sm mt-3">
-              {request.reason}
-            </p>
-          )}
-        </a>
-      ))}
-    </div>
+          </VStack>
+        ))}
+      </VStack>
+    </Card>
   </RightColumnCard>
 );
 

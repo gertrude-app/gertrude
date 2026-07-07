@@ -1,4 +1,12 @@
-import { Button, ConfirmationDialog, EmptyState, Input, inflect } from '@gertrude/ui';
+import {
+  Button,
+  ConfirmationDialog,
+  EmptyState,
+  Input,
+  Stack,
+  VStack,
+  inflect,
+} from '@gertrude/ui';
 import { MonitorSmartphoneIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { Device } from '#/components/types';
@@ -32,14 +40,17 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
 
   return (
     <div className="grid grid-cols-1 gap-y-6 gap-x-18 @5xl/main:grid-cols-[minmax(0,1fr)_20rem]">
-      <div className="flex flex-col gap-6">
+      <VStack gap={6}>
         <CardContainer
           className="flex flex-col gap-4"
           heading="Basic details"
           subheading="Update the name used throughout Gertrude."
         >
-          <form
-            className="flex flex-col gap-3 @2xl/main:flex-row @2xl/main:items-start"
+          <Stack
+            as="form"
+            direction={{ default: `vertical`, '@2xl/main': `horizontal` }}
+            gap={3}
+            align={{ default: `stretch`, '@2xl/main': `start` }}
             onSubmit={(event) => {
               event.preventDefault();
               if (canSaveName) {
@@ -63,7 +74,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
             >
               Save
             </Button>
-          </form>
+          </Stack>
         </CardContainer>
 
         <CardContainer
@@ -81,7 +92,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
           }
         >
           {devices.length > 0 ? (
-            <div className="flex flex-col gap-3">
+            <VStack gap={3}>
               {devices.map((device) => (
                 <DeviceListRow
                   key={device.id}
@@ -89,7 +100,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
                   href={deviceSettingsHref(device)}
                 />
               ))}
-            </div>
+            </VStack>
           ) : (
             <EmptyState
               icon={MonitorSmartphoneIcon}
@@ -105,7 +116,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
             />
           )}
         </CardContainer>
-      </div>
+      </VStack>
 
       <CardContainer
         className="h-fit flex flex-col gap-3"

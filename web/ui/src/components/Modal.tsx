@@ -2,6 +2,10 @@ import { Dialog } from '@base-ui/react/dialog';
 import cx from 'clsx';
 import React from 'react';
 import { Drawer } from 'vaul';
+import Divider from '../primitives/Divider';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 import { OverlayPortalProvider } from './OverlayPortalContext';
 
 export interface ModalProps {
@@ -100,28 +104,31 @@ const Modal: React.FC<ModalProps> = ({
             )}
           >
             <OverlayPortalProvider container={overlayPortalContainer}>
-              <div className="flex max-h-[min(82vh,720px)] w-full flex-col overflow-hidden rounded-[inherit] bg-white">
-                <div className="flex flex-col gap-1 px-5 pb-4 pt-5">
-                  <Dialog.Title className="text-xl font-medium text-stone-950">
+              <VStack className="max-h-[min(82vh,720px)] w-full overflow-hidden rounded-[inherit] bg-white">
+                <VStack gap={1} className="px-5 pb-4 pt-5">
+                  <Text as={Dialog.Title} variant="title">
                     {title}
-                  </Dialog.Title>
+                  </Text>
                   {description && (
-                    <Dialog.Description className="text-sm leading-6 text-stone-600">
+                    <Text as={Dialog.Description} variant="prose">
                       {description}
-                    </Dialog.Description>
+                    </Text>
                   )}
-                </div>
+                </VStack>
                 {hasBody && (
                   <div className={cx(`overflow-auto px-5 pb-5`, bodyClassName)}>
                     {children}
                   </div>
                 )}
                 {footer && (
-                  <div className="flex justify-end gap-2 border-t border-stone-200 bg-stone-50 px-5 py-3">
-                    {footer}
-                  </div>
+                  <>
+                    <Divider />
+                    <HStack justify="end" gap={2} className="bg-stone-50 px-5 py-3">
+                      {footer}
+                    </HStack>
+                  </>
                 )}
-              </div>
+              </VStack>
             </OverlayPortalProvider>
           </Dialog.Popup>
         </Dialog.Portal>
@@ -152,29 +159,36 @@ const Modal: React.FC<ModalProps> = ({
           )}
         >
           <OverlayPortalProvider container={overlayPortalContainer}>
-            <div className="flex max-h-[calc(100svh-1rem)] w-full flex-col overflow-hidden rounded-[inherit] bg-white">
+            <VStack className="max-h-[calc(100svh-1rem)] w-full overflow-hidden rounded-[inherit] bg-white">
               <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-stone-300" />
-              <div className="flex flex-col gap-1 px-5 pb-4 pt-4">
-                <Drawer.Title className="text-xl font-medium text-stone-950">
+              <VStack gap={1} className="px-5 pb-4 pt-4">
+                <Text as={Drawer.Title} variant="title">
                   {title}
-                </Drawer.Title>
+                </Text>
                 {description && (
-                  <Drawer.Description className="text-sm leading-6 text-stone-600">
+                  <Text as={Drawer.Description} variant="prose">
                     {description}
-                  </Drawer.Description>
+                  </Text>
                 )}
-              </div>
+              </VStack>
               {hasBody && (
                 <div className={cx(`overflow-auto px-5 pb-5`, bodyClassName)}>
                   {children}
                 </div>
               )}
               {footer && (
-                <div className="flex justify-end gap-2 border-t border-stone-200 bg-stone-50 px-5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-                  {footer}
-                </div>
+                <>
+                  <Divider />
+                  <HStack
+                    justify="end"
+                    gap={2}
+                    className="bg-stone-50 px-5 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+                  >
+                    {footer}
+                  </HStack>
+                </>
               )}
-            </div>
+            </VStack>
           </OverlayPortalProvider>
         </Drawer.Content>
       </Drawer.Portal>

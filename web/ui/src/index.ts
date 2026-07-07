@@ -27,7 +27,11 @@ export { default as SidebarItem } from './components/SidebarItem';
 export { default as SidebarLayout } from './components/SidebarLayout';
 export { default as SidebarSection } from './components/SidebarSection';
 export { default as SlideOver } from './components/SlideOver';
-export type { SlideOverProps } from './components/SlideOver';
+export type {
+  SlideOverBodyProps,
+  SlideOverFooterProps,
+  SlideOverProps,
+} from './components/SlideOver';
 export { default as Textarea } from './components/Textarea';
 export { default as Toaster } from './components/Toaster';
 export { default as Toggle } from './components/Toggle';
@@ -37,30 +41,70 @@ export type { SelectOption } from './components/Select';
 
 // primitives
 export { default as Card } from './primitives/Card';
-export type { CardElement, CardPadding, CardProps } from './primitives/Card';
+export type {
+  CardBodyProps,
+  CardElement,
+  CardFooterProps,
+  CardOwnProps,
+  CardPadding,
+  CardPreset,
+  CardProps,
+} from './primitives/Card';
 export { default as Divider } from './primitives/Divider';
-export type { DividerOrientation, DividerProps } from './primitives/Divider';
+export type {
+  DividerOrientation,
+  DividerOwnProps,
+  DividerProps,
+} from './primitives/Divider';
 export { default as HStack } from './primitives/HStack';
-export type { HStackProps } from './primitives/HStack';
+export type { HStackOwnProps, HStackProps } from './primitives/HStack';
 export { default as Spacer } from './primitives/Spacer';
-export type { SpacerProps } from './primitives/Spacer';
+export type { SpacerOwnProps, SpacerProps } from './primitives/Spacer';
+export { default as Stack } from './primitives/Stack';
+export { default as Text } from './primitives/Text';
+export type {
+  TextLineClamp,
+  TextOwnProps,
+  TextProps,
+  TextVariant,
+} from './primitives/Text';
 export { default as VStack } from './primitives/VStack';
-export type { VStackProps } from './primitives/VStack';
+export type { VStackOwnProps, VStackProps } from './primitives/VStack';
 export type {
   CSSVariableProperties,
+  ContainerBreakpoint,
+  ContainerName,
+  ContainerSize,
   ResponsiveBreakpoint,
   ResponsiveSpacing,
   ResponsiveSpacingMap,
+  ResponsiveValue,
+  ResponsiveValueMap,
   Spacing,
+  ViewportBreakpoint,
 } from './primitives/spacing';
 export type {
+  ResponsiveStackAlign,
+  ResponsiveStackDirection,
   ResponsiveStackGap,
+  ResponsiveStackJustify,
+  ResponsiveStackWrap,
   StackAlign,
+  StackDirection,
   StackElement,
   StackGap,
   StackJustify,
+  StackOwnProps,
   StackProps,
-} from './primitives/stack';
+  StackWrap,
+} from './primitives/stack-utils';
+export type { VisibilityBreakpoint, VisibilityProps } from './primitives/visibility';
+export type {
+  PolymorphicComponent,
+  PolymorphicElement,
+  PolymorphicProps,
+  PolymorphicRef,
+} from './primitives/polymorphic';
 
 // utils
 export { inflect } from './lib/utils';

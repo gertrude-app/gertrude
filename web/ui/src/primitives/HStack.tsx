@@ -1,38 +1,34 @@
-import cx from 'clsx';
 import React from 'react';
-import type { StackProps } from './stack';
-import { getResponsiveSpacingStyle, stackGapClasses } from './spacing';
-import { stackAlignClasses, stackJustifyClasses } from './stack';
+import type {
+  PolymorphicComponent,
+  PolymorphicProps,
+  PolymorphicRef,
+} from './polymorphic';
+import type { StackOwnProps } from './stack-utils';
+import Stack from './Stack';
 
-export interface HStackProps extends StackProps {
-  wrap?: boolean;
-}
+export type HStackOwnProps = Omit<StackOwnProps, `direction`>;
+export type HStackProps<Element extends React.ElementType = `div`> = PolymorphicProps<
+  Element,
+  HStackOwnProps
+>;
 
-const HStack: React.FC<HStackProps> = ({
-  as: Component = `div`,
-  gap = 0,
+type HStackComponent = PolymorphicComponent<`div`, HStackOwnProps>;
+
+const HStackRender = <Element extends React.ElementType = `div`>({
   align = `center`,
-  justify = `start`,
-  wrap = false,
-  className,
-  children,
-  style,
+  ref,
   ...props
-}) => (
-  <Component
-    {...props}
-    style={{ ...getResponsiveSpacingStyle(gap, `stack-gap`), ...style }}
-    className={cx(
-      `flex flex-row`,
-      wrap ? `flex-wrap` : `flex-nowrap`,
-      stackGapClasses,
-      stackAlignClasses[align],
-      stackJustifyClasses[justify],
-      className,
-    )}
-  >
-    {children}
-  </Component>
-);
+}: HStackProps<Element> & {
+  ref?: PolymorphicRef<Element>;
+}): React.ReactElement =>
+  React.createElement(Stack as React.ElementType, {
+    ...props,
+    ref,
+    direction: `horizontal`,
+    align,
+  });
+
+const HStack = HStackRender as HStackComponent;
 
 export default HStack;

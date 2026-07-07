@@ -23,7 +23,7 @@ const Window: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const meta = {
-  title: 'Supervise/Frames', // eslint-disable-line
+  title: 'Supervise/Frames',
   ...appWindow(900, 700),
 } satisfies Meta;
 

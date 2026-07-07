@@ -1,6 +1,8 @@
 import cx from 'clsx';
 import { ChevronDownIcon } from 'lucide-react';
 import React from 'react';
+import Stack from '../primitives/Stack';
+import Text from '../primitives/Text';
 import DropdownMenu from './DropdownMenu';
 import DropdownMenuItem, { type DropdownMenuItemIcon } from './DropdownMenuItem';
 
@@ -90,25 +92,24 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
   const SelectedIcon = selectedOption ? getOptionIcon(selectedOption) : undefined;
 
   return (
-    <div
-      className={cx(
-        `flex`,
-        labelPosition === `left` ? `items-center gap-2` : `flex-col gap-1`,
-        disabled && `opacity-60`,
-        className,
-      )}
+    <Stack
+      direction={labelPosition === `left` ? `horizontal` : `vertical`}
+      gap={labelPosition === `left` ? 2 : 1}
+      align={labelPosition === `left` ? `center` : `stretch`}
+      className={cx(disabled && `opacity-60`, className)}
     >
       {label && (
-        <label
+        <Text
+          as="label"
           htmlFor={generatedId}
+          variant="label"
           className={cx(
-            `text-[13px] text-stone-500`,
             labelPosition === `left` ? `shrink-0` : `ml-2.5`,
             disabled && `cursor-not-allowed`,
           )}
         >
           {label}
-        </label>
+        </Text>
       )}
       <DropdownMenu
         disabled={disabled}
@@ -176,7 +177,7 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
           );
         })}
       </DropdownMenu>
-    </div>
+    </Stack>
   );
 };
 

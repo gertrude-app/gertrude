@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { fixedViewport, keychainProps, props, time } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/BatchUnlockRequests', // eslint-disable-line
+  title: 'Dashboard/Children/BatchUnlockRequests',
   component: BatchUnlockRequests,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

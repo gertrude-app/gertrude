@@ -156,7 +156,7 @@ const IOSDevicePageWithPodcasts: React.FC<{
 };
 
 const meta = {
-  title: 'Dashboard/iOS/IOSDevice Podcasts Section', // eslint-disable-line
+  title: 'Dashboard/iOS/IOSDevice Podcasts Section',  
   component: IOSDevicePageWithPodcasts,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },

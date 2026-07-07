@@ -2,6 +2,9 @@ import { Menu } from '@base-ui/react/menu';
 import cx from 'clsx';
 import { CheckIcon, ChevronRightIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 import { useOverlayPortalContainer } from './OverlayPortalContext';
 
 export type DropdownMenuItemIcon = LucideIcon | React.ReactNode;
@@ -59,48 +62,48 @@ const DropdownMenuItem: React.FC<Props> = ({
 }) => {
   const overlayPortalContainer = useOverlayPortalContainer();
   const textContent = (
-    <div className="flex min-w-0 flex-col">
-      <span
-        className={cx(
-          `truncate`,
-          selected ? `text-violet-800` : `text-stone-800`,
-          destructive && `!text-red-800`,
-        )}
+    <VStack className="min-w-0">
+      <Text
+        variant="bodyStrong"
+        truncate
+        className={cx(selected && `!text-violet-800`, destructive && `!text-red-800`)}
       >
         {title}
-      </span>
+      </Text>
       {description && (
-        <span
-          className={cx(
-            `-mt-0.25 text-xs leading-4 text-stone-500`,
-            destructive && `!text-red-900/70`,
-          )}
+        <Text
+          variant="captionMuted"
+          className={cx(`-mt-0.25 leading-4`, destructive && `!text-red-900/70`)}
         >
           {description}
-        </span>
+        </Text>
       )}
-    </div>
+    </VStack>
   );
   const content = (
     <>
-      <div className="flex min-w-0 items-start gap-2">
+      <HStack align={description ? `start` : `center`} gap={2} className="min-w-0">
         {renderIcon(
           icon,
           cx(
-            `mt-1.25 w-3.5 h-3.5 shrink-0`,
+            `w-3.5 h-3.5 shrink-0`,
+            description && `mt-0.75`,
             selected ? `text-violet-800` : `text-stone-500`,
             destructive && `!text-red-700`,
           ),
         )}
         {textContent}
-      </div>
+      </HStack>
       {selected && !children && (
-        <div className="w-4 h-4 rounded-full flex shrink-0 justify-center items-center bg-violet-500 self-center">
+        <HStack
+          justify="center"
+          className="w-4 h-4 rounded-full shrink-0 bg-violet-500 self-center"
+        >
           <CheckIcon
             className="w-3 h-3 text-white translate-y-[0.5px]"
             strokeWidth={3.5}
           />
-        </div>
+        </HStack>
       )}
     </>
   );
@@ -109,16 +112,17 @@ const DropdownMenuItem: React.FC<Props> = ({
     return (
       <Menu.SubmenuRoot>
         <Menu.SubmenuTrigger className={itemClasses(active, destructive)}>
-          <div className="flex min-w-0 items-start gap-2">
+          <HStack align={description ? `start` : `center`} gap={2} className="min-w-0">
             {renderIcon(
               icon,
               cx(
-                `mt-0.5 w-3.5 h-3.5 shrink-0`,
+                `w-3.5 h-3.5 shrink-0`,
+                description && `mt-0.75`,
                 selected ? `text-violet-800` : `text-stone-500`,
               ),
             )}
             {textContent}
-          </div>
+          </HStack>
           <ChevronRightIcon className="w-4 h-4 shrink-0 self-center text-stone-500" />
         </Menu.SubmenuTrigger>
         <Menu.Portal container={overlayPortalContainer ?? undefined}>

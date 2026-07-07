@@ -2,7 +2,7 @@ import TestimonialsBlock from '@site/components/TestimonialsBlock';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Site/TestimonialsBlock', // eslint-disable-line
+  title: 'Site/TestimonialsBlock',
   component: TestimonialsBlock,
   parameters: {
     layout: `fullscreen`,

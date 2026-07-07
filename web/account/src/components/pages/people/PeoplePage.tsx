@@ -1,4 +1,4 @@
-import { PageHeading } from '@gertrude/ui';
+import { PageHeading, Stack, VStack } from '@gertrude/ui';
 import { PlusIcon, ScanEyeIcon } from 'lucide-react';
 import React from 'react';
 import type {
@@ -64,7 +64,7 @@ const PeoplePage: React.FC<Props> = ({
       />
     }
   >
-    <div className="flex flex-col @5xl/main:flex-row gap-12">
+    <Stack direction={{ default: `vertical`, '@5xl/main': `horizontal` }} gap={12}>
       <CardContainer className="flex flex-col gap-4 @xl/main:gap-6 flex-grow">
         {people.map((person) => (
           <PersonCard
@@ -76,7 +76,7 @@ const PeoplePage: React.FC<Props> = ({
           />
         ))}
       </CardContainer>
-      <div className="@5xl/main:w-72 shrink-0 flex flex-col gap-6">
+      <VStack gap={6} className="@5xl/main:w-72 shrink-0">
         <SuspensionRequestsPreviewCard
           suspensionRequests={suspensionRequests}
           viewAllHref={suspensionRequestsHref}
@@ -89,8 +89,8 @@ const PeoplePage: React.FC<Props> = ({
           securityEvents={securityEvents}
           viewAllHref={securityEventsHref}
         />
-      </div>
-    </div>
+      </VStack>
+    </Stack>
   </DashboardPage>
 );
 

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Unauthed/EmailInputForm', // eslint-disable-line
+  title: 'Dashboard/Unauthed/EmailInputForm',
   component: EmailInputForm,
   parameters: { layout: `centered` },
   decorators: [(story) => <div className="max-w-md">{story()}</div>],

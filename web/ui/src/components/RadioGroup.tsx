@@ -1,5 +1,9 @@
 import cx from 'clsx';
 import React from 'react';
+import HStack from '../primitives/HStack';
+import Stack from '../primitives/Stack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 
 interface Props {
   selected: string;
@@ -26,17 +30,23 @@ const RadioGroup: React.FC<Props> = ({
   const radioName = name ?? generatedName;
 
   return (
-    <fieldset
+    <VStack
+      as="fieldset"
+      gap={2}
       disabled={disabled}
       aria-label={!label ? ariaLabel : undefined}
-      className={cx(`flex flex-col gap-2`, disabled && `opacity-60`)}
+      className={cx(disabled && `opacity-60`)}
     >
-      {label && <legend className="mb-1.5 text-[13px] text-stone-500">{label}</legend>}
-      <div
-        className={cx(
-          `flex gap-3`,
-          direction === `vertical` ? `flex-col` : `flex-row flex-wrap items-center`,
-        )}
+      {label && (
+        <Text as="legend" variant="label" className="mb-1.5 font-normal">
+          {label}
+        </Text>
+      )}
+      <Stack
+        direction={direction === `vertical` ? `vertical` : `horizontal`}
+        gap={3}
+        align={direction === `vertical` ? `stretch` : `center`}
+        wrap={direction === `horizontal`}
       >
         {possibleValues.map((value, index) => {
           const id = `${generatedName}-${index}`;
@@ -61,10 +71,12 @@ const RadioGroup: React.FC<Props> = ({
                 onChange={() => setSelected(value)}
                 className="peer sr-only"
               />
-              <span
+              <HStack
+                as="span"
+                justify="center"
                 aria-hidden="true"
                 className={cx(
-                  `flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm transition-[border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
+                  `h-4.5 w-4.5 shrink-0 rounded-full border bg-white shadow-sm transition-[border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
                   checked
                     ? `border-violet-800 shadow-violet-500/20`
                     : `border-stone-300/80 shadow-stone-300/30`,
@@ -76,13 +88,13 @@ const RadioGroup: React.FC<Props> = ({
                     checked ? `scale-100 opacity-100` : `scale-50 opacity-0`,
                   )}
                 />
-              </span>
-              <span className="text-sm font-medium text-stone-800">{value}</span>
+              </HStack>
+              <Text variant="bodyStrong">{value}</Text>
             </label>
           );
         })}
-      </div>
-    </fieldset>
+      </Stack>
+    </VStack>
   );
 };
 

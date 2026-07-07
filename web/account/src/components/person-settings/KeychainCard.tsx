@@ -1,4 +1,14 @@
-import { Badge, Button, DropdownMenu, DropdownMenuItem, inflect } from '@gertrude/ui';
+import {
+  Badge,
+  Button,
+  Card,
+  DropdownMenu,
+  DropdownMenuItem,
+  HStack,
+  Text,
+  VStack,
+  inflect,
+} from '@gertrude/ui';
 import { EllipsisIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { Schedule } from '#/components/types';
@@ -26,24 +36,24 @@ const KeychainCard: React.FC<Props> = ({
   schedule,
   setSchedule,
 }) => (
-  <div className="p-3 flex flex-col bg-white border border-stone-200 rounded-xl shadow shadow-stone-300/30">
-    <div className="flex flex-col flex-grow">
-      <div className="flex items-center gap-2">
-        <span className="text-stone-900 font-medium">{name}</span>
+  <Card padding={3} className="flex flex-col">
+    <VStack gap={0.5} className="flex-grow">
+      <HStack gap={2}>
+        <Text variant="bodyLargeStrong">{name}</Text>
         {isPublic && <Badge size="small">Public</Badge>}
-      </div>
-      {description && <span className="text-sm text-stone-600">{description}</span>}
+      </HStack>
+      {description && <Text variant="captionSubtle">{description}</Text>}
       {schedule && (
-        <span className="text-xs text-stone-800 mt-1 font-medium">
+        <Text variant="captionStrong" className="mt-1">
           {formatSchedule(schedule)}
-        </span>
+        </Text>
       )}
-    </div>
-    <div className="flex items-center justify-between mt-3 gap-3">
-      <span className="text-xs font-medium text-stone-500">
+    </VStack>
+    <HStack justify="between" gap={3} className="mt-3">
+      <Text variant="captionMuted">
         {numKeys} {inflect(`key`, numKeys)}
-      </span>
-      <div className="flex gap-2">
+      </Text>
+      <HStack gap={2}>
         <ScheduleButton schedule={schedule} setSchedule={setSchedule} />
         <DropdownMenu
           trigger={
@@ -60,9 +70,9 @@ const KeychainCard: React.FC<Props> = ({
             destructive
           />
         </DropdownMenu>
-      </div>
-    </div>
-  </div>
+      </HStack>
+    </HStack>
+  </Card>
 );
 
 export default KeychainCard;

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { keychainProps, keychains, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Keychains/KeychainPicker', // eslint-disable-line
+  title: 'Dashboard/Keychains/KeychainPicker',
   component: KeychainPicker,
   decorators: [
     (Story) => (

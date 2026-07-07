@@ -1,3 +1,4 @@
+import { HStack, VStack } from '@gertrude/ui';
 import React from 'react';
 import SignupPageTestimonial from './SignupPageTestimonial';
 
@@ -63,9 +64,9 @@ const TestimonialColumn: React.FC<TestimonialColumnProps> = ({ column, columnInd
   }, [columnIndex]);
 
   return (
-    <div className="min-w-0 flex-1">
-      <div
-        className="testimonial-marquee flex flex-col"
+    <VStack className="min-w-0 flex-1">
+      <VStack
+        className="testimonial-marquee"
         style={
           {
             '--testimonial-marquee-duration': duration,
@@ -74,10 +75,11 @@ const TestimonialColumn: React.FC<TestimonialColumnProps> = ({ column, columnInd
         }
       >
         {marqueeIterations.map((iteration) => (
-          <div
+          <VStack
             key={iteration}
             ref={iteration === 0 ? contentRef : undefined}
-            className="flex shrink-0 flex-col gap-3 pb-3"
+            gap={3}
+            className="shrink-0 pb-3"
           >
             {column.map((testimonial, testimonialIndex) => (
               <div
@@ -88,10 +90,10 @@ const TestimonialColumn: React.FC<TestimonialColumnProps> = ({ column, columnInd
                 <SignupPageTestimonial {...testimonial} />
               </div>
             ))}
-          </div>
+          </VStack>
         ))}
-      </div>
-    </div>
+      </VStack>
+    </VStack>
   );
 };
 
@@ -104,7 +106,11 @@ const RotatingTestimonials: React.FC<Props> = ({ testimonials }) => {
 
   return (
     <div className="relative mt-10 min-h-0 flex-1 w-[120%] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_10%,black)]">
-      <div className="absolute -left-30 right-30 -top-16 bottom-0 flex origin-bottom-left rotate-12 gap-3">
+      <HStack
+        align="stretch"
+        gap={3}
+        className="absolute -left-30 right-30 -top-16 bottom-0 origin-bottom-left rotate-12"
+      >
         {testimonialColumns.map((column, columnIndex) => (
           <TestimonialColumn
             key={columnIndex}
@@ -112,7 +118,7 @@ const RotatingTestimonials: React.FC<Props> = ({ testimonials }) => {
             columnIndex={columnIndex}
           />
         ))}
-      </div>
+      </HStack>
     </div>
   );
 };

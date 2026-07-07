@@ -1,4 +1,4 @@
-import { Badge } from '@gertrude/ui';
+import { Badge, Card, HStack, Text, VStack } from '@gertrude/ui';
 import React from 'react';
 
 interface Props {
@@ -10,8 +10,8 @@ interface Props {
 }
 
 const AppAd: React.FC<Props> = ({ screenshot, appIcon, heading, subheading, badges }) => (
-  <div className="flex flex-col rounded-3xl border border-stone-200 shadow-md shadow-stone-300/20 bg-white">
-    <div className="bg-stone-50 h-50 flex justify-center items-center m-3 relative rounded-xl">
+  <Card preset="big" padding={0} className="!rounded-3xl shadow-stone-300/20">
+    <HStack justify="center" className="bg-stone-50 h-50 m-3 relative rounded-xl">
       <img
         src={screenshot}
         alt=""
@@ -23,26 +23,30 @@ const AppAd: React.FC<Props> = ({ screenshot, appIcon, heading, subheading, badg
         alt={`${heading} screenshot`}
         className="w-full h-full object-cover border border-white rounded-xl relative"
       />
-    </div>
-    <div className="flex justify-center items-center h-0">
+    </HStack>
+    <HStack justify="center" className="h-0">
       <img
         src={appIcon}
         alt={`${heading} icon`}
         className="w-20 h-20 rounded-[22px] shadow-md shadow-stone-300/30 -translate-y-4 border border-stone-200"
       />
-    </div>
-    <div className="pt-10 px-8 pb-8 flex flex-col items-center">
-      <div className="flex justify-center gap-2 flex-wrap">
+    </HStack>
+    <VStack align="center" className="pt-10 px-8 pb-8">
+      <HStack justify="center" gap={2} wrap>
         {badges.map((badge) => (
           <Badge key={badge} color="neutral" size="small">
             {badge}
           </Badge>
         ))}
-      </div>
-      <h3 className="text-lg text-stone-900 font-semibold text-center mt-2">{heading}</h3>
-      <h4 className="text-sm text-stone-700 text-center">{subheading}</h4>
-    </div>
-  </div>
+      </HStack>
+      <Text as="h3" variant="heading" className="text-center mt-2">
+        {heading}
+      </Text>
+      <Text as="h4" variant="body" className="text-center">
+        {subheading}
+      </Text>
+    </VStack>
+  </Card>
 );
 
 export default AppAd;

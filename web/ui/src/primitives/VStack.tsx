@@ -1,34 +1,34 @@
-import cx from 'clsx';
 import React from 'react';
-import type { StackProps } from './stack';
-import { getResponsiveSpacingStyle, stackGapClasses } from './spacing';
-import { stackAlignClasses, stackJustifyClasses } from './stack';
+import type {
+  PolymorphicComponent,
+  PolymorphicProps,
+  PolymorphicRef,
+} from './polymorphic';
+import type { StackOwnProps } from './stack-utils';
+import Stack from './Stack';
 
-export type VStackProps = StackProps;
+export type VStackOwnProps = Omit<StackOwnProps, `direction` | `wrap`>;
+export type VStackProps<Element extends React.ElementType = `div`> = PolymorphicProps<
+  Element,
+  VStackOwnProps
+>;
 
-const VStack: React.FC<VStackProps> = ({
-  as: Component = `div`,
-  gap = 0,
+type VStackComponent = PolymorphicComponent<`div`, VStackOwnProps>;
+
+const VStackRender = <Element extends React.ElementType = `div`>({
   align = `stretch`,
-  justify = `start`,
-  className,
-  children,
-  style,
+  ref,
   ...props
-}) => (
-  <Component
-    {...props}
-    style={{ ...getResponsiveSpacingStyle(gap, `stack-gap`), ...style }}
-    className={cx(
-      `flex flex-col`,
-      stackGapClasses,
-      stackAlignClasses[align],
-      stackJustifyClasses[justify],
-      className,
-    )}
-  >
-    {children}
-  </Component>
-);
+}: VStackProps<Element> & {
+  ref?: PolymorphicRef<Element>;
+}): React.ReactElement =>
+  React.createElement(Stack as React.ElementType, {
+    ...props,
+    ref,
+    direction: `vertical`,
+    align,
+  });
+
+const VStack = VStackRender as VStackComponent;
 
 export default VStack;

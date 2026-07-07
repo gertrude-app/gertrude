@@ -1,4 +1,4 @@
-import { Button, DropdownMenu, Input } from '@gertrude/ui';
+import { Button, Divider, DropdownMenu, HStack, Input, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { ClockIcon } from 'lucide-react';
 import React from 'react';
@@ -63,12 +63,13 @@ export const ScheduleEditor: React.FC<ScheduleButtonProps> = ({
   };
 
   return (
-    <div
-      className="flex flex-col gap-3 p-2"
+    <VStack
+      gap={3}
+      className="p-2"
       onClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => event.stopPropagation()}
     >
-      <div className="flex flex-col gap-1">
+      <VStack gap={1}>
         <div className="grid grid-cols-2 rounded-lg bg-stone-100 p-1">
           {([`active`, `inactive`] as const).map((type) => (
             <button
@@ -86,7 +87,7 @@ export const ScheduleEditor: React.FC<ScheduleButtonProps> = ({
             </button>
           ))}
         </div>
-      </div>
+      </VStack>
       <div className="grid grid-cols-7 gap-1">
         {dayEntries.map(([day, label]) => {
           const selected = editableSchedule.days[day];
@@ -112,25 +113,26 @@ export const ScheduleEditor: React.FC<ScheduleButtonProps> = ({
           );
         })}
       </div>
-      <div className="flex items-center gap-2">
+      <HStack gap={2}>
         <Input
           type="time"
           value={timeOfDayToInputValue(editableSchedule.startTime)}
           setValue={(value) => updateTime(`startTime`, value)}
           className="flex-grow"
         />
-        <span className="text-sm text-stone-500">to</span>
+        <Text variant="bodyMuted">to</Text>
         <Input
           type="time"
           value={timeOfDayToInputValue(editableSchedule.endTime)}
           setValue={(value) => updateTime(`endTime`, value)}
           className="flex-grow"
         />
-      </div>
-      <div className="flex items-center justify-between gap-3 border-t border-stone-200 pt-3">
-        <span className="min-w-0 text-xs text-stone-500">
+      </HStack>
+      <Divider />
+      <HStack justify="between" gap={3}>
+        <Text variant="captionMuted" className="min-w-0">
           {formatSchedule(editableSchedule)}
-        </span>
+        </Text>
         {schedule && (
           <Button
             type="button"
@@ -141,8 +143,8 @@ export const ScheduleEditor: React.FC<ScheduleButtonProps> = ({
             Clear
           </Button>
         )}
-      </div>
-    </div>
+      </HStack>
+    </VStack>
   );
 };
 

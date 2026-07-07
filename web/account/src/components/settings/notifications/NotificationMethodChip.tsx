@@ -1,4 +1,4 @@
-import { Button, ConfirmationDialog } from '@gertrude/ui';
+import { Button, ConfirmationDialog, HStack, Text } from '@gertrude/ui';
 import { XIcon } from 'lucide-react';
 import React from 'react';
 import type { NotificationMethod } from '#/components/types';
@@ -19,7 +19,7 @@ const NotificationMethodChip: React.FC<Props> = ({
   notificationCount,
   onDelete,
 }) => (
-  <div className="flex items-center rounded-xl border border-stone-200 bg-white p-1.5 pl-3 shadow shadow-stone-300/30">
+  <HStack className="rounded-xl border border-stone-200 bg-white p-1.5 pl-3 shadow shadow-stone-300/30">
     {notificationMethodIcon(method)}
     {methodLabel(method)}
     <ConfirmationDialog
@@ -46,43 +46,47 @@ const NotificationMethodChip: React.FC<Props> = ({
         },
       ]}
     />
-  </div>
+  </HStack>
 );
 
 export default NotificationMethodChip;
 
 function methodLabel(method: NotificationMethod): React.ReactNode {
-  const baseClasses = `ml-2.5 text-stone-600`;
+  const baseClasses = `ml-2.5 text-base text-stone-600`;
   const targetClasses = `rounded border-[0.5px] border-stone-300 bg-stone-100 px-1 py-0.25 font-medium text-stone-900`;
   const target = notificationMethodTarget(method);
 
   switch (method.type) {
     case `email`:
       return (
-        <span className={baseClasses}>
+        <Text variant="body" className={baseClasses}>
           Email <span className={targetClasses}>{target}</span>
-        </span>
+        </Text>
       );
     case `text`:
       return (
-        <span className={baseClasses}>
+        <Text variant="body" className={baseClasses}>
           Text <span className={targetClasses}>{target}</span>
-        </span>
+        </Text>
       );
     case `slack`:
       return (
-        <span className={baseClasses}>
+        <Text variant="body" className={baseClasses}>
           Slack <span className={targetClasses}>{target}</span>
-        </span>
+        </Text>
       );
     case `ntfy`:
       return (
-        <span className={baseClasses}>
+        <Text variant="body" className={baseClasses}>
           Notify <span className={targetClasses}>{target}</span> via ntfy
-        </span>
+        </Text>
       );
     case `push`:
-      return <span className={baseClasses}>Push</span>;
+      return (
+        <Text variant="body" className={baseClasses}>
+          Push
+        </Text>
+      );
   }
 }
 

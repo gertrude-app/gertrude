@@ -1,3 +1,4 @@
+import { Card, Text, VStack } from '@gertrude/ui';
 import React from 'react';
 
 interface Props {
@@ -6,10 +7,18 @@ interface Props {
 }
 
 const SignupPageTestimonial: React.FC<Props> = ({ quote, name }) => (
-  <div className="flex flex-col shadow-md shadow-stone-300/20 bg-stone-50 border border-stone-200 p-6 rounded-2xl gap-4">
-    <p className="text-stone-800">{quote}</p>
-    {name && <p className="text-stone-500 self-end text-xs -mb-2">{name}</p>}
-  </div>
+  <Card preset="big" padding={6} className="!bg-stone-50 shadow-stone-300/20">
+    <VStack gap={4}>
+      <Text as="p" variant="bodyLarge">
+        {quote}
+      </Text>
+      {name && (
+        <Text as="p" variant="captionMuted" className="self-end -mb-2">
+          {name}
+        </Text>
+      )}
+    </VStack>
+  </Card>
 );
 
 export default SignupPageTestimonial;

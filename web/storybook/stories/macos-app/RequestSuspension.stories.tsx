@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { appWindow, props } from '../story-helpers';
 
 const meta = {
-  title: 'MacOS App/RequestSuspension', // eslint-disable-line
+  title: 'MacOS App/RequestSuspension',
   component: RequestSuspension,
   ...appWindow(680, 360),
 } satisfies Meta<typeof RequestSuspension>;

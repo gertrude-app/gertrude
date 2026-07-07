@@ -4,6 +4,7 @@ import { CheckIcon, InfoIcon, type LucideIcon, XIcon } from 'lucide-react';
 import React from 'react';
 import type { ToastVariant } from '../lib/toast';
 import { toastManager } from '../lib/toast';
+import Text from '../primitives/Text';
 import LoadingDots from './LoadingDots';
 
 type VariantStyles = {
@@ -53,8 +54,16 @@ interface ToastMessageProps extends ToastMessageContent {
 
 const PlainToastMessage: React.FC<ToastMessageContent> = ({ title, description }) => (
   <>
-    {title ? <div className="m-0 text-sm font-medium">{title}</div> : null}
-    {description ? <div className="m-0 text-sm leading-5">{description}</div> : null}
+    {title ? (
+      <Text as="div" variant="bodyStrong" className="m-0">
+        {title}
+      </Text>
+    ) : null}
+    {description ? (
+      <Text as="div" variant="body" className="m-0 leading-5">
+        {description}
+      </Text>
+    ) : null}
   </>
 );
 
@@ -94,10 +103,12 @@ const ToastMessage: React.FC<ToastMessageProps> = ({ title, description, version
   return (
     <div className="relative min-w-0 flex-1 overflow-hidden">
       <div className={cx(isTransitioning && `toast-message-in`)} key={version}>
-        <Toast.Title className="m-0 text-sm font-medium">{current.title}</Toast.Title>
-        <Toast.Description className="m-0 text-sm leading-5">
+        <Text as={Toast.Title} variant="bodyStrong" className="m-0">
+          {current.title}
+        </Text>
+        <Text as={Toast.Description} variant="body" className="m-0 leading-5">
           {current.description}
-        </Toast.Description>
+        </Text>
       </div>
       {outgoing ? (
         <div aria-hidden="true" className="toast-message-out absolute inset-x-0 top-0">

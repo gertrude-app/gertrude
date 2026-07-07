@@ -1,4 +1,4 @@
-import { Button } from '@gertrude/ui';
+import { Button, HStack, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { TrashIcon } from 'lucide-react';
 import React from 'react';
@@ -29,10 +29,8 @@ const ActivityPersonSection: React.FC<Props> = ({
   const personId = items[0]?.personId;
 
   return (
-    <div className="flex flex-col gap-3">
-      {showHeading && (
-        <span className="text-lg font-medium">{personName}'s activity</span>
-      )}
+    <VStack gap={3}>
+      {showHeading && <Text variant="heading">{personName}'s activity</Text>}
       <CardContainer className="flex flex-col gap-6">
         {chunkedItems.map((chunk, index) => (
           <ActivitySuspensionChunk
@@ -43,7 +41,7 @@ const ActivityPersonSection: React.FC<Props> = ({
           />
         ))}
         {onDeleteAll && (
-          <div className="flex justify-center">
+          <HStack justify="center">
             <Button
               type="button"
               onClick={() => personId && onDeleteAll(personId)}
@@ -51,10 +49,10 @@ const ActivityPersonSection: React.FC<Props> = ({
             >
               Delete all {personName}'s activity
             </Button>
-          </div>
+          </HStack>
         )}
       </CardContainer>
-    </div>
+    </VStack>
   );
 };
 
@@ -76,18 +74,18 @@ const ActivitySuspensionChunk: React.FC<ActivitySuspensionChunkProps> = ({
     )}
   >
     {chunk.type === `duringSuspension` && (
-      <div className="flex items-end -ml-3.5 gap-2">
+      <HStack align="end" gap={2} className="-ml-3.5">
         <div className="rounded-tl-full w-5 h-5 border-t-3 border-l-3 border-red-600 -mb-0.25" />
-        <span className="text-red-700/80 font-medium relative -top-1.25">
+        <span className="relative -top-1.5 font-medium text-red-700/80">
           During suspension
         </span>
-      </div>
+      </HStack>
     )}
-    <div className="flex items-stretch">
+    <HStack align="stretch">
       {chunk.type === `duringSuspension` && (
         <div className="top-0 bottom-0 w-0.75 bg-red-600 relative -mr-1 -left-3.5 shrink-0" />
       )}
-      <div className="flex flex-col gap-6 flex-grow">
+      <VStack gap={6} className="flex-grow">
         {chunk.items.map((item) =>
           item.type === `screenshot` ? (
             <ScreenshotActivityItem
@@ -114,12 +112,12 @@ const ActivitySuspensionChunk: React.FC<ActivitySuspensionChunkProps> = ({
             />
           ),
         )}
-      </div>
-    </div>
+      </VStack>
+    </HStack>
     {chunk.type === `duringSuspension` && (
-      <div className="flex items-end -ml-3.5 gap-2">
+      <HStack align="end" gap={2} className="-ml-3.5">
         <div className="rounded-bl-full w-8 h-5 border-b-3 border-l-3 border-red-600 -mt-0.25" />
-      </div>
+      </HStack>
     )}
   </div>
 );

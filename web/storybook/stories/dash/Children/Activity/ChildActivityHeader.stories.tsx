@@ -2,7 +2,7 @@ import { UserActivityHeader } from '@dash/components';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Dashboard/Children/Activity/ChildActivityHeader', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/ChildActivityHeader',
   component: UserActivityHeader,
 } satisfies Meta<typeof UserActivityHeader>;
 

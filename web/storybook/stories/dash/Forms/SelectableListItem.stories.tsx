@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Forms/SelectableListItem', // eslint-disable-line
+  title: 'Dashboard/Forms/SelectableListItem',
   component: SelectableListItem,
 } satisfies Meta<typeof SelectableListItem>;
 

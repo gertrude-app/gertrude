@@ -1,4 +1,4 @@
-import { Button, Tooltip } from '@gertrude/ui';
+import { Button, HStack, Tooltip } from '@gertrude/ui';
 import cx from 'clsx';
 import { FlagIcon, GripVerticalIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
@@ -257,10 +257,11 @@ const ScreenshotActivityItem: React.FC<Props> = ({
           </>
 
           {/* controls */}
-          <div
+          <HStack
             ref={controlsRef}
+            gap={2}
             className={cx(
-              `flex items-center gap-2 p-1 @lg/main:p-2 bg-white/70 border border-white/50 ring ring-black/10 backdrop-blur-md rounded-xl @lg/main:rounded-2xl pointer-events-auto select-none shadow-md shadow-black/5`,
+              `p-1 @lg/main:p-2 bg-white/70 border border-white/50 ring ring-black/10 backdrop-blur-md rounded-xl @lg/main:rounded-2xl pointer-events-auto select-none shadow-md shadow-black/5`,
               dragPosition ? `absolute z-10` : `relative`,
             )}
             style={
@@ -300,7 +301,7 @@ const ScreenshotActivityItem: React.FC<Props> = ({
             <Button type="button" onClick={() => onDelete?.(id)} icon={TrashIcon}>
               Delete
             </Button>
-          </div>
+          </HStack>
         </div>
       )}
     </div>

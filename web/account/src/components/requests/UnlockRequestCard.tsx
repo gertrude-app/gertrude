@@ -1,6 +1,16 @@
-import { Button, Modal, SlideOver, Textarea } from '@gertrude/ui';
+import {
+  Button,
+  Card,
+  HStack,
+  Modal,
+  SlideOver,
+  Text,
+  Textarea,
+  VStack,
+} from '@gertrude/ui';
 import React from 'react';
 import type { UnlockRequest, UnlockRequestKeyDraft } from '#/components/types';
+import RequestReasonBubble from './RequestReasonBubble';
 import UnlockRequestResponsePanel from './UnlockRequestResponsePanel';
 
 interface Props {
@@ -35,32 +45,31 @@ const UnlockRequestCard: React.FC<Props> = ({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-4 shadow-md shadow-stone-300/30">
-      <div className="flex flex-col gap-1.5">
-        <h2 className="text-lg font-medium text-stone-900">{request.personName}</h2>
-        <div className="flex flex-wrap gap-1">
+    <Card preset="big" padding={4} className="flex flex-col gap-3">
+      <VStack gap={1.5}>
+        <Text as="h2" variant="heading">
+          {request.personName}
+        </Text>
+        <HStack wrap gap={1}>
           {request.domains.slice(0, 4).map((domain) => (
-            <span
+            <Text
               key={domain}
-              className="rounded-md border border-stone-200 bg-stone-50 px-1.5 py-0.5 text-xs font-medium text-stone-700"
+              variant="captionSubtleStrong"
+              className="rounded-md border border-stone-200 bg-stone-50 px-1.5 py-0.5"
             >
               {domain}
-            </span>
+            </Text>
           ))}
           {request.domains.length > 4 && (
-            <span className="text-xs text-stone-500">
-              + {request.domains.length - 4} more
-            </span>
+            <Text variant="captionMuted">+ {request.domains.length - 4} more</Text>
           )}
-        </div>
-      </div>
-      {request.reason && (
-        <p className="w-fit self-start rounded-2xl rounded-tl bg-stone-200 px-3.5 py-2.5 text-sm text-stone-800">
-          {request.reason}
-        </p>
-      )}
-      <div
-        className="mt-auto flex justify-end gap-2"
+        </HStack>
+      </VStack>
+      {request.reason && <RequestReasonBubble>{request.reason}</RequestReasonBubble>}
+      <HStack
+        justify="end"
+        gap={2}
+        className="mt-auto"
         onClick={(event) => event.stopPropagation()}
       >
         <Button
@@ -74,7 +83,7 @@ const UnlockRequestCard: React.FC<Props> = ({
         <Button type="button" onClick={() => setReviewOpen(true)} size="small">
           Review
         </Button>
-      </div>
+      </HStack>
       <Modal
         open={denyModalOpen}
         onOpenChange={handleDenyModalOpenChange}
@@ -123,7 +132,7 @@ const UnlockRequestCard: React.FC<Props> = ({
           }}
         />
       </SlideOver>
-    </div>
+    </Card>
   );
 };
 

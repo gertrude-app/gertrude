@@ -1,4 +1,4 @@
-import { Button, Input } from '@gertrude/ui';
+import { Button, Input, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import RotatingTestimonials, {
@@ -67,16 +67,16 @@ const SignupPage: React.FC<Props> = ({
       />
     }
     rightDisplay={
-      <div className="flex h-full flex-col items-center overflow-hidden pt-20 relative">
+      <VStack align="center" className="h-full overflow-hidden pt-20 relative">
         <img src="/logo-wordmark.svg" alt="Gertrude" className="w-36 relative" />
-        <h2 className="text-3xl font-medium text-stone-900 mt-8 relative">
+        <Text as="h2" variant="display" className="mt-8 relative">
           Here's what parents are saying.
-        </h2>
-        <h3 className="text-lg text-stone-600 mt-1 relative mb-4">
+        </Text>
+        <Text as="h3" variant="subheading" className="mt-1 relative mb-4">
           Just in case you'd be inclined to doubt us.
-        </h3>
+        </Text>
         <RotatingTestimonials testimonials={testimonials} />
-      </div>
+      </VStack>
     }
   />
 );

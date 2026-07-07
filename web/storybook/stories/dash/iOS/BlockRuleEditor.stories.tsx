@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/iOS/BlockRuleEditor', // eslint-disable-line
+  title: 'Dashboard/iOS/BlockRuleEditor',
   component: BlockRuleEditor,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof BlockRuleEditor>;

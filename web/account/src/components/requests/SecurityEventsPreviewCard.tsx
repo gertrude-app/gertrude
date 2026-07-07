@@ -1,4 +1,4 @@
-import { Badge } from '@gertrude/ui';
+import { Badge, Card, HStack, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
@@ -26,11 +26,13 @@ const SecurityEventsPreviewCard: React.FC<Props> = ({
       },
     ]}
   >
-    <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
-      {securityEvents.slice(0, 4).map((event) => (
-        <SecurityEventRow key={event.id} securityEvent={event} />
-      ))}
-    </div>
+    <Card padding={3}>
+      <VStack>
+        {securityEvents.slice(0, 4).map((event) => (
+          <SecurityEventRow key={event.id} securityEvent={event} />
+        ))}
+      </VStack>
+    </Card>
   </RightColumnCard>
 );
 
@@ -44,14 +46,14 @@ const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent }) => {
   const [showExplanation, setShowExplanation] = React.useState(false);
 
   return (
-    <div
-      className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer text-left"
+    <VStack
+      className="border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer text-left"
       onClick={() => setShowExplanation(!showExplanation)}
     >
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs text-stone-600">
+      <HStack justify="between" className="mb-1.5">
+        <Text variant="captionSubtle">
           {securityEvent.time} • {securityEvent.date}
-        </span>
+        </Text>
         <div
           className={cx(`w-2 h-2 rounded-full mr-1`, {
             'bg-red-500': securityEvent.severity === `high`,
@@ -59,14 +61,16 @@ const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent }) => {
             'bg-stone-200': securityEvent.severity === `low`,
           })}
         />
-      </div>
-      <div className="flex items-center gap-1.5">
+      </HStack>
+      <HStack gap={1.5}>
         <Badge size="xsmall">
           {securityEvent.type === `mac-app` ? `Mac App` : `Admin Dashboard`}
         </Badge>
         {securityEvent.type === `mac-app` && (
-          <span
-            className="min-w-0 truncate text-xs text-stone-600"
+          <Text
+            variant="captionSubtle"
+            truncate
+            className="min-w-0"
             title={`${securityEvent.personName} on ${securityEvent.deviceName}`}
           >
             <a
@@ -85,11 +89,13 @@ const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent }) => {
             >
               {securityEvent.deviceName}
             </a>
-          </span>
+          </Text>
         )}
         {securityEvent.type === `admin-dashboard` && (
-          <a
-            className="text-xs text-stone-600 hover:text-stone-900 hover:underline"
+          <Text
+            as="a"
+            variant="captionSubtle"
+            className="hover:text-stone-900 hover:underline"
             href={
               securityEvent.ipAddressHref ??
               `https://whatismyipaddress.com/ip/${securityEvent.ipAddress}`
@@ -97,21 +103,25 @@ const SecurityEventRow: React.FC<SecurityEventProps> = ({ securityEvent }) => {
             onClick={(event) => event.stopPropagation()}
           >
             {securityEvent.ipAddress}
-          </a>
+          </Text>
         )}
-      </div>
-      <span className="text-sm text-stone-900 mt-1">{securityEvent.title}</span>
+      </HStack>
+      <Text variant="bodyStrong" className="mt-1">
+        {securityEvent.title}
+      </Text>
       {securityEvent.subtitle && (
-        <span className="text-xs text-stone-500">{securityEvent.subtitle}</span>
+        <Text variant="captionMuted">{securityEvent.subtitle}</Text>
       )}
-      <p
+      <Text
+        as="p"
+        variant="caption"
         className={cx(
-          `overflow-hidden text-xs text-stone-600 transition-[height,margin,opacity] duration-150`,
+          `overflow-hidden transition-[height,margin,opacity] duration-150`,
           showExplanation ? `mt-2 opacity-100 h-auto` : `mt-0 opacity-0 h-0`,
         )}
       >
         {securityEvent.explanation}
-      </p>
-    </div>
+      </Text>
+    </VStack>
   );
 };

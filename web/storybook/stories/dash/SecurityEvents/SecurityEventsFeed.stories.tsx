@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { props, time } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/SecurityEvents/SecurityEventsFeed', // eslint-disable-line
+  title: 'Dashboard/SecurityEvents/SecurityEventsFeed',
   component: SecurityEventsFeed,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

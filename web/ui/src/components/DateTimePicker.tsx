@@ -2,6 +2,10 @@ import { Popover } from '@base-ui/react/popover';
 import cx from 'clsx';
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
+import Divider from '../primitives/Divider';
+import HStack from '../primitives/HStack';
+import Stack from '../primitives/Stack';
+import Text from '../primitives/Text';
 import Button from './Button';
 import Input from './Input';
 import { OverlayPortalProvider, useOverlayPortalContainer } from './OverlayPortalContext';
@@ -262,23 +266,21 @@ const DateTimePicker: React.FC<Props> = (props) => {
   };
 
   return (
-    <div
-      className={cx(
-        `flex`,
-        labelPostiion === `left` ? `items-center gap-2` : `flex-col gap-1`,
-        className,
-      )}
+    <Stack
+      direction={labelPostiion === `left` ? `horizontal` : `vertical`}
+      gap={labelPostiion === `left` ? 2 : 1}
+      align={labelPostiion === `left` ? `center` : `stretch`}
+      className={className}
     >
       {label && (
-        <label
+        <Text
+          as="label"
           htmlFor={generatedId}
-          className={cx(
-            `text-[13px] text-stone-500`,
-            labelPostiion === `left` ? `shrink-0` : `ml-2.5`,
-          )}
+          variant="label"
+          className={cx(labelPostiion === `left` ? `shrink-0` : `ml-2.5`)}
         >
           {label}
-        </label>
+        </Text>
       )}
       <Popover.Root modal={false}>
         <Popover.Trigger
@@ -325,7 +327,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
             >
               <Popover.Title className="sr-only">Choose date and time</Popover.Title>
               <OverlayPortalProvider container={popupContainer}>
-                <div className="border-b border-stone-200 bg-stone-50 p-2">
+                <div className="bg-stone-50 p-2">
                   <div className="grid grid-cols-[1fr_6rem] gap-2">
                     <Select
                       selected={selectedMonth}
@@ -345,15 +347,15 @@ const DateTimePicker: React.FC<Props> = (props) => {
                     />
                   </div>
                 </div>
+                <Divider />
                 <div className="bg-white p-2">
                   <div className="grid grid-cols-7 px-0.5">
                     {weekdayLabels.map((weekday) => (
-                      <div
-                        key={weekday}
-                        className="flex h-6 items-center justify-center text-[11px] font-medium text-stone-400"
-                      >
-                        {weekday}
-                      </div>
+                      <HStack key={weekday} justify="center" className="h-6">
+                        <Text variant="label" className="text-[11px] !text-stone-400">
+                          {weekday}
+                        </Text>
+                      </HStack>
                     ))}
                     {calendarDays.map(({ year, month, day, adjacent }) => {
                       const selected = date
@@ -395,8 +397,9 @@ const DateTimePicker: React.FC<Props> = (props) => {
                     })}
                   </div>
                 </div>
-                <div className="border-t border-stone-200 bg-stone-50 p-2">
-                  <div className="flex items-center gap-2">
+                <Divider />
+                <div className="bg-stone-50 p-2">
+                  <HStack gap={2}>
                     <Input
                       type="time"
                       value={formatTimeValue(date ?? viewDate)}
@@ -408,14 +411,14 @@ const DateTimePicker: React.FC<Props> = (props) => {
                         Clear
                       </Button>
                     ) : null}
-                  </div>
+                  </HStack>
                 </div>
               </OverlayPortalProvider>
             </Popover.Popup>
           </Popover.Positioner>
         </Popover.Portal>
       </Popover.Root>
-    </div>
+    </Stack>
   );
 };
 

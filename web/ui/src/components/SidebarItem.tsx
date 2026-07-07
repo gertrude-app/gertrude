@@ -2,6 +2,8 @@ import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
 import { type LucideIcon } from 'lucide-react';
 import React from 'react';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
 import { useSidebarContext } from './SidebarContext';
 
 interface Props {
@@ -41,19 +43,28 @@ const SidebarItem: React.FC<Props> = ({
         </>
       )}
       <Icon className="h-4.5 w-4.5 shrink-0" />
-      <span className="flex min-w-0 items-center gap-2">
-        <span className="min-w-0 truncate text-[15px] leading-5">{title}</span>
+      <HStack as="span" gap={2} className="min-w-0">
+        <Text
+          variant="body"
+          truncate
+          className="min-w-0 text-[15px] leading-5 !text-stone-900"
+        >
+          {title}
+        </Text>
         {badgeCount !== undefined && (
-          <span
+          <Text
+            variant="caption"
             className={cx(
-              `min-w-5 shrink-0 rounded-full px-1.5 py-0.25 text-center text-xs font-medium leading-5 tabular-nums`,
-              selected ? `bg-stone-100 text-stone-700` : `bg-stone-200/70 text-stone-600`,
+              `min-w-5 shrink-0 rounded-full px-1.5 py-0.25 text-center font-medium leading-5 tabular-nums`,
+              selected
+                ? `bg-stone-100 !text-stone-700`
+                : `bg-stone-200/70 !text-stone-600`,
             )}
           >
             {badgeCount}
-          </span>
+          </Text>
         )}
-      </span>
+      </HStack>
     </>
   );
 

@@ -2,7 +2,7 @@ import DefenseInDepthBlock from '@site/components/DefenseInDepthBlock';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Site/DefenseInDepthBlock', // eslint-disable-line
+  title: 'Site/DefenseInDepthBlock',
   component: DefenseInDepthBlock,
   parameters: {
     layout: `fullscreen`,

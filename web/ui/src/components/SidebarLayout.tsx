@@ -1,6 +1,7 @@
 import cx from 'clsx';
 import { SidebarIcon } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import Stack from '../primitives/Stack';
 import Button from './Button';
 import { SidebarContext } from './SidebarContext';
 
@@ -51,7 +52,7 @@ const SidebarLayout: React.FC<Props> = ({ content, children }) => {
 
   return (
     <SidebarContext.Provider value={sidebarContext}>
-      <div className="flex min-h-screen relative">
+      <Stack direction="horizontal" align="stretch" className="min-h-screen relative">
         <div className="hidden min-[940px]:block">{children}</div>
         <div
           className={cx(
@@ -74,7 +75,7 @@ const SidebarLayout: React.FC<Props> = ({ content, children }) => {
           </div>
           <div>{content}</div>
         </main>
-      </div>
+      </Stack>
     </SidebarContext.Provider>
   );
 };

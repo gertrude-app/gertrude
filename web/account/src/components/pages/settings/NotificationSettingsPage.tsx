@@ -1,4 +1,4 @@
-import { Button, EmptyState } from '@gertrude/ui';
+import { Button, EmptyState, HStack, VStack } from '@gertrude/ui';
 import { BellRingIcon, PlusIcon } from 'lucide-react';
 import React from 'react';
 import type { Notification, NotificationMethod } from '#/components/types';
@@ -81,7 +81,7 @@ const NotificationSettingsPage: React.FC<Props> = ({
 
   return (
     <>
-      <div className="mt-4 flex flex-col gap-4">
+      <VStack gap={4} className="mt-4">
         <CardContainer
           heading="Methods"
           subheading="Verified ways that Gertrude can notify you for child requests and events."
@@ -91,7 +91,7 @@ const NotificationSettingsPage: React.FC<Props> = ({
             </Button>
           }
         >
-          <div className="mt-4 flex flex-wrap gap-2">
+          <HStack wrap gap={2} className="mt-4">
             {notificationMethods.map((method) => (
               <NotificationMethodChip
                 key={method.id}
@@ -104,7 +104,7 @@ const NotificationSettingsPage: React.FC<Props> = ({
                 onDelete={() => deleteNotificationMethod(method.id)}
               />
             ))}
-          </div>
+          </HStack>
         </CardContainer>
         <CardContainer
           heading="Notifications"
@@ -142,7 +142,7 @@ const NotificationSettingsPage: React.FC<Props> = ({
             />
           )}
         </CardContainer>
-      </div>
+      </VStack>
       <AddNotificationMethodSlideOver
         open={addMethodOpen}
         onOpenChange={setAddMethodOpen}

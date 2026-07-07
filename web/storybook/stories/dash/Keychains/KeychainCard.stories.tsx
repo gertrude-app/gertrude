@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Keychains/KeychainCard', // eslint-disable-line
+  title: 'Dashboard/Keychains/KeychainCard',
   component: KeychainCard,
 } satisfies Meta<typeof KeychainCard>;
 

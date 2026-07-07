@@ -1,4 +1,4 @@
-import { Button, Tooltip } from '@gertrude/ui';
+import { Button, Card, Divider, HStack, Text, Tooltip } from '@gertrude/ui';
 import { FlagIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 
@@ -20,18 +20,26 @@ const KeylogActivityItem: React.FC<Props> = ({
   onToggleFlag,
   onDelete,
 }) => (
-  <div className="border border-stone-200 bg-white rounded-xl shadow shadow-stone-300/30 flex flex-col overflow-hidden">
-    <p className="text-sm @lg/main:text-base font-mono text-stone-800 p-3 bg-stone-50 border-b border-stone-200 flex flex-col">
-      {text.split(`\n`).map((line) => (
-        <span>{line}</span>
+  <Card padding={0} className="overflow-hidden">
+    <Text
+      as="p"
+      variant="code"
+      className="@lg/main:text-base p-3 bg-stone-50 flex flex-col"
+    >
+      {text.split(`\n`).map((line, index) => (
+        <span key={`${index}-${line}`}>{line}</span>
       ))}
-    </p>
-    <div className="p-3 flex items-center justify-between gap-2">
-      <span className="text-stone-600 text-xs @lg/main:text-sm">
-        Typed in <span className="font-medium text-stone-900">{applicationName}</span>
-      </span>
+    </Text>
+    <Divider />
+    <HStack justify="between" gap={2} className="p-3">
+      <Text variant="captionSubtle" className="@lg/main:text-sm">
+        Typed in{` `}
+        <Text variant="bodyStrong" className="@lg/main:text-sm">
+          {applicationName}
+        </Text>
+      </Text>
       {(onToggleFlag || onDelete) && (
-        <div className="flex items-center gap-2 relative">
+        <HStack gap={2} className="relative">
           {flagged && (
             <div className="absolute w-120 h-40 rounded-[100%] -left-40 -bottom-24 [background:radial-gradient(#ddbb5535,transparent_70%)]" />
           )}
@@ -55,10 +63,10 @@ const KeylogActivityItem: React.FC<Props> = ({
           <Button type="button" onClick={() => onDelete?.(id)} icon={TrashIcon}>
             Delete
           </Button>
-        </div>
+        </HStack>
       )}
-    </div>
-  </div>
+    </HStack>
+  </Card>
 );
 
 export default KeylogActivityItem;

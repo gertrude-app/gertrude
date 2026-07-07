@@ -1,4 +1,13 @@
-import { Button, EmptyState, Input } from '@gertrude/ui';
+import {
+  Button,
+  Card,
+  EmptyState,
+  HStack,
+  Input,
+  Stack,
+  Text,
+  VStack,
+} from '@gertrude/ui';
 import { BanIcon, KeyIcon, PlusIcon, SquareDashedIcon, XIcon } from 'lucide-react';
 import React from 'react';
 import type {
@@ -55,9 +64,9 @@ const MacSettingsPage: React.FC<Props> = ({
   if (!config || !hasMacDevices) {
     return (
       <CardContainer className="flex flex-col gap-4">
-        <span className="text-center text-sm text-stone-500">
+        <Text variant="bodyMuted" className="text-center">
           No Mac settings to configure.
-        </span>
+        </Text>
       </CardContainer>
     );
   }
@@ -131,7 +140,7 @@ const MacSettingsPage: React.FC<Props> = ({
             },
           ]}
         >
-          <div className="flex flex-col gap-3">
+          <VStack gap={3}>
             <SettingsRow
               type="toggle"
               title="Enable Keylogging"
@@ -156,7 +165,10 @@ const MacSettingsPage: React.FC<Props> = ({
                 })
               }
             >
-              <div className="flex flex-col @lg/main:flex-row gap-4 @lg/main:gap-2">
+              <Stack
+                direction={{ default: `vertical`, '@lg/main': `horizontal` }}
+                gap={{ default: 4, '@lg/main': 2 }}
+              >
                 <Input
                   label="Average Frequency"
                   suffix="seconds"
@@ -189,7 +201,7 @@ const MacSettingsPage: React.FC<Props> = ({
                   }
                   className="@lg/main:w-1/2"
                 />
-              </div>
+              </Stack>
             </SettingsRow>
             {(config.keyloggingEnabled || config.screenshots) && (
               <SettingsRow
@@ -202,7 +214,7 @@ const MacSettingsPage: React.FC<Props> = ({
                 }
               />
             )}
-          </div>
+          </VStack>
         </PersonSettingsExpandableSection>
         <PersonSettingsExpandableSection
           title="Internet Filtering"
@@ -247,7 +259,7 @@ const MacSettingsPage: React.FC<Props> = ({
             },
           ]}
         >
-          <div className="flex flex-col gap-3">
+          <VStack gap={3}>
             <SettingsRow
               type="toggle"
               title="Enable Downtime"
@@ -257,7 +269,7 @@ const MacSettingsPage: React.FC<Props> = ({
                 patchConfig({ downtime: enabled ? defaultDowntime : undefined })
               }
             >
-              <div className="flex gap-2">
+              <HStack gap={2}>
                 <Input
                   label="Start Time"
                   type="time"
@@ -288,7 +300,7 @@ const MacSettingsPage: React.FC<Props> = ({
                   }}
                   className="w-1/2"
                 />
-              </div>
+              </HStack>
             </SettingsRow>
             <SettingsRow
               type="toggle"
@@ -298,7 +310,7 @@ const MacSettingsPage: React.FC<Props> = ({
               setEnabled={(enabled) => patchConfig({ filteringOn: enabled })}
             >
               {assignedKeychains.length > 0 ? (
-                <div className="flex flex-col gap-3">
+                <VStack gap={3}>
                   <div className="grid grid-cols-1 gap-3 @4xl/main:grid-cols-2 @6xl/main:grid-cols-3">
                     {assignedKeychains.map((keychain) => (
                       <KeychainCard
@@ -326,7 +338,7 @@ const MacSettingsPage: React.FC<Props> = ({
                       />
                     ))}
                   </div>
-                  <div className="flex justify-end items-center">
+                  <HStack justify="end">
                     <Button
                       type="button"
                       onClick={() => setAddKeychainSlideOverOpen(true)}
@@ -334,8 +346,8 @@ const MacSettingsPage: React.FC<Props> = ({
                     >
                       Add Keychain
                     </Button>
-                  </div>
-                </div>
+                  </HStack>
+                </VStack>
               ) : (
                 <EmptyState
                   icon={KeyIcon}
@@ -356,7 +368,7 @@ const MacSettingsPage: React.FC<Props> = ({
               title="Always Blocked Groups"
               description="These block groups will apply at all times, even when the filter is suspended."
             >
-              <div className="bg-white border border-stone-200 rounded-xl shadow shadow-stone-300/30 flex flex-col overflow-hidden">
+              <Card padding={0} className="overflow-hidden">
                 <BlockGroup
                   title="Adult Content"
                   shortDescription="Block the most-trafficked adult websites, plus adult-oriented TLDs."
@@ -413,7 +425,7 @@ const MacSettingsPage: React.FC<Props> = ({
                     })
                   }
                 />
-              </div>
+              </Card>
             </SettingsRow>
             <SettingsRow
               type="alwaysOn"
@@ -421,15 +433,16 @@ const MacSettingsPage: React.FC<Props> = ({
               description="These domains will be blocked at all times, even when the filter is suspended."
             >
               {config.customAlwaysBlockedDomains.length > 0 ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-wrap gap-2">
+                <VStack gap={3}>
+                  <HStack wrap gap={2}>
                     {config.customAlwaysBlockedDomains.map((domain) => (
-                      <div
+                      <HStack
                         key={domain}
-                        className="bg-white flex items-center gap-2 border p-1 pl-2.5 rounded-xl border-stone-200 shadow shadow-stone-300/30"
+                        gap={2}
+                        className="bg-white border p-1 pl-2.5 rounded-xl border-stone-200 shadow shadow-stone-300/30"
                       >
                         <BanIcon className="h-4 w-4 text-stone-500" />
-                        <span className="text-stone-800">{domain}</span>
+                        <Text variant="body">{domain}</Text>
                         <Button
                           type="button"
                           onClick={() => {
@@ -444,10 +457,10 @@ const MacSettingsPage: React.FC<Props> = ({
                           size="small"
                           variant="ghost"
                         />
-                      </div>
+                      </HStack>
                     ))}
-                  </div>
-                  <div className="flex justify-end">
+                  </HStack>
+                  <HStack justify="end">
                     <Button
                       type="button"
                       onClick={() => setAddBlockedDomainModalOpen(true)}
@@ -455,8 +468,8 @@ const MacSettingsPage: React.FC<Props> = ({
                     >
                       Add Blocked Domain
                     </Button>
-                  </div>
-                </div>
+                  </HStack>
+                </VStack>
               ) : (
                 <EmptyState
                   icon={BanIcon}
@@ -472,7 +485,7 @@ const MacSettingsPage: React.FC<Props> = ({
                 />
               )}
             </SettingsRow>
-          </div>
+          </VStack>
         </PersonSettingsExpandableSection>
         <PersonSettingsExpandableSection
           title="Apps"
@@ -497,14 +510,14 @@ const MacSettingsPage: React.FC<Props> = ({
             },
           ]}
         >
-          <div className="flex flex-col gap-3">
+          <VStack gap={3}>
             <SettingsRow
               type="alwaysOn"
               title="Blocked Apps"
               description="These apps can't open at all. Add a schedule to only block them at certain times."
             >
               {config.blockedApps.length > 0 ? (
-                <div className="flex flex-col gap-3">
+                <VStack gap={3}>
                   {config.blockedApps.map((app, index) => (
                     <ConfiguredAppRow
                       key={`${app.nameOrBundleId}-${index}`}
@@ -525,7 +538,7 @@ const MacSettingsPage: React.FC<Props> = ({
                       }
                     />
                   ))}
-                  <div className="flex justify-end">
+                  <HStack justify="end">
                     <Button
                       type="button"
                       onClick={() => setAddAppSlideOverType(`blocked`)}
@@ -533,8 +546,8 @@ const MacSettingsPage: React.FC<Props> = ({
                     >
                       Add Blocked App
                     </Button>
-                  </div>
-                </div>
+                  </HStack>
+                </VStack>
               ) : (
                 <EmptyState
                   icon={SquareDashedIcon}
@@ -556,7 +569,7 @@ const MacSettingsPage: React.FC<Props> = ({
               description="By default apps can't reach the internet. These apps are granted full, unrestricted access."
             >
               {config.unrestrictedApps.length > 0 ? (
-                <div className="flex flex-col gap-3">
+                <VStack gap={3}>
                   {config.unrestrictedApps.map((app, index) => (
                     <ConfiguredAppRow
                       key={`${app.nameOrBundleId}-${index}`}
@@ -570,7 +583,7 @@ const MacSettingsPage: React.FC<Props> = ({
                       }
                     />
                   ))}
-                  <div className="flex justify-end">
+                  <HStack justify="end">
                     <Button
                       type="button"
                       onClick={() => setAddAppSlideOverType(`unrestricted`)}
@@ -578,8 +591,8 @@ const MacSettingsPage: React.FC<Props> = ({
                     >
                       Add Unrestricted App
                     </Button>
-                  </div>
-                </div>
+                  </HStack>
+                </VStack>
               ) : (
                 <EmptyState
                   icon={SquareDashedIcon}
@@ -595,7 +608,7 @@ const MacSettingsPage: React.FC<Props> = ({
                 />
               )}
             </SettingsRow>
-          </div>
+          </VStack>
         </PersonSettingsExpandableSection>
       </CardContainer>
       <AddBlockedDomainModal

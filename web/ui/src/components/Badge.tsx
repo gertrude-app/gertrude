@@ -1,6 +1,7 @@
 import cx from 'clsx';
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
+import HStack from '../primitives/HStack';
 
 interface Props {
   children: React.ReactNode;
@@ -11,7 +12,7 @@ interface Props {
 }
 
 const Badge: React.FC<Props> = ({ children, color, size, icon: Icon, className }) => {
-  const commonClasses = `flex items-center select-none shrink-0 ${className}`;
+  const commonClasses = cx(`select-none shrink-0`, className);
   const colorClasses = cx({
     border: true,
     'bg-violet-100 border-violet-400 text-violet-900': color === `violet`,
@@ -22,10 +23,10 @@ const Badge: React.FC<Props> = ({ children, color, size, icon: Icon, className }
     'bg-stone-100 border-stone-400 text-stone-800': color === `neutral` || !color,
   });
   const sizeClasses = cx({
-    'px-1 py-0 text-[10px] rounded-[5px] gap-1': size === `xsmall`,
-    'px-1.5 py-0.25 text-xs rounded-[5px] gap-1': size === `small`,
-    'px-2 py-0.25 text-sm rounded-[6px] gap-1.5': size === `medium` || !size,
-    'px-3 py-0.5 rounded-[7px] text-[15px] gap-2': size === `large`,
+    'px-1 py-0 text-[10px] rounded-[5px]': size === `xsmall`,
+    'px-1.5 py-0.25 text-xs rounded-[5px]': size === `small`,
+    'px-2 py-0.25 text-sm rounded-[6px]': size === `medium` || !size,
+    'px-3 py-0.5 rounded-[7px] text-[15px]': size === `large`,
   });
   const iconSizeClasses = cx({
     'h-2.5 w-2.5': size === `xsmall`,
@@ -33,6 +34,7 @@ const Badge: React.FC<Props> = ({ children, color, size, icon: Icon, className }
     'h-3.5 w-3.5': size === `medium` || !size,
     'h-4 w-4': size === `large`,
   });
+  const gap = size === `large` ? 2 : size === `medium` || !size ? 1.5 : 1;
 
   if (color === `beta` || color === `canary`) {
     return (
@@ -50,7 +52,8 @@ const Badge: React.FC<Props> = ({ children, color, size, icon: Icon, className }
           },
         )}
       >
-        <div
+        <HStack
+          gap={gap}
           className={cx(commonClasses, sizeClasses, {
             'bg-gradient-to-br from-emerald-100 to-indigo-100': color === `beta`,
             'bg-gradient-to-br from-yellow-100 to-red-100': color === `canary`,
@@ -72,16 +75,16 @@ const Badge: React.FC<Props> = ({ children, color, size, icon: Icon, className }
           >
             {children}
           </span>
-        </div>
+        </HStack>
       </div>
     );
   }
 
   return (
-    <div className={cx(commonClasses, colorClasses, sizeClasses)}>
+    <HStack gap={gap} className={cx(commonClasses, colorClasses, sizeClasses)}>
       {Icon && <Icon className={iconSizeClasses} />}
       <span>{children}</span>
-    </div>
+    </HStack>
   );
 };
 

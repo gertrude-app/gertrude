@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/Activity/KeystrokesViewer', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/KeystrokesViewer',
   component: KeystrokesViewer,
 } satisfies Meta<typeof KeystrokesViewer>;
 

@@ -1,7 +1,20 @@
-import { Button, Input, Modal, Select, Textarea, inflect } from '@gertrude/ui';
+import {
+  Button,
+  Card,
+  HStack,
+  Input,
+  Modal,
+  Select,
+  Stack,
+  Text,
+  Textarea,
+  VStack,
+  inflect,
+} from '@gertrude/ui';
 import { ClockIcon } from 'lucide-react';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
+import RequestReasonBubble from './RequestReasonBubble';
 
 interface Props {
   request: SuspensionRequest;
@@ -66,19 +79,21 @@ const SuspensionRequestCard: React.FC<Props> = ({ request, onDeny, onGrant }) =>
   };
 
   return (
-    <div className="flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-4 shadow-md shadow-stone-300/30">
-      <div>
-        <div className="flex flex-col">
-          <h2 className="text-lg font-medium text-stone-900">{request.personName}</h2>
-          <span className="text-sm text-stone-600 -mt-0.5">{request.duration}</span>
-        </div>
+    <Card preset="big" padding={4} className="flex flex-col justify-between">
+      <VStack>
+        <VStack>
+          <Text as="h2" variant="heading">
+            {request.personName}
+          </Text>
+          <Text variant="bodySubtle" className="-mt-0.5">
+            {request.duration}
+          </Text>
+        </VStack>
         {request.reason && (
-          <p className="w-fit self-start rounded-2xl rounded-tl bg-stone-200 px-3.5 py-2.5 text-sm text-stone-800 mt-2">
-            {request.reason}
-          </p>
+          <RequestReasonBubble className="mt-2">{request.reason}</RequestReasonBubble>
         )}
-      </div>
-      <div className="flex justify-end gap-2 mt-4">
+      </VStack>
+      <HStack justify="end" gap={2} className="mt-4">
         <Button
           type="button"
           onClick={() => setDenyModalOpen(true)}
@@ -117,7 +132,7 @@ const SuspensionRequestCard: React.FC<Props> = ({ request, onDeny, onGrant }) =>
         >
           Grant {request.duration}
         </Button>
-      </div>
+      </HStack>
       <Modal
         open={denyModalOpen}
         onOpenChange={handleDenyModalOpenChange}
@@ -173,7 +188,7 @@ const SuspensionRequestCard: React.FC<Props> = ({ request, onDeny, onGrant }) =>
           </>
         }
       >
-        <div className="grid gap-4 sm:grid-cols-[1fr_10rem]">
+        <Stack direction={{ default: `vertical`, sm: `horizontal` }} gap={4}>
           <Input
             type="number"
             label="Duration"
@@ -185,10 +200,11 @@ const SuspensionRequestCard: React.FC<Props> = ({ request, onDeny, onGrant }) =>
             selected={customDurationUnit}
             setSelected={setCustomDurationUnit}
             possibleValues={durationUnits}
+            className="sm:w-40"
           />
-        </div>
+        </Stack>
       </Modal>
-    </div>
+    </Card>
   );
 };
 

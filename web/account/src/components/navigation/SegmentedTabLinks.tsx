@@ -1,3 +1,4 @@
+import { HStack, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import React from 'react';
 
@@ -61,7 +62,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
   }, [tabs.length, updateScrollState]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <VStack gap={4}>
       <div
         className={cx(
           `relative overflow-hidden rounded-xl bg-stone-100 px-1.5`,
@@ -89,7 +90,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
                 )}
                 aria-current={isSelected ? `page` : undefined}
               >
-                <span className="inline-flex items-center gap-2">
+                <HStack as="span" gap={2}>
                   <span>{tab.label}</span>
                   {tab.badgeCount !== undefined && (
                     <span
@@ -103,7 +104,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
                       {tab.badgeCount}
                     </span>
                   )}
-                </span>
+                </HStack>
               </a>
             );
           })}
@@ -116,7 +117,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
         )}
       </div>
       {children}
-    </div>
+    </VStack>
   );
 };
 

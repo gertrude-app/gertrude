@@ -4,7 +4,7 @@ import type { SubscriptionPanelAction } from '@dash/types';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Dashboard/Settings/SubscriptionPanel', // eslint-disable-line
+  title: 'Dashboard/Settings/SubscriptionPanel',
   component: SubscriptionPanel,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof SubscriptionPanel>;

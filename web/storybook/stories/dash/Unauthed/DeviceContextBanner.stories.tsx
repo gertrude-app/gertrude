@@ -7,7 +7,7 @@ import {
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Dashboard/Unauthed/DeviceContextBanner', // eslint-disable-line
+  title: 'Dashboard/Unauthed/DeviceContextBanner',
   component: DeviceContextBanner,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof DeviceContextBanner>;

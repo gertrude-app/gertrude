@@ -1,4 +1,4 @@
-import { Button, Input } from '@gertrude/ui';
+import { Button, Input, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import AppAd from '#/components/unauthed/AppAd';
@@ -84,14 +84,14 @@ const LoginPage: React.FC<Props> = ({
 export default LoginPage;
 
 const LoginAppsDisplay: React.FC = () => (
-  <div className="flex h-full flex-col items-center pt-20 relative overflow-scroll bg-stone-50">
+  <VStack align="center" className="h-full pt-20 relative overflow-scroll bg-stone-50">
     <img src="/logo-wordmark.svg" alt="Gertrude" className="w-36 relative" />
-    <h2 className="text-3xl font-medium text-stone-900 mt-8 relative">
+    <Text as="h2" variant="display" className="mt-8 relative">
       Have you tried all our apps?
-    </h2>
-    <h3 className="text-lg text-stone-600 mt-1 relative">
+    </Text>
+    <Text as="h3" variant="subheading" className="mt-1 relative">
       We're biased, but we think they're pretty great.
-    </h3>
+    </Text>
     <div className="grid grid-cols-2 gap-6 px-12 py-12">
       <AppAd
         screenshot="/mac-app-screenshot.png"
@@ -115,5 +115,5 @@ const LoginAppsDisplay: React.FC = () => (
         badges={[`iOS`, `iPadOS`]}
       />
     </div>
-  </div>
+  </VStack>
 );

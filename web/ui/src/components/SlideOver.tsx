@@ -2,6 +2,13 @@ import { useLocation, useNavigate } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
 import { Drawer } from 'vaul';
+import type {
+  ResponsiveStackGap,
+  ResponsiveStackJustify,
+} from '../primitives/stack-utils';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 import { OverlayPortalProvider } from './OverlayPortalContext';
 
 export interface SlideOverProps {
@@ -21,6 +28,24 @@ export interface SlideOverProps {
   className?: string;
   overlayClassName?: string;
 }
+
+export interface SlideOverBodyProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export interface SlideOverFooterProps {
+  children: React.ReactNode;
+  justify?: ResponsiveStackJustify;
+  gap?: ResponsiveStackGap;
+  bleedX?: boolean;
+  className?: string;
+}
+
+type SlideOverComponent = React.FC<SlideOverProps> & {
+  Body: typeof SlideOverBody;
+  Footer: typeof SlideOverFooter;
+};
 
 const useMediaQuery = (query: string): boolean => {
   const [matches, setMatches] = React.useState(false);
@@ -60,7 +85,7 @@ const getParentPath = (path: string): string => {
   return parentPath || `/`;
 };
 
-const SlideOver: React.FC<SlideOverProps> = ({
+const SlideOverRoot: React.FC<SlideOverProps> = ({
   children,
   trigger,
   open,
@@ -148,7 +173,7 @@ const SlideOver: React.FC<SlideOverProps> = ({
           <OverlayPortalProvider container={overlayPortalContainer}>
             <div className="h-full w-full overflow-hidden rounded-[inherit] @container/slide">
               {hasHeading ? (
-                <div className="flex h-full flex-col">
+                <VStack className="h-full">
                   <div
                     className={cx(
                       `shrink-0 pt-6 pb-4 @lg/slide:pt-8`,
@@ -156,14 +181,16 @@ const SlideOver: React.FC<SlideOverProps> = ({
                     )}
                   >
                     {heading ? (
-                      <Drawer.Title className="text-xl font-medium text-stone-900">
+                      <Text as={Drawer.Title} variant="title">
                         {heading}
-                      </Drawer.Title>
+                      </Text>
                     ) : (
                       <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
                     )}
                     {subheading && (
-                      <p className="mt-1 text-sm text-stone-600">{subheading}</p>
+                      <Text as="p" variant="body" className="mt-1">
+                        {subheading}
+                      </Text>
                     )}
                   </div>
                   <div
@@ -171,7 +198,7 @@ const SlideOver: React.FC<SlideOverProps> = ({
                   >
                     {children}
                   </div>
-                </div>
+                </VStack>
               ) : (
                 <>
                   <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
@@ -191,5 +218,34 @@ const SlideOver: React.FC<SlideOverProps> = ({
     </Drawer.Root>
   );
 };
+
+const SlideOverBody: React.FC<SlideOverBodyProps> = ({ children, className }) => (
+  <div className={cx(`min-h-0 flex-1 overflow-y-auto pb-6`, className)}>{children}</div>
+);
+
+const SlideOverFooter: React.FC<SlideOverFooterProps> = ({
+  children,
+  justify = `between`,
+  gap = 3,
+  bleedX,
+  className,
+}) => (
+  <HStack
+    justify={justify}
+    gap={gap}
+    className={cx(
+      `shrink-0 border-t border-stone-200 bg-stone-50/95 py-3 @lg/slide:py-4`,
+      bleedX ? `-mx-4 px-4 @lg/slide:-mx-6 @lg/slide:px-6` : `px-3 @lg/slide:px-6`,
+      className,
+    )}
+  >
+    {children}
+  </HStack>
+);
+
+const SlideOver = Object.assign(SlideOverRoot, {
+  Body: SlideOverBody,
+  Footer: SlideOverFooter,
+}) as SlideOverComponent;
 
 export default SlideOver;

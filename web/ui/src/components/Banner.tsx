@@ -1,6 +1,8 @@
 import cx from 'clsx';
 import { CircleAlertIcon, InfoIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
 
 export type BannerVariant = `neutral` | `warning` | `error`;
 
@@ -39,16 +41,21 @@ const Banner: React.FC<BannerProps> = ({ children, variant = `neutral`, classNam
   const Icon = styles.Icon;
 
   return (
-    <div
-      className={cx(
-        `flex items-start gap-3 rounded-xl border p-3`,
-        styles.container,
-        className,
-      )}
+    <HStack
+      align="start"
+      gap={3}
+      className={cx(`rounded-xl border p-3`, styles.container, className)}
     >
       <Icon className={cx(`h-5 w-5 shrink-0`, styles.icon)} />
-      <div className="text-sm leading-5 [&_strong]:font-semibold">{children}</div>
-    </div>
+      <Text
+        as="div"
+        variant="body"
+        className="leading-5 [&_strong]:font-semibold"
+        style={{ color: `inherit` }}
+      >
+        {children}
+      </Text>
+    </HStack>
   );
 };
 

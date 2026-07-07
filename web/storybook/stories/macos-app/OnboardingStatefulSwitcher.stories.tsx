@@ -3,7 +3,7 @@ import { appWindow, props } from '../story-helpers';
 import OnboardingStatefulSwitcher from './OnboardingStatefulSwitcher';
 
 const meta = {
-  title: 'MacOS App/Onboarding/Transitions', // eslint-disable-line
+  title: 'MacOS App/Onboarding/Transitions',
   component: OnboardingStatefulSwitcher,
   ...appWindow(900, 700),
 } satisfies Meta<typeof OnboardingStatefulSwitcher>;

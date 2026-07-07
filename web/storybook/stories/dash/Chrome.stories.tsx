@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Core/Chrome', // eslint-disable-line
+  title: 'Dashboard/Core/Chrome',
   component: Chrome,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof Chrome>;

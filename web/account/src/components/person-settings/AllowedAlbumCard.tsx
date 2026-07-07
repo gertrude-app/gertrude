@@ -1,4 +1,12 @@
-import { Button, DropdownMenu, DropdownMenuItem } from '@gertrude/ui';
+import {
+  Button,
+  Card,
+  DropdownMenu,
+  DropdownMenuItem,
+  HStack,
+  Text,
+  VStack,
+} from '@gertrude/ui';
 import cx from 'clsx';
 import { CheckIcon, EllipsisIcon, EyeIcon, EyeOffIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
@@ -14,25 +22,6 @@ type Props = {
   onToggleAlbumArt?: () => void;
   onRemove?: () => void;
 };
-
-const getCardClasses = (
-  selected: boolean,
-  disabled: boolean,
-  selectable = false,
-): string =>
-  cx(
-    `relative flex flex-col rounded-xl border p-2 gap-2 shadow transition-[background-color,border-color,box-shadow,opacity] duration-150`,
-    disabled
-      ? `cursor-not-allowed border-stone-200 bg-stone-100/70 opacity-60 shadow-transparent`
-      : selected
-        ? `cursor-pointer border-violet-300 bg-violet-50 shadow-violet-300/30 hover:border-violet-400 hover:shadow-violet-300/50`
-        : `border-stone-200 bg-white shadow-stone-300/30`,
-    !disabled && selectable && `cursor-pointer`,
-    !disabled &&
-      selectable &&
-      !selected &&
-      `hover:border-stone-400/70 hover:shadow-stone-300/70`,
-  );
 
 const AllowedAlbumCard: React.FC<Props> = ({
   album,
@@ -67,35 +56,44 @@ const AllowedAlbumCard: React.FC<Props> = ({
             className="aspect-square rounded-md h-full relative"
           />
         ) : (
-          <div className="aspect-square rounded-md h-full flex justify-center items-center bg-stone-200/80 relative">
+          <HStack
+            justify="center"
+            className="aspect-square rounded-md h-full bg-stone-200/80 relative"
+          >
             <img
               src={album.artworkUrl}
               alt=""
               className="aspect-square rounded-md h-full opacity-0"
             />
             <EyeOffIcon className="text-stone-400/80 w-8 h-8 absolute" />
-          </div>
+          </HStack>
         )}
         {selected && !disabled && (
-          <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full border border-violet-200 bg-violet-500 text-white shadow shadow-violet-500/30">
+          <HStack
+            justify="center"
+            className="absolute right-2 top-2 h-5 w-5 rounded-full border border-violet-200 bg-violet-500 text-white shadow shadow-violet-500/30"
+          >
             <CheckIcon className="h-3 w-3" strokeWidth={3} />
-          </span>
+          </HStack>
         )}
       </div>
-      <div className="flex justify-between items-center gap-2 flex-grow">
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate text-sm font-medium text-stone-800 leading-5">
+      <HStack justify="between" gap={2} className="flex-grow">
+        <VStack className="min-w-0">
+          <Text variant="bodyStrong" truncate>
             {album.title}
-          </span>
-          <span className="truncate text-xs text-stone-500 leading-5 -mt-0.5">
+          </Text>
+          <Text variant="captionMuted" truncate className="-mt-0.5">
             {album.artist}
-          </span>
+          </Text>
           {disabledLabel && (
-            <span className="mt-1 inline-flex w-fit rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
+            <Text
+              variant="captionSubtleStrong"
+              className="mt-1 inline-flex w-fit rounded-full bg-stone-200 px-2 py-0.5"
+            >
               {disabledLabel}
-            </span>
+            </Text>
           )}
-        </div>
+        </VStack>
         {(onToggleAlbumArt || onRemove) && (
           <DropdownMenu
             trigger={
@@ -119,25 +117,33 @@ const AllowedAlbumCard: React.FC<Props> = ({
             )}
           </DropdownMenu>
         )}
-      </div>
+      </HStack>
     </>
   );
 
   if (onSelect) {
     return (
-      <button
+      <Card
+        as="button"
         type="button"
+        interactive
+        selected={selected}
         disabled={disabled}
         aria-pressed={selected}
         onClick={onSelect}
-        className={cx(getCardClasses(selected, disabled, true), `w-full text-left`)}
+        padding={2}
+        className="relative flex w-full flex-col gap-2 text-left"
       >
         {content}
-      </button>
+      </Card>
     );
   }
 
-  return <div className={getCardClasses(false, false)}>{content}</div>;
+  return (
+    <Card padding={2} className="relative flex flex-col gap-2">
+      {content}
+    </Card>
+  );
 };
 
 export default AllowedAlbumCard;

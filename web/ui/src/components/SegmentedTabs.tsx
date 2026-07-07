@@ -1,6 +1,9 @@
 import { Link, Outlet, useLocation } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 
 interface Tab {
   label: string;
@@ -73,7 +76,7 @@ const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
   }, [tabs.length, updateScrollState]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <VStack gap={4}>
       <div
         className={cx(
           `relative overflow-hidden rounded-xl bg-stone-100 px-1.5`,
@@ -107,21 +110,24 @@ const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
                 )}
                 aria-current={isSelected ? `page` : undefined}
               >
-                <span className="inline-flex items-center gap-2">
-                  <span>{tab.label}</span>
+                <HStack as="span" gap={2}>
+                  <Text variant="body" style={{ color: `inherit` }}>
+                    {tab.label}
+                  </Text>
                   {tab.badgeCount !== undefined && (
-                    <span
+                    <Text
+                      variant="caption"
                       className={cx(
-                        `min-w-5 rounded-full px-1.5 py-0.25 text-xs font-medium tabular-nums`,
+                        `min-w-5 rounded-full px-1.5 py-0.25 font-medium tabular-nums`,
                         isSelected
-                          ? `bg-stone-100 text-stone-700`
-                          : `bg-stone-200/70 text-stone-600`,
+                          ? `bg-stone-100 !text-stone-700`
+                          : `bg-stone-200/70 !text-stone-600`,
                       )}
                     >
                       {tab.badgeCount}
-                    </span>
+                    </Text>
                   )}
-                </span>
+                </HStack>
               </Link>
             );
           })}
@@ -134,7 +140,7 @@ const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
         )}
       </div>
       <Outlet />
-    </div>
+    </VStack>
   );
 };
 

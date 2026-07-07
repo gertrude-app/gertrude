@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Shared/TextInput', // eslint-disable-line
+  title: 'Shared/TextInput',
   component: TextInput,
   decorators: [(story) => <div className="max-w-sm">{story()}</div>],
 } satisfies Meta<typeof TextInput>;

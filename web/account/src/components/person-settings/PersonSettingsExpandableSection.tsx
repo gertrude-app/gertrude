@@ -1,3 +1,4 @@
+import { Divider, HStack, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
@@ -26,12 +27,14 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
-    <div className="flex flex-col bg-white @xl/main:border-x border-y border-stone-200 @xl/main:rounded-xl shadow shadow-stone-300/30 -mx-3 @lg/main:-mx-4 @xl/main:mx-0">
-      <div
-        className="flex justify-between gap-3 p-3 items-center cursor-pointer select-none"
+    <VStack className="bg-white @xl/main:border-x border-y border-stone-200 @xl/main:rounded-xl shadow shadow-stone-300/30 -mx-3 @lg/main:-mx-4 @xl/main:mx-0">
+      <HStack
+        justify="between"
+        gap={3}
+        className="p-3 cursor-pointer select-none"
         onClick={() => setExpanded(!expanded)}
       >
-        <div className="flex items-center gap-x-4 gap-y-0.5 flex-wrap">
+        <HStack gap={4} wrap className="gap-y-0.5">
           {appIconUrl && (
             <div className="relative">
               <img
@@ -46,8 +49,10 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
               />
             </div>
           )}
-          <span className="text-lg font-medium text-stone-900">{title}</span>
-          <div className="flex gap-2 flex-wrap">
+          <Text as="h2" variant="heading">
+            {title}
+          </Text>
+          <HStack gap={2} wrap>
             {previewChips.map((preview) => {
               if (preview) {
                 return (
@@ -60,24 +65,25 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
               }
               return null;
             })}
-          </div>
-        </div>
+          </HStack>
+        </HStack>
         <ChevronRightIcon
           className={cx(
             `w-5 h-5 text-stone-600 transition-[rotate] duration-200 shrink-0`,
             expanded && `rotate-90`,
           )}
         />
-      </div>
+      </HStack>
       <div
         className={cx(
           expanded ? `h-auto opacity-100` : `h-0 opacity-0`,
           `overflow-hidden transition-[height,opacity] duration-200`,
         )}
       >
-        <div className="p-3 border-t border-stone-200">{children}</div>
+        <Divider />
+        <div className="p-3">{children}</div>
       </div>
-    </div>
+    </VStack>
   );
 };
 

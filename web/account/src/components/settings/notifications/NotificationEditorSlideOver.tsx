@@ -1,4 +1,4 @@
-import { Button, Select, SlideOver } from '@gertrude/ui';
+import { Button, Card, Select, SlideOver, Text, VStack } from '@gertrude/ui';
 import { PauseCircleIcon, ShieldAlertIcon, UnlockIcon } from 'lucide-react';
 import React from 'react';
 import type {
@@ -124,14 +124,16 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
       size="medium"
       withPx
     >
-      <div className="flex h-full flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto pb-6">
+      <VStack className="h-full">
+        <SlideOver.Body>
           {methods.length === 0 ? (
-            <div className="rounded-xl border border-stone-200 bg-white p-4 text-sm leading-6 text-stone-600 shadow shadow-stone-300/30">
-              Add a notification method before creating custom notifications.
-            </div>
+            <Card padding={4}>
+              <Text as="p" variant="proseSubtle">
+                Add a notification method before creating custom notifications.
+              </Text>
+            </Card>
           ) : (
-            <div className="flex max-w-xl flex-col gap-5">
+            <VStack gap={5} className="max-w-xl">
               <Select
                 label="Method"
                 selected={draftMethodId}
@@ -152,10 +154,10 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
                   possibleValues={securityLevelOptions}
                 />
               )}
-            </div>
+            </VStack>
           )}
-        </div>
-        <div className="-mx-4 flex shrink-0 items-center justify-between gap-3 border-t border-stone-200 bg-stone-50/95 px-4 py-3 @lg/slide:-mx-6 @lg/slide:px-6 @lg/slide:py-4">
+        </SlideOver.Body>
+        <SlideOver.Footer bleedX>
           <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
@@ -167,8 +169,8 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
           >
             {notification ? `Save changes` : `Create notification`}
           </Button>
-        </div>
-      </div>
+        </SlideOver.Footer>
+      </VStack>
     </SlideOver>
   );
 };

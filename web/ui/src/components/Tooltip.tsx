@@ -1,6 +1,7 @@
 import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import cx from 'clsx';
 import React from 'react';
+import Text from '../primitives/Text';
 import { useOverlayPortalContainer } from './OverlayPortalContext';
 
 type TooltipRootProps = React.ComponentProps<typeof BaseTooltip.Root>;
@@ -93,15 +94,17 @@ const TooltipRoot: React.FC<TooltipProps> = ({
             positionerClassName,
           )}
         >
-          <BaseTooltip.Popup
+          <Text
+            as={BaseTooltip.Popup}
+            variant="caption"
             className={cx(
-              `relative origin-[var(--transform-origin)] rounded-lg border border-stone-950 bg-stone-950 px-2 py-1 text-xs font-medium leading-4 text-white shadow-lg shadow-stone-950/20 transition-[opacity,transform] duration-100 ease-out data-ending-style:opacity-0 data-instant:transition-none data-starting-style:opacity-0 data-starting-style:[transform:scale(0.98)]`,
+              `relative origin-[var(--transform-origin)] rounded-lg border border-stone-950 bg-stone-950 px-2 py-1 font-medium leading-4 !text-white shadow-lg shadow-stone-950/20 transition-[opacity,transform] duration-100 ease-out data-ending-style:opacity-0 data-instant:transition-none data-starting-style:opacity-0 data-starting-style:[transform:scale(0.98)]`,
               contentClassName,
             )}
           >
             {showArrow && <BaseTooltip.Arrow className={arrowClasses} />}
             {content}
-          </BaseTooltip.Popup>
+          </Text>
         </BaseTooltip.Positioner>
       </BaseTooltip.Portal>
     </BaseTooltip.Root>

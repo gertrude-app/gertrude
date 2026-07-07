@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/tanstack-react';
 import VStack from './VStack';
-import { type StackAlign, type StackGap, type StackJustify } from './stack';
+import { type StackAlign, type StackGap, type StackJustify } from './stack-utils';
 import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryLayout';
 
 const gaps = [0, 1, 2, 3, 4, 6, 8] satisfies StackGap[];

@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { confirmableEntityAction, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/EditChild', // eslint-disable-line
+  title: 'Dashboard/Children/EditChild',
   component: EditChild,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },

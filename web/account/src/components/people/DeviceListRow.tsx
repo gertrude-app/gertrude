@@ -1,4 +1,4 @@
-import { Badge } from '@gertrude/ui';
+import { Badge, Card, HStack, Text, VStack } from '@gertrude/ui';
 import React from 'react';
 import type { Device } from '#/components/types';
 import { deviceImageUrl, deviceSubtitle, deviceTitle } from '#/components/utils';
@@ -9,23 +9,29 @@ interface Props {
 }
 
 const DeviceListRow: React.FC<Props> = ({ device, href }) => (
-  <a
+  <Card
+    as="a"
     href={href}
-    className="flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-3 pr-6 shadow shadow-stone-300/30 transition-[border-color,box-shadow] duration-100 hover:border-stone-300 hover:shadow-stone-300/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/80"
+    padding={3}
+    className="flex items-center justify-between gap-3 pr-6 transition-[border-color,box-shadow] duration-100 hover:border-stone-300 hover:shadow-stone-300/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/80"
   >
-    <div className="flex min-w-0 items-center gap-3">
-      <div className="flex h-10 w-12 shrink-0 items-center justify-center text-stone-700">
+    <HStack className="min-w-0" gap={3}>
+      <HStack justify="center" className="h-10 w-12 shrink-0 text-stone-700">
         <img
           src={deviceImageUrl(device.type, device.modelIdentifier)}
           alt=""
           className="h-9 w-11 object-contain drop-shadow-sm"
         />
-      </div>
-      <div className="min-w-0 flex flex-col">
-        <span className="truncate font-medium text-stone-900">{deviceTitle(device)}</span>
-        <span className="truncate text-sm text-stone-500">{deviceSubtitle(device)}</span>
-      </div>
-    </div>
+      </HStack>
+      <VStack className="min-w-0">
+        <Text variant="bodyLargeStrong" truncate>
+          {deviceTitle(device)}
+        </Text>
+        <Text variant="bodyMuted" truncate>
+          {deviceSubtitle(device)}
+        </Text>
+      </VStack>
+    </HStack>
     <Badge
       size="small"
       color={device.type === `mac` && device.online ? `green` : `neutral`}
@@ -38,7 +44,7 @@ const DeviceListRow: React.FC<Props> = ({ device, href }) => (
           ? `iPhone`
           : `iPad`}
     </Badge>
-  </a>
+  </Card>
 );
 
 export default DeviceListRow;

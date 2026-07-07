@@ -2,7 +2,7 @@ import { Button } from '@shared/components';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Shared/Button', // eslint-disable-line
+  title: 'Shared/Button',
   component: Button,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof Button>;

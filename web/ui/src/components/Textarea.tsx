@@ -1,5 +1,7 @@
 import cx from 'clsx';
 import React from 'react';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 
 interface Props {
   value: string;
@@ -22,17 +24,16 @@ const Textarea: React.FC<Props> = ({ ...props }) => {
   const descriptionId = props.helperText || props.error ? `${id}-description` : undefined;
 
   return (
-    <div className={cx(`flex flex-col gap-1`, props.disabled && `opacity-60`)}>
+    <VStack gap={1} className={cx(props.disabled && `opacity-60`)}>
       {props.label && (
-        <label
+        <Text
+          as="label"
           htmlFor={id}
-          className={cx(
-            `ml-2.5 text-[13px] text-stone-500`,
-            props.disabled && `cursor-not-allowed`,
-          )}
+          variant="label"
+          className={cx(`ml-2.5`, props.disabled && `cursor-not-allowed`)}
         >
           {props.label}
-        </label>
+        </Text>
       )}
       <textarea
         id={id}
@@ -61,17 +62,16 @@ const Textarea: React.FC<Props> = ({ ...props }) => {
         )}
       />
       {(props.error || props.helperText) && (
-        <p
+        <Text
+          as="p"
           id={descriptionId}
-          className={cx(
-            `ml-2.5 text-[13px] leading-5`,
-            props.error ? `text-red-500` : `text-stone-500`,
-          )}
+          variant={props.error ? `error` : `label`}
+          className={cx(`ml-2.5 leading-5`, !props.error && `font-normal`)}
         >
           {props.error ?? props.helperText}
-        </p>
+        </Text>
       )}
-    </div>
+    </VStack>
   );
 };
 

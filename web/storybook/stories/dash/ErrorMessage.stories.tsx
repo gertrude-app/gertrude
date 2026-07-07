@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Core/ErrorMessage', // eslint-disable-line
+  title: 'Dashboard/Core/ErrorMessage',
   component: ErrorMessage,
 } satisfies Meta<typeof ErrorMessage>;
 

@@ -1,5 +1,9 @@
 import { EllipsisIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
+import Divider from '../primitives/Divider';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 import Button from './Button';
 import DropdownMenu from './DropdownMenu';
 import DropdownMenuItem from './DropdownMenuItem';
@@ -41,37 +45,44 @@ const PageHeading: React.FC<Props> = ({
   buttons = [],
   breadcrumbs = [],
 }) => (
-  <div className="@2xl/main:border-b border-stone-200/60 pb-4">
+  <div className="pb-4 @2xl/main:pb-0">
     {breadcrumbs.length > 0 && (
       <nav aria-label="Breadcrumb" className="mb-2">
-        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-stone-500">
+        <HStack as="ol" wrap gap={1.5}>
           {breadcrumbs.map((breadcrumb, index) => (
-            <li
-              key={`${breadcrumb.href}-${breadcrumb.text}`}
-              className="flex items-center gap-1.5"
-            >
-              {index > 0 && <span className="text-stone-300">/</span>}
-              <a
+            <HStack as="li" key={`${breadcrumb.href}-${breadcrumb.text}`} gap={1.5}>
+              {index > 0 && (
+                <Text variant="bodyMuted" className="!text-stone-300">
+                  /
+                </Text>
+              )}
+              <Text
+                as="a"
                 href={breadcrumb.href}
-                className="rounded-md px-1.5 py-0.5 -mx-1.5 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 focus-visible:bg-stone-100 focus-visible:text-stone-900 focus-visible:outline-none"
+                variant="bodyMuted"
+                className="-mx-1.5 rounded-md px-1.5 py-0.5 transition-colors hover:bg-stone-100 hover:!text-stone-900 focus-visible:bg-stone-100 focus-visible:!text-stone-900 focus-visible:outline-none"
               >
                 {breadcrumb.text}
-              </a>
-            </li>
+              </Text>
+            </HStack>
           ))}
-        </ol>
+        </HStack>
       </nav>
     )}
-    <div className="flex justify-between items-end">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-medium text-stone-900 flex-grow @2xl/main:-mb-2">
+    <HStack justify="between" align="end">
+      <VStack gap={2}>
+        <Text as="h1" variant="display" className="flex-grow @2xl/main:-mb-2">
           {title}
-        </h1>
-        {subtitle && <h2 className="text-stone-600">{subtitle}</h2>}
-      </div>
+        </Text>
+        {subtitle && (
+          <Text as="h2" variant="bodyMuted" className="text-base">
+            {subtitle}
+          </Text>
+        )}
+      </VStack>
       {buttons.length > 0 && (
         <>
-          <div className="flex @2xl/main:hidden">
+          <HStack hideAbove="@2xl/main">
             <DropdownMenu
               trigger={<Button type="button" onClick={() => {}} icon={EllipsisIcon} />}
             >
@@ -84,8 +95,8 @@ const PageHeading: React.FC<Props> = ({
                 />
               ))}
             </DropdownMenu>
-          </div>
-          <div className="hidden @2xl/main:flex gap-2">
+          </HStack>
+          <HStack hideBelow="@2xl/main" gap={2}>
             {buttons.map((button) =>
               isLinkButton(button) ? (
                 <Button
@@ -109,10 +120,11 @@ const PageHeading: React.FC<Props> = ({
                 </Button>
               ),
             )}
-          </div>
+          </HStack>
         </>
       )}
-    </div>
+    </HStack>
+    <Divider hideBelow="@2xl/main" className="mt-4 !bg-stone-200/60" />
   </div>
 );
 

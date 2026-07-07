@@ -1,10 +1,14 @@
 import {
   Badge,
   Button,
+  Card,
   EmptyState,
+  HStack,
   Input,
   SlideOver,
+  Text,
   Tooltip,
+  VStack,
   inflect,
 } from '@gertrude/ui';
 import cx from 'clsx';
@@ -88,8 +92,8 @@ const AddKeychainSlideOver: React.FC<Props> = ({
       subheading={`Choose keychains to assign to ${personName}.`}
       size="large"
     >
-      <div className="flex h-full flex-col">
-        <div className="flex shrink-0 flex-col gap-3 px-3 pb-4 @lg/slide:px-6">
+      <VStack className="h-full">
+        <VStack gap={3} className="shrink-0 px-3 pb-4 @lg/slide:px-6">
           <Input
             type="text"
             value={searchQuery}
@@ -103,12 +107,15 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                 [`public`, `Public Keychains`, publicKeychainCount],
               ] as const
             ).map(([value, label, count]) => (
-              <button
+              <HStack
+                as="button"
                 key={value}
                 type="button"
+                justify="center"
+                gap={2}
                 onClick={() => setTab(value)}
                 className={cx(
-                  `flex items-center justify-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-[background-color,border-color,box-shadow,color] duration-100`,
+                  `rounded-lg border px-3 py-1.5 text-sm font-medium transition-[background-color,border-color,box-shadow,color] duration-100`,
                   tab === value
                     ? `border-stone-200 bg-white text-stone-900 shadow shadow-stone-300/30`
                     : `cursor-pointer border-transparent text-stone-600 hover:bg-stone-200/50`,
@@ -125,63 +132,63 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                 >
                   {count}
                 </span>
-              </button>
+              </HStack>
             ))}
           </div>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 @lg/slide:px-6">
+        </VStack>
+        <SlideOver.Body className="px-3 @lg/slide:px-6">
           {filteredKeychains.length > 0 ? (
             <div className="grid grid-cols-1 gap-2 @md/slide:grid-cols-2">
               {filteredKeychains.map((keychain) => {
                 const selected = selectedKeychainIds.includes(keychain.id);
                 const alreadyAssigned = assignedKeychainIds.includes(keychain.id);
                 const keychainButton = (
-                  <button
+                  <Card
+                    as="button"
                     key={keychain.id}
                     type="button"
+                    interactive
+                    selected={selected}
                     disabled={alreadyAssigned}
                     aria-pressed={selected}
                     onClick={() => toggleKeychain(keychain)}
-                    className={cx(
-                      `relative flex min-h-34 w-full flex-col rounded-xl border p-3 text-left shadow transition-[background-color,border-color,box-shadow,opacity] duration-150`,
-                      alreadyAssigned
-                        ? `cursor-not-allowed border-stone-200 bg-stone-100/70 opacity-60 shadow-transparent`
-                        : selected
-                          ? `cursor-pointer border-violet-300 bg-violet-50 shadow-violet-300/30 hover:border-violet-400 hover:shadow-violet-300/50`
-                          : `cursor-pointer border-stone-200 bg-white shadow-stone-300/30 hover:border-stone-400/70 hover:shadow-stone-300/70`,
-                    )}
+                    className="relative flex min-h-34 w-full flex-col text-left"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-medium text-stone-900">
-                            {keychain.name}
-                          </span>
+                    <HStack align="start" justify="between" gap={3}>
+                      <VStack className="min-w-0">
+                        <HStack wrap gap={2}>
+                          <Text variant="bodyLargeStrong">{keychain.name}</Text>
                           {keychain.isPublic && <Badge size="small">Public</Badge>}
-                        </div>
+                        </HStack>
                         {keychain.description && (
-                          <span className="mt-1 line-clamp-2 text-sm text-stone-600">
+                          <Text variant="bodySubtle" lineClamp={2} className="mt-1">
                             {keychain.description}
-                          </span>
+                          </Text>
                         )}
-                      </div>
+                      </VStack>
                       {selected && !alreadyAssigned && (
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-violet-200 bg-violet-500 text-white shadow shadow-violet-500/30">
+                        <HStack
+                          justify="center"
+                          className="h-5 w-5 shrink-0 rounded-full border border-violet-200 bg-violet-500 text-white shadow shadow-violet-500/30"
+                        >
                           <CheckIcon className="h-3 w-3" strokeWidth={3} />
-                        </span>
+                        </HStack>
                       )}
-                    </div>
-                    <div className="mt-auto flex items-center justify-between gap-3 pt-4">
-                      <span className="text-xs font-medium text-stone-500">
+                    </HStack>
+                    <HStack justify="between" gap={3} className="mt-auto pt-4">
+                      <Text variant="captionMuted">
                         {keychain.numKeys} {inflect(`key`, keychain.numKeys)}
-                      </span>
+                      </Text>
                       {alreadyAssigned && (
-                        <span className="rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
+                        <Text
+                          variant="captionSubtleStrong"
+                          className="rounded-full bg-stone-200 px-2 py-0.5"
+                        >
                           Already added
-                        </span>
+                        </Text>
                       )}
-                    </div>
-                  </button>
+                    </HStack>
+                  </Card>
                 );
 
                 return alreadyAssigned ? (
@@ -208,16 +215,16 @@ const AddKeychainSlideOver: React.FC<Props> = ({
               }
             />
           )}
-        </div>
-        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-stone-200 bg-stone-50/95 px-3 py-3 @lg/slide:px-6 @lg/slide:py-4">
-          <span className="text-sm text-stone-600">
+        </SlideOver.Body>
+        <SlideOver.Footer>
+          <Text variant="bodyMuted">
             {selectedKeychains.length === 0
               ? `Select one or more keychains`
               : `${selectedKeychains.length} ${inflect(
                   `keychain`,
                   selectedKeychains.length,
                 )} selected`}
-          </span>
+          </Text>
           <Button
             type="button"
             variant="primary"
@@ -231,8 +238,8 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                   selectedKeychains.length,
                 )}`}
           </Button>
-        </div>
-      </div>
+        </SlideOver.Footer>
+      </VStack>
     </SlideOver>
   );
 };

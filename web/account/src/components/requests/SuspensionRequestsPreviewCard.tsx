@@ -1,6 +1,8 @@
+import { Card, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
+import RequestReasonBubble from './RequestReasonBubble';
 import RightColumnCard from './RightColumnCard';
 
 interface Props {
@@ -24,27 +26,27 @@ const SuspensionRequestsPreviewCard: React.FC<Props> = ({
       },
     ]}
   >
-    <div className="bg-white border border-stone-200 rounded-xl p-3 flex flex-col shadow shadow-stone-300/30">
-      {suspensionRequests.slice(0, 3).map((request) => (
-        <a
-          key={request.id}
-          href={viewAllHref}
-          className="flex flex-col border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer gap-1.5"
-        >
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-stone-900">
-              {request.personName}
-            </span>
-            <span className="text-xs text-stone-600">{request.duration}</span>
-          </div>
-          {request.reason && (
-            <p className="text-stone-800 bg-stone-200 px-3.5 py-2.5 rounded-2xl rounded-tl w-fit self-start text-sm">
-              {request.reason}
-            </p>
-          )}
-        </a>
-      ))}
-    </div>
+    <Card padding={3}>
+      <VStack>
+        {suspensionRequests.slice(0, 3).map((request) => (
+          <VStack
+            as="a"
+            key={request.id}
+            href={viewAllHref}
+            gap={1.5}
+            className="border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer"
+          >
+            <VStack>
+              <Text variant="bodyStrong">{request.personName}</Text>
+              <Text variant="captionSubtle">{request.duration}</Text>
+            </VStack>
+            {request.reason && (
+              <RequestReasonBubble>{request.reason}</RequestReasonBubble>
+            )}
+          </VStack>
+        ))}
+      </VStack>
+    </Card>
   </RightColumnCard>
 );
 

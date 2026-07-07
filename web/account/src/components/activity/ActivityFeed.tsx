@@ -1,3 +1,4 @@
+import { Text, VStack } from '@gertrude/ui';
 import React from 'react';
 import type { ActivityItem } from '#/lib/activity';
 import ActivityPersonSection from '#/components/activity/ActivityPersonSection';
@@ -26,7 +27,9 @@ const ActivityFeed: React.FC<Props> = ({
   if (visibleItems.length === 0) {
     return (
       <CardContainer className="flex flex-col gap-4">
-        <span className="text-center text-sm text-stone-500">No activity to review.</span>
+        <Text variant="bodyMuted" className="text-center">
+          No activity to review.
+        </Text>
       </CardContainer>
     );
   }
@@ -36,7 +39,7 @@ const ActivityFeed: React.FC<Props> = ({
     : Array.from(groupBy(visibleItems, (item) => item.personName).entries());
 
   return (
-    <div className="flex flex-col gap-16">
+    <VStack gap={16}>
       {itemGroups.map(([groupPersonName, groupItems]) => (
         <ActivityPersonSection
           key={groupPersonName}
@@ -48,7 +51,7 @@ const ActivityFeed: React.FC<Props> = ({
           onDeleteAll={onDeletePersonActivity}
         />
       ))}
-    </div>
+    </VStack>
   );
 };
 

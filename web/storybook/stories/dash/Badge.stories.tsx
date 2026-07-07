@@ -43,7 +43,7 @@ const Badges: React.FC = () => (
 );
 
 const meta = {
-  title: 'Dashboard/Core/Badge', // eslint-disable-line
+  title: 'Dashboard/Core/Badge',
   component: Badges,
 } satisfies Meta<typeof Badges>;
 

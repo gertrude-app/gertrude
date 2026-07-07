@@ -31,7 +31,7 @@ export const Small: Story = props({
 });
 
 const meta = {
-  title: 'Dashboard/Core/GradientIcon', // eslint-disable-line
+  title: 'Dashboard/Core/GradientIcon',
   component: GradientGrid,
   argTypes: {
     size: {

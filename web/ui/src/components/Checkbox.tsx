@@ -1,6 +1,9 @@
 import cx from 'clsx';
 import { CheckIcon, MinusIcon } from 'lucide-react';
 import React from 'react';
+import HStack from '../primitives/HStack';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 
 interface Props {
   checked: boolean;
@@ -60,10 +63,12 @@ const Checkbox: React.FC<Props> = ({
         onChange={(event) => setChecked(event.target.checked)}
         className="peer sr-only"
       />
-      <span
+      <HStack
+        as="span"
+        justify="center"
         aria-hidden="true"
         className={cx(
-          `mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-[5px] border shadow-sm transition-[background-color,border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
+          `mt-0.5 h-4.5 w-4.5 shrink-0 rounded-[5px] border shadow-sm transition-[background-color,border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
           checked || indeterminate
             ? `border-violet-800 bg-violet-500 text-white shadow-violet-500/20`
             : `border-stone-300/80 bg-white text-transparent shadow-stone-300/30`,
@@ -74,16 +79,16 @@ const Checkbox: React.FC<Props> = ({
         ) : (
           <CheckIcon className="h-3.5 w-3.5" strokeWidth={3.5} />
         )}
-      </span>
+      </HStack>
       {(label || description) && (
-        <span className="flex min-w-0 translate-y-px flex-col">
-          {label && <span className="text-sm font-medium text-stone-800">{label}</span>}
+        <VStack as="span" className="min-w-0 translate-y-px">
+          {label && <Text variant="bodyStrong">{label}</Text>}
           {description && (
-            <span id={descriptionId} className="text-xs leading-5 text-stone-500">
+            <Text id={descriptionId} variant="captionMuted" className="leading-5">
               {description}
-            </span>
+            </Text>
           )}
-        </span>
+        </VStack>
       )}
     </label>
   );

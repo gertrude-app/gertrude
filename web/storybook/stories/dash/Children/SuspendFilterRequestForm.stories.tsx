@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/SuspendFilterRequestForm', // eslint-disable-line
+  title: 'Dashboard/Children/SuspendFilterRequestForm',
   component: SuspendFilterRequestForm,
   decorators: [
     (Story) => (

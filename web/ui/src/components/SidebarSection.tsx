@@ -1,4 +1,6 @@
 import React from 'react';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 
 interface Props {
   title?: string;
@@ -6,10 +8,12 @@ interface Props {
 }
 
 const SidebarSection: React.FC<Props> = ({ title, children }) => (
-  <div className="flex flex-col gap-2">
-    <span className="text-[13px] font-medium text-stone-500 select-none">{title}</span>
-    <div className="flex flex-col">{children}</div>
-  </div>
+  <VStack gap={2}>
+    <Text variant="label" className="select-none">
+      {title}
+    </Text>
+    <VStack>{children}</VStack>
+  </VStack>
 );
 
 export default SidebarSection;

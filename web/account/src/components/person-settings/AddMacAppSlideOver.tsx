@@ -1,5 +1,4 @@
-import { Button, SlideOver, Tooltip } from '@gertrude/ui';
-import cx from 'clsx';
+import { Button, Card, HStack, SlideOver, Text, Tooltip, VStack } from '@gertrude/ui';
 import { CheckIcon } from 'lucide-react';
 import React from 'react';
 import type { ConfiguredMacApp, InstalledMacApp } from '#/components/types';
@@ -104,8 +103,8 @@ const AddMacAppSlideOver: React.FC<Props> = ({
       subheading={`Choose one or more apps installed on ${personName}'s Mac.`}
       size="large"
     >
-      <div className="flex h-full flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 @lg/slide:px-6">
+      <VStack className="h-full">
+        <SlideOver.Body className="px-3 @lg/slide:px-6">
           <div className="grid grid-cols-2 gap-2 @md/slide:grid-cols-3">
             {installedApps.map((app) => {
               const selected = selectedInstalledAppIds.includes(app.id);
@@ -130,20 +129,16 @@ const AddMacAppSlideOver: React.FC<Props> = ({
                       ? `Remove this app from Unrestricted Apps before adding it to Blocked Apps.`
                       : null;
               const appButton = (
-                <button
+                <Card
+                  as="button"
                   key={app.id}
                   type="button"
+                  interactive
+                  selected={selected}
                   disabled={disabled}
                   aria-pressed={selected}
                   onClick={() => toggleSelectedInstalledApp(app)}
-                  className={cx(
-                    `group relative flex min-h-34 w-full flex-col items-center justify-center rounded-xl border p-3 text-center shadow transition-[background-color,border-color,box-shadow,opacity] duration-150`,
-                    disabled
-                      ? `cursor-not-allowed border-stone-200 bg-stone-100/70 opacity-60 shadow-transparent`
-                      : selected
-                        ? `cursor-pointer border-violet-300 bg-violet-50 shadow-violet-300/30 hover:border-violet-400 hover:shadow-violet-300/50`
-                        : `cursor-pointer border-stone-200 bg-white shadow-stone-300/30 hover:border-stone-400/70 hover:shadow-stone-300/70`,
-                  )}
+                  className="group relative flex min-h-34 w-full flex-col items-center justify-center text-center"
                 >
                   <div className="relative mb-2">
                     <img
@@ -157,21 +152,27 @@ const AddMacAppSlideOver: React.FC<Props> = ({
                       className="w-10 h-10 shadow rounded-[11px] relative"
                     />
                     {selected && !disabled && (
-                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border border-violet-200 bg-violet-500 text-white shadow shadow-violet-500/30">
+                      <HStack
+                        justify="center"
+                        className="absolute -right-1 -top-1 h-5 w-5 rounded-full border border-violet-200 bg-violet-500 text-white shadow shadow-violet-500/30"
+                      >
                         <CheckIcon className="h-3 w-3" strokeWidth={3} />
-                      </span>
+                      </HStack>
                     )}
                   </div>
-                  <span className="text-sm font-medium text-stone-800">{app.name}</span>
-                  <span className="mt-0.5 max-w-full truncate text-xs text-stone-500">
+                  <Text variant="bodyStrong">{app.name}</Text>
+                  <Text variant="captionMuted" truncate className="mt-0.5 max-w-full">
                     {app.bundleId}
-                  </span>
+                  </Text>
                   {disabledLabel && (
-                    <span className="mt-2 rounded-full bg-stone-200 px-2 py-0.5 text-xs font-medium text-stone-600">
+                    <Text
+                      variant="captionSubtleStrong"
+                      className="mt-2 rounded-full bg-stone-200 px-2 py-0.5"
+                    >
                       {disabledLabel}
-                    </span>
+                    </Text>
                   )}
-                </button>
+                </Card>
               );
 
               return disabledTooltip ? (
@@ -183,15 +184,15 @@ const AddMacAppSlideOver: React.FC<Props> = ({
               );
             })}
           </div>
-        </div>
-        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-stone-200 bg-stone-50/95 px-3 py-3 @lg/slide:px-6 @lg/slide:py-4">
-          <span className="text-sm text-stone-600">
+        </SlideOver.Body>
+        <SlideOver.Footer>
+          <Text variant="bodyMuted">
             {selectedInstalledApps.length === 0
               ? `Select one or more apps`
               : `${selectedInstalledApps.length} app${
                   selectedInstalledApps.length === 1 ? `` : `s`
                 } selected`}
-          </span>
+          </Text>
           <Button
             type="button"
             variant="primary"
@@ -210,8 +211,8 @@ const AddMacAppSlideOver: React.FC<Props> = ({
                     selectedInstalledApps.length === 1 ? `` : `s`
                   } to Blocked Apps`}
           </Button>
-        </div>
-      </div>
+        </SlideOver.Footer>
+      </VStack>
     </SlideOver>
   );
 };

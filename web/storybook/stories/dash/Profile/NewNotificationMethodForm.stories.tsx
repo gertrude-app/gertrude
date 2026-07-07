@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { fixedViewport, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Settings/NewNotificationMethodForm', // eslint-disable-line
+  title: 'Dashboard/Settings/NewNotificationMethodForm',
   component: NewNotificationMethodForm,
   ...fixedViewport(385, 812),
 } satisfies Meta<typeof NewNotificationMethodForm>;

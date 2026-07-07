@@ -1,4 +1,4 @@
-import { Badge, inflect } from '@gertrude/ui';
+import { Badge, Card, HStack, Text, VStack, inflect } from '@gertrude/ui';
 import { formatDate } from '@shared/datetime';
 import React from 'react';
 import type { ActivityReviewStats, DaySummary } from '#/lib/activity';
@@ -20,7 +20,9 @@ const ActivityOverviewList: React.FC<Props> = ({
   if (days.length === 0) {
     return (
       <CardContainer className="flex flex-col gap-4">
-        <span className="text-center text-sm text-stone-500">{emptyText}</span>
+        <Text variant="bodyMuted" className="text-center">
+          {emptyText}
+        </Text>
       </CardContainer>
     );
   }
@@ -40,18 +42,14 @@ const ActivityOverviewList: React.FC<Props> = ({
         ))}
       </CardContainer>
       {oldestDate && (
-        <span className="text-center text-sm text-stone-400">
+        <Text variant="captionMuted" className="text-center">
           Items from before {formatDate(oldestDate, `short`)} have been automatically
           deleted.
-        </span>
+        </Text>
       )}
     </>
   );
 };
-
-const cardClassName =
-  `border border-stone-200 bg-white rounded-xl shadow shadow-stone-300/30 relative flex flex-col p-3 ` +
-  `hover:border-stone-300 hover:shadow-stone-400/60 transition-[border-color,box-shadow] duration-100`;
 
 interface ActivityOverviewDayCardProps {
   dayLink: DayLinkTarget;
@@ -71,9 +69,14 @@ const ActivityOverviewDayCard: React.FC<ActivityOverviewDayCardProps> = ({
       : `/activity/day/${day}`;
 
   return (
-    <a href={href} className={cardClassName}>
+    <Card
+      as="a"
+      href={href}
+      padding={3}
+      className="relative transition-[border-color,box-shadow] duration-100 hover:border-stone-300 hover:shadow-stone-400/60"
+    >
       <DayCardBody date={date} stats={stats} />
-    </a>
+    </Card>
   );
 };
 
@@ -81,16 +84,16 @@ const DayCardBody: React.FC<{ date: Date; stats: ActivityReviewStats }> = ({
   date,
   stats,
 }) => (
-  <>
-    <span className="text-xs text-stone-600">{formatDate(date, `short`)}</span>
-    <span className="flex items-end gap-1 mt-0.5">
-      <span className="text-xl font-medium text-stone-900">
+  <VStack>
+    <Text variant="captionSubtle">{formatDate(date, `short`)}</Text>
+    <HStack align="end" gap={1} className="mt-0.5">
+      <Text variant="title">
         {stats.reviewedCount}/{stats.totalCount}
-      </span>
-      <span className="text-sm text-stone-600 mb-0.5">
+      </Text>
+      <Text variant="bodySubtle" className="mb-0.5">
         {inflect(`item`, stats.totalCount)} reviewed
-      </span>
-    </span>
+      </Text>
+    </HStack>
     <div className="h-2 w-full bg-stone-200/70 rounded-full relative overflow-hidden mt-4">
       <div
         className="h-full bg-violet-400"
@@ -102,7 +105,7 @@ const DayCardBody: React.FC<{ date: Date; stats: ActivityReviewStats }> = ({
         {stats.flaggedCount} flagged
       </Badge>
     )}
-  </>
+  </VStack>
 );
 
 export default ActivityOverviewList;

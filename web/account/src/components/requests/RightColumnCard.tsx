@@ -1,4 +1,4 @@
-import { Button } from '@gertrude/ui';
+import { Button, HStack, Text, VStack } from '@gertrude/ui';
 import React from 'react';
 import type { ButtonLink } from '#/components/types';
 
@@ -9,11 +9,13 @@ interface Props {
 }
 
 const RightColumnCard: React.FC<Props> = ({ children, title, links }) => (
-  <div className="bg-stone-50 border border-stone-200 rounded-2xl p-1.25 flex flex-col gap-0.75">
-    <span className="text-xs font-medium text-stone-600 ml-3">{title}</span>
+  <VStack gap={1} className="bg-stone-50 border border-stone-200 rounded-2xl p-1.25">
+    <Text variant="captionSubtleStrong" className="ml-3">
+      {title}
+    </Text>
     {children}
     {links && (
-      <div className="flex justify-end">
+      <HStack justify="end">
         {links.map((link) => (
           <Button
             key={`${link.href}-${link.text}`}
@@ -27,9 +29,9 @@ const RightColumnCard: React.FC<Props> = ({ children, title, links }) => (
             {link.text}
           </Button>
         ))}
-      </div>
+      </HStack>
     )}
-  </div>
+  </VStack>
 );
 
 export default RightColumnCard;

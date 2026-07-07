@@ -1,6 +1,8 @@
 import cx from 'clsx';
 import { type LucideIcon } from 'lucide-react';
 import React from 'react';
+import Text from '../primitives/Text';
+import VStack from '../primitives/VStack';
 import Button from './Button';
 
 interface Props {
@@ -31,15 +33,21 @@ const EmptyState: React.FC<Props> = ({
   button,
   className,
 }) => (
-  <div
+  <VStack
+    align="center"
+    justify="center"
     className={cx(
-      `flex flex-col items-center justify-center rounded-xl bg-stone-50 px-6 py-6 text-center bg-dots border border-stone-200`,
+      `rounded-xl bg-stone-50 px-6 py-6 text-center bg-dots border border-stone-200`,
       className,
     )}
   >
     <Icon className="h-6 w-6 text-stone-600" />
-    <span className="mt-2 font-medium text-stone-900">{title}</span>
-    <span className={cx(`text-sm text-stone-500`, button && `mb-4`)}>{description}</span>
+    <Text variant="bodyStrong" className="mt-2 text-base">
+      {title}
+    </Text>
+    <Text variant="bodyMuted" className={cx(`mt-0.5`, button && `mb-4`)}>
+      {description}
+    </Text>
     {button &&
       (button.type === `link` ? (
         <Button
@@ -60,7 +68,7 @@ const EmptyState: React.FC<Props> = ({
           {button.text}
         </Button>
       ))}
-  </div>
+  </VStack>
 );
 
 export default EmptyState;

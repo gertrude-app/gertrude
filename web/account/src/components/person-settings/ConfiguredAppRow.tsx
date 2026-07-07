@@ -1,4 +1,13 @@
-import { Button, DropdownMenu, DropdownMenuItem } from '@gertrude/ui';
+import {
+  Button,
+  Card,
+  Divider,
+  DropdownMenu,
+  DropdownMenuItem,
+  HStack,
+  Text,
+  VStack,
+} from '@gertrude/ui';
 import { EllipsisIcon, TrashIcon, XIcon } from 'lucide-react';
 import React from 'react';
 import type { ConfiguredMacApp, Schedule } from '#/components/types';
@@ -12,8 +21,8 @@ interface Props {
 }
 
 const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
-  <div className="flex items-center justify-between border gap-2 p-3 rounded-xl border-stone-200 shadow shadow-stone-300/30 bg-white">
-    <div className="flex items-center gap-3">
+  <Card padding={3} className="flex items-center justify-between gap-2">
+    <HStack gap={3}>
       <div className="shrink-0">
         <img
           src={app.appIconUrl}
@@ -26,18 +35,18 @@ const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
           className="w-10 h-10 shadow rounded-[11px] relative"
         />
       </div>
-      <div className="flex flex-col">
-        <span className="font-medium text-stone-800">{app.nameOrBundleId}</span>
+      <VStack>
+        <Text variant="bodyStrong">{app.nameOrBundleId}</Text>
         {app.schedule && (
-          <span className="text-xs text-stone-600 -mt-0.25">
+          <Text variant="captionSubtle" className="-mt-0.25">
             {formatSchedule(app.schedule)}
-          </span>
+          </Text>
         )}
-      </div>
-    </div>
+      </VStack>
+    </HStack>
     {setSchedule ? (
       <>
-        <div className="hidden items-center gap-2 sm:flex">
+        <HStack gap={2} hideBelow="sm">
           <ScheduleButton schedule={app.schedule} setSchedule={setSchedule} />
           <Button
             type="button"
@@ -47,7 +56,7 @@ const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
             size="small"
             variant="ghost"
           />
-        </div>
+        </HStack>
         <div className="sm:hidden">
           <DropdownMenu
             contentClassName="w-82"
@@ -62,7 +71,8 @@ const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
             }
           >
             <ScheduleEditor schedule={app.schedule} setSchedule={setSchedule} />
-            <div className="mx-1 border-t border-stone-200 pt-1">
+            <div className="mx-1 pt-1">
+              <Divider />
               <DropdownMenuItem
                 title="Remove App"
                 icon={TrashIcon}
@@ -83,7 +93,7 @@ const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
         variant="ghost"
       />
     )}
-  </div>
+  </Card>
 );
 
 export default ConfiguredAppRow;

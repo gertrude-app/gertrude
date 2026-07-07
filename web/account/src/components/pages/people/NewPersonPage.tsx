@@ -1,4 +1,4 @@
-import { Banner, Input } from '@gertrude/ui';
+import { Banner, HStack, Input, Stack, VStack } from '@gertrude/ui';
 import { UserIcon } from 'lucide-react';
 import React from 'react';
 import CreationFlowScreen from '#/components/people/CreationFlowScreen';
@@ -34,15 +34,19 @@ const NewPersonPage: React.FC<Props> = ({
         {
           title: `What is this person's relationship to you?`,
           element: (
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col @lg/main:flex-row gap-2 @lg/main:gap-4 self-stretch">
+            <VStack gap={4}>
+              <Stack
+                direction={{ default: `vertical`, '@lg/main': `horizontal` }}
+                gap={{ default: 2, '@lg/main': 4 }}
+                className="self-stretch"
+              >
                 <NewPersonRelationshipCard
                   title="Your child"
                   icon={
-                    <div className="flex items-end">
+                    <HStack align="end">
                       <UserIcon className="w-8 h-8" />
                       <UserIcon strokeWidth={2.5} className="w-5.5 h-5.5 -ml-1 mb-0.25" />
-                    </div>
+                    </HStack>
                   }
                   selected={relationship === `child`}
                   onClick={() => setRelationship(`child`)}
@@ -50,10 +54,10 @@ const NewPersonPage: React.FC<Props> = ({
                 <NewPersonRelationshipCard
                   title="A peer or accountability partner"
                   icon={
-                    <div className="flex">
+                    <HStack>
                       <UserIcon className="w-8 h-8" />
                       <UserIcon className="w-8 h-8 -ml-1" />
-                    </div>
+                    </HStack>
                   }
                   selected={relationship === `peer`}
                   onClick={() => setRelationship(`peer`)}
@@ -64,7 +68,7 @@ const NewPersonPage: React.FC<Props> = ({
                   selected={relationship === `self`}
                   onClick={() => setRelationship(`self`)}
                 />
-              </div>
+              </Stack>
               {relationship === `self` && (
                 <Banner variant="warning">
                   By far the best way to protect and help yourself is by having someone
@@ -74,7 +78,7 @@ const NewPersonPage: React.FC<Props> = ({
                   hotline at 1-800-GERTRUDE and we'll help you out.
                 </Banner>
               )}
-            </div>
+            </VStack>
           ),
           nextEnabled: relationship !== null,
         },

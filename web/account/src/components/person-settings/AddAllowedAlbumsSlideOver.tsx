@@ -1,4 +1,4 @@
-import { Button, EmptyState, Input, SlideOver } from '@gertrude/ui';
+import { Button, EmptyState, Input, SlideOver, Text, VStack } from '@gertrude/ui';
 import { MusicIcon } from 'lucide-react';
 import React from 'react';
 import type { AllowedAlbum } from '#/components/types';
@@ -85,7 +85,7 @@ const AddAllowedAlbumsSlideOver: React.FC<Props> = ({
       subheading="Search for albums to allow in Gertrude Music."
       size="large"
     >
-      <div className="flex h-full flex-col">
+      <VStack className="h-full">
         <div className="shrink-0 px-3 pb-4 @lg/slide:px-6">
           <Input
             type="text"
@@ -94,7 +94,7 @@ const AddAllowedAlbumsSlideOver: React.FC<Props> = ({
             placeholder="Search albums or artists..."
           />
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4 @lg/slide:px-6">
+        <SlideOver.Body className="px-3 @lg/slide:px-6">
           {filteredAlbumCatalog.length > 0 ? (
             <div className="grid grid-cols-2 gap-4 @md/slide:grid-cols-3">
               {filteredAlbumCatalog.map((album) => {
@@ -122,13 +122,13 @@ const AddAllowedAlbumsSlideOver: React.FC<Props> = ({
               description="Try a different album title or artist."
             />
           )}
-        </div>
-        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-stone-200 bg-stone-50/95 px-3 py-3 @lg/slide:px-6 @lg/slide:py-4">
-          <span className="text-sm text-stone-600">
+        </SlideOver.Body>
+        <SlideOver.Footer>
+          <Text variant="bodyMuted">
             {selectedAlbums.length === 0
               ? `Select one or more albums`
               : `${selectedAlbums.length} album${selectedAlbums.length === 1 ? `` : `s`} selected`}
-          </span>
+          </Text>
           <Button
             type="button"
             variant="primary"
@@ -139,8 +139,8 @@ const AddAllowedAlbumsSlideOver: React.FC<Props> = ({
               ? `Add Album`
               : `Add ${selectedAlbums.length} Album${selectedAlbums.length === 1 ? `` : `s`}`}
           </Button>
-        </div>
-      </div>
+        </SlideOver.Footer>
+      </VStack>
     </SlideOver>
   );
 };

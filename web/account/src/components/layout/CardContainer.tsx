@@ -1,3 +1,4 @@
+import { HStack, Stack, Text } from '@gertrude/ui';
 import cx from 'clsx';
 import React from 'react';
 
@@ -32,42 +33,46 @@ const CardContainer: React.FC<Props> = ({
       )}
     >
       {hasHeader && (
-        <div
-          className={cx(
-            `flex flex-col gap-3 @2xl/main:flex-row @2xl/main:items-start`,
-            hasHeaderText ? `@2xl/main:justify-between` : `@2xl/main:justify-end`,
-          )}
+        <Stack
+          direction={{ default: `vertical`, '@2xl/main': `horizontal` }}
+          gap={3}
+          align={{ default: `stretch`, '@2xl/main': `start` }}
+          justify={hasHeaderText ? `between` : `end`}
         >
           {hasHeaderText && (
             <div className="min-w-0">
               {hasHeading && (
-                <h2
-                  className={cx(
-                    `text-lg font-medium`,
-                    dangerZone ? `text-red-950/90` : `text-stone-900`,
-                  )}
+                <Text
+                  as="h2"
+                  variant="heading"
+                  className={cx(dangerZone ? `text-red-950/90` : `text-stone-900`)}
                 >
                   {heading}
-                </h2>
+                </Text>
               )}
               {hasSubheading && (
-                <p
-                  className={cx(
-                    `text-sm`,
-                    dangerZone ? `text-red-900/70` : `text-stone-500`,
-                  )}
+                <Text
+                  as="p"
+                  variant="bodyMuted"
+                  className={cx(dangerZone && `text-red-900/70`)}
                 >
                   {subheading}
-                </p>
+                </Text>
               )}
             </div>
           )}
           {buttons !== undefined && (
-            <div className="flex shrink-0 flex-wrap items-center gap-2 @2xl/main:justify-end">
+            <HStack
+              as="div"
+              wrap
+              gap={2}
+              justify={{ '@2xl/main': `end` }}
+              className="shrink-0"
+            >
               {buttons}
-            </div>
+            </HStack>
           )}
-        </div>
+        </Stack>
       )}
       {children}
     </div>
