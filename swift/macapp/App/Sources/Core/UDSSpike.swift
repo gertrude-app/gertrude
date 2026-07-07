@@ -20,9 +20,13 @@ public enum UDSSpikeMessage: Codable, Equatable, Sendable {
   case pong(seq: Int)
   case filterPush(seq: Int)
   case pushAck(seq: Int)
+  case blob(seq: Int, data: Data)
+  case blobAck(seq: Int, byteCount: Int, checksum: UInt32)
 }
 
 public enum UDSFrame {
+  public static let maxPayloadBytes = 16 * 1024 * 1024
+
   public static func encode(_ msg: UDSSpikeMessage) throws -> Data {
     let payload = try JSONEncoder().encode(msg)
     var length = UInt32(payload.count).bigEndian
@@ -30,12 +34,23 @@ public enum UDSFrame {
     data.append(payload)
     return data
   }
+
+  public static func checksum(_ data: Data) -> UInt32 {
+    var hash: UInt32 = 2_166_136_261
+    for byte in data {
+      hash = (hash ^ UInt32(byte)) &* 16_777_619
+    }
+    return hash
+  }
 }
 
 public final class UDSFrameParser {
   private var buffer = Data()
+  private let maxPayloadBytes: Int
 
-  public init() {}
+  public init(maxPayloadBytes: Int = UDSFrame.maxPayloadBytes) {
+    self.maxPayloadBytes = maxPayloadBytes
+  }
 
   public func append(_ chunk: Data) -> [UDSSpikeMessage] {
     self.buffer.append(chunk)
@@ -43,7 +58,7 @@ public final class UDSFrameParser {
     while self.buffer.count >= 4 {
       let lengthBytes = [UInt8](self.buffer.prefix(4))
       let length = lengthBytes.reduce(UInt32(0)) { ($0 << 8) | UInt32($1) }
-      guard length <= 1024 * 1024 else {
+      guard length <= self.maxPayloadBytes else {
         self.buffer.removeAll()
         break
       }

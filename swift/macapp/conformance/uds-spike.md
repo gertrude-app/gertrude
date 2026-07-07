@@ -30,6 +30,9 @@ never activates without the marker file (see Gating below).
 - `App/Tests/MacSimTests/UDSSpikeTests.swift` — 3 local tests (round-trip, peer
   rejection, rebind/reconnect) over temp-dir sockets; run with
   `just macapp-test --filter UDSSpikeTests`.
+- `App/Tests/MacSimTests/UDSSpikePayloadTests.swift` — 5 local tests added
+  2026-07-07 with the write queue (see §Large-payload / write-queue
+  validation).
 
 ## Success criteria — all witnessed
 
@@ -132,6 +135,41 @@ requirement, not just bundle id string) — same token, same API family.
 - VM `/tmp` is wiped on reboot: re-upload tarballs/scripts after any reboot
   witness.
 
+## Large-payload / write-queue validation (2026-07-07) ✅
+
+The one untested wire-level behavior from the original spike (only <1KB frames
+had ever crossed the channel) is now validated locally, and the server's
+usleep write-retry is replaced with a real write queue. Tests in
+`App/Tests/MacSimTests/UDSSpikePayloadTests.swift`
+(`just macapp-test --filter UDSSpikePayloadTests`).
+
+- **Realistic max `userRules` size measured**: a synthetic 10,000-key user
+  (40 keychains × 250 keys, far past the heaviest real users) plus a
+  2,000-app manifest encodes to **~2.2MB** JSON (filterData 1.92MB +
+  manifest 0.26MB). The frame parser's cap was raised 1MB → 16MB
+  (configurable), giving >7x headroom; the test asserts ≥4x.
+- **Old send path witnessed failing first**: with a reader stalled 500ms
+  (kernel buffer full), the usleep retry burned its 100×1ms budget and
+  killed the connection — reader saw EOF mid-frame, all pending frames lost.
+  Exactly the inadequacy ledger 11 predicted.
+- **Replacement: per-connection write queue** — outbound chunk array +
+  offset (no O(n) re-copying), drained opportunistically on send and by a
+  writability `DispatchSource` armed only while bytes are pending
+  (suspend/resume balanced against the release-while-suspended crash);
+  EAGAIN arms the source and returns instead of blocking the serial server
+  queue (the usleep also stalled *all* connections; the queue stalls none).
+- **Overflow policy**: 64MB default cap (configurable); a peer that never
+  drains gets its connection closed — same remedy as every other channel
+  failure, the client reconnect loop. Witnessed via a never-reading raw
+  client tripping a 2MB test cap.
+- **Witnessed green**: 6×1MB filter→app burst (~8MB wire) against a raw
+  slow reader pinned to an 8KB `SO_RCVBUF` — all frames arrive intact, in
+  order, connection stays open; 8×2MB app→filter burst (~21MB wire) all
+  acked with matching checksums; 4MB single-frame round trips both
+  directions. The NW client side needed no change (NW buffers internally).
+- Not re-witnessed on VM: pure userspace/kernel-socket behavior, identical
+  on VM; local results were unsurprising, per plan VM witness skipped.
+
 ## UDS vs XPC — comparative assessment (post-spike, discussed with Jared)
 
 Not *strictly* better — better on exactly the axis costing us field reliability,
@@ -179,8 +217,9 @@ Honest costs / risks:
   forces a socket-path rethink).
 - **The honest gap:** the chronic per-machine wedge was never reproduced, so
   "UDS is immune" is a structural argument (no registration to go stale), not a
-  witnessed one. Also untested: fast-user-switching with two live GUI sessions;
-  behavior under real load (block-streaming bursts vs kernel socket buffers).
+  witnessed one. Also untested: fast-user-switching with two live GUI sessions.
+  (Load behavior — large-frame bursts vs kernel socket buffers — was untested
+  at spike time; now validated, see §Large-payload / write-queue validation.)
 
 Position: switch, but via the dark-ship route — implement the
 `FilterXPCClient` interface over UDS, run both channels side by side reporting
@@ -219,11 +258,10 @@ changes.
   fleet's chronic-wedge machines — unreproducible locally (40/40 clean VM
   attempts) — answer directly. "XPC dead / UDS alive and round-tripping" on
   those machines closes the case with field evidence.
-- **Payload-size validation (do early in phase A)**: `userRules` with full
-  keychains is the largest message crossing the channel; the write queue must
-  be tested against real kernel socket-buffer limits (burst of large frames +
-  slow reader), not the spike's toy retry. The spike only ever moved <1KB
-  frames — this is the one untested wire-level behavior.
+- **Payload-size validation — DONE (2026-07-07)**: see §Large-payload /
+  write-queue validation above. The write queue exists and is validated
+  against kernel socket-buffer limits on the spike branch; phase A promotes
+  it rather than building it.
 
 ### Phase B — flip (small code, gated on field data)
 

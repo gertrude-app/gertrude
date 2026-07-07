@@ -18,18 +18,25 @@ public final class UDSSpikeServer: @unchecked Sendable {
     let fd: Int32
     let uid: uid_t
     let source: DispatchSourceRead
+    let writeSource: DispatchSourceWrite
     let parser = UDSFrameParser()
+    var outbound: [Data] = []
+    var outboundOffset = 0
+    var outboundBytes = 0
+    var writeSourceArmed = false
 
-    init(fd: Int32, uid: uid_t, source: DispatchSourceRead) {
+    init(fd: Int32, uid: uid_t, source: DispatchSourceRead, writeSource: DispatchSourceWrite) {
       self.fd = fd
       self.uid = uid
       self.source = source
+      self.writeSource = writeSource
     }
   }
 
   private let queue = DispatchQueue(label: "com.netrivet.gertrude.uds-spike-server")
   private let rootDir: String
   private let pushInterval: TimeInterval
+  private let maxOutboundBytes: Int
   private let validatePeer: PeerValidation
   private var listeners: [uid_t: Listener] = [:]
   private var conns: [Int32: Conn] = [:]
@@ -40,10 +47,12 @@ public final class UDSSpikeServer: @unchecked Sendable {
   public init(
     rootDir: String = UDSSpike.socketDir,
     pushInterval: TimeInterval = 30,
+    maxOutboundBytes: Int = 64 * 1024 * 1024,
     validatePeer: @escaping PeerValidation,
   ) {
     self.rootDir = rootDir
     self.pushInterval = pushInterval
+    self.maxOutboundBytes = maxOutboundBytes
     self.validatePeer = validatePeer
   }
 
@@ -88,11 +97,9 @@ public final class UDSSpikeServer: @unchecked Sendable {
     self.queue.sync {
       self.pushTimer?.cancel()
       self.pushTimer = nil
-      for conn in self.conns.values {
-        conn.source.cancel()
-        close(conn.fd)
+      for conn in Array(self.conns.values) {
+        self.closeConn(conn)
       }
-      self.conns = [:]
       for listener in self.listeners.values {
         listener.source.cancel()
         close(listener.fd)
@@ -104,6 +111,14 @@ public final class UDSSpikeServer: @unchecked Sendable {
 
   public func snapshot() -> (received: [UDSSpikeMessage], connectionCount: Int) {
     self.queue.sync { (self.receivedLog, self.conns.count) }
+  }
+
+  public func broadcast(_ msg: UDSSpikeMessage) {
+    self.queue.async {
+      for conn in self.conns.values {
+        self.send(msg, to: conn)
+      }
+    }
   }
 
   static func discoverUids() -> [uid_t] {
@@ -211,9 +226,13 @@ public final class UDSSpikeServer: @unchecked Sendable {
     _ = fcntl(fd, F_SETFL, flags | O_NONBLOCK)
 
     let source = DispatchSource.makeReadSource(fileDescriptor: fd, queue: self.queue)
-    let conn = Conn(fd: fd, uid: uid, source: source)
+    let writeSource = DispatchSource.makeWriteSource(fileDescriptor: fd, queue: self.queue)
+    let conn = Conn(fd: fd, uid: uid, source: source, writeSource: writeSource)
     source.setEventHandler { [weak self] in
       self?.readAvailable(from: conn)
+    }
+    writeSource.setEventHandler { [weak self] in
+      self?.drainOutbound(conn)
     }
     source.resume()
     self.conns[fd] = conn
@@ -259,7 +278,13 @@ public final class UDSSpikeServer: @unchecked Sendable {
       self.send(.pong(seq: seq), to: conn)
     case .pushAck(let seq):
       os_log("[G•] UDS server: received pushAck %{public}d (filter->app->filter proven)", seq)
-    case .helloAck, .pong, .filterPush:
+    case .blob(let seq, let data):
+      os_log("[G•] UDS server: received blob %{public}d, %{public}d bytes", seq, data.count)
+      self.send(
+        .blobAck(seq: seq, byteCount: data.count, checksum: UDSFrame.checksum(data)),
+        to: conn,
+      )
+    case .helloAck, .pong, .filterPush, .blobAck:
       os_log("[G•] UDS server: unexpected message: %{public}s", "\(msg)")
     }
   }
@@ -269,28 +294,62 @@ public final class UDSSpikeServer: @unchecked Sendable {
       os_log("[G•] UDS server: encode failed")
       return
     }
-    let result: Bool = data.withUnsafeBytes { bytes in
-      var sent = 0
-      var attempts = 0
-      while sent < data.count {
-        let n = Darwin.send(conn.fd, bytes.baseAddress! + sent, data.count - sent, 0)
-        if n > 0 {
-          sent += n
-        } else if errno == EAGAIN, attempts < 100 {
-          attempts += 1
-          usleep(1000)
-        } else if errno == EINTR {
-          continue
-        } else {
-          return false
-        }
-      }
-      return true
-    }
-    if !result {
-      os_log("[G•] UDS server: send failed: %{public}s", String(cString: strerror(errno)))
+    guard conn.outboundBytes + data.count <= self.maxOutboundBytes else {
+      os_log(
+        "[G•] UDS server: outbound buffer overflow (%{public}d pending), closing uid %{public}d",
+        conn.outboundBytes,
+        conn.uid,
+      )
       self.closeConn(conn)
+      return
     }
+    conn.outbound.append(data)
+    conn.outboundBytes += data.count
+    self.drainOutbound(conn)
+  }
+
+  private func drainOutbound(_ conn: Conn) {
+    guard self.conns[conn.fd] === conn else { return }
+    while let chunk = conn.outbound.first {
+      let n = chunk.withUnsafeBytes { bytes in
+        Darwin.send(
+          conn.fd,
+          bytes.baseAddress! + conn.outboundOffset,
+          chunk.count - conn.outboundOffset,
+          0,
+        )
+      }
+      if n > 0 {
+        conn.outboundOffset += n
+        conn.outboundBytes -= n
+        if conn.outboundOffset == chunk.count {
+          conn.outbound.removeFirst()
+          conn.outboundOffset = 0
+        }
+      } else if errno == EAGAIN {
+        self.armWriteSource(conn)
+        return
+      } else if errno == EINTR {
+        continue
+      } else {
+        os_log("[G•] UDS server: send failed: %{public}s", String(cString: strerror(errno)))
+        self.closeConn(conn)
+        return
+      }
+    }
+    self.disarmWriteSource(conn)
+  }
+
+  private func armWriteSource(_ conn: Conn) {
+    guard !conn.writeSourceArmed else { return }
+    conn.writeSourceArmed = true
+    conn.writeSource.resume()
+  }
+
+  private func disarmWriteSource(_ conn: Conn) {
+    guard conn.writeSourceArmed else { return }
+    conn.writeSourceArmed = false
+    conn.writeSource.suspend()
   }
 
   private func startPushTimer() {
@@ -312,6 +371,10 @@ public final class UDSSpikeServer: @unchecked Sendable {
 
   private func closeConn(_ conn: Conn) {
     conn.source.cancel()
+    if !conn.writeSourceArmed {
+      conn.writeSource.resume()
+    }
+    conn.writeSource.cancel()
     close(conn.fd)
     self.conns[conn.fd] = nil
   }

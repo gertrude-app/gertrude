@@ -47,6 +47,10 @@ public final class UDSSpikeClient: @unchecked Sendable {
     self.queue.sync { self.receivedLog }
   }
 
+  public func send(_ msg: UDSSpikeMessage) {
+    self.queue.async { self.sendMsg(msg) }
+  }
+
   private func connect() {
     self.parser = UDSFrameParser()
     let conn = NWConnection(to: .unix(path: self.socketPath), using: .tcp)
@@ -117,6 +121,11 @@ public final class UDSSpikeClient: @unchecked Sendable {
     case .filterPush(let seq):
       os_log("[G•] UDS client: received filterPush %{public}d, acking", seq)
       self.sendMsg(.pushAck(seq: seq))
+    case .blob(let seq, let data):
+      os_log("[G•] UDS client: received blob %{public}d, %{public}d bytes, acking", seq, data.count)
+      self.sendMsg(.blobAck(seq: seq, byteCount: data.count, checksum: UDSFrame.checksum(data)))
+    case .blobAck(let seq, let byteCount, _):
+      os_log("[G•] UDS client: received blobAck %{public}d, %{public}d bytes", seq, byteCount)
     case .hello, .ping, .pushAck:
       os_log("[G•] UDS client: unexpected message: %{public}s", "\(msg)")
     }
