@@ -14,6 +14,8 @@ struct ClaimMusicDevice: Pair {
     let modelName: String
     let iosVersion: String
     let code: Int
+    let childId: Child.Id
+    let deviceId: IOSDevice.Id
   }
 }
 
@@ -53,6 +55,8 @@ extension ClaimMusicDevice: Resolver {
       modelName: device.modelName,
       iosVersion: device.iosVersion,
       code: code,
+      childId: child.id,
+      deviceId: device.id,
     )
   }
 

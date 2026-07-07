@@ -14,7 +14,12 @@ struct GetAmClaimData: Pair {
 
   @TSCodable
   enum ResumeStep: Equatable, Sendable {
-    case done(amSubscription: AmSubscriptionState, childName: String)
+    case done(
+      amSubscription: AmSubscriptionState,
+      childName: String,
+      childId: Child.Id,
+      deviceId: IOSDevice.Id,
+    )
   }
 
   struct Output: PairOutput {
@@ -48,6 +53,8 @@ extension GetAmClaimData: Resolver {
           resumeStep: .done(
             amSubscription: account.amSubscriptionState(forInstall: install),
             childName: child.name,
+            childId: child.id,
+            deviceId: device.id,
           ),
         )
       },
@@ -76,6 +83,8 @@ extension GetAmClaimData: Resolver {
           resumeStep: .done(
             amSubscription: account.amSubscriptionState(forInstall: install),
             childName: child.name,
+            childId: child.id,
+            deviceId: device.id,
           ),
         )
       },

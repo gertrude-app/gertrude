@@ -68,7 +68,7 @@ const ClaimPodcastsDeviceScreen: React.FC<{
         accessEndsAt={accessEndsAt}
         trialDaysRemaining={trialDaysRemaining}
         showSubscribe={showSubscribe}
-        onBackToDashboard={() => {}}
+        onManageSettings={() => {}}
         onSubscribe={() => {}}
         onMaybeLater={() => {}}
       />

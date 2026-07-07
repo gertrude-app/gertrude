@@ -38,7 +38,8 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.children).toEqual([])
     expect(output.modelName).toEqual(device.modelName)
     expect(output.iosVersion).toEqual(device.iosVersion)
-    expect(output.resumeStep).toEqual(.done(childName: child.name))
+    expect(output.resumeStep)
+      .toEqual(.done(childName: child.name, childId: child.id, deviceId: device.id))
     expect(output.paymentAction).toBeNil()
   }
 
@@ -86,7 +87,8 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
       in: parent.context,
     )
 
-    expect(output.resumeStep).toEqual(.done(childName: child.name))
+    expect(output.resumeStep)
+      .toEqual(.done(childName: child.name, childId: child.id, deviceId: device.id))
     expect(output.children).toEqual([])
     let completed = try await Claim.find(code: claim.code, in: self.db)
     expect(completed?.childId).toEqual(child.id)

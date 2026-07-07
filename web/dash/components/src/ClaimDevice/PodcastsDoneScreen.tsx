@@ -14,7 +14,7 @@ const PodcastsDoneScreen: React.FC<{
   accessEndsAt?: string;
   trialDaysRemaining?: number;
   showSubscribe?: boolean;
-  onBackToDashboard: () => void;
+  onManageSettings: () => void;
   onSubscribe: () => void;
   onMaybeLater: () => void;
 }> = (props) => {
@@ -35,7 +35,7 @@ const PodcastsDoneScreen: React.FC<{
         childName={props.childName}
         deviceType={deviceType}
         accessEndsAt={props.accessEndsAt ?? `soon`}
-        onBackToDashboard={props.onBackToDashboard}
+        onManageSettings={props.onManageSettings}
         onSubscribe={props.onSubscribe}
       />
     );
@@ -46,7 +46,7 @@ const PodcastsDoneScreen: React.FC<{
       deviceType={deviceType}
       trialDaysRemaining={props.trialDaysRemaining}
       showSubscribe={props.showSubscribe}
-      onBackToDashboard={props.onBackToDashboard}
+      onManageSettings={props.onManageSettings}
       onSubscribe={props.onSubscribe}
     />
   );
@@ -93,9 +93,9 @@ const PodcastsDoneApproachingExpiry: React.FC<{
   childName: string;
   deviceType: string;
   accessEndsAt: string;
-  onBackToDashboard: () => void;
+  onManageSettings: () => void;
   onSubscribe: () => void;
-}> = ({ childName, deviceType, accessEndsAt, onBackToDashboard, onSubscribe }) => (
+}> = ({ childName, deviceType, accessEndsAt, onManageSettings, onSubscribe }) => (
   <div>
     <ScreenHeader
       icon="hourglass-half"
@@ -121,8 +121,8 @@ const PodcastsDoneApproachingExpiry: React.FC<{
     />
 
     <div className="flex justify-end items-center gap-3">
-      <Button type="button" color="secondary" onClick={onBackToDashboard}>
-        Back to Dashboard
+      <Button type="button" color="secondary" onClick={onManageSettings}>
+        {deviceType} settings
       </Button>
       <Button type="button" color="primary" onClick={onSubscribe}>
         Subscribe to Light &rarr;
@@ -136,14 +136,14 @@ const PodcastsDoneActive: React.FC<{
   deviceType: string;
   trialDaysRemaining?: number;
   showSubscribe?: boolean;
-  onBackToDashboard: () => void;
+  onManageSettings: () => void;
   onSubscribe: () => void;
 }> = ({
   childName,
   deviceType,
   trialDaysRemaining,
   showSubscribe,
-  onBackToDashboard,
+  onManageSettings,
   onSubscribe,
 }) => (
   <div>
@@ -175,8 +175,8 @@ const PodcastsDoneActive: React.FC<{
           Subscribe to Light &rarr;
         </Button>
       )}
-      <Button type="button" color="primary" onClick={onBackToDashboard}>
-        Back to Dashboard
+      <Button type="button" color="primary" onClick={onManageSettings}>
+        {deviceType} settings
       </Button>
     </div>
   </div>

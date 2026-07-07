@@ -13,7 +13,7 @@ struct GetMusicClaimData: Pair {
 
   @TSCodable
   enum ResumeStep: Equatable, Sendable {
-    case done(childName: String)
+    case done(childName: String, childId: Child.Id, deviceId: IOSDevice.Id)
   }
 
   struct Output: PairOutput {
@@ -47,7 +47,9 @@ extension GetMusicClaimData: Resolver {
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: paymentAction == nil ? .done(childName: child.name) : nil,
+          resumeStep: paymentAction == nil
+            ? .done(childName: child.name, childId: child.id, deviceId: device.id)
+            : nil,
           paymentAction: paymentAction,
         )
       },
@@ -82,7 +84,9 @@ extension GetMusicClaimData: Resolver {
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: paymentAction == nil ? .done(childName: child.name) : nil,
+          resumeStep: paymentAction == nil
+            ? .done(childName: child.name, childId: child.id, deviceId: device.id)
+            : nil,
           paymentAction: paymentAction,
         )
       },

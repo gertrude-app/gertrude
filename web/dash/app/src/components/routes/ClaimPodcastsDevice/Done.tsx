@@ -7,6 +7,8 @@ import { podcastsDoneVariant } from './podcastsDoneVariant';
 export interface PodcastsDoneNavState {
   subscription: T.ClaimAmDevice.Output[`subscription`];
   childName: string;
+  childId: string;
+  deviceId: string;
   modelName: string;
   iosVersion: string;
 }
@@ -23,7 +25,7 @@ const ClaimPodcastsDeviceDone: React.FC = () => {
     return <Navigate to={`/claim-podcasts-device/${code}/claim`} replace />;
   }
 
-  const { subscription, childName, modelName, iosVersion } = state;
+  const { subscription, childName, childId, deviceId, modelName, iosVersion } = state;
   const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   const { variant, accessEndsAt, trialDaysRemaining, subscribeUrl, showSubscribe } =
     podcastsDoneVariant(subscription);
@@ -47,7 +49,7 @@ const ClaimPodcastsDeviceDone: React.FC = () => {
         accessEndsAt={accessEndsAt}
         trialDaysRemaining={trialDaysRemaining}
         showSubscribe={showSubscribe}
-        onBackToDashboard={() => navigate(`/`)}
+        onManageSettings={() => navigate(`/children/${childId}/ios-devices/${deviceId}`)}
         onSubscribe={handleSubscribe}
         onMaybeLater={() => navigate(`/`)}
       />
