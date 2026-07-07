@@ -22,6 +22,8 @@ const ClaimPodcastsDeviceClaim: React.FC = () => {
     const state: PodcastsDoneNavState = {
       subscription: query.data.resumeStep.amSubscription,
       childName: query.data.resumeStep.childName,
+      childId: query.data.resumeStep.childId,
+      deviceId: query.data.resumeStep.deviceId,
       modelName: query.data.modelName,
       iosVersion: query.data.iosVersion,
     };
@@ -67,6 +69,8 @@ const ClaimPodcastsDeviceClaim: React.FC = () => {
     const state: PodcastsDoneNavState = {
       subscription: output.subscription,
       childName: output.childName,
+      childId: output.childId,
+      deviceId: output.deviceId,
       modelName: output.modelName,
       iosVersion: output.iosVersion,
     };

@@ -26,6 +26,8 @@ final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.parentId == parent.id)
       .all(in: self.db)
     expect(children).toHaveCount(1)
+    expect(output.deviceId).toEqual(device.id) // for the done-screen settings deep link
+    expect(output.childId).toEqual(children[0].id)
 
     let updated = try await self.db.find(device.id)
     expect(updated.childId).toEqual(children[0].id)

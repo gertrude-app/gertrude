@@ -15,6 +15,8 @@ export namespace GetAmClaimData {
       case: 'done';
       amSubscription: AmSubscriptionState;
       childName: string;
+      childId: UUID;
+      deviceId: UUID;
     };
   }
 }

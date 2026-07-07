@@ -7,7 +7,7 @@ const MusicDoneScreen: React.FC<{
   childName: string;
   modelName: string;
   iosVersion: string;
-  onBackToDashboard: () => void;
+  onManageSettings: () => void;
 }> = (props) => {
   const deviceType = props.modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   return (
@@ -24,7 +24,7 @@ const MusicDoneScreen: React.FC<{
 
       <div className="mb-6 rounded-xl border border-violet-100 bg-violet-50 px-5 py-4">
         <p className="text-violet-900 font-semibold">
-          Approved music will appear in the Music app.
+          Approve albums from the {deviceType} settings screen.
         </p>
         <p className="text-violet-800/90 text-sm mt-1">
           If {props.childName} still sees the claim code, open Gertrude Music again and it
@@ -33,8 +33,8 @@ const MusicDoneScreen: React.FC<{
       </div>
 
       <div className="flex justify-end">
-        <Button type="button" color="primary" onClick={props.onBackToDashboard}>
-          Back to Dashboard
+        <Button type="button" color="primary" onClick={props.onManageSettings}>
+          {deviceType} settings
         </Button>
       </div>
     </div>

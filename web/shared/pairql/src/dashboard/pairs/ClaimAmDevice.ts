@@ -13,5 +13,7 @@ export namespace ClaimAmDevice {
     iosVersion: string;
     code: number;
     subscription: AmSubscriptionState;
+    childId: UUID;
+    deviceId: UUID;
   }
 }

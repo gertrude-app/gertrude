@@ -43,6 +43,8 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.parentId == parent.id)
       .all(in: self.db)
     expect(children).toHaveCount(1)
+    expect(output.deviceId).toEqual(device.id) // for the done-screen settings deep link
+    expect(output.childId).toEqual(children[0].id)
 
     let updated = try await self.db.find(device.id)
     expect(updated.childId).toEqual(children[0].id)
@@ -63,6 +65,8 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(output.childName).toEqual(child.name)
+    expect(output.deviceId).toEqual(device.id) // for the done-screen settings deep link
+    expect(output.childId).toEqual(child.id)
 
     let updated = try await self.db.find(device.id)
     expect(updated.childId).toEqual(child.id)
@@ -108,6 +112,8 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output.childName).toEqual(child.name)
     expect(output.modelName).toEqual(device.modelName)
+    expect(output.childId).toEqual(child.id)
+    expect(output.deviceId).toEqual(device.id)
   }
 
   func testFreshClaimWithoutMusicAccessRequiresPaymentAndDoesNotClaim() async throws {

@@ -18,6 +18,8 @@ struct ClaimAmDevice: Pair {
     let iosVersion: String
     let code: Int
     let subscription: AmSubscriptionState
+    let childId: Child.Id
+    let deviceId: IOSDevice.Id
   }
 }
 
@@ -56,6 +58,8 @@ extension ClaimAmDevice: Resolver {
       iosVersion: device.iosVersion,
       code: code,
       subscription: account.amSubscriptionState(forInstall: install),
+      childId: child.id,
+      deviceId: device.id,
     )
   }
 }

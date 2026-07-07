@@ -14,6 +14,8 @@ export namespace GetMusicClaimData {
     resumeStep?: {
       case: 'done';
       childName: string;
+      childId: UUID;
+      deviceId: UUID;
     };
     paymentAction?: SubscriptionPanelAction;
   }

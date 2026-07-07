@@ -12,5 +12,7 @@ export namespace ClaimMusicDevice {
     modelName: string;
     iosVersion: string;
     code: number;
+    childId: UUID;
+    deviceId: UUID;
   }
 }

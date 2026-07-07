@@ -23,6 +23,8 @@ final class GetAmClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.resumeStep).toEqual(.done(
       amSubscription: .amTrial(expiresAt: persisted.createdAt + .days(30)),
       childName: child.name,
+      childId: child.id,
+      deviceId: device.id,
     ))
   }
 
@@ -54,6 +56,8 @@ final class GetAmClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.resumeStep).toEqual(.done(
       amSubscription: .amTrial(expiresAt: persisted.createdAt + .days(30)),
       childName: child.name,
+      childId: child.id,
+      deviceId: device.id,
     ))
     let completed = try await Claim.find(code: claim.code, in: self.db)
     expect(completed?.childId).toEqual(child.id)
