@@ -1,0 +1,58 @@
+appId: com.netrivet.gertrude-ios.app
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "onboarding-screen-hi-there"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-time-expectation"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-confirm-childs-device"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-explain-permission-depends-on-age"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-confirm-minor-device"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-confirm-parent-is-onboarding"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-confirm-in-apple-family"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-explain-two-install-steps"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-explain-auth-with-parent-apple-account"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-dont-get-tricked-pre-auth"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-explain-install-with-device-passcode"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-dont-get-tricked-pre-install"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-offer-account-connect"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    text: "https://gertrude.app/b/[0-9]{6}"

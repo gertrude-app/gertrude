@@ -1,0 +1,21 @@
+appId: com.innocencelabs.gertrude-fm-temp-dev
+---
+# once claimed the app lands on the Albums screen; its first library load can transiently
+# fail into a manual "Try again" error state, so give the load a beat and retry until the
+# empty-library ("No albums yet") state shows.
+- extendedWaitUntil:
+    visible: "Albums"
+    timeout: 20000
+- repeat:
+    times: 3
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 6000
+      - runFlow:
+          when:
+            visible: "Try again"
+          commands:
+            - tapOn: "Try again"
+- extendedWaitUntil:
+    visible: "No albums yet"
+    timeout: 20000

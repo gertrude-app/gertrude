@@ -1,6 +1,8 @@
 import '../watch-helpers.just'
 
 swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
+bundle_id := "com.netrivet.gertrude.am.dev"
+sim_derived_data := ".derived-data/sim"
 
 _default:
   @just --choose
@@ -62,9 +64,34 @@ fix:
   @xml-lint --fix app/Info.plist app/Info.Debug.plist app/LaunchScreen.storyboard
   @prettier --write '**/*.json' '!**/.build/**'
 
-build-app:
-  xcodebuild -workspace GertiePodcasts.xcodeproj/project.xcworkspace \
-    -scheme App -configuration Debug build 
+build-app: sim-build
+
+sim-build destination="generic/platform=iOS Simulator":
+  @just gen
+  @xcodebuild \
+    -project GertiePodcasts.xcodeproj \
+    -scheme "Gertrude Podcasts" \
+    -configuration Debug \
+    -destination '{{destination}}' \
+    -derivedDataPath {{sim_derived_data}} \
+    -quiet \
+    build
+
+sim-install simulator="booted":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  app_path="$(find {{sim_derived_data}}/Build/Products/Debug-iphonesimulator -maxdepth 1 -name 'Gertrude Podcasts.app' -print -quit)"
+  if [[ -z "$app_path" ]]; then
+    echo "Gertrude Podcasts simulator app not found. Run: just sim-build" >&2
+    exit 66
+  fi
+  xcrun simctl install {{simulator}} "$app_path"
+
+sim-launch simulator="booted":
+  @xcrun simctl launch {{simulator}} {{bundle_id}}
+
+sim-uninstall simulator="booted":
+  @xcrun simctl uninstall {{simulator}} {{bundle_id}} || true
 
 clean:
   @rm -rf lib-tca/.build lib-core/.build lib-views/.build

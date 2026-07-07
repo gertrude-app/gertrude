@@ -55,6 +55,7 @@ public struct WelcomeView: View {
         Text(lstr(.welcomeDescription))
           .font(.system(size: 16, weight: .medium))
           .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
+          .accessibilityIdentifier("onboarding-screen-hi-there")
           .swooshIn(
             tracking: self.$subtitleOffset,
             to: .zero,
@@ -72,6 +73,7 @@ public struct WelcomeView: View {
             }
           }
         }, variant: .primary)
+          .accessibilityIdentifier("btn-primary")
           .swooshIn(
             tracking: self.$buttonOffset,
             to: .zero,

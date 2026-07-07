@@ -20,6 +20,15 @@ podcasts *args:
 music *args:
   @cd swift/music && just {{args}}
 
+verify-podcasts *args:
+  @./verification/run podcasts {{args}}
+
+verify-blocker *args:
+  @./verification/run blocker {{args}}
+
+verify-music *args:
+  @./verification/run music {{args}}
+
 # api shortcuts
 
 api:

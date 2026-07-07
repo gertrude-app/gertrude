@@ -1,0 +1,9 @@
+appId: com.netrivet.gertrude-ios.app
+---
+# the app polls every 5s; the instant it sees the claim the reducer nils the connect state and
+# jumps straight to the connectSuccess screen, so the transient connect-account-success view
+# never reliably paints. assert the stable terminal screen instead (allow for the poll cadence).
+- extendedWaitUntil:
+    visible:
+      id: "onboarding-screen-connect-success"
+    timeout: 25000

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+
+scenario="${1:-}"
+
+case "$scenario" in
+  blocker)
+    "$verification_root/scenarios/blocker/run" "${@:2}"
+    ;;
+  music)
+    "$verification_root/scenarios/music/run" "${@:2}"
+    ;;
+  podcasts)
+    "$verification_root/scenarios/podcasts/run" "${@:2}"
+    ;;
+  ""|-h|--help|help)
+    cat <<EOF
+usage: just verify-<scenario> [command]
+       (dispatcher: ./verification/run <scenario> [command])
+
+scenarios:
+  blocker
+  music
+  podcasts
+EOF
+    ;;
+  *)
+    echo "unknown verification scenario: $scenario" >&2
+    exit 64
+    ;;
+esac

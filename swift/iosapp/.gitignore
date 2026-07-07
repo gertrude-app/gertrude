@@ -1,5 +1,6 @@
 # Xcode
 /Packages
+/.derived-data
 
 # Local config
 config/Local.xcconfig

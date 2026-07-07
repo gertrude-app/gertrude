@@ -1,0 +1,10 @@
+appId: com.netrivet.gertrude.am.dev
+---
+# enters the deterministic PIN 111111: six taps on "1". waitToSettleTimeoutMs: 0 skips the
+# post-tap animation-settle wait so the digits register back-to-back instead of one-per-second.
+- repeat:
+    times: 6
+    commands:
+      - tapOn:
+          text: "1"
+          waitToSettleTimeoutMs: 0

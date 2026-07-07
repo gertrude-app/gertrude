@@ -10,6 +10,7 @@ struct BigButton: View {
   var variant: Variant
   var icon: String?
   var disabled: Bool
+  var accessibilityIdentifier: String?
 
   var label: some View {
     HStack {
@@ -61,14 +62,17 @@ struct BigButton: View {
       } label: {
         self.label
       }
+      .optionalAccessibilityIdentifier(self.accessibilityIdentifier)
     case .link(let url):
       Link(destination: url) {
         self.label
       }
+      .optionalAccessibilityIdentifier(self.accessibilityIdentifier)
     case .share(let text):
       ShareLink(item: text) {
         self.label
       }
+      .optionalAccessibilityIdentifier(self.accessibilityIdentifier)
     }
   }
 
@@ -78,12 +82,14 @@ struct BigButton: View {
     variant: Variant = .primary,
     icon: String? = nil,
     disabled: Bool = false,
+    accessibilityIdentifier: String? = nil,
   ) {
     self.text = text
     self.type = type
     self.variant = variant
     self.icon = icon
     self.disabled = disabled
+    self.accessibilityIdentifier = accessibilityIdentifier
   }
 
   enum Variant {
@@ -95,6 +101,17 @@ struct BigButton: View {
     case button(() -> Void)
     case link(URL)
     case share(String)
+  }
+}
+
+extension View {
+  @ViewBuilder
+  func optionalAccessibilityIdentifier(_ id: String?) -> some View {
+    if let id {
+      self.accessibilityIdentifier(id)
+    } else {
+      self
+    }
   }
 }
 

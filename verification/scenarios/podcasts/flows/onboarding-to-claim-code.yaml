@@ -1,0 +1,22 @@
+appId: com.netrivet.gertrude.am.dev
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "onboarding-screen-hi-there"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-are-you-the-parent"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-explain-account-required"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-connect-account-or-skip"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    text: "https://gertrude\\.app/p/[0-9]{6}"

@@ -1,0 +1,6 @@
+appId: com.innocencelabs.gertrude-fm-temp-dev
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    text: "https://gertrude.app/m/[0-9]{6}"

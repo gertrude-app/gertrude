@@ -85,6 +85,7 @@ struct ChooseWhatToBlockView: View {
           variant: .primary,
           disabled: !self.allGroups.isEmpty
             && self.allGroups.allSatisfy { self.disabledGroupIds.contains($0.id) },
+          accessibilityIdentifier: "btn-primary",
         )
         .swooshIn(
           tracking: self.$buttonOffset,

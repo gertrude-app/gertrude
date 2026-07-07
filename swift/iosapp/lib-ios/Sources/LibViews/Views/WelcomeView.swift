@@ -52,6 +52,7 @@ struct WelcomeView: View {
         Text("Gertrude blocks unwanted stuff, like GIFs, from your device.")
           .font(.system(size: 16, weight: .medium))
           .multilineTextAlignment(self.deviceType() == .pad ? .center : .leading)
+          .accessibilityIdentifier("onboarding-screen-hi-there")
           .swooshIn(
             tracking: self.$subtitleOffset,
             to: .zero,
@@ -59,19 +60,24 @@ struct WelcomeView: View {
             for: .milliseconds(800),
           )
 
-        BigButton("Get started", type: .button {
-          self.vanishingAnimations()
-          delayed(by: .milliseconds(800)) {
-            self.onPrimaryBtnTap()
-          }
-        }, variant: .primary)
-          .swooshIn(
-            tracking: self.$buttonOffset,
-            to: .zero,
-            after: .seconds(1.3),
-            for: .milliseconds(800),
-          )
-          .padding(.top, 20)
+        BigButton(
+          "Get started",
+          type: .button {
+            self.vanishingAnimations()
+            delayed(by: .milliseconds(800)) {
+              self.onPrimaryBtnTap()
+            }
+          },
+          variant: .primary,
+          accessibilityIdentifier: "btn-primary",
+        )
+        .swooshIn(
+          tracking: self.$buttonOffset,
+          to: .zero,
+          after: .seconds(1.3),
+          for: .milliseconds(800),
+        )
+        .padding(.top, 20)
       }
       .padding(30)
       .frame(maxWidth: 500)

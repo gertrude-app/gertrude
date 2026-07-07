@@ -62,6 +62,7 @@ public struct AppView: View {
           ButtonScreenView(
             text: "The setup usually takes about 5-7 minutes, but in some cases extra steps are required.",
             primary: self.btn(text: "Next", .primary),
+            screenIdentifier: "onboarding-screen-time-expectation",
           )
 
         case .onboarding(.happyPath(.confirmChildsDevice)):
@@ -69,12 +70,14 @@ public struct AppView: View {
             text: "Is this the \(self.deviceType) you want to protect?",
             primary: self.btn(text: "Yes", .primary),
             secondary: self.btn(text: "No", .secondary),
+            screenIdentifier: "onboarding-screen-confirm-childs-device",
           )
 
         case .onboarding(.happyPath(.explainPermissionDependsOnAge)):
           ButtonScreenView(
             text: "To protect privacy, Apple requires special permission before we can block unwanted internet access. How we get that permission depends on the AGE of the \(self.deviceType) user.",
             primary: self.btn(text: "Got it, next", .primary),
+            screenIdentifier: "onboarding-screen-explain-permission-depends-on-age",
           )
 
         case .onboarding(.happyPath(.confirmMinorDevice)):
@@ -83,6 +86,7 @@ public struct AppView: View {
             primary: self.btn(text: "Under 18", .primary),
             secondary: self.btn(text: "18 or older", .secondary),
             primaryLooksLikeSecondary: true,
+            screenIdentifier: "onboarding-screen-confirm-minor-device",
           )
 
         case .onboarding(.happyPath(.confirmParentIsOnboarding)):
@@ -90,6 +94,7 @@ public struct AppView: View {
             text: "Are you the parent or guardian?",
             primary: self.btn(text: "Yes", .primary),
             secondary: self.btn(text: "No", .secondary),
+            screenIdentifier: "onboarding-screen-confirm-parent-is-onboarding",
           )
 
         case .onboarding(.happyPath(.confirmInAppleFamily)):
@@ -98,18 +103,21 @@ public struct AppView: View {
             primary: self.btn(text: "Yes, it’s in an Apple Family", .primary),
             secondary: self.btn(text: "No", .secondary),
             tertiary: self.btn(text: "I’m not sure", .tertiary),
+            screenIdentifier: "onboarding-screen-confirm-in-apple-family",
           )
 
         case .onboarding(.happyPath(.explainTwoInstallSteps)):
           ButtonScreenView(
             text: "Next we’ll authorize and install the content filter. It takes TWO steps, both of which are required.",
             primary: self.btn(text: "Next", .primary),
+            screenIdentifier: "onboarding-screen-explain-two-install-steps",
           )
 
         case .onboarding(.happyPath(.explainAuthWithParentAppleAccount)):
           ButtonScreenView(
             text: "For the first step, you’ll authorize Gertrude to access Screen Time using YOUR Apple ID (the parent/guardian, not the child’s).",
             primary: self.btn(text: "Got it, next", .primary),
+            screenIdentifier: "onboarding-screen-explain-auth-with-parent-apple-account",
           )
 
         case .onboarding(.happyPath(.dontGetTrickedPreAuth)):
@@ -117,12 +125,14 @@ public struct AppView: View {
             text: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
             primary: self.btn(text: "Got it, next", .primary, animate: false, async: true),
             image: self.iosVersionImage("AllowScreenTimeAccess"),
+            screenIdentifier: "onboarding-screen-dont-get-tricked-pre-auth",
           )
 
         case .onboarding(.happyPath(.explainInstallWithDevicePasscode)):
           ButtonScreenView(
             text: "Great! Half way there. In the next step, use the passcode of THIS \(self.deviceType.uppercased()) (the one you’re holding), not your own.",
             primary: self.btn(text: "Got it, next", .primary),
+            screenIdentifier: "onboarding-screen-explain-install-with-device-passcode",
           )
 
         case .onboarding(.happyPath(.dontGetTrickedPreInstall)):
@@ -130,6 +140,7 @@ public struct AppView: View {
             text: "Again, don’t get tricked! Be sure to click “Allow”, even though it looks like you’re supposed to click “Don’t Allow”.",
             primary: self.btn(text: "Got it, next", .primary, animate: false, async: true),
             image: self.iosVersionImage("AllowContentFilter"),
+            screenIdentifier: "onboarding-screen-dont-get-tricked-pre-install",
           )
 
         case .onboarding(.happyPath(.offerAccountConnect)):
@@ -146,6 +157,7 @@ public struct AppView: View {
               .secondary,
             ),
             tertiary: self.btn(text: "Tell me more", .tertiary),
+            screenIdentifier: "onboarding-screen-offer-account-connect",
           )
 
         case .onboarding(.happyPath(.explainAccountConnect)):
@@ -160,6 +172,7 @@ public struct AppView: View {
           ButtonScreenView(
             text: "Success! This \(self.deviceType) is now connected to your Gertrude parent account.",
             primary: self.btn(text: "Next", .primary),
+            screenIdentifier: "onboarding-screen-connect-success",
           )
 
         case .onboarding(.happyPath(.optOutBlockGroups)):

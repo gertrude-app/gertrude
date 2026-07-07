@@ -243,6 +243,7 @@ struct ConnectedStateView: View {
         )
       }
       .padding(.horizontal, 30)
+      .accessibilityIdentifier("connect-account-success")
     }
   }
 }

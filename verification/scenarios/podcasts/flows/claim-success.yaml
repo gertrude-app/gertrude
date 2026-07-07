@@ -1,0 +1,10 @@
+appId: com.netrivet.gertrude.am.dev
+---
+# single maestro session (one automation attach) instead of shell-polling the hierarchy;
+# repeated attach/detach churn can segfault SpringBoard's XCTAutomationSupport (see README gotchas)
+- extendedWaitUntil:
+    visible:
+      text: ".*all set.*"
+    timeout: 30000
+- assertVisible:
+    text: ".*(Free trial active|Free forever|Active subscription|Subscription active|Legacy access active).*"

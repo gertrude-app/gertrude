@@ -85,6 +85,16 @@ Supports all 3 apps, plus dashboard and admin websites
 - generated typesscript clients for websites
 - when working on tasks related to pairql, always read `./swift/docs/pairql.md`
 
+## Multi-surface verification (e2e smoke loops)
+
+- agent-drivable scenarios proving app ↔ API ↔ dashboard work together: iOS Simulator via
+  Maestro, dashboard via Cypress, backend state via typed PairQL oracles
+- entry points: `just verify-podcasts`, `just verify-blocker`, `just verify-music` (each
+  supports `preflight`, `e2e`, and per-phase commands)
+- when verifying a cross-surface flow end-to-end, smoke-testing before a release, or adding
+  a scenario, always read `./verification/README.md` first — principles, naming conventions,
+  setup, and known gotchas live there
+
 ## Templated Emails
 
 - Postmark-based email system for transactional emails

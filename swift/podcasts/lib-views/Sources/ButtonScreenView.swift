@@ -79,6 +79,7 @@ public struct ButtonScreenView: View {
   let screenType: ScreenType
   let urlInputConfig: UrlInputConfig?
   let ignoreKeyboard: Bool
+  let screenIdentifier: String?
 
   @State private var showBg = false
   @State private var iconOffset: Vector
@@ -109,6 +110,7 @@ public struct ButtonScreenView: View {
     remoteImage: RemoteImage? = nil,
     screenType: ScreenType = .info,
     primaryLooksLikeSecondary: Bool = false,
+    screenIdentifier: String? = nil,
     urlInput: UrlInputConfig? = nil,
     animateBtnEntry: Bool = true,
     ignoreKeyboard: Bool = false,
@@ -122,6 +124,7 @@ public struct ButtonScreenView: View {
     self.secondaryButtonConfig = secondary
     self.tertiaryButtonConfig = tertiary
     self.primaryLooksLikeSecondary = primaryLooksLikeSecondary
+    self.screenIdentifier = screenIdentifier
     self.urlInputConfig = urlInput
     self.ignoreKeyboard = ignoreKeyboard
 
@@ -197,6 +200,7 @@ public struct ButtonScreenView: View {
 
         Text(self.text)
           .font(.system(size: 18, weight: .medium))
+          .optionalAccessibilityIdentifier(self.screenIdentifier)
           .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
 
         if let listItems = self.listItems {
@@ -275,6 +279,7 @@ public struct ButtonScreenView: View {
               ),
               variant: self.primaryLooksLikeSecondary ? .secondary : .primary,
             )
+            .accessibilityIdentifier("btn-primary")
             .swooshIn(
               tracking: self.$primaryButtonStatus.offset,
               to: .zero,
@@ -522,6 +527,17 @@ public struct ButtonScreenView: View {
       print("Submitted URL: \(url)")
     },
   )
+}
+
+extension View {
+  @ViewBuilder
+  func optionalAccessibilityIdentifier(_ id: String?) -> some View {
+    if let id {
+      self.accessibilityIdentifier(id)
+    } else {
+      self
+    }
+  }
 }
 
 #Preview("URL input with button") {

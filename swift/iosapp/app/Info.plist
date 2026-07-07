@@ -4,6 +4,11 @@
   <dict>
     <key>API_ENDPOINT</key>
     <string>$(API_ENDPOINT)</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsLocalNetworking</key>
+      <string>$(ALLOW_LOCAL_NETWORKING)</string>
+    </dict>
     <key>UILaunchScreen</key>
     <dict>
       <key>UIColorName</key>

@@ -1,0 +1,4 @@
+appId: com.netrivet.gertrude.am.dev
+---
+- assertVisible: "Pause"
+- tapOn: "Pause"
