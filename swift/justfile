@@ -25,7 +25,7 @@ iosapp-xcode-build:
   @pnpm exec nx run iosapp:xcode-build
 
 iosconfig:
-  @echo "LOCAL_API_URL = https:/\$()/{{ngrok_subdomain}}.ngrok-free.app" > iosapp/config/Local.xcconfig
+  @echo "LOCAL_API_ENDPOINT = https:/\$()/{{ngrok_subdomain}}.ngrok-free.app" > iosapp/config/Local.xcconfig
 
 ios-tunnel:
   @pkill -f ngrok || true

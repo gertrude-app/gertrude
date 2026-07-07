@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieTcaFeatures
 import LibClients
 import XCTest
 import XExpect
@@ -8,15 +9,13 @@ import XExpect
 final class IOSReducerTestsAuthFail: XCTestCase {
   @MainActor
   func testInvalidAccountToSupervision() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.invalidAccountType)
       }
@@ -28,8 +27,7 @@ final class IOSReducerTestsAuthFail: XCTestCase {
       $0.screen = .onboarding(.authFail(.invalidAccount(.letsFigureThisOut)))
     }
 
-    expect(apiLoggedDetails.value)
-      .toEqual(["[onboarding] authorization failed: invalidAccountType"])
+    expect(logged.value.contains { $0.contains("invalidAccountType") }).toEqual(true)
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.authFail(.invalidAccount(.confirmInAppleFamily)))
@@ -107,15 +105,13 @@ final class IOSReducerTestsAuthFail: XCTestCase {
 
   @MainActor
   func testAuthConflict() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.authorizationConflict)
       }
@@ -127,8 +123,7 @@ final class IOSReducerTestsAuthFail: XCTestCase {
       $0.screen = .onboarding(.authFail(.authConflict))
     }
 
-    expect(apiLoggedDetails.value)
-      .toEqual(["[onboarding] authorization failed: authorizationConflict"])
+    expect(logged.value.contains { $0.contains("authorizationConflict") }).toEqual(true)
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.explainTwoInstallSteps))
@@ -137,15 +132,13 @@ final class IOSReducerTestsAuthFail: XCTestCase {
 
   @MainActor
   func testUnexpectedAuthFail() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.unexpected(.invalidArgument))
       }
@@ -155,10 +148,8 @@ final class IOSReducerTestsAuthFail: XCTestCase {
     await store.receive(.programmatic(.authorizationFailed(.unexpected(.invalidArgument)))) {
       $0.screen = .onboarding(.authFail(.unexpected))
     }
-    expect(apiLoggedDetails.value).toEqual([
-      "[onboarding] authorization failed: unexpected(LibClients.AuthFailureReason.Unexpected.invalidArgument)",
-    ])
 
+    expect(logged.value.contains { $0.contains("invalidArgument") }).toEqual(true)
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.explainTwoInstallSteps))
     }
@@ -166,15 +157,13 @@ final class IOSReducerTestsAuthFail: XCTestCase {
 
   @MainActor
   func testOtherAuthFail() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.other("printer on fire"))
       }
@@ -184,22 +173,19 @@ final class IOSReducerTestsAuthFail: XCTestCase {
     await store.receive(.programmatic(.authorizationFailed(.other("printer on fire")))) {
       $0.screen = .onboarding(.authFail(.unexpected))
     }
-    expect(apiLoggedDetails.value).toEqual([
-      "[onboarding] authorization failed: other(\"printer on fire\")",
-    ])
+
+    expect(logged.value.contains { $0.contains("printer on fire") }).toEqual(true)
   }
 
   @MainActor
   func testNetworkErrorAuthFail() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.networkError)
       }
@@ -209,7 +195,8 @@ final class IOSReducerTestsAuthFail: XCTestCase {
     await store.receive(.programmatic(.authorizationFailed(.networkError))) {
       $0.screen = .onboarding(.authFail(.networkError))
     }
-    expect(apiLoggedDetails.value).toEqual(["[onboarding] authorization failed: networkError"])
+
+    expect(logged.value.contains { $0.contains("networkError") }).toEqual(true)
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.explainTwoInstallSteps))
     }
@@ -217,15 +204,13 @@ final class IOSReducerTestsAuthFail: XCTestCase {
 
   @MainActor
   func testPasscodeRequiredAuthFail() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.passcodeRequired)
       }
@@ -235,8 +220,8 @@ final class IOSReducerTestsAuthFail: XCTestCase {
     await store.receive(.programmatic(.authorizationFailed(.passcodeRequired))) {
       $0.screen = .onboarding(.authFail(.passcodeRequired))
     }
-    expect(apiLoggedDetails.value)
-      .toEqual(["[onboarding] authorization failed: passcodeRequired"])
+
+    expect(logged.value.contains { $0.contains("passcodeRequired") }).toEqual(true)
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.explainTwoInstallSteps))
     }
@@ -244,15 +229,13 @@ final class IOSReducerTestsAuthFail: XCTestCase {
 
   @MainActor
   func testRestrictedAuthFail() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.restricted)
       }
@@ -262,21 +245,19 @@ final class IOSReducerTestsAuthFail: XCTestCase {
     await store.receive(.programmatic(.authorizationFailed(.restricted))) {
       $0.screen = .onboarding(.authFail(.restricted))
     }
-    expect(apiLoggedDetails.value)
-      .toEqual(["[onboarding] authorization failed: restricted"])
+
+    expect(logged.value.contains { $0.contains("restricted") }).toEqual(true)
   }
 
   @MainActor
   func testCanceledAuthFail() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
+    let logged = LockIsolated<[String]>([])
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.dontGetTrickedPreAuth))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _id, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
-      }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.systemExtension.requestAuthorization = {
         .failure(.authorizationCanceled)
       }
@@ -286,8 +267,8 @@ final class IOSReducerTestsAuthFail: XCTestCase {
     await store.receive(.programmatic(.authorizationFailed(.authorizationCanceled))) {
       $0.screen = .onboarding(.authFail(.authCanceled))
     }
-    expect(apiLoggedDetails.value)
-      .toEqual(["[onboarding] authorization failed: authorizationCanceled"])
+
+    expect(logged.value.contains { $0.contains("authorizationCanceled") }).toEqual(true)
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.explainTwoInstallSteps))
     }

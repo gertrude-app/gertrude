@@ -136,8 +136,9 @@ struct SettingsFeature {
       source: .reclaimStorage,
     )
     log(
-      .info("ad696f72"),
-      "reclaim storage",
+      .info,
+      .setup,
+      "ad696f72",
       detail: "requestedEpisodes:\(episodes.count) invalidatedEpisodes:\(discardResult.invalidatedEpisodes.count) protectedEpisodes:\(discardResult.protectedEpisodeIds.count) requestedBytes:\(bytes) invalidatedBytes:\(discardResult.invalidatedEpisodes.reduce(0) { $0 + $1.sizeInBytes })",
     )
   }

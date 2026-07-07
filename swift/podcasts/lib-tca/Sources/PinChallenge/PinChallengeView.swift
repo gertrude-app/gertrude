@@ -30,7 +30,7 @@ struct PinChallengeView: View {
     if let pin = self.keychain.loadPincode() {
       return pin
     } else {
-      log(.error("17cb36cc"), "missing pincode", detail: "context:\(self.context.rawValue)")
+      log(.err, .pin, "17cb36cc", detail: "context:\(self.context.rawValue)")
       return Int.random(in: 100_000 ... 999_999)
     }
   }

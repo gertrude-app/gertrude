@@ -2,6 +2,7 @@ import BlockerRoute
 import Combine
 import ComposableArchitecture
 import GertieBlocker
+import GertieTcaFeatures
 import LibCore
 import Testing
 
@@ -20,7 +21,6 @@ import Testing
   } withDependencies: {
     $0.mainQueue = .immediate
     $0.date = .constant(.reference)
-    $0.api.logEvent = { @Sendable _, _ in }
     $0.device.batteryLevel = { .level(0.15) }
     $0.device.availableDiskSpaceInBytes = { 1024 * 1024 * 50 }
     $0.device.clearCache = { _ in
@@ -75,7 +75,7 @@ import Testing
 
 @MainActor
 @Test func unconnectedRecoveryWithGoodData() async throws {
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
+  let loggedIds = LockIsolated<[String]>([])
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
   let recoveryDirectiveInvocations = LockIsolated(0)
   let dismissInvocations = LockIsolated(0)
@@ -88,9 +88,7 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       [BlockGroup.whatsAppFeatures.legacyUUID]
     }
@@ -118,16 +116,16 @@ import Testing
   await store.shake(times: 5)
   await store.send(.receivedShake) { $0.timesShaken = 0 }
 
-  #expect(apiLoggedEvents.value == [Both("a8998540", "entering recovery mode")])
   #expect(filterNotifications.value == [.rulesChanged])
   #expect(recoveryDirectiveInvocations.value == 1)
   #expect(dismissInvocations.value == 1)
+  #expect(loggedIds.value == ["a8998540"])
 }
 
 @MainActor
 @Test func unconnectedRecoveryWithMissingDisabledBlockGroups() async throws {
+  let loggedIds = LockIsolated<[String]>([])
   let recoveryDirectiveInvocations = LockIsolated(0)
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
   let savedDisabledBlockGroups = LockIsolated<[[UUID]]>([])
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
   let dismissInvocations = LockIsolated(0)
@@ -136,9 +134,7 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       nil // <-- missing disabled block groups triggers save
     }
@@ -166,16 +162,16 @@ import Testing
   await store.shake(times: 5)
   await store.send(.receivedShake) { $0.timesShaken = 0 }
 
-  #expect(apiLoggedEvents.value == [Both("a8998540", "entering recovery mode")])
   #expect(savedDisabledBlockGroups.value == [[]]) // <-- saved empty disabled block groups
   #expect(filterNotifications.value == [.rulesChanged])
   #expect(recoveryDirectiveInvocations.value == 1)
   #expect(dismissInvocations.value == 1)
+  #expect(loggedIds.value == ["a8998540"])
 }
 
 @MainActor
 @Test func unconnectedRecoveryWithMissingRulesSuccessfulFetch() async throws {
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
+  let loggedIds = LockIsolated<[String]>([])
   let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
   let fetchDefaultRulesInvocations = LockIsolated(0)
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
@@ -186,10 +182,8 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
     $0.device.deviceId = { UUID(1) }
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
     $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
       fatalError("saveDisabledBlockGroupIds should not be called")
@@ -220,20 +214,17 @@ import Testing
   await store.shake(times: 5)
   await store.send(.receivedShake) { $0.timesShaken = 0 }
 
-  #expect(apiLoggedEvents.value == [
-    Both("a8998540", "entering recovery mode"),
-    Both("bcca235f", "rules missing in recovery mode"),
-  ])
   #expect(fetchDefaultRulesInvocations.value == 1)
   #expect(savedProtectionModes.value == [.normal([.urlContains(value: "default-from-api")])])
   #expect(filterNotifications.value == [.rulesChanged])
   #expect(recoveryDirectiveInvocations.value == 1)
   #expect(dismissInvocations.value == 1)
+  #expect(loggedIds.value == ["a8998540", "bcca235f"])
 }
 
 @MainActor
 @Test func unconnectedRecoveryWithMissingRulesFailedFetch() async throws {
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
+  let loggedIds = LockIsolated<[String]>([])
   let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
   let fetchDefaultRulesInvocations = LockIsolated(0)
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
@@ -242,10 +233,8 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
     $0.device.deviceId = { UUID(1) }
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
     $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
       fatalError("saveDisabledBlockGroupIds should not be called")
@@ -271,11 +260,6 @@ import Testing
   await store.shake(times: 5)
   await store.send(.receivedShake) { $0.timesShaken = 0 }
 
-  #expect(apiLoggedEvents.value == [
-    Both("a8998540", "entering recovery mode"),
-    Both("bcca235f", "rules missing in recovery mode"),
-    Both("2c3a4481", "failed to fetch defaults in recovery mode"),
-  ])
   #expect(fetchDefaultRulesInvocations.value == 1)
   #expect(savedProtectionModes.value.count == 1)
   if case .normal(let rules) = savedProtectionModes.value.first {
@@ -284,11 +268,12 @@ import Testing
     Issue.record("Expected .normal protection mode with hardcoded defaults")
   }
   #expect(filterNotifications.value == [.rulesChanged])
+  #expect(loggedIds.value == ["a8998540", "bcca235f", "2c3a4481"])
 }
 
 @MainActor
 @Test func unconnectedRecoveryWithRetryDirective() async throws {
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
+  let loggedIds = LockIsolated<[String]>([])
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
   let recoveryDirectiveInvocations = LockIsolated(0)
   let cleanupForRetryInvocations = LockIsolated(0)
@@ -298,9 +283,7 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [] }
     $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in
       fatalError("saveDisabledBlockGroupIds should not be called")
@@ -329,19 +312,16 @@ import Testing
   await store.shake(times: 5)
   await store.send(.receivedShake) { $0.timesShaken = 0 }
 
-  #expect(apiLoggedEvents.value == [
-    Both("a8998540", "entering recovery mode"),
-    Both("aeaa467d", "received retry directive"),
-  ])
   #expect(filterNotifications.value == [.rulesChanged])
   #expect(recoveryDirectiveInvocations.value == 1)
   #expect(cleanupForRetryInvocations.value == 1)
   #expect(dismissInvocations.value == 1)
+  #expect(loggedIds.value == ["a8998540", "aeaa467d"])
 }
 
 @MainActor
 @Test func unconnectedRecoveryDoesNotTriggerWhenConnected() async throws {
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
+  let loggedIds = LockIsolated<[String]>([])
   let recoveryDirectiveInvocations = LockIsolated(0)
   let dismissInvocations = LockIsolated(0)
 
@@ -358,9 +338,7 @@ import Testing
     InfoFeature()
   } withDependencies: {
     $0.osLog.log = { @Sendable _ in }
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       fatalError("loadDisabledBlockGroupIds should not be called")
     }
@@ -391,13 +369,14 @@ import Testing
   await store.shake(times: 5)
   await store.send(.receivedShake) { $0.timesShaken = 0 }
 
-  #expect(apiLoggedEvents.value.isEmpty)
   #expect(recoveryDirectiveInvocations.value == 1)
   #expect(dismissInvocations.value == 1)
+  #expect(loggedIds.value.isEmpty)
 }
 
 @MainActor
 @Test func ensureUnconnectedRulesWithGoodData() async throws {
+  let loggedIds = LockIsolated<[String]>([])
   let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
   let fetchBlockRulesInvocations = LockIsolated(0)
   let filterNotifications = LockIsolated<[FilterClient.Notification]>([])
@@ -410,9 +389,6 @@ import Testing
   )) {
     InfoFeature()
   } withDependencies: {
-    $0.api.logEvent = { @Sendable _, _ in
-      fatalError("logEvent should not be called")
-    }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       loadDisabledBlockGroupIdsInvocations.withValue { $0 += 1 }
       return [BlockGroup.whatsAppFeatures.legacyUUID]
@@ -433,6 +409,7 @@ import Testing
       filterNotifications.withValue { $0.append(notification) }
     }
     $0.osLog.log = { @Sendable _ in }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
   }
 
   await store.send(.sheetPresented)
@@ -441,11 +418,12 @@ import Testing
   #expect(fetchBlockRulesInvocations.value == 1)
   #expect(savedProtectionModes.value == [.normal([.urlContains(value: "fetched-rule")])])
   #expect(filterNotifications.value == [.rulesChanged])
+  #expect(loggedIds.value.isEmpty)
 }
 
 @MainActor
 @Test func ensureUnconnectedRulesWithMissingDisabledBlockGroups() async throws {
-  let apiLoggedEvents = LockIsolated<[Both<String, String?>]>([])
+  let loggedIds = LockIsolated<[String]>([])
   let savedDisabledBlockGroups = LockIsolated<[[UUID]]>([])
   let savedProtectionModes = LockIsolated<[ProtectionMode]>([])
   let fetchBlockRulesInvocations = LockIsolated(0)
@@ -458,9 +436,6 @@ import Testing
   )) {
     InfoFeature()
   } withDependencies: {
-    $0.api.logEvent = { @Sendable id, detail in
-      apiLoggedEvents.withValue { $0.append(Both(id, detail)) }
-    }
     $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in
       nil
     }
@@ -480,18 +455,16 @@ import Testing
       filterNotifications.withValue { $0.append(notification) }
     }
     $0.osLog.log = { @Sendable _ in }
+    $0.appEvent.record = { event in loggedIds.withValue { $0.append(event.eventId) } }
   }
 
   await store.send(.sheetPresented)
 
   #expect(savedDisabledBlockGroups.value == [[]]) // <-- saved empty disabled block groups
-  #expect(apiLoggedEvents.value == [Both(
-    "59d3c6d1",
-    "UNEXPECTED no stored disabled block groups ids",
-  )])
   #expect(fetchBlockRulesInvocations.value == 1)
   #expect(savedProtectionModes.value == [.normal([.urlContains(value: "fetched-rule")])])
   #expect(filterNotifications.value == [.rulesChanged])
+  #expect(loggedIds.value == ["59d3c6d1"])
 }
 
 @MainActor

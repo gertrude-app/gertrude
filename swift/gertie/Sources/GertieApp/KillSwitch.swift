@@ -4,6 +4,53 @@ public enum GertrudeIOSApp: String, Codable, CaseIterable, Sendable {
   case blocker
   case music
   case podcasts
+
+  public static let productionAPIBaseURL = URL(string: "https://api.gertrude.app")!
+
+  public static func apiBaseURL(
+    file: StaticString = #fileID,
+    line: UInt = #line,
+  ) -> URL {
+    self.resolveAPIBaseURL(
+      Bundle.main.object(forInfoDictionaryKey: "API_ENDPOINT") as? String,
+      file: file,
+      line: line,
+    )
+  }
+
+  private static func resolveAPIBaseURL(
+    _ value: String?,
+    file: StaticString = #fileID,
+    line: UInt = #line,
+    assertionFailure: (String, StaticString, UInt) -> Void = Self.debugAssertionFailure,
+  ) -> URL {
+    let endpoint = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    if let url = URL(string: endpoint), url.scheme != nil, url.host != nil {
+      return url
+    }
+    assertionFailure(
+      "Missing or invalid API_ENDPOINT; falling back to \(self.productionAPIBaseURL.absoluteString)",
+      file,
+      line,
+    )
+    return self.productionAPIBaseURL
+  }
+
+  private static func debugAssertionFailure(
+    _ message: String,
+    file: StaticString,
+    line: UInt,
+  ) {
+    #if DEBUG
+      guard !self.isRunningTests else { return }
+      assertionFailure(message, file: file, line: line)
+    #endif
+  }
+
+  private static var isRunningTests: Bool {
+    NSClassFromString("XCTestCase") != nil
+      || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+  }
 }
 
 public struct KillSwitchCheckTiming: Codable, Equatable, Sendable {

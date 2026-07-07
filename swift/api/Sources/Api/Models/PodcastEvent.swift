@@ -1,12 +1,13 @@
 import Foundation
+import GertieApp
 
 struct PodcastEvent: Codable, Sendable {
   var id: Id
   var eventId: String
-  var kind: Kind
-  var label: String
+  var level: EventLevel
+  var domain: String?
   var detail: String?
-  var deviceId: UUID
+  var deviceId: IOSDevice.Id?
   var modelIdentifier: String
   var appVersion: String
   var iosVersion: String
@@ -15,31 +16,22 @@ struct PodcastEvent: Codable, Sendable {
   init(
     id: Id = .init(),
     eventId: String,
-    kind: Kind,
-    label: String,
+    level: EventLevel = .info,
+    domain: String? = nil,
     detail: String? = nil,
-    deviceId: UUID,
+    deviceId: IOSDevice.Id?,
     modelIdentifier: String,
     appVersion: String,
     iosVersion: String,
   ) {
     self.id = id
     self.eventId = eventId
-    self.kind = kind
-    self.label = label
+    self.level = level
+    self.domain = domain
     self.detail = detail
     self.deviceId = deviceId
     self.modelIdentifier = modelIdentifier
     self.appVersion = appVersion
     self.iosVersion = iosVersion
-  }
-}
-
-extension PodcastEvent {
-  enum Kind: String, Sendable, Codable {
-    case info
-    case error
-    case unexpected
-    case subscription
   }
 }

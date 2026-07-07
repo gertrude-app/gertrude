@@ -507,7 +507,6 @@ final class IOSReducerTestsLaunch: XCTestCase {
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [BlockGroup.gifs.legacyUUID] }
       $0.sharedStorage.loadAccountConnection = { .mock { $0.supervised = nil } }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.sharedStorage.migrateLegacyData = { @Sendable in false }
       $0.sharedStorage.loadAllBlockGroups = { @Sendable in nil }
       $0.api.connectAccountFeatureFlag = {

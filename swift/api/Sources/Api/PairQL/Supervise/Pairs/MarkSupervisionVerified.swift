@@ -30,7 +30,7 @@ extension MarkSupervisionVerified: Resolver {
 
     try await context.db.create(IOSEvent(
       eventId: "09748184",
-      kind: .supervision,
+      domain: "supervision",
       detail: "supervision_verified: code=\(input.code)",
       deviceId: validated.device.id,
       modelIdentifier: validated.device.modelIdentifier,

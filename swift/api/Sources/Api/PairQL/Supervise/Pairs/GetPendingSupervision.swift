@@ -33,7 +33,7 @@ extension GetPendingSupervision: Resolver {
 
     try await context.db.create(IOSEvent(
       eventId: "3b8f1e2c",
-      kind: .supervision,
+      domain: "supervision",
       detail: "tool_code_entered: platform=\(input.platform)",
       deviceId: validated.device.id,
       modelIdentifier: validated.device.modelIdentifier,

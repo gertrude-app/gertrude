@@ -105,7 +105,7 @@ final class IosOnlyMacTrialCampaignTests: ApiTestCase, @unchecked Sendable {
   private func createCheckin(for device: IOSDevice, at date: Date) async throws -> IOSEvent {
     var event = try await self.db.create(IOSEvent(
       eventId: "b977cfdc",
-      kind: .checkin,
+      domain: "checkin",
       deviceId: device.id,
       modelIdentifier: device.modelIdentifier,
       iosVersion: device.iosVersion,

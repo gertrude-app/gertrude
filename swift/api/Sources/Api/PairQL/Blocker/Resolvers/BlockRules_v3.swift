@@ -28,7 +28,7 @@ extension BlockRules_v3: Resolver {
     if let device {
       _ = try? await ctx.db.create(IOSEvent(
         eventId: "06329f27",
-        kind: .checkin,
+        domain: "checkin",
         detail: "rules=\(blockRules.count), hash=\(rulesHash)",
         deviceId: device.id,
         modelIdentifier: device.modelIdentifier,

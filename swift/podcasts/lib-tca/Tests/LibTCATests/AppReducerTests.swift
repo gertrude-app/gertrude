@@ -12,7 +12,6 @@ import Testing
 @MainActor struct AppReducerTests {
   @Test func `reinstall with preserved db does not false onboard`() async {
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
         .legacyGrandfathered(accessEndsAt: .reference, showMigrationNag: false, migrationUrl: nil)
       }
@@ -45,7 +44,6 @@ import Testing
   }
 
   @Test func `first launch sends 27c4f26a event after device id is established`() async {
-    let loggedEventIds = LockIsolated<[String]>([])
     let keychainStore = LockIsolated<[String: Data]>([:])
     let crossPromosFetchedAfterDeviceId = LockIsolated(false)
     let crossPromos = CrossPromos.Output(promos: [
@@ -60,7 +58,6 @@ import Testing
       ),
     ])
     await withDependencies {
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.api.crossPromos = {
         crossPromosFetchedAfterDeviceId.setValue(
           keychainStore.value[KeychainClient.Key.deviceId.rawValue] != nil,
@@ -94,7 +91,7 @@ import Testing
       #expect(keychainStore.value[KeychainClient.Key.deviceId.rawValue] != nil)
       #expect(crossPromosFetchedAfterDeviceId.value)
       await Task.yield()
-      #expect(loggedEventIds.value.contains("27c4f26a"))
+      #expect(loggedEventIds().contains("27c4f26a"))
     }
   }
 
@@ -102,7 +99,6 @@ import Testing
     let now = Date.reference
     let campaign = childHomeCampaign(id: "fm-teaser")
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = { .legacyGrandfathered(
         accessEndsAt: .reference,
         showMigrationNag: false,
@@ -141,9 +137,7 @@ import Testing
       primaryCta: .init(label: "Check it out", action: .openUrl("https://gertrude.app/fm")),
       dismissable: false, // no dismiss-action cta and not a dismissable sheet → no way out
     )
-    let loggedLabels = LockIsolated<[String]>([])
     await withDependencies {
-      $0.api.logEvent = { _, _, label, _ in loggedLabels.withValue { $0.append(label) } }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
@@ -157,13 +151,12 @@ import Testing
       await store.finish()
       #expect(store.state.crossPromos.promos.isEmpty) // filtered out of state at ingestion
       #expect(store.state.crossPromo == nil) // and so never presented
-      #expect(loggedLabels.value.contains("cross promo dropped: no guaranteed exit"))
+      #expect(loggedEvents().contains { $0.apiId == "b9e1a7c4" })
     }
   }
 
   @Test func `claimed device without a pincode resumes at the passcode step`() async {
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .active(
           expiresAt: .reference + .days(300),
@@ -200,7 +193,6 @@ import Testing
     let now = Date.reference
     let campaign = childHomeCampaign(id: "fm-teaser")
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = { .legacyGrandfathered(
         accessEndsAt: .reference,
         showMigrationNag: false,
@@ -232,7 +224,6 @@ import Testing
     let now = Date.reference
     let campaign = childHomeCampaign(id: "fm-teaser")
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = { .legacyGrandfathered(
         accessEndsAt: .reference,
         showMigrationNag: false,
@@ -265,7 +256,6 @@ import Testing
     let campaign = childHomeCampaign(id: "fm-teaser")
     let envelope = CrossPromos.Output(promos: [campaign])
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
@@ -284,7 +274,6 @@ import Testing
   @Test func `receivedCrossPromos during onboarding does not present child home`() async {
     let envelope = CrossPromos.Output(promos: [childHomeCampaign(id: "fm-teaser")])
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase()
     } operation: {
       var initialState = AppReducer.State()
@@ -302,7 +291,6 @@ import Testing
     let now = Date.reference
     let campaign = childHomeCampaign(id: "fm-teaser")
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
@@ -324,7 +312,6 @@ import Testing
     let now = Date.reference
     let campaign = childHomeCampaign(id: "fm-teaser")
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
@@ -354,10 +341,7 @@ import Testing
       primaryCta: .init(label: "Check it out", action: .dismiss),
       dismissable: true,
     )
-    let logged = LockIsolated<[(String, String)]>([])
     await withDependencies {
-      $0.api
-        .logEvent = { _, _, label, detail in logged.withValue { $0.append((label, detail ?? "")) } }
       $0.api.getTrialStatus = { .legacyGrandfathered(
         accessEndsAt: .reference,
         showMigrationNag: false,
@@ -382,8 +366,8 @@ import Testing
       }
       await store.finish()
 
-      let impression = logged.value.first { $0.0 == "cross promo impression" }
-      #expect(impression?.1 == "campaign=fm-teaser variant=B placement=amChildHome")
+      let impression = loggedEvents().first { $0.apiId == "fa1c7e93" }
+      #expect(impression?.detail == "campaign=fm-teaser variant=B placement=amChildHome")
     }
   }
 
@@ -399,10 +383,7 @@ import Testing
       secondaryCta: .init(label: "No thanks", action: .dismiss),
       dismissable: true,
     )
-    let logged = LockIsolated<[(String, String)]>([])
     await withDependencies {
-      $0.api
-        .logEvent = { _, _, label, detail in logged.withValue { $0.append((label, detail ?? "")) } }
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
@@ -416,9 +397,10 @@ import Testing
       }
       await store.finish()
 
-      let cta = logged.value.first { $0.0 == "cross promo cta" }
+      let cta = loggedEvents().first { $0.apiId == "b62d4a8f" }
       #expect(cta?
-        .1 == "campaign=fm-teaser variant=- placement=amChildHome slot=primary action=open-url")
+        .detail ==
+        "campaign=fm-teaser variant=- placement=amChildHome slot=primary action=open-url")
       #expect(dep(\.db).dismissedCrossPromoIds().contains("fm-teaser")) // engaged → don't re-show
     }
   }
@@ -435,7 +417,6 @@ import Testing
       dismissable: true,
     )
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.keychain._load = { key in keychainStore.value[key.rawValue] }
@@ -471,7 +452,6 @@ import Testing
       ),
     ])
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.keychain._load = { key in keychainStore.value[key.rawValue] }
@@ -497,9 +477,7 @@ import Testing
   }
 
   @Test func `pin set after a mid-claim relaunch logs the detection event`() async {
-    let loggedEventIds = LockIsolated<[String]>([])
     await withDependencies {
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]), installDate: .reference, deviceId: UUID())
@@ -518,15 +496,13 @@ import Testing
 
       await store.finish()
       await Task.yield()
-      #expect(loggedEventIds.value.contains("ba182b20"))
-      #expect(loggedEventIds.value.contains("c3e9a1f4"))
+      #expect(loggedEventIds().contains("ba182b20"))
+      #expect(loggedEventIds().contains("c3e9a1f4"))
     }
   }
 
   @Test func `normal onboarding finish does not log the detection event`() async {
-    let loggedEventIds = LockIsolated<[String]>([])
     await withDependencies {
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]), installDate: .reference, deviceId: UUID())
@@ -540,15 +516,14 @@ import Testing
       await store.send(.mode(.presented(.onboarding(.finished(123_456)))))
       await store.finish()
       await Task.yield()
-      #expect(loggedEventIds.value.contains("ba182b20"))
-      #expect(!loggedEventIds.value.contains("c3e9a1f4"))
+      #expect(loggedEventIds().contains("ba182b20"))
+      #expect(!loggedEventIds().contains("c3e9a1f4"))
     }
   }
 
   @Test func `foregrounding silently flips a skip user to active once claimed`() async {
     let keychainStore = LockIsolated<[String: Data]>([:])
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
         .connected(
           token: UUID(),

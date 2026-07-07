@@ -1,4 +1,47 @@
+import GertieApp
+
 extension PlaybackFailure {
+  var eventId: String {
+    switch self {
+    case .appleMusicSubscriptionRequired: "18378ebc"
+    case .catalogLookupFailed: "37358a04"
+    case .musicAccessDenied: "9791174c"
+    case .musicAccessRestricted: "1676a4ae"
+    case .playbackFailed: "f357b375"
+    case .privacyAcknowledgementRequired: "21a860f7"
+    case .trackUnavailable: "e1423c41"
+    }
+  }
+
+  var eventLevel: EventLevel {
+    switch self {
+    case .appleMusicSubscriptionRequired:
+      .warn
+    case .catalogLookupFailed,
+         .musicAccessDenied,
+         .musicAccessRestricted,
+         .playbackFailed:
+      .err
+    case .privacyAcknowledgementRequired,
+         .trackUnavailable:
+      .warn
+    }
+  }
+
+  var eventDomain: LogDomain {
+    switch self {
+    case .appleMusicSubscriptionRequired:
+      .subs
+    case .catalogLookupFailed,
+         .musicAccessDenied,
+         .musicAccessRestricted,
+         .playbackFailed,
+         .privacyAcknowledgementRequired,
+         .trackUnavailable:
+      .playback
+    }
+  }
+
   var title: String {
     switch self {
     case .appleMusicSubscriptionRequired:

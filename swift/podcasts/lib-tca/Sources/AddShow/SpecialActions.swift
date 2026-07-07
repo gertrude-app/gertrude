@@ -20,11 +20,11 @@ extension AddShowFeature {
         let (_, response) = try await URLSession.shared.upload(for: request, from: dbData)
         guard let httpResponse = response as? HTTPURLResponse,
               (200 ... 299).contains(httpResponse.statusCode) else {
-          log(.error("b4c8d7e2"), "upload db fail: unexpected response")
+          log(.err, .library, "b4c8d7e2")
           await send(.delegate(.alert("DB upload failed, unexpected response")))
           return
         }
-        log(.info("a5f6b9c3"), "upload db success")
+        log(.info, .library, "a5f6b9c3")
         await send(.delegate(.alert("DB upload success: \(deviceId)")))
       }
     }
@@ -32,7 +32,7 @@ extension AddShowFeature {
     if input.starts(with: "am: download db ") {
       let urlString = String(input.dropFirst("am: download db ".count))
       guard let url = URL(string: urlString) else {
-        log(.error("d8e9f1a2"), "download db fail: invalid url")
+        log(.err, .library, "d8e9f1a2")
         return .send(.delegate(.alert("DB download failed, invalid URL")))
       }
 
@@ -43,19 +43,19 @@ extension AddShowFeature {
         }
         let allowed = try await self.api.verifyDbDownload(deviceId, urlString)
         guard allowed else {
-          log(.info("c3b2a1f0"), "download db not allowed")
+          log(.info, .library, "c3b2a1f0")
           await send(.delegate(.alert("DB download not allowed")))
           return
         }
         let (data, response) = try await URLSession.shared.data(from: url)
         guard let httpResponse = response as? HTTPURLResponse,
               (200 ... 299).contains(httpResponse.statusCode) else {
-          log(.error("e9f1a2b3"), "download db fail: bad response")
+          log(.err, .library, "e9f1a2b3")
           await send(.delegate(.alert("DB download failed, bad response")))
           return
         }
         try data.write(to: .tempDb)
-        log(.info("f1a2b3c4"), "download db success")
+        log(.info, .library, "f1a2b3c4")
         await send(.delegate(.alert("DB download success, restart app")))
       }
     }
@@ -70,10 +70,10 @@ extension AddShowFeature {
         let verified = try await self.api.verifyPromoCode(deviceId, code)
         if verified {
           try CurrentSubscription.set(status: .complimentary, expiringAt: .distantFuture)
-          log(.info("111b15d5"), "set subscription to complimentary")
+          log(.info, .library, "111b15d5")
           await send(.delegate(.alert("Subscription set to complimentary :)")))
         } else {
-          log(.info("9a7c3e21"), "promo code verification failed")
+          log(.info, .library, "9a7c3e21")
           await send(.delegate(.alert("Invalid promo code")))
         }
       }

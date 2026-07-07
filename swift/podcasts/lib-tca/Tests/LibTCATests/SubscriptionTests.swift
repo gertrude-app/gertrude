@@ -13,7 +13,6 @@ import Testing
 @MainActor struct SubscriptionTests {
   @Test func `server trial status sets trialing with server expiresAt`() async throws {
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = { .trial(expiresAt: .reference + .days(20)) }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
@@ -38,7 +37,6 @@ import Testing
 
   @Test func `server trial expired sets unpaid with server since date`() async throws {
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = { .trialExpired(since: .reference - .days(2)) }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
@@ -63,7 +61,6 @@ import Testing
 
   @Test func `legacy nag authoritatively rewrites stale local row and flags nag`() async throws {
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
         .legacyGrandfathered(
           accessEndsAt: .reference + .days(40),
@@ -96,7 +93,6 @@ import Testing
 
   @Test func `legacy silent phase rewrites local row without nag`() async throws {
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
         .legacyGrandfathered(
           accessEndsAt: .reference + .days(300),
@@ -129,7 +125,6 @@ import Testing
   @Test func `legacy expired authoritatively maps claimed device to unpaid`() async throws {
     let keychainStore = LockIsolated<[String: Data]>([:])
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(
           childId: UUID(),
@@ -163,7 +158,6 @@ import Testing
   @Test func `claimed legacy grandfathered preserves server migration nag`() async throws {
     let keychainStore = LockIsolated<[String: Data]>([:])
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(
           childId: UUID(),
@@ -248,7 +242,6 @@ import Testing
     let token = UUID()
     let keychainStore = LockIsolated<[String: Data]>([:])
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getTrialStatus = {
         .connected(token: token, childId: UUID(), childName: "Sally", subscription: .active(
           expiresAt: .reference + .days(300),
@@ -280,7 +273,6 @@ import Testing
   @Test func `account status authoritatively corrects stale local active`() async throws {
     let keychainStore = LockIsolated<[String: Data]>([:])
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
       }
@@ -306,7 +298,6 @@ import Testing
   @Test func `confirmed 401 clears token and falls back to trial poll`() async throws {
     let keychainStore = LockIsolated<[String: Data]>([:])
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         throw PqlError(id: "a", requestId: "b", type: .unauthorized, debugMessage: "no token")
       }
@@ -335,7 +326,6 @@ import Testing
     let keychainStore = LockIsolated<[String: Data]>([:])
     let token = UUID()
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = { throw URLError(.timedOut) }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
@@ -360,10 +350,8 @@ import Testing
 
   @Test func `5xx on account status does not clear token and logs error`() async throws {
     let keychainStore = LockIsolated<[String: Data]>([:])
-    let loggedEventIds = LockIsolated<[String]>([])
     let token = UUID()
     try await withDependencies {
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.api.getAccountStatus = {
         throw PqlError(id: "a", requestId: "b", type: .serverError, debugMessage: "boom")
       }
@@ -385,7 +373,7 @@ import Testing
 
       #expect(keychainStore.value[KeychainClient.Key.amToken.rawValue] == token.uuidString
         .data(using: .utf8))
-      #expect(loggedEventIds.value.contains("a1f4c2d9"))
+      #expect(loggedEventIds().contains("a1f4c2d9"))
     }
   }
 
@@ -393,7 +381,6 @@ import Testing
     let keychainStore = LockIsolated<[String: Data]>([:])
     let reclaimToken = UUID()
     try await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         throw PqlError(id: "a", requestId: "b", type: .unauthorized, debugMessage: "no token")
       }

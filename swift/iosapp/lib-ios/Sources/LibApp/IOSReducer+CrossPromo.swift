@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Foundation
 import GertieApp
 import GertieTcaFeatures
+import LibClients
 
 extension IOSReducer {
   enum CrossPromoEvent: String {
@@ -117,10 +118,11 @@ extension IOSReducer {
 
   func logUnpresentableCrossPromos(_ campaigns: [CrossPromoCampaign]) -> EffectOf<IOSReducer> {
     .merge(campaigns.map { campaign in
-      .run { [deps = self.deps] _ in
-        await deps.api.logEvent(
+      .run { _ in
+        log(
+          .warn,
           "c4f06a92",
-          "cross promo dropped: no guaranteed exit"
+          detail: "cross promo dropped: no guaranteed exit"
             + " campaign=\(campaign.campaignId) placement=\(campaign.placement)",
         )
       }
@@ -137,8 +139,8 @@ extension IOSReducer {
       + " variant=\(campaign.variant ?? "-")"
       + " placement=\(campaign.placement)"
     let detail = extra.map { "\(base) \($0)" } ?? base
-    return .run { [deps = self.deps] _ in
-      await deps.api.logEvent(event.id, detail)
+    return .run { _ in
+      log(.info, event.id, detail: detail)
     }
   }
 }

@@ -88,7 +88,7 @@ struct OnboardingFeature {
         return .none
       case (.areYouTheParent, .secondaryBtnTapped):
         state.screen = .parentRequired
-        log(.info("4936b4ff"), "onboarding, not parent")
+        log(.info, .setup, "4936b4ff")
         return .none
       case (.parentRequired, .primaryBtnTapped):
         state.screen = .hiThere

@@ -2,6 +2,7 @@ import BlockerRoute
 import Dependencies
 import DuetSQL
 import Foundation
+import GertieApp
 import XCTest
 import XExpect
 
@@ -28,9 +29,11 @@ final class BlockerResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.eventId == eventId)
       .first(in: self.db)
 
-    expect(retrieved.kind).toEqual(.info)
+    expect(retrieved.level).toEqual(.info)
+    expect(retrieved.domain).toEqual(nil)
     expect(retrieved.modelIdentifier).toEqual("iPhone18,2")
     expect(retrieved.iosVersion).toEqual("18.0.1")
+    expect(retrieved.appVersion).toEqual("1.5.0")
     expect(retrieved.deviceId).toEqual(.init(vendorId))
     expect(retrieved.detail).toEqual("first launch")
 
@@ -62,9 +65,11 @@ final class BlockerResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.eventId == eventId)
       .first(in: self.db)
 
-    expect(retrieved.kind).toEqual(.info)
+    expect(retrieved.level).toEqual(.info)
+    expect(retrieved.domain).toEqual(nil)
     expect(retrieved.modelIdentifier).toEqual("iPhone,unknown")
     expect(retrieved.iosVersion).toEqual("18.0.1")
+    expect(retrieved.appVersion).toEqual("0.0.0")
     expect(retrieved.deviceId).toEqual(.init(vendorId))
     expect(retrieved.detail).toEqual("first launch")
 

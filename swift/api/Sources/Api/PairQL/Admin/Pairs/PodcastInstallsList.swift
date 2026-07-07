@@ -136,6 +136,7 @@ private struct DistinctInstallCount: CustomCountable {
     SELECT COUNT(DISTINCT \(deviceId)) AS count
     FROM \(table: PodcastEvent.self)
     WHERE \(eventId) = '27c4f26a'
+      AND \(deviceId) IS NOT NULL
     """)
   }
 
@@ -172,6 +173,7 @@ private struct InstallSummaryQuery: CustomQueryable {
         \(deviceId), \(modelIdentifier), \(iosVersion), \(appVersion), \(createdAt)
       FROM \(table: PodcastEvent.self)
       WHERE \(eventId) = '27c4f26a'
+        AND \(deviceId) IS NOT NULL
       ORDER BY \(deviceId), \(createdAt) ASC
     ) first_launch
     LEFT JOIN (

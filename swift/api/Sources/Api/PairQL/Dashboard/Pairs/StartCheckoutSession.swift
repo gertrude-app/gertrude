@@ -68,7 +68,7 @@ extension StartCheckoutSession: Resolver {
          let device = try? await context.db.find(iosDeviceId) {
         _ = try? await context.db.create(IOSEvent(
           eventId: "9c7e2dcb",
-          kind: .supervision,
+          domain: "supervision",
           detail: "checkout_initiated, tier=\(input.tier)",
           deviceId: device.id,
           modelIdentifier: device.modelIdentifier,

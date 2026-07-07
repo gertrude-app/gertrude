@@ -56,7 +56,7 @@ public final class ControllerProxy: Sendable {
     let task = Task {
       if await self.deps.storage.migrateLegacyData() {
         self.deps.logger.log("migration performed by controller")
-        await self.deps.api.logEvent(id: "99bacaaa", detail: "migration performed by controller")
+        LibClients.log(.info, .storage, "99bacaaa")
         self.notifyRulesChanged.withValue { $0() }
       }
     }
@@ -69,7 +69,7 @@ public final class ControllerProxy: Sendable {
   public func startFilter() -> Task<Void, Never> {
     self.deps.logger.log("starting filter")
     return Task {
-      await self.deps.api.logEvent(id: "00ec3909", detail: "controller proxy: filter started")
+      LibClients.log(.info, .controller, "00ec3909")
       self.deps.logger.log("start filter refresh rules 1")
       await self.refreshRules(reason: .startup)
       self.deps.logger.log("start filter refresh rules 2")
@@ -183,8 +183,8 @@ public final class ControllerProxy: Sendable {
   @discardableResult
   public func stopFilter(reason: NEProviderStopReason) -> Task<Void, Never> {
     self.deps.logger.log("stopping filter")
-    return Task { [api = self.deps.api] in
-      await api.logEvent(id: "8e23bea2", detail: "filter stopped, reason: \(reason)")
+    return Task {
+      LibClients.log(.info, .controller, "8e23bea2", detail: "reason: \(reason)")
     }
   }
 

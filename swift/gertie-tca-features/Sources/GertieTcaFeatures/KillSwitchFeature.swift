@@ -357,12 +357,7 @@ private final class UserDefaultsBox: @unchecked Sendable {
 
 private extension KillSwitchClient {
   static var apiBaseURL: URL {
-    URL(
-      string:
-      Bundle.main.object(forInfoDictionaryKey: "API_URL") as? String
-        ?? Bundle.main.object(forInfoDictionaryKey: "API_ENDPOINT") as? String
-        ?? "https://api.gertrude.app",
-    )!
+    GertrudeIOSApp.apiBaseURL()
   }
 
   static let pairql = PairQLClient<IOSAppsRoute>(

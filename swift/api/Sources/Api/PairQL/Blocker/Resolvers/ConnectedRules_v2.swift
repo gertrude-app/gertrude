@@ -25,7 +25,7 @@ extension ConnectedRules_v2: Resolver {
 
     _ = try? await ctx.db.create(IOSEvent(
       eventId: "b977cfdc",
-      kind: .checkin,
+      domain: "checkin",
       detail: "rules=\(blockRules.count), hash=\(rulesHash)",
       deviceId: ctx.device.id,
       modelIdentifier: input.modelIdentifier,

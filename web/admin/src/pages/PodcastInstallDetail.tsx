@@ -12,25 +12,31 @@ import LoadingState from '../components/LoadingState';
 import { formatDate } from '../lib/format';
 
 interface PodcastEvent extends TimelineEvent {
-  kind: string;
+  level: string;
+  domain?: string;
 }
 
 const getEventColor = (event: TimelineEvent): string => {
   const podcastEvent = event as PodcastEvent;
-  if (podcastEvent.kind === `subscription`) return `bg-green-500`;
-  if (podcastEvent.kind === `error`) return `bg-red-400`;
-  if (podcastEvent.kind === `unexpected`) return `bg-amber-400`;
+  if (podcastEvent.domain === `subscription`) return `bg-green-500`;
+  if (podcastEvent.level === `error` || podcastEvent.level === `critical`)
+    return `bg-red-400`;
+  if (podcastEvent.level === `warning`) return `bg-amber-400`;
   if (event.eventId === `27c4f26a`) return `bg-emerald-500`;
   return `bg-slate-300`;
 };
 
-const getKindBadgeClass = (kind: string): string => {
-  switch (kind) {
-    case `subscription`:
-      return `bg-green-100 text-green-700`;
+const getEventBadge = (event: PodcastEvent): string => event.domain ?? event.level;
+
+const getEventBadgeClass = (event: PodcastEvent): string => {
+  if (event.domain === `subscription`) {
+    return `bg-green-100 text-green-700`;
+  }
+  switch (event.level) {
+    case `critical`:
     case `error`:
       return `bg-red-100 text-red-700`;
-    case `unexpected`:
+    case `warning`:
       return `bg-amber-100 text-amber-700`;
     default:
       return `bg-slate-100 text-slate-600`;
@@ -118,11 +124,11 @@ const PodcastInstallDetail: React.FC = () => {
           const podcastEvent = event as PodcastEvent;
           return (
             <span
-              className={`text-xs px-1.5 py-0.5 rounded ${getKindBadgeClass(
-                podcastEvent.kind,
+              className={`text-xs px-1.5 py-0.5 rounded ${getEventBadgeClass(
+                podcastEvent,
               )}`}
             >
-              {podcastEvent.kind}
+              {getEventBadge(podcastEvent)}
             </span>
           );
         }}

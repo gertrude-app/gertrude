@@ -59,21 +59,20 @@ extension DatabaseWriter {
   }
 
   func insertEvent(
-    kind: EventKind.Db,
-    label: String,
+    kind: DbEventKind,
     detail: String? = nil,
     apiId: String? = nil,
   ) {
     self.tryWrite { db in
       try Event
-        .insert { Event.Draft(kind: kind.rawValue, label: label, detail: detail, apiId: apiId) }
+        .insert { Event.Draft(kind: kind.rawValue, detail: detail, apiId: apiId) }
         .execute(db)
     }
   }
 
   func insertRecord(id: Record.ID, value: String = "", detail: String? = nil) {
     if let existing = self.record(id: id) {
-      log(.unexpected("c59c4548"), "duplicate record \(id) insert", detail: "\(existing)")
+      log(.warn, .setup, "c59c4548", detail: "\(id): \(existing)")
       return
     }
     self.tryWrite { db in
@@ -152,6 +151,9 @@ public func appDatabase(
   migrator.registerMigration("subscription-legacy-status") {
     try Migrations.subscriptionLegacyStatus($0)
   }
+  migrator.registerMigration("drop-event-label") {
+    try #sql("ALTER TABLE events DROP COLUMN label").execute($0)
+  }
   try migrator.migrate(database)
 
   try database.write { db in
@@ -219,6 +221,6 @@ func replaceLocalDbWithDownloadedDb() {
     try? FileManager.default.removeItem(at: .localDbWal)
     try? FileManager.default.removeItem(at: .localDbShm)
     _ = try? FileManager.default.replaceItemAt(.localDb, withItemAt: .tempDb)
-    log(.info("3c4e2f29"), "replaced local db w/ downloaded")
+    log(.info, .setup, "3c4e2f29")
   }
 }

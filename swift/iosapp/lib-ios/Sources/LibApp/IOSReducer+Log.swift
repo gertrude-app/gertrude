@@ -1,9 +1,10 @@
+import LibClients
 import os.log
 
 extension IOSReducer.Deps {
   func log(_ msg: String, _ id: String) {
     #if !DEBUG
-      Task { await self.api.logEvent(id, "[onboarding]: \(msg)") }
+      LibClients.log(.info, .onboarding, id, detail: msg)
     #else
       if ProcessInfo.processInfo.environment["SWIFT_DETERMINISTIC_HASHING"] == nil {
         Task {

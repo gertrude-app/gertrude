@@ -44,7 +44,7 @@ extension RecordDeviceUSBConnection: Resolver {
 
     try await context.db.create(IOSEvent(
       eventId: "86af13a9",
-      kind: .supervision,
+      domain: "supervision",
       detail: "tool_connected: code=\(input.code), udid=\(input.udid), model=\(input.modelIdentifier)",
       deviceId: device.id,
       modelIdentifier: input.modelIdentifier,

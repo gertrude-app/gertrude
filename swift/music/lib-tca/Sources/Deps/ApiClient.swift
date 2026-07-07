@@ -1,6 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
+import GertieApp
 import MusicRoute
 import PairQL
 import PairQLClient
@@ -43,16 +44,9 @@ extension ApiClient: DependencyKey {
 }
 
 private let pairql = PairQLClient<MusicRoute>(
-  endpoint: { URL(string: .apiEndpoint)! },
+  endpoint: { GertrudeIOSApp.apiBaseURL() },
   timeout: 10,
 )
-
-private extension String {
-  static var apiEndpoint: String {
-    Bundle.main.object(forInfoDictionaryKey: "API_ENDPOINT") as? String
-      ?? "https://api.gertrude.app"
-  }
-}
 
 extension ApiClient {
   enum ApiError: Error {

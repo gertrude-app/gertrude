@@ -117,7 +117,7 @@ struct AddShowFeature {
         state.resettingPin = false
         return .run { send in
           self.keychain.save(pincode: pin)
-          log(.info("0c045f6c"), "pin changed", detail: "to: \(pin.redacted)")
+          log(.info, .library, "0c045f6c", detail: "to: \(pin.redacted)")
           await send(.delegate(.alert(lstr(.pinChangeSuccess))))
           try? await self.clock.sleep(for: .seconds(2))
           await self.dismiss()
@@ -137,10 +137,10 @@ struct AddShowFeature {
 
       case .addByUrlSubmitted(let input):
         if let special = self.handleSpecialAction(input: input) {
-          log(.info("2c229d59"), "special action", detail: input)
+          log(.info, .library, "2c229d59", detail: input)
           return special
         }
-        log(.info("8524413f"), "add by url", detail: input)
+        log(.info, .library, "8524413f", detail: input)
         let feedUrl = input.starts(with: "http") ? input : "https://\(input)"
         state.screen = .chooseArtworkPolicy(feedUrl)
         return .none
@@ -165,7 +165,7 @@ struct AddShowFeature {
   func subscribe(to feedUrl: String, artwork withArtwork: Bool) -> EffectOf<AddShowFeature> {
     .run { send in
       do {
-        log(.info("7785c87b"), "subscribe", detail: "\(feedUrl), artwork: \(withArtwork)")
+        log(.info, .library, "7785c87b", detail: "\(feedUrl), artwork: \(withArtwork)")
         let feed = try await self.podcasts.getFeed(feedUrl)
         let existingShow = try await self.db.read { db in
           try Show
@@ -173,7 +173,7 @@ struct AddShowFeature {
             .fetchOne(db)
         }
         if existingShow != nil {
-          log(.info("b8139e22"), "duplicate subscribe")
+          log(.info, .library, "b8139e22")
           await send(.delegate(.alert(lstr(.addShowAlreadySubscribed))))
           try? await self.clock.sleep(for: .seconds(2))
           await self.dismiss()
@@ -186,7 +186,7 @@ struct AddShowFeature {
             .fetchOne(db)
         }
         guard let show else {
-          log(.error("98916a65"), "subscribe fail", detail: "db insert returned nil: \(feedUrl)")
+          log(.err, .library, "98916a65", detail: "db insert->nil: \(feedUrl)")
           await send(.setScreen(.choosingMethod))
           await send(.delegate(.alert(lstr(.addShowError))))
           return
@@ -200,7 +200,7 @@ struct AddShowFeature {
         }
         await send(.subscribed(show))
       } catch {
-        log(.error("8c5abff7"), "subscribe fail", detail: "\(feedUrl): \(error)")
+        log(.err, .library, "8c5abff7", detail: "\(feedUrl): \(error)")
         await send(.setScreen(.choosingMethod))
         await send(.delegate(.alert(lstr(.addShowError))))
       }

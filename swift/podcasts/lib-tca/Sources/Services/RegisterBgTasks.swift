@@ -101,7 +101,7 @@ final class BgRefreshFeedsOperation: AsyncOperation, @unchecked Sendable {
       autoPruneDownloads()
       let duration = Date().timeIntervalSince(start)
       let detail = "time: \(String(format: "%.1f", duration))s"
-      self.database.insertEvent(kind: .debug, label: "bg-feed-refresh", detail: detail)
+      self.database.insertEvent(kind: .debug, detail: "bg-feed-refresh: \(detail)")
       self.finish()
     }
   }
@@ -147,8 +147,7 @@ final class BgDownloadEpisodesOperation: AsyncOperation, @unchecked Sendable {
       let timing = "in: \(String(format: "%.1f", duration))s"
       self.database.insertEvent(
         kind: .debug,
-        label: "bg-download-episodes -> end",
-        detail: "downloaded \(episodes.count) episodes \(timing)",
+        detail: "bg-download-episodes -> end: downloaded \(episodes.count) episodes \(timing)",
       )
       self.finish()
     }

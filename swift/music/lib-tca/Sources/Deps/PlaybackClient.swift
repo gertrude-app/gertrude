@@ -1,6 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
+import GertieApp
 
 #if canImport(MusicKit)
   import Combine

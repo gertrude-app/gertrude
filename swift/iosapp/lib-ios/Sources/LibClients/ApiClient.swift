@@ -4,7 +4,6 @@ import DependenciesMacros
 import Foundation
 import GertieBlocker
 import LibCore
-import os.log
 import PairQL
 import PairQLClient
 import TaggedTime
@@ -22,8 +21,6 @@ public struct ApiClient: Sendable {
     async throws -> [BlockRule]
   public var fetchDefaultBlockRules: @Sendable (_ deviceId: UUID?)
     async throws -> [BlockRule]
-  public var logEvent: @Sendable (_ id: String, _ detail: String?)
-    async -> Void
   public var recoveryDirective: @Sendable ()
     async throws -> String?
   public var setAccountConnection: @Sendable (ChildIOSDeviceData_v2?)
@@ -114,26 +111,6 @@ extension ApiClient: DependencyKey {
           )),
         )
         return legacyRules.map(\.current)
-      },
-      logEvent: { id, detail in
-        @Dependency(\.device) var device
-        let deviceData = await device.data()
-        do {
-          _ = try await pairql.call(
-            LogIOSEvent_v2.self,
-            unauthed: .logIOSEvent_v2(.init(
-              eventId: id,
-              kind: "ios",
-              modelIdentifier: deviceData.modelIdentifier,
-              iOSVersion: deviceData.iOSVersion,
-              appVersion: version,
-              vendorId: deviceData.deviceId,
-              detail: detail,
-            )),
-          )
-        } catch {
-          os_log("[G•] error logging event: %{public}s", String(reflecting: error))
-        }
       },
       recoveryDirective: {
         @Dependency(\.locale) var locale

@@ -174,9 +174,9 @@ struct AppReducer: Sendable {
           .run { _ in
             self.keychain.save(pincode: pincode)
             self.database.insertRecord(id: .onboardingFinished)
-            log(.info("ba182b20"), "set pincode", detail: "\(pincode.redacted)")
+            log(.info, .setup, "ba182b20", detail: "\(pincode.redacted)")
             if resumedAfterClaim {
-              log(.info("c3e9a1f4"), "pin set after mid-claim relaunch")
+              log(.info, .setup, "c3e9a1f4")
             }
           },
         )
@@ -212,9 +212,9 @@ struct AppReducer: Sendable {
       case .mode(.presented(.onboarding(.delegate(.shouldNotBeOnboarding)))):
         if self.keychain.hasPincode() {
           state.mode = .podcasts(.init())
-          log(.unexpected("73430b7b"), "false onboarding")
+          log(.warn, .setup, "73430b7b")
         } else {
-          log(.unexpected("9f4d7c2d"), "false onboarding")
+          log(.warn, .setup, "9f4d7c2d")
         }
         return .none
       case .alert:
@@ -273,8 +273,9 @@ struct AppReducer: Sendable {
     .merge(campaigns.map { campaign in
       .run { _ in
         await log(
-          .unexpected("b9e1a7c4"),
-          "cross promo dropped: no guaranteed exit",
+          .warn,
+          .setup,
+          "b9e1a7c4",
           detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement)",
         ).value
       }
@@ -313,7 +314,7 @@ struct AppReducer: Sendable {
       + " placement=\(campaign.placement)"
     let detail = extra.map { "\(base) \($0)" } ?? base
     return .run { _ in
-      await log(.info(event.id), "cross promo \(event.rawValue)", detail: detail).value
+      await log(.info, .setup, event.id, detail: detail).value
     }
   }
 
@@ -353,7 +354,7 @@ struct AppReducer: Sendable {
       await self.refreshTrialStatus()
     } catch is URLError {
     } catch {
-      log(.error("a1f4c2d9"), "account status refresh failed", detail: "\(error)")
+      log(.err, .setup, "a1f4c2d9", detail: "\(error)")
     }
   }
 
@@ -375,7 +376,12 @@ struct AppReducer: Sendable {
   func logFirstLaunch() {
     let region = self.locale.region?.identifier ?? "(nil)"
     let lang = self.locale.language.languageCode?.identifier ?? "(nil)"
-    log(.info("27c4f26a"), "firstLaunch", detail: "region: `\(region)`, language: `\(lang)`")
+    log(
+      .info,
+      .setup,
+      "27c4f26a",
+      detail: "region: `\(region)`, language: `\(lang)`",
+    )
   }
 
   func ensureDeviceId() async {
@@ -420,14 +426,9 @@ func unexpected(
       assertionFailure(message, file: file, line: line)
     }
   #endif
-  dep(\.db).insertEvent(kind: .error, label: id, detail: detail)
+  dep(\.db).insertEvent(kind: .error, detail: detail, apiId: id)
   #if !DEBUG
-    Task { try? await dep(\.api).logEvent(
-      id: id,
-      kind: .unexpected(nil),
-      label: "\(file):\(line)",
-      detail: detail,
-    ) }
+    Task { await sendAppEvent(.warn, nil, id, "\(file):\(line)" + (detail.map { " \($0)" } ?? "")) }
   #endif
 }
 

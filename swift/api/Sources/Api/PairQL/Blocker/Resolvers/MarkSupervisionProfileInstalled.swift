@@ -14,7 +14,7 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
 
       try await ctx.db.create(IOSEvent(
         eventId: "1c6f6ca8",
-        kind: .supervision,
+        domain: "supervision",
         detail: "profile_installed_confirmed",
         deviceId: ctx.device.id,
         modelIdentifier: ctx.device.modelIdentifier,

@@ -125,8 +125,7 @@ func migrateLegacyStorage() async -> Bool {
       // don't auto opt-in upgraders to new Apple Music group released March 2026
       uuids.append(UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!)
       saveCodable(uuids, forKey: .disabledBlockGroupIds)
-      @Dependency(\.api) var api
-      await api.logEvent(id: "04376893", detail: "migrated block groups to UUIDs")
+      log(.info, .storage, "04376893")
     }
   }
 
@@ -145,12 +144,12 @@ func migrateLegacyStorage() async -> Bool {
       disabledGroups.append(.spotifyImages)
     }
     saveCodable(disabledGroups, forKey: .disabledBlockGroups)
-    await api.logEvent(id: "edd6e55f", detail: "migrated v1.3.x -> 1.5.x")
+    log(.info, .storage, "edd6e55f")
     return true
   }
 
   if UserDefaults.gertrude.data(forKey: Key.legacyProtectionMode.rawValue) != nil {
-    await api.logEvent(id: "fdab6cff", detail: "unexpected migration error")
+    log(.warn, .storage, "fdab6cff")
     return false
   }
 
@@ -163,7 +162,7 @@ func migrateLegacyStorage() async -> Bool {
   @Dependency(\.device) var device
   saveCodable([BlockGroup.spotifyImages], forKey: .disabledBlockGroups)
   if let defaultRules = try? await api.fetchDefaultBlockRules(device.deviceId()) {
-    await api.logEvent(id: "c732e0ab", detail: "migrated v1.1.x -> 1.5.x")
+    log(.info, .storage, "c732e0ab")
     saveCodable(ProtectionMode.normal(defaultRules), forKey: .protectionMode)
   } else {
     saveCodable(
@@ -171,7 +170,7 @@ func migrateLegacyStorage() async -> Bool {
       ProtectionMode.onboarding(BlockRule.Legacy.defaults.map(\.current)),
       forKey: .protectionMode,
     )
-    await api.logEvent(id: "8d4a445b", detail: "error migrating v1.1.x -> 1.5.x")
+    log(.err, .storage, "8d4a445b")
   }
   return true
 }

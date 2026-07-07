@@ -354,6 +354,42 @@ extension MusicApp.Token: Model {
   }
 }
 
+extension MusicApp.Event: Model {
+  public static let schemaName = "music_app"
+  public static let tableName = "events"
+  public typealias ColumnName = CodingKeys
+
+  public func postgresData(for column: ColumnName) -> Postgres.Data {
+    switch column {
+    case .id: .id(self)
+    case .eventId: .string(self.eventId)
+    case .level: .string(self.level.rawValue)
+    case .domain: .string(self.domain)
+    case .detail: .string(self.detail)
+    case .deviceId: .uuid(self.deviceId?.rawValue)
+    case .modelIdentifier: .string(self.modelIdentifier)
+    case .iosVersion: .string(self.iosVersion)
+    case .appVersion: .string(self.appVersion)
+    case .createdAt: .date(self.createdAt)
+    }
+  }
+
+  public var insertValues: [ColumnName: Postgres.Data] {
+    [
+      .id: .id(self),
+      .eventId: .string(self.eventId),
+      .level: .string(self.level.rawValue),
+      .domain: .string(self.domain),
+      .detail: .string(self.detail),
+      .deviceId: .uuid(self.deviceId?.rawValue),
+      .modelIdentifier: .string(self.modelIdentifier),
+      .iosVersion: .string(self.iosVersion),
+      .appVersion: .string(self.appVersion),
+      .createdAt: .currentTimestamp,
+    ]
+  }
+}
+
 extension GertieBlocker.BlockRule: @retroactive PostgresJsonable {}
 
 extension Parent: Model {
@@ -1523,12 +1559,12 @@ extension PodcastEvent: Model {
     switch column {
     case .id: .id(self)
     case .eventId: .string(self.eventId)
-    case .kind: .string(self.kind.rawValue)
-    case .label: .string(self.label)
+    case .level: .string(self.level.rawValue)
+    case .domain: .string(self.domain)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .appVersion: .string(self.appVersion)
     case .iosVersion: .string(self.iosVersion)
-    case .deviceId: .uuid(self.deviceId)
+    case .deviceId: .uuid(self.deviceId?.rawValue)
     case .detail: .string(self.detail)
     case .createdAt: .date(self.createdAt)
     }
@@ -1538,12 +1574,12 @@ extension PodcastEvent: Model {
     [
       .id: .id(self),
       .eventId: .string(self.eventId),
-      .kind: .string(self.kind.rawValue),
-      .label: .string(self.label),
+      .level: .string(self.level.rawValue),
+      .domain: .string(self.domain),
       .modelIdentifier: .string(self.modelIdentifier),
       .appVersion: .string(self.appVersion),
       .iosVersion: .string(self.iosVersion),
-      .deviceId: .uuid(self.deviceId),
+      .deviceId: .uuid(self.deviceId?.rawValue),
       .detail: .string(self.detail),
       .createdAt: .currentTimestamp,
     ]
@@ -1559,11 +1595,13 @@ extension IOSEvent: Model {
     switch column {
     case .id: .id(self)
     case .eventId: .string(self.eventId)
-    case .kind: .string(self.kind.rawValue)
+    case .level: .string(self.level.rawValue)
+    case .domain: .string(self.domain)
     case .detail: .string(self.detail)
     case .deviceId: .uuid(self.deviceId?.rawValue)
     case .modelIdentifier: .string(self.modelIdentifier)
     case .iosVersion: .string(self.iosVersion)
+    case .appVersion: .string(self.appVersion)
     case .createdAt: .date(self.createdAt)
     }
   }
@@ -1572,11 +1610,13 @@ extension IOSEvent: Model {
     [
       .id: .id(self),
       .eventId: .string(self.eventId),
-      .kind: .string(self.kind.rawValue),
+      .level: .string(self.level.rawValue),
+      .domain: .string(self.domain),
       .detail: .string(self.detail),
       .deviceId: .uuid(self.deviceId?.rawValue),
       .modelIdentifier: .string(self.modelIdentifier),
       .iosVersion: .string(self.iosVersion),
+      .appVersion: .string(self.appVersion),
       .createdAt: .currentTimestamp,
     ]
   }

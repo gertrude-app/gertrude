@@ -1,8 +1,17 @@
 import ComposableArchitecture
 import Dependencies
 import Foundation
+import SQLiteData
 
 @testable import LibTCA
+
+func loggedEvents() -> [Event] {
+  dep(\.db).tryRead { try Event.all.fetchAll($0) }.sorted { $0.id < $1.id }
+}
+
+func loggedEventIds() -> [String] {
+  loggedEvents().compactMap(\.apiId)
+}
 
 func dictKeychain(
   _ store: LockIsolated<[String: Data]> = .init([:]),

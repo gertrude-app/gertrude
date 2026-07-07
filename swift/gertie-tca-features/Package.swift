@@ -5,7 +5,10 @@ import PackageDescription
 let package = Package(
   name: "GertieTcaFeatures",
   platforms: [.macOS(.v15), .iOS(.v17)],
-  products: [.library(name: "GertieTcaFeatures", targets: ["GertieTcaFeatures"])],
+  products: [
+    .library(name: "GertieTcaFeatures", targets: ["GertieTcaFeatures"]),
+    .library(name: "AppEvents", targets: ["AppEvents"]),
+  ],
   dependencies: [
     .package(path: "../gertie"),
     .package(path: "../pairql"),
@@ -19,8 +22,18 @@ let package = Package(
   ],
   targets: [
     .target(
+      name: "AppEvents",
+      dependencies: [
+        .product(name: "GertieApp", package: "gertie"),
+        .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
+        .product(name: "PairQLClient", package: "pairql"),
+        .product(name: "Dependencies", package: "swift-dependencies"),
+      ],
+    ),
+    .target(
       name: "GertieTcaFeatures",
       dependencies: [
+        "AppEvents",
         .product(name: "GertieApp", package: "gertie"),
         .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
         .product(name: "PairQLClient", package: "pairql"),

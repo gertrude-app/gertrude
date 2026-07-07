@@ -20,6 +20,7 @@ extension XSlack.Slack.Client {
     case contactForm = "contact-form"
     case info
     case debug
+    case music
     case podcasts
     case podcastsLogs = "podcasts-logs"
   }

@@ -55,7 +55,7 @@ enum Reset {
       try await db.create([
         IOSEvent(
           eventId: "8d35f043",
-          kind: .onboarding,
+          domain: "onboarding",
           detail: "region: `US`",
           deviceId: deviceId,
           modelIdentifier: "iPhone15,2",
@@ -63,7 +63,7 @@ enum Reset {
         ),
         IOSEvent(
           eventId: "cdb31095",
-          kind: .onboarding,
+          domain: "onboarding",
           deviceId: deviceId,
           modelIdentifier: "iPhone15,2",
           iosVersion: "26.1",

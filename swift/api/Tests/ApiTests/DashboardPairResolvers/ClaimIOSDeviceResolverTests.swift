@@ -231,10 +231,9 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
     try await self.db.create(PodcastEvent(
       eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
+      domain: "subscription",
       detail: "originalID: 123456789012345",
-      deviceId: device.id.rawValue,
+      deviceId: device.id,
       modelIdentifier: device.modelIdentifier,
       appVersion: "1.4.0",
       iosVersion: device.iosVersion,
@@ -250,7 +249,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     }
 
     let event = try await PodcastEvent.query()
-      .where(.deviceId == device.id.rawValue)
+      .where(.deviceId == device.id)
       .first(in: self.db)
     let identity = try await BillingIdentity.query()
       .where(.parentId == parent.id)

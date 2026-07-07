@@ -38,6 +38,7 @@ let package = Package(
       name: "LibCore",
       dependencies: [
         .product(name: "GertieBlocker", package: "gertie"),
+        .product(name: "GertieApp", package: "gertie"),
       ],
     ),
     .target(
@@ -85,6 +86,7 @@ let package = Package(
         "LibCore",
         .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "GertieApp", package: "gertie"),
+        .product(name: "AppEvents", package: "gertie-tca-features"),
         .product(name: "BlockerRoute", package: "pairql-blocker"),
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Dependencies", package: "swift-dependencies"),

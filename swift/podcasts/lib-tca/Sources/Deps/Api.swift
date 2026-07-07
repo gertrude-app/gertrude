@@ -1,6 +1,7 @@
 import Dependencies
 import DependenciesMacros
 import Foundation
+import GertieApp
 import LibCore
 import PairQL
 import PairQLClient
@@ -9,12 +10,6 @@ import PodcastRoute
 @DependencyClient
 struct ApiClient: Sendable {
   var crossPromos: @Sendable () async throws -> CrossPromos.Output
-  var logEvent: @Sendable (
-    _ id: String,
-    _ kind: EventKind,
-    _ label: String,
-    _ detail: String?,
-  ) async throws -> Void
   var migrateDeviceId: @Sendable (_ oldDeviceId: UUID, _ newVendorId: UUID) async throws -> Void
   var getTrialStatus: @Sendable () async throws -> GetTrialStatus.Output
   var getAccountStatus: @Sendable () async throws -> GetAccountStatus.Output
@@ -48,25 +43,6 @@ extension ApiClient: DependencyKey {
         )
 
         return try await pairql.call(CrossPromos.self, unauthed: .crossPromos(input))
-      },
-      logEvent: { id, kind, label, detail in
-        guard let metadata = await podcastDeviceMetadata() else { return }
-
-        let input = LogPodcastEvent_v3.Input(
-          eventId: id,
-          kind: kind.string,
-          label: label,
-          detail: detail,
-          deviceId: metadata.deviceId,
-          modelIdentifier: metadata.modelIdentifier,
-          appVersion: metadata.appVersion,
-          iosVersion: metadata.iosVersion,
-        )
-
-        _ = try await pairql.call(
-          LogPodcastEvent_v3.self,
-          unauthed: .logPodcastEvent_v3(input),
-        )
       },
       migrateDeviceId: { oldDeviceId, newVendorId in
         let input = MigratePodcastVendorId.Input(
@@ -141,7 +117,7 @@ extension ApiClient: DependencyKey {
 }
 
 private let pairql = PairQLClient<PodcastRoute>(
-  endpoint: { URL(string: podcastApiEndpoint())! },
+  endpoint: { GertrudeIOSApp.apiBaseURL() },
   timeout: 10,
 )
 
@@ -153,11 +129,6 @@ func authed<P: Pair>(
     throw ApiClient.ApiError.noToken
   }
   return try await pairql.call(pair, authed: route, token: token)
-}
-
-private func podcastApiEndpoint() -> String {
-  Bundle.main.infoDictionary?["API_ENDPOINT"] as? String
-    ?? "https://api.gertrude.app"
 }
 
 private func podcastDeviceMetadata() async -> (
@@ -182,85 +153,6 @@ extension ApiClient {
     case noDeviceId
     case noToken
     case unexpectedError(statusCode: Int)
-  }
-}
-
-enum EventKind {
-  case error(String? = nil)
-  case unexpected(String? = nil)
-  case info(String? = nil)
-  case subscription(String? = nil)
-  case debug
-
-  var apiId: String? {
-    switch self {
-    case .error(let id),
-         .unexpected(let id),
-         .info(let id),
-         .subscription(let id):
-      id
-    default: nil
-    }
-  }
-
-  var string: String {
-    switch self {
-    case .error: "error"
-    case .unexpected: "unexpected"
-    case .info: "info"
-    case .debug: "debug"
-    case .subscription: "subscription"
-    }
-  }
-
-  enum Db: String {
-    case error
-    case unexpected
-    case info
-    case debug
-    case subscription
-  }
-
-  var toDb: EventKind.Db {
-    switch self {
-    case .error: .error
-    case .unexpected: .unexpected
-    case .info: .info
-    case .debug: .debug
-    case .subscription: .subscription
-    }
-  }
-}
-
-@discardableResult
-func log(
-  _ kind: EventKind,
-  _ label: String,
-  detail: String? = nil,
-  fileID: StaticString = #fileID,
-  filePath: StaticString = #filePath,
-  file: StaticString = #file,
-  line: UInt = #line,
-) -> Task<Void, Never> {
-  Task {
-    do {
-      if let apiId = kind.apiId {
-        try await dep(\.api).logEvent(apiId, kind, label, detail)
-      }
-      dep(\.db).insertEvent(
-        kind: kind.toDb,
-        label: label,
-        detail: detail,
-        apiId: kind.apiId,
-      )
-    } catch {
-      reportIssue(
-        "Failed to log event kind \(kind), label: \(label), detail: \(detail ?? "nil"): \(error)",
-        fileID: fileID,
-        filePath: filePath,
-        line: line,
-      )
-    }
   }
 }
 
