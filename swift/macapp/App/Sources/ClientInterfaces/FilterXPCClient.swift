@@ -8,6 +8,8 @@ import TaggedTime
 public struct FilterXPCClient: Sendable {
   public var establishConnection: @Sendable () async -> Result<Void, XPCErr>
   public var checkConnectionHealth: @Sendable () async -> Result<Void, XPCErr>
+  public var checkUdsShadowHealth: @Sendable () async -> UDS.ShadowHealth
+  public var takeUdsShadowStatusReport: @Sendable () async -> UDS.ShadowStatusReport
   public var disconnectUser: @Sendable () async -> Result<Void, XPCErr>
   public var endFilterSuspension: @Sendable () async -> Result<Void, XPCErr>
   public var endDowntimePause: @Sendable () async -> Result<Void, XPCErr>
@@ -32,6 +34,13 @@ public struct FilterXPCClient: Sendable {
   public init(
     establishConnection: @escaping @Sendable () async -> Result<Void, XPCErr>,
     checkConnectionHealth: @escaping @Sendable () async -> Result<Void, XPCErr>,
+    checkUdsShadowHealth: @escaping @Sendable () async -> UDS.ShadowHealth = { .init(
+      healthy: false,
+      detail: "unimplemented",
+    ) },
+    takeUdsShadowStatusReport: @escaping @Sendable () async -> UDS.ShadowStatusReport = {
+      .init(connected: false)
+    },
     disconnectUser: @escaping @Sendable () async -> Result<Void, XPCErr>,
     endFilterSuspension: @escaping @Sendable () async -> Result<Void, XPCErr>,
     endDowntimePause: @escaping @Sendable () async -> Result<Void, XPCErr>,
@@ -55,6 +64,8 @@ public struct FilterXPCClient: Sendable {
   ) {
     self.establishConnection = establishConnection
     self.checkConnectionHealth = checkConnectionHealth
+    self.checkUdsShadowHealth = checkUdsShadowHealth
+    self.takeUdsShadowStatusReport = takeUdsShadowStatusReport
     self.disconnectUser = disconnectUser
     self.endFilterSuspension = endFilterSuspension
     self.endDowntimePause = endDowntimePause
@@ -96,6 +107,14 @@ extension FilterXPCClient: TestDependencyKey {
       checkConnectionHealth: unimplemented(
         "FilterXPCClient.checkConnectionHealth",
         placeholder: .success(()),
+      ),
+      checkUdsShadowHealth: unimplemented(
+        "FilterXPCClient.checkUdsShadowHealth",
+        placeholder: .init(healthy: false, detail: "test placeholder"),
+      ),
+      takeUdsShadowStatusReport: unimplemented(
+        "FilterXPCClient.takeUdsShadowStatusReport",
+        placeholder: .init(connected: false),
       ),
       disconnectUser: unimplemented(
         "FilterXPCClient.disconnectUser",
@@ -157,6 +176,8 @@ extension FilterXPCClient: TestDependencyKey {
     .init(
       establishConnection: { .success(()) },
       checkConnectionHealth: { .success(()) },
+      checkUdsShadowHealth: { .init(healthy: true, detail: "mock") },
+      takeUdsShadowStatusReport: { .init(connected: true) },
       disconnectUser: { .success(()) },
       endFilterSuspension: { .success(()) },
       endDowntimePause: { .success(()) },

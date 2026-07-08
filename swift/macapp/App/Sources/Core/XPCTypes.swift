@@ -1,7 +1,7 @@
 import Foundation
 import Gertie
 
-public struct UserFilterData: Sendable, Codable {
+public struct UserFilterData: Sendable, Codable, Equatable {
   public var keychains: [RuleKeychain]
   public var downtime: Downtime?
   public var filteringDisabled: Bool?

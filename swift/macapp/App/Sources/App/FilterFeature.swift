@@ -11,15 +11,44 @@ struct FilterFeature: Feature {
     var currentSuspensionExpiration: Date?
     var `extension`: FilterExtensionState
     var version: String
+    var xpcFailureReported = false
+    var udsShadowFailureReported = false
+    var channelSamples = ChannelSamples()
+    var lastShadowStatusReportAt: Date?
+  }
+
+  // both channels sampled together at the five-minute heartbeat; the
+  // four buckets roll up into the daily `udsShadowStatus` telemetry event
+  struct ChannelSamples: Equatable {
+    var bothHealthy = 0
+    var xpcOnlyHealthy = 0
+    var udsOnlyHealthy = 0
+    var neitherHealthy = 0
+
+    mutating func record(xpcHealthy: Bool, udsHealthy: Bool) {
+      switch (xpcHealthy, udsHealthy) {
+      case (true, true): self.bothHealthy += 1
+      case (true, false): self.xpcOnlyHealthy += 1
+      case (false, true): self.udsOnlyHealthy += 1
+      case (false, false): self.neitherHealthy += 1
+      }
+    }
+
+    var detail: String {
+      "samples: \(self.bothHealthy) both ok, \(self.xpcOnlyHealthy) xpc-only, "
+        + "\(self.udsOnlyHealthy) uds-only, \(self.neitherHealthy) both dead"
+    }
   }
 
   enum Action: Equatable, Sendable {
     case receivedState(FilterExtensionState)
     case receivedVersion(String)
+    case channelHealthSampled(xpcHealthy: Bool, udsShadow: UDS.ShadowHealth)
   }
 
   struct Reducer: FeatureReducer {
     @Dependency(\.api) var api
+    @Dependency(\.date.now) var now
     @Dependency(\.filterXpc) var xpc
 
     func reduce(into state: inout State, action: Action) -> Effect<Action> {
@@ -37,6 +66,63 @@ struct FilterFeature: Feature {
       case .receivedVersion(let version):
         state.version = version
         return .none
+
+      // uds dark-ship telemetry: edge-triggered wedge events for both
+      // channels, plus a per-launch + daily status rollup, so the fleet
+      // yields both wedge-rates and a "shadow works at all" denominator
+      case .channelHealthSampled(let xpcHealthy, let shadow):
+        state.channelSamples.record(xpcHealthy: xpcHealthy, udsHealthy: shadow.healthy)
+        var effects: [Effect<Action>] = []
+
+        if !xpcHealthy, !state.xpcFailureReported {
+          state.xpcFailureReported = true
+          effects.append(.exec { _ in
+            await self.api.logUds(
+              "xpcHealthCheckFailed",
+              "uds shadow \(shadow.healthy ? "ALIVE" : "dead"): \(shadow.detail)",
+            )
+          })
+        } else if xpcHealthy, state.xpcFailureReported {
+          state.xpcFailureReported = false
+          effects.append(.exec { _ in
+            await self.api.logUds(
+              "xpcHealthCheckRecovered",
+              "uds shadow \(shadow.healthy ? "alive" : "DEAD"): \(shadow.detail)",
+            )
+          })
+        }
+
+        if !shadow.healthy, !state.udsShadowFailureReported {
+          state.udsShadowFailureReported = true
+          effects.append(.exec { _ in
+            await self.api.logUds(
+              "udsHealthCheckFailed",
+              "xpc \(xpcHealthy ? "alive" : "DEAD"): \(shadow.detail)",
+            )
+          })
+        } else if shadow.healthy, state.udsShadowFailureReported {
+          state.udsShadowFailureReported = false
+          effects.append(.exec { _ in
+            await self.api.logUds(
+              "udsHealthCheckRecovered",
+              "xpc \(xpcHealthy ? "alive" : "DEAD"): \(shadow.detail)",
+            )
+          })
+        }
+
+        let dueForStatusReport = state.lastShadowStatusReportAt
+          .map { self.now.timeIntervalSince($0) >= 60 * 60 * 24 } ?? true
+        if dueForStatusReport {
+          state.lastShadowStatusReportAt = self.now
+          let samples = state.channelSamples
+          state.channelSamples = .init()
+          effects.append(.exec { _ in
+            let report = await self.xpc.takeUdsShadowStatusReport()
+            await self.api.logUds("udsShadowStatus", "\(report.detail); \(samples.detail)")
+          })
+        }
+
+        return effects.isEmpty ? .none : .merge(effects)
       }
     }
   }
@@ -144,8 +230,14 @@ extension FilterFeature.RootReducer {
       return .exec { [persist = state.persistent] send in
         let filter = await self.filterExtension.state()
         guard filter.isXpcReachable else { return }
+        let xpcConnected = await self.xpc.connected()
+        let shadowHealth = await self.xpc.checkUdsShadowHealth()
+        await send(.filter(.channelHealthSampled(
+          xpcHealthy: xpcConnected,
+          udsShadow: shadowHealth,
+        )))
         // attempt to reconnect, if necessary
-        if await self.xpc.connected() == false {
+        if !xpcConnected {
           _ = await self.xpc.establishConnection()
         } else if case .success(let acc) = await self.xpc.requestAck() {
           await send(.filter(.receivedVersion(acc.version)))

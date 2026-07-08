@@ -395,6 +395,172 @@ final class FilterFeatureTests: XCTestCase {
     await store.send(.xpc(.receivedExtensionMessage(.logs(logs))))
     await expect(logFilterEvents.calls).toEqual([logs])
   }
+
+  @MainActor
+  func testXpcHealthCheckFailureReportsUdsShadowHealthOnceUntilRecovery() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.network.isConnected = { true }
+    store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.filterXpc.checkConnectionHealth = { .failure(.timeout) } // <-- xpc wedged
+    store.deps.filterXpc.establishConnection = { .failure(.timeout) } // ...and unrepairable
+    let shadowHealth = UDS.ShadowHealth(healthy: true, detail: "round-trip ok, filter v1.2.3")
+    store.deps.filterXpc.checkUdsShadowHealth = { shadowHealth }
+    store.deps.filterXpc.takeUdsShadowStatusReport = { .init(
+      connected: true,
+      filterVersion: "1.2.3",
+      requestsSucceeded: 5,
+    ) }
+    let securityEvent = spy2(on: (LogSecurityEvent.Input.self, UUID?.self), returning: ())
+    store.deps.api.logSecurityEvent = securityEvent.fn
+
+    // first sample: xpc failure edge reported + per-launch status rollup
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(
+      xpcHealthy: false,
+      udsShadow: shadowHealth,
+    ))) {
+      $0.filter.xpcFailureReported = true
+      $0.filter.lastShadowStatusReportAt = Date(timeIntervalSince1970: 0)
+      $0.filter.channelSamples = .init() // recorded, then reset by the rollup
+    }
+    await expect(securityEvent.calls).toEqual([
+      Both(
+        .init(
+          deviceId: Persistent.State.mock.user!.deviceId,
+          event: "xpcHealthCheckFailed",
+          detail: "uds shadow ALIVE: round-trip ok, filter v1.2.3",
+        ),
+        nil,
+      ),
+      Both(
+        .init(
+          deviceId: Persistent.State.mock.user!.deviceId,
+          event: "udsShadowStatus",
+          detail: "connected, filter v1.2.3, requests 5 ok / 0 failed, reconnects 0;"
+            + " samples: 0 both ok, 0 xpc-only, 1 uds-only, 0 both dead",
+        ),
+        nil,
+      ),
+    ])
+
+    // still wedged 5 minutes later: sample counted, no duplicate report
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(
+      xpcHealthy: false,
+      udsShadow: shadowHealth,
+    ))) {
+      $0.filter.channelSamples.udsOnlyHealthy = 1
+    }
+    await expect(securityEvent.calls.count).toEqual(2)
+
+    // xpc recovers: recovery reported, edge trigger reset
+    store.deps.filterXpc.checkConnectionHealth = { .success(()) }
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: shadowHealth))) {
+      $0.filter.xpcFailureReported = false
+      $0.filter.channelSamples.bothHealthy = 1
+    }
+    await expect(securityEvent.calls.count).toEqual(3)
+    await expect(securityEvent.calls[2].a.event).toEqual("xpcHealthCheckRecovered")
+  }
+
+  @MainActor
+  func testUdsShadowDeathWhileXpcAliveReportedOnceUntilRecovery() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.network.isConnected = { true }
+    store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.filterXpc.checkConnectionHealth = { .success(()) } // <-- xpc fine
+    store.deps.filterXpc.requestAck = { .success(.init(
+      randomInt: 1,
+      version: "1.0.0",
+      userId: 502,
+      numUserKeys: 1,
+    )) }
+    let deadShadow = UDS.ShadowHealth(
+      healthy: false,
+      detail: "not connected, last round-trip: never",
+    )
+    store.deps.filterXpc.checkUdsShadowHealth = { deadShadow }
+    store.deps.filterXpc.takeUdsShadowStatusReport = { .init(connected: false) }
+    let securityEvent = spy2(on: (LogSecurityEvent.Input.self, UUID?.self), returning: ())
+    store.deps.api.logSecurityEvent = securityEvent.fn
+
+    // first sample: uds failure edge + per-launch status rollup
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: deadShadow))) {
+      $0.filter.udsShadowFailureReported = true
+      $0.filter.lastShadowStatusReportAt = Date(timeIntervalSince1970: 0)
+    }
+    await expect(securityEvent.calls[0].a.event).toEqual("udsHealthCheckFailed")
+    await expect(securityEvent.calls[0].a.detail)
+      .toEqual("xpc alive: not connected, last round-trip: never")
+    await expect(securityEvent.calls[1].a.event).toEqual("udsShadowStatus")
+    await expect(securityEvent.calls[1].a.detail)
+      .toEqual("never connected, requests 0 ok / 0 failed, reconnects 0;"
+        + " samples: 0 both ok, 1 xpc-only, 0 uds-only, 0 both dead")
+
+    // still dead: no duplicate
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: deadShadow))) {
+      $0.filter.channelSamples.xpcOnlyHealthy = 1
+    }
+    await expect(securityEvent.calls.count).toEqual(2)
+
+    // shadow recovers
+    let aliveShadow = UDS.ShadowHealth(healthy: true, detail: "round-trip ok, filter v1.0.0")
+    store.deps.filterXpc.checkUdsShadowHealth = { aliveShadow }
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: aliveShadow))) {
+      $0.filter.udsShadowFailureReported = false
+      $0.filter.channelSamples.bothHealthy = 1
+    }
+    await expect(securityEvent.calls.count).toEqual(3)
+    await expect(securityEvent.calls[2].a.event).toEqual("udsHealthCheckRecovered")
+  }
+
+  @MainActor
+  func testShadowStatusRollupEmittedDaily() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.network.isConnected = { true }
+    store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.filterXpc.checkConnectionHealth = { .success(()) }
+    store.deps.filterXpc.requestAck = { .success(.init(
+      randomInt: 1,
+      version: "1.0.0",
+      userId: 502,
+      numUserKeys: 1,
+    )) }
+    let shadowHealth = UDS.ShadowHealth(healthy: true, detail: "round-trip ok")
+    store.deps.filterXpc.checkUdsShadowHealth = { shadowHealth }
+    store.deps.filterXpc.takeUdsShadowStatusReport = { .init(connected: true) }
+    let securityEvent = spy2(on: (LogSecurityEvent.Input.self, UUID?.self), returning: ())
+    store.deps.api.logSecurityEvent = securityEvent.fn
+
+    // launch rollup on first sample
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: shadowHealth)))
+    await expect(securityEvent.calls.count).toEqual(1)
+    await expect(securityEvent.calls[0].a.event).toEqual("udsShadowStatus")
+
+    // 5 minutes later: sample counted, no rollup
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: shadowHealth))) {
+      $0.filter.channelSamples.bothHealthy = 1
+    }
+    await expect(securityEvent.calls.count).toEqual(1)
+
+    // 24 hours later: next rollup, with accumulated samples, counters reset
+    store.deps.date = .constant(Date(timeIntervalSince1970: 60 * 60 * 24))
+    await store.send(.heartbeat(.everyFiveMinutes))
+    await store.receive(.filter(.channelHealthSampled(xpcHealthy: true, udsShadow: shadowHealth))) {
+      $0.filter.channelSamples = .init()
+      $0.filter.lastShadowStatusReportAt = Date(timeIntervalSince1970: 60 * 60 * 24)
+    }
+    await expect(securityEvent.calls.count).toEqual(2)
+    await expect(securityEvent.calls[1].a.detail)
+      .toEqual("connected, requests 0 ok / 0 failed, reconnects 0;"
+        + " samples: 2 both ok, 0 xpc-only, 0 uds-only, 0 both dead")
+  }
 }
 
 extension LogSecurityEvent.Input {
