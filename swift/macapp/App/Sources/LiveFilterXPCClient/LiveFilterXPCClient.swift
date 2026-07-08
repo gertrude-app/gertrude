@@ -8,45 +8,88 @@ import TaggedTime
 extension FilterXPCClient: @retroactive DependencyKey {
   public static var liveValue: Self {
     let xpc = ThreadSafeFilterXPC()
+    // phase A dark-ship: xpc stays the live channel; every outbound message
+    // is also duplicated onto the shadow uds channel for health comparison
+    let shadow = UDSClient.shared
+    shadow.start()
     return .init(
       establishConnection: { await .init {
         try await xpc.establishConnection()
       }},
-      checkConnectionHealth: { await .init {
-        try await xpc.checkConnectionHealth()
-      }},
-      disconnectUser: { await .init {
-        try await xpc.disconnectUser()
-      }},
-      endFilterSuspension: { await .init {
-        try await xpc.endFilterSuspension()
-      }},
-      endDowntimePause: { await .init {
-        try await xpc.endDowntimePause()
-      }},
-      pauseDowntime: { expiration in await .init {
-        try await xpc.pauseDowntime(until: expiration)
-      }},
-      requestAck: { await .init {
-        try await xpc.requestAck()
-      }},
-      requestUserTypes: { await .init {
-        try await xpc.requestUserTypes()
-      }},
-      sendAlive: { await .init {
-        let success = try await xpc.sendAlive()
-        if !success {
-          await send(urlMessage: .alive(getuid()))
-          _ = try await xpc.requestAck()
+      checkConnectionHealth: {
+        shadow.mirror(.ackRequest(randomInt: Int.random(in: 0 ... 10000), userId: getuid()))
+        return await .init {
+          try await xpc.checkConnectionHealth()
         }
-        return success
-      }},
-      sendDeleteAllStoredState: { await .init {
-        try await xpc.sendDeleteAllStoredState()
-      }},
+      },
+      checkUdsShadowHealth: { await shadow.health() },
+      takeUdsShadowStatusReport: { shadow.takeStatusReport() },
+      disconnectUser: {
+        shadow.mirror(.disconnectUser(userId: getuid()))
+        return await .init {
+          try await xpc.disconnectUser()
+        }
+      },
+      endFilterSuspension: {
+        shadow.mirror(.endFilterSuspension(userId: getuid()))
+        return await .init {
+          try await xpc.endFilterSuspension()
+        }
+      },
+      endDowntimePause: {
+        shadow.mirror(.endDowntimePause(userId: getuid()))
+        return await .init {
+          try await xpc.endDowntimePause()
+        }
+      },
+      pauseDowntime: { expiration in
+        shadow.mirror(.pauseDowntime(userId: getuid(), until: expiration))
+        return await .init {
+          try await xpc.pauseDowntime(until: expiration)
+        }
+      },
+      requestAck: {
+        shadow.mirror(.ackRequest(randomInt: Int.random(in: 0 ... 10000), userId: getuid()))
+        return await .init {
+          try await xpc.requestAck()
+        }
+      },
+      requestUserTypes: {
+        shadow.mirror(.userTypesRequest)
+        return await .init {
+          try await xpc.requestUserTypes()
+        }
+      },
+      sendAlive: {
+        shadow.mirror(.alive(userId: getuid()))
+        return await .init {
+          let success = try await xpc.sendAlive()
+          if !success {
+            await send(urlMessage: .alive(getuid()))
+            _ = try await xpc.requestAck()
+          }
+          return success
+        }
+      },
+      sendDeleteAllStoredState: {
+        shadow.mirror(.deleteAllStoredState)
+        return await .init {
+          try await xpc.sendDeleteAllStoredState()
+        }
+      },
       sendURLMessage: send(urlMessage:),
       sendUserRules: { manifest, keychains, downtime, filteringDisabled, alwaysBlocked in
-        await .init {
+        shadow.mirror(.userRules(
+          userId: getuid(),
+          manifest: manifest,
+          filterData: .init(
+            keychains: keychains,
+            downtime: downtime,
+            filteringDisabled: filteringDisabled,
+            alwaysBlocked: alwaysBlocked,
+          ),
+        ))
+        return await .init {
           try await xpc.sendUserRules(
             manifest: manifest,
             keychains: keychains,
@@ -56,15 +99,24 @@ extension FilterXPCClient: @retroactive DependencyKey {
           )
         }
       },
-      setBlockStreaming: { enabled in await .init {
-        try await xpc.setBlockStreaming(enabled: enabled)
-      }},
-      setUserExemption: { userId, enabled in await .init {
-        try await xpc.setUserExemption(userId: userId, enabled: enabled)
-      }},
-      suspendFilter: { duration in await .init {
-        try await xpc.suspendFilter(for: duration)
-      }},
+      setBlockStreaming: { enabled in
+        shadow.mirror(.setBlockStreaming(enabled: enabled, userId: getuid()))
+        return await .init {
+          try await xpc.setBlockStreaming(enabled: enabled)
+        }
+      },
+      setUserExemption: { userId, enabled in
+        shadow.mirror(.setUserExemption(userId: userId, enabled: enabled))
+        return await .init {
+          try await xpc.setUserExemption(userId: userId, enabled: enabled)
+        }
+      },
+      suspendFilter: { duration in
+        shadow.mirror(.suspendFilter(userId: getuid(), durationInSeconds: duration.rawValue))
+        return await .init {
+          try await xpc.suspendFilter(for: duration)
+        }
+      },
       events: {
         xpcEventSubject.withValue { subject in
           Move(subject.eraseToAnyPublisher())

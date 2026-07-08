@@ -18,7 +18,16 @@ extension LogSecurityEvent: Resolver {
     ))
 
     guard let event = Gertie.SecurityEvent.MacApp(rawValue: input.event) else {
-      if input.event != "appUpdateInitiated" { // <-- removed for noise
+      let suppressedEvents = [
+        "appUpdateInitiated", // <-- removed for noise
+        // below: UDS dark-ship telemetry
+        "xpcHealthCheckFailed",
+        "xpcHealthCheckRecovered",
+        "udsHealthCheckFailed",
+        "udsHealthCheckRecovered",
+        "udsShadowStatus",
+      ]
+      if !suppressedEvents.contains(input.event) {
         await with(dependency: \.slack)
           .error("Unknown security event: `\(input.event)`, detail: \(input.detail ?? "(nil)")")
       }

@@ -2,6 +2,8 @@
 
 ## Release notes
 
+- `2.9.4` (canary, 7/8/26)
+  - unix-domain-socket shadow xpc
 - `2.9.3` (beta 5/4/26)
   - real regex support for unlocking keys (see docs/notes/001)
 - `2.9.2` (stable 4/23/26)

@@ -130,6 +130,17 @@ let package = Package(
       ],
     ),
     .testTarget(
+      name: "UDSTests",
+      dependencies: [
+        "Filter",
+        "LiveFilterXPCClient",
+        "Core",
+        "TestSupport",
+        "x-expect" => "XExpect",
+        "gertie" => "Gertie",
+      ],
+    ),
+    .testTarget(
       name: "WebSocketTests",
       dependencies: [
         "LiveWebSocketClient",

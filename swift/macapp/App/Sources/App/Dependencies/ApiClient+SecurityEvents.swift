@@ -23,6 +23,22 @@ public extension ApiClient {
       nil,
     )
   }
+
+  // engineering telemetry (not parent-facing): raw slugs are stored in
+  // system.security_events but are unknown to the dashboard feed, so they
+  // never surface to parents. dropped (not buffered) when offline.
+  func logUds(_ rawSlug: String, _ detail: String? = nil) async {
+    @Dependency(\.storage) var storage
+    @Dependency(\.network) var network
+    guard network.isConnected(),
+          let deviceId = try? await storage.loadPersistentState()?.user?.deviceId else {
+      return
+    }
+    await self.logSecurityEvent(
+      .init(deviceId: deviceId, event: rawSlug, detail: detail),
+      nil,
+    )
+  }
 }
 
 struct BufferedSecurityEvent: Codable {

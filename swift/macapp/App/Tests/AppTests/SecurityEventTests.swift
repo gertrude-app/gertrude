@@ -88,6 +88,15 @@ final class SecurityEventTests: XCTestCase {
         ),
         1, // <-- the stored token
       ),
+      Both(
+        .init(
+          deviceId: .deadbeef,
+          event: "udsShadowStatus", // <-- per-launch shadow rollup, first heartbeat
+          detail: "connected, requests 0 ok / 0 failed, reconnects 0;"
+            + " samples: 1 both ok, 0 xpc-only, 0 uds-only, 0 both dead",
+        ),
+        nil,
+      ),
     ])
 
     // buffered events should be cleared and not resent
