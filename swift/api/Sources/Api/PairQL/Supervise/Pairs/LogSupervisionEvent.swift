@@ -23,7 +23,7 @@ extension LogSupervisionEvent: Resolver {
 
     try await context.db.create(IOSEvent(
       eventId: "016d03db",
-      kind: .supervision,
+      domain: "supervision",
       detail: "\(input.event): \(input.detail)",
       deviceId: validated.device.id,
       modelIdentifier: validated.device.modelIdentifier,

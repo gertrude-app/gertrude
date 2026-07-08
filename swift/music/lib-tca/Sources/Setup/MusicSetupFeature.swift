@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import GertieApp
 import MusicRoute
 
 @Reducer
@@ -93,15 +94,18 @@ struct MusicSetupFeature: Sendable {
           return self.checkAppleMusicSubscription()
         case .denied:
           state.screen = .appleMusicDenied
+          log(.err, .setup, "e145e6b5")
           return .none
         case .notDetermined:
           state.screen = showWelcomeIfNeeded ? .welcome : .appleMusicPermission
           return .none
         case .restricted:
           state.screen = .appleMusicRestricted
+          log(.err, .setup, "c58a3b1d")
           return .none
         case .unknown:
           state.screen = .appleMusicStatusUnavailable
+          log(.warn, .setup, "7d682c16")
           return .none
         }
 
@@ -111,20 +115,25 @@ struct MusicSetupFeature: Sendable {
           return self.checkGertrudeConnection(&state)
         case .permissionDenied:
           state.screen = .appleMusicDenied
+          log(.err, .setup, "8a026e2c")
           return .none
         case .privacyAcknowledgementRequired:
           state.screen = .appleMusicPrivacyAcknowledgementRequired
+          log(.warn, .setup, "af4f5985")
           return .none
-        case .subscriptionRequired(let canBecomeSubscriber):
-          state.screen = .appleMusicSubscriptionRequired(canShowOffer: canBecomeSubscriber)
+        case .subscriptionRequired(let canShowOffer):
+          state.screen = .appleMusicSubscriptionRequired(canShowOffer: canShowOffer)
+          log(.warn, .subs, "bfa4b9e6", detail: "canShowOffer=\(canShowOffer)")
           return .none
         case .unknown:
           state.screen = .appleMusicStatusUnavailable
+          log(.warn, .subs, "e1c0d002")
           return .none
         }
 
       case .appleMusicSubscriptionOfferButtonTapped:
         state.isSubscriptionOfferPresented = true
+        log(.info, .subs, "c380387c")
         return .none
 
       case .appleMusicSubscriptionOfferPresentationChanged(let isPresented):
@@ -154,17 +163,20 @@ struct MusicSetupFeature: Sendable {
           childName: childName,
         ))
         state.screen = .ready(childName: childName)
+        log(.info, .setup, "aa99a570")
         return .merge(
           .cancel(id: CancelID.musicAppStatusPolling),
           .send(.delegate(.completed(childName: childName))),
         )
 
-      case .musicAppStatusFailed(let hasStoredConnection):
-        guard !hasStoredConnection else { return .none }
+      case .musicAppStatusFailed(let hasStored):
+        log(.err, .setup, "d3cb7281", detail: "stored=\(hasStored)")
+        guard !hasStored else { return .none }
         state.screen = .gertrudeConnection(.failed)
         return .cancel(id: CancelID.musicAppStatusPolling)
 
       case .musicAppStatusPollingFailed:
+        log(.err, .setup, "0f92a6a8")
         return .none
 
       case .settingsButtonTapped:

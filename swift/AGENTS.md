@@ -18,6 +18,13 @@ If you need a UUID, use bash to invoke `uuid --llm` to get one, instead of makin
 yourself. Many places in this codebase we use partial identifiers (especially for
 logging), like `c05ef986`, if you need one of those, invode `sid --llm`.
 
+When a new short id names an iOS-app telemetry event (the `eventId` arg of a `log(...)`
+call in the blocker, podcasts, or music apps), also add a human-readable label for it in
+the matching server-side map at
+`api/Sources/Api/PairQL/IOSApps/EventLabels/EventLabels+{Blocker,Podcast,Music}.swift`.
+These events send only the id (no label on the wire), so an id with no map entry renders
+as a raw hash in admin timelines and Slack.
+
 When adding new functions and extensions, avoid creating small single-function files.
 Group related functions and extensions in an existing file by default, breaking out new
 files when a file grows too large or when a clear organizational seam emerges.

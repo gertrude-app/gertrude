@@ -1,0 +1,20 @@
+{
+  "name": "music-lib-tca",
+  "root": "music/lib-tca",
+  "projectType": "library",
+  "implicitDependencies": [
+    "music-lib-views",
+    "gertie",
+    "gertie-tca-features",
+    "pairql",
+    "pairql-music"
+  ],
+  "targets": {
+    "build": {
+      "command": "cd music/lib-tca && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd music/lib-tca && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

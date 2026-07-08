@@ -12,7 +12,6 @@ import Testing
     let keychainStore = LockIsolated<[String: Data]>([:])
     await withDependencies {
       $0.api.consumePinResetCode = { _ in } // server accepts the code
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(.reference)
       $0.dismiss = DismissEffect {}
       $0.defaultDatabase = try! appDatabase()
@@ -44,7 +43,6 @@ import Testing
           appTag: .incorrectConfirmationCode, // the resolver's bad/expired/wrong-install signal
         )
       }
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(.reference)
       $0.dismiss = DismissEffect {}
       $0.defaultDatabase = try! appDatabase()
@@ -100,10 +98,8 @@ import Testing
   @Test func `setting a new pin saves it and dismisses`() async throws {
     let keychainStore = LockIsolated<[String: Data]>([:])
     let isDismissed = LockIsolated(false)
-    let loggedEventIds = LockIsolated<[String]>([])
     await withDependencies {
       $0.api.consumePinResetCode = { _ in }
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.date = .constant(.reference)
       $0.dismiss = DismissEffect { isDismissed.setValue(true) }
       $0.defaultDatabase = try! appDatabase()
@@ -124,7 +120,7 @@ import Testing
         == "654321".data(using: .utf8))
       #expect(isDismissed.value)
       await Task.yield()
-      #expect(loggedEventIds.value.contains("5f2c8e04"))
+      #expect(loggedEventIds().contains("5f2c8e04"))
     }
   }
 

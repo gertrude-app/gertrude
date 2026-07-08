@@ -227,8 +227,9 @@ private func _play(episode: Episode, show: Show) async throws {
     )
     if episode.downloaded {
       log(
-        .error("93bc1333"),
-        "downloaded episode missing local file before playback recovery",
+        .err,
+        .playback,
+        "93bc1333",
         detail: detail,
       )
     }
@@ -240,8 +241,9 @@ private func _play(episode: Episode, show: Show) async throws {
         try await dep(\.audio).play(episode: episode, show: show)
         NowPlaying.updateSyncingProgress { $0.isPlaying = true }
         log(
-          .info("d299b47a"),
-          "episode play recovered after local file check failed",
+          .info,
+          .playback,
+          "d299b47a",
           detail: detail,
         )
       case .cancelled:
@@ -249,8 +251,9 @@ private func _play(episode: Episode, show: Show) async throws {
       case .failure:
         NowPlaying.delete()
         log(
-          .error("2e2c9e97"),
-          "episode play recovery failed after local file check",
+          .err,
+          .playback,
+          "2e2c9e97",
           detail: detail,
         )
       }

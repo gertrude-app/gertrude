@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import GertieApp
 
 struct PlaybackProgress: Codable, Equatable, Sendable {
   var elapsedTime: TimeInterval
@@ -345,6 +346,12 @@ struct PlaybackFeature: Sendable {
       case .playbackFailed(let failure):
         state.failure = failure
         state.pauseSession()
+        log(
+          failure.eventLevel,
+          failure.eventDomain,
+          failure.eventId,
+          detail: "\(failure)",
+        )
         return .none
 
       case .playbackFailureDismissed:

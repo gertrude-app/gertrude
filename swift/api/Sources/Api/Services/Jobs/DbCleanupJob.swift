@@ -99,11 +99,32 @@ struct CleanupJob: AsyncScheduledJob {
     logs.append("Deleted \(smokeAdmins) smoke test admin accounts")
 
     let checkinEvents = try await IOSEvent.query()
-      .where(.kind == "checkin")
+      .where(.domain == "checkin")
       .where(.createdAt < 14.daysAgo)
       .delete(in: self.db)
 
     logs.append("Deleted \(checkinEvents) iOS check-in events")
+
+    let blockerDebugEvents = try await IOSEvent.query()
+      .where(.level == "debug")
+      .where(.createdAt < 7.daysAgo)
+      .delete(in: self.db)
+
+    logs.append("Deleted \(blockerDebugEvents) blocker debug events")
+
+    let musicDebugEvents = try await MusicApp.Event.query()
+      .where(.level == "debug")
+      .where(.createdAt < 7.daysAgo)
+      .delete(in: self.db)
+
+    logs.append("Deleted \(musicDebugEvents) music debug events")
+
+    let podcastDebugEvents = try await PodcastEvent.query()
+      .where(.level == "debug")
+      .where(.createdAt < 7.daysAgo)
+      .delete(in: self.db)
+
+    logs.append("Deleted \(podcastDebugEvents) podcast debug events")
 
     let deletedTelemetry = try await RouteTelemetry.query()
       .where(.createdAt < 30.daysAgo)

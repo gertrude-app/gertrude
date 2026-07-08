@@ -50,7 +50,6 @@ import Testing
     await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
-      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
         try NowPlayingModel.insert {
@@ -114,7 +113,6 @@ import Testing
     await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
-      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
         try NowPlayingModel.insert {
@@ -229,7 +227,6 @@ import Testing
     await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
-      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
         try NowPlayingModel.insert {
@@ -282,7 +279,6 @@ import Testing
     let releaseDownload = LockIsolated<CheckedContinuation<Void, Never>?>(nil)
 
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.continuousClock = ImmediateClock()
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase {
@@ -345,7 +341,6 @@ import Testing
     await withDependencies {
       $0.continuousClock = clock
       $0.date = .constant(.reference)
-      $0.api.logEvent = { _, _, _, _ in }
       $0.defaultDatabase = try! appDatabase {
         try fixtures($0)
         try NowPlayingModel.insert {

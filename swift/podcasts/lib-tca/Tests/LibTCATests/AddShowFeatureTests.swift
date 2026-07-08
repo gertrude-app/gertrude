@@ -96,7 +96,6 @@ import Testing
       $0.podcasts.getFeed = { _ in
         Feed(show: .mock(2) { $0.sourceUrl = dupeFeed }, episodes: [])
       }
-      $0.api.logEvent = { _, _, _, _ in }
     } operation: {
       let store = TestStore(
         initialState: .init(screen: .chooseArtworkPolicy(dupeFeed)),
@@ -131,7 +130,6 @@ import Testing
       $0.defaultDatabase = try! appDatabase()
       $0.date = .constant(.reference)
       $0.dismiss = .init { dismissed.setValue(true) }
-      $0.api.logEvent = { _, _, _, _ in }
       $0.haptics.notification = { _ in }
       $0.continuousClock = clock
       $0.keychain._save = { key, data in

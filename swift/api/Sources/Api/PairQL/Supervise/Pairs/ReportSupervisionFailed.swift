@@ -27,7 +27,7 @@ extension ReportSupervisionFailed: Resolver {
 
     try await context.db.create(IOSEvent(
       eventId: "df3914fa",
-      kind: .supervision,
+      domain: "supervision",
       detail: "supervision_failed: code=\(input.code)",
       deviceId: validated.device.id,
       modelIdentifier: validated.device.modelIdentifier,

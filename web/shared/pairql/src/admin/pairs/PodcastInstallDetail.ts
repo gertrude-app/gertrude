@@ -19,7 +19,8 @@ export namespace PodcastInstallDetail {
     events: Array<{
       id: string;
       eventId: string;
-      kind: string;
+      level: string;
+      domain?: string;
       label: string;
       detail?: string;
       createdAt: ISODateString;

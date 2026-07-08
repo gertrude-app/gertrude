@@ -75,13 +75,17 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testConnectStampsLegacyAmIapWhenDeviceHasQualifyingPurchase() async throws {
     let child = try await self.child()
     let vendorId = UUID()
+    try await self.db.create(IOSDevice(
+      id: .init(vendorId),
+      modelIdentifier: "iPhone14,2",
+      iosVersion: "18.4.0",
+    ))
     // a qualifying historical AM IAP recorded against this physical device
     var event = try await self.db.create(PodcastEvent(
       eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
+      domain: "subscription",
       detail: "originalID: 123456789012345", // len 15 -> host purchase
-      deviceId: vendorId,
+      deviceId: .init(vendorId),
       modelIdentifier: "iPhone14,2",
       appVersion: "1.4.0",
       iosVersion: "18.4.0",

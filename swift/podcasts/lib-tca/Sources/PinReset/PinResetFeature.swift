@@ -77,7 +77,7 @@ struct PinResetFeature {
       case .newPinSubmitted(let pin):
         return .run { _ in
           self.keychain.save(pincode: pin)
-          log(.info("5f2c8e04"), "pin reset", detail: "to: \(pin.redacted)")
+          log(.info, .pin, "5f2c8e04", detail: "to: \(pin.redacted)")
           await self.dismiss()
         }
 

@@ -1,0 +1,13 @@
+{
+  "name": "music-lib-views",
+  "root": "music/lib-views",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "cd music/lib-views && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd music/lib-views && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

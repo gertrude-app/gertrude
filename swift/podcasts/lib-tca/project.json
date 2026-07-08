@@ -1,0 +1,22 @@
+{
+  "name": "podcasts-lib-tca",
+  "root": "podcasts/lib-tca",
+  "projectType": "library",
+  "implicitDependencies": [
+    "podcasts-lib-core",
+    "podcasts-lib-views",
+    "pairql",
+    "pairql-podcasts",
+    "x-kit",
+    "gertie",
+    "gertie-tca-features"
+  ],
+  "targets": {
+    "build": {
+      "command": "cd podcasts/lib-tca && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd podcasts/lib-tca && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

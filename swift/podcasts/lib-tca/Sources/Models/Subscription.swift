@@ -118,7 +118,7 @@ struct CurrentSubscription: FetchKeyRequest {
       .where { $0.id.eq(Subscription.ID(1)) }
       .fetchOne(db)
     guard let subscription else {
-      log(.unexpected("c47d3e0b"), "missing subscription record")
+      log(.warn, "c47d3e0b")
       return .fallback
     }
     return subscription

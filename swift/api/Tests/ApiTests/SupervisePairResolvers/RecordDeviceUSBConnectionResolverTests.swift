@@ -39,7 +39,7 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
       .all(in: self.db)
     expect(events).toHaveCount(1)
     expect(events[0].detail!).toContain("tool_connected")
-    expect(events[0].kind).toEqual(IOSEvent.Kind.supervision)
+    expect(events[0].domain).toEqual("supervision")
   }
 
   func testCodeNotFound_throwsError() async throws {

@@ -24,7 +24,8 @@ struct PodcastInstallDetail: Pair {
   struct Event: PairNestable {
     var id: String
     var eventId: String
-    var kind: String
+    var level: String
+    var domain: String?
     var label: String
     var detail: String?
     var createdAt: Date
@@ -40,7 +41,7 @@ struct PodcastInstallDetail: Pair {
 extension PodcastInstallDetail: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
     let events = try await PodcastEvent.query()
-      .where(.deviceId == input.deviceId)
+      .where(.deviceId == IOSDevice.Id(input.deviceId))
       .orderBy(.createdAt, .asc)
       .all(in: context.db)
 
@@ -73,8 +74,9 @@ extension PodcastInstallDetail: Resolver {
       outputEvents.append(Event(
         id: event.id.rawValue.uuidString,
         eventId: event.eventId,
-        kind: event.kind.rawValue,
-        label: event.label,
+        level: event.level.rawValue,
+        domain: event.domain,
+        label: EventLabel.podcast(event.eventId) ?? event.eventId,
         detail: event.detail,
         createdAt: event.createdAt,
         elapsedSeconds: elapsedSeconds,

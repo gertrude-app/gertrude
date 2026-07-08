@@ -88,7 +88,6 @@ import Testing
       subscription: .active(expiresAt: .reference + .days(300)),
     )
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]))

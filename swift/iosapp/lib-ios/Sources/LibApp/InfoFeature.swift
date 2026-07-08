@@ -146,9 +146,8 @@ public struct InfoFeature {
 
       case .explainClearCacheNextTapped:
         state.subScreen = .main
-        return .run { [deps = self.deps] _ in
-          await deps.api.logEvent("e81796af", "UNEXPECTED")
-        }
+        log(.err, "e81796af")
+        return .none
 
       case .receivedShake where state.connection == nil && state.timesShaken == 5:
         self.deps.osLog.log("received 5th shake: entering unconnected recovery mode")
@@ -185,7 +184,7 @@ public struct InfoFeature {
 
   func unconnectedRecovery() -> EffectOf<InfoFeature> {
     .run { [deps = self.deps] _ in
-      await deps.api.logEvent("a8998540", "entering recovery mode")
+      log(.info, .supervision, "a8998540")
       if deps.sharedStorage.loadDisabledBlockGroupIds() == nil {
         deps.osLog.log("unconnected recovery: no stored disabled block group ids, saving empty")
         deps.sharedStorage.saveDisabledBlockGroupIds([])
@@ -196,14 +195,14 @@ public struct InfoFeature {
       deps.osLog.log("unconnected recovery: current rules: \(rules?.shortDesc ?? "(nil)")")
       if rules.missingRules {
         deps.osLog.log("unconnected recovery: rules missing, fetching defaults")
-        await deps.api.logEvent("bcca235f", "rules missing in recovery mode")
+        log(.warn, .supervision, "bcca235f")
         let defaultRules = try? await deps.api
           .fetchDefaultBlockRules(deps.device.deviceId())
         if let defaultRules, !defaultRules.isEmpty {
           deps.sharedStorage.saveProtectionMode(.normal(defaultRules))
           deps.osLog.log("unconnected recovery: saved fetched default rules")
         } else {
-          await deps.api.logEvent("2c3a4481", "failed to fetch defaults in recovery mode")
+          log(.err, .supervision, "2c3a4481")
           deps.sharedStorage
             .saveProtectionMode(.normal(BlockRule.Legacy.defaults.map(\.current)))
           deps.osLog.log("unconnected recovery: saved hardcoded default fallback rules")
@@ -230,7 +229,7 @@ extension InfoFeature.Deps {
   func ensureUnconnectedRules(deviceId: UUID?) async throws {
     let disabled = self.sharedStorage.loadDisabledBlockGroupIds()
     if disabled == nil {
-      await self.api.logEvent("59d3c6d1", "UNEXPECTED no stored disabled block groups ids")
+      log(.warn, .supervision, "59d3c6d1")
       self.sharedStorage.saveDisabledBlockGroupIds([])
     }
     guard let deviceId else { return }
@@ -255,7 +254,7 @@ extension InfoFeature.Deps {
     let directive = try? await self.api.recoveryDirective()
     if directive == "retry" {
       await self.systemExtension.cleanupForRetry()
-      await self.api.logEvent("aeaa467d", "received retry directive")
+      log(.info, .supervision, "aeaa467d")
     }
   }
 }

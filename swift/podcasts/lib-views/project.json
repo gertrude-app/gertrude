@@ -1,0 +1,14 @@
+{
+  "name": "podcasts-lib-views",
+  "root": "podcasts/lib-views",
+  "projectType": "library",
+  "implicitDependencies": ["podcasts-lib-core"],
+  "targets": {
+    "build": {
+      "command": "cd podcasts/lib-views && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd podcasts/lib-views && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

@@ -237,11 +237,11 @@ public struct IOSReducer: Sendable {
         switch await deps.systemExtension.requestAuthorization() {
         case .success:
           await send(.programmatic(.authorizationSucceeded))
-          await deps.api.logEvent("4a0c585f", "[onboarding] authorization succeeded")
+          log(.info, .onboarding, "4a0c585f")
         case .failure(let reason):
           await send(.programmatic(.authorizationFailed(reason)))
           await deps.systemExtension.cleanupForRetry()
-          await deps.api.logEvent("e2e02460", "[onboarding] authorization failed: \(reason)")
+          log(.warn, .onboarding, "e2e02460", detail: "\(reason)")
         }
       }
 
@@ -256,11 +256,11 @@ public struct IOSReducer: Sendable {
         switch await deps.systemExtension.installFilter() {
         case .success:
           await send(.programmatic(.installSucceeded))
-          await deps.api.logEvent("adced334", "[onboarding] filter install success")
+          log(.info, .filter, "adced334")
         case .failure(let error):
           await send(.programmatic(.installFailed(error)))
           await deps.systemExtension.cleanupForRetry()
-          await deps.api.logEvent("004d0d89", "[onboarding] filter install failed: \(error)")
+          log(.err, .filter, "004d0d89", detail: "\(error)")
         }
       }
 
@@ -885,9 +885,11 @@ public struct IOSReducer: Sendable {
               deps.sharedStorage.saveAllBlockGroups(groups)
               await send(.programmatic(.receivedAllBlockGroups(groups)))
             }
-            await deps.api.logEvent(
+            log(
+              .info,
+              .onboarding,
               "8d35f043",
-              "[onboarding] first launch, region: `\(deps.locale.region?.identifier ?? "(nil)")`",
+              detail: "first launch, region: `\(deps.locale.region?.identifier ?? "(nil)")`",
             )
           }
         },

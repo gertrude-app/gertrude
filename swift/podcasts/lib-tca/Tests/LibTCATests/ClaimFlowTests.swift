@@ -12,9 +12,7 @@ import Testing
     let token = UUID()
     let isDismissed = LockIsolated(false)
     let keychainStore = LockIsolated<[String: Data]>([:])
-    let loggedEventIds = LockIsolated<[String]>([])
     await withDependencies {
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.api.createClaimCode = { .init(code: 123_456, expiresAt: .reference + .days(1)) }
       $0.api.getTrialStatus = {
         .connected(token: token, childId: UUID(), childName: "Sally", subscription: .active(
@@ -48,7 +46,7 @@ import Testing
       await store.finish()
       #expect(isDismissed.value)
       await Task.yield()
-      #expect(loggedEventIds.value.contains("9b9ea2d6"))
+      #expect(loggedEventIds().contains("9b9ea2d6"))
     }
   }
 
@@ -56,7 +54,6 @@ import Testing
     let clock = TestClock()
     let isDismissed = LockIsolated(false)
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.createClaimCode = { .init(code: 222_333, expiresAt: .reference + .days(1)) }
       $0.api.getTrialStatus = {
         .connected(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
@@ -90,7 +87,6 @@ import Testing
   @Test func `claim into unpaid shows neutral success advancing to payment`() async {
     let clock = TestClock()
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.createClaimCode = { .init(code: 654_321, expiresAt: .reference + .days(1)) }
       $0.api.getTrialStatus = {
         .connected(token: UUID(), childId: UUID(), childName: "Sally", subscription: .unpaid(
@@ -121,7 +117,6 @@ import Testing
   @Test func `entering at payment mints no claim code`() async {
     let clock = TestClock()
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
       }
@@ -152,9 +147,7 @@ import Testing
   @Test func `payment poll into entitled state writes row and dismisses`() async throws {
     let clock = TestClock()
     let isDismissed = LockIsolated(false)
-    let loggedEventIds = LockIsolated<[String]>([])
     try await withDependencies {
-      $0.api.logEvent = { id, _, _, _ in loggedEventIds.withValue { $0.append(id) } }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .active(
           expiresAt: .reference + .days(365),
@@ -183,7 +176,7 @@ import Testing
       #expect(dep(\.db).subscription().status == .active)
       #expect(isDismissed.value)
       await Task.yield()
-      #expect(loggedEventIds.value.contains("c6cae011"))
+      #expect(loggedEventIds().contains("c6cae011"))
     }
   }
 
@@ -191,7 +184,6 @@ import Testing
     let clock = TestClock()
     let isDismissed = LockIsolated(false)
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
       }
@@ -225,7 +217,6 @@ import Testing
     let clock = TestClock()
     let isDismissed = LockIsolated(false)
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.getAccountStatus = {
         .init(childId: UUID(), childName: "Sally", subscription: .unpaid(remediationUrl: nil))
       }
@@ -254,7 +245,6 @@ import Testing
   @Test func `claim code creation failure shows retryable error`() async {
     let clock = TestClock()
     await withDependencies {
-      $0.api.logEvent = { _, _, _, _ in }
       $0.api.createClaimCode = { throw ApiClient.ApiError.requestFailed }
       $0.api.getTrialStatus = { .trial(expiresAt: .reference + .days(5)) }
       $0.continuousClock = clock

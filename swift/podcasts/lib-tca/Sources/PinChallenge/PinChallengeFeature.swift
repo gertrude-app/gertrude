@@ -36,7 +36,7 @@ struct PinChallengeFeature {
         state.lockout = .pinLockout()
         return .run { send in
           await self.haptics.notification(.success)
-          if wasLockedOut { log(.info("\(self.logBaseId)-1"), "pin lockout cleared") }
+          if wasLockedOut { log(.info, .pin, "\(self.logBaseId)-1") }
           await send(.delegate(.verified))
         }
 
@@ -47,7 +47,7 @@ struct PinChallengeFeature {
         state.lockout = lockout
         return .run { _ in
           await self.haptics.notification(.error)
-          if newlyLockedOut { log(.info("\(self.logBaseId)-2"), "pin lockout set") }
+          if newlyLockedOut { log(.info, .pin, "\(self.logBaseId)-2") }
         }
 
       case .pincodeCancelled:

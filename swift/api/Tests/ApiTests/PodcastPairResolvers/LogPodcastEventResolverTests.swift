@@ -1,5 +1,7 @@
 import DuetSQL
 import Foundation
+import GertieApp
+import IOSAppsRoute
 import PodcastRoute
 import XCTest
 import XExpect
@@ -36,14 +38,40 @@ final class LogPodcastEventResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     expect(retrieved.eventId).toEqual(eventId)
-    expect(retrieved.kind).toEqual(.info)
-    expect(retrieved.label).toEqual(label)
+    expect(retrieved.level).toEqual(.info)
+    expect(retrieved.domain).toEqual(nil)
     expect(retrieved.modelIdentifier).toEqual(modelIdentifier)
     expect(retrieved.appVersion).toEqual(appVersion)
     expect(retrieved.iosVersion).toEqual(iosVersion)
-    expect(retrieved.deviceId).toEqual(installId)
+    expect(retrieved.deviceId).toEqual(IOSDevice.Id(installId))
     expect(retrieved.detail).toEqual(detail)
     expect(retrieved.createdAt).not.toBeNil()
+  }
+
+  func testLogAppEventWithoutDeviceIdCreatesPodcastEventWithoutInstall() async throws {
+    let installsBefore = try await PodcastApp.Install.query().all(in: self.db).count // baseline
+
+    _ = try await LogAppEvent.resolve(with: LogEventRequest(
+      app: .podcasts,
+      eventId: "nildev01",
+      level: .warn,
+      domain: "setup",
+      detail: "identifierForVendor unavailable",
+      deviceId: nil,
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.6.0",
+      iosVersion: "18.2",
+    ), in: .mock)
+
+    let event = try await PodcastEvent.query()
+      .where(.eventId == "nildev01")
+      .first(in: self.db)
+    expect(event.deviceId).toBeNil()
+    expect(event.level).toEqual(.warn)
+    expect(event.domain).toEqual("setup")
+
+    let installsAfter = try await PodcastApp.Install.query().all(in: self.db).count
+    expect(installsAfter).toEqual(installsBefore) // nil-device event creates no install
   }
 
   func v3Input(
@@ -70,7 +98,7 @@ final class LogPodcastEventResolverTests: ApiTestCase, @unchecked Sendable {
 
     // backward-compatible: the event row is still created unchanged
     let event = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .first(in: self.db)
     expect(event.eventId).toEqual("abc123de")
 
@@ -100,7 +128,7 @@ final class LogPodcastEventResolverTests: ApiTestCase, @unchecked Sendable {
 
     // both event rows still recorded (events are not deduped by the augmentation)
     let events = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .all(in: self.db)
     expect(events.count).toEqual(2)
   }

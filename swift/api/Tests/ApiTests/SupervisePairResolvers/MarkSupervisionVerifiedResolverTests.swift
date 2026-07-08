@@ -35,7 +35,7 @@ final class MarkSupervisionVerifiedResolverTests: ApiTestCase, @unchecked Sendab
       .all(in: self.db)
     expect(events).toHaveCount(1)
     expect(events[0].detail!).toContain("supervision_verified")
-    expect(events[0].kind).toEqual(IOSEvent.Kind.supervision)
+    expect(events[0].domain).toEqual("supervision")
   }
 
   func testCodeNotFound_throwsError() async throws {

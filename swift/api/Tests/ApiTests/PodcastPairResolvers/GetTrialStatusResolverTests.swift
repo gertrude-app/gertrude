@@ -20,6 +20,28 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     )
   }
 
+  @discardableResult
+  func legacyPodcastEvent(
+    deviceId: UUID,
+    eventId: String = "af0a338f",
+    detail: String,
+  ) async throws -> PodcastEvent {
+    try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    return try await self.db.create(PodcastEvent(
+      eventId: eventId,
+      domain: "subscription",
+      detail: detail,
+      deviceId: .init(deviceId),
+      modelIdentifier: "iPhone15,2",
+      appVersion: "1.4.0",
+      iosVersion: "18.2",
+    ))
+  }
+
   // MARK: - install creation / idempotency
 
   func testFreshDeviceCreatesDeviceAndInstallAndReturnsTrial() async throws {
@@ -171,21 +193,15 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testHostPurchaseGrandfatheredAndBeatsTrial() async throws {
     let deviceId = UUID()
-    try await self.db.create(PodcastEvent(
-      eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
-      detail: "originalID: 123456789012345", // len 15 -> host purchase
+    try await self.legacyPodcastEvent(
       deviceId: deviceId,
-      modelIdentifier: "iPhone15,2",
-      appVersion: "1.4.0",
-      iosVersion: "18.2",
-    ))
+      detail: "originalID: 123456789012345",
+    )
 
     let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
 
     let event = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .first(in: self.db)
     expect(output).toEqual(.legacyGrandfathered(
       accessEndsAt: event.createdAt + .days(455),
@@ -196,21 +212,16 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFamilySharedIsGrandfathered() async throws {
     let deviceId = UUID()
-    try await self.db.create(PodcastEvent(
-      eventId: "a72104d7",
-      kind: .subscription,
-      label: "subscribe success",
-      detail: "originalID: 505123456789012345", // len 18 -> family-shared
+    try await self.legacyPodcastEvent(
       deviceId: deviceId,
-      modelIdentifier: "iPhone15,2",
-      appVersion: "1.4.0",
-      iosVersion: "18.2",
-    ))
+      eventId: "a72104d7",
+      detail: "originalID: 505123456789012345",
+    )
 
     let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
 
     let event = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .first(in: self.db)
     expect(output).toEqual(.legacyGrandfathered(
       accessEndsAt: event.createdAt + .days(455),
@@ -221,18 +232,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testLegacyNagFiresAtExactNagWindowBoundary() async throws {
     let deviceId = UUID()
-    try await self.db.create(PodcastEvent(
-      eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
-      detail: "originalID: 123456789012345",
+    try await self.legacyPodcastEvent(
       deviceId: deviceId,
-      modelIdentifier: "iPhone15,2",
-      appVersion: "1.4.0",
-      iosVersion: "18.2",
-    ))
+      detail: "originalID: 123456789012345",
+    )
     let event = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .first(in: self.db)
 
     // accessEndsAt = paidAt + 455d; nag boundary = accessEndsAt - 60d = paidAt + 395d
@@ -251,18 +256,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testLegacyNagSilentJustOutsideNagWindow() async throws {
     let deviceId = UUID()
-    try await self.db.create(PodcastEvent(
-      eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
-      detail: "originalID: 123456789012345",
+    try await self.legacyPodcastEvent(
       deviceId: deviceId,
-      modelIdentifier: "iPhone15,2",
-      appVersion: "1.4.0",
-      iosVersion: "18.2",
-    ))
+      detail: "originalID: 123456789012345",
+    )
     let event = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .first(in: self.db)
 
     let output = try await withDependencies {
@@ -280,16 +279,10 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testSandboxTransactionIsNotGrandfathered() async throws {
     let deviceId = UUID()
-    try await self.db.create(PodcastEvent(
-      eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
-      detail: "originalID: 2000000000000000", // len 16 -> sandbox/Xcode, excluded
+    try await self.legacyPodcastEvent(
       deviceId: deviceId,
-      modelIdentifier: "iPhone15,2",
-      appVersion: "1.4.0",
-      iosVersion: "18.2",
-    ))
+      detail: "originalID: 2000000000000000",
+    )
 
     let output = try await GetTrialStatus.resolve(with: self.input(deviceId), in: .mock)
 
@@ -300,18 +293,12 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testExpiredLegacyFallsThroughToTrial() async throws {
     let deviceId = UUID()
-    try await self.db.create(PodcastEvent(
-      eventId: "af0a338f",
-      kind: .subscription,
-      label: "subscribe success",
-      detail: "originalID: 123456789012345",
+    try await self.legacyPodcastEvent(
       deviceId: deviceId,
-      modelIdentifier: "iPhone15,2",
-      appVersion: "1.4.0",
-      iosVersion: "18.2",
-    ))
+      detail: "originalID: 123456789012345",
+    )
     let event = try await PodcastEvent.query()
-      .where(.deviceId == deviceId)
+      .where(.deviceId == IOSDevice.Id(deviceId))
       .first(in: self.db)
 
     let output = try await withDependencies {

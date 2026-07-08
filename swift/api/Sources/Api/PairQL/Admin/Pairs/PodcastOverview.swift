@@ -112,6 +112,7 @@ private struct StatusBreakdownRowsQuery: CustomQueryable {
         SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt)
         FROM \(table: PodcastEvent.self)
         WHERE \(eventId) = '27c4f26a'
+          AND \(deviceId) IS NOT NULL
         ORDER BY \(deviceId), \(createdAt) ASC
       ) first_launch
       LEFT JOIN (
@@ -149,6 +150,7 @@ private struct DeviceTypeInstallCount: CustomCountable {
     SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
     FROM \(table: PodcastEvent.self)
     WHERE \(PodcastEvent.columnName(.eventId)) =\(" ")
+      AND \(PodcastEvent.columnName(.deviceId)) IS NOT NULL
     """)
     stmt.components.append(.binding(eventId))
     stmt.components.append(.sql(" AND \(PodcastEvent.columnName(.modelIdentifier)) LIKE "))
@@ -184,6 +186,7 @@ private struct RecentInstallsQuery: CustomQueryable {
       SELECT DISTINCT ON (\(deviceId)) \(deviceId), \(createdAt), \(modelIdentifier)
       FROM \(table: PodcastEvent.self)
       WHERE \(eventId) = '27c4f26a'
+        AND \(deviceId) IS NOT NULL
       ORDER BY \(deviceId), \(createdAt)
     ) first_launch
     LEFT JOIN \(table: IOSDevice.self) dev ON dev.\(devPk) = first_launch.\(deviceId)
@@ -211,6 +214,7 @@ private struct ActivePodcastUsersCount: CustomCountable {
         (\(eventId) = '27c4f26a' AND \(createdAt) >= NOW() - INTERVAL '30 days')
         OR (\(hostPurchasePodcastEventPredicateSQL))
       )
+      AND \(deviceId) IS NOT NULL
     """)
   }
 

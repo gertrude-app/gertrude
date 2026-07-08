@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieApp
 
 @Reducer
 struct LibraryFeature: Sendable {
@@ -56,15 +57,20 @@ struct LibraryFeature: Sendable {
 
       case .approvedLibraryLoaded(let library):
         state.status = library.albums.isEmpty ? .empty : .loaded(library)
+        if library.albums.isEmpty {
+          log(.debug, .library, "e24738fc")
+        }
         return .none
 
       case .approvedLibraryLoadFailed:
+        log(.err, .library, "cd55459e")
         guard !state.status.isDisplayingLibrary else { return .none }
         state.status = .failed
         return .none
 
       case .approvedLibrarySubscriptionRequired:
         state.status = .subscriptionRequired
+        log(.warn, .subs, "ded74480")
         return .none
 
       case .cachedApprovedLibraryLoaded(let library):

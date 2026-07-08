@@ -1,0 +1,10 @@
+{
+  "name": "ts-codable-macro",
+  "root": "ts-codable-macro",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "cd ts-codable-macro && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    }
+  }
+}

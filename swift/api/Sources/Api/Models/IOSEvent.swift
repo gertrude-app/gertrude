@@ -1,41 +1,37 @@
 import Foundation
+import GertieApp
 
 struct IOSEvent: Codable, Sendable {
   var id: Id
   var eventId: String
-  var kind: Kind
+  var level: EventLevel
+  var domain: String?
   var detail: String?
   var deviceId: IOSDevice.Id?
   var modelIdentifier: String
   var iosVersion: String
+  var appVersion: String
   var createdAt = Date()
 
   init(
     id: Id = .init(),
     eventId: String,
-    kind: Kind,
+    level: EventLevel = .info,
+    domain: String? = nil,
     detail: String? = nil,
     deviceId: IOSDevice.Id? = nil,
     modelIdentifier: String,
     iosVersion: String,
+    appVersion: String = "0.0.0",
   ) {
     self.id = id
     self.eventId = eventId
-    self.kind = kind
+    self.level = level
+    self.domain = domain
     self.detail = detail
     self.deviceId = deviceId
     self.modelIdentifier = modelIdentifier
     self.iosVersion = iosVersion
-  }
-}
-
-extension IOSEvent {
-  enum Kind: String, Sendable, Codable {
-    case info
-    case onboarding
-    case filter
-    case error
-    case supervision
-    case checkin
+    self.appVersion = appVersion
   }
 }

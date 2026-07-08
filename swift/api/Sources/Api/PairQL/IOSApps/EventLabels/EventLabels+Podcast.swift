@@ -1,0 +1,101 @@
+extension EventLabel {
+  static func podcast(_ eventId: String) -> String? {
+    switch eventId {
+
+    // --- Launch & Onboarding ---
+    case "27c4f26a": "First launch"
+    case "4936b4ff": "Onboarding, not parent"
+    case "73430b7b": "False onboarding"
+    case "9f4d7c2d": "False onboarding"
+    // --- Pin ---
+    case "ba182b20": "Set pincode"
+    case "c3e9a1f4": "Pin set after mid-claim relaunch"
+    case "0c045f6c": "Pin changed"
+    case "5f2c8e04": "Pin reset"
+    case "17cb36cc": "Missing pincode"
+    case "7e312b0f": "Pin lockout set"
+    case "e86bd7f3-2": "Pin lockout set"
+    case "8ed78e84-2": "Pin lockout set"
+    // --- Library / Shows ---
+    case "8524413f": "Add by url"
+    case "7785c87b": "Subscribe"
+    case "b8139e22": "Duplicate subscribe"
+    case "98916a65": "Subscribe fail"
+    case "8c5abff7": "Subscribe fail"
+    case "2c229d59": "Special action"
+    case "b4c8d7e2": "Upload db fail: unexpected response"
+    case "a5f6b9c3": "Upload db success"
+    case "d8e9f1a2": "Download db fail: invalid url"
+    case "c3b2a1f0": "Download db not allowed"
+    case "e9f1a2b3": "Download db fail: bad response"
+    case "f1a2b3c4": "Download db success"
+    case "ad696f72": "Reclaim storage"
+    // --- Claim ---
+    case "6ba6a016": "Claim flow opened"
+    case "de4909f1": "Claim code shown"
+    case "b2cb8725": "Claim code create failed"
+    case "82b8e4c0": "Claim advanced to payment"
+    case "c4ef5b66": "Claim flow cancelled"
+    case "32bb0769": "Claim payment declined"
+    case "9b9ea2d6": "Device claimed"
+    // --- Subscription / IAP ---
+    case "456c9362": "Free trial expired"
+    case "1ace9aa6": "Defeated repeat free trial attempt"
+    case "a72104d7": "Subscription activated"
+    case "af0a338f": "Subscribe success"
+    case "41eb271c": "Purchase pending"
+    case "9c0c89e7": "Purchase cancelled by user"
+    case "a07a7825": "No products found"
+    case "c8f3e1b4": "No transaction found to finish"
+    case "111b15d5": "Set subscription to complimentary"
+    case "9a7c3e21": "Promo code verification failed"
+    case "c6cae011": "Payment remediation succeeded"
+    case "c47d3e0b": "Missing subscription record"
+    case "a1f4c2d9": "Account status refresh failed"
+    // --- Reviews ---
+    case "71393f94": "Chose to leave rating"
+    case "b96de934": "Chose to leave review"
+    case "ecef1f7f": "Dismissed review prompt"
+    // --- Local DB ---
+    case "c59c4548": "Duplicate record insert"
+    case "3c4e2f29": "Replaced local db w/ downloaded"
+    // --- Downloads / Playback (mostly legacy, suppressed) ---
+    case "4ac9084e": "Skipped download invalidation while active"
+    case "8c975d36": "Download success invalidated before commit"
+    case "d299b47a": "Episode play recovered after file check"
+    case "2e2c9e97": "Episode play recovery failed"
+    case "459454b4": "Downloaded episode missing local file"
+    case "eeaa7b30": "Play missing local file (legacy)"
+    case "45692a47": "Missing file for downloaded episode (legacy)"
+    case "ba664a9f": "Play missing file, recovered (legacy)"
+    case "4fa186eb": "Play missing file, dl failed (legacy)"
+    case "70012cf6": "Episode playback (legacy)"
+    case "9faa5b69": "Episode playback (legacy)"
+    case "8de8f996": "Now playing (legacy)"
+    case "be3f7267": "Podcasts (legacy)"
+    case "93bc1333": "Downloaded episode missing before playback recovery"
+    // --- Pin lockout ---
+    case "8ed78e84-1", "b3d9f1a7-1", "e86bd7f3-1": "Pin lockout cleared"
+    case "b3d9f1a7-2": "Pin lockout set"
+    // --- Cross promo ---
+    case "fa1c7e93": "Cross promo impression"
+    case "b62d4a8f": "Cross promo cta"
+    case "c9e35b21": "Cross promo dismiss"
+    case "b9e1a7c4": "Cross promo dropped"
+    // --- Unexpected / assertions ---
+    case "60324a0d": "Unexpected: episode not in show state"
+    case "e975479b": "Unexpected: now playing default case"
+    case "1e83d193": "Unexpected: episode+show missing (play)"
+    case "c13211b3": "Unexpected: episode+show missing (change)"
+    case "20df6265": "Unexpected: episode+show missing (progress)"
+    case "62c1d0f4": "Unexpected: show not found"
+    case "23be3c77": "Unexpected: bg refresh schedule failed"
+    case "d99cfd5a": "Unexpected: bg download schedule failed"
+    case "c5e409b9": "Unexpected: feed show missing"
+    case "fb3a7ce5": "Unexpected: new episode data missing"
+    case "e1ebff9a": "Unexpected: deleted episode missing"
+    case "a8b1cc45": "Unexpected: common episode data missing"
+    default: nil
+    }
+  }
+}

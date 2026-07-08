@@ -47,9 +47,9 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
       .orderBy(.createdAt, .asc)
       .all(in: self.db)
     expect(events.count).toEqual(2)
-    expect(events[0].kind).toEqual(.supervision)
+    expect(events[0].domain).toEqual("supervision")
     expect(events[0].detail).toEqual("supervision_tool_download: platform=mac")
-    expect(events[1].kind).toEqual(.supervision)
+    expect(events[1].domain).toEqual("supervision")
     expect(events[1].detail).toEqual("supervision_tool_download: platform=windows")
   }
 

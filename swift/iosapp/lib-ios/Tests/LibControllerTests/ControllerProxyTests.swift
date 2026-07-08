@@ -56,10 +56,7 @@ func setup(
       return performsMigration
     }
     $0.device.deviceId = { UUID(1) }
-    $0.api.logEvent = { id, detail in
-      await Task.megaYield() // ensure notify callback set in time for init migration
-      test.loggedApiEvents.withValue { $0.append(id) }
-    }
+    $0.appEvent.record = { event in test.loggedApiEvents.withValue { $0.append(event.eventId) } }
     $0.api.fetchBlockRules = { vendorId, disabledGroups in
       test.fetchBlockRulesCalls.withValue { $0.append(Both(vendorId, disabledGroups)) }
       return apiNormalRules
@@ -109,17 +106,17 @@ func setup(
 @Test func initPerformsMigration() async throws {
   let test = await setup(performsMigration: true)
   #expect(test.migrateCalled.value == true)
-  #expect(test.loggedApiEvents.value == ["99bacaaa"])
   #expect(test.notifyRulesChangedCount.value == 1)
   #expect(test.logged("migration performed by controller"))
+  #expect(test.loggedApiEvents.value == ["99bacaaa"])
 }
 
 @Test func initSkipsMigrationWhenNotNeeded() async throws {
   let test = await setup(performsMigration: false)
   #expect(test.migrateCalled.value == true)
-  #expect(test.loggedApiEvents.value == [])
   #expect(test.notifyRulesChangedCount.value == 0)
   #expect(false == test.logged("migration performed by controller"))
+  #expect(test.loggedApiEvents.value == [])
 }
 
 @Test func refreshRulesForStartupNotConnected() async throws {

@@ -1,104 +1,38 @@
-import Dependencies
 import DuetSQL
 import Foundation
+import GertieApp
+import IOSAppsRoute
 import PodcastRoute
-import XSlack
 
 extension LogPodcastEvent_v3: Resolver {
   static func resolve(with input: Input, in context: Context) async throws -> Output {
-    try await PodcastApp.Install.ensureExists(
-      deviceId: IOSDevice.Id(input.deviceId),
-      modelIdentifier: input.modelIdentifier,
-      iosVersion: input.iosVersion,
-      appVersion: input.appVersion,
-      in: context.db,
-    )
+    await context.db.logDeprecated("LogPodcastEvent(v3)")
 
-    try await context.db.create(PodcastEvent(
+    let (level, domain) = podcastEventLevelAndDomain(input.kind)
+
+    return try await LogAppEvent.resolve(with: LogEventRequest(
+      app: .podcasts,
       eventId: input.eventId,
-      kind: .init(rawValue: input.kind) ?? .unexpected,
-      label: input.label,
+      level: level,
+      domain: domain,
       detail: input.detail,
       deviceId: input.deviceId,
       modelIdentifier: input.modelIdentifier,
       appVersion: input.appVersion,
       iosVersion: input.iosVersion,
-    ))
-
-    ModelIdentifier.alertIfUnknown(input.modelIdentifier)
-
-    if context.env.mode != .prod || suppressedEventIds.contains(input.eventId) {
-      return .success
-    }
-
-    let iapTxnId = extractPodcastLegacyIAPTxnId(input.detail)
-    let isFamilyShareIapEvent = iapTxnId.map { !iapIdIsRootPurchase($0) } ?? false
-
-    Task {
-      let slack = get(dependency: \.slack)
-
-      if isFamilyShareIapEvent {
-        if try await isPodcastFirstFamilyShareForDevice(input, in: context) {
-          await slack.internal(
-            .info,
-            "*FIRST Podcast Family-Sharing Activation* `\(input.modelName)`",
-          )
-        }
-        return // don't log duplicate family share txn events
-      }
-
-      let search = githubSearch(input.eventId)
-      let msg = "`\(input.label)`\(input.detail.map { " - \($0)" } ?? "")"
-      await slack.internal(.podcasts, "Podcast app event: \(search) \(msg)")
-
-      if try await isPodcastFirstPayment(input, in: context) {
-        await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
-        await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
-        get(dependency: \.postmark).toSuperAdmin(
-          "FIRST Podcast Subscription",
-          "device: \(input.modelName)",
-        )
-      }
-
-      if input.eventId == midClaimPinSetEventId {
-        try await alertSuperAdminOfMidClaimPinSet(input, in: context)
-      }
-    }
-
-    return .success
+    ), in: context)
   }
 }
 
 // helpers
 
-private func isPodcastFirstPayment(
-  _ input: LogPodcastEvent_v3.Input,
-  in ctx: Context,
-) async throws -> Bool {
-  guard isPodcastLegacyIAPPaymentEvent(input.eventId),
-        let iapTxnId = extractPodcastLegacyIAPTxnId(input.detail),
-        iapIdIsRootPurchase(iapTxnId) else {
-    return false
+func podcastEventLevelAndDomain(_ kind: String) -> (EventLevel, String?) {
+  switch kind {
+  case "info": (.info, nil)
+  case "error": (.err, nil)
+  case "subscription": (.info, "subscription")
+  default: (.warn, nil)
   }
-  let paidEventCount = try await ctx.db.count(
-    HostPurchaseEventCountForOriginalID.self,
-    withBindings: [.string(iapTxnId)],
-  )
-  return paidEventCount == 1
-}
-
-private func isPodcastFirstFamilyShareForDevice(
-  _ input: LogPodcastEvent_v3.Input,
-  in ctx: Context,
-) async throws -> Bool {
-  guard isPodcastLegacyIAPPaymentEvent(input.eventId) else {
-    return false
-  }
-  let count = try await ctx.db.count(
-    FamilySharedOrSandboxEventCountForDevice.self,
-    withBindings: [.uuid(input.deviceId)],
-  )
-  return count == 1
 }
 
 func isPodcastLegacyIAPPaymentEvent(_ eventId: String) -> Bool {
@@ -106,21 +40,6 @@ func isPodcastLegacyIAPPaymentEvent(_ eventId: String) -> Bool {
 }
 
 let midClaimPinSetEventId = "c3e9a1f4"
-
-private func alertSuperAdminOfMidClaimPinSet(
-  _ input: LogPodcastEvent_v3.Input,
-  in ctx: Context,
-) async throws {
-  let device = try await ctx.db.find(IOSDevice.Id(input.deviceId))
-  guard let child = try await device.child(in: ctx.db) else { return }
-  let parent = try await child.parent(in: ctx.db)
-  get(dependency: \.postmark).toSuperAdmin(
-    "Podcasts PIN set after mid-claim relaunch",
-    "device: \(input.modelName), child: \(child.name), parent: \(parent.email.rawValue) — "
-      + "the Podcasts PIN may have been set by someone other than the parent (app killed between "
-      + "claim and PIN setup). Consider emailing the parent about a dashboard PIN reset.",
-  )
-}
 
 /// We don't record StoreKit.AppStore.Environment or inAppOwnershipType, so we
 /// use originalID length as a proxy (verified against Apple's App Store Server
@@ -216,15 +135,3 @@ struct EarliestGrandfatherableLegacyIapForDevice: CustomQueryable {
 
   var createdAt: Date?
 }
-
-private let suppressedEventIds: Set<String> = [
-  "7785c87b", // subscribe event, noisy, not super interesting
-  "4ac9084e", // skipped download invalidation while active
-  "d299b47a", // episode play recovered after file check
-  "2e2c9e97", // episode play recovery failed
-  "8c975d36", // download success invalidated before commit
-  "eeaa7b30", // legacy (v1.2): episode play, missing local file
-  "45692a47", // legacy (v1.2-1.3): missing file for downloaded episode
-  "ba664a9f", // legacy (v1.3): play missing file, recovered
-  "4fa186eb", // legacy (v1.3): play missing file, dl failed
-]

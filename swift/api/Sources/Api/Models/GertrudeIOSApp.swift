@@ -26,7 +26,7 @@ extension GertrudeIOSApp {
     switch self {
     case .blocker: .info
     case .podcasts: .podcasts
-    case .music: .info
+    case .music: .music
     }
   }
 }

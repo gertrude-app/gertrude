@@ -161,7 +161,7 @@ extension ParentDetail: Resolver {
             connected: connected,
           ))
         } else if let latestPodcastEvent = try await PodcastEvent.query()
-          .where(.deviceId == device.id.rawValue)
+          .where(.deviceId == device.id)
           .orderBy(.createdAt, .desc)
           .limit(1)
           .all(in: context.db)
@@ -196,7 +196,7 @@ extension ParentDetail: Resolver {
         }
         let lastCheckin = try await IOSEvent.query()
           .where(.deviceId == device.id.rawValue)
-          .where(.kind == "checkin")
+          .where(.domain == "checkin")
           .orderBy(.createdAt, .desc)
           .limit(1)
           .all(in: context.db)

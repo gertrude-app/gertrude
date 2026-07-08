@@ -18,10 +18,10 @@ final class CrossPromoTests: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.date = .constant(now)
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.sharedStorage.loadDismissedCrossPromoIds = { @Sendable in nil }
       $0.sharedStorage.loadCrossPromoLastShownAt = { @Sendable in nil }
       $0.sharedStorage.saveCrossPromoLastShownAt = { @Sendable in savedAt.setValue($0) }
-      $0.api.logEvent = { @Sendable _, detail in logged.withValue { $0.append(detail ?? "") } }
     }
 
     await store.send(.programmatic(.receivedCrossPromos(.init(promos: [promo])))) {
@@ -31,8 +31,8 @@ final class CrossPromoTests: XCTestCase {
     await store.finish()
 
     expect(savedAt.value).toEqual(now) // throttle record written on impression
-    XCTAssertEqual(logged.value.count, 1)
-    XCTAssertTrue(logged.value.first?.contains("cross promo impression") == true)
+    expect(logged.value.contains { $0.contains("cross promo impression") }).toEqual(true)
+    expect(logged.value.count).toEqual(1)
   }
 
   @MainActor
@@ -90,9 +90,9 @@ final class CrossPromoTests: XCTestCase {
     let store = TestStore(initialState: initial) {
       IOSReducer()
     } withDependencies: {
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.sharedStorage.loadDismissedCrossPromoIds = { @Sendable in [] }
       $0.sharedStorage.saveDismissedCrossPromoIds = { @Sendable in saved.setValue($0) }
-      $0.api.logEvent = { @Sendable _, detail in logged.withValue { $0.append(detail ?? "") } }
     }
 
     await store.send(.destination(.presented(.crossPromo(.delegate(.ctaTapped(.primary)))))) {
@@ -101,7 +101,7 @@ final class CrossPromoTests: XCTestCase {
     await store.finish()
 
     expect(saved.value).toEqual([promo.campaignId]) // burned so it won't re-show
-    XCTAssertTrue(logged.value.first?.contains("cross promo cta") == true)
+    expect(logged.value.contains { $0.contains("cross promo cta") }).toEqual(true)
   }
 
   @MainActor
@@ -114,9 +114,9 @@ final class CrossPromoTests: XCTestCase {
     let store = TestStore(initialState: initial) {
       IOSReducer()
     } withDependencies: {
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.sharedStorage.loadDismissedCrossPromoIds = { @Sendable in [] }
       $0.sharedStorage.saveDismissedCrossPromoIds = { @Sendable in saved.setValue($0) }
-      $0.api.logEvent = { @Sendable _, detail in logged.withValue { $0.append(detail ?? "") } }
     }
 
     await store.send(.destination(.dismiss)) {
@@ -125,7 +125,7 @@ final class CrossPromoTests: XCTestCase {
     await store.finish()
 
     expect(saved.value).toEqual([promo.campaignId])
-    XCTAssertTrue(logged.value.first?.contains("cross promo dismiss") == true)
+    expect(logged.value.contains { $0.contains("cross promo dismiss") }).toEqual(true)
   }
 
   @MainActor
@@ -135,13 +135,13 @@ final class CrossPromoTests: XCTestCase {
     let store = TestStore(initialState: .init(screen: .running(state: .notConnected))) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _, detail in logged.withValue { $0.append(detail ?? "") } }
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
     }
 
     await store.send(.programmatic(.receivedCrossPromos(.init(promos: [badPromo]))))
     await store.finish()
 
-    XCTAssertTrue(logged.value.contains { $0.contains("dropped: no guaranteed exit") })
+    expect(logged.value.contains { $0.contains("dropped: no guaranteed exit") }).toEqual(true)
   }
 
   @MainActor
@@ -161,9 +161,9 @@ final class CrossPromoTests: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.date = .constant(now)
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.sharedStorage.loadDismissedCrossPromoIds = { @Sendable in nil }
       $0.sharedStorage.saveCrossPromoLastShownAt = { @Sendable in savedAt.setValue($0) }
-      $0.api.logEvent = { @Sendable _, detail in logged.withValue { $0.append(detail ?? "") } }
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.tertiary, "No thanks"))) {
@@ -172,7 +172,7 @@ final class CrossPromoTests: XCTestCase {
     await store.finish()
 
     expect(savedAt.value).toEqual(now)
-    XCTAssertTrue(logged.value.first?.contains("cross promo impression") == true)
+    expect(logged.value.contains { $0.contains("cross promo impression") }).toEqual(true)
   }
 
   @MainActor
@@ -219,9 +219,9 @@ final class CrossPromoTests: XCTestCase {
     let store = TestStore(initialState: initial) {
       IOSReducer()
     } withDependencies: {
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.detail ?? "") } }
       $0.sharedStorage.loadDismissedCrossPromoIds = { @Sendable in [] }
       $0.sharedStorage.saveDismissedCrossPromoIds = { @Sendable in saved.setValue($0) }
-      $0.api.logEvent = { @Sendable _, detail in logged.withValue { $0.append(detail ?? "") } }
     }
 
     await store.send(.interactive(.onboardingCrossPromo(.delegate(.dismissed)))) {
@@ -231,7 +231,7 @@ final class CrossPromoTests: XCTestCase {
     await store.finish()
 
     expect(saved.value).toEqual([promo.campaignId]) // burned so it won't re-show
-    XCTAssertTrue(logged.value.first?.contains("cross promo dismiss") == true)
+    expect(logged.value.contains { $0.contains("cross promo dismiss") }).toEqual(true)
   }
 }
 

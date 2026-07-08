@@ -36,8 +36,9 @@ func activelyDownloadingEpisodeIds(
   let protected = Set(episodes.filter(\.downloading).map(\.id))
   for episode in episodes where protected.contains(episode.id) {
     log(
-      .info("4ac9084e"),
-      "skipped download invalidation while active",
+      .info,
+      .download,
+      "4ac9084e",
       detail: invalidationDetail(episode: episode, source: source, fileSystem: fileSystem),
     )
   }

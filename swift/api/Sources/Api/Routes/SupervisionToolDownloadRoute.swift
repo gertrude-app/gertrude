@@ -38,7 +38,7 @@ enum SupervisionToolDownloadRoute {
     let task = Task {
       try await request.context.db.create(IOSEvent(
         eventId: "7d644b4d",
-        kind: .supervision,
+        domain: "supervision",
         detail: "supervision_tool_download: platform=\(platform.rawValue)",
         deviceId: device.id,
         modelIdentifier: device.modelIdentifier,

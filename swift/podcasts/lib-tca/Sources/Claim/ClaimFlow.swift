@@ -66,7 +66,7 @@ struct ClaimFlow {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        log(.info("6ba6a016"), "claim flow opened", detail: "\(state.context)/\(state.step)")
+        log(.info, .claim, "6ba6a016", detail: "\(state.context)/\(state.step)")
         switch state.step {
         case .showingCode:
           return self.startShowingCode(&state)
@@ -80,13 +80,13 @@ struct ClaimFlow {
         return self.startShowingCode(&state)
 
       case .claimCodeResponse(let code):
-        log(.info("de4909f1"), "claim code shown")
+        log(.info, .claim, "de4909f1")
         state.claimCode = code
         state.claimCodeFailed = false
         return .none
 
       case .claimCodeFailed:
-        log(.error("b2cb8725"), "claim code create failed")
+        log(.err, .claim, "b2cb8725")
         state.claimCodeFailed = true
         return .none
 
@@ -96,7 +96,7 @@ struct ClaimFlow {
         }
         self.keychain.save(amToken: token)
         subscription.writeLocal(now: self.now)
-        log(.subscription("9b9ea2d6"), "device claimed", detail: "\(subscription)")
+        log(.info, .subs, "9b9ea2d6", detail: "\(subscription)")
         state.childName = childName
         state.entitlement = subscription
         state.step = .success
@@ -106,7 +106,7 @@ struct ClaimFlow {
         if state.context == .onboarding {
           return self.dismissFlow()
         }
-        log(.info("82b8e4c0"), "claim advanced to payment")
+        log(.info, .claim, "82b8e4c0")
         state.step = .payment
         return self.startPayment()
 
@@ -114,19 +114,15 @@ struct ClaimFlow {
         state.entitlement = output.subscription
         output.subscription.writeLocal(now: self.now)
         guard output.subscription.isEntitled else { return .none }
-        log(
-          .subscription("c6cae011"),
-          "payment remediation succeeded",
-          detail: "\(output.subscription)",
-        )
+        log(.info, .subs, "c6cae011", detail: "\(output.subscription)")
         return self.dismissFlow()
 
       case .cancelTapped:
-        log(.info("c4ef5b66"), "claim flow cancelled", detail: "\(state.step)")
+        log(.info, .claim, "c4ef5b66", detail: "\(state.step)")
         return self.dismissFlow()
 
       case .notNowTapped:
-        log(.info("32bb0769"), "claim payment declined")
+        log(.info, .claim, "32bb0769")
         return self.dismissFlow()
 
       case .doneTapped:

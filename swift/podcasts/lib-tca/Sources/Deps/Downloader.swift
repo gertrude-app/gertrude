@@ -57,8 +57,9 @@ private func _trackedDownload(episode: Episode) async -> DownloadOutcome {
       let wasInvalidated = downloadState.map { !$0.downloading } ?? false
       if wasInvalidated {
         log(
-          .info("8c975d36"),
-          "download success invalidated before commit",
+          .info,
+          .download,
+          "8c975d36",
           detail: downloadStateDetail(downloadState ?? episode, fileSystem: fileSystem),
         )
       }
@@ -124,8 +125,9 @@ func ensureDownloaded(episode: Episode) async -> DownloadOutcome {
         .execute(db)
     }
     log(
-      .error("459454b4"),
-      "expected downloaded episode missing local file",
+      .err,
+      .download,
+      "459454b4",
       detail: downloadStateDetail(currentEpisode, fileSystem: fileSystem),
     )
   }

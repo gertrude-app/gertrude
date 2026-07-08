@@ -1,4 +1,5 @@
 import Foundation
+import GertieApp
 
 public enum MagicStrings {
   public static let gertrudeBundleIdLong: String = .gertrudeBundleIdLong
@@ -29,32 +30,13 @@ public extension String {
   }
 
   static var gertrudeApi: String {
-    (try? Configuration.value(for: "API_URL")) ?? "https://api.gertrude.app"
+    GertrudeIOSApp.apiBaseURL().absoluteString
   }
 }
 
 public extension URL {
   static func profileDownload(deviceId: UUID) -> URL {
     URL(string: "\(String.gertrudeApi)/ios-profile/\(deviceId)")!
-  }
-}
-
-enum Configuration {
-  enum Error: Swift.Error {
-    case missingKey, invalidValue
-  }
-
-  static func value(for key: String) throws -> String {
-    guard let object = Bundle.main.object(forInfoDictionaryKey: key) else {
-      throw Error.missingKey
-    }
-
-    switch object {
-    case let string as String:
-      return string
-    default:
-      throw Error.invalidValue
-    }
   }
 }
 

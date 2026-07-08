@@ -1,5 +1,6 @@
 import BlockerRoute
 import Foundation
+import GertieApp
 import PodcastRoute
 
 protocol IOSModelIdentifiable {
@@ -22,6 +23,7 @@ extension IOSEvent: IOSModelIdentifiable {}
 extension LogPodcastEvent_v2.Input: IOSModelIdentifiable {}
 extension LogPodcastEvent_v3.Input: IOSModelIdentifiable {}
 extension LogIOSEvent_v2.Input: IOSModelIdentifiable {}
+extension LogEventRequest: IOSModelIdentifiable {}
 
 enum ModelIdentifier {
   static func fromLegacyDeviceType(_ value: String) -> String {

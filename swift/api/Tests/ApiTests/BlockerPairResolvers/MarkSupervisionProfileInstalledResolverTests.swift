@@ -23,7 +23,7 @@ final class MarkSupervisionProfileInstalledResolverTests: ApiTestCase, @unchecke
       .where(.deviceId == child.device.id)
       .all(in: self.db)
     expect(events).toHaveCount(1)
-    expect(events.first?.kind).toEqual(.supervision)
+    expect(events.first?.domain).toEqual("supervision")
     expect(events.first?.detail).toEqual("profile_installed_confirmed")
   }
 

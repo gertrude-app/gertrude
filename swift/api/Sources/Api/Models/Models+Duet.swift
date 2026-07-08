@@ -214,6 +214,25 @@ extension MusicApp.Token {
   }
 }
 
+extension MusicApp.Event: Duet.Identifiable {
+  typealias Id = Tagged<MusicApp.Event, UUID>
+}
+
+extension MusicApp.Event {
+  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
+    case id
+    case eventId
+    case level
+    case domain
+    case detail
+    case deviceId
+    case modelIdentifier
+    case iosVersion
+    case appVersion
+    case createdAt
+  }
+}
+
 extension BlockerApp.BlockRule: Duet.Identifiable {
   typealias Id = Tagged<BlockerApp.BlockRule, UUID>
 }
@@ -856,8 +875,8 @@ extension PodcastEvent {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case eventId
-    case kind
-    case label
+    case level
+    case domain
     case modelIdentifier
     case appVersion
     case iosVersion
@@ -875,11 +894,13 @@ extension IOSEvent {
   enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
     case id
     case eventId
-    case kind
+    case level
+    case domain
     case detail
     case deviceId
     case modelIdentifier
     case iosVersion
+    case appVersion
     case createdAt
   }
 }

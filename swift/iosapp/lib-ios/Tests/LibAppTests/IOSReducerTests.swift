@@ -2,6 +2,7 @@ import BlockerRoute
 @preconcurrency import Combine
 import ComposableArchitecture
 import GertieBlocker
+import GertieTcaFeatures
 import LibCore
 import XCTest
 import XExpect
@@ -12,7 +13,6 @@ import XExpect
 final class IOSReducerTests: XCTestCase {
   @MainActor
   func testHappyPath() async throws {
-    let apiLoggedDetails = LockIsolated<[String]>([])
     let requestAuthInvocations = LockIsolated(0)
     let installInvocations = LockIsolated(0)
     let deleteCacheFillDirInvocations = LockIsolated(0)
@@ -29,6 +29,8 @@ final class IOSReducerTests: XCTestCase {
     let deviceId = UUID()
     let id1 = UUID()
     let id2 = UUID()
+    let apiLoggedEventIds = LockIsolated<[String]>([])
+    let apiLoggedDetails = LockIsolated<[String]>([])
 
     let store = TestStore(initialState: IOSReducer.State()) {
       IOSReducer()
@@ -36,8 +38,9 @@ final class IOSReducerTests: XCTestCase {
       $0.date = .constant(.reference)
       $0.mainQueue = .immediate
       $0.locale = Locale(identifier: "en_US")
-      $0.api.logEvent = { @Sendable _, detail in
-        apiLoggedDetails.withValue { $0.append(detail ?? "") }
+      $0.appEvent.record = { event in
+        apiLoggedEventIds.withValue { $0.append(event.eventId) }
+        apiLoggedDetails.withValue { $0.append(event.detail ?? "") }
       }
       $0.api.fetchDefaultBlockRules = { @Sendable _ in
         defaultBlocksInvocations.withValue { $0 += 1 }
@@ -127,7 +130,8 @@ final class IOSReducerTests: XCTestCase {
     ])))
 
     expect(storedDates.value).toEqual([.reference])
-    expect(apiLoggedDetails.value).toEqual(["[onboarding] first launch, region: `US`"])
+    expect(apiLoggedEventIds.value).toEqual(["8d35f043"])
+    expect(apiLoggedDetails.value.first?.contains("first launch, region") == true).toEqual(true)
     expect(deleteCacheFillDirInvocations.value).toEqual(1)
     expect(defaultBlocksInvocations.value).toEqual(1)
     expect(savedProtectionModes.value).toEqual([.onboarding([.urlContains(value: "default-rule")])])
@@ -185,10 +189,7 @@ final class IOSReducerTests: XCTestCase {
     }
 
     expect(requestAuthInvocations.value).toEqual(1)
-    expect(apiLoggedDetails.value).toEqual([
-      "[onboarding] first launch, region: `US`",
-      "[onboarding] authorization succeeded",
-    ])
+    expect(apiLoggedEventIds.value).toEqual(["8d35f043", "4a0c585f"])
 
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
       $0.screen = .onboarding(.happyPath(.dontGetTrickedPreInstall))
@@ -207,11 +208,7 @@ final class IOSReducerTests: XCTestCase {
     expect(savedProtectionModes.value.count).toEqual(1)
     expect(installInvocations.value).toEqual(1)
     expect(savedDisabledBlockGroups.value).toEqual([[]])
-    expect(apiLoggedDetails.value).toEqual([
-      "[onboarding] first launch, region: `US`",
-      "[onboarding] authorization succeeded",
-      "[onboarding] filter install success",
-    ])
+    expect(apiLoggedEventIds.value).toEqual(["8d35f043", "4a0c585f", "adced334"])
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
       $0.screen = .onboarding(.happyPath(.optOutBlockGroups))
@@ -302,7 +299,6 @@ final class IOSReducerTests: XCTestCase {
     let store = TestStore(initialState: initialState) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.systemExtension.installFilter = { .success(()) }
       $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable _ in }
     }
@@ -379,7 +375,6 @@ final class IOSReducerTests: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.device.deleteCacheFillDir = {}
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.api.fetchDefaultBlockRules = { @Sendable _ in
         defaultBlocksInvocations.withValue { $0 += 1 }
         return [.urlContains(value: "GIFs")]
@@ -440,7 +435,6 @@ final class IOSReducerTests: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.device.deleteCacheFillDir = {}
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: true) }
       $0.sharedStorage = .liveValue
@@ -496,7 +490,6 @@ final class IOSReducerTests: XCTestCase {
       $0.date = .constant(.reference)
       $0.locale = Locale(identifier: "en_US")
       $0.device.deleteCacheFillDir = {}
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.api.fetchAllBlockGroups = { @Sendable _ in [] }
       $0.api.fetchDefaultBlockRules = { @Sendable _ in
         struct TestError: Error {}
@@ -562,7 +555,6 @@ final class IOSReducerTests: XCTestCase {
     } withDependencies: {
       $0.mainQueue = .immediate
       $0.date = .constant(.reference)
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.device.batteryLevel = { .level(0.75) } // <-- enough battery
       $0.device.availableDiskSpaceInBytes = { 1024 * 1024 * 1024 * 5 } // <-- 5 GB space
       $0.device.clearCache = { _ in
@@ -596,7 +588,6 @@ final class IOSReducerTests: XCTestCase {
     } withDependencies: {
       $0.mainQueue = .immediate
       $0.date = .constant(.reference)
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.device.batteryLevel = { .level(0.95) } // <-- logs of battery, but...
       $0.device.availableDiskSpaceInBytes = { 1024 * 1024 * 1024 * 65 } // ...65 GB to clear !!
       $0.device.clearCache = { _ in
@@ -666,7 +657,6 @@ final class IOSReducerTests: XCTestCase {
       $0.locale = Locale(identifier: "en_US")
       $0.device.deleteCacheFillDir = {}
       $0.api.fetchDefaultBlockRules = { @Sendable _ in [] }
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.api.connectAccountFeatureFlag = { @Sendable in .init(isEnabled: false) }
       // filter running...
       $0.systemExtension.filterRunning = { true }
@@ -729,7 +719,6 @@ final class IOSReducerTests: XCTestCase {
     )) {
       IOSReducer()
     } withDependencies: {
-      $0.api.logEvent = { @Sendable _, _ in }
       $0.systemExtension.installFilter = { .success(()) }
       $0.sharedStorage.saveDisabledBlockGroupIds = { @Sendable value in
         savedDisabledGroups.withValue { $0.append(value) }

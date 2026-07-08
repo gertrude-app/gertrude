@@ -9,7 +9,6 @@ import Testing
 @MainActor
 @Test func allMigrations() async throws {
   try await withDependencies {
-    $0.api.logEvent = { _, _ in }
     $0.api.fetchDefaultBlockRules = { _ in [.targetContains(value: "def.com")] }
     $0.device.deviceId = { UUID() }
   } operation: {

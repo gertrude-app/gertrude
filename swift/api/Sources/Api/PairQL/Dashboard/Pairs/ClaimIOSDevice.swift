@@ -50,7 +50,7 @@ extension ClaimIOSDevice: Resolver {
 
         try await context.db.create(IOSEvent(
           eventId: "f2c3863b",
-          kind: .supervision,
+          domain: "supervision",
           detail: "code_claimed: code=\(input.code)",
           deviceId: device.id,
           modelIdentifier: device.modelIdentifier,

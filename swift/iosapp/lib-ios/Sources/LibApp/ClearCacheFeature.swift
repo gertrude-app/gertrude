@@ -105,14 +105,16 @@ public struct ClearCacheFeature {
           .run { [start = state.startClearCache, deps = self.deps, ctx = state.context] _ in
             if let start {
               let elapsed = String(format: "%.1f", deps.date.now.timeIntervalSince(start) / 60.0)
-              await deps.api.logEvent(
+              log(
+                .info,
                 "cb9cf096",
-                "cache cleared, elapsed time: \(elapsed)m, disk: \(diskSpace) \(ctx)",
+                detail: "cache cleared, elapsed time: \(elapsed)m, disk: \(diskSpace) \(ctx)",
               )
             } else {
-              await deps.api.logEvent(
+              log(
+                .info,
                 "cb9cf096",
-                "cache cleared, elapsed time: (unknown), disk: \(diskSpace) \(ctx)",
+                detail: "cache cleared, elapsed time: (unknown), disk: \(diskSpace) \(ctx)",
               )
             }
           },
@@ -121,8 +123,8 @@ public struct ClearCacheFeature {
 
       case .receivedClearCacheUpdate(.errorCouldNotCreateDir):
         return .merge(
-          .run { [deps = self.deps, ctx = state.context] _ in
-            await deps.api.logEvent("ae941213", "error creating cache fill dir \(ctx)")
+          .run { [ctx = state.context] _ in
+            log(.err, "ae941213", detail: "ctx=\(ctx)")
           },
           .cancel(id: CancelId.cacheClearUpdates),
         )
@@ -139,9 +141,9 @@ public struct ClearCacheFeature {
     state.startClearCache = self.deps.date.now
     let availableSpace = state.availableDiskSpaceInBytes
     return .merge(
-      .run { [deps = self.deps, ctx = state.context] _ in
+      .run { [ctx = state.context] _ in
         let humanSize = Bytes.humanReadable(availableSpace ?? -1, decimalPlaces: 1, prefix: .binary)
-        await deps.api.logEvent("ea3f9c37", "starting cache clear, disk size: \(humanSize), \(ctx)")
+        log(.info, "ea3f9c37", detail: "size=\(humanSize), \(ctx)")
       },
       .publisher { [deps = self.deps] in
         deps.device.clearCache(availableSpace)
