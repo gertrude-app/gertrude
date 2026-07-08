@@ -33,6 +33,7 @@ extension OpenBillingPortal: Resolver {
 
     let stripeConfiguration: String? = switch input.configuration {
     case .lightTier: env.stripe.portalConfigIdLightTier
+    case .mediumTier: env.stripe.portalConfigIdMediumTier
     case .default: nil
     }
 

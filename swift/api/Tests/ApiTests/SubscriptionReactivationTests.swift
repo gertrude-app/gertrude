@@ -82,7 +82,10 @@ final class SubscriptionReactivationTests: ApiTestCase, @unchecked Sendable {
     let panel = try await GetSubscriptionPanel_v2.resolve(in: context(parent))
     expect(panel.planStatus).toEqual(.free)
     expect(panel.primary).toEqual(.reactivateViaCheckout(tier: .full))
-    expect(panel.secondary).toEqual([.reactivateViaCheckout(tier: .light)])
+    expect(panel.secondary).toEqual([
+      .reactivateViaCheckout(tier: .medium),
+      .reactivateViaCheckout(tier: .light),
+    ])
 
     let checkout = try await withDependencies {
       $0.stripe.createCheckoutSession = { data in

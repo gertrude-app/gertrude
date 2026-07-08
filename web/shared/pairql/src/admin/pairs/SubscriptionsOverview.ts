@@ -9,12 +9,15 @@ export namespace SubscriptionsOverview {
       month: string;
       centsCollected: number;
       fullPlanCents: number;
+      mediumPlanCents: number;
       lightPlanCents: number;
       otherCents: number;
       paidInvoices: number;
     }>;
     fullPlanCount: number;
     fullPlanAnnualRevenue: number;
+    mediumPlanCount: number;
+    mediumPlanAnnualRevenue: number;
     lightPlanCount: number;
     lightPlanAnnualRevenue: number;
     trialingCount: number;

@@ -212,7 +212,11 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
     (iosData?.totalSuccess ?? 0) +
     (podcastData?.activePodcastUsers ?? 0);
   const freeCount =
-    data.totalAccounts - data.fullPlanCount - data.lightPlanCount - data.trialingCount;
+    data.totalAccounts -
+    data.fullPlanCount -
+    data.mediumPlanCount -
+    data.lightPlanCount -
+    data.trialingCount;
   // monthly compensation from living room
   const LIVING_ROOM_MONTHLY = 150;
   const stats = [
@@ -230,6 +234,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
       value: `$${(data.monthlyRevenue + LIVING_ROOM_MONTHLY).toLocaleString()}`,
     },
     { label: `Full Plans`, value: data.fullPlanCount.toLocaleString() },
+    { label: `Medium Plans`, value: data.mediumPlanCount.toLocaleString() },
     { label: `Light Plans`, value: data.lightPlanCount.toLocaleString() },
     { label: `Total Accounts`, value: data.totalAccounts.toLocaleString() },
   ];
@@ -258,7 +263,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
         </Link>
       </div>
       <div className="p-4 sm:p-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -293,6 +298,11 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
               label: `Full`,
               value: data.fullPlanCount,
               gradient: `from-brand-violet to-brand-fuchsia`,
+            },
+            {
+              label: `Medium`,
+              value: data.mediumPlanCount,
+              gradient: `from-indigo-400 to-violet-500`,
             },
             {
               label: `Light`,

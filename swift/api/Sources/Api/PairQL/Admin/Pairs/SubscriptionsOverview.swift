@@ -14,6 +14,8 @@ struct SubscriptionsOverview: Pair {
     var monthlySubscriptionRevenue: [MonthlySubscriptionRevenueOutput]
     var fullPlanCount: Int
     var fullPlanAnnualRevenue: Int
+    var mediumPlanCount: Int
+    var mediumPlanAnnualRevenue: Int
     var lightPlanCount: Int
     var lightPlanAnnualRevenue: Int
     var trialingCount: Int
@@ -31,6 +33,7 @@ struct SubscriptionsOverview: Pair {
     var month: String
     var centsCollected: Int
     var fullPlanCents: Int
+    var mediumPlanCents: Int
     var lightPlanCents: Int
     var otherCents: Int
     var paidInvoices: Int
@@ -39,10 +42,13 @@ struct SubscriptionsOverview: Pair {
 
 extension SubscriptionsOverview: NoInputResolver {
   static func resolve(in context: Context) async throws -> Output {
+    @Dependency(\.env) var env
     let data = try await AnalyticsQuery.shared.data()
 
     var fullPlanCount = 0
     var fullPlanAnnualCents = 0
+    var mediumPlanCount = 0
+    var mediumPlanAnnualCents = 0
     var lightPlanCount = 0
     var lightPlanAnnualCents = 0
     var trialingCount = 0
@@ -55,6 +61,13 @@ extension SubscriptionsOverview: NoInputResolver {
         case .light:
           lightPlanCount += 1
           lightPlanAnnualCents += 1000
+        case .medium:
+          if sub.stripeStatus == .trialing {
+            trialingCount += 1
+          } else if sub.stripeStatus.isPaying {
+            mediumPlanCount += 1
+            mediumPlanAnnualCents += 500 * 12
+          }
         case .full:
           if sub.stripeStatus == .trialing {
             trialingCount += 1
@@ -86,25 +99,31 @@ extension SubscriptionsOverview: NoInputResolver {
     }
 
     let monthlySubscriptionRevenue = try await context.db
-      .customQuery(MonthlySubscriptionRevenue.self)
+      .customQuery(
+        MonthlySubscriptionRevenue.self,
+        withBindings: [.string(env.stripe.priceIdMedium)],
+      )
       .map { row in
         MonthlySubscriptionRevenueOutput(
           month: row.month,
           centsCollected: row.centsCollected,
           fullPlanCents: row.fullPlanCents,
+          mediumPlanCents: row.mediumPlanCents,
           lightPlanCents: row.lightPlanCents,
           otherCents: row.otherCents,
           paidInvoices: row.paidInvoices,
         )
       }
 
-    let totalAnnualCents = fullPlanAnnualCents + lightPlanAnnualCents
+    let totalAnnualCents = fullPlanAnnualCents + mediumPlanAnnualCents + lightPlanAnnualCents
     return .init(
       monthlyRevenue: totalAnnualCents / 100 / 12,
       annualRevenue: totalAnnualCents / 100,
       monthlySubscriptionRevenue: monthlySubscriptionRevenue,
       fullPlanCount: fullPlanCount,
       fullPlanAnnualRevenue: fullPlanAnnualCents / 100,
+      mediumPlanCount: mediumPlanCount,
+      mediumPlanAnnualRevenue: mediumPlanAnnualCents / 100,
       lightPlanCount: lightPlanCount,
       lightPlanAnnualRevenue: lightPlanAnnualCents / 100,
       trialingCount: trialingCount,
@@ -116,7 +135,10 @@ extension SubscriptionsOverview: NoInputResolver {
 
 private struct MonthlySubscriptionRevenue: CustomQueryable {
   static func query(bindings: [Postgres.Data]) -> SQL.Statement {
-    SQL.Statement(
+    guard bindings.count == 1 else {
+      return SQL.Statement("SELECT NULL WHERE FALSE")
+    }
+    var stmt = SQL.Statement(
       """
       WITH raw_events AS MATERIALIZED (
         SELECT
@@ -147,7 +169,13 @@ private struct MonthlySubscriptionRevenue: CustomQueryable {
           COALESCE(
             (NULLIF(event_json #>> '{data,object,lines,data,0,price,unit_amount}', ''))::int,
             0
-          ) AS unit_amount
+          ) AS unit_amount,
+          (event_json #>> '{data,object,lines,data,0,price,id}') =
+      """)
+    stmt.components.append(.binding(bindings[0]))
+    stmt.components.append(.sql(
+      """
+       AS is_medium
         FROM normalized_events
         WHERE event_json->>'type' = 'invoice.paid'
       ),
@@ -157,14 +185,20 @@ private struct MonthlySubscriptionRevenue: CustomQueryable {
           event_time,
           cents_collected,
           CASE
+            WHEN interval = 'month' AND COALESCE(is_medium, false) THEN 0
             WHEN interval = 'month' AND unit_amount IN (500, 1000, 1500) THEN cents_collected
             ELSE 0
           END AS full_plan_cents,
+          CASE
+            WHEN interval = 'month' AND COALESCE(is_medium, false) THEN cents_collected
+            ELSE 0
+          END AS medium_plan_cents,
           CASE
             WHEN interval = 'year' AND unit_amount = 1000 THEN cents_collected
             ELSE 0
           END AS light_plan_cents,
           CASE
+            WHEN interval = 'month' AND COALESCE(is_medium, false) THEN 0
             WHEN interval = 'month' AND unit_amount IN (500, 1000, 1500) THEN 0
             WHEN interval = 'year' AND unit_amount = 1000 THEN 0
             ELSE cents_collected
@@ -179,6 +213,7 @@ private struct MonthlySubscriptionRevenue: CustomQueryable {
           date_trunc('month', event_time) AS month_start,
           SUM(cents_collected)::int AS cents_collected,
           SUM(full_plan_cents)::int AS full_plan_cents,
+          SUM(medium_plan_cents)::int AS medium_plan_cents,
           SUM(light_plan_cents)::int AS light_plan_cents,
           SUM(other_cents)::int AS other_cents,
           COUNT(*)::int AS paid_invoices
@@ -200,18 +235,21 @@ private struct MonthlySubscriptionRevenue: CustomQueryable {
         TO_CHAR(months.month_start, 'YYYY-MM') AS month,
         COALESCE(monthly.cents_collected, 0)::int AS cents_collected,
         COALESCE(monthly.full_plan_cents, 0)::int AS full_plan_cents,
+        COALESCE(monthly.medium_plan_cents, 0)::int AS medium_plan_cents,
         COALESCE(monthly.light_plan_cents, 0)::int AS light_plan_cents,
         COALESCE(monthly.other_cents, 0)::int AS other_cents,
         COALESCE(monthly.paid_invoices, 0)::int AS paid_invoices
       FROM months
       LEFT JOIN monthly USING (month_start)
       ORDER BY months.month_start
-      """)
+      """))
+    return stmt
   }
 
   var month: String
   var centsCollected: Int
   var fullPlanCents: Int
+  var mediumPlanCents: Int
   var lightPlanCents: Int
   var otherCents: Int
   var paidInvoices: Int

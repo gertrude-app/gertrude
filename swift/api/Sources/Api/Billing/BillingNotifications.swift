@@ -53,7 +53,7 @@ func notifyTierChange(
   let adminLink = AdminLink()
   let slackLink = adminLink.slack(to: .parent(parent.id), text: email)
   let emailLink = adminLink.email(to: .parent(parent.id), text: email)
-  let change = to == .full ? "Upgrade" : "Downgrade"
+  let change = to > from ? "Upgrade" : "Downgrade"
   Task {
     let slack = get(dependency: \.slack)
     let postmark = get(dependency: \.postmark)

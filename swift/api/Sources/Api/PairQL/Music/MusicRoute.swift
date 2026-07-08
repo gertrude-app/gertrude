@@ -57,7 +57,7 @@ func requireGertrudeMusicAccess(
     throw context.error(
       "ad0437fe",
       .paymentRequired,
-      user: "Gertrude Music requires a Gertrude Light or Full subscription.",
+      user: "Gertrude Music requires a Gertrude Medium or Full subscription.",
     )
   }
 }

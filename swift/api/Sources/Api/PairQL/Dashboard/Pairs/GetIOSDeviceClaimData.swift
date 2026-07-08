@@ -81,7 +81,7 @@ private func resumeStep(
     return .done
   }
   let account = try await context.currentBillingAccount()
-  if account.paymentActionForMissingLightPlanCapability(.superviseIosDevice) != nil {
+  if account.paymentActionForMissingCapability(.superviseIosDevice) != nil {
     return .payment
   }
   return .downloadHelper

@@ -27,7 +27,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
 
   func testReturnsApprovedAlbumsForAuthedChild() async throws {
     let child = try await self.child()
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let (device, install) = try await self.claimedInstall(for: child)
     let ctx = MusicApp.InstallContext(
       requestId: "mock-req-id",
@@ -106,7 +106,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
 
   func testAuthedRouteResolvesTokenAndReturnsApprovedLibrary() async throws {
     let child = try await self.child()
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let (_, install) = try await self.claimedInstall(for: child)
     let token = try await self.db.create(MusicApp.Token(installId: install.id))
     try await self.db.create(Music.ApprovedAlbum(

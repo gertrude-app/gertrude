@@ -10,7 +10,7 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
   func testMusicClaimAfterBlockerConnectSetsClaimedAt() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     var device = try await self.db.create(IOSDevice.random)
     let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
@@ -38,7 +38,7 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
   func testMusicClaimAfterBlockerConnectCompletesClaimRow() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let code = Int.random(in: 100_000 ... 999_999)
     var device = try await self.db.create(IOSDevice.random)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))

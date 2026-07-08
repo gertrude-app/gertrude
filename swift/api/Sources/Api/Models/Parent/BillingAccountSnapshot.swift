@@ -52,6 +52,7 @@ struct BillingAccountSnapshot: Sendable {
 
     switch sub.tier {
     case .light: return .light(status: billingStatus(of: sub))
+    case .medium: return .medium(status: billingStatus(of: sub))
     case .full: return .full(status: billingStatus(of: sub))
     }
   }
@@ -67,7 +68,6 @@ struct BillingAccountSnapshot: Sendable {
     if let trialStart = self.billingIdentity?.fullTrialStartedAt,
        self.date < trialStart + PlanStatus.trialPeriod {
       capabilities.insert(.connectMacApp)
-      capabilities.insert(.useGertrudeMusic)
     }
     return capabilities
   }
@@ -82,6 +82,7 @@ struct BillingAccountSnapshot: Sendable {
     }
     switch sub.tier {
     case .light: return Cents(83)
+    case .medium: return Cents(500)
     case .full: return Cents(sub.isLegacyPrice ? 500 : 1000)
     }
   }
@@ -92,7 +93,7 @@ struct BillingAccountSnapshot: Sendable {
       .active
     case .full(.pastDue), .fullTrialGrace:
       .needsAttention
-    case .light, .free:
+    case .light, .medium, .free:
       .inactive
     }
   }
@@ -108,7 +109,8 @@ enum Capability: Hashable, Sendable, CaseIterable {
 extension StripeSubscription.Tier {
   var capabilities: Set<Capability> {
     switch self {
-    case .light: [.superviseIosDevice, .useGertrudeMusic]
+    case .light: [.superviseIosDevice]
+    case .medium: [.superviseIosDevice, .useGertrudeMusic]
     case .full: [.superviseIosDevice, .connectMacApp, .useGertrudeMusic]
     }
   }

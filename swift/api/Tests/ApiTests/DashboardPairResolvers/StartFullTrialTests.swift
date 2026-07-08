@@ -65,6 +65,9 @@ final class StartFullTrialTests: ApiTestCase, @unchecked Sendable {
     let panel = try await GetSubscriptionPanel_v2.resolve(in: parent.context)
     expect(panel.planStatus).toEqual(.fullTrial(until: .reference + .days(21), substrate: nil))
     expect(panel.primary).toEqual(.startCheckout(tier: .full))
-    expect(panel.secondary).toEqual([.startCheckout(tier: .light)])
+    expect(panel.secondary).toEqual([
+      .startCheckout(tier: .medium),
+      .startCheckout(tier: .light),
+    ])
   }
 }

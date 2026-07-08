@@ -57,7 +57,7 @@ extension CheckSupervisionFlowStatus: Resolver {
       )
       let clientSupportsRequiresSubscription = input.appVersion != nil
       if clientSupportsRequiresSubscription,
-         billing.paymentActionForMissingLightPlanCapability(.superviseIosDevice) != nil {
+         billing.paymentActionForMissingCapability(.superviseIosDevice) != nil {
         return .requiresSubscription(data)
       }
     }

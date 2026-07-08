@@ -1,16 +1,11 @@
-import {
-  ApiErrorMessage,
-  LightPlanGateScreen,
-  Loading,
-  ScreenShell,
-} from '@dash/components';
+import { ApiErrorMessage, Loading, PlanGateScreen, ScreenShell } from '@dash/components';
 import { posessive } from '@shared/string';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import type { SubscriptionPanelAction } from '@dash/types';
+import type { SubscriptionPanelAction, SubscriptionTier } from '@dash/types';
 import Current from '../../../environment';
 import { Key, useMutation, useQuery } from '../../../hooks';
-import { lightPlanGatePrimaryLabel } from '../../../lib/subscriptionActions';
+import { planGatePrimaryLabel } from '../../../lib/subscriptionActions';
 
 const SuperviseDevicePayment: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -24,7 +19,7 @@ const SuperviseDevicePayment: React.FC = () => {
   );
 
   const startCheckout = useMutation(
-    (tier: `light` | `full`) =>
+    (tier: SubscriptionTier) =>
       Current.api.startCheckoutSession({
         tier,
         successPath: `/supervise-device/${code}/download-helper`,
@@ -37,7 +32,7 @@ const SuperviseDevicePayment: React.FC = () => {
   );
 
   const openBillingPortal = useMutation(
-    (configuration: `lightTier` | `default`) =>
+    (configuration: `lightTier` | `mediumTier` | `default`) =>
       Current.api.openBillingPortal({
         returnPath: `/supervise-device/${code}/payment`,
         configuration,
@@ -103,7 +98,7 @@ const SuperviseDevicePayment: React.FC = () => {
 
   return (
     <ScreenShell title={`Continue ${deviceType} Setup`}>
-      <LightPlanGateScreen
+      <PlanGateScreen
         icon="credit-card"
         subtitle={`Setting up ${posessive(childName)} ${modelName} · iOS ${iosVersion}`}
         message={
@@ -115,7 +110,7 @@ const SuperviseDevicePayment: React.FC = () => {
         }
         extraBullets={[`All basic iOS blocking (GIFs, Apple Maps, Spotify etc.)`]}
         onPrimary={() => handlePaymentAction(paymentAction)}
-        primaryLabel={lightPlanGatePrimaryLabel(paymentAction)}
+        primaryLabel={planGatePrimaryLabel(paymentAction)}
         isWorking={startCheckout.isPending || openBillingPortal.isPending}
         checkoutCancelled={checkoutCancelled}
         error={paymentError}

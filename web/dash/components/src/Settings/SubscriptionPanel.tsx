@@ -131,7 +131,7 @@ export default SubscriptionPanel;
 
 // — compare view —
 
-type CurrentPlan = `free` | `light` | `full`;
+type CurrentPlan = `free` | `light` | `medium` | `full`;
 
 function currentPlan(planStatus: PlanStatus): CurrentPlan {
   switch (planStatus.case) {
@@ -139,6 +139,8 @@ function currentPlan(planStatus: PlanStatus): CurrentPlan {
       return `free`;
     case `light`:
       return `light`;
+    case `medium`:
+      return `medium`;
     case `full`:
     case `complimentary`:
     case `fullTrial`:
@@ -163,10 +165,17 @@ const PLAN_FEATURES: Record<CurrentPlan, { name: string; features: string[] }> =
       `Enable additional supervision-only restrictions`,
     ],
   },
+  medium: {
+    name: `Medium`,
+    features: [
+      `Everything in Light`,
+      `Safe, parent-curated music listening with the Gertrude Music app`,
+    ],
+  },
   full: {
     name: `Full`,
     features: [
-      `Everything in Light`,
+      `Everything in Medium`,
       `Full Mac app protection for the whole family, including internet filtering, screenshots, app blocking, downtime, and more.`,
     ],
   },

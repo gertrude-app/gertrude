@@ -10,12 +10,20 @@ final class CapabilityTests: DependencyTestCase {
     expect(billing(tier: .light, status: .active).can(.superviseIosDevice)).toBeTrue()
   }
 
+  func testCanSuperviseForActiveMedium() {
+    expect(billing(tier: .medium, status: .active).can(.superviseIosDevice)).toBeTrue()
+  }
+
   func testCanSuperviseForActiveFull() {
     expect(billing(tier: .full, status: .active).can(.superviseIosDevice)).toBeTrue()
   }
 
   func testCanSuperviseForPastDueLight() {
     expect(billing(tier: .light, status: .pastDue).can(.superviseIosDevice)).toBeFalse()
+  }
+
+  func testCannotSuperviseForPastDueMedium() {
+    expect(billing(tier: .medium, status: .pastDue).can(.superviseIosDevice)).toBeFalse()
   }
 
   func testCannotSuperviseForPastDueFull() {
@@ -72,20 +80,28 @@ final class CapabilityTests: DependencyTestCase {
     expect(billing(tier: .full, status: .canceled).can(.superviseIosDevice)).toBeFalse()
   }
 
-  func testCanUseMusicForActiveLight() {
-    expect(billing(tier: .light, status: .active).can(.useGertrudeMusic)).toBeTrue()
+  func testCannotUseMusicForActiveLight() {
+    expect(billing(tier: .light, status: .active).can(.useGertrudeMusic)).toBeFalse()
+  }
+
+  func testCanUseMusicForActiveMedium() {
+    expect(billing(tier: .medium, status: .active).can(.useGertrudeMusic)).toBeTrue()
+  }
+
+  func testCannotUseMusicForPastDueMedium() {
+    expect(billing(tier: .medium, status: .pastDue).can(.useGertrudeMusic)).toBeFalse()
   }
 
   func testCanUseMusicForActiveFull() {
     expect(billing(tier: .full, status: .active).can(.useGertrudeMusic)).toBeTrue()
   }
 
-  func testCanUseMusicForStandaloneFullTrial() {
+  func testCannotUseMusicForStandaloneFullTrial() {
     let trialStart = Date.reference
     expect(
       billing(trialStartedAt: trialStart, date: trialStart + .days(10))
         .can(.useGertrudeMusic),
-    ).toBeTrue()
+    ).toBeFalse() // music requires a paid sub, like supervision
   }
 
   func testCannotUseMusicForFullTrialGraceWithoutPaidSubstrate() {
@@ -96,12 +112,24 @@ final class CapabilityTests: DependencyTestCase {
     ).toBeFalse()
   }
 
-  func testCanUseMusicForCurrentLightDuringFullTrialGrace() {
+  func testCannotUseMusicForCurrentLightDuringFullTrialGrace() {
     let trialStart = Date.reference
     expect(
       billing(
         trialStartedAt: trialStart,
         tier: .light,
+        status: .active,
+        date: trialStart + .days(24),
+      ).can(.useGertrudeMusic),
+    ).toBeFalse()
+  }
+
+  func testCanUseMusicForCurrentMediumDuringFullTrialGrace() {
+    let trialStart = Date.reference
+    expect(
+      billing(
+        trialStartedAt: trialStart,
+        tier: .medium,
         status: .active,
         date: trialStart + .days(24),
       ).can(.useGertrudeMusic),
@@ -132,8 +160,32 @@ final class CapabilityTests: DependencyTestCase {
     expect(billing().can(.useGertrudeMusic)).toBeFalse()
   }
 
-  func testPaymentActionForMissingLightPlanCapabilityIgnoresMacAppCapability() {
-    expect(billing().paymentActionForMissingLightPlanCapability(.connectMacApp)).toBeNil()
+  func testPaymentActionForMissingCapabilityIgnoresMacAppCapability() {
+    expect(billing().paymentActionForMissingCapability(.connectMacApp)).toBeNil()
+  }
+
+  func testPaymentActionForMusicOnActiveLightIsUpgradeToMedium() {
+    expect(
+      billing(tier: .light, status: .active).paymentActionForMissingCapability(.useGertrudeMusic),
+    ).toEqual(.changeSubscriptionTier(to: .medium))
+  }
+
+  func testPaymentActionForMusicOnFreeIsMediumCheckout() {
+    expect(
+      billing().paymentActionForMissingCapability(.useGertrudeMusic),
+    ).toEqual(.startCheckout(tier: .medium))
+  }
+
+  func testPaymentActionForMusicOnPastDueMediumIsPortal() {
+    expect(
+      billing(tier: .medium, status: .pastDue).paymentActionForMissingCapability(.useGertrudeMusic),
+    ).toEqual(.openBillingPortal(config: .mediumTier))
+  }
+
+  func testPaymentActionForSuperviseOnFreeIsLightCheckout() {
+    expect(
+      billing().paymentActionForMissingCapability(.superviseIosDevice),
+    ).toEqual(.startCheckout(tier: .light))
   }
 
   func testCanConnectMacAppForFull() {
@@ -157,6 +209,10 @@ final class CapabilityTests: DependencyTestCase {
 
   func testCannotConnectMacAppForLight() {
     expect(billing(tier: .light, status: .active).can(.connectMacApp)).toBeFalse()
+  }
+
+  func testCannotConnectMacAppForMedium() {
+    expect(billing(tier: .medium, status: .active).can(.connectMacApp)).toBeFalse()
   }
 
   // MARK: - macAppAccessStatus tri-state (.active / .needsAttention / .inactive)
@@ -192,6 +248,12 @@ final class CapabilityTests: DependencyTestCase {
   func testAccessStatusInactiveForLight() {
     expect(
       billing(tier: .light, status: .active).macAppAccessStatus,
+    ).toEqual(.inactive)
+  }
+
+  func testAccessStatusInactiveForMedium() {
+    expect(
+      billing(tier: .medium, status: .active).macAppAccessStatus,
     ).toEqual(.inactive)
   }
 

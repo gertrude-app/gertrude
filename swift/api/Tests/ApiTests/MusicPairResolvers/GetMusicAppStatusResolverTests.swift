@@ -104,7 +104,7 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testClaimedDeviceCreatesTokenAndReturnsChildContext() async throws {
     let child = try await self.child()
-    try await self.addLightPaidSubscription(for: child.parent.id) // entitled -> .active
+    try await self.addPaidSubscription(for: child.parent.id, tier: .medium) // entitled -> .active
     let deviceId = UUID()
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
@@ -203,7 +203,7 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testAlreadyBoundDeviceCompletesMusicClaimAndReturnsChildContext() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)

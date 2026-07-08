@@ -8,7 +8,7 @@ import XExpect
 final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
   func testSearchesAppleMusicAlbums() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
 
     let output = try await withDependencies {
       $0.appleMusic.searchAlbums = { search in
@@ -46,7 +46,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testClampsSearchLimit() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
 
     let highLimit = try await withDependencies {
       $0.appleMusic.searchAlbums = { search in
@@ -86,7 +86,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testBlankQueryReturnsNoAlbumsWithoutSearching() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
 
     let output = try await withDependencies {
       $0.appleMusic

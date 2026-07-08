@@ -171,7 +171,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testRejectsMusicManagementWithoutConnectedMusic() async throws {
     let child = try await self.child()
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
 
     do {
       _ = try await ApproveMusicAlbum.resolve(
@@ -196,7 +196,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   private func connectMusicApp(for child: ChildEntities) async throws {
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
     })

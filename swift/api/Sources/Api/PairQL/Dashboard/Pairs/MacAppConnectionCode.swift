@@ -46,15 +46,15 @@ extension BillingAccountSnapshot {
       return .subscriptionFixRequired
 
     case .fullTrialGrace(_, let substrate):
-      if let substrate, substrate.tier == .light, case .current = substrate.status {
+      if let substrate, substrate.tier != .full, case .current = substrate.status {
         return .planUpgradeRequired
       }
       return .subscriptionFixRequired
 
-    case .light(.pastDue):
+    case .light(.pastDue), .medium(.pastDue):
       return .subscriptionFixRequired
 
-    case .light(.current):
+    case .light(.current), .medium(.current):
       return trialedFull ? .planUpgradeRequired : .trialRequired
 
     case .free:
