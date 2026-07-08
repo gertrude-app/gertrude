@@ -5,9 +5,17 @@ swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
 _default:
   @just --choose
 
-gen debug_api_endpoint=env("GERTRUDE_MUSIC_DEBUG_API_ENDPOINT"):
-  @GERTRUDE_MUSIC_DEBUG_API_ENDPOINT='{{debug_api_endpoint}}' xcodegen -s project.yml
-  @xml-lint --fix app/Info.plist
+gen local_api_endpoint="":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  endpoint='{{local_api_endpoint}}'
+  endpoint="${endpoint:-${LOCAL_API_ENDPOINT:-}}"
+  endpoint="${endpoint:-$(../../scripts/local-api-endpoint)}"
+  LOCAL_API_ENDPOINT="$endpoint" \
+    GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM="${GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM:-WFN83LM943}" \
+    GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER="${GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER:-com.netrivet.gertrude.music.dev}" \
+    xcodegen -s project.yml
+  xml-lint --fix app/Info.plist app/Info.Debug.plist
 
 xcode:
   @just gen
@@ -40,7 +48,7 @@ check:
 
 fix:
   @swiftformat --exclude '**/.build' .
-  @xml-lint --fix app/Info.plist
+  @xml-lint --fix app/Info.plist app/Info.Debug.plist
   @prettier --write '**/*.json' '!**/.build/**'
 
 clean:

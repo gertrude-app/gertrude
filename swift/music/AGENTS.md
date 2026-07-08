@@ -7,11 +7,10 @@ Mac's current LAN address and the local API port. Do not use `localhost` for a p
 device.
 
 - Start the local API from the repo root with `just watch-api`.
-- Read the port from the repo-root `.gtask-ports` file (`API_PORT`, often not `8080`).
-- Get the current Wi-Fi IP with `ipconfig getifaddr en0`.
+- The local API endpoint is inferred by `scripts/local-api-endpoint`, using `LOCAL_API_ENDPOINT` when set,
+  otherwise the Wi-Fi IP and repo-root `.gtask-ports` `API_PORT`.
 - Regenerate after switching Wi-Fi networks or when `.gtask-ports` changes:
 
 ```bash
-cd swift/music
-just gen "http://<wifi-ip>:<API_PORT>"
+just music gen
 ```

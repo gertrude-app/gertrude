@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+format="url"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --xcconfig)
+      format="xcconfig"
+      shift
+      ;;
+    *)
+      echo "unknown argument: $1" >&2
+      exit 1
+      ;;
+  esac
+done
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+url="${LOCAL_API_ENDPOINT:-}"
+if [[ -z "$url" ]]; then
+  if [[ -z "${API_PORT:-}" && -f "$repo_root/.gtask-ports" ]]; then
+    source "$repo_root/.gtask-ports"
+  fi
+  host="${LOCAL_API_HOST:-}"
+  if [[ -z "$host" ]]; then
+    host="$(ipconfig getifaddr en0)"
+  fi
+  url="http://$host:${API_PORT:-8080}"
+fi
+
+case "$format" in
+  url)
+    printf '%s\n' "$url"
+    ;;
+  xcconfig)
+    printf '%s\n' "$url" | sed 's#://#:/\$()/#'
+    ;;
+esac

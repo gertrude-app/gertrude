@@ -6,7 +6,7 @@ Create a `.xcconfig` file at `iosapp/config/Local.xcconfig` with the following c
 use `just iosconfig` to create it automatically:
 
 ```xcconfig
-LOCAL_API_ENDPOINT = https:/$()/REPLACE.ngrok-free.app
+LOCAL_API_ENDPOINT = http:/$()/<wifi-ip>:<API_PORT>
 ```
 
 ## Release notes

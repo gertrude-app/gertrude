@@ -25,7 +25,7 @@ iosapp-xcode-build:
   @pnpm exec nx run iosapp:xcode-build
 
 iosconfig:
-  @echo "LOCAL_API_ENDPOINT = https:/\$()/{{ngrok_subdomain}}.ngrok-free.app" > iosapp/config/Local.xcconfig
+  @printf 'LOCAL_API_ENDPOINT = %s\n' "$(../scripts/local-api-endpoint --xcconfig)" > iosapp/config/Local.xcconfig
 
 ios-tunnel:
   @pkill -f ngrok || true
@@ -194,6 +194,8 @@ xmlfiles := """
 ./macapp/Xcode/Gertrude/Gertrude.entitlements \
 ./macapp/Xcode/Gertrude/Info.plist \
 ./macapp/Xcode/GertrudeRelauncher/GertrudeRelauncher.entitlements \
+./music/app/Info.Debug.plist \
 ./music/app/Info.plist \
+./podcasts/app/Info.Debug.plist \
 ./podcasts/app/Info.plist
 """
