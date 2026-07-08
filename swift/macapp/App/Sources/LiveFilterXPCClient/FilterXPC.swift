@@ -181,6 +181,13 @@ func newConnection() -> NSXPCConnection {
   connection.exportedInterface = NSXPCInterface(with: FilterMessageReceiving.self)
   connection.exportedObject = ReceiveFilterMessage(subject: xpcEventSubject)
   connection.remoteObjectInterface = NSXPCInterface(with: AppMessageReceiving.self)
+  connection.interruptionHandler = {
+    os_log("[G•] APP FilterXPC connection interrupted")
+  }
+  connection.invalidationHandler = { [id = ObjectIdentifier(connection)] in
+    os_log("[G•] APP FilterXPC connection invalidated, replacing")
+    Task { await sharedConnection.replace(ifCurrent: id, with: { newConnection() }) }
+  }
   connection.resume()
   return connection
 }

@@ -18,6 +18,15 @@ public actor Connection {
   }
 
   public func replace(with create: @Sendable () -> NSXPCConnection) {
+    self.connection.invalidate()
+    self.connection = create()
+  }
+
+  public func replace(
+    ifCurrent id: ObjectIdentifier,
+    with create: @Sendable () -> NSXPCConnection,
+  ) {
+    guard ObjectIdentifier(self.connection) == id else { return }
     self.connection = create()
   }
 
