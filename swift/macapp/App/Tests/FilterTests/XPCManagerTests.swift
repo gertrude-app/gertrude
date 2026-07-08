@@ -1,5 +1,6 @@
 import Core
 import Foundation
+import Security
 import XCTest
 import XExpect
 
@@ -93,6 +94,24 @@ final class XPCManagerTests: XCTestCase {
     manager.accept(connection: self.testXpcConnection(), userId: 502)
     manager.stopListener()
     expect(manager.connectionIds).toEqual([:])
+  }
+
+  func testAppCodeSigningRequirementLocksToBundleIdAndTeam() {
+    expect(XPCManager.appCodeSigningRequirement).toEqual(
+      "anchor apple generic"
+        + " and identifier \"com.netrivet.gertrude.app\""
+        + " and certificate leaf[subject.OU] = \"WFN83LM943\"",
+    )
+  }
+
+  func testAppCodeSigningRequirementParses() {
+    var requirement: SecRequirement? // <-- invalid string would crash accept()
+    let status = SecRequirementCreateWithString(
+      XPCManager.appCodeSigningRequirement as CFString,
+      [],
+      &requirement,
+    )
+    expect(status).toEqual(errSecSuccess)
   }
 
   // helpers

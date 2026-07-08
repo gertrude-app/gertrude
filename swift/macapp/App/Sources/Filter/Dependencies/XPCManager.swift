@@ -84,12 +84,21 @@ class XPCManager: NSObject, NSXPCListenerDelegate, XPCSender {
     return true
   }
 
+  static let appCodeSigningRequirement = "anchor apple generic"
+    + " and identifier \"\(Constants.APP_BUNDLE_ID)\""
+    + " and certificate leaf[subject.OU] = \"\(Constants.TEAM_ID)\""
+
   func accept(connection newConnection: NSXPCConnection, userId: uid_t) {
     os_log(
       "[G•] FILTER XPCManager: accepting new connection %{public}@ for user %{public}d",
       newConnection,
       userId,
     )
+    if #available(macOS 13.0, *) {
+      newConnection.setCodeSigningRequirement(Self.appCodeSigningRequirement)
+    } else {
+      os_log("[G•] FILTER XPCManager: peer code signing requirement unavailable")
+    }
     let id = ObjectIdentifier(newConnection)
     newConnection.invalidationHandler = { [weak self] in
       self?.removeConnection(userId: userId, id: id)

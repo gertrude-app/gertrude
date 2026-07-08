@@ -2,8 +2,13 @@
 
 ## Release notes
 
-- `2.9.4` (canary, 7/8/26)
+- `2.9.4` (canary, 7/9/26)
   - unix-domain-socket shadow xpc
+  - try to restore filter on xpc comm lost repair fail
+  - capture/log comm fail forensics
+  - replace invalidated xpc connection
+  - keep per-user map of xpc connections, instead of last comm wins
+  - harden xpc with signature for supporting macos versions
 - `2.9.3` (beta 5/4/26)
   - real regex support for unlocking keys (see docs/notes/001)
 - `2.9.2` (stable 4/23/26)
