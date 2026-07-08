@@ -83,4 +83,11 @@ extension Child {
       .orderBy(.createdAt, .asc)
       .all(in: db)
   }
+
+  func approvedMusicArtists(in db: any DuetSQL.Client) async throws -> [Music.ApprovedArtist] {
+    try await Music.ApprovedArtist.query()
+      .where(.childId == self.id)
+      .orderBy(.createdAt, .asc)
+      .all(in: db)
+  }
 }

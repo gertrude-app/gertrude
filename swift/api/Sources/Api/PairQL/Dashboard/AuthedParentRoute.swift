@@ -25,8 +25,11 @@ enum AuthedParentRoute: PairRoute {
   case getChildren
   case searchMusicCatalog(SearchMusicCatalog.Input)
   case getApprovedMusicAlbums(GetApprovedMusicAlbums.Input)
+  case getApprovedMusicArtists(GetApprovedMusicArtists.Input)
   case approveMusicAlbum(ApproveMusicAlbum.Input)
+  case approveMusicArtist(ApproveMusicArtist.Input)
   case removeApprovedMusicAlbum(RemoveApprovedMusicAlbum.Input)
+  case removeApprovedMusicArtist(RemoveApprovedMusicArtist.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice_v2(IOSDevice.Id)
@@ -154,13 +157,25 @@ extension AuthedParentRoute {
           Operation(GetApprovedMusicAlbums.self)
           Body(.dashboardInput(GetApprovedMusicAlbums.self))
         }
+        Route(.case(Self.getApprovedMusicArtists)) {
+          Operation(GetApprovedMusicArtists.self)
+          Body(.dashboardInput(GetApprovedMusicArtists.self))
+        }
         Route(.case(Self.approveMusicAlbum)) {
           Operation(ApproveMusicAlbum.self)
           Body(.dashboardInput(ApproveMusicAlbum.self))
         }
+        Route(.case(Self.approveMusicArtist)) {
+          Operation(ApproveMusicArtist.self)
+          Body(.dashboardInput(ApproveMusicArtist.self))
+        }
         Route(.case(Self.removeApprovedMusicAlbum)) {
           Operation(RemoveApprovedMusicAlbum.self)
           Body(.dashboardInput(RemoveApprovedMusicAlbum.self))
+        }
+        Route(.case(Self.removeApprovedMusicArtist)) {
+          Operation(RemoveApprovedMusicArtist.self)
+          Body(.dashboardInput(RemoveApprovedMusicArtist.self))
         }
         Route(.case(Self.handleCheckoutCancel)) {
           Operation(HandleCheckoutCancel.self)
@@ -336,11 +351,20 @@ extension AuthedParentRoute: RouteResponder {
     case .getApprovedMusicAlbums(let input):
       let output = try await GetApprovedMusicAlbums.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .getApprovedMusicArtists(let input):
+      let output = try await GetApprovedMusicArtists.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .approveMusicAlbum(let input):
       let output = try await ApproveMusicAlbum.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .approveMusicArtist(let input):
+      let output = try await ApproveMusicArtist.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .removeApprovedMusicAlbum(let input):
       let output = try await RemoveApprovedMusicAlbum.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .removeApprovedMusicArtist(let input):
+      let output = try await RemoveApprovedMusicArtist.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .saveUser(let input):
       let output = try await SaveUser.resolve(with: input, in: context)

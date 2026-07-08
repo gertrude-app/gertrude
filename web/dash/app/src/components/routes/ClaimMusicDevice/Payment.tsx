@@ -113,7 +113,9 @@ const ClaimMusicDevicePayment: React.FC = () => {
           </>
         }
         plan="medium"
-        extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
+        extraBullets={[
+          `Includes Gertrude Music for approved Apple Music artists and albums`,
+        ]}
         priceSize="emphasized"
         checkoutCancelled={checkoutCancelled}
         error={paymentError}

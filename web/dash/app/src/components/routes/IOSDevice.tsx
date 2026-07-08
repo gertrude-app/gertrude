@@ -586,7 +586,9 @@ const MusicDeviceSection: React.FC<{
         <PlanTeaser
           className="mb-4"
           plan="medium"
-          extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
+          extraBullets={[
+            `Includes Gertrude Music for approved Apple Music artists and albums`,
+          ]}
         />
         <Button type="link" to="/settings" color="primary" size="small">
           Manage subscription

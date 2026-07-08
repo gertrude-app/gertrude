@@ -98,14 +98,15 @@ describe(`children screen`, () => {
         musicConnected: true,
       });
       cy.interceptPql(`GetApprovedMusicAlbums`, { albums: [] });
+      cy.interceptPql(`GetApprovedMusicArtists`, { artists: [] });
 
       cy.visit(`/children/user-123/ios-devices/ios-device-123`);
 
       cy.contains(`Huck's iPhone`);
       cy.contains(`Gertrude Music`);
-      cy.contains(`Search Apple Music albums`);
-      cy.contains(/Huck.s allowed albums/);
-      cy.contains(`No allowed albums yet`);
+      cy.contains(`Search Apple Music`);
+      cy.contains(/Huck.s allowed music/);
+      cy.contains(`No allowed music yet`);
     });
   });
 

@@ -19,7 +19,26 @@ struct SearchMusicCatalog: Pair {
       var appleMusicUrl: String?
     }
 
+    struct Artist: PairNestable {
+      var id: Music.ArtistId
+      var name: String
+      var catalogMetadata: Music.CatalogMetadata?
+    }
+
+    struct Item: PairNestable {
+      enum Kind: String, PairNestable {
+        case album
+        case artist
+      }
+
+      var kind: Kind
+      var album: Album?
+      var artist: Artist?
+    }
+
+    var items: [Item]
     var albums: [Album]
+    var artists: [Artist]
   }
 }
 
@@ -30,27 +49,43 @@ extension SearchMusicCatalog: Resolver {
 
     let query = input.query.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !query.isEmpty else {
-      return .init(albums: [])
+      return .init(items: [], albums: [], artists: [])
     }
 
-    let albums = try await get(dependency: \.appleMusic).searchAlbums(
-      .init(
-        term: query,
-        storefront: "us",
-        limit: min(max(input.limit ?? 10, 1), 25),
-      ))
+    let limit = min(max(input.limit ?? 10, 1), 25)
+    let results = try await get(dependency: \.appleMusic).searchCatalog(
+      .init(term: query, storefront: "us", limit: limit),
+    )
 
     return .init(
-      albums: albums.map {
-        .init(
-          id: $0.id,
-          title: $0.title,
-          artistName: $0.artistName,
-          artworkUrl: $0.artworkUrl,
-          trackCount: $0.trackCount,
-          releaseDate: $0.releaseDate,
-          appleMusicUrl: $0.appleMusicUrl,
-        )
-      })
+      items: results.items.compactMap(Self.outputItem(from:)),
+      albums: results.albums.map(Self.outputAlbum(from:)),
+      artists: results.artists.map(Self.outputArtist(from:)),
+    )
+  }
+
+  private static func outputItem(from item: AppleMusicCatalogSearchItem) -> Output.Item? {
+    switch item.kind {
+    case .album:
+      item.album.map { .init(kind: .album, album: Self.outputAlbum(from: $0), artist: nil) }
+    case .artist:
+      item.artist.map { .init(kind: .artist, album: nil, artist: Self.outputArtist(from: $0)) }
+    }
+  }
+
+  private static func outputAlbum(from album: AppleMusicCatalogAlbum) -> Output.Album {
+    .init(
+      id: album.id,
+      title: album.title,
+      artistName: album.artistName,
+      artworkUrl: album.artworkUrl,
+      trackCount: album.trackCount,
+      releaseDate: album.releaseDate,
+      appleMusicUrl: album.appleMusicUrl,
+    )
+  }
+
+  private static func outputArtist(from artist: AppleMusicCatalogArtist) -> Output.Artist {
+    .init(id: artist.id, name: artist.name, catalogMetadata: artist.catalogMetadata)
   }
 }

@@ -25,6 +25,30 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     expect(matched).toEqual(.music(.authed(token, .getApprovedMusicLibrary)))
   }
 
+  func testV2RouteMatches() throws {
+    let token = UUID()
+    var request = URLRequest(url: URL(string: "gertrude-music/GetApprovedMusicLibrary_v2")!)
+    request.httpMethod = "POST"
+    request.addValue(token.uuidString, forHTTPHeaderField: "X-MusicToken")
+
+    let matched = try PairQLRoute.router.match(request: request)
+
+    expect(matched).toEqual(.music(.authed(token, .getApprovedMusicLibrary_v2)))
+  }
+
+  func testAlbumTracksRouteMatches() throws {
+    let token = UUID()
+    let input = GetApprovedMusicAlbumTracks.Input(albumId: "1440935467")
+    var request = URLRequest(url: URL(string: "gertrude-music/GetApprovedMusicAlbumTracks")!)
+    request.httpMethod = "POST"
+    request.addValue(token.uuidString, forHTTPHeaderField: "X-MusicToken")
+    request.httpBody = try JSONEncoder().encode(input)
+
+    let matched = try PairQLRoute.router.match(request: request)
+
+    expect(matched).toEqual(.music(.authed(token, .getApprovedMusicAlbumTracks(input))))
+  }
+
   func testReturnsApprovedAlbumsForAuthedChild() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
@@ -102,6 +126,169 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
         ],
       ),
     ])
+  }
+
+  func testV2ReturnsApprovedAlbumsAndArtistsForAuthedChild() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "1440935467",
+      title: "Stories from the Outside",
+      artistName: "Lena Jonsson Trio",
+      artworkUrl: "https://example.com/stories.jpg",
+      trackCount: 12,
+      showsArtwork: true,
+    ))
+    try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "1733742320",
+      title: "Elements",
+      artistName: "Lena Jonsson Trio",
+      artworkUrl: nil,
+      trackCount: nil,
+      showsArtwork: false,
+    ))
+    try await self.db.create(Music.ApprovedArtist(
+      childId: child.id,
+      appleMusicArtistId: "123456789",
+      name: "Lena Jonsson Trio",
+      catalogMetadata: approvedArtistMetadata(),
+    ))
+
+    let output = try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
+
+    expect(output).toEqual(.init(
+      albums: [
+        .init(
+          id: "1440935467",
+          title: "Stories from the Outside",
+          artistName: "Lena Jonsson Trio",
+          artworkUrl: "https://example.com/stories.jpg",
+          trackCount: 12,
+          showsArtwork: true,
+        ),
+        .init(
+          id: "1733742320",
+          title: "Elements",
+          artistName: "Lena Jonsson Trio",
+          artworkUrl: nil,
+          trackCount: nil,
+          showsArtwork: false,
+        ),
+      ],
+      artists: [
+        .init(
+          id: "123456789",
+          name: "Lena Jonsson Trio",
+          catalogMetadata: approvedArtistOutputMetadata(),
+        ),
+      ],
+    ))
+  }
+
+  func testReturnsApprovedAlbumTracksForExplicitAlbum() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "1440935467",
+      title: "Stories from the Outside",
+      artistName: "Lena Jonsson Trio",
+      artworkUrl: "https://example.com/stories.jpg",
+      trackCount: 12,
+      showsArtwork: true,
+    ))
+
+    let output = try await withDependencies {
+      $0.appleMusic.albumTracks = { lookup in mockTracks(for: lookup) }
+    } operation: {
+      try await GetApprovedMusicAlbumTracks.resolve(
+        with: .init(albumId: "1440935467"),
+        in: ctx,
+      )
+    }
+
+    expect(output).toEqual([
+      .init(
+        id: "1440935468",
+        title: "Sommarsvärta",
+        artistName: "Lena Jonsson Trio",
+        artworkUrl: "https://example.com/stories.jpg",
+      ),
+      .init(
+        id: "1440935469",
+        title: "Snowstorm",
+        artistName: "Lena Jonsson Trio",
+        artworkUrl: "https://example.com/snowstorm.jpg",
+      ),
+    ])
+  }
+
+  func testRejectsUnapprovedAlbumTracks() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+
+    do {
+      _ = try await GetApprovedMusicAlbumTracks.resolve(
+        with: .init(albumId: "1440935467"),
+        in: ctx,
+      )
+      XCTFail("expected unauthorized error for unapproved album")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.unauthorized)
+    }
+  }
+
+  func testV1IgnoresApprovedArtists() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    try await self.db.create(Music.ApprovedArtist(
+      childId: child.id,
+      appleMusicArtistId: "123456789",
+      name: "Lena Jonsson Trio",
+      catalogMetadata: approvedArtistMetadata(),
+    ))
+
+    let output = try await GetApprovedMusicLibrary.resolve(in: ctx)
+
+    expect(output.albums).toEqual([])
   }
 
   func testAuthedRouteResolvesTokenAndReturnsApprovedLibrary() async throws {
@@ -201,6 +388,52 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     )
     return (device, install)
   }
+}
+
+private func approvedArtistMetadata() -> Music.CatalogMetadata {
+  .init(
+    artwork: .init(
+      url: "https://example.com/artist/{w}x{h}bb.jpg",
+      width: 1200,
+      height: 1200,
+      bgColor: "19160f",
+      textColor1: "f3949b",
+      textColor2: "b08ff2",
+      textColor3: "c77b7f",
+      textColor4: "9277c5",
+    ),
+    editorialNotes: .init(
+      tagline: "Swedish folk trio",
+      short: "Modern fiddle music.",
+      standard: "A longer <b>Apple Music</b> artist note.",
+      name: "Apple Music Folk",
+    ),
+    appleMusicUrl: "https://music.apple.com/us/artist/lena-jonsson-trio/123456789",
+    genreNames: ["Folk", "Worldwide"],
+  )
+}
+
+private func approvedArtistOutputMetadata() -> MusicCatalogMetadata {
+  .init(
+    artwork: .init(
+      url: "https://example.com/artist/{w}x{h}bb.jpg",
+      width: 1200,
+      height: 1200,
+      bgColor: "19160f",
+      textColor1: "f3949b",
+      textColor2: "b08ff2",
+      textColor3: "c77b7f",
+      textColor4: "9277c5",
+    ),
+    editorialNotes: .init(
+      tagline: "Swedish folk trio",
+      short: "Modern fiddle music.",
+      standard: "A longer <b>Apple Music</b> artist note.",
+      name: "Apple Music Folk",
+    ),
+    appleMusicUrl: "https://music.apple.com/us/artist/lena-jonsson-trio/123456789",
+    genreNames: ["Folk", "Worldwide"],
+  )
 }
 
 private func mockTracks(for lookup: AppleMusicAlbumTracksLookup) -> [AppleMusicCatalogTrack] {

@@ -16,6 +16,12 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.ApproveMusicAlbum.Output>(input, `ApproveMusicAlbum`, `parent`);
   };
 
+  public approveMusicArtist = (
+    input: P.ApproveMusicArtist.Input,
+  ): Promise<Result<P.ApproveMusicArtist.Output>> => {
+    return this.query<P.ApproveMusicArtist.Output>(input, `ApproveMusicArtist`, `parent`);
+  };
+
   public changeSubscriptionTier = (
     input: P.ChangeSubscriptionTier.Input,
   ): Promise<Result<P.ChangeSubscriptionTier.Output>> => {
@@ -178,6 +184,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetApprovedMusicAlbums.Output>(
       input,
       `GetApprovedMusicAlbums`,
+      `parent`,
+    );
+  };
+
+  public getApprovedMusicArtists = (
+    input: P.GetApprovedMusicArtists.Input,
+  ): Promise<Result<P.GetApprovedMusicArtists.Output>> => {
+    return this.query<P.GetApprovedMusicArtists.Output>(
+      input,
+      `GetApprovedMusicArtists`,
       `parent`,
     );
   };
@@ -376,6 +392,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.RemoveApprovedMusicAlbum.Output>(
       input,
       `RemoveApprovedMusicAlbum`,
+      `parent`,
+    );
+  };
+
+  public removeApprovedMusicArtist = (
+    input: P.RemoveApprovedMusicArtist.Input,
+  ): Promise<Result<P.RemoveApprovedMusicArtist.Output>> => {
+    return this.query<P.RemoveApprovedMusicArtist.Output>(
+      input,
+      `RemoveApprovedMusicArtist`,
       `parent`,
     );
   };

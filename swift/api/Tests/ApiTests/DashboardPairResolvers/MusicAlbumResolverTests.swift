@@ -37,6 +37,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         artworkUrl: "https://example.com/stories.jpg",
         trackCount: 12,
         showsArtwork: true,
+        createdAt: albums.albums[0].createdAt,
       ),
       .init(
         id: .init(rawValue: "1733742320"),
@@ -45,6 +46,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         artworkUrl: "https://example.com/elements.jpg",
         trackCount: 6,
         showsArtwork: false,
+        createdAt: albums.albums[1].createdAt,
       ),
     ])
   }
@@ -105,6 +107,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         artworkUrl: "https://example.com/stories.jpg",
         trackCount: 12,
         showsArtwork: true,
+        createdAt: albums.albums[0].createdAt,
       ),
     ])
   }

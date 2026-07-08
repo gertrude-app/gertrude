@@ -81,3 +81,5 @@ extension MusicApp.Token {
 extension Parent.Notification.Trigger: PostgresRawBindable {}
 
 extension ReleaseChannel: @retroactive PostgresRawBindable {}
+
+extension Music.CatalogMetadata: PostgresJsonable {}

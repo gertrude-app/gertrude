@@ -10,6 +10,7 @@ export namespace GetApprovedMusicAlbums {
       artworkUrl?: string;
       trackCount?: number;
       showsArtwork: boolean;
+      createdAt?: ISODateString;
     }>;
   }
 }

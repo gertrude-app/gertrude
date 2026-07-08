@@ -1,12 +1,34 @@
 import { ApiErrorMessage, EmptyState, Loading } from '@dash/components';
 import { Button, TextInput } from '@shared/components';
 import React, { useState } from 'react';
-import type { GetApprovedMusicAlbums, SearchMusicCatalog } from '@dash/types';
+import type {
+  GetApprovedMusicAlbums,
+  GetApprovedMusicArtists,
+  SearchMusicCatalog,
+} from '@dash/types';
 import Current from '../../environment';
 import { Key, useMutation, useQuery } from '../../hooks';
 
 type SearchAlbum = SearchMusicCatalog.Output[`albums`][number];
+type SearchArtist = SearchMusicCatalog.Output[`artists`][number];
 type ApprovedAlbum = GetApprovedMusicAlbums.Output[`albums`][number];
+type ApprovedArtist = GetApprovedMusicArtists.Output[`artists`][number];
+type ArtistLike = Pick<SearchArtist, `name` | `catalogMetadata`>;
+type ApprovedMusicItem =
+  | {
+      kind: `artist`;
+      id: string;
+      createdAt?: string;
+      sequence: number;
+      artist: ApprovedArtist;
+    }
+  | {
+      kind: `album`;
+      id: string;
+      createdAt?: string;
+      sequence: number;
+      album: ApprovedAlbum;
+    };
 
 const MusicCuration: React.FC<{
   childId: string;
@@ -16,12 +38,16 @@ const MusicCuration: React.FC<{
   const [searchQuery, setSearchQuery] = useState(``);
   const [hasSearched, setHasSearched] = useState(false);
   const approvedAlbumsKey = Key.approvedMusicAlbums(childId);
+  const approvedArtistsKey = Key.approvedMusicArtists(childId);
 
   const approvedAlbumsQuery = useQuery(approvedAlbumsKey, () =>
     Current.api.getApprovedMusicAlbums(childId),
   );
+  const approvedArtistsQuery = useQuery(approvedArtistsKey, () =>
+    Current.api.getApprovedMusicArtists(childId),
+  );
 
-  const searchAlbums = useMutation(
+  const searchCatalog = useMutation(
     (input: SearchMusicCatalog.Input) => Current.api.searchMusicCatalog(input),
     {
       onSuccess: () => setHasSearched(true),
@@ -42,6 +68,17 @@ const MusicCuration: React.FC<{
     { invalidating: [approvedAlbumsKey], toast: `approve:music-album` },
   );
 
+  const approveArtist = useMutation(
+    (artist: SearchArtist) =>
+      Current.api.approveMusicArtist({
+        childId,
+        appleMusicArtistId: artist.id,
+        name: artist.name,
+        catalogMetadata: artist.catalogMetadata,
+      }),
+    { invalidating: [approvedArtistsKey], toast: `approve:music-artist` },
+  );
+
   const removeAlbum = useMutation(
     (albumId: string) =>
       Current.api.removeApprovedMusicAlbum({
@@ -49,6 +86,15 @@ const MusicCuration: React.FC<{
         appleMusicAlbumId: albumId,
       }),
     { invalidating: [approvedAlbumsKey], toast: `remove:music-album` },
+  );
+
+  const removeArtist = useMutation(
+    (artistId: string) =>
+      Current.api.removeApprovedMusicArtist({
+        childId,
+        appleMusicArtistId: artistId,
+      }),
+    { invalidating: [approvedArtistsKey], toast: `remove:music-artist` },
   );
 
   // TEMP(app-review): the "show album artwork" toggle drives the iOS app's lock-screen /
@@ -71,16 +117,26 @@ const MusicCuration: React.FC<{
   // );
 
   const approvedAlbums = approvedAlbumsQuery.data?.albums ?? [];
+  const approvedArtists = approvedArtistsQuery.data?.artists ?? [];
   const approvedAlbumIds = new Set(approvedAlbums.map((album) => album.id));
-  const searchResults = searchAlbums.data?.albums ?? [];
-  const canSearch = searchQuery.trim().length > 0 && !searchAlbums.isPending;
-  const showSearchResults = hasSearched || searchAlbums.isPending || searchAlbums.isError;
+  const approvedArtistIds = new Set(approvedArtists.map((artist) => artist.id));
+  const approvedItems = mixedApprovedItems(approvedArtists, approvedAlbums);
+  const searchItems = searchCatalog.data?.items ?? [];
+  const canSearch = searchQuery.trim().length > 0 && !searchCatalog.isPending;
+  const showSearchResults =
+    hasSearched || searchCatalog.isPending || searchCatalog.isError;
+  const hasSearchResults = searchItems.length > 0;
+  const approvedMusicIsPending =
+    approvedAlbumsQuery.isPending || approvedArtistsQuery.isPending;
+  const approvedMusicIsSuccess =
+    approvedAlbumsQuery.isSuccess && approvedArtistsQuery.isSuccess;
+  const hasApprovedMusic = approvedItems.length > 0;
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     const query = searchQuery.trim();
-    if (!query || searchAlbums.isPending) return;
-    searchAlbums.mutate({ query, limit: 10 });
+    if (!query || searchCatalog.isPending) return;
+    searchCatalog.mutate({ query, limit: 10 });
   };
 
   return (
@@ -89,39 +145,60 @@ const MusicCuration: React.FC<{
         <TextInput
           type="text"
           name="music-search"
-          label="Search Apple Music albums"
+          label="Search Apple Music"
           value={searchQuery}
           setValue={setSearchQuery}
-          placeholder="Album title or artist"
+          placeholder="Artist or album"
         />
         <Button type="submit" color="primary" disabled={!canSearch} className="sm:mb-px">
-          {searchAlbums.isPending ? `Searching...` : `Search`}
+          {searchCatalog.isPending ? `Searching...` : `Search`}
         </Button>
       </form>
 
       {showSearchResults && (
         <section className="mt-8">
           <h2 className="text-xl font-bold text-slate-700 mb-3">Search results</h2>
-          {searchAlbums.isPending && <Loading label="Searching albums…" />}
-          {searchAlbums.isError && <ApiErrorMessage error={searchAlbums.error} />}
-          {searchAlbums.isSuccess && searchResults.length === 0 && (
+          {searchCatalog.isPending && <Loading label="Searching Apple Music…" />}
+          {searchCatalog.isError && <ApiErrorMessage error={searchCatalog.error} />}
+          {searchCatalog.isSuccess && !hasSearchResults && (
             <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-5 py-8 text-center text-slate-500">
-              No albums found. Try another search.
+              No artists or albums found. Try another search.
             </div>
           )}
-          {searchResults.length > 0 && (
+          {searchItems.length > 0 && (
             <div className="grid gap-3">
-              {searchResults.map((album) => (
-                <SearchResultAlbumCard
-                  key={album.id}
-                  album={album}
-                  isApproved={approvedAlbumIds.has(album.id)}
-                  isApproving={
-                    approveAlbum.isPending && approveAlbum.variables?.id === album.id
-                  }
-                  onApprove={() => approveAlbum.mutate(album)}
-                />
-              ))}
+              {searchItems.map((item, index) => {
+                const artist = item.artist;
+                if (item.kind === `artist` && artist) {
+                  return (
+                    <SearchResultArtistCard
+                      key={`artist-${artist.id}-${index}`}
+                      artist={artist}
+                      isApproved={approvedArtistIds.has(artist.id)}
+                      isApproving={
+                        approveArtist.isPending &&
+                        approveArtist.variables?.id === artist.id
+                      }
+                      onApprove={() => approveArtist.mutate(artist)}
+                    />
+                  );
+                }
+                const album = item.album;
+                if (item.kind === `album` && album) {
+                  return (
+                    <SearchResultAlbumCard
+                      key={`album-${album.id}-${index}`}
+                      album={album}
+                      isApproved={approvedAlbumIds.has(album.id)}
+                      isApproving={
+                        approveAlbum.isPending && approveAlbum.variables?.id === album.id
+                      }
+                      onApprove={() => approveAlbum.mutate(album)}
+                    />
+                  );
+                }
+                return null;
+              })}
             </div>
           )}
         </section>
@@ -129,18 +206,21 @@ const MusicCuration: React.FC<{
 
       <section className="mt-12">
         <h2 className="text-xl font-bold text-slate-700 mb-3">
-          {childName}&rsquo;s allowed albums
+          {childName}&rsquo;s allowed music
         </h2>
-        {approvedAlbumsQuery.isPending && <Loading label="Loading allowed albums…" />}
+        {approvedMusicIsPending && <Loading label="Loading allowed music…" />}
         {approvedAlbumsQuery.isError && (
           <ApiErrorMessage error={approvedAlbumsQuery.error} />
         )}
-        {approvedAlbumsQuery.isSuccess && approvedAlbums.length === 0 && (
+        {approvedArtistsQuery.isError && (
+          <ApiErrorMessage error={approvedArtistsQuery.error} />
+        )}
+        {approvedMusicIsSuccess && !hasApprovedMusic && (
           <EmptyState
-            heading="No allowed albums yet"
-            secondaryText="Search Apple Music above and add the albums this child is allowed to play."
+            heading="No allowed music yet"
+            secondaryText="Search Apple Music above and add the artists or albums this child is allowed to play. Allowed artists include their current and future eligible releases."
             icon="music"
-            buttonText="Search for albums"
+            buttonText="Search for music"
             buttonIcon="magnifying-glass"
             action={() =>
               document
@@ -149,22 +229,69 @@ const MusicCuration: React.FC<{
             }
           />
         )}
-        {approvedAlbums.length > 0 && (
+        {approvedItems.length > 0 && (
           <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,26rem),1fr))] gap-4">
-            {approvedAlbums.map((album) => (
-              <ApprovedAlbumCard
-                key={album.id}
-                album={album}
-                isRemoving={removeAlbum.isPending && removeAlbum.variables === album.id}
-                onRemove={() => removeAlbum.mutate(album.id)}
-              />
-            ))}
+            {approvedItems.map((item) =>
+              item.kind === `artist` ? (
+                <ApprovedArtistCard
+                  key={`artist-${item.id}`}
+                  artist={item.artist}
+                  isRemoving={
+                    removeArtist.isPending && removeArtist.variables === item.id
+                  }
+                  onRemove={() => removeArtist.mutate(item.id)}
+                />
+              ) : (
+                <ApprovedAlbumCard
+                  key={`album-${item.id}`}
+                  album={item.album}
+                  isRemoving={removeAlbum.isPending && removeAlbum.variables === item.id}
+                  onRemove={() => removeAlbum.mutate(item.id)}
+                />
+              ),
+            )}
           </div>
         )}
       </section>
     </div>
   );
 };
+
+const SearchResultArtistCard: React.FC<{
+  artist: SearchArtist;
+  isApproved: boolean;
+  isApproving: boolean;
+  onApprove(): void;
+}> = ({ artist, isApproved, isApproving, onApprove }) => (
+  <div className="min-w-0 flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200">
+    <ArtistArtwork artist={artist} />
+    <ArtistInfo artist={artist} />
+    <div className="flex flex-wrap sm:flex-nowrap sm:flex-col gap-2 sm:items-end sm:ml-auto sm:shrink-0">
+      <Button
+        type="button"
+        color="secondary"
+        size="small"
+        disabled={isApproved || isApproving}
+        onClick={onApprove}
+        className="shrink-0 whitespace-nowrap"
+      >
+        {isApproved ? `Allowed` : isApproving ? `Adding...` : `Allow artist`}
+      </Button>
+      {artist.catalogMetadata?.appleMusicUrl && (
+        <Button
+          type="external"
+          href={artist.catalogMetadata.appleMusicUrl}
+          color="tertiary"
+          size="small"
+          className="shrink-0 whitespace-nowrap sm:mt-1"
+        >
+          Apple Music
+          <i className="fa-solid fa-arrow-up-right-from-square ml-2 text-xs" />
+        </Button>
+      )}
+    </div>
+  </div>
+);
 
 const SearchResultAlbumCard: React.FC<{
   album: SearchAlbum;
@@ -198,6 +325,31 @@ const SearchResultAlbumCard: React.FC<{
           <i className="fa-solid fa-arrow-up-right-from-square ml-2 text-xs" />
         </Button>
       )}
+    </div>
+  </div>
+);
+
+const ApprovedArtistCard: React.FC<{
+  artist: ApprovedArtist;
+  isRemoving: boolean;
+  onRemove(): void;
+}> = ({ artist, isRemoving, onRemove }) => (
+  <div className="min-w-0 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200">
+    <div className="min-w-0 flex gap-4">
+      <ArtistArtwork artist={artist} />
+      <ArtistInfo artist={artist} />
+    </div>
+    <div className="mt-4 flex justify-end">
+      <Button
+        type="button"
+        color="warning"
+        size="small"
+        disabled={isRemoving}
+        onClick={onRemove}
+        className="shrink-0 whitespace-nowrap"
+      >
+        {isRemoving ? `Removing...` : `Remove`}
+      </Button>
     </div>
   </div>
 );
@@ -244,6 +396,22 @@ const ApprovedAlbumCard: React.FC<{
   </div>
 );
 
+const ArtistArtwork: React.FC<{
+  artist: ArtistLike;
+}> = ({ artist }) => {
+  const artworkUrl = sizedAppleArtworkUrl(artist.catalogMetadata?.artwork?.url);
+
+  return (
+    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full bg-violet-50 flex items-center justify-center border border-violet-100">
+      {artworkUrl ? (
+        <img src={artworkUrl} alt={artist.name} className="h-full w-full object-cover" />
+      ) : (
+        <i className="fa-solid fa-microphone text-3xl text-violet-300" />
+      )}
+    </div>
+  );
+};
+
 const AlbumArtwork: React.FC<{
   artworkUrl?: string;
   title: string;
@@ -256,6 +424,27 @@ const AlbumArtwork: React.FC<{
     )}
   </div>
 );
+
+const ArtistInfo: React.FC<{
+  artist: ArtistLike;
+}> = ({ artist }) => {
+  const genres = artist.catalogMetadata?.genreNames ?? [];
+  const note =
+    artist.catalogMetadata?.editorialNotes?.tagline ??
+    artist.catalogMetadata?.editorialNotes?.short;
+
+  return (
+    <div className="min-w-0 w-full flex-grow">
+      <h3 className="block max-w-full truncate text-lg font-semibold leading-tight text-slate-800">
+        {artist.name}
+      </h3>
+      {genres.length > 0 && (
+        <p className="text-slate-600 truncate">{genres.join(` • `)}</p>
+      )}
+      {note && <p className="text-sm text-slate-400 mt-1 line-clamp-2">{note}</p>}
+    </div>
+  );
+};
 
 const AlbumInfo: React.FC<{
   album: Pick<SearchAlbum, `title` | `artistName` | `trackCount` | `releaseDate`>;
@@ -277,5 +466,37 @@ const AlbumInfo: React.FC<{
     </div>
   );
 };
+
+function mixedApprovedItems(
+  artists: ApprovedArtist[],
+  albums: ApprovedAlbum[],
+): ApprovedMusicItem[] {
+  return [
+    ...artists.map((artist, index) => ({
+      kind: `artist` as const,
+      id: artist.id,
+      createdAt: artist.createdAt,
+      sequence: index,
+      artist,
+    })),
+    ...albums.map((album, index) => ({
+      kind: `album` as const,
+      id: album.id,
+      createdAt: album.createdAt,
+      sequence: artists.length + index,
+      album,
+    })),
+  ].sort(compareApprovedMusicItems);
+}
+
+function compareApprovedMusicItems(a: ApprovedMusicItem, b: ApprovedMusicItem): number {
+  const timeA = a.createdAt ? Date.parse(a.createdAt) : Number.POSITIVE_INFINITY;
+  const timeB = b.createdAt ? Date.parse(b.createdAt) : Number.POSITIVE_INFINITY;
+  return timeA - timeB || a.sequence - b.sequence;
+}
+
+function sizedAppleArtworkUrl(url?: string): string | undefined {
+  return url?.replace(`{w}`, `600`).replace(`{h}`, `600`);
+}
 
 export default MusicCuration;
