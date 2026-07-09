@@ -2,24 +2,8 @@ import DuetSQL
 import Gertie
 import GertieBlocker
 
-extension DashAnnouncement: Model {
-  public static let schemaName = "parent"
-  public static let tableName = "dash_announcements"
-  public typealias ColumnName = CodingKeys
-
-  public var insertValues: [ColumnName: Postgres.Data] {
-    [
-      .id: .id(self),
-      .parentId: .uuid(self.parentId),
-      .kind: .string(self.kind.rawValue),
-      .icon: .string(self.icon),
-      .html: .string(self.html),
-      .action: .json(self.action?.toPostgresJson),
-      .createdAt: .currentTimestamp,
-      .deletedAt: .date(self.deletedAt),
-    ]
-  }
-}
+extension DashAnnouncement.Kind: PostgresRawBindable {}
+extension ClaimIntent: PostgresRawBindable {}
 
 extension BlockerApp.BlockRule: Model {
   public static let schemaName = "blocker_app"
@@ -68,26 +52,6 @@ extension BlockerApp.Token: Model {
       .id: .id(self),
       .installId: .uuid(self.installId),
       .value: .uuid(self.value),
-      .createdAt: .currentTimestamp,
-      .updatedAt: .currentTimestamp,
-    ]
-  }
-}
-
-extension Claim: Model {
-  public static let schemaName = "child"
-  public static let tableName = "claims"
-  public typealias ColumnName = CodingKeys
-
-  public var insertValues: [ColumnName: Postgres.Data] {
-    [
-      .id: .id(self),
-      .code: .int(self.code),
-      .intent: .string(self.intent.rawValue),
-      .deviceId: .uuid(self.deviceId),
-      .childId: .uuid(self.childId),
-      .expiresAt: .date(self.expiresAt),
-      .claimedAt: .date(self.claimedAt),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
@@ -499,25 +463,6 @@ extension Key: Model {
       .comment: .string(self.comment),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
-      .deletedAt: .date(self.deletedAt),
-    ]
-  }
-}
-
-extension KeystrokeLine: Model {
-  public static let schemaName = "macapp"
-  public static let tableName = "keystroke_lines"
-  public typealias ColumnName = CodingKeys
-
-  public var insertValues: [ColumnName: Postgres.Data] {
-    [
-      .id: .id(self),
-      .computerUserId: .uuid(self.computerUserId),
-      .appName: .string(self.appName),
-      .line: .string(self.line),
-      .filterSuspended: .bool(self.filterSuspended),
-      .flagged: .date(self.flagged),
-      .createdAt: .date(self.createdAt),
       .deletedAt: .date(self.deletedAt),
     ]
   }

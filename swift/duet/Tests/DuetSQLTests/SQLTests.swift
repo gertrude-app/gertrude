@@ -542,6 +542,44 @@ final class SqlTests: XCTestCase {
     ])
   }
 
+  func testCreateMacroModel() async throws {
+    let thing = MacroThing(name: "foo", customEnum: .bar)
+
+    let client = TestClient()
+    _ = try await client.create([thing])
+
+    let expected = """
+    INSERT INTO public.macro_things
+    ("count", "created_at", "custom_enum", "deleted_at", "id", "name", "optional_custom_enum", "updated_at")
+    VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8)
+    """
+
+    expect(client.stmt.prepared).toEqual(expected)
+    expect(client.stmt.params).toEqual([
+      .int(nil),
+      .currentTimestamp,
+      .enum(Thing.CustomEnum.bar),
+      .date(nil),
+      .id(thing),
+      .string("foo"),
+      .enum(nil),
+      .currentTimestamp,
+    ])
+  }
+
+  func testMacroModelCodingKeys() throws {
+    expect(MacroThing.columnName(.createdAt)).toEqual("created_at")
+    expect(MacroThing.columnName(.optionalCustomEnum)).toEqual("optional_custom_enum")
+    expect(MacroThing.isSoftDeletable).toEqual(true)
+    let thing = MacroThing(name: "roundtrip", count: 5)
+    let json = try JSONEncoder().encode(thing)
+    let decoded = try JSONDecoder().decode(MacroThing.self, from: json)
+    expect(decoded.id).toEqual(thing.id)
+    expect(decoded.name).toEqual("roundtrip")
+    expect(decoded.count).toEqual(5)
+  }
+
   func testUpdate() async throws {
     let thing = LilThing(int: 5, createdAt: .epoch, updatedAt: .reference)
 

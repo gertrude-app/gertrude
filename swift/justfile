@@ -60,6 +60,9 @@ api-build:
 api-test *args:
   @cd api && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 
+duet-test *args:
+  @cd duet && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
+
 macapp-test *args:
   @cd macapp/App && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 

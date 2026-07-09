@@ -1,4 +1,5 @@
 // swift-tools-version:6.0
+import CompilerPluginSupport
 import PackageDescription
 
 let package = Package(
@@ -13,6 +14,7 @@ let package = Package(
     .package(path: "../x-expect"),
     .package("vapor/fluent-postgres-driver@2.9.2"),
     .package("jaredh159/swift-tagged@0.10.1"),
+    .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
   ],
   targets: [
     .target(
@@ -23,10 +25,21 @@ let package = Package(
       ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
     ),
+    .macro(
+      name: "DuetMacros",
+      dependencies: [
+        .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+        .product(name: "SwiftSyntax", package: "swift-syntax"),
+        .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+        .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+      ],
+      swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
+    ),
     .target(
       name: "DuetSQL",
       dependencies: [
         "Duet",
+        "DuetMacros",
         .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
         .product(name: "XCore", package: "x-kit"),
         .product(name: "Tagged", package: "swift-tagged"),
@@ -39,6 +52,21 @@ let package = Package(
     ),
   ],
 )
+
+#if os(macOS)
+  package.dependencies.append(
+    .package(url: "https://github.com/pointfreeco/swift-macro-testing", from: "0.5.0"),
+  )
+  package.targets.append(
+    .testTarget(
+      name: "DuetMacrosTests",
+      dependencies: [
+        "DuetMacros",
+        .product(name: "MacroTesting", package: "swift-macro-testing"),
+      ],
+    ),
+  )
+#endif
 
 // helpers
 

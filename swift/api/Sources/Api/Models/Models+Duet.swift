@@ -39,23 +39,6 @@ extension Either where Left: DuetSQL.Model, Right: DuetSQL.Model {
   }
 }
 
-extension DashAnnouncement: Duet.Identifiable {
-  typealias Id = Tagged<DashAnnouncement, UUID>
-}
-
-extension DashAnnouncement {
-  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
-    case id
-    case parentId
-    case kind
-    case icon
-    case html
-    case action
-    case createdAt
-    case deletedAt
-  }
-}
-
 extension BlockerApp.SuspendFilterRequest {
   typealias Id = Tagged<BlockerApp.SuspendFilterRequest, UUID>
 }
@@ -83,24 +66,6 @@ extension BlockerApp.Token {
     case id
     case installId
     case value
-    case createdAt
-    case updatedAt
-  }
-}
-
-extension Claim: Duet.Identifiable {
-  typealias Id = Tagged<Claim, UUID>
-}
-
-extension Claim {
-  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
-    case id
-    case code
-    case intent
-    case deviceId
-    case childId
-    case expiresAt
-    case claimedAt
     case createdAt
     case updatedAt
   }
@@ -484,23 +449,6 @@ extension Key {
     case comment
     case createdAt
     case updatedAt
-    case deletedAt
-  }
-}
-
-extension KeystrokeLine: Duet.Identifiable {
-  typealias Id = Tagged<KeystrokeLine, UUID>
-}
-
-extension KeystrokeLine {
-  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
-    case id
-    case computerUserId
-    case appName
-    case line
-    case filterSuspended
-    case flagged
-    case createdAt
     case deletedAt
   }
 }
