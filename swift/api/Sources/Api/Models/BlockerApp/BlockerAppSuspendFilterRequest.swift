@@ -3,6 +3,7 @@ import Gertie
 import TaggedTime
 
 extension BlockerApp {
+  @DuetModel(schema: "blocker_app", table: "suspend_filter_requests")
   struct SuspendFilterRequest: Codable, Sendable, Equatable {
     var id: Id
     var deviceId: IOSDevice.Id

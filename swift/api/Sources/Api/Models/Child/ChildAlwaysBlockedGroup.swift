@@ -1,5 +1,6 @@
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "child", table: "always_blocked_groups")
 struct ChildAlwaysBlockedGroup: Codable, Sendable {
   var id: Id
   var childId: Child.Id

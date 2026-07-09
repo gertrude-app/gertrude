@@ -1,6 +1,8 @@
+import DuetSQL
 import Foundation
 import GertieApp
 
+@DuetModel(schema: "podcast_app", table: "events")
 struct PodcastEvent: Codable, Sendable {
   var id: Id
   var eventId: String

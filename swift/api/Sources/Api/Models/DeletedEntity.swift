@@ -1,5 +1,7 @@
+import DuetSQL
 import Foundation
 
+@DuetModel(schema: "system", table: "deleted_entities")
 struct DeletedEntity: Codable, Sendable {
   var id: Id
   var type: String

@@ -1,6 +1,7 @@
-import Duet
+import DuetSQL
 import Gertie
 
+@DuetModel(schema: "macos", table: "browsers")
 struct Browser: Codable, Sendable {
   var id: Id
   var match: BrowserMatch

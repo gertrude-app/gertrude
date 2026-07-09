@@ -1,6 +1,7 @@
 import DuetSQL
 import PairQL
 
+@DuetModel(schema: "child", table: "ios_devices")
 struct IOSDevice: Codable, Sendable, Equatable {
   var id: Id
   var childId: Child.Id?

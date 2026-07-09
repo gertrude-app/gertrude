@@ -1,5 +1,6 @@
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "macos", table: "app_categories")
 struct AppCategory: Codable, Sendable {
   var id: Id
   var name: String

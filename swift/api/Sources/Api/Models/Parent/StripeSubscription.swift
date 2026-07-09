@@ -2,6 +2,7 @@ import Dependencies
 import DuetSQL
 
 /// current/active stripe subscription
+@DuetModel(schema: "parent", table: "stripe_subscriptions")
 struct StripeSubscription: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

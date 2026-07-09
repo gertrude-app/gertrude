@@ -335,11 +335,19 @@ If you are doing anything non-trivial in the API with the Duet database layer, r
 
 ### Adding/Removing a Model Field
 
-Adding/removing a field/column to a model requires changes in three files:
+Add/remove the stored property on the model struct (e.g.
+`api/Sources/Api/Models/Child/IOSDevice.swift`) — the `@DuetModel` macro derives
+`CodingKeys` and `insertValues` from the stored properties. If the property's type isn't
+already bindable (a primitive, `Tagged`, `PostgresEnum`, or `PostgresJsonable`), add a
+`PostgresBindable`/`PostgresRawBindable` conformance in
+`api/Sources/Api/Models/Models+DuetSQL.swift`.
 
-- The model struct (e.g. `api/Sources/Api/Models/IOS/IOSDevice.swift`) — add the property
-- `api/Sources/Api/Models/Models+Duet.swift` — add to the `CodingKeys` enum
-- `api/Sources/Api/Models/Models+DuetSQL.swift` — add to `postgresData` and `insertValues`
+### Adding a New Model
+
+Declare the struct with stored properties (must include `id` and `createdAt`) and attach
+the macro: `@DuetModel(schema: "parent", table: "dash_announcements")`. Pass
+`clientCreatedAt: true` only if inserts must preserve a client-supplied `createdAt`
+instead of `CURRENT_TIMESTAMP` (see `KeystrokeLine`).
 
 ### Other database tasks
 

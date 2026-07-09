@@ -1,7 +1,9 @@
+import DuetSQL
 import Foundation
 import GertieApp
 
 extension AppStore {
+  @DuetModel(schema: "appstore", table: "reviews")
   struct Review: Codable, Sendable {
     var id: Id
     var appleId: String

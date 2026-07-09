@@ -3,18 +3,12 @@ import Duet
 import DuetSQL
 import Tagged
 
+@DuetModel(schema: "system", table: "super_admin_tokens")
 struct SuperAdminToken: Codable, Sendable {
   var id: Id
   var value: Value
   var createdAt = Date()
   var deletedAt: Date
-
-  enum CodingKeys: String, CodingKey, CaseIterable, ModelColumns {
-    case id
-    case value
-    case createdAt
-    case deletedAt
-  }
 
   init(id: Id? = nil, value: Value? = nil, deletedAt: Date? = nil) {
     @Dependency(\.uuid) var uuid
@@ -25,6 +19,5 @@ struct SuperAdminToken: Codable, Sendable {
 }
 
 extension SuperAdminToken {
-  typealias Id = Tagged<SuperAdminToken, UUID>
   typealias Value = Tagged<(SuperAdminToken, value: ()), UUID>
 }

@@ -3,6 +3,7 @@ import Gertie
 import TaggedTime
 
 extension MacApp {
+  @DuetModel(schema: "macapp", table: "suspend_filter_requests")
   struct SuspendFilterRequest: Codable, Sendable, Equatable {
     var id: Id
     var computerUserId: ComputerUser.Id

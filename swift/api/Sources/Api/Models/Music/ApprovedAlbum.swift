@@ -5,6 +5,7 @@ extension Music {
   typealias AlbumId = Tagged<(Music, albumId: ()), String>
   typealias TrackId = Tagged<(Music, trackId: ()), String>
 
+  @DuetModel(schema: "music", table: "approved_albums")
   struct ApprovedAlbum: Codable, Sendable {
     var id: Id
     var childId: Child.Id

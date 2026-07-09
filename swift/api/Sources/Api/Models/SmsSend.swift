@@ -1,7 +1,8 @@
 import Dependencies
-import Duet
+import DuetSQL
 import Foundation
 
+@DuetModel(schema: "system", table: "sms_sends")
 struct SmsSend: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

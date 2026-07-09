@@ -1,6 +1,8 @@
+import DuetSQL
 import Foundation
 
 extension MusicApp {
+  @DuetModel(schema: "music_app", table: "installs")
   struct Install: Codable, Sendable, Equatable {
     var id: Id
     var deviceId: IOSDevice.Id

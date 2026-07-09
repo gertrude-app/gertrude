@@ -1,5 +1,6 @@
 import DuetSQL
 
+@DuetModel(schema: "parent", table: "keychains")
 struct Keychain: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

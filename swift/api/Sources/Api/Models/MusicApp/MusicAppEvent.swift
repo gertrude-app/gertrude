@@ -1,7 +1,9 @@
+import DuetSQL
 import Foundation
 import GertieApp
 
 extension MusicApp {
+  @DuetModel(schema: "music_app", table: "events")
   struct Event: Codable, Sendable {
     var id: Id
     var eventId: String

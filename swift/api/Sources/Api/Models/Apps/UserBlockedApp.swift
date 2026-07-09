@@ -1,6 +1,7 @@
 import DuetSQL
 import Gertie
 
+@DuetModel(schema: "child", table: "blocked_mac_apps")
 struct UserBlockedApp: Codable, Sendable {
   var id: Id
   var identifier: String

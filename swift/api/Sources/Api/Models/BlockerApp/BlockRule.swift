@@ -2,6 +2,7 @@ import DuetSQL
 import GertieBlocker
 
 extension BlockerApp {
+  @DuetModel(schema: "blocker_app", table: "block_rules")
   struct BlockRule: Codable, Sendable {
     var id: Id
     var deviceId: IOSDevice.Id?

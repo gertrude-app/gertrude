@@ -1,6 +1,8 @@
+import DuetSQL
 import Foundation
 
 extension PodcastApp {
+  @DuetModel(schema: "podcast_app", table: "installs")
   struct Install: Codable, Sendable, Equatable {
     var id: Id
     var deviceId: IOSDevice.Id

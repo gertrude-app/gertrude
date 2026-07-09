@@ -1,5 +1,7 @@
+import DuetSQL
 import Foundation
 
+@DuetModel(schema: "system", table: "route_telemetry")
 struct RouteTelemetry: Codable, Sendable {
   enum Result: String, Codable, Sendable {
     case ok
