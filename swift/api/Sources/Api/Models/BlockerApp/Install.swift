@@ -8,10 +8,6 @@ extension BlockerApp {
     var deviceId: IOSDevice.Id
     var appVersion: String
     var webPolicy: String
-    var isProfileLocked: Bool
-    var allowAppRemoval: Bool
-    var allowEraseContentAndSettings: Bool
-    var allowAppInstallation: Bool
     var createdAt = Date()
     var updatedAt = Date()
 
@@ -20,19 +16,11 @@ extension BlockerApp {
       deviceId: IOSDevice.Id,
       appVersion: String,
       webPolicy: String = "blockAll",
-      isProfileLocked: Bool = true,
-      allowAppRemoval: Bool = false,
-      allowEraseContentAndSettings: Bool = false,
-      allowAppInstallation: Bool = true,
     ) {
       self.id = id
       self.deviceId = deviceId
       self.appVersion = appVersion
       self.webPolicy = webPolicy
-      self.isProfileLocked = isProfileLocked
-      self.allowAppRemoval = allowAppRemoval
-      self.allowEraseContentAndSettings = allowEraseContentAndSettings
-      self.allowAppInstallation = allowAppInstallation
     }
   }
 }

@@ -45,8 +45,11 @@ enum ProfileDownloadRoute {
       }
     }
 
-    let install = try await device.blockerInstall(in: req.context.db)
-    let xml = generateProfileXml(for: device, install: install)
+    let settings = try await BlockerApp.ProfileSettings.ensure(
+      for: device.id,
+      in: req.context.db,
+    )
+    let xml = generateProfileXml(for: device, settings: settings)
     let signer = with(dependency: \.profileSigner)
     let signedBytes = try signer.sign(Array(xml.utf8))
 
@@ -64,16 +67,19 @@ enum ProfileDownloadRoute {
 // @see https://developer.apple.com/documentation/devicemanagement/webcontentfilter
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
-func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> String {
+func generateProfileXml(
+  for device: IOSDevice,
+  settings: BlockerApp.ProfileSettings,
+) -> String {
   var restrictionKeys = """
         <key>allowAppRemoval</key>
-        <\(install.allowAppRemoval ? "true" : "false")/>
+        <\(settings.allowAppRemoval ? "true" : "false")/>
 
         <key>allowEraseContentAndSettings</key>
-        <\(install.allowEraseContentAndSettings ? "true" : "false")/>
+        <\(settings.allowEraseContentAndSettings ? "true" : "false")/>
 
         <key>allowAppInstallation</key>
-        <\(install.allowAppInstallation ? "true" : "false")/>
+        <\(settings.allowAppInstallation ? "true" : "false")/>
   """
   // special temporary customer workaround
   if device.id.lowercased == "ed25c68a-2dba-4854-b3bd-efe0d8523e6f" {
@@ -107,7 +113,7 @@ func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> S
       <string>This profile allows the device to be securely managed by a Gertrude account.</string>
 
       <key>PayloadRemovalDisallowed</key>
-      <\(install.isProfileLocked ? "true" : "false")/>
+      <\(settings.isProfileLocked ? "true" : "false")/>
 
       <key>PayloadContent</key>
       <array>

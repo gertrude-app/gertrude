@@ -15,7 +15,17 @@ public extension PostgresRawBindable {
   static var nilPostgresData: Postgres.Data { RawValue.nilPostgresData }
 }
 
+public protocol PostgresArrayBindable {
+  static func postgresData(_ array: [Self]?) -> Postgres.Data
+}
+
 public protocol PostgresJsonable: Codable, PostgresBindable {}
+
+public extension PostgresArrayBindable where Self: PostgresJsonable {
+  static func postgresData(_ array: [Self]?) -> Postgres.Data {
+    .json(array.map { try! JSON.encode($0) })
+  }
+}
 
 public extension PostgresJsonable {
   var toPostgresJson: String { try! JSON.encode(self) }
@@ -38,7 +48,7 @@ public enum Postgres {
   public enum Data: Sendable {
     case id(UUIDIdentifiable)
     case string(String?)
-    case intArray([Int]?)
+    case textArray([String]?)
     case int(Int?)
     case int64(Int64?)
     case float(Float?)
@@ -57,34 +67,33 @@ public extension Postgres.Data {
   var binding: any Sendable & Encodable {
     switch self {
     case .bool(let bool):
-      return bool
+      bool
     case .currentTimestamp:
-      return "CURRENT_TIMESTAMP"
+      "CURRENT_TIMESTAMP"
     case .date(let date):
-      return date
+      date
     case .double(let double):
-      return double
+      double
     case .float(let float):
-      return float
+      float
     case .id(let model):
-      return model.uuidId.uuidString
+      model.uuidId.uuidString
     case .int(let int):
-      return int
+      int
     case .int64(let int64):
-      return int64
-    case .intArray(let ints):
-      guard let ints else { return "NULL" }
-      return "'{\(ints.map(String.init).joined(separator: ","))}'"
+      int64
+    case .textArray(let strings):
+      strings
     case .json(let string):
-      return string
+      string
     case .bytea(let data):
-      return data?.base64EncodedString()
+      data?.base64EncodedString()
     case .null:
-      return "NULL"
+      "NULL"
     case .string(let string):
-      return string
+      string
     case .uuid(let uuid):
-      return uuid?.uuidString
+      uuid?.uuidString
     }
   }
 }
@@ -97,7 +106,7 @@ extension Postgres.Data: Equatable {
     case (.string(let lhsVal), .string(let rhsVal)),
          (.json(let lhsVal), .json(let rhsVal)):
       lhsVal == rhsVal
-    case (.intArray(let lhsVal), .intArray(let rhsVal)):
+    case (.textArray(let lhsVal), .textArray(let rhsVal)):
       lhsVal == rhsVal
     case (.int(let lhsVal), .int(let rhsVal)):
       lhsVal == rhsVal
@@ -192,9 +201,15 @@ extension Foundation.Data: PostgresBindable {
   public static var nilPostgresData: Postgres.Data { .bytea(nil) }
 }
 
-extension [Int]: PostgresBindable {
-  public var postgresData: Postgres.Data { .intArray(self) }
-  public static var nilPostgresData: Postgres.Data { .intArray(nil) }
+extension String: PostgresArrayBindable {
+  public static func postgresData(_ array: [String]?) -> Postgres.Data {
+    .textArray(array)
+  }
+}
+
+extension Array: PostgresBindable where Element: PostgresArrayBindable {
+  public var postgresData: Postgres.Data { Element.postgresData(self) }
+  public static var nilPostgresData: Postgres.Data { Element.postgresData(nil) }
 }
 
 extension Tagged: PostgresBindable where RawValue: PostgresBindable {

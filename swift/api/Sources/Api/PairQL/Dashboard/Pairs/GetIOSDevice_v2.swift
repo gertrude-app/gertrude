@@ -95,6 +95,7 @@ extension GetIOSDevice_v2: Resolver {
     let domains = try await device.webPolicyDomains(in: ctx.db)
     let blockRules = try await device.blockRules(in: ctx.db)
     let supervision = try await device.supervision(in: ctx.db)
+    let settings = try await BlockerApp.ProfileSettings.ensure(for: device.id, in: ctx.db)
     return Output.Blocker(
       allBlockGroups: allBlockGroups.map {
         .init(
@@ -109,10 +110,10 @@ extension GetIOSDevice_v2: Resolver {
       webPolicyDomains: domains.map(\.domain),
       customBlockRules: blockRules.map { .init(id: $0.id, rule: $0.rule) },
       isSupervised: supervision?.supervised ?? false,
-      isProfileLocked: install.isProfileLocked,
-      allowAppRemoval: install.allowAppRemoval,
-      allowEraseContentAndSettings: install.allowEraseContentAndSettings,
-      allowAppInstallation: install.allowAppInstallation,
+      isProfileLocked: settings.isProfileLocked,
+      allowAppRemoval: settings.allowAppRemoval,
+      allowEraseContentAndSettings: settings.allowEraseContentAndSettings,
+      allowAppInstallation: settings.allowAppInstallation,
     )
   }
 
