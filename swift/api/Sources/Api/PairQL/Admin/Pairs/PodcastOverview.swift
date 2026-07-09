@@ -150,10 +150,12 @@ private struct DeviceTypeInstallCount: CustomCountable {
     SELECT COUNT(DISTINCT \(PodcastEvent.columnName(.deviceId))) AS count
     FROM \(table: PodcastEvent.self)
     WHERE \(PodcastEvent.columnName(.eventId)) =\(" ")
-      AND \(PodcastEvent.columnName(.deviceId)) IS NOT NULL
     """)
     stmt.components.append(.binding(eventId))
-    stmt.components.append(.sql(" AND \(PodcastEvent.columnName(.modelIdentifier)) LIKE "))
+    stmt.components.append(.sql("""
+     AND \(PodcastEvent.columnName(.deviceId)) IS NOT NULL
+     AND \(PodcastEvent.columnName(.modelIdentifier)) LIKE\(" ")
+    """))
     stmt.components.append(.binding(devicePattern))
     return stmt
   }
