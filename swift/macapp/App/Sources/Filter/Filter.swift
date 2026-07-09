@@ -96,6 +96,7 @@ public struct Filter: Reducer, Sendable {
 
     case .loadedPersistentState(.some(let persisted)):
       state.userKeychains = persisted.userKeychains
+      state.userDowntime = persisted.userDowntime.mapValues { Downtime(window: $0) }
       var manifest = persisted.appIdManifest
       manifest.normalizeBundleIds()
       state.appIdManifest = manifest
@@ -115,7 +116,7 @@ public struct Filter: Reducer, Sendable {
         }
         return .run { _ in
           let blockedReq = flow.blockedRequest(id: self.uuid(), time: self.now, app: app)
-          try await self.xpc.sendBlockedRequest(userId, blockedReq)
+          try? await self.xpc.sendBlockedRequest(userId, blockedReq)
         }
       }
       return .none
@@ -163,13 +164,13 @@ public struct Filter: Reducer, Sendable {
 
     case .suspensionTimerEnded(let userId):
       state.suspensions[userId] = nil
-      return .run { _ in try await self.xpc.notifyFilterSuspensionEnded(userId) }
+      return .run { _ in try? await self.xpc.notifyFilterSuspensionEnded(userId) }
 
     case .staleSuspensionFound(let userId):
       state.suspensions[userId] = nil
       return .merge(
         .cancel(id: CancelId.suspensionTimer(for: userId)),
-        .run { _ in try await self.xpc.notifyFilterSuspensionEnded(userId) },
+        .run { _ in try? await self.xpc.notifyFilterSuspensionEnded(userId) },
       )
 
     case .cacheAppDescriptor("", _):

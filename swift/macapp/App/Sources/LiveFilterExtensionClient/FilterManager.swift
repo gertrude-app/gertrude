@@ -167,7 +167,40 @@ final class FilterManager: NSObject {
   /// replaces + removes config, so user has to click "allow" again
   func reinstallFilter() async -> FilterInstallResult {
     _ = await self.uninstallFilter()
-    return await self.installFilter()
+    let result = await self.installFilter()
+    switch result {
+    case .installedSuccessfully, .alreadyInstalled:
+      return result
+    case .activationRequestFailed,
+         .failedToGetBundleIdentifier,
+         .failedToLoadConfig,
+         .failedToSaveConfig,
+         .timedOutWaiting,
+         .userClickedDontAllow:
+      await self.restoreRemovedFilterConfiguration()
+      return result
+    }
+  }
+
+  func restoreRemovedFilterConfiguration() async {
+    if case .failed(let error) = await self.system.loadFilterConfiguration() {
+      unexpectedError(id: "ba0e9ff1", error)
+      return
+    }
+    if self.system.filterProviderConfiguration() == nil {
+      let providerConfiguration = NEFilterProviderConfiguration()
+      providerConfiguration.filterSockets = true
+      providerConfiguration.filterPackets = false
+      providerConfiguration.filterDataProviderBundleIdentifier = FILTER_EXT_BUNDLE_ID
+      self.system.updateNEFilterManagerShared(providerConfiguration)
+    }
+    self.system.enableNEFilterManagerShared()
+    if let error = await self.system.saveNEFilterManagerShared() {
+      unexpectedError(id: "4c72d881", error)
+    } else {
+      os_log("[G•] APP FilterManager restored filter config after failed reinstall")
+      interestingEvent(id: "4c72d881", "restored filter config after failed reinstall")
+    }
   }
 }
 
