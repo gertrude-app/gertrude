@@ -63,6 +63,10 @@
       string:
       "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/49/3b/11/493b11b6-3bd9-f908-d080-26ebf0000cb9/9fd89cdc-63c4-494a-9354-91ef9fc03222.jpg/600x600bb.jpg",
     )
+    static let vasenArtistArtworkURL = URL(
+      string:
+      "https://is1-ssl.mzstatic.com/image/thumb/AMCArtistImages112/v4/e7/96/6c/e7966c1e-9654-6ec8-7758-d74134600bb4/600x600bb.jpg",
+    )
   }
 
   extension [AlbumData] {
@@ -141,6 +145,23 @@
         title: "Live in Japan (Live)",
         artist: "Väsen",
         artworkUrl: PreviewMusicData.liveInJapanArtworkURL,
+      ),
+    ]
+  }
+
+  extension [ArtistData] {
+    static let previewArtists: [ArtistData] = [
+      .init(
+        id: "909253",
+        name: "Väsen",
+        artworkUrl: PreviewMusicData.vasenArtistArtworkURL,
+        subtitle: "Swedish folk trio",
+      ),
+      .init(
+        id: "1430482210",
+        name: "Lena Jonsson Trio",
+        artworkUrl: PreviewMusicData.storiesArtworkURL,
+        subtitle: "Nyckelharpa-forward acoustic folk",
       ),
     ]
   }

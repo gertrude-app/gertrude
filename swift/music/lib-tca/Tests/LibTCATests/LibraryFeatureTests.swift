@@ -29,7 +29,7 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func showsEmptyStateWhenApprovedLibraryHasNoAlbums() async {
+  func showsEmptyStateWhenApprovedLibraryHasNoMusic() async {
     let store = TestStore(initialState: .init()) {
       LibraryFeature()
     } withDependencies: {
@@ -44,6 +44,29 @@ struct LibraryFeatureTests {
     }
     await store.receive(.approvedLibraryLoaded(.empty)) {
       $0.status = .empty
+    }
+    await store.receive(.refreshPresentationFinished) {
+      $0.isRefreshingRemoteLibrary = false
+    }
+  }
+
+  @Test
+  func showsLibraryWhenApprovedLibraryHasOnlyArtists() async {
+    let library = ApprovedMusicLibrary(albums: [], artists: ApprovedMusicLibrary.mock.artists)
+    let store = TestStore(initialState: .init()) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.continuousClock = ImmediateClock()
+      $0.approvedMusic.loadCachedApprovedLibrary = { nil }
+      $0.approvedMusic.loadRemoteApprovedLibrary = { library }
+    }
+
+    await store.send(.onAppear) {
+      $0.isRefreshingRemoteLibrary = true
+      $0.hasStartedInitialLibraryLoad = true
+    }
+    await store.receive(.approvedLibraryLoaded(library)) {
+      $0.status = .loaded(library)
     }
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false

@@ -3,7 +3,7 @@ import SwiftUI
 
 public enum LibraryViewState: Equatable, Sendable {
   case loading
-  case loaded(albums: [AlbumData])
+  case loaded(albums: [AlbumData], artists: [ArtistData])
   case empty
   case failed
   case subscriptionRequired
@@ -39,7 +39,7 @@ public struct LibraryView: View {
   public var body: some View {
     #if os(iOS)
       self.decoratedContent
-        .navigationTitle("Albums")
+        .navigationTitle("Library")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
           if self.showsRefreshIndicator {
@@ -50,7 +50,7 @@ public struct LibraryView: View {
         }
     #else
       self.decoratedContent
-        .navigationTitle("Albums")
+        .navigationTitle("Library")
         .toolbar {
           if self.showsRefreshIndicator {
             ToolbarItem(placement: .automatic) {
@@ -74,7 +74,7 @@ public struct LibraryView: View {
   private var refreshToolbarContent: some View {
     ProgressView()
       .controlSize(.small)
-      .accessibilityLabel("Refreshing albums")
+      .accessibilityLabel("Refreshing library")
       .allowsHitTesting(false)
   }
 
@@ -91,23 +91,23 @@ public struct LibraryView: View {
   @ViewBuilder private var content: some View {
     switch self.state {
     case .loading:
-      AlbumGridView(albums: [], isLoading: true)
+      LibraryGridView(albums: [], isLoading: true)
 
-    case .loaded(let albums):
-      self.loadedContent(albums: albums)
+    case .loaded(let albums, let artists):
+      self.loadedContent(albums: albums, artists: artists)
 
     case .empty:
       self.messageContent(
-        title: "No albums yet",
+        title: "No music yet",
         message:
-        "Approved albums will appear here after they’re added in Gertrude.",
+        "Approved artists and albums will appear here after they’re added in Gertrude.",
         systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
 
     case .failed:
       self.messageContent(
-        title: "Couldn’t load albums",
+        title: "Couldn’t load library",
         message: "Check your connection and try again.",
         systemImage: "wifi.exclamationmark",
         buttonTitle: "Try again",
@@ -124,9 +124,10 @@ public struct LibraryView: View {
     }
   }
 
-  private func loadedContent(albums: [AlbumData]) -> some View {
-    AlbumGridView(
+  private func loadedContent(albums: [AlbumData], artists: [ArtistData]) -> some View {
+    LibraryGridView(
       albums: albums,
+      artists: artists,
       transitionNamespace: self.transitionNamespace,
       onAlbumTap: self.onAlbumTap,
       onDebugResetTap: self.onDebugResetTap,
@@ -352,7 +353,7 @@ private struct LibraryMessageCard: View {
   #Preview("Loaded") {
     NavigationStack {
       LibraryView(
-        state: .loaded(albums: .previewAlbums),
+        state: .loaded(albums: .previewAlbums, artists: .previewArtists),
         onDebugResetTap: {},
       )
     }
@@ -361,7 +362,7 @@ private struct LibraryMessageCard: View {
   #Preview("Loaded, Refreshing") {
     NavigationStack {
       LibraryView(
-        state: .loaded(albums: .previewAlbums),
+        state: .loaded(albums: .previewAlbums, artists: .previewArtists),
         isRefreshing: true,
       )
     }

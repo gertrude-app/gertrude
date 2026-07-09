@@ -56,8 +56,8 @@ struct LibraryFeature: Sendable {
         return self.refreshRemoteApprovedLibrary(loadCache: true)
 
       case .approvedLibraryLoaded(let library):
-        state.status = library.albums.isEmpty ? .empty : .loaded(library)
-        if library.albums.isEmpty {
+        state.status = library.isEmpty ? .empty : .loaded(library)
+        if library.isEmpty {
           log(.debug, .library, "e24738fc")
         }
         return .none
@@ -74,7 +74,7 @@ struct LibraryFeature: Sendable {
         return .none
 
       case .cachedApprovedLibraryLoaded(let library):
-        state.status = library.albums.isEmpty ? .empty : .loaded(library)
+        state.status = library.isEmpty ? .empty : .loaded(library)
         return .none
 
       case .refreshPresentationFinished:

@@ -165,7 +165,11 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       catalogMetadata: approvedArtistMetadata(),
     ))
 
-    let output = try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
+    let output = try await withDependencies {
+      $0.appleMusic.artistAlbums = { lookup in mockArtistAlbums(for: lookup) }
+    } operation: {
+      try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
+    }
 
     expect(output).toEqual(.init(
       albums: [
@@ -185,6 +189,14 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
           trackCount: nil,
           showsArtwork: false,
         ),
+        .init(
+          id: "2250000001",
+          title: "Artist Grant Release",
+          artistName: "Lena Jonsson Trio",
+          artworkUrl: "https://example.com/artist-release.jpg",
+          trackCount: 8,
+          showsArtwork: true,
+        ),
       ],
       artists: [
         .init(
@@ -194,6 +206,45 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
         ),
       ],
     ))
+  }
+
+  func testReturnsApprovedAlbumTracksForArtistCoveredAlbum() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    try await self.db.create(Music.ApprovedArtist(
+      childId: child.id,
+      appleMusicArtistId: "123456789",
+      name: "Lena Jonsson Trio",
+      catalogMetadata: approvedArtistMetadata(),
+    ))
+
+    let output = try await withDependencies {
+      $0.appleMusic.artistAlbums = { lookup in mockArtistAlbums(for: lookup) }
+      $0.appleMusic.albumTracks = { lookup in mockTracks(for: lookup) }
+    } operation: {
+      try await GetApprovedMusicAlbumTracks.resolve(
+        with: .init(albumId: "2250000001"),
+        in: ctx,
+      )
+    }
+
+    expect(output).toEqual([
+      .init(
+        id: "2250000002",
+        title: "Artist Grant Track",
+        artistName: "Lena Jonsson Trio",
+        artworkUrl: "https://example.com/artist-release.jpg",
+      ),
+    ])
   }
 
   func testReturnsApprovedAlbumTracksForExplicitAlbum() async throws {
@@ -436,6 +487,31 @@ private func approvedArtistOutputMetadata() -> MusicCatalogMetadata {
   )
 }
 
+private func mockArtistAlbums(for lookup: AppleMusicArtistAlbumsLookup)
+  -> [AppleMusicCatalogAlbum] {
+  switch lookup.artistId.rawValue {
+  case "123456789":
+    [
+      .init(
+        id: "1733742320",
+        title: "Elements",
+        artistName: "Lena Jonsson Trio",
+        artworkUrl: "https://example.com/elements.jpg",
+        trackCount: 12,
+      ),
+      .init(
+        id: "2250000001",
+        title: "Artist Grant Release",
+        artistName: "Lena Jonsson Trio",
+        artworkUrl: "https://example.com/artist-release.jpg",
+        trackCount: 8,
+      ),
+    ]
+  default:
+    []
+  }
+}
+
 private func mockTracks(for lookup: AppleMusicAlbumTracksLookup) -> [AppleMusicCatalogTrack] {
   switch lookup.albumId.rawValue {
   case "1440935467":
@@ -462,6 +538,15 @@ private func mockTracks(for lookup: AppleMusicAlbumTracksLookup) -> [AppleMusicC
         artistName: "Lena Jonsson Trio",
         albumTitle: "Elements",
         artworkUrl: "https://example.com/elements.jpg",
+      ),
+    ]
+  case "2250000001":
+    [
+      .init(
+        id: "2250000002",
+        title: "Artist Grant Track",
+        artistName: "Lena Jonsson Trio",
+        albumTitle: "Artist Grant Release",
       ),
     ]
   default:

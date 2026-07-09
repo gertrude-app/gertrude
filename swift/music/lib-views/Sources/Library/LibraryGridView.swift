@@ -1,7 +1,8 @@
 import SwiftUI
 
-struct AlbumGridView: View {
+struct LibraryGridView: View {
   private let albums: [AlbumData]
+  private let artists: [ArtistData]
   private let isLoading: Bool
   private let transitionNamespace: Namespace.ID?
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
@@ -9,12 +10,14 @@ struct AlbumGridView: View {
 
   init(
     albums: [AlbumData],
+    artists: [ArtistData] = [],
     isLoading: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.albums = albums
+    self.artists = artists
     self.isLoading = isLoading
     self.transitionNamespace = transitionNamespace
     self.onAlbumTap = onAlbumTap
@@ -26,13 +29,13 @@ struct AlbumGridView: View {
       ScrollView {
         if self.isLoading {
           self.loadingGrid(containerWidth: proxy.size.width)
-        } else if self.albums.isEmpty {
-          AlbumGridEmptyStateView()
+        } else if self.albums.isEmpty, self.artists.isEmpty {
+          LibraryGridEmptyStateView()
             .padding(.horizontal, self.horizontalPadding)
             .padding(.top, 24)
             .padding(.bottom, self.bottomContentPadding)
         } else {
-          self.albumGrid(containerWidth: proxy.size.width)
+          self.libraryGrid(containerWidth: proxy.size.width)
 
           #if DEBUG
             if let onDebugResetTap = self.onDebugResetTap {
@@ -46,6 +49,9 @@ struct AlbumGridView: View {
         }
       }
       .background(.background)
+      .navigationDestination(for: ArtistData.self) { artist in
+        ArtistPlaceholderView(artist: artist)
+      }
     }
   }
 
@@ -59,8 +65,19 @@ struct AlbumGridView: View {
     )
   }
 
-  private func albumGrid(containerWidth: CGFloat) -> some View {
+  private func libraryGrid(containerWidth: CGFloat) -> some View {
     LazyVGrid(columns: self.columns, alignment: .leading, spacing: 24) {
+      ForEach(self.artists) { artist in
+        NavigationLink(value: artist) {
+          ArtistCardView(
+            artist: artist,
+            artworkSize: self.artworkSize(for: containerWidth),
+          )
+        }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
+      }
+
       ForEach(self.albums) { album in
         AlbumCardView(
           album: album,
@@ -98,7 +115,7 @@ struct AlbumGridView: View {
     .padding(.horizontal, self.horizontalPadding)
     .padding(.top, 16)
     .padding(.bottom, self.bottomContentPadding)
-    .accessibilityLabel("Loading albums")
+    .accessibilityLabel("Loading library")
   }
 
   private let bottomContentPadding: CGFloat = 96
@@ -132,17 +149,17 @@ struct AlbumGridView: View {
   }
 #endif
 
-private struct AlbumGridEmptyStateView: View {
+private struct LibraryGridEmptyStateView: View {
   var body: some View {
     VStack(spacing: 8) {
       Image(systemName: "rectangle.stack")
         .font(.system(size: 30, weight: .semibold))
         .foregroundStyle(.secondary)
 
-      Text("No albums yet")
+      Text("No music yet")
         .font(.system(size: 18, weight: .semibold))
 
-      Text("Approved albums will show up here.")
+      Text("Approved artists and albums will show up here.")
         .font(.system(size: 14, weight: .medium))
         .foregroundStyle(.secondary)
     }
@@ -153,11 +170,11 @@ private struct AlbumGridEmptyStateView: View {
 }
 
 #if DEBUG
-  #Preview("Album grid") {
-    AlbumGridView(albums: .previewAlbums, onDebugResetTap: {})
+  #Preview("Library grid") {
+    LibraryGridView(albums: .previewAlbums, artists: .previewArtists, onDebugResetTap: {})
   }
 
-  #Preview("Album grid empty") {
-    AlbumGridView(albums: [])
+  #Preview("Library grid empty") {
+    LibraryGridView(albums: [])
   }
 #endif

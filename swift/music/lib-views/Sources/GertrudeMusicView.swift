@@ -13,7 +13,7 @@ public struct GertrudeMusicView: View {
 #if DEBUG
   #Preview {
     NavigationStack {
-      LibraryView(state: .loaded(albums: .previewAlbums))
+      LibraryView(state: .loaded(albums: .previewAlbums, artists: .previewArtists))
     }
   }
 #endif

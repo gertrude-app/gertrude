@@ -63,6 +63,24 @@ private extension MusicEditorialNotes {
   }
 }
 
+private struct ApprovedMusicAlbumSummary: Equatable, Sendable {
+  var id: Music.AlbumId
+  var artworkUrl: String?
+
+  init(id: Music.AlbumId, artworkUrl: String?) {
+    self.id = id
+    self.artworkUrl = artworkUrl
+  }
+
+  init(album: Music.ApprovedAlbum) {
+    self.init(id: album.appleMusicAlbumId, artworkUrl: album.artworkUrl)
+  }
+
+  init(album: AppleMusicCatalogAlbum) {
+    self.init(id: album.id, artworkUrl: album.artworkUrl)
+  }
+}
+
 extension AuthedRoute: RouteResponder {
   static func respond(to route: Self, in ctx: MusicApp.InstallContext) async throws -> Response {
     switch route {
@@ -85,17 +103,12 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
 
     let albums = try await ctx.child.approvedMusicAlbums(in: ctx.db)
     let artists = try await ctx.child.approvedMusicArtists(in: ctx.db)
+    let artistReleaseAlbums = await self.artistReleaseAlbums(for: artists)
     return .init(
-      albums: albums.map { album in
-        .init(
-          id: album.appleMusicAlbumId.rawValue,
-          title: album.title,
-          artistName: album.artistName,
-          artworkUrl: album.artworkUrl,
-          trackCount: album.trackCount,
-          showsArtwork: album.showsArtwork,
-        )
-      },
+      albums: self.outputAlbums(
+        explicitAlbums: albums,
+        artistReleaseAlbums: artistReleaseAlbums,
+      ),
       artists: artists.map { artist in
         .init(
           id: artist.appleMusicArtistId.rawValue,
@@ -105,30 +118,106 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
       },
     )
   }
+
+  private static func outputAlbums(
+    explicitAlbums: [Music.ApprovedAlbum],
+    artistReleaseAlbums: [AppleMusicCatalogAlbum],
+  ) -> [Output.Album] {
+    var seenAlbumIds = Set<String>()
+    var albums = explicitAlbums.map { album in
+      _ = seenAlbumIds.insert(album.appleMusicAlbumId.rawValue)
+      return Output.Album(
+        id: album.appleMusicAlbumId.rawValue,
+        title: album.title,
+        artistName: album.artistName,
+        artworkUrl: album.artworkUrl,
+        trackCount: album.trackCount,
+        showsArtwork: album.showsArtwork,
+      )
+    }
+
+    for album in artistReleaseAlbums {
+      guard seenAlbumIds.insert(album.id.rawValue).inserted else { continue }
+      albums.append(.init(
+        id: album.id.rawValue,
+        title: album.title,
+        artistName: album.artistName,
+        artworkUrl: album.artworkUrl,
+        trackCount: album.trackCount,
+        showsArtwork: true,
+      ))
+    }
+
+    return albums
+  }
+
+  fileprivate static func artistReleaseAlbums(
+    for artists: [Music.ApprovedArtist],
+  ) async -> [AppleMusicCatalogAlbum] {
+    let appleMusic = get(dependency: \.appleMusic)
+    var albums: [AppleMusicCatalogAlbum] = []
+    for artist in artists {
+      do {
+        let artistAlbums = try await appleMusic.artistAlbums(.init(
+          artistId: artist.appleMusicArtistId,
+          artistName: artist.name,
+          storefront: "us",
+        ))
+        albums.append(contentsOf: artistAlbums)
+      } catch {
+        with(dependency: \.logger).error(
+          "Apple Music artist albums lookup failed for artist `\(artist.appleMusicArtistId.rawValue)`: \(error)",
+        )
+      }
+    }
+    return albums
+  }
 }
 
 extension GetApprovedMusicAlbumTracks: Resolver {
   static func resolve(with input: Input, in ctx: MusicApp.InstallContext) async throws -> Output {
     try await requireMusicAccess(in: ctx)
 
-    let album = try await Music.ApprovedAlbum.query()
+    let albumId = Music.AlbumId(rawValue: input.albumId)
+    let explicitAlbums = try await Music.ApprovedAlbum.query()
       .where(.childId == ctx.child.id)
       .where(.appleMusicAlbumId == input.albumId)
-      .first(in: ctx.db, orThrow: ctx.error(
-        "f63d584c",
-        .unauthorized,
-        "Music album `\(input.albumId)` is not approved for this child",
-      ))
+      .all(in: ctx.db)
+    if let explicitAlbum = explicitAlbums.first {
+      return await self.outputTracks(for: ApprovedMusicAlbumSummary(album: explicitAlbum))
+    }
 
-    return await self.outputTracks(for: album)
+    if let artistCoveredAlbum = try await self.artistCoveredAlbum(
+      albumId: albumId,
+      in: ctx,
+    ) {
+      return await self.outputTracks(for: artistCoveredAlbum)
+    }
+
+    throw ctx.error(
+      "f63d584c",
+      .unauthorized,
+      "Music album `\(input.albumId)` is not approved for this child",
+    )
+  }
+
+  private static func artistCoveredAlbum(
+    albumId: Music.AlbumId,
+    in ctx: MusicApp.InstallContext,
+  ) async throws -> ApprovedMusicAlbumSummary? {
+    let artists = try await ctx.child.approvedMusicArtists(in: ctx.db)
+    let artistReleaseAlbums = await GetApprovedMusicLibrary_v2.artistReleaseAlbums(for: artists)
+    return artistReleaseAlbums
+      .first { $0.id == albumId }
+      .map { ApprovedMusicAlbumSummary(album: $0) }
   }
 
   private static func outputTracks(
-    for album: Music.ApprovedAlbum,
+    for album: ApprovedMusicAlbumSummary,
   ) async -> [GetApprovedMusicLibrary.Output.Track] {
     do {
       let tracks = try await get(dependency: \.appleMusic).albumTracks(.init(
-        albumId: album.appleMusicAlbumId,
+        albumId: album.id,
         storefront: "us",
       ))
       return tracks.map { track in
@@ -141,7 +230,7 @@ extension GetApprovedMusicAlbumTracks: Resolver {
       }
     } catch {
       with(dependency: \.logger).error(
-        "Apple Music album tracks lookup failed for album `\(album.appleMusicAlbumId.rawValue)`: \(error)",
+        "Apple Music album tracks lookup failed for album `\(album.id.rawValue)`: \(error)",
       )
       return []
     }

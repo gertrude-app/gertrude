@@ -46,7 +46,10 @@ private extension LibraryFeature.State {
     case .loading:
       .loading
     case .loaded(let library):
-      .loaded(albums: library.albums.map(AlbumData.init))
+      .loaded(
+        albums: library.albums.map(AlbumData.init),
+        artists: library.artists.map(ArtistData.init),
+      )
     case .empty:
       .empty
     case .failed:
