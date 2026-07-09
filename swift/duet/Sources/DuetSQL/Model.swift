@@ -9,7 +9,6 @@ public protocol Model: Duet.Identifiable, Codable, Sendable {
   static var schemaName: String { get }
   var createdAt: Date { get set }
   var insertValues: [ColumnName: Postgres.Data] { get }
-  func postgresData(for: ColumnName) -> Postgres.Data
 }
 
 public protocol ModelColumns {

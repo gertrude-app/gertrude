@@ -36,7 +36,6 @@ public enum Postgres {
   public enum Data: Sendable {
     case id(UUIDIdentifiable)
     case string(String?)
-    case varchar(String?)
     case intArray([Int]?)
     case int(Int?)
     case int64(Int64?)
@@ -87,8 +86,6 @@ public extension Postgres.Data {
       return string
     case .uuid(let uuid):
       return uuid?.uuidString
-    case .varchar(let string):
-      return string
     }
   }
 }
@@ -99,8 +96,7 @@ extension Postgres.Data: Equatable {
     case (.id(let lhsId), .id(let rhsId)):
       lhsId.uuidId == rhsId.uuidId
     case (.string(let lhsVal), .string(let rhsVal)),
-         (.json(let lhsVal), .json(let rhsVal)),
-         (.varchar(let lhsVal), .varchar(let rhsVal)):
+         (.json(let lhsVal), .json(let rhsVal)):
       lhsVal == rhsVal
     case (.intArray(let lhsVal), .intArray(let rhsVal)):
       lhsVal == rhsVal

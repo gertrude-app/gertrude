@@ -572,7 +572,7 @@ final class SqlTests: XCTestCase {
       .string(nil),
       .string("string"),
       .currentTimestamp,
-      .varchar("version"),
+      .string("version"),
     ])
   }
 

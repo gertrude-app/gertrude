@@ -69,23 +69,6 @@ extension LilThing {
 extension LilThing: Model {
   typealias Id = Tagged<LilThing, UUID>
   static let tableName = "lil_things"
-
-  func postgresData(for column: ColumnName) -> Postgres.Data {
-    switch column {
-    case .id:
-      .id(self)
-    case .int:
-      .int(self.int)
-    case .data:
-      .bytea(self.data)
-    case .createdAt:
-      .date(self.createdAt)
-    case .updatedAt:
-      .date(self.updatedAt)
-    case .deletedAt:
-      .date(self.deletedAt)
-    }
-  }
 }
 
 extension OptLilThing {
@@ -111,17 +94,4 @@ extension OptLilThing {
 extension OptLilThing: Model {
   typealias Id = Tagged<OptLilThing, UUID>
   static let tableName = "opt_lil_things"
-
-  func postgresData(for column: ColumnName) -> Postgres.Data {
-    switch column {
-    case .id:
-      .id(self)
-    case .int:
-      .int(self.int)
-    case .string:
-      .string(self.string)
-    case .createdAt:
-      .date(self.createdAt)
-    }
-  }
 }
