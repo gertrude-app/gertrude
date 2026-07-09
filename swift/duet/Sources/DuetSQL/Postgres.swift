@@ -2,9 +2,27 @@ import Duet
 import Foundation
 import XCore
 
-public protocol PostgresEnum: Sendable {
+public protocol PostgresBindable {
+  var postgresData: Postgres.Data { get }
+  static var nilPostgresData: Postgres.Data { get }
+}
+
+public protocol PostgresRawBindable: PostgresBindable, RawRepresentable
+  where RawValue: PostgresBindable {}
+
+public extension PostgresRawBindable {
+  var postgresData: Postgres.Data { self.rawValue.postgresData }
+  static var nilPostgresData: Postgres.Data { RawValue.nilPostgresData }
+}
+
+public protocol PostgresEnum: Sendable, PostgresBindable {
   var typeName: String { get }
   var rawValue: String { get }
+}
+
+public extension PostgresEnum {
+  var postgresData: Postgres.Data { .enum(self) }
+  static var nilPostgresData: Postgres.Data { .enum(nil) }
 }
 
 public extension PostgresEnum where Self: CaseIterable {
@@ -16,13 +34,16 @@ public extension PostgresEnum where Self: CaseIterable {
   }
 }
 
-public protocol PostgresJsonable: Codable {}
+public protocol PostgresJsonable: Codable, PostgresBindable {}
 
 public extension PostgresJsonable {
   var toPostgresJson: String { try! JSON.encode(self) }
   init(fromPostgresJson json: String) throws {
     self = try JSONDecoder().decode(Self.self, from: json.data(using: .utf8)!)
   }
+
+  var postgresData: Postgres.Data { .json(self.toPostgresJson) }
+  static var nilPostgresData: Postgres.Data { .json(nil) }
 }
 
 public enum Postgres {
@@ -148,4 +169,70 @@ extension Postgres.Data: ExpressibleByBooleanLiteral {
 
 public extension Postgres.Data {
   static var currentTime: Self { .currentTimestamp }
+}
+
+extension String: PostgresBindable {
+  public var postgresData: Postgres.Data { .string(self) }
+  public static var nilPostgresData: Postgres.Data { .string(nil) }
+}
+
+extension Int: PostgresBindable {
+  public var postgresData: Postgres.Data { .int(self) }
+  public static var nilPostgresData: Postgres.Data { .int(nil) }
+}
+
+extension Int64: PostgresBindable {
+  public var postgresData: Postgres.Data { .int64(self) }
+  public static var nilPostgresData: Postgres.Data { .int64(nil) }
+}
+
+extension Float: PostgresBindable {
+  public var postgresData: Postgres.Data { .float(self) }
+  public static var nilPostgresData: Postgres.Data { .float(nil) }
+}
+
+extension Double: PostgresBindable {
+  public var postgresData: Postgres.Data { .double(self) }
+  public static var nilPostgresData: Postgres.Data { .double(nil) }
+}
+
+extension Bool: PostgresBindable {
+  public var postgresData: Postgres.Data { .bool(self) }
+  public static var nilPostgresData: Postgres.Data { .bool(nil) }
+}
+
+extension Date: PostgresBindable {
+  public var postgresData: Postgres.Data { .date(self) }
+  public static var nilPostgresData: Postgres.Data { .date(nil) }
+}
+
+extension UUID: PostgresBindable {
+  public var postgresData: Postgres.Data { .uuid(self) }
+  public static var nilPostgresData: Postgres.Data { .uuid(nil) }
+}
+
+extension Foundation.Data: PostgresBindable {
+  public var postgresData: Postgres.Data { .bytea(self) }
+  public static var nilPostgresData: Postgres.Data { .bytea(nil) }
+}
+
+extension [Int]: PostgresBindable {
+  public var postgresData: Postgres.Data { .intArray(self) }
+  public static var nilPostgresData: Postgres.Data { .intArray(nil) }
+}
+
+extension Tagged: PostgresBindable where RawValue: PostgresBindable {
+  public var postgresData: Postgres.Data { self.rawValue.postgresData }
+  public static var nilPostgresData: Postgres.Data { RawValue.nilPostgresData }
+}
+
+extension Optional: PostgresBindable where Wrapped: PostgresBindable {
+  public var postgresData: Postgres.Data {
+    switch self {
+    case .some(let wrapped): wrapped.postgresData
+    case .none: Wrapped.nilPostgresData
+    }
+  }
+
+  public static var nilPostgresData: Postgres.Data { Wrapped.nilPostgresData }
 }

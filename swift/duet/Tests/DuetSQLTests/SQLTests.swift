@@ -10,6 +10,27 @@ import XExpect
 @testable import DuetSQL
 
 final class SqlTests: XCTestCase {
+  func testPostgresBindable() {
+    expect("foo".postgresData).toEqual(.string("foo"))
+    expect(33.postgresData).toEqual(.int(33))
+    expect(true.postgresData).toEqual(.bool(true))
+    expect(3.14.postgresData).toEqual(.double(3.14))
+    let date = Date()
+    expect(date.postgresData).toEqual(.date(date))
+    let uuid = UUID()
+    expect(uuid.postgresData).toEqual(.uuid(uuid))
+    let tagged = Thing.Id(uuid)
+    expect(tagged.postgresData).toEqual(.uuid(uuid))
+    expect(Thing.CustomEnum.foo.postgresData).toEqual(.enum(Thing.CustomEnum.foo))
+    // optionals preserve the typed nil of their wrapped type
+    expect(Int?.none.postgresData).toEqual(.int(nil))
+    expect(String?.none.postgresData).toEqual(.string(nil))
+    expect(Thing.Id?.none.postgresData).toEqual(.uuid(nil))
+    expect(Thing.CustomEnum?.none.postgresData).toEqual(.enum(nil))
+    expect(Data?.none.postgresData).toEqual(.bytea(nil))
+    expect(Int?.some(5).postgresData).toEqual(.int(5))
+  }
+
   func testSelect() async throws {
     let stmt = try await select(Thing.self)
 
