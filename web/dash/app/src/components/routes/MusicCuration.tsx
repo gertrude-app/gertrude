@@ -334,11 +334,17 @@ const ApprovedArtistCard: React.FC<{
   isRemoving: boolean;
   onRemove(): void;
 }> = ({ artist, isRemoving, onRemove }) => (
-  <div className="min-w-0 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200">
+  <div
+    data-test="approved-music-item"
+    className="min-w-0 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200"
+  >
     <div className="min-w-0 flex gap-4">
       <ArtistArtwork artist={artist} />
       <ArtistInfo artist={artist} />
     </div>
+    <p className="mt-3 text-sm font-medium text-slate-500">
+      Allows all current and future eligible releases by this artist.
+    </p>
     <div className="mt-4 flex justify-end">
       <Button
         type="button"
@@ -362,7 +368,10 @@ const ApprovedAlbumCard: React.FC<{
   // isUpdatingArtwork: boolean;
   // onToggleArtwork(): void;
 }> = ({ album, isRemoving, onRemove }) => (
-  <div className="min-w-0 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200">
+  <div
+    data-test="approved-music-item"
+    className="min-w-0 rounded-2xl bg-white p-4 shadow border-[0.5px] border-slate-200"
+  >
     <div className="min-w-0 flex gap-4">
       <AlbumArtwork
         artworkUrl={album.showsArtwork ? album.artworkUrl : undefined}
@@ -490,9 +499,15 @@ function mixedApprovedItems(
 }
 
 function compareApprovedMusicItems(a: ApprovedMusicItem, b: ApprovedMusicItem): number {
-  const timeA = a.createdAt ? Date.parse(a.createdAt) : Number.POSITIVE_INFINITY;
-  const timeB = b.createdAt ? Date.parse(b.createdAt) : Number.POSITIVE_INFINITY;
-  return timeA - timeB || a.sequence - b.sequence;
+  const timeA = createdAtSortTime(a.createdAt);
+  const timeB = createdAtSortTime(b.createdAt);
+  return timeB - timeA || a.sequence - b.sequence;
+}
+
+function createdAtSortTime(createdAt?: string): number {
+  if (!createdAt) return Number.NEGATIVE_INFINITY;
+  const time = Date.parse(createdAt);
+  return Number.isNaN(time) ? Number.NEGATIVE_INFINITY : time;
 }
 
 function sizedAppleArtworkUrl(url?: string): string | undefined {
