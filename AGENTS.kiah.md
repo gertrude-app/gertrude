@@ -1,3 +1,16 @@
 # Instructions specific to Kiah
 
-When working on Xcode/SwiftUI projects, use the Xcode MCP server when relevant for building projects, checking Xcode navigator issues, rendering SwiftUI previews, reading build logs, and inspecting project structure. Prefer it over shell-only checks when the user's issue is visible in Xcode or previews.
+ALl work on Gertrude takes place in "tasks", managed by my cli helper `gt`. This repo
+checkout is one such task. Use the `gt-workspaces` skill to learn more.
+
+When working on Xcode/SwiftUI projects, use the Xcode MCP server when relevant for
+building projects, checking Xcode navigator issues, rendering SwiftUI previews, reading
+build logs, and inspecting project structure. Prefer it over shell-only checks when the
+user's issue is visible in Xcode or previews.
+
+If I refer to Jared, he's my boss and coworker, we're the only two full-time developers
+working on Gertrude.
+
+If I ask you to do something related to GitHub (look at issues, review PRs, etc.), use the
+GitHub CLI (`gh`) where it makes sense rather than a bunch of web fetches pulling down
+html pages from github.com.
