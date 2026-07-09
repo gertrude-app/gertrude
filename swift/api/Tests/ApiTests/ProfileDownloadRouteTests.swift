@@ -211,16 +211,20 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     """)
   }
 
-  func testGoldenProfileXmlSafariWorkaroundDevice() {
+  // golden master: populated whitelist + web allowlist, pinning payload placement,
+  // key names/casing from the validated spike, and xml escaping
+  func testGoldenProfileXmlFullConfig() {
     let device = IOSDevice.mock {
-      $0
-        .id =
-        .init(UUID(
-          uuidString: "ed25c68a-2dba-4854-b3bd-efe0d8523e6f",
-        )!) // hardcoded workaround device
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
     }
-    var settings = BlockerApp.ProfileSettings.mock { $0.deviceId = device.id }
-    settings.allowAppInstallation = false // matches prod row for this device
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.whitelistedAppBundleIds = ["com.apple.AppStore", "com.culturedcode.ThingsiPhone"]
+      $0.webAllowList = [
+        .init(url: "https://example.com", title: "Example"),
+        .init(url: "https://site.com/a?b=1&c=2", title: "Q&A <site>"), // exercises escaping
+      ]
+    }
     let xml = generateProfileXml(for: device, settings: settings)
     expect(xml).toEqual("""
     <?xml version="1.0" encoding="UTF-8"?>
@@ -237,7 +241,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
         <string>Configuration</string>
 
         <key>PayloadUUID</key>
-        <string>ed25c68a-2dba-4854-b3bd-efe0d8523e6f</string>
+        <string>aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000</string>
 
         <key>PayloadVersion</key>
         <integer>1</integer>
@@ -284,6 +288,50 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
 
           <dict>
             <key>PayloadType</key>
+            <string>com.apple.webcontent-filter</string>
+
+            <key>FilterType</key>
+            <string>BuiltIn</string>
+
+            <key>AutoFilterEnabled</key>
+            <false/>
+
+            <key>PayloadDescription</key>
+            <string>Configures allowed websites</string>
+
+            <key>PayloadDisplayName</key>
+            <string>Gertrude Allowed Websites</string>
+
+            <key>PayloadIdentifier</key>
+            <string>app.gertrude.builtin-webfilter.24f0679b-6e8d-44fa-b4ef-e5d2f7a18b13</string>
+
+            <key>PayloadUUID</key>
+            <string>24f0679b-6e8d-44fa-b4ef-e5d2f7a18b13</string>
+
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+
+            <key>AllowListBookmarks</key>
+            <array>
+              <dict>
+                <key>Title</key>
+                <string>Example</string>
+
+                <key>URL</key>
+                <string>https://example.com</string>
+              </dict>
+              <dict>
+                <key>Title</key>
+                <string>Q&amp;A &lt;site&gt;</string>
+
+                <key>URL</key>
+                <string>https://site.com/a?b=1&amp;c=2</string>
+              </dict>
+            </array>
+          </dict>
+
+          <dict>
+            <key>PayloadType</key>
             <string>com.apple.applicationaccess</string>
 
             <key>PayloadIdentifier</key>
@@ -302,14 +350,35 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
           <false/>
 
           <key>allowAppInstallation</key>
-          <false/>
-          <key>allowSafari</key>
-          <false/>
+          <true/>
+
+          <key>whitelistedAppBundleIDs</key>
+          <array>
+            <string>com.apple.AppStore</string>
+            <string>com.culturedcode.ThingsiPhone</string>
+          </array>
           </dict>
         </array>
       </dict>
     </plist>
     """)
+  }
+
+  // empty-but-present lists are maximally restrictive: hide all apps, block whole web
+  func testEmptyListsEmitEmptyArrays() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.whitelistedAppBundleIds = []
+      $0.webAllowList = []
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml).toContain("<key>whitelistedAppBundleIDs</key>\n      <array/>")
+    expect(xml).toContain("<key>AllowListBookmarks</key>\n        <array/>")
+    expect(xml).toContain("<key>FilterType</key>\n        <string>BuiltIn</string>")
+    expect(xml).toContain("<key>AutoFilterEnabled</key>\n        <false/>")
   }
 
   func testCmsSigningRoundTrip() throws {

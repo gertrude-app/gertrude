@@ -81,13 +81,9 @@ func generateProfileXml(
         <key>allowAppInstallation</key>
         <\(settings.allowAppInstallation ? "true" : "false")/>
   """
-  // special temporary customer workaround
-  if device.id.lowercased == "ed25c68a-2dba-4854-b3bd-efe0d8523e6f" {
-    restrictionKeys += """
-
-          <key>allowSafari</key>
-          <false/>
-    """
+  if let bundleIds = settings.whitelistedAppBundleIds {
+    restrictionKeys += "\n\n      <key>whitelistedAppBundleIDs</key>\n      "
+    restrictionKeys += plistStringArray(bundleIds, indent: 6)
   }
   return """
   <?xml version="1.0" encoding="UTF-8"?>
@@ -148,7 +144,7 @@ func generateProfileXml(
           <key>FilterBrowsers</key>
           <true/>
         </dict>
-
+  \(settings.webAllowList.map(builtInWebFilterXml) ?? "")
         <dict>
           <key>PayloadType</key>
           <string>com.apple.applicationaccess</string>
@@ -168,6 +164,71 @@ func generateProfileXml(
     </dict>
   </plist>
   """.trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+private func builtInWebFilterXml(
+  _ bookmarks: [BlockerApp.ProfileSettings.Bookmark],
+) -> String {
+  let bookmarkDicts = bookmarks.map { bookmark in
+    """
+              <dict>
+                <key>Title</key>
+                <string>\(xmlEscaped(bookmark.title))</string>
+
+                <key>URL</key>
+                <string>\(xmlEscaped(bookmark.url))</string>
+              </dict>
+    """
+  }.joined(separator: "\n")
+  let array = bookmarks.isEmpty ? "<array/>" : "<array>\n\(bookmarkDicts)\n        </array>"
+  return """
+
+        <dict>
+          <key>PayloadType</key>
+          <string>com.apple.webcontent-filter</string>
+
+          <key>FilterType</key>
+          <string>BuiltIn</string>
+
+          <key>AutoFilterEnabled</key>
+          <false/>
+
+          <key>PayloadDescription</key>
+          <string>Configures allowed websites</string>
+
+          <key>PayloadDisplayName</key>
+          <string>Gertrude Allowed Websites</string>
+
+          <key>PayloadIdentifier</key>
+          <string>app.gertrude.builtin-webfilter.24f0679b-6e8d-44fa-b4ef-e5d2f7a18b13</string>
+
+          <key>PayloadUUID</key>
+          <string>24f0679b-6e8d-44fa-b4ef-e5d2f7a18b13</string>
+
+          <key>PayloadVersion</key>
+          <integer>1</integer>
+
+          <key>AllowListBookmarks</key>
+          \(array)
+        </dict>
+
+  """
+}
+
+private func plistStringArray(_ strings: [String], indent: Int) -> String {
+  let pad = String(repeating: " ", count: indent)
+  guard !strings.isEmpty else { return "<array/>" }
+  let entries = strings
+    .map { "\(pad)  <string>\(xmlEscaped($0))</string>" }
+    .joined(separator: "\n")
+  return "<array>\n\(entries)\n\(pad)</array>"
+}
+
+private func xmlEscaped(_ string: String) -> String {
+  string
+    .replacingOccurrences(of: "&", with: "&amp;")
+    .replacingOccurrences(of: "<", with: "&lt;")
+    .replacingOccurrences(of: ">", with: "&gt;")
 }
 
 private let SUBSCRIPTION_REQUIRED_HTML = """
