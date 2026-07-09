@@ -18,6 +18,7 @@ import {
 } from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
+const expandedUnlockDomain = unlockRequests[0]!.domains[0]!;
 
 const meta = {
   title: 'Account/Components/Requests/Cards and Panels',
@@ -72,12 +73,13 @@ export const Cards = {
 
 export const UnlockResponsePanel = {
   name: 'Unlock response panel',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryScreen>
       <div className="h-screen bg-white pt-8">
         <UnlockRequestResponsePanel
           domains={unlockRequests[0]!.domains}
+          defaultExpandedDomains={[expandedUnlockDomain]}
           keychainOptions={keychains.map((keychain) => ({
             id: keychain.id,
             name: keychain.name,

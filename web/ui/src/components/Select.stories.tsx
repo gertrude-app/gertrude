@@ -67,10 +67,13 @@ const meta = {
     size: { options: [`small`, `medium`], control: { type: `inline-radio` } },
     disabled: { control: `boolean` },
     className: { control: false },
+    defaultOpen: { control: false },
+    onOpenChange: { control: false },
+    open: { control: false },
     possibleValues: { control: false },
     setSelected: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Select>;
 
 export default meta;
@@ -147,6 +150,42 @@ export const Assortment: Story = {
               label: `Bedtime`,
               description: `Block entertainment and games.`,
               icon: MoonIcon,
+            },
+          ]}
+        />
+      </StorySection>
+    </StoryCanvas>
+  ),
+};
+
+export const OpenMenu: Story = {
+  parameters: galleryParameters,
+  render: () => (
+    <StoryCanvas innerClassName="max-w-xl">
+      <StorySection title="Open select" contentClassName="block">
+        <Select
+          open
+          label="Policy"
+          selected="homework"
+          setSelected={() => undefined}
+          possibleValues={[
+            {
+              value: `homework`,
+              label: `Homework focus`,
+              description: `Allow school and research sites.`,
+              icon: ShieldCheckIcon,
+            },
+            {
+              value: `bedtime`,
+              label: `Bedtime`,
+              description: `Block entertainment and games.`,
+              icon: MoonIcon,
+            },
+            {
+              value: `weekend`,
+              label: `Weekend`,
+              description: `Loosen restrictions for Saturday and Sunday.`,
+              icon: CalendarDaysIcon,
             },
           ]}
         />

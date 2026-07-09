@@ -18,6 +18,9 @@ interface Props {
   onSelect?: () => void;
   children?: React.ReactNode;
   destructive?: boolean;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const itemClasses = (active?: boolean, destructive?: boolean): string =>
@@ -59,6 +62,9 @@ const DropdownMenuItem: React.FC<Props> = ({
   onSelect,
   children,
   destructive,
+  open,
+  defaultOpen,
+  onOpenChange,
 }) => {
   const overlayPortalContainer = useOverlayPortalContainer();
   const textContent = (
@@ -110,7 +116,7 @@ const DropdownMenuItem: React.FC<Props> = ({
 
   if (children) {
     return (
-      <Menu.SubmenuRoot>
+      <Menu.SubmenuRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
         <Menu.SubmenuTrigger className={itemClasses(active, destructive)}>
           <HStack align={description ? `start` : `center`} gap={2} className="min-w-0">
             {renderIcon(

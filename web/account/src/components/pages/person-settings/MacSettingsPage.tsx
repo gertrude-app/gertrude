@@ -31,6 +31,8 @@ import {
   timeOfDayToInputValue,
 } from '#/components/utils';
 
+type MacSettingsSection = `monitoring` | `filtering` | `apps`;
+
 interface Props {
   config?: PersonMacSettingsConfiguration;
   personName: string;
@@ -38,6 +40,7 @@ interface Props {
   assignedKeychains: Keychain[];
   allKeychains: Keychain[];
   installedMacApps: InstalledMacApp[];
+  defaultExpandedSections?: MacSettingsSection[];
   patchConfig: (patch: Partial<PersonMacSettingsConfiguration>) => void;
 }
 
@@ -45,6 +48,7 @@ const defaultDowntime: NonNullable<PersonMacSettingsConfiguration[`downtime`]> =
   start: { hour: 9, minute: 0 },
   end: { hour: 17, minute: 0 },
 };
+const emptyDefaultExpandedSections: MacSettingsSection[] = [];
 
 const MacSettingsPage: React.FC<Props> = ({
   config,
@@ -53,6 +57,7 @@ const MacSettingsPage: React.FC<Props> = ({
   assignedKeychains,
   allKeychains,
   installedMacApps,
+  defaultExpandedSections = emptyDefaultExpandedSections,
   patchConfig,
 }) => {
   const [addBlockedDomainModalOpen, setAddBlockedDomainModalOpen] = React.useState(false);
@@ -117,6 +122,7 @@ const MacSettingsPage: React.FC<Props> = ({
       <CardContainer className="flex flex-col gap-4">
         <PersonSettingsExpandableSection
           title="Monitoring"
+          defaultExpanded={defaultExpandedSections.includes(`monitoring`)}
           previewChips={[
             {
               title: `Keylogging`,
@@ -218,6 +224,7 @@ const MacSettingsPage: React.FC<Props> = ({
         </PersonSettingsExpandableSection>
         <PersonSettingsExpandableSection
           title="Internet Filtering"
+          defaultExpanded={defaultExpandedSections.includes(`filtering`)}
           previewChips={[
             config.downtime
               ? {
@@ -489,6 +496,7 @@ const MacSettingsPage: React.FC<Props> = ({
         </PersonSettingsExpandableSection>
         <PersonSettingsExpandableSection
           title="Apps"
+          defaultExpanded={defaultExpandedSections.includes(`apps`)}
           previewChips={[
             {
               title: `Blocked Apps`,

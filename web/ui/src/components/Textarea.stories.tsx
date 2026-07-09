@@ -39,7 +39,7 @@ const meta = {
     required: { control: false },
     setValue: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Textarea>;
 
 export default meta;

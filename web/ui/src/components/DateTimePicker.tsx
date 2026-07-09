@@ -13,10 +13,14 @@ import Select from './Select';
 
 interface CommonProps {
   label?: string;
-  labelPostiion?: `left` | `top`;
+  labelPosition?: `left` | `top`;
   size?: `small` | `medium`;
   allowFuture?: boolean;
   allowPast?: boolean;
+  now?: Date;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
   className?: string;
 }
 
@@ -25,12 +29,12 @@ type Props = CommonProps &
     | {
         date: Date;
         setDate: (date: Date) => void;
-        notRequred?: false;
+        notRequired?: false;
       }
     | {
         date?: Date;
         setDate: (date: Date | undefined) => void;
-        notRequred: true;
+        notRequired: true;
       }
   );
 
@@ -128,14 +132,18 @@ const DateTimePicker: React.FC<Props> = (props) => {
   const {
     date,
     label,
-    labelPostiion = `top`,
+    labelPosition = `top`,
     size = `medium`,
     allowFuture = true,
     allowPast = true,
+    now: nowOverride,
+    open,
+    defaultOpen,
+    onOpenChange,
     className,
   } = props;
   const generatedId = React.useId();
-  const now = new Date();
+  const now = nowOverride ?? new Date();
   const [viewDate, setViewDate] = React.useState(() =>
     constrainDate(date ?? now, now, allowPast, allowFuture),
   );
@@ -144,9 +152,9 @@ const DateTimePicker: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     if (date) {
-      setViewDate(constrainDate(date, new Date(), allowPast, allowFuture));
+      setViewDate(constrainDate(date, nowOverride ?? new Date(), allowPast, allowFuture));
     }
-  }, [date, allowPast, allowFuture]);
+  }, [date, allowPast, allowFuture, nowOverride]);
 
   const selectedYearNumber = viewDate.getFullYear();
   const selectedMonthNumber = viewDate.getMonth();
@@ -217,7 +225,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
 
     nextDate.setFullYear(year, month, nextDay);
 
-    if (date || !props.notRequred) {
+    if (date || !props.notRequired) {
       commitDate(nextDate);
       return;
     }
@@ -248,7 +256,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
 
     nextDate.setHours(hours, minutes, 0, 0);
 
-    if (date || !props.notRequred) {
+    if (date || !props.notRequired) {
       commitDate(nextDate);
       return;
     }
@@ -257,7 +265,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
   };
 
   const clearDate = (): void => {
-    if (!props.notRequred) {
+    if (!props.notRequired) {
       return;
     }
 
@@ -267,9 +275,9 @@ const DateTimePicker: React.FC<Props> = (props) => {
 
   return (
     <Stack
-      direction={labelPostiion === `left` ? `horizontal` : `vertical`}
-      gap={labelPostiion === `left` ? 2 : 1}
-      align={labelPostiion === `left` ? `center` : `stretch`}
+      direction={labelPosition === `left` ? `horizontal` : `vertical`}
+      gap={labelPosition === `left` ? 2 : 1}
+      align={labelPosition === `left` ? `center` : `stretch`}
       className={className}
     >
       {label && (
@@ -277,12 +285,17 @@ const DateTimePicker: React.FC<Props> = (props) => {
           as="label"
           htmlFor={generatedId}
           variant="label"
-          className={cx(labelPostiion === `left` ? `shrink-0` : `ml-2.5`)}
+          className={cx(labelPosition === `left` ? `shrink-0` : `ml-2.5`)}
         >
           {label}
         </Text>
       )}
-      <Popover.Root modal={false}>
+      <Popover.Root
+        modal={false}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+      >
         <Popover.Trigger
           render={
             <button
@@ -290,7 +303,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
               type="button"
               className={cx(
                 `relative flex w-full cursor-pointer items-stretch overflow-hidden border border-stone-300/80 bg-white text-left shadow shadow-stone-300/30 outline-none transition-[border-color,box-shadow] duration-150 select-none hover:border-stone-400/70 hover:shadow-stone-300/80 focus-visible:border-violet-300 focus-visible:shadow-violet-200/70 focus-visible:ring-2 focus-visible:ring-violet-200/70`,
-                labelPostiion === `left` && `min-w-0 flex-1`,
+                labelPosition === `left` && `min-w-0 flex-1`,
                 size === `small`
                   ? `min-h-[29.5px] rounded-[7px]`
                   : `min-h-[36.5px] rounded-[9px]`,
@@ -406,7 +419,7 @@ const DateTimePicker: React.FC<Props> = (props) => {
                       setValue={setTime}
                       className="min-w-0 flex-1"
                     />
-                    {props.notRequred && date ? (
+                    {props.notRequired && date ? (
                       <Button type="button" onClick={clearDate}>
                         Clear
                       </Button>

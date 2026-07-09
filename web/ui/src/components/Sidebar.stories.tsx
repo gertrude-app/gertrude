@@ -94,7 +94,7 @@ const meta = {
     children: { control: false },
     logoUrl: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`mobile`, `desktop`] },
 } satisfies Meta<typeof Sidebar>;
 
 export default meta;

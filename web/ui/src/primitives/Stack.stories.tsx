@@ -6,7 +6,7 @@ import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryL
 const meta = {
   title: 'UI/Primitives/Stack',
   component: Stack,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Stack>;
 
 export default meta;

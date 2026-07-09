@@ -31,7 +31,7 @@ const meta = {
     className: { control: false },
     tabs: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof SegmentedTabs>;
 
 export default meta;

@@ -69,7 +69,7 @@ const manyPreviewChips = [
 const meta = {
   title: 'Account/Components/Person Settings/Expandable Section',
   component: PersonSettingsExpandableSection,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['desktop'] },
 };
 
 export default meta;

@@ -9,7 +9,7 @@ import SettingsRow from './SettingsRow';
 const meta = {
   title: 'Account/Components/Person Settings/Settings Row',
   component: SettingsRow,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['desktop'] },
 };
 
 export default meta;

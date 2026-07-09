@@ -19,7 +19,7 @@ const meta = {
     variant: { options: variants, control: { type: `inline-radio` } },
     className: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Banner>;
 
 export default meta;

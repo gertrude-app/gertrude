@@ -29,7 +29,7 @@ const meta = {
     breadcrumbs: { control: false },
     buttons: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof PageHeading>;
 
 export default meta;

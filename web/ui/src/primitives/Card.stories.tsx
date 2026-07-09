@@ -20,7 +20,7 @@ const meta = {
     padding: { control: false },
     preset: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Card>;
 
 export default meta;

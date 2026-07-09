@@ -34,6 +34,9 @@ interface Props<Options extends readonly SelectOption<string>[]> {
   disabled?: boolean;
   size?: SelectSize;
   className?: string;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const getOptionValue = <Value extends string>(option: SelectOption<Value>): Value =>
@@ -83,6 +86,9 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
   disabled,
   size = `medium`,
   className,
+  open,
+  defaultOpen,
+  onOpenChange,
 }: Props<Options>): React.ReactElement => {
   const generatedId = React.useId();
   const selectedOption = possibleValues.find(
@@ -113,6 +119,9 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
       )}
       <DropdownMenu
         disabled={disabled}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
         trigger={
           <button
             id={generatedId}

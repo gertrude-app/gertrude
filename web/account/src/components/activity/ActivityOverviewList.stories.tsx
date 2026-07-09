@@ -9,7 +9,7 @@ import { daySummaries } from '#/components/storybook/fixtures';
 const meta = {
   title: 'Account/Components/Activity/Activity Overview List',
   component: ActivityOverviewList,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['desktop'] },
 };
 
 export default meta;

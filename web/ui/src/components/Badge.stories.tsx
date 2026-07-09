@@ -34,7 +34,7 @@ const meta = {
     color: { options: colors, control: { type: `select` } },
     size: { options: sizes, control: { type: `inline-radio` } },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Badge>;
 
 export default meta;

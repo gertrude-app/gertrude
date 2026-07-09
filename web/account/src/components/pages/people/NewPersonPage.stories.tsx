@@ -5,7 +5,7 @@ import NewPersonPage, { type PersonRelationship } from './NewPersonPage';
 const meta = {
   title: 'Account/Pages/People/New Person',
   component: NewPersonPage,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['mobile', 'desktop'] },
 };
 
 export default meta;

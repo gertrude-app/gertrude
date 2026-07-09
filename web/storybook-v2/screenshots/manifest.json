@@ -1,0 +1,1394 @@
+[
+  {
+    "id": "account-components-activity-activity-feed--grouped-and-single-person",
+    "iframePath": "/iframe.html?id=account-components-activity-activity-feed--grouped-and-single-person&viewMode=story",
+    "name": "Grouped and single person",
+    "path": "screenshots/desktop/account-components-activity-activity-feed--grouped-and-single-person.png",
+    "title": "Account/Components/Activity/Activity Feed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-activity-activity-overview-list--states",
+    "iframePath": "/iframe.html?id=account-components-activity-activity-overview-list--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/account-components-activity-activity-overview-list--states.png",
+    "title": "Account/Components/Activity/Activity Overview List",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-layout-authed-app-layout--with-request-badge",
+    "iframePath": "/iframe.html?id=account-components-layout-authed-app-layout--with-request-badge&viewMode=story",
+    "name": "With request badge",
+    "path": "screenshots/mobile/account-components-layout-authed-app-layout--with-request-badge.png",
+    "title": "Account/Components/Layout/Authed App Layout",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-layout-authed-app-layout--with-request-badge",
+    "iframePath": "/iframe.html?id=account-components-layout-authed-app-layout--with-request-badge&viewMode=story",
+    "name": "With request badge",
+    "path": "screenshots/desktop/account-components-layout-authed-app-layout--with-request-badge.png",
+    "title": "Account/Components/Layout/Authed App Layout",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-block-group--states",
+    "iframePath": "/iframe.html?id=account-components-person-settings-block-group--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/account-components-person-settings-block-group--states.png",
+    "title": "Account/Components/Person Settings/Block Group",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-allowed-albums",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-allowed-albums&viewMode=story",
+    "name": "Add allowed albums slide-over",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--add-allowed-albums.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-allowed-albums",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-allowed-albums&viewMode=story",
+    "name": "Add allowed albums slide-over",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-allowed-albums.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-blocked-domain",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-blocked-domain&viewMode=story",
+    "name": "Add blocked domain modal",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--add-blocked-domain.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-blocked-domain",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-blocked-domain&viewMode=story",
+    "name": "Add blocked domain modal",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-blocked-domain.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-keychains",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-keychains&viewMode=story",
+    "name": "Add keychains slide-over",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--add-keychains.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-keychains",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-keychains&viewMode=story",
+    "name": "Add keychains slide-over",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-keychains.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-mac-apps",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-mac-apps&viewMode=story",
+    "name": "Add Mac apps slide-over",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--add-mac-apps.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-mac-apps",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-mac-apps&viewMode=story",
+    "name": "Add Mac apps slide-over",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-mac-apps.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--open-schedule-editor",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--open-schedule-editor&viewMode=story",
+    "name": "Open schedule editor",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--open-schedule-editor.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-expandable-section--states",
+    "iframePath": "/iframe.html?id=account-components-person-settings-expandable-section--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/account-components-person-settings-expandable-section--states.png",
+    "title": "Account/Components/Person Settings/Expandable Section",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-settings-row--types",
+    "iframePath": "/iframe.html?id=account-components-person-settings-settings-row--types&viewMode=story",
+    "name": "Types",
+    "path": "screenshots/desktop/account-components-person-settings-settings-row--types.png",
+    "title": "Account/Components/Person Settings/Settings Row",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-requests-cards-and-panels--unlock-response-panel",
+    "iframePath": "/iframe.html?id=account-components-requests-cards-and-panels--unlock-response-panel&viewMode=story",
+    "name": "Unlock response panel",
+    "path": "screenshots/mobile/account-components-requests-cards-and-panels--unlock-response-panel.png",
+    "title": "Account/Components/Requests/Cards and Panels",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-requests-cards-and-panels--unlock-response-panel",
+    "iframePath": "/iframe.html?id=account-components-requests-cards-and-panels--unlock-response-panel&viewMode=story",
+    "name": "Unlock response panel",
+    "path": "screenshots/desktop/account-components-requests-cards-and-panels--unlock-response-panel.png",
+    "title": "Account/Components/Requests/Cards and Panels",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-settings-notifications--add-method",
+    "iframePath": "/iframe.html?id=account-components-settings-notifications--add-method&viewMode=story",
+    "name": "Add method slide-over",
+    "path": "screenshots/mobile/account-components-settings-notifications--add-method.png",
+    "title": "Account/Components/Settings/Notifications",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-settings-notifications--add-method",
+    "iframePath": "/iframe.html?id=account-components-settings-notifications--add-method&viewMode=story",
+    "name": "Add method slide-over",
+    "path": "screenshots/desktop/account-components-settings-notifications--add-method.png",
+    "title": "Account/Components/Settings/Notifications",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-settings-notifications--add-method-ntfy-success",
+    "iframePath": "/iframe.html?id=account-components-settings-notifications--add-method-ntfy-success&viewMode=story",
+    "name": "Add method ntfy success slide-over",
+    "path": "screenshots/desktop/account-components-settings-notifications--add-method-ntfy-success.png",
+    "title": "Account/Components/Settings/Notifications",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-settings-notifications--add-method-verification",
+    "iframePath": "/iframe.html?id=account-components-settings-notifications--add-method-verification&viewMode=story",
+    "name": "Add method verification slide-over",
+    "path": "screenshots/desktop/account-components-settings-notifications--add-method-verification.png",
+    "title": "Account/Components/Settings/Notifications",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-settings-notifications--edit-notification",
+    "iframePath": "/iframe.html?id=account-components-settings-notifications--edit-notification&viewMode=story",
+    "name": "Edit notification slide-over",
+    "path": "screenshots/mobile/account-components-settings-notifications--edit-notification.png",
+    "title": "Account/Components/Settings/Notifications",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-settings-notifications--edit-notification",
+    "iframePath": "/iframe.html?id=account-components-settings-notifications--edit-notification&viewMode=story",
+    "name": "Edit notification slide-over",
+    "path": "screenshots/desktop/account-components-settings-notifications--edit-notification.png",
+    "title": "Account/Components/Settings/Notifications",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-activity--day",
+    "iframePath": "/iframe.html?id=account-pages-activity--day&viewMode=story",
+    "name": "Day",
+    "path": "screenshots/mobile/account-pages-activity--day.png",
+    "title": "Account/Pages/Activity",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-activity--day",
+    "iframePath": "/iframe.html?id=account-pages-activity--day&viewMode=story",
+    "name": "Day",
+    "path": "screenshots/desktop/account-pages-activity--day.png",
+    "title": "Account/Pages/Activity",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-activity--overview",
+    "iframePath": "/iframe.html?id=account-pages-activity--overview&viewMode=story",
+    "name": "Overview",
+    "path": "screenshots/mobile/account-pages-activity--overview.png",
+    "title": "Account/Pages/Activity",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-activity--overview",
+    "iframePath": "/iframe.html?id=account-pages-activity--overview&viewMode=story",
+    "name": "Overview",
+    "path": "screenshots/desktop/account-pages-activity--overview.png",
+    "title": "Account/Pages/Activity",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-list--default",
+    "iframePath": "/iframe.html?id=account-pages-people-list--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-people-list--default.png",
+    "title": "Account/Pages/People/List",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-list--default",
+    "iframePath": "/iframe.html?id=account-pages-people-list--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-people-list--default.png",
+    "title": "Account/Pages/People/List",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--default",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-people-new-person--default.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--default",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-people-new-person--default.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic&viewMode=story",
+    "name": "Basic",
+    "path": "screenshots/mobile/account-pages-people-person-settings--basic.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic&viewMode=story",
+    "name": "Basic",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios&viewMode=story",
+    "name": "iPhone and iPad",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios&viewMode=story",
+    "name": "iPhone and iPad",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-all-sections-expanded",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-all-sections-expanded&viewMode=story",
+    "name": "iPhone and iPad all sections expanded",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-all-sections-expanded.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-all-sections-expanded",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-all-sections-expanded&viewMode=story",
+    "name": "iPhone and iPad all sections expanded",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-all-sections-expanded.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--mac",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac&viewMode=story",
+    "name": "Mac",
+    "path": "screenshots/mobile/account-pages-people-person-settings--mac.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--mac",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac&viewMode=story",
+    "name": "Mac",
+    "path": "screenshots/desktop/account-pages-people-person-settings--mac.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--mac-all-sections-expanded",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-all-sections-expanded&viewMode=story",
+    "name": "Mac all sections expanded",
+    "path": "screenshots/mobile/account-pages-people-person-settings--mac-all-sections-expanded.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--mac-all-sections-expanded",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-all-sections-expanded&viewMode=story",
+    "name": "Mac all sections expanded",
+    "path": "screenshots/desktop/account-pages-people-person-settings--mac-all-sections-expanded.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-requests--suspension",
+    "iframePath": "/iframe.html?id=account-pages-requests--suspension&viewMode=story",
+    "name": "Suspension",
+    "path": "screenshots/mobile/account-pages-requests--suspension.png",
+    "title": "Account/Pages/Requests",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-requests--suspension",
+    "iframePath": "/iframe.html?id=account-pages-requests--suspension&viewMode=story",
+    "name": "Suspension",
+    "path": "screenshots/desktop/account-pages-requests--suspension.png",
+    "title": "Account/Pages/Requests",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-requests--unlock",
+    "iframePath": "/iframe.html?id=account-pages-requests--unlock&viewMode=story",
+    "name": "Unlock",
+    "path": "screenshots/mobile/account-pages-requests--unlock.png",
+    "title": "Account/Pages/Requests",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-requests--unlock",
+    "iframePath": "/iframe.html?id=account-pages-requests--unlock&viewMode=story",
+    "name": "Unlock",
+    "path": "screenshots/desktop/account-pages-requests--unlock.png",
+    "title": "Account/Pages/Requests",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-settings--notifications",
+    "iframePath": "/iframe.html?id=account-pages-settings--notifications&viewMode=story",
+    "name": "Notifications",
+    "path": "screenshots/mobile/account-pages-settings--notifications.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-settings--notifications",
+    "iframePath": "/iframe.html?id=account-pages-settings--notifications&viewMode=story",
+    "name": "Notifications",
+    "path": "screenshots/desktop/account-pages-settings--notifications.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--login",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
+    "name": "Login",
+    "path": "screenshots/mobile/account-pages-unauthed--login.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--login",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
+    "name": "Login",
+    "path": "screenshots/desktop/account-pages-unauthed--login.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup&viewMode=story",
+    "name": "Signup",
+    "path": "screenshots/mobile/account-pages-unauthed--signup.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup&viewMode=story",
+    "name": "Signup",
+    "path": "screenshots/desktop/account-pages-unauthed--signup.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-badge--colors",
+    "iframePath": "/iframe.html?id=ui-components-badge--colors&viewMode=story",
+    "name": "Colors",
+    "path": "screenshots/desktop/ui-components-badge--colors.png",
+    "title": "UI/Components/Badge",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-badge--sizes",
+    "iframePath": "/iframe.html?id=ui-components-badge--sizes&viewMode=story",
+    "name": "Sizes",
+    "path": "screenshots/desktop/ui-components-badge--sizes.png",
+    "title": "UI/Components/Badge",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-banner--variants",
+    "iframePath": "/iframe.html?id=ui-components-banner--variants&viewMode=story",
+    "name": "Variants",
+    "path": "screenshots/desktop/ui-components-banner--variants.png",
+    "title": "UI/Components/Banner",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-button--assortment",
+    "iframePath": "/iframe.html?id=ui-components-button--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-button--assortment.png",
+    "title": "UI/Components/Button",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-button--sizes",
+    "iframePath": "/iframe.html?id=ui-components-button--sizes&viewMode=story",
+    "name": "Sizes",
+    "path": "screenshots/desktop/ui-components-button--sizes.png",
+    "title": "UI/Components/Button",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-button--split-actions",
+    "iframePath": "/iframe.html?id=ui-components-button--split-actions&viewMode=story",
+    "name": "Split Actions",
+    "path": "screenshots/desktop/ui-components-button--split-actions.png",
+    "title": "UI/Components/Button",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-button--variants",
+    "iframePath": "/iframe.html?id=ui-components-button--variants&viewMode=story",
+    "name": "Variants",
+    "path": "screenshots/desktop/ui-components-button--variants.png",
+    "title": "UI/Components/Button",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-checkbox--states",
+    "iframePath": "/iframe.html?id=ui-components-checkbox--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/ui-components-checkbox--states.png",
+    "title": "UI/Components/Checkbox",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-confirmationdialog--open-destructive",
+    "iframePath": "/iframe.html?id=ui-components-confirmationdialog--open-destructive&viewMode=story",
+    "name": "Open destructive",
+    "path": "screenshots/mobile/ui-components-confirmationdialog--open-destructive.png",
+    "title": "UI/Components/ConfirmationDialog",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "ui-components-confirmationdialog--open-destructive",
+    "iframePath": "/iframe.html?id=ui-components-confirmationdialog--open-destructive&viewMode=story",
+    "name": "Open destructive",
+    "path": "screenshots/desktop/ui-components-confirmationdialog--open-destructive.png",
+    "title": "UI/Components/ConfirmationDialog",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-datetimepicker--assortment",
+    "iframePath": "/iframe.html?id=ui-components-datetimepicker--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-datetimepicker--assortment.png",
+    "title": "UI/Components/DateTimePicker",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-datetimepicker--open-calendar",
+    "iframePath": "/iframe.html?id=ui-components-datetimepicker--open-calendar&viewMode=story",
+    "name": "Open Calendar",
+    "path": "screenshots/desktop/ui-components-datetimepicker--open-calendar.png",
+    "title": "UI/Components/DateTimePicker",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-dropdownmenu--open-actions",
+    "iframePath": "/iframe.html?id=ui-components-dropdownmenu--open-actions&viewMode=story",
+    "name": "Open Actions",
+    "path": "screenshots/desktop/ui-components-dropdownmenu--open-actions.png",
+    "title": "UI/Components/DropdownMenu",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-dropdownmenu--open-nested-menu",
+    "iframePath": "/iframe.html?id=ui-components-dropdownmenu--open-nested-menu&viewMode=story",
+    "name": "Open nested menu",
+    "path": "screenshots/desktop/ui-components-dropdownmenu--open-nested-menu.png",
+    "title": "UI/Components/DropdownMenu",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-dropdownmenu--open-searchable",
+    "iframePath": "/iframe.html?id=ui-components-dropdownmenu--open-searchable&viewMode=story",
+    "name": "Open Searchable",
+    "path": "screenshots/desktop/ui-components-dropdownmenu--open-searchable.png",
+    "title": "UI/Components/DropdownMenu",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-emptystate--assortment",
+    "iframePath": "/iframe.html?id=ui-components-emptystate--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-emptystate--assortment.png",
+    "title": "UI/Components/EmptyState",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-input--adornments",
+    "iframePath": "/iframe.html?id=ui-components-input--adornments&viewMode=story",
+    "name": "Adornments",
+    "path": "screenshots/desktop/ui-components-input--adornments.png",
+    "title": "UI/Components/Input",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-input--disabled",
+    "iframePath": "/iframe.html?id=ui-components-input--disabled&viewMode=story",
+    "name": "Disabled",
+    "path": "screenshots/desktop/ui-components-input--disabled.png",
+    "title": "UI/Components/Input",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-input--help-and-error",
+    "iframePath": "/iframe.html?id=ui-components-input--help-and-error&viewMode=story",
+    "name": "Help And Error",
+    "path": "screenshots/desktop/ui-components-input--help-and-error.png",
+    "title": "UI/Components/Input",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-input--type-variants",
+    "iframePath": "/iframe.html?id=ui-components-input--type-variants&viewMode=story",
+    "name": "Type Variants",
+    "path": "screenshots/desktop/ui-components-input--type-variants.png",
+    "title": "UI/Components/Input",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-loadingdots--sizes",
+    "iframePath": "/iframe.html?id=ui-components-loadingdots--sizes&viewMode=story",
+    "name": "Sizes",
+    "path": "screenshots/desktop/ui-components-loadingdots--sizes.png",
+    "title": "UI/Components/LoadingDots",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-modal--open-form",
+    "iframePath": "/iframe.html?id=ui-components-modal--open-form&viewMode=story",
+    "name": "Open form",
+    "path": "screenshots/mobile/ui-components-modal--open-form.png",
+    "title": "UI/Components/Modal",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "ui-components-modal--open-form",
+    "iframePath": "/iframe.html?id=ui-components-modal--open-form&viewMode=story",
+    "name": "Open form",
+    "path": "screenshots/desktop/ui-components-modal--open-form.png",
+    "title": "UI/Components/Modal",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-pageheading--assortment",
+    "iframePath": "/iframe.html?id=ui-components-pageheading--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-pageheading--assortment.png",
+    "title": "UI/Components/PageHeading",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-radiogroup--assortment",
+    "iframePath": "/iframe.html?id=ui-components-radiogroup--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-radiogroup--assortment.png",
+    "title": "UI/Components/RadioGroup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-segmentedtabs--assortment",
+    "iframePath": "/iframe.html?id=ui-components-segmentedtabs--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-segmentedtabs--assortment.png",
+    "title": "UI/Components/SegmentedTabs",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-select--assortment",
+    "iframePath": "/iframe.html?id=ui-components-select--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-select--assortment.png",
+    "title": "UI/Components/Select",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-select--open-menu",
+    "iframePath": "/iframe.html?id=ui-components-select--open-menu&viewMode=story",
+    "name": "Open Menu",
+    "path": "screenshots/desktop/ui-components-select--open-menu.png",
+    "title": "UI/Components/Select",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-sidebar--full-layout",
+    "iframePath": "/iframe.html?id=ui-components-sidebar--full-layout&viewMode=story",
+    "name": "Full Layout",
+    "path": "screenshots/mobile/ui-components-sidebar--full-layout.png",
+    "title": "UI/Components/Sidebar",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "ui-components-sidebar--full-layout",
+    "iframePath": "/iframe.html?id=ui-components-sidebar--full-layout&viewMode=story",
+    "name": "Full Layout",
+    "path": "screenshots/desktop/ui-components-sidebar--full-layout.png",
+    "title": "UI/Components/Sidebar",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-slideover--open-panel",
+    "iframePath": "/iframe.html?id=ui-components-slideover--open-panel&viewMode=story",
+    "name": "Open panel",
+    "path": "screenshots/mobile/ui-components-slideover--open-panel.png",
+    "title": "UI/Components/SlideOver",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "ui-components-slideover--open-panel",
+    "iframePath": "/iframe.html?id=ui-components-slideover--open-panel&viewMode=story",
+    "name": "Open panel",
+    "path": "screenshots/desktop/ui-components-slideover--open-panel.png",
+    "title": "UI/Components/SlideOver",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-textarea--assortment",
+    "iframePath": "/iframe.html?id=ui-components-textarea--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-textarea--assortment.png",
+    "title": "UI/Components/Textarea",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-toaster--visible-stack",
+    "iframePath": "/iframe.html?id=ui-components-toaster--visible-stack&viewMode=story",
+    "name": "Visible stack",
+    "path": "screenshots/mobile/ui-components-toaster--visible-stack.png",
+    "title": "UI/Components/Toaster",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "ui-components-toaster--visible-stack",
+    "iframePath": "/iframe.html?id=ui-components-toaster--visible-stack&viewMode=story",
+    "name": "Visible stack",
+    "path": "screenshots/desktop/ui-components-toaster--visible-stack.png",
+    "title": "UI/Components/Toaster",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-toggle--states",
+    "iframePath": "/iframe.html?id=ui-components-toggle--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/ui-components-toggle--states.png",
+    "title": "UI/Components/Toggle",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-tooltip--placements",
+    "iframePath": "/iframe.html?id=ui-components-tooltip--placements&viewMode=story",
+    "name": "Placements",
+    "path": "screenshots/desktop/ui-components-tooltip--placements.png",
+    "title": "UI/Components/Tooltip",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-card--interactive-states",
+    "iframePath": "/iframe.html?id=ui-primitives-card--interactive-states&viewMode=story",
+    "name": "Interactive States",
+    "path": "screenshots/desktop/ui-primitives-card--interactive-states.png",
+    "title": "UI/Primitives/Card",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-card--responsive-padding",
+    "iframePath": "/iframe.html?id=ui-primitives-card--responsive-padding&viewMode=story",
+    "name": "Responsive Padding",
+    "path": "screenshots/desktop/ui-primitives-card--responsive-padding.png",
+    "title": "UI/Primitives/Card",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-card--sections",
+    "iframePath": "/iframe.html?id=ui-primitives-card--sections&viewMode=story",
+    "name": "Sections",
+    "path": "screenshots/desktop/ui-primitives-card--sections.png",
+    "title": "UI/Primitives/Card",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-card--semantic-elements",
+    "iframePath": "/iframe.html?id=ui-primitives-card--semantic-elements&viewMode=story",
+    "name": "Semantic Elements",
+    "path": "screenshots/desktop/ui-primitives-card--semantic-elements.png",
+    "title": "UI/Primitives/Card",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-card--surfaces",
+    "iframePath": "/iframe.html?id=ui-primitives-card--surfaces&viewMode=story",
+    "name": "Surfaces",
+    "path": "screenshots/desktop/ui-primitives-card--surfaces.png",
+    "title": "UI/Primitives/Card",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-divider--horizontal",
+    "iframePath": "/iframe.html?id=ui-primitives-divider--horizontal&viewMode=story",
+    "name": "Horizontal",
+    "path": "screenshots/desktop/ui-primitives-divider--horizontal.png",
+    "title": "UI/Primitives/Divider",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-divider--vertical",
+    "iframePath": "/iframe.html?id=ui-primitives-divider--vertical&viewMode=story",
+    "name": "Vertical",
+    "path": "screenshots/desktop/ui-primitives-divider--vertical.png",
+    "title": "UI/Primitives/Divider",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-hstack--alignment",
+    "iframePath": "/iframe.html?id=ui-primitives-hstack--alignment&viewMode=story",
+    "name": "Alignment",
+    "path": "screenshots/desktop/ui-primitives-hstack--alignment.png",
+    "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-hstack--justification",
+    "iframePath": "/iframe.html?id=ui-primitives-hstack--justification&viewMode=story",
+    "name": "Justification",
+    "path": "screenshots/desktop/ui-primitives-hstack--justification.png",
+    "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-hstack--responsive-spacing",
+    "iframePath": "/iframe.html?id=ui-primitives-hstack--responsive-spacing&viewMode=story",
+    "name": "Responsive Spacing",
+    "path": "screenshots/desktop/ui-primitives-hstack--responsive-spacing.png",
+    "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-hstack--semantic-elements",
+    "iframePath": "/iframe.html?id=ui-primitives-hstack--semantic-elements&viewMode=story",
+    "name": "Semantic Elements",
+    "path": "screenshots/desktop/ui-primitives-hstack--semantic-elements.png",
+    "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-hstack--spacing",
+    "iframePath": "/iframe.html?id=ui-primitives-hstack--spacing&viewMode=story",
+    "name": "Spacing",
+    "path": "screenshots/desktop/ui-primitives-hstack--spacing.png",
+    "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-hstack--wrapping",
+    "iframePath": "/iframe.html?id=ui-primitives-hstack--wrapping&viewMode=story",
+    "name": "Wrapping",
+    "path": "screenshots/desktop/ui-primitives-hstack--wrapping.png",
+    "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-spacer--horizontal-fill",
+    "iframePath": "/iframe.html?id=ui-primitives-spacer--horizontal-fill&viewMode=story",
+    "name": "Horizontal Fill",
+    "path": "screenshots/desktop/ui-primitives-spacer--horizontal-fill.png",
+    "title": "UI/Primitives/Spacer",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-spacer--multiple-spacers",
+    "iframePath": "/iframe.html?id=ui-primitives-spacer--multiple-spacers&viewMode=story",
+    "name": "Multiple Spacers",
+    "path": "screenshots/desktop/ui-primitives-spacer--multiple-spacers.png",
+    "title": "UI/Primitives/Spacer",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-spacer--vertical-fill",
+    "iframePath": "/iframe.html?id=ui-primitives-spacer--vertical-fill&viewMode=story",
+    "name": "Vertical Fill",
+    "path": "screenshots/desktop/ui-primitives-spacer--vertical-fill.png",
+    "title": "UI/Primitives/Spacer",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-stack--container-responsive",
+    "iframePath": "/iframe.html?id=ui-primitives-stack--container-responsive&viewMode=story",
+    "name": "Container Responsive",
+    "path": "screenshots/desktop/ui-primitives-stack--container-responsive.png",
+    "title": "UI/Primitives/Stack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-stack--directions",
+    "iframePath": "/iframe.html?id=ui-primitives-stack--directions&viewMode=story",
+    "name": "Directions",
+    "path": "screenshots/desktop/ui-primitives-stack--directions.png",
+    "title": "UI/Primitives/Stack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-stack--responsive-visibility",
+    "iframePath": "/iframe.html?id=ui-primitives-stack--responsive-visibility&viewMode=story",
+    "name": "Responsive Visibility",
+    "path": "screenshots/desktop/ui-primitives-stack--responsive-visibility.png",
+    "title": "UI/Primitives/Stack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-stack--responsive-wrapping",
+    "iframePath": "/iframe.html?id=ui-primitives-stack--responsive-wrapping&viewMode=story",
+    "name": "Responsive Wrapping",
+    "path": "screenshots/desktop/ui-primitives-stack--responsive-wrapping.png",
+    "title": "UI/Primitives/Stack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-text--presets",
+    "iframePath": "/iframe.html?id=ui-primitives-text--presets&viewMode=story",
+    "name": "Presets",
+    "path": "screenshots/desktop/ui-primitives-text--presets.png",
+    "title": "UI/Primitives/Text",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-text--text-overflow",
+    "iframePath": "/iframe.html?id=ui-primitives-text--text-overflow&viewMode=story",
+    "name": "Text Overflow",
+    "path": "screenshots/desktop/ui-primitives-text--text-overflow.png",
+    "title": "UI/Primitives/Text",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-vstack--alignment",
+    "iframePath": "/iframe.html?id=ui-primitives-vstack--alignment&viewMode=story",
+    "name": "Alignment",
+    "path": "screenshots/desktop/ui-primitives-vstack--alignment.png",
+    "title": "UI/Primitives/VStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-vstack--justification",
+    "iframePath": "/iframe.html?id=ui-primitives-vstack--justification&viewMode=story",
+    "name": "Justification",
+    "path": "screenshots/desktop/ui-primitives-vstack--justification.png",
+    "title": "UI/Primitives/VStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-vstack--responsive-spacing",
+    "iframePath": "/iframe.html?id=ui-primitives-vstack--responsive-spacing&viewMode=story",
+    "name": "Responsive Spacing",
+    "path": "screenshots/desktop/ui-primitives-vstack--responsive-spacing.png",
+    "title": "UI/Primitives/VStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-vstack--semantic-elements",
+    "iframePath": "/iframe.html?id=ui-primitives-vstack--semantic-elements&viewMode=story",
+    "name": "Semantic Elements",
+    "path": "screenshots/desktop/ui-primitives-vstack--semantic-elements.png",
+    "title": "UI/Primitives/VStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-vstack--spacing",
+    "iframePath": "/iframe.html?id=ui-primitives-vstack--spacing&viewMode=story",
+    "name": "Spacing",
+    "path": "screenshots/desktop/ui-primitives-vstack--spacing.png",
+    "title": "UI/Primitives/VStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  }
+]

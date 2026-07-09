@@ -9,7 +9,7 @@ import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryL
 const meta = {
   title: 'UI/Primitives/Divider',
   component: Divider,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Divider>;
 
 export default meta;

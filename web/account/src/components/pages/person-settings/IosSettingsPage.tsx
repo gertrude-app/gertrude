@@ -10,12 +10,17 @@ import PersonSettingsExpandableSection from '#/components/person-settings/Person
 import SettingsRow from '#/components/person-settings/SettingsRow';
 import { albumKey } from '#/components/utils';
 
+type IosSettingsSection = `blocker` | `music` | `podcasts`;
+
 interface Props {
   config?: PersonIosSettingsConfiguration;
   hasIosDevices: boolean;
   albumCatalog: AllowedAlbum[];
+  defaultExpandedSections?: IosSettingsSection[];
   patchConfig: (patch: Partial<PersonIosSettingsConfiguration>) => void;
 }
+
+const emptyDefaultExpandedSections: IosSettingsSection[] = [];
 
 const iosBlockGroups = [
   {
@@ -90,6 +95,7 @@ const IosSettingsPage: React.FC<Props> = ({
   config,
   hasIosDevices,
   albumCatalog,
+  defaultExpandedSections = emptyDefaultExpandedSections,
   patchConfig,
 }) => {
   const [addAlbumSlideOverOpen, setAddAlbumSlideOverOpen] = React.useState(false);
@@ -112,6 +118,7 @@ const IosSettingsPage: React.FC<Props> = ({
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/blocker.webp"
           title="Gertrude Blocker"
+          defaultExpanded={defaultExpandedSections.includes(`blocker`)}
           previewChips={[
             {
               title: `Blocked Groups`,
@@ -201,6 +208,7 @@ const IosSettingsPage: React.FC<Props> = ({
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/music.png"
           title="Gertrude Music"
+          defaultExpanded={defaultExpandedSections.includes(`music`)}
           previewChips={[
             {
               title: `Allowed Albums`,
@@ -276,6 +284,7 @@ const IosSettingsPage: React.FC<Props> = ({
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/am.webp"
           title="Gertrude Podcasts"
+          defaultExpanded={defaultExpandedSections.includes(`podcasts`)}
           previewChips={[]}
         >
           hi

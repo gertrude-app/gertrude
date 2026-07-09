@@ -106,9 +106,21 @@ export const Cards = {
   ),
 };
 
+export const OpenScheduleEditor = {
+  name: 'Open schedule editor',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <StoryCanvas innerClassName="max-w-md">
+      <StorySection title="Button trigger" contentClassName="pb-80">
+        <ScheduleButton schedule={weekdaySchedule} setSchedule={noop} defaultOpen />
+      </StorySection>
+    </StoryCanvas>
+  ),
+};
+
 export const AddBlockedDomain = {
   name: 'Add blocked domain modal',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
       <AddBlockedDomainModal open onOpenChange={noop} onAdd={noop} />
@@ -118,7 +130,7 @@ export const AddBlockedDomain = {
 
 export const AddKeychains = {
   name: 'Add keychains slide-over',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
       <AddKeychainSlideOver
@@ -135,7 +147,7 @@ export const AddKeychains = {
 
 export const AddMacApps = {
   name: 'Add Mac apps slide-over',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
       <AddMacAppSlideOver
@@ -143,8 +155,13 @@ export const AddMacApps = {
         type="blocked"
         personName="Jude"
         installedApps={installedMacApps}
-        blockedApps={[]}
-        unrestrictedApps={[]}
+        blockedApps={[
+          {
+            nameOrBundleId: installedMacApps[0]!.name,
+            appIconUrl: installedMacApps[0]!.appIconUrl,
+          },
+        ]}
+        unrestrictedApps={[{ nameOrBundleId: installedMacApps[1]!.name }]}
         onOpenChange={noop}
         onAdd={noop}
       />
@@ -154,7 +171,7 @@ export const AddMacApps = {
 
 export const AddAllowedAlbums = {
   name: 'Add allowed albums slide-over',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
       <AddAllowedAlbumsSlideOver

@@ -53,6 +53,34 @@ export const Sizes: Story = {
   ),
 };
 
+export const OpenForm: Story = {
+  name: 'Open form',
+  parameters: { ...galleryParameters, screenshotsAt: [`mobile`, `desktop`] },
+  render: () => (
+    <StoryCanvas>
+      <Modal
+        open
+        onOpenChange={() => undefined}
+        size="medium"
+        title="Grant custom duration"
+        description="Sally requested a 15 minute filter suspension. Choose a different duration before granting."
+        footer={
+          <>
+            <Button type="button" variant="ghost" onClick={() => undefined}>
+              Cancel
+            </Button>
+            <Button type="button" variant="primary" onClick={() => undefined}>
+              Grant duration
+            </Button>
+          </>
+        }
+      >
+        <ModalContent />
+      </Modal>
+    </StoryCanvas>
+  ),
+};
+
 type ModalTriggerButtonProps = {
   size: (typeof sizes)[number];
   title: string;

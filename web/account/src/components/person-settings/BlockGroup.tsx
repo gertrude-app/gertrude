@@ -9,6 +9,7 @@ interface Props {
   longExplanation: string;
   blocked: boolean;
   setBlocked: (blocked: boolean) => void;
+  defaultExpanded?: boolean;
 }
 
 const BlockGroup: React.FC<Props> = ({
@@ -17,8 +18,9 @@ const BlockGroup: React.FC<Props> = ({
   longExplanation,
   blocked,
   setBlocked,
+  defaultExpanded = false,
 }) => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(defaultExpanded);
 
   return (
     <VStack

@@ -31,6 +31,7 @@ import type {
 interface Props {
   domains: string[];
   keychainOptions: Array<{ id: string; name: string }>;
+  defaultExpandedDomains?: string[];
   onDenyAll: () => void;
   onSave: (keys: UnlockRequestKeyDraft[]) => void;
 }
@@ -49,6 +50,8 @@ const addressTypeOptions: Array<SelectOption<KeyAddressType>> = [
     icon: ShieldIcon,
   },
 ];
+
+const emptyDefaultExpandedDomains: string[] = [];
 
 const unlockedForOptions: Array<SelectOption<KeyScopeType>> = [
   {
@@ -74,6 +77,7 @@ export const defaultKeyFromDomain = (domain: string): UnlockKey => ({
 const UnlockRequestResponsePanel: React.FC<Props> = ({
   domains,
   keychainOptions,
+  defaultExpandedDomains = emptyDefaultExpandedDomains,
   onDenyAll,
   onSave,
 }) => {
@@ -83,7 +87,7 @@ const UnlockRequestResponsePanel: React.FC<Props> = ({
       id: domain,
       allowed: true,
       key: defaultKeyFromDomain(domain),
-      moreOptionsExpanded: false,
+      moreOptionsExpanded: defaultExpandedDomains.includes(domain),
       keychainId: defaultKeychainId,
     })),
   );
@@ -94,11 +98,11 @@ const UnlockRequestResponsePanel: React.FC<Props> = ({
         id: domain,
         allowed: true,
         key: defaultKeyFromDomain(domain),
-        moreOptionsExpanded: false,
+        moreOptionsExpanded: defaultExpandedDomains.includes(domain),
         keychainId: defaultKeychainId,
       })),
     );
-  }, [domains, defaultKeychainId]);
+  }, [domains, defaultExpandedDomains, defaultKeychainId]);
 
   const updateKeyAddressType = (domain: string, addressType: KeyAddressType): void => {
     setKeys((currentKeys) =>
@@ -284,7 +288,7 @@ const UnlockRequestResponsePanel: React.FC<Props> = ({
                           />
                           <DateTimePicker
                             date={keyDraft.key.expiration}
-                            notRequred
+                            notRequired
                             setDate={(date) => {
                               setKeys((currentKeys) =>
                                 currentKeys.map((currentKeyDraft) =>

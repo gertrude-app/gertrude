@@ -24,7 +24,11 @@ const meta = {
 
 export default meta;
 
-const MacSettingsStory: React.FC = () => {
+const MacSettingsStory: React.FC<{
+  defaultExpandedSections?: React.ComponentProps<
+    typeof MacSettingsPage
+  >[`defaultExpandedSections`];
+}> = ({ defaultExpandedSections }) => {
   const [config, setConfig] = React.useState<PersonMacSettingsConfiguration>(macSettings);
 
   return (
@@ -37,12 +41,17 @@ const MacSettingsStory: React.FC = () => {
       )}
       allKeychains={keychains}
       installedMacApps={installedMacApps}
+      defaultExpandedSections={defaultExpandedSections}
       patchConfig={(patch) => setConfig((current) => ({ ...current, ...patch }))}
     />
   );
 };
 
-const IosSettingsStory: React.FC = () => {
+const IosSettingsStory: React.FC<{
+  defaultExpandedSections?: React.ComponentProps<
+    typeof IosSettingsPage
+  >[`defaultExpandedSections`];
+}> = ({ defaultExpandedSections }) => {
   const [config, setConfig] = React.useState<PersonIosSettingsConfiguration>(iosSettings);
 
   return (
@@ -50,13 +59,14 @@ const IosSettingsStory: React.FC = () => {
       config={config}
       hasIosDevices
       albumCatalog={albums}
+      defaultExpandedSections={defaultExpandedSections}
       patchConfig={(patch) => setConfig((current) => ({ ...current, ...patch }))}
     />
   );
 };
 
 export const Basic = {
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryScreen>
       <PersonSettingsShellPage
@@ -83,7 +93,7 @@ export const Basic = {
 };
 
 export const Mac = {
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
       <MacSettingsStory />
@@ -93,10 +103,30 @@ export const Mac = {
 
 export const Ios = {
   name: 'iPhone and iPad',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
       <IosSettingsStory />
+    </StoryScreen>
+  ),
+};
+
+export const MacAllSectionsExpanded = {
+  name: 'Mac all sections expanded',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
+      <MacSettingsStory defaultExpandedSections={[`monitoring`, `filtering`, `apps`]} />
+    </StoryScreen>
+  ),
+};
+
+export const IosAllSectionsExpanded = {
+  name: 'iPhone and iPad all sections expanded',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
+      <IosSettingsStory defaultExpandedSections={[`blocker`, `music`, `podcasts`]} />
     </StoryScreen>
   ),
 };

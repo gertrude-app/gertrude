@@ -27,7 +27,7 @@ const meta = {
     small: { control: `boolean` },
     setChecked: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Toggle>;
 
 export default meta;

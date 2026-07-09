@@ -9,6 +9,9 @@ interface Props {
   searchable?: boolean;
   disabled?: boolean;
   contentClassName?: string;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 type FilterableChildProps = {
@@ -46,8 +49,12 @@ const DropdownMenu: React.FC<Props> = ({
   searchable,
   disabled,
   contentClassName = `w-60`,
+  open,
+  defaultOpen = false,
+  onOpenChange,
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
+  const menuOpen = open ?? internalOpen;
   const [searchQuery, setSearchQuery] = React.useState(``);
   const [activeIndex, setActiveIndex] = React.useState(-1);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -66,7 +73,7 @@ const DropdownMenu: React.FC<Props> = ({
   const triggerElement = React.isValidElement(trigger) ? trigger : undefined;
 
   React.useEffect(() => {
-    if (!open || !searchable) {
+    if (!menuOpen || !searchable) {
       return;
     }
 
@@ -75,7 +82,7 @@ const DropdownMenu: React.FC<Props> = ({
     });
 
     return () => window.cancelAnimationFrame(animationFrame);
-  }, [open, searchable]);
+  }, [menuOpen, searchable]);
 
   React.useEffect(() => {
     if (!searchable || visibleChildren.length === 0) {
@@ -124,22 +131,29 @@ const DropdownMenu: React.FC<Props> = ({
 
     activeMenuItem.click();
   };
+  const setMenuOpen = (nextOpen: boolean): void => {
+    if (open === undefined) {
+      setInternalOpen(nextOpen);
+    }
+
+    onOpenChange?.(nextOpen);
+
+    if (!nextOpen) {
+      setSearchQuery(``);
+      setActiveIndex(-1);
+    }
+  };
 
   return (
     <Menu.Root
-      open={open}
+      open={menuOpen}
       onOpenChange={(nextOpen) => {
         if (disabled) {
-          setOpen(false);
+          setMenuOpen(false);
           return;
         }
 
-        setOpen(nextOpen);
-
-        if (!nextOpen) {
-          setSearchQuery(``);
-          setActiveIndex(-1);
-        }
+        setMenuOpen(nextOpen);
       }}
       disabled={disabled}
       modal={false}

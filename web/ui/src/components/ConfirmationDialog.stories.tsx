@@ -110,6 +110,30 @@ export const ActionStates: Story = {
   ),
 };
 
+export const OpenDestructive: Story = {
+  name: 'Open destructive',
+  parameters: { ...galleryParameters, screenshotsAt: [`mobile`, `desktop`] },
+  render: () => (
+    <StoryCanvas>
+      <ConfirmationDialog
+        open
+        onOpenChange={() => undefined}
+        confirmationQuestion="Delete this keychain?"
+        description="This will remove the keychain from every child using it. This action cannot be undone."
+        actions={[
+          { text: `Cancel`, variant: `ghost` },
+          {
+            text: `Delete keychain`,
+            variant: `destructive`,
+            icon: Trash2Icon,
+            onClick: confirmAction,
+          },
+        ]}
+      />
+    </StoryCanvas>
+  ),
+};
+
 type ConfirmationTriggerProps = React.ComponentProps<typeof ConfirmationDialog> & {
   buttonText: string;
   buttonVariant?: React.ComponentProps<typeof Button>[`variant`];

@@ -12,7 +12,7 @@ const noop = (): void => {};
 
 const meta = {
   title: 'Account/Pages/Requests',
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['mobile', 'desktop'] },
 };
 
 export default meta;

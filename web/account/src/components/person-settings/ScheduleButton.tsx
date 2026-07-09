@@ -13,6 +13,7 @@ import {
 export type ScheduleButtonProps = {
   schedule?: Schedule;
   setSchedule: (schedule?: Schedule) => void;
+  defaultOpen?: boolean;
 };
 
 type DayKey = keyof Schedule[`days`];
@@ -148,9 +149,14 @@ export const ScheduleEditor: React.FC<ScheduleButtonProps> = ({
   );
 };
 
-const ScheduleButton: React.FC<ScheduleButtonProps> = ({ schedule, setSchedule }) => (
+const ScheduleButton: React.FC<ScheduleButtonProps> = ({
+  schedule,
+  setSchedule,
+  defaultOpen,
+}) => (
   <DropdownMenu
     contentClassName="w-82"
+    defaultOpen={defaultOpen}
     trigger={
       <Button type="button" onClick={() => {}} size="small" icon={ClockIcon}>
         {schedule ? `Schedule` : `No Schedule`}

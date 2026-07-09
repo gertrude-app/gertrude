@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/tanstack-react';
 import Button from './Button';
 import Input from './Input';
 import Toaster from './Toaster';
-import { toast } from '#/lib/toast';
+import { toast, toastManager } from '#/lib/toast';
 import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryLayout';
 
 const ToastControls: React.FC = () => {
@@ -59,6 +59,27 @@ const ToastControls: React.FC = () => {
   );
 };
 
+const ToastStack: React.FC = () => {
+  React.useEffect(() => {
+    toast.dismiss();
+
+    const ids = [
+      toast.success(`Settings saved`, { timeout: 600000 }),
+      toast.error(`Could not sync Jude’s Mac`, { timeout: 600000 }),
+      toast.info(`Profile update queued`, { timeout: 600000 }),
+      toastManager.add({
+        description: `Sending notification…`,
+        type: `loading`,
+        timeout: 600000,
+      }),
+    ];
+
+    return () => ids.forEach((id) => toast.dismiss(id));
+  }, []);
+
+  return <Toaster timeout={600000} limit={4} forceExpanded />;
+};
+
 const meta = {
   title: 'UI/Components/Toaster',
   component: Toaster,
@@ -79,6 +100,21 @@ export const Variants: Story = {
         <ToastControls />
       </StorySection>
       <Toaster />
+    </StoryCanvas>
+  ),
+};
+
+export const VisibleStack: Story = {
+  name: 'Visible stack',
+  parameters: { ...galleryParameters, screenshotsAt: [`mobile`, `desktop`] },
+  render: () => (
+    <StoryCanvas innerClassName="max-w-3xl">
+      <StorySection title="Toast stack" contentClassName="block">
+        <div className="rounded-2xl border border-dashed border-stone-300 bg-white/70 p-6 text-sm text-stone-500">
+          Toasts appear fixed in the viewport.
+        </div>
+      </StorySection>
+      <ToastStack />
     </StoryCanvas>
   ),
 };

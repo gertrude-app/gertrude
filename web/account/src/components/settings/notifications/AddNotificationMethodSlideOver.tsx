@@ -46,11 +46,23 @@ type MethodSelectOption = {
   icon: LucideIcon | React.ReactNode;
 };
 
+type DefaultState = Partial<{
+  methodType: NotificationMethodType;
+  flowState: FlowState;
+  emailAddress: string;
+  phoneNumber: string;
+  slackChannelName: string;
+  slackChannelId: string;
+  slackBotToken: string;
+  confirmationCode: string;
+}>;
+
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onComplete?: (draft: NotificationMethodDraft) => void | Promise<void>;
   defaultNtfyTopic?: string;
+  defaultState?: DefaultState;
 };
 
 const methodOptions = [
@@ -96,15 +108,30 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   onOpenChange,
   onComplete,
   defaultNtfyTopic = `gertrude-family-alerts-8k4tq9`,
+  defaultState,
 }) => {
-  const [methodType, setMethodType] = React.useState<NotificationMethodType>(`email`);
-  const [flowState, setFlowState] = React.useState<FlowState>(`compose`);
-  const [emailAddress, setEmailAddress] = React.useState(``);
-  const [phoneNumber, setPhoneNumber] = React.useState(``);
-  const [slackChannelName, setSlackChannelName] = React.useState(``);
-  const [slackChannelId, setSlackChannelId] = React.useState(``);
-  const [slackBotToken, setSlackBotToken] = React.useState(``);
-  const [confirmationCode, setConfirmationCode] = React.useState(``);
+  const [methodType, setMethodType] = React.useState<NotificationMethodType>(
+    defaultState?.methodType ?? `email`,
+  );
+  const [flowState, setFlowState] = React.useState<FlowState>(
+    defaultState?.flowState ?? `compose`,
+  );
+  const [emailAddress, setEmailAddress] = React.useState(
+    defaultState?.emailAddress ?? ``,
+  );
+  const [phoneNumber, setPhoneNumber] = React.useState(defaultState?.phoneNumber ?? ``);
+  const [slackChannelName, setSlackChannelName] = React.useState(
+    defaultState?.slackChannelName ?? ``,
+  );
+  const [slackChannelId, setSlackChannelId] = React.useState(
+    defaultState?.slackChannelId ?? ``,
+  );
+  const [slackBotToken, setSlackBotToken] = React.useState(
+    defaultState?.slackBotToken ?? ``,
+  );
+  const [confirmationCode, setConfirmationCode] = React.useState(
+    defaultState?.confirmationCode ?? ``,
+  );
   const [ntfyTopic, setNtfyTopic] = React.useState(defaultNtfyTopic);
   const [submitting, setSubmitting] = React.useState(false);
   const needsCode = [`email`, `text`, `slack`].includes(methodType);
@@ -121,14 +148,14 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   });
 
   const reset = (): void => {
-    setMethodType(`email`);
-    setFlowState(`compose`);
-    setEmailAddress(``);
-    setPhoneNumber(``);
-    setSlackChannelName(``);
-    setSlackChannelId(``);
-    setSlackBotToken(``);
-    setConfirmationCode(``);
+    setMethodType(defaultState?.methodType ?? `email`);
+    setFlowState(defaultState?.flowState ?? `compose`);
+    setEmailAddress(defaultState?.emailAddress ?? ``);
+    setPhoneNumber(defaultState?.phoneNumber ?? ``);
+    setSlackChannelName(defaultState?.slackChannelName ?? ``);
+    setSlackChannelId(defaultState?.slackChannelId ?? ``);
+    setSlackBotToken(defaultState?.slackBotToken ?? ``);
+    setConfirmationCode(defaultState?.confirmationCode ?? ``);
     setNtfyTopic(defaultNtfyTopic);
     setSubmitting(false);
   };

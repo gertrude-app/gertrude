@@ -4,7 +4,7 @@ import AuthedAppLayout from './AuthedAppLayout';
 const meta = {
   title: 'Account/Components/Layout/Authed App Layout',
   component: AuthedAppLayout,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['mobile', 'desktop'] },
 };
 
 export default meta;

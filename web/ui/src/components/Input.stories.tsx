@@ -43,7 +43,7 @@ const meta = {
     name: { control: false },
     setValue: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Input>;
 
 export default meta;

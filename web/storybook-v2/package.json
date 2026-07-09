@@ -6,7 +6,10 @@
   "scripts": {
     "start": "storybook dev --port ${PORT:-6007} --config-dir ./.storybook --ci --disable-telemetry",
     "build": "storybook build --config-dir ./.storybook --disable-telemetry",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "visual:update": "pnpm run build && node scripts/screenshot-stories.js && rm -rf storybook-static",
+    "visual:update:existing": "node scripts/screenshot-stories.js",
+    "playwright:install": "playwright install chromium"
   },
   "dependencies": {
     "@gertrude/ui": "workspace:*",
@@ -20,6 +23,7 @@
     "@types/node": "22.19.3",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "playwright": "1.61.1",
     "storybook": "10.4.6",
     "tailwindcss": "4.3.0",
     "typescript": "6.0.3",

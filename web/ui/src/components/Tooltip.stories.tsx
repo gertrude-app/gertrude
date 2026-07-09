@@ -90,7 +90,7 @@ export const Basic: Story = {
 };
 
 export const Placements: Story = {
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: [`desktop`] },
   render: () => (
     <StoryCanvas>
       <StorySection title="Placements" contentClassName="justify-center">

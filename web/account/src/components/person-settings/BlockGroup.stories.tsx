@@ -9,7 +9,7 @@ import BlockGroup from './BlockGroup';
 const meta = {
   title: 'Account/Components/Person Settings/Block Group',
   component: BlockGroup,
-  parameters: { layout: 'fullscreen' },
+  parameters: { layout: 'fullscreen', screenshotsAt: ['desktop'] },
 };
 
 export default meta;
@@ -33,6 +33,7 @@ const BlockGroupStory: React.FC = () => {
         longExplanation="Blocks Instagram, TikTok, X, Facebook, Snapchat, Threads, and Pinterest."
         blocked={socialMediaBlocked}
         setBlocked={setSocialMediaBlocked}
+        defaultExpanded
       />
     </div>
   );

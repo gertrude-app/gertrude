@@ -39,7 +39,7 @@ const meta = {
     possibleValues: { control: false },
     setSelected: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof RadioGroup>;
 
 export default meta;

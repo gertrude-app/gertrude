@@ -17,7 +17,7 @@ const justifies = [
 const meta = {
   title: 'UI/Primitives/HStack',
   component: HStack,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof HStack>;
 
 export default meta;

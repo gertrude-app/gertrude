@@ -33,7 +33,7 @@ const meta = {
     setChecked: { control: false },
     value: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;

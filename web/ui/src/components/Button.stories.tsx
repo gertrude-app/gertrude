@@ -27,7 +27,7 @@ const meta = {
     disabled: { control: `boolean` },
     onClick: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Button>;
 
 export default meta;

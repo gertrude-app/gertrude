@@ -119,17 +119,27 @@ const ToastMessage: React.FC<ToastMessageProps> = ({ title, description, version
   );
 };
 
-const Toaster: React.FC = () => (
-  <Toast.Provider toastManager={toastManager} timeout={5000} limit={3}>
+interface ToasterProps {
+  timeout?: number;
+  limit?: number;
+  forceExpanded?: boolean;
+}
+
+const Toaster: React.FC<ToasterProps> = ({
+  timeout = 5000,
+  limit = 3,
+  forceExpanded = false,
+}) => (
+  <Toast.Provider toastManager={toastManager} timeout={timeout} limit={limit}>
     <Toast.Portal>
       <Toast.Viewport className="fixed top-auto right-4 bottom-4 left-auto z-[80] w-[calc(100vw-2rem)] outline-none sm:right-6 sm:bottom-6 sm:w-96">
-        <ToastList />
+        <ToastList forceExpanded={forceExpanded} />
       </Toast.Viewport>
     </Toast.Portal>
   </Toast.Provider>
 );
 
-const ToastList: React.FC = () => {
+const ToastList: React.FC<{ forceExpanded: boolean }> = ({ forceExpanded }) => {
   const { toasts } = Toast.useToastManager();
 
   return toasts.map((toast) => {
@@ -144,10 +154,17 @@ const ToastList: React.FC = () => {
         swipeDirection="right"
         className={cx(
           stackClasses,
+          forceExpanded &&
+            `!h-[var(--toast-height)] ![transform:translateX(var(--toast-swipe-movement-x))_translateY(var(--offset-y))]`,
           `cursor-default rounded-xl border border-stone-200 bg-white text-stone-950 shadow-lg shadow-stone-950/10 outline-none focus-visible:ring-2 focus-visible:ring-stone-400/70`,
         )}
       >
-        <Toast.Content className="flex h-full items-center justify-between gap-3 overflow-hidden px-3 py-2.5 transition-opacity duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] data-behind:opacity-0 data-expanded:opacity-100">
+        <Toast.Content
+          className={cx(
+            `flex h-full items-center justify-between gap-3 overflow-hidden px-3 py-2.5 transition-opacity duration-[250ms] ease-[cubic-bezier(0.22,1,0.36,1)] data-behind:opacity-0 data-expanded:opacity-100`,
+            forceExpanded && `!opacity-100`,
+          )}
+        >
           <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
             <span
               aria-hidden={!isLoading}

@@ -77,7 +77,7 @@ const ClaimPodcastsDeviceScreen: React.FC<{
 };
 
 const meta = {
-  title: 'Dashboard/ClaimPodcastsDevice/Screens',  
+  title: 'Dashboard/ClaimPodcastsDevice/Screens',
   component: ClaimPodcastsDeviceScreen,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },

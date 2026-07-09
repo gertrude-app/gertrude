@@ -62,6 +62,9 @@ build-dash:
 build-admin:
   @pnpm exec nx run admin:build
 
+build-account:
+  @pnpm exec nx run account:build
+
 # ci/test type things
 
 cy-open:
@@ -89,6 +92,9 @@ visual-test:
 visual-test-reset:
   @git restore --source=HEAD --staged --worktree -- storybook/visual-tests/screenshots/argos
 
+update-ui-screenshots:
+  @pnpm --filter storybook-v2 visual:update
+
 og-export:
   @cd storybook/visual-tests && PUPPETEER_PRODUCT=chrome STORYBOOK_URL=http://localhost:${STORYBOOK_PORT:-6006} ../node_modules/.bin/ts-node --project tsconfig.json export-og-images.ts
 
@@ -113,7 +119,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test build-storybook build-site build-dash build-admin
+check: lint format-check typecheck test build-storybook build-site build-dash build-admin build-account
 
 sync-supervise-ui:
   #!/usr/bin/env bash

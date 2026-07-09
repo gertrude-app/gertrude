@@ -8,7 +8,7 @@ import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryL
 const meta = {
   title: 'UI/Primitives/Spacer',
   component: Spacer,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Spacer>;
 
 export default meta;

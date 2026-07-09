@@ -9,6 +9,7 @@ import CardContainer from '#/components/layout/CardContainer';
 import { chunkActivityBySuspension } from '#/lib/activity';
 
 interface Props {
+  personId: string;
   personName: string;
   items: ActivityItem[];
   showHeading?: boolean;
@@ -18,6 +19,7 @@ interface Props {
 }
 
 const ActivityPersonSection: React.FC<Props> = ({
+  personId,
   personName,
   items,
   showHeading = true,
@@ -26,7 +28,6 @@ const ActivityPersonSection: React.FC<Props> = ({
   onDeleteAll,
 }) => {
   const chunkedItems = chunkActivityBySuspension(items);
-  const personId = items[0]?.personId;
 
   return (
     <VStack gap={3}>
@@ -42,11 +43,7 @@ const ActivityPersonSection: React.FC<Props> = ({
         ))}
         {onDeleteAll && (
           <HStack justify="center">
-            <Button
-              type="button"
-              onClick={() => personId && onDeleteAll(personId)}
-              icon={TrashIcon}
-            >
+            <Button type="button" onClick={() => onDeleteAll(personId)} icon={TrashIcon}>
               Delete all {personName}'s activity
             </Button>
           </HStack>

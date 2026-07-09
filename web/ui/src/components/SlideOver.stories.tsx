@@ -105,6 +105,38 @@ export const HeadingOptions: Story = {
   ),
 };
 
+export const OpenPanel: Story = {
+  name: 'Open panel',
+  parameters: { ...galleryParameters, screenshotsAt: [`mobile`, `desktop`] },
+  render: () => (
+    <StoryCanvas>
+      <SlideOver
+        open
+        onOpenChange={() => undefined}
+        size="medium"
+        heading="Edit allowed site"
+        subheading="Changes apply the next time the child’s device syncs."
+        ariaLabel="Edit allowed site"
+        withPx
+      >
+        <div className="flex h-full flex-col">
+          <SlideOver.Body>
+            <SlideOverBody />
+          </SlideOver.Body>
+          <SlideOver.Footer bleedX>
+            <Button type="button" variant="ghost" onClick={() => undefined}>
+              Cancel
+            </Button>
+            <Button type="button" variant="primary" onClick={() => undefined}>
+              Save changes
+            </Button>
+          </SlideOver.Footer>
+        </div>
+      </SlideOver>
+    </StoryCanvas>
+  ),
+};
+
 type SlideOverTriggerProps = Omit<React.ComponentProps<typeof SlideOver>, `children`>;
 
 const SlideOverTrigger: React.FC<SlideOverTriggerProps> = (props) => {

@@ -6,7 +6,7 @@ const sizes = [`xsmall`, `small`, `medium`, `large`] as const;
 const meta = {
   title: 'UI/Components/LoadingDots',
   component: LoadingDots,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof LoadingDots>;
 
 export default meta;

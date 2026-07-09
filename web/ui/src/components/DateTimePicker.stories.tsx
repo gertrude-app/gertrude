@@ -4,22 +4,18 @@ import type { FC } from 'react';
 import DateTimePicker from './DateTimePicker';
 import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryLayout';
 
-const makeDate = (dayOffset: number, hour: number, minute: number): Date => {
-  const date = new Date();
+const fixedNow = new Date(2026, 6, 7, 12, 0, 0, 0);
 
-  date.setDate(date.getDate() + dayOffset);
-  date.setHours(hour, minute, 0, 0);
-
-  return date;
-};
+const makeDate = (day: number, hour: number, minute: number): Date =>
+  new Date(2026, 6, day, hour, minute, 0, 0);
 
 const DateTimePickerAssortment: FC = () => {
-  const [schoolStart, setSchoolStart] = React.useState(() => makeDate(7, 8, 30));
-  const [quietHours, setQuietHours] = React.useState(() => makeDate(1, 20, 0));
-  const [weekendReview, setWeekendReview] = React.useState(() => makeDate(4, 10, 15));
-  const [oneTimePass, setOneTimePass] = React.useState(() => makeDate(2, 16, 45));
-  const [pastOnly, setPastOnly] = React.useState(() => makeDate(-7, 8, 30));
-  const [futureOnly, setFutureOnly] = React.useState(() => makeDate(7, 8, 30));
+  const [schoolStart, setSchoolStart] = React.useState(() => makeDate(14, 8, 30));
+  const [quietHours, setQuietHours] = React.useState(() => makeDate(8, 20, 0));
+  const [weekendReview, setWeekendReview] = React.useState(() => makeDate(11, 10, 15));
+  const [oneTimePass, setOneTimePass] = React.useState(() => makeDate(9, 16, 45));
+  const [pastOnly, setPastOnly] = React.useState(() => makeDate(3, 8, 30));
+  const [futureOnly, setFutureOnly] = React.useState(() => makeDate(14, 8, 30));
   const [optional, setOptional] = React.useState<Date | undefined>();
 
   return (
@@ -28,20 +24,27 @@ const DateTimePickerAssortment: FC = () => {
         title="Common pickers"
         contentClassName="grid items-end gap-5 sm:grid-cols-2"
       >
-        <DateTimePicker label="Medium" date={schoolStart} setDate={setSchoolStart} />
+        <DateTimePicker
+          label="Medium"
+          date={schoolStart}
+          setDate={setSchoolStart}
+          now={fixedNow}
+        />
         <DateTimePicker
           label="Small"
           date={quietHours}
           setDate={setQuietHours}
           size="small"
+          now={fixedNow}
         />
         <DateTimePicker
           label="Left label"
-          labelPostiion="left"
+          labelPosition="left"
           date={weekendReview}
           setDate={setWeekendReview}
+          now={fixedNow}
         />
-        <DateTimePicker date={oneTimePass} setDate={setOneTimePass} />
+        <DateTimePicker date={oneTimePass} setDate={setOneTimePass} now={fixedNow} />
       </StorySection>
       <StorySection
         title="Date constraints"
@@ -52,18 +55,21 @@ const DateTimePickerAssortment: FC = () => {
           date={pastOnly}
           setDate={setPastOnly}
           allowFuture={false}
+          now={fixedNow}
         />
         <DateTimePicker
           label="Future only"
           date={futureOnly}
           setDate={setFutureOnly}
           allowPast={false}
+          now={fixedNow}
         />
         <DateTimePicker
           label="Optional"
           date={optional}
           setDate={setOptional}
-          notRequred
+          notRequired
+          now={fixedNow}
         />
       </StorySection>
     </StoryCanvas>
@@ -74,9 +80,16 @@ const meta = {
   title: 'UI/Components/DateTimePicker',
   component: DateTimePicker,
   args: {
-    date: makeDate(2, 16, 45),
+    date: makeDate(9, 16, 45),
     setDate: () => undefined,
-    notRequred: false,
+    notRequired: false,
+    now: fixedNow,
+  },
+  argTypes: {
+    now: { control: false },
+    open: { control: false },
+    defaultOpen: { control: false },
+    onOpenChange: { control: false },
   },
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof DateTimePicker>;
@@ -86,6 +99,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Assortment: Story = {
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: [`desktop`] },
   render: () => <DateTimePickerAssortment />,
+};
+
+export const OpenCalendar: Story = {
+  parameters: { ...galleryParameters, screenshotsAt: [`desktop`] },
+  render: () => (
+    <StoryCanvas innerClassName="max-w-xl">
+      <StorySection title="Open calendar" contentClassName="block pb-96">
+        <DateTimePicker
+          open
+          label="Expiration date"
+          date={makeDate(14, 8, 30)}
+          setDate={() => undefined}
+          now={fixedNow}
+        />
+      </StorySection>
+    </StoryCanvas>
+  ),
 };

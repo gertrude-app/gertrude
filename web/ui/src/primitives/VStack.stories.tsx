@@ -11,7 +11,7 @@ const justifies = [`start`, `center`, `end`, `between`] satisfies StackJustify[]
 const meta = {
   title: 'UI/Primitives/VStack',
   component: VStack,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof VStack>;
 
 export default meta;

@@ -34,7 +34,7 @@ const meta = {
     className: { control: false },
     icon: { control: false },
   },
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof EmptyState>;
 
 export default meta;

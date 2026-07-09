@@ -9,7 +9,7 @@ import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryL
 const meta = {
   title: 'UI/Primitives/Text',
   component: Text,
-  parameters: { layout: `fullscreen` },
+  parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Text>;
 
 export default meta;

@@ -3,7 +3,6 @@ import React from 'react';
 import type { ActivityItem } from '#/lib/activity';
 import ActivityPersonSection from '#/components/activity/ActivityPersonSection';
 import CardContainer from '#/components/layout/CardContainer';
-import { groupBy } from '#/lib/utils';
 
 interface Props {
   items: ActivityItem[];
@@ -13,6 +12,12 @@ interface Props {
   onDelete?: (id: string) => void;
   onDeletePersonActivity?: (personId: string) => void;
 }
+
+type ActivityItemGroup = {
+  personId: string;
+  personName: string;
+  items: ActivityItem[];
+};
 
 const ActivityFeed: React.FC<Props> = ({
   items,
@@ -34,17 +39,35 @@ const ActivityFeed: React.FC<Props> = ({
     );
   }
 
-  const itemGroups = personName
-    ? [[personName, visibleItems] as const]
-    : Array.from(groupBy(visibleItems, (item) => item.personName).entries());
+  const firstVisibleItem = visibleItems[0];
+  const groupsByPersonId = new Map<string, ActivityItemGroup>();
+
+  visibleItems.forEach((item) => {
+    const group = groupsByPersonId.get(item.personId);
+
+    if (group) {
+      group.items.push(item);
+    } else {
+      groupsByPersonId.set(item.personId, {
+        personId: item.personId,
+        personName: item.personName,
+        items: [item],
+      });
+    }
+  });
+
+  const itemGroups: ActivityItemGroup[] = personName
+    ? [{ personId: firstVisibleItem.personId, personName, items: visibleItems }]
+    : Array.from(groupsByPersonId.values());
 
   return (
     <VStack gap={16}>
-      {itemGroups.map(([groupPersonName, groupItems]) => (
+      {itemGroups.map((group) => (
         <ActivityPersonSection
-          key={groupPersonName}
-          personName={groupPersonName}
-          items={groupItems}
+          key={group.personId}
+          personId={group.personId}
+          personName={group.personName}
+          items={group.items}
           showHeading={personName ? showPersonHeading : true}
           onToggleFlag={onToggleFlag}
           onDelete={onDelete}

@@ -52,7 +52,7 @@ export const MethodsAndNotifications = {
 
 export const AddMethod = {
   name: 'Add method slide-over',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
       <AddNotificationMethodSlideOver open onOpenChange={noop} onComplete={noop} />
@@ -60,14 +60,49 @@ export const AddMethod = {
   ),
 };
 
+export const AddMethodVerification = {
+  name: 'Add method verification slide-over',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddNotificationMethodSlideOver
+        open
+        onOpenChange={noop}
+        onComplete={noop}
+        defaultState={{
+          methodType: `email`,
+          flowState: `codeSent`,
+          emailAddress: `parent@example.com`,
+          confirmationCode: `123456`,
+        }}
+      />
+    </StoryCanvas>
+  ),
+};
+
+export const AddMethodNtfySuccess = {
+  name: 'Add method ntfy success slide-over',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddNotificationMethodSlideOver
+        open
+        onOpenChange={noop}
+        onComplete={noop}
+        defaultState={{ methodType: `ntfy`, flowState: `ntfyCreated` }}
+      />
+    </StoryCanvas>
+  ),
+};
+
 export const EditNotification = {
   name: 'Edit notification slide-over',
-  parameters: galleryParameters,
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
       <NotificationEditorSlideOver
         open
-        notification={notifications[0]!}
+        notification={notifications[1]!}
         methods={notificationMethods}
         onOpenChange={noop}
         onSave={noop}
