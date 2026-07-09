@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+import plistlib
+import sys
+
+if len(sys.argv) != 4:
+  print(f"usage: {sys.argv[0]} <base.plist> <additions.plist> <out.plist>", file=sys.stderr)
+  sys.exit(1)
+
+base_path, additions_path, out_path = sys.argv[1:4]
+
+with open(base_path, "rb") as f:
+  merged = plistlib.load(f)
+with open(additions_path, "rb") as f:
+  additions = plistlib.load(f)
+
+clobbered = sorted(k for k in additions if k in merged)
+if clobbered:
+  print(f"error: {additions_path} overrides keys from {base_path}: {', '.join(clobbered)}", file=sys.stderr)
+  sys.exit(1)
+
+merged.update(additions)
+
+with open(out_path, "wb") as f:
+  plistlib.dump(merged, f, sort_keys=True)

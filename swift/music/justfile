@@ -15,6 +15,7 @@ gen local_api_endpoint="":
     GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM="${GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM:-WFN83LM943}" \
     GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER="${GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER:-com.netrivet.gertrude.music.dev}" \
     xcodegen -s project.yml
+  ../../scripts/derive-debug-plist app/Info.plist app/Info.Debug.additions.plist app/Info.Debug.plist
   xml-lint --fix app/Info.plist app/Info.Debug.plist
 
 xcode:

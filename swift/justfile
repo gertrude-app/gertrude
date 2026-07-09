@@ -194,8 +194,10 @@ xmlfiles := """
 ./macapp/Xcode/Gertrude/Gertrude.entitlements \
 ./macapp/Xcode/Gertrude/Info.plist \
 ./macapp/Xcode/GertrudeRelauncher/GertrudeRelauncher.entitlements \
+./music/app/Info.Debug.additions.plist \
 ./music/app/Info.Debug.plist \
 ./music/app/Info.plist \
+./podcasts/app/Info.Debug.additions.plist \
 ./podcasts/app/Info.Debug.plist \
 ./podcasts/app/Info.plist
 """
