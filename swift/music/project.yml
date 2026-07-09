@@ -18,12 +18,16 @@ targets:
     sources:
       - path: app/sources
         group: app
+      - path: app/Assets.xcassets
+        group: app
       - path: app/AppIcon.icon
         group: app
         buildPhase: resources
       - path: app/AppIconDev.icon
         group: app
         buildPhase: resources
+      - path: app/LaunchScreen.storyboard
+        group: app
     dependencies:
       - package: LibTCA
         product: LibTCA
@@ -59,6 +63,8 @@ targets:
         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleLocalizations:
+          - en
         API_ENDPOINT: $(API_ENDPOINT)
         NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved music.
         UISupportedInterfaceOrientations:
@@ -66,7 +72,7 @@ targets:
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
         UIRequiresFullScreen: true
-        UILaunchScreen: {}
+        UILaunchStoryboardName: LaunchScreen
         UIBackgroundModes:
           - audio
 schemes:

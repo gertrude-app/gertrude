@@ -42,7 +42,7 @@ public struct MusicSetupView: View {
   public var body: some View {
     switch self.state {
     case .checking:
-      LoadingScreenView(text: "Checking setup…")
+      MusicSetupSplashView()
 
     case .welcome:
       MusicSetupWelcomeView {

@@ -9,7 +9,6 @@ struct MusicSetupWelcomeView: View {
 
   let onPrimaryButtonTap: @MainActor @Sendable () -> Void
 
-  @State private var showBackground = false
   @State private var showLogo = false
   @State private var showTagline = false
   @State private var showPrimaryButton = false
@@ -17,7 +16,6 @@ struct MusicSetupWelcomeView: View {
   var body: some View {
     ZStack {
       MusicSetupWelcomeBackground()
-        .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
       GeometryReader { proxy in
@@ -60,9 +58,6 @@ struct MusicSetupWelcomeView: View {
       }
     }
     .onAppear {
-      withAnimation(.smooth(duration: 0.7)) {
-        self.showBackground = true
-      }
       withAnimation(.bouncy(duration: 0.75, extraBounce: 0.14).delay(0.12)) {
         self.showLogo = true
       }
@@ -81,6 +76,20 @@ struct MusicSetupWelcomeView: View {
     #else
       500
     #endif
+  }
+}
+
+struct MusicSetupSplashView: View {
+  var body: some View {
+    ZStack {
+      Image("MusicSplashGradient", bundle: Bundle.module)
+        .resizable()
+      Image("MusicSplashNote", bundle: Bundle.module)
+        .resizable()
+        .scaledToFit()
+        .frame(width: 144, height: 144)
+    }
+    .ignoresSafeArea()
   }
 }
 
