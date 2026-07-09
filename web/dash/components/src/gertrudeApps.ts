@@ -49,10 +49,6 @@ const CLAIM_FUNNEL_PATH_SEGMENT: Record<ClaimIntent, string> = {
   music: `claim-music-device`,
 };
 
-const LEGACY_PODCASTS_QUERY_KEY = `claimPendingAmDevice`;
-
-const LEGACY_PODCASTS_FUNNEL_PATH_SEGMENT = `claim-am-device`;
-
 export function claimFunnelPath(intent: ClaimIntent, claimCode: string): string {
   return `/${CLAIM_FUNNEL_PATH_SEGMENT[intent]}/${claimCode}/claim`;
 }
@@ -60,10 +56,7 @@ export function claimFunnelPath(intent: ClaimIntent, claimCode: string): string 
 export function detectClaimFunnelPath(
   pathname: string,
 ): { intent: ClaimIntent; claimCode: string } | null {
-  const entries: [ClaimIntent, string][] = [
-    ...(Object.entries(CLAIM_FUNNEL_PATH_SEGMENT) as [ClaimIntent, string][]),
-    [`podcasts`, LEGACY_PODCASTS_FUNNEL_PATH_SEGMENT],
-  ];
+  const entries = Object.entries(CLAIM_FUNNEL_PATH_SEGMENT) as [ClaimIntent, string][];
   for (const [intent, segment] of entries) {
     const match = pathname.match(new RegExp(`^/${segment}/(\\d+)(/|$)`));
     if (match?.[1]) {
@@ -76,10 +69,7 @@ export function detectClaimFunnelPath(
 export function detectClaimPending(
   params: URLSearchParams,
 ): { intent: ClaimIntent; claimCode: string } | null {
-  const entries: [ClaimIntent, string][] = [
-    ...(Object.entries(CLAIM_PENDING_QUERY_KEY) as [ClaimIntent, string][]),
-    [`podcasts`, LEGACY_PODCASTS_QUERY_KEY],
-  ];
+  const entries = Object.entries(CLAIM_PENDING_QUERY_KEY) as [ClaimIntent, string][];
   for (const [intent, key] of entries) {
     const claimCode = params.get(key);
     if (claimCode) {

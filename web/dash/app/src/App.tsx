@@ -98,11 +98,6 @@ const App: React.FC = () => {
           element={<ClaimPodcastsDeviceDone />}
         />
         <Route
-          path="claim-am-device/:code/claim"
-          element={<ClaimPodcastsDeviceClaim />}
-        />
-        <Route path="claim-am-device/:code/done" element={<ClaimPodcastsDeviceDone />} />
-        <Route
           path="claim-blocker-device/:code/claim"
           element={<ClaimBlockerDeviceClaim />}
         />
