@@ -14,7 +14,8 @@ struct AlbumDetailViewContainer: View {
         },
         transitionSourceID: self.store.transitionSourceID,
         isPlaying: self.store.isPlaying,
-        isLoading: self.store.isLoading,
+        isLoading: self.store.isLoading || self.store.isLoadingTracks,
+        isLoadingTracks: self.store.isLoadingTracks,
         currentTrackID: self.store.currentTrackID?.rawValue,
         onPlayTap: { self.store.send(.playTapped) },
         onTrackTap: { self.store.send(.trackTapped(.init($0))) },
@@ -35,5 +36,8 @@ struct AlbumDetailViewContainer: View {
       }
     }
     .animation(.snappy(duration: 0.22), value: self.store.playbackFailure)
+    .onAppear {
+      self.store.send(.onAppear)
+    }
   }
 }

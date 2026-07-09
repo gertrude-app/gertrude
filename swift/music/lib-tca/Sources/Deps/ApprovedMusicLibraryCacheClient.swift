@@ -42,7 +42,10 @@ extension DependencyValues {
 
 extension ApprovedMusicLibraryCacheClient {
   static func live(directory: URL) -> Self {
-    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(directory: directory)
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 2,
+    )
     return Self(
       _load: { childId in
         try await Task.detached(priority: .utility) {

@@ -43,13 +43,14 @@ struct ApprovedMusicLibraryCacheClientTests {
   }
 
   @Test
-  func returnsNilForUnsupportedCacheVersion() async throws {
-    let directory = try temporaryDirectory(named: "returnsNilForUnsupportedCacheVersion")
+  func returnsNilForLegacyCacheVersion() async throws {
+    let directory = try temporaryDirectory(named: "returnsNilForLegacyCacheVersion")
     defer { try? FileManager.default.removeItem(at: directory) }
-    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(directory: directory)
-    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    try Data(#"{"version":0,"value":{"albums":[]}}"#.utf8)
-      .write(to: diskCache.fileURL(childId: childId))
+    let legacyDiskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 1,
+    )
+    try legacyDiskCache.save(.mock, childId: childId)
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
 
     let loaded = try await cache.load(childId: childId)

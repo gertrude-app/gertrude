@@ -8,6 +8,7 @@ import PairQL
 struct ApprovedMusicClient: Sendable {
   var loadRemoteApprovedLibrary: @Sendable () async throws -> ApprovedMusicLibrary
   var loadCachedApprovedLibrary: @Sendable () async -> ApprovedMusicLibrary?
+  var loadAlbumTracks: @Sendable (_ albumID: ApprovedAlbum.ID) async throws -> [ApprovedTrack]
 }
 
 extension ApprovedMusicClient: DependencyKey {
@@ -35,6 +36,21 @@ extension ApprovedMusicClient: DependencyKey {
         guard let connection = keychain.loadConnection() else { return nil }
         return try? await cache.load(childId: connection.childId)
       },
+      loadAlbumTracks: { albumID in
+        @Dependency(\.api) var api
+        @Dependency(\.keychain) var keychain
+        guard let connection = keychain.loadConnection() else {
+          throw ApprovedMusicClientError.missingConnection
+        }
+        do {
+          return try await api.getApprovedMusicAlbumTracks(
+            connection.token,
+            albumID.rawValue,
+          ).map(ApprovedTrack.init)
+        } catch let error as PqlError where error.type == .paymentRequired {
+          throw ApprovedMusicClientError.subscriptionRequired
+        }
+      },
     )
   }
 }
@@ -51,29 +67,80 @@ extension ApprovedMusicClient {
     static let mock = Self(
       loadRemoteApprovedLibrary: { .mock },
       loadCachedApprovedLibrary: { .mock },
+      loadAlbumTracks: { albumID in ApprovedMusicLibrary.mock.album(id: albumID)?.tracks ?? [] },
     )
   #endif
 
   static let empty = Self(
     loadRemoteApprovedLibrary: { .empty },
     loadCachedApprovedLibrary: { .empty },
+    loadAlbumTracks: { _ in [] },
   )
 }
 
 private extension ApprovedMusicLibrary {
-  init(remote output: GetApprovedMusicLibrary.Output) {
-    self.init(albums: output.albums.map(ApprovedAlbum.init))
+  init(remote output: GetApprovedMusicLibrary_v2.Output) {
+    self.init(
+      albums: output.albums.map(ApprovedAlbum.init),
+      artists: output.artists.map(ApprovedArtist.init),
+    )
   }
 }
 
 private extension ApprovedAlbum {
-  init(remote album: GetApprovedMusicLibrary.Output.Album) {
+  init(remote album: GetApprovedMusicLibrary_v2.Output.Album) {
     self.init(
       id: .init(rawValue: album.id),
       title: album.title,
       artistName: album.artistName,
       artworkURL: album.artworkURL,
-      tracks: album.tracks.map(ApprovedTrack.init),
+    )
+  }
+}
+
+private extension ApprovedArtist {
+  init(remote artist: GetApprovedMusicLibrary_v2.Output.Artist) {
+    self.init(
+      id: .init(rawValue: artist.id),
+      name: artist.name,
+      catalogMetadata: artist.catalogMetadata.map(ApprovedMusicCatalogMetadata.init),
+    )
+  }
+}
+
+private extension ApprovedMusicCatalogMetadata {
+  init(remote metadata: MusicCatalogMetadata) {
+    self.init(
+      artwork: metadata.artwork.map(ApprovedMusicArtwork.init),
+      editorialNotes: metadata.editorialNotes.map(ApprovedMusicEditorialNotes.init),
+      appleMusicUrl: metadata.appleMusicUrl,
+      genreNames: metadata.genreNames,
+    )
+  }
+}
+
+private extension ApprovedMusicArtwork {
+  init(remote artwork: MusicArtwork) {
+    self.init(
+      url: artwork.url,
+      width: artwork.width,
+      height: artwork.height,
+      bgColor: artwork.bgColor,
+      textColor1: artwork.textColor1,
+      textColor2: artwork.textColor2,
+      textColor3: artwork.textColor3,
+      textColor4: artwork.textColor4,
+    )
+  }
+}
+
+private extension ApprovedMusicEditorialNotes {
+  init(remote notes: MusicEditorialNotes) {
+    self.init(
+      tagline: notes.tagline,
+      short: notes.short,
+      standard: notes.standard,
+      name: notes.name,
     )
   }
 }
@@ -89,7 +156,7 @@ private extension ApprovedTrack {
   }
 }
 
-private extension GetApprovedMusicLibrary.Output.Album {
+private extension GetApprovedMusicLibrary_v2.Output.Album {
   var artworkURL: URL? {
     guard let artworkUrl else { return nil }
     return URL(string: artworkUrl)

@@ -6,6 +6,7 @@ public struct AlbumDetailView: View {
   private let transitionSourceID: String?
   private let isPlaying: Bool
   private let isLoading: Bool
+  private let isLoadingTracks: Bool
   private let currentTrackID: String?
   private let onPlayTap: @MainActor @Sendable () -> Void
   private let onTrackTap: @MainActor @Sendable (String) -> Void
@@ -16,6 +17,7 @@ public struct AlbumDetailView: View {
     transitionSourceID: String? = nil,
     isPlaying: Bool = false,
     isLoading: Bool = false,
+    isLoadingTracks: Bool = false,
     currentTrackID: String? = nil,
     onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
     onTrackTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -24,6 +26,7 @@ public struct AlbumDetailView: View {
     self.transitionSourceID = transitionSourceID
     self.isPlaying = isPlaying
     self.isLoading = isLoading
+    self.isLoadingTracks = isLoadingTracks
     self.currentTrackID = currentTrackID
     self.onPlayTap = onPlayTap
     self.onTrackTap = onTrackTap
@@ -78,7 +81,7 @@ public struct AlbumDetailView: View {
           .frame(maxWidth: .infinity)
 
           if self.rows.isEmpty {
-            AlbumDetailEmptyTracksView()
+            AlbumDetailEmptyTracksView(isLoading: self.isLoadingTracks)
               .padding(.horizontal, 20)
           } else {
             VStack(spacing: 0) {
@@ -292,16 +295,24 @@ private struct AlbumDetailWaveformView: View {
 }
 
 private struct AlbumDetailEmptyTracksView: View {
+  let isLoading: Bool
+
   var body: some View {
-    Text("No tracks yet")
-      .font(.system(size: 15, weight: .semibold))
-      .foregroundStyle(.secondary)
-      .frame(maxWidth: .infinity)
-      .padding(24)
-      .background(
-        .primary.opacity(0.05),
-        in: .rect(cornerRadius: 24, style: .continuous),
-      )
+    VStack(spacing: 10) {
+      if self.isLoading {
+        ProgressView()
+      }
+
+      Text(self.isLoading ? "Loading tracks" : "No tracks yet")
+        .font(.system(size: 15, weight: .semibold))
+        .foregroundStyle(.secondary)
+    }
+    .frame(maxWidth: .infinity)
+    .padding(24)
+    .background(
+      .primary.opacity(0.05),
+      in: .rect(cornerRadius: 24, style: .continuous),
+    )
   }
 }
 
@@ -322,6 +333,17 @@ private struct AlbumDetailEmptyTracksView: View {
         tracks: .previewTracks,
         isPlaying: true,
         currentTrackID: [TrackData].previewTracks[2].id,
+      )
+    }
+  }
+
+  #Preview("Album detail loading tracks") {
+    NavigationStack {
+      AlbumDetailView(
+        album: [AlbumData].previewAlbums[0],
+        tracks: [],
+        isLoading: true,
+        isLoadingTracks: true,
       )
     }
   }
