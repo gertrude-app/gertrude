@@ -88,17 +88,17 @@ describe(`app-aware claim glue`, () => {
 });
 
 describe(`logged-out claim deep-link bounce`, () => {
-  it(`recovers a legacy AM claim deep-link via the api claim redirect (backwards compat)`, () => {
+  it(`recovers a podcasts claim deep-link via the api claim redirect`, () => {
     cy.intercept(`**/claim-pending-podcasts/778899`, {
       statusCode: 307,
       headers: {
-        location: `${Cypress.config().baseUrl}/signup?claimPendingAmDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2&redirect=${encodeURIComponent(
-          `/claim-am-device/778899/claim`,
+        location: `${Cypress.config().baseUrl}/signup?claimPendingPodcastsDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2&redirect=${encodeURIComponent(
+          `/claim-podcasts-device/778899/claim`,
         )}`,
       },
     });
 
-    cy.visit(`/claim-am-device/778899/claim`);
+    cy.visit(`/claim-podcasts-device/778899/claim`);
 
     cy.location(`pathname`).should(`eq`, `/signup`);
     cy.contains(`Signup to connect:`);
@@ -106,7 +106,7 @@ describe(`logged-out claim deep-link bounce`, () => {
     cy.contains(`Gertrude Podcasts`);
 
     cy.interceptPql(`Signup`, {});
-    cy.get(`input[name=email]`).type(`am-claim@example.com`);
+    cy.get(`input[name=email]`).type(`podcasts-claim@example.com`);
     cy.get(`input[name=password]`).type(`bobbobbob{enter}`);
 
     cy.wait(`@Signup`) // claim context must reach the signup payload
@@ -143,7 +143,7 @@ describe(`logged-out claim deep-link bounce`, () => {
 });
 
 describe(`verify-signup-email post-verify routing`, () => {
-  it(`continues to the AM funnel through the referral survey when a redirect param is present`, () => {
+  it(`continues to the podcasts funnel through the referral survey when a redirect param is present`, () => {
     cy.interceptPql(`VerifySignupEmail`, { adminId: `admin-123`, token: `token-123` });
     cy.interceptPql(`GetAmClaimData`, {
       children: [],
@@ -154,14 +154,14 @@ describe(`verify-signup-email post-verify routing`, () => {
 
     cy.visit(
       `/verify-signup-email/verify-token-123?redirect=${encodeURIComponent(
-        `/claim-am-device/778899/claim`,
+        `/claim-podcasts-device/778899/claim`,
       )}`,
     );
 
     cy.wait(`@VerifySignupEmail`);
     cy.location(`pathname`).should(`eq`, `/referral-survey`);
     cy.contains(`Skip`).click();
-    cy.location(`pathname`).should(`eq`, `/claim-am-device/778899/claim`);
+    cy.location(`pathname`).should(`eq`, `/claim-podcasts-device/778899/claim`);
   });
 
   it(`routes to the Music funnel through the referral survey when a redirect param is present`, () => {

@@ -14,14 +14,6 @@ describe(`detectClaimPending()`, () => {
     });
   });
 
-  it(`still maps the legacy claimPendingAmDevice param to podcasts`, () => {
-    const params = new URLSearchParams(`claimPendingAmDevice=778899`); // backwards compat
-    expect(detectClaimPending(params)).toEqual({
-      intent: `podcasts`,
-      claimCode: `778899`,
-    });
-  });
-
   it(`maps claimPendingSupervision to the blockerSupervise intent`, () => {
     const params = new URLSearchParams(`claimPendingSupervision=123456`);
     expect(detectClaimPending(params)).toEqual({
@@ -79,14 +71,6 @@ describe(`claimFunnelPath()`, () => {
 describe(`detectClaimFunnelPath()`, () => {
   it(`maps a claim-podcasts-device path to the podcasts intent`, () => {
     expect(detectClaimFunnelPath(`/claim-podcasts-device/778899/claim`)).toEqual({
-      intent: `podcasts`,
-      claimCode: `778899`,
-    });
-  });
-
-  it(`still maps the legacy claim-am-device path to the podcasts intent`, () => {
-    expect(detectClaimFunnelPath(`/claim-am-device/778899/claim`)).toEqual({
-      // backwards compat
       intent: `podcasts`,
       claimCode: `778899`,
     });
