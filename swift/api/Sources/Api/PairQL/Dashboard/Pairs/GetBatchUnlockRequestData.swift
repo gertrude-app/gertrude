@@ -36,7 +36,7 @@ extension GetBatchUnlockRequestData: Resolver {
     let computerUsers = try await child.computerUsers(in: context.db)
     let allRequests = try await UnlockRequest.query()
       .where(.computerUserId |=| computerUsers.map { .id($0) })
-      .where(.status == .enum(RequestStatus.pending))
+      .where(.status == RequestStatus.pending)
       .all(in: context.db)
 
     var keychains = try await child.keychains(in: context.db)

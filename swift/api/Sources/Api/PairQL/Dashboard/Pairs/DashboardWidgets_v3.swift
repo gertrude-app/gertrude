@@ -135,7 +135,7 @@ extension DashboardWidgets_v3: NoInputResolver {
     )
     async let unlockRequests = Api.UnlockRequest.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
-      .where(.status == .enum(RequestStatus.pending))
+      .where(.status == RequestStatus.pending)
       .all(in: context.db)
     async let keystrokes = KeystrokeLine.query()
       .where(.computerUserId |=| computerUsers.map(\.id))

@@ -52,9 +52,7 @@ struct Thing: Codable {
 
 // extensions
 
-extension Thing.CustomEnum: PostgresEnum {
-  var typeName: String { "custom_enums" }
-}
+extension Thing.CustomEnum: PostgresRawBindable {}
 
 extension Thing {
   var insertValues: [ColumnName: Postgres.Data] {
@@ -66,8 +64,8 @@ extension Thing {
       .bool: .bool(self.bool),
       .optionalInt: .int(self.optionalInt),
       .optionalString: .string(self.optionalString),
-      .customEnum: .enum(self.customEnum),
-      .optionalCustomEnum: .enum(self.optionalCustomEnum),
+      .customEnum: .string(self.customEnum.rawValue),
+      .optionalCustomEnum: .string(self.optionalCustomEnum?.rawValue),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]

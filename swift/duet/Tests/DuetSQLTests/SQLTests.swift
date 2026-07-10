@@ -21,12 +21,12 @@ final class SqlTests: XCTestCase {
     expect(uuid.postgresData).toEqual(.uuid(uuid))
     let tagged = Thing.Id(uuid)
     expect(tagged.postgresData).toEqual(.uuid(uuid))
-    expect(Thing.CustomEnum.foo.postgresData).toEqual(.enum(Thing.CustomEnum.foo))
+    expect(Thing.CustomEnum.foo.postgresData).toEqual(.string("foo"))
     // optionals preserve the typed nil of their wrapped type
     expect(Int?.none.postgresData).toEqual(.int(nil))
     expect(String?.none.postgresData).toEqual(.string(nil))
     expect(Thing.Id?.none.postgresData).toEqual(.uuid(nil))
-    expect(Thing.CustomEnum?.none.postgresData).toEqual(.enum(nil))
+    expect(Thing.CustomEnum?.none.postgresData).toEqual(.string(nil))
     expect(Data?.none.postgresData).toEqual(.bytea(nil))
     expect(Int?.some(5).postgresData).toEqual(.int(5))
   }
@@ -559,11 +559,11 @@ final class SqlTests: XCTestCase {
     expect(client.stmt.params).toEqual([
       .int(nil),
       .currentTimestamp,
-      .enum(Thing.CustomEnum.bar),
+      .string("bar"),
       .date(nil),
       .id(thing),
       .string("foo"),
-      .enum(nil),
+      .string(nil),
       .currentTimestamp,
     ])
   }
@@ -623,10 +623,10 @@ final class SqlTests: XCTestCase {
     expect(client.stmt.params).toEqual([
       .bool(false),
       .currentTimestamp,
-      .enum(Thing.CustomEnum.foo),
+      .string("foo"),
       .id(thing),
       .int(3),
-      .enum(nil),
+      .string(nil),
       .int(4),
       .string(nil),
       .string("string"),
@@ -643,24 +643,6 @@ final class SqlTests: XCTestCase {
     sql.serialize(to: &serializer)
     expect(serializer.sql).toContain("NULL")
     expect(serializer.sql).not.toContain("$1")
-  }
-
-  func testNilEnumSerializesToNull() async throws {
-    let thing = Thing(
-      customEnum: .bar,
-      optionalCustomEnum: nil,
-    )
-
-    let client = TestClient()
-    _ = try await client.create([thing])
-
-    let sql = client.stmt.sql
-    var serializer = SQLSerializer(database: TestDatabase())
-    sql.serialize(to: &serializer)
-    let sqlString = serializer.sql
-
-    expect(sqlString).toContain("'bar'::custom_enums")
-    expect(sqlString).toContain(", NULL,")
   }
 
   func testByteaSerializesToDecode() async throws {
@@ -689,24 +671,6 @@ final class SqlTests: XCTestCase {
     let sqlString = serializer.sql
 
     expect(sqlString).toContain(", NULL,")
-  }
-
-  func testNonNilEnumSerializesToTypedValue() async throws {
-    let thing = Thing(
-      customEnum: .foo,
-      optionalCustomEnum: .bar,
-    )
-
-    let client = TestClient()
-    _ = try await client.create([thing])
-
-    let sql = client.stmt.sql
-    var serializer = SQLSerializer(database: TestDatabase())
-    sql.serialize(to: &serializer)
-    let sqlString = serializer.sql
-
-    expect(sqlString).toContain("'foo'::custom_enums")
-    expect(sqlString).toContain("'bar'::custom_enums")
   }
 }
 

@@ -32,13 +32,9 @@ extension DashAnnouncement.Action: PostgresJsonable {}
 
 extension BrowserMatch: @retroactive PostgresJsonable {}
 
-extension RequestStatus: @retroactive PostgresEnum {
-  public var typeName: String { "enum_shared_request_status" }
-}
+extension RequestStatus: @retroactive PostgresRawBindable {}
 
-extension StripeSubscription.Tier: PostgresEnum {
-  public var typeName: String { "parent.subscription_tier" }
-}
+extension StripeSubscription.Tier: PostgresRawBindable {}
 
 protocol HasOptionalDeletedAt {
   var deletedAt: Date? { get set }
@@ -82,6 +78,4 @@ extension MusicApp.Token {
 
 extension Parent.Notification.Trigger: PostgresRawBindable {}
 
-extension ReleaseChannel: @retroactive PostgresEnum {
-  public var typeName: String { "enum_release_channels" }
-}
+extension ReleaseChannel: @retroactive PostgresRawBindable {}

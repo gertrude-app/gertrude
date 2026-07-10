@@ -13,10 +13,6 @@ public enum ColumnType {
   case custom(String)
   case timestampWithTimezone
 
-  static func `enum`<T: PostgresEnum & CaseIterable>(_: T.Type) -> ColumnType {
-    .custom(T.typeName)
-  }
-
   var sql: String {
     switch self {
     case .text: "text"
@@ -38,7 +34,6 @@ struct Column {
     case boolean(Bool)
     case text(String)
     case int(Int)
-    case enumValue(PostgresEnum)
     case uuid(UUID)
     case currentTimestamp
 
@@ -52,8 +47,6 @@ struct Column {
         "\(value)"
       case .uuid(let value):
         "'\(value)'"
-      case .enumValue(let value):
-        "'\(value.rawValue)'::\(value.typeName)"
       case .currentTimestamp:
         "CURRENT_TIMESTAMP"
       }

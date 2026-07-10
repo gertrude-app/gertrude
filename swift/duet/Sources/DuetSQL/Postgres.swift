@@ -15,25 +15,6 @@ public extension PostgresRawBindable {
   static var nilPostgresData: Postgres.Data { RawValue.nilPostgresData }
 }
 
-public protocol PostgresEnum: Sendable, PostgresBindable {
-  var typeName: String { get }
-  var rawValue: String { get }
-}
-
-public extension PostgresEnum {
-  var postgresData: Postgres.Data { .enum(self) }
-  static var nilPostgresData: Postgres.Data { .enum(nil) }
-}
-
-public extension PostgresEnum where Self: CaseIterable {
-  static var typeName: String {
-    guard let first = allCases.first else {
-      fatalError("PostgresEnum \(Self.self) has no cases")
-    }
-    return first.typeName
-  }
-}
-
 public protocol PostgresJsonable: Codable, PostgresBindable {}
 
 public extension PostgresJsonable {
@@ -65,7 +46,6 @@ public enum Postgres {
     case uuid(UUIDStringable?)
     case bool(Bool?)
     case date(Date?)
-    case `enum`(PostgresEnum?)
     case json(String?)
     case bytea(Foundation.Data?)
     case null
@@ -84,8 +64,6 @@ public extension Postgres.Data {
       return date
     case .double(let double):
       return double
-    case .enum(let enumVal):
-      return enumVal?.rawValue
     case .float(let float):
       return float
     case .id(let model):
@@ -135,8 +113,6 @@ extension Postgres.Data: Equatable {
       lhsVal == rhsVal
     case (.date(let lhsVal), .date(let rhsVal)):
       lhsVal == rhsVal
-    case (.enum(let lhsVal), .enum(let rhsVal)):
-      lhsVal?.rawValue == rhsVal?.rawValue
     case (.bytea(let lhsVal), .bytea(let rhsVal)):
       lhsVal == rhsVal
     case (.null, .null):

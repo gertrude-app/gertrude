@@ -17,7 +17,6 @@ enum DuetSqlExpression: SQLExpression {
   case date(Date)
   case currentTimestamp
   case null
-  case customEnum(String, String)
   case jsonb(String)
   case bytea(String)
 
@@ -29,8 +28,6 @@ enum DuetSqlExpression: SQLExpression {
       serializer.write("'\(date)'::timestamptz")
     case .jsonb(let json):
       serializer.write("'\(json)'::jsonb")
-    case .customEnum(let typeName, let value):
-      serializer.write("'\(value)'::\(typeName)")
     case .bytea(let base64):
       serializer.write("decode('\(base64)', 'base64')")
     case .currentTimestamp:
