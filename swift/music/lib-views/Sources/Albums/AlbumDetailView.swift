@@ -72,17 +72,35 @@ public struct AlbumDetailView: View {
             AlbumDetailPlayButton(
               isPlaying: self.isPlaying,
               isLoading: self.isLoading,
-              artworkUrl: self.album.artworkUrl,
+              palette: self.album.artworkPalette,
               onTap: self.onPlayTap,
             )
             .padding(.horizontal, 20)
             .padding(.top, 4)
           }
           .frame(maxWidth: .infinity)
+          .padding(.top, proxy.frame(in: .global).minY + 18)
+          .padding(.bottom, 24)
+          .background {
+            if let backgroundColor = self.album.artworkPalette?
+              .backgroundColor {
+              LinearGradient(
+                colors: [
+                  .clear,
+                  backgroundColor.opacity(0.3),
+                ],
+                startPoint: .top,
+                endPoint: .bottom,
+              )
+              .ignoresSafeArea(edges: .top)
+            }
+          }
 
           if self.rows.isEmpty {
-            AlbumDetailEmptyTracksView(isLoading: self.isLoadingTracks)
-              .padding(.horizontal, 20)
+            AlbumDetailEmptyTracksView(
+              isLoading: self.isLoadingTracks,
+            )
+            .padding(.horizontal, 20)
           } else {
             VStack(spacing: 0) {
               ForEach(self.rows) { row in
@@ -92,6 +110,7 @@ public struct AlbumDetailView: View {
                     == self.currentTrackID,
                   isPlaying: self.isPlaying
                     && row.track.id == self.currentTrackID,
+                  palette: self.album.artworkPalette,
                 ) {
                   self.onTrackTap(row.track.id)
                 }
@@ -99,12 +118,13 @@ public struct AlbumDetailView: View {
             }
           }
         }
-        .padding(.top, 18)
         .padding(.bottom, 112)
       }
       .background(.background)
+      .ignoresSafeArea(edges: .top)
     }
     .navigationTitle("")
+    .albumDetailNavigationBarBackground()
   }
 
   private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
@@ -118,69 +138,83 @@ public struct AlbumDetailView: View {
   }
 }
 
+private extension View {
+  @ViewBuilder
+  func albumDetailNavigationBarBackground() -> some View {
+    #if os(iOS)
+      self.toolbarBackground(.hidden, for: .navigationBar)
+    #else
+      self
+    #endif
+  }
+}
+
 private struct AlbumDetailPlayButton: View {
+  @Environment(\.self) private var environment
+
   let isPlaying: Bool
   let isLoading: Bool
-  let artworkUrl: URL?
+  let palette: ArtworkPalette?
   let onTap: @MainActor @Sendable () -> Void
 
   var body: some View {
-    Button(action: self.onTap) {
-      ZStack {
-        if let artworkUrl = self.artworkUrl {
-          GeometryReader { proxy in
-            CachedArtworkImageView(
-              url: artworkUrl,
-            ) { image in
-              image
-                .resizable()
-                .scaledToFill()
-                .frame(
-                  width: proxy.size.width * 1.35,
-                )
-                .position(
-                  x: proxy.size.width / 2,
-                  y: proxy.size.height / 2,
-                )
-                .blur(radius: 50)
-                .opacity(0.85)
-            } placeholder: {
-              Color.clear
-            }
-          }
-          .frame(height: 52)
-        }
-        HStack(spacing: 8) {
-          if self.isLoading {
-            ProgressView()
-              .controlSize(.small)
-              .tint(.white)
-          } else {
-            Image(
-              systemName: self.isPlaying
-                ? "pause.fill" : "play.fill",
-            )
-          }
+    let colors = self.colors
 
-          Text(self.title)
+    Button(action: self.onTap) {
+      HStack(spacing: 8) {
+        if self.isLoading {
+          ProgressView()
+            .controlSize(.small)
+            .tint(colors.foreground)
+        } else {
+          Image(
+            systemName: self.isPlaying
+              ? "pause.fill" : "play.fill",
+          )
         }
+
+        Text(self.title)
       }
       .font(.system(size: 17, weight: .bold, design: .rounded))
       .frame(maxWidth: .infinity)
       .frame(height: 52)
-      .foregroundStyle(.white)
-      .background(.black, in: Capsule())
-      .clipShape(Capsule())
+      .foregroundStyle(colors.foreground)
+      .background(colors.background, in: Capsule())
       .contentShape(Capsule())
     }
     .buttonStyle(.plain)
     .disabled(self.isLoading)
   }
 
+  private var colors: AlbumDetailPlayButtonColors {
+    guard let paletteColors = self.palette?.orderedColors(in: self.environment) else {
+      return self.environment.colorScheme == .dark
+        ? AlbumDetailPlayButtonColors(background: .white, foreground: .black)
+        : AlbumDetailPlayButtonColors(background: .black, foreground: .white)
+    }
+
+    if self.environment.colorScheme == .dark {
+      return AlbumDetailPlayButtonColors(
+        background: paletteColors.lighter,
+        foreground: paletteColors.darker,
+      )
+    }
+
+    return AlbumDetailPlayButtonColors(
+      background: paletteColors.darker,
+      foreground: paletteColors.lighter,
+    )
+  }
+
   private var title: String {
     if self.isLoading { return "Loading" }
     return self.isPlaying ? "Playing" : "Play"
   }
+}
+
+private struct AlbumDetailPlayButtonColors {
+  let background: Color
+  let foreground: Color
 }
 
 private struct AlbumDetailTrackRow: Identifiable, Equatable {
@@ -191,17 +225,25 @@ private struct AlbumDetailTrackRow: Identifiable, Equatable {
 }
 
 private struct AlbumDetailTrackRowView: View {
+  @Environment(\.self) private var environment
+
   let row: AlbumDetailTrackRow
   let isCurrent: Bool
   let isPlaying: Bool
+  let palette: ArtworkPalette?
   let onTap: @MainActor @Sendable () -> Void
 
   var body: some View {
+    let currentTrackStyle = self.currentTrackStyle
+
     Button(action: self.onTap) {
       HStack(spacing: 12) {
         Group {
           if self.isCurrent {
-            AlbumDetailWaveformView(isPlaying: self.isPlaying)
+            AlbumDetailWaveformView(
+              isPlaying: self.isPlaying,
+              color: currentTrackStyle.text,
+            )
           } else {
             Text(self.row.number, format: .number)
               .font(
@@ -222,13 +264,16 @@ private struct AlbumDetailTrackRowView: View {
             .font(.system(size: 16, weight: .semibold))
             .foregroundStyle(
               self.isCurrent
-                ? Color.gertrudeBrandAccent : .primary,
+                ? currentTrackStyle.text : .primary,
             )
             .lineLimit(2)
 
           Text(self.row.track.artist)
             .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(
+              self.isCurrent
+                ? currentTrackStyle.secondaryText : .secondary,
+            )
             .lineLimit(1)
         }
 
@@ -239,7 +284,7 @@ private struct AlbumDetailTrackRowView: View {
       .background {
         if self.isCurrent {
           RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(Color.gertrudeBrandAccent.opacity(0.10))
+            .fill(currentTrackStyle.background)
             .padding(.horizontal, 10)
         }
       }
@@ -251,6 +296,27 @@ private struct AlbumDetailTrackRowView: View {
     )
   }
 
+  private var currentTrackStyle: AlbumDetailCurrentTrackStyle {
+    guard let paletteColors = self.palette?.orderedColors(in: self.environment) else {
+      return AlbumDetailCurrentTrackStyle(
+        background: Color.gertrudeBrandAccent.opacity(0.10),
+        text: .gertrudeBrandAccent,
+        secondaryText: .secondary,
+      )
+    }
+
+    let highlightColor = self.environment.colorScheme == .dark
+      ? paletteColors.darker : paletteColors.lighter
+    let foregroundColor = self.environment.colorScheme == .dark
+      ? paletteColors.lighter : paletteColors.darker
+
+    return AlbumDetailCurrentTrackStyle(
+      background: highlightColor.opacity(0.5),
+      text: foregroundColor,
+      secondaryText: foregroundColor.opacity(0.65),
+    )
+  }
+
   private var accessibilityPlaybackPrefix: String {
     if self.isPlaying { return "Playing, " }
     if self.isCurrent { return "Paused, " }
@@ -258,8 +324,15 @@ private struct AlbumDetailTrackRowView: View {
   }
 }
 
+private struct AlbumDetailCurrentTrackStyle {
+  let background: Color
+  let text: Color
+  let secondaryText: Color
+}
+
 private struct AlbumDetailWaveformView: View {
   let isPlaying: Bool
+  let color: Color
 
   var body: some View {
     if self.isPlaying {
@@ -275,7 +348,7 @@ private struct AlbumDetailWaveformView: View {
     HStack(alignment: .center, spacing: 2) {
       ForEach(0 ..< 4, id: \.self) { index in
         RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-          .fill(Color.gertrudeBrandAccent)
+          .fill(self.color)
           .frame(
             width: 3,
             height: self.barHeight(index: index, date: date),

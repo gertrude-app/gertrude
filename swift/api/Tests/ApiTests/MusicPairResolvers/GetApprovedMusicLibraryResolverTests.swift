@@ -166,7 +166,124 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     ))
 
     let output = try await withDependencies {
+      $0.appleMusic.albums = { lookup in
+        expect(lookup.albumIds.map(\.rawValue)).toEqual(["1440935467", "1733742320"])
+        return mockExplicitAlbums(for: lookup)
+      }
       $0.appleMusic.artistAlbums = { lookup in mockArtistAlbums(for: lookup) }
+      $0.appleMusic.artistTopSongs = { lookup in mockArtistTopSongs(for: lookup) }
+    } operation: {
+      try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
+    }
+
+    expect(output).toEqual(.init(
+      albums: [
+        .init(
+          id: "1440935467",
+          title: "Stories from the Outside",
+          artistName: "Lena Jonsson Trio",
+          artworkUrl: "https://example.com/stories.jpg",
+          artwork: mockAlbumOutputArtwork(url: "https://example.com/stories/{w}x{h}bb.jpg"),
+          trackCount: 12,
+          showsArtwork: true,
+        ),
+        .init(
+          id: "1733742320",
+          title: "Elements",
+          artistName: "Lena Jonsson Trio",
+          artworkUrl: "https://example.com/elements.jpg",
+          artwork: mockAlbumOutputArtwork(url: "https://example.com/elements/{w}x{h}bb.jpg"),
+          trackCount: 12,
+          releaseDate: "2024-04-12",
+          releaseType: "Album",
+          showsArtwork: false,
+        ),
+        .init(
+          id: "2250000001",
+          title: "Artist Grant Release",
+          artistName: "Lena Jonsson Trio",
+          artworkUrl: "https://example.com/artist-release.jpg",
+          artwork: .init(
+            url: "https://example.com/artist-release/{w}x{h}bb.jpg",
+            width: 1200,
+            height: 1200,
+            bgColor: "102030",
+            textColor1: "ffffff",
+            textColor2: "eeeeee",
+            textColor3: "dddddd",
+            textColor4: "cccccc",
+          ),
+          trackCount: 8,
+          releaseDate: "2025-06-06",
+          releaseType: "Album",
+          showsArtwork: true,
+        ),
+      ],
+      artists: [
+        .init(
+          id: "123456789",
+          name: "Lena Jonsson Trio",
+          catalogMetadata: approvedArtistOutputMetadata(),
+          releaseAlbumIds: ["1733742320", "2250000001"],
+          topSongs: [
+            .init(
+              id: "123456790",
+              title: "Sommarsvärta",
+              artistName: "Lena Jonsson Trio",
+              albumTitle: "Stories from the Outside",
+              artworkUrl: "https://example.com/song.jpg",
+              durationInMillis: 200_000,
+            ),
+          ],
+        ),
+      ],
+    ))
+
+    let hydratedAlbums = try await ctx.child.approvedMusicAlbums(in: self.db)
+    expect(hydratedAlbums.map(\.artwork)).toEqual([
+      mockAlbumArtwork(url: "https://example.com/stories/{w}x{h}bb.jpg"),
+      mockAlbumArtwork(url: "https://example.com/elements/{w}x{h}bb.jpg"),
+    ])
+
+    let reloadedOutput = try await withDependencies {
+      $0.appleMusic.albums = { _ in
+        XCTFail("expected persisted artwork to prevent another album lookup")
+        return []
+      }
+      $0.appleMusic.artistAlbums = { lookup in mockArtistAlbums(for: lookup) }
+      $0.appleMusic.artistTopSongs = { lookup in mockArtistTopSongs(for: lookup) }
+    } operation: {
+      try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
+    }
+    expect(reloadedOutput).toEqual(output)
+  }
+
+  func testV2ReturnsExplicitAlbumsWhenArtworkHydrationFails() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "1440935467",
+      title: "Stories from the Outside",
+      artistName: "Lena Jonsson Trio",
+      artworkUrl: "https://example.com/stories.jpg",
+      trackCount: 12,
+      showsArtwork: true,
+    ))
+
+    let output = try await withDependencies {
+      $0.appleMusic.albums = { _ in
+        throw AppleMusicError.httpError(statusCode: 500, body: "unavailable")
+      }
     } operation: {
       try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
     }
@@ -181,31 +298,13 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
           trackCount: 12,
           showsArtwork: true,
         ),
-        .init(
-          id: "1733742320",
-          title: "Elements",
-          artistName: "Lena Jonsson Trio",
-          artworkUrl: nil,
-          trackCount: nil,
-          showsArtwork: false,
-        ),
-        .init(
-          id: "2250000001",
-          title: "Artist Grant Release",
-          artistName: "Lena Jonsson Trio",
-          artworkUrl: "https://example.com/artist-release.jpg",
-          trackCount: 8,
-          showsArtwork: true,
-        ),
       ],
-      artists: [
-        .init(
-          id: "123456789",
-          name: "Lena Jonsson Trio",
-          catalogMetadata: approvedArtistOutputMetadata(),
-        ),
-      ],
+      artists: [],
     ))
+    let album = try await Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .first(in: self.db)
+    expect(album.artwork).toBeNil()
   }
 
   func testReturnsApprovedAlbumTracksForArtistCoveredAlbum() async throws {
@@ -487,6 +586,56 @@ private func approvedArtistOutputMetadata() -> MusicCatalogMetadata {
   )
 }
 
+private func mockExplicitAlbums(for lookup: AppleMusicAlbumsLookup)
+  -> [AppleMusicCatalogAlbum] {
+  let albums: [AppleMusicCatalogAlbum] = [
+    .init(
+      id: "1440935467",
+      title: "Stories from the Outside",
+      artistName: "Lena Jonsson Trio",
+      artworkUrl: "https://example.com/stories.jpg",
+      artwork: mockAlbumArtwork(url: "https://example.com/stories/{w}x{h}bb.jpg"),
+      trackCount: 12,
+    ),
+    .init(
+      id: "1733742320",
+      title: "Elements",
+      artistName: "Lena Jonsson Trio",
+      artworkUrl: "https://example.com/elements.jpg",
+      artwork: mockAlbumArtwork(url: "https://example.com/elements/{w}x{h}bb.jpg"),
+      trackCount: 6,
+    ),
+  ]
+  let albumIds = Set(lookup.albumIds)
+  return albums.filter { albumIds.contains($0.id) }
+}
+
+private func mockAlbumArtwork(url: String) -> Music.Artwork {
+  .init(
+    url: url,
+    width: 1200,
+    height: 1200,
+    bgColor: "102030",
+    textColor1: "ffffff",
+    textColor2: "eeeeee",
+    textColor3: "dddddd",
+    textColor4: "cccccc",
+  )
+}
+
+private func mockAlbumOutputArtwork(url: String) -> MusicArtwork {
+  .init(
+    url: url,
+    width: 1200,
+    height: 1200,
+    bgColor: "102030",
+    textColor1: "ffffff",
+    textColor2: "eeeeee",
+    textColor3: "dddddd",
+    textColor4: "cccccc",
+  )
+}
+
 private func mockArtistAlbums(for lookup: AppleMusicArtistAlbumsLookup)
   -> [AppleMusicCatalogAlbum] {
   switch lookup.artistId.rawValue {
@@ -498,13 +647,47 @@ private func mockArtistAlbums(for lookup: AppleMusicArtistAlbumsLookup)
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/elements.jpg",
         trackCount: 12,
+        releaseDate: "2024-04-12",
+        releaseType: "Album",
       ),
       .init(
         id: "2250000001",
         title: "Artist Grant Release",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/artist-release.jpg",
+        artwork: .init(
+          url: "https://example.com/artist-release/{w}x{h}bb.jpg",
+          width: 1200,
+          height: 1200,
+          bgColor: "102030",
+          textColor1: "ffffff",
+          textColor2: "eeeeee",
+          textColor3: "dddddd",
+          textColor4: "cccccc",
+        ),
         trackCount: 8,
+        releaseDate: "2025-06-06",
+        releaseType: "Album",
+      ),
+    ]
+  default:
+    []
+  }
+}
+
+private func mockArtistTopSongs(
+  for lookup: AppleMusicArtistTopSongsLookup,
+) -> [AppleMusicCatalogTrack] {
+  switch lookup.artistId.rawValue {
+  case "123456789":
+    [
+      .init(
+        id: "123456790",
+        title: "Sommarsvärta",
+        artistName: "Lena Jonsson Trio",
+        albumTitle: "Stories from the Outside",
+        artworkUrl: "https://example.com/song.jpg",
+        durationInMillis: 200_000,
       ),
     ]
   default:

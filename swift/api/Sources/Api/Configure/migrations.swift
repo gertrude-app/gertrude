@@ -114,6 +114,7 @@ extension Configure {
     app.migrations.add(MediumTier())
     app.migrations.add(AddParentAccountSiteBeta())
     app.migrations.add(CreateMusicApprovedArtists())
+    app.migrations.add(AddMusicApprovedAlbumArtwork())
   }
 }
 

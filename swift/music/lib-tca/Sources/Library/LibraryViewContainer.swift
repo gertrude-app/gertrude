@@ -6,6 +6,11 @@ struct LibraryViewContainer: View {
   @Bindable var store: StoreOf<LibraryFeature>
   @Namespace private var zoomNamespace
 
+  let currentTrackID: ApprovedTrack.ID?
+  let playbackQueueTrackIDs: [ApprovedTrack.ID]
+  let isPlaybackLoading: Bool
+  let isPlaybackPlaying: Bool
+
   var body: some View {
     let albumDetailStore = self.albumDetailStore
 
@@ -14,11 +19,22 @@ struct LibraryViewContainer: View {
         state: self.store.viewState,
         isRefreshing: self.store.isRefreshingRemoteLibrary,
         transitionNamespace: self.zoomNamespace,
+        currentTrackID: self.currentTrackID?.rawValue,
+        playbackQueueTrackIDs: self.playbackQueueTrackIDs.map(\.rawValue),
+        isPlaybackLoading: self.isPlaybackLoading,
+        isPlaybackPlaying: self.isPlaybackPlaying,
         onRetryTap: { self.store.send(.retryButtonTapped) },
         onRefresh: {
           self.store.send(.refreshPulled)
         },
         onAlbumTap: { self.store.send(.albumTapped(.init($0))) },
+        onArtistPlayTap: { self.store.send(.artistPlayTapped(.init($0))) },
+        onArtistSongTap: { artistID, trackID in
+          self.store.send(.artistTopSongTapped(
+            artistID: .init(artistID),
+            trackID: .init(trackID),
+          ))
+        },
         onDebugResetTap: { self.store.send(.debugResetOnboardingButtonTapped) },
       )
       .albumDetailZoomPush(

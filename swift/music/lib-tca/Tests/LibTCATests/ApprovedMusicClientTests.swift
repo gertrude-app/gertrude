@@ -1,6 +1,7 @@
 import CustomDump
 import Dependencies
 import Foundation
+import LibViews
 import MusicRoute
 import Testing
 
@@ -147,6 +148,18 @@ struct ApprovedMusicClientTests {
     #expect(library.isEmpty)
     expectNoDifference(tracks, [])
   }
+
+  @Test
+  func mapsArtistDetailViewData() {
+    let album = AlbumData(album: approvedMusicLibrary.albums[0])
+    let artist = ArtistData(artist: approvedMusicLibrary.artists[0])
+
+    #expect(album.trackCount == 1)
+    #expect(album.releaseDate == "2024-04-12")
+    #expect(album.releaseType == "Album")
+    #expect(artist.releaseAlbumIds == ["album-1"])
+    #expect(artist.topSongs.map(\.duration) == ["3:20"])
+  }
 }
 
 private actor SavedCacheWrites {
@@ -179,7 +192,19 @@ private let remoteApprovedMusicLibrary = GetApprovedMusicLibrary_v2.Output(
       title: "Library Album",
       artistName: "Library Artist",
       artworkUrl: "https://example.com/album.jpg",
+      artwork: .init(
+        url: "https://example.com/album/{w}x{h}bb.jpg",
+        width: 1200,
+        height: 1200,
+        bgColor: "203040",
+        textColor1: "ffffff",
+        textColor2: "eeeeee",
+        textColor3: "dddddd",
+        textColor4: "cccccc",
+      ),
       trackCount: 1,
+      releaseDate: "2024-04-12",
+      releaseType: "Album",
       showsArtwork: true,
     ),
   ],
@@ -207,6 +232,17 @@ private let remoteApprovedMusicLibrary = GetApprovedMusicLibrary_v2.Output(
         appleMusicUrl: "https://music.apple.com/us/artist/library-artist/artist-1",
         genreNames: ["Folk", "Classical"],
       ),
+      releaseAlbumIds: ["album-1"],
+      topSongs: [
+        .init(
+          id: "top-song-1",
+          title: "Top Song",
+          artistName: "Library Artist",
+          albumTitle: "Library Album",
+          artworkUrl: "https://example.com/top-song.jpg",
+          durationInMillis: 200_000,
+        ),
+      ],
     ),
   ],
 )
@@ -235,7 +271,20 @@ private let approvedMusicLibrary = ApprovedMusicLibrary(
       id: "album-1",
       title: "Library Album",
       artistName: "Library Artist",
-      artworkURL: URL(string: "https://example.com/album.jpg"),
+      artworkURL: URL(string: "https://example.com/album/600x600bb.jpg"),
+      artwork: .init(
+        url: "https://example.com/album/{w}x{h}bb.jpg",
+        width: 1200,
+        height: 1200,
+        bgColor: "203040",
+        textColor1: "ffffff",
+        textColor2: "eeeeee",
+        textColor3: "dddddd",
+        textColor4: "cccccc",
+      ),
+      trackCount: 1,
+      releaseDate: "2024-04-12",
+      releaseType: "Album",
     ),
   ],
   artists: [
@@ -262,6 +311,17 @@ private let approvedMusicLibrary = ApprovedMusicLibrary(
         appleMusicUrl: "https://music.apple.com/us/artist/library-artist/artist-1",
         genreNames: ["Folk", "Classical"],
       ),
+      releaseAlbumIds: ["album-1"],
+      topSongs: [
+        .init(
+          id: "top-song-1",
+          title: "Top Song",
+          artistName: "Library Artist",
+          albumTitle: "Library Album",
+          artworkURL: URL(string: "https://example.com/top-song.jpg"),
+          durationInMillis: 200_000,
+        ),
+      ],
     ),
   ],
 )
@@ -274,7 +334,19 @@ private let v2ApprovedMusicLibraryJSON = #"""
       "title": "Library Album",
       "artistName": "Library Artist",
       "artworkUrl": "https://example.com/album.jpg",
+      "artwork": {
+        "url": "https://example.com/album/{w}x{h}bb.jpg",
+        "width": 1200,
+        "height": 1200,
+        "bgColor": "203040",
+        "textColor1": "ffffff",
+        "textColor2": "eeeeee",
+        "textColor3": "dddddd",
+        "textColor4": "cccccc"
+      },
       "trackCount": 1,
+      "releaseDate": "2024-04-12",
+      "releaseType": "Album",
       "showsArtwork": true
     }
   ],
@@ -301,7 +373,18 @@ private let v2ApprovedMusicLibraryJSON = #"""
         },
         "appleMusicUrl": "https://music.apple.com/us/artist/library-artist/artist-1",
         "genreNames": ["Folk", "Classical"]
-      }
+      },
+      "releaseAlbumIds": ["album-1"],
+      "topSongs": [
+        {
+          "id": "top-song-1",
+          "title": "Top Song",
+          "artistName": "Library Artist",
+          "albumTitle": "Library Album",
+          "artworkUrl": "https://example.com/top-song.jpg",
+          "durationInMillis": 200000
+        }
+      ]
     }
   ]
 }

@@ -10,6 +10,7 @@ struct ApproveMusicAlbum: Pair {
     var title: String
     var artistName: String
     var artworkUrl: String?
+    var artwork: Music.Artwork?
     var trackCount: Int?
     var showsArtwork = true
   }
@@ -25,11 +26,12 @@ extension ApproveMusicAlbum: Resolver {
         title: input.title,
         artistName: input.artistName,
         artworkUrl: input.artworkUrl,
+        artwork: input.artwork,
         trackCount: input.trackCount,
         showsArtwork: input.showsArtwork,
       ),
       conflictOn: [.childId, .appleMusicAlbumId],
-      do: .update(set: [.title, .artistName, .artworkUrl, .trackCount, .showsArtwork]),
+      do: .update(set: [.title, .artistName, .artworkUrl, .artwork, .trackCount, .showsArtwork]),
     )
     return .success
   }

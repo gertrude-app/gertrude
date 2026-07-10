@@ -31,25 +31,25 @@ struct PlaybackFeatureTests {
   }
 
   @Test
-  func playAlbumQueueStartsSessionAtStartIndex() async {
+  func playQueueStartsSessionAtStartIndex() async {
     let items = [
       playbackItem("track-1"),
       playbackItem("track-2"),
       playbackItem("track-3"),
     ]
-    let recorder = PlaybackAlbumRecorder()
+    let recorder = PlaybackQueueRecorder()
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.playAlbum = { items, startIndex in
+      $0.playback.playQueue = { items, startIndex in
         await recorder.record(items: items, startIndex: startIndex)
       }
     }
 
-    await store.send(.playAlbumQueue(items: items, startIndex: 1)) {
+    await store.send(.playQueue(items: items, startIndex: 1)) {
       $0.session = .init(
         playStatus: .loading,
-        albumQueue: .init(items: items, currentIndex: 1),
+        queue: .init(items: items, currentIndex: 1),
       )
     }
     await store.receive(.playbackStarted) {
@@ -61,31 +61,31 @@ struct PlaybackFeatureTests {
   }
 
   @Test
-  func albumQueueTracksCurrentAndUpcomingItems() {
+  func queueTracksCurrentAndUpcomingItems() {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
-    let queue = PlaybackFeature.AlbumQueue(items: items, currentIndex: 1)
+    let queue = PlaybackFeature.Queue(items: items, currentIndex: 1)
 
     #expect(queue.currentItem == items[1])
     #expect(queue.upcomingItems == [items[2], items[0]])
   }
 
   @Test
-  func playAlbumQueueWithEmptyTracksDoesNothing() async {
+  func playQueueWithEmptyTracksDoesNothing() async {
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     }
 
-    await store.send(.playAlbumQueue(items: [], startIndex: 0))
+    await store.send(.playQueue(items: [], startIndex: 0))
   }
 
   @Test
-  func playAlbumQueueWithInvalidStartIndexDoesNothing() async {
+  func playQueueWithInvalidStartIndexDoesNothing() async {
     let items = [playbackItem("track-1")]
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     }
 
-    await store.send(.playAlbumQueue(items: items, startIndex: 1))
+    await store.send(.playQueue(items: items, startIndex: 1))
   }
 
   @Test
@@ -166,14 +166,14 @@ struct PlaybackFeatureTests {
   func playbackEventUpdatesCurrentSessionItem() async {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 0),
+      queue: .init(items: items, currentIndex: 0),
       progress: .init(elapsedTime: 40, duration: 180),
     ))) {
       PlaybackFeature()
     }
 
     await store.send(.playbackEvent(.currentItemChanged(items[2].id))) {
-      $0.session?.albumQueue.currentIndex = 2
+      $0.session?.queue.currentIndex = 2
       $0.session?.progress = .zero
     }
   }
@@ -182,7 +182,7 @@ struct PlaybackFeatureTests {
   func playbackEventWithUnknownCurrentItemDoesNothing() async {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 0),
+      queue: .init(items: items, currentIndex: 0),
       progress: .init(elapsedTime: 40, duration: 180),
     ))) {
       PlaybackFeature()
@@ -195,7 +195,7 @@ struct PlaybackFeatureTests {
   func playbackEventWithSameCurrentItemDoesNothing() async {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 0),
+      queue: .init(items: items, currentIndex: 0),
       progress: .init(elapsedTime: 40, duration: 180),
     ))) {
       PlaybackFeature()
@@ -306,7 +306,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 0),
+      queue: .init(items: items, currentIndex: 0),
       progress: .init(elapsedTime: 42, duration: 180),
     ))) {
       PlaybackFeature()
@@ -346,7 +346,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 1),
+      queue: .init(items: items, currentIndex: 1),
       progress: .init(elapsedTime: 4, duration: 180),
     ))) {
       PlaybackFeature()
@@ -366,7 +366,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 1),
+      queue: .init(items: items, currentIndex: 1),
       progress: .init(elapsedTime: 3, duration: 180),
     ))) {
       PlaybackFeature()
@@ -386,7 +386,7 @@ struct PlaybackFeatureTests {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(session: .init(
-      albumQueue: .init(items: items, currentIndex: 0),
+      queue: .init(items: items, currentIndex: 0),
       progress: .init(elapsedTime: 2, duration: 180),
     ))) {
       PlaybackFeature()
@@ -430,7 +430,7 @@ struct PlaybackFeatureTests {
     await store.receive(.cachedSessionLoaded(cachedSession)) {
       $0.session = .init(
         playStatus: .paused,
-        albumQueue: .init(items: items, currentIndex: 1),
+        queue: .init(items: items, currentIndex: 1),
         progress: progress,
       )
       $0.requiresPlayerRestore = true
@@ -461,14 +461,14 @@ struct PlaybackFeatureTests {
     let recorder = PlaybackRestoreRecorder()
     var state = PlaybackFeature.State(session: .init(
       playStatus: .paused,
-      albumQueue: .init(items: items, currentIndex: 1),
+      queue: .init(items: items, currentIndex: 1),
       progress: progress,
     ))
     state.requiresPlayerRestore = true
     let store = TestStore(initialState: state) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.playAlbumFromPosition = { items, startIndex, position in
+      $0.playback.playQueueFromPosition = { items, startIndex, position in
         await recorder.record(items: items, startIndex: startIndex, position: position)
       }
     }
@@ -521,7 +521,7 @@ struct PlaybackFeatureTests {
   }
 }
 
-private actor PlaybackAlbumRecorder {
+private actor PlaybackQueueRecorder {
   var items: [PlaybackItem]?
   var startIndex: Int?
 

@@ -14,6 +14,7 @@ struct SearchMusicCatalog: Pair {
       var title: String
       var artistName: String
       var artworkUrl: String?
+      var artwork: Music.Artwork?
       var trackCount: Int?
       var releaseDate: String?
       var appleMusicUrl: String?
@@ -79,6 +80,7 @@ extension SearchMusicCatalog: Resolver {
       title: album.title,
       artistName: album.artistName,
       artworkUrl: album.artworkUrl,
+      artwork: album.artwork,
       trackCount: album.trackCount,
       releaseDate: album.releaseDate,
       appleMusicUrl: album.appleMusicUrl,

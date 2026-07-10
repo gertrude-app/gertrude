@@ -60,6 +60,20 @@ final class AppleMusicClientTests: XCTestCase {
     expect(queryItems.first { $0.name == "with" }?.value).toEqual("topResults")
   }
 
+  func testBuildsCatalogAlbumsURL() throws {
+    let url = try appleMusicCatalogAlbumsURL(.init(
+      albumIds: ["1511628001", "1682152618"],
+      storefront: "us",
+    ))
+
+    let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
+    expect(components.scheme).toEqual("https")
+    expect(components.host).toEqual("api.music.apple.com")
+    expect(components.path).toEqual("/v1/catalog/us/albums")
+    expect(components.queryItems?.first { $0.name == "ids" }?.value)
+      .toEqual("1511628001,1682152618")
+  }
+
   func testBuildsCatalogAlbumURL() throws {
     let url = try appleMusicCatalogAlbumURL(.init(
       albumId: .init(rawValue: "1511628001"),
@@ -91,6 +105,20 @@ final class AppleMusicClientTests: XCTestCase {
     expect(queryItems.first { $0.name == "limit" }?.value).toEqual("100")
   }
 
+  func testBuildsCatalogArtistTopSongsURL() throws {
+    let url = try appleMusicCatalogArtistTopSongsURL(.init(
+      artistId: .init(rawValue: "123456789"),
+      artistName: "Lena Jonsson Trio",
+      storefront: "us",
+    ))
+
+    let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
+    expect(components.scheme).toEqual("https")
+    expect(components.host).toEqual("api.music.apple.com")
+    expect(components.path).toEqual("/v1/catalog/us/artists/123456789/view/top-songs")
+    expect(components.queryItems?.first { $0.name == "limit" }?.value).toEqual("12")
+  }
+
   func testBuildsCatalogURLFromRelativeNextPath() throws {
     let url = try appleMusicCatalogURL(
       fromNext: "/v1/catalog/us/artists/123456789/view/full-albums?offset=100",
@@ -116,7 +144,14 @@ final class AppleMusicClientTests: XCTestCase {
                 "name": "Stories from the Outside",
                 "artistName": "Lena Jonsson Trio",
                 "artwork": {
-                  "url": "https://example.com/art/{w}x{h}bb.jpg"
+                  "url": "https://example.com/art/{w}x{h}bb.jpg",
+                  "width": 1200,
+                  "height": 1200,
+                  "bgColor": "102030",
+                  "textColor1": "ffffff",
+                  "textColor2": "eeeeee",
+                  "textColor3": "dddddd",
+                  "textColor4": "cccccc"
                 },
                 "trackCount": 12,
                 "releaseDate": "2020-05-29",
@@ -137,6 +172,16 @@ final class AppleMusicClientTests: XCTestCase {
         title: "Stories from the Outside",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/art/600x600bb.jpg",
+        artwork: .init(
+          url: "https://example.com/art/{w}x{h}bb.jpg",
+          width: 1200,
+          height: 1200,
+          bgColor: "102030",
+          textColor1: "ffffff",
+          textColor2: "eeeeee",
+          textColor3: "dddddd",
+          textColor4: "cccccc",
+        ),
         trackCount: 12,
         releaseDate: "2020-05-29",
         appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
@@ -156,7 +201,14 @@ final class AppleMusicClientTests: XCTestCase {
             "name": "Stories from the Outside",
             "artistName": "Lena Jonsson Trio",
             "artwork": {
-              "url": "https://example.com/art/{w}x{h}bb.jpg"
+              "url": "https://example.com/art/{w}x{h}bb.jpg",
+              "width": 1200,
+              "height": 1200,
+              "bgColor": "102030",
+              "textColor1": "ffffff",
+              "textColor2": "eeeeee",
+              "textColor3": "dddddd",
+              "textColor4": "cccccc"
             },
             "trackCount": 12,
             "releaseDate": "2020-05-29",
@@ -176,6 +228,16 @@ final class AppleMusicClientTests: XCTestCase {
           title: "Stories from the Outside",
           artistName: "Lena Jonsson Trio",
           artworkUrl: "https://example.com/art/600x600bb.jpg",
+          artwork: .init(
+            url: "https://example.com/art/{w}x{h}bb.jpg",
+            width: 1200,
+            height: 1200,
+            bgColor: "102030",
+            textColor1: "ffffff",
+            textColor2: "eeeeee",
+            textColor3: "dddddd",
+            textColor4: "cccccc",
+          ),
           trackCount: 12,
           releaseDate: "2020-05-29",
           appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
@@ -183,6 +245,82 @@ final class AppleMusicClientTests: XCTestCase {
       ],
       next: "/v1/catalog/us/artists/123456789/view/full-albums?offset=100",
     ))
+  }
+
+  func testDecodesArtistTopSongsResponse() throws {
+    let data = try XCTUnwrap("""
+    {
+      "data": [
+        {
+          "id": "123456790",
+          "type": "songs",
+          "attributes": {
+            "name": "Sommarsvärta",
+            "artistName": "Lena Jonsson Trio",
+            "albumName": "Stories from the Outside",
+            "durationInMillis": 200000,
+            "artwork": {
+              "url": "https://example.com/song/{w}x{h}bb.jpg"
+            }
+          }
+        }
+      ]
+    }
+    """.data(using: .utf8))
+
+    let songs = try decodeAppleMusicCatalogArtistTopSongs(from: data)
+
+    expect(songs).toEqual([
+      .init(
+        id: .init(rawValue: "123456790"),
+        title: "Sommarsvärta",
+        artistName: "Lena Jonsson Trio",
+        albumTitle: "Stories from the Outside",
+        artworkUrl: "https://example.com/song/600x600bb.jpg",
+        durationInMillis: 200_000,
+      ),
+    ])
+  }
+
+  func testDecodesAlbumReleaseTypes() throws {
+    let data = try XCTUnwrap("""
+    {
+      "results": {
+        "albums": {
+          "data": [
+            {
+              "id": "1",
+              "attributes": {
+                "name": "Full Album",
+                "artistName": "Artist",
+                "isSingle": false
+              }
+            },
+            {
+              "id": "2",
+              "attributes": {
+                "name": "New Song - Single",
+                "artistName": "Artist",
+                "isSingle": true
+              }
+            },
+            {
+              "id": "3",
+              "attributes": {
+                "name": "Short Release - EP",
+                "artistName": "Artist",
+                "isSingle": true
+              }
+            }
+          ]
+        }
+      }
+    }
+    """.data(using: .utf8))
+
+    let albums = try decodeAppleMusicCatalogAlbums(from: data)
+
+    expect(albums.map(\.releaseType)).toEqual(["Album", "Single", "EP"])
   }
 
   func testDecodesArtistSearchResponse() throws {
@@ -331,6 +469,7 @@ final class AppleMusicClientTests: XCTestCase {
       title: "Stories from the Outside",
       artistName: "Lena Jonsson Trio",
       artworkUrl: "https://example.com/art/600x600bb.jpg",
+      artwork: .init(url: "https://example.com/art/{w}x{h}bb.jpg"),
       trackCount: 12,
       releaseDate: "2020-05-29",
       appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",

@@ -17,6 +17,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
           title: search.term,
           artistName: search.storefront,
           artworkUrl: "https://example.com/art.jpg",
+          artwork: albumArtwork(),
           trackCount: search.limit,
           releaseDate: "2020-05-29",
           appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
@@ -44,6 +45,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
       title: "Lena",
       artistName: "us",
       artworkUrl: "https://example.com/art.jpg",
+      artwork: albumArtwork(),
       trackCount: 10,
       releaseDate: "2020-05-29",
       appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
@@ -144,6 +146,19 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
       expect(error.type).toEqual(.paymentRequired)
     }
   }
+}
+
+private func albumArtwork() -> Music.Artwork {
+  .init(
+    url: "https://example.com/art/{w}x{h}bb.jpg",
+    width: 1200,
+    height: 1200,
+    bgColor: "102030",
+    textColor1: "ffffff",
+    textColor2: "eeeeee",
+    textColor3: "dddddd",
+    textColor4: "cccccc",
+  )
 }
 
 private func artistMetadata(genreNames: [String] = ["Folk"]) -> Music.CatalogMetadata {

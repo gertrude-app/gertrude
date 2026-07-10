@@ -85,14 +85,21 @@ struct AppFeature: Sendable {
           )
       #endif
 
+      case .library(.delegate(.artistPlaybackButtonTapped(let items))):
+        guard !items.isEmpty else { return .none }
+        if state.playback.session?.queue.items.map(\.id) == items.map(\.id) {
+          return .send(.playback(.togglePlayPause))
+        }
+        return .send(.playback(.playQueue(items: items, startIndex: 0)))
+
       case .library(.delegate(.dismissPlaybackFailure)):
         return .send(.playback(.playbackFailureDismissed))
 
       case .library(.delegate(.playbackFailureActionTapped)):
         return .send(.playback(.playbackFailureActionTapped))
 
-      case .library(.delegate(.playAlbum(let items, let startIndex))):
-        return .send(.playback(.playAlbumQueue(items: items, startIndex: startIndex)))
+      case .library(.delegate(.playQueue(let items, let startIndex))):
+        return .send(.playback(.playQueue(items: items, startIndex: startIndex)))
 
       case .library(.delegate(.togglePlayPause)):
         return .send(.playback(.togglePlayPause))

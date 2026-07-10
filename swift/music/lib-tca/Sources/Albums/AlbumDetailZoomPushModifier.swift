@@ -70,13 +70,17 @@ private struct AlbumDetailZoomPushModifier: ViewModifier {
 
     private func popTopAlbumDetailForReplacementIfNeeded(_ replacementPushID: String) {
       guard self.poppingForReplacementID != replacementPushID else { return }
-      guard let topDetailPushID = AlbumDetailZoomPusher.topDetailPushID(
+      guard let topDetailPushID = ArtworkDetailZoomPusher.topDetailPushID(
+        kind: .album,
         in: self.navigationController,
       ), topDetailPushID != replacementPushID else { return }
 
       self.poppingForReplacementID = replacementPushID
       self.pushedAlbumDetailID = nil
-      let didPop = AlbumDetailZoomPusher.popTopDetail(in: self.navigationController)
+      let didPop = ArtworkDetailZoomPusher.popTopDetail(
+        kind: .album,
+        in: self.navigationController,
+      )
       if !didPop {
         self.poppingForReplacementID = nil
       }
@@ -92,9 +96,12 @@ private struct AlbumDetailZoomPushModifier: ViewModifier {
       guard self.pushedAlbumDetailID != pushID else { return }
       self.pushedAlbumDetailID = pushID
 
-      let didPush = AlbumDetailZoomPusher.push(
+      let didPush = ArtworkDetailZoomPusher.push(
+        kind: .album,
         pushID: pushID,
-        transitionSourceID: albumDetailStore.transitionSourceID,
+        transitionID: albumDetailStore.transitionSourceID.map(
+          albumArtworkZoomTransitionID,
+        ),
         rootView: AlbumDetailViewContainer(store: albumDetailStore),
         in: self.navigationController,
         onPop: { self.onDismiss(pushID) },

@@ -95,8 +95,8 @@ struct CachedPlaybackSession: Codable, Equatable, Sendable {
 
   init(session: PlaybackFeature.Session) {
     self.init(
-      items: session.albumQueue.items,
-      currentIndex: session.albumQueue.currentIndex,
+      items: session.queue.items,
+      currentIndex: session.queue.currentIndex,
       progress: session.progress,
     )
   }
@@ -105,7 +105,7 @@ struct CachedPlaybackSession: Codable, Equatable, Sendable {
     guard !self.items.isEmpty else { return nil }
     return PlaybackFeature.Session(
       playStatus: .paused,
-      albumQueue: .init(items: self.items, currentIndex: self.currentIndex),
+      queue: .init(items: self.items, currentIndex: self.currentIndex),
       progress: PlaybackProgress(
         elapsedTime: self.progress.elapsedTime,
         duration: self.progress.duration,

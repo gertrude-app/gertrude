@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import LibViews
 import SwiftUI
 
 public struct EntryPoint: View {
@@ -10,6 +11,7 @@ public struct EntryPoint: View {
 
   public var body: some View {
     AppView(store: self.store.inner)
+      .tint(.gertrudeBrandAccent)
   }
 }
 

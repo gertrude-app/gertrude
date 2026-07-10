@@ -27,6 +27,10 @@ struct ApprovedAlbum: Codable, Equatable, Identifiable, Sendable {
   let title: String
   let artistName: String
   let artworkURL: URL?
+  let artwork: ApprovedMusicArtwork?
+  let trackCount: Int?
+  let releaseDate: String?
+  let releaseType: String?
   var tracks: [ApprovedTrack]
 
   init(
@@ -34,12 +38,20 @@ struct ApprovedAlbum: Codable, Equatable, Identifiable, Sendable {
     title: String,
     artistName: String,
     artworkURL: URL? = nil,
+    artwork: ApprovedMusicArtwork? = nil,
+    trackCount: Int? = nil,
+    releaseDate: String? = nil,
+    releaseType: String? = nil,
     tracks: [ApprovedTrack] = [],
   ) {
     self.id = id
     self.title = title
     self.artistName = artistName
     self.artworkURL = artworkURL
+    self.artwork = artwork
+    self.trackCount = trackCount
+    self.releaseDate = releaseDate
+    self.releaseType = releaseType
     self.tracks = tracks
   }
 }
@@ -50,15 +62,21 @@ struct ApprovedArtist: Codable, Equatable, Identifiable, Sendable {
   let id: ID
   let name: String
   let catalogMetadata: ApprovedMusicCatalogMetadata?
+  let releaseAlbumIds: [ApprovedAlbum.ID]?
+  let topSongs: [ApprovedTrack]?
 
   init(
     id: ID,
     name: String,
     catalogMetadata: ApprovedMusicCatalogMetadata? = nil,
+    releaseAlbumIds: [ApprovedAlbum.ID]? = nil,
+    topSongs: [ApprovedTrack]? = nil,
   ) {
     self.id = id
     self.name = name
     self.catalogMetadata = catalogMetadata
+    self.releaseAlbumIds = releaseAlbumIds
+    self.topSongs = topSongs
   }
 }
 
@@ -137,17 +155,23 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
   let id: ID
   let title: String
   let artistName: String
+  let albumTitle: String?
   let artworkURL: URL?
+  let durationInMillis: Int?
 
   init(
     id: ID,
     title: String,
     artistName: String,
+    albumTitle: String? = nil,
     artworkURL: URL? = nil,
+    durationInMillis: Int? = nil,
   ) {
     self.id = id
     self.title = title
     self.artistName = artistName
+    self.albumTitle = albumTitle
     self.artworkURL = artworkURL
+    self.durationInMillis = durationInMillis
   }
 }

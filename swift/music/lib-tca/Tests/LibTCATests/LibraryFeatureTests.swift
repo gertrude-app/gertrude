@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import Testing
 
 @testable import LibTCA
@@ -307,6 +308,65 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func artistPlayTapRequestsPlaybackForAllTopSongs() async {
+    let topSongs = [
+      ApprovedTrack(
+        id: "song-1",
+        title: "First",
+        artistName: "Artist",
+        artworkURL: URL(string: "https://example.com/first.jpg"),
+      ),
+      ApprovedTrack(
+        id: "song-2",
+        title: "Second",
+        artistName: "Artist",
+        artworkURL: URL(string: "https://example.com/second.jpg"),
+      ),
+    ]
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      topSongs: topSongs,
+    )
+    let library = ApprovedMusicLibrary(artists: [artist])
+    let items = topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
+    }
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.artistPlayTapped(artist.id))
+    await store.receive(.delegate(.artistPlaybackButtonTapped(items: items)))
+  }
+
+  @Test
+  func artistTopSongTapQueuesAllTopSongsFromTappedSong() async {
+    let topSongs = [
+      ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
+      ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
+    ]
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      topSongs: topSongs,
+    )
+    let library = ApprovedMusicLibrary(artists: [artist])
+    let items = topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
+    }
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.artistTopSongTapped(
+      artistID: artist.id,
+      trackID: topSongs[1].id,
+    ))
+    await store.receive(.delegate(.playQueue(items: items, startIndex: 1)))
+  }
+
+  @Test
   func albumTapNavigatesToAlbumScreen() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
@@ -369,6 +429,6 @@ struct LibraryFeatureTests {
 
     let items = [playbackItem("track-1")]
     await store.send(.albumDetail(.presented(.delegate(.playAlbum(items: items, startIndex: 0)))))
-    await store.receive(.delegate(.playAlbum(items: items, startIndex: 0)))
+    await store.receive(.delegate(.playQueue(items: items, startIndex: 0)))
   }
 }

@@ -35,6 +35,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         title: "Stories from the Outside",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/stories.jpg",
+        artwork: albumArtwork(url: "https://example.com/stories.jpg"),
         trackCount: 12,
         showsArtwork: true,
         createdAt: albums.albums[0].createdAt,
@@ -44,6 +45,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         title: "Elements",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/elements.jpg",
+        artwork: albumArtwork(url: "https://example.com/elements.jpg"),
         trackCount: 6,
         showsArtwork: false,
         createdAt: albums.albums[1].createdAt,
@@ -73,6 +75,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
     expect(album.title).toEqual("Stories from the Outside")
     expect(album.artistName).toEqual("Lena Jonsson Trio")
     expect(album.artworkUrl).toEqual("https://example.com/stories.jpg")
+    expect(album.artwork).toEqual(albumArtwork(url: "https://example.com/stories.jpg"))
     expect(album.trackCount).toEqual(12)
     expect(album.showsArtwork).toEqual(true)
   }
@@ -105,6 +108,7 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         title: "Stories from the Outside",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/stories.jpg",
+        artwork: albumArtwork(url: "https://example.com/stories.jpg"),
         trackCount: 12,
         showsArtwork: true,
         createdAt: albums.albums[0].createdAt,
@@ -231,8 +235,22 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
       title: title,
       artistName: artistName,
       artworkUrl: artworkUrl,
+      artwork: artworkUrl.map { albumArtwork(url: $0) },
       trackCount: trackCount,
       showsArtwork: showsArtwork,
     )
   }
+}
+
+private func albumArtwork(url: String) -> Music.Artwork {
+  .init(
+    url: url,
+    width: 1200,
+    height: 1200,
+    bgColor: "102030",
+    textColor1: "ffffff",
+    textColor2: "eeeeee",
+    textColor3: "dddddd",
+    textColor4: "cccccc",
+  )
 }

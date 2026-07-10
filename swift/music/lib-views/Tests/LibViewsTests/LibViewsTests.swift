@@ -1,3 +1,4 @@
+import SwiftUI
 import Testing
 
 @testable import LibViews
@@ -51,4 +52,13 @@ func onboardingBlurbFallsBackOnResidualMustache() {
     device: "iPhone",
     fallback: fallback,
   ) == fallback)
+}
+
+@MainActor
+@Test
+func comparesResolvedColorLuminance() {
+  let environment = EnvironmentValues()
+
+  #expect(Color.black.isDarker(than: .white, in: environment))
+  #expect(!Color.white.isDarker(than: .black, in: environment))
 }

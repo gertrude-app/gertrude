@@ -24,20 +24,30 @@ struct LibraryFeature: Sendable {
     case approvedLibraryRefresh
   }
 
+  enum DelegateAction: Equatable {
+    case artistPlaybackButtonTapped(items: [PlaybackItem])
+    case dismissPlaybackFailure
+    case playbackFailureActionTapped
+    case playQueue(items: [PlaybackItem], startIndex: Int)
+    case togglePlayPause
+  }
+
   enum Action: Equatable {
-    case onAppear
+    case albumTapped(ApprovedAlbum.ID)
+    case albumDetail(PresentationAction<AlbumDetailFeature.Action>)
+    case albumDetailDismissed(String)
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
     case approvedLibrarySubscriptionRequired
+    case artistPlayTapped(ApprovedArtist.ID)
+    case artistTopSongTapped(artistID: ApprovedArtist.ID, trackID: ApprovedTrack.ID)
     case cachedApprovedLibraryLoaded(ApprovedMusicLibrary)
+    case debugResetOnboardingButtonTapped
+    case delegate(DelegateAction)
+    case onAppear
     case refreshPresentationFinished
     case refreshPulled
     case retryButtonTapped
-    case albumTapped(ApprovedAlbum.ID)
-    case albumDetailDismissed(String)
-    case debugResetOnboardingButtonTapped
-    case delegate(AlbumDetailFeature.Action.DelegateAction)
-    case albumDetail(PresentationAction<AlbumDetailFeature.Action>)
   }
 
   @Dependency(\.approvedMusic) var approvedMusic
@@ -46,6 +56,39 @@ struct LibraryFeature: Sendable {
   var body: some Reducer<State, Action> {
     Reduce { state, action in
       switch action {
+      case .albumTapped(let albumID):
+        state.presentAlbumDetail(
+          albumID: albumID,
+          transitionSourceID: albumID.rawValue,
+          replacingCurrent: false,
+        )
+        return .none
+
+      case .albumDetailDismissed(let pushID):
+        guard state.albumDetail?.pushID == pushID else { return .none }
+        if let pendingAlbumDetail = state.pendingAlbumDetail {
+          state.albumDetail = pendingAlbumDetail
+          state.pendingAlbumDetail = nil
+        } else {
+          state.albumDetail = nil
+        }
+        return .none
+
+      case .artistPlayTapped(let artistID):
+        guard let items = self.artistPlaybackItems(
+          for: artistID,
+          in: state.status,
+        ) else { return .none }
+        return .send(.delegate(.artistPlaybackButtonTapped(items: items)))
+
+      case .artistTopSongTapped(let artistID, let trackID):
+        guard let items = self.artistPlaybackItems(
+          for: artistID,
+          in: state.status,
+        ), let startIndex = items.firstIndex(where: { $0.id == trackID })
+        else { return .none }
+        return .send(.delegate(.playQueue(items: items, startIndex: startIndex)))
+
       case .onAppear:
         guard !state.hasStartedInitialLibraryLoad else { return .none }
         state.hasStartedInitialLibraryLoad = true
@@ -95,26 +138,17 @@ struct LibraryFeature: Sendable {
         }
         return self.refreshRemoteApprovedLibrary(loadCache: true)
 
-      case .albumTapped(let albumID):
-        state.presentAlbumDetail(
-          albumID: albumID,
-          transitionSourceID: albumID.rawValue,
-          replacingCurrent: false,
-        )
-        return .none
-
-      case .albumDetailDismissed(let pushID):
-        guard state.albumDetail?.pushID == pushID else { return .none }
-        if let pendingAlbumDetail = state.pendingAlbumDetail {
-          state.albumDetail = pendingAlbumDetail
-          state.pendingAlbumDetail = nil
-        } else {
-          state.albumDetail = nil
-        }
-        return .none
-
       case .albumDetail(.presented(.delegate(let delegateAction))):
-        return .send(.delegate(delegateAction))
+        switch delegateAction {
+        case .dismissPlaybackFailure:
+          return .send(.delegate(.dismissPlaybackFailure))
+        case .playbackFailureActionTapped:
+          return .send(.delegate(.playbackFailureActionTapped))
+        case .playAlbum(let items, let startIndex):
+          return .send(.delegate(.playQueue(items: items, startIndex: startIndex)))
+        case .togglePlayPause:
+          return .send(.delegate(.togglePlayPause))
+        }
 
       case .debugResetOnboardingButtonTapped, .delegate, .albumDetail:
         return .none
@@ -122,6 +156,18 @@ struct LibraryFeature: Sendable {
     }
     .ifLet(\.$albumDetail, action: \.albumDetail) {
       AlbumDetailFeature()
+    }
+  }
+
+  private func artistPlaybackItems(
+    for artistID: ApprovedArtist.ID,
+    in status: Status,
+  ) -> [PlaybackItem]? {
+    guard case .loaded(let library) = status,
+          let topSongs = library.artist(id: artistID)?.topSongs,
+          !topSongs.isEmpty else { return nil }
+    return topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
     }
   }
 
@@ -167,6 +213,11 @@ extension LibraryFeature.State {
     guard case .loaded(let library) = self.status,
           let album = library.album(id: albumID)
     else { return false }
+
+    if self.albumDetail?.album.id == albumID {
+      self.pendingAlbumDetail = nil
+      return true
+    }
 
     let albumDetail = AlbumDetailFeature.State(
       album: album,

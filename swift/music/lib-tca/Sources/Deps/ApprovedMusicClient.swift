@@ -89,11 +89,16 @@ private extension ApprovedMusicLibrary {
 
 private extension ApprovedAlbum {
   init(remote album: GetApprovedMusicLibrary_v2.Output.Album) {
+    let artwork = album.artwork.map(ApprovedMusicArtwork.init)
     self.init(
       id: .init(rawValue: album.id),
       title: album.title,
       artistName: album.artistName,
-      artworkURL: album.artworkURL,
+      artworkURL: artwork?.artworkURL ?? album.artworkURL,
+      artwork: artwork,
+      trackCount: album.trackCount,
+      releaseDate: album.releaseDate,
+      releaseType: album.releaseType,
     )
   }
 }
@@ -104,6 +109,8 @@ private extension ApprovedArtist {
       id: .init(rawValue: artist.id),
       name: artist.name,
       catalogMetadata: artist.catalogMetadata.map(ApprovedMusicCatalogMetadata.init),
+      releaseAlbumIds: artist.releaseAlbumIds?.map(ApprovedAlbum.ID.init(rawValue:)),
+      topSongs: artist.topSongs?.map(ApprovedTrack.init),
     )
   }
 }
@@ -154,6 +161,26 @@ private extension ApprovedTrack {
       artworkURL: track.artworkURL,
     )
   }
+
+  init(remote song: GetApprovedMusicLibrary_v2.Output.Artist.TopSong) {
+    self.init(
+      id: .init(rawValue: song.id),
+      title: song.title,
+      artistName: song.artistName,
+      albumTitle: song.albumTitle,
+      artworkURL: song.artworkURL,
+      durationInMillis: song.durationInMillis,
+    )
+  }
+}
+
+private extension ApprovedMusicArtwork {
+  var artworkURL: URL? {
+    guard var url = self.url else { return nil }
+    url = url.replacingOccurrences(of: "{w}", with: "600")
+    url = url.replacingOccurrences(of: "{h}", with: "600")
+    return URL(string: url)
+  }
 }
 
 private extension GetApprovedMusicLibrary_v2.Output.Album {
@@ -164,6 +191,13 @@ private extension GetApprovedMusicLibrary_v2.Output.Album {
 }
 
 private extension GetApprovedMusicLibrary.Output.Track {
+  var artworkURL: URL? {
+    guard let artworkUrl else { return nil }
+    return URL(string: artworkUrl)
+  }
+}
+
+private extension GetApprovedMusicLibrary_v2.Output.Artist.TopSong {
   var artworkURL: URL? {
     guard let artworkUrl else { return nil }
     return URL(string: artworkUrl)

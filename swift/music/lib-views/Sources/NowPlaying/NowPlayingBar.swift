@@ -15,6 +15,7 @@ import SwiftUI
     private let isPlaying: Bool
     private let isLoading: Bool
     private let isEnabled: Bool
+    private let foregroundColor: Color
     private let panelTransitionID: String?
     private let artworkTransitionID: String?
     private let displayMode: NowPlayingBarDisplayMode
@@ -30,6 +31,7 @@ import SwiftUI
       isPlaying: Bool,
       isLoading: Bool,
       isEnabled: Bool,
+      foregroundColor: Color,
       panelTransitionID: String?,
       artworkTransitionID: String?,
       displayMode: NowPlayingBarDisplayMode,
@@ -44,6 +46,7 @@ import SwiftUI
       self.isPlaying = isPlaying
       self.isLoading = isLoading
       self.isEnabled = isEnabled
+      self.foregroundColor = foregroundColor
       self.panelTransitionID = panelTransitionID
       self.artworkTransitionID = artworkTransitionID
       self.displayMode = displayMode
@@ -75,6 +78,7 @@ import SwiftUI
         isPlaying: self.isPlaying,
         isLoading: self.isLoading,
         isEnabled: self.isEnabled,
+        foregroundColor: self.foregroundColor,
         onTap: self.onTap,
         onPlayTap: self.onPlayTap,
         onNextTap: self.onNextTap,
@@ -154,6 +158,7 @@ import SwiftUI
     let isPlaying: Bool
     var isLoading = false
     let isEnabled: Bool
+    let foregroundColor: Color
     let onTap: @MainActor @Sendable () -> Void
     let onPlayTap: @MainActor @Sendable () -> Void
     let onNextTap: @MainActor @Sendable () -> Void
@@ -180,6 +185,7 @@ import SwiftUI
             NowPlayingBarText(
               title: self.title,
               artist: self.artist,
+              foregroundColor: self.foregroundColor,
             )
           }
           .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
@@ -193,6 +199,7 @@ import SwiftUI
           NowPlayingIconButton(
             systemName: self.isPlaying ? "pause.fill" : "play.fill",
             size: 18,
+            foregroundColor: self.foregroundColor,
             isLoading: self.isLoading,
             isEnabled: self.isEnabled && !self.isLoading,
             accessibilityLabel: self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play",
@@ -201,6 +208,7 @@ import SwiftUI
           NowPlayingIconButton(
             systemName: "forward.fill",
             size: 17,
+            foregroundColor: self.foregroundColor,
             isEnabled: self.isEnabled,
             accessibilityLabel: "Next",
             hitSlop: .init(width: 12, height: 8),
@@ -226,6 +234,7 @@ import SwiftUI
             NowPlayingBarText(
               title: self.title,
               artist: self.artist,
+              foregroundColor: self.foregroundColor,
             )
           }
           .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
@@ -238,14 +247,14 @@ import SwiftUI
         NowPlayingIconButton(
           systemName: self.isPlaying ? "pause.fill" : "play.fill",
           size: 17,
+          foregroundColor: self.foregroundColor,
           isLoading: self.isLoading,
           isEnabled: self.isEnabled && !self.isLoading,
           accessibilityLabel: self.isLoading ? "Loading" : self.isPlaying ? "Pause" : "Play",
           action: self.onPlayTap,
         )
       }
-      .padding(.leading, 14)
-      .padding(.trailing, 22)
+      .padding(.horizontal, 14)
       .frame(height: 40)
     }
   }
@@ -253,18 +262,19 @@ import SwiftUI
   private struct NowPlayingBarText: View {
     let title: String
     let artist: String
+    let foregroundColor: Color
 
     var body: some View {
       VStack(alignment: .leading, spacing: 0) {
         Text(self.title)
           .font(.system(size: 13, weight: .bold, design: .rounded))
-          .foregroundStyle(.primary)
+          .foregroundStyle(self.foregroundColor)
           .lineLimit(1)
           .fixedSize(horizontal: true, vertical: false)
 
         Text(self.artist)
           .font(.system(size: 12, weight: .regular, design: .rounded))
-          .foregroundStyle(.primary.opacity(0.86))
+          .foregroundStyle(self.foregroundColor.opacity(0.86))
           .lineLimit(1)
           .fixedSize(horizontal: true, vertical: false)
       }
@@ -326,6 +336,7 @@ import SwiftUI
   private struct NowPlayingIconButton: View {
     let systemName: String
     let size: CGFloat
+    let foregroundColor: Color
     var isLoading = false
     let isEnabled: Bool
     let accessibilityLabel: String
@@ -338,13 +349,13 @@ import SwiftUI
           if self.isLoading {
             ProgressView()
               .controlSize(.small)
-              .tint(.primary)
+              .tint(self.foregroundColor)
           } else {
             Image(systemName: self.systemName)
               .font(.system(size: self.size, weight: .black))
           }
         }
-        .foregroundStyle(.primary)
+        .foregroundStyle(self.foregroundColor)
         .frame(width: max(28, self.size + 8), height: 30)
         .contentShape(Rectangle())
       }
@@ -370,6 +381,7 @@ import SwiftUI
         artworkTransitionID: nil,
         isPlaying: true,
         isEnabled: true,
+        foregroundColor: .black,
         onTap: {},
         onPlayTap: {},
         onNextTap: {},
@@ -387,6 +399,7 @@ import SwiftUI
         artworkTransitionID: nil,
         isPlaying: false,
         isEnabled: true,
+        foregroundColor: .black,
         onTap: {},
         onPlayTap: {},
         onNextTap: {},

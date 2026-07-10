@@ -5,6 +5,7 @@ import SwiftUI
 
 struct AppView: View {
   @Bindable var store: StoreOf<AppFeature>
+  @Environment(\.colorScheme) private var colorScheme
   @Environment(\.scenePhase) private var scenePhase
 
   private let nowPlayingPanelTransitionID = "now-playing-panel"
@@ -49,6 +50,10 @@ struct AppView: View {
   private var libraryView: some View {
     LibraryViewContainer(
       store: self.store.scope(state: \.library, action: \.library),
+      currentTrackID: self.store.playback.session?.currentTrackID,
+      playbackQueueTrackIDs: self.store.playback.session?.queue.items.map(\.id) ?? [],
+      isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
+      isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
     )
   }
 
@@ -65,10 +70,7 @@ struct AppView: View {
     }
 
     private var iOSLibraryContent: some View {
-      self.libraryView
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-          self.nowPlayingBarInset(showsBackground: true)
-        }
+      self.iOSTabView
         .nowPlayingZoomPresentation(
           isPresented: self.nowPlayingPresented,
           panelSourceID: self.nowPlayingPanelTransitionID,
@@ -78,14 +80,99 @@ struct AppView: View {
         }
     }
 
-    private func nowPlayingBarInset(showsBackground: Bool) -> some View {
-      self.nowPlayingBar(showsBackground: showsBackground)
-        .padding(.horizontal, 12)
-        .padding(.top, 6)
-        .padding(.bottom, 8)
+    @ViewBuilder
+    private var iOSTabView: some View {
+      if #available(iOS 26.0, *) {
+        self.modernIOSTabView
+          .tabViewBottomAccessory {
+            TabBarAccessoryPlacementReader { placement in
+              self.nowPlayingBarInset(
+                displayMode: placement == .inline ? .inline : .expanded,
+                showsBackground: false,
+              )
+            }
+          }
+          .tabBarMinimizeBehavior(.onScrollDown)
+      } else if #available(iOS 18.0, *) {
+        self.modernIOSTabView
+      } else {
+        TabView {
+          self.libraryView
+            .tabItem {
+              Label("Library", systemImage: "square.grid.2x2")
+            }
+
+          self.queueView
+            .tabItem {
+              Label("Queue", systemImage: "list.bullet")
+            }
+
+          self.searchView
+            .tabItem {
+              Label("Search", systemImage: "magnifyingglass")
+            }
+        }
+      }
     }
 
-    private func nowPlayingBar(showsBackground: Bool) -> some View {
+    @available(iOS 18.0, *)
+    private var modernIOSTabView: some View {
+      TabView {
+        Tab("Library", systemImage: "square.grid.2x2") {
+          self.libraryView
+        }
+
+        Tab("Queue", systemImage: "list.bullet") {
+          self.queueView
+        }
+
+        Tab("Search", systemImage: "magnifyingglass", role: .search) {
+          self.searchView
+        }
+      }
+    }
+
+    private var queueView: some View {
+      NavigationStack {
+        if let session = self.store.playback.session {
+          List(session.queue.items) { item in
+            Text(item.title)
+              .fontWeight(item.id == session.currentTrackID ? .semibold : .regular)
+          }
+          .navigationTitle("Queue")
+        } else {
+          ContentUnavailableView("Queue", systemImage: "list.bullet")
+            .navigationTitle("Queue")
+        }
+      }
+    }
+
+    private var searchView: some View {
+      NavigationStack {
+        ContentUnavailableView("Search", systemImage: "magnifyingglass")
+          .navigationTitle("Search")
+      }
+    }
+
+    private func nowPlayingBarInset(
+      displayMode: NowPlayingBarDisplayMode,
+      showsBackground: Bool,
+    ) -> some View {
+      self.nowPlayingBar(
+        displayMode: displayMode,
+        showsBackground: showsBackground,
+      )
+      .padding(.vertical, 7)
+    }
+
+    private var nowPlayingForegroundColor: Color {
+      self.colorScheme == .dark ? .white : .black
+    }
+
+    private func nowPlayingBar(
+      displayMode: NowPlayingBarDisplayMode,
+      showsBackground: Bool,
+    ) -> some View {
       let session = self.store.playback.session
       return NowPlayingBar(
         title: session?.currentItem.title ?? "Not Playing",
@@ -94,9 +181,10 @@ struct AppView: View {
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
+        foregroundColor: self.nowPlayingForegroundColor,
         panelTransitionID: self.nowPlayingPanelTransitionID,
         artworkTransitionID: self.nowPlayingArtworkTransitionID,
-        displayMode: .expanded,
+        displayMode: displayMode,
         showsBackground: showsBackground,
         onTap: {
           guard self.store.playback.session != nil else { return }
@@ -185,3 +273,21 @@ struct AppView: View {
     self.$store.isNowPlayingPresented.sending(\.nowPlayingPresentationChanged)
   }
 }
+
+#if os(iOS)
+  @available(iOS 26.0, *)
+  private struct TabBarAccessoryPlacementReader<Content: View>: View {
+    @Environment(\.tabViewBottomAccessoryPlacement) private var placement
+    private let content: (TabViewBottomAccessoryPlacement?) -> Content
+
+    init(
+      @ViewBuilder content: @escaping (TabViewBottomAccessoryPlacement?) -> Content,
+    ) {
+      self.content = content
+    }
+
+    var body: some View {
+      self.content(self.placement)
+    }
+  }
+#endif

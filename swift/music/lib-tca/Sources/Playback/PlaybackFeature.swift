@@ -76,7 +76,7 @@ struct PlaybackFeature: Sendable {
     var requiresPlayerRestore = false
   }
 
-  struct AlbumQueue: Equatable, Sendable {
+  struct Queue: Equatable, Sendable {
     var items: [PlaybackItem]
     var currentIndex: Int
 
@@ -115,17 +115,17 @@ struct PlaybackFeature: Sendable {
 
   struct Session: Equatable, Sendable {
     var playStatus: PlayStatus
-    var albumQueue: AlbumQueue
+    var queue: Queue
     var progress: PlaybackProgress
 
     init(
       playStatus: PlayStatus = .playing,
-      albumQueue: AlbumQueue,
+      queue: Queue,
       progress: PlaybackProgress = .zero,
     ) {
-      precondition(!albumQueue.items.isEmpty)
+      precondition(!queue.items.isEmpty)
       self.playStatus = playStatus
-      self.albumQueue = albumQueue
+      self.queue = queue
       self.progress = progress
     }
 
@@ -136,7 +136,7 @@ struct PlaybackFeature: Sendable {
     ) {
       self.init(
         playStatus: playStatus,
-        albumQueue: .init(items: [currentItem]),
+        queue: .init(items: [currentItem]),
         progress: progress,
       )
     }
@@ -152,7 +152,7 @@ struct PlaybackFeature: Sendable {
     case cachedSessionLoaded(CachedPlaybackSession?)
     case observePlayback
     case pause
-    case playAlbumQueue(items: [PlaybackItem], startIndex: Int)
+    case playQueue(items: [PlaybackItem], startIndex: Int)
     case playbackEvent(PlaybackEvent)
     case playbackFailed(PlaybackFailure)
     case playbackFailureActionTapped
@@ -225,16 +225,16 @@ struct PlaybackFeature: Sendable {
           }
         }
 
-      case .playAlbumQueue(let items, let startIndex):
+      case .playQueue(let items, let startIndex):
         guard items.indices.contains(startIndex) else { return .none }
         state.failure = nil
         state.lastCachedProgressBucket = nil
         state.requiresPlayerRestore = false
-        let albumQueue = AlbumQueue(items: items, currentIndex: startIndex)
-        state.session = .init(playStatus: .loading, albumQueue: albumQueue)
+        let queue = Queue(items: items, currentIndex: startIndex)
+        state.session = .init(playStatus: .loading, queue: queue)
         return .run { send in
           do {
-            try await self.playback.playAlbum(items, startIndex)
+            try await self.playback.playQueue(items, startIndex)
             await send(.playbackStarted)
           } catch {
             await send(.playbackFailed(.init(error: error)))
@@ -275,9 +275,9 @@ struct PlaybackFeature: Sendable {
           state.setPlayStatus(.loading)
           return .run { send in
             do {
-              try await self.playback.playAlbumFromPosition(
-                session.albumQueue.items,
-                session.albumQueue.currentIndex,
+              try await self.playback.playQueueFromPosition(
+                session.queue.items,
+                session.queue.currentIndex,
                 session.progress.elapsedTime,
               )
               await send(.playbackStarted)
@@ -399,7 +399,7 @@ extension PlaybackFeature.State {
 
   mutating func setCurrentItem(id: ApprovedTrack.ID) -> Bool {
     guard var session = self.session else { return false }
-    guard session.albumQueue.moveToItem(id: id) else { return false }
+    guard session.queue.moveToItem(id: id) else { return false }
     session.progress = .zero
     self.lastCachedProgressBucket = nil
     self.session = session
@@ -417,11 +417,11 @@ extension PlaybackFeature.State {
 
 extension PlaybackFeature.Session {
   var currentItem: PlaybackItem {
-    self.albumQueue.currentItem
+    self.queue.currentItem
   }
 
   var nextItems: [PlaybackItem] {
-    self.albumQueue.upcomingItems
+    self.queue.upcomingItems
   }
 
   var isPlaying: Bool {

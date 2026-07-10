@@ -21,8 +21,8 @@ enum PlaybackEvent: Equatable, Sendable {
 @DependencyClient
 struct PlaybackClient: Sendable {
   var playTrack: @Sendable (_ item: PlaybackItem) async throws -> Void
-  var playAlbum: @Sendable (_ items: [PlaybackItem], _ startIndex: Int) async throws -> Void
-  var playAlbumFromPosition: @Sendable (
+  var playQueue: @Sendable (_ items: [PlaybackItem], _ startIndex: Int) async throws -> Void
+  var playQueueFromPosition: @Sendable (
     _ items: [PlaybackItem],
     _ startIndex: Int,
     _ position: TimeInterval,
@@ -62,10 +62,10 @@ extension PlaybackClient {
       playTrack: { item in
         try await Self.play(items: [item], startIndex: 0, repeats: false)
       },
-      playAlbum: { items, startIndex in
+      playQueue: { items, startIndex in
         try await Self.play(items: items, startIndex: startIndex, repeats: true)
       },
-      playAlbumFromPosition: { items, startIndex, position in
+      playQueueFromPosition: { items, startIndex, position in
         try await Self.play(
           items: items,
           startIndex: startIndex,
@@ -102,8 +102,8 @@ extension PlaybackClient {
 
   static let noop = Self(
     playTrack: { _ in },
-    playAlbum: { _, _ in },
-    playAlbumFromPosition: { _, _, _ in },
+    playQueue: { _, _ in },
+    playQueueFromPosition: { _, _, _ in },
     pause: {},
     restartCurrentEntry: {},
     resume: {},
@@ -121,10 +121,10 @@ extension PlaybackClient {
         playTrack: { item in
           await state.play(items: [item], startIndex: 0, repeats: false)
         },
-        playAlbum: { items, startIndex in
+        playQueue: { items, startIndex in
           await state.play(items: items, startIndex: startIndex, repeats: true)
         },
-        playAlbumFromPosition: { items, startIndex, position in
+        playQueueFromPosition: { items, startIndex, position in
           await state.play(
             items: items,
             startIndex: startIndex,

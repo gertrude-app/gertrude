@@ -80,7 +80,10 @@ public struct GetApprovedMusicLibrary_v2: Pair {
       public var title: String
       public var artistName: String
       public var artworkUrl: String?
+      public var artwork: MusicArtwork?
       public var trackCount: Int?
+      public var releaseDate: String?
+      public var releaseType: String?
       public var showsArtwork: Bool
 
       public init(
@@ -88,31 +91,68 @@ public struct GetApprovedMusicLibrary_v2: Pair {
         title: String,
         artistName: String,
         artworkUrl: String?,
+        artwork: MusicArtwork? = nil,
         trackCount: Int?,
+        releaseDate: String? = nil,
+        releaseType: String? = nil,
         showsArtwork: Bool,
       ) {
         self.id = id
         self.title = title
         self.artistName = artistName
         self.artworkUrl = artworkUrl
+        self.artwork = artwork
         self.trackCount = trackCount
+        self.releaseDate = releaseDate
+        self.releaseType = releaseType
         self.showsArtwork = showsArtwork
       }
     }
 
     public struct Artist: PairNestable {
+      public struct TopSong: PairNestable {
+        public var id: String
+        public var title: String
+        public var artistName: String
+        public var albumTitle: String?
+        public var artworkUrl: String?
+        public var durationInMillis: Int?
+
+        public init(
+          id: String,
+          title: String,
+          artistName: String,
+          albumTitle: String? = nil,
+          artworkUrl: String? = nil,
+          durationInMillis: Int? = nil,
+        ) {
+          self.id = id
+          self.title = title
+          self.artistName = artistName
+          self.albumTitle = albumTitle
+          self.artworkUrl = artworkUrl
+          self.durationInMillis = durationInMillis
+        }
+      }
+
       public var id: String
       public var name: String
       public var catalogMetadata: MusicCatalogMetadata?
+      public var releaseAlbumIds: [String]?
+      public var topSongs: [TopSong]?
 
       public init(
         id: String,
         name: String,
         catalogMetadata: MusicCatalogMetadata? = nil,
+        releaseAlbumIds: [String]? = nil,
+        topSongs: [TopSong]? = nil,
       ) {
         self.id = id
         self.name = name
         self.catalogMetadata = catalogMetadata
+        self.releaseAlbumIds = releaseAlbumIds
+        self.topSongs = topSongs
       }
     }
 

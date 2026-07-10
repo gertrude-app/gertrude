@@ -82,4 +82,5 @@ extension Parent.Notification.Trigger: PostgresRawBindable {}
 
 extension ReleaseChannel: @retroactive PostgresRawBindable {}
 
+extension Music.Artwork: PostgresJsonable {}
 extension Music.CatalogMetadata: PostgresJsonable {}

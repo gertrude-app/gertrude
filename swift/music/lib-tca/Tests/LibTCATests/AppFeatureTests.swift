@@ -46,6 +46,38 @@ struct AppFeatureTests {
   }
 
   @Test
+  func nowPlayingAlbumInfoTapPreservesLoadedCurrentAlbumDetail() async {
+    let loadedAlbum = ApprovedMusicLibrary.mock.albums[0]
+    let track = loadedAlbum.tracks[1]
+    var library = ApprovedMusicLibrary.mock
+    library.albums[0].tracks = []
+    let item = PlaybackItem(
+      track: track,
+      artworkURL: loadedAlbum.artworkURL,
+      albumID: loadedAlbum.id,
+    )
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(library)
+    state.library.albumDetail = .init(
+      album: loadedAlbum,
+      transitionSourceID: loadedAlbum.id.rawValue,
+    )
+    state.playback.session = .init(playStatus: .playing, currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAlbumInfoTapped) {
+      $0.isNowPlayingPresented = false
+      $0.library.albumDetail?.playStatus = .playing
+      $0.library.albumDetail?.currentTrackID = track.id
+    }
+
+    #expect(store.state.library.albumDetail?.album.tracks == loadedAlbum.tracks)
+  }
+
+  @Test
   func nowPlayingAlbumInfoTapFromAnotherAlbumDetailQueuesReplacement() async {
     let library = ApprovedMusicLibrary.mock
     let currentAlbum = library.albums[0]
@@ -145,7 +177,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func libraryPlayAlbumDelegateStartsAlbumQueuePlayback() async {
+  func libraryPlayQueueDelegateStartsQueuePlayback() async {
     let items = [
       playbackItem("track-1"),
       playbackItem("track-2"),
@@ -155,15 +187,56 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.library(.delegate(.playAlbum(items: items, startIndex: 1))))
-    await store.receive(.playback(.playAlbumQueue(items: items, startIndex: 1))) {
+    await store.send(.library(.delegate(.playQueue(items: items, startIndex: 1))))
+    await store.receive(.playback(.playQueue(items: items, startIndex: 1))) {
       $0.playback.session = .init(
         playStatus: .loading,
-        albumQueue: .init(items: items, currentIndex: 1),
+        queue: .init(items: items, currentIndex: 1),
       )
     }
     await store.receive(.playback(.playbackStarted)) {
       $0.playback.session?.playStatus = .playing
+    }
+  }
+
+  @Test
+  func artistPlaybackButtonStartsArtistQueueWhenAnotherQueueIsActive() async {
+    let oldItem = playbackItem("old-track")
+    let items = [playbackItem("track-1"), playbackItem("track-2")]
+    var state = AppFeature.State()
+    state.playback.session = .init(currentItem: oldItem)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.library(.delegate(.artistPlaybackButtonTapped(items: items))))
+    await store.receive(.playback(.playQueue(items: items, startIndex: 0))) {
+      $0.playback.session = .init(
+        playStatus: .loading,
+        queue: .init(items: items),
+      )
+    }
+    await store.receive(.playback(.playbackStarted)) {
+      $0.playback.session?.playStatus = .playing
+    }
+  }
+
+  @Test
+  func artistPlaybackButtonPausesMatchingArtistQueue() async {
+    let items = [playbackItem("track-1"), playbackItem("track-2")]
+    var state = AppFeature.State()
+    state.playback.session = .init(
+      playStatus: .playing,
+      queue: .init(items: items),
+    )
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.library(.delegate(.artistPlaybackButtonTapped(items: items))))
+    await store.receive(.playback(.togglePlayPause))
+    await store.receive(.playback(.pause)) {
+      $0.playback.session?.playStatus = .paused
     }
   }
 

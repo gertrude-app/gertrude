@@ -62,6 +62,7 @@ const MusicCuration: React.FC<{
         title: album.title,
         artistName: album.artistName,
         artworkUrl: album.artworkUrl,
+        artwork: album.artwork,
         trackCount: album.trackCount,
         showsArtwork: true,
       }),

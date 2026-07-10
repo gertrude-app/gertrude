@@ -101,9 +101,18 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
   static func resolve(in ctx: MusicApp.InstallContext) async throws -> Output {
     try await requireMusicAccess(in: ctx)
 
-    let albums = try await ctx.child.approvedMusicAlbums(in: ctx.db)
+    let albums = try await self.hydrateArtworkIfNeeded(
+      ctx.child.approvedMusicAlbums(in: ctx.db),
+      in: ctx,
+    )
     let artists = try await ctx.child.approvedMusicArtists(in: ctx.db)
-    let artistReleaseAlbums = await self.artistReleaseAlbums(for: artists)
+    async let releaseAlbumsByArtistId = self.artistReleaseAlbumsByArtistId(for: artists)
+    async let topSongsByArtistId = self.artistTopSongsByArtistId(for: artists)
+    let artistReleaseAlbumsById = await releaseAlbumsByArtistId
+    let artistTopSongsById = await topSongsByArtistId
+    let artistReleaseAlbums = artists.flatMap {
+      artistReleaseAlbumsById[$0.appleMusicArtistId] ?? []
+    }
     return .init(
       albums: self.outputAlbums(
         explicitAlbums: albums,
@@ -114,6 +123,18 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
           id: artist.appleMusicArtistId.rawValue,
           name: artist.name,
           catalogMetadata: artist.catalogMetadata.map(MusicCatalogMetadata.init),
+          releaseAlbumIds: artistReleaseAlbumsById[artist.appleMusicArtistId]?
+            .map(\.id.rawValue),
+          topSongs: artistTopSongsById[artist.appleMusicArtistId]?.map { song in
+            .init(
+              id: song.id.rawValue,
+              title: song.title,
+              artistName: song.artistName,
+              albumTitle: song.albumTitle,
+              artworkUrl: song.artworkUrl,
+              durationInMillis: song.durationInMillis,
+            )
+          },
         )
       },
     )
@@ -124,14 +145,22 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
     artistReleaseAlbums: [AppleMusicCatalogAlbum],
   ) -> [Output.Album] {
     var seenAlbumIds = Set<String>()
+    var artistReleaseAlbumsById: [Music.AlbumId: AppleMusicCatalogAlbum] = [:]
+    for album in artistReleaseAlbums where artistReleaseAlbumsById[album.id] == nil {
+      artistReleaseAlbumsById[album.id] = album
+    }
     var albums = explicitAlbums.map { album in
       _ = seenAlbumIds.insert(album.appleMusicAlbumId.rawValue)
+      let catalogAlbum = artistReleaseAlbumsById[album.appleMusicAlbumId]
       return Output.Album(
         id: album.appleMusicAlbumId.rawValue,
         title: album.title,
         artistName: album.artistName,
         artworkUrl: album.artworkUrl,
-        trackCount: album.trackCount,
+        artwork: album.artwork.map(MusicArtwork.init),
+        trackCount: album.trackCount ?? catalogAlbum?.trackCount,
+        releaseDate: catalogAlbum?.releaseDate,
+        releaseType: catalogAlbum?.releaseType,
         showsArtwork: album.showsArtwork,
       )
     }
@@ -143,7 +172,10 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
         title: album.title,
         artistName: album.artistName,
         artworkUrl: album.artworkUrl,
+        artwork: album.artwork.map(MusicArtwork.init),
         trackCount: album.trackCount,
+        releaseDate: album.releaseDate,
+        releaseType: album.releaseType,
         showsArtwork: true,
       ))
     }
@@ -151,26 +183,97 @@ extension GetApprovedMusicLibrary_v2: NoInputResolver {
     return albums
   }
 
+  private static func hydrateArtworkIfNeeded(
+    _ albums: [Music.ApprovedAlbum],
+    in ctx: MusicApp.InstallContext,
+  ) async -> [Music.ApprovedAlbum] {
+    let missingAlbumIds = albums.compactMap { album in
+      album.artwork == nil ? album.appleMusicAlbumId : nil
+    }
+    guard !missingAlbumIds.isEmpty else { return albums }
+
+    let catalogAlbums: [AppleMusicCatalogAlbum]
+    do {
+      catalogAlbums = try await get(dependency: \.appleMusic).albums(.init(
+        albumIds: missingAlbumIds,
+        storefront: "us",
+      ))
+    } catch {
+      with(dependency: \.logger).error(
+        "Apple Music album artwork hydration failed for `\(missingAlbumIds.map(\.rawValue).joined(separator: ","))`: \(error)",
+      )
+      return albums
+    }
+
+    let catalogAlbumsById = Dictionary(uniqueKeysWithValues: catalogAlbums.map { ($0.id, $0) })
+    var hydratedAlbums = albums
+    for index in hydratedAlbums.indices where hydratedAlbums[index].artwork == nil {
+      guard let catalogAlbum = catalogAlbumsById[hydratedAlbums[index].appleMusicAlbumId]
+      else { continue }
+
+      hydratedAlbums[index].artwork = catalogAlbum.artwork ?? .init(
+        url: catalogAlbum.artworkUrl ?? hydratedAlbums[index].artworkUrl,
+      )
+      hydratedAlbums[index].artworkUrl = catalogAlbum.artworkUrl
+        ?? hydratedAlbums[index].artworkUrl
+      do {
+        try await ctx.db.update(hydratedAlbums[index])
+      } catch {
+        with(dependency: \.logger).error(
+          "Persisting Apple Music artwork failed for album `\(hydratedAlbums[index].appleMusicAlbumId.rawValue)`: \(error)",
+        )
+      }
+    }
+    return hydratedAlbums
+  }
+
   fileprivate static func artistReleaseAlbums(
     for artists: [Music.ApprovedArtist],
   ) async -> [AppleMusicCatalogAlbum] {
+    let albumsByArtistId = await self.artistReleaseAlbumsByArtistId(for: artists)
+    return artists.flatMap { albumsByArtistId[$0.appleMusicArtistId] ?? [] }
+  }
+
+  private static func artistReleaseAlbumsByArtistId(
+    for artists: [Music.ApprovedArtist],
+  ) async -> [Music.ArtistId: [AppleMusicCatalogAlbum]] {
     let appleMusic = get(dependency: \.appleMusic)
-    var albums: [AppleMusicCatalogAlbum] = []
+    var albumsByArtistId: [Music.ArtistId: [AppleMusicCatalogAlbum]] = [:]
     for artist in artists {
       do {
-        let artistAlbums = try await appleMusic.artistAlbums(.init(
+        albumsByArtistId[artist.appleMusicArtistId] = try await appleMusic.artistAlbums(.init(
           artistId: artist.appleMusicArtistId,
           artistName: artist.name,
           storefront: "us",
         ))
-        albums.append(contentsOf: artistAlbums)
       } catch {
         with(dependency: \.logger).error(
           "Apple Music artist albums lookup failed for artist `\(artist.appleMusicArtistId.rawValue)`: \(error)",
         )
       }
     }
-    return albums
+    return albumsByArtistId
+  }
+
+  private static func artistTopSongsByArtistId(
+    for artists: [Music.ApprovedArtist],
+  ) async -> [Music.ArtistId: [AppleMusicCatalogTrack]] {
+    let appleMusic = get(dependency: \.appleMusic)
+    var topSongsByArtistId: [Music.ArtistId: [AppleMusicCatalogTrack]] = [:]
+    for artist in artists {
+      do {
+        topSongsByArtistId[artist.appleMusicArtistId] = try await appleMusic.artistTopSongs(.init(
+          artistId: artist.appleMusicArtistId,
+          artistName: artist.name,
+          storefront: "us",
+        ))
+      } catch {
+        with(dependency: \.logger).error(
+          "Apple Music artist top songs lookup failed for artist `\(artist.appleMusicArtistId.rawValue)`: \(error)",
+        )
+      }
+    }
+    return topSongsByArtistId
   }
 }
 
