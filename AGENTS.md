@@ -162,8 +162,10 @@ the same failure mode for future agents.
 
 Proactively copy complex URLs and other likely copy-paste values (email text, SQL, or
 commands) to my macOS clipboard when I will use them in a browser, another app, or another
-terminal. Mark the rendered value with 📋 only; don't mention it in prose. I use clipboard
-history, so copying multiple values is fine.
+terminal — actually pipe the value through `pbcopy`, every time; the 📋 marker is not a
+substitute for that call and must only be added after `pbcopy` has actually run. Mark the
+rendered value with 📋 only; don't mention it in prose. I use clipboard history, so copying
+multiple values is fine.
 
 ## Further user-specific instructions
 
