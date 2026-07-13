@@ -1,16 +1,7 @@
 import cx from 'clsx';
 import React from 'react';
 import type { PolymorphicComponent, PolymorphicRef } from './polymorphic';
-import { stackGapClasses } from './spacing';
-import {
-  type StackOwnProps,
-  type StackProps,
-  getStackStyle,
-  stackAlignClasses,
-  stackDirectionClasses,
-  stackJustifyClasses,
-  stackWrapClasses,
-} from './stack-utils';
+import { type StackOwnProps, type StackProps, getStackAttributes } from './stack-utils';
 import { getVisibilityClasses } from './visibility';
 
 type StackComponent = PolymorphicComponent<`div`, StackOwnProps>;
@@ -31,6 +22,7 @@ const StackRender = <Element extends React.ElementType = `div`>({
   ...props
 }: StackProps<Element> & { ref?: PolymorphicRef<Element> }): React.ReactElement => {
   const Component = as ?? `div`;
+  const stackAttributes = getStackAttributes({ direction, gap, align, justify, wrap });
 
   return React.createElement(
     Component,
@@ -38,16 +30,12 @@ const StackRender = <Element extends React.ElementType = `div`>({
       ...props,
       ref,
       style: {
-        ...getStackStyle({ direction, gap, align, justify, wrap }),
+        ...stackAttributes.style,
         ...style,
       },
       className: cx(
         `flex`,
-        stackDirectionClasses,
-        stackGapClasses,
-        stackAlignClasses,
-        stackJustifyClasses,
-        stackWrapClasses,
+        stackAttributes.className,
         getVisibilityClasses({ hideBelow, hideAbove, restoreDisplay: `flex` }),
         className,
       ),

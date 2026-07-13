@@ -9,8 +9,7 @@ import type { VisibilityProps } from './visibility';
 import {
   type ResponsiveSpacing,
   type Spacing,
-  cardPaddingClasses,
-  getResponsiveSpacingStyle,
+  getCardPaddingAttributes,
 } from './spacing';
 import { getVisibilityClasses } from './visibility';
 
@@ -105,6 +104,10 @@ const CardRender = <Element extends React.ElementType = `div`>({
 }: CardProps<Element> & { ref?: PolymorphicRef<Element> }): React.ReactElement => {
   const defaultPadding = cardPresetPadding[preset];
   const Component = as ?? `div`;
+  const paddingAttributes = getCardPaddingAttributes(
+    padding ?? defaultPadding,
+    defaultPadding,
+  );
 
   return React.createElement(
     Component,
@@ -113,17 +116,13 @@ const CardRender = <Element extends React.ElementType = `div`>({
       ...getDisabledProps(Component, disabled),
       ref,
       style: {
-        ...getResponsiveSpacingStyle(
-          padding ?? defaultPadding,
-          `card-padding`,
-          defaultPadding,
-        ),
+        ...paddingAttributes.style,
         ...style,
       },
       className: cx(
         `border`,
         cardPresetClasses[preset],
-        cardPaddingClasses,
+        paddingAttributes.className,
         disabled
           ? `border-stone-200 bg-stone-100/70 opacity-60 shadow-transparent`
           : selected
@@ -155,21 +154,25 @@ const CardBody: React.FC<CardBodyProps> = ({
   style,
   hideBelow,
   hideAbove,
-}) => (
-  <div
-    style={{
-      ...getResponsiveSpacingStyle(padding, `card-padding`, 4),
-      ...style,
-    }}
-    className={cx(
-      cardPaddingClasses,
-      getVisibilityClasses({ hideBelow, hideAbove, restoreDisplay: `block` }),
-      className,
-    )}
-  >
-    {children}
-  </div>
-);
+}) => {
+  const paddingAttributes = getCardPaddingAttributes(padding, 4);
+
+  return (
+    <div
+      style={{
+        ...paddingAttributes.style,
+        ...style,
+      }}
+      className={cx(
+        paddingAttributes.className,
+        getVisibilityClasses({ hideBelow, hideAbove, restoreDisplay: `block` }),
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+};
 
 const CardFooter: React.FC<CardFooterProps> = ({
   children,

@@ -1,13 +1,18 @@
 import type { PolymorphicProps } from './polymorphic';
 import type { VisibilityProps } from './visibility';
 import type React from 'react';
-import { getResponsiveValueStyle } from './responsive';
+import {
+  type ResponsiveValueAttributes,
+  createResponsiveClassMap,
+  getResponsiveValueAttributes,
+  mergeResponsiveValueAttributes,
+} from './responsive';
 import {
   type CSSVariableProperties,
   type ResponsiveSpacing,
   type ResponsiveValue,
   type Spacing,
-  getResponsiveSpacingStyle,
+  getStackGapAttributes,
 } from './spacing';
 
 export type StackGap = Spacing;
@@ -74,31 +79,49 @@ export const stackJustifyClasses = `[justify-content:var(--stack-justify)] xs:[j
 
 export const stackWrapClasses = `[flex-wrap:var(--stack-wrap)] xs:[flex-wrap:var(--stack-wrap-xs)] sm:[flex-wrap:var(--stack-wrap-sm)] md:[flex-wrap:var(--stack-wrap-md)] lg:[flex-wrap:var(--stack-wrap-lg)] xl:[flex-wrap:var(--stack-wrap-xl)] 2xl:[flex-wrap:var(--stack-wrap-2xl)] @xs/main:[flex-wrap:var(--stack-wrap-main-xs)] @sm/main:[flex-wrap:var(--stack-wrap-main-sm)] @md/main:[flex-wrap:var(--stack-wrap-main-md)] @lg/main:[flex-wrap:var(--stack-wrap-main-lg)] @xl/main:[flex-wrap:var(--stack-wrap-main-xl)] @2xl/main:[flex-wrap:var(--stack-wrap-main-2xl)] @3xl/main:[flex-wrap:var(--stack-wrap-main-3xl)] @4xl/main:[flex-wrap:var(--stack-wrap-main-4xl)] @5xl/main:[flex-wrap:var(--stack-wrap-main-5xl)] @6xl/main:[flex-wrap:var(--stack-wrap-main-6xl)] @7xl/main:[flex-wrap:var(--stack-wrap-main-7xl)] @xs/slide:[flex-wrap:var(--stack-wrap-slide-xs)] @sm/slide:[flex-wrap:var(--stack-wrap-slide-sm)] @md/slide:[flex-wrap:var(--stack-wrap-slide-md)] @lg/slide:[flex-wrap:var(--stack-wrap-slide-lg)] @xl/slide:[flex-wrap:var(--stack-wrap-slide-xl)] @2xl/slide:[flex-wrap:var(--stack-wrap-slide-2xl)] @3xl/slide:[flex-wrap:var(--stack-wrap-slide-3xl)] @4xl/slide:[flex-wrap:var(--stack-wrap-slide-4xl)] @5xl/slide:[flex-wrap:var(--stack-wrap-slide-5xl)] @6xl/slide:[flex-wrap:var(--stack-wrap-slide-6xl)] @7xl/slide:[flex-wrap:var(--stack-wrap-slide-7xl)]`;
 
-export const getStackStyle = ({
+const stackDirectionClassMap = createResponsiveClassMap(stackDirectionClasses);
+const stackAlignClassMap = createResponsiveClassMap(stackAlignClasses);
+const stackJustifyClassMap = createResponsiveClassMap(stackJustifyClasses);
+const stackWrapClassMap = createResponsiveClassMap(stackWrapClasses);
+
+export const getStackAttributes = ({
   direction,
   gap,
   align,
   justify,
   wrap,
-}: StackStyleOptions): CSSVariableProperties => ({
-  ...getResponsiveValueStyle<StackDirection>(
-    direction,
-    `stack-direction`,
-    (value) => stackDirectionCssValues[value],
-    `vertical`,
-  ),
-  ...getResponsiveSpacingStyle(gap, `stack-gap`),
-  ...getResponsiveValueStyle<StackAlign>(
-    align,
-    `stack-align`,
-    (value) => stackAlignCssValues[value],
-    `stretch`,
-  ),
-  ...getResponsiveValueStyle<StackJustify>(
-    justify,
-    `stack-justify`,
-    (value) => stackJustifyCssValues[value],
-    `start`,
-  ),
-  ...getResponsiveValueStyle<StackWrap>(wrap, `stack-wrap`, stackWrapCssValue, false),
-});
+}: StackStyleOptions): ResponsiveValueAttributes =>
+  mergeResponsiveValueAttributes(
+    getResponsiveValueAttributes<StackDirection>(
+      direction,
+      `stack-direction`,
+      (value) => stackDirectionCssValues[value],
+      `vertical`,
+      stackDirectionClassMap,
+    ),
+    getStackGapAttributes(gap),
+    getResponsiveValueAttributes<StackAlign>(
+      align,
+      `stack-align`,
+      (value) => stackAlignCssValues[value],
+      `stretch`,
+      stackAlignClassMap,
+    ),
+    getResponsiveValueAttributes<StackJustify>(
+      justify,
+      `stack-justify`,
+      (value) => stackJustifyCssValues[value],
+      `start`,
+      stackJustifyClassMap,
+    ),
+    getResponsiveValueAttributes<StackWrap>(
+      wrap,
+      `stack-wrap`,
+      stackWrapCssValue,
+      false,
+      stackWrapClassMap,
+    ),
+  );
+
+export const getStackStyle = (options: StackStyleOptions): CSSVariableProperties =>
+  getStackAttributes(options).style;

@@ -13,6 +13,12 @@ export type ResponsiveValueMap<Value> = { default?: Value } & Partial<
   Record<ResponsiveBreakpoint, Value>
 >;
 export type ResponsiveValue<Value> = Value | ResponsiveValueMap<Value>;
+export type ResponsiveClassMap = Record<`default` | ResponsiveBreakpoint, string>;
+
+export interface ResponsiveValueAttributes {
+  style: CSSVariableProperties;
+  className: string;
+}
 
 export const viewportBreakpoints = [`xs`, `sm`, `md`, `lg`, `xl`, `2xl`] as const;
 export const mainContainerBreakpoints = [
@@ -83,6 +89,28 @@ export const responsiveBreakpointSuffixes: Record<ResponsiveBreakpoint, string> 
   '@7xl/slide': `slide-7xl`,
 };
 
+const responsiveClassMapKeys = [`default`, ...responsiveBreakpoints] as const;
+
+export const createResponsiveClassMap = (classes: string): ResponsiveClassMap => {
+  const classNames = classes.trim().split(/\s+/);
+
+  if (classNames.length !== responsiveClassMapKeys.length) {
+    throw new Error(
+      `Expected ${responsiveClassMapKeys.length} responsive classes, received ${classNames.length}`,
+    );
+  }
+
+  const classMap = {} as ResponsiveClassMap;
+  responsiveClassMapKeys.forEach((key, index) => {
+    const className = classNames[index];
+    if (className === undefined) {
+      throw new Error(`Missing responsive class for ${key}`);
+    }
+    classMap[key] = className;
+  });
+  return classMap;
+};
+
 export const getResponsiveVariableName = (
   variableName: string,
   breakpoint?: ResponsiveBreakpoint,
@@ -95,6 +123,46 @@ export const isResponsiveValueMap = <Value>(
   value: ResponsiveValue<Value>,
 ): value is ResponsiveValueMap<Value> =>
   typeof value === `object` && value !== null && !Array.isArray(value);
+
+interface ResponsiveValueEntry<Value> {
+  breakpoint: ResponsiveBreakpoint | undefined;
+  value: Value;
+}
+
+const getResponsiveValueEntries = <Value>(
+  value: ResponsiveValue<Value>,
+  defaultValue: Value,
+): ResponsiveValueEntry<Value>[] => {
+  const entries: ResponsiveValueEntry<Value>[] = [];
+  const addEntry = (
+    breakpoint: ResponsiveBreakpoint | undefined,
+    entryValue: Value,
+  ): void => {
+    entries.push({ breakpoint, value: entryValue });
+  };
+
+  if (!isResponsiveValueMap(value)) {
+    addEntry(undefined, value);
+    return entries;
+  }
+
+  const defaultResponsiveValue = value.default ?? defaultValue;
+  addEntry(undefined, defaultResponsiveValue);
+
+  responsiveBreakpointGroups.forEach((breakpointGroup) => {
+    let currentValue = defaultResponsiveValue;
+
+    breakpointGroup.forEach((breakpoint) => {
+      const nextValue = value[breakpoint] ?? currentValue;
+      if (!Object.is(nextValue, currentValue)) {
+        currentValue = nextValue;
+        addEntry(breakpoint, currentValue);
+      }
+    });
+  });
+
+  return entries;
+};
 
 const setResponsiveValueVariable = <Value>(
   style: CSSVariableProperties,
@@ -114,37 +182,56 @@ export const getResponsiveValueStyle = <Value>(
 ): CSSVariableProperties => {
   const style: CSSVariableProperties = {};
 
-  if (!isResponsiveValueMap(value)) {
-    setResponsiveValueVariable(style, variableName, undefined, value, serializeValue);
-    responsiveBreakpoints.forEach((breakpoint) => {
-      setResponsiveValueVariable(style, variableName, breakpoint, value, serializeValue);
-    });
-    return style;
-  }
-
-  const defaultResponsiveValue = value.default ?? defaultValue;
-  setResponsiveValueVariable(
-    style,
-    variableName,
-    undefined,
-    defaultResponsiveValue,
-    serializeValue,
-  );
-
-  responsiveBreakpointGroups.forEach((breakpointGroup) => {
-    let currentValue = defaultResponsiveValue;
-
-    breakpointGroup.forEach((breakpoint) => {
-      currentValue = value[breakpoint] ?? currentValue;
+  getResponsiveValueEntries(value, defaultValue).forEach(
+    ({ breakpoint, value: entryValue }) => {
       setResponsiveValueVariable(
         style,
         variableName,
         breakpoint,
-        currentValue,
+        entryValue,
         serializeValue,
       );
-    });
-  });
+    },
+  );
 
   return style;
 };
+
+export const getResponsiveValueAttributes = <Value>(
+  value: ResponsiveValue<Value>,
+  variableName: string,
+  serializeValue: (value: Value) => string,
+  defaultValue: Value,
+  classMap: ResponsiveClassMap,
+): ResponsiveValueAttributes => {
+  const style: CSSVariableProperties = {};
+  const classNames: string[] = [];
+
+  getResponsiveValueEntries(value, defaultValue).forEach(
+    ({ breakpoint, value: entryValue }) => {
+      setResponsiveValueVariable(
+        style,
+        variableName,
+        breakpoint,
+        entryValue,
+        serializeValue,
+      );
+      classNames.push(classMap[breakpoint ?? `default`]);
+    },
+  );
+
+  return { style, className: classNames.join(` `) };
+};
+
+export const mergeResponsiveValueAttributes = (
+  ...attributes: ResponsiveValueAttributes[]
+): ResponsiveValueAttributes => ({
+  style: Object.assign(
+    {},
+    ...attributes.map((attribute) => attribute.style),
+  ) as CSSVariableProperties,
+  className: attributes
+    .map((attribute) => attribute.className)
+    .filter(Boolean)
+    .join(` `),
+});

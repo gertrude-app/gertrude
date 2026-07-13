@@ -1,7 +1,11 @@
 import {
   type CSSVariableProperties,
+  type ResponsiveClassMap,
   type ResponsiveValue,
+  type ResponsiveValueAttributes,
   type ResponsiveValueMap,
+  createResponsiveClassMap,
+  getResponsiveValueAttributes,
   getResponsiveValueStyle,
 } from './responsive';
 
@@ -11,7 +15,9 @@ export type {
   ContainerName,
   ContainerSize,
   ResponsiveBreakpoint,
+  ResponsiveClassMap,
   ResponsiveValue,
+  ResponsiveValueAttributes,
   ResponsiveValueMap,
   ViewportBreakpoint,
 } from './responsive';
@@ -46,6 +52,9 @@ export const stackGapClasses = `gap-[var(--stack-gap)] xs:gap-[var(--stack-gap-x
 
 export const cardPaddingClasses = `p-[var(--card-padding)] xs:p-[var(--card-padding-xs)] sm:p-[var(--card-padding-sm)] md:p-[var(--card-padding-md)] lg:p-[var(--card-padding-lg)] xl:p-[var(--card-padding-xl)] 2xl:p-[var(--card-padding-2xl)] @xs/main:p-[var(--card-padding-main-xs)] @sm/main:p-[var(--card-padding-main-sm)] @md/main:p-[var(--card-padding-main-md)] @lg/main:p-[var(--card-padding-main-lg)] @xl/main:p-[var(--card-padding-main-xl)] @2xl/main:p-[var(--card-padding-main-2xl)] @3xl/main:p-[var(--card-padding-main-3xl)] @4xl/main:p-[var(--card-padding-main-4xl)] @5xl/main:p-[var(--card-padding-main-5xl)] @6xl/main:p-[var(--card-padding-main-6xl)] @7xl/main:p-[var(--card-padding-main-7xl)] @xs/slide:p-[var(--card-padding-slide-xs)] @sm/slide:p-[var(--card-padding-slide-sm)] @md/slide:p-[var(--card-padding-slide-md)] @lg/slide:p-[var(--card-padding-slide-lg)] @xl/slide:p-[var(--card-padding-slide-xl)] @2xl/slide:p-[var(--card-padding-slide-2xl)] @3xl/slide:p-[var(--card-padding-slide-3xl)] @4xl/slide:p-[var(--card-padding-slide-4xl)] @5xl/slide:p-[var(--card-padding-slide-5xl)] @6xl/slide:p-[var(--card-padding-slide-6xl)] @7xl/slide:p-[var(--card-padding-slide-7xl)]`;
 
+const stackGapClassMap = createResponsiveClassMap(stackGapClasses);
+const cardPaddingClassMap = createResponsiveClassMap(cardPaddingClasses);
+
 export const spacingToCssValue = (spacing: Spacing): string =>
   spacing === 0 ? `0px` : `calc(var(--spacing) * ${spacing})`;
 
@@ -55,3 +64,33 @@ export const getResponsiveSpacingStyle = (
   defaultSpacing: Spacing = 0,
 ): CSSVariableProperties =>
   getResponsiveValueStyle(spacing, variableName, spacingToCssValue, defaultSpacing);
+
+export const getResponsiveSpacingAttributes = (
+  spacing: ResponsiveSpacing,
+  variableName: string,
+  classMap: ResponsiveClassMap,
+  defaultSpacing: Spacing = 0,
+): ResponsiveValueAttributes =>
+  getResponsiveValueAttributes(
+    spacing,
+    variableName,
+    spacingToCssValue,
+    defaultSpacing,
+    classMap,
+  );
+
+export const getStackGapAttributes = (
+  gap: ResponsiveSpacing,
+): ResponsiveValueAttributes =>
+  getResponsiveSpacingAttributes(gap, `stack-gap`, stackGapClassMap);
+
+export const getCardPaddingAttributes = (
+  padding: ResponsiveSpacing,
+  defaultSpacing: Spacing = 0,
+): ResponsiveValueAttributes =>
+  getResponsiveSpacingAttributes(
+    padding,
+    `card-padding`,
+    cardPaddingClassMap,
+    defaultSpacing,
+  );
