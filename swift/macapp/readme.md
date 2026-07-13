@@ -2,6 +2,8 @@
 
 ## Release notes
 
+- `2.9.5` (canary, 7/13/26)
+  - no changes, just testing xpc upgrade reboot reconnect fix again
 - `2.9.4` (canary, 7/9/26)
   - unix-domain-socket shadow xpc
   - try to restore filter on xpc comm lost repair fail
