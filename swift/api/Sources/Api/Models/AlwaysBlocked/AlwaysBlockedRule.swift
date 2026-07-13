@@ -1,6 +1,7 @@
 import DuetSQL
 import Gertie
 
+@DuetModel(schema: "macapp", table: "always_blocked_rules")
 struct AlwaysBlockedRule: Codable, Sendable {
   var id: Id
   var groupId: AlwaysBlockedGroup.Id

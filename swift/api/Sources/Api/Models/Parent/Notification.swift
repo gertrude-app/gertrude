@@ -2,6 +2,7 @@ import DuetSQL
 import Tagged
 
 extension Parent {
+  @DuetModel(schema: "parent", table: "notifications")
   struct Notification: Codable, Sendable {
     var id: Id
     var parentId: Parent.Id

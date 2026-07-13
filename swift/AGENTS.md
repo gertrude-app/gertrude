@@ -329,17 +329,28 @@ If you are doing anything non-trivial in the API with the Duet database layer, r
 ### Adding a Database Migration
 
 - read several examples in `api/Sources/Api/Database/Migrations/` to see pattern
+- NEVER create Postgres enum types (`CREATE TYPE ... AS ENUM`) — we deliberately removed
+  the last of them (migration 103) because they are hard to evolve. Model enum-ish
+  columns as `text` with a `CHECK` constraint, backed by a Swift `String`-raw enum
+  conforming to `PostgresRawBindable`
 - for any non-trivial migration (data backfill, column drop, transforms, etc.), follow
   `./.agents/skills/migration-verification/SKILL.md` to capture a pre/post baseline before
   merging
 
 ### Adding/Removing a Model Field
 
-Adding/removing a field/column to a model requires changes in three files:
+Add/remove the stored property on the model struct (e.g.
+`api/Sources/Api/Models/Child/IOSDevice.swift`) — the `@DuetModel` macro derives
+`CodingKeys` and `insertValues` from the stored properties. If the property's type isn't
+already bindable (a primitive, `Tagged`, `PostgresRawBindable`, or `PostgresJsonable`),
+add a conformance in `api/Sources/Api/Models/Models+DuetSQL.swift`.
 
-- The model struct (e.g. `api/Sources/Api/Models/IOS/IOSDevice.swift`) — add the property
-- `api/Sources/Api/Models/Models+Duet.swift` — add to the `CodingKeys` enum
-- `api/Sources/Api/Models/Models+DuetSQL.swift` — add to `postgresData` and `insertValues`
+### Adding a New Model
+
+Declare the struct with stored properties (must include `id` and `createdAt`) and attach
+the macro: `@DuetModel(schema: "parent", table: "dash_announcements")`. Pass
+`clientCreatedAt: true` only if inserts must preserve a client-supplied `createdAt`
+instead of `CURRENT_TIMESTAMP` (see `KeystrokeLine`).
 
 ### Other database tasks
 

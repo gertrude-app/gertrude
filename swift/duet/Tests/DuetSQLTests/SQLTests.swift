@@ -10,6 +10,27 @@ import XExpect
 @testable import DuetSQL
 
 final class SqlTests: XCTestCase {
+  func testPostgresBindable() {
+    expect("foo".postgresData).toEqual(.string("foo"))
+    expect(33.postgresData).toEqual(.int(33))
+    expect(true.postgresData).toEqual(.bool(true))
+    expect(3.14.postgresData).toEqual(.double(3.14))
+    let date = Date()
+    expect(date.postgresData).toEqual(.date(date))
+    let uuid = UUID()
+    expect(uuid.postgresData).toEqual(.uuid(uuid))
+    let tagged = Thing.Id(uuid)
+    expect(tagged.postgresData).toEqual(.uuid(uuid))
+    expect(Thing.CustomEnum.foo.postgresData).toEqual(.string("foo"))
+    // optionals preserve the typed nil of their wrapped type
+    expect(Int?.none.postgresData).toEqual(.int(nil))
+    expect(String?.none.postgresData).toEqual(.string(nil))
+    expect(Thing.Id?.none.postgresData).toEqual(.uuid(nil))
+    expect(Thing.CustomEnum?.none.postgresData).toEqual(.string(nil))
+    expect(Data?.none.postgresData).toEqual(.bytea(nil))
+    expect(Int?.some(5).postgresData).toEqual(.int(5))
+  }
+
   func testSelect() async throws {
     let stmt = try await select(Thing.self)
 
@@ -521,6 +542,44 @@ final class SqlTests: XCTestCase {
     ])
   }
 
+  func testCreateMacroModel() async throws {
+    let thing = MacroThing(name: "foo", customEnum: .bar)
+
+    let client = TestClient()
+    _ = try await client.create([thing])
+
+    let expected = """
+    INSERT INTO public.macro_things
+    ("count", "created_at", "custom_enum", "deleted_at", "id", "name", "optional_custom_enum", "updated_at")
+    VALUES
+    ($1, $2, $3, $4, $5, $6, $7, $8)
+    """
+
+    expect(client.stmt.prepared).toEqual(expected)
+    expect(client.stmt.params).toEqual([
+      .int(nil),
+      .currentTimestamp,
+      .string("bar"),
+      .date(nil),
+      .id(thing),
+      .string("foo"),
+      .string(nil),
+      .currentTimestamp,
+    ])
+  }
+
+  func testMacroModelCodingKeys() throws {
+    expect(MacroThing.columnName(.createdAt)).toEqual("created_at")
+    expect(MacroThing.columnName(.optionalCustomEnum)).toEqual("optional_custom_enum")
+    expect(MacroThing.isSoftDeletable).toEqual(true)
+    let thing = MacroThing(name: "roundtrip", count: 5)
+    let json = try JSONEncoder().encode(thing)
+    let decoded = try JSONDecoder().decode(MacroThing.self, from: json)
+    expect(decoded.id).toEqual(thing.id)
+    expect(decoded.name).toEqual("roundtrip")
+    expect(decoded.count).toEqual(5)
+  }
+
   func testUpdate() async throws {
     let thing = LilThing(int: 5, createdAt: .epoch, updatedAt: .reference)
 
@@ -564,15 +623,15 @@ final class SqlTests: XCTestCase {
     expect(client.stmt.params).toEqual([
       .bool(false),
       .currentTimestamp,
-      .enum(Thing.CustomEnum.foo),
+      .string("foo"),
       .id(thing),
       .int(3),
-      .enum(nil),
+      .string(nil),
       .int(4),
       .string(nil),
       .string("string"),
       .currentTimestamp,
-      .varchar("version"),
+      .string("version"),
     ])
   }
 
@@ -584,24 +643,6 @@ final class SqlTests: XCTestCase {
     sql.serialize(to: &serializer)
     expect(serializer.sql).toContain("NULL")
     expect(serializer.sql).not.toContain("$1")
-  }
-
-  func testNilEnumSerializesToNull() async throws {
-    let thing = Thing(
-      customEnum: .bar,
-      optionalCustomEnum: nil,
-    )
-
-    let client = TestClient()
-    _ = try await client.create([thing])
-
-    let sql = client.stmt.sql
-    var serializer = SQLSerializer(database: TestDatabase())
-    sql.serialize(to: &serializer)
-    let sqlString = serializer.sql
-
-    expect(sqlString).toContain("'bar'::custom_enums")
-    expect(sqlString).toContain(", NULL,")
   }
 
   func testByteaSerializesToDecode() async throws {
@@ -630,24 +671,6 @@ final class SqlTests: XCTestCase {
     let sqlString = serializer.sql
 
     expect(sqlString).toContain(", NULL,")
-  }
-
-  func testNonNilEnumSerializesToTypedValue() async throws {
-    let thing = Thing(
-      customEnum: .foo,
-      optionalCustomEnum: .bar,
-    )
-
-    let client = TestClient()
-    _ = try await client.create([thing])
-
-    let sql = client.stmt.sql
-    var serializer = SQLSerializer(database: TestDatabase())
-    sql.serialize(to: &serializer)
-    let sqlString = serializer.sql
-
-    expect(sqlString).toContain("'foo'::custom_enums")
-    expect(sqlString).toContain("'bar'::custom_enums")
   }
 }
 

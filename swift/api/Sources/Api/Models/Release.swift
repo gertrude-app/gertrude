@@ -1,6 +1,7 @@
-import Duet
+import DuetSQL
 import Gertie
 
+@DuetModel(schema: "macapp", table: "releases")
 struct Release: Codable, Sendable {
   var id: Id
   var semver: String

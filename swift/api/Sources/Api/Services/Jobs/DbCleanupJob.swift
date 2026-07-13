@@ -49,14 +49,14 @@ struct CleanupJob: AsyncScheduledJob {
     logs.append("Deleted \(deletedKeystrokes) keystroke lines")
 
     let deletedNonPendingUnlockRequests = try await UnlockRequest.query()
-      .where(.not(.equals(.status, .enum(RequestStatus.pending))))
+      .where(.status != RequestStatus.pending)
       .where(.updatedAt < 3.daysAgo)
       .delete(in: self.db)
 
     logs.append("Deleted \(deletedNonPendingUnlockRequests) non-pending unlock requests")
 
     let deletedPendingUnlockRequests = try await UnlockRequest.query()
-      .where(.equals(.status, .enum(RequestStatus.pending)))
+      .where(.status == RequestStatus.pending)
       .where(.updatedAt < 7.daysAgo)
       .delete(in: self.db)
 

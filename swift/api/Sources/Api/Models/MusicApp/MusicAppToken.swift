@@ -4,6 +4,7 @@ import Foundation
 import Tagged
 
 extension MusicApp {
+  @DuetModel(schema: "music_app", table: "tokens")
   struct Token: Codable, Sendable {
     var id: Id
     var installId: MusicApp.Install.Id

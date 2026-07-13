@@ -1,5 +1,6 @@
 import DuetSQL
 
+@DuetModel(schema: "system", table: "stripe_events")
 struct StripeEvent: Codable, Sendable {
   var id: Id
   var json: String

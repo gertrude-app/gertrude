@@ -1,5 +1,6 @@
 import DuetSQL
 
+@DuetModel(schema: "macos", table: "identified_apps")
 struct IdentifiedApp: Codable, Sendable {
   var id: Id
   var categoryId: AppCategory.Id?

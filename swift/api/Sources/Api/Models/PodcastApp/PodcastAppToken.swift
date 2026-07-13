@@ -3,6 +3,7 @@ import DuetSQL
 import Tagged
 
 extension PodcastApp {
+  @DuetModel(schema: "podcast_app", table: "tokens")
   struct Token: Codable, Sendable {
     var id: Id
     var installId: PodcastApp.Install.Id

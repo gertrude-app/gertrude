@@ -108,6 +108,7 @@ extension Configure {
     app.migrations.add(ClaimsCutover())
     app.migrations.add(CreateMusicEvents())
     app.migrations.add(AddNativeIOSAppEventFields())
+    app.migrations.add(PgEnumsToText())
   }
 }
 

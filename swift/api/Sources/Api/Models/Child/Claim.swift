@@ -1,5 +1,6 @@
 import DuetSQL
 
+@DuetModel(schema: "child", table: "claims")
 struct Claim: Codable, Sendable, Equatable {
   var id: Id
   var code: Int

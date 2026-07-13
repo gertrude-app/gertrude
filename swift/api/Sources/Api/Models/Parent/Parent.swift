@@ -1,6 +1,7 @@
 import DuetSQL
 import Gertie
 
+@DuetModel(schema: "parent", table: "parents")
 struct Parent: Codable, Sendable {
   var id: Id
   var email: EmailAddress

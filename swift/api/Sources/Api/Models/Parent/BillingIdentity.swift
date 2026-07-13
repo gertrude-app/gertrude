@@ -2,6 +2,7 @@ import DuetSQL
 import Tagged
 
 // the lasting/lifetime information about a customer's billing
+@DuetModel(schema: "parent", table: "billing_identities")
 struct BillingIdentity: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

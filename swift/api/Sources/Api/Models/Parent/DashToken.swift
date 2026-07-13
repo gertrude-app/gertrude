@@ -1,8 +1,9 @@
 import Dependencies
-import Duet
+import DuetSQL
 import Tagged
 
 extension Parent {
+  @DuetModel(schema: "parent", table: "dash_tokens")
   struct DashToken: Codable, Sendable {
     var id: Id
     var parentId: Parent.Id

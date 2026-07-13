@@ -1,6 +1,8 @@
+import DuetSQL
 import Foundation
 import GertieApp
 
+@DuetModel(schema: "blocker_app", table: "events")
 struct IOSEvent: Codable, Sendable {
   var id: Id
   var eventId: String

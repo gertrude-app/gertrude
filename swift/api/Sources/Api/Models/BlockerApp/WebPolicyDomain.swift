@@ -1,6 +1,8 @@
+import DuetSQL
 import Foundation
 
 extension BlockerApp {
+  @DuetModel(schema: "blocker_app", table: "web_policy_domains")
   struct WebPolicyDomain: Codable, Sendable {
     var id: Id
     var deviceId: IOSDevice.Id

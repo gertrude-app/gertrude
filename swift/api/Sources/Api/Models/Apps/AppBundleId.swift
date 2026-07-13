@@ -1,5 +1,6 @@
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "macos", table: "app_bundle_ids")
 struct AppBundleId: Codable, Sendable {
   var id: Id
   var bundleId: String

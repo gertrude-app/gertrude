@@ -1,6 +1,7 @@
 import Dependencies
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "parent", table: "marketing_email_sends")
 struct MarketingEmailSend: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

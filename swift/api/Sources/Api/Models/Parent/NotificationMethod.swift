@@ -1,7 +1,8 @@
-import Duet
+import DuetSQL
 import TSCodable
 
 extension Parent {
+  @DuetModel(schema: "parent", table: "notification_methods")
   struct NotificationMethod: Codable, Sendable {
     var id: Id
     var parentId: Parent.Id

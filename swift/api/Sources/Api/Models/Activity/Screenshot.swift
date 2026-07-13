@@ -1,5 +1,6 @@
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "child", table: "screenshots", clientCreatedAt: true)
 struct Screenshot: Codable, Sendable {
   var id: Id
   var computerUserId: ComputerUser.Id

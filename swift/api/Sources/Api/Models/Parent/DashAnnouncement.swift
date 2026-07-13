@@ -1,6 +1,7 @@
 import Dependencies
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "parent", table: "dash_announcements")
 struct DashAnnouncement: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

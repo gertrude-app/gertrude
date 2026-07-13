@@ -1,5 +1,6 @@
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "system", table: "security_events")
 struct SecurityEvent: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id

@@ -1,6 +1,7 @@
-import Duet
+import DuetSQL
 import Gertie
 
+@DuetModel(schema: "child", table: "always_blocked_rules")
 struct ChildAlwaysBlockedRule: Codable, Sendable {
   var id: Id
   var childId: Child.Id

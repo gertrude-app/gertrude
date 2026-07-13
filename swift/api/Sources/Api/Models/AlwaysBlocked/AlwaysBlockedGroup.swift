@@ -1,5 +1,6 @@
 import DuetSQL
 
+@DuetModel(schema: "macapp", table: "always_blocked_groups")
 struct AlwaysBlockedGroup: Codable, Sendable {
   var id: Id
   var name: String

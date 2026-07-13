@@ -2,6 +2,7 @@ import DuetSQL
 import Tagged
 
 extension BlockerApp {
+  @DuetModel(schema: "blocker_app", table: "supervisions")
   struct Supervision: Codable, Sendable, Equatable {
     var id: Id
     var deviceId: IOSDevice.Id

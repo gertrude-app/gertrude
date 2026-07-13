@@ -1,5 +1,6 @@
-import Duet
+import DuetSQL
 
+@DuetModel(schema: "macapp", table: "keystroke_lines", clientCreatedAt: true)
 struct KeystrokeLine: Codable, Sendable {
   var id: Id
   var computerUserId: ComputerUser.Id

@@ -37,3 +37,17 @@ complexity and may cost a little performance.
 ## Backdating `createdAt` in tests
 
 If you need to backdate `createdAt` for tests, use the `modifyCreatedAt` helper.
+
+## Models and column types
+
+Model structs are declared with `@DuetModel(schema: "parent", table: "dash_announcements")`,
+which generates `Id`, `CodingKeys`, and `insertValues` from the stored properties — never
+hand-write those. Column values bind via `PostgresBindable`; primitives, `Date`, `UUID`,
+`Tagged`, and optionals are built in. For custom property types, add a conformance in
+`api/Sources/Api/Models/Models+DuetSQL.swift`:
+
+- string-backed enum → conform to `PostgresRawBindable` (binds `rawValue`); the column is
+  `text` with a `CHECK` constraint. NEVER create a Postgres enum type (`CREATE TYPE ... AS
+  ENUM`) — this codebase deliberately eliminated them because check constraints are far
+  easier to evolve
+- codable type stored as jsonb → conform to `PostgresJsonable`

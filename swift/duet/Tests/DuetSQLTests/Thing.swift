@@ -52,22 +52,20 @@ struct Thing: Codable {
 
 // extensions
 
-extension Thing.CustomEnum: PostgresEnum {
-  var typeName: String { "custom_enums" }
-}
+extension Thing.CustomEnum: PostgresRawBindable {}
 
 extension Thing {
   var insertValues: [ColumnName: Postgres.Data] {
     [
       .id: .id(self),
       .string: .string(self.string),
-      .version: .varchar(self.version),
+      .version: .string(self.version),
       .int: .int(self.int),
       .bool: .bool(self.bool),
       .optionalInt: .int(self.optionalInt),
       .optionalString: .string(self.optionalString),
-      .customEnum: .enum(self.customEnum),
-      .optionalCustomEnum: .enum(self.optionalCustomEnum),
+      .customEnum: .string(self.customEnum.rawValue),
+      .optionalCustomEnum: .string(self.optionalCustomEnum?.rawValue),
       .createdAt: .currentTimestamp,
       .updatedAt: .currentTimestamp,
     ]
@@ -94,33 +92,4 @@ extension Thing {
 extension Thing: Model {
   typealias Id = Tagged<Thing, UUID>
   static let tableName = "things"
-
-  func postgresData(for column: ColumnName) -> Postgres.Data {
-    switch column {
-    case .id:
-      .id(self)
-    case .string:
-      .string(self.string)
-    case .version:
-      .varchar(self.version)
-    case .int:
-      .int(self.int)
-    case .bool:
-      .bool(self.bool)
-    case .optionalInt:
-      .int(self.optionalInt)
-    case .optionalString:
-      .string(self.optionalString)
-    case .customEnum:
-      .enum(self.customEnum)
-    case .optionalCustomEnum:
-      .enum(self.optionalCustomEnum)
-    case .createdAt:
-      .date(self.createdAt)
-    case .updatedAt:
-      .date(self.updatedAt)
-    case .deletedAt:
-      .date(self.deletedAt)
-    }
-  }
 }

@@ -1,5 +1,7 @@
+import DuetSQL
 import Foundation
 
+@DuetModel(schema: "system", table: "interesting_events")
 struct InterestingEvent: Codable, Sendable {
   var id: Id
   var eventId: String

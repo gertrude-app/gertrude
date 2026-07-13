@@ -1,6 +1,7 @@
 import DuetSQL
 import Gertie
 
+@DuetModel(schema: "macapp", table: "unlock_requests")
 struct UnlockRequest: Codable, Sendable {
   var id: Id
   var computerUserId: ComputerUser.Id

@@ -1,6 +1,7 @@
-import Duet
+import DuetSQL
 import Foundation
 
+@DuetModel(schema: "macos", table: "mac_apps")
 struct CatalogedApp: Codable, Sendable {
   var id: Id
   var bundleId: String

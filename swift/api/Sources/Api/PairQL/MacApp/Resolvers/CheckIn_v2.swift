@@ -200,7 +200,7 @@ private extension CheckIn_v2 {
           let resolved = try? await MacApp.SuspendFilterRequest.query()
           .where(.id == suspensionReqId)
           .where(.computerUserId == computerUser.id)
-          .where(.status != .enum(RequestStatus.pending))
+          .where(.status != RequestStatus.pending)
           .first(in: context.db)
     else {
       return nil
@@ -225,7 +225,7 @@ private extension CheckIn_v2 {
     let resolved = try await UnlockRequest.query()
       .where(.id |=| unlockIds)
       .where(.computerUserId == computerUser.id)
-      .where(.status != .enum(RequestStatus.pending))
+      .where(.status != RequestStatus.pending)
       .all(in: context.db)
 
     guard !resolved.isEmpty else {

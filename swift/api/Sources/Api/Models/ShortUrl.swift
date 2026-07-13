@@ -1,7 +1,8 @@
 import Dependencies
-import Duet
+import DuetSQL
 import Foundation
 
+@DuetModel(schema: "system", table: "short_urls")
 struct ShortUrl: Codable, Sendable {
   var id: Id
   var shortId: String

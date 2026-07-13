@@ -2,6 +2,7 @@ import Dependencies
 import DuetSQL
 import Tagged
 
+@DuetModel(schema: "child", table: "macapp_tokens")
 struct MacAppToken: Codable, Sendable {
   var id: Id
   var childId: Child.Id

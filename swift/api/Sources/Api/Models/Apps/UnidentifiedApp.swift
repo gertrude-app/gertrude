@@ -1,6 +1,7 @@
-import Duet
+import DuetSQL
 import Gertie
 
+@DuetModel(schema: "macos", table: "unidentified_apps")
 struct UnidentifiedApp: Codable, Sendable {
   var id: Id
   var bundleId: String
