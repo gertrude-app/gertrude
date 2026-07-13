@@ -140,7 +140,7 @@ const SuperviseDeviceScreen: React.FC<{
 };
 
 const meta = {
-  title: 'Dashboard/SuperviseDevice/Screens', // eslint-disable-line
+  title: 'Dashboard/SuperviseDevice/Screens',
   component: SuperviseDeviceScreen,
   decorators: [withStatefulChrome],
   parameters: { layout: `fullscreen` },

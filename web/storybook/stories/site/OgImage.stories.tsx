@@ -6,7 +6,7 @@ import SiteOgImage from './og-images/SiteOgImage';
 import WickedProjectOgImage from './og-images/WickedProjectOgImage';
 
 export default {
-  title: 'Site/OgImages', // eslint-disable-line
+  title: 'Site/OgImages',
   component: SiteOgImage,
   parameters: {
     layout: `fullscreen`,

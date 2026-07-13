@@ -2,7 +2,7 @@ import DepressingStatisticsBlock from '@site/components/DepressingStatisticsBloc
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Site/DepressingStatisticsBlock', // eslint-disable-line
+  title: 'Site/DepressingStatisticsBlock',
   component: DepressingStatisticsBlock,
   parameters: {
     layout: `fullscreen`,

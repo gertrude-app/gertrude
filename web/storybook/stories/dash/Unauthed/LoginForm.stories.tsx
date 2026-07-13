@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Unauthed/LoginForm', // eslint-disable-line
+  title: 'Dashboard/Unauthed/LoginForm',
   component: LoginForm,
   parameters: { layout: `fullscreen` },
   decorators: [

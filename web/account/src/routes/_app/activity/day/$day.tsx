@@ -2,8 +2,8 @@ import { LoadingDots, PageHeading } from '@gertrude/ui';
 import { formatDate } from '@shared/datetime';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import ActivityFeed from '#/components/ActivityFeed';
-import DashboardPage from '#/components/DashboardPage';
+import ActivityFeed from '#/components/activity/ActivityFeed';
+import DashboardPage from '#/components/layout/DashboardPage';
 import {
   dateFromDayParam,
   dayRange,

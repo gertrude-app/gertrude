@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { appWindow, props } from '../story-helpers';
 
 const meta = {
-  title: 'MacOS App/Administrate', // eslint-disable-line
+  title: 'MacOS App/Administrate',
   component: Administrate,
   ...appWindow(900, 660),
 } satisfies Meta<typeof Administrate>;

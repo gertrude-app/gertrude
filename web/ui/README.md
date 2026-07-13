@@ -1,3 +1,3 @@
 # Gertrude UI
 
-Gertrude's design system and component library for the web.
+Gertrude's shared web component package. Preview components in `../storybook-v2`.

@@ -1,4 +1,5 @@
 {
+  "extends": "../tsconfig.json",
   "include": ["**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "target": "ES2022",
@@ -9,7 +10,6 @@
       "@/*": ["./src/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

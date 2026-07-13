@@ -2,7 +2,7 @@ import { Logo } from '@shared/components';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Shared/Logo', // eslint-disable-line
+  title: 'Shared/Logo',
   component: Logo,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof Logo>;

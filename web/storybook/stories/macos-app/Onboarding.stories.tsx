@@ -314,7 +314,7 @@ const ALWAYS_BLOCKED_GROUPS = [
 ];
 
 const meta = {
-  title: 'MacOS App/Onboarding', // eslint-disable-line
+  title: 'MacOS App/Onboarding',
   component: Onboarding,
   ...appWindow(900, 700),
 } satisfies Meta<typeof Onboarding>;

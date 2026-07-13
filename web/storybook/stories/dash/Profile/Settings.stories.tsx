@@ -6,7 +6,7 @@ import { confirmableEntityAction, props, withIdsAnd } from '../../story-helpers'
 import { Email as CardStory } from './NotificationCard.stories';
 
 const meta = {
-  title: 'Dashboard/Settings/Settings', // eslint-disable-line
+  title: 'Dashboard/Settings/Settings',
   component: Settings,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

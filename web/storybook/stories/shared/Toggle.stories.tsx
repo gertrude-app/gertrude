@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Shared/Toggle', // eslint-disable-line
+  title: 'Shared/Toggle',
   component: Toggle,
   parameters: { layout: `centered` },
 } satisfies Meta<typeof Toggle>;

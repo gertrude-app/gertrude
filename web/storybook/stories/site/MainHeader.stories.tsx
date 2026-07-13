@@ -12,7 +12,7 @@ const Container: React.FC<{ theme: `white` | `violet` }> = ({ theme }) => (
 );
 
 const meta = {
-  title: 'Site/MainHeader', // eslint-disable-line
+  title: 'Site/MainHeader',
   component: Container,
   parameters: {
     layout: `fullscreen`,

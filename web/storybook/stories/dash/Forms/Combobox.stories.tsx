@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Forms/Combobox', // eslint-disable-line
+  title: 'Dashboard/Forms/Combobox',
   component: Combobox,
 } satisfies Meta<typeof Combobox>;
 

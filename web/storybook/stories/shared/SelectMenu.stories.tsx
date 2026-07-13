@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Shared/SelectMenu', // eslint-disable-line
+  title: 'Shared/SelectMenu',
   component: SelectMenu,
 } satisfies Meta<typeof SelectMenu>;
 

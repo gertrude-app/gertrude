@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Settings/NotificationCard', // eslint-disable-line
+  title: 'Dashboard/Settings/NotificationCard',
   component: NotificationCard,
 } satisfies Meta<typeof NotificationCard>;
 

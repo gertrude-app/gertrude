@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/DeviceCard', // eslint-disable-line
+  title: 'Dashboard/Children/DeviceCard',
   component: DeviceCard,
 } satisfies Meta<typeof DeviceCard>;
 

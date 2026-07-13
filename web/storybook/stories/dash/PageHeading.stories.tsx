@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Core/PageHeading', // eslint-disable-line
+  title: 'Dashboard/Core/PageHeading',
   component: PageHeading,
 } satisfies Meta<typeof PageHeading>;
 

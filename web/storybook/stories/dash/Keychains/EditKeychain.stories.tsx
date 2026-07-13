@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { confirmableEntityAction, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Keychains/Edit', // eslint-disable-line
+  title: 'Dashboard/Keychains/Edit',
   component: EditKeychain,
 } satisfies Meta<typeof EditKeychain>;
 

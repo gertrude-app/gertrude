@@ -2,7 +2,7 @@ import HeroBlock from '@site/components/HeroBlock';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Site/HeroBlock', // eslint-disable-line
+  title: 'Site/HeroBlock',
   component: HeroBlock,
   parameters: {
     layout: `fullscreen`,

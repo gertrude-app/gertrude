@@ -50,6 +50,9 @@ fix:
   @cd swift && just fix
   @cd web && just fix
 
+update-ui-screenshots:
+  @cd web && just update-ui-screenshots
+
 # codegen
 
 codegen:

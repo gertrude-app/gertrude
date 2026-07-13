@@ -5,11 +5,11 @@ packages:
   - site
   - shared/*
   - storybook
+  - storybook-v2
   - smoke
   - admin
   - supervise
   - ui
-  - dashboard-v2
 
 onlyBuiltDependencies:
   - core-js-pure

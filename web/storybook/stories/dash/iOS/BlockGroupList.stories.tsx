@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/iOS/Block Groups', // eslint-disable-line
+  title: 'Dashboard/iOS/Block Groups',
   component: BlockGroupList,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

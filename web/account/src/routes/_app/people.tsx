@@ -1,7 +1,7 @@
 import { LoadingDots, PageHeading } from '@gertrude/ui';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import DashboardPage from '#/components/DashboardPage';
+import DashboardPage from '#/components/layout/DashboardPage';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useQuery } from '#/pairql/query';

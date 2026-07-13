@@ -2,7 +2,7 @@ import EditBlockRules from '@dash/components/src/iOS/EditBlockRules';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Dashboard/iOS/EditBlockRules', // eslint-disable-line
+  title: 'Dashboard/iOS/EditBlockRules',
   component: EditBlockRules,
   parameters: { layout: `centered` },
 } satisfies Meta<typeof EditBlockRules>;

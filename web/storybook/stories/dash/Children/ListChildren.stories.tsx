@@ -4,7 +4,7 @@ import { withStatefulChrome } from '../../decorators/StatefulChrome';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/ListChildren', // eslint-disable-line
+  title: 'Dashboard/Children/ListChildren',
   component: ListChildren,
   parameters: { layout: `fullscreen` },
   decorators: [withStatefulChrome],

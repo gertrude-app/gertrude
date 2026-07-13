@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Modal/Modal', // eslint-disable-line
+  title: 'Dashboard/Modal/Modal',
   component: Modal,
   parameters: { layout: `fullscreen` },
 } satisfies Meta<typeof Modal>;

@@ -1,8 +1,8 @@
 import { LoadingDots, PageHeading } from '@gertrude/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import ActivityOverviewList from '#/components/ActivityOverviewList';
-import DashboardPage from '#/components/DashboardPage';
+import ActivityOverviewList from '#/components/activity/ActivityOverviewList';
+import DashboardPage from '#/components/layout/DashboardPage';
 import { toDaySummaries } from '#/lib/activity';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';

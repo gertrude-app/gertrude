@@ -2,7 +2,7 @@ import MainFooter from '@site/components/MainFooter';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Site/MainFooter', // eslint-disable-line
+  title: 'Site/MainFooter',
   component: MainFooter,
   parameters: {
     layout: `fullscreen`,

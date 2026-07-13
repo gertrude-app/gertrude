@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Modal/RequestModal', // eslint-disable-line
+  title: 'Dashboard/Modal/RequestModal',
   component: RequestModal,
 } satisfies Meta<typeof RequestModal>;
 

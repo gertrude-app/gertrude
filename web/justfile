@@ -15,14 +15,8 @@ site:
 admin:
   @PORT=${ADMIN_PORT:-4243} pnpm --filter admin start
 
-ui:
-  @pnpm --filter @gertrude/ui exec vite dev --port ${UI_PORT:-5173} --open
-
 account:
   @pnpm --filter account exec vite dev --port ${ACCOUNT_PORT:-9347}
-
-dashboard-v2:
-  @pnpm --filter dashboard-v2 exec vite dev --port ${DASHBOARD_V2_PORT:-9348}
 
 hmr-docs:
   @watchexec --watch site/markdoc --exts .md "just hmr-comment"
@@ -32,6 +26,9 @@ hmr-blog:
 
 storybook:
   @PORT=${STORYBOOK_PORT:-6006} pnpm --filter @storybook/app start
+
+storybook-v2:
+  @PORT=${STORYBOOK_V2_PORT:-6007} pnpm --filter storybook-v2 start
 
 dev:
   pnpm concurrently \
@@ -65,6 +62,9 @@ build-dash:
 build-admin:
   @pnpm exec nx run admin:build
 
+build-account:
+  @pnpm exec nx run account:build
+
 # ci/test type things
 
 cy-open:
@@ -92,6 +92,9 @@ visual-test:
 visual-test-reset:
   @git restore --source=HEAD --staged --worktree -- storybook/visual-tests/screenshots/argos
 
+update-ui-screenshots:
+  @pnpm --filter storybook-v2 visual:update
+
 og-export:
   @cd storybook/visual-tests && PUPPETEER_PRODUCT=chrome STORYBOOK_URL=http://localhost:${STORYBOOK_PORT:-6006} ../node_modules/.bin/ts-node --project tsconfig.json export-og-images.ts
 
@@ -116,7 +119,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test build-storybook build-site build-dash build-admin
+check: lint format-check typecheck test build-storybook build-site build-dash build-admin build-account
 
 sync-supervise-ui:
   #!/usr/bin/env bash

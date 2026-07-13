@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/KeyCreator/KeyCreator', // eslint-disable-line
+  title: 'Dashboard/KeyCreator/KeyCreator',
   component: KeyCreator,
 } satisfies Meta<typeof KeyCreator>;
 

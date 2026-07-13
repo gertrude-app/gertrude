@@ -2,7 +2,7 @@ import CTABlock from '@site/components/CTABlock';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta = {
-  title: 'Site/CTABlock', // eslint-disable-line
+  title: 'Site/CTABlock',
   component: CTABlock,
   parameters: {
     layout: `fullscreen`,

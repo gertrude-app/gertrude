@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { keyExamples, props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Keychains/KeyListKey', // eslint-disable-line
+  title: 'Dashboard/Keychains/KeyListKey',
   component: KeyListKey,
 } satisfies Meta<typeof KeyListKey>;
 

@@ -2,7 +2,7 @@ import type { Meta } from '@storybook/react';
 import * as ProductHunt from './ProductHunt';
 
 export default {
-  title: 'Site/Product Hunt', // eslint-disable-line
+  title: 'Site/Product Hunt',
   component: ProductHunt.BlockedRequests,
   parameters: {
     layout: `fullscreen`,

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props } from '../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Forms/RadioGroup', // eslint-disable-line
+  title: 'Dashboard/Forms/RadioGroup',
   component: RadioGroup,
 } satisfies Meta<typeof RadioGroup>;
 

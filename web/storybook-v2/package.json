@@ -1,0 +1,32 @@
+{
+  "name": "storybook-v2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "storybook dev --port ${PORT:-6007} --config-dir ./.storybook --ci --disable-telemetry",
+    "build": "storybook build --config-dir ./.storybook --disable-telemetry",
+    "typecheck": "tsc --noEmit",
+    "visual:update": "pnpm run build && node scripts/screenshot-stories.js && rm -rf storybook-static",
+    "visual:update:existing": "node scripts/screenshot-stories.js",
+    "playwright:install": "playwright install chromium"
+  },
+  "dependencies": {
+    "@gertrude/ui": "workspace:*",
+    "@tanstack/react-router": "1.170.16",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@storybook/tanstack-react": "10.4.6",
+    "@tailwindcss/vite": "4.3.0",
+    "@types/node": "22.19.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "playwright": "1.61.1",
+    "storybook": "10.4.6",
+    "tailwindcss": "4.3.0",
+    "typescript": "6.0.3",
+    "vite": "8.0.11"
+  }
+}

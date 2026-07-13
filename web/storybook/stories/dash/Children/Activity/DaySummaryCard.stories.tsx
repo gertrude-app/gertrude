@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { props, time } from '../../../story-helpers';
 
 const meta = {
-  title: 'Dashboard/Children/Activity/DaySummaryCard', // eslint-disable-line
+  title: 'Dashboard/Children/Activity/DaySummaryCard',
   component: DaySummaryCard,
 } satisfies Meta<typeof DaySummaryCard>;
 
