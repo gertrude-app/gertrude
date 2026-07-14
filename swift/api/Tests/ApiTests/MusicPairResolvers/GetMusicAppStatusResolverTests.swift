@@ -12,6 +12,16 @@ import XExpect
 @testable import Api
 
 final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
+  static let dashboardUrl = "https://parents.gertrude.app"
+
+  var unpaidCtx: Context {
+    .mock(dashboardUrl: Self.dashboardUrl)
+  }
+
+  var remediationUrl: URL {
+    URL(string: "\(Self.dashboardUrl)/settings")!
+  }
+
   func input(
     _ deviceId: UUID,
     appVersion: String = "1.0.0",
@@ -94,6 +104,7 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testClaimedDeviceCreatesTokenAndReturnsChildContext() async throws {
     let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.id) // entitled -> .active
     let deviceId = UUID()
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
@@ -112,11 +123,12 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
 
-    guard case .claimed(let token, let childId, let childName) = output else {
+    guard case .claimed(let token, let childId, let childName, let entitlement) = output else {
       return XCTFail("expected .claimed, got \(output)")
     }
     expect(childId).toEqual(child.id.rawValue)
     expect(childName).toEqual(child.model.name)
+    expect(entitlement).toEqual(.active)
 
     let install = try await MusicApp.Install.query()
       .where(.deviceId == device.id)
@@ -126,6 +138,33 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .all(in: self.db)
     expect(tokens).toHaveCount(1)
     expect(token).toEqual(tokens[0].value.rawValue)
+  }
+
+  func testClaimedDeviceWithoutMusicAccessReportsUnpaidEntitlement() async throws {
+    let child = try await self.child() // no subscription -> free -> not entitled
+    let deviceId = UUID()
+    let device = try await self.db.create(IOSDevice(
+      id: .init(deviceId),
+      childId: child.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    try await self.createClaim(
+      .music,
+      device.id,
+      child.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    let output = try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: self.unpaidCtx)
+
+    guard case .claimed(_, _, let childName, let entitlement) = output else {
+      return XCTFail("expected .claimed, got \(output)")
+    }
+    expect(childName).toEqual(child.model.name)
+    expect(entitlement).toEqual(.unpaid(remediationUrl: self.remediationUrl))
   }
 
   func testClaimedDeviceReusesExistingToken() async throws {
@@ -151,7 +190,7 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
 
-    guard case .claimed(let token, _, _) = output else {
+    guard case .claimed(let token, _, _, _) = output else {
       return XCTFail("expected .claimed, got \(output)")
     }
     expect(token).toEqual(existing.value.rawValue)
@@ -182,11 +221,12 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
       try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
     }
 
-    guard case .claimed(let token, let childId, let childName) = output else {
+    guard case .claimed(let token, let childId, let childName, let entitlement) = output else {
       return XCTFail("expected .claimed, got \(output)")
     }
     expect(childId).toEqual(child.id.rawValue)
     expect(childName).toEqual(child.name)
+    expect(entitlement).toEqual(.active)
 
     let claim = try await Claim.find(code: code, in: self.db)
     expect(claim?.intent).toEqual(.music)
@@ -204,8 +244,8 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(token).toEqual(tokens[0].value.rawValue)
   }
 
-  func testAlreadyBoundDeviceWithoutMusicAccessReturnsClaimCodeAndDoesNotClaim() async throws {
-    let parent = try await self.parent()
+  func testAlreadyBoundDeviceWithoutMusicAccessClaimsAndReportsUnpaid() async throws {
+    let parent = try await self.parent() // no subscription -> free -> not entitled
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let deviceId = UUID()
     let code = Int.random(in: 100_000 ... 999_999)
@@ -220,13 +260,19 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
       $0.verificationCode = .init(generate: { code })
       $0.date = .constant(.reference)
     } operation: {
-      try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: .mock)
+      try await GetMusicAppStatus.resolve(with: self.input(deviceId), in: self.unpaidCtx)
     }
 
-    expect(output).toEqual(.unclaimed(code: code, expiresAt: .reference + .days(7)))
-    let claim = try await Claim.find(code: code, in: self.db)
+    guard case .claimed(_, let childId, let childName, let entitlement) = output else {
+      return XCTFail("expected .claimed, got \(output)")
+    }
+    expect(childId).toEqual(child.id.rawValue)
+    expect(childName).toEqual(child.name)
+    expect(entitlement).toEqual(.unpaid(remediationUrl: self.remediationUrl))
+
+    let claim = try await Claim.find(code: code, in: self.db) // claim completed despite unpaid
     expect(claim?.deviceId).toEqual(device.id)
-    expect(claim?.childId).toBeNil()
-    expect(claim?.claimedAt).toBeNil()
+    expect(claim?.childId).toEqual(child.id)
+    expect(claim?.claimedAt).toEqual(.reference)
   }
 }

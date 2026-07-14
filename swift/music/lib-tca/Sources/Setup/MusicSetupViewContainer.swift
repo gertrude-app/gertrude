@@ -40,8 +40,18 @@ struct MusicSetupViewContainer: View {
     switch event {
     case .appleMusicPermissionTapped:
       self.store.send(.appleMusicPermissionButtonTapped)
+    case .deviceRecognizedContinueTapped:
+      self.store.send(.deviceRecognizedContinueButtonTapped)
+    case .explainAccountContinueTapped:
+      self.store.send(.explainAccountContinueButtonTapped)
     case .getStartedTapped:
       self.store.send(.getStartedButtonTapped)
+    case .nudgeContinueTapped:
+      self.store.send(.nudgeContinueButtonTapped)
+    case .parentNoTapped:
+      self.store.send(.parentNoButtonTapped)
+    case .parentYesTapped:
+      self.store.send(.parentYesButtonTapped)
     case .refreshConnectionTapped:
       self.store.send(.refreshConnectionButtonTapped)
     case .retryTapped:
@@ -61,6 +71,14 @@ private extension MusicSetupFeature.State {
       .checking
     case .welcome:
       .welcome
+    case .parentQuestion:
+      .parentQuestion
+    case .selfManagerNudge:
+      .selfManagerNudge
+    case .explainAccount:
+      .explainAccount
+    case .connecting:
+      .gertrudeConnection(.checking)
     case .appleMusicPermission:
       .appleMusicPermission
     case .appleMusicDenied:
@@ -76,9 +94,13 @@ private extension MusicSetupFeature.State {
     case .gertrudeConnection(.checking):
       .gertrudeConnection(.checking)
     case .gertrudeConnection(.unclaimed(let code, _)):
-      .gertrudeConnection(.unclaimed(code: code))
+      .gertrudeConnection(.unclaimed(code: code, audience: self.claimAudience))
     case .gertrudeConnection(.failed):
       .gertrudeConnection(.failed)
+    case .deviceRecognized(let childName):
+      .deviceRecognized(childName: childName)
+    case .subscriptionRequired(let childName, let remediationUrl):
+      .subscriptionRequired(childName: childName, remediationUrl: remediationUrl)
     case .ready:
       .checking
     }

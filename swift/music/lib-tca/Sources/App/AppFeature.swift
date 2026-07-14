@@ -77,7 +77,6 @@ struct AppFeature: Sendable {
         state.library = .init()
         state.playback = .init()
         state.setup = .init()
-        state.setup.screen = .welcome
         return .merge(
           .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
           .cancel(id: PlaybackFeature.CancelID.playbackEvents),

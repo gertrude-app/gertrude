@@ -23,8 +23,13 @@ public struct GetMusicAppStatus: Pair {
     }
   }
 
+  public enum Entitlement: PairNestable {
+    case active
+    case unpaid(remediationUrl: URL?)
+  }
+
   public enum Output: PairOutput {
     case unclaimed(code: Int, expiresAt: Date)
-    case claimed(token: UUID, childId: UUID, childName: String)
+    case claimed(token: UUID, childId: UUID, childName: String, entitlement: Entitlement)
   }
 }
