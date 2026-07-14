@@ -132,10 +132,7 @@ struct CleanupJob: AsyncScheduledJob {
 
     logs.append("Deleted \(deletedTelemetry) route telemetry rows")
 
-    await self.db.notifyDeprecationComplete(
-      if: "BlockRules(v1)",
-      notLoggedWithinLast: .days(90),
-    )
+    await self.db.notifyCompletedDeprecations(noRequestsWithinLast: .days(120))
 
     return logs
   }

@@ -6,12 +6,11 @@ extension DuetSQL.Client {
       return
     }
 
-    if var existing = try? await InterestingEvent.query()
+    if let existing = try? await InterestingEvent.query()
       .where(.eventId == event)
       .where(.kind == "deprecation")
       .where(.context == "active")
       .first(in: self) {
-      existing.createdAt = Date()
       _ = try? await self.update(existing)
       return
     }
@@ -25,30 +24,24 @@ extension DuetSQL.Client {
       .toSuperAdmin("deprecation starting", event)
   }
 
-  func notifyDeprecationComplete(
-    if event: String,
-    notLoggedWithinLast interval: TimeInterval,
-  ) async {
+  func notifyCompletedDeprecations(noRequestsWithinLast interval: TimeInterval) async {
     guard get(dependency: \.env.mode) == .prod else {
       return
     }
 
-    guard var record = try? await InterestingEvent.query()
-      .where(.eventId == event)
+    guard let stale = try? await InterestingEvent.query()
       .where(.kind == "deprecation")
       .where(.context == "active")
-      .first(in: self) else {
+      .where(.updatedAt < Date().addingTimeInterval(-interval))
+      .all(in: self) else {
       return
     }
 
-    guard record.createdAt < Date().addingTimeInterval(-interval) else {
-      return
+    for var record in stale {
+      record.context = "complete"
+      _ = try? await self.update(record)
+      with(dependency: \.postmark)
+        .toSuperAdmin("deprecation complete!", record.eventId)
     }
-
-    record.context = "complete"
-    _ = try? await self.update(record)
-
-    with(dependency: \.postmark)
-      .toSuperAdmin("deprecation complete!", event)
   }
 }

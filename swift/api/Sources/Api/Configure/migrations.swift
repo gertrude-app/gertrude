@@ -109,6 +109,7 @@ extension Configure {
     app.migrations.add(CreateMusicEvents())
     app.migrations.add(AddNativeIOSAppEventFields())
     app.migrations.add(PgEnumsToText())
+    app.migrations.add(TrackDeprecationLastSeen())
   }
 }
 
