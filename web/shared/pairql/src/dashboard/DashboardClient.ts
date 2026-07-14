@@ -420,6 +420,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.SaveDevice.Output>(input, `SaveDevice`, `parent`);
   };
 
+  public saveExtendedSupervisionControls = (
+    input: P.SaveExtendedSupervisionControls.Input,
+  ): Promise<Result<P.SaveExtendedSupervisionControls.Output>> => {
+    return this.query<P.SaveExtendedSupervisionControls.Output>(
+      input,
+      `SaveExtendedSupervisionControls`,
+      `parent`,
+    );
+  };
+
   public saveKey = (input: P.SaveKey.Input): Promise<Result<P.SaveKey.Output>> => {
     return this.query<P.SaveKey.Output>(input, `SaveKey`, `parent`);
   };

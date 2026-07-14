@@ -12,7 +12,7 @@ import {
   // BlockRuleEditor,
   PodcastsDeviceSection,
   ToggleCard,
-  // TrashBtn,
+  TrashBtn,
 } from '@dash/components';
 // import { PlusIcon } from '@heroicons/react/24/solid';
 import { Button /* SelectMenu */ } from '@shared/components';
@@ -50,6 +50,12 @@ const IOSDevice: React.FC = () => {
     allowAppRemoval: false,
     allowEraseContentAndSettings: false,
     allowAppInstallation: true,
+    hasExtendedControls: false,
+    whitelistedAppBundleIds: null,
+    newBundleId: ``,
+    webAllowList: null,
+    newBookmarkUrl: ``,
+    newBookmarkTitle: ``,
   });
 
   // const deleteBlockRule = useConfirmableDelete(`blockRule`, {
@@ -74,8 +80,8 @@ const IOSDevice: React.FC = () => {
   // );
 
   const saveDevice = useMutation(
-    () =>
-      Current.api.updateIOSDevice({
+    async () => {
+      const result = await Current.api.updateIOSDevice({
         deviceId: id,
         enabledBlockGroups: [...state.enabledBlockGroups],
         webPolicy: state.webPolicy,
@@ -84,7 +90,22 @@ const IOSDevice: React.FC = () => {
         allowAppRemoval: state.allowAppRemoval,
         allowEraseContentAndSettings: state.allowEraseContentAndSettings,
         allowAppInstallation: state.allowAppInstallation,
-      }),
+      });
+      if (result.isError || !state.hasExtendedControls) {
+        return result;
+      }
+      return Current.api.saveExtendedSupervisionControls({
+        deviceId: id,
+        controls: {
+          whitelistedAppBundleIds: state.whitelistedAppBundleIds
+            ? [...state.whitelistedAppBundleIds]
+            : undefined,
+          webAllowList: state.webAllowList
+            ? state.webAllowList.map((b) => ({ ...b }))
+            : undefined,
+        },
+      });
+    },
     { toast: `save:ios-device`, invalidating: [Key.iOSDevice(id)] },
   );
 
@@ -118,7 +139,15 @@ const IOSDevice: React.FC = () => {
       state.isProfileLocked === blocker.isProfileLocked &&
       state.allowAppRemoval === blocker.allowAppRemoval &&
       state.allowEraseContentAndSettings === blocker.allowEraseContentAndSettings &&
-      state.allowAppInstallation === blocker.allowAppInstallation
+      state.allowAppInstallation === blocker.allowAppInstallation &&
+      isEqual(
+        state.whitelistedAppBundleIds,
+        blocker.extendedSupervisionControls?.whitelistedAppBundleIds ?? null,
+      ) &&
+      isEqual(
+        state.webAllowList,
+        blocker.extendedSupervisionControls?.webAllowList ?? null,
+      )
     : true;
 
   return (
@@ -210,6 +239,171 @@ const IOSDevice: React.FC = () => {
                     dispatch({ type: `setAllowAppInstallation`, value: v })
                   }
                 />
+                {blocker.extendedSupervisionControls !== undefined && (
+                  <>
+                    <ToggleCard
+                      title="Only allow approved apps"
+                      description={`Hide every app on the ${dt} except the ones you specifically approve.`}
+                      enabled={state.whitelistedAppBundleIds !== null}
+                      setEnabled={(v) =>
+                        dispatch({ type: `setAppWhitelistEnabled`, value: v })
+                      }
+                      warning={
+                        state.whitelistedAppBundleIds?.length === 0
+                          ? `With no apps approved, nearly every app will be hidden from the ${dt}.`
+                          : undefined
+                      }
+                    >
+                      {state.whitelistedAppBundleIds !== null && (
+                        <div className="mt-4">
+                          {state.whitelistedAppBundleIds.length > 0 && (
+                            <div className="flex flex-col gap-2 mb-4">
+                              {state.whitelistedAppBundleIds.map((bundleId) => (
+                                <div
+                                  key={bundleId}
+                                  className="flex items-center justify-between bg-white rounded-lg pl-4 pr-3 py-2"
+                                >
+                                  <span className="font-mono text-sm text-violet-700">
+                                    {bundleId}
+                                  </span>
+                                  <TrashBtn
+                                    onClick={() =>
+                                      dispatch({ type: `removeBundleId`, bundleId })
+                                    }
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              className="flex-1 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300"
+                              placeholder="App bundle ID (e.g. com.apple.mobilesafari)"
+                              value={state.newBundleId}
+                              onChange={(e) =>
+                                dispatch({
+                                  type: `setNewBundleId`,
+                                  value: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === `Enter`) {
+                                  e.preventDefault();
+                                  dispatch({ type: `addBundleId` });
+                                }
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              color="secondary"
+                              onClick={() => dispatch({ type: `addBundleId` })}
+                              disabled={
+                                !state.newBundleId.trim() ||
+                                state.whitelistedAppBundleIds.includes(
+                                  state.newBundleId.trim(),
+                                )
+                              }
+                            >
+                              Add app
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </ToggleCard>
+                    <ToggleCard
+                      title="Only allow approved websites"
+                      description={`Block every website on the ${dt} except the ones you specifically approve.`}
+                      enabled={state.webAllowList !== null}
+                      setEnabled={(v) =>
+                        dispatch({ type: `setWebAllowListEnabled`, value: v })
+                      }
+                      warning={
+                        state.webAllowList?.length === 0
+                          ? `With no websites approved, the entire web will be blocked on the ${dt}.`
+                          : undefined
+                      }
+                    >
+                      {state.webAllowList !== null && (
+                        <div className="mt-4">
+                          {state.webAllowList.length > 0 && (
+                            <div className="flex flex-col gap-2 mb-4">
+                              {state.webAllowList.map((bookmark) => (
+                                <div
+                                  key={bookmark.url}
+                                  className="flex items-center justify-between bg-white rounded-lg pl-4 pr-3 py-2"
+                                >
+                                  <div className="min-w-0">
+                                    <span className="block font-medium text-slate-700">
+                                      {bookmark.title}
+                                    </span>
+                                    <span className="block font-mono text-sm text-violet-700 truncate">
+                                      {bookmark.url}
+                                    </span>
+                                  </div>
+                                  <TrashBtn
+                                    onClick={() =>
+                                      dispatch({
+                                        type: `removeBookmark`,
+                                        url: bookmark.url,
+                                      })
+                                    }
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <input
+                              type="text"
+                              className="sm:w-44 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300"
+                              placeholder="Name (e.g. Weather)"
+                              value={state.newBookmarkTitle}
+                              onChange={(e) =>
+                                dispatch({
+                                  type: `setNewBookmarkTitle`,
+                                  value: e.target.value,
+                                })
+                              }
+                            />
+                            <input
+                              type="text"
+                              className="flex-1 border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-300"
+                              placeholder="URL (e.g. https://weather.com)"
+                              value={state.newBookmarkUrl}
+                              onChange={(e) =>
+                                dispatch({
+                                  type: `setNewBookmarkUrl`,
+                                  value: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === `Enter`) {
+                                  e.preventDefault();
+                                  dispatch({ type: `addBookmark` });
+                                }
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              color="secondary"
+                              onClick={() => dispatch({ type: `addBookmark` })}
+                              disabled={
+                                !state.newBookmarkTitle.trim() ||
+                                !state.newBookmarkUrl.trim() ||
+                                state.webAllowList.some(
+                                  (b) => b.url === state.newBookmarkUrl.trim(),
+                                )
+                              }
+                            >
+                              Add website
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </ToggleCard>
+                  </>
+                )}
               </div>
             )}
             {/* <div className="mt-12 max-w-3xl">

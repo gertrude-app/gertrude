@@ -102,6 +102,7 @@ enum Capability: Hashable, Sendable, CaseIterable {
   case superviseIosDevice
   case connectMacApp
   case useGertrudeMusic
+  case manageExtendedSupervisionControls
 }
 
 extension StripeSubscription.Tier {

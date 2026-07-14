@@ -1,5 +1,10 @@
 // auto-generated, do not edit
-import type { AmSubscriptionState, BlockRule, WebPolicy } from '../shared';
+import type {
+  AmSubscriptionState,
+  BlockRule,
+  ExtendedSupervisionControls,
+  WebPolicy,
+} from '../shared';
 
 export namespace GetIOSDevice_v2 {
   export type Input = UUID;
@@ -27,6 +32,7 @@ export namespace GetIOSDevice_v2 {
       allowAppRemoval: boolean;
       allowEraseContentAndSettings: boolean;
       allowAppInstallation: boolean;
+      extendedSupervisionControls?: ExtendedSupervisionControls;
     };
     am?: {
       subscription: AmSubscriptionState;

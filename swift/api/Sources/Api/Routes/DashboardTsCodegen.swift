@@ -58,6 +58,8 @@ enum DashboardTsCodegenRoute {
       ("AmSubscriptionState", AmSubscriptionState.self),
       ("IOSDeviceChildAssignment", ClaimIOSDevice.ChildAssignment.self),
       ("ClaimChildOption", GetIOSDeviceClaimData.ChildOption.self),
+      ("ExtendedSupervisionControls", SaveExtendedSupervisionControls.Controls.self),
+      ("AllowListBookmark", SaveExtendedSupervisionControls.Bookmark.self),
     ]
   }
 
@@ -119,6 +121,7 @@ enum DashboardTsCodegenRoute {
       GetIOSDevice_v2.self,
       UpsertBlockRule.self,
       UpdateIOSDevice.self,
+      SaveExtendedSupervisionControls.self,
       GetIOSDeviceClaimData.self,
       GetAmClaimData.self,
       ClaimAmDevice.self,

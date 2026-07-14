@@ -53,6 +53,7 @@ export * from './pairs/RequestPublicKeychain';
 export * from './pairs/ResetPassword';
 export * from './pairs/SaveConferenceEmail';
 export * from './pairs/SaveDevice';
+export * from './pairs/SaveExtendedSupervisionControls';
 export * from './pairs/SaveKey';
 export * from './pairs/SaveKeychain';
 export * from './pairs/SaveNotification';

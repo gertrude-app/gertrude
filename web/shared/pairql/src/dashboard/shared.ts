@@ -20,6 +20,11 @@ export type AdminNotificationTrigger =
   | 'securityEventsMedium'
   | 'securityEventsRecommended';
 
+export interface AllowListBookmark {
+  url: string;
+  title: string;
+}
+
 export type AmSubscriptionState =
   | { case: 'active'; expiresAt: ISODateString }
   | { case: 'fullTrial'; expiresAt: ISODateString }
@@ -145,6 +150,11 @@ export type DeviceModelFamily =
   | 'studio'
   | 'pro'
   | 'unknown';
+
+export interface ExtendedSupervisionControls {
+  whitelistedAppBundleIds?: string[];
+  webAllowList?: Array<{ url: string; title: string }>;
+}
 
 export type IOSDeviceChildAssignment =
   { case: 'newChild'; name: string } | { case: 'existingChild'; id: UUID };
