@@ -11,6 +11,7 @@ struct InterestingEvent: Codable, Sendable {
   var parentId: Parent.Id?
   var detail: String?
   var createdAt = Date()
+  var updatedAt = Date()
 
   init(
     id: Id = .init(),
