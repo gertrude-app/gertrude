@@ -78,7 +78,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func nowPlayingAlbumInfoTapFromAnotherAlbumDetailQueuesReplacement() async {
+  func nowPlayingAlbumInfoTapFromAnotherAlbumDetailReplacesDetail() async {
     let library = ApprovedMusicLibrary.mock
     let currentAlbum = library.albums[0]
     let visibleAlbum = library.albums[1]
@@ -102,20 +102,11 @@ struct AppFeatureTests {
 
     await store.send(.nowPlayingAlbumInfoTapped) {
       $0.isNowPlayingPresented = false
-      $0.library.pendingAlbumDetail = .init(
-        album: currentAlbum,
-        playStatus: .playing,
-        currentTrackID: track.id,
-      )
-    }
-
-    await store.send(.library(.albumDetailDismissed(visibleAlbum.id.rawValue))) {
       $0.library.albumDetail = .init(
         album: currentAlbum,
         playStatus: .playing,
         currentTrackID: track.id,
       )
-      $0.library.pendingAlbumDetail = nil
     }
   }
 

@@ -132,10 +132,6 @@ extension AlbumDetailFeature.State {
     self.playStatus == .loading
   }
 
-  var pushID: String {
-    self.transitionSourceID ?? self.album.id.rawValue
-  }
-
   var playbackItems: [PlaybackItem] {
     self.tracks.map { PlaybackItem(
       track: $0,

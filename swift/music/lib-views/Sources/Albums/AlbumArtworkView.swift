@@ -1,5 +1,9 @@
 import SwiftUI
 
+public func albumArtworkZoomTransitionID(for albumID: String) -> String {
+  "album-artwork-\(albumID)"
+}
+
 public struct AlbumArtworkView: View {
   @Environment(\.colorScheme) private var colorScheme
 

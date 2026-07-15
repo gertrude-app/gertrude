@@ -3,7 +3,6 @@ import SwiftUI
 public struct AlbumDetailView: View {
   private let album: AlbumData
   private let rows: [AlbumDetailTrackRow]
-  private let transitionSourceID: String?
   private let isPlaying: Bool
   private let isLoading: Bool
   private let isLoadingTracks: Bool
@@ -14,7 +13,6 @@ public struct AlbumDetailView: View {
   public init(
     album: AlbumData,
     tracks: [TrackData],
-    transitionSourceID: String? = nil,
     isPlaying: Bool = false,
     isLoading: Bool = false,
     isLoadingTracks: Bool = false,
@@ -23,7 +21,6 @@ public struct AlbumDetailView: View {
     onTrackTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
   ) {
     self.album = album
-    self.transitionSourceID = transitionSourceID
     self.isPlaying = isPlaying
     self.isLoading = isLoading
     self.isLoadingTracks = isLoadingTracks
@@ -40,12 +37,10 @@ public struct AlbumDetailView: View {
       ScrollView {
         VStack(spacing: 30) {
           VStack(spacing: 16) {
-            ZoomableAlbumArtworkView(
+            AlbumArtworkView(
               album: self.album,
               size: self.artworkSize(for: proxy.size.width),
               cornerRadius: 16,
-              transitionID: self.artworkTransitionID,
-              role: .destination,
             )
 
             VStack(spacing: 5) {
@@ -129,12 +124,6 @@ public struct AlbumDetailView: View {
 
   private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
     min(320, max(220, containerWidth - 96))
-  }
-
-  private var artworkTransitionID: String {
-    albumArtworkZoomTransitionID(
-      for: self.transitionSourceID ?? self.album.id,
-    )
   }
 }
 

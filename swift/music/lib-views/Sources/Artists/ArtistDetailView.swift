@@ -105,7 +105,7 @@ public struct ArtistDetailView: View {
   private let artist: ArtistDetailData
   private let topSongs: [ArtistTopSongData]
   private let releases: [ArtistReleaseData]
-  private let transitionSourceID: String?
+  private let transitionNamespace: Namespace.ID?
   private let currentTrackID: String?
   private let isPlaying: Bool
   private let isLoading: Bool
@@ -117,7 +117,7 @@ public struct ArtistDetailView: View {
     artist: ArtistDetailData,
     topSongs: [ArtistTopSongData] = [],
     releases: [ArtistReleaseData] = [],
-    transitionSourceID: String? = nil,
+    transitionNamespace: Namespace.ID? = nil,
     currentTrackID: String? = nil,
     isPlaying: Bool = false,
     isLoading: Bool = false,
@@ -129,7 +129,7 @@ public struct ArtistDetailView: View {
     self.artist = artist
     self.topSongs = topSongs
     self.releases = releases
-    self.transitionSourceID = transitionSourceID
+    self.transitionNamespace = transitionNamespace
     self.currentTrackID = currentTrackID
     self.isPlaying = isPlaying
     self.isLoading = isLoading
@@ -144,7 +144,6 @@ public struct ArtistDetailView: View {
         VStack(alignment: .leading, spacing: 30) {
           ArtistDetailHeroView(
             artist: self.artist,
-            transitionID: self.artworkTransitionID,
             isPlaying: self.isPlaying,
             isLoading: self.isLoading,
             onPlayTap: self.onPlayTap,
@@ -176,6 +175,7 @@ public struct ArtistDetailView: View {
 
           ArtistReleasesShelf(
             releases: self.releases,
+            transitionNamespace: self.transitionNamespace,
             onReleaseTap: self.onReleaseTap,
           )
 
@@ -191,12 +191,6 @@ public struct ArtistDetailView: View {
     }
     .navigationTitle("")
     .artistDetailNavigationBarBackground()
-  }
-
-  private var artworkTransitionID: String {
-    artistArtworkZoomTransitionID(
-      for: self.transitionSourceID ?? self.artist.id,
-    )
   }
 }
 
@@ -215,7 +209,6 @@ private struct ArtistDetailHeroView: View {
   @Environment(\.self) private var environment
 
   let artist: ArtistDetailData
-  let transitionID: String?
   let isPlaying: Bool
   let isLoading: Bool
   let onPlayTap: @MainActor @Sendable () -> Void
@@ -224,11 +217,9 @@ private struct ArtistDetailHeroView: View {
     let colors = self.playButtonColors
 
     VStack(spacing: 18) {
-      ZoomableArtistArtworkView(
+      ArtistArtworkView(
         artworkUrl: self.artist.artworkUrl,
         size: 220,
-        transitionID: self.transitionID,
-        role: .destination,
       )
 
       Text(self.artist.name)
@@ -298,7 +289,7 @@ private struct ArtistDetailPlayButtonColors {
   let foreground: Color
 }
 
-extension ArtistDetailData {
+public extension ArtistDetailData {
   init(artist: ArtistData) {
     self.init(
       id: artist.id,
@@ -483,13 +474,16 @@ private struct ArtistTopSongWaveformView: View {
 
 private struct ArtistReleasesShelf: View {
   let releases: [ArtistReleaseData]
+  let transitionNamespace: Namespace.ID?
   let onReleaseTap: @MainActor @Sendable (String) -> Void
 
   init(
     releases: [ArtistReleaseData],
+    transitionNamespace: Namespace.ID?,
     onReleaseTap: @MainActor @escaping @Sendable (String) -> Void,
   ) {
     self.releases = releases.sortedByReleaseDateNewestFirst()
+    self.transitionNamespace = transitionNamespace
     self.onReleaseTap = onReleaseTap
   }
 
@@ -511,6 +505,7 @@ private struct ArtistReleasesShelf: View {
             ForEach(self.releases) { release in
               ArtistReleaseCard(
                 release: release,
+                transitionNamespace: self.transitionNamespace,
                 onTap: { self.onReleaseTap(release.id) },
               )
             }
@@ -527,17 +522,21 @@ private struct ArtistReleasesShelf: View {
 
 private struct ArtistReleaseCard: View {
   let release: ArtistReleaseData
+  let transitionNamespace: Namespace.ID?
   let onTap: @MainActor @Sendable () -> Void
 
   var body: some View {
     Button(action: self.onTap) {
       VStack(alignment: .leading, spacing: 9) {
-        ZoomableAlbumArtworkView(
+        AlbumArtworkView(
           album: self.release.albumData,
           size: 148,
           cornerRadius: 16,
-          transitionID: albumArtworkZoomTransitionID(for: self.release.id),
-          role: .source,
+        )
+        .matchedTransitionSourceIfAvailable(
+          id: albumArtworkZoomTransitionID(for: self.release.id),
+          in: self.transitionNamespace,
+          cornerRadius: 16,
         )
 
         VStack(alignment: .leading, spacing: 2) {

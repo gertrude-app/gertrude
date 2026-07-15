@@ -56,7 +56,6 @@ struct AppFeature: Sendable {
         guard state.library.presentAlbumDetail(
           albumID: albumID,
           transitionSourceID: nil,
-          replacingCurrent: true,
         ) else { return .none }
         state.isNowPlayingPresented = false
         state.library.setAlbumDetailPlaybackSession(state.playback.session)

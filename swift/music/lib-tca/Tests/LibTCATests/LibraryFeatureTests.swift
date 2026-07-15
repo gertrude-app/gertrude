@@ -375,15 +375,42 @@ struct LibraryFeatureTests {
     }
 
     await store.send(.albumTapped(album.id)) {
-      $0.albumDetail = .init(
+      $0.path.append(.album(.init(
         album: album,
         transitionSourceID: album.id.rawValue,
-      )
+      )))
     }
   }
 
   @Test
-  func albumDetailDismissedClearsAlbumDetail() async {
+  func artistReleaseTapPushesAlbumAfterArtist() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      releaseAlbumIds: [album.id],
+    )
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.artistTapped(artist.id)) {
+      $0.path.append(.artist(.init(artistID: artist.id)))
+    }
+    await store.send(.path(.element(
+      id: 0,
+      action: .artist(.releaseTapped(album.id)),
+    ))) {
+      $0.path.append(.album(.init(
+        album: album,
+        transitionSourceID: album.id.rawValue,
+      )))
+    }
+  }
+
+  @Test
+  func albumDetailDismissalClearsAlbumDetail() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     var state = LibraryFeature.State(status: .loaded(library))
@@ -395,26 +422,31 @@ struct LibraryFeatureTests {
       LibraryFeature()
     }
 
-    await store.send(.albumDetailDismissed(album.id.rawValue)) {
-      $0.albumDetail = nil
+    await store.send(.path(.popFrom(id: 0))) {
+      $0.path.removeAll()
     }
   }
 
   @Test
-  func staleAlbumDetailDismissalDoesNotClearNewAlbumDetail() async {
+  func albumTapReplacesCurrentAlbumDetail() async {
     let library = ApprovedMusicLibrary.mock
     let oldAlbum = library.albums[0]
     let newAlbum = library.albums[1]
     var state = LibraryFeature.State(status: .loaded(library))
     state.albumDetail = .init(
-      album: newAlbum,
-      transitionSourceID: newAlbum.id.rawValue,
+      album: oldAlbum,
+      transitionSourceID: oldAlbum.id.rawValue,
     )
     let store = TestStore(initialState: state) {
       LibraryFeature()
     }
 
-    await store.send(.albumDetailDismissed(oldAlbum.id.rawValue))
+    await store.send(.albumTapped(newAlbum.id)) {
+      $0.albumDetail = .init(
+        album: newAlbum,
+        transitionSourceID: newAlbum.id.rawValue,
+      )
+    }
   }
 
   @Test
@@ -428,7 +460,10 @@ struct LibraryFeatureTests {
     }
 
     let items = [playbackItem("track-1")]
-    await store.send(.albumDetail(.presented(.delegate(.playAlbum(items: items, startIndex: 0)))))
+    await store.send(.path(.element(
+      id: 0,
+      action: .album(.delegate(.playAlbum(items: items, startIndex: 0))),
+    )))
     await store.receive(.delegate(.playQueue(items: items, startIndex: 0)))
   }
 }

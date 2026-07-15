@@ -13,44 +13,29 @@ public struct LibraryView: View {
   private let state: LibraryViewState
   private let isRefreshing: Bool
   private let transitionNamespace: Namespace.ID?
-  private let currentTrackID: String?
-  private let playbackQueueTrackIDs: [String]
-  private let isPlaybackLoading: Bool
-  private let isPlaybackPlaying: Bool
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onRefresh: @MainActor @Sendable () async -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
-  private let onArtistPlayTap: @MainActor @Sendable (String) -> Void
-  private let onArtistSongTap: @MainActor @Sendable (String, String) -> Void
+  private let onArtistTap: @MainActor @Sendable (String) -> Void
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   public init(
     state: LibraryViewState,
     isRefreshing: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
-    currentTrackID: String? = nil,
-    playbackQueueTrackIDs: [String] = [],
-    isPlaybackLoading: Bool = false,
-    isPlaybackPlaying: Bool = false,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onRefresh: @MainActor @escaping @Sendable () async -> Void = {},
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistPlayTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistSongTap: @MainActor @escaping @Sendable (String, String) -> Void = { _, _ in },
+    onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.state = state
     self.isRefreshing = isRefreshing
     self.transitionNamespace = transitionNamespace
-    self.currentTrackID = currentTrackID
-    self.playbackQueueTrackIDs = playbackQueueTrackIDs
-    self.isPlaybackLoading = isPlaybackLoading
-    self.isPlaybackPlaying = isPlaybackPlaying
     self.onRetryTap = onRetryTap
     self.onRefresh = onRefresh
     self.onAlbumTap = onAlbumTap
-    self.onArtistPlayTap = onArtistPlayTap
-    self.onArtistSongTap = onArtistSongTap
+    self.onArtistTap = onArtistTap
     self.onDebugResetTap = onDebugResetTap
   }
 
@@ -147,13 +132,8 @@ public struct LibraryView: View {
       albums: albums,
       artists: artists,
       transitionNamespace: self.transitionNamespace,
-      currentTrackID: self.currentTrackID,
-      playbackQueueTrackIDs: self.playbackQueueTrackIDs,
-      isPlaybackLoading: self.isPlaybackLoading,
-      isPlaybackPlaying: self.isPlaybackPlaying,
       onAlbumTap: self.onAlbumTap,
-      onArtistPlayTap: self.onArtistPlayTap,
-      onArtistSongTap: self.onArtistSongTap,
+      onArtistTap: self.onArtistTap,
       onDebugResetTap: self.onDebugResetTap,
     )
   }

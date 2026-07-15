@@ -12,7 +12,6 @@ struct AlbumDetailViewContainer: View {
         tracks: self.store.album.tracks.map {
           TrackData(track: $0)
         },
-        transitionSourceID: self.store.transitionSourceID,
         isPlaying: self.store.isPlaying,
         isLoading: self.store.isLoading || self.store.isLoadingTracks,
         isLoadingTracks: self.store.isLoadingTracks,
@@ -36,8 +35,8 @@ struct AlbumDetailViewContainer: View {
       }
     }
     .animation(.snappy(duration: 0.22), value: self.store.playbackFailure)
-    .onAppear {
-      self.store.send(.onAppear)
+    .task(id: self.store.album.id) {
+      _ = self.store.send(.onAppear)
     }
   }
 }

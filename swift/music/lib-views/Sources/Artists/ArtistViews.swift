@@ -1,6 +1,10 @@
 import Foundation
 import SwiftUI
 
+public func artistArtworkZoomTransitionID(for artistID: String) -> String {
+  "artist-artwork-\(artistID)"
+}
+
 public struct ArtistData: Identifiable, Equatable, Hashable, Sendable {
   public let id: String
   public let name: String
@@ -37,22 +41,27 @@ public struct ArtistCardView: View {
 
   private let artist: ArtistData
   private let artworkSize: CGFloat
+  private let transitionNamespace: Namespace.ID?
 
   public init(
     artist: ArtistData,
     artworkSize: CGFloat = 148,
+    transitionNamespace: Namespace.ID? = nil,
   ) {
     self.artist = artist
     self.artworkSize = artworkSize
+    self.transitionNamespace = transitionNamespace
   }
 
   public var body: some View {
     VStack(alignment: .center, spacing: 10) {
-      ZoomableArtistArtworkView(
+      ArtistArtworkView(
         artworkUrl: self.artist.artworkUrl,
         size: self.artworkSize,
-        transitionID: self.artworkTransitionID,
-        role: .source,
+      )
+      .matchedTransitionSourceIfAvailable(
+        id: self.artworkTransitionID,
+        in: self.transitionNamespace,
       )
 
       Text(self.artist.name)

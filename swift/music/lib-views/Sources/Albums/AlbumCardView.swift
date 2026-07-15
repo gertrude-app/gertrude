@@ -23,11 +23,14 @@ public struct AlbumCardView: View {
   public var body: some View {
     Button(action: self.onTap) {
       VStack(alignment: .leading, spacing: 10) {
-        ZoomableAlbumArtworkView(
+        AlbumArtworkView(
           album: self.album,
           size: self.artworkSize,
-          transitionID: self.artworkTransitionID,
-          role: .source,
+        )
+        .matchedTransitionSourceIfAvailable(
+          id: self.artworkTransitionID,
+          in: self.transitionNamespace,
+          cornerRadius: 12,
         )
 
         VStack(alignment: .leading, spacing: 2) {
