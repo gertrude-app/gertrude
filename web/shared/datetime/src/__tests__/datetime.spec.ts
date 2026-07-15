@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { time } from '../';
+import { formatTime, time } from '../';
+
+describe(`formatTime`, () => {
+  test(`formats a local time without seconds`, () => {
+    expect(formatTime(new Date(2026, 6, 3, 9, 5))).toBe(`9:05 AM`);
+  });
+});
 
 describe(`time.humanDuration`, () => {
   const cases: Array<[number, string]> = [

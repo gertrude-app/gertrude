@@ -1,4 +1,5 @@
 import { Button, Card, Divider, HStack, Text, Tooltip } from '@gertrude/ui';
+import { formatTime } from '@shared/datetime';
 import { FlagIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 
@@ -16,6 +17,7 @@ const KeylogActivityItem: React.FC<Props> = ({
   id,
   text,
   applicationName,
+  date,
   flagged,
   onToggleFlag,
   onDelete,
@@ -33,7 +35,8 @@ const KeylogActivityItem: React.FC<Props> = ({
     <Divider />
     <HStack justify="between" gap={2} className="p-3">
       <Text variant="captionSubtle" className="@lg/main:text-sm">
-        Typed in{` `}
+        <time dateTime={date.toISOString()}>{formatTime(date)}</time>
+        {` · Typed in `}
         <Text variant="bodyStrong" className="@lg/main:text-sm">
           {applicationName}
         </Text>

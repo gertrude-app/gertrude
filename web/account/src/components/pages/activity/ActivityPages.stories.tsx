@@ -5,6 +5,32 @@ import { activityItems, daySummaries } from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
 
+const dayActivityItems = activityItems.map((item) => {
+  if (item.id === `activity-1`) {
+    return { ...item, flagged: true };
+  }
+
+  if (item.id === `activity-2b` && item.type === `screenshot`) {
+    return {
+      ...item,
+      url: `/example-screenshots/programmer-200.png`,
+      width: 200,
+      height: 125,
+    };
+  }
+
+  if (item.id === `activity-3` && item.type === `screenshot`) {
+    return {
+      ...item,
+      url: `/example-screenshots/google.png`,
+      width: 1672,
+      height: 941,
+    };
+  }
+
+  return item;
+});
+
 const meta = {
   title: 'Account/Pages/Activity',
   parameters: { layout: 'fullscreen', screenshotsAt: ['mobile', 'desktop'] },
@@ -32,7 +58,7 @@ export const Day = {
     <StoryScreen>
       <ActivityFeedPage
         date={new Date(2026, 6, 3)}
-        items={activityItems}
+        items={dayActivityItems}
         breadcrumbs={[{ text: `All Activity`, href: `/activity` }]}
         onToggleFlag={noop}
         onDelete={noop}
