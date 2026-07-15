@@ -5,6 +5,22 @@
   "imports": {
     "#/*": "./src/*"
   },
+  "nx": {
+    "targets": {
+      "build": {
+        "inputs": [
+          "default",
+          "^default",
+          {
+            "env": "VITE_API_ENDPOINT"
+          }
+        ],
+        "outputs": [
+          "{projectRoot}/dist"
+        ]
+      }
+    }
+  },
   "scripts": {
     "start": "vite",
     "dev": "vite dev",

@@ -3,7 +3,7 @@
 **/pnpm-lock.yaml
 **/.nx/
 **/.agents/
-**/storybook/storybook-static/
+**/storybook-static/
 **/dash/app/build
 **/site/.next
 **/site/out

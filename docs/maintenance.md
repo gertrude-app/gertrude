@@ -44,12 +44,19 @@ files-changed:
     appviews: ... # triggers appviews-comment job
     dashboard: ... # triggers dashboard job
     site: ... # triggers site job
-    storybook: ... # storybook job PAUSED — see "Paused: Argos Visual Regression" below
+    storybook_v2: ... # triggers the Account/UI Storybook build
+    storybook: ... # legacy Storybook job PAUSED — see below
 ```
 
 Note: The `check` job runs on all web changes without filtering — it covers lint,
 format-check, typecheck (via nx, across every package with a `typecheck` script), and
 vitest.
+
+The `storybook_v2` job is a build-only check for `web/storybook-v2`. Its filter includes
+`web/account`, `web/ui`, and Account's transitive workspace dependencies because Storybook
+v2 consumes their source, stories, styles, and static assets. It does not generate or
+compare screenshots. Account itself is also built by the Cloudflare Workers integration on
+every pull request.
 
 **`web/supervise` intentionally has no dedicated `files-changed` output.** It has no build
 step (`main: "./src/index.ts"`, source-only) and is consumed by the external Tauri
@@ -96,7 +103,8 @@ Current scope:
 4. **Check for new web packages** - If a new web package is added:
 
    - Determine which apps depend on it
-   - Add to appropriate filters (dashboard, site, storybook)
+   - Add it and its transitive dependencies to the appropriate filters (dashboard, site,
+     storybook)
    - If it can affect Storybook v2 screenshots, add it to the `screenshots` filter in
      `.github/workflows/pr-body.yml`
 
@@ -112,9 +120,10 @@ volume) and over the Argos free tier.
 
 Kept (restorable): `web/storybook/visual-tests/`, the `visual-test` / `build-storybook`
 justfile recipes, the `@argos-ci/puppeteer` dep, and the `storybook` `files-changed`
-output + filter. To restore, re-add the job from git history and check the `ARGOS_TOKEN`
-secret + branch-protection required checks. **If not restored before long, delete the
-kept machinery and rip it all out.**
+output + filter. This is separate from the build-only `storybook_v2` job. To restore,
+re-add the job from git history and check the `ARGOS_TOKEN` secret + branch-protection
+required checks. **If not restored before long, delete the kept machinery and rip it all
+out.**
 
 ## Agent/LLM-Facing Content
 

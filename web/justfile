@@ -42,6 +42,8 @@ clean:
   @rm -rf site/.next
   @rm -rf site/out
   @rm -rf dash/app/build
+  @rm -rf account/dist
+  @rm -rf storybook-v2/storybook-static
   @find . -name "node_modules" -type d -prune -exec rm -rf {} + && pnpm i
 
 nuke-node-modules:
@@ -55,6 +57,9 @@ build-site:
 
 build-storybook:
   @pnpm exec nx run @storybook/app:build
+
+build-storybook-v2:
+  @pnpm exec nx run storybook-v2:build
 
 build-dash:
   @pnpm exec nx run @dash/app:build
@@ -119,7 +124,7 @@ typecheck-watch:
 
 fix: format lint-fix
 
-check: lint format-check typecheck test build-storybook build-site build-dash build-admin build-account
+check: lint format-check typecheck test build-storybook build-storybook-v2 build-site build-dash build-admin build-account
 
 sync-supervise-ui:
   #!/usr/bin/env bash

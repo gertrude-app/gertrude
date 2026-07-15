@@ -178,7 +178,9 @@ export function prepareDeleteCombined(
 }
 
 export function dateFromDayParam(day: string): Date {
-  const [year, month, date] = day.split(`-`).map(Number);
+  const [year = Number.NaN, month = Number.NaN, date = Number.NaN] = day
+    .split(`-`)
+    .map(Number);
   return new Date(year, month - 1, date);
 }
 

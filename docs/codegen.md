@@ -24,7 +24,7 @@ Run all codegen: `just codegen`
 ### PairQL TypeScript Clients (`codegen-pairql-ts-clients`)
 
 Fetches route specs from running local API and generates type-safe TypeScript clients in
-`web/shared/pairql/src/` for Dashboard and Admin web apps.
+`web/shared/pairql/src/` for Dashboard, Admin, and Account web apps.
 
 NB: requires local API to be running
 

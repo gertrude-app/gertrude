@@ -131,7 +131,9 @@ Supports all 3 apps, plus dashboard and admin websites
 ## Libraries
 
 - shared libraries for swift apps/api are in `./swift/`
-- shared libraries for web apps are in `./web/shared`.
+- shared libraries for web apps are in `./web/shared`
+- shared web components and UI primitives are in `./web/ui` and previewed in
+  `./web/storybook-v2`.
 
 ## Code generation
 
