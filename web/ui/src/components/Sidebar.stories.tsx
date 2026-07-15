@@ -104,7 +104,10 @@ type Story = StoryObj<typeof meta>;
 export const FullLayout: Story = {
   parameters: galleryParameters,
   render: () => (
-    <SidebarLayout content={<DashboardContent />}>
+    <SidebarLayout
+      content={<DashboardContent />}
+      mobileLogo={<img src={logoUrl} alt="Gertrude" width={132} />}
+    >
       <NavigationSidebar logoWidth={132} />
     </SidebarLayout>
   ),

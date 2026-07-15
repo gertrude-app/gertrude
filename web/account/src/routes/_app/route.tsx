@@ -10,7 +10,10 @@ const AuthedLayout: React.FC = () => {
     pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <SidebarLayout content={<Outlet />}>
+    <SidebarLayout
+      content={<Outlet />}
+      mobileLogo={<img src="/logo-wordmark.svg" alt="Gertrude" width={140} />}
+    >
       <Sidebar
         logoUrl="/logo-wordmark.svg"
         logoWidth={140}
