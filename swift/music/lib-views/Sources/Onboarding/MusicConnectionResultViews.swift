@@ -23,7 +23,7 @@ struct MusicDeviceRecognizedView: View {
           .font(.system(size: 24, weight: .bold))
           .multilineTextAlignment(.center)
 
-        Text(musicDeviceLabel(childName: self.childName))
+        Text(musicDeviceLabel(self.childName))
           .font(.system(size: 17, weight: .semibold))
           .foregroundStyle(Color(self.colorScheme, light: .violet600, dark: .violet300))
       }
@@ -48,6 +48,7 @@ struct MusicSubscriptionRequiredView: View {
 
   let childName: String
   let remediationUrl: URL?
+  let overrideText: String?
   let statusDelay: Duration
 
   var body: some View {
@@ -64,9 +65,11 @@ struct MusicSubscriptionRequiredView: View {
 
       Spacer()
 
-      Text(
-        "This is \(musicDeviceLabel(childName: self.childName)). The Gertrude account needs a subscription before approved music can play. Open this link:",
-      )
+      Text(musicOnboardingBlurb(
+        override: self.overrideText,
+        device: musicDeviceLabel(self.childName),
+        fallback: "This is \(musicDeviceLabel(self.childName)). The Gertrude account needs a subscription before approved music can play. Open this link:",
+      ))
       .font(.system(size: 17, weight: .medium))
       .foregroundStyle(Color(
         self.colorScheme,
@@ -100,10 +103,12 @@ struct MusicSubscriptionRequiredView: View {
   init(
     childName: String,
     remediationUrl: URL?,
+    overrideText: String? = nil,
     statusDelay: Duration = .seconds(45),
   ) {
     self.childName = childName
     self.remediationUrl = remediationUrl
+    self.overrideText = overrideText
     self.statusDelay = statusDelay
   }
 
@@ -120,8 +125,21 @@ func musicDeviceType() -> String {
   #endif
 }
 
-func musicDeviceLabel(childName: String) -> String {
+func musicDeviceLabel(_ childName: String) -> String {
   "\(childName)’s \(musicDeviceType())"
+}
+
+func musicOnboardingBlurb(
+  override: String?,
+  device: String,
+  fallback: String,
+) -> String {
+  guard let override, !override.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+    return fallback
+  }
+  let filled = override.replacingOccurrences(of: "{{device}}", with: device)
+  guard !filled.contains("{{"), !filled.contains("}}") else { return fallback }
+  return filled
 }
 
 #Preview("Device Recognized") {
@@ -137,6 +155,7 @@ func musicDeviceLabel(childName: String) -> String {
   MusicSubscriptionRequiredView(
     childName: "Billy Bob",
     remediationUrl: URL(string: "https://parents.gertrude.app/settings"),
+    overrideText: "{{device}} needs a subscription — Gertrude Music is $5 a month and covers your whole family. Open this link:",
     statusDelay: .seconds(2),
   )
 }

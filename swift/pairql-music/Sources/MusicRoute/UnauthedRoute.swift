@@ -2,6 +2,7 @@ import PairQL
 
 public enum UnauthedRoute: PairRoute {
   case getMusicAppStatus(GetMusicAppStatus.Input)
+  case getMusicOnboardingConfig
 }
 
 public extension UnauthedRoute {
@@ -9,6 +10,9 @@ public extension UnauthedRoute {
     Route(.case(Self.getMusicAppStatus)) {
       Operation(GetMusicAppStatus.self)
       Body(.json(GetMusicAppStatus.Input.self))
+    }
+    Route(.case(Self.getMusicOnboardingConfig)) {
+      Operation(GetMusicOnboardingConfig.self)
     }
   }
   .eraseToAnyParserPrinter()

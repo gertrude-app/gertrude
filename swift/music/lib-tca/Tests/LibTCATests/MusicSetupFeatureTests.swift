@@ -15,6 +15,7 @@ struct MusicSetupFeatureTests {
     } withDependencies: {
       $0.keychain = KeychainStore().client
       $0.api.getMusicAppStatus = { .unclaimed(code: 123_456, expiresAt: .distantFuture) }
+      $0.api.getMusicOnboardingConfig = { .init(subscriptionRequiredText: "pay up") }
     }
 
     await store.send(.onAppear) {
@@ -25,6 +26,9 @@ struct MusicSetupFeatureTests {
       expiresAt: .distantFuture,
     ))) {
       $0.prefetch = .loaded(.unclaimed(code: 123_456, expiresAt: .distantFuture))
+    }
+    await store.receive(.onboardingConfigLoaded(.init(subscriptionRequiredText: "pay up"))) {
+      $0.onboardingConfig = .init(subscriptionRequiredText: "pay up")
     }
   }
 

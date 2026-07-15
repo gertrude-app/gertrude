@@ -41,6 +41,9 @@ extension MusicRoute: RouteResponder {
       case .getMusicAppStatus(let input):
         let output = try await GetMusicAppStatus.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .getMusicOnboardingConfig:
+        let output = try await GetMusicOnboardingConfig.resolve(in: context)
+        return try await self.respond(with: output)
       }
     }
   }
@@ -111,6 +114,17 @@ extension GetMusicAppStatus: Resolver {
 
     let claim = try await device.ensureClaim(intent: .music, in: ctx.db)
     return .unclaimed(code: claim.code, expiresAt: claim.expiresAt)
+  }
+}
+
+extension GetMusicOnboardingConfig: NoInputResolver {
+  static func resolve(in _: Context) async throws -> Output {
+    .init(
+      // use {{device}} placeholder -> "iPhone"/"iPad"
+      explainAccountText: nil,
+      // use {{device}} placeholder -> "<name>’s iPhone"/"<name>’s iPad"
+      subscriptionRequiredText: nil,
+    )
   }
 }
 

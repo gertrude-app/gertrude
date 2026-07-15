@@ -5,7 +5,7 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case welcome
   case parentQuestion
   case selfManagerNudge
-  case explainAccount
+  case explainAccount(overrideText: String?)
   case appleMusicPermission
   case appleMusicDenied
   case appleMusicRestricted
@@ -14,7 +14,7 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case appleMusicSubscriptionRequired(canShowOffer: Bool)
   case gertrudeConnection(MusicSetupConnectionViewState)
   case deviceRecognized(childName: String)
-  case subscriptionRequired(childName: String, remediationUrl: URL?)
+  case subscriptionRequired(childName: String, remediationUrl: URL?, overrideText: String?)
 }
 
 public enum MusicSetupConnectionViewState: Equatable, Sendable {
@@ -86,9 +86,13 @@ public struct MusicSetupView: View {
         screenType: .info,
       )
 
-    case .explainAccount:
+    case .explainAccount(let overrideText):
       ButtonScreenView(
-        text: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
+        text: musicOnboardingBlurb(
+          override: overrideText,
+          device: musicDeviceType(),
+          fallback: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
+        ),
         primary: .init("Got it, next", animate: false) {
           self.onEvent(.explainAccountContinueTapped)
         },
@@ -100,8 +104,12 @@ public struct MusicSetupView: View {
         self.onEvent(.deviceRecognizedContinueTapped)
       }
 
-    case .subscriptionRequired(let childName, let remediationUrl):
-      MusicSubscriptionRequiredView(childName: childName, remediationUrl: remediationUrl)
+    case .subscriptionRequired(let childName, let remediationUrl, let overrideText):
+      MusicSubscriptionRequiredView(
+        childName: childName,
+        remediationUrl: remediationUrl,
+        overrideText: overrideText,
+      )
 
     case .appleMusicPermission:
       ButtonScreenView(
@@ -206,7 +214,9 @@ public struct MusicSetupView: View {
 }
 
 #Preview("Explain Account") {
-  MusicSetupView(state: .explainAccount)
+  MusicSetupView(state: .explainAccount(
+    overrideText: "Set up Gertrude Music on this {{device}}. It’s $5 a month, and one subscription covers every device in your family.",
+  ))
 }
 
 #Preview("Device Recognized") {
@@ -217,6 +227,7 @@ public struct MusicSetupView: View {
   MusicSetupView(state: .subscriptionRequired(
     childName: "Billy Bob",
     remediationUrl: URL(string: "https://parents.gertrude.app/settings"),
+    overrideText: "{{device}} needs a subscription — Gertrude Music is $5 a month and covers your whole family. Open this link:",
   ))
 }
 

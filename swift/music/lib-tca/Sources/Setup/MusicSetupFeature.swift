@@ -12,6 +12,7 @@ struct MusicSetupFeature: Sendable {
     var screen = Screen.checking
     var claimAudience = MusicClaimAudience.parentPartner
     var prefetch = Prefetch.loading
+    var onboardingConfig: GetMusicOnboardingConfig.Output?
 
     enum Prefetch: Equatable {
       case loading
@@ -64,6 +65,7 @@ struct MusicSetupFeature: Sendable {
     case musicAppStatusPollingFailed
     case nudgeContinueButtonTapped
     case onAppear
+    case onboardingConfigLoaded(GetMusicOnboardingConfig.Output)
     case parentNoButtonTapped
     case parentYesButtonTapped
     case prefetchStatusFailed
@@ -94,7 +96,11 @@ struct MusicSetupFeature: Sendable {
         }
         state.screen = .welcome
         log(.info, .setup, "8502ee88")
-        return self.prefetchStatus()
+        return .merge(self.prefetchStatus(), self.fetchOnboardingConfig())
+
+      case .onboardingConfigLoaded(let config):
+        state.onboardingConfig = config
+        return .none
 
       case .prefetchStatusLoaded(let output):
         state.prefetch = .loaded(output)
@@ -303,6 +309,14 @@ struct MusicSetupFeature: Sendable {
         try await send(.prefetchStatusLoaded(self.api.getMusicAppStatus()))
       } catch {
         await send(.prefetchStatusFailed)
+      }
+    }
+  }
+
+  private func fetchOnboardingConfig() -> EffectOf<Self> {
+    .run { send in
+      if let config = try? await self.api.getMusicOnboardingConfig() {
+        await send(.onboardingConfigLoaded(config))
       }
     }
   }

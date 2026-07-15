@@ -9,6 +9,7 @@ import PairQLClient
 @DependencyClient
 struct ApiClient: Sendable {
   var getMusicAppStatus: @Sendable () async throws -> GetMusicAppStatus.Output
+  var getMusicOnboardingConfig: @Sendable () async throws -> GetMusicOnboardingConfig.Output
   var getApprovedMusicLibrary:
     @Sendable (_ token: UUID) async throws -> GetApprovedMusicLibrary.Output
 }
@@ -30,6 +31,12 @@ extension ApiClient: DependencyKey {
             iosVersion: iosVersion,
             appVersion: appVersion,
           )),
+        )
+      },
+      getMusicOnboardingConfig: {
+        try await pairql.call(
+          GetMusicOnboardingConfig.self,
+          unauthed: .getMusicOnboardingConfig,
         )
       },
       getApprovedMusicLibrary: { token in
