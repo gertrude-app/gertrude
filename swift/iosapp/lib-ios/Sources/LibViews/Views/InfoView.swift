@@ -196,7 +196,7 @@ struct InfoView: View {
           Spacer()
 
           VStack(spacing: 12) {
-            if connection.supervised != nil {
+            if connection.supervisedByGertrude {
               BigButton(
                 "Sync Profile",
                 type: .button { self.store.send(.syncProfileTapped) },
