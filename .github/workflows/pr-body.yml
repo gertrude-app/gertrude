@@ -1,0 +1,72 @@
+name: pr-body
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  screenshot-checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            screenshots:
+              - web/storybook-v2/**
+              - web/ui/**
+              - web/account/**
+              - web/shared/**
+              - web/justfile
+              - web/package.json
+              - web/pnpm-lock.yaml
+              - web/pnpm-workspace.yaml
+      - name: update screenshot checklist
+        uses: actions/github-script@v7
+        env:
+          SCREENSHOT_RELEVANT: ${{ steps.changes.outputs.screenshots }}
+        with:
+          script: |
+            const markerStart = `<!-- gertrude:screenshot-checklist:start -->`;
+            const markerEnd = `<!-- gertrude:screenshot-checklist:end -->`;
+            const checklist = [
+              markerStart,
+              `## Screenshot Checklist`,
+              ``,
+              `- [ ] Storybook v2 UI screenshots updated (\`just update-ui-screenshots\`) or N/A.`,
+              markerEnd,
+            ].join(`\n`);
+
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const screenshotRelevant = process.env.SCREENSHOT_RELEVANT === `true`;
+
+            const pr = context.payload.pull_request;
+            let body = pr.body ?? ``;
+            const blockPattern = new RegExp(
+              `${markerStart}[\\s\\S]*?${markerEnd}\\n?`,
+              `m`,
+            );
+            const hasBlock = blockPattern.test(body);
+
+            if (screenshotRelevant) {
+              if (hasBlock) return;
+              body = body.trimEnd();
+              body = body ? `${body}\n\n${checklist}` : checklist;
+            } else {
+              if (!hasBlock) return;
+              body = body.replace(blockPattern, ``).trim();
+            }
+
+            await github.rest.pulls.update({
+              owner,
+              repo,
+              pull_number,
+              body,
+            });
