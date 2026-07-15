@@ -171,6 +171,7 @@ struct PlaybackFeature: Sendable {
 
   enum CancelID: Hashable {
     case playbackEvents
+    case playbackStart
     case seek
   }
 
@@ -219,11 +220,15 @@ struct PlaybackFeature: Sendable {
         return .run { send in
           do {
             try await self.playback.playTrack(item)
+            try Task.checkCancellation()
             await send(.playbackStarted)
+          } catch is CancellationError {
+            return
           } catch {
             await send(.playbackFailed(.init(error: error)))
           }
         }
+        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
 
       case .playQueue(let items, let startIndex):
         guard items.indices.contains(startIndex) else { return .none }
@@ -235,11 +240,15 @@ struct PlaybackFeature: Sendable {
         return .run { send in
           do {
             try await self.playback.playQueue(items, startIndex)
+            try Task.checkCancellation()
             await send(.playbackStarted)
+          } catch is CancellationError {
+            return
           } catch {
             await send(.playbackFailed(.init(error: error)))
           }
         }
+        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
 
       case .togglePlayPause:
         switch state.session?.playStatus {
@@ -280,11 +289,15 @@ struct PlaybackFeature: Sendable {
                 session.queue.currentIndex,
                 session.progress.elapsedTime,
               )
+              try Task.checkCancellation()
               await send(.playbackStarted)
+            } catch is CancellationError {
+              return
             } catch {
               await send(.playbackFailed(.init(error: error)))
             }
           }
+          .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
         }
         state.resumeSession()
         return .merge(
@@ -331,6 +344,7 @@ struct PlaybackFeature: Sendable {
       case .stop:
         state.pauseSession()
         return .merge(
+          .cancel(id: CancelID.playbackStart),
           self.saveCachedSession(state.session),
           .run { _ in
             await self.playback.stop()

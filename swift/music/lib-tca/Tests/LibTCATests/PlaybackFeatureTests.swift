@@ -61,6 +61,79 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func newerQueuePlayCancelsInFlightQueuePlay() async {
+    let firstItems = [playbackItem("first-1"), playbackItem("first-2")]
+    let secondItems = [playbackItem("second-1"), playbackItem("second-2")]
+    let gate = PlaybackStartGate()
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.playQueue = { _, _ in
+        try await gate.start()
+      }
+    }
+
+    await store.send(.playQueue(items: firstItems, startIndex: 0)) {
+      $0.session = .init(
+        playStatus: .loading,
+        queue: .init(items: firstItems),
+      )
+    }
+    await gate.waitUntilFirstStartBegins()
+
+    await store.send(.playQueue(items: secondItems, startIndex: 0)) {
+      $0.session = .init(
+        playStatus: .loading,
+        queue: .init(items: secondItems),
+      )
+    }
+    await store.receive(.playbackStarted) {
+      $0.session?.playStatus = .playing
+    }
+
+    await gate.releaseFirstStart()
+    await store.finish()
+  }
+
+  @Test
+  func newerQueuePositionCancelsInFlightQueuePlay() async {
+    let items = [
+      playbackItem("track-1"),
+      playbackItem("track-2"),
+      playbackItem("track-3"),
+    ]
+    let gate = PlaybackStartGate()
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.playQueue = { _, _ in
+        try await gate.start()
+      }
+    }
+
+    await store.send(.playQueue(items: items, startIndex: 0)) {
+      $0.session = .init(
+        playStatus: .loading,
+        queue: .init(items: items),
+      )
+    }
+    await gate.waitUntilFirstStartBegins()
+
+    await store.send(.playQueue(items: items, startIndex: 2)) {
+      $0.session = .init(
+        playStatus: .loading,
+        queue: .init(items: items, currentIndex: 2),
+      )
+    }
+    await store.receive(.playbackStarted) {
+      $0.session?.playStatus = .playing
+    }
+
+    await gate.releaseFirstStart()
+    await store.finish()
+  }
+
+  @Test
   func queueTracksCurrentAndUpcomingItems() {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let queue = PlaybackFeature.Queue(items: items, currentIndex: 1)
@@ -518,6 +591,48 @@ struct PlaybackFeatureTests {
     await store.send(.stop) {
       $0.session?.playStatus = .paused
     }
+  }
+}
+
+private actor PlaybackStartGate {
+  private var callCount = 0
+  private var firstReleaseContinuation: CheckedContinuation<Void, Never>?
+  private var firstStartContinuation: CheckedContinuation<Void, Never>?
+  private var firstStartHasBegun = false
+  private var firstStartIsReleased = false
+
+  func start() async throws {
+    self.callCount += 1
+    guard self.callCount == 1 else { return }
+    self.firstStartHasBegun = true
+    self.firstStartContinuation?.resume()
+    self.firstStartContinuation = nil
+
+    await withTaskCancellationHandler {
+      await withCheckedContinuation { continuation in
+        if self.firstStartIsReleased {
+          continuation.resume()
+        } else {
+          self.firstReleaseContinuation = continuation
+        }
+      }
+    } onCancel: {
+      Task { await self.releaseFirstStart() }
+    }
+    try Task.checkCancellation()
+  }
+
+  func waitUntilFirstStartBegins() async {
+    guard !self.firstStartHasBegun else { return }
+    await withCheckedContinuation { continuation in
+      self.firstStartContinuation = continuation
+    }
+  }
+
+  func releaseFirstStart() {
+    self.firstStartIsReleased = true
+    self.firstReleaseContinuation?.resume()
+    self.firstReleaseContinuation = nil
   }
 }
 

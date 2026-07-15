@@ -206,6 +206,8 @@ extension PlaybackClient {
         }
       } catch let error as PlaybackClientError {
         throw error
+      } catch is CancellationError {
+        throw CancellationError()
       } catch {
         return
       }
@@ -219,12 +221,17 @@ extension PlaybackClient {
       startTime: TimeInterval? = nil,
     ) async throws {
       guard !items.isEmpty, items.indices.contains(startIndex) else { return }
+      try Task.checkCancellation()
       try await self.requestAuthorization()
+      try Task.checkCancellation()
       try await self.ensureSubscriptionAllowsPlayback()
+      try Task.checkCancellation()
       let songs = try await self.songs(for: items)
+      try Task.checkCancellation()
 
       #if os(iOS)
         await self.activateAudioSession()
+        try Task.checkCancellation()
       #endif
       let player = ApplicationMusicPlayer.shared
       player.queue = ApplicationMusicPlayer.Queue(for: songs, startingAt: songs[startIndex])
@@ -240,9 +247,12 @@ extension PlaybackClient {
       player.state.repeatMode = repeatMode
       do {
         try await player.play()
+        try Task.checkCancellation()
         if let seekTime {
           player.playbackTime = seekTime
         }
+      } catch is CancellationError {
+        throw CancellationError()
       } catch {
         throw PlaybackClientError.playbackFailed
       }
@@ -438,6 +448,8 @@ extension PlaybackClient {
         throw PlaybackClientError.catalogLookupFailed
       } catch let error as PlaybackClientError {
         throw error
+      } catch is CancellationError {
+        throw CancellationError()
       } catch {
         throw PlaybackClientError.catalogLookupFailed
       }
