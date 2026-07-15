@@ -205,6 +205,17 @@ final class IOSReducerTestsResume: XCTestCase {
       $0.screen = .onboarding(.supervision(.resume(.websiteWarning(childName: "Franny"))))
     }
     await store.send(.interactive(.onboardingBtnTapped(.primary, ""))) {
+      $0.screen = .onboarding(.supervision(.resume(.offerScreenTimeAccess)))
+    }
+    await store
+      .send(.interactive(.onboardingBtnTapped(.primary, ""))) { // "Grant Screen Time access"
+        $0.screen = .onboarding(.supervision(.resume(.dontGetTrickedPreScreenTime)))
+      }
+    await store.send(.interactive(.onboardingBtnTapped(
+      .primary,
+      "",
+    ))) // "Got it, next" — fires grant
+    await store.receive(.programmatic(.screenTimeAuthResolved(granted: true))) {
       $0.screen = .onboarding(.supervision(.resume(.promptClearCache)))
     }
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
@@ -215,6 +226,14 @@ final class IOSReducerTestsResume: XCTestCase {
     }
     expect(codeCleaned.value).toEqual(true)
     expect(setupCompleted.value).toEqual(true)
+  }
+
+  @MainActor
+  func testOfferScreenTimeAccess_notNow_goesToPromptClearCache() async throws {
+    let store = store(starting: .onboarding(.supervision(.resume(.offerScreenTimeAccess))))
+    await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) { // "Not now"
+      $0.screen = .onboarding(.supervision(.resume(.promptClearCache)))
+    }
   }
 
   @MainActor

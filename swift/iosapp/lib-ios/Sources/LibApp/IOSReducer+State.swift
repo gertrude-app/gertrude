@@ -147,6 +147,8 @@ extension IOSReducer {
         case verifyingProfileInstall(didError: Bool = false)
         case profileInstalled
         case websiteWarning(childName: String?)
+        case offerScreenTimeAccess
+        case dontGetTrickedPreScreenTime
         case promptClearCache
         case networkError
         case requiresSubscription

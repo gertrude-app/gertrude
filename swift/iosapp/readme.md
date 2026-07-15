@@ -12,6 +12,7 @@ LOCAL_API_ENDPOINT = http:/$()/<wifi-ip>:<API_PORT>
 ## Release notes
 
 - `x.x.x` (dev)
+  - in supervision flow, post filter install, request screen time auth
   - surface supervision payment gate helper screens
 - `1.8.3` (6/26/26)
   - connect free account uses claim-based flow, not code entry

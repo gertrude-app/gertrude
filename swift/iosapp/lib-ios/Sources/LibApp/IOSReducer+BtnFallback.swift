@@ -206,6 +206,10 @@ extension IOSReducer.Onboarding.Supervision.Resume {
     case (.profileInstalled, _):
       .onboarding(.supervision(.resume(.websiteWarning(childName: nil))))
     case (.websiteWarning(_), _):
+      .onboarding(.supervision(.resume(.offerScreenTimeAccess)))
+    case (.offerScreenTimeAccess, _):
+      .onboarding(.supervision(.resume(.promptClearCache)))
+    case (.dontGetTrickedPreScreenTime, _):
       .onboarding(.supervision(.resume(.promptClearCache)))
     case (.promptClearCache, _):
       .onboarding(.happyPath(.requestAppStoreRating))

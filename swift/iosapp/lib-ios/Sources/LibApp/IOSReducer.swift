@@ -102,8 +102,16 @@ public struct IOSReducer: Sendable {
 
     #if DEBUG
       case .receivedShake where state.screen == .onboarding(.happyPath(.hiThere)):
-        state.screen = .onboarding(.happyPath(.dontGetTrickedPreAuth))
-        return .none
+        state.screen = .onboarding(.supervision(.resume(.websiteWarning(childName: "Test User"))))
+        return .run { [deps = self.deps] _ in
+          await deps.receiveAccountConnection(.init(
+            childId: UUID(),
+            token: UUID(),
+            deviceId: UUID(),
+            childName: "Test User",
+            supervised: .byGertrude(claimCode: 123_456),
+          ))
+        }
     #endif
 
     case .onboardingClearCache(.completeBtnTapped),
@@ -633,8 +641,32 @@ public struct IOSReducer: Sendable {
 
     case (.onboarding(.supervision(.resume(.websiteWarning(_)))), .primary):
       self.deps.log(state.screen, action, "8aa4790f")
+      state.screen = .onboarding(.supervision(.resume(.offerScreenTimeAccess)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.offerScreenTimeAccess))), .primary):
+      self.deps.log(state.screen, action, "e5ceb475")
+      state.screen = .onboarding(.supervision(.resume(.dontGetTrickedPreScreenTime)))
+      return .none
+
+    case (.onboarding(.supervision(.resume(.offerScreenTimeAccess))), .secondary):
+      self.deps.log(state.screen, action, "4b31789b")
+      log(.info, .supervision, "a8340a51")
       state.screen = .onboarding(.supervision(.resume(.promptClearCache)))
       return .none
+
+    case (.onboarding(.supervision(.resume(.dontGetTrickedPreScreenTime))), .primary):
+      self.deps.log(state.screen, action, "f79e62fd")
+      return .run { [deps = self.deps] send in
+        switch await deps.systemExtension.requestIndividualAuthorization() {
+        case .success:
+          log(.info, .supervision, "f90a5a50")
+          await send(.programmatic(.screenTimeAuthResolved(granted: true)))
+        case .failure(let reason):
+          log(.warn, .supervision, "9d722938", detail: "\(reason)")
+          await send(.programmatic(.screenTimeAuthResolved(granted: false)))
+        }
+      }
 
     case (.onboarding(.supervision(.resume(.promptClearCache))), .primary):
       self.deps.log(state.screen, action, "acfc7894")
@@ -929,6 +961,10 @@ public struct IOSReducer: Sendable {
 
     case .setProfileRecovery:
       state.onboarding.isProfileRecovery = true
+      return .none
+
+    case .screenTimeAuthResolved:
+      state.screen = .onboarding(.supervision(.resume(.promptClearCache)))
       return .none
 
     case .authorizationSucceeded:
