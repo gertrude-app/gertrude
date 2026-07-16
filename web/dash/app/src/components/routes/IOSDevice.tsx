@@ -26,8 +26,14 @@ import type { PodcastsRunwayTier } from '../../podcastsSubscriptionRunway';
 import type { PodcastsStatus } from '@dash/components';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
+import {
+  EMPTY_EXTENDED,
+  extendedControlsPayload,
+  normalizeExtended,
+} from '../../lib/extendedRestrictions';
 import { podcastsSubscriptionRunway } from '../../podcastsSubscriptionRunway';
 import reducer from '../../reducers/ios-device-reducer';
+import ExtendedRestrictions from './ExtendedRestrictions';
 import MusicCuration from './MusicCuration';
 
 const TIER_TO_STATUS: Record<PodcastsRunwayTier, PodcastsStatus> = {
@@ -56,6 +62,7 @@ const IOSDevice: React.FC = () => {
     webAllowList: null,
     newBookmarkUrl: ``,
     newBookmarkTitle: ``,
+    extended: EMPTY_EXTENDED,
   });
 
   // const deleteBlockRule = useConfirmableDelete(`blockRule`, {
@@ -103,6 +110,7 @@ const IOSDevice: React.FC = () => {
           webAllowList: state.webAllowList
             ? state.webAllowList.map((b) => ({ ...b }))
             : undefined,
+          ...extendedControlsPayload(state.extended),
         },
       });
     },
@@ -147,7 +155,8 @@ const IOSDevice: React.FC = () => {
       isEqual(
         state.webAllowList,
         blocker.extendedSupervisionControls?.webAllowList ?? null,
-      )
+      ) &&
+      isEqual(state.extended, normalizeExtended(blocker.extendedSupervisionControls))
     : true;
 
   return (
@@ -240,7 +249,15 @@ const IOSDevice: React.FC = () => {
                   }
                 />
                 {blocker.extendedSupervisionControls !== undefined && (
-                  <>
+                  <div className="mt-10 pt-8 border-t-2 border-slate-100">
+                    <h3 className="text-lg font-bold text-slate-700">
+                      Extended controls
+                    </h3>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Fine-grained restrictions for this supervised {dt}. Anything you
+                      turn on (purple) is enforced on the device; anything left off stays
+                      available.
+                    </p>
                     <ToggleCard
                       title="Only allow approved apps"
                       description={`Hide every app on the ${dt} except the ones you specifically approve.`}
@@ -402,7 +419,8 @@ const IOSDevice: React.FC = () => {
                         </div>
                       )}
                     </ToggleCard>
-                  </>
+                    <ExtendedRestrictions extended={state.extended} dispatch={dispatch} />
+                  </div>
                 )}
               </div>
             )}

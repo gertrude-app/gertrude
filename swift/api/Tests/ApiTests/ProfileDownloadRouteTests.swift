@@ -99,7 +99,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     let device = try await self.db.create(IOSDevice.mock)
     var settings = BlockerApp.ProfileSettings.mock { $0.deviceId = device.id }
     settings.whitelistedAppBundleIds = ["com.apple.mobilesafari", "com.acme.app"]
-    settings.webAllowList = [.init(url: "https://example.com", title: "Example")]
+    settings.webAllowList = [.init(url: "https://example.com/bob's", title: "Bob's Site")]
     try await self.db.create(settings)
 
     let retrieved = try await BlockerApp.ProfileSettings.query()
@@ -109,7 +109,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     expect(retrieved.whitelistedAppBundleIds)
       .toEqual(["com.apple.mobilesafari", "com.acme.app"])
     expect(retrieved.webAllowList)
-      .toEqual([.init(url: "https://example.com", title: "Example")])
+      .toEqual([.init(url: "https://example.com/bob's", title: "Bob's Site")])
 
     let ensured = try await BlockerApp.ProfileSettings.ensure(for: device.id, in: self.db)
     expect(ensured.id).toEqual(settings.id) // ensure finds, never clobbers existing
@@ -379,6 +379,48 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     expect(xml).toContain("<key>AllowListBookmarks</key>\n        <array/>")
     expect(xml).toContain("<key>FilterType</key>\n        <string>BuiltIn</string>")
     expect(xml).toContain("<key>AutoFilterEnabled</key>\n        <false/>")
+  }
+
+  func testExtendedRestrictionsEmitWhenSet() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.allowItunes = false
+      $0.allowExplicitContent = false
+      $0.ratingMovies = 0
+      $0.ratingTvShows = 200
+      $0.forceDelayedSoftwareUpdates = true
+      $0.enforcedSoftwareUpdateDelay = 30
+      // allowSafari, allowGameCenter, etc. deliberately left nil
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml).toContain("<key>allowiTunes</key>\n      <false/>") // lowercase-i casing
+    expect(xml).toContain("<key>allowExplicitContent</key>\n      <false/>")
+    expect(xml)
+      .toContain("<key>ratingMovies</key>\n      <integer>0</integer>") // integer, not bool
+    expect(xml)
+      .toContain("<key>ratingTVShows</key>\n      <integer>200</integer>") // TVShows casing
+    expect(xml).toContain("<key>ratingRegion</key>\n      <string>us</string>")
+    expect(xml).toContain("<key>forceDelayedSoftwareUpdates</key>\n      <true/>") // true emits too
+    expect(xml).toContain("<key>enforcedSoftwareUpdateDelay</key>\n      <integer>30</integer>")
+    expect(xml.contains("allowSafari")).toBeFalse() // nil keys omitted entirely
+    expect(xml.contains("allowGameCenter")).toBeFalse()
+  }
+
+  func testRatingRegionOmittedWithoutRatings() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.allowSafari = false
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml).toContain("<key>allowSafari</key>\n      <false/>")
+    expect(xml.contains("ratingRegion")).toBeFalse()
+    expect(xml.contains("ratingMovies")).toBeFalse()
   }
 
   func testCmsSigningRoundTrip() throws {

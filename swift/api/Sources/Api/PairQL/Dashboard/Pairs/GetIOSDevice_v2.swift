@@ -105,6 +105,25 @@ extension GetIOSDevice_v2: Resolver {
         whitelistedAppBundleIds: settings.whitelistedAppBundleIds,
         webAllowList: settings.webAllowList
           .map { $0.map { .init(url: $0.url, title: $0.title) } },
+        allowItunes: settings.allowItunes,
+        allowMusicService: settings.allowMusicService,
+        allowRadioService: settings.allowRadioService,
+        allowNews: settings.allowNews,
+        allowBookstore: settings.allowBookstore,
+        allowExplicitContent: settings.allowExplicitContent,
+        ratingMovies: settings.ratingMovies,
+        ratingTvShows: settings.ratingTvShows,
+        allowSafari: settings.allowSafari,
+        allowSpotlightInternetResults: settings.allowSpotlightInternetResults,
+        allowDefinitionLookup: settings.allowDefinitionLookup,
+        allowAutomaticAppDownloads: settings.allowAutomaticAppDownloads,
+        allowAppClips: settings.allowAppClips,
+        allowSystemAppRemoval: settings.allowSystemAppRemoval,
+        allowAssistant: settings.allowAssistant,
+        allowGameCenter: settings.allowGameCenter,
+        forceDelayedSoftwareUpdates: settings.forceDelayedSoftwareUpdates,
+        enforcedSoftwareUpdateDelay: settings.enforcedSoftwareUpdateDelay,
+        forceAutomaticDateAndTime: settings.forceAutomaticDateAndTime,
       )
     }
     return Output.Blocker(

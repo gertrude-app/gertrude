@@ -27,7 +27,7 @@ enum DuetSqlExpression: SQLExpression {
     case .date(let date):
       serializer.write("'\(date)'::timestamptz")
     case .jsonb(let json):
-      serializer.write("'\(json)'::jsonb")
+      serializer.write("'\(sqlEscaped(json))'::jsonb")
     case .bytea(let base64):
       serializer.write("decode('\(base64)', 'base64')")
     case .currentTimestamp:
@@ -36,4 +36,8 @@ enum DuetSqlExpression: SQLExpression {
       serializer.write("NULL")
     }
   }
+}
+
+private func sqlEscaped(_ string: String) -> String {
+  string.replacingOccurrences(of: "'", with: "''")
 }

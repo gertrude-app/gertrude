@@ -12,6 +12,29 @@ struct BlockerProfileSettings: GertieMigration {
         allow_app_installation boolean NOT NULL DEFAULT true,
         whitelisted_app_bundle_ids text[],
         web_allow_list jsonb,
+        allow_itunes boolean,
+        allow_music_service boolean,
+        allow_radio_service boolean,
+        allow_news boolean,
+        allow_bookstore boolean,
+        allow_explicit_content boolean,
+        rating_movies integer
+          CHECK (rating_movies IS NULL OR rating_movies BETWEEN 0 AND 1000),
+        rating_tv_shows integer
+          CHECK (rating_tv_shows IS NULL OR rating_tv_shows BETWEEN 0 AND 1000),
+        allow_safari boolean,
+        allow_spotlight_internet_results boolean,
+        allow_definition_lookup boolean,
+        allow_automatic_app_downloads boolean,
+        allow_app_clips boolean,
+        allow_system_app_removal boolean,
+        allow_assistant boolean,
+        allow_game_center boolean,
+        force_delayed_software_updates boolean,
+        enforced_software_update_delay integer
+          CHECK (enforced_software_update_delay IS NULL
+            OR enforced_software_update_delay BETWEEN 1 AND 90),
+        force_automatic_date_and_time boolean,
         created_at timestamp with time zone NOT NULL,
         updated_at timestamp with time zone NOT NULL
       );

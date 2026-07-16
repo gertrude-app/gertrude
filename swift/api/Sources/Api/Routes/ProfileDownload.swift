@@ -85,6 +85,38 @@ func generateProfileXml(
     restrictionKeys += "\n\n      <key>whitelistedAppBundleIDs</key>\n      "
     restrictionKeys += plistStringArray(bundleIds, indent: 6)
   }
+  let extendedBoolKeys: [(String, Bool?)] = [
+    ("allowiTunes", settings.allowItunes),
+    ("allowMusicService", settings.allowMusicService),
+    ("allowRadioService", settings.allowRadioService),
+    ("allowNews", settings.allowNews),
+    ("allowBookstore", settings.allowBookstore),
+    ("allowExplicitContent", settings.allowExplicitContent),
+    ("allowSafari", settings.allowSafari),
+    ("allowSpotlightInternetResults", settings.allowSpotlightInternetResults),
+    ("allowDefinitionLookup", settings.allowDefinitionLookup),
+    ("allowAutomaticAppDownloads", settings.allowAutomaticAppDownloads),
+    ("allowAppClips", settings.allowAppClips),
+    ("allowSystemAppRemoval", settings.allowSystemAppRemoval),
+    ("allowAssistant", settings.allowAssistant),
+    ("allowGameCenter", settings.allowGameCenter),
+    ("forceDelayedSoftwareUpdates", settings.forceDelayedSoftwareUpdates),
+    ("forceAutomaticDateAndTime", settings.forceAutomaticDateAndTime),
+  ]
+  for (key, value) in extendedBoolKeys {
+    restrictionKeys += plistBoolKey(key, value)
+  }
+  let extendedIntKeys: [(String, Int?)] = [
+    ("ratingMovies", settings.ratingMovies),
+    ("ratingTVShows", settings.ratingTvShows),
+    ("enforcedSoftwareUpdateDelay", settings.enforcedSoftwareUpdateDelay),
+  ]
+  for (key, value) in extendedIntKeys {
+    restrictionKeys += plistIntKey(key, value)
+  }
+  if settings.ratingMovies != nil || settings.ratingTvShows != nil {
+    restrictionKeys += "\n\n      <key>ratingRegion</key>\n      <string>us</string>"
+  }
   return """
   <?xml version="1.0" encoding="UTF-8"?>
   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -222,6 +254,16 @@ private func plistStringArray(_ strings: [String], indent: Int) -> String {
     .map { "\(pad)  <string>\(xmlEscaped($0))</string>" }
     .joined(separator: "\n")
   return "<array>\n\(entries)\n\(pad)</array>"
+}
+
+private func plistBoolKey(_ key: String, _ value: Bool?) -> String {
+  guard let value else { return "" }
+  return "\n\n      <key>\(key)</key>\n      <\(value ? "true" : "false")/>"
+}
+
+private func plistIntKey(_ key: String, _ value: Int?) -> String {
+  guard let value else { return "" }
+  return "\n\n      <key>\(key)</key>\n      <integer>\(value)</integer>"
 }
 
 private func xmlEscaped(_ string: String) -> String {

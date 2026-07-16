@@ -145,8 +145,11 @@ Supports all 3 apps, plus dashboard and admin websites
 
 - never add comments when writing code
 - never remove comments when refactoring code
-- in test files, DO sometimes add small (usually line-end) comments to help separate
-  critical, load-bearing setup and assertion details from the rest of test
+- in test files, small comments are welcome, but let the test NAME carry the description —
+  don't preface a test with a comment restating what it tests. Default to short line-end
+  callouts on non-obvious or load-bearing lines (a few per test is fine — e.g. tying a
+  critical setup line buried in boilerplate to the assertion it drives); reach for a block
+  comment above a test only rarely, for what genuinely can't be said at line-end.
 
 ## Continuous Improvement
 

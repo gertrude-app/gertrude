@@ -1,6 +1,8 @@
 import { produce } from 'immer';
+import type { ExtControlsState } from '../lib/extendedRestrictions';
 import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
 import type { AllowListBookmark, GetIOSDevice_v2, WebPolicy } from '@dash/types';
+import { normalizeExtended } from '../lib/extendedRestrictions';
 
 export type State = {
   enabledBlockGroups: UUID[];
@@ -17,6 +19,7 @@ export type State = {
   webAllowList: AllowListBookmark[] | null;
   newBookmarkUrl: string;
   newBookmarkTitle: string;
+  extended: ExtControlsState;
   editingBlockRule?: EditBlockRuleProps & { id?: UUID };
 };
 
@@ -43,6 +46,7 @@ export type Action =
   | { type: `setAllowAppRemoval`; value: boolean }
   | { type: `setAllowEraseContentAndSettings`; value: boolean }
   | { type: `setAllowAppInstallation`; value: boolean }
+  | { type: `setExtendedControls`; values: Partial<ExtControlsState> }
   | { type: `receiveData`; data: GetIOSDevice_v2.Output };
 
 function reducer(state: State, action: Action): void {
@@ -141,6 +145,9 @@ function reducer(state: State, action: Action): void {
     case `setAllowAppInstallation`:
       state.allowAppInstallation = action.value;
       return;
+    case `setExtendedControls`:
+      Object.assign(state.extended, action.values);
+      return;
     case `receiveData`: {
       const blocker = action.data.blocker;
       if (!blocker) return;
@@ -159,6 +166,7 @@ function reducer(state: State, action: Action): void {
       state.webAllowList = extended?.webAllowList
         ? extended.webAllowList.map((b) => ({ ...b }))
         : null;
+      state.extended = normalizeExtended(extended);
       return;
     }
     case `addBlockRule`:
