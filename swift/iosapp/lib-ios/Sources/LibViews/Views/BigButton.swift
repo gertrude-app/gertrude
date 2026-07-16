@@ -2,6 +2,8 @@ import SwiftUI
 
 struct BigButton: View {
   @Environment(\.colorScheme) var cs
+  @ScaledMetric(relativeTo: .body) private var textSize = 18
+  @ScaledMetric(relativeTo: .body) private var iconSize = 16
 
   var text: String
   var type: ButtonType
@@ -13,7 +15,7 @@ struct BigButton: View {
     HStack {
       Spacer()
       Text(self.text)
-        .font(.system(size: 18, weight: .semibold))
+        .font(.system(size: self.textSize, weight: .semibold))
         .foregroundStyle(
           self.variant == .primary
             ? Color(self.cs, light: .white, dark: .white)
@@ -21,7 +23,7 @@ struct BigButton: View {
         )
       if let icon = self.icon {
         Image(systemName: icon)
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: self.iconSize, weight: .semibold))
           .foregroundStyle(
             self.variant == .primary
               ? Color(self.cs, light: .white, dark: .white)

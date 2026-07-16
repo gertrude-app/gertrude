@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ButtonScreenView: View {
   @Environment(\.colorScheme) var cs
+  @ScaledMetric(relativeTo: .title) private var titleScale = 1.0
+  @ScaledMetric(relativeTo: .body) private var bodyScale = 1.0
 
   struct Config {
     var text: String
@@ -50,7 +52,7 @@ struct ButtonScreenView: View {
   let image: String?
   let screenType: ScreenType
 
-  @State private var showBg = false
+  @State private var showBg = true
   @State private var iconOffset = Vector(x: 0, y: -20)
   @State private var textOffset = Vector(x: 0, y: 20)
   @State private var primaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
@@ -86,141 +88,171 @@ struct ButtonScreenView: View {
     self.primaryLooksLikeSecondary = primaryLooksLikeSecondary
   }
 
+  private struct Metrics {
+    var isCompact: Bool
+    var spacing: CGFloat
+    var iconSize: CGFloat
+    var listPadBottom: CGFloat
+    var buttonPadTop: CGFloat
+    var insets: EdgeInsets
+
+    static let regular = Metrics(
+      isCompact: false,
+      spacing: 16,
+      iconSize: 40,
+      listPadBottom: 20,
+      buttonPadTop: 12,
+      insets: EdgeInsets(top: 80, leading: 30, bottom: 30, trailing: 30),
+    )
+
+    static let compact = Metrics(
+      isCompact: true,
+      spacing: 12,
+      iconSize: 34,
+      listPadBottom: 8,
+      buttonPadTop: 8,
+      insets: EdgeInsets(top: 42, leading: 22, bottom: 22, trailing: 22),
+    )
+  }
+
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
+    AdaptiveScreen(backgroundVisible: self.showBg) { isCompact in
+      self.content(m: isCompact ? .compact : .regular)
+    }
+  }
 
-      VStack(alignment: .leading, spacing: 16) {
-        Image(systemName: self.icon)
-          .font(.system(size: 40, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .milliseconds(800))
-          .frame(maxWidth: .infinity, alignment: .center)
+  private func content(m: Metrics) -> some View {
+    VStack(alignment: .leading, spacing: m.spacing) {
+      Image(systemName: self.icon)
+        .font(.system(size: m.iconSize * self.titleScale, weight: .regular))
+        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .milliseconds(800))
+        .frame(maxWidth: .infinity, alignment: .center)
 
-        Spacer()
+      Spacer(minLength: m.isCompact ? 10 : nil)
 
-        if let image = self.image {
-          Image(image)
-            .scaleEffect(image.contains("IOS26") ? 1.25 : 1.0)
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 50)
-            .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
-        }
-
-        Text(self.text)
-          .font(.system(size: 18, weight: .medium))
+      if let image = self.image {
+        self.screenImage(image, isCompact: m.isCompact)
           .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+      }
 
-        if let listItems = self.listItems {
-          VStack(alignment: .leading) {
-            ForEach(listItems, id: \.self) { item in
-              HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "circle.fill")
-                  .font(.system(size: 6))
-                  .padding(.top, 7)
-                  .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-                Text(item)
-                  .font(.system(size: 16, weight: .medium))
-                  .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
-                  .opacity(0.8)
-                Spacer()
-              }
-              .padding(.leading, 14)
+      Text(self.text)
+        .font(.system(size: 18 * self.bodyScale, weight: .medium))
+        .fixedSize(horizontal: false, vertical: true)
+        .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+
+      if let listItems = self.listItems {
+        VStack(alignment: .leading) {
+          ForEach(listItems, id: \.self) { item in
+            HStack(alignment: .top, spacing: 12) {
+              Image(systemName: "circle.fill")
+                .font(.system(size: 6 * self.bodyScale))
+                .padding(.top, 7)
+                .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+              Text(item)
+                .font(.system(size: 16 * self.bodyScale, weight: .medium))
+                .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
+                .fixedSize(horizontal: false, vertical: true)
+                .opacity(0.8)
+              Spacer()
             }
-          }
-          .padding(.bottom, 20)
-          .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
-        }
-
-        if let config = self.primaryButtonConfig {
-          if self.primaryButtonStatus.isLoading {
-            self.LoadingButton
-          } else {
-            BigButton(
-              config.text,
-              type: self.withOrWithoutVanishingAnimations(
-                type: config.type,
-                animate: config.animate,
-                asyncAction: config.asyncAction,
-                isLoading: self.$primaryButtonStatus.isLoading,
-              ),
-              variant: self.primaryLooksLikeSecondary ? .secondary : .primary,
-              disabled: config.disabled,
-            )
-            .swooshIn(
-              tracking: self.$primaryButtonStatus.offset,
-              to: .zero,
-              after: .milliseconds(150),
-              for: .milliseconds(800),
-            )
-            .padding(.top, 12)
+            .padding(.leading, 14)
           }
         }
+        .padding(.bottom, m.listPadBottom)
+        .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
+      }
 
-        if let config = self.secondaryButtonConfig {
-          if self.secondaryButtonStatus.isLoading {
-            self.LoadingButton
-          } else {
-            BigButton(
-              config.text,
-              type: self.withOrWithoutVanishingAnimations(
-                type: config.type,
-                animate: config.animate,
-                asyncAction: config.asyncAction,
-                isLoading: self.$secondaryButtonStatus.isLoading,
-              ),
-              variant: .secondary,
-              disabled: config.disabled,
-            )
-            .swooshIn(
-              tracking: self.$secondaryButtonStatus.offset,
-              to: .zero,
-              after: .milliseconds(300),
-              for: .milliseconds(800),
-            )
-          }
-        }
-
-        if let config = self.tertiaryButtonConfig {
-          if self.tertiaryButtonStatus.isLoading {
-            self.LoadingButton
-          } else {
-            BigButton(
-              config.text,
-              type: self.withOrWithoutVanishingAnimations(
-                type: config.type,
-                animate: config.animate,
-                asyncAction: config.asyncAction,
-                isLoading: self.$tertiaryButtonStatus.isLoading,
-              ),
-              variant: .secondary,
-              disabled: config.disabled,
-            )
-            .swooshIn(
-              tracking: self.$tertiaryButtonStatus.offset,
-              to: .zero,
-              after: .milliseconds(450),
-              for: .milliseconds(800),
-            )
-          }
+      if let config = self.primaryButtonConfig {
+        if self.primaryButtonStatus.isLoading {
+          self.LoadingButton
+        } else {
+          BigButton(
+            config.text,
+            type: self.withOrWithoutVanishingAnimations(
+              type: config.type,
+              animate: config.animate,
+              asyncAction: config.asyncAction,
+              isLoading: self.$primaryButtonStatus.isLoading,
+            ),
+            variant: self.primaryLooksLikeSecondary ? .secondary : .primary,
+            disabled: config.disabled,
+          )
+          .swooshIn(
+            tracking: self.$primaryButtonStatus.offset,
+            to: .zero,
+            after: .milliseconds(150),
+            for: .milliseconds(800),
+          )
+          .padding(.top, m.buttonPadTop)
         }
       }
-      .frame(maxWidth: 500)
-      .padding(30)
-      .padding(.top, 50)
+
+      if let config = self.secondaryButtonConfig {
+        if self.secondaryButtonStatus.isLoading {
+          self.LoadingButton
+        } else {
+          BigButton(
+            config.text,
+            type: self.withOrWithoutVanishingAnimations(
+              type: config.type,
+              animate: config.animate,
+              asyncAction: config.asyncAction,
+              isLoading: self.$secondaryButtonStatus.isLoading,
+            ),
+            variant: .secondary,
+            disabled: config.disabled,
+          )
+          .swooshIn(
+            tracking: self.$secondaryButtonStatus.offset,
+            to: .zero,
+            after: .milliseconds(300),
+            for: .milliseconds(800),
+          )
+        }
+      }
+
+      if let config = self.tertiaryButtonConfig {
+        if self.tertiaryButtonStatus.isLoading {
+          self.LoadingButton
+        } else {
+          BigButton(
+            config.text,
+            type: self.withOrWithoutVanishingAnimations(
+              type: config.type,
+              animate: config.animate,
+              asyncAction: config.asyncAction,
+              isLoading: self.$tertiaryButtonStatus.isLoading,
+            ),
+            variant: .secondary,
+            disabled: config.disabled,
+          )
+          .swooshIn(
+            tracking: self.$tertiaryButtonStatus.offset,
+            to: .zero,
+            after: .milliseconds(450),
+            for: .milliseconds(800),
+          )
+        }
+      }
+    }
+    .frame(maxWidth: 500)
+    .padding(m.insets)
+  }
+
+  @ViewBuilder
+  private func screenImage(_ image: String, isCompact: Bool) -> some View {
+    if isCompact {
+      Image(image)
+        .resizable()
+        .scaledToFit()
+        .frame(maxWidth: .infinity, maxHeight: image.contains("IOS26") ? 260 : 300)
+        .padding(.bottom, 8)
+    } else {
+      Image(image)
+        .scaleEffect(image.contains("IOS26") ? 1.25 : 1.0)
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, 50)
     }
   }
 
