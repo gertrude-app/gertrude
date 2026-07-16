@@ -79,9 +79,13 @@ extension AppUpdatesFeature.RootReducer: FilterControlling {
                 xpcErrorDetail = "\(xpcError)"
               }
               let filterState = await self.filter.state()
+              let udsHealth = await self.xpc.checkUdsShadowHealth()
+              let systemUptime = Int(self.device.systemUptime())
               await self.api.securityEvent(
                 .appUpdateFailedToReplaceSystemExtension,
-                "filter state: \(filterState), xpc error: \(xpcErrorDetail)",
+                "filter state: \(filterState), xpc error: \(xpcErrorDetail), "
+                  + "uds shadow: \(udsHealth.healthy ? "ALIVE" : "dead"): \(udsHealth.detail), "
+                  + "system uptime: \(systemUptime)s",
               )
               await send(.appUpdates(.delegate(.postUpdateFilterReplaceFailed)))
               await unexpectedError(id: "cde231a0", detail: "state: \(filterState)")

@@ -170,6 +170,10 @@ final class UpdateTests: XCTestCase {
     // ... but the xpc connection is now broken
     store.deps.filterXpc.checkConnectionHealth = mockFn(always: .failure(.noConnection))
     store.deps.filterXpc.establishConnection = mockFn(always: .failure(.noConnection))
+    store.deps.filterXpc.checkUdsShadowHealth = {
+      .init(healthy: true, detail: "round-trip ok, filter v1.2.3")
+    }
+    store.deps.device.systemUptime = { 123 }
 
     let securityEvent = spy2(on: (LogSecurityEvent.Input.self, UUID?.self), returning: ())
     store.deps.api.logSecurityEvent = securityEvent.fn
@@ -186,7 +190,8 @@ final class UpdateTests: XCTestCase {
     expect(eventCalls.contains(Both(
       .init(
         .appUpdateFailedToReplaceSystemExtension,
-        "filter state: installedAndRunning, xpc error: noConnection",
+        "filter state: installedAndRunning, xpc error: noConnection, "
+          + "uds shadow: ALIVE: round-trip ok, filter v1.2.3, system uptime: 123s",
       ),
       nil,
     ))).toEqual(true)

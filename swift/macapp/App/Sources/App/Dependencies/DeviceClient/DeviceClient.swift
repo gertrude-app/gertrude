@@ -35,6 +35,7 @@ struct DeviceClient: Sendable {
   var terminateApp: @Sendable (RunningApp) async -> Void
   var username: @Sendable () -> String
   var boottime: @Sendable () -> Date?
+  var systemUptime: @Sendable () -> TimeInterval
 }
 
 extension DeviceClient: DependencyKey {
@@ -86,6 +87,7 @@ extension DeviceClient: DependencyKey {
       }
       return Date(timeIntervalSince1970: Double(tv.tv_sec) + (Double(tv.tv_usec) / 1_000_000.0))
     },
+    systemUptime: { ProcessInfo.processInfo.systemUptime },
   )
 }
 
@@ -131,6 +133,7 @@ extension DeviceClient: TestDependencyKey {
     terminateApp: unimplemented("DeviceClient.terminateApp"),
     username: unimplemented("DeviceClient.username", placeholder: ""),
     boottime: unimplemented("DeviceClient.boottime", placeholder: nil),
+    systemUptime: unimplemented("DeviceClient.systemUptime", placeholder: 0),
   )
 
   static let mock = Self(
@@ -169,6 +172,7 @@ extension DeviceClient: TestDependencyKey {
     terminateApp: { _ in },
     username: { "test-username" },
     boottime: { nil },
+    systemUptime: { 0 },
   )
 }
 

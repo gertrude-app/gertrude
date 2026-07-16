@@ -11,6 +11,7 @@ dependencies.
 - `.github/workflows/swift-ci.yml` - main swift monorepo CI (includes macapp, iosapp,
   podcasts, api, libs)
 - `.github/workflows/web-ci.yml` - web monorepo CI
+- `.github/workflows/pr-body.yml` - path-scoped PR body reminders
 
 ### Where Dependencies Are Expressed
 
@@ -56,6 +57,22 @@ supervision tool, not built from this repo. The lint/format/typecheck coverage f
 `check` is sufficient for the package itself. It can still appear in another app's filter
 when that app imports it, such as Storybook visual coverage.
 
+#### pr-body.yml
+
+The `screenshot-checklist` job uses `dorny/paths-filter` to decide whether to add the
+Storybook v2 screenshot checklist to the PR body. The `screenshots` filter should include
+every path that can affect `web/storybook-v2/screenshots/**` when
+`just update-ui-screenshots` runs.
+
+Current scope:
+
+- `web/storybook-v2/**` — runner, Storybook config, generated screenshots, manifest.
+- `web/ui/**` — shared UI primitives/components and their stories.
+- `web/account/**` — account app pages/components and their stories.
+- `web/shared/**` — shared data/helpers imported by account Storybook stories.
+- `web/justfile`, `web/package.json`, `web/pnpm-lock.yaml`, `web/pnpm-workspace.yaml` —
+  screenshot command and dependency/workspace wiring.
+
 ### Periodic Maintenance Steps
 
 1. **Review Package.swift files** - Check each package's dependencies array:
@@ -80,6 +97,8 @@ when that app imports it, such as Storybook visual coverage.
 
    - Determine which apps depend on it
    - Add to appropriate filters (dashboard, site, storybook)
+   - If it can affect Storybook v2 screenshots, add it to the `screenshots` filter in
+     `.github/workflows/pr-body.yml`
 
 5. **Check for moved/renamed packages** - If a package path changes, update filters
    accordingly.
