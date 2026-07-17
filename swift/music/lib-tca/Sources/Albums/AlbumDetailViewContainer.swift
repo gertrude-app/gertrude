@@ -16,7 +16,11 @@ struct AlbumDetailViewContainer: View {
         isLoading: self.store.isLoading || self.store.isLoadingTracks,
         isLoadingTracks: self.store.isLoadingTracks,
         currentTrackID: self.store.currentTrackID?.rawValue,
+        onAddToQueue: { self.store.send(.addToQueueTapped) },
+        onPlayNext: { self.store.send(.playNextTapped) },
         onPlayTap: { self.store.send(.playTapped) },
+        onTrackAddToQueue: { self.store.send(.trackAddToQueueTapped(.init($0))) },
+        onTrackPlayNext: { self.store.send(.trackPlayNextTapped(.init($0))) },
         onTrackTap: { self.store.send(.trackTapped(.init($0))) },
       )
 

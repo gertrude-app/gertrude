@@ -17,8 +17,14 @@ struct ArtistDetailFeature {
   }
 
   enum Action: Equatable {
+    case addToQueueTapped
     case playButtonTapped
+    case playNextTapped
+    case releaseAddToQueueTapped(ApprovedAlbum.ID)
+    case releasePlayNextTapped(ApprovedAlbum.ID)
     case releaseTapped(ApprovedAlbum.ID)
+    case topSongAddToQueueTapped(ApprovedTrack.ID)
+    case topSongPlayNextTapped(ApprovedTrack.ID)
     case topSongTapped(ApprovedTrack.ID)
   }
 

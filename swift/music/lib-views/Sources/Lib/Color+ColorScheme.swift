@@ -42,6 +42,14 @@ public extension Color {
     opacity: 1,
   )
 
+  internal static func artworkPlaceholder(in colorScheme: ColorScheme) -> Color {
+    Color(
+      colorScheme,
+      light: Color(red: 0.90, green: 0.90, blue: 0.92),
+      dark: Color(red: 0.14, green: 0.14, blue: 0.16),
+    )
+  }
+
   internal init?(hex: String) {
     let r, g, b: Double
 

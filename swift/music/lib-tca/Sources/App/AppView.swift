@@ -24,8 +24,8 @@ struct AppView: View {
           .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
           .task(id: self.store.setup.isReady) {
             guard self.store.setup.isReady else { return }
-            await self.store.send(.playback(.restoreCachedSession)).finish()
             _ = self.store.send(.playback(.observePlayback))
+            await self.store.send(.playback(.restoreCachedSession)).finish()
           }
       #else
         self.libraryView
@@ -51,7 +51,6 @@ struct AppView: View {
     LibraryViewContainer(
       store: self.store.scope(state: \.library, action: \.library),
       currentTrackID: self.store.playback.session?.currentTrackID,
-      playbackQueueTrackIDs: self.store.playback.session?.queue.items.map(\.id) ?? [],
       isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
       isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
     )
@@ -96,37 +95,45 @@ struct AppView: View {
       } else if #available(iOS 18.0, *) {
         self.modernIOSTabView
       } else {
-        TabView {
+        TabView(selection: self.selectedTab) {
           self.libraryView
             .tabItem {
               Label("Library", systemImage: "square.grid.2x2")
             }
+            .tag(AppFeature.Tab.library)
 
           self.queueView
             .tabItem {
               Label("Queue", systemImage: "list.bullet")
             }
+            .tag(AppFeature.Tab.queue)
 
           self.searchView
             .tabItem {
               Label("Search", systemImage: "magnifyingglass")
             }
+            .tag(AppFeature.Tab.search)
         }
       }
     }
 
     @available(iOS 18.0, *)
     private var modernIOSTabView: some View {
-      TabView {
-        Tab("Library", systemImage: "square.grid.2x2") {
+      TabView(selection: self.selectedTab) {
+        Tab("Library", systemImage: "square.grid.2x2", value: AppFeature.Tab.library) {
           self.libraryView
         }
 
-        Tab("Queue", systemImage: "list.bullet") {
+        Tab("Queue", systemImage: "list.bullet", value: AppFeature.Tab.queue) {
           self.queueView
         }
 
-        Tab("Search", systemImage: "magnifyingglass", role: .search) {
+        Tab(
+          "Search",
+          systemImage: "magnifyingglass",
+          value: AppFeature.Tab.search,
+          role: .search,
+        ) {
           self.searchView
         }
       }
@@ -135,14 +142,31 @@ struct AppView: View {
     private var queueView: some View {
       NavigationStack {
         if let session = self.store.playback.session {
-          List(session.queue.items) { item in
-            Text(item.title)
-              .fontWeight(item.id == session.currentTrackID ? .semibold : .regular)
+          PlaybackQueueView(
+            currentEntry: session.queue.currentEntry.viewData,
+            upcomingEntries: session.queue.upcomingEntries.map(\.viewData),
+            onClearUpcoming: {
+              self.store.send(.playback(.clearUpcomingButtonTapped))
+            },
+            onRemove: {
+              self.store.send(.playback(.queueEntryRemoveRequested($0)))
+            },
+            onReorder: {
+              self.store.send(.playback(.reorderUpcoming($0)))
+            },
+          )
+        } else {
+          ContentUnavailableView {
+            Label("Your queue is empty", systemImage: "music.note.list")
+          } description: {
+            Text("Choose an approved album, artist, or song to start listening.")
+          } actions: {
+            Button("Browse Library") {
+              self.store.send(.queueBrowseLibraryButtonTapped)
+            }
+            .buttonStyle(.borderedProminent)
           }
           .navigationTitle("Queue")
-        } else {
-          ContentUnavailableView("Queue", systemImage: "list.bullet")
-            .navigationTitle("Queue")
         }
       }
     }
@@ -271,6 +295,21 @@ struct AppView: View {
 
   private var nowPlayingPresented: Binding<Bool> {
     self.$store.isNowPlayingPresented.sending(\.nowPlayingPresentationChanged)
+  }
+
+  private var selectedTab: Binding<AppFeature.Tab> {
+    self.$store.selectedTab.sending(\.tabSelected)
+  }
+}
+
+private extension PlaybackQueueEntry {
+  var viewData: PlaybackQueueEntryData {
+    PlaybackQueueEntryData(
+      id: self.id,
+      title: self.item.title,
+      artist: self.item.artistName,
+      artworkURL: self.item.artworkURL,
+    )
   }
 }
 

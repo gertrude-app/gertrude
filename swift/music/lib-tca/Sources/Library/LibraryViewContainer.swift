@@ -7,7 +7,6 @@ struct LibraryViewContainer: View {
   @Namespace private var zoomNamespace
 
   let currentTrackID: ApprovedTrack.ID?
-  let playbackQueueTrackIDs: [ApprovedTrack.ID]
   let isPlaybackLoading: Bool
   let isPlaybackPlaying: Bool
 
@@ -23,6 +22,8 @@ struct LibraryViewContainer: View {
         onRefresh: {
           self.store.send(.refreshPulled)
         },
+        onAlbumAddToQueue: { self.store.send(.albumAddToQueueTapped(.init($0))) },
+        onAlbumPlayNext: { self.store.send(.albumPlayNextTapped(.init($0))) },
         onAlbumTap: { self.store.send(.albumTapped(.init($0))) },
         onArtistTap: { self.store.send(.artistTapped(.init($0))) },
         onDebugResetTap: { self.store.send(.debugResetOnboardingButtonTapped) },
@@ -52,19 +53,26 @@ struct LibraryViewContainer: View {
     if case .loaded(let library) = self.store.status,
        let artist = library.artist(id: store.artistID) {
       let artistData = ArtistData(artist: artist)
-      let isCurrentQueue = !artistData.topSongs.isEmpty
-        && artistData.topSongs.map(\.id) == self.playbackQueueTrackIDs.map(\.rawValue)
+      let isCurrentArtist = self.currentTrackID.map { currentTrackID in
+        artistData.topSongs.contains(where: { $0.id == currentTrackID.rawValue })
+      } ?? false
 
       ArtistDetailView(
         artist: ArtistDetailData(artist: artistData),
         topSongs: artistData.topSongs,
         releases: self.releases(for: artist, in: library),
         transitionNamespace: self.zoomNamespace,
-        currentTrackID: isCurrentQueue ? self.currentTrackID?.rawValue : nil,
-        isPlaying: isCurrentQueue && self.isPlaybackPlaying,
-        isLoading: isCurrentQueue && self.isPlaybackLoading,
+        currentTrackID: isCurrentArtist ? self.currentTrackID?.rawValue : nil,
+        isPlaying: isCurrentArtist && self.isPlaybackPlaying,
+        isLoading: isCurrentArtist && self.isPlaybackLoading,
+        onAddToQueue: { store.send(.addToQueueTapped) },
+        onPlayNext: { store.send(.playNextTapped) },
         onPlayTap: { store.send(.playButtonTapped) },
+        onSongAddToQueue: { store.send(.topSongAddToQueueTapped(.init($0))) },
+        onSongPlayNext: { store.send(.topSongPlayNextTapped(.init($0))) },
         onSongTap: { store.send(.topSongTapped(.init($0))) },
+        onReleaseAddToQueue: { store.send(.releaseAddToQueueTapped(.init($0))) },
+        onReleasePlayNext: { store.send(.releasePlayNextTapped(.init($0))) },
         onReleaseTap: { store.send(.releaseTapped(.init($0))) },
       )
       .navigationZoomTransitionIfAvailable(

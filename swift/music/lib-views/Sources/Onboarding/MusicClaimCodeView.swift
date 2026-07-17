@@ -30,7 +30,7 @@ struct MusicClaimCodeView: View {
         ))
         .fixedSize(horizontal: false, vertical: true)
 
-      Text(self.claimUrl)
+      Text(self.claimLink.url.absoluteString)
         .font(.system(size: 20, weight: .semibold, design: .monospaced))
         .minimumScaleFactor(0.7)
         .lineLimit(1)
@@ -41,7 +41,7 @@ struct MusicClaimCodeView: View {
 
       BigButton(
         "Send link",
-        type: .share(self.claimUrl),
+        type: .share(self.claimLink.url.absoluteString),
         variant: .primary,
         icon: "square.and.arrow.up",
       )
@@ -71,12 +71,8 @@ struct MusicClaimCodeView: View {
     }
   }
 
-  private var codeString: String {
-    String(format: "%06d", self.code)
-  }
-
-  private var claimUrl: String {
-    "https://gertrude.app/m/\(self.codeString)"
+  private var claimLink: MusicClaimLink {
+    MusicClaimLink(code: self.code)
   }
 }
 

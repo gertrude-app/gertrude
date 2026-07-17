@@ -72,44 +72,61 @@ struct PlaybackFeature: Sendable {
   struct State: Equatable {
     var session: Session?
     var failure: PlaybackFailure?
+    var hasAuthoritativeSnapshot = false
+    var isRestoringCheckpoint = false
     var lastCachedProgressBucket: Int?
-    var requiresPlayerRestore = false
+    var pendingAlbumResolutionSongID: ApprovedTrack.ID?
+    var pendingPlayNowItems: [PlaybackItem]?
+    var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] = [:]
   }
 
   struct Queue: Equatable, Sendable {
-    var items: [PlaybackItem]
+    var entries: [PlaybackQueueEntry]
     var currentIndex: Int
 
     init(
       items: [PlaybackItem],
       currentIndex: Int = 0,
     ) {
-      self.items = items
+      self.entries = items.enumerated().map { index, item in
+        PlaybackQueueEntry(id: "pending:\(index):\(item.id.rawValue)", item: item)
+      }
       self.currentIndex = items.indices.contains(currentIndex) ? currentIndex : 0
     }
 
+    init?(
+      entries: [PlaybackQueueEntry],
+      currentEntryID: PlaybackQueueEntry.ID?,
+    ) {
+      guard let currentEntryID,
+            let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }) else {
+        return nil
+      }
+      self.entries = entries
+      self.currentIndex = currentIndex
+    }
+
+    var currentEntry: PlaybackQueueEntry {
+      self.entries[self.currentIndex]
+    }
+
     var currentItem: PlaybackItem {
-      self.items[self.currentIndex]
+      self.currentEntry.item
+    }
+
+    var items: [PlaybackItem] {
+      self.entries.map(\.item)
+    }
+
+    var upcomingEntries: [PlaybackQueueEntry] {
+      guard !self.entries.isEmpty,
+            self.currentIndex < self.entries.index(before: self.entries.endIndex) else { return [] }
+      let nextIndex = self.entries.index(after: self.currentIndex)
+      return Array(self.entries[nextIndex...])
     }
 
     var upcomingItems: [PlaybackItem] {
-      guard !self.items.isEmpty else { return [] }
-      let nextIndex = self.items.index(after: self.currentIndex)
-      return Array(self.items[nextIndex...]) + Array(self.items[..<self.currentIndex])
-    }
-
-    mutating func moveToItem(id: ApprovedTrack.ID) -> Bool {
-      guard let index = self.items.firstIndex(where: { $0.id == id }) else {
-        return false
-      }
-      return self.moveToIndex(index)
-    }
-
-    private mutating func moveToIndex(_ index: Int) -> Bool {
-      guard self.items.indices.contains(index) else { return false }
-      guard self.currentIndex != index else { return false }
-      self.currentIndex = index
-      return true
+      self.upcomingEntries.map(\.item)
     }
   }
 
@@ -140,6 +157,27 @@ struct PlaybackFeature: Sendable {
         progress: progress,
       )
     }
+
+    init?(
+      snapshot: PlaybackSnapshot,
+      sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID],
+    ) {
+      let entries = snapshot.entries.map { entry in
+        PlaybackQueueEntry(
+          id: entry.id,
+          item: entry.item.withAlbumID(sourceAlbumIDs[entry.item.id]),
+        )
+      }
+      guard let queue = Queue(
+        entries: entries,
+        currentEntryID: snapshot.currentEntryID,
+      ) else { return nil }
+      self.init(
+        playStatus: snapshot.playStatus,
+        queue: queue,
+        progress: snapshot.progress,
+      )
+    }
   }
 
   enum PlayStatus: Equatable, Sendable {
@@ -149,16 +187,21 @@ struct PlaybackFeature: Sendable {
   }
 
   enum Action: Equatable {
-    case cachedSessionLoaded(CachedPlaybackSession?)
+    case addToQueue([PlaybackItem])
+    case checkpointLoaded(PlaybackCheckpoint?)
+    case checkpointRestorationFinished(PlaybackSnapshot?)
+    case clearUpcomingButtonTapped
     case observePlayback
     case pause
-    case playQueue(items: [PlaybackItem], startIndex: Int)
+    case playNext([PlaybackItem])
+    case playNow(items: [PlaybackItem], startIndex: Int)
+    case playNowFinished(PlaybackSnapshot)
     case playbackEvent(PlaybackEvent)
     case playbackFailed(PlaybackFailure)
     case playbackFailureActionTapped
     case playbackFailureDismissed
-    case playbackStarted
-    case playTrack(PlaybackItem)
+    case queueEntryRemoveRequested(PlaybackQueueEntry.ID)
+    case reorderUpcoming([PlaybackQueueEntry.ID])
     case restoreCachedSession
     case resume
     case saveCachedSession
@@ -170,6 +213,7 @@ struct PlaybackFeature: Sendable {
   }
 
   enum CancelID: Hashable {
+    case checkpointSave
     case playbackEvents
     case playbackStart
     case seek
@@ -182,14 +226,54 @@ struct PlaybackFeature: Sendable {
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
-      case .cachedSessionLoaded(let cachedSession):
+      case .addToQueue(let items):
+        return self.insertIntoQueue(items, position: .tail, state: &state)
+
+      case .checkpointLoaded(let loadedCheckpoint):
         guard state.session == nil,
-              let session = cachedSession?.playbackSession else { return .none }
+              let loadedCheckpoint else { return .none }
+        let checkpoint = loadedCheckpoint.activeQueue
         state.failure = nil
+        state.hasAuthoritativeSnapshot = false
+        state.isRestoringCheckpoint = true
         state.lastCachedProgressBucket = nil
-        state.requiresPlayerRestore = true
-        state.session = session
-        return .none
+        state.sourceAlbumIDs.merge(checkpoint.sourceAlbumIDs) { _, new in new }
+        return .run { send in
+          do {
+            let snapshot = try await self.playback.restoreQueue(checkpoint)
+            try Task.checkCancellation()
+            await send(.checkpointRestorationFinished(snapshot))
+          } catch is CancellationError {
+            return
+          } catch {
+            await send(.checkpointRestorationFinished(nil))
+          }
+        }
+        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+
+      case .checkpointRestorationFinished(let snapshot):
+        state.isRestoringCheckpoint = false
+        guard let snapshot else {
+          state.hasAuthoritativeSnapshot = false
+          return .none
+        }
+        return .send(.playbackEvent(.snapshotChanged(snapshot)))
+
+      case .clearUpcomingButtonTapped:
+        guard state.session?.queue.upcomingEntries.isEmpty == false else { return .none }
+        state.pendingPlayNowItems = nil
+        return .run { send in
+          do {
+            let snapshot = try await self.playback.clearUpcoming()
+            try Task.checkCancellation()
+            await send(.playbackEvent(.snapshotChanged(snapshot)))
+          } catch is CancellationError {
+            return
+          } catch {
+            await send(.playbackFailed(.init(error: error)))
+          }
+        }
+        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
 
       case .observePlayback:
         return .run { send in
@@ -199,49 +283,60 @@ struct PlaybackFeature: Sendable {
         }
         .cancellable(id: CancelID.playbackEvents, cancelInFlight: true)
 
-      case .playbackEvent(.playStatusChanged(let playStatus)):
-        state.setPlayStatus(playStatus)
-        return self.saveCachedSession(state.session)
-
-      case .playbackEvent(.currentItemChanged(let itemID)):
-        guard state.setCurrentItem(id: itemID) else { return .none }
-        return self.saveCachedSession(state.session)
-
-      case .playbackEvent(.progressChanged(let progress)):
-        state.setProgress(progress)
-        guard state.shouldCacheProgressSnapshot() else { return .none }
-        return self.saveCachedSession(state.session)
-
-      case .playTrack(let item):
+      case .playbackEvent(.queueEnded):
+        guard state.session != nil || state.isRestoringCheckpoint else { return .none }
         state.failure = nil
+        state.hasAuthoritativeSnapshot = false
+        state.isRestoringCheckpoint = false
         state.lastCachedProgressBucket = nil
-        state.requiresPlayerRestore = false
-        state.session = .init(playStatus: .loading, currentItem: item)
-        return .run { send in
-          do {
-            try await self.playback.playTrack(item)
-            try Task.checkCancellation()
-            await send(.playbackStarted)
-          } catch is CancellationError {
-            return
-          } catch {
-            await send(.playbackFailed(.init(error: error)))
-          }
-        }
-        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+        state.pendingAlbumResolutionSongID = nil
+        state.pendingPlayNowItems = nil
+        state.session = nil
+        state.sourceAlbumIDs.removeAll()
+        return .merge(
+          .cancel(id: CancelID.playbackStart),
+          .cancel(id: CancelID.seek),
+          .concatenate(
+            .cancel(id: CancelID.checkpointSave),
+            .run { _ in
+              await self.playback.clearQueue()
+              await self.playbackSessionCache.delete()
+            },
+          ),
+        )
 
-      case .playQueue(let items, let startIndex):
+      case .playbackEvent(.snapshotChanged(let snapshot)):
+        if let pendingItems = state.pendingPlayNowItems {
+          guard snapshot.entries.map(\.item.id) == pendingItems.map(\.id) else { return .none }
+          state.pendingPlayNowItems = nil
+        }
+        return self.applySnapshot(snapshot, state: &state)
+
+      case .playNext(let items):
+        return self.insertIntoQueue(items, position: .next, state: &state)
+
+      case .playNow(let items, let startIndex):
         guard items.indices.contains(startIndex) else { return .none }
+        let requestedItems = Array(items[startIndex...])
+        let existingUpcomingItems = state.hasAuthoritativeSnapshot
+          ? state.session?.queue.upcomingItems ?? []
+          : []
+        let composedItems = requestedItems + existingUpcomingItems
         state.failure = nil
+        state.hasAuthoritativeSnapshot = false
+        state.isRestoringCheckpoint = false
         state.lastCachedProgressBucket = nil
-        state.requiresPlayerRestore = false
-        let queue = Queue(items: items, currentIndex: startIndex)
-        state.session = .init(playStatus: .loading, queue: queue)
+        state.pendingPlayNowItems = composedItems
+        state.recordSourceAlbums(requestedItems)
+        state.session = .init(
+          playStatus: .loading,
+          queue: .init(items: composedItems),
+        )
         return .run { send in
           do {
-            try await self.playback.playQueue(items, startIndex)
+            let snapshot = try await self.playback.playNow(items, startIndex)
             try Task.checkCancellation()
-            await send(.playbackStarted)
+            await send(.playNowFinished(snapshot))
           } catch is CancellationError {
             return
           } catch {
@@ -249,6 +344,10 @@ struct PlaybackFeature: Sendable {
           }
         }
         .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+
+      case .playNowFinished(let snapshot):
+        state.pendingPlayNowItems = nil
+        return self.applySnapshot(snapshot, state: &state)
 
       case .togglePlayPause:
         switch state.session?.playStatus {
@@ -264,44 +363,62 @@ struct PlaybackFeature: Sendable {
         guard state.session?.playStatus == .playing else { return .none }
         state.pauseSession()
         return .merge(
-          self.saveCachedSession(state.session),
+          self.saveCheckpoint(state),
           .run { _ in
             await self.playback.pause()
           },
         )
 
-      case .restoreCachedSession:
-        guard state.session == nil else { return .none }
+      case .queueEntryRemoveRequested(let entryID):
+        guard state.session?.queue.upcomingEntries.contains(where: { $0.id == entryID }) == true
+        else { return .none }
+        state.pendingPlayNowItems = nil
         return .run { send in
-          await send(.cachedSessionLoaded(try? self.playbackSessionCache.load()))
+          do {
+            let snapshot = try await self.playback.removeQueueEntry(entryID)
+            try Task.checkCancellation()
+            await send(.playbackEvent(.snapshotChanged(snapshot)))
+          } catch is CancellationError {
+            return
+          } catch {
+            await send(.playbackFailed(.init(error: error)))
+          }
+        }
+        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+
+      case .reorderUpcoming(let entryIDs):
+        guard let session = state.session,
+              entryIDs.count == session.queue.upcomingEntries.count,
+              Set(entryIDs) == Set(session.queue.upcomingEntries.map(\.id)) else {
+          return .none
+        }
+        state.pendingPlayNowItems = nil
+        return .run { send in
+          do {
+            let snapshot = try await self.playback.reorderUpcoming(entryIDs)
+            try Task.checkCancellation()
+            await send(.playbackEvent(.snapshotChanged(snapshot)))
+          } catch is CancellationError {
+            return
+          } catch {
+            await send(.playbackFailed(.init(error: error)))
+          }
+        }
+        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+
+      case .restoreCachedSession:
+        guard state.session == nil,
+              !state.isRestoringCheckpoint else { return .none }
+        return .run { send in
+          await send(.checkpointLoaded(try? self.playbackSessionCache.load()))
         }
 
       case .resume:
-        guard let session = state.session,
-              session.playStatus == .paused else { return .none }
+        guard state.session?.playStatus == .paused else { return .none }
         state.failure = nil
-        if state.requiresPlayerRestore {
-          state.setPlayStatus(.loading)
-          return .run { send in
-            do {
-              try await self.playback.playQueueFromPosition(
-                session.queue.items,
-                session.queue.currentIndex,
-                session.progress.elapsedTime,
-              )
-              try Task.checkCancellation()
-              await send(.playbackStarted)
-            } catch is CancellationError {
-              return
-            } catch {
-              await send(.playbackFailed(.init(error: error)))
-            }
-          }
-          .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
-        }
         state.resumeSession()
         return .merge(
-          self.saveCachedSession(state.session),
+          self.saveCheckpoint(state),
           .run { send in
             do {
               try await self.playback.resume()
@@ -312,7 +429,7 @@ struct PlaybackFeature: Sendable {
         )
 
       case .saveCachedSession:
-        return self.saveCachedSession(state.session)
+        return self.saveCheckpoint(state)
 
       case .seek(let time):
         guard let duration = state.session?.progress.duration, duration > 0 else { return .none }
@@ -322,17 +439,19 @@ struct PlaybackFeature: Sendable {
           await self.playback.seek(clampedTime)
         }
         .cancellable(id: CancelID.seek, cancelInFlight: true)
-        return .merge(self.saveCachedSession(state.session), seekEffect)
+        return .merge(self.saveCheckpoint(state), seekEffect)
 
       case .skipToNext:
         guard state.session != nil else { return .none }
-        return .run { _ in
-          try? await self.playback.skipToNext()
+        return .run { send in
+          guard let outcome = try? await self.playback.skipToNext(),
+                outcome == .queueEnded else { return }
+          await send(.playbackEvent(.queueEnded))
         }
 
       case .skipToPrevious:
-        guard let elapsedTime = state.session?.progress.elapsedTime else { return .none }
-        if elapsedTime > 3 {
+        guard let session = state.session else { return .none }
+        if session.progress.elapsedTime > 3 || session.queue.currentIndex == 0 {
           return .run { _ in
             await self.playback.restartCurrentEntry()
           }
@@ -345,20 +464,15 @@ struct PlaybackFeature: Sendable {
         state.pauseSession()
         return .merge(
           .cancel(id: CancelID.playbackStart),
-          self.saveCachedSession(state.session),
+          self.saveCheckpoint(state),
           .run { _ in
             await self.playback.stop()
           },
         )
 
-      case .playbackStarted:
-        state.failure = nil
-        state.requiresPlayerRestore = false
-        state.resumeSession()
-        return self.saveCachedSession(state.session)
-
       case .playbackFailed(let failure):
         state.failure = failure
+        state.pendingPlayNowItems = nil
         state.pauseSession()
         log(
           failure.eventLevel,
@@ -381,12 +495,75 @@ struct PlaybackFeature: Sendable {
     }
   }
 
-  private func saveCachedSession(_ session: PlaybackFeature.Session?) -> EffectOf<Self> {
-    guard let session else { return .none }
-    let cachedSession = CachedPlaybackSession(session: session)
-    return .run { _ in
-      try? await self.playbackSessionCache.save(cachedSession)
+  private func applySnapshot(
+    _ snapshot: PlaybackSnapshot,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard var session = Session(
+      snapshot: snapshot,
+      sourceAlbumIDs: state.sourceAlbumIDs,
+    ) else { return .none }
+    let previousSession = state.session
+    if previousSession?.isLoading == true, session.playStatus == .paused {
+      session.playStatus = .loading
     }
+    state.hasAuthoritativeSnapshot = !state.isRestoringCheckpoint
+    state.session = session
+    guard !state.isRestoringCheckpoint else { return .none }
+    let shouldCacheImmediately = previousSession?.queue != session.queue
+      || previousSession?.playStatus != session.playStatus
+    if shouldCacheImmediately {
+      state.lastCachedProgressBucket = Int(session.progress.elapsedTime / 5)
+      return self.saveCheckpoint(state)
+    }
+    guard state.shouldCacheProgressSnapshot() else { return .none }
+    return self.saveCheckpoint(state)
+  }
+
+  private func insertIntoQueue(
+    _ items: [PlaybackItem],
+    position: PlaybackQueueInsertionPosition,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard !items.isEmpty else { return .none }
+    state.failure = nil
+    state.isRestoringCheckpoint = false
+    state.pendingPlayNowItems = nil
+    state.recordSourceAlbums(items)
+    if state.session == nil {
+      state.hasAuthoritativeSnapshot = false
+      state.session = .init(
+        playStatus: .loading,
+        queue: .init(items: items),
+      )
+    }
+    return .run { send in
+      do {
+        let snapshot = try await self.playback.insertIntoQueue(items, position)
+        try Task.checkCancellation()
+        await send(.playbackEvent(.snapshotChanged(snapshot)))
+      } catch is CancellationError {
+        return
+      } catch {
+        await send(.playbackFailed(.init(error: error)))
+      }
+    }
+    .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+  }
+
+  private func saveCheckpoint(_ state: State) -> EffectOf<Self> {
+    guard state.hasAuthoritativeSnapshot,
+          !state.isRestoringCheckpoint,
+          let session = state.session else { return .none }
+    let checkpoint = PlaybackCheckpoint(
+      session: session,
+      sourceAlbumIDs: state.sourceAlbumIDs,
+    )
+    return .run { _ in
+      try Task.checkCancellation()
+      try? await self.playbackSessionCache.save(checkpoint)
+    }
+    .cancellable(id: CancelID.checkpointSave, cancelInFlight: true)
   }
 }
 
@@ -411,13 +588,53 @@ extension PlaybackFeature.State {
     self.session = session
   }
 
-  mutating func setCurrentItem(id: ApprovedTrack.ID) -> Bool {
-    guard var session = self.session else { return false }
-    guard session.queue.moveToItem(id: id) else { return false }
-    session.progress = .zero
-    self.lastCachedProgressBucket = nil
-    self.session = session
+  mutating func recordSourceAlbums(_ items: [PlaybackItem]) {
+    for item in items {
+      if let albumID = item.albumID {
+        self.sourceAlbumIDs[item.id] = albumID
+      }
+    }
+  }
+
+  mutating func resolveCurrentAlbum(in library: ApprovedMusicLibrary) -> Bool {
+    guard let item = self.session?.currentItem else { return false }
+    if let albumID = self.sourceAlbumIDs[item.id],
+       library.album(id: albumID) != nil {
+      if item.albumID != albumID {
+        self.setSourceAlbumID(albumID, for: item.id)
+      }
+      return true
+    }
+    self.sourceAlbumIDs[item.id] = nil
+    guard let album = library.album(matching: item) else {
+      if item.albumID != nil {
+        self.setSourceAlbumID(nil, for: item.id)
+      }
+      return false
+    }
+    if item.albumID != album.id {
+      self.setSourceAlbumID(album.id, for: item.id)
+    }
     return true
+  }
+
+  mutating func setSourceAlbumID(
+    _ albumID: ApprovedAlbum.ID?,
+    for songID: ApprovedTrack.ID,
+  ) {
+    self.sourceAlbumIDs[songID] = albumID
+    guard var session = self.session else { return }
+    session.queue.entries = session.queue.entries.map { entry in
+      guard entry.item.id == songID else { return entry }
+      return PlaybackQueueEntry(
+        id: entry.id,
+        item: entry.item.withAlbumID(albumID),
+      )
+    }
+    self.session = session
+    if self.pendingAlbumResolutionSongID == songID, albumID != nil {
+      self.pendingAlbumResolutionSongID = nil
+    }
   }
 
   mutating func shouldCacheProgressSnapshot() -> Bool {

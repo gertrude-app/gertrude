@@ -5,6 +5,8 @@ struct LibraryGridView: View {
   private let artists: [ArtistData]
   private let isLoading: Bool
   private let transitionNamespace: Namespace.ID?
+  private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
+  private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
   private let onArtistTap: @MainActor @Sendable (String) -> Void
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
@@ -14,6 +16,8 @@ struct LibraryGridView: View {
     artists: [ArtistData] = [],
     isLoading: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
+    onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
@@ -22,6 +26,8 @@ struct LibraryGridView: View {
     self.artists = artists
     self.isLoading = isLoading
     self.transitionNamespace = transitionNamespace
+    self.onAlbumAddToQueue = onAlbumAddToQueue
+    self.onAlbumPlayNext = onAlbumPlayNext
     self.onAlbumTap = onAlbumTap
     self.onArtistTap = onArtistTap
     self.onDebugResetTap = onDebugResetTap
@@ -86,6 +92,8 @@ struct LibraryGridView: View {
           album: album,
           artworkSize: self.artworkSize(for: containerWidth),
           transitionNamespace: self.transitionNamespace,
+          onAddToQueue: { self.onAlbumAddToQueue(album.id) },
+          onPlayNext: { self.onAlbumPlayNext(album.id) },
         ) {
           self.onAlbumTap(album.id)
         }
@@ -135,22 +143,6 @@ struct LibraryGridView: View {
     max(148, floor((containerWidth - self.horizontalPadding * 2 - self.columnSpacing) / 2))
   }
 }
-
-#if DEBUG
-  private struct DebugResetOnboardingButton: View {
-    let onTap: @MainActor @Sendable () -> Void
-
-    var body: some View {
-      Button("Reset onboarding", action: self.onTap)
-        .font(.system(size: 12, weight: .semibold, design: .rounded))
-        .buttonStyle(.bordered)
-        .tint(.secondary)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.regularMaterial, in: Capsule())
-    }
-  }
-#endif
 
 private struct LibraryGridEmptyStateView: View {
   var body: some View {

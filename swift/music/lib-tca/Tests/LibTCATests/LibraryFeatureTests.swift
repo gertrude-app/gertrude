@@ -363,7 +363,84 @@ struct LibraryFeatureTests {
       artistID: artist.id,
       trackID: topSongs[1].id,
     ))
-    await store.receive(.delegate(.playQueue(items: items, startIndex: 1)))
+    await store.receive(.delegate(.playNow(items: items, startIndex: 1)))
+  }
+
+  @Test
+  func artistDetailQueueActionsDelegateApprovedTopSongs() async {
+    let topSongs = [
+      ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
+      ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
+    ]
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      topSongs: topSongs,
+    )
+    let library = ApprovedMusicLibrary(artists: [artist])
+    let items = topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
+    }
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.artistTapped(artist.id)) {
+      $0.path.append(.artist(.init(artistID: artist.id)))
+    }
+    await store.send(.path(.element(id: 0, action: .artist(.playNextTapped))))
+    await store.receive(.delegate(.playNext(items: items)))
+    await store.send(.path(.element(id: 0, action: .artist(.addToQueueTapped))))
+    await store.receive(.delegate(.addToQueue(items: items)))
+    await store.send(.path(.element(
+      id: 0,
+      action: .artist(.topSongPlayNextTapped(topSongs[1].id)),
+    )))
+    await store.receive(.delegate(.playNext(items: [items[1]])))
+    await store.send(.path(.element(
+      id: 0,
+      action: .artist(.topSongAddToQueueTapped(topSongs[0].id)),
+    )))
+    await store.receive(.delegate(.addToQueue(items: [items[0]])))
+  }
+
+  @Test
+  func albumCardQueueActionsDelegateLoadedTracksInOrder() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let library = ApprovedMusicLibrary(albums: [album])
+    let items = playbackItems(album: album)
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.albumPlayNextTapped(album.id))
+    await store.receive(.delegate(.playNext(items: items)))
+    await store.send(.albumAddToQueueTapped(album.id))
+    await store.receive(.delegate(.addToQueue(items: items)))
+  }
+
+  @Test
+  func albumCardQueueActionLoadsTracksAndPreservesAlbumHint() async {
+    var album = ApprovedMusicLibrary.mock.albums[0]
+    let tracks = album.tracks
+    album.tracks = []
+    let albumID = album.id
+    var loadedAlbum = album
+    loadedAlbum.tracks = tracks
+    let items = playbackItems(album: loadedAlbum)
+    let library = ApprovedMusicLibrary(albums: [album])
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic.loadAlbumTracks = { requestedAlbumID in
+        #expect(requestedAlbumID == albumID)
+        return tracks
+      }
+    }
+
+    await store.send(.albumPlayNextTapped(albumID))
+    await store.receive(.albumQueueTracksLoaded(albumID, tracks, .next))
+    await store.receive(.delegate(.playNext(items: items)))
   }
 
   @Test
@@ -380,6 +457,37 @@ struct LibraryFeatureTests {
         transitionSourceID: album.id.rawValue,
       )))
     }
+  }
+
+  @Test
+  func artistReleaseQueueActionsRouteThroughAlbumFlow() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      releaseAlbumIds: [album.id],
+    )
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    let items = playbackItems(album: album)
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.artistTapped(artist.id)) {
+      $0.path.append(.artist(.init(artistID: artist.id)))
+    }
+    await store.send(.path(.element(
+      id: 0,
+      action: .artist(.releasePlayNextTapped(album.id)),
+    )))
+    await store.receive(.albumPlayNextTapped(album.id))
+    await store.receive(.delegate(.playNext(items: items)))
+    await store.send(.path(.element(
+      id: 0,
+      action: .artist(.releaseAddToQueueTapped(album.id)),
+    )))
+    await store.receive(.albumAddToQueueTapped(album.id))
+    await store.receive(.delegate(.addToQueue(items: items)))
   }
 
   @Test
@@ -462,8 +570,8 @@ struct LibraryFeatureTests {
     let items = [playbackItem("track-1")]
     await store.send(.path(.element(
       id: 0,
-      action: .album(.delegate(.playAlbum(items: items, startIndex: 0))),
+      action: .album(.delegate(.playNow(items: items, startIndex: 0))),
     )))
-    await store.receive(.delegate(.playQueue(items: items, startIndex: 0)))
+    await store.receive(.delegate(.playNow(items: items, startIndex: 0)))
   }
 }
