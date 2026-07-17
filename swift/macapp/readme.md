@@ -2,6 +2,8 @@
 
 ## Release notes
 
+- `2.9.7` (canary, 7/17/26)
+  - no changes, just testing xpc upgrade reboot reconnect fix again
 - `2.9.6` (canary, 7/16/26)
   - no changes, more xpc wedge failure telemetry, prior not definitive
 - `2.9.5` (canary, 7/13/26)
