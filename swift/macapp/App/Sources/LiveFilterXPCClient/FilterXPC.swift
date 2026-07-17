@@ -11,6 +11,7 @@ struct FilterXPC: Sendable {
   @Dependency(\.mainQueue) var scheduler
   @Dependency(\.filterExtension) var filterExtension
 
+  // sync:bc4068f6 app-to-filter xpc request surface
   func establishConnection() async throws {
     let checkConnection = await Result { try await self.checkConnectionHealth() }
     guard checkConnection.isFailure else { return }
@@ -71,6 +72,7 @@ struct FilterXPC: Sendable {
   ) async throws {
     try await self.establishConnection()
 
+    // sync:70544a7f user-rules payload encoding
     let manifestData = try XPC.encode(manifest)
     let filterData = try XPC.encode(UserFilterData(
       keychains: keychains,

@@ -5,6 +5,9 @@ import Gertie
 import os.log
 
 public struct Filter: Reducer, Sendable {
+  public static let appAlivenessSeconds = 150
+  public static let heartbeatIntervalSeconds = 60
+
   public struct State: Equatable, DecisionState {
     public var userKeychains: [uid_t: [RuleKeychain]] = [:] {
       didSet { rebuildKeychainIndexes() }
@@ -71,12 +74,14 @@ public struct Filter: Reducer, Sendable {
           await self.xpc.startListener()
         },
 
+        // sync:56acb165 filter boot durable reload
         .run { [load = storage.loadPersistentState] send in
           try await send(.loadedPersistentState(load()))
         },
 
+        // sync:d8356a06 liveness heartbeat cleanup
         .run { send in
-          for await _ in self.mainQueue.timer(interval: .seconds(60)) {
+          for await _ in self.mainQueue.timer(interval: .seconds(Self.heartbeatIntervalSeconds)) {
             await send(.heartbeat)
           }
         }.cancellable(id: CancelId.heartbeat, cancelInFlight: true),
@@ -95,6 +100,7 @@ public struct Filter: Reducer, Sendable {
       )
 
     case .loadedPersistentState(.some(let persisted)):
+      // sync:56acb165 filter boot durable reload
       state.userKeychains = persisted.userKeychains
       state.userDowntime = persisted.userDowntime.mapValues { Downtime(window: $0) }
       var manifest = persisted.appIdManifest
@@ -134,6 +140,7 @@ public struct Filter: Reducer, Sendable {
       }
 
       for (userId, expiration) in state.macappsAliveUntil {
+        // sync:d8356a06 liveness heartbeat cleanup
         if expiration < self.now {
           state.macappsAliveUntil[userId] = nil
         }
@@ -189,6 +196,7 @@ public struct Filter: Reducer, Sendable {
       return .none
 
     case .xpc(.receivedAppMessage(.setBlockStreaming(true, let userId))):
+      // sync:29acb988 filter state replay
       state.recordAppActivity(from: userId)
       state.blockListeners[userId] = self.now + .minutes(5)
       os_log("[D•] FILTER state start streaming: %{public}@", "\(state.debug)")
@@ -200,6 +208,7 @@ public struct Filter: Reducer, Sendable {
       return .none
 
     case .xpc(.receivedAppMessage(.disconnectUser(let userId))):
+      // sync:29acb988 filter state replay
       state.userKeychains[userId] = nil
       state.userAlwaysBlocked[userId] = nil
       state.suspensions[userId] = nil
@@ -235,6 +244,7 @@ public struct Filter: Reducer, Sendable {
       let filteringDisabled,
       let alwaysBlocked,
     ))):
+      // sync:29acb988 filter state replay
       state.recordAppActivity(from: userId)
       // nil = old app (filteringDisabled absent from XPC JSON) — preserve stale state for
       // monitoring-only children on legacy app versions that don't send filteringDisabled.
@@ -292,6 +302,7 @@ public struct Filter: Reducer, Sendable {
 
     case .xpc(.receivedAppMessage(.macappAlive(let userId))),
          .urlMessage(.alive(let userId)):
+      // sync:ded93bed app liveness window
       state.recordAppActivity(from: userId)
       return .none
 
@@ -314,7 +325,8 @@ public struct Filter: Reducer, Sendable {
 public extension Filter.State {
   mutating func recordAppActivity(from userId: uid_t) {
     @Dependency(\.date.now) var now
-    self.macappsAliveUntil[userId] = now + .seconds(150)
+    // sync:ded93bed app liveness window
+    self.macappsAliveUntil[userId] = now + .seconds(Filter.appAlivenessSeconds)
   }
 
   mutating func rebuildKeychainIndexes() {

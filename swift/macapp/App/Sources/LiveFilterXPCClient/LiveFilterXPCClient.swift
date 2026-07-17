@@ -202,6 +202,7 @@ actor ThreadSafeFilterXPC {
 
 @Sendable
 private func send(urlMessage: XPC.URLMessage) async {
+  // sync:bc81c515 url-message fallback
   var request = URLRequest(url: urlMessage.url)
   request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
   request.timeoutInterval = 2

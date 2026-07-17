@@ -279,6 +279,8 @@ just api-test      # Run API tests
 just api-test --filter SomeTestName
 just macapp-test   # Run the macOS app package tests
 just iosapp-test   # Run the iOS library package tests
+just macsim-test   # MacSim scenarios + default explorer corpus (per-PR tier)
+just macsim-hunt   # MacSim larger seed hunt (nightly/manual tier)
 just lint-fix      # Fix formatting
 ```
 
@@ -315,6 +317,9 @@ be generalized and moved to a shared location before creating duplicates.
 
 - `/docs/pairql.md` - PairQL architecture (comprehensive, 281 lines)
 - `macapp/readme.md` - macOS release notes and procedures
+- `macapp/conformance/` - MacSim simulated-OS harness docs: read
+  `maintenance-contract.md` before changing filter verdict, XPC, persistence,
+  or liveness behavior
 - `iosapp/readme.md` - iOS release notes and config
 - `api/readme.md` - Docker setup instructions
 - Individual library READMEs for public packages

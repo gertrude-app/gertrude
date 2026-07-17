@@ -40,6 +40,7 @@ public class FilterProxy {
   // to enable this for a specific period
   var verboseLogging: Bool { self.sendingBlockDecisions }
 
+  // sync:9d971fd4 flow delivery verdict path
   public func handleNewFlow(_ flow: NEFilterFlow.DTO) -> NEFilterNewFlowVerdict {
     let userId: uid_t
     let earlyUserDecision = self.store.earlyUserDecision(auditToken: flow.sourceAppAuditToken)
@@ -135,6 +136,7 @@ public class FilterProxy {
     readBytesStartOffset: Int,
     readBytes: Data,
   ) -> NEFilterDataVerdict {
+    // sync:9d971fd4 flow delivery verdict path
     let existingDeferred = self.deferredOutboundFlows[flow.identifier]
     let hasDeferredState = existingDeferred != nil
     var deferred = existingDeferred ?? .init(
@@ -208,6 +210,7 @@ public class FilterProxy {
   }
 
   public func startFilter() {
+    // sync:56acb165 filter boot durable reload
     self.store.shouldSendBlockDecisions().sink { [weak self] in
       os_log("[G•] FILTER data provider: toggle send block decisions %{public}d", $0)
       self?.sendingBlockDecisions = $0

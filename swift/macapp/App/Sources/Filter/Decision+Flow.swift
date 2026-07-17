@@ -61,6 +61,7 @@ public extension NetworkFilter {
     }
 
     if fromGertrude, flow.hostname == XPC.URLMessage.alive(userId).hostname {
+      // sync:bc81c515 url-message fallback
       return .block(.urlMessage(.alive(userId)))
     }
 
@@ -239,7 +240,8 @@ public extension NetworkFilter {
     for userId: uid_t,
     permits app: AppDescriptor,
   ) -> Bool {
-    guard let suspension = state.suspensions[userId], suspension.isActive else {
+    // sync:086c6b0b clocked suspension decisions
+    guard let suspension = state.suspensions[userId], suspension.isActive(at: self.now) else {
       return false
     }
     return suspension.scope.permits(app)
