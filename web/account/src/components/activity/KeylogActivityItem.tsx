@@ -1,6 +1,7 @@
-import { Button, Card, Divider, HStack, Text, Tooltip } from '@gertrude/ui';
-import { FlagIcon, TrashIcon } from 'lucide-react';
+import { Card, Divider, HStack, Text } from '@gertrude/ui';
+import { formatTime } from '@shared/datetime';
 import React from 'react';
+import ActivityItemActions from './ActivityItemActions';
 
 interface Props {
   id: string;
@@ -16,6 +17,7 @@ const KeylogActivityItem: React.FC<Props> = ({
   id,
   text,
   applicationName,
+  date,
   flagged,
   onToggleFlag,
   onDelete,
@@ -33,38 +35,18 @@ const KeylogActivityItem: React.FC<Props> = ({
     <Divider />
     <HStack justify="between" gap={2} className="p-3">
       <Text variant="captionSubtle" className="@lg/main:text-sm">
-        Typed in{` `}
+        <time dateTime={date.toISOString()}>{formatTime(date)}</time>
+        {` · Typed in `}
         <Text variant="bodyStrong" className="@lg/main:text-sm">
           {applicationName}
         </Text>
       </Text>
-      {(onToggleFlag || onDelete) && (
-        <HStack gap={2} className="relative">
-          {flagged && (
-            <div className="absolute w-120 h-40 rounded-[100%] -left-40 -bottom-24 [background:radial-gradient(#ddbb5535,transparent_70%)]" />
-          )}
-          <Tooltip
-            content={
-              flagged
-                ? `Flagged items won't be deleted for 60 days`
-                : `Flag to prevent deletion for 60 days`
-            }
-          >
-            <Button
-              type="button"
-              onClick={() => onToggleFlag?.(id)}
-              icon={FlagIcon}
-              fillIcon={flagged}
-              variant={flagged ? `selected` : `ghost`}
-            >
-              {flagged ? `Flagged` : `Flag`}
-            </Button>
-          </Tooltip>
-          <Button type="button" onClick={() => onDelete?.(id)} icon={TrashIcon}>
-            Delete
-          </Button>
-        </HStack>
-      )}
+      <ActivityItemActions
+        id={id}
+        flagged={flagged}
+        onToggleFlag={onToggleFlag}
+        onDelete={onDelete}
+      />
     </HStack>
   </Card>
 );

@@ -3,6 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "nx": {
+    "implicitDependencies": [
+      "account"
+    ],
+    "targets": {
+      "build": {
+        "outputs": [
+          "{projectRoot}/storybook-static"
+        ]
+      }
+    }
+  },
   "scripts": {
     "start": "storybook dev --port ${PORT:-6007} --config-dir ./.storybook --ci --disable-telemetry",
     "build": "storybook build --config-dir ./.storybook --disable-telemetry",

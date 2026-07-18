@@ -25,7 +25,10 @@ const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) 
       : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <SidebarLayout content={children}>
+    <SidebarLayout
+      content={children}
+      mobileLogo={<img src="/logo-wordmark.svg" alt="Gertrude" width={140} />}
+    >
       <Sidebar
         logoUrl="/logo-wordmark.svg"
         logoWidth={140}

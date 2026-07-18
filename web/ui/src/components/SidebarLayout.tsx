@@ -8,9 +8,10 @@ import { SidebarContext } from './SidebarContext';
 interface Props {
   content: React.ReactNode;
   children: React.ReactNode;
+  mobileLogo: React.ReactNode;
 }
 
-const SidebarLayout: React.FC<Props> = ({ content, children }) => {
+const SidebarLayout: React.FC<Props> = ({ content, children, mobileLogo }) => {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const sidebarContext = useMemo(() => ({ close }), [close]);
@@ -71,7 +72,13 @@ const SidebarLayout: React.FC<Props> = ({ content, children }) => {
         </div>
         <main className="flex-grow">
           <div className="px-3 min-[32rem]:px-4 min-[36rem]:px-8 min-[48rem]:px-12 py-3 min-[32rem]:py-4 min-[36rem]:py-6 min-[940px]:hidden block">
-            <Button type="button" onClick={() => setOpen(!open)} icon={SidebarIcon} />
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+              <div className="justify-self-start">
+                <Button type="button" onClick={() => setOpen(!open)} icon={SidebarIcon} />
+              </div>
+              <div className="justify-self-center">{mobileLogo}</div>
+              <div />
+            </div>
           </div>
           <div>{content}</div>
         </main>

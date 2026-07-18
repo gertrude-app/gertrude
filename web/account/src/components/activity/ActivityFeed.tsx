@@ -28,8 +28,9 @@ const ActivityFeed: React.FC<Props> = ({
   onDeletePersonActivity,
 }) => {
   const visibleItems = items.filter((item) => !item.deleted);
+  const [firstVisibleItem] = visibleItems;
 
-  if (visibleItems.length === 0) {
+  if (!firstVisibleItem) {
     return (
       <CardContainer className="flex flex-col gap-4">
         <Text variant="bodyMuted" className="text-center">
@@ -39,7 +40,6 @@ const ActivityFeed: React.FC<Props> = ({
     );
   }
 
-  const firstVisibleItem = visibleItems[0];
   const groupsByPersonId = new Map<string, ActivityItemGroup>();
 
   visibleItems.forEach((item) => {

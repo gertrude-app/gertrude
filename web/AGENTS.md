@@ -12,10 +12,12 @@ Next.js, Vite, Tailwind.
 
 - **`site/`** — Marketing site + docs (Next.js, port varies)
 - **`dash/app/`** — Parent admin dashboard (Vite SPA)
+- **`account/`** — WIP replacement for the parent dashboard (Vite SPA)
 - **`appviews/`** — Web views embedded in macOS app via webviews (Vite)
 - **`supervise/`** — Web UI only for external Tauri iOS device supervision tool
 - **`admin/`** — Internal reporting/admin backend (Next.js)
-- **`storybook/`** — Component library/documentation
+- **`storybook/`** — Legacy component and app documentation
+- **`storybook-v2/`** — Storybook for Account and the shared UI package
 
 ## Marketing Site
 
@@ -26,6 +28,7 @@ Next.js, Vite, Tailwind.
 
 ## Key Packages
 
+- **`ui/`** — Shared components and UI primitives used by Account and Storybook v2
 - **`dash/*`** — Dashboard-specific libs (components, types, datetime, keys, utils,
   ambient types, block-rules)
 - **`shared/*`** — Cross-app libs (components, datetime, tailwind preset, ts-utils,
@@ -34,15 +37,22 @@ Next.js, Vite, Tailwind.
 ## Quick Commands
 
 ```bash
+# Local development
+just account              # Run Account
+just storybook-v2         # Run Storybook v2
+
 # Testing & QA
-just test          # Run unit tests (vitest)
-just cy-run        # Dashboard e2e tests
-just smoke-run     # Smoke tests
-just check         # Lint + format-check + typecheck + test
-just fix           # Format + lint-fix
-just typecheck     # Type check all packages (nx)
+just test                 # Run unit tests (vitest)
+just cy-run               # Dashboard e2e tests
+just smoke-run            # Smoke tests
+just check                # Lint, format-check, typecheck, test, and app builds
+just fix                  # Format + lint-fix
+just typecheck            # Type check all packages (nx)
+just update-ui-screenshots
 
 # Build
-just build-dash    # Build dashboard
-just build-site    # Build marketing site
+just build-account
+just build-storybook-v2
+just build-dash
+just build-site
 ```

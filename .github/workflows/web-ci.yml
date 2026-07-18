@@ -6,12 +6,14 @@ on:
       - master
     paths:
       - 'web/**'
+      - 'swift/api/Sources/Api/PairQL/Account/**'
       - 'swift/api/Sources/Api/PairQL/Dashboard/**'
       - '.github/workflows/web-ci.yml'
   pull_request:
     types: [opened, synchronize, labeled]
     paths:
       - 'web/**'
+      - 'swift/api/Sources/Api/PairQL/Account/**'
       - 'swift/api/Sources/Api/PairQL/Dashboard/**'
       - '.github/workflows/web-ci.yml'
 
@@ -82,6 +84,7 @@ jobs:
       appviews: ${{ steps.changes.outputs.appviews }}
       dashboard: ${{ steps.changes.outputs.dashboard }}
       site: ${{ steps.changes.outputs.site }}
+      storybook_v2: ${{ steps.changes.outputs.storybook_v2 }}
       # retained for the paused storybook job (see docs/maintenance.md)
       storybook: ${{ steps.changes.outputs.storybook }}
     steps:
@@ -104,6 +107,20 @@ jobs:
             site:
               - web/site/**
               - web/shared/**
+            storybook_v2:
+              - .github/workflows/web-ci.yml
+              - web/account/**
+              - web/dash/ambient/**
+              - web/justfile
+              - web/nx.json
+              - web/package.json
+              - web/pnpm-lock.yaml
+              - web/pnpm-workspace.yaml
+              - web/shared/**
+              - web/storybook-v2/**
+              - web/tsconfig.json
+              - web/ui/**
+              - swift/api/Sources/Api/PairQL/Account/**
             storybook:
               - web/storybook/**
               - web/appviews/**
@@ -117,6 +134,23 @@ jobs:
               - web/dash/keys/**
               - web/dash/types/**
               - web/dash/utils/**
+
+  storybook-v2:
+    name: storybook-v2
+    needs: files-changed
+    if: github.event_name == 'pull_request' && needs.files-changed.outputs.storybook_v2 == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install pnpm
+        uses: pnpm/action-setup@v4
+      - name: install deps
+        run: cd web && pnpm install
+      - name: setup just
+        uses: extractions/setup-just@v2
+      - name: build storybook v2
+        run: cd web && just build-storybook-v2
 
   appviews-comment:
     needs: files-changed

@@ -48,6 +48,13 @@ export function formatDate(
   ].join(``);
 }
 
+export function formatTime(date: Date): string {
+  return date.toLocaleTimeString(`en-US`, {
+    hour: `numeric`,
+    minute: `2-digit`,
+  });
+}
+
 export const time = {
   now,
   subtracting,

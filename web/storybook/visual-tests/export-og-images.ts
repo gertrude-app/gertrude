@@ -129,7 +129,7 @@ async function main(): Promise<void> {
 
     const absOut = resolve(REPO_ROOT, exp.outPath);
     await mkdir(dirname(absOut), { recursive: true });
-    await writeFile(absOut, buffer);
+    await writeFile(absOut, typeof buffer === `string` ? buffer : new Uint8Array(buffer));
     process.stderr.write(`  → ${exp.outPath}\n`);
   }
 
