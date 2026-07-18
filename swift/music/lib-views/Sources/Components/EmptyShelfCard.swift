@@ -36,5 +36,7 @@ struct EmptyShelfCard: View {
     .padding(26)
     .background(.primary.opacity(0.05))
     .clipShape(.rect(cornerRadius: 20, style: .continuous))
+    .frame(maxWidth: 600)
+    .frame(maxWidth: .infinity)
   }
 }

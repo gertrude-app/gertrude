@@ -47,72 +47,34 @@ public struct AlbumDetailView: View {
   public var body: some View {
     GeometryReader { proxy in
       List {
-        VStack(spacing: 16) {
-          AlbumArtworkView(
-            album: self.album,
-            size: self.artworkSize(for: proxy.size.width),
-            cornerRadius: 16,
-          )
-
-          VStack(spacing: 5) {
-            Text(self.album.title)
-              .font(
-                .system(
-                  size: 26,
-                  weight: .bold,
-                  design: .rounded,
-                ),
+        self.heroContent(containerWidth: proxy.size.width)
+          .frame(maxWidth: .infinity)
+          .padding(.top, proxy.safeAreaInsets.top + 18)
+          .padding(.bottom, 24)
+          .background {
+            if let backgroundColor = self.album.artworkPalette?.backgroundColor {
+              LinearGradient(
+                colors: [
+                  .clear,
+                  backgroundColor.opacity(0.3),
+                ],
+                startPoint: .top,
+                endPoint: .bottom,
               )
-              .foregroundStyle(.primary)
-              .multilineTextAlignment(.center)
-              .lineLimit(3)
-
-            Text(self.album.artist)
-              .font(.system(size: 17, weight: .semibold))
-              .foregroundStyle(.secondary)
-              .multilineTextAlignment(.center)
-              .lineLimit(2)
+              .ignoresSafeArea(edges: .top)
+            }
           }
-          .padding(.horizontal, 28)
-
-          AlbumDetailPlayButton(
-            isPlaying: self.isPlaying,
-            isLoading: self.isLoading,
-            palette: self.album.artworkPalette,
-            onTap: self.onPlayTap,
-          )
-          .playbackQueueContextMenu(
-            onPlayNext: self.onPlayNext,
-            onAddToQueue: self.onAddToQueue,
-          )
-          .padding(.horizontal, 20)
-          .padding(.top, 4)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.top, proxy.frame(in: .global).minY + 18)
-        .padding(.bottom, 24)
-        .background {
-          if let backgroundColor = self.album.artworkPalette?.backgroundColor {
-            LinearGradient(
-              colors: [
-                .clear,
-                backgroundColor.opacity(0.3),
-              ],
-              startPoint: .top,
-              endPoint: .bottom,
-            )
-            .ignoresSafeArea(edges: .top)
-          }
-        }
-        .padding(.bottom, 30)
-        .listRowInsets(EdgeInsets())
-        .listRowSeparator(.hidden)
-        .listRowBackground(Color.clear)
+          .padding(.bottom, 30)
+          .listRowInsets(EdgeInsets())
+          .listRowSeparator(.hidden)
+          .listRowBackground(Color.clear)
 
         if self.rows.isEmpty {
           AlbumDetailEmptyTracksView(
             isLoading: self.isLoadingTracks,
           )
+          .frame(maxWidth: 600)
+          .frame(maxWidth: .infinity)
           .padding(.horizontal, 20)
           .listRowInsets(EdgeInsets())
           .listRowSeparator(.hidden)
@@ -126,6 +88,8 @@ public struct AlbumDetailView: View {
               palette: self.album.artworkPalette,
               onTap: { self.onTrackTap(row.track.id) },
             )
+            .frame(maxWidth: 800)
+            .frame(maxWidth: .infinity)
             .playbackQueueContextMenu(
               onPlayNext: { self.onTrackPlayNext(row.track.id) },
               onAddToQueue: { self.onTrackAddToQueue(row.track.id) },
@@ -162,8 +126,84 @@ public struct AlbumDetailView: View {
     .detailNavigationBarBackground()
   }
 
+  @ViewBuilder
+  private func heroContent(containerWidth: CGFloat) -> some View {
+    if containerWidth >= 800 {
+      let artworkSize = min(300, max(220, (containerWidth - 96) * 0.38))
+      HStack(spacing: 36) {
+        AlbumArtworkView(
+          album: self.album,
+          size: artworkSize,
+          cornerRadius: 16,
+        )
+
+        VStack(spacing: 18) {
+          self.albumMetadata
+
+          self.playButton
+            .frame(maxWidth: 440)
+        }
+        .frame(maxWidth: 440)
+      }
+      .frame(maxWidth: 900)
+      .padding(.horizontal, 32)
+    } else {
+      VStack(spacing: 16) {
+        AlbumArtworkView(
+          album: self.album,
+          size: self.artworkSize(for: containerWidth),
+          cornerRadius: 16,
+        )
+
+        self.albumMetadata
+          .frame(maxWidth: 560)
+          .padding(.horizontal, 28)
+
+        self.playButton
+          .frame(maxWidth: 520)
+          .padding(.horizontal, 20)
+          .padding(.top, 4)
+      }
+    }
+  }
+
+  private var albumMetadata: some View {
+    VStack(spacing: 5) {
+      Text(self.album.title)
+        .font(
+          .system(
+            size: 26,
+            weight: .bold,
+            design: .rounded,
+          ),
+        )
+        .foregroundStyle(.primary)
+        .multilineTextAlignment(.center)
+        .lineLimit(3)
+
+      Text(self.album.artist)
+        .font(.system(size: 17, weight: .semibold))
+        .foregroundStyle(.secondary)
+        .multilineTextAlignment(.center)
+        .lineLimit(2)
+    }
+  }
+
+  private var playButton: some View {
+    AlbumDetailPlayButton(
+      isPlaying: self.isPlaying,
+      isLoading: self.isLoading,
+      palette: self.album.artworkPalette,
+      onTap: self.onPlayTap,
+    )
+    .playbackQueueContextMenu(
+      onPlayNext: self.onPlayNext,
+      onAddToQueue: self.onAddToQueue,
+    )
+  }
+
   private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
-    min(320, max(220, containerWidth - 96))
+    max(1, min(320, containerWidth - 64))
   }
 }
 
@@ -197,5 +237,36 @@ public struct AlbumDetailView: View {
         isLoadingTracks: true,
       )
     }
+  }
+
+  #Preview("Album detail narrow") {
+    NavigationStack {
+      AlbumDetailView(
+        album: [AlbumData].previewAlbums[0],
+        tracks: .previewTracks,
+      )
+    }
+    .frame(width: 320, height: 568)
+  }
+
+  #Preview("Album detail wide") {
+    NavigationStack {
+      AlbumDetailView(
+        album: [AlbumData].previewAlbums[0],
+        tracks: .previewTracks,
+      )
+    }
+    .frame(width: 1024, height: 768)
+  }
+
+  #Preview("Album detail accessibility text") {
+    NavigationStack {
+      AlbumDetailView(
+        album: [AlbumData].previewAlbums[0],
+        tracks: .previewTracks,
+      )
+    }
+    .environment(\.dynamicTypeSize, .accessibility3)
+    .frame(width: 600, height: 700)
   }
 #endif

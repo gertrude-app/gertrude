@@ -106,7 +106,6 @@ public struct PlaybackErrorBanner: View {
         title: PreviewMusicData.nowPlayingTitle,
         artist: PreviewMusicData.nowPlayingArtist,
         artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-        artworkTransitionID: nil,
         isPlaying: true,
         isLoading: false,
         progress: 0.38,

@@ -33,7 +33,7 @@ targets:
         product: LibTCA
     settings:
       base:
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
         SWIFT_VERSION: "6.0"
         PRODUCT_NAME: "Gertrude Music"
         DEVELOPMENT_TEAM: "WFN83LM943"
@@ -71,7 +71,9 @@ targets:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
-        UIRequiresFullScreen: true
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         UILaunchStoryboardName: LaunchScreen
         UIBackgroundModes:
           - audio

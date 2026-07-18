@@ -100,5 +100,7 @@ struct ArtistDetailEmptyCard: View {
       .primary.opacity(0.05),
       in: .rect(cornerRadius: 18, style: .continuous),
     )
+    .frame(maxWidth: 700)
+    .frame(maxWidth: .infinity)
   }
 }

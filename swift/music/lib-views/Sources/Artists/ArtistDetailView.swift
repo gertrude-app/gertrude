@@ -60,6 +60,7 @@ public struct ArtistDetailView: View {
         VStack(alignment: .leading, spacing: 30) {
           ArtistDetailHeroView(
             artist: self.artist,
+            containerWidth: proxy.size.width,
             isPlaying: self.isPlaying,
             isLoading: self.isLoading,
             onPlayTap: self.onPlayTap,
@@ -69,7 +70,7 @@ public struct ArtistDetailView: View {
             onAddToQueue: self.onAddToQueue,
           )
           .padding(.horizontal, 20)
-          .padding(.top, proxy.frame(in: .global).minY + 18)
+          .padding(.top, proxy.safeAreaInsets.top + 18)
           .padding(.bottom, 24)
           .background {
             if let backgroundColor = self.artist.artworkPalette?.backgroundColor {
@@ -104,6 +105,8 @@ public struct ArtistDetailView: View {
 
           if let editorialNotes = self.artist.editorialNotes?.nonEmpty {
             ArtistEditorialNotesSection(notes: editorialNotes)
+              .frame(maxWidth: 700)
+              .frame(maxWidth: .infinity)
               .padding(.horizontal, 20)
           }
         }
@@ -144,5 +147,39 @@ public struct ArtistDetailView: View {
     NavigationStack {
       ArtistDetailView(artist: .previewSpoketIKoket)
     }
+  }
+
+  #Preview("Artist detail narrow") {
+    NavigationStack {
+      ArtistDetailView(
+        artist: .previewSpoketIKoket,
+        topSongs: .previewSpoketIKoketTopSongs,
+        releases: .previewSpoketIKoketReleases,
+      )
+    }
+    .frame(width: 320, height: 568)
+  }
+
+  #Preview("Artist detail wide") {
+    NavigationStack {
+      ArtistDetailView(
+        artist: .previewSpoketIKoket,
+        topSongs: .previewSpoketIKoketTopSongs,
+        releases: .previewSpoketIKoketReleases,
+      )
+    }
+    .frame(width: 1024, height: 768)
+  }
+
+  #Preview("Artist detail accessibility text") {
+    NavigationStack {
+      ArtistDetailView(
+        artist: .previewSpoketIKoket,
+        topSongs: .previewSpoketIKoketTopSongs,
+        releases: .previewSpoketIKoketReleases,
+      )
+    }
+    .environment(\.dynamicTypeSize, .accessibility3)
+    .frame(width: 600, height: 700)
   }
 #endif

@@ -8,9 +8,6 @@ struct AppView: View {
   @Environment(\.colorScheme) private var colorScheme
   @Environment(\.scenePhase) private var scenePhase
 
-  private let nowPlayingPanelTransitionID = "now-playing-panel"
-  private let nowPlayingArtworkTransitionID = "now-playing-artwork"
-
   var body: some View {
     Group {
       #if os(iOS)
@@ -70,10 +67,13 @@ struct AppView: View {
 
     private var iOSLibraryContent: some View {
       self.iOSTabView
-        .nowPlayingZoomPresentation(
+        .nowPlayingPresentation(
           isPresented: self.nowPlayingPresented,
-          panelSourceID: self.nowPlayingPanelTransitionID,
-          artworkID: self.nowPlayingArtworkTransitionID,
+          background: {
+            NowPlayingBackgroundView(
+              artworkURL: self.store.playback.session?.currentItem.artworkURL,
+            )
+          },
         ) {
           self.nowPlayingSheet
         }
@@ -206,8 +206,6 @@ struct AppView: View {
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
         foregroundColor: self.nowPlayingForegroundColor,
-        panelTransitionID: self.nowPlayingPanelTransitionID,
-        artworkTransitionID: self.nowPlayingArtworkTransitionID,
         displayMode: displayMode,
         showsBackground: showsBackground,
         onTap: {
@@ -233,7 +231,7 @@ struct AppView: View {
             title: session.currentItem.title,
             artist: session.currentItem.artistName,
             artworkURL: session.currentItem.artworkURL,
-            artworkTransitionID: self.nowPlayingArtworkTransitionID,
+            showsBackground: false,
             isPlaying: session.isPlaying,
             isLoading: session.isLoading,
             progress: session.progress.fraction,
@@ -259,7 +257,7 @@ struct AppView: View {
             title: "Not Playing",
             artist: "Choose an approved track",
             artworkURL: nil,
-            artworkTransitionID: self.nowPlayingArtworkTransitionID,
+            showsBackground: false,
             isPlaying: false,
             isLoading: false,
             progress: 0,
@@ -287,6 +285,7 @@ struct AppView: View {
         onActionTap: { self.store.send(.playback(.playbackFailureActionTapped)) },
         onDismissTap: { self.store.send(.playback(.playbackFailureDismissed)) },
       )
+      .frame(maxWidth: 640)
       .padding(.horizontal, 18)
       .padding(.top, 12)
       .transition(.move(edge: .top).combined(with: .opacity))

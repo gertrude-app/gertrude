@@ -5,7 +5,7 @@ public struct NowPlayingScreenView: View {
   private let title: String
   private let artist: String
   private let artworkURL: URL?
-  private let artworkTransitionID: String?
+  private let showsBackground: Bool
   private let isPlaying: Bool
   private let isLoading: Bool
   private let progress: Double
@@ -20,7 +20,7 @@ public struct NowPlayingScreenView: View {
     title: String,
     artist: String,
     artworkURL: URL?,
-    artworkTransitionID: String?,
+    showsBackground: Bool = true,
     isPlaying: Bool,
     isLoading: Bool,
     progress: Double,
@@ -34,7 +34,7 @@ public struct NowPlayingScreenView: View {
     self.title = title
     self.artist = artist
     self.artworkURL = artworkURL
-    self.artworkTransitionID = artworkTransitionID
+    self.showsBackground = showsBackground
     self.isPlaying = isPlaying
     self.isLoading = isLoading
     self.progress = progress
@@ -49,62 +49,136 @@ public struct NowPlayingScreenView: View {
   public var body: some View {
     GeometryReader { proxy in
       ZStack {
-        Color.black
-          .ignoresSafeArea()
-
-        CachedArtworkImageView(
-          url: self.artworkURL,
-        ) { image in
-          image
-            .resizable()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .scaleEffect(1.2)
-            .clipped()
-            .ignoresSafeArea()
-            .blur(radius: 80)
-            .opacity(0.7)
-        } placeholder: {
-          Color.clear
-            .frame(width: 100, height: 100)
+        if self.showsBackground {
+          NowPlayingBackgroundView(artworkURL: self.artworkURL)
         }
 
-        VStack(spacing: 0) {
-          RoundedRectangle(cornerRadius: 2)
-            .fill(.white.opacity(0.3))
-            .frame(width: 60, height: 4)
-
-          Spacer(minLength: 18)
-
-          self.artworkView(size: self.artworkSize(for: proxy.size))
-
-          self.albumInfoView
-            .padding(.horizontal, 12)
-            .padding(.top, 20)
-
-          NowPlayingTransportControls(
-            isPlaying: self.isPlaying,
-            isLoading: self.isLoading,
-            onPlayPauseTap: self.onPlayPauseTap,
-            onPreviousTap: self.onPreviousTap,
-            onNextTap: self.onNextTap,
-          )
-          .padding(.top, 36)
-          .padding(.bottom, 36)
-
-          NowPlayingProgressBar(
-            progress: self.progress,
-            duration: self.duration,
-            onScrub: self.onScrub,
-          )
-          .padding(.horizontal, 2)
-
-          Spacer(minLength: 22)
+        switch self.layout(for: proxy.size) {
+        case .vertical:
+          self.verticalContent(in: proxy.size)
+        case .horizontal:
+          self.horizontalContent(in: proxy.size)
+        case .compact:
+          self.compactContent(in: proxy.size)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.horizontal, 32)
-        .padding(.vertical, 8)
       }
+      .frame(width: proxy.size.width, height: proxy.size.height)
     }
+  }
+
+  private func verticalContent(in size: CGSize) -> some View {
+    VStack(spacing: 0) {
+      self.dragIndicator
+
+      Spacer(minLength: 18)
+
+      self.artworkView(size: self.verticalArtworkSize(for: size))
+
+      self.albumInfoView
+        .frame(maxWidth: 520)
+        .padding(.horizontal, 12)
+        .padding(.top, 20)
+
+      self.transportControls
+        .padding(.top, 36)
+        .padding(.bottom, 36)
+
+      self.progressBar
+        .frame(maxWidth: 560)
+        .padding(.horizontal, 2)
+
+      Spacer(minLength: 22)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .padding(.horizontal, 32)
+    .padding(.vertical, 8)
+  }
+
+  private func horizontalContent(in size: CGSize) -> some View {
+    let horizontalPadding = min(48, max(24, size.width * 0.05))
+    let contentSpacing = min(36, max(24, size.width * 0.04))
+    let artworkSize = self.horizontalArtworkSize(
+      for: size,
+      horizontalPadding: horizontalPadding,
+      contentSpacing: contentSpacing,
+    )
+
+    return VStack(spacing: 0) {
+      self.dragIndicator
+
+      Spacer(minLength: 12)
+
+      HStack(spacing: contentSpacing) {
+        self.artworkView(size: artworkSize)
+
+        VStack(spacing: 24) {
+          self.albumInfoView
+            .frame(maxWidth: 460)
+
+          self.transportControls
+
+          self.progressBar
+            .frame(maxWidth: 500)
+        }
+        .frame(maxWidth: .infinity)
+      }
+
+      Spacer(minLength: 12)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .padding(.horizontal, horizontalPadding)
+    .padding(.vertical, 8)
+  }
+
+  private func compactContent(in size: CGSize) -> some View {
+    ScrollView {
+      VStack(spacing: 0) {
+        self.dragIndicator
+
+        self.artworkView(size: self.compactArtworkSize(for: size))
+          .padding(.top, 16)
+
+        self.albumInfoView
+          .padding(.horizontal, 8)
+          .padding(.top, 16)
+
+        self.transportControls
+          .padding(.top, 22)
+
+        self.progressBar
+          .padding(.top, 22)
+          .padding(.bottom, 24)
+      }
+      .frame(maxWidth: .infinity)
+      .frame(minHeight: size.height, alignment: .top)
+      .padding(.horizontal, 24)
+      .padding(.vertical, 8)
+    }
+    .scrollIndicators(.hidden)
+  }
+
+  private var dragIndicator: some View {
+    RoundedRectangle(cornerRadius: 2)
+      .fill(.white.opacity(0.3))
+      .frame(width: 60, height: 4)
+  }
+
+  private var transportControls: some View {
+    NowPlayingTransportControls(
+      isPlaying: self.isPlaying,
+      isLoading: self.isLoading,
+      onPlayPauseTap: self.onPlayPauseTap,
+      onPreviousTap: self.onPreviousTap,
+      onNextTap: self.onNextTap,
+    )
+  }
+
+  private var progressBar: some View {
+    NowPlayingProgressBar(
+      progress: self.progress,
+      duration: self.duration,
+      onScrub: self.onScrub,
+    )
   }
 
   @ViewBuilder
@@ -149,34 +223,59 @@ public struct NowPlayingScreenView: View {
     }
   }
 
-  @ViewBuilder
   private func artworkView(size: CGFloat) -> some View {
-    let artwork = AlbumArtworkView(
+    AlbumArtworkView(
       artworkUrl: self.artworkURL,
       size: size,
       cornerRadius: 16,
     )
-    #if os(iOS)
-      if let artworkTransitionID {
-        NowPlayingZoomRegisteredView(
-          id: artworkTransitionID,
-          role: .destination,
-          cornerRadius: 16,
-        ) {
-          artwork
-        }
-        .frame(width: size, height: size)
-      } else {
-        artwork
-      }
-    #else
-      artwork
-    #endif
   }
 
-  private func artworkSize(for size: CGSize) -> CGFloat {
-    min(330, max(210, min(size.width - 72, size.height * 0.43)))
+  private func layout(for size: CGSize) -> NowPlayingScreenLayout {
+    if size.width >= 560,
+       size.height < 620 || size.width > size.height * 1.18 {
+      return .horizontal
+    }
+    if size.height >= 560 {
+      return .vertical
+    }
+    return .compact
   }
+
+  private func verticalArtworkSize(for size: CGSize) -> CGFloat {
+    min(
+      330,
+      max(1, size.width - 64),
+      max(140, size.height * 0.43),
+    )
+  }
+
+  private func horizontalArtworkSize(
+    for size: CGSize,
+    horizontalPadding: CGFloat,
+    contentSpacing: CGFloat,
+  ) -> CGFloat {
+    let availableWidth = max(1, size.width - horizontalPadding * 2 - contentSpacing)
+    return min(
+      330,
+      availableWidth * 0.44,
+      max(1, size.height - 72),
+    )
+  }
+
+  private func compactArtworkSize(for size: CGSize) -> CGFloat {
+    min(
+      220,
+      max(1, size.width - 48),
+      max(120, size.height * 0.34),
+    )
+  }
+}
+
+private enum NowPlayingScreenLayout {
+  case vertical
+  case horizontal
+  case compact
 }
 
 #if DEBUG
@@ -185,7 +284,6 @@ public struct NowPlayingScreenView: View {
       title: PreviewMusicData.nowPlayingTitle,
       artist: PreviewMusicData.nowPlayingArtist,
       artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-      artworkTransitionID: nil,
       isPlaying: true,
       isLoading: false,
       progress: 0.38,
@@ -202,7 +300,6 @@ public struct NowPlayingScreenView: View {
       title: PreviewMusicData.nowPlayingTitle,
       artist: PreviewMusicData.nowPlayingArtist,
       artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-      artworkTransitionID: nil,
       isPlaying: false,
       isLoading: false,
       progress: 0.62,
@@ -219,7 +316,6 @@ public struct NowPlayingScreenView: View {
       title: "A Long Tune Title That Wraps Gracefully",
       artist: "Unknown Artist",
       artworkURL: nil,
-      artworkTransitionID: nil,
       isPlaying: false,
       isLoading: false,
       progress: 0,
@@ -229,5 +325,73 @@ public struct NowPlayingScreenView: View {
       onNextTap: {},
       onScrub: { _ in },
     )
+  }
+
+  #Preview("Now playing compact") {
+    NowPlayingScreenView(
+      title: "A Long Tune Title That Wraps Gracefully",
+      artist: "An Artist With a Long Display Name",
+      artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+      isPlaying: true,
+      isLoading: false,
+      progress: 0.38,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+    .frame(width: 320, height: 480)
+  }
+
+  #Preview("Now playing short and wide") {
+    NowPlayingScreenView(
+      title: PreviewMusicData.nowPlayingTitle,
+      artist: PreviewMusicData.nowPlayingArtist,
+      artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+      isPlaying: true,
+      isLoading: false,
+      progress: 0.38,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+    .frame(width: 700, height: 400)
+  }
+
+  #Preview("Now playing minimum window") {
+    NowPlayingScreenView(
+      title: "A Long Tune Title That Wraps Gracefully",
+      artist: "An Artist With a Long Display Name",
+      artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+      isPlaying: true,
+      isLoading: false,
+      progress: 0.38,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+    .frame(width: 320, height: 320)
+  }
+
+  #Preview("Now playing tall and narrow") {
+    NowPlayingScreenView(
+      title: PreviewMusicData.nowPlayingTitle,
+      artist: PreviewMusicData.nowPlayingArtist,
+      artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+      isPlaying: true,
+      isLoading: false,
+      progress: 0.38,
+      duration: 214,
+      onPlayPauseTap: {},
+      onPreviousTap: {},
+      onNextTap: {},
+      onScrub: { _ in },
+    )
+    .frame(width: 420, height: 900)
   }
 #endif

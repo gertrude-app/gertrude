@@ -8,10 +8,14 @@ struct ArtistTopSongsShelf: View {
   let onSongPlayNext: @MainActor @Sendable (String) -> Void
   let onSongTap: @MainActor @Sendable (String) -> Void
 
-  private let rows = Array(
-    repeating: GridItem(.fixed(52), spacing: 8, alignment: .top),
-    count: 3,
-  )
+  @ScaledMetric(relativeTo: .body) private var rowHeight: CGFloat = 52
+
+  private var rows: [GridItem] {
+    Array(
+      repeating: GridItem(.fixed(self.rowHeight), spacing: 8, alignment: .top),
+      count: 3,
+    )
+  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: 12) {
@@ -55,6 +59,9 @@ struct ArtistTopSongsShelf: View {
 }
 
 private struct ArtistTopSongCard: View {
+  @ScaledMetric(relativeTo: .body) private var cardWidth: CGFloat = 292
+  @ScaledMetric(relativeTo: .body) private var cardHeight: CGFloat = 52
+
   let number: Int
   let song: ArtistTopSongData
   let isCurrent: Bool
@@ -107,7 +114,7 @@ private struct ArtistTopSongCard: View {
             .foregroundStyle(.secondary)
         }
       }
-      .frame(width: 292, height: 52, alignment: .leading)
+      .frame(width: self.cardWidth, height: self.cardHeight, alignment: .leading)
       .contentShape(.rect)
     }
     .buttonStyle(.plain)

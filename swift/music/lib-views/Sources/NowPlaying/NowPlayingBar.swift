@@ -16,8 +16,6 @@ import SwiftUI
     private let isLoading: Bool
     private let isEnabled: Bool
     private let foregroundColor: Color
-    private let panelTransitionID: String?
-    private let artworkTransitionID: String?
     private let displayMode: NowPlayingBarDisplayMode
     private let showsBackground: Bool
     private let onTap: @MainActor @Sendable () -> Void
@@ -32,8 +30,6 @@ import SwiftUI
       isLoading: Bool,
       isEnabled: Bool,
       foregroundColor: Color,
-      panelTransitionID: String?,
-      artworkTransitionID: String?,
       displayMode: NowPlayingBarDisplayMode,
       showsBackground: Bool,
       onTap: @MainActor @escaping @Sendable () -> Void,
@@ -47,8 +43,6 @@ import SwiftUI
       self.isLoading = isLoading
       self.isEnabled = isEnabled
       self.foregroundColor = foregroundColor
-      self.panelTransitionID = panelTransitionID
-      self.artworkTransitionID = artworkTransitionID
       self.displayMode = displayMode
       self.showsBackground = showsBackground
       self.onTap = onTap
@@ -58,12 +52,10 @@ import SwiftUI
 
     public var body: some View {
       if #available(iOS 26.0, *) {
-        self.withPanelTransitionSource(
-          self.barContent
-            .environment(\.backgroundMaterial, Material?.none),
-        )
+        self.barContent
+          .environment(\.backgroundMaterial, Material?.none)
       } else {
-        self.withPanelTransitionSource(self.barContent)
+        self.barContent
       }
     }
 
@@ -74,7 +66,6 @@ import SwiftUI
         title: self.title,
         artist: self.artist,
         artworkURL: self.artworkURL,
-        artworkTransitionID: self.artworkTransitionID,
         isPlaying: self.isPlaying,
         isLoading: self.isLoading,
         isEnabled: self.isEnabled,
@@ -119,28 +110,6 @@ import SwiftUI
 
     private var panelCornerRadius: CGFloat {
       self.layout == .inline ? 20 : 24
-    }
-
-    private var panelHeight: CGFloat {
-      self.layout == .inline ? 40 : 46
-    }
-
-    @ViewBuilder
-    private func withPanelTransitionSource(_ content: some View) -> some View {
-      if let panelTransitionID {
-        NowPlayingZoomRegisteredView(
-          id: panelTransitionID,
-          role: .source,
-          cornerRadius: self.panelCornerRadius,
-          allowsInteraction: true,
-        ) {
-          content
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: self.panelHeight)
-      } else {
-        content
-      }
     }
   }
 #endif

@@ -28,7 +28,8 @@ struct AlbumDetailPlayButton: View {
       }
       .font(.system(size: 17, weight: .bold, design: .rounded))
       .frame(maxWidth: .infinity)
-      .frame(height: 52)
+      .padding(.vertical, 14)
+      .frame(minHeight: 52)
       .foregroundStyle(colors.foreground)
       .background(colors.background, in: Capsule())
       .contentShape(Capsule())

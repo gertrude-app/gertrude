@@ -157,6 +157,7 @@ public struct LibraryView: View {
           buttonTitle: buttonTitle,
           onButtonTap: self.onRetryTap,
         )
+        .frame(maxWidth: 600)
 
         #if DEBUG
           if let onDebugResetTap = self.onDebugResetTap {

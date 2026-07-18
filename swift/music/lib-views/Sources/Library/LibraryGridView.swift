@@ -35,16 +35,22 @@ struct LibraryGridView: View {
 
   var body: some View {
     GeometryReader { proxy in
+      let metrics = LibraryGridMetrics(
+        containerWidth: proxy.size.width,
+        horizontalPadding: self.horizontalPadding,
+        columnSpacing: self.columnSpacing,
+      )
+
       ScrollView {
         if self.isLoading {
-          self.loadingGrid(containerWidth: proxy.size.width)
+          self.loadingGrid(metrics: metrics)
         } else if self.albums.isEmpty, self.artists.isEmpty {
           LibraryGridEmptyStateView()
             .padding(.horizontal, self.horizontalPadding)
             .padding(.top, 24)
             .padding(.bottom, self.bottomContentPadding)
         } else {
-          self.libraryGrid(containerWidth: proxy.size.width)
+          self.libraryGrid(metrics: metrics)
 
           #if DEBUG
             if let onDebugResetTap = self.onDebugResetTap {
@@ -64,22 +70,15 @@ struct LibraryGridView: View {
   private let horizontalPadding: CGFloat = 20
   private let columnSpacing: CGFloat = 16
 
-  private var columns: [GridItem] {
-    Array(
-      repeating: GridItem(.flexible(minimum: 148), spacing: self.columnSpacing, alignment: .top),
-      count: 2,
-    )
-  }
-
-  private func libraryGrid(containerWidth: CGFloat) -> some View {
-    LazyVGrid(columns: self.columns, alignment: .leading, spacing: 24) {
+  private func libraryGrid(metrics: LibraryGridMetrics) -> some View {
+    LazyVGrid(columns: metrics.columns, alignment: .leading, spacing: 24) {
       ForEach(self.artists) { artist in
         Button {
           self.onArtistTap(artist.id)
         } label: {
           ArtistCardView(
             artist: artist,
-            artworkSize: self.artworkSize(for: containerWidth),
+            artworkSize: metrics.artworkSize,
             transitionNamespace: self.transitionNamespace,
           )
         }
@@ -90,7 +89,7 @@ struct LibraryGridView: View {
       ForEach(self.albums) { album in
         AlbumCardView(
           album: album,
-          artworkSize: self.artworkSize(for: containerWidth),
+          artworkSize: metrics.artworkSize,
           transitionNamespace: self.transitionNamespace,
           onAddToQueue: { self.onAlbumAddToQueue(album.id) },
           onPlayNext: { self.onAlbumPlayNext(album.id) },
@@ -100,30 +99,34 @@ struct LibraryGridView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
       }
     }
+    .frame(width: metrics.contentWidth, alignment: .leading)
     .padding(.horizontal, self.horizontalPadding)
+    .frame(maxWidth: .infinity)
     .padding(.top, 16)
     .padding(.bottom, self.albumGridBottomPadding)
   }
 
-  private func loadingGrid(containerWidth: CGFloat) -> some View {
-    LazyVGrid(columns: self.columns, alignment: .leading, spacing: 24) {
+  private func loadingGrid(metrics: LibraryGridMetrics) -> some View {
+    LazyVGrid(columns: metrics.columns, alignment: .leading, spacing: 24) {
       ForEach(0 ..< 6, id: \.self) { _ in
         VStack(alignment: .leading, spacing: 10) {
           SkeletonBlock(
-            width: self.artworkSize(for: containerWidth),
-            height: self.artworkSize(for: containerWidth),
+            width: metrics.artworkSize,
+            height: metrics.artworkSize,
             cornerRadius: 20,
           )
 
           VStack(alignment: .leading, spacing: 6) {
-            SkeletonBlock(width: 132, height: 13, cornerRadius: 6)
-            SkeletonBlock(width: 92, height: 11, cornerRadius: 5)
+            SkeletonBlock(width: min(132, metrics.artworkSize), height: 13, cornerRadius: 6)
+            SkeletonBlock(width: min(92, metrics.artworkSize), height: 11, cornerRadius: 5)
           }
         }
-        .frame(width: self.artworkSize(for: containerWidth), alignment: .leading)
+        .frame(width: metrics.artworkSize, alignment: .leading)
       }
     }
+    .frame(width: metrics.contentWidth, alignment: .leading)
     .padding(.horizontal, self.horizontalPadding)
+    .frame(maxWidth: .infinity)
     .padding(.top, 16)
     .padding(.bottom, self.bottomContentPadding)
     .accessibilityLabel("Loading library")
@@ -138,9 +141,37 @@ struct LibraryGridView: View {
       self.bottomContentPadding
     #endif
   }
+}
 
-  private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
-    max(148, floor((containerWidth - self.horizontalPadding * 2 - self.columnSpacing) / 2))
+private struct LibraryGridMetrics {
+  let artworkSize: CGFloat
+  let columns: [GridItem]
+  let contentWidth: CGFloat
+
+  init(
+    containerWidth: CGFloat,
+    horizontalPadding: CGFloat,
+    columnSpacing: CGFloat,
+  ) {
+    let availableWidth = max(1, containerWidth - horizontalPadding * 2)
+    let minimumArtworkSize: CGFloat = 148
+    let maximumArtworkSize: CGFloat = 220
+    let maximumColumnCount = 5
+    let fittingColumnCount = max(
+      1,
+      Int(floor((availableWidth + columnSpacing) / (minimumArtworkSize + columnSpacing))),
+    )
+    let columnCount = min(maximumColumnCount, fittingColumnCount)
+    let totalSpacing = CGFloat(columnCount - 1) * columnSpacing
+    let uncappedArtworkSize = floor((availableWidth - totalSpacing) / CGFloat(columnCount))
+    let artworkSize = max(1, min(maximumArtworkSize, uncappedArtworkSize))
+
+    self.artworkSize = artworkSize
+    self.columns = Array(
+      repeating: GridItem(.fixed(artworkSize), spacing: columnSpacing, alignment: .top),
+      count: columnCount,
+    )
+    self.contentWidth = artworkSize * CGFloat(columnCount) + totalSpacing
   }
 }
 
@@ -161,6 +192,8 @@ private struct LibraryGridEmptyStateView: View {
     .frame(maxWidth: .infinity)
     .padding(28)
     .background(.primary.opacity(0.05), in: .rect(cornerRadius: 24, style: .continuous))
+    .frame(maxWidth: 600)
+    .frame(maxWidth: .infinity)
   }
 }
 
@@ -171,5 +204,15 @@ private struct LibraryGridEmptyStateView: View {
 
   #Preview("Library grid empty") {
     LibraryGridView(albums: [])
+  }
+
+  #Preview("Library grid narrow") {
+    LibraryGridView(albums: .previewAlbums, artists: .previewArtists)
+      .frame(width: 320, height: 568)
+  }
+
+  #Preview("Library grid wide") {
+    LibraryGridView(albums: .previewAlbums, artists: .previewArtists)
+      .frame(width: 1024, height: 768)
   }
 #endif

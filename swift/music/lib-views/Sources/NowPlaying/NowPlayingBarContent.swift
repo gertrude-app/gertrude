@@ -12,7 +12,6 @@ import SwiftUI
     let title: String
     let artist: String
     let artworkURL: URL?
-    let artworkTransitionID: String?
     let isPlaying: Bool
     var isLoading = false
     let isEnabled: Bool
@@ -38,7 +37,6 @@ import SwiftUI
               url: self.artworkURL,
               size: 32,
               cornerRadius: 4,
-              transitionID: self.artworkTransitionID,
             )
             NowPlayingBarText(
               title: self.title,
@@ -87,7 +85,6 @@ import SwiftUI
               url: self.artworkURL,
               size: 30,
               cornerRadius: 7,
-              transitionID: self.artworkTransitionID,
             )
             NowPlayingBarText(
               title: self.title,
@@ -159,24 +156,8 @@ import SwiftUI
     let url: URL?
     let size: CGFloat
     let cornerRadius: CGFloat
-    let transitionID: String?
 
     var body: some View {
-      if let transitionID {
-        NowPlayingZoomRegisteredView(
-          id: transitionID,
-          role: .source,
-          cornerRadius: self.cornerRadius,
-        ) {
-          self.artwork
-        }
-        .frame(width: self.size, height: self.size)
-      } else {
-        self.artwork
-      }
-    }
-
-    private var artwork: some View {
       CachedArtworkImageView(url: self.url) { image in
         image
           .resizable()
@@ -236,7 +217,6 @@ import SwiftUI
         title: PreviewMusicData.nowPlayingTitle,
         artist: PreviewMusicData.nowPlayingArtist,
         artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-        artworkTransitionID: nil,
         isPlaying: true,
         isEnabled: true,
         foregroundColor: .black,
@@ -254,7 +234,6 @@ import SwiftUI
         title: PreviewMusicData.nowPlayingTitle,
         artist: PreviewMusicData.nowPlayingArtist,
         artworkURL: PreviewMusicData.nowPlayingArtworkURL,
-        artworkTransitionID: nil,
         isPlaying: false,
         isEnabled: true,
         foregroundColor: .black,
