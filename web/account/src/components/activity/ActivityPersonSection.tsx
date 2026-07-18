@@ -28,6 +28,8 @@ const ActivityPersonSection: React.FC<Props> = ({
   onDeleteAll,
 }) => {
   const chunkedItems = chunkActivityBySuspension(items);
+  const hasFlaggedItems = items.some((item) => item.flagged);
+  const allItemsFlagged = items.every((item) => item.flagged);
 
   return (
     <VStack gap={3}>
@@ -43,8 +45,15 @@ const ActivityPersonSection: React.FC<Props> = ({
         ))}
         {onDeleteAll && (
           <HStack justify="center">
-            <Button type="button" onClick={() => onDeleteAll(personId)} icon={TrashIcon}>
-              Delete all {personName}'s activity
+            <Button
+              type="button"
+              onClick={() => onDeleteAll(personId)}
+              icon={TrashIcon}
+              disabled={allItemsFlagged}
+            >
+              {`Delete all ${personName}'s${
+                hasFlaggedItems ? ` unflagged` : ``
+              } activity`}
             </Button>
           </HStack>
         )}

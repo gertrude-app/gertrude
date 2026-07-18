@@ -288,6 +288,30 @@
     }
   },
   {
+    "id": "account-design-references-people--default",
+    "iframePath": "/iframe.html?id=account-design-references-people--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-design-references-people--default.png",
+    "title": "Account/Design References/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-design-references-people--default",
+    "iframePath": "/iframe.html?id=account-design-references-people--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-design-references-people--default.png",
+    "title": "Account/Design References/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-activity--day",
     "iframePath": "/iframe.html?id=account-pages-activity--day&viewMode=story",
     "name": "Day",
@@ -336,11 +360,11 @@
     }
   },
   {
-    "id": "account-pages-people-list--default",
-    "iframePath": "/iframe.html?id=account-pages-people-list--default&viewMode=story",
+    "id": "account-pages-people--default",
+    "iframePath": "/iframe.html?id=account-pages-people--default&viewMode=story",
     "name": "Default",
-    "path": "screenshots/mobile/account-pages-people-list--default.png",
-    "title": "Account/Pages/People/List",
+    "path": "screenshots/mobile/account-pages-people--default.png",
+    "title": "Account/Pages/People",
     "viewport": {
       "width": 390,
       "height": 844,
@@ -348,11 +372,35 @@
     }
   },
   {
-    "id": "account-pages-people-list--default",
-    "iframePath": "/iframe.html?id=account-pages-people-list--default&viewMode=story",
+    "id": "account-pages-people--default",
+    "iframePath": "/iframe.html?id=account-pages-people--default&viewMode=story",
     "name": "Default",
-    "path": "screenshots/desktop/account-pages-people-list--default.png",
-    "title": "Account/Pages/People/List",
+    "path": "screenshots/desktop/account-pages-people--default.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--empty",
+    "iframePath": "/iframe.html?id=account-pages-people--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/mobile/account-pages-people--empty.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--empty",
+    "iframePath": "/iframe.html?id=account-pages-people--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/desktop/account-pages-people--empty.png",
+    "title": "Account/Pages/People",
     "viewport": {
       "width": 1440,
       "height": 900,
