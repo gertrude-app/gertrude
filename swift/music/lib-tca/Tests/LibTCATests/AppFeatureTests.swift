@@ -165,7 +165,9 @@ struct AppFeatureTests {
   func nowPlayingAlbumInfoTapWithoutAlbumIDDoesNothing() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let item = PlaybackItem(
-      track: album.tracks[0],
+      id: album.tracks[0].id,
+      title: album.tracks[0].title,
+      artistName: album.tracks[0].artistName,
       artworkURL: album.artworkURL,
     )
     var state = AppFeature.State()

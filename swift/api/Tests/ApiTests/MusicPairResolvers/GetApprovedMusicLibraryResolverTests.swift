@@ -36,6 +36,19 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     expect(matched).toEqual(.music(.authed(token, .getApprovedMusicLibrary_v2)))
   }
 
+  func testV3RouteMatches() throws {
+    let token = UUID()
+    let input = GetApprovedMusicLibrary_v3.Input(knownRevision: 42)
+    var request = URLRequest(url: URL(string: "gertrude-music/GetApprovedMusicLibrary_v3")!)
+    request.httpMethod = "POST"
+    request.addValue(token.uuidString, forHTTPHeaderField: "X-MusicToken")
+    request.httpBody = try JSONEncoder().encode(input)
+
+    let matched = try PairQLRoute.router.match(request: request)
+
+    expect(matched).toEqual(.music(.authed(token, .getApprovedMusicLibrary_v3(input))))
+  }
+
   func testAlbumTracksRouteMatches() throws {
     let token = UUID()
     let input = GetApprovedMusicAlbumTracks.Input(albumId: "1440935467")
@@ -497,6 +510,186 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     }
   }
 
+  func testLegacyRoutesProjectPublishedSnapshotWithoutAppleRequests() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "album-1",
+      title: "Legacy",
+      artistName: "Legacy",
+      resolution: libraryResolverResolvedAlbum(),
+      resolvedAt: .reference,
+    ))
+    _ = try await self.db.create(Music.ApprovedArtist(
+      childId: child.id,
+      appleMusicArtistId: "artist-1",
+      name: "Legacy",
+      resolution: libraryResolverResolvedArtist(),
+      resolvedAt: .reference,
+    ))
+    _ = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+
+    let v1 = try await GetApprovedMusicLibrary.resolve(in: ctx)
+    let v2 = try await GetApprovedMusicLibrary_v2.resolve(in: ctx)
+    let tracks = try await GetApprovedMusicAlbumTracks.resolve(
+      with: .init(albumId: "album-1"),
+      in: ctx,
+    )
+
+    expect(v1.albums.map(\.id)).toEqual(["album-1"])
+    expect(v1.albums.first?.tracks.map(\.id)).toEqual(["track-1"])
+    expect(v2.albums.map(\.id)).toEqual(["album-1", "artist-album"])
+    expect(v2.artists.map(\.id)).toEqual(["artist-1"])
+    expect(tracks.map(\.id)).toEqual(["track-1"])
+  }
+
+  func testV3ReturnsRevisionZeroEmptySnapshotAndThenUnchanged() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+
+    let initial = try await GetApprovedMusicLibrary_v3.resolve(
+      with: .init(),
+      in: ctx,
+    )
+    let unchanged = try await GetApprovedMusicLibrary_v3.resolve(
+      with: .init(knownRevision: 0),
+      in: ctx,
+    )
+
+    expect(initial).toEqual(.snapshot(.init(
+      revision: 0,
+      generatedAt: .init(timeIntervalSince1970: 0),
+      albums: [],
+      artists: [],
+    )))
+    expect(unchanged).toEqual(.unchanged(revision: 0))
+  }
+
+  func testV3ReadsPublishedSnapshotWithoutAppleRequests() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "album-1",
+      title: "Legacy",
+      artistName: "Legacy",
+      resolution: libraryResolverResolvedAlbum(),
+      resolvedAt: .reference,
+    ))
+    let published = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+
+    let output = try await GetApprovedMusicLibrary_v3.resolve(
+      with: .init(),
+      in: ctx,
+    )
+    let unchanged = try await GetApprovedMusicLibrary_v3.resolve(
+      with: .init(knownRevision: published.revision),
+      in: ctx,
+    )
+
+    expect(output).toEqual(.snapshot(published.payload))
+    expect(unchanged).toEqual(.unchanged(revision: published.revision))
+  }
+
+  func testV3RejectsSnapshotThatDoesNotMatchCurrentGrants() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    var album = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "album-1",
+      title: "Legacy",
+      artistName: "Legacy",
+      resolution: libraryResolverResolvedAlbum(),
+      resolvedAt: .reference,
+    ))
+    _ = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+    album.resolution?.title = "Changed without publication"
+    try await self.db.update(album)
+
+    do {
+      _ = try await GetApprovedMusicLibrary_v3.resolve(with: .init(), in: ctx)
+      XCTFail("expected inconsistent snapshot error")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.serverError)
+    }
+  }
+
+  func testV3RejectsGrantWithoutPublishedSnapshot() async throws {
+    let child = try await self.child()
+    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    let (device, install) = try await self.claimedInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: "album-1",
+      title: "Legacy",
+      artistName: "Legacy",
+    ))
+
+    do {
+      _ = try await GetApprovedMusicLibrary_v3.resolve(with: .init(), in: ctx)
+      XCTFail("expected incomplete library error")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.serverError)
+    }
+  }
+
   func testUnauthorizedAfterTokenRowDeleted() async throws {
     let child = try await self.child()
     let (_, install) = try await self.claimedInstall(for: child)
@@ -538,6 +731,53 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     )
     return (device, install)
   }
+}
+
+private func libraryResolverResolvedAlbum() -> Music.ResolvedAlbum {
+  .init(
+    id: "album-1",
+    title: "Trusted",
+    artistName: "Artist",
+    artistIds: ["artist-1"],
+    trackCount: 1,
+    tracks: [
+      .init(
+        id: "track-1",
+        title: "Track",
+        artistName: "Artist",
+        artistIds: ["artist-1"],
+        albumId: "album-1",
+        albumTitle: "Trusted",
+      ),
+    ],
+  )
+}
+
+private func libraryResolverResolvedArtist() -> Music.ResolvedArtist {
+  .init(
+    id: "artist-1",
+    name: "Artist",
+    topSongs: [],
+    albums: [
+      .init(
+        id: "artist-album",
+        title: "Artist Album",
+        artistName: "Artist",
+        artistIds: ["artist-1"],
+        trackCount: 1,
+        tracks: [
+          .init(
+            id: "artist-track",
+            title: "Artist Track",
+            artistName: "Artist",
+            artistIds: ["artist-1"],
+            albumId: "artist-album",
+            albumTitle: "Artist Album",
+          ),
+        ],
+      ),
+    ],
+  )
 }
 
 private func approvedArtistMetadata() -> Music.CatalogMetadata {

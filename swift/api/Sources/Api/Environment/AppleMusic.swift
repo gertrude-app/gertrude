@@ -22,112 +22,69 @@ struct AppleMusicClient: Sendable {
     @Sendable (_ lookup: AppleMusicArtistTopSongsLookup) async throws -> [AppleMusicCatalogTrack]
   var albumTracks:
     @Sendable (_ lookup: AppleMusicAlbumTracksLookup) async throws -> [AppleMusicCatalogTrack]
+  var resolveAlbum:
+    @Sendable (_ albumId: Music.AlbumId) async throws -> Music.ResolvedAlbum
+  var resolveArtist:
+    @Sendable (_ artistId: Music.ArtistId) async throws -> Music.ResolvedArtist
 }
 
 struct AppleMusicAlbumSearch: Equatable, Sendable {
   var term: String
-  var storefront: String
   var limit: Int
 
-  init(
-    term: String,
-    storefront: String = "us",
-    limit: Int = 10,
-  ) {
+  init(term: String, limit: Int = 10) {
     self.term = term
-    self.storefront = storefront
     self.limit = limit
   }
 }
 
 struct AppleMusicArtistSearch: Equatable, Sendable {
   var term: String
-  var storefront: String
   var limit: Int
 
-  init(
-    term: String,
-    storefront: String = "us",
-    limit: Int = 10,
-  ) {
+  init(term: String, limit: Int = 10) {
     self.term = term
-    self.storefront = storefront
     self.limit = limit
   }
 }
 
 struct AppleMusicCatalogSearch: Equatable, Sendable {
   var term: String
-  var storefront: String
   var limit: Int
 
-  init(
-    term: String,
-    storefront: String = "us",
-    limit: Int = 10,
-  ) {
+  init(term: String, limit: Int = 10) {
     self.term = term
-    self.storefront = storefront
     self.limit = limit
   }
 }
 
 struct AppleMusicAlbumsLookup: Equatable, Sendable {
   var albumIds: [Music.AlbumId]
-  var storefront: String
-
-  init(
-    albumIds: [Music.AlbumId],
-    storefront: String = "us",
-  ) {
-    self.albumIds = albumIds
-    self.storefront = storefront
-  }
 }
 
 struct AppleMusicArtistAlbumsLookup: Equatable, Sendable {
   var artistId: Music.ArtistId
   var artistName: String
-  var storefront: String
-
-  init(
-    artistId: Music.ArtistId,
-    artistName: String,
-    storefront: String = "us",
-  ) {
-    self.artistId = artistId
-    self.artistName = artistName
-    self.storefront = storefront
-  }
 }
 
 struct AppleMusicArtistTopSongsLookup: Equatable, Sendable {
   var artistId: Music.ArtistId
   var artistName: String
-  var storefront: String
   var limit: Int
 
   init(
     artistId: Music.ArtistId,
     artistName: String,
-    storefront: String = "us",
     limit: Int = 12,
   ) {
     self.artistId = artistId
     self.artistName = artistName
-    self.storefront = storefront
     self.limit = limit
   }
 }
 
 struct AppleMusicAlbumTracksLookup: Equatable, Sendable {
   var albumId: Music.AlbumId
-  var storefront: String
-
-  init(albumId: Music.AlbumId, storefront: String = "us") {
-    self.albumId = albumId
-    self.storefront = storefront
-  }
 }
 
 struct AppleMusicCatalogAlbum: Codable, Equatable, Sendable {
@@ -275,6 +232,20 @@ extension AppleMusicClient: DependencyKey {
         let token = try await generateAppleMusicDeveloperToken()
         return try await fetchAppleMusicCatalogAlbumTracks(lookup, developerToken: token)
       },
+      resolveAlbum: { albumId in
+        let token = try await generateAppleMusicDeveloperToken()
+        return try await resolveAppleMusicCatalogAlbum(
+          albumId,
+          load: appleMusicDataLoader(developerToken: token),
+        )
+      },
+      resolveArtist: { artistId in
+        let token = try await generateAppleMusicDeveloperToken()
+        return try await resolveAppleMusicCatalogArtist(
+          artistId,
+          load: appleMusicDataLoader(developerToken: token),
+        )
+      },
     )
   }
 }
@@ -291,6 +262,8 @@ extension AppleMusicClient: TestDependencyKey {
     artistAlbums: unimplemented("AppleMusicClient.artistAlbums()", placeholder: []),
     artistTopSongs: unimplemented("AppleMusicClient.artistTopSongs()", placeholder: []),
     albumTracks: unimplemented("AppleMusicClient.albumTracks()", placeholder: []),
+    resolveAlbum: { try Self.testResolvedAlbum($0) },
+    resolveArtist: { try Self.testResolvedArtist($0) },
   )
 }
 
@@ -411,7 +384,6 @@ func searchAppleMusicCatalog(
 func appleMusicCatalogSearchURL(_ search: AppleMusicAlbumSearch) throws -> URL {
   try appleMusicCatalogSearchURL(
     term: search.term,
-    storefront: search.storefront,
     limit: search.limit,
     types: ["albums"],
   )
@@ -420,7 +392,6 @@ func appleMusicCatalogSearchURL(_ search: AppleMusicAlbumSearch) throws -> URL {
 func appleMusicCatalogArtistSearchURL(_ search: AppleMusicArtistSearch) throws -> URL {
   try appleMusicCatalogSearchURL(
     term: search.term,
-    storefront: search.storefront,
     limit: search.limit,
     types: ["artists"],
   )
@@ -429,7 +400,6 @@ func appleMusicCatalogArtistSearchURL(_ search: AppleMusicArtistSearch) throws -
 func appleMusicCatalogMixedSearchURL(_ search: AppleMusicCatalogSearch) throws -> URL {
   try appleMusicCatalogSearchURL(
     term: search.term,
-    storefront: search.storefront,
     limit: search.limit,
     types: ["albums", "artists"],
     with: ["topResults"],
@@ -438,7 +408,6 @@ func appleMusicCatalogMixedSearchURL(_ search: AppleMusicCatalogSearch) throws -
 
 private func appleMusicCatalogSearchURL(
   term: String,
-  storefront: String,
   limit: Int,
   types: [String],
   with: [String] = [],
@@ -446,7 +415,7 @@ private func appleMusicCatalogSearchURL(
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(storefront)/search"
+  components.path = "/v1/catalog/us/search"
   components.queryItems = [
     .init(name: "term", value: term),
     .init(name: "types", value: types.joined(separator: ",")),
@@ -472,7 +441,6 @@ func fetchAppleMusicCatalogAlbums(
     let endIndex = min(startIndex + 100, lookup.albumIds.count)
     let batch = AppleMusicAlbumsLookup(
       albumIds: Array(lookup.albumIds[startIndex ..< endIndex]),
-      storefront: lookup.storefront,
     )
     let url = try appleMusicCatalogAlbumsURL(batch)
     var request = URLRequest(url: url)
@@ -500,7 +468,7 @@ func appleMusicCatalogAlbumsURL(_ lookup: AppleMusicAlbumsLookup) throws -> URL 
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(lookup.storefront)/albums"
+  components.path = "/v1/catalog/us/albums"
   components.queryItems = [
     .init(name: "ids", value: lookup.albumIds.map(\.rawValue).joined(separator: ",")),
   ]
@@ -593,7 +561,7 @@ func appleMusicCatalogArtistAlbumsURL(
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(lookup.storefront)/artists/\(lookup.artistId.rawValue)/view/\(view.rawValue)"
+  components.path = "/v1/catalog/us/artists/\(lookup.artistId.rawValue)/view/\(view.rawValue)"
   components.queryItems = [
     .init(name: "limit", value: "100"),
   ]
@@ -631,7 +599,7 @@ func appleMusicCatalogArtistTopSongsURL(_ lookup: AppleMusicArtistTopSongsLookup
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(lookup.storefront)/artists/\(lookup.artistId.rawValue)/view/top-songs"
+  components.path = "/v1/catalog/us/artists/\(lookup.artistId.rawValue)/view/top-songs"
   components.queryItems = [
     .init(name: "limit", value: "\(max(1, min(25, lookup.limit)))"),
   ]
@@ -645,12 +613,17 @@ func appleMusicCatalogURL(fromNext next: String) throws -> URL {
   guard var components = URLComponents(string: next) else {
     throw AppleMusicError.invalidArtistAlbumsUrl
   }
-  if components.scheme == nil {
-    components.scheme = "https"
+  if let scheme = components.scheme, scheme.lowercased() != "https" {
+    throw AppleMusicError.invalidArtistAlbumsUrl
   }
-  if components.host == nil {
-    components.host = "api.music.apple.com"
+  if let host = components.host, host.lowercased() != "api.music.apple.com" {
+    throw AppleMusicError.invalidArtistAlbumsUrl
   }
+  guard components.user == nil, components.password == nil, components.port == nil else {
+    throw AppleMusicError.invalidArtistAlbumsUrl
+  }
+  components.scheme = "https"
+  components.host = "api.music.apple.com"
   if !components.path.hasPrefix("/") {
     components.path = "/" + components.path
   }
@@ -688,7 +661,7 @@ func appleMusicCatalogAlbumURL(_ lookup: AppleMusicAlbumTracksLookup) throws -> 
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(lookup.storefront)/albums/\(lookup.albumId.rawValue)"
+  components.path = "/v1/catalog/us/albums/\(lookup.albumId.rawValue)"
   components.queryItems = [
     .init(name: "include", value: "tracks"),
   ]
@@ -1154,6 +1127,12 @@ extension AppleMusicClient {
     },
     albumTracks: { lookup in
       Self.mockTracksByAlbum[lookup.albumId.rawValue] ?? []
+    },
+    resolveAlbum: { albumId in
+      try Self.mockResolvedAlbum(albumId)
+    },
+    resolveArtist: { artistId in
+      try Self.mockResolvedArtist(artistId)
     },
   )
 

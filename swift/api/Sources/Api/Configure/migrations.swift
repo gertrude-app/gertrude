@@ -115,6 +115,7 @@ extension Configure {
     app.migrations.add(AddParentAccountSiteBeta())
     app.migrations.add(CreateMusicApprovedArtists())
     app.migrations.add(AddMusicApprovedAlbumArtwork())
+    app.migrations.add(AddMusicCatalogFoundation())
   }
 }
 

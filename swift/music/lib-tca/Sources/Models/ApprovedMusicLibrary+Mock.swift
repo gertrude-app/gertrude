@@ -115,6 +115,19 @@
             appleMusicUrl: "https://music.apple.com/us/artist/v%C3%A4sen/909253",
             genreNames: ["Worldwide", "Folk"],
           ),
+          releaseAlbumIds: ["1641851258"],
+          topSongs: [
+            .init(
+              id: "1641851259",
+              title: "Brewed",
+              artistName: "Väsen",
+              albumID: "1641851258",
+              albumTitle: "Brewed",
+              artworkURL: URL(
+                string: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/98/f3/0c/98f30cf6-2c93-e325-47de-be6a693aad8a/00b970d0-6ad6-4a55-a6d1-9ea83844ee99.jpg/600x600bb.jpg",
+              ),
+            ),
+          ],
         ),
       ],
     )

@@ -8,7 +8,6 @@ final class AppleMusicClientTests: XCTestCase {
   func testBuildsCatalogAlbumSearchURL() throws {
     let url = try appleMusicCatalogSearchURL(.init(
       term: "Lena Jonsson Trio",
-      storefront: "us",
       limit: 25,
     ))
 
@@ -26,7 +25,6 @@ final class AppleMusicClientTests: XCTestCase {
   func testBuildsCatalogArtistSearchURL() throws {
     let url = try appleMusicCatalogArtistSearchURL(.init(
       term: "Lena Jonsson Trio",
-      storefront: "us",
       limit: 25,
     ))
 
@@ -44,7 +42,6 @@ final class AppleMusicClientTests: XCTestCase {
   func testBuildsCatalogMixedSearchURL() throws {
     let url = try appleMusicCatalogMixedSearchURL(.init(
       term: "Lena Jonsson Trio",
-      storefront: "us",
       limit: 25,
     ))
 
@@ -63,7 +60,6 @@ final class AppleMusicClientTests: XCTestCase {
   func testBuildsCatalogAlbumsURL() throws {
     let url = try appleMusicCatalogAlbumsURL(.init(
       albumIds: ["1511628001", "1682152618"],
-      storefront: "us",
     ))
 
     let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
@@ -77,7 +73,6 @@ final class AppleMusicClientTests: XCTestCase {
   func testBuildsCatalogAlbumURL() throws {
     let url = try appleMusicCatalogAlbumURL(.init(
       albumId: .init(rawValue: "1511628001"),
-      storefront: "us",
     ))
 
     let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
@@ -93,7 +88,6 @@ final class AppleMusicClientTests: XCTestCase {
     let url = try appleMusicCatalogArtistAlbumsURL(.init(
       artistId: .init(rawValue: "123456789"),
       artistName: "Lena Jonsson Trio",
-      storefront: "us",
     ), view: .fullAlbums)
 
     let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
@@ -109,7 +103,6 @@ final class AppleMusicClientTests: XCTestCase {
     let url = try appleMusicCatalogArtistTopSongsURL(.init(
       artistId: .init(rawValue: "123456789"),
       artistName: "Lena Jonsson Trio",
-      storefront: "us",
     ))
 
     let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
@@ -129,6 +122,15 @@ final class AppleMusicClientTests: XCTestCase {
     expect(components.host).toEqual("api.music.apple.com")
     expect(components.path).toEqual("/v1/catalog/us/artists/123456789/view/full-albums")
     expect(components.queryItems?.first { $0.name == "offset" }?.value).toEqual("100")
+  }
+
+  func testRejectsUntrustedCatalogPaginationURL() throws {
+    XCTAssertThrowsError(
+      try appleMusicCatalogURL(fromNext: "https://example.com/steal-token"),
+    )
+    XCTAssertThrowsError(
+      try appleMusicCatalogURL(fromNext: "http://api.music.apple.com/insecure"),
+    )
   }
 
   func testDecodesAlbumSearchResponse() throws {

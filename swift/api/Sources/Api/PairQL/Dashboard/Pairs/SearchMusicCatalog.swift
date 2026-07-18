@@ -55,7 +55,7 @@ extension SearchMusicCatalog: Resolver {
 
     let limit = min(max(input.limit ?? 10, 1), 25)
     let results = try await get(dependency: \.appleMusic).searchCatalog(
-      .init(term: query, storefront: "us", limit: limit),
+      .init(term: query, limit: limit),
     )
 
     return .init(

@@ -13,16 +13,20 @@ struct ApprovedMusicClientTests {
   func liveClientCachesSuccessfulApiLoad() async throws {
     let writes = SavedCacheWrites()
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
-    let remoteLibrary = try JSONDecoder().decode(
-      GetApprovedMusicLibrary_v2.Output.self,
-      from: Data(v2ApprovedMusicLibraryJSON.utf8),
+    let decoder = JSONDecoder()
+    decoder.dateDecodingStrategy = .iso8601
+    let remoteLibrary = try decoder.decode(
+      MusicLibrarySnapshot.self,
+      from: Data(v3ApprovedMusicLibraryJSON.utf8),
     )
 
     let library = try await withDependencies {
-      $0.api.getApprovedMusicLibrary = { token in
+      $0.api.getApprovedMusicLibrary = { token, knownRevision in
         #expect(token == approvedMusicClientConnection.token)
-        return remoteLibrary
+        #expect(knownRevision == nil)
+        return .snapshot(remoteLibrary)
       }
+      $0.approvedMusicLibraryCache._load = { _ in nil }
       $0.approvedMusicLibraryCache._save = { library, childId in
         await writes.append(library: library, childId: childId)
       }
@@ -41,12 +45,22 @@ struct ApprovedMusicClientTests {
   }
 
   @Test
-  func liveClientIgnoresCacheWriteFailure() async throws {
+  func liveClientReturnsCachedLibraryForUnchangedRevisionWithoutWriting() async throws {
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
 
     let library = try await withDependencies {
-      $0.api.getApprovedMusicLibrary = { _ in remoteApprovedMusicLibrary }
-      $0.approvedMusicLibraryCache._save = { _, _ in throw TestError() }
+      $0.api.getApprovedMusicLibrary = { token, knownRevision in
+        #expect(token == approvedMusicClientConnection.token)
+        #expect(knownRevision == approvedMusicLibrary.revision)
+        return .unchanged(revision: approvedMusicLibrary.revision)
+      }
+      $0.approvedMusicLibraryCache._load = { childId in
+        #expect(childId == approvedMusicClientConnection.childId)
+        return approvedMusicLibrary
+      }
+      $0.approvedMusicLibraryCache._save = { _, _ in
+        Issue.record("unchanged snapshot should not rewrite cache")
+      }
       $0.keychain._load = { key in
         key == .connection ? connectionData : nil
       }
@@ -58,23 +72,90 @@ struct ApprovedMusicClientTests {
   }
 
   @Test
-  func liveClientLoadsAlbumTracks() async throws {
+  func liveClientRejectsUnchangedResponseWithoutMatchingCache() async throws {
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
 
-    let tracks = try await withDependencies {
-      $0.api.getApprovedMusicAlbumTracks = { token, albumID in
-        #expect(token == approvedMusicClientConnection.token)
-        #expect(albumID == "album-1")
-        return remoteApprovedAlbumTracks
+    await #expect(throws: ApprovedMusicClientError.self) {
+      try await withDependencies {
+        $0.api.getApprovedMusicLibrary = { _, knownRevision in
+          #expect(knownRevision == nil)
+          return .unchanged(revision: 7)
+        }
+        $0.approvedMusicLibraryCache._load = { _ in nil }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
       }
+    }
+  }
+
+  @Test
+  func liveClientRejectsSnapshotOlderThanCache() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    var staleSnapshot = remoteApprovedMusicLibrary
+    staleSnapshot.revision = approvedMusicLibrary.revision - 1
+    let stale = staleSnapshot
+
+    await #expect(throws: ApprovedMusicClientError.self) {
+      try await withDependencies {
+        $0.api.getApprovedMusicLibrary = { _, knownRevision in
+          #expect(knownRevision == approvedMusicLibrary.revision)
+          return .snapshot(stale)
+        }
+        $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+        $0.approvedMusicLibraryCache._save = { _, _ in
+          Issue.record("stale snapshot should not rewrite cache")
+        }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
+      }
+    }
+  }
+
+  @Test
+  func liveClientRejectsIncompleteSnapshot() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    var incompleteSnapshot = remoteApprovedMusicLibrary
+    incompleteSnapshot.artists[0].topSongs[0].id = "not-in-album"
+    let incomplete = incompleteSnapshot
+
+    await #expect(throws: ApprovedMusicClientError.self) {
+      try await withDependencies {
+        $0.api.getApprovedMusicLibrary = { _, _ in .snapshot(incomplete) }
+        $0.approvedMusicLibraryCache._load = { _ in nil }
+        $0.approvedMusicLibraryCache._save = { _, _ in
+          Issue.record("incomplete snapshot should not write cache")
+        }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
+      }
+    }
+  }
+
+  @Test
+  func liveClientIgnoresCacheWriteFailure() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+
+    let library = try await withDependencies {
+      $0.api.getApprovedMusicLibrary = { _, _ in .snapshot(remoteApprovedMusicLibrary) }
+      $0.approvedMusicLibraryCache._load = { _ in nil }
+      $0.approvedMusicLibraryCache._save = { _, _ in throw TestError() }
       $0.keychain._load = { key in
         key == .connection ? connectionData : nil
       }
     } operation: {
-      try await ApprovedMusicClient.liveValue.loadAlbumTracks(albumID: "album-1")
+      try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
     }
 
-    expectNoDifference(tracks, approvedAlbumTracks)
+    expectNoDifference(library, approvedMusicLibrary)
   }
 
   @Test
@@ -134,19 +215,15 @@ struct ApprovedMusicClientTests {
     for album in library.albums {
       #expect(!album.tracks.isEmpty)
       #expect(Set(album.tracks.map(\.id)).count == album.tracks.count)
+      #expect(album.tracks.allSatisfy { $0.albumID == album.id })
     }
-
-    let tracks = try await ApprovedMusicClient.mock.loadAlbumTracks(library.albums[0].id)
-    expectNoDifference(tracks, library.albums[0].tracks)
   }
 
   @Test
   func emptyLibraryIsAvailableForTestsAndPreviews() async throws {
     let library = try await ApprovedMusicClient.empty.loadRemoteApprovedLibrary()
-    let tracks = try await ApprovedMusicClient.empty.loadAlbumTracks(albumID: "album-1")
 
     #expect(library.isEmpty)
-    expectNoDifference(tracks, [])
   }
 
   @Test
@@ -185,7 +262,11 @@ private let approvedMusicClientConnection = MusicAppConnection(
   childName: "Harriet",
 )
 
-private let remoteApprovedMusicLibrary = GetApprovedMusicLibrary_v2.Output(
+private let snapshotDate = Date(timeIntervalSince1970: 1000)
+
+private let remoteApprovedMusicLibrary = MusicLibrarySnapshot(
+  revision: 7,
+  generatedAt: snapshotDate,
   albums: [
     .init(
       id: "album-1",
@@ -206,6 +287,18 @@ private let remoteApprovedMusicLibrary = GetApprovedMusicLibrary_v2.Output(
       releaseDate: "2024-04-12",
       releaseType: "Album",
       showsArtwork: true,
+      addedAt: snapshotDate,
+      tracks: [
+        .init(
+          id: "track-1",
+          title: "Library Track",
+          artistName: "Track Artist",
+          albumId: "album-1",
+          albumTitle: "Library Album",
+          artworkUrl: "https://example.com/track.jpg",
+          durationInMillis: 180_000,
+        ),
+      ],
     ),
   ],
   artists: [
@@ -235,37 +328,24 @@ private let remoteApprovedMusicLibrary = GetApprovedMusicLibrary_v2.Output(
       releaseAlbumIds: ["album-1"],
       topSongs: [
         .init(
-          id: "top-song-1",
+          id: "track-1",
           title: "Top Song",
           artistName: "Library Artist",
+          albumId: "album-1",
           albumTitle: "Library Album",
           artworkUrl: "https://example.com/top-song.jpg",
           durationInMillis: 200_000,
         ),
       ],
+      addedAt: snapshotDate,
     ),
   ],
 )
 
-private let remoteApprovedAlbumTracks: GetApprovedMusicAlbumTracks.Output = [
-  .init(
-    id: "track-1",
-    title: "Library Track",
-    artistName: "Track Artist",
-    artworkUrl: "https://example.com/track.jpg",
-  ),
-]
-
-private let approvedAlbumTracks = [
-  ApprovedTrack(
-    id: "track-1",
-    title: "Library Track",
-    artistName: "Track Artist",
-    artworkURL: URL(string: "https://example.com/track.jpg"),
-  ),
-]
-
 private let approvedMusicLibrary = ApprovedMusicLibrary(
+  schemaVersion: 3,
+  revision: 7,
+  generatedAt: snapshotDate,
   albums: [
     .init(
       id: "album-1",
@@ -285,6 +365,18 @@ private let approvedMusicLibrary = ApprovedMusicLibrary(
       trackCount: 1,
       releaseDate: "2024-04-12",
       releaseType: "Album",
+      addedAt: snapshotDate,
+      tracks: [
+        .init(
+          id: "track-1",
+          title: "Library Track",
+          artistName: "Track Artist",
+          albumID: "album-1",
+          albumTitle: "Library Album",
+          artworkURL: URL(string: "https://example.com/track.jpg"),
+          durationInMillis: 180_000,
+        ),
+      ],
     ),
   ],
   artists: [
@@ -314,20 +406,25 @@ private let approvedMusicLibrary = ApprovedMusicLibrary(
       releaseAlbumIds: ["album-1"],
       topSongs: [
         .init(
-          id: "top-song-1",
+          id: "track-1",
           title: "Top Song",
           artistName: "Library Artist",
+          albumID: "album-1",
           albumTitle: "Library Album",
           artworkURL: URL(string: "https://example.com/top-song.jpg"),
           durationInMillis: 200_000,
         ),
       ],
+      addedAt: snapshotDate,
     ),
   ],
 )
 
-private let v2ApprovedMusicLibraryJSON = #"""
+private let v3ApprovedMusicLibraryJSON = #"""
 {
+  "schemaVersion": 3,
+  "revision": 7,
+  "generatedAt": "1970-01-01T00:16:40Z",
   "albums": [
     {
       "id": "album-1",
@@ -347,7 +444,17 @@ private let v2ApprovedMusicLibraryJSON = #"""
       "trackCount": 1,
       "releaseDate": "2024-04-12",
       "releaseType": "Album",
-      "showsArtwork": true
+      "showsArtwork": true,
+      "addedAt": "1970-01-01T00:16:40Z",
+      "tracks": [{
+        "id": "track-1",
+        "title": "Library Track",
+        "artistName": "Track Artist",
+        "albumId": "album-1",
+        "albumTitle": "Library Album",
+        "artworkUrl": "https://example.com/track.jpg",
+        "durationInMillis": 180000
+      }]
     }
   ],
   "artists": [
@@ -375,16 +482,16 @@ private let v2ApprovedMusicLibraryJSON = #"""
         "genreNames": ["Folk", "Classical"]
       },
       "releaseAlbumIds": ["album-1"],
-      "topSongs": [
-        {
-          "id": "top-song-1",
-          "title": "Top Song",
-          "artistName": "Library Artist",
-          "albumTitle": "Library Album",
-          "artworkUrl": "https://example.com/top-song.jpg",
-          "durationInMillis": 200000
-        }
-      ]
+      "topSongs": [{
+        "id": "track-1",
+        "title": "Top Song",
+        "artistName": "Library Artist",
+        "albumId": "album-1",
+        "albumTitle": "Library Album",
+        "artworkUrl": "https://example.com/top-song.jpg",
+        "durationInMillis": 200000
+      }],
+      "addedAt": "1970-01-01T00:16:40Z"
     }
   ]
 }

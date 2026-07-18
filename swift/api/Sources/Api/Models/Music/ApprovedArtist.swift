@@ -80,6 +80,8 @@ extension Music {
     var appleMusicArtistId: ArtistId
     var name: String
     var catalogMetadata: CatalogMetadata?
+    var resolution: ResolvedArtist?
+    var resolvedAt: Date?
     var createdAt = Date()
 
     init(
@@ -88,12 +90,16 @@ extension Music {
       appleMusicArtistId: ArtistId,
       name: String,
       catalogMetadata: CatalogMetadata? = nil,
+      resolution: ResolvedArtist? = nil,
+      resolvedAt: Date? = nil,
     ) {
       self.id = id
       self.childId = childId
       self.appleMusicArtistId = appleMusicArtistId
       self.name = name
       self.catalogMetadata = catalogMetadata
+      self.resolution = resolution
+      self.resolvedAt = resolvedAt
     }
   }
 }

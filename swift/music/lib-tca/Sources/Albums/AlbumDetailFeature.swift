@@ -39,8 +39,6 @@ struct AlbumDetailFeature {
     }
 
     case addToQueueTapped
-    case albumTracksLoadFailed(ApprovedAlbum.ID)
-    case albumTracksLoaded(ApprovedAlbum.ID, [ApprovedTrack])
     case delegate(DelegateAction)
     case onAppear
     case playbackFailureActionTapped
@@ -52,12 +50,6 @@ struct AlbumDetailFeature {
     case trackTapped(ApprovedTrack.ID)
   }
 
-  enum CancelID: Hashable {
-    case albumTracks
-  }
-
-  @Dependency(\.approvedMusic) var approvedMusic
-
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
@@ -66,17 +58,6 @@ struct AlbumDetailFeature {
         return .send(.delegate(.addToQueue(items: state.playbackItems)))
 
       case .onAppear:
-        return self.loadTracksIfNeeded(&state)
-
-      case .albumTracksLoaded(let albumID, let tracks):
-        guard state.album.id == albumID else { return .none }
-        state.album.tracks = tracks
-        state.isLoadingTracks = false
-        return .none
-
-      case .albumTracksLoadFailed(let albumID):
-        guard state.album.id == albumID else { return .none }
-        state.isLoadingTracks = false
         return .none
 
       case .playNextTapped:
@@ -89,9 +70,7 @@ struct AlbumDetailFeature {
         }
 
         let items = state.playbackItems
-        guard !items.isEmpty else {
-          return self.loadTracksIfNeeded(&state)
-        }
+        guard !items.isEmpty else { return .none }
         return .send(.delegate(.playNow(items: items, startIndex: 0)))
 
       case .trackAddToQueueTapped(let trackID):
@@ -125,21 +104,6 @@ struct AlbumDetailFeature {
         return .none
       }
     }
-  }
-
-  private func loadTracksIfNeeded(_ state: inout State) -> EffectOf<Self> {
-    guard state.album.tracks.isEmpty, !state.isLoadingTracks else { return .none }
-    state.isLoadingTracks = true
-    let albumID = state.album.id
-    return .run { send in
-      do {
-        let tracks = try await self.approvedMusic.loadAlbumTracks(albumID)
-        await send(.albumTracksLoaded(albumID, tracks))
-      } catch {
-        await send(.albumTracksLoadFailed(albumID))
-      }
-    }
-    .cancellable(id: CancelID.albumTracks, cancelInFlight: true)
   }
 }
 

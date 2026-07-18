@@ -645,6 +645,17 @@ final class SqlTests: XCTestCase {
     expect(serializer.sql).not.toContain("$1")
   }
 
+  func testJsonSerializesAsBoundValue() throws {
+    var stmt = SQL.Statement("SELECT ")
+    stmt.components.append(.binding(.json(#"{"title":"Artist's Album"}"#)))
+    let sql = stmt.sql
+    var serializer = SQLSerializer(database: TestDatabase())
+    sql.serialize(to: &serializer)
+
+    expect(serializer.sql).toContain("$1::jsonb")
+    expect(serializer.sql).not.toContain("Artist's Album")
+  }
+
   func testByteaSerializesToDecode() async throws {
     let thing = LilThing(int: 1, data: Data("hello".utf8))
 

@@ -420,27 +420,15 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func albumCardQueueActionLoadsTracksAndPreservesAlbumHint() async {
+  func albumCardQueueActionDoesNothingForIncompleteAlbum() async {
     var album = ApprovedMusicLibrary.mock.albums[0]
-    let tracks = album.tracks
     album.tracks = []
-    let albumID = album.id
-    var loadedAlbum = album
-    loadedAlbum.tracks = tracks
-    let items = playbackItems(album: loadedAlbum)
     let library = ApprovedMusicLibrary(albums: [album])
     let store = TestStore(initialState: .init(status: .loaded(library))) {
       LibraryFeature()
-    } withDependencies: {
-      $0.approvedMusic.loadAlbumTracks = { requestedAlbumID in
-        #expect(requestedAlbumID == albumID)
-        return tracks
-      }
     }
 
-    await store.send(.albumPlayNextTapped(albumID))
-    await store.receive(.albumQueueTracksLoaded(albumID, tracks, .next))
-    await store.receive(.delegate(.playNext(items: items)))
+    await store.send(.albumPlayNextTapped(album.id))
   }
 
   @Test

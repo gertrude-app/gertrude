@@ -8,7 +8,6 @@ import PairQL
 struct ApprovedMusicClient: Sendable {
   var loadRemoteApprovedLibrary: @Sendable () async throws -> ApprovedMusicLibrary
   var loadCachedApprovedLibrary: @Sendable () async -> ApprovedMusicLibrary?
-  var loadAlbumTracks: @Sendable (_ albumID: ApprovedAlbum.ID) async throws -> [ApprovedTrack]
 }
 
 extension ApprovedMusicClient: DependencyKey {
@@ -22,10 +21,37 @@ extension ApprovedMusicClient: DependencyKey {
           throw ApprovedMusicClientError.missingConnection
         }
         do {
-          let output = try await api.getApprovedMusicLibrary(connection.token)
-          let library = ApprovedMusicLibrary(remote: output)
-          try? await cache.save(library, childId: connection.childId)
-          return library
+          let cached = try? await cache.load(childId: connection.childId)
+          let output = try await api.getApprovedMusicLibrary(
+            connection.token,
+            cached?.revision,
+          )
+          switch output {
+          case .unchanged(let revision):
+            guard let cached, cached.revision == revision else {
+              throw ApprovedMusicClientError.invalidUnchangedRevision
+            }
+            return cached
+          case .snapshot(let snapshot):
+            guard snapshot.schemaVersion == MusicLibrarySnapshot.currentSchemaVersion else {
+              throw ApprovedMusicClientError.unsupportedSchema(snapshot.schemaVersion)
+            }
+            guard snapshot.revision >= 0 else {
+              throw ApprovedMusicClientError.invalidRevision
+            }
+            let library = ApprovedMusicLibrary(remote: snapshot)
+            guard library.hasCompleteSnapshot else {
+              throw ApprovedMusicClientError.incompleteSnapshot
+            }
+            if let cached, snapshot.revision <= cached.revision {
+              guard snapshot.revision == cached.revision else {
+                throw ApprovedMusicClientError.staleSnapshot
+              }
+              return cached
+            }
+            try? await cache.save(library, childId: connection.childId)
+            return library
+          }
         } catch let error as PqlError where error.type == .paymentRequired {
           throw ApprovedMusicClientError.subscriptionRequired
         }
@@ -35,21 +61,6 @@ extension ApprovedMusicClient: DependencyKey {
         @Dependency(\.keychain) var keychain
         guard let connection = keychain.loadConnection() else { return nil }
         return try? await cache.load(childId: connection.childId)
-      },
-      loadAlbumTracks: { albumID in
-        @Dependency(\.api) var api
-        @Dependency(\.keychain) var keychain
-        guard let connection = keychain.loadConnection() else {
-          throw ApprovedMusicClientError.missingConnection
-        }
-        do {
-          return try await api.getApprovedMusicAlbumTracks(
-            connection.token,
-            albumID.rawValue,
-          ).map(ApprovedTrack.init)
-        } catch let error as PqlError where error.type == .paymentRequired {
-          throw ApprovedMusicClientError.subscriptionRequired
-        }
       },
     )
   }
@@ -67,28 +78,29 @@ extension ApprovedMusicClient {
     static let mock = Self(
       loadRemoteApprovedLibrary: { .mock },
       loadCachedApprovedLibrary: { .mock },
-      loadAlbumTracks: { albumID in ApprovedMusicLibrary.mock.album(id: albumID)?.tracks ?? [] },
     )
   #endif
 
   static let empty = Self(
     loadRemoteApprovedLibrary: { .empty },
     loadCachedApprovedLibrary: { .empty },
-    loadAlbumTracks: { _ in [] },
   )
 }
 
 private extension ApprovedMusicLibrary {
-  init(remote output: GetApprovedMusicLibrary_v2.Output) {
+  init(remote snapshot: MusicLibrarySnapshot) {
     self.init(
-      albums: output.albums.map(ApprovedAlbum.init),
-      artists: output.artists.map(ApprovedArtist.init),
+      schemaVersion: snapshot.schemaVersion,
+      revision: snapshot.revision,
+      generatedAt: snapshot.generatedAt,
+      albums: snapshot.albums.map(ApprovedAlbum.init),
+      artists: snapshot.artists.map(ApprovedArtist.init),
     )
   }
 }
 
 private extension ApprovedAlbum {
-  init(remote album: GetApprovedMusicLibrary_v2.Output.Album) {
+  init(remote album: MusicLibrarySnapshot.Album) {
     let artwork = album.artwork.map(ApprovedMusicArtwork.init)
     self.init(
       id: .init(rawValue: album.id),
@@ -99,18 +111,21 @@ private extension ApprovedAlbum {
       trackCount: album.trackCount,
       releaseDate: album.releaseDate,
       releaseType: album.releaseType,
+      addedAt: album.addedAt,
+      tracks: album.tracks.map(ApprovedTrack.init),
     )
   }
 }
 
 private extension ApprovedArtist {
-  init(remote artist: GetApprovedMusicLibrary_v2.Output.Artist) {
+  init(remote artist: MusicLibrarySnapshot.Artist) {
     self.init(
       id: .init(rawValue: artist.id),
       name: artist.name,
       catalogMetadata: artist.catalogMetadata.map(ApprovedMusicCatalogMetadata.init),
-      releaseAlbumIds: artist.releaseAlbumIds?.map(ApprovedAlbum.ID.init(rawValue:)),
-      topSongs: artist.topSongs?.map(ApprovedTrack.init),
+      releaseAlbumIds: artist.releaseAlbumIds.map(ApprovedAlbum.ID.init(rawValue:)),
+      topSongs: artist.topSongs.map(ApprovedTrack.init),
+      addedAt: artist.addedAt,
     )
   }
 }
@@ -153,23 +168,15 @@ private extension ApprovedMusicEditorialNotes {
 }
 
 private extension ApprovedTrack {
-  init(remote track: GetApprovedMusicLibrary.Output.Track) {
+  init(remote track: MusicLibrarySnapshot.Track) {
     self.init(
       id: .init(rawValue: track.id),
       title: track.title,
       artistName: track.artistName,
+      albumID: .init(rawValue: track.albumId),
+      albumTitle: track.albumTitle,
       artworkURL: track.artworkURL,
-    )
-  }
-
-  init(remote song: GetApprovedMusicLibrary_v2.Output.Artist.TopSong) {
-    self.init(
-      id: .init(rawValue: song.id),
-      title: song.title,
-      artistName: song.artistName,
-      albumTitle: song.albumTitle,
-      artworkURL: song.artworkURL,
-      durationInMillis: song.durationInMillis,
+      durationInMillis: track.durationInMillis,
     )
   }
 }
@@ -183,21 +190,14 @@ private extension ApprovedMusicArtwork {
   }
 }
 
-private extension GetApprovedMusicLibrary_v2.Output.Album {
+private extension MusicLibrarySnapshot.Album {
   var artworkURL: URL? {
     guard let artworkUrl else { return nil }
     return URL(string: artworkUrl)
   }
 }
 
-private extension GetApprovedMusicLibrary.Output.Track {
-  var artworkURL: URL? {
-    guard let artworkUrl else { return nil }
-    return URL(string: artworkUrl)
-  }
-}
-
-private extension GetApprovedMusicLibrary_v2.Output.Artist.TopSong {
+private extension MusicLibrarySnapshot.Track {
   var artworkURL: URL? {
     guard let artworkUrl else { return nil }
     return URL(string: artworkUrl)
@@ -205,6 +205,11 @@ private extension GetApprovedMusicLibrary_v2.Output.Artist.TopSong {
 }
 
 enum ApprovedMusicClientError: Error {
+  case incompleteSnapshot
+  case invalidRevision
+  case invalidUnchangedRevision
   case missingConnection
+  case staleSnapshot
   case subscriptionRequired
+  case unsupportedSchema(Int)
 }

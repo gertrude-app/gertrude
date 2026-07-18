@@ -10,10 +10,9 @@ import PairQLClient
 struct ApiClient: Sendable {
   var getMusicAppStatus: @Sendable () async throws -> GetMusicAppStatus.Output
   var getMusicOnboardingConfig: @Sendable () async throws -> GetMusicOnboardingConfig.Output
-  var getApprovedMusicAlbumTracks:
-    @Sendable (_ token: UUID, _ albumID: String) async throws -> GetApprovedMusicAlbumTracks.Output
   var getApprovedMusicLibrary:
-    @Sendable (_ token: UUID) async throws -> GetApprovedMusicLibrary_v2.Output
+    @Sendable (_ token: UUID, _ knownRevision: Int64?) async throws
+    -> GetApprovedMusicLibrary_v3.Output
 }
 
 extension ApiClient: DependencyKey {
@@ -41,17 +40,11 @@ extension ApiClient: DependencyKey {
           unauthed: .getMusicOnboardingConfig,
         )
       },
-      getApprovedMusicAlbumTracks: { token, albumID in
-        try await pairql.call(
-          GetApprovedMusicAlbumTracks.self,
-          authed: .getApprovedMusicAlbumTracks(.init(albumId: albumID)),
-          token: token,
-        )
-      },
-      getApprovedMusicLibrary: { token in
-        try await pairql.call(
-          GetApprovedMusicLibrary_v2.self,
-          authed: .getApprovedMusicLibrary_v2,
+      getApprovedMusicLibrary: { token, knownRevision in
+        let input = GetApprovedMusicLibrary_v3.Input(knownRevision: knownRevision)
+        return try await pairql.call(
+          GetApprovedMusicLibrary_v3.self,
+          authed: .getApprovedMusicLibrary_v3(input),
           token: token,
         )
       },

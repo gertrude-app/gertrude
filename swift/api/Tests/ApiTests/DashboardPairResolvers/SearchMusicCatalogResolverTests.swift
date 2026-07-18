@@ -12,10 +12,12 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await withDependencies {
       $0.appleMusic.searchCatalog = { search in
+        expect(search.term).toEqual("Lena")
+        expect(search.limit).toEqual(10)
         let album = AppleMusicCatalogAlbum(
           id: .init(rawValue: "1511628001"),
           title: search.term,
-          artistName: search.storefront,
+          artistName: "us",
           artworkUrl: "https://example.com/art.jpg",
           artwork: albumArtwork(),
           trackCount: search.limit,
@@ -25,7 +27,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
         let artist = AppleMusicCatalogArtist(
           id: .init(rawValue: "123456789"),
           name: search.term,
-          catalogMetadata: artistMetadata(genreNames: [search.storefront]),
+          catalogMetadata: artistMetadata(genreNames: ["us"]),
         )
         return .init(
           items: [.init(artist: artist), .init(album: album)],

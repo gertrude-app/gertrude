@@ -2,19 +2,60 @@ import Foundation
 import Tagged
 
 struct ApprovedMusicLibrary: Codable, Equatable, Sendable {
+  var schemaVersion: Int
+  var revision: Int64
+  var generatedAt: Date
   var albums: [ApprovedAlbum]
   var artists: [ApprovedArtist]
 
   init(
+    schemaVersion: Int = 3,
+    revision: Int64 = 0,
+    generatedAt: Date = .init(timeIntervalSince1970: 0),
     albums: [ApprovedAlbum] = [],
     artists: [ApprovedArtist] = [],
   ) {
+    self.schemaVersion = schemaVersion
+    self.revision = revision
+    self.generatedAt = generatedAt
     self.albums = albums
     self.artists = artists
   }
 
   var isEmpty: Bool {
     self.albums.isEmpty && self.artists.isEmpty
+  }
+
+  var hasCompleteSnapshot: Bool {
+    guard self.schemaVersion == 3, self.revision >= 0 else { return false }
+    var albumsById: [ApprovedAlbum.ID: ApprovedAlbum] = [:]
+    for album in self.albums {
+      guard !album.id.rawValue.isEmpty, albumsById[album.id] == nil else { return false }
+      guard Set(album.tracks.map(\.id)).count == album.tracks.count else { return false }
+      guard album.tracks.allSatisfy({
+        !$0.id.rawValue.isEmpty && $0.albumID == album.id
+      }) else { return false }
+      albumsById[album.id] = album
+    }
+
+    var artistIds = Set<ApprovedArtist.ID>()
+    for artist in self.artists {
+      guard !artist.id.rawValue.isEmpty, artistIds.insert(artist.id).inserted else {
+        return false
+      }
+      guard let releaseAlbumIds = artist.releaseAlbumIds,
+            let topSongs = artist.topSongs else { return false }
+      guard Set(releaseAlbumIds).count == releaseAlbumIds.count else { return false }
+      guard releaseAlbumIds.allSatisfy({ albumsById[$0] != nil }) else { return false }
+      var topSongIds = Set<ApprovedTrack.ID>()
+      for song in topSongs {
+        guard topSongIds.insert(song.id).inserted,
+              let albumId = song.albumID,
+              let album = albumsById[albumId],
+              album.tracks.contains(where: { $0.id == song.id }) else { return false }
+      }
+    }
+    return true
   }
 
   static let empty = Self()
@@ -31,6 +72,7 @@ struct ApprovedAlbum: Codable, Equatable, Identifiable, Sendable {
   let trackCount: Int?
   let releaseDate: String?
   let releaseType: String?
+  let addedAt: Date
   var tracks: [ApprovedTrack]
 
   init(
@@ -42,6 +84,7 @@ struct ApprovedAlbum: Codable, Equatable, Identifiable, Sendable {
     trackCount: Int? = nil,
     releaseDate: String? = nil,
     releaseType: String? = nil,
+    addedAt: Date = .init(timeIntervalSince1970: 0),
     tracks: [ApprovedTrack] = [],
   ) {
     self.id = id
@@ -52,7 +95,8 @@ struct ApprovedAlbum: Codable, Equatable, Identifiable, Sendable {
     self.trackCount = trackCount
     self.releaseDate = releaseDate
     self.releaseType = releaseType
-    self.tracks = tracks
+    self.addedAt = addedAt
+    self.tracks = tracks.map { $0.withAlbumID($0.albumID ?? id) }
   }
 }
 
@@ -64,6 +108,7 @@ struct ApprovedArtist: Codable, Equatable, Identifiable, Sendable {
   let catalogMetadata: ApprovedMusicCatalogMetadata?
   let releaseAlbumIds: [ApprovedAlbum.ID]?
   let topSongs: [ApprovedTrack]?
+  let addedAt: Date
 
   init(
     id: ID,
@@ -71,12 +116,14 @@ struct ApprovedArtist: Codable, Equatable, Identifiable, Sendable {
     catalogMetadata: ApprovedMusicCatalogMetadata? = nil,
     releaseAlbumIds: [ApprovedAlbum.ID]? = nil,
     topSongs: [ApprovedTrack]? = nil,
+    addedAt: Date = .init(timeIntervalSince1970: 0),
   ) {
     self.id = id
     self.name = name
     self.catalogMetadata = catalogMetadata
     self.releaseAlbumIds = releaseAlbumIds
     self.topSongs = topSongs
+    self.addedAt = addedAt
   }
 }
 
@@ -155,6 +202,7 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
   let id: ID
   let title: String
   let artistName: String
+  let albumID: ApprovedAlbum.ID?
   let albumTitle: String?
   let artworkURL: URL?
   let durationInMillis: Int?
@@ -163,6 +211,7 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
     id: ID,
     title: String,
     artistName: String,
+    albumID: ApprovedAlbum.ID? = nil,
     albumTitle: String? = nil,
     artworkURL: URL? = nil,
     durationInMillis: Int? = nil,
@@ -170,8 +219,21 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
     self.id = id
     self.title = title
     self.artistName = artistName
+    self.albumID = albumID
     self.albumTitle = albumTitle
     self.artworkURL = artworkURL
     self.durationInMillis = durationInMillis
+  }
+
+  func withAlbumID(_ albumID: ApprovedAlbum.ID?) -> Self {
+    .init(
+      id: self.id,
+      title: self.title,
+      artistName: self.artistName,
+      albumID: albumID,
+      albumTitle: self.albumTitle,
+      artworkURL: self.artworkURL,
+      durationInMillis: self.durationInMillis,
+    )
   }
 }

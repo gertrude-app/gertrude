@@ -1,3 +1,4 @@
+import Dependencies
 import DuetSQL
 import PairQL
 import XCTest
@@ -35,7 +36,7 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
       .init(
         id: .init(rawValue: "123456789"),
         name: "Lena Jonsson Trio",
-        catalogMetadata: metadata,
+        catalogMetadata: self.metadata(),
         createdAt: artists.artists[0].createdAt,
       ),
       .init(
@@ -53,6 +54,10 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
     let input = self.input(child: child)
 
     _ = try await ApproveMusicArtist.resolve(with: input, in: child.parent.context)
+    let initiallyApproved = try await Music.ApprovedArtist.query()
+      .where(.childId == child.id)
+      .where(.appleMusicArtistId == "123456789")
+      .first(in: self.db)
     _ = try await ApproveMusicArtist.resolve(with: input, in: child.parent.context)
 
     let count = try await Music.ApprovedArtist.query()
@@ -66,6 +71,8 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     expect(count).toEqual(1)
+    expect(artist.id).toEqual(initiallyApproved.id)
+    expect(artist.createdAt).toEqual(initiallyApproved.createdAt)
     expect(artist.name).toEqual("Lena Jonsson Trio")
     expect(artist.catalogMetadata).toEqual(self.metadata())
   }
@@ -101,6 +108,60 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
         createdAt: artists.artists[0].createdAt,
       ),
     ])
+  }
+
+  func testApproveMusicArtistIgnoresBrowserMetadataAndPublishesSnapshot() async throws {
+    let child = try await self.child()
+    try await self.connectMusicApp(for: child)
+
+    _ = try await ApproveMusicArtist.resolve(
+      with: .init(
+        childId: child.id,
+        appleMusicArtistId: "123456789",
+        name: "Forged artist",
+        catalogMetadata: .init(genreNames: ["Forged"]),
+      ),
+      in: child.parent.context,
+    )
+
+    let artist = try await Music.ApprovedArtist.query()
+      .where(.childId == child.id)
+      .first(in: self.db)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+    expect(artist.name).toEqual("Lena Jonsson Trio")
+    expect(artist.catalogMetadata).toEqual(self.metadata())
+    expect(artist.resolution?.name).toEqual("Lena Jonsson Trio")
+    expect(snapshot?.revision).toEqual(1)
+    expect(snapshot?.payload.artists.map(\.name)).toEqual(["Lena Jonsson Trio"])
+  }
+
+  func testInitialArtistResolutionFailureWritesNothing() async throws {
+    let child = try await self.child()
+    try await self.connectMusicApp(for: child)
+
+    do {
+      _ = try await withDependencies {
+        $0.appleMusic.resolveArtist = { _ in throw MusicArtistMutationTestError.unavailable }
+      } operation: {
+        try await ApproveMusicArtist.resolve(
+          with: self.input(child: child),
+          in: child.parent.context,
+        )
+      }
+      XCTFail("expected resolution failure")
+    } catch MusicArtistMutationTestError.unavailable {}
+
+    let artistCount = try await Music.ApprovedArtist.query()
+      .where(.childId == child.id)
+      .count(in: self.db)
+    let snapshotCount = try await Music.LibrarySnapshot.query()
+      .where(.childId == child.id)
+      .count(in: self.db)
+    expect(artistCount).toEqual(0)
+    expect(snapshotCount).toEqual(0)
   }
 
   func testRemoveApprovedMusicArtist() async throws {
@@ -260,4 +321,8 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
       genreNames: ["Folk", "Worldwide"],
     )
   }
+}
+
+private enum MusicArtistMutationTestError: Error {
+  case unavailable
 }

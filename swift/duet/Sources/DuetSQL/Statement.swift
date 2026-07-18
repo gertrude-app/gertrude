@@ -264,7 +264,8 @@ public extension SQL.Statement {
       case .binding(.id(let id)):
         sql.appendInterpolation(expression: .uuid(id.uuidId.uuidString))
       case .binding(.json(.some(let json))):
-        sql.appendInterpolation(expression: .jsonb(json))
+        sql.appendInterpolation(bind: json)
+        sql += SQLQueryString(stringLiteral: "::jsonb")
       case .binding(.json(.none)):
         sql.appendInterpolation(expression: .null)
       case .binding(.bytea(.some(let data))):

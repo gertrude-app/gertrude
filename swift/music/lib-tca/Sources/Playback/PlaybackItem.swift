@@ -38,7 +38,7 @@ struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
       title: track.title,
       artistName: track.artistName,
       artworkURL: artworkURL,
-      albumID: albumID,
+      albumID: albumID ?? track.albumID,
       albumTitle: track.albumTitle,
       duration: track.durationInMillis.map { TimeInterval($0) / 1000 },
     )

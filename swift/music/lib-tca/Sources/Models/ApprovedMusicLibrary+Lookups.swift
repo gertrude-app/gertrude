@@ -8,6 +8,9 @@ extension ApprovedMusicLibrary {
   }
 
   func album(matching item: PlaybackItem) -> ApprovedAlbum? {
+    if let albumID = item.albumID, let album = self.album(id: albumID) {
+      return album
+    }
     guard let albumTitle = item.albumTitle else { return nil }
     return self.albums
       .filter { album in

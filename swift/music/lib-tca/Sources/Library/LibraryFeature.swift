@@ -39,7 +39,6 @@ struct LibraryFeature: Sendable {
   }
 
   enum CancelID: Hashable, Sendable {
-    case albumQueueLoad
     case approvedLibraryRefresh
   }
 
@@ -56,11 +55,6 @@ struct LibraryFeature: Sendable {
   enum Action: Equatable {
     case albumAddToQueueTapped(ApprovedAlbum.ID)
     case albumPlayNextTapped(ApprovedAlbum.ID)
-    case albumQueueTracksLoaded(
-      ApprovedAlbum.ID,
-      [ApprovedTrack],
-      PlaybackQueueInsertionPosition,
-    )
     case albumTapped(ApprovedAlbum.ID)
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
@@ -97,22 +91,6 @@ struct LibraryFeature: Sendable {
           position: .next,
           status: state.status,
         )
-
-      case .albumQueueTracksLoaded(let albumID, let tracks, let position):
-        guard case .loaded(let library) = state.status,
-              let album = library.album(id: albumID),
-              !tracks.isEmpty else { return .none }
-        let items = tracks.map { PlaybackItem(
-          track: $0,
-          artworkURL: album.artworkURL,
-          albumID: album.id,
-        ) }
-        switch position {
-        case .next:
-          return .send(.delegate(.playNext(items: items)))
-        case .tail:
-          return .send(.delegate(.addToQueue(items: items)))
-        }
 
       case .albumTapped(let albumID):
         state.presentAlbumDetail(
@@ -276,25 +254,18 @@ struct LibraryFeature: Sendable {
   ) -> EffectOf<Self> {
     guard case .loaded(let library) = status,
           let album = library.album(id: albumID) else { return .none }
-    if !album.tracks.isEmpty {
-      let items = album.tracks.map { PlaybackItem(
-        track: $0,
-        artworkURL: album.artworkURL,
-        albumID: album.id,
-      ) }
-      switch position {
-      case .next:
-        return .send(.delegate(.playNext(items: items)))
-      case .tail:
-        return .send(.delegate(.addToQueue(items: items)))
-      }
+    guard !album.tracks.isEmpty else { return .none }
+    let items = album.tracks.map { PlaybackItem(
+      track: $0,
+      artworkURL: album.artworkURL,
+      albumID: album.id,
+    ) }
+    switch position {
+    case .next:
+      return .send(.delegate(.playNext(items: items)))
+    case .tail:
+      return .send(.delegate(.addToQueue(items: items)))
     }
-    return .run { send in
-      guard let tracks = try? await self.approvedMusic.loadAlbumTracks(albumID)
-      else { return }
-      await send(.albumQueueTracksLoaded(albumID, tracks, position))
-    }
-    .cancellable(id: CancelID.albumQueueLoad, cancelInFlight: true)
   }
 
   private func artistPlaybackItems(

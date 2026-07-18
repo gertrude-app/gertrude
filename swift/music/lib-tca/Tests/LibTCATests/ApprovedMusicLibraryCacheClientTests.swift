@@ -48,9 +48,45 @@ struct ApprovedMusicLibraryCacheClientTests {
     defer { try? FileManager.default.removeItem(at: directory) }
     let legacyDiskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
       directory: directory,
-      version: 1,
+      version: 2,
     )
     try legacyDiskCache.save(.mock, childId: childId)
+    let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
+
+    let loaded = try await cache.load(childId: childId)
+
+    expectNoDifference(loaded, nil)
+  }
+
+  @Test
+  func returnsNilForUnsupportedSnapshotSchema() async throws {
+    let directory = try temporaryDirectory(named: "returnsNilForUnsupportedSnapshotSchema")
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 3,
+    )
+    var unsupported = ApprovedMusicLibrary.mock
+    unsupported.schemaVersion = 2
+    try diskCache.save(unsupported, childId: childId)
+    let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
+
+    let loaded = try await cache.load(childId: childId)
+
+    expectNoDifference(loaded, nil)
+  }
+
+  @Test
+  func returnsNilForIncompleteSnapshot() async throws {
+    let directory = try temporaryDirectory(named: "returnsNilForIncompleteSnapshot")
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 3,
+    )
+    var incomplete = ApprovedMusicLibrary.mock
+    incomplete.albums.append(incomplete.albums[0])
+    try diskCache.save(incomplete, childId: childId)
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
 
     let loaded = try await cache.load(childId: childId)
