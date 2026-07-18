@@ -29,15 +29,15 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: 26.1.1
-      - name: setup just
-        uses: extractions/setup-just@v2
       - uses: actions/cache@v4
         with:
           path: swift/macapp/App/.build
           key: macsim-xc26.1.1-${{ hashFiles('swift/macapp/App/Package.resolved') }}
           restore-keys: macsim-xc26.1.1-
       - name: macsim per-pr corpus
-        run: cd swift && just macsim-test
+        run: |
+          cd swift/macapp/App
+          SWIFT_DETERMINISTIC_HASHING=1 swift test --filter MacSimTests
 
   macsim-hunt:
     if: github.event_name != 'pull_request'
@@ -50,12 +50,12 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: 26.1.1
-      - name: setup just
-        uses: extractions/setup-just@v2
       - uses: actions/cache@v4
         with:
           path: swift/macapp/App/.build
           key: macsim-xc26.1.1-${{ hashFiles('swift/macapp/App/Package.resolved') }}
           restore-keys: macsim-xc26.1.1-
       - name: macsim seed hunt
-        run: cd swift && just macsim-hunt
+        run: |
+          cd swift/macapp/App
+          SWIFT_DETERMINISTIC_HASHING=1 EXPLORE_SEEDS=80 EXPLORE_STEPS=45 swift test --filter MacExplorerTests
