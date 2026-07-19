@@ -48,7 +48,7 @@ struct ApprovedMusicLibraryCacheClientTests {
     defer { try? FileManager.default.removeItem(at: directory) }
     let legacyDiskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
       directory: directory,
-      version: 2,
+      version: 1,
     )
     try legacyDiskCache.save(.mock, childId: childId)
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
@@ -64,10 +64,10 @@ struct ApprovedMusicLibraryCacheClientTests {
     defer { try? FileManager.default.removeItem(at: directory) }
     let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
       directory: directory,
-      version: 3,
+      version: 2,
     )
     var unsupported = ApprovedMusicLibrary.mock
-    unsupported.schemaVersion = 2
+    unsupported.schemaVersion = 3
     try diskCache.save(unsupported, childId: childId)
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
 
@@ -82,7 +82,7 @@ struct ApprovedMusicLibraryCacheClientTests {
     defer { try? FileManager.default.removeItem(at: directory) }
     let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
       directory: directory,
-      version: 3,
+      version: 2,
     )
     var incomplete = ApprovedMusicLibrary.mock
     incomplete.albums.append(incomplete.albums[0])

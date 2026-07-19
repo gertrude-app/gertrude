@@ -67,9 +67,11 @@ public struct PlaybackQueueView: View {
       }
     }
     .navigationTitle("Queue")
+    .tint(.primary)
     .toolbar {
       if !self.upcomingEntries.isEmpty {
         Button("Clear", role: .destructive, action: self.onClearUpcoming)
+          .tint(.red)
       }
     }
   }

@@ -3,6 +3,29 @@ import Testing
 
 @testable import LibViews
 
+@Test
+func playlistArtworkURLsAreDeduplicatedInEntryOrder() {
+  let first = URL(string: "https://example.com/first.jpg")!
+  let second = URL(string: "https://example.com/second.jpg")!
+  let playlist = PlaylistData(
+    id: "playlist",
+    name: "Playlist",
+    entries: [first, first, second, first].enumerated().map { index, url in
+      PlaylistEntryData(
+        id: "entry-\(index)",
+        track: TrackData(
+          id: "track-\(index)",
+          title: "Track \(index)",
+          artist: "Artist",
+          artworkUrl: url,
+        ),
+      )
+    },
+  )
+
+  #expect(playlist.artworkUrls == [first, second])
+}
+
 @MainActor
 @Test
 func packageLoads() {

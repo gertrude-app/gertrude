@@ -11,9 +11,11 @@ public struct ArtistDetailView: View {
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
   private let onPlayTap: @MainActor @Sendable () -> Void
+  private let onSongAddToPlaylist: @MainActor @Sendable (String) -> Void
   private let onSongAddToQueue: @MainActor @Sendable (String) -> Void
   private let onSongPlayNext: @MainActor @Sendable (String) -> Void
   private let onSongTap: @MainActor @Sendable (String) -> Void
+  private let onReleaseAddToPlaylist: @MainActor @Sendable (String) -> Void
   private let onReleaseAddToQueue: @MainActor @Sendable (String) -> Void
   private let onReleasePlayNext: @MainActor @Sendable (String) -> Void
   private let onReleaseTap: @MainActor @Sendable (String) -> Void
@@ -29,9 +31,11 @@ public struct ArtistDetailView: View {
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
     onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
+    onSongAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onSongAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onSongPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onSongTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onReleaseAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onReleaseAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onReleasePlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onReleaseTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -46,9 +50,11 @@ public struct ArtistDetailView: View {
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
     self.onPlayTap = onPlayTap
+    self.onSongAddToPlaylist = onSongAddToPlaylist
     self.onSongAddToQueue = onSongAddToQueue
     self.onSongPlayNext = onSongPlayNext
     self.onSongTap = onSongTap
+    self.onReleaseAddToPlaylist = onReleaseAddToPlaylist
     self.onReleaseAddToQueue = onReleaseAddToQueue
     self.onReleasePlayNext = onReleasePlayNext
     self.onReleaseTap = onReleaseTap
@@ -64,10 +70,6 @@ public struct ArtistDetailView: View {
             isPlaying: self.isPlaying,
             isLoading: self.isLoading,
             onPlayTap: self.onPlayTap,
-          )
-          .playbackQueueContextMenu(
-            onPlayNext: self.onPlayNext,
-            onAddToQueue: self.onAddToQueue,
           )
           .padding(.horizontal, 20)
           .padding(.top, proxy.safeAreaInsets.top + 18)
@@ -90,6 +92,7 @@ public struct ArtistDetailView: View {
             songs: self.topSongs,
             currentTrackID: self.currentTrackID,
             isPlaying: self.isPlaying,
+            onSongAddToPlaylist: self.onSongAddToPlaylist,
             onSongAddToQueue: self.onSongAddToQueue,
             onSongPlayNext: self.onSongPlayNext,
             onSongTap: self.onSongTap,
@@ -98,6 +101,7 @@ public struct ArtistDetailView: View {
           ArtistReleasesShelf(
             releases: self.releases,
             transitionNamespace: self.transitionNamespace,
+            onReleaseAddToPlaylist: self.onReleaseAddToPlaylist,
             onReleaseAddToQueue: self.onReleaseAddToQueue,
             onReleasePlayNext: self.onReleasePlayNext,
             onReleaseTap: self.onReleaseTap,
@@ -117,6 +121,33 @@ public struct ArtistDetailView: View {
     }
     .navigationTitle("")
     .detailNavigationBarBackground()
+    .toolbar {
+      ToolbarItem(placement: self.menuPlacement) {
+        Menu {
+          Button(action: self.onPlayNext) {
+            Label("Play Next", systemImage: "text.line.first.and.arrowtriangle.forward")
+          }
+          .tint(.primary)
+
+          Button(action: self.onAddToQueue) {
+            Label("Add to Queue", systemImage: "text.badge.plus")
+          }
+          .tint(.primary)
+        } label: {
+          Label("Artist Actions", systemImage: "ellipsis")
+        }
+        .tint(.primary)
+        .disabled(self.topSongs.isEmpty)
+      }
+    }
+  }
+
+  private var menuPlacement: ToolbarItemPlacement {
+    #if os(iOS)
+      .topBarTrailing
+    #else
+      .automatic
+    #endif
   }
 }
 

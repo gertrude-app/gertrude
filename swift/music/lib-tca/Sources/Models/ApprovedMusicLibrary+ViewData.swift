@@ -45,6 +45,25 @@ extension ArtistTopSongData {
   }
 }
 
+extension PlaylistData {
+  init(playlist: MusicPlaylist) {
+    self.init(
+      id: playlist.id.rawValue.uuidString,
+      name: playlist.name,
+      entries: playlist.entries.map(PlaylistEntryData.init),
+    )
+  }
+}
+
+extension PlaylistEntryData {
+  init(entry: MusicPlaylistEntry) {
+    self.init(
+      id: entry.id.rawValue.uuidString,
+      track: TrackData(track: entry.track),
+    )
+  }
+}
+
 extension TrackData {
   init(track: ApprovedTrack) {
     self.init(

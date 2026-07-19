@@ -171,7 +171,27 @@ struct PlaybackSessionCacheClientTests {
   }
 
   @Test
+  func checkpointPersistsPlaylistSourcePerDuplicateOccurrence() {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let session = PlaybackFeature.Session(
+      playStatus: .paused,
+      queue: .init(items: [
+        playbackItem("duplicate").withPlaylistSource(firstSource),
+        playbackItem("duplicate").withPlaylistSource(secondSource),
+      ]),
+      progress: .init(elapsedTime: 42, duration: 180),
+    )
+
+    let checkpoint = PlaybackCheckpoint(session: session, sourceAlbumIDs: [:])
+
+    expectNoDifference(checkpoint.playlistSourceHints, [firstSource, secondSource])
+  }
+
+  @Test
   func existingCheckpointNormalizesToCurrentAndUpcomingItems() {
+    let currentSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let nextSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
     let checkpoint = PlaybackCheckpoint(
       songIDs: ["consumed", "current", "up-next"],
       currentIndex: 1,
@@ -181,6 +201,7 @@ struct PlaybackSessionCacheClientTests {
         .init(songID: "consumed", albumID: "album-consumed"),
         .init(songID: "current", albumID: "album-current"),
       ],
+      playlistSourceHints: [nil, currentSource, nextSource],
     )
 
     expectNoDifference(
@@ -193,6 +214,7 @@ struct PlaybackSessionCacheClientTests {
         sourceAlbumHints: [
           .init(songID: "current", albumID: "album-current"),
         ],
+        playlistSourceHints: [currentSource, nextSource],
       ),
     )
   }

@@ -4,6 +4,7 @@ import SwiftUI
 struct ArtistReleasesShelf: View {
   let releases: [ArtistReleaseData]
   let transitionNamespace: Namespace.ID?
+  let onReleaseAddToPlaylist: @MainActor @Sendable (String) -> Void
   let onReleaseAddToQueue: @MainActor @Sendable (String) -> Void
   let onReleasePlayNext: @MainActor @Sendable (String) -> Void
   let onReleaseTap: @MainActor @Sendable (String) -> Void
@@ -11,12 +12,14 @@ struct ArtistReleasesShelf: View {
   init(
     releases: [ArtistReleaseData],
     transitionNamespace: Namespace.ID?,
+    onReleaseAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void,
     onReleaseAddToQueue: @MainActor @escaping @Sendable (String) -> Void,
     onReleasePlayNext: @MainActor @escaping @Sendable (String) -> Void,
     onReleaseTap: @MainActor @escaping @Sendable (String) -> Void,
   ) {
     self.releases = releases.sortedByReleaseDateNewestFirst()
     self.transitionNamespace = transitionNamespace
+    self.onReleaseAddToPlaylist = onReleaseAddToPlaylist
     self.onReleaseAddToQueue = onReleaseAddToQueue
     self.onReleasePlayNext = onReleasePlayNext
     self.onReleaseTap = onReleaseTap
@@ -45,6 +48,7 @@ struct ArtistReleasesShelf: View {
               .playbackQueueContextMenu(
                 onPlayNext: { self.onReleasePlayNext(release.id) },
                 onAddToQueue: { self.onReleaseAddToQueue(release.id) },
+                onAddToPlaylist: { self.onReleaseAddToPlaylist(release.id) },
               )
             }
           }

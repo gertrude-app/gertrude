@@ -7,9 +7,11 @@ public struct AlbumDetailView: View {
   private let isLoading: Bool
   private let isLoadingTracks: Bool
   private let currentTrackID: String?
+  private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
   private let onPlayTap: @MainActor @Sendable () -> Void
+  private let onTrackAddToPlaylist: @MainActor @Sendable (String) -> Void
   private let onTrackAddToQueue: @MainActor @Sendable (String) -> Void
   private let onTrackPlayNext: @MainActor @Sendable (String) -> Void
   private let onTrackTap: @MainActor @Sendable (String) -> Void
@@ -21,9 +23,11 @@ public struct AlbumDetailView: View {
     isLoading: Bool = false,
     isLoadingTracks: Bool = false,
     currentTrackID: String? = nil,
+    onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
     onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
+    onTrackAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onTrackAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onTrackPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onTrackTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -33,9 +37,11 @@ public struct AlbumDetailView: View {
     self.isLoading = isLoading
     self.isLoadingTracks = isLoadingTracks
     self.currentTrackID = currentTrackID
+    self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
     self.onPlayTap = onPlayTap
+    self.onTrackAddToPlaylist = onTrackAddToPlaylist
     self.onTrackAddToQueue = onTrackAddToQueue
     self.onTrackPlayNext = onTrackPlayNext
     self.onTrackTap = onTrackTap
@@ -93,6 +99,7 @@ public struct AlbumDetailView: View {
             .playbackQueueContextMenu(
               onPlayNext: { self.onTrackPlayNext(row.track.id) },
               onAddToQueue: { self.onTrackAddToQueue(row.track.id) },
+              onAddToPlaylist: { self.onTrackAddToPlaylist(row.track.id) },
             )
             .swipeActions(edge: .trailing) {
               Button {
@@ -124,6 +131,38 @@ public struct AlbumDetailView: View {
     }
     .navigationTitle("")
     .detailNavigationBarBackground()
+    .toolbar {
+      ToolbarItem(placement: self.menuPlacement) {
+        Menu {
+          Button(action: self.onPlayNext) {
+            Label("Play Next", systemImage: "text.line.first.and.arrowtriangle.forward")
+          }
+          .tint(.primary)
+
+          Button(action: self.onAddToQueue) {
+            Label("Add to Queue", systemImage: "text.badge.plus")
+          }
+          .tint(.primary)
+
+          Button(action: self.onAddToPlaylist) {
+            Label("Add to Playlist", systemImage: "music.note.list")
+          }
+          .tint(.primary)
+        } label: {
+          Label("Album Actions", systemImage: "ellipsis")
+        }
+        .tint(.primary)
+        .disabled(self.rows.isEmpty)
+      }
+    }
+  }
+
+  private var menuPlacement: ToolbarItemPlacement {
+    #if os(iOS)
+      .topBarTrailing
+    #else
+      .automatic
+    #endif
   }
 
   @ViewBuilder
@@ -195,10 +234,6 @@ public struct AlbumDetailView: View {
       isLoading: self.isLoading,
       palette: self.album.artworkPalette,
       onTap: self.onPlayTap,
-    )
-    .playbackQueueContextMenu(
-      onPlayNext: self.onPlayNext,
-      onAddToQueue: self.onAddToQueue,
     )
   }
 

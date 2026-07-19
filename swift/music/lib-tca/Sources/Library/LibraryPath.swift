@@ -4,6 +4,7 @@ import ComposableArchitecture
 enum LibraryPath {
   case album(AlbumDetailFeature)
   case artist(ArtistDetailFeature)
+  case playlist(PlaylistDetailFeature)
 }
 
 extension LibraryPath.State: Equatable {}
@@ -20,9 +21,11 @@ struct ArtistDetailFeature {
     case addToQueueTapped
     case playButtonTapped
     case playNextTapped
+    case releaseAddToPlaylistTapped(ApprovedAlbum.ID)
     case releaseAddToQueueTapped(ApprovedAlbum.ID)
     case releasePlayNextTapped(ApprovedAlbum.ID)
     case releaseTapped(ApprovedAlbum.ID)
+    case topSongAddToPlaylistTapped(ApprovedTrack.ID)
     case topSongAddToQueueTapped(ApprovedTrack.ID)
     case topSongPlayNextTapped(ApprovedTrack.ID)
     case topSongTapped(ApprovedTrack.ID)

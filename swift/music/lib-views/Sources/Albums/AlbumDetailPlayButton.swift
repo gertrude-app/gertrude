@@ -6,10 +6,25 @@ struct AlbumDetailPlayButton: View {
   let isPlaying: Bool
   let isLoading: Bool
   let palette: ArtworkPalette?
+  let colorOverride: PlaybackButtonColors?
   let onTap: @MainActor @Sendable () -> Void
 
+  init(
+    isPlaying: Bool,
+    isLoading: Bool,
+    palette: ArtworkPalette?,
+    colorOverride: PlaybackButtonColors? = nil,
+    onTap: @MainActor @escaping @Sendable () -> Void,
+  ) {
+    self.isPlaying = isPlaying
+    self.isLoading = isLoading
+    self.palette = palette
+    self.colorOverride = colorOverride
+    self.onTap = onTap
+  }
+
   var body: some View {
-    let colors = PlaybackButtonColors(
+    let colors = self.colorOverride ?? PlaybackButtonColors(
       palette: self.palette,
       environment: self.environment,
     )

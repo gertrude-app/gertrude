@@ -2,11 +2,20 @@ import ComposableArchitecture
 import LibViews
 import SwiftUI
 
+#if canImport(UIKit)
+  import UIKit
+#endif
+
 public struct EntryPoint: View {
   private let store: AppStore
 
   public init(store: AppStore) {
     self.store = store
+    #if canImport(UIKit)
+      UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor(
+        Color.gertrudeBrandAccent,
+      )
+    #endif
   }
 
   public var body: some View {

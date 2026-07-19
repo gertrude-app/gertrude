@@ -4,6 +4,7 @@ struct ArtistTopSongsShelf: View {
   let songs: [ArtistTopSongData]
   let currentTrackID: String?
   let isPlaying: Bool
+  let onSongAddToPlaylist: @MainActor @Sendable (String) -> Void
   let onSongAddToQueue: @MainActor @Sendable (String) -> Void
   let onSongPlayNext: @MainActor @Sendable (String) -> Void
   let onSongTap: @MainActor @Sendable (String) -> Void
@@ -45,6 +46,7 @@ struct ArtistTopSongsShelf: View {
               .playbackQueueContextMenu(
                 onPlayNext: { self.onSongPlayNext(song.id) },
                 onAddToQueue: { self.onSongAddToQueue(song.id) },
+                onAddToPlaylist: { self.onSongAddToPlaylist(song.id) },
               )
             }
           }

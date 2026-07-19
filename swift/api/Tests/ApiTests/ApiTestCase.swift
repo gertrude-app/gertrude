@@ -111,6 +111,39 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
     )
   }
 
+  func claimedMusicInstall(for child: ChildEntities) async throws
+    -> (IOSDevice, MusicApp.Install) {
+    let device = try await self.db.create(IOSDevice(
+      id: .init(UUID()),
+      childId: child.model.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    try await self.createClaim(
+      .music,
+      device.id,
+      child.model.id,
+      code: Int.random(in: 100_000 ... 999_999),
+      claimedAt: .reference,
+    )
+    let install = try await self.db.create(
+      MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
+    )
+    return (device, install)
+  }
+
+  func musicContext(for child: ChildEntities) async throws -> MusicApp.InstallContext {
+    let (device, install) = try await self.claimedMusicInstall(for: child)
+    return MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+  }
+
   @discardableResult
   func createAutoIncludeKeychain() async throws -> (Keychain, Api.Key) {
     guard let autoIdStr = self.env.get("AUTO_INCLUDED_KEYCHAIN_ID"),

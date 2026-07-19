@@ -119,6 +119,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
   var elapsedTime: TimeInterval
   var durationFallback: TimeInterval?
   var sourceAlbumHints: [SourceAlbumHint]
+  var playlistSourceHints: [PlaylistPlaybackSource?]
 
   init(
     songIDs: [ApprovedTrack.ID],
@@ -126,6 +127,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     elapsedTime: TimeInterval,
     durationFallback: TimeInterval? = nil,
     sourceAlbumHints: [SourceAlbumHint] = [],
+    playlistSourceHints: [PlaylistPlaybackSource?]? = nil,
   ) {
     self.songIDs = songIDs
     self.currentIndex = currentIndex
@@ -134,6 +136,8 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       duration.isFinite && duration > 0 ? duration : nil
     }
     self.sourceAlbumHints = sourceAlbumHints
+    self.playlistSourceHints = playlistSourceHints
+      ?? Array(repeating: nil, count: songIDs.count)
   }
 
   init(
@@ -153,6 +157,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       elapsedTime: session.progress.elapsedTime,
       durationFallback: session.progress.duration,
       sourceAlbumHints: sourceAlbumHints,
+      playlistSourceHints: items.map(\.playlistSource),
     )
   }
 
@@ -173,6 +178,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       elapsedTime: legacySession.progress.elapsedTime,
       durationFallback: legacySession.progress.duration,
       sourceAlbumHints: sourceAlbumHints,
+      playlistSourceHints: items.map(\.playlistSource),
     )
   }
 
@@ -186,11 +192,14 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       elapsedTime: self.elapsedTime,
       durationFallback: self.durationFallback,
       sourceAlbumHints: self.sourceAlbumHints.filter { retainedSongIDs.contains($0.songID) },
+      playlistSourceHints: Array(self.playlistSourceHints.dropFirst(self.currentIndex)),
     )
   }
 
   var isValid: Bool {
-    !self.songIDs.isEmpty && self.songIDs.indices.contains(self.currentIndex)
+    !self.songIDs.isEmpty
+      && self.songIDs.indices.contains(self.currentIndex)
+      && self.playlistSourceHints.count == self.songIDs.count
   }
 
   var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] {

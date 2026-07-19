@@ -6,6 +6,7 @@ public struct AlbumCardView: View {
   private let album: AlbumData
   private let artworkSize: CGFloat
   private let transitionNamespace: Namespace.ID?
+  private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
   private let onTap: @MainActor @Sendable () -> Void
@@ -14,6 +15,7 @@ public struct AlbumCardView: View {
     album: AlbumData,
     artworkSize: CGFloat = 148,
     transitionNamespace: Namespace.ID? = nil,
+    onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
     onTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -21,6 +23,7 @@ public struct AlbumCardView: View {
     self.album = album
     self.artworkSize = artworkSize
     self.transitionNamespace = transitionNamespace
+    self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
     self.onTap = onTap
@@ -63,6 +66,7 @@ public struct AlbumCardView: View {
     .playbackQueueContextMenu(
       onPlayNext: self.onPlayNext,
       onAddToQueue: self.onAddToQueue,
+      onAddToPlaylist: self.onAddToPlaylist,
     )
     .accessibilityLabel("\(self.album.title), \(self.album.artist)")
   }

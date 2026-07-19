@@ -30,14 +30,17 @@ struct AlbumDetailFeature {
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
+      case addAlbumToPlaylist(ApprovedAlbum.ID)
       case addToQueue(items: [PlaybackItem])
       case dismissPlaybackFailure
       case playbackFailureActionTapped
       case playNow(items: [PlaybackItem], startIndex: Int)
       case playNext(items: [PlaybackItem])
       case togglePlayPause
+      case addTrackToPlaylist(trackID: ApprovedTrack.ID, albumID: ApprovedAlbum.ID)
     }
 
+    case addToPlaylistTapped
     case addToQueueTapped
     case delegate(DelegateAction)
     case onAppear
@@ -45,6 +48,7 @@ struct AlbumDetailFeature {
     case playbackFailureDismissed
     case playNextTapped
     case playTapped
+    case trackAddToPlaylistTapped(ApprovedTrack.ID)
     case trackAddToQueueTapped(ApprovedTrack.ID)
     case trackPlayNextTapped(ApprovedTrack.ID)
     case trackTapped(ApprovedTrack.ID)
@@ -53,6 +57,9 @@ struct AlbumDetailFeature {
   var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
+      case .addToPlaylistTapped:
+        return .send(.delegate(.addAlbumToPlaylist(state.album.id)))
+
       case .addToQueueTapped:
         guard !state.playbackItems.isEmpty else { return .none }
         return .send(.delegate(.addToQueue(items: state.playbackItems)))
@@ -72,6 +79,13 @@ struct AlbumDetailFeature {
         let items = state.playbackItems
         guard !items.isEmpty else { return .none }
         return .send(.delegate(.playNow(items: items, startIndex: 0)))
+
+      case .trackAddToPlaylistTapped(let trackID):
+        guard state.tracks.contains(where: { $0.id == trackID }) else { return .none }
+        return .send(.delegate(.addTrackToPlaylist(
+          trackID: trackID,
+          albumID: state.album.id,
+        )))
 
       case .trackAddToQueueTapped(let trackID):
         guard let item = state.playbackItems.first(where: { $0.id == trackID })

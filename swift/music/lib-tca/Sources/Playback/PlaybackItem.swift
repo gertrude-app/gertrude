@@ -1,6 +1,11 @@
 import Foundation
 import Tagged
 
+struct PlaylistPlaybackSource: Codable, Equatable, Sendable {
+  let playlistID: UUID
+  let entryID: UUID
+}
+
 struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
   let id: ApprovedTrack.ID
   let title: String
@@ -9,6 +14,7 @@ struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
   let albumID: ApprovedAlbum.ID?
   let albumTitle: String?
   let duration: TimeInterval?
+  let playlistSource: PlaylistPlaybackSource?
 
   init(
     id: ApprovedTrack.ID,
@@ -18,6 +24,7 @@ struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
     albumID: ApprovedAlbum.ID? = nil,
     albumTitle: String? = nil,
     duration: TimeInterval? = nil,
+    playlistSource: PlaylistPlaybackSource? = nil,
   ) {
     self.id = id
     self.title = title
@@ -26,6 +33,7 @@ struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
     self.albumID = albumID
     self.albumTitle = albumTitle
     self.duration = duration
+    self.playlistSource = playlistSource
   }
 
   init(
@@ -53,6 +61,20 @@ struct PlaybackItem: Codable, Equatable, Identifiable, Sendable {
       albumID: albumID,
       albumTitle: self.albumTitle,
       duration: self.duration,
+      playlistSource: self.playlistSource,
+    )
+  }
+
+  func withPlaylistSource(_ playlistSource: PlaylistPlaybackSource?) -> Self {
+    Self(
+      id: self.id,
+      title: self.title,
+      artistName: self.artistName,
+      artworkURL: self.artworkURL,
+      albumID: self.albumID,
+      albumTitle: self.albumTitle,
+      duration: self.duration,
+      playlistSource: playlistSource,
     )
   }
 }
@@ -92,4 +114,40 @@ struct PlaybackSnapshot: Equatable, Sendable {
     playStatus: .paused,
     progress: .zero,
   )
+}
+
+enum PlaybackSourceHintMatcher {
+  struct Occurrence: Equatable, Sendable {
+    var item: PlaybackItem
+    var retainedEntryID: PlaybackQueueEntry.ID?
+
+    init(item: PlaybackItem, retainedEntryID: PlaybackQueueEntry.ID? = nil) {
+      self.item = item
+      self.retainedEntryID = retainedEntryID
+    }
+  }
+
+  static func match(
+    plan: [Occurrence],
+    entries: [PlaybackQueueEntry],
+    existing: [PlaybackQueueEntry.ID: PlaylistPlaybackSource] = [:],
+  ) -> [PlaybackQueueEntry.ID: PlaylistPlaybackSource] {
+    let currentEntryIDs = Set(entries.map(\.id))
+    var matched = existing.filter { currentEntryIDs.contains($0.key) }
+    let entriesByID = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, $0) })
+
+    for occurrence in plan {
+      guard let retainedEntryID = occurrence.retainedEntryID,
+            let entry = entriesByID[retainedEntryID],
+            entry.item.id == occurrence.item.id else { continue }
+      matched[retainedEntryID] = occurrence.item.playlistSource
+    }
+
+    for (occurrence, entry) in zip(plan, entries) {
+      guard occurrence.item.id == entry.item.id else { break }
+      matched[entry.id] = occurrence.item.playlistSource
+    }
+
+    return matched
+  }
 }

@@ -131,6 +131,7 @@ extension Music {
     struct Content: Equatable, Sendable {
       var albums: [MusicLibrarySnapshot.Album]
       var artists: [MusicLibrarySnapshot.Artist]
+      var playlists: [MusicLibrarySnapshot.Playlist] = []
 
       func snapshot(revision: Int64, generatedAt: Date) -> MusicLibrarySnapshot {
         .init(
@@ -138,6 +139,7 @@ extension Music {
           generatedAt: generatedAt,
           albums: self.albums,
           artists: self.artists,
+          playlists: self.playlists,
         )
       }
     }
@@ -153,6 +155,7 @@ extension Music {
     static func compile(
       albumGrants: [AlbumGrant],
       artistGrants: [ArtistGrant],
+      playlists: [PlaylistRules.Playlist] = [],
     ) throws -> Content {
       let sortedAlbumGrants = albumGrants.sorted(by: self.albumGrantOrder)
       let sortedArtistGrants = artistGrants.sorted(by: self.artistGrantOrder)
@@ -230,7 +233,14 @@ extension Music {
         )
       }
 
-      return .init(albums: albums, artists: artists)
+      return .init(
+        albums: albums,
+        artists: artists,
+        playlists: PlaylistRules.compile(
+          playlists: playlists,
+          using: .init(albums: albums),
+        ),
+      )
     }
 
     private static func deduplicatedAlbumGrants(
@@ -392,5 +402,6 @@ extension MusicLibrarySnapshot {
     self.schemaVersion == Self.currentSchemaVersion
       && self.albums == content.albums
       && self.artists == content.artists
+      && self.playlists == content.playlists
   }
 }

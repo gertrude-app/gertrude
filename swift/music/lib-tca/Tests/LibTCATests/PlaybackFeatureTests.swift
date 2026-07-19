@@ -136,6 +136,202 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func playNowReconcilesPlaylistSourcesOntoMusicKitEntries() async {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let items = [
+      playbackItem("duplicate").withPlaylistSource(firstSource),
+      playbackItem("duplicate").withPlaylistSource(secondSource),
+    ]
+    let snapshot = playbackSnapshot(items: items.map { $0.withPlaylistSource(nil) })
+    let sourceHints = [
+      "entry-0": firstSource,
+      "entry-1": secondSource,
+    ]
+    let store = TestStore(initialState: PlaybackFeature.State()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.playNow = { _, _ in snapshot }
+    }
+
+    await store.send(.playNow(items: items, startIndex: 0)) {
+      $0.pendingPlayNowItems = items
+      $0.pendingPlaylistSourcePlan = items.map {
+        PlaybackSourceHintMatcher.Occurrence(item: $0)
+      }
+      $0.session = .init(
+        playStatus: .loading,
+        queue: .init(items: items),
+      )
+    }
+    await store.receive(.playNowFinished(snapshot)) {
+      $0.hasAuthoritativeSnapshot = true
+      $0.lastCachedProgressBucket = 0
+      $0.pendingPlayNowItems = nil
+      $0.pendingPlaylistSourcePlan = nil
+      $0.playlistSourceHints = sourceHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        playlistSourceHints: sourceHints,
+      )
+    }
+
+    expectNoDifference(store.state.session?.queue.items, items)
+  }
+
+  @Test
+  func progressiveSnapshotsRetainSourcePlanUntilAllOccurrencesMaterialize() async {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let sourcedItems = [
+      playbackItem("first").withPlaylistSource(firstSource),
+      playbackItem("second").withPlaylistSource(secondSource),
+    ]
+    let plan = sourcedItems.map {
+      PlaybackSourceHintMatcher.Occurrence(item: $0)
+    }
+    let firstSnapshot = playbackSnapshot(items: [playbackItem("first")])
+    let fullSnapshot = playbackSnapshot(items: [
+      playbackItem("first"),
+      playbackItem("second"),
+    ])
+    let firstHints = ["entry-0": firstSource]
+    let fullHints = [
+      "entry-0": firstSource,
+      "entry-1": secondSource,
+    ]
+    var state = PlaybackFeature.State()
+    state.pendingPlaylistSourcePlan = plan
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.snapshotChanged(firstSnapshot))) {
+      $0.hasAuthoritativeSnapshot = true
+      $0.lastCachedProgressBucket = 0
+      $0.playlistSourceHints = firstHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: firstSnapshot,
+        sourceAlbumIDs: [:],
+        playlistSourceHints: firstHints,
+      )
+    }
+    await store.send(.playbackEvent(.snapshotChanged(fullSnapshot))) {
+      $0.pendingPlaylistSourcePlan = nil
+      $0.playlistSourceHints = fullHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: fullSnapshot,
+        sourceAlbumIDs: [:],
+        playlistSourceHints: fullHints,
+      )
+    }
+  }
+
+  @Test
+  func playlistSourceMatcherAlignsDuplicateOccurrencesAndPreservedTail() {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let tailSource = PlaylistPlaybackSource(playlistID: UUID(4), entryID: UUID(5))
+    let plan = [
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("duplicate").withPlaylistSource(firstSource),
+      ),
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("duplicate").withPlaylistSource(secondSource),
+      ),
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("tail").withPlaylistSource(tailSource),
+        retainedEntryID: "old-tail",
+      ),
+    ]
+    let entries = [
+      PlaybackQueueEntry(id: "new-1", item: playbackItem("duplicate")),
+      PlaybackQueueEntry(id: "new-2", item: playbackItem("duplicate")),
+      PlaybackQueueEntry(id: "old-tail", item: playbackItem("tail")),
+    ]
+
+    let matched = PlaybackSourceHintMatcher.match(plan: plan, entries: entries)
+
+    expectNoDifference(matched, [
+      "new-1": firstSource,
+      "new-2": secondSource,
+      "old-tail": tailSource,
+    ])
+  }
+
+  @Test
+  func playlistSourceMatcherSupportsProgressiveMaterialization() {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let plan = [
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("first").withPlaylistSource(firstSource),
+      ),
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("second").withPlaylistSource(secondSource),
+      ),
+      PlaybackSourceHintMatcher.Occurrence(item: playbackItem("third")),
+    ]
+    let partialEntries = [
+      PlaybackQueueEntry(id: "new-1", item: playbackItem("first")),
+      PlaybackQueueEntry(id: "new-2", item: playbackItem("second")),
+    ]
+
+    let matched = PlaybackSourceHintMatcher.match(plan: plan, entries: partialEntries)
+
+    expectNoDifference(matched, [
+      "new-1": firstSource,
+      "new-2": secondSource,
+    ])
+  }
+
+  @Test
+  func playlistSourceMatcherPreservesEntryIdentityAcrossReorderAndRemove() {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let plan = [
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("first").withPlaylistSource(firstSource),
+        retainedEntryID: "entry-1",
+      ),
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("second").withPlaylistSource(secondSource),
+        retainedEntryID: "entry-2",
+      ),
+    ]
+    let reorderedEntries = [
+      PlaybackQueueEntry(id: "entry-2", item: playbackItem("second")),
+    ]
+
+    let matched = PlaybackSourceHintMatcher.match(
+      plan: plan,
+      entries: reorderedEntries,
+      existing: ["entry-1": firstSource, "entry-2": secondSource],
+    )
+
+    expectNoDifference(matched, ["entry-2": secondSource])
+  }
+
+  @Test
+  func playlistSourceMatcherDoesNotGuessForUnattributedDuplicateSong() {
+    let source = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let plan = [
+      PlaybackSourceHintMatcher.Occurrence(item: playbackItem("duplicate")),
+      PlaybackSourceHintMatcher.Occurrence(
+        item: playbackItem("duplicate").withPlaylistSource(source),
+      ),
+    ]
+    let entries = [
+      PlaybackQueueEntry(id: "only", item: playbackItem("duplicate")),
+    ]
+
+    let matched = PlaybackSourceHintMatcher.match(plan: plan, entries: entries)
+
+    expectNoDifference(matched, [:])
+  }
+
+  @Test
   func musicKitArtworkURLUsesWebFallbackWhenAvailable() {
     let webURL = URL(string: "https://example.com/album.jpg")!
     let libraryURL = URL(
@@ -1066,6 +1262,68 @@ struct PlaybackFeatureTests {
 
     let restoredCheckpoint = await recorder.checkpoint
     expectNoDifference(restoredCheckpoint, PlaybackCheckpoint.mock.activeQueue)
+  }
+
+  @Test
+  func restoreCachedSessionRealignsDuplicatePlaylistSources() async {
+    let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let checkpoint = PlaybackCheckpoint(
+      songIDs: ["duplicate", "duplicate"],
+      currentIndex: 0,
+      elapsedTime: 12,
+      playlistSourceHints: [firstSource, secondSource],
+    )
+    let snapshot = playbackSnapshot(
+      items: [playbackItem("duplicate"), playbackItem("duplicate")],
+      playStatus: .paused,
+    )
+    let sourceHints = [
+      "entry-0": firstSource,
+      "entry-1": secondSource,
+    ]
+    let store = TestStore(initialState: PlaybackFeature.State()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.restoreQueue = { _ in snapshot }
+      $0.playbackSessionCache._load = { checkpoint }
+    }
+
+    await store.send(.restoreCachedSession)
+    await store.receive(.checkpointLoaded(checkpoint)) {
+      $0.isRestoringCheckpoint = true
+      $0.pendingPlaylistSourcePlan = zip(
+        checkpoint.songIDs,
+        checkpoint.playlistSourceHints,
+      ).map { songID, source in
+        PlaybackSourceHintMatcher.Occurrence(item: PlaybackItem(
+          id: songID,
+          title: "",
+          artistName: "",
+          artworkURL: nil,
+          playlistSource: source,
+        ))
+      }
+    }
+    await store.receive(.checkpointRestorationFinished(snapshot)) {
+      $0.isRestoringCheckpoint = false
+    }
+    await store.receive(.playbackEvent(.snapshotChanged(snapshot))) {
+      $0.hasAuthoritativeSnapshot = true
+      $0.lastCachedProgressBucket = 0
+      $0.pendingPlaylistSourcePlan = nil
+      $0.playlistSourceHints = sourceHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        playlistSourceHints: sourceHints,
+      )
+    }
+
+    expectNoDifference(
+      store.state.session?.queue.items.map(\.playlistSource),
+      [firstSource, secondSource],
+    )
   }
 
   @Test

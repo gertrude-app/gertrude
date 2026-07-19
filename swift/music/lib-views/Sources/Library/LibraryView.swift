@@ -3,7 +3,7 @@ import SwiftUI
 
 public enum LibraryViewState: Equatable, Sendable {
   case loading
-  case loaded(albums: [AlbumData], artists: [ArtistData])
+  case loaded(items: [LibraryCollectionItemData])
   case empty
   case failed
   case subscriptionRequired
@@ -12,36 +12,63 @@ public enum LibraryViewState: Equatable, Sendable {
 public struct LibraryView: View {
   private let state: LibraryViewState
   private let isRefreshing: Bool
+  private let isPlaylistMutationInFlight: Bool
+  private let playlistMutationErrorMessage: String?
   private let transitionNamespace: Namespace.ID?
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onRefresh: @MainActor @Sendable () async -> Void
+  private let onAlbumAddToPlaylist: @MainActor @Sendable (String) -> Void
   private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
   private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
   private let onArtistTap: @MainActor @Sendable (String) -> Void
+  private let onCreatePlaylist: @MainActor @Sendable (String) -> Void
+  private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
+  private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
+  private let onPlaylistTap: @MainActor @Sendable (String) -> Void
+  private let onPlaylistMutationErrorDismissed: @MainActor @Sendable () -> Void
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
+
+  @State private var createPlaylistName = ""
+  @State private var isCreatePlaylistPromptPresented = false
 
   public init(
     state: LibraryViewState,
     isRefreshing: Bool = false,
+    isPlaylistMutationInFlight: Bool = false,
+    playlistMutationErrorMessage: String? = nil,
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onRefresh: @MainActor @escaping @Sendable () async -> Void = {},
+    onAlbumAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onCreatePlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistMutationErrorDismissed: @MainActor @escaping @Sendable () -> Void = {},
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.state = state
     self.isRefreshing = isRefreshing
+    self.isPlaylistMutationInFlight = isPlaylistMutationInFlight
+    self.playlistMutationErrorMessage = playlistMutationErrorMessage
     self.transitionNamespace = transitionNamespace
     self.onRetryTap = onRetryTap
     self.onRefresh = onRefresh
+    self.onAlbumAddToPlaylist = onAlbumAddToPlaylist
     self.onAlbumAddToQueue = onAlbumAddToQueue
     self.onAlbumPlayNext = onAlbumPlayNext
     self.onAlbumTap = onAlbumTap
     self.onArtistTap = onArtistTap
+    self.onCreatePlaylist = onCreatePlaylist
+    self.onPlaylistAddToQueue = onPlaylistAddToQueue
+    self.onPlaylistPlayNext = onPlaylistPlayNext
+    self.onPlaylistTap = onPlaylistTap
+    self.onPlaylistMutationErrorDismissed = onPlaylistMutationErrorDismissed
     self.onDebugResetTap = onDebugResetTap
   }
 
@@ -51,9 +78,12 @@ public struct LibraryView: View {
         .navigationTitle("Library")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-          if self.showsRefreshIndicator {
-            ToolbarItem(placement: .topBarTrailing) {
+          ToolbarItemGroup(placement: .topBarTrailing) {
+            if self.showsRefreshIndicator {
               self.refreshToolbarContent
+            }
+            if self.showsCreateButton {
+              self.createPlaylistButton
             }
           }
         }
@@ -61,9 +91,12 @@ public struct LibraryView: View {
       self.decoratedContent
         .navigationTitle("Library")
         .toolbar {
-          if self.showsRefreshIndicator {
-            ToolbarItem(placement: .automatic) {
+          ToolbarItemGroup(placement: .automatic) {
+            if self.showsRefreshIndicator {
               self.refreshToolbarContent
+            }
+            if self.showsCreateButton {
+              self.createPlaylistButton
             }
           }
         }
@@ -78,13 +111,79 @@ public struct LibraryView: View {
       .overlay(alignment: .top) {
         LibraryRefreshAtmosphere(isActive: self.isRefreshing)
       }
+      .alert("New Playlist", isPresented: self.$isCreatePlaylistPromptPresented) {
+        TextField("Playlist Name", text: self.$createPlaylistName)
+          .onSubmit(self.createPlaylistPromptSubmitted)
+        Button("Cancel", role: .cancel, action: self.createPlaylistPromptCancelled)
+          .tint(.primary)
+        Button("Create", action: self.createPlaylistPromptSubmitted)
+          .tint(.white)
+          .keyboardShortcut(.defaultAction)
+          .disabled(!self.createPlaylistName.isValidPlaylistName)
+      } message: {
+        Text("Enter a name for your playlist.")
+      }
+      .alert("Couldn’t Update Playlist", isPresented: self.playlistMutationErrorBinding) {
+        Button("OK", role: .cancel) {}
+      } message: {
+        Text(self.playlistMutationErrorMessage ?? "Please try again.")
+      }
+  }
+
+  private var playlistMutationErrorBinding: Binding<Bool> {
+    Binding(
+      get: { self.playlistMutationErrorMessage != nil },
+      set: { isPresented in
+        if !isPresented {
+          self.onPlaylistMutationErrorDismissed()
+        }
+      },
+    )
   }
 
   private var refreshToolbarContent: some View {
     ProgressView()
       .controlSize(.small)
+      .tint(.primary)
       .accessibilityLabel("Refreshing library")
       .allowsHitTesting(false)
+  }
+
+  @ViewBuilder
+  private var createPlaylistButton: some View {
+    if self.isPlaylistMutationInFlight {
+      ProgressView()
+        .controlSize(.small)
+        .tint(.primary)
+        .accessibilityLabel("Saving playlist")
+    } else {
+      Button {
+        self.createPlaylistName = ""
+        self.isCreatePlaylistPromptPresented = true
+      } label: {
+        Label("New Playlist", systemImage: "plus")
+      }
+      .tint(.primary)
+    }
+  }
+
+  private func createPlaylistPromptCancelled() {
+    self.isCreatePlaylistPromptPresented = false
+  }
+
+  private func createPlaylistPromptSubmitted() {
+    guard self.createPlaylistName.isValidPlaylistName else { return }
+    self.isCreatePlaylistPromptPresented = false
+    self.onCreatePlaylist(self.createPlaylistName)
+  }
+
+  private var showsCreateButton: Bool {
+    switch self.state {
+    case .loaded, .empty:
+      true
+    case .loading, .failed, .subscriptionRequired:
+      false
+    }
   }
 
   private var showsRefreshIndicator: Bool {
@@ -101,24 +200,27 @@ public struct LibraryView: View {
   private var content: some View {
     switch self.state {
     case .loading:
-      LibraryGridView(albums: [], isLoading: true)
+      LibraryGridView(items: [], isLoading: true)
 
-    case .loaded(let albums, let artists):
+    case .loaded(let items):
       LibraryGridView(
-        albums: albums,
-        artists: artists,
+        items: items,
         transitionNamespace: self.transitionNamespace,
+        onAlbumAddToPlaylist: self.onAlbumAddToPlaylist,
         onAlbumAddToQueue: self.onAlbumAddToQueue,
         onAlbumPlayNext: self.onAlbumPlayNext,
         onAlbumTap: self.onAlbumTap,
         onArtistTap: self.onArtistTap,
+        onPlaylistAddToQueue: self.onPlaylistAddToQueue,
+        onPlaylistPlayNext: self.onPlaylistPlayNext,
+        onPlaylistTap: self.onPlaylistTap,
         onDebugResetTap: self.onDebugResetTap,
       )
 
     case .empty:
       self.messageContent(
         title: "No music yet",
-        message: "Approved artists and albums will appear here after they’re added in Gertrude.",
+        message: "Approved artists, albums, and your playlists will appear here.",
         systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
@@ -174,19 +276,31 @@ public struct LibraryView: View {
 }
 
 #if DEBUG
+  private let previewLibraryViewItems =
+    [PlaylistData.previewRoadTrip].map(LibraryCollectionItemData.playlist)
+      + [ArtistData].previewArtists.map(LibraryCollectionItemData.artist)
+      + [AlbumData].previewAlbums.map(LibraryCollectionItemData.album)
+
   #Preview("Loaded") {
     NavigationStack {
       LibraryView(
-        state: .loaded(albums: .previewAlbums, artists: .previewArtists),
+        state: .loaded(items: previewLibraryViewItems),
         onDebugResetTap: {},
       )
     }
   }
 
+  #Preview("Loaded, Dark") {
+    NavigationStack {
+      LibraryView(state: .loaded(items: previewLibraryViewItems))
+    }
+    .preferredColorScheme(.dark)
+  }
+
   #Preview("Loaded, Refreshing") {
     NavigationStack {
       LibraryView(
-        state: .loaded(albums: .previewAlbums, artists: .previewArtists),
+        state: .loaded(items: previewLibraryViewItems),
         isRefreshing: true,
       )
     }
@@ -215,4 +329,5 @@ public struct LibraryView: View {
       LibraryView(state: .failed, onDebugResetTap: {})
     }
   }
+
 #endif

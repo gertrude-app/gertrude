@@ -888,7 +888,7 @@ private actor SimulatorPlaybackState {
     let checkpoint = checkpoint.activeQueue
     guard checkpoint.isValid, self.items.isEmpty else { return self.snapshot }
     let sourceAlbumIDs = checkpoint.sourceAlbumIDs
-    self.items = checkpoint.songIDs.map { songID in
+    self.items = checkpoint.songIDs.enumerated().map { index, songID in
       PlaybackItem(
         id: songID,
         title: "Track \(songID.rawValue)",
@@ -896,6 +896,7 @@ private actor SimulatorPlaybackState {
         artworkURL: nil,
         albumID: sourceAlbumIDs[songID],
         duration: checkpoint.durationFallback,
+        playlistSource: checkpoint.playlistSourceHints[index],
       )
     }
     self.currentIndex = checkpoint.currentIndex

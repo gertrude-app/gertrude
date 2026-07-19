@@ -3,7 +3,7 @@ title: Gertrude Music Privacy Policy
 description: Privacy policy for the Gertrude Music app.
 ---
 
-Last updated: _6/19/2026_
+Last updated: _7/18/2026_
 
 Gertrude Music is a music app managed by parents or guardians, who curate the set of songs
 and albums a child is allowed to play. We collect as little information as possible, and
@@ -28,9 +28,16 @@ approved library up to date, and fix bugs. This can include:
   iOS-provided identifier for Gertrude apps.
 - The connection token described above, used to request the approved music library for the
   linked child.
+- Playlist names and ordered song selections created in the app. Gertrude stores this
+  information only so playlists can sync across the child's devices and the child can
+  create, rename, reorder, and delete them.
 
-We use this information only to operate and improve Gertrude Music. It is not used for
-advertising.
+Library recency used to sort played and newly created collections stays on the device and
+is not sent to Gertrude. Playlist membership does not approve music; a song can play only
+while it is still part of the parent's approved library.
+
+We use the information sent to Gertrude only to operate and improve Gertrude Music. It is
+not used for advertising.
 
 ### Apple Music
 

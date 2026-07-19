@@ -25,12 +25,10 @@ extension Music {
         .first
     }
 
-    @discardableResult
-    static func publish(
-      childId: Child.Id,
-      generatedAt: Date,
+    static func catalogContent(
+      for childId: Child.Id,
       in db: any DuetSQL.Client,
-    ) async throws -> LibrarySnapshot {
+    ) async throws -> LibrarySnapshotCompiler.Content {
       let albumGrants = try await ApprovedAlbum.query()
         .where(.childId == childId)
         .orderBy(.createdAt, .asc)
@@ -54,10 +52,27 @@ extension Music {
             resolution: artist.resolution,
           )
         }
-      let content = try LibrarySnapshotCompiler.compile(
+      return try LibrarySnapshotCompiler.compile(
         albumGrants: albumGrants,
         artistGrants: artistGrants,
       )
+    }
+
+    @discardableResult
+    static func publish(
+      childId: Child.Id,
+      generatedAt: Date,
+      in db: any DuetSQL.Client,
+    ) async throws -> LibrarySnapshot {
+      var content = try await self.catalogContent(for: childId, in: db)
+      let index = PlaylistRules.EffectiveTrackIndex(albums: content.albums)
+      let playlists = try await PlaylistRepository.reconcileForPublication(
+        childId: childId,
+        using: index,
+        at: generatedAt,
+        in: db,
+      )
+      content.playlists = PlaylistRules.compile(playlists: playlists, using: index)
       let existing = try await self.snapshot(for: childId, in: db)
       if let existing,
          existing.revision == existing.payload.revision,

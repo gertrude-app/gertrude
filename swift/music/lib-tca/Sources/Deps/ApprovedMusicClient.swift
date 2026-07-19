@@ -6,13 +6,47 @@ import PairQL
 
 @DependencyClient
 struct ApprovedMusicClient: Sendable {
-  var loadRemoteApprovedLibrary: @Sendable () async throws -> ApprovedMusicLibrary
+  var addToPlaylist:
+    @Sendable (_ input: AddToMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var createPlaylist:
+    @Sendable (_ input: CreateMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var deletePlaylist:
+    @Sendable (_ input: DeleteMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var loadCachedApprovedLibrary: @Sendable () async -> ApprovedMusicLibrary?
+  var loadRemoteApprovedLibrary: @Sendable () async throws -> ApprovedMusicLibrary
+  var removePlaylistEntry:
+    @Sendable (_ input: RemoveMusicPlaylistEntry.Input) async throws -> MusicPlaylistMutationResult
+  var renamePlaylist:
+    @Sendable (_ input: RenameMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var reorderPlaylistEntries:
+    @Sendable (_ input: ReorderMusicPlaylistEntries.Input) async throws
+    -> MusicPlaylistMutationResult
 }
 
 extension ApprovedMusicClient: DependencyKey {
   static var liveValue: Self {
     Self(
+      addToPlaylist: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.addToMusicPlaylist(token, input)
+        }
+      },
+      createPlaylist: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.createMusicPlaylist(token, input)
+        }
+      },
+      deletePlaylist: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.deleteMusicPlaylist(token, input)
+        }
+      },
+      loadCachedApprovedLibrary: {
+        @Dependency(\.approvedMusicLibraryCache) var cache
+        @Dependency(\.keychain) var keychain
+        guard let connection = keychain.loadConnection() else { return nil }
+        return try? await cache.load(childId: connection.childId)
+      },
       loadRemoteApprovedLibrary: {
         @Dependency(\.api) var api
         @Dependency(\.approvedMusicLibraryCache) var cache
@@ -33,34 +67,31 @@ extension ApprovedMusicClient: DependencyKey {
             }
             return cached
           case .snapshot(let snapshot):
-            guard snapshot.schemaVersion == MusicLibrarySnapshot.currentSchemaVersion else {
-              throw ApprovedMusicClientError.unsupportedSchema(snapshot.schemaVersion)
-            }
-            guard snapshot.revision >= 0 else {
-              throw ApprovedMusicClientError.invalidRevision
-            }
-            let library = ApprovedMusicLibrary(remote: snapshot)
-            guard library.hasCompleteSnapshot else {
-              throw ApprovedMusicClientError.incompleteSnapshot
-            }
-            if let cached, snapshot.revision <= cached.revision {
-              guard snapshot.revision == cached.revision else {
-                throw ApprovedMusicClientError.staleSnapshot
-              }
-              return cached
-            }
-            try? await cache.save(library, childId: connection.childId)
-            return library
+            return try await receiveSnapshot(
+              snapshot,
+              cached: cached,
+              childId: connection.childId,
+              cache: cache,
+            )
           }
         } catch let error as PqlError where error.type == .paymentRequired {
           throw ApprovedMusicClientError.subscriptionRequired
         }
       },
-      loadCachedApprovedLibrary: {
-        @Dependency(\.approvedMusicLibraryCache) var cache
-        @Dependency(\.keychain) var keychain
-        guard let connection = keychain.loadConnection() else { return nil }
-        return try? await cache.load(childId: connection.childId)
+      removePlaylistEntry: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.removeMusicPlaylistEntry(token, input)
+        }
+      },
+      renamePlaylist: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.renameMusicPlaylist(token, input)
+        }
+      },
+      reorderPlaylistEntries: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.reorderMusicPlaylistEntries(token, input)
+        }
       },
     )
   }
@@ -76,15 +107,113 @@ extension DependencyValues {
 extension ApprovedMusicClient {
   #if DEBUG
     static let mock = Self(
-      loadRemoteApprovedLibrary: { .mock },
+      addToPlaylist: { _ in .updated(.mock) },
+      createPlaylist: { _ in .updated(.mock) },
+      deletePlaylist: { _ in .updated(.mock) },
       loadCachedApprovedLibrary: { .mock },
+      loadRemoteApprovedLibrary: { .mock },
+      removePlaylistEntry: { _ in .updated(.mock) },
+      renamePlaylist: { _ in .updated(.mock) },
+      reorderPlaylistEntries: { _ in .updated(.mock) },
     )
   #endif
 
   static let empty = Self(
-    loadRemoteApprovedLibrary: { .empty },
+    addToPlaylist: { _ in .updated(.empty) },
+    createPlaylist: { _ in .updated(.empty) },
+    deletePlaylist: { _ in .updated(.empty) },
     loadCachedApprovedLibrary: { .empty },
+    loadRemoteApprovedLibrary: { .empty },
+    removePlaylistEntry: { _ in .updated(.empty) },
+    renamePlaylist: { _ in .updated(.empty) },
+    reorderPlaylistEntries: { _ in .updated(.empty) },
   )
+}
+
+enum MusicPlaylistMutationResult: Equatable, Sendable {
+  case updated(ApprovedMusicLibrary)
+  case duplicateConfirmationRequired(
+    library: ApprovedMusicLibrary,
+    confirmation: MusicPlaylistDuplicateConfirmation,
+  )
+  case conflict(ApprovedMusicLibrary)
+}
+
+private func performPlaylistMutation(
+  _ operation: @escaping @Sendable (ApiClient, UUID) async throws -> MusicPlaylistMutationOutput,
+) async throws -> MusicPlaylistMutationResult {
+  @Dependency(\.api) var api
+  @Dependency(\.approvedMusicLibraryCache) var cache
+  @Dependency(\.keychain) var keychain
+  guard let connection = keychain.loadConnection() else {
+    throw ApprovedMusicClientError.missingConnection
+  }
+  do {
+    let output = try await operation(api, connection.token)
+    let cached = try? await cache.load(childId: connection.childId)
+    switch output {
+    case .updated(let snapshot):
+      let library = try await receiveSnapshot(
+        snapshot,
+        cached: cached,
+        childId: connection.childId,
+        cache: cache,
+      )
+      return .updated(library)
+    case .duplicateConfirmationRequired(let snapshot, let confirmation):
+      let library = try await receiveSnapshot(
+        snapshot,
+        cached: cached,
+        childId: connection.childId,
+        cache: cache,
+      )
+      return .duplicateConfirmationRequired(
+        library: library,
+        confirmation: confirmation,
+      )
+    case .conflict(let snapshot):
+      let library = try await receiveSnapshot(
+        snapshot,
+        cached: cached,
+        childId: connection.childId,
+        cache: cache,
+      )
+      return .conflict(library)
+    }
+  } catch let error as PqlError where error.type == .paymentRequired {
+    throw ApprovedMusicClientError.subscriptionRequired
+  }
+}
+
+private func receiveSnapshot(
+  _ snapshot: MusicLibrarySnapshot,
+  cached: ApprovedMusicLibrary?,
+  childId: UUID,
+  cache: ApprovedMusicLibraryCacheClient,
+) async throws -> ApprovedMusicLibrary {
+  guard snapshot.schemaVersion == MusicLibrarySnapshot.currentSchemaVersion else {
+    throw ApprovedMusicClientError.unsupportedSchema(snapshot.schemaVersion)
+  }
+  guard snapshot.revision >= 0 else {
+    throw ApprovedMusicClientError.invalidRevision
+  }
+  let library = ApprovedMusicLibrary(remote: snapshot)
+  guard library.hasCompleteSnapshot else {
+    throw ApprovedMusicClientError.incompleteSnapshot
+  }
+  if let cached {
+    guard snapshot.revision >= cached.revision else {
+      throw ApprovedMusicClientError.staleSnapshot
+    }
+    if snapshot.revision == cached.revision {
+      guard library == cached else {
+        throw ApprovedMusicClientError.inconsistentSnapshot
+      }
+      return cached
+    }
+  }
+  try? await cache.save(library, childId: childId)
+  return library
 }
 
 private extension ApprovedMusicLibrary {
@@ -95,6 +224,7 @@ private extension ApprovedMusicLibrary {
       generatedAt: snapshot.generatedAt,
       albums: snapshot.albums.map(ApprovedAlbum.init),
       artists: snapshot.artists.map(ApprovedArtist.init),
+      playlists: snapshot.playlists.map(MusicPlaylist.init),
     )
   }
 }
@@ -126,6 +256,28 @@ private extension ApprovedArtist {
       releaseAlbumIds: artist.releaseAlbumIds.map(ApprovedAlbum.ID.init(rawValue:)),
       topSongs: artist.topSongs.map(ApprovedTrack.init),
       addedAt: artist.addedAt,
+    )
+  }
+}
+
+private extension MusicPlaylist {
+  init(remote playlist: MusicLibrarySnapshot.Playlist) {
+    self.init(
+      id: .init(rawValue: playlist.id),
+      name: playlist.name,
+      revision: playlist.revision,
+      createdAt: playlist.createdAt,
+      updatedAt: playlist.updatedAt,
+      entries: playlist.entries.map(MusicPlaylistEntry.init),
+    )
+  }
+}
+
+private extension MusicPlaylistEntry {
+  init(remote entry: MusicLibrarySnapshot.Playlist.Entry) {
+    self.init(
+      id: .init(rawValue: entry.id),
+      track: .init(remote: entry.track),
     )
   }
 }
@@ -206,6 +358,7 @@ private extension MusicLibrarySnapshot.Track {
 
 enum ApprovedMusicClientError: Error {
   case incompleteSnapshot
+  case inconsistentSnapshot
   case invalidRevision
   case invalidUnchangedRevision
   case missingConnection

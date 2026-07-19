@@ -44,7 +44,7 @@ extension ApprovedMusicLibraryCacheClient {
   static func live(directory: URL) -> Self {
     let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
       directory: directory,
-      version: 3,
+      version: 2,
       isValid: { $0.hasCompleteSnapshot },
     )
     return Self(

@@ -4,6 +4,11 @@ struct PlaybackButtonColors {
   let background: Color
   let foreground: Color
 
+  init(background: Color, foreground: Color) {
+    self.background = background
+    self.foreground = foreground
+  }
+
   init(
     palette: ArtworkPalette?,
     environment: EnvironmentValues,

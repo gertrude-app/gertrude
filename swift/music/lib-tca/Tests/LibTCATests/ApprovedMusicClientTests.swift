@@ -17,7 +17,7 @@ struct ApprovedMusicClientTests {
     decoder.dateDecodingStrategy = .iso8601
     let remoteLibrary = try decoder.decode(
       MusicLibrarySnapshot.self,
-      from: Data(v3ApprovedMusicLibraryJSON.utf8),
+      from: Data(v2ApprovedMusicLibraryJSON.utf8),
     )
 
     let library = try await withDependencies {
@@ -42,6 +42,75 @@ struct ApprovedMusicClientTests {
     expectNoDifference(savedWrites, [
       .init(library: approvedMusicLibrary, childId: approvedMusicClientConnection.childId),
     ])
+  }
+
+  @Test
+  func liveClientCachesSuccessfulPlaylistMutation() async throws {
+    let writes = SavedCacheWrites()
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    var changedRemote = remoteApprovedMusicLibrary
+    changedRemote.revision = 8
+    let remote = changedRemote
+    var expected = approvedMusicLibrary
+    expected.revision = 8
+
+    let result = try await withDependencies {
+      $0.api.createMusicPlaylist = { token, input in
+        #expect(token == approvedMusicClientConnection.token)
+        #expect(input == .init(name: "New Playlist"))
+        return .updated(remote)
+      }
+      $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+      $0.approvedMusicLibraryCache._save = { library, childId in
+        await writes.append(library: library, childId: childId)
+      }
+      $0.keychain._load = { key in
+        key == .connection ? connectionData : nil
+      }
+    } operation: {
+      try await ApprovedMusicClient.liveValue.createPlaylist(.init(name: "New Playlist"))
+    }
+
+    let savedWrites = await writes.all()
+    expectNoDifference(result, .updated(expected))
+    expectNoDifference(savedWrites, [
+      .init(library: expected, childId: approvedMusicClientConnection.childId),
+    ])
+  }
+
+  @Test
+  func liveClientMapsDuplicateConfirmationWithAuthoritativeLibrary() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    let confirmation = MusicPlaylistDuplicateConfirmation.track(
+      playlistId: UUID(3),
+      duplicate: .init(trackId: "track-1", title: "Library Track", existingCount: 1),
+    )
+
+    let result = try await withDependencies {
+      $0.api.addToMusicPlaylist = { _, _ in
+        .duplicateConfirmationRequired(
+          snapshot: remoteApprovedMusicLibrary,
+          confirmation: confirmation,
+        )
+      }
+      $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+      $0.keychain._load = { key in
+        key == .connection ? connectionData : nil
+      }
+    } operation: {
+      try await ApprovedMusicClient.liveValue.addToPlaylist(.init(
+        playlistId: UUID(3),
+        source: .track(trackId: "track-1", albumId: "album-1"),
+      ))
+    }
+
+    expectNoDifference(
+      result,
+      .duplicateConfirmationRequired(
+        library: approvedMusicLibrary,
+        confirmation: confirmation,
+      ),
+    )
   }
 
   @Test
@@ -340,10 +409,33 @@ private let remoteApprovedMusicLibrary = MusicLibrarySnapshot(
       addedAt: snapshotDate,
     ),
   ],
+  playlists: [
+    .init(
+      id: UUID(3),
+      name: "Favorites",
+      revision: 2,
+      createdAt: snapshotDate,
+      updatedAt: snapshotDate,
+      entries: [
+        .init(
+          id: UUID(4),
+          track: .init(
+            id: "track-1",
+            title: "Library Track",
+            artistName: "Track Artist",
+            albumId: "album-1",
+            albumTitle: "Library Album",
+            artworkUrl: "https://example.com/track.jpg",
+            durationInMillis: 180_000,
+          ),
+        ),
+      ],
+    ),
+  ],
 )
 
 private let approvedMusicLibrary = ApprovedMusicLibrary(
-  schemaVersion: 3,
+  schemaVersion: 2,
   revision: 7,
   generatedAt: snapshotDate,
   albums: [
@@ -418,11 +510,34 @@ private let approvedMusicLibrary = ApprovedMusicLibrary(
       addedAt: snapshotDate,
     ),
   ],
+  playlists: [
+    .init(
+      id: .init(rawValue: UUID(3)),
+      name: "Favorites",
+      revision: 2,
+      createdAt: snapshotDate,
+      updatedAt: snapshotDate,
+      entries: [
+        .init(
+          id: .init(rawValue: UUID(4)),
+          track: .init(
+            id: "track-1",
+            title: "Library Track",
+            artistName: "Track Artist",
+            albumID: "album-1",
+            albumTitle: "Library Album",
+            artworkURL: URL(string: "https://example.com/track.jpg"),
+            durationInMillis: 180_000,
+          ),
+        ),
+      ],
+    ),
+  ],
 )
 
-private let v3ApprovedMusicLibraryJSON = #"""
+private let v2ApprovedMusicLibraryJSON = #"""
 {
-  "schemaVersion": 3,
+  "schemaVersion": 2,
   "revision": 7,
   "generatedAt": "1970-01-01T00:16:40Z",
   "albums": [
@@ -492,6 +607,29 @@ private let v3ApprovedMusicLibraryJSON = #"""
         "durationInMillis": 200000
       }],
       "addedAt": "1970-01-01T00:16:40Z"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "00000000-0000-0000-0000-000000000003",
+      "name": "Favorites",
+      "revision": 2,
+      "createdAt": "1970-01-01T00:16:40Z",
+      "updatedAt": "1970-01-01T00:16:40Z",
+      "entries": [
+        {
+          "id": "00000000-0000-0000-0000-000000000004",
+          "track": {
+            "id": "track-1",
+            "title": "Library Track",
+            "artistName": "Track Artist",
+            "albumId": "album-1",
+            "albumTitle": "Library Album",
+            "artworkUrl": "https://example.com/track.jpg",
+            "durationInMillis": 180000
+          }
+        }
+      ]
     }
   ]
 }

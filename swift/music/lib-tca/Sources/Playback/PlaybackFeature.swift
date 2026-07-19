@@ -77,6 +77,8 @@ struct PlaybackFeature: Sendable {
     var lastCachedProgressBucket: Int?
     var pendingAlbumResolutionSongID: ApprovedTrack.ID?
     var pendingPlayNowItems: [PlaybackItem]?
+    var pendingPlaylistSourcePlan: [PlaybackSourceHintMatcher.Occurrence]?
+    var playlistSourceHints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource] = [:]
     var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] = [:]
   }
 
@@ -161,11 +163,16 @@ struct PlaybackFeature: Sendable {
     init?(
       snapshot: PlaybackSnapshot,
       sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID],
+      playlistSourceHints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource] = [:],
     ) {
       let entries = snapshot.entries.map { entry in
         PlaybackQueueEntry(
           id: entry.id,
-          item: entry.item.withAlbumID(sourceAlbumIDs[entry.item.id]),
+          item: entry.item
+            .withAlbumID(sourceAlbumIDs[entry.item.id])
+            .withPlaylistSource(
+              playlistSourceHints[entry.id] ?? entry.item.playlistSource,
+            ),
         )
       }
       guard let queue = Queue(
@@ -238,6 +245,7 @@ struct PlaybackFeature: Sendable {
         state.isRestoringCheckpoint = true
         state.lastCachedProgressBucket = nil
         state.sourceAlbumIDs.merge(checkpoint.sourceAlbumIDs) { _, new in new }
+        state.preparePlaylistSourcePlan(checkpoint: checkpoint)
         return .run { send in
           do {
             let snapshot = try await self.playback.restoreQueue(checkpoint)
@@ -260,8 +268,12 @@ struct PlaybackFeature: Sendable {
         return .send(.playbackEvent(.snapshotChanged(snapshot)))
 
       case .clearUpcomingButtonTapped:
-        guard state.session?.queue.upcomingEntries.isEmpty == false else { return .none }
+        guard let queue = state.session?.queue,
+              !queue.upcomingEntries.isEmpty else { return .none }
         state.pendingPlayNowItems = nil
+        state.preparePlaylistSourcePlan(
+          entries: Array(queue.entries.prefix(queue.currentIndex + 1)),
+        )
         return .run { send in
           do {
             let snapshot = try await self.playback.clearUpcoming()
@@ -291,6 +303,8 @@ struct PlaybackFeature: Sendable {
         state.lastCachedProgressBucket = nil
         state.pendingAlbumResolutionSongID = nil
         state.pendingPlayNowItems = nil
+        state.pendingPlaylistSourcePlan = nil
+        state.playlistSourceHints.removeAll()
         state.session = nil
         state.sourceAlbumIDs.removeAll()
         return .merge(
@@ -318,10 +332,15 @@ struct PlaybackFeature: Sendable {
       case .playNow(let items, let startIndex):
         guard items.indices.contains(startIndex) else { return .none }
         let requestedItems = Array(items[startIndex...])
-        let existingUpcomingItems = state.hasAuthoritativeSnapshot
-          ? state.session?.queue.upcomingItems ?? []
+        let existingUpcomingEntries = state.hasAuthoritativeSnapshot
+          ? state.session?.queue.upcomingEntries ?? []
           : []
+        let existingUpcomingItems = existingUpcomingEntries.map(\.item)
         let composedItems = requestedItems + existingUpcomingItems
+        state.preparePlaylistSourcePlan(
+          newItems: requestedItems,
+          retainedEntries: existingUpcomingEntries,
+        )
         state.failure = nil
         state.hasAuthoritativeSnapshot = false
         state.isRestoringCheckpoint = false
@@ -370,9 +389,12 @@ struct PlaybackFeature: Sendable {
         )
 
       case .queueEntryRemoveRequested(let entryID):
-        guard state.session?.queue.upcomingEntries.contains(where: { $0.id == entryID }) == true
-        else { return .none }
+        guard let queue = state.session?.queue,
+              queue.upcomingEntries.contains(where: { $0.id == entryID }) else { return .none }
         state.pendingPlayNowItems = nil
+        state.preparePlaylistSourcePlan(
+          entries: queue.entries.filter { $0.id != entryID },
+        )
         return .run { send in
           do {
             let snapshot = try await self.playback.removeQueueEntry(entryID)
@@ -393,6 +415,13 @@ struct PlaybackFeature: Sendable {
           return .none
         }
         state.pendingPlayNowItems = nil
+        let upcomingByID = Dictionary(
+          uniqueKeysWithValues: session.queue.upcomingEntries.map { ($0.id, $0) },
+        )
+        state.preparePlaylistSourcePlan(
+          entries: Array(session.queue.entries.prefix(session.queue.currentIndex + 1))
+            + entryIDs.compactMap { upcomingByID[$0] },
+        )
         return .run { send in
           do {
             let snapshot = try await self.playback.reorderUpcoming(entryIDs)
@@ -473,6 +502,7 @@ struct PlaybackFeature: Sendable {
       case .playbackFailed(let failure):
         state.failure = failure
         state.pendingPlayNowItems = nil
+        state.pendingPlaylistSourcePlan = nil
         state.pauseSession()
         log(
           failure.eventLevel,
@@ -499,9 +529,24 @@ struct PlaybackFeature: Sendable {
     _ snapshot: PlaybackSnapshot,
     state: inout State,
   ) -> EffectOf<Self> {
+    state.recordPlaylistSources(entries: state.session?.queue.entries ?? [])
+    state.recordPlaylistSources(entries: snapshot.entries)
+    let sourcePlan = state.pendingPlaylistSourcePlan ?? []
+    state.playlistSourceHints = PlaybackSourceHintMatcher.match(
+      plan: sourcePlan,
+      entries: snapshot.entries,
+      existing: state.playlistSourceHints,
+    )
+    if Self.hasMatchedAllPlaylistSources(
+      in: sourcePlan,
+      hints: state.playlistSourceHints,
+    ) {
+      state.pendingPlaylistSourcePlan = nil
+    }
     guard var session = Session(
       snapshot: snapshot,
       sourceAlbumIDs: state.sourceAlbumIDs,
+      playlistSourceHints: state.playlistSourceHints,
     ) else { return .none }
     let previousSession = state.session
     if previousSession?.isLoading == true, session.playStatus == .paused {
@@ -520,12 +565,42 @@ struct PlaybackFeature: Sendable {
     return self.saveCheckpoint(state)
   }
 
+  private static func hasMatchedAllPlaylistSources(
+    in plan: [PlaybackSourceHintMatcher.Occurrence],
+    hints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource],
+  ) -> Bool {
+    var remaining = plan.compactMap(\.item.playlistSource)
+    for hint in hints.values {
+      if let index = remaining.firstIndex(of: hint) {
+        remaining.remove(at: index)
+      }
+    }
+    return remaining.isEmpty
+  }
+
   private func insertIntoQueue(
     _ items: [PlaybackItem],
     position: PlaybackQueueInsertionPosition,
     state: inout State,
   ) -> EffectOf<Self> {
     guard !items.isEmpty else { return .none }
+    if let queue = state.session?.queue {
+      switch position {
+      case .next:
+        state.preparePlaylistSourcePlan(
+          prefixEntries: Array(queue.entries.prefix(queue.currentIndex + 1)),
+          newItems: items,
+          suffixEntries: Array(queue.entries.dropFirst(queue.currentIndex + 1)),
+        )
+      case .tail:
+        state.preparePlaylistSourcePlan(
+          prefixEntries: queue.entries,
+          newItems: items,
+        )
+      }
+    } else {
+      state.preparePlaylistSourcePlan(newItems: items)
+    }
     state.failure = nil
     state.isRestoringCheckpoint = false
     state.pendingPlayNowItems = nil
@@ -586,6 +661,83 @@ extension PlaybackFeature.State {
     guard var session = self.session else { return }
     session.progress = progress
     self.session = session
+  }
+
+  mutating func recordPlaylistSources(entries: [PlaybackQueueEntry]) {
+    for entry in entries {
+      if let source = entry.item.playlistSource {
+        self.playlistSourceHints[entry.id] = source
+      }
+    }
+  }
+
+  mutating func preparePlaylistSourcePlan(checkpoint: PlaybackCheckpoint) {
+    let plan = zip(
+      checkpoint.songIDs,
+      checkpoint.playlistSourceHints,
+    ).map { songID, source in
+      PlaybackSourceHintMatcher.Occurrence(item: PlaybackItem(
+        id: songID,
+        title: "",
+        artistName: "",
+        artworkURL: nil,
+        playlistSource: source,
+      ))
+    }
+    self.setPendingPlaylistSourcePlan(plan)
+  }
+
+  mutating func preparePlaylistSourcePlan(entries: [PlaybackQueueEntry]) {
+    self.recordPlaylistSources(entries: entries)
+    self.setPendingPlaylistSourcePlan(entries.map {
+      PlaybackSourceHintMatcher.Occurrence(
+        item: $0.item,
+        retainedEntryID: $0.id,
+      )
+    })
+  }
+
+  mutating func preparePlaylistSourcePlan(
+    newItems: [PlaybackItem],
+    retainedEntries: [PlaybackQueueEntry] = [],
+  ) {
+    self.preparePlaylistSourcePlan(
+      prefixEntries: [],
+      newItems: newItems,
+      suffixEntries: retainedEntries,
+    )
+  }
+
+  mutating func preparePlaylistSourcePlan(
+    prefixEntries: [PlaybackQueueEntry],
+    newItems: [PlaybackItem],
+    suffixEntries: [PlaybackQueueEntry] = [],
+  ) {
+    let retainedEntries = prefixEntries + suffixEntries
+    self.recordPlaylistSources(entries: retainedEntries)
+    let plan = prefixEntries.map {
+      PlaybackSourceHintMatcher.Occurrence(
+        item: $0.item,
+        retainedEntryID: $0.id,
+      )
+    } + newItems.map {
+      PlaybackSourceHintMatcher.Occurrence(item: $0)
+    } + suffixEntries.map {
+      PlaybackSourceHintMatcher.Occurrence(
+        item: $0.item,
+        retainedEntryID: $0.id,
+      )
+    }
+    self.setPendingPlaylistSourcePlan(plan)
+  }
+
+  private mutating func setPendingPlaylistSourcePlan(
+    _ plan: [PlaybackSourceHintMatcher.Occurrence],
+  ) {
+    self.pendingPlaylistSourcePlan = self.playlistSourceHints.isEmpty
+      && plan.allSatisfy { $0.item.playlistSource == nil }
+      ? nil
+      : plan
   }
 
   mutating func recordSourceAlbums(_ items: [PlaybackItem]) {

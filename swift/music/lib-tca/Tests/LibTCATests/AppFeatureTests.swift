@@ -307,6 +307,7 @@ struct AppFeatureTests {
       playbackItem("track-3"),
     ]
     let requestedItems = Array(items.dropFirst())
+    let origin = LibraryCollectionIdentity(kind: .album, id: "album")
     let snapshot = playbackSnapshot(items: requestedItems)
     let store = TestStore(initialState: .init()) {
       AppFeature()
@@ -314,7 +315,13 @@ struct AppFeatureTests {
       $0.playback.playNow = { _, _ in snapshot }
     }
 
-    await store.send(.library(.delegate(.playNow(items: items, startIndex: 1))))
+    await store.send(.library(.delegate(.playNow(
+      items: items,
+      startIndex: 1,
+      origin: origin,
+    )))) {
+      $0.pendingLibraryPlayNowOrigin = origin
+    }
     await store.receive(.playback(.playNow(items: items, startIndex: 1))) {
       $0.playback.pendingPlayNowItems = requestedItems
       $0.playback.session = .init(
@@ -323,11 +330,13 @@ struct AppFeatureTests {
       )
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
+      $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
       $0.playback.pendingPlayNowItems = nil
       $0.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
     }
+    await store.receive(.library(.collectionPlayNowSucceeded(origin)))
   }
 
   @Test
@@ -335,6 +344,7 @@ struct AppFeatureTests {
     let oldItems = [playbackItem("old-track"), playbackItem("old-next")]
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let composedItems = items + [oldItems[1]]
+    let origin = LibraryCollectionIdentity(kind: .artist, id: "artist")
     let snapshot = playbackSnapshot(items: composedItems)
     var state = AppFeature.State()
     state.playback.hasAuthoritativeSnapshot = true
@@ -345,7 +355,12 @@ struct AppFeatureTests {
       $0.playback.playNow = { _, _ in snapshot }
     }
 
-    await store.send(.library(.delegate(.artistPlaybackButtonTapped(items: items))))
+    await store.send(.library(.delegate(.artistPlaybackButtonTapped(
+      items: items,
+      origin: origin,
+    )))) {
+      $0.pendingLibraryPlayNowOrigin = origin
+    }
     await store.receive(.playback(.playNow(items: items, startIndex: 0))) {
       $0.playback.hasAuthoritativeSnapshot = false
       $0.playback.pendingPlayNowItems = composedItems
@@ -355,11 +370,13 @@ struct AppFeatureTests {
       )
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
+      $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
       $0.playback.pendingPlayNowItems = nil
       $0.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
     }
+    await store.receive(.library(.collectionPlayNowSucceeded(origin)))
   }
 
   @Test
@@ -374,7 +391,10 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.library(.delegate(.artistPlaybackButtonTapped(items: items))))
+    await store.send(.library(.delegate(.artistPlaybackButtonTapped(
+      items: items,
+      origin: .init(kind: .artist, id: "artist"),
+    ))))
     await store.receive(.playback(.togglePlayPause))
     await store.receive(.playback(.pause)) {
       $0.playback.session?.playStatus = .paused
@@ -434,6 +454,33 @@ struct AppFeatureTests {
       $0.library.albumDetail = .init(
         album: album,
         transitionSourceID: album.id.rawValue,
+        playbackFailure: .musicAccessDenied,
+      )
+    }
+  }
+
+  @Test
+  func libraryActionPropagatesExistingPlaybackFailureToPlaylistDetail() async {
+    var library = ApprovedMusicLibrary.mock
+    let playlist = MusicPlaylist(
+      id: .init(rawValue: UUID(1)),
+      name: "Favorites",
+      revision: 1,
+      createdAt: Date(timeIntervalSince1970: 1),
+      updatedAt: Date(timeIntervalSince1970: 1),
+      entries: [],
+    )
+    library.playlists = [playlist]
+    var state = AppFeature.State()
+    state.library.status = .loaded(library)
+    state.playback.failure = .musicAccessDenied
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.library(.playlistTapped(playlist.id))) {
+      $0.library.playlistDetail = .init(
+        playlist: playlist,
         playbackFailure: .musicAccessDenied,
       )
     }

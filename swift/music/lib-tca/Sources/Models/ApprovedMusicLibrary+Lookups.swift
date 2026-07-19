@@ -1,3 +1,5 @@
+import Foundation
+
 extension ApprovedMusicLibrary {
   func album(id: ApprovedAlbum.ID) -> ApprovedAlbum? {
     self.albums.first { $0.id == id }
@@ -5,6 +7,23 @@ extension ApprovedMusicLibrary {
 
   func artist(id: ApprovedArtist.ID) -> ApprovedArtist? {
     self.artists.first { $0.id == id }
+  }
+
+  func playlist(id: MusicPlaylist.ID) -> MusicPlaylist? {
+    self.playlists.first { $0.id == id }
+  }
+
+  func observedAddedAt(for identity: LibraryCollectionIdentity) -> Date? {
+    switch identity.kind {
+    case .album:
+      self.albums.first(where: { $0.id.rawValue == identity.id })?.addedAt
+    case .artist:
+      self.artists.first(where: { $0.id.rawValue == identity.id })?.addedAt
+    case .playlist:
+      self.playlists.first(where: {
+        $0.id.rawValue.uuidString == identity.id
+      })?.createdAt
+    }
   }
 
   func album(matching item: PlaybackItem) -> ApprovedAlbum? {
