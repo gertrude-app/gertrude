@@ -99,19 +99,19 @@ struct AppView: View {
         self.modernIOSTabView
       } else {
         TabView(selection: self.selectedTab) {
-          self.libraryView
+          self.iOSTabContent(self.libraryView)
             .tabItem {
               Label("Library", systemImage: "square.grid.2x2")
             }
             .tag(AppFeature.Tab.library)
 
-          self.queueView
+          self.iOSTabContent(self.queueView)
             .tabItem {
               Label("Queue", systemImage: "list.bullet")
             }
             .tag(AppFeature.Tab.queue)
 
-          self.searchView
+          self.iOSTabContent(self.searchView)
             .tabItem {
               Label("Search", systemImage: "magnifyingglass")
             }
@@ -124,11 +124,11 @@ struct AppView: View {
     private var modernIOSTabView: some View {
       TabView(selection: self.selectedTab) {
         Tab("Library", systemImage: "square.grid.2x2", value: AppFeature.Tab.library) {
-          self.libraryView
+          self.iOSTabContent(self.libraryView)
         }
 
         Tab("Queue", systemImage: "list.bullet", value: AppFeature.Tab.queue) {
-          self.queueView
+          self.iOSTabContent(self.queueView)
         }
 
         Tab(
@@ -137,8 +137,20 @@ struct AppView: View {
           value: AppFeature.Tab.search,
           role: .search,
         ) {
-          self.searchView
+          self.iOSTabContent(self.searchView)
         }
+      }
+    }
+
+    @ViewBuilder
+    private func iOSTabContent(_ content: some View) -> some View {
+      if #available(iOS 26.0, *) {
+        content
+      } else {
+        content
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            self.nowPlayingSafeAreaInset
+          }
       }
     }
 
@@ -199,6 +211,16 @@ struct AppView: View {
         showsBackground: showsBackground,
       )
       .padding(.vertical, 7)
+    }
+
+    private var nowPlayingSafeAreaInset: some View {
+      self.nowPlayingBar(
+        displayMode: .expanded,
+        showsBackground: true,
+      )
+      .padding(.horizontal, 12)
+      .padding(.top, 6)
+      .padding(.bottom, 8)
     }
 
     private var nowPlayingForegroundColor: Color {
