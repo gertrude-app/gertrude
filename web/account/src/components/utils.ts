@@ -16,7 +16,10 @@ export const deviceTitle = (device: Device): string =>
 
 export const deviceSubtitle = (device: Device): string => {
   if (device.type === `mac`) {
-    return `${device.name ? `${device.modelName} • ` : ``}macOS ${device.macOSVersion}`;
+    const version = device.macOSVersion
+      ? `macOS ${device.macOSVersion}`
+      : `macOS version unavailable`;
+    return `${device.name ? `${device.modelName} • ` : ``}${version}`;
   }
 
   return `${device.type === `iphone` ? `iOS` : `iPadOS`} ${device.iOSVersion}`;

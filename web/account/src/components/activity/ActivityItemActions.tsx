@@ -41,7 +41,12 @@ const ActivityItemActions: React.FC<Props> = ({
           {flagged ? `Flagged` : `Flag`}
         </Button>
       </Tooltip>
-      <Button type="button" onClick={() => onDelete?.(id)} icon={TrashIcon}>
+      <Button
+        type="button"
+        onClick={() => onDelete?.(id)}
+        icon={TrashIcon}
+        disabled={flagged}
+      >
         Delete
       </Button>
     </HStack>

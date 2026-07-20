@@ -7,7 +7,7 @@ export type Device =
       personId: string;
       type: `mac`;
       name?: string;
-      macOSVersion: string;
+      macOSVersion?: string;
       modelName: string;
       modelIdentifier: string;
       online: boolean;
@@ -21,20 +21,6 @@ export type Device =
       modelIdentifier: string;
     };
 
-export type RecentMusicListening = {
-  trackName: string;
-  artistName: string;
-  albumArtUrl: string;
-  recencyInMinutes: number;
-};
-
-export type RecentPodcastListening = {
-  title: string;
-  podcastName: string;
-  artworkUrl: string;
-  recencyInMinutes: number;
-};
-
 export type PersonCardPerson = {
   id: string;
   name: string;
@@ -43,8 +29,6 @@ export type PersonCardPerson = {
     url: string;
     recency: string;
   } | null;
-  musicListening: RecentMusicListening | null;
-  podcastListening: RecentPodcastListening | null;
 };
 
 export type SecurityEvent = {

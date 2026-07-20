@@ -71,34 +71,18 @@ export const people: PersonCardPerson[] = [
       url: `/example-screenshots/kid-school.png`,
       recency: `Captured 4 minutes ago`,
     },
-    musicListening: {
-      trackName: `Here Comes the Sun`,
-      artistName: `The Beatles`,
-      albumArtUrl: `https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/df/db/61/dfdb615d-47f8-06e9-9533-b96daccc029f/18UMGIM31076.rgb.jpg/300x300bb.jpg`,
-      recencyInMinutes: 0,
-    },
-    podcastListening: null,
   },
   {
     id: `person-2`,
     name: `Mabel`,
     devices: [ipadDevice],
     screenshot: null,
-    musicListening: null,
-    podcastListening: {
-      title: `Space facts for kids`,
-      podcastName: `Science Hour`,
-      artworkUrl: `https://picsum.photos/seed/science-hour/300/300`,
-      recencyInMinutes: 12,
-    },
   },
   {
     id: `person-3`,
     name: `Caleb`,
     devices: [],
     screenshot: null,
-    musicListening: null,
-    podcastListening: null,
   },
 ];
 

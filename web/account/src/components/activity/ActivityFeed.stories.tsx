@@ -29,9 +29,14 @@ export const GroupedAndSinglePerson = {
           onDeletePersonActivity={noop}
         />
       </StorySection>
-      <StorySection title="Single person" contentClassName="flex-col items-stretch">
+      <StorySection
+        title="Single person, all flagged"
+        contentClassName="flex-col items-stretch"
+      >
         <ActivityFeed
-          items={activityItems.filter((item) => item.personName === `Jude`)}
+          items={activityItems
+            .filter((item) => item.personName === `Jude`)
+            .map((item) => ({ ...item, flagged: true }))}
           personName="Jude"
           showPersonHeading={false}
           onToggleFlag={noop}
