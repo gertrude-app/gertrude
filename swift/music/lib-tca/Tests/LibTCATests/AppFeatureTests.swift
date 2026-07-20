@@ -82,12 +82,14 @@ struct AppFeatureTests {
     state.isNowPlayingPresented = true
     state.library.status = .loaded(library)
     state.playback.session = .init(playStatus: .playing, currentItem: item)
+    state.selectedTab = .search
     let store = TestStore(initialState: state) {
       AppFeature()
     }
 
     await store.send(.nowPlayingAlbumInfoTapped) {
       $0.isNowPlayingPresented = false
+      $0.selectedTab = .library
       $0.library.albumDetail = .init(
         album: album,
         playStatus: .playing,
@@ -445,6 +447,7 @@ struct AppFeatureTests {
     let album = library.albums[0]
     var state = AppFeature.State()
     state.library.status = .loaded(library)
+    state.search.applyLibraryStatus(.loaded(library))
     state.playback.failure = .musicAccessDenied
     let store = TestStore(initialState: state) {
       AppFeature()
@@ -473,6 +476,7 @@ struct AppFeatureTests {
     library.playlists = [playlist]
     var state = AppFeature.State()
     state.library.status = .loaded(library)
+    state.search.applyLibraryStatus(.loaded(library))
     state.playback.failure = .musicAccessDenied
     let store = TestStore(initialState: state) {
       AppFeature()
@@ -529,6 +533,75 @@ struct AppFeatureTests {
       guard var albumDetail = $0.library.albumDetail else { return }
       albumDetail.playStatus = .playing
       $0.library.albumDetail = albumDetail
+    }
+  }
+
+  @Test
+  func selectingSearchSynchronizesTheAuthoritativeLibrary() async {
+    let library = ApprovedMusicLibrary.mock
+    var state = AppFeature.State()
+    state.library.status = .loaded(library)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    var expectedSearch = SearchFeature.State()
+    expectedSearch.applyLibraryStatus(.loaded(library))
+    await store.send(.tabSelected(.search)) {
+      $0.selectedTab = .search
+      $0.search = expectedSearch
+    }
+  }
+
+  @Test
+  func searchCurrentSongTapTogglesPlayback() async {
+    let item = playbackItem("track-1")
+    var state = AppFeature.State()
+    state.playback.session = .init(playStatus: .playing, currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.search(.delegate(.songTapped(item))))
+    await store.receive(.playback(.togglePlayPause))
+    await store.receive(.playback(.pause)) {
+      $0.playback.session?.playStatus = .paused
+    }
+  }
+
+  @Test
+  func searchSongTapStartsOnlyThatSong() async {
+    let item = playbackItem("track-1")
+    let snapshot = playbackSnapshot(items: [item])
+    let store = TestStore(initialState: AppFeature.State()) {
+      AppFeature()
+    } withDependencies: {
+      $0.playback.playNow = { _, _ in snapshot }
+    }
+
+    await store.send(.search(.delegate(.songTapped(item))))
+    await store.receive(.playback(.playNow(items: [item], startIndex: 0))) {
+      $0.playback.pendingPlayNowItems = [item]
+      $0.playback.session = .init(playStatus: .loading, currentItem: item)
+    }
+    await store.receive(.playback(.playNowFinished(snapshot))) {
+      $0.playback.hasAuthoritativeSnapshot = true
+      $0.playback.lastCachedProgressBucket = 0
+      $0.playback.pendingPlayNowItems = nil
+      $0.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+    }
+  }
+
+  @Test
+  func searchBrowseLibrarySwitchesTabs() async {
+    var state = AppFeature.State()
+    state.selectedTab = .search
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.search(.delegate(.browseLibrary))) {
+      $0.selectedTab = .library
     }
   }
 }

@@ -13,7 +13,6 @@ public struct LibraryView: View {
   private let state: LibraryViewState
   private let isRefreshing: Bool
   private let isPlaylistMutationInFlight: Bool
-  private let playlistMutationErrorMessage: String?
   private let transitionNamespace: Namespace.ID?
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onRefresh: @MainActor @Sendable () async -> Void
@@ -26,7 +25,6 @@ public struct LibraryView: View {
   private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
   private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
   private let onPlaylistTap: @MainActor @Sendable (String) -> Void
-  private let onPlaylistMutationErrorDismissed: @MainActor @Sendable () -> Void
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   @State private var createPlaylistName = ""
@@ -36,7 +34,6 @@ public struct LibraryView: View {
     state: LibraryViewState,
     isRefreshing: Bool = false,
     isPlaylistMutationInFlight: Bool = false,
-    playlistMutationErrorMessage: String? = nil,
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onRefresh: @MainActor @escaping @Sendable () async -> Void = {},
@@ -49,13 +46,11 @@ public struct LibraryView: View {
     onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistMutationErrorDismissed: @MainActor @escaping @Sendable () -> Void = {},
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.state = state
     self.isRefreshing = isRefreshing
     self.isPlaylistMutationInFlight = isPlaylistMutationInFlight
-    self.playlistMutationErrorMessage = playlistMutationErrorMessage
     self.transitionNamespace = transitionNamespace
     self.onRetryTap = onRetryTap
     self.onRefresh = onRefresh
@@ -68,7 +63,6 @@ public struct LibraryView: View {
     self.onPlaylistAddToQueue = onPlaylistAddToQueue
     self.onPlaylistPlayNext = onPlaylistPlayNext
     self.onPlaylistTap = onPlaylistTap
-    self.onPlaylistMutationErrorDismissed = onPlaylistMutationErrorDismissed
     self.onDebugResetTap = onDebugResetTap
   }
 
@@ -123,22 +117,6 @@ public struct LibraryView: View {
       } message: {
         Text("Enter a name for your playlist.")
       }
-      .alert("Couldn’t Update Playlist", isPresented: self.playlistMutationErrorBinding) {
-        Button("OK", role: .cancel) {}
-      } message: {
-        Text(self.playlistMutationErrorMessage ?? "Please try again.")
-      }
-  }
-
-  private var playlistMutationErrorBinding: Binding<Bool> {
-    Binding(
-      get: { self.playlistMutationErrorMessage != nil },
-      set: { isPresented in
-        if !isPresented {
-          self.onPlaylistMutationErrorDismissed()
-        }
-      },
-    )
   }
 
   private var refreshToolbarContent: some View {

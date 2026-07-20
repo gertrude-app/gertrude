@@ -16,6 +16,7 @@ struct AppFeature: Sendable {
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
     var pendingLibraryPlayNowOrigin: LibraryCollectionIdentity?
+    var search = SearchFeature.State()
     var setup = MusicSetupFeature.State()
     var isNowPlayingPresented = false
     var selectedTab = Tab.library
@@ -29,6 +30,7 @@ struct AppFeature: Sendable {
     case playback(PlaybackFeature.Action)
     case playbackAlbumIDsResolved(ApprovedTrack.ID, [ApprovedAlbum.ID])
     case queueBrowseLibraryButtonTapped
+    case search(SearchFeature.Action)
     case setup(MusicSetupFeature.Action)
     case tabSelected(Tab)
   }
@@ -60,6 +62,10 @@ struct AppFeature: Sendable {
       PlaybackFeature()
     }
 
+    Scope(state: \.search, action: \.search) {
+      SearchFeature()
+    }
+
     Scope(state: \.setup, action: \.setup) {
       MusicSetupFeature()
     }
@@ -73,10 +79,8 @@ struct AppFeature: Sendable {
           transitionSourceID: nil,
         ) else { return .none }
         state.isNowPlayingPresented = false
-        state.library.setAlbumDetailPlaybackSession(state.playback.session)
-        state.library.setPlaylistDetailPlaybackSession(state.playback.session)
-        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
-        state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
+        state.selectedTab = .library
+        self.synchronizeDetailPlayback(state: &state)
         return .none
 
       case .killSwitch:
@@ -92,6 +96,9 @@ struct AppFeature: Sendable {
 
       case .tabSelected(let tab):
         state.selectedTab = tab
+        if tab == .search {
+          state.search.applyLibraryStatus(state.library.status)
+        }
         return .none
 
       #if DEBUG
@@ -102,6 +109,7 @@ struct AppFeature: Sendable {
           state.library = .init()
           state.playback = .init()
           state.pendingLibraryPlayNowOrigin = nil
+          state.search = .init()
           state.setup = .init()
           state.selectedTab = .library
           return .merge(
@@ -143,19 +151,14 @@ struct AppFeature: Sendable {
         return .send(.playback(.togglePlayPause))
 
       case .library:
-        state.library.setAlbumDetailPlaybackSession(state.playback.session)
-        state.library.setPlaylistDetailPlaybackSession(state.playback.session)
-        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
-        state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
+        state.search.applyLibraryStatus(state.library.status)
+        self.synchronizeDetailPlayback(state: &state)
         return self.resolveCurrentPlaybackAlbum(state: &state)
 
       case .playback(.playNowFinished):
         let origin = state.pendingLibraryPlayNowOrigin
         state.pendingLibraryPlayNowOrigin = nil
-        state.library.setAlbumDetailPlaybackSession(state.playback.session)
-        state.library.setPlaylistDetailPlaybackSession(state.playback.session)
-        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
-        state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
+        self.synchronizeDetailPlayback(state: &state)
         let resolveAlbum = self.resolveCurrentPlaybackAlbum(state: &state)
         guard state.playback.hasAuthoritativeSnapshot, let origin else {
           return resolveAlbum
@@ -167,19 +170,13 @@ struct AppFeature: Sendable {
 
       case .playback(.playbackFailed):
         state.pendingLibraryPlayNowOrigin = nil
-        state.library.setAlbumDetailPlaybackSession(state.playback.session)
-        state.library.setPlaylistDetailPlaybackSession(state.playback.session)
-        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
-        state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
+        self.synchronizeDetailPlayback(state: &state)
         return self.resolveCurrentPlaybackAlbum(state: &state)
 
       case .playback(.playbackEvent(.queueEnded)):
         state.pendingLibraryPlayNowOrigin = nil
         state.isNowPlayingPresented = false
-        state.library.setAlbumDetailPlaybackSession(nil)
-        state.library.setPlaylistDetailPlaybackSession(nil)
-        state.library.setAlbumDetailPlaybackFailure(nil)
-        state.library.setPlaylistDetailPlaybackFailure(nil)
+        self.synchronizeDetailPlayback(state: &state)
         return .cancel(id: CancelID.albumResolution)
 
       case .playback(let playbackAction):
@@ -194,10 +191,7 @@ struct AppFeature: Sendable {
         default:
           break
         }
-        state.library.setAlbumDetailPlaybackSession(state.playback.session)
-        state.library.setPlaylistDetailPlaybackSession(state.playback.session)
-        state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
-        state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
+        self.synchronizeDetailPlayback(state: &state)
         return self.resolveCurrentPlaybackAlbum(state: &state)
 
       case .playbackAlbumIDsResolved(let songID, let albumIDs):
@@ -209,14 +203,45 @@ struct AppFeature: Sendable {
           .sorted(by: { $0.rawValue < $1.rawValue })
           .first else { return .none }
         state.playback.setSourceAlbumID(albumID, for: songID)
-        state.library.setAlbumDetailPlaybackSession(state.playback.session)
-        state.library.setPlaylistDetailPlaybackSession(state.playback.session)
+        self.synchronizeDetailPlayback(state: &state)
         return .send(.playback(.saveCachedSession))
+
+      case .search(.delegate(.browseLibrary)):
+        state.selectedTab = .library
+        return .none
+
+      case .search(.delegate(.library(let action))):
+        return .send(.library(action))
+
+      case .search(.delegate(.playback(let action))):
+        return .send(.library(.delegate(action)))
+
+      case .search(.delegate(.songTapped(let item))):
+        state.pendingLibraryPlayNowOrigin = nil
+        if state.playback.session?.currentTrackID == item.id {
+          return .send(.playback(.togglePlayPause))
+        }
+        return .send(.playback(.playNow(items: [item], startIndex: 0)))
+
+      case .search:
+        self.synchronizeDetailPlayback(state: &state)
+        return .none
 
       case .setup:
         return .none
       }
     }
+  }
+
+  private func synchronizeDetailPlayback(state: inout State) {
+    state.library.setAlbumDetailPlaybackSession(state.playback.session)
+    state.library.setPlaylistDetailPlaybackSession(state.playback.session)
+    state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
+    state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
+    state.search.setAlbumDetailPlaybackSession(state.playback.session)
+    state.search.setPlaylistDetailPlaybackSession(state.playback.session)
+    state.search.setAlbumDetailPlaybackFailure(state.playback.failure)
+    state.search.setPlaylistDetailPlaybackFailure(state.playback.failure)
   }
 
   private func resolveCurrentPlaybackAlbum(
@@ -228,8 +253,7 @@ struct AppFeature: Sendable {
     let previousAlbumID = currentItem.albumID
     _ = state.playback.resolveCurrentAlbum(in: library)
     if state.playback.session?.currentItem.albumID != previousAlbumID {
-      state.library.setAlbumDetailPlaybackSession(state.playback.session)
-      state.library.setPlaylistDetailPlaybackSession(state.playback.session)
+      self.synchronizeDetailPlayback(state: &state)
       return .send(.playback(.saveCachedSession))
     }
     guard state.playback.session?.currentItem.albumID == nil,

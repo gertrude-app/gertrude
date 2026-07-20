@@ -139,12 +139,31 @@ struct LibraryFeature: Sendable {
     case onAppear
     case path(StackActionOf<LibraryPath>)
     case playlistAddToQueueTapped(MusicPlaylist.ID)
+    case playlistDeleteConfirmed(
+      playlistID: MusicPlaylist.ID,
+      expectedRevision: Int64,
+    )
+    case playlistEntryRemoveTapped(
+      playlistID: MusicPlaylist.ID,
+      expectedRevision: Int64,
+      entryID: MusicPlaylistEntry.ID,
+    )
     case playlistMutationFailureDismissed
     case playlistMutationResponse(
       PlaylistMutationOutcome,
       rollback: ApprovedMusicLibrary?,
     )
     case playlistPlayNextTapped(MusicPlaylist.ID)
+    case playlistRenameSubmitted(
+      playlistID: MusicPlaylist.ID,
+      expectedRevision: Int64,
+      name: String,
+    )
+    case playlistReorderSubmitted(
+      playlistID: MusicPlaylist.ID,
+      expectedRevision: Int64,
+      entryIDs: [MusicPlaylistEntry.ID],
+    )
     case playlistTapped(MusicPlaylist.ID)
     case refreshPresentationFinished
     case refreshPulled
@@ -301,6 +320,37 @@ struct LibraryFeature: Sendable {
           status: state.status,
         )
 
+      case .playlistDeleteConfirmed(let playlistID, let expectedRevision):
+        return self.deletePlaylist(
+          playlistID: playlistID,
+          expectedRevision: expectedRevision,
+          state: &state,
+        )
+
+      case .playlistEntryRemoveTapped(let playlistID, let expectedRevision, let entryID):
+        return self.removePlaylistEntry(
+          playlistID: playlistID,
+          expectedRevision: expectedRevision,
+          entryID: entryID,
+          state: &state,
+        )
+
+      case .playlistRenameSubmitted(let playlistID, let expectedRevision, let name):
+        return self.renamePlaylist(
+          playlistID: playlistID,
+          expectedRevision: expectedRevision,
+          rawName: name,
+          state: &state,
+        )
+
+      case .playlistReorderSubmitted(let playlistID, let expectedRevision, let entryIDs):
+        return self.reorderPlaylist(
+          playlistID: playlistID,
+          expectedRevision: expectedRevision,
+          entryIDs: entryIDs,
+          state: &state,
+        )
+
       case .playlistPlayNextTapped(let playlistID):
         return self.queuePlaylist(
           playlistID: playlistID,
@@ -430,15 +480,11 @@ struct LibraryFeature: Sendable {
           return .send(.delegate(.addToQueue(items: items)))
 
         case .delete:
-          guard !state.isPlaylistMutationInFlight else { return .none }
-          state.isPlaylistMutationInFlight = true
-          state.playlistMutationFailure = nil
-          return self.performPlaylistMutation {
-            try await self.approvedMusic.deletePlaylist(.init(
-              playlistId: detail.playlist.id.rawValue,
-              expectedRevision: detail.playlist.revision,
-            ))
-          }
+          return self.deletePlaylist(
+            playlistID: detail.playlist.id,
+            expectedRevision: detail.playlist.revision,
+            state: &state,
+          )
 
         case .dismissPlaybackFailure:
           return .send(.delegate(.dismissPlaybackFailure))
@@ -457,77 +503,28 @@ struct LibraryFeature: Sendable {
           )))
 
         case .removeEntry(let entryID):
-          guard !state.isPlaylistMutationInFlight,
-                case .loaded(let library) = state.status,
-                let playlistIndex = library.playlists.firstIndex(where: {
-                  $0.id == detail.playlist.id
-                }),
-                library.playlists[playlistIndex].entries.contains(where: {
-                  $0.id == entryID
-                }) else { return .none }
-          var optimisticLibrary = library
-          optimisticLibrary.playlists[playlistIndex].entries.removeAll {
-            $0.id == entryID
-          }
-          state.isPlaylistMutationInFlight = true
-          state.playlistMutationFailure = nil
-          state.applyLibrary(optimisticLibrary)
-          return self.performPlaylistMutation(rollback: library) {
-            try await self.approvedMusic.removePlaylistEntry(.init(
-              playlistId: detail.playlist.id.rawValue,
-              expectedRevision: detail.playlist.revision,
-              entryId: entryID.rawValue,
-            ))
-          }
+          return self.removePlaylistEntry(
+            playlistID: detail.playlist.id,
+            expectedRevision: detail.playlist.revision,
+            entryID: entryID,
+            state: &state,
+          )
 
         case .rename(let rawName):
-          guard !state.isPlaylistMutationInFlight,
-                let name = rawName.validPlaylistName,
-                name != detail.playlist.name,
-                case .loaded(let library) = state.status,
-                let playlistIndex = library.playlists.firstIndex(where: {
-                  $0.id == detail.playlist.id
-                }) else { return .none }
-          var optimisticLibrary = library
-          optimisticLibrary.playlists[playlistIndex].name = name
-          state.isPlaylistMutationInFlight = true
-          state.playlistMutationFailure = nil
-          state.applyLibrary(optimisticLibrary)
-          return self.performPlaylistMutation(rollback: library) {
-            try await self.approvedMusic.renamePlaylist(.init(
-              playlistId: detail.playlist.id.rawValue,
-              expectedRevision: detail.playlist.revision,
-              name: name,
-            ))
-          }
+          return self.renamePlaylist(
+            playlistID: detail.playlist.id,
+            expectedRevision: detail.playlist.revision,
+            rawName: rawName,
+            state: &state,
+          )
 
         case .reorder(let entryIDs):
-          guard !state.isPlaylistMutationInFlight,
-                case .loaded(let library) = state.status,
-                let playlistIndex = library.playlists.firstIndex(where: {
-                  $0.id == detail.playlist.id
-                }) else { return .none }
-          let entriesByID = Dictionary(
-            uniqueKeysWithValues: library.playlists[playlistIndex].entries.map {
-              ($0.id, $0)
-            },
+          return self.reorderPlaylist(
+            playlistID: detail.playlist.id,
+            expectedRevision: detail.playlist.revision,
+            entryIDs: entryIDs,
+            state: &state,
           )
-          guard entryIDs.count == entriesByID.count,
-                entryIDs.allSatisfy({ entriesByID[$0] != nil }) else { return .none }
-          var optimisticLibrary = library
-          optimisticLibrary.playlists[playlistIndex].entries = entryIDs.compactMap {
-            entriesByID[$0]
-          }
-          state.isPlaylistMutationInFlight = true
-          state.playlistMutationFailure = nil
-          state.applyLibrary(optimisticLibrary)
-          return self.performPlaylistMutation(rollback: library) {
-            try await self.approvedMusic.reorderPlaylistEntries(.init(
-              playlistId: detail.playlist.id.rawValue,
-              expectedRevision: detail.playlist.revision,
-              entryIds: entryIDs.map(\.rawValue),
-            ))
-          }
 
         case .togglePlayPause:
           return .send(.delegate(.togglePlayPause))
@@ -665,6 +662,114 @@ struct LibraryFeature: Sendable {
     }
     .forEach(\.path, action: \.path) {
       LibraryPath.body
+    }
+  }
+
+  private func deletePlaylist(
+    playlistID: MusicPlaylist.ID,
+    expectedRevision: Int64,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard !state.isPlaylistMutationInFlight,
+          case .loaded(let library) = state.status,
+          library.playlist(id: playlistID)?.revision == expectedRevision else { return .none }
+    state.isPlaylistMutationInFlight = true
+    state.playlistMutationFailure = nil
+    return self.performPlaylistMutation {
+      try await self.approvedMusic.deletePlaylist(.init(
+        playlistId: playlistID.rawValue,
+        expectedRevision: expectedRevision,
+      ))
+    }
+  }
+
+  private func removePlaylistEntry(
+    playlistID: MusicPlaylist.ID,
+    expectedRevision: Int64,
+    entryID: MusicPlaylistEntry.ID,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard !state.isPlaylistMutationInFlight,
+          case .loaded(let library) = state.status,
+          let playlistIndex = library.playlists.firstIndex(where: {
+            $0.id == playlistID && $0.revision == expectedRevision
+          }),
+          library.playlists[playlistIndex].entries.contains(where: {
+            $0.id == entryID
+          }) else { return .none }
+    var optimisticLibrary = library
+    optimisticLibrary.playlists[playlistIndex].entries.removeAll {
+      $0.id == entryID
+    }
+    state.isPlaylistMutationInFlight = true
+    state.playlistMutationFailure = nil
+    state.applyLibrary(optimisticLibrary)
+    return self.performPlaylistMutation(rollback: library) {
+      try await self.approvedMusic.removePlaylistEntry(.init(
+        playlistId: playlistID.rawValue,
+        expectedRevision: expectedRevision,
+        entryId: entryID.rawValue,
+      ))
+    }
+  }
+
+  private func renamePlaylist(
+    playlistID: MusicPlaylist.ID,
+    expectedRevision: Int64,
+    rawName: String,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard !state.isPlaylistMutationInFlight,
+          let name = rawName.validPlaylistName,
+          case .loaded(let library) = state.status,
+          let playlistIndex = library.playlists.firstIndex(where: {
+            $0.id == playlistID && $0.revision == expectedRevision
+          }),
+          library.playlists[playlistIndex].name != name else { return .none }
+    var optimisticLibrary = library
+    optimisticLibrary.playlists[playlistIndex].name = name
+    state.isPlaylistMutationInFlight = true
+    state.playlistMutationFailure = nil
+    state.applyLibrary(optimisticLibrary)
+    return self.performPlaylistMutation(rollback: library) {
+      try await self.approvedMusic.renamePlaylist(.init(
+        playlistId: playlistID.rawValue,
+        expectedRevision: expectedRevision,
+        name: name,
+      ))
+    }
+  }
+
+  private func reorderPlaylist(
+    playlistID: MusicPlaylist.ID,
+    expectedRevision: Int64,
+    entryIDs: [MusicPlaylistEntry.ID],
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard !state.isPlaylistMutationInFlight,
+          case .loaded(let library) = state.status,
+          let playlistIndex = library.playlists.firstIndex(where: {
+            $0.id == playlistID && $0.revision == expectedRevision
+          }) else { return .none }
+    let entriesByID = Dictionary(
+      uniqueKeysWithValues: library.playlists[playlistIndex].entries.map {
+        ($0.id, $0)
+      },
+    )
+    guard Set(entryIDs) == Set(entriesByID.keys) else { return .none }
+    var optimisticLibrary = library
+    optimisticLibrary.playlists[playlistIndex].entries = entryIDs.compactMap {
+      entriesByID[$0]
+    }
+    state.isPlaylistMutationInFlight = true
+    state.playlistMutationFailure = nil
+    state.applyLibrary(optimisticLibrary)
+    return self.performPlaylistMutation(rollback: library) {
+      try await self.approvedMusic.reorderPlaylistEntries(.init(
+        playlistId: playlistID.rawValue,
+        expectedRevision: expectedRevision,
+        entryIds: entryIDs.map(\.rawValue),
+      ))
     }
   }
 
@@ -821,15 +926,7 @@ private extension LibraryFeature.Status {
 extension LibraryFeature.State {
   mutating func applyLibrary(_ library: ApprovedMusicLibrary) {
     self.status = library.isEmpty ? .empty : .loaded(library)
-    for id in Array(self.path.ids) {
-      guard var detail = self.path[id: id, case: \.playlist] else { continue }
-      guard let playlist = library.playlist(id: detail.playlist.id) else {
-        self.path.pop(from: id)
-        return
-      }
-      detail.playlist = playlist
-      self.path[id: id] = .playlist(detail)
-    }
+    self.path.reconcile(with: library)
   }
 
   mutating func prioritizeCreatedPlaylist(

@@ -13,7 +13,7 @@ struct AppView: View {
       #if os(iOS)
         self.iOSContent
           .overlay(alignment: .top) {
-            if self.store.library.albumDetail == nil,
+            if !self.isPlaybackFailurePresentedInDetail,
                let failure = self.store.playback.failure {
               self.playbackFailureBanner(failure)
             }
@@ -38,6 +38,9 @@ struct AppView: View {
         break
       }
     }
+    .libraryPresentations(
+      store: self.store.scope(state: \.library, action: \.library),
+    )
     .killSwitch(
       store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.setup.isReady,
@@ -172,10 +175,19 @@ struct AppView: View {
     }
 
     private var searchView: some View {
-      NavigationStack {
-        ContentUnavailableView("Search", systemImage: "magnifyingglass")
-          .navigationTitle("Search")
-      }
+      SearchViewContainer(
+        store: self.store.scope(state: \.search, action: \.search),
+        library: self.approvedLibrary,
+        currentTrackID: self.store.playback.session?.currentTrackID,
+        isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
+        isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
+        isPlaylistMutationInFlight: self.store.library.isPlaylistMutationInFlight,
+      )
+    }
+
+    private var approvedLibrary: ApprovedMusicLibrary? {
+      guard case .loaded(let library) = self.store.library.status else { return nil }
+      return library
     }
 
     private func nowPlayingBarInset(
@@ -291,6 +303,19 @@ struct AppView: View {
       .transition(.move(edge: .top).combined(with: .opacity))
     }
   #endif
+
+  private var isPlaybackFailurePresentedInDetail: Bool {
+    switch self.store.selectedTab {
+    case .library:
+      self.store.library.albumDetail != nil
+        || self.store.library.playlistDetail != nil
+    case .queue:
+      false
+    case .search:
+      self.store.search.albumDetail != nil
+        || self.store.search.playlistDetail != nil
+    }
+  }
 
   private var nowPlayingPresented: Binding<Bool> {
     self.$store.isNowPlayingPresented.sending(\.nowPlayingPresentationChanged)

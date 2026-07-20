@@ -742,6 +742,41 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func directPlaylistRenameUsesTheAuthoritativeMutationPipeline() async {
+    let library = self.playlistLibrary()
+    let playlist = library.playlists[0]
+    let updatedLibrary = {
+      var updatedLibrary = library
+      updatedLibrary.playlists[0].name = "Road Trip"
+      updatedLibrary.playlists[0].revision = 2
+      return updatedLibrary
+    }()
+    let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic.renamePlaylist = { _ in .updated(updatedLibrary) }
+    }
+
+    var optimisticLibrary = library
+    optimisticLibrary.playlists[0].name = "Road Trip"
+    await store.send(.playlistRenameSubmitted(
+      playlistID: playlist.id,
+      expectedRevision: playlist.revision,
+      name: "  Road Trip  ",
+    )) {
+      $0.isPlaylistMutationInFlight = true
+      $0.applyLibrary(optimisticLibrary)
+    }
+    await store.receive(.playlistMutationResponse(
+      .updated(updatedLibrary),
+      rollback: library,
+    )) {
+      $0.isPlaylistMutationInFlight = false
+      $0.applyLibrary(updatedLibrary)
+    }
+  }
+
+  @Test
   func failedRenameRollsBackOptimisticName() async {
     let library = self.playlistLibrary()
     let playlist = library.playlists[0]
