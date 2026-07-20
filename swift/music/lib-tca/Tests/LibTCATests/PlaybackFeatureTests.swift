@@ -356,6 +356,20 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func progressOnlySnapshotsHaveTheSameSession() {
+    let items = [playbackItem("track-1")]
+    let initial = playbackSnapshot(items: items)
+    let progressed = playbackSnapshot(
+      items: items,
+      progress: .init(elapsedTime: 1, duration: 180),
+    )
+    let paused = playbackSnapshot(items: items, playStatus: .paused)
+
+    #expect(progressed.hasSameSession(as: initial))
+    #expect(!paused.hasSameSession(as: initial))
+  }
+
+  @Test
   func terminalDetectorRecognizesNaturalFinalCompletion() {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let playingFinalItem = PlaybackTerminalDetector.Observation(
@@ -445,6 +459,36 @@ struct PlaybackFeatureTests {
     )
     #expect(snapshot.currentEntryID == snapshot.entries.first?.id)
     #expect(Set(snapshot.entries.map(\.id)).count == 4)
+    await client.clearQueue()
+    await clock.advance()
+  }
+
+  @Test
+  func simulatorProgressTickerEmitsProgressWithoutRepublishingSession() async throws {
+    let clock = PlaybackSimulatorClock()
+    let client = PlaybackClient.simulated { _ in
+      await clock.sleep()
+    }
+    let receivedEvents = Task {
+      var events: [PlaybackEvent] = []
+      for await event in client.events() {
+        events.append(event)
+        if events.count == 3 { return events }
+      }
+      return events
+    }
+    await Task.yield()
+    _ = try await client.playNow([playbackItem("track-1")], 0)
+
+    await clock.advance()
+    let events = await receivedEvents.value
+
+    #expect(events.count == 3)
+    guard case .progressChanged(let progress) = events.last else {
+      Issue.record("Expected a progress event")
+      return
+    }
+    expectNoDifference(progress, .init(elapsedTime: 0.25, duration: 180))
     await client.clearQueue()
     await clock.advance()
   }
@@ -762,6 +806,7 @@ struct PlaybackFeatureTests {
       session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
       hasAuthoritativeSnapshot: true,
       lastCachedProgressBucket: 8,
+      progress: initialSnapshot.progress,
     )) {
       PlaybackFeature()
     } withDependencies: {
@@ -932,9 +977,44 @@ struct PlaybackFeatureTests {
       progress: progress,
     )))) {
       $0.hasAuthoritativeSnapshot = true
-      $0.session?.progress = progress
+      $0.progress = progress
       $0.lastCachedProgressBucket = 8
     }
+  }
+
+  @Test
+  func progressEventUpdatesProgressWithoutReplacingSession() async {
+    let item = playbackItem("track-1")
+    let session = PlaybackFeature.Session(currentItem: item)
+    let progress = PlaybackProgress(elapsedTime: 0.25, duration: 180)
+    let store = TestStore(initialState: .init(
+      session: session,
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.progressChanged(progress))) {
+      $0.progress = progress
+    }
+    expectNoDifference(store.state.session, session)
+  }
+
+  @Test
+  func progressEventFromReplacedQueueDoesNotUpdatePendingSession() async {
+    let pendingItem = playbackItem("pending")
+    let store = TestStore(initialState: .init(
+      session: .init(playStatus: .loading, currentItem: pendingItem),
+      pendingPlayNowItems: [pendingItem],
+    )) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.progressChanged(.init(
+      elapsedTime: 42,
+      duration: 180,
+    ))))
   }
 
   @Test
@@ -946,6 +1026,7 @@ struct PlaybackFeatureTests {
     )
     let store = TestStore(initialState: .init(
       session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      progress: initialSnapshot.progress,
     )) {
       PlaybackFeature()
     }
@@ -956,7 +1037,7 @@ struct PlaybackFeatureTests {
     )))) {
       $0.hasAuthoritativeSnapshot = true
       $0.session?.queue.currentIndex = 2
-      $0.session?.progress = .zero
+      $0.progress = .zero
       $0.lastCachedProgressBucket = 0
     }
   }
@@ -1065,30 +1146,30 @@ struct PlaybackFeatureTests {
   @Test
   func seekUpdatesCurrentSessionProgress() async {
     let item = playbackItem("track-1")
-    let store = TestStore(initialState: .init(session: .init(
-      currentItem: item,
+    let store = TestStore(initialState: .init(
+      session: .init(currentItem: item),
       progress: .init(elapsedTime: 10, duration: 180),
-    ))) {
+    )) {
       PlaybackFeature()
     }
 
     await store.send(.seek(42)) {
-      $0.session?.progress = .init(elapsedTime: 42, duration: 180)
+      $0.progress = .init(elapsedTime: 42, duration: 180)
     }
   }
 
   @Test
   func seekClampsToDuration() async {
     let item = playbackItem("track-1")
-    let store = TestStore(initialState: .init(session: .init(
-      currentItem: item,
+    let store = TestStore(initialState: .init(
+      session: .init(currentItem: item),
       progress: .init(elapsedTime: 10, duration: 180),
-    ))) {
+    )) {
       PlaybackFeature()
     }
 
     await store.send(.seek(240)) {
-      $0.session?.progress = .init(elapsedTime: 180, duration: 180)
+      $0.progress = .init(elapsedTime: 180, duration: 180)
     }
   }
 
@@ -1096,10 +1177,10 @@ struct PlaybackFeatureTests {
   func skipToNextRequestsMusicKitNextEntry() async {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
-    let store = TestStore(initialState: .init(session: .init(
-      queue: .init(items: items, currentIndex: 0),
+    let store = TestStore(initialState: .init(
+      session: .init(queue: .init(items: items, currentIndex: 0)),
       progress: .init(elapsedTime: 42, duration: 180),
-    ))) {
+    )) {
       PlaybackFeature()
     } withDependencies: {
       $0.playback.skipToNext = {
@@ -1118,14 +1199,12 @@ struct PlaybackFeatureTests {
     let item = playbackItem("track-1")
     let recorder = PlaybackCommandRecorder()
     let store = TestStore(initialState: .init(
-      session: .init(
-        currentItem: item,
-        progress: .init(elapsedTime: 42, duration: 180),
-      ),
+      session: .init(currentItem: item),
       failure: .trackUnavailable,
       hasAuthoritativeSnapshot: true,
       lastCachedProgressBucket: 8,
       pendingAlbumResolutionSongID: item.id,
+      progress: .init(elapsedTime: 42, duration: 180),
       sourceAlbumIDs: [item.id: "album-1"],
     )) {
       PlaybackFeature()
@@ -1148,6 +1227,7 @@ struct PlaybackFeatureTests {
       $0.hasAuthoritativeSnapshot = false
       $0.lastCachedProgressBucket = nil
       $0.pendingAlbumResolutionSongID = nil
+      $0.progress = .zero
       $0.session = nil
       $0.sourceAlbumIDs.removeAll()
     }
@@ -1162,10 +1242,10 @@ struct PlaybackFeatureTests {
   func skipToPreviousAfterFirstThreeSecondsRestartsCurrentItem() async {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
-    let store = TestStore(initialState: .init(session: .init(
-      queue: .init(items: items, currentIndex: 1),
+    let store = TestStore(initialState: .init(
+      session: .init(queue: .init(items: items, currentIndex: 1)),
       progress: .init(elapsedTime: 4, duration: 180),
-    ))) {
+    )) {
       PlaybackFeature()
     } withDependencies: {
       $0.playback.restartCurrentEntry = {
@@ -1182,10 +1262,10 @@ struct PlaybackFeatureTests {
   func skipToPreviousWithinFirstThreeSecondsMovesToPreviousItem() async {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
-    let store = TestStore(initialState: .init(session: .init(
-      queue: .init(items: items, currentIndex: 1),
+    let store = TestStore(initialState: .init(
+      session: .init(queue: .init(items: items, currentIndex: 1)),
       progress: .init(elapsedTime: 3, duration: 180),
-    ))) {
+    )) {
       PlaybackFeature()
     } withDependencies: {
       $0.playback.skipToPrevious = {
@@ -1202,10 +1282,10 @@ struct PlaybackFeatureTests {
   func skipToPreviousOnFirstItemRestartsWithoutWrapping() async {
     let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
     let recorder = PlaybackCommandRecorder()
-    let store = TestStore(initialState: .init(session: .init(
-      queue: .init(items: items, currentIndex: 0),
+    let store = TestStore(initialState: .init(
+      session: .init(queue: .init(items: items, currentIndex: 0)),
       progress: .init(elapsedTime: 2, duration: 180),
-    ))) {
+    )) {
       PlaybackFeature()
     } withDependencies: {
       $0.playback.restartCurrentEntry = {
@@ -1257,6 +1337,7 @@ struct PlaybackFeatureTests {
     await store.receive(.playbackEvent(.snapshotChanged(snapshot))) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 8
+      $0.progress = snapshot.progress
       $0.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
     }
 
@@ -1371,6 +1452,7 @@ struct PlaybackFeatureTests {
         sourceAlbumIDs: ["track-1": "album-1"],
       ),
       hasAuthoritativeSnapshot: true,
+      progress: snapshot.progress,
       sourceAlbumIDs: ["track-1": "album-1"],
     )) {
       PlaybackFeature()

@@ -79,7 +79,7 @@ struct PlaybackSessionCacheClientTests {
     let legacyCache = ChildScopedDiskJSONCache<CachedPlaybackSession>(
       directory: directory,
       version: 1,
-      isValid: { $0.playbackSession != nil },
+      isValid: \.isValid,
     )
     try legacyCache.save(.mock, childId: childId)
     let connectionData = try JSONEncoder().encode(MusicAppConnection(
@@ -114,7 +114,7 @@ struct PlaybackSessionCacheClientTests {
     let legacyCache = ChildScopedDiskJSONCache<CachedPlaybackSession>(
       directory: directory,
       version: 1,
-      isValid: { $0.playbackSession != nil },
+      isValid: \.isValid,
     )
     try checkpointCache.save(.mock, childId: childId)
     try legacyCache.save(.mock, childId: childId)
@@ -147,11 +147,11 @@ struct PlaybackSessionCacheClientTests {
     let session = PlaybackFeature.Session(
       playStatus: .paused,
       queue: .init(items: items, currentIndex: 1),
-      progress: .init(elapsedTime: 42, duration: 180),
     )
 
     let checkpoint = PlaybackCheckpoint(
       session: session,
+      progress: .init(elapsedTime: 42, duration: 180),
       sourceAlbumIDs: ["consumed": "album-consumed"],
     )
 
@@ -180,10 +180,13 @@ struct PlaybackSessionCacheClientTests {
         playbackItem("duplicate").withPlaylistSource(firstSource),
         playbackItem("duplicate").withPlaylistSource(secondSource),
       ]),
-      progress: .init(elapsedTime: 42, duration: 180),
     )
 
-    let checkpoint = PlaybackCheckpoint(session: session, sourceAlbumIDs: [:])
+    let checkpoint = PlaybackCheckpoint(
+      session: session,
+      progress: .init(elapsedTime: 42, duration: 180),
+      sourceAlbumIDs: [:],
+    )
 
     expectNoDifference(checkpoint.playlistSourceHints, [firstSource, secondSource])
   }

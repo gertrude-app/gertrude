@@ -114,6 +114,12 @@ struct PlaybackSnapshot: Equatable, Sendable {
     playStatus: .paused,
     progress: .zero,
   )
+
+  func hasSameSession(as other: Self) -> Bool {
+    self.entries == other.entries
+      && self.currentEntryID == other.currentEntryID
+      && self.playStatus == other.playStatus
+  }
 }
 
 enum PlaybackSourceHintMatcher {

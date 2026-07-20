@@ -83,7 +83,7 @@ private actor PlaybackCheckpointStorage {
     self.legacyCache = ChildScopedDiskJSONCache<CachedPlaybackSession>(
       directory: directory,
       version: 1,
-      isValid: { $0.playbackSession != nil },
+      isValid: \.isValid,
     )
   }
 
@@ -142,6 +142,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
 
   init(
     session: PlaybackFeature.Session,
+    progress: PlaybackProgress,
     sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID],
   ) {
     let items = Array(session.queue.items.dropFirst(session.queue.currentIndex))
@@ -154,8 +155,8 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     self.init(
       songIDs: items.map(\.id),
       currentIndex: 0,
-      elapsedTime: session.progress.elapsedTime,
-      durationFallback: session.progress.duration,
+      elapsedTime: progress.elapsedTime,
+      durationFallback: progress.duration,
       sourceAlbumHints: sourceAlbumHints,
       playlistSourceHints: items.map(\.playlistSource),
     )
@@ -225,23 +226,7 @@ struct CachedPlaybackSession: Codable, Equatable, Sendable {
     self.progress = progress
   }
 
-  init(session: PlaybackFeature.Session) {
-    self.init(
-      items: session.queue.items,
-      currentIndex: session.queue.currentIndex,
-      progress: session.progress,
-    )
-  }
-
-  var playbackSession: PlaybackFeature.Session? {
-    guard !self.items.isEmpty else { return nil }
-    return PlaybackFeature.Session(
-      playStatus: .paused,
-      queue: .init(items: self.items, currentIndex: self.currentIndex),
-      progress: PlaybackProgress(
-        elapsedTime: self.progress.elapsedTime,
-        duration: self.progress.duration,
-      ),
-    )
+  var isValid: Bool {
+    !self.items.isEmpty
   }
 }

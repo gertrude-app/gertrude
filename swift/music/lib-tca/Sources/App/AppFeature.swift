@@ -179,6 +179,9 @@ struct AppFeature: Sendable {
         self.synchronizeDetailPlayback(state: &state)
         return .cancel(id: CancelID.albumResolution)
 
+      case .playback(.playbackEvent(.progressChanged)):
+        return .none
+
       case .playback(let playbackAction):
         switch playbackAction {
         case .addToQueue,

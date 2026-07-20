@@ -268,8 +268,8 @@ struct AppView: View {
             showsBackground: false,
             isPlaying: session.isPlaying,
             isLoading: session.isLoading,
-            progress: session.progress.fraction,
-            duration: session.progress.duration,
+            progress: self.store.playback.progress.fraction,
+            duration: self.store.playback.progress.duration,
             onPlayPauseTap: {
               self.store.send(.playback(.togglePlayPause))
             },

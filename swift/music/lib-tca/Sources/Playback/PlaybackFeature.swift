@@ -79,6 +79,7 @@ struct PlaybackFeature: Sendable {
     var pendingPlayNowItems: [PlaybackItem]?
     var pendingPlaylistSourcePlan: [PlaybackSourceHintMatcher.Occurrence]?
     var playlistSourceHints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource] = [:]
+    var progress = PlaybackProgress.zero
     var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] = [:]
   }
 
@@ -135,28 +136,23 @@ struct PlaybackFeature: Sendable {
   struct Session: Equatable, Sendable {
     var playStatus: PlayStatus
     var queue: Queue
-    var progress: PlaybackProgress
 
     init(
       playStatus: PlayStatus = .playing,
       queue: Queue,
-      progress: PlaybackProgress = .zero,
     ) {
       precondition(!queue.items.isEmpty)
       self.playStatus = playStatus
       self.queue = queue
-      self.progress = progress
     }
 
     init(
       playStatus: PlayStatus = .playing,
       currentItem: PlaybackItem,
-      progress: PlaybackProgress = .zero,
     ) {
       self.init(
         playStatus: playStatus,
         queue: .init(items: [currentItem]),
-        progress: progress,
       )
     }
 
@@ -182,7 +178,6 @@ struct PlaybackFeature: Sendable {
       self.init(
         playStatus: snapshot.playStatus,
         queue: queue,
-        progress: snapshot.progress,
       )
     }
   }
@@ -305,6 +300,7 @@ struct PlaybackFeature: Sendable {
         state.pendingPlayNowItems = nil
         state.pendingPlaylistSourcePlan = nil
         state.playlistSourceHints.removeAll()
+        state.progress = .zero
         state.session = nil
         state.sourceAlbumIDs.removeAll()
         return .merge(
@@ -318,6 +314,12 @@ struct PlaybackFeature: Sendable {
             },
           ),
         )
+
+      case .playbackEvent(.progressChanged(let progress)):
+        guard state.pendingPlayNowItems == nil else { return .none }
+        state.setProgress(progress)
+        guard state.shouldCacheProgressSnapshot() else { return .none }
+        return self.saveCheckpoint(state)
 
       case .playbackEvent(.snapshotChanged(let snapshot)):
         if let pendingItems = state.pendingPlayNowItems {
@@ -346,6 +348,7 @@ struct PlaybackFeature: Sendable {
         state.isRestoringCheckpoint = false
         state.lastCachedProgressBucket = nil
         state.pendingPlayNowItems = composedItems
+        state.progress = .zero
         state.recordSourceAlbums(requestedItems)
         state.session = .init(
           playStatus: .loading,
@@ -461,7 +464,9 @@ struct PlaybackFeature: Sendable {
         return self.saveCheckpoint(state)
 
       case .seek(let time):
-        guard let duration = state.session?.progress.duration, duration > 0 else { return .none }
+        guard state.session != nil,
+              state.progress.duration > 0 else { return .none }
+        let duration = state.progress.duration
         let clampedTime = min(duration, max(0, time))
         state.setProgress(.init(elapsedTime: clampedTime, duration: duration))
         let seekEffect: EffectOf<Self> = .run { _ in
@@ -480,7 +485,7 @@ struct PlaybackFeature: Sendable {
 
       case .skipToPrevious:
         guard let session = state.session else { return .none }
-        if session.progress.elapsedTime > 3 || session.queue.currentIndex == 0 {
+        if state.progress.elapsedTime > 3 || session.queue.currentIndex == 0 {
           return .run { _ in
             await self.playback.restartCurrentEntry()
           }
@@ -553,12 +558,13 @@ struct PlaybackFeature: Sendable {
       session.playStatus = .loading
     }
     state.hasAuthoritativeSnapshot = !state.isRestoringCheckpoint
+    state.progress = snapshot.progress
     state.session = session
     guard !state.isRestoringCheckpoint else { return .none }
     let shouldCacheImmediately = previousSession?.queue != session.queue
       || previousSession?.playStatus != session.playStatus
     if shouldCacheImmediately {
-      state.lastCachedProgressBucket = Int(session.progress.elapsedTime / 5)
+      state.lastCachedProgressBucket = Int(state.progress.elapsedTime / 5)
       return self.saveCheckpoint(state)
     }
     guard state.shouldCacheProgressSnapshot() else { return .none }
@@ -632,6 +638,7 @@ struct PlaybackFeature: Sendable {
           let session = state.session else { return .none }
     let checkpoint = PlaybackCheckpoint(
       session: session,
+      progress: state.progress,
       sourceAlbumIDs: state.sourceAlbumIDs,
     )
     return .run { _ in
@@ -658,9 +665,8 @@ extension PlaybackFeature.State {
   }
 
   mutating func setProgress(_ progress: PlaybackProgress) {
-    guard var session = self.session else { return }
-    session.progress = progress
-    self.session = session
+    guard self.session != nil else { return }
+    self.progress = progress
   }
 
   mutating func recordPlaylistSources(entries: [PlaybackQueueEntry]) {
@@ -790,8 +796,8 @@ extension PlaybackFeature.State {
   }
 
   mutating func shouldCacheProgressSnapshot() -> Bool {
-    guard let elapsedTime = self.session?.progress.elapsedTime else { return false }
-    let bucket = Int(elapsedTime / 5)
+    guard self.session != nil else { return false }
+    let bucket = Int(self.progress.elapsedTime / 5)
     guard bucket != self.lastCachedProgressBucket else { return false }
     self.lastCachedProgressBucket = bucket
     return true

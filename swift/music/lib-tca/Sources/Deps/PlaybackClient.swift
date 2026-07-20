@@ -13,6 +13,7 @@ import GertieApp
 #endif
 
 enum PlaybackEvent: Equatable, Sendable {
+  case progressChanged(PlaybackProgress)
   case queueEnded
   case snapshotChanged(PlaybackSnapshot)
 }
@@ -536,8 +537,14 @@ extension PlaybackClient {
               lastSnapshot = .empty
               continuation.yield(.queueEnded)
             } else if snapshot != lastSnapshot {
+              let previousSnapshot = lastSnapshot
               lastSnapshot = snapshot
-              continuation.yield(.snapshotChanged(snapshot))
+              if let previousSnapshot,
+                 snapshot.hasSameSession(as: previousSnapshot) {
+                continuation.yield(.progressChanged(snapshot.progress))
+              } else {
+                continuation.yield(.snapshotChanged(snapshot))
+              }
             }
             try? await Task.sleep(nanoseconds: 250_000_000)
           }
@@ -1013,7 +1020,7 @@ private actor SimulatorPlaybackState {
   func seek(to time: TimeInterval) {
     guard time.isFinite else { return }
     self.elapsedTime = min(self.duration, max(0, time))
-    self.sendSnapshot()
+    self.sendProgress()
   }
 
   func skipToNext() -> PlaybackSkipOutcome {
@@ -1098,6 +1105,12 @@ private actor SimulatorPlaybackState {
     continuation.yield(.snapshotChanged(self.snapshot))
   }
 
+  private func sendProgress() {
+    for continuation in self.continuations.values {
+      continuation.yield(.progressChanged(self.progress))
+    }
+  }
+
   private func startProgressTickerIfNeeded() {
     guard self.progressTicker == nil else { return }
     self.progressTicker = Task.detached {
@@ -1123,7 +1136,7 @@ private actor SimulatorPlaybackState {
     if self.elapsedTime >= self.duration {
       self.finishCurrentItem()
     } else {
-      self.sendSnapshot()
+      self.sendProgress()
     }
   }
 
