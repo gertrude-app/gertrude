@@ -41,6 +41,9 @@ extension MusicRoute: RouteResponder {
       case .getMusicAppStatus(let input):
         let output = try await GetMusicAppStatus.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .getMusicOnboardingConfig:
+        let output = try await GetMusicOnboardingConfig.resolve(in: context)
+        return try await self.respond(with: output)
       }
     }
   }
@@ -82,36 +85,60 @@ extension GetMusicAppStatus: Resolver {
         MusicApp.Token(installId: install.id),
         conflictOn: [.installId],
       )
+      let entitlement = try await musicEntitlement(for: child, in: ctx)
 
       return .claimed(
         token: token.value.rawValue,
         childId: child.id.rawValue,
         childName: child.name,
+        entitlement: entitlement,
       )
     }
 
     if let child = try await device.child(in: ctx.db) {
-      let parent = try await child.parent(in: ctx.db)
-      let account = try await parent.billingAccountSnapshot(
-        in: ctx.db,
-        at: get(dependency: \.date.now),
+      let claim = try await device.ensureClaim(intent: .music, in: ctx.db)
+      try await completeClaim(claim, for: child, in: ctx.db)
+      let token = try await ctx.db.findOrCreate(
+        MusicApp.Token(installId: install.id),
+        conflictOn: [.installId],
       )
-      if account.can(.useGertrudeMusic) {
-        let claim = try await device.ensureClaim(intent: .music, in: ctx.db)
-        try await completeClaim(claim, for: child, in: ctx.db)
-        let token = try await ctx.db.findOrCreate(
-          MusicApp.Token(installId: install.id),
-          conflictOn: [.installId],
-        )
-        return .claimed(
-          token: token.value.rawValue,
-          childId: child.id.rawValue,
-          childName: child.name,
-        )
-      }
+      let entitlement = try await musicEntitlement(for: child, in: ctx)
+
+      return .claimed(
+        token: token.value.rawValue,
+        childId: child.id.rawValue,
+        childName: child.name,
+        entitlement: entitlement,
+      )
     }
 
     let claim = try await device.ensureClaim(intent: .music, in: ctx.db)
     return .unclaimed(code: claim.code, expiresAt: claim.expiresAt)
   }
+}
+
+extension GetMusicOnboardingConfig: NoInputResolver {
+  static func resolve(in _: Context) async throws -> Output {
+    .init(
+      // use {{device}} placeholder -> "iPhone"/"iPad"
+      explainAccountText: nil,
+      // use {{device}} placeholder -> "<name>’s iPhone"/"<name>’s iPad"
+      subscriptionRequiredText: nil,
+    )
+  }
+}
+
+func musicEntitlement(
+  for child: Child,
+  in ctx: Context,
+) async throws -> GetMusicAppStatus.Entitlement {
+  let parent = try await child.parent(in: ctx.db)
+  let account = try await parent.billingAccountSnapshot(
+    in: ctx.db,
+    at: get(dependency: \.date.now),
+  )
+  guard account.can(.useGertrudeMusic) else {
+    return .unpaid(remediationUrl: URL(string: "\(ctx.dashboardUrl)/settings"))
+  }
+  return .active
 }

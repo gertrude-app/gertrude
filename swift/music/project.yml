@@ -18,9 +18,16 @@ targets:
     sources:
       - path: app/sources
         group: app
+      - path: app/Assets.xcassets
+        group: app
       - path: app/AppIcon.icon
         group: app
         buildPhase: resources
+      - path: app/AppIconDev.icon
+        group: app
+        buildPhase: resources
+      - path: app/LaunchScreen.storyboard
+        group: app
     dependencies:
       - package: LibTCA
         product: LibTCA
@@ -29,7 +36,7 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "6.0"
         PRODUCT_NAME: "Gertrude Music"
-        DEVELOPMENT_TEAM: "Y63PLK783B"
+        DEVELOPMENT_TEAM: "WFN83LM943"
         CODE_SIGN_STYLE: Automatic
         MARKETING_VERSION: 0.2.0
         CURRENT_PROJECT_VERSION: 6
@@ -43,8 +50,11 @@ targets:
         Debug:
           ONLY_ACTIVE_ARCH: YES
           CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES
-          PRODUCT_BUNDLE_IDENTIFIER: "com.innocencelabs.gertrude-fm-temp-dev"
-          API_ENDPOINT: "${GERTRUDE_MUSIC_DEBUG_API_ENDPOINT}"
+          ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDev
+          INFOPLIST_FILE: app/Info.Debug.plist
+          DEVELOPMENT_TEAM: "${GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM}"
+          PRODUCT_BUNDLE_IDENTIFIER: "${GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER}"
+          API_ENDPOINT: "${LOCAL_API_ENDPOINT}"
     info:
       path: app/Info.plist
       properties:
@@ -53,6 +63,8 @@ targets:
         CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleLocalizations:
+          - en
         API_ENDPOINT: $(API_ENDPOINT)
         NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved music.
         UISupportedInterfaceOrientations:
@@ -60,26 +72,9 @@ targets:
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
         UIRequiresFullScreen: true
-        UILaunchScreen: {}
+        UILaunchStoryboardName: LaunchScreen
         UIBackgroundModes:
           - audio
-    postBuildScripts:
-      - name: Add debug local API Info.plist keys
-        script: |
-          if [ "$CONFIGURATION" != "Debug" ]; then
-            exit 0
-          fi
-          case "$API_ENDPOINT" in
-            http://*) ;;
-            *) exit 0 ;;
-          esac
-          plist="$TARGET_BUILD_DIR/$INFOPLIST_PATH"
-          /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" "$plist" 2>/dev/null || true
-          /usr/libexec/PlistBuddy -c "Set :NSAppTransportSecurity:NSAllowsLocalNetworking true" "$plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity:NSAllowsLocalNetworking bool true" "$plist"
-          /usr/libexec/PlistBuddy -c "Set :NSLocalNetworkUsageDescription Gertrude Music connects to a local development API while testing." "$plist" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :NSLocalNetworkUsageDescription string Gertrude Music connects to a local development API while testing." "$plist"
-        basedOnDependencyAnalysis: false
-        showEnvVars: false
-
 schemes:
   "Gertrude Music":
     build:

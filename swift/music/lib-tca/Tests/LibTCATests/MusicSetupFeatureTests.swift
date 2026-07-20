@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import LibViews
 import MusicRoute
 import Testing
 
@@ -8,170 +9,249 @@ import Testing
 @MainActor
 struct MusicSetupFeatureTests {
   @Test
-  func onAppearShowsWelcomeWhenAppleMusicPermissionHasNotBeenRequested() async {
+  func newUserOnAppearShowsWelcomeAndPrefetchesStatus() async {
     let store = TestStore(initialState: .init()) {
       MusicSetupFeature()
     } withDependencies: {
-      $0.musicSetup.authorizationStatus = { .notDetermined }
+      $0.keychain = KeychainStore().client
+      $0.api.getMusicAppStatus = { .unclaimed(code: 123_456, expiresAt: .distantFuture) }
+      $0.api.getMusicOnboardingConfig = { .init(subscriptionRequiredText: "pay up") }
     }
 
-    await store.send(.onAppear)
-    await store.receive(.appleMusicAuthorizationStatusLoaded(
-      .notDetermined,
-      showWelcomeIfNeeded: true,
-    )) {
+    await store.send(.onAppear) {
       $0.screen = .welcome
+    }
+    await store.receive(.prefetchStatusLoaded(.unclaimed(
+      code: 123_456,
+      expiresAt: .distantFuture,
+    ))) {
+      $0.prefetch = .loaded(.unclaimed(code: 123_456, expiresAt: .distantFuture))
+    }
+    await store.receive(.onboardingConfigLoaded(.init(subscriptionRequiredText: "pay up"))) {
+      $0.onboardingConfig = .init(subscriptionRequiredText: "pay up")
     }
   }
 
   @Test
-  func getStartedShowsAppleMusicPermissionScreen() async {
+  func getStartedWithUnclaimedStatusShowsParentQuestion() async {
     var state = MusicSetupFeature.State()
     state.screen = .welcome
+    state.prefetch = .loaded(.unclaimed(code: 123_456, expiresAt: .distantFuture))
     let store = TestStore(initialState: state) {
       MusicSetupFeature()
     }
 
     await store.send(.getStartedButtonTapped) {
+      $0.screen = .parentQuestion
+    }
+  }
+
+  @Test
+  func parentNoShowsNudgeThenProceedsAsSelfManagement() async {
+    var state = MusicSetupFeature.State()
+    state.screen = .parentQuestion
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    }
+
+    await store.send(.parentNoButtonTapped) {
+      $0.screen = .selfManagerNudge
+    }
+    await store.send(.nudgeContinueButtonTapped) {
+      $0.claimAudience = .selfManagement
+      $0.screen = .explainAccount
+    }
+  }
+
+  @Test
+  func claimFlowPollsToRecognizedThenAppleMusicThenReady() async {
+    let clock = TestClock()
+    let token = UUID(1)
+    let childId = UUID(2)
+    let provider = MusicAppStatusProvider(outputs: [
+      .unclaimed(code: 123_456, expiresAt: .distantFuture), // explainAccount fetch
+      .claimed(token: token, childId: childId, childName: "Harriet", entitlement: .active),
+    ])
+    var state = MusicSetupFeature.State()
+    state.screen = .explainAccount
+    state.claimAudience = .parentPartner
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.keychain = KeychainStore().client
+      $0.continuousClock = clock
+      $0.api.getMusicAppStatus = { try await provider.next() }
+      $0.musicSetup.authorizationStatus = { .authorized }
+      $0.musicSetup.subscriptionStatus = { .canPlayCatalogContent }
+    }
+
+    await store.send(.explainAccountContinueButtonTapped) {
+      $0.screen = .gertrudeConnection(.checking)
+    }
+    await store.receive(.musicAppStatusLoaded(.unclaimed(
+      code: 123_456,
+      expiresAt: .distantFuture,
+    ))) {
+      $0.screen = .gertrudeConnection(.unclaimed(code: 123_456, expiresAt: .distantFuture))
+    }
+    await clock.advance(by: .seconds(5)) // poll finds the completed claim
+    await store.receive(.musicAppStatusLoaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+      entitlement: .active,
+    ))) {
+      $0.screen = .deviceRecognized(childName: "Harriet")
+    }
+    await store.send(.deviceRecognizedContinueButtonTapped) // stays on deviceRecognized, no splash
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.authorized))
+    await store.receive(.appleMusicSubscriptionStatusLoaded(.canPlayCatalogContent)) {
+      $0.screen = .ready(childName: "Harriet")
+    }
+    await store.receive(.delegate(.completed(childName: "Harriet")))
+  }
+
+  @Test
+  func deviceRecognizedContinueGoesStraightToPermissionWithoutSplash() async {
+    var state = MusicSetupFeature.State()
+    state.screen = .deviceRecognized(childName: "Harriet")
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.musicSetup.authorizationStatus = { .notDetermined }
+    }
+
+    await store.send(.deviceRecognizedContinueButtonTapped) // no .checking splash in between
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.notDetermined)) {
       $0.screen = .appleMusicPermission
     }
   }
 
   @Test
-  func authorizedSubscribedAndClaimedCompletesSetup() async {
+  func recognizedEntitledDeviceSkipsQuestion() async {
     let token = UUID(1)
     let childId = UUID(2)
+    var state = MusicSetupFeature.State()
+    state.screen = .welcome
+    state.prefetch = .loaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+      entitlement: .active,
+    ))
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.keychain = KeychainStore().client
+    }
+
+    await store.send(.getStartedButtonTapped) {
+      $0.screen = .deviceRecognized(childName: "Harriet")
+    }
+  }
+
+  @Test
+  func recognizedUnpaidDeviceShowsSubscriptionRequiredThenResolves() async {
+    let clock = TestClock()
+    let token = UUID(1)
+    let childId = UUID(2)
+    let url = URL(string: "https://parents.gertrude.app/settings")
+    let provider = MusicAppStatusProvider(outputs: [
+      .claimed(token: token, childId: childId, childName: "Harriet", entitlement: .active),
+    ])
+    var state = MusicSetupFeature.State()
+    state.screen = .welcome
+    state.prefetch = .loaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+      entitlement: .unpaid(remediationUrl: url),
+    ))
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.keychain = KeychainStore().client
+      $0.continuousClock = clock
+      $0.api.getMusicAppStatus = { try await provider.next() }
+    }
+
+    await store.send(.getStartedButtonTapped) {
+      $0.screen = .subscriptionRequired(childName: "Harriet", remediationUrl: url)
+    }
+    await clock.advance(by: .seconds(5)) // poll finds the paid subscription
+    await store.receive(.musicAppStatusLoaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+      entitlement: .active,
+    ))) {
+      $0.screen = .deviceRecognized(childName: "Harriet")
+    }
+  }
+
+  @Test
+  func subscriptionRequiredPollingDoesNotResaveConnectionEachTick() async {
+    let keychain = KeychainStore()
+    let token = UUID(1)
+    let childId = UUID(2)
+    let url = URL(string: "https://parents.gertrude.app/settings")
+    var state = MusicSetupFeature.State()
+    state
+      .screen = .subscriptionRequired(childName: "Harriet", remediationUrl: url) // already polling
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.keychain = keychain.client
+    }
+
+    let unpaidTick = MusicSetupFeature.Action.musicAppStatusLoaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+      entitlement: .unpaid(remediationUrl: url),
+    ))
+    await store.send(unpaidTick) // poll tick, still unpaid: no screen change
+    await store.send(unpaidTick) // another tick: still no screen change
+
+    #expect(keychain.connectionSaveCount == 0) // already on screen -> must not re-save each tick
+  }
+
+  @Test
+  func returningUserSkipsOnboardingToAppleMusic() async {
+    let keychain = KeychainStore()
+    keychain.client.save(connection: .init(token: UUID(1), childId: UUID(2), childName: "Harriet"))
     let store = TestStore(initialState: .init()) {
       MusicSetupFeature()
     } withDependencies: {
-      $0.api.getMusicAppStatus = {
-        .claimed(
-          token: token,
-          childId: childId,
-          childName: "Harriet",
-        )
-      }
-      $0.keychain._load = { _ in nil }
-      $0.keychain._save = { _, _ in }
-      $0.keychain.delete = { _ in }
+      $0.keychain = keychain.client
       $0.musicSetup.authorizationStatus = { .authorized }
       $0.musicSetup.subscriptionStatus = { .canPlayCatalogContent }
     }
 
-    await store.send(.onAppear)
-    await store.receive(.appleMusicAuthorizationStatusLoaded(
-      .authorized,
-      showWelcomeIfNeeded: true,
-    ))
+    await store.send(.onAppear) // stays on .checking: no welcome, no prefetch
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.authorized))
     await store.receive(.appleMusicSubscriptionStatusLoaded(.canPlayCatalogContent)) {
-      $0.screen = .gertrudeConnection(.checking)
-    }
-    await store.receive(.musicAppStatusLoaded(.claimed(
-      token: token,
-      childId: childId,
-      childName: "Harriet",
-    ))) {
       $0.screen = .ready(childName: "Harriet")
     }
     await store.receive(.delegate(.completed(childName: "Harriet")))
   }
 
   @Test
-  func subscriptionRequiredCanPresentAppleMusicOffer() async {
-    let store = TestStore(initialState: .init()) {
-      MusicSetupFeature()
-    } withDependencies: {
-      $0.musicSetup.subscriptionStatus = {
-        .subscriptionRequired(canBecomeSubscriber: true)
-      }
-    }
-
-    await store.send(.appleMusicAuthorizationStatusLoaded(.authorized, showWelcomeIfNeeded: false))
-    await store.receive(.appleMusicSubscriptionStatusLoaded(.subscriptionRequired(
-      canBecomeSubscriber: true,
-    ))) {
-      $0.screen = .appleMusicSubscriptionRequired(canShowOffer: true)
-    }
-  }
-
-  @Test
-  func dismissingSubscriptionOfferRechecksAppleMusicAndGertrudeConnection() async {
-    let token = UUID(1)
-    let childId = UUID(2)
+  func getStartedWhilePrefetchLoadingWaitsThenForks() async {
     var state = MusicSetupFeature.State()
-    state.isSubscriptionOfferPresented = true
-    state.screen = .appleMusicSubscriptionRequired(canShowOffer: true)
+    state.screen = .welcome
+    state.prefetch = .loading
     let store = TestStore(initialState: state) {
       MusicSetupFeature()
-    } withDependencies: {
-      $0.api.getMusicAppStatus = {
-        .claimed(
-          token: token,
-          childId: childId,
-          childName: "Harriet",
-        )
-      }
-      $0.keychain._load = { _ in nil }
-      $0.keychain._save = { _, _ in }
-      $0.keychain.delete = { _ in }
-      $0.musicSetup.subscriptionStatus = { .canPlayCatalogContent }
     }
 
-    await store.send(.appleMusicSubscriptionOfferPresentationChanged(false)) {
-      $0.isSubscriptionOfferPresented = false
-      $0.screen = .checking
+    await store.send(.getStartedButtonTapped) {
+      $0.screen = .connecting
     }
-    await store.receive(.appleMusicSubscriptionStatusLoaded(.canPlayCatalogContent)) {
-      $0.screen = .gertrudeConnection(.checking)
+    await store.send(.prefetchStatusLoaded(.unclaimed(code: 123_456, expiresAt: .distantFuture))) {
+      $0.prefetch = .loaded(.unclaimed(code: 123_456, expiresAt: .distantFuture))
+      $0.screen = .parentQuestion
     }
-    await store.receive(.musicAppStatusLoaded(.claimed(
-      token: token,
-      childId: childId,
-      childName: "Harriet",
-    ))) {
-      $0.screen = .ready(childName: "Harriet")
-    }
-    await store.receive(.delegate(.completed(childName: "Harriet")))
-  }
-
-  @Test
-  func unclaimedConnectionPollsUntilClaimed() async {
-    let clock = TestClock()
-    let expiresAt = Date(timeIntervalSince1970: 123)
-    let token = UUID(1)
-    let childId = UUID(2)
-    let statusProvider = MusicAppStatusProvider(outputs: [
-      .unclaimed(code: 123_456, expiresAt: expiresAt),
-      .claimed(token: token, childId: childId, childName: "Harriet"),
-    ])
-    let store = TestStore(initialState: .init()) {
-      MusicSetupFeature()
-    } withDependencies: {
-      $0.api.getMusicAppStatus = { try await statusProvider.next() }
-      $0.continuousClock = clock
-      $0.keychain._load = { _ in nil }
-      $0.keychain._save = { _, _ in }
-      $0.keychain.delete = { _ in }
-    }
-
-    await store.send(.appleMusicSubscriptionStatusLoaded(.canPlayCatalogContent)) {
-      $0.screen = .gertrudeConnection(.checking)
-    }
-    await store.receive(.musicAppStatusLoaded(.unclaimed(
-      code: 123_456,
-      expiresAt: expiresAt,
-    ))) {
-      $0.screen = .gertrudeConnection(.unclaimed(code: 123_456, expiresAt: expiresAt))
-    }
-    await clock.advance(by: .seconds(5))
-    await store.receive(.musicAppStatusLoaded(.claimed(
-      token: token,
-      childId: childId,
-      childName: "Harriet",
-    ))) {
-      $0.screen = .ready(childName: "Harriet")
-    }
-    await store.receive(.delegate(.completed(childName: "Harriet")))
   }
 
   @Test
@@ -187,6 +267,25 @@ struct MusicSetupFeatureTests {
 
     await store.send(.settingsButtonTapped)
     #expect(await recorder.openSettingsCount == 1)
+  }
+}
+
+private final class KeychainStore: @unchecked Sendable {
+  private let lock = NSLock()
+  private var storage: [KeychainClient.Key: Data] = [:]
+  private var connectionSaves = 0
+
+  var connectionSaveCount: Int { self.lock.withLock { self.connectionSaves } }
+
+  var client: KeychainClient {
+    KeychainClient(
+      _load: { key in self.lock.withLock { self.storage[key] } },
+      _save: { key, data in self.lock.withLock {
+        self.storage[key] = data
+        if key == .connection { self.connectionSaves += 1 } // count connection re-saves
+      } },
+      delete: { key in self.lock.withLock { _ = self.storage.removeValue(forKey: key) } },
+    )
   }
 }
 

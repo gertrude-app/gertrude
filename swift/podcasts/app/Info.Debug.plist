@@ -4,10 +4,15 @@
   <dict>
     <key>API_ENDPOINT</key>
     <string>$(API_ENDPOINT)</string>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+      <string>com.netrivet.gertrude.am.refresh-feed</string>
+      <string>com.netrivet.gertrude.am.download-episodes</string>
+    </array>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>Gertrude Music</string>
+    <string>Gertrude Podcasts</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -17,6 +22,7 @@
     <key>CFBundleLocalizations</key>
     <array>
       <string>en</string>
+      <string>es</string>
     </array>
     <key>CFBundleName</key>
     <string>$(PRODUCT_NAME)</string>
@@ -26,11 +32,18 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
-    <key>NSAppleMusicUsageDescription</key>
-    <string>Gertrude Music needs access to Apple Music to play approved music.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsLocalNetworking</key>
+      <true/>
+    </dict>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Gertrude Podcasts connects to a local development API while testing.</string>
     <key>UIBackgroundModes</key>
     <array>
       <string>audio</string>
+      <string>fetch</string>
+      <string>processing</string>
     </array>
     <key>UILaunchStoryboardName</key>
     <string>LaunchScreen</string>

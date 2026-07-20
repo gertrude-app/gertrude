@@ -70,19 +70,20 @@ struct AppFeature: Sendable {
         state.isNowPlayingPresented = isPresented
         return .none
 
-      case .library(.debugResetOnboardingButtonTapped):
-        self.keychain.deleteConnection()
-        self.keychain.save(deviceId: self.uuid())
-        state.isNowPlayingPresented = false
-        state.library = .init()
-        state.playback = .init()
-        state.setup = .init()
-        state.setup.screen = .welcome
-        return .merge(
-          .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
-          .cancel(id: PlaybackFeature.CancelID.playbackEvents),
-          .run { _ in await self.playback.stop() },
-        )
+      #if DEBUG
+        case .library(.debugResetOnboardingButtonTapped):
+          self.keychain.deleteConnection()
+          self.keychain.save(deviceId: self.uuid())
+          state.isNowPlayingPresented = false
+          state.library = .init()
+          state.playback = .init()
+          state.setup = .init()
+          return .merge(
+            .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
+            .cancel(id: PlaybackFeature.CancelID.playbackEvents),
+            .run { _ in await self.playback.stop() },
+          )
+      #endif
 
       case .library(.delegate(.dismissPlaybackFailure)):
         return .send(.playback(.playbackFailureDismissed))

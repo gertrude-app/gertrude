@@ -276,7 +276,7 @@ struct ButtonScreenView: View {
 
 #Preview("Music permission") {
   ButtonScreenView(
-    text: "Gertrude Music needs permission to use Apple Music so approved albums can play.",
+    text: "Gertrude Music needs permission to use Apple Music so approved music can play.",
     primary: .init("Continue") {},
     screenType: .music,
   )

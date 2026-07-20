@@ -10,9 +10,12 @@ struct MusicSetupWelcomeView: View {
   let onPrimaryButtonTap: @MainActor @Sendable () -> Void
 
   @State private var showBackground = false
-  @State private var showLogo = false
-  @State private var showTagline = false
-  @State private var showPrimaryButton = false
+  @State private var greeting = ""
+  @State private var lettersOffset: [Vector] = []
+  @State private var subtitleOffset = Vector(x: 0, y: 40)
+  @State private var buttonOffset = Vector(x: 0, y: 40)
+
+  private static let greetingText = "Hi there!"
 
   var body: some View {
     ZStack {
@@ -20,67 +23,102 @@ struct MusicSetupWelcomeView: View {
         .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
-      GeometryReader { proxy in
-        let availableWidth = min(proxy.size.width, Self.screenWidth)
-        let contentWidth = min(availableWidth - 60, 440)
-        VStack(spacing: 24) {
+      VStack(alignment: self.isPad ? .center : .leading, spacing: 12) {
+        if !self.isPad {
           Spacer()
-
-          VStack(spacing: 24) {
-            Image("MusicLogo", bundle: Bundle.module)
-              .resizable()
-              .scaledToFit()
-              .frame(maxWidth: 240)
-              .opacity(self.showLogo ? 1 : 0)
-              .scaleEffect(self.showLogo ? 1 : 0.94)
-              .offset(y: self.showLogo ? 0 : 18)
-
-            Text("Approved albums only. The music selected for you — and nothing else.")
-              .font(.system(size: 18, weight: .medium))
-              .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
-              .multilineTextAlignment(.center)
-              .fixedSize(horizontal: false, vertical: true)
-              .frame(maxWidth: min(contentWidth, 340))
-              .opacity(self.showTagline ? 1 : 0)
-              .offset(y: self.showTagline ? 0 : 12)
-          }
-
-          Spacer()
-
-          BigButton("Get started", type: .button {
-            self.onPrimaryButtonTap()
-          }, variant: .primary)
-            .frame(width: contentWidth)
-            .padding(.bottom, 30)
-            .opacity(self.showPrimaryButton ? 1 : 0)
-            .scaleEffect(self.showPrimaryButton ? 1 : 0.98)
-            .offset(y: self.showPrimaryButton ? 0 : 20)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+        HStack(spacing: 0) {
+          ForEach(Array(self.greeting.enumerated()), id: \.offset) { index, char in
+            Text(String(char))
+              .font(.system(size: 50, weight: .black))
+              .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
+              .swooshIn(
+                tracking: self.$lettersOffset[index],
+                to: .zero,
+                after: .seconds(Double(index) / 15.0 + 0.5),
+                for: .milliseconds(600),
+              )
+          }
+        }
+
+        Text(
+          "Gertrude Music lets parents or accountability partners give access to only selected, approved music.",
+        )
+        .font(.system(size: 16, weight: .medium))
+        .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
+        .multilineTextAlignment(self.isPad ? .center : .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .swooshIn(
+          tracking: self.$subtitleOffset,
+          to: .zero,
+          after: .seconds(1.0),
+          for: .milliseconds(800),
+          via: .smooth,
+        )
+
+        BigButton("Get started", type: .button {
+          self.vanishingAnimations()
+          delayed(by: .milliseconds(800)) {
+            self.onPrimaryButtonTap()
+          }
+        }, variant: .primary)
+          .padding(.top, 20)
+          .swooshIn(
+            tracking: self.$buttonOffset,
+            to: .zero,
+            after: .seconds(1.3),
+            for: .milliseconds(800),
+            via: .smooth,
+          )
       }
+      .padding(30)
+      .frame(maxWidth: 500)
     }
     .onAppear {
-      withAnimation(.smooth(duration: 0.7)) {
+      self.greeting = Self.greetingText
+      self.lettersOffset = Array(repeating: Vector(x: 0, y: 40), count: self.greeting.count)
+      withAnimation(.smooth(duration: 1.2)) {
         self.showBackground = true
-      }
-      withAnimation(.bouncy(duration: 0.75, extraBounce: 0.14).delay(0.12)) {
-        self.showLogo = true
-      }
-      withAnimation(.smooth(duration: 0.55).delay(0.30)) {
-        self.showTagline = true
-      }
-      withAnimation(.bouncy(duration: 0.65, extraBounce: 0.12).delay(0.48)) {
-        self.showPrimaryButton = true
       }
     }
   }
 
-  private static var screenWidth: CGFloat {
+  @MainActor private func vanishingAnimations() {
+    withAnimation(.smooth(duration: 1)) {
+      self.showBackground = false
+    }
+    for index in self.lettersOffset.indices {
+      withAnimation(.smooth(duration: 0.5)) {
+        self.lettersOffset[index].y = 50
+      }
+    }
+    withAnimation(.smooth(duration: 0.5)) {
+      self.subtitleOffset.y = 50
+      self.buttonOffset.y = 50
+    }
+  }
+
+  private var isPad: Bool {
     #if os(iOS)
-      UIScreen.main.bounds.width
+      UIDevice.current.userInterfaceIdiom == .pad
     #else
-      500
+      false
     #endif
+  }
+}
+
+struct MusicSetupSplashView: View {
+  var body: some View {
+    ZStack {
+      Image("MusicSplashGradient", bundle: Bundle.module)
+        .resizable()
+      Image("MusicSplashNote", bundle: Bundle.module)
+        .resizable()
+        .scaledToFit()
+        .frame(width: 144, height: 144)
+    }
+    .ignoresSafeArea()
   }
 }
 

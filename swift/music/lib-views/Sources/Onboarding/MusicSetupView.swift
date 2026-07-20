@@ -3,6 +3,9 @@ import SwiftUI
 public enum MusicSetupViewState: Equatable, Sendable {
   case checking
   case welcome
+  case parentQuestion
+  case selfManagerNudge
+  case explainAccount(overrideText: String?)
   case appleMusicPermission
   case appleMusicDenied
   case appleMusicRestricted
@@ -10,17 +13,30 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case appleMusicStatusUnavailable
   case appleMusicSubscriptionRequired(canShowOffer: Bool)
   case gertrudeConnection(MusicSetupConnectionViewState)
+  case deviceRecognized(childName: String)
+  case subscriptionRequired(childName: String, remediationUrl: URL?, overrideText: String?)
 }
 
 public enum MusicSetupConnectionViewState: Equatable, Sendable {
   case checking
-  case unclaimed(code: Int)
+  case unclaimed(code: Int, audience: MusicClaimAudience)
   case failed
+}
+
+/// who is holding the device during setup, which selects the claim-code copy
+public enum MusicClaimAudience: Equatable, Sendable {
+  case parentPartner
+  case selfManagement
 }
 
 public enum MusicSetupViewEvent: Equatable, Sendable {
   case appleMusicPermissionTapped
+  case deviceRecognizedContinueTapped
+  case explainAccountContinueTapped
   case getStartedTapped
+  case nudgeContinueTapped
+  case parentNoTapped
+  case parentYesTapped
   case refreshConnectionTapped
   case retryTapped
   case settingsTapped
@@ -42,16 +58,62 @@ public struct MusicSetupView: View {
   public var body: some View {
     switch self.state {
     case .checking:
-      LoadingScreenView(text: "Checking setup…")
+      MusicSetupSplashView()
 
     case .welcome:
       MusicSetupWelcomeView {
         self.onEvent(.getStartedTapped)
       }
 
+    case .parentQuestion:
+      ButtonScreenView(
+        text: "Are you the parent or accountability partner? Gertrude Music is controlled by a separate Gertrude account, ideally managed by someone other than the person using this device.",
+        primary: .init("Yes, I’m the parent or partner", animate: false) {
+          self.onEvent(.parentYesTapped)
+        },
+        secondary: .init("No, this device is mine", animate: false) {
+          self.onEvent(.parentNoTapped)
+        },
+        screenType: .question,
+      )
+
+    case .selfManagerNudge:
+      ButtonScreenView(
+        text: "Gertrude Music works best when someone else manages the account. A parent or accountability partner chooses what music is allowed, so the choice isn’t in your own hands. You can continue and set it up yourself, but consider asking someone to manage the account for you.",
+        primary: .init("Continue", animate: false) {
+          self.onEvent(.nudgeContinueTapped)
+        },
+        screenType: .info,
+      )
+
+    case .explainAccount(let overrideText):
+      ButtonScreenView(
+        text: musicOnboardingBlurb(
+          override: overrideText,
+          device: musicDeviceType(),
+          fallback: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
+        ),
+        primary: .init("Got it, next", animate: false) {
+          self.onEvent(.explainAccountContinueTapped)
+        },
+        screenType: .link,
+      )
+
+    case .deviceRecognized(let childName):
+      MusicDeviceRecognizedView(childName: childName) {
+        self.onEvent(.deviceRecognizedContinueTapped)
+      }
+
+    case .subscriptionRequired(let childName, let remediationUrl, let overrideText):
+      MusicSubscriptionRequiredView(
+        childName: childName,
+        remediationUrl: remediationUrl,
+        overrideText: overrideText,
+      )
+
     case .appleMusicPermission:
       ButtonScreenView(
-        text: "Gertrude Music needs permission to use Apple Music so approved albums can play.",
+        text: "Gertrude Music needs permission to use Apple Music so music albums can play.",
         primary: .init("Continue", animate: false, asyncAction: true) {
           self.onEvent(.appleMusicPermissionTapped)
         },
@@ -120,10 +182,8 @@ public struct MusicSetupView: View {
     case .gertrudeConnection(.checking):
       LoadingScreenView(text: "Checking Gertrude account connection…")
 
-    case .gertrudeConnection(.unclaimed(code: let code)):
-      MusicClaimCodeView(code: code) {
-        self.onEvent(.refreshConnectionTapped)
-      }
+    case .gertrudeConnection(.unclaimed(let code, let audience)):
+      MusicClaimCodeView(code: code, audience: audience)
 
     case .gertrudeConnection(.failed):
       ButtonScreenView(
@@ -143,6 +203,32 @@ public struct MusicSetupView: View {
 
 #Preview("Welcome") {
   MusicSetupView(state: .welcome)
+}
+
+#Preview("Parent Question") {
+  MusicSetupView(state: .parentQuestion)
+}
+
+#Preview("Self Manager Nudge") {
+  MusicSetupView(state: .selfManagerNudge)
+}
+
+#Preview("Explain Account") {
+  MusicSetupView(state: .explainAccount(
+    overrideText: "Set up Gertrude Music on this {{device}}. It’s $5 a month, and one subscription covers every device in your family.",
+  ))
+}
+
+#Preview("Device Recognized") {
+  MusicSetupView(state: .deviceRecognized(childName: "Billy Bob"))
+}
+
+#Preview("Subscription Required") {
+  MusicSetupView(state: .subscriptionRequired(
+    childName: "Billy Bob",
+    remediationUrl: URL(string: "https://parents.gertrude.app/settings"),
+    overrideText: "{{device}} needs a subscription — Gertrude Music is $5 a month and covers your whole family. Open this link:",
+  ))
 }
 
 #Preview("Apple Music Permission") {
@@ -177,8 +263,12 @@ public struct MusicSetupView: View {
   MusicSetupView(state: .gertrudeConnection(.checking))
 }
 
-#Preview("Gertrude Claim") {
-  MusicSetupView(state: .gertrudeConnection(.unclaimed(code: 123_456)))
+#Preview("Gertrude Claim (Parent)") {
+  MusicSetupView(state: .gertrudeConnection(.unclaimed(code: 123_456, audience: .parentPartner)))
+}
+
+#Preview("Gertrude Claim (Self)") {
+  MusicSetupView(state: .gertrudeConnection(.unclaimed(code: 123_456, audience: .selfManagement)))
 }
 
 #Preview("Gertrude Connection Failed") {

@@ -117,7 +117,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func debugResetOnboardingRotatesDeviceConnectionAndShowsWelcome() async {
+  func debugResetOnboardingRotatesDeviceConnectionAndRestartsSetup() async {
     let item = playbackItem("track-1")
     var state = AppFeature.State()
     state.isNowPlayingPresented = true
@@ -140,8 +140,8 @@ struct AppFeatureTests {
       $0.library = .init()
       $0.playback = .init()
       $0.setup = .init()
-      $0.setup.screen = .welcome
     }
+    #expect(store.state.setup.screen == .checking)
   }
 
   @Test

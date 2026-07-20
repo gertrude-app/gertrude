@@ -4,8 +4,8 @@ struct MusicClaimCodeView: View {
   @Environment(\.colorScheme) private var colorScheme
 
   let code: Int
+  let audience: MusicClaimAudience
   let statusDelay: Duration
-  let onRefreshTap: @MainActor @Sendable () -> Void
 
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
@@ -17,20 +17,18 @@ struct MusicClaimCodeView: View {
       Spacer()
       Spacer()
 
-      WaitingStatus(label: "Watching for account connection…", delay: self.statusDelay)
+      WaitingStatus(label: "Waiting for account connection…", delay: self.statusDelay)
 
       Spacer()
 
-      Text(
-        "Send this link to the Gertrude account owner so they can connect this device in the dashboard.",
-      )
-      .font(.system(size: 17, weight: .medium))
-      .foregroundStyle(Color(
-        self.colorScheme,
-        light: .black.opacity(0.8),
-        dark: .white.opacity(0.8),
-      ))
-      .fixedSize(horizontal: false, vertical: true)
+      Text(self.instructions)
+        .font(.system(size: 17, weight: .medium))
+        .foregroundStyle(Color(
+          self.colorScheme,
+          light: .black.opacity(0.8),
+          dark: .white.opacity(0.8),
+        ))
+        .fixedSize(horizontal: false, vertical: true)
 
       Text(self.claimUrl)
         .font(.system(size: 20, weight: .semibold, design: .monospaced))
@@ -40,12 +38,6 @@ struct MusicClaimCodeView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.vertical, 8)
         .textSelection(.enabled)
-
-      BigButton(
-        "I claimed this device",
-        type: .button { self.onRefreshTap() },
-        variant: .secondary,
-      )
 
       BigButton(
         "Send link",
@@ -62,12 +54,21 @@ struct MusicClaimCodeView: View {
 
   init(
     code: Int,
+    audience: MusicClaimAudience,
     statusDelay: Duration = .seconds(45),
-    onRefreshTap: @MainActor @escaping @Sendable () -> Void = {},
   ) {
     self.code = code
+    self.audience = audience
     self.statusDelay = statusDelay
-    self.onRefreshTap = onRefreshTap
+  }
+
+  private var instructions: String {
+    switch self.audience {
+    case .parentPartner:
+      "Open this link on your own phone or computer (not this \(musicDeviceType())) to connect a Gertrude account:"
+    case .selfManagement:
+      "Send this link to your parent or accountability partner so they can connect this device to their Gertrude account:"
+    }
   }
 
   private var codeString: String {
@@ -79,11 +80,15 @@ struct MusicClaimCodeView: View {
   }
 }
 
-#Preview("Claim") {
-  MusicClaimCodeView(code: 123_456, statusDelay: .seconds(2))
+#Preview("Claim (Parent)") {
+  MusicClaimCodeView(code: 123_456, audience: .parentPartner, statusDelay: .seconds(2))
+}
+
+#Preview("Claim (Self)") {
+  MusicClaimCodeView(code: 123_456, audience: .selfManagement, statusDelay: .seconds(2))
 }
 
 #Preview("Claim Dark") {
-  MusicClaimCodeView(code: 123_456, statusDelay: .seconds(2))
+  MusicClaimCodeView(code: 123_456, audience: .parentPartner, statusDelay: .seconds(2))
     .preferredColorScheme(.dark)
 }

@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import GertieApp
+import LibViews
 import MusicRoute
 
 @Reducer
@@ -9,17 +10,32 @@ struct MusicSetupFeature: Sendable {
   struct State: Equatable {
     var isSubscriptionOfferPresented = false
     var screen = Screen.checking
+    var claimAudience = MusicClaimAudience.parentPartner
+    var prefetch = Prefetch.loading
+    var onboardingConfig: GetMusicOnboardingConfig.Output?
+
+    enum Prefetch: Equatable {
+      case loading
+      case loaded(GetMusicAppStatus.Output)
+      case failed
+    }
 
     enum Screen: Equatable {
       case checking
       case welcome
+      case parentQuestion
+      case selfManagerNudge
+      case explainAccount
+      case connecting
+      case gertrudeConnection(ConnectionStatus)
+      case deviceRecognized(childName: String)
+      case subscriptionRequired(childName: String, remediationUrl: URL?)
       case appleMusicPermission
       case appleMusicDenied
       case appleMusicRestricted
       case appleMusicPrivacyAcknowledgementRequired
       case appleMusicStatusUnavailable
       case appleMusicSubscriptionRequired(canShowOffer: Bool)
-      case gertrudeConnection(ConnectionStatus)
       case ready(childName: String)
     }
 
@@ -35,20 +51,25 @@ struct MusicSetupFeature: Sendable {
       case completed(childName: String)
     }
 
-    case appleMusicAuthorizationStatusLoaded(
-      AppleMusicAuthorizationStatus,
-      showWelcomeIfNeeded: Bool,
-    )
+    case appleMusicAuthorizationStatusLoaded(AppleMusicAuthorizationStatus)
     case appleMusicPermissionButtonTapped
     case appleMusicSubscriptionOfferButtonTapped
     case appleMusicSubscriptionOfferPresentationChanged(Bool)
     case appleMusicSubscriptionStatusLoaded(AppleMusicSubscriptionStatus)
     case delegate(DelegateAction)
+    case deviceRecognizedContinueButtonTapped
+    case explainAccountContinueButtonTapped
     case getStartedButtonTapped
     case musicAppStatusFailed(hasStoredConnection: Bool)
     case musicAppStatusLoaded(GetMusicAppStatus.Output)
     case musicAppStatusPollingFailed
+    case nudgeContinueButtonTapped
     case onAppear
+    case onboardingConfigLoaded(GetMusicOnboardingConfig.Output)
+    case parentNoButtonTapped
+    case parentYesButtonTapped
+    case prefetchStatusFailed
+    case prefetchStatusLoaded(GetMusicAppStatus.Output)
     case refreshConnectionButtonTapped
     case retryButtonTapped
     case settingsButtonTapped
@@ -69,26 +90,63 @@ struct MusicSetupFeature: Sendable {
       switch action {
       case .onAppear:
         state.screen = .checking
-        return self.checkAppleMusic(showWelcomeIfNeeded: true)
+        // a returning user already has a connection; skip onboarding, resolve Apple Music
+        if self.keychain.loadConnection() != nil {
+          return self.checkAppleMusicAuthorization()
+        }
+        state.screen = .welcome
+        log(.info, .setup, "8502ee88")
+        return .merge(self.prefetchStatus(), self.fetchOnboardingConfig())
 
-      case .retryButtonTapped:
-        state.screen = .checking
-        return self.checkAppleMusic(showWelcomeIfNeeded: false)
-
-      case .getStartedButtonTapped:
-        state.screen = .appleMusicPermission
+      case .onboardingConfigLoaded(let config):
+        state.onboardingConfig = config
         return .none
 
+      case .prefetchStatusLoaded(let output):
+        state.prefetch = .loaded(output)
+        guard state.screen == .connecting else { return .none }
+        return self.advanceFromPrefetch(&state)
+
+      case .prefetchStatusFailed:
+        state.prefetch = .failed
+        guard state.screen == .connecting else { return .none }
+        return self.advanceFromPrefetch(&state)
+
+      case .getStartedButtonTapped:
+        return self.advanceFromPrefetch(&state)
+
+      case .parentYesButtonTapped:
+        state.claimAudience = .parentPartner
+        state.screen = .explainAccount
+        log(.info, .setup, "7606fe61")
+        return .none
+
+      case .parentNoButtonTapped:
+        state.screen = .selfManagerNudge
+        log(.info, .setup, "f09d005a")
+        return .none
+
+      case .nudgeContinueButtonTapped:
+        state.claimAudience = .selfManagement
+        state.screen = .explainAccount
+        return .none
+
+      case .explainAccountContinueButtonTapped:
+        state.screen = .gertrudeConnection(.checking)
+        return self.fetchMusicAppStatus(hasStoredConnection: false)
+
+      case .deviceRecognizedContinueButtonTapped:
+        return self.checkAppleMusicAuthorization()
+
+      case .retryButtonTapped:
+        return self.checkAppleMusicAuthorization()
+
       case .appleMusicPermissionButtonTapped:
-        state.screen = .checking
         return .run { send in
-          await send(.appleMusicAuthorizationStatusLoaded(
-            self.musicSetup.requestAuthorization(),
-            showWelcomeIfNeeded: false,
-          ))
+          await send(.appleMusicAuthorizationStatusLoaded(self.musicSetup.requestAuthorization()))
         }
 
-      case .appleMusicAuthorizationStatusLoaded(let status, let showWelcomeIfNeeded):
+      case .appleMusicAuthorizationStatusLoaded(let status):
         switch status {
         case .authorized:
           return self.checkAppleMusicSubscription()
@@ -97,7 +155,7 @@ struct MusicSetupFeature: Sendable {
           log(.err, .setup, "e145e6b5")
           return .none
         case .notDetermined:
-          state.screen = showWelcomeIfNeeded ? .welcome : .appleMusicPermission
+          state.screen = .appleMusicPermission
           return .none
         case .restricted:
           state.screen = .appleMusicRestricted
@@ -112,7 +170,7 @@ struct MusicSetupFeature: Sendable {
       case .appleMusicSubscriptionStatusLoaded(let status):
         switch status {
         case .canPlayCatalogContent:
-          return self.checkGertrudeConnection(&state)
+          return self.finishSetup(&state)
         case .permissionDenied:
           state.screen = .appleMusicDenied
           log(.err, .setup, "8a026e2c")
@@ -139,34 +197,31 @@ struct MusicSetupFeature: Sendable {
       case .appleMusicSubscriptionOfferPresentationChanged(let isPresented):
         state.isSubscriptionOfferPresented = isPresented
         guard !isPresented else { return .none }
-        state.screen = .checking
         return self.checkAppleMusicSubscription()
 
       case .refreshConnectionButtonTapped:
-        let hasStoredConnection = self.keychain.loadConnection() != nil
         state.screen = .gertrudeConnection(.checking)
         return .merge(
           .cancel(id: CancelID.musicAppStatusPolling),
-          self.fetchMusicAppStatus(hasStoredConnection: hasStoredConnection),
+          self.fetchMusicAppStatus(hasStoredConnection: false),
         )
 
       case .musicAppStatusLoaded(.unclaimed(let code, let expiresAt)):
         self.keychain.deleteConnection()
         let wasAlreadyPolling = state.isShowingUnclaimedConnection
         state.screen = .gertrudeConnection(.unclaimed(code: code, expiresAt: expiresAt))
+        if !wasAlreadyPolling {
+          log(.info, .setup, "ffbbb03c")
+        }
         return wasAlreadyPolling ? .none : self.startMusicAppStatusPolling()
 
-      case .musicAppStatusLoaded(.claimed(let token, let childId, let childName)):
-        self.keychain.save(connection: .init(
+      case .musicAppStatusLoaded(.claimed(let token, let childId, let childName, let entitlement)):
+        return self.enterClaimed(
+          &state,
           token: token,
           childId: childId,
           childName: childName,
-        ))
-        state.screen = .ready(childName: childName)
-        log(.info, .setup, "aa99a570")
-        return .merge(
-          .cancel(id: CancelID.musicAppStatusPolling),
-          .send(.delegate(.completed(childName: childName))),
+          entitlement: entitlement,
         )
 
       case .musicAppStatusFailed(let hasStored):
@@ -190,32 +245,91 @@ struct MusicSetupFeature: Sendable {
     }
   }
 
-  private func checkAppleMusic(showWelcomeIfNeeded: Bool) -> EffectOf<Self> {
+  private func advanceFromPrefetch(_ state: inout State) -> EffectOf<Self> {
+    switch state.prefetch {
+    case .loading:
+      state.screen = .connecting
+      return .none
+    case .loaded(.claimed(let token, let childId, let childName, let entitlement)):
+      log(.info, .setup, "9b438d26")
+      return self.enterClaimed(
+        &state,
+        token: token,
+        childId: childId,
+        childName: childName,
+        entitlement: entitlement,
+      )
+    case .loaded(.unclaimed), .failed:
+      state.screen = .parentQuestion
+      return .none
+    }
+  }
+
+  private func enterClaimed(
+    _ state: inout State,
+    token: UUID,
+    childId: UUID,
+    childName: String,
+    entitlement: GetMusicAppStatus.Entitlement,
+  ) -> EffectOf<Self> {
+    let wasAlreadyShowing = state.isShowingSubscriptionRequired
+    if !wasAlreadyShowing {
+      self.keychain.save(connection: .init(token: token, childId: childId, childName: childName))
+      log(.info, .setup, "aa99a570")
+    }
+    switch entitlement {
+    case .active:
+      state.screen = .deviceRecognized(childName: childName)
+      return .cancel(id: CancelID.musicAppStatusPolling)
+    case .unpaid(let remediationUrl):
+      state.screen = .subscriptionRequired(childName: childName, remediationUrl: remediationUrl)
+      if !wasAlreadyShowing {
+        log(.warn, .subs, "6ad351da")
+      }
+      return wasAlreadyShowing ? .none : self.startMusicAppStatusPolling()
+    }
+  }
+
+  private func finishSetup(_ state: inout State) -> EffectOf<Self> {
+    guard let childName = self.keychain.loadConnection()?.childName else {
+      state.screen = .gertrudeConnection(.failed)
+      return .cancel(id: CancelID.musicAppStatusPolling)
+    }
+    state.screen = .ready(childName: childName)
+    log(.info, .setup, "8af8b414")
+    return .merge(
+      .cancel(id: CancelID.musicAppStatusPolling),
+      .send(.delegate(.completed(childName: childName))),
+    )
+  }
+
+  private func prefetchStatus() -> EffectOf<Self> {
     .run { send in
-      await send(.appleMusicAuthorizationStatusLoaded(
-        self.musicSetup.authorizationStatus(),
-        showWelcomeIfNeeded: showWelcomeIfNeeded,
-      ))
+      do {
+        try await send(.prefetchStatusLoaded(self.api.getMusicAppStatus()))
+      } catch {
+        await send(.prefetchStatusFailed)
+      }
+    }
+  }
+
+  private func fetchOnboardingConfig() -> EffectOf<Self> {
+    .run { send in
+      if let config = try? await self.api.getMusicOnboardingConfig() {
+        await send(.onboardingConfigLoaded(config))
+      }
+    }
+  }
+
+  private func checkAppleMusicAuthorization() -> EffectOf<Self> {
+    .run { send in
+      await send(.appleMusicAuthorizationStatusLoaded(self.musicSetup.authorizationStatus()))
     }
   }
 
   private func checkAppleMusicSubscription() -> EffectOf<Self> {
     .run { send in
       await send(.appleMusicSubscriptionStatusLoaded(self.musicSetup.subscriptionStatus()))
-    }
-  }
-
-  private func checkGertrudeConnection(_ state: inout State) -> EffectOf<Self> {
-    let storedConnection = self.keychain.loadConnection()
-    if let storedConnection {
-      state.screen = .ready(childName: storedConnection.childName)
-      return .merge(
-        .send(.delegate(.completed(childName: storedConnection.childName))),
-        self.fetchMusicAppStatus(hasStoredConnection: true),
-      )
-    } else {
-      state.screen = .gertrudeConnection(.checking)
-      return self.fetchMusicAppStatus(hasStoredConnection: false)
     }
   }
 
@@ -251,5 +365,9 @@ extension MusicSetupFeature.State {
 
   var isShowingUnclaimedConnection: Bool {
     if case .gertrudeConnection(.unclaimed) = self.screen { true } else { false }
+  }
+
+  var isShowingSubscriptionRequired: Bool {
+    if case .subscriptionRequired = self.screen { true } else { false }
   }
 }

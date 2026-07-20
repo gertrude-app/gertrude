@@ -187,6 +187,15 @@ final class ApiTests: ApiTestCase, @unchecked Sendable {
 
 extension Context {
   static var mock: Self {
-    .init(requestId: "mock-req-id", dashboardUrl: "/", ipAddress: nil, telemetry: TelemetryBag())
+    .mock()
+  }
+
+  static func mock(dashboardUrl: String = "/") -> Self {
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: dashboardUrl,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
   }
 }

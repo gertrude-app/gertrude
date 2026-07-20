@@ -11,11 +11,19 @@ extension EventLabel {
     case "aa99a570": "Music device claimed"
     case "d3cb7281": "Music app status failed"
     case "0f92a6a8": "Music app status polling failed"
+    // --- Onboarding funnel ---
+    case "8502ee88": "Onboarding welcome shown"
+    case "7606fe61": "Onboarding: is parent or partner"
+    case "f09d005a": "Onboarding: device is self-managed"
+    case "ffbbb03c": "Onboarding claim code shown"
+    case "9b438d26": "Onboarding device recognized (no claim needed)"
+    case "8af8b414": "Onboarding setup completed"
     // --- Subscription ---
     case "bfa4b9e6": "Apple Music subscription required"
     case "e1c0d002": "Apple Music subscription status unavailable"
     case "c380387c": "Apple Music subscription offer shown"
     case "ded74480": "Gertrude Music subscription required"
+    case "6ad351da": "Onboarding subscription required (recognized, unpaid)"
     // --- Library ---
     case "e24738fc": "Approved library empty"
     case "cd55459e": "Approved library load failed"

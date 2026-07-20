@@ -26,8 +26,15 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsLocalNetworking</key>
+      <true/>
+    </dict>
     <key>NSAppleMusicUsageDescription</key>
     <string>Gertrude Music needs access to Apple Music to play approved music.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Gertrude Music connects to a local development API while testing.</string>
     <key>UIBackgroundModes</key>
     <array>
       <string>audio</string>

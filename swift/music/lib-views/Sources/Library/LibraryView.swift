@@ -121,7 +121,7 @@ public struct LibraryView: View {
       self.messageContent(
         title: "Subscription required",
         message:
-        "The Gertrude account needs Light or Full before approved music can play on this device.",
+        "The Gertrude account needs an active subscription before approved music can play on this device.",
         systemImage: "creditcard",
         buttonTitle: "Check again",
       )
