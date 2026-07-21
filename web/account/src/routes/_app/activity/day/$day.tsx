@@ -20,6 +20,7 @@ const NINE_MINUTES = 9 * 60 * 1000;
 
 const ActivityDayPage: React.FC = () => {
   const { day } = Route.useParams();
+  const navigate = Route.useNavigate();
   const queryKey = Key.dayActivity(day);
   const summariesKey = Key.activitySummaries;
   const optimistic = useOptimism();
@@ -60,7 +61,13 @@ const ActivityDayPage: React.FC = () => {
     const [input, next] = prepareDeleteCombined(ids, query.data);
     if (input.keystrokeLineIds.length === 0 && input.screenshotIds.length === 0) return;
     optimistic.update(queryKey, next);
-    deleteActivity.mutate(input);
+    deleteActivity.mutate(input, {
+      onSuccess: () => {
+        if (next.people.every((person) => person.items.length === 0)) {
+          void navigate({ to: `/activity`, replace: true });
+        }
+      },
+    });
   }
 
   function handleDeletePerson(personId: string): void {
