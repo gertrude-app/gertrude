@@ -1,0 +1,136 @@
+name: dash-promote
+
+# Tier 2 of the dashboard staleness story: gate the dashboard prod deploy on the
+# API's PairQL contract hash. Cloudflare Pages tracks the `release` branch (NOT
+# master). This workflow runs on every master push that could affect the dashboard
+# and decides:
+#
+#   • new contract hash == prod API contract hash → fast-forward `release` to
+#     this commit. CF Pages picks it up and deploys. Zero human touch.
+#   • new contract hash != prod API contract hash → leave `release` alone and
+#     post Slack. The human's API deploy step runs `scripts/promote-dashboard.sh`
+#     after the API prod cutover, which performs the same fast-forward (with a
+#     prod-hash verification poll).
+#
+# Prerequisites (see tier-2-rollout-plan.md):
+#   1. The staleness-detector code must already be deployed to prod, so that
+#      GET /dashboard-pairql-contract-hash returns the 64-char hash as plain text.
+#   2. Branch protection on `release` must allow `github-actions[bot]` to push.
+#   3. Cloudflare Pages production_branch is set to `release`.
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'web/dash/**'
+      - 'web/shared/**'
+      - 'swift/api/Sources/Api/PairQL/Dashboard/**'
+      - '.github/workflows/dash-promote.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  decide:
+    name: decide-and-promote
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: read new dashboard contract hash
+        id: new
+        run: |
+          set -euo pipefail
+          FILE=web/shared/pairql/src/dashboard/contract.ts
+          if [ ! -f "$FILE" ]; then
+            echo "::error file=$FILE::missing — staleness-detector codegen has not run on master"
+            exit 1
+          fi
+          HASH=$(grep -oE '[0-9a-f]{64}' "$FILE" | head -1)
+          if [ -z "$HASH" ]; then
+            echo "::error file=$FILE::could not extract contract hash"
+            exit 1
+          fi
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "::notice::new dashboard contract hash: ${HASH:0:12}…"
+
+      - name: fetch prod API contract hash
+        id: prod
+        run: |
+          set -euo pipefail
+          HASH=$(curl -fsSL --max-time 15 https://api.gertrude.app/dashboard-pairql-contract-hash)
+          if ! [[ "$HASH" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "::error::prod /dashboard-pairql-contract-hash returned unexpected body: '$HASH' — is the staleness-detector deployed?"
+            exit 1
+          fi
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          echo "::notice::prod API contract hash: ${HASH:0:12}…"
+
+      - name: decide
+        id: decide
+        run: |
+          if [ "${{ steps.new.outputs.hash }}" = "${{ steps.prod.outputs.hash }}" ]; then
+            echo "action=promote" >> "$GITHUB_OUTPUT"
+          else
+            echo "action=hold" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: promote — fast-forward release branch
+        if: steps.decide.outputs.action == 'promote'
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git push origin "${GITHUB_SHA}:refs/heads/release"
+
+      - name: slack — promoted
+        if: steps.decide.outputs.action == 'promote'
+        env:
+          SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          SHORT=${GITHUB_SHA:0:8}
+          URL="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          TEXT=":white_check_mark: Dashboard <${URL}|${SHORT}> promoted (no contract change)."
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            channel: "C08GLK13HAB",
+            text: $text,
+            username: "Gertrude Bot",
+            icon_emoji: ":robot_face:"
+          }')
+          curl -fsSL -X POST \
+            -H "Content-type: application/json; charset=utf-8" \
+            -H "Authorization: Bearer $SLACK_API_TOKEN" \
+            -d "$PAYLOAD" \
+            https://slack.com/api/chat.postMessage
+
+      - name: slack — held pending API deploy
+        if: steps.decide.outputs.action == 'hold'
+        env:
+          SLACK_API_TOKEN: ${{ secrets.SLACK_API_TOKEN }}
+          NEW_HASH:  ${{ steps.new.outputs.hash }}
+          PROD_HASH: ${{ steps.prod.outputs.hash }}
+        run: |
+          set -euo pipefail
+          SHORT=${GITHUB_SHA:0:8}
+          URL="https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}"
+          TEXT=":large_yellow_circle: Dashboard <${URL}|${SHORT}> *HELD* — PairQL contract changed.
+After the API prod cutover, run \`bash scripts/promote-dashboard.sh\` to release.
+• new:  ${NEW_HASH:0:12}…
+• prod: ${PROD_HASH:0:12}…"
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{
+            channel: "C08GLK13HAB",
+            text: $text,
+            username: "Gertrude Bot",
+            icon_emoji: ":robot_face:"
+          }')
+          curl -fsSL -X POST \
+            -H "Content-type: application/json; charset=utf-8" \
+            -H "Authorization: Bearer $SLACK_API_TOKEN" \
+            -d "$PAYLOAD" \
+            https://slack.com/api/chat.postMessage

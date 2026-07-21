@@ -137,7 +137,14 @@ enum DashboardTsCodegenRoute {
     )
   }
 
-  static let currentContractHash = try! Self.hash(Self.contract())
+  static let currentContractHash: String? = {
+    do {
+      return try Self.hash(Self.contract())
+    } catch {
+      print("ERROR: dashboard contract hash unavailable: \(error)")
+      return nil
+    }
+  }()
 
   private static func contract() throws -> Contract {
     var shared: [String: String] = [:]
@@ -173,6 +180,13 @@ enum DashboardTsCodegenRoute {
   @Sendable static func handler(_ request: Request) async throws -> Response {
     request.logger.notice("TS codegen: \("Dashboard".green)")
     return try self.generate()
+  }
+
+  @Sendable static func hashHandler(_ request: Request) async throws -> String {
+    guard let hash = self.currentContractHash else {
+      throw Abort(.internalServerError, reason: "dashboard contract hash unavailable")
+    }
+    return hash
   }
 
   private static func ts<P: Pair>(

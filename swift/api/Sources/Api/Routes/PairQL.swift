@@ -191,21 +191,15 @@ enum PairQLRoute: Equatable, RouteResponder {
 // helpers
 
 private func addDashboardContractHeader(_ response: Response, for route: PairQLRoute) -> Response {
-  if case .dashboard = route {
-    response.headers.replaceOrAdd(
-      name: .xDashboardPairQLContract,
-      value: DashboardTsCodegenRoute.currentContractHash,
-    )
+  if case .dashboard = route, let hash = DashboardTsCodegenRoute.currentContractHash {
+    response.headers.replaceOrAdd(name: .xDashboardPairQLContract, value: hash)
   }
   return response
 }
 
 private func addDashboardContractHeader(_ response: Response, forDomain domain: String) -> Response {
-  if domain == "dashboard" {
-    response.headers.replaceOrAdd(
-      name: .xDashboardPairQLContract,
-      value: DashboardTsCodegenRoute.currentContractHash,
-    )
+  if domain == "dashboard", let hash = DashboardTsCodegenRoute.currentContractHash {
+    response.headers.replaceOrAdd(name: .xDashboardPairQLContract, value: hash)
   }
   return response
 }

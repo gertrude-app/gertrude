@@ -19,6 +19,11 @@ public extension Configure {
     )
 
     app.get(
+      "dashboard-pairql-contract-hash",
+      use: DashboardTsCodegenRoute.hashHandler(_:),
+    )
+
+    app.get(
       "admin-ts-codegen",
       use: AdminTsCodegenRoute.handler(_:),
     )
