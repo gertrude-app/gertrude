@@ -26,7 +26,7 @@ const KeylogActivityItem: React.FC<Props> = ({
     <Text
       as="p"
       variant="code"
-      className="@lg/main:text-base p-3 bg-stone-50 flex flex-col"
+      className="text-base! @lg/main:text-lg! p-3 bg-stone-200 flex flex-col"
     >
       {text.split(`\n`).map((line, index) => (
         <span key={`${index}-${line}`}>{line}</span>
