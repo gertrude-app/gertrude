@@ -20,6 +20,11 @@ export type AdminNotificationTrigger =
   | 'securityEventsMedium'
   | 'securityEventsRecommended';
 
+export interface AllowListBookmark {
+  url: string;
+  title: string;
+}
+
 export type AmSubscriptionState =
   | { case: 'active'; expiresAt: ISODateString }
   | { case: 'fullTrial'; expiresAt: ISODateString }
@@ -145,6 +150,30 @@ export type DeviceModelFamily =
   | 'studio'
   | 'pro'
   | 'unknown';
+
+export interface ExtendedSupervisionControls {
+  whitelistedAppBundleIds?: string[];
+  webAllowList?: Array<{ url: string; title: string }>;
+  allowItunes?: boolean;
+  allowMusicService?: boolean;
+  allowRadioService?: boolean;
+  allowNews?: boolean;
+  allowBookstore?: boolean;
+  allowExplicitContent?: boolean;
+  ratingMovies?: number;
+  ratingTvShows?: number;
+  allowSafari?: boolean;
+  allowSpotlightInternetResults?: boolean;
+  allowDefinitionLookup?: boolean;
+  allowAutomaticAppDownloads?: boolean;
+  allowAppClips?: boolean;
+  allowSystemAppRemoval?: boolean;
+  allowAssistant?: boolean;
+  allowGameCenter?: boolean;
+  forceDelayedSoftwareUpdates?: boolean;
+  enforcedSoftwareUpdateDelay?: number;
+  forceAutomaticDateAndTime?: boolean;
+}
 
 export type IOSDeviceChildAssignment =
   { case: 'newChild'; name: string } | { case: 'existingChild'; id: UUID };

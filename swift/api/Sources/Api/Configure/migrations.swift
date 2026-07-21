@@ -110,6 +110,7 @@ extension Configure {
     app.migrations.add(AddNativeIOSAppEventFields())
     app.migrations.add(PgEnumsToText())
     app.migrations.add(TrackDeprecationLastSeen())
+    app.migrations.add(BlockerProfileSettings())
   }
 }
 

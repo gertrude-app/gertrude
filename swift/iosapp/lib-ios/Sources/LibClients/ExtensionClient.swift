@@ -5,10 +5,45 @@ import os.log
 
 public struct ExtensionClient: Sendable {
   public var requestAuthorization: @Sendable () async -> Result<Void, AuthFailureReason>
+  public var requestIndividualAuthorization: @Sendable () async -> Result<Void, AuthFailureReason>
   public var installFilter: @Sendable () async -> Result<Void, FilterInstallError>
   public var filterRunning: @Sendable () async -> Bool
   public var cleanupForRetry: @Sendable () async -> Void
 }
+
+#if os(iOS)
+  private func requestFamilyControlsAuth(
+    for member: FamilyControlsMember,
+  ) async -> Result<Void, AuthFailureReason> {
+    do {
+      try await AuthorizationCenter.shared.requestAuthorization(for: member)
+      return .success(())
+    } catch let familyError as FamilyControlsError {
+      switch familyError {
+      case .invalidAccountType:
+        return .failure(.invalidAccountType)
+      case .authorizationConflict:
+        return .failure(.authorizationConflict)
+      case .authorizationCanceled:
+        return .failure(.authorizationCanceled)
+      case .networkError:
+        return .failure(.networkError)
+      case .authenticationMethodUnavailable:
+        return .failure(.passcodeRequired)
+      case .restricted:
+        return .failure(.restricted)
+      case .unavailable:
+        return .failure(.unexpected(.unavailable))
+      case .invalidArgument:
+        return .failure(.unexpected(.invalidArgument))
+      @unknown default:
+        return .failure(.other(String(reflecting: familyError)))
+      }
+    } catch {
+      return .failure(.other(String(reflecting: error)))
+    }
+  }
+#endif
 
 extension ExtensionClient: DependencyKey {
   public static let liveValue = ExtensionClient(
@@ -16,37 +51,20 @@ extension ExtensionClient: DependencyKey {
       #if targetEnvironment(simulator)
         return .success(())
       #elseif os(iOS)
-        do {
-          #if DEBUG
-            try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-          #else
-            try await AuthorizationCenter.shared.requestAuthorization(for: .child)
-          #endif
-          return .success(())
-        } catch let familyError as FamilyControlsError {
-          switch familyError {
-          case .invalidAccountType:
-            return .failure(.invalidAccountType)
-          case .authorizationConflict:
-            return .failure(.authorizationConflict)
-          case .authorizationCanceled:
-            return .failure(.authorizationCanceled)
-          case .networkError:
-            return .failure(.networkError)
-          case .authenticationMethodUnavailable:
-            return .failure(.passcodeRequired)
-          case .restricted:
-            return .failure(.restricted)
-          case .unavailable:
-            return .failure(.unexpected(.unavailable))
-          case .invalidArgument:
-            return .failure(.unexpected(.invalidArgument))
-          @unknown default:
-            return .failure(.other(String(reflecting: familyError)))
-          }
-        } catch {
-          return .failure(.other(String(reflecting: error)))
-        }
+        #if DEBUG
+          return await requestFamilyControlsAuth(for: .individual)
+        #else
+          return await requestFamilyControlsAuth(for: .child)
+        #endif
+      #else
+        return .failure(.other("unexpected OS"))
+      #endif
+    },
+    requestIndividualAuthorization: {
+      #if targetEnvironment(simulator)
+        return .success(())
+      #elseif os(iOS)
+        return await requestFamilyControlsAuth(for: .individual)
       #else
         return .failure(.other("unexpected OS"))
       #endif
@@ -124,6 +142,7 @@ extension ExtensionClient: DependencyKey {
 extension ExtensionClient: TestDependencyKey {
   public static let testValue = ExtensionClient(
     requestAuthorization: { .success(()) },
+    requestIndividualAuthorization: { .success(()) },
     installFilter: { .success(()) },
     filterRunning: { false },
     cleanupForRetry: {},

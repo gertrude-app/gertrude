@@ -45,11 +45,14 @@ extension UpdateIOSDevice: Resolver {
 
     var install = try await device.blockerInstall(in: ctx.db)
     install.webPolicy = input.webPolicy.rawValue
-    install.isProfileLocked = input.isProfileLocked
-    install.allowAppRemoval = input.allowAppRemoval
-    install.allowEraseContentAndSettings = input.allowEraseContentAndSettings
-    install.allowAppInstallation = input.allowAppInstallation
     try await ctx.db.update(install)
+
+    var settings = try await BlockerApp.ProfileSettings.ensure(for: device.id, in: ctx.db)
+    settings.isProfileLocked = input.isProfileLocked
+    settings.allowAppRemoval = input.allowAppRemoval
+    settings.allowEraseContentAndSettings = input.allowEraseContentAndSettings
+    settings.allowAppInstallation = input.allowAppInstallation
+    try await ctx.db.update(settings)
 
     try await BlockerApp.WebPolicyDomain.query()
       .where(.deviceId == input.deviceId)

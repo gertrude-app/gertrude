@@ -35,6 +35,7 @@ struct GetIOSDevice_v2: Pair {
       var allowAppRemoval: Bool
       var allowEraseContentAndSettings: Bool
       var allowAppInstallation: Bool
+      var extendedSupervisionControls: SaveExtendedSupervisionControls.Controls?
     }
 
     struct AmInstall: PairNestable {
@@ -95,6 +96,36 @@ extension GetIOSDevice_v2: Resolver {
     let domains = try await device.webPolicyDomains(in: ctx.db)
     let blockRules = try await device.blockRules(in: ctx.db)
     let supervision = try await device.supervision(in: ctx.db)
+    let settings = try await BlockerApp.ProfileSettings.ensure(for: device.id, in: ctx.db)
+    let isSupervised = supervision?.supervised ?? false
+    let billing = try await ctx.currentBillingAccount()
+    var extendedControls: SaveExtendedSupervisionControls.Controls?
+    if isSupervised, billing.can(.manageExtendedSupervisionControls) {
+      extendedControls = .init(
+        whitelistedAppBundleIds: settings.whitelistedAppBundleIds,
+        webAllowList: settings.webAllowList
+          .map { $0.map { .init(url: $0.url, title: $0.title) } },
+        allowItunes: settings.allowItunes,
+        allowMusicService: settings.allowMusicService,
+        allowRadioService: settings.allowRadioService,
+        allowNews: settings.allowNews,
+        allowBookstore: settings.allowBookstore,
+        allowExplicitContent: settings.allowExplicitContent,
+        ratingMovies: settings.ratingMovies,
+        ratingTvShows: settings.ratingTvShows,
+        allowSafari: settings.allowSafari,
+        allowSpotlightInternetResults: settings.allowSpotlightInternetResults,
+        allowDefinitionLookup: settings.allowDefinitionLookup,
+        allowAutomaticAppDownloads: settings.allowAutomaticAppDownloads,
+        allowAppClips: settings.allowAppClips,
+        allowSystemAppRemoval: settings.allowSystemAppRemoval,
+        allowAssistant: settings.allowAssistant,
+        allowGameCenter: settings.allowGameCenter,
+        forceDelayedSoftwareUpdates: settings.forceDelayedSoftwareUpdates,
+        enforcedSoftwareUpdateDelay: settings.enforcedSoftwareUpdateDelay,
+        forceAutomaticDateAndTime: settings.forceAutomaticDateAndTime,
+      )
+    }
     return Output.Blocker(
       allBlockGroups: allBlockGroups.map {
         .init(
@@ -108,11 +139,12 @@ extension GetIOSDevice_v2: Resolver {
       webPolicy: .init(string: install.webPolicy) ?? .blockAll,
       webPolicyDomains: domains.map(\.domain),
       customBlockRules: blockRules.map { .init(id: $0.id, rule: $0.rule) },
-      isSupervised: supervision?.supervised ?? false,
-      isProfileLocked: install.isProfileLocked,
-      allowAppRemoval: install.allowAppRemoval,
-      allowEraseContentAndSettings: install.allowEraseContentAndSettings,
-      allowAppInstallation: install.allowAppInstallation,
+      isSupervised: isSupervised,
+      isProfileLocked: settings.isProfileLocked,
+      allowAppRemoval: settings.allowAppRemoval,
+      allowEraseContentAndSettings: settings.allowEraseContentAndSettings,
+      allowAppInstallation: settings.allowAppInstallation,
+      extendedSupervisionControls: extendedControls,
     )
   }
 

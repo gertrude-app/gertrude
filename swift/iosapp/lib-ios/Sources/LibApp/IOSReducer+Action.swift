@@ -40,6 +40,7 @@ public extension IOSReducer {
       case setScreen(Screen)
       case authorizationSucceeded
       case authorizationFailed(AuthFailureReason)
+      case screenTimeAuthResolved(granted: Bool)
       case installSucceeded
       case installFailed(FilterInstallError)
       case receivedConnectAccountFeatureFlag(ConnectAccountFeatureFlag.Output)

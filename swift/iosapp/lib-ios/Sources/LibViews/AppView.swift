@@ -608,6 +608,20 @@ public struct AppView: View {
             primary: self.btn(text: "Got it", .primary),
           )
 
+        case .onboarding(.supervision(.resume(.offerScreenTimeAccess))):
+          ButtonScreenView(
+            text: "We’re working on adding more control for the account holder via Screen Time. If you grant access now, you’ll be able to opt into these new features from the Gertrude website.\n\nFor safety and accountability, make sure there is a 4-digit Screen Time passcode set that only the account holder knows.",
+            primary: self.btn(text: "Grant Screen Time access", .primary),
+            secondary: self.btn(text: "Not now", .secondary),
+          )
+
+        case .onboarding(.supervision(.resume(.dontGetTrickedPreScreenTime))):
+          ButtonScreenView(
+            text: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+            primary: self.btn(text: "Got it, next", .primary, animate: false, async: true),
+            image: self.iosVersionImage("AllowScreenTimeAccess"),
+          )
+
         case .onboarding(.supervision(.resume(.networkError))):
           ButtonScreenView(
             text: "Couldn’t reach Gertrude’s servers. Please check your internet connection and try again.",

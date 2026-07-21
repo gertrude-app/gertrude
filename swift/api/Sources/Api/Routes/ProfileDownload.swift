@@ -45,8 +45,11 @@ enum ProfileDownloadRoute {
       }
     }
 
-    let install = try await device.blockerInstall(in: req.context.db)
-    let xml = generateProfileXml(for: device, install: install)
+    let settings = try await BlockerApp.ProfileSettings.ensure(
+      for: device.id,
+      in: req.context.db,
+    )
+    let xml = generateProfileXml(for: device, settings: settings)
     let signer = with(dependency: \.profileSigner)
     let signedBytes = try signer.sign(Array(xml.utf8))
 
@@ -64,24 +67,55 @@ enum ProfileDownloadRoute {
 // @see https://developer.apple.com/documentation/devicemanagement/webcontentfilter
 // `DenyListURLS` is interesting, can specify 500 URLs, could put top 500 porn sites there...
 // `SafariHistoryRetentionEnabled`, also cool, kills private mode, and history clearing
-func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> String {
+func generateProfileXml(
+  for device: IOSDevice,
+  settings: BlockerApp.ProfileSettings,
+) -> String {
   var restrictionKeys = """
         <key>allowAppRemoval</key>
-        <\(install.allowAppRemoval ? "true" : "false")/>
+        <\(settings.allowAppRemoval ? "true" : "false")/>
 
         <key>allowEraseContentAndSettings</key>
-        <\(install.allowEraseContentAndSettings ? "true" : "false")/>
+        <\(settings.allowEraseContentAndSettings ? "true" : "false")/>
 
         <key>allowAppInstallation</key>
-        <\(install.allowAppInstallation ? "true" : "false")/>
+        <\(settings.allowAppInstallation ? "true" : "false")/>
   """
-  // special temporary customer workaround
-  if device.id.lowercased == "ed25c68a-2dba-4854-b3bd-efe0d8523e6f" {
-    restrictionKeys += """
-
-          <key>allowSafari</key>
-          <false/>
-    """
+  if let bundleIds = settings.whitelistedAppBundleIds {
+    restrictionKeys += "\n\n      <key>whitelistedAppBundleIDs</key>\n      "
+    restrictionKeys += plistStringArray(bundleIds, indent: 6)
+  }
+  let extendedBoolKeys: [(String, Bool?)] = [
+    ("allowiTunes", settings.allowItunes),
+    ("allowMusicService", settings.allowMusicService),
+    ("allowRadioService", settings.allowRadioService),
+    ("allowNews", settings.allowNews),
+    ("allowBookstore", settings.allowBookstore),
+    ("allowExplicitContent", settings.allowExplicitContent),
+    ("allowSafari", settings.allowSafari),
+    ("allowSpotlightInternetResults", settings.allowSpotlightInternetResults),
+    ("allowDefinitionLookup", settings.allowDefinitionLookup),
+    ("allowAutomaticAppDownloads", settings.allowAutomaticAppDownloads),
+    ("allowAppClips", settings.allowAppClips),
+    ("allowSystemAppRemoval", settings.allowSystemAppRemoval),
+    ("allowAssistant", settings.allowAssistant),
+    ("allowGameCenter", settings.allowGameCenter),
+    ("forceDelayedSoftwareUpdates", settings.forceDelayedSoftwareUpdates),
+    ("forceAutomaticDateAndTime", settings.forceAutomaticDateAndTime),
+  ]
+  for (key, value) in extendedBoolKeys {
+    restrictionKeys += plistBoolKey(key, value)
+  }
+  let extendedIntKeys: [(String, Int?)] = [
+    ("ratingMovies", settings.ratingMovies),
+    ("ratingTVShows", settings.ratingTvShows),
+    ("enforcedSoftwareUpdateDelay", settings.enforcedSoftwareUpdateDelay),
+  ]
+  for (key, value) in extendedIntKeys {
+    restrictionKeys += plistIntKey(key, value)
+  }
+  if settings.ratingMovies != nil || settings.ratingTvShows != nil {
+    restrictionKeys += "\n\n      <key>ratingRegion</key>\n      <string>us</string>"
   }
   return """
   <?xml version="1.0" encoding="UTF-8"?>
@@ -107,7 +141,7 @@ func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> S
       <string>This profile allows the device to be securely managed by a Gertrude account.</string>
 
       <key>PayloadRemovalDisallowed</key>
-      <\(install.isProfileLocked ? "true" : "false")/>
+      <\(settings.isProfileLocked ? "true" : "false")/>
 
       <key>PayloadContent</key>
       <array>
@@ -142,7 +176,7 @@ func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> S
           <key>FilterBrowsers</key>
           <true/>
         </dict>
-
+  \(settings.webAllowList.map(builtInWebFilterXml) ?? "")
         <dict>
           <key>PayloadType</key>
           <string>com.apple.applicationaccess</string>
@@ -162,6 +196,81 @@ func generateProfileXml(for device: IOSDevice, install: BlockerApp.Install) -> S
     </dict>
   </plist>
   """.trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+private func builtInWebFilterXml(
+  _ bookmarks: [BlockerApp.ProfileSettings.Bookmark],
+) -> String {
+  let bookmarkDicts = bookmarks.map { bookmark in
+    """
+              <dict>
+                <key>Title</key>
+                <string>\(xmlEscaped(bookmark.title))</string>
+
+                <key>URL</key>
+                <string>\(xmlEscaped(bookmark.url))</string>
+              </dict>
+    """
+  }.joined(separator: "\n")
+  let array = bookmarks.isEmpty ? "<array/>" : "<array>\n\(bookmarkDicts)\n        </array>"
+  return """
+
+        <dict>
+          <key>PayloadType</key>
+          <string>com.apple.webcontent-filter</string>
+
+          <key>FilterType</key>
+          <string>BuiltIn</string>
+
+          <key>AutoFilterEnabled</key>
+          <false/>
+
+          <key>PayloadDescription</key>
+          <string>Configures allowed websites</string>
+
+          <key>PayloadDisplayName</key>
+          <string>Gertrude Allowed Websites</string>
+
+          <key>PayloadIdentifier</key>
+          <string>app.gertrude.builtin-webfilter.24f0679b-6e8d-44fa-b4ef-e5d2f7a18b13</string>
+
+          <key>PayloadUUID</key>
+          <string>24f0679b-6e8d-44fa-b4ef-e5d2f7a18b13</string>
+
+          <key>PayloadVersion</key>
+          <integer>1</integer>
+
+          <key>AllowListBookmarks</key>
+          \(array)
+        </dict>
+
+  """
+}
+
+private func plistStringArray(_ strings: [String], indent: Int) -> String {
+  let pad = String(repeating: " ", count: indent)
+  guard !strings.isEmpty else { return "<array/>" }
+  let entries = strings
+    .map { "\(pad)  <string>\(xmlEscaped($0))</string>" }
+    .joined(separator: "\n")
+  return "<array>\n\(entries)\n\(pad)</array>"
+}
+
+private func plistBoolKey(_ key: String, _ value: Bool?) -> String {
+  guard let value else { return "" }
+  return "\n\n      <key>\(key)</key>\n      <\(value ? "true" : "false")/>"
+}
+
+private func plistIntKey(_ key: String, _ value: Int?) -> String {
+  guard let value else { return "" }
+  return "\n\n      <key>\(key)</key>\n      <integer>\(value)</integer>"
+}
+
+private func xmlEscaped(_ string: String) -> String {
+  string
+    .replacingOccurrences(of: "&", with: "&amp;")
+    .replacingOccurrences(of: "<", with: "&lt;")
+    .replacingOccurrences(of: ">", with: "&gt;")
 }
 
 private let SUBSCRIPTION_REQUIRED_HTML = """

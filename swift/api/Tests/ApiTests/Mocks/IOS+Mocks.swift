@@ -68,6 +68,20 @@ extension BlockerApp.Install: RandomMocked {
   }
 }
 
+extension BlockerApp.ProfileSettings: RandomMocked {
+  public static var mock: BlockerApp.ProfileSettings {
+    .init(deviceId: .init())
+  }
+
+  public static var empty: BlockerApp.ProfileSettings {
+    .init(deviceId: .init())
+  }
+
+  public static var random: BlockerApp.ProfileSettings {
+    .init(deviceId: .init())
+  }
+}
+
 extension BlockerApp.Supervision: RandomMocked {
   public static var mock: BlockerApp.Supervision {
     .init(deviceId: .init())

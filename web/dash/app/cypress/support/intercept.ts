@@ -186,6 +186,10 @@ export function interceptPql(
   output: T.SaveConferenceEmail.Output,
 ): void;
 export function interceptPql(slug: `SaveDevice`, output: T.SaveDevice.Output): void;
+export function interceptPql(
+  slug: `SaveExtendedSupervisionControls`,
+  output: T.SaveExtendedSupervisionControls.Output,
+): void;
 export function interceptPql(slug: `SaveKey`, output: T.SaveKey.Output): void;
 export function interceptPql(slug: `SaveKeychain`, output: T.SaveKeychain.Output): void;
 export function interceptPql(
@@ -300,6 +304,7 @@ export function forcePqlErr(
     | `ResetPassword`
     | `SaveConferenceEmail`
     | `SaveDevice`
+    | `SaveExtendedSupervisionControls`
     | `SaveKey`
     | `SaveKeychain`
     | `SaveNotification`

@@ -11,7 +11,10 @@ LOCAL_API_ENDPOINT = http:/$()/<wifi-ip>:<API_PORT>
 
 ## Release notes
 
-- `x.x.x` (dev)
+- `1.9.0` (7/21/26)
+  - button screen affordances for clipped text on small ios screens (i.e. iphone se)
+  - don't show "sync profile" button for configurator supervised devices
+  - in supervision flow, post filter install, request screen time auth
   - surface supervision payment gate helper screens
 - `1.8.3` (6/26/26)
   - connect free account uses claim-based flow, not code entry

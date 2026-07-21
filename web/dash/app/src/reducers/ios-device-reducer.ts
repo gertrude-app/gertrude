@@ -1,6 +1,8 @@
 import { produce } from 'immer';
+import type { ExtControlsState } from '../lib/extendedRestrictions';
 import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
-import type { GetIOSDevice_v2, WebPolicy } from '@dash/types';
+import type { AllowListBookmark, GetIOSDevice_v2, WebPolicy } from '@dash/types';
+import { normalizeExtended } from '../lib/extendedRestrictions';
 
 export type State = {
   enabledBlockGroups: UUID[];
@@ -11,6 +13,13 @@ export type State = {
   allowAppRemoval: boolean;
   allowEraseContentAndSettings: boolean;
   allowAppInstallation: boolean;
+  hasExtendedControls: boolean;
+  whitelistedAppBundleIds: string[] | null;
+  newBundleId: string;
+  webAllowList: AllowListBookmark[] | null;
+  newBookmarkUrl: string;
+  newBookmarkTitle: string;
+  extended: ExtControlsState;
   editingBlockRule?: EditBlockRuleProps & { id?: UUID };
 };
 
@@ -24,10 +33,20 @@ export type Action =
   | { type: `editBlockRule`; event: EditEvent }
   | { type: `setEditingBlockRule`; rule: EditBlockRuleProps; id: UUID }
   | { type: `removeDomain`; domain: string }
+  | { type: `setAppWhitelistEnabled`; value: boolean }
+  | { type: `setNewBundleId`; value: string }
+  | { type: `addBundleId` }
+  | { type: `removeBundleId`; bundleId: string }
+  | { type: `setWebAllowListEnabled`; value: boolean }
+  | { type: `setNewBookmarkUrl`; value: string }
+  | { type: `setNewBookmarkTitle`; value: string }
+  | { type: `addBookmark` }
+  | { type: `removeBookmark`; url: string }
   | { type: `setIsProfileLocked`; value: boolean }
   | { type: `setAllowAppRemoval`; value: boolean }
   | { type: `setAllowEraseContentAndSettings`; value: boolean }
   | { type: `setAllowAppInstallation`; value: boolean }
+  | { type: `setExtendedControls`; values: Partial<ExtControlsState> }
   | { type: `receiveData`; data: GetIOSDevice_v2.Output };
 
 function reducer(state: State, action: Action): void {
@@ -58,6 +77,62 @@ function reducer(state: State, action: Action): void {
     case `removeDomain`:
       state.webPolicyDomains = state.webPolicyDomains.filter((d) => d !== action.domain);
       return;
+    case `setAppWhitelistEnabled`:
+      state.whitelistedAppBundleIds = action.value
+        ? (state.whitelistedAppBundleIds ?? [])
+        : null;
+      return;
+    case `setNewBundleId`:
+      state.newBundleId = action.value;
+      return;
+    case `addBundleId`: {
+      const bundleId = state.newBundleId.trim();
+      if (
+        bundleId &&
+        state.whitelistedAppBundleIds &&
+        !state.whitelistedAppBundleIds.includes(bundleId)
+      ) {
+        state.whitelistedAppBundleIds.push(bundleId);
+        state.newBundleId = ``;
+      }
+      return;
+    }
+    case `removeBundleId`:
+      if (state.whitelistedAppBundleIds) {
+        state.whitelistedAppBundleIds = state.whitelistedAppBundleIds.filter(
+          (id) => id !== action.bundleId,
+        );
+      }
+      return;
+    case `setWebAllowListEnabled`:
+      state.webAllowList = action.value ? (state.webAllowList ?? []) : null;
+      return;
+    case `setNewBookmarkUrl`:
+      state.newBookmarkUrl = action.value;
+      return;
+    case `setNewBookmarkTitle`:
+      state.newBookmarkTitle = action.value;
+      return;
+    case `addBookmark`: {
+      const url = state.newBookmarkUrl.trim();
+      const title = state.newBookmarkTitle.trim();
+      if (
+        url &&
+        title &&
+        state.webAllowList &&
+        !state.webAllowList.some((b) => b.url === url)
+      ) {
+        state.webAllowList.push({ url, title });
+        state.newBookmarkUrl = ``;
+        state.newBookmarkTitle = ``;
+      }
+      return;
+    }
+    case `removeBookmark`:
+      if (state.webAllowList) {
+        state.webAllowList = state.webAllowList.filter((b) => b.url !== action.url);
+      }
+      return;
     case `setIsProfileLocked`:
       state.isProfileLocked = action.value;
       return;
@@ -70,6 +145,9 @@ function reducer(state: State, action: Action): void {
     case `setAllowAppInstallation`:
       state.allowAppInstallation = action.value;
       return;
+    case `setExtendedControls`:
+      Object.assign(state.extended, action.values);
+      return;
     case `receiveData`: {
       const blocker = action.data.blocker;
       if (!blocker) return;
@@ -80,6 +158,15 @@ function reducer(state: State, action: Action): void {
       state.allowAppRemoval = blocker.allowAppRemoval;
       state.allowEraseContentAndSettings = blocker.allowEraseContentAndSettings;
       state.allowAppInstallation = blocker.allowAppInstallation;
+      const extended = blocker.extendedSupervisionControls;
+      state.hasExtendedControls = extended !== undefined;
+      state.whitelistedAppBundleIds = extended?.whitelistedAppBundleIds
+        ? [...extended.whitelistedAppBundleIds]
+        : null;
+      state.webAllowList = extended?.webAllowList
+        ? extended.webAllowList.map((b) => ({ ...b }))
+        : null;
+      state.extended = normalizeExtended(extended);
       return;
     }
     case `addBlockRule`:
