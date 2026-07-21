@@ -46,7 +46,7 @@ extension GetIOSDeviceSupervisionStatus: Resolver {
     let supervision = try await device.supervision(in: context.db)
     let child = try await context.verifiedChild(from: childId)
     let account = try await context.currentBillingAccount()
-    let paymentAction = account.paymentActionForMissingLightPlanCapability(.superviseIosDevice)
+    let paymentAction = account.paymentActionForMissingCapability(.superviseIosDevice)
     return .init(
       deviceId: device.id,
       childId: child.id,

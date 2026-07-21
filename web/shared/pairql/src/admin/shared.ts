@@ -21,7 +21,7 @@ export type DeviceModelFamily =
 export type GertrudeApp = 'blocker' | 'music' | 'podcasts';
 
 export interface PaidSubscription {
-  tier: 'light' | 'full';
+  tier: 'light' | 'medium' | 'full';
   status:
     | { case: 'current'; renewsAt: ISODateString }
     | { case: 'pastDue'; since: ISODateString };
@@ -30,6 +30,12 @@ export interface PaidSubscription {
 export type PlanStatus =
   | {
       case: 'light';
+      status:
+        | { case: 'current'; renewsAt: ISODateString }
+        | { case: 'pastDue'; since: ISODateString };
+    }
+  | {
+      case: 'medium';
       status:
         | { case: 'current'; renewsAt: ISODateString }
         | { case: 'pastDue'; since: ISODateString };
@@ -54,4 +60,4 @@ export type StripeSubscriptionStatus =
   | 'incomplete'
   | 'incomplete_expired';
 
-export type SubscriptionTier = 'light' | 'full';
+export type SubscriptionTier = 'light' | 'medium' | 'full';

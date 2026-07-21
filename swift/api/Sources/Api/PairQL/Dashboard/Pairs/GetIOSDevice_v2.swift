@@ -172,7 +172,7 @@ extension GetIOSDevice_v2: Resolver {
     guard tokenExists else { return nil }
     let account = try await ctx.currentBillingAccount()
     return Output.MusicInstall(
-      requiresPayment: account.paymentActionForMissingLightPlanCapability(.useGertrudeMusic) != nil,
+      requiresPayment: account.paymentActionForMissingCapability(.useGertrudeMusic) != nil,
     )
   }
 }

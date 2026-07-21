@@ -50,6 +50,7 @@ struct ParentData: Sendable {
     guard let sub = self.subscription, sub.stripeStatus.isPaying else { return nil }
     switch sub.tier {
     case .light: return Cents(83)
+    case .medium: return Cents(500)
     case .full: return Cents(sub.isLegacyPrice ? 500 : 1000)
     }
   }

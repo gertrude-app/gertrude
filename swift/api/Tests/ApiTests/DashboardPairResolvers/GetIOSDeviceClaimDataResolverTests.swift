@@ -93,7 +93,7 @@ final class GetIOSDeviceClaimDataResolverTests: ApiTestCase, @unchecked Sendable
 
   func testUnclaimedAlreadyBoundCode_completesClaimAndReturnsResumeStep() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .light)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice(
       id: .init(),

@@ -24,7 +24,9 @@ extension BillingAccountSnapshot {
     switch self.planStatus {
     case .complimentary:
       return .complimentary
-    case .full(.current(let renewalDate)), .light(.current(let renewalDate)):
+    case .full(.current(let renewalDate)),
+         .medium(.current(let renewalDate)),
+         .light(.current(let renewalDate)):
       return .active(expiresAt: renewalDate)
     case .fullTrial(let trialExpiration, let substrate):
       if case .current(let renewalDate) = substrate?.status {
@@ -37,7 +39,7 @@ extension BillingAccountSnapshot {
         return .amTrial(expiresAt: max(amTrialEnd, legacyFloor))
       }
       return .fullTrial(expiresAt: max(trialExpiration, legacyFloor))
-    case .free, .fullTrialGrace, .full(.pastDue), .light(.pastDue):
+    case .free, .fullTrialGrace, .full(.pastDue), .medium(.pastDue), .light(.pastDue):
       let legacyPaidAt = self.billingIdentity?.legacyAmIapPaidAt
       let legacyAccessEnd = legacyPaidAt.map { $0 + PodcastApp.LegacyIap.grantWindow }
       let legacyActive = legacyAccessEnd.map { self.date < $0 } ?? false

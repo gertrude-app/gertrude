@@ -682,6 +682,7 @@ const InfoCard: React.FC<InfoCardProps> = ({ label, value }) => (
 
 const PLAN_TIER_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   full: { label: `Full`, bg: `from-brand-violet to-brand-fuchsia`, text: `text-white` },
+  medium: { label: `Medium`, bg: `from-indigo-400 to-violet-500`, text: `text-white` },
   light: { label: `Light`, bg: `from-sky-400 to-blue-500`, text: `text-white` },
   free: { label: `Free`, bg: `from-slate-300 to-slate-400`, text: `text-white` },
 };
@@ -692,22 +693,26 @@ function billingLabel(planStatus: PlanStatus, sub: Subscription | undefined): st
       return sub ? `Lapsed` : `No subscription`;
     case `light`:
       return sub?.stripeStatus === `past_due` ? `Overdue — $10/yr` : `Paid — $10/yr`;
+    case `medium`:
+      return sub?.stripeStatus === `past_due` ? `Overdue — $5/mo` : `Paid — $5/mo`;
     case `complimentary`:
       return `Complimentary`;
     case `fullTrial`: {
       const substrate = planStatus.substrate;
-      if (substrate?.tier === `light`) {
+      if (substrate && substrate.tier !== `full`) {
+        const name = PLAN_TIER_CONFIG[substrate.tier]?.label ?? substrate.tier;
         return substrate.status.case === `pastDue`
-          ? `Trialing Full — Light overdue`
+          ? `Trialing Full — ${name} overdue`
           : `Trialing Full — ends ${formatDate(planStatus.until)}`;
       }
       return `Trial — ends ${formatDate(planStatus.until)}`;
     }
     case `fullTrialGrace`: {
       const substrate = planStatus.substrate;
-      if (substrate?.tier === `light`) {
+      if (substrate && substrate.tier !== `full`) {
+        const name = PLAN_TIER_CONFIG[substrate.tier]?.label ?? substrate.tier;
         return substrate.status.case === `pastDue`
-          ? `Full trial expired — Light overdue`
+          ? `Full trial expired — ${name} overdue`
           : `Full trial expired`;
       }
       return `Trial expired`;

@@ -49,7 +49,7 @@ const AdminSettings: React.FC = () => {
   );
 
   const openBillingPortal = useMutation(
-    ({ configuration }: { configuration: `lightTier` | `default` }) =>
+    ({ configuration }: { configuration: `lightTier` | `mediumTier` | `default` }) =>
       Current.api.openBillingPortal({
         returnPath: `/settings`,
         configuration,

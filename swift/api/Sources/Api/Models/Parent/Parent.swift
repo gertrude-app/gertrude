@@ -70,7 +70,7 @@ extension Parent {
       .all(in: db)
   }
 
-  func canDowngradeFullSubToLight(in db: any DuetSQL.Client) async throws -> Bool {
+  func canLeaveFullTier(in db: any DuetSQL.Client) async throws -> Bool {
     try await Computer.query()
       .where(.parentId == self.id)
       .count(in: db) == 0

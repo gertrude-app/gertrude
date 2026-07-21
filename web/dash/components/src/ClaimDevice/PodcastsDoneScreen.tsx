@@ -1,7 +1,7 @@
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React from 'react';
-import LightPlanTeaser from './LightPlanTeaser';
+import PlanTeaser from './PlanTeaser';
 import ScreenHeader from './ScreenHeader';
 
 export type PodcastsDoneVariant = `active` | `approachingExpiry` | `notEntitled`;
@@ -72,7 +72,7 @@ const PodcastsDoneNotEntitled: React.FC<{
       Gertrude account needs a <b>Light subscription</b>.
     </p>
 
-    <LightPlanTeaser
+    <PlanTeaser
       className="mb-6"
       priceSize="emphasized"
       extraBullets={[`Includes Gertrude Blocker (iOS supervision) at no extra cost`]}
@@ -114,7 +114,7 @@ const PodcastsDoneApproachingExpiry: React.FC<{
       </p>
     </div>
 
-    <LightPlanTeaser
+    <PlanTeaser
       className="mb-6"
       priceSize="normal"
       extraBullets={[`Includes Gertrude Blocker (iOS supervision) at no extra cost`]}

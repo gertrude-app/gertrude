@@ -34,20 +34,14 @@ extension ChangeSubscriptionTier: Resolver {
       )
     }
 
-    if fromTier == .full, input.to == .light {
-      guard try await context.parent.canDowngradeFullSubToLight(in: context.db) else {
+    if fromTier == .full {
+      guard try await context.parent.canLeaveFullTier(in: context.db) else {
         throw context.error(
           "1d145a5e",
           .badRequest,
-          user: "Switching to Light is only available when no Macs are registered.",
+          user: "Switching away from Full is only available when no Macs are registered.",
         )
       }
-    } else if !(fromTier == .light && input.to == .full) {
-      throw context.error(
-        "c65f260c",
-        .badRequest,
-        user: "Only changes between Light and Full are supported.",
-      )
     }
 
     let live = try await stripe.getSubscription(stripeId)
@@ -88,7 +82,7 @@ extension ChangeSubscriptionTier: Resolver {
     try await context.db.update(identity)
 
     _ = try? await context.db.create(InterestingEvent(
-      eventId: input.to == .full ? "tier_upgraded" : "tier_downgraded",
+      eventId: input.to > fromTier ? "tier_upgraded" : "tier_downgraded",
       kind: "billing",
       context: "dash",
       parentId: context.parent.id,

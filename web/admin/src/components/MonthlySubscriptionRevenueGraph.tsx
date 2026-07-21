@@ -52,6 +52,10 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
             Full Plan
           </span>
           <span className="inline-flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-sm bg-violet-500" />
+            Medium Plan
+          </span>
+          <span className="inline-flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-sm bg-sky-500" />
             Light Plan
           </span>
@@ -71,13 +75,20 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
               month.centsCollected > 0
                 ? (month.fullPlanCents / month.centsCollected) * barHeight
                 : 0;
+            const mediumPlanHeight =
+              month.centsCollected > 0
+                ? (month.mediumPlanCents / month.centsCollected) * barHeight
+                : 0;
             const lightPlanHeight =
               month.centsCollected > 0
                 ? (month.lightPlanCents / month.centsCollected) * barHeight
                 : 0;
             const otherHeight =
               month.centsCollected > 0
-                ? Math.max(0, barHeight - fullPlanHeight - lightPlanHeight)
+                ? Math.max(
+                    0,
+                    barHeight - fullPlanHeight - mediumPlanHeight - lightPlanHeight,
+                  )
                 : barHeight;
 
             return (
@@ -99,6 +110,12 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
                         <div
                           className="w-full bg-emerald-500"
                           style={{ height: fullPlanHeight }}
+                        />
+                      )}
+                      {month.mediumPlanCents > 0 && (
+                        <div
+                          className="w-full bg-violet-500"
+                          style={{ height: mediumPlanHeight }}
                         />
                       )}
                       {month.lightPlanCents > 0 && (
@@ -157,6 +174,15 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
                 </span>
                 <span className="font-medium text-slate-700">
                   {formatDollars(hoveredMonth.fullPlanCents)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-sm bg-violet-500" />
+                  Medium Plan
+                </span>
+                <span className="font-medium text-slate-700">
+                  {formatDollars(hoveredMonth.mediumPlanCents)}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-3">

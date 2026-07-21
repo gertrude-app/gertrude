@@ -25,7 +25,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFreshClaimNewChildSetsDeviceFields() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.unclaimedMusicDevice(code: code)
 
@@ -54,7 +54,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFreshClaimExistingChildSetsDeviceFields() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let code = Int.random(in: 100_000 ... 999_999)
     let device = try await self.unclaimedMusicDevice(code: code)
@@ -76,7 +76,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testAlreadyBoundExpiredClaimThrowsExpiredAndDoesNotClaim() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let claim = try await self.createClaim(
@@ -99,7 +99,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testResumeClaimBySameParentReturnsOutput() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let claim = try await self.createClaim(.music, device.id, child.id, claimedAt: .reference)

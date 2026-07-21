@@ -197,7 +197,7 @@ export interface KeychainSummary {
 }
 
 export interface PaidSubscription {
-  tier: 'light' | 'full';
+  tier: 'light' | 'medium' | 'full';
   status:
     | { case: 'current'; renewsAt: ISODateString }
     | { case: 'pastDue'; since: ISODateString };
@@ -216,6 +216,12 @@ export interface PlainTimeWindow {
 export type PlanStatus =
   | {
       case: 'light';
+      status:
+        | { case: 'current'; renewsAt: ISODateString }
+        | { case: 'pastDue'; since: ISODateString };
+    }
+  | {
+      case: 'medium';
       status:
         | { case: 'current'; renewsAt: ISODateString }
         | { case: 'pastDue'; since: ISODateString };
@@ -265,12 +271,12 @@ export type SingleAppScope =
 
 export type SubscriptionPanelAction =
   | { case: 'startCheckout'; tier: SubscriptionTier }
-  | { case: 'openBillingPortal'; config: 'lightTier' | 'default' }
+  | { case: 'openBillingPortal'; config: 'lightTier' | 'mediumTier' | 'default' }
   | { case: 'changeSubscriptionTier'; to: SubscriptionTier }
   | { case: 'reactivateViaCheckout'; tier: SubscriptionTier }
   | { case: 'startFullTrial' };
 
-export type SubscriptionTier = 'light' | 'full';
+export type SubscriptionTier = 'light' | 'medium' | 'full';
 
 export interface SuccessOutput {
   success: boolean;

@@ -61,19 +61,21 @@ extension StripeSubscription {
 
   enum Tier: String, Codable, Equatable, CaseIterable, Sendable {
     case light
+    case medium
     case full
 
     var checkoutStripePriceId: String {
       @Dependency(\.env) var env
       return switch self {
       case .full: env.stripe.priceIdFull
+      case .medium: env.stripe.priceIdMedium
       case .light: env.stripe.priceIdLight
       }
     }
 
     var periodLengthInDays: Int {
       switch self {
-      case .full: 30
+      case .full, .medium: 30
       case .light: 365
       }
     }
@@ -82,6 +84,8 @@ extension StripeSubscription {
       @Dependency(\.env) var env
       if stripePriceId == env.stripe.priceIdFull {
         self = .full
+      } else if stripePriceId == env.stripe.priceIdMedium {
+        self = .medium
       } else if stripePriceId == env.stripe.priceIdLight {
         self = .light
       } else if env.stripe.legacyPriceIdsFull.contains(stripePriceId) {
@@ -90,6 +94,12 @@ extension StripeSubscription {
         return nil
       }
     }
+  }
+}
+
+extension StripeSubscription.Tier: Comparable {
+  static func < (lhs: Self, rhs: Self) -> Bool {
+    allCases.firstIndex(of: lhs)! < allCases.firstIndex(of: rhs)!
   }
 }
 

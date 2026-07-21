@@ -2,7 +2,7 @@
 export namespace OpenBillingPortal {
   export interface Input {
     returnPath: string;
-    configuration: 'lightTier' | 'default';
+    configuration: 'lightTier' | 'mediumTier' | 'default';
   }
 
   export interface Output {

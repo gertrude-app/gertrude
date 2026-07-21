@@ -79,7 +79,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testClaimed_notYetSupervised() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .light)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
     let device = try await self.db.create(IOSDevice(
@@ -196,7 +196,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testClaimed_notYetSupervised_expiredCode_renewsAndReturnsClaimed() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .light)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let uuids = MockUUIDs()
     let device = try await self.db.create(IOSDevice(
@@ -240,7 +240,7 @@ final class CheckSupervisionFlowStatusResolverTests: ApiTestCase, @unchecked Sen
 
   func testSupervised_notYetProfileInstalled() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .light)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice(
       id: .init(),

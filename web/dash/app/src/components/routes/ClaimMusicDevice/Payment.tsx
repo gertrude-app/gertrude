@@ -1,15 +1,10 @@
-import {
-  ApiErrorMessage,
-  LightPlanGateScreen,
-  Loading,
-  ScreenShell,
-} from '@dash/components';
+import { ApiErrorMessage, Loading, PlanGateScreen, ScreenShell } from '@dash/components';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import type { SubscriptionPanelAction } from '@dash/types';
+import type { SubscriptionPanelAction, SubscriptionTier } from '@dash/types';
 import Current from '../../../environment';
 import { Key, useMutation, useQuery } from '../../../hooks';
-import { lightPlanGatePrimaryLabel } from '../../../lib/subscriptionActions';
+import { planGatePrimaryLabel } from '../../../lib/subscriptionActions';
 
 const ClaimMusicDevicePayment: React.FC = () => {
   const { code = `` } = useParams<{ code: string }>();
@@ -23,7 +18,7 @@ const ClaimMusicDevicePayment: React.FC = () => {
   );
 
   const startCheckout = useMutation(
-    (tier: `light` | `full`) =>
+    (tier: SubscriptionTier) =>
       Current.api.startCheckoutSession({
         tier,
         successPath: `/claim-music-device/${code}/claim`,
@@ -35,13 +30,21 @@ const ClaimMusicDevicePayment: React.FC = () => {
   );
 
   const openBillingPortal = useMutation(
-    (configuration: `lightTier` | `default`) =>
+    (configuration: `lightTier` | `mediumTier` | `default`) =>
       Current.api.openBillingPortal({
         returnPath: `/claim-music-device/${code}/payment`,
         configuration,
       }),
     {
       onError: () => setPaymentError(`Failed to open Stripe. Please try again.`),
+    },
+  );
+
+  const changeTier = useMutation(
+    (to: SubscriptionTier) => Current.api.changeSubscriptionTier({ to }),
+    {
+      onSuccess: () => navigate(`/claim-music-device/${code}/claim`),
+      onError: () => setPaymentError(`Failed to update your plan. Please try again.`),
     },
   );
 
@@ -90,6 +93,8 @@ const ClaimMusicDevicePayment: React.FC = () => {
         openBillingPortal.mutate(action.config);
         return;
       case `changeSubscriptionTier`:
+        changeTier.mutate(action.to);
+        return;
       case `startFullTrial`:
         setPaymentError(`Please manage your subscription from Settings.`);
         return;
@@ -98,21 +103,24 @@ const ClaimMusicDevicePayment: React.FC = () => {
 
   return (
     <ScreenShell title={`Connect ${deviceType}`}>
-      <LightPlanGateScreen
+      <PlanGateScreen
         icon="music"
         subtitle={`${modelName} · iOS ${iosVersion}`}
         message={
           <>
-            Gertrude Music requires a <b>Gertrude Light or Full subscription</b> before
+            Gertrude Music requires a <b>Gertrude Medium or Full subscription</b> before
             this {deviceType} can be connected.
           </>
         }
+        plan="medium"
         extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
         priceSize="emphasized"
         checkoutCancelled={checkoutCancelled}
         error={paymentError}
-        primaryLabel={lightPlanGatePrimaryLabel(paymentAction)}
-        isWorking={startCheckout.isPending || openBillingPortal.isPending}
+        primaryLabel={planGatePrimaryLabel(paymentAction)}
+        isWorking={
+          startCheckout.isPending || openBillingPortal.isPending || changeTier.isPending
+        }
         onPrimary={() => handlePaymentAction(paymentAction)}
         secondary={{ label: `Maybe later`, onClick: () => navigate(`/`) }}
       />

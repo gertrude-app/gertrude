@@ -8,7 +8,7 @@ import { PARENTS_APP_URL } from '@/lib/urls';
 
 export const metadata = createMetadata(
   `Pricing | One Gertrude Account for Your Whole Family`,
-  `Simple, layered plans for your whole family. Start free, add Gertrude Podcasts and iOS supervision with Light ($10/year), or get everything including the Mac app with Full ($10/month).`,
+  `Simple, layered plans for your whole family. Start free, add Gertrude Podcasts and iOS supervision with Light ($10/year), add parent-curated music with Medium ($5/month), or get everything including the Mac app with Full ($10/month).`,
 );
 
 const SIGNUP_URL = `${PARENTS_APP_URL}/signup?v=new_site`;
@@ -53,12 +53,22 @@ const TIERS: Tier[] = [
     cta: { label: `Get Light`, variant: `secondary` },
   },
   {
+    name: `Medium`,
+    priceMain: `$5`,
+    pricePeriod: `/mo`,
+    billing: `Billed monthly`,
+    blurb: `Adds safe, parent-curated music for your kids.`,
+    inheritsFrom: `Light`,
+    includes: [`Gertrude Music: parent-approved Apple Music albums`],
+    cta: { label: `Get Medium`, variant: `secondary` },
+  },
+  {
     name: `Full`,
     priceMain: `$10`,
     pricePeriod: `/mo`,
     billing: `Billed monthly`,
     blurb: `Everything Gertrude makes, including Mac.`,
-    inheritsFrom: `Light`,
+    inheritsFrom: `Medium`,
     includes: [`Gertrude for Mac: full web filtering & monitoring`],
     trial: `21-day free trial`,
     cta: { label: `Start free trial`, variant: `primary` },
@@ -72,14 +82,22 @@ interface FeatureRow {
   label: string;
   free: boolean | string;
   light: boolean;
+  medium: boolean;
   full: boolean;
 }
 
 const MATRIX: FeatureRow[] = [
-  { label: `Basic iOS blocking`, free: true, light: true, full: true },
-  { label: `Gertrude Podcasts`, free: `30-day trial`, light: true, full: true },
-  { label: `iOS device supervision`, free: false, light: true, full: true },
-  { label: `Gertrude for Mac`, free: false, light: false, full: true },
+  { label: `Basic iOS blocking`, free: true, light: true, medium: true, full: true },
+  {
+    label: `Gertrude Podcasts`,
+    free: `30-day trial`,
+    light: true,
+    medium: true,
+    full: true,
+  },
+  { label: `iOS device supervision`, free: false, light: true, medium: true, full: true },
+  { label: `Gertrude Music`, free: false, light: false, medium: true, full: true },
+  { label: `Gertrude for Mac`, free: false, light: false, medium: false, full: true },
 ];
 
 const PricingPage: NextPage = () => (
@@ -116,7 +134,7 @@ const PricingPage: NextPage = () => (
     </section>
 
     <section className="relative px-5 xs:px-8 sm:px-12 lg:px-20 pb-6">
-      <div className="max-w-md lg:max-w-6xl mx-auto grid gap-5 xs:gap-6 lg:grid-cols-3 items-stretch">
+      <div className="max-w-md lg:max-w-4xl xl:max-w-7xl mx-auto grid gap-5 xs:gap-6 lg:grid-cols-2 xl:grid-cols-4 items-stretch">
         {TIERS.map((tier, index) => (
           <TierCard key={tier.name} tier={tier} index={index} />
         ))}
@@ -308,10 +326,12 @@ const ComparisonTable: React.FC = () => (
             <td className="py-4 pr-3 text-violet-100/70 text-sm">{row.label}</td>
             <MatrixCell value={row.free} />
             <MatrixCell value={row.light} />
+            <MatrixCell value={row.medium} />
             <MatrixCell value={row.full} featured />
           </tr>
         ))}
         <tr aria-hidden="true">
+          <td />
           <td />
           <td />
           <td />
@@ -325,9 +345,10 @@ const ComparisonTable: React.FC = () => (
           <h3 className="text-center text-sm font-semibold text-violet-50">
             {row.label}
           </h3>
-          <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="mt-3 grid grid-cols-4 gap-1.5">
             <MobileMatrixCell plan="Free" value={row.free} />
             <MobileMatrixCell plan="Light" value={row.light} />
+            <MobileMatrixCell plan="Med" value={row.medium} />
             <MobileMatrixCell plan="Full" value={row.full} featured />
           </div>
         </div>

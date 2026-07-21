@@ -24,7 +24,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testResumeClaimedBySameParentReturnsDone() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let claim = try await self.createClaim(.music, device.id, child.id, claimedAt: .reference)
@@ -45,7 +45,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testResumeClaimedBySameParentWithoutMusicInstallThrowsNotFound() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let claim = try await self.createClaim(.music, device.id, child.id, claimedAt: .reference)
@@ -57,7 +57,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUnclaimedValidCodeReturnsChildrenAndNoResumeStep() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random)
     let claim = try await self.createClaim(.music, device.id)
@@ -76,7 +76,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUnclaimedCodeForAlreadyBoundDeviceCompletesClaimAndReturnsDone() async throws {
     let parent = try await self.parent()
-    try await self.addLightPaidSubscription(for: parent.id)
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let claim = try await self.createClaim(.music, device.id)
@@ -109,7 +109,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output.resumeStep).toBeNil()
     expect(output.children).toEqual([])
-    expect(output.paymentAction).toEqual(.startCheckout(tier: .light))
+    expect(output.paymentAction).toEqual(.startCheckout(tier: .medium))
   }
 
   func testUnclaimedBoundDeviceWithoutMusicAccessReturnsPaymentActionAndDoesNotClaim() async throws {
@@ -126,7 +126,7 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output.resumeStep).toBeNil()
     expect(output.children).toEqual([])
-    expect(output.paymentAction).toEqual(.startCheckout(tier: .light))
+    expect(output.paymentAction).toEqual(.startCheckout(tier: .medium))
     let unchanged = try await Claim.find(code: claim.code, in: self.db)
     expect(unchanged?.claimedAt).toBeNil()
     expect(unchanged?.childId).toBeNil()

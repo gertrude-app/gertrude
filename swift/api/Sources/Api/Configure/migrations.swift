@@ -111,6 +111,7 @@ extension Configure {
     app.migrations.add(PgEnumsToText())
     app.migrations.add(TrackDeprecationLastSeen())
     app.migrations.add(BlockerProfileSettings())
+    app.migrations.add(MediumTier())
   }
 }
 

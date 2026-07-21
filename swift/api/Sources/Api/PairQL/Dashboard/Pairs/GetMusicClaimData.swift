@@ -29,7 +29,16 @@ struct GetMusicClaimData: Pair {
 extension GetMusicClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let account = try await context.currentBillingAccount()
-    let paymentAction = account.paymentActionForMissingLightPlanCapability(.useGertrudeMusic)
+    let paymentAction = account.paymentActionForMissingCapability(.useGertrudeMusic)
+
+    if paymentAction != nil {
+      _ = try? await context.db.create(InterestingEvent(
+        eventId: "music_paywall_hit",
+        kind: "event",
+        context: "dash",
+        parentId: context.parent.id,
+      ))
+    }
 
     return try await resolveClaimData(
       code: input.code,

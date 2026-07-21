@@ -109,20 +109,24 @@ extension ParentsList: Resolver {
       return ("light", "paid")
     case .light(.pastDue):
       return ("light", "overdue")
+    case .medium(.current):
+      return ("medium", "paid")
+    case .medium(.pastDue):
+      return ("medium", "overdue")
     case .fullTrial(_, let substrate):
-      if let substrate, substrate.tier == .light {
+      if let substrate, substrate.tier != .full {
         if case .pastDue = substrate.status {
-          return ("light", "overdue")
+          return (substrate.tier.rawValue, "overdue")
         }
-        return ("light", "trialingFull")
+        return (substrate.tier.rawValue, "trialingFull")
       }
       return ("full", "trialing")
     case .fullTrialGrace(_, let substrate):
-      if let substrate, substrate.tier == .light {
+      if let substrate, substrate.tier != .full {
         if case .pastDue = substrate.status {
-          return ("light", "overdue")
+          return (substrate.tier.rawValue, "overdue")
         }
-        return ("light", "trialExpired")
+        return (substrate.tier.rawValue, "trialExpired")
       }
       return ("full", "trialExpired")
     case .full(.current):

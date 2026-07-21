@@ -1,4 +1,4 @@
-import { ClaimScreen, LightPlanGateScreen, ScreenShell } from '@dash/components';
+import { ClaimScreen, PlanGateScreen, ScreenShell } from '@dash/components';
 import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import {
@@ -64,7 +64,7 @@ const SuperviseDeviceScreen: React.FC<{
   if (step === `payment`) {
     return (
       <ScreenShell title={`Continue ${deviceType} Setup`}>
-        <LightPlanGateScreen
+        <PlanGateScreen
           icon="credit-card"
           subtitle={`Setting up ${childName}'s ${modelName} · iOS ${iosVersion}`}
           message={

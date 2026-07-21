@@ -5,10 +5,10 @@ import {
   AppHeader,
   BetaBadge,
   BlockGroupList,
-  // EditBlockRules,
-  LightPlanTeaser,
   Loading,
   PageHeading,
+  // EditBlockRules,
+  PlanTeaser,
   // BlockRuleEditor,
   PodcastsDeviceSection,
   ToggleCard,
@@ -580,10 +580,12 @@ const MusicDeviceSection: React.FC<{
     {requiresPayment ? (
       <div className="mt-4">
         <p className="text-slate-500 mb-4">
-          Paused — your Gertrude account needs Light or higher to manage Gertrude Music.
+          Paused — your Gertrude account needs the Medium plan (or Full) to manage
+          Gertrude Music.
         </p>
-        <LightPlanTeaser
+        <PlanTeaser
           className="mb-4"
+          plan="medium"
           extraBullets={[`Includes Gertrude Music for approved Apple Music albums`]}
         />
         <Button type="link" to="/settings" color="primary" size="small">

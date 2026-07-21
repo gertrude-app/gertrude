@@ -10,6 +10,7 @@ import XCore
 enum PlanStatus: Equatable, Sendable {
   case free
   case light(status: BillingStatus)
+  case medium(status: BillingStatus)
   case full(status: BillingStatus)
   case fullTrial(until: Date, substrate: PaidSubscription?)
   case fullTrialGrace(until: Date, substrate: PaidSubscription?)

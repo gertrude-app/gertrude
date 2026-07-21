@@ -1,13 +1,15 @@
 import { Button } from '@shared/components';
 import React from 'react';
-import LightPlanTeaser from './LightPlanTeaser';
+import type { TeaserPlan } from './PlanTeaser';
+import PlanTeaser from './PlanTeaser';
 import ScreenHeader from './ScreenHeader';
 
-const LightPlanGateScreen: React.FC<{
+const PlanGateScreen: React.FC<{
   icon: string;
   title?: string;
   subtitle?: string;
   message: React.ReactNode;
+  plan?: TeaserPlan;
   extraBullets?: string[];
   priceSize?: `normal` | `emphasized`;
   checkoutCancelled?: boolean;
@@ -24,6 +26,7 @@ const LightPlanGateScreen: React.FC<{
   title = `Subscribe to Continue`,
   subtitle,
   message,
+  plan,
   extraBullets,
   priceSize,
   checkoutCancelled = false,
@@ -38,7 +41,12 @@ const LightPlanGateScreen: React.FC<{
 
     <p className="text-slate-600 mb-5">{message}</p>
 
-    <LightPlanTeaser className="mb-6" priceSize={priceSize} extraBullets={extraBullets} />
+    <PlanTeaser
+      className="mb-6"
+      plan={plan}
+      priceSize={priceSize}
+      extraBullets={extraBullets}
+    />
 
     {checkoutCancelled && (
       <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6 text-sm text-amber-700">
@@ -61,4 +69,4 @@ const LightPlanGateScreen: React.FC<{
   </div>
 );
 
-export default LightPlanGateScreen;
+export default PlanGateScreen;
