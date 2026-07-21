@@ -74,10 +74,7 @@ struct AppFeature: Sendable {
       switch action {
       case .nowPlayingAlbumInfoTapped:
         guard let albumID = state.playback.session?.currentItem.albumID else { return .none }
-        guard state.library.presentAlbumDetail(
-          albumID: albumID,
-          transitionSourceID: nil,
-        ) else { return .none }
+        guard state.library.pushAlbumDetail(albumID: albumID) else { return .none }
         state.isNowPlayingPresented = false
         state.selectedTab = .library
         self.synchronizeDetailPlayback(state: &state)

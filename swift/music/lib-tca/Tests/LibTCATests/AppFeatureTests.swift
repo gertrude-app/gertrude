@@ -99,7 +99,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func nowPlayingAlbumInfoTapPreservesLoadedCurrentAlbumDetail() async {
+  func nowPlayingAlbumInfoTapPushesCurrentAlbumAgain() async {
     let loadedAlbum = ApprovedMusicLibrary.mock.albums[0]
     let track = loadedAlbum.tracks[1]
     var library = ApprovedMusicLibrary.mock
@@ -123,15 +123,17 @@ struct AppFeatureTests {
 
     await store.send(.nowPlayingAlbumInfoTapped) {
       $0.isNowPlayingPresented = false
-      $0.library.albumDetail?.playStatus = .playing
-      $0.library.albumDetail?.currentTrackID = track.id
+      $0.library.path.append(.album(.init(
+        album: library.albums[0],
+      )))
     }
 
-    #expect(store.state.library.albumDetail?.album.tracks == loadedAlbum.tracks)
+    #expect(store.state.library.path.count == 2)
+    #expect(store.state.library.albumDetail?.album.tracks.isEmpty == true)
   }
 
   @Test
-  func nowPlayingAlbumInfoTapFromAnotherAlbumDetailReplacesDetail() async {
+  func nowPlayingAlbumInfoTapPushesAfterAnotherAlbumDetail() async {
     let library = ApprovedMusicLibrary.mock
     let currentAlbum = library.albums[0]
     let visibleAlbum = library.albums[1]
@@ -155,12 +157,14 @@ struct AppFeatureTests {
 
     await store.send(.nowPlayingAlbumInfoTapped) {
       $0.isNowPlayingPresented = false
-      $0.library.albumDetail = .init(
+      $0.library.path.append(.album(.init(
         album: currentAlbum,
         playStatus: .playing,
         currentTrackID: track.id,
-      )
+      )))
     }
+
+    #expect(store.state.library.path.count == 2)
   }
 
   @Test

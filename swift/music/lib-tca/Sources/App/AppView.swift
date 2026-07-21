@@ -210,7 +210,6 @@ struct AppView: View {
         displayMode: displayMode,
         showsBackground: showsBackground,
       )
-      .padding(.vertical, 7)
     }
 
     private var nowPlayingSafeAreaInset: some View {

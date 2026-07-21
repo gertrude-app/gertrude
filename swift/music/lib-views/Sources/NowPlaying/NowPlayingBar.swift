@@ -61,7 +61,7 @@ import SwiftUI
 
     @ViewBuilder
     private var barContent: some View {
-      let content = NowPlayingBarContent(
+      let controls = NowPlayingBarContent(
         layout: self.layout,
         title: self.title,
         artist: self.artist,
@@ -74,6 +74,7 @@ import SwiftUI
         onPlayTap: self.onPlayTap,
         onNextTap: self.onNextTap,
       )
+      let content = self.accessoryContent(controls)
       if self.showsBackground {
         if #available(iOS 26.0, *) {
           content
@@ -83,6 +84,9 @@ import SwiftUI
             )
         } else {
           content
+            .clipShape(
+              RoundedRectangle(cornerRadius: self.panelCornerRadius, style: .continuous),
+            )
             .background {
               RoundedRectangle(cornerRadius: self.panelCornerRadius, style: .continuous)
                 .fill(Color(.secondarySystemBackground))
@@ -99,6 +103,21 @@ import SwiftUI
       }
     }
 
+    private func accessoryContent(_ controls: some View) -> some View {
+      ZStack(alignment: .bottom) {
+        NowPlayingBarAtmosphere(isActive: self.isPlaying)
+          .frame(maxWidth: .infinity)
+          .frame(height: 32)
+          .opacity(0.6)
+
+        if self.showsBackground {
+          controls
+        } else {
+          controls.padding(.vertical, 7)
+        }
+      }
+    }
+
     private var layout: NowPlayingBarLayout {
       switch self.displayMode {
       case .automatic, .expanded:
@@ -112,4 +131,26 @@ import SwiftUI
       self.layout == .inline ? 20 : 24
     }
   }
+
+  #if DEBUG
+    #Preview("Playing accessory") {
+      NowPlayingBar(
+        title: PreviewMusicData.nowPlayingTitle,
+        artist: PreviewMusicData.nowPlayingArtist,
+        artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+        isPlaying: true,
+        isLoading: false,
+        isEnabled: true,
+        foregroundColor: .black,
+        displayMode: .expanded,
+        showsBackground: false,
+        onTap: {},
+        onPlayTap: {},
+        onNextTap: {},
+      )
+      .background(Color(.secondarySystemBackground))
+      .padding(24)
+      .background(Color(.systemGroupedBackground))
+    }
+  #endif
 #endif

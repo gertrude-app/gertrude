@@ -51,7 +51,7 @@ import SwiftUI
         .buttonStyle(.plain)
         .frame(minWidth: 0, maxWidth: .infinity)
 
-        HStack(spacing: 18) {
+        HStack(spacing: 2) {
           NowPlayingIconButton(
             systemName: self.isPlaying ? "pause.fill" : "play.fill",
             size: 18,
@@ -67,7 +67,6 @@ import SwiftUI
             foregroundColor: self.foregroundColor,
             isEnabled: self.isEnabled,
             accessibilityLabel: "Next",
-            hitSlop: .init(width: 12, height: 8),
             action: self.onNextTap,
           )
         }
@@ -110,7 +109,7 @@ import SwiftUI
         )
       }
       .padding(.horizontal, 14)
-      .frame(height: 40)
+      .frame(height: 44)
     }
   }
 
@@ -179,7 +178,6 @@ import SwiftUI
     var isLoading = false
     let isEnabled: Bool
     let accessibilityLabel: String
-    var hitSlop: CGSize = .zero
     let action: @MainActor @Sendable () -> Void
 
     var body: some View {
@@ -195,15 +193,11 @@ import SwiftUI
           }
         }
         .foregroundStyle(self.foregroundColor)
-        .frame(width: max(28, self.size + 8), height: 30)
+        .frame(width: 44, height: 44)
         .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
-      .padding(.horizontal, self.hitSlop.width)
-      .padding(.vertical, self.hitSlop.height)
       .contentShape(Rectangle())
-      .padding(.horizontal, -self.hitSlop.width)
-      .padding(.vertical, -self.hitSlop.height)
       .disabled(!self.isEnabled)
       .opacity(self.isEnabled ? 1 : 0.35)
       .accessibilityLabel(self.accessibilityLabel)

@@ -953,6 +953,16 @@ extension LibraryFeature.State {
   }
 
   @discardableResult
+  mutating func pushAlbumDetail(albumID: ApprovedAlbum.ID) -> Bool {
+    guard case .loaded(let library) = self.status,
+          let album = library.album(id: albumID)
+    else { return false }
+
+    self.path.append(.album(.init(album: album)))
+    return true
+  }
+
+  @discardableResult
   mutating func presentAlbumDetail(
     albumID: ApprovedAlbum.ID,
     transitionSourceID: String?,
