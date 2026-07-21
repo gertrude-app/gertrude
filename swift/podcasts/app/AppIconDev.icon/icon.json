@@ -1,0 +1,74 @@
+{
+  "fill": {
+    "linear-gradient": [
+      "display-p3:0.50588,0.36863,1.00000,1.00000",
+      "srgb:0.88235,0.16471,0.98431,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 0.7
+      }
+    }
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "fill": {
+            "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+          },
+          "image-name": "Subtract.svg",
+          "name": "Subtract",
+          "position": {
+            "scale": 2.36,
+            "translation-in-points": [1.103960519882321, -108.04536918602957]
+          }
+        },
+        {
+          "fill": {
+            "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+          },
+          "image-name": "Union.svg",
+          "name": "Union",
+          "position": {
+            "scale": 2.36,
+            "translation-in-points": [1.103960519882321, 199.93463081397033]
+          }
+        }
+      ],
+      "position": {
+        "scale": 1,
+        "translation-in-points": [-1.103960519882321, -3.464630813970416]
+      },
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    },
+    {
+      "layers": [
+        {
+          "image-name": "dev-banner.svg",
+          "name": "dev banner",
+          "position": {
+            "scale": 1,
+            "translation-in-points": [0, 0]
+          }
+        }
+      ]
+    }
+  ],
+  "supported-platforms": {
+    "circles": ["watchOS"],
+    "squares": "shared"
+  }
+}
