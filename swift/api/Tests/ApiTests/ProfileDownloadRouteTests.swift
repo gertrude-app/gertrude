@@ -356,6 +356,7 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
           <array>
             <string>com.apple.AppStore</string>
             <string>com.culturedcode.ThingsiPhone</string>
+            <string>com.netrivet.gertrude-ios.app</string>
           </array>
           </dict>
         </array>
@@ -375,10 +376,77 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
       $0.webAllowList = []
     }
     let xml = generateProfileXml(for: device, settings: settings)
-    expect(xml).toContain("<key>whitelistedAppBundleIDs</key>\n      <array/>")
     expect(xml).toContain("<key>AllowListBookmarks</key>\n        <array/>")
     expect(xml).toContain("<key>FilterType</key>\n        <string>BuiltIn</string>")
     expect(xml).toContain("<key>AutoFilterEnabled</key>\n        <false/>")
+  }
+
+  // an app whitelist that omits our own app hides the only way to sync a corrected
+  // profile, and a locked profile can't be removed -- so we always append ourselves
+  func testWhitelistAlwaysIncludesGertrudeApp() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.whitelistedAppBundleIds = ["com.culturedcode.ThingsiPhone"]
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml).toContain("""
+    <key>whitelistedAppBundleIDs</key>
+          <array>
+            <string>com.culturedcode.ThingsiPhone</string>
+            <string>com.netrivet.gertrude-ios.app</string>
+          </array>
+    """)
+  }
+
+  func testEmptyWhitelistStillIncludesGertrudeApp() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.whitelistedAppBundleIds = [] // "approve nothing" must still leave us recoverable
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml).toContain("""
+    <key>whitelistedAppBundleIDs</key>
+          <array>
+            <string>com.netrivet.gertrude-ios.app</string>
+          </array>
+    """)
+  }
+
+  func testWhitelistDoesntDuplicateGertrudeApp() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.whitelistedAppBundleIds = ["com.netrivet.gertrude-ios.app", "com.apple.AppStore"]
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml).toContain("""
+    <key>whitelistedAppBundleIDs</key>
+          <array>
+            <string>com.netrivet.gertrude-ios.app</string>
+            <string>com.apple.AppStore</string>
+          </array>
+    """)
+  }
+
+  // nil (feature off) must stay absent -- appending would silently hide every other app
+  func testNilWhitelistEmitsNoKeyAtAll() {
+    let device = IOSDevice.mock {
+      $0.id = .init(UUID(uuidString: "aaaaaaaa-bbbb-cccc-dddd-eeeeffff0000")!)
+    }
+    let settings = BlockerApp.ProfileSettings.mock {
+      $0.deviceId = device.id
+      $0.whitelistedAppBundleIds = nil
+    }
+    let xml = generateProfileXml(for: device, settings: settings)
+    expect(xml.contains("whitelistedAppBundleIDs")).toBeFalse()
   }
 
   func testExtendedRestrictionsEmitWhenSet() {
