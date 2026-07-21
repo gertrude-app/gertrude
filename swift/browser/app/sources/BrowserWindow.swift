@@ -1,12 +1,11 @@
 import AppKit
-import WebKit
+import SwiftUI
 
 @MainActor
 final class BrowserWindow {
   private var window: NSWindow?
-  private var webView: WKWebView?
 
-  func show(initialURL: URL?) {
+  func show(rootView: some View) {
     if self.window == nil {
       let window = NSWindow(
         contentRect: NSRect(x: 0, y: 0, width: 900, height: 600),
@@ -18,13 +17,8 @@ final class BrowserWindow {
       window.title = "Gertie"
       window.center()
       window.isReleasedWhenClosed = false
-      let webView = WKWebView(frame: .zero)
-      window.contentView = webView
-      self.webView = webView
+      window.contentView = NSHostingView(rootView: rootView)
       self.window = window
-    }
-    if let url = initialURL {
-      self.webView?.load(URLRequest(url: url))
     }
     NSApp.activate(ignoringOtherApps: true)
     self.window?.makeKeyAndOrderFront(nil)

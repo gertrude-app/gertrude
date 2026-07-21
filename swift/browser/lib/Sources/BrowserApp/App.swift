@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import SwiftUI
 
 @MainActor public struct App {
   let store = Store(
@@ -16,8 +17,7 @@ import Foundation
     }
   }
 
-  public var currentTabURL: URL? {
-    guard let id = self.store.state.selectedTabID else { return nil }
-    return self.store.state.tabs[id: id]?.url
+  public var rootView: some View {
+    RootView(store: self.store)
   }
 }

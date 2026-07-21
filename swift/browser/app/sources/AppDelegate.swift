@@ -8,6 +8,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     self.app.send(.didFinishLaunching)
-    self.browserWindow.show(initialURL: self.app.currentTabURL)
+    self.browserWindow.show(rootView: self.app.rootView)
   }
 }
