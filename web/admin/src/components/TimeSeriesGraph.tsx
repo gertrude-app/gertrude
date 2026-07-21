@@ -8,16 +8,18 @@ interface DataItem {
   label: string;
 }
 
-interface StatusConfig {
+export interface StatusConfig {
   isSuccess: (status: string) => boolean;
   isWarning: (status: string) => boolean;
   isInfo?: (status: string) => boolean;
 }
 
+export type TimeSeriesGradient = `violet` | `blue` | `green` | `fuchsia`;
+
 interface TimeSeriesGraphProps<T extends DataItem> {
   items: T[];
   itemLabel: string;
-  gradient: `violet` | `blue` | `green`;
+  gradient: TimeSeriesGradient;
   statusConfig: StatusConfig;
   twoColumnTooltip?: boolean;
 }
@@ -140,18 +142,21 @@ const TimeSeriesGraph = <T extends DataItem>({
     violet: `from-brand-violet to-brand-fuchsia`,
     blue: `from-sky-400 to-blue-500`,
     green: `from-emerald-400 to-green-500`,
+    fuchsia: `from-fuchsia-500 to-violet-600`,
   };
 
   const shadowClasses = {
     violet: `shadow-brand-violet/40`,
     blue: `shadow-sky-500/40`,
     green: `shadow-emerald-500/40`,
+    fuchsia: `shadow-fuchsia-500/40`,
   };
 
   const buttonActiveClasses = {
     violet: `from-brand-violet to-brand-fuchsia shadow-brand-violet/20`,
     blue: `from-sky-400 to-blue-500 shadow-sky-500/20`,
     green: `from-emerald-400 to-green-500 shadow-emerald-500/20`,
+    fuchsia: `from-fuchsia-500 to-violet-600 shadow-fuchsia-500/20`,
   };
 
   return (

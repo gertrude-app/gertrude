@@ -21,6 +21,7 @@ export namespace SubscriptionsOverview {
     lightPlanCount: number;
     lightPlanAnnualRevenue: number;
     trialingCount: number;
+    protectedChildren: number;
     totalAccounts: number;
     recentSignups: Array<{
       date: ISODateString;

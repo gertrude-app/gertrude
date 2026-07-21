@@ -3,19 +3,61 @@ import { Link, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import ErrorState from '../components/ErrorState';
-import { ArrowLeftIcon, MicIcon, SmartphoneIcon, StarIcon } from '../components/Icons';
+import {
+  ArrowLeftIcon,
+  type IconProps,
+  MicIcon,
+  MusicIcon,
+  SmartphoneIcon,
+  StarIcon,
+} from '../components/Icons';
 import LoadingState from '../components/LoadingState';
 import Section from '../components/Section';
 import StatCard from '../components/StatCard';
 import { formatDate } from '../lib/format';
 
-type GertrudeApp = `blocker` | `podcasts`;
+type GertrudeApp = `blocker` | `music` | `podcasts`;
 
 const BACKFILL_DATE = `2026-01-06T00:00:00Z`;
 
-const BACKFILL: Record<GertrudeApp, { stars: Record<number, number> }> = {
-  blocker: { stars: { 5: 62, 2: 1 } },
-  podcasts: { stars: { 5: 6 } },
+type AppConfig = {
+  name: string;
+  Icon: React.FC<IconProps>;
+  loadingGradient: NonNullable<React.ComponentProps<typeof LoadingState>[`gradient`]>;
+  gradientClass: string;
+  shadowClass: string;
+  highlight: NonNullable<React.ComponentProps<typeof StatCard>[`highlight`]>;
+  backfillStars: Record<number, number>;
+};
+
+const APP_CONFIG: Record<GertrudeApp, AppConfig> = {
+  blocker: {
+    name: `Gertrude Blocker`,
+    Icon: SmartphoneIcon,
+    loadingGradient: `blue`,
+    gradientClass: `from-sky-400 to-blue-500`,
+    shadowClass: `shadow-sky-500/20`,
+    highlight: `blue`,
+    backfillStars: { 5: 62, 2: 1 },
+  },
+  music: {
+    name: `Gertrude Music`,
+    Icon: MusicIcon,
+    loadingGradient: `violet`,
+    gradientClass: `from-fuchsia-500 to-violet-600`,
+    shadowClass: `shadow-fuchsia-500/20`,
+    highlight: `violet`,
+    backfillStars: {},
+  },
+  podcasts: {
+    name: `Gertrude Podcasts`,
+    Icon: MicIcon,
+    loadingGradient: `green`,
+    gradientClass: `from-emerald-400 to-green-500`,
+    shadowClass: `shadow-emerald-500/20`,
+    highlight: `green`,
+    backfillStars: { 5: 6 },
+  },
 };
 
 type TimelineItem =
@@ -23,14 +65,15 @@ type TimelineItem =
   | { type: `backfill`; stars: Record<number, number>; date: string };
 
 const AppRatings: React.FC = () => {
-  const { app } = useParams<{ app: GertrudeApp }>();
+  const { app } = useParams<{ app: string }>();
   const [data, setData] = useState<T.AppRatings.Output | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const config = app && isGertrudeApp(app) ? APP_CONFIG[app] : undefined;
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      if (!app || (app !== `blocker` && app !== `podcasts`)) {
+      if (!isGertrudeApp(app)) {
         setError(`Invalid app parameter`);
         setLoading(false);
         return;
@@ -56,26 +99,23 @@ const AppRatings: React.FC = () => {
 
   if (loading) {
     return (
-      <LoadingState context="ratings" gradient={app === `blocker` ? `blue` : `green`} />
+      <LoadingState context="ratings" gradient={config?.loadingGradient ?? `violet`} />
     );
   }
 
-  if (error || !data) {
+  if (error || !data || !config) {
     return <ErrorState context="ratings" error={error ?? `Unknown error`} />;
   }
 
-  const appName = app === `blocker` ? `Gertrude Blocker` : `Gertrude Podcasts`;
-  const Icon = app === `blocker` ? SmartphoneIcon : MicIcon;
-  const gradientClass =
-    app === `blocker` ? `from-sky-400 to-blue-500` : `from-emerald-400 to-green-500`;
-  const shadowClass = app === `blocker` ? `shadow-sky-500/20` : `shadow-emerald-500/20`;
-  const validApp = app === `podcasts` ? `podcasts` : `blocker`;
-  const backfill = BACKFILL[validApp];
+  const Icon = config.Icon;
   const numReviews = data.items.filter((i) => i.type === `review`).length;
+  const hasBackfill = Object.values(config.backfillStars).some((count) => count > 0);
 
   const timelineItems: TimelineItem[] = [
     ...data.items.map((item) => ({ type: `apiItem` as const, item })),
-    { type: `backfill` as const, stars: backfill.stars, date: BACKFILL_DATE },
+    ...(hasBackfill
+      ? [{ type: `backfill` as const, stars: config.backfillStars, date: BACKFILL_DATE }]
+      : []),
   ].sort((a, b) => {
     const dateA = a.type === `backfill` ? a.date : a.item.date;
     const dateB = b.type === `backfill` ? b.date : b.item.date;
@@ -94,13 +134,13 @@ const AppRatings: React.FC = () => {
         </Link>
         <div className="flex items-center gap-3">
           <div
-            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientClass} flex items-center justify-center shadow-lg ${shadowClass}`}
+            className={`w-10 h-10 rounded-xl bg-gradient-to-br ${config.gradientClass} flex items-center justify-center shadow-lg ${config.shadowClass}`}
           >
             <Icon className="w-5 h-5 text-white" />
           </div>
           <div>
             <h1 className="font-display font-semibold text-slate-900 text-2xl">
-              {appName} Ratings
+              {config.name} Ratings
             </h1>
             <p className="text-sm text-slate-500">
               {data.totalCount} total ratings · {data.currentAverage.toFixed(1)} average
@@ -115,7 +155,7 @@ const AppRatings: React.FC = () => {
           <StatCard
             label="Average Rating"
             value={data.currentAverage.toFixed(1)}
-            highlight={app === `blocker` ? `blue` : `green`}
+            highlight={config.highlight}
           />
           <StatCard label="Reviews" value={numReviews} />
         </div>
@@ -140,6 +180,10 @@ const AppRatings: React.FC = () => {
     </div>
   );
 };
+
+function isGertrudeApp(app: string | undefined): app is GertrudeApp {
+  return app === `blocker` || app === `music` || app === `podcasts`;
+}
 
 function getItemId(item: T.AppRatings.Output[`items`][number]): string {
   return `${item.type}-${item.id}`;

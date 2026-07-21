@@ -19,6 +19,7 @@ struct SubscriptionsOverview: Pair {
     var lightPlanCount: Int
     var lightPlanAnnualRevenue: Int
     var trialingCount: Int
+    var protectedChildren: Int
     var totalAccounts: Int
     var recentSignups: [RecentSignupOutput]
   }
@@ -82,7 +83,8 @@ extension SubscriptionsOverview: NoInputResolver {
         if parent.isActive
           || parent.hasCompletedSupervision
           || parent.hasConnectedFreeIOSDevice
-          || parent.hasConnectedPodcastApp {
+          || parent.hasConnectedPodcastApp
+          || parent.hasConnectedMusicApp {
           "engaged"
         } else if parent.numComputerUsers > 0 || parent.hasIncompleteSupervision {
           "partial"
@@ -116,7 +118,7 @@ extension SubscriptionsOverview: NoInputResolver {
       }
 
     let totalAnnualCents = fullPlanAnnualCents + mediumPlanAnnualCents + lightPlanAnnualCents
-    return .init(
+    return try await .init(
       monthlyRevenue: totalAnnualCents / 100 / 12,
       annualRevenue: totalAnnualCents / 100,
       monthlySubscriptionRevenue: monthlySubscriptionRevenue,
@@ -127,10 +129,234 @@ extension SubscriptionsOverview: NoInputResolver {
       lightPlanCount: lightPlanCount,
       lightPlanAnnualRevenue: lightPlanAnnualCents / 100,
       trialingCount: trialingCount,
+      protectedChildren: self.protectedChildren(in: context),
       totalAccounts: data.overview.allTimeSignups,
       recentSignups: signups,
     )
   }
+
+  static func protectedChildren(in context: Context) async throws -> Int {
+    try await context.db.count(ProtectedChildrenCount.self)
+  }
+}
+
+private struct ProtectedChildrenCount: CustomCountable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    let parentId = Parent.columnName(.id)
+    let parentEmail = Parent.columnName(.email)
+    let parentEmailVerifiedAt = Parent.columnName(.emailVerifiedAt)
+    let childId = Child.columnName(.id)
+    let childParentId = Child.columnName(.parentId)
+    let childFilteringDisabled = Child.columnName(.filteringDisabled)
+    let computerId = Computer.columnName(.id)
+    let computerParentId = Computer.columnName(.parentId)
+    let computerUserId = ComputerUser.columnName(.id)
+    let computerUserChildId = ComputerUser.columnName(.childId)
+    let computerUserComputerId = ComputerUser.columnName(.computerId)
+    let notificationParentId = Parent.Notification.columnName(.parentId)
+    let keychainId = Keychain.columnName(.id)
+    let keychainParentId = Keychain.columnName(.parentId)
+    let keychainIsPublic = Keychain.columnName(.isPublic)
+    let keyKeychainId = Key.columnName(.keychainId)
+    let screenshotComputerUserId = Screenshot.columnName(.computerUserId)
+    let keystrokeComputerUserId = KeystrokeLine.columnName(.computerUserId)
+    let iosDeviceId = IOSDevice.columnName(.id)
+    let iosDeviceChildId = IOSDevice.columnName(.childId)
+    let iosEventDeviceId = IOSEvent.columnName(.deviceId)
+    let iosEventEventId = IOSEvent.columnName(.eventId)
+    let supervisionDeviceId = BlockerApp.Supervision.columnName(.deviceId)
+    let supervisionProfileInstalledAt = BlockerApp.Supervision.columnName(.profileInstalledAt)
+    let blockerInstallId = BlockerApp.Install.columnName(.id)
+    let blockerInstallDeviceId = BlockerApp.Install.columnName(.deviceId)
+    let blockerTokenInstallId = BlockerApp.Token.columnName(.installId)
+    let podcastDeviceId = PodcastEvent.columnName(.deviceId)
+    let podcastEventId = PodcastEvent.columnName(.eventId)
+    let podcastCreatedAt = PodcastEvent.columnName(.createdAt)
+    let musicInstallId = MusicApp.Install.columnName(.id)
+    let musicInstallDeviceId = MusicApp.Install.columnName(.deviceId)
+    let musicTokenInstallId = MusicApp.Token.columnName(.installId)
+    return SQL.Statement("""
+    WITH verified_parents AS (
+      SELECT \(parentId) AS parent_id
+      FROM \(table: Parent.self)
+      WHERE \(parentEmailVerifiedAt) IS NOT NULL
+        AND \(parentEmail) NOT LIKE '%.smoke-test-%'
+        AND \(parentEmail) NOT LIKE 'e2e-user-%'
+    ),
+    active_mac_parents AS (
+      SELECT vp.parent_id
+      FROM verified_parents vp
+      WHERE EXISTS (
+          SELECT 1
+          FROM \(table: Computer.self) pc
+          JOIN \(table: ComputerUser.self) cu
+            ON cu.\(computerUserComputerId) = pc.\(computerId)
+          WHERE pc.\(computerParentId) = vp.parent_id
+        )
+        AND EXISTS (
+          SELECT 1
+          FROM \(table: Parent.Notification.self) n
+          WHERE n.\(notificationParentId) = vp.parent_id
+        )
+        AND (
+          EXISTS (
+            SELECT 1
+            FROM \(table: Keychain.self) kc
+            JOIN \(table: Key.self) k
+              ON k.\(keyKeychainId) = kc.\(keychainId)
+            WHERE kc.\(keychainParentId) = vp.parent_id
+              AND kc.\(keychainIsPublic) = false
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM \(table: Computer.self) pc
+            JOIN \(table: ComputerUser.self) cu
+              ON cu.\(computerUserComputerId) = pc.\(computerId)
+            LEFT JOIN \(table: Screenshot.self) ss
+              ON ss.\(screenshotComputerUserId) = cu.\(computerUserId)
+            LEFT JOIN \(table: KeystrokeLine.self) kl
+              ON kl.\(keystrokeComputerUserId) = cu.\(computerUserId)
+            WHERE pc.\(computerParentId) = vp.parent_id
+              AND (ss.id IS NOT NULL OR kl.id IS NOT NULL)
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM \(table: Child.self) c
+            JOIN \(table: ComputerUser.self) cu
+              ON cu.\(computerUserChildId) = c.\(childId)
+            WHERE c.\(childParentId) = vp.parent_id
+              AND c.\(childFilteringDisabled) = true
+          )
+        )
+    ),
+    mac_subjects AS (
+      SELECT 'child:' || c.\(childId)::text AS subject_key
+      FROM \(table: Child.self) c
+      JOIN active_mac_parents amp ON amp.parent_id = c.\(childParentId)
+    ),
+    screen_time_success_devices AS (
+      SELECT DISTINCT e.\(iosEventDeviceId) AS device_id
+      FROM \(table: IOSEvent.self) e
+      WHERE e.\(iosEventDeviceId) IS NOT NULL
+        AND e.\(iosEventEventId) = 'cdb31095'
+        AND e.\(iosEventDeviceId) IN (
+          SELECT \(iosEventDeviceId) FROM \(table: IOSEvent
+      .self) WHERE \(iosEventEventId) = '4a0c585f'
+        )
+        AND e.\(iosEventDeviceId) NOT IN (
+          SELECT \(iosEventDeviceId) FROM \(table: IOSEvent
+      .self) WHERE \(iosEventEventId) = 'bad8adcc'
+        )
+        AND e.\(iosEventDeviceId) NOT IN (
+          SELECT \(supervisionDeviceId) FROM \(table: BlockerApp.Supervision.self)
+          WHERE \(supervisionProfileInstalledAt) IS NOT NULL
+        )
+    ),
+    configurator_success_devices AS (
+      SELECT DISTINCT e.\(iosEventDeviceId) AS device_id
+      FROM \(table: IOSEvent.self) e
+      WHERE e.\(iosEventDeviceId) IS NOT NULL
+        AND e.\(iosEventEventId) = '8d35f043'
+        AND e.\(iosEventDeviceId) IN (
+          SELECT \(iosEventDeviceId) FROM \(table: IOSEvent
+      .self) WHERE \(iosEventEventId) = 'bad8adcc'
+        )
+    ),
+    gertrude_supervision_success_devices AS (
+      SELECT DISTINCT e.\(iosEventDeviceId) AS device_id
+      FROM \(table: IOSEvent.self) e
+      WHERE e.\(iosEventDeviceId) IS NOT NULL
+        AND e.\(iosEventEventId) = '8d35f043'
+        AND e.\(iosEventDeviceId) IN (
+          SELECT \(supervisionDeviceId) FROM \(table: BlockerApp.Supervision.self)
+          WHERE \(supervisionProfileInstalledAt) IS NOT NULL
+        )
+        AND e.\(iosEventDeviceId) NOT IN (
+          SELECT \(iosEventDeviceId) FROM \(table: IOSEvent
+      .self) WHERE \(iosEventEventId) = 'bad8adcc'
+        )
+    ),
+    non_supervised_connection_success_devices AS (
+      SELECT DISTINCT e.\(iosEventDeviceId) AS device_id
+      FROM \(table: IOSEvent.self) e
+      JOIN \(table: BlockerApp.Install.self) i
+        ON i.\(blockerInstallDeviceId) = e.\(iosEventDeviceId)
+      JOIN \(table: BlockerApp.Token.self) t
+        ON t.\(blockerTokenInstallId) = i.\(blockerInstallId)
+      WHERE e.\(iosEventDeviceId) IS NOT NULL
+        AND e.\(iosEventEventId) = '8d35f043'
+        AND e.\(iosEventDeviceId) NOT IN (
+          SELECT \(supervisionDeviceId) FROM \(table: BlockerApp.Supervision.self)
+          WHERE \(supervisionProfileInstalledAt) IS NOT NULL
+        )
+        AND e.\(iosEventDeviceId) NOT IN (
+          SELECT \(iosEventDeviceId) FROM \(table: IOSEvent
+      .self) WHERE \(iosEventEventId) = 'bad8adcc'
+        )
+    ),
+    ios_success_devices AS (
+      SELECT device_id FROM screen_time_success_devices
+      UNION
+      SELECT device_id FROM configurator_success_devices
+      UNION
+      SELECT device_id FROM gertrude_supervision_success_devices
+      UNION
+      SELECT device_id FROM non_supervised_connection_success_devices
+    ),
+    ios_subjects AS (
+      SELECT DISTINCT COALESCE(
+        'child:' || d.\(iosDeviceChildId)::text,
+        'ios-device:' || d.\(iosDeviceId)::text
+      ) AS subject_key
+      FROM \(table: IOSDevice.self) d
+      JOIN ios_success_devices s ON s.device_id = d.\(iosDeviceId)
+    ),
+    podcast_active_devices AS (
+      SELECT DISTINCT \(podcastDeviceId) AS device_id
+      FROM \(table: PodcastEvent.self)
+      WHERE \(podcastDeviceId) IS NOT NULL
+        AND (
+          (\(podcastEventId) = '27c4f26a' AND \(podcastCreatedAt) >= NOW() - INTERVAL '30 days')
+          OR (\(hostPurchasePodcastEventPredicateSQL))
+        )
+    ),
+    podcast_subjects AS (
+      SELECT DISTINCT COALESCE(
+        'child:' || d.\(iosDeviceChildId)::text,
+        'ios-device:' || d.\(iosDeviceId)::text
+      ) AS subject_key
+      FROM \(table: IOSDevice.self) d
+      JOIN podcast_active_devices p ON p.device_id = d.\(iosDeviceId)
+    ),
+    music_connected_devices AS (
+      SELECT DISTINCT i.\(musicInstallDeviceId) AS device_id
+      FROM \(table: MusicApp.Install.self) i
+      JOIN \(table: MusicApp.Token.self) t
+        ON t.\(musicTokenInstallId) = i.\(musicInstallId)
+    ),
+    music_subjects AS (
+      SELECT DISTINCT COALESCE(
+        'child:' || d.\(iosDeviceChildId)::text,
+        'ios-device:' || d.\(iosDeviceId)::text
+      ) AS subject_key
+      FROM \(table: IOSDevice.self) d
+      JOIN music_connected_devices m ON m.device_id = d.\(iosDeviceId)
+    ),
+    protected_subjects AS (
+      SELECT subject_key FROM mac_subjects
+      UNION
+      SELECT subject_key FROM ios_subjects
+      UNION
+      SELECT subject_key FROM podcast_subjects
+      UNION
+      SELECT subject_key FROM music_subjects
+    )
+    SELECT COUNT(DISTINCT subject_key) AS count
+    FROM protected_subjects
+    """)
+  }
+
+  var count: Int
 }
 
 private struct MonthlySubscriptionRevenue: CustomQueryable {
