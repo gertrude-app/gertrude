@@ -112,6 +112,7 @@ extension Configure {
     app.migrations.add(TrackDeprecationLastSeen())
     app.migrations.add(BlockerProfileSettings())
     app.migrations.add(MediumTier())
+    app.migrations.add(AddParentAccountSiteBeta())
   }
 }
 

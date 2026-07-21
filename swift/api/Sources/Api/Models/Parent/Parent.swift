@@ -12,6 +12,7 @@ struct Parent: Codable, Sendable {
   var referralCode: String?
   var referredByParentId: Id?
   var timeZone: String?
+  var accountSiteBetaEnabled = false
   var dailyReviewEmail = false
   var lastReviewEmailAt: Date?
   var createdAt = Date()
