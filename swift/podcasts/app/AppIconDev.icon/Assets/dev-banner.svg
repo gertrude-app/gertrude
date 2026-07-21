@@ -1,0 +1,10 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M345 1024L1024 345V638L638 1024H345Z" fill="#00C0A5"/>
+<g transform="translate(522 862) rotate(-45) scale(0.66)" fill="white" fill-rule="evenodd" clip-rule="evenodd">
+<g transform="translate(0 18)">
+<path d="M0 0H86C148 0 190 41 190 105C190 169 148 210 86 210H0V0ZM50 45V165H83C119 165 139 142 139 105C139 68 119 45 83 45H50Z"/>
+<path d="M220 0H385V45H270V82H372V126H270V165H385V210H220V0Z"/>
+<path d="M407 0H462L519 148L576 0H631L545 210H493L407 0Z"/>
+</g>
+</g>
+</svg>

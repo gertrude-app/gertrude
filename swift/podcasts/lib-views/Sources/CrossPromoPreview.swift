@@ -84,7 +84,7 @@ private struct CrossPromoSheetPreviewHost<Content: View>: View {
       primary: .init("Get the app", animate: false) { dismiss() },
       secondary: .init("Maybe later", animate: false) { dismiss() },
       remoteImage: .init(
-        url: "https://raw.githubusercontent.com/gertrude-app/gertrude/master/swift/podcasts/app/Assets.xcassets/AppIcon.appiconset/radio-1024.png",
+        url: "https://gertrude-web-assets.nyc3.digitaloceanspaces.com/xpromo/gertrude-am-icon-512.png",
         label: "Gertrude Podcasts app icon",
       ),
       screenType: .announcement,

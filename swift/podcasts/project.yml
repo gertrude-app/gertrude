@@ -22,6 +22,15 @@ targets:
         group: app
       - path: app/Assets.xcassets
         group: app
+      - path: app/LaunchScreenAssets
+        group: app
+        buildPhase: resources
+      - path: app/AppIcon.icon
+        group: app
+        buildPhase: resources
+      - path: app/AppIconDev.icon
+        group: app
+        buildPhase: resources
       - path: app/LaunchScreen.storyboard
         group: app
       - path: app/StoreConfig.storekit
