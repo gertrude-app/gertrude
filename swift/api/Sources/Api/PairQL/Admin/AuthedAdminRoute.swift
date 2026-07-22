@@ -13,6 +13,9 @@ enum AuthedAdminRoute: PairRoute {
   case podcastOverview
   case podcastInstallsList(PodcastInstallsList.Input)
   case podcastInstallDetail(PodcastInstallDetail.Input)
+  case musicOverview
+  case musicInstallsList(MusicInstallsList.Input)
+  case musicInstallDetail(MusicInstallDetail.Input)
   case parentsList(ParentsList.Input)
   case parentDetail(ParentDetail.Input)
   case deleteParent(DeleteParent.Input)
@@ -62,6 +65,17 @@ enum AuthedAdminRoute: PairRoute {
     Route(.case(Self.podcastInstallDetail)) {
       Operation(PodcastInstallDetail.self)
       Body(.input(PodcastInstallDetail.self))
+    }
+    Route(.case(Self.musicOverview)) {
+      Operation(MusicOverview.self)
+    }
+    Route(.case(Self.musicInstallsList)) {
+      Operation(MusicInstallsList.self)
+      Body(.input(MusicInstallsList.self))
+    }
+    Route(.case(Self.musicInstallDetail)) {
+      Operation(MusicInstallDetail.self)
+      Body(.input(MusicInstallDetail.self))
     }
     Route(.case(Self.parentsList)) {
       Operation(ParentsList.self)
@@ -144,6 +158,15 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .podcastInstallDetail(let input):
       let output = try await PodcastInstallDetail.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .musicOverview:
+      let output = try await MusicOverview.resolve(in: context)
+      return try await self.respond(with: output)
+    case .musicInstallsList(let input):
+      let output = try await MusicInstallsList.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .musicInstallDetail(let input):
+      let output = try await MusicInstallDetail.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .parentsList(let input):
       let output = try await ParentsList.resolve(with: input, in: context)

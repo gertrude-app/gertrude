@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import type { StatusConfig } from '../components/TimeSeriesGraph';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import BreakdownBar from '../components/BreakdownBar';
@@ -9,6 +10,7 @@ import {
   ArrowRightIcon,
   MicIcon,
   MonitorIcon,
+  MusicIcon,
   SmartphoneIcon,
   TagIcon,
   UsersIcon,
@@ -16,7 +18,6 @@ import {
 import InstallsGraph from '../components/InstallsGraph';
 import LoadingState from '../components/LoadingState';
 import MonthlySubscriptionRevenueGraph from '../components/MonthlySubscriptionRevenueGraph';
-import PodcastInstallsGraph from '../components/PodcastInstallsGraph';
 import SignupGraph from '../components/SignupGraph';
 
 const MACOS_VERSION_NAMES: Record<string, string> = {
@@ -43,6 +44,18 @@ const macOSVersionLabel = (version: string): string => {
   return name ? `macOS ${version} ${name}` : `macOS ${version}`;
 };
 
+const podcastInstallStatusConfig: StatusConfig = {
+  isSuccess: (status) => status === `paid`,
+  isInfo: (status) => status === `trial`,
+  isWarning: (status) => status === `connected` || status === `iap`,
+};
+
+const musicInstallStatusConfig: StatusConfig = {
+  isSuccess: (status) => status === `paid`,
+  isInfo: (status) => status === `connected`,
+  isWarning: () => false,
+};
+
 const Dashboard: React.FC = () => {
   const [overviewData, setOverviewData] = useState<T.SubscriptionsOverview.Output | null>(
     null,
@@ -52,6 +65,7 @@ const Dashboard: React.FC = () => {
     useState<T.PlatformVersionStats.Output | null>(null);
   const [iosData, setIosData] = useState<T.IOSOverview.Output | null>(null);
   const [podcastData, setPodcastData] = useState<T.PodcastOverview.Output | null>(null);
+  const [musicData, setMusicData] = useState<T.MusicOverview.Output | null>(null);
   const [cohortData, setCohortData] = useState<T.CohortAnalysis.Output | null>(null);
   const [appNamingCount, setAppNamingCount] = useState<number | null>(null);
   const [appNamingStats, setAppNamingStats] = useState<{
@@ -74,6 +88,7 @@ const Dashboard: React.FC = () => {
         macResult,
         iosResult,
         podcastResult,
+        musicResult,
         platformVersionResult,
         cohortResult,
         appNamingResult,
@@ -86,6 +101,7 @@ const Dashboard: React.FC = () => {
         client.macOverview(),
         client.iOSOverview(),
         client.podcastOverview(),
+        client.musicOverview(),
         client.platformVersionStats(),
         client.cohortAnalysis(),
         client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
@@ -113,6 +129,7 @@ const Dashboard: React.FC = () => {
       setMacData(macResult.value ?? null);
       setIosData(iosResult.value ?? null);
       setPodcastData(podcastResult.value ?? null);
+      setMusicData(musicResult.value ?? null);
       setPlatformVersionData(platformVersionResult.value ?? null);
       setCohortData(cohortResult.value ?? null);
       if (!appNamingResult.isError && appNamingResult.value) {
@@ -175,18 +192,13 @@ const Dashboard: React.FC = () => {
         </Link>
       )}
       {overviewData && (
-        <OverviewSection
-          data={overviewData}
-          macData={macData}
-          iosData={iosData}
-          podcastData={podcastData}
-          platformVersionData={platformVersionData}
-        />
+        <OverviewSection data={overviewData} platformVersionData={platformVersionData} />
       )}
       {cohortData && <CohortHealthSection data={cohortData} />}
       {macData && <MacSection data={macData} />}
       {iosData && <IOSSection data={iosData} />}
       {podcastData && <PodcastSection data={podcastData} />}
+      {musicData && <MusicSection data={musicData} />}
       {appNamingStats && <AppNamingCard stats={appNamingStats} />}
     </div>
   );
@@ -194,23 +206,13 @@ const Dashboard: React.FC = () => {
 
 interface OverviewSectionProps {
   data: T.SubscriptionsOverview.Output;
-  macData: T.MacOverview.Output | null;
-  iosData: T.IOSOverview.Output | null;
-  podcastData: T.PodcastOverview.Output | null;
   platformVersionData: T.PlatformVersionStats.Output | null;
 }
 
 const OverviewSection: React.FC<OverviewSectionProps> = ({
   data,
-  macData,
-  iosData,
-  podcastData,
   platformVersionData,
 }) => {
-  const protectedPeople =
-    (macData?.childrenOfActiveParents ?? 0) +
-    (iosData?.totalSuccess ?? 0) +
-    (podcastData?.activePodcastUsers ?? 0);
   const freeCount =
     data.totalAccounts -
     data.fullPlanCount -
@@ -222,7 +224,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
   const stats = [
     {
       label: `Protected People`,
-      value: protectedPeople.toLocaleString(),
+      value: data.protectedChildren.toLocaleString(),
       highlight: true,
     },
     {
@@ -744,7 +746,141 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ data }) => {
           <h3 className="font-display font-medium text-slate-900 mb-3">
             Recent Installs
           </h3>
-          <PodcastInstallsGraph installs={data.recentInstalls} />
+          <InstallsGraph
+            installs={data.recentInstalls}
+            gradient="green"
+            statusConfig={podcastInstallStatusConfig}
+          />
+        </div>
+      </div>
+    </section>
+  );
+};
+
+interface MusicSectionProps {
+  data: T.MusicOverview.Output;
+}
+
+const MusicSection: React.FC<MusicSectionProps> = ({ data }) => {
+  const breakdown = data.statusBreakdown;
+
+  return (
+    <section className="bg-white rounded-2xl border border-slate-200/80 shadow-sm shadow-slate-200/50 overflow-hidden">
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100">
+        <div className="flex flex-wrap justify-between items-center gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-fuchsia-500 to-violet-600 flex items-center justify-center shadow-lg shadow-fuchsia-500/20">
+              <MusicIcon className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="font-display font-semibold text-slate-900 text-xl">
+              Music App
+            </h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/music"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-fuchsia-600 hover:text-fuchsia-700 bg-fuchsia-50 hover:bg-fuchsia-100 rounded-lg transition-all group"
+            >
+              <span>Installs</span>
+              <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+            <Link
+              to="/ratings/music"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-fuchsia-600 hover:text-fuchsia-700 bg-fuchsia-50 hover:bg-fuchsia-100 rounded-lg transition-all group"
+            >
+              <span>Ratings</span>
+              <ArrowRightIcon className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+        </div>
+      </div>
+      <div className="p-4 sm:p-6 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {data.totalInstalls.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Total Installs</div>
+          </div>
+          <div className="bg-gradient-to-br from-fuchsia-500 to-violet-600 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-white">
+              {data.connectedMusicUsers.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-white/80">Connected Users</div>
+          </div>
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {data.approvedAlbums.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Approved Albums</div>
+          </div>
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {data.paidMusicFamilies.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Paid Music Families</div>
+          </div>
+          <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+            <div className="text-2xl font-display font-semibold text-slate-900">
+              {breakdown.unclaimed.toLocaleString()}
+            </div>
+            <div className="text-sm mt-1 text-slate-500">Unclaimed</div>
+          </div>
+        </div>
+
+        <BreakdownBar
+          title="Connection Status"
+          total={data.totalInstalls}
+          segments={[
+            {
+              label: `Paid`,
+              value: breakdown.paid,
+              gradient: `from-fuchsia-500 to-violet-600`,
+            },
+            {
+              label: `Complimentary`,
+              value: breakdown.complimentary,
+              gradient: `from-rose-400 to-pink-500`,
+            },
+            {
+              label: `Connected`,
+              value: breakdown.connected,
+              gradient: `from-sky-400 to-blue-500`,
+            },
+            {
+              label: `Unclaimed`,
+              value: breakdown.unclaimed,
+              gradient: `from-slate-300 to-slate-400`,
+            },
+          ]}
+        />
+
+        <BreakdownBar
+          title="Device Breakdown"
+          total={data.totalInstalls}
+          segments={[
+            {
+              label: `iPhone`,
+              value: data.iPhoneInstalls,
+              gradient: `from-fuchsia-500 to-violet-600`,
+            },
+            {
+              label: `iPad`,
+              value: data.iPadInstalls,
+              gradient: `from-violet-400 to-purple-500`,
+            },
+          ]}
+        />
+
+        <div>
+          <h3 className="font-display font-medium text-slate-900 mb-3">
+            Recent Installs
+          </h3>
+          <InstallsGraph
+            installs={data.recentInstalls}
+            gradient="fuchsia"
+            statusConfig={musicInstallStatusConfig}
+          />
         </div>
       </div>
     </section>

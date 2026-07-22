@@ -86,6 +86,7 @@ private struct CohortRowsQuery: CustomQueryable {
     let iDevice = BlockerApp.Install.columnName(.deviceId)
     let tInstall = BlockerApp.Token.columnName(.installId)
     let paiDevice = PodcastApp.Install.columnName(.deviceId)
+    let maiDevice = MusicApp.Install.columnName(.deviceId)
     let biParent = BillingIdentity.columnName(.parentId)
     let biCustomer = BillingIdentity.columnName(.stripeCustomerId)
     let subParent = StripeSubscription.columnName(.parentId)
@@ -196,6 +197,12 @@ private struct CohortRowsQuery: CustomQueryable {
         FROM \(table: PodcastApp.Install.self) pai
         JOIN \(table: IOSDevice.self) d
           ON d.\(dId) = pai.\(paiDevice) AND d.\(dChild) IS NOT NULL
+        JOIN \(table: Child.self) c ON c.\(cId) = d.\(dChild)
+        UNION
+        SELECT DISTINCT c.\(cParent) AS parent_id
+        FROM \(table: MusicApp.Install.self) mai
+        JOIN \(table: IOSDevice.self) d
+          ON d.\(dId) = mai.\(maiDevice) AND d.\(dChild) IS NOT NULL
         JOIN \(table: Child.self) c ON c.\(cId) = d.\(dChild)
       ),
       ios_account_parents AS (

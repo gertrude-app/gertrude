@@ -50,6 +50,13 @@ const planBadgeStyles: Record<string, Record<string, string>> = {
     overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
     unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
   },
+  medium: {
+    paid: `bg-indigo-50 text-indigo-700 ring-indigo-600/20`,
+    trialingFull: `bg-violet-50 text-violet-600 ring-violet-500/20`,
+    trialExpired: `bg-orange-50 text-orange-700 ring-orange-600/20`,
+    overdue: `bg-amber-50 text-amber-700 ring-amber-600/20`,
+    unpaid: `bg-red-50 text-red-700 ring-red-600/20`,
+  },
   free: {
     free: `bg-slate-50 text-slate-400 ring-slate-300/20`,
     unpaid: `bg-slate-50 text-slate-400 ring-slate-300/20`,
@@ -81,7 +88,14 @@ export const PlanBadge: React.FC<PlanBadgeProps> = ({
 }) => {
   const tierStyles = planBadgeStyles[planCase] ?? planBadgeStyles.free;
   const style = tierStyles?.[status] ?? `bg-slate-50 text-slate-600 ring-slate-500/20`;
-  const tierLabel = planCase === `free` ? `` : planCase === `light` ? `Light` : `Full`;
+  const tierLabel =
+    planCase === `free`
+      ? ``
+      : planCase === `light`
+        ? `Light`
+        : planCase === `medium`
+          ? `Medium`
+          : `Full`;
   const isLapsed = planCase === `free` && status === `unpaid`;
   const statusLabel = isLapsed ? `Lapsed` : (billingLabels[status] ?? status);
   const label = tierLabel ? `${tierLabel} · ${statusLabel}` : statusLabel;

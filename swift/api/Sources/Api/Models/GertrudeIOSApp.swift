@@ -3,14 +3,14 @@ import XSlack
 
 extension GertrudeIOSApp {
   static var appStoreSyncedCases: [Self] {
-    [.blocker, .podcasts]
+    [.blocker, .podcasts, .music]
   }
 
   var appStoreAppleId: String {
     switch self {
     case .blocker: "6736368820"
     case .podcasts: "6753187429"
-    case .music: ""
+    case .music: "6782194077"
     }
   }
 

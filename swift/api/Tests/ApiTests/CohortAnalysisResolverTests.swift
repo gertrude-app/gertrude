@@ -46,18 +46,25 @@ final class CohortAnalysisResolverTests: ApiTestCase, @unchecked Sendable {
     // Parent B: free-iOS account only (iOS device, no Mac, no supervision)
     let b = try await self.childWithIOSDevice()
 
+    let d = try await self.child()
+    let musicDevice = try await self.db.create(IOSDevice.mock { $0.childId = d.id })
+    try await self.db.create(MusicApp.Install(
+      deviceId: musicDevice.id,
+      appVersion: "1.0.0",
+    ))
+
     // Parent C: verified signup, no surface
     let c = try await self.parent { $0.emailVerifiedAt = .reference }
 
-    for parentId in [a.parent.model.id, b.parent.model.id, c.model.id] {
+    for parentId in [a.parent.model.id, b.parent.model.id, c.model.id, d.parent.model.id] {
       try await self.placeParentInCohort(parentId, at: cohortDate)
     }
 
     let output = try await CohortAnalysis.resolve(in: .mock)
     let row = try XCTUnwrap(output.cohorts.first { $0.month == monthKey })
 
-    expect(row.verifiedSignups).toEqual(3)
-    expect(row.paidIntentCount).toEqual(1)
+    expect(row.verifiedSignups).toEqual(4)
+    expect(row.paidIntentCount).toEqual(2)
     expect(row.paidIntentEverPaidCount).toEqual(1)
     expect(row.paidIntentPayingCount).toEqual(1)
     expect(row.freeIosCount).toEqual(1)

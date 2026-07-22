@@ -33,8 +33,10 @@ function appDetailLink(deviceId: string, app: string): string | null {
       return `/blocker/${deviceId.toLowerCase()}/events`;
     case `am`:
       return `/podcasts/${deviceId.toLowerCase()}/detail`;
+    case `music`:
+      return `/music/${deviceId.toLowerCase()}/detail`;
     default:
-      return null; // music has no admin detail page yet
+      return null;
   }
 }
 

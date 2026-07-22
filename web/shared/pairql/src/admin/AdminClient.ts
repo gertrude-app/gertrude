@@ -108,6 +108,32 @@ export default class AdminClient extends Client<Auth> {
     return this.query<P.MacOverview.Output>(input, `MacOverview`, `superAdmin`);
   };
 
+  public musicInstallDetail = (
+    input: P.MusicInstallDetail.Input,
+  ): Promise<Result<P.MusicInstallDetail.Output>> => {
+    return this.query<P.MusicInstallDetail.Output>(
+      input,
+      `MusicInstallDetail`,
+      `superAdmin`,
+    );
+  };
+
+  public musicInstallsList = (
+    input: P.MusicInstallsList.Input,
+  ): Promise<Result<P.MusicInstallsList.Output>> => {
+    return this.query<P.MusicInstallsList.Output>(
+      input,
+      `MusicInstallsList`,
+      `superAdmin`,
+    );
+  };
+
+  public musicOverview = (
+    input: P.MusicOverview.Input,
+  ): Promise<Result<P.MusicOverview.Output>> => {
+    return this.query<P.MusicOverview.Output>(input, `MusicOverview`, `superAdmin`);
+  };
+
   public parentDetail = (
     input: P.ParentDetail.Input,
   ): Promise<Result<P.ParentDetail.Output>> => {

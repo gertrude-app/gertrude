@@ -114,7 +114,7 @@ extension PodcastInstallsList: Resolver {
     guard let install = try await device.podcastInstall(in: context.db) else {
       switch snapshot.planStatus {
       case .complimentary: return "complimentary"
-      case .full(.current), .light(.current): return "paid"
+      case .full(.current), .medium(.current), .light(.current): return "paid"
       default: return firstLaunch + PodcastApp.Install.trialPeriod > now ? "connected" : "expired"
       }
     }

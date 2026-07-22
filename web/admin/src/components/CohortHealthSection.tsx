@@ -143,7 +143,7 @@ const CohortHealthSection: React.FC<{ data: T.CohortAnalysis.Output }> = ({ data
               <StatCard
                 label="Paid-intent → paying"
                 value={`${pctLabel(intentPaying, intent)}`}
-                subvalue={`${intentPaying} of ${intent} who tried Mac, iOS supervision, or Podcasts`}
+                subvalue={`${intentPaying} of ${intent} who tried Mac, iOS supervision, Podcasts, or Music`}
                 highlight="green"
               />
               <StatCard
@@ -399,8 +399,8 @@ const HowToRead: React.FC = () => {
                 the trailing rate in the card, not one bar.
               </li>
               <li>
-                Recent cohorts are dimmed because their outcomes are still maturing
-                (paying lags signup by weeks due to trial periods).
+                Recent cohorts are dimmed because their outcomes are still maturing (some
+                paid-surface outcomes lag signup by weeks).
               </li>
             </ul>
           </div>

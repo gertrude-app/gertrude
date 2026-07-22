@@ -1,5 +1,8 @@
 import React from 'react';
-import TimeSeriesGraph from './TimeSeriesGraph';
+import TimeSeriesGraph, {
+  type StatusConfig,
+  type TimeSeriesGradient,
+} from './TimeSeriesGraph';
 
 interface Install {
   date: string;
@@ -9,9 +12,21 @@ interface Install {
 
 interface InstallsGraphProps {
   installs: Install[];
+  gradient?: TimeSeriesGradient;
+  statusConfig?: StatusConfig;
 }
 
-const InstallsGraph: React.FC<InstallsGraphProps> = ({ installs }) => {
+const defaultStatusConfig: StatusConfig = {
+  isSuccess: (status) => status === `success`,
+  isInfo: (status) => status === `supervised`,
+  isWarning: () => false,
+};
+
+const InstallsGraph: React.FC<InstallsGraphProps> = ({
+  installs,
+  gradient = `blue`,
+  statusConfig = defaultStatusConfig,
+}) => {
   const items = installs.map((install) => ({
     date: install.date,
     status: install.status,
@@ -22,12 +37,8 @@ const InstallsGraph: React.FC<InstallsGraphProps> = ({ installs }) => {
     <TimeSeriesGraph
       items={items}
       itemLabel="install"
-      gradient="blue"
-      statusConfig={{
-        isSuccess: (status) => status === `success`,
-        isInfo: (status) => status === `supervised`,
-        isWarning: () => false,
-      }}
+      gradient={gradient}
+      statusConfig={statusConfig}
       twoColumnTooltip
     />
   );

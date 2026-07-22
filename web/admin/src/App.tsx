@@ -10,6 +10,8 @@ import IOSDeviceEvents from './pages/IOSDeviceEvents';
 import IOSDevicesList from './pages/IOSDevicesList';
 import IOSStats from './pages/IOSStats';
 import Login from './pages/Login';
+import MusicInstallDetail from './pages/MusicInstallDetail';
+import MusicInstallsList from './pages/MusicInstallsList';
 import PairqlTelemetry from './pages/PairqlTelemetry';
 import ParentDetail from './pages/ParentDetail';
 import ParentsList from './pages/ParentsList';
@@ -61,6 +63,8 @@ const App: React.FC = () => {
         <Route path="/blocker/:vendorId/events" element={<IOSDeviceEvents />} />
         <Route path="/podcasts" element={<PodcastInstallsList />} />
         <Route path="/podcasts/:deviceId/detail" element={<PodcastInstallDetail />} />
+        <Route path="/music" element={<MusicInstallsList />} />
+        <Route path="/music/:deviceId/detail" element={<MusicInstallDetail />} />
         <Route path="/ratings/:app" element={<AppRatings />} />
         <Route path="/parents" element={<ParentsList />} />
         <Route path="/parents/:id" element={<ParentDetail />} />
