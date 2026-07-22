@@ -156,6 +156,59 @@ export function groupRequestsByKey(requests: UnlockRequest[]): RequestGroup[] {
   });
 }
 
+export type WebEntry = { kind: `web`; id: string; group: RequestGroup };
+
+export type AppEntry = {
+  kind: `app`;
+  id: string;
+  appName?: string;
+  appSlug?: string;
+  appBundleId?: string;
+  appIconHash?: string;
+  hostGroups: RequestGroup[];
+};
+
+export type UnlockEntry = WebEntry | AppEntry;
+
+export function appIdentity(
+  key: SharedKey,
+): { id: string; slug?: string; bundleId?: string } | null {
+  if (key.scope.type !== `single`) return null;
+  const single = key.scope.single;
+  return single.type === `identifiedAppSlug`
+    ? { id: `slug:${single.identifiedAppSlug}`, slug: single.identifiedAppSlug }
+    : { id: `bundle:${single.bundleId}`, bundleId: single.bundleId };
+}
+
+export function groupRequestsByApp(requests: UnlockRequest[]): UnlockEntry[] {
+  const appMap = new Map<string, AppEntry>();
+  const ordered: UnlockEntry[] = [];
+  for (const group of groupRequestsByKey(requests)) {
+    const app = appIdentity(group.key);
+    if (!app) {
+      ordered.push({ kind: `web`, id: `web:${group.representative.id}`, group });
+      continue;
+    }
+    let entry = appMap.get(app.id);
+    if (!entry) {
+      const rep = group.representative;
+      entry = {
+        kind: `app`,
+        id: `app:${app.id}`,
+        appName: rep.appName,
+        appSlug: rep.appSlug,
+        appBundleId: rep.appBundleId,
+        appIconHash: rep.appIconHash,
+        hostGroups: [],
+      };
+      appMap.set(app.id, entry);
+      ordered.push(entry);
+    }
+    entry.hostGroups.push(group);
+  }
+  return ordered;
+}
+
 export const UNSAFE_DOMAINS = [
   `google.com`,
   `facebook.com`,

@@ -16,7 +16,7 @@ final class CreateOnboardingBlockedAppsResolverTests: ApiTestCase, @unchecked Se
 
     expect(output).toEqual(.success)
 
-    let blockedApps = try await UserBlockedApp.query()
+    let blockedApps = try await BlockedMacApp.query()
       .where(.childId == child.id)
       .all(in: self.db)
     expect(blockedApps).toHaveCount(2)
@@ -26,7 +26,7 @@ final class CreateOnboardingBlockedAppsResolverTests: ApiTestCase, @unchecked Se
 
   func testDoesNotDuplicateExistingBlockedApps() async throws {
     let child = try await self.childWithComputer()
-    try await self.db.create(UserBlockedApp(
+    try await self.db.create(BlockedMacApp(
       identifier: "com.apple.Music",
       childId: child.id,
     ))
@@ -38,7 +38,7 @@ final class CreateOnboardingBlockedAppsResolverTests: ApiTestCase, @unchecked Se
 
     expect(output).toEqual(.success)
 
-    let blockedApps = try await UserBlockedApp.query()
+    let blockedApps = try await BlockedMacApp.query()
       .where(.childId == child.id)
       .all(in: self.db)
     expect(blockedApps).toHaveCount(2)

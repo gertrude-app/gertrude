@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class ChildKeychainSummariesTests: ApiTestCase, @unchecked Sendable {
+final class KeychainSummariesTests: ApiTestCase, @unchecked Sendable {
   func testReturnsAllKeychainsWithCorrectKeyCounts() async throws {
     let child = try await self.child()
     let parent = child.parent
@@ -57,7 +57,7 @@ final class ChildKeychainSummariesTests: ApiTestCase, @unchecked Sendable {
       key: .domain(domain: "other.com", scope: .webBrowsers),
     ))
 
-    let result = try await childKeychainSummaries(for: child.model.id, in: self.db)
+    let result = try await keychainSummaries(for: child.model.id, in: self.db).summaries
 
     expect(result).toHaveCount(2)
     let kc1Result = result.first { $0.id == kc1.id }!
@@ -74,8 +74,9 @@ final class ChildKeychainSummariesTests: ApiTestCase, @unchecked Sendable {
 
   func testReturnsEmptyForChildWithNoKeychains() async throws {
     let child = try await self.child()
-    let result = try await childKeychainSummaries(for: child.model.id, in: self.db)
-    expect(result).toEqual([])
+    let result = try await keychainSummaries(for: child.model.id, in: self.db)
+    expect(result.summaries).toEqual([])
+    expect(result.publicUnrestrictedApps).toEqual([])
   }
 
   func testKeychainWithNoKeysReportsZeroCount() async throws {
@@ -86,7 +87,7 @@ final class ChildKeychainSummariesTests: ApiTestCase, @unchecked Sendable {
     ))
     try await self.db.create(ChildKeychain(childId: child.model.id, keychainId: kc.id))
 
-    let result = try await childKeychainSummaries(for: child.model.id, in: self.db)
+    let result = try await keychainSummaries(for: child.model.id, in: self.db).summaries
     expect(result).toHaveCount(1)
     expect(result[0].numKeys).toEqual(0)
   }

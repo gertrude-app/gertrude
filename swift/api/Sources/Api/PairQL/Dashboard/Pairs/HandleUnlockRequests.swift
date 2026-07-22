@@ -17,6 +17,7 @@ struct HandleUnlockRequests: Pair {
     var unlockRequestId: UnlockRequest.Id
     var status: RequestStatus
     var key: KeyData?
+    var grantAppScope: AppScope.Single?
     var responseComment: String?
   }
 
@@ -35,6 +36,9 @@ extension HandleUnlockRequests: Resolver {
     var targets: [String] = []
     var keychainIds: Set<Keychain.Id> = []
     var userDevice: ComputerUser?
+    var grantChildId: Child.Id?
+    var ensuredGrantScopeKeys = Set<String>()
+    var didGrantApp = false
 
     struct LegacyMessage {
       var id: UUID
@@ -68,8 +72,41 @@ extension HandleUnlockRequests: Resolver {
       switch decision.status {
       case .accepted:
         acceptedCount += 1
-        if let keyData = decision.key {
+        if let scope = decision.grantAppScope {
+          if decision.key != nil {
+            throw context.error(
+              id: "a1b2c3d4",
+              type: .badRequest,
+              debugMessage: "unlock decision has both key and grantAppScope",
+              userMessage: "Something went wrong approving this app.",
+              showContactSupport: true,
+            )
+          }
+          let childId = device.childId
+          if grantChildId == nil {
+            grantChildId = childId
+            let existing = try await UnrestrictedMacApp.query()
+              .where(.childId == childId)
+              .all(in: context.db)
+            for row in existing {
+              ensuredGrantScopeKeys.insert(unrestrictedMacAppScopeKey(row.scope))
+            }
+          }
+          if ensuredGrantScopeKeys.insert(unrestrictedMacAppScopeKey(scope)).inserted {
+            try await context.db.create(UnrestrictedMacApp(scope: scope, childId: childId))
+            didGrantApp = true
+          }
+        } else if let keyData = decision.key {
           let keychain = try await context.parent.keychain(keyData.keychainId, in: context.db)
+          if case .skeleton = keyData.key, !keychain.isPublic {
+            throw context.error(
+              id: "8bb2764d",
+              type: .badRequest,
+              debugMessage: "rejected skeleton key for non-public keychain",
+              userMessage: "App keys can no longer be created here — manage app internet access from the child's Mac Apps screen instead.",
+              showContactSupport: false,
+            )
+          }
           keychainIds.insert(keychain.id)
           let existingKeys = try await keychain.keys(in: context.db)
           if var existing = existingKeys.first(where: { $0.key == keyData.key }) {
@@ -104,6 +141,9 @@ extension HandleUnlockRequests: Resolver {
     let websockets = get(dependency: \.websockets)
     for keychainId in keychainIds {
       try await websockets.send(.userUpdated, to: .usersWith(keychain: keychainId))
+    }
+    if let grantChildId, didGrantApp {
+      try await websockets.send(.userUpdated, to: .user(grantChildId))
     }
 
     if let userDevice {
@@ -140,5 +180,12 @@ extension HandleUnlockRequests: Resolver {
     }
 
     return .success
+  }
+}
+
+private func unrestrictedMacAppScopeKey(_ scope: AppScope.Single) -> String {
+  switch scope.normalized {
+  case .bundleId(let id): "bundle:\(id)"
+  case .identifiedAppSlug(let slug): "slug:\(slug)"
   }
 }

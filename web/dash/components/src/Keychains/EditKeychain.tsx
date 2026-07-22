@@ -122,6 +122,7 @@ const EditKeychain: React.FC<Props> = ({
               <KeyList
                 viewMode={viewMode}
                 keys={keys}
+                apps={apps}
                 editKey={beginEditKey}
                 deleteKey={(id) => deleteKey.start(id)}
               />

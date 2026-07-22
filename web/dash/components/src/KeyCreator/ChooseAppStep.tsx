@@ -7,7 +7,6 @@ import UserInputText from '../UserInputText';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  keyType: `app` | `website`;
   mode: `edit` | `create`;
   activeStep: EditKey.Step;
   appIdentificationType: `bundleId` | `slug`;
@@ -18,16 +17,8 @@ interface Props {
 }
 
 const ChooseAppStep: React.FC<Props> = (props) => {
-  const {
-    mode,
-    keyType,
-    activeStep,
-    appIdentificationType,
-    apps,
-    appSlug,
-    appBundleId,
-    update,
-  } = props;
+  const { mode, activeStep, appIdentificationType, apps, appSlug, appBundleId, update } =
+    props;
 
   return (
     <KeyCreationStep
@@ -38,11 +29,7 @@ const ChooseAppStep: React.FC<Props> = (props) => {
       activeTitle="Select app:"
       title={<Title {...props} />}
       activeStep={activeStep}
-      ownStep={
-        keyType === `app`
-          ? EditKey.Step.AppKey_ChooseApp
-          : EditKey.Step.WebsiteKey_Advanced_ChooseApp
-      }
+      ownStep={EditKey.Step.Advanced_ChooseApp}
     >
       <div>
         <RadioGroup<`bundleId` | `slug`>
@@ -102,7 +89,6 @@ function canAdvance(
 }
 
 const Title: React.FC<Props> = ({
-  keyType,
   apps,
   appBundleId,
   appSlug,
@@ -114,7 +100,7 @@ const Title: React.FC<Props> = ({
       className="mr-2"
       size="small"
     />
-    <span>{keyType === `app` ? `Allowing app ` : `App `}</span>
+    <span>App </span>
     <UserInputText>
       {appIdentificationType === `bundleId`
         ? appBundleId

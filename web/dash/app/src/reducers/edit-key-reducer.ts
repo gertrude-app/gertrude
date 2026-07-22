@@ -4,30 +4,17 @@ import { EditKey, domain } from '@dash/keys';
 export default function reducer(state: EditKey.State, action: EditKey.Event): void {
   if (action.type === `nextStepClicked`) {
     switch (state.activeStep) {
-      case EditKey.Step.SetKeyType:
-        state.activeStep =
-          state.keyType === `app`
-            ? EditKey.Step.AppKey_ChooseApp
-            : EditKey.Step.WebsiteKey_SetAddress;
+      case EditKey.Step.SetAddress:
+        state.activeStep = EditKey.Step.SetAppScope;
         return;
-      case EditKey.Step.AppKey_ChooseApp:
-        state.activeStep = EditKey.Step.AppKey_SetAppScope;
-        break;
-      case EditKey.Step.WebsiteKey_SetAddress:
-        state.activeStep = EditKey.Step.WebsiteKey_SetAppScope;
-        return;
-      case EditKey.Step.WebsiteKey_Advanced_ChooseApp:
-      case EditKey.Step.AppKey_Advanced_SetAddress: // fallthrough
-        state.activeStep = EditKey.Step.Expiration;
-        return;
-      case EditKey.Step.AppKey_SetAppScope:
-        state.activeStep = EditKey.Step.Expiration;
-        return;
-      case EditKey.Step.WebsiteKey_SetAppScope:
+      case EditKey.Step.SetAppScope:
         state.activeStep =
           state.addressScope === `singleApp`
-            ? EditKey.Step.WebsiteKey_Advanced_ChooseApp
+            ? EditKey.Step.Advanced_ChooseApp
             : EditKey.Step.Expiration;
+        return;
+      case EditKey.Step.Advanced_ChooseApp:
+        state.activeStep = EditKey.Step.Expiration;
         return;
       case EditKey.Step.Expiration:
         state.activeStep = EditKey.Step.Comment;
@@ -39,27 +26,17 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
 
   if (action.type === `prevStepClicked`) {
     switch (state.activeStep) {
-      case EditKey.Step.AppKey_ChooseApp:
-        state.activeStep = EditKey.Step.SetKeyType;
+      case EditKey.Step.SetAppScope:
+        state.activeStep = EditKey.Step.SetAddress;
         return;
-      case EditKey.Step.WebsiteKey_SetAppScope:
-        state.activeStep = EditKey.Step.WebsiteKey_SetAddress;
-        return;
-      case EditKey.Step.WebsiteKey_SetAddress:
-        state.activeStep = EditKey.Step.SetKeyType;
+      case EditKey.Step.Advanced_ChooseApp:
+        state.activeStep = EditKey.Step.SetAppScope;
         return;
       case EditKey.Step.Expiration:
-        if (state.keyType === `website`) {
-          state.activeStep =
-            state.addressScope === `singleApp`
-              ? EditKey.Step.WebsiteKey_Advanced_ChooseApp
-              : EditKey.Step.WebsiteKey_SetAppScope;
-        } else {
-          state.activeStep =
-            state.appScope === `address`
-              ? EditKey.Step.AppKey_Advanced_SetAddress
-              : EditKey.Step.AppKey_SetAppScope;
-        }
+        state.activeStep =
+          state.addressScope === `singleApp`
+            ? EditKey.Step.Advanced_ChooseApp
+            : EditKey.Step.SetAppScope;
         return;
       case EditKey.Step.Comment:
         state.activeStep = EditKey.Step.Expiration;
@@ -70,20 +47,12 @@ export default function reducer(state: EditKey.State, action: EditKey.Event): vo
   }
 
   switch (action.type) {
-    case `setKeyType`:
-      state.keyType = action.to;
-      break;
-
     case `setKeychainId`:
       state.keychainId = action.to;
       break;
 
     case `setAppSlug`:
       state.appSlug = action.to;
-      break;
-
-    case `setAppScope`:
-      state.appScope = action.to;
       break;
 
     case `setAddressScope`:

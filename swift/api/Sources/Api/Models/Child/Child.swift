@@ -82,8 +82,14 @@ extension Child {
       .first(in: db)
   }
 
-  func blockedApps(in db: any DuetSQL.Client) async throws -> [UserBlockedApp] {
-    try await UserBlockedApp.query()
+  func blockedMacApps(in db: any DuetSQL.Client) async throws -> [BlockedMacApp] {
+    try await BlockedMacApp.query()
+      .where(.childId == self.id)
+      .all(in: db)
+  }
+
+  func unrestrictedMacApps(in db: any DuetSQL.Client) async throws -> [UnrestrictedMacApp] {
+    try await UnrestrictedMacApp.query()
       .where(.childId == self.id)
       .all(in: db)
   }

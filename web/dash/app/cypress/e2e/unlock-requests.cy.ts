@@ -15,6 +15,17 @@ describe(`batch unlock requests flow`, () => {
     });
   }
 
+  function appRequest(override: Partial<UnlockRequest> = {}): UnlockRequest {
+    return makeRequest({
+      appCategories: [], // non-browser => app-scoped
+      appName: `Unity Hub`,
+      appSlug: `unity-hub`,
+      appBundleId: `com.unity3d.unityhub`,
+      url: undefined,
+      ...override,
+    });
+  }
+
   beforeEach(() => {
     cy.simulateLoggedIn();
     keychain = mock.keychainSummary({
@@ -220,5 +231,119 @@ describe(`batch unlock requests flow`, () => {
     cy.forcePqlErr(`GetBatchUnlockRequestData`, { type: `serverError` });
     cy.visit(`/children/child-1/unlock-requests`);
     cy.contains(`try again`);
+  });
+
+  it(`collapses one app's many hosts into a single app row`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        appRequest({ id: `u1`, domain: `config.unity3d.com` }),
+        appRequest({ id: `u2`, domain: `api.unity.com` }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`Unity Hub`);
+    cy.contains(`2 addresses requested`); // whack-a-mole collapsed to one row
+  });
+
+  it(`grants a whole app: emits grantAppScope decisions with no key`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        appRequest({ id: `u1`, domain: `config.unity3d.com` }),
+        appRequest({ id: `u2`, domain: `api.unity.com` }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`); // nameable app defaults to "Allow app"
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions).to.have.length(2); // one per host request
+        for (const d of body.decisions) {
+          expect(d.status).to.eq(`accepted`);
+          expect(d.grantAppScope).to.deep.eq({
+            type: `identifiedAppSlug`,
+            identifiedAppSlug: `unity-hub`,
+          });
+          expect(d.key).to.eq(undefined); // grant path writes no keychain key
+        }
+      });
+  });
+
+  it(`allow-addresses on an app: emits app-scoped keychain keys, no grant`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        appRequest({ id: `u1`, domain: `config.unity3d.com` }),
+        appRequest({ id: `u2`, domain: `api.unity.com` }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`Unity Hub`)
+      .closest(`tr, [class*="border"]`)
+      .contains(`Allow 2 addresses`)
+      .click();
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions).to.have.length(2);
+        for (const d of body.decisions) {
+          expect(d.status).to.eq(`accepted`);
+          expect(d.grantAppScope).to.eq(undefined);
+          expect(d.key.keychainId).to.eq(`keychain-1`); // into the chosen keychain
+          expect(d.key.key.scope).to.deep.eq({
+            type: `single`,
+            single: { type: `identifiedAppSlug`, identifiedAppSlug: `unity-hub` },
+          });
+        }
+      });
+  });
+
+  it(`denies a whole app: rejects every host request`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        appRequest({ id: `u1`, domain: `config.unity3d.com` }),
+        appRequest({ id: `u2`, domain: `api.unity.com` }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`Unity Hub`).closest(`tr, [class*="border"]`).contains(`Deny`).click();
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions).to.have.length(2);
+        for (const d of body.decisions) expect(d.status).to.eq(`rejected`);
+      });
+  });
+
+  it(`unidentified app defaults to allow-addresses (key, not grant)`, () => {
+    cy.interceptPql(`GetBatchUnlockRequestData`, {
+      requests: [
+        appRequest({
+          id: `w1`,
+          appName: undefined, // no display name => "Allow addresses" default
+          appSlug: undefined,
+          appBundleId: `4P553833NY.com.gaijinent.WarThunder`,
+          domain: undefined,
+          ipAddress: `99.81.103.55`,
+        }),
+      ],
+      keychains: [keychain],
+    });
+    cy.visit(`/children/child-1/unlock-requests`);
+    cy.contains(`Submit`).click();
+    cy.wait(`@HandleUnlockRequests`)
+      .its(`request.body`)
+      .should((body) => {
+        expect(body.decisions).to.have.length(1);
+        const [d] = body.decisions;
+        expect(d.status).to.eq(`accepted`);
+        expect(d.grantAppScope).to.eq(undefined);
+        expect(d.key).to.not.eq(undefined); // approved as a keychain key
+      });
   });
 });

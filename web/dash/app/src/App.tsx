@@ -8,7 +8,6 @@ import CheckoutSuccess from './components/routes/CheckoutSuccess';
 import ChildActivityFeed from './components/routes/ChildActivityFeed';
 import ChildActivitySummaries from './components/routes/ChildActivitySummaries';
 import ChildIOSDevicesRoute from './components/routes/ChildIOSDevices';
-import ChildMac from './components/routes/ChildMac';
 import ClaimBlockerDeviceClaim from './components/routes/ClaimBlockerDevice/Claim';
 import ClaimBlockerDeviceDone from './components/routes/ClaimBlockerDevice/Done';
 import ClaimMusicDeviceClaim from './components/routes/ClaimMusicDevice/Claim';
@@ -27,6 +26,10 @@ import Keychains from './components/routes/Keychains';
 import LinkExpired from './components/routes/LinkExpired';
 import Login from './components/routes/Login';
 import Logout from './components/routes/Logout';
+import Mac from './components/routes/Mac';
+import MacApps from './components/routes/MacApps';
+import MacFiltering from './components/routes/MacFiltering';
+import MacMonitoring from './components/routes/MacMonitoring';
 import MagicLink from './components/routes/MagicLink';
 import ReferralSurvey from './components/routes/ReferralSurvey';
 import RequestPasswordReset from './components/routes/RequestPasswordReset';
@@ -142,7 +145,12 @@ const App: React.FC = () => {
 
           <Route path=":userId">
             <Route index element={<UserRoute />} />
-            <Route path="mac" element={<ChildMac />} />
+            <Route path="mac">
+              <Route index element={<Mac />} />
+              <Route path="monitoring" element={<MacMonitoring />} />
+              <Route path="filtering" element={<MacFiltering />} />
+              <Route path="apps" element={<MacApps />} />
+            </Route>
 
             <Route path="ios-devices">
               <Route index element={<ChildIOSDevicesRoute />} />

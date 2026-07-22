@@ -1,9 +1,11 @@
 import {
   type AddressType,
+  type AppEntry,
   type RequestGroup,
+  type UnlockEntry,
   adjustKeyAddressType,
   defaultAddressType,
-  groupRequestsByKey,
+  groupRequestsByApp,
   hasDomainScope,
   keyForUnlockRequest,
   naughtyInfo,
@@ -16,10 +18,15 @@ import { CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { Badge, Button } from '@shared/components';
 import cx from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import type { HandleUnlockRequests, KeychainSummary, UnlockRequest } from '@dash/types';
+import type {
+  HandleUnlockRequests,
+  KeychainSummary,
+  SingleAppScope,
+  UnlockRequest,
+} from '@dash/types';
 import PageHeading from '../PageHeading';
 
-type Decision = `accept` | `reject` | `undecided`;
+type Decision = `accept` | `grant` | `approve` | `reject` | `undecided`;
 
 type RowState = {
   decision: Decision;
@@ -34,63 +41,66 @@ type Props = {
   childName: string;
   requests: UnlockRequest[];
   keychains: KeychainSummary[];
+  apiBaseUrl?: string;
   onSubmit?: (input: HandleUnlockRequests.Input, numUndecided: number) => void;
   submitting?: boolean;
 };
+
+function defaultDecision(entry: UnlockEntry): Decision {
+  if (entry.kind === `web`) {
+    const naughty = naughtyInfo(entry.group);
+    if (naughty) return naughty.level === `deny` ? `reject` : `undecided`;
+    return `accept`;
+  }
+  return entry.appName ? `grant` : `approve`;
+}
+
+function defaultRowAddressType(entry: UnlockEntry): AddressType {
+  return entry.kind === `web` ? defaultAddressType(entry.group.key) : `strict`;
+}
+
+const isAllowed = (decision: Decision): boolean =>
+  decision === `accept` || decision === `grant` || decision === `approve`;
 
 const BatchUnlockRequests: React.FC<Props> = ({
   childName,
   requests,
   keychains,
+  apiBaseUrl,
   onSubmit,
   submitting,
 }) => {
-  const groups = useMemo(() => groupRequestsByKey(requests), [requests]);
+  const entries = useMemo(() => groupRequestsByApp(requests), [requests]);
 
   const bestKeychainId = keychains[0]?.id ?? ``;
   const [globalKeychainId, setGlobalKeychainId] = useState(bestKeychainId);
-  const [rows, setRows] = useState<Record<UUID, RowState>>(() =>
+  const [rows, setRows] = useState<Record<string, RowState>>(() =>
     Object.fromEntries(
-      groups.map((g) => {
-        const naughty = naughtyInfo(g);
-        const decision: Decision = naughty
-          ? naughty.level === `deny`
-            ? `reject`
-            : `undecided`
-          : `accept`;
-        return [
-          g.representative.id,
-          {
-            decision,
-            keychainId: bestKeychainId,
-            keychainOverridden: false,
-            addressType: defaultAddressType(g.key),
-            expiration: undefined,
-            comment: undefined,
-          },
-        ];
-      }),
+      entries.map((entry) => [
+        entry.id,
+        {
+          decision: defaultDecision(entry),
+          keychainId: bestKeychainId,
+          keychainOverridden: false,
+          addressType: defaultRowAddressType(entry),
+          expiration: undefined,
+          comment: undefined,
+        },
+      ]),
     ),
   );
   useEffect(() => {
     setRows((prev) => {
-      const newEntries: Record<UUID, RowState> = {};
+      const newEntries: Record<string, RowState> = {};
       let hasNew = false;
-      for (const g of groups) {
-        const id = g.representative.id;
-        if (!prev[id]) {
+      for (const entry of entries) {
+        if (!prev[entry.id]) {
           hasNew = true;
-          const naughty = naughtyInfo(g);
-          const decision: Decision = naughty
-            ? naughty.level === `deny`
-              ? `reject`
-              : `undecided`
-            : `accept`;
-          newEntries[id] = {
-            decision,
+          newEntries[entry.id] = {
+            decision: defaultDecision(entry),
             keychainId: globalKeychainId,
             keychainOverridden: false,
-            addressType: defaultAddressType(g.key),
+            addressType: defaultRowAddressType(entry),
             expiration: undefined,
             comment: undefined,
           };
@@ -98,9 +108,9 @@ const BatchUnlockRequests: React.FC<Props> = ({
       }
       return hasNew ? { ...prev, ...newEntries } : prev;
     });
-  }, [groups, globalKeychainId]);
+  }, [entries, globalKeychainId]);
 
-  const getRow = (id: UUID): RowState =>
+  const getRow = (id: string): RowState =>
     rows[id] ?? {
       decision: `undecided`,
       keychainId: bestKeychainId,
@@ -110,44 +120,46 @@ const BatchUnlockRequests: React.FC<Props> = ({
       comment: undefined,
     };
 
-  const [expandedEdit, setExpandedEdit] = useState<UUID | null>(null);
-  const [expandedInfo, setExpandedInfo] = useState<UUID | null>(null);
+  const [expandedEdit, setExpandedEdit] = useState<string | null>(null);
+  const [expandedInfo, setExpandedInfo] = useState<string | null>(null);
+  const [expandedHosts, setExpandedHosts] = useState<string | null>(null);
   const [denyComment, setDenyComment] = useState(``);
 
   const changeGlobalKeychain = (keychainId: UUID): void => {
     setGlobalKeychainId(keychainId);
     setRows((prev) => {
       const next = { ...prev };
-      for (const g of groups) {
-        const cur = next[g.representative.id];
+      for (const entry of entries) {
+        const cur = next[entry.id];
         if (cur && !cur.keychainOverridden) {
-          next[g.representative.id] = { ...cur, keychainId };
+          next[entry.id] = { ...cur, keychainId };
         }
       }
       return next;
     });
   };
 
-  const updateRow = (id: UUID, update: Partial<RowState>): void => {
+  const updateRow = (id: string, update: Partial<RowState>): void => {
     setRows((prev) => {
       const cur = prev[id];
       return cur ? { ...prev, [id]: { ...cur, ...update } } : prev;
     });
   };
 
-  const acceptCount = groups.filter(
-    (g) => rows[g.representative.id]?.decision === `accept`,
-  ).length;
-  const rejectCount = groups.filter(
-    (g) => rows[g.representative.id]?.decision === `reject`,
+  const allowCount = entries.filter((e) => isAllowed(getRow(e.id).decision)).length;
+  const rejectCount = entries.filter((e) => getRow(e.id).decision === `reject`).length;
+  const undecidedCount = entries.filter(
+    (e) => getRow(e.id).decision === `undecided`,
   ).length;
 
-  const setAllDecisions = (decision: Decision): void => {
+  const setAllDecisions = (mode: `allow` | `reject`): void => {
     setRows((prev) => {
       const next = { ...prev };
-      for (const g of groups) {
-        const cur = next[g.representative.id];
-        if (cur) next[g.representative.id] = { ...cur, decision };
+      for (const entry of entries) {
+        const cur = next[entry.id];
+        if (!cur) continue;
+        const decision = mode === `reject` ? `reject` : defaultDecision(entry);
+        next[entry.id] = { ...cur, decision };
       }
       return next;
     });
@@ -155,90 +167,111 @@ const BatchUnlockRequests: React.FC<Props> = ({
 
   const handleSubmit = (): void => {
     if (!onSubmit) return;
-    const allDuplicateIds: UUID[] = [];
     type SubmitDecision = HandleUnlockRequests.Input[`decisions`][number];
-    const decisions: SubmitDecision[] = groups.flatMap<SubmitDecision>((group) => {
-      const request = group.representative;
-      const rs = getRow(request.id);
-      if (rs.decision === `undecided`) return [];
-      if (rs.decision === `reject`) {
-        allDuplicateIds.push(...group.duplicateIds);
-        return [
-          {
-            unlockRequestId: request.id,
-            status: `rejected` as const,
-            responseComment: denyComment || undefined,
-          },
-        ];
-      }
-      const expiration = rs.expiration
-        ? (`${rs.expiration}T00:00:00.000Z` as ISODateString)
+    const decisions: SubmitDecision[] = [];
+    const allDuplicateIds: UUID[] = [];
+
+    const rejectGroup = (group: RequestGroup): void => {
+      allDuplicateIds.push(...group.duplicateIds);
+      decisions.push({
+        unlockRequestId: group.representative.id,
+        status: `rejected`,
+        responseComment: denyComment || undefined,
+      });
+    };
+
+    const acceptGroup = (group: RequestGroup, row: RowState): void => {
+      const expiration = row.expiration
+        ? (`${row.expiration}T00:00:00.000Z` as ISODateString)
         : undefined;
       if (
-        rs.addressType === `strict` &&
+        row.addressType === `strict` &&
         group.key.type === `anySubdomain` &&
         group.allRequests.length > 1
       ) {
-        return group.allRequests.map((req) => ({
-          unlockRequestId: req.id,
-          status: `accepted` as const,
-          key: {
-            keychainId: rs.keychainId,
-            key: adjustKeyAddressType(keyForUnlockRequest(req), `strict`, req),
-            comment: rs.comment,
-            expiration,
-          },
-        }));
+        for (const req of group.allRequests) {
+          decisions.push({
+            unlockRequestId: req.id,
+            status: `accepted`,
+            key: {
+              keychainId: row.keychainId,
+              key: adjustKeyAddressType(keyForUnlockRequest(req), `strict`, req),
+              comment: row.comment,
+              expiration,
+            },
+          });
+        }
+        return;
       }
       allDuplicateIds.push(...group.duplicateIds);
-      return [
-        {
-          unlockRequestId: request.id,
-          status: `accepted` as const,
-          key: {
-            keychainId: rs.keychainId,
-            key: adjustKeyAddressType(group.key, rs.addressType, request),
-            comment: rs.comment,
-            expiration,
-          },
+      decisions.push({
+        unlockRequestId: group.representative.id,
+        status: `accepted`,
+        key: {
+          keychainId: row.keychainId,
+          key: adjustKeyAddressType(group.key, row.addressType, group.representative),
+          comment: row.comment,
+          expiration,
         },
-      ];
-    });
-    const numUndecided = groups.filter(
-      (g) => getRow(g.representative.id).decision === `undecided`,
-    ).length;
-    onSubmit({ decisions, duplicateRequestIds: allDuplicateIds }, numUndecided);
-  };
+      });
+    };
 
-  const targetLabel = (r: UnlockRequest): string =>
-    r.domain ??
-    r.url?.replace(/^https?:\/\//, ``).replace(/\/$/, ``) ??
-    r.ipAddress ??
-    `unknown`;
+    const grantApp = (entry: AppEntry): void => {
+      for (const group of entry.hostGroups) {
+        const scope = group.key.scope;
+        if (scope.type !== `single`) continue;
+        allDuplicateIds.push(...group.duplicateIds);
+        decisions.push({
+          unlockRequestId: group.representative.id,
+          status: `accepted`,
+          grantAppScope: scope.single satisfies SingleAppScope,
+        });
+      }
+    };
 
-  const typeLabel = (group: RequestGroup): { label: string; isApp: boolean } => {
-    if (group.key.scope.type !== `webBrowsers`) {
-      return { label: `App`, isApp: true };
+    const approveApp = (entry: AppEntry, keychainId: UUID): void => {
+      for (const group of entry.hostGroups) {
+        allDuplicateIds.push(...group.duplicateIds);
+        decisions.push({
+          unlockRequestId: group.representative.id,
+          status: `accepted`,
+          key: { keychainId, key: group.key },
+        });
+      }
+    };
+
+    for (const entry of entries) {
+      const row = getRow(entry.id);
+      if (row.decision === `undecided`) continue;
+      if (entry.kind === `web`) {
+        if (row.decision === `reject`) rejectGroup(entry.group);
+        else acceptGroup(entry.group, row);
+        continue;
+      }
+      if (row.decision === `reject`) {
+        for (const group of entry.hostGroups) rejectGroup(group);
+      } else if (row.decision === `grant`) {
+        grantApp(entry);
+      } else {
+        approveApp(entry, row.keychainId);
+      }
     }
-    return { label: `Web`, isApp: false };
-  };
 
-  const undecidedCount = groups.filter(
-    (g) => rows[g.representative.id]?.decision === `undecided`,
-  ).length;
+    onSubmit({ decisions, duplicateRequestIds: allDuplicateIds }, undecidedCount);
+  };
 
   return (
     <div className="flex flex-col @container">
       <PageHeading icon="unlock">{childName}&rsquo;s unlock requests</PageHeading>
 
-      {groups.length > 1 && (
+      {entries.length > 1 && (
         <p className="text-base text-slate-500 mt-5 px-1">
-          {groups.length} requests are pending. We&rsquo;ve pre-filled recommended
+          {entries.length} requests are pending. We&rsquo;ve pre-filled recommended
           actions, but please review each one before submitting.
         </p>
       )}
 
-      {keychains.length > 1 && groups.length > 1 && (
+      {keychains.length > 1 && entries.length > 1 && (
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 px-1">
           <label className="text-sm font-medium text-slate-500 whitespace-nowrap">
             Default keychain:
@@ -259,128 +292,42 @@ const BatchUnlockRequests: React.FC<Props> = ({
 
       {/* mobile card layout */}
       <div className="mt-6 space-y-3 @[720px]:hidden">
-        {groups.map((group) => {
-          const request = group.representative;
-          const row = getRow(request.id);
-          const { label: type, isApp } = typeLabel(group);
-          const infoExpanded = expandedInfo === request.id;
-          return (
-            <div
-              key={request.id}
-              className={cx(
-                `rounded-2xl border overflow-hidden transition-colors`,
-                row.decision === `reject` ? `border-red-200/60` : `border-slate-200`,
-              )}
-            >
-              <div className="p-4">
-                <div
-                  className={cx(
-                    `flex items-center gap-2`,
-                    request.appName || request.requestComment ? `mb-1` : `mb-3`,
-                  )}
-                >
-                  <Badge type={isApp ? `yellow` : `blue`} size="small">
-                    {type}
-                  </Badge>
-                  <span className="font-mono text-sm text-slate-900 truncate">
-                    {targetLabel(request)}
-                  </span>
-                  {group.allRequests.length > 1 && (
-                    <span className="shrink-0 text-xs text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
-                      {group.allRequests.length} requests
-                    </span>
-                  )}
-                </div>
-
-                {(request.appName || request.requestComment) && (
-                  <p className="text-sm @[720px]:text-xs text-slate-400 mb-3 @[720px]:mb-2 mt-2.5 @[720px]:mt-0 ml-1">
-                    {request.appName && (
-                      <span className="text-violet-400">{request.appName}</span>
-                    )}
-                    {request.appName && request.requestComment && ` · `}
-                    {request.requestComment && (
-                      <span className="italic">
-                        &ldquo;{request.requestComment}&rdquo;
-                      </span>
-                    )}
-                  </p>
-                )}
-
-                <NaughtyWarning group={group} />
-
-                <div className="flex items-center gap-2 mb-3">
-                  <button
-                    onClick={() => {
-                      setExpandedInfo(infoExpanded ? null : request.id);
-                      if (expandedEdit === request.id) setExpandedEdit(null);
-                    }}
-                    className={cx(
-                      `flex-1 flex items-center justify-center gap-2 rounded-xl border py-2.5 transition-colors`,
-                      infoExpanded
-                        ? `border-violet-300 bg-violet-50 text-violet-600`
-                        : `border-slate-200 bg-white text-slate-400 active:bg-violet-50 active:text-violet-500`,
-                    )}
-                  >
-                    <InformationCircleIcon className="w-5 h-5" />
-                  </button>
-                  {row.decision !== `reject` && (
-                    <button
-                      data-test="row-edit-toggle"
-                      onClick={() => {
-                        setExpandedEdit(expandedEdit === request.id ? null : request.id);
-                        if (infoExpanded) setExpandedInfo(null);
-                      }}
-                      className={cx(
-                        `flex-1 flex items-center justify-center gap-2 rounded-xl border py-2.5 transition-colors`,
-                        expandedEdit === request.id
-                          ? `border-violet-300 bg-violet-50 text-violet-600`
-                          : `border-slate-200 bg-white text-slate-400 active:bg-violet-50 active:text-violet-500`,
-                      )}
-                    >
-                      <AdjustmentsHorizontalIcon className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-
-                {infoExpanded && (
-                  <div className="pb-3 border-t border-slate-100 pt-3">
-                    <InfoPanel request={request} group={group} />
-                  </div>
-                )}
-                {expandedEdit === request.id && (
-                  <div className="pb-3 pt-1">
-                    <EditPanel
-                      keyRecord={group.key}
-                      row={row}
-                      onUpdate={(update) => updateRow(request.id, update)}
-                    />
-                  </div>
-                )}
-
-                <div className={cx(`mb-3`, row.decision === `reject` && `hidden`)}>
-                  <KeychainSelect
-                    keychains={keychains}
-                    value={row.keychainId}
-                    disabled={false}
-                    overridden={row.keychainOverridden}
-                    onChange={(keychainId) =>
-                      updateRow(request.id, {
-                        keychainId,
-                        keychainOverridden: keychainId !== globalKeychainId,
-                      })
-                    }
-                  />
-                </div>
-
-                <DecisionButtons
-                  decision={row.decision}
-                  onToggle={(decision) => updateRow(request.id, { decision })}
-                  fullWidth
-                />
-              </div>
-            </div>
-          );
-        })}
+        {entries.map((entry) =>
+          entry.kind === `web` ? (
+            <WebCard
+              key={entry.id}
+              group={entry.group}
+              keychains={keychains}
+              row={getRow(entry.id)}
+              globalKeychainId={globalKeychainId}
+              infoExpanded={expandedInfo === entry.id}
+              editExpanded={expandedEdit === entry.id}
+              onToggleInfo={() => {
+                setExpandedInfo(expandedInfo === entry.id ? null : entry.id);
+                if (expandedEdit === entry.id) setExpandedEdit(null);
+              }}
+              onToggleEdit={() => {
+                setExpandedEdit(expandedEdit === entry.id ? null : entry.id);
+                if (expandedInfo === entry.id) setExpandedInfo(null);
+              }}
+              onUpdate={(update) => updateRow(entry.id, update)}
+            />
+          ) : (
+            <AppCard
+              key={entry.id}
+              entry={entry}
+              keychains={keychains}
+              row={getRow(entry.id)}
+              globalKeychainId={globalKeychainId}
+              apiBaseUrl={apiBaseUrl}
+              hostsExpanded={expandedHosts === entry.id}
+              onToggleHosts={() =>
+                setExpandedHosts(expandedHosts === entry.id ? null : entry.id)
+              }
+              onUpdate={(update) => updateRow(entry.id, update)}
+            />
+          ),
+        )}
       </div>
 
       {/* desktop table layout */}
@@ -405,133 +352,42 @@ const BatchUnlockRequests: React.FC<Props> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {groups.map((group) => {
-                const request = group.representative;
-                const row = getRow(request.id);
-                const { label: type, isApp } = typeLabel(group);
-                const infoExpanded = expandedInfo === request.id;
-                const editExpanded = expandedEdit === request.id;
-
-                return (
-                  <React.Fragment key={request.id}>
-                    <tr className={cx(`transition-colors`, ``)}>
-                      <td className="px-4 py-3 align-top">
-                        <Badge type={isApp ? `yellow` : `blue`} size="small">
-                          {type}
-                        </Badge>
-                      </td>
-                      <td className="px-3 py-3 align-top">
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm text-slate-900 truncate max-w-[12rem] @[900px]:max-w-xs">
-                              {targetLabel(request)}
-                            </span>
-                            {group.allRequests.length > 1 && (
-                              <span className="shrink-0 text-xs text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
-                                {group.allRequests.length}
-                              </span>
-                            )}
-                          </div>
-                          {(request.appName || request.requestComment) && (
-                            <span className="text-xs text-slate-400 mt-0.5">
-                              {request.appName && (
-                                <span className="text-violet-400">{request.appName}</span>
-                              )}
-                              {request.appName && request.requestComment && ` · `}
-                              {request.requestComment && (
-                                <span className="italic">
-                                  &ldquo;{request.requestComment}&rdquo;
-                                </span>
-                              )}
-                            </span>
-                          )}
-                          <NaughtyWarning group={group} />
-                        </div>
-                      </td>
-                      <td
-                        className={cx(
-                          `px-3 py-3 transition-opacity`,
-                          row.decision === `reject`
-                            ? `opacity-0 pointer-events-none`
-                            : `opacity-100`,
-                        )}
-                      >
-                        <KeychainSelect
-                          keychains={keychains}
-                          value={row.keychainId}
-                          disabled={false}
-                          overridden={row.keychainOverridden}
-                          onChange={(keychainId) =>
-                            updateRow(request.id, {
-                              keychainId,
-                              keychainOverridden: keychainId !== globalKeychainId,
-                            })
-                          }
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={() => {
-                              setExpandedInfo(infoExpanded ? null : request.id);
-                              if (expandedEdit === request.id) setExpandedEdit(null);
-                            }}
-                            className={cx(
-                              `p-1 rounded-lg transition-colors`,
-                              infoExpanded
-                                ? `bg-violet-100 text-violet-600`
-                                : `text-slate-400 hover:text-violet-500 hover:bg-violet-50`,
-                            )}
-                          >
-                            <InformationCircleIcon className="w-[18px] h-[18px]" />
-                          </button>
-                          {row.decision !== `reject` && (
-                            <button
-                              data-test="row-edit-toggle"
-                              onClick={() => {
-                                setExpandedEdit(editExpanded ? null : request.id);
-                                if (infoExpanded) setExpandedInfo(null);
-                              }}
-                              className={cx(
-                                `p-1 rounded-lg transition-colors`,
-                                editExpanded
-                                  ? `bg-violet-100 text-violet-600`
-                                  : `text-slate-400 hover:text-violet-500 hover:bg-violet-50`,
-                              )}
-                            >
-                              <AdjustmentsHorizontalIcon className="w-[18px] h-[18px]" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-3 py-3">
-                        <DecisionButtons
-                          decision={row.decision}
-                          onToggle={(decision) => updateRow(request.id, { decision })}
-                        />
-                      </td>
-                    </tr>
-                    {infoExpanded && (
-                      <tr className="bg-slate-50">
-                        <td colSpan={5} className="px-6 py-4">
-                          <InfoPanel request={request} group={group} />
-                        </td>
-                      </tr>
-                    )}
-                    {editExpanded && (
-                      <tr className="bg-violet-50/30">
-                        <td colSpan={5} className="px-6 py-4">
-                          <EditPanel
-                            keyRecord={group.key}
-                            row={row}
-                            onUpdate={(update) => updateRow(request.id, update)}
-                          />
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })}
+              {entries.map((entry) =>
+                entry.kind === `web` ? (
+                  <WebRow
+                    key={entry.id}
+                    group={entry.group}
+                    keychains={keychains}
+                    row={getRow(entry.id)}
+                    globalKeychainId={globalKeychainId}
+                    infoExpanded={expandedInfo === entry.id}
+                    editExpanded={expandedEdit === entry.id}
+                    onToggleInfo={() => {
+                      setExpandedInfo(expandedInfo === entry.id ? null : entry.id);
+                      if (expandedEdit === entry.id) setExpandedEdit(null);
+                    }}
+                    onToggleEdit={() => {
+                      setExpandedEdit(expandedEdit === entry.id ? null : entry.id);
+                      if (expandedInfo === entry.id) setExpandedInfo(null);
+                    }}
+                    onUpdate={(update) => updateRow(entry.id, update)}
+                  />
+                ) : (
+                  <AppRow
+                    key={entry.id}
+                    entry={entry}
+                    keychains={keychains}
+                    row={getRow(entry.id)}
+                    globalKeychainId={globalKeychainId}
+                    apiBaseUrl={apiBaseUrl}
+                    hostsExpanded={expandedHosts === entry.id}
+                    onToggleHosts={() =>
+                      setExpandedHosts(expandedHosts === entry.id ? null : entry.id)
+                    }
+                    onUpdate={(update) => updateRow(entry.id, update)}
+                  />
+                ),
+              )}
             </tbody>
           </table>
         </div>
@@ -540,7 +396,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
       {/* bottom action bar */}
       <div className="sticky bottom-0 mt-3 @[720px]:mt-0 @[720px]:rounded-b-2xl @[720px]:border @[720px]:border-t-0 @[720px]:border-slate-200 bg-slate-50/95 @[720px]:bg-slate-50/50 backdrop-blur-sm @[720px]:backdrop-blur-none rounded-2xl @[720px]:rounded-t-none px-4 py-4 shadow-[0_-8px_24px_rgba(0,0,0,0.12)] @[720px]:shadow-none z-10">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {groups.length > 1 && (
+          {entries.length > 1 && (
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setAllDecisions(`reject`)}
@@ -550,7 +406,7 @@ const BatchUnlockRequests: React.FC<Props> = ({
                 Deny all
               </button>
               <button
-                onClick={() => setAllDecisions(`accept`)}
+                onClick={() => setAllDecisions(`allow`)}
                 className="flex-1 sm:flex-initial inline-flex items-center justify-center px-4 py-2 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-colors shadow-sm"
               >
                 <CheckIcon className="w-4 h-4 mr-1.5" />
@@ -573,16 +429,16 @@ const BatchUnlockRequests: React.FC<Props> = ({
               onClick={handleSubmit}
               color="primary"
               size="medium"
-              disabled={acceptCount + rejectCount === 0 || submitting}
+              disabled={allowCount + rejectCount === 0 || submitting}
             >
               {submitting ? `Submitting...` : `Submit`}
-              {groups.length > 1 && (acceptCount > 0 || rejectCount > 0) && (
+              {entries.length > 1 && (allowCount > 0 || rejectCount > 0) && (
                 <span className="ml-2 opacity-60 text-xs font-normal">
-                  ({acceptCount > 0 ? `${acceptCount} accept` : ``}
-                  {acceptCount > 0 && rejectCount > 0 ? `, ` : ``}
+                  ({allowCount > 0 ? `${allowCount} allow` : ``}
+                  {allowCount > 0 && rejectCount > 0 ? `, ` : ``}
                   {rejectCount > 0 ? `${rejectCount} deny` : ``}
                   {undecidedCount > 0
-                    ? `${acceptCount + rejectCount > 0 ? `, ` : ``}${undecidedCount} skipped`
+                    ? `${allowCount + rejectCount > 0 ? `, ` : ``}${undecidedCount} skipped`
                     : ``}
                   )
                 </span>
@@ -590,6 +446,493 @@ const BatchUnlockRequests: React.FC<Props> = ({
             </Button>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+const targetLabel = (r: UnlockRequest): string =>
+  r.domain ??
+  r.url?.replace(/^https?:\/\//, ``).replace(/\/$/, ``) ??
+  r.ipAddress ??
+  `unknown`;
+
+function appIconUrl(entry: AppEntry, apiBaseUrl?: string): string | undefined {
+  const hash = entry.appIconHash;
+  if (!hash) return undefined;
+  if (hash.startsWith(`http`) || hash.startsWith(`data:`)) return hash;
+  return apiBaseUrl ? `${apiBaseUrl}/app-icon/${hash}` : undefined;
+}
+
+const WebRow: React.FC<{
+  group: RequestGroup;
+  keychains: KeychainSummary[];
+  row: RowState;
+  globalKeychainId: UUID;
+  infoExpanded: boolean;
+  editExpanded: boolean;
+  onToggleInfo: () => void;
+  onToggleEdit: () => void;
+  onUpdate: (update: Partial<RowState>) => void;
+}> = ({
+  group,
+  keychains,
+  row,
+  globalKeychainId,
+  infoExpanded,
+  editExpanded,
+  onToggleInfo,
+  onToggleEdit,
+  onUpdate,
+}) => {
+  const request = group.representative;
+  return (
+    <React.Fragment>
+      <tr className="transition-colors">
+        <td className="px-4 py-3 align-top">
+          <Badge type="blue" size="small">
+            Web
+          </Badge>
+        </td>
+        <td className="px-3 py-3 align-top">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-sm text-slate-900 truncate max-w-[12rem] @[900px]:max-w-xs">
+                {targetLabel(request)}
+              </span>
+              {group.allRequests.length > 1 && (
+                <span className="shrink-0 text-xs text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
+                  {group.allRequests.length}
+                </span>
+              )}
+            </div>
+            {(request.appName || request.requestComment) && (
+              <span className="text-xs text-slate-400 mt-0.5">
+                {request.appName && (
+                  <span className="text-violet-400">{request.appName}</span>
+                )}
+                {request.appName && request.requestComment && ` · `}
+                {request.requestComment && (
+                  <span className="italic">&ldquo;{request.requestComment}&rdquo;</span>
+                )}
+              </span>
+            )}
+            <NaughtyWarning group={group} />
+          </div>
+        </td>
+        <td
+          className={cx(
+            `px-3 py-3 transition-opacity`,
+            row.decision === `reject` ? `opacity-0 pointer-events-none` : `opacity-100`,
+          )}
+        >
+          <KeychainSelect
+            keychains={keychains}
+            value={row.keychainId}
+            disabled={false}
+            overridden={row.keychainOverridden}
+            onChange={(keychainId) =>
+              onUpdate({
+                keychainId,
+                keychainOverridden: keychainId !== globalKeychainId,
+              })
+            }
+          />
+        </td>
+        <td className="px-3 py-3">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={onToggleInfo}
+              className={cx(
+                `p-1 rounded-lg transition-colors`,
+                infoExpanded
+                  ? `bg-violet-100 text-violet-600`
+                  : `text-slate-400 hover:text-violet-500 hover:bg-violet-50`,
+              )}
+            >
+              <InformationCircleIcon className="w-[18px] h-[18px]" />
+            </button>
+            {row.decision !== `reject` && (
+              <button
+                data-test="row-edit-toggle"
+                onClick={onToggleEdit}
+                className={cx(
+                  `p-1 rounded-lg transition-colors`,
+                  editExpanded
+                    ? `bg-violet-100 text-violet-600`
+                    : `text-slate-400 hover:text-violet-500 hover:bg-violet-50`,
+                )}
+              >
+                <AdjustmentsHorizontalIcon className="w-[18px] h-[18px]" />
+              </button>
+            )}
+          </div>
+        </td>
+        <td className="px-3 py-3">
+          <DecisionButtons
+            decision={row.decision}
+            onToggle={(decision) => onUpdate({ decision })}
+          />
+        </td>
+      </tr>
+      {infoExpanded && (
+        <tr className="bg-slate-50">
+          <td colSpan={5} className="px-6 py-4">
+            <InfoPanel request={request} group={group} />
+          </td>
+        </tr>
+      )}
+      {editExpanded && (
+        <tr className="bg-violet-50/30">
+          <td colSpan={5} className="px-6 py-4">
+            <EditPanel keyRecord={group.key} row={row} onUpdate={onUpdate} />
+          </td>
+        </tr>
+      )}
+    </React.Fragment>
+  );
+};
+
+const AppRow: React.FC<{
+  entry: AppEntry;
+  keychains: KeychainSummary[];
+  row: RowState;
+  globalKeychainId: UUID;
+  apiBaseUrl?: string;
+  hostsExpanded: boolean;
+  onToggleHosts: () => void;
+  onUpdate: (update: Partial<RowState>) => void;
+}> = ({
+  entry,
+  keychains,
+  row,
+  globalKeychainId,
+  apiBaseUrl,
+  hostsExpanded,
+  onToggleHosts,
+  onUpdate,
+}) => {
+  const nameable = !!entry.appName;
+  const title = entry.appName ?? entry.appBundleId ?? `Unknown app`;
+  const addressCount = entry.hostGroups.length;
+  const allowed = isAllowed(row.decision);
+  return (
+    <React.Fragment>
+      <tr className="bg-amber-50/20 transition-colors">
+        <td className="px-4 py-3 align-top">
+          <Badge type="yellow" size="small">
+            App
+          </Badge>
+        </td>
+        <td className="px-3 py-3 align-top">
+          <div className="flex items-start gap-3">
+            <AppIcon iconUrl={appIconUrl(entry, apiBaseUrl)} />
+            <div className="min-w-0">
+              <span
+                className={cx(
+                  `block font-semibold text-slate-800 truncate max-w-[12rem] @[900px]:max-w-xs`,
+                  !nameable && `font-mono text-sm font-medium`,
+                )}
+              >
+                {title}
+              </span>
+              {allowed && (
+                <div className="mt-2">
+                  <ModeToggle
+                    granted={row.decision === `grant`}
+                    addressCount={addressCount}
+                    onGrant={() => onUpdate({ decision: `grant` })}
+                    onApprove={() => onUpdate({ decision: `approve` })}
+                  />
+                </div>
+              )}
+              <HostsToggle
+                addressCount={addressCount}
+                expanded={hostsExpanded}
+                onToggle={onToggleHosts}
+              />
+            </div>
+          </div>
+        </td>
+        <td
+          className={cx(
+            `px-3 py-3 transition-opacity align-top`,
+            row.decision === `approve` ? `opacity-100` : `opacity-0 pointer-events-none`,
+          )}
+        >
+          <KeychainSelect
+            keychains={keychains}
+            value={row.keychainId}
+            disabled={false}
+            overridden={row.keychainOverridden}
+            onChange={(keychainId) =>
+              onUpdate({
+                keychainId,
+                keychainOverridden: keychainId !== globalKeychainId,
+              })
+            }
+          />
+        </td>
+        <td className="px-3 py-3" />
+        <td className="px-3 py-3 align-top">
+          <AllowDenyButtons
+            allowed={allowed}
+            denied={row.decision === `reject`}
+            onAllow={() =>
+              onUpdate({
+                decision: allowed ? `undecided` : nameable ? `grant` : `approve`,
+              })
+            }
+            onDeny={() =>
+              onUpdate({ decision: row.decision === `reject` ? `undecided` : `reject` })
+            }
+          />
+        </td>
+      </tr>
+      {hostsExpanded && (
+        <tr className="bg-slate-50">
+          <td colSpan={5} className="px-6 py-4">
+            <p className="text-xs uppercase tracking-wider font-semibold text-slate-400 mb-2">
+              Addresses {title} requested
+            </p>
+            <HostList entry={entry} />
+          </td>
+        </tr>
+      )}
+    </React.Fragment>
+  );
+};
+
+const WebCard: React.FC<{
+  group: RequestGroup;
+  keychains: KeychainSummary[];
+  row: RowState;
+  globalKeychainId: UUID;
+  infoExpanded: boolean;
+  editExpanded: boolean;
+  onToggleInfo: () => void;
+  onToggleEdit: () => void;
+  onUpdate: (update: Partial<RowState>) => void;
+}> = ({
+  group,
+  keychains,
+  row,
+  globalKeychainId,
+  infoExpanded,
+  editExpanded,
+  onToggleInfo,
+  onToggleEdit,
+  onUpdate,
+}) => {
+  const request = group.representative;
+  return (
+    <div
+      className={cx(
+        `rounded-2xl border overflow-hidden transition-colors`,
+        row.decision === `reject` ? `border-red-200/60` : `border-slate-200`,
+      )}
+    >
+      <div className="p-4">
+        <div
+          className={cx(
+            `flex items-center gap-2`,
+            request.appName || request.requestComment ? `mb-1` : `mb-3`,
+          )}
+        >
+          <Badge type="blue" size="small">
+            Web
+          </Badge>
+          <span className="font-mono text-sm text-slate-900 truncate">
+            {targetLabel(request)}
+          </span>
+          {group.allRequests.length > 1 && (
+            <span className="shrink-0 text-xs text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
+              {group.allRequests.length} requests
+            </span>
+          )}
+        </div>
+
+        {(request.appName || request.requestComment) && (
+          <p className="text-sm @[720px]:text-xs text-slate-400 mb-3 @[720px]:mb-2 mt-2.5 @[720px]:mt-0 ml-1">
+            {request.appName && (
+              <span className="text-violet-400">{request.appName}</span>
+            )}
+            {request.appName && request.requestComment && ` · `}
+            {request.requestComment && (
+              <span className="italic">&ldquo;{request.requestComment}&rdquo;</span>
+            )}
+          </p>
+        )}
+
+        <NaughtyWarning group={group} />
+
+        <div className="flex items-center gap-2 mb-3">
+          <button
+            onClick={onToggleInfo}
+            className={cx(
+              `flex-1 flex items-center justify-center gap-2 rounded-xl border py-2.5 transition-colors`,
+              infoExpanded
+                ? `border-violet-300 bg-violet-50 text-violet-600`
+                : `border-slate-200 bg-white text-slate-400 active:bg-violet-50 active:text-violet-500`,
+            )}
+          >
+            <InformationCircleIcon className="w-5 h-5" />
+          </button>
+          {row.decision !== `reject` && (
+            <button
+              data-test="row-edit-toggle"
+              onClick={onToggleEdit}
+              className={cx(
+                `flex-1 flex items-center justify-center gap-2 rounded-xl border py-2.5 transition-colors`,
+                editExpanded
+                  ? `border-violet-300 bg-violet-50 text-violet-600`
+                  : `border-slate-200 bg-white text-slate-400 active:bg-violet-50 active:text-violet-500`,
+              )}
+            >
+              <AdjustmentsHorizontalIcon className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+
+        {infoExpanded && (
+          <div className="pb-3 border-t border-slate-100 pt-3">
+            <InfoPanel request={request} group={group} />
+          </div>
+        )}
+        {editExpanded && (
+          <div className="pb-3 pt-1">
+            <EditPanel keyRecord={group.key} row={row} onUpdate={onUpdate} />
+          </div>
+        )}
+
+        <div className={cx(`mb-3`, row.decision === `reject` && `hidden`)}>
+          <KeychainSelect
+            keychains={keychains}
+            value={row.keychainId}
+            disabled={false}
+            overridden={row.keychainOverridden}
+            onChange={(keychainId) =>
+              onUpdate({
+                keychainId,
+                keychainOverridden: keychainId !== globalKeychainId,
+              })
+            }
+          />
+        </div>
+
+        <DecisionButtons
+          decision={row.decision}
+          onToggle={(decision) => onUpdate({ decision })}
+          fullWidth
+        />
+      </div>
+    </div>
+  );
+};
+
+const AppCard: React.FC<{
+  entry: AppEntry;
+  keychains: KeychainSummary[];
+  row: RowState;
+  globalKeychainId: UUID;
+  apiBaseUrl?: string;
+  hostsExpanded: boolean;
+  onToggleHosts: () => void;
+  onUpdate: (update: Partial<RowState>) => void;
+}> = ({
+  entry,
+  keychains,
+  row,
+  globalKeychainId,
+  apiBaseUrl,
+  hostsExpanded,
+  onToggleHosts,
+  onUpdate,
+}) => {
+  const nameable = !!entry.appName;
+  const title = entry.appName ?? entry.appBundleId ?? `Unknown app`;
+  const addressCount = entry.hostGroups.length;
+  const allowed = isAllowed(row.decision);
+  return (
+    <div
+      className={cx(
+        `rounded-2xl border bg-amber-50/20 overflow-hidden transition-colors`,
+        row.decision === `reject` ? `border-red-200/60` : `border-slate-200`,
+      )}
+    >
+      <div className="p-4">
+        <div className="flex items-start gap-3 mb-3">
+          <AppIcon iconUrl={appIconUrl(entry, apiBaseUrl)} />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <Badge type="yellow" size="small">
+                App
+              </Badge>
+              <span
+                className={cx(
+                  `font-semibold text-slate-800 truncate`,
+                  !nameable && `font-mono text-sm font-medium`,
+                )}
+              >
+                {title}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {allowed && (
+          <div className="mb-3">
+            <ModeToggle
+              granted={row.decision === `grant`}
+              addressCount={addressCount}
+              onGrant={() => onUpdate({ decision: `grant` })}
+              onApprove={() => onUpdate({ decision: `approve` })}
+            />
+          </div>
+        )}
+
+        <HostsToggle
+          addressCount={addressCount}
+          expanded={hostsExpanded}
+          onToggle={onToggleHosts}
+          className="mb-3"
+        />
+        {hostsExpanded && (
+          <div className="mb-3 rounded-xl bg-slate-50 p-3">
+            <HostList entry={entry} />
+          </div>
+        )}
+
+        {row.decision === `approve` && (
+          <div className="mb-3">
+            <KeychainSelect
+              keychains={keychains}
+              value={row.keychainId}
+              disabled={false}
+              overridden={row.keychainOverridden}
+              onChange={(keychainId) =>
+                onUpdate({
+                  keychainId,
+                  keychainOverridden: keychainId !== globalKeychainId,
+                })
+              }
+            />
+          </div>
+        )}
+
+        <AllowDenyButtons
+          fullWidth
+          allowed={allowed}
+          denied={row.decision === `reject`}
+          onAllow={() =>
+            onUpdate({
+              decision: allowed ? `undecided` : nameable ? `grant` : `approve`,
+            })
+          }
+          onDeny={() =>
+            onUpdate({ decision: row.decision === `reject` ? `undecided` : `reject` })
+          }
+        />
       </div>
     </div>
   );
@@ -656,6 +999,120 @@ const DecisionButtons: React.FC<{
       Accept
     </button>
   </div>
+);
+
+const AllowDenyButtons: React.FC<{
+  allowed: boolean;
+  denied: boolean;
+  fullWidth?: boolean;
+  onAllow: () => void;
+  onDeny: () => void;
+}> = ({ allowed, denied, fullWidth, onAllow, onDeny }) => (
+  <div className={cx(`flex items-center justify-end gap-2`, fullWidth && `w-full`)}>
+    <button
+      onClick={onDeny}
+      className={cx(
+        `inline-flex items-center justify-center px-3 py-2.5 @[720px]:py-1.5 rounded-xl @[720px]:rounded-lg text-sm font-medium transition-all`,
+        fullWidth && `flex-1`,
+        denied
+          ? `border border-red-300 text-red-600`
+          : `border border-slate-200 bg-white text-slate-400 hover:border-red-200 hover:text-red-500`,
+      )}
+    >
+      <XMarkIcon className="w-4 h-4 mr-1" />
+      Deny
+    </button>
+    <button
+      onClick={onAllow}
+      className={cx(
+        `inline-flex items-center justify-center px-3 py-2.5 @[720px]:py-1.5 rounded-xl @[720px]:rounded-lg text-sm font-medium transition-all`,
+        fullWidth && `flex-1`,
+        allowed
+          ? `border border-green-400 text-green-600`
+          : `border border-slate-200 bg-white text-slate-400 hover:border-green-200 hover:text-green-500`,
+      )}
+    >
+      <CheckIcon className="w-4 h-4 mr-1" />
+      Allow
+    </button>
+  </div>
+);
+
+const ModeToggle: React.FC<{
+  granted: boolean;
+  addressCount: number;
+  onGrant: () => void;
+  onApprove: () => void;
+}> = ({ granted, addressCount, onGrant, onApprove }) => (
+  <div className="inline-flex items-center rounded-lg border border-slate-200 bg-white p-0.5 text-xs font-medium w-fit">
+    <button
+      onClick={onGrant}
+      className={cx(
+        `px-2.5 py-1 rounded-md transition-colors`,
+        granted
+          ? `bg-emerald-100 text-emerald-700`
+          : `text-slate-400 hover:text-slate-600`,
+      )}
+    >
+      Allow app
+    </button>
+    <button
+      onClick={onApprove}
+      className={cx(
+        `px-2.5 py-1 rounded-md transition-colors`,
+        !granted
+          ? `bg-violet-100 text-violet-700`
+          : `text-slate-400 hover:text-slate-600`,
+      )}
+    >
+      {addressCount === 1 ? `Allow address` : `Allow ${addressCount} addresses`}
+    </button>
+  </div>
+);
+
+const HostsToggle: React.FC<{
+  addressCount: number;
+  expanded: boolean;
+  onToggle: () => void;
+  className?: string;
+}> = ({ addressCount, expanded, onToggle, className }) => (
+  <button
+    onClick={onToggle}
+    className={cx(
+      `block text-sm text-slate-400 hover:text-slate-600 transition-colors mt-2`,
+      className,
+    )}
+  >
+    {addressCount} address{addressCount === 1 ? `` : `es`} requested
+    <i
+      className={cx(
+        `fa-solid fa-chevron-down ml-1.5 text-xs transition-transform`,
+        expanded && `-rotate-180`,
+      )}
+    />
+  </button>
+);
+
+const HostList: React.FC<{ entry: AppEntry }> = ({ entry }) => (
+  <ul className="flex flex-col gap-1.5">
+    {entry.hostGroups.map((g) => (
+      <li key={g.representative.id} className="flex items-center gap-2">
+        <span className="font-mono text-xs text-slate-600 truncate">
+          {targetLabel(g.representative)}
+        </span>
+        {g.allRequests.length > 1 && (
+          <span className="shrink-0 text-xs text-slate-400 bg-slate-100 rounded-full px-2 py-0.5">
+            {g.allRequests.length}
+          </span>
+        )}
+        {g.representative.requestComment && (
+          <span className="text-xs text-slate-400 italic truncate">
+            &ldquo;{g.representative.requestComment}&rdquo;
+          </span>
+        )}
+      </li>
+    ))}
+  </ul>
 );
 
 const EditPanel: React.FC<{
@@ -883,5 +1340,14 @@ const InfoPanel: React.FC<{ request: UnlockRequest; group: RequestGroup }> = ({
     </div>
   );
 };
+
+const AppIcon: React.FC<{ iconUrl?: string }> = ({ iconUrl }) =>
+  iconUrl ? (
+    <img src={iconUrl} alt="" className="w-8 h-8 rounded-lg shrink-0" />
+  ) : (
+    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 text-slate-300">
+      <i className="fa-solid fa-cube" />
+    </div>
+  );
 
 export default BatchUnlockRequests;

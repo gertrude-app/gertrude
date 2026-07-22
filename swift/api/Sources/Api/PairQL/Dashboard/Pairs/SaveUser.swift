@@ -2,6 +2,7 @@ import DuetSQL
 import Gertie
 import PairQL
 
+// @deprecated: remove after 2026-08-05
 struct SaveUser: Pair {
   static let auth: ClientAuth = .parent
 
@@ -17,7 +18,7 @@ struct SaveUser: Pair {
     var filteringDisabled: Bool?
     var downtime: PlainTimeWindow?
     var keychains: [ChildKeychain]
-    var blockedApps: [UserBlockedApp.DTO]?
+    var blockedApps: [BlockedMacApp.DTO]?
     var alwaysBlockedGroupIds: [AlwaysBlockedGroup.Id]?
     var customAlwaysBlockedRules: [ChildCustomBlockRule]?
 
@@ -77,18 +78,19 @@ extension SaveUser: Resolver {
       try await context.db.update(user)
 
       if let blockedApps = input.blockedApps {
-        let existing = try await user.blockedApps(in: context.db).map(\.dto)
+        let existing = try await user.blockedMacApps(in: context.db).map(\.dto)
         if !existing.elementsEqual(blockedApps) {
           dashSecurityEvent(.blockedAppsChanged, "child: \(user.name)", in: context)
-          try await UserBlockedApp.query()
+          try await BlockedMacApp.query()
             .where(.childId == user.id)
             .delete(in: context.db)
-          let models = blockedApps.map { UserBlockedApp(dto: $0, childId: user.id) }
+          let models = blockedApps.map { BlockedMacApp(dto: $0, childId: user.id) }
           try await context.db.create(models)
         }
       }
 
-      let existing = try await childKeychainSummaries(for: user.id, in: context.db)
+      let existing = try await keychainSummaries(for: user.id, in: context.db)
+        .summaries
         .map(\.userKeychain)
       if !existing.elementsEqual(input.keychains) {
         dashSecurityEvent(.keychainsChanged, "child: \(user.name)", in: context)

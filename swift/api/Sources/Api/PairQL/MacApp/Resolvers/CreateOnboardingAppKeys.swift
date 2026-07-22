@@ -1,4 +1,5 @@
 import DuetSQL
+import Gertie
 import MacAppRoute
 
 extension CreateOnboardingAppKeys: Resolver {
@@ -21,17 +22,13 @@ extension CreateOnboardingAppKeys: Resolver {
     guard !unique.isEmpty else { return .success }
 
     let child = context.child
-    let keychain = try await defaultKeychain(for: child, in: context.db)
-
-    let existingKeys = try await Key.query()
-      .where(.keychainId == keychain.id)
-      .all(in: context.db)
-    let existingSlugs = Set(existingKeys.compactMap { key -> String? in
-      if case .skeleton(scope: .identifiedAppSlug(let slug)) = key.key { return slug }
+    let existing = try await child.unrestrictedMacApps(in: context.db)
+    let existingSlugs = Set(existing.compactMap { app -> String? in
+      if case .identifiedAppSlug(let slug) = app.scope { return slug }
       return nil
     })
-    let existingBundleIds = Set(existingKeys.compactMap { key -> String? in
-      if case .skeleton(scope: .bundleId(let id)) = key.key { return id }
+    let existingBundleIds = Set(existing.compactMap { app -> String? in
+      if case .bundleId(let id) = app.scope.normalized { return id }
       return nil
     })
 
@@ -61,54 +58,32 @@ extension CreateOnboardingAppKeys: Resolver {
     }
 
     var createdSlugs = Set<String>()
+    var newApps: [UnrestrictedMacApp] = []
     for bundleId in unique {
       if let appId = bundleIdToAppId[bundleId],
          let slug = appIdToSlug[appId] {
-        let coveredByLegacyKey = slugBundleIds[slug, default: []]
+        let coveredByLegacyApp = slugBundleIds[slug, default: []]
           .contains(where: { existingBundleIds.contains($0) })
-        if !coveredByLegacyKey,
+        if !coveredByLegacyApp,
            !existingSlugs.contains(slug),
            createdSlugs.insert(slug).inserted {
-          try await context.db.create(Key(
-            keychainId: keychain.id,
-            key: .skeleton(scope: .identifiedAppSlug(slug)),
+          newApps.append(UnrestrictedMacApp(
+            scope: .identifiedAppSlug(slug),
+            childId: child.id,
           ))
         }
       } else if !existingBundleIds.contains(bundleId) {
-        try await context.db.create(Key(
-          keychainId: keychain.id,
-          key: .skeleton(scope: .bundleId(bundleId)),
+        newApps.append(UnrestrictedMacApp(
+          scope: .bundleId(bundleId),
+          childId: child.id,
         ))
       }
     }
 
+    if !newApps.isEmpty {
+      try await context.db.create(newApps)
+    }
+
     return .success
   }
-}
-
-private func defaultKeychain(
-  for child: Child,
-  in db: any DuetSQL.Client,
-) async throws -> Keychain {
-  let keychains = try await ChildKeychain.query()
-    .where(.childId == child.id)
-    .all(in: db)
-  let keychainIds = keychains.map(\.keychainId)
-
-  if !keychainIds.isEmpty {
-    let all = try await Keychain.query()
-      .where(.id |=| keychainIds)
-      .orderBy(.createdAt, .asc)
-      .all(in: db)
-    let defaultName = "\(child.name)'s Keychain"
-    return all.first { $0.name == defaultName } ?? all[0]
-  }
-
-  let keychain = try await db.create(Keychain(
-    parentId: child.parentId,
-    name: "\(child.name)'s Keychain",
-    isPublic: false,
-  ))
-  try await db.create(ChildKeychain(childId: child.id, keychainId: keychain.id))
-  return keychain
 }

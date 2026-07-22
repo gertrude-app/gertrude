@@ -14,7 +14,7 @@ extension CreateOnboardingBlockedApps: Resolver {
     guard !unique.isEmpty else { return .success }
 
     let child = context.child
-    let existing = try await UserBlockedApp.query()
+    let existing = try await BlockedMacApp.query()
       .where(.childId == child.id)
       .all(in: context.db)
     let existingIds = Set(existing.map(\.identifier))
@@ -22,7 +22,7 @@ extension CreateOnboardingBlockedApps: Resolver {
     let newBundleIds = unique.filter { !existingIds.contains($0) }
     guard !newBundleIds.isEmpty else { return .success }
 
-    let models = newBundleIds.map { UserBlockedApp(identifier: $0, childId: child.id) }
+    let models = newBundleIds.map { BlockedMacApp(identifier: $0, childId: child.id) }
     try await context.db.create(models)
 
     return .success

@@ -48,7 +48,9 @@ export { default as TrashBtn } from './Forms/TrashBtn';
 export { default as EditBlockRules } from './iOS/EditBlockRules';
 export { default as ChildIOSDevices } from './Users/ChildIOSDevices';
 export { default as ConnectIOSAppModal } from './Users/ConnectIOSAppModal';
-export { default as ChildMacSettings } from './Users/ChildMacSettings';
+export { default as ChildMacSettingsLegacy } from './Users/ChildMacSettings.legacy';
+export { default as MacOverview } from './Users/MacOverview';
+export type { MacOverviewSection, SectionFact } from './Users/MacOverview';
 export { default as EditChild } from './Users/EditChild';
 export { default as Dashboard } from './Dashboard/Dashboard';
 export { default as DaySummaryCard } from './Users/Activity/DaySummaryCard';
@@ -84,6 +86,25 @@ export type { ActivityFeedItem } from './Users/Activity/ChildActivityFeed';
 export { default as BlockRuleEditor } from './iOS/BlockRuleEditor';
 export { default as BlockGroupList } from './iOS/BlockGroupList';
 export { default as ToggleCard } from './Forms/ToggleCard';
+export { default as TimeInput } from './Forms/TimeInput';
+export { default as BlockedAppCard } from './Users/BlockedAppCard';
+export {
+  AppGridIcon,
+  AppGridTile,
+  ScrollableAppGrid,
+  useToggleSet,
+} from './Users/AppGrid';
+export type { TileTheme } from './Users/AppGrid';
+export {
+  AddAppsPanel,
+  AppSelectionEmptyHint,
+  BLOCKED_TILE_THEME,
+  EnterTransition,
+  INTERNET_TILE_THEME,
+  UnrestrictedAppCard,
+} from './Users/AppSelection';
+export type { AppSelectionItem } from './Users/AppSelection';
+export { default as AddKeychainDrawer } from './Users/AddKeychainDrawer';
 export type { BlockGroupData } from './iOS/BlockGroupList';
 export { default as ChildAssignmentPicker } from './ClaimDevice/ChildAssignmentPicker';
 export type { ChildSelection } from './ClaimDevice/ChildAssignmentPicker';

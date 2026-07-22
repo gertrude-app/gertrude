@@ -56,6 +56,91 @@ final class GetBatchUnlockRequestDataTests: ApiTestCase, @unchecked Sendable {
     expect(ids).toEqual([first.id, second.id, third.id])
   }
 
+  func testCatalogedAppNameAndIconTakePrecedence() async throws {
+    try await self.db.delete(all: IdentifiedApp.self)
+    try await self.db.delete(all: AppBundleId.self)
+    await clearCachedAppIdManifest()
+
+    let child = try await self.child().withDevice()
+
+    // an identified app whose curated name differs from the Mac's real name
+    let identified = try await self.db.create(IdentifiedApp(
+      name: "Unity",
+      slug: "unity-hub",
+      launchable: true,
+    ))
+    // identified catalog enumerates both the clean + team-prefixed forms (as prod does)
+    try await self.db.create(AppBundleId(
+      identifiedAppId: identified.id,
+      bundleId: "com.unity3d.unityhub",
+    ))
+    try await self.db.create(AppBundleId(
+      identifiedAppId: identified.id,
+      bundleId: "9QW8UQUTAA.com.unity3d.unityhub",
+    ))
+    // cataloged app carries the real Mac display name + an icon
+    try await self.db.create(CatalogedApp(
+      bundleId: "com.unity3d.unityhub",
+      name: "Unity Hub",
+      iconContentHash: "abc123",
+    ))
+
+    // request arrives with a team-id prefix — must still match the cataloged row
+    let request = UnlockRequest(
+      computerUserId: child.computerUser.id,
+      appBundleId: "9QW8UQUTAA.com.unity3d.unityhub",
+      hostname: "core.cloud.unity3d.com",
+      status: .pending,
+    )
+    try await self.db.create(request)
+
+    let output = try await GetBatchUnlockRequestData.resolve(
+      with: child.model.id,
+      in: context(child.parent),
+    )
+
+    let req = try XCTUnwrap(output.requests.first)
+    expect(req.appName).toEqual("Unity Hub") // cataloged name wins over "Unity"
+    expect(req.appIconHash).toEqual("abc123")
+    expect(req.appSlug).toEqual("unity-hub") // identified slug still drives scope
+  }
+
+  func testUncatalogedAppFallsBackToIdentifiedName() async throws {
+    try await self.db.delete(all: IdentifiedApp.self)
+    try await self.db.delete(all: AppBundleId.self)
+    try await self.db.delete(all: CatalogedApp.self)
+    await clearCachedAppIdManifest()
+
+    let child = try await self.child().withDevice()
+
+    let identified = try await self.db.create(IdentifiedApp(
+      name: "Firefox",
+      slug: "firefox",
+      launchable: true,
+    ))
+    try await self.db.create(AppBundleId(
+      identifiedAppId: identified.id,
+      bundleId: "org.mozilla.firefox",
+    ))
+
+    let request = UnlockRequest(
+      computerUserId: child.computerUser.id,
+      appBundleId: "org.mozilla.firefox",
+      hostname: "example.com",
+      status: .pending,
+    )
+    try await self.db.create(request)
+
+    let output = try await GetBatchUnlockRequestData.resolve(
+      with: child.model.id,
+      in: context(child.parent),
+    )
+
+    let req = try XCTUnwrap(output.requests.first)
+    expect(req.appName).toEqual("Firefox") // no cataloged row → identified name
+    expect(req.appIconHash).toBeNil()
+  }
+
   func testPublicKeychainOwnedByOtherParentExcludedFromKeychains() async throws {
     let child = try await self.child().withDevice()
 

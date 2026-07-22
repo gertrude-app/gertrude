@@ -1,7 +1,7 @@
 // auto-generated, do not edit
 import type {
   BlockRule,
-  BlockedApp,
+  BlockedMacApp,
   PlainTimeWindow,
   RuleSchedule,
   SuccessOutput,
@@ -23,7 +23,7 @@ export namespace SaveUser {
       id: UUID;
       schedule?: RuleSchedule;
     }>;
-    blockedApps?: BlockedApp[];
+    blockedApps?: BlockedMacApp[];
     alwaysBlockedGroupIds?: UUID[];
     customAlwaysBlockedRules?: Array<{
       id: UUID;

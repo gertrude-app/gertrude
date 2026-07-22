@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
 import type {
   BlockRule,
-  BlockedApp,
+  BlockedMacApp,
   MacAppConnectionCode,
   PlainTimeWindow,
   RequestState,
@@ -60,7 +60,8 @@ interface Props {
   keychainSchedule?: RuleSchedule;
   setAddingKeychainSchedule(schedule?: RuleSchedule): unknown;
   setAssignedKeychainSchedule(id: UUID, schedule?: RuleSchedule): unknown;
-  blockedApps?: BlockedApp[];
+  blockedApps?: BlockedMacApp[];
+  installedApps?: Array<{ bundleId: string; name: string; iconUrl?: string }>;
   newBlockedAppIdentifier: string;
   updateNewBlockedAppIdentifier(identifier: string): unknown;
   addNewBlockedApp(): unknown;
@@ -93,7 +94,7 @@ interface Props {
   deleteAlwaysBlockedRule(id: UUID): unknown;
 }
 
-const ChildMacSettings: React.FC<Props> = ({
+const ChildMacSettingsLegacy: React.FC<Props> = ({
   childName,
   hasConnectedMac,
   keyloggingEnabled,
@@ -125,6 +126,7 @@ const ChildMacSettings: React.FC<Props> = ({
   setAddingKeychainSchedule,
   setAssignedKeychainSchedule,
   blockedApps,
+  installedApps,
   newBlockedAppIdentifier,
   updateNewBlockedAppIdentifier,
   addNewBlockedApp,
@@ -302,13 +304,19 @@ const ChildMacSettings: React.FC<Props> = ({
               </div>
             ) : (
               <div className="gap-1.5 my-2 flex flex-col">
-                {blockedApps.map((app) => (
-                  <BlockedAppCard
-                    app={app}
-                    setSchedule={(schedule) => setBlockedAppSchedule(app.id, schedule)}
-                    onDelete={() => removeBlockedApp(app.id)}
-                  />
-                ))}
+                {blockedApps.map((app) => {
+                  const resolved = resolveInstalledApp(app.identifier, installedApps);
+                  return (
+                    <BlockedAppCard
+                      key={app.id}
+                      app={app}
+                      resolvedName={resolved?.name}
+                      iconUrl={resolved?.iconUrl}
+                      setSchedule={(schedule) => setBlockedAppSchedule(app.id, schedule)}
+                      onDelete={() => removeBlockedApp(app.id)}
+                    />
+                  );
+                })}
               </div>
             )}
             <form
@@ -491,4 +499,17 @@ const ChildMacSettings: React.FC<Props> = ({
   </div>
 );
 
-export default ChildMacSettings;
+export default ChildMacSettingsLegacy;
+
+function resolveInstalledApp(
+  identifier: string,
+  installedApps?: Array<{ bundleId: string; name: string; iconUrl?: string }>,
+): { name: string; iconUrl?: string } | undefined {
+  if (!installedApps || installedApps.length === 0) return undefined;
+  const byBundleId = installedApps.find((app) => app.bundleId === identifier);
+  if (byBundleId) return { name: byBundleId.name, iconUrl: byBundleId.iconUrl };
+  const lowered = identifier.toLowerCase();
+  const byName = installedApps.find((app) => app.name.toLowerCase() === lowered);
+  if (byName) return { name: byName.name, iconUrl: byName.iconUrl };
+  return undefined;
+}

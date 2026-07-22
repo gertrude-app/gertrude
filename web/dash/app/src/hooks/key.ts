@@ -17,6 +17,7 @@ import type {
   GetIOSDeviceSupervisionStatus,
   GetIOSDevice_v2,
   GetIdentifiedApps,
+  GetInstalledMacApps,
   GetMusicAlbumCuration,
   GetMusicClaimData,
   GetMusicCuration,
@@ -72,6 +73,14 @@ export class Key extends QueryKey<never> {
       `children/:id/music-curation/:album-id`,
       [`children`, childId, `music`, `curation`, albumId],
       childId,
+    );
+  }
+
+  static installedMacApps(id: UUID): QueryKey<GetInstalledMacApps.Output> {
+    return new QueryKey(
+      `children/:id/installed-mac-apps`,
+      [`children`, id, `installed-mac-apps`],
+      id,
     );
   }
 

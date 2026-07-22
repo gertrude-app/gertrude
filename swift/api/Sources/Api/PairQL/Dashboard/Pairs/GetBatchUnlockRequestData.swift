@@ -18,6 +18,7 @@ struct GetBatchUnlockRequestData: Pair {
     let appName: String?
     let appSlug: String?
     let appBundleId: String?
+    let appIconHash: String?
     let appCategories: [String]
     let createdAt: Date
   }
@@ -38,6 +39,11 @@ extension GetBatchUnlockRequestData: Resolver {
       .where(.computerUserId |=| computerUsers.map { .id($0) })
       .where(.status == RequestStatus.pending)
       .all(in: context.db)
+
+    let catalogedByBundleId = try await catalogedApps(
+      forBundleIds: allRequests.map(\.appBundleId),
+      in: context.db,
+    )
 
     var keychains = try await child.keychains(in: context.db)
       .filter { $0.parentId == context.parent.id }
@@ -64,14 +70,24 @@ extension GetBatchUnlockRequestData: Resolver {
     }
 
     return try await Output(
-      requests: allRequests.concurrentMap { try await .init(from: $0, in: context) },
+      requests: allRequests.concurrentMap {
+        try await .init(
+          from: $0,
+          in: context,
+          catalogedApp: catalogedByBundleId[normalizedBundleId($0.appBundleId)],
+        )
+      },
       keychains: sortedKeychains.concurrentMap { try await .init(from: $0) },
     )
   }
 }
 
 extension GetBatchUnlockRequestData.UnlockRequestData {
-  init(from request: UnlockRequest, in context: ParentContext) async throws {
+  init(
+    from request: UnlockRequest,
+    in context: ParentContext,
+    catalogedApp: CatalogedApp?,
+  ) async throws {
     let userDevice = try await request.computerUser(in: context.db)
     let user = try await context.verifiedChild(from: userDevice.childId)
 
@@ -88,11 +104,44 @@ extension GetBatchUnlockRequestData.UnlockRequestData {
       domain: request.hostname,
       ipAddress: request.ipAddress,
       requestComment: request.requestComment,
-      appName: app.displayName,
+      // prefer the cataloged app's name from mac over human chosen app name
+      appName: catalogedApp?.name ?? app.displayName,
       appSlug: app.slug,
       appBundleId: request.appBundleId,
+      appIconHash: catalogedApp?.iconContentHash,
       appCategories: Array(app.categories),
       createdAt: request.createdAt,
     )
   }
+}
+
+// helpers
+
+private func catalogedApps(
+  forBundleIds bundleIds: [String],
+  in db: any DuetSQL.Client,
+) async throws -> [String: CatalogedApp] {
+  let forms = Set(bundleIds.flatMap { [$0, normalizedBundleId($0)] })
+  guard !forms.isEmpty else { return [:] }
+  let apps = try await CatalogedApp.query()
+    .where(.bundleId |=| Array(forms))
+    .all(in: db)
+  return apps.reduce(into: [:]) { dict, app in
+    dict[normalizedBundleId(app.bundleId)] = app
+  }
+}
+
+private func normalizedBundleId(_ bundleId: String) -> String {
+  var id = bundleId
+  if id.first == "." {
+    id = String(id.dropFirst())
+  }
+  // strip a leading 10-char Apple team-id prefix, e.g. "9QW8UQUTAA."
+  let parts = id.split(separator: ".", maxSplits: 1)
+  if parts.count == 2,
+     parts[0].count == 10,
+     parts[0].allSatisfy({ $0.isNumber || ($0.isLetter && $0.isUppercase) }) {
+    id = String(parts[1])
+  }
+  return id
 }

@@ -2,27 +2,43 @@ import { defaults } from '@dash/types';
 import { ChevronDownIcon, ClockIcon, TrashIcon } from '@heroicons/react/24/outline';
 import cx from 'classnames';
 import React, { useState } from 'react';
-import type { BlockedApp, RuleSchedule } from '@dash/types';
+import type { BlockedMacApp, RuleSchedule } from '@dash/types';
 import SchedulePicker from '../Keychains/schedule/SchedulePicker';
 
 interface Props {
-  app: BlockedApp;
+  app: BlockedMacApp;
+  resolvedName?: string;
+  iconUrl?: string;
   setSchedule(schedule?: RuleSchedule): void;
   onDelete(): void;
 }
 
-const BlockedAppCard: React.FC<Props> = ({ app, setSchedule, onDelete }) => {
+const BlockedAppCard: React.FC<Props> = ({
+  app,
+  resolvedName,
+  iconUrl,
+  setSchedule,
+  onDelete,
+}) => {
   const [showSchedule, setShowSchedule] = useState(false);
 
   return (
     <div className="p-2.5 border border-slate-200 bg-white rounded-xl" key={app.id}>
       <div className="flex items-center gap-3">
-        <i className="fa text-red-500 fa-ban p-1.5 bg-red-100/80 rounded-md" />
-        <div className="flex-grow overflow-hidden relative h-8 flex items-center">
-          <span className="font-semibold text-slate-600 whitespace-nowrap absolute left-0">
-            {app.identifier}
+        {iconUrl ? (
+          <img
+            src={iconUrl}
+            alt=""
+            className="w-8 h-8 rounded-md shrink-0 object-contain"
+          />
+        ) : (
+          <i className="fa text-red-500 fa-ban p-1.5 bg-red-100/80 rounded-md" />
+        )}
+        <div className="flex-grow overflow-hidden relative h-8 flex items-center min-w-0">
+          <span className="font-semibold text-slate-600 whitespace-nowrap truncate">
+            {resolvedName ?? app.identifier}
           </span>
-          <div className="absolute right-0 top-0 h-full w-10 bg-gradient-to-r from-transparent to-white" />
+          <div className="absolute right-0 top-0 h-full w-10 bg-gradient-to-r from-transparent to-white pointer-events-none" />
         </div>
         {app.schedule ? (
           <button

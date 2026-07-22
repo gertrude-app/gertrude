@@ -56,6 +56,7 @@ const UserUnlockRequests: React.FC = () => {
       childName={requests[0]?.userName ?? ``}
       requests={requests}
       keychains={keychains}
+      apiBaseUrl={Current.env.apiEndpoint()}
       onSubmit={(data, numUndecided) => {
         hadUndecided.current = numUndecided > 0;
         submit.mutate(data);

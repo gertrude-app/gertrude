@@ -124,6 +124,11 @@ public extension Configure {
     )
 
     app.get(
+      "app-icon", ":hash",
+      use: AppIconRoute.handler(_:),
+    )
+
+    app.get(
       "download-supervision-app", ":code", "platform", ":platform",
       use: SupervisionToolDownloadRoute.handler(_:),
     )

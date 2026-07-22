@@ -91,6 +91,7 @@ export function child(override: Partial<Child> = {}): Child {
       },
     ],
     iosDevices: [],
+    publicUnrestrictedApps: [],
     availableAlwaysBlockedGroups: [],
     alwaysBlockedGroupIds: [],
     customAlwaysBlockedRules: [],

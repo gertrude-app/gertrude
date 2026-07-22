@@ -258,6 +258,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetIdentifiedApps.Output>(input, `GetIdentifiedApps`, `parent`);
   };
 
+  public getInstalledMacApps = (
+    input: P.GetInstalledMacApps.Input,
+  ): Promise<Result<P.GetInstalledMacApps.Output>> => {
+    return this.query<P.GetInstalledMacApps.Output>(
+      input,
+      `GetInstalledMacApps`,
+      `parent`,
+    );
+  };
+
   public getMusicAlbumCuration = (
     input: P.GetMusicAlbumCuration.Input,
   ): Promise<Result<P.GetMusicAlbumCuration.Output>> => {
@@ -464,6 +474,32 @@ export default class DashboardClient extends Client<Auth> {
     input: P.SaveKeychain.Input,
   ): Promise<Result<P.SaveKeychain.Output>> => {
     return this.query<P.SaveKeychain.Output>(input, `SaveKeychain`, `parent`);
+  };
+
+  public saveMacappApps = (
+    input: P.SaveMacappApps.Input,
+  ): Promise<Result<P.SaveMacappApps.Output>> => {
+    return this.query<P.SaveMacappApps.Output>(input, `SaveMacappApps`, `parent`);
+  };
+
+  public saveMacappFiltering = (
+    input: P.SaveMacappFiltering.Input,
+  ): Promise<Result<P.SaveMacappFiltering.Output>> => {
+    return this.query<P.SaveMacappFiltering.Output>(
+      input,
+      `SaveMacappFiltering`,
+      `parent`,
+    );
+  };
+
+  public saveMacappMonitoring = (
+    input: P.SaveMacappMonitoring.Input,
+  ): Promise<Result<P.SaveMacappMonitoring.Output>> => {
+    return this.query<P.SaveMacappMonitoring.Output>(
+      input,
+      `SaveMacappMonitoring`,
+      `parent`,
+    );
   };
 
   public saveMusicAlbumCuration = (

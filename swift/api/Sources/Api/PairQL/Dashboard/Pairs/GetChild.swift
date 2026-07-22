@@ -14,6 +14,13 @@ struct UserKeychainSummary: PairNestable {
   var schedule: RuleSchedule?
 }
 
+struct PublicUnrestrictedMacApp: PairNestable {
+  var keychainId: Api.Keychain.Id
+  var keychainName: String
+  var scope: AppScope.Single
+  var schedule: RuleSchedule?
+}
+
 struct AlwaysBlockedGroupSummary: PairNestable {
   var id: AlwaysBlockedGroup.Id
   var name: String
@@ -44,7 +51,9 @@ struct GetChild: Pair {
     var downtime: PlainTimeWindow?
     var computers: [Computer]
     var iosDevices: [IOSDevice]
-    var blockedApps: [UserBlockedApp.DTO]?
+    var blockedApps: [BlockedMacApp.DTO]?
+    var unrestrictedApps: [UnrestrictedMacApp.DTO]?
+    var publicUnrestrictedApps: [PublicUnrestrictedMacApp]
     var availableAlwaysBlockedGroups: [AlwaysBlockedGroupSummary]
     var alwaysBlockedGroupIds: [AlwaysBlockedGroup.Id]
     var customAlwaysBlockedRules: [ChildCustomBlockRule]
@@ -83,7 +92,7 @@ extension GetChild: Resolver {
     in context: ParentContext,
   ) async throws -> Output {
     let child = try await context.verifiedChild(from: id)
-    async let childKeychains = childKeychainSummaries(for: child.id, in: context.db)
+    async let keychainsAndPublic = keychainSummaries(for: child.id, in: context.db)
     async let availableAlwaysBlockedGroups = AlwaysBlockedGroup.query()
       .orderBy(.name, .asc)
       .all(in: context.db)
@@ -126,10 +135,8 @@ extension GetChild: Resolver {
       in: context.db,
     )
 
-    var blockedApps: [UserBlockedApp.DTO]?
-    if versions.contains(where: { $0 >= .init("2.6.0")! }) {
-      blockedApps = try await (child.blockedApps(in: context.db)).map(\.dto)
-    }
+    let blockedApps = try await child.blockedMacApps(in: context.db).map(\.dto)
+    let unrestrictedApps = try await child.unrestrictedMacApps(in: context.db).map(\.dto)
 
     let canDisableFilter = !versions.isEmpty
       && versions.allSatisfy { $0 >= .init("2.9.0")! }
@@ -138,6 +145,7 @@ extension GetChild: Resolver {
       && versions.allSatisfy { $0 >= .init("2.9.1")! }
 
     let musicConnectedDeviceIds = try await musicConnectedDeviceIdsAsync
+    let (childKeychains, publicUnrestrictedApps) = try await keychainsAndPublic
 
     return try await .init(
       id: child.id,
@@ -174,6 +182,8 @@ extension GetChild: Resolver {
         )
       },
       blockedApps: blockedApps,
+      unrestrictedApps: unrestrictedApps,
+      publicUnrestrictedApps: publicUnrestrictedApps,
       availableAlwaysBlockedGroups: availableAlwaysBlockedGroups,
       alwaysBlockedGroupIds: alwaysBlockedGroupIds,
       customAlwaysBlockedRules: customAlwaysBlockedRules,
@@ -183,14 +193,17 @@ extension GetChild: Resolver {
   }
 }
 
-func childKeychainSummaries(
+func keychainSummaries(
   for childId: Child.Id,
   in db: any DuetSQL.Client,
-) async throws -> [UserKeychainSummary] {
+) async throws -> (
+  summaries: [UserKeychainSummary],
+  publicUnrestrictedApps: [PublicUnrestrictedMacApp],
+) {
   let childKeychains = try await ChildKeychain.query()
     .where(.childId == childId)
     .all(in: db)
-  guard !childKeychains.isEmpty else { return [] }
+  guard !childKeychains.isEmpty else { return ([], []) }
 
   let keychainIds = childKeychains.map(\.keychainId)
   async let keychainsAsync = Keychain.query()
@@ -201,12 +214,12 @@ func childKeychainSummaries(
     .all(in: db)
 
   let keychains = try await keychainsAsync
-  let countsByKeychain = try await keysAsync
-    .reduce(into: [Keychain.Id: Int]()) { counts, key in
-      counts[key.keychainId, default: 0] += 1
-    }
-  return keychains.map { keychain in
-    .init(
+  let keys = try await keysAsync
+  let countsByKeychain = keys.reduce(into: [Keychain.Id: Int]()) { counts, key in
+    counts[key.keychainId, default: 0] += 1
+  }
+  let summaries = keychains.map { keychain in
+    UserKeychainSummary(
       id: keychain.id,
       parentId: keychain.parentId,
       name: keychain.name,
@@ -216,4 +229,21 @@ func childKeychainSummaries(
       schedule: childKeychains.first { $0.keychainId == keychain.id }?.schedule,
     )
   }
+  let publicUnrestrictedApps = keychains
+    .filter(\.isPublic)
+    .flatMap { keychain -> [PublicUnrestrictedMacApp] in
+      let childKeychain = childKeychains.first { $0.keychainId == keychain.id }
+      return keys
+        .filter { $0.keychainId == keychain.id }
+        .compactMap { key in
+          guard case .skeleton(let scope) = key.key else { return nil }
+          return PublicUnrestrictedMacApp(
+            keychainId: keychain.id,
+            keychainName: keychain.name,
+            scope: scope,
+            schedule: childKeychain?.schedule,
+          )
+        }
+    }
+  return (summaries, publicUnrestrictedApps)
 }

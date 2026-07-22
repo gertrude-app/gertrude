@@ -402,6 +402,152 @@ export const WithNaughtyDomains: Story = props({
   ],
 });
 
+const unityIcon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='7' fill='%23222c37'/%3E%3Cpath d='M16 7l7 4v10l-7 4-7-4V11z' fill='%23fff'/%3E%3C/svg%3E`;
+const minecraftIcon = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='7' fill='%237cb342'/%3E%3Crect x='8' y='8' width='7' height='7' fill='%23558b2f'/%3E%3Crect x='17' y='17' width='7' height='7' fill='%23558b2f'/%3E%3C/svg%3E`;
+
+const appRequestsArgs = props({
+  childName: `Leo`,
+  keychains,
+  requests: [
+    // Unity Hub whack-a-mole: one app, four distinct hosts, all app-scoped
+    {
+      id: `u1`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `config.unity3d.com`,
+      ipAddress: `35.190.85.1`,
+      requestComment: `trying to open my game project`,
+      appName: `Unity Hub`,
+      appSlug: `unity-hub`,
+      appBundleId: `com.unity3d.unityhub`,
+      appIconHash: unityIcon,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 2 }),
+    },
+    {
+      id: `u2`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `api.unity.com`,
+      ipAddress: `104.16.90.1`,
+      appName: `Unity Hub`,
+      appSlug: `unity-hub`,
+      appBundleId: `com.unity3d.unityhub`,
+      appIconHash: unityIcon,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 3 }),
+    },
+    {
+      id: `u3`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `cdn.unitycloud.com`,
+      ipAddress: `151.101.1.5`,
+      appName: `Unity Hub`,
+      appSlug: `unity-hub`,
+      appBundleId: `com.unity3d.unityhub`,
+      appIconHash: unityIcon,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 4 }),
+    },
+    {
+      id: `u4`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `analytics.unity-cdn.net`,
+      ipAddress: `18.66.1.9`,
+      appName: `Unity Hub`,
+      appSlug: `unity-hub`,
+      appBundleId: `com.unity3d.unityhub`,
+      appIconHash: unityIcon,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 5 }),
+    },
+    // cataloged app with icon, two hosts
+    {
+      id: `m1`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `authserver.mojang.com`,
+      ipAddress: `13.107.6.1`,
+      requestComment: `log in to minecraft`,
+      appName: `Minecraft`,
+      appSlug: `minecraft`,
+      appBundleId: `com.mojang.minecraft`,
+      appIconHash: minecraftIcon,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 8 }),
+    },
+    {
+      id: `m2`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `sessionserver.mojang.net`,
+      ipAddress: `13.107.6.2`,
+      appName: `Minecraft`,
+      appSlug: `minecraft`,
+      appBundleId: `com.mojang.minecraft`,
+      appIconHash: minecraftIcon,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 9 }),
+    },
+    // unidentified app (bundleId only) → defaults to "Allow addresses"
+    {
+      id: `w1`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      ipAddress: `99.81.103.55`,
+      requestComment: `war thunder wont connect`,
+      appName: undefined,
+      appBundleId: `4P553833NY.com.gaijinent.WarThunder`,
+      appCategories: [],
+      createdAt: time.subtracting({ minutes: 14 }),
+    },
+    // browser web rows for contrast
+    {
+      id: `b1`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `www.youtube.com`,
+      url: `https://www.youtube.com/watch?v=xyz`,
+      ipAddress: `142.251.153.1`,
+      appName: `Safari`,
+      appBundleId: `.com.apple.Safari`,
+      appCategories: [`browser`],
+      createdAt: time.subtracting({ minutes: 18 }),
+    },
+    {
+      id: `b2`,
+      userId: `user-leo`,
+      userName: `Leo`,
+      status: `pending` as const,
+      domain: `www.khanacademy.org`,
+      url: `https://www.khanacademy.org/math`,
+      ipAddress: `151.101.1.42`,
+      requestComment: `math practice`,
+      appName: `Safari`,
+      appBundleId: `.com.apple.Safari`,
+      appCategories: [`browser`],
+      createdAt: time.subtracting({ minutes: 22 }),
+    },
+  ],
+});
+
+export const AppRequests: Story = appRequestsArgs;
+
+export const AppRequestsMobile: Story = {
+  ...appRequestsArgs,
+  ...fixedViewport(390, 844),
+};
+
 export const Mobile: Story = {
   ...props({
     ...Default.args!,

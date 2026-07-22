@@ -41,6 +41,17 @@ public extension AppScope {
   }
 }
 
+public extension AppScope.Single {
+  var normalized: AppScope.Single {
+    switch self {
+    case .bundleId(let bundleId):
+      .bundleId(String(bundleId.droppingDotPrefix))
+    case .identifiedAppSlug:
+      self
+    }
+  }
+}
+
 private extension String {
   var droppingDotPrefix: Substring {
     self.first == "." ? self.dropFirst() : self[...]

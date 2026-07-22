@@ -38,6 +38,15 @@ extension SaveKey: Resolver {
       )
     }
     let keychain = try await context.parent.keychain(input.keychainId, in: context.db)
+    if case .skeleton = input.key, !keychain.isPublic {
+      throw context.error(
+        id: "d2f81a9c",
+        type: .badRequest,
+        debugMessage: "rejected skeleton key for non-public keychain",
+        userMessage: "App keys can no longer be created here — manage app internet access from the child's Mac Apps screen instead.",
+        showContactSupport: false,
+      )
+    }
     if input.isNew {
       let existingKeys = try await keychain.keys(in: context.db)
       if var existing = existingKeys.first(where: { $0.key == input.key }) {

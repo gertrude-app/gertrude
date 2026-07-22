@@ -14,7 +14,7 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
     try await self.db.delete(all: IdentifiedApp.self)
   }
 
-  func testCreatesSkeletonKeysInDefaultKeychain() async throws {
+  func testCreatesUnrestrictedMacApps() async throws {
     let child = try await self.childWithComputer()
 
     let output = try await CreateOnboardingAppKeys.resolve(
@@ -24,94 +24,15 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
     expect(output).toEqual(.success)
 
+    // no keychain is created — app-unrestrict no longer lives in keychains
     let keychains = try await child.model.keychains(in: self.db)
-    expect(keychains).toHaveCount(1)
-    expect(keychains[0].name).toEqual("\(child.name)'s Keychain")
+    expect(keychains).toHaveCount(0)
 
-    let keys = try await Api.Key.query()
-      .where(.keychainId == keychains[0].id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(2)
-    expect(keys[0].key).toEqual(.skeleton(scope: .bundleId("com.apple.Music")))
-    expect(keys[1].key).toEqual(.skeleton(scope: .bundleId("com.slack.Slack")))
-  }
-
-  func testPrefersNamedDefaultKeychain() async throws {
-    let child = try await self.childWithComputer()
-    let older = try await self.db.create(Keychain(
-      parentId: child.parentId,
-      name: "Custom Keychain",
-      isPublic: false,
-    ))
-    try await self.db.create(ChildKeychain(
-      childId: child.id,
-      keychainId: older.id,
-    ))
-    let named = try await self.db.create(Keychain(
-      parentId: child.parentId,
-      name: "\(child.name)'s Keychain",
-      isPublic: false,
-    ))
-    try await self.db.create(ChildKeychain(
-      childId: child.id,
-      keychainId: named.id,
-    ))
-
-    let output = try await CreateOnboardingAppKeys.resolve(
-      with: ["com.apple.Music"],
-      in: child.context,
-    )
-
-    expect(output).toEqual(.success)
-
-    let keys = try await Api.Key.query()
-      .where(.keychainId == named.id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(1)
-
-    let olderKeys = try await Api.Key.query()
-      .where(.keychainId == older.id)
-      .all(in: self.db)
-    expect(olderKeys).toHaveCount(0)
-  }
-
-  func testFallsBackToOldestKeychainWhenNoNameMatch() async throws {
-    let child = try await self.childWithComputer()
-    let oldest = try await self.db.create(Keychain(
-      parentId: child.parentId,
-      name: "First Keychain",
-      isPublic: false,
-    ))
-    try await self.db.create(ChildKeychain(
-      childId: child.id,
-      keychainId: oldest.id,
-    ))
-    let newer = try await self.db.create(Keychain(
-      parentId: child.parentId,
-      name: "Second Keychain",
-      isPublic: false,
-    ))
-    try await self.db.create(ChildKeychain(
-      childId: child.id,
-      keychainId: newer.id,
-    ))
-
-    let output = try await CreateOnboardingAppKeys.resolve(
-      with: ["com.apple.Music"],
-      in: child.context,
-    )
-
-    expect(output).toEqual(.success)
-
-    let keys = try await Api.Key.query()
-      .where(.keychainId == oldest.id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(1)
-
-    let newerKeys = try await Api.Key.query()
-      .where(.keychainId == newer.id)
-      .all(in: self.db)
-    expect(newerKeys).toHaveCount(0)
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+      .sorted { "\($0.scope)" < "\($1.scope)" }
+    expect(apps).toHaveCount(2)
+    expect(apps[0].scope).toEqual(.bundleId("com.apple.Music"))
+    expect(apps[1].scope).toEqual(.bundleId("com.slack.Slack"))
   }
 
   func testFiltersBrowserBundleIds() async throws {
@@ -126,12 +47,9 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
     expect(output).toEqual(.success)
 
-    let keychains = try await child.model.keychains(in: self.db)
-    let keys = try await Api.Key.query()
-      .where(.keychainId == keychains[0].id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(1)
-    expect(keys[0].key).toEqual(.skeleton(scope: .bundleId("com.apple.Music")))
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+    expect(apps).toHaveCount(1)
+    expect(apps[0].scope).toEqual(.bundleId("com.apple.Music"))
   }
 
   func testFiltersMalformedBundleIds() async throws {
@@ -144,12 +62,9 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
     expect(output).toEqual(.success)
 
-    let keychains = try await child.model.keychains(in: self.db)
-    let keys = try await Api.Key.query()
-      .where(.keychainId == keychains[0].id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(1)
-    expect(keys[0].key).toEqual(.skeleton(scope: .bundleId("com.apple.Music")))
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+    expect(apps).toHaveCount(1)
+    expect(apps[0].scope).toEqual(.bundleId("com.apple.Music"))
   }
 
   func testRejectsRequestWhenTokenTooOld() async throws {
@@ -179,11 +94,8 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
     )
     expect(output2).toEqual(.success)
 
-    let keychains = try await child.model.keychains(in: self.db)
-    let keys = try await Api.Key.query()
-      .where(.keychainId == keychains[0].id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(3)
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+    expect(apps).toHaveCount(3)
   }
 
   func testUsesIdentifiedAppSlugWhenAvailable() async throws {
@@ -205,30 +117,18 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
     expect(output).toEqual(.success)
 
-    let keychains = try await child.model.keychains(in: self.db)
-    let keys = try await Api.Key.query()
-      .where(.keychainId == keychains[0].id)
-      .all(in: self.db)
-    let sortedKeys = keys.sorted { "\($0.key)" < "\($1.key)" }
-    expect(sortedKeys).toHaveCount(2)
-    expect(sortedKeys[0].key).toEqual(.skeleton(scope: .bundleId("com.unknown.App")))
-    expect(sortedKeys[1].key).toEqual(.skeleton(scope: .identifiedAppSlug("music")))
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+      .sorted { "\($0.scope)" < "\($1.scope)" }
+    expect(apps).toHaveCount(2)
+    expect(apps[0].scope).toEqual(.bundleId("com.unknown.App"))
+    expect(apps[1].scope).toEqual(.identifiedAppSlug("music"))
   }
 
-  func testSkipsSlugKeyWhenLegacyBundleIdKeyExists() async throws {
+  func testSkipsSlugAppWhenLegacyBundleIdAppExists() async throws {
     let child = try await self.childWithComputer()
-    let keychain = try await self.db.create(Keychain(
-      parentId: child.parentId,
-      name: "\(child.name)'s Keychain",
-      isPublic: false,
-    ))
-    try await self.db.create(ChildKeychain(
+    try await self.db.create(UnrestrictedMacApp(
+      scope: .bundleId("com.apple.Music"),
       childId: child.id,
-      keychainId: keychain.id,
-    ))
-    try await self.db.create(Key(
-      keychainId: keychain.id,
-      key: .skeleton(scope: .bundleId("com.apple.Music")),
     ))
 
     let app = try await self.db.create(IdentifiedApp(
@@ -248,14 +148,41 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
     expect(output).toEqual(.success)
 
-    let keys = try await Api.Key.query()
-      .where(.keychainId == keychain.id)
-      .all(in: self.db)
-    expect(keys).toHaveCount(1)
-    expect(keys[0].key).toEqual(.skeleton(scope: .bundleId("com.apple.Music")))
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+    expect(apps).toHaveCount(1)
+    expect(apps[0].scope).toEqual(.bundleId("com.apple.Music"))
   }
 
-  func testAllBrowsersFilteredCreatesNoKeychainOrKeys() async throws {
+  func testSkipsSlugAppWhenDotPrefixedLegacyBundleIdAppExists() async throws {
+    let child = try await self.childWithComputer()
+    try await self.db.create(UnrestrictedMacApp(
+      scope: .bundleId(".com.apple.Music"), // <-- legacy dot-prefixed bundleId
+      childId: child.id,
+    ))
+
+    let app = try await self.db.create(IdentifiedApp(
+      name: "Music",
+      slug: "music",
+      launchable: true,
+    ))
+    try await self.db.create(AppBundleId(
+      identifiedAppId: app.id,
+      bundleId: "com.apple.Music",
+    ))
+
+    let output = try await CreateOnboardingAppKeys.resolve(
+      with: ["com.apple.Music"],
+      in: child.context,
+    )
+
+    expect(output).toEqual(.success)
+
+    // normalization means the dot-prefixed legacy row covers the slug — no dupe
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+    expect(apps).toHaveCount(1)
+  }
+
+  func testAllBrowsersFilteredCreatesNothing() async throws {
     let child = try await self.childWithComputer()
     try await self.db.create(Browser(match: .bundleId("com.test.BrowserC")))
 
@@ -266,6 +193,8 @@ final class CreateOnboardingAppKeysResolverTests: ApiTestCase, @unchecked Sendab
 
     expect(output).toEqual(.success)
 
+    let apps = try await child.model.unrestrictedMacApps(in: self.db)
+    expect(apps).toHaveCount(0)
     let keychains = try await child.model.keychains(in: self.db)
     expect(keychains).toHaveCount(0)
   }

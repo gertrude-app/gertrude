@@ -1,3 +1,4 @@
+import DuetSQL
 import Gertie
 import XCTest
 import XExpect
@@ -62,6 +63,47 @@ final class HandleUnlockRequestsTests: ApiTestCase, @unchecked Sendable {
         to: .userDevice(child.computerUser.id),
       ),
     ])
+  }
+
+  func testAcceptWithSkeletonKeyForNonPublicKeychainRejected() async throws {
+    let child = try await self.child().withDevice {
+      $0.appVersion = "2.9.0"
+    }
+
+    let keychain = try await self.db.create(Keychain(
+      parentId: child.parent.id,
+      name: "School",
+      isPublic: false,
+    ))
+    try await self.db.create(ChildKeychain(
+      childId: child.model.id,
+      keychainId: keychain.id,
+    ))
+
+    var request = UnlockRequest.mock
+    request.computerUserId = child.computerUser.id
+    request.status = .pending
+    request.hostname = "minecraftservices.com"
+    try await self.db.create(request)
+
+    let key = Gertie.Key.skeleton(scope: .identifiedAppSlug("minecraft"))
+    try await expectErrorFrom {
+      try await HandleUnlockRequests.resolve(
+        with: .init(
+          decisions: [.init(
+            unlockRequestId: request.id,
+            status: .accepted,
+            key: .init(keychainId: keychain.id, key: key),
+            responseComment: nil,
+          )],
+          duplicateRequestIds: [],
+        ),
+        in: self.context(child.parent),
+      )
+    }.toContain("skeleton")
+
+    let keys = try await keychain.keys(in: self.db)
+    expect(keys).toHaveCount(0) // no key created
   }
 
   func testRejectSingleRequestNewApp() async throws {
@@ -324,5 +366,103 @@ final class HandleUnlockRequestsTests: ApiTestCase, @unchecked Sendable {
     expect(merged.id).toEqual(existing.id)
     expect(merged.comment).toEqual("updated comment")
     expect(merged.deletedAt).not.toBeNil()
+  }
+
+  func testGrantAppWritesUnrestrictedMacAppRowNoKey() async throws {
+    let child = try await self.child().withDevice {
+      $0.appVersion = "2.9.0"
+    }
+
+    var req1 = UnlockRequest.mock
+    req1.computerUserId = child.computerUser.id
+    req1.status = .pending
+    req1.hostname = "core.cloud.unity3d.com"
+    try await self.db.create(req1)
+
+    var req2 = UnlockRequest.mock
+    req2.computerUserId = child.computerUser.id
+    req2.status = .pending
+    req2.hostname = "download.unity3d.com"
+    try await self.db.create(req2)
+
+    let scope = AppScope.Single.identifiedAppSlug("unity-hub")
+    let output = try await HandleUnlockRequests.resolve(
+      with: .init(
+        decisions: [
+          .init(unlockRequestId: req1.id, status: .accepted, grantAppScope: scope),
+          .init(unlockRequestId: req2.id, status: .accepted, grantAppScope: scope),
+        ],
+        duplicateRequestIds: [],
+      ),
+      in: context(child.parent),
+    )
+
+    expect(output).toEqual(.success)
+    await expect(try self.db.find(req1.id).status).toEqual(.accepted)
+    await expect(try self.db.find(req2.id).status).toEqual(.accepted)
+
+    // exactly ONE row despite two decisions for the same app (batch dedup)
+    let rows = try await UnrestrictedMacApp.query()
+      .where(.childId == child.model.id)
+      .all(in: self.db)
+    expect(rows).toHaveCount(1)
+    expect(rows[0].scope).toEqual(scope)
+
+    // one child-level .userUpdated + one aggregated handled message with both hosts
+    expect(sent.websocketMessages).toEqual([
+      .init(.userUpdated, to: .user(child.model.id)),
+      .init(
+        .unlockRequestsHandled(
+          ids: [req1.id.rawValue, req2.id.rawValue],
+          accepted: 2,
+          rejected: 0,
+          targets: ["core.cloud.unity3d.com", "download.unity3d.com"],
+        ),
+        to: .userDevice(child.computerUser.id),
+      ),
+    ])
+  }
+
+  func testGrantAppSkipsExistingRowAndOmitsUserUpdated() async throws {
+    let child = try await self.child().withDevice {
+      $0.appVersion = "2.9.0"
+    }
+
+    let scope = AppScope.Single.identifiedAppSlug("unity-hub")
+    try await self.db.create(UnrestrictedMacApp(scope: scope, childId: child.model.id))
+
+    var req = UnlockRequest.mock
+    req.computerUserId = child.computerUser.id
+    req.status = .pending
+    req.hostname = "core.cloud.unity3d.com"
+    try await self.db.create(req)
+
+    let output = try await HandleUnlockRequests.resolve(
+      with: .init(
+        decisions: [.init(unlockRequestId: req.id, status: .accepted, grantAppScope: scope)],
+        duplicateRequestIds: [],
+      ),
+      in: context(child.parent),
+    )
+
+    expect(output).toEqual(.success)
+
+    let rows = try await UnrestrictedMacApp.query()
+      .where(.childId == child.model.id)
+      .all(in: self.db)
+    expect(rows).toHaveCount(1) // still just the pre-existing row
+
+    // nothing newly granted → no .userUpdated, only the handled message
+    expect(sent.websocketMessages).toEqual([
+      .init(
+        .unlockRequestsHandled(
+          ids: [req.id.rawValue],
+          accepted: 1,
+          rejected: 0,
+          targets: ["core.cloud.unity3d.com"],
+        ),
+        to: .userDevice(child.computerUser.id),
+      ),
+    ])
   }
 }

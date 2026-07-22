@@ -11,7 +11,7 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
       isNew: true,
       id: .init(),
       keychainId: parent.keychain.id,
-      key: .skeleton(scope: .bundleId("com.example.app")),
+      key: .anySubdomain(domain: .init(string: "fixture.com"), scope: .webBrowsers),
       comment: "a comment",
       expiration: nil,
     )
@@ -57,7 +57,7 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
     input.isNew = false
     input.id = key.id
     input.comment = "updated comment"
-    input.key = .skeleton(scope: .bundleId("com.updated"))
+    input.key = .anySubdomain(domain: .init(string: "updated.com"), scope: .unrestricted)
 
     let output = try await SaveKey.resolve(with: input, in: admin.context)
     expect(output).toEqual(.success)
@@ -168,6 +168,32 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
     expect(matching.first?.comment).toBeNil()
   }
 
+  func testRejectsSkeletonKeyForNonPublicKeychain() async throws {
+    var (input, admin) = try await prepare()
+    var keychain = admin.keychain
+    keychain.isPublic = false
+    try await self.db.update(keychain)
+    input.key = .skeleton(scope: .bundleId("com.example.app"))
+
+    try await expectErrorFrom {
+      try await SaveKey.resolve(with: input, in: admin.context)
+    }.toContain("skeleton")
+  }
+
+  func testAcceptsSkeletonKeyForPublicKeychain() async throws {
+    var (input, admin) = try await prepare()
+    var keychain = admin.keychain
+    keychain.isPublic = true
+    try await self.db.update(keychain)
+    input.key = .skeleton(scope: .bundleId("com.example.app"))
+
+    let output = try await SaveKey.resolve(with: input, in: admin.context)
+    expect(output).toEqual(.success)
+
+    let key = try await self.db.find(input.id)
+    expect(key.key).toEqual(input.key)
+  }
+
   func testRejectsCloudflareEchKey() async throws {
     var (input, admin) = try await prepare()
     input.key = .anySubdomain(domain: .init(string: "cloudflare-ech.com"), scope: .unrestricted)
@@ -189,7 +215,7 @@ final class KeyResolverTests: ApiTestCase, @unchecked Sendable {
     input.isNew = false
     input.id = key.id
     input.comment = "updated comment"
-    input.key = .skeleton(scope: .bundleId("com.updated"))
+    input.key = .anySubdomain(domain: .init(string: "updated.com"), scope: .unrestricted)
     input.expiration = Date(addingDays: 5)
 
     let output = try await SaveKey.resolve(with: input, in: admin.context)

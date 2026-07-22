@@ -22,6 +22,7 @@ enum AuthedParentRoute: PairRoute {
   case getSelectableKeychains
   case getSuspendFilterRequest(GetSuspendFilterRequest.Input)
   case getChild(GetChild.Input)
+  case getChildInstalledApps(GetInstalledMacApps.Input)
   case getChildren
   case searchMusicCatalog_v2(SearchMusicCatalog_v2.Input)
   case getMusicCuration(GetMusicCuration.Input)
@@ -46,6 +47,9 @@ enum AuthedParentRoute: PairRoute {
   case saveNotification(SaveNotification.Input)
   case saveUser(SaveUser.Input)
   case setDailyReviewEmail(SetDailyReviewEmail.Input)
+  case saveMacappMonitoring(SaveMacappMonitoring.Input)
+  case saveMacappApps(SaveMacappApps.Input)
+  case saveMacappFiltering(SaveMacappFiltering.Input)
   case toggleChildKeychain(ToggleChildKeychain.Input)
   case getSubscriptionPanel_v2
   case openBillingPortal(OpenBillingPortal.Input)
@@ -146,6 +150,10 @@ extension AuthedParentRoute {
         Route(.case(Self.getChild)) {
           Operation(GetChild.self)
           Body(.dashboardInput(GetChild.self))
+        }
+        Route(.case(Self.getChildInstalledApps)) {
+          Operation(GetInstalledMacApps.self)
+          Body(.dashboardInput(GetInstalledMacApps.self))
         }
         Route(.case(Self.getChildren)) {
           Operation(GetChildren.self)
@@ -258,6 +266,18 @@ extension AuthedParentRoute {
           Operation(ChangeSubscriptionTier.self)
           Body(.dashboardInput(ChangeSubscriptionTier.self))
         }
+        Route(.case(Self.saveMacappMonitoring)) {
+          Operation(SaveMacappMonitoring.self)
+          Body(.dashboardInput(SaveMacappMonitoring.self))
+        }
+        Route(.case(Self.saveMacappApps)) {
+          Operation(SaveMacappApps.self)
+          Body(.dashboardInput(SaveMacappApps.self))
+        }
+        Route(.case(Self.saveMacappFiltering)) {
+          Operation(SaveMacappFiltering.self)
+          Body(.dashboardInput(SaveMacappFiltering.self))
+        }
         Route(.case(Self.securityEventsFeed)) {
           Operation(SecurityEventsFeed.self)
         }
@@ -347,6 +367,9 @@ extension AuthedParentRoute: RouteResponder {
     case .getChild(let input):
       let output = try await GetChild.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .getChildInstalledApps(let input):
+      let output = try await GetInstalledMacApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .getChildren:
       let output = try await GetChildren.resolve(in: context)
       return try await self.respond(with: output)
@@ -376,6 +399,15 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .saveUser(let input):
       let output = try await SaveUser.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveMacappMonitoring(let input):
+      let output = try await SaveMacappMonitoring.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveMacappApps(let input):
+      let output = try await SaveMacappApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveMacappFiltering(let input):
+      let output = try await SaveMacappFiltering.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .childActivitySummaries(let input):
       let output = try await ChildActivitySummaries.resolve(with: input, in: context)
