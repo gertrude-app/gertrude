@@ -161,6 +161,7 @@ const PLAN_FEATURES: Record<CurrentPlan, { name: string; features: string[] }> =
     name: `Light`,
     features: [
       `Everything in Free`,
+      `Safe, parent-curated podcast listening with the Gertrude Podcasts app`,
       `Supervise and protect iPhones and iPads for adults 18+ with the Gertrude iOS app`,
       `Enable additional supervision-only restrictions`,
     ],
