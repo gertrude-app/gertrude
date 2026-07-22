@@ -155,19 +155,12 @@ extension GetApprovedMusicLibrary: NoInputResolver {
   static func resolve(in ctx: MusicApp.InstallContext) async throws -> Output {
     try await requireMusicAccess(in: ctx)
 
-    let albums = try await ctx.child.approvedMusicAlbums(in: ctx.db)
     if let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
       for: ctx.child.id,
       in: ctx.db,
     ) {
-      let snapshotAlbumsById = Dictionary(
-        uniqueKeysWithValues: snapshot.payload.albums.map { ($0.id, $0) },
-      )
-      return .init(albums: albums.compactMap { approved in
-        guard let album = snapshotAlbumsById[approved.appleMusicAlbumId.rawValue] else {
-          return nil
-        }
-        return .init(
+      return .init(albums: snapshot.payload.albums.map { album in
+        .init(
           id: album.id,
           title: album.title,
           artistName: album.artistName,
@@ -186,6 +179,7 @@ extension GetApprovedMusicLibrary: NoInputResolver {
       })
     }
 
+    let albums = try await ctx.child.approvedMusicAlbums(in: ctx.db)
     let tracksByAlbum = try await self.tracksByAlbum(for: albums)
     let outputAlbums = albums.map { album in
       let tracks = tracksByAlbum[album.appleMusicAlbumId.rawValue] ?? []

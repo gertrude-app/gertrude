@@ -8,7 +8,6 @@ struct AlbumDetailFeature {
     let transitionSourceID: String?
     var playStatus: PlaybackFeature.PlayStatus?
     var currentTrackID: ApprovedTrack.ID?
-    var isLoadingTracks = false
     var playbackFailure: PlaybackFailure?
 
     init(
@@ -16,14 +15,12 @@ struct AlbumDetailFeature {
       transitionSourceID: String? = nil,
       playStatus: PlaybackFeature.PlayStatus? = nil,
       currentTrackID: ApprovedTrack.ID? = nil,
-      isLoadingTracks: Bool = false,
       playbackFailure: PlaybackFailure? = nil,
     ) {
       self.album = album
       self.transitionSourceID = transitionSourceID
       self.playStatus = playStatus
       self.currentTrackID = currentTrackID
-      self.isLoadingTracks = isLoadingTracks
       self.playbackFailure = playbackFailure
     }
   }
@@ -43,7 +40,6 @@ struct AlbumDetailFeature {
     case addToPlaylistTapped
     case addToQueueTapped
     case delegate(DelegateAction)
-    case onAppear
     case playbackFailureActionTapped
     case playbackFailureDismissed
     case playNextTapped
@@ -63,9 +59,6 @@ struct AlbumDetailFeature {
       case .addToQueueTapped:
         guard !state.playbackItems.isEmpty else { return .none }
         return .send(.delegate(.addToQueue(items: state.playbackItems)))
-
-      case .onAppear:
-        return .none
 
       case .playNextTapped:
         guard !state.playbackItems.isEmpty else { return .none }

@@ -134,23 +134,15 @@ private struct AlbumDetailWaveformView: View {
 }
 
 struct AlbumDetailEmptyTracksView: View {
-  let isLoading: Bool
-
   var body: some View {
-    VStack(spacing: 10) {
-      if self.isLoading {
-        ProgressView()
-      }
-
-      Text(self.isLoading ? "Loading tracks" : "No tracks yet")
-        .font(.system(size: 15, weight: .semibold))
-        .foregroundStyle(.secondary)
-    }
-    .frame(maxWidth: .infinity)
-    .padding(24)
-    .background(
-      .primary.opacity(0.05),
-      in: .rect(cornerRadius: 24, style: .continuous),
-    )
+    Text("No tracks yet")
+      .font(.system(size: 15, weight: .semibold))
+      .foregroundStyle(.secondary)
+      .frame(maxWidth: .infinity)
+      .padding(24)
+      .background(
+        .primary.opacity(0.05),
+        in: .rect(cornerRadius: 24, style: .continuous),
+      )
   }
 }

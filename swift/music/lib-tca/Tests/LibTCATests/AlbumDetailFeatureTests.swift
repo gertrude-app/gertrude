@@ -6,16 +6,7 @@ import Testing
 @MainActor
 struct AlbumDetailFeatureTests {
   @Test
-  func onAppearDoesNotLoadTracks() async {
-    let store = TestStore(initialState: .init(album: ApprovedMusicLibrary.mock.albums[0])) {
-      AlbumDetailFeature()
-    }
-
-    await store.send(.onAppear)
-  }
-
-  @Test
-  func incompleteAlbumDoesNotStartPlaybackOrLoadTracks() async {
+  func albumWithoutTracksDoesNotStartPlayback() async {
     let album = ApprovedAlbum(
       id: "album-1",
       title: "Album",
@@ -25,7 +16,6 @@ struct AlbumDetailFeatureTests {
       AlbumDetailFeature()
     }
 
-    await store.send(.onAppear)
     await store.send(.playTapped)
   }
 
@@ -144,22 +134,5 @@ struct AlbumDetailFeatureTests {
     }
 
     await store.send(.trackTapped("not-in-this-album"))
-  }
-
-  @Test
-  func playTappedDoesNothingWhileTracksAreLoading() async {
-    let album = ApprovedAlbum(
-      id: "empty-album",
-      title: "Empty Album",
-      artistName: "Nobody",
-    )
-    let store = TestStore(initialState: .init(
-      album: album,
-      isLoadingTracks: true,
-    )) {
-      AlbumDetailFeature()
-    }
-
-    await store.send(.playTapped)
   }
 }

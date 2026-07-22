@@ -401,7 +401,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
     artists: [Music.ResolvedArtist] = [],
   ) async throws -> (ChildEntities, MusicApp.InstallContext) {
     let child = try await self.child()
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let ctx = try await self.musicContext(for: child)
     for album in albums {
       _ = try await self.db.create(Music.ApprovedAlbum(

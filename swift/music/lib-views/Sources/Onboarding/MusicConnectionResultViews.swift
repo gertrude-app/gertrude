@@ -117,6 +117,7 @@ struct MusicSubscriptionRequiredView: View {
   }
 }
 
+@MainActor
 func musicDeviceType() -> String {
   #if os(iOS)
     UIDevice.current.userInterfaceIdiom == .pad ? "iPad" : "iPhone"
@@ -125,6 +126,7 @@ func musicDeviceType() -> String {
   #endif
 }
 
+@MainActor
 func musicDeviceLabel(_ childName: String) -> String {
   "\(childName)’s \(musicDeviceType())"
 }

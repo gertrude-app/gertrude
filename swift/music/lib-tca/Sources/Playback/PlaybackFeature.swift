@@ -306,13 +306,11 @@ struct PlaybackFeature: Sendable {
         return .merge(
           .cancel(id: CancelID.playbackStart),
           .cancel(id: CancelID.seek),
-          .concatenate(
-            .cancel(id: CancelID.checkpointSave),
-            .run { _ in
-              await self.playback.clearQueue()
-              await self.playbackSessionCache.delete()
-            },
-          ),
+          .run { _ in
+            await self.playback.clearQueue()
+            await self.playbackSessionCache.delete()
+          }
+          .cancellable(id: CancelID.checkpointSave, cancelInFlight: true),
         )
 
       case .playbackEvent(.progressChanged(let progress)):

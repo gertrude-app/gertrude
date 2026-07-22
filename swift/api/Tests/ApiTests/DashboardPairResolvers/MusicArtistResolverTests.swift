@@ -229,7 +229,7 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testRejectsMusicArtistManagementWithoutConnectedMusic() async throws {
     let child = try await self.child()
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
 
     do {
       _ = try await ApproveMusicArtist.resolve(
@@ -268,7 +268,7 @@ final class MusicArtistResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   private func connectMusicApp(for child: ChildEntities) async throws {
-    try await self.addLightPaidSubscription(for: child.parent.model.id)
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let device = try await self.db.create(IOSDevice.random {
       $0.childId = child.id
     })

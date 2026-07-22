@@ -72,7 +72,7 @@ import SwiftUI
         }
       }
       .padding(.leading, 15)
-      .padding(.trailing, 22)
+      .padding(.trailing, 9)
       .frame(height: 46)
     }
 
@@ -108,7 +108,8 @@ import SwiftUI
           action: self.onPlayTap,
         )
       }
-      .padding(.horizontal, 14)
+      .padding(.leading, 14)
+      .padding(.trailing, 5)
       .frame(height: 44)
     }
   }

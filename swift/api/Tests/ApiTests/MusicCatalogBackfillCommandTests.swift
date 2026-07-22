@@ -25,6 +25,32 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
     artist = try await self.db.find(artist.id)
     let resolvedAlbum = backfillAlbum(id: album.appleMusicAlbumId)
     let resolvedArtist = backfillArtist(id: artist.appleMusicArtistId)
+    let emptyPlaylist = try await self.db.create(Music.Playlist(
+      childId: child.id,
+      name: "Empty",
+      createdAt: .reference - 50,
+      updatedAt: .reference - 50,
+    ))
+    let populatedPlaylist = try await self.db.create(Music.Playlist(
+      childId: child.id,
+      name: "Populated",
+      createdAt: .reference - 40,
+      updatedAt: .reference - 40,
+    ))
+    let populatedEntry = try await self.db.create(Music.PlaylistEntry(
+      playlistId: populatedPlaylist.id,
+      position: 0,
+      appleMusicTrackId: "album-1-track",
+      preferredAlbumId: "album-1",
+      createdAt: .reference - 30,
+    ))
+    _ = try await self.db.create(Music.PlaylistEntry(
+      playlistId: populatedPlaylist.id,
+      position: 1,
+      appleMusicTrackId: "unapproved-track",
+      preferredAlbumId: "album-1",
+      createdAt: .reference - 20,
+    ))
 
     let firstReport = try await withDependencies {
       $0.db = self.db
@@ -56,6 +82,19 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
     expect(reloadedArtist.createdAt).toEqual(artist.createdAt)
     expect(reloadedArtist.resolution).toEqual(resolvedArtist)
     expect(firstSnapshot?.payload.albums.map(\.id)).toEqual(["album-1", "artist-album"])
+    expect(firstSnapshot?.payload.playlists.map(\.id)).toEqual([
+      emptyPlaylist.id.rawValue,
+      populatedPlaylist.id.rawValue,
+    ])
+    expect(firstSnapshot?.payload.playlists.map { $0.entries.map(\.id) }).toEqual([
+      [],
+      [populatedEntry.id.rawValue],
+    ])
+    let reconciledEntries = try await Music.PlaylistRepository.entries(
+      for: populatedPlaylist.id,
+      in: self.db,
+    )
+    expect(reconciledEntries.map(\.id)).toEqual([populatedEntry.id])
 
     let secondReport = try await withDependencies {
       $0.db = self.db
@@ -80,8 +119,10 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
     expect(secondReport.resolvedArtists).toEqual(0)
     expect(secondReport.unresolvedAlbums).toEqual(0)
     expect(secondReport.unresolvedArtists).toEqual(0)
+    expect(secondReport.unpublishedChildren).toEqual(0)
     expect(secondSnapshot?.revision).toEqual(firstSnapshot?.revision)
     expect(secondSnapshot?.createdAt).toEqual(firstSnapshot?.createdAt)
+    expect(secondSnapshot?.payload).toEqual(firstSnapshot?.payload)
   }
 
   func testIncompleteBackfillFailsClearlyWithoutPartialSnapshot() async throws {

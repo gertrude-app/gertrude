@@ -166,7 +166,7 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
         continue
       }
       do {
-        let content = try Music.LibrarySnapshotCompiler.compile(
+        var content = try Music.LibrarySnapshotCompiler.compile(
           albumGrants: allAlbums.filter { $0.childId == childId }.map {
             .init(
               appleMusicAlbumId: $0.appleMusicAlbumId,
@@ -183,6 +183,12 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
             )
           },
         )
+        let index = Music.PlaylistRules.EffectiveTrackIndex(albums: content.albums)
+        let playlists = try await Music.PlaylistRepository.rulesPlaylists(
+          for: childId,
+          in: self.db,
+        )
+        content.playlists = Music.PlaylistRules.compile(playlists: playlists, using: index)
         if !snapshot.payload.hasSameContent(as: content) {
           report.unpublishedChildren += 1
         }

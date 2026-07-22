@@ -118,6 +118,7 @@ extension Music {
         playlists[indexOfPlaylist].revision += 1
         playlists[indexOfPlaylist].updatedAt = date
         try await db.update(playlists[indexOfPlaylist])
+        playlists[indexOfPlaylist] = try await db.find(playlists[indexOfPlaylist].id)
       }
 
       return playlists.map { playlist in

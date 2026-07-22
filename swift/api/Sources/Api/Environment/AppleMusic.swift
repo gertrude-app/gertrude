@@ -8,18 +8,8 @@ import XHttp
 #endif
 
 struct AppleMusicClient: Sendable {
-  var searchAlbums:
-    @Sendable (_ search: AppleMusicAlbumSearch) async throws -> [AppleMusicCatalogAlbum]
-  var searchArtists:
-    @Sendable (_ search: AppleMusicArtistSearch) async throws -> [AppleMusicCatalogArtist]
   var searchCatalog:
     @Sendable (_ search: AppleMusicCatalogSearch) async throws -> AppleMusicCatalogSearchResults
-  var albums:
-    @Sendable (_ lookup: AppleMusicAlbumsLookup) async throws -> [AppleMusicCatalogAlbum]
-  var artistAlbums:
-    @Sendable (_ lookup: AppleMusicArtistAlbumsLookup) async throws -> [AppleMusicCatalogAlbum]
-  var artistTopSongs:
-    @Sendable (_ lookup: AppleMusicArtistTopSongsLookup) async throws -> [AppleMusicCatalogTrack]
   var albumTracks:
     @Sendable (_ lookup: AppleMusicAlbumTracksLookup) async throws -> [AppleMusicCatalogTrack]
   var resolveAlbum:
@@ -28,57 +18,12 @@ struct AppleMusicClient: Sendable {
     @Sendable (_ artistId: Music.ArtistId) async throws -> Music.ResolvedArtist
 }
 
-struct AppleMusicAlbumSearch: Equatable, Sendable {
-  var term: String
-  var limit: Int
-
-  init(term: String, limit: Int = 10) {
-    self.term = term
-    self.limit = limit
-  }
-}
-
-struct AppleMusicArtistSearch: Equatable, Sendable {
-  var term: String
-  var limit: Int
-
-  init(term: String, limit: Int = 10) {
-    self.term = term
-    self.limit = limit
-  }
-}
-
 struct AppleMusicCatalogSearch: Equatable, Sendable {
   var term: String
   var limit: Int
 
   init(term: String, limit: Int = 10) {
     self.term = term
-    self.limit = limit
-  }
-}
-
-struct AppleMusicAlbumsLookup: Equatable, Sendable {
-  var albumIds: [Music.AlbumId]
-}
-
-struct AppleMusicArtistAlbumsLookup: Equatable, Sendable {
-  var artistId: Music.ArtistId
-  var artistName: String
-}
-
-struct AppleMusicArtistTopSongsLookup: Equatable, Sendable {
-  var artistId: Music.ArtistId
-  var artistName: String
-  var limit: Int
-
-  init(
-    artistId: Music.ArtistId,
-    artistName: String,
-    limit: Int = 12,
-  ) {
-    self.artistId = artistId
-    self.artistName = artistName
     self.limit = limit
   }
 }
@@ -204,29 +149,9 @@ struct AppleMusicCatalogTrack: Codable, Equatable, Sendable {
 extension AppleMusicClient: DependencyKey {
   static var liveValue: Self {
     Self(
-      searchAlbums: { search in
-        let token = try await generateAppleMusicDeveloperToken()
-        return try await searchAppleMusicCatalogAlbums(search, developerToken: token)
-      },
-      searchArtists: { search in
-        let token = try await generateAppleMusicDeveloperToken()
-        return try await searchAppleMusicCatalogArtists(search, developerToken: token)
-      },
       searchCatalog: { search in
         let token = try await generateAppleMusicDeveloperToken()
         return try await searchAppleMusicCatalog(search, developerToken: token)
-      },
-      albums: { lookup in
-        let token = try await generateAppleMusicDeveloperToken()
-        return try await fetchAppleMusicCatalogAlbums(lookup, developerToken: token)
-      },
-      artistAlbums: { lookup in
-        let token = try await generateAppleMusicDeveloperToken()
-        return try await fetchAppleMusicCatalogArtistAlbums(lookup, developerToken: token)
-      },
-      artistTopSongs: { lookup in
-        let token = try await generateAppleMusicDeveloperToken()
-        return try await fetchAppleMusicCatalogArtistTopSongs(lookup, developerToken: token)
       },
       albumTracks: { lookup in
         let token = try await generateAppleMusicDeveloperToken()
@@ -252,15 +177,10 @@ extension AppleMusicClient: DependencyKey {
 
 extension AppleMusicClient: TestDependencyKey {
   static let testValue = Self(
-    searchAlbums: unimplemented("AppleMusicClient.searchAlbums()", placeholder: []),
-    searchArtists: unimplemented("AppleMusicClient.searchArtists()", placeholder: []),
     searchCatalog: unimplemented(
       "AppleMusicClient.searchCatalog()",
       placeholder: .init(items: [], albums: [], artists: []),
     ),
-    albums: unimplemented("AppleMusicClient.albums()", placeholder: []),
-    artistAlbums: unimplemented("AppleMusicClient.artistAlbums()", placeholder: []),
-    artistTopSongs: unimplemented("AppleMusicClient.artistTopSongs()", placeholder: []),
     albumTracks: unimplemented("AppleMusicClient.albumTracks()", placeholder: []),
     resolveAlbum: { try Self.testResolvedAlbum($0) },
     resolveArtist: { try Self.testResolvedArtist($0) },
@@ -309,54 +229,6 @@ private struct AppleMusicDeveloperTokenPayload: JWTPayload {
   }
 }
 
-func searchAppleMusicCatalogAlbums(
-  _ search: AppleMusicAlbumSearch,
-  developerToken: String,
-) async throws -> [AppleMusicCatalogAlbum] {
-  let url = try appleMusicCatalogSearchURL(search)
-  var request = URLRequest(url: url)
-  request.httpMethod = "GET"
-  request.setValue("Bearer \(developerToken)", forHTTPHeaderField: "Authorization")
-  request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-  let (data, response) = try await XHttp.data(for: request)
-  guard let httpResponse = response as? HTTPURLResponse else {
-    throw AppleMusicError.invalidResponseType
-  }
-  guard (200 ... 299).contains(httpResponse.statusCode) else {
-    throw AppleMusicError.httpError(
-      statusCode: httpResponse.statusCode,
-      body: String(data: data, encoding: .utf8) ?? "<decode err>",
-    )
-  }
-
-  return try decodeAppleMusicCatalogAlbums(from: data)
-}
-
-func searchAppleMusicCatalogArtists(
-  _ search: AppleMusicArtistSearch,
-  developerToken: String,
-) async throws -> [AppleMusicCatalogArtist] {
-  let url = try appleMusicCatalogArtistSearchURL(search)
-  var request = URLRequest(url: url)
-  request.httpMethod = "GET"
-  request.setValue("Bearer \(developerToken)", forHTTPHeaderField: "Authorization")
-  request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-  let (data, response) = try await XHttp.data(for: request)
-  guard let httpResponse = response as? HTTPURLResponse else {
-    throw AppleMusicError.invalidResponseType
-  }
-  guard (200 ... 299).contains(httpResponse.statusCode) else {
-    throw AppleMusicError.httpError(
-      statusCode: httpResponse.statusCode,
-      body: String(data: data, encoding: .utf8) ?? "<decode err>",
-    )
-  }
-
-  return try decodeAppleMusicCatalogArtists(from: data)
-}
-
 func searchAppleMusicCatalog(
   _ search: AppleMusicCatalogSearch,
   developerToken: String,
@@ -379,22 +251,6 @@ func searchAppleMusicCatalog(
   }
 
   return try decodeAppleMusicCatalogSearchResults(from: data)
-}
-
-func appleMusicCatalogSearchURL(_ search: AppleMusicAlbumSearch) throws -> URL {
-  try appleMusicCatalogSearchURL(
-    term: search.term,
-    limit: search.limit,
-    types: ["albums"],
-  )
-}
-
-func appleMusicCatalogArtistSearchURL(_ search: AppleMusicArtistSearch) throws -> URL {
-  try appleMusicCatalogSearchURL(
-    term: search.term,
-    limit: search.limit,
-    types: ["artists"],
-  )
 }
 
 func appleMusicCatalogMixedSearchURL(_ search: AppleMusicCatalogSearch) throws -> URL {
@@ -430,197 +286,18 @@ private func appleMusicCatalogSearchURL(
   return url
 }
 
-func fetchAppleMusicCatalogAlbums(
-  _ lookup: AppleMusicAlbumsLookup,
-  developerToken: String,
-) async throws -> [AppleMusicCatalogAlbum] {
-  guard !lookup.albumIds.isEmpty else { return [] }
-
-  var albums: [AppleMusicCatalogAlbum] = []
-  for startIndex in stride(from: 0, to: lookup.albumIds.count, by: 100) {
-    let endIndex = min(startIndex + 100, lookup.albumIds.count)
-    let batch = AppleMusicAlbumsLookup(
-      albumIds: Array(lookup.albumIds[startIndex ..< endIndex]),
-    )
-    let url = try appleMusicCatalogAlbumsURL(batch)
-    var request = URLRequest(url: url)
-    request.httpMethod = "GET"
-    request.setValue("Bearer \(developerToken)", forHTTPHeaderField: "Authorization")
-    request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-    let (data, response) = try await XHttp.data(for: request)
-    guard let httpResponse = response as? HTTPURLResponse else {
-      throw AppleMusicError.invalidResponseType
-    }
-    guard (200 ... 299).contains(httpResponse.statusCode) else {
-      throw AppleMusicError.httpError(
-        statusCode: httpResponse.statusCode,
-        body: String(data: data, encoding: .utf8) ?? "<decode err>",
-      )
-    }
-
-    try albums.append(contentsOf: decodeAppleMusicCatalogAlbumCollection(from: data))
-  }
-  return albums
-}
-
-func appleMusicCatalogAlbumsURL(_ lookup: AppleMusicAlbumsLookup) throws -> URL {
-  var components = URLComponents()
-  components.scheme = "https"
-  components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/us/albums"
-  components.queryItems = [
-    .init(name: "ids", value: lookup.albumIds.map(\.rawValue).joined(separator: ",")),
-  ]
-  guard !lookup.albumIds.isEmpty, let url = components.url else {
-    throw AppleMusicError.invalidAlbumsUrl
-  }
-  return url
-}
-
-enum AppleMusicArtistAlbumsView: String, CaseIterable, Sendable {
-  case fullAlbums = "full-albums"
-  case singles
-  case liveAlbums = "live-albums"
-  case compilationAlbums = "compilation-albums"
-
-  var requiresPrimaryArtistMatch: Bool {
-    self == .compilationAlbums
-  }
-}
-
-struct AppleMusicCatalogArtistAlbumsPage: Equatable, Sendable {
-  var albums: [AppleMusicCatalogAlbum]
-  var next: String?
-}
-
-func fetchAppleMusicCatalogArtistAlbums(
-  _ lookup: AppleMusicArtistAlbumsLookup,
-  developerToken: String,
-) async throws -> [AppleMusicCatalogAlbum] {
-  var albums: [AppleMusicCatalogAlbum] = []
-  var seenAlbumIds = Set<String>()
-
-  for view in AppleMusicArtistAlbumsView.allCases {
-    do {
-      var url: URL? = try appleMusicCatalogArtistAlbumsURL(lookup, view: view)
-      while let requestURL = url {
-        let page = try await fetchAppleMusicCatalogArtistAlbumsPage(
-          at: requestURL,
-          developerToken: developerToken,
-        )
-        for var album in page.albums {
-          guard !view.requiresPrimaryArtistMatch
-            || album.isPrimaryArtist(named: lookup.artistName)
-          else { continue }
-          guard seenAlbumIds.insert(album.id.rawValue).inserted else { continue }
-          if view == .singles {
-            album.releaseType = album.title.lowercased().hasSuffix(" - ep") ? "EP" : "Single"
-          } else if album.releaseType == nil {
-            album.releaseType = "Album"
-          }
-          albums.append(album)
-        }
-        url = try page.next.map(appleMusicCatalogURL(fromNext:))
-      }
-    } catch AppleMusicError.httpError(let statusCode, _) where statusCode == 404 {
-      continue
-    }
-  }
-
-  return albums
-}
-
-private func fetchAppleMusicCatalogArtistAlbumsPage(
-  at url: URL,
-  developerToken: String,
-) async throws -> AppleMusicCatalogArtistAlbumsPage {
-  var request = URLRequest(url: url)
-  request.httpMethod = "GET"
-  request.setValue("Bearer \(developerToken)", forHTTPHeaderField: "Authorization")
-  request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-  let (data, response) = try await XHttp.data(for: request)
-  guard let httpResponse = response as? HTTPURLResponse else {
-    throw AppleMusicError.invalidResponseType
-  }
-  guard (200 ... 299).contains(httpResponse.statusCode) else {
-    throw AppleMusicError.httpError(
-      statusCode: httpResponse.statusCode,
-      body: String(data: data, encoding: .utf8) ?? "<decode err>",
-    )
-  }
-
-  return try decodeAppleMusicCatalogArtistAlbums(from: data)
-}
-
-func appleMusicCatalogArtistAlbumsURL(
-  _ lookup: AppleMusicArtistAlbumsLookup,
-  view: AppleMusicArtistAlbumsView,
-) throws -> URL {
-  var components = URLComponents()
-  components.scheme = "https"
-  components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/us/artists/\(lookup.artistId.rawValue)/view/\(view.rawValue)"
-  components.queryItems = [
-    .init(name: "limit", value: "100"),
-  ]
-  guard let url = components.url else {
-    throw AppleMusicError.invalidArtistAlbumsUrl
-  }
-  return url
-}
-
-func fetchAppleMusicCatalogArtistTopSongs(
-  _ lookup: AppleMusicArtistTopSongsLookup,
-  developerToken: String,
-) async throws -> [AppleMusicCatalogTrack] {
-  let url = try appleMusicCatalogArtistTopSongsURL(lookup)
-  var request = URLRequest(url: url)
-  request.httpMethod = "GET"
-  request.setValue("Bearer \(developerToken)", forHTTPHeaderField: "Authorization")
-  request.setValue("application/json", forHTTPHeaderField: "Accept")
-
-  let (data, response) = try await XHttp.data(for: request)
-  guard let httpResponse = response as? HTTPURLResponse else {
-    throw AppleMusicError.invalidResponseType
-  }
-  guard (200 ... 299).contains(httpResponse.statusCode) else {
-    throw AppleMusicError.httpError(
-      statusCode: httpResponse.statusCode,
-      body: String(data: data, encoding: .utf8) ?? "<decode err>",
-    )
-  }
-
-  return try decodeAppleMusicCatalogArtistTopSongs(from: data)
-}
-
-func appleMusicCatalogArtistTopSongsURL(_ lookup: AppleMusicArtistTopSongsLookup) throws -> URL {
-  var components = URLComponents()
-  components.scheme = "https"
-  components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/us/artists/\(lookup.artistId.rawValue)/view/top-songs"
-  components.queryItems = [
-    .init(name: "limit", value: "\(max(1, min(25, lookup.limit)))"),
-  ]
-  guard let url = components.url else {
-    throw AppleMusicError.invalidArtistTopSongsUrl
-  }
-  return url
-}
-
 func appleMusicCatalogURL(fromNext next: String) throws -> URL {
   guard var components = URLComponents(string: next) else {
-    throw AppleMusicError.invalidArtistAlbumsUrl
+    throw AppleMusicError.invalidCatalogPaginationUrl
   }
   if let scheme = components.scheme, scheme.lowercased() != "https" {
-    throw AppleMusicError.invalidArtistAlbumsUrl
+    throw AppleMusicError.invalidCatalogPaginationUrl
   }
   if let host = components.host, host.lowercased() != "api.music.apple.com" {
-    throw AppleMusicError.invalidArtistAlbumsUrl
+    throw AppleMusicError.invalidCatalogPaginationUrl
   }
   guard components.user == nil, components.password == nil, components.port == nil else {
-    throw AppleMusicError.invalidArtistAlbumsUrl
+    throw AppleMusicError.invalidCatalogPaginationUrl
   }
   components.scheme = "https"
   components.host = "api.music.apple.com"
@@ -628,7 +305,7 @@ func appleMusicCatalogURL(fromNext next: String) throws -> URL {
     components.path = "/" + components.path
   }
   guard let url = components.url else {
-    throw AppleMusicError.invalidArtistAlbumsUrl
+    throw AppleMusicError.invalidCatalogPaginationUrl
   }
   return url
 }
@@ -671,16 +348,6 @@ func appleMusicCatalogAlbumURL(_ lookup: AppleMusicAlbumTracksLookup) throws -> 
   return url
 }
 
-func decodeAppleMusicCatalogAlbums(from data: Data) throws -> [AppleMusicCatalogAlbum] {
-  let response = try JSONDecoder().decode(AppleMusicCatalogSearchResponse.self, from: data)
-  return response.results?.albums?.data.map(catalogAlbum(from:)) ?? []
-}
-
-func decodeAppleMusicCatalogArtists(from data: Data) throws -> [AppleMusicCatalogArtist] {
-  let response = try JSONDecoder().decode(AppleMusicCatalogSearchResponse.self, from: data)
-  return response.results?.artists?.data.map(catalogArtist(from:)) ?? []
-}
-
 func decodeAppleMusicCatalogSearchResults(
   from data: Data,
 ) throws -> AppleMusicCatalogSearchResults {
@@ -698,39 +365,6 @@ func decodeAppleMusicCatalogSearchResults(
       : topItems,
     albums: albums,
     artists: artists,
-  )
-}
-
-func decodeAppleMusicCatalogAlbumCollection(
-  from data: Data,
-) throws -> [AppleMusicCatalogAlbum] {
-  let response = try JSONDecoder().decode(AppleMusicCatalogAlbumCollectionResponse.self, from: data)
-  return response.data.map(catalogAlbum(from:))
-}
-
-func decodeAppleMusicCatalogArtistTopSongs(from data: Data) throws
-  -> [AppleMusicCatalogTrack] {
-  let response = try JSONDecoder().decode(AppleMusicCatalogSongCollectionResponse.self, from: data)
-  return response.data.compactMap { song in
-    guard song.type == "songs", let attributes = song.attributes else { return nil }
-    return AppleMusicCatalogTrack(
-      id: .init(rawValue: song.id),
-      title: attributes.name,
-      artistName: attributes.artistName,
-      albumTitle: attributes.albumName,
-      artworkUrl: sizedAppleMusicArtworkUrl(attributes.artwork?.url),
-      durationInMillis: attributes.durationInMillis,
-    )
-  }
-}
-
-func decodeAppleMusicCatalogArtistAlbums(
-  from data: Data,
-) throws -> AppleMusicCatalogArtistAlbumsPage {
-  let response = try JSONDecoder().decode(AppleMusicCatalogAlbumCollectionResponse.self, from: data)
-  return .init(
-    albums: response.data.map(catalogAlbum(from:)),
-    next: response.next,
   )
 }
 
@@ -845,15 +479,6 @@ private func sizedAppleMusicArtworkUrl(_ url: String?) -> String? {
     .replacingOccurrences(of: "{h}", with: "600")
 }
 
-private extension AppleMusicCatalogAlbum {
-  func isPrimaryArtist(named artistName: String) -> Bool {
-    self.artistName.trimmingCharacters(in: .whitespacesAndNewlines)
-      .localizedCaseInsensitiveCompare(
-        artistName.trimmingCharacters(in: .whitespacesAndNewlines),
-      ) == .orderedSame
-  }
-}
-
 private struct AppleMusicCatalogSearchResponse: Decodable {
   var results: Results?
   var meta: Meta?
@@ -966,33 +591,6 @@ private struct AppleMusicCatalogSearchResponse: Decodable {
   }
 }
 
-private struct AppleMusicCatalogAlbumCollectionResponse: Decodable {
-  var data: [AppleMusicCatalogSearchResponse.Album]
-  var next: String?
-}
-
-private struct AppleMusicCatalogSongCollectionResponse: Decodable {
-  var data: [Song]
-
-  struct Song: Decodable {
-    var id: String
-    var type: String
-    var attributes: Attributes?
-  }
-
-  struct Attributes: Decodable {
-    var name: String
-    var artistName: String
-    var albumName: String?
-    var artwork: Artwork?
-    var durationInMillis: Int?
-  }
-
-  struct Artwork: Decodable {
-    var url: String?
-  }
-}
-
 private struct AppleMusicCatalogAlbumResponse: Decodable {
   var data: [Album]
 
@@ -1030,9 +628,7 @@ private struct AppleMusicCatalogAlbumResponse: Decodable {
 enum AppleMusicError: Error, CustomStringConvertible {
   case missingEnv(String)
   case invalidSearchUrl
-  case invalidAlbumsUrl
-  case invalidArtistAlbumsUrl
-  case invalidArtistTopSongsUrl
+  case invalidCatalogPaginationUrl
   case invalidAlbumUrl
   case invalidResponseType
   case httpError(statusCode: Int, body: String)
@@ -1043,12 +639,8 @@ enum AppleMusicError: Error, CustomStringConvertible {
       "Missing required environment variable: `\(key)`"
     case .invalidSearchUrl:
       "Invalid Apple Music search URL"
-    case .invalidAlbumsUrl:
-      "Invalid Apple Music albums URL"
-    case .invalidArtistAlbumsUrl:
-      "Invalid Apple Music artist albums URL"
-    case .invalidArtistTopSongsUrl:
-      "Invalid Apple Music artist top songs URL"
+    case .invalidCatalogPaginationUrl:
+      "Invalid Apple Music catalog pagination URL"
     case .invalidAlbumUrl:
       "Invalid Apple Music album URL"
     case .invalidResponseType:
@@ -1060,82 +652,6 @@ enum AppleMusicError: Error, CustomStringConvertible {
 }
 
 extension AppleMusicClient {
-  static let mock = Self(
-    searchAlbums: { search in
-      let term = search.term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-      let albums =
-        term.isEmpty
-          ? Self.mockAlbums
-          : Self.mockAlbums.filter {
-            $0.title.lowercased().contains(term) || $0.artistName.lowercased().contains(term)
-          }
-      return Array(albums.prefix(max(0, search.limit)))
-    },
-    searchArtists: { search in
-      let term = search.term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-      let artists =
-        term.isEmpty
-          ? Self.mockArtists
-          : Self.mockArtists.filter {
-            $0.name.lowercased().contains(term)
-              || ($0.catalogMetadata?.genreNames ?? []).contains { $0.lowercased().contains(term) }
-          }
-      return Array(artists.prefix(max(0, search.limit)))
-    },
-    searchCatalog: { search in
-      let term = search.term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-      let albums =
-        term.isEmpty
-          ? Self.mockAlbums
-          : Self.mockAlbums.filter {
-            $0.title.lowercased().contains(term) || $0.artistName.lowercased().contains(term)
-          }
-      let artists =
-        term.isEmpty
-          ? Self.mockArtists
-          : Self.mockArtists.filter {
-            $0.name.lowercased().contains(term)
-              || ($0.catalogMetadata?.genreNames ?? []).contains { $0.lowercased().contains(term) }
-          }
-      let items = artists.map(AppleMusicCatalogSearchItem.init(artist:))
-        + albums.map(AppleMusicCatalogSearchItem.init(album:))
-      return .init(
-        items: Array(items.prefix(max(0, search.limit))),
-        albums: Array(albums.prefix(max(0, search.limit))),
-        artists: Array(artists.prefix(max(0, search.limit))),
-      )
-    },
-    albums: { lookup in
-      let albumIds = Set(lookup.albumIds)
-      return Self.mockAlbums.filter { albumIds.contains($0.id) }
-    },
-    artistAlbums: { lookup in
-      Self.mockAlbums.filter { $0.isPrimaryArtist(named: lookup.artistName) }
-    },
-    artistTopSongs: { lookup in
-      let albumIds = Set(
-        Self.mockAlbums
-          .filter { $0.isPrimaryArtist(named: lookup.artistName) }
-          .map(\.id.rawValue),
-      )
-      return Array(
-        Self.mockTracksByAlbum
-          .filter { albumIds.contains($0.key) }
-          .flatMap(\.value)
-          .prefix(max(0, lookup.limit)),
-      )
-    },
-    albumTracks: { lookup in
-      Self.mockTracksByAlbum[lookup.albumId.rawValue] ?? []
-    },
-    resolveAlbum: { albumId in
-      try Self.mockResolvedAlbum(albumId)
-    },
-    resolveArtist: { artistId in
-      try Self.mockResolvedArtist(artistId)
-    },
-  )
-
   static let mockAlbums: [AppleMusicCatalogAlbum] = [
     .init(
       id: "1511628001",

@@ -5,7 +5,6 @@ public struct AlbumDetailView: View {
   private let rows: [AlbumDetailTrackRow]
   private let isPlaying: Bool
   private let isLoading: Bool
-  private let isLoadingTracks: Bool
   private let currentTrackID: String?
   private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
@@ -21,7 +20,6 @@ public struct AlbumDetailView: View {
     tracks: [TrackData],
     isPlaying: Bool = false,
     isLoading: Bool = false,
-    isLoadingTracks: Bool = false,
     currentTrackID: String? = nil,
     onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
@@ -35,7 +33,6 @@ public struct AlbumDetailView: View {
     self.album = album
     self.isPlaying = isPlaying
     self.isLoading = isLoading
-    self.isLoadingTracks = isLoadingTracks
     self.currentTrackID = currentTrackID
     self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
@@ -76,15 +73,13 @@ public struct AlbumDetailView: View {
           .listRowBackground(Color.clear)
 
         if self.rows.isEmpty {
-          AlbumDetailEmptyTracksView(
-            isLoading: self.isLoadingTracks,
-          )
-          .frame(maxWidth: 600)
-          .frame(maxWidth: .infinity)
-          .padding(.horizontal, 20)
-          .listRowInsets(EdgeInsets())
-          .listRowSeparator(.hidden)
-          .listRowBackground(Color.clear)
+          AlbumDetailEmptyTracksView()
+            .frame(maxWidth: 600)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 20)
+            .listRowInsets(EdgeInsets())
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
         } else {
           ForEach(self.rows) { row in
             AlbumDetailTrackRowView(
@@ -263,13 +258,11 @@ public struct AlbumDetailView: View {
     }
   }
 
-  #Preview("Album detail loading tracks") {
+  #Preview("Album detail empty") {
     NavigationStack {
       AlbumDetailView(
         album: [AlbumData].previewAlbums[0],
         tracks: [],
-        isLoading: true,
-        isLoadingTracks: true,
       )
     }
   }

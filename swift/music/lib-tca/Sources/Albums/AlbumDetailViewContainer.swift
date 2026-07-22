@@ -13,8 +13,7 @@ struct AlbumDetailViewContainer: View {
           TrackData(track: $0)
         },
         isPlaying: self.store.isPlaying,
-        isLoading: self.store.isLoading || self.store.isLoadingTracks,
-        isLoadingTracks: self.store.isLoadingTracks,
+        isLoading: self.store.isLoading,
         currentTrackID: self.store.currentTrackID?.rawValue,
         onAddToPlaylist: { self.store.send(.addToPlaylistTapped) },
         onAddToQueue: { self.store.send(.addToQueueTapped) },
@@ -41,8 +40,5 @@ struct AlbumDetailViewContainer: View {
       }
     }
     .animation(.snappy(duration: 0.22), value: self.store.playbackFailure)
-    .task(id: self.store.album.id) {
-      _ = self.store.send(.onAppear)
-    }
   }
 }
