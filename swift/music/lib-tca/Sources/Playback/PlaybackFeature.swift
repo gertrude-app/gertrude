@@ -23,6 +23,7 @@ struct PlaybackProgress: Codable, Equatable, Sendable {
 }
 
 enum PlaybackFailure: Equatable, Sendable {
+  case appleMusicSignInRequired
   case appleMusicSubscriptionRequired
   case catalogLookupFailed
   case musicAccessDenied
@@ -33,6 +34,8 @@ enum PlaybackFailure: Equatable, Sendable {
 
   init(error: any Error) {
     switch error as? PlaybackClientError {
+    case .appleMusicSignInRequired:
+      self = .appleMusicSignInRequired
     case .appleMusicSubscriptionRequired:
       self = .appleMusicSubscriptionRequired
     case .catalogLookupFailed:
@@ -56,13 +59,36 @@ enum PlaybackFailure: Equatable, Sendable {
     switch self {
     case .musicAccessDenied, .musicAccessRestricted:
       true
-    case .appleMusicSubscriptionRequired,
+    case .appleMusicSignInRequired,
+         .appleMusicSubscriptionRequired,
          .catalogLookupFailed,
          .playbackFailed,
          .privacyAcknowledgementRequired,
          .trackUnavailable:
       false
     }
+  }
+}
+
+struct PlaybackFailureReport: Equatable, Sendable {
+  var failure: PlaybackFailure
+  var diagnostic: PlaybackDiagnostic?
+
+  init(failure: PlaybackFailure, diagnostic: PlaybackDiagnostic? = nil) {
+    self.failure = failure
+    self.diagnostic = diagnostic
+  }
+
+  init(error: any Error) {
+    self.failure = PlaybackFailure(error: error)
+    self.diagnostic = (error as? PlaybackClientError)?.diagnostic
+  }
+
+  var logDetail: String {
+    guard let logDetail = self.diagnostic?.logDetail, !logDetail.isEmpty else {
+      return "\(self.failure)"
+    }
+    return "\(self.failure) \(logDetail)"
   }
 }
 
@@ -199,7 +225,7 @@ struct PlaybackFeature: Sendable {
     case playNow(items: [PlaybackItem], startIndex: Int)
     case playNowFinished(PlaybackSnapshot)
     case playbackEvent(PlaybackEvent)
-    case playbackFailed(PlaybackFailure)
+    case playbackFailed(PlaybackFailureReport)
     case playbackFailureActionTapped
     case playbackFailureDismissed
     case queueEntryRemoveRequested(PlaybackQueueEntry.ID)
@@ -502,7 +528,8 @@ struct PlaybackFeature: Sendable {
           },
         )
 
-      case .playbackFailed(let failure):
+      case .playbackFailed(let report):
+        let failure = report.failure
         state.failure = failure
         state.pendingPlayNowItems = nil
         state.pendingPlaylistSourcePlan = nil
@@ -511,7 +538,7 @@ struct PlaybackFeature: Sendable {
           failure.eventLevel,
           failure.eventDomain,
           failure.eventId,
-          detail: "\(failure)",
+          detail: report.logDetail,
         )
         return .none
 

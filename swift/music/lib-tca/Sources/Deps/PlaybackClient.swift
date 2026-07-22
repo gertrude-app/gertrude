@@ -261,10 +261,11 @@ extension PlaybackClient {
         case .notDetermined:
           throw PlaybackClientError.musicAccessDenied
         @unknown default:
-          throw PlaybackClientError.playbackFailed
+          throw PlaybackClientError
+            .playbackFailed(.init(summary: "unknown authorization request status"))
         }
       @unknown default:
-        throw PlaybackClientError.playbackFailed
+        throw PlaybackClientError.playbackFailed(.init(summary: "unknown authorization status"))
       }
     }
 
@@ -349,8 +350,10 @@ extension PlaybackClient {
         return self.playbackSnapshot(for: ApplicationMusicPlayer.shared)
       } catch is CancellationError {
         throw CancellationError()
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(error, fallback: PlaybackClientError.playbackFailed)
       } catch {
-        throw PlaybackClientError.playbackFailed
+        throw PlaybackClientError.playbackFailed(.init(unexpected: error))
       }
     }
 
@@ -371,13 +374,18 @@ extension PlaybackClient {
         if error.status == 404 {
           throw PlaybackClientError.trackUnavailable
         }
-        throw PlaybackClientError.catalogLookupFailed
+        throw PlaybackClientError.catalogLookupFailed(.init(error))
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(
+          error,
+          fallback: PlaybackClientError.catalogLookupFailed,
+        )
       } catch let error as PlaybackClientError {
         throw error
       } catch is CancellationError {
         throw CancellationError()
       } catch {
-        throw PlaybackClientError.catalogLookupFailed
+        throw PlaybackClientError.catalogLookupFailed(.init(unexpected: error))
       }
     }
 
@@ -413,8 +421,10 @@ extension PlaybackClient {
         return self.playbackSnapshot(for: player)
       } catch is CancellationError {
         throw CancellationError()
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(error, fallback: PlaybackClientError.playbackFailed)
       } catch {
-        throw PlaybackClientError.playbackFailed
+        throw PlaybackClientError.playbackFailed(.init(unexpected: error))
       }
     }
 
@@ -504,7 +514,7 @@ extension PlaybackClient {
         }
         guard player.queue.entries.count == songs.count,
               player.queue.currentEntry != nil else {
-          throw PlaybackClientError.playbackFailed
+          throw PlaybackClientError.playbackFailed(.init(summary: "checkpoint queue incomplete"))
         }
         player.pause()
         player.playbackTime = restoredQueue.currentItemWasAvailable
@@ -514,8 +524,10 @@ extension PlaybackClient {
         throw CancellationError()
       } catch let error as PlaybackClientError {
         throw error
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(error, fallback: PlaybackClientError.playbackFailed)
       } catch {
-        throw PlaybackClientError.playbackFailed
+        throw PlaybackClientError.playbackFailed(.init(unexpected: error))
       }
     }
 
@@ -698,8 +710,10 @@ extension PlaybackClient {
     private static func resumePlayback() async throws {
       do {
         try await ApplicationMusicPlayer.shared.play()
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(error, fallback: PlaybackClientError.playbackFailed)
       } catch {
-        throw PlaybackClientError.playbackFailed
+        throw PlaybackClientError.playbackFailed(.init(unexpected: error))
       }
     }
 
@@ -788,13 +802,18 @@ extension PlaybackClient {
         if error.status == 404 {
           throw PlaybackClientError.trackUnavailable
         }
-        throw PlaybackClientError.catalogLookupFailed
+        throw PlaybackClientError.catalogLookupFailed(.init(error))
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(
+          error,
+          fallback: PlaybackClientError.catalogLookupFailed,
+        )
       } catch let error as PlaybackClientError {
         throw error
       } catch is CancellationError {
         throw CancellationError()
       } catch {
-        throw PlaybackClientError.catalogLookupFailed
+        throw PlaybackClientError.catalogLookupFailed(.init(unexpected: error))
       }
     }
 
@@ -818,13 +837,18 @@ extension PlaybackClient {
         if error.status == 404 {
           throw PlaybackClientError.trackUnavailable
         }
-        throw PlaybackClientError.catalogLookupFailed
+        throw PlaybackClientError.catalogLookupFailed(.init(error))
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(
+          error,
+          fallback: PlaybackClientError.catalogLookupFailed,
+        )
       } catch let error as PlaybackClientError {
         throw error
       } catch is CancellationError {
         throw CancellationError()
       } catch {
-        throw PlaybackClientError.catalogLookupFailed
+        throw PlaybackClientError.catalogLookupFailed(.init(unexpected: error))
       }
     }
   #endif
@@ -1176,11 +1200,90 @@ private actor SimulatorPlaybackState {
 }
 
 enum PlaybackClientError: Error, Equatable, Sendable {
+  case appleMusicSignInRequired(PlaybackDiagnostic?)
   case appleMusicSubscriptionRequired
-  case catalogLookupFailed
+  case catalogLookupFailed(PlaybackDiagnostic?)
   case musicAccessDenied
   case musicAccessRestricted
-  case playbackFailed
+  case playbackFailed(PlaybackDiagnostic?)
   case privacyAcknowledgementRequired
   case trackUnavailable
+
+  var diagnostic: PlaybackDiagnostic? {
+    switch self {
+    case .appleMusicSignInRequired(let diagnostic),
+         .catalogLookupFailed(let diagnostic),
+         .playbackFailed(let diagnostic):
+      diagnostic
+    case .appleMusicSubscriptionRequired,
+         .musicAccessDenied,
+         .musicAccessRestricted,
+         .privacyAcknowledgementRequired,
+         .trackUnavailable:
+      nil
+    }
+  }
 }
+
+struct PlaybackDiagnostic: Equatable, Sendable {
+  var status: Int?
+  var code: Int?
+  var summary: String?
+
+  var logDetail: String {
+    var parts: [String] = []
+    if let status = self.status { parts.append("status=\(status)") }
+    if let code = self.code { parts.append("code=\(code)") }
+    if let summary = self.summary, !summary.isEmpty { parts.append(summary) }
+    return parts.joined(separator: " ")
+  }
+}
+
+#if canImport(MusicKit)
+  extension PlaybackDiagnostic {
+    init(_ error: MusicDataRequest.Error) {
+      self.init(
+        status: error.status,
+        code: error.code,
+        summary: [error.title, error.detailText]
+          .compactMap(\.self)
+          .filter { !$0.isEmpty }
+          .joined(separator: ": "),
+      )
+    }
+
+    init(unexpected error: any Error) {
+      self.init(
+        status: nil,
+        code: nil,
+        summary: "\(type(of: error)): \(error.localizedDescription)",
+      )
+    }
+  }
+
+  extension PlaybackClientError {
+    static func tokenRequest(
+      _ error: MusicTokenRequestError,
+      fallback: (PlaybackDiagnostic?) -> PlaybackClientError,
+    ) -> PlaybackClientError {
+      switch error {
+      case .permissionDenied:
+        .musicAccessDenied
+      case .privacyAcknowledgementRequired:
+        .privacyAcknowledgementRequired
+      case .userNotSignedIn:
+        .appleMusicSignInRequired(.init(summary: "tokenRequest.userNotSignedIn"))
+      case .userTokenRevoked:
+        .appleMusicSignInRequired(.init(summary: "tokenRequest.userTokenRevoked"))
+      case .developerTokenRequestFailed:
+        fallback(.init(summary: "tokenRequest.developerTokenRequestFailed"))
+      case .userTokenRequestFailed:
+        fallback(.init(summary: "tokenRequest.userTokenRequestFailed"))
+      case .unknown:
+        fallback(.init(summary: "tokenRequest.unknown"))
+      @unknown default:
+        fallback(.init(summary: "tokenRequest.unrecognized"))
+      }
+    }
+  }
+#endif
