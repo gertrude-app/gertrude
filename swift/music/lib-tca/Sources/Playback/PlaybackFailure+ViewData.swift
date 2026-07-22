@@ -3,6 +3,7 @@ import GertieApp
 extension PlaybackFailure {
   var eventId: String {
     switch self {
+    case .appleMusicSignInRequired: "0e6f42ff"
     case .appleMusicSubscriptionRequired: "18378ebc"
     case .catalogLookupFailed: "37358a04"
     case .musicAccessDenied: "9791174c"
@@ -15,7 +16,8 @@ extension PlaybackFailure {
 
   var eventLevel: EventLevel {
     switch self {
-    case .appleMusicSubscriptionRequired:
+    case .appleMusicSignInRequired,
+         .appleMusicSubscriptionRequired:
       .warn
     case .catalogLookupFailed,
          .musicAccessDenied,
@@ -32,7 +34,8 @@ extension PlaybackFailure {
     switch self {
     case .appleMusicSubscriptionRequired:
       .subs
-    case .catalogLookupFailed,
+    case .appleMusicSignInRequired,
+         .catalogLookupFailed,
          .musicAccessDenied,
          .musicAccessRestricted,
          .playbackFailed,
@@ -44,6 +47,8 @@ extension PlaybackFailure {
 
   var title: String {
     switch self {
+    case .appleMusicSignInRequired:
+      "Sign in to Apple Music"
     case .appleMusicSubscriptionRequired:
       "Apple Music subscription required"
     case .catalogLookupFailed:
@@ -63,6 +68,8 @@ extension PlaybackFailure {
 
   var message: String {
     switch self {
+    case .appleMusicSignInRequired:
+      "This device isn’t signed in to Apple Music. Sign in from the Settings app, then try again."
     case .appleMusicSubscriptionRequired:
       "This device needs an active Apple Music subscription to play approved music."
     case .catalogLookupFailed:
@@ -82,6 +89,8 @@ extension PlaybackFailure {
 
   var systemImage: String {
     switch self {
+    case .appleMusicSignInRequired:
+      "person.crop.circle.badge.questionmark"
     case .appleMusicSubscriptionRequired:
       "person.crop.circle.badge.exclamationmark"
     case .catalogLookupFailed:
@@ -103,7 +112,8 @@ extension PlaybackFailure {
     switch self {
     case .musicAccessDenied, .musicAccessRestricted:
       "Open Settings"
-    case .appleMusicSubscriptionRequired,
+    case .appleMusicSignInRequired,
+         .appleMusicSubscriptionRequired,
          .catalogLookupFailed,
          .playbackFailed,
          .privacyAcknowledgementRequired,

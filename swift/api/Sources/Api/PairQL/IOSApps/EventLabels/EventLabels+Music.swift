@@ -35,6 +35,7 @@ extension EventLabel {
     case "f357b375": "Playback failed"
     case "21a860f7": "Playback: Apple Music setup needed"
     case "e1423c41": "Playback: track unavailable"
+    case "0e6f42ff": "Playback: Apple Music sign-in required"
     default: nil
     }
   }

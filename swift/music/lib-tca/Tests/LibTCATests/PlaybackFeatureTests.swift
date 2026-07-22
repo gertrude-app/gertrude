@@ -906,11 +906,53 @@ struct PlaybackFeatureTests {
       $0.pendingPlayNowItems = [item]
       $0.session = .init(playStatus: .loading, currentItem: item)
     }
-    await store.receive(.playbackFailed(.musicAccessDenied)) {
+    await store.receive(.playbackFailed(.init(failure: .musicAccessDenied))) {
       $0.failure = .musicAccessDenied
       $0.pendingPlayNowItems = nil
       $0.session?.playStatus = .paused
     }
+  }
+
+  @Test
+  func revokedUserTokenSurfacesSignInRequiredWithPreservedDiagnostic() async {
+    let diagnostic = PlaybackDiagnostic(summary: "tokenRequest.userTokenRevoked")
+    let store = TestStore(initialState: .init()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.playNow = { _, _ in
+        throw PlaybackClientError.appleMusicSignInRequired(diagnostic)
+      }
+    }
+
+    let item = playbackItem("track-1")
+
+    await store.send(.playNow(items: [item], startIndex: 0)) {
+      $0.pendingPlayNowItems = [item]
+      $0.session = .init(playStatus: .loading, currentItem: item)
+    }
+    await store.receive(
+      .playbackFailed(.init(failure: .appleMusicSignInRequired, diagnostic: diagnostic)),
+    ) {
+      $0.failure = .appleMusicSignInRequired
+      $0.pendingPlayNowItems = nil
+      $0.session?.playStatus = .paused
+    }
+  }
+
+  @Test
+  func signInRequiredLogDetailDistinguishesUnderlyingTokenError() {
+    let notSignedIn = PlaybackFailureReport(
+      failure: .appleMusicSignInRequired,
+      diagnostic: .init(summary: "tokenRequest.userNotSignedIn"),
+    )
+    let revoked = PlaybackFailureReport(
+      failure: .appleMusicSignInRequired,
+      diagnostic: .init(summary: "tokenRequest.userTokenRevoked"),
+    )
+
+    #expect(notSignedIn.logDetail == "appleMusicSignInRequired tokenRequest.userNotSignedIn")
+    #expect(revoked.logDetail == "appleMusicSignInRequired tokenRequest.userTokenRevoked")
+    #expect(notSignedIn.failure.eventId == revoked.failure.eventId) // same event, different detail
   }
 
   @Test
