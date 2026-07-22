@@ -4,6 +4,36 @@ import Tagged
 extension Music {
   typealias ArtistId = Tagged<(Music, artistId: ()), String>
 
+  @DuetModel(schema: "music", table: "approved_artists")
+  struct ApprovedArtist: Codable, Sendable {
+    var id: Id
+    var childId: Child.Id
+    var appleMusicArtistId: ArtistId
+    var name: String
+    var catalogMetadata: CatalogMetadata?
+    var resolution: ResolvedArtist?
+    var resolvedAt: Date?
+    var createdAt = Date()
+
+    init(
+      id: Id = .init(),
+      childId: Child.Id,
+      appleMusicArtistId: ArtistId,
+      name: String,
+      catalogMetadata: CatalogMetadata? = nil,
+      resolution: ResolvedArtist? = nil,
+      resolvedAt: Date? = nil,
+    ) {
+      self.id = id
+      self.childId = childId
+      self.appleMusicArtistId = appleMusicArtistId
+      self.name = name
+      self.catalogMetadata = catalogMetadata
+      self.resolution = resolution
+      self.resolvedAt = resolvedAt
+    }
+  }
+
   struct CatalogMetadata: Codable, Equatable, Sendable {
     var artwork: Artwork?
     var editorialNotes: EditorialNotes?
@@ -70,36 +100,6 @@ extension Music {
       self.short = short
       self.standard = standard
       self.name = name
-    }
-  }
-
-  @DuetModel(schema: "music", table: "approved_artists")
-  struct ApprovedArtist: Codable, Sendable {
-    var id: Id
-    var childId: Child.Id
-    var appleMusicArtistId: ArtistId
-    var name: String
-    var catalogMetadata: CatalogMetadata?
-    var resolution: ResolvedArtist?
-    var resolvedAt: Date?
-    var createdAt = Date()
-
-    init(
-      id: Id = .init(),
-      childId: Child.Id,
-      appleMusicArtistId: ArtistId,
-      name: String,
-      catalogMetadata: CatalogMetadata? = nil,
-      resolution: ResolvedArtist? = nil,
-      resolvedAt: Date? = nil,
-    ) {
-      self.id = id
-      self.childId = childId
-      self.appleMusicArtistId = appleMusicArtistId
-      self.name = name
-      self.catalogMetadata = catalogMetadata
-      self.resolution = resolution
-      self.resolvedAt = resolvedAt
     }
   }
 }

@@ -113,10 +113,7 @@ extension Configure {
     app.migrations.add(BlockerProfileSettings())
     app.migrations.add(MediumTier())
     app.migrations.add(AddParentAccountSiteBeta())
-    app.migrations.add(CreateMusicApprovedArtists())
-    app.migrations.add(AddMusicApprovedAlbumArtwork())
-    app.migrations.add(AddMusicCatalogFoundation())
-    app.migrations.add(CreateMusicPlaylists())
+    app.migrations.add(ExpandMusicLibrary())
   }
 }
 

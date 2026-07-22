@@ -8,9 +8,9 @@ extension Music {
       in db: any DuetSQL.Client,
     ) async throws {
       try await db.execute(raw: """
-        SELECT id
-        FROM parent.children
-        WHERE id = '\(uuid: childId.rawValue)'
+        SELECT \(col: Child.columnName(.id))
+        FROM \(table: Child.self)
+        WHERE \(col: Child.columnName(.id)) = '\(id: childId)'
         FOR UPDATE;
       """)
     }
