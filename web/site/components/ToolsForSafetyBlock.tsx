@@ -1,9 +1,10 @@
 'use client';
 
 import cx from 'classnames';
-import { LaptopIcon, MusicIcon, PodcastIcon, TabletSmartphoneIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useScrollY } from '../lib/hooks';
+
+const GROUP_REVEAL_DELAY = 850;
 
 const initialPhrases = [
   `internet safety.`,
@@ -63,14 +64,6 @@ const ToolsForSafetyBlock: React.FC = () => {
         className="absolute inset-0 bg-gradient-to-b from-white to-fuchsia-600 pointer-events-none"
         style={{ opacity: scrollProgress * 0.7 }}
       />
-      <svg width="0" height="0" style={{ position: `absolute` }}>
-        <defs>
-          <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style={{ stopColor: `#a855f7`, stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: `#d946ef`, stopOpacity: 1 }} />
-          </linearGradient>
-        </defs>
-      </svg>
       <div
         className="flex flex-col items-center w-full"
         style={{
@@ -93,40 +86,53 @@ const ToolsForSafetyBlock: React.FC = () => {
           </h1>
         </div>
 
-        <div className="mt-12 xs:mt-16 md:mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 xs:gap-8 lg:gap-6 xl:gap-8 w-full max-w-6xl justify-items-center sm:justify-items-stretch">
-          <ProductCard
-            icon={TabletSmartphoneIcon}
-            label="iPhone & iPad"
-            description="Plug holes in Screen Time, including #images GIF search"
-            delay={500}
-            href="#ios"
-          />
-          <ProductCard
-            icon={LaptopIcon}
-            label="Mac"
-            description="Comprehensive web filtering and screenshot monitoring"
-            delay={700}
-            href="#mac"
-          />
-          <ProductCard
-            icon={PodcastIcon}
-            label="Podcasts"
-            description="Parent-managed podcasts protected by PIN code"
-            delay={900}
-            href="#podcasts"
-          />
-          <ProductCard
-            icon={MusicIcon}
-            label="Music"
-            description="Only approved music, nothing else"
-            delay={1100}
-            comingSoon
-          />
+        <div className="mt-12 grid w-full max-w-6xl grid-cols-1 gap-10 xs:mt-14 md:mt-16 lg:grid-cols-2 lg:gap-0">
+          <ProductGroup
+            title="Powerful protection & accountability"
+            revealDelay={GROUP_REVEAL_DELAY}
+            className="lg:pr-10 xl:pr-12"
+          >
+            <ProductCard
+              iconSrc="/app-icons/gertrude.webp"
+              label="iPhone & iPad"
+              description="Plug holes in Screen Time, including #images GIF search"
+              delay={150}
+              href="#ios"
+            />
+            <ProductCard
+              iconSrc="/app-icons/gertrude.webp"
+              label="Mac"
+              description="Comprehensive web filtering and screenshot monitoring"
+              delay={250}
+              href="#mac"
+            />
+          </ProductGroup>
+          <ProductGroup
+            title="Truly safe, parent-curated media"
+            revealDelay={GROUP_REVEAL_DELAY}
+            divider
+            className="lg:pl-10 xl:pl-12"
+          >
+            <ProductCard
+              iconSrc="/app-icons/music.webp"
+              label="Music"
+              description="Only approved music, nothing else"
+              delay={350}
+              href="#music"
+            />
+            <ProductCard
+              iconSrc="/app-icons/podcasts.webp"
+              label="Podcasts"
+              description="Parent-managed podcasts protected by PIN code"
+              delay={450}
+              href="#podcasts"
+            />
+          </ProductGroup>
         </div>
 
         <p
-          className="mt-24 xs:mt-28 max-w-xl px-8 xs:px-10 sm:px-0 text-center text-slate-500 text-xs xs:text-sm md:text-base leading-snug antialiased animate-fadeIn opacity-0"
-          style={{ animationDelay: `1300ms`, animationFillMode: `forwards` }}
+          className="mt-16 max-w-xl px-8 text-center text-xs leading-snug text-slate-500 opacity-0 antialiased animate-fadeIn xs:mt-20 xs:px-10 xs:text-sm sm:px-0 md:text-base"
+          style={{ animationDelay: `950ms`, animationFillMode: `forwards` }}
         >
           iPhone, iPad, and Mac all connect to{` `}
           <span className="font-semibold text-fuchsia-600">one Gertrude account</span>
@@ -137,47 +143,61 @@ const ToolsForSafetyBlock: React.FC = () => {
   );
 };
 
+const ProductGroup: React.FC<{
+  title: string;
+  revealDelay: number;
+  divider?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}> = ({ title, revealDelay, divider = false, className, children }) => (
+  <section className={cx(`relative`, className)}>
+    {divider && (
+      <span
+        className="absolute -left-px top-0 hidden h-full w-px bg-fuchsia-200/70 opacity-0 animate-fade-in lg:block"
+        style={{ animationDelay: `${revealDelay}ms` }}
+      />
+    )}
+    <h2
+      className="mb-6 text-center text-sm font-medium text-slate-500 opacity-0 animate-fade-in xs:text-base md:text-lg"
+      style={{ animationDelay: `${revealDelay}ms` }}
+    >
+      {title}
+    </h2>
+    <div className="grid grid-cols-1 gap-5 xs:gap-6 sm:grid-cols-2 sm:gap-8 lg:gap-6 xl:gap-8">
+      {children}
+    </div>
+  </section>
+);
+
 interface ProductCardProps {
-  icon: React.ComponentType<{ className?: string }>;
+  iconSrc: string;
   label: string;
   description: string;
   delay: number;
   href?: string;
-  comingSoon?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
-  icon: Icon,
+  iconSrc,
   label,
   description,
   delay,
   href,
-  comingSoon = false,
 }) => {
   const isDisabled = !href;
   const content = (
     <>
-      <div
+      <img
+        src={iconSrc}
+        alt=""
+        width={400}
+        height={400}
         className={cx(
-          `relative shrink-0 bg-white/80 backdrop-blur-sm rounded-2xl xs:rounded-3xl p-4 xs:p-6 md:p-8 sm:mb-4 md:mb-6 border border-fuchsia-200 shadow-lg shadow-fuchsia-100`,
-          !isDisabled &&
-            `transition-all duration-300 group-hover:scale-105 group-hover:border-fuchsia-400 group-hover:shadow-xl group-hover:shadow-fuchsia-200`,
-          isDisabled && `border-violet-200 shadow-violet-100`,
+          `size-[4.5rem] shrink-0 object-contain drop-shadow-[0_12px_24px_rgba(126,34,206,0.2)] xs:size-24 sm:mb-4 sm:size-[5.5rem] md:mb-6 md:size-32`,
+          !isDisabled && `transition-transform duration-300 group-hover:scale-105`,
+          isDisabled && `opacity-60 grayscale`,
         )}
-      >
-        {comingSoon && (
-          <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-white shadow-lg shadow-fuchsia-300/40 xs:px-3 xs:text-[10px]">
-            Coming soon!
-          </div>
-        )}
-        <Icon
-          className={cx(
-            `size-10 xs:size-12 sm:size-10 md:size-16 [&_*]:stroke-[url(#icon-gradient)] [&_circle]:fill-[url(#icon-gradient)]`,
-            !isDisabled && `transition-transform duration-300 group-hover:scale-110`,
-            isDisabled && `opacity-60 grayscale`,
-          )}
-        />
-      </div>
+      />
       <div>
         <h3
           className={cx(
@@ -216,7 +236,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     <a
       href={href}
       onClick={(e) => {
-        const target = document.querySelector(href);
+        const target = href.startsWith(`#`) ? document.querySelector(href) : null;
         if (target) {
           e.preventDefault();
           target.scrollIntoView({ behavior: `smooth` });
