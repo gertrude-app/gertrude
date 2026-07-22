@@ -6,7 +6,7 @@ import XExpect
 @testable import Api
 
 final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
-  func testBackfillsLegacyGrantsPreservesIdentityAndIsRerunnable() async throws {
+  func testBackfillsLegacyAlbumGrantsPreservesIdentityAndIsRerunnable() async throws {
     let child = try await self.child()
     var album = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
@@ -14,17 +14,9 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
       title: "Legacy Album",
       artistName: "Legacy Artist",
     ))
-    var artist = try await self.db.create(Music.ApprovedArtist(
-      childId: child.id,
-      appleMusicArtistId: "artist-1",
-      name: "Legacy Artist",
-    ))
     try await album.modifyCreatedAt(.exact(.reference - 200))
-    try await artist.modifyCreatedAt(.exact(.reference - 100))
     album = try await self.db.find(album.id)
-    artist = try await self.db.find(artist.id)
     let resolvedAlbum = backfillAlbum(id: album.appleMusicAlbumId)
-    let resolvedArtist = backfillArtist(id: artist.appleMusicArtistId)
     let emptyPlaylist = try await self.db.create(Music.Playlist(
       childId: child.id,
       name: "Empty",
@@ -56,12 +48,10 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
       $0.db = self.db
       $0.date.now = .reference
       $0.appleMusic.resolveAlbum = { _ in resolvedAlbum }
-      $0.appleMusic.resolveArtist = { _ in resolvedArtist }
     } operation: {
       try await MusicCatalogBackfillCommand().exec(childIds: [child.id])
     }
     let reloadedAlbum = try await self.db.find(album.id)
-    let reloadedArtist = try await self.db.find(artist.id)
     let firstSnapshot = try await Music.LibrarySnapshotRepository.snapshot(
       for: child.id,
       in: self.db,
@@ -69,19 +59,14 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
 
     expect(firstReport).toEqual(.init(
       resolvedAlbums: 1,
-      resolvedArtists: 1,
       publishedChildren: 1,
       unresolvedAlbums: 0,
-      unresolvedArtists: 0,
       unpublishedChildren: 0,
     ))
     expect(reloadedAlbum.id).toEqual(album.id)
     expect(reloadedAlbum.createdAt).toEqual(album.createdAt)
     expect(reloadedAlbum.resolution).toEqual(resolvedAlbum)
-    expect(reloadedArtist.id).toEqual(artist.id)
-    expect(reloadedArtist.createdAt).toEqual(artist.createdAt)
-    expect(reloadedArtist.resolution).toEqual(resolvedArtist)
-    expect(firstSnapshot?.payload.albums.map(\.id)).toEqual(["album-1", "artist-album"])
+    expect(firstSnapshot?.payload.albums.map(\.id)).toEqual(["album-1"])
     expect(firstSnapshot?.payload.playlists.map(\.id)).toEqual([
       emptyPlaylist.id.rawValue,
       populatedPlaylist.id.rawValue,
@@ -103,10 +88,6 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
         XCTFail("resolved album should not be fetched again")
         return resolvedAlbum
       }
-      $0.appleMusic.resolveArtist = { _ in
-        XCTFail("resolved artist should not be fetched again")
-        return resolvedArtist
-      }
     } operation: {
       try await MusicCatalogBackfillCommand().exec(childIds: [child.id])
     }
@@ -116,9 +97,7 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(secondReport.resolvedAlbums).toEqual(0)
-    expect(secondReport.resolvedArtists).toEqual(0)
     expect(secondReport.unresolvedAlbums).toEqual(0)
-    expect(secondReport.unresolvedArtists).toEqual(0)
     expect(secondReport.unpublishedChildren).toEqual(0)
     expect(secondSnapshot?.revision).toEqual(firstSnapshot?.revision)
     expect(secondSnapshot?.createdAt).toEqual(firstSnapshot?.createdAt)
@@ -133,18 +112,11 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
       title: "Legacy",
       artistName: "Legacy",
     ))
-    _ = try await self.db.create(Music.ApprovedArtist(
-      childId: child.id,
-      appleMusicArtistId: "artist-1",
-      name: "Legacy",
-    ))
-
     do {
       _ = try await withDependencies {
         $0.db = self.db
         $0.date.now = .reference
-        $0.appleMusic.resolveAlbum = { _ in backfillAlbum(id: "album-1") }
-        $0.appleMusic.resolveArtist = { _ in throw BackfillTestError.unavailable }
+        $0.appleMusic.resolveAlbum = { _ in throw BackfillTestError.unavailable }
       } operation: {
         try await MusicCatalogBackfillCommand().exec(childIds: [child.id])
       }
@@ -152,8 +124,7 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
     } catch let error as MusicCatalogBackfillCommand.BackfillError {
       switch error {
       case .incomplete(let report):
-        expect(report.unresolvedAlbums).toEqual(0)
-        expect(report.unresolvedArtists).toEqual(1)
+        expect(report.unresolvedAlbums).toEqual(1)
         expect(report.unpublishedChildren).toEqual(1)
       }
     }
@@ -168,15 +139,6 @@ final class MusicCatalogBackfillCommandTests: ApiTestCase, @unchecked Sendable {
 
 private enum BackfillTestError: Error {
   case unavailable
-}
-
-private func backfillArtist(id: Music.ArtistId) -> Music.ResolvedArtist {
-  .init(
-    id: id,
-    name: "Trusted Artist",
-    topSongs: [],
-    albums: [backfillAlbum(id: "artist-album")],
-  )
 }
 
 private func backfillAlbum(id: Music.AlbumId) -> Music.ResolvedAlbum {

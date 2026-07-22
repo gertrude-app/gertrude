@@ -16,13 +16,27 @@ final class AppleMusicResolutionTests: XCTestCase {
   }
 
   func testResolutionURLsRequestRequiredRelationships() throws {
-    let albumURL = try appleMusicCatalogAlbumResolutionURL(["album-1"])
-    let albumComponents = try XCTUnwrap(
-      URLComponents(url: albumURL, resolvingAgainstBaseURL: false),
+    let directAlbumURL = try appleMusicCatalogAlbumResolutionURL(
+      ["album-1"],
+      requiringArtistRelationship: false,
     )
-    expect(albumComponents.queryItems?.first { $0.name == "include" }?.value)
+    let directAlbumComponents = try XCTUnwrap(
+      URLComponents(url: directAlbumURL, resolvingAgainstBaseURL: false),
+    )
+    expect(directAlbumComponents.queryItems?.first { $0.name == "include" }?.value)
+      .toEqual("tracks")
+    expect(directAlbumComponents.queryItems?.map(\.name)).toEqual(["ids", "include"])
+
+    let artistAlbumURL = try appleMusicCatalogAlbumResolutionURL(
+      ["album-1"],
+      requiringArtistRelationship: true,
+    )
+    let artistAlbumComponents = try XCTUnwrap(
+      URLComponents(url: artistAlbumURL, resolvingAgainstBaseURL: false),
+    )
+    expect(artistAlbumComponents.queryItems?.first { $0.name == "include" }?.value)
       .toEqual("artists,tracks")
-    expect(albumComponents.queryItems?.map(\.name)).toEqual(["ids", "include"])
+    expect(artistAlbumComponents.queryItems?.map(\.name)).toEqual(["ids", "include"])
 
     let songsURL = try appleMusicCatalogSongsURL(["song-1"])
     let songComponents = try XCTUnwrap(
@@ -41,7 +55,7 @@ final class AppleMusicResolutionTests: XCTestCase {
           albumJson(
             id: "album-1",
             title: "Album",
-            artistIds: ["artist-1", "artist-2"],
+            artistIds: nil,
             tracks: [
               songJson(id: "song-1", title: "First", artistName: "Artist"),
               songJson(id: "video-1", title: "Video", artistName: "Artist", type: "music-videos"),
@@ -68,7 +82,7 @@ final class AppleMusicResolutionTests: XCTestCase {
     )
 
     expect(album.id).toEqual("album-1")
-    expect(album.artistIds).toEqual(["artist-1", "artist-2"])
+    expect(album.artistIds).toBeEmpty()
     expect(album.tracks.map(\.id)).toEqual(["song-1", "song-2"])
     expect(album.tracks.map(\.artistName)).toEqual(["Artist", "Guest"])
     expect(album.tracks.map(\.albumId)).toEqual(["album-1", "album-1"])
@@ -77,6 +91,32 @@ final class AppleMusicResolutionTests: XCTestCase {
       "/v1/catalog/us/albums",
       "/v1/catalog/us/albums/album-1/tracks",
     ])
+  }
+
+  func testResolvesVariousArtistsAlbumWithEmptyArtistsRelationship() async throws {
+    let loader = StubAppleMusicLoader { url in
+      guard url.path == "/v1/catalog/us/albums" else {
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+      return albumCollection([
+        albumJson(
+          id: "album-1",
+          title: "Soundtrack",
+          artistName: "Various Artists",
+          artistIds: [],
+          tracks: [songJson(id: "song-1", title: "Song", artistName: "Artist")],
+        ),
+      ])
+    }
+
+    let album = try await resolveAppleMusicCatalogAlbum(
+      "album-1",
+      load: loader.dataLoader,
+    )
+
+    expect(album.artistName).toEqual("Various Artists")
+    expect(album.artistIds).toBeEmpty()
+    expect(album.tracks.map(\.id)).toEqual(["song-1"])
   }
 
   func testResolvesArtistUsingExactRelationshipsAndCompleteReleasePages() async throws {
@@ -166,7 +206,7 @@ final class AppleMusicResolutionTests: XCTestCase {
             isSingle: true,
           ),
           albumJson(id: "one-artist-comp", title: "Greatest Hits", artistIds: ["artist-1"]),
-          albumJson(id: "various", title: "Various", artistIds: ["various-artists"]),
+          albumJson(id: "various", title: "Various", artistIds: []),
         ])
       case "/v1/catalog/us/songs":
         data("""
@@ -357,28 +397,32 @@ private func albumCollection(_ albums: [String]) -> Data {
 private func albumJson(
   id: String,
   title: String,
-  artistIds: [String],
+  artistName: String = "Artist",
+  artistIds: [String]?,
   tracks: [String] = [],
   tracksNext: String? = nil,
   artistsNext: String? = nil,
   isSingle: Bool = false,
 ) -> String {
-  let artists = artistIds.map { "{\"id\":\"\($0)\",\"type\":\"artists\"}" }
-    .joined(separator: ",")
+  let artistsRelationship = artistIds.map { artistIds in
+    let artists = artistIds.map { "{\"id\":\"\($0)\",\"type\":\"artists\"}" }
+      .joined(separator: ",")
+    let next = artistsNext.map { ",\"next\":\"\($0)\"" } ?? ""
+    return "\"artists\": {\"data\": [\(artists)]\(next)},"
+  } ?? ""
   let tracksNext = tracksNext.map { ",\"next\":\"\($0)\"" } ?? ""
-  let artistsNext = artistsNext.map { ",\"next\":\"\($0)\"" } ?? ""
   return """
   {
     "id": "\(id)",
     "type": "albums",
     "attributes": {
       "name": "\(title)",
-      "artistName": "Artist",
+      "artistName": "\(artistName)",
       "trackCount": \(tracks.count),
       "isSingle": \(isSingle)
     },
     "relationships": {
-      "artists": {"data": [\(artists)]\(artistsNext)},
+      \(artistsRelationship)
       "tracks": {"data": [\(tracks.joined(separator: ","))]\(tracksNext)}
     }
   }

@@ -65,14 +65,20 @@ func appleMusicCatalogArtistResolutionURL(_ artistId: Music.ArtistId) throws -> 
   return url
 }
 
-func appleMusicCatalogAlbumResolutionURL(_ albumIds: [Music.AlbumId]) throws -> URL {
+func appleMusicCatalogAlbumResolutionURL(
+  _ albumIds: [Music.AlbumId],
+  requiringArtistRelationship: Bool,
+) throws -> URL {
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
   components.path = "/v1/catalog/us/albums"
   components.queryItems = [
     .init(name: "ids", value: albumIds.map(\.rawValue).joined(separator: ",")),
-    .init(name: "include", value: "artists,tracks"),
+    .init(
+      name: "include",
+      value: requiringArtistRelationship ? "artists,tracks" : "tracks",
+    ),
   ]
   guard !albumIds.isEmpty, let url = components.url else {
     throw AppleMusicResolutionError.invalidURL
@@ -99,7 +105,11 @@ func resolveAppleMusicCatalogAlbum(
   _ albumId: Music.AlbumId,
   load: AppleMusicDataLoader,
 ) async throws -> Music.ResolvedAlbum {
-  let albums = try await resolvedAppleMusicAlbums([albumId], load: load)
+  let albums = try await resolvedAppleMusicAlbums(
+    [albumId],
+    requiringArtistRelationship: false,
+    load: load,
+  )
   guard let album = albums.first, album.id == albumId else {
     throw AppleMusicResolutionError.missingResource(type: "album", id: albumId.rawValue)
   }
@@ -147,7 +157,11 @@ func resolveAppleMusicCatalogArtist(
   ).map(Music.TrackId.init(rawValue:))
   var seenTopSongIds = Set<Music.TrackId>()
   let topSongIds = topSongReferences.filter { seenTopSongIds.insert($0).inserted }
-  let hydratedAlbums = try await resolvedAppleMusicAlbums(releaseIds, load: load)
+  let hydratedAlbums = try await resolvedAppleMusicAlbums(
+    releaseIds,
+    requiringArtistRelationship: true,
+    load: load,
+  )
   let qualifyingAlbums = hydratedAlbums.filter { album in
     Set(album.artistIds) == [artistId]
   }
@@ -175,6 +189,7 @@ func resolveAppleMusicCatalogArtist(
 
 private func resolvedAppleMusicAlbums(
   _ albumIds: [Music.AlbumId],
+  requiringArtistRelationship: Bool,
   load: AppleMusicDataLoader,
 ) async throws -> [Music.ResolvedAlbum] {
   guard !albumIds.isEmpty else { return [] }
@@ -182,7 +197,10 @@ private func resolvedAppleMusicAlbums(
   for start in stride(from: 0, to: albumIds.count, by: 100) {
     let end = min(start + 100, albumIds.count)
     let batch = Array(albumIds[start ..< end])
-    let url = try appleMusicCatalogAlbumResolutionURL(batch)
+    let url = try appleMusicCatalogAlbumResolutionURL(
+      batch,
+      requiringArtistRelationship: requiringArtistRelationship,
+    )
     let response = try await JSONDecoder().decode(
       AppleMusicAlbumResolutionResponse.self,
       from: load(url),
@@ -197,7 +215,10 @@ private func resolvedAppleMusicAlbums(
     guard let album = rawAlbumsById[albumId] else {
       throw AppleMusicResolutionError.missingResource(type: "album", id: albumId.rawValue)
     }
-    try await resolved.append(album.resolved(load: load))
+    try await resolved.append(album.resolved(
+      requiringArtistRelationship: requiringArtistRelationship,
+      load: load,
+    ))
   }
   return resolved
 }
@@ -416,26 +437,26 @@ private struct AppleMusicRawAlbum: Decodable {
     var tracks: AppleMusicRawTrackPage?
   }
 
-  func resolved(load: AppleMusicDataLoader) async throws -> Music.ResolvedAlbum {
-    guard let artists = self.relationships?.artists else {
+  func resolved(
+    requiringArtistRelationship: Bool,
+    load: AppleMusicDataLoader,
+  ) async throws -> Music.ResolvedAlbum {
+    let artistIds: [String]
+    if let artists = self.relationships?.artists {
+      artistIds = try await completeReferenceIds(
+        in: artists,
+        type: "artists",
+        limit: nil,
+        load: load,
+      )
+    } else if requiringArtistRelationship {
       throw AppleMusicResolutionError.incompleteResource(
         type: "album",
         id: self.id,
         relationship: "artists",
       )
-    }
-    let artistIds = try await completeReferenceIds(
-      in: artists,
-      type: "artists",
-      limit: nil,
-      load: load,
-    )
-    guard !artistIds.isEmpty else {
-      throw AppleMusicResolutionError.incompleteResource(
-        type: "album",
-        id: self.id,
-        relationship: "artists",
-      )
+    } else {
+      artistIds = []
     }
     guard let firstTracksPage = self.relationships?.tracks else {
       throw AppleMusicResolutionError.incompleteResource(

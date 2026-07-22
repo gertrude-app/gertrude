@@ -7,10 +7,8 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
 
   struct Report: Equatable, Sendable {
     var resolvedAlbums = 0
-    var resolvedArtists = 0
     var publishedChildren = 0
     var unresolvedAlbums = 0
-    var unresolvedArtists = 0
     var unpublishedChildren = 0
   }
 
@@ -20,12 +18,12 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
     var description: String {
       switch self {
       case .incomplete(let report):
-        "Music catalog backfill incomplete: \(report.unresolvedAlbums) albums, \(report.unresolvedArtists) artists, and \(report.unpublishedChildren) children remain incomplete"
+        "Music catalog backfill incomplete: \(report.unresolvedAlbums) albums and \(report.unpublishedChildren) children remain incomplete"
       }
     }
   }
 
-  var help: String { "Resolve music grants and publish complete child libraries" }
+  var help: String { "Resolve legacy album grants and publish complete child libraries" }
 
   @Dependency(\.appleMusic) var appleMusic
   @Dependency(\.date.now) var now
@@ -35,7 +33,7 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
   func run(using context: CommandContext, signature: Signature) async throws {
     let report = try await self.exec()
     self.logger.info(
-      "Music catalog backfill complete: resolved \(report.resolvedAlbums) albums and \(report.resolvedArtists) artists; published \(report.publishedChildren) children",
+      "Music catalog backfill complete: resolved \(report.resolvedAlbums) albums; published \(report.publishedChildren) children",
     )
   }
 
@@ -85,52 +83,11 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
       }
     }
 
-    let artists = try await Music.ApprovedArtist.query()
-      .orderBy(.createdAt, .asc)
-      .all(in: self.db)
-      .filter { childIds?.contains($0.childId) ?? true }
-    let unresolvedArtists = artists.filter { $0.resolution == nil }
-    let artistsById = Dictionary(grouping: unresolvedArtists, by: \.appleMusicArtistId)
-    for artistId in artistsById.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
-      do {
-        let resolution = try await self.appleMusic.resolveArtist(artistId)
-        guard resolution.id == artistId else {
-          throw Music.LibrarySnapshotCompiler.CompilerError.artistResolutionIdMismatch(
-            expected: artistId,
-            actual: resolution.id,
-          )
-        }
-        for artist in artistsById[artistId] ?? [] {
-          let resolved = try await self.db.withTransaction { db in
-            try await Music.LibrarySnapshotRepository.lock(childId: artist.childId, in: db)
-            let stored = try await Music.ApprovedArtist.query()
-              .where(.id == artist.id)
-              .all(in: db)
-              .first
-            guard var stored, stored.resolution == nil else { return false }
-            stored.name = resolution.name
-            stored.catalogMetadata = resolution.catalogMetadata
-            stored.resolution = resolution
-            stored.resolvedAt = self.now
-            try await db.update(stored)
-            return true
-          }
-          if resolved {
-            report.resolvedArtists += 1
-          }
-        }
-      } catch {
-        self.logger.error(
-          "Backfilling Apple Music artist `\(artistId.rawValue)` failed: \(error)",
-        )
-      }
-    }
-
     let allAlbums = try await Music.ApprovedAlbum.query().all(in: self.db)
       .filter { childIds?.contains($0.childId) ?? true }
     let allArtists = try await Music.ApprovedArtist.query().all(in: self.db)
       .filter { childIds?.contains($0.childId) ?? true }
-    let childIds = Set(allAlbums.map(\.childId) + allArtists.map(\.childId))
+    let childIds = Set(allAlbums.map(\.childId))
     for childId in childIds.sorted(by: { $0.rawValue.uuidString < $1.rawValue.uuidString }) {
       let childAlbums = allAlbums.filter { $0.childId == childId }
       let childArtists = allArtists.filter { $0.childId == childId }
@@ -153,7 +110,6 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
     }
 
     report.unresolvedAlbums = allAlbums.count { $0.resolution == nil }
-    report.unresolvedArtists = allArtists.count { $0.resolution == nil }
     let snapshotsByChildId = try await Dictionary(
       uniqueKeysWithValues: Music.LibrarySnapshot.query()
         .all(in: self.db)
@@ -198,7 +154,6 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
     }
 
     guard report.unresolvedAlbums == 0,
-          report.unresolvedArtists == 0,
           report.unpublishedChildren == 0 else {
       throw BackfillError.incomplete(report)
     }
