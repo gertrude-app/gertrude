@@ -9,6 +9,7 @@ import type {
   GetAllDevices,
   GetAmClaimData,
   GetApprovedMusicAlbums,
+  GetApprovedMusicArtists,
   GetBatchUnlockRequestData,
   GetBlockerClaimData,
   GetChild,
@@ -59,6 +60,14 @@ export class Key extends QueryKey<never> {
     return new QueryKey(
       `children/:id/approved-music-albums`,
       [`children`, id, `music`, `approved-albums`],
+      id,
+    );
+  }
+
+  static approvedMusicArtists(id: UUID): QueryKey<GetApprovedMusicArtists.Output> {
+    return new QueryKey(
+      `children/:id/approved-music-artists`,
+      [`children`, id, `music`, `approved-artists`],
       id,
     );
   }

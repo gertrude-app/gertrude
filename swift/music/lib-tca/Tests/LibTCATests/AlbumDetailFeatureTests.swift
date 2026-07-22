@@ -6,6 +6,20 @@ import Testing
 @MainActor
 struct AlbumDetailFeatureTests {
   @Test
+  func albumWithoutTracksDoesNotStartPlayback() async {
+    let album = ApprovedAlbum(
+      id: "album-1",
+      title: "Album",
+      artistName: "Artist",
+    )
+    let store = TestStore(initialState: .init(album: album)) {
+      AlbumDetailFeature()
+    }
+
+    await store.send(.playTapped)
+  }
+
+  @Test
   func playTappedRequestsAlbumQueuePlaybackFromFirstTrack() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let store = TestStore(initialState: .init(album: album)) {
@@ -13,7 +27,7 @@ struct AlbumDetailFeatureTests {
     }
 
     await store.send(.playTapped)
-    await store.receive(.delegate(.playAlbum(
+    await store.receive(.delegate(.playNow(
       items: playbackItems(album: album),
       startIndex: 0,
     )))
@@ -28,10 +42,39 @@ struct AlbumDetailFeatureTests {
     }
 
     await store.send(.trackTapped(track.id))
-    await store.receive(.delegate(.playAlbum(
+    await store.receive(.delegate(.playNow(
       items: playbackItems(album: album),
       startIndex: 2,
     )))
+  }
+
+  @Test
+  func albumQueueActionsDelegateAllTracks() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let items = playbackItems(album: album)
+    let store = TestStore(initialState: .init(album: album)) {
+      AlbumDetailFeature()
+    }
+
+    await store.send(.playNextTapped)
+    await store.receive(.delegate(.playNext(items: items)))
+    await store.send(.addToQueueTapped)
+    await store.receive(.delegate(.addToQueue(items: items)))
+  }
+
+  @Test
+  func trackQueueActionsDelegateOnlySelectedTrack() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let track = album.tracks[1]
+    let item = playbackItems(album: album)[1]
+    let store = TestStore(initialState: .init(album: album)) {
+      AlbumDetailFeature()
+    }
+
+    await store.send(.trackPlayNextTapped(track.id))
+    await store.receive(.delegate(.playNext(items: [item])))
+    await store.send(.trackAddToQueueTapped(track.id))
+    await store.receive(.delegate(.addToQueue(items: [item])))
   }
 
   @Test
@@ -91,19 +134,5 @@ struct AlbumDetailFeatureTests {
     }
 
     await store.send(.trackTapped("not-in-this-album"))
-  }
-
-  @Test
-  func playTappedWithEmptyAlbumDoesNothing() async {
-    let album = ApprovedAlbum(
-      id: "empty-album",
-      title: "Empty Album",
-      artistName: "Nobody",
-    )
-    let store = TestStore(initialState: .init(album: album)) {
-      AlbumDetailFeature()
-    }
-
-    await store.send(.playTapped)
   }
 }

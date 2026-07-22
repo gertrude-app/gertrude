@@ -43,13 +43,50 @@ struct ApprovedMusicLibraryCacheClientTests {
   }
 
   @Test
-  func returnsNilForUnsupportedCacheVersion() async throws {
-    let directory = try temporaryDirectory(named: "returnsNilForUnsupportedCacheVersion")
+  func returnsNilForLegacyCacheVersion() async throws {
+    let directory = try temporaryDirectory(named: "returnsNilForLegacyCacheVersion")
     defer { try? FileManager.default.removeItem(at: directory) }
-    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(directory: directory)
-    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-    try Data(#"{"version":0,"value":{"albums":[]}}"#.utf8)
-      .write(to: diskCache.fileURL(childId: childId))
+    let legacyDiskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 1,
+    )
+    try legacyDiskCache.save(.mock, childId: childId)
+    let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
+
+    let loaded = try await cache.load(childId: childId)
+
+    expectNoDifference(loaded, nil)
+  }
+
+  @Test
+  func returnsNilForUnsupportedSnapshotSchema() async throws {
+    let directory = try temporaryDirectory(named: "returnsNilForUnsupportedSnapshotSchema")
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 2,
+    )
+    var unsupported = ApprovedMusicLibrary.mock
+    unsupported.schemaVersion = 3
+    try diskCache.save(unsupported, childId: childId)
+    let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
+
+    let loaded = try await cache.load(childId: childId)
+
+    expectNoDifference(loaded, nil)
+  }
+
+  @Test
+  func returnsNilForIncompleteSnapshot() async throws {
+    let directory = try temporaryDirectory(named: "returnsNilForIncompleteSnapshot")
+    defer { try? FileManager.default.removeItem(at: directory) }
+    let diskCache = ChildScopedDiskJSONCache<ApprovedMusicLibrary>(
+      directory: directory,
+      version: 2,
+    )
+    var incomplete = ApprovedMusicLibrary.mock
+    incomplete.albums.append(incomplete.albums[0])
+    try diskCache.save(incomplete, childId: childId)
     let cache = ApprovedMusicLibraryCacheClient.live(directory: directory)
 
     let loaded = try await cache.load(childId: childId)

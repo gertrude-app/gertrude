@@ -41,6 +41,11 @@ struct ButtonScreenView: View {
     }
   }
 
+  private struct ButtonStatus {
+    var offset = Vector(x: 0, y: 20)
+    var isLoading = false
+  }
+
   let text: String
   let primaryButtonConfig: Config?
   let secondaryButtonConfig: Config?
@@ -52,9 +57,9 @@ struct ButtonScreenView: View {
   @State private var showBackground = false
   @State private var iconOffset = Vector(x: 0, y: -20)
   @State private var textOffset = Vector(x: 0, y: 20)
-  @State private var primaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
-  @State private var secondaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
-  @State private var tertiaryButtonStatus = (offset: Vector(x: 0, y: 20), isLoading: false)
+  @State private var primaryButtonStatus = ButtonStatus()
+  @State private var secondaryButtonStatus = ButtonStatus()
+  @State private var tertiaryButtonStatus = ButtonStatus()
   @State private var buttonTapped = false
 
   var body: some View {
@@ -168,7 +173,7 @@ struct ButtonScreenView: View {
   @ViewBuilder
   private func button(
     _ config: Config,
-    status: Binding<(offset: Vector, isLoading: Bool)>,
+    status: Binding<ButtonStatus>,
     delay: Duration,
     variant: BigButton.Variant,
   ) -> some View {
@@ -186,19 +191,13 @@ struct ButtonScreenView: View {
           type: config.type,
           animate: config.animate,
           asyncAction: config.asyncAction,
-          isLoading: Binding(
-            get: { status.wrappedValue.isLoading },
-            set: { status.wrappedValue.isLoading = $0 },
-          ),
+          isLoading: status.isLoading,
         ),
         variant: variant,
         disabled: config.disabled,
       )
       .swooshIn(
-        tracking: Binding(
-          get: { status.wrappedValue.offset },
-          set: { status.wrappedValue.offset = $0 },
-        ),
+        tracking: status.offset,
         to: .zero,
         after: delay,
         for: .milliseconds(800),

@@ -8,20 +8,28 @@ struct TestError: Error {}
 let childId = UUID(1)
 let otherChildId = UUID(2)
 
-let cachedApprovedMusicLibrary = ApprovedMusicLibrary(albums: [
-  .init(
-    id: "cached-album",
-    title: "Cached Album",
-    artistName: "Cached Artist",
-    tracks: [
-      .init(
-        id: "cached-track",
-        title: "Cached Track",
-        artistName: "Cached Artist",
-      ),
-    ],
-  ),
-])
+let cachedApprovedMusicLibrary = ApprovedMusicLibrary(
+  albums: [
+    .init(
+      id: "cached-album",
+      title: "Cached Album",
+      artistName: "Cached Artist",
+      tracks: [
+        .init(
+          id: "cached-track",
+          title: "Cached Track",
+          artistName: "Cached Artist",
+        ),
+      ],
+    ),
+  ],
+  artists: [
+    .init(
+      id: "cached-artist",
+      name: "Cached Artist",
+    ),
+  ],
+)
 
 func playbackItem(_ id: ApprovedTrack.ID) -> PlaybackItem {
   PlaybackItem(
@@ -40,6 +48,23 @@ func playbackItems(album: ApprovedAlbum) -> [PlaybackItem] {
   ) }
 }
 
+func playbackSnapshot(
+  items: [PlaybackItem],
+  currentIndex: Int = 0,
+  playStatus: PlaybackFeature.PlayStatus = .playing,
+  progress: PlaybackProgress = .zero,
+) -> PlaybackSnapshot {
+  let entries = items.enumerated().map { index, item in
+    PlaybackQueueEntry(id: "entry-\(index)", item: item)
+  }
+  return PlaybackSnapshot(
+    entries: entries,
+    currentEntryID: entries.indices.contains(currentIndex) ? entries[currentIndex].id : nil,
+    playStatus: playStatus,
+    progress: progress,
+  )
+}
+
 func temporaryDirectory(named name: String, fileID: String = #fileID) throws -> URL {
   let suiteName = URL(fileURLWithPath: fileID).deletingPathExtension().lastPathComponent
   let root = FileManager.default.temporaryDirectory.appendingPathComponent(
@@ -50,6 +75,25 @@ func temporaryDirectory(named name: String, fileID: String = #fileID) throws -> 
   let directory = root.appendingPathComponent(name, isDirectory: true)
   try? FileManager.default.removeItem(at: directory)
   return directory
+}
+
+extension PlaybackCheckpoint {
+  static let mock = Self(
+    songIDs: ["track-1", "track-2"],
+    currentIndex: 1,
+    elapsedTime: 42,
+    durationFallback: 180,
+    sourceAlbumHints: [
+      .init(songID: "track-1", albumID: "album-1"),
+    ],
+  )
+
+  static let otherMock = Self(
+    songIDs: ["other-track"],
+    currentIndex: 0,
+    elapsedTime: 12,
+    durationFallback: 120,
+  )
 }
 
 extension CachedPlaybackSession {

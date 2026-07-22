@@ -45,7 +45,7 @@ swift/
 ├── macapp/               # macOS app
 ├── iosapp/               # iOS content-filter app (the "blocker")
 ├── podcasts/             # Gertrude AM podcast app
-├── music/                # Gertrude Music app (private beta)
+├── music/                # Gertrude Music app
 ├── gertie/               # Shared data/types: Gertie, GertieBlocker, GertieApp targets
 ├── gertie-tca-features/  # Shared TCA reducers/behavior (client apps only, not the api)
 ├── duet/                 # Custom lightweight ORM

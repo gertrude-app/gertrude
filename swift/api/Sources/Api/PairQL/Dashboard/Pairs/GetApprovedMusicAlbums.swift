@@ -12,8 +12,10 @@ struct GetApprovedMusicAlbums: Pair {
       var title: String
       var artistName: String
       var artworkUrl: String?
+      var artwork: Music.Artwork?
       var trackCount: Int?
       var showsArtwork: Bool
+      var createdAt: Date?
     }
 
     var albums: [Album]
@@ -30,8 +32,10 @@ extension GetApprovedMusicAlbums: Resolver {
         title: $0.title,
         artistName: $0.artistName,
         artworkUrl: $0.artworkUrl,
+        artwork: $0.artwork,
         trackCount: $0.trackCount,
         showsArtwork: $0.showsArtwork,
+        createdAt: $0.createdAt,
       )
     })
   }

@@ -6,6 +6,10 @@ export function interceptPql(
   output: T.ApproveMusicAlbum.Output,
 ): void;
 export function interceptPql(
+  slug: `ApproveMusicArtist`,
+  output: T.ApproveMusicArtist.Output,
+): void;
+export function interceptPql(
   slug: `ChangeSubscriptionTier`,
   output: T.ChangeSubscriptionTier.Output,
 ): void;
@@ -82,6 +86,10 @@ export function interceptPql(
 export function interceptPql(
   slug: `GetApprovedMusicAlbums`,
   output: T.GetApprovedMusicAlbums.Output,
+): void;
+export function interceptPql(
+  slug: `GetApprovedMusicArtists`,
+  output: T.GetApprovedMusicArtists.Output,
 ): void;
 export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
@@ -169,6 +177,10 @@ export function interceptPql(
   output: T.RemoveApprovedMusicAlbum.Output,
 ): void;
 export function interceptPql(
+  slug: `RemoveApprovedMusicArtist`,
+  output: T.RemoveApprovedMusicArtist.Output,
+): void;
+export function interceptPql(
   slug: `RequestAmPinReset`,
   output: T.RequestAmPinReset.Output,
 ): void;
@@ -252,6 +264,7 @@ export function interceptPql(slug: string, output: any): void {
 export function forcePqlErr(
   slug:
     | `ApproveMusicAlbum`
+    | `ApproveMusicArtist`
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimAmDevice`
@@ -273,6 +286,7 @@ export function forcePqlErr(
     | `GetAllDevices`
     | `GetAmClaimData`
     | `GetApprovedMusicAlbums`
+    | `GetApprovedMusicArtists`
     | `GetBatchUnlockRequestData`
     | `GetBlockerClaimData`
     | `GetChild`
@@ -298,6 +312,7 @@ export function forcePqlErr(
     | `OpenBillingPortal`
     | `PrepIOSAppConnection`
     | `RemoveApprovedMusicAlbum`
+    | `RemoveApprovedMusicArtist`
     | `RequestAmPinReset`
     | `RequestMagicLink`
     | `RequestPublicKeychain`

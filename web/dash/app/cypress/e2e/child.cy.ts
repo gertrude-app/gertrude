@@ -98,14 +98,57 @@ describe(`children screen`, () => {
         musicConnected: true,
       });
       cy.interceptPql(`GetApprovedMusicAlbums`, { albums: [] });
+      cy.interceptPql(`GetApprovedMusicArtists`, { artists: [] });
 
       cy.visit(`/children/user-123/ios-devices/ios-device-123`);
 
       cy.contains(`Huck's iPhone`);
       cy.contains(`Gertrude Music`);
-      cy.contains(`Search Apple Music albums`);
-      cy.contains(/Huck.s allowed albums/);
-      cy.contains(`No allowed albums yet`);
+      cy.contains(`Search Apple Music`);
+      cy.contains(/Huck.s allowed music/);
+      cy.contains(`No allowed music yet`);
+    });
+
+    it(`shows allowed music newest first and explains artist grants`, () => {
+      cy.interceptPql(`GetIOSDevice_v2`, {
+        childName: `Huck`,
+        deviceType: `iPhone`,
+        osVersion: `18.2`,
+        musicConnected: true,
+      });
+      cy.interceptPql(`GetApprovedMusicAlbums`, {
+        albums: [
+          {
+            id: `album-old`,
+            title: `Older Album`,
+            artistName: `Album Artist`,
+            trackCount: 10,
+            showsArtwork: true,
+            createdAt: `2026-07-01T12:00:00Z`,
+          },
+        ],
+      });
+      cy.interceptPql(`GetApprovedMusicArtists`, {
+        artists: [
+          {
+            id: `artist-new`,
+            name: `Newer Artist`,
+            catalogMetadata: { genreNames: [] },
+            createdAt: `2026-07-09T12:00:00Z`,
+          },
+        ],
+      });
+
+      cy.visit(`/children/user-123/ios-devices/ios-device-123`);
+
+      cy.get(`[data-test=approved-music-item]`)
+        .should(`have.length`, 2)
+        .then(($items) => {
+          const itemText = [...$items].map((item) => item.textContent ?? ``);
+          expect(itemText[0]).to.contain(`Newer Artist`);
+          expect(itemText[1]).to.contain(`Older Album`);
+        });
+      cy.contains(`Allows all current and future eligible releases by this artist.`);
     });
   });
 

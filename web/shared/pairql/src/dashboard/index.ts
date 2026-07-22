@@ -1,6 +1,7 @@
 // auto-generated, do not edit
 export * from './shared';
 export * from './pairs/ApproveMusicAlbum';
+export * from './pairs/ApproveMusicArtist';
 export * from './pairs/ChangeSubscriptionTier';
 export * from './pairs/ChildActivitySummaries';
 export * from './pairs/ClaimAmDevice';
@@ -22,6 +23,7 @@ export * from './pairs/GetAdminKeychains';
 export * from './pairs/GetAllDevices';
 export * from './pairs/GetAmClaimData';
 export * from './pairs/GetApprovedMusicAlbums';
+export * from './pairs/GetApprovedMusicArtists';
 export * from './pairs/GetBatchUnlockRequestData';
 export * from './pairs/GetBlockerClaimData';
 export * from './pairs/GetChild';
@@ -47,6 +49,7 @@ export * from './pairs/MacAppConnectionCode';
 export * from './pairs/OpenBillingPortal';
 export * from './pairs/PrepIOSAppConnection';
 export * from './pairs/RemoveApprovedMusicAlbum';
+export * from './pairs/RemoveApprovedMusicArtist';
 export * from './pairs/RequestAmPinReset';
 export * from './pairs/RequestMagicLink';
 export * from './pairs/RequestPublicKeychain';

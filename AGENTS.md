@@ -32,10 +32,8 @@ below.
 
 ### iOS Music app (Gertrude Music)
 
-> **Private beta (not yet released):** Gertrude Music, a parent-curated music-playing iOS
-> app, now lives in `./swift/music`. It's in App Store review for a private beta while we
-> validate the business model with Apple — hopefully coming soon. Don't present it as a
-> shipped or public product (e.g. in marketing copy or `llms.txt`).
+- `./swift/music`
+- publicly available on the App Store
 
 ## Apple OS version numbering
 

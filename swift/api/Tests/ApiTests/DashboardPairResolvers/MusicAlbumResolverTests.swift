@@ -1,3 +1,4 @@
+import Dependencies
 import DuetSQL
 import XCTest
 import XExpect
@@ -35,16 +36,20 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         title: "Stories from the Outside",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/stories.jpg",
+        artwork: albumArtwork(url: "https://example.com/stories.jpg"),
         trackCount: 12,
         showsArtwork: true,
+        createdAt: albums.albums[0].createdAt,
       ),
       .init(
         id: .init(rawValue: "1733742320"),
         title: "Elements",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/elements.jpg",
+        artwork: albumArtwork(url: "https://example.com/elements.jpg"),
         trackCount: 6,
         showsArtwork: false,
+        createdAt: albums.albums[1].createdAt,
       ),
     ])
   }
@@ -55,6 +60,10 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
     let input = self.input(child: child)
 
     _ = try await ApproveMusicAlbum.resolve(with: input, in: child.parent.context)
+    let initiallyApproved = try await Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .where(.appleMusicAlbumId == "1440935467")
+      .first(in: self.db)
     _ = try await ApproveMusicAlbum.resolve(with: input, in: child.parent.context)
 
     let count = try await Music.ApprovedAlbum.query()
@@ -68,11 +77,38 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
       .first(in: self.db)
 
     expect(count).toEqual(1)
+    expect(album.id).toEqual(initiallyApproved.id)
+    expect(album.createdAt).toEqual(initiallyApproved.createdAt)
     expect(album.title).toEqual("Stories from the Outside")
     expect(album.artistName).toEqual("Lena Jonsson Trio")
     expect(album.artworkUrl).toEqual("https://example.com/stories.jpg")
+    expect(album.artwork).toEqual(albumArtwork(url: "https://example.com/stories.jpg"))
     expect(album.trackCount).toEqual(12)
     expect(album.showsArtwork).toEqual(true)
+  }
+
+  func testIdempotentAlbumApprovalRepairsMissingSnapshotWithoutRewritingGrant() async throws {
+    let child = try await self.child()
+    try await self.connectMusicApp(for: child)
+    let input = self.input(child: child)
+    _ = try await ApproveMusicAlbum.resolve(with: input, in: child.parent.context)
+    let initiallyApproved = try await Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .where(.appleMusicAlbumId == "1440935467")
+      .first(in: self.db)
+    try await Music.LibrarySnapshot.query()
+      .where(.childId == child.id)
+      .delete(in: self.db)
+
+    _ = try await ApproveMusicAlbum.resolve(with: input, in: child.parent.context)
+
+    let reloaded = try await self.db.find(initiallyApproved.id)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+    expect(reloaded.resolvedAt).toEqual(initiallyApproved.resolvedAt)
+    expect(snapshot?.payload.albums.map(\.id)).toEqual(["1440935467"])
   }
 
   func testApproveMusicAlbumUpdatesCachedMetadata() async throws {
@@ -103,10 +139,106 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
         title: "Stories from the Outside",
         artistName: "Lena Jonsson Trio",
         artworkUrl: "https://example.com/stories.jpg",
+        artwork: albumArtwork(url: "https://example.com/stories.jpg"),
         trackCount: 12,
         showsArtwork: true,
+        createdAt: albums.albums[0].createdAt,
       ),
     ])
+  }
+
+  func testApproveMusicAlbumIgnoresBrowserMetadataAndPublishesSnapshot() async throws {
+    let child = try await self.child()
+    try await self.connectMusicApp(for: child)
+
+    _ = try await ApproveMusicAlbum.resolve(
+      with: self.input(
+        child: child,
+        title: "Forged title",
+        artistName: "Forged artist",
+        artworkUrl: "https://malicious.example/art.jpg",
+        trackCount: 999,
+      ),
+      in: child.parent.context,
+    )
+
+    let album = try await Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .first(in: self.db)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+    expect(album.title).toEqual("Stories from the Outside")
+    expect(album.artistName).toEqual("Lena Jonsson Trio")
+    expect(album.artworkUrl).toEqual("https://example.com/stories.jpg")
+    expect(album.trackCount).toEqual(12)
+    expect(album.resolution?.tracks.count).toEqual(1)
+    expect(snapshot?.revision).toEqual(1)
+    expect(snapshot?.payload.albums.first?.tracks.count).toEqual(1)
+  }
+
+  func testInitialAlbumResolutionFailureWritesNothing() async throws {
+    let child = try await self.child()
+    try await self.connectMusicApp(for: child)
+
+    do {
+      _ = try await withDependencies {
+        $0.appleMusic.resolveAlbum = { _ in throw MusicAlbumMutationTestError.unavailable }
+      } operation: {
+        try await ApproveMusicAlbum.resolve(
+          with: self.input(child: child),
+          in: child.parent.context,
+        )
+      }
+      XCTFail("expected resolution failure")
+    } catch MusicAlbumMutationTestError.unavailable {}
+
+    let albumCount = try await Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .count(in: self.db)
+    let snapshotCount = try await Music.LibrarySnapshot.query()
+      .where(.childId == child.id)
+      .count(in: self.db)
+    expect(albumCount).toEqual(0)
+    expect(snapshotCount).toEqual(0)
+  }
+
+  func testFailedAlbumReapprovalRetainsGrantResolutionAndSnapshot() async throws {
+    let child = try await self.child()
+    try await self.connectMusicApp(for: child)
+    _ = try await ApproveMusicAlbum.resolve(
+      with: self.input(child: child),
+      in: child.parent.context,
+    )
+    let album = try await Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .first(in: self.db)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+
+    do {
+      _ = try await withDependencies {
+        $0.appleMusic.resolveAlbum = { _ in throw MusicAlbumMutationTestError.unavailable }
+      } operation: {
+        try await ApproveMusicAlbum.resolve(
+          with: self.input(child: child, title: "Forged replacement"),
+          in: child.parent.context,
+        )
+      }
+      XCTFail("expected resolution failure")
+    } catch MusicAlbumMutationTestError.unavailable {}
+
+    let reloadedAlbum = try await self.db.find(album.id)
+    let reloadedSnapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+    expect(reloadedAlbum.resolution).toEqual(album.resolution)
+    expect(reloadedAlbum.createdAt).toEqual(album.createdAt)
+    expect(reloadedSnapshot?.payload).toEqual(snapshot?.payload)
   }
 
   func testRemoveApprovedMusicAlbum() async throws {
@@ -228,8 +360,26 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
       title: title,
       artistName: artistName,
       artworkUrl: artworkUrl,
+      artwork: artworkUrl.map { albumArtwork(url: $0) },
       trackCount: trackCount,
       showsArtwork: showsArtwork,
     )
   }
+}
+
+private enum MusicAlbumMutationTestError: Error {
+  case unavailable
+}
+
+private func albumArtwork(url: String) -> Music.Artwork {
+  .init(
+    url: url,
+    width: 1200,
+    height: 1200,
+    bgColor: "102030",
+    textColor1: "ffffff",
+    textColor2: "eeeeee",
+    textColor3: "dddddd",
+    textColor4: "cccccc",
+  )
 }

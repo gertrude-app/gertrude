@@ -3,62 +3,94 @@ import SwiftUI
 
 public enum LibraryViewState: Equatable, Sendable {
   case loading
-  case loaded(albums: [AlbumData])
+  case loaded(items: [LibraryCollectionItemData])
   case empty
   case failed
   case subscriptionRequired
 }
 
 public struct LibraryView: View {
-  @Binding private var searchText: String
-
   private let state: LibraryViewState
   private let isRefreshing: Bool
+  private let isPlaylistMutationInFlight: Bool
   private let transitionNamespace: Namespace.ID?
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onRefresh: @MainActor @Sendable () async -> Void
+  private let onAlbumAddToPlaylist: @MainActor @Sendable (String) -> Void
+  private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
+  private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
+  private let onArtistTap: @MainActor @Sendable (String) -> Void
+  private let onCreatePlaylist: @MainActor @Sendable (String) -> Void
+  private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
+  private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
+  private let onPlaylistTap: @MainActor @Sendable (String) -> Void
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
+
+  @State private var createPlaylistName = ""
+  @State private var isCreatePlaylistPromptPresented = false
 
   public init(
     state: LibraryViewState,
-    searchText: Binding<String> = .constant(""),
     isRefreshing: Bool = false,
+    isPlaylistMutationInFlight: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onRefresh: @MainActor @escaping @Sendable () async -> Void = {},
+    onAlbumAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onCreatePlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
-    self._searchText = searchText
     self.state = state
     self.isRefreshing = isRefreshing
+    self.isPlaylistMutationInFlight = isPlaylistMutationInFlight
     self.transitionNamespace = transitionNamespace
     self.onRetryTap = onRetryTap
     self.onRefresh = onRefresh
+    self.onAlbumAddToPlaylist = onAlbumAddToPlaylist
+    self.onAlbumAddToQueue = onAlbumAddToQueue
+    self.onAlbumPlayNext = onAlbumPlayNext
     self.onAlbumTap = onAlbumTap
+    self.onArtistTap = onArtistTap
+    self.onCreatePlaylist = onCreatePlaylist
+    self.onPlaylistAddToQueue = onPlaylistAddToQueue
+    self.onPlaylistPlayNext = onPlaylistPlayNext
+    self.onPlaylistTap = onPlaylistTap
     self.onDebugResetTap = onDebugResetTap
   }
 
   public var body: some View {
     #if os(iOS)
       self.decoratedContent
-        .navigationTitle("Albums")
+        .navigationTitle("Library")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-          if self.showsRefreshIndicator {
-            ToolbarItem(placement: .topBarTrailing) {
+          ToolbarItemGroup(placement: .topBarTrailing) {
+            if self.showsRefreshIndicator {
               self.refreshToolbarContent
+            }
+            if self.showsCreateButton {
+              self.createPlaylistButton
             }
           }
         }
     #else
       self.decoratedContent
-        .navigationTitle("Albums")
+        .navigationTitle("Library")
         .toolbar {
-          if self.showsRefreshIndicator {
-            ToolbarItem(placement: .automatic) {
+          ToolbarItemGroup(placement: .automatic) {
+            if self.showsRefreshIndicator {
               self.refreshToolbarContent
+            }
+            if self.showsCreateButton {
+              self.createPlaylistButton
             }
           }
         }
@@ -73,13 +105,63 @@ public struct LibraryView: View {
       .overlay(alignment: .top) {
         LibraryRefreshAtmosphere(isActive: self.isRefreshing)
       }
+      .alert("New Playlist", isPresented: self.$isCreatePlaylistPromptPresented) {
+        TextField("Playlist Name", text: self.$createPlaylistName)
+          .onSubmit(self.createPlaylistPromptSubmitted)
+        Button("Cancel", role: .cancel, action: self.createPlaylistPromptCancelled)
+          .tint(.primary)
+        Button("Create", action: self.createPlaylistPromptSubmitted)
+          .tint(.white)
+          .keyboardShortcut(.defaultAction)
+          .disabled(!self.createPlaylistName.isValidPlaylistName)
+      } message: {
+        Text("Enter a name for your playlist.")
+      }
   }
 
   private var refreshToolbarContent: some View {
     ProgressView()
       .controlSize(.small)
-      .accessibilityLabel("Refreshing albums")
+      .tint(.primary)
+      .accessibilityLabel("Refreshing library")
       .allowsHitTesting(false)
+  }
+
+  @ViewBuilder
+  private var createPlaylistButton: some View {
+    if self.isPlaylistMutationInFlight {
+      ProgressView()
+        .controlSize(.small)
+        .tint(.primary)
+        .accessibilityLabel("Saving playlist")
+    } else {
+      Button {
+        self.createPlaylistName = ""
+        self.isCreatePlaylistPromptPresented = true
+      } label: {
+        Label("New Playlist", systemImage: "plus")
+      }
+      .tint(.primary)
+    }
+  }
+
+  private func createPlaylistPromptCancelled() {
+    self.isCreatePlaylistPromptPresented = false
+  }
+
+  private func createPlaylistPromptSubmitted() {
+    guard self.createPlaylistName.isValidPlaylistName else { return }
+    self.isCreatePlaylistPromptPresented = false
+    self.onCreatePlaylist(self.createPlaylistName)
+  }
+
+  private var showsCreateButton: Bool {
+    switch self.state {
+    case .loaded, .empty:
+      true
+    case .loading, .failed, .subscriptionRequired:
+      false
+    }
   }
 
   private var showsRefreshIndicator: Bool {
@@ -92,26 +174,38 @@ public struct LibraryView: View {
     }
   }
 
-  @ViewBuilder private var content: some View {
+  @ViewBuilder
+  private var content: some View {
     switch self.state {
     case .loading:
-      AlbumGridView(albums: [], isLoading: true)
+      LibraryGridView(items: [], isLoading: true)
 
-    case .loaded(let albums):
-      self.loadedContent(albums: albums)
+    case .loaded(let items):
+      LibraryGridView(
+        items: items,
+        transitionNamespace: self.transitionNamespace,
+        onAlbumAddToPlaylist: self.onAlbumAddToPlaylist,
+        onAlbumAddToQueue: self.onAlbumAddToQueue,
+        onAlbumPlayNext: self.onAlbumPlayNext,
+        onAlbumTap: self.onAlbumTap,
+        onArtistTap: self.onArtistTap,
+        onPlaylistAddToQueue: self.onPlaylistAddToQueue,
+        onPlaylistPlayNext: self.onPlaylistPlayNext,
+        onPlaylistTap: self.onPlaylistTap,
+        onDebugResetTap: self.onDebugResetTap,
+      )
 
     case .empty:
       self.messageContent(
-        title: "No albums yet",
-        message:
-        "Approved albums will appear here after they’re added in Gertrude.",
+        title: "No music yet",
+        message: "Approved artists, albums, and your playlists will appear here.",
         systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
 
     case .failed:
       self.messageContent(
-        title: "Couldn’t load albums",
+        title: "Couldn’t load library",
         message: "Check your connection and try again.",
         systemImage: "wifi.exclamationmark",
         buttonTitle: "Try again",
@@ -125,61 +219,6 @@ public struct LibraryView: View {
         systemImage: "creditcard",
         buttonTitle: "Check again",
       )
-    }
-  }
-
-  private func loadedContent(albums: [AlbumData]) -> some View {
-    let filteredAlbums = self.filteredAlbums(from: albums)
-
-    return Group {
-      if filteredAlbums.isEmpty, self.hasActiveSearch {
-        self.searchEmptyContent
-      } else {
-        AlbumGridView(
-          albums: filteredAlbums,
-          transitionNamespace: self.transitionNamespace,
-          onAlbumTap: self.onAlbumTap,
-          onDebugResetTap: self.onDebugResetTap,
-        )
-      }
-    }
-  }
-
-  private var searchEmptyContent: some View {
-    ScrollView {
-      LibraryMessageCard(
-        title: "No matching albums",
-        message: "No albums matched “\(self.trimmedSearchText)”. Try another title or artist.",
-        systemImage: "magnifyingglass",
-        buttonTitle: "Clear search",
-        onButtonTap: { self.searchText = "" },
-      )
-      .padding(.horizontal, 20)
-      .padding(.top, 24)
-      .padding(.bottom, 96)
-    }
-    .background(.background)
-  }
-
-  private var trimmedSearchText: String {
-    self.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-  }
-
-  private var searchTerms: [String] {
-    self.trimmedSearchText.split(whereSeparator: \.isWhitespace).map(String.init)
-  }
-
-  private var hasActiveSearch: Bool {
-    !self.searchTerms.isEmpty
-  }
-
-  private func filteredAlbums(from albums: [AlbumData]) -> [AlbumData] {
-    let terms = self.searchTerms
-    guard !terms.isEmpty else { return albums }
-
-    return albums.filter { album in
-      let searchableText = "\(album.title) \(album.artist)"
-      return terms.allSatisfy { searchableText.localizedStandardContains($0) }
     }
   }
 
@@ -198,12 +237,11 @@ public struct LibraryView: View {
           buttonTitle: buttonTitle,
           onButtonTap: self.onRetryTap,
         )
+        .frame(maxWidth: 600)
 
         #if DEBUG
           if let onDebugResetTap = self.onDebugResetTap {
-            LibraryDebugResetOnboardingButton(
-              onTap: onDebugResetTap,
-            )
+            DebugResetOnboardingButton(onTap: onDebugResetTap)
           }
         #endif
       }
@@ -215,203 +253,32 @@ public struct LibraryView: View {
   }
 }
 
-private struct LibraryRefreshAtmosphere: View {
-  @Environment(\.colorScheme) private var colorScheme
-
-  let isActive: Bool
-
-  @State private var isPresented = false
-  @State private var isRendered = false
-
-  var body: some View {
-    Group {
-      if self.isRendered {
-        self.glow
-          .frame(height: 430)
-          .scaleEffect(x: 1.12, y: 0.98, anchor: .top)
-          .offset(y: self.isPresented ? -24 : -520)
-          .opacity(0.86)
-          .blur(radius: 28)
-          .mask(self.fade)
-          .ignoresSafeArea(edges: .top)
-          .allowsHitTesting(false)
-          .accessibilityHidden(true)
-      }
-    }
-    .task(id: self.isActive) {
-      if self.isActive {
-        self.isRendered = true
-        self.isPresented = false
-        await Task.yield()
-        withAnimation(.snappy(duration: 0.68)) {
-          self.isPresented = true
-        }
-      } else if self.isRendered {
-        withAnimation(.snappy(duration: 0.52)) {
-          self.isPresented = false
-        }
-        try? await Task.sleep(for: .milliseconds(640))
-        if !Task.isCancelled {
-          self.isRendered = false
-        }
-      }
-    }
-  }
-
-  @ViewBuilder private var glow: some View {
-    if #available(iOS 18.0, macOS 15.0, *) {
-      MeshGradient(
-        width: 5,
-        height: 4,
-        points: self.meshPoints,
-        colors: self.meshColors,
-        smoothsColors: true,
-      )
-    } else {
-      LinearGradient(
-        colors: [
-          Color(
-            self.colorScheme,
-            light: .violet500.opacity(0.64),
-            dark: .violet900.opacity(0.76),
-          ),
-          Color(
-            self.colorScheme,
-            light: .fuchsia500.opacity(0.34),
-            dark: .fuchsia900.opacity(0.46),
-          ),
-          .clear,
-        ],
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing,
-      )
-    }
-  }
-
-  private var meshPoints: [SIMD2<Float>] {
-    [
-      .init(0, 0), .init(0.26, 0), .init(0.50, 0.02), .init(0.74, 0), .init(1, 0),
-      .init(0, 0.24), .init(0.24, 0.18), .init(0.50, 0.12), .init(0.76, 0.18), .init(1, 0.24),
-      .init(0, 0.52), .init(0.24, 0.43), .init(0.50, 0.37), .init(0.76, 0.43), .init(1, 0.52),
-      .init(0, 0.88), .init(0.28, 0.82), .init(0.50, 0.78), .init(0.72, 0.82), .init(1, 0.88),
-    ]
-  }
-
-  private var meshColors: [Color] {
-    [
-      Color(self.colorScheme, light: .violet500.opacity(0.80), dark: .violet800.opacity(0.68)),
-      Color(self.colorScheme, light: .fuchsia400.opacity(0.58), dark: .fuchsia900.opacity(0.52)),
-      Color(self.colorScheme, light: .fuchsia300.opacity(0.66), dark: .fuchsia950.opacity(0.44)),
-      Color(self.colorScheme, light: .fuchsia400.opacity(0.58), dark: .fuchsia900.opacity(0.52)),
-      Color(self.colorScheme, light: .violet500.opacity(0.80), dark: .violet800.opacity(0.68)),
-      Color(self.colorScheme, light: .violet600.opacity(0.54), dark: .violet900.opacity(0.52)),
-      Color(self.colorScheme, light: .fuchsia500.opacity(0.42), dark: .fuchsia900.opacity(0.40)),
-      Color(self.colorScheme, light: .violet500.opacity(0.42), dark: .violet900.opacity(0.38)),
-      Color(self.colorScheme, light: .fuchsia500.opacity(0.42), dark: .fuchsia900.opacity(0.40)),
-      Color(self.colorScheme, light: .violet600.opacity(0.54), dark: .violet900.opacity(0.52)),
-      Color(self.colorScheme, light: .violet500.opacity(0.16), dark: .violet950.opacity(0.16)),
-      Color(self.colorScheme, light: .fuchsia400.opacity(0.14), dark: .fuchsia950.opacity(0.14)),
-      Color(self.colorScheme, light: .violet500.opacity(0.18), dark: .violet950.opacity(0.16)),
-      Color(self.colorScheme, light: .fuchsia400.opacity(0.14), dark: .fuchsia950.opacity(0.14)),
-      Color(self.colorScheme, light: .violet500.opacity(0.16), dark: .violet950.opacity(0.16)),
-      .clear,
-      .clear,
-      .clear,
-      .clear,
-      .clear,
-    ]
-  }
-
-  private var fade: some View {
-    LinearGradient(
-      stops: [
-        .init(color: .black, location: 0),
-        .init(color: .black.opacity(0.88), location: 0.34),
-        .init(color: .black.opacity(0.18), location: 0.72),
-        .init(color: .clear, location: 0.94),
-      ],
-      startPoint: .top,
-      endPoint: .bottom,
-    )
-  }
-}
-
 #if DEBUG
-  private struct LibraryDebugResetOnboardingButton: View {
-    let onTap: @MainActor @Sendable () -> Void
+  private let previewLibraryViewItems =
+    [PlaylistData.previewRoadTrip].map(LibraryCollectionItemData.playlist)
+      + [ArtistData].previewArtists.map(LibraryCollectionItemData.artist)
+      + [AlbumData].previewAlbums.map(LibraryCollectionItemData.album)
 
-    var body: some View {
-      Button("Reset onboarding", action: self.onTap)
-        .font(.system(size: 12, weight: .semibold, design: .rounded))
-        .buttonStyle(.bordered)
-        .tint(.secondary)
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.regularMaterial, in: Capsule())
-    }
-  }
-#endif
-
-private struct LibraryMessageCard: View {
-  let title: String
-  let message: String
-  let systemImage: String
-  var buttonTitle: String?
-  var onButtonTap: @MainActor @Sendable () -> Void = {}
-
-  var body: some View {
-    VStack(spacing: 16) {
-      ZStack {
-        Circle()
-          .fill(.primary.opacity(0.06))
-          .frame(width: 76, height: 76)
-
-        Image(systemName: self.systemImage)
-          .font(.system(size: 30, weight: .semibold))
-          .foregroundStyle(.secondary)
-      }
-
-      VStack(spacing: 6) {
-        Text(self.title)
-          .font(.system(size: 22, weight: .bold, design: .rounded))
-          .foregroundStyle(.primary)
-
-        Text(self.message)
-          .font(.system(size: 15, weight: .medium))
-          .foregroundStyle(.secondary)
-          .multilineTextAlignment(.center)
-          .fixedSize(horizontal: false, vertical: true)
-      }
-
-      if let buttonTitle {
-        Button(buttonTitle, action: self.onButtonTap)
-          .buttonStyle(.borderedProminent)
-          .padding(.top, 4)
-      }
-    }
-    .frame(maxWidth: .infinity)
-    .padding(28)
-    .background(
-      .primary.opacity(0.05),
-      in: .rect(cornerRadius: 28, style: .continuous),
-    )
-  }
-}
-
-#if DEBUG
   #Preview("Loaded") {
     NavigationStack {
       LibraryView(
-        state: .loaded(albums: .previewAlbums),
+        state: .loaded(items: previewLibraryViewItems),
         onDebugResetTap: {},
       )
     }
   }
 
+  #Preview("Loaded, Dark") {
+    NavigationStack {
+      LibraryView(state: .loaded(items: previewLibraryViewItems))
+    }
+    .preferredColorScheme(.dark)
+  }
+
   #Preview("Loaded, Refreshing") {
     NavigationStack {
       LibraryView(
-        state: .loaded(albums: .previewAlbums),
+        state: .loaded(items: previewLibraryViewItems),
         isRefreshing: true,
       )
     }
@@ -440,4 +307,5 @@ private struct LibraryMessageCard: View {
       LibraryView(state: .failed, onDebugResetTap: {})
     }
   }
+
 #endif

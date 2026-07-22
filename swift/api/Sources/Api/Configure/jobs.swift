@@ -12,6 +12,7 @@ public extension Configure {
     app.queues.schedule(ScheduledMarketingCampaignJob()).daily().at(10, 30, .am)
     app.queues.schedule(CrashReporterJob()).hourly().at(25)
     app.queues.schedule(DailyReviewEmailJob()).hourly().at(15)
+    app.queues.schedule(MusicCatalogRefreshJob()).daily().at(3, 30, .am)
 
     // sync job runs twice hourly to preserve inferred new rating granularity
     app.queues.schedule(AppStoreSyncJob()).hourly().at(05)
@@ -31,5 +32,6 @@ public extension Configure {
       app.asyncCommands.use(ResetCommand(), as: "reset")
     #endif
     app.asyncCommands.use(SyncStagingDataCommand(), as: "sync-staging-data")
+    app.asyncCommands.use(MusicCatalogBackfillCommand(), as: "backfill-music-catalog")
   }
 }

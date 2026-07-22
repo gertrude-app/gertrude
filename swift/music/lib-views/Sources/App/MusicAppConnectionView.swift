@@ -73,10 +73,9 @@ public struct MusicAppConnectionView: View {
         .padding(.top, 8)
 
     case .unclaimed(let code):
-      let displayUrl = Self.displayClaimUrl(code)
-      let shareUrl = URL(string: Self.claimUrl(code))!
+      let claimLink = MusicClaimLink(code: code)
       VStack(spacing: 16) {
-        Text(Self.codeString(code))
+        Text(claimLink.codeString)
           .font(.system(size: 44, weight: .black, design: .rounded))
           .monospacedDigit()
           .tracking(5)
@@ -91,7 +90,7 @@ public struct MusicAppConnectionView: View {
             .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(.secondary)
 
-          Text(displayUrl)
+          Text(claimLink.displayURL)
             .font(.system(size: 17, weight: .semibold, design: .monospaced))
             .minimumScaleFactor(0.75)
             .lineLimit(1)
@@ -103,7 +102,7 @@ public struct MusicAppConnectionView: View {
         .padding(.vertical, 14)
         .background(.primary.opacity(0.05), in: .rect(cornerRadius: 18, style: .continuous))
 
-        ShareLink(item: shareUrl) {
+        ShareLink(item: claimLink.url) {
           Label("Send link", systemImage: "square.and.arrow.up")
             .frame(maxWidth: .infinity)
         }
@@ -152,18 +151,6 @@ public struct MusicAppConnectionView: View {
     case .failed:
       "wifi.exclamationmark"
     }
-  }
-
-  private static func codeString(_ code: Int) -> String {
-    String(format: "%06d", code)
-  }
-
-  private static func displayClaimUrl(_ code: Int) -> String {
-    "gertrude.app/m/\(self.codeString(code))"
-  }
-
-  private static func claimUrl(_ code: Int) -> String {
-    "https://\(self.displayClaimUrl(code))"
   }
 }
 

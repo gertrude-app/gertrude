@@ -8,36 +8,28 @@ import XHttp
 #endif
 
 struct AppleMusicClient: Sendable {
-  var searchAlbums:
-    @Sendable (_ search: AppleMusicAlbumSearch) async throws -> [AppleMusicCatalogAlbum]
+  var searchCatalog:
+    @Sendable (_ search: AppleMusicCatalogSearch) async throws -> AppleMusicCatalogSearchResults
   var albumTracks:
     @Sendable (_ lookup: AppleMusicAlbumTracksLookup) async throws -> [AppleMusicCatalogTrack]
+  var resolveAlbum:
+    @Sendable (_ albumId: Music.AlbumId) async throws -> Music.ResolvedAlbum
+  var resolveArtist:
+    @Sendable (_ artistId: Music.ArtistId) async throws -> Music.ResolvedArtist
 }
 
-struct AppleMusicAlbumSearch: Equatable, Sendable {
+struct AppleMusicCatalogSearch: Equatable, Sendable {
   var term: String
-  var storefront: String
   var limit: Int
 
-  init(
-    term: String,
-    storefront: String = "us",
-    limit: Int = 10,
-  ) {
+  init(term: String, limit: Int = 10) {
     self.term = term
-    self.storefront = storefront
     self.limit = limit
   }
 }
 
 struct AppleMusicAlbumTracksLookup: Equatable, Sendable {
   var albumId: Music.AlbumId
-  var storefront: String
-
-  init(albumId: Music.AlbumId, storefront: String = "us") {
-    self.albumId = albumId
-    self.storefront = storefront
-  }
 }
 
 struct AppleMusicCatalogAlbum: Codable, Equatable, Sendable {
@@ -45,8 +37,10 @@ struct AppleMusicCatalogAlbum: Codable, Equatable, Sendable {
   var title: String
   var artistName: String
   var artworkUrl: String?
+  var artwork: Music.Artwork?
   var trackCount: Int?
   var releaseDate: String?
+  var releaseType: String?
   var appleMusicUrl: String?
 
   init(
@@ -54,17 +48,76 @@ struct AppleMusicCatalogAlbum: Codable, Equatable, Sendable {
     title: String,
     artistName: String,
     artworkUrl: String? = nil,
+    artwork: Music.Artwork? = nil,
     trackCount: Int? = nil,
     releaseDate: String? = nil,
+    releaseType: String? = nil,
     appleMusicUrl: String? = nil,
   ) {
     self.id = id
     self.title = title
     self.artistName = artistName
     self.artworkUrl = artworkUrl
+    self.artwork = artwork
     self.trackCount = trackCount
     self.releaseDate = releaseDate
+    self.releaseType = releaseType
     self.appleMusicUrl = appleMusicUrl
+  }
+}
+
+struct AppleMusicCatalogArtist: Codable, Equatable, Sendable {
+  var id: Music.ArtistId
+  var name: String
+  var catalogMetadata: Music.CatalogMetadata?
+
+  init(
+    id: Music.ArtistId,
+    name: String,
+    catalogMetadata: Music.CatalogMetadata? = nil,
+  ) {
+    self.id = id
+    self.name = name
+    self.catalogMetadata = catalogMetadata
+  }
+}
+
+struct AppleMusicCatalogSearchResults: Codable, Equatable, Sendable {
+  var items: [AppleMusicCatalogSearchItem]
+  var albums: [AppleMusicCatalogAlbum]
+  var artists: [AppleMusicCatalogArtist]
+
+  init(
+    items: [AppleMusicCatalogSearchItem],
+    albums: [AppleMusicCatalogAlbum],
+    artists: [AppleMusicCatalogArtist],
+  ) {
+    self.items = items
+    self.albums = albums
+    self.artists = artists
+  }
+}
+
+struct AppleMusicCatalogSearchItem: Codable, Equatable, Sendable {
+  enum Kind: String, Codable, Sendable {
+    case album
+    case artist
+  }
+
+  var kind: Kind
+  var album: AppleMusicCatalogAlbum?
+  var artist: AppleMusicCatalogArtist?
+
+  init(album: AppleMusicCatalogAlbum) {
+    self.kind = .album
+    self.album = album
+    self.artist = nil
+  }
+
+  init(artist: AppleMusicCatalogArtist) {
+    self.kind = .artist
+    self.album = nil
+    self.artist = artist
   }
 }
 
@@ -74,6 +127,7 @@ struct AppleMusicCatalogTrack: Codable, Equatable, Sendable {
   var artistName: String
   var albumTitle: String?
   var artworkUrl: String?
+  var durationInMillis: Int?
 
   init(
     id: Music.TrackId,
@@ -81,25 +135,41 @@ struct AppleMusicCatalogTrack: Codable, Equatable, Sendable {
     artistName: String,
     albumTitle: String? = nil,
     artworkUrl: String? = nil,
+    durationInMillis: Int? = nil,
   ) {
     self.id = id
     self.title = title
     self.artistName = artistName
     self.albumTitle = albumTitle
     self.artworkUrl = artworkUrl
+    self.durationInMillis = durationInMillis
   }
 }
 
 extension AppleMusicClient: DependencyKey {
   static var liveValue: Self {
     Self(
-      searchAlbums: { search in
+      searchCatalog: { search in
         let token = try await generateAppleMusicDeveloperToken()
-        return try await searchAppleMusicCatalogAlbums(search, developerToken: token)
+        return try await searchAppleMusicCatalog(search, developerToken: token)
       },
       albumTracks: { lookup in
         let token = try await generateAppleMusicDeveloperToken()
         return try await fetchAppleMusicCatalogAlbumTracks(lookup, developerToken: token)
+      },
+      resolveAlbum: { albumId in
+        let token = try await generateAppleMusicDeveloperToken()
+        return try await resolveAppleMusicCatalogAlbum(
+          albumId,
+          load: appleMusicDataLoader(developerToken: token),
+        )
+      },
+      resolveArtist: { artistId in
+        let token = try await generateAppleMusicDeveloperToken()
+        return try await resolveAppleMusicCatalogArtist(
+          artistId,
+          load: appleMusicDataLoader(developerToken: token),
+        )
       },
     )
   }
@@ -107,8 +177,13 @@ extension AppleMusicClient: DependencyKey {
 
 extension AppleMusicClient: TestDependencyKey {
   static let testValue = Self(
-    searchAlbums: unimplemented("AppleMusicClient.searchAlbums()", placeholder: []),
+    searchCatalog: unimplemented(
+      "AppleMusicClient.searchCatalog()",
+      placeholder: .init(items: [], albums: [], artists: []),
+    ),
     albumTracks: unimplemented("AppleMusicClient.albumTracks()", placeholder: []),
+    resolveAlbum: { try Self.testResolvedAlbum($0) },
+    resolveArtist: { try Self.testResolvedArtist($0) },
   )
 }
 
@@ -154,11 +229,11 @@ private struct AppleMusicDeveloperTokenPayload: JWTPayload {
   }
 }
 
-func searchAppleMusicCatalogAlbums(
-  _ search: AppleMusicAlbumSearch,
+func searchAppleMusicCatalog(
+  _ search: AppleMusicCatalogSearch,
   developerToken: String,
-) async throws -> [AppleMusicCatalogAlbum] {
-  let url = try appleMusicCatalogSearchURL(search)
+) async throws -> AppleMusicCatalogSearchResults {
+  let url = try appleMusicCatalogMixedSearchURL(search)
   var request = URLRequest(url: url)
   request.httpMethod = "GET"
   request.setValue("Bearer \(developerToken)", forHTTPHeaderField: "Authorization")
@@ -175,21 +250,62 @@ func searchAppleMusicCatalogAlbums(
     )
   }
 
-  return try decodeAppleMusicCatalogAlbums(from: data)
+  return try decodeAppleMusicCatalogSearchResults(from: data)
 }
 
-func appleMusicCatalogSearchURL(_ search: AppleMusicAlbumSearch) throws -> URL {
+func appleMusicCatalogMixedSearchURL(_ search: AppleMusicCatalogSearch) throws -> URL {
+  try appleMusicCatalogSearchURL(
+    term: search.term,
+    limit: search.limit,
+    types: ["albums", "artists"],
+    with: ["topResults"],
+  )
+}
+
+private func appleMusicCatalogSearchURL(
+  term: String,
+  limit: Int,
+  types: [String],
+  with: [String] = [],
+) throws -> URL {
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(search.storefront)/search"
+  components.path = "/v1/catalog/us/search"
   components.queryItems = [
-    .init(name: "term", value: search.term),
-    .init(name: "types", value: "albums"),
-    .init(name: "limit", value: String(search.limit)),
+    .init(name: "term", value: term),
+    .init(name: "types", value: types.joined(separator: ",")),
+    .init(name: "limit", value: String(limit)),
   ]
+  if !with.isEmpty {
+    components.queryItems?.append(.init(name: "with", value: with.joined(separator: ",")))
+  }
   guard let url = components.url else {
     throw AppleMusicError.invalidSearchUrl
+  }
+  return url
+}
+
+func appleMusicCatalogURL(fromNext next: String) throws -> URL {
+  guard var components = URLComponents(string: next) else {
+    throw AppleMusicError.invalidCatalogPaginationUrl
+  }
+  if let scheme = components.scheme, scheme.lowercased() != "https" {
+    throw AppleMusicError.invalidCatalogPaginationUrl
+  }
+  if let host = components.host, host.lowercased() != "api.music.apple.com" {
+    throw AppleMusicError.invalidCatalogPaginationUrl
+  }
+  guard components.user == nil, components.password == nil, components.port == nil else {
+    throw AppleMusicError.invalidCatalogPaginationUrl
+  }
+  components.scheme = "https"
+  components.host = "api.music.apple.com"
+  if !components.path.hasPrefix("/") {
+    components.path = "/" + components.path
+  }
+  guard let url = components.url else {
+    throw AppleMusicError.invalidCatalogPaginationUrl
   }
   return url
 }
@@ -222,7 +338,7 @@ func appleMusicCatalogAlbumURL(_ lookup: AppleMusicAlbumTracksLookup) throws -> 
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/\(lookup.storefront)/albums/\(lookup.albumId.rawValue)"
+  components.path = "/v1/catalog/us/albums/\(lookup.albumId.rawValue)"
   components.queryItems = [
     .init(name: "include", value: "tracks"),
   ]
@@ -232,19 +348,113 @@ func appleMusicCatalogAlbumURL(_ lookup: AppleMusicAlbumTracksLookup) throws -> 
   return url
 }
 
-func decodeAppleMusicCatalogAlbums(from data: Data) throws -> [AppleMusicCatalogAlbum] {
+func decodeAppleMusicCatalogSearchResults(
+  from data: Data,
+) throws -> AppleMusicCatalogSearchResults {
   let response = try JSONDecoder().decode(AppleMusicCatalogSearchResponse.self, from: data)
-  return response.results?.albums?.data.map { album in
-    .init(
-      id: .init(rawValue: album.id),
-      title: album.attributes.name,
-      artistName: album.attributes.artistName,
-      artworkUrl: sizedAppleMusicArtworkUrl(album.attributes.artwork?.url),
-      trackCount: album.attributes.trackCount,
-      releaseDate: album.attributes.releaseDate,
-      appleMusicUrl: album.attributes.url,
-    )
-  } ?? []
+  let albums = response.results?.albums?.data.map(catalogAlbum(from:)) ?? []
+  let artists = response.results?.artists?.data.map(catalogArtist(from:)) ?? []
+  let topItems = response.results?.topResults?.data.compactMap(catalogSearchItem(from:)) ?? []
+  return .init(
+    items: topItems.isEmpty
+      ? fallbackCatalogSearchItems(
+        albums: albums,
+        artists: artists,
+        order: response.meta?.results.order,
+      )
+      : topItems,
+    albums: albums,
+    artists: artists,
+  )
+}
+
+private func catalogAlbum(
+  from album: AppleMusicCatalogSearchResponse.Album,
+) -> AppleMusicCatalogAlbum {
+  .init(
+    id: .init(rawValue: album.id),
+    title: album.attributes.name,
+    artistName: album.attributes.artistName,
+    artworkUrl: sizedAppleMusicArtworkUrl(album.attributes.artwork?.url),
+    artwork: album.attributes.artwork.map(catalogArtwork(from:)),
+    trackCount: album.attributes.trackCount,
+    releaseDate: album.attributes.releaseDate,
+    releaseType: album.attributes.releaseType,
+    appleMusicUrl: album.attributes.url,
+  )
+}
+
+private func catalogArtist(
+  from artist: AppleMusicCatalogSearchResponse.Artist,
+) -> AppleMusicCatalogArtist {
+  .init(
+    id: .init(rawValue: artist.id),
+    name: artist.attributes.name,
+    catalogMetadata: catalogMetadata(from: artist.attributes),
+  )
+}
+
+private func catalogSearchItem(
+  from topResult: AppleMusicCatalogSearchResponse.TopResult,
+) -> AppleMusicCatalogSearchItem? {
+  if let album = topResult.album {
+    .init(album: catalogAlbum(from: album))
+  } else if let artist = topResult.artist {
+    .init(artist: catalogArtist(from: artist))
+  } else {
+    nil
+  }
+}
+
+private func fallbackCatalogSearchItems(
+  albums: [AppleMusicCatalogAlbum],
+  artists: [AppleMusicCatalogArtist],
+  order: [String]?,
+) -> [AppleMusicCatalogSearchItem] {
+  let orderedKinds = order ?? ["artists", "albums"]
+  var items: [AppleMusicCatalogSearchItem] = []
+  for kind in orderedKinds {
+    switch kind {
+    case "albums":
+      items.append(contentsOf: albums.map(AppleMusicCatalogSearchItem.init(album:)))
+    case "artists":
+      items.append(contentsOf: artists.map(AppleMusicCatalogSearchItem.init(artist:)))
+    default:
+      break
+    }
+  }
+  return items.isEmpty
+    ? albums.map(AppleMusicCatalogSearchItem.init(album:))
+    + artists.map(AppleMusicCatalogSearchItem.init(artist:))
+    : items
+}
+
+private func catalogMetadata(
+  from attributes: AppleMusicCatalogSearchResponse.ArtistAttributes,
+) -> Music.CatalogMetadata {
+  .init(
+    artwork: attributes.artwork.map(catalogArtwork(from:)),
+    editorialNotes: attributes.editorialNotes.map {
+      .init(tagline: $0.tagline, short: $0.short, standard: $0.standard, name: $0.name)
+    },
+    appleMusicUrl: attributes.url,
+    genreNames: attributes.genreNames ?? [],
+  )
+}
+
+private func catalogArtwork(
+  from artwork: AppleMusicCatalogSearchResponse.Artwork,
+) -> Music.Artwork {
+  .init(
+    url: artwork.url,
+    width: artwork.width,
+    height: artwork.height,
+    bgColor: artwork.bgColor,
+    textColor1: artwork.textColor1,
+    textColor2: artwork.textColor2,
+    textColor3: artwork.textColor3,
+    textColor4: artwork.textColor4,
+  )
 }
 
 func decodeAppleMusicCatalogAlbumTracks(from data: Data) throws -> [AppleMusicCatalogTrack] {
@@ -258,6 +468,7 @@ func decodeAppleMusicCatalogAlbumTracks(from data: Data) throws -> [AppleMusicCa
       artistName: attributes.artistName,
       albumTitle: attributes.albumName,
       artworkUrl: sizedAppleMusicArtworkUrl(attributes.artwork?.url),
+      durationInMillis: attributes.durationInMillis,
     )
   } ?? []
 }
@@ -270,9 +481,12 @@ private func sizedAppleMusicArtworkUrl(_ url: String?) -> String? {
 
 private struct AppleMusicCatalogSearchResponse: Decodable {
   var results: Results?
+  var meta: Meta?
 
   struct Results: Decodable {
     var albums: AlbumCollection?
+    var artists: ArtistCollection?
+    var topResults: TopResultCollection?
   }
 
   struct AlbumCollection: Decodable {
@@ -290,11 +504,90 @@ private struct AppleMusicCatalogSearchResponse: Decodable {
     var artwork: Artwork?
     var trackCount: Int?
     var releaseDate: String?
+    var isSingle: Bool?
+    var url: String?
+
+    var releaseType: String? {
+      if self.name.lowercased().hasSuffix(" - ep") {
+        "EP"
+      } else if let isSingle = self.isSingle {
+        isSingle ? "Single" : "Album"
+      } else {
+        nil
+      }
+    }
+  }
+
+  struct ArtistCollection: Decodable {
+    var data: [Artist]
+  }
+
+  struct Artist: Decodable {
+    var id: String
+    var attributes: ArtistAttributes
+  }
+
+  struct TopResultCollection: Decodable {
+    var data: [TopResult]
+  }
+
+  struct TopResult: Decodable {
+    var album: Album?
+    var artist: Artist?
+
+    init(from decoder: Decoder) throws {
+      let container = try decoder.container(keyedBy: CodingKeys.self)
+      let type = try container.decode(String.self, forKey: .type)
+      switch type {
+      case "albums":
+        self.album = try? Album(from: decoder)
+        self.artist = nil
+      case "artists":
+        self.album = nil
+        self.artist = try? Artist(from: decoder)
+      default:
+        self.album = nil
+        self.artist = nil
+      }
+    }
+
+    enum CodingKeys: String, CodingKey {
+      case type
+    }
+  }
+
+  struct ArtistAttributes: Decodable {
+    var name: String
+    var artwork: Artwork?
+    var editorialNotes: EditorialNotes?
+    var genreNames: [String]?
     var url: String?
   }
 
   struct Artwork: Decodable {
     var url: String?
+    var width: Int?
+    var height: Int?
+    var bgColor: String?
+    var textColor1: String?
+    var textColor2: String?
+    var textColor3: String?
+    var textColor4: String?
+  }
+
+  struct EditorialNotes: Decodable {
+    var tagline: String?
+    var short: String?
+    var standard: String?
+    var name: String?
+  }
+
+  struct Meta: Decodable {
+    var results: ResultsMeta
+  }
+
+  struct ResultsMeta: Decodable {
+    var order: [String]?
   }
 }
 
@@ -324,6 +617,7 @@ private struct AppleMusicCatalogAlbumResponse: Decodable {
     var artistName: String
     var albumName: String?
     var artwork: Artwork?
+    var durationInMillis: Int?
   }
 
   struct Artwork: Decodable {
@@ -334,6 +628,7 @@ private struct AppleMusicCatalogAlbumResponse: Decodable {
 enum AppleMusicError: Error, CustomStringConvertible {
   case missingEnv(String)
   case invalidSearchUrl
+  case invalidCatalogPaginationUrl
   case invalidAlbumUrl
   case invalidResponseType
   case httpError(statusCode: Int, body: String)
@@ -344,6 +639,8 @@ enum AppleMusicError: Error, CustomStringConvertible {
       "Missing required environment variable: `\(key)`"
     case .invalidSearchUrl:
       "Invalid Apple Music search URL"
+    case .invalidCatalogPaginationUrl:
+      "Invalid Apple Music catalog pagination URL"
     case .invalidAlbumUrl:
       "Invalid Apple Music album URL"
     case .invalidResponseType:
@@ -355,22 +652,6 @@ enum AppleMusicError: Error, CustomStringConvertible {
 }
 
 extension AppleMusicClient {
-  static let mock = Self(
-    searchAlbums: { search in
-      let term = search.term.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-      let albums =
-        term.isEmpty
-          ? Self.mockAlbums
-          : Self.mockAlbums.filter {
-            $0.title.lowercased().contains(term) || $0.artistName.lowercased().contains(term)
-          }
-      return Array(albums.prefix(max(0, search.limit)))
-    },
-    albumTracks: { lookup in
-      Self.mockTracksByAlbum[lookup.albumId.rawValue] ?? []
-    },
-  )
-
   static let mockAlbums: [AppleMusicCatalogAlbum] = [
     .init(
       id: "1511628001",
@@ -411,6 +692,42 @@ extension AppleMusicClient {
       trackCount: 12,
       releaseDate: "2022-09-16",
       appleMusicUrl: "https://music.apple.com/us/album/brewed/1641851258",
+    ),
+  ]
+
+  static let mockArtists: [AppleMusicCatalogArtist] = [
+    .init(
+      id: "123456789",
+      name: "Lena Jonsson Trio",
+      catalogMetadata: .init(
+        artwork: .init(
+          url: "https://is1-ssl.mzstatic.com/image/thumb/Features116/v4/artist-lena/{w}x{h}bb.jpg",
+          width: 1200,
+          height: 1200,
+          bgColor: "19160f",
+          textColor1: "f3949b",
+          textColor2: "b08ff2",
+          textColor3: "c77b7f",
+          textColor4: "9277c5",
+        ),
+        editorialNotes: .init(tagline: "Modern Swedish folk"),
+        appleMusicUrl: "https://music.apple.com/us/artist/lena-jonsson-trio/123456789",
+        genreNames: ["Folk", "Worldwide"],
+      ),
+    ),
+    .init(
+      id: "555555555",
+      name: "Väsen",
+      catalogMetadata: .init(
+        artwork: .init(
+          url: "https://is1-ssl.mzstatic.com/image/thumb/Features116/v4/artist-vasen/{w}x{h}bb.jpg",
+          width: 1200,
+          height: 1200,
+        ),
+        editorialNotes: .init(tagline: "Strings and grooves"),
+        appleMusicUrl: "https://music.apple.com/us/artist/vasen/555555555",
+        genreNames: ["Folk"],
+      ),
     ),
   ]
 

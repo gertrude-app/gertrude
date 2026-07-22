@@ -355,6 +355,35 @@ jobs:
           cd swift/podcasts/lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
           cd ../lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
 
+  music-lib:
+    needs: files-changed
+    if: needs.files-changed.outputs.music == 'true'
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.1.1
+      - uses: actions/cache@v4
+        with:
+          path: |
+            swift/music/lib-tca/.build
+            swift/music/lib-views/.build
+          key: music-xc26.1.1-${{ hashFiles('swift/music/lib-tca/Package.resolved') }}
+          restore-keys: music-xc26.1.1-
+      - name: build
+        run: |
+          cd swift/music/lib-views && swift build
+          cd ../lib-tca && swift build
+      - name: test
+        timeout-minutes: 12
+        run: |
+          cd swift/music/lib-views && SWIFT_DETERMINISTIC_HASHING=1 swift test
+          cd ../lib-tca && SWIFT_DETERMINISTIC_HASHING=1 swift test
+
   swift-lint:
     needs: files-changed
     if: needs.files-changed.outputs.swift == 'true' && github.event_name == 'pull_request'
@@ -387,6 +416,7 @@ jobs:
       macapp: ${{ steps.changes.outputs.macapp }}
       iosapp: ${{ steps.changes.outputs.iosapp }}
       podcasts: ${{ steps.changes.outputs.podcasts }}
+      music: ${{ steps.changes.outputs.music }}
       libs: ${{ steps.changes.outputs.libs }}
       api: ${{ steps.changes.outputs.api }}
       swift: ${{ steps.changes.outputs.swift }}
@@ -421,6 +451,16 @@ jobs:
               - swift/pairql-podcasts/**
               - swift/api/Sources/Api/PairQL/Podcast/**
               - swift/ts-codable-macro/**
+            music:
+              - swift/music/**
+              - swift/gertie/**
+              - swift/gertie-tca-features/**
+              - swift/pairql/**
+              - swift/pairql-ios-apps/**
+              - swift/pairql-music/**
+              - swift/ts-codable-macro/**
+              - swift/x-expect/**
+              - swift/x-kit/**
             libs:
               - swift/duet/**
               - swift/pairql/**

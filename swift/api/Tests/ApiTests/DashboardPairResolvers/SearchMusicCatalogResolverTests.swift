@@ -6,23 +6,34 @@ import XExpect
 @testable import Api
 
 final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
-  func testSearchesAppleMusicAlbums() async throws {
+  func testSearchesAppleMusicAlbumsAndArtistsInMixedOrder() async throws {
     let parent = try await self.parent()
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
 
     let output = try await withDependencies {
-      $0.appleMusic.searchAlbums = { search in
-        [
-          .init(
-            id: .init(rawValue: "1511628001"),
-            title: search.term,
-            artistName: search.storefront,
-            artworkUrl: "https://example.com/art.jpg",
-            trackCount: search.limit,
-            releaseDate: "2020-05-29",
-            appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
-          ),
-        ]
+      $0.appleMusic.searchCatalog = { search in
+        expect(search.term).toEqual("Lena")
+        expect(search.limit).toEqual(10)
+        let album = AppleMusicCatalogAlbum(
+          id: .init(rawValue: "1511628001"),
+          title: search.term,
+          artistName: "us",
+          artworkUrl: "https://example.com/art.jpg",
+          artwork: albumArtwork(),
+          trackCount: search.limit,
+          releaseDate: "2020-05-29",
+          appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
+        )
+        let artist = AppleMusicCatalogArtist(
+          id: .init(rawValue: "123456789"),
+          name: search.term,
+          catalogMetadata: artistMetadata(genreNames: ["us"]),
+        )
+        return .init(
+          items: [.init(artist: artist), .init(album: album)],
+          albums: [album],
+          artists: [artist],
+        )
       }
     } operation: {
       try await SearchMusicCatalog.resolve(
@@ -31,17 +42,28 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
       )
     }
 
-    expect(output.albums).toEqual([
-      .init(
-        id: .init(rawValue: "1511628001"),
-        title: "Lena",
-        artistName: "us",
-        artworkUrl: "https://example.com/art.jpg",
-        trackCount: 10,
-        releaseDate: "2020-05-29",
-        appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
-      ),
+    let album = SearchMusicCatalog.Output.Album(
+      id: .init(rawValue: "1511628001"),
+      title: "Lena",
+      artistName: "us",
+      artworkUrl: "https://example.com/art.jpg",
+      artwork: albumArtwork(),
+      trackCount: 10,
+      releaseDate: "2020-05-29",
+      appleMusicUrl: "https://music.apple.com/us/album/stories-from-the-outside/1511628001",
+    )
+    let artist = SearchMusicCatalog.Output.Artist(
+      id: .init(rawValue: "123456789"),
+      name: "Lena",
+      catalogMetadata: artistMetadata(genreNames: ["us"]),
+    )
+
+    expect(output.items).toEqual([
+      .init(kind: .artist, album: nil, artist: artist),
+      .init(kind: .album, album: album, artist: nil),
     ])
+    expect(output.albums).toEqual([album])
+    expect(output.artists).toEqual([artist])
   }
 
   func testClampsSearchLimit() async throws {
@@ -49,13 +71,17 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
 
     let highLimit = try await withDependencies {
-      $0.appleMusic.searchAlbums = { search in
-        [.init(
-          id: .init(rawValue: "1"),
-          title: "Album",
-          artistName: "Artist",
-          trackCount: search.limit,
-        )]
+      $0.appleMusic.searchCatalog = { search in
+        .init(
+          items: [.init(artist: .init(id: .init(rawValue: "2"), name: "Artist \(search.limit)"))],
+          albums: [.init(
+            id: .init(rawValue: "1"),
+            title: "Album",
+            artistName: "Artist",
+            trackCount: search.limit,
+          )],
+          artists: [.init(id: .init(rawValue: "2"), name: "Artist \(search.limit)")],
+        )
       }
     } operation: {
       try await SearchMusicCatalog.resolve(
@@ -65,13 +91,17 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
     }
 
     let lowLimit = try await withDependencies {
-      $0.appleMusic.searchAlbums = { search in
-        [.init(
-          id: .init(rawValue: "1"),
-          title: "Album",
-          artistName: "Artist",
-          trackCount: search.limit,
-        )]
+      $0.appleMusic.searchCatalog = { search in
+        .init(
+          items: [.init(artist: .init(id: .init(rawValue: "2"), name: "Artist \(search.limit)"))],
+          albums: [.init(
+            id: .init(rawValue: "1"),
+            title: "Album",
+            artistName: "Artist",
+            trackCount: search.limit,
+          )],
+          artists: [.init(id: .init(rawValue: "2"), name: "Artist \(search.limit)")],
+        )
       }
     } operation: {
       try await SearchMusicCatalog.resolve(
@@ -81,16 +111,18 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
     }
 
     expect(highLimit.albums[0].trackCount).toEqual(25)
+    expect(highLimit.artists[0].name).toEqual("Artist 25")
     expect(lowLimit.albums[0].trackCount).toEqual(1)
+    expect(lowLimit.artists[0].name).toEqual("Artist 1")
   }
 
-  func testBlankQueryReturnsNoAlbumsWithoutSearching() async throws {
+  func testBlankQueryReturnsNoResultsWithoutSearching() async throws {
     let parent = try await self.parent()
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
 
     let output = try await withDependencies {
       $0.appleMusic
-        .searchAlbums = { _ in throw SearchMusicCatalogResolverTestError.unexpectedSearch }
+        .searchCatalog = { _ in throw SearchMusicCatalogResolverTestError.unexpectedSearch }
     } operation: {
       try await SearchMusicCatalog.resolve(
         with: .init(query: "   ", limit: 10),
@@ -98,7 +130,9 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
       )
     }
 
+    expect(output.items).toEqual([])
     expect(output.albums).toEqual([])
+    expect(output.artists).toEqual([])
   }
 
   func testRequiresMusicAccess() async throws {
@@ -114,6 +148,32 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
       expect(error.type).toEqual(.paymentRequired)
     }
   }
+}
+
+private func albumArtwork() -> Music.Artwork {
+  .init(
+    url: "https://example.com/art/{w}x{h}bb.jpg",
+    width: 1200,
+    height: 1200,
+    bgColor: "102030",
+    textColor1: "ffffff",
+    textColor2: "eeeeee",
+    textColor3: "dddddd",
+    textColor4: "cccccc",
+  )
+}
+
+private func artistMetadata(genreNames: [String] = ["Folk"]) -> Music.CatalogMetadata {
+  .init(
+    artwork: .init(
+      url: "https://example.com/artist/{w}x{h}bb.jpg",
+      width: 1200,
+      height: 1200,
+    ),
+    editorialNotes: .init(tagline: "Modern Swedish folk"),
+    appleMusicUrl: "https://music.apple.com/us/artist/lena-jonsson-trio/123456789",
+    genreNames: genreNames,
+  )
 }
 
 enum SearchMusicCatalogResolverTestError: Error {

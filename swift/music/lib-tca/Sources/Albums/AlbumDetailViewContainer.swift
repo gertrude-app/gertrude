@@ -12,11 +12,16 @@ struct AlbumDetailViewContainer: View {
         tracks: self.store.album.tracks.map {
           TrackData(track: $0)
         },
-        transitionSourceID: self.store.transitionSourceID,
         isPlaying: self.store.isPlaying,
         isLoading: self.store.isLoading,
         currentTrackID: self.store.currentTrackID?.rawValue,
+        onAddToPlaylist: { self.store.send(.addToPlaylistTapped) },
+        onAddToQueue: { self.store.send(.addToQueueTapped) },
+        onPlayNext: { self.store.send(.playNextTapped) },
         onPlayTap: { self.store.send(.playTapped) },
+        onTrackAddToPlaylist: { self.store.send(.trackAddToPlaylistTapped(.init($0))) },
+        onTrackAddToQueue: { self.store.send(.trackAddToQueueTapped(.init($0))) },
+        onTrackPlayNext: { self.store.send(.trackPlayNextTapped(.init($0))) },
         onTrackTap: { self.store.send(.trackTapped(.init($0))) },
       )
 

@@ -13,8 +13,11 @@ extension Music {
     var title: String
     var artistName: String
     var artworkUrl: String?
+    var artwork: Artwork?
     var trackCount: Int?
     var showsArtwork: Bool
+    var resolution: ResolvedAlbum?
+    var resolvedAt: Date?
     var createdAt = Date()
 
     init(
@@ -24,8 +27,11 @@ extension Music {
       title: String,
       artistName: String,
       artworkUrl: String? = nil,
+      artwork: Artwork? = nil,
       trackCount: Int? = nil,
       showsArtwork: Bool = true,
+      resolution: ResolvedAlbum? = nil,
+      resolvedAt: Date? = nil,
     ) {
       self.id = id
       self.childId = childId
@@ -33,8 +39,11 @@ extension Music {
       self.title = title
       self.artistName = artistName
       self.artworkUrl = artworkUrl
+      self.artwork = artwork
       self.trackCount = trackCount
       self.showsArtwork = showsArtwork
+      self.resolution = resolution
+      self.resolvedAt = resolvedAt
     }
   }
 }

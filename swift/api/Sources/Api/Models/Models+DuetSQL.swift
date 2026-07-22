@@ -3,6 +3,7 @@ import DuetSQL
 import Gertie
 import GertieApp
 import GertieBlocker
+import MusicRoute
 import Tagged
 
 extension DashAnnouncement.Kind: PostgresRawBindable {}
@@ -81,3 +82,10 @@ extension MusicApp.Token {
 extension Parent.Notification.Trigger: PostgresRawBindable {}
 
 extension ReleaseChannel: @retroactive PostgresRawBindable {}
+
+extension Music.Artwork: PostgresJsonable {}
+extension Music.CatalogMetadata: PostgresJsonable {}
+extension Music.ResolvedTrack: PostgresJsonable {}
+extension Music.ResolvedAlbum: PostgresJsonable {}
+extension Music.ResolvedArtist: PostgresJsonable {}
+extension MusicLibrarySnapshot: @retroactive PostgresJsonable {}
