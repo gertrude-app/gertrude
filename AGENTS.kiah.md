@@ -8,6 +8,16 @@ building projects, checking Xcode navigator issues, rendering SwiftUI previews, 
 build logs, and inspecting project structure. Prefer it over shell-only checks when the
 user's issue is visible in Xcode or previews.
 
+For physical-device Gertrude Music debug builds, generate the Xcode project with Kiah's
+personal development team and temporary bundle identifier. Keep these as generation-time
+overrides rather than changing the checked-in project defaults:
+
+```bash
+GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM=Y63PLK783B \
+GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER=com.innocencelabs.gertrude-fm-temp-dev \
+just music gen
+```
+
 If I refer to Jared, he's my boss and coworker, we're the only two full-time developers
 working on Gertrude.
 
