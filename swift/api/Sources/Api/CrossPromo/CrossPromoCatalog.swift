@@ -16,7 +16,14 @@ enum CrossPromoCatalog {
   }
 
   static let campaigns: [App: [CrossPromoCampaign]] = [
-    .iosBlocker: [Self.gertrudeAmBlockerOnboarding],
+    .gertrudeAm: [
+      Self.gertrudeMusicAmOnboardingParent,
+      Self.gertrudeMusicAmChildHome,
+    ],
+    .iosBlocker: [
+      Self.gertrudeMusicBlockerOnboarding,
+      Self.gertrudeMusicBlockerHome,
+    ],
   ]
 
   static func select(app: App, for device: Device) -> [CrossPromoCampaign] {
@@ -24,22 +31,91 @@ enum CrossPromoCatalog {
     self.campaigns[app] ?? []
   }
 
-  static let gertrudeAmBlockerOnboarding = CrossPromoCampaign(
-    campaignId: "ios-blocker-onboarding-gertrude-am-v1",
+  static let gertrudeMusicBlockerOnboarding = CrossPromoCampaign(
+    campaignId: "ios-blocker-onboarding-gertrude-music-v1",
     placement: "iosBlockerOnboarding",
     style: .screen,
-    headline: "Kid-safe podcasts too!",
-    body: "Gertrude Podcasts is a podcast player app where parents choose the shows and kids listen independently. Searching and subscribing to podcasts is locked behind a PIN code.",
+    headline: "Introducing Gertrude Music",
+    body: "You choose the music. They get a delightful listening app that shows only what you’ve approved—no search, feeds, chat, or recommendations.",
     image: .init(
-      url: "https://gertrude-web-assets.nyc3.digitaloceanspaces.com/xpromo/gertrude-am-icon-512.png",
-      description: "Gertrude Podcasts app icon",
+      url: "https://gertrude-web-assets.nyc3.digitaloceanspaces.com/xpromo/gertrude-music-v1.webp",
+      description: "Gertrude Music icon over a blurred album library",
     ),
-    primaryCta: .init(label: "Get Gertrude Podcasts", action: .openAppStoreProduct("6753187429")),
+    primaryCta: .init(
+      label: "Get Gertrude Music",
+      action: .openAppStoreProduct("6782194077"),
+    ),
     secondaryCta: .init(
       label: "Send a link ↗",
-      action: .share("https://gertrude.app/blog/safe-podcast-app-for-kids"),
+      action: .share("https://gertrude.app/music"),
     ),
     tertiaryCta: .init(label: "No thanks", action: .dismiss),
     dismissable: false,
+  )
+
+  static let gertrudeMusicBlockerHome = CrossPromoCampaign(
+    campaignId: "ios-blocker-home-gertrude-music-v1",
+    placement: "iosBlockerHome",
+    style: .sheet,
+    headline: "Meet Gertrude Music",
+    body: "Enjoy a delightful music app that shows only music chosen for you by a parent or accountability partner—no search, feeds, chat, or recommendations.",
+    image: .init(
+      url: "https://gertrude-web-assets.nyc3.digitaloceanspaces.com/xpromo/gertrude-music-v1.webp",
+      description: "Gertrude Music icon over a blurred album library",
+    ),
+    primaryCta: .init(
+      label: "Get Gertrude Music",
+      action: .openAppStoreProduct("6782194077"),
+    ),
+    secondaryCta: .init(
+      label: "Send a link ↗",
+      action: .share("https://gertrude.app/music"),
+    ),
+    tertiaryCta: .init(label: "No thanks", action: .dismiss),
+    dismissable: true,
+  )
+
+  static let gertrudeMusicAmOnboardingParent = CrossPromoCampaign(
+    campaignId: "am-onboarding-parent-gertrude-music-v1",
+    placement: "amOnboardingParent",
+    style: .sheet,
+    headline: "Introducing Gertrude Music",
+    body: "You choose the music. They get a delightful listening app that shows only what you’ve approved—no search, feeds, chat, or recommendations.",
+    image: .init(
+      url: "https://gertrude-web-assets.nyc3.digitaloceanspaces.com/xpromo/gertrude-music-v1.webp",
+      description: "Gertrude Music icon over a blurred album library",
+    ),
+    primaryCta: .init(
+      label: "Get Gertrude Music",
+      action: .openAppStoreProduct("6782194077"),
+    ),
+    secondaryCta: .init(
+      label: "Send a link ↗",
+      action: .share("https://gertrude.app/music"),
+    ),
+    tertiaryCta: .init(label: "No thanks", action: .dismiss),
+    dismissable: false,
+  )
+
+  static let gertrudeMusicAmChildHome = CrossPromoCampaign(
+    campaignId: "am-child-home-gertrude-music-v1",
+    placement: "amChildHome",
+    style: .sheet,
+    headline: "Meet Gertrude Music",
+    body: "Enjoy a delightful music app that shows only music chosen for you by a parent or accountability partner—no search, feeds, chat, or recommendations.",
+    image: .init(
+      url: "https://gertrude-web-assets.nyc3.digitaloceanspaces.com/xpromo/gertrude-music-v1.webp",
+      description: "Gertrude Music icon over a blurred album library",
+    ),
+    primaryCta: .init(
+      label: "Get Gertrude Music",
+      action: .openAppStoreProduct("6782194077"),
+    ),
+    secondaryCta: .init(
+      label: "Send a link ↗",
+      action: .share("https://gertrude.app/music"),
+    ),
+    tertiaryCta: .init(label: "No thanks", action: .dismiss),
+    dismissable: true,
   )
 }
