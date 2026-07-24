@@ -1,38 +1,62 @@
-import { LoadingDots, PageHeading } from '@gertrude/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import type { PersonCardPerson } from '#/components/types';
+import type {
+  LoadableState,
+  PersonCardPerson,
+  SuspensionRequest,
+} from '#/components/types';
 import type { GetPeople } from '@shared/pairql/src/account';
-import DashboardPage from '#/components/layout/DashboardPage';
 import PeoplePage from '#/components/pages/people/PeoplePage';
+import { toSuspensionRequest } from '#/lib/suspensionRequests';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useQuery } from '#/pairql/query';
 
 const PeopleRoute: React.FC = () => {
-  const query = useQuery(Key.people, () => liveClient.getPeople());
+  const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
+  const suspensionRequestsQuery = useQuery(Key.suspensionRequests, () =>
+    liveClient.getSuspensionRequests(),
+  );
 
-  if (query.isPending) {
-    return (
-      <DashboardPage heading={<PageHeading title="Protected People" />}>
-        <LoadingDots />
-      </DashboardPage>
-    );
-  }
+  const peopleState: LoadableState<PersonCardPerson[]> =
+    peopleQuery.data !== undefined
+      ? {
+          status: `success`,
+          data: peopleQuery.data.map(toPersonCardPerson),
+        }
+      : peopleQuery.isError
+        ? {
+            status: `error`,
+            message:
+              peopleQuery.error.userMessage ?? `Check your connection and try again.`,
+            onRetry: () => void peopleQuery.refetch(),
+          }
+        : { status: `loading` };
 
-  if (query.isError) {
-    return (
-      <DashboardPage heading={<PageHeading title="Protected People" />}>
-        <p className="text-red-600">
-          {query.error.userMessage ?? `Failed to load people.`}
-        </p>
-      </DashboardPage>
-    );
-  }
+  const suspensionRequestsState: LoadableState<SuspensionRequest[]> =
+    suspensionRequestsQuery.data !== undefined
+      ? {
+          status: `success`,
+          data: suspensionRequestsQuery.data.map(toSuspensionRequest),
+        }
+      : suspensionRequestsQuery.isError
+        ? {
+            status: `error`,
+            message:
+              suspensionRequestsQuery.error.userMessage ??
+              `Check your connection and try again.`,
+            onRetry: () => void suspensionRequestsQuery.refetch(),
+          }
+        : { status: `loading` };
 
   return (
     <PeoplePage
-      people={query.data.map(toPersonCardPerson)}
+      peopleState={peopleState}
+      suspensionRequestsState={suspensionRequestsState}
+      onRefreshSuspensionRequests={() => void suspensionRequestsQuery.refetch()}
+      refreshingSuspensionRequests={suspensionRequestsQuery.isFetching}
+      suspensionRequestsHref="/requests/suspension"
+      suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
       monitorHref="/activity"
       monitorHrefForPerson={(personId) => `/activity/person/${personId}`}
     />

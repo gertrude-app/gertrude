@@ -4,6 +4,7 @@ import type {
   GetPeople,
   GetPersonActivitySummaries,
   GetPersonDayActivity,
+  GetSuspensionRequests,
 } from '@shared/pairql/src/account';
 
 export class QueryKey<T> {
@@ -17,6 +18,10 @@ export class QueryKey<T> {
 export class Key extends QueryKey<never> {
   static get people(): QueryKey<GetPeople.Output> {
     return new QueryKey([`people`]);
+  }
+
+  static get suspensionRequests(): QueryKey<GetSuspensionRequests.Output> {
+    return new QueryKey([`requests`, `suspension`]);
   }
 
   static get activitySummaries(): QueryKey<GetActivitySummaries.Output> {

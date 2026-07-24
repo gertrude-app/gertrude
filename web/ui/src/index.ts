@@ -26,6 +26,8 @@ export { default as Sidebar } from './components/Sidebar';
 export { default as SidebarItem } from './components/SidebarItem';
 export { default as SidebarLayout } from './components/SidebarLayout';
 export { default as SidebarSection } from './components/SidebarSection';
+export { default as Skeleton } from './components/Skeleton';
+export type { SkeletonProps, SkeletonRadius } from './components/Skeleton';
 export { default as SlideOver } from './components/SlideOver';
 export type {
   SlideOverBodyProps,
@@ -49,6 +51,7 @@ export type {
   CardPadding,
   CardPreset,
   CardProps,
+  CardVariant,
 } from './primitives/Card';
 export { default as Divider } from './primitives/Divider';
 export type {

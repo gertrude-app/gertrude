@@ -35,11 +35,36 @@ enum AdminEvent: Equatable {
       )
     }
 
-    var dashboardUrl: String
+    enum NotificationDestination: Equatable {
+      case legacyDashboard(baseUrl: String)
+      case accountSite(baseUrl: String)
+
+      var baseUrl: String {
+        switch self {
+        case .legacyDashboard(baseUrl: let baseUrl),
+             .accountSite(baseUrl: let baseUrl):
+          baseUrl
+        }
+      }
+    }
+
+    var notificationDestination: NotificationDestination
     var childId: Child.Id
     var childName: String
     var duration: Seconds<Int>
     var requestComment: String?
     var context: Context
+  }
+}
+
+extension AdminEvent {
+  func routingMacSuspensionRequest(toAccountSiteAt accountDashboardUrl: String) -> Self {
+    guard case .suspendFilterRequestSubmitted(var request) = self,
+          case .macapp = request.context else {
+      return self
+    }
+
+    request.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
+    return .suspendFilterRequestSubmitted(request)
   }
 }

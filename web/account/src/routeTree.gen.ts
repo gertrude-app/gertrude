@@ -15,7 +15,10 @@ import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppPeopleRouteImport } from './routes/_app/people'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppActivityIndexRouteImport } from './routes/_app/activity/index'
+import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
+import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
+import { Route as AppRequestsSuspensionRequestIdRouteImport } from './routes/_app/requests/suspension/$requestId'
 import { Route as AppActivityDayDayRouteImport } from './routes/_app/activity/day/$day'
 import { Route as AppActivityPersonPersonIdIndexRouteImport } from './routes/_app/activity/person/$personId/index'
 import { Route as AppActivityPersonPersonIdDayDayRouteImport } from './routes/_app/activity/person/$personId/day/$day'
@@ -49,11 +52,27 @@ const AppActivityIndexRoute = AppActivityIndexRouteImport.update({
   path: '/activity/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppRequestsUnlockRoute = AppRequestsUnlockRouteImport.update({
+  id: '/requests/unlock',
+  path: '/requests/unlock',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppRequestsSuspensionRoute = AppRequestsSuspensionRouteImport.update({
+  id: '/requests/suspension',
+  path: '/requests/suspension',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const unauthedOtpTokenRoute = unauthedOtpTokenRouteImport.update({
   id: '/(unauthed)/otp/$token',
   path: '/otp/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRequestsSuspensionRequestIdRoute =
+  AppRequestsSuspensionRequestIdRouteImport.update({
+    id: '/$requestId',
+    path: '/$requestId',
+    getParentRoute: () => AppRequestsSuspensionRoute,
+  } as any)
 const AppActivityDayDayRoute = AppActivityDayDayRouteImport.update({
   id: '/activity/day/$day',
   path: '/activity/day/$day',
@@ -78,8 +97,11 @@ export interface FileRoutesByFullPath {
   '/people': typeof AppPeopleRoute
   '/signout': typeof AppSignoutRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
+  '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity/': typeof AppActivityIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
+  '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
   '/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
@@ -89,8 +111,11 @@ export interface FileRoutesByTo {
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
+  '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity': typeof AppActivityIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
+  '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
   '/activity/person/$personId': typeof AppActivityPersonPersonIdIndexRoute
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
@@ -102,8 +127,11 @@ export interface FileRoutesById {
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
+  '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
+  '/_app/requests/unlock': typeof AppRequestsUnlockRoute
   '/_app/activity/': typeof AppActivityIndexRoute
   '/_app/activity/day/$day': typeof AppActivityDayDayRoute
+  '/_app/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
   '/_app/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/_app/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
@@ -115,8 +143,11 @@ export interface FileRouteTypes {
     | '/people'
     | '/signout'
     | '/otp/$token'
+    | '/requests/suspension'
+    | '/requests/unlock'
     | '/activity/'
     | '/activity/day/$day'
+    | '/requests/suspension/$requestId'
     | '/activity/person/$personId/'
     | '/activity/person/$personId/day/$day'
   fileRoutesByTo: FileRoutesByTo
@@ -126,8 +157,11 @@ export interface FileRouteTypes {
     | '/signout'
     | '/'
     | '/otp/$token'
+    | '/requests/suspension'
+    | '/requests/unlock'
     | '/activity'
     | '/activity/day/$day'
+    | '/requests/suspension/$requestId'
     | '/activity/person/$personId'
     | '/activity/person/$personId/day/$day'
   id:
@@ -138,8 +172,11 @@ export interface FileRouteTypes {
     | '/_app/signout'
     | '/_app/'
     | '/(unauthed)/otp/$token'
+    | '/_app/requests/suspension'
+    | '/_app/requests/unlock'
     | '/_app/activity/'
     | '/_app/activity/day/$day'
+    | '/_app/requests/suspension/$requestId'
     | '/_app/activity/person/$personId/'
     | '/_app/activity/person/$personId/day/$day'
   fileRoutesById: FileRoutesById
@@ -194,12 +231,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppActivityIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/requests/unlock': {
+      id: '/_app/requests/unlock'
+      path: '/requests/unlock'
+      fullPath: '/requests/unlock'
+      preLoaderRoute: typeof AppRequestsUnlockRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/requests/suspension': {
+      id: '/_app/requests/suspension'
+      path: '/requests/suspension'
+      fullPath: '/requests/suspension'
+      preLoaderRoute: typeof AppRequestsSuspensionRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/(unauthed)/otp/$token': {
       id: '/(unauthed)/otp/$token'
       path: '/otp/$token'
       fullPath: '/otp/$token'
       preLoaderRoute: typeof unauthedOtpTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/requests/suspension/$requestId': {
+      id: '/_app/requests/suspension/$requestId'
+      path: '/$requestId'
+      fullPath: '/requests/suspension/$requestId'
+      preLoaderRoute: typeof AppRequestsSuspensionRequestIdRouteImport
+      parentRoute: typeof AppRequestsSuspensionRoute
     }
     '/_app/activity/day/$day': {
       id: '/_app/activity/day/$day'
@@ -225,10 +283,25 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRequestsSuspensionRouteChildren {
+  AppRequestsSuspensionRequestIdRoute: typeof AppRequestsSuspensionRequestIdRoute
+}
+
+const AppRequestsSuspensionRouteChildren: AppRequestsSuspensionRouteChildren = {
+  AppRequestsSuspensionRequestIdRoute: AppRequestsSuspensionRequestIdRoute,
+}
+
+const AppRequestsSuspensionRouteWithChildren =
+  AppRequestsSuspensionRoute._addFileChildren(
+    AppRequestsSuspensionRouteChildren,
+  )
+
 interface AppRouteRouteChildren {
   AppPeopleRoute: typeof AppPeopleRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRouteWithChildren
+  AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
   AppActivityIndexRoute: typeof AppActivityIndexRoute
   AppActivityDayDayRoute: typeof AppActivityDayDayRoute
   AppActivityPersonPersonIdIndexRoute: typeof AppActivityPersonPersonIdIndexRoute
@@ -239,6 +312,8 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRoute: AppPeopleRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
+  AppRequestsSuspensionRoute: AppRequestsSuspensionRouteWithChildren,
+  AppRequestsUnlockRoute: AppRequestsUnlockRoute,
   AppActivityIndexRoute: AppActivityIndexRoute,
   AppActivityDayDayRoute: AppActivityDayDayRoute,
   AppActivityPersonPersonIdIndexRoute: AppActivityPersonPersonIdIndexRoute,

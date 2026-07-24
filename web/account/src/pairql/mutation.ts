@@ -4,14 +4,16 @@ import type { QueryKey } from './keys';
 import type { PqlError, Result } from '@shared/pairql';
 import type { UseMutationResult } from '@tanstack/react-query';
 
-type ToastMessages = {
-  loading: string;
-  success: string;
-  error: string;
+type ToastMessage<Variables> = string | ((variables: Variables) => string);
+
+type ToastMessages<Variables> = {
+  loading: ToastMessage<Variables>;
+  success: ToastMessage<Variables>;
+  error: ToastMessage<Variables>;
 };
 
-type MutationOptions<T> = {
-  toast?: ToastMessages;
+type MutationOptions<T, Variables> = {
+  toast?: ToastMessages<Variables>;
   invalidating?: QueryKey<unknown>[];
   onSuccess?: (payload: T) => unknown;
   onError?: (error: PqlError) => unknown;
@@ -19,7 +21,7 @@ type MutationOptions<T> = {
 
 export function useMutation<T, V>(
   fn: (arg: V) => Promise<Result<T, PqlError>>,
-  options: MutationOptions<T> = {},
+  options: MutationOptions<T, V> = {},
 ): UseMutationResult<T, PqlError, V> {
   const queryClient = useQueryClient();
   return useReactMutation<T, PqlError, V>({
@@ -27,11 +29,14 @@ export function useMutation<T, V>(
       const promise = fn(arg).then((result) => result.valueOrThrow());
       const messages = options.toast;
       if (messages) {
+        const message = (value: ToastMessage<V>): string =>
+          typeof value === `function` ? value(arg) : value;
+
         toast.async(promise, {
-          loading: messages.loading,
-          success: messages.success,
+          loading: message(messages.loading),
+          success: message(messages.success),
           error: (error) =>
-            (error as PqlError | undefined)?.userMessage ?? messages.error,
+            (error as PqlError | undefined)?.userMessage ?? message(messages.error),
         });
       }
       return promise;
@@ -39,8 +44,10 @@ export function useMutation<T, V>(
     onSuccess: options.onSuccess,
     onError: options.onError,
     onSettled() {
-      options.invalidating?.forEach((key) =>
-        queryClient.invalidateQueries({ queryKey: key.segments }),
+      return Promise.all(
+        options.invalidating?.map((key) =>
+          queryClient.invalidateQueries({ queryKey: key.segments }),
+        ) ?? [],
       );
     },
   });

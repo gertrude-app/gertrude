@@ -1,6 +1,7 @@
-import { LoadingDots, PageHeading } from '@gertrude/ui';
+import { PageHeading } from '@gertrude/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
+import { ActivityOverviewLoadingState } from '#/components/activity/ActivityLoadingStates';
 import ActivityOverviewList from '#/components/activity/ActivityOverviewList';
 import DashboardPage from '#/components/layout/DashboardPage';
 import { toDaySummaries } from '#/lib/activity';
@@ -27,7 +28,7 @@ const PersonActivityPage: React.FC = () => {
       }
     >
       {query.isPending ? (
-        <LoadingDots />
+        <ActivityOverviewLoadingState />
       ) : query.isError ? (
         <p className="text-red-600">
           {query.error.userMessage ?? `Failed to load activity.`}

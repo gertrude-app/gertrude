@@ -1,4 +1,5 @@
 import Dependencies
+import Foundation
 import XCTest
 import XExpect
 
@@ -53,8 +54,11 @@ final class DasboardUnauthedResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output).toEqual(.success)
     expect(sent.emails).toHaveCount(1)
-    expect(sent.emails[0].templateModel["url"]!)
-      .toContain("/otp/\(token.lowercased)?redirect=%2Ffoo")
+    let url = try XCTUnwrap(sent.emails[0].templateModel["url"])
+    expect(url).toContain("/otp/\(token.lowercased)")
+    let components = try XCTUnwrap(URLComponents(string: url))
+    let redirect = components.queryItems?.first { $0.name == "redirect" }?.value
+    expect(redirect).toEqual("/foo")
   }
 
   func testSendMagicLinkToUnknownEmailReturnsSuccessSendingNoAccountEmail() async throws {

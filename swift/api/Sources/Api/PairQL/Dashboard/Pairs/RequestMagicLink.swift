@@ -1,4 +1,5 @@
 import DuetSQL
+import Foundation
 import PairQL
 import Vapor
 
@@ -34,9 +35,10 @@ extension RequestMagicLink: Resolver {
     let token = await with(dependency: \.ephemeral)
       .createParentIdToken(parent.id)
     var url = "\(context.dashboardUrl)/otp/\(token.lowercased)"
-    if let redirect = input.redirect,
-       let encoded = redirect.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed) {
-      url += "?redirect=\(encoded)"
+    if let redirect = input.redirect {
+      var components = URLComponents(string: url)
+      components?.queryItems = [URLQueryItem(name: "redirect", value: redirect)]
+      url = components?.string ?? url
     }
     try await postmark.send(template: .magicLink(to: email, model: .init(url: url)))
     return .success

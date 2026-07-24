@@ -19,7 +19,7 @@ final class BlockerFilterSuspensionResolversTests: ApiTestCase, @unchecked Senda
       .init(
         parentId: child.parentId,
         event: .suspendFilterRequestSubmitted(.init(
-          dashboardUrl: "",
+          notificationDestination: .legacyDashboard(baseUrl: ""),
           childId: child.id,
           childName: child.name,
           duration: 33,

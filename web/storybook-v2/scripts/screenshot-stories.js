@@ -306,6 +306,7 @@ async function captureScreenshot(page, job, baseUrl) {
   await page.goto(`${baseUrl}${iframePath}`, { waitUntil: `domcontentloaded` });
   await page.addStyleTag({ content: disableAnimationsCss });
   await waitForStoryToSettle(page);
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.locator(`#storybook-root`).screenshot({
     animations: `disabled`,
     caret: `hide`,

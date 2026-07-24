@@ -2,11 +2,13 @@ import { toast } from '@gertrude/ui';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import LoginPage from '#/components/pages/unauthed/LoginPage';
+import { postAuthLocation, validateAuthRedirectSearch } from '#/lib/authRedirect';
 import { isAuthed, setAuth } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 
 const LoginRoute: React.FC = () => {
   const navigate = useNavigate();
+  const { redirect: authRedirect } = Route.useSearch();
   const [email, setEmail] = React.useState(``);
   const [password, setPassword] = React.useState(``);
   const [submitting, setSubmitting] = React.useState(false);
@@ -21,7 +23,7 @@ const LoginRoute: React.FC = () => {
     result.with({
       success: ({ accountId, token }) => {
         setAuth(accountId, token);
-        void navigate({ to: `/people` });
+        void navigate(postAuthLocation(authRedirect));
       },
       error: (err) => {
         toast.error(err.userMessage ?? `Login failed — check your email and password.`);
@@ -32,7 +34,10 @@ const LoginRoute: React.FC = () => {
   async function handleMagicLink(): Promise<void> {
     if (!email || sendingLink) return;
     setSendingLink(true);
-    const result = await liveClient.accountRequestMagicLink({ email });
+    const result = await liveClient.accountRequestMagicLink({
+      email,
+      redirect: authRedirect,
+    });
     setSendingLink(false);
     result.with({
       success: () => toast.success(`Check your email for a sign-in link.`),
@@ -55,9 +60,10 @@ const LoginRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/(unauthed)/login`)({
-  beforeLoad: () => {
+  validateSearch: validateAuthRedirectSearch,
+  beforeLoad: ({ search }) => {
     if (isAuthed()) {
-      throw redirect({ to: `/people` });
+      throw redirect(postAuthLocation(search.redirect));
     }
   },
   component: LoginRoute,

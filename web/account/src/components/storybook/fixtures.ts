@@ -249,14 +249,29 @@ export const unlockRequests: UnlockRequest[] = [
 export const suspensionRequests: SuspensionRequest[] = [
   {
     id: `suspension-1`,
+    personId: `person-1`,
     personName: `Jude`,
+    deviceName: `Jude's MacBook`,
+    requestedDurationInSeconds: 30 * 60,
     duration: `30 minutes`,
     reason: `I need to download a school project from Google Drive.`,
+    extraMonitoringOptions: {
+      k: `keylogging`,
+      '@90': `1.5x screenshots`,
+      '@60': `2x screenshots`,
+      '@30': `3x screenshots`,
+      '@90+k': `1.5x screenshots + keylogging`,
+      '@60+k': `2x screenshots + keylogging`,
+      '@30+k': `3x screenshots + keylogging`,
+    },
   },
   {
     id: `suspension-2`,
+    personId: `person-2`,
     personName: `Mabel`,
+    requestedDurationInSeconds: 5 * 60,
     duration: `5 minutes`,
+    extraMonitoringOptions: {},
   },
 ];
 

@@ -1,8 +1,9 @@
-import { LoadingDots, PageHeading } from '@gertrude/ui';
+import { PageHeading } from '@gertrude/ui';
 import { formatDate } from '@shared/datetime';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import ActivityFeed from '#/components/activity/ActivityFeed';
+import { ActivityFeedLoadingState } from '#/components/activity/ActivityLoadingStates';
 import DashboardPage from '#/components/layout/DashboardPage';
 import {
   dateFromDayParam,
@@ -85,7 +86,7 @@ const ActivityDayPage: React.FC = () => {
       }
     >
       {query.isPending ? (
-        <LoadingDots />
+        <ActivityFeedLoadingState />
       ) : query.isError ? (
         <p className="text-red-600">
           {query.error.userMessage ?? `Failed to load activity.`}

@@ -1,4 +1,5 @@
 import { HStack, VStack } from '@gertrude/ui';
+import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
 
@@ -6,6 +7,7 @@ export type SegmentedTabLink = {
   label: string;
   href: string;
   badgeCount?: number;
+  badgeText?: string;
 };
 
 interface Props {
@@ -46,20 +48,29 @@ const SegmentedTabLinks: React.FC<Props> = ({
   }, []);
 
   React.useEffect(() => {
-    updateScrollState();
-
     const node = scrollRef.current;
 
     if (!node) {
       return;
     }
 
+    const selectedTab = Array.from(node.children).find(
+      (child) => child.getAttribute(`aria-current`) === `page`,
+    ) as HTMLElement | undefined;
+
+    if (selectedTab) {
+      node.scrollLeft =
+        selectedTab.offsetLeft - (node.clientWidth - selectedTab.clientWidth) / 2;
+    }
+
+    updateScrollState();
+
     const resizeObserver = new ResizeObserver(updateScrollState);
     resizeObserver.observe(node);
     Array.from(node.children).forEach((child) => resizeObserver.observe(child));
 
     return () => resizeObserver.disconnect();
-  }, [tabs.length, updateScrollState]);
+  }, [normalizedSelectedHref, tabs.length, updateScrollState]);
 
   return (
     <VStack gap={4}>
@@ -79,9 +90,9 @@ const SegmentedTabLinks: React.FC<Props> = ({
             const isSelected = normalizedSelectedHref === href;
 
             return (
-              <a
+              <Link
                 key={`${tab.href}-${tab.label}`}
-                href={tab.href}
+                to={tab.href}
                 className={cx(
                   `flex shrink-0 justify-center rounded-lg border px-3 py-1 text-center whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow,color] duration-100 select-none @sm/main:flex-grow`,
                   isSelected
@@ -92,7 +103,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
               >
                 <HStack as="span" gap={2}>
                   <span>{tab.label}</span>
-                  {tab.badgeCount !== undefined && (
+                  {(tab.badgeCount !== undefined || tab.badgeText !== undefined) && (
                     <span
                       className={cx(
                         `min-w-5 rounded-full px-1.5 py-0.25 text-xs font-medium tabular-nums`,
@@ -101,11 +112,11 @@ const SegmentedTabLinks: React.FC<Props> = ({
                           : `bg-stone-200/70 text-stone-600`,
                       )}
                     >
-                      {tab.badgeCount}
+                      {tab.badgeText ?? tab.badgeCount}
                     </span>
                   )}
                 </HStack>
-              </a>
+              </Link>
             );
           })}
         </nav>

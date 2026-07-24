@@ -4,34 +4,28 @@ import DashboardPage from '#/components/layout/DashboardPage';
 import SegmentedTabLinks from '#/components/navigation/SegmentedTabLinks';
 
 interface Props {
-  selectedHref: string;
-  unlockRequestsHref: string;
-  suspensionRequestsHref: string;
-  unlockRequestCount: number;
-  suspensionRequestCount: number;
-  children?: React.ReactNode;
+  selected: `unlock` | `suspension`;
+  suspensionRequestCount?: number;
+  children: React.ReactNode;
 }
 
 const RequestsShellPage: React.FC<Props> = ({
-  selectedHref,
-  unlockRequestsHref,
-  suspensionRequestsHref,
-  unlockRequestCount,
+  selected,
   suspensionRequestCount,
   children,
 }) => (
   <DashboardPage heading={<PageHeading title="Requests" />}>
     <SegmentedTabLinks
-      selectedHref={selectedHref}
+      selectedHref={`/requests/${selected}`}
       tabs={[
         {
           label: `Unlock Requests`,
-          href: unlockRequestsHref,
-          badgeCount: unlockRequestCount,
+          href: `/requests/unlock`,
+          badgeText: `Coming soon`,
         },
         {
           label: `Suspension Requests`,
-          href: suspensionRequestsHref,
+          href: `/requests/suspension`,
           badgeCount: suspensionRequestCount,
         },
       ]}

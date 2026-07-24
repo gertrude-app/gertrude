@@ -62,7 +62,7 @@ const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) 
           <SidebarItem
             title="Requests"
             icon={InboxIcon}
-            href="/requests"
+            href="/requests/suspension"
             selected={isSelected(`/requests`)}
             badgeCount={requestCount}
           />

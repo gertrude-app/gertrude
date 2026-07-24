@@ -29,7 +29,7 @@ final class MacAppResolverTests: ApiTestCase, @unchecked Sendable {
       .init(
         parentId: child.parentId,
         event: .suspendFilterRequestSubmitted(.init(
-          dashboardUrl: "",
+          notificationDestination: .legacyDashboard(baseUrl: ""),
           childId: child.id,
           childName: child.name,
           duration: 1111,

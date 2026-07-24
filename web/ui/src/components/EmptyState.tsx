@@ -13,6 +13,7 @@ interface Props {
     text: string;
     icon?: LucideIcon;
     variant?: `primary` | `default` | `ghost` | `destructive`;
+    loading?: boolean;
   } & (
     | {
         type: `link`;
@@ -55,6 +56,7 @@ const EmptyState: React.FC<Props> = ({
           href={button.href}
           icon={button.icon}
           variant={button.variant}
+          loading={button.loading}
         >
           {button.text}
         </Button>
@@ -64,6 +66,7 @@ const EmptyState: React.FC<Props> = ({
           onClick={button.onClick}
           icon={button.icon}
           variant={button.variant}
+          loading={button.loading}
         >
           {button.text}
         </Button>

@@ -7,6 +7,8 @@ import {
   unlockRequests,
 } from '#/components/storybook/fixtures';
 
+const noop = (): void => {};
+
 const meta = {
   title: 'Account/Design References/People',
   component: PeoplePageReference,
@@ -30,6 +32,8 @@ export const Default = {
         monitorHrefForPerson={(personId) => `/activity/person/${personId}`}
         addDeviceHrefForPerson={(personId) => `/people/${personId}/devices/new`}
         suspensionRequestsHref="/requests/suspension"
+        suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
+        onRefreshSuspensionRequests={noop}
         unlockRequestsHref="/requests/unlock"
         securityEventsHref="/security-events"
       />
