@@ -120,22 +120,20 @@ interface DeviceRowProps {
 }
 
 const DeviceRow: React.FC<DeviceRowProps> = ({ device }) => (
-  <HStack
-    align="center"
-    gap={2.5}
-    className="rounded-xl border border-stone-200 bg-stone-50 py-1.5 pl-2.5 pr-4"
-  >
-    <DeviceArtwork device={device} />
-    <VStack className="flex-grow">
-      <Text variant="bodyStrong">{deviceTitle(device)}</Text>
-      <Text variant="captionMuted">{deviceSubtitle(device)}</Text>
-    </VStack>
-    {device.type === `mac` && (
-      <Badge size="small" color={device.online ? `green` : `neutral`}>
-        {device.online ? `Online` : `Offline`}
-      </Badge>
-    )}
-  </HStack>
+  <Card variant="subtle" padding={0}>
+    <HStack align="center" gap={2.5} className="py-1.5 pl-2.5 pr-4">
+      <DeviceArtwork device={device} />
+      <VStack className="flex-grow">
+        <Text variant="bodyStrong">{deviceTitle(device)}</Text>
+        <Text variant="captionMuted">{deviceSubtitle(device)}</Text>
+      </VStack>
+      {device.type === `mac` && (
+        <Badge size="small" color={device.online ? `green` : `neutral`}>
+          {device.online ? `Online` : `Offline`}
+        </Badge>
+      )}
+    </HStack>
+  </Card>
 );
 
 interface DeviceArtworkProps {

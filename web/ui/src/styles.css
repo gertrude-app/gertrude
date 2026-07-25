@@ -88,6 +88,26 @@ body {
   }
 }
 
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  transform: translateX(-100%);
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 .toast-message-in {
   animation: toast-message-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -122,6 +142,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .loading-dots-dot,
+  .skeleton::after,
   .toast-message-in,
   .toast-message-out {
     animation: none;
@@ -129,5 +150,9 @@ body {
 
   .loading-dots-dot {
     opacity: 0.7;
+  }
+
+  .skeleton::after {
+    display: none;
   }
 }

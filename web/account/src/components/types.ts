@@ -1,6 +1,11 @@
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
+export type LoadableState<Data> =
+  | { status: `loading` }
+  | { status: `error`; message: string; onRetry: () => void }
+  | { status: `success`; data: Data };
+
 export type Device =
   | {
       id: string;
@@ -64,9 +69,13 @@ export type UnlockRequest = {
 
 export type SuspensionRequest = {
   id: string;
+  personId: string;
   personName: string;
+  deviceName?: string;
+  requestedDurationInSeconds: number;
   duration: string;
   reason?: string;
+  extraMonitoringOptions: Record<string, string>;
 };
 
 export type TimeOfDay = {

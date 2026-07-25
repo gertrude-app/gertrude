@@ -18,6 +18,7 @@ import {
 } from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
+const responseHrefForRequest = (id: string): string => `/requests/suspension/${id}`;
 const expandedUnlockDomain = unlockRequests[0]!.domains[0]!;
 
 const meta = {
@@ -37,7 +38,9 @@ export const Cards = {
       >
         <SuspensionRequestsPreviewCard
           suspensionRequests={suspensionRequests}
+          onRefresh={noop}
           viewAllHref="/requests/suspension"
+          responseHrefForRequest={responseHrefForRequest}
         />
         <UnlockRequestsPreviewCard
           unlockRequests={unlockRequests}
@@ -48,14 +51,22 @@ export const Cards = {
           viewAllHref="/events"
         />
       </StorySection>
+      <StorySection title="Empty preview card">
+        <div className="w-72">
+          <SuspensionRequestsPreviewCard
+            suspensionRequests={[]}
+            onRefresh={noop}
+            responseHrefForRequest={responseHrefForRequest}
+          />
+        </div>
+      </StorySection>
       <StorySection
         title="Request cards"
         contentClassName="grid grid-cols-1 gap-4 @3xl/main:grid-cols-2"
       >
         <SuspensionRequestCard
           request={suspensionRequests[0]!}
-          onDeny={noop}
-          onGrant={noop}
+          responseHref={responseHrefForRequest(suspensionRequests[0]!.id)}
         />
         <UnlockRequestCard
           request={unlockRequests[0]!}

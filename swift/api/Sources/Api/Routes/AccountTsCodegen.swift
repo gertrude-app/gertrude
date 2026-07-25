@@ -28,6 +28,8 @@ enum AccountTsCodegenRoute {
       AccountRequestMagicLink.self,
       AccountLoginMagicLink.self,
       GetPeople.self,
+      GetSuspensionRequests.self,
+      DecideSuspensionRequest.self,
       GetActivitySummaries.self,
       GetDayActivity.self,
       GetPersonActivitySummaries.self,

@@ -85,6 +85,7 @@ export const Assortment: Story = {
             type: `button`,
             text: `Refresh`,
             variant: `ghost`,
+            loading: true,
             onClick: emptyStateAction,
           }}
         />

@@ -16,10 +16,12 @@ import { getVisibilityClasses } from './visibility';
 export type CardElement = React.ElementType;
 export type CardPadding = ResponsiveSpacing;
 export type CardPreset = `big` | `compact`;
+export type CardVariant = `default` | `subtle`;
 
 export interface CardOwnProps extends VisibilityProps {
   children?: React.ReactNode;
   preset?: CardPreset;
+  variant?: CardVariant;
   padding?: CardPadding;
   interactive?: boolean;
   selected?: boolean;
@@ -47,8 +49,13 @@ export interface CardFooterProps extends VisibilityProps {
 }
 
 const cardPresetClasses: Record<CardPreset, string> = {
-  big: `rounded-2xl shadow-md`,
-  compact: `rounded-xl shadow`,
+  big: `rounded-2xl`,
+  compact: `rounded-xl`,
+};
+
+const cardPresetShadowClasses: Record<CardPreset, string> = {
+  big: `shadow-md`,
+  compact: `shadow`,
 };
 
 const cardPresetPadding: Record<CardPreset, Spacing> = {
@@ -90,6 +97,7 @@ type CardComponent = CardBaseComponent & {
 const CardRender = <Element extends React.ElementType = `div`>({
   as,
   preset = `compact`,
+  variant = `default`,
   padding,
   interactive,
   selected,
@@ -122,12 +130,15 @@ const CardRender = <Element extends React.ElementType = `div`>({
       className: cx(
         `border`,
         cardPresetClasses[preset],
+        variant === `default` ? cardPresetShadowClasses[preset] : `shadow-none`,
         paddingAttributes.className,
         disabled
           ? `border-stone-200 bg-stone-100/70 opacity-60 shadow-transparent`
           : selected
             ? `border-violet-300 bg-violet-50 shadow-violet-300/30`
-            : `border-stone-200 bg-white shadow-stone-300/30`,
+            : variant === `subtle`
+              ? `border-stone-200 bg-stone-50`
+              : `border-stone-200 bg-white shadow-stone-300/30`,
         interactive &&
           `transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300/80`,
         interactive &&

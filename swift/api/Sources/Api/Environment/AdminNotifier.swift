@@ -18,9 +18,13 @@ extension AdminNotifier: DependencyKey {
   static var liveValue: AdminNotifier {
     .init { parentId, event in
       @Dependency(\.db) var db
+      @Dependency(\.env) var env
       @Dependency(\.slack) var slack
       do {
         let parent = try await db.find(parentId)
+        let event = parent.accountSiteBetaEnabled
+          ? event.routingMacSuspensionRequest(toAccountSiteAt: env.accountDashboardUrl)
+          : event
         let notifications = try await parent.notifications(in: db)
 
         // happy path: they have at least one notification for this event

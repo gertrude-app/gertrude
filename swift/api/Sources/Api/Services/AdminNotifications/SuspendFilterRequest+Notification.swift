@@ -40,9 +40,14 @@ extension AdminEvent.SuspendFilterRequestSubmitted: AdminNotifying {
   var url: String {
     switch self.context {
     case .macapp(computerUserId: let computerUserId, requestId: let requestId):
-      "\(dashboardUrl)/children/\(computerUserId.lowercased)/suspend-filter-requests/\(requestId.lowercased)"
+      switch self.notificationDestination {
+      case .legacyDashboard(baseUrl: let baseUrl):
+        "\(baseUrl)/children/\(computerUserId.lowercased)/suspend-filter-requests/\(requestId.lowercased)"
+      case .accountSite(baseUrl: let baseUrl):
+        "\(baseUrl.withoutTrailingSlashes)/requests/suspension/\(requestId.lowercased)"
+      }
     case .iosapp:
-      "\(dashboardUrl)/TODO" // TODO: ios filter suspension urls
+      "\(notificationDestination.baseUrl)/TODO" // TODO: ios filter suspension urls
     }
   }
 }

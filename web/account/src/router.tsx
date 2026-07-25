@@ -13,6 +13,7 @@ export function createRouter(queryClient: QueryClient): Router<typeof routeTree>
     context: { queryClient },
     defaultPreload: `intent`,
     defaultPreloadStaleTime: 0,
+    notFoundMode: `root`,
     scrollRestoration: true,
   });
 }

@@ -36,6 +36,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public decideSuspensionRequest = (
+    input: P.DecideSuspensionRequest.Input,
+  ): Promise<Result<P.DecideSuspensionRequest.Output>> => {
+    return this.query<P.DecideSuspensionRequest.Output>(
+      input,
+      `DecideSuspensionRequest`,
+      `parent`,
+    );
+  };
+
   public deleteActivity = (
     input: P.DeleteActivity.Input,
   ): Promise<Result<P.DeleteActivity.Output>> => {
@@ -78,6 +88,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.GetPersonDayActivity.Output>(
       input,
       `GetPersonDayActivity`,
+      `parent`,
+    );
+  };
+
+  public getSuspensionRequests = (
+    input: P.GetSuspensionRequests.Input,
+  ): Promise<Result<P.GetSuspensionRequests.Output>> => {
+    return this.query<P.GetSuspensionRequests.Output>(
+      input,
+      `GetSuspensionRequests`,
       `parent`,
     );
   };

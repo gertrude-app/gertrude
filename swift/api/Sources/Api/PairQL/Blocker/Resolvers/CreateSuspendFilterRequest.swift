@@ -14,7 +14,7 @@ extension CreateSuspendFilterRequest: Resolver {
     await with(dependency: \.adminNotifier).notify(
       context.child.parentId,
       .suspendFilterRequestSubmitted(.init(
-        dashboardUrl: context.dashboardUrl,
+        notificationDestination: .legacyDashboard(baseUrl: context.dashboardUrl),
         childId: context.child.id,
         childName: context.child.name,
         duration: input.duration,

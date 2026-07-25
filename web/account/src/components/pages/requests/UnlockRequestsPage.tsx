@@ -1,32 +1,24 @@
+import { EmptyState } from '@gertrude/ui';
+import { KeyRoundIcon } from 'lucide-react';
 import React from 'react';
-import type { UnlockRequest, UnlockRequestKeyDraft } from '#/components/types';
+import RequestsShellPage from './RequestsShellPage';
 import CardContainer from '#/components/layout/CardContainer';
-import UnlockRequestCard from '#/components/requests/UnlockRequestCard';
 
 interface Props {
-  requests: UnlockRequest[];
-  keychainOptions: Array<{ id: string; name: string }>;
-  onDeny: (id: string, reason: string) => void;
-  onAllow: (id: string, keys: UnlockRequestKeyDraft[]) => void;
+  suspensionRequestCount?: number;
 }
 
-const UnlockRequestsPage: React.FC<Props> = ({
-  requests,
-  keychainOptions,
-  onDeny,
-  onAllow,
-}) => (
-  <CardContainer className="grid grid-cols-1 gap-4 @3xl/main:grid-cols-2 @5xl/main:grid-cols-3">
-    {requests.map((request) => (
-      <UnlockRequestCard
-        key={request.id}
-        request={request}
-        keychainOptions={keychainOptions}
-        onDeny={onDeny}
-        onAllow={onAllow}
+const UnlockRequestsPage: React.FC<Props> = ({ suspensionRequestCount }) => (
+  <RequestsShellPage selected="unlock" suspensionRequestCount={suspensionRequestCount}>
+    <CardContainer>
+      <EmptyState
+        icon={KeyRoundIcon}
+        title="Unlock requests are coming soon"
+        description="You'll be able to review and respond to website unlock requests here."
+        className="bg-white"
       />
-    ))}
-  </CardContainer>
+    </CardContainer>
+  </RequestsShellPage>
 );
 
 export default UnlockRequestsPage;

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/tanstack-react';
-import Card, { type CardPreset } from './Card';
+import Card, { type CardPreset, type CardVariant } from './Card';
 import Divider from './Divider';
 import HStack from './HStack';
 import Text from './Text';
@@ -19,6 +19,7 @@ const meta = {
     className: { control: false },
     padding: { control: false },
     preset: { control: false },
+    variant: { control: false },
   },
   parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof Card>;
@@ -32,8 +33,9 @@ const MetricCard: React.FC<{
   value: string;
   helper: string;
   preset?: CardPreset;
-}> = ({ title, value, helper, preset }) => (
-  <Card preset={preset}>
+  variant?: CardVariant;
+}> = ({ title, value, helper, preset, variant }) => (
+  <Card preset={preset} variant={variant}>
     <VStack gap={3}>
       <VStack gap={1}>
         <Text variant="label">{title}</Text>
@@ -90,6 +92,29 @@ export const Surfaces: Story = {
         />
         <MetricCard
           preset="compact"
+          title="Requests"
+          value="12"
+          helper="Unlock and suspension requests this week."
+        />
+      </StorySection>
+      <StorySection
+        title="Subtle variant"
+        contentClassName="grid w-full grid-cols-1 gap-3 md:grid-cols-3"
+      >
+        <MetricCard
+          variant="subtle"
+          title="People"
+          value="3"
+          helper="Protected children in this family."
+        />
+        <MetricCard
+          variant="subtle"
+          title="Devices"
+          value="7"
+          helper="Macs and iOS devices reporting in."
+        />
+        <MetricCard
+          variant="subtle"
           title="Requests"
           value="12"
           helper="Unlock and suspension requests this week."

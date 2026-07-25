@@ -1,11 +1,20 @@
 import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
 import { Outlet, createFileRoute, redirect, useLocation } from '@tanstack/react-router';
-import { LogOutIcon, ScanEyeIcon, UsersIcon } from 'lucide-react';
+import { InboxIcon, LogOutIcon, ScanEyeIcon, UsersIcon } from 'lucide-react';
 import React from 'react';
+import { authRedirectForPath } from '#/lib/authRedirect';
 import { isAuthed } from '#/pairql/auth';
+import { liveClient } from '#/pairql/client';
+import { Key } from '#/pairql/keys';
+import { useQuery } from '#/pairql/query';
 
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
+  const suspensionRequests = useQuery(
+    Key.suspensionRequests,
+    () => liveClient.getSuspensionRequests(),
+    { refetchInterval: 30_000 },
+  );
   const isSelected = (href: string): boolean =>
     pathname === href || pathname.startsWith(`${href}/`);
 
@@ -31,6 +40,13 @@ const AuthedLayout: React.FC = () => {
             selected={isSelected(`/people`)}
           />
           <SidebarItem
+            title="Requests"
+            icon={InboxIcon}
+            href="/requests/suspension"
+            selected={isSelected(`/requests`)}
+            badgeCount={suspensionRequests.data?.length}
+          />
+          <SidebarItem
             title="Activity"
             icon={ScanEyeIcon}
             href="/activity"
@@ -43,9 +59,10 @@ const AuthedLayout: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/_app`)({
-  beforeLoad: () => {
+  beforeLoad: ({ location }) => {
     if (!isAuthed()) {
-      throw redirect({ to: `/login` });
+      const loginRedirect = authRedirectForPath(location.href);
+      throw redirect({ to: `/login`, search: { redirect: loginRedirect } });
     }
   },
   component: AuthedLayout,
