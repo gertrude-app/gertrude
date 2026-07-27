@@ -69,7 +69,7 @@ export const people: PersonCardPerson[] = [
     devices: devices.slice(0, 2),
     screenshot: {
       url: `/example-screenshots/kid-school.png`,
-      recency: `Captured 4 minutes ago`,
+      recency: `4 minutes ago`,
     },
   },
   {

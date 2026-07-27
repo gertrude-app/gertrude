@@ -1,4 +1,5 @@
 import DuetSQL
+import Foundation
 import PairQL
 import TSCodable
 
@@ -9,6 +10,12 @@ struct GetPeople: Pair {
     let id: Child.Id
     let name: String
     let devices: [Device]
+    let screenshot: RecentScreenshot?
+  }
+
+  struct RecentScreenshot: PairNestable {
+    let url: String
+    let createdAt: Date
   }
 
   @TSCodable
@@ -61,9 +68,30 @@ extension GetPeople: NoInputResolver {
 
     let computerUsers = try await computerUsersAsync
     let iOSDevices = try await iOSDevicesAsync
-    let computers = try await Computer.query()
+    let computerUserIdsByPersonId = Dictionary(grouping: computerUsers, by: \.childId)
+      .mapValues { $0.map(\.id) }
+    let recentScreenshotCutoff = Date(subtractingDays: 14)
+
+    async let computersAsync = Computer.query()
       .where(.id |=| computerUsers.map(\.computerId))
       .all(in: context.db)
+    async let recentScreenshotsAsync: [(Child.Id, Screenshot)?] = people.concurrentMap {
+      person -> (Child.Id, Screenshot)? in
+      guard let computerUserIds = computerUserIdsByPersonId[person.id] else { return nil }
+      let screenshots = try await Screenshot.query()
+        .where(.computerUserId |=| computerUserIds)
+        .where(.createdAt >= recentScreenshotCutoff)
+        .orderBy(.createdAt, .desc)
+        .limit(1)
+        .all(in: context.db)
+      return screenshots.first.map { (person.id, $0) }
+    }
+
+    let computers = try await computersAsync
+    let recentScreenshotPairs = try await recentScreenshotsAsync
+    let recentScreenshotsByPersonId = Dictionary(
+      uniqueKeysWithValues: recentScreenshotPairs.compactMap(\.self),
+    )
     let computersById = computers.reduce(into: [Computer.Id: Computer]()) { result, computer in
       result[computer.id] = computer
     }
@@ -99,6 +127,8 @@ extension GetPeople: NoInputResolver {
       )
     }
 
+    let aws = with(dependency: \.aws)
+    let bucketUrl = with(dependency: \.env.s3.bucketUrl)
     return people.map { person in
       Person(
         id: person.id,
@@ -106,6 +136,12 @@ extension GetPeople: NoInputResolver {
         devices: (macDevices + mobileDevices)
           .filter { $0.0 == person.id }
           .map(\.1),
+        screenshot: recentScreenshotsByPersonId[person.id].map { screenshot in
+          RecentScreenshot(
+            url: signedScreenshotUrl(screenshot.url, bucketUrl: bucketUrl, aws: aws),
+            createdAt: screenshot.createdAt,
+          )
+        },
       )
     }
   }

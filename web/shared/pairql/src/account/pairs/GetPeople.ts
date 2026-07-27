@@ -24,5 +24,9 @@ export namespace GetPeople {
           modelIdentifier: string;
         }
     >;
+    screenshot?: {
+      url: string;
+      createdAt: ISODateString;
+    };
   }>;
 }

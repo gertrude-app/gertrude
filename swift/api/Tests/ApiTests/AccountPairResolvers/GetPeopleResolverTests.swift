@@ -1,4 +1,5 @@
 import Dependencies
+import DuetSQL
 import Gertie
 import XCTest
 import XExpect
@@ -6,7 +7,7 @@ import XExpect
 @testable import Api
 
 final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
-  func testReturnsPeopleWithConnectedDevices() async throws {
+  func testReturnsPeopleWithConnectedDevicesAndRecentScreenshot() async throws {
     let parent = try await self.parent()
     let person = try await self.db.create(Child(parentId: parent.id, name: "Jude"))
     let personWithoutDevices = try await self.db.create(
@@ -40,6 +41,29 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
       modelIdentifier: "iPad13,16",
       iosVersion: "18.6",
     ))
+    let screenshotDate = Date(timeIntervalSince1970: floor(Date().timeIntervalSince1970))
+    _ = try await self.db.create(Screenshot(
+      computerUserId: computerUser.id,
+      url: "\(self.env.s3.bucketUrl)/screenshots/older.jpg",
+      width: 1280,
+      height: 720,
+      createdAt: screenshotDate.addingTimeInterval(-600),
+    ))
+    let newestScreenshot = try await self.db.create(Screenshot(
+      computerUserId: computerUser.id,
+      url: "\(self.env.s3.bucketUrl)/screenshots/newest.jpg",
+      width: 1280,
+      height: 720,
+      createdAt: screenshotDate.addingTimeInterval(-300),
+    ))
+    let deletedScreenshot = try await self.db.create(Screenshot(
+      computerUserId: computerUser.id,
+      url: "\(self.env.s3.bucketUrl)/screenshots/deleted.jpg",
+      width: 1280,
+      height: 720,
+      createdAt: screenshotDate.addingTimeInterval(-60),
+    ))
+    try await Screenshot.query().byId(deletedScreenshot.id).delete(in: self.db)
 
     let otherParent = try await self.parent()
     try await self.db.create(Child(parentId: otherParent.id, name: "Someone Else"))
@@ -47,6 +71,9 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
     let output = try await withDependencies {
       $0.websockets.status = { id in
         id == computerUser.id ? .filterOn : .offline
+      }
+      $0.aws._signedS3GetUrl = { objectKey in
+        URL(string: "https://signed.test/\(objectKey)")!
       }
     } operation: {
       try await GetPeople.resolve(in: self.accountContext(parent))
@@ -66,6 +93,9 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
     expect(mac.modelName).toEqual("M2 MacBook Air (2022)")
     expect(mac.modelIdentifier).toEqual("Mac14,2")
     expect(mac.online).toBeTrue()
+    expect(returnedPerson.screenshot?.url)
+      .toEqual("https://signed.test/screenshots/newest.jpg")
+    expect(returnedPerson.screenshot?.createdAt).toEqual(newestScreenshot.createdAt)
 
     guard case .ios(let phone) = returnedPerson.devices[1] else {
       return XCTFail("Expected an iOS device")
@@ -89,6 +119,27 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
       output.first { $0.id == personWithoutDevices.id },
     )
     expect(returnedPersonWithoutDevices.devices).toBeEmpty()
+    expect(returnedPersonWithoutDevices.screenshot).toBeNil()
+  }
+
+  func testOmitsScreenshotsOlderThanTwoWeeks() async throws {
+    let person = try await self.childWithComputer()
+    try await self.db.create(Screenshot(
+      computerUserId: person.computerUser.id,
+      url: "\(self.env.s3.bucketUrl)/screenshots/stale.jpg",
+      width: 1280,
+      height: 720,
+      createdAt: Date().addingTimeInterval(-(14 * 24 * 60 * 60 + 60)),
+    ))
+
+    let output = try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+    } operation: {
+      try await GetPeople.resolve(in: self.accountContext(person.parent))
+    }
+
+    let returnedPerson = try XCTUnwrap(output.first)
+    expect(returnedPerson.screenshot).toBeNil()
   }
 
   func testReturnsEmptyWhenAccountHasNoPeople() async throws {
