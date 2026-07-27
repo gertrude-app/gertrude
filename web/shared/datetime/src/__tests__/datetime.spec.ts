@@ -1,9 +1,20 @@
-import { describe, expect, test } from 'vitest';
-import { formatTime, time } from '../';
+import { afterEach, describe, expect, test, vi } from 'vitest';
+import { formatTime, relativeTime, time } from '../';
+
+afterEach(() => vi.useRealTimers());
 
 describe(`formatTime`, () => {
   test(`formats a local time without seconds`, () => {
     expect(formatTime(new Date(2026, 6, 3, 9, 5))).toBe(`9:05 AM`);
+  });
+});
+
+describe(`relativeTime`, () => {
+  test(`formats a past date relative to now`, () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(`2026-07-27T12:00:00Z`));
+
+    expect(relativeTime(`2026-07-27T11:56:00Z`)).toBe(`4 minutes ago`);
   });
 });
 

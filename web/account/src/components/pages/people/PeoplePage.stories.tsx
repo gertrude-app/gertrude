@@ -4,12 +4,11 @@ import PeoplePage from './PeoplePage';
 import { people, suspensionRequests } from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
-const protectedPeople = people.map((person) => ({ ...person, screenshot: null }));
 
 type PeoplePageProps = ComponentProps<typeof PeoplePage>;
 
 const defaultProps: PeoplePageProps = {
-  peopleState: { status: `success`, data: protectedPeople },
+  peopleState: { status: `success`, data: people },
   suspensionRequestsState: { status: `success`, data: suspensionRequests },
   onRefreshSuspensionRequests: noop,
   suspensionRequestsHref: `/requests/suspension`,

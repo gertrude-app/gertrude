@@ -1,5 +1,15 @@
 import { inflect } from '@shared/string';
 
+const relativeTimeFormatter = new Intl.RelativeTimeFormat(`en`, { numeric: `auto` });
+const relativeTimeUnits = [
+  [`year`, 24 * 60 * 60 * 1000 * 365],
+  [`month`, (24 * 60 * 60 * 1000 * 365) / 12],
+  [`day`, 24 * 60 * 60 * 1000],
+  [`hour`, 60 * 60 * 1000],
+  [`minute`, 60 * 1000],
+  [`second`, 1000],
+] as const;
+
 export function isoToDateInput(iso: string): string {
   return formatDate(new Date(iso), `dateInput`);
 }
@@ -53,6 +63,17 @@ export function formatTime(date: Date): string {
     hour: `numeric`,
     minute: `2-digit`,
   });
+}
+
+export function relativeTime(isoOrDate: Date | string): string {
+  const date = typeof isoOrDate === `string` ? new Date(isoOrDate) : isoOrDate;
+  const difference = Date.now() - date.getTime();
+  for (const [unit, milliseconds] of relativeTimeUnits) {
+    if (Math.abs(difference) > milliseconds || unit === `second`) {
+      return relativeTimeFormatter.format(-Math.round(difference / milliseconds), unit);
+    }
+  }
+  return `now`;
 }
 
 export const time = {

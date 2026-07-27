@@ -1,3 +1,4 @@
+import { relativeTime } from '@shared/datetime';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import type {
@@ -88,7 +89,12 @@ function toPersonCardPerson(person: GetPeople.Output[number]): PersonCardPerson 
             modelIdentifier: device.modelIdentifier,
           },
     ),
-    screenshot: null,
+    screenshot: person.screenshot
+      ? {
+          url: person.screenshot.url,
+          recency: relativeTime(person.screenshot.createdAt),
+        }
+      : null,
   };
 }
 
