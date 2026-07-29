@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 type TimespanOption = `week` | `month` | `3 months` | `6 months` | `year`;
 
@@ -81,48 +81,57 @@ const TimeSeriesGraph = <T extends DataItem>({
   const { numPeriods, daysPerPeriod } = periodConfig;
   const isGrouped = daysPerPeriod > 1;
 
-  const now = new Date();
+  const datedItems = useMemo(
+    () =>
+      items.map((item) => {
+        const date = new Date(item.date);
+        date.setHours(0, 0, 0, 0);
+        return { item, time: date.getTime() };
+      }),
+    [items],
+  );
 
-  const getPeriodsData = (offsetPeriods: number): PeriodData<T>[] => {
-    const periods: { start: Date; end: Date }[] = [];
-    const totalDays = numPeriods * daysPerPeriod;
+  const [data, lastPeriodData] = useMemo(() => {
+    const now = new Date();
 
-    for (let i = 0; i < numPeriods; i++) {
-      const periodEnd = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() - i * daysPerPeriod - offsetPeriods * totalDays,
-      );
-      const periodStart = new Date(
-        periodEnd.getFullYear(),
-        periodEnd.getMonth(),
-        periodEnd.getDate() - (daysPerPeriod - 1),
-      );
-      periods.push({ start: periodStart, end: periodEnd });
-    }
+    const getPeriodsData = (offsetPeriods: number): PeriodData<T>[] => {
+      const periods: { start: Date; end: Date }[] = [];
+      const totalDays = numPeriods * daysPerPeriod;
 
-    return periods.reverse().map(({ start, end }) => {
-      const periodItems = items.filter((item) => {
-        const itemDate = new Date(item.date);
-        itemDate.setHours(0, 0, 0, 0);
-        const startDate = new Date(start);
-        startDate.setHours(0, 0, 0, 0);
+      for (let i = 0; i < numPeriods; i++) {
+        const periodEnd = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() - i * daysPerPeriod - offsetPeriods * totalDays,
+        );
+        const periodStart = new Date(
+          periodEnd.getFullYear(),
+          periodEnd.getMonth(),
+          periodEnd.getDate() - (daysPerPeriod - 1),
+        );
+        periods.push({ start: periodStart, end: periodEnd });
+      }
+
+      return periods.reverse().map(({ start, end }) => {
+        const startMs = start.getTime();
         const endDate = new Date(end);
         endDate.setHours(23, 59, 59, 999);
-        return itemDate >= startDate && itemDate <= endDate;
+        const endMs = endDate.getTime();
+        const periodItems = datedItems
+          .filter(({ time }) => time >= startMs && time <= endMs)
+          .map(({ item }) => item);
+        return {
+          time: end,
+          startTime: start,
+          count: periodItems.length,
+          items: periodItems,
+          isGrouped,
+        };
       });
-      return {
-        time: end,
-        startTime: start,
-        count: periodItems.length,
-        items: periodItems,
-        isGrouped,
-      };
-    });
-  };
+    };
 
-  const data = getPeriodsData(0);
-  const lastPeriodData = getPeriodsData(1);
+    return [getPeriodsData(0), getPeriodsData(1)];
+  }, [datedItems, daysPerPeriod, isGrouped, numPeriods]);
 
   const thisPeriodCount = data.reduce((acc, cur) => acc + cur.count, 0);
   const lastPeriodCount = lastPeriodData.reduce((acc, cur) => acc + cur.count, 0);

@@ -183,6 +183,13 @@ private struct ProtectedChildrenCount: CustomCountable {
         AND \(parentEmail) NOT LIKE '%.smoke-test-%'
         AND \(parentEmail) NOT LIKE 'e2e-user-%'
     ),
+    non_empty_keychain_parents AS MATERIALIZED (
+      SELECT DISTINCT kc.\(keychainParentId) AS parent_id
+      FROM \(table: Keychain.self) kc
+      JOIN \(table: Key.self) k
+        ON k.\(keyKeychainId) = kc.\(keychainId)
+      WHERE kc.\(keychainIsPublic) = false
+    ),
     active_mac_parents AS (
       SELECT vp.parent_id
       FROM verified_parents vp
@@ -199,25 +206,27 @@ private struct ProtectedChildrenCount: CustomCountable {
           WHERE n.\(notificationParentId) = vp.parent_id
         )
         AND (
-          EXISTS (
-            SELECT 1
-            FROM \(table: Keychain.self) kc
-            JOIN \(table: Key.self) k
-              ON k.\(keyKeychainId) = kc.\(keychainId)
-            WHERE kc.\(keychainParentId) = vp.parent_id
-              AND kc.\(keychainIsPublic) = false
+          vp.parent_id IN (
+            SELECT parent_id FROM non_empty_keychain_parents
           )
           OR EXISTS (
             SELECT 1
             FROM \(table: Computer.self) pc
             JOIN \(table: ComputerUser.self) cu
               ON cu.\(computerUserComputerId) = pc.\(computerId)
-            LEFT JOIN \(table: Screenshot.self) ss
-              ON ss.\(screenshotComputerUserId) = cu.\(computerUserId)
-            LEFT JOIN \(table: KeystrokeLine.self) kl
-              ON kl.\(keystrokeComputerUserId) = cu.\(computerUserId)
             WHERE pc.\(computerParentId) = vp.parent_id
-              AND (ss.id IS NOT NULL OR kl.id IS NOT NULL)
+              AND (
+                EXISTS (
+                  SELECT 1
+                  FROM \(table: Screenshot.self) ss
+                  WHERE ss.\(screenshotComputerUserId) = cu.\(computerUserId)
+                )
+                OR EXISTS (
+                  SELECT 1
+                  FROM \(table: KeystrokeLine.self) kl
+                  WHERE kl.\(keystrokeComputerUserId) = cu.\(computerUserId)
+                )
+              )
           )
           OR EXISTS (
             SELECT 1

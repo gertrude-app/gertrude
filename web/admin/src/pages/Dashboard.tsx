@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { StatusConfig } from '../components/TimeSeriesGraph';
+import type { Result } from '@shared/pairql';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import BreakdownBar from '../components/BreakdownBar';
@@ -56,6 +57,46 @@ const musicInstallStatusConfig: StatusConfig = {
   isWarning: () => false,
 };
 
+type DashboardLoad = Promise<
+  [
+    Result<T.SubscriptionsOverview.Output>,
+    Result<T.MacOverview.Output>,
+    Result<T.IOSOverview.Output>,
+    Result<T.PodcastOverview.Output>,
+    Result<T.MusicOverview.Output>,
+    Result<T.PlatformVersionStats.Output>,
+    Result<T.CohortAnalysis.Output>,
+    Result<T.AppNamingStats.Output>,
+  ]
+>;
+
+let pendingDashboardLoad: { token: string | null; request: DashboardLoad } | null = null;
+
+const loadDashboard = (): DashboardLoad => {
+  const token = localStorage.getItem(`admin_token`);
+  if (pendingDashboardLoad?.token === token) {
+    return pendingDashboardLoad.request;
+  }
+
+  const request = Promise.all([
+    client.subscriptionsOverview(),
+    client.macOverview(),
+    client.iOSOverview(),
+    client.podcastOverview(),
+    client.musicOverview(),
+    client.platformVersionStats(),
+    client.cohortAnalysis(),
+    client.appNamingStats(),
+  ]);
+  pendingDashboardLoad = { token, request };
+  void request.finally(() => {
+    if (pendingDashboardLoad?.request === request) {
+      pendingDashboardLoad = null;
+    }
+  });
+  return request;
+};
+
 const Dashboard: React.FC = () => {
   const [overviewData, setOverviewData] = useState<T.SubscriptionsOverview.Output | null>(
     null,
@@ -68,17 +109,15 @@ const Dashboard: React.FC = () => {
   const [musicData, setMusicData] = useState<T.MusicOverview.Output | null>(null);
   const [cohortData, setCohortData] = useState<T.CohortAnalysis.Output | null>(null);
   const [appNamingCount, setAppNamingCount] = useState<number | null>(null);
-  const [appNamingStats, setAppNamingStats] = useState<{
-    total: number;
-    above100k: number;
-    above50k: number;
-    above10k: number;
-    above1k: number;
-  } | null>(null);
+  const [appNamingStats, setAppNamingStats] = useState<T.AppNamingStats.Output | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isActive = true;
+
     const fetchData = async (): Promise<void> => {
       setLoading(true);
       setError(null);
@@ -92,24 +131,9 @@ const Dashboard: React.FC = () => {
         platformVersionResult,
         cohortResult,
         appNamingResult,
-        apps50k,
-        apps10k,
-        apps1k,
-        appsAll,
-      ] = await Promise.all([
-        client.subscriptionsOverview(),
-        client.macOverview(),
-        client.iOSOverview(),
-        client.podcastOverview(),
-        client.musicOverview(),
-        client.platformVersionStats(),
-        client.cohortAnalysis(),
-        client.getUnidentifiedApps({ threshold: 100_000, limit: 1 }),
-        client.getUnidentifiedApps({ threshold: 50_000, limit: 1 }),
-        client.getUnidentifiedApps({ threshold: 10_000, limit: 1 }),
-        client.getUnidentifiedApps({ threshold: 1_000, limit: 1 }),
-        client.getUnidentifiedApps({ threshold: 1, limit: 1 }),
-      ]);
+      ] = await loadDashboard();
+
+      if (!isActive) return;
 
       if (overviewResult.isError) {
         setError(
@@ -133,32 +157,16 @@ const Dashboard: React.FC = () => {
       setPlatformVersionData(platformVersionResult.value ?? null);
       setCohortData(cohortResult.value ?? null);
       if (!appNamingResult.isError && appNamingResult.value) {
-        setAppNamingCount(appNamingResult.value.totalAboveThreshold);
-      }
-      if (
-        !appsAll.isError &&
-        appsAll.value &&
-        !apps1k.isError &&
-        apps1k.value &&
-        !apps10k.isError &&
-        apps10k.value &&
-        !apps50k.isError &&
-        apps50k.value &&
-        !appNamingResult.isError &&
-        appNamingResult.value
-      ) {
-        setAppNamingStats({
-          total: appsAll.value.totalAboveThreshold,
-          above100k: appNamingResult.value.totalAboveThreshold,
-          above50k: apps50k.value.totalAboveThreshold,
-          above10k: apps10k.value.totalAboveThreshold,
-          above1k: apps1k.value.totalAboveThreshold,
-        });
+        setAppNamingCount(appNamingResult.value.above100k);
+        setAppNamingStats(appNamingResult.value);
       }
       setLoading(false);
     };
 
-    fetchData();
+    void fetchData();
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   if (loading) {

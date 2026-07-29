@@ -21,6 +21,7 @@ enum AuthedAdminRoute: PairRoute {
   case deleteParent(DeleteParent.Input)
   case searchParentByEmail(SearchParentByEmail.Input)
   case appRatings(AppRatings.Input)
+  case appNamingStats
   case getUnidentifiedApps(GetUnidentifiedApps.Input)
   case getIdentifiedAppsForAdmin
   case promoteApp(PromoteApp.Input)
@@ -96,6 +97,9 @@ enum AuthedAdminRoute: PairRoute {
     Route(.case(Self.appRatings)) {
       Operation(AppRatings.self)
       Body(.input(AppRatings.self))
+    }
+    Route(.case(Self.appNamingStats)) {
+      Operation(AppNamingStats.self)
     }
     Route(.case(Self.getUnidentifiedApps)) {
       Operation(GetUnidentifiedApps.self)
@@ -182,6 +186,9 @@ extension AuthedAdminRoute: RouteResponder {
       return try await self.respond(with: output)
     case .appRatings(let input):
       let output = try await AppRatings.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .appNamingStats:
+      let output = try await AppNamingStats.resolve(in: context)
       return try await self.respond(with: output)
     case .getUnidentifiedApps(let input):
       let output = try await GetUnidentifiedApps.resolve(with: input, in: context)

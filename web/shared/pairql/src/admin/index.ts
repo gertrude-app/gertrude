@@ -1,5 +1,6 @@
 // auto-generated, do not edit
 export * from './shared';
+export * from './pairs/AppNamingStats';
 export * from './pairs/AppRatings';
 export * from './pairs/CohortAnalysis';
 export * from './pairs/DeleteParent';
