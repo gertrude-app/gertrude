@@ -22,6 +22,7 @@ extension AdminRoute {
 
 extension AdminRoute: RouteResponder {
   static func respond(to route: Self, in context: Context) async throws -> Response {
+    let response: Response
     switch route {
     case .authed(let uuid, let authedRoute):
       _ = try await SuperAdminToken.query()
@@ -30,9 +31,11 @@ extension AdminRoute: RouteResponder {
           in: context.db,
           orThrow: context.error("7df93d61", .loggedOut, "Admin token not found or expired"),
         )
-      return try await AuthedAdminRoute.respond(to: authedRoute, in: context)
+      response = try await AuthedAdminRoute.respond(to: authedRoute, in: context)
     case .unauthed(let route):
-      return try await UnauthedAdminRoute.respond(to: route, in: context)
+      response = try await UnauthedAdminRoute.respond(to: route, in: context)
     }
+    response.headers.responseCompression = .enable
+    return response
   }
 }

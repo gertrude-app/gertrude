@@ -210,20 +210,21 @@ private struct CohortRowsQuery: CustomQueryable {
         FROM \(table: IOSDevice.self) d
         JOIN \(table: Child.self) c ON c.\(cId) = d.\(dChild)
       ),
+      normalized_stripe_events AS MATERIALIZED (
+        SELECT
+          CASE
+            WHEN raw_json ? 'json'
+              AND LEFT(LTRIM(raw_json->>'json'), 1) = '{'
+            THEN (raw_json->>'json')::jsonb
+            ELSE raw_json
+          END AS event_json
+        FROM (
+          SELECT \(seJson)::jsonb AS raw_json FROM \(table: StripeEvent.self)
+        ) raw_events
+      ),
       paid_invoice_customers AS (
         SELECT DISTINCT event_json #>> '{data,object,customer}' AS customer_id
-        FROM (
-          SELECT
-            CASE
-              WHEN raw_json ? 'json'
-                AND LEFT(LTRIM(raw_json->>'json'), 1) = '{'
-              THEN (raw_json->>'json')::jsonb
-              ELSE raw_json
-            END AS event_json
-          FROM (
-            SELECT \(seJson)::jsonb AS raw_json FROM \(table: StripeEvent.self)
-          ) raw_events
-        ) normalized_events
+        FROM normalized_stripe_events
         WHERE event_json->>'type' = 'invoice.paid'
           AND COALESCE((event_json #>> '{data,object,amount_paid}')::int, 0) > 0
           AND event_json #>> '{data,object,customer}' IS NOT NULL
