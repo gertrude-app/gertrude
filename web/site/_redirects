@@ -30,6 +30,7 @@
 /ipad /iphone-and-ipad 301
 /am /#podcasts 301
 /podcasts /#podcasts 301
+/music /blog/approved-only-music-app 302
 /about / 301
 /privacy /docs/iosapp-privacy 301
 /terms /docs/terms 301
