@@ -147,14 +147,4 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
     let output = try await GetPeople.resolve(in: self.accountContext(parent))
     expect(output).toBeEmpty()
   }
-
-  private func accountContext(_ parent: ParentEntities) -> AccountOwnerContext {
-    AccountOwnerContext(
-      requestId: "test-request",
-      dashboardUrl: "",
-      accountOwner: parent.model,
-      ipAddress: nil,
-      telemetry: TelemetryBag(),
-    )
-  }
 }

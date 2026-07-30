@@ -17,6 +17,13 @@ struct AccountOwnerContext: ResolverContext {
       .where(.parentId == self.accountOwner.id)
       .all(in: self.db)
   }
+
+  func person(_ id: Child.Id) async throws -> Child {
+    try await Child.query()
+      .where(.id == id)
+      .where(.parentId == self.accountOwner.id)
+      .first(in: self.db)
+  }
 }
 
 extension AccountOwnerContext {

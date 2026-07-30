@@ -30,8 +30,16 @@ const PersonSettingsShellPage: React.FC<Props> = ({
       selectedHref={selectedHref}
       tabs={[
         { label: `Basic`, href: baseHref },
-        { label: `Mac Settings`, href: `${baseHref}/mac-settings` },
-        { label: `iPhone/iPad Settings`, href: `${baseHref}/ios-settings` },
+        {
+          label: `Mac`,
+          href: `${baseHref}/mac-settings`,
+          badgeText: `Coming soon`,
+        },
+        {
+          label: `iPhone/iPad`,
+          href: `${baseHref}/ios-settings`,
+          badgeText: `Coming soon`,
+        },
       ]}
     >
       {children}

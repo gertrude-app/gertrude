@@ -12,13 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
-import { Route as AppPeopleRouteImport } from './routes/_app/people'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
+import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
+import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
 import { Route as AppActivityIndexRouteImport } from './routes/_app/activity/index'
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
+import { Route as AppPeoplePersonIdRouteRouteImport } from './routes/_app/people/$personId/route'
+import { Route as AppPeoplePersonIdIndexRouteImport } from './routes/_app/people/$personId/index'
 import { Route as AppRequestsSuspensionRequestIdRouteImport } from './routes/_app/requests/suspension/$requestId'
+import { Route as AppPeoplePersonIdMacSettingsRouteImport } from './routes/_app/people/$personId/mac-settings'
+import { Route as AppPeoplePersonIdIosSettingsRouteImport } from './routes/_app/people/$personId/ios-settings'
 import { Route as AppActivityDayDayRouteImport } from './routes/_app/activity/day/$day'
 import { Route as AppActivityPersonPersonIdIndexRouteImport } from './routes/_app/activity/person/$personId/index'
 import { Route as AppActivityPersonPersonIdDayDayRouteImport } from './routes/_app/activity/person/$personId/day/$day'
@@ -37,15 +42,20 @@ const AppSignoutRoute = AppSignoutRouteImport.update({
   path: '/signout',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppPeopleRoute = AppPeopleRouteImport.update({
-  id: '/people',
-  path: '/people',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const unauthedLoginRoute = unauthedLoginRouteImport.update({
   id: '/(unauthed)/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppPeopleRouteRoute = AppPeopleRouteRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppPeopleIndexRoute = AppPeopleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppPeopleRouteRoute,
 } as any)
 const AppActivityIndexRoute = AppActivityIndexRouteImport.update({
   id: '/activity/',
@@ -67,11 +77,33 @@ const unauthedOtpTokenRoute = unauthedOtpTokenRouteImport.update({
   path: '/otp/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPeoplePersonIdRouteRoute = AppPeoplePersonIdRouteRouteImport.update({
+  id: '/$personId',
+  path: '/$personId',
+  getParentRoute: () => AppPeopleRouteRoute,
+} as any)
+const AppPeoplePersonIdIndexRoute = AppPeoplePersonIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppPeoplePersonIdRouteRoute,
+} as any)
 const AppRequestsSuspensionRequestIdRoute =
   AppRequestsSuspensionRequestIdRouteImport.update({
     id: '/$requestId',
     path: '/$requestId',
     getParentRoute: () => AppRequestsSuspensionRoute,
+  } as any)
+const AppPeoplePersonIdMacSettingsRoute =
+  AppPeoplePersonIdMacSettingsRouteImport.update({
+    id: '/mac-settings',
+    path: '/mac-settings',
+    getParentRoute: () => AppPeoplePersonIdRouteRoute,
+  } as any)
+const AppPeoplePersonIdIosSettingsRoute =
+  AppPeoplePersonIdIosSettingsRouteImport.update({
+    id: '/ios-settings',
+    path: '/ios-settings',
+    getParentRoute: () => AppPeoplePersonIdRouteRoute,
   } as any)
 const AppActivityDayDayRoute = AppActivityDayDayRouteImport.update({
   id: '/activity/day/$day',
@@ -93,45 +125,58 @@ const AppActivityPersonPersonIdDayDayRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/people': typeof AppPeopleRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
-  '/people': typeof AppPeopleRoute
   '/signout': typeof AppSignoutRoute
+  '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity/': typeof AppActivityIndexRoute
+  '/people/': typeof AppPeopleIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
+  '/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsRoute
+  '/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
+  '/people/$personId/': typeof AppPeoplePersonIdIndexRoute
   '/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof unauthedLoginRoute
-  '/people': typeof AppPeopleRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity': typeof AppActivityIndexRoute
+  '/people': typeof AppPeopleIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
+  '/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsRoute
+  '/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
+  '/people/$personId': typeof AppPeoplePersonIdIndexRoute
   '/activity/person/$personId': typeof AppActivityPersonPersonIdIndexRoute
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
+  '/_app/people': typeof AppPeopleRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
-  '/_app/people': typeof AppPeopleRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/_app/requests/unlock': typeof AppRequestsUnlockRoute
   '/_app/activity/': typeof AppActivityIndexRoute
+  '/_app/people/': typeof AppPeopleIndexRoute
   '/_app/activity/day/$day': typeof AppActivityDayDayRoute
+  '/_app/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsRoute
+  '/_app/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/_app/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
+  '/_app/people/$personId/': typeof AppPeoplePersonIdIndexRoute
   '/_app/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/_app/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
@@ -139,44 +184,57 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
     | '/people'
+    | '/login'
     | '/signout'
+    | '/people/$personId'
     | '/otp/$token'
     | '/requests/suspension'
     | '/requests/unlock'
     | '/activity/'
+    | '/people/'
     | '/activity/day/$day'
+    | '/people/$personId/ios-settings'
+    | '/people/$personId/mac-settings'
     | '/requests/suspension/$requestId'
+    | '/people/$personId/'
     | '/activity/person/$personId/'
     | '/activity/person/$personId/day/$day'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/people'
     | '/signout'
     | '/'
     | '/otp/$token'
     | '/requests/suspension'
     | '/requests/unlock'
     | '/activity'
+    | '/people'
     | '/activity/day/$day'
+    | '/people/$personId/ios-settings'
+    | '/people/$personId/mac-settings'
     | '/requests/suspension/$requestId'
+    | '/people/$personId'
     | '/activity/person/$personId'
     | '/activity/person/$personId/day/$day'
   id:
     | '__root__'
     | '/_app'
-    | '/(unauthed)/login'
     | '/_app/people'
+    | '/(unauthed)/login'
     | '/_app/signout'
     | '/_app/'
+    | '/_app/people/$personId'
     | '/(unauthed)/otp/$token'
     | '/_app/requests/suspension'
     | '/_app/requests/unlock'
     | '/_app/activity/'
+    | '/_app/people/'
     | '/_app/activity/day/$day'
+    | '/_app/people/$personId/ios-settings'
+    | '/_app/people/$personId/mac-settings'
     | '/_app/requests/suspension/$requestId'
+    | '/_app/people/$personId/'
     | '/_app/activity/person/$personId/'
     | '/_app/activity/person/$personId/day/$day'
   fileRoutesById: FileRoutesById
@@ -210,19 +268,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSignoutRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/people': {
-      id: '/_app/people'
-      path: '/people'
-      fullPath: '/people'
-      preLoaderRoute: typeof AppPeopleRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/(unauthed)/login': {
       id: '/(unauthed)/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof unauthedLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/people': {
+      id: '/_app/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AppPeopleRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/people/': {
+      id: '/_app/people/'
+      path: '/'
+      fullPath: '/people/'
+      preLoaderRoute: typeof AppPeopleIndexRouteImport
+      parentRoute: typeof AppPeopleRouteRoute
     }
     '/_app/activity/': {
       id: '/_app/activity/'
@@ -252,12 +317,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unauthedOtpTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/people/$personId': {
+      id: '/_app/people/$personId'
+      path: '/$personId'
+      fullPath: '/people/$personId'
+      preLoaderRoute: typeof AppPeoplePersonIdRouteRouteImport
+      parentRoute: typeof AppPeopleRouteRoute
+    }
+    '/_app/people/$personId/': {
+      id: '/_app/people/$personId/'
+      path: '/'
+      fullPath: '/people/$personId/'
+      preLoaderRoute: typeof AppPeoplePersonIdIndexRouteImport
+      parentRoute: typeof AppPeoplePersonIdRouteRoute
+    }
     '/_app/requests/suspension/$requestId': {
       id: '/_app/requests/suspension/$requestId'
       path: '/$requestId'
       fullPath: '/requests/suspension/$requestId'
       preLoaderRoute: typeof AppRequestsSuspensionRequestIdRouteImport
       parentRoute: typeof AppRequestsSuspensionRoute
+    }
+    '/_app/people/$personId/mac-settings': {
+      id: '/_app/people/$personId/mac-settings'
+      path: '/mac-settings'
+      fullPath: '/people/$personId/mac-settings'
+      preLoaderRoute: typeof AppPeoplePersonIdMacSettingsRouteImport
+      parentRoute: typeof AppPeoplePersonIdRouteRoute
+    }
+    '/_app/people/$personId/ios-settings': {
+      id: '/_app/people/$personId/ios-settings'
+      path: '/ios-settings'
+      fullPath: '/people/$personId/ios-settings'
+      preLoaderRoute: typeof AppPeoplePersonIdIosSettingsRouteImport
+      parentRoute: typeof AppPeoplePersonIdRouteRoute
     }
     '/_app/activity/day/$day': {
       id: '/_app/activity/day/$day'
@@ -283,6 +376,38 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppPeoplePersonIdRouteRouteChildren {
+  AppPeoplePersonIdIosSettingsRoute: typeof AppPeoplePersonIdIosSettingsRoute
+  AppPeoplePersonIdMacSettingsRoute: typeof AppPeoplePersonIdMacSettingsRoute
+  AppPeoplePersonIdIndexRoute: typeof AppPeoplePersonIdIndexRoute
+}
+
+const AppPeoplePersonIdRouteRouteChildren: AppPeoplePersonIdRouteRouteChildren =
+  {
+    AppPeoplePersonIdIosSettingsRoute: AppPeoplePersonIdIosSettingsRoute,
+    AppPeoplePersonIdMacSettingsRoute: AppPeoplePersonIdMacSettingsRoute,
+    AppPeoplePersonIdIndexRoute: AppPeoplePersonIdIndexRoute,
+  }
+
+const AppPeoplePersonIdRouteRouteWithChildren =
+  AppPeoplePersonIdRouteRoute._addFileChildren(
+    AppPeoplePersonIdRouteRouteChildren,
+  )
+
+interface AppPeopleRouteRouteChildren {
+  AppPeoplePersonIdRouteRoute: typeof AppPeoplePersonIdRouteRouteWithChildren
+  AppPeopleIndexRoute: typeof AppPeopleIndexRoute
+}
+
+const AppPeopleRouteRouteChildren: AppPeopleRouteRouteChildren = {
+  AppPeoplePersonIdRouteRoute: AppPeoplePersonIdRouteRouteWithChildren,
+  AppPeopleIndexRoute: AppPeopleIndexRoute,
+}
+
+const AppPeopleRouteRouteWithChildren = AppPeopleRouteRoute._addFileChildren(
+  AppPeopleRouteRouteChildren,
+)
+
 interface AppRequestsSuspensionRouteChildren {
   AppRequestsSuspensionRequestIdRoute: typeof AppRequestsSuspensionRequestIdRoute
 }
@@ -297,7 +422,7 @@ const AppRequestsSuspensionRouteWithChildren =
   )
 
 interface AppRouteRouteChildren {
-  AppPeopleRoute: typeof AppPeopleRoute
+  AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
   AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRouteWithChildren
@@ -309,7 +434,7 @@ interface AppRouteRouteChildren {
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
-  AppPeopleRoute: AppPeopleRoute,
+  AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
   AppRequestsSuspensionRoute: AppRequestsSuspensionRouteWithChildren,

@@ -14,6 +14,7 @@ const defaultProps: PeoplePageProps = {
   suspensionRequestsHref: `/requests/suspension`,
   suspensionRequestHrefForRequest: (id) => `/requests/suspension/${id}`,
   monitorHref: `/activity`,
+  settingsHrefForPerson: (personId) => `/people/${personId}`,
   monitorHrefForPerson: (personId) => `/activity/person/${personId}`,
 };
 

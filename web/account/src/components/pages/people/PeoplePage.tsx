@@ -20,6 +20,7 @@ interface Props {
   suspensionRequestsHref: string;
   suspensionRequestHrefForRequest: (id: string) => string;
   monitorHref: string;
+  settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
 }
 
@@ -64,10 +65,15 @@ const PeopleLoadingState: React.FC = () => (
 
 interface PeopleContentProps {
   state: LoadableState<PersonCardPerson[]>;
+  settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
 }
 
-const PeopleContent: React.FC<PeopleContentProps> = ({ state, monitorHrefForPerson }) => {
+const PeopleContent: React.FC<PeopleContentProps> = ({
+  state,
+  settingsHrefForPerson,
+  monitorHrefForPerson,
+}) => {
   if (state.status === `loading`) {
     return <PeopleLoadingState />;
   }
@@ -97,6 +103,7 @@ const PeopleContent: React.FC<PeopleContentProps> = ({ state, monitorHrefForPers
     <PersonCard
       key={person.id}
       person={person}
+      settingsHref={settingsHrefForPerson(person.id)}
       monitorHref={monitorHrefForPerson(person.id)}
     />
   ));
@@ -166,6 +173,7 @@ const PeoplePage: React.FC<Props> = ({
   suspensionRequestsHref,
   suspensionRequestHrefForRequest,
   monitorHref,
+  settingsHrefForPerson,
   monitorHrefForPerson,
 }) => (
   <DashboardPage
@@ -185,7 +193,11 @@ const PeoplePage: React.FC<Props> = ({
   >
     <Stack direction={{ default: `vertical`, '@5xl/main': `horizontal` }} gap={12}>
       <CardContainer className="flex flex-grow flex-col gap-4 @xl/main:gap-6">
-        <PeopleContent state={peopleState} monitorHrefForPerson={monitorHrefForPerson} />
+        <PeopleContent
+          state={peopleState}
+          settingsHrefForPerson={settingsHrefForPerson}
+          monitorHrefForPerson={monitorHrefForPerson}
+        />
       </CardContainer>
       <VStack gap={6} className="shrink-0 @5xl/main:w-72">
         <SuspensionRequestsContent

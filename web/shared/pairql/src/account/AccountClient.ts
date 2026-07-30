@@ -52,6 +52,12 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeleteActivity.Output>(input, `DeleteActivity`, `parent`);
   };
 
+  public deletePerson = (
+    input: P.DeletePerson.Input,
+  ): Promise<Result<P.DeletePerson.Output>> => {
+    return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
+  };
+
   public getActivitySummaries = (
     input: P.GetActivitySummaries.Input,
   ): Promise<Result<P.GetActivitySummaries.Output>> => {
@@ -106,6 +112,12 @@ export default class AccountClient extends Client<Auth> {
     input: P.ToggleActivityFlag.Input,
   ): Promise<Result<P.ToggleActivityFlag.Output>> => {
     return this.query<P.ToggleActivityFlag.Output>(input, `ToggleActivityFlag`, `parent`);
+  };
+
+  public updatePersonName = (
+    input: P.UpdatePersonName.Input,
+  ): Promise<Result<P.UpdatePersonName.Output>> => {
+    return this.query<P.UpdatePersonName.Output>(input, `UpdatePersonName`, `parent`);
   };
 }
 
