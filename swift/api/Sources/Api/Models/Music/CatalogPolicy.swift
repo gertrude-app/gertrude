@@ -265,25 +265,9 @@ extension Music {
           return .replaceWithAlbumGrant(album)
         }
 
-        let albumSummary = ResolvedAlbumSummary(
-          id: album.id,
-          title: album.title,
-          artistName: album.artistName,
-          artistIds: album.artistIds,
-          artworkUrl: album.artworkUrl,
-          artwork: album.artwork,
-          trackCount: album.tracks.count,
-          releaseDate: album.releaseDate,
-          releaseType: album.releaseType,
-          appleMusicUrl: album.appleMusicUrl,
-        )
         return .replaceWithTrackGrants(album.tracks.enumerated().compactMap { position, track in
           guard selectedTrackIds.contains(track.id) else { return nil }
-          return ResolvedTrackGrant(
-            track: track,
-            preferredAlbum: albumSummary,
-            catalogPosition: position,
-          )
+          return album.trackGrant(at: position)
         })
       }
 

@@ -8,8 +8,6 @@ import type {
   GetAdminKeychains,
   GetAllDevices,
   GetAmClaimData,
-  GetApprovedMusicAlbums,
-  GetApprovedMusicArtists,
   GetBatchUnlockRequestData,
   GetBlockerClaimData,
   GetChild,
@@ -56,22 +54,6 @@ export class Key extends QueryKey<never> {
 
   static child(id: UUID): QueryKey<GetChild.Output> {
     return new QueryKey(`children/:id`, [`children`, id], id);
-  }
-
-  static approvedMusicAlbums(id: UUID): QueryKey<GetApprovedMusicAlbums.Output> {
-    return new QueryKey(
-      `children/:id/approved-music-albums`,
-      [`children`, id, `music`, `approved-albums`],
-      id,
-    );
-  }
-
-  static approvedMusicArtists(id: UUID): QueryKey<GetApprovedMusicArtists.Output> {
-    return new QueryKey(
-      `children/:id/approved-music-artists`,
-      [`children`, id, `music`, `approved-artists`],
-      id,
-    );
   }
 
   static musicCuration(id: UUID): QueryKey<GetMusicCuration.Output> {

@@ -192,26 +192,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAmClaimData.Output>(input, `GetAmClaimData`, `parent`);
   };
 
-  public getApprovedMusicAlbums = (
-    input: P.GetApprovedMusicAlbums.Input,
-  ): Promise<Result<P.GetApprovedMusicAlbums.Output>> => {
-    return this.query<P.GetApprovedMusicAlbums.Output>(
-      input,
-      `GetApprovedMusicAlbums`,
-      `parent`,
-    );
-  };
-
-  public getApprovedMusicArtists = (
-    input: P.GetApprovedMusicArtists.Input,
-  ): Promise<Result<P.GetApprovedMusicArtists.Output>> => {
-    return this.query<P.GetApprovedMusicArtists.Output>(
-      input,
-      `GetApprovedMusicArtists`,
-      `parent`,
-    );
-  };
-
   public getBatchUnlockRequestData = (
     input: P.GetBatchUnlockRequestData.Input,
   ): Promise<Result<P.GetBatchUnlockRequestData.Output>> => {
@@ -412,16 +392,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.PrepIOSAppConnection.Output>(
       input,
       `PrepIOSAppConnection`,
-      `parent`,
-    );
-  };
-
-  public removeApprovedMusicAlbum = (
-    input: P.RemoveApprovedMusicAlbum.Input,
-  ): Promise<Result<P.RemoveApprovedMusicAlbum.Output>> => {
-    return this.query<P.RemoveApprovedMusicAlbum.Output>(
-      input,
-      `RemoveApprovedMusicAlbum`,
       `parent`,
     );
   };

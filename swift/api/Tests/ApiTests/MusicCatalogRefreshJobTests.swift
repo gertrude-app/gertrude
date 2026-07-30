@@ -300,6 +300,27 @@ final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
       .count(in: self.db)).toEqual(0)
     expect(snapshot?.revision).toEqual(first.revision + 1)
     expect(snapshot?.payload.albums[0].tracks.map(\.id)).toEqual(["track-1", "track-3"])
+
+    let unchanged = await withDependencies {
+      $0.db = self.db
+      $0.date.now = .reference + 200
+      $0.appleMusic.resolveAlbum = { _ in
+        await calls.increment()
+        return resolution
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [child.id])
+    }
+    let unchangedSnapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+
+    await expect(calls.value()).toEqual(2)
+    expect(unchanged.refreshedTracks).toEqual(0)
+    expect(unchanged.unchangedTracks).toEqual(2)
+    expect(unchangedSnapshot?.revision).toEqual(snapshot?.revision)
+    expect(unchangedSnapshot?.createdAt).toEqual(snapshot?.createdAt)
   }
 
   func testAlbumRefreshRemovesNewlyCoveredTrackGrant() async throws {

@@ -5,7 +5,7 @@ import XExpect
 @testable import Api
 
 final class MusicTrackModelTests: ApiTestCase, @unchecked Sendable {
-  func testCreateListAndValidateApprovedTrack() async throws {
+  func testCreateAndListApprovedTrack() async throws {
     let child = try await self.child()
     let inserted = try await self.db.create(approvedTrack(
       childId: child.id,
@@ -24,7 +24,6 @@ final class MusicTrackModelTests: ApiTestCase, @unchecked Sendable {
     expect(stored.showsArtwork).toEqual(false)
     expect(stored.resolvedAt).toEqual(.reference)
     await expect(try stored.child(in: self.db).id).toEqual(child.id)
-    XCTAssertNoThrow(try stored.validateResolution())
   }
 
   func testTrackIdIsUniqueWithinChild() async throws {
@@ -76,18 +75,6 @@ final class MusicTrackModelTests: ApiTestCase, @unchecked Sendable {
       .where(.childId == child.id)
       .count(in: self.db)
     expect(count).toEqual(0)
-  }
-
-  func testModelValidationChecksResolutionIds() async throws {
-    let child = try await self.child()
-    var track = approvedTrack(childId: child.id)
-    track.preferredAlbumId = "album-2"
-
-    XCTAssertThrowsError(try track.validateResolution()) { error in
-      expect(error as? Music.ResolvedTrackGrant.ValidationError).toEqual(
-        .preferredAlbumIdMismatch(expected: "album-2", actual: "album-1"),
-      )
-    }
   }
 
   func testDeletingChildCascadesToApprovedTracks() async throws {

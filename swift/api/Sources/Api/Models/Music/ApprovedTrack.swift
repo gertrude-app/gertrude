@@ -33,13 +33,6 @@ extension Music {
 }
 
 extension Music.ApprovedTrack {
-  func validateResolution() throws {
-    try self.resolution.validate(
-      appleMusicTrackId: self.appleMusicTrackId,
-      preferredAlbumId: self.preferredAlbumId,
-    )
-  }
-
   func child(in db: any DuetSQL.Client) async throws -> Child {
     try await Child.query()
       .where(.id == self.childId)

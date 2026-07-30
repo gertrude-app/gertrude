@@ -93,7 +93,7 @@ final class AppleMusicResolutionTests: XCTestCase {
     ])
   }
 
-  func testResolvesTrustedTrackForExactPreferredAlbum() async throws {
+  func testResolvesTrustedTrackUsingExactPreferredAlbumMetadata() async throws {
     let loader = StubAppleMusicLoader { url in
       switch url.path {
       case "/v1/catalog/us/songs":
@@ -175,18 +175,14 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     expect(resolution.grant.track).toEqual(.init(
       id: "song-2",
-      title: "Hydrated Track",
-      artistName: "Track Artist",
-      artistIds: ["artist-1", "artist-2"],
+      title: "Album Track",
+      artistName: "Album Artist",
+      artistIds: [],
       albumId: "album-1",
-      albumTitle: "Preferred Album",
-      artworkUrl: "https://example.com/track/600x600.jpg",
-      durationInMillis: 222_000,
-      discNumber: 2,
-      trackNumber: 3,
-      contentRating: .explicit,
-      appleMusicUrl: "https://music.apple.com/us/album/preferred/album-1?i=song-2",
+      albumTitle: "Album",
+      durationInMillis: 180_000,
     ))
+    expect(resolution.grant.track).toEqual(resolution.album.tracks[1])
     expect(resolution.grant.preferredAlbum).toEqual(.init(
       id: "album-1",
       title: "Preferred Album",

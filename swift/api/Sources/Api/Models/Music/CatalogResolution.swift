@@ -89,6 +89,29 @@ extension Music {
       self.appleMusicUrl = appleMusicUrl
       self.tracks = tracks
     }
+
+    var summary: ResolvedAlbumSummary {
+      .init(
+        id: self.id,
+        title: self.title,
+        artistName: self.artistName,
+        artistIds: self.artistIds,
+        artworkUrl: self.artworkUrl,
+        artwork: self.artwork,
+        trackCount: self.tracks.count,
+        releaseDate: self.releaseDate,
+        releaseType: self.releaseType,
+        appleMusicUrl: self.appleMusicUrl,
+      )
+    }
+
+    func trackGrant(at catalogPosition: Int) -> ResolvedTrackGrant {
+      .init(
+        track: self.tracks[catalogPosition],
+        preferredAlbum: self.summary,
+        catalogPosition: catalogPosition,
+      )
+    }
   }
 
   struct ResolvedAlbumSummary: Codable, Equatable, Sendable {

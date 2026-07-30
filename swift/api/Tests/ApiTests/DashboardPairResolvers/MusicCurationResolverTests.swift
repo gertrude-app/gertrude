@@ -398,26 +398,23 @@ final class MusicCurationResolverTests: ApiTestCase, @unchecked Sendable {
       id: "album-1",
       trackIds: ["track-1", "track-2"],
     )
-    _ = try await withDependencies {
-      $0.date.now = .reference
-      $0.appleMusic.resolveAlbum = { _ in album }
-    } operation: {
-      try await ApproveMusicAlbum.resolve(
-        with: .init(
-          childId: child.id,
-          appleMusicAlbumId: album.id,
-          title: album.title,
-          artistName: album.artistName,
-          showsArtwork: false,
-        ),
-        in: child.parent.context,
-      )
-    }
-    let storedSnapshot = try await Music.LibrarySnapshotRepository.snapshot(
-      for: child.id,
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: album.id,
+      title: album.title,
+      artistName: album.artistName,
+      artworkUrl: album.artworkUrl,
+      artwork: album.artwork,
+      trackCount: album.trackCount,
+      showsArtwork: false,
+      resolution: album,
+      resolvedAt: .reference,
+    ))
+    let initial = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
       in: self.db,
     )
-    let initial = try XCTUnwrap(storedSnapshot)
 
     let output = try await withDependencies {
       $0.date.now = .reference + 100
@@ -769,24 +766,8 @@ private func curationTrackResolution(
   album: Music.ResolvedAlbum,
 ) throws -> AppleMusicTrackResolution {
   let index = try XCTUnwrap(album.tracks.firstIndex { $0.id == lookup.trackId })
-  let track = album.tracks[index]
   return .init(
-    grant: .init(
-      track: track,
-      preferredAlbum: .init(
-        id: album.id,
-        title: album.title,
-        artistName: album.artistName,
-        artistIds: album.artistIds,
-        artworkUrl: album.artworkUrl,
-        artwork: album.artwork,
-        trackCount: album.tracks.count,
-        releaseDate: album.releaseDate,
-        releaseType: album.releaseType,
-        appleMusicUrl: album.appleMusicUrl,
-      ),
-      catalogPosition: index,
-    ),
+    grant: album.trackGrant(at: index),
     album: album,
   )
 }

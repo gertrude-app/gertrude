@@ -243,22 +243,7 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
           )
           continue
         }
-        let resolution = Music.ResolvedTrackGrant(
-          track: album.tracks[position],
-          preferredAlbum: .init(
-            id: album.id,
-            title: album.title,
-            artistName: album.artistName,
-            artistIds: album.artistIds,
-            artworkUrl: album.artworkUrl,
-            artwork: album.artwork,
-            trackCount: album.tracks.count,
-            releaseDate: album.releaseDate,
-            releaseType: album.releaseType,
-            appleMusicUrl: album.appleMusicUrl,
-          ),
-          catalogPosition: position,
-        )
+        let resolution = album.trackGrant(at: position)
         try resolution.validate(
           appleMusicTrackId: track.appleMusicTrackId,
           preferredAlbumId: track.preferredAlbumId,

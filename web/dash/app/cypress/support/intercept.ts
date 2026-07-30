@@ -88,14 +88,6 @@ export function interceptPql(
   output: T.GetAmClaimData.Output,
 ): void;
 export function interceptPql(
-  slug: `GetApprovedMusicAlbums`,
-  output: T.GetApprovedMusicAlbums.Output,
-): void;
-export function interceptPql(
-  slug: `GetApprovedMusicArtists`,
-  output: T.GetApprovedMusicArtists.Output,
-): void;
-export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
   output: T.GetBatchUnlockRequestData.Output,
 ): void;
@@ -183,10 +175,6 @@ export function interceptPql(
 export function interceptPql(
   slug: `PrepIOSAppConnection`,
   output: T.PrepIOSAppConnection.Output,
-): void;
-export function interceptPql(
-  slug: `RemoveApprovedMusicAlbum`,
-  output: T.RemoveApprovedMusicAlbum.Output,
 ): void;
 export function interceptPql(
   slug: `RemoveApprovedMusicArtist`,
@@ -302,8 +290,6 @@ export function forcePqlErr(
     | `GetAdminKeychains`
     | `GetAllDevices`
     | `GetAmClaimData`
-    | `GetApprovedMusicAlbums`
-    | `GetApprovedMusicArtists`
     | `GetBatchUnlockRequestData`
     | `GetBlockerClaimData`
     | `GetChild`
@@ -330,7 +316,6 @@ export function forcePqlErr(
     | `MacAppConnectionCode`
     | `OpenBillingPortal`
     | `PrepIOSAppConnection`
-    | `RemoveApprovedMusicAlbum`
     | `RemoveApprovedMusicArtist`
     | `RequestAmPinReset`
     | `RequestMagicLink`

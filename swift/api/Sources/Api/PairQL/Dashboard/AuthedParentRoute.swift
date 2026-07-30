@@ -23,19 +23,13 @@ enum AuthedParentRoute: PairRoute {
   case getSuspendFilterRequest(GetSuspendFilterRequest.Input)
   case getChild(GetChild.Input)
   case getChildren
-  case searchMusicCatalog(SearchMusicCatalog.Input)
   case searchMusicCatalog_v2(SearchMusicCatalog_v2.Input)
   case getMusicCuration(GetMusicCuration.Input)
   case getMusicAlbumCuration(GetMusicAlbumCuration.Input)
   case saveMusicAlbumCuration(SaveMusicAlbumCuration.Input)
-  case getApprovedMusicAlbums(GetApprovedMusicAlbums.Input)
-  case getApprovedMusicArtists(GetApprovedMusicArtists.Input)
   case approveMusicTrack(ApproveMusicTrack.Input)
-  case approveMusicAlbum(ApproveMusicAlbum.Input)
   case approveMusicAlbum_v2(ApproveMusicAlbum_v2.Input)
-  case approveMusicArtist(ApproveMusicArtist.Input)
   case approveMusicArtist_v2(ApproveMusicArtist_v2.Input)
-  case removeApprovedMusicAlbum(RemoveApprovedMusicAlbum.Input)
   case removeApprovedMusicArtist(RemoveApprovedMusicArtist.Input)
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
@@ -156,10 +150,6 @@ extension AuthedParentRoute {
         Route(.case(Self.getChildren)) {
           Operation(GetChildren.self)
         }
-        Route(.case(Self.searchMusicCatalog)) {
-          Operation(SearchMusicCatalog.self)
-          Body(.dashboardInput(SearchMusicCatalog.self))
-        }
         Route(.case(Self.searchMusicCatalog_v2)) {
           Operation(SearchMusicCatalog_v2.self)
           Body(.dashboardInput(SearchMusicCatalog_v2.self))
@@ -176,37 +166,17 @@ extension AuthedParentRoute {
           Operation(SaveMusicAlbumCuration.self)
           Body(.dashboardInput(SaveMusicAlbumCuration.self))
         }
-        Route(.case(Self.getApprovedMusicAlbums)) {
-          Operation(GetApprovedMusicAlbums.self)
-          Body(.dashboardInput(GetApprovedMusicAlbums.self))
-        }
-        Route(.case(Self.getApprovedMusicArtists)) {
-          Operation(GetApprovedMusicArtists.self)
-          Body(.dashboardInput(GetApprovedMusicArtists.self))
-        }
         Route(.case(Self.approveMusicTrack)) {
           Operation(ApproveMusicTrack.self)
           Body(.dashboardInput(ApproveMusicTrack.self))
-        }
-        Route(.case(Self.approveMusicAlbum)) {
-          Operation(ApproveMusicAlbum.self)
-          Body(.dashboardInput(ApproveMusicAlbum.self))
         }
         Route(.case(Self.approveMusicAlbum_v2)) {
           Operation(ApproveMusicAlbum_v2.self)
           Body(.dashboardInput(ApproveMusicAlbum_v2.self))
         }
-        Route(.case(Self.approveMusicArtist)) {
-          Operation(ApproveMusicArtist.self)
-          Body(.dashboardInput(ApproveMusicArtist.self))
-        }
         Route(.case(Self.approveMusicArtist_v2)) {
           Operation(ApproveMusicArtist_v2.self)
           Body(.dashboardInput(ApproveMusicArtist_v2.self))
-        }
-        Route(.case(Self.removeApprovedMusicAlbum)) {
-          Operation(RemoveApprovedMusicAlbum.self)
-          Body(.dashboardInput(RemoveApprovedMusicAlbum.self))
         }
         Route(.case(Self.removeApprovedMusicArtist)) {
           Operation(RemoveApprovedMusicArtist.self)
@@ -380,9 +350,6 @@ extension AuthedParentRoute: RouteResponder {
     case .getChildren:
       let output = try await GetChildren.resolve(in: context)
       return try await self.respond(with: output)
-    case .searchMusicCatalog(let input):
-      let output = try await SearchMusicCatalog.resolve(with: input, in: context)
-      return try await self.respond(with: output)
     case .searchMusicCatalog_v2(let input):
       let output = try await SearchMusicCatalog_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -395,29 +362,14 @@ extension AuthedParentRoute: RouteResponder {
     case .saveMusicAlbumCuration(let input):
       let output = try await SaveMusicAlbumCuration.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .getApprovedMusicAlbums(let input):
-      let output = try await GetApprovedMusicAlbums.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .getApprovedMusicArtists(let input):
-      let output = try await GetApprovedMusicArtists.resolve(with: input, in: context)
-      return try await self.respond(with: output)
     case .approveMusicTrack(let input):
       let output = try await ApproveMusicTrack.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .approveMusicAlbum(let input):
-      let output = try await ApproveMusicAlbum.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .approveMusicAlbum_v2(let input):
       let output = try await ApproveMusicAlbum_v2.resolve(with: input, in: context)
       return try await self.respond(with: output)
-    case .approveMusicArtist(let input):
-      let output = try await ApproveMusicArtist.resolve(with: input, in: context)
-      return try await self.respond(with: output)
     case .approveMusicArtist_v2(let input):
       let output = try await ApproveMusicArtist_v2.resolve(with: input, in: context)
-      return try await self.respond(with: output)
-    case .removeApprovedMusicAlbum(let input):
-      let output = try await RemoveApprovedMusicAlbum.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .removeApprovedMusicArtist(let input):
       let output = try await RemoveApprovedMusicArtist.resolve(with: input, in: context)

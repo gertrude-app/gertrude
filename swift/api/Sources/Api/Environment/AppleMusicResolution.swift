@@ -159,35 +159,18 @@ func resolveAppleMusicCatalogTrack(
   }
 
   return try appleMusicTrackResolution(
-    track: song.resolvedTrack(album: album),
     album: album,
     catalogPosition: catalogPosition,
   )
 }
 
 private func appleMusicTrackResolution(
-  track: Music.ResolvedTrack,
   album: Music.ResolvedAlbum,
   catalogPosition: Int,
 ) throws -> AppleMusicTrackResolution {
-  let grant = Music.ResolvedTrackGrant(
-    track: track,
-    preferredAlbum: .init(
-      id: album.id,
-      title: album.title,
-      artistName: album.artistName,
-      artistIds: album.artistIds,
-      artworkUrl: album.artworkUrl,
-      artwork: album.artwork,
-      trackCount: album.tracks.count,
-      releaseDate: album.releaseDate,
-      releaseType: album.releaseType,
-      appleMusicUrl: album.appleMusicUrl,
-    ),
-    catalogPosition: catalogPosition,
-  )
+  let grant = album.trackGrant(at: catalogPosition)
   try grant.validate(
-    appleMusicTrackId: track.id,
+    appleMusicTrackId: grant.track.id,
     preferredAlbumId: album.id,
   )
   return .init(grant: grant, album: album)
@@ -848,7 +831,6 @@ extension AppleMusicClient {
       )
     }
     return try appleMusicTrackResolution(
-      track: album.tracks[catalogPosition],
       album: album,
       catalogPosition: catalogPosition,
     )
