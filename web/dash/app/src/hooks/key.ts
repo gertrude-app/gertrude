@@ -19,7 +19,9 @@ import type {
   GetIOSDeviceSupervisionStatus,
   GetIOSDevice_v2,
   GetIdentifiedApps,
+  GetMusicAlbumCuration,
   GetMusicClaimData,
+  GetMusicCuration,
   GetSelectableKeychains,
   GetSubscriptionPanel_v2,
   GetSuspendFilterRequest,
@@ -69,6 +71,25 @@ export class Key extends QueryKey<never> {
       `children/:id/approved-music-artists`,
       [`children`, id, `music`, `approved-artists`],
       id,
+    );
+  }
+
+  static musicCuration(id: UUID): QueryKey<GetMusicCuration.Output> {
+    return new QueryKey(
+      `children/:id/music-curation`,
+      [`children`, id, `music`, `curation`],
+      id,
+    );
+  }
+
+  static musicAlbumCuration(
+    childId: UUID,
+    albumId: string,
+  ): QueryKey<GetMusicAlbumCuration.Output> {
+    return new QueryKey(
+      `children/:id/music-curation/:album-id`,
+      [`children`, childId, `music`, `curation`, albumId],
+      childId,
     );
   }
 

@@ -87,7 +87,11 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
       .filter { childIds?.contains($0.childId) ?? true }
     let allArtists = try await Music.ApprovedArtist.query().all(in: self.db)
       .filter { childIds?.contains($0.childId) ?? true }
-    let childIds = Set(allAlbums.map(\.childId))
+    let allTracks = try await Music.ApprovedTrack.query().all(in: self.db)
+      .filter { childIds?.contains($0.childId) ?? true }
+    let childIds = Set(
+      allAlbums.map(\.childId) + allArtists.map(\.childId) + allTracks.map(\.childId),
+    )
     for childId in childIds.sorted(by: { $0.rawValue.uuidString < $1.rawValue.uuidString }) {
       let childAlbums = allAlbums.filter { $0.childId == childId }
       let childArtists = allArtists.filter { $0.childId == childId }
@@ -135,6 +139,15 @@ struct MusicCatalogBackfillCommand: AsyncCommand {
             .init(
               appleMusicArtistId: $0.appleMusicArtistId,
               createdAt: $0.createdAt,
+              resolution: $0.resolution,
+            )
+          },
+          trackGrants: allTracks.filter { $0.childId == childId }.map {
+            .init(
+              appleMusicTrackId: $0.appleMusicTrackId,
+              preferredAlbumId: $0.preferredAlbumId,
+              createdAt: $0.createdAt,
+              showsArtwork: $0.showsArtwork,
               resolution: $0.resolution,
             )
           },

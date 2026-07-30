@@ -2,6 +2,7 @@ import Dependencies
 import DuetSQL
 import PairQL
 
+// @deprecated safe to remove 2026-09-01
 struct ApproveMusicArtist: Pair {
   static let auth: ClientAuth = .parent
 
@@ -15,6 +16,7 @@ struct ApproveMusicArtist: Pair {
 
 extension ApproveMusicArtist: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
+    await context.db.logDeprecated("ApproveMusicArtist(v1)")
     let child = try await context.verifiedChildWithConnectedMusicApp(from: input.childId)
     let resolution = try await get(dependency: \.appleMusic).resolveArtist(
       input.appleMusicArtistId,
@@ -22,41 +24,25 @@ extension ApproveMusicArtist: Resolver {
     let now = get(dependency: \.date.now)
     try await context.db.withTransaction { db in
       try await Music.LibrarySnapshotRepository.lock(childId: child.id, in: db)
-      let existing = try await Music.ApprovedArtist.query()
-        .where(.childId == child.id)
-        .where(.appleMusicArtistId == input.appleMusicArtistId.rawValue)
-        .all(in: db)
-        .first
-      if let existing,
-         existing.name == resolution.name,
-         existing.catalogMetadata == resolution.catalogMetadata,
-         existing.resolution == resolution {
-        try await Music.LibrarySnapshotRepository.publish(
-          childId: child.id,
-          generatedAt: now,
-          in: db,
+      let policy = try await Music.CatalogPolicy.load(childId: child.id, in: db)
+      let covered = try policy.coverage.directGrantsCovered(by: resolution)
+      guard covered.albumIds.isEmpty, covered.trackIds.isEmpty else {
+        throw context.error(
+          "3184828b",
+          .badRequest,
+          user: "Reload Gertrude to review which existing music allowances this artist will replace.",
         )
-        return
       }
-      try await db.upsert(
-        Music.ApprovedArtist(
-          childId: child.id,
-          appleMusicArtistId: input.appleMusicArtistId,
-          name: resolution.name,
-          catalogMetadata: resolution.catalogMetadata,
-          resolution: resolution,
-          resolvedAt: now,
-        ),
-        conflictOn: [.childId, .appleMusicArtistId],
-        do: .update(set: [
-          .name,
-          .catalogMetadata,
-          .resolution,
-          .resolvedAt,
-        ]),
-      )
-      try await Music.LibrarySnapshotRepository.publish(
+      let changed = try await Music.CatalogPolicy.addArtist(
         childId: child.id,
+        resolution: resolution,
+        policy: policy,
+        resolvedAt: now,
+        in: db,
+      )
+      _ = try await publishMusicPolicy(
+        childId: child.id,
+        changed: changed,
         generatedAt: now,
         in: db,
       )

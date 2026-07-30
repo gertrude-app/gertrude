@@ -71,6 +71,8 @@ extension SearchMusicCatalog: Resolver {
       item.album.map { .init(kind: .album, album: Self.outputAlbum(from: $0), artist: nil) }
     case .artist:
       item.artist.map { .init(kind: .artist, album: nil, artist: Self.outputArtist(from: $0)) }
+    case .track:
+      nil
     }
   }
 

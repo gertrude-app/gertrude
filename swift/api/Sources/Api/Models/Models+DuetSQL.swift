@@ -88,5 +88,7 @@ extension Music.Artwork: PostgresJsonable {}
 extension Music.CatalogMetadata: PostgresJsonable {}
 extension Music.ResolvedTrack: PostgresJsonable {}
 extension Music.ResolvedAlbum: PostgresJsonable {}
+extension Music.ResolvedAlbumSummary: PostgresJsonable {}
+extension Music.ResolvedTrackGrant: PostgresJsonable {}
 extension Music.ResolvedArtist: PostgresJsonable {}
 extension MusicLibrarySnapshot: @retroactive PostgresJsonable {}

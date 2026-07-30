@@ -18,7 +18,7 @@ final class AppleMusicClientTests: XCTestCase {
 
     let queryItems = try XCTUnwrap(components.queryItems)
     expect(queryItems.first { $0.name == "term" }?.value).toEqual("Lena Jonsson Trio")
-    expect(queryItems.first { $0.name == "types" }?.value).toEqual("albums,artists")
+    expect(queryItems.first { $0.name == "types" }?.value).toEqual("songs,albums,artists")
     expect(queryItems.first { $0.name == "limit" }?.value).toEqual("25")
     expect(queryItems.first { $0.name == "with" }?.value).toEqual("topResults")
   }
@@ -262,6 +262,9 @@ final class AppleMusicClientTests: XCTestCase {
             }
           ]
         },
+        "songs": {
+          "data": [{"id": "song-collection", "type": "songs"}]
+        },
         "albums": {
           "data": [
             {
@@ -320,6 +323,258 @@ final class AppleMusicClientTests: XCTestCase {
     expect(results.items).toEqual([.init(artist: artist), .init(album: album)])
     expect(results.albums).toEqual([album])
     expect(results.artists).toEqual([artist])
+    expect(results.tracks).toBeEmpty()
+  }
+
+  func testSearchHydratesCollectionAndTopResultSongs() async throws {
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/search":
+        Data("""
+        {
+          "results": {
+            "songs": {
+              "data": [{"id": "song-collection", "type": "songs"}]
+            },
+            "albums": {
+              "data": [{
+                "id": "album-result",
+                "type": "albums",
+                "attributes": {
+                  "name": "Album Result",
+                  "artistName": "Result Artist"
+                }
+              }]
+            },
+            "artists": {
+              "data": [{
+                "id": "artist-result",
+                "type": "artists",
+                "attributes": {"name": "Result Artist"}
+              }]
+            },
+            "topResults": {
+              "data": [
+                {"id": "song-top", "type": "songs"},
+                {
+                  "id": "album-result",
+                  "type": "albums",
+                  "attributes": {
+                    "name": "Album Result",
+                    "artistName": "Result Artist"
+                  }
+                },
+                {
+                  "id": "artist-result",
+                  "type": "artists",
+                  "attributes": {"name": "Result Artist"}
+                }
+              ]
+            }
+          }
+        }
+        """.utf8)
+      case "/v1/catalog/us/songs":
+        Data("""
+        {
+          "data": [
+            {
+              "id": "song-collection",
+              "type": "songs",
+              "attributes": {
+                "name": "Collection Track",
+                "artistName": "Collection Artist",
+                "albumName": "Version B",
+                "artwork": {
+                  "url": "https://example.com/collection/{w}x{h}.jpg",
+                  "width": 1200,
+                  "height": 1200,
+                  "bgColor": "102030"
+                },
+                "durationInMillis": 123000,
+                "discNumber": 2,
+                "trackNumber": 4,
+                "contentRating": "explicit",
+                "url": "https://music.apple.com/us/album/version-b/album-b?i=song-collection"
+              },
+              "relationships": {
+                "albums": {
+                  "data": [
+                    {"id": "album-a", "type": "albums"},
+                    {"id": "album-b", "type": "albums"}
+                  ]
+                },
+                "artists": {
+                  "data": [{"id": "artist-collection", "type": "artists"}]
+                }
+              }
+            },
+            {
+              "id": "song-top",
+              "type": "songs",
+              "attributes": {
+                "name": "Top Track",
+                "artistName": "Top Artist",
+                "albumName": "Top Album",
+                "durationInMillis": 234000
+              },
+              "relationships": {
+                "albums": {
+                  "data": [{"id": "album-top", "type": "albums"}]
+                },
+                "artists": {
+                  "data": [{"id": "artist-top", "type": "artists"}]
+                }
+              }
+            }
+          ]
+        }
+        """.utf8)
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    let results = try await searchAppleMusicCatalog(
+      .init(term: "track search", limit: 10),
+      load: loader.dataLoader,
+    )
+
+    expect(results.tracks).toEqual([
+      .init(
+        id: "song-collection",
+        title: "Collection Track",
+        artistName: "Collection Artist",
+        artistIds: ["artist-collection"],
+        preferredAlbumId: "album-b",
+        albumTitle: "Version B",
+        artworkUrl: "https://example.com/collection/600x600.jpg",
+        artwork: .init(
+          url: "https://example.com/collection/{w}x{h}.jpg",
+          width: 1200,
+          height: 1200,
+          bgColor: "102030",
+        ),
+        durationInMillis: 123_000,
+        discNumber: 2,
+        trackNumber: 4,
+        contentRating: .explicit,
+        appleMusicUrl:
+        "https://music.apple.com/us/album/version-b/album-b?i=song-collection",
+      ),
+      .init(
+        id: "song-top",
+        title: "Top Track",
+        artistName: "Top Artist",
+        artistIds: ["artist-top"],
+        preferredAlbumId: "album-top",
+        albumTitle: "Top Album",
+        durationInMillis: 234_000,
+      ),
+    ])
+    expect(results.items.map(\.kind)).toEqual([.track, .album, .artist])
+    expect(results.items.first?.track).toEqual(results.tracks[1])
+    expect(results.albums.map(\.id)).toEqual(["album-result"])
+    expect(results.artists.map(\.id)).toEqual(["artist-result"])
+
+    let requests = await loader.requestURLs()
+    expect(requests.map(\.path)).toEqual([
+      "/v1/catalog/us/search",
+      "/v1/catalog/us/songs",
+    ])
+    let hydrationComponents = try XCTUnwrap(
+      URLComponents(url: requests[1], resolvingAgainstBaseURL: false),
+    )
+    expect(hydrationComponents.queryItems?.first { $0.name == "ids" }?.value)
+      .toEqual("song-collection,song-top")
+    expect(hydrationComponents.queryItems?.first { $0.name == "include" }?.value)
+      .toEqual("albums,artists")
+  }
+
+  func testSearchOmitsSongWithoutExactAlbumRelationship() async throws {
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/search":
+        Data("""
+        {
+          "results": {
+            "songs": {
+              "data": [
+                {"id": "orphan", "type": "songs"},
+                {"id": "usable", "type": "songs"}
+              ]
+            },
+            "topResults": {
+              "data": [
+                {"id": "orphan", "type": "songs"},
+                {"id": "usable", "type": "songs"}
+              ]
+            }
+          }
+        }
+        """.utf8)
+      case "/v1/catalog/us/songs":
+        Data("""
+        {
+          "data": [
+            {
+              "id": "orphan",
+              "type": "songs",
+              "attributes": {
+                "name": "Orphan",
+                "artistName": "Artist",
+                "albumName": "Unrelated Text"
+              },
+              "relationships": {
+                "albums": {"data": []},
+                "artists": {"data": [{"id": "artist-1", "type": "artists"}]}
+              }
+            },
+            {
+              "id": "usable",
+              "type": "songs",
+              "attributes": {
+                "name": "Usable",
+                "artistName": "Artist",
+                "albumName": "Exact Album"
+              },
+              "relationships": {
+                "albums": {"data": [{"id": "album-1", "type": "albums"}]},
+                "artists": {"data": [{"id": "artist-1", "type": "artists"}]}
+              }
+            }
+          ]
+        }
+        """.utf8)
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    let results = try await searchAppleMusicCatalog(
+      .init(term: "tracks"),
+      load: loader.dataLoader,
+    )
+
+    expect(results.tracks.map(\.id)).toEqual(["usable"])
+    expect(results.items.map(\.track?.id)).toEqual(["usable"])
+  }
+
+  func testPreferredAlbumUsesOfficialURLOnlyForExactRelationship() {
+    expect(preferredAppleMusicAlbumId(
+      among: ["album-a", "album-b"],
+      appleMusicUrl: "https://music.apple.com/us/album/version/album-b?i=song-1",
+    )).toEqual("album-b")
+
+    expect(preferredAppleMusicAlbumId(
+      among: ["album-b", "album-a"],
+      appleMusicUrl: "https://music.apple.com/us/album/unrelated/album-z?i=song-1",
+    )).toEqual("album-a")
+
+    expect(preferredAppleMusicAlbumId(
+      among: [],
+      appleMusicUrl: "https://music.apple.com/us/album/version/album-a?i=song-1",
+    )).toBeNil()
   }
 
   func testDecodesMixedSearchResponseFallsBackToMetaOrder() throws {
@@ -437,6 +692,18 @@ final class AppleMusicClientTests: XCTestCase {
         albumTitle: "Stories from the Outside",
       ),
     ])
+  }
+
+  func testDefaultTestClientResolvesKnownTrack() async throws {
+    let resolution = try await AppleMusicClient.testValue.resolveTrack(.init(
+      trackId: "1511628002",
+      preferredAlbumId: "1511628001",
+    ))
+
+    expect(resolution.grant.track.id).toEqual("1511628002")
+    expect(resolution.grant.preferredAlbum.id).toEqual("1511628001")
+    expect(resolution.grant.catalogPosition).toEqual(0)
+    expect(resolution.album.tracks.map(\.id)).toEqual(["1511628002", "1511628003"])
   }
 
   func testDecodesMissingAlbumsAsEmpty() throws {

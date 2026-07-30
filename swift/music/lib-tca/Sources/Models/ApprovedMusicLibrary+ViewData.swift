@@ -71,6 +71,8 @@ extension TrackData {
       title: track.title,
       artist: track.artistName,
       artworkUrl: track.artworkURL,
+      discNumber: track.discNumber,
+      trackNumber: track.trackNumber,
     )
   }
 }

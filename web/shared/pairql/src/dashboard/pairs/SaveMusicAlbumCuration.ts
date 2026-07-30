@@ -1,14 +1,17 @@
 // auto-generated, do not edit
-export namespace SearchMusicCatalog {
+export namespace SaveMusicAlbumCuration {
   export interface Input {
-    query: string;
-    limit?: number;
+    childId: UUID;
+    appleMusicAlbumId: string;
+    expectedRevision: number;
+    selectedTrackIds: string[];
   }
 
   export interface Output {
-    items: Array<{
-      kind: 'album' | 'artist';
-      album?: {
+    status: 'updated' | 'conflict' | 'coveredByArtist';
+    curation: {
+      revision: number;
+      albums: Array<{
         id: string;
         title: string;
         artistName: string;
@@ -23,11 +26,16 @@ export namespace SearchMusicCatalog {
           textColor3?: string;
           textColor4?: string;
         };
-        trackCount?: number;
+        catalogTrackCount: number;
+        selectedTrackCount: number;
         releaseDate?: string;
+        releaseType?: string;
         appleMusicUrl?: string;
-      };
-      artist?: {
+        scope: 'selectedTracks' | 'wholeAlbum';
+        showsArtwork: boolean;
+        createdAt: ISODateString;
+      }>;
+      artists: Array<{
         id: string;
         name: string;
         catalogMetadata?: {
@@ -50,9 +58,11 @@ export namespace SearchMusicCatalog {
           appleMusicUrl?: string;
           genreNames: string[];
         };
-      };
-    }>;
-    albums: Array<{
+        createdAt: ISODateString;
+      }>;
+    };
+    album: {
+      revision: number;
       id: string;
       title: string;
       artistName: string;
@@ -67,33 +77,27 @@ export namespace SearchMusicCatalog {
         textColor3?: string;
         textColor4?: string;
       };
-      trackCount?: number;
       releaseDate?: string;
+      releaseType?: string;
       appleMusicUrl?: string;
-    }>;
-    artists: Array<{
-      id: string;
-      name: string;
-      catalogMetadata?: {
-        artwork?: {
-          url?: string;
-          width?: number;
-          height?: number;
-          bgColor?: string;
-          textColor1?: string;
-          textColor2?: string;
-          textColor3?: string;
-          textColor4?: string;
-        };
-        editorialNotes?: {
-          tagline?: string;
-          short?: string;
-          standard?: string;
-          name?: string;
-        };
+      scope: 'none' | 'selectedTracks' | 'wholeAlbum' | 'artist';
+      selectedTrackCount: number;
+      catalogTrackCount: number;
+      canEdit: boolean;
+      governingArtistId?: string;
+      governingArtistName?: string;
+      tracks: Array<{
+        id: string;
+        title: string;
+        artistName: string;
+        artworkUrl?: string;
+        durationInMillis?: number;
+        discNumber?: number;
+        trackNumber?: number;
+        contentRating?: 'clean' | 'explicit';
         appleMusicUrl?: string;
-        genreNames: string[];
-      };
-    }>;
+        isSelected: boolean;
+      }>;
+    };
   }
 }

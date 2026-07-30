@@ -7,9 +7,25 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
   struct Summary: Equatable, Sendable {
     var refreshedAlbums = 0
     var refreshedArtists = 0
+    var refreshedTracks = 0
     var unchangedAlbums = 0
     var unchangedArtists = 0
+    var unchangedTracks = 0
+    var normalizedAlbums = 0
+    var normalizedTracks = 0
     var failures = 0
+
+    mutating func merge(_ other: Self) {
+      self.refreshedAlbums += other.refreshedAlbums
+      self.refreshedArtists += other.refreshedArtists
+      self.refreshedTracks += other.refreshedTracks
+      self.unchangedAlbums += other.unchangedAlbums
+      self.unchangedArtists += other.unchangedArtists
+      self.unchangedTracks += other.unchangedTracks
+      self.normalizedAlbums += other.normalizedAlbums
+      self.normalizedTracks += other.normalizedTracks
+      self.failures += other.failures
+    }
   }
 
   @Dependency(\.appleMusic) var appleMusic
@@ -23,84 +39,84 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
     _ = await self.exec()
   }
 
-  func exec(childIds: Set<Child.Id>? = nil) async -> Summary {
+  func exec(childIds filter: Set<Child.Id>? = nil) async -> Summary {
     var summary = Summary()
     do {
       let albums = try await Music.ApprovedAlbum.query()
         .orderBy(.createdAt, .asc)
         .all(in: self.db)
-        .filter { childIds?.contains($0.childId) ?? true }
-      let albumsById = Dictionary(grouping: albums, by: \.appleMusicAlbumId)
-      for albumId in albumsById.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
-        let resolution: Music.ResolvedAlbum
-        do {
-          resolution = try await self.appleMusic.resolveAlbum(albumId)
-        } catch {
-          summary.failures += albumsById[albumId]?.count ?? 0
-          self.logger.error(
-            "Apple Music refresh failed for album `\(albumId.rawValue)`: \(error)",
-          )
-          continue
-        }
-
-        for album in albumsById[albumId] ?? [] {
-          if let existing = album.resolution,
-             !self.albumContentChanged(album, from: existing, to: resolution) {
-            summary.unchangedAlbums += 1
-            continue
-          }
-          do {
-            let refreshed = try await self.refresh(album: album, resolution: resolution)
-            if refreshed {
-              summary.refreshedAlbums += 1
-            } else {
-              summary.unchangedAlbums += 1
-            }
-          } catch {
-            summary.failures += 1
-            self.logger.error(
-              "Persisting Apple Music refresh failed for album grant `\(album.id)`: \(error)",
-            )
-          }
-        }
-      }
-
+        .filter { filter?.contains($0.childId) ?? true }
       let artists = try await Music.ApprovedArtist.query()
         .orderBy(.createdAt, .asc)
         .all(in: self.db)
-        .filter { childIds?.contains($0.childId) ?? true }
-      let artistsById = Dictionary(grouping: artists, by: \.appleMusicArtistId)
-      for artistId in artistsById.keys.sorted(by: { $0.rawValue < $1.rawValue }) {
-        let resolution: Music.ResolvedArtist
+        .filter { filter?.contains($0.childId) ?? true }
+      let tracks = try await Music.ApprovedTrack.query()
+        .orderBy(.createdAt, .asc)
+        .all(in: self.db)
+        .filter { filter?.contains($0.childId) ?? true }
+
+      let albumIds = Set(albums.map(\.appleMusicAlbumId) + tracks.map(\.preferredAlbumId))
+      var albumResolutions: [Music.AlbumId: Music.ResolvedAlbum] = [:]
+      var failedAlbumIds = Set<Music.AlbumId>()
+      for albumId in albumIds.sorted(by: { $0.rawValue < $1.rawValue }) {
         do {
-          resolution = try await self.appleMusic.resolveArtist(artistId)
+          let resolution = try await self.appleMusic.resolveAlbum(albumId)
+          guard resolution.id == albumId else {
+            throw Music.LibrarySnapshotCompiler.CompilerError.albumResolutionIdMismatch(
+              expected: albumId,
+              actual: resolution.id,
+            )
+          }
+          albumResolutions[albumId] = resolution
         } catch {
-          summary.failures += artistsById[artistId]?.count ?? 0
+          failedAlbumIds.insert(albumId)
+          self.logger.error(
+            "Apple Music refresh failed for album `\(albumId.rawValue)`: \(error)",
+          )
+        }
+      }
+
+      let artistIds = Set(artists.map(\.appleMusicArtistId))
+      var artistResolutions: [Music.ArtistId: Music.ResolvedArtist] = [:]
+      var failedArtistIds = Set<Music.ArtistId>()
+      for artistId in artistIds.sorted(by: { $0.rawValue < $1.rawValue }) {
+        do {
+          let resolution = try await self.appleMusic.resolveArtist(artistId)
+          guard resolution.id == artistId else {
+            throw Music.LibrarySnapshotCompiler.CompilerError.artistResolutionIdMismatch(
+              expected: artistId,
+              actual: resolution.id,
+            )
+          }
+          artistResolutions[artistId] = resolution
+        } catch {
+          failedArtistIds.insert(artistId)
           self.logger.error(
             "Apple Music refresh failed for artist `\(artistId.rawValue)`: \(error)",
           )
-          continue
         }
+      }
 
-        for artist in artistsById[artistId] ?? [] {
-          if let existing = artist.resolution,
-             !self.artistContentChanged(artist, from: existing, to: resolution) {
-            summary.unchangedArtists += 1
-            continue
-          }
-          do {
-            let refreshed = try await self.refresh(artist: artist, resolution: resolution)
-            if refreshed {
-              summary.refreshedArtists += 1
-            } else {
-              summary.unchangedArtists += 1
-            }
-          } catch {
-            summary.failures += 1
-            self.logger.error(
-              "Persisting Apple Music refresh failed for artist grant `\(artist.id)`: \(error)",
-            )
-          }
+      let affectedChildIds = Set(
+        albums.map(\.childId) + artists.map(\.childId) + tracks.map(\.childId),
+      )
+      for childId in affectedChildIds.sorted(by: {
+        $0.rawValue.uuidString < $1.rawValue.uuidString
+      }) {
+        do {
+          let delta = try await self.refreshChild(
+            childId,
+            albumResolutions: albumResolutions,
+            failedAlbumIds: failedAlbumIds,
+            artistResolutions: artistResolutions,
+            failedArtistIds: failedArtistIds,
+          )
+          summary.merge(delta)
+        } catch {
+          summary.failures += 1
+          self.logger.error(
+            "Persisting Apple Music refresh failed for child `\(childId)`: \(error)",
+          )
         }
       }
     } catch {
@@ -110,202 +126,183 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
     return summary
   }
 
-  private func refresh(
-    album: Music.ApprovedAlbum,
-    resolution: Music.ResolvedAlbum,
-  ) async throws -> Bool {
+  private func refreshChild(
+    _ childId: Child.Id,
+    albumResolutions: [Music.AlbumId: Music.ResolvedAlbum],
+    failedAlbumIds: Set<Music.AlbumId>,
+    artistResolutions: [Music.ArtistId: Music.ResolvedArtist],
+    failedArtistIds: Set<Music.ArtistId>,
+  ) async throws -> Summary {
     try await self.db.withTransaction { db in
-      try await Music.LibrarySnapshotRepository.lock(childId: album.childId, in: db)
-      let current = try await Music.ApprovedAlbum.query()
-        .where(.id == album.id)
-        .all(in: db)
-        .first
-      guard var current else { return false }
-      guard try await self.childContentChanged(album: current, to: resolution, in: db) else {
-        return false
+      try await Music.LibrarySnapshotRepository.lock(childId: childId, in: db)
+      var summary = Summary()
+      var changed = false
+      var policy = try await Music.CatalogPolicy.load(childId: childId, in: db)
+
+      for var artist in policy.artists {
+        if failedArtistIds.contains(artist.appleMusicArtistId) {
+          summary.failures += 1
+          continue
+        }
+        guard let resolution = artistResolutions[artist.appleMusicArtistId] else { continue }
+        if self.artistMatches(artist, resolution: resolution) {
+          summary.unchangedArtists += 1
+          continue
+        }
+        artist.name = resolution.name
+        artist.catalogMetadata = resolution.catalogMetadata
+        artist.resolution = resolution
+        artist.resolvedAt = self.now
+        try await db.update(artist)
+        summary.refreshedArtists += 1
+        changed = true
       }
-      current.title = resolution.title
-      current.artistName = resolution.artistName
-      current.artworkUrl = resolution.artworkUrl
-      current.artwork = resolution.artwork
-      current.trackCount = resolution.trackCount
-      current.resolution = resolution
-      current.resolvedAt = self.now
-      try await db.update(current)
-      try await Music.LibrarySnapshotRepository.publish(
-        childId: current.childId,
-        generatedAt: self.now,
-        in: db,
-      )
-      return true
+
+      policy = try await Music.CatalogPolicy.load(childId: childId, in: db)
+      var coveredAlbumIds = Set<Music.AlbumId>()
+      var coveredTrackIds = Set<Music.TrackId>()
+      for artist in policy.artists {
+        guard let resolution = artist.resolution else { continue }
+        let covered = try policy.coverage.directGrantsCovered(by: resolution)
+        coveredAlbumIds.formUnion(covered.albumIds)
+        coveredTrackIds.formUnion(covered.trackIds)
+      }
+      if !coveredAlbumIds.isEmpty {
+        let deleted = try await Music.ApprovedAlbum.query()
+          .where(.childId == childId)
+          .where(.appleMusicAlbumId |=| coveredAlbumIds.map(\.rawValue))
+          .delete(in: db)
+        summary.normalizedAlbums += deleted
+        changed = deleted > 0 || changed
+      }
+      if !coveredTrackIds.isEmpty {
+        let deleted = try await Music.ApprovedTrack.query()
+          .where(.childId == childId)
+          .where(.appleMusicTrackId |=| coveredTrackIds.map(\.rawValue))
+          .delete(in: db)
+        summary.normalizedTracks += deleted
+        changed = deleted > 0 || changed
+      }
+
+      policy = try await Music.CatalogPolicy.load(childId: childId, in: db)
+      for var album in policy.albums {
+        if failedAlbumIds.contains(album.appleMusicAlbumId) {
+          summary.failures += 1
+          continue
+        }
+        guard let resolution = albumResolutions[album.appleMusicAlbumId] else { continue }
+        if self.albumMatches(album, resolution: resolution) {
+          summary.unchangedAlbums += 1
+          continue
+        }
+        album.title = resolution.title
+        album.artistName = resolution.artistName
+        album.artworkUrl = resolution.artworkUrl
+        album.artwork = resolution.artwork
+        album.trackCount = resolution.trackCount
+        album.resolution = resolution
+        album.resolvedAt = self.now
+        try await db.update(album)
+        summary.refreshedAlbums += 1
+        changed = true
+      }
+
+      policy = try await Music.CatalogPolicy.load(childId: childId, in: db)
+      var albumCoveredTrackIds = Set<Music.TrackId>()
+      for album in policy.albums {
+        guard let resolution = album.resolution else { continue }
+        try albumCoveredTrackIds.formUnion(
+          policy.coverage.directTrackIdsCovered(by: resolution),
+        )
+        albumCoveredTrackIds.formUnion(
+          policy.tracks(preferredAlbumId: album.appleMusicAlbumId).map(\.appleMusicTrackId),
+        )
+      }
+      if !albumCoveredTrackIds.isEmpty {
+        let deleted = try await Music.ApprovedTrack.query()
+          .where(.childId == childId)
+          .where(.appleMusicTrackId |=| albumCoveredTrackIds.map(\.rawValue))
+          .delete(in: db)
+        summary.normalizedTracks += deleted
+        changed = deleted > 0 || changed
+      }
+
+      policy = try await Music.CatalogPolicy.load(childId: childId, in: db)
+      for var track in policy.tracks {
+        if failedAlbumIds.contains(track.preferredAlbumId) {
+          summary.failures += 1
+          continue
+        }
+        guard let album = albumResolutions[track.preferredAlbumId] else { continue }
+        guard let position = album.tracks.firstIndex(where: {
+          $0.id == track.appleMusicTrackId
+        }) else {
+          summary.failures += 1
+          self.logger.error(
+            "Apple Music album `\(album.id.rawValue)` no longer contains selected track `\(track.appleMusicTrackId.rawValue)`",
+          )
+          continue
+        }
+        let resolution = Music.ResolvedTrackGrant(
+          track: album.tracks[position],
+          preferredAlbum: .init(
+            id: album.id,
+            title: album.title,
+            artistName: album.artistName,
+            artistIds: album.artistIds,
+            artworkUrl: album.artworkUrl,
+            artwork: album.artwork,
+            trackCount: album.tracks.count,
+            releaseDate: album.releaseDate,
+            releaseType: album.releaseType,
+            appleMusicUrl: album.appleMusicUrl,
+          ),
+          catalogPosition: position,
+        )
+        try resolution.validate(
+          appleMusicTrackId: track.appleMusicTrackId,
+          preferredAlbumId: track.preferredAlbumId,
+        )
+        if track.resolution == resolution {
+          summary.unchangedTracks += 1
+          continue
+        }
+        track.resolution = resolution
+        track.resolvedAt = self.now
+        try await db.update(track)
+        summary.refreshedTracks += 1
+        changed = true
+      }
+
+      if changed {
+        _ = try await Music.LibrarySnapshotRepository.publishAfterPolicyChange(
+          childId: childId,
+          generatedAt: self.now,
+          in: db,
+        )
+      }
+      return summary
     }
   }
 
-  private func albumContentChanged(
+  private func albumMatches(
     _ album: Music.ApprovedAlbum,
-    from existing: Music.ResolvedAlbum,
-    to refreshed: Music.ResolvedAlbum,
+    resolution: Music.ResolvedAlbum,
   ) -> Bool {
-    let grant = { (resolution: Music.ResolvedAlbum) in
-      Music.LibrarySnapshotCompiler.AlbumGrant(
-        appleMusicAlbumId: album.appleMusicAlbumId,
-        createdAt: album.createdAt,
-        showsArtwork: album.showsArtwork,
-        resolution: resolution,
-      )
-    }
-    do {
-      return try Music.LibrarySnapshotCompiler.compile(
-        albumGrants: [grant(existing)],
-        artistGrants: [],
-      ) != Music.LibrarySnapshotCompiler.compile(
-        albumGrants: [grant(refreshed)],
-        artistGrants: [],
-      )
-    } catch {
-      return true
-    }
+    album.title == resolution.title
+      && album.artistName == resolution.artistName
+      && album.artworkUrl == resolution.artworkUrl
+      && album.artwork == resolution.artwork
+      && album.trackCount == resolution.trackCount
+      && album.resolution == resolution
   }
 
-  private func artistContentChanged(
+  private func artistMatches(
     _ artist: Music.ApprovedArtist,
-    from existing: Music.ResolvedArtist,
-    to refreshed: Music.ResolvedArtist,
-  ) -> Bool {
-    let grant = { (resolution: Music.ResolvedArtist) in
-      Music.LibrarySnapshotCompiler.ArtistGrant(
-        appleMusicArtistId: artist.appleMusicArtistId,
-        createdAt: artist.createdAt,
-        resolution: resolution,
-      )
-    }
-    do {
-      return try Music.LibrarySnapshotCompiler.compile(
-        albumGrants: [],
-        artistGrants: [grant(existing)],
-      ) != Music.LibrarySnapshotCompiler.compile(
-        albumGrants: [],
-        artistGrants: [grant(refreshed)],
-      )
-    } catch {
-      return true
-    }
-  }
-
-  private func childContentChanged(
-    album: Music.ApprovedAlbum,
-    to resolution: Music.ResolvedAlbum,
-    in db: any DuetSQL.Client,
-  ) async throws -> Bool {
-    let albums = try await Music.ApprovedAlbum.query()
-      .where(.childId == album.childId)
-      .all(in: db)
-    let artists = try await Music.ApprovedArtist.query()
-      .where(.childId == album.childId)
-      .all(in: db)
-    let existingGrants = albums.map {
-      Music.LibrarySnapshotCompiler.AlbumGrant(
-        appleMusicAlbumId: $0.appleMusicAlbumId,
-        createdAt: $0.createdAt,
-        showsArtwork: $0.showsArtwork,
-        resolution: $0.resolution,
-      )
-    }
-    let refreshedGrants = albums.map {
-      Music.LibrarySnapshotCompiler.AlbumGrant(
-        appleMusicAlbumId: $0.appleMusicAlbumId,
-        createdAt: $0.createdAt,
-        showsArtwork: $0.showsArtwork,
-        resolution: $0.id == album.id ? resolution : $0.resolution,
-      )
-    }
-    let artistGrants = artists.map {
-      Music.LibrarySnapshotCompiler.ArtistGrant(
-        appleMusicArtistId: $0.appleMusicArtistId,
-        createdAt: $0.createdAt,
-        resolution: $0.resolution,
-      )
-    }
-    let refreshed = try Music.LibrarySnapshotCompiler.compile(
-      albumGrants: refreshedGrants,
-      artistGrants: artistGrants,
-    )
-    guard let existing = try? Music.LibrarySnapshotCompiler.compile(
-      albumGrants: existingGrants,
-      artistGrants: artistGrants,
-    ) else { return true }
-    return existing != refreshed
-  }
-
-  private func childContentChanged(
-    artist: Music.ApprovedArtist,
-    to resolution: Music.ResolvedArtist,
-    in db: any DuetSQL.Client,
-  ) async throws -> Bool {
-    let albums = try await Music.ApprovedAlbum.query()
-      .where(.childId == artist.childId)
-      .all(in: db)
-    let artists = try await Music.ApprovedArtist.query()
-      .where(.childId == artist.childId)
-      .all(in: db)
-    let albumGrants = albums.map {
-      Music.LibrarySnapshotCompiler.AlbumGrant(
-        appleMusicAlbumId: $0.appleMusicAlbumId,
-        createdAt: $0.createdAt,
-        showsArtwork: $0.showsArtwork,
-        resolution: $0.resolution,
-      )
-    }
-    let existingGrants = artists.map {
-      Music.LibrarySnapshotCompiler.ArtistGrant(
-        appleMusicArtistId: $0.appleMusicArtistId,
-        createdAt: $0.createdAt,
-        resolution: $0.resolution,
-      )
-    }
-    let refreshedGrants = artists.map {
-      Music.LibrarySnapshotCompiler.ArtistGrant(
-        appleMusicArtistId: $0.appleMusicArtistId,
-        createdAt: $0.createdAt,
-        resolution: $0.id == artist.id ? resolution : $0.resolution,
-      )
-    }
-    let refreshed = try Music.LibrarySnapshotCompiler.compile(
-      albumGrants: albumGrants,
-      artistGrants: refreshedGrants,
-    )
-    guard let existing = try? Music.LibrarySnapshotCompiler.compile(
-      albumGrants: albumGrants,
-      artistGrants: existingGrants,
-    ) else { return true }
-    return existing != refreshed
-  }
-
-  private func refresh(
-    artist: Music.ApprovedArtist,
     resolution: Music.ResolvedArtist,
-  ) async throws -> Bool {
-    try await self.db.withTransaction { db in
-      try await Music.LibrarySnapshotRepository.lock(childId: artist.childId, in: db)
-      let current = try await Music.ApprovedArtist.query()
-        .where(.id == artist.id)
-        .all(in: db)
-        .first
-      guard var current else { return false }
-      guard try await self.childContentChanged(artist: current, to: resolution, in: db) else {
-        return false
-      }
-      current.name = resolution.name
-      current.catalogMetadata = resolution.catalogMetadata
-      current.resolution = resolution
-      current.resolvedAt = self.now
-      try await db.update(current)
-      try await Music.LibrarySnapshotRepository.publish(
-        childId: current.childId,
-        generatedAt: self.now,
-        in: db,
-      )
-      return true
-    }
+  ) -> Bool {
+    artist.name == resolution.name
+      && artist.catalogMetadata == resolution.catalogMetadata
+      && artist.resolution == resolution
   }
 }

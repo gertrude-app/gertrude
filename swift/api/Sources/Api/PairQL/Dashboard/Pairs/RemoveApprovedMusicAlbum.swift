@@ -17,12 +17,13 @@ extension RemoveApprovedMusicAlbum: Resolver {
     let now = get(dependency: \.date.now)
     try await context.db.withTransaction { db in
       try await Music.LibrarySnapshotRepository.lock(childId: child.id, in: db)
-      let deleted = try await Music.ApprovedAlbum.query()
-        .where(.childId == child.id)
-        .where(.appleMusicAlbumId == input.appleMusicAlbumId.rawValue)
-        .delete(in: db)
-      if deleted > 0 {
-        try await Music.LibrarySnapshotRepository.publish(
+      let changed = try await Music.CatalogPolicy.removeDirectAlbum(
+        childId: child.id,
+        albumId: input.appleMusicAlbumId,
+        in: db,
+      )
+      if changed {
+        _ = try await Music.LibrarySnapshotRepository.publishAfterPolicyChange(
           childId: child.id,
           generatedAt: now,
           in: db,

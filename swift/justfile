@@ -84,6 +84,9 @@ sync-staging-data: build-api
 backfill-music-catalog: build-api
   @just exec-api backfill-music-catalog
 
+normalize-music-policy: build-api
+  @just exec-api normalize-music-policy
+
 scheduled-marketing-dry-run: build-api
   @just exec-api scheduled-marketing-dry-run
 

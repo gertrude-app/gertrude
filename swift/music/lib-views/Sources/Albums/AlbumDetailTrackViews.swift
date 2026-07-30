@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AlbumDetailTrackRow: Identifiable, Equatable {
-  let number: Int
+  let number: String?
   let track: TrackData
 
   var id: String { self.track.id }
@@ -27,8 +27,8 @@ struct AlbumDetailTrackRowView: View {
               isPlaying: self.isPlaying,
               color: currentTrackStyle.text,
             )
-          } else {
-            Text(self.row.number, format: .number)
+          } else if let number = self.row.number {
+            Text(number)
               .font(
                 .system(
                   size: 14,
@@ -72,9 +72,7 @@ struct AlbumDetailTrackRowView: View {
       .contentShape(Rectangle())
     }
     .buttonStyle(.plain)
-    .accessibilityLabel(
-      "\(self.accessibilityPlaybackPrefix)\(self.row.number). \(self.row.track.title), \(self.row.track.artist)",
-    )
+    .accessibilityLabel(self.accessibilityLabel)
   }
 
   private var currentTrackStyle: AlbumDetailCurrentTrackStyle {
@@ -96,6 +94,11 @@ struct AlbumDetailTrackRowView: View {
       text: foregroundColor,
       secondaryText: foregroundColor.opacity(0.65),
     )
+  }
+
+  private var accessibilityLabel: String {
+    let number = self.row.number.map { "\($0). " } ?? ""
+    return "\(self.accessibilityPlaybackPrefix)\(number)\(self.row.track.title), \(self.row.track.artist)"
   }
 
   private var accessibilityPlaybackPrefix: String {

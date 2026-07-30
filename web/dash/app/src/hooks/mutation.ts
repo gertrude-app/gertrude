@@ -122,6 +122,7 @@ type ToastId =
   | `flag:activity-item`
   | `approve:music-album`
   | `approve:music-artist`
+  | `approve:music-track`
   | `remove:music-album`
   | `remove:music-artist`
   | `update:music-artwork`
@@ -163,6 +164,8 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
 
     case `approve:music-album`:
       return { verb: `allow`, entity: `album` };
+    case `approve:music-track`:
+      return { verb: `allow`, entity: `track` };
     case `approve:music-artist`:
       return { verb: `allow`, entity: `artist` };
     case `remove:music-album`:

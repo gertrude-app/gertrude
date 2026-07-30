@@ -42,8 +42,12 @@ public struct AlbumDetailView: View {
     self.onTrackAddToQueue = onTrackAddToQueue
     self.onTrackPlayNext = onTrackPlayNext
     self.onTrackTap = onTrackTap
-    self.rows = tracks.enumerated().map { index, track in
-      AlbumDetailTrackRow(number: index + 1, track: track)
+    let usesMultipleDiscs = Set(tracks.compactMap(\.discNumber)).count > 1
+    self.rows = tracks.map { track in
+      AlbumDetailTrackRow(
+        number: track.albumDetailNumber(includesDisc: usesMultipleDiscs),
+        track: track,
+      )
     }
   }
 
@@ -234,6 +238,14 @@ public struct AlbumDetailView: View {
 
   private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
     max(1, min(320, containerWidth - 64))
+  }
+}
+
+extension TrackData {
+  func albumDetailNumber(includesDisc: Bool) -> String? {
+    guard let trackNumber else { return nil }
+    guard includesDisc, let discNumber else { return String(trackNumber) }
+    return "\(discNumber).\(trackNumber)"
   }
 }
 

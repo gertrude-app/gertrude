@@ -93,6 +93,198 @@ final class AppleMusicResolutionTests: XCTestCase {
     ])
   }
 
+  func testResolvesTrustedTrackForExactPreferredAlbum() async throws {
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/songs":
+        data("""
+        {
+          "data": [{
+            "id": "song-2",
+            "type": "songs",
+            "attributes": {
+              "name": "Hydrated Track",
+              "artistName": "Track Artist",
+              "albumName": "Other Association",
+              "artwork": {"url": "https://example.com/track/{w}x{h}.jpg"},
+              "durationInMillis": 222000,
+              "discNumber": 2,
+              "trackNumber": 3,
+              "contentRating": "explicit",
+              "url": "https://music.apple.com/us/album/preferred/album-1?i=song-2"
+            },
+            "relationships": {
+              "albums": {
+                "data": [
+                  {"id": "album-2", "type": "albums"},
+                  {"id": "album-1", "type": "albums"}
+                ]
+              },
+              "artists": {
+                "data": [
+                  {"id": "artist-1", "type": "artists"},
+                  {"id": "artist-2", "type": "artists"}
+                ]
+              }
+            }
+          }]
+        }
+        """)
+      case "/v1/catalog/us/albums":
+        data("""
+        {
+          "data": [{
+            "id": "album-1",
+            "type": "albums",
+            "attributes": {
+              "name": "Preferred Album",
+              "artistName": "Album Artist",
+              "artwork": {
+                "url": "https://example.com/album/{w}x{h}.jpg",
+                "width": 1200,
+                "height": 1200
+              },
+              "trackCount": 2,
+              "releaseDate": "2026-01-02",
+              "isSingle": false,
+              "url": "https://music.apple.com/us/album/preferred/album-1"
+            },
+            "relationships": {
+              "artists": {
+                "data": [{"id": "artist-1", "type": "artists"}]
+              },
+              "tracks": {
+                "data": [
+                  \(songJson(id: "song-1", title: "First", artistName: "Album Artist")),
+                  \(songJson(id: "song-2", title: "Album Track", artistName: "Album Artist"))
+                ]
+              }
+            }
+          }]
+        }
+        """)
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    let resolution = try await resolveAppleMusicCatalogTrack(
+      .init(trackId: "song-2", preferredAlbumId: "album-1"),
+      load: loader.dataLoader,
+    )
+
+    expect(resolution.grant.track).toEqual(.init(
+      id: "song-2",
+      title: "Hydrated Track",
+      artistName: "Track Artist",
+      artistIds: ["artist-1", "artist-2"],
+      albumId: "album-1",
+      albumTitle: "Preferred Album",
+      artworkUrl: "https://example.com/track/600x600.jpg",
+      durationInMillis: 222_000,
+      discNumber: 2,
+      trackNumber: 3,
+      contentRating: .explicit,
+      appleMusicUrl: "https://music.apple.com/us/album/preferred/album-1?i=song-2",
+    ))
+    expect(resolution.grant.preferredAlbum).toEqual(.init(
+      id: "album-1",
+      title: "Preferred Album",
+      artistName: "Album Artist",
+      artistIds: ["artist-1"],
+      artworkUrl: "https://example.com/album/600x600.jpg",
+      artwork: .init(
+        url: "https://example.com/album/{w}x{h}.jpg",
+        width: 1200,
+        height: 1200,
+      ),
+      trackCount: 2,
+      releaseDate: "2026-01-02",
+      releaseType: "Album",
+      appleMusicUrl: "https://music.apple.com/us/album/preferred/album-1",
+    ))
+    expect(resolution.grant.catalogPosition).toEqual(1)
+    expect(resolution.album.tracks.map(\.id)).toEqual(["song-1", "song-2"])
+    expect(resolution.album.appleMusicUrl)
+      .toEqual("https://music.apple.com/us/album/preferred/album-1")
+    XCTAssertNoThrow(try resolution.grant.validate(
+      appleMusicTrackId: "song-2",
+      preferredAlbumId: "album-1",
+    ))
+    let requestPaths = await loader.requestPaths()
+    expect(requestPaths).toEqual([
+      "/v1/catalog/us/songs",
+      "/v1/catalog/us/albums",
+    ])
+  }
+
+  func testRejectsPreferredAlbumOutsideTrackRelationships() async throws {
+    let loader = StubAppleMusicLoader { url in
+      guard url.path == "/v1/catalog/us/songs" else {
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+      return data("""
+      {
+        "data": [
+          \(hydratedSongJson(id: "song-1", artistIds: ["artist-1"], albumId: "album-2"))
+        ]
+      }
+      """)
+    }
+
+    do {
+      _ = try await resolveAppleMusicCatalogTrack(
+        .init(trackId: "song-1", preferredAlbumId: "album-1"),
+        load: loader.dataLoader,
+      )
+      XCTFail("expected preferred album mismatch")
+    } catch let error as AppleMusicResolutionError {
+      expect(error).toEqual(.trackNotAssociatedWithAlbum(
+        track: "song-1",
+        album: "album-1",
+      ))
+    }
+
+    let requestPaths = await loader.requestPaths()
+    expect(requestPaths).toEqual(["/v1/catalog/us/songs"])
+  }
+
+  func testRejectsTrackMissingFromPreferredAlbum() async throws {
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/songs":
+        data("""
+        {
+          "data": [
+            \(hydratedSongJson(id: "song-1", artistIds: ["artist-1"], albumId: "album-1"))
+          ]
+        }
+        """)
+      case "/v1/catalog/us/albums":
+        albumCollection([
+          albumJson(
+            id: "album-1",
+            title: "Album",
+            artistIds: ["artist-1"],
+            tracks: [songJson(id: "song-2", title: "Other", artistName: "Artist")],
+          ),
+        ])
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    do {
+      _ = try await resolveAppleMusicCatalogTrack(
+        .init(trackId: "song-1", preferredAlbumId: "album-1"),
+        load: loader.dataLoader,
+      )
+      XCTFail("expected preferred album to contain track")
+    } catch let error as AppleMusicResolutionError {
+      expect(error).toEqual(.albumMissingTrack(album: "album-1", track: "song-1"))
+    }
+  }
+
   func testResolvesVariousArtistsAlbumWithEmptyArtistsRelationship() async throws {
     let loader = StubAppleMusicLoader { url in
       guard url.path == "/v1/catalog/us/albums" else {
@@ -354,7 +546,7 @@ final class AppleMusicResolutionTests: XCTestCase {
   }
 }
 
-private actor StubAppleMusicLoader {
+actor StubAppleMusicLoader {
   private let response: @Sendable (URL) throws -> Data
   private var requests: [URL] = []
 
@@ -375,6 +567,10 @@ private actor StubAppleMusicLoader {
     self.requests.map(\.path)
   }
 
+  func requestURLs() -> [URL] {
+    self.requests
+  }
+
   func albumBatchSizes() -> [Int] {
     self.requests.compactMap { url in
       guard url.path == "/v1/catalog/us/albums" else { return nil }
@@ -385,7 +581,7 @@ private actor StubAppleMusicLoader {
   }
 }
 
-private enum StubError: Error, Equatable {
+enum StubError: Error, Equatable {
   case pageFailed
   case unexpectedURL(String)
 }

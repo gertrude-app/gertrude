@@ -3,7 +3,6 @@ import {
   ApiErrorMessage,
   /*ConfirmDeleteEntity*/
   AppHeader,
-  BetaBadge,
   BlockGroupList,
   Loading,
   PageHeading,
@@ -574,9 +573,7 @@ const MusicDeviceSection: React.FC<{
   requiresPayment: boolean;
 }> = ({ childId, childName, requiresPayment }) => (
   <div className="max-w-3xl">
-    <AppHeader app="music">
-      <BetaBadge />
-    </AppHeader>
+    <AppHeader app="music" />
     {requiresPayment ? (
       <div className="mt-4">
         <p className="text-slate-500 mb-4">

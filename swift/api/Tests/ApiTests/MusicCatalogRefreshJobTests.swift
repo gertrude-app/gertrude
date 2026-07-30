@@ -14,6 +14,7 @@ final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
       appleMusicAlbumId: "album-1",
       title: resolution.title,
       artistName: resolution.artistName,
+      trackCount: resolution.trackCount,
       resolution: resolution,
       resolvedAt: .reference,
     ))
@@ -119,7 +120,71 @@ final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
     expect(snapshot?.payload.artists.first?.releaseAlbumIds).toEqual(["album-1"])
   }
 
-  func testArtistRefreshDoesNotWriteWhenChangesAreShadowedByDirectAlbum() async throws {
+  func testArtistRefreshRemovesNewlyCoveredTrackGrant() async throws {
+    let child = try await self.child()
+    let originalAlbum = refreshAlbumWithTracks(
+      id: "artist-album",
+      trackIds: ["track-1"],
+    )
+    let artist = try await self.db.create(Music.ApprovedArtist(
+      childId: child.id,
+      appleMusicArtistId: "artist-1",
+      name: "Artist",
+      resolution: resolvedArtist(id: "artist-1", albums: [originalAlbum]),
+      resolvedAt: .reference,
+    ))
+    _ = try await self.db.create(Music.ApprovedTrack(
+      childId: child.id,
+      appleMusicTrackId: "track-2",
+      preferredAlbumId: "preferred-album",
+      resolution: resolvedTrackGrant(
+        id: "track-2",
+        preferredAlbumId: "preferred-album",
+      ),
+      resolvedAt: .reference,
+    ))
+    let first = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+    let expandedAlbum = refreshAlbumWithTracks(
+      id: "artist-album",
+      trackIds: ["track-1", "track-2"],
+    )
+    let expandedArtist = resolvedArtist(id: "artist-1", albums: [expandedAlbum])
+    let preferredAlbum = refreshAlbumWithTracks(
+      id: "preferred-album",
+      trackIds: ["track-2"],
+    )
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.date.now = .reference + 100
+      $0.appleMusic.resolveAlbum = { _ in preferredAlbum }
+      $0.appleMusic.resolveArtist = { _ in expandedArtist }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [child.id])
+    }
+    let reloadedArtist = try await self.db.find(artist.id)
+    let tracks = try await Music.ApprovedTrack.query()
+      .where(.childId == child.id)
+      .all(in: self.db)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+
+    expect(summary.refreshedArtists).toEqual(1)
+    expect(summary.normalizedTracks).toEqual(1)
+    expect(reloadedArtist.resolution).toEqual(expandedArtist)
+    expect(tracks).toBeEmpty()
+    expect(snapshot?.revision).toEqual(first.revision + 1)
+    expect(snapshot?.payload.albums.map(\.id)).toEqual(["artist-album"])
+    expect(snapshot?.payload.albums[0].tracks.map(\.id)).toEqual(["track-1", "track-2"])
+  }
+
+  func testArtistRefreshWritesWhenBroaderMetadataChangesEffectiveAlbum() async throws {
     let child = try await self.child()
     let directResolution = refreshAlbum(id: "album-1", title: "Direct")
     _ = try await self.db.create(Music.ApprovedAlbum(
@@ -169,13 +234,150 @@ final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
       in: self.db,
     )
 
-    expect(summary.unchangedAlbums).toEqual(1)
-    expect(summary.unchangedArtists).toEqual(1)
-    expect(reloadedArtist.resolution).toEqual(old)
-    expect(reloadedArtist.resolvedAt).toEqual(.reference)
-    expect(snapshot?.revision).toEqual(first.revision)
-    expect(snapshot?.createdAt).toEqual(first.createdAt)
-    expect(snapshot?.payload).toEqual(first.payload)
+    expect(summary.normalizedAlbums).toEqual(1)
+    expect(summary.refreshedArtists).toEqual(1)
+    expect(reloadedArtist.resolution).toEqual(updated)
+    expect(reloadedArtist.resolvedAt).toEqual(.reference + 100)
+    expect(snapshot?.revision).toEqual(first.revision + 1)
+    expect(snapshot?.createdAt).toEqual(.reference + 100)
+    expect(snapshot?.payload.albums.first?.title).toEqual("New artist metadata")
+  }
+
+  func testTrackRefreshUsesCompletePreferredAlbumWithoutPromotingScope() async throws {
+    let child = try await self.child()
+    let selectedTrackIds: [Music.TrackId] = ["track-1", "track-3"]
+    for (position, trackId) in selectedTrackIds.enumerated() {
+      _ = try await self.db.create(Music.ApprovedTrack(
+        childId: child.id,
+        appleMusicTrackId: trackId,
+        preferredAlbumId: "album-1",
+        resolution: resolvedTrackGrant(
+          id: trackId,
+          preferredAlbumId: "album-1",
+          trackTitle: "Old \(trackId.rawValue)",
+          catalogPosition: position,
+        ),
+        resolvedAt: .reference,
+      ))
+    }
+    let first = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+    let resolution = refreshAlbumWithTracks(
+      id: "album-1",
+      trackIds: ["track-1", "track-2", "track-3"],
+    )
+    let calls = RefreshCallCounter()
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.date.now = .reference + 100
+      $0.appleMusic.resolveAlbum = { _ in
+        await calls.increment()
+        return resolution
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [child.id])
+    }
+    let tracks = try await Music.ApprovedTrack.query()
+      .where(.childId == child.id)
+      .orderBy(.appleMusicTrackId, .asc)
+      .all(in: self.db)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+
+    await expect(calls.value()).toEqual(1)
+    expect(summary.refreshedTracks).toEqual(2)
+    expect(summary.normalizedTracks).toEqual(0)
+    expect(tracks.map(\.resolution.catalogPosition)).toEqual([0, 2])
+    expect(tracks.map(\.resolution.preferredAlbum.trackCount)).toEqual([3, 3])
+    await expect(try Music.ApprovedAlbum.query()
+      .where(.childId == child.id)
+      .count(in: self.db)).toEqual(0)
+    expect(snapshot?.revision).toEqual(first.revision + 1)
+    expect(snapshot?.payload.albums[0].tracks.map(\.id)).toEqual(["track-1", "track-3"])
+  }
+
+  func testAlbumRefreshRemovesNewlyCoveredTrackGrant() async throws {
+    let child = try await self.child()
+    let originalAlbum = refreshAlbumWithTracks(
+      id: "album-1",
+      trackIds: ["track-1"],
+    )
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: originalAlbum.id,
+      title: originalAlbum.title,
+      artistName: originalAlbum.artistName,
+      trackCount: originalAlbum.trackCount,
+      resolution: originalAlbum,
+      resolvedAt: .reference,
+    ))
+    _ = try await self.db.create(Music.ApprovedTrack(
+      childId: child.id,
+      appleMusicTrackId: "track-2",
+      preferredAlbumId: "album-2",
+      resolution: resolvedTrackGrant(
+        id: "track-2",
+        preferredAlbumId: "album-2",
+      ),
+      resolvedAt: .reference,
+    ))
+    _ = try await self.db.create(Music.ApprovedTrack(
+      childId: child.id,
+      appleMusicTrackId: "removed-track",
+      preferredAlbumId: "album-1",
+      resolution: resolvedTrackGrant(
+        id: "removed-track",
+        preferredAlbumId: "album-1",
+      ),
+      resolvedAt: .reference,
+    ))
+    let first = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+    let expandedAlbum = refreshAlbumWithTracks(
+      id: "album-1",
+      trackIds: ["track-1", "track-2"],
+    )
+    let preferredAlbum = refreshAlbumWithTracks(
+      id: "album-2",
+      trackIds: ["track-2"],
+    )
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.date.now = .reference + 100
+      $0.appleMusic.resolveAlbum = { albumId in
+        switch albumId.rawValue {
+        case "album-1": expandedAlbum
+        case "album-2": preferredAlbum
+        default: throw RefreshError.unavailable
+        }
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [child.id])
+    }
+    let tracks = try await Music.ApprovedTrack.query()
+      .where(.childId == child.id)
+      .all(in: self.db)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: child.id,
+      in: self.db,
+    )
+
+    expect(summary.refreshedAlbums).toEqual(1)
+    expect(summary.normalizedTracks).toEqual(2)
+    expect(tracks).toBeEmpty()
+    expect(snapshot?.revision).toEqual(first.revision + 1)
+    expect(snapshot?.payload.albums.map(\.id)).toEqual(["album-1"])
+    expect(snapshot?.payload.albums[0].tracks.map(\.id)).toEqual(["track-1", "track-2"])
   }
 
   func testDuplicateAppleIdsResolveOnceAcrossChildren() async throws {
@@ -238,6 +440,31 @@ private func refreshArtist(albumIds: [Music.AlbumId]) -> Music.ResolvedArtist {
     name: "Artist",
     topSongs: [],
     albums: albumIds.map { refreshAlbum(id: $0) },
+  )
+}
+
+private func refreshAlbumWithTracks(
+  id: Music.AlbumId,
+  trackIds: [Music.TrackId],
+) -> Music.ResolvedAlbum {
+  .init(
+    id: id,
+    title: "Album",
+    artistName: "Artist",
+    artistIds: ["artist-1"],
+    trackCount: trackIds.count,
+    tracks: trackIds.enumerated().map { index, trackId in
+      .init(
+        id: trackId,
+        title: "Updated \(trackId.rawValue)",
+        artistName: "Artist",
+        artistIds: ["artist-1"],
+        albumId: id,
+        albumTitle: "Album",
+        discNumber: 1,
+        trackNumber: index + 1,
+      )
+    },
   )
 }
 

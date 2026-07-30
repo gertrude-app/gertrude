@@ -26,6 +26,22 @@ func playlistArtworkURLsAreDeduplicatedInEntryOrder() {
   #expect(playlist.artworkUrls == [first, second])
 }
 
+@Test
+func albumDetailUsesOnlyRealCatalogTrackNumbers() {
+  let missing = TrackData(id: "missing", title: "Missing", artist: "Artist")
+  let numbered = TrackData(
+    id: "numbered",
+    title: "Numbered",
+    artist: "Artist",
+    discNumber: 2,
+    trackNumber: 7,
+  )
+
+  #expect(missing.albumDetailNumber(includesDisc: false) == nil)
+  #expect(numbered.albumDetailNumber(includesDisc: false) == "7")
+  #expect(numbered.albumDetailNumber(includesDisc: true) == "2.7")
+}
+
 @MainActor
 @Test
 func packageLoads() {

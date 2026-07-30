@@ -118,7 +118,7 @@ final class MusicCatalogCompilerTests: XCTestCase {
     expect(content.artists.first?.catalogMetadata?.genreNames).toEqual(["Folk"])
   }
 
-  func testOverlapUsesDirectMetadataAndNewestApplicableGrantDate() throws {
+  func testArtistScopeWinsOverOverlappingDirectAlbum() throws {
     let directDate = Date.reference + 100
     let artistDate = Date.reference + 200
     let direct = resolvedAlbum(id: "album-1", title: "Direct title")
@@ -140,12 +140,12 @@ final class MusicCatalogCompilerTests: XCTestCase {
     )
 
     expect(content.albums).toHaveCount(1)
-    expect(content.albums.first?.title).toEqual("Direct title")
-    expect(content.albums.first?.showsArtwork).toEqual(false)
+    expect(content.albums.first?.title).toEqual("Artist title")
+    expect(content.albums.first?.showsArtwork).toEqual(true)
     expect(content.albums.first?.addedAt).toEqual(artistDate)
   }
 
-  func testRemovingOneOverlappingGrantRetainsOtherCoverage() throws {
+  func testRemovingOverlappingDirectGrantDoesNotChangeArtistCoverage() throws {
     let album = resolvedAlbum(id: "album-1", title: "Direct")
     let artistAlbum = resolvedAlbum(id: "album-1", title: "Artist")
     let artistGrant = Music.LibrarySnapshotCompiler.ArtistGrant(
@@ -168,7 +168,7 @@ final class MusicCatalogCompilerTests: XCTestCase {
     )
 
     expect(withBoth.albums.map(\.id)).toEqual(["album-1"])
-    expect(withBoth.albums.first?.title).toEqual("Direct")
+    expect(withBoth.albums.first?.title).toEqual("Artist")
     expect(afterDirectRemoval.albums.map(\.id)).toEqual(["album-1"])
     expect(afterDirectRemoval.albums.first?.title).toEqual("Artist")
   }
@@ -215,7 +215,7 @@ final class MusicCatalogCompilerTests: XCTestCase {
 
     expect(content.albums.map(\.id)).toEqual(["album-1", "album-2", "album-3"])
     expect(content.albums[0].tracks.map(\.id)).toEqual(["track-1"])
-    expect(content.albums[1].title).toEqual("Older")
+    expect(content.albums[1].title).toEqual("Duplicate")
     expect(content.artists.map(\.id)).toEqual(["artist-2", "artist-1"])
   }
 
@@ -249,6 +249,218 @@ final class MusicCatalogCompilerTests: XCTestCase {
     expect(content.artists.first?.releaseAlbumIds).toEqual(["album-1"])
     expect(content.artists.first?.addedAt).toEqual(.reference + 100)
     expect(content.albums.map(\.id)).toEqual(["album-1"])
+  }
+
+  func testDirectTracksCreateOnePartialAlbumInCatalogOrder() throws {
+    let first = compilerTrackGrant(
+      id: "track-1",
+      preferredAlbumId: "partial-album",
+      createdAt: .reference + 20,
+      showsArtwork: false,
+      albumTitle: "Partial Album",
+      albumTrackCount: 8,
+      albumArtworkUrl: "https://example.com/album.jpg",
+      trackTitle: "First",
+      catalogPosition: 0,
+    )
+    let second = compilerTrackGrant(
+      id: "track-2",
+      preferredAlbumId: "partial-album",
+      createdAt: .reference,
+      showsArtwork: false,
+      albumTitle: "Partial Album",
+      albumTrackCount: 8,
+      albumArtworkUrl: "https://example.com/album.jpg",
+      trackTitle: "Second",
+      trackArtworkUrl: "https://example.com/second.jpg",
+      discNumber: 1,
+      trackNumber: 2,
+      catalogPosition: 2,
+    )
+    let third = compilerTrackGrant(
+      id: "track-3",
+      preferredAlbumId: "partial-album",
+      createdAt: .reference + 10,
+      showsArtwork: false,
+      albumTitle: "Partial Album",
+      albumTrackCount: 8,
+      albumArtworkUrl: "https://example.com/album.jpg",
+      trackTitle: "Third",
+      discNumber: 2,
+      trackNumber: 1,
+      catalogPosition: 2,
+    )
+    let tied = compilerTrackGrant(
+      id: "track-0",
+      preferredAlbumId: "partial-album",
+      createdAt: .reference + 30,
+      showsArtwork: false,
+      albumTitle: "Partial Album",
+      albumTrackCount: 8,
+      albumArtworkUrl: "https://example.com/album.jpg",
+      trackTitle: "Tied",
+      discNumber: 1,
+      trackNumber: 2,
+      catalogPosition: 2,
+    )
+
+    let content = try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [],
+      artistGrants: [],
+      trackGrants: [third, first, second, tied],
+    )
+
+    expect(content.albums).toHaveCount(1)
+    expect(content.albums[0].id).toEqual("partial-album")
+    expect(content.albums[0].title).toEqual("Partial Album")
+    expect(content.albums[0].trackCount).toEqual(8)
+    expect(content.albums[0].showsArtwork).toEqual(false)
+    expect(content.albums[0].addedAt).toEqual(.reference)
+    expect(content.albums[0].tracks.map(\.id)).toEqual([
+      "track-1",
+      "track-0",
+      "track-2",
+      "track-3",
+    ])
+    expect(content.albums[0].tracks.map(\.artworkUrl)).toEqual([
+      "https://example.com/album.jpg",
+      "https://example.com/album.jpg",
+      "https://example.com/second.jpg",
+      "https://example.com/album.jpg",
+    ])
+    expect(content.albums[0].tracks.map(\.discNumber)).toEqual([nil, 1, 1, 2])
+    expect(content.albums[0].tracks.map(\.trackNumber)).toEqual([nil, 2, 2, 1])
+  }
+
+  func testCurrentAllTrackGrantSetDoesNotRequireAlbumScope() throws {
+    let content = try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [],
+      artistGrants: [],
+      trackGrants: [compilerTrackGrant(
+        id: "only-track",
+        preferredAlbumId: "single-album",
+        createdAt: .reference,
+        albumTrackCount: 1,
+      )],
+    )
+
+    expect(content.albums.map(\.id)).toEqual(["single-album"])
+    expect(content.albums[0].trackCount).toEqual(1)
+    expect(content.albums[0].tracks.map(\.id)).toEqual(["only-track"])
+  }
+
+  func testAlbumGrantSuppressesCoveredTrackWithDifferentPreferredAlbum() throws {
+    let album = resolvedAlbum(
+      id: "album-a",
+      tracks: [resolvedTrack(id: "shared-track", albumId: "album-a")],
+    )
+    let content = try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [.init(
+        appleMusicAlbumId: "album-a",
+        createdAt: .reference,
+        showsArtwork: true,
+        resolution: album,
+      )],
+      artistGrants: [],
+      trackGrants: [compilerTrackGrant(
+        id: "shared-track",
+        preferredAlbumId: "album-b",
+        createdAt: .reference + 10,
+      )],
+    )
+
+    expect(content.albums.map(\.id)).toEqual(["album-a"])
+    expect(content.albums[0].tracks.map(\.id)).toEqual(["shared-track"])
+  }
+
+  func testArtistAlbumMergesUncoveredTrackWithoutLosingWiderMetadata() throws {
+    let artistAlbum = resolvedAlbum(
+      id: "album-1",
+      title: "Artist Album",
+      tracks: [resolvedTrack(id: "artist-track", albumId: "album-1")],
+    )
+    let artistGrant = Music.LibrarySnapshotCompiler.ArtistGrant(
+      appleMusicArtistId: "artist-1",
+      createdAt: .reference + 20,
+      resolution: resolvedArtist(id: "artist-1", albums: [artistAlbum]),
+    )
+    let content = try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [],
+      artistGrants: [artistGrant],
+      trackGrants: [
+        compilerTrackGrant(
+          id: "artist-track",
+          preferredAlbumId: "alternate-album",
+          createdAt: .reference,
+          catalogPosition: 0,
+        ),
+        compilerTrackGrant(
+          id: "extra-track",
+          preferredAlbumId: "album-1",
+          createdAt: .reference + 10,
+          catalogPosition: 1,
+        ),
+      ],
+    )
+
+    expect(content.albums).toHaveCount(1)
+    expect(content.albums[0].title).toEqual("Artist Album")
+    expect(content.albums[0].showsArtwork).toEqual(true)
+    expect(content.albums[0].addedAt).toEqual(.reference + 20)
+    expect(content.albums[0].tracks.map(\.id)).toEqual(["artist-track", "extra-track"])
+  }
+
+  func testDuplicateTrackGrantUsesNewestPreferredAlbum() throws {
+    let older = compilerTrackGrant(
+      id: "shared-track",
+      preferredAlbumId: "album-a",
+      createdAt: .reference,
+      albumTitle: "Older",
+    )
+    let newer = compilerTrackGrant(
+      id: "shared-track",
+      preferredAlbumId: "album-b",
+      createdAt: .reference + 10,
+      albumTitle: "Newer",
+    )
+
+    let content = try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [],
+      artistGrants: [],
+      trackGrants: [newer, older],
+    )
+
+    expect(content.albums.map(\.id)).toEqual(["album-b"])
+    expect(content.albums[0].title).toEqual("Newer")
+    expect(content.albums[0].tracks.map(\.id)).toEqual(["shared-track"])
+  }
+
+  func testPartialAlbumPlaylistExcludesUnselectedTrack() throws {
+    let content = try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [],
+      artistGrants: [],
+      trackGrants: [compilerTrackGrant(
+        id: "allowed-track",
+        preferredAlbumId: "partial-album",
+        createdAt: .reference,
+        albumTrackCount: 2,
+      )],
+      playlists: [.init(
+        id: UUID(1),
+        name: "Favorites",
+        revision: 1,
+        createdAt: .reference,
+        updatedAt: .reference,
+        entries: [
+          .init(id: UUID(2), trackId: "allowed-track", preferredAlbumId: "partial-album"),
+          .init(id: UUID(3), trackId: "unselected-track", preferredAlbumId: "partial-album"),
+        ],
+      )],
+    )
+
+    expect(content.albums[0].tracks.map(\.id)).toEqual(["allowed-track"])
+    expect(content.playlists[0].entries.map(\.id)).toEqual([UUID(2)])
+    expect(content.playlists[0].entries.map(\.track.id)).toEqual(["allowed-track"])
   }
 
   func testMissingResolutionRefusesPartialPublication() throws {
@@ -310,6 +522,28 @@ final class MusicCatalogCompilerTests: XCTestCase {
         .trackAlbumIdMismatch(track: "track-1", expected: "album-1", actual: "album-2"),
       )
     }
+
+    let trackResolution = resolvedTrackGrant(
+      id: "track-1",
+      preferredAlbumId: "album-1",
+    )
+    XCTAssertThrowsError(try Music.LibrarySnapshotCompiler.compile(
+      albumGrants: [],
+      artistGrants: [],
+      trackGrants: [.init(
+        appleMusicTrackId: "track-1",
+        preferredAlbumId: "album-2",
+        createdAt: .reference,
+        showsArtwork: true,
+        resolution: trackResolution,
+      )],
+    )) { error in
+      expect(error as? Music.LibrarySnapshotCompiler.CompilerError).toEqual(
+        .invalidTrackResolution(
+          .preferredAlbumIdMismatch(expected: "album-2", actual: "album-1"),
+        ),
+      )
+    }
   }
 
   func testContentEqualityIgnoresRevisionAndGenerationTime() throws {
@@ -334,46 +568,36 @@ final class MusicCatalogCompilerTests: XCTestCase {
   }
 }
 
-private func resolvedArtist(
-  id: Music.ArtistId,
-  albums: [Music.ResolvedAlbum],
-) -> Music.ResolvedArtist {
-  .init(id: id, name: "Artist", topSongs: [], albums: albums)
-}
-
-private func resolvedAlbum(
-  id: Music.AlbumId,
-  title: String = "Album",
-  artworkUrl: String? = nil,
-  tracks: [Music.ResolvedTrack]? = nil,
-) -> Music.ResolvedAlbum {
-  .init(
-    id: id,
-    title: title,
-    artistName: "Artist",
-    artistIds: ["artist-1"],
-    artworkUrl: artworkUrl,
-    trackCount: tracks?.count ?? 1,
-    releaseDate: "2026-01-02",
-    releaseType: "Album",
-    tracks: tracks ?? [resolvedTrack(id: "\(id.rawValue)-track", albumId: id)],
-  )
-}
-
-private func resolvedTrack(
+private func compilerTrackGrant(
   id: Music.TrackId,
-  albumId: Music.AlbumId,
-  title: String = "Track",
-  artworkUrl: String? = nil,
-) -> Music.ResolvedTrack {
+  preferredAlbumId: Music.AlbumId,
+  createdAt: Date,
+  showsArtwork: Bool = true,
+  albumTitle: String = "Album",
+  albumTrackCount: Int = 1,
+  albumArtworkUrl: String? = nil,
+  trackTitle: String = "Track",
+  trackArtworkUrl: String? = nil,
+  discNumber: Int? = nil,
+  trackNumber: Int? = nil,
+  catalogPosition: Int = 0,
+) -> Music.LibrarySnapshotCompiler.TrackGrant {
   .init(
-    id: id,
-    title: title,
-    artistName: "Artist",
-    artistIds: ["artist-1"],
-    albumId: albumId,
-    albumTitle: albumId == "album-1" ? "Direct" : "Album",
-    artworkUrl: artworkUrl,
-    durationInMillis: 180_000,
+    appleMusicTrackId: id,
+    preferredAlbumId: preferredAlbumId,
+    createdAt: createdAt,
+    showsArtwork: showsArtwork,
+    resolution: resolvedTrackGrant(
+      id: id,
+      preferredAlbumId: preferredAlbumId,
+      albumTitle: albumTitle,
+      albumTrackCount: albumTrackCount,
+      albumArtworkUrl: albumArtworkUrl,
+      trackTitle: trackTitle,
+      trackArtworkUrl: trackArtworkUrl,
+      discNumber: discNumber,
+      trackNumber: trackNumber,
+      catalogPosition: catalogPosition,
+    ),
   )
 }
