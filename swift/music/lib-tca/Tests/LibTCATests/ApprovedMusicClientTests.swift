@@ -47,7 +47,7 @@ struct ApprovedMusicClientTests {
   }
 
   @Test
-  func liveClientPreservesOptionalCatalogTrackNumbers() async throws {
+  func liveClientPreservesCatalogTrackViewData() async throws {
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
     var numberedRemote = remoteApprovedMusicLibrary
     numberedRemote.albums[0].tracks[0].discNumber = 2
@@ -71,6 +71,7 @@ struct ApprovedMusicClientTests {
 
     #expect(track.discNumber == 2)
     #expect(track.trackNumber == 7)
+    #expect(viewData.duration == "3:00")
     #expect(viewData.discNumber == 2)
     #expect(viewData.trackNumber == 7)
   }

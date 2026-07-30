@@ -86,8 +86,10 @@ public struct AlbumDetailView: View {
             .listRowBackground(Color.clear)
         } else {
           ForEach(self.rows) { row in
-            AlbumDetailTrackRowView(
-              row: row,
+            TrackRowView(
+              number: row.number,
+              track: row.track,
+              showsArtwork: false,
               isCurrent: row.track.id == self.currentTrackID,
               isPlaying: self.isPlaying && row.track.id == self.currentTrackID,
               palette: self.album.artworkPalette,

@@ -50,6 +50,7 @@ public struct PlaylistEntryData: Equatable, Identifiable, Sendable {
             title: "On the Road",
             artist: "The Travelers",
             artworkUrl: PreviewMusicData.storiesArtworkURL,
+            duration: "3:36",
           ),
         ),
         .init(
@@ -59,6 +60,7 @@ public struct PlaylistEntryData: Equatable, Identifiable, Sendable {
             title: "Open Sky",
             artist: "Northbound",
             artworkUrl: PreviewMusicData.brewedArtworkURL,
+            duration: "4:12",
           ),
         ),
         .init(
@@ -68,6 +70,7 @@ public struct PlaylistEntryData: Equatable, Identifiable, Sendable {
             title: "On the Road",
             artist: "The Travelers",
             artworkUrl: PreviewMusicData.ruleOf3ArtworkURL,
+            duration: "3:36",
           ),
         ),
         .init(
@@ -77,6 +80,7 @@ public struct PlaylistEntryData: Equatable, Identifiable, Sendable {
             title: "Home by Morning",
             artist: "Northbound",
             artworkUrl: PreviewMusicData.frifotArtworkURL,
+            duration: "4:05",
           ),
         ),
       ],

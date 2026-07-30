@@ -71,6 +71,7 @@ extension TrackData {
       title: track.title,
       artist: track.artistName,
       artworkUrl: track.artworkURL,
+      duration: track.durationInMillis?.musicDuration,
       discNumber: track.discNumber,
       trackNumber: track.trackNumber,
     )

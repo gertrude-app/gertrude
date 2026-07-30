@@ -5,6 +5,7 @@ public struct TrackData: Identifiable, Equatable, Sendable {
   public let title: String
   public let artist: String
   public let artworkUrl: URL?
+  public let duration: String?
   public let discNumber: Int?
   public let trackNumber: Int?
 
@@ -13,6 +14,7 @@ public struct TrackData: Identifiable, Equatable, Sendable {
     title: String,
     artist: String,
     artworkUrl: URL? = nil,
+    duration: String? = nil,
     discNumber: Int? = nil,
     trackNumber: Int? = nil,
   ) {
@@ -20,6 +22,7 @@ public struct TrackData: Identifiable, Equatable, Sendable {
     self.title = title
     self.artist = artist
     self.artworkUrl = artworkUrl
+    self.duration = duration
     self.discNumber = discNumber
     self.trackNumber = trackNumber
   }

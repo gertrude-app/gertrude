@@ -82,11 +82,13 @@ public struct PlaylistDetailView: View {
             .listRowBackground(Color.clear)
         } else {
           ForEach(Array(self.playlist.entries.enumerated()), id: \.element.id) { index, entry in
-            PlaylistTrackRowView(
-              number: index + 1,
-              entry: entry,
+            TrackRowView(
+              number: String(index + 1),
+              track: entry.track,
+              showsArtwork: true,
               isCurrent: entry.id == self.currentEntryID,
               isPlaying: self.isPlaying && entry.id == self.currentEntryID,
+              palette: nil,
               onTap: { self.onTrackTap(entry.id) },
             )
             .frame(maxWidth: 800)
@@ -340,101 +342,3 @@ public struct PlaylistDetailView: View {
     }
   }
 #endif
-
-private struct PlaylistTrackRowView: View {
-  let number: Int
-  let entry: PlaylistEntryData
-  let isCurrent: Bool
-  let isPlaying: Bool
-  let onTap: @MainActor @Sendable () -> Void
-
-  var body: some View {
-    Button(action: self.onTap) {
-      HStack(spacing: 12) {
-        Group {
-          if self.isCurrent {
-            PlaybackWaveformView(
-              isPlaying: self.isPlaying,
-              color: .gertrudeBrandAccent,
-              barCount: 4,
-              barWidth: 3,
-              barSpacing: 2,
-              minimumBarHeight: 4,
-              maximumBarHeight: 16,
-              containerWidth: 24,
-              containerHeight: 24,
-              alignment: .center,
-              phaseStep: 0.85,
-              minimumInterval: nil,
-            )
-          } else {
-            Text(self.number, format: .number)
-              .font(.system(size: 14, weight: .semibold, design: .rounded))
-              .monospacedDigit()
-              .foregroundStyle(.secondary)
-          }
-        }
-        .frame(width: 24, alignment: .trailing)
-
-        PlaylistTrackArtworkView(url: self.entry.track.artworkUrl)
-
-        VStack(alignment: .leading, spacing: 3) {
-          Text(self.entry.track.title)
-            .font(.system(size: 16, weight: .semibold))
-            .foregroundStyle(self.isCurrent ? Color.gertrudeBrandAccent : .primary)
-            .lineLimit(2)
-
-          Text(self.entry.track.artist)
-            .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
-
-        Spacer(minLength: 0)
-      }
-      .padding(.horizontal, 20)
-      .padding(.vertical, 12)
-      .background {
-        if self.isCurrent {
-          RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(Color.gertrudeBrandAccent.opacity(0.10))
-            .padding(.horizontal, 10)
-        }
-      }
-      .contentShape(Rectangle())
-    }
-    .buttonStyle(.plain)
-    .accessibilityLabel(
-      "\(self.playbackPrefix)\(self.number). \(self.entry.track.title), \(self.entry.track.artist)",
-    )
-  }
-
-  private var playbackPrefix: String {
-    if self.isPlaying { return "Playing, " }
-    if self.isCurrent { return "Paused, " }
-    return ""
-  }
-}
-
-private struct PlaylistTrackArtworkView: View {
-  let url: URL?
-
-  var body: some View {
-    CachedArtworkImageView(url: self.url) { image in
-      image
-        .resizable()
-        .scaledToFill()
-        .frame(width: 44, height: 44)
-        .clipShape(.rect(cornerRadius: 8, style: .continuous))
-    } placeholder: {
-      RoundedRectangle(cornerRadius: 8, style: .continuous)
-        .fill(Color.gertrudeBrandAccent.opacity(0.14))
-        .frame(width: 44, height: 44)
-        .overlay {
-          Image(systemName: "music.note")
-            .foregroundStyle(Color.gertrudeBrandAccent)
-        }
-    }
-    .accessibilityHidden(true)
-  }
-}
