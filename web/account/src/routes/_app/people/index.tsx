@@ -1,4 +1,3 @@
-import { relativeTime } from '@shared/datetime';
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import type {
@@ -6,8 +5,8 @@ import type {
   PersonCardPerson,
   SuspensionRequest,
 } from '#/components/types';
-import type { GetPeople } from '@shared/pairql/src/account';
 import PeoplePage from '#/components/pages/people/PeoplePage';
+import { toPersonCardPerson } from '#/lib/people';
 import { toSuspensionRequest } from '#/lib/suspensionRequests';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -59,45 +58,12 @@ const PeopleRoute: React.FC = () => {
       suspensionRequestsHref="/requests/suspension"
       suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
       monitorHref="/activity"
+      settingsHrefForPerson={(personId) => `/people/${personId}`}
       monitorHrefForPerson={(personId) => `/activity/person/${personId}`}
     />
   );
 };
 
-function toPersonCardPerson(person: GetPeople.Output[number]): PersonCardPerson {
-  return {
-    id: person.id,
-    name: person.name,
-    devices: person.devices.map((device) =>
-      device.case === `mac`
-        ? {
-            id: device.id,
-            personId: person.id,
-            type: `mac`,
-            name: device.name,
-            macOSVersion: device.macOSVersion,
-            modelName: device.modelName,
-            modelIdentifier: device.modelIdentifier,
-            online: device.online,
-          }
-        : {
-            id: device.id,
-            personId: person.id,
-            type: device.type,
-            iOSVersion: device.iOSVersion,
-            modelName: device.modelName,
-            modelIdentifier: device.modelIdentifier,
-          },
-    ),
-    screenshot: person.screenshot
-      ? {
-          url: person.screenshot.url,
-          recency: relativeTime(person.screenshot.createdAt),
-        }
-      : null,
-  };
-}
-
-export const Route = createFileRoute(`/_app/people`)({
+export const Route = createFileRoute(`/_app/people/`)({
   component: PeopleRoute,
 });

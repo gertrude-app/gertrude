@@ -135,14 +135,4 @@ final class GetSuspensionRequestsResolverTests: ApiTestCase, @unchecked Sendable
     let output = try await GetSuspensionRequests.resolve(in: self.accountContext(parent))
     expect(output).toBeEmpty()
   }
-
-  private func accountContext(_ parent: ParentEntities) -> AccountOwnerContext {
-    AccountOwnerContext(
-      requestId: "test-request",
-      dashboardUrl: "",
-      accountOwner: parent.model,
-      ipAddress: nil,
-      telemetry: TelemetryBag(),
-    )
-  }
 }

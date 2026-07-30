@@ -91,6 +91,16 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
     )
   }
 
+  func accountContext(_ parent: ParentEntities) -> AccountOwnerContext {
+    .init(
+      requestId: "mock-req-id",
+      dashboardUrl: "",
+      accountOwner: parent.model,
+      ipAddress: nil,
+      telemetry: TelemetryBag(),
+    )
+  }
+
   func context(_ parent: ParentWithKeychainEntities) -> ParentContext {
     .init(
       requestId: "mock-req-id",

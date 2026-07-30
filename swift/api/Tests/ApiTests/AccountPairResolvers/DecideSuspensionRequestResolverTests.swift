@@ -95,14 +95,4 @@ final class DecideSuspensionRequestResolverTests: ApiTestCase, @unchecked Sendab
     expect(unchanged.status).toEqual(.pending)
     expect(sent.websocketMessages).toBeEmpty()
   }
-
-  private func accountContext(_ parent: ParentEntities) -> AccountOwnerContext {
-    AccountOwnerContext(
-      requestId: "test-request",
-      dashboardUrl: "",
-      accountOwner: parent.model,
-      ipAddress: nil,
-      telemetry: TelemetryBag(),
-    )
-  }
 }

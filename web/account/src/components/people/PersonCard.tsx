@@ -8,19 +8,11 @@ import {
   Text,
   VStack,
 } from '@gertrude/ui';
-import {
-  LaptopIcon,
-  type LucideIcon,
-  MonitorSmartphoneIcon,
-  PlusIcon,
-  ScanEyeIcon,
-  SettingsIcon,
-  SmartphoneIcon,
-  TabletIcon,
-} from 'lucide-react';
+import { MonitorSmartphoneIcon, PlusIcon, ScanEyeIcon, SettingsIcon } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonCardPerson } from '#/components/types';
-import { deviceImageUrl, deviceSubtitle, deviceTitle } from '#/components/utils';
+import DeviceArtwork from '#/components/people/DeviceArtwork';
+import { deviceSubtitle, deviceTitle } from '#/components/utils';
 
 interface Props {
   person: PersonCardPerson;
@@ -135,37 +127,5 @@ const DeviceRow: React.FC<DeviceRowProps> = ({ device }) => (
     </HStack>
   </Card>
 );
-
-interface DeviceArtworkProps {
-  device: Device;
-}
-
-const DeviceArtwork: React.FC<DeviceArtworkProps> = ({ device }) => {
-  const imageUrl = deviceImageUrl(device.type, device.modelIdentifier);
-  const [failedUrl, setFailedUrl] = React.useState<string>();
-  const FallbackIcon: LucideIcon =
-    device.type === `mac`
-      ? LaptopIcon
-      : device.type === `iphone`
-        ? SmartphoneIcon
-        : TabletIcon;
-  const showFallback =
-    device.modelIdentifier.endsWith(`,unknown`) || failedUrl === imageUrl;
-
-  return (
-    <HStack justify="center" align="center" className="h-5.5 w-7 shrink-0">
-      {showFallback ? (
-        <FallbackIcon className="h-5 w-5 text-stone-500" />
-      ) : (
-        <img
-          src={imageUrl}
-          alt=""
-          className="h-5.5 w-7 object-contain drop-shadow-sm"
-          onError={() => setFailedUrl(imageUrl)}
-        />
-      )}
-    </HStack>
-  );
-};
 
 export default PersonCard;

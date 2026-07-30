@@ -768,6 +768,54 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--basic-delete-confirmation",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-delete-confirmation&viewMode=story",
+    "name": "Basic delete confirmation",
+    "path": "screenshots/mobile/account-pages-people-person-settings--basic-delete-confirmation.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-delete-confirmation",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-delete-confirmation&viewMode=story",
+    "name": "Basic delete confirmation",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic-delete-confirmation.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-no-devices",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-no-devices&viewMode=story",
+    "name": "Basic with no devices",
+    "path": "screenshots/mobile/account-pages-people-person-settings--basic-no-devices.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-no-devices",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-no-devices&viewMode=story",
+    "name": "Basic with no devices",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic-no-devices.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--ios",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios&viewMode=story",
     "name": "iPhone and iPad",
@@ -816,6 +864,30 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--ios-coming-soon",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-coming-soon&viewMode=story",
+    "name": "iPhone and iPad coming soon",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-coming-soon.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-coming-soon",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-coming-soon&viewMode=story",
+    "name": "iPhone and iPad coming soon",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-coming-soon.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--mac",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac&viewMode=story",
     "name": "Mac",
@@ -856,6 +928,30 @@
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-all-sections-expanded&viewMode=story",
     "name": "Mac all sections expanded",
     "path": "screenshots/desktop/account-pages-people-person-settings--mac-all-sections-expanded.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--mac-coming-soon",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-coming-soon&viewMode=story",
+    "name": "Mac coming soon",
+    "path": "screenshots/mobile/account-pages-people-person-settings--mac-coming-soon.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--mac-coming-soon",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-coming-soon&viewMode=story",
+    "name": "Mac coming soon",
+    "path": "screenshots/desktop/account-pages-people-person-settings--mac-coming-soon.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,

@@ -4,6 +4,8 @@ import Vapor
 
 enum AuthedAccountRoute: PairRoute {
   case getPeople
+  case updatePersonName(UpdatePersonName.Input)
+  case deletePerson(DeletePerson.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
   case getActivitySummaries(GetActivitySummaries.Input)
@@ -16,6 +18,14 @@ enum AuthedAccountRoute: PairRoute {
   nonisolated(unsafe) static let router = OneOf {
     Route(.case(Self.getPeople)) {
       Operation(GetPeople.self)
+    }
+    Route(.case(Self.updatePersonName)) {
+      Operation(UpdatePersonName.self)
+      Body(.accountInput(UpdatePersonName.self))
+    }
+    Route(.case(Self.deletePerson)) {
+      Operation(DeletePerson.self)
+      Body(.accountInput(DeletePerson.self))
     }
     Route(.case(Self.getSuspensionRequests)) {
       Operation(GetSuspensionRequests.self)
@@ -56,6 +66,12 @@ extension AuthedAccountRoute: RouteResponder {
     switch route {
     case .getPeople:
       let output = try await GetPeople.resolve(in: context)
+      return try await self.respond(with: output)
+    case .updatePersonName(let input):
+      let output = try await UpdatePersonName.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .deletePerson(let input):
+      let output = try await DeletePerson.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getSuspensionRequests:
       let output = try await GetSuspensionRequests.resolve(in: context)

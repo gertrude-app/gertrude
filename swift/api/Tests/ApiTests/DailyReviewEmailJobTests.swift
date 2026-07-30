@@ -1,10 +1,11 @@
+import Dependencies
 import Foundation
 import XCTest
 import XExpect
 
 @testable import Api
 
-final class DailyReviewEmailJobTests: XCTestCase {
+final class DailyReviewEmailJobTests: ApiTestCase, @unchecked Sendable {
   func testSendsOnlyAtSendHourInParentTimeZone() {
     expect(self.shouldSend(now: self.at("America/New_York", 8), tz: "America/New_York"))
       .toEqual(true)
@@ -79,7 +80,51 @@ final class DailyReviewEmailJobTests: XCTestCase {
     expect(row.html.contains("&lt;b&gt;x&lt;/b&gt;")).toEqual(true)
   }
 
+  func testNonBetaDigestLinksToLegacyActivity() async throws {
+    let (model, childId) = try await self.digest(accountSiteBetaEnabled: false)
+
+    expect(model.reviewUrl).toEqual("https://dashboard.example/children/activity")
+    expect(model.manageUrl).toEqual("https://dashboard.example/settings")
+    expect(model.childRows.contains(
+      "href=\"https://dashboard.example/children/\(childId.lowercased)/activity\"",
+    )).toEqual(true)
+  }
+
+  func testBetaDigestLinksToAccountActivityAndLegacySettings() async throws {
+    let (model, childId) = try await self.digest(accountSiteBetaEnabled: true)
+
+    expect(model.reviewUrl).toEqual("https://account.example/activity")
+    expect(model.manageUrl).toEqual("https://dashboard.example/settings")
+    expect(model.childRows.contains(
+      "href=\"https://account.example/activity/person/\(childId.lowercased)\"",
+    )).toEqual(true)
+  }
+
   // MARK: - helpers
+
+  private func digest(
+    accountSiteBetaEnabled: Bool,
+  ) async throws -> (DailyReviewDigest, Child.Id) {
+    let child = try await self.child(withParent: {
+      $0.accountSiteBetaEnabled = accountSiteBetaEnabled
+    })
+    let connectedChild = try await child.withDevice()
+    _ = try await self.db.create(Screenshot(
+      computerUserId: connectedChild.computerUser.id,
+      url: "https://example.com/screenshot.jpg",
+      width: 1280,
+      height: 720,
+      createdAt: .reference,
+    ))
+
+    let model = try await withDependencies {
+      $0.env.dashboardUrl = "https://dashboard.example/"
+      $0.env.accountDashboardUrl = "https://account.example/"
+    } operation: {
+      try await DailyReviewEmailJob().buildDigest(for: child.parent.model)
+    }
+    return try (XCTUnwrap(model), child.id)
+  }
 
   private func shouldSend(
     now: Date,

@@ -7,7 +7,7 @@ import {
   VStack,
   inflect,
 } from '@gertrude/ui';
-import { MonitorSmartphoneIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { Device } from '#/components/types';
 import CardContainer from '#/components/layout/CardContainer';
@@ -18,10 +18,10 @@ interface Props {
   nameDraft: string;
   setNameDraft: (name: string) => void;
   devices: Device[];
-  deviceSettingsHref: (device: Device) => string;
+  savingName?: boolean;
+  deletingPerson?: boolean;
   onSaveName: () => void;
-  onAddDevice: () => void;
-  onDeletePerson: () => void;
+  onDeletePerson: () => void | Promise<void>;
 }
 
 const PersonBasicSettingsPage: React.FC<Props> = ({
@@ -29,9 +29,9 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
   nameDraft,
   setNameDraft,
   devices,
-  deviceSettingsHref,
+  savingName,
+  deletingPerson,
   onSaveName,
-  onAddDevice,
   onDeletePerson,
 }) => {
   const trimmedNameDraft = nameDraft.trim();
@@ -53,23 +53,25 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
             align={{ default: `stretch`, '@2xl/main': `start` }}
             onSubmit={(event) => {
               event.preventDefault();
-              if (canSaveName) {
+              if (canSaveName && !savingName && !deletingPerson) {
                 onSaveName();
               }
             }}
           >
             <Input
               type="text"
-              label="Child's name"
+              label="Name"
               value={nameDraft}
               setValue={setNameDraft}
               error={nameError}
+              disabled={savingName || deletingPerson}
               className="flex-grow"
             />
             <Button
               type="submit"
               variant="primary"
-              disabled={!canSaveName}
+              disabled={!canSaveName || deletingPerson}
+              loading={savingName}
               className="@2xl/main:mt-[22px]"
             >
               Save
@@ -81,38 +83,22 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
           className="flex flex-col gap-4"
           heading="Devices"
           subheading={
-            devices.length === 0
-              ? `Add a device to get started protecting ${personName}.`
-              : `${devices.length} ${inflect(`device`, devices.length)} connected to ${personName}.`
-          }
-          buttons={
-            <Button type="button" onClick={onAddDevice} icon={PlusIcon} variant="default">
-              Add Device
-            </Button>
+            devices.length > 0
+              ? `${devices.length} ${inflect(`device`, devices.length)} connected to ${personName}.`
+              : undefined
           }
         >
           {devices.length > 0 ? (
             <VStack gap={3}>
               {devices.map((device) => (
-                <DeviceListRow
-                  key={device.id}
-                  device={device}
-                  href={deviceSettingsHref(device)}
-                />
+                <DeviceListRow key={device.id} device={device} />
               ))}
             </VStack>
           ) : (
             <EmptyState
               icon={MonitorSmartphoneIcon}
               title="No Devices"
-              description={`Add a device to get started protecting ${personName}.`}
-              button={{
-                text: `Add Device`,
-                type: `button`,
-                onClick: onAddDevice,
-                icon: PlusIcon,
-                variant: `primary`,
-              }}
+              description={`No devices are connected to ${personName} yet.`}
             />
           )}
         </CardContainer>
@@ -126,24 +112,29 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
       >
         <ConfirmationDialog
           confirmationQuestion={`Delete ${personName}?`}
-          description="This will remove the child, devices, activity, requests, and settings. This cannot be undone."
+          description="This will remove the person, devices, activity, requests, and settings. This cannot be undone."
           trigger={
             <Button
               type="button"
               onClick={() => {}}
               icon={TrashIcon}
               variant="destructive"
+              disabled={savingName}
+              loading={deletingPerson}
               className="w-full"
             >
-              Delete child
+              Delete {personName}
             </Button>
           }
           actions={[
             { text: `Cancel` },
             {
-              text: `Delete child`,
+              text: `Delete ${personName}`,
               icon: TrashIcon,
               variant: `destructive`,
+              disabled: savingName,
+              loading: deletingPerson,
+              autoClose: false,
               onClick: onDeletePerson,
             },
           ]}

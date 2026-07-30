@@ -32,12 +32,14 @@ export function useMutation<T, V>(
         const message = (value: ToastMessage<V>): string =>
           typeof value === `function` ? value(arg) : value;
 
-        toast.async(promise, {
-          loading: message(messages.loading),
-          success: message(messages.success),
-          error: (error) =>
-            (error as PqlError | undefined)?.userMessage ?? message(messages.error),
-        });
+        void toast
+          .async(promise, {
+            loading: message(messages.loading),
+            success: message(messages.success),
+            error: (error) =>
+              (error as PqlError | undefined)?.userMessage ?? message(messages.error),
+          })
+          .catch(() => undefined);
       }
       return promise;
     },

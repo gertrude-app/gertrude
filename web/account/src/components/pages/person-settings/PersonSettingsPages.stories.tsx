@@ -4,13 +4,12 @@ import type {
   PersonIosSettingsConfiguration,
   PersonMacSettingsConfiguration,
 } from '#/components/types';
-import PersonBasicSettingsPage from '../people/PersonBasicSettingsPage';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
 import IosSettingsPage from './IosSettingsPage';
 import MacSettingsPage from './MacSettingsPage';
+import PersonSettingsComingSoonPage from './PersonSettingsComingSoonPage';
 import {
   albums,
-  devices,
   installedMacApps,
   iosSettings,
   keychains,
@@ -65,7 +64,8 @@ const IosSettingsStory: React.FC<{
   );
 };
 
-export const Basic = {
+export const MacComingSoon = {
+  name: 'Mac coming soon',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryScreen>
@@ -73,20 +73,26 @@ export const Basic = {
         personName="Jude"
         peopleHref="/people"
         baseHref="/people/person-1"
-        selectedHref="/people/person-1"
+        selectedHref="/people/person-1/mac-settings"
       >
-        <PersonBasicSettingsPage
-          personName="Jude"
-          nameDraft="Jude"
-          setNameDraft={() => {}}
-          devices={devices.slice(0, 2)}
-          deviceSettingsHref={(device) =>
-            `/people/${device.personId}/${device.type}-settings`
-          }
-          onSaveName={() => {}}
-          onAddDevice={() => {}}
-          onDeletePerson={() => {}}
-        />
+        <PersonSettingsComingSoonPage platform="mac" />
+      </PersonSettingsShellPage>
+    </StoryScreen>
+  ),
+};
+
+export const IosComingSoon = {
+  name: 'iPhone and iPad coming soon',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryScreen>
+      <PersonSettingsShellPage
+        personName="Jude"
+        peopleHref="/people"
+        baseHref="/people/person-1"
+        selectedHref="/people/person-1/ios-settings"
+      >
+        <PersonSettingsComingSoonPage platform="ios" />
       </PersonSettingsShellPage>
     </StoryScreen>
   ),
