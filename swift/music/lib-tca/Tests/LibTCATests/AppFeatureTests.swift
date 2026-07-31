@@ -42,6 +42,48 @@ struct AppFeatureTests {
   }
 
   @Test
+  func nowPlayingAddToPlaylistTapPresentsCurrentTrackChooser() async {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[0]
+    let track = album.tracks[0]
+    let item = PlaybackItem(
+      track: track,
+      artworkURL: album.artworkURL,
+      albumID: album.id,
+    )
+    var state = AppFeature.State()
+    state.library.status = .loaded(library)
+    state.search.applyLibraryStatus(.loaded(library))
+    state.playback.session = .init(currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAddToPlaylistTapped)
+    await store.receive(.library(.addTrackToPlaylistTapped(
+      trackID: track.id,
+      albumID: album.id,
+    ))) {
+      $0.library.addToPlaylist = .init(source: .track(
+        trackId: track.id.rawValue,
+        albumId: album.id.rawValue,
+      ))
+    }
+  }
+
+  @Test
+  func nowPlayingAddToPlaylistTapWithoutAlbumDoesNothing() async {
+    let item = playbackItem("track-1")
+    var state = AppFeature.State()
+    state.playback.session = .init(currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAddToPlaylistTapped)
+  }
+
+  @Test
   func queueEndingDismissesNowPlayingAndClearsPlaybackPresentation() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let item = playbackItems(album: album)[0]

@@ -40,6 +40,7 @@ struct AppView: View {
     }
     .libraryPresentations(
       store: self.store.scope(state: \.library, action: \.library),
+      isEnabled: !self.store.isNowPlayingPresented,
     )
     .killSwitch(
       store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
@@ -281,6 +282,14 @@ struct AppView: View {
             onScrub: { time in
               self.store.send(.playback(.seek(time)))
             },
+            isAddToPlaylistEnabled: session.currentItem.albumID != nil
+              && !self.store.library.isPlaylistMutationInFlight,
+            onCloseTap: {
+              self.store.send(.nowPlayingPresentationChanged(false))
+            },
+            onAddToPlaylistTap: {
+              self.store.send(.nowPlayingAddToPlaylistTapped)
+            },
             onAlbumInfoTap: session.currentItem.albumID == nil ? nil : { @MainActor @Sendable in
               self.store.send(.nowPlayingAlbumInfoTapped)
             },
@@ -299,6 +308,10 @@ struct AppView: View {
             onPreviousTap: {},
             onNextTap: {},
             onScrub: { _ in },
+            isAddToPlaylistEnabled: false,
+            onCloseTap: {
+              self.store.send(.nowPlayingPresentationChanged(false))
+            },
           )
         }
 
@@ -307,6 +320,9 @@ struct AppView: View {
         }
       }
       .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
+      .libraryPresentations(
+        store: self.store.scope(state: \.library, action: \.library),
+      )
     }
 
     private func playbackFailureBanner(_ failure: PlaybackFailure) -> some View {

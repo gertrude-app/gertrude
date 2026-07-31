@@ -4,13 +4,20 @@ import LibViews
 import SwiftUI
 
 extension View {
-  func libraryPresentations(store: StoreOf<LibraryFeature>) -> some View {
-    self.modifier(LibraryPresentationModifier(store: store))
+  func libraryPresentations(
+    store: StoreOf<LibraryFeature>,
+    isEnabled: Bool = true,
+  ) -> some View {
+    self.modifier(LibraryPresentationModifier(
+      store: store,
+      isEnabled: isEnabled,
+    ))
   }
 }
 
 private struct LibraryPresentationModifier: ViewModifier {
   @Bindable var store: StoreOf<LibraryFeature>
+  let isEnabled: Bool
 
   func body(content: Content) -> some View {
     content
@@ -48,7 +55,7 @@ private struct LibraryPresentationModifier: ViewModifier {
 
   private var addToPlaylistBinding: Binding<Bool> {
     Binding(
-      get: { self.store.addToPlaylist != nil },
+      get: { self.isEnabled && self.store.addToPlaylist != nil },
       set: { isPresented in
         if !isPresented {
           self.store.send(.addToPlaylistCancelled)
@@ -60,7 +67,8 @@ private struct LibraryPresentationModifier: ViewModifier {
   private var mutationFailureBinding: Binding<Bool> {
     Binding(
       get: {
-        self.store.addToPlaylist == nil
+        self.isEnabled
+          && self.store.addToPlaylist == nil
           && self.store.playlistMutationFailure != nil
       },
       set: { isPresented in

@@ -25,6 +25,7 @@ struct AppFeature: Sendable {
   enum Action: Equatable {
     case killSwitch(KillSwitchFeature.Action)
     case library(LibraryFeature.Action)
+    case nowPlayingAddToPlaylistTapped
     case nowPlayingAlbumInfoTapped
     case nowPlayingPresentationChanged(Bool)
     case playback(PlaybackFeature.Action)
@@ -72,6 +73,14 @@ struct AppFeature: Sendable {
 
     Reduce { state, action in
       switch action {
+      case .nowPlayingAddToPlaylistTapped:
+        guard let currentItem = state.playback.session?.currentItem,
+              let albumID = currentItem.albumID else { return .none }
+        return .send(.library(.addTrackToPlaylistTapped(
+          trackID: currentItem.id,
+          albumID: albumID,
+        )))
+
       case .nowPlayingAlbumInfoTapped:
         guard let albumID = state.playback.session?.currentItem.albumID else { return .none }
         guard state.library.pushAlbumDetail(albumID: albumID) else { return .none }

@@ -182,9 +182,11 @@ public struct AddToPlaylistSheet: View {
       }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel", action: self.onCancel)
-            .tint(.primary)
-            .disabled(self.isMutating)
+          Button(action: self.onCancel) {
+            Label("Close", systemImage: "xmark")
+          }
+          .tint(.primary)
+          .disabled(self.isMutating)
         }
       }
       .sheet(isPresented: self.$isNamePromptPresented) {
