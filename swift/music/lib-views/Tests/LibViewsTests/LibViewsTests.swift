@@ -227,7 +227,7 @@ private func queueEntry(_ id: String) -> PlaybackQueueEntryData {
 @MainActor
 @Test
 func packageLoads() {
-  _ = GertrudeMusicView()
+  _ = MusicSetupView(state: .checking)
 }
 
 @MainActor

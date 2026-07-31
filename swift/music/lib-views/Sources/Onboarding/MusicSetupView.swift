@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public enum MusicSetupViewState: Equatable, Sendable {
@@ -61,38 +62,43 @@ public struct MusicSetupView: View {
       MusicSetupSplashView()
 
     case .welcome:
-      MusicSetupWelcomeView {
+      GertieWelcomeScreen(
+        greeting: "Hi there!",
+        message: "Gertrude Music lets parents or accountability partners give access to only selected, approved music.",
+        actionTitle: "Get started",
+      ) {
         self.onEvent(.getStartedTapped)
       }
 
     case .parentQuestion:
-      ButtonScreenView(
-        text: "Are you the parent or accountability partner? Gertrude Music is controlled by a separate Gertrude account, ideally managed by someone other than the person using this device.",
-        primary: .init("Yes, I’m the parent or partner", animate: false) {
-          self.onEvent(.parentYesTapped)
-        },
-        secondary: .init("No, this device is mine", animate: false) {
-          self.onEvent(.parentNoTapped)
-        },
-        screenType: .question,
+      GertieActionScreen(
+        message: "Are you the parent or accountability partner? Gertrude Music is controlled by a separate Gertrude account, ideally managed by someone other than the person using this device.",
+        icon: .question,
+        actions: [
+          .button("Yes, I’m the parent or partner") {
+            self.onEvent(.parentYesTapped)
+          },
+          .button("No, this device is mine") {
+            self.onEvent(.parentNoTapped)
+          },
+        ],
       )
 
     case .selfManagerNudge:
-      ButtonScreenView(
-        text: "Gertrude Music works best when someone else manages the account. A parent or accountability partner chooses what music is allowed, so the choice isn’t in your own hands. You can continue and set it up yourself, but consider asking someone to manage the account for you.",
-        primary: .init("Continue", animate: false) {
+      GertieActionScreen(
+        message: "Gertrude Music works best when someone else manages the account. A parent or accountability partner chooses what music is allowed, so the choice isn’t in your own hands. You can continue and set it up yourself, but consider asking someone to manage the account for you.",
+        action: .button("Continue") {
           self.onEvent(.nudgeContinueTapped)
         },
-        screenType: .info,
       )
 
     case .explainAccount:
-      ButtonScreenView(
-        text: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
-        primary: .init("Got it, next", animate: false) {
+      GertieActionScreen(
+        message: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
+        icon: .system("link.circle"),
+        action: .button("Got it, next") {
           self.onEvent(.explainAccountContinueTapped)
         },
-        screenType: .link,
       )
 
     case .deviceRecognized(let childName):
@@ -104,86 +110,97 @@ public struct MusicSetupView: View {
       MusicUnavailableView(childName: childName)
 
     case .appleMusicPermission:
-      ButtonScreenView(
-        text: "Gertrude Music needs permission to use Apple Music so music albums can play.",
-        primary: .init("Continue", animate: false, asyncAction: true) {
+      GertieActionScreen(
+        message: "Gertrude Music needs permission to use Apple Music so music albums can play.",
+        icon: .system("music.note.list"),
+        action: .button("Continue", behavior: .showProgress) {
           self.onEvent(.appleMusicPermissionTapped)
         },
-        screenType: .music,
       )
 
     case .appleMusicDenied:
-      ButtonScreenView(
-        text: "Apple Music access is turned off for Gertrude Music. Open Settings and allow Apple Music access, then try again.",
-        primary: .init("Open Settings", animate: false) {
-          self.onEvent(.settingsTapped)
-        },
-        secondary: .init("Try again", animate: false) {
-          self.onEvent(.retryTapped)
-        },
-        screenType: .error,
+      GertieActionScreen(
+        message: "Apple Music access is turned off for Gertrude Music. Open Settings and allow Apple Music access, then try again.",
+        icon: .error,
+        actions: [
+          .button("Open Settings") {
+            self.onEvent(.settingsTapped)
+          },
+          .button("Try again") {
+            self.onEvent(.retryTapped)
+          },
+        ],
       )
 
     case .appleMusicRestricted:
-      ButtonScreenView(
-        text: "Apple Music access appears to be restricted on this device. It may need to be allowed in Screen Time or device settings.",
-        primary: .init("Open Settings", animate: false) {
-          self.onEvent(.settingsTapped)
-        },
-        secondary: .init("Try again", animate: false) {
-          self.onEvent(.retryTapped)
-        },
-        screenType: .error,
+      GertieActionScreen(
+        message: "Apple Music access appears to be restricted on this device. It may need to be allowed in Screen Time or device settings.",
+        icon: .error,
+        actions: [
+          .button("Open Settings") {
+            self.onEvent(.settingsTapped)
+          },
+          .button("Try again") {
+            self.onEvent(.retryTapped)
+          },
+        ],
       )
 
     case .appleMusicPrivacyAcknowledgementRequired:
-      ButtonScreenView(
-        text: "This Apple ID needs to finish Apple Music setup before playback can start. Finish any iOS prompts, then come back and try again.",
-        primary: .init("Try again", animate: false) {
+      GertieActionScreen(
+        message: "This Apple ID needs to finish Apple Music setup before playback can start. Finish any iOS prompts, then come back and try again.",
+        icon: .error,
+        action: .button("Try again") {
           self.onEvent(.retryTapped)
         },
-        screenType: .error,
       )
 
     case .appleMusicStatusUnavailable:
-      ButtonScreenView(
-        text: "Gertrude Music couldn’t check Apple Music on this device. Check your connection and try again.",
-        primary: .init("Try again", animate: false) {
+      GertieActionScreen(
+        message: "Gertrude Music couldn’t check Apple Music on this device. Check your connection and try again.",
+        icon: .error,
+        action: .button("Try again") {
           self.onEvent(.retryTapped)
         },
-        screenType: .error,
       )
 
     case .appleMusicSubscriptionRequired(let canShowOffer):
-      ButtonScreenView(
-        text: canShowOffer
-          ? "This device needs an active Apple Music subscription to play approved music."
-          :
-          "This device needs an active Apple Music subscription to play approved music. This Apple ID may not be eligible to start a subscription here.",
-        primary: canShowOffer ? .init("Start subscription", animate: false) {
-          self.onEvent(.subscriptionOfferTapped)
-        } : .init("Check again", animate: false) {
-          self.onEvent(.retryTapped)
-        },
-        secondary: canShowOffer ? .init("Check again", animate: false) {
-          self.onEvent(.retryTapped)
-        } : nil,
-        screenType: .music,
-      )
+      if canShowOffer {
+        GertieActionScreen(
+          message: "This device needs an active Apple Music subscription to play approved music.",
+          icon: .system("music.note.list"),
+          actions: [
+            .button("Start subscription") {
+              self.onEvent(.subscriptionOfferTapped)
+            },
+            .button("Check again") {
+              self.onEvent(.retryTapped)
+            },
+          ],
+        )
+      } else {
+        GertieActionScreen(
+          message: "This device needs an active Apple Music subscription to play approved music. This Apple ID may not be eligible to start a subscription here.",
+          icon: .system("music.note.list"),
+          action: .button("Check again") {
+            self.onEvent(.retryTapped)
+          },
+        )
+      }
 
     case .gertrudeConnection(.checking):
-      LoadingScreenView(text: "Checking Gertrude account connection…")
+      GertieLoadingScreen(message: "Checking Gertrude account connection…")
 
     case .gertrudeConnection(.unclaimed(let code, let audience)):
       MusicClaimCodeView(code: code, audience: audience)
 
     case .gertrudeConnection(.failed):
-      ButtonScreenView(
-        text: "Gertrude Music couldn’t connect to Gertrude. Check your internet connection and try again.",
-        primary: .init("Try again", animate: false) {
+      GertieActionScreen(
+        message: "Gertrude Music couldn’t connect to Gertrude. Check your internet connection and try again.",
+        icon: .error,
+        action: .button("Try again") {
           self.onEvent(.refreshConnectionTapped)
         },
-        screenType: .error,
       )
     }
   }

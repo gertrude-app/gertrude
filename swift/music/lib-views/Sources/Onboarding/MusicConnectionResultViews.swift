@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 #if os(iOS)
@@ -31,11 +32,10 @@ struct MusicDeviceRecognizedView: View {
 
       Spacer()
 
-      BigButton(
-        "Continue",
-        type: .button { self.onContinueTap() },
-        variant: .primary,
-      )
+      Button("Continue") {
+        self.onContinueTap()
+      }
+      .buttonStyle(.gertiePrimary)
     }
     .frame(maxWidth: 500)
     .padding(30)
@@ -76,7 +76,7 @@ struct MusicUnavailableView: View {
 
       Spacer()
 
-      WaitingStatus(label: "Still checking availability…", delay: self.statusDelay)
+      GertieWaitingStatus(label: "Still checking availability…", delay: self.statusDelay)
     }
     .frame(maxWidth: 500)
     .padding(30)
