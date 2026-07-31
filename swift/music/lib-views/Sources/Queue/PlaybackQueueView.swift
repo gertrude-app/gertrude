@@ -88,13 +88,10 @@ public struct PlaybackQueueView: View {
 
       if !self.displayRows.isEmpty {
         if self.hasQueuedEntries {
-          PlaybackQueueSectionHeader(
-            title: "Next in queue",
-            clearAction: self.onClearQueue,
-          )
-          .listRowInsets(EdgeInsets())
-          .listRowSeparator(.hidden)
-          .listRowBackground(Color.clear)
+          PlaybackQueueSectionHeader(title: "Next in queue")
+            .listRowInsets(EdgeInsets())
+            .listRowSeparator(.hidden)
+            .listRowBackground(Color.clear)
         }
 
         ForEach(self.displayRows) { displayRow in
@@ -136,6 +133,14 @@ public struct PlaybackQueueView: View {
     .background(.background)
     .navigationTitle("Queue")
     .tint(.primary)
+    .toolbar {
+      if self.hasQueuedEntries {
+        Button(role: .destructive, action: self.onClearQueue) {
+          Label("Clear queue", systemImage: "trash")
+        }
+        .tint(.primary)
+      }
+    }
   }
 
   private func move(fromOffsets: IndexSet, toOffset: Int) {
@@ -230,28 +235,17 @@ private struct PlaybackQueueDisplayRow: Identifiable {
 
 private struct PlaybackQueueSectionHeader: View {
   let title: String
-  var clearAction: (@MainActor @Sendable () -> Void)?
 
   var body: some View {
-    HStack(alignment: .firstTextBaseline) {
-      Text(self.title)
-        .font(.title3.weight(.bold))
-        .foregroundStyle(.primary)
-        .accessibilityAddTraits(.isHeader)
-
-      Spacer(minLength: 12)
-
-      if let clearAction {
-        Button("Clear queue", role: .destructive, action: clearAction)
-          .buttonStyle(.borderless)
-          .font(.subheadline.weight(.semibold))
-      }
-    }
-    .padding(.horizontal, 20)
-    .frame(maxWidth: 800)
-    .frame(maxWidth: .infinity)
-    .padding(.top, 28)
-    .padding(.bottom, 8)
+    Text(self.title)
+      .font(.title3.weight(.bold))
+      .foregroundStyle(.primary)
+      .accessibilityAddTraits(.isHeader)
+      .padding(.horizontal, 20)
+      .frame(maxWidth: 800, alignment: .leading)
+      .frame(maxWidth: .infinity)
+      .padding(.top, 28)
+      .padding(.bottom, 8)
   }
 }
 

@@ -100,6 +100,8 @@ public struct PlaylistDetailView: View {
               onPlayNext: { self.onTrackPlayNext(entry.id) },
               onAddToQueue: { self.onTrackAddToQueue(entry.id) },
               onAddToPlaylist: { self.onTrackAddToPlaylist(entry.id) },
+              onRemoveFromPlaylist: { self.onRemoveEntry(entry.id) },
+              isRemoveFromPlaylistDisabled: self.isMutating,
             )
             .swipeActions(edge: .trailing) {
               Button(role: .destructive) {

@@ -5,6 +5,7 @@ public struct AlbumCardView: View {
 
   private let album: AlbumData
   private let artworkSize: CGFloat
+  private let isPlaying: Bool
   private let transitionNamespace: Namespace.ID?
   private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
@@ -14,6 +15,7 @@ public struct AlbumCardView: View {
   public init(
     album: AlbumData,
     artworkSize: CGFloat = 148,
+    isPlaying: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
@@ -22,6 +24,7 @@ public struct AlbumCardView: View {
   ) {
     self.album = album
     self.artworkSize = artworkSize
+    self.isPlaying = isPlaying
     self.transitionNamespace = transitionNamespace
     self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
@@ -42,22 +45,17 @@ public struct AlbumCardView: View {
           cornerRadius: 12,
         )
 
-        VStack(alignment: .leading, spacing: 2) {
-          Text(self.album.title)
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(Color(self.colorScheme, light: .black, dark: .white))
-            .lineLimit(2)
-            .multilineTextAlignment(.leading)
-
-          Text(self.album.artist)
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(Color(
-              self.colorScheme,
-              light: .black.opacity(0.8),
-              dark: .white.opacity(0.72),
-            ))
-            .lineLimit(1)
-        }
+        LibraryCardMetadataView(
+          title: self.album.title,
+          subtitle: self.album.artist,
+          isPlaying: self.isPlaying,
+          titleColor: Color(self.colorScheme, light: .black, dark: .white),
+          subtitleColor: Color(
+            self.colorScheme,
+            light: .black.opacity(0.8),
+            dark: .white.opacity(0.72),
+          ),
+        )
       }
       .frame(width: self.artworkSize, alignment: .leading)
       .contentShape(Rectangle())
@@ -68,7 +66,9 @@ public struct AlbumCardView: View {
       onAddToQueue: self.onAddToQueue,
       onAddToPlaylist: self.onAddToPlaylist,
     )
-    .accessibilityLabel("\(self.album.title), \(self.album.artist)")
+    .accessibilityLabel(
+      "\(self.isPlaying ? "Playing, " : "")\(self.album.title), \(self.album.artist)",
+    )
   }
 
   private var artworkTransitionID: String {
@@ -80,7 +80,7 @@ public struct AlbumCardView: View {
   #Preview("Album cards") {
     HStack(alignment: .top, spacing: 16) {
       AlbumCardView(album: [AlbumData].previewAlbums[0])
-      AlbumCardView(album: [AlbumData].previewAlbums[1])
+      AlbumCardView(album: [AlbumData].previewAlbums[1], isPlaying: true)
     }
     .padding(24)
   }

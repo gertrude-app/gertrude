@@ -18,6 +18,7 @@ struct LibraryViewContainer: View {
     ) {
       LibraryView(
         state: self.store.viewState,
+        playingItemID: self.playingItemID,
         isRefreshing: self.store.isRefreshingRemoteLibrary,
         isPlaylistMutationInFlight: self.store.isPlaylistMutationInFlight,
         transitionNamespace: self.zoomNamespace,
@@ -84,6 +85,19 @@ struct LibraryViewContainer: View {
           in: self.zoomNamespace,
         )
       }
+    }
+  }
+
+  private var playingItemID: String? {
+    guard self.isPlaybackPlaying,
+          let identity = self.activePlaybackContext?.identity else { return nil }
+    switch identity.kind {
+    case .album:
+      return "album-\(identity.id)"
+    case .playlist:
+      return "playlist-\(identity.id)"
+    case .artist:
+      return nil
     }
   }
 }
