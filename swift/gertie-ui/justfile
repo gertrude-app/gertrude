@@ -1,0 +1,11 @@
+_default:
+  @just --choose
+
+gen:
+  @cd Catalog && \
+    GERTRUDE_UI_CATALOG_DEVELOPMENT_TEAM="${GERTRUDE_UI_CATALOG_DEVELOPMENT_TEAM:-Y63PLK783B}" \
+    GERTRUDE_UI_CATALOG_BUNDLE_IDENTIFIER="${GERTRUDE_UI_CATALOG_BUNDLE_IDENTIFIER:-com.innocencelabs.gertrude-ui-catalog}" \
+    xcodegen -s project.yml
+
+xcode: gen
+  @open Catalog/GertieUICatalog.xcworkspace
