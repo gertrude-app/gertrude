@@ -115,11 +115,13 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
   }
 
   var songIDs: [ApprovedTrack.ID]
+  var context: PlaybackContext?
   var currentIndex: Int
   var elapsedTime: TimeInterval
   var durationFallback: TimeInterval?
-  var sourceAlbumHints: [SourceAlbumHint]
   var playlistSourceHints: [PlaylistPlaybackSource?]
+  var queueRoles: [PlaybackQueueRole?]?
+  var sourceAlbumHints: [SourceAlbumHint]
 
   init(
     songIDs: [ApprovedTrack.ID],
@@ -128,20 +130,25 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     durationFallback: TimeInterval? = nil,
     sourceAlbumHints: [SourceAlbumHint] = [],
     playlistSourceHints: [PlaylistPlaybackSource?]? = nil,
+    queueRoles: [PlaybackQueueRole?]? = nil,
+    context: PlaybackContext? = nil,
   ) {
     self.songIDs = songIDs
+    self.context = context
     self.currentIndex = currentIndex
     self.elapsedTime = elapsedTime.isFinite ? max(0, elapsedTime) : 0
     self.durationFallback = durationFallback.flatMap { duration in
       duration.isFinite && duration > 0 ? duration : nil
     }
-    self.sourceAlbumHints = sourceAlbumHints
     self.playlistSourceHints = playlistSourceHints
       ?? Array(repeating: nil, count: songIDs.count)
+    self.queueRoles = queueRoles
+    self.sourceAlbumHints = sourceAlbumHints
   }
 
   init(
     session: PlaybackFeature.Session,
+    context: PlaybackContext? = nil,
     progress: PlaybackProgress,
     sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID],
   ) {
@@ -152,6 +159,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
             let albumID = sourceAlbumIDs[item.id] ?? item.albumID else { return nil }
       return SourceAlbumHint(songID: item.id, albumID: albumID)
     }
+    let queueRoles = items.map(\.queueRole)
     self.init(
       songIDs: items.map(\.id),
       currentIndex: 0,
@@ -159,6 +167,8 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       durationFallback: progress.duration,
       sourceAlbumHints: sourceAlbumHints,
       playlistSourceHints: items.map(\.playlistSource),
+      queueRoles: queueRoles.contains(where: { $0 != nil }) ? queueRoles : nil,
+      context: context,
     )
   }
 
@@ -173,6 +183,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
             let albumID = item.albumID else { return nil }
       return SourceAlbumHint(songID: item.id, albumID: albumID)
     }
+    let queueRoles = items.map(\.queueRole)
     self.init(
       songIDs: items.map(\.id),
       currentIndex: 0,
@@ -180,6 +191,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       durationFallback: legacySession.progress.duration,
       sourceAlbumHints: sourceAlbumHints,
       playlistSourceHints: items.map(\.playlistSource),
+      queueRoles: queueRoles.contains(where: { $0 != nil }) ? queueRoles : nil,
     )
   }
 
@@ -194,6 +206,8 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       durationFallback: self.durationFallback,
       sourceAlbumHints: self.sourceAlbumHints.filter { retainedSongIDs.contains($0.songID) },
       playlistSourceHints: Array(self.playlistSourceHints.dropFirst(self.currentIndex)),
+      queueRoles: self.queueRoles.map { Array($0.dropFirst(self.currentIndex)) },
+      context: self.context,
     )
   }
 
@@ -201,6 +215,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     !self.songIDs.isEmpty
       && self.songIDs.indices.contains(self.currentIndex)
       && self.playlistSourceHints.count == self.songIDs.count
+      && (self.queueRoles == nil || self.queueRoles?.count == self.songIDs.count)
   }
 
   var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] {

@@ -223,6 +223,69 @@ struct PlaybackSessionCacheClientTests {
   }
 
   @Test
+  func checkpointPersistsPlaybackContextAndQueueRoles() throws {
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "album"),
+      title: "Album",
+    )
+    let session = PlaybackFeature.Session(
+      queue: .init(items: [
+        playbackItem("current").withQueueRole(.context),
+        playbackItem("queued").withQueueRole(.queued),
+        playbackItem("following").withQueueRole(.context),
+      ]),
+    )
+
+    let checkpoint = PlaybackCheckpoint(
+      session: session,
+      context: context,
+      progress: .zero,
+      sourceAlbumIDs: [:],
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackCheckpoint.self,
+      from: JSONEncoder().encode(checkpoint),
+    )
+
+    expectNoDifference(decoded.context, context)
+    expectNoDifference(decoded.queueRoles, [.context, .queued, .context])
+  }
+
+  @Test
+  func decodesCheckpointSavedBeforeQueueMetadata() throws {
+    let previousCheckpoint = PlaybackCheckpointV2(
+      songIDs: ["track-1"],
+      currentIndex: 0,
+      elapsedTime: 12,
+      durationFallback: 180,
+      sourceAlbumHints: [
+        .init(songID: "track-1", albumID: "album-1"),
+      ],
+      playlistSourceHints: [nil],
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackCheckpoint.self,
+      from: JSONEncoder().encode(previousCheckpoint),
+    )
+
+    expectNoDifference(
+      decoded,
+      PlaybackCheckpoint(
+        songIDs: ["track-1"],
+        currentIndex: 0,
+        elapsedTime: 12,
+        durationFallback: 180,
+        sourceAlbumHints: [
+          .init(songID: "track-1", albumID: "album-1"),
+        ],
+        playlistSourceHints: [nil],
+      ),
+    )
+  }
+
+  @Test
   func deleteRemovesOnlyRequestedChildCache() throws {
     let directory = try temporaryDirectory(named: "deleteRemovesOnlyRequestedChildCache")
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -237,6 +300,15 @@ struct PlaybackSessionCacheClientTests {
     expectNoDifference(deleted, nil)
     expectNoDifference(preserved, .otherMock)
   }
+}
+
+private struct PlaybackCheckpointV2: Encodable {
+  var songIDs: [ApprovedTrack.ID]
+  var currentIndex: Int
+  var elapsedTime: TimeInterval
+  var durationFallback: TimeInterval?
+  var sourceAlbumHints: [PlaybackCheckpoint.SourceAlbumHint]
+  var playlistSourceHints: [PlaylistPlaybackSource?]
 }
 
 private func playbackCheckpointCache(

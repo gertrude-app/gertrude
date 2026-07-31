@@ -6,6 +6,7 @@ struct ArtistDetailViewContainer: View {
   let store: StoreOf<ArtistDetailFeature>
   let library: ApprovedMusicLibrary
   let currentTrackID: ApprovedTrack.ID?
+  let activePlaybackContext: PlaybackContext?
   let isPlaybackLoading: Bool
   let isPlaybackPlaying: Bool
   let transitionNamespace: Namespace.ID?
@@ -16,6 +17,7 @@ struct ArtistDetailViewContainer: View {
       let isCurrentArtist = self.currentTrackID.map { currentTrackID in
         artistData.topSongs.contains(where: { $0.id == currentTrackID.rawValue })
       } ?? false
+      let isArtistContext = self.activePlaybackContext?.identity == .artist(artist.id)
 
       ArtistDetailView(
         artist: ArtistDetailData(artist: artistData),
@@ -23,8 +25,9 @@ struct ArtistDetailViewContainer: View {
         releases: self.releases(for: artist),
         transitionNamespace: self.transitionNamespace,
         currentTrackID: isCurrentArtist ? self.currentTrackID?.rawValue : nil,
-        isPlaying: isCurrentArtist && self.isPlaybackPlaying,
-        isLoading: isCurrentArtist && self.isPlaybackLoading,
+        isPlaying: isArtistContext && self.isPlaybackPlaying,
+        isLoading: isArtistContext && self.isPlaybackLoading,
+        isCurrentTrackPlaying: isCurrentArtist && self.isPlaybackPlaying,
         onAddToQueue: { self.store.send(.addToQueueTapped) },
         onPlayNext: { self.store.send(.playNextTapped) },
         onPlayTap: { self.store.send(.playButtonTapped) },

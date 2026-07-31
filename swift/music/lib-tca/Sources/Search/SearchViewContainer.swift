@@ -8,6 +8,7 @@ struct SearchViewContainer: View {
 
   let library: ApprovedMusicLibrary?
   let currentTrackID: ApprovedTrack.ID?
+  let activePlaybackContext: PlaybackContext?
   let isPlaybackLoading: Bool
   let isPlaybackPlaying: Bool
   let isPlaylistMutationInFlight: Bool
@@ -57,6 +58,7 @@ struct SearchViewContainer: View {
             store: artistStore,
             library: library,
             currentTrackID: self.currentTrackID,
+            activePlaybackContext: self.activePlaybackContext,
             isPlaybackLoading: self.isPlaybackLoading,
             isPlaybackPlaying: self.isPlaybackPlaying,
             transitionNamespace: self.zoomNamespace,

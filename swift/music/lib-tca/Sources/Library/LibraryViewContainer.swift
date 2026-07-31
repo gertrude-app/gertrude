@@ -8,6 +8,7 @@ struct LibraryViewContainer: View {
   @Namespace private var zoomNamespace
 
   let currentTrackID: ApprovedTrack.ID?
+  let activePlaybackContext: PlaybackContext?
   let isPlaybackLoading: Bool
   let isPlaybackPlaying: Bool
 
@@ -64,6 +65,7 @@ struct LibraryViewContainer: View {
             store: artistStore,
             library: library,
             currentTrackID: self.currentTrackID,
+            activePlaybackContext: self.activePlaybackContext,
             isPlaybackLoading: self.isPlaybackLoading,
             isPlaybackPlaying: self.isPlaybackPlaying,
             transitionNamespace: self.zoomNamespace,

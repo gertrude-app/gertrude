@@ -99,7 +99,7 @@ struct LibraryFeature: Sendable {
     case addToQueue(items: [PlaybackItem])
     case artistPlaybackButtonTapped(
       items: [PlaybackItem],
-      origin: LibraryCollectionIdentity,
+      context: PlaybackContext,
     )
     case dismissPlaybackFailure
     case playbackFailureActionTapped
@@ -107,7 +107,7 @@ struct LibraryFeature: Sendable {
     case playNow(
       items: [PlaybackItem],
       startIndex: Int,
-      origin: LibraryCollectionIdentity,
+      context: PlaybackContext,
     )
     case togglePlayPause
   }
@@ -373,22 +373,29 @@ struct LibraryFeature: Sendable {
         guard let items = self.artistPlaybackItems(
           for: artistID,
           in: state.status,
+        ), let context = self.artistPlaybackContext(
+          for: artistID,
+          in: state.status,
         ) else { return .none }
         return .send(.delegate(.artistPlaybackButtonTapped(
           items: items,
-          origin: .artist(artistID),
+          context: context,
         )))
 
       case .artistTopSongTapped(let artistID, let trackID):
         guard let items = self.artistPlaybackItems(
           for: artistID,
           in: state.status,
-        ), let startIndex = items.firstIndex(where: { $0.id == trackID })
+        ), let startIndex = items.firstIndex(where: { $0.id == trackID }),
+        let context = self.artistPlaybackContext(
+          for: artistID,
+          in: state.status,
+        )
         else { return .none }
         return .send(.delegate(.playNow(
           items: items,
           startIndex: startIndex,
-          origin: .artist(artistID),
+          context: context,
         )))
 
       case .path(.element(id: let id, action: .artist(.addToQueueTapped))):
@@ -499,7 +506,10 @@ struct LibraryFeature: Sendable {
           return .send(.delegate(.playNow(
             items: items,
             startIndex: startIndex,
-            origin: .playlist(detail.playlist.id),
+            context: PlaybackContext(
+              identity: .playlist(detail.playlist.id),
+              title: detail.playlist.name,
+            ),
           )))
 
         case .removeEntry(let entryID):
@@ -629,7 +639,7 @@ struct LibraryFeature: Sendable {
         return self.refreshRemoteApprovedLibrary(loadCache: true)
 
       case .path(.element(id: let id, action: .album(.delegate(let delegateAction)))):
-        guard let albumID = state.path[id: id, case: \.album]?.album.id else { return .none }
+        guard let album = state.path[id: id, case: \.album]?.album else { return .none }
         switch delegateAction {
         case .addAlbumToPlaylist(let albumID):
           return .send(.addAlbumToPlaylistTapped(albumID))
@@ -643,7 +653,10 @@ struct LibraryFeature: Sendable {
           return .send(.delegate(.playNow(
             items: items,
             startIndex: startIndex,
-            origin: .album(albumID),
+            context: PlaybackContext(
+              identity: .album(album.id),
+              title: album.title,
+            ),
           )))
         case .playNext(let items):
           return .send(.delegate(.playNext(items: items)))
@@ -823,6 +836,18 @@ struct LibraryFeature: Sendable {
     }
   }
 
+  private func artistPlaybackContext(
+    for artistID: ApprovedArtist.ID,
+    in status: Status,
+  ) -> PlaybackContext? {
+    guard case .loaded(let library) = status,
+          let artist = library.artist(id: artistID) else { return nil }
+    return PlaybackContext(
+      identity: .artist(artist.id),
+      title: artist.name,
+    )
+  }
+
   private func performAddToPlaylistMutation(
     operation: @escaping @Sendable () async throws -> MusicPlaylistMutationResult,
   ) -> EffectOf<Self> {
@@ -999,9 +1024,12 @@ extension LibraryFeature.State {
     self.albumDetail = albumDetail
   }
 
-  mutating func setAlbumDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+  mutating func setAlbumDetailPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext?,
+  ) {
     guard var albumDetail = self.albumDetail else { return }
-    albumDetail.setPlaybackSession(session)
+    albumDetail.setPlaybackSession(session, activeContext: activeContext)
     self.albumDetail = albumDetail
   }
 
@@ -1011,9 +1039,12 @@ extension LibraryFeature.State {
     self.playlistDetail = playlistDetail
   }
 
-  mutating func setPlaylistDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+  mutating func setPlaylistDetailPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext?,
+  ) {
     guard var playlistDetail = self.playlistDetail else { return }
-    playlistDetail.setPlaybackSession(session)
+    playlistDetail.setPlaybackSession(session, activeContext: activeContext)
     self.playlistDetail = playlistDetail
   }
 }

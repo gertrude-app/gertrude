@@ -341,7 +341,10 @@ struct LibraryFeatureTests {
     await store.send(.artistPlayTapped(artist.id))
     await store.receive(.delegate(.artistPlaybackButtonTapped(
       items: items,
-      origin: .artist(artist.id),
+      context: PlaybackContext(
+        identity: .artist(artist.id),
+        title: artist.name,
+      ),
     )))
   }
 
@@ -371,7 +374,10 @@ struct LibraryFeatureTests {
     await store.receive(.delegate(.playNow(
       items: items,
       startIndex: 1,
-      origin: .artist(artist.id),
+      context: PlaybackContext(
+        identity: .artist(artist.id),
+        title: artist.name,
+      ),
     )))
   }
 
@@ -572,7 +578,10 @@ struct LibraryFeatureTests {
     await store.receive(.delegate(.playNow(
       items: items,
       startIndex: 0,
-      origin: .album(album.id),
+      context: PlaybackContext(
+        identity: .album(album.id),
+        title: album.title,
+      ),
     )))
   }
 

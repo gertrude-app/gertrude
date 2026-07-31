@@ -5,6 +5,7 @@ public struct PlaylistDetailView: View {
   private let isPlaying: Bool
   private let isLoading: Bool
   private let currentEntryID: String?
+  private let isCurrentTrackPlaying: Bool
   private let isMutating: Bool
   private let onAddMusicTap: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
@@ -28,6 +29,7 @@ public struct PlaylistDetailView: View {
     isPlaying: Bool = false,
     isLoading: Bool = false,
     currentEntryID: String? = nil,
+    isCurrentTrackPlaying: Bool = false,
     isMutating: Bool = false,
     onAddMusicTap: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
@@ -46,6 +48,7 @@ public struct PlaylistDetailView: View {
     self.isPlaying = isPlaying
     self.isLoading = isLoading
     self.currentEntryID = currentEntryID
+    self.isCurrentTrackPlaying = isCurrentTrackPlaying
     self.isMutating = isMutating
     self.onAddMusicTap = onAddMusicTap
     self.onAddToQueue = onAddToQueue
@@ -87,7 +90,7 @@ public struct PlaylistDetailView: View {
               track: entry.track,
               showsArtwork: true,
               isCurrent: entry.id == self.currentEntryID,
-              isPlaying: self.isPlaying && entry.id == self.currentEntryID,
+              isPlaying: self.isCurrentTrackPlaying && entry.id == self.currentEntryID,
               palette: nil,
               onTap: { self.onTrackTap(entry.id) },
             )

@@ -7,17 +7,20 @@ struct PlaylistDetailFeature {
     var playlist: MusicPlaylist
     var playStatus: PlaybackFeature.PlayStatus?
     var currentEntryID: MusicPlaylistEntry.ID?
+    var currentTrackPlayStatus: PlaybackFeature.PlayStatus?
     var playbackFailure: PlaybackFailure?
 
     init(
       playlist: MusicPlaylist,
       playStatus: PlaybackFeature.PlayStatus? = nil,
       currentEntryID: MusicPlaylistEntry.ID? = nil,
+      currentTrackPlayStatus: PlaybackFeature.PlayStatus? = nil,
       playbackFailure: PlaybackFailure? = nil,
     ) {
       self.playlist = playlist
       self.playStatus = playStatus
       self.currentEntryID = currentEntryID
+      self.currentTrackPlayStatus = currentTrackPlayStatus ?? playStatus
       self.playbackFailure = playbackFailure
     }
   }
@@ -79,7 +82,7 @@ struct PlaylistDetailFeature {
         return .send(.delegate(.playNext(items: state.playbackItems)))
 
       case .playTapped:
-        if state.currentEntryID != nil {
+        if state.playStatus != nil {
           return .send(.delegate(.togglePlayPause))
         }
         guard !state.playbackItems.isEmpty else { return .none }
@@ -133,6 +136,10 @@ extension PlaylistDetailFeature.State {
     self.playStatus == .loading
   }
 
+  var isCurrentTrackPlaying: Bool {
+    self.currentTrackPlayStatus == .playing
+  }
+
   var playbackItems: [PlaybackItem] {
     self.playlist.entries.map { entry in
       PlaybackItem(
@@ -157,18 +164,36 @@ extension PlaylistDetailFeature.State {
     self.playbackFailure = failure
   }
 
-  mutating func setPlaybackSession(_ session: PlaybackFeature.Session?) {
-    guard let session,
-          let source = session.queue.currentItem.playlistSource,
-          source.playlistID == self.playlist.id.rawValue,
-          let entryID = self.playlist.entries.first(where: {
-            $0.id.rawValue == source.entryID
-          })?.id else {
+  mutating func setPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext? = nil,
+  ) {
+    guard let session else {
       self.playStatus = nil
       self.currentEntryID = nil
+      self.currentTrackPlayStatus = nil
       return
     }
-    self.playStatus = session.playStatus
-    self.currentEntryID = entryID
+
+    let sourceEntryID: MusicPlaylistEntry.ID? = session.queue.currentItem.playlistSource
+      .flatMap { source in
+        guard source.playlistID == self.playlist.id.rawValue else { return nil }
+        return self.playlist.entries.first(where: {
+          $0.id.rawValue == source.entryID
+        })?.id
+      }
+    let matchingEntryID = sourceEntryID ?? self.playlist.entries.first(where: {
+      $0.track.id == session.currentTrackID
+    })?.id
+    if let matchingEntryID {
+      self.currentEntryID = matchingEntryID
+      self.currentTrackPlayStatus = session.playStatus
+    } else {
+      self.currentEntryID = nil
+      self.currentTrackPlayStatus = nil
+    }
+    self.playStatus = activeContext?.identity == .playlist(self.playlist.id)
+      ? session.playStatus
+      : nil
   }
 }

@@ -6,6 +6,7 @@ public struct AlbumDetailView: View {
   private let isPlaying: Bool
   private let isLoading: Bool
   private let currentTrackID: String?
+  private let isCurrentTrackPlaying: Bool
   private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
@@ -21,6 +22,7 @@ public struct AlbumDetailView: View {
     isPlaying: Bool = false,
     isLoading: Bool = false,
     currentTrackID: String? = nil,
+    isCurrentTrackPlaying: Bool = false,
     onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
@@ -34,6 +36,7 @@ public struct AlbumDetailView: View {
     self.isPlaying = isPlaying
     self.isLoading = isLoading
     self.currentTrackID = currentTrackID
+    self.isCurrentTrackPlaying = isCurrentTrackPlaying
     self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
@@ -91,7 +94,7 @@ public struct AlbumDetailView: View {
               track: row.track,
               showsArtwork: false,
               isCurrent: row.track.id == self.currentTrackID,
-              isPlaying: self.isPlaying && row.track.id == self.currentTrackID,
+              isPlaying: self.isCurrentTrackPlaying && row.track.id == self.currentTrackID,
               palette: self.album.artworkPalette,
               onTap: { self.onTrackTap(row.track.id) },
             )

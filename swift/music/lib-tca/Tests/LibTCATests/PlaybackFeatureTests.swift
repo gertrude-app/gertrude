@@ -23,16 +23,32 @@ struct PlaybackFeatureTests {
       playbackItem("track-2"),
       playbackItem("track-3"),
     ]
-    let requestedItems = Array(items.dropFirst())
-    let snapshot = playbackSnapshot(items: requestedItems)
+    let requestedItems = Array(items.dropFirst()).map { $0.withQueueRole(.context) }
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "album"),
+      title: "Album",
+    )
+    let snapshot = playbackSnapshot(items: requestedItems.map { $0.withQueueRole(nil) })
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "entry-1": .context,
+    ]
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
       $0.playback.playNow = { _, _ in snapshot }
     }
 
-    await store.send(.playNow(items: items, startIndex: 1)) {
+    await store.send(.playNow(
+      items: items,
+      startIndex: 1,
+      context: context,
+    )) {
+      $0.pendingMetadataPlan = requestedItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
       $0.pendingPlayNowItems = requestedItems
+      $0.playbackContext = context
       $0.session = .init(
         playStatus: .loading,
         queue: .init(items: requestedItems),
@@ -41,29 +57,47 @@ struct PlaybackFeatureTests {
     await store.receive(.playNowFinished(snapshot)) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
-      $0.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+      $0.queueRoleHints = roleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
   }
 
   @Test
-  func playNowPrependsRequestedSuffixToExistingUpcoming() async {
+  func playNowPreservesQueuedItemsAndReplacesPreviousContext() async {
     let existingItems = [
-      playbackItem("current"),
-      playbackItem("old-next-1"),
-      playbackItem("old-next-2"),
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued").withQueueRole(.queued),
+      playbackItem("old-context").withQueueRole(.context),
     ]
     let requestedItems = [
       playbackItem("requested-1"),
       playbackItem("requested-2"),
       playbackItem("requested-3"),
     ]
-    let composedItems = Array(requestedItems.dropFirst()) + Array(existingItems.dropFirst())
-    let initialSnapshot = playbackSnapshot(items: existingItems)
-    let composedSnapshot = playbackSnapshot(items: composedItems)
+    let composedItems = [
+      requestedItems[1].withQueueRole(.context),
+      existingItems[1],
+      requestedItems[2].withQueueRole(.context),
+    ]
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "new-album"),
+      title: "New Album",
+    )
+    let composedSnapshot = playbackSnapshot(items: composedItems.map { $0.withQueueRole(nil) })
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "entry-1": .queued,
+      "entry-2": .context,
+    ]
     let recorder = PlaybackQueueRecorder()
     let store = TestStore(initialState: .init(
-      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      session: .init(queue: .init(items: existingItems)),
       hasAuthoritativeSnapshot: true,
       lastCachedProgressBucket: 0,
     )) {
@@ -75,10 +109,18 @@ struct PlaybackFeatureTests {
       }
     }
 
-    await store.send(.playNow(items: requestedItems, startIndex: 1)) {
+    await store.send(.playNow(
+      items: requestedItems,
+      startIndex: 1,
+      context: context,
+    )) {
       $0.hasAuthoritativeSnapshot = false
       $0.lastCachedProgressBucket = nil
+      $0.pendingMetadataPlan = composedItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
       $0.pendingPlayNowItems = composedItems
+      $0.playbackContext = context
       $0.session = .init(
         playStatus: .loading,
         queue: .init(items: composedItems),
@@ -87,51 +129,65 @@ struct PlaybackFeatureTests {
     await store.receive(.playNowFinished(composedSnapshot)) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
-      $0.session = PlaybackFeature.Session(snapshot: composedSnapshot, sourceAlbumIDs: [:])
+      $0.queueRoleHints = roleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: composedSnapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
 
     let recordedItems = await recorder.items
     let recordedStartIndex = await recorder.startIndex
-    expectNoDifference(recordedItems, requestedItems)
-    expectNoDifference(recordedStartIndex, 1)
+    expectNoDifference(recordedItems, composedItems)
+    expectNoDifference(recordedStartIndex, 0)
   }
 
   @Test
   func playNowPreservesDuplicateOccurrences() async {
     let duplicate = playbackItem("duplicate")
-    let existingItems = [playbackItem("current"), duplicate]
     let requestedItems = [playbackItem("first"), duplicate, duplicate]
-    let composedItems = requestedItems + [duplicate]
-    let snapshot = playbackSnapshot(items: composedItems)
-    let store = TestStore(initialState: .init(
-      session: PlaybackFeature.Session(
-        snapshot: playbackSnapshot(items: existingItems),
-        sourceAlbumIDs: [:],
-      ),
-      hasAuthoritativeSnapshot: true,
-    )) {
+    let composedItems = requestedItems.map { $0.withQueueRole(.context) }
+    let snapshot = playbackSnapshot(items: composedItems.map { $0.withQueueRole(nil) })
+    let roleHints = Dictionary(
+      uniqueKeysWithValues: snapshot.entries.map { ($0.id, PlaybackQueueRole.context) },
+    )
+    let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
       $0.playback.playNow = { _, _ in snapshot }
     }
 
-    await store.send(.playNow(items: requestedItems, startIndex: 0)) {
-      $0.hasAuthoritativeSnapshot = false
+    await store.send(.playNow(
+      items: requestedItems,
+      startIndex: 0,
+      context: nil,
+    )) {
+      $0.pendingMetadataPlan = composedItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
       $0.pendingPlayNowItems = composedItems
       $0.session = .init(playStatus: .loading, queue: .init(items: composedItems))
     }
     await store.receive(.playNowFinished(snapshot)) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
-      $0.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+      $0.queueRoleHints = roleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
 
     expectNoDifference(store.state.session?.queue.items, composedItems)
     expectNoDifference(
       store.state.session?.queue.entries.map(\.id),
-      ["entry-0", "entry-1", "entry-2", "entry-3"],
+      ["entry-0", "entry-1", "entry-2"],
     )
   }
 
@@ -154,30 +210,41 @@ struct PlaybackFeatureTests {
       $0.playback.playNow = { _, _ in snapshot }
     }
 
-    await store.send(.playNow(items: items, startIndex: 0)) {
-      $0.pendingPlayNowItems = items
-      $0.pendingPlaylistSourcePlan = items.map {
-        PlaybackSourceHintMatcher.Occurrence(item: $0)
+    let contextItems = items.map { $0.withQueueRole(.context) }
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "entry-1": .context,
+    ]
+    await store.send(.playNow(
+      items: items,
+      startIndex: 0,
+      context: nil,
+    )) {
+      $0.pendingMetadataPlan = contextItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
       }
+      $0.pendingPlayNowItems = contextItems
       $0.session = .init(
         playStatus: .loading,
-        queue: .init(items: items),
+        queue: .init(items: contextItems),
       )
     }
     await store.receive(.playNowFinished(snapshot)) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
-      $0.pendingPlaylistSourcePlan = nil
       $0.playlistSourceHints = sourceHints
+      $0.queueRoleHints = roleHints
       $0.session = PlaybackFeature.Session(
         snapshot: snapshot,
         sourceAlbumIDs: [:],
         playlistSourceHints: sourceHints,
+        queueRoleHints: roleHints,
       )
     }
 
-    expectNoDifference(store.state.session?.queue.items, items)
+    expectNoDifference(store.state.session?.queue.items, contextItems)
   }
 
   @Test
@@ -189,7 +256,7 @@ struct PlaybackFeatureTests {
       playbackItem("second").withPlaylistSource(secondSource),
     ]
     let plan = sourcedItems.map {
-      PlaybackSourceHintMatcher.Occurrence(item: $0)
+      PlaybackMetadataHintMatcher.Occurrence(item: $0)
     }
     let firstSnapshot = playbackSnapshot(items: [playbackItem("first")])
     let fullSnapshot = playbackSnapshot(items: [
@@ -202,7 +269,7 @@ struct PlaybackFeatureTests {
       "entry-1": secondSource,
     ]
     var state = PlaybackFeature.State()
-    state.pendingPlaylistSourcePlan = plan
+    state.pendingMetadataPlan = plan
     let store = TestStore(initialState: state) {
       PlaybackFeature()
     }
@@ -218,7 +285,7 @@ struct PlaybackFeatureTests {
       )
     }
     await store.send(.playbackEvent(.snapshotChanged(fullSnapshot))) {
-      $0.pendingPlaylistSourcePlan = nil
+      $0.pendingMetadataPlan = nil
       $0.playlistSourceHints = fullHints
       $0.session = PlaybackFeature.Session(
         snapshot: fullSnapshot,
@@ -234,13 +301,13 @@ struct PlaybackFeatureTests {
     let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
     let tailSource = PlaylistPlaybackSource(playlistID: UUID(4), entryID: UUID(5))
     let plan = [
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("duplicate").withPlaylistSource(firstSource),
       ),
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("duplicate").withPlaylistSource(secondSource),
       ),
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("tail").withPlaylistSource(tailSource),
         retainedEntryID: "old-tail",
       ),
@@ -251,7 +318,7 @@ struct PlaybackFeatureTests {
       PlaybackQueueEntry(id: "old-tail", item: playbackItem("tail")),
     ]
 
-    let matched = PlaybackSourceHintMatcher.match(plan: plan, entries: entries)
+    let matched = PlaybackMetadataHintMatcher.match(plan: plan, entries: entries)
 
     expectNoDifference(matched, [
       "new-1": firstSource,
@@ -265,20 +332,20 @@ struct PlaybackFeatureTests {
     let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
     let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
     let plan = [
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("first").withPlaylistSource(firstSource),
       ),
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("second").withPlaylistSource(secondSource),
       ),
-      PlaybackSourceHintMatcher.Occurrence(item: playbackItem("third")),
+      PlaybackMetadataHintMatcher.Occurrence(item: playbackItem("third")),
     ]
     let partialEntries = [
       PlaybackQueueEntry(id: "new-1", item: playbackItem("first")),
       PlaybackQueueEntry(id: "new-2", item: playbackItem("second")),
     ]
 
-    let matched = PlaybackSourceHintMatcher.match(plan: plan, entries: partialEntries)
+    let matched = PlaybackMetadataHintMatcher.match(plan: plan, entries: partialEntries)
 
     expectNoDifference(matched, [
       "new-1": firstSource,
@@ -291,11 +358,11 @@ struct PlaybackFeatureTests {
     let firstSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
     let secondSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
     let plan = [
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("first").withPlaylistSource(firstSource),
         retainedEntryID: "entry-1",
       ),
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("second").withPlaylistSource(secondSource),
         retainedEntryID: "entry-2",
       ),
@@ -304,7 +371,7 @@ struct PlaybackFeatureTests {
       PlaybackQueueEntry(id: "entry-2", item: playbackItem("second")),
     ]
 
-    let matched = PlaybackSourceHintMatcher.match(
+    let matched = PlaybackMetadataHintMatcher.match(
       plan: plan,
       entries: reorderedEntries,
       existing: ["entry-1": firstSource, "entry-2": secondSource],
@@ -317,8 +384,8 @@ struct PlaybackFeatureTests {
   func playlistSourceMatcherDoesNotGuessForUnattributedDuplicateSong() {
     let source = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
     let plan = [
-      PlaybackSourceHintMatcher.Occurrence(item: playbackItem("duplicate")),
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(item: playbackItem("duplicate")),
+      PlaybackMetadataHintMatcher.Occurrence(
         item: playbackItem("duplicate").withPlaylistSource(source),
       ),
     ]
@@ -326,7 +393,7 @@ struct PlaybackFeatureTests {
       PlaybackQueueEntry(id: "only", item: playbackItem("duplicate")),
     ]
 
-    let matched = PlaybackSourceHintMatcher.match(plan: plan, entries: entries)
+    let matched = PlaybackMetadataHintMatcher.match(plan: plan, entries: entries)
 
     expectNoDifference(matched, [:])
   }
@@ -434,7 +501,7 @@ struct PlaybackFeatureTests {
   }
 
   @Test
-  func simulatorPlayNowPreservesExistingUpcoming() async throws {
+  func simulatorPlayNowReplacesExistingUpcoming() async throws {
     let clock = PlaybackSimulatorClock()
     let client = PlaybackClient.simulated { _ in
       await clock.sleep()
@@ -455,10 +522,10 @@ struct PlaybackFeatureTests {
 
     expectNoDifference(
       snapshot.entries.map(\.item.id),
-      ["requested-2", "requested-2", "old-next-1", "old-next-2"],
+      ["requested-2", "requested-2"],
     )
     #expect(snapshot.currentEntryID == snapshot.entries.first?.id)
-    #expect(Set(snapshot.entries.map(\.id)).count == 4)
+    #expect(Set(snapshot.entries.map(\.id)).count == 2)
     await client.clearQueue()
     await clock.advance()
   }
@@ -504,18 +571,63 @@ struct PlaybackFeatureTests {
       playbackItem("old-next-1"),
       playbackItem("old-next-2"),
     ]
-    _ = try await client.playNow(initialItems, 0)
+    let initialSnapshot = try await client.playNow(initialItems, 0)
 
     _ = try await client.insertIntoQueue(
       [playbackItem("play-next-1"), playbackItem("play-next-2")],
       .next,
     )
-    let snapshot = try await client.insertIntoQueue([playbackItem("added")], .tail)
+    let snapshot = try await client.insertIntoQueue(
+      [playbackItem("added")],
+      .before(.init(id: "stale", item: initialSnapshot.entries[1].item)),
+    )
 
     expectNoDifference(
       snapshot.entries.map(\.item.id),
-      ["current", "play-next-1", "play-next-2", "old-next-1", "old-next-2", "added"],
+      ["current", "play-next-1", "play-next-2", "added", "old-next-1", "old-next-2"],
     )
+    await client.clearQueue()
+    await clock.advance()
+  }
+
+  @Test
+  func simulatorRepeatedReorderingRetainsEveryOccurrence() async throws {
+    let clock = PlaybackSimulatorClock()
+    let client = PlaybackClient.simulated { _ in
+      await clock.sleep()
+    }
+    let items = [
+      playbackItem("current"),
+      playbackItem("duplicate"),
+      playbackItem("other"),
+      playbackItem("duplicate"),
+    ]
+    let initialSnapshot = try await client.playNow(items, 0)
+    let initialEntryIDs = initialSnapshot.entries.map(\.id)
+
+    _ = try await client.setUpcoming([
+      initialSnapshot.entries[3],
+      initialSnapshot.entries[1],
+      initialSnapshot.entries[2],
+    ])
+    let snapshot = try await client.setUpcoming([
+      .init(id: "stale-other", item: initialSnapshot.entries[2].item),
+      .init(id: "stale-duplicate-1", item: initialSnapshot.entries[3].item),
+      .init(id: "stale-duplicate-2", item: initialSnapshot.entries[1].item),
+    ])
+
+    expectNoDifference(snapshot.entries.map(\.id), [
+      initialEntryIDs[0],
+      initialEntryIDs[2],
+      initialEntryIDs[3],
+      initialEntryIDs[1],
+    ])
+    expectNoDifference(snapshot.entries.map(\.item.id), [
+      "current",
+      "other",
+      "duplicate",
+      "duplicate",
+    ])
     await client.clearQueue()
     await clock.advance()
   }
@@ -597,7 +709,13 @@ struct PlaybackFeatureTests {
   func newerPlayNowCancelsInFlightPlayNow() async {
     let firstItems = [playbackItem("first-1"), playbackItem("first-2")]
     let secondItems = [playbackItem("second-1"), playbackItem("second-2")]
-    let secondSnapshot = playbackSnapshot(items: secondItems)
+    let firstContextItems = firstItems.map { $0.withQueueRole(.context) }
+    let secondContextItems = secondItems.map { $0.withQueueRole(.context) }
+    let secondSnapshot = playbackSnapshot(items: secondContextItems)
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "entry-1": .context,
+    ]
     let gate = PlaybackStartGate()
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
@@ -608,21 +726,33 @@ struct PlaybackFeatureTests {
       }
     }
 
-    await store.send(.playNow(items: firstItems, startIndex: 0)) {
-      $0.pendingPlayNowItems = firstItems
-      $0.session = .init(playStatus: .loading, queue: .init(items: firstItems))
+    await store.send(.playNow(items: firstItems, startIndex: 0, context: nil)) {
+      $0.pendingMetadataPlan = firstContextItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
+      $0.pendingPlayNowItems = firstContextItems
+      $0.session = .init(playStatus: .loading, queue: .init(items: firstContextItems))
     }
     await gate.waitUntilFirstStartBegins()
 
-    await store.send(.playNow(items: secondItems, startIndex: 0)) {
-      $0.pendingPlayNowItems = secondItems
-      $0.session = .init(playStatus: .loading, queue: .init(items: secondItems))
+    await store.send(.playNow(items: secondItems, startIndex: 0, context: nil)) {
+      $0.pendingMetadataPlan = secondContextItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
+      $0.pendingPlayNowItems = secondContextItems
+      $0.session = .init(playStatus: .loading, queue: .init(items: secondContextItems))
     }
     await store.receive(.playNowFinished(secondSnapshot)) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
-      $0.session = PlaybackFeature.Session(snapshot: secondSnapshot, sourceAlbumIDs: [:])
+      $0.queueRoleHints = roleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: secondSnapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
 
     await gate.releaseFirstStart()
@@ -632,8 +762,23 @@ struct PlaybackFeatureTests {
   @Test
   func queueEditCancelsInFlightPlayNow() async {
     let playNowItems = [playbackItem("first-1"), playbackItem("first-2")]
-    let queuedItem = playbackItem("queued")
-    let queuedSnapshot = playbackSnapshot(items: [queuedItem])
+    let contextItems = playNowItems.map { $0.withQueueRole(.context) }
+    let queuedItem = playbackItem("queued").withQueueRole(.queued)
+    let queuedSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "pending:0:first-1", item: playNowItems[0]),
+        .init(id: "queued-entry", item: queuedItem.withQueueRole(nil)),
+        .init(id: "pending:1:first-2", item: playNowItems[1]),
+      ],
+      currentEntryID: "pending:0:first-1",
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "pending:0:first-1": .context,
+      "queued-entry": .queued,
+      "pending:1:first-2": .context,
+    ]
     let gate = PlaybackStartGate()
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
@@ -645,19 +790,37 @@ struct PlaybackFeatureTests {
       }
     }
 
-    await store.send(.playNow(items: playNowItems, startIndex: 0)) {
-      $0.pendingPlayNowItems = playNowItems
-      $0.session = .init(playStatus: .loading, queue: .init(items: playNowItems))
+    await store.send(.playNow(items: playNowItems, startIndex: 0, context: nil)) {
+      $0.pendingMetadataPlan = contextItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
+      $0.pendingPlayNowItems = contextItems
+      $0.session = .init(playStatus: .loading, queue: .init(items: contextItems))
     }
     await gate.waitUntilFirstStartBegins()
 
     await store.send(.addToQueue([queuedItem])) {
+      $0.pendingMetadataPlan = [
+        .init(item: contextItems[0], retainedEntryID: "pending:0:first-1"),
+        .init(item: queuedItem),
+        .init(item: contextItems[1], retainedEntryID: "pending:1:first-2"),
+      ]
       $0.pendingPlayNowItems = nil
+      $0.queueRoleHints = [
+        "pending:0:first-1": .context,
+        "pending:1:first-2": .context,
+      ]
     }
     await store.receive(.playbackEvent(.snapshotChanged(queuedSnapshot))) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
-      $0.session = PlaybackFeature.Session(snapshot: queuedSnapshot, sourceAlbumIDs: [:])
+      $0.pendingMetadataPlan = nil
+      $0.queueRoleHints = roleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: queuedSnapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
 
     await gate.releaseFirstStart()
@@ -724,7 +887,7 @@ struct PlaybackFeatureTests {
       PlaybackFeature()
     }
 
-    await store.send(.playNow(items: [], startIndex: 0))
+    await store.send(.playNow(items: [], startIndex: 0, context: nil))
   }
 
   @Test
@@ -734,43 +897,109 @@ struct PlaybackFeatureTests {
       PlaybackFeature()
     }
 
-    await store.send(.playNow(items: items, startIndex: 1))
+    await store.send(.playNow(items: items, startIndex: 1, context: nil))
   }
 
   @Test
-  func queueInsertionCommandsUseRequestedMusicKitPositions() async {
-    let items = [playbackItem("track-1"), playbackItem("track-2")]
-    let insertedItem = playbackItem("track-3")
-    let snapshot = playbackSnapshot(items: items)
+  func queueInsertionCommandsUseManualQueueBoundaries() async {
+    let currentItem = playbackItem("current").withQueueRole(.context)
+    let contextItem = playbackItem("context").withQueueRole(.context)
+    let addedItem = playbackItem("added").withQueueRole(.queued)
+    let nextItem = playbackItem("next").withQueueRole(.queued)
+    let initialSnapshot = playbackSnapshot(items: [currentItem, contextItem])
+    let firstSnapshot = PlaybackSnapshot(
+      entries: [
+        initialSnapshot.entries[0],
+        .init(id: "added-entry", item: addedItem.withQueueRole(nil)),
+        initialSnapshot.entries[1],
+      ],
+      currentEntryID: initialSnapshot.currentEntryID,
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let secondSnapshot = PlaybackSnapshot(
+      entries: [
+        initialSnapshot.entries[0],
+        .init(id: "next-entry", item: nextItem.withQueueRole(nil)),
+        .init(id: "added-entry", item: addedItem.withQueueRole(nil)),
+        initialSnapshot.entries[1],
+      ],
+      currentEntryID: initialSnapshot.currentEntryID,
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let firstRoleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "added-entry": .queued,
+      "entry-1": .context,
+    ]
+    let secondRoleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "next-entry": .queued,
+      "added-entry": .queued,
+      "entry-1": .context,
+    ]
     let recorder = PlaybackQueueEditRecorder()
     let store = TestStore(initialState: .init(
-      session: PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:]),
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
       hasAuthoritativeSnapshot: true,
       lastCachedProgressBucket: 0,
     )) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.insertIntoQueue = { items, position in
-        await recorder.recordInsertion(items: items, position: position)
-        return snapshot
+      $0.playback.insertIntoQueue = { items, target in
+        let insertionCount = await recorder.recordInsertion(items: items, target: target)
+        return insertionCount == 1 ? firstSnapshot : secondSnapshot
       }
     }
 
-    await store.send(.addToQueue([insertedItem]))
-    await store.receive(.playbackEvent(.snapshotChanged(snapshot)))
-    await store.send(.playNext([insertedItem]))
-    await store.receive(.playbackEvent(.snapshotChanged(snapshot)))
+    await store.send(.addToQueue([addedItem])) {
+      $0.pendingMetadataPlan = [
+        .init(item: currentItem, retainedEntryID: "entry-0"),
+        .init(item: addedItem),
+        .init(item: contextItem, retainedEntryID: "entry-1"),
+      ]
+      $0.queueRoleHints = ["entry-0": .context, "entry-1": .context]
+    }
+    await store.receive(.playbackEvent(.snapshotChanged(firstSnapshot))) {
+      $0.pendingMetadataPlan = nil
+      $0.queueRoleHints = firstRoleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: firstSnapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: firstRoleHints,
+      )
+    }
+    await store.send(.playNext([nextItem])) {
+      $0.pendingMetadataPlan = [
+        .init(item: currentItem, retainedEntryID: "entry-0"),
+        .init(item: nextItem),
+        .init(item: addedItem, retainedEntryID: "added-entry"),
+        .init(item: contextItem, retainedEntryID: "entry-1"),
+      ]
+    }
+    await store.receive(.playbackEvent(.snapshotChanged(secondSnapshot))) {
+      $0.pendingMetadataPlan = nil
+      $0.queueRoleHints = secondRoleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: secondSnapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: secondRoleHints,
+      )
+    }
 
     #expect(await recorder.insertions == [
-      .init(items: [insertedItem], position: .tail),
-      .init(items: [insertedItem], position: .next),
+      .init(items: [addedItem], target: .before(initialSnapshot.entries[1])),
+      .init(items: [nextItem], target: .next),
     ])
   }
 
   @Test
   func addToQueueWithoutPlaybackShowsLoadingThenUsesMusicKitSnapshot() async {
     let item = playbackItem("track-1")
+    let queuedItem = item.withQueueRole(.queued)
     let snapshot = playbackSnapshot(items: [item])
+    let roleHints = ["entry-0": PlaybackQueueRole.queued]
     let store = TestStore(initialState: .init()) {
       PlaybackFeature()
     } withDependencies: {
@@ -778,55 +1007,31 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.addToQueue([item])) {
-      $0.session = .init(playStatus: .loading, currentItem: item)
+      $0.pendingMetadataPlan = [
+        PlaybackMetadataHintMatcher.Occurrence(item: queuedItem),
+      ]
+      $0.session = .init(playStatus: .loading, currentItem: queuedItem)
     }
     await store.receive(.playbackEvent(.snapshotChanged(snapshot))) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
-      $0.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+      $0.pendingMetadataPlan = nil
+      $0.queueRoleHints = roleHints
+      $0.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
   }
 
   @Test
-  func clearUpcomingPreservesCurrentPlayback() async {
-    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
-    let initialSnapshot = playbackSnapshot(
-      items: items,
-      currentIndex: 1,
-      progress: .init(elapsedTime: 42, duration: 180),
-    )
-    let updatedSnapshot = PlaybackSnapshot(
-      entries: Array(initialSnapshot.entries.prefix(2)),
-      currentEntryID: initialSnapshot.currentEntryID,
-      playStatus: .playing,
-      progress: initialSnapshot.progress,
-    )
-    let recorder = PlaybackQueueEditRecorder()
-    let store = TestStore(initialState: .init(
-      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
-      hasAuthoritativeSnapshot: true,
-      lastCachedProgressBucket: 8,
-      progress: initialSnapshot.progress,
-    )) {
-      PlaybackFeature()
-    } withDependencies: {
-      $0.playback.clearUpcoming = {
-        await recorder.recordClearUpcoming()
-        return updatedSnapshot
-      }
-    }
-
-    await store.send(.clearUpcomingButtonTapped)
-    await store.receive(.playbackEvent(.snapshotChanged(updatedSnapshot))) {
-      $0.session = PlaybackFeature.Session(snapshot: updatedSnapshot, sourceAlbumIDs: [:])
-    }
-
-    #expect(await recorder.clearUpcomingCount == 1)
-  }
-
-  @Test
-  func queueEntryRemovalUsesOccurrenceIdentity() async {
-    let items = [playbackItem("track-1"), playbackItem("track-1"), playbackItem("track-2")]
+  func clearQueueSendsTheCompleteRemainingTarget() async {
+    let items = [
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued").withQueueRole(.queued),
+      playbackItem("context").withQueueRole(.context),
+    ]
     let initialSnapshot = playbackSnapshot(items: items)
     let updatedSnapshot = PlaybackSnapshot(
       entries: [initialSnapshot.entries[0], initialSnapshot.entries[2]],
@@ -842,31 +1047,63 @@ struct PlaybackFeatureTests {
     )) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.removeQueueEntry = { entryID in
-        await recorder.recordRemoval(entryID: entryID)
+      $0.playback.setUpcoming = { entries in
+        await recorder.recordUpcomingUpdate(entries)
         return updatedSnapshot
       }
     }
+    store.exhaustivity = .off
 
-    await store.send(.queueEntryRemoveRequested("entry-1"))
-    await store.receive(.playbackEvent(.snapshotChanged(updatedSnapshot))) {
-      $0.session = PlaybackFeature.Session(snapshot: updatedSnapshot, sourceAlbumIDs: [:])
-    }
+    await store.send(.clearQueueButtonTapped)
+    await store.finish()
 
-    #expect(await recorder.removedEntryIDs == ["entry-1"])
+    let updates = await recorder.upcomingUpdates
+    expectNoDifference(
+      updates.map { $0.map(\.viewID) },
+      [["entry-2"]],
+    )
+    expectNoDifference(
+      store.state.session?.queue.upcomingEntries.map(\.viewID),
+      ["entry-2"],
+    )
   }
 
   @Test
-  func reorderUpcomingUsesMusicKitOccurrenceOrder() async {
-    let items = [playbackItem("track-1"), playbackItem("track-2"), playbackItem("track-3")]
-    let initialSnapshot = playbackSnapshot(items: items)
+  func queueEntryRemovalUsesStableIdentityAndPreservesDisplayedMetadata() async {
+    let currentItem = PlaybackItem(
+      id: "duplicate",
+      title: "Current",
+      artistName: "Artist",
+      artworkURL: URL(string: "https://example.com/current.jpg"),
+    )
+    let removedItem = PlaybackItem(
+      id: "duplicate",
+      title: "Duplicate",
+      artistName: "Artist",
+      artworkURL: URL(string: "https://example.com/duplicate.jpg"),
+    )
+    let retainedItem = PlaybackItem(
+      id: "retained",
+      title: "Retained",
+      artistName: "Artist",
+      artworkURL: URL(string: "https://example.com/retained.jpg"),
+    )
+    let initialSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "engine-current", item: currentItem, viewID: "stable-current"),
+        .init(id: "engine-duplicate", item: removedItem, viewID: "stable-duplicate"),
+        .init(id: "engine-retained", item: retainedItem, viewID: "stable-retained"),
+      ],
+      currentEntryID: "engine-current",
+      playStatus: .playing,
+      progress: .zero,
+    )
     let updatedSnapshot = PlaybackSnapshot(
       entries: [
-        initialSnapshot.entries[0],
-        initialSnapshot.entries[2],
-        initialSnapshot.entries[1],
+        .init(id: "new-current", item: playbackItem("duplicate")),
+        .init(id: "new-retained", item: playbackItem("retained")),
       ],
-      currentEntryID: initialSnapshot.currentEntryID,
+      currentEntryID: "new-current",
       playStatus: .playing,
       progress: .zero,
     )
@@ -878,18 +1115,488 @@ struct PlaybackFeatureTests {
     )) {
       PlaybackFeature()
     } withDependencies: {
-      $0.playback.reorderUpcoming = { entryIDs in
-        await recorder.recordReorder(entryIDs: entryIDs)
+      $0.playback.setUpcoming = { entries in
+        await recorder.recordUpcomingUpdate(entries)
         return updatedSnapshot
       }
     }
+    store.exhaustivity = .off
 
-    await store.send(.reorderUpcoming(["entry-2", "entry-1"]))
-    await store.receive(.playbackEvent(.snapshotChanged(updatedSnapshot))) {
-      $0.session = PlaybackFeature.Session(snapshot: updatedSnapshot, sourceAlbumIDs: [:])
+    await store.send(.queueEntryRemoveRequested("stable-duplicate"))
+    await store.finish()
+
+    let updates = await recorder.upcomingUpdates
+    expectNoDifference(
+      updates.map { $0.map(\.viewID) },
+      [["stable-retained"]],
+    )
+    expectNoDifference(store.state.session?.queue.entries.map(\.viewID), [
+      "stable-current",
+      "stable-retained",
+    ])
+    expectNoDifference(store.state.session?.queue.items.map(\.artworkURL), [
+      currentItem.artworkURL,
+      retainedItem.artworkURL,
+    ])
+  }
+
+  @Test
+  func crossingQueueBoundaryWithoutChangingOrderOnlyUpdatesRoles() async {
+    let items = [
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued-1").withQueueRole(.queued),
+      playbackItem("queued-2").withQueueRole(.queued),
+      playbackItem("context").withQueueRole(.context),
+    ]
+    let snapshot = playbackSnapshot(items: items)
+    let cacheRecorder = PlaybackSessionCacheRecorder()
+    let queueRecorder = PlaybackQueueEditRecorder()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { entries in
+        await queueRecorder.recordUpcomingUpdate(entries)
+        return snapshot
+      }
+      $0.playbackSessionCache._save = { checkpoint in
+        await cacheRecorder.record(checkpoint)
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-1", "entry-2", "entry-3"],
+      queuedEntryCount: 1,
+    ))
+    await store.finish()
+
+    let updates = await queueRecorder.upcomingUpdates
+    let checkpoint = await cacheRecorder.checkpoint
+    #expect(updates.isEmpty)
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.role), [
+      .queued,
+      .context,
+      .context,
+    ])
+    expectNoDifference(checkpoint?.queueRoles, [
+      .context,
+      .queued,
+      .context,
+      .context,
+    ])
+  }
+
+  @Test
+  func reorderUpcomingSendsCompleteTargetAndPreservesDisplayedMetadata() async {
+    let items = [
+      PlaybackItem(
+        id: "track-1",
+        title: "Track 1",
+        artistName: "Artist",
+        artworkURL: URL(string: "https://example.com/track-1.jpg"),
+      ),
+      PlaybackItem(
+        id: "track-2",
+        title: "Track 2",
+        artistName: "Artist",
+        artworkURL: URL(string: "https://example.com/track-2.jpg"),
+      ),
+      PlaybackItem(
+        id: "track-3",
+        title: "Track 3",
+        artistName: "Artist",
+        artworkURL: URL(string: "https://example.com/track-3.jpg"),
+      ),
+    ]
+    let initialSnapshot = playbackSnapshot(items: items)
+    let updatedSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "new-current", item: playbackItem("track-1")),
+        .init(id: "new-track-3", item: playbackItem("track-3")),
+        .init(id: "new-track-2", item: playbackItem("track-2")),
+      ],
+      currentEntryID: "new-current",
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let recorder = PlaybackQueueEditRecorder()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { entries in
+        await recorder.recordUpcomingUpdate(entries)
+        return updatedSnapshot
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-2", "entry-1"],
+      queuedEntryCount: 1,
+    ))
+    await store.finish()
+
+    let updates = await recorder.upcomingUpdates
+    expectNoDifference(
+      updates.map { $0.map(\.viewID) },
+      [["entry-2", "entry-1"]],
+    )
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-1",
+    ])
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.role), [
+      .queued,
+      .context,
+    ])
+    expectNoDifference(store.state.session?.queue.items.map(\.artworkURL), [
+      items[0].artworkURL,
+      items[2].artworkURL,
+      items[1].artworkURL,
+    ])
+  }
+
+  @Test
+  func movingANonBoundaryContextItemQueuesOnlyThatOccurrence() async {
+    let items = [
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued-1").withQueueRole(.queued),
+      playbackItem("queued-2").withQueueRole(.queued),
+      playbackItem("context-1").withQueueRole(.context),
+      playbackItem("context-2").withQueueRole(.context),
+      playbackItem("context-3").withQueueRole(.context),
+    ]
+    let initialSnapshot = playbackSnapshot(items: items)
+    let requestedViewIDs = ["entry-1", "entry-5", "entry-2", "entry-3", "entry-4"]
+    let updatedSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "new-current", item: playbackItem("current")),
+        .init(id: "new-queued-1", item: playbackItem("queued-1")),
+        .init(id: "new-context-3", item: playbackItem("context-3")),
+        .init(id: "new-queued-2", item: playbackItem("queued-2")),
+        .init(id: "new-context-1", item: playbackItem("context-1")),
+        .init(id: "new-context-2", item: playbackItem("context-2")),
+      ],
+      currentEntryID: "new-current",
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { _ in updatedSnapshot }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: requestedViewIDs,
+      queuedEntryCount: 3,
+    ))
+    await store.finish()
+
+    expectNoDifference(
+      store.state.session?.queue.upcomingEntries.map(\.viewID),
+      requestedViewIDs,
+    )
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.role), [
+      .queued,
+      .queued,
+      .queued,
+      .context,
+      .context,
+    ])
+  }
+
+  @Test
+  func staleSnapshotDoesNotUndoOptimisticQueueReorder() async {
+    let items = [
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued").withQueueRole(.queued),
+      playbackItem("context").withQueueRole(.context),
+    ]
+    let initialSnapshot = playbackSnapshot(items: items)
+    let updatedSnapshot = PlaybackSnapshot(
+      entries: [
+        initialSnapshot.entries[0],
+        initialSnapshot.entries[2],
+        initialSnapshot.entries[1],
+      ],
+      currentEntryID: initialSnapshot.currentEntryID,
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let gate = PlaybackStartGate()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { _ in
+        try await gate.start()
+        return updatedSnapshot
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-2", "entry-1"],
+      queuedEntryCount: 0,
+    ))
+    await gate.waitUntilFirstStartBegins()
+    await store.send(.playbackEvent(.snapshotChanged(initialSnapshot)))
+
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-1",
+    ])
+    expectNoDifference(store.state.pendingUpcomingViewIDs, ["entry-2", "entry-1"])
+
+    await gate.releaseFirstStart()
+    await store.receive(.playbackEvent(.snapshotChanged(updatedSnapshot)))
+    await store.finish()
+
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-1",
+    ])
+    #expect(store.state.pendingUpcomingViewIDs == nil)
+  }
+
+  @Test
+  func refreshedMusicKitIDsDoNotConfirmAnIntermediateOrder() async {
+    let items = [
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued").withQueueRole(.queued),
+      playbackItem("context").withQueueRole(.context),
+    ]
+    let initialSnapshot = playbackSnapshot(items: items)
+    let intermediateSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "new-current", item: playbackItem("current")),
+        .init(id: "new-queued", item: playbackItem("queued")),
+        .init(id: "new-context", item: playbackItem("context")),
+      ],
+      currentEntryID: "new-current",
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let updatedSnapshot = PlaybackSnapshot(
+      entries: [
+        intermediateSnapshot.entries[0],
+        intermediateSnapshot.entries[2],
+        intermediateSnapshot.entries[1],
+      ],
+      currentEntryID: intermediateSnapshot.currentEntryID,
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let gate = PlaybackStartGate()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { _ in
+        try await gate.start()
+        return intermediateSnapshot
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-2", "entry-1"],
+      queuedEntryCount: 0,
+    ))
+    await gate.waitUntilFirstStartBegins()
+    await gate.releaseFirstStart()
+    await store.receive(.playbackEvent(.snapshotChanged(intermediateSnapshot)))
+
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-1",
+    ])
+    expectNoDifference(store.state.pendingUpcomingViewIDs, ["entry-2", "entry-1"])
+
+    await store.send(.playbackEvent(.snapshotChanged(updatedSnapshot)))
+
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-1",
+    ])
+    #expect(store.state.pendingUpcomingViewIDs == nil)
+  }
+
+  @Test
+  func boundaryChangeKeepsTheInFlightPhysicalOrderUpdate() async {
+    let items = [
+      playbackItem("current").withQueueRole(.context),
+      playbackItem("queued").withQueueRole(.queued),
+      playbackItem("context").withQueueRole(.context),
+    ]
+    let initialSnapshot = playbackSnapshot(items: items)
+    let updatedSnapshot = PlaybackSnapshot(
+      entries: [
+        initialSnapshot.entries[0],
+        initialSnapshot.entries[2],
+        initialSnapshot.entries[1],
+      ],
+      currentEntryID: initialSnapshot.currentEntryID,
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let gate = PlaybackStartGate()
+    let recorder = PlaybackQueueEditRecorder()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { entries in
+        await recorder.recordUpcomingUpdate(entries)
+        try await gate.start()
+        return updatedSnapshot
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-2", "entry-1"],
+      queuedEntryCount: 0,
+    ))
+    await gate.waitUntilFirstStartBegins()
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-2", "entry-1"],
+      queuedEntryCount: 1,
+    ))
+
+    expectNoDifference(store.state.pendingUpcomingViewIDs, ["entry-2", "entry-1"])
+    let updatesBeforeCompletion = await recorder.upcomingUpdates
+    #expect(updatesBeforeCompletion.count == 1)
+
+    await gate.releaseFirstStart()
+    await store.receive(.playbackEvent(.snapshotChanged(updatedSnapshot)))
+    await store.finish()
+
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-1",
+    ])
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.role), [
+      .queued,
+      .context,
+    ])
+  }
+
+  @Test
+  func newerReorderReplacesTheInFlightTarget() async {
+    let items = [
+      playbackItem("current"),
+      playbackItem("first"),
+      playbackItem("second"),
+      playbackItem("third"),
+    ]
+    let initialSnapshot = playbackSnapshot(items: items)
+    let gate = PlaybackStartGate()
+    let recorder = PlaybackQueueEditRecorder()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:]),
+      hasAuthoritativeSnapshot: true,
+      lastCachedProgressBucket: 0,
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { entries in
+        await recorder.recordUpcomingUpdate(entries)
+        try await gate.start()
+        return PlaybackSnapshot(
+          entries: [initialSnapshot.entries[0]] + entries,
+          currentEntryID: initialSnapshot.currentEntryID,
+          playStatus: .playing,
+          progress: .zero,
+        )
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-3", "entry-1", "entry-2"],
+      queuedEntryCount: 1,
+    ))
+    await gate.waitUntilFirstStartBegins()
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-2", "entry-3", "entry-1"],
+      queuedEntryCount: 2,
+    ))
+    await store.finish()
+
+    let updates = await recorder.upcomingUpdates
+    expectNoDifference(
+      updates.map { $0.map(\.viewID) },
+      [
+        ["entry-3", "entry-1", "entry-2"],
+        ["entry-2", "entry-3", "entry-1"],
+      ],
+    )
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.viewID), [
+      "entry-2",
+      "entry-3",
+      "entry-1",
+    ])
+    expectNoDifference(store.state.session?.queue.upcomingEntries.map(\.role), [
+      .queued,
+      .queued,
+      .context,
+    ])
+  }
+
+  @Test
+  func reorderRequiresEveryStableOccurrenceExactlyOnce() async {
+    let snapshot = playbackSnapshot(items: [
+      playbackItem("current"),
+      playbackItem("first"),
+      playbackItem("second"),
+    ])
+    let recorder = PlaybackQueueEditRecorder()
+    let store = TestStore(initialState: .init(
+      session: PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:]),
+    )) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { entries in
+        await recorder.recordUpcomingUpdate(entries)
+        return snapshot
+      }
     }
 
-    #expect(await recorder.reorderedEntryIDs == [["entry-2", "entry-1"]])
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-1", "entry-1"],
+      queuedEntryCount: 1,
+    ))
+    await store.send(.reorderUpcoming(
+      entryViewIDs: ["entry-1", "entry-2"],
+      queuedEntryCount: 3,
+    ))
+
+    let updates = await recorder.upcomingUpdates
+    #expect(updates.isEmpty)
   }
 
   @Test
@@ -901,13 +1608,18 @@ struct PlaybackFeatureTests {
     }
 
     let item = playbackItem("track-1")
+    let contextItem = item.withQueueRole(.context)
 
-    await store.send(.playNow(items: [item], startIndex: 0)) {
-      $0.pendingPlayNowItems = [item]
-      $0.session = .init(playStatus: .loading, currentItem: item)
+    await store.send(.playNow(items: [item], startIndex: 0, context: nil)) {
+      $0.pendingMetadataPlan = [
+        PlaybackMetadataHintMatcher.Occurrence(item: contextItem),
+      ]
+      $0.pendingPlayNowItems = [contextItem]
+      $0.session = .init(playStatus: .loading, currentItem: contextItem)
     }
     await store.receive(.playbackFailed(.init(failure: .musicAccessDenied))) {
       $0.failure = .musicAccessDenied
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
       $0.session?.playStatus = .paused
     }
@@ -925,15 +1637,20 @@ struct PlaybackFeatureTests {
     }
 
     let item = playbackItem("track-1")
+    let contextItem = item.withQueueRole(.context)
 
-    await store.send(.playNow(items: [item], startIndex: 0)) {
-      $0.pendingPlayNowItems = [item]
-      $0.session = .init(playStatus: .loading, currentItem: item)
+    await store.send(.playNow(items: [item], startIndex: 0, context: nil)) {
+      $0.pendingMetadataPlan = [
+        PlaybackMetadataHintMatcher.Occurrence(item: contextItem),
+      ]
+      $0.pendingPlayNowItems = [contextItem]
+      $0.session = .init(playStatus: .loading, currentItem: contextItem)
     }
     await store.receive(
       .playbackFailed(.init(failure: .appleMusicSignInRequired, diagnostic: diagnostic)),
     ) {
       $0.failure = .appleMusicSignInRequired
+      $0.pendingMetadataPlan = nil
       $0.pendingPlayNowItems = nil
       $0.session?.playStatus = .paused
     }
@@ -1415,11 +2132,11 @@ struct PlaybackFeatureTests {
     await store.send(.restoreCachedSession)
     await store.receive(.checkpointLoaded(checkpoint)) {
       $0.isRestoringCheckpoint = true
-      $0.pendingPlaylistSourcePlan = zip(
+      $0.pendingMetadataPlan = zip(
         checkpoint.songIDs,
         checkpoint.playlistSourceHints,
       ).map { songID, source in
-        PlaybackSourceHintMatcher.Occurrence(item: PlaybackItem(
+        PlaybackMetadataHintMatcher.Occurrence(item: PlaybackItem(
           id: songID,
           title: "",
           artistName: "",
@@ -1434,7 +2151,7 @@ struct PlaybackFeatureTests {
     await store.receive(.playbackEvent(.snapshotChanged(snapshot))) {
       $0.hasAuthoritativeSnapshot = true
       $0.lastCachedProgressBucket = 0
-      $0.pendingPlaylistSourcePlan = nil
+      $0.pendingMetadataPlan = nil
       $0.playlistSourceHints = sourceHints
       $0.session = PlaybackFeature.Session(
         snapshot: snapshot,
@@ -1653,31 +2370,22 @@ private actor PlaybackSessionCacheRecorder {
 private actor PlaybackQueueEditRecorder {
   struct Insertion: Equatable {
     var items: [PlaybackItem]
-    var position: PlaybackQueueInsertionPosition
+    var target: PlaybackQueueInsertionTarget
   }
 
-  var clearUpcomingCount = 0
   var insertions: [Insertion] = []
-  var removedEntryIDs: [PlaybackQueueEntry.ID] = []
-  var reorderedEntryIDs: [[PlaybackQueueEntry.ID]] = []
-
-  func recordClearUpcoming() {
-    self.clearUpcomingCount += 1
-  }
+  var upcomingUpdates: [[PlaybackQueueEntry]] = []
 
   func recordInsertion(
     items: [PlaybackItem],
-    position: PlaybackQueueInsertionPosition,
-  ) {
-    self.insertions.append(.init(items: items, position: position))
+    target: PlaybackQueueInsertionTarget,
+  ) -> Int {
+    self.insertions.append(.init(items: items, target: target))
+    return self.insertions.count
   }
 
-  func recordRemoval(entryID: PlaybackQueueEntry.ID) {
-    self.removedEntryIDs.append(entryID)
-  }
-
-  func recordReorder(entryIDs: [PlaybackQueueEntry.ID]) {
-    self.reorderedEntryIDs.append(entryIDs)
+  func recordUpcomingUpdate(_ entries: [PlaybackQueueEntry]) {
+    self.upcomingUpdates.append(entries)
   }
 }
 

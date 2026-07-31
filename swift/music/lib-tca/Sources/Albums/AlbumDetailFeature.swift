@@ -8,6 +8,7 @@ struct AlbumDetailFeature {
     let transitionSourceID: String?
     var playStatus: PlaybackFeature.PlayStatus?
     var currentTrackID: ApprovedTrack.ID?
+    var currentTrackPlayStatus: PlaybackFeature.PlayStatus?
     var playbackFailure: PlaybackFailure?
 
     init(
@@ -15,12 +16,14 @@ struct AlbumDetailFeature {
       transitionSourceID: String? = nil,
       playStatus: PlaybackFeature.PlayStatus? = nil,
       currentTrackID: ApprovedTrack.ID? = nil,
+      currentTrackPlayStatus: PlaybackFeature.PlayStatus? = nil,
       playbackFailure: PlaybackFailure? = nil,
     ) {
       self.album = album
       self.transitionSourceID = transitionSourceID
       self.playStatus = playStatus
       self.currentTrackID = currentTrackID
+      self.currentTrackPlayStatus = currentTrackPlayStatus ?? playStatus
       self.playbackFailure = playbackFailure
     }
   }
@@ -65,7 +68,7 @@ struct AlbumDetailFeature {
         return .send(.delegate(.playNext(items: state.playbackItems)))
 
       case .playTapped:
-        if state.currentTrackID != nil {
+        if state.playStatus != nil {
           return .send(.delegate(.togglePlayPause))
         }
 
@@ -127,6 +130,10 @@ extension AlbumDetailFeature.State {
     self.playStatus == .loading
   }
 
+  var isCurrentTrackPlaying: Bool {
+    self.currentTrackPlayStatus == .playing
+  }
+
   var playbackItems: [PlaybackItem] {
     self.tracks.map { PlaybackItem(
       track: $0,
@@ -139,16 +146,26 @@ extension AlbumDetailFeature.State {
     self.playbackFailure = failure
   }
 
-  mutating func setPlaybackSession(_ session: PlaybackFeature.Session?) {
-    guard let session,
-          self.tracks.contains(where: { $0.id == session.currentTrackID })
-    else {
+  mutating func setPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext? = nil,
+  ) {
+    guard let session else {
       self.playStatus = nil
       self.currentTrackID = nil
+      self.currentTrackPlayStatus = nil
       return
     }
 
-    self.playStatus = session.playStatus
-    self.currentTrackID = session.currentTrackID
+    if self.tracks.contains(where: { $0.id == session.currentTrackID }) {
+      self.currentTrackID = session.currentTrackID
+      self.currentTrackPlayStatus = session.playStatus
+    } else {
+      self.currentTrackID = nil
+      self.currentTrackPlayStatus = nil
+    }
+    self.playStatus = activeContext?.identity == .album(self.album.id)
+      ? session.playStatus
+      : nil
   }
 }

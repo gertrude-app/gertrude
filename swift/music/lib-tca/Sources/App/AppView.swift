@@ -52,6 +52,7 @@ struct AppView: View {
     LibraryViewContainer(
       store: self.store.scope(state: \.library, action: \.library),
       currentTrackID: self.store.playback.session?.currentTrackID,
+      activePlaybackContext: self.store.playback.activePlaybackContext,
       isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
       isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
     )
@@ -160,15 +161,21 @@ struct AppView: View {
         if let session = self.store.playback.session {
           PlaybackQueueView(
             currentEntry: session.queue.currentEntry.viewData,
-            upcomingEntries: session.queue.upcomingEntries.map(\.viewData),
-            onClearUpcoming: {
-              self.store.send(.playback(.clearUpcomingButtonTapped))
+            queuedEntries: session.queue.queuedEntries.map(\.viewData),
+            contextTitle: self.store.playback.playbackContext?.title,
+            contextEntries: session.queue.contextEntries.map(\.viewData),
+            isPlaying: session.isPlaying,
+            onClearQueue: {
+              self.store.send(.playback(.clearQueueButtonTapped))
             },
             onRemove: {
               self.store.send(.playback(.queueEntryRemoveRequested($0)))
             },
-            onReorder: {
-              self.store.send(.playback(.reorderUpcoming($0)))
+            onReorder: { order in
+              self.store.send(.playback(.reorderUpcoming(
+                entryViewIDs: order.entryIDs,
+                queuedEntryCount: order.queuedEntryCount,
+              )))
             },
           )
         } else {
@@ -192,6 +199,7 @@ struct AppView: View {
         store: self.store.scope(state: \.search, action: \.search),
         library: self.approvedLibrary,
         currentTrackID: self.store.playback.session?.currentTrackID,
+        activePlaybackContext: self.store.playback.activePlaybackContext,
         isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
         isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
         isPlaylistMutationInFlight: self.store.library.isPlaylistMutationInFlight,
@@ -366,7 +374,7 @@ struct AppView: View {
 private extension PlaybackQueueEntry {
   var viewData: PlaybackQueueEntryData {
     PlaybackQueueEntryData(
-      id: self.id,
+      id: self.viewID,
       title: self.item.title,
       artist: self.item.artistName,
       artworkURL: self.item.artworkURL,

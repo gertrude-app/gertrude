@@ -47,6 +47,48 @@ struct PlaylistDetailFeatureTests {
   }
 
   @Test
+  func manuallyQueuedEntryHighlightsWithoutClaimingPlaylistContext() async {
+    let playlist = self.musicPlaylist()
+    let state = PlaylistDetailFeature.State(playlist: playlist)
+    let item = state.playbackItems[0].withQueueRole(.queued)
+    var synchronizedState = state
+    synchronizedState.setPlaybackSession(
+      .init(currentItem: item),
+      activeContext: nil,
+    )
+
+    #expect(synchronizedState.currentEntryID == playlist.entries[0].id)
+    #expect(synchronizedState.isCurrentTrackPlaying)
+    #expect(!synchronizedState.isPlaying)
+
+    let store = TestStore(initialState: synchronizedState) {
+      PlaylistDetailFeature()
+    }
+    await store.send(.playTapped)
+    await store.receive(.delegate(.playNow(
+      items: state.playbackItems,
+      startIndex: 0,
+    )))
+  }
+
+  @Test
+  func albumPlaybackHighlightsTrackWithoutClaimingPlaylistContext() {
+    let playlist = self.musicPlaylist()
+    var state = PlaylistDetailFeature.State(playlist: playlist)
+    state.setPlaybackSession(
+      .init(currentItem: playbackItem("duplicate").withQueueRole(.context)),
+      activeContext: PlaybackContext(
+        identity: .init(kind: .album, id: "album"),
+        title: "Album",
+      ),
+    )
+
+    #expect(state.currentEntryID == playlist.entries[0].id)
+    #expect(state.isCurrentTrackPlaying)
+    #expect(!state.isPlaying)
+  }
+
+  @Test
   func playbackFailureActionsDelegateToApp() async {
     let store = TestStore(initialState: PlaylistDetailFeature.State(
       playlist: self.musicPlaylist(),
