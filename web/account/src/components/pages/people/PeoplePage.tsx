@@ -1,5 +1,11 @@
 import { Card, EmptyState, PageHeading, Skeleton, Stack, VStack } from '@gertrude/ui';
-import { CircleAlertIcon, RefreshCwIcon, ScanEyeIcon, UsersIcon } from 'lucide-react';
+import {
+  CircleAlertIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  ScanEyeIcon,
+  UsersIcon,
+} from 'lucide-react';
 import React from 'react';
 import type {
   LoadableState,
@@ -17,6 +23,7 @@ interface Props {
   suspensionRequestsState: LoadableState<SuspensionRequest[]>;
   onRefreshSuspensionRequests: () => void;
   refreshingSuspensionRequests?: boolean;
+  addPersonHref: string;
   suspensionRequestsHref: string;
   suspensionRequestHrefForRequest: (id: string) => string;
   monitorHref: string;
@@ -65,12 +72,14 @@ const PeopleLoadingState: React.FC = () => (
 
 interface PeopleContentProps {
   state: LoadableState<PersonCardPerson[]>;
+  addPersonHref: string;
   settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
 }
 
 const PeopleContent: React.FC<PeopleContentProps> = ({
   state,
+  addPersonHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
 }) => {
@@ -94,6 +103,13 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
         icon={UsersIcon}
         title="No protected people"
         description="No one has been added to this account yet."
+        button={{
+          text: `Add Person`,
+          type: `link`,
+          href: addPersonHref,
+          icon: PlusIcon,
+          variant: `primary`,
+        }}
         className="bg-white"
       />
     );
@@ -170,6 +186,7 @@ const PeoplePage: React.FC<Props> = ({
   suspensionRequestsState,
   onRefreshSuspensionRequests,
   refreshingSuspensionRequests,
+  addPersonHref,
   suspensionRequestsHref,
   suspensionRequestHrefForRequest,
   monitorHref,
@@ -181,6 +198,12 @@ const PeoplePage: React.FC<Props> = ({
       <PageHeading
         title="Protected People"
         buttons={[
+          {
+            text: `Add Person`,
+            href: addPersonHref,
+            variant: `secondary`,
+            icon: PlusIcon,
+          },
           {
             text: `Monitor`,
             href: monitorHref,
@@ -195,6 +218,7 @@ const PeoplePage: React.FC<Props> = ({
       <CardContainer className="flex flex-grow flex-col gap-4 @xl/main:gap-6">
         <PeopleContent
           state={peopleState}
+          addPersonHref={addPersonHref}
           settingsHrefForPerson={settingsHrefForPerson}
           monitorHrefForPerson={monitorHrefForPerson}
         />

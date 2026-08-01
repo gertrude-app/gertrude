@@ -11,6 +11,7 @@ const preview: Preview = {
     },
     screenshotViewports: {
       mobile: { width: 390, height: 844 },
+      medium: { width: 600, height: 900 },
       tablet: { width: 768, height: 1024 },
       desktop: { width: 1440, height: 900 },
     },

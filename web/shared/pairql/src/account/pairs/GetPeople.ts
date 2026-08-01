@@ -1,10 +1,13 @@
 // auto-generated, do not edit
+import type { PersonRelationship } from '../shared';
+
 export namespace GetPeople {
   export type Input = void;
 
   export type Output = Array<{
     id: UUID;
     name: string;
+    relationship: PersonRelationship;
     devices: Array<
       | {
           case: 'mac';

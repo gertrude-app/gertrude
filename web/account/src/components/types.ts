@@ -1,5 +1,8 @@
+import type { PersonRelationship } from '@shared/pairql/src/account';
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
+
+export type { PersonRelationship };
 
 export type LoadableState<Data> =
   | { status: `loading` }
@@ -29,6 +32,7 @@ export type Device =
 export type PersonCardPerson = {
   id: string;
   name: string;
+  relationship: PersonRelationship;
   devices: Device[];
   screenshot: {
     url: string;

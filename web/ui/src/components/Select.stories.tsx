@@ -186,6 +186,8 @@ export const OpenMenu: Story = {
               label: `Weekend`,
               description: `Loosen restrictions for Saturday and Sunday.`,
               icon: CalendarDaysIcon,
+              disabled: true,
+              disabledTooltip: `Weekend access is unavailable for this profile.`,
             },
           ]}
         />

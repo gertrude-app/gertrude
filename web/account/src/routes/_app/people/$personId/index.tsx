@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import React from 'react';
+import type { PersonRelationship } from '#/components/types';
 import PersonBasicSettingsPage from '#/components/pages/people/PersonBasicSettingsPage';
 import { toPersonCardPerson } from '#/lib/people';
 import { liveClient } from '#/pairql/client';
@@ -15,15 +16,25 @@ const PersonBasicSettingsRoute: React.FC = () => {
     (candidate) => candidate.id.toLowerCase() === personId.toLowerCase(),
   );
   const person = personData ? toPersonCardPerson(personData) : undefined;
+  const selfRelationshipUnavailable =
+    peopleQuery.data?.some(
+      (candidate) =>
+        candidate.relationship === `self` &&
+        candidate.id.toLowerCase() !== personId.toLowerCase(),
+    ) ?? false;
   const resolvedPersonId = person?.id;
   const personName = person?.name;
+  const personRelationship = person?.relationship;
   const [nameDraft, setNameDraft] = React.useState(personName ?? ``);
-  const updateName = useMutation(liveClient.updatePersonName, {
+  const [relationshipDraft, setRelationshipDraft] = React.useState<PersonRelationship>(
+    personRelationship ?? `child`,
+  );
+  const updateDetails = useMutation(liveClient.updatePersonBasicDetails, {
     invalidating: [Key.people],
     toast: {
-      loading: `Saving name…`,
-      success: `Name updated`,
-      error: `Failed to update name`,
+      loading: `Saving details…`,
+      success: `Details updated`,
+      error: `Failed to update details`,
     },
   });
   const deletePerson = useMutation(liveClient.deletePerson, {
@@ -42,6 +53,12 @@ const PersonBasicSettingsRoute: React.FC = () => {
     }
   }, [resolvedPersonId, personName]);
 
+  React.useEffect(() => {
+    if (personRelationship !== undefined) {
+      setRelationshipDraft(personRelationship);
+    }
+  }, [resolvedPersonId, personRelationship]);
+
   if (!person) {
     return null;
   }
@@ -51,11 +68,19 @@ const PersonBasicSettingsRoute: React.FC = () => {
       personName={person.name}
       nameDraft={nameDraft}
       setNameDraft={setNameDraft}
+      relationship={person.relationship}
+      relationshipDraft={relationshipDraft}
+      setRelationshipDraft={setRelationshipDraft}
       devices={person.devices}
-      savingName={updateName.isPending}
+      savingDetails={updateDetails.isPending}
       deletingPerson={deletePerson.isPending}
-      onSaveName={() =>
-        updateName.mutate({ personId: person.id, name: nameDraft.trim() })
+      selfRelationshipUnavailable={selfRelationshipUnavailable}
+      onSaveDetails={() =>
+        updateDetails.mutate({
+          personId: person.id,
+          name: nameDraft,
+          relationship: relationshipDraft,
+        })
       }
       onDeletePerson={() =>
         deletePerson.mutateAsync({ personId: person.id }).then(

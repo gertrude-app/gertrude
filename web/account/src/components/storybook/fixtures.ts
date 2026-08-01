@@ -66,6 +66,7 @@ export const people: PersonCardPerson[] = [
   {
     id: `person-1`,
     name: `Jude`,
+    relationship: `child`,
     devices: devices.slice(0, 2),
     screenshot: {
       url: `/example-screenshots/kid-school.png`,
@@ -75,12 +76,14 @@ export const people: PersonCardPerson[] = [
   {
     id: `person-2`,
     name: `Mabel`,
+    relationship: `child`,
     devices: [ipadDevice],
     screenshot: null,
   },
   {
     id: `person-3`,
     name: `Caleb`,
+    relationship: `peer`,
     devices: [],
     screenshot: null,
   },

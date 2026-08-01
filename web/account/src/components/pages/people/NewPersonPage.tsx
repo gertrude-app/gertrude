@@ -1,16 +1,19 @@
 import { Banner, HStack, Input, Stack, VStack } from '@gertrude/ui';
+import cx from 'clsx';
 import { UserIcon } from 'lucide-react';
 import React from 'react';
+import type { PersonRelationship } from '#/components/types';
 import CreationFlowScreen from '#/components/people/CreationFlowScreen';
 import NewPersonRelationshipCard from '#/components/people/NewPersonRelationshipCard';
-
-export type PersonRelationship = `child` | `peer` | `self`;
+import { selfRelationshipUnavailableMessage } from '#/lib/people';
 
 interface Props {
   relationship: PersonRelationship | null;
   setRelationship: (relationship: PersonRelationship) => void;
   name: string;
   setName: (name: string) => void;
+  creating?: boolean;
+  selfRelationshipUnavailable?: boolean;
   onFinish: () => void;
 }
 
@@ -19,6 +22,8 @@ const NewPersonPage: React.FC<Props> = ({
   setRelationship,
   name,
   setName,
+  creating = false,
+  selfRelationshipUnavailable = false,
   onFinish,
 }) => {
   const personLabel =
@@ -34,7 +39,7 @@ const NewPersonPage: React.FC<Props> = ({
         {
           title: `What is this person's relationship to you?`,
           element: (
-            <VStack gap={4}>
+            <VStack>
               <Stack
                 direction={{ default: `vertical`, '@lg/main': `horizontal` }}
                 gap={{ default: 2, '@lg/main': 4 }}
@@ -52,7 +57,7 @@ const NewPersonPage: React.FC<Props> = ({
                   onClick={() => setRelationship(`child`)}
                 />
                 <NewPersonRelationshipCard
-                  title="A peer or accountability partner"
+                  title="A spouse, friend, or peer"
                   icon={
                     <HStack>
                       <UserIcon className="w-8 h-8" />
@@ -66,30 +71,71 @@ const NewPersonPage: React.FC<Props> = ({
                   title="Yourself"
                   icon={<UserIcon className="w-8 h-8" />}
                   selected={relationship === `self`}
+                  disabled={selfRelationshipUnavailable}
+                  disabledTooltip={
+                    selfRelationshipUnavailable
+                      ? selfRelationshipUnavailableMessage
+                      : undefined
+                  }
                   onClick={() => setRelationship(`self`)}
                 />
               </Stack>
-              {relationship === `self` && (
-                <Banner variant="warning">
-                  By far the best way to protect and help yourself is by having someone
-                  you trust that will keep you accountable, monitor your activity, and
-                  manage your internet access. Gertrude is designed to work in this way.
-                  If you don't have somebody like this in your life, call the Gertrude
-                  hotline at 1-800-GERTRUDE and we'll help you out.
-                </Banner>
-              )}
+              <div
+                aria-hidden={relationship !== `self`}
+                className={cx(
+                  `grid transition-[grid-template-rows] ease-out motion-reduce:transition-none motion-reduce:delay-0`,
+                  relationship === `self`
+                    ? `grid-rows-[1fr] duration-150 delay-0`
+                    : `pointer-events-none grid-rows-[0fr] duration-100 delay-100`,
+                )}
+              >
+                <div className="min-h-0">
+                  <div
+                    className={cx(
+                      `pt-4 transition-[opacity,translate] duration-100 ease-out motion-reduce:transition-none motion-reduce:delay-0`,
+                      relationship === `self`
+                        ? `translate-y-0 opacity-100 delay-100`
+                        : `-translate-y-1 opacity-0 delay-0`,
+                    )}
+                  >
+                    <Banner variant="warning">
+                      Gertrude works best when someone you trust manages your settings and
+                      reviews your activity. You can continue setting it up for yourself,
+                      but consider asking a trusted person to manage your account.
+                    </Banner>
+                  </div>
+                </div>
+              </div>
             </VStack>
           ),
-          nextEnabled: relationship !== null,
+          nextEnabled:
+            relationship !== null &&
+            !(relationship === `self` && selfRelationshipUnavailable),
         },
         {
           title: `What is ${personLabel} name?`,
-          element: <Input type="text" value={name} setValue={setName} />,
-          nextEnabled: name.length > 0,
+          element: (
+            <>
+              <label htmlFor="new-person-name" className="sr-only">
+                Name
+              </label>
+              <Input
+                id="new-person-name"
+                name="personName"
+                type="text"
+                value={name}
+                setValue={setName}
+                required
+                disabled={creating}
+              />
+            </>
+          ),
+          nextEnabled: name.trim().length > 0,
         },
       ]}
       finishText="Add Person"
       onFinish={onFinish}
+      finishing={creating}
     />
   );
 };

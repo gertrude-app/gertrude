@@ -19,6 +19,7 @@ enum AccountTsCodegenRoute {
       ("ServerPqlError", PqlError.self),
       ("SuccessOutput", SuccessOutput.self),
       ("ClientAuth", ClientAuth.self),
+      ("PersonRelationship", Child.Relationship.self),
     ]
   }
 
@@ -28,7 +29,8 @@ enum AccountTsCodegenRoute {
       AccountRequestMagicLink.self,
       AccountLoginMagicLink.self,
       GetPeople.self,
-      UpdatePersonName.self,
+      CreatePerson.self,
+      UpdatePersonBasicDetails.self,
       DeletePerson.self,
       GetSuspensionRequests.self,
       DecideSuspensionRequest.self,
