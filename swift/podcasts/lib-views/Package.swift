@@ -7,6 +7,7 @@ let package = Package(
   platforms: [.macOS(.v15), .iOS(.v17)],
   products: [.library(name: "LibViews", targets: ["LibViews"])],
   dependencies: [
+    .package(path: "../../gertie-ui"),
     .package(path: "../lib-core"),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
   ],
@@ -14,6 +15,7 @@ let package = Package(
     .target(
       name: "LibViews",
       dependencies: [
+        .product(name: "GertieUI", package: "gertie-ui"),
         .product(name: "LibCore", package: "lib-core"),
       ],
       exclude: ["FakeEntry.swift"],

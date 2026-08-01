@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieUI
 import LibViews
 import SwiftUI
 
@@ -26,14 +27,16 @@ struct PinResetView: View {
           onPrepHaptics: self.haptics.prepare,
         )
       case .unclaimed:
-        ButtonScreenView(
-          text: lstr(.pinResetUnavailableBody),
-          primary: .init(
-            text: lstr(.pinResetContactSupport),
-            type: .link(URL(string: "https://gertrude.app/contact")!),
-          ),
-          secondary: .init(lstr(.pinCancel), animate: false) { self.store.send(.cancelTapped) },
-          screenType: .info,
+        GertieActionScreen(
+          message: lstr(.pinResetUnavailableBody),
+          icon: .info,
+          actions: [
+            .link(
+              lstr(.pinResetContactSupport),
+              destination: URL(string: "https://gertrude.app/contact")!,
+            ),
+            .button(lstr(.pinCancel)) { self.store.send(.cancelTapped) },
+          ],
         )
       }
     }
@@ -42,26 +45,30 @@ struct PinResetView: View {
 }
 
 #Preview("PIN recovery unavailable") {
-  ButtonScreenView(
-    text: lstr(.pinResetUnavailableBody),
-    primary: .init(
-      text: lstr(.pinResetContactSupport),
-      type: .link(URL(string: "https://gertrude.app/contact")!),
-    ),
-    secondary: .init(lstr(.pinCancel), animate: false) {},
-    screenType: .info,
+  GertieActionScreen(
+    message: lstr(.pinResetUnavailableBody),
+    icon: .info,
+    actions: [
+      .link(
+        lstr(.pinResetContactSupport),
+        destination: URL(string: "https://gertrude.app/contact")!,
+      ),
+      .button(lstr(.pinCancel)) {},
+    ],
   )
 }
 
 #Preview("PIN recovery unavailable (dark)") {
-  ButtonScreenView(
-    text: lstr(.pinResetUnavailableBody),
-    primary: .init(
-      text: lstr(.pinResetContactSupport),
-      type: .link(URL(string: "https://gertrude.app/contact")!),
-    ),
-    secondary: .init(lstr(.pinCancel), animate: false) {},
-    screenType: .info,
+  GertieActionScreen(
+    message: lstr(.pinResetUnavailableBody),
+    icon: .info,
+    actions: [
+      .link(
+        lstr(.pinResetContactSupport),
+        destination: URL(string: "https://gertrude.app/contact")!,
+      ),
+      .button(lstr(.pinCancel)) {},
+    ],
   )
   .preferredColorScheme(.dark)
 }

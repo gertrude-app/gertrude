@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct PinCodeView: View {
@@ -157,13 +158,10 @@ public struct PinCodeView: View {
       Spacer()
 
       if let onCancel = self.onCancel {
-        BigButton(
-          lstr(.pinCancel),
-          type: .button(onCancel),
-          variant: .secondary,
-        )
-        .padding(.horizontal, 30)
-        .padding(.bottom, 30)
+        Button(lstr(.pinCancel), action: onCancel)
+          .buttonStyle(.gertieSecondary)
+          .padding(.horizontal, 30)
+          .padding(.bottom, 30)
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

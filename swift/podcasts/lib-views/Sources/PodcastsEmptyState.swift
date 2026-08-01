@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct PodcastsEmptyState: View {
@@ -31,12 +32,13 @@ public struct PodcastsEmptyState: View {
 
       Spacer()
 
-      BigButton(
-        lstr(.showsAddShow),
-        type: .button(self.onAddShowTap),
-        variant: .primary,
-        icon: "plus",
-      )
+      Button(action: self.onAddShowTap) {
+        HStack(spacing: 8) {
+          Text(lstr(.showsAddShow))
+          Image(systemName: "plus")
+        }
+      }
+      .buttonStyle(.gertiePrimary)
       .padding(.horizontal, 30)
       .padding(.bottom, 30)
     }

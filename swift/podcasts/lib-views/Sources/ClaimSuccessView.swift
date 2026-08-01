@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct ClaimSuccessView: View {
@@ -40,9 +41,7 @@ public struct ClaimSuccessView: View {
     VStack(spacing: 24) {
       Spacer()
 
-      Image(systemName: "checkmark.circle.fill")
-        .font(.system(size: 60, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+      GertieScreenIconBadge(systemName: "checkmark.circle.fill")
 
       VStack(spacing: 8) {
         Text(self.isTerminal ? lstr(.claimSuccessTerminalTitle) : lstr(.claimSuccessNeutralTitle))
@@ -67,11 +66,10 @@ public struct ClaimSuccessView: View {
 
       Spacer()
 
-      BigButton(
-        self.buttonLabel ?? (self.isTerminal ? lstr(.claimDone) : lstr(.claimNext)),
-        type: .button { self.onEvent(.continueTapped) },
-        variant: .primary,
-      )
+      Button(self.buttonLabel ?? (self.isTerminal ? lstr(.claimDone) : lstr(.claimNext))) {
+        self.onEvent(.continueTapped)
+      }
+      .buttonStyle(.gertiePrimary)
     }
     .frame(maxWidth: 500)
     .padding(30)

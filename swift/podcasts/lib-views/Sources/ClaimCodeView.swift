@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct ClaimCodeView: View {
@@ -33,10 +34,7 @@ public struct ClaimCodeView: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Image(systemName: "link.circle")
-        .font(.system(size: 40, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-        .frame(maxWidth: .infinity, alignment: .center)
+      GertieScreenIconBadge(systemName: "link.circle")
 
       Spacer()
 
@@ -47,7 +45,7 @@ public struct ClaimCodeView: View {
         Spacer()
         Spacer()
 
-        WaitingStatus(label: lstr(.claimCodeWatching), delay: self.statusDelay)
+        GertieWaitingStatus(label: lstr(.claimCodeWatching), delay: self.statusDelay)
 
         Spacer()
 
@@ -58,28 +56,27 @@ public struct ClaimCodeView: View {
       }
 
       if self.failed || self.code != nil {
-        BigButton(
-          self.dismissLabel,
-          type: .button { self.onEvent(.dismissTapped) },
-          variant: .secondary,
-        )
+        Button(self.dismissLabel) {
+          self.onEvent(.dismissTapped)
+        }
+        .buttonStyle(.gertieSecondary)
       }
 
       if !self.failed, let code = self.code {
-        BigButton(
-          lstr(.claimSendLink),
-          type: .share(self.claimUrl(code)),
-          variant: .primary,
-          icon: "square.and.arrow.up",
-        )
+        ShareLink(item: self.claimUrl(code)) {
+          HStack(spacing: 8) {
+            Text(lstr(.claimSendLink))
+            Image(systemName: "square.and.arrow.up")
+          }
+        }
+        .buttonStyle(.gertiePrimary)
       }
 
       if self.failed {
-        BigButton(
-          lstr(.claimTryAgain),
-          type: .button { self.onEvent(.retryTapped) },
-          variant: .primary,
-        )
+        Button(lstr(.claimTryAgain)) {
+          self.onEvent(.retryTapped)
+        }
+        .buttonStyle(.gertiePrimary)
       }
     }
     .frame(maxWidth: 500)

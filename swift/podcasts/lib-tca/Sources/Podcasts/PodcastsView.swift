@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieUI
 import LibViews
 import SQLiteData
 import SwiftUI
@@ -51,20 +52,13 @@ struct PodcastsView: View {
         action: \.destination.requestReview,
       ),
       content: { store in
-        ButtonScreenView(
-          text: lstr(.podcastsRequestReviewMessage),
-          primary: .init(
-            lstr(.podcastsRequestReviewGiveRating),
-            animate: false,
-          ) { store.send(.leaveRating) },
-          secondary: .init(
-            lstr(.podcastsRequestReviewLeaveReview),
-            animate: false,
-          ) { store.send(.leaveReview) },
-          tertiary: .init(
-            lstr(.podcastsRequestReviewNoThanks),
-            animate: false,
-          ) { store.send(.noThanks) },
+        GertieActionScreen(
+          message: lstr(.podcastsRequestReviewMessage),
+          actions: [
+            .button(lstr(.podcastsRequestReviewGiveRating)) { store.send(.leaveRating) },
+            .button(lstr(.podcastsRequestReviewLeaveReview)) { store.send(.leaveReview) },
+            .button(lstr(.podcastsRequestReviewNoThanks)) { store.send(.noThanks) },
+          ],
         )
       },
     )

@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct PinResetCodeView: View {
@@ -113,17 +114,16 @@ public struct PinResetCodeView: View {
             .multilineTextAlignment(.center)
         }
 
-        BigButton(
-          lstr(.pinResetContinue),
-          type: .button {
-            self.onSubmit(self.code ?? 0)
-            self.input = ""
-          },
-          disabled: self.code == nil,
-        )
+        Button(lstr(.pinResetContinue)) {
+          self.onSubmit(self.code ?? 0)
+          self.input = ""
+        }
+        .buttonStyle(.gertiePrimary)
+        .disabled(self.code == nil)
         .swooshIn(tracking: self.$buttonOffset, to: .zero, after: .seconds(0.3), for: .seconds(0.6))
 
-        BigButton(lstr(.pinCancel), type: .button(self.onCancel), variant: .secondary)
+        Button(lstr(.pinCancel), action: self.onCancel)
+          .buttonStyle(.gertieSecondary)
       }
       .padding(.horizontal, 30)
 
@@ -142,7 +142,8 @@ public struct PinResetCodeView: View {
         .multilineTextAlignment(.center)
         .padding(.horizontal, 60)
       Spacer()
-      BigButton(lstr(.pinCancel), type: .button(self.onCancel), variant: .secondary)
+      Button(lstr(.pinCancel), action: self.onCancel)
+        .buttonStyle(.gertieSecondary)
         .padding(.horizontal, 30)
         .padding(.bottom, 30)
     }

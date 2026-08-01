@@ -7,6 +7,7 @@ options:
     - en
     - es
     - Base
+  postGenCommand: python3 fix-gertie-ui-package-backlink.py GertiePodcasts.xcodeproj/project.pbxproj
 
 configs:
   Debug: debug
@@ -34,6 +35,8 @@ targets:
       - path: app/LaunchScreen.storyboard
         group: app
     dependencies:
+      - package: GertieUI
+        product: GertieUI
       - package: LibCore
       - package: LibViews
       - package: LibTCA
@@ -86,6 +89,8 @@ targets:
           - com.netrivet.gertrude.am.refresh-feed
           - com.netrivet.gertrude.am.download-episodes
 packages:
+  GertieUI:
+    path: ../gertie-ui
   LibCore:
     path: ./lib-core
   LibViews:

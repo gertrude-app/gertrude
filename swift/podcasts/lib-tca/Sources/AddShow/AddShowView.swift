@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieUI
 import LibViews
 import SwiftUI
 
@@ -16,13 +17,16 @@ struct AddShowView: View {
         )
 
       case .changePinInstructions:
-        ButtonScreenView(
-          text: lstr(.pinChangeInstructions),
-          primary: .init(lstr(.pinChangeProceed)) {
+        GertieActionScreen(
+          message: lstr(.pinChangeInstructions),
+          action: .button(
+            lstr(.pinChangeProceed),
+            behavior: .afterExitAnimation,
+          ) {
             self.store.send(.changePinInstructionsOkTapped)
           },
-          ignoreKeyboard: true,
         )
+        .ignoresSafeArea(.keyboard, edges: .bottom)
 
       case .settingNewPin:
         PinCodeView(
@@ -35,14 +39,16 @@ struct AddShowView: View {
         )
 
       case .choosingMethod:
-        ButtonScreenView(
-          text: lstr(.addShowHowToAdd),
-          primary: .init(lstr(.addShowSearch)) {
-            self.store.send(.selectSearchTapped)
-          },
-          secondary: .init(lstr(.addShowAddByUrl)) {
-            self.store.send(.selectAddByUrlTapped)
-          },
+        GertieActionScreen(
+          message: lstr(.addShowHowToAdd),
+          actions: [
+            .button(lstr(.addShowSearch), behavior: .afterExitAnimation) {
+              self.store.send(.selectSearchTapped)
+            },
+            .button(lstr(.addShowAddByUrl), behavior: .afterExitAnimation) {
+              self.store.send(.selectAddByUrlTapped)
+            },
+          ],
         )
 
       case .searching:
@@ -61,32 +67,75 @@ struct AddShowView: View {
         }
 
       case .chooseArtworkPolicy:
-        ButtonScreenView(
-          text: lstr(.addShowShowArtworkQuestion),
-          primary: .init(lstr(.addShowAllowImages)) {
-            self.store.send(.selectAllowArtworkTapped)
-          },
-          secondary: .init(lstr(.addShowNoImages)) {
-            self.store.send(.selectDontAllowArtworkTapped)
-          },
-          ignoreKeyboard: true,
+        GertieActionScreen(
+          message: lstr(.addShowShowArtworkQuestion),
+          actions: [
+            .button(lstr(.addShowAllowImages), behavior: .afterExitAnimation) {
+              self.store.send(.selectAllowArtworkTapped)
+            },
+            .button(lstr(.addShowNoImages), behavior: .afterExitAnimation) {
+              self.store.send(.selectDontAllowArtworkTapped)
+            },
+          ],
         )
+        .ignoresSafeArea(.keyboard, edges: .bottom)
 
       case .subscribing:
-        LoadingScreenView(text: lstr(.addShowSubscribing))
+        GertieLoadingScreen(message: lstr(.addShowSubscribing))
 
       case .addingByUrl:
-        ButtonScreenView(
-          text: lstr(.addShowEnterUrl),
-          urlInput: .init(
-            placeholder: "https://site.com/feed.xml",
-            buttonText: lstr(.addShowSubscribe),
-          ) { url in
-            self.store.send(.addByUrlSubmitted(url))
-          },
-          animateBtnEntry: false,
-        )
+        AddShowURLScreen { url in
+          self.store.send(.addByUrlSubmitted(url))
+        }
       }
+    }
+  }
+}
+
+private struct AddShowURLScreen: View {
+  @Environment(\.colorScheme) private var colorScheme
+  @FocusState private var isURLFieldFocused: Bool
+  @State private var url = ""
+
+  let onSubmit: @MainActor @Sendable (String) -> Void
+
+  var body: some View {
+    GertieActionScreen(
+      message: lstr(.addShowEnterUrl),
+      motion: .none,
+      supplementPlacement: .afterMessage,
+    ) {
+      VStack(spacing: 40) {
+        TextField("https://site.com/feed.xml", text: self.$url)
+          .textInputAutocapitalization(.never)
+          .font(.system(size: 22, weight: .medium))
+          .textContentType(.URL)
+          .autocorrectionDisabled()
+          .focused(self.$isURLFieldFocused)
+          .padding(.horizontal, 16)
+          .padding(.vertical, 14)
+          .background(
+            RoundedRectangle(cornerRadius: 8)
+              .fill(self.colorScheme == .dark ? Color.black : Color.white),
+          )
+          .overlay(
+            RoundedRectangle(cornerRadius: 8)
+              .stroke(
+                Color.gray.opacity(self.colorScheme == .dark ? 0.5 : 0.3),
+                lineWidth: 1,
+              ),
+          )
+          .onAppear {
+            self.isURLFieldFocused = true
+          }
+
+        Button(lstr(.addShowSubscribe)) {
+          self.onSubmit(self.url)
+        }
+        .buttonStyle(.gertiePrimary)
+        .disabled(self.url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      }
+      .padding(.bottom, 20)
     }
   }
 }

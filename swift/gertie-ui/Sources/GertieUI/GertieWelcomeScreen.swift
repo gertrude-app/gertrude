@@ -45,6 +45,7 @@ public struct GertieWelcomeScreen: View {
               .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
               .multilineTextAlignment(usesCenteredLayout ? .center : .leading)
               .fixedSize(horizontal: false, vertical: true)
+              .accessibilityIdentifier("onboarding-screen-hi-there")
               .swooshIn(
                 fromYOffset: 20,
                 after: .seconds(1.0),
@@ -58,6 +59,7 @@ public struct GertieWelcomeScreen: View {
               Text(verbatim: self.actionTitle)
             }
             .buttonStyle(.gertiePrimary)
+            .accessibilityIdentifier("btn-primary")
             .allowsHitTesting(!self.isLeaving)
             .swooshIn(
               fromYOffset: 20,

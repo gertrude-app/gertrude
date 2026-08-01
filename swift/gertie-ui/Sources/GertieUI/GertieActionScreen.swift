@@ -131,6 +131,7 @@ public struct GertieActionScreen<Supplement: View>: View {
   private let icon: GertieActionScreenIcon
   private let bullets: [String]
   private let actions: [GertieScreenAction]
+  private let accessibilityIdentifier: String?
   private let motion: GertieActionScreenMotion
   private let supplementPlacement: GertieActionScreenSupplementPlacement
   private let supplement: Supplement
@@ -140,6 +141,7 @@ public struct GertieActionScreen<Supplement: View>: View {
     icon: GertieActionScreenIcon = .info,
     bullets: [String] = [],
     actions: [GertieScreenAction] = [],
+    accessibilityIdentifier: String? = nil,
     motion: GertieActionScreenMotion = .standard,
     supplementPlacement: GertieActionScreenSupplementPlacement,
     @ViewBuilder supplement: () -> Supplement,
@@ -148,6 +150,7 @@ public struct GertieActionScreen<Supplement: View>: View {
     self.icon = icon
     self.bullets = bullets
     self.actions = actions
+    self.accessibilityIdentifier = accessibilityIdentifier
     self.motion = motion
     self.supplementPlacement = supplementPlacement
     self.supplement = supplement()
@@ -158,6 +161,7 @@ public struct GertieActionScreen<Supplement: View>: View {
     icon: GertieActionScreenIcon = .info,
     bullets: [String] = [],
     action: GertieScreenAction,
+    accessibilityIdentifier: String? = nil,
     motion: GertieActionScreenMotion = .standard,
     supplementPlacement: GertieActionScreenSupplementPlacement,
     @ViewBuilder supplement: () -> Supplement,
@@ -167,6 +171,7 @@ public struct GertieActionScreen<Supplement: View>: View {
       icon: icon,
       bullets: bullets,
       actions: [action],
+      accessibilityIdentifier: accessibilityIdentifier,
       motion: motion,
       supplementPlacement: supplementPlacement,
       supplement: supplement,
@@ -219,6 +224,9 @@ public struct GertieActionScreen<Supplement: View>: View {
                   ),
                 )
                 .fixedSize(horizontal: false, vertical: true)
+                .modifier(GertieOptionalAccessibilityIdentifier(
+                  identifier: self.accessibilityIdentifier,
+                ))
 
               if self.supplementPlacement == .afterMessage {
                 self.supplement
@@ -306,6 +314,7 @@ public struct GertieActionScreen<Supplement: View>: View {
                       at: index,
                     )
                   }
+                  .accessibilityIdentifier(self.actionAccessibilityIdentifier(at: index))
                   .modifier(
                     GertieActionScreenEntranceModifier(
                       motion: self.motion,
@@ -387,6 +396,19 @@ public struct GertieActionScreen<Supplement: View>: View {
       return ExitTaskID(id: nil, skipsMotion: self.skipsMotion)
     }
     return ExitTaskID(id: id, skipsMotion: self.skipsMotion)
+  }
+
+  private func actionAccessibilityIdentifier(at index: Int) -> String {
+    switch index {
+    case 0:
+      "btn-primary"
+    case 1:
+      "btn-secondary"
+    case 2:
+      "onboarding-tertiary-button"
+    default:
+      "btn-\(index + 1)"
+    }
   }
 
   private func isPrimaryAction(at index: Int) -> Bool {
@@ -488,6 +510,7 @@ public extension GertieActionScreen where Supplement == EmptyView {
     icon: GertieActionScreenIcon = .info,
     bullets: [String] = [],
     actions: [GertieScreenAction] = [],
+    accessibilityIdentifier: String? = nil,
     motion: GertieActionScreenMotion = .standard,
   ) {
     self.init(
@@ -495,6 +518,7 @@ public extension GertieActionScreen where Supplement == EmptyView {
       icon: icon,
       bullets: bullets,
       actions: actions,
+      accessibilityIdentifier: accessibilityIdentifier,
       motion: motion,
       supplementPlacement: .beforeMessage,
     ) {
@@ -507,6 +531,7 @@ public extension GertieActionScreen where Supplement == EmptyView {
     icon: GertieActionScreenIcon = .info,
     bullets: [String] = [],
     action: GertieScreenAction,
+    accessibilityIdentifier: String? = nil,
     motion: GertieActionScreenMotion = .standard,
   ) {
     self.init(
@@ -514,8 +539,21 @@ public extension GertieActionScreen where Supplement == EmptyView {
       icon: icon,
       bullets: bullets,
       actions: [action],
+      accessibilityIdentifier: accessibilityIdentifier,
       motion: motion,
     )
+  }
+}
+
+private struct GertieOptionalAccessibilityIdentifier: ViewModifier {
+  let identifier: String?
+
+  @ViewBuilder func body(content: Content) -> some View {
+    if let identifier {
+      content.accessibilityIdentifier(identifier)
+    } else {
+      content
+    }
   }
 }
 

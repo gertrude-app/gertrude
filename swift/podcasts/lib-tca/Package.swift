@@ -9,6 +9,7 @@ let package = Package(
   dependencies: [
     .package(path: "../lib-core"),
     .package(path: "../lib-views"),
+    .package(path: "../../gertie-ui"),
     .package(path: "../../pairql"),
     .package(path: "../../pairql-podcasts"),
     .package(path: "../../x-kit"),
@@ -36,6 +37,7 @@ let package = Package(
         .product(name: "SQLiteData", package: "sqlite-data"),
         .product(name: "LibCore", package: "lib-core"),
         .product(name: "LibViews", package: "lib-views"),
+        .product(name: "GertieUI", package: "gertie-ui"),
         .product(name: "PodcastRoute", package: "pairql-podcasts"),
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "XCore", package: "x-kit"),
