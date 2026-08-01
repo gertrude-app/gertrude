@@ -10,10 +10,7 @@ struct MusicClaimCodeView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 16) {
-      Image(systemName: "link.circle")
-        .font(.system(size: 40, weight: .regular))
-        .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
-        .frame(maxWidth: .infinity, alignment: .center)
+      GertieScreenIconBadge(systemName: "link.circle")
 
       Spacer()
       Spacer()

@@ -15,9 +15,7 @@ struct MusicDeviceRecognizedView: View {
     VStack(spacing: 24) {
       Spacer()
 
-      Image(systemName: "checkmark.circle.fill")
-        .font(.system(size: 60, weight: .regular))
-        .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
+      GertieScreenIconBadge(systemName: "checkmark.circle.fill")
 
       VStack(spacing: 8) {
         Text("Account connected")
@@ -53,9 +51,7 @@ struct MusicUnavailableView: View {
     VStack(spacing: 24) {
       Spacer()
 
-      Image(systemName: "music.note")
-        .font(.system(size: 60, weight: .regular))
-        .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
+      GertieScreenIconBadge(systemName: "music.note")
 
       VStack(spacing: 12) {
         Text("Music unavailable")
