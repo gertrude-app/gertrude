@@ -163,10 +163,17 @@ struct AppFeature: Sendable {
       case .library(.delegate(.togglePlayPause)):
         return .send(.playback(.togglePlayPause))
 
-      case .library:
+      case .library(let libraryAction):
         state.search.applyLibraryStatus(state.library.status)
         self.synchronizeDetailPlayback(state: &state)
-        return self.resolveCurrentPlaybackAlbum(state: &state)
+        let albumResolution = self.resolveCurrentPlaybackAlbum(state: &state)
+        guard case .approvedLibraryLoaded(let library) = libraryAction else {
+          return albumResolution
+        }
+        return .merge(
+          albumResolution,
+          .send(.playback(.approvedTrackIDsUpdated(library.approvedTrackIDs))),
+        )
 
       case .playback(.playNowFinished):
         let origin = state.pendingLibraryPlayNowOrigin

@@ -211,6 +211,35 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     )
   }
 
+  func filtered(to approvedTrackIDs: Set<ApprovedTrack.ID>) -> Self? {
+    let checkpoint = self.activeQueue
+    let retainedIndices = checkpoint.songIDs.indices.filter {
+      approvedTrackIDs.contains(checkpoint.songIDs[$0])
+    }
+    guard !retainedIndices.isEmpty else { return nil }
+    let currentItemWasRetained = retainedIndices.first == checkpoint.currentIndex
+    let songIDs = retainedIndices.map { checkpoint.songIDs[$0] }
+    let retainedSongIDs = Set(songIDs)
+    let queueRoles = checkpoint.queueRoles.map { roles in
+      retainedIndices.map { roles[$0] }
+    }
+    let retainsContext = queueRoles?.contains(where: { $0 == .context }) ?? true
+    return Self(
+      songIDs: songIDs,
+      currentIndex: 0,
+      elapsedTime: currentItemWasRetained ? checkpoint.elapsedTime : 0,
+      durationFallback: currentItemWasRetained ? checkpoint.durationFallback : nil,
+      sourceAlbumHints: checkpoint.sourceAlbumHints.filter {
+        retainedSongIDs.contains($0.songID)
+      },
+      playlistSourceHints: retainedIndices.map {
+        checkpoint.playlistSourceHints[$0]
+      },
+      queueRoles: queueRoles,
+      context: retainsContext ? checkpoint.context : nil,
+    )
+  }
+
   var isValid: Bool {
     !self.songIDs.isEmpty
       && self.songIDs.indices.contains(self.currentIndex)

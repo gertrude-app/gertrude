@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import CustomDump
 import Foundation
 import Testing
 
@@ -666,6 +667,23 @@ struct AppFeatureTests {
       albumDetail.currentTrackPlayStatus = .playing
       $0.library.albumDetail = albumDetail
     }
+  }
+
+  @Test
+  func onlyConfirmedLibraryUpdatesPlaybackApprovals() async {
+    let library = ApprovedMusicLibrary.mock
+    let store = TestStore(initialState: AppFeature.State()) {
+      AppFeature()
+    }
+    store.exhaustivity = .off
+
+    await store.send(.library(.cachedApprovedLibraryLoaded(library)))
+    #expect(store.state.playback.approvedTrackIDs == nil)
+
+    await store.send(.library(.approvedLibraryLoaded(library)))
+    await store.receive(.playback(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
+
+    expectNoDifference(store.state.playback.approvedTrackIDs, library.approvedTrackIDs)
   }
 
   @Test

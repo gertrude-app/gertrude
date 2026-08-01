@@ -69,6 +69,10 @@ struct PlaybackClient: Sendable {
   var pause: @Sendable () async -> Void
   var playNow: @Sendable (_ items: [PlaybackItem], _ startIndex: Int) async throws
     -> PlaybackSnapshot
+  var replaceQueue: @Sendable (
+    _ entries: [PlaybackQueueEntry],
+    _ shouldPlay: Bool,
+  ) async throws -> PlaybackSnapshot
   var restartCurrentEntry: @Sendable () async -> Void
   var restoreQueue: @Sendable (_ checkpoint: PlaybackCheckpoint) async throws -> PlaybackSnapshot
   var resume: @Sendable () async throws -> Void
@@ -119,6 +123,9 @@ extension PlaybackClient {
       playNow: { items, startIndex in
         try await Self.playNow(items: items, startIndex: startIndex)
       },
+      replaceQueue: { entries, shouldPlay in
+        try await Self.replaceQueue(with: entries, shouldPlay: shouldPlay)
+      },
       restartCurrentEntry: {
         await Self.restartPlaybackCurrentEntry()
       },
@@ -153,6 +160,7 @@ extension PlaybackClient {
     loadAlbumIDs: { _ in [] },
     pause: {},
     playNow: { _, _ in .empty },
+    replaceQueue: { _, _ in .empty },
     restartCurrentEntry: {},
     restoreQueue: { _ in .empty },
     resume: {},
@@ -195,6 +203,9 @@ extension PlaybackClient {
       },
       playNow: { items, startIndex in
         await state.playNow(items: items, startIndex: startIndex)
+      },
+      replaceQueue: { entries, shouldPlay in
+        try await state.replaceQueue(with: entries, shouldPlay: shouldPlay)
       },
       restartCurrentEntry: {
         await state.restartCurrentEntry()
@@ -452,11 +463,92 @@ extension PlaybackClient {
       try Task.checkCancellation()
       player.queue.entries = updatedEntries
       player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
-      return try await self.playbackSnapshot(
+      let snapshot = try await self.playbackSnapshot(
         for: player,
         matchingCurrentItemID: currentItemID,
         matchingUpcomingItemIDs: requestedEntries.map(\.item.id),
       )
+      guard let receivedCurrentEntryID = snapshot.currentEntryID,
+            let receivedCurrentIndex = snapshot.entries.firstIndex(where: {
+              $0.id == receivedCurrentEntryID
+            }) else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "updated queue current missing"))
+      }
+      guard snapshot.entries[receivedCurrentIndex].item.id == currentItemID else {
+        return snapshot
+      }
+      guard snapshot.entries.dropFirst(receivedCurrentIndex + 1).map(\.item.id)
+        == requestedEntries.map(\.item.id) else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "updated queue incomplete"))
+      }
+      return snapshot
+    }
+
+    @MainActor
+    private static func replaceQueue(
+      with requestedEntries: [PlaybackQueueEntry],
+      shouldPlay: Bool,
+    ) async throws -> PlaybackSnapshot {
+      guard !requestedEntries.isEmpty else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue empty"))
+      }
+      try Task.checkCancellation()
+      let player = ApplicationMusicPlayer.shared
+      player.pause()
+      let entries = Array(player.queue.entries)
+      guard let currentEntryID = player.queue.currentEntry?.id,
+            let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }) else {
+        throw PlaybackClientError
+          .playbackFailed(.init(summary: "replacement current entry missing"))
+      }
+      var availableEntries = Array(entries.dropFirst(currentIndex))
+      var matchedEntries: [MusicKit.MusicPlayer.Queue.Entry] = []
+      for requestedEntry in requestedEntries {
+        let matchingIndex = availableEntries.firstIndex(where: {
+          $0.id == requestedEntry.id
+            && self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+        }) ?? availableEntries.firstIndex(where: {
+          self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+        })
+        guard let matchingIndex else {
+          throw PlaybackClientError.playbackFailed(.init(summary: "replacement entry missing"))
+        }
+        matchedEntries.append(availableEntries.remove(at: matchingIndex))
+      }
+      guard let firstEntry = matchedEntries.first else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue empty"))
+      }
+      try Task.checkCancellation()
+      player.stop()
+      player.queue = ApplicationMusicPlayer.Queue(matchedEntries, startingAt: firstEntry)
+      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
+      do {
+        if shouldPlay {
+          try await ApplicationMusicPlayer.shared.play()
+        } else {
+          try await ApplicationMusicPlayer.shared.prepareToPlay()
+          player.pause()
+        }
+        try Task.checkCancellation()
+        let snapshot = try await self.playbackSnapshot(
+          for: player,
+          matchingCurrentItemID: requestedEntries[0].item.id,
+          matchingUpcomingItemIDs: requestedEntries.dropFirst().map(\.item.id),
+        )
+        guard snapshot.entries.map(\.item.id) == requestedEntries.map(\.item.id),
+              snapshot.currentEntryID == snapshot.entries.first?.id else {
+          throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue incomplete"))
+        }
+        return snapshot
+      } catch is CancellationError {
+        throw CancellationError()
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(error, fallback: PlaybackClientError.playbackFailed)
+      } catch let error as PlaybackClientError {
+        throw error
+      } catch {
+        throw PlaybackClientError.playbackFailed(.init(unexpected: error))
+      }
     }
 
     @MainActor
@@ -901,6 +993,43 @@ private actor SimulatorPlaybackState {
     self.playStatus = .playing
     self.sendSnapshot()
     self.startProgressTickerIfNeeded()
+    return self.snapshot
+  }
+
+  func replaceQueue(
+    with requestedEntries: [PlaybackQueueEntry],
+    shouldPlay: Bool,
+  ) throws -> PlaybackSnapshot {
+    guard !requestedEntries.isEmpty else {
+      throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue empty"))
+    }
+    var availableEntries = zip(
+      self.entryIDs.dropFirst(self.currentIndex),
+      self.items.dropFirst(self.currentIndex),
+    ).map { (id: $0, item: $1) }
+    var matchedEntries: [(id: PlaybackQueueEntry.ID, item: PlaybackItem)] = []
+    for requestedEntry in requestedEntries {
+      let matchingIndex = availableEntries.firstIndex(where: {
+        $0.id == requestedEntry.id && $0.item.id == requestedEntry.item.id
+      }) ?? availableEntries.firstIndex(where: {
+        $0.item.id == requestedEntry.item.id
+      })
+      guard let matchingIndex else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "replacement entry missing"))
+      }
+      matchedEntries.append(availableEntries.remove(at: matchingIndex))
+    }
+    self.stopProgressTicker()
+    self.entryIDs = matchedEntries.map(\.id)
+    self.items = matchedEntries.map(\.item)
+    self.currentIndex = 0
+    self.duration = self.currentItemDuration
+    self.elapsedTime = 0
+    self.playStatus = shouldPlay ? .playing : .paused
+    self.sendSnapshot()
+    if shouldPlay {
+      self.startProgressTickerIfNeeded()
+    }
     return self.snapshot
   }
 

@@ -29,6 +29,10 @@ struct ApprovedMusicLibrary: Codable, Equatable, Sendable {
     self.albums.isEmpty && self.artists.isEmpty && self.playlists.isEmpty
   }
 
+  var approvedTrackIDs: Set<ApprovedTrack.ID> {
+    Set(self.albums.flatMap(\.tracks).map(\.id))
+  }
+
   var hasCompleteSnapshot: Bool {
     guard self.schemaVersion == 2, self.revision >= 0 else { return false }
     var albumsById: [ApprovedAlbum.ID: ApprovedAlbum] = [:]

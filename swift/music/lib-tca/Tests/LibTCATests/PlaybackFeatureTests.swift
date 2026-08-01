@@ -531,6 +531,42 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func simulatorReplacesQueueWithExistingOccurrencesAndPreservesPausedState() async throws {
+    let clock = PlaybackSimulatorClock()
+    let client = PlaybackClient.simulated { _ in
+      await clock.sleep()
+    }
+    let initialSnapshot = try await client.playNow([
+      playbackItem("revoked"),
+      playbackItem("duplicate"),
+      playbackItem("allowed"),
+      playbackItem("duplicate"),
+    ], 0)
+
+    let snapshot = try await client.replaceQueue([
+      initialSnapshot.entries[2],
+      initialSnapshot.entries[3],
+      initialSnapshot.entries[1],
+    ], false)
+
+    expectNoDifference(snapshot.entries.map(\.id), [
+      initialSnapshot.entries[2].id,
+      initialSnapshot.entries[3].id,
+      initialSnapshot.entries[1].id,
+    ])
+    expectNoDifference(snapshot.entries.map(\.item.id), [
+      "allowed",
+      "duplicate",
+      "duplicate",
+    ])
+    #expect(snapshot.currentEntryID == snapshot.entries.first?.id)
+    #expect(snapshot.playStatus == .paused)
+    expectNoDifference(snapshot.progress, .init(elapsedTime: 0, duration: 180))
+    await client.clearQueue()
+    await clock.advance()
+  }
+
+  @Test
   func simulatorProgressTickerEmitsProgressWithoutRepublishingSession() async throws {
     let clock = PlaybackSimulatorClock()
     let client = PlaybackClient.simulated { _ in
@@ -2258,6 +2294,337 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func confirmedApprovedTracksRemoveEveryRevokedUpcomingOccurrence() async {
+    let current = playbackItem("current").withQueueRole(.context)
+    let revoked = playbackItem("revoked").withQueueRole(.queued)
+    let allowed = playbackItem("allowed").withQueueRole(.context)
+    let initialSnapshot = playbackSnapshot(items: [current, revoked, allowed, revoked])
+    let updatedSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "new-current", item: current.withQueueRole(nil)),
+        .init(id: "new-allowed", item: allowed.withQueueRole(nil)),
+      ],
+      currentEntryID: "new-current",
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "album"),
+      title: "Album",
+    )
+    let cacheRecorder = PlaybackSessionCacheRecorder()
+    let queueRecorder = PlaybackQueueEditRecorder()
+    var state = PlaybackFeature.State()
+    state.hasAuthoritativeSnapshot = true
+    state.lastCachedProgressBucket = 0
+    state.playbackContext = context
+    state.session = PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:])
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.setUpcoming = { entries in
+        await queueRecorder.recordUpcomingUpdate(entries)
+        return updatedSnapshot
+      }
+      $0.playbackSessionCache._save = { checkpoint in
+        await cacheRecorder.record(checkpoint)
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated(["current", "allowed"]))
+    await store.receive(.playbackEvent(.snapshotChanged(updatedSnapshot)))
+    await store.finish()
+
+    let updates = await queueRecorder.upcomingUpdates
+    expectNoDifference(updates.map { $0.map(\.viewID) }, [["entry-2"]])
+    expectNoDifference(store.state.session?.queue.entries.map(\.viewID), [
+      "entry-0",
+      "entry-2",
+    ])
+    expectNoDifference(store.state.session?.queue.entries.map(\.role), [
+      .context,
+      .context,
+    ])
+    expectNoDifference(store.state.playbackContext, context)
+    let cachedCheckpoint = await cacheRecorder.checkpoint
+    expectNoDifference(cachedCheckpoint?.songIDs, ["current", "allowed"])
+    #expect(store.state.pendingUpcomingViewIDs == nil)
+    #expect(!store.state.shouldClearPlaybackOnUpcomingUpdateFailure)
+  }
+
+  @Test
+  func revokedPlayingTrackAdvancesToFirstApprovedOccurrence() async {
+    let revoked = playbackItem("revoked").withQueueRole(.context)
+    let queued = playbackItem("queued").withQueueRole(.queued)
+    let contextItem = playbackItem("context").withQueueRole(.context)
+    let revokedTail = playbackItem("revoked-tail").withQueueRole(.context)
+    let progress = PlaybackProgress(elapsedTime: 42, duration: 180)
+    let initialSnapshot = playbackSnapshot(
+      items: [revoked, queued, contextItem, revokedTail],
+      progress: progress,
+    )
+    let replacementSnapshot = PlaybackSnapshot(
+      entries: [
+        .init(id: "new-queued", item: queued.withQueueRole(nil)),
+        .init(id: "new-context", item: contextItem.withQueueRole(nil)),
+      ],
+      currentEntryID: "new-queued",
+      playStatus: .playing,
+      progress: .zero,
+    )
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "album"),
+      title: "Album",
+    )
+    let cacheRecorder = PlaybackSessionCacheRecorder()
+    let queueRecorder = PlaybackQueueEditRecorder()
+    var state = PlaybackFeature.State()
+    state.hasAuthoritativeSnapshot = true
+    state.lastCachedProgressBucket = 8
+    state.playbackContext = context
+    state.progress = progress
+    state.session = PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:])
+    state.sourceAlbumIDs = [
+      "revoked": "revoked-album",
+      "queued": "queued-album",
+      "context": "context-album",
+    ]
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.replaceQueue = { entries, shouldPlay in
+        await queueRecorder.recordReplacement(entries, shouldPlay: shouldPlay)
+        return replacementSnapshot
+      }
+      $0.playbackSessionCache._save = { checkpoint in
+        await cacheRecorder.record(checkpoint)
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated(["queued", "context"]))
+    await store.receive(.playbackEvent(.snapshotChanged(replacementSnapshot)))
+    await store.finish()
+
+    let replacements = await queueRecorder.replacements
+    expectNoDifference(replacements.map { $0.entries.map(\.viewID) }, [
+      ["entry-1", "entry-2"],
+    ])
+    expectNoDifference(replacements.map(\.shouldPlay), [true])
+    expectNoDifference(store.state.session?.currentTrackID, "queued")
+    expectNoDifference(store.state.session?.queue.entries.map(\.viewID), [
+      "entry-1",
+      "entry-2",
+    ])
+    expectNoDifference(store.state.session?.queue.entries.map(\.role), [
+      .queued,
+      .context,
+    ])
+    expectNoDifference(store.state.session?.playStatus, .playing)
+    expectNoDifference(store.state.playbackContext, context)
+    expectNoDifference(store.state.progress, .zero)
+    #expect(store.state.sourceAlbumIDs["revoked"] == nil)
+    let cachedCheckpoint = await cacheRecorder.checkpoint
+    expectNoDifference(cachedCheckpoint?.songIDs, ["queued", "context"])
+  }
+
+  @Test
+  func revokedPausedTrackAdvancesWithoutStartingPlayback() async {
+    let revoked = playbackItem("revoked")
+    let allowed = playbackItem("allowed")
+    let initialSnapshot = playbackSnapshot(
+      items: [revoked, allowed],
+      playStatus: .paused,
+    )
+    let replacementSnapshot = playbackSnapshot(
+      items: [allowed],
+      playStatus: .paused,
+    )
+    let queueRecorder = PlaybackQueueEditRecorder()
+    var state = PlaybackFeature.State()
+    state.hasAuthoritativeSnapshot = true
+    state.session = PlaybackFeature.Session(snapshot: initialSnapshot, sourceAlbumIDs: [:])
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.replaceQueue = { entries, shouldPlay in
+        await queueRecorder.recordReplacement(entries, shouldPlay: shouldPlay)
+        return replacementSnapshot
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated(["allowed"]))
+    await store.receive(.playbackEvent(.snapshotChanged(replacementSnapshot)))
+    await store.finish()
+
+    let replacements = await queueRecorder.replacements
+    expectNoDifference(replacements.map(\.shouldPlay), [false])
+    expectNoDifference(store.state.session?.currentTrackID, "allowed")
+    expectNoDifference(store.state.session?.playStatus, .paused)
+  }
+
+  @Test
+  func confirmedEmptyApprovalClearsPlaybackAndCheckpoint() async {
+    let recorder = PlaybackCommandRecorder()
+    var state = PlaybackFeature.State()
+    state.hasAuthoritativeSnapshot = true
+    state.session = .init(currentItem: playbackItem("revoked"))
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.clearQueue = {
+        await recorder.recordClearQueue()
+      }
+      $0.playbackSessionCache._delete = {
+        await recorder.recordDeleteCheckpoint()
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated([]))
+    await store.receive(.playbackEvent(.queueEnded))
+    await store.finish()
+
+    #expect(store.state.session == nil)
+    #expect(store.state.approvedTrackIDs == [])
+    #expect(await recorder.clearQueueCount == 1)
+    #expect(await recorder.deleteCheckpointCount == 1)
+  }
+
+  @Test
+  func approvedTracksFilterCheckpointBeforeRestoration() async {
+    let source = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "album"),
+      title: "Album",
+    )
+    let checkpoint = PlaybackCheckpoint(
+      songIDs: ["revoked-current", "allowed", "revoked-tail"],
+      currentIndex: 0,
+      elapsedTime: 42,
+      durationFallback: 180,
+      sourceAlbumHints: [
+        .init(songID: "revoked-current", albumID: "album"),
+        .init(songID: "allowed", albumID: "album"),
+      ],
+      playlistSourceHints: [nil, source, nil],
+      queueRoles: [.context, .queued, .context],
+      context: context,
+    )
+    let restoredSnapshot = playbackSnapshot(
+      items: [playbackItem("allowed")],
+      playStatus: .paused,
+    )
+    let cacheRecorder = PlaybackSessionCacheRecorder()
+    let restoreRecorder = PlaybackCheckpointRestoreRecorder()
+    let store = TestStore(initialState: PlaybackFeature.State()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.restoreQueue = { filteredCheckpoint in
+        await restoreRecorder.record(filteredCheckpoint)
+        return restoredSnapshot
+      }
+      $0.playbackSessionCache._load = { checkpoint }
+      $0.playbackSessionCache._save = { filteredCheckpoint in
+        await cacheRecorder.record(filteredCheckpoint)
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated(["allowed"]))
+    await store.send(.restoreCachedSession)
+    await store.receive(.checkpointLoaded(checkpoint))
+    await store.receive(.checkpointRestorationFinished(restoredSnapshot))
+    await store.receive(.playbackEvent(.snapshotChanged(restoredSnapshot)))
+    await store.finish()
+
+    let restoredCheckpoint = await restoreRecorder.checkpoint
+    let cachedCheckpoint = await cacheRecorder.checkpoint
+    expectNoDifference(
+      restoredCheckpoint,
+      checkpoint.filtered(to: ["allowed"]),
+    )
+    expectNoDifference(cachedCheckpoint?.songIDs, ["allowed"])
+    expectNoDifference(store.state.session?.currentTrackID, "allowed")
+    expectNoDifference(store.state.session?.queue.currentEntry.role, .queued)
+    #expect(store.state.playbackContext == nil)
+  }
+
+  @Test
+  func failedApprovedUpcomingUpdateClearsPlayback() async {
+    let recorder = PlaybackCommandRecorder()
+    let snapshot = playbackSnapshot(items: [
+      playbackItem("current"),
+      playbackItem("revoked"),
+    ])
+    var state = PlaybackFeature.State()
+    state.hasAuthoritativeSnapshot = true
+    state.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.clearQueue = {
+        await recorder.recordClearQueue()
+      }
+      $0.playback.setUpcoming = { _ in throw TestError() }
+      $0.playbackSessionCache._delete = {
+        await recorder.recordDeleteCheckpoint()
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated(["current"]))
+    await store.receive(.upcomingQueueUpdateFailed(
+      expectedViewIDs: [],
+      failure: .init(error: TestError()),
+    ))
+    await store.receive(.playbackEvent(.queueEnded))
+    await store.finish()
+
+    #expect(store.state.session == nil)
+    #expect(await recorder.clearQueueCount == 1)
+    #expect(await recorder.deleteCheckpointCount == 1)
+  }
+
+  @Test
+  func failedRevokedCurrentReplacementClearsPlayback() async {
+    let recorder = PlaybackCommandRecorder()
+    let snapshot = playbackSnapshot(items: [
+      playbackItem("revoked"),
+      playbackItem("allowed"),
+    ])
+    var state = PlaybackFeature.State()
+    state.hasAuthoritativeSnapshot = true
+    state.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+    let store = TestStore(initialState: state) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.clearQueue = {
+        await recorder.recordClearQueue()
+      }
+      $0.playback.replaceQueue = { _, _ in throw TestError() }
+      $0.playbackSessionCache._delete = {
+        await recorder.recordDeleteCheckpoint()
+      }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.approvedTrackIDsUpdated(["allowed"]))
+    await store.receive(.queueReplacementFailed(
+      expectedViewIDs: ["entry-1"],
+      failure: .init(error: TestError()),
+    ))
+    await store.receive(.playbackEvent(.queueEnded))
+    await store.finish()
+
+    #expect(store.state.session == nil)
+    #expect(await recorder.clearQueueCount == 1)
+    #expect(await recorder.deleteCheckpointCount == 1)
+  }
+
+  @Test
   func stopPausesCurrentSession() async {
     let item = playbackItem("track-1")
     let store = TestStore(initialState: .init(session: .init(currentItem: item))) {
@@ -2373,7 +2740,13 @@ private actor PlaybackQueueEditRecorder {
     var target: PlaybackQueueInsertionTarget
   }
 
+  struct Replacement: Equatable {
+    var entries: [PlaybackQueueEntry]
+    var shouldPlay: Bool
+  }
+
   var insertions: [Insertion] = []
+  var replacements: [Replacement] = []
   var upcomingUpdates: [[PlaybackQueueEntry]] = []
 
   func recordInsertion(
@@ -2382,6 +2755,13 @@ private actor PlaybackQueueEditRecorder {
   ) -> Int {
     self.insertions.append(.init(items: items, target: target))
     return self.insertions.count
+  }
+
+  func recordReplacement(
+    _ entries: [PlaybackQueueEntry],
+    shouldPlay: Bool,
+  ) {
+    self.replacements.append(.init(entries: entries, shouldPlay: shouldPlay))
   }
 
   func recordUpcomingUpdate(_ entries: [PlaybackQueueEntry]) {
