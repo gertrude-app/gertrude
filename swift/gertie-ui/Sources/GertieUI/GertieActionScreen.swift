@@ -118,7 +118,6 @@ public enum GertieActionScreenSupplementPlacement {
 public struct GertieActionScreen<Supplement: View>: View {
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.colorScheme) private var cs
-  @ScaledMetric(relativeTo: .title) private var iconSize = 32.0
   @ScaledMetric(relativeTo: .body) private var messageSize = 18.0
   @ScaledMetric(relativeTo: .body) private var bulletSize = 16.0
   @ScaledMetric(relativeTo: .body) private var bulletDotSize = 6.0
@@ -183,50 +182,7 @@ public struct GertieActionScreen<Supplement: View>: View {
       GeometryReader { proxy in
         ScrollView {
           VStack(alignment: .leading, spacing: 16) {
-            Image(systemName: self.icon.systemName)
-              .font(.system(size: self.iconSize, weight: .medium))
-              .foregroundStyle(
-                Color(
-                  self.cs,
-                  light: .violet500,
-                  dark: .violet400,
-                ),
-              )
-              .accessibilityHidden(true)
-              .frame(width: 60, height: 60)
-              .background(
-                Gradient(colors: [
-                  Color(
-                    self.cs,
-                    light: .violet100,
-                    dark: .black.opacity(0.3),
-                  ),
-                  Color(
-                    self.cs,
-                    light: .white.opacity(0.5),
-                    dark: .white.opacity(0.1),
-                  ),
-                ]),
-              )
-              .cornerRadius(16)
-              .padding(.vertical, 1.5)
-              .padding(.horizontal, 1)
-              .background(
-                Gradient(colors: [
-                  Color(
-                    self.cs,
-                    light: .white,
-                    dark: .white.opacity(0.2),
-                  ),
-                  Color(
-                    self.cs,
-                    light: .violet300.opacity(0.6),
-                    dark: .black.opacity(0.2),
-                  ),
-                ]),
-              )
-              .cornerRadius(17)
-              .frame(maxWidth: .infinity, alignment: .center)
+            GertieScreenIconBadge(systemName: self.icon.systemName)
               .modifier(
                 GertieActionScreenEntranceModifier(
                   motion: self.motion,
