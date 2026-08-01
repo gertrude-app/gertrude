@@ -240,10 +240,20 @@ struct AppView: View {
       showsBackground: Bool,
     ) -> some View {
       let session = self.store.playback.session
+      let item = session.map {
+        self.nowPlayingBarItem($0.queue.currentEntry)
+      } ?? NowPlayingBarItem(
+        id: "not-playing",
+        title: "Not Playing",
+        artist: "Choose an approved track",
+        artworkURL: nil,
+      )
+      let nextItem = session?.queue.upcomingEntries.first.map {
+        self.nowPlayingBarItem($0)
+      }
       return NowPlayingBar(
-        title: session?.currentItem.title ?? "Not Playing",
-        artist: session?.currentItem.artistName ?? "Choose an approved track",
-        artworkURL: session?.currentItem.artworkURL,
+        item: item,
+        nextItem: nextItem,
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
@@ -260,6 +270,15 @@ struct AppView: View {
         onNextTap: {
           self.store.send(.playback(.skipToNext))
         },
+      )
+    }
+
+    private func nowPlayingBarItem(_ entry: PlaybackQueueEntry) -> NowPlayingBarItem {
+      NowPlayingBarItem(
+        id: entry.viewID,
+        title: entry.item.title,
+        artist: entry.item.artistName,
+        artworkURL: entry.item.artworkURL,
       )
     }
   #endif

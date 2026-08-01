@@ -2,6 +2,25 @@ import Foundation
 import SwiftUI
 
 #if os(iOS)
+  public struct NowPlayingBarItem: Equatable, Identifiable, Sendable {
+    public let id: String
+    public let title: String
+    public let artist: String
+    public let artworkURL: URL?
+
+    public init(
+      id: String,
+      title: String,
+      artist: String,
+      artworkURL: URL?,
+    ) {
+      self.id = id
+      self.title = title
+      self.artist = artist
+      self.artworkURL = artworkURL
+    }
+  }
+
   public enum NowPlayingBarDisplayMode: Sendable {
     case automatic
     case expanded
@@ -9,9 +28,8 @@ import SwiftUI
   }
 
   public struct NowPlayingBar: View {
-    private let title: String
-    private let artist: String
-    private let artworkURL: URL?
+    private let item: NowPlayingBarItem
+    private let nextItem: NowPlayingBarItem?
     private let isPlaying: Bool
     private let isLoading: Bool
     private let isEnabled: Bool
@@ -23,9 +41,8 @@ import SwiftUI
     private let onNextTap: @MainActor @Sendable () -> Void
 
     public init(
-      title: String,
-      artist: String,
-      artworkURL: URL?,
+      item: NowPlayingBarItem,
+      nextItem: NowPlayingBarItem? = nil,
       isPlaying: Bool,
       isLoading: Bool,
       isEnabled: Bool,
@@ -36,9 +53,8 @@ import SwiftUI
       onPlayTap: @MainActor @escaping @Sendable () -> Void,
       onNextTap: @MainActor @escaping @Sendable () -> Void,
     ) {
-      self.title = title
-      self.artist = artist
-      self.artworkURL = artworkURL
+      self.item = item
+      self.nextItem = nextItem
       self.isPlaying = isPlaying
       self.isLoading = isLoading
       self.isEnabled = isEnabled
@@ -63,9 +79,8 @@ import SwiftUI
     private var barContent: some View {
       let controls = NowPlayingBarContent(
         layout: self.layout,
-        title: self.title,
-        artist: self.artist,
-        artworkURL: self.artworkURL,
+        item: self.item,
+        nextItem: self.nextItem,
         isPlaying: self.isPlaying,
         isLoading: self.isLoading,
         isEnabled: self.isEnabled,
@@ -135,9 +150,18 @@ import SwiftUI
   #if DEBUG
     #Preview("Playing accessory") {
       NowPlayingBar(
-        title: PreviewMusicData.nowPlayingTitle,
-        artist: PreviewMusicData.nowPlayingArtist,
-        artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+        item: NowPlayingBarItem(
+          id: "current",
+          title: PreviewMusicData.nowPlayingTitle,
+          artist: PreviewMusicData.nowPlayingArtist,
+          artworkURL: PreviewMusicData.nowPlayingArtworkURL,
+        ),
+        nextItem: NowPlayingBarItem(
+          id: "next",
+          title: "Stories",
+          artist: "Alasdair Fraser & Natalie Haas",
+          artworkURL: PreviewMusicData.storiesArtworkURL,
+        ),
         isPlaying: true,
         isLoading: false,
         isEnabled: true,
