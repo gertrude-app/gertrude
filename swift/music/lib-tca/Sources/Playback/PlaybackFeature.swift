@@ -1210,10 +1210,6 @@ extension PlaybackFeature.Session {
     self.queue.currentItem
   }
 
-  var nextItems: [PlaybackItem] {
-    self.queue.upcomingItems
-  }
-
   var isPlaying: Bool {
     self.playStatus == .playing
   }

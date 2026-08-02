@@ -37,7 +37,7 @@ struct MusicDeviceRecognizedView: View {
     }
     .frame(maxWidth: 500)
     .padding(30)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 }
 
@@ -76,7 +76,7 @@ struct MusicUnavailableView: View {
     }
     .frame(maxWidth: 500)
     .padding(30)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   init(childName: String, statusDelay: Duration = .seconds(45)) {

@@ -11,16 +11,6 @@ struct HapticsClient: Sendable {
   var selection: @MainActor @Sendable () -> Void = {}
 }
 
-extension HapticsClient {
-  enum ImpactStyle: CaseIterable {
-    case light, medium, heavy, soft, rigid
-  }
-
-  enum NotificationStyle: CaseIterable {
-    case success, warning, error
-  }
-}
-
 extension HapticsClient: DependencyKey {
   static var liveValue: HapticsClient {
     .init(

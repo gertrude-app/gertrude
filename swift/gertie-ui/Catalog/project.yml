@@ -2,7 +2,7 @@ name: GertieUICatalog
 options:
   deploymentTarget:
     iOS: "17.0"
-  postGenCommand: python3 fix-local-package-backlink.py
+  postGenCommand: python3 ../../../scripts/fix-xcodegen-local-package-backlink.py GertieUICatalog.xcodeproj/project.pbxproj GertieUI ..
 
 packages:
   GertieUI:

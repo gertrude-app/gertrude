@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public enum PlaylistDuplicatePrompt: Equatable, Sendable {

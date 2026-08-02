@@ -76,7 +76,7 @@ public struct ClaimPaymentView: View {
     .frame(maxWidth: 500)
     .padding(30)
     .padding(.top, 50)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   private var bodyText: String {

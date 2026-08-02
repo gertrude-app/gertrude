@@ -7,7 +7,7 @@ options:
     - en
     - es
     - Base
-  postGenCommand: python3 fix-gertie-ui-package-backlink.py GertiePodcasts.xcodeproj/project.pbxproj
+  postGenCommand: python3 ../../scripts/fix-xcodegen-local-package-backlink.py GertiePodcasts.xcodeproj/project.pbxproj GertieUI ../gertie-ui
 
 configs:
   Debug: debug

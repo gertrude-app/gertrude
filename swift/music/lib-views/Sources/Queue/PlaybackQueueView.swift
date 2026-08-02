@@ -1,4 +1,5 @@
 import Foundation
+import GertieUI
 import SwiftUI
 
 public struct PlaybackQueueEntryData: Equatable, Identifiable, Sendable {

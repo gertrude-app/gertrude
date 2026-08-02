@@ -1,4 +1,5 @@
 import Foundation
+import GertieUI
 import SwiftUI
 
 struct GlowingArtworkImage<ArtworkShape: Shape, StrokeShape: Shape, Placeholder: View>: View {

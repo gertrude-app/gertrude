@@ -73,7 +73,7 @@ public struct ClaimSuccessView: View {
     }
     .frame(maxWidth: 500)
     .padding(30)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   private func subtitle(for entitlement: Entitlement) -> String {

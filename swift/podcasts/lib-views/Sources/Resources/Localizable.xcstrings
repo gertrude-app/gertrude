@@ -355,23 +355,6 @@
         }
       }
     },
-    "settings.subscription.header" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SUBSCRIPTION"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SUSCRIPCIÓN"
-          }
-        }
-      }
-    },
     "settings.subscription.renews" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -402,91 +385,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Estado"
-          }
-        }
-      }
-    },
-    "settings.subscription.label" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscription"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suscripción"
-          }
-        }
-      }
-    },
-    "settings.subscription.status.freeTrial" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Free trial"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prueba gratuita"
-          }
-        }
-      }
-    },
-    "settings.subscription.status.active" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscription active"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suscripción activa"
-          }
-        }
-      }
-    },
-    "settings.subscription.status.freeForever" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Free forever"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gratis para siempre"
-          }
-        }
-      }
-    },
-    "settings.subscription.status.unpaid" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscription unpaid"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suscripción no pagada"
           }
         }
       }
@@ -538,23 +436,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Expirada"
-          }
-        }
-      }
-    },
-    "settings.subscription.subscribeNow" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Subscribe Now"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suscríbete ahora"
           }
         }
       }

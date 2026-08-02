@@ -180,7 +180,7 @@ public struct GertieActionScreen<Supplement: View>: View {
 
   public var body: some View {
     ZStack {
-      GertieActionScreenBackground()
+      GertieScreenBackground()
         .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
@@ -598,28 +598,6 @@ private struct GertieScreenActionView: View {
         Text(verbatim: self.action.title)
       }
     }
-  }
-}
-
-private struct GertieActionScreenBackground: View {
-  @Environment(\.colorScheme) private var colorScheme
-
-  var body: some View {
-    Color(self.colorScheme, light: .white, dark: .black)
-      .overlay {
-        LinearGradient(
-          colors: [
-            Color(
-              self.colorScheme,
-              light: .violet200,
-              dark: .violet950.opacity(0.7),
-            ),
-            .clear,
-          ],
-          startPoint: .top,
-          endPoint: .bottom,
-        )
-      }
   }
 }
 

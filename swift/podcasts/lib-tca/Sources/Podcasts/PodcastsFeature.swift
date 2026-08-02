@@ -176,12 +176,6 @@ struct PodcastsFeature {
     .ifLet(\.$destination, action: \.destination)
   }
 
-  func queryShows() -> [ShowInfo] {
-    self.database.tryRead {
-      try Show.orderedWithInfo.fetchAll($0)
-    }
-  }
-
   func maybeShowTrialEndingDialogue(state: inout State) {
     if state.subscription.status == .trialing,
        state.subscription.expiresAt.timeIntervalSince(self.date.now) <= .days(5),

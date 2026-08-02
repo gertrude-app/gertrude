@@ -82,7 +82,7 @@ public struct ClaimCodeView: View {
     .frame(maxWidth: 500)
     .padding(30)
     .padding(.top, 50)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   @ViewBuilder private func codeContent(_ code: Int) -> some View {

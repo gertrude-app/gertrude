@@ -9,7 +9,6 @@ let package = Package(
   dependencies: [
     .package(path: "../../gertie-ui"),
     .package(path: "../lib-core"),
-    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
   ],
   targets: [
     .target(
@@ -23,10 +22,7 @@ let package = Package(
     ),
     .testTarget(
       name: "LibViewsTests",
-      dependencies: [
-        "LibViews",
-        .product(name: "CustomDump", package: "swift-custom-dump"),
-      ],
+      dependencies: ["LibViews"],
     ),
   ],
 )

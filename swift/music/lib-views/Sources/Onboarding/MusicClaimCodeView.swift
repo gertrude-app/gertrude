@@ -48,7 +48,7 @@ struct MusicClaimCodeView: View {
     .frame(maxWidth: 500)
     .padding(30)
     .padding(.top, 50)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   init(

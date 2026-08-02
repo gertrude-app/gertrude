@@ -44,16 +44,8 @@
       string:
       "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/54/29/e2542981-4315-57e1-6df7-0785143c4d84/7300343882657.jpg/600x600bb.jpg",
     )
-    static let ranarimArtworkURL = URL(
-      string:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/87/aa/69/87aa69f3-e7ff-8d6f-5643-02e0bfcccd5e/7393844010315.jpg/600x600bb.jpg",
-    )
     static let triakelArtworkURL = URL(
       string: "https://is1-ssl.mzstatic.com/image/thumb/Music/9c/e0/36/mzi.zhphocov.jpg/600x600bb.jpg",
-    )
-    static let liveInJapanArtworkURL = URL(
-      string:
-      "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/48/f5/8c/48f58c1c-508e-5653-762d-c704114d6d7d/7f8656d8-ffd9-455c-8daf-0165554a92e4.jpg/600x600bb.jpg",
     )
     static let nordanvindenArtworkURL = URL(
       string:
@@ -139,33 +131,6 @@
         title: "Månskratt",
         artist: "Groupa Med Lena Willemark",
         artworkUrl: PreviewMusicData.manskrattArtworkURL,
-      ),
-    ]
-
-    static let longNamePreviewAlbums: [AlbumData] = [
-      .init(
-        id: "1",
-        title: "Ingen större fröjd i världen är",
-        artist: "Ahlberg, Ek & Roswall",
-        artworkUrl: PreviewMusicData.trettonArtworkURL,
-      ),
-      .init(
-        id: "2",
-        title: "För världen älskar vad som är brokot",
-        artist: "Ranarim",
-        artworkUrl: PreviewMusicData.ranarimArtworkURL,
-      ),
-      .init(
-        id: "3",
-        title: "Sånger Från 63° N",
-        artist: "Triakel",
-        artworkUrl: PreviewMusicData.triakelArtworkURL,
-      ),
-      .init(
-        id: "4",
-        title: "Live in Japan (Live)",
-        artist: "Väsen",
-        artworkUrl: PreviewMusicData.liveInJapanArtworkURL,
       ),
     ]
   }

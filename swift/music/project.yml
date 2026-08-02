@@ -5,7 +5,7 @@ options:
   developmentLanguage: en
   knownRegions:
     - en
-  postGenCommand: python3 fix-gertie-ui-package-backlink.py
+  postGenCommand: python3 ../../scripts/fix-xcodegen-local-package-backlink.py GertrudeMusic.xcodeproj/project.pbxproj GertieUI ../gertie-ui
 
 configs:
   Debug: debug

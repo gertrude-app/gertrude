@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public func playlistArtworkZoomTransitionID(for playlistID: String) -> String {
