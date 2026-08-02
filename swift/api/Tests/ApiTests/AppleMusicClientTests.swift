@@ -58,7 +58,7 @@ final class AppleMusicClientTests: XCTestCase {
     )
   }
 
-  func testDecodesMixedSearchAlbumResponse() throws {
+  func testDecodesMixedSearchAlbumResponse() async throws {
     let data = try XCTUnwrap("""
     {
       "results": {
@@ -91,7 +91,7 @@ final class AppleMusicClientTests: XCTestCase {
     }
     """.data(using: .utf8))
 
-    let results = try decodeAppleMusicCatalogSearchResults(from: data)
+    let results = try await self.searchResults(from: data)
 
     expect(results.albums).toEqual([
       .init(
@@ -116,7 +116,7 @@ final class AppleMusicClientTests: XCTestCase {
     ])
   }
 
-  func testDecodesAlbumReleaseTypes() throws {
+  func testDecodesAlbumReleaseTypes() async throws {
     let data = try XCTUnwrap("""
     {
       "results": {
@@ -152,12 +152,12 @@ final class AppleMusicClientTests: XCTestCase {
     }
     """.data(using: .utf8))
 
-    let results = try decodeAppleMusicCatalogSearchResults(from: data)
+    let results = try await self.searchResults(from: data)
 
     expect(results.albums.map(\.releaseType)).toEqual(["Album", "Single", "EP"])
   }
 
-  func testDecodesMixedSearchArtistResponse() throws {
+  func testDecodesMixedSearchArtistResponse() async throws {
     let data = try XCTUnwrap("""
     {
       "results": {
@@ -194,7 +194,7 @@ final class AppleMusicClientTests: XCTestCase {
     }
     """.data(using: .utf8))
 
-    let results = try decodeAppleMusicCatalogSearchResults(from: data)
+    let results = try await self.searchResults(from: data)
 
     expect(results.artists).toEqual([
       .init(
@@ -224,7 +224,7 @@ final class AppleMusicClientTests: XCTestCase {
     ])
   }
 
-  func testDecodesMixedSearchResponseUsingTopResultsOrder() throws {
+  func testDecodesMixedSearchResponseUsingTopResultsOrder() async throws {
     let data = try XCTUnwrap("""
     {
       "results": {
@@ -300,7 +300,7 @@ final class AppleMusicClientTests: XCTestCase {
     }
     """.data(using: .utf8))
 
-    let results = try decodeAppleMusicCatalogSearchResults(from: data)
+    let results = try await self.searchResults(from: data)
     let album = AppleMusicCatalogAlbum(
       id: .init(rawValue: "1511628001"),
       title: "Stories from the Outside",
@@ -320,10 +320,7 @@ final class AppleMusicClientTests: XCTestCase {
       ),
     )
 
-    expect(results.items).toEqual([.init(artist: artist), .init(album: album)])
-    expect(results.albums).toEqual([album])
-    expect(results.artists).toEqual([artist])
-    expect(results.tracks).toBeEmpty()
+    expect(results.items).toEqual([.artist(artist), .album(album)])
   }
 
   func testSearchHydratesCollectionAndTopResultSongs() async throws {
@@ -355,6 +352,7 @@ final class AppleMusicClientTests: XCTestCase {
             },
             "topResults": {
               "data": [
+                {"id": "song-collection", "type": "songs"},
                 {"id": "song-top", "type": "songs"},
                 {
                   "id": "album-result",
@@ -472,10 +470,18 @@ final class AppleMusicClientTests: XCTestCase {
         durationInMillis: 234_000,
       ),
     ])
-    expect(results.items.map(\.kind)).toEqual([.track, .album, .artist])
-    expect(results.items.first?.track).toEqual(results.tracks[1])
-    expect(results.albums.map(\.id)).toEqual(["album-result"])
-    expect(results.artists.map(\.id)).toEqual(["artist-result"])
+    let collectionTrack = try XCTUnwrap(results.tracks.first {
+      $0.id == "song-collection"
+    })
+    let topTrack = try XCTUnwrap(results.tracks.first { $0.id == "song-top" })
+    let album = try XCTUnwrap(results.albums.first)
+    let artist = try XCTUnwrap(results.artists.first)
+    expect(results.items).toEqual([
+      .track(collectionTrack),
+      .track(topTrack),
+      .album(album),
+      .artist(artist),
+    ])
 
     let requests = await loader.requestURLs()
     expect(requests.map(\.path)).toEqual([
@@ -556,8 +562,8 @@ final class AppleMusicClientTests: XCTestCase {
       load: loader.dataLoader,
     )
 
+    expect(results.items).toEqual(results.tracks.map(AppleMusicCatalogSearchItem.track))
     expect(results.tracks.map(\.id)).toEqual(["usable"])
-    expect(results.items.map(\.track?.id)).toEqual(["usable"])
   }
 
   func testPreferredAlbumUsesOfficialURLOnlyForExactRelationship() {
@@ -577,7 +583,7 @@ final class AppleMusicClientTests: XCTestCase {
     )).toBeNil()
   }
 
-  func testDecodesMixedSearchResponseFallsBackToMetaOrder() throws {
+  func testDecodesMixedSearchResponseFallsBackToMetaOrder() async throws {
     let data = try XCTUnwrap("""
     {
       "results": {
@@ -613,7 +619,7 @@ final class AppleMusicClientTests: XCTestCase {
     }
     """.data(using: .utf8))
 
-    let results = try decodeAppleMusicCatalogSearchResults(from: data)
+    let results = try await self.searchResults(from: data)
     let album = AppleMusicCatalogAlbum(
       id: .init(rawValue: "1511628001"),
       title: "Stories from the Outside",
@@ -625,7 +631,7 @@ final class AppleMusicClientTests: XCTestCase {
       catalogMetadata: .init(),
     )
 
-    expect(results.items).toEqual([.init(album: album), .init(artist: artist)])
+    expect(results.items).toEqual([.album(album), .artist(artist)])
   }
 
   func testDecodesAlbumTracksResponse() throws {
@@ -706,16 +712,56 @@ final class AppleMusicClientTests: XCTestCase {
     expect(resolution.album.tracks.map(\.id)).toEqual(["1511628002", "1511628003"])
   }
 
-  func testDecodesMissingAlbumsAsEmpty() throws {
+  func testDecodesMissingAlbumsAsEmpty() async throws {
     let data = try XCTUnwrap("""
     {
       "results": {}
     }
     """.data(using: .utf8))
 
-    let results = try decodeAppleMusicCatalogSearchResults(from: data)
+    let results = try await self.searchResults(from: data)
 
-    expect(results.albums).toEqual([])
-    expect(results.artists).toEqual([])
+    expect(results.items).toBeEmpty()
+  }
+
+  private func searchResults(
+    from data: Data,
+  ) async throws -> AppleMusicCatalogSearchResults {
+    try await searchAppleMusicCatalog(
+      .init(term: "test"),
+      load: { url in
+        switch url.path {
+        case "/v1/catalog/us/search":
+          data
+        case "/v1/catalog/us/songs":
+          Data(#"{"data":[]}"#.utf8)
+        default:
+          throw StubError.unexpectedURL(url.absoluteString)
+        }
+      },
+    )
+  }
+}
+
+private extension AppleMusicCatalogSearchResults {
+  var albums: [AppleMusicCatalogAlbum] {
+    self.items.compactMap {
+      guard case .album(let album) = $0 else { return nil }
+      return album
+    }
+  }
+
+  var artists: [AppleMusicCatalogArtist] {
+    self.items.compactMap {
+      guard case .artist(let artist) = $0 else { return nil }
+      return artist
+    }
+  }
+
+  var tracks: [AppleMusicCatalogSearchTrack] {
+    self.items.compactMap {
+      guard case .track(let track) = $0 else { return nil }
+      return track
+    }
   }
 }

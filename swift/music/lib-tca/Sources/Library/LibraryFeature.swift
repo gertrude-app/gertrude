@@ -97,6 +97,7 @@ struct LibraryFeature: Sendable {
 
   enum DelegateAction: Equatable {
     case addToQueue(items: [PlaybackItem])
+    case approvedTrackIDsUpdated(Set<ApprovedTrack.ID>)
     case artistPlaybackButtonTapped(
       items: [PlaybackItem],
       context: PlaybackContext,
@@ -257,20 +258,21 @@ struct LibraryFeature: Sendable {
       case .addToPlaylistMutationResponse(let outcome):
         state.isPlaylistMutationInFlight = false
         state.isRefreshingRemoteLibrary = false
+        var effects: [EffectOf<Self>] = []
         var recencyToSave: LibraryCollectionRecency?
         switch outcome {
         case .updated(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.addToPlaylist = nil
           if state.playlistIDsBeforeCreate != nil {
             recencyToSave = state.prioritizeCreatedPlaylist(in: library, at: self.now)
           }
         case .confirmationRequired(let library, let confirmation):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.addToPlaylist?.confirmation = confirmation
           state.playlistIDsBeforeCreate = nil
         case .conflict(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.playlistMutationFailure = .conflict
           state.playlistIDsBeforeCreate = nil
         case .failed:
@@ -278,9 +280,9 @@ struct LibraryFeature: Sendable {
           state.playlistIDsBeforeCreate = nil
         }
         if let recencyToSave {
-          return self.saveCollectionRecency(recencyToSave)
+          effects.append(self.saveCollectionRecency(recencyToSave))
         }
-        return .none
+        return .merge(effects)
 
       case .albumAddToQueueTapped(let albumID):
         return self.queueAlbum(
@@ -553,11 +555,10 @@ struct LibraryFeature: Sendable {
         )
 
       case .approvedLibraryLoaded(let library):
-        state.applyLibrary(library)
         if library.isEmpty {
           log(.debug, .library, "e24738fc")
         }
-        return .none
+        return self.applyAuthoritativeLibrary(library, to: &state)
 
       case .approvedLibraryLoadFailed:
         log(.err, .library, "cd55459e")
@@ -596,15 +597,16 @@ struct LibraryFeature: Sendable {
       case .playlistMutationResponse(let outcome, let rollback):
         state.isPlaylistMutationInFlight = false
         state.isRefreshingRemoteLibrary = false
+        var effects: [EffectOf<Self>] = []
         var recencyToSave: LibraryCollectionRecency?
         switch outcome {
         case .updated(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           if state.playlistIDsBeforeCreate != nil {
             recencyToSave = state.prioritizeCreatedPlaylist(in: library, at: self.now)
           }
         case .conflict(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.playlistMutationFailure = .conflict
           state.playlistIDsBeforeCreate = nil
         case .failed:
@@ -615,9 +617,9 @@ struct LibraryFeature: Sendable {
           state.playlistIDsBeforeCreate = nil
         }
         if let recencyToSave {
-          return self.saveCollectionRecency(recencyToSave)
+          effects.append(self.saveCollectionRecency(recencyToSave))
         }
-        return .none
+        return .merge(effects)
 
       case .refreshPresentationFinished:
         state.isRefreshingRemoteLibrary = false
@@ -893,6 +895,14 @@ struct LibraryFeature: Sendable {
         }
       },
     )
+  }
+
+  private func applyAuthoritativeLibrary(
+    _ library: ApprovedMusicLibrary,
+    to state: inout State,
+  ) -> EffectOf<Self> {
+    state.applyLibrary(library)
+    return .send(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
   }
 
   private func saveCollectionRecency(

@@ -116,40 +116,34 @@ extension SearchMusicCatalog_v2: Resolver {
     ))
     return .init(
       revision: revision,
-      items: results.items.compactMap { item in
-        switch item.kind {
-        case .track:
-          item.track.map {
-            .init(
-              kind: .track,
-              track: outputTrack($0, policy: policy),
-              album: nil,
-              artist: nil,
-            )
-          }
-        case .album:
-          item.album.map {
-            .init(
-              kind: .album,
-              track: nil,
-              album: outputAlbum($0, policy: policy),
-              artist: nil,
-            )
-          }
-        case .artist:
-          item.artist.map {
-            .init(
-              kind: .artist,
-              track: nil,
-              album: nil,
-              artist: .init(
-                id: $0.id,
-                name: $0.name,
-                catalogMetadata: $0.catalogMetadata,
-                status: policy.artist($0.id) == nil ? .available : .allowed,
-              ),
-            )
-          }
+      items: results.items.map { item in
+        switch item {
+        case .track(let track):
+          .init(
+            kind: .track,
+            track: outputTrack(track, policy: policy),
+            album: nil,
+            artist: nil,
+          )
+        case .album(let album):
+          .init(
+            kind: .album,
+            track: nil,
+            album: outputAlbum(album, policy: policy),
+            artist: nil,
+          )
+        case .artist(let artist):
+          .init(
+            kind: .artist,
+            track: nil,
+            album: nil,
+            artist: .init(
+              id: artist.id,
+              name: artist.name,
+              catalogMetadata: artist.catalogMetadata,
+              status: policy.artist(artist.id) == nil ? .available : .allowed,
+            ),
+          )
         }
       },
     )

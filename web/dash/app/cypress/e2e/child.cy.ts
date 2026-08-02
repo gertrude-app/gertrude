@@ -109,6 +109,7 @@ describe(`children screen`, () => {
       cy.contains(`Gertrude Music`);
       cy.contains(`Search Apple Music`);
       cy.contains(/Huck.s allowed music/);
+      cy.contains(`Changes appear after the Music app is relaunched or refreshed`);
       cy.contains(`No allowed music yet`);
     });
 

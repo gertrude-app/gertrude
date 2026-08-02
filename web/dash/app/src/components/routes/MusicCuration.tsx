@@ -319,7 +319,7 @@ const MusicCuration: React.FC<{
           </h2>
           {curationQuery.data && (
             <p className="hidden text-xs text-slate-400 sm:block">
-              Changes appear automatically on connected devices
+              Changes appear after the Music app is relaunched or refreshed
             </p>
           )}
         </div>

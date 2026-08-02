@@ -665,14 +665,9 @@ final class MusicCurationResolverTests: ApiTestCase, @unchecked Sendable {
           AppleMusicCatalogArtist(id: "allowed-artist", name: "Allowed Artist"),
           AppleMusicCatalogArtist(id: "available-artist", name: "Available Artist"),
         ]
-        return .init(
-          items: tracks.map(AppleMusicCatalogSearchItem.init(track:))
-            + albums.map(AppleMusicCatalogSearchItem.init(album:))
-            + artists.map(AppleMusicCatalogSearchItem.init(artist:)),
-          albums: albums,
-          artists: artists,
-          tracks: tracks,
-        )
+        return .init(items: tracks.map(AppleMusicCatalogSearchItem.track)
+          + albums.map(AppleMusicCatalogSearchItem.album)
+          + artists.map(AppleMusicCatalogSearchItem.artist))
       }
     } operation: {
       try await SearchMusicCatalog_v2.resolve(

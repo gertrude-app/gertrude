@@ -140,57 +140,14 @@ struct AppleMusicCatalogSearchTrack: Codable, Equatable, Sendable {
   }
 }
 
-struct AppleMusicCatalogSearchResults: Codable, Equatable, Sendable {
+struct AppleMusicCatalogSearchResults: Equatable, Sendable {
   var items: [AppleMusicCatalogSearchItem]
-  var albums: [AppleMusicCatalogAlbum]
-  var artists: [AppleMusicCatalogArtist]
-  var tracks: [AppleMusicCatalogSearchTrack]
-
-  init(
-    items: [AppleMusicCatalogSearchItem],
-    albums: [AppleMusicCatalogAlbum],
-    artists: [AppleMusicCatalogArtist],
-    tracks: [AppleMusicCatalogSearchTrack] = [],
-  ) {
-    self.items = items
-    self.albums = albums
-    self.artists = artists
-    self.tracks = tracks
-  }
 }
 
-struct AppleMusicCatalogSearchItem: Codable, Equatable, Sendable {
-  enum Kind: String, Codable, Sendable {
-    case album
-    case artist
-    case track
-  }
-
-  var kind: Kind
-  var album: AppleMusicCatalogAlbum?
-  var artist: AppleMusicCatalogArtist?
-  var track: AppleMusicCatalogSearchTrack?
-
-  init(album: AppleMusicCatalogAlbum) {
-    self.kind = .album
-    self.album = album
-    self.artist = nil
-    self.track = nil
-  }
-
-  init(artist: AppleMusicCatalogArtist) {
-    self.kind = .artist
-    self.album = nil
-    self.artist = artist
-    self.track = nil
-  }
-
-  init(track: AppleMusicCatalogSearchTrack) {
-    self.kind = .track
-    self.album = nil
-    self.artist = nil
-    self.track = track
-  }
+enum AppleMusicCatalogSearchItem: Equatable, Sendable {
+  case album(AppleMusicCatalogAlbum)
+  case artist(AppleMusicCatalogArtist)
+  case track(AppleMusicCatalogSearchTrack)
 }
 
 struct AppleMusicCatalogTrack: Codable, Equatable, Sendable {
@@ -258,7 +215,7 @@ extension AppleMusicClient: TestDependencyKey {
   static let testValue = Self(
     searchCatalog: unimplemented(
       "AppleMusicClient.searchCatalog()",
-      placeholder: .init(items: [], albums: [], artists: []),
+      placeholder: .init(items: []),
     ),
     albumTracks: unimplemented("AppleMusicClient.albumTracks()", placeholder: []),
     resolveAlbum: { try Self.testResolvedAlbum($0) },
@@ -414,17 +371,6 @@ func appleMusicCatalogAlbumURL(_ lookup: AppleMusicAlbumTracksLookup) throws -> 
   return url
 }
 
-func decodeAppleMusicCatalogSearchResults(
-  from data: Data,
-) throws -> AppleMusicCatalogSearchResults {
-  let response = try JSONDecoder().decode(AppleMusicCatalogSearchResponse.self, from: data)
-  return catalogSearchResults(
-    from: response,
-    tracks: [],
-    defaultOrder: ["artists", "albums"],
-  )
-}
-
 func searchAppleMusicCatalog(
   _ search: AppleMusicCatalogSearch,
   load: AppleMusicDataLoader,
@@ -454,20 +400,16 @@ private func catalogSearchResults(
   let topItems = response.results?.topResults?.data.compactMap {
     catalogSearchItem(from: $0, tracksById: tracksById)
   } ?? []
-  return .init(
-    items: topItems.isEmpty
-      ? fallbackCatalogSearchItems(
-        albums: albums,
-        artists: artists,
-        tracks: tracks,
-        order: response.meta?.results.order,
-        defaultOrder: defaultOrder,
-      )
-      : topItems,
-    albums: albums,
-    artists: artists,
-    tracks: tracks,
-  )
+  let items = topItems.isEmpty
+    ? fallbackCatalogSearchItems(
+      albums: albums,
+      artists: artists,
+      tracks: tracks,
+      order: response.meta?.results.order,
+      defaultOrder: defaultOrder,
+    )
+    : topItems
+  return .init(items: items)
 }
 
 private func catalogSearchSongIds(
@@ -568,12 +510,12 @@ private func catalogSearchItem(
   tracksById: [Music.TrackId: AppleMusicCatalogSearchTrack],
 ) -> AppleMusicCatalogSearchItem? {
   if let album = topResult.album {
-    .init(album: catalogAlbum(from: album))
+    .album(catalogAlbum(from: album))
   } else if let artist = topResult.artist {
-    .init(artist: catalogArtist(from: artist))
+    .artist(catalogArtist(from: artist))
   } else if let song = topResult.song,
             let track = tracksById[Music.TrackId(rawValue: song.id)] {
-    .init(track: track)
+    .track(track)
   } else {
     nil
   }
@@ -591,19 +533,19 @@ private func fallbackCatalogSearchItems(
   for kind in orderedKinds {
     switch kind {
     case "albums":
-      items.append(contentsOf: albums.map(AppleMusicCatalogSearchItem.init(album:)))
+      items.append(contentsOf: albums.map(AppleMusicCatalogSearchItem.album))
     case "artists":
-      items.append(contentsOf: artists.map(AppleMusicCatalogSearchItem.init(artist:)))
+      items.append(contentsOf: artists.map(AppleMusicCatalogSearchItem.artist))
     case "songs":
-      items.append(contentsOf: tracks.map(AppleMusicCatalogSearchItem.init(track:)))
+      items.append(contentsOf: tracks.map(AppleMusicCatalogSearchItem.track))
     default:
       break
     }
   }
   return items.isEmpty
-    ? tracks.map(AppleMusicCatalogSearchItem.init(track:))
-    + albums.map(AppleMusicCatalogSearchItem.init(album:))
-    + artists.map(AppleMusicCatalogSearchItem.init(artist:))
+    ? tracks.map(AppleMusicCatalogSearchItem.track)
+    + albums.map(AppleMusicCatalogSearchItem.album)
+    + artists.map(AppleMusicCatalogSearchItem.artist)
     : items
 }
 

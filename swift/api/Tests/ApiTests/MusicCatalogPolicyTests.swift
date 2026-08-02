@@ -175,7 +175,7 @@ final class MusicCatalogPolicyTests: XCTestCase {
 
     expect(index.governingGrant(forAlbum: "partial-album")).toBeNil()
     expect(index.governingGrant(forTrack: "earlier-track")).toEqual(.track(earlier))
-    expect(index.directTrackGrant(forTrack: "later-track")).toEqual(later)
+    expect(index.governingGrant(forTrack: "later-track")).toEqual(.track(later))
     expect(index.directTrackGrants(preferredAlbumId: "partial-album"))
       .toEqual([earlier, later])
   }

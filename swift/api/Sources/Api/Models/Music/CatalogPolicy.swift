@@ -216,10 +216,6 @@ extension Music {
         return self.trackGrantsById[trackId].map(GoverningGrant.track)
       }
 
-      func directTrackGrant(forTrack trackId: TrackId) -> TrackGrant? {
-        self.trackGrantsById[trackId]
-      }
-
       func directTrackGrants(preferredAlbumId: AlbumId) -> [TrackGrant] {
         self.trackIdsByPreferredAlbumId[preferredAlbumId, default: []].compactMap {
           self.trackGrantsById[$0]

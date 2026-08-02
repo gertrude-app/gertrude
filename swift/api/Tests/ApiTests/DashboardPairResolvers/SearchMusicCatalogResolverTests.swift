@@ -28,11 +28,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
           name: search.term,
           catalogMetadata: artistMetadata(genreNames: ["us"]),
         )
-        return .init(
-          items: [.init(artist: artist), .init(album: album)],
-          albums: [album],
-          artists: [artist],
-        )
+        return .init(items: [.artist(artist), .album(album)])
       }
     } operation: {
       try await SearchMusicCatalog_v2.resolve(
@@ -68,11 +64,7 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
             id: "2",
             name: "Artist \(search.limit)",
           )
-          return .init(
-            items: [.init(album: album), .init(artist: artist)],
-            albums: [album],
-            artists: [artist],
-          )
+          return .init(items: [.album(album), .artist(artist)])
         }
       } operation: {
         try await SearchMusicCatalog_v2.resolve(

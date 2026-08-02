@@ -302,22 +302,6 @@ extension Music.CatalogPolicy {
       .delete(in: db) > 0
   }
 
-  static func removeDirectAlbum(
-    childId: Child.Id,
-    albumId: Music.AlbumId,
-    in db: any DuetSQL.Client,
-  ) async throws -> Bool {
-    let deletedAlbum = try await Music.ApprovedAlbum.query()
-      .where(.childId == childId)
-      .where(.appleMusicAlbumId == albumId.rawValue)
-      .delete(in: db)
-    let deletedTracks = try await Music.ApprovedTrack.query()
-      .where(.childId == childId)
-      .where(.preferredAlbumId == albumId.rawValue)
-      .delete(in: db)
-    return deletedAlbum + deletedTracks > 0
-  }
-
   private static func upsertAlbum(
     childId: Child.Id,
     resolution: Music.ResolvedAlbum,

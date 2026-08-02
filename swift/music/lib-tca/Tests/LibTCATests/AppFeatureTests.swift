@@ -681,6 +681,7 @@ struct AppFeatureTests {
     #expect(store.state.playback.approvedTrackIDs == nil)
 
     await store.send(.library(.approvedLibraryLoaded(library)))
+    await store.receive(.library(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs))))
     await store.receive(.playback(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
 
     expectNoDifference(store.state.playback.approvedTrackIDs, library.approvedTrackIDs)

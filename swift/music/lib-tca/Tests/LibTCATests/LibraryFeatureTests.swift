@@ -26,6 +26,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(library)) {
       $0.status = .loaded(library)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -48,6 +49,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(.empty)) {
       $0.status = .empty
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated([])))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -71,6 +73,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(library)) {
       $0.status = .loaded(library)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -142,6 +145,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(library)) {
       $0.status = .loaded(library)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -176,6 +180,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(remote)) {
       $0.status = .loaded(remote)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(remote.approvedTrackIDs)))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -199,6 +204,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(remote)) {
       $0.status = .loaded(remote)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(remote.approvedTrackIDs)))
     await clock.advance(by: .milliseconds(1500))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
@@ -227,6 +233,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(remote)) {
       $0.status = .loaded(remote)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(remote.approvedTrackIDs)))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -253,6 +260,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryLoaded(remote)) {
       $0.status = .loaded(remote)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(remote.approvedTrackIDs)))
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -627,6 +635,7 @@ struct LibraryFeatureTests {
         at: now,
       )
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
     await store.finish()
 
     let savedRecency = await recorder.value
@@ -674,6 +683,7 @@ struct LibraryFeatureTests {
         at: now,
       )
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
     await store.finish()
 
     let firstItemID = updatedLibrary.collectionItems(
@@ -739,6 +749,7 @@ struct LibraryFeatureTests {
       $0.isPlaylistMutationInFlight = false
       $0.addToPlaylist?.confirmation = confirmation
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
     await store.send(.addToPlaylistDuplicateResolutionSelected(.addAgain)) {
       $0.addToPlaylist?.confirmation = nil
       $0.isPlaylistMutationInFlight = true
@@ -748,6 +759,7 @@ struct LibraryFeatureTests {
       $0.isPlaylistMutationInFlight = false
       $0.status = .loaded(updatedLibrary)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
   }
 
   @Test
@@ -783,6 +795,7 @@ struct LibraryFeatureTests {
       $0.isPlaylistMutationInFlight = false
       $0.applyLibrary(updatedLibrary)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
   }
 
   @Test

@@ -129,6 +129,9 @@ struct AppFeature: Sendable {
         state.pendingLibraryPlayNowOrigin = nil
         return .send(.playback(.addToQueue(items)))
 
+      case .library(.delegate(.approvedTrackIDsUpdated(let approvedTrackIDs))):
+        return .send(.playback(.approvedTrackIDsUpdated(approvedTrackIDs)))
+
       case .library(.delegate(.artistPlaybackButtonTapped(let items, let context))):
         guard !items.isEmpty else { return .none }
         if state.playback.activePlaybackContext?.identity == context.identity {
@@ -163,17 +166,10 @@ struct AppFeature: Sendable {
       case .library(.delegate(.togglePlayPause)):
         return .send(.playback(.togglePlayPause))
 
-      case .library(let libraryAction):
+      case .library:
         state.search.applyLibraryStatus(state.library.status)
         self.synchronizeDetailPlayback(state: &state)
-        let albumResolution = self.resolveCurrentPlaybackAlbum(state: &state)
-        guard case .approvedLibraryLoaded(let library) = libraryAction else {
-          return albumResolution
-        }
-        return .merge(
-          albumResolution,
-          .send(.playback(.approvedTrackIDsUpdated(library.approvedTrackIDs))),
-        )
+        return self.resolveCurrentPlaybackAlbum(state: &state)
 
       case .playback(.playNowFinished):
         let origin = state.pendingLibraryPlayNowOrigin
