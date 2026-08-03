@@ -8,6 +8,13 @@ building projects, checking Xcode navigator issues, rendering SwiftUI previews, 
 build logs, and inspecting project structure. Prefer it over shell-only checks when the
 user's issue is visible in Xcode or previews.
 
+Never take over or disrupt Kiah's visible desktop. Do not bring apps or windows to the
+foreground, move the pointer, synthesize mouse, keyboard, or touch input, or run UI
+automation that controls the host screen. Never manipulate visible UI to facilitate a
+test or screenshot. Screenshots and previews are allowed only when they can be captured
+entirely in the background without changing visible UI or stealing focus; otherwise ask
+Kiah to perform the interaction or provide the screenshot.
+
 For physical-device Gertrude Music debug builds, generate the Xcode project with Kiah's
 personal development team and temporary bundle identifier. Keep these as generation-time
 overrides rather than changing the checked-in project defaults:
