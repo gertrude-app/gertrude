@@ -6,7 +6,7 @@ import type {
 } from '#/components/types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
 import IosSettingsPage from './IosSettingsPage';
-import MacSettingsPage from './MacSettingsPage';
+import MacSettingsPage from './MacSettingsPage.reference';
 import PersonSettingsComingSoonPage from './PersonSettingsComingSoonPage';
 import {
   albums,

@@ -13,6 +13,7 @@ type Props = {
   | {
       type: `toggle`;
       enabled: boolean;
+      disabled?: boolean;
       setEnabled: (enabled: boolean) => void;
     }
   | {
@@ -37,7 +38,12 @@ const SettingsRow: React.FC<Props> = (props) => {
             <Text variant="bodySubtle">{props.description}</Text>
           </VStack>
           {props.type === `toggle` && (
-            <Toggle checked={props.enabled} setChecked={props.setEnabled} />
+            <Toggle
+              checked={props.enabled}
+              setChecked={props.setEnabled}
+              disabled={props.disabled}
+              ariaLabel={props.title}
+            />
           )}
         </HStack>
         {props.children && (

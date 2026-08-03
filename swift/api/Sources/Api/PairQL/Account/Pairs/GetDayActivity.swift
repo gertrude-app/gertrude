@@ -31,7 +31,9 @@ extension GetDayActivity: Resolver {
       return PersonDay(
         personId: person.id,
         personName: person.name,
-        items: feed.items.map(GetPersonDayActivity.Item.init(from:)),
+        items: feed.items.map {
+          .init(from: $0, showSuspensionActivity: feed.showSuspensionActivity)
+        },
       )
     }
     return Output(people: peopleDays.filter { !$0.items.isEmpty })

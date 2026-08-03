@@ -12,6 +12,8 @@ export * from './pairs/GetDayActivity';
 export * from './pairs/GetPeople';
 export * from './pairs/GetPersonActivitySummaries';
 export * from './pairs/GetPersonDayActivity';
+export * from './pairs/GetPersonMacSettings';
 export * from './pairs/GetSuspensionRequests';
 export * from './pairs/ToggleActivityFlag';
 export * from './pairs/UpdatePersonBasicDetails';
+export * from './pairs/UpdatePersonMacMonitoringSettings';

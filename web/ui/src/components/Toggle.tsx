@@ -6,13 +6,15 @@ interface Props {
   setChecked: (checked: boolean) => void;
   disabled?: boolean;
   small?: boolean;
+  ariaLabel?: string;
 }
 
-const Toggle: React.FC<Props> = ({ checked, setChecked, disabled, small }) => (
+const Toggle: React.FC<Props> = ({ checked, setChecked, disabled, small, ariaLabel }) => (
   <button
     type="button"
     role="switch"
     aria-checked={checked}
+    aria-label={ariaLabel}
     disabled={disabled}
     onClick={() => setChecked(!checked)}
     className={cx(

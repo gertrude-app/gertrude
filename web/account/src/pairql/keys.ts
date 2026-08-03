@@ -4,6 +4,7 @@ import type {
   GetPeople,
   GetPersonActivitySummaries,
   GetPersonDayActivity,
+  GetPersonMacSettings,
   GetSuspensionRequests,
 } from '@shared/pairql/src/account';
 
@@ -22,6 +23,10 @@ export class Key extends QueryKey<never> {
 
   static get suspensionRequests(): QueryKey<GetSuspensionRequests.Output> {
     return new QueryKey([`requests`, `suspension`]);
+  }
+
+  static get activity(): QueryKey<unknown> {
+    return new QueryKey([`activity`]);
   }
 
   static get activitySummaries(): QueryKey<GetActivitySummaries.Output> {
@@ -43,6 +48,10 @@ export class Key extends QueryKey<never> {
     day: string,
   ): QueryKey<GetPersonDayActivity.Output> {
     return new QueryKey([`activity`, personId, day]);
+  }
+
+  static personMacSettings(personId: string): QueryKey<GetPersonMacSettings.Output> {
+    return new QueryKey([`people`, personId, `mac-settings`]);
   }
 
   private constructor() {

@@ -1,4 +1,4 @@
-import { Divider, HStack, Text, VStack } from '@gertrude/ui';
+import { Badge, Divider, HStack, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
@@ -14,6 +14,7 @@ export type PersonSettingsExpandableSectionProps = {
   previewChips: PersonSettingsPreviewChip[];
   appIconUrl?: string;
   defaultExpanded?: boolean;
+  hasUnsavedChanges?: boolean;
   children: React.ReactNode;
 };
 
@@ -22,6 +23,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
   previewChips,
   appIconUrl,
   defaultExpanded = false,
+  hasUnsavedChanges = false,
   children,
 }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
@@ -67,12 +69,19 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
             })}
           </HStack>
         </HStack>
-        <ChevronRightIcon
-          className={cx(
-            `w-5 h-5 text-stone-600 transition-[rotate] duration-200 shrink-0`,
-            expanded && `rotate-90`,
+        <HStack gap={2} className="shrink-0">
+          {hasUnsavedChanges && (
+            <Badge size="small" color="yellow">
+              Unsaved changes
+            </Badge>
           )}
-        />
+          <ChevronRightIcon
+            className={cx(
+              `w-5 h-5 text-stone-600 transition-[rotate] duration-200 shrink-0`,
+              expanded && `rotate-90`,
+            )}
+          />
+        </HStack>
       </HStack>
       <div
         className={cx(

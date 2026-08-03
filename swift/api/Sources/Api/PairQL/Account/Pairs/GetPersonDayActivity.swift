@@ -53,7 +53,7 @@ extension GetPersonDayActivity: Resolver {
     )
     return Output(
       personName: feed.userName,
-      items: feed.items.map(Item.init(from:)),
+      items: feed.items.map { Item(from: $0, showSuspensionActivity: feed.showSuspensionActivity) },
     )
   }
 }
@@ -61,7 +61,7 @@ extension GetPersonDayActivity: Resolver {
 // mappers
 
 extension GetPersonDayActivity.Item {
-  init(from item: UserActivity.Item) {
+  init(from item: UserActivity.Item, showSuspensionActivity: Bool) {
     switch item {
     case .screenshot(let screenshot):
       self = .screenshot(.init(
@@ -72,7 +72,7 @@ extension GetPersonDayActivity.Item {
         height: screenshot.height,
         date: screenshot.createdAt,
         flagged: screenshot.flagged,
-        duringSuspension: screenshot.duringSuspension,
+        duringSuspension: showSuspensionActivity && screenshot.duringSuspension,
       ))
     case .keystrokeLine(let keystroke):
       self = .keylog(.init(
@@ -82,7 +82,7 @@ extension GetPersonDayActivity.Item {
         appName: keystroke.appName,
         date: keystroke.createdAt,
         flagged: keystroke.flagged,
-        duringSuspension: keystroke.duringSuspension,
+        duringSuspension: showSuspensionActivity && keystroke.duringSuspension,
       ))
     }
   }

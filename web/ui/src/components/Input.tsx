@@ -24,6 +24,8 @@ type Props = {
   name?: string;
   required?: boolean;
   autoComplete?: string;
+  min?: number;
+  step?: number;
   helperText?: string;
   error?: string;
   disabled?: boolean;
@@ -78,7 +80,8 @@ const Input: React.FC<Props> = ({ ...props }) => {
           )}
           placeholder={props.placeholder}
           type={props.type}
-          step={props.type === `time` ? 60 : undefined}
+          min={props.min}
+          step={props.type === `time` ? 60 : props.step}
           value={props.value}
           disabled={props.disabled}
           required={props.required}

@@ -32,6 +32,8 @@ enum AccountTsCodegenRoute {
       CreatePerson.self,
       UpdatePersonBasicDetails.self,
       DeletePerson.self,
+      GetPersonMacSettings.self,
+      UpdatePersonMacMonitoringSettings.self,
       GetSuspensionRequests.self,
       DecideSuspensionRequest.self,
       GetActivitySummaries.self,
