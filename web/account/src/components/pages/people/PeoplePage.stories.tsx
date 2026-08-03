@@ -11,6 +11,7 @@ const defaultProps: PeoplePageProps = {
   peopleState: { status: `success`, data: people },
   suspensionRequestsState: { status: `success`, data: suspensionRequests },
   onRefreshSuspensionRequests: noop,
+  addPersonHref: `/people/new`,
   suspensionRequestsHref: `/requests/suspension`,
   suspensionRequestHrefForRequest: (id) => `/requests/suspension/${id}`,
   monitorHref: `/activity`,

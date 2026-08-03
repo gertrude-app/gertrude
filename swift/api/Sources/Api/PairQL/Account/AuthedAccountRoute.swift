@@ -4,7 +4,8 @@ import Vapor
 
 enum AuthedAccountRoute: PairRoute {
   case getPeople
-  case updatePersonName(UpdatePersonName.Input)
+  case createPerson(CreatePerson.Input)
+  case updatePersonBasicDetails(UpdatePersonBasicDetails.Input)
   case deletePerson(DeletePerson.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
@@ -19,9 +20,13 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.getPeople)) {
       Operation(GetPeople.self)
     }
-    Route(.case(Self.updatePersonName)) {
-      Operation(UpdatePersonName.self)
-      Body(.accountInput(UpdatePersonName.self))
+    Route(.case(Self.createPerson)) {
+      Operation(CreatePerson.self)
+      Body(.accountInput(CreatePerson.self))
+    }
+    Route(.case(Self.updatePersonBasicDetails)) {
+      Operation(UpdatePersonBasicDetails.self)
+      Body(.accountInput(UpdatePersonBasicDetails.self))
     }
     Route(.case(Self.deletePerson)) {
       Operation(DeletePerson.self)
@@ -67,8 +72,11 @@ extension AuthedAccountRoute: RouteResponder {
     case .getPeople:
       let output = try await GetPeople.resolve(in: context)
       return try await self.respond(with: output)
-    case .updatePersonName(let input):
-      let output = try await UpdatePersonName.resolve(with: input, in: context)
+    case .createPerson(let input):
+      let output = try await CreatePerson.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .updatePersonBasicDetails(let input):
+      let output = try await UpdatePersonBasicDetails.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .deletePerson(let input):
       let output = try await DeletePerson.resolve(with: input, in: context)

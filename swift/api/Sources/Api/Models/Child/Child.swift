@@ -6,6 +6,7 @@ struct Child: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id
   var name: String
+  var relationship: Relationship
   var keyloggingEnabled: Bool
   var screenshotsEnabled: Bool
   var screenshotsResolution: Int
@@ -20,6 +21,7 @@ struct Child: Codable, Sendable {
     id: Id = .init(),
     parentId: Parent.Id,
     name: String,
+    relationship: Relationship = .child,
     keyloggingEnabled: Bool = true,
     screenshotsEnabled: Bool = true,
     screenshotsResolution: Int = 1000,
@@ -31,6 +33,7 @@ struct Child: Codable, Sendable {
     self.id = id
     self.parentId = parentId
     self.name = name
+    self.relationship = relationship
     self.keyloggingEnabled = keyloggingEnabled
     self.screenshotsEnabled = screenshotsEnabled
     self.screenshotsResolution = screenshotsResolution
@@ -38,6 +41,14 @@ struct Child: Codable, Sendable {
     self.showSuspensionActivity = showSuspensionActivity
     self.filteringDisabled = filteringDisabled
     self.downtime = downtime
+  }
+}
+
+extension Child {
+  enum Relationship: String, Codable, Equatable, CaseIterable, Sendable {
+    case child
+    case peer
+    case selfManaged = "self"
   }
 }
 

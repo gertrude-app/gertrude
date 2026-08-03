@@ -55,6 +55,7 @@ const PeopleRoute: React.FC = () => {
       suspensionRequestsState={suspensionRequestsState}
       onRefreshSuspensionRequests={() => void suspensionRequestsQuery.refetch()}
       refreshingSuspensionRequests={suspensionRequestsQuery.isFetching}
+      addPersonHref="/people/new"
       suspensionRequestsHref="/requests/suspension"
       suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
       monitorHref="/activity"

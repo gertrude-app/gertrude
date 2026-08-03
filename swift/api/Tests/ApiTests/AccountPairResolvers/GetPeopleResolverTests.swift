@@ -9,7 +9,11 @@ import XExpect
 final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
   func testReturnsPeopleWithConnectedDevicesAndRecentScreenshot() async throws {
     let parent = try await self.parent()
-    let person = try await self.db.create(Child(parentId: parent.id, name: "Jude"))
+    let person = try await self.db.create(Child(
+      parentId: parent.id,
+      name: "Jude",
+      relationship: .peer,
+    ))
     let personWithoutDevices = try await self.db.create(
       Child(parentId: parent.id, name: "Mabel"),
     )
@@ -82,6 +86,7 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output).toHaveCount(2)
     let returnedPerson = try XCTUnwrap(output.first { $0.id == person.id })
     expect(returnedPerson.name).toEqual("Jude")
+    expect(returnedPerson.relationship).toEqual(.peer)
     expect(returnedPerson.devices).toHaveCount(3)
 
     guard case .mac(let mac) = returnedPerson.devices[0] else {
@@ -118,6 +123,7 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
     let returnedPersonWithoutDevices = try XCTUnwrap(
       output.first { $0.id == personWithoutDevices.id },
     )
+    expect(returnedPersonWithoutDevices.relationship).toEqual(.child)
     expect(returnedPersonWithoutDevices.devices).toBeEmpty()
     expect(returnedPersonWithoutDevices.screenshot).toBeNil()
   }

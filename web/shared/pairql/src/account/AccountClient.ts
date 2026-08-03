@@ -36,6 +36,12 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public createPerson = (
+    input: P.CreatePerson.Input,
+  ): Promise<Result<P.CreatePerson.Output>> => {
+    return this.query<P.CreatePerson.Output>(input, `CreatePerson`, `parent`);
+  };
+
   public decideSuspensionRequest = (
     input: P.DecideSuspensionRequest.Input,
   ): Promise<Result<P.DecideSuspensionRequest.Output>> => {
@@ -114,10 +120,14 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.ToggleActivityFlag.Output>(input, `ToggleActivityFlag`, `parent`);
   };
 
-  public updatePersonName = (
-    input: P.UpdatePersonName.Input,
-  ): Promise<Result<P.UpdatePersonName.Output>> => {
-    return this.query<P.UpdatePersonName.Output>(input, `UpdatePersonName`, `parent`);
+  public updatePersonBasicDetails = (
+    input: P.UpdatePersonBasicDetails.Input,
+  ): Promise<Result<P.UpdatePersonBasicDetails.Output>> => {
+    return this.query<P.UpdatePersonBasicDetails.Output>(
+      input,
+      `UpdatePersonBasicDetails`,
+      `parent`,
+    );
   };
 }
 

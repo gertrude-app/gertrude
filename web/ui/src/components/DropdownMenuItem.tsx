@@ -6,6 +6,7 @@ import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
 import VStack from '../primitives/VStack';
 import { useOverlayPortalContainer } from './OverlayPortalContext';
+import Tooltip from './Tooltip';
 
 export type DropdownMenuItemIcon = LucideIcon | React.ReactNode;
 
@@ -18,16 +19,25 @@ interface Props {
   onSelect?: () => void;
   children?: React.ReactNode;
   destructive?: boolean;
+  disabled?: boolean;
+  disabledTooltip?: React.ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
 
-const itemClasses = (active?: boolean, destructive?: boolean): string =>
+const itemClasses = (
+  active?: boolean,
+  destructive?: boolean,
+  disabled?: boolean,
+): string =>
   cx(
-    `flex justify-between items-start cursor-pointer outline-none hover:bg-stone-100 data-[highlighted]:bg-stone-100 px-2 py-1.5 rounded-lg gap-3`,
-    active && `bg-stone-100`,
-    destructive && `hover:!bg-red-100/50`,
+    `flex justify-between items-start outline-none px-2 py-1.5 rounded-lg gap-3`,
+    disabled
+      ? `cursor-not-allowed opacity-50`
+      : `cursor-pointer hover:bg-stone-100 data-[highlighted]:bg-stone-100`,
+    active && !disabled && `bg-stone-100`,
+    destructive && !disabled && `hover:!bg-red-100/50`,
   );
 
 const renderIcon = (
@@ -62,6 +72,8 @@ const DropdownMenuItem: React.FC<Props> = ({
   onSelect,
   children,
   destructive,
+  disabled,
+  disabledTooltip,
   open,
   defaultOpen,
   onOpenChange,
@@ -142,10 +154,22 @@ const DropdownMenuItem: React.FC<Props> = ({
     );
   }
 
-  return (
-    <Menu.Item onClick={() => onSelect?.()} className={itemClasses(active, destructive)}>
+  const item = (
+    <Menu.Item
+      disabled={disabled}
+      onClick={() => onSelect?.()}
+      className={itemClasses(active, destructive, disabled)}
+    >
       {content}
     </Menu.Item>
+  );
+
+  return disabledTooltip ? (
+    <Tooltip content={disabledTooltip} side="right">
+      {item}
+    </Tooltip>
+  ) : (
+    item
   );
 };
 

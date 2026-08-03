@@ -9,6 +9,7 @@ struct GetPeople: Pair {
   struct Person: PairOutput, PairNestable {
     let id: Child.Id
     let name: String
+    let relationship: Child.Relationship
     let devices: [Device]
     let screenshot: RecentScreenshot?
   }
@@ -133,6 +134,7 @@ extension GetPeople: NoInputResolver {
       Person(
         id: person.id,
         name: person.name,
+        relationship: person.relationship,
         devices: (macDevices + mobileDevices)
           .filter { $0.0 == person.id }
           .map(\.1),

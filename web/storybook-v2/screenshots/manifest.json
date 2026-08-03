@@ -720,6 +720,18 @@
     }
   },
   {
+    "id": "account-pages-people-new-person--creating",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--creating&viewMode=story",
+    "name": "Creating",
+    "path": "screenshots/desktop/account-pages-people-new-person--creating.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-new-person--default",
     "iframePath": "/iframe.html?id=account-pages-people-new-person--default&viewMode=story",
     "name": "Default",
@@ -736,6 +748,66 @@
     "iframePath": "/iframe.html?id=account-pages-people-new-person--default&viewMode=story",
     "name": "Default",
     "path": "screenshots/desktop/account-pages-people-new-person--default.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--name",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--name&viewMode=story",
+    "name": "Name step",
+    "path": "screenshots/mobile/account-pages-people-new-person--name.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--name",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--name&viewMode=story",
+    "name": "Name step",
+    "path": "screenshots/desktop/account-pages-people-new-person--name.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--self",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--self&viewMode=story",
+    "name": "Self relationship warning",
+    "path": "screenshots/mobile/account-pages-people-new-person--self.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--self",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--self&viewMode=story",
+    "name": "Self relationship warning",
+    "path": "screenshots/desktop/account-pages-people-new-person--self.png",
+    "title": "Account/Pages/People/New Person",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-new-person--self-unavailable",
+    "iframePath": "/iframe.html?id=account-pages-people-new-person--self-unavailable&viewMode=story",
+    "name": "Self relationship unavailable",
+    "path": "screenshots/desktop/account-pages-people-new-person--self-unavailable.png",
     "title": "Account/Pages/People/New Person",
     "viewport": {
       "width": 1440,
@@ -808,6 +880,54 @@
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-no-devices&viewMode=story",
     "name": "Basic with no devices",
     "path": "screenshots/desktop/account-pages-people-person-settings--basic-no-devices.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-self-unavailable",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-self-unavailable&viewMode=story",
+    "name": "Basic with self relationship unavailable",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic-self-unavailable.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-unsaved-changes",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-unsaved-changes&viewMode=story",
+    "name": "Basic with unsaved changes",
+    "path": "screenshots/mobile/account-pages-people-person-settings--basic-unsaved-changes.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-unsaved-changes",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-unsaved-changes&viewMode=story",
+    "name": "Basic with unsaved changes",
+    "path": "screenshots/medium/account-pages-people-person-settings--basic-unsaved-changes.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 600,
+      "height": 900,
+      "name": "medium"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-unsaved-changes",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-unsaved-changes&viewMode=story",
+    "name": "Basic with unsaved changes",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic-unsaved-changes.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,

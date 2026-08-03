@@ -15,6 +15,8 @@ export type SelectOption<Value extends string> =
       label: string;
       description?: React.ReactNode;
       icon?: DropdownMenuItemIcon;
+      disabled?: boolean;
+      disabledTooltip?: React.ReactNode;
     };
 type SelectOptionValue<Option> = Option extends { value: infer Value extends string }
   ? Value
@@ -53,6 +55,13 @@ const getOptionIcon = <Value extends string>(
   option: SelectOption<Value>,
 ): DropdownMenuItemIcon | undefined =>
   typeof option === `string` ? undefined : option.icon;
+
+const getOptionDisabled = <Value extends string>(option: SelectOption<Value>): boolean =>
+  typeof option === `string` ? false : (option.disabled ?? false);
+
+const getOptionDisabledTooltip = <Value extends string>(
+  option: SelectOption<Value>,
+): React.ReactNode => (typeof option === `string` ? undefined : option.disabledTooltip);
 
 const renderIcon = (
   icon: DropdownMenuItemIcon | undefined,
@@ -173,6 +182,8 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
           const optionLabel = getOptionLabel(option);
           const optionDescription = getOptionDescription(option);
           const OptionIcon = getOptionIcon(option);
+          const optionDisabled = getOptionDisabled(option);
+          const optionDisabledTooltip = getOptionDisabledTooltip(option);
 
           return (
             <DropdownMenuItem
@@ -181,7 +192,9 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
               description={optionDescription}
               icon={OptionIcon}
               selected={value === selected}
-              onSelect={() => setSelected(value)}
+              disabled={optionDisabled}
+              disabledTooltip={optionDisabled ? optionDisabledTooltip : undefined}
+              onSelect={optionDisabled ? undefined : () => setSelected(value)}
             />
           );
         })}

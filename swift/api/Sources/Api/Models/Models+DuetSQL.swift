@@ -7,6 +7,7 @@ import MusicRoute
 import Tagged
 
 extension DashAnnouncement.Kind: PostgresRawBindable {}
+extension Child.Relationship: PostgresRawBindable {}
 extension ClaimIntent: PostgresRawBindable {}
 extension EventLevel: @retroactive PostgresRawBindable {}
 extension GertrudeIOSApp: @retroactive PostgresRawBindable {}

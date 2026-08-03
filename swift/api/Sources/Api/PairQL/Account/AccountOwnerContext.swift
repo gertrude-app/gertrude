@@ -24,6 +24,37 @@ struct AccountOwnerContext: ResolverContext {
       .where(.parentId == self.accountOwner.id)
       .first(in: self.db)
   }
+
+  func validatePersonRelationship(
+    _ relationship: Child.Relationship,
+    excluding excludedPersonId: Child.Id? = nil,
+  ) async throws {
+    guard relationship == .selfManaged else { return }
+    let hasAnotherSelfManagedPerson = try await self.people().contains {
+      $0.id != excludedPersonId && $0.relationship == .selfManaged
+    }
+    guard !hasAnotherSelfManagedPerson else {
+      throw self.error(
+        id: "2eac58e7",
+        type: .badRequest,
+        debugMessage: "account already has a self-managed person",
+        userMessage: "Another protected person is already set to Myself. Change their relationship first.",
+      )
+    }
+  }
+
+  func validatedPersonName(_ untrimmedName: String) throws -> String {
+    let name = untrimmedName.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !name.isEmpty else {
+      throw self.error(
+        id: "d13d20d5",
+        type: .badRequest,
+        debugMessage: "person name cannot be empty",
+        userMessage: "Enter a name for this person.",
+      )
+    }
+    return name
+  }
 }
 
 extension AccountOwnerContext {
