@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import type { LoadableState } from '#/components/types';
+import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
 import MacSettingsPage, {
   type MacMonitoringConfiguration,
   type MacSettingsConfiguration,
@@ -12,6 +13,7 @@ import { useQuery } from '#/pairql/query';
 
 const MacSettingsRoute: React.FC = () => {
   const { personId } = Route.useParams();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
   const settingsKey = Key.personMacSettings(personId);
   const settingsQuery = useQuery(settingsKey, () =>
     liveClient.getPersonMacSettings({ personId }),
@@ -24,6 +26,17 @@ const MacSettingsRoute: React.FC = () => {
       error: `Failed to save monitoring settings`,
     },
   });
+  const updateInternetFiltering = useMutation(
+    liveClient.updatePersonMacInternetFiltering,
+    {
+      invalidating: [settingsKey],
+      toast: {
+        loading: `Saving internet filtering settings…`,
+        success: `Internet filtering settings saved`,
+        error: `Failed to save internet filtering settings`,
+      },
+    },
+  );
 
   const state: LoadableState<MacSettingsConfiguration> =
     settingsQuery.data !== undefined
@@ -38,24 +51,51 @@ const MacSettingsRoute: React.FC = () => {
         : { status: `loading` };
 
   return (
-    <MacSettingsPage
-      state={state}
-      savingMonitoring={updateMonitoring.isPending}
-      onSaveMonitoring={(configuration: MacMonitoringConfiguration) => {
-        if (updateMonitoring.isPending) {
-          return;
-        }
+    <>
+      <MacSettingsPage
+        key={personId}
+        state={state}
+        savingMonitoring={updateMonitoring.isPending}
+        savingInternetFiltering={updateInternetFiltering.isPending}
+        onUnsavedChangesChange={setHasUnsavedChanges}
+        onSaveMonitoring={(configuration: MacMonitoringConfiguration) => {
+          if (updateMonitoring.isPending) {
+            return;
+          }
 
-        updateMonitoring.mutate({
-          personId,
-          keyloggingEnabled: configuration.keyloggingEnabled,
-          showSuspensionActivity: configuration.showSuspensionActivity,
-          screenshotsEnabled: configuration.screenshots.enabled,
-          screenshotsResolution: configuration.screenshots.resolution,
-          screenshotsFrequency: configuration.screenshots.frequency,
-        });
-      }}
-    />
+          updateMonitoring.mutate({
+            personId,
+            keyloggingEnabled: configuration.keyloggingEnabled,
+            showSuspensionActivity: configuration.showSuspensionActivity,
+            screenshotsEnabled: configuration.screenshots.enabled,
+            screenshotsResolution: configuration.screenshots.resolution,
+            screenshotsFrequency: configuration.screenshots.frequency,
+          });
+        }}
+        onSaveInternetFiltering={({
+          filteringEnabled,
+          keychains,
+          alwaysBlockedGroupIds,
+          customAlwaysBlockedDomains,
+        }) => {
+          if (updateInternetFiltering.isPending) {
+            return;
+          }
+
+          updateInternetFiltering.mutate({
+            personId,
+            filteringEnabled,
+            keychains,
+            alwaysBlockedGroupIds,
+            customAlwaysBlockedDomains,
+          });
+        }}
+      />
+      <UnsavedChangesGuard
+        hasUnsavedChanges={hasUnsavedChanges}
+        description="Your Mac settings haven't been saved."
+      />
+    </>
   );
 };
 

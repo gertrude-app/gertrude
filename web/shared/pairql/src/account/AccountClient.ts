@@ -140,6 +140,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public updatePersonMacInternetFiltering = (
+    input: P.UpdatePersonMacInternetFiltering.Input,
+  ): Promise<Result<P.UpdatePersonMacInternetFiltering.Output>> => {
+    return this.query<P.UpdatePersonMacInternetFiltering.Output>(
+      input,
+      `UpdatePersonMacInternetFiltering`,
+      `parent`,
+    );
+  };
+
   public updatePersonMacMonitoringSettings = (
     input: P.UpdatePersonMacMonitoringSettings.Input,
   ): Promise<Result<P.UpdatePersonMacMonitoringSettings.Output>> => {

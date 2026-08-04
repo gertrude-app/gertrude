@@ -42,7 +42,6 @@ const ScheduledKeychainCard: React.FC = () => {
       schedule={schedule}
       setSchedule={setSchedule}
       onRemove={noop}
-      onEdit={noop}
     />
   );
 };

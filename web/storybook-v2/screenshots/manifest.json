@@ -840,6 +840,30 @@
     }
   },
   {
+    "id": "account-pages-people-person-mac-settings--internet-filtering",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--internet-filtering&viewMode=story",
+    "name": "Internet filtering",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--internet-filtering.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--internet-filtering",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--internet-filtering&viewMode=story",
+    "name": "Internet filtering",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--internet-filtering.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-mac-settings--loading",
     "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--loading&viewMode=story",
     "name": "Loading",
@@ -904,6 +928,30 @@
     "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-connected-mac&viewMode=story",
     "name": "No connected Mac",
     "path": "screenshots/desktop/account-pages-people-person-mac-settings--no-connected-mac.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--overview",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--overview&viewMode=story",
+    "name": "Overview",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--overview.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--overview",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--overview&viewMode=story",
+    "name": "Overview",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--overview.png",
     "title": "Account/Pages/People/Person Mac Settings",
     "viewport": {
       "width": 1440,

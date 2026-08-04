@@ -26,6 +26,8 @@ final class PersonMacSettingsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.screenshots.resolution).toEqual(1440)
     expect(output.screenshots.frequency).toEqual(90)
     expect(output.screenshots.canBeDisabled).toBeFalse()
+    expect(output.internetFiltering.enabled).toBeFalse()
+    expect(output.internetFiltering.canBeDisabled).toBeFalse()
     expect(output.hasMacDevices).toBeTrue()
   }
 
@@ -43,6 +45,8 @@ final class PersonMacSettingsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.screenshots.resolution).toEqual(1000)
     expect(output.screenshots.frequency).toEqual(180)
     expect(output.screenshots.canBeDisabled).toBeTrue()
+    expect(output.internetFiltering.enabled).toBeTrue()
+    expect(output.internetFiltering.canBeDisabled).toBeFalse()
     expect(output.hasMacDevices).toBeFalse()
   }
 
@@ -114,6 +118,255 @@ final class PersonMacSettingsResolverTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(output).toEqual(.success)
+    expect(sent.websocketMessages).toBeEmpty()
+  }
+
+  func testGetsInternetFilteringCapabilityFromAllConnectedMacVersions() async throws {
+    let child = try await self.child()
+    let person = try await child.withDevice(computer: {
+      $0.filterVersion = .init("2.9.0")!
+    })
+    _ = try await child.withDevice(computer: {
+      $0.filterVersion = .init("2.9.1")!
+    })
+
+    let output = try await GetPersonMacSettings.resolve(
+      with: .init(personId: person.id),
+      in: self.accountContext(person.parent),
+    )
+
+    expect(output.internetFiltering.enabled).toBeTrue()
+    expect(output.internetFiltering.canBeDisabled).toBeTrue()
+  }
+
+  func testUpdatesInternetFilteringAndNotifiesMacApps() async throws {
+    let person = try await self.child(with: {
+      $0.screenshotsEnabled = true
+    }).withDevice(computer: {
+      $0.filterVersion = .init("2.9.0")!
+    })
+
+    let output = try await UpdatePersonMacInternetFiltering.resolve(
+      with: .init(
+        personId: person.id,
+        filteringEnabled: false,
+        keychains: [],
+        alwaysBlockedGroupIds: [],
+        customAlwaysBlockedDomains: [],
+      ),
+      in: self.accountContext(person.parent),
+    )
+
+    let updated = try await self.db.find(person.id)
+    expect(output).toEqual(.success)
+    expect(updated.filteringDisabled).toBeTrue()
+    expect(sent.websocketMessages).toEqual([
+      .init(.userUpdated, to: .user(person.id)),
+    ])
+  }
+
+  func testUpdatesInternetFilteringKeychains() async throws {
+    let person = try await self.child().withDevice(computer: {
+      $0.filterVersion = .init("2.9.0")!
+    })
+    let first = try await self.db.create(Keychain.random {
+      $0.parentId = person.parent.id
+    })
+    let second = try await self.db.create(Keychain.random {
+      $0.parentId = person.parent.id
+    })
+
+    _ = try await UpdatePersonMacInternetFiltering.resolve(
+      with: .init(
+        personId: person.id,
+        filteringEnabled: true,
+        keychains: [.init(id: first.id, schedule: nil), .init(id: second.id, schedule: nil)],
+        alwaysBlockedGroupIds: [],
+        customAlwaysBlockedDomains: [],
+      ),
+      in: self.accountContext(person.parent),
+    )
+
+    let assigned = try await ChildKeychain.query()
+      .all(in: self.db)
+      .filter { $0.childId == person.model.id }
+    expect(Set(assigned.map(\.keychainId))).toEqual(Set([first.id, second.id]))
+    expect(sent.websocketMessages).toEqual([
+      .init(.userUpdated, to: .user(person.id)),
+    ])
+  }
+
+  func testUpdatesKeychainSchedule() async throws {
+    let person = try await self.child().withDevice(computer: {
+      $0.filterVersion = .init("2.9.0")!
+    })
+    let keychain = try await self.db.create(Keychain.random {
+      $0.parentId = person.parent.id
+    })
+    let schedule = GetPersonMacSettings.KeychainSchedule(.init(
+      mode: .active,
+      days: .weekdays,
+      window: .init(start: .init(hour: 8, minute: 0), end: .init(hour: 16, minute: 0)),
+    ))
+
+    _ = try await UpdatePersonMacInternetFiltering.resolve(
+      with: .init(
+        personId: person.id,
+        filteringEnabled: true,
+        keychains: [.init(id: keychain.id, schedule: schedule)],
+        alwaysBlockedGroupIds: [],
+        customAlwaysBlockedDomains: [],
+      ),
+      in: self.accountContext(person.parent),
+    )
+
+    let assignment = try await ChildKeychain.query()
+      .all(in: self.db)
+      .first { $0.childId == person.model.id && $0.keychainId == keychain.id }
+    expect(assignment?.schedule).toEqual(schedule.ruleSchedule)
+  }
+
+  func testUpdatesAlwaysBlockedGroups() async throws {
+    let person = try await self.child().withDevice(computer: {
+      $0.filterVersion = .init("2.9.1")!
+    })
+    let adultContent = try await self.db.create(AlwaysBlockedGroup(
+      name: "Adult content",
+      description: "Block adult websites.",
+      longDescription: "Blocks adult websites.",
+    ))
+    let socialMedia = try await self.db.create(AlwaysBlockedGroup(
+      name: "Social media",
+      description: "Block social media websites.",
+      longDescription: "Blocks social media websites.",
+    ))
+
+    _ = try await UpdatePersonMacInternetFiltering.resolve(
+      with: .init(
+        personId: person.id,
+        filteringEnabled: true,
+        keychains: [],
+        alwaysBlockedGroupIds: [adultContent.id, socialMedia.id],
+        customAlwaysBlockedDomains: [],
+      ),
+      in: self.accountContext(person.parent),
+    )
+
+    let assigned = try await ChildAlwaysBlockedGroup.query()
+      .all(in: self.db)
+      .filter { $0.childId == person.model.id }
+    expect(Set(assigned.map(\.groupId))).toEqual(Set([adultContent.id, socialMedia.id]))
+    expect(sent.websocketMessages).toEqual([
+      .init(.userUpdated, to: .user(person.id)),
+    ])
+
+    let settings = try await GetPersonMacSettings.resolve(
+      with: .init(personId: person.id),
+      in: self.accountContext(person.parent),
+    )
+    expect(settings.internetFiltering.supportsAlwaysBlocked).toBeTrue()
+    expect(settings.internetFiltering.availableAlwaysBlockedGroups.map(\.id)).toEqual([
+      adultContent.id,
+      socialMedia.id,
+    ])
+    expect(Set(settings.internetFiltering.alwaysBlockedGroupIds)).toEqual(
+      Set([adultContent.id, socialMedia.id]),
+    )
+  }
+
+  func testUpdatesCustomAlwaysBlockedDomainsWithoutRemovingLegacyRules() async throws {
+    let person = try await self.child().withDevice(computer: {
+      $0.filterVersion = .init("2.9.1")!
+    })
+    try await self.db.create([
+      ChildAlwaysBlockedRule(
+        childId: person.id,
+        rule: .hostnameOrSubdomain(value: " Reddit.COM "),
+      ),
+      ChildAlwaysBlockedRule(
+        childId: person.id,
+        rule: .urlContains(value: "legacy-rule"),
+      ),
+    ])
+
+    let initialSettings = try await GetPersonMacSettings.resolve(
+      with: .init(personId: person.id),
+      in: self.accountContext(person.parent),
+    )
+    expect(initialSettings.internetFiltering.customAlwaysBlockedDomains).toEqual([
+      "reddit.com",
+    ])
+
+    _ = try await UpdatePersonMacInternetFiltering.resolve(
+      with: .init(
+        personId: person.id,
+        filteringEnabled: true,
+        keychains: [],
+        alwaysBlockedGroupIds: [],
+        customAlwaysBlockedDomains: ["discord.com", "example.com"],
+      ),
+      in: self.accountContext(person.parent),
+    )
+
+    let updatedRules = try await ChildAlwaysBlockedRule.query()
+      .all(in: self.db)
+      .filter { $0.childId == person.model.id }
+    let updatedDomains = updatedRules.compactMap { model -> String? in
+      guard case .hostnameOrSubdomain(let domain) = model.rule else { return nil }
+      return domain
+    }
+    expect(Set(updatedDomains)).toEqual(Set(["discord.com", "example.com"]))
+    expect(updatedRules.contains { $0.rule == .urlContains(value: "legacy-rule") }).toBeTrue()
+    expect(sent.websocketMessages).toEqual([
+      .init(.userUpdated, to: .user(person.id)),
+    ])
+  }
+
+  func testRejectsDisablingInternetFilteringWithoutScreenshotMonitoring() async throws {
+    let person = try await self.child(with: {
+      $0.screenshotsEnabled = false
+    }).withDevice(computer: {
+      $0.filterVersion = .init("2.9.0")!
+    })
+
+    try await expectErrorFrom {
+      try await UpdatePersonMacInternetFiltering.resolve(
+        with: .init(
+          personId: person.id,
+          filteringEnabled: false,
+          keychains: [],
+          alwaysBlockedGroupIds: [],
+          customAlwaysBlockedDomains: [],
+        ),
+        in: self.accountContext(person.parent),
+      )
+    }.toContain("Internet filtering can only be disabled while screenshots are enabled")
+
+    let unchanged = try await self.db.find(person.id)
+    expect(unchanged.filteringDisabled).toBeFalse()
+    expect(sent.websocketMessages).toBeEmpty()
+  }
+
+  func testRejectsDisablingInternetFilteringForOutdatedMac() async throws {
+    let person = try await self.child().withDevice(computer: {
+      $0.filterVersion = .init("2.8.9")!
+    })
+
+    try await expectErrorFrom {
+      try await UpdatePersonMacInternetFiltering.resolve(
+        with: .init(
+          personId: person.id,
+          filteringEnabled: false,
+          keychains: [],
+          alwaysBlockedGroupIds: [],
+          customAlwaysBlockedDomains: [],
+        ),
+        in: self.accountContext(person.parent),
+      )
+    }.toContain("Update every connected Mac before disabling internet filtering")
+
+    let unchanged = try await self.db.find(person.id)
+    expect(unchanged.filteringDisabled).toBeFalse()
     expect(sent.websocketMessages).toBeEmpty()
   }
 

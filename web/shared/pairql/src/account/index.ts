@@ -16,4 +16,5 @@ export * from './pairs/GetPersonMacSettings';
 export * from './pairs/GetSuspensionRequests';
 export * from './pairs/ToggleActivityFlag';
 export * from './pairs/UpdatePersonBasicDetails';
+export * from './pairs/UpdatePersonMacInternetFiltering';
 export * from './pairs/UpdatePersonMacMonitoringSettings';

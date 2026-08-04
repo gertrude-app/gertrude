@@ -21,9 +21,9 @@ type Props = {
   numKeys: number;
   isPublic: boolean;
   onRemove: () => void;
-  onEdit?: () => void;
   schedule?: Schedule;
   setSchedule: (schedule?: Schedule) => void;
+  showSchedule?: boolean;
 };
 
 const KeychainCard: React.FC<Props> = ({
@@ -32,9 +32,9 @@ const KeychainCard: React.FC<Props> = ({
   description,
   numKeys,
   onRemove,
-  onEdit,
   schedule,
   setSchedule,
+  showSchedule = true,
 }) => (
   <Card padding={3} className="flex flex-col">
     <VStack gap={0.5} className="flex-grow">
@@ -54,17 +54,20 @@ const KeychainCard: React.FC<Props> = ({
         {numKeys} {inflect(`key`, numKeys)}
       </Text>
       <HStack gap={2}>
-        <ScheduleButton schedule={schedule} setSchedule={setSchedule} />
+        {showSchedule && <ScheduleButton schedule={schedule} setSchedule={setSchedule} />}
         <DropdownMenu
           trigger={
             <Button type="button" onClick={() => {}} size="small" icon={EllipsisIcon} />
           }
         >
-          {onEdit && (
-            <DropdownMenuItem title="Edit Keychain" icon={PencilIcon} onSelect={onEdit} />
-          )}
           <DropdownMenuItem
-            title="Remove Keychain"
+            title="Edit"
+            icon={PencilIcon}
+            disabled
+            disabledTooltip="Coming Soon"
+          />
+          <DropdownMenuItem
+            title="Remove"
             icon={TrashIcon}
             onSelect={onRemove}
             destructive

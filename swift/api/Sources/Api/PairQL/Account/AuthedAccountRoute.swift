@@ -9,6 +9,7 @@ enum AuthedAccountRoute: PairRoute {
   case deletePerson(DeletePerson.Input)
   case getPersonMacSettings(GetPersonMacSettings.Input)
   case updatePersonMacMonitoringSettings(UpdatePersonMacMonitoringSettings.Input)
+  case updatePersonMacInternetFiltering(UpdatePersonMacInternetFiltering.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
   case getActivitySummaries(GetActivitySummaries.Input)
@@ -41,6 +42,10 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.updatePersonMacMonitoringSettings)) {
       Operation(UpdatePersonMacMonitoringSettings.self)
       Body(.accountInput(UpdatePersonMacMonitoringSettings.self))
+    }
+    Route(.case(Self.updatePersonMacInternetFiltering)) {
+      Operation(UpdatePersonMacInternetFiltering.self)
+      Body(.accountInput(UpdatePersonMacInternetFiltering.self))
     }
     Route(.case(Self.getSuspensionRequests)) {
       Operation(GetSuspensionRequests.self)
@@ -96,6 +101,9 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .updatePersonMacMonitoringSettings(let input):
       let output = try await UpdatePersonMacMonitoringSettings.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .updatePersonMacInternetFiltering(let input):
+      let output = try await UpdatePersonMacInternetFiltering.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getSuspensionRequests:
       let output = try await GetSuspensionRequests.resolve(in: context)
