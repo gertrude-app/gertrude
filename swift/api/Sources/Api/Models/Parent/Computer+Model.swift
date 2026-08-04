@@ -86,6 +86,7 @@ extension Computer.Model {
 
 extension Computer.Model {
   enum Chip: String, Encodable {
+    case m5 = "M5"
     case m4 = "M4"
     case m3 = "M3"
     case m2 = "M2"
@@ -174,6 +175,14 @@ extension Computer {
         screenSizeInInches: 13.0,
       )
     // MacBook Air @link https://support.apple.com/en-us/HT201862
+    case "Mac17,3":
+      .init(
+        type: .macBookAir,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2026],
+        screenSizeInInches: 13.0,
+      )
     case "Mac16,13":
       .init(
         type: .macBookAir,
