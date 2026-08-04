@@ -12,9 +12,17 @@ You have access to the Gertrude PostgreSQL database for querying and analysis.
 
 For connection info, read `./swift/api/.env` and use the values there.
 
-You may READ and write to the LOCAL task database, as it is a task-specific,
-PII-scrubbed local snapshot. You may NEVER try to discover how to ssh into production
-or read/write remote databases for any reason. The snapshot is complete, not a subset of prod.
+You may read from and write to the LOCAL task database because it is a task-specific,
+PII-scrubbed snapshot. You must NEVER use tools to SSH into production, retrieve
+production credentials, connect to a remote database, or execute remote queries or
+mutations.
+
+You may help a user who is operating production themselves by providing shell commands
+(including connection commands) and SQL for them to review and run. You may also interpret
+non-secret output they choose to share. The user must execute every production command.
+Never ask them to disclose credentials or other secrets.
+
+The local snapshot is complete, not a subset of production.
 
 Important: although this repo has some docker-related files, all local development goes
 through a local install of postgres and NOT through docker. Never use `docker` commands
