@@ -34,7 +34,11 @@ public struct ClaimCodeView: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 16) {
-      GertieScreenIconBadge(systemName: "link.circle")
+      Image(systemName: "link.circle")
+        .font(.system(size: 40, weight: .regular))
+        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .accessibilityHidden(true)
+        .frame(maxWidth: .infinity, alignment: .center)
 
       Spacer()
 

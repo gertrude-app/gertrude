@@ -118,6 +118,7 @@ public enum GertieActionScreenSupplementPlacement {
 public struct GertieActionScreen<Supplement: View>: View {
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.colorScheme) private var cs
+  @ScaledMetric(relativeTo: .title) private var iconSize = 40.0
   @ScaledMetric(relativeTo: .body) private var messageSize = 18.0
   @ScaledMetric(relativeTo: .body) private var bulletSize = 16.0
   @ScaledMetric(relativeTo: .body) private var bulletDotSize = 6.0
@@ -187,7 +188,17 @@ public struct GertieActionScreen<Supplement: View>: View {
       GeometryReader { proxy in
         ScrollView {
           VStack(alignment: .leading, spacing: 16) {
-            GertieScreenIconBadge(systemName: self.icon.systemName)
+            Image(systemName: self.icon.systemName)
+              .font(.system(size: self.iconSize, weight: .regular))
+              .foregroundStyle(
+                Color(
+                  self.cs,
+                  light: .violet500,
+                  dark: .violet400,
+                ),
+              )
+              .accessibilityHidden(true)
+              .frame(maxWidth: .infinity, alignment: .center)
               .modifier(
                 GertieActionScreenEntranceModifier(
                   motion: self.motion,

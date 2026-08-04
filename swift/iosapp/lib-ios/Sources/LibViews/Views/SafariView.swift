@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 #if os(iOS)
@@ -67,43 +68,32 @@ struct ProfileDownloadView: View {
   let onSafariDismissed: () -> Void
 
   @State private var showSafari = false
-  @State private var showBg = false
 
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
+    VStack(spacing: 12) {
+      Spacer().frame(height: 0)
 
-      VStack(spacing: 12) {
-        Spacer().frame(height: 0)
-
-        VStack(alignment: .leading, spacing: 12) {
-          Text("1. Choose “Allow”")
-          Text("2. Tap “Close”")
-          Text(self.osMajorVersion >= 26 ? "3. Tap the “✓”" : "3. Tap “Done”")
-        }
-        .font(.system(size: 20, weight: .semibold))
-        .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
-
-        Spacer()
+      VStack(alignment: .leading, spacing: 12) {
+        Text("1. Choose “Allow”")
+        Text("2. Tap “Close”")
+        Text(self.osMajorVersion >= 26 ? "3. Tap the “✓”" : "3. Tap “Done”")
       }
-      .frame(maxWidth: 500)
-      .padding(30)
+      .font(.system(size: 20, weight: .semibold))
+      .foregroundStyle(Color(self.cs, light: .violet700, dark: .violet300))
+
+      Spacer()
     }
-    .onAppear {
-      withAnimation(.smooth(duration: 0.7)) {
-        self.showBg = true
+    .frame(maxWidth: 500)
+    .padding(30)
+    .gertieScreenBackground()
+    .task {
+      do {
+        try await Task.sleep(for: .milliseconds(300))
+      } catch {
+        return
       }
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-        self.showSafari = true
-      }
+      guard !Task.isCancelled else { return }
+      self.showSafari = true
     }
     .sheet(isPresented: self.$showSafari, onDismiss: self.onSafariDismissed) {
       SafariView(url: self.profileUrl, onDismiss: {})

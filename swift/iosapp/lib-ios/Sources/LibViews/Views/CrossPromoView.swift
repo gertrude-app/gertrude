@@ -1,33 +1,120 @@
 import ComposableArchitecture
 import GertieApp
 import GertieTcaFeatures
+import GertieUI
 import LibClients
 import SwiftUI
 
 struct CrossPromoView: View {
-  @Environment(\.colorScheme) var cs
+  @Environment(\.colorScheme) private var colorScheme
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @ScaledMetric(relativeTo: .title) private var titleScale = 1.0
   @ScaledMetric(relativeTo: .body) private var bodyScale = 1.0
 
   let store: StoreOf<CrossPromoFeature>
 
-  @State private var imageOffset = Vector(x: 0, y: -20)
-  @State private var textOffset = Vector(x: 0, y: 20)
-  @State private var primaryOffset = Vector(x: 0, y: 20)
-  @State private var secondaryOffset = Vector(x: 0, y: 20)
-  @State private var tertiaryOffset = Vector(x: 0, y: 20)
+  var body: some View {
+    GeometryReader { proxy in
+      let isCompact = proxy.size.height <= 700 || self.dynamicTypeSize.isAccessibilitySize
+
+      ScrollView {
+        self.content(
+          campaign: self.store.campaign,
+          metrics: isCompact ? .compact : .regular,
+        )
+        .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+      }
+      .scrollBounceBehavior(.basedOnSize)
+      .scrollIndicators(.hidden)
+    }
+    .gertieScreenBackground()
+    .interactiveDismissDisabled(!self.store.campaign.dismissable)
+    .background {
+      #if os(iOS)
+        SharePresenter(text: self.store.share?.text) { self.store.send(.shareCompleted($0)) }
+      #else
+        EmptyView()
+      #endif
+    }
+  }
+
+  private func content(
+    campaign: CrossPromoCampaign,
+    metrics: Metrics,
+  ) -> some View {
+    VStack(alignment: .leading, spacing: metrics.spacing) {
+      Spacer(minLength: metrics.isCompact ? 0 : nil)
+
+      if let image = campaign.image {
+        CrossPromoImage(
+          url: image.url,
+          label: image.description,
+          onLoadFailure: { error in
+            log(
+              .warn,
+              "670a86df",
+              detail: "cross promo image load failed"
+                + " campaign=\(campaign.campaignId) placement=\(campaign.placement)"
+                + " url=\(image.url) error=\(error)",
+            )
+          },
+        )
+        .frame(maxWidth: .infinity)
+        .frame(height: metrics.imageHeight)
+        .padding(.bottom, metrics.imagePadBottom)
+        .swooshIn(fromYOffset: -20)
+      }
+
+      Text(campaign.headline)
+        .font(.system(size: metrics.headlineSize * self.titleScale, weight: .bold))
+        .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
+        .fixedSize(horizontal: false, vertical: true)
+        .swooshIn(fromYOffset: 20)
+
+      Text(campaign.body)
+        .font(.system(size: metrics.bodySize * self.bodyScale, weight: .medium))
+        .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100).opacity(0.85))
+        .fixedSize(horizontal: false, vertical: true)
+        .swooshIn(fromYOffset: 20)
+
+      Button(campaign.primaryCta.label) {
+        self.store.send(.primaryBtnTapped)
+      }
+      .buttonStyle(.gertiePrimary)
+      .padding(.top, metrics.buttonPadTop)
+      .swooshIn(fromYOffset: 20, after: .milliseconds(150))
+
+      if let secondary = campaign.secondaryCta {
+        Button(secondary.label) {
+          self.store.send(.secondaryBtnTapped)
+        }
+        .buttonStyle(.gertieSecondary)
+        .swooshIn(fromYOffset: 20, after: .milliseconds(300))
+      }
+
+      if let tertiary = campaign.tertiaryCta {
+        Button(tertiary.label) {
+          self.store.send(.tertiaryBtnTapped)
+        }
+        .buttonStyle(.gertieSecondary)
+        .swooshIn(fromYOffset: 20, after: .milliseconds(450))
+      }
+    }
+    .frame(maxWidth: 500, alignment: .leading)
+    .padding(metrics.insets)
+  }
 
   private struct Metrics {
-    var isCompact: Bool
-    var spacing: CGFloat
-    var headlineSize: CGFloat
-    var bodySize: CGFloat
-    var imageHeight: CGFloat
-    var imagePadBottom: CGFloat
-    var buttonPadTop: CGFloat
-    var insets: EdgeInsets
+    let isCompact: Bool
+    let spacing: CGFloat
+    let headlineSize: CGFloat
+    let bodySize: CGFloat
+    let imageHeight: CGFloat
+    let imagePadBottom: CGFloat
+    let buttonPadTop: CGFloat
+    let insets: EdgeInsets
 
-    static let regular = Metrics(
+    static let regular = Self(
       isCompact: false,
       spacing: 16,
       headlineSize: 26,
@@ -38,7 +125,7 @@ struct CrossPromoView: View {
       insets: EdgeInsets(top: 30, leading: 30, bottom: 50, trailing: 30),
     )
 
-    static let compact = Metrics(
+    static let compact = Self(
       isCompact: true,
       spacing: 12,
       headlineSize: 24,
@@ -49,123 +136,28 @@ struct CrossPromoView: View {
       insets: EdgeInsets(top: 22, leading: 22, bottom: 22, trailing: 22),
     )
   }
+}
+
+private struct CrossPromoImage: View {
+  let url: String
+  let label: String?
+  let onLoadFailure: (@MainActor @Sendable (any Error) -> Void)?
 
   var body: some View {
-    let campaign = self.store.campaign
-    AdaptiveScreen { isCompact in
-      self.content(campaign: campaign, m: isCompact ? .compact : .regular)
-    }
-    .interactiveDismissDisabled(!campaign.dismissable)
-    .background {
-      #if os(iOS)
-        SharePresenter(text: self.store.share?.text) { self.store.send(.shareCompleted($0)) }
-      #else
+    if let url = URL(string: self.url) {
+      RetryingAsyncImage(
+        url: url,
+        animation: .smooth(duration: 0.4),
+        onFailure: self.onLoadFailure,
+      ) { image in
+        image
+          .resizable()
+          .scaledToFit()
+          .accessibilityLabel(Text(verbatim: self.label ?? ""))
+          .transition(.opacity)
+      } placeholder: {
         EmptyView()
-      #endif
-    }
-  }
-
-  private func content(campaign: CrossPromoCampaign, m: Metrics) -> some View {
-    VStack(alignment: .leading, spacing: m.spacing) {
-      Spacer(minLength: m.isCompact ? 0 : nil)
-
-      if let image = campaign.image, let url = URL(string: image.url) {
-        RetryingAsyncImage(
-          url: url,
-          animation: .smooth(duration: 0.4),
-          onFailure: { error in
-            log(
-              .warn,
-              "670a86df",
-              detail: "cross promo image load failed"
-                + " campaign=\(campaign.campaignId) placement=\(campaign.placement)"
-                + " url=\(image.url) error=\(error)",
-            )
-          },
-        ) { loaded in
-          loaded
-            .resizable()
-            .scaledToFit()
-            .accessibilityLabel(image.description ?? "")
-            .transition(.opacity)
-        } placeholder: {
-          EmptyView()
-        }
-        .frame(maxWidth: .infinity)
-        .frame(height: m.imageHeight)
-        .padding(.bottom, m.imagePadBottom)
-        .swooshIn(
-          tracking: self.$imageOffset,
-          to: .zero,
-          after: .zero,
-          for: .milliseconds(800),
-        )
-      }
-
-      Text(campaign.headline)
-        .font(.system(size: m.headlineSize * self.titleScale, weight: .bold))
-        .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
-        .fixedSize(horizontal: false, vertical: true)
-        .swooshIn(
-          tracking: self.$textOffset,
-          to: .zero,
-          after: .zero,
-          for: .milliseconds(800),
-        )
-
-      Text(campaign.body)
-        .font(.system(size: m.bodySize * self.bodyScale, weight: .medium))
-        .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100).opacity(0.85))
-        .fixedSize(horizontal: false, vertical: true)
-        .swooshIn(
-          tracking: self.$textOffset,
-          to: .zero,
-          after: .zero,
-          for: .milliseconds(800),
-        )
-
-      BigButton(
-        campaign.primaryCta.label,
-        type: .button { self.store.send(.primaryBtnTapped) },
-        variant: .primary,
-      )
-      .padding(.top, m.buttonPadTop)
-      .swooshIn(
-        tracking: self.$primaryOffset,
-        to: .zero,
-        after: .milliseconds(150),
-        for: .milliseconds(800),
-      )
-
-      if let secondary = campaign.secondaryCta {
-        BigButton(
-          secondary.label,
-          type: .button { self.store.send(.secondaryBtnTapped) },
-          variant: .secondary,
-        )
-        .swooshIn(
-          tracking: self.$secondaryOffset,
-          to: .zero,
-          after: .milliseconds(300),
-          for: .milliseconds(800),
-        )
-      }
-
-      if let tertiary = campaign.tertiaryCta {
-        BigButton(
-          tertiary.label,
-          type: .button { self.store.send(.tertiaryBtnTapped) },
-          variant: .secondary,
-        )
-        .swooshIn(
-          tracking: self.$tertiaryOffset,
-          to: .zero,
-          after: .milliseconds(450),
-          for: .milliseconds(800),
-        )
       }
     }
-    .frame(maxWidth: 500, alignment: .leading)
-    .padding(m.insets)
   }
 }

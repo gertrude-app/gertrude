@@ -1,6 +1,5 @@
 #if !os(iOS)
-  import AppKit
-  import SwiftUI
+  import Foundation
 
   @MainActor
   public class UIDevice: @unchecked Sendable {
@@ -19,29 +18,8 @@
 
   @MainActor
   public class UIPasteboard: @unchecked Sendable {
-    public nonisolated(unsafe) static let general = UIPasteboard()
+    public static let general = UIPasteboard()
     public var string: String?
-  }
-
-  @MainActor
-  public class UIScreen: @unchecked Sendable {
-    public struct Bounds {
-      public var width: CGFloat { 393 }
-      public var height: CGFloat { 852 }
-    }
-
-    public static let main = UIScreen()
-    public var bounds: Bounds { Bounds() }
-  }
-
-  public enum UIKeyboardType {
-    case numberPad
-  }
-
-  public extension View {
-    func keyboardType(_ type: UIKeyboardType) -> some View {
-      self
-    }
   }
 
 #else
@@ -49,7 +27,6 @@
 
   public typealias UIDevice = UIKit.UIDevice
   public typealias UIPasteboard = UIKit.UIPasteboard
-  public typealias UIScreen = UIKit.UIScreen
 
   public extension UIDevice {
     nonisolated static let deviceDidShakeNotification = Notification

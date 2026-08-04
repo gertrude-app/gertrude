@@ -41,7 +41,10 @@ public struct ClaimSuccessView: View {
     VStack(spacing: 24) {
       Spacer()
 
-      GertieScreenIconBadge(systemName: "checkmark.circle.fill")
+      Image(systemName: "checkmark.circle.fill")
+        .font(.system(size: 60, weight: .regular))
+        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .accessibilityHidden(true)
 
       VStack(spacing: 8) {
         Text(self.isTerminal ? lstr(.claimSuccessTerminalTitle) : lstr(.claimSuccessNeutralTitle))

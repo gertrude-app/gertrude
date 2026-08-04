@@ -1,89 +1,81 @@
-import LibCore
+import GertieUI
 import SwiftUI
 
 struct FairiesView: View {
   struct Sparkle: Identifiable {
-    var id: UUID
-    var position: Vector
-    var velocity: Vector
+    let id = UUID()
+    var position: CGPoint
+    let velocity: CGVector
 
-    mutating func update() {
-      self.position += self.velocity
-    }
+    mutating func update(in size: CGSize) {
+      self.position.x += self.velocity.dx
+      self.position.y += self.velocity.dy
 
-    init(position: Vector, velocity: Vector) {
-      self.id = UUID()
-      self.position = position
-      self.velocity = velocity
+      if self.position.y > size.height + 10 {
+        self.position.y = -10
+      } else if self.position.y < -10 {
+        self.position.y = size.height + 10
+      }
+
+      if self.position.x > size.width + 10 {
+        self.position.x = -10
+      } else if self.position.x < -10 {
+        self.position.x = size.width + 10
+      }
     }
   }
 
   @Environment(\.colorScheme) var cs
   @State private var sparkles = [Sparkle]()
-  @State private var timer: Timer?
 
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(Gradient(colors: [.clear, Color(self.cs, light: .violet300, dark: .violet950)]))
-        .ignoresSafeArea()
-      Group {
-        ForEach(self.$sparkles) { $sparkle in
+    GeometryReader { proxy in
+      ZStack {
+        Rectangle()
+          .fill(Gradient(colors: [.clear, Color(self.cs, light: .violet300, dark: .violet950)]))
+          .ignoresSafeArea()
+
+        ForEach(self.sparkles) { sparkle in
           Circle()
             .frame(width: 3, height: 3)
             .foregroundStyle(Color.violet500)
             .blur(radius: 3)
             .position(x: sparkle.position.x, y: sparkle.position.y)
         }
+        .ignoresSafeArea()
       }
-      .ignoresSafeArea()
-    }
-    .onAppear {
-      for _ in 0 ..< 30 {
-        self.sparkles.append(Sparkle(
-          position: Vector(
-            x: Double.random(in: 0 ... Double(UIScreen.main.bounds.width)),
-            y: Double.random(in: 0 ... Double(UIScreen.main.bounds.height)),
-          ),
-          velocity: Vector(
-            x: Double.random(in: -1 ... 1),
-            y: Double.random(in: -1 ... 1),
-          ),
-        ))
+      .task(id: proxy.size) {
+        await self.animate(in: proxy.size)
       }
-      self.animate()
-    }
-    .onDisappear {
-      self.stopAnimation()
     }
   }
 
-  func animate() {
-    self.timer = Timer.scheduledTimer(
-      withTimeInterval: 0.016,
-      repeats: true,
-    ) { _ in
+  @MainActor
+  private func animate(in size: CGSize) async {
+    self.sparkles = (0 ..< 30).map { _ in
+      Sparkle(
+        position: CGPoint(
+          x: .random(in: 0 ... max(0, size.width)),
+          y: .random(in: 0 ... max(0, size.height)),
+        ),
+        velocity: CGVector(
+          dx: .random(in: -1 ... 1),
+          dy: .random(in: -1 ... 1),
+        ),
+      )
+    }
+
+    while !Task.isCancelled {
+      do {
+        try await Task.sleep(for: .milliseconds(16))
+      } catch {
+        return
+      }
+
       for index in self.sparkles.indices {
-        self.sparkles[index].update()
-        if self.sparkles[index].position.y > Double(UIScreen.main.bounds.height) + 10 {
-          self.sparkles[index].position.y = -10
-        }
-        if self.sparkles[index].position.y < -10 {
-          self.sparkles[index].position.y = Double(UIScreen.main.bounds.height) + 10
-        }
-        if self.sparkles[index].position.x > Double(UIScreen.main.bounds.width) + 10 {
-          self.sparkles[index].position.x = -10
-        }
-        if self.sparkles[index].position.x < -10 {
-          self.sparkles[index].position.x = Double(UIScreen.main.bounds.width) + 10
-        }
+        self.sparkles[index].update(in: size)
       }
     }
-  }
-
-  func stopAnimation() {
-    self.timer?.invalidate()
-    self.timer = nil
   }
 }
 

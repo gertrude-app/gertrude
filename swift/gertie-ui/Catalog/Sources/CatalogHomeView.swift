@@ -26,12 +26,6 @@ struct CatalogHomeView: View {
           }
 
           NavigationLink {
-            ScreenIconBadgeCatalogView()
-          } label: {
-            Label("Screen Icons", systemImage: "app.dashed")
-          }
-
-          NavigationLink {
             ActionScreenCatalogView()
           } label: {
             Label("Action Screen", systemImage: "rectangle.and.hand.point.up.left.fill")

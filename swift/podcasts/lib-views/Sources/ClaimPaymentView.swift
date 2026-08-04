@@ -39,7 +39,11 @@ public struct ClaimPaymentView: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 16) {
-      GertieScreenIconBadge(systemName: "creditcard.circle")
+      Image(systemName: "creditcard.circle")
+        .font(.system(size: 40, weight: .regular))
+        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .accessibilityHidden(true)
+        .frame(maxWidth: .infinity, alignment: .center)
 
       Spacer()
       Spacer()
