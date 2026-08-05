@@ -20,13 +20,13 @@
       "layers": [
         {
           "fill": {
-            "solid": "display-p3:1.00000,1.00000,1.00000,1.00000"
+            "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
           },
-          "image-name": "note.svg",
-          "name": "note",
+          "image-name": "sixteenths.svg",
+          "name": "sixteenths",
           "position": {
-            "scale": 2.69,
-            "translation-in-points": [-25.63766264742935, 0]
+            "scale": 2.78,
+            "translation-in-points": [-26.09729604106292, 0]
           }
         }
       ],
