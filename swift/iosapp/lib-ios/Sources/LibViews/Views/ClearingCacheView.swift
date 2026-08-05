@@ -36,7 +36,9 @@ struct ClearingCacheView: View {
   }
 
   var clearedView: some View {
-    GertieActionScreen(
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Done!",
       message: self.clearedMessage,
       action: .button(self.clearedBtnLabel, behavior: .afterExitAnimation) {
         self.store.send(.completeBtnTapped)
@@ -122,7 +124,7 @@ struct ClearingCacheView: View {
     )) {
       ClearCacheFeature()
     },
-    clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+    clearedMessage: "Previously downloaded GIFs should be gone!",
     clearedBtnLabel: "Next",
   )
 }
@@ -137,7 +139,7 @@ struct ClearingCacheView: View {
     )) {
       ClearCacheFeature()
     },
-    clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+    clearedMessage: "Previously downloaded GIFs should be gone!",
     clearedBtnLabel: "Next",
   )
   .tint(.gertrudeBrandAccent)
@@ -151,7 +153,7 @@ struct ClearingCacheView: View {
     )) {
       ClearCacheFeature()
     },
-    clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+    clearedMessage: "Previously downloaded GIFs should be gone!",
     clearedBtnLabel: "Next",
   )
 }

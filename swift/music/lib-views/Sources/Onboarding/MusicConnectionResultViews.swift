@@ -6,41 +6,18 @@ import SwiftUI
 #endif
 
 struct MusicDeviceRecognizedView: View {
-  @Environment(\.colorScheme) private var colorScheme
-
   let childName: String
   let onContinueTap: @MainActor @Sendable () -> Void
 
   var body: some View {
-    VStack(spacing: 24) {
-      Spacer()
-
-      Image(systemName: "checkmark.circle.fill")
-        .font(.system(size: 60, weight: .regular))
-        .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
-        .accessibilityHidden(true)
-
-      VStack(spacing: 8) {
-        Text("Account connected")
-          .font(.system(size: 24, weight: .bold))
-          .multilineTextAlignment(.center)
-
-        Text(musicDeviceLabel(self.childName))
-          .font(.system(size: 17, weight: .semibold))
-          .foregroundStyle(Color(self.colorScheme, light: .violet600, dark: .violet300))
-      }
-      .multilineTextAlignment(.center)
-
-      Spacer()
-
-      Button("Continue") {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Account connected",
+      message: musicDeviceLabel(self.childName),
+      action: .button("Continue") {
         self.onContinueTap()
-      }
-      .buttonStyle(.gertiePrimary)
-    }
-    .frame(maxWidth: 500)
-    .padding(30)
-    .gertieScreenBackground()
+      },
+    )
   }
 }
 

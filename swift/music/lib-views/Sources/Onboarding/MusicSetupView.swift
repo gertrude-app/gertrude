@@ -156,9 +156,11 @@ public struct MusicSetupView: View {
       )
 
     case .appleMusicStatusUnavailable:
-      GertieActionScreen(
-        message: "Gertrude Music couldn’t check Apple Music on this device. Check your connection and try again.",
-        icon: .error,
+      GertieResultScreen(
+        icon: "xmark.circle.fill",
+        tone: .error,
+        title: "Couldn’t check Apple Music",
+        message: "Check your connection and try again.",
         action: .button("Try again") {
           self.onEvent(.retryTapped)
         },
@@ -195,9 +197,11 @@ public struct MusicSetupView: View {
       MusicClaimCodeView(code: code, audience: audience)
 
     case .gertrudeConnection(.failed):
-      GertieActionScreen(
-        message: "Gertrude Music couldn’t connect to Gertrude. Check your internet connection and try again.",
-        icon: .error,
+      GertieResultScreen(
+        icon: "xmark.circle.fill",
+        tone: .error,
+        title: "Couldn’t connect to Gertrude",
+        message: "Check your internet connection and try again.",
         action: .button("Try again") {
           self.onEvent(.refreshConnectionTapped)
         },

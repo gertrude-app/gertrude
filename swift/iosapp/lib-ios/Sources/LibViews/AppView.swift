@@ -24,7 +24,7 @@ public struct AppView: View {
       ) {
         ClearingCacheView(
           store: clearCacheStore,
-          clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+          clearedMessage: "Previously downloaded GIFs should be gone!",
           clearedBtnLabel: "Next",
         )
         .onAppear { clearCacheStore.send(.onAppear) }
@@ -192,11 +192,9 @@ public struct AppView: View {
           )
 
         case .onboarding(.happyPath(.connectSuccess)):
-          GertieActionScreen(
-            message: "Success! This \(self.deviceType) is now connected to your Gertrude parent account.",
-            action: self.action(text: "Next", .primary),
-            accessibilityIdentifier: "onboarding-screen-connect-success",
-          )
+          AccountConnectionSuccessView(deviceType: self.deviceType) {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next")))
+          }
 
         case .onboarding(.happyPath(.optOutBlockGroups)):
           ChooseWhatToBlockView(
@@ -292,11 +290,9 @@ public struct AppView: View {
           )
 
         case .onboarding(.authFail(.networkError)):
-          GertieActionScreen(
-            message: "Hmmm.. Are you sure you’re connected to the internet? Double-check and try again when you’re online.",
-            icon: .error,
-            action: self.action(text: "Try again", .primary),
-          )
+          AuthorizationNetworkErrorView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Try again")))
+          }
 
         case .onboarding(.authFail(.passcodeRequired)):
           GertieActionScreen(
@@ -568,7 +564,8 @@ public struct AppView: View {
         case .onboarding(.supervision(.setup(.generateSetupCode(let didError)))):
           SpinnerErrorView(
             loadingText: "Generating your setup code...",
-            errorText: "Something went wrong generating your setup code. Please try again.",
+            errorTitle: "Couldn’t generate a setup code",
+            errorMessage: "Please try again.",
             isError: didError,
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
@@ -666,16 +663,16 @@ public struct AppView: View {
         case .onboarding(.supervision(.resume(.verifyingProfileInstall(let didError)))):
           SpinnerErrorView(
             loadingText: "Verifying profile installation...",
-            errorText: "Profile not detected. Make sure you installed the profile in Settings.",
+            errorTitle: "Profile not detected",
+            errorMessage: "Make sure you installed the profile in Settings.",
             isError: didError,
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
 
         case .onboarding(.supervision(.resume(.profileInstalled))):
-          GertieActionScreen(
-            message: "Profile installed successfully! Gertrude can now block unwanted content.\n\nFrom the website, the account holder can manage what gets blocked and also remove the supervision.",
-            action: self.action(text: "Next", .primary),
-          )
+          ProfileInstalledView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next")))
+          }
 
         case .onboarding(.supervision(.resume(.websiteWarning(let childName)))):
           GertieActionScreen(
@@ -705,11 +702,9 @@ public struct AppView: View {
           }
 
         case .onboarding(.supervision(.resume(.networkError))):
-          GertieActionScreen(
-            message: "Couldn’t reach Gertrude’s servers. Please check your internet connection and try again.",
-            icon: .error,
-            action: self.action(text: "Try again", .primary),
-          )
+          SupervisionNetworkErrorView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Try again")))
+          }
 
         case .onboarding(.supervision(.resume(.requiresSubscription))):
           GertieActionScreen(
@@ -719,10 +714,9 @@ public struct AppView: View {
           )
 
         case .supervisionSuccessFirstLaunch:
-          GertieActionScreen(
-            message: "Excellent! Looks like you’ve installed Gertrude under Supervised mode. Just a couple steps to get you all set up.",
-            action: self.action(text: "Next", .primary),
-          )
+          SupervisionDetectedView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next")))
+          }
 
         case .running:
           RunningView(store: self.store)
@@ -788,6 +782,85 @@ public struct AppView: View {
   }
 }
 
+private struct AccountConnectionSuccessView: View {
+  let deviceType: String
+  let onNext: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Successfully connected!",
+      message: "This \(self.deviceType) is now connected to your Gertrude parent account.",
+      accessibilityIdentifier: "onboarding-screen-connect-success",
+      action: .button("Next", behavior: .afterExitAnimation) {
+        self.onNext()
+      },
+    )
+  }
+}
+
+private struct ProfileInstalledView: View {
+  let onNext: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Profile installed successfully!",
+      message: "Gertrude can now block unwanted content.\n\nFrom the website, the account holder can manage what gets blocked and also remove the supervision.",
+      action: .button("Next", behavior: .afterExitAnimation) {
+        self.onNext()
+      },
+    )
+  }
+}
+
+private struct SupervisionDetectedView: View {
+  let onNext: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Excellent!",
+      message: "Looks like you’ve installed Gertrude under Supervised mode. Just a couple steps to get you all set up.",
+      action: .button("Next", behavior: .afterExitAnimation) {
+        self.onNext()
+      },
+    )
+  }
+}
+
+private struct AuthorizationNetworkErrorView: View {
+  let onRetry: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "xmark.circle.fill",
+      tone: .error,
+      title: "Couldn’t connect to the internet",
+      message: "Double-check your connection and try again when you’re online.",
+      action: .button("Try again", behavior: .afterExitAnimation) {
+        self.onRetry()
+      },
+    )
+  }
+}
+
+private struct SupervisionNetworkErrorView: View {
+  let onRetry: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "xmark.circle.fill",
+      tone: .error,
+      title: "Couldn’t reach Gertrude",
+      message: "Please check your internet connection and try again.",
+      action: .button("Try again", behavior: .afterExitAnimation) {
+        self.onRetry()
+      },
+    )
+  }
+}
+
 private struct OnboardingInstructionImage: View {
   let name: String
   let accessibilityLabel: String
@@ -814,12 +887,34 @@ extension URL {
 
 #Preview {
   AppView(
-    store: Store(initialState: IOSReducer.State()) {
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.happyPath(.hiThere)),
+    )) {
       IOSReducer()
     },
     osMajorVersion: 26,
     deviceType: "iPhone",
   )
+}
+
+#Preview("Account connected") {
+  AccountConnectionSuccessView(deviceType: "iPhone") {}
+}
+
+#Preview("Authorization network error") {
+  AuthorizationNetworkErrorView {}
+}
+
+#Preview("Supervision network error") {
+  SupervisionNetworkErrorView {}
+}
+
+#Preview("Supervision detected") {
+  SupervisionDetectedView {}
+}
+
+#Preview("Profile Flow: Installed") {
+  ProfileInstalledView {}
 }
 
 #Preview("Profile Flow: Prompt Install") {

@@ -9,10 +9,6 @@ struct ConnectingView: View {
   let infoBlurb: String?
   let deviceType: String
 
-  var showsBackButton: Bool {
-    if case .connected = self.store.state.screen { false } else { true }
-  }
-
   var body: some View {
     ZStack {
       switch self.store.state.screen {
@@ -25,25 +21,20 @@ struct ConnectingView: View {
       case .codeGenerationFailed:
         CodeGenerationFailedView { self.store.send(.retryTapped) }
           .transition(.opacity)
-      case .connected(childName: let childName):
-        ConnectedStateView(childName: childName)
-          .transition(.opacity)
       }
     }
     .animation(.smooth(duration: 0.4), value: self.store.state.screen)
     .overlay(alignment: .topLeading) {
-      if self.showsBackButton {
-        Button {
-          self.store.send(.cancelTapped)
-        } label: {
-          Image(systemName: "chevron.left")
-            .font(.system(size: 18, weight: .semibold))
-            .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
-            .padding(12)
-        }
-        .padding(.leading, 8)
-        .padding(.top, 8)
+      Button {
+        self.store.send(.cancelTapped)
+      } label: {
+        Image(systemName: "chevron.left")
+          .font(.system(size: 18, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+          .padding(12)
       }
+      .padding(.leading, 8)
+      .padding(.top, 8)
     }
     .onAppear { self.store.send(.onAppear) }
   }
@@ -66,160 +57,63 @@ struct ShowCodeView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Image(systemName: "link.circle")
-        .font(.system(size: 40, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-        .accessibilityHidden(true)
-        .frame(maxWidth: .infinity, alignment: .center)
-        .swooshIn(fromYOffset: -20)
+    GertieActionScreen(
+      message: self.infoBlurb ??
+        "Open this link on YOUR phone or computer (not this \(self.deviceType)) to connect to a Gertrude account:",
+      icon: .system("link.circle"),
+      actions: [
+        .share("Send link", item: self.connectUrl),
+        .link(
+          "Help me connect...",
+          destination: URL(string: "https://gertrude.app/iosapp-connect-help")!,
+        ),
+      ],
+      supplementPlacement: .afterMessage,
+    ) {
+      VStack(spacing: 16) {
+        Text(self.connectUrl)
+          .font(.system(size: 20, weight: .semibold, design: .monospaced))
+          .minimumScaleFactor(0.7)
+          .lineLimit(1)
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.vertical, 8)
 
-      Spacer()
-
-      Text(
-        self.infoBlurb ??
-          "Open this link on YOUR phone or computer (not this \(self.deviceType)) to connect to a Gertrude account:",
-      )
-      .font(.system(size: 18, weight: .medium))
-      .swooshIn(fromYOffset: 20)
-
-      Text(self.connectUrl)
-        .font(.system(size: 20, weight: .semibold, design: .monospaced))
-        .minimumScaleFactor(0.7)
-        .lineLimit(1)
-        .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.vertical, 8)
-        .swooshIn(fromYOffset: 20, after: .milliseconds(100))
-
-      GertieWaitingStatus(
-        label: "Watching for connection…",
-        delay: .zero,
-      )
-      .opacity(self.showWaiting ? 1 : 0)
-      .accessibilityHidden(!self.showWaiting)
-      .task {
-        do {
-          try await Task.sleep(for: .seconds(45))
-        } catch {
-          return
-        }
-        guard !Task.isCancelled else { return }
-        withAnimation(.smooth(duration: 0.5)) {
-          self.showWaiting = true
-        }
-      }
-
-      Spacer()
-        .frame(height: 40)
-
-      ShareLink(item: self.connectUrl) {
-        HStack(spacing: 8) {
-          Text("Send link")
-          Image(systemName: "square.and.arrow.up")
-        }
-      }
-      .buttonStyle(.gertiePrimary)
-      .swooshIn(fromYOffset: 20, after: .milliseconds(300))
-
-      Link(destination: URL(string: "https://gertrude.app/iosapp-connect-help")!) {
-        Text("Help me connect...")
-      }
-      .buttonStyle(.gertieSecondary)
-      .swooshIn(fromYOffset: 20, after: .milliseconds(400))
-    }
-    .frame(maxWidth: 500)
-    .padding(30)
-    .padding(.top, 50)
-    .gertieScreenBackground()
-  }
-}
-
-struct ConnectedStateView: View {
-  @Environment(\.colorScheme) private var cs
-
-  let childName: String
-
-  var body: some View {
-    VStack(spacing: 24) {
-      Image(systemName: "checkmark.circle.fill")
-        .font(.system(size: 60, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-        .accessibilityHidden(true)
-        .swooshIn(
-          fromYOffset: 20,
-          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+        GertieWaitingStatus(
+          label: "Watching for connection…",
+          delay: .zero,
         )
-
-      VStack(spacing: 8) {
-        Text("Successfully connected!")
-          .font(.system(size: 24, weight: .bold))
-          .multilineTextAlignment(.center)
-
-        Text("This device is now connected to ***\(self.childName)***")
-          .font(.system(size: 16, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
-          .multilineTextAlignment(.center)
+        .opacity(self.showWaiting ? 1 : 0)
+        .accessibilityHidden(!self.showWaiting)
+        .task {
+          do {
+            try await Task.sleep(for: .seconds(45))
+          } catch {
+            return
+          }
+          guard !Task.isCancelled else { return }
+          withAnimation(.smooth(duration: 0.5)) {
+            self.showWaiting = true
+          }
+        }
       }
-      .swooshIn(
-        fromYOffset: 20,
-        after: .milliseconds(100),
-        animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-      )
-      .accessibilityIdentifier("connect-account-success")
     }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .padding(.horizontal, 30)
-    .gertieScreenBackground()
   }
 }
 
 struct CodeGenerationFailedView: View {
-  @Environment(\.colorScheme) private var cs
-
   let retry: () -> Void
 
   var body: some View {
-    VStack(spacing: 24) {
-      Image(systemName: "xmark.circle.fill")
-        .font(.system(size: 60, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .red, dark: .red.opacity(0.8)))
-        .accessibilityHidden(true)
-        .swooshIn(
-          fromYOffset: 20,
-          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-        )
-
-      VStack(spacing: 8) {
-        Text("Couldn't generate a code")
-          .font(.system(size: 24, weight: .bold))
-          .multilineTextAlignment(.center)
-
-        Text("Please check your internet connection and try again.")
-          .font(.system(size: 16, weight: .medium))
-          .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
-          .multilineTextAlignment(.center)
-      }
-      .swooshIn(
-        fromYOffset: 20,
-        after: .milliseconds(100),
-        animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-      )
-
-      Button("Try again") {
+    GertieResultScreen(
+      icon: "xmark.circle.fill",
+      tone: .error,
+      title: "Couldn't generate a code",
+      message: "Please check your internet connection and try again.",
+      action: .button("Try again") {
         self.retry()
-      }
-      .buttonStyle(.gertiePrimary)
-      .padding(.horizontal, 30)
-      .swooshIn(
-        fromYOffset: 20,
-        after: .milliseconds(200),
-        animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-      )
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .padding(.horizontal, 30)
-    .gertieScreenBackground()
+      },
+    )
   }
 }
 
@@ -252,16 +146,6 @@ struct CodeGenerationFailedView: View {
     deviceType: "iPhone",
   )
   .preferredColorScheme(.dark)
-}
-
-#Preview("Connected") {
-  ConnectingView(
-    store: .init(initialState: .init(screen: .connected(childName: "Emma"))) {
-      EmptyReducer()
-    },
-    infoBlurb: nil,
-    deviceType: "iPhone",
-  )
 }
 
 #Preview("Code generation failed") {

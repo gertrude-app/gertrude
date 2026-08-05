@@ -3,15 +3,18 @@ import SwiftUI
 
 struct SpinnerErrorView: View {
   let loadingText: String
-  let errorText: String
+  let errorTitle: String
+  let errorMessage: String?
   let isError: Bool
   let onRetry: () -> Void
 
   var body: some View {
     if self.isError {
-      GertieActionScreen(
-        message: self.errorText,
-        icon: .error,
+      GertieResultScreen(
+        icon: "xmark.circle.fill",
+        tone: .error,
+        title: self.errorTitle,
+        message: self.errorMessage,
         action: .button("Try again") {
           self.onRetry()
         },
@@ -25,16 +28,18 @@ struct SpinnerErrorView: View {
 #Preview("Loading") {
   SpinnerErrorView(
     loadingText: "Doing something...",
-    errorText: "Something went wrong.",
+    errorTitle: "Something went wrong",
+    errorMessage: nil,
     isError: false,
     onRetry: {},
   )
 }
 
-#Preview("Error") {
+#Preview("Setup code error") {
   SpinnerErrorView(
-    loadingText: "Doing something...",
-    errorText: "Something went wrong.",
+    loadingText: "Generating your setup code...",
+    errorTitle: "Couldn’t generate a setup code",
+    errorMessage: "Please try again.",
     isError: true,
     onRetry: {},
   )

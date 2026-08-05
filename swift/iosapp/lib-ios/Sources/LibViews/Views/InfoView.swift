@@ -21,7 +21,7 @@ struct InfoView: View {
       ) {
         ClearingCacheView(
           store: clearCacheStore,
-          clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+          clearedMessage: "Previously downloaded GIFs should be gone!",
           clearedBtnLabel: "Back",
         )
         .onAppear { clearCacheStore.send(.onAppear) }

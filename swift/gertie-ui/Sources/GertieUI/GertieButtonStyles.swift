@@ -97,6 +97,7 @@ private struct GertiePrimaryButtonAppearance: ButtonStyle {
     VStack {
       configuration.label
         .font(.headline)
+        .multilineTextAlignment(.center)
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
@@ -148,6 +149,7 @@ private struct GertieSecondaryButtonAppearance: ButtonStyle {
     VStack {
       configuration.label
         .font(.headline)
+        .multilineTextAlignment(.center)
         .foregroundStyle(
           Color(self.cs, light: Color.violet700, dark: Color.violet100),
         )
@@ -240,4 +242,17 @@ public extension PrimitiveButtonStyle where Self == GertieSecondaryButtonStyle {
   }
   .frame(width: 320)
   .padding()
+}
+
+#Preview("Accessibility text") {
+  VStack(spacing: 16) {
+    Button("Get Gertrude Podcasts") {}
+      .buttonStyle(.gertiePrimary)
+
+    Button("Send a link to a parent") {}
+      .buttonStyle(.gertieSecondary)
+  }
+  .frame(width: 320)
+  .padding()
+  .environment(\.dynamicTypeSize, .accessibility3)
 }

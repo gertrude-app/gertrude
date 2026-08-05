@@ -33,60 +33,63 @@ public struct ClaimCodeView: View {
   }
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Image(systemName: "link.circle")
-        .font(.system(size: 40, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-        .accessibilityHidden(true)
-        .frame(maxWidth: .infinity, alignment: .center)
-
-      Spacer()
-
-      if self.failed {
-        self.errorContent
-        Spacer()
-      } else if let code = self.code {
-        Spacer()
-        Spacer()
-
-        GertieWaitingStatus(label: lstr(.claimCodeWatching), delay: self.statusDelay)
-
-        Spacer()
-
-        self.codeContent(code)
-      } else {
-        self.loadingContent
-        Spacer()
-      }
-
-      if self.failed || self.code != nil {
-        Button(self.dismissLabel) {
-          self.onEvent(.dismissTapped)
-        }
-        .buttonStyle(.gertieSecondary)
-      }
-
-      if !self.failed, let code = self.code {
-        ShareLink(item: self.claimUrl(code)) {
-          HStack(spacing: 8) {
-            Text(lstr(.claimSendLink))
-            Image(systemName: "square.and.arrow.up")
-          }
-        }
-        .buttonStyle(.gertiePrimary)
-      }
-
-      if self.failed {
-        Button(lstr(.claimTryAgain)) {
+    if self.failed {
+      GertieResultScreen(
+        icon: "xmark.circle.fill",
+        tone: .error,
+        title: lstr(.claimCodeErrorTitle),
+        message: lstr(.claimCodeErrorBody),
+        action: .button(lstr(.claimTryAgain)) {
           self.onEvent(.retryTapped)
+        },
+        secondaryAction: .button(self.dismissLabel) {
+          self.onEvent(.dismissTapped)
+        },
+      )
+    } else {
+      VStack(alignment: .leading, spacing: 16) {
+        Image(systemName: "link.circle")
+          .font(.system(size: 40, weight: .regular))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .accessibilityHidden(true)
+          .frame(maxWidth: .infinity, alignment: .center)
+
+        Spacer()
+
+        if let code = self.code {
+          Spacer()
+          Spacer()
+
+          GertieWaitingStatus(label: lstr(.claimCodeWatching), delay: self.statusDelay)
+
+          Spacer()
+
+          self.codeContent(code)
+        } else {
+          self.loadingContent
+          Spacer()
         }
-        .buttonStyle(.gertiePrimary)
+
+        if let code = self.code {
+          Button(self.dismissLabel) {
+            self.onEvent(.dismissTapped)
+          }
+          .buttonStyle(.gertieSecondary)
+
+          ShareLink(item: self.claimUrl(code)) {
+            HStack(spacing: 8) {
+              Text(lstr(.claimSendLink))
+              Image(systemName: "square.and.arrow.up")
+            }
+          }
+          .buttonStyle(.gertiePrimary)
+        }
       }
+      .frame(maxWidth: 500)
+      .padding(30)
+      .padding(.top, 50)
+      .gertieScreenBackground()
     }
-    .frame(maxWidth: 500)
-    .padding(30)
-    .padding(.top, 50)
-    .gertieScreenBackground()
   }
 
   @ViewBuilder private func codeContent(_ code: Int) -> some View {
@@ -115,19 +118,6 @@ public struct ClaimCodeView: View {
       .font(.system(size: 16, weight: .medium))
       .foregroundStyle(Color(self.cs, light: .black.opacity(0.6), dark: .white.opacity(0.6)))
       .frame(maxWidth: .infinity, alignment: .center)
-  }
-
-  @ViewBuilder private var errorContent: some View {
-    Text(lstr(.claimCodeErrorTitle))
-      .font(.system(size: 20, weight: .bold))
-      .frame(maxWidth: .infinity, alignment: .center)
-      .multilineTextAlignment(.center)
-
-    Text(lstr(.claimCodeErrorBody))
-      .font(.system(size: 16, weight: .medium))
-      .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
-      .frame(maxWidth: .infinity, alignment: .center)
-      .multilineTextAlignment(.center)
   }
 
   private func codeString(_ code: Int) -> String {

@@ -24,8 +24,11 @@ struct RunningView: View {
         Spacer()
 
         Image(systemName: "checkmark")
-          .font(.system(size: 40, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .font(.system(size: 30, weight: .semibold))
+          .foregroundStyle(Color(self.cs, light: .violet800, dark: .violet400))
+          .padding(12)
+          .background(Color(self.cs, light: .violet300.opacity(0.6), dark: .violet950))
+          .clipShape(.rect(cornerRadius: 24))
           .accessibilityHidden(true)
           .swooshIn(
             fromYOffset: 20,

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct FreeAlternativesHubView: View {
   @Environment(\.colorScheme) var cs
+  @ScaledMetric(relativeTo: .subheadline) private var orTextSize = 14.0
 
   let onBirthdayTapped: () -> Void
   let onSiblingTapped: () -> Void
@@ -10,63 +11,50 @@ struct FreeAlternativesHubView: View {
   let onGertrudeTapped: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Image(systemName: "arrow.triangle.branch")
-        .font(.system(size: 40, weight: .regular))
-        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-        .accessibilityHidden(true)
-        .frame(maxWidth: .infinity, alignment: .center)
-        .swooshIn(fromYOffset: -20)
-
-      Spacer()
-
-      Text("There are three free alternatives:")
-        .font(.system(size: 18, weight: .medium))
-        .swooshIn(fromYOffset: 20)
-
-      AlternativeCard(
-        icon: "birthday.cake",
-        title: "Change your birthday",
-        onTap: self.onBirthdayTapped,
-      )
-      .swooshIn(fromYOffset: 20, after: .milliseconds(100))
-
-      AlternativeCard(
-        icon: "person.2",
-        title: "Use a sibling’s account",
-        onTap: self.onSiblingTapped,
-      )
-      .swooshIn(fromYOffset: 20, after: .milliseconds(200))
-
-      AlternativeCard(
-        icon: "desktopcomputer",
-        title: "Supervise yourself",
-        onTap: self.onAppleConfiguratorTapped,
-      )
-      .swooshIn(fromYOffset: 20, after: .milliseconds(300))
-
-      Text("or")
-        .font(.system(size: 14, weight: .medium))
-        .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.top, 8)
-        .swooshIn(fromYOffset: 20, after: .milliseconds(350))
-
-      Button("Go with Gertrude ($10/year)") {
+    GertieActionScreen(
+      message: "There are three free alternatives:",
+      icon: .system("arrow.triangle.branch"),
+      action: .button("Go with Gertrude ($10/year)") {
         self.onGertrudeTapped()
+      },
+      supplementPlacement: .afterMessage,
+    ) {
+      VStack(alignment: .leading, spacing: 16) {
+        AlternativeCard(
+          icon: "birthday.cake",
+          title: "Change your birthday",
+          onTap: self.onBirthdayTapped,
+        )
+
+        AlternativeCard(
+          icon: "person.2",
+          title: "Use a sibling’s account",
+          onTap: self.onSiblingTapped,
+        )
+
+        AlternativeCard(
+          icon: "desktopcomputer",
+          title: "Supervise yourself",
+          onTap: self.onAppleConfiguratorTapped,
+        )
+
+        Text("or")
+          .font(.system(size: self.orTextSize, weight: .medium))
+          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.top, 8)
       }
-      .buttonStyle(.gertiePrimary)
-      .swooshIn(fromYOffset: 20, after: .milliseconds(400))
+      .frame(maxWidth: .infinity)
     }
-    .frame(maxWidth: 500)
-    .padding(30)
-    .padding(.top, 50)
-    .gertieScreenBackground()
   }
 }
 
 struct AlternativeCard: View {
   @Environment(\.colorScheme) var cs
+  @ScaledMetric(relativeTo: .title3) private var iconSize = 22.0
+  @ScaledMetric(relativeTo: .title3) private var iconWidth = 36.0
+  @ScaledMetric(relativeTo: .body) private var titleSize = 16.0
+  @ScaledMetric(relativeTo: .caption) private var chevronSize = 12.0
 
   let icon: String
   let title: String
@@ -78,18 +66,18 @@ struct AlternativeCard: View {
     } label: {
       HStack(spacing: 14) {
         Image(systemName: self.icon)
-          .font(.system(size: 22, weight: .medium))
+          .font(.system(size: self.iconSize, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .frame(width: 36)
+          .frame(width: self.iconWidth)
 
         Text(self.title)
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: self.titleSize, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
 
         Spacer()
 
         Image(systemName: "chevron.right")
-          .font(.system(size: 12, weight: .semibold))
+          .font(.system(size: self.chevronSize, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet500))
       }
       .padding(.horizontal, 16)

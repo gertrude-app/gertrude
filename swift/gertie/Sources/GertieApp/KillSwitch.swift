@@ -42,14 +42,15 @@ public enum GertrudeIOSApp: String, Codable, CaseIterable, Sendable {
     line: UInt,
   ) {
     #if DEBUG
-      guard !self.isRunningTests else { return }
+      guard !self.isRunningTestsOrPreviews else { return }
       assertionFailure(message, file: file, line: line)
     #endif
   }
 
-  private static var isRunningTests: Bool {
+  private static var isRunningTestsOrPreviews: Bool {
     NSClassFromString("XCTestCase") != nil
       || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+      || ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
   }
 }
 
