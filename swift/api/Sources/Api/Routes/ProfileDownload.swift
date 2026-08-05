@@ -83,7 +83,12 @@ func generateProfileXml(
   """
   if let bundleIds = settings.whitelistedAppBundleIds {
     restrictionKeys += "\n\n      <key>whitelistedAppBundleIDs</key>\n      "
-    restrictionKeys += plistStringArray(bundleIds, indent: 6)
+    restrictionKeys += plistStringArray(
+      bundleIds.contains(GERTRUDE_APP_BUNDLE_ID)
+        ? bundleIds
+        : bundleIds + [GERTRUDE_APP_BUNDLE_ID],
+      indent: 6,
+    )
   }
   let extendedBoolKeys: [(String, Bool?)] = [
     ("allowiTunes", settings.allowItunes),
@@ -246,6 +251,8 @@ private func builtInWebFilterXml(
 
   """
 }
+
+private let GERTRUDE_APP_BUNDLE_ID = "com.netrivet.gertrude-ios.app"
 
 private func plistStringArray(_ strings: [String], indent: Int) -> String {
   let pad = String(repeating: " ", count: indent)
