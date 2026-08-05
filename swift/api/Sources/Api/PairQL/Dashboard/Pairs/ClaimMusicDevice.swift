@@ -32,8 +32,6 @@ extension ClaimMusicDevice: Resolver {
       },
       beforeClaim: { device in
         try await self.requireMusicInstall(for: device, eventId: "11369678", in: context)
-        let account = try await context.currentBillingAccount()
-        try requireGertrudeMusicAccess(in: context, billing: account)
       },
       onFresh: { device, child in
         try await self.output(device: device, child: child, code: input.code, in: context)
@@ -48,8 +46,6 @@ extension ClaimMusicDevice: Resolver {
     in context: ParentContext,
   ) async throws -> Output {
     try await self.requireMusicInstall(for: device, eventId: "7e6db2f2", in: context)
-    let account = try await context.currentBillingAccount()
-    try requireGertrudeMusicAccess(in: context, billing: account)
     return .init(
       childName: child.name,
       modelName: device.modelName,

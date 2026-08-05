@@ -40,7 +40,22 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.iosVersion).toEqual(device.iosVersion)
     expect(output.resumeStep)
       .toEqual(.done(childName: child.name, childId: child.id, deviceId: device.id))
-    expect(output.paymentAction).toBeNil()
+  }
+
+  func testResumeClaimedWithoutMusicAccessReturnsDone() async throws {
+    let parent = try await self.parent() // no subscription, no music entitlement
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let claim = try await self.createClaim(.music, device.id, child.id, claimedAt: .reference)
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: parent.context,
+    )
+
+    expect(output.resumeStep)
+      .toEqual(.done(childName: child.name, childId: child.id, deviceId: device.id))
   }
 
   func testResumeClaimedBySameParentWithoutMusicInstallThrowsNotFound() async throws {
@@ -71,7 +86,6 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.resumeStep).toBeNil()
     expect(output.children.map(\.id)).toEqual([child.id])
     expect(output.modelName).toEqual(device.modelName)
-    expect(output.paymentAction).toBeNil()
   }
 
   func testUnclaimedCodeForAlreadyBoundDeviceCompletesClaimAndReturnsDone() async throws {
@@ -95,9 +109,9 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     expect(completed?.claimedAt).not.toBeNil()
   }
 
-  func testUnclaimedWithoutMusicAccessReturnsPaymentActionAndNoChildren() async throws {
-    let parent = try await self.parent()
-    _ = try await self.db.create(Child.random { $0.parentId = parent.id })
+  func testUnclaimedWithoutMusicAccessReturnsChildren() async throws {
+    let parent = try await self.parent() // no subscription, no music entitlement
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random)
     let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
@@ -108,12 +122,11 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(output.resumeStep).toBeNil()
-    expect(output.children).toEqual([])
-    expect(output.paymentAction).toEqual(.startCheckout(tier: .medium))
+    expect(output.children.map(\.id)).toEqual([child.id])
   }
 
-  func testUnclaimedBoundDeviceWithoutMusicAccessReturnsPaymentActionAndDoesNotClaim() async throws {
-    let parent = try await self.parent()
+  func testUnclaimedBoundDeviceWithoutMusicAccessCompletesClaim() async throws {
+    let parent = try await self.parent() // no subscription, no music entitlement
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     let claim = try await self.createClaim(.music, device.id)
@@ -124,20 +137,20 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
       in: parent.context,
     )
 
-    expect(output.resumeStep).toBeNil()
+    expect(output.resumeStep)
+      .toEqual(.done(childName: child.name, childId: child.id, deviceId: device.id))
     expect(output.children).toEqual([])
-    expect(output.paymentAction).toEqual(.startCheckout(tier: .medium))
-    let unchanged = try await Claim.find(code: claim.code, in: self.db)
-    expect(unchanged?.claimedAt).toBeNil()
-    expect(unchanged?.childId).toBeNil()
+    let completed = try await Claim.find(code: claim.code, in: self.db)
+    expect(completed?.childId).toEqual(child.id)
+    expect(completed?.claimedAt).not.toBeNil()
   }
 
-  func testUnclaimedPastDueFullReturnsBillingPortalAction() async throws {
+  func testUnclaimedPastDueFullReturnsChildren() async throws {
     let parent = try await self.parentWithSubscription {
       $1.tier = .full
-      $1.stripeStatus = .pastDue
+      $1.stripeStatus = .pastDue // past due revokes music entitlement
     }
-    _ = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice.random)
     let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
@@ -148,8 +161,42 @@ final class GetMusicClaimDataResolverTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(output.resumeStep).toBeNil()
-    expect(output.children).toEqual([])
-    expect(output.paymentAction).toEqual(.openBillingPortal(config: .default))
+    expect(output.children.map(\.id)).toEqual([child.id])
+  }
+
+  func testUnclaimedCanceledReturnsChildren() async throws {
+    let parent = try await self.parentWithSubscription {
+      $1.tier = .medium
+      $1.stripeStatus = .canceled
+    }
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.music, device.id)
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: self.context(parent.model),
+    )
+
+    expect(output.resumeStep).toBeNil()
+    expect(output.children.map(\.id)).toEqual([child.id])
+  }
+
+  func testUnclaimedLightTierReturnsChildren() async throws {
+    let parent = try await self.parentWithSubscription { $1.tier = .light } // light lacks music
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.music, device.id)
+    try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
+
+    let output = try await GetMusicClaimData.resolve(
+      with: .init(code: claim.code),
+      in: self.context(parent.model),
+    )
+
+    expect(output.resumeStep).toBeNil()
+    expect(output.children.map(\.id)).toEqual([child.id])
   }
 
   func testUnclaimedWithoutMusicInstallThrowsNotFound() async throws {
