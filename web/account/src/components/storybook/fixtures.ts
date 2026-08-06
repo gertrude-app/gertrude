@@ -111,6 +111,14 @@ export const keychains: Keychain[] = [
     numKeys: 18,
     isPublic: true,
   },
+  {
+    id: `keychain-google-docs`,
+    name: `Google Docs`,
+    description: `Documents, presentations, and shared classroom files.`,
+    warning: `Image search results may include inappropriate content.`,
+    numKeys: 27,
+    isPublic: true,
+  },
 ];
 
 export const installedMacApps: InstalledMacApp[] = [

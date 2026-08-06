@@ -1,5 +1,4 @@
 import DuetSQL
-import Foundation
 import Gertie
 import PairQL
 
@@ -43,6 +42,7 @@ struct GetPersonMacSettings: Pair {
     let id: Keychain.Id
     let name: String
     let description: String?
+    let warning: String?
     let isPublic: Bool
     let numKeys: Int
     let schedule: KeychainSchedule?
@@ -55,6 +55,12 @@ struct GetPersonMacSettings: Pair {
     let longDescription: String
   }
 
+  struct CustomAlwaysBlockedRule: PairNestable {
+    let id: ChildAlwaysBlockedRule.Id
+    let rule: BlockRule
+    let comment: String?
+  }
+
   struct InternetFilteringSettings: PairNestable {
     let enabled: Bool
     let canBeDisabled: Bool
@@ -63,7 +69,7 @@ struct GetPersonMacSettings: Pair {
     let supportsAlwaysBlocked: Bool
     let availableAlwaysBlockedGroups: [AlwaysBlockedGroupSettings]
     let alwaysBlockedGroupIds: [AlwaysBlockedGroup.Id]
-    let customAlwaysBlockedDomains: [String]
+    let customAlwaysBlockedRules: [CustomAlwaysBlockedRule]
   }
 
   struct Output: PairOutput {
@@ -106,10 +112,13 @@ extension GetPersonMacSettings: Resolver {
       .where(.childId == person.id)
       .all(in: context.db)
       .map(\.groupId)
-    async let customAlwaysBlockedDomains = childCustomAlwaysBlockedDomains(
-      for: person.id,
-      in: context.db,
-    )
+    async let customAlwaysBlockedRules = ChildAlwaysBlockedRule.query()
+      .where(.childId == person.id)
+      .orderBy(.createdAt, .asc)
+      .all(in: context.db)
+      .map {
+        CustomAlwaysBlockedRule(id: $0.id, rule: $0.rule, comment: $0.comment)
+      }
     let availableKeychains = try await Keychain.query()
       .where(.parentId == person.parentId .|| .isPublic == true)
       .all(in: context.db)
@@ -135,32 +144,11 @@ extension GetPersonMacSettings: Resolver {
           && versions.allSatisfy { $0 >= .init("2.9.1")! },
         availableAlwaysBlockedGroups: availableAlwaysBlockedGroups,
         alwaysBlockedGroupIds: alwaysBlockedGroupIds,
-        customAlwaysBlockedDomains: customAlwaysBlockedDomains,
+        customAlwaysBlockedRules: customAlwaysBlockedRules,
       ),
       hasMacDevices: !computerUsers.isEmpty,
     )
   }
-}
-
-func customAlwaysBlockedDomains(from models: [ChildAlwaysBlockedRule]) -> [String] {
-  var seen: Set<String> = []
-  return models.compactMap { model in
-    guard case .hostnameOrSubdomain(let domain) = model.rule else { return nil }
-    let normalized = domain.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-    guard !normalized.isEmpty, seen.insert(normalized).inserted else { return nil }
-    return normalized
-  }
-}
-
-private func childCustomAlwaysBlockedDomains(
-  for personId: Child.Id,
-  in db: any DuetSQL.Client,
-) async throws -> [String] {
-  let models = try await ChildAlwaysBlockedRule.query()
-    .where(.childId == personId)
-    .orderBy(.createdAt, .asc)
-    .all(in: db)
-  return customAlwaysBlockedDomains(from: models)
 }
 
 private func childKeychainSettings(
@@ -195,6 +183,7 @@ extension GetPersonMacSettings.KeychainSettings {
       id: keychain.id,
       name: keychain.name,
       description: keychain.description,
+      warning: keychain.warning,
       isPublic: keychain.isPublic,
       numKeys: numKeys,
       schedule: schedule,

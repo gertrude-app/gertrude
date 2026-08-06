@@ -1,4 +1,6 @@
 // auto-generated, do not edit
+import type { BlockRule } from '../shared';
+
 export namespace GetPersonMacSettings {
   export interface Input {
     personId: UUID;
@@ -20,6 +22,7 @@ export namespace GetPersonMacSettings {
         id: UUID;
         name: string;
         description?: string;
+        warning?: string;
         isPublic: boolean;
         numKeys: number;
         schedule?: {
@@ -47,6 +50,7 @@ export namespace GetPersonMacSettings {
         id: UUID;
         name: string;
         description?: string;
+        warning?: string;
         isPublic: boolean;
         numKeys: number;
         schedule?: {
@@ -78,7 +82,11 @@ export namespace GetPersonMacSettings {
         longDescription: string;
       }>;
       alwaysBlockedGroupIds: UUID[];
-      customAlwaysBlockedDomains: string[];
+      customAlwaysBlockedRules: Array<{
+        id: UUID;
+        rule: BlockRule;
+        comment?: string;
+      }>;
     };
     hasMacDevices: boolean;
   }

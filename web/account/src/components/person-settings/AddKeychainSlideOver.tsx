@@ -12,7 +12,7 @@ import {
   inflect,
 } from '@gertrude/ui';
 import cx from 'clsx';
-import { CheckIcon, KeyIcon } from 'lucide-react';
+import { CheckIcon, KeyIcon, ShieldAlertIcon } from 'lucide-react';
 import React from 'react';
 import type { Keychain } from '#/components/types';
 
@@ -25,6 +25,7 @@ type Props = {
   keychains: Keychain[];
   assignedKeychainIds: string[];
   onAdd: (keychainIds: string[]) => void;
+  defaultTab?: KeychainTab;
 };
 
 const AddKeychainSlideOver: React.FC<Props> = ({
@@ -34,10 +35,11 @@ const AddKeychainSlideOver: React.FC<Props> = ({
   keychains,
   assignedKeychainIds,
   onAdd,
+  defaultTab = `own`,
 }) => {
   const [selectedKeychainIds, setSelectedKeychainIds] = React.useState<string[]>([]);
   const [searchQuery, setSearchQuery] = React.useState(``);
-  const [tab, setTab] = React.useState<KeychainTab>(`own`);
+  const [tab, setTab] = React.useState<KeychainTab>(defaultTab);
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
   const tabKeychains = keychains.filter((keychain) =>
     tab === `public` ? keychain.isPublic : !keychain.isPublic,
@@ -54,7 +56,7 @@ const AddKeychainSlideOver: React.FC<Props> = ({
   const reset = (): void => {
     setSelectedKeychainIds([]);
     setSearchQuery(``);
-    setTab(`own`);
+    setTab(defaultTab);
   };
   const handleOpenChange = (nextOpen: boolean): void => {
     if (!nextOpen) {
@@ -164,6 +166,18 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                           <Text variant="bodySubtle" lineClamp={2} className="mt-1">
                             {keychain.description}
                           </Text>
+                        )}
+                        {keychain.warning && (
+                          <HStack
+                            align="start"
+                            gap={2}
+                            className="mt-3 rounded-lg border border-amber-300 bg-amber-100/70 p-2"
+                          >
+                            <ShieldAlertIcon className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                            <Text variant="caption" className="leading-4 text-amber-900">
+                              {keychain.warning}
+                            </Text>
+                          </HStack>
                         )}
                       </VStack>
                       {selected && !alreadyAssigned && (

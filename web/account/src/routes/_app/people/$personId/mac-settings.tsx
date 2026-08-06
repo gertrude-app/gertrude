@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
+import type {
+  MacMonitoringConfiguration,
+  MacSettingsConfiguration,
+} from '#/components/pages/person-settings/MacSettingsPage.types';
 import type { LoadableState } from '#/components/types';
 import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
-import MacSettingsPage, {
-  type MacMonitoringConfiguration,
-  type MacSettingsConfiguration,
-} from '#/components/pages/person-settings/MacSettingsPage';
+import MacSettingsPage from '#/components/pages/person-settings/MacSettingsPage';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
@@ -58,38 +59,34 @@ const MacSettingsRoute: React.FC = () => {
         savingMonitoring={updateMonitoring.isPending}
         savingInternetFiltering={updateInternetFiltering.isPending}
         onUnsavedChangesChange={setHasUnsavedChanges}
-        onSaveMonitoring={(configuration: MacMonitoringConfiguration) => {
-          if (updateMonitoring.isPending) {
-            return;
-          }
-
-          updateMonitoring.mutate({
-            personId,
-            keyloggingEnabled: configuration.keyloggingEnabled,
-            showSuspensionActivity: configuration.showSuspensionActivity,
-            screenshotsEnabled: configuration.screenshots.enabled,
-            screenshotsResolution: configuration.screenshots.resolution,
-            screenshotsFrequency: configuration.screenshots.frequency,
-          });
-        }}
+        onSaveMonitoring={(configuration: MacMonitoringConfiguration) =>
+          updateMonitoring
+            .mutateAsync({
+              personId,
+              keyloggingEnabled: configuration.keyloggingEnabled,
+              showSuspensionActivity: configuration.showSuspensionActivity,
+              screenshotsEnabled: configuration.screenshots.enabled,
+              screenshotsResolution: configuration.screenshots.resolution,
+              screenshotsFrequency: configuration.screenshots.frequency,
+            })
+            .then(() => undefined)
+        }
         onSaveInternetFiltering={({
           filteringEnabled,
           keychains,
           alwaysBlockedGroupIds,
-          customAlwaysBlockedDomains,
-        }) => {
-          if (updateInternetFiltering.isPending) {
-            return;
-          }
-
-          updateInternetFiltering.mutate({
-            personId,
-            filteringEnabled,
-            keychains,
-            alwaysBlockedGroupIds,
-            customAlwaysBlockedDomains,
-          });
-        }}
+          customAlwaysBlockedRules,
+        }) =>
+          updateInternetFiltering
+            .mutateAsync({
+              personId,
+              filteringEnabled,
+              keychains,
+              alwaysBlockedGroupIds,
+              customAlwaysBlockedRules,
+            })
+            .then(() => undefined)
+        }
       />
       <UnsavedChangesGuard
         hasUnsavedChanges={hasUnsavedChanges}

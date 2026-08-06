@@ -1,4 +1,5 @@
 import Foundation
+import Gertie
 import PairQL
 import TypeScriptInterop
 import Vapor
@@ -20,6 +21,7 @@ enum AccountTsCodegenRoute {
       ("SuccessOutput", SuccessOutput.self),
       ("ClientAuth", ClientAuth.self),
       ("PersonRelationship", Child.Relationship.self),
+      ("BlockRule", Gertie.BlockRule.self),
     ]
   }
 

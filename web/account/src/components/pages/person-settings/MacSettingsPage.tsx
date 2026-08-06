@@ -6,198 +6,92 @@ import {
   Input,
   Skeleton,
   Stack,
-  Text,
   VStack,
 } from '@gertrude/ui';
 import {
-  BanIcon,
   CircleAlertIcon,
   KeyIcon,
   LaptopIcon,
   PlusIcon,
   RefreshCwIcon,
-  XIcon,
 } from 'lucide-react';
 import React from 'react';
-import type { LoadableState, Schedule } from '#/components/types';
+import type { LoadableState } from '#/components/types';
+import type {
+  InternetFilteringFormState,
+  MacSettingsAction,
+  MonitoringFormState,
+} from './MacSettingsPage.reducer';
+import type {
+  InternetFilteringConfiguration,
+  MacMonitoringConfiguration,
+  MacSettingsConfiguration,
+} from './MacSettingsPage.types';
+import macSettingsReducer, {
+  createMacSettingsFormState,
+  internetFilteringConfiguration,
+  internetFilteringHasUnsavedChanges,
+  monitoringHasUnsavedChanges,
+  monitoringSubmission,
+  monitoringValidation,
+} from './MacSettingsPage.reducer';
 import CardContainer from '#/components/layout/CardContainer';
-import AddBlockedDomainModal from '#/components/person-settings/AddBlockedDomainModal';
 import AddKeychainSlideOver from '#/components/person-settings/AddKeychainSlideOver';
 import BlockGroup from '#/components/person-settings/BlockGroup';
+import CustomAlwaysBlockedRules from '#/components/person-settings/CustomAlwaysBlockedRules';
 import KeychainCard from '#/components/person-settings/KeychainCard';
 import PersonSettingsExpandableSection from '#/components/person-settings/PersonSettingsExpandableSection';
 import SettingsRow from '#/components/person-settings/SettingsRow';
-
-interface MacKeychain {
-  id: string;
-  name: string;
-  description?: string;
-  isPublic: boolean;
-  numKeys: number;
-  schedule?: Schedule;
-}
-
-interface AlwaysBlockedGroup {
-  id: string;
-  name: string;
-  description: string;
-  longDescription: string;
-}
-
-export interface MacSettingsConfiguration {
-  keyloggingEnabled: boolean;
-  showSuspensionActivity: boolean;
-  screenshots: {
-    enabled: boolean;
-    resolution: number;
-    frequency: number;
-    canBeDisabled: boolean;
-  };
-  internetFiltering: {
-    enabled: boolean;
-    canBeDisabled: boolean;
-    keychains: MacKeychain[];
-    availableKeychains: MacKeychain[];
-    supportsAlwaysBlocked: boolean;
-    availableAlwaysBlockedGroups: AlwaysBlockedGroup[];
-    alwaysBlockedGroupIds: string[];
-    customAlwaysBlockedDomains: string[];
-  };
-  hasMacDevices: boolean;
-}
-
-export interface MacMonitoringConfiguration {
-  keyloggingEnabled: boolean;
-  showSuspensionActivity: boolean;
-  screenshots: {
-    enabled: boolean;
-    resolution: number;
-    frequency: number;
-  };
-}
-
-interface InternetFilteringConfiguration {
-  filteringEnabled: boolean;
-  keychains: Array<{ id: string; schedule?: Schedule }>;
-  alwaysBlockedGroupIds: string[];
-  customAlwaysBlockedDomains: string[];
-}
 
 interface Props {
   state: LoadableState<MacSettingsConfiguration>;
   savingMonitoring?: boolean;
   savingInternetFiltering?: boolean;
-  onSaveMonitoring: (configuration: MacMonitoringConfiguration) => void;
-  onSaveInternetFiltering: (configuration: InternetFilteringConfiguration) => void;
+  onSaveMonitoring: (configuration: MacMonitoringConfiguration) => void | Promise<void>;
+  onSaveInternetFiltering: (
+    configuration: InternetFilteringConfiguration,
+  ) => void | Promise<void>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
 }
 
 interface MonitoringSettingsProps {
   settings: MacSettingsConfiguration;
+  state: MonitoringFormState;
+  dispatch: React.Dispatch<MacSettingsAction>;
   saving: boolean;
-  onSave: (configuration: MacMonitoringConfiguration) => void;
-  onUnsavedChangesChange: (hasUnsavedChanges: boolean) => void;
+  onSave: (configuration: MacMonitoringConfiguration) => void | Promise<void>;
 }
-
-const integerAtLeast = (value: string, minimum: number): number | undefined => {
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed >= minimum ? parsed : undefined;
-};
 
 const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
   settings,
+  state,
+  dispatch,
   saving,
   onSave,
-  onUnsavedChangesChange,
 }) => {
-  const [keyloggingEnabled, setKeyloggingEnabled] = React.useState(
-    settings.keyloggingEnabled,
-  );
-  const [screenshotsEnabled, setScreenshotsEnabled] = React.useState(
-    settings.screenshots.enabled,
-  );
-  const [showSuspensionActivity, setShowSuspensionActivity] = React.useState(
-    settings.showSuspensionActivity,
-  );
-  const [frequencyDraft, setFrequencyDraft] = React.useState(
-    String(settings.screenshots.frequency),
-  );
-  const [resolutionDraft, setResolutionDraft] = React.useState(
-    String(settings.screenshots.resolution),
-  );
-  const frequency = integerAtLeast(frequencyDraft, 10);
-  const resolution = integerAtLeast(resolutionDraft, 1);
-  const frequencyError =
-    frequencyDraft.trim() === ``
-      ? `Frequency is required.`
-      : frequency === undefined
-        ? `Enter a whole number of at least 10 seconds.`
-        : undefined;
-  const resolutionError =
-    resolutionDraft.trim() === ``
-      ? `Resolution is required.`
-      : resolution === undefined
-        ? `Enter a positive whole number.`
-        : undefined;
-  const hasUnsavedChanges =
-    keyloggingEnabled !== settings.keyloggingEnabled ||
-    screenshotsEnabled !== settings.screenshots.enabled ||
-    showSuspensionActivity !== settings.showSuspensionActivity ||
-    frequencyDraft !== String(settings.screenshots.frequency) ||
-    resolutionDraft !== String(settings.screenshots.resolution);
+  const { draft } = state;
+  const { frequency, resolution, frequencyError, resolutionError } =
+    monitoringValidation(draft);
+  const hasUnsavedChanges = monitoringHasUnsavedChanges(state);
   const screenshotRequirementMet =
-    settings.screenshots.canBeDisabled || screenshotsEnabled;
+    settings.screenshots.canBeDisabled || draft.screenshotsEnabled;
   const canSave =
     hasUnsavedChanges &&
     frequency !== undefined &&
     resolution !== undefined &&
     screenshotRequirementMet;
 
-  React.useEffect(() => {
-    if (hasUnsavedChanges) {
-      return;
-    }
-
-    setKeyloggingEnabled(settings.keyloggingEnabled);
-    setScreenshotsEnabled(settings.screenshots.enabled);
-    setShowSuspensionActivity(settings.showSuspensionActivity);
-    setFrequencyDraft(String(settings.screenshots.frequency));
-    setResolutionDraft(String(settings.screenshots.resolution));
-  }, [
-    hasUnsavedChanges,
-    settings.keyloggingEnabled,
-    settings.showSuspensionActivity,
-    settings.screenshots.enabled,
-    settings.screenshots.frequency,
-    settings.screenshots.resolution,
-  ]);
-
-  React.useEffect(() => {
-    onUnsavedChangesChange(hasUnsavedChanges);
-  }, [hasUnsavedChanges, onUnsavedChangesChange]);
-
   const save = (): void => {
-    if (
-      !hasUnsavedChanges ||
-      frequency === undefined ||
-      resolution === undefined ||
-      !screenshotRequirementMet ||
-      saving
-    ) {
+    const submission = monitoringSubmission(draft);
+    if (!hasUnsavedChanges || !submission || !screenshotRequirementMet || saving) {
       return;
     }
 
-    setFrequencyDraft(String(frequency));
-    setResolutionDraft(String(resolution));
-    onSave({
-      keyloggingEnabled,
-      showSuspensionActivity,
-      screenshots: {
-        enabled: screenshotsEnabled,
-        resolution,
-        frequency,
-      },
-    });
+    dispatch({ type: `monitoringSaveStarted`, submitted: submission.draft });
+    void Promise.resolve(onSave(submission.configuration)).then(
+      () => dispatch({ type: `monitoringSaveSucceeded`, submitted: submission.draft }),
+      () => undefined,
+    );
   };
 
   return (
@@ -209,8 +103,8 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
           title: `Keylogging`,
           values: [
             {
-              text: keyloggingEnabled ? `On` : `Off`,
-              color: keyloggingEnabled ? `violet` : `neutral`,
+              text: draft.keyloggingEnabled ? `On` : `Off`,
+              color: draft.keyloggingEnabled ? `violet` : `neutral`,
             },
           ],
         },
@@ -218,12 +112,12 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
           title: `Screenshots`,
           values: [
             {
-              text: screenshotsEnabled
+              text: draft.screenshotsEnabled
                 ? frequency === undefined
                   ? `On`
                   : `Every ${frequency}s`
                 : `Off`,
-              color: screenshotsEnabled ? `violet` : `neutral`,
+              color: draft.screenshotsEnabled ? `violet` : `neutral`,
             },
           ],
         },
@@ -240,9 +134,11 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
             type="toggle"
             title="Enable Keylogging"
             description="Sends reports of all keystrokes to your review."
-            enabled={keyloggingEnabled}
+            enabled={draft.keyloggingEnabled}
             disabled={saving}
-            setEnabled={setKeyloggingEnabled}
+            setEnabled={(enabled) =>
+              dispatch({ type: `monitoringKeyloggingChanged`, enabled })
+            }
           />
           <SettingsRow
             type="toggle"
@@ -252,17 +148,13 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
                 ? `Periodically take a screenshot and upload it for your review.`
                 : `Screenshots are required when internet filtering is disabled.`
             }
-            enabled={screenshotsEnabled}
+            enabled={draft.screenshotsEnabled}
             disabled={
-              saving || (screenshotsEnabled && !settings.screenshots.canBeDisabled)
+              saving || (draft.screenshotsEnabled && !settings.screenshots.canBeDisabled)
             }
-            setEnabled={(enabled) => {
-              setScreenshotsEnabled(enabled);
-              if (!enabled) {
-                setFrequencyDraft(String(settings.screenshots.frequency));
-                setResolutionDraft(String(settings.screenshots.resolution));
-              }
-            }}
+            setEnabled={(enabled) =>
+              dispatch({ type: `monitoringScreenshotsChanged`, enabled })
+            }
           >
             <Stack
               direction={{ default: `vertical`, '@lg/main': `horizontal` }}
@@ -273,8 +165,10 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
                 suffix="seconds"
                 prefix="Every"
                 type="number"
-                value={frequencyDraft}
-                setValue={setFrequencyDraft}
+                value={draft.frequencyDraft}
+                setValue={(value) =>
+                  dispatch({ type: `monitoringFrequencyChanged`, value })
+                }
                 min={10}
                 step={1}
                 error={frequencyError}
@@ -286,8 +180,10 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
                 label="Resolution"
                 suffix="px"
                 type="number"
-                value={resolutionDraft}
-                setValue={setResolutionDraft}
+                value={draft.resolutionDraft}
+                setValue={(value) =>
+                  dispatch({ type: `monitoringResolutionChanged`, value })
+                }
                 min={1}
                 step={1}
                 error={resolutionError}
@@ -296,14 +192,16 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
               />
             </Stack>
           </SettingsRow>
-          {(keyloggingEnabled || screenshotsEnabled) && (
+          {(draft.keyloggingEnabled || draft.screenshotsEnabled) && (
             <SettingsRow
               type="toggle"
               title="Emphasize Filter Suspension Activity"
               description="Visually highlight activity that is recorded while filter is suspended."
-              enabled={showSuspensionActivity}
+              enabled={draft.showSuspensionActivity}
               disabled={saving}
-              setEnabled={setShowSuspensionActivity}
+              setEnabled={(enabled) =>
+                dispatch({ type: `monitoringSuspensionActivityChanged`, enabled })
+              }
             />
           )}
           <HStack justify="end">
@@ -325,71 +223,35 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
 
 interface InternetFilteringSettingsProps {
   settings: MacSettingsConfiguration;
+  state: InternetFilteringFormState;
+  dispatch: React.Dispatch<MacSettingsAction>;
   saving: boolean;
-  onSave: (configuration: InternetFilteringConfiguration) => void;
-  onUnsavedChangesChange: (hasUnsavedChanges: boolean) => void;
+  onSave: (configuration: InternetFilteringConfiguration) => void | Promise<void>;
 }
 
 const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
   settings,
+  state,
+  dispatch,
   saving,
   onSave,
-  onUnsavedChangesChange,
 }) => {
-  const [filteringEnabled, setFilteringEnabled] = React.useState(
-    settings.internetFiltering.enabled,
-  );
-  const [keychains, setKeychains] = React.useState(settings.internetFiltering.keychains);
-  const [alwaysBlockedGroupIds, setAlwaysBlockedGroupIds] = React.useState(
-    settings.internetFiltering.alwaysBlockedGroupIds,
-  );
-  const [customAlwaysBlockedDomains, setCustomAlwaysBlockedDomains] = React.useState(
-    settings.internetFiltering.customAlwaysBlockedDomains,
-  );
-  const [addBlockedDomainModalOpen, setAddBlockedDomainModalOpen] = React.useState(false);
   const [addKeychainSlideOverOpen, setAddKeychainSlideOverOpen] = React.useState(false);
-  const hasUnsavedChanges =
-    filteringEnabled !== settings.internetFiltering.enabled ||
-    JSON.stringify(keychains) !== JSON.stringify(settings.internetFiltering.keychains) ||
-    JSON.stringify(alwaysBlockedGroupIds) !==
-      JSON.stringify(settings.internetFiltering.alwaysBlockedGroupIds) ||
-    JSON.stringify(customAlwaysBlockedDomains) !==
-      JSON.stringify(settings.internetFiltering.customAlwaysBlockedDomains);
+  const { draft } = state;
+  const hasUnsavedChanges = internetFilteringHasUnsavedChanges(state);
   const canDisable =
     settings.internetFiltering.canBeDisabled && settings.screenshots.enabled;
 
-  React.useEffect(() => {
-    if (hasUnsavedChanges) {
-      return;
-    }
-
-    setFilteringEnabled(settings.internetFiltering.enabled);
-    setKeychains(settings.internetFiltering.keychains);
-    setAlwaysBlockedGroupIds(settings.internetFiltering.alwaysBlockedGroupIds);
-    setCustomAlwaysBlockedDomains(settings.internetFiltering.customAlwaysBlockedDomains);
-  }, [
-    hasUnsavedChanges,
-    settings.internetFiltering.alwaysBlockedGroupIds,
-    settings.internetFiltering.customAlwaysBlockedDomains,
-    settings.internetFiltering.enabled,
-    settings.internetFiltering.keychains,
-  ]);
-
-  React.useEffect(() => {
-    onUnsavedChangesChange(hasUnsavedChanges);
-  }, [hasUnsavedChanges, onUnsavedChangesChange]);
-
   const save = (): void => {
-    if (!hasUnsavedChanges || saving || (!filteringEnabled && !canDisable)) {
+    if (!hasUnsavedChanges || saving || (!draft.filteringEnabled && !canDisable)) {
       return;
     }
 
-    onSave({
-      filteringEnabled,
-      keychains: keychains.map(({ id, schedule }) => ({ id, schedule })),
-      alwaysBlockedGroupIds,
-      customAlwaysBlockedDomains,
-    });
+    const submitted = draft;
+    void Promise.resolve(onSave(internetFilteringConfiguration(submitted))).then(
+      () => dispatch({ type: `internetFilteringSaveSucceeded`, submitted }),
+      () => undefined,
+    );
   };
 
   return (
@@ -401,8 +263,8 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
           title: `Filter`,
           values: [
             {
-              text: filteringEnabled ? `On` : `Off`,
-              color: filteringEnabled ? `violet` : `neutral`,
+              text: draft.filteringEnabled ? `On` : `Off`,
+              color: draft.filteringEnabled ? `violet` : `neutral`,
             },
           ],
         },
@@ -410,8 +272,8 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
           title: `Keychains`,
           values: [
             {
-              text: `${keychains.length}`,
-              color: keychains.length > 0 ? `violet` : `neutral`,
+              text: `${draft.keychains.length}`,
+              color: draft.keychains.length > 0 ? `violet` : `neutral`,
             },
           ],
         },
@@ -420,12 +282,12 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
               title: `Always Blocked`,
               values: [
                 {
-                  text: `${alwaysBlockedGroupIds.length} groups`,
-                  color: alwaysBlockedGroupIds.length > 0 ? `violet` : `neutral`,
+                  text: `${draft.alwaysBlockedGroupIds.length} groups`,
+                  color: draft.alwaysBlockedGroupIds.length > 0 ? `violet` : `neutral`,
                 },
                 {
-                  text: `${customAlwaysBlockedDomains.length} domains`,
-                  color: customAlwaysBlockedDomains.length > 0 ? `violet` : `neutral`,
+                  text: `${draft.customAlwaysBlockedRules.length} rules`,
+                  color: draft.customAlwaysBlockedRules.length > 0 ? `violet` : `neutral`,
                 },
               ],
             }
@@ -443,22 +305,26 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
             type="toggle"
             title="Filter Internet Access"
             description="Block internet access except sites allowed by assigned keychains."
-            enabled={filteringEnabled}
-            disabled={saving || (filteringEnabled && !canDisable)}
-            setEnabled={setFilteringEnabled}
-            warning={
-              !settings.internetFiltering.canBeDisabled
-                ? `Update every connected Mac before disabling internet filtering.`
-                : !settings.screenshots.enabled
-                  ? `Enable screenshots before disabling internet filtering.`
-                  : undefined
+            enabled={draft.filteringEnabled}
+            disabled={saving || (draft.filteringEnabled && !canDisable)}
+            setEnabled={(enabled) =>
+              dispatch({ type: `filteringEnabledChanged`, enabled })
             }
-            showWarning={filteringEnabled && !canDisable}
+            warning={
+              !draft.filteringEnabled
+                ? `Internet access is unrestricted and this person is only protected by ${settings.keyloggingEnabled ? `screenshots and keylogging` : `screenshots`}.`
+                : !settings.internetFiltering.canBeDisabled
+                  ? `Update every connected Mac before disabling internet filtering.`
+                  : !settings.screenshots.enabled
+                    ? `Enable screenshots before disabling internet filtering.`
+                    : undefined
+            }
+            showWarning={!draft.filteringEnabled || !canDisable}
           >
-            {keychains.length > 0 ? (
+            {draft.keychains.length > 0 ? (
               <VStack gap={3}>
                 <div className="grid grid-cols-1 gap-3 @4xl/main:grid-cols-2 @6xl/main:grid-cols-3">
-                  {keychains.map((keychain) => (
+                  {draft.keychains.map((keychain) => (
                     <KeychainCard
                       key={keychain.id}
                       name={keychain.name}
@@ -467,20 +333,14 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
                       isPublic={keychain.isPublic}
                       schedule={keychain.schedule}
                       setSchedule={(schedule) =>
-                        setKeychains((current) =>
-                          current.map((currentKeychain) =>
-                            currentKeychain.id === keychain.id
-                              ? { ...currentKeychain, schedule }
-                              : currentKeychain,
-                          ),
-                        )
+                        dispatch({
+                          type: `keychainScheduleChanged`,
+                          id: keychain.id,
+                          schedule,
+                        })
                       }
                       onRemove={() =>
-                        setKeychains((current) =>
-                          current.filter(
-                            (currentKeychain) => currentKeychain.id !== keychain.id,
-                          ),
-                        )
+                        dispatch({ type: `keychainRemoved`, id: keychain.id })
                       }
                     />
                   ))}
@@ -523,15 +383,13 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
                     title={group.name}
                     shortDescription={group.description}
                     longExplanation={group.longDescription}
-                    blocked={alwaysBlockedGroupIds.includes(group.id)}
+                    blocked={draft.alwaysBlockedGroupIds.includes(group.id)}
                     setBlocked={(blocked) =>
-                      setAlwaysBlockedGroupIds((current) =>
-                        blocked
-                          ? current.includes(group.id)
-                            ? current
-                            : [...current, group.id]
-                          : current.filter((id) => id !== group.id),
-                      )
+                      dispatch({
+                        type: `alwaysBlockedGroupChanged`,
+                        id: group.id,
+                        blocked,
+                      })
                     }
                   />
                 ))}
@@ -541,59 +399,15 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
           {settings.internetFiltering.supportsAlwaysBlocked && (
             <SettingsRow
               type="alwaysOn"
-              title="Custom Always Blocked Domains"
-              description="These domains will be blocked at all times, even when the filter is suspended."
+              title="Custom Always Blocked Rules"
+              description="These rules apply at all times, even when the filter is suspended."
             >
-              {customAlwaysBlockedDomains.length > 0 ? (
-                <VStack gap={3}>
-                  <HStack wrap gap={2}>
-                    {customAlwaysBlockedDomains.map((domain) => (
-                      <HStack
-                        key={domain}
-                        gap={2}
-                        className="bg-white border p-1 pl-2.5 rounded-xl border-stone-200 shadow shadow-stone-300/30"
-                      >
-                        <BanIcon className="h-4 w-4 text-stone-500" />
-                        <Text variant="body">{domain}</Text>
-                        <Button
-                          type="button"
-                          onClick={() =>
-                            setCustomAlwaysBlockedDomains((current) =>
-                              current.filter((currentDomain) => currentDomain !== domain),
-                            )
-                          }
-                          icon={XIcon}
-                          ariaLabel={`Remove ${domain}`}
-                          size="small"
-                          variant="ghost"
-                        />
-                      </HStack>
-                    ))}
-                  </HStack>
-                  <HStack justify="end">
-                    <Button
-                      type="button"
-                      onClick={() => setAddBlockedDomainModalOpen(true)}
-                      icon={PlusIcon}
-                    >
-                      Add Blocked Domain
-                    </Button>
-                  </HStack>
-                </VStack>
-              ) : (
-                <EmptyState
-                  icon={BanIcon}
-                  title="No Always Blocked Domains"
-                  description="Let's add some!"
-                  button={{
-                    text: `Add Blocked Domain`,
-                    type: `button`,
-                    onClick: () => setAddBlockedDomainModalOpen(true),
-                    icon: PlusIcon,
-                    variant: `primary`,
-                  }}
-                />
-              )}
+              <CustomAlwaysBlockedRules
+                rules={draft.customAlwaysBlockedRules}
+                onChange={(rules) =>
+                  dispatch({ type: `customAlwaysBlockedRulesChanged`, rules })
+                }
+              />
             </SettingsRow>
           )}
           <HStack justify="end">
@@ -601,7 +415,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
               type="submit"
               variant="primary"
               disabled={
-                !hasUnsavedChanges || saving || (!filteringEnabled && !canDisable)
+                !hasUnsavedChanges || saving || (!draft.filteringEnabled && !canDisable)
               }
               loading={saving}
               className="w-full @lg/main:w-auto"
@@ -611,50 +425,58 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
           </HStack>
         </VStack>
       </form>
-      <AddBlockedDomainModal
-        open={addBlockedDomainModalOpen}
-        onOpenChange={setAddBlockedDomainModalOpen}
-        onAdd={(domain) =>
-          setCustomAlwaysBlockedDomains((current) =>
-            current.includes(domain) ? current : [...current, domain],
-          )
-        }
-      />
       <AddKeychainSlideOver
         open={addKeychainSlideOverOpen}
         onOpenChange={setAddKeychainSlideOverOpen}
         personName="this person"
         keychains={settings.internetFiltering.availableKeychains}
-        assignedKeychainIds={keychains.map((keychain) => keychain.id)}
+        assignedKeychainIds={draft.keychains.map((keychain) => keychain.id)}
         onAdd={(ids) =>
-          setKeychains((current) => [
-            ...current,
-            ...settings.internetFiltering.availableKeychains.filter((keychain) =>
+          dispatch({
+            type: `keychainsAdded`,
+            keychains: settings.internetFiltering.availableKeychains.filter((keychain) =>
               ids.includes(keychain.id),
             ),
-          ])
+          })
         }
       />
     </PersonSettingsExpandableSection>
   );
 };
 
-const MacSettingsPage: React.FC<Props> = ({
-  state,
-  savingMonitoring = false,
-  savingInternetFiltering = false,
+interface MacSettingsEditorProps {
+  settings: MacSettingsConfiguration;
+  savingMonitoring: boolean;
+  savingInternetFiltering: boolean;
+  onSaveMonitoring: (configuration: MacMonitoringConfiguration) => void | Promise<void>;
+  onSaveInternetFiltering: (
+    configuration: InternetFilteringConfiguration,
+  ) => void | Promise<void>;
+  onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
+}
+
+const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
+  settings,
+  savingMonitoring,
+  savingInternetFiltering,
   onSaveMonitoring,
   onSaveInternetFiltering,
   onUnsavedChangesChange,
 }) => {
-  const [monitoringHasUnsavedChanges, setMonitoringHasUnsavedChanges] =
-    React.useState(false);
-  const [filteringHasUnsavedChanges, setFilteringHasUnsavedChanges] =
-    React.useState(false);
-  const hasUnsavedChanges =
-    state.status === `success` &&
-    state.data.hasMacDevices &&
-    (monitoringHasUnsavedChanges || filteringHasUnsavedChanges);
+  const [formState, dispatch] = React.useReducer(
+    macSettingsReducer,
+    settings,
+    createMacSettingsFormState,
+  );
+  const monitoringHasChanges = monitoringHasUnsavedChanges(formState.monitoring);
+  const internetFilteringHasChanges = internetFilteringHasUnsavedChanges(
+    formState.internetFiltering,
+  );
+  const hasUnsavedChanges = monitoringHasChanges || internetFilteringHasChanges;
+
+  React.useEffect(() => {
+    dispatch({ type: `settingsReceived`, settings });
+  }, [internetFilteringHasChanges, monitoringHasChanges, settings]);
 
   React.useEffect(() => {
     onUnsavedChangesChange?.(hasUnsavedChanges);
@@ -667,6 +489,39 @@ const MacSettingsPage: React.FC<Props> = ({
     [onUnsavedChangesChange],
   );
 
+  return (
+    <CardContainer className="flex flex-col gap-4">
+      {(savingMonitoring || savingInternetFiltering) && (
+        <span role="status" className="sr-only">
+          Saving Mac settings
+        </span>
+      )}
+      <MonitoringSettings
+        settings={settings}
+        state={formState.monitoring}
+        dispatch={dispatch}
+        saving={savingMonitoring}
+        onSave={onSaveMonitoring}
+      />
+      <InternetFilteringSettings
+        settings={settings}
+        state={formState.internetFiltering}
+        dispatch={dispatch}
+        saving={savingInternetFiltering}
+        onSave={onSaveInternetFiltering}
+      />
+    </CardContainer>
+  );
+};
+
+const MacSettingsPage: React.FC<Props> = ({
+  state,
+  savingMonitoring = false,
+  savingInternetFiltering = false,
+  onSaveMonitoring,
+  onSaveInternetFiltering,
+  onUnsavedChangesChange,
+}) => {
   if (state.status === `loading`) {
     return (
       <CardContainer className="flex flex-col gap-4">
@@ -714,25 +569,14 @@ const MacSettingsPage: React.FC<Props> = ({
   }
 
   return (
-    <CardContainer className="flex flex-col gap-4">
-      {(savingMonitoring || savingInternetFiltering) && (
-        <span role="status" className="sr-only">
-          Saving Mac settings
-        </span>
-      )}
-      <MonitoringSettings
-        settings={state.data}
-        saving={savingMonitoring}
-        onSave={onSaveMonitoring}
-        onUnsavedChangesChange={setMonitoringHasUnsavedChanges}
-      />
-      <InternetFilteringSettings
-        settings={state.data}
-        saving={savingInternetFiltering}
-        onSave={onSaveInternetFiltering}
-        onUnsavedChangesChange={setFilteringHasUnsavedChanges}
-      />
-    </CardContainer>
+    <MacSettingsEditor
+      settings={state.data}
+      savingMonitoring={savingMonitoring}
+      savingInternetFiltering={savingInternetFiltering}
+      onSaveMonitoring={onSaveMonitoring}
+      onSaveInternetFiltering={onSaveInternetFiltering}
+      onUnsavedChangesChange={onUnsavedChangesChange}
+    />
   );
 };
 

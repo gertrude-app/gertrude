@@ -1,20 +1,20 @@
 ---
 name: device-images
 description:
-  Update local Apple device artwork for the Dashboard_v2 from ipsw.dev. Use when asked
+  Update local Apple device artwork for the Account site from ipsw.dev. Use when asked
   to add, refresh, audit, crop, or wire up Mac, iPhone, or iPad model images in
-  web/dashboard-v2/public/devices, especially after new Apple model releases.
+  web/account/public/devices, especially after new Apple model releases.
 ---
 
-# Dashboard Device Images Skill
+# Account Device Images Skill
 
-Use this when updating local device artwork for `web/dashboard-v2/`.
+Use this when updating local device artwork for `web/account/`.
 
-The dashboard stores device images here:
+The Account site stores device images here:
 
-- `web/dashboard-v2/public/devices/macs/`
-- `web/dashboard-v2/public/devices/iphones/`
-- `web/dashboard-v2/public/devices/ipads/`
+- `web/account/public/devices/macs/`
+- `web/account/public/devices/iphones/`
+- `web/account/public/devices/ipads/`
 
 The UI expects `.png` files named exactly by model identifier, commas included, e.g.
 `Mac14,2.png`, `iPhone14,7.png`, `iPad13,18.png`. Do not URL-encode commas in local
@@ -30,7 +30,7 @@ Fetch product pages from ipsw.dev:
 
 Use `curl -L -A 'Mozilla/5.0'`; other clients may get `403 Forbidden`.
 
-Use PNG source URLs, not WebP, because the dashboard image helper emits `.png` paths:
+Use PNG source URLs, not WebP, because the Account image helper emits `.png` paths:
 
 ```text
 https://ipsw.dev/img/devices/<MODEL_IDENTIFIER>.png
@@ -86,7 +86,7 @@ import re
 import sys
 
 work = Path(sys.argv[1])
-root = Path('web/dashboard-v2/public/devices')
+root = Path('web/account/public/devices')
 
 def items(product):
     text = (work / f'{product}.html').read_text(errors='replace')
@@ -128,9 +128,9 @@ FORCE=${FORCE:-0}
 work_dir=$(mktemp -d)
 trap 'rm -rf "$work_dir"' EXIT
 mkdir -p \
-  web/dashboard-v2/public/devices/macs \
-  web/dashboard-v2/public/devices/iphones \
-  web/dashboard-v2/public/devices/ipads
+  web/account/public/devices/macs \
+  web/account/public/devices/iphones \
+  web/account/public/devices/ipads
 
 for product in Mac iPhone iPad; do
   curl -fL -A 'Mozilla/5.0' -sS "https://ipsw.dev/product/$product" -o "$work_dir/$product.html"
@@ -171,7 +171,7 @@ for product, folder in [('Mac', 'macs'), ('iPhone', 'iphones'), ('iPad', 'ipads'
 PY
 
 while IFS=$'\t' read -r product folder identifier name year; do
-  dest="web/dashboard-v2/public/devices/$folder/$identifier.png"
+  dest="web/account/public/devices/$folder/$identifier.png"
   if [[ "$FORCE" != "1" && -f "$dest" ]]; then
     continue
   fi
@@ -192,14 +192,15 @@ done < "$work_dir/devices.tsv"
 2. Spot-check local URLs if the dev server is running, e.g.:
 
 ```bash
+ACCOUNT_ORIGIN=${ACCOUNT_ORIGIN:-http://localhost:5173}
 curl -s -o /dev/null -w '%{http_code} %{content_type} %{size_download}\n' \
-  'http://localhost:3001/devices/iphones/iPhone14,7.png'
+  "$ACCOUNT_ORIGIN/devices/iphones/iPhone14,7.png"
 ```
 
 3. If wiring images into UI or mock data, run:
 
 ```bash
-pnpm --filter dashboard-v2 exec tsc --noEmit
+bun run --cwd web/account typecheck
 ```
 
 ## UI/API wiring notes
@@ -213,13 +214,15 @@ The iOS apps send the identifier from `DeviceClient.getModelIdentifier()` (`unam
 that value. Legacy rows may contain `iPhone,unknown` / `iPad,unknown`, so UI should avoid
 showing a broken image if the identifier is unknown or absent.
 
-Before wiring real dashboard data, confirm the relevant dashboard PairQL output exposes
-`modelIdentifier`. As of this writing, `GetChild`, `GetAllDevices`, and
-`GetIOSDevice_v2` expose `modelName` / `deviceType` for iOS devices but not
-`modelIdentifier`, so using exact iPhone/iPad images with real API data requires adding
-that field to the PairQL outputs and regenerating TypeScript clients.
+Account's `GetPeople` PairQL output exposes `modelIdentifier` for Mac, iPhone, and iPad
+devices. `web/account/src/lib/people.ts` maps those values into Account's device types,
+and `web/account/src/components/people/DeviceArtwork.tsx` falls back to a generic icon
+for unknown identifiers or missing images. If another Account PairQL output starts
+supplying device artwork, include `modelIdentifier` there and regenerate the TypeScript
+clients.
 
-The shared helper should map device type to the matching public folder, e.g.:
+The helper in `web/account/src/components/utils.ts` maps device type to the matching
+public folder:
 
 ```ts
 const deviceImageBaseUrls = {

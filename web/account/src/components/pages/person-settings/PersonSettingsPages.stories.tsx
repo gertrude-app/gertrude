@@ -5,9 +5,9 @@ import type {
   PersonMacSettingsConfiguration,
 } from '#/components/types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
+import IosSettingsComingSoonPage from './IosSettingsComingSoonPage';
 import IosSettingsPage from './IosSettingsPage';
 import MacSettingsPage from './MacSettingsPage.reference';
-import PersonSettingsComingSoonPage from './PersonSettingsComingSoonPage';
 import {
   albums,
   installedMacApps,
@@ -64,23 +64,6 @@ const IosSettingsStory: React.FC<{
   );
 };
 
-export const MacComingSoon = {
-  name: 'Mac coming soon',
-  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => (
-    <StoryScreen>
-      <PersonSettingsShellPage
-        personName="Jude"
-        peopleHref="/people"
-        baseHref="/people/person-1"
-        selectedHref="/people/person-1/mac-settings"
-      >
-        <PersonSettingsComingSoonPage platform="mac" />
-      </PersonSettingsShellPage>
-    </StoryScreen>
-  ),
-};
-
 export const IosComingSoon = {
   name: 'iPhone and iPad coming soon',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
@@ -92,7 +75,7 @@ export const IosComingSoon = {
         baseHref="/people/person-1"
         selectedHref="/people/person-1/ios-settings"
       >
-        <PersonSettingsComingSoonPage platform="ios" />
+        <IosSettingsComingSoonPage />
       </PersonSettingsShellPage>
     </StoryScreen>
   ),

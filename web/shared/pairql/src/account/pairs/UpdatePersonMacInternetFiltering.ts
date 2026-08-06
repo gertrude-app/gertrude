@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { SuccessOutput } from '../shared';
+import type { BlockRule, SuccessOutput } from '../shared';
 
 export namespace UpdatePersonMacInternetFiltering {
   export interface Input {
@@ -29,7 +29,11 @@ export namespace UpdatePersonMacInternetFiltering {
       };
     }>;
     alwaysBlockedGroupIds: UUID[];
-    customAlwaysBlockedDomains: string[];
+    customAlwaysBlockedRules: Array<{
+      id: UUID;
+      rule: BlockRule;
+      comment?: string;
+    }>;
   }
 
   export type Output = SuccessOutput;

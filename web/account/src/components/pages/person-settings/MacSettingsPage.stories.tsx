@@ -1,8 +1,9 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
 import type { LoadableState } from '#/components/types';
+import type { MacSettingsConfiguration } from './MacSettingsPage.types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
-import MacSettingsPage, { type MacSettingsConfiguration } from './MacSettingsPage';
+import MacSettingsPage from './MacSettingsPage';
 
 const meta = {
   title: 'Account/Pages/People/Person Mac Settings',
@@ -80,7 +81,16 @@ const defaultSettings: MacSettingsConfiguration = {
       },
     ],
     alwaysBlockedGroupIds: [`adult-content`, `messages-gif-search`, `spotlight-search`],
-    customAlwaysBlockedDomains: [`reddit.com`, `discord.com`],
+    customAlwaysBlockedRules: [
+      {
+        id: `rule-reddit`,
+        rule: { case: `hostnameOrSubdomain`, value: `reddit.com` },
+      },
+      {
+        id: `rule-discord`,
+        rule: { case: `hostnameOrSubdomain`, value: `discord.com` },
+      },
+    ],
     availableKeychains: [
       {
         id: `family`,
@@ -102,14 +112,13 @@ const defaultSettings: MacSettingsConfiguration = {
 };
 
 const expandSection = (canvasElement: HTMLElement, title: string): void => {
-  const heading = Array.from(canvasElement.querySelectorAll(`h2`)).find(
-    (element) => element.textContent === title,
+  const button = Array.from(canvasElement.querySelectorAll(`button`)).find(
+    (element) => element.getAttribute(`aria-label`) === title,
   );
-  const header = heading?.parentElement?.parentElement;
-  if (!header) {
+  if (!button) {
     throw new globalThis.Error(`${title} section not found`);
   }
-  header.click();
+  button.click();
 };
 
 const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
@@ -149,7 +158,7 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
             filteringEnabled,
             keychains,
             alwaysBlockedGroupIds,
-            customAlwaysBlockedDomains,
+            customAlwaysBlockedRules,
           }) => {
             if (state.status === `success`) {
               setState({
@@ -160,7 +169,7 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
                     ...state.data.internetFiltering,
                     enabled: filteringEnabled,
                     alwaysBlockedGroupIds,
-                    customAlwaysBlockedDomains,
+                    customAlwaysBlockedRules,
                     keychains: keychains.map((keychain) => ({
                       ...state.data.internetFiltering.availableKeychains.find(
                         (availableKeychain) => availableKeychain.id === keychain.id,
@@ -206,6 +215,47 @@ export const InternetFiltering = {
   },
 };
 
+export const CustomRuleVariants = {
+  name: 'Custom rule variants',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: {
+            ...defaultSettings.internetFiltering,
+            customAlwaysBlockedRules: [
+              {
+                id: `rule-reddit`,
+                rule: { case: `hostnameOrSubdomain`, value: `Reddit.COM` },
+                comment: `Retained legacy comment`,
+              },
+              {
+                id: `rule-app`,
+                rule: { case: `bundleIdContains`, value: `com.spotify.client` },
+                comment: `Legacy app rule`,
+              },
+              {
+                id: `rule-browser`,
+                rule: {
+                  case: `both`,
+                  a: { case: `hostnameContains`, value: `images.example` },
+                  b: { case: `flowTypeIs`, value: `browser` },
+                },
+              },
+            ],
+          },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
 export const UnsavedChanges = {
   name: 'Unsaved changes',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
@@ -224,9 +274,117 @@ export const UnsavedChanges = {
   },
 };
 
+export const NoAlwaysBlockedSelections = {
+  name: 'No Always Blocked selections',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: {
+            ...defaultSettings.internetFiltering,
+            alwaysBlockedGroupIds: [],
+            customAlwaysBlockedRules: [],
+          },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
+export const NoAssignedKeychains = {
+  name: 'No assigned keychains',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: {
+            ...defaultSettings.internetFiltering,
+            keychains: [],
+          },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
+export const AlwaysBlockedUnsupported = {
+  name: 'Always Blocked unsupported',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: {
+            ...defaultSettings.internetFiltering,
+            supportsAlwaysBlocked: false,
+          },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
+export const FilteringRequiresUpdate = {
+  name: 'Internet filtering requires Mac update',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: {
+            ...defaultSettings.internetFiltering,
+            canBeDisabled: false,
+          },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
+export const FilteringDisabled = {
+  name: 'Internet filtering disabled',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: { ...defaultSettings.internetFiltering, enabled: false },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
 export const ScreenshotsRequired = {
   name: 'Screenshots required while filtering is disabled',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <MacSettingsStory
       initialState={{
