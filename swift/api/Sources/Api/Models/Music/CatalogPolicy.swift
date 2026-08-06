@@ -2,11 +2,11 @@ extension Music {
   enum CatalogPolicy {
     struct ArtistGrant: Equatable, Sendable {
       var appleMusicArtistId: ArtistId
-      var resolution: ResolvedArtist?
+      var resolution: ResolvedArtist
 
       init(
         appleMusicArtistId: ArtistId,
-        resolution: ResolvedArtist?,
+        resolution: ResolvedArtist,
       ) {
         self.appleMusicArtistId = appleMusicArtistId
         self.resolution = resolution
@@ -15,11 +15,11 @@ extension Music {
 
     struct AlbumGrant: Equatable, Sendable {
       var appleMusicAlbumId: AlbumId
-      var resolution: ResolvedAlbum?
+      var resolution: ResolvedAlbum
 
       init(
         appleMusicAlbumId: AlbumId,
-        resolution: ResolvedAlbum?,
+        resolution: ResolvedAlbum,
       ) {
         self.appleMusicAlbumId = appleMusicAlbumId
         self.resolution = resolution
@@ -65,8 +65,6 @@ extension Music {
     }
 
     enum ValidationError: Error, Equatable, Sendable {
-      case missingArtistResolution(ArtistId)
-      case missingAlbumResolution(AlbumId)
       case artistResolutionIdMismatch(expected: ArtistId, actual: ArtistId)
       case albumResolutionIdMismatch(expected: AlbumId, actual: AlbumId)
       case trackAlbumIdMismatch(track: TrackId, expected: AlbumId, actual: AlbumId)
@@ -109,9 +107,7 @@ extension Music {
           guard artistGrantsById[grant.appleMusicArtistId] == nil else {
             throw ValidationError.duplicateArtistGrant(grant.appleMusicArtistId)
           }
-          guard let resolution = grant.resolution else {
-            throw ValidationError.missingArtistResolution(grant.appleMusicArtistId)
-          }
+          let resolution = grant.resolution
           guard resolution.id == grant.appleMusicArtistId else {
             throw ValidationError.artistResolutionIdMismatch(
               expected: grant.appleMusicArtistId,
@@ -133,9 +129,7 @@ extension Music {
           guard albumGrantsById[grant.appleMusicAlbumId] == nil else {
             throw ValidationError.duplicateAlbumGrant(grant.appleMusicAlbumId)
           }
-          guard let resolution = grant.resolution else {
-            throw ValidationError.missingAlbumResolution(grant.appleMusicAlbumId)
-          }
+          let resolution = grant.resolution
           guard resolution.id == grant.appleMusicAlbumId else {
             throw ValidationError.albumResolutionIdMismatch(
               expected: grant.appleMusicAlbumId,

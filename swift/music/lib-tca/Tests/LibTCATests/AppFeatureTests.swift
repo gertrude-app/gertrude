@@ -670,21 +670,23 @@ struct AppFeatureTests {
   }
 
   @Test
-  func onlyConfirmedLibraryUpdatesPlaybackApprovals() async {
-    let library = ApprovedMusicLibrary.mock
+  func cachedAndRemoteLibrariesUpdatePlaybackApprovals() async {
+    let cached = cachedApprovedMusicLibrary
+    let remote = ApprovedMusicLibrary.mock
     let store = TestStore(initialState: AppFeature.State()) {
       AppFeature()
     }
     store.exhaustivity = .off
 
-    await store.send(.library(.cachedApprovedLibraryLoaded(library)))
-    #expect(store.state.playback.approvedTrackIDs == nil)
+    await store.send(.library(.cachedApprovedLibraryLoaded(cached)))
+    await store.receive(.library(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs))))
+    await store.receive(.playback(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
+    expectNoDifference(store.state.playback.approvedTrackIDs, cached.approvedTrackIDs)
 
-    await store.send(.library(.approvedLibraryLoaded(library)))
-    await store.receive(.library(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs))))
-    await store.receive(.playback(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
-
-    expectNoDifference(store.state.playback.approvedTrackIDs, library.approvedTrackIDs)
+    await store.send(.library(.approvedLibraryLoaded(remote)))
+    await store.receive(.library(.delegate(.approvedTrackIDsUpdated(remote.approvedTrackIDs))))
+    await store.receive(.playback(.approvedTrackIDsUpdated(remote.approvedTrackIDs)))
+    expectNoDifference(store.state.playback.approvedTrackIDs, remote.approvedTrackIDs)
   }
 
   @Test

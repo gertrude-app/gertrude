@@ -305,4 +305,7 @@ it _routed_ — it's a server-only shim) or codegen emits a duplicate-method cli
 When an old surface cannot represent the replacement's semantics, it is acceptable to
 require stale tabs to reload instead of preserving a partially correct adapter. Make that
 a deliberate product decision, remove the obsolete operation family coherently, and
-accept that requests from already-loaded bundles fail until the page is refreshed.
+accept that requests from already-loaded bundles fail until the page is refreshed. Add
+those operation names to `slackPairQLRouteNotFound`'s suppression list while retaining
+not-found route telemetry, so expected stale traffic remains observable without creating
+Slack error noise.

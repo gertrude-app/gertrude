@@ -230,6 +230,7 @@ struct LibraryFeatureTests {
     await store.receive(.cachedApprovedLibraryLoaded(cached)) {
       $0.status = .loaded(cached)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
     await store.receive(.approvedLibraryLoaded(remote)) {
       $0.status = .loaded(remote)
     }
@@ -257,6 +258,7 @@ struct LibraryFeatureTests {
     await store.receive(.cachedApprovedLibraryLoaded(.empty)) {
       $0.status = .empty
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated([])))
     await store.receive(.approvedLibraryLoaded(remote)) {
       $0.status = .loaded(remote)
     }
@@ -284,6 +286,7 @@ struct LibraryFeatureTests {
     await store.receive(.cachedApprovedLibraryLoaded(cached)) {
       $0.status = .loaded(cached)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
     await store.receive(.approvedLibraryLoadFailed)
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
@@ -309,6 +312,7 @@ struct LibraryFeatureTests {
     await store.receive(.cachedApprovedLibraryLoaded(cached)) {
       $0.status = .loaded(cached)
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
     await store.receive(.approvedLibrarySubscriptionRequired) {
       $0.status = .subscriptionRequired
     }

@@ -16,8 +16,8 @@ extension Music {
     var artwork: Artwork?
     var trackCount: Int?
     var showsArtwork: Bool
-    var resolution: ResolvedAlbum?
-    var resolvedAt: Date?
+    var resolution: ResolvedAlbum
+    var resolvedAt: Date
     var createdAt = Date()
 
     init(
@@ -30,8 +30,8 @@ extension Music {
       artwork: Artwork? = nil,
       trackCount: Int? = nil,
       showsArtwork: Bool = true,
-      resolution: ResolvedAlbum? = nil,
-      resolvedAt: Date? = nil,
+      resolution: ResolvedAlbum,
+      resolvedAt: Date,
     ) {
       self.id = id
       self.childId = childId

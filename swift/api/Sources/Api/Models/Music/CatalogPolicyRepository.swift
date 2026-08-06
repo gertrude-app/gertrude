@@ -282,20 +282,18 @@ extension Music.CatalogPolicy {
     policy: StoredPolicy,
     in db: any DuetSQL.Client,
   ) async throws -> Bool {
-    if let resolution = artist.resolution {
-      let covered = try policy.coverage.directGrantsCovered(by: resolution)
-      if !covered.albumIds.isEmpty {
-        _ = try await Music.ApprovedAlbum.query()
-          .where(.childId == artist.childId)
-          .where(.appleMusicAlbumId |=| covered.albumIds.map(\.rawValue))
-          .delete(in: db)
-      }
-      if !covered.trackIds.isEmpty {
-        _ = try await Music.ApprovedTrack.query()
-          .where(.childId == artist.childId)
-          .where(.appleMusicTrackId |=| covered.trackIds.map(\.rawValue))
-          .delete(in: db)
-      }
+    let covered = try policy.coverage.directGrantsCovered(by: artist.resolution)
+    if !covered.albumIds.isEmpty {
+      _ = try await Music.ApprovedAlbum.query()
+        .where(.childId == artist.childId)
+        .where(.appleMusicAlbumId |=| covered.albumIds.map(\.rawValue))
+        .delete(in: db)
+    }
+    if !covered.trackIds.isEmpty {
+      _ = try await Music.ApprovedTrack.query()
+        .where(.childId == artist.childId)
+        .where(.appleMusicTrackId |=| covered.trackIds.map(\.rawValue))
+        .delete(in: db)
     }
     return try await Music.ApprovedArtist.query()
       .where(.id == artist.id)

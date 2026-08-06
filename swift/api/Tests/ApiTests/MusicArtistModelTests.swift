@@ -33,6 +33,8 @@ final class MusicArtistModelTests: ApiTestCase, @unchecked Sendable {
       appleMusicArtistId: "123456789",
       name: "Lena Jonsson Trio",
       catalogMetadata: metadata,
+      resolution: resolvedArtist(id: "123456789", albums: []),
+      resolvedAt: .reference,
     ))
 
     var artists = try await child.model.approvedMusicArtists(in: self.db)

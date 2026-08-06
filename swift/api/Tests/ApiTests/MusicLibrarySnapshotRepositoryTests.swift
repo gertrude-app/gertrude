@@ -246,7 +246,7 @@ final class MusicLibrarySnapshotRepositoryTests: ApiTestCase, @unchecked Sendabl
     expect(repaired.createdAt).toEqual(.reference + 100)
   }
 
-  func testMissingResolutionCannotReplaceLastGoodSnapshot() async throws {
+  func testInvalidResolutionCannotReplaceLastGoodSnapshot() async throws {
     let child = try await self.child()
     _ = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
@@ -265,6 +265,8 @@ final class MusicLibrarySnapshotRepositoryTests: ApiTestCase, @unchecked Sendabl
       childId: child.id,
       appleMusicArtistId: "artist-1",
       name: "Artist",
+      resolution: .init(id: "wrong-artist", name: "Artist", topSongs: [], albums: []),
+      resolvedAt: .reference,
     ))
 
     do {
@@ -273,9 +275,11 @@ final class MusicLibrarySnapshotRepositoryTests: ApiTestCase, @unchecked Sendabl
         generatedAt: .reference + 100,
         in: self.db,
       )
-      XCTFail("expected missing resolution error")
+      XCTFail("expected invalid resolution error")
     } catch let error as Music.LibrarySnapshotCompiler.CompilerError {
-      expect(error).toEqual(.missingArtistResolution("artist-1"))
+      expect(error).toEqual(
+        .artistResolutionIdMismatch(expected: "artist-1", actual: "wrong-artist"),
+      )
     }
 
     let reloaded = try await Music.LibrarySnapshotRepository.snapshot(

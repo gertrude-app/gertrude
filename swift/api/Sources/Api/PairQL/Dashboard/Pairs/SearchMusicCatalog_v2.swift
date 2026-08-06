@@ -165,7 +165,7 @@ private func outputTrack(
       kind: .allowedWithArtist,
       managementAlbumId: nil,
       governingArtistId: artist.appleMusicArtistId,
-      governingArtistName: artist.resolution?.name,
+      governingArtistName: artist.resolution.name,
     )
   case .album(let album)?:
     .init(
@@ -217,7 +217,7 @@ private func outputAlbum(
       kind: .allowedWithArtist,
       selectedTrackCount: 0,
       governingArtistId: artist.appleMusicArtistId,
-      governingArtistName: artist.resolution?.name,
+      governingArtistName: artist.resolution.name,
     )
   case .album?:
     status = .init(

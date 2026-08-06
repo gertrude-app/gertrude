@@ -25,9 +25,33 @@ struct AddMusicTrackGrants: GertieMigration {
       CREATE INDEX idx_approved_tracks_child_preferred_album
         ON music.approved_tracks (child_id, preferred_album_id);
     """)
+
+    try await sql.execute("""
+      ALTER TABLE music.approved_albums
+        ALTER COLUMN resolution SET NOT NULL,
+        ALTER COLUMN resolved_at SET NOT NULL;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE music.approved_artists
+        ALTER COLUMN resolution SET NOT NULL,
+        ALTER COLUMN resolved_at SET NOT NULL;
+    """)
   }
 
   func down(sql: SQLDatabase) async throws {
+    try await sql.execute("""
+      ALTER TABLE music.approved_artists
+        ALTER COLUMN resolution DROP NOT NULL,
+        ALTER COLUMN resolved_at DROP NOT NULL;
+    """)
+
+    try await sql.execute("""
+      ALTER TABLE music.approved_albums
+        ALTER COLUMN resolution DROP NOT NULL,
+        ALTER COLUMN resolved_at DROP NOT NULL;
+    """)
+
     try await sql.execute("DROP TABLE music.approved_tracks;")
   }
 }

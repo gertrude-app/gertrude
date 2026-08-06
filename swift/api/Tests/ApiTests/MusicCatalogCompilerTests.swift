@@ -463,33 +463,6 @@ final class MusicCatalogCompilerTests: XCTestCase {
     expect(content.playlists[0].entries.map(\.track.id)).toEqual(["allowed-track"])
   }
 
-  func testMissingResolutionRefusesPartialPublication() throws {
-    XCTAssertThrowsError(try Music.LibrarySnapshotCompiler.compile(
-      albumGrants: [.init(
-        appleMusicAlbumId: "album-1",
-        createdAt: .reference,
-        showsArtwork: true,
-        resolution: nil,
-      )],
-      artistGrants: [],
-    )) { error in
-      expect(error as? Music.LibrarySnapshotCompiler.CompilerError)
-        .toEqual(.missingAlbumResolution("album-1"))
-    }
-
-    XCTAssertThrowsError(try Music.LibrarySnapshotCompiler.compile(
-      albumGrants: [],
-      artistGrants: [.init(
-        appleMusicArtistId: "artist-1",
-        createdAt: .reference,
-        resolution: nil,
-      )],
-    )) { error in
-      expect(error as? Music.LibrarySnapshotCompiler.CompilerError)
-        .toEqual(.missingArtistResolution("artist-1"))
-    }
-  }
-
   func testMismatchedResolutionAndTrackProvenanceAreRejected() throws {
     XCTAssertThrowsError(try Music.LibrarySnapshotCompiler.compile(
       albumGrants: [.init(

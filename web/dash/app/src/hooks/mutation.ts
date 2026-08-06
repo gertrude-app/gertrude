@@ -110,7 +110,6 @@ type MutationOptions<T> = {
 export type MutationResult<T, V> = UseMutationResult<T, PqlError, V>;
 
 type ToastId =
-  | `delete:admin`
   | `delete:user`
   | `delete:computer`
   | `delete:block-rule`
@@ -121,9 +120,7 @@ type ToastId =
   | `delete:activity-items`
   | `flag:activity-item`
   | `approve:music-album`
-  | `approve:music-artist`
   | `approve:music-track`
-  | `remove:music-album`
   | `remove:music-artist`
   | `update:music-artwork`
   | `update:suspend-filter-request`
@@ -166,10 +163,6 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
       return { verb: `allow`, entity: `album` };
     case `approve:music-track`:
       return { verb: `allow`, entity: `track` };
-    case `approve:music-artist`:
-      return { verb: `allow`, entity: `artist` };
-    case `remove:music-album`:
-      return { verb: `remove`, entity: `album` };
     case `remove:music-artist`:
       return { verb: `remove`, entity: `artist` };
     case `update:music-artwork`:
@@ -178,9 +171,6 @@ function getToast(toastId?: ToastId): { verb: string; entity: string } | undefin
     case `delete:user`:
     case `save:user`:
       return { verb, entity: `child` };
-
-    case `delete:admin`:
-      return { verb, entity: `account` };
 
     case `create:pending-notification-method`:
       return { verb: `send`, entity: `verification code` };

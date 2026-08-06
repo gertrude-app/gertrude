@@ -162,8 +162,7 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
       var coveredAlbumIds = Set<Music.AlbumId>()
       var coveredTrackIds = Set<Music.TrackId>()
       for artist in policy.artists {
-        guard let resolution = artist.resolution else { continue }
-        let covered = try policy.coverage.directGrantsCovered(by: resolution)
+        let covered = try policy.coverage.directGrantsCovered(by: artist.resolution)
         coveredAlbumIds.formUnion(covered.albumIds)
         coveredTrackIds.formUnion(covered.trackIds)
       }
@@ -210,9 +209,8 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
       policy = try await Music.CatalogPolicy.load(childId: childId, in: db)
       var albumCoveredTrackIds = Set<Music.TrackId>()
       for album in policy.albums {
-        guard let resolution = album.resolution else { continue }
         try albumCoveredTrackIds.formUnion(
-          policy.coverage.directTrackIdsCovered(by: resolution),
+          policy.coverage.directTrackIdsCovered(by: album.resolution),
         )
         albumCoveredTrackIds.formUnion(
           policy.tracks(preferredAlbumId: album.appleMusicAlbumId).map(\.appleMusicTrackId),

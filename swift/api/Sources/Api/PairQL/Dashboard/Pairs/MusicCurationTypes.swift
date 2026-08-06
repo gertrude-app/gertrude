@@ -109,8 +109,10 @@ extension Music.CatalogPolicy.StoredPolicy {
     var albumsById: [Music.AlbumId: MusicCurationOutput.Album] = [:]
 
     for album in self.albums {
-      guard case .album? = self.coverage.governingGrant(forAlbum: album.appleMusicAlbumId),
-            let resolution = album.resolution else { continue }
+      guard case .album? = self.coverage.governingGrant(
+        forAlbum: album.appleMusicAlbumId,
+      ) else { continue }
+      let resolution = album.resolution
       albumsById[album.appleMusicAlbumId] = .init(
         id: resolution.id,
         title: resolution.title,
@@ -213,7 +215,7 @@ extension Music.CatalogPolicy.StoredPolicy {
       catalogTrackCount: album.tracks.count,
       canEdit: scope != .artist,
       governingArtistId: governingArtist?.appleMusicArtistId,
-      governingArtistName: governingArtist?.resolution?.name,
+      governingArtistName: governingArtist?.resolution.name,
       tracks: album.tracks.map {
         .init(
           id: $0.id,

@@ -58,6 +58,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       artworkUrl: "https://example.com/stories.jpg",
       trackCount: 12,
       showsArtwork: true,
+      resolution: resolvedAlbum(id: "1440935467"),
+      resolvedAt: .reference,
     ))
     try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
@@ -67,6 +69,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       artworkUrl: nil,
       trackCount: nil,
       showsArtwork: false,
+      resolution: resolvedAlbum(id: "1733742320"),
+      resolvedAt: .reference,
     ))
 
     let output = try await withDependencies {
@@ -240,6 +244,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       artworkUrl: "https://example.com/stories.jpg",
       trackCount: 12,
       showsArtwork: true,
+      resolution: resolvedAlbum(id: "1440935467"),
+      resolvedAt: .reference,
     ))
 
     let response = try await withDependencies {
@@ -469,7 +475,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       generatedAt: .reference,
       in: self.db,
     )
-    album.resolution?.title = "Changed without publication"
+    album.resolution.title = "Changed without publication"
     try await self.db.update(album)
 
     do {
@@ -497,6 +503,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       appleMusicAlbumId: "album-1",
       title: "Legacy",
       artistName: "Legacy",
+      resolution: resolvedAlbum(id: "album-1"),
+      resolvedAt: .reference,
     ))
 
     do {

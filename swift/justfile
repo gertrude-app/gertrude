@@ -81,9 +81,6 @@ reset: build-api
 sync-staging-data: build-api
   @just exec-api sync-staging-data
 
-backfill-music-catalog: build-api
-  @just exec-api backfill-music-catalog
-
 normalize-music-policy: build-api
   @just exec-api normalize-music-policy
 

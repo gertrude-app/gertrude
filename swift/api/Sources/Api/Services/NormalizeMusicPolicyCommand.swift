@@ -45,12 +45,7 @@ struct NormalizeMusicPolicyCommand: AsyncCommand {
         var coveredAlbumIds = Set<Music.AlbumId>()
         var coveredTrackIds = Set<Music.TrackId>()
         for artist in policy.artists {
-          guard let resolution = artist.resolution else {
-            throw Music.CatalogPolicy.ValidationError.missingArtistResolution(
-              artist.appleMusicArtistId,
-            )
-          }
-          let covered = try policy.coverage.directGrantsCovered(by: resolution)
+          let covered = try policy.coverage.directGrantsCovered(by: artist.resolution)
           coveredAlbumIds.formUnion(covered.albumIds)
           coveredTrackIds.formUnion(covered.trackIds)
         }

@@ -39,6 +39,8 @@ final class MusicAdminResolverTests: ApiTestCase, @unchecked Sendable {
       title: "Kind of Blue",
       artistName: "Miles Davis",
       trackCount: 5,
+      resolution: resolvedAlbum(id: "album_1"),
+      resolvedAt: .reference,
     ))
 
     let unclaimedDevice = try await self.db.create(IOSDevice.mock)
@@ -91,6 +93,8 @@ final class MusicAdminResolverTests: ApiTestCase, @unchecked Sendable {
       appleMusicAlbumId: "album_1",
       title: "Blue Train",
       artistName: "John Coltrane",
+      resolution: resolvedAlbum(id: "album_1"),
+      resolvedAt: .reference,
     ))
 
     let unclaimedDevice = try await self.db.create(IOSDevice.mock)

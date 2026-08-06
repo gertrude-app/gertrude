@@ -20,14 +20,6 @@ extension GetApprovedMusicLibrary_v2: Resolver {
         .where(.childId == ctx.child.id)
         .all(in: ctx.db)
       let (albumGrants, artistGrants, trackGrants) = try await (albums, artists, tracks)
-      guard albumGrants.allSatisfy({ $0.resolution != nil }),
-            artistGrants.allSatisfy({ $0.resolution != nil }) else {
-        throw ctx.error(
-          "6cfffc06",
-          .serverError,
-          "Music grants are unresolved for child `\(ctx.child.id)`",
-        )
-      }
       guard snapshot.revision == snapshot.payload.revision else {
         throw ctx.error(
           "03dbe342",

@@ -573,7 +573,7 @@ struct LibraryFeature: Sendable {
 
       case .cachedApprovedLibraryLoaded(let library):
         state.applyLibrary(library)
-        return .none
+        return .send(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
 
       case .collectionPlayNowSucceeded(let identity):
         guard case .loaded(let library) = state.status,

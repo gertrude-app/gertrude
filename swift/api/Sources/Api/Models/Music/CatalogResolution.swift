@@ -229,13 +229,13 @@ extension Music {
       var appleMusicAlbumId: AlbumId
       var createdAt: Date
       var showsArtwork: Bool
-      var resolution: ResolvedAlbum?
+      var resolution: ResolvedAlbum
 
       init(
         appleMusicAlbumId: AlbumId,
         createdAt: Date,
         showsArtwork: Bool,
-        resolution: ResolvedAlbum?,
+        resolution: ResolvedAlbum,
       ) {
         self.appleMusicAlbumId = appleMusicAlbumId
         self.createdAt = createdAt
@@ -247,12 +247,12 @@ extension Music {
     struct ArtistGrant: Equatable, Sendable {
       var appleMusicArtistId: ArtistId
       var createdAt: Date
-      var resolution: ResolvedArtist?
+      var resolution: ResolvedArtist
 
       init(
         appleMusicArtistId: ArtistId,
         createdAt: Date,
-        resolution: ResolvedArtist?,
+        resolution: ResolvedArtist,
       ) {
         self.appleMusicArtistId = appleMusicArtistId
         self.createdAt = createdAt
@@ -299,8 +299,6 @@ extension Music {
     }
 
     enum CompilerError: Error, Equatable {
-      case missingAlbumResolution(AlbumId)
-      case missingArtistResolution(ArtistId)
       case albumResolutionIdMismatch(expected: AlbumId, actual: AlbumId)
       case artistResolutionIdMismatch(expected: ArtistId, actual: ArtistId)
       case trackAlbumIdMismatch(track: TrackId, expected: AlbumId, actual: AlbumId)
@@ -356,7 +354,7 @@ extension Music {
         if case .artist? = coverage.governingGrant(forAlbum: grant.appleMusicAlbumId) {
           continue
         }
-        let album = grant.resolution!
+        let album = grant.resolution
         if albumsById[album.id] == nil {
           albumOrder.append(album.id)
           albumsById[album.id] = album
@@ -424,7 +422,7 @@ extension Music {
       }
 
       for grant in artistGrants {
-        for album in grant.resolution!.albums {
+        for album in grant.resolution.albums {
           let governsMetadata: Bool = if case .artist(let governing)? = coverage
             .governingGrant(forAlbum: album.id) {
             governing.appleMusicArtistId == grant.appleMusicArtistId
@@ -478,7 +476,7 @@ extension Music {
       }
 
       let artists = artistGrants.map { grant in
-        let artist = grant.resolution!
+        let artist = grant.resolution
         var seenReleaseIds = Set<AlbumId>()
         let releaseAlbumIds = artist.albums.compactMap { album in
           seenReleaseIds.insert(album.id).inserted ? album.id.rawValue : nil
@@ -569,9 +567,7 @@ extension Music {
       trackGrants: [TrackGrant],
     ) throws {
       for grant in albumGrants {
-        guard let resolution = grant.resolution else {
-          throw CompilerError.missingAlbumResolution(grant.appleMusicAlbumId)
-        }
+        let resolution = grant.resolution
         guard resolution.id == grant.appleMusicAlbumId else {
           throw CompilerError.albumResolutionIdMismatch(
             expected: grant.appleMusicAlbumId,
@@ -581,9 +577,7 @@ extension Music {
         try self.validateTracks(in: resolution)
       }
       for grant in artistGrants {
-        guard let resolution = grant.resolution else {
-          throw CompilerError.missingArtistResolution(grant.appleMusicArtistId)
-        }
+        let resolution = grant.resolution
         guard resolution.id == grant.appleMusicArtistId else {
           throw CompilerError.artistResolutionIdMismatch(
             expected: grant.appleMusicArtistId,

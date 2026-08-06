@@ -147,7 +147,9 @@ final class NormalizeMusicPolicyCommandTests: ApiTestCase, @unchecked Sendable {
     _ = try await self.db.create(Music.ApprovedArtist(
       childId: invalidChild.id,
       appleMusicArtistId: "artist-2",
-      name: "Unresolved",
+      name: "Invalid",
+      resolution: resolvedArtist(id: "wrong-artist", albums: []),
+      resolvedAt: .reference,
     ))
 
     do {
@@ -160,7 +162,9 @@ final class NormalizeMusicPolicyCommandTests: ApiTestCase, @unchecked Sendable {
       }
       XCTFail("expected invalid policy error")
     } catch let error as Music.CatalogPolicy.ValidationError {
-      expect(error).toEqual(.missingArtistResolution("artist-2"))
+      expect(error).toEqual(
+        .artistResolutionIdMismatch(expected: "artist-2", actual: "wrong-artist"),
+      )
     }
 
     await expect(try Music.ApprovedAlbum.query()
