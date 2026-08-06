@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import CustomDump
 import Foundation
 import Testing
 
@@ -42,6 +43,48 @@ struct AppFeatureTests {
   }
 
   @Test
+  func nowPlayingAddToPlaylistTapPresentsCurrentTrackChooser() async {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[0]
+    let track = album.tracks[0]
+    let item = PlaybackItem(
+      track: track,
+      artworkURL: album.artworkURL,
+      albumID: album.id,
+    )
+    var state = AppFeature.State()
+    state.library.status = .loaded(library)
+    state.search.applyLibraryStatus(.loaded(library))
+    state.playback.session = .init(currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAddToPlaylistTapped)
+    await store.receive(.library(.addTrackToPlaylistTapped(
+      trackID: track.id,
+      albumID: album.id,
+    ))) {
+      $0.library.addToPlaylist = .init(source: .track(
+        trackId: track.id.rawValue,
+        albumId: album.id.rawValue,
+      ))
+    }
+  }
+
+  @Test
+  func nowPlayingAddToPlaylistTapWithoutAlbumDoesNothing() async {
+    let item = playbackItem("track-1")
+    var state = AppFeature.State()
+    state.playback.session = .init(currentItem: item)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingAddToPlaylistTapped)
+  }
+
+  @Test
   func queueEndingDismissesNowPlayingAndClearsPlaybackPresentation() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let item = playbackItems(album: album)[0]
@@ -62,6 +105,7 @@ struct AppFeatureTests {
     await store.send(.playback(.playbackEvent(.queueEnded))) {
       $0.isNowPlayingPresented = false
       $0.library.albumDetail?.currentTrackID = nil
+      $0.library.albumDetail?.currentTrackPlayStatus = nil
       $0.library.albumDetail?.playStatus = nil
       $0.playback.hasAuthoritativeSnapshot = false
       $0.playback.session = nil
@@ -92,8 +136,8 @@ struct AppFeatureTests {
       $0.selectedTab = .library
       $0.library.albumDetail = .init(
         album: album,
-        playStatus: .playing,
         currentTrackID: track.id,
+        currentTrackPlayStatus: .playing,
       )
     }
   }
@@ -159,8 +203,8 @@ struct AppFeatureTests {
       $0.isNowPlayingPresented = false
       $0.library.path.append(.album(.init(
         album: currentAlbum,
-        playStatus: .playing,
         currentTrackID: track.id,
+        currentTrackPlayStatus: .playing,
       )))
     }
 
@@ -312,9 +356,16 @@ struct AppFeatureTests {
       playbackItem("track-2"),
       playbackItem("track-3"),
     ]
-    let requestedItems = Array(items.dropFirst())
-    let origin = LibraryCollectionIdentity(kind: .album, id: "album")
-    let snapshot = playbackSnapshot(items: requestedItems)
+    let requestedItems = Array(items.dropFirst()).map { $0.withQueueRole(.context) }
+    let context = PlaybackContext(
+      identity: .init(kind: .album, id: "album"),
+      title: "Album",
+    )
+    let snapshot = playbackSnapshot(items: requestedItems.map { $0.withQueueRole(nil) })
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "entry-1": .context,
+    ]
     let store = TestStore(initialState: .init()) {
       AppFeature()
     } withDependencies: {
@@ -324,12 +375,20 @@ struct AppFeatureTests {
     await store.send(.library(.delegate(.playNow(
       items: items,
       startIndex: 1,
-      origin: origin,
+      context: context,
     )))) {
-      $0.pendingLibraryPlayNowOrigin = origin
+      $0.pendingLibraryPlayNowOrigin = context.identity
     }
-    await store.receive(.playback(.playNow(items: items, startIndex: 1))) {
+    await store.receive(.playback(.playNow(
+      items: items,
+      startIndex: 1,
+      context: context,
+    ))) {
+      $0.playback.pendingMetadataPlan = requestedItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
       $0.playback.pendingPlayNowItems = requestedItems
+      $0.playback.playbackContext = context
       $0.playback.session = .init(
         playStatus: .loading,
         queue: .init(items: requestedItems),
@@ -339,19 +398,41 @@ struct AppFeatureTests {
       $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
+      $0.playback.pendingMetadataPlan = nil
       $0.playback.pendingPlayNowItems = nil
-      $0.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+      $0.playback.queueRoleHints = roleHints
+      $0.playback.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
-    await store.receive(.library(.collectionPlayNowSucceeded(origin)))
+    await store.receive(.library(.collectionPlayNowSucceeded(context.identity)))
   }
 
   @Test
-  func artistPlaybackButtonStartsArtistQueueWhenAnotherQueueIsActive() async {
-    let oldItems = [playbackItem("old-track"), playbackItem("old-next")]
+  func artistPlaybackButtonPreservesQueuedItemsAndReplacesContext() async {
+    let oldItems = [
+      playbackItem("old-track").withQueueRole(.context),
+      playbackItem("old-queued").withQueueRole(.queued),
+      playbackItem("old-context").withQueueRole(.context),
+    ]
     let items = [playbackItem("track-1"), playbackItem("track-2")]
-    let composedItems = items + [oldItems[1]]
-    let origin = LibraryCollectionIdentity(kind: .artist, id: "artist")
-    let snapshot = playbackSnapshot(items: composedItems)
+    let composedItems = [
+      items[0].withQueueRole(.context),
+      oldItems[1],
+      items[1].withQueueRole(.context),
+    ]
+    let context = PlaybackContext(
+      identity: .init(kind: .artist, id: "artist"),
+      title: "Artist",
+    )
+    let snapshot = playbackSnapshot(items: composedItems.map { $0.withQueueRole(nil) })
+    let roleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [
+      "entry-0": .context,
+      "entry-1": .queued,
+      "entry-2": .context,
+    ]
     var state = AppFeature.State()
     state.playback.hasAuthoritativeSnapshot = true
     state.playback.session = .init(queue: .init(items: oldItems))
@@ -363,13 +444,21 @@ struct AppFeatureTests {
 
     await store.send(.library(.delegate(.artistPlaybackButtonTapped(
       items: items,
-      origin: origin,
+      context: context,
     )))) {
-      $0.pendingLibraryPlayNowOrigin = origin
+      $0.pendingLibraryPlayNowOrigin = context.identity
     }
-    await store.receive(.playback(.playNow(items: items, startIndex: 0))) {
+    await store.receive(.playback(.playNow(
+      items: items,
+      startIndex: 0,
+      context: context,
+    ))) {
       $0.playback.hasAuthoritativeSnapshot = false
+      $0.playback.pendingMetadataPlan = composedItems.map {
+        PlaybackMetadataHintMatcher.Occurrence(item: $0)
+      }
       $0.playback.pendingPlayNowItems = composedItems
+      $0.playback.playbackContext = context
       $0.playback.session = .init(
         playStatus: .loading,
         queue: .init(items: composedItems),
@@ -379,19 +468,30 @@ struct AppFeatureTests {
       $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
+      $0.playback.pendingMetadataPlan = nil
       $0.playback.pendingPlayNowItems = nil
-      $0.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+      $0.playback.queueRoleHints = roleHints
+      $0.playback.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
-    await store.receive(.library(.collectionPlayNowSucceeded(origin)))
+    await store.receive(.library(.collectionPlayNowSucceeded(context.identity)))
   }
 
   @Test
-  func artistPlaybackButtonPausesWhenCurrentTrackBelongsToArtist() async {
+  func artistPlaybackButtonPausesWhenArtistContextIsPlaying() async {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
+    let context = PlaybackContext(
+      identity: .init(kind: .artist, id: "artist"),
+      title: "Artist",
+    )
     var state = AppFeature.State()
+    state.playback.playbackContext = context
     state.playback.session = .init(
       playStatus: .playing,
-      queue: .init(items: [items[0], playbackItem("older-tail")]),
+      queue: .init(items: items.map { $0.withQueueRole(.context) }),
     )
     let store = TestStore(initialState: state) {
       AppFeature()
@@ -399,7 +499,7 @@ struct AppFeatureTests {
 
     await store.send(.library(.delegate(.artistPlaybackButtonTapped(
       items: items,
-      origin: .init(kind: .artist, id: "artist"),
+      context: context,
     ))))
     await store.receive(.playback(.togglePlayPause))
     await store.receive(.playback(.pause)) {
@@ -419,30 +519,40 @@ struct AppFeatureTests {
 
   @Test
   func libraryQueueDelegatesRouteToPlaybackClient() async {
-    let items = [playbackItem("track-1"), playbackItem("track-2")]
-    let snapshot = playbackSnapshot(items: items)
+    let currentItem = playbackItem("current").withQueueRole(.context)
+    let addedItem = playbackItem("added")
+    let nextItem = playbackItem("next")
     let recorder = AppPlaybackQueueRecorder()
     var state = AppFeature.State()
-    state.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+    state.playback.session = .init(currentItem: currentItem)
     state.playback.hasAuthoritativeSnapshot = true
     state.playback.lastCachedProgressBucket = 0
     let store = TestStore(initialState: state) {
       AppFeature()
     } withDependencies: {
-      $0.playback.insertIntoQueue = { items, position in
-        await recorder.record(items: items, position: position)
-        return snapshot
+      $0.playback.insertIntoQueue = { items, target in
+        await recorder.record(items: items, target: target)
+        throw CancellationError()
       }
     }
 
-    await store.send(.library(.delegate(.addToQueue(items: items))))
-    await store.receive(.playback(.addToQueue(items)))
-    await store.receive(.playback(.playbackEvent(.snapshotChanged(snapshot))))
-    await store.send(.library(.delegate(.playNext(items: items))))
-    await store.receive(.playback(.playNext(items)))
-    await store.receive(.playback(.playbackEvent(.snapshotChanged(snapshot))))
+    await store.send(.library(.delegate(.addToQueue(items: [addedItem]))))
+    await store.receive(.playback(.addToQueue([addedItem]))) {
+      $0.playback.pendingMetadataPlan = [
+        .init(item: currentItem, retainedEntryID: "pending:0:current"),
+        .init(item: addedItem.withQueueRole(.queued)),
+      ]
+      $0.playback.queueRoleHints = ["pending:0:current": .context]
+    }
+    await store.send(.library(.delegate(.playNext(items: [nextItem]))))
+    await store.receive(.playback(.playNext([nextItem]))) {
+      $0.playback.pendingMetadataPlan = [
+        .init(item: currentItem, retainedEntryID: "pending:0:current"),
+        .init(item: nextItem.withQueueRole(.queued)),
+      ]
+    }
 
-    #expect(await recorder.positions == [.tail, .next])
+    #expect(await recorder.targets == [.tail, .next])
   }
 
   @Test
@@ -504,6 +614,11 @@ struct AppFeatureTests {
       artworkURL: album.artworkURL,
       albumID: album.id,
     )
+    let contextItem = item.withQueueRole(.context)
+    let context = PlaybackContext(
+      identity: .album(album.id),
+      title: album.title,
+    )
     var state = AppFeature.State()
     state.library.status = .loaded(library)
     state.library.albumDetail = .init(
@@ -511,33 +626,67 @@ struct AppFeatureTests {
       transitionSourceID: album.id.rawValue,
     )
     let snapshot = playbackSnapshot(items: [item])
+    let roleHints = ["entry-0": PlaybackQueueRole.context]
     let store = TestStore(initialState: state) {
       AppFeature()
     } withDependencies: {
       $0.playback.playNow = { _, _ in snapshot }
     }
 
-    await store.send(.playback(.playNow(items: [item], startIndex: 0))) {
-      $0.playback.pendingPlayNowItems = [item]
-      $0.playback.session = .init(playStatus: .loading, currentItem: item)
+    await store.send(.playback(.playNow(
+      items: [item],
+      startIndex: 0,
+      context: context,
+    ))) {
+      $0.playback.pendingMetadataPlan = [
+        PlaybackMetadataHintMatcher.Occurrence(item: contextItem),
+      ]
+      $0.playback.pendingPlayNowItems = [contextItem]
+      $0.playback.playbackContext = context
+      $0.playback.session = .init(playStatus: .loading, currentItem: contextItem)
       $0.playback.sourceAlbumIDs[track.id] = album.id
       guard var albumDetail = $0.library.albumDetail else { return }
       albumDetail.playStatus = .loading
       albumDetail.currentTrackID = track.id
+      albumDetail.currentTrackPlayStatus = .loading
       $0.library.albumDetail = albumDetail
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
+      $0.playback.pendingMetadataPlan = nil
       $0.playback.pendingPlayNowItems = nil
+      $0.playback.queueRoleHints = roleHints
       $0.playback.session = PlaybackFeature.Session(
         snapshot: snapshot,
         sourceAlbumIDs: [track.id: album.id],
+        queueRoleHints: roleHints,
       )
       guard var albumDetail = $0.library.albumDetail else { return }
       albumDetail.playStatus = .playing
+      albumDetail.currentTrackPlayStatus = .playing
       $0.library.albumDetail = albumDetail
     }
+  }
+
+  @Test
+  func cachedAndRemoteLibrariesUpdatePlaybackApprovals() async {
+    let cached = cachedApprovedMusicLibrary
+    let remote = ApprovedMusicLibrary.mock
+    let store = TestStore(initialState: AppFeature.State()) {
+      AppFeature()
+    }
+    store.exhaustivity = .off
+
+    await store.send(.library(.cachedApprovedLibraryLoaded(cached)))
+    await store.receive(.library(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs))))
+    await store.receive(.playback(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
+    expectNoDifference(store.state.playback.approvedTrackIDs, cached.approvedTrackIDs)
+
+    await store.send(.library(.approvedLibraryLoaded(remote)))
+    await store.receive(.library(.delegate(.approvedTrackIDsUpdated(remote.approvedTrackIDs))))
+    await store.receive(.playback(.approvedTrackIDsUpdated(remote.approvedTrackIDs)))
+    expectNoDifference(store.state.playback.approvedTrackIDs, remote.approvedTrackIDs)
   }
 
   @Test
@@ -576,7 +725,9 @@ struct AppFeatureTests {
   @Test
   func searchSongTapStartsOnlyThatSong() async {
     let item = playbackItem("track-1")
+    let contextItem = item.withQueueRole(.context)
     let snapshot = playbackSnapshot(items: [item])
+    let roleHints = ["entry-0": PlaybackQueueRole.context]
     let store = TestStore(initialState: AppFeature.State()) {
       AppFeature()
     } withDependencies: {
@@ -584,15 +735,28 @@ struct AppFeatureTests {
     }
 
     await store.send(.search(.delegate(.songTapped(item))))
-    await store.receive(.playback(.playNow(items: [item], startIndex: 0))) {
-      $0.playback.pendingPlayNowItems = [item]
-      $0.playback.session = .init(playStatus: .loading, currentItem: item)
+    await store.receive(.playback(.playNow(
+      items: [item],
+      startIndex: 0,
+      context: nil,
+    ))) {
+      $0.playback.pendingMetadataPlan = [
+        PlaybackMetadataHintMatcher.Occurrence(item: contextItem),
+      ]
+      $0.playback.pendingPlayNowItems = [contextItem]
+      $0.playback.session = .init(playStatus: .loading, currentItem: contextItem)
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
+      $0.playback.pendingMetadataPlan = nil
       $0.playback.pendingPlayNowItems = nil
-      $0.playback.session = PlaybackFeature.Session(snapshot: snapshot, sourceAlbumIDs: [:])
+      $0.playback.queueRoleHints = roleHints
+      $0.playback.session = PlaybackFeature.Session(
+        snapshot: snapshot,
+        sourceAlbumIDs: [:],
+        queueRoleHints: roleHints,
+      )
     }
   }
 
@@ -611,12 +775,12 @@ struct AppFeatureTests {
 }
 
 private actor AppPlaybackQueueRecorder {
-  var positions: [PlaybackQueueInsertionPosition] = []
+  var targets: [PlaybackQueueInsertionTarget] = []
 
   func record(
     items _: [PlaybackItem],
-    position: PlaybackQueueInsertionPosition,
+    target: PlaybackQueueInsertionTarget,
   ) {
-    self.positions.append(position)
+    self.targets.append(target)
   }
 }

@@ -61,10 +61,23 @@ final class ArtworkImageCache {
 
 struct CachedArtworkImageView<Content: View, Placeholder: View>: View {
   let url: URL?
+  let retainsPreviousImage: Bool
   @ViewBuilder let content: (Image) -> Content
   @ViewBuilder let placeholder: () -> Placeholder
 
   @State private var loadedArtwork: LoadedArtwork?
+
+  init(
+    url: URL?,
+    retainsPreviousImage: Bool = false,
+    @ViewBuilder content: @escaping (Image) -> Content,
+    @ViewBuilder placeholder: @escaping () -> Placeholder,
+  ) {
+    self.url = url
+    self.retainsPreviousImage = retainsPreviousImage
+    self.content = content
+    self.placeholder = placeholder
+  }
 
   var body: some View {
     Group {
@@ -83,6 +96,7 @@ struct CachedArtworkImageView<Content: View, Placeholder: View>: View {
     guard let url = self.url else { return nil }
     if self.loadedArtwork?.url == url { return self.loadedArtwork?.image }
     return ArtworkImageCache.shared.cachedImage(for: url)
+      ?? (self.retainsPreviousImage ? self.loadedArtwork?.image : nil)
   }
 
   private func loadImage() async {

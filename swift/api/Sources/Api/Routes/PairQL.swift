@@ -345,15 +345,17 @@ private func slackPairQLRouteNotFound(_ request: Request, _ error: Error) async 
   let domain = request.parameters.get("domain") ?? ""
   let operation = request.parameters.get("operation") ?? ""
 
-  if domain == "dashboard", operation == "ChildActivitySummaries" {
-    return
-  }
-
-  if domain == "dashboard", operation == "DashboardWidgets" {
-    return
-  }
-
-  if domain == "dashboard", operation == "GetAccountOwner" {
+  if domain == "dashboard", [
+    "ApproveMusicAlbum",
+    "ApproveMusicArtist",
+    "ChildActivitySummaries",
+    "DashboardWidgets",
+    "GetAccountOwner",
+    "GetApprovedMusicAlbums",
+    "GetApprovedMusicArtists",
+    "RemoveApprovedMusicAlbum",
+    "SearchMusicCatalog",
+  ].contains(operation) {
     return
   }
 

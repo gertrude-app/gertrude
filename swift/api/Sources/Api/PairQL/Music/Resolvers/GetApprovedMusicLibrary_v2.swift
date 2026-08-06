@@ -16,15 +16,10 @@ extension GetApprovedMusicLibrary_v2: Resolver {
       async let artists = Music.ApprovedArtist.query()
         .where(.childId == ctx.child.id)
         .all(in: ctx.db)
-      let (albumGrants, artistGrants) = try await (albums, artists)
-      guard albumGrants.allSatisfy({ $0.resolution != nil }),
-            artistGrants.allSatisfy({ $0.resolution != nil }) else {
-        throw ctx.error(
-          "6cfffc06",
-          .serverError,
-          "Music grants are unresolved for child `\(ctx.child.id)`",
-        )
-      }
+      async let tracks = Music.ApprovedTrack.query()
+        .where(.childId == ctx.child.id)
+        .all(in: ctx.db)
+      let (albumGrants, artistGrants, trackGrants) = try await (albums, artists, tracks)
       guard snapshot.revision == snapshot.payload.revision else {
         throw ctx.error(
           "03dbe342",
@@ -45,6 +40,15 @@ extension GetApprovedMusicLibrary_v2: Resolver {
           .init(
             appleMusicArtistId: $0.appleMusicArtistId,
             createdAt: $0.createdAt,
+            resolution: $0.resolution,
+          )
+        },
+        trackGrants: trackGrants.map {
+          .init(
+            appleMusicTrackId: $0.appleMusicTrackId,
+            preferredAlbumId: $0.preferredAlbumId,
+            createdAt: $0.createdAt,
+            showsArtwork: $0.showsArtwork,
             resolution: $0.resolution,
           )
         },
@@ -74,7 +78,10 @@ extension GetApprovedMusicLibrary_v2: Resolver {
     async let artistCount = Music.ApprovedArtist.query()
       .where(.childId == ctx.child.id)
       .count(in: ctx.db)
-    let grantCount = try await albumCount + artistCount
+    async let trackCount = Music.ApprovedTrack.query()
+      .where(.childId == ctx.child.id)
+      .count(in: ctx.db)
+    let grantCount = try await albumCount + artistCount + trackCount
     guard grantCount == 0 else {
       throw ctx.error(
         "c5475ffa",

@@ -6,6 +6,7 @@ public struct AlbumDetailView: View {
   private let isPlaying: Bool
   private let isLoading: Bool
   private let currentTrackID: String?
+  private let isCurrentTrackPlaying: Bool
   private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
@@ -21,6 +22,7 @@ public struct AlbumDetailView: View {
     isPlaying: Bool = false,
     isLoading: Bool = false,
     currentTrackID: String? = nil,
+    isCurrentTrackPlaying: Bool = false,
     onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
@@ -34,6 +36,7 @@ public struct AlbumDetailView: View {
     self.isPlaying = isPlaying
     self.isLoading = isLoading
     self.currentTrackID = currentTrackID
+    self.isCurrentTrackPlaying = isCurrentTrackPlaying
     self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
@@ -42,8 +45,12 @@ public struct AlbumDetailView: View {
     self.onTrackAddToQueue = onTrackAddToQueue
     self.onTrackPlayNext = onTrackPlayNext
     self.onTrackTap = onTrackTap
-    self.rows = tracks.enumerated().map { index, track in
-      AlbumDetailTrackRow(number: index + 1, track: track)
+    let usesMultipleDiscs = Set(tracks.compactMap(\.discNumber)).count > 1
+    self.rows = tracks.map { track in
+      AlbumDetailTrackRow(
+        number: track.albumDetailNumber(includesDisc: usesMultipleDiscs),
+        track: track,
+      )
     }
   }
 
@@ -82,10 +89,12 @@ public struct AlbumDetailView: View {
             .listRowBackground(Color.clear)
         } else {
           ForEach(self.rows) { row in
-            AlbumDetailTrackRowView(
-              row: row,
+            TrackRowView(
+              number: row.number,
+              track: row.track,
+              showsArtwork: false,
               isCurrent: row.track.id == self.currentTrackID,
-              isPlaying: self.isPlaying && row.track.id == self.currentTrackID,
+              isPlaying: self.isCurrentTrackPlaying && row.track.id == self.currentTrackID,
               palette: self.album.artworkPalette,
               onTap: { self.onTrackTap(row.track.id) },
             )
@@ -234,6 +243,14 @@ public struct AlbumDetailView: View {
 
   private func artworkSize(for containerWidth: CGFloat) -> CGFloat {
     max(1, min(320, containerWidth - 64))
+  }
+}
+
+extension TrackData {
+  func albumDetailNumber(includesDisc: Bool) -> String? {
+    guard let trackNumber else { return nil }
+    guard includesDisc, let discNumber else { return String(trackNumber) }
+    return "\(discNumber).\(trackNumber)"
   }
 }
 

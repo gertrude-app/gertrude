@@ -96,16 +96,22 @@ struct PlaybackFailureReport: Equatable, Sendable {
 struct PlaybackFeature: Sendable {
   @ObservableState
   struct State: Equatable {
+    var approvedTrackIDs: Set<ApprovedTrack.ID>?
     var session: Session?
     var failure: PlaybackFailure?
     var hasAuthoritativeSnapshot = false
     var isRestoringCheckpoint = false
     var lastCachedProgressBucket: Int?
     var pendingAlbumResolutionSongID: ApprovedTrack.ID?
+    var pendingMetadataPlan: [PlaybackMetadataHintMatcher.Occurrence]?
     var pendingPlayNowItems: [PlaybackItem]?
-    var pendingPlaylistSourcePlan: [PlaybackSourceHintMatcher.Occurrence]?
+    var pendingQueueReplacementViewIDs: [String]?
+    var pendingUpcomingViewIDs: [String]?
+    var playbackContext: PlaybackContext?
     var playlistSourceHints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource] = [:]
     var progress = PlaybackProgress.zero
+    var queueRoleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [:]
+    var shouldClearPlaybackOnUpcomingUpdateFailure = false
     var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] = [:]
   }
 
@@ -157,6 +163,14 @@ struct PlaybackFeature: Sendable {
     var upcomingItems: [PlaybackItem] {
       self.upcomingEntries.map(\.item)
     }
+
+    var queuedEntries: [PlaybackQueueEntry] {
+      self.upcomingEntries.filter { $0.role == .queued }
+    }
+
+    var contextEntries: [PlaybackQueueEntry] {
+      self.upcomingEntries.filter { $0.role == .context }
+    }
   }
 
   struct Session: Equatable, Sendable {
@@ -186,6 +200,7 @@ struct PlaybackFeature: Sendable {
       snapshot: PlaybackSnapshot,
       sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID],
       playlistSourceHints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource] = [:],
+      queueRoleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole] = [:],
     ) {
       let entries = snapshot.entries.map { entry in
         PlaybackQueueEntry(
@@ -194,7 +209,11 @@ struct PlaybackFeature: Sendable {
             .withAlbumID(sourceAlbumIDs[entry.item.id])
             .withPlaylistSource(
               playlistSourceHints[entry.id] ?? entry.item.playlistSource,
+            )
+            .withQueueRole(
+              queueRoleHints[entry.id] ?? entry.item.queueRole,
             ),
+          viewID: entry.viewID,
         )
       }
       guard let queue = Queue(
@@ -216,20 +235,28 @@ struct PlaybackFeature: Sendable {
 
   enum Action: Equatable {
     case addToQueue([PlaybackItem])
+    case approvedTrackIDsUpdated(Set<ApprovedTrack.ID>)
     case checkpointLoaded(PlaybackCheckpoint?)
     case checkpointRestorationFinished(PlaybackSnapshot?)
-    case clearUpcomingButtonTapped
+    case clearQueueButtonTapped
     case observePlayback
     case pause
     case playNext([PlaybackItem])
-    case playNow(items: [PlaybackItem], startIndex: Int)
+    case playNow(items: [PlaybackItem], startIndex: Int, context: PlaybackContext?)
     case playNowFinished(PlaybackSnapshot)
     case playbackEvent(PlaybackEvent)
     case playbackFailed(PlaybackFailureReport)
     case playbackFailureActionTapped
     case playbackFailureDismissed
-    case queueEntryRemoveRequested(PlaybackQueueEntry.ID)
-    case reorderUpcoming([PlaybackQueueEntry.ID])
+    case queueEntryRemoveRequested(String)
+    case queueReplacementFailed(
+      expectedViewIDs: [String],
+      failure: PlaybackFailureReport,
+    )
+    case reorderUpcoming(
+      entryViewIDs: [String],
+      queuedEntryCount: Int,
+    )
     case restoreCachedSession
     case resume
     case saveCachedSession
@@ -238,6 +265,10 @@ struct PlaybackFeature: Sendable {
     case skipToPrevious
     case stop
     case togglePlayPause
+    case upcomingQueueUpdateFailed(
+      expectedViewIDs: [String],
+      failure: PlaybackFailureReport,
+    )
   }
 
   enum CancelID: Hashable {
@@ -257,17 +288,37 @@ struct PlaybackFeature: Sendable {
       case .addToQueue(let items):
         return self.insertIntoQueue(items, position: .tail, state: &state)
 
+      case .approvedTrackIDsUpdated(let approvedTrackIDs):
+        state.approvedTrackIDs = approvedTrackIDs
+        return self.reconcileApprovedQueue(state: &state) ?? .none
+
       case .checkpointLoaded(let loadedCheckpoint):
         guard state.session == nil,
               let loadedCheckpoint else { return .none }
-        let checkpoint = loadedCheckpoint.activeQueue
+        let activeCheckpoint = loadedCheckpoint.activeQueue
+        let checkpoint: PlaybackCheckpoint? = if let approvedTrackIDs = state.approvedTrackIDs {
+          activeCheckpoint.filtered(to: approvedTrackIDs)
+        } else {
+          activeCheckpoint
+        }
+        guard let checkpoint else {
+          return .run { _ in
+            await self.playback.clearQueue()
+            await self.playbackSessionCache.delete()
+          }
+          .cancellable(id: CancelID.checkpointSave, cancelInFlight: true)
+        }
         state.failure = nil
         state.hasAuthoritativeSnapshot = false
         state.isRestoringCheckpoint = true
         state.lastCachedProgressBucket = nil
+        state.playbackContext = checkpoint.context
         state.sourceAlbumIDs.merge(checkpoint.sourceAlbumIDs) { _, new in new }
-        state.preparePlaylistSourcePlan(checkpoint: checkpoint)
+        state.prepareMetadataPlan(checkpoint: checkpoint)
         return .run { send in
+          if checkpoint != activeCheckpoint {
+            try? await self.playbackSessionCache.save(checkpoint)
+          }
           do {
             let snapshot = try await self.playback.restoreQueue(checkpoint)
             try Task.checkCancellation()
@@ -288,25 +339,15 @@ struct PlaybackFeature: Sendable {
         }
         return .send(.playbackEvent(.snapshotChanged(snapshot)))
 
-      case .clearUpcomingButtonTapped:
-        guard let queue = state.session?.queue,
-              !queue.upcomingEntries.isEmpty else { return .none }
-        state.pendingPlayNowItems = nil
-        state.preparePlaylistSourcePlan(
-          entries: Array(queue.entries.prefix(queue.currentIndex + 1)),
+      case .clearQueueButtonTapped:
+        guard state.pendingQueueReplacementViewIDs == nil,
+              !state.shouldClearPlaybackOnUpcomingUpdateFailure,
+              let queue = state.session?.queue,
+              !queue.queuedEntries.isEmpty else { return .none }
+        return self.updateUpcomingQueue(
+          queue.contextEntries,
+          state: &state,
         )
-        return .run { send in
-          do {
-            let snapshot = try await self.playback.clearUpcoming()
-            try Task.checkCancellation()
-            await send(.playbackEvent(.snapshotChanged(snapshot)))
-          } catch is CancellationError {
-            return
-          } catch {
-            await send(.playbackFailed(.init(error: error)))
-          }
-        }
-        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
 
       case .observePlayback:
         return .run { send in
@@ -323,11 +364,16 @@ struct PlaybackFeature: Sendable {
         state.isRestoringCheckpoint = false
         state.lastCachedProgressBucket = nil
         state.pendingAlbumResolutionSongID = nil
+        state.pendingMetadataPlan = nil
         state.pendingPlayNowItems = nil
-        state.pendingPlaylistSourcePlan = nil
+        state.pendingQueueReplacementViewIDs = nil
+        state.pendingUpcomingViewIDs = nil
+        state.playbackContext = nil
         state.playlistSourceHints.removeAll()
         state.progress = .zero
+        state.queueRoleHints.removeAll()
         state.session = nil
+        state.shouldClearPlaybackOnUpcomingUpdateFailure = false
         state.sourceAlbumIDs.removeAll()
         return .merge(
           .cancel(id: CancelID.playbackStart),
@@ -340,38 +386,48 @@ struct PlaybackFeature: Sendable {
         )
 
       case .playbackEvent(.progressChanged(let progress)):
-        guard state.pendingPlayNowItems == nil else { return .none }
+        guard state.pendingPlayNowItems == nil,
+              state.pendingQueueReplacementViewIDs == nil else { return .none }
         state.setProgress(progress)
         guard state.shouldCacheProgressSnapshot() else { return .none }
         return self.saveCheckpoint(state)
 
-      case .playbackEvent(.snapshotChanged(let snapshot)):
+      case .playbackEvent(.snapshotChanged(let receivedSnapshot)):
         if let pendingItems = state.pendingPlayNowItems {
-          guard snapshot.entries.map(\.item.id) == pendingItems.map(\.id) else { return .none }
+          guard receivedSnapshot.entries.map(\.item.id) == pendingItems.map(\.id) else {
+            return .none
+          }
           state.pendingPlayNowItems = nil
         }
-        return self.applySnapshot(snapshot, state: &state)
+        return self.applySnapshot(receivedSnapshot, state: &state)
 
       case .playNext(let items):
         return self.insertIntoQueue(items, position: .next, state: &state)
 
-      case .playNow(let items, let startIndex):
-        guard items.indices.contains(startIndex) else { return .none }
-        let requestedItems = Array(items[startIndex...])
-        let existingUpcomingEntries = state.hasAuthoritativeSnapshot
-          ? state.session?.queue.upcomingEntries ?? []
+      case .playNow(let items, let startIndex, let context):
+        guard state.pendingQueueReplacementViewIDs == nil,
+              !state.shouldClearPlaybackOnUpcomingUpdateFailure,
+              items.indices.contains(startIndex) else { return .none }
+        let requestedItems = items[startIndex...]
+          .filter { state.approvedTrackIDs?.contains($0.id) ?? true }
+          .map { $0.withQueueRole(.context) }
+        guard let currentItem = requestedItems.first else { return .none }
+        let queuedItems = state.hasAuthoritativeSnapshot
+          ? state.session?.queue.queuedEntries.map(\.item).filter {
+            state.approvedTrackIDs?.contains($0.id) ?? true
+          } ?? []
           : []
-        let existingUpcomingItems = existingUpcomingEntries.map(\.item)
-        let composedItems = requestedItems + existingUpcomingItems
-        state.preparePlaylistSourcePlan(
-          newItems: requestedItems,
-          retainedEntries: existingUpcomingEntries,
-        )
+        let composedItems = [currentItem] + queuedItems + requestedItems.dropFirst()
+        state.prepareMetadataPlan(newItems: composedItems)
         state.failure = nil
         state.hasAuthoritativeSnapshot = false
         state.isRestoringCheckpoint = false
         state.lastCachedProgressBucket = nil
         state.pendingPlayNowItems = composedItems
+        state.pendingQueueReplacementViewIDs = nil
+        state.pendingUpcomingViewIDs = nil
+        state.playbackContext = context
+        state.shouldClearPlaybackOnUpcomingUpdateFailure = false
         state.progress = .zero
         state.recordSourceAlbums(requestedItems)
         state.session = .init(
@@ -380,7 +436,7 @@ struct PlaybackFeature: Sendable {
         )
         return .run { send in
           do {
-            let snapshot = try await self.playback.playNow(items, startIndex)
+            let snapshot = try await self.playback.playNow(composedItems, 0)
             try Task.checkCancellation()
             await send(.playNowFinished(snapshot))
           } catch is CancellationError {
@@ -406,7 +462,15 @@ struct PlaybackFeature: Sendable {
         }
 
       case .pause:
-        guard state.session?.playStatus == .playing else { return .none }
+        guard let session = state.session,
+              session.playStatus == .playing else { return .none }
+        if state.pendingQueueReplacementViewIDs != nil {
+          return self.replaceActiveQueue(
+            with: Array(session.queue.entries[session.queue.currentIndex...]),
+            playStatus: .paused,
+            state: &state,
+          )
+        }
         state.pauseSession()
         return .merge(
           self.saveCheckpoint(state),
@@ -415,52 +479,73 @@ struct PlaybackFeature: Sendable {
           },
         )
 
-      case .queueEntryRemoveRequested(let entryID):
-        guard let queue = state.session?.queue,
-              queue.upcomingEntries.contains(where: { $0.id == entryID }) else { return .none }
-        state.pendingPlayNowItems = nil
-        state.preparePlaylistSourcePlan(
-          entries: queue.entries.filter { $0.id != entryID },
+      case .queueEntryRemoveRequested(let entryViewID):
+        guard state.pendingQueueReplacementViewIDs == nil,
+              !state.shouldClearPlaybackOnUpcomingUpdateFailure,
+              let queue = state.session?.queue,
+              queue.upcomingEntries.contains(where: {
+                $0.viewID == entryViewID
+              }) else { return .none }
+        return self.updateUpcomingQueue(
+          queue.upcomingEntries.filter { $0.viewID != entryViewID },
+          state: &state,
         )
-        return .run { send in
-          do {
-            let snapshot = try await self.playback.removeQueueEntry(entryID)
-            try Task.checkCancellation()
-            await send(.playbackEvent(.snapshotChanged(snapshot)))
-          } catch is CancellationError {
-            return
-          } catch {
-            await send(.playbackFailed(.init(error: error)))
-          }
-        }
-        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
 
-      case .reorderUpcoming(let entryIDs):
-        guard let session = state.session,
-              entryIDs.count == session.queue.upcomingEntries.count,
-              Set(entryIDs) == Set(session.queue.upcomingEntries.map(\.id)) else {
+      case .queueReplacementFailed(let expectedViewIDs, let report):
+        guard state.pendingQueueReplacementViewIDs == expectedViewIDs else { return .none }
+        log(
+          report.failure.eventLevel,
+          report.failure.eventDomain,
+          report.failure.eventId,
+          detail: report.logDetail,
+        )
+        return .send(.playbackEvent(.queueEnded))
+
+      case .reorderUpcoming(let entryViewIDs, let queuedEntryCount):
+        guard state.pendingQueueReplacementViewIDs == nil,
+              !state.shouldClearPlaybackOnUpcomingUpdateFailure,
+              let queue = state.session?.queue,
+              entryViewIDs.count == queue.upcomingEntries.count,
+              Set(entryViewIDs) == Set(queue.upcomingEntries.map(\.viewID)),
+              (0 ... entryViewIDs.count).contains(queuedEntryCount) else {
           return .none
         }
-        state.pendingPlayNowItems = nil
-        let upcomingByID = Dictionary(
-          uniqueKeysWithValues: session.queue.upcomingEntries.map { ($0.id, $0) },
+        let upcomingByViewID = Dictionary(
+          uniqueKeysWithValues: queue.upcomingEntries.map { ($0.viewID, $0) },
         )
-        state.preparePlaylistSourcePlan(
-          entries: Array(session.queue.entries.prefix(session.queue.currentIndex + 1))
-            + entryIDs.compactMap { upcomingByID[$0] },
-        )
-        return .run { send in
-          do {
-            let snapshot = try await self.playback.reorderUpcoming(entryIDs)
-            try Task.checkCancellation()
-            await send(.playbackEvent(.snapshotChanged(snapshot)))
-          } catch is CancellationError {
-            return
-          } catch {
-            await send(.playbackFailed(.init(error: error)))
+        let reorderedEntries = entryViewIDs.enumerated().compactMap { index, viewID in
+          upcomingByViewID[viewID].map { entry in
+            PlaybackQueueEntry(
+              id: entry.id,
+              item: entry.item.withQueueRole(
+                index < queuedEntryCount ? .queued : .context,
+              ),
+              viewID: entry.viewID,
+            )
           }
         }
-        .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+        guard reorderedEntries.count == entryViewIDs.count else { return .none }
+        return self.updateUpcomingQueue(
+          reorderedEntries,
+          state: &state,
+        )
+
+      case .upcomingQueueUpdateFailed(let expectedViewIDs, let report):
+        guard state.pendingUpcomingViewIDs == expectedViewIDs else { return .none }
+        let shouldClearPlayback = state.shouldClearPlaybackOnUpcomingUpdateFailure
+        state.pendingUpcomingViewIDs = nil
+        state.shouldClearPlaybackOnUpcomingUpdateFailure = false
+        log(
+          report.failure.eventLevel,
+          report.failure.eventDomain,
+          report.failure.eventId,
+          detail: report.logDetail,
+        )
+        if shouldClearPlayback {
+          return .send(.playbackEvent(.queueEnded))
+        }
+        state.failure = report.failure
+        return .none
 
       case .restoreCachedSession:
         guard state.session == nil,
@@ -470,7 +555,8 @@ struct PlaybackFeature: Sendable {
         }
 
       case .resume:
-        guard state.session?.playStatus == .paused else { return .none }
+        guard state.pendingQueueReplacementViewIDs == nil,
+              state.session?.playStatus == .paused else { return .none }
         state.failure = nil
         state.resumeSession()
         return .merge(
@@ -488,7 +574,8 @@ struct PlaybackFeature: Sendable {
         return self.saveCheckpoint(state)
 
       case .seek(let time):
-        guard state.session != nil,
+        guard state.pendingQueueReplacementViewIDs == nil,
+              state.session != nil,
               state.progress.duration > 0 else { return .none }
         let duration = state.progress.duration
         let clampedTime = min(duration, max(0, time))
@@ -500,7 +587,9 @@ struct PlaybackFeature: Sendable {
         return .merge(self.saveCheckpoint(state), seekEffect)
 
       case .skipToNext:
-        guard state.session != nil else { return .none }
+        guard state.pendingQueueReplacementViewIDs == nil,
+              !state.shouldClearPlaybackOnUpcomingUpdateFailure,
+              state.session != nil else { return .none }
         return .run { send in
           guard let outcome = try? await self.playback.skipToNext(),
                 outcome == .queueEnded else { return }
@@ -508,7 +597,9 @@ struct PlaybackFeature: Sendable {
         }
 
       case .skipToPrevious:
-        guard let session = state.session else { return .none }
+        guard state.pendingQueueReplacementViewIDs == nil,
+              !state.shouldClearPlaybackOnUpcomingUpdateFailure,
+              let session = state.session else { return .none }
         if state.progress.elapsedTime > 3 || session.queue.currentIndex == 0 {
           return .run { _ in
             await self.playback.restartCurrentEntry()
@@ -519,9 +610,24 @@ struct PlaybackFeature: Sendable {
         }
 
       case .stop:
+        if state.pendingQueueReplacementViewIDs != nil,
+           let session = state.session {
+          return self.replaceActiveQueue(
+            with: Array(session.queue.entries[session.queue.currentIndex...]),
+            playStatus: .paused,
+            state: &state,
+          )
+        }
+        let cancelPlaybackStart: EffectOf<Self> =
+          state.shouldClearPlaybackOnUpcomingUpdateFailure
+            ? .none
+            : .cancel(id: CancelID.playbackStart)
+        if !state.shouldClearPlaybackOnUpcomingUpdateFailure {
+          state.pendingUpcomingViewIDs = nil
+        }
         state.pauseSession()
         return .merge(
-          .cancel(id: CancelID.playbackStart),
+          cancelPlaybackStart,
           self.saveCheckpoint(state),
           .run { _ in
             await self.playback.stop()
@@ -531,8 +637,11 @@ struct PlaybackFeature: Sendable {
       case .playbackFailed(let report):
         let failure = report.failure
         state.failure = failure
+        state.pendingMetadataPlan = nil
         state.pendingPlayNowItems = nil
-        state.pendingPlaylistSourcePlan = nil
+        state.pendingQueueReplacementViewIDs = nil
+        state.pendingUpcomingViewIDs = nil
+        state.shouldClearPlaybackOnUpcomingUpdateFailure = false
         state.pauseSession()
         log(
           failure.eventLevel,
@@ -555,28 +664,107 @@ struct PlaybackFeature: Sendable {
     }
   }
 
+  private static func preservingEntryMetadata(
+    in snapshot: PlaybackSnapshot,
+    from queue: Queue?,
+  ) -> PlaybackSnapshot {
+    guard let queue else { return snapshot }
+    var availableEntries = queue.entries
+    var previousEntries = [PlaybackQueueEntry?](repeating: nil, count: snapshot.entries.count)
+
+    for index in snapshot.entries.indices {
+      let entry = snapshot.entries[index]
+      guard let matchingIndex = availableEntries.firstIndex(where: {
+        $0.id == entry.id && $0.item.id == entry.item.id
+      }) else { continue }
+      previousEntries[index] = availableEntries.remove(at: matchingIndex)
+    }
+
+    for index in snapshot.entries.indices where previousEntries[index] == nil {
+      let entry = snapshot.entries[index]
+      guard let matchingIndex = availableEntries.firstIndex(where: {
+        $0.item.id == entry.item.id
+      }) else { continue }
+      previousEntries[index] = availableEntries.remove(at: matchingIndex)
+    }
+
+    return PlaybackSnapshot(
+      entries: snapshot.entries.indices.map { index in
+        let entry = snapshot.entries[index]
+        guard let previousEntry = previousEntries[index] else { return entry }
+        return PlaybackQueueEntry(
+          id: entry.id,
+          item: entry.item
+            .withAlbumID(previousEntry.item.albumID ?? entry.item.albumID)
+            .withArtworkURL(previousEntry.item.artworkURL ?? entry.item.artworkURL)
+            .withPlaylistSource(
+              previousEntry.item.playlistSource ?? entry.item.playlistSource,
+            )
+            .withQueueRole(previousEntry.item.queueRole ?? entry.item.queueRole),
+          viewID: previousEntry.viewID.hasPrefix("pending:")
+            ? entry.viewID
+            : previousEntry.viewID,
+        )
+      },
+      currentEntryID: snapshot.currentEntryID,
+      playStatus: snapshot.playStatus,
+      progress: snapshot.progress,
+    )
+  }
+
   private func applySnapshot(
-    _ snapshot: PlaybackSnapshot,
+    _ receivedSnapshot: PlaybackSnapshot,
     state: inout State,
   ) -> EffectOf<Self> {
-    state.recordPlaylistSources(entries: state.session?.queue.entries ?? [])
-    state.recordPlaylistSources(entries: snapshot.entries)
-    let sourcePlan = state.pendingPlaylistSourcePlan ?? []
-    state.playlistSourceHints = PlaybackSourceHintMatcher.match(
-      plan: sourcePlan,
+    let snapshot = Self.preservingEntryMetadata(
+      in: receivedSnapshot,
+      from: state.session?.queue,
+    )
+    if let expectedViewIDs = state.pendingQueueReplacementViewIDs {
+      guard let receivedQueue = Queue(
+        entries: snapshot.entries,
+        currentEntryID: snapshot.currentEntryID,
+      ), receivedQueue.currentIndex == 0,
+      receivedQueue.entries.map(\.viewID) == expectedViewIDs else { return .none }
+      state.pendingQueueReplacementViewIDs = nil
+    }
+    if let expectedViewIDs = state.pendingUpcomingViewIDs {
+      guard let receivedQueue = Queue(
+        entries: snapshot.entries,
+        currentEntryID: snapshot.currentEntryID,
+      ) else { return .none }
+      if receivedQueue.currentEntry.viewID == state.session?.queue.currentEntry.viewID,
+         receivedQueue.upcomingEntries.map(\.viewID) != expectedViewIDs {
+        return .none
+      }
+      state.pendingUpcomingViewIDs = nil
+      state.shouldClearPlaybackOnUpcomingUpdateFailure = false
+    }
+    state.recordMetadata(entries: snapshot.entries)
+    let metadataPlan = state.pendingMetadataPlan ?? []
+    state.playlistSourceHints = PlaybackMetadataHintMatcher.match(
+      plan: metadataPlan,
       entries: snapshot.entries,
       existing: state.playlistSourceHints,
     )
-    if Self.hasMatchedAllPlaylistSources(
-      in: sourcePlan,
-      hints: state.playlistSourceHints,
+    state.queueRoleHints = PlaybackMetadataHintMatcher.match(
+      plan: metadataPlan,
+      entries: snapshot.entries,
+      existing: state.queueRoleHints,
+      value: { $0.queueRole },
+    )
+    if Self.hasMatchedAllMetadata(
+      in: metadataPlan,
+      playlistSourceHints: state.playlistSourceHints,
+      queueRoleHints: state.queueRoleHints,
     ) {
-      state.pendingPlaylistSourcePlan = nil
+      state.pendingMetadataPlan = nil
     }
     guard var session = Session(
       snapshot: snapshot,
       sourceAlbumIDs: state.sourceAlbumIDs,
       playlistSourceHints: state.playlistSourceHints,
+      queueRoleHints: state.queueRoleHints,
     ) else { return .none }
     let previousSession = state.session
     if previousSession?.isLoading == true, session.playStatus == .paused {
@@ -584,8 +772,13 @@ struct PlaybackFeature: Sendable {
     }
     state.hasAuthoritativeSnapshot = !state.isRestoringCheckpoint
     state.progress = snapshot.progress
-    state.session = session
+    if previousSession != session {
+      state.session = session
+    }
     guard !state.isRestoringCheckpoint else { return .none }
+    if let reconciliation = self.reconcileApprovedQueue(state: &state) {
+      return reconciliation
+    }
     let shouldCacheImmediately = previousSession?.queue != session.queue
       || previousSession?.playStatus != session.playStatus
     if shouldCacheImmediately {
@@ -596,17 +789,178 @@ struct PlaybackFeature: Sendable {
     return self.saveCheckpoint(state)
   }
 
-  private static func hasMatchedAllPlaylistSources(
-    in plan: [PlaybackSourceHintMatcher.Occurrence],
-    hints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource],
+  private static func hasMatchedAllMetadata(
+    in plan: [PlaybackMetadataHintMatcher.Occurrence],
+    playlistSourceHints: [PlaybackQueueEntry.ID: PlaylistPlaybackSource],
+    queueRoleHints: [PlaybackQueueEntry.ID: PlaybackQueueRole],
   ) -> Bool {
-    var remaining = plan.compactMap(\.item.playlistSource)
-    for hint in hints.values {
-      if let index = remaining.firstIndex(of: hint) {
+    self.hasMatchedAll(
+      plan.compactMap(\.item.playlistSource),
+      with: Array(playlistSourceHints.values),
+    ) && self.hasMatchedAll(
+      plan.compactMap(\.item.queueRole),
+      with: Array(queueRoleHints.values),
+    )
+  }
+
+  private static func hasMatchedAll<Value: Equatable>(
+    _ expected: [Value],
+    with actual: [Value],
+  ) -> Bool {
+    var remaining = expected
+    for value in actual {
+      if let index = remaining.firstIndex(of: value) {
         remaining.remove(at: index)
       }
     }
     return remaining.isEmpty
+  }
+
+  private func reconcileApprovedQueue(
+    state: inout State,
+  ) -> EffectOf<Self>? {
+    guard state.hasAuthoritativeSnapshot,
+          !state.isRestoringCheckpoint,
+          let approvedTrackIDs = state.approvedTrackIDs,
+          let session = state.session else { return nil }
+    let queue = session.queue
+    if let pendingViewIDs = state.pendingQueueReplacementViewIDs {
+      let approvedEntries = queue.entries[queue.currentIndex...].filter {
+        approvedTrackIDs.contains($0.item.id)
+      }
+      guard !approvedEntries.isEmpty else {
+        return .send(.playbackEvent(.queueEnded))
+      }
+      guard approvedEntries.map(\.viewID) != pendingViewIDs else { return nil }
+      return self.replaceActiveQueue(
+        with: approvedEntries,
+        playStatus: session.playStatus,
+        state: &state,
+      )
+    }
+    let approvedUpcomingEntries = queue.upcomingEntries.filter {
+      approvedTrackIDs.contains($0.item.id)
+    }
+    if !approvedTrackIDs.contains(queue.currentItem.id) {
+      guard !approvedUpcomingEntries.isEmpty else {
+        return .send(.playbackEvent(.queueEnded))
+      }
+      return self.replaceActiveQueue(
+        with: approvedUpcomingEntries,
+        playStatus: session.playStatus,
+        state: &state,
+      )
+    }
+    guard approvedUpcomingEntries.count != queue.upcomingEntries.count else { return nil }
+    return self.updateUpcomingQueue(
+      approvedUpcomingEntries,
+      clearPlaybackOnFailure: true,
+      state: &state,
+    )
+  }
+
+  private func replaceActiveQueue(
+    with entries: [PlaybackQueueEntry],
+    playStatus: PlayStatus,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard let firstEntry = entries.first,
+          let queue = Queue(
+            entries: entries,
+            currentEntryID: firstEntry.id,
+          ) else { return .none }
+    let expectedViewIDs = entries.map(\.viewID)
+    let retainedEntryIDs = Set(entries.map(\.id))
+    let retainedTrackIDs = Set(entries.map(\.item.id))
+    state.failure = nil
+    state.lastCachedProgressBucket = 0
+    state.pendingAlbumResolutionSongID = nil
+    state.pendingMetadataPlan = nil
+    state.pendingPlayNowItems = nil
+    state.pendingQueueReplacementViewIDs = expectedViewIDs
+    state.pendingUpcomingViewIDs = nil
+    state.playlistSourceHints = state.playlistSourceHints.filter {
+      retainedEntryIDs.contains($0.key)
+    }
+    state.progress = .zero
+    state.queueRoleHints = state.queueRoleHints.filter {
+      retainedEntryIDs.contains($0.key)
+    }
+    state.recordMetadata(entries: entries)
+    state.session = .init(playStatus: playStatus, queue: queue)
+    state.shouldClearPlaybackOnUpcomingUpdateFailure = false
+    state.sourceAlbumIDs = state.sourceAlbumIDs.filter {
+      retainedTrackIDs.contains($0.key)
+    }
+    if !entries.contains(where: { $0.role == .context }) {
+      state.playbackContext = nil
+    }
+    let replacementEffect: EffectOf<Self> = .run { send in
+      do {
+        let snapshot = try await self.playback.replaceQueue(
+          entries,
+          playStatus != .paused,
+        )
+        try Task.checkCancellation()
+        await send(.playbackEvent(.snapshotChanged(snapshot)))
+      } catch is CancellationError {
+        return
+      } catch {
+        await send(.queueReplacementFailed(
+          expectedViewIDs: expectedViewIDs,
+          failure: .init(error: error),
+        ))
+      }
+    }
+    .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+    return .merge(
+      self.saveCheckpoint(state),
+      replacementEffect,
+    )
+  }
+
+  private func updateUpcomingQueue(
+    _ upcomingEntries: [PlaybackQueueEntry],
+    clearPlaybackOnFailure: Bool = false,
+    state: inout State,
+  ) -> EffectOf<Self> {
+    guard let session = state.session else { return .none }
+    let expectedViewIDs = upcomingEntries.map(\.viewID)
+    let physicalOrderChanged = expectedViewIDs != session.queue.upcomingEntries.map(\.viewID)
+    let entries = Array(session.queue.entries.prefix(session.queue.currentIndex + 1))
+      + upcomingEntries
+    state.failure = nil
+    state.pendingMetadataPlan = nil
+    state.pendingPlayNowItems = nil
+    state.recordMetadata(entries: entries)
+    state.session?.queue.entries = entries
+    if !entries.contains(where: { $0.role == .context }) {
+      state.playbackContext = nil
+    }
+    if !physicalOrderChanged {
+      return self.saveCheckpoint(state)
+    }
+    state.pendingUpcomingViewIDs = expectedViewIDs
+    state.shouldClearPlaybackOnUpcomingUpdateFailure = clearPlaybackOnFailure
+    let updateEffect: EffectOf<Self> = .run { send in
+      do {
+        let snapshot = try await self.playback.setUpcoming(upcomingEntries)
+        try Task.checkCancellation()
+        await send(.playbackEvent(.snapshotChanged(snapshot)))
+      } catch is CancellationError {
+        return
+      } catch {
+        await send(.upcomingQueueUpdateFailed(
+          expectedViewIDs: expectedViewIDs,
+          failure: .init(error: error),
+        ))
+      }
+    }
+    .cancellable(id: CancelID.playbackStart, cancelInFlight: true)
+    return .merge(
+      self.saveCheckpoint(state),
+      updateEffect,
+    )
   }
 
   private func insertIntoQueue(
@@ -614,38 +968,63 @@ struct PlaybackFeature: Sendable {
     position: PlaybackQueueInsertionPosition,
     state: inout State,
   ) -> EffectOf<Self> {
-    guard !items.isEmpty else { return .none }
+    guard state.pendingQueueReplacementViewIDs == nil,
+          !state.shouldClearPlaybackOnUpcomingUpdateFailure else { return .none }
+    let queuedItems = items
+      .filter { state.approvedTrackIDs?.contains($0.id) ?? true }
+      .map { $0.withQueueRole(.queued) }
+    guard !queuedItems.isEmpty else { return .none }
+    let target: PlaybackQueueInsertionTarget
     if let queue = state.session?.queue {
       switch position {
       case .next:
-        state.preparePlaylistSourcePlan(
+        target = .next
+        state.prepareMetadataPlan(
           prefixEntries: Array(queue.entries.prefix(queue.currentIndex + 1)),
-          newItems: items,
+          newItems: queuedItems,
           suffixEntries: Array(queue.entries.dropFirst(queue.currentIndex + 1)),
         )
       case .tail:
-        state.preparePlaylistSourcePlan(
-          prefixEntries: queue.entries,
-          newItems: items,
-        )
+        if let firstContextEntry = queue.upcomingEntries.first(where: {
+          $0.role == .context
+        }), let insertionIndex = queue.entries.firstIndex(where: {
+          $0.id == firstContextEntry.id
+        }) {
+          target = .before(firstContextEntry)
+          state.prepareMetadataPlan(
+            prefixEntries: Array(queue.entries[..<insertionIndex]),
+            newItems: queuedItems,
+            suffixEntries: Array(queue.entries[insertionIndex...]),
+          )
+        } else {
+          target = .tail
+          state.prepareMetadataPlan(
+            prefixEntries: queue.entries,
+            newItems: queuedItems,
+          )
+        }
       }
     } else {
-      state.preparePlaylistSourcePlan(newItems: items)
+      target = .tail
+      state.prepareMetadataPlan(newItems: queuedItems)
     }
     state.failure = nil
     state.isRestoringCheckpoint = false
     state.pendingPlayNowItems = nil
-    state.recordSourceAlbums(items)
+    state.pendingUpcomingViewIDs = nil
+    state.shouldClearPlaybackOnUpcomingUpdateFailure = false
+    state.recordSourceAlbums(queuedItems)
     if state.session == nil {
       state.hasAuthoritativeSnapshot = false
+      state.playbackContext = nil
       state.session = .init(
         playStatus: .loading,
-        queue: .init(items: items),
+        queue: .init(items: queuedItems),
       )
     }
     return .run { send in
       do {
-        let snapshot = try await self.playback.insertIntoQueue(items, position)
+        let snapshot = try await self.playback.insertIntoQueue(queuedItems, target)
         try Task.checkCancellation()
         await send(.playbackEvent(.snapshotChanged(snapshot)))
       } catch is CancellationError {
@@ -663,6 +1042,7 @@ struct PlaybackFeature: Sendable {
           let session = state.session else { return .none }
     let checkpoint = PlaybackCheckpoint(
       session: session,
+      context: state.playbackContext,
       progress: state.progress,
       sourceAlbumIDs: state.sourceAlbumIDs,
     )
@@ -675,6 +1055,11 @@ struct PlaybackFeature: Sendable {
 }
 
 extension PlaybackFeature.State {
+  var activePlaybackContext: PlaybackContext? {
+    guard self.session?.queue.currentEntry.role == .context else { return nil }
+    return self.playbackContext
+  }
+
   mutating func pauseSession() {
     self.setPlayStatus(.paused)
   }
@@ -694,79 +1079,69 @@ extension PlaybackFeature.State {
     self.progress = progress
   }
 
-  mutating func recordPlaylistSources(entries: [PlaybackQueueEntry]) {
+  mutating func recordMetadata(entries: [PlaybackQueueEntry]) {
     for entry in entries {
       if let source = entry.item.playlistSource {
         self.playlistSourceHints[entry.id] = source
       }
+      if let role = entry.item.queueRole {
+        self.queueRoleHints[entry.id] = role
+      }
     }
   }
 
-  mutating func preparePlaylistSourcePlan(checkpoint: PlaybackCheckpoint) {
-    let plan = zip(
-      checkpoint.songIDs,
-      checkpoint.playlistSourceHints,
-    ).map { songID, source in
-      PlaybackSourceHintMatcher.Occurrence(item: PlaybackItem(
-        id: songID,
+  mutating func prepareMetadataPlan(checkpoint: PlaybackCheckpoint) {
+    let plan = checkpoint.songIDs.indices.map { index in
+      PlaybackMetadataHintMatcher.Occurrence(item: PlaybackItem(
+        id: checkpoint.songIDs[index],
         title: "",
         artistName: "",
         artworkURL: nil,
-        playlistSource: source,
+        playlistSource: checkpoint.playlistSourceHints[index],
+        queueRole: checkpoint.queueRoles?[index],
       ))
     }
-    self.setPendingPlaylistSourcePlan(plan)
+    self.setPendingMetadataPlan(plan)
   }
 
-  mutating func preparePlaylistSourcePlan(entries: [PlaybackQueueEntry]) {
-    self.recordPlaylistSources(entries: entries)
-    self.setPendingPlaylistSourcePlan(entries.map {
-      PlaybackSourceHintMatcher.Occurrence(
-        item: $0.item,
-        retainedEntryID: $0.id,
-      )
-    })
-  }
-
-  mutating func preparePlaylistSourcePlan(
-    newItems: [PlaybackItem],
-    retainedEntries: [PlaybackQueueEntry] = [],
-  ) {
-    self.preparePlaylistSourcePlan(
+  mutating func prepareMetadataPlan(newItems: [PlaybackItem]) {
+    self.prepareMetadataPlan(
       prefixEntries: [],
       newItems: newItems,
-      suffixEntries: retainedEntries,
     )
   }
 
-  mutating func preparePlaylistSourcePlan(
+  mutating func prepareMetadataPlan(
     prefixEntries: [PlaybackQueueEntry],
     newItems: [PlaybackItem],
     suffixEntries: [PlaybackQueueEntry] = [],
   ) {
     let retainedEntries = prefixEntries + suffixEntries
-    self.recordPlaylistSources(entries: retainedEntries)
+    self.recordMetadata(entries: retainedEntries)
     let plan = prefixEntries.map {
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: $0.item,
         retainedEntryID: $0.id,
       )
     } + newItems.map {
-      PlaybackSourceHintMatcher.Occurrence(item: $0)
+      PlaybackMetadataHintMatcher.Occurrence(item: $0)
     } + suffixEntries.map {
-      PlaybackSourceHintMatcher.Occurrence(
+      PlaybackMetadataHintMatcher.Occurrence(
         item: $0.item,
         retainedEntryID: $0.id,
       )
     }
-    self.setPendingPlaylistSourcePlan(plan)
+    self.setPendingMetadataPlan(plan)
   }
 
-  private mutating func setPendingPlaylistSourcePlan(
-    _ plan: [PlaybackSourceHintMatcher.Occurrence],
+  private mutating func setPendingMetadataPlan(
+    _ plan: [PlaybackMetadataHintMatcher.Occurrence],
   ) {
-    self.pendingPlaylistSourcePlan = self.playlistSourceHints.isEmpty
-      && plan.allSatisfy { $0.item.playlistSource == nil }
+    self.pendingMetadataPlan = self.playlistSourceHints.isEmpty
+      && self.queueRoleHints.isEmpty
+      && plan.allSatisfy {
+        $0.item.playlistSource == nil && $0.item.queueRole == nil
+      }
       ? nil
       : plan
   }
@@ -812,6 +1187,7 @@ extension PlaybackFeature.State {
       return PlaybackQueueEntry(
         id: entry.id,
         item: entry.item.withAlbumID(albumID),
+        viewID: entry.viewID,
       )
     }
     self.session = session

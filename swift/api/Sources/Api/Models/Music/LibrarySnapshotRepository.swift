@@ -52,9 +52,23 @@ extension Music {
             resolution: artist.resolution,
           )
         }
+      let trackGrants = try await ApprovedTrack.query()
+        .where(.childId == childId)
+        .orderBy(.createdAt, .asc)
+        .all(in: db)
+        .map { track in
+          LibrarySnapshotCompiler.TrackGrant(
+            appleMusicTrackId: track.appleMusicTrackId,
+            preferredAlbumId: track.preferredAlbumId,
+            createdAt: track.createdAt,
+            showsArtwork: track.showsArtwork,
+            resolution: track.resolution,
+          )
+        }
       return try LibrarySnapshotCompiler.compile(
         albumGrants: albumGrants,
         artistGrants: artistGrants,
+        trackGrants: trackGrants,
       )
     }
 
@@ -62,6 +76,39 @@ extension Music {
     static func publish(
       childId: Child.Id,
       generatedAt: Date,
+      in db: any DuetSQL.Client,
+    ) async throws -> LibrarySnapshot {
+      try await self.publish(
+        childId: childId,
+        generatedAt: generatedAt,
+        publication: .ifContentChanged,
+        in: db,
+      )
+    }
+
+    @discardableResult
+    static func publishAfterPolicyChange(
+      childId: Child.Id,
+      generatedAt: Date,
+      in db: any DuetSQL.Client,
+    ) async throws -> LibrarySnapshot {
+      try await self.publish(
+        childId: childId,
+        generatedAt: generatedAt,
+        publication: .afterPolicyChange,
+        in: db,
+      )
+    }
+
+    private enum Publication {
+      case ifContentChanged
+      case afterPolicyChange
+    }
+
+    private static func publish(
+      childId: Child.Id,
+      generatedAt: Date,
+      publication: Publication,
       in db: any DuetSQL.Client,
     ) async throws -> LibrarySnapshot {
       var content = try await self.catalogContent(for: childId, in: db)
@@ -74,7 +121,8 @@ extension Music {
       )
       content.playlists = PlaylistRules.compile(playlists: playlists, using: index)
       let existing = try await self.snapshot(for: childId, in: db)
-      if let existing,
+      if case .ifContentChanged = publication,
+         let existing,
          existing.revision == existing.payload.revision,
          existing.payload.hasSameContent(as: content) {
         return existing

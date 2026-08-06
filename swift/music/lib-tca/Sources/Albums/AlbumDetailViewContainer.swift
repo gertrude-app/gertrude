@@ -15,6 +15,7 @@ struct AlbumDetailViewContainer: View {
         isPlaying: self.store.isPlaying,
         isLoading: self.store.isLoading,
         currentTrackID: self.store.currentTrackID?.rawValue,
+        isCurrentTrackPlaying: self.store.isCurrentTrackPlaying,
         onAddToPlaylist: { self.store.send(.addToPlaylistTapped) },
         onAddToQueue: { self.store.send(.addToQueueTapped) },
         onPlayNext: { self.store.send(.playNextTapped) },

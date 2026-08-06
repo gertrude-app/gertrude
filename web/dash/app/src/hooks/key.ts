@@ -8,8 +8,6 @@ import type {
   GetAdminKeychains,
   GetAllDevices,
   GetAmClaimData,
-  GetApprovedMusicAlbums,
-  GetApprovedMusicArtists,
   GetBatchUnlockRequestData,
   GetBlockerClaimData,
   GetChild,
@@ -19,7 +17,9 @@ import type {
   GetIOSDeviceSupervisionStatus,
   GetIOSDevice_v2,
   GetIdentifiedApps,
+  GetMusicAlbumCuration,
   GetMusicClaimData,
+  GetMusicCuration,
   GetSelectableKeychains,
   GetSubscriptionPanel_v2,
   GetSuspendFilterRequest,
@@ -56,19 +56,22 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`children/:id`, [`children`, id], id);
   }
 
-  static approvedMusicAlbums(id: UUID): QueryKey<GetApprovedMusicAlbums.Output> {
+  static musicCuration(id: UUID): QueryKey<GetMusicCuration.Output> {
     return new QueryKey(
-      `children/:id/approved-music-albums`,
-      [`children`, id, `music`, `approved-albums`],
+      `children/:id/music-curation`,
+      [`children`, id, `music`, `curation`],
       id,
     );
   }
 
-  static approvedMusicArtists(id: UUID): QueryKey<GetApprovedMusicArtists.Output> {
+  static musicAlbumCuration(
+    childId: UUID,
+    albumId: string,
+  ): QueryKey<GetMusicAlbumCuration.Output> {
     return new QueryKey(
-      `children/:id/approved-music-artists`,
-      [`children`, id, `music`, `approved-artists`],
-      id,
+      `children/:id/music-curation/:album-id`,
+      [`children`, childId, `music`, `curation`, albumId],
+      childId,
     );
   }
 

@@ -292,12 +292,20 @@ The operation is now accessible at `POST /pairql/{domain}/{PairName}`
 ## Versioning / Deprecating a Dashboard Pair
 
 Dashboard clients can lag a deploy by ~weeks (stale open browser tabs), so a breaking
-wire-shape change to a dashboard pair is shipped as a new `_v2` that owns the canonical
-types and shared logic, while the old pair becomes a deprecated, thin down-projection
-adapter that reuses that logic and re-maps to throwaway frozen `*V1` wire types (nested
-inside the deprecated pair so they disappear when it is deleted). Mark the old pair with
-`// @deprecated safe to remove <date>` and have its resolver call
+wire-shape change to a dashboard pair normally ships as a new `_v2` that owns the
+canonical types and shared logic, while the old pair becomes a deprecated, thin
+down-projection adapter that reuses that logic and re-maps to throwaway frozen `*V1` wire
+types (nested inside the deprecated pair so they disappear when it is deleted). Mark the
+old pair with `// @deprecated safe to remove <date>` and have its resolver call
 `context.db.logDeprecated("Name(v1)")` so residual stale traffic is tracked until it is
 safe to delete. Also remove the deprecated v1 from `DashboardTsCodegen.pairqlPairs` (keep
 it _routed_ — it's a server-only shim) or codegen emits a duplicate-method client (the
 `_v2` suffix is stripped from the generated method name, so v1 and v2 collide).
+
+When an old surface cannot represent the replacement's semantics, it is acceptable to
+require stale tabs to reload instead of preserving a partially correct adapter. Make that
+a deliberate product decision, remove the obsolete operation family coherently, and
+accept that requests from already-loaded bundles fail until the page is refreshed. Add
+those operation names to `slackPairQLRouteNotFound`'s suppression list while retaining
+not-found route telemetry, so expected stale traffic remains observable without creating
+Slack error noise.

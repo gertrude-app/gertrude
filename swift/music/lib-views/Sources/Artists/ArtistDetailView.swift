@@ -8,6 +8,7 @@ public struct ArtistDetailView: View {
   private let currentTrackID: String?
   private let isPlaying: Bool
   private let isLoading: Bool
+  private let isCurrentTrackPlaying: Bool
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
   private let onPlayTap: @MainActor @Sendable () -> Void
@@ -28,6 +29,7 @@ public struct ArtistDetailView: View {
     currentTrackID: String? = nil,
     isPlaying: Bool = false,
     isLoading: Bool = false,
+    isCurrentTrackPlaying: Bool = false,
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
     onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -47,6 +49,7 @@ public struct ArtistDetailView: View {
     self.currentTrackID = currentTrackID
     self.isPlaying = isPlaying
     self.isLoading = isLoading
+    self.isCurrentTrackPlaying = isCurrentTrackPlaying
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
     self.onPlayTap = onPlayTap
@@ -91,7 +94,7 @@ public struct ArtistDetailView: View {
           ArtistTopSongsShelf(
             songs: self.topSongs,
             currentTrackID: self.currentTrackID,
-            isPlaying: self.isPlaying,
+            isPlaying: self.isCurrentTrackPlaying,
             onSongAddToPlaylist: self.onSongAddToPlaylist,
             onSongAddToQueue: self.onSongAddToQueue,
             onSongPlayNext: self.onSongPlayNext,

@@ -3,6 +3,7 @@ import SwiftUI
 public struct PlaylistCardView: View {
   private let playlist: PlaylistData
   private let artworkSize: CGFloat
+  private let isPlaying: Bool
   private let transitionNamespace: Namespace.ID?
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
@@ -11,6 +12,7 @@ public struct PlaylistCardView: View {
   public init(
     playlist: PlaylistData,
     artworkSize: CGFloat = 148,
+    isPlaying: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
@@ -18,6 +20,7 @@ public struct PlaylistCardView: View {
   ) {
     self.playlist = playlist
     self.artworkSize = artworkSize
+    self.isPlaying = isPlaying
     self.transitionNamespace = transitionNamespace
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
@@ -37,18 +40,13 @@ public struct PlaylistCardView: View {
           cornerRadius: 12,
         )
 
-        VStack(alignment: .leading, spacing: 2) {
-          Text(self.playlist.name)
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(.primary)
-            .lineLimit(2)
-            .multilineTextAlignment(.leading)
-
-          Text(self.trackCountText)
-            .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(.secondary)
-            .lineLimit(1)
-        }
+        LibraryCardMetadataView(
+          title: self.playlist.name,
+          subtitle: self.trackCountText,
+          isPlaying: self.isPlaying,
+          titleColor: .primary,
+          subtitleColor: .secondary,
+        )
       }
       .frame(width: self.artworkSize, alignment: .leading)
       .contentShape(Rectangle())
@@ -58,10 +56,22 @@ public struct PlaylistCardView: View {
       onPlayNext: self.playlist.entries.isEmpty ? nil : self.onPlayNext,
       onAddToQueue: self.playlist.entries.isEmpty ? nil : self.onAddToQueue,
     )
-    .accessibilityLabel("\(self.playlist.name), \(self.trackCountText)")
+    .accessibilityLabel(
+      "\(self.isPlaying ? "Playing, " : "")\(self.playlist.name), \(self.trackCountText)",
+    )
   }
 
   private var trackCountText: String {
     self.playlist.trackCount == 1 ? "1 song" : "\(self.playlist.trackCount) songs"
   }
 }
+
+#if DEBUG
+  #Preview("Playlist card playing") {
+    PlaylistCardView(
+      playlist: .previewRoadTrip,
+      isPlaying: true,
+    )
+    .padding(24)
+  }
+#endif

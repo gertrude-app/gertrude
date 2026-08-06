@@ -10,6 +10,9 @@ public struct NowPlayingScreenView: View {
   private let isLoading: Bool
   private let progress: Double
   private let duration: TimeInterval
+  private let isAddToPlaylistEnabled: Bool
+  private let onCloseTap: @MainActor @Sendable () -> Void
+  private let onAddToPlaylistTap: @MainActor @Sendable () -> Void
   private let onPlayPauseTap: @MainActor @Sendable () -> Void
   private let onPreviousTap: @MainActor @Sendable () -> Void
   private let onNextTap: @MainActor @Sendable () -> Void
@@ -29,6 +32,9 @@ public struct NowPlayingScreenView: View {
     onPreviousTap: @MainActor @escaping @Sendable () -> Void,
     onNextTap: @MainActor @escaping @Sendable () -> Void,
     onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void,
+    isAddToPlaylistEnabled: Bool = true,
+    onCloseTap: @MainActor @escaping @Sendable () -> Void = {},
+    onAddToPlaylistTap: @MainActor @escaping @Sendable () -> Void = {},
     onAlbumInfoTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.title = title
@@ -39,6 +45,9 @@ public struct NowPlayingScreenView: View {
     self.isLoading = isLoading
     self.progress = progress
     self.duration = duration
+    self.isAddToPlaylistEnabled = isAddToPlaylistEnabled
+    self.onCloseTap = onCloseTap
+    self.onAddToPlaylistTap = onAddToPlaylistTap
     self.onPlayPauseTap = onPlayPauseTap
     self.onPreviousTap = onPreviousTap
     self.onNextTap = onNextTap
@@ -46,7 +55,40 @@ public struct NowPlayingScreenView: View {
     self.onAlbumInfoTap = onAlbumInfoTap
   }
 
+  @ViewBuilder
   public var body: some View {
+    #if os(iOS)
+      NavigationStack {
+        self.screenContent
+          .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+              Button(action: self.onCloseTap) {
+                Label("Close Now Playing", systemImage: "xmark")
+              }
+              .tint(.white)
+            }
+
+            ToolbarItem(placement: .topBarTrailing) {
+              Menu {
+                Button(action: self.onAddToPlaylistTap) {
+                  Label("Add to Playlist", systemImage: "music.note.list")
+                }
+                .tint(.primary)
+                .disabled(!self.isAddToPlaylistEnabled)
+              } label: {
+                Label("Now Playing Actions", systemImage: "ellipsis")
+              }
+              .tint(.white)
+            }
+          }
+          .toolbarBackground(.hidden, for: .navigationBar)
+      }
+    #else
+      self.screenContent
+    #endif
+  }
+
+  private var screenContent: some View {
     GeometryReader { proxy in
       ZStack {
         if self.showsBackground {
@@ -68,8 +110,6 @@ public struct NowPlayingScreenView: View {
 
   private func verticalContent(in size: CGSize) -> some View {
     VStack(spacing: 0) {
-      self.dragIndicator
-
       Spacer(minLength: 18)
 
       self.artworkView(size: self.verticalArtworkSize(for: size))
@@ -104,8 +144,6 @@ public struct NowPlayingScreenView: View {
     )
 
     return VStack(spacing: 0) {
-      self.dragIndicator
-
       Spacer(minLength: 12)
 
       HStack(spacing: contentSpacing) {
@@ -133,8 +171,6 @@ public struct NowPlayingScreenView: View {
   private func compactContent(in size: CGSize) -> some View {
     ScrollView {
       VStack(spacing: 0) {
-        self.dragIndicator
-
         self.artworkView(size: self.compactArtworkSize(for: size))
           .padding(.top, 16)
 
@@ -155,12 +191,6 @@ public struct NowPlayingScreenView: View {
       .padding(.vertical, 8)
     }
     .scrollIndicators(.hidden)
-  }
-
-  private var dragIndicator: some View {
-    RoundedRectangle(cornerRadius: 2)
-      .fill(.white.opacity(0.3))
-      .frame(width: 60, height: 4)
   }
 
   private var transportControls: some View {

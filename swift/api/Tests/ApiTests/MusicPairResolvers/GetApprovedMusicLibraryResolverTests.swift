@@ -58,6 +58,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       artworkUrl: "https://example.com/stories.jpg",
       trackCount: 12,
       showsArtwork: true,
+      resolution: resolvedAlbum(id: "1440935467"),
+      resolvedAt: .reference,
     ))
     try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
@@ -67,6 +69,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       artworkUrl: nil,
       trackCount: nil,
       showsArtwork: false,
+      resolution: resolvedAlbum(id: "1733742320"),
+      resolvedAt: .reference,
     ))
 
     let output = try await withDependencies {
@@ -205,7 +209,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     let overlapped = try await GetApprovedMusicLibrary.resolve(in: ctx)
 
     expect(overlapped.albums.map(\.id)).toEqual(["album-1"])
-    expect(overlapped.albums.map(\.showsArtwork)).toEqual([false])
+    expect(overlapped.albums.map(\.showsArtwork)).toEqual([true])
 
     let childId = child.id
     try await self.db.withTransaction { db in
@@ -240,6 +244,8 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       artworkUrl: "https://example.com/stories.jpg",
       trackCount: 12,
       showsArtwork: true,
+      resolution: resolvedAlbum(id: "1440935467"),
+      resolvedAt: .reference,
     ))
 
     let response = try await withDependencies {
@@ -395,6 +401,55 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     expect(unchanged).toEqual(.unchanged(revision: published.revision))
   }
 
+  func testV2ReadsAndVerifiesPublishedTrackGrantSnapshot() async throws {
+    let child = try await self.child()
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
+    let (device, install) = try await self.claimedMusicInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    var trackGrant = try await self.db.create(Music.ApprovedTrack(
+      childId: child.id,
+      appleMusicTrackId: "selected-track",
+      preferredAlbumId: "partial-album",
+      resolution: resolvedTrackGrant(
+        id: "selected-track",
+        preferredAlbumId: "partial-album",
+        albumTitle: "Partial Album",
+        albumTrackCount: 3,
+      ),
+      resolvedAt: .reference,
+    ))
+    let published = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+
+    let output = try await GetApprovedMusicLibrary_v2.resolve(
+      with: .init(),
+      in: ctx,
+    )
+
+    expect(output).toEqual(.snapshot(published.payload))
+    expect(published.payload.albums[0].tracks.map(\.id)).toEqual(["selected-track"])
+
+    trackGrant.resolution.track.title = "Changed without publication"
+    try await self.db.update(trackGrant)
+
+    do {
+      _ = try await GetApprovedMusicLibrary_v2.resolve(with: .init(), in: ctx)
+      XCTFail("expected inconsistent snapshot error")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.serverError)
+    }
+  }
+
   func testV2RejectsSnapshotThatDoesNotMatchCurrentGrants() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
@@ -420,7 +475,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       generatedAt: .reference,
       in: self.db,
     )
-    album.resolution?.title = "Changed without publication"
+    album.resolution.title = "Changed without publication"
     try await self.db.update(album)
 
     do {
@@ -448,6 +503,39 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
       appleMusicAlbumId: "album-1",
       title: "Legacy",
       artistName: "Legacy",
+      resolution: resolvedAlbum(id: "album-1"),
+      resolvedAt: .reference,
+    ))
+
+    do {
+      _ = try await GetApprovedMusicLibrary_v2.resolve(with: .init(), in: ctx)
+      XCTFail("expected incomplete library error")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.serverError)
+    }
+  }
+
+  func testV2RejectsTrackGrantWithoutPublishedSnapshot() async throws {
+    let child = try await self.child()
+    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
+    let (device, install) = try await self.claimedMusicInstall(for: child)
+    let ctx = MusicApp.InstallContext(
+      requestId: "mock-req-id",
+      dashboardUrl: "/",
+      install: install,
+      device: device,
+      child: child.model,
+      telemetry: TelemetryBag(),
+    )
+    _ = try await self.db.create(Music.ApprovedTrack(
+      childId: child.id,
+      appleMusicTrackId: "selected-track",
+      preferredAlbumId: "partial-album",
+      resolution: resolvedTrackGrant(
+        id: "selected-track",
+        preferredAlbumId: "partial-album",
+      ),
+      resolvedAt: .reference,
     ))
 
     do {

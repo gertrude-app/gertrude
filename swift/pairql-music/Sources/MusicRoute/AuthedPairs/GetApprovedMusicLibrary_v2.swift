@@ -81,6 +81,8 @@ public struct MusicLibrarySnapshot: PairNestable {
     public var albumTitle: String
     public var artworkUrl: String?
     public var durationInMillis: Int?
+    public var discNumber: Int?
+    public var trackNumber: Int?
 
     public init(
       id: String,
@@ -90,6 +92,8 @@ public struct MusicLibrarySnapshot: PairNestable {
       albumTitle: String,
       artworkUrl: String? = nil,
       durationInMillis: Int? = nil,
+      discNumber: Int? = nil,
+      trackNumber: Int? = nil,
     ) {
       self.id = id
       self.title = title
@@ -98,6 +102,8 @@ public struct MusicLibrarySnapshot: PairNestable {
       self.albumTitle = albumTitle
       self.artworkUrl = artworkUrl
       self.durationInMillis = durationInMillis
+      self.discNumber = discNumber
+      self.trackNumber = trackNumber
     }
   }
 

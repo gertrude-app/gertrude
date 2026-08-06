@@ -29,6 +29,10 @@ struct ApprovedMusicLibrary: Codable, Equatable, Sendable {
     self.albums.isEmpty && self.artists.isEmpty && self.playlists.isEmpty
   }
 
+  var approvedTrackIDs: Set<ApprovedTrack.ID> {
+    Set(self.albums.flatMap(\.tracks).map(\.id))
+  }
+
   var hasCompleteSnapshot: Bool {
     guard self.schemaVersion == 2, self.revision >= 0 else { return false }
     var albumsById: [ApprovedAlbum.ID: ApprovedAlbum] = [:]
@@ -265,6 +269,8 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
   let albumTitle: String?
   let artworkURL: URL?
   let durationInMillis: Int?
+  let discNumber: Int?
+  let trackNumber: Int?
 
   init(
     id: ID,
@@ -274,6 +280,8 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
     albumTitle: String? = nil,
     artworkURL: URL? = nil,
     durationInMillis: Int? = nil,
+    discNumber: Int? = nil,
+    trackNumber: Int? = nil,
   ) {
     self.id = id
     self.title = title
@@ -282,6 +290,8 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
     self.albumTitle = albumTitle
     self.artworkURL = artworkURL
     self.durationInMillis = durationInMillis
+    self.discNumber = discNumber
+    self.trackNumber = trackNumber
   }
 
   func withAlbumID(_ albumID: ApprovedAlbum.ID?) -> Self {
@@ -293,6 +303,8 @@ struct ApprovedTrack: Codable, Equatable, Identifiable, Sendable {
       albumTitle: self.albumTitle,
       artworkURL: self.artworkURL,
       durationInMillis: self.durationInMillis,
+      discNumber: self.discNumber,
+      trackNumber: self.trackNumber,
     )
   }
 }

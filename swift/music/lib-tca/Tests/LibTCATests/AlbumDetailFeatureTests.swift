@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import Testing
 
 @testable import LibTCA
@@ -124,6 +125,40 @@ struct AlbumDetailFeatureTests {
 
     #expect(state.isPlaying == false)
     #expect(state.currentTrackID == album.tracks[0].id)
+  }
+
+  @Test
+  func playlistPlaybackHighlightsTrackWithoutClaimingAlbumContext() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let playlistID = MusicPlaylist.ID(rawValue: UUID(1))
+    var state = AlbumDetailFeature.State(album: album)
+    state.setPlaybackSession(
+      .init(
+        currentItem: PlaybackItem(
+          track: album.tracks[0],
+          artworkURL: album.artworkURL,
+          albumID: album.id,
+        )
+        .withQueueRole(.context),
+      ),
+      activeContext: PlaybackContext(
+        identity: .playlist(playlistID),
+        title: "Playlist",
+      ),
+    )
+
+    #expect(state.currentTrackID == album.tracks[0].id)
+    #expect(state.isCurrentTrackPlaying)
+    #expect(!state.isPlaying)
+
+    let store = TestStore(initialState: state) {
+      AlbumDetailFeature()
+    }
+    await store.send(.playTapped)
+    await store.receive(.delegate(.playNow(
+      items: playbackItems(album: album),
+      startIndex: 0,
+    )))
   }
 
   @Test

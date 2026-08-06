@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LibraryGridView: View {
   private let items: [LibraryCollectionItemData]
+  private let playingItemID: String?
   private let isLoading: Bool
   private let transitionNamespace: Namespace.ID?
   private let onAlbumAddToPlaylist: @MainActor @Sendable (String) -> Void
@@ -18,6 +19,7 @@ struct LibraryGridView: View {
 
   init(
     items: [LibraryCollectionItemData],
+    playingItemID: String? = nil,
     isLoading: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     onAlbumAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -31,6 +33,7 @@ struct LibraryGridView: View {
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.items = items
+    self.playingItemID = playingItemID
     self.isLoading = isLoading
     self.transitionNamespace = transitionNamespace
     self.onAlbumAddToPlaylist = onAlbumAddToPlaylist
@@ -104,6 +107,7 @@ struct LibraryGridView: View {
             AlbumCardView(
               album: album,
               artworkSize: metrics.artworkSize,
+              isPlaying: item.id == self.playingItemID,
               transitionNamespace: self.transitionNamespace,
               onAddToPlaylist: { self.onAlbumAddToPlaylist(album.id) },
               onAddToQueue: { self.onAlbumAddToQueue(album.id) },
@@ -130,6 +134,7 @@ struct LibraryGridView: View {
             PlaylistCardView(
               playlist: playlist,
               artworkSize: metrics.artworkSize,
+              isPlaying: item.id == self.playingItemID,
               transitionNamespace: self.transitionNamespace,
               onAddToQueue: { self.onPlaylistAddToQueue(playlist.id) },
               onPlayNext: { self.onPlaylistPlayNext(playlist.id) },
@@ -181,6 +186,60 @@ struct LibraryGridView: View {
     #else
       self.bottomContentPadding
     #endif
+  }
+}
+
+struct LibraryCardMetadataView: View {
+  let title: String
+  let subtitle: String
+  let isPlaying: Bool
+  let titleColor: Color
+  let subtitleColor: Color
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 2) {
+      HStack(alignment: .top, spacing: 6) {
+        Text(self.title)
+          .font(.system(size: 14, weight: .semibold))
+          .foregroundStyle(
+            self.isPlaying ? Color.gertrudeBrandAccent : self.titleColor,
+          )
+          .lineLimit(2)
+          .multilineTextAlignment(.leading)
+          .layoutPriority(1)
+
+        if self.isPlaying {
+          Spacer(minLength: 4)
+
+          PlaybackWaveformView(
+            isPlaying: true,
+            color: .gertrudeBrandAccent,
+            barCount: 4,
+            barWidth: 2.5,
+            barSpacing: 1.5,
+            minimumBarHeight: 3,
+            maximumBarHeight: 14,
+            containerWidth: 16,
+            containerHeight: 16,
+            alignment: .center,
+            phaseStep: 0.85,
+            minimumInterval: 1.0 / 15.0,
+          )
+          .padding(.top, 1)
+          .accessibilityHidden(true)
+        }
+      }
+      .frame(maxWidth: .infinity, alignment: .leading)
+
+      Text(self.subtitle)
+        .font(.system(size: 12, weight: .medium))
+        .foregroundStyle(
+          self.isPlaying
+            ? Color.gertrudeBrandAccent.opacity(0.68)
+            : self.subtitleColor,
+        )
+        .lineLimit(1)
+    }
   }
 }
 

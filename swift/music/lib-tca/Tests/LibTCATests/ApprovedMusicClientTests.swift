@@ -39,9 +39,41 @@ struct ApprovedMusicClientTests {
 
     let savedWrites = await writes.all()
     expectNoDifference(library, approvedMusicLibrary)
+    #expect(library.albums[0].tracks[0].discNumber == nil)
+    #expect(library.albums[0].tracks[0].trackNumber == nil)
     expectNoDifference(savedWrites, [
       .init(library: approvedMusicLibrary, childId: approvedMusicClientConnection.childId),
     ])
+  }
+
+  @Test
+  func liveClientPreservesCatalogTrackViewData() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    var numberedRemote = remoteApprovedMusicLibrary
+    numberedRemote.albums[0].tracks[0].discNumber = 2
+    numberedRemote.albums[0].tracks[0].trackNumber = 7
+    numberedRemote.playlists[0].entries[0].track.discNumber = 2
+    numberedRemote.playlists[0].entries[0].track.trackNumber = 7
+    let remote = numberedRemote
+
+    let library = try await withDependencies {
+      $0.api.getApprovedMusicLibrary = { _, _ in .snapshot(remote) }
+      $0.approvedMusicLibraryCache._load = { _ in nil }
+      $0.approvedMusicLibraryCache._save = { _, _ in }
+      $0.keychain._load = { key in
+        key == .connection ? connectionData : nil
+      }
+    } operation: {
+      try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
+    }
+    let track = library.albums[0].tracks[0]
+    let viewData = TrackData(track: track)
+
+    #expect(track.discNumber == 2)
+    #expect(track.trackNumber == 7)
+    #expect(viewData.duration == "3:00")
+    #expect(viewData.discNumber == 2)
+    #expect(viewData.trackNumber == 7)
   }
 
   @Test

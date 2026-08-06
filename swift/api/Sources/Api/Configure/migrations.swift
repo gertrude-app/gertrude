@@ -116,6 +116,7 @@ extension Configure {
     app.migrations.add(ExpandMusicLibrary())
     app.migrations.add(AppStoreMusicApp())
     app.migrations.add(AddChildRelationship())
+    app.migrations.add(AddMusicTrackGrants())
   }
 }
 

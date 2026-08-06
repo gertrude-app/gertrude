@@ -25,6 +25,7 @@ struct AppFeature: Sendable {
   enum Action: Equatable {
     case killSwitch(KillSwitchFeature.Action)
     case library(LibraryFeature.Action)
+    case nowPlayingAddToPlaylistTapped
     case nowPlayingAlbumInfoTapped
     case nowPlayingPresentationChanged(Bool)
     case playback(PlaybackFeature.Action)
@@ -72,6 +73,14 @@ struct AppFeature: Sendable {
 
     Reduce { state, action in
       switch action {
+      case .nowPlayingAddToPlaylistTapped:
+        guard let currentItem = state.playback.session?.currentItem,
+              let albumID = currentItem.albumID else { return .none }
+        return .send(.library(.addTrackToPlaylistTapped(
+          trackID: currentItem.id,
+          albumID: albumID,
+        )))
+
       case .nowPlayingAlbumInfoTapped:
         guard let albumID = state.playback.session?.currentItem.albumID else { return .none }
         guard state.library.pushAlbumDetail(albumID: albumID) else { return .none }
@@ -120,15 +129,21 @@ struct AppFeature: Sendable {
         state.pendingLibraryPlayNowOrigin = nil
         return .send(.playback(.addToQueue(items)))
 
-      case .library(.delegate(.artistPlaybackButtonTapped(let items, let origin))):
+      case .library(.delegate(.approvedTrackIDsUpdated(let approvedTrackIDs))):
+        return .send(.playback(.approvedTrackIDsUpdated(approvedTrackIDs)))
+
+      case .library(.delegate(.artistPlaybackButtonTapped(let items, let context))):
         guard !items.isEmpty else { return .none }
-        if let currentTrackID = state.playback.session?.currentTrackID,
-           items.contains(where: { $0.id == currentTrackID }) {
+        if state.playback.activePlaybackContext?.identity == context.identity {
           state.pendingLibraryPlayNowOrigin = nil
           return .send(.playback(.togglePlayPause))
         }
-        state.pendingLibraryPlayNowOrigin = origin
-        return .send(.playback(.playNow(items: items, startIndex: 0)))
+        state.pendingLibraryPlayNowOrigin = context.identity
+        return .send(.playback(.playNow(
+          items: items,
+          startIndex: 0,
+          context: context,
+        )))
 
       case .library(.delegate(.dismissPlaybackFailure)):
         return .send(.playback(.playbackFailureDismissed))
@@ -140,9 +155,13 @@ struct AppFeature: Sendable {
         state.pendingLibraryPlayNowOrigin = nil
         return .send(.playback(.playNext(items)))
 
-      case .library(.delegate(.playNow(let items, let startIndex, let origin))):
-        state.pendingLibraryPlayNowOrigin = origin
-        return .send(.playback(.playNow(items: items, startIndex: startIndex)))
+      case .library(.delegate(.playNow(let items, let startIndex, let context))):
+        state.pendingLibraryPlayNowOrigin = context.identity
+        return .send(.playback(.playNow(
+          items: items,
+          startIndex: startIndex,
+          context: context,
+        )))
 
       case .library(.delegate(.togglePlayPause)):
         return .send(.playback(.togglePlayPause))
@@ -182,7 +201,7 @@ struct AppFeature: Sendable {
       case .playback(let playbackAction):
         switch playbackAction {
         case .addToQueue,
-             .clearUpcomingButtonTapped,
+             .clearQueueButtonTapped,
              .playNext,
              .queueEntryRemoveRequested,
              .reorderUpcoming,
@@ -221,7 +240,11 @@ struct AppFeature: Sendable {
         if state.playback.session?.currentTrackID == item.id {
           return .send(.playback(.togglePlayPause))
         }
-        return .send(.playback(.playNow(items: [item], startIndex: 0)))
+        return .send(.playback(.playNow(
+          items: [item],
+          startIndex: 0,
+          context: nil,
+        )))
 
       case .search:
         self.synchronizeDetailPlayback(state: &state)
@@ -234,12 +257,24 @@ struct AppFeature: Sendable {
   }
 
   private func synchronizeDetailPlayback(state: inout State) {
-    state.library.setAlbumDetailPlaybackSession(state.playback.session)
-    state.library.setPlaylistDetailPlaybackSession(state.playback.session)
+    state.library.setAlbumDetailPlaybackSession(
+      state.playback.session,
+      activeContext: state.playback.activePlaybackContext,
+    )
+    state.library.setPlaylistDetailPlaybackSession(
+      state.playback.session,
+      activeContext: state.playback.activePlaybackContext,
+    )
     state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
     state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
-    state.search.setAlbumDetailPlaybackSession(state.playback.session)
-    state.search.setPlaylistDetailPlaybackSession(state.playback.session)
+    state.search.setAlbumDetailPlaybackSession(
+      state.playback.session,
+      activeContext: state.playback.activePlaybackContext,
+    )
+    state.search.setPlaylistDetailPlaybackSession(
+      state.playback.session,
+      activeContext: state.playback.activePlaybackContext,
+    )
     state.search.setAlbumDetailPlaybackFailure(state.playback.failure)
     state.search.setPlaylistDetailPlaybackFailure(state.playback.failure)
   }

@@ -32,6 +32,6 @@ public extension Configure {
       app.asyncCommands.use(ResetCommand(), as: "reset")
     #endif
     app.asyncCommands.use(SyncStagingDataCommand(), as: "sync-staging-data")
-    app.asyncCommands.use(MusicCatalogBackfillCommand(), as: "backfill-music-catalog")
+    app.asyncCommands.use(NormalizeMusicPolicyCommand(), as: "normalize-music-policy")
   }
 }

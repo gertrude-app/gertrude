@@ -138,7 +138,7 @@ struct SearchFeature: Sendable {
         return .send(.delegate(.library(.retryButtonTapped)))
 
       case .path(.element(id: let id, action: .album(.delegate(let delegateAction)))):
-        guard let albumID = state.path[id: id, case: \.album]?.album.id else { return .none }
+        guard let album = state.path[id: id, case: \.album]?.album else { return .none }
         switch delegateAction {
         case .addAlbumToPlaylist(let albumID):
           return .send(.delegate(.library(.addAlbumToPlaylistTapped(albumID))))
@@ -154,7 +154,10 @@ struct SearchFeature: Sendable {
           return .send(.delegate(.playback(.playNow(
             items: items,
             startIndex: startIndex,
-            origin: .album(albumID),
+            context: PlaybackContext(
+              identity: .album(album.id),
+              title: album.title,
+            ),
           ))))
         case .togglePlayPause:
           return .send(.delegate(.playback(.togglePlayPause)))
@@ -170,11 +173,12 @@ struct SearchFeature: Sendable {
         return .send(.delegate(.playback(.addToQueue(items: items))))
 
       case .path(.element(id: let id, action: .artist(.playButtonTapped))):
-        guard let artistID = state.path[id: id, case: \.artist]?.artistID,
-              let items = self.artistPlaybackItems(pathID: id, state: state) else { return .none }
+        guard let items = self.artistPlaybackItems(pathID: id, state: state),
+              let context = self.artistPlaybackContext(pathID: id, state: state)
+        else { return .none }
         return .send(.delegate(.playback(.artistPlaybackButtonTapped(
           items: items,
-          origin: .artist(artistID),
+          context: context,
         ))))
 
       case .path(.element(id: let id, action: .artist(.playNextTapped))):
@@ -250,13 +254,14 @@ struct SearchFeature: Sendable {
         id: let id,
         action: .artist(.topSongTapped(let trackID)),
       )):
-        guard let artistID = state.path[id: id, case: \.artist]?.artistID,
-              let items = self.artistPlaybackItems(pathID: id, state: state),
-              let startIndex = items.firstIndex(where: { $0.id == trackID }) else { return .none }
+        guard let items = self.artistPlaybackItems(pathID: id, state: state),
+              let startIndex = items.firstIndex(where: { $0.id == trackID }),
+              let context = self.artistPlaybackContext(pathID: id, state: state)
+        else { return .none }
         return .send(.delegate(.playback(.playNow(
           items: items,
           startIndex: startIndex,
-          origin: .artist(artistID),
+          context: context,
         ))))
 
       case .path(.element(id: let id, action: .playlist(.delegate(let delegateAction)))):
@@ -298,7 +303,10 @@ struct SearchFeature: Sendable {
           return .send(.delegate(.playback(.playNow(
             items: items,
             startIndex: startIndex,
-            origin: .playlist(detail.playlist.id),
+            context: PlaybackContext(
+              identity: .playlist(detail.playlist.id),
+              title: detail.playlist.name,
+            ),
           ))))
 
         case .removeEntry(let entryID):
@@ -361,6 +369,19 @@ struct SearchFeature: Sendable {
     return result.playbackItems
   }
 
+  private func artistPlaybackContext(
+    pathID: StackElementID,
+    state: State,
+  ) -> PlaybackContext? {
+    guard let artistID = state.path[id: pathID, case: \.artist]?.artistID,
+          let result = state.librarySearch.result(id: .artist(artistID)),
+          case .artist(let artist) = result.source else { return nil }
+    return PlaybackContext(
+      identity: .artist(artist.id),
+      title: artist.name,
+    )
+  }
+
   private func artistTrack(
     pathID: StackElementID,
     trackID: ApprovedTrack.ID,
@@ -414,9 +435,12 @@ extension SearchFeature.State {
     self.albumDetail = albumDetail
   }
 
-  mutating func setAlbumDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+  mutating func setAlbumDetailPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext?,
+  ) {
     guard var albumDetail = self.albumDetail else { return }
-    albumDetail.setPlaybackSession(session)
+    albumDetail.setPlaybackSession(session, activeContext: activeContext)
     self.albumDetail = albumDetail
   }
 
@@ -426,9 +450,12 @@ extension SearchFeature.State {
     self.playlistDetail = playlistDetail
   }
 
-  mutating func setPlaylistDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+  mutating func setPlaylistDetailPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext?,
+  ) {
     guard var playlistDetail = self.playlistDetail else { return }
-    playlistDetail.setPlaybackSession(session)
+    playlistDetail.setPlaybackSession(session, activeContext: activeContext)
     self.playlistDetail = playlistDetail
   }
 }

@@ -329,6 +329,8 @@ private extension ApprovedTrack {
       albumTitle: track.albumTitle,
       artworkURL: track.artworkURL,
       durationInMillis: track.durationInMillis,
+      discNumber: track.discNumber,
+      trackNumber: track.trackNumber,
     )
   }
 }

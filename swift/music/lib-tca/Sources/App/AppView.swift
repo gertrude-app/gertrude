@@ -40,6 +40,7 @@ struct AppView: View {
     }
     .libraryPresentations(
       store: self.store.scope(state: \.library, action: \.library),
+      isEnabled: !self.store.isNowPlayingPresented,
     )
     .killSwitch(
       store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
@@ -51,6 +52,7 @@ struct AppView: View {
     LibraryViewContainer(
       store: self.store.scope(state: \.library, action: \.library),
       currentTrackID: self.store.playback.session?.currentTrackID,
+      activePlaybackContext: self.store.playback.activePlaybackContext,
       isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
       isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
     )
@@ -159,15 +161,21 @@ struct AppView: View {
         if let session = self.store.playback.session {
           PlaybackQueueView(
             currentEntry: session.queue.currentEntry.viewData,
-            upcomingEntries: session.queue.upcomingEntries.map(\.viewData),
-            onClearUpcoming: {
-              self.store.send(.playback(.clearUpcomingButtonTapped))
+            queuedEntries: session.queue.queuedEntries.map(\.viewData),
+            contextTitle: self.store.playback.playbackContext?.title,
+            contextEntries: session.queue.contextEntries.map(\.viewData),
+            isPlaying: session.isPlaying,
+            onClearQueue: {
+              self.store.send(.playback(.clearQueueButtonTapped))
             },
             onRemove: {
               self.store.send(.playback(.queueEntryRemoveRequested($0)))
             },
-            onReorder: {
-              self.store.send(.playback(.reorderUpcoming($0)))
+            onReorder: { order in
+              self.store.send(.playback(.reorderUpcoming(
+                entryViewIDs: order.entryIDs,
+                queuedEntryCount: order.queuedEntryCount,
+              )))
             },
           )
         } else {
@@ -191,6 +199,7 @@ struct AppView: View {
         store: self.store.scope(state: \.search, action: \.search),
         library: self.approvedLibrary,
         currentTrackID: self.store.playback.session?.currentTrackID,
+        activePlaybackContext: self.store.playback.activePlaybackContext,
         isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
         isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
         isPlaylistMutationInFlight: self.store.library.isPlaylistMutationInFlight,
@@ -231,10 +240,20 @@ struct AppView: View {
       showsBackground: Bool,
     ) -> some View {
       let session = self.store.playback.session
+      let item = session.map {
+        self.nowPlayingBarItem($0.queue.currentEntry)
+      } ?? NowPlayingBarItem(
+        id: "not-playing",
+        title: "Not Playing",
+        artist: "Choose an approved track",
+        artworkURL: nil,
+      )
+      let nextItem = session?.queue.upcomingEntries.first.map {
+        self.nowPlayingBarItem($0)
+      }
       return NowPlayingBar(
-        title: session?.currentItem.title ?? "Not Playing",
-        artist: session?.currentItem.artistName ?? "Choose an approved track",
-        artworkURL: session?.currentItem.artworkURL,
+        item: item,
+        nextItem: nextItem,
         isPlaying: session?.isPlaying ?? false,
         isLoading: session?.isLoading ?? false,
         isEnabled: session != nil,
@@ -251,6 +270,15 @@ struct AppView: View {
         onNextTap: {
           self.store.send(.playback(.skipToNext))
         },
+      )
+    }
+
+    private func nowPlayingBarItem(_ entry: PlaybackQueueEntry) -> NowPlayingBarItem {
+      NowPlayingBarItem(
+        id: entry.viewID,
+        title: entry.item.title,
+        artist: entry.item.artistName,
+        artworkURL: entry.item.artworkURL,
       )
     }
   #endif
@@ -281,6 +309,14 @@ struct AppView: View {
             onScrub: { time in
               self.store.send(.playback(.seek(time)))
             },
+            isAddToPlaylistEnabled: session.currentItem.albumID != nil
+              && !self.store.library.isPlaylistMutationInFlight,
+            onCloseTap: {
+              self.store.send(.nowPlayingPresentationChanged(false))
+            },
+            onAddToPlaylistTap: {
+              self.store.send(.nowPlayingAddToPlaylistTapped)
+            },
             onAlbumInfoTap: session.currentItem.albumID == nil ? nil : { @MainActor @Sendable in
               self.store.send(.nowPlayingAlbumInfoTapped)
             },
@@ -299,6 +335,10 @@ struct AppView: View {
             onPreviousTap: {},
             onNextTap: {},
             onScrub: { _ in },
+            isAddToPlaylistEnabled: false,
+            onCloseTap: {
+              self.store.send(.nowPlayingPresentationChanged(false))
+            },
           )
         }
 
@@ -307,6 +347,9 @@ struct AppView: View {
         }
       }
       .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
+      .libraryPresentations(
+        store: self.store.scope(state: \.library, action: \.library),
+      )
     }
 
     private func playbackFailureBanner(_ failure: PlaybackFailure) -> some View {
@@ -350,7 +393,7 @@ struct AppView: View {
 private extension PlaybackQueueEntry {
   var viewData: PlaybackQueueEntryData {
     PlaybackQueueEntryData(
-      id: self.id,
+      id: self.viewID,
       title: self.item.title,
       artist: self.item.artistName,
       artworkURL: self.item.artworkURL,

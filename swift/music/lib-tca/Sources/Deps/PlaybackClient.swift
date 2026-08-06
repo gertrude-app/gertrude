@@ -60,24 +60,24 @@ struct PlaybackTerminalDetector: Sendable {
 @DependencyClient
 struct PlaybackClient: Sendable {
   var clearQueue: @Sendable () async -> Void
-  var clearUpcoming: @Sendable () async throws -> PlaybackSnapshot
   var events: @Sendable () -> AsyncStream<PlaybackEvent> = { AsyncStream { $0.finish() } }
   var insertIntoQueue: @Sendable (
     _ items: [PlaybackItem],
-    _ position: PlaybackQueueInsertionPosition,
+    _ target: PlaybackQueueInsertionTarget,
   ) async throws -> PlaybackSnapshot
   var loadAlbumIDs: @Sendable (_ songID: ApprovedTrack.ID) async throws -> [ApprovedAlbum.ID]
   var pause: @Sendable () async -> Void
   var playNow: @Sendable (_ items: [PlaybackItem], _ startIndex: Int) async throws
     -> PlaybackSnapshot
-  var removeQueueEntry: @Sendable (_ entryID: PlaybackQueueEntry.ID) async throws
-    -> PlaybackSnapshot
-  var reorderUpcoming: @Sendable (_ entryIDs: [PlaybackQueueEntry.ID]) async throws
-    -> PlaybackSnapshot
+  var replaceQueue: @Sendable (
+    _ entries: [PlaybackQueueEntry],
+    _ shouldPlay: Bool,
+  ) async throws -> PlaybackSnapshot
   var restartCurrentEntry: @Sendable () async -> Void
   var restoreQueue: @Sendable (_ checkpoint: PlaybackCheckpoint) async throws -> PlaybackSnapshot
   var resume: @Sendable () async throws -> Void
   var seek: @Sendable (_ time: TimeInterval) async -> Void
+  var setUpcoming: @Sendable (_ entries: [PlaybackQueueEntry]) async throws -> PlaybackSnapshot
   var skipToNext: @Sendable () async throws -> PlaybackSkipOutcome
   var skipToPrevious: @Sendable () async throws -> Void
   var stop: @Sendable () async -> Void
@@ -108,14 +108,11 @@ extension PlaybackClient {
       clearQueue: {
         await Self.clearPlaybackQueue()
       },
-      clearUpcoming: {
-        try await Self.clearUpcomingEntries()
-      },
       events: {
         Self.playbackEvents()
       },
-      insertIntoQueue: { items, position in
-        try await Self.insertIntoQueue(items, position: position)
+      insertIntoQueue: { items, target in
+        try await Self.insertIntoQueue(items, target: target)
       },
       loadAlbumIDs: { songID in
         try await Self.loadAlbumIDs(for: songID)
@@ -126,11 +123,8 @@ extension PlaybackClient {
       playNow: { items, startIndex in
         try await Self.playNow(items: items, startIndex: startIndex)
       },
-      removeQueueEntry: { entryID in
-        try await Self.removeQueueEntry(entryID)
-      },
-      reorderUpcoming: { entryIDs in
-        try await Self.reorderUpcoming(entryIDs)
+      replaceQueue: { entries, shouldPlay in
+        try await Self.replaceQueue(with: entries, shouldPlay: shouldPlay)
       },
       restartCurrentEntry: {
         await Self.restartPlaybackCurrentEntry()
@@ -143,6 +137,9 @@ extension PlaybackClient {
       },
       seek: { time in
         await Self.seekPlayback(to: time)
+      },
+      setUpcoming: { entries in
+        try await Self.setUpcoming(entries)
       },
       skipToNext: {
         try await Self.skipToNextEntry()
@@ -158,18 +155,17 @@ extension PlaybackClient {
 
   static let noop = Self(
     clearQueue: {},
-    clearUpcoming: { .empty },
     events: { AsyncStream { $0.finish() } },
     insertIntoQueue: { _, _ in .empty },
     loadAlbumIDs: { _ in [] },
     pause: {},
     playNow: { _, _ in .empty },
-    removeQueueEntry: { _ in .empty },
-    reorderUpcoming: { _ in .empty },
+    replaceQueue: { _, _ in .empty },
     restartCurrentEntry: {},
     restoreQueue: { _ in .empty },
     resume: {},
     seek: { _ in },
+    setUpcoming: { _ in .empty },
     skipToNext: { .advanced },
     skipToPrevious: {},
     stop: {},
@@ -193,14 +189,11 @@ extension PlaybackClient {
       clearQueue: {
         await state.clearQueue()
       },
-      clearUpcoming: {
-        await state.clearUpcoming()
-      },
       events: {
         state.events()
       },
-      insertIntoQueue: { items, position in
-        await state.insert(items, position: position)
+      insertIntoQueue: { items, target in
+        await state.insert(items, target: target)
       },
       loadAlbumIDs: { songID in
         await state.albumIDs(for: songID)
@@ -211,11 +204,8 @@ extension PlaybackClient {
       playNow: { items, startIndex in
         await state.playNow(items: items, startIndex: startIndex)
       },
-      removeQueueEntry: { entryID in
-        await state.remove(entryID: entryID)
-      },
-      reorderUpcoming: { entryIDs in
-        await state.reorderUpcoming(entryIDs: entryIDs)
+      replaceQueue: { entries, shouldPlay in
+        try await state.replaceQueue(with: entries, shouldPlay: shouldPlay)
       },
       restartCurrentEntry: {
         await state.restartCurrentEntry()
@@ -228,6 +218,9 @@ extension PlaybackClient {
       },
       seek: { time in
         await state.seek(to: time)
+      },
+      setUpcoming: { entries in
+        await state.setUpcoming(entries)
       },
       skipToNext: {
         await state.skipToNext()
@@ -317,16 +310,7 @@ extension PlaybackClient {
         try Task.checkCancellation()
       #endif
       let player = ApplicationMusicPlayer.shared
-      let existingEntries = Array(player.queue.entries)
-      let existingUpcoming: [MusicKit.MusicPlayer.Queue.Entry] = if let currentEntryID = player
-        .queue.currentEntry?.id,
-        let currentIndex = existingEntries.firstIndex(where: { $0.id == currentEntryID }) {
-        Array(existingEntries.dropFirst(currentIndex + 1))
-      } else {
-        []
-      }
-      let requestedEntries = songs.map { MusicKit.MusicPlayer.Queue.Entry($0) }
-      let entries = requestedEntries + existingUpcoming
+      let entries = songs.map { MusicKit.MusicPlayer.Queue.Entry($0) }
       guard let firstEntry = entries.first else {
         return self.playbackSnapshot(for: player)
       }
@@ -392,7 +376,7 @@ extension PlaybackClient {
     @MainActor
     private static func insertIntoQueue(
       _ items: [PlaybackItem],
-      position: PlaybackQueueInsertionPosition,
+      target: PlaybackQueueInsertionTarget,
     ) async throws -> PlaybackSnapshot {
       guard !items.isEmpty else {
         return self.playbackSnapshot(for: ApplicationMusicPlayer.shared)
@@ -409,14 +393,33 @@ extension PlaybackClient {
       try Task.checkCancellation()
       let songs = try await self.songs(for: items)
       try Task.checkCancellation()
-      let insertionPosition: MusicKit.MusicPlayer.Queue.EntryInsertionPosition = switch position {
-      case .next:
-        .afterCurrentEntry
-      case .tail:
-        .tail
-      }
       do {
-        try await player.queue.insert(songs, position: insertionPosition)
+        switch target {
+        case .before(let requestedEntry):
+          let entries = Array(player.queue.entries)
+          guard let currentEntryID = player.queue.currentEntry?.id,
+                let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }) else {
+            return self.playbackSnapshot(for: player)
+          }
+          let upcomingEntries = entries.dropFirst(currentIndex + 1)
+          let insertionIndex = upcomingEntries.firstIndex(where: {
+            $0.id == requestedEntry.id
+              && self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+          }) ?? upcomingEntries.firstIndex(where: {
+            self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+          })
+          guard let insertionIndex else { return self.playbackSnapshot(for: player) }
+          var updatedEntries = player.queue.entries
+          updatedEntries.insert(
+            contentsOf: songs.map { MusicKit.MusicPlayer.Queue.Entry($0) },
+            at: insertionIndex,
+          )
+          player.queue.entries = updatedEntries
+        case .next:
+          try await player.queue.insert(songs, position: .afterCurrentEntry)
+        case .tail:
+          try await player.queue.insert(songs, position: .tail)
+        }
         try Task.checkCancellation()
         return self.playbackSnapshot(for: player)
       } catch is CancellationError {
@@ -429,49 +432,123 @@ extension PlaybackClient {
     }
 
     @MainActor
-    private static func removeQueueEntry(
-      _ entryID: PlaybackQueueEntry.ID,
-    ) async throws -> PlaybackSnapshot {
-      try Task.checkCancellation()
-      let player = ApplicationMusicPlayer.shared
-      guard let currentEntryID = player.queue.currentEntry?.id else {
-        return self.playbackSnapshot(for: player)
-      }
-      var entries = player.queue.entries
-      guard let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }),
-            let removalIndex = entries.firstIndex(where: { $0.id == entryID }),
-            removalIndex > currentIndex else {
-        return self.playbackSnapshot(for: player)
-      }
-      entries.remove(at: removalIndex)
-      try Task.checkCancellation()
-      player.queue.entries = entries
-      return self.playbackSnapshot(for: player)
-    }
-
-    @MainActor
-    private static func reorderUpcoming(
-      _ entryIDs: [PlaybackQueueEntry.ID],
+    private static func setUpcoming(
+      _ requestedEntries: [PlaybackQueueEntry],
     ) async throws -> PlaybackSnapshot {
       try Task.checkCancellation()
       let player = ApplicationMusicPlayer.shared
       let entries = Array(player.queue.entries)
       guard let currentEntryID = player.queue.currentEntry?.id,
-            let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }) else {
+            let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }),
+            let currentItemID = self.playbackQueueEntry(for: entries[currentIndex])?.item.id else {
         return self.playbackSnapshot(for: player)
       }
-      let upcoming = Array(entries.dropFirst(currentIndex + 1))
-      guard entryIDs.count == upcoming.count,
-            Set(entryIDs) == Set(upcoming.map(\.id)) else {
-        return self.playbackSnapshot(for: player)
+      var availableEntries = Array(entries.dropFirst(currentIndex + 1))
+      var matchedEntries: [MusicKit.MusicPlayer.Queue.Entry] = []
+      for requestedEntry in requestedEntries {
+        let matchingIndex = availableEntries.firstIndex(where: {
+          $0.id == requestedEntry.id
+            && self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+        }) ?? availableEntries.firstIndex(where: {
+          self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+        })
+        guard let matchingIndex else { return self.playbackSnapshot(for: player) }
+        matchedEntries.append(availableEntries.remove(at: matchingIndex))
       }
-      let upcomingByID = Dictionary(uniqueKeysWithValues: upcoming.map { ($0.id, $0) })
-      var reordered = ApplicationMusicPlayer.Queue.Entries()
-      reordered.append(contentsOf: entries.prefix(currentIndex + 1))
-      reordered.append(contentsOf: entryIDs.compactMap { upcomingByID[$0] })
+      var updatedEntries = player.queue.entries
+      updatedEntries.replaceSubrange(
+        (currentIndex + 1)...,
+        with: matchedEntries,
+      )
       try Task.checkCancellation()
-      player.queue.entries = reordered
-      return self.playbackSnapshot(for: player)
+      player.queue.entries = updatedEntries
+      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
+      let snapshot = try await self.playbackSnapshot(
+        for: player,
+        matchingCurrentItemID: currentItemID,
+        matchingUpcomingItemIDs: requestedEntries.map(\.item.id),
+      )
+      guard let receivedCurrentEntryID = snapshot.currentEntryID,
+            let receivedCurrentIndex = snapshot.entries.firstIndex(where: {
+              $0.id == receivedCurrentEntryID
+            }) else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "updated queue current missing"))
+      }
+      guard snapshot.entries[receivedCurrentIndex].item.id == currentItemID else {
+        return snapshot
+      }
+      guard snapshot.entries.dropFirst(receivedCurrentIndex + 1).map(\.item.id)
+        == requestedEntries.map(\.item.id) else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "updated queue incomplete"))
+      }
+      return snapshot
+    }
+
+    @MainActor
+    private static func replaceQueue(
+      with requestedEntries: [PlaybackQueueEntry],
+      shouldPlay: Bool,
+    ) async throws -> PlaybackSnapshot {
+      guard !requestedEntries.isEmpty else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue empty"))
+      }
+      try Task.checkCancellation()
+      let player = ApplicationMusicPlayer.shared
+      player.pause()
+      let entries = Array(player.queue.entries)
+      guard let currentEntryID = player.queue.currentEntry?.id,
+            let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }) else {
+        throw PlaybackClientError
+          .playbackFailed(.init(summary: "replacement current entry missing"))
+      }
+      var availableEntries = Array(entries.dropFirst(currentIndex))
+      var matchedEntries: [MusicKit.MusicPlayer.Queue.Entry] = []
+      for requestedEntry in requestedEntries {
+        let matchingIndex = availableEntries.firstIndex(where: {
+          $0.id == requestedEntry.id
+            && self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+        }) ?? availableEntries.firstIndex(where: {
+          self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
+        })
+        guard let matchingIndex else {
+          throw PlaybackClientError.playbackFailed(.init(summary: "replacement entry missing"))
+        }
+        matchedEntries.append(availableEntries.remove(at: matchingIndex))
+      }
+      guard let firstEntry = matchedEntries.first else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue empty"))
+      }
+      try Task.checkCancellation()
+      player.stop()
+      player.queue = ApplicationMusicPlayer.Queue(matchedEntries, startingAt: firstEntry)
+      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
+      do {
+        if shouldPlay {
+          try await ApplicationMusicPlayer.shared.play()
+        } else {
+          try await ApplicationMusicPlayer.shared.prepareToPlay()
+          player.pause()
+        }
+        try Task.checkCancellation()
+        let snapshot = try await self.playbackSnapshot(
+          for: player,
+          matchingCurrentItemID: requestedEntries[0].item.id,
+          matchingUpcomingItemIDs: requestedEntries.dropFirst().map(\.item.id),
+        )
+        guard snapshot.entries.map(\.item.id) == requestedEntries.map(\.item.id),
+              snapshot.currentEntryID == snapshot.entries.first?.id else {
+          throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue incomplete"))
+        }
+        return snapshot
+      } catch is CancellationError {
+        throw CancellationError()
+      } catch let error as MusicTokenRequestError {
+        throw PlaybackClientError.tokenRequest(error, fallback: PlaybackClientError.playbackFailed)
+      } catch let error as PlaybackClientError {
+        throw error
+      } catch {
+        throw PlaybackClientError.playbackFailed(.init(unexpected: error))
+      }
     }
 
     @MainActor
@@ -581,6 +658,34 @@ extension PlaybackClient {
       )
     }
 
+    @MainActor
+    private static func playbackSnapshot(
+      for player: ApplicationMusicPlayer,
+      matchingCurrentItemID expectedCurrentItemID: ApprovedTrack.ID,
+      matchingUpcomingItemIDs expectedItemIDs: [ApprovedTrack.ID],
+    ) async throws -> PlaybackSnapshot {
+      for _ in 0 ..< 30 {
+        let snapshot = self.playbackSnapshot(for: player)
+        guard let currentEntryID = snapshot.currentEntryID,
+              let currentIndex = snapshot.entries.firstIndex(where: {
+                $0.id == currentEntryID
+              }) else {
+          try await Task.sleep(nanoseconds: 100_000_000)
+          try Task.checkCancellation()
+          continue
+        }
+        guard snapshot.entries[currentIndex].item.id == expectedCurrentItemID else {
+          return snapshot
+        }
+        if snapshot.entries.dropFirst(currentIndex + 1).map(\.item.id) == expectedItemIDs {
+          return snapshot
+        }
+        try await Task.sleep(nanoseconds: 100_000_000)
+        try Task.checkCancellation()
+      }
+      return self.playbackSnapshot(for: player)
+    }
+
     private static func observationStatus(
       for status: MusicKit.MusicPlayer.PlaybackStatus,
     ) -> PlaybackObservationStatus {
@@ -670,25 +775,6 @@ extension PlaybackClient {
       @unknown default:
         return nil
       }
-    }
-
-    @MainActor
-    private static func clearUpcomingEntries() async throws -> PlaybackSnapshot {
-      try Task.checkCancellation()
-      let player = ApplicationMusicPlayer.shared
-      var entries = player.queue.entries
-      guard let currentEntryID = player.queue.currentEntry?.id,
-            let currentIndex = entries.firstIndex(where: { $0.id == currentEntryID }) else {
-        return self.playbackSnapshot(for: player)
-      }
-      if currentIndex < entries.index(before: entries.endIndex) {
-        entries.removeSubrange(entries.index(after: currentIndex)...)
-        try Task.checkCancellation()
-        player.queue.entries = entries
-      }
-      let repeatMode: MusicKit.MusicPlayer.RepeatMode = .none
-      player.state.repeatMode = repeatMode
-      return self.playbackSnapshot(for: player)
     }
 
     @MainActor
@@ -897,21 +983,53 @@ private actor SimulatorPlaybackState {
   ) -> PlaybackSnapshot {
     guard items.indices.contains(startIndex) else { return self.snapshot }
     let requestedItems = Array(items[startIndex...])
-    let upcomingStartIndex = self.items.indices.contains(self.currentIndex)
-      ? self.currentIndex + 1
-      : self.items.endIndex
-    let existingUpcomingItems = Array(self.items.dropFirst(upcomingStartIndex))
-    let existingUpcomingEntryIDs = Array(self.entryIDs.dropFirst(upcomingStartIndex))
     self.queueGeneration += 1
     self.nextEntryID = 0
-    self.items = requestedItems + existingUpcomingItems
-    self.entryIDs = requestedItems.map { _ in self.makeEntryID() } + existingUpcomingEntryIDs
+    self.items = requestedItems
+    self.entryIDs = requestedItems.map { _ in self.makeEntryID() }
     self.currentIndex = 0
     self.duration = self.currentItemDuration
     self.elapsedTime = 0
     self.playStatus = .playing
     self.sendSnapshot()
     self.startProgressTickerIfNeeded()
+    return self.snapshot
+  }
+
+  func replaceQueue(
+    with requestedEntries: [PlaybackQueueEntry],
+    shouldPlay: Bool,
+  ) throws -> PlaybackSnapshot {
+    guard !requestedEntries.isEmpty else {
+      throw PlaybackClientError.playbackFailed(.init(summary: "replacement queue empty"))
+    }
+    var availableEntries = zip(
+      self.entryIDs.dropFirst(self.currentIndex),
+      self.items.dropFirst(self.currentIndex),
+    ).map { (id: $0, item: $1) }
+    var matchedEntries: [(id: PlaybackQueueEntry.ID, item: PlaybackItem)] = []
+    for requestedEntry in requestedEntries {
+      let matchingIndex = availableEntries.firstIndex(where: {
+        $0.id == requestedEntry.id && $0.item.id == requestedEntry.item.id
+      }) ?? availableEntries.firstIndex(where: {
+        $0.item.id == requestedEntry.item.id
+      })
+      guard let matchingIndex else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "replacement entry missing"))
+      }
+      matchedEntries.append(availableEntries.remove(at: matchingIndex))
+    }
+    self.stopProgressTicker()
+    self.entryIDs = matchedEntries.map(\.id)
+    self.items = matchedEntries.map(\.item)
+    self.currentIndex = 0
+    self.duration = self.currentItemDuration
+    self.elapsedTime = 0
+    self.playStatus = shouldPlay ? .playing : .paused
+    self.sendSnapshot()
+    if shouldPlay {
+      self.startProgressTickerIfNeeded()
+    }
     return self.snapshot
   }
 
@@ -928,6 +1046,7 @@ private actor SimulatorPlaybackState {
         albumID: sourceAlbumIDs[songID],
         duration: checkpoint.durationFallback,
         playlistSource: checkpoint.playlistSourceHints[index],
+        queueRole: checkpoint.queueRoles?[index],
       )
     }
     self.currentIndex = checkpoint.currentIndex
@@ -953,17 +1072,27 @@ private actor SimulatorPlaybackState {
 
   func insert(
     _ items: [PlaybackItem],
-    position: PlaybackQueueInsertionPosition,
+    target: PlaybackQueueInsertionTarget,
   ) -> PlaybackSnapshot {
     guard !items.isEmpty else { return self.snapshot }
     guard !self.items.isEmpty else {
       return self.playNow(items: items, startIndex: 0)
     }
-    let insertionIndex = switch position {
+    let insertionIndex: Int
+    switch target {
+    case .before(let requestedEntry):
+      let upcomingIndices = self.entryIDs.indices.dropFirst(self.currentIndex + 1)
+      guard let index = upcomingIndices.first(where: {
+        self.entryIDs[$0] == requestedEntry.id
+          && self.items[$0].id == requestedEntry.item.id
+      }) ?? upcomingIndices.first(where: {
+        self.items[$0].id == requestedEntry.item.id
+      }) else { return self.snapshot }
+      insertionIndex = index
     case .next:
-      self.currentIndex + 1
+      insertionIndex = self.currentIndex + 1
     case .tail:
-      self.items.endIndex
+      insertionIndex = self.items.endIndex
     }
     self.items.insert(contentsOf: items, at: insertionIndex)
     self.entryIDs.insert(
@@ -974,40 +1103,32 @@ private actor SimulatorPlaybackState {
     return self.snapshot
   }
 
-  func remove(entryID: PlaybackQueueEntry.ID) -> PlaybackSnapshot {
-    guard let index = self.entryIDs.firstIndex(of: entryID),
-          index > self.currentIndex else { return self.snapshot }
-    self.items.remove(at: index)
-    self.entryIDs.remove(at: index)
-    self.sendSnapshot()
-    return self.snapshot
-  }
-
-  func reorderUpcoming(
-    entryIDs: [PlaybackQueueEntry.ID],
+  func setUpcoming(
+    _ requestedEntries: [PlaybackQueueEntry],
   ) -> PlaybackSnapshot {
     let upcomingStartIndex = self.currentIndex + 1
-    let upcomingIDs = Array(self.entryIDs.dropFirst(upcomingStartIndex))
-    guard entryIDs.count == upcomingIDs.count,
-          Set(entryIDs) == Set(upcomingIDs) else { return self.snapshot }
-    let itemsByID = Dictionary(
-      uniqueKeysWithValues: zip(self.entryIDs, self.items).map { ($0, $1) },
+    var availableEntries = zip(
+      self.entryIDs.dropFirst(upcomingStartIndex),
+      self.items.dropFirst(upcomingStartIndex),
+    ).map { (id: $0, item: $1) }
+    var matchedEntries: [(id: PlaybackQueueEntry.ID, item: PlaybackItem)] = []
+    for requestedEntry in requestedEntries {
+      let matchingIndex = availableEntries.firstIndex(where: {
+        $0.id == requestedEntry.id && $0.item.id == requestedEntry.item.id
+      }) ?? availableEntries.firstIndex(where: {
+        $0.item.id == requestedEntry.item.id
+      })
+      guard let matchingIndex else { return self.snapshot }
+      matchedEntries.append(availableEntries.remove(at: matchingIndex))
+    }
+    self.entryIDs.replaceSubrange(
+      upcomingStartIndex...,
+      with: matchedEntries.map(\.id),
     )
-    self.entryIDs.replaceSubrange(upcomingStartIndex..., with: entryIDs)
     self.items.replaceSubrange(
       upcomingStartIndex...,
-      with: entryIDs.compactMap { itemsByID[$0] },
+      with: matchedEntries.map(\.item),
     )
-    self.sendSnapshot()
-    return self.snapshot
-  }
-
-  func clearUpcoming() -> PlaybackSnapshot {
-    let upcomingStartIndex = self.currentIndex + 1
-    if self.items.indices.contains(self.currentIndex), upcomingStartIndex < self.items.endIndex {
-      self.entryIDs.removeSubrange(upcomingStartIndex...)
-      self.items.removeSubrange(upcomingStartIndex...)
-    }
     self.sendSnapshot()
     return self.snapshot
   }

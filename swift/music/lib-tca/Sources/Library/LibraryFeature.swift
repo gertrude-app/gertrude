@@ -97,9 +97,10 @@ struct LibraryFeature: Sendable {
 
   enum DelegateAction: Equatable {
     case addToQueue(items: [PlaybackItem])
+    case approvedTrackIDsUpdated(Set<ApprovedTrack.ID>)
     case artistPlaybackButtonTapped(
       items: [PlaybackItem],
-      origin: LibraryCollectionIdentity,
+      context: PlaybackContext,
     )
     case dismissPlaybackFailure
     case playbackFailureActionTapped
@@ -107,7 +108,7 @@ struct LibraryFeature: Sendable {
     case playNow(
       items: [PlaybackItem],
       startIndex: Int,
-      origin: LibraryCollectionIdentity,
+      context: PlaybackContext,
     )
     case togglePlayPause
   }
@@ -257,20 +258,21 @@ struct LibraryFeature: Sendable {
       case .addToPlaylistMutationResponse(let outcome):
         state.isPlaylistMutationInFlight = false
         state.isRefreshingRemoteLibrary = false
+        var effects: [EffectOf<Self>] = []
         var recencyToSave: LibraryCollectionRecency?
         switch outcome {
         case .updated(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.addToPlaylist = nil
           if state.playlistIDsBeforeCreate != nil {
             recencyToSave = state.prioritizeCreatedPlaylist(in: library, at: self.now)
           }
         case .confirmationRequired(let library, let confirmation):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.addToPlaylist?.confirmation = confirmation
           state.playlistIDsBeforeCreate = nil
         case .conflict(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.playlistMutationFailure = .conflict
           state.playlistIDsBeforeCreate = nil
         case .failed:
@@ -278,9 +280,9 @@ struct LibraryFeature: Sendable {
           state.playlistIDsBeforeCreate = nil
         }
         if let recencyToSave {
-          return self.saveCollectionRecency(recencyToSave)
+          effects.append(self.saveCollectionRecency(recencyToSave))
         }
-        return .none
+        return .merge(effects)
 
       case .albumAddToQueueTapped(let albumID):
         return self.queueAlbum(
@@ -373,22 +375,29 @@ struct LibraryFeature: Sendable {
         guard let items = self.artistPlaybackItems(
           for: artistID,
           in: state.status,
+        ), let context = self.artistPlaybackContext(
+          for: artistID,
+          in: state.status,
         ) else { return .none }
         return .send(.delegate(.artistPlaybackButtonTapped(
           items: items,
-          origin: .artist(artistID),
+          context: context,
         )))
 
       case .artistTopSongTapped(let artistID, let trackID):
         guard let items = self.artistPlaybackItems(
           for: artistID,
           in: state.status,
-        ), let startIndex = items.firstIndex(where: { $0.id == trackID })
+        ), let startIndex = items.firstIndex(where: { $0.id == trackID }),
+        let context = self.artistPlaybackContext(
+          for: artistID,
+          in: state.status,
+        )
         else { return .none }
         return .send(.delegate(.playNow(
           items: items,
           startIndex: startIndex,
-          origin: .artist(artistID),
+          context: context,
         )))
 
       case .path(.element(id: let id, action: .artist(.addToQueueTapped))):
@@ -499,7 +508,10 @@ struct LibraryFeature: Sendable {
           return .send(.delegate(.playNow(
             items: items,
             startIndex: startIndex,
-            origin: .playlist(detail.playlist.id),
+            context: PlaybackContext(
+              identity: .playlist(detail.playlist.id),
+              title: detail.playlist.name,
+            ),
           )))
 
         case .removeEntry(let entryID):
@@ -543,11 +555,10 @@ struct LibraryFeature: Sendable {
         )
 
       case .approvedLibraryLoaded(let library):
-        state.applyLibrary(library)
         if library.isEmpty {
           log(.debug, .library, "e24738fc")
         }
-        return .none
+        return self.applyAuthoritativeLibrary(library, to: &state)
 
       case .approvedLibraryLoadFailed:
         log(.err, .library, "cd55459e")
@@ -562,7 +573,7 @@ struct LibraryFeature: Sendable {
 
       case .cachedApprovedLibraryLoaded(let library):
         state.applyLibrary(library)
-        return .none
+        return .send(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
 
       case .collectionPlayNowSucceeded(let identity):
         guard case .loaded(let library) = state.status,
@@ -586,15 +597,16 @@ struct LibraryFeature: Sendable {
       case .playlistMutationResponse(let outcome, let rollback):
         state.isPlaylistMutationInFlight = false
         state.isRefreshingRemoteLibrary = false
+        var effects: [EffectOf<Self>] = []
         var recencyToSave: LibraryCollectionRecency?
         switch outcome {
         case .updated(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           if state.playlistIDsBeforeCreate != nil {
             recencyToSave = state.prioritizeCreatedPlaylist(in: library, at: self.now)
           }
         case .conflict(let library):
-          state.applyLibrary(library)
+          effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.playlistMutationFailure = .conflict
           state.playlistIDsBeforeCreate = nil
         case .failed:
@@ -605,9 +617,9 @@ struct LibraryFeature: Sendable {
           state.playlistIDsBeforeCreate = nil
         }
         if let recencyToSave {
-          return self.saveCollectionRecency(recencyToSave)
+          effects.append(self.saveCollectionRecency(recencyToSave))
         }
-        return .none
+        return .merge(effects)
 
       case .refreshPresentationFinished:
         state.isRefreshingRemoteLibrary = false
@@ -629,7 +641,7 @@ struct LibraryFeature: Sendable {
         return self.refreshRemoteApprovedLibrary(loadCache: true)
 
       case .path(.element(id: let id, action: .album(.delegate(let delegateAction)))):
-        guard let albumID = state.path[id: id, case: \.album]?.album.id else { return .none }
+        guard let album = state.path[id: id, case: \.album]?.album else { return .none }
         switch delegateAction {
         case .addAlbumToPlaylist(let albumID):
           return .send(.addAlbumToPlaylistTapped(albumID))
@@ -643,7 +655,10 @@ struct LibraryFeature: Sendable {
           return .send(.delegate(.playNow(
             items: items,
             startIndex: startIndex,
-            origin: .album(albumID),
+            context: PlaybackContext(
+              identity: .album(album.id),
+              title: album.title,
+            ),
           )))
         case .playNext(let items):
           return .send(.delegate(.playNext(items: items)))
@@ -823,6 +838,18 @@ struct LibraryFeature: Sendable {
     }
   }
 
+  private func artistPlaybackContext(
+    for artistID: ApprovedArtist.ID,
+    in status: Status,
+  ) -> PlaybackContext? {
+    guard case .loaded(let library) = status,
+          let artist = library.artist(id: artistID) else { return nil }
+    return PlaybackContext(
+      identity: .artist(artist.id),
+      title: artist.name,
+    )
+  }
+
   private func performAddToPlaylistMutation(
     operation: @escaping @Sendable () async throws -> MusicPlaylistMutationResult,
   ) -> EffectOf<Self> {
@@ -868,6 +895,14 @@ struct LibraryFeature: Sendable {
         }
       },
     )
+  }
+
+  private func applyAuthoritativeLibrary(
+    _ library: ApprovedMusicLibrary,
+    to state: inout State,
+  ) -> EffectOf<Self> {
+    state.applyLibrary(library)
+    return .send(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
   }
 
   private func saveCollectionRecency(
@@ -999,9 +1034,12 @@ extension LibraryFeature.State {
     self.albumDetail = albumDetail
   }
 
-  mutating func setAlbumDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+  mutating func setAlbumDetailPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext?,
+  ) {
     guard var albumDetail = self.albumDetail else { return }
-    albumDetail.setPlaybackSession(session)
+    albumDetail.setPlaybackSession(session, activeContext: activeContext)
     self.albumDetail = albumDetail
   }
 
@@ -1011,9 +1049,12 @@ extension LibraryFeature.State {
     self.playlistDetail = playlistDetail
   }
 
-  mutating func setPlaylistDetailPlaybackSession(_ session: PlaybackFeature.Session?) {
+  mutating func setPlaylistDetailPlaybackSession(
+    _ session: PlaybackFeature.Session?,
+    activeContext: PlaybackContext?,
+  ) {
     guard var playlistDetail = self.playlistDetail else { return }
-    playlistDetail.setPlaybackSession(session)
+    playlistDetail.setPlaybackSession(session, activeContext: activeContext)
     self.playlistDetail = playlistDetail
   }
 }

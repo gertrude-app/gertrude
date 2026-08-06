@@ -8,6 +8,7 @@ struct LibraryViewContainer: View {
   @Namespace private var zoomNamespace
 
   let currentTrackID: ApprovedTrack.ID?
+  let activePlaybackContext: PlaybackContext?
   let isPlaybackLoading: Bool
   let isPlaybackPlaying: Bool
 
@@ -17,6 +18,7 @@ struct LibraryViewContainer: View {
     ) {
       LibraryView(
         state: self.store.viewState,
+        playingItemID: self.playingItemID,
         isRefreshing: self.store.isRefreshingRemoteLibrary,
         isPlaylistMutationInFlight: self.store.isPlaylistMutationInFlight,
         transitionNamespace: self.zoomNamespace,
@@ -64,6 +66,7 @@ struct LibraryViewContainer: View {
             store: artistStore,
             library: library,
             currentTrackID: self.currentTrackID,
+            activePlaybackContext: self.activePlaybackContext,
             isPlaybackLoading: self.isPlaybackLoading,
             isPlaybackPlaying: self.isPlaybackPlaying,
             transitionNamespace: self.zoomNamespace,
@@ -82,6 +85,19 @@ struct LibraryViewContainer: View {
           in: self.zoomNamespace,
         )
       }
+    }
+  }
+
+  private var playingItemID: String? {
+    guard self.isPlaybackPlaying,
+          let identity = self.activePlaybackContext?.identity else { return nil }
+    switch identity.kind {
+    case .album:
+      return "album-\(identity.id)"
+    case .playlist:
+      return "playlist-\(identity.id)"
+    case .artist:
+      return nil
     }
   }
 }

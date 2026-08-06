@@ -2,12 +2,16 @@
 import type * as T from '@dash/types';
 
 export function interceptPql(
-  slug: `ApproveMusicAlbum`,
-  output: T.ApproveMusicAlbum.Output,
+  slug: `ApproveMusicAlbum_v2`,
+  output: T.ApproveMusicAlbum_v2.Output,
 ): void;
 export function interceptPql(
-  slug: `ApproveMusicArtist`,
-  output: T.ApproveMusicArtist.Output,
+  slug: `ApproveMusicArtist_v2`,
+  output: T.ApproveMusicArtist_v2.Output,
+): void;
+export function interceptPql(
+  slug: `ApproveMusicTrack`,
+  output: T.ApproveMusicTrack.Output,
 ): void;
 export function interceptPql(
   slug: `ChangeSubscriptionTier`,
@@ -84,14 +88,6 @@ export function interceptPql(
   output: T.GetAmClaimData.Output,
 ): void;
 export function interceptPql(
-  slug: `GetApprovedMusicAlbums`,
-  output: T.GetApprovedMusicAlbums.Output,
-): void;
-export function interceptPql(
-  slug: `GetApprovedMusicArtists`,
-  output: T.GetApprovedMusicArtists.Output,
-): void;
-export function interceptPql(
   slug: `GetBatchUnlockRequestData`,
   output: T.GetBatchUnlockRequestData.Output,
 ): void;
@@ -119,8 +115,16 @@ export function interceptPql(
   output: T.GetIdentifiedApps.Output,
 ): void;
 export function interceptPql(
+  slug: `GetMusicAlbumCuration`,
+  output: T.GetMusicAlbumCuration.Output,
+): void;
+export function interceptPql(
   slug: `GetMusicClaimData`,
   output: T.GetMusicClaimData.Output,
+): void;
+export function interceptPql(
+  slug: `GetMusicCuration`,
+  output: T.GetMusicCuration.Output,
 ): void;
 export function interceptPql(
   slug: `GetSelectableKeychains`,
@@ -173,10 +177,6 @@ export function interceptPql(
   output: T.PrepIOSAppConnection.Output,
 ): void;
 export function interceptPql(
-  slug: `RemoveApprovedMusicAlbum`,
-  output: T.RemoveApprovedMusicAlbum.Output,
-): void;
-export function interceptPql(
   slug: `RemoveApprovedMusicArtist`,
   output: T.RemoveApprovedMusicArtist.Output,
 ): void;
@@ -205,13 +205,17 @@ export function interceptPql(
 export function interceptPql(slug: `SaveKey`, output: T.SaveKey.Output): void;
 export function interceptPql(slug: `SaveKeychain`, output: T.SaveKeychain.Output): void;
 export function interceptPql(
+  slug: `SaveMusicAlbumCuration`,
+  output: T.SaveMusicAlbumCuration.Output,
+): void;
+export function interceptPql(
   slug: `SaveNotification`,
   output: T.SaveNotification.Output,
 ): void;
 export function interceptPql(slug: `SaveUser`, output: T.SaveUser.Output): void;
 export function interceptPql(
-  slug: `SearchMusicCatalog`,
-  output: T.SearchMusicCatalog.Output,
+  slug: `SearchMusicCatalog_v2`,
+  output: T.SearchMusicCatalog_v2.Output,
 ): void;
 export function interceptPql(
   slug: `SecurityEventsFeed`,
@@ -263,8 +267,9 @@ export function interceptPql(slug: string, output: any): void {
 
 export function forcePqlErr(
   slug:
-    | `ApproveMusicAlbum`
-    | `ApproveMusicArtist`
+    | `ApproveMusicAlbum_v2`
+    | `ApproveMusicArtist_v2`
+    | `ApproveMusicTrack`
     | `ChangeSubscriptionTier`
     | `ChildActivitySummaries`
     | `ClaimAmDevice`
@@ -285,8 +290,6 @@ export function forcePqlErr(
     | `GetAdminKeychains`
     | `GetAllDevices`
     | `GetAmClaimData`
-    | `GetApprovedMusicAlbums`
-    | `GetApprovedMusicArtists`
     | `GetBatchUnlockRequestData`
     | `GetBlockerClaimData`
     | `GetChild`
@@ -296,7 +299,9 @@ export function forcePqlErr(
     | `GetIOSDeviceSupervisionStatus`
     | `GetIOSDevice_v2`
     | `GetIdentifiedApps`
+    | `GetMusicAlbumCuration`
     | `GetMusicClaimData`
+    | `GetMusicCuration`
     | `GetSelectableKeychains`
     | `GetSubscriptionPanel_v2`
     | `GetSuspendFilterRequest`
@@ -311,7 +316,6 @@ export function forcePqlErr(
     | `MacAppConnectionCode`
     | `OpenBillingPortal`
     | `PrepIOSAppConnection`
-    | `RemoveApprovedMusicAlbum`
     | `RemoveApprovedMusicArtist`
     | `RequestAmPinReset`
     | `RequestMagicLink`
@@ -322,9 +326,10 @@ export function forcePqlErr(
     | `SaveExtendedSupervisionControls`
     | `SaveKey`
     | `SaveKeychain`
+    | `SaveMusicAlbumCuration`
     | `SaveNotification`
     | `SaveUser`
-    | `SearchMusicCatalog`
+    | `SearchMusicCatalog_v2`
     | `SecurityEventsFeed`
     | `SendPasswordResetEmail`
     | `SetDailyReviewEmail`

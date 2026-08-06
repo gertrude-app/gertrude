@@ -11,15 +11,29 @@ export default class DashboardClient extends Client<Auth> {
   }
 
   public approveMusicAlbum = (
-    input: P.ApproveMusicAlbum.Input,
-  ): Promise<Result<P.ApproveMusicAlbum.Output>> => {
-    return this.query<P.ApproveMusicAlbum.Output>(input, `ApproveMusicAlbum`, `parent`);
+    input: P.ApproveMusicAlbum_v2.Input,
+  ): Promise<Result<P.ApproveMusicAlbum_v2.Output>> => {
+    return this.query<P.ApproveMusicAlbum_v2.Output>(
+      input,
+      `ApproveMusicAlbum_v2`,
+      `parent`,
+    );
   };
 
   public approveMusicArtist = (
-    input: P.ApproveMusicArtist.Input,
-  ): Promise<Result<P.ApproveMusicArtist.Output>> => {
-    return this.query<P.ApproveMusicArtist.Output>(input, `ApproveMusicArtist`, `parent`);
+    input: P.ApproveMusicArtist_v2.Input,
+  ): Promise<Result<P.ApproveMusicArtist_v2.Output>> => {
+    return this.query<P.ApproveMusicArtist_v2.Output>(
+      input,
+      `ApproveMusicArtist_v2`,
+      `parent`,
+    );
+  };
+
+  public approveMusicTrack = (
+    input: P.ApproveMusicTrack.Input,
+  ): Promise<Result<P.ApproveMusicTrack.Output>> => {
+    return this.query<P.ApproveMusicTrack.Output>(input, `ApproveMusicTrack`, `parent`);
   };
 
   public changeSubscriptionTier = (
@@ -178,26 +192,6 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetAmClaimData.Output>(input, `GetAmClaimData`, `parent`);
   };
 
-  public getApprovedMusicAlbums = (
-    input: P.GetApprovedMusicAlbums.Input,
-  ): Promise<Result<P.GetApprovedMusicAlbums.Output>> => {
-    return this.query<P.GetApprovedMusicAlbums.Output>(
-      input,
-      `GetApprovedMusicAlbums`,
-      `parent`,
-    );
-  };
-
-  public getApprovedMusicArtists = (
-    input: P.GetApprovedMusicArtists.Input,
-  ): Promise<Result<P.GetApprovedMusicArtists.Output>> => {
-    return this.query<P.GetApprovedMusicArtists.Output>(
-      input,
-      `GetApprovedMusicArtists`,
-      `parent`,
-    );
-  };
-
   public getBatchUnlockRequestData = (
     input: P.GetBatchUnlockRequestData.Input,
   ): Promise<Result<P.GetBatchUnlockRequestData.Output>> => {
@@ -264,10 +258,26 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetIdentifiedApps.Output>(input, `GetIdentifiedApps`, `parent`);
   };
 
+  public getMusicAlbumCuration = (
+    input: P.GetMusicAlbumCuration.Input,
+  ): Promise<Result<P.GetMusicAlbumCuration.Output>> => {
+    return this.query<P.GetMusicAlbumCuration.Output>(
+      input,
+      `GetMusicAlbumCuration`,
+      `parent`,
+    );
+  };
+
   public getMusicClaimData = (
     input: P.GetMusicClaimData.Input,
   ): Promise<Result<P.GetMusicClaimData.Output>> => {
     return this.query<P.GetMusicClaimData.Output>(input, `GetMusicClaimData`, `parent`);
+  };
+
+  public getMusicCuration = (
+    input: P.GetMusicCuration.Input,
+  ): Promise<Result<P.GetMusicCuration.Output>> => {
+    return this.query<P.GetMusicCuration.Output>(input, `GetMusicCuration`, `parent`);
   };
 
   public getSelectableKeychains = (
@@ -386,16 +396,6 @@ export default class DashboardClient extends Client<Auth> {
     );
   };
 
-  public removeApprovedMusicAlbum = (
-    input: P.RemoveApprovedMusicAlbum.Input,
-  ): Promise<Result<P.RemoveApprovedMusicAlbum.Output>> => {
-    return this.query<P.RemoveApprovedMusicAlbum.Output>(
-      input,
-      `RemoveApprovedMusicAlbum`,
-      `parent`,
-    );
-  };
-
   public removeApprovedMusicArtist = (
     input: P.RemoveApprovedMusicArtist.Input,
   ): Promise<Result<P.RemoveApprovedMusicArtist.Output>> => {
@@ -466,6 +466,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.SaveKeychain.Output>(input, `SaveKeychain`, `parent`);
   };
 
+  public saveMusicAlbumCuration = (
+    input: P.SaveMusicAlbumCuration.Input,
+  ): Promise<Result<P.SaveMusicAlbumCuration.Output>> => {
+    return this.query<P.SaveMusicAlbumCuration.Output>(
+      input,
+      `SaveMusicAlbumCuration`,
+      `parent`,
+    );
+  };
+
   public saveNotification = (
     input: P.SaveNotification.Input,
   ): Promise<Result<P.SaveNotification.Output>> => {
@@ -477,9 +487,13 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public searchMusicCatalog = (
-    input: P.SearchMusicCatalog.Input,
-  ): Promise<Result<P.SearchMusicCatalog.Output>> => {
-    return this.query<P.SearchMusicCatalog.Output>(input, `SearchMusicCatalog`, `parent`);
+    input: P.SearchMusicCatalog_v2.Input,
+  ): Promise<Result<P.SearchMusicCatalog_v2.Output>> => {
+    return this.query<P.SearchMusicCatalog_v2.Output>(
+      input,
+      `SearchMusicCatalog_v2`,
+      `parent`,
+    );
   };
 
   public securityEventsFeed = (

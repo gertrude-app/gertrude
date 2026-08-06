@@ -14,6 +14,7 @@ struct PlaylistDetailViewContainer: View {
         isPlaying: self.store.isPlaying,
         isLoading: self.store.isLoading,
         currentEntryID: self.store.currentEntryID?.rawValue.uuidString,
+        isCurrentTrackPlaying: self.store.isCurrentTrackPlaying,
         isMutating: self.isPlaylistMutationInFlight,
         onAddMusicTap: { self.store.send(.addMusicTapped) },
         onAddToQueue: { self.store.send(.addToQueueTapped) },

@@ -82,12 +82,13 @@ enum DashboardTsCodegenRoute {
       HandleUnlockRequests.self,
       GetChild.self,
       GetChildren.self,
-      SearchMusicCatalog.self,
-      GetApprovedMusicAlbums.self,
-      GetApprovedMusicArtists.self,
-      ApproveMusicAlbum.self,
-      ApproveMusicArtist.self,
-      RemoveApprovedMusicAlbum.self,
+      SearchMusicCatalog_v2.self,
+      GetMusicCuration.self,
+      GetMusicAlbumCuration.self,
+      SaveMusicAlbumCuration.self,
+      ApproveMusicTrack.self,
+      ApproveMusicAlbum_v2.self,
+      ApproveMusicArtist_v2.self,
       RemoveApprovedMusicArtist.self,
       HandleCheckoutCancel.self,
       HandleCheckoutSuccess.self,
@@ -152,6 +153,7 @@ enum DashboardTsCodegenRoute {
       .init(URL.self, as: "string"),
       .init(Music.AlbumId.self, as: "string"),
       .init(Music.ArtistId.self, as: "string"),
+      .init(Music.TrackId.self, as: "string"),
     ]
     var config = Config(compact: true, aliasing: sharedAliases)
 
