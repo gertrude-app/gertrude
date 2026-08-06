@@ -568,6 +568,10 @@ struct LibraryFeature: Sendable {
 
       case .approvedLibraryMusicAccessUnavailable:
         state.status = .musicAccessUnavailable
+        state.addToPlaylist = nil
+        state.isPlaylistMutationInFlight = false
+        state.playlistIDsBeforeCreate = nil
+        state.playlistMutationFailure = nil
         log(.warn, .subs, "ded74480")
         return .none
 

@@ -856,7 +856,55 @@ struct LibraryFeatureTests {
     }
     await store.receive(.approvedLibraryMusicAccessUnavailable) {
       $0.status = .musicAccessUnavailable // not .playlistMutationFailure, and no stale library
+      $0.isPlaylistMutationInFlight = false // latch guards every mutation, must not stick
     }
+  }
+
+  @Test
+  func addToPlaylistLosingMusicAccessDismissesSheetAndFreesLaterMutations() async {
+    let library = self.playlistLibrary()
+    let playlist = library.playlists[0]
+    let album = library.albums[0]
+    let track = album.tracks[0]
+    let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic.addToPlaylist = { _ in
+        throw ApprovedMusicClientError.musicAccessUnavailable
+      }
+      $0.approvedMusic.createPlaylist = { _ in .updated(library) }
+      $0.date.now = Date(timeIntervalSince1970: 100)
+    }
+
+    await store.send(.addTrackToPlaylistTapped(trackID: track.id, albumID: album.id)) {
+      $0.addToPlaylist = .init(source: .track(
+        trackId: track.id.rawValue,
+        albumId: album.id.rawValue,
+      ))
+    }
+    await store.send(.addToPlaylistDestinationSelected(playlist.id)) {
+      $0.addToPlaylist?.destinationPlaylistID = playlist.id
+      $0.isPlaylistMutationInFlight = true
+    }
+    await store.receive(.approvedLibraryMusicAccessUnavailable) {
+      $0.status = .musicAccessUnavailable
+      $0.addToPlaylist = nil // sheet would otherwise stay open over the unavailable wall
+      $0.isPlaylistMutationInFlight = false
+    }
+
+    await store.send(.approvedLibraryLoaded(library)) { // account reactivated
+      $0.applyLibrary(library)
+    }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
+    await store.send(.createPlaylistSubmitted("Road Trip")) { // not swallowed by a stuck latch
+      $0.isPlaylistMutationInFlight = true
+      $0.playlistIDsBeforeCreate = [playlist.id]
+    }
+    await store.receive(.playlistMutationResponse(.updated(library), rollback: nil)) {
+      $0.isPlaylistMutationInFlight = false
+      $0.playlistIDsBeforeCreate = nil
+    }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
   }
 
   @Test
