@@ -5,6 +5,7 @@ import {
   actionLabel,
   badge,
   manageBlurb,
+  managePlanText,
   subtext,
   title,
 } from '../Settings/SubscriptionPanelCopy';
@@ -106,5 +107,26 @@ describe(`actionLabel()`, () => {
         `Upgrade to ${name}`,
       );
     }
+  });
+});
+
+describe(`complimentary`, () => {
+  const comp = input({ case: `complimentary` });
+
+  it(`has its own copy rather than borrowing full's`, () => {
+    expect(title(comp)).not.toBe(title(input({ case: `full`, status: current })));
+    expect(subtext(comp)).not.toBe(subtext(input({ case: `full`, status: current })));
+  });
+
+  it(`quotes no price and names no tier`, () => {
+    for (const copy of [title(comp), subtext(comp)]) {
+      expect(copy).not.toMatch(/\$\s?\d/);
+      expect(copy).not.toMatch(/\b(light|medium|full)\b/i);
+    }
+  });
+
+  it(`offers no plan management or billing blurb`, () => {
+    expect(managePlanText(comp)).toBeUndefined();
+    expect(manageBlurb(comp)).toBeUndefined();
   });
 });

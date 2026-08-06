@@ -23,8 +23,9 @@ export function title(input: Input): string {
       return `Light plan`;
     case `medium`:
       return `Medium plan`;
-    case `full`:
     case `complimentary`:
+      return `Complimentary`;
+    case `full`:
       return `Full plan`;
     case `fullTrial`:
     case `fullTrialGrace`:
@@ -41,8 +42,9 @@ export function subtext(input: Input): string {
       return `$10/year. Protect child and adult (supervised) iPhones and iPads with the Gertrude iOS app.`;
     case `medium`:
       return `$5/month. Everything in Light, plus parent-curated music listening with Gertrude Music.`;
-    case `full`:
     case `complimentary`:
+      return `Complete access to all Gertrude apps on all of your family’s devices.`;
+    case `full`:
       return `$10/month. Protect and monitor Macs, iPhones and iPads for the whole family.`;
     case `fullTrial`:
       return `Your free trial ends ${long(planStatus.until)}. Subscribe to keep using Gertrude across all your family’s devices.`;
@@ -160,7 +162,7 @@ export function badge(input: Input): BadgeOutput {
   const { planStatus } = input;
   switch (planStatus.case) {
     case `complimentary`:
-      return { text: `Complimentary`, type: `ok` };
+      return { text: `Active`, type: `ok` };
     case `fullTrial`: {
       const msUntilTrialEnd = new Date(planStatus.until).getTime() - Date.now();
       if (msUntilTrialEnd <= EXPIRING_SOON_THRESHOLD_MS) {
