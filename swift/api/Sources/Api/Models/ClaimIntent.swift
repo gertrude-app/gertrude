@@ -36,6 +36,13 @@ enum ClaimIntent: String, Codable, Sendable, Equatable, CaseIterable {
     }
   }
 
+  var unauthedLandingRoute: String {
+    switch self {
+    case .blockerSupervise, .blockerConnect, .podcasts: "signup"
+    case .music: "login"
+    }
+  }
+
   var claimPendingQueryKey: String {
     switch self {
     case .blockerSupervise: "claimPendingSupervision"
