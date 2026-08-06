@@ -87,6 +87,21 @@ extension Music {
     }
 
     @discardableResult
+    static func publish(
+      childId: Child.Id,
+      policyChanged: Bool,
+      generatedAt: Date,
+      in db: any DuetSQL.Client,
+    ) async throws -> LibrarySnapshot {
+      try await self.publish(
+        childId: childId,
+        generatedAt: generatedAt,
+        publication: policyChanged ? .afterPolicyChange : .ifContentChanged,
+        in: db,
+      )
+    }
+
+    @discardableResult
     static func publishAfterPolicyChange(
       childId: Child.Id,
       generatedAt: Date,
