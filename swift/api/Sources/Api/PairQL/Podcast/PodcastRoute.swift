@@ -40,6 +40,9 @@ extension PodcastRoute: RouteResponder {
       case .migratePodcastVendorId(let input):
         let output = try await MigratePodcastVendorId.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .pinResetEscapeHatch(let input):
+        let output = try await PinResetEscapeHatch.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       }
 
     case .authed(let uuid, let authedRoute):

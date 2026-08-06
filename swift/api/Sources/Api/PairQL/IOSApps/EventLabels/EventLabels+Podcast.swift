@@ -12,6 +12,7 @@ extension EventLabel {
     case "c3e9a1f4": "Pin set after mid-claim relaunch"
     case "0c045f6c": "Pin changed"
     case "5f2c8e04": "Pin reset"
+    case "bf86c342": "Pin reset escape hatch authorized"
     case "17cb36cc": "Missing pincode"
     case "7e312b0f": "Pin lockout set"
     case "e86bd7f3-2": "Pin lockout set"

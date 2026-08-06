@@ -14,6 +14,7 @@ struct ApiClient: Sendable {
   var getTrialStatus: @Sendable () async throws -> GetTrialStatus.Output
   var getAccountStatus: @Sendable () async throws -> GetAccountStatus.Output
   var consumePinResetCode: @Sendable (_ code: Int) async throws -> Void
+  var pinResetEscapeHatch: @Sendable () async throws -> Bool
   var createClaimCode: @Sendable () async throws -> CreateClaimCode.Output
   var createDatabaseUpload: @Sendable (_ deviceId: UUID) async throws -> URL
   var verifyPromoCode: @Sendable (_ deviceId: UUID, _ code: String) async throws -> Bool
@@ -78,6 +79,25 @@ extension ApiClient: DependencyKey {
           ConsumePinResetCode.self,
           .consumePinResetCode(.init(code: code)),
         )
+      },
+      pinResetEscapeHatch: {
+        let device = dep(\.device)
+        let (vendorId, iosVersion, modelIdentifier) = await device.data()
+        let appVersion = Bundle.main
+          .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        let input = PinResetEscapeHatch.Input(
+          deviceId: dep(\.keychain).loadDeviceId(),
+          vendorId: vendorId,
+          modelIdentifier: modelIdentifier,
+          iosVersion: iosVersion,
+          appVersion: appVersion,
+          locale: dep(\.locale).identifier,
+        )
+        let output = try await pairql.call(
+          PinResetEscapeHatch.self,
+          unauthed: .pinResetEscapeHatch(input),
+        )
+        return output.authorized
       },
       createClaimCode: {
         guard let deviceId = dep(\.keychain).loadDeviceId() else {

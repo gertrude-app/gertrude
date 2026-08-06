@@ -12,6 +12,7 @@ public enum UnauthedRoute: PairRoute {
   case verifyPromoCode(VerifyPromoCode.Input)
   case verifyDbDownload(VerifyDbDownload.Input)
   case migratePodcastVendorId(MigratePodcastVendorId.Input)
+  case pinResetEscapeHatch(PinResetEscapeHatch.Input)
 }
 
 public extension UnauthedRoute {
@@ -58,6 +59,10 @@ public extension UnauthedRoute {
     Route(.case(Self.migratePodcastVendorId)) {
       Operation(MigratePodcastVendorId.self)
       Body(.json(MigratePodcastVendorId.Input.self))
+    }
+    Route(.case(Self.pinResetEscapeHatch)) {
+      Operation(PinResetEscapeHatch.self)
+      Body(.json(PinResetEscapeHatch.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

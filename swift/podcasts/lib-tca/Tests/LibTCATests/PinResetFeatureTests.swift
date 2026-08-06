@@ -135,6 +135,82 @@ import Testing
     }
   }
 
+  @Test func `five shakes on an unclaimed device trigger an authorized escape hatch`() async throws {
+    let keychainStore = LockIsolated<[String: Data]>([:])
+    let numRequests = LockIsolated(0)
+    await withDependencies {
+      $0.api.pinResetEscapeHatch = {
+        numRequests.withValue { $0 += 1 }
+        return true // server recognized the allowlisted device id
+      }
+      $0.date = .constant(.reference)
+      $0.dismiss = DismissEffect {}
+      $0.defaultDatabase = try! appDatabase()
+      $0.keychain = dictKeychain(keychainStore, pincode: 111_111)
+    } operation: {
+      let store = TestStore(initialState: .init(isClaimed: false)) { PinResetFeature() }
+      store.exhaustivity = .off
+      #expect(store.state.step == .unclaimed) // no email-code path exists for these users
+
+      for _ in 1 ... 4 {
+        await store.send(.receivedShake)
+      }
+      #expect(numRequests.value == 0) // nothing hits the api until the 5th shake
+      #expect(store.state.step == .unclaimed)
+
+      await store.send(.receivedShake)
+      await store.skipReceivedActions()
+
+      #expect(numRequests.value == 1)
+      #expect(store.state.step == .setNewPin) // parent picks their own new pin
+      #expect(store.state.timesShaken == 0)
+      // old pin survives until the parent commits a new one
+      #expect(keychainStore.value[KeychainClient.Key.pincode.rawValue] == "111111"
+        .data(using: .utf8))
+    }
+  }
+
+  @Test func `escape hatch stays shut until the server authorizes`() async throws {
+    let response = LockIsolated<Result<Bool, any Error>>(.success(false))
+    let numRequests = LockIsolated(0)
+    await withDependencies {
+      $0.api.pinResetEscapeHatch = {
+        numRequests.withValue { $0 += 1 }
+        return try response.value.get()
+      }
+      $0.date = .constant(.reference)
+      $0.dismiss = DismissEffect {}
+      $0.defaultDatabase = try! appDatabase()
+      $0.keychain = dictKeychain(LockIsolated([:]), pincode: 111_111)
+    } operation: {
+      // a claimed parent locked out of their gertrude account is stuck on .enterCode
+      let store = TestStore(initialState: .init(isClaimed: true)) { PinResetFeature() }
+      store.exhaustivity = .off
+
+      await self.shakeFiveTimes(store)
+      #expect(store.state.step == .enterCode) // silent denial, nothing reveals the mechanism
+      #expect(store.state.timesShaken == 0) // counter re-arms for another attempt
+
+      response.setValue(.failure(URLError(.notConnectedToInternet)))
+      await self.shakeFiveTimes(store)
+      #expect(store.state.step == .enterCode) // an outage must not read as authorization
+
+      response.setValue(.success(true))
+      await self.shakeFiveTimes(store)
+      #expect(store.state.step == .setNewPin)
+
+      await self.shakeFiveTimes(store)
+      #expect(numRequests.value == 3) // shaking is inert once they're already setting a pin
+    }
+  }
+
+  func shakeFiveTimes(_ store: TestStoreOf<PinResetFeature>) async {
+    for _ in 1 ... 5 {
+      await store.send(.receivedShake)
+    }
+    await store.skipReceivedActions(strict: false)
+  }
+
   @Test func `cancelling dismisses the flow`() async throws {
     let isDismissed = LockIsolated(false)
     await withDependencies {
