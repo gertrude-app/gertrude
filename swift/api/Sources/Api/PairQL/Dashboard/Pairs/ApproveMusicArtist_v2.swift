@@ -89,3 +89,21 @@ func artistConfirmationToken(
     .map { String(format: "%02x", $0) }
     .joined()
 }
+
+struct MusicArtistApprovalOutput: PairOutput {
+  enum Status: String, PairNestable {
+    case updated
+    case confirmationRequired
+  }
+
+  struct Confirmation: PairNestable {
+    var revision: Int64
+    var token: String
+    var albumCount: Int
+    var trackCount: Int
+  }
+
+  var status: Status
+  var curation: MusicCurationOutput
+  var confirmation: Confirmation?
+}

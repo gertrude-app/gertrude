@@ -91,3 +91,15 @@ extension SaveMusicAlbumCuration: Resolver {
     }
   }
 }
+
+struct MusicAlbumCurationMutationOutput: PairOutput {
+  enum Status: String, PairNestable {
+    case updated
+    case conflict
+    case coveredByArtist
+  }
+
+  var status: Status
+  var curation: MusicCurationOutput
+  var album: MusicAlbumCuration
+}
