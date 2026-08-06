@@ -20,8 +20,7 @@ struct ApiClient: Sendable {
   var getApprovedMusicLibrary:
     @Sendable (_ token: UUID, _ knownRevision: Int64?) async throws
     -> GetApprovedMusicLibrary_v2.Output
-  var getMusicAppStatus: @Sendable () async throws -> GetMusicAppStatus.Output
-  var getMusicOnboardingConfig: @Sendable () async throws -> GetMusicOnboardingConfig.Output
+  var getMusicAppStatus: @Sendable () async throws -> GetMusicAppStatus_v2.Output
   var removeMusicPlaylistEntry:
     @Sendable (_ token: UUID, _ input: RemoveMusicPlaylistEntry.Input) async throws
     -> RemoveMusicPlaylistEntry.Output
@@ -72,19 +71,13 @@ extension ApiClient: DependencyKey {
           throw ApiClient.ApiError.noDeviceId
         }
         return try await pairql.call(
-          GetMusicAppStatus.self,
-          unauthed: .getMusicAppStatus(.init(
+          GetMusicAppStatus_v2.self,
+          unauthed: .getMusicAppStatus_v2(.init(
             deviceId: deviceId,
             modelIdentifier: modelIdentifier,
             iosVersion: iosVersion,
             appVersion: appVersion,
           )),
-        )
-      },
-      getMusicOnboardingConfig: {
-        try await pairql.call(
-          GetMusicOnboardingConfig.self,
-          unauthed: .getMusicOnboardingConfig,
         )
       },
       removeMusicPlaylistEntry: { token, input in

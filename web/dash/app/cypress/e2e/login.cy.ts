@@ -126,4 +126,42 @@ describe(`app-aware claim glue`, () => {
     cy.contains(`iPhone 15 Pro`);
     cy.contains(`Gertrude Blocker`);
   });
+
+  it(`shows the Gertrude Music app card + "Login to connect:" for a Music claim`, () => {
+    cy.visit(
+      `/login?claimPendingMusicDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2`,
+    );
+    cy.contains(`Login to connect:`);
+    cy.contains(`iPhone 15 Pro`);
+    cy.contains(`For app:`);
+    cy.contains(`Gertrude Music`);
+  });
+});
+
+describe(`music claim lands login-first`, () => {
+  it(`recovers a music claim deep-link on login, keeping signup one click away`, () => {
+    cy.intercept(`**/claim-pending-music/778899`, {
+      statusCode: 307,
+      headers: {
+        location: `${Cypress.config().baseUrl}/login?claimPendingMusicDevice=778899&modelName=iPhone+15+Pro&iosVersion=18.2&redirect=${encodeURIComponent(
+          `/claim-music-device/778899/claim`,
+        )}`,
+      },
+    });
+
+    cy.visit(`/claim-music-device/778899/claim`);
+
+    cy.location(`pathname`).should(`eq`, `/login`);
+    cy.contains(`Login to connect:`);
+    cy.contains(`Gertrude Music`);
+
+    cy.contains(`a`, `signup`).click(); // claim context must survive the hop to signup
+    cy.location(`pathname`).should(`eq`, `/signup`);
+    cy.location(`search`).should(`contain`, `claimPendingMusicDevice=778899`);
+    cy.location(`search`).should(
+      `contain`,
+      `redirect=${encodeURIComponent(`/claim-music-device/778899/claim`)}`,
+    );
+    cy.contains(`Gertrude Music`);
+  });
 });

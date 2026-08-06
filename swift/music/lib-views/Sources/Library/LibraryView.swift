@@ -6,7 +6,7 @@ public enum LibraryViewState: Equatable, Sendable {
   case loaded(items: [LibraryCollectionItemData])
   case empty
   case failed
-  case subscriptionRequired
+  case musicAccessUnavailable
 }
 
 public struct LibraryView: View {
@@ -162,7 +162,7 @@ public struct LibraryView: View {
     switch self.state {
     case .loaded, .empty:
       true
-    case .loading, .failed, .subscriptionRequired:
+    case .loading, .failed, .musicAccessUnavailable:
       false
     }
   }
@@ -172,7 +172,7 @@ public struct LibraryView: View {
     switch self.state {
     case .loaded, .empty:
       return true
-    case .loading, .failed, .subscriptionRequired:
+    case .loading, .failed, .musicAccessUnavailable:
       return false
     }
   }
@@ -215,12 +215,12 @@ public struct LibraryView: View {
         buttonTitle: "Try again",
       )
 
-    case .subscriptionRequired:
+    case .musicAccessUnavailable:
       self.messageContent(
-        title: "Subscription required",
+        title: "Music unavailable",
         message:
-        "The Gertrude account needs an active subscription before approved music can play on this device.",
-        systemImage: "creditcard",
+        "This device is connected, but Gertrude Music isn’t available for this account.",
+        systemImage: "music.note",
         buttonTitle: "Check again",
       )
     }
@@ -303,7 +303,7 @@ public struct LibraryView: View {
 
   #Preview("Subscription required") {
     NavigationStack {
-      LibraryView(state: .subscriptionRequired)
+      LibraryView(state: .musicAccessUnavailable)
     }
   }
 

@@ -4,8 +4,6 @@ import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 
 export interface MusicDoneNavState {
   childName: string;
-  childId: string;
-  deviceId: string;
   modelName: string;
   iosVersion: string;
 }
@@ -20,7 +18,7 @@ const ClaimMusicDeviceDone: React.FC = () => {
     return <Navigate to={`/claim-music-device/${code}/claim`} replace />;
   }
 
-  const { childName, childId, deviceId, modelName, iosVersion } = state;
+  const { childName, modelName, iosVersion } = state;
   const deviceType = modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
 
   return (
@@ -29,7 +27,7 @@ const ClaimMusicDeviceDone: React.FC = () => {
         childName={childName}
         modelName={modelName}
         iosVersion={iosVersion}
-        onManageSettings={() => navigate(`/children/${childId}/ios-devices/${deviceId}`)}
+        onDone={() => navigate(`/`)}
       />
     </ScreenShell>
   );

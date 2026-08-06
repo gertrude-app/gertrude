@@ -113,6 +113,35 @@ struct AppFeatureTests {
   }
 
   @Test
+  func losingMusicAccessRevokesCachedPlayback() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let item = playbackItems(album: album)[0]
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(.mock)
+    state.playback.hasAuthoritativeSnapshot = true
+    state.playback.session = .init(currentItem: item)
+    state.playback.approvedTrackIDs = [item.id] // was approved before the lapse
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.library(.approvedLibraryMusicAccessUnavailable)) {
+      $0.library.status = .musicAccessUnavailable
+      $0.search.applyLibraryStatus(.musicAccessUnavailable)
+    }
+    await store.receive(.library(.delegate(.approvedTrackIDsUpdated([]))))
+    await store.receive(.playback(.approvedTrackIDsUpdated([]))) {
+      $0.playback.approvedTrackIDs = []
+    }
+    await store.receive(.playback(.playbackEvent(.queueEnded))) {
+      $0.isNowPlayingPresented = false
+      $0.playback.hasAuthoritativeSnapshot = false
+      $0.playback.session = nil // nothing left to keep listening to
+    }
+  }
+
+  @Test
   func nowPlayingAlbumInfoTapDismissesNowPlayingAndPresentsCurrentAlbum() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]

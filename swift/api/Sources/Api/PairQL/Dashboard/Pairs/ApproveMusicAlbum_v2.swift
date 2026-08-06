@@ -30,9 +30,9 @@ extension ApproveMusicAlbum_v2: Resolver {
         resolvedAt: now,
         in: db,
       )
-      let snapshot = try await publishMusicPolicy(
+      let snapshot = try await Music.LibrarySnapshotRepository.publish(
         childId: child.id,
-        changed: changed,
+        policyChanged: changed,
         generatedAt: now,
         in: db,
       )

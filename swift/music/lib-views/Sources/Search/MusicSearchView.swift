@@ -5,7 +5,7 @@ public enum MusicSearchViewState: Equatable, Sendable {
   case failed
   case loading
   case ready([MusicSearchResultData])
-  case subscriptionRequired
+  case musicAccessUnavailable
 }
 
 public struct MusicSearchView: View {
@@ -111,11 +111,11 @@ public struct MusicSearchView: View {
         buttonTitle: "Try again",
       )
 
-    case .subscriptionRequired:
+    case .musicAccessUnavailable:
       self.messageContent(
-        title: "Subscription required",
-        message: "The Gertrude account needs Light or Full before approved music can play on this device.",
-        systemImage: "creditcard",
+        title: "Music unavailable",
+        message: "This device is connected, but Gertrude Music isn’t available for this account.",
+        systemImage: "music.note",
         buttonTitle: "Check again",
       )
     }

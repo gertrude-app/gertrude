@@ -69,26 +69,22 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
     expect(children).toHaveCount(1)
   }
 
-  func testMusicClaimAfterBlockerConnectWithoutAccessDoesNotSetClaimedAt() async throws {
-    let parent = try await self.parent()
+  func testMusicClaimAfterBlockerConnectWithoutAccessSetsClaimedAt() async throws {
+    let parent = try await self.parent() // no subscription, no music entitlement
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     var device = try await self.db.create(IOSDevice.random)
     let claim = try await self.createClaim(.music, device.id)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
     try await device.bindChild(child, in: self.db)
 
-    do {
-      _ = try await ClaimMusicDevice.resolve(
-        with: .init(code: claim.code, child: .newChild(name: "Ignored")),
-        in: parent.context,
-      )
-      XCTFail("expected payment required")
-    } catch let error as PqlError {
-      expect(error.type).toEqual(.paymentRequired)
-    }
+    let output = try await ClaimMusicDevice.resolve(
+      with: .init(code: claim.code, child: .newChild(name: "Ignored")),
+      in: parent.context,
+    )
 
+    expect(output.childName).toEqual(child.name) // bound child wins over the input name
     let updatedClaim = try await Claim.find(code: claim.code, in: self.db)
-    expect(updatedClaim?.claimedAt).toBeNil()
+    expect(updatedClaim?.claimedAt).not.toBeNil()
   }
 
   func testCodeReuse_amClaimedCode_rejectedInBlockerFunnel() async throws {

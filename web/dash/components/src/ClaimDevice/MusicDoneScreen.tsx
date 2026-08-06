@@ -7,7 +7,7 @@ const MusicDoneScreen: React.FC<{
   childName: string;
   modelName: string;
   iosVersion: string;
-  onManageSettings: () => void;
+  onDone: () => void;
 }> = (props) => {
   const deviceType = props.modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   return (
@@ -23,18 +23,15 @@ const MusicDoneScreen: React.FC<{
       </p>
 
       <div className="mb-6 rounded-xl border border-violet-100 bg-violet-50 px-5 py-4">
-        <p className="text-violet-900 font-semibold">
-          Approve albums from the {deviceType} settings screen.
-        </p>
-        <p className="text-violet-800/90 text-sm mt-1">
+        <p className="text-violet-900">
           If {props.childName} still sees the claim code, open Gertrude Music again and it
           should finish connecting.
         </p>
       </div>
 
       <div className="flex justify-end">
-        <Button type="button" color="primary" onClick={props.onManageSettings}>
-          {deviceType} settings
+        <Button type="button" color="primary" onClick={props.onDone}>
+          Return to dashboard
         </Button>
       </div>
     </div>

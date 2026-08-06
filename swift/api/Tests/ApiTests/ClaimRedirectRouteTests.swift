@@ -202,11 +202,32 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
+        expect(location).toContain("\(self.env.dashboardUrl)/login") // music lands login-first
+        expect(location).not.toContain("/signup")
         expect(location).toContain("claimPendingMusicDevice=\(code)")
         expect(location).toContain("iosVersion=18.2")
         expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
         expect(location).not.toContain("error=")
+      },
+    )
+  }
+
+  func testMusicErrorCodes_alsoLandOnLogin() async throws {
+    try await app.test(
+      .GET,
+      "claim-pending-music/abc",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("\(self.env.dashboardUrl)/login?error=invalid_code")
+      },
+    )
+
+    try await app.test(
+      .GET,
+      "claim-pending-music/999999",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("\(self.env.dashboardUrl)/login?error=missing_code")
       },
     )
   }
@@ -233,6 +254,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
         expect(location).toContain("claimPendingMusicDevice=\(code)") // routed by claim intent
+        expect(location).toContain("\(self.env.dashboardUrl)/login") // ...so login-first too
         expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
         expect(location).not.toContain("claimPendingBlocker")
         expect(location).not.toContain("error=")

@@ -22,25 +22,12 @@ struct GetMusicClaimData: Pair {
     let deviceType: String
     let iosVersion: String
     let resumeStep: ResumeStep?
-    let paymentAction: GetSubscriptionPanel_v2.Action?
   }
 }
 
 extension GetMusicClaimData: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
-    let account = try await context.currentBillingAccount()
-    let paymentAction = account.paymentActionForMissingCapability(.useGertrudeMusic)
-
-    if paymentAction != nil {
-      _ = try? await context.db.create(InterestingEvent(
-        eventId: "music_paywall_hit",
-        kind: "event",
-        context: "dash",
-        parentId: context.parent.id,
-      ))
-    }
-
-    return try await resolveClaimData(
+    try await resolveClaimData(
       code: input.code,
       intent: .music,
       baseId: "5052a8c5", // 5052a8c5-1, 5052a8c5-2, 5052a8c5-3, 5052a8c5-4
@@ -56,10 +43,7 @@ extension GetMusicClaimData: Resolver {
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: paymentAction == nil
-            ? .done(childName: child.name, childId: child.id, deviceId: device.id)
-            : nil,
-          paymentAction: paymentAction,
+          resumeStep: .done(childName: child.name, childId: child.id, deviceId: device.id),
         )
       },
       onUnclaimed: { device, children in
@@ -69,14 +53,11 @@ extension GetMusicClaimData: Resolver {
           throw context.error("4e4b135e", .notFound, user: msg)
         }
         return Output(
-          children: paymentAction == nil
-            ? children.map { GetIOSDeviceClaimData.ChildOption(id: $0.id, name: $0.name) }
-            : [],
+          children: children.map { GetIOSDeviceClaimData.ChildOption(id: $0.id, name: $0.name) },
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
           resumeStep: nil,
-          paymentAction: paymentAction,
         )
       },
       onUnclaimedBound: { claim, device, child in
@@ -85,18 +66,13 @@ extension GetMusicClaimData: Resolver {
           let msg = "Code not found. Double-check and try again."
           throw context.error("12ec95d0", .notFound, user: msg)
         }
-        if paymentAction == nil {
-          try await completeClaim(claim, for: child, in: context.db)
-        }
+        try await completeClaim(claim, for: child, in: context.db)
         return Output(
           children: [],
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: paymentAction == nil
-            ? .done(childName: child.name, childId: child.id, deviceId: device.id)
-            : nil,
-          paymentAction: paymentAction,
+          resumeStep: .done(childName: child.name, childId: child.id, deviceId: device.id),
         )
       },
     )

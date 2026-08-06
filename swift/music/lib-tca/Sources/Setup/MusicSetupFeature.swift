@@ -12,11 +12,10 @@ struct MusicSetupFeature: Sendable {
     var screen = Screen.checking
     var claimAudience = MusicClaimAudience.parentPartner
     var prefetch = Prefetch.loading
-    var onboardingConfig: GetMusicOnboardingConfig.Output?
 
     enum Prefetch: Equatable {
       case loading
-      case loaded(GetMusicAppStatus.Output)
+      case loaded(GetMusicAppStatus_v2.Output)
       case failed
     }
 
@@ -29,7 +28,7 @@ struct MusicSetupFeature: Sendable {
       case connecting
       case gertrudeConnection(ConnectionStatus)
       case deviceRecognized(childName: String)
-      case subscriptionRequired(childName: String, remediationUrl: URL?)
+      case musicAccessUnavailable(childName: String)
       case appleMusicPermission
       case appleMusicDenied
       case appleMusicRestricted
@@ -61,15 +60,14 @@ struct MusicSetupFeature: Sendable {
     case explainAccountContinueButtonTapped
     case getStartedButtonTapped
     case musicAppStatusFailed(hasStoredConnection: Bool)
-    case musicAppStatusLoaded(GetMusicAppStatus.Output)
+    case musicAppStatusLoaded(GetMusicAppStatus_v2.Output)
     case musicAppStatusPollingFailed
     case nudgeContinueButtonTapped
     case onAppear
-    case onboardingConfigLoaded(GetMusicOnboardingConfig.Output)
     case parentNoButtonTapped
     case parentYesButtonTapped
     case prefetchStatusFailed
-    case prefetchStatusLoaded(GetMusicAppStatus.Output)
+    case prefetchStatusLoaded(GetMusicAppStatus_v2.Output)
     case refreshConnectionButtonTapped
     case retryButtonTapped
     case settingsButtonTapped
@@ -96,11 +94,7 @@ struct MusicSetupFeature: Sendable {
         }
         state.screen = .welcome
         log(.info, .setup, "8502ee88")
-        return .merge(self.prefetchStatus(), self.fetchOnboardingConfig())
-
-      case .onboardingConfigLoaded(let config):
-        state.onboardingConfig = config
-        return .none
+        return self.prefetchStatus()
 
       case .prefetchStatusLoaded(let output):
         state.prefetch = .loaded(output)
@@ -270,9 +264,9 @@ struct MusicSetupFeature: Sendable {
     token: UUID,
     childId: UUID,
     childName: String,
-    entitlement: GetMusicAppStatus.Entitlement,
+    entitlement: GetMusicAppStatus_v2.Entitlement,
   ) -> EffectOf<Self> {
-    let wasAlreadyShowing = state.isShowingSubscriptionRequired
+    let wasAlreadyShowing = state.isShowingMusicAccessUnavailable
     if !wasAlreadyShowing {
       self.keychain.save(connection: .init(token: token, childId: childId, childName: childName))
       log(.info, .setup, "aa99a570")
@@ -281,8 +275,8 @@ struct MusicSetupFeature: Sendable {
     case .active:
       state.screen = .deviceRecognized(childName: childName)
       return .cancel(id: CancelID.musicAppStatusPolling)
-    case .unpaid(let remediationUrl):
-      state.screen = .subscriptionRequired(childName: childName, remediationUrl: remediationUrl)
+    case .unavailable:
+      state.screen = .musicAccessUnavailable(childName: childName)
       if !wasAlreadyShowing {
         log(.warn, .subs, "6ad351da")
       }
@@ -309,14 +303,6 @@ struct MusicSetupFeature: Sendable {
         try await send(.prefetchStatusLoaded(self.api.getMusicAppStatus()))
       } catch {
         await send(.prefetchStatusFailed)
-      }
-    }
-  }
-
-  private func fetchOnboardingConfig() -> EffectOf<Self> {
-    .run { send in
-      if let config = try? await self.api.getMusicOnboardingConfig() {
-        await send(.onboardingConfigLoaded(config))
       }
     }
   }
@@ -367,7 +353,7 @@ extension MusicSetupFeature.State {
     if case .gertrudeConnection(.unclaimed) = self.screen { true } else { false }
   }
 
-  var isShowingSubscriptionRequired: Bool {
-    if case .subscriptionRequired = self.screen { true } else { false }
+  var isShowingMusicAccessUnavailable: Bool {
+    if case .musicAccessUnavailable = self.screen { true } else { false }
   }
 }

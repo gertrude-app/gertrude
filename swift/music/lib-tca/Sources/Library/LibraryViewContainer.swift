@@ -113,8 +113,8 @@ private extension LibraryFeature.State {
       .empty
     case .failed:
       .failed
-    case .subscriptionRequired:
-      .subscriptionRequired
+    case .musicAccessUnavailable:
+      .musicAccessUnavailable
     }
   }
 }

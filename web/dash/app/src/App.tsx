@@ -13,7 +13,6 @@ import ClaimBlockerDeviceClaim from './components/routes/ClaimBlockerDevice/Clai
 import ClaimBlockerDeviceDone from './components/routes/ClaimBlockerDevice/Done';
 import ClaimMusicDeviceClaim from './components/routes/ClaimMusicDevice/Claim';
 import ClaimMusicDeviceDone from './components/routes/ClaimMusicDevice/Done';
-import ClaimMusicDevicePayment from './components/routes/ClaimMusicDevice/Payment';
 import ClaimPodcastsDeviceClaim from './components/routes/ClaimPodcastsDevice/Claim';
 import ClaimPodcastsDeviceDone from './components/routes/ClaimPodcastsDevice/Done';
 import Computer from './components/routes/Computer';
@@ -111,7 +110,7 @@ const App: React.FC = () => {
         />
         <Route
           path="claim-music-device/:code/payment"
-          element={<ClaimMusicDevicePayment />}
+          element={<Navigate to="../claim" replace relative="path" />}
         />
         <Route path="claim-music-device/:code/done" element={<ClaimMusicDeviceDone />} />
         <Route path="/checkout-success" element={<CheckoutSuccess />} />
