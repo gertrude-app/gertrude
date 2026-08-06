@@ -46,3 +46,9 @@ all notes.
   shared data; `gertie-tca-features` = shared TCA behavior) and the
   new-**target**-vs-new-**package** rule. Read before creating a new SPM module, or when
   unsure where to place shared functionality.
+
+- **[010 — Music connection flow trades usability for App Store admission](./010-music-companion-app-claim-posture.md)**
+  — the Gertrude Music claim flow is deliberately unhelpful (lands on login, never names a
+  plan, ends on the dashboard root, claims devices for accounts that can't use them) to
+  qualify for the 3.1.3(f) companion exemption after a 3.1.1 rejection. Read before
+  "fixing" any of it.
