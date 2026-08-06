@@ -572,8 +572,9 @@ struct LibraryFeature: Sendable {
         state.isPlaylistMutationInFlight = false
         state.playlistIDsBeforeCreate = nil
         state.playlistMutationFailure = nil
+        state.path.removeAll()
         log(.warn, .subs, "ded74480")
-        return .none
+        return .send(.delegate(.approvedTrackIDsUpdated([])))
 
       case .cachedApprovedLibraryLoaded(let library):
         state.applyLibrary(library)

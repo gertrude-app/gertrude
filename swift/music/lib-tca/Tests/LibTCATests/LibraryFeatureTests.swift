@@ -119,6 +119,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryMusicAccessUnavailable) {
       $0.status = .musicAccessUnavailable
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated([]))) // revokes cached playback
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -316,6 +317,7 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryMusicAccessUnavailable) {
       $0.status = .musicAccessUnavailable
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated([]))) // supersedes the cached set
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
     }
@@ -857,7 +859,9 @@ struct LibraryFeatureTests {
     await store.receive(.approvedLibraryMusicAccessUnavailable) {
       $0.status = .musicAccessUnavailable // not .playlistMutationFailure, and no stale library
       $0.isPlaylistMutationInFlight = false // latch guards every mutation, must not stick
+      $0.path.removeAll() // the open playlist detail can't outlive the library it came from
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated([])))
   }
 
   @Test
@@ -891,6 +895,7 @@ struct LibraryFeatureTests {
       $0.addToPlaylist = nil // sheet would otherwise stay open over the unavailable wall
       $0.isPlaylistMutationInFlight = false
     }
+    await store.receive(.delegate(.approvedTrackIDsUpdated([])))
 
     await store.send(.approvedLibraryLoaded(library)) { // account reactivated
       $0.applyLibrary(library)
