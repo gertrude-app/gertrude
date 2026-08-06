@@ -76,7 +76,7 @@ private extension MusicSetupFeature.State {
     case .selfManagerNudge:
       .selfManagerNudge
     case .explainAccount:
-      .explainAccount(overrideText: self.onboardingConfig?.explainAccountText)
+      .explainAccount
     case .connecting:
       .gertrudeConnection(.checking)
     case .appleMusicPermission:
@@ -99,12 +99,8 @@ private extension MusicSetupFeature.State {
       .gertrudeConnection(.failed)
     case .deviceRecognized(let childName):
       .deviceRecognized(childName: childName)
-    case .subscriptionRequired(let childName, let remediationUrl):
-      .subscriptionRequired(
-        childName: childName,
-        remediationUrl: remediationUrl,
-        overrideText: self.onboardingConfig?.subscriptionRequiredText,
-      )
+    case .musicAccessUnavailable(let childName):
+      .musicAccessUnavailable(childName: childName)
     case .ready:
       .checking
     }

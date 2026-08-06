@@ -100,8 +100,8 @@ private extension SearchFeature.State {
       .loading
     case .ready:
       .ready(self.results.map(\.viewData))
-    case .subscriptionRequired:
-      .subscriptionRequired
+    case .musicAccessUnavailable:
+      .musicAccessUnavailable
     }
   }
 }

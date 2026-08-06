@@ -5,7 +5,7 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case welcome
   case parentQuestion
   case selfManagerNudge
-  case explainAccount(overrideText: String?)
+  case explainAccount
   case appleMusicPermission
   case appleMusicDenied
   case appleMusicRestricted
@@ -14,7 +14,7 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case appleMusicSubscriptionRequired(canShowOffer: Bool)
   case gertrudeConnection(MusicSetupConnectionViewState)
   case deviceRecognized(childName: String)
-  case subscriptionRequired(childName: String, remediationUrl: URL?, overrideText: String?)
+  case musicAccessUnavailable(childName: String)
 }
 
 public enum MusicSetupConnectionViewState: Equatable, Sendable {
@@ -86,13 +86,9 @@ public struct MusicSetupView: View {
         screenType: .info,
       )
 
-    case .explainAccount(let overrideText):
+    case .explainAccount:
       ButtonScreenView(
-        text: musicOnboardingBlurb(
-          override: overrideText,
-          device: musicDeviceType(),
-          fallback: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
-        ),
+        text: "Gertrude Music needs a Gertrude account to approve music for this \(musicDeviceType()). Next you’ll connect one.",
         primary: .init("Got it, next", animate: false) {
           self.onEvent(.explainAccountContinueTapped)
         },
@@ -104,12 +100,8 @@ public struct MusicSetupView: View {
         self.onEvent(.deviceRecognizedContinueTapped)
       }
 
-    case .subscriptionRequired(let childName, let remediationUrl, let overrideText):
-      MusicSubscriptionRequiredView(
-        childName: childName,
-        remediationUrl: remediationUrl,
-        overrideText: overrideText,
-      )
+    case .musicAccessUnavailable(let childName):
+      MusicUnavailableView(childName: childName)
 
     case .appleMusicPermission:
       ButtonScreenView(
@@ -214,21 +206,15 @@ public struct MusicSetupView: View {
 }
 
 #Preview("Explain Account") {
-  MusicSetupView(state: .explainAccount(
-    overrideText: "Set up Gertrude Music on this {{device}}. It’s $5 a month, and one subscription covers every device in your family.",
-  ))
+  MusicSetupView(state: .explainAccount)
 }
 
 #Preview("Device Recognized") {
   MusicSetupView(state: .deviceRecognized(childName: "Billy Bob"))
 }
 
-#Preview("Subscription Required") {
-  MusicSetupView(state: .subscriptionRequired(
-    childName: "Billy Bob",
-    remediationUrl: URL(string: "https://parents.gertrude.app/settings"),
-    overrideText: "{{device}} needs a subscription — Gertrude Music is $5 a month and covers your whole family. Open this link:",
-  ))
+#Preview("Music Unavailable") {
+  MusicSetupView(state: .musicAccessUnavailable(childName: "Billy Bob"))
 }
 
 #Preview("Apple Music Permission") {

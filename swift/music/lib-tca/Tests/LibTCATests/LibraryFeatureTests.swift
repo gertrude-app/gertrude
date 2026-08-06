@@ -102,22 +102,22 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func showsSubscriptionRequiredWhenApprovedLibraryRequiresPayment() async {
+  func showsMusicUnavailableWhenApprovedLibraryRequiresPayment() async {
     let store = TestStore(initialState: .init()) {
       LibraryFeature()
     } withDependencies: {
       $0.continuousClock = ImmediateClock()
       $0.approvedMusic.loadCachedApprovedLibrary = { nil }
       $0.approvedMusic
-        .loadRemoteApprovedLibrary = { throw ApprovedMusicClientError.subscriptionRequired }
+        .loadRemoteApprovedLibrary = { throw ApprovedMusicClientError.musicAccessUnavailable }
     }
 
     await store.send(.onAppear) {
       $0.isRefreshingRemoteLibrary = true
       $0.hasStartedInitialLibraryLoad = true
     }
-    await store.receive(.approvedLibrarySubscriptionRequired) {
-      $0.status = .subscriptionRequired
+    await store.receive(.approvedLibraryMusicAccessUnavailable) {
+      $0.status = .musicAccessUnavailable
     }
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
@@ -294,7 +294,7 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func subscriptionRequiredOverridesCachedApprovedLibrary() async {
+  func musicAccessUnavailableOverridesCachedApprovedLibrary() async {
     let cached = cachedApprovedMusicLibrary
     let store = TestStore(initialState: .init()) {
       LibraryFeature()
@@ -302,7 +302,7 @@ struct LibraryFeatureTests {
       $0.continuousClock = ImmediateClock()
       $0.approvedMusic.loadCachedApprovedLibrary = { cached }
       $0.approvedMusic
-        .loadRemoteApprovedLibrary = { throw ApprovedMusicClientError.subscriptionRequired }
+        .loadRemoteApprovedLibrary = { throw ApprovedMusicClientError.musicAccessUnavailable }
     }
 
     await store.send(.onAppear) {
@@ -313,8 +313,8 @@ struct LibraryFeatureTests {
       $0.status = .loaded(cached)
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
-    await store.receive(.approvedLibrarySubscriptionRequired) {
-      $0.status = .subscriptionRequired
+    await store.receive(.approvedLibraryMusicAccessUnavailable) {
+      $0.status = .musicAccessUnavailable
     }
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
@@ -828,6 +828,34 @@ struct LibraryFeatureTests {
       $0.isPlaylistMutationInFlight = false
       $0.playlistMutationFailure = .failed
       $0.applyLibrary(library)
+    }
+  }
+
+  @Test
+  func playlistMutationLosingMusicAccessGoesUnavailable() async {
+    let library = self.playlistLibrary()
+    let playlist = library.playlists[0]
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.playlistDetail = .init(playlist: playlist)
+    let pathID = state.path.ids.last!
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic
+        .renamePlaylist = { _ in throw ApprovedMusicClientError.musicAccessUnavailable }
+    }
+
+    var optimisticLibrary = library
+    optimisticLibrary.playlists[0].name = "New Name"
+    await store.send(.path(.element(
+      id: pathID,
+      action: .playlist(.delegate(.rename("New Name"))),
+    ))) {
+      $0.isPlaylistMutationInFlight = true
+      $0.applyLibrary(optimisticLibrary)
+    }
+    await store.receive(.approvedLibraryMusicAccessUnavailable) {
+      $0.status = .musicAccessUnavailable // not .playlistMutationFailure, and no stale library
     }
   }
 

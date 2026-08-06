@@ -61,7 +61,7 @@ struct LibraryFeature: Sendable {
     case loaded(ApprovedMusicLibrary)
     case empty
     case failed
-    case subscriptionRequired
+    case musicAccessUnavailable
   }
 
   struct AddToPlaylistState: Equatable {
@@ -127,7 +127,7 @@ struct LibraryFeature: Sendable {
     case albumTapped(ApprovedAlbum.ID)
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
-    case approvedLibrarySubscriptionRequired
+    case approvedLibraryMusicAccessUnavailable
     case artistPlayTapped(ApprovedArtist.ID)
     case artistTapped(ApprovedArtist.ID)
     case artistTopSongTapped(artistID: ApprovedArtist.ID, trackID: ApprovedTrack.ID)
@@ -566,8 +566,8 @@ struct LibraryFeature: Sendable {
         state.status = .failed
         return .none
 
-      case .approvedLibrarySubscriptionRequired:
-        state.status = .subscriptionRequired
+      case .approvedLibraryMusicAccessUnavailable:
+        state.status = .musicAccessUnavailable
         log(.warn, .subs, "ded74480")
         return .none
 
@@ -868,6 +868,8 @@ struct LibraryFeature: Sendable {
           case .conflict(let library):
             await send(.addToPlaylistMutationResponse(.conflict(library)))
           }
+        } catch ApprovedMusicClientError.musicAccessUnavailable {
+          await send(.approvedLibraryMusicAccessUnavailable)
         } catch {
           await send(.addToPlaylistMutationResponse(.failed))
         }
@@ -890,6 +892,8 @@ struct LibraryFeature: Sendable {
                .duplicateConfirmationRequired(let library, _):
             await send(.playlistMutationResponse(.conflict(library), rollback: rollback))
           }
+        } catch ApprovedMusicClientError.musicAccessUnavailable {
+          await send(.approvedLibraryMusicAccessUnavailable)
         } catch {
           await send(.playlistMutationResponse(.failed, rollback: rollback))
         }
@@ -930,8 +934,8 @@ struct LibraryFeature: Sendable {
       }
       do {
         try await send(.approvedLibraryLoaded(self.approvedMusic.loadRemoteApprovedLibrary()))
-      } catch ApprovedMusicClientError.subscriptionRequired {
-        await send(.approvedLibrarySubscriptionRequired)
+      } catch ApprovedMusicClientError.musicAccessUnavailable {
+        await send(.approvedLibraryMusicAccessUnavailable)
       } catch {
         await send(.approvedLibraryLoadFailed)
       }
@@ -952,7 +956,7 @@ private extension LibraryFeature.Status {
     switch self {
     case .loaded, .empty:
       true
-    case .loading, .failed, .subscriptionRequired:
+    case .loading, .failed, .musicAccessUnavailable:
       false
     }
   }

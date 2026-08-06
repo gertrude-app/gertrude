@@ -75,7 +75,7 @@ extension ApprovedMusicClient: DependencyKey {
             )
           }
         } catch let error as PqlError where error.type == .paymentRequired {
-          throw ApprovedMusicClientError.subscriptionRequired
+          throw ApprovedMusicClientError.musicAccessUnavailable
         }
       },
       removePlaylistEntry: { input in
@@ -181,7 +181,7 @@ private func performPlaylistMutation(
       return .conflict(library)
     }
   } catch let error as PqlError where error.type == .paymentRequired {
-    throw ApprovedMusicClientError.subscriptionRequired
+    throw ApprovedMusicClientError.musicAccessUnavailable
   }
 }
 
@@ -365,6 +365,6 @@ enum ApprovedMusicClientError: Error {
   case invalidUnchangedRevision
   case missingConnection
   case staleSnapshot
-  case subscriptionRequired
+  case musicAccessUnavailable
   case unsupportedSchema(Int)
 }

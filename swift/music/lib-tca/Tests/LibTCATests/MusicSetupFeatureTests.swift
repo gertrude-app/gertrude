@@ -15,7 +15,6 @@ struct MusicSetupFeatureTests {
     } withDependencies: {
       $0.keychain = KeychainStore().client
       $0.api.getMusicAppStatus = { .unclaimed(code: 123_456, expiresAt: .distantFuture) }
-      $0.api.getMusicOnboardingConfig = { .init(subscriptionRequiredText: "pay up") }
     }
 
     await store.send(.onAppear) {
@@ -26,9 +25,6 @@ struct MusicSetupFeatureTests {
       expiresAt: .distantFuture,
     ))) {
       $0.prefetch = .loaded(.unclaimed(code: 123_456, expiresAt: .distantFuture))
-    }
-    await store.receive(.onboardingConfigLoaded(.init(subscriptionRequiredText: "pay up"))) {
-      $0.onboardingConfig = .init(subscriptionRequiredText: "pay up")
     }
   }
 
@@ -151,11 +147,10 @@ struct MusicSetupFeatureTests {
   }
 
   @Test
-  func recognizedUnpaidDeviceShowsSubscriptionRequiredThenResolves() async {
+  func recognizedDeviceWithoutMusicAccessShowsUnavailableThenResolves() async {
     let clock = TestClock()
     let token = UUID(1)
     let childId = UUID(2)
-    let url = URL(string: "https://parents.gertrude.app/settings")
     let provider = MusicAppStatusProvider(outputs: [
       .claimed(token: token, childId: childId, childName: "Harriet", entitlement: .active),
     ])
@@ -165,7 +160,7 @@ struct MusicSetupFeatureTests {
       token: token,
       childId: childId,
       childName: "Harriet",
-      entitlement: .unpaid(remediationUrl: url),
+      entitlement: .unavailable,
     ))
     let store = TestStore(initialState: state) {
       MusicSetupFeature()
@@ -176,9 +171,9 @@ struct MusicSetupFeatureTests {
     }
 
     await store.send(.getStartedButtonTapped) {
-      $0.screen = .subscriptionRequired(childName: "Harriet", remediationUrl: url)
+      $0.screen = .musicAccessUnavailable(childName: "Harriet")
     }
-    await clock.advance(by: .seconds(5)) // poll finds the paid subscription
+    await clock.advance(by: .seconds(5)) // poll finds the account became eligible
     await store.receive(.musicAppStatusLoaded(.claimed(
       token: token,
       childId: childId,
@@ -190,28 +185,54 @@ struct MusicSetupFeatureTests {
   }
 
   @Test
-  func subscriptionRequiredPollingDoesNotResaveConnectionEachTick() async {
+  func claimWithoutMusicAccessSavesConnectionAndStaysUnavailable() async {
     let keychain = KeychainStore()
     let token = UUID(1)
     let childId = UUID(2)
-    let url = URL(string: "https://parents.gertrude.app/settings")
     var state = MusicSetupFeature.State()
-    state
-      .screen = .subscriptionRequired(childName: "Harriet", remediationUrl: url) // already polling
+    state.screen = .welcome
+    state.prefetch = .loaded(.claimed(
+      token: token,
+      childId: childId,
+      childName: "Harriet",
+      entitlement: .unavailable,
+    ))
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.keychain = keychain.client
+      $0.continuousClock = TestClock()
+    }
+
+    await store.send(.getStartedButtonTapped) {
+      $0.screen = .musicAccessUnavailable(childName: "Harriet")
+    }
+
+    #expect(keychain.connectionSaveCount == 1) // connection persists despite no entitlement
+    await store.skipInFlightEffects() // polling keeps running so activation can recover
+  }
+
+  @Test
+  func musicAccessUnavailablePollingDoesNotResaveConnection() async {
+    let keychain = KeychainStore()
+    let token = UUID(1)
+    let childId = UUID(2)
+    var state = MusicSetupFeature.State()
+    state.screen = .musicAccessUnavailable(childName: "Harriet") // already polling
     let store = TestStore(initialState: state) {
       MusicSetupFeature()
     } withDependencies: {
       $0.keychain = keychain.client
     }
 
-    let unpaidTick = MusicSetupFeature.Action.musicAppStatusLoaded(.claimed(
+    let unavailableTick = MusicSetupFeature.Action.musicAppStatusLoaded(.claimed(
       token: token,
       childId: childId,
       childName: "Harriet",
-      entitlement: .unpaid(remediationUrl: url),
+      entitlement: .unavailable,
     ))
-    await store.send(unpaidTick) // poll tick, still unpaid: no screen change
-    await store.send(unpaidTick) // another tick: still no screen change
+    await store.send(unavailableTick) // poll tick, still unavailable: no screen change
+    await store.send(unavailableTick) // another tick: still no screen change
 
     #expect(keychain.connectionSaveCount == 0) // already on screen -> must not re-save each tick
   }
@@ -290,13 +311,13 @@ private final class KeychainStore: @unchecked Sendable {
 }
 
 private actor MusicAppStatusProvider {
-  var outputs: [GetMusicAppStatus.Output]
+  var outputs: [GetMusicAppStatus_v2.Output]
 
-  init(outputs: [GetMusicAppStatus.Output]) {
+  init(outputs: [GetMusicAppStatus_v2.Output]) {
     self.outputs = outputs
   }
 
-  func next() throws -> GetMusicAppStatus.Output {
+  func next() throws -> GetMusicAppStatus_v2.Output {
     guard !self.outputs.isEmpty else { throw TestError() }
     return self.outputs.removeFirst()
   }

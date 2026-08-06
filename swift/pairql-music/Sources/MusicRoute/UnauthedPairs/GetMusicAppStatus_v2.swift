@@ -1,8 +1,7 @@
 import Foundation
 import PairQL
 
-/// deprecated: v0.1.0 - v0.2.0
-public struct GetMusicAppStatus: Pair {
+public struct GetMusicAppStatus_v2: Pair {
   public static let auth: ClientAuth = .none
 
   public struct Input: PairInput {
@@ -26,7 +25,7 @@ public struct GetMusicAppStatus: Pair {
 
   public enum Entitlement: PairNestable {
     case active
-    case unpaid(remediationUrl: URL?)
+    case unavailable
   }
 
   public enum Output: PairOutput {

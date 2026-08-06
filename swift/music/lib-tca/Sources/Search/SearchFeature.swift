@@ -7,7 +7,7 @@ struct SearchFeature: Sendable {
     case failed
     case loading
     case ready
-    case subscriptionRequired
+    case musicAccessUnavailable
   }
 
   @ObservableState
@@ -421,8 +421,8 @@ extension SearchFeature.State {
       self.results = []
       self.path.removeAll()
 
-    case .subscriptionRequired:
-      self.availability = .subscriptionRequired
+    case .musicAccessUnavailable:
+      self.availability = .musicAccessUnavailable
       self.librarySearch = MusicLibrarySearch()
       self.results = []
       self.path.removeAll()
