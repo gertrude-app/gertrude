@@ -275,18 +275,6 @@ final class MusicAlbumResolverTests: ApiTestCase, @unchecked Sendable {
     } catch {}
   }
 
-  private func musicChild() async throws -> ChildEntities {
-    let child = try await self.child()
-    try await self.connectMusicApp(for: child)
-    return child
-  }
-
-  private func connectMusicApp(for child: ChildEntities) async throws {
-    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (_, install) = try await self.claimedMusicInstall(for: child)
-    _ = try await self.db.create(MusicApp.Token(installId: install.id))
-  }
-
   private func input(
     child: ChildEntities,
     albumId: Music.AlbumId = "1440935467",

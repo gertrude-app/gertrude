@@ -126,14 +126,6 @@ final class SearchMusicCatalogResolverTests: ApiTestCase, @unchecked Sendable {
       XCTFail("expected search to fail")
     } catch {}
   }
-
-  private func musicChild() async throws -> ChildEntities {
-    let child = try await self.child()
-    try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (_, install) = try await self.claimedMusicInstall(for: child)
-    _ = try await self.db.create(MusicApp.Token(installId: install.id))
-    return child
-  }
 }
 
 private func albumArtwork() -> Music.Artwork {

@@ -41,15 +41,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV1ReturnsApprovedAlbumsForAuthedChild() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
       appleMusicAlbumId: "1440935467",
@@ -124,15 +116,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV1ProjectsArtistAlbumsThroughV02ClientModel() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     _ = try await self.db.create(Music.ApprovedArtist(
       childId: child.id,
       appleMusicArtistId: "artist-1",
@@ -169,15 +153,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV1DeduplicatesOverlapAndRetainsArtistCoverageAfterDirectRemoval() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     let albumResolution = libraryResolverResolvedAlbum()
     _ = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
@@ -292,15 +268,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV1ProjectsPublishedSnapshotWithoutAppleRequests() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     _ = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
       appleMusicAlbumId: "album-1",
@@ -334,15 +302,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV2ReturnsRevisionZeroEmptySnapshotAndThenUnchanged() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
 
     let initial = try await GetApprovedMusicLibrary_v2.resolve(
       with: .init(),
@@ -365,15 +325,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV2ReadsPublishedSnapshotWithoutAppleRequests() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     _ = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
       appleMusicAlbumId: "album-1",
@@ -404,15 +356,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV2ReadsAndVerifiesPublishedTrackGrantSnapshot() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     var trackGrant = try await self.db.create(Music.ApprovedTrack(
       childId: child.id,
       appleMusicTrackId: "selected-track",
@@ -453,15 +397,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV2RejectsSnapshotThatDoesNotMatchCurrentGrants() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     var album = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
       appleMusicAlbumId: "album-1",
@@ -489,15 +425,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV2RejectsGrantWithoutPublishedSnapshot() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     _ = try await self.db.create(Music.ApprovedAlbum(
       childId: child.id,
       appleMusicAlbumId: "album-1",
@@ -518,15 +446,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
   func testV2RejectsTrackGrantWithoutPublishedSnapshot() async throws {
     let child = try await self.child()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
-    let (device, install) = try await self.claimedMusicInstall(for: child)
-    let ctx = MusicApp.InstallContext(
-      requestId: "mock-req-id",
-      dashboardUrl: "/",
-      install: install,
-      device: device,
-      child: child.model,
-      telemetry: TelemetryBag(),
-    )
+    let ctx = try await self.musicContext(for: child)
     _ = try await self.db.create(Music.ApprovedTrack(
       childId: child.id,
       appleMusicTrackId: "selected-track",
