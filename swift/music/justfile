@@ -1,7 +1,7 @@
 import '../watch-helpers.just'
 
 swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
-bundle_id := "${GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER:-com.netrivet.gertrude.music.dev}"
+bundle_id := env("GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER", "com.netrivet.gertrude.music.dev")
 sim_derived_data := ".derived-data/sim"
 
 _default:
