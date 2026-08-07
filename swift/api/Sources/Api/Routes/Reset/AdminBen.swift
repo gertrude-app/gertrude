@@ -26,11 +26,11 @@
         parentId: ben.id,
         stripeCustomerId: "cus_UVjrurAptk11E2",
         lastStripeSubscriptionId: "sub_1TWiOKGKRdhETuKABBZ0SiBS",
-        lastPaidTier: .light,
+        lastPaidTier: .medium,
       ))
       try await db.create(StripeSubscription(
         parentId: ben.id,
-        tier: .light,
+        tier: .medium,
         stripeId: "sub_1TWiOKGKRdhETuKABBZ0SiBS",
         stripeStatus: .active,
         currentPeriodEnd: Date() + .days(365),
