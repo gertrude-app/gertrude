@@ -97,7 +97,14 @@ just verify-blocker
 just verify-music
 just verify-podcasts app
 just verify-podcasts e2e
+just verify-all            # every scenario in turn (defaults to e2e)
+just verify-all preflight  # cheap prerequisite check across all three
 ```
+
+`verify-all` is the pre-release gate: it runs each scenario to completion rather than
+stopping at the first red, prints a per-scenario summary, and exits non-zero if any failed.
+Scenarios share the API database, the dashboard, and the simulator, so they run **serially** —
+budget roughly the sum of the individual runs, most of it iOS build time.
 
 ## Setup (first run on a new machine)
 

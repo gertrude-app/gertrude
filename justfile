@@ -29,6 +29,9 @@ verify-blocker *args:
 verify-music *args:
   @./verification/run music {{args}}
 
+verify-all *args:
+  @./verification/run all {{args}}
+
 # api shortcuts
 
 api:
