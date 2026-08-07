@@ -150,6 +150,79 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.keys.contains(.init(id: autoKey.id.rawValue, key: autoKey.key))).toBeTrue()
   }
 
+  func testSynthesizesUnrestrictedAppKeychains() async throws {
+    let child = try await self.childWithComputer()
+
+    let parent = try await self.parent().withKeychain()
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: parent.keychain.id))
+    let realKey = try await self.db.create(Key(
+      keychainId: parent.keychain.id,
+      key: .domain(domain: "real.com", scope: .webBrowsers),
+    ))
+
+    let unsched1 = try await self.db.create(UnrestrictedMacApp(
+      scope: .bundleId("com.foo"),
+      childId: child.id,
+    ))
+    let unsched2 = try await self.db.create(UnrestrictedMacApp(
+      scope: .identifiedAppSlug("slack"),
+      childId: child.id,
+    ))
+
+    let schedule = RuleSchedule(
+      mode: .active,
+      days: .all,
+      window: .init(start: .init(hour: 8, minute: 0), end: .init(hour: 17, minute: 0)),
+    )
+    let sched = try await self.db.create(UnrestrictedMacApp(
+      scope: .bundleId("com.bar"),
+      childId: child.id,
+      schedule: schedule,
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    expect(output.keys.contains(.init(id: realKey.id.rawValue, key: realKey.key)))
+      .toBeTrue()
+
+    let collapsed = output.keychains.first { $0.id == child.id.rawValue }!
+    expect(collapsed.schedule).toBeNil()
+    expect(Set(collapsed.keys)).toEqual([
+      .init(id: unsched1.id.rawValue, key: .skeleton(scope: .bundleId("com.foo"))),
+      .init(id: unsched2.id.rawValue, key: .skeleton(scope: .identifiedAppSlug("slack"))),
+    ])
+
+    let scheduled = output.keychains.first { $0.id == sched.id.rawValue }!
+    expect(scheduled.schedule).toEqual(schedule)
+    expect(scheduled.keys).toEqual([
+      .init(id: sched.id.rawValue, key: .skeleton(scope: .bundleId("com.bar"))),
+    ])
+  }
+
+  func testUnrestrictedAppEnablesAutoIncludedKeychain() async throws {
+    let child = try await self.childWithComputer()
+    let (_, autoKey) = try await self.createAutoIncludeKeychain()
+    let unrestricted = try await self.db.create(UnrestrictedMacApp(
+      scope: .bundleId("com.foo"),
+      childId: child.id,
+    ))
+
+    let output = try await CheckIn_v2.resolve(
+      with: .init(appVersion: "1.0.0", filterVersion: nil),
+      in: child.context,
+    )
+
+    expect(output.keys.contains(.init(id: autoKey.id.rawValue, key: autoKey.key)))
+      .toBeTrue()
+    expect(output.keys.contains(.init(
+      id: unrestricted.id.rawValue,
+      key: .skeleton(scope: .bundleId("com.foo")),
+    ))).toBeTrue()
+  }
+
   func testIncludesResolvedFilterSuspension() async throws {
     let child = try await self.childWithComputer()
     let susp = try await self.db.create(MacApp.SuspendFilterRequest.mock {

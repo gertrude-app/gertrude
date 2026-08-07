@@ -1,10 +1,10 @@
 import DuetSQL
 import Gertie
 
-@DuetModel(schema: "child", table: "blocked_mac_apps")
-struct UserBlockedApp: Codable, Sendable {
+@DuetModel(schema: "child", table: "unrestricted_mac_apps")
+struct UnrestrictedMacApp: Codable, Sendable {
   var id: Id
-  var identifier: String
+  var scope: AppScope.Single
   var childId: Child.Id
   var schedule: RuleSchedule?
   var createdAt = Date()
@@ -12,12 +12,12 @@ struct UserBlockedApp: Codable, Sendable {
 
   init(
     id: Id = .init(),
-    identifier: String,
+    scope: AppScope.Single,
     childId: Child.Id,
     schedule: RuleSchedule? = nil,
   ) {
     self.id = id
-    self.identifier = identifier
+    self.scope = scope
     self.childId = childId
     self.schedule = schedule
   }
@@ -25,34 +25,30 @@ struct UserBlockedApp: Codable, Sendable {
 
 // extensions
 
-extension UserBlockedApp {
+extension UnrestrictedMacApp {
   var dto: DTO {
-    DTO(id: self.id, identifier: self.identifier, schedule: self.schedule)
+    DTO(id: self.id, scope: self.scope, schedule: self.schedule)
   }
 
   struct DTO: Codable, Equatable, Sendable {
     var id: Id
-    var identifier: String
+    var scope: AppScope.Single
     var schedule: RuleSchedule?
 
     init(
       id: Id = .init(),
-      identifier: String,
+      scope: AppScope.Single,
       schedule: RuleSchedule? = nil,
     ) {
       self.id = id
-      self.identifier = identifier
+      self.scope = scope
       self.schedule = schedule
     }
   }
 }
 
-extension UserBlockedApp {
-  var blockedApp: BlockedApp {
-    BlockedApp(identifier: self.identifier, schedule: self.schedule)
-  }
-
+extension UnrestrictedMacApp {
   init(dto: DTO, childId: Child.Id) {
-    self.init(id: dto.id, identifier: dto.identifier, childId: childId, schedule: dto.schedule)
+    self.init(id: dto.id, scope: dto.scope, childId: childId, schedule: dto.schedule)
   }
 }

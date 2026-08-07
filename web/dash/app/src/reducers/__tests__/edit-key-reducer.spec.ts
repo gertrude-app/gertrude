@@ -16,7 +16,7 @@ describe(`editKeyReducer()`, () => {
       appBundleId: `com.brave`,
       appSlug: `brave`,
     });
-    state.activeStep = EditKey.Step.WebsiteKey_SetAddress;
+    state.activeStep = EditKey.Step.SetAddress;
     expect(state.address).toBe(`foobar.com`);
 
     // toggle to strict, we they shouldn't have to restore the `cdn.` subdomain
@@ -32,67 +32,39 @@ describe(`editKeyReducer()`, () => {
     expect(state.addressType).toBe(`standard`);
   });
 
-  test(`changing keyType`, () => {
-    reducer(state, { type: `setKeyType`, to: `app` });
-    expect(state.keyType).toBe(`app`);
-  });
-
   const nextPrevCases: Array<[string, `next` | `prev`, EditKey.Step, () => void]> = [
     [
-      `back from normal website key expiration`,
+      `back from normal key expiration`,
       `prev`,
-      EditKey.Step.WebsiteKey_SetAppScope,
+      EditKey.Step.SetAppScope,
       () => {
         state.activeStep = EditKey.Step.Expiration;
-        state.keyType = `website`;
       },
     ],
     [
-      `back from single app website key expiration`,
+      `back from single app key expiration`,
       `prev`,
-      EditKey.Step.WebsiteKey_Advanced_ChooseApp,
+      EditKey.Step.Advanced_ChooseApp,
       () => {
         state.activeStep = EditKey.Step.Expiration;
-        state.keyType = `website`;
         state.addressScope = `singleApp`; // <-- advanced option
       },
     ],
     [
-      `back from normal app key expiration`,
-      `prev`,
-      EditKey.Step.AppKey_SetAppScope,
-      () => {
-        state.activeStep = EditKey.Step.Expiration;
-        state.keyType = `app`;
-      },
-    ],
-    [
-      `back from advanced address-scoped app key expiration`,
-      `prev`,
-      EditKey.Step.AppKey_Advanced_SetAddress,
-      () => {
-        state.activeStep = EditKey.Step.Expiration;
-        state.keyType = `app`;
-        state.appScope = `address`; // <-- advanced option
-      },
-    ],
-    [
-      `forward from website key advanced address scope`,
+      `forward from advanced address scope`,
       `next`,
-      EditKey.Step.WebsiteKey_Advanced_ChooseApp,
+      EditKey.Step.Advanced_ChooseApp,
       () => {
-        state.keyType = `website`;
-        state.activeStep = EditKey.Step.WebsiteKey_SetAppScope;
+        state.activeStep = EditKey.Step.SetAppScope;
         state.addressScope = `singleApp`; // <-- advanced option
       },
     ],
     [
-      `forward from website key advanced choose app`,
+      `forward from advanced choose app`,
       `next`,
       EditKey.Step.Expiration,
       () => {
-        state.keyType = `website`;
-        state.activeStep = EditKey.Step.WebsiteKey_Advanced_ChooseApp;
+        state.activeStep = EditKey.Step.Advanced_ChooseApp;
         state.addressScope = `singleApp`; // <-- advanced option
       },
     ],
@@ -105,11 +77,8 @@ describe(`editKeyReducer()`, () => {
   });
 
   test(`key creation flow`, () => {
-    state.keyType = `website`;
-
-    // go forward to websiteKey_setAddress
-    reducer(state, { type: `nextStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.WebsiteKey_SetAddress);
+    // new key starts on the address step
+    expect(state.activeStep).toBe(EditKey.Step.SetAddress);
 
     // update the address
     reducer(state, { type: `setAddress`, to: `goats.com` });
@@ -125,7 +94,7 @@ describe(`editKeyReducer()`, () => {
 
     // go to next step, set address scope
     reducer(state, { type: `nextStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.WebsiteKey_SetAppScope);
+    expect(state.activeStep).toBe(EditKey.Step.SetAppScope);
 
     // set app scope to unrestricted
     reducer(state, { type: `setAddressScope`, to: `unrestricted` });
@@ -165,26 +134,15 @@ describe(`editKeyReducer()`, () => {
     reducer(state, { type: `setComment`, to: `this is a comment` });
     expect(state.comment).toBe(`this is a comment`);
 
-    // now back to setKeyType
+    // now back to the first step
     reducer(state, { type: `prevStepClicked` });
     expect(state.activeStep).toBe(EditKey.Step.Expiration);
     reducer(state, { type: `prevStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.WebsiteKey_SetAppScope);
+    expect(state.activeStep).toBe(EditKey.Step.SetAppScope);
     reducer(state, { type: `prevStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.WebsiteKey_SetAddress);
-    reducer(state, { type: `prevStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.SetKeyType);
+    expect(state.activeStep).toBe(EditKey.Step.SetAddress);
 
-    // now set type toApp and go forward to appKey_chooseApp
-    reducer(state, { type: `setKeyType`, to: `app` });
-    reducer(state, { type: `nextStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.AppKey_ChooseApp);
-
-    // now back to setKeyType
-    reducer(state, { type: `prevStepClicked` });
-    expect(state.activeStep).toBe(EditKey.Step.SetKeyType);
-
-    // set the application name
+    // choosing a single app scope
     reducer(state, { type: `setAppSlug`, to: `slack` });
     expect(state.appSlug).toBe(`slack`);
 

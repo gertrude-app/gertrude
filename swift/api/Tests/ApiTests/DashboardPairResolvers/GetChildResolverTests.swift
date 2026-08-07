@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import Gertie
 import XCTest
 import XExpect
 
@@ -101,5 +102,60 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.iosDevices.count).toEqual(1)
     expect(output.iosDevices[0].id).toEqual(device.id)
     expect(output.iosDevices[0].musicConnected).toEqual(true)
+  }
+
+  func testIncludesUnrestrictedAppsAndPublicProjection() async throws {
+    let child = try await self.child()
+
+    try await self.db.create([
+      UnrestrictedMacApp(scope: .bundleId("com.apple.Safari"), childId: child.id),
+      UnrestrictedMacApp(scope: .identifiedAppSlug("chess"), childId: child.id),
+    ])
+
+    let privateKeychain = try await self.db.create(Keychain(
+      parentId: child.parent.model.id,
+      name: "private kc",
+      isPublic: false,
+    ))
+    let publicKeychain = try await self.db.create(Keychain(
+      parentId: child.parent.model.id,
+      name: "public kc",
+      isPublic: true,
+    ))
+    try await self.db.create([
+      ChildKeychain(childId: child.id, keychainId: privateKeychain.id),
+      ChildKeychain(childId: child.id, keychainId: publicKeychain.id),
+    ])
+    try await self.db.create([
+      Key(
+        keychainId: publicKeychain.id,
+        key: .skeleton(scope: .bundleId("com.public.app")),
+      ),
+      Key(
+        keychainId: publicKeychain.id,
+        key: .domain(domain: "example.com", scope: .webBrowsers),
+      ),
+      Key(
+        keychainId: privateKeychain.id,
+        key: .skeleton(scope: .bundleId("com.private.app")),
+      ),
+    ])
+
+    let output = try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+    } operation: {
+      try await GetChild.resolve(with: child.id, in: context(child.parent))
+    }
+
+    let unrestrictedScopes = (output.unrestrictedApps ?? []).map(\.scope)
+    expect(Set(unrestrictedScopes)).toEqual(
+      [.bundleId("com.apple.Safari"), .identifiedAppSlug("chess")],
+    )
+
+    expect(output.publicUnrestrictedApps.count).toEqual(1)
+    let pub = output.publicUnrestrictedApps[0]
+    expect(pub.keychainId).toEqual(publicKeychain.id)
+    expect(pub.keychainName).toEqual("public kc")
+    expect(pub.scope).toEqual(.bundleId("com.public.app"))
   }
 }

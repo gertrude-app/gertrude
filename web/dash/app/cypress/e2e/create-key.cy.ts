@@ -29,8 +29,6 @@ describe(`create key flow`, () => {
   it(`handles entered domain with subdomain correctly`, () => {
     cy.visit(`/keychains/123`);
     cy.contains(`Create key`).click();
-    cy.contains(`Grant access to a specific website`).click();
-    cy.testId(`keycreator-next-step`).click();
     cy.testId(`key-address`).type(`foo.bar.com`);
 
     cy.testId(`standard-registrable`)
@@ -84,8 +82,6 @@ describe(`create key flow`, () => {
   it(`handles entered domain with no subdomain correctly`, () => {
     cy.visit(`/keychains/123`);
     cy.contains(`Create key`).click();
-    cy.contains(`Grant access to a specific website`).click();
-    cy.testId(`keycreator-next-step`).click();
     cy.testId(`key-address`).type(`bar.com`);
 
     cy.testId(`standard-registrable`)
@@ -116,8 +112,6 @@ describe(`create key flow`, () => {
   it(`gives useful hint when entering IP address wrongly`, () => {
     cy.visit(`/keychains/123`);
     cy.contains(`Create key`).click();
-    cy.contains(`Grant access to a specific website`).click();
-    cy.testId(`keycreator-next-step`).click();
     cy.testId(`key-address`).type(`123.146.189.123`);
     cy.testId(`incorrect-ip-hint`).should(`exist`);
   });
@@ -125,8 +119,6 @@ describe(`create key flow`, () => {
   it(`ignores scheme and path if entered by user`, () => {
     cy.visit(`/keychains/123`);
     cy.contains(`Create key`).click();
-    cy.contains(`Grant access to a specific website`).click();
-    cy.testId(`keycreator-next-step`).click();
     cy.testId(`key-address`).type(`https://radsite.com/with/some-path`); // <-- 👋
     cy.testId(`keycreator-next-step`).should(`not.be.disabled`);
 
@@ -139,8 +131,6 @@ describe(`create key flow`, () => {
   it(`prevents proceeding and gives useful hint when address invalid`, () => {
     cy.visit(`/keychains/123`);
     cy.contains(`Create key`).click();
-    cy.contains(`Grant access to a specific website`).click();
-    cy.testId(`keycreator-next-step`).click();
     cy.testId(`key-address`).type(`foo`);
     cy.testId(`keycreator-next-step`).should(`be.disabled`);
   });

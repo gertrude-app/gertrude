@@ -115,6 +115,10 @@ export function interceptPql(
   output: T.GetIdentifiedApps.Output,
 ): void;
 export function interceptPql(
+  slug: `GetInstalledMacApps`,
+  output: T.GetInstalledMacApps.Output,
+): void;
+export function interceptPql(
   slug: `GetMusicAlbumCuration`,
   output: T.GetMusicAlbumCuration.Output,
 ): void;
@@ -204,6 +208,18 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `SaveKey`, output: T.SaveKey.Output): void;
 export function interceptPql(slug: `SaveKeychain`, output: T.SaveKeychain.Output): void;
+export function interceptPql(
+  slug: `SaveMacappApps`,
+  output: T.SaveMacappApps.Output,
+): void;
+export function interceptPql(
+  slug: `SaveMacappFiltering`,
+  output: T.SaveMacappFiltering.Output,
+): void;
+export function interceptPql(
+  slug: `SaveMacappMonitoring`,
+  output: T.SaveMacappMonitoring.Output,
+): void;
 export function interceptPql(
   slug: `SaveMusicAlbumCuration`,
   output: T.SaveMusicAlbumCuration.Output,
@@ -299,6 +315,7 @@ export function forcePqlErr(
     | `GetIOSDeviceSupervisionStatus`
     | `GetIOSDevice_v2`
     | `GetIdentifiedApps`
+    | `GetInstalledMacApps`
     | `GetMusicAlbumCuration`
     | `GetMusicClaimData`
     | `GetMusicCuration`
@@ -326,6 +343,9 @@ export function forcePqlErr(
     | `SaveExtendedSupervisionControls`
     | `SaveKey`
     | `SaveKeychain`
+    | `SaveMacappApps`
+    | `SaveMacappFiltering`
+    | `SaveMacappMonitoring`
     | `SaveMusicAlbumCuration`
     | `SaveNotification`
     | `SaveUser`

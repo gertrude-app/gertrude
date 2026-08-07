@@ -34,7 +34,7 @@ const WebsiteKeyAppScopeStep: React.FC<Props> = ({
       </h2>
     }
     activeStep={activeStep}
-    ownStep={EditKey.Step.WebsiteKey_SetAppScope}
+    ownStep={EditKey.Step.SetAppScope}
     canAdvance
   >
     <div>

@@ -29,7 +29,7 @@ const KeyCreationStep: React.FC<Props> = ({
   update,
 }) => {
   const open = ownStep === activeStep;
-  const isFirst = ownStep === EditKey.Step.SetKeyType;
+  const isFirst = ownStep === EditKey.Step.SetAddress;
   const isLast = ownStep === EditKey.Step.Comment;
   const isActive = ownStep === activeStep;
   const isBeforeActive = ownStep < activeStep;
@@ -98,7 +98,7 @@ const KeyCreationStep: React.FC<Props> = ({
                     isFirst ? `justify-end` : `justify-between`,
                   )}
                 >
-                  {ownStep > EditKey.Step.SetKeyType && (
+                  {ownStep > EditKey.Step.SetAddress && (
                     <Button
                       type="button"
                       onClick={() => update({ type: `prevStepClicked` })}

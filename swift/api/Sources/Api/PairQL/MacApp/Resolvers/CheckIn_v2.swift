@@ -7,7 +7,7 @@ extension CheckIn_v2: Resolver {
     async let appManifest = getCachedAppIdManifest()
     async let parent = context.child.parent(in: context.db)
     async let browsers = Browser.query().all(in: context.db)
-    async let blockedApps = context.child.blockedApps(in: context.db)
+    async let blockedApps = context.child.blockedMacApps(in: context.db)
     async let keychains = loadRuleKeychains(in: context)
     async let alwaysBlocked = loadAlwaysBlockedRules(in: context)
 
@@ -73,6 +73,7 @@ private extension CheckIn_v2 {
     in context: MacApp.ChildContext,
   ) async throws -> [RuleKeychain] {
     var keychains = try await ruleKeychains(for: context.child.id, in: context.db)
+    try await self.appendUnrestrictedAppKeychains(to: &keychains, in: context)
     try await self.appendAutoIncludedKeychain(to: &keychains, in: context)
     return keychains
   }
@@ -119,6 +120,32 @@ private extension CheckIn_v2 {
       id: autoId,
       keys: autoKeys.map { .init(id: $0.id.rawValue, key: $0.key) },
     ))
+  }
+
+  static func appendUnrestrictedAppKeychains(
+    to keychains: inout [RuleKeychain],
+    in context: MacApp.ChildContext,
+  ) async throws {
+    let unrestricted = try await context.child.unrestrictedMacApps(in: context.db)
+    guard !unrestricted.isEmpty else { return }
+
+    // group all unscheduled into one synthetic keychain for small perf/complexity win
+    let unscheduled = unrestricted.filter { $0.schedule == nil }
+    if !unscheduled.isEmpty {
+      keychains.append(.init(
+        id: context.child.id.rawValue,
+        keys: unscheduled.map { .init(id: $0.id.rawValue, key: .skeleton(scope: $0.scope)) },
+      ))
+    }
+
+    // wrap each scheduled in own synthetic keychain
+    for row in unrestricted where row.schedule != nil {
+      keychains.append(.init(
+        id: row.id.rawValue,
+        schedule: row.schedule,
+        keys: [.init(id: row.id.rawValue, key: .skeleton(scope: row.scope))],
+      ))
+    }
   }
 
   static func syncComputerUser(

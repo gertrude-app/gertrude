@@ -52,3 +52,8 @@ all notes.
   plan, ends on the dashboard root, claims devices for accounts that can't use them) to
   qualify for the 3.1.3(f) companion exemption after a 3.1.1 rejection. Read before
   "fixing" any of it.
+
+- **[011 — Giving "app has unrestricted internet" a real home](./011-app-unrestrict-data-model.md)**
+  — first-class child-scoped unrestricted-app model (near-mirror of the blocked-app
+  model) replacing the emergent keychain/key projection; legacy keychain shape is
+  synthesized back at the Mac-app wire boundary so the wire contract is unchanged.

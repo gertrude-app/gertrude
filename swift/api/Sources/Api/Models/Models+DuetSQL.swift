@@ -29,6 +29,7 @@ extension Parent.NotificationMethod.Config: PostgresJsonable {}
 extension Gertie.Key: @retroactive PostgresJsonable {}
 
 extension AppScope: @retroactive PostgresJsonable {}
+extension AppScope.Single: @retroactive PostgresJsonable {}
 
 extension RuleSchedule: @retroactive PostgresJsonable {}
 extension PlainTimeWindow: @retroactive PostgresJsonable {}

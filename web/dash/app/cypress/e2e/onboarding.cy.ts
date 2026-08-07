@@ -15,6 +15,7 @@ describe(`dashboard onboarding nudges`, () => {
     keychains: [],
     computers: [],
     iosDevices: [],
+    publicUnrestrictedApps: [],
     availableAlwaysBlockedGroups: [],
     alwaysBlockedGroupIds: [],
     customAlwaysBlockedRules: [],

@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
+import type { AppEntry, UnlockEntry } from '../unlock';
 import type { UnlockRequest } from '@dash/types';
 import {
+  appIdentity,
+  groupRequestsByApp,
   groupRequestsByKey,
   keyForUnlockRequest,
   keyIdentity,
@@ -289,5 +292,205 @@ describe(`naughtyInfo()`, () => {
       request({ id: `1`, domain: `googleads.g.doubleclick.net` }),
     ]);
     expect(naughtyInfo(groups[0]!)?.level).toBe(`deny`);
+  });
+});
+
+function appEntry(entry: UnlockEntry | undefined): AppEntry {
+  expect(entry?.kind).toBe(`app`);
+  return entry as AppEntry;
+}
+
+describe(`appIdentity()`, () => {
+  test(`returns null for webBrowsers scope`, () => {
+    const key = keyForUnlockRequest({
+      domain: `example.com`,
+      appCategories: [`browser`],
+      appBundleId: `.com.apple.Safari`,
+    });
+    expect(appIdentity(key)).toBeNull();
+  });
+
+  test(`returns slug identity for identifiedAppSlug scope`, () => {
+    const key = keyForUnlockRequest({
+      domain: `unity.com`,
+      appCategories: [],
+      appSlug: `unity-hub`,
+    });
+    expect(appIdentity(key)).toEqual({ id: `slug:unity-hub`, slug: `unity-hub` });
+  });
+
+  test(`returns bundle identity for bundleId scope`, () => {
+    const key = keyForUnlockRequest({
+      domain: `unity.com`,
+      appCategories: [],
+      appBundleId: `com.unity.hub`,
+    });
+    expect(appIdentity(key)).toEqual({
+      id: `bundle:com.unity.hub`,
+      bundleId: `com.unity.hub`,
+    });
+  });
+});
+
+describe(`groupRequestsByApp()`, () => {
+  test(`browser requests stay as 1:1 web entries`, () => {
+    const entries = groupRequestsByApp([
+      request({ id: `1`, domain: `khanacademy.org` }),
+      request({ id: `2`, domain: `wikipedia.org` }),
+    ]);
+
+    expect(entries).toHaveLength(2);
+    expect(entries.every((e) => e.kind === `web`)).toBe(true);
+  });
+
+  test(`collapses one app's many hosts into a single app super-group`, () => {
+    const entries = groupRequestsByApp([
+      request({
+        id: `1`,
+        domain: `docs.unity.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }),
+      request({
+        id: `2`,
+        domain: `assets.unity3d.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }),
+      request({
+        id: `3`,
+        domain: `cdn.cloudunity.net`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }),
+    ]);
+
+    expect(entries).toHaveLength(1); // whack-a-mole collapsed
+    const app = appEntry(entries[0]);
+    expect(app.id).toBe(`app:slug:unity-hub`);
+    expect(app.hostGroups).toHaveLength(3); // one per distinct host
+  });
+
+  test(`different apps produce different app entries`, () => {
+    const entries = groupRequestsByApp([
+      request({ id: `1`, domain: `unity.com`, appCategories: [], appSlug: `unity-hub` }),
+      request({
+        id: `2`,
+        domain: `minecraft.net`,
+        appCategories: [],
+        appSlug: `minecraft`,
+      }),
+    ]);
+
+    expect(entries).toHaveLength(2);
+    expect(entries.map((e) => e.id)).toEqual([
+      `app:slug:unity-hub`,
+      `app:slug:minecraft`,
+    ]);
+  });
+
+  test(`slug identity collapses across differing bundle ids`, () => {
+    const entries = groupRequestsByApp([
+      request({
+        id: `1`,
+        domain: `unity.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+        appBundleId: `com.unity.hub`,
+      }),
+      request({
+        id: `2`,
+        domain: `unity3d.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+        appBundleId: `TEAMID.com.unity.hub`,
+      }),
+    ]);
+
+    expect(entries).toHaveLength(1); // slug wins over bundle-variant
+    expect(appEntry(entries[0]).hostGroups).toHaveLength(2); // two distinct hosts, one app
+  });
+
+  test(`groups by bundleId when no slug is present`, () => {
+    const entries = groupRequestsByApp([
+      request({
+        id: `1`,
+        domain: `a.example.com`,
+        appCategories: [],
+        appBundleId: `com.some.app`,
+      }),
+      request({
+        id: `2`,
+        domain: `b.example.com`,
+        appCategories: [],
+        appBundleId: `com.some.app`,
+      }),
+    ]);
+
+    expect(entries).toHaveLength(1);
+    expect(appEntry(entries[0]).id).toBe(`app:bundle:com.some.app`);
+  });
+
+  test(`preserves first-seen order across mixed web and app entries`, () => {
+    const entries = groupRequestsByApp([
+      request({ id: `1`, domain: `khanacademy.org` }), // web
+      request({
+        id: `2`,
+        domain: `docs.unity.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }), // app
+      request({ id: `3`, domain: `wikipedia.org` }), // web
+      request({
+        id: `4`,
+        domain: `assets.unity3d.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }), // same app
+    ]);
+
+    expect(entries.map((e) => e.kind)).toEqual([`web`, `app`, `web`]); // unity folds into entry #2
+    expect(appEntry(entries[1]).hostGroups).toHaveLength(2);
+  });
+
+  test(`app entry carries name, slug, bundleId, and icon hash from representative`, () => {
+    const entries = groupRequestsByApp([
+      request({
+        id: `1`,
+        domain: `unity.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+        appBundleId: `com.unity.hub`,
+        appName: `Unity Hub`,
+        appIconHash: `abc123`,
+      }),
+    ]);
+
+    const app = appEntry(entries[0]);
+    expect(app.appName).toBe(`Unity Hub`);
+    expect(app.appSlug).toBe(`unity-hub`);
+    expect(app.appBundleId).toBe(`com.unity.hub`);
+    expect(app.appIconHash).toBe(`abc123`);
+  });
+
+  test(`app super-group host groups keep their merged duplicates`, () => {
+    const entries = groupRequestsByApp([
+      request({
+        id: `1`,
+        domain: `docs.unity.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }),
+      request({
+        id: `2`,
+        domain: `docs.unity.com`,
+        appCategories: [],
+        appSlug: `unity-hub`,
+      }),
+    ]);
+
+    const app = appEntry(entries[0]);
+    expect(app.hostGroups).toHaveLength(1); // same host merges to one host group
+    expect(app.hostGroups[0]?.allRequests).toHaveLength(2);
   });
 });

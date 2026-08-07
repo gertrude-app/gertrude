@@ -48,7 +48,7 @@ export type BillingStatus =
   | { case: 'current'; renewsAt: ISODateString }
   | { case: 'pastDue'; since: ISODateString };
 
-export interface BlockedApp {
+export interface BlockedMacApp {
   id: UUID;
   identifier: string;
   schedule?: RuleSchedule;
@@ -80,7 +80,9 @@ export interface Child {
   downtime?: PlainTimeWindow;
   computers: ChildComputer[];
   iosDevices: ChildIOSDevice[];
-  blockedApps?: BlockedApp[];
+  blockedApps?: BlockedMacApp[];
+  unrestrictedApps?: UnrestrictedMacApp[];
+  publicUnrestrictedApps: PublicUnrestrictedMacApp[];
   availableAlwaysBlockedGroups: Array<{
     id: UUID;
     name: string;
@@ -237,6 +239,13 @@ export type PlanStatus =
   | { case: 'free' }
   | { case: 'complimentary' };
 
+export interface PublicUnrestrictedMacApp {
+  keychainId: UUID;
+  keychainName: string;
+  scope: SingleAppScope;
+  schedule?: RuleSchedule;
+}
+
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
 export type RequestStatus = 'pending' | 'accepted' | 'rejected';
@@ -307,8 +316,15 @@ export interface UnlockRequest {
   appName?: string;
   appSlug?: string;
   appBundleId?: string;
+  appIconHash?: string;
   appCategories: string[];
   createdAt: ISODateString;
+}
+
+export interface UnrestrictedMacApp {
+  id: UUID;
+  scope: SingleAppScope;
+  schedule?: RuleSchedule;
 }
 
 export type UserActivityItem =

@@ -63,7 +63,6 @@ export function anySubdomainKey(
 export function keyState(overrides: Partial<EditKey.State> = {}): EditKey.State {
   return {
     ...newKeyState(`key-id`, `keychain-id`),
-    keyType: `website`,
     ...overrides,
   };
 }

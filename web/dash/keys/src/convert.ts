@@ -40,20 +40,18 @@ export function toState(keyRecord: Key): EditKey.State {
 
   if (key.scope.type === `unrestricted`) {
     state.addressScope = `unrestricted`;
-    state.keyType = `website`;
     setAddressFields(key, state);
     return state;
   }
 
   if (key.scope.type === `webBrowsers`) {
     state.addressScope = `webBrowsers`;
-    state.keyType = `website`;
     setAddressFields(key, state);
     return state;
   }
 
   state.addressScope = `singleApp`;
-  state.keyType = `app`;
+  state.showAdvancedAddressScopeOptions = true;
   if (key.scope.single.type === `bundleId`) {
     state.appBundleId = key.scope.single.bundleId;
     state.appIdentificationType = `bundleId`;
@@ -65,47 +63,9 @@ export function toState(keyRecord: Key): EditKey.State {
 }
 
 export function toKeyRecord(state?: EditKey.State): Key | null {
-  if (!state?.keyType) {
+  if (!state) {
     return null;
   }
-  return state.keyType === `website`
-    ? websiteKeyToKeyRecord(state)
-    : appKeyToKeyRecord(state);
-}
-
-function setAddressFields(key: SharedKey, state: EditKey.State): void {
-  if (key.type === `domain`) {
-    state.addressType = `strict`;
-    state.address = key.domain;
-  } else if (key.type === `anySubdomain`) {
-    state.addressType = `standard`;
-    state.address = key.domain;
-  } else if (key.type === `domainRegex`) {
-    state.addressType = `domainRegex`;
-    state.address = key.pattern;
-    state.showAdvancedAddressOptions = true;
-  } else if (key.type === `ipAddress`) {
-    state.addressType = `ip`;
-    state.address = key.ipAddress;
-    state.showAdvancedAddressOptions = true;
-  }
-}
-
-function toSkeleton(key: SharedKey, state: EditKey.State): EditKey.State {
-  state.keyType = `app`;
-  state.appScope = `unrestricted`;
-  state.addressScope = `singleApp`;
-  if (key.scope.type === `bundleId`) {
-    state.appIdentificationType = `bundleId`;
-    state.appBundleId = key.scope.bundleId;
-  } else if (key.scope.type === `identifiedAppSlug`) {
-    state.appIdentificationType = `slug`;
-    state.appSlug = key.scope.identifiedAppSlug;
-  }
-  return state;
-}
-
-function websiteKeyToKeyRecord(state: EditKey.State): Key | null {
   const address = domain.sanitizeUserInput(state.address);
   const tmpScope: AppScope = { type: `webBrowsers` };
   let key: SharedKey = { type: `domain`, domain: ``, scope: tmpScope };
@@ -149,43 +109,48 @@ function websiteKeyToKeyRecord(state: EditKey.State): Key | null {
   };
 }
 
-function appKeyToKeyRecord(state: EditKey.State): Key | null {
-  if (state.appScope === `unrestricted`) {
-    const single = singleAppScope(state);
-    if (!single) return null;
-    return {
-      id: state.id,
-      keychainId: state.keychainId,
-      key: { type: `skeleton`, scope: single },
-      comment: state.comment,
-      expiration: state.expiration,
-    };
-  } else {
-    return websiteKeyToKeyRecord(state);
+function setAddressFields(key: SharedKey, state: EditKey.State): void {
+  if (key.type === `domain`) {
+    state.addressType = `strict`;
+    state.address = key.domain;
+  } else if (key.type === `anySubdomain`) {
+    state.addressType = `standard`;
+    state.address = key.domain;
+  } else if (key.type === `domainRegex`) {
+    state.addressType = `domainRegex`;
+    state.address = key.pattern;
+    state.showAdvancedAddressOptions = true;
+  } else if (key.type === `ipAddress`) {
+    state.addressType = `ip`;
+    state.address = key.ipAddress;
+    state.showAdvancedAddressOptions = true;
   }
 }
 
+function toSkeleton(key: SharedKey, state: EditKey.State): EditKey.State {
+  state.addressScope = `singleApp`;
+  if (key.scope.type === `bundleId`) {
+    state.appIdentificationType = `bundleId`;
+    state.appBundleId = key.scope.bundleId;
+  } else if (key.scope.type === `identifiedAppSlug`) {
+    state.appIdentificationType = `slug`;
+    state.appSlug = key.scope.identifiedAppSlug;
+  }
+  return state;
+}
+
 function appScope(state: EditKey.State): AppScope | null {
-  if (state.keyType === `website`) {
-    switch (state.addressScope) {
-      case `webBrowsers`:
-        return { type: `webBrowsers` };
-      case `unrestricted`:
-        return { type: `unrestricted` };
-      case `singleApp`: {
-        const single = singleAppScope(state);
-        if (!single) {
-          return null;
-        }
-        return { type: `single`, single };
+  switch (state.addressScope) {
+    case `webBrowsers`:
+      return { type: `webBrowsers` };
+    case `unrestricted`:
+      return { type: `unrestricted` };
+    case `singleApp`: {
+      const single = singleAppScope(state);
+      if (!single) {
+        return null;
       }
-    }
-  } else {
-    switch (state.appScope) {
-      case `unrestricted`:
-        return { type: `unrestricted` };
-      case `address`:
-        return appScope({ ...state, keyType: `website` });
+      return { type: `single`, single };
     }
   }
 }

@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { RequestStatus, SharedKey, SuccessOutput } from '../shared';
+import type { RequestStatus, SharedKey, SingleAppScope, SuccessOutput } from '../shared';
 
 export namespace HandleUnlockRequests {
   export interface Input {
@@ -12,6 +12,7 @@ export namespace HandleUnlockRequests {
         comment?: string;
         expiration?: ISODateString;
       };
+      grantAppScope?: SingleAppScope;
       responseComment?: string;
     }>;
     duplicateRequestIds: UUID[];

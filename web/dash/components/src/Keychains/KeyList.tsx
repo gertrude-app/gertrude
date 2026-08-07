@@ -1,22 +1,31 @@
+import { toState } from '@dash/keys';
 import cx from 'classnames';
 import React from 'react';
 import type { Key as KeyType } from '@dash/types';
 import Key from './KeyListKey';
 
+type AppRef = {
+  slug: string;
+  name: string;
+  bundleIds?: Array<{ bundleId: string }>;
+};
+
 type Props = {
   keys: KeyType[];
+  apps?: AppRef[];
   editKey(id: UUID): unknown;
   deleteKey(id: UUID): unknown;
   viewMode: `list` | `table`;
 };
 
-const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (
+const KeyList: React.FC<Props> = ({ keys, apps, editKey, deleteKey, viewMode }) => (
   <div className="bg-slate-100 border border-slate-200 rounded-t-none border-t-0 rounded-3xl p-6 lg:p-8 flex flex-col">
     <div className={cx(viewMode === `table` && `xl:hidden`)}>
       {keys.map((key) => (
         <Key
           key={key.id}
           record={key}
+          appName={resolveAppName(key, apps)}
           onClick={() => editKey(key.id)}
           onDelete={() => deleteKey(key.id)}
           type="list"
@@ -39,6 +48,7 @@ const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (
         <Key
           key={key.id}
           record={key}
+          appName={resolveAppName(key, apps)}
           onClick={() => editKey(key.id)}
           onDelete={() => deleteKey(key.id)}
           type="table"
@@ -47,6 +57,21 @@ const KeyList: React.FC<Props> = ({ keys, editKey, deleteKey, viewMode }) => (
     </div>
   </div>
 );
+
+function resolveAppName(record: KeyType, apps?: AppRef[]): string | undefined {
+  if (!apps || apps.length === 0) return undefined;
+  const key = toState(record);
+  if (key.addressScope !== `singleApp`) return undefined;
+  if (key.appSlug) {
+    return apps.find((a) => a.slug === key.appSlug)?.name;
+  }
+  if (key.appBundleId) {
+    return apps.find((a) =>
+      (a.bundleIds ?? []).some((b) => b.bundleId === key.appBundleId),
+    )?.name;
+  }
+  return undefined;
+}
 
 export default KeyList;
 

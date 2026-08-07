@@ -25,6 +25,7 @@ export function child(id: UUID): Child {
     keychains: [],
     computers: [],
     iosDevices: [],
+    publicUnrestrictedApps: [],
     availableAlwaysBlockedGroups: [],
     alwaysBlockedGroupIds: [],
     customAlwaysBlockedRules: [],

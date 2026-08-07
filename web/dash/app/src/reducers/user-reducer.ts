@@ -6,6 +6,7 @@ import type {
   Child,
   PlainTimeWindow,
   RuleSchedule,
+  SingleAppScope,
   UserKeychainSummary,
 } from '@dash/types';
 import { commit, editable } from '../lib/helpers';
@@ -33,7 +34,10 @@ export type Action =
   | { type: `updateNewBlockedAppIdentifier`; identifier: string }
   | { type: `removeBlockedApp`; id: UUID }
   | { type: `addNewBlockedApp` }
+  | { type: `addBlockedApps`; identifiers: string[] }
   | { type: `setBlockedAppSchedule`; id: UUID; schedule?: RuleSchedule }
+  | { type: `addUnrestrictedApps`; scopes: SingleAppScope[] }
+  | { type: `removeUnrestrictedApp`; id: UUID }
   | { type: `setKeychainSchedule`; id: UUID; schedule?: RuleSchedule }
   | { type: `addKeychain`; keychain: UserKeychainSummary }
   | { type: `setAddingKeychainSchedule`; schedule?: RuleSchedule }
@@ -94,8 +98,25 @@ function reducer(state: State, action: Action): State | undefined {
         state.newBlockedAppIdentifier = ``;
       }
       return;
+    case `addBlockedApps`:
+      state.child.draft.blockedApps = [
+        ...(state.child.draft.blockedApps ?? []),
+        ...action.identifiers.map((identifier) => ({ id: uuid(), identifier })),
+      ];
+      return;
     case `removeBlockedApp`:
       state.child.draft.blockedApps = state.child.draft.blockedApps?.filter(
+        (app) => app.id !== action.id,
+      );
+      return;
+    case `addUnrestrictedApps`:
+      state.child.draft.unrestrictedApps = [
+        ...(state.child.draft.unrestrictedApps ?? []),
+        ...action.scopes.map((scope) => ({ id: uuid(), scope })),
+      ];
+      return;
+    case `removeUnrestrictedApp`:
+      state.child.draft.unrestrictedApps = state.child.draft.unrestrictedApps?.filter(
         (app) => app.id !== action.id,
       );
       return;

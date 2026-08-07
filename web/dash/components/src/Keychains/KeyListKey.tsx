@@ -8,17 +8,20 @@ import { TrashBtn } from '../Forms';
 
 interface Props {
   record: KeyType;
+  appName?: string;
   onClick(): unknown;
   onDelete(): unknown;
   type: `list` | `table`;
 }
 
-const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
+const Key: React.FC<Props> = ({ record, appName, onClick, onDelete, type }) => {
   const key = toState(record);
+  const isSkeleton = record.key.type === `skeleton`;
+  const handleClick = isSkeleton ? () => {} : onClick;
   let scope = ``;
   switch (key.addressScope) {
     case `singleApp`:
-      scope = (key.appSlug || key.appBundleId) as string;
+      scope = appName || ((key.appSlug || key.appBundleId) as string);
       break;
     case `unrestricted`:
       scope = `all apps`;
@@ -31,8 +34,11 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
   if (type === `list`) {
     return (
       <div
-        className="py-3 px-4 rounded-xl odd:bg-slate-50 hover:bg-slate-200 cursor-pointer transition-[background-color] duration-100 flex justify-between"
-        onClick={onClick}
+        className={cx(
+          `py-3 px-4 rounded-xl odd:bg-slate-50 hover:bg-slate-200 transition-[background-color] duration-100 flex justify-between`,
+          !isSkeleton && `cursor-pointer`,
+        )}
+        onClick={handleClick}
       >
         <div className="flex-grow relative overflow-x-hidden flex items-center">
           <p className="text-slate-600 font-medium whitespace-nowrap">
@@ -40,10 +46,10 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
               <span
                 className={cx(
                   `text-slate-900 font-bold px-1 rounded py-0.5 mr-0.5`,
-                  key.keyType === `website` ? `bg-fuchsia-200` : `bg-violet-200`,
+                  isSkeleton ? `bg-violet-200` : `bg-fuchsia-200`,
                 )}
               >
-                {key.keyType === `website` ? `Website` : `App`} key
+                {isSkeleton ? `App` : `Website`} key
               </span>
               {` `}unlocking{` `}
             </span>
@@ -69,7 +75,10 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
               {` `}for{` `}
               <span
                 className={cx(
-                  key.addressScope === `singleApp` && !key.appSlug && `font-mono px-1`,
+                  key.addressScope === `singleApp` &&
+                    !key.appSlug &&
+                    !appName &&
+                    `font-mono px-1`,
                   `font-bold text-slate-800 underline underline-offset-2 decoration-fuchsia-500`,
                 )}
               >
@@ -95,17 +104,17 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
   }
   return (
     <>
-      <TableCell onClick={onClick} className={cx(`flex justify-center items-center`)}>
+      <TableCell onClick={handleClick} className={cx(`flex justify-center items-center`)}>
         <span
           className={cx(
             `rounded-full px-4 py-0.5 font-medium text-white`,
-            key.keyType === `website` ? `bg-fuchsia-400` : ` bg-violet-400`,
+            isSkeleton ? `bg-violet-400` : `bg-fuchsia-400`,
           )}
         >
-          {key.keyType === `website` ? `Website` : `App`}
+          {isSkeleton ? `App` : `Website`}
         </span>
       </TableCell>
-      <TableCell onClick={onClick} className="max-w-[280px] overflow-hidden relative">
+      <TableCell onClick={handleClick} className="max-w-[280px] overflow-hidden relative">
         <div className="absolute h-full w-12 top-auto bottom-0 right-0 rounded-r-lg bg-gradient-to-r from-transparent via-slate-50 to-slate-50" />
         <span
           className={cx(
@@ -126,13 +135,13 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
           )}
         </span>
       </TableCell>
-      <TableCell onClick={onClick} className="relative">
+      <TableCell onClick={handleClick} className="relative">
         <div className="absolute h-full w-12 top-auto bottom-0 right-0 rounded-r-lg bg-gradient-to-r from-transparent via-slate-50 to-slate-50" />
         <span className="underline decoration-fuchsia-500 underline-offset-2 font-semibold whitespace-nowrap">
           {scope}
         </span>
       </TableCell>
-      <TableCell onClick={onClick} className="flex">
+      <TableCell onClick={handleClick} className="flex">
         <span
           className={cx(
             `font-medium italic`,
@@ -148,12 +157,12 @@ const Key: React.FC<Props> = ({ record, onClick, onDelete, type }) => {
             : `none`}
         </span>
       </TableCell>
-      <TableCell onClick={onClick} className="px-1 bg-transparent border-none">
+      <TableCell onClick={handleClick} className="px-1 bg-transparent border-none">
         <Button type="button" onClick={onDelete} color="warning" size="small">
           Delete
         </Button>
       </TableCell>
-      <TableCell onClick={onClick} className="pl-1 bg-transparent border-none">
+      <TableCell onClick={handleClick} className="pl-1 bg-transparent border-none">
         {key.expiration && <ClockIcon className="w-5 shrink-0 text-slate-400" />}
       </TableCell>
     </>

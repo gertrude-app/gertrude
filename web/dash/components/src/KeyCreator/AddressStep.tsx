@@ -7,7 +7,6 @@ import AddressTypeHint from './AddressTypeHint';
 import KeyCreationStep from './KeyCreationStep';
 
 interface Props {
-  keyType: `app` | `website`;
   mode: `edit` | `create`;
   activeStep: EditKey.Step;
   address: string;
@@ -19,7 +18,6 @@ interface Props {
 
 const AddressStep: React.FC<Props> = ({
   mode,
-  keyType,
   activeStep,
   address,
   addressType,
@@ -35,15 +33,11 @@ const AddressStep: React.FC<Props> = ({
     title={
       <h2 className="font-medium text-slate-900 text-lg max-w-[calc(100%-25px)] overflow-hidden flex items-center space-x-2">
         <GradientIcon icon="unlock" className="mr-2" size="small" />
-        <span>{keyType === `website` ? `Unlocking ` : `Address `}</span>
+        <span>Unlocking </span>
         {address.trim() !== `` && <UserInputText>{address}</UserInputText>}
       </h2>
     }
-    ownStep={
-      keyType === `website`
-        ? EditKey.Step.WebsiteKey_SetAddress
-        : EditKey.Step.AppKey_Advanced_SetAddress
-    }
+    ownStep={EditKey.Step.SetAddress}
     activeStep={activeStep}
     canAdvance={validate.address(address, addressType)}
   >

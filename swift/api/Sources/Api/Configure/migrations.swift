@@ -117,6 +117,8 @@ extension Configure {
     app.migrations.add(AppStoreMusicApp())
     app.migrations.add(AddChildRelationship())
     app.migrations.add(AddMusicTrackGrants())
+    app.migrations.add(CreateUnrestrictedMacApps())
+    app.migrations.add(BackfillUnrestrictedMacApps())
   }
 }
 

@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 export const CreateStart: Story = props({
   id: `1`,
   isNew: true,
-  activeStep: EditKey.Step.SetKeyType,
+  activeStep: EditKey.Step.SetAddress,
   keychainId: `kc1`,
   address: ``,
   addressType: `standard`,
@@ -22,7 +22,6 @@ export const CreateStart: Story = props({
   appIdentificationType: `slug`,
   showAdvancedAddressOptions: false,
   showAdvancedAddressScopeOptions: false,
-  appScope: `unrestricted`,
   update: () => {},
   apps: [
     { slug: `slack`, name: `Slack` },
@@ -38,16 +37,14 @@ export const CreateStart: Story = props({
 // @screenshot xs/600,md/550
 export const CreateAddressType: Story = props({
   ...CreateStart.args,
-  keyType: `website`,
-  activeStep: EditKey.Step.WebsiteKey_SetAddress,
+  activeStep: EditKey.Step.SetAddress,
   address: `goats.com`,
 });
 
 export const CreateStrictAddressType: Story = props({
   ...CreateStart.args,
   addressType: `strict`,
-  keyType: `website`,
-  activeStep: EditKey.Step.WebsiteKey_SetAddress,
+  activeStep: EditKey.Step.SetAddress,
   address: `goats.com`,
 });
 
@@ -55,15 +52,13 @@ export const CreateStrictAddressType: Story = props({
 export const CreateAddressScope: Story = props({
   ...CreateStart.args,
   addressType: `standard`,
-  keyType: `website`,
-  activeStep: EditKey.Step.WebsiteKey_SetAppScope,
+  activeStep: EditKey.Step.SetAppScope,
   address: `goats.com`,
 });
 
 export const CreateExpirationOff: Story = props({
   ...CreateStart.args,
   addressType: `standard`,
-  keyType: `website`,
   activeStep: EditKey.Step.Expiration,
   address: `goats.com`,
 });
@@ -72,7 +67,6 @@ export const CreateExpirationOff: Story = props({
 export const CreateExpiration: Story = props({
   ...CreateStart.args,
   addressType: `standard`,
-  keyType: `website`,
   activeStep: EditKey.Step.Expiration,
   expiration: time.stable(),
   address: `goats.com`,
@@ -81,7 +75,6 @@ export const CreateExpiration: Story = props({
 // @screenshot xs/600,md/550
 export const EditComment: Story = props({
   ...CreateExpiration.args,
-  keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.None,
   expiration: undefined,
@@ -91,7 +84,6 @@ export const EditComment: Story = props({
 
 export const EditNoComment: Story = props({
   ...CreateExpiration.args,
-  keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.None,
   isNew: false,
@@ -99,7 +91,6 @@ export const EditNoComment: Story = props({
 
 export const EditHasExpiration: Story = props({
   ...CreateExpiration.args,
-  keyType: `website`,
   address: `goats.com`,
   activeStep: EditKey.Step.None,
   expiration: time.adding({ days: 7 }),
@@ -109,90 +100,35 @@ export const EditHasExpiration: Story = props({
 // @screenshot xs/600,md/550
 export const EditStepOpen: Story = props({
   ...CreateExpiration.args,
-  keyType: `website`,
   address: `goats.com`,
-  activeStep: EditKey.Step.WebsiteKey_SetAddress,
+  activeStep: EditKey.Step.SetAddress,
   expiration: time.adding({ days: 7 }),
   isNew: false,
 });
 
-export const CreateApp: Story = props({
-  ...CreateStart.args,
-  keyType: `app`,
-  activeStep: EditKey.Step.SetKeyType,
-  address: `goats.com`,
-  appIdentificationType: `slug`,
-  appSlug: `slack`,
-});
-
-// @screenshot xs/600,md/550
-export const CreateAppSlug: Story = props({
-  ...CreateApp.args,
-  activeStep: EditKey.Step.AppKey_ChooseApp,
-});
-
-export const CreateAppBundleId: Story = props({
-  ...CreateApp.args,
-  activeStep: EditKey.Step.AppKey_ChooseApp,
-  appIdentificationType: `bundleId`,
-  appBundleId: `com.goats.app`,
-});
-
-// @screenshot xs/600,md/550
-export const CreateAppScope: Story = props({
-  ...CreateAppSlug.args,
-  activeStep: EditKey.Step.AppKey_SetAppScope,
-});
-
-export const CreateAppExpiration: Story = props({
-  ...CreateAppSlug.args,
-  activeStep: EditKey.Step.Expiration,
-});
-
-export const CreateAppComment: Story = props({
-  ...CreateAppSlug.args,
-  activeStep: EditKey.Step.Comment,
-});
-
-// @screenshot xs/600,md/550
-export const AppKeyAddressScope: Story = props({
-  ...CreateApp.args,
-  keyType: `app`,
-  appScope: `address`,
-  activeStep: EditKey.Step.AppKey_Advanced_SetAddress,
-});
-
-export const EditAppKeyBundleId: Story = props({
-  ...CreateApp.args,
-  isNew: false,
-  keyType: `app`,
-  activeStep: EditKey.Step.None,
-  appBundleId: `com.unknown.app`,
-  appSlug: undefined,
-  appIdentificationType: `bundleId`,
-});
-
-export const EditAppKeyAddressScope: Story = props({
-  ...CreateApp.args,
-  isNew: false,
-  keyType: `app`,
-  appScope: `address`,
-  activeStep: EditKey.Step.None,
-});
-
 // @screenshot xs/600,md/550
 export const WebKeyAppScope: Story = props({
-  ...CreateApp.args,
-  keyType: `website`,
-  appScope: `address`,
+  ...CreateStart.args,
+  address: `goats.com`,
+  appSlug: `slack`,
   addressScope: `singleApp`,
-  activeStep: EditKey.Step.WebsiteKey_Advanced_ChooseApp,
+  showAdvancedAddressScopeOptions: true,
+  activeStep: EditKey.Step.Advanced_ChooseApp,
 });
 
 export const EditWebKeyAppScope: Story = props({
   ...WebKeyAppScope.args,
   isNew: false,
   activeStep: EditKey.Step.None,
+});
+
+export const EditWebKeyBundleId: Story = props({
+  ...WebKeyAppScope.args,
+  isNew: false,
+  activeStep: EditKey.Step.None,
+  appBundleId: `com.unknown.app`,
+  appSlug: undefined,
+  appIdentificationType: `bundleId`,
 });
 
 export default meta;
