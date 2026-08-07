@@ -75,7 +75,7 @@ run_cypress_dashboard() {
 
   (cd "$root/web" \
     && DASH_PORT="$dash_port" \
-       CYPRESS_CLAIM_CODE="$claim_code" \
+       CYPRESS_CLAIM_CODE="${claim_code:-}" \
        CYPRESS_ADMIN_ID="$admin_id" \
        CYPRESS_ADMIN_TOKEN="$admin_token" \
        CYPRESS_CHILD_NAME="$child_name" \

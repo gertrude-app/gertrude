@@ -1,5 +1,5 @@
 scenario_name="music"
-bundle_id="com.innocencelabs.gertrude-fm-temp-dev"
+bundle_id="${GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER:-com.netrivet.gertrude.music.dev}"
 app_name="Gertrude Music"
 app_bundle_path="$root/swift/music/.derived-data/sim/Build/Products/Debug-iphonesimulator/Gertrude Music.app"
 claim_parent_fixture_name="ben"

@@ -1,6 +1,23 @@
-appId: com.innocencelabs.gertrude-fm-temp-dev
+appId: com.netrivet.gertrude.music.dev
 ---
+# fresh launch lands on the "Hi there!" welcome; walk the parent-partner happy path
+# (welcome -> parent question -> explain account) to reach the claim-code screen.
 - launchApp:
     clearState: true
-- assertVisible:
-    text: "https://gertrude.app/m/[0-9]{6}"
+# a splash screen (and sometimes a "Checking Gertrude account connection" interstitial)
+# precede the welcome screen, so wait for it rather than asserting immediately. the
+# title/subtitle/button then swoosh in over ~2s; a tap mid-entrance-animation doesn't
+# activate the button, so let the animation settle before tapping.
+- extendedWaitUntil:
+    visible: "Get started"
+    timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 4000
+- tapOn: "Get started"
+- tapOn: "Yes, I.m the parent or partner" # regex "." tolerates the curly apostrophe
+- tapOn: "Got it, next"
+# the app fetches its claim code from the API; the unclaimed screen shows the link
+- extendedWaitUntil:
+    visible:
+      text: "https://gertrude.app/m/[0-9]{6}"
+    timeout: 30000

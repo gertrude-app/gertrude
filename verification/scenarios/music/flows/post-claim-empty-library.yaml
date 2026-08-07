@@ -1,11 +1,16 @@
-appId: com.innocencelabs.gertrude-fm-temp-dev
+appId: com.netrivet.gertrude.music.dev
 ---
-# once claimed the app lands on the Albums screen; its first library load can transiently
-# fail into a manual "Try again" error state, so give the load a beat and retry until the
-# empty-library ("No albums yet") state shows.
+# after the dashboard claim, the app polls and shows the "Account connected" device-recognized
+# screen; continue past it (on the simulator Apple Music auth/subscription auto-resolve) into
+# the approved-music library.
 - extendedWaitUntil:
-    visible: "Albums"
-    timeout: 20000
+    visible: "Account connected"
+    timeout: 25000
+- waitForAnimationToEnd:
+    timeout: 4000
+- tapOn: "Continue"
+# lands on the Library screen; the first load can transiently fail into a "Couldn't load
+# library" / "Try again" state, so retry that before asserting the empty "No music yet" state.
 - repeat:
     times: 3
     commands:
@@ -17,5 +22,5 @@ appId: com.innocencelabs.gertrude-fm-temp-dev
           commands:
             - tapOn: "Try again"
 - extendedWaitUntil:
-    visible: "No albums yet"
+    visible: "No music yet"
     timeout: 20000

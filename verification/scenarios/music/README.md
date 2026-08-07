@@ -7,10 +7,13 @@ Cross-surface loop (simulator app + real dashboard + API):
 3. Read the app-generated music claim code from the simulator hierarchy.
 4. Claim that code for the paid Ben fixture parent by driving the **real dashboard claim UI
    with Cypress** (assign the device to a new child, reach the connected screen).
-5. Wait for the app to finish its claim poll and show the empty approved-albums library.
+5. Wait for the app to poll, show its "Account connected" screen, and land on the empty
+   library (`No music yet`).
 6. Approve the known test album `Stories from the Outside` by driving the **real dashboard
    music-curation UI with Cypress** (search Apple Music, click "Allow album") — behavior
-   under test, not a side-channel.
+   under test, not a side-channel. Approval is modelled as **track grants** (artist > album >
+   track precedence), so "Allow album" writes a whole-album grant and the dashboard then reads
+   back `All tracks allowed`.
 7. Let the app load the approved album, then drive play and pause through Maestro.
 
 The simulator app uses app-side simulator implementations for Apple Music setup and playback,
@@ -35,7 +38,7 @@ just verify-music e2e
 ```
 
 `flow` drives the Maestro-only slice to the claim-code screen; `claim` reads the code, drives
-the dashboard claim with Cypress, and waits for the app's empty approved-albums library;
+the dashboard claim with Cypress, and waits for the app's empty library;
 `approve` drives the dashboard album approval and then play/pause in the app. `e2e` composes
 reset → app → flow → claim → approve.
 

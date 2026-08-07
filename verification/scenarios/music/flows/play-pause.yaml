@@ -1,6 +1,6 @@
-appId: com.innocencelabs.gertrude-fm-temp-dev
+appId: com.netrivet.gertrude.music.dev
 ---
-- assertVisible: "No albums yet"
+- assertVisible: "No music yet"
 # reloading the approved library hits the live Apple catalog and can transiently come
 # back empty or errored; retry (Check again / Try again) until the approved album appears.
 - repeat:

@@ -31,7 +31,7 @@ function searchCatalog(triesLeft) {
 
 describe(`Gertrude Music album approval`, () => {
   it(`approves an Apple Music album for the child from the dashboard`, () => {
-    cy.intercept(`POST`, `**/pairql/dashboard/SearchMusicCatalog`).as(`search`);
+    cy.intercept(`POST`, `**/pairql/dashboard/SearchMusicCatalog_v2`).as(`search`);
 
     cy.visit(`/children`, { onBeforeLoad: seedAuth });
 
@@ -43,19 +43,25 @@ describe(`Gertrude Music album approval`, () => {
       .click();
 
     cy.url().should(`include`, `/ios-devices/`);
-    cy.contains(`Search Apple Music albums`); // MusicCuration mounted (not the paywall)
+    cy.contains(`Search Apple Music`); // MusicCuration mounted (not the paywall)
 
     // critical action: search the live catalog and allow the target album
     searchCatalog(3);
 
-    cy.contains(`.rounded-2xl`, albumTitle) // the result card for the target album
+    cy.contains(`[data-test=music-search-result]`, albumTitle)
       .contains(`button`, `Allow album`)
       .click();
 
-    // approval persisted: the result button flips to "Allowed" and the album now
-    // appears in the approved list (a Remove button only exists for approved albums)
-    cy.contains(`.rounded-2xl`, albumTitle).contains(`button`, `Allowed`);
-    cy.contains(`button`, `Remove`);
-    cy.contains(`No allowed albums yet`).should(`not.exist`);
+    // approval persisted: under track grants an allow-album writes a whole-album grant,
+    // so the search result flips to the manage affordance and the album lands in the
+    // approved list with an "All tracks allowed" badge
+    cy.contains(`[data-test=music-search-result]`, albumTitle).contains(
+      `button`,
+      `All tracks allowed · Manage`,
+    );
+    cy.contains(`[data-test=approved-music-item]`, albumTitle).contains(
+      `All tracks allowed`,
+    );
+    cy.contains(`No allowed music yet`).should(`not.exist`);
   });
 });
