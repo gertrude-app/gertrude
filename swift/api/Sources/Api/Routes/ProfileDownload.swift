@@ -43,6 +43,22 @@ enum ProfileDownloadRoute {
           body: .init(string: SUBSCRIPTION_REQUIRED_HTML),
         )
       }
+      if let limit = account.supervisedIOSDeviceLimit,
+         try await parent.supervisedIOSDevices(in: req.context.db).count > limit {
+        let parentLink = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
+        Task {
+          await get(dependency: \.slack)
+            .internal(
+              .info,
+              "*iOS supervision:* profile download blocked (over device limit), \(parentLink)",
+            )
+        }
+        return Response(
+          status: .paymentRequired,
+          headers: ["Content-Type": "text/html; charset=utf-8"],
+          body: .init(string: DEVICE_LIMIT_REACHED_HTML),
+        )
+      }
     }
 
     let settings = try await BlockerApp.ProfileSettings.ensure(
@@ -280,44 +296,72 @@ private func xmlEscaped(_ string: String) -> String {
     .replacingOccurrences(of: ">", with: "&gt;")
 }
 
-private let SUBSCRIPTION_REQUIRED_HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subscription Required</title>
-  <style>
-    body {
-      font-family: -apple-system, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f5f3ff;
-      padding: 24px;
-      box-sizing: border-box;
-    }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 32px 24px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 4px 24px rgba(109, 40, 217, 0.1);
-    }
-    h1 { color: #5b21b6; font-size: 22px; margin: 0 0 12px; }
-    p { color: #4b5563; font-size: 15px; line-height: 1.5; margin: 0; }
-    .url { color: #7c3aed; white-space: nowrap; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Subscription Required</h1>
-    <p>Gertrude supervision requires a paid subscription ($10/year). Subscribe at <span class="url">https://parents.gertrude.app</span> and then try again.</p>
-  </div>
-</body>
-</html>
-"""
+private let SUBSCRIPTION_REQUIRED_HTML = noticePageHtml(
+  title: "Subscription Required",
+  paragraphs: [
+    """
+    Gertrude supervision requires a paid subscription ($10/year). Subscribe at \
+    <span class="url">https://parents.gertrude.app</span> and then try again.
+    """,
+  ],
+)
+
+private let DEVICE_LIMIT_REACHED_HTML = noticePageHtml(
+  title: "Device Limit Reached",
+  paragraphs: [
+    """
+    This account has supervised more iPhones and iPads than Gertrude allows. \
+    Gertrude is built for parents and accountability partners helping kids and friends.
+    """,
+    """
+    If that describes you and you need more devices, get in touch at \
+    <span class="url">https://gertrude.app/contact</span> and we'll sort it out with you.
+    """,
+  ],
+)
+
+private func noticePageHtml(title: String, paragraphs: [String]) -> String {
+  let body = paragraphs.map { "    <p>\($0)</p>" }.joined(separator: "\n")
+  return """
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>\(title)</title>
+    <style>
+      body {
+        font-family: -apple-system, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: #f5f3ff;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 32px 24px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 4px 24px rgba(109, 40, 217, 0.1);
+      }
+      h1 { color: #5b21b6; font-size: 22px; margin: 0 0 12px; }
+      p { color: #4b5563; font-size: 15px; line-height: 1.5; margin: 0 0 12px; }
+      p:last-child { margin-bottom: 0; }
+      .url { color: #7c3aed; white-space: nowrap; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>\(title)</h1>
+  \(body)
+    </div>
+  </body>
+  </html>
+  """
+}
