@@ -43,6 +43,55 @@ import Testing
     }
   }
 
+  @Test func `submitting unchanged search text re-searches instead of stranding spinner`()
+    async throws {
+    let result = SearchResult(
+      id: 1,
+      title: "Lancaster Baptist Church Audio Podcast",
+      artistName: "Lancaster Baptist Church",
+      feedUrl: "https://feeds.podtrac.com/2kW40nLGkY_a",
+      episodeCount: 10,
+    )
+    let searches = LockIsolated(0)
+
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.podcasts.search = { _ in
+        searches.setValue(searches.value + 1)
+        return [result]
+      }
+    } operation: {
+      let store = TestStore(
+        initialState: .init(screen: .searching),
+        reducer: AddShowFeature.init,
+      )
+
+      await store.send(.setSearchText("Lancaster Baptist")) {
+        $0.searchText = "Lancaster Baptist"
+        $0.searchInFlight = true
+      }
+      await store.send(.searchSetDebounced)
+      await store.receive(.setSearchResults([result])) {
+        $0.searchResults = [result]
+        $0.searchInFlight = false
+      }
+
+      // tapping the keyboard's search key re-commits the binding with identical text
+      await store.send(.setSearchText("Lancaster Baptist")) // must be inert, not a state wipe
+      #expect(searches.value == 1)
+
+      await store.send(.searchSubmitted) {
+        $0.searchInFlight = true
+      }
+      await store.receive(.setSearchResults([result])) {
+        $0.searchInFlight = false // spinner clears; previously hung here forever
+      }
+      #expect(searches.value == 2)
+      #expect(store.state.searchResults == [result])
+    }
+  }
+
   @Test func `changing search text cancels the stale in-flight search`() async throws {
     let clock = TestClock()
     let staleResult = SearchResult(

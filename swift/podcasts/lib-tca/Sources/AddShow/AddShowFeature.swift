@@ -41,6 +41,7 @@ struct AddShowFeature {
     case selectDontAllowArtworkTapped
     case setSearchText(String)
     case searchSetDebounced
+    case searchSubmitted
     case selectShow(SearchResult)
     case setSearchResults([SearchResult])
     case setScreen(State.Screen)
@@ -66,6 +67,7 @@ struct AddShowFeature {
     Reduce { state, action in
       switch action {
       case .setSearchText(let text):
+        guard text != state.searchText else { return .none }
         state.searchText = text
         state.searchResults = []
         state.searchInFlight = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -75,12 +77,13 @@ struct AddShowFeature {
         state.screen = screen
         return .none
 
-      case .searchSetDebounced:
+      case .searchSetDebounced, .searchSubmitted:
         let query = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
           state.searchInFlight = false
           return .none
         }
+        state.searchInFlight = true
         return .run { send in
           await send(.setSearchResults((try? self.podcasts.search(query)) ?? []))
         }
