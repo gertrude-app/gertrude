@@ -6,7 +6,7 @@ import { makeVerificationClient } from './client';
 // than raw SQL. Contract drift (renamed field, changed shape) breaks this at `tsc` time.
 // This is the *oracle*, not the behavior under test; the claim action stays in the real UI.
 
-const code = Number(process.env.ORACLE_CLAIM_CODE ?? `0`);
+const code = Number(process.env[`ORACLE_CLAIM_CODE`] ?? `0`);
 
 test(`podcasts claim ${code} resolves to the done step in the backend`, async () => {
   const oracle = makeVerificationClient();

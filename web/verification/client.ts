@@ -23,7 +23,7 @@ export function makeVerificationClient(
 ): VerificationClient {
   const endpoint = config.apiEndpoint ?? env(`API_ENDPOINT`);
   const dashboardUrl = config.dashboardUrl ?? env(`DASH_URL`);
-  const adminToken = config.adminToken ?? process.env.ORACLE_ADMIN_TOKEN ?? ``;
+  const adminToken = config.adminToken ?? process.env[`ORACLE_ADMIN_TOKEN`] ?? ``;
 
   const client = new DashboardClient(endpoint, (init) => {
     const headers = init.headers as Record<string, string>;
