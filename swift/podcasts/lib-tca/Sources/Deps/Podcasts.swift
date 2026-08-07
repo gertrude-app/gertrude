@@ -10,6 +10,7 @@ struct PodcastClient: Sendable {
   var search: @Sendable (_ query: String) async throws -> [SearchResult]
   var downloadAudio: @Sendable (_ episode: Episode) async -> Bool = { _ in false }
   var downloadArtwork: @Sendable (_ show: Show) async -> Void = { _ in }
+  var canReachSecurely: @Sendable (_ url: String) async -> Bool = { _ in true }
 }
 
 extension PodcastClient: DependencyKey {
@@ -27,6 +28,9 @@ extension PodcastClient: DependencyKey {
       },
       downloadArtwork: { show in
         await downloadArtworkLive(show: show)
+      },
+      canReachSecurely: { url in
+        await canReachSecurelyLive(url: url)
       },
     )
   }
@@ -149,6 +153,24 @@ enum SearchError: Error, Sendable {
   case invalidURL
   case networkError
   case decodingError
+}
+
+@Sendable
+func canReachSecurelyLive(url urlString: String) async -> Bool {
+  guard let url = URL(string: urlString), url.scheme == "https" else {
+    return false
+  }
+
+  var request = URLRequest(url: url)
+  request.httpMethod = "HEAD"
+  request.timeoutInterval = 10
+
+  do {
+    let (_, response) = try await URLSession.shared.data(for: request)
+    return response is HTTPURLResponse
+  } catch {
+    return false
+  }
 }
 
 @Sendable

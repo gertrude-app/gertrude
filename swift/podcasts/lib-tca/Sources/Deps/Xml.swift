@@ -56,11 +56,6 @@ private func sanitizeFeedXML(_ xml: String) -> String {
   return result
 }
 
-private func upgradeToHttps(_ urlString: String) -> String {
-  guard urlString.hasPrefix("http://") else { return urlString }
-  return "https://" + urlString.dropFirst(7)
-}
-
 private func urlWithoutQueryOrFragment(_ urlString: String) -> String {
   guard var components = URLComponents(string: urlString) else {
     return urlString
@@ -145,15 +140,15 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
     }
 
     if elementName == "itunes:image", !self.isInItem {
-      self.showArtworkUrl = attributeDict["href"]
+      self.showArtworkUrl = attributeDict["href"].map(upgradeToHttps)
     }
 
     if elementName == "image", self.isInItem {
-      self.episodeArtworkUrl = attributeDict["href"]
+      self.episodeArtworkUrl = attributeDict["href"].map(upgradeToHttps)
     }
 
     if elementName == "itunes:image", self.isInItem {
-      self.episodeArtworkUrl = attributeDict["href"]
+      self.episodeArtworkUrl = attributeDict["href"].map(upgradeToHttps)
     }
   }
 
@@ -211,7 +206,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       case "link":
         self.showWebsiteUrl = trimmedText
       case "url" where self.parentElement == "image" && !self.isInItem:
-        self.showArtworkUrl = trimmedText
+        self.showArtworkUrl = upgradeToHttps(trimmedText)
       case "itunes:image":
         // iTunes image is handled in attributes
         break
@@ -237,7 +232,7 @@ private class PodcastFeedParser: NSObject, XMLParserDelegate {
       case "itunes:episode":
         self.episodeNumber = Int(trimmedText)
       case "url" where self.parentElement == "image" && self.isInItem:
-        self.episodeArtworkUrl = trimmedText
+        self.episodeArtworkUrl = upgradeToHttps(trimmedText)
       default:
         break
       }

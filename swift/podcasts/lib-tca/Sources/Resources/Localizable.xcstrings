@@ -273,6 +273,23 @@
         }
       }
     },
+    "addShow.insecureError" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This podcast doesn’t offer a secure (https) link, so it can’t be added."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este pódcast no ofrece un enlace seguro (https), así que no se puede agregar."
+          }
+        }
+      }
+    },
     "addShow.search" : {
       "extractionState" : "manual",
       "localizations" : {

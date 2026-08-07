@@ -23,6 +23,7 @@ extension EventLabel {
     case "b8139e22": "Duplicate subscribe"
     case "98916a65": "Subscribe fail"
     case "8c5abff7": "Subscribe fail"
+    case "5d1f8a63": "Subscribe fail: insecure media"
     case "2c229d59": "Special action"
     case "b4c8d7e2": "Upload db fail: unexpected response"
     case "a5f6b9c3": "Upload db success"
