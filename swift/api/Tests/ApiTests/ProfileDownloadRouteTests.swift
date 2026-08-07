@@ -95,6 +95,67 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     )
   }
 
+  func testSupervisedDeviceCountTalliesPhonesNotRows() async throws {
+    let child = try await self.child()
+    // "a" re-supervised twice is one phone; null udids can't be deduped, so count singly
+    try await self.supervise(child.id, udids: ["a", "a", "b", nil, nil])
+    let abandoned = try await self.db.create(IOSDevice.mock { $0.childId = child.id })
+    try await self.db.create(BlockerApp.Supervision(deviceId: abandoned.id, udid: "c"))
+    let other = try await self.child()
+    try await self.supervise(other.id, udids: ["x", "y", "z"])
+
+    let count = try await child.parent.model.supervisedIOSDevices(in: self.db).count
+
+    expect(count).toEqual(4) // a + b + 2 unidentified, not "c" (never finished) or another parent's
+  }
+
+  func testAtDeviceLimit_servesProfile() async throws {
+    let child = try await self.child()
+    try await self.addPaidSubscription(for: child.parent.id, tier: .light)
+    let devices = try await self.supervise(child.id, udids: (1 ... 5).map { "udid-\($0)" })
+
+    try await app.test(
+      .GET,
+      "ios-profile/\(devices.last!.id.lowercased)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.ok)
+      },
+    )
+  }
+
+  func testOverDeviceLimit_blockedWithContactCopy() async throws {
+    let child = try await self.child()
+    try await self.addPaidSubscription(for: child.parent.id, tier: .light)
+    let devices = try await self.supervise(child.id, udids: (1 ... 6).map { "udid-\($0)" })
+
+    try await app.test(
+      .GET,
+      "ios-profile/\(devices.last!.id.lowercased)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.paymentRequired)
+        expect(res.body.string).toContain("Device Limit Reached")
+        expect(res.body.string).toContain("gertrude.app/contact")
+        // the copy must route to a human, never to a bigger plan
+        expect(res.body.string.lowercased().contains("upgrade")).toBeFalse()
+        expect(res.body.string.contains("parents.gertrude.app")).toBeFalse()
+      },
+    )
+  }
+
+  func testComplimentaryAccountIsUncapped() async throws {
+    let child = try await self.child()
+    try await self.db.create(BillingIdentity(parentId: child.parent.id, isComplimentary: true))
+    let devices = try await self.supervise(child.id, udids: (1 ... 25).map { "udid-\($0)" })
+
+    try await app.test(
+      .GET,
+      "ios-profile/\(devices.last!.id.lowercased)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.ok)
+      },
+    )
+  }
+
   func testProfileSettingsJsonColumnsRoundTrip() async throws {
     let device = try await self.db.create(IOSDevice.mock)
     var settings = BlockerApp.ProfileSettings.mock { $0.deviceId = device.id }
@@ -489,6 +550,24 @@ final class ProfileDownloadRouteTests: ApiTestCase, @unchecked Sendable {
     expect(xml).toContain("<key>allowSafari</key>\n      <false/>")
     expect(xml.contains("ratingRegion")).toBeFalse()
     expect(xml.contains("ratingMovies")).toBeFalse()
+  }
+
+  @discardableResult
+  private func supervise(
+    _ childId: Child.Id,
+    udids: [String?],
+  ) async throws -> [IOSDevice] {
+    var devices: [IOSDevice] = []
+    for udid in udids {
+      let device = try await self.db.create(IOSDevice.mock { $0.childId = childId })
+      try await self.db.create(BlockerApp.Supervision(
+        deviceId: device.id,
+        udid: udid,
+        supervisedAt: .reference,
+      ))
+      devices.append(device)
+    }
+    return devices
   }
 
   func testCmsSigningRoundTrip() throws {

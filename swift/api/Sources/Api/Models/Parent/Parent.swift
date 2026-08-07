@@ -133,6 +133,17 @@ extension Parent {
     return try await db.create(identity)
   }
 
+  func supervisedIOSDevices(in db: any DuetSQL.Client) async throws -> SupervisedIOSDevices {
+    let rows = try await db.customQuery(
+      SupervisedIOSDeviceUdids.self,
+      withBindings: [.uuid(self.id.rawValue)],
+    )
+    return SupervisedIOSDevices(
+      udids: Set(rows.compactMap(\.udid)),
+      unidentified: rows.count(where: { $0.udid == nil }),
+    )
+  }
+
   func adminSiteLink(_ kind: AdminLink.Kind) -> String {
     switch kind {
     case .email:
@@ -143,4 +154,39 @@ extension Parent {
       AdminLink().url(to: .parent(self.id))
     }
   }
+}
+
+struct SupervisedIOSDevices {
+  let udids: Set<String>
+  let unidentified: Int
+
+  var count: Int {
+    self.udids.count + self.unidentified
+  }
+
+  func alreadyIncludes(udid: String) -> Bool {
+    self.udids.contains(udid)
+  }
+}
+
+private struct SupervisedIOSDeviceUdids: CustomQueryable {
+  static func query(bindings: [Postgres.Data]) -> SQL.Statement {
+    guard let parentId = bindings.first else {
+      return SQL.Statement("SELECT NULL AS udid WHERE FALSE")
+    }
+    var stmt = SQL.Statement("""
+    SELECT s.\(BlockerApp.Supervision.columnName(.udid)) AS udid
+    FROM \(table: BlockerApp.Supervision.self) s
+    JOIN \(table: IOSDevice.self) d
+      ON d.id = s.\(BlockerApp.Supervision.columnName(.deviceId))
+    JOIN \(table: Child.self) c
+      ON c.id = d.\(IOSDevice.columnName(.childId))
+    WHERE s.\(BlockerApp.Supervision.columnName(.supervisedAt)) IS NOT NULL
+      AND c.\(Child.columnName(.parentId)) =
+    """)
+    stmt.components.append(.binding(parentId))
+    return stmt
+  }
+
+  var udid: String?
 }
