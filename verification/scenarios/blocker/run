@@ -126,7 +126,7 @@ app() {
 
   echo ""
   echo "writing local simulator API config"
-  (cd "$root" && just swift iosconfig)
+  (cd "$root" && LOCAL_API_ENDPOINT="$api_url" just swift iosconfig)
 
   echo ""
   echo "building simulator app"

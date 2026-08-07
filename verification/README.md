@@ -155,10 +155,16 @@ first — most of the time sunk here has been stale infrastructure, not real reg
   `connect-account-success` view straight to `connectSuccess`, so asserting the transient id never
   lands. Assert the terminal stable screen with `extendedWaitUntil` + a timeout covering the poll
   cadence.
-- **Loopback, not ngrok.** The app (`just swift iosconfig` → `127.0.0.1:$API_PORT`) and dashboard
-  (`VITE_API_ENDPOINT` in `web/dash/app/.env.local`) both hit the local API directly; the sim
-  reaches the host with no tunnel. `NGROK_SUBDOMAIN` in `.gtask-ports` only feeds the unused
-  `ios-tunnel` recipe — a flow never needs it.
+- **Loopback, not ngrok — and pin it explicitly.** Each scenario passes
+  `LOCAL_API_ENDPOINT="$api_url"` into the app build (`sim-build` → `xcodegen` for music and
+  podcasts; `just swift iosconfig` → `Local.xcconfig` for blocker) so the binary is baked against
+  `127.0.0.1:$API_PORT`; the dashboard uses `VITE_API_ENDPOINT` in `web/dash/app/.env.local`. The
+  sim reaches the host with no tunnel. Without that pin `scripts/local-api-endpoint` falls back to
+  `http://$(ipconfig getifaddr en0):$API_PORT`, which quietly works while wifi is up and fails the
+  build outright when `en0` has no address — so a flow that talks to the API on one machine can be
+  unreachable or unbuildable on another. Confirm what a built app actually points at with
+  `plutil -extract API_ENDPOINT raw "<path to .app>/Info.plist"`. `NGROK_SUBDOMAIN` in
+  `.gtask-ports` only feeds the unused `ios-tunnel` recipe — a flow never needs it.
 - **Background-run exit codes.** A trailing `echo` after a `just`/`maestro` command makes the
   harness report exit 0 regardless; capture the real code (`RC=$?`) into the log and check that.
 - **Simulator SpringBoard crashes mid-run (Apple bug, not ours).** A step fails on state the

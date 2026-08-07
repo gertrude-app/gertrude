@@ -83,7 +83,7 @@ app() {
 
   echo ""
   echo "building simulator app"
-  (cd "$root" && just podcasts sim-build)
+  (cd "$root" && LOCAL_API_ENDPOINT="$api_url" just podcasts sim-build)
 
   echo ""
   echo "installing simulator app"

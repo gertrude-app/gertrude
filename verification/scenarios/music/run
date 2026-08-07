@@ -141,7 +141,7 @@ app() {
 
   echo ""
   echo "building simulator app"
-  (cd "$root/swift/music" && GERTRUDE_MUSIC_DEBUG_API_ENDPOINT="$api_url" just sim-build)
+  (cd "$root/swift/music" && LOCAL_API_ENDPOINT="$api_url" just sim-build)
 
   if [[ ! -d "$app_bundle_path" ]]; then
     echo "$app_name simulator app not found after build: $app_bundle_path" >&2
