@@ -14,6 +14,7 @@ struct SettingsFeature {
     var pendingClaimAfterPin = false
     @Presents var claimFlow: ClaimFlow.State?
     @Presents var pinReset: PinResetFeature.State?
+    @Shared(.appConfig) var appConfig
   }
 
   enum Action: Equatable {

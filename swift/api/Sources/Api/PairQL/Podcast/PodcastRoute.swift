@@ -43,6 +43,9 @@ extension PodcastRoute: RouteResponder {
       case .pinResetEscapeHatch(let input):
         let output = try await PinResetEscapeHatch.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .getPodcastAppConfig(let input):
+        let output = try await GetPodcastAppConfig.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       }
 
     case .authed(let uuid, let authedRoute):

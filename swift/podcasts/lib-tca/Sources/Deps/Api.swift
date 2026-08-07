@@ -10,6 +10,7 @@ import PodcastRoute
 @DependencyClient
 struct ApiClient: Sendable {
   var crossPromos: @Sendable () async throws -> CrossPromos.Output
+  var appConfig: @Sendable () async throws -> GetPodcastAppConfig.Output
   var migrateDeviceId: @Sendable (_ oldDeviceId: UUID, _ newVendorId: UUID) async throws -> Void
   var getTrialStatus: @Sendable () async throws -> GetTrialStatus.Output
   var getAccountStatus: @Sendable () async throws -> GetAccountStatus.Output
@@ -25,25 +26,41 @@ extension ApiClient: DependencyKey {
   static var testValue: ApiClient {
     var client = ApiClient()
     client.crossPromos = { .init(promos: []) }
+    client.appConfig = { .init() }
     return client
   }
 
   static var liveValue: ApiClient {
     .init(
       crossPromos: {
-        guard let metadata = await podcastDeviceMetadata() else {
+        let metadata = await podcastDeviceMetadata()
+        guard let deviceId = metadata.deviceId else {
           return .init(promos: [])
         }
 
         let input = CrossPromos.Input(
+          deviceId: deviceId,
+          appVersion: metadata.appVersion,
+          modelIdentifier: metadata.modelIdentifier,
+          iosVersion: metadata.iosVersion,
+          locale: metadata.locale,
+        )
+
+        return try await pairql.call(CrossPromos.self, unauthed: .crossPromos(input))
+      },
+      appConfig: {
+        let metadata = await podcastDeviceMetadata()
+        let input = GetPodcastAppConfig.Input(
           deviceId: metadata.deviceId,
           appVersion: metadata.appVersion,
           modelIdentifier: metadata.modelIdentifier,
           iosVersion: metadata.iosVersion,
-          locale: dep(\.locale).identifier,
+          locale: metadata.locale,
         )
-
-        return try await pairql.call(CrossPromos.self, unauthed: .crossPromos(input))
+        return try await pairql.call(
+          GetPodcastAppConfig.self,
+          unauthed: .getPodcastAppConfig(input),
+        )
       },
       migrateDeviceId: { oldDeviceId, newVendorId in
         let input = MigratePodcastVendorId.Input(
@@ -56,18 +73,15 @@ extension ApiClient: DependencyKey {
         )
       },
       getTrialStatus: {
-        guard let deviceId = dep(\.keychain).loadDeviceId() else {
+        let metadata = await podcastDeviceMetadata()
+        guard let deviceId = metadata.deviceId else {
           throw ApiClient.ApiError.noDeviceId
         }
-        let device = dep(\.device)
-        let (_, iosVersion, modelIdentifier) = await device.data()
-        let appVersion = Bundle.main
-          .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
         let input = GetTrialStatus.Input(
           deviceId: deviceId,
-          modelIdentifier: modelIdentifier,
-          iosVersion: iosVersion,
-          appVersion: appVersion,
+          modelIdentifier: metadata.modelIdentifier,
+          iosVersion: metadata.iosVersion,
+          appVersion: metadata.appVersion,
         )
         return try await pairql.call(GetTrialStatus.self, unauthed: .getTrialStatus(input))
       },
@@ -81,17 +95,14 @@ extension ApiClient: DependencyKey {
         )
       },
       pinResetEscapeHatch: {
-        let device = dep(\.device)
-        let (vendorId, iosVersion, modelIdentifier) = await device.data()
-        let appVersion = Bundle.main
-          .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        let metadata = await podcastDeviceMetadata()
         let input = PinResetEscapeHatch.Input(
-          deviceId: dep(\.keychain).loadDeviceId(),
-          vendorId: vendorId,
-          modelIdentifier: modelIdentifier,
-          iosVersion: iosVersion,
-          appVersion: appVersion,
-          locale: dep(\.locale).identifier,
+          deviceId: metadata.deviceId,
+          vendorId: metadata.vendorId,
+          modelIdentifier: metadata.modelIdentifier,
+          iosVersion: metadata.iosVersion,
+          appVersion: metadata.appVersion,
+          locale: metadata.locale,
         )
         let output = try await pairql.call(
           PinResetEscapeHatch.self,
@@ -151,20 +162,26 @@ func authed<P: Pair>(
   return try await pairql.call(pair, authed: route, token: token)
 }
 
-private func podcastDeviceMetadata() async -> (
-  deviceId: UUID,
-  appVersion: String,
-  buildNumber: String?,
-  modelIdentifier: String,
-  iosVersion: String,
-)? {
-  guard let deviceId = dep(\.keychain).loadDeviceId() else { return nil }
-  let device = dep(\.device)
-  let (_, iosVersion, modelIdentifier) = await device.data()
-  let appVersion = Bundle.main
-    .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
-  let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-  return (deviceId, appVersion, buildNumber, modelIdentifier, iosVersion)
+private struct PodcastDeviceMetadata {
+  var deviceId: UUID?
+  var vendorId: UUID?
+  var appVersion: String
+  var modelIdentifier: String
+  var iosVersion: String
+  var locale: String
+}
+
+private func podcastDeviceMetadata() async -> PodcastDeviceMetadata {
+  let (vendorId, iosVersion, modelIdentifier) = await dep(\.device).data()
+  return .init(
+    deviceId: dep(\.keychain).loadDeviceId(),
+    vendorId: vendorId,
+    appVersion: Bundle.main
+      .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0",
+    modelIdentifier: modelIdentifier,
+    iosVersion: iosVersion,
+    locale: dep(\.locale).identifier,
+  )
 }
 
 extension ApiClient {

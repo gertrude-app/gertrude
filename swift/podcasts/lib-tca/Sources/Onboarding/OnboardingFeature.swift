@@ -11,6 +11,7 @@ struct OnboardingFeature {
     var resumedAfterClaim: Bool = false
     var trialStatus: GetTrialStatus.Output?
     @Presents var claimFlow: ClaimFlow.State?
+    @Shared(.appConfig) var appConfig
 
     var pinRecoveryAvailable: Bool {
       self.resumedAfterClaim || self.trialStatus?.isConnected == true

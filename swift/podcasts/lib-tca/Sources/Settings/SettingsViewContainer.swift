@@ -13,6 +13,7 @@ struct SettingsViewContainer: View {
       reclaimableStorageGb: self.reclaimableGb,
       isClaimed: self.store.isClaimed,
       legacyMigrationNag: self.store.subscription.legacyMigrationNag,
+      priceTextOverride: self.store.appConfig.accountPriceText,
       onEvent: { self.store.send(.view($0)) },
     )
     .onAppear { self.store.send(.onAppear) }

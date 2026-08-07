@@ -228,13 +228,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude Podcasts is free to try for 30 days. After you try it, you’ll need a Gertrude account. Just $10/year for all your family’s devices."
+            "value" : "Gertrude Podcasts is free to try for 30 days. After you try it, you’ll need a Gertrude account that can be shared by all your family’s devices."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gertrude Podcasts es gratis para probar durante 30 días. Después de probarlo, necesitarás una cuenta de Gertrude. Solo $10 al año para todos los dispositivos de tu familia."
+            "value" : "Gertrude Podcasts es gratis para probar durante 30 días. Después de probarlo, necesitarás una cuenta de Gertrude que pueden compartir todos los dispositivos de tu familia."
           }
         }
       }

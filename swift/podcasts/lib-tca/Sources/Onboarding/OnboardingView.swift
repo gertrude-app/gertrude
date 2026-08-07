@@ -47,7 +47,10 @@ struct OnboardingView: View {
 
         case .explainAccountRequired:
           ButtonScreenView(
-            text: lstr(.onboardingExplainAccount),
+            text: remoteCopy(
+              self.store.appConfig.explainAccountText,
+              or: lstr(.onboardingExplainAccount),
+            ),
             primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
             screenIdentifier: "onboarding-screen-explain-account-required",
           )

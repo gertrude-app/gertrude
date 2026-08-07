@@ -53,6 +53,7 @@ public struct SettingsView: View {
   let reclaimableStorageGb: Double?
   let isClaimed: Bool
   let legacyMigrationNag: Bool
+  let priceTextOverride: String?
   let onEvent: @MainActor @Sendable (Event) -> Void
 
   public init(
@@ -61,6 +62,7 @@ public struct SettingsView: View {
     reclaimableStorageGb: Double? = nil,
     isClaimed: Bool = false,
     legacyMigrationNag: Bool = false,
+    priceTextOverride: String? = nil,
     onEvent: @MainActor @Sendable @escaping (Event) -> Void = { _ in },
   ) {
     self.status = status
@@ -68,6 +70,7 @@ public struct SettingsView: View {
     self.reclaimableStorageGb = reclaimableStorageGb
     self.isClaimed = isClaimed
     self.legacyMigrationNag = legacyMigrationNag
+    self.priceTextOverride = priceTextOverride
     self.onEvent = onEvent
   }
 
@@ -251,7 +254,7 @@ public struct SettingsView: View {
                       .cornerRadius(10)
                   }
 
-                  Text(lstr(.accountPrice))
+                  Text(remoteCopy(self.priceTextOverride, or: lstr(.accountPrice)))
                     .font(.subheadline)
                     .foregroundColor(Color(
                       self.cs,
