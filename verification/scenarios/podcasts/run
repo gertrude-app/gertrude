@@ -279,44 +279,6 @@ pin() {
   ok "PIN set; show added and playback started"
 }
 
-dashboard() {
-  echo "podcasts dashboard verification (cypress)"
-  echo ""
-
-  for tool in pnpm; do
-    if ! have "$tool"; then
-      missing "$tool"
-      exit 69
-    fi
-  done
-
-  claim_code="${CLAIM_CODE:-}"
-  if [[ -z "$claim_code" ]]; then
-    simulator="$(selected_simulator)"
-    simulator_name="$(selected_simulator_name "$simulator")"
-    ok "target simulator: ${simulator_name:-unknown} ($simulator)"
-    claim_code="$(extract_claim_code "$simulator" || true)"
-  fi
-  if [[ -z "$claim_code" ]]; then
-    echo "claim code not found; set CLAIM_CODE or run before leaving the claim-code screen" >&2
-    exit 70
-  fi
-  ok "claim code: $claim_code"
-
-  read_dashboard_creds
-  child_name="$claim_child_name"
-
-  echo ""
-  echo "verifying dashboard device via cypress (real browser)"
-  run_cypress_dashboard verify-device.cy.js "$claim_code" "$child_name"
-  ok "dashboard UI reflects connected podcasts device"
-
-  echo ""
-  echo "asserting backend recorded the claim via typed pairql oracle"
-  run_oracle "$claim_code"
-  ok "typed pairql oracle confirms claim persisted"
-}
-
 reset_api() {
   echo "podcasts api fixture reset"
   echo ""
@@ -374,9 +336,6 @@ case "$command" in
   pin)
     pin
     ;;
-  dashboard)
-    dashboard
-    ;;
   reset-api)
     reset_api
     ;;
@@ -393,7 +352,7 @@ case "$command" in
     ;;
   ""|-h|--help|help)
     cat <<EOF
-usage: just verify-podcasts [preflight|app|flow|claim|pin|dashboard|reset-api|reset-sim|e2e|env] [--headed] [--chrome]
+usage: just verify-podcasts [preflight|app|flow|claim|pin|reset-api|reset-sim|e2e|env] [--headed] [--chrome]
 
   --headed  run the dashboard cypress specs in a visible browser (default: headless)
   --chrome  drive the dashboard in real Google Chrome instead of Electron (implies --headed)

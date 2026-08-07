@@ -83,8 +83,8 @@ be verified by hand. Everything below serves that; when in doubt, protect the si
   prerequisites), `app` (build + install + launch), `flow` (the Maestro-only simulator slice),
   `claim` (cross-surface dashboard claim + app observation), `reset-api` (reseed API fixtures;
   installed app untouched), `reset-sim` (uninstall app + reset keychain; API untouched), `e2e`
-  (compose all of the above). Scenario-specific phases get their own verb (`pin`, `approve`,
-  `dashboard`); the shared verbs must never widen or narrow per scenario.
+  (compose all of the above). Scenario-specific phases get their own verb (`pin`, `approve`);
+  the shared verbs must never widen or narrow per scenario.
 - **Accessibility ids**: screens get `onboarding-screen-<semantic-name>` (name the meaning,
   not the copy); shared/generic buttons get `btn-<role>` (`btn-primary`, `btn-secondary`).
   One convention across all apps.

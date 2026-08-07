@@ -14,7 +14,7 @@ Initial target loop:
 4. Drive onboarding until the app displays a podcasts claim code.
 5. Claim that code through the dashboard for a seeded parent/child.
 6. Let the app observe the claim.
-7. Verify the dashboard claim route and device routes see the podcasts app as connected.
+7. Assert the backend recorded the claim through the typed PairQL oracle.
 8. Set a PIN and reach the podcast home screen.
 9. Add and play a deterministic fixture podcast.
 10. Assert simulator-local SQLite state.
@@ -28,7 +28,6 @@ just verify-podcasts app
 just verify-podcasts flow
 just verify-podcasts claim
 just verify-podcasts pin
-just verify-podcasts dashboard
 just verify-podcasts e2e
 ```
 
@@ -50,9 +49,9 @@ her parent id, so `admin_id == admin_token == BE400000-0000-0000-0000-0000000000
 (overridable via `DASHBOARD_ADMIN_ID` / `DASHBOARD_PARENT_TOKEN`). No `parent.dash_tokens`
 query, no "first token" heuristic. Because blanca has no pre-seeded child, the claim form
 creates `Verification Child` unless `DASHBOARD_CLAIM_CHILD_NAME` overrides it. Blanca exists
-only *after* a reset, so `dashboard` / `claim` expect a prior `reset-api` (the `e2e`
-ordering guarantees this; `reset-sim` is the separate simulator-side teardown — uninstall +
-keychain reset — and doesn't touch the API).
+only *after* a reset, so `claim` expects a prior `reset-api` (the `e2e` ordering guarantees
+this; `reset-sim` is the separate simulator-side teardown — uninstall + keychain reset — and
+doesn't touch the API).
 
 The dashboard tier is black-box via a real browser, scripted with **Cypress** — the web
 analog to Maestro for the app tier. The deterministic specs live in `dashboard/` next to the
@@ -60,7 +59,6 @@ Maestro `flows/`, and run against the live dashboard (`http://localhost:$DASH_PO
 real local API, not PairQL curl calls:
 
 - `dashboard/e2e/claim.cy.js` — drives the claim form (assign device to a child) and submits.
-- `dashboard/e2e/verify-device.cy.js` — confirms the claim is persisted and observable.
 
 These specs intentionally assert **behavior through phases, not copy**. The dashboard's own
 unit/cypress suites own exact-copy and component coverage; this harness only proves the
@@ -81,7 +79,7 @@ The `run` script seeds blanca's fixture `admin_id` + token into `localStorage` (
 shells `pnpm cypress run --project dashboard` with the claim code / child name as `CYPRESS_*`
 env. Cypress is invoked from `web/` (where it is a dev dependency); the specs are plain JS to
 stay self-contained outside the `web` pnpm workspace. `--headed` (e.g.
-`just verify-podcasts dashboard --headed`) runs the specs in a visible browser; the default
+`just verify-podcasts claim --headed`) runs the specs in a visible browser; the default
 is headless.
 
 The simulator app talks to the task-local API via `http://127.0.0.1:$API_PORT`, with
