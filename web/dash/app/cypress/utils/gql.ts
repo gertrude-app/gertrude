@@ -8,7 +8,7 @@ export function hasOperationName(
   if (!body) {
     return false;
   }
-  return body.operationName === operationName;
+  return body[`operationName`] === operationName;
 }
 
 export function aliasOperation(

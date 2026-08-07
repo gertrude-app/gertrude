@@ -54,7 +54,7 @@ export function useAuth(): Auth {
 }
 
 function getInitialAdmin(): Admin | null {
-  if (import.meta.env.VITEST) {
+  if (import.meta.env[`VITEST`]) {
     return null;
   }
 

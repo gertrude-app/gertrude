@@ -31,10 +31,10 @@ async function main(): Promise<void> {
   const browser = await puppeteer.launch({
     headless: true,
     product: `chrome`,
-    args: process.env.CI ? [`--no-sandbox`, `--disable-setuid-sandbox`] : [],
+    args: process.env[`CI`] ? [`--no-sandbox`, `--disable-setuid-sandbox`] : [],
   });
   const page = await browser.newPage();
-  const url = `http://localhost:4777/${process.env.CI ? `` : `iframe.html`}`;
+  const url = `http://localhost:4777/${process.env[`CI`] ? `` : `iframe.html`}`;
 
   // inject css to stabilize screenshots
   await page.evaluateOnNewDocument(() => {

@@ -87,9 +87,9 @@ export class LiveEnvironment implements EnvironmentClient {
   public optionalVar(varName: OptionalVar): string | undefined {
     switch (varName) {
       case OptionalVar.TestAdminCreds:
-        return import.meta.env.VITE_TEST_ADMIN_CREDS;
+        return import.meta.env[`VITE_TEST_ADMIN_CREDS`];
       case OptionalVar.IsStaging:
-        return import.meta.env.VITE_IS_STAGING;
+        return import.meta.env[`VITE_IS_STAGING`];
     }
   }
 }

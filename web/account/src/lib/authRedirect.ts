@@ -24,8 +24,8 @@ export const validateAuthRedirectSearch = (
   search: Record<string, unknown>,
 ): AuthRedirectSearch => {
   const redirect =
-    typeof search.redirect === `string`
-      ? authRedirectForPath(search.redirect)
+    typeof search[`redirect`] === `string`
+      ? authRedirectForPath(search[`redirect`])
       : undefined;
   return redirect ? { redirect } : {};
 };

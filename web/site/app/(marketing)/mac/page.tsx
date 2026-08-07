@@ -1,4 +1,3 @@
-import React from 'react';
 import type { NextPage } from 'next';
 import CTABlock from '@/components/CTABlock';
 import DefenseInDepthBlock from '@/components/DefenseInDepthBlock';

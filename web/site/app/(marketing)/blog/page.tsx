@@ -1,6 +1,5 @@
 import cx from 'classnames';
 import Link from 'next/link';
-import React from 'react';
 import type { NextPage } from 'next';
 import Logo from '@/components/Logo';
 import * as seo from '@/lib/seo';
