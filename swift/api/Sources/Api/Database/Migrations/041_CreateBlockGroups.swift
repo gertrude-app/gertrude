@@ -9,6 +9,8 @@ struct CreateBlockGroups: GertieMigration {
     let appStoreImages = UUID(uuidString: "283a29ec-13eb-4bd3-9211-eb920bd85158")!
     let appleMapsImages = UUID(uuidString: "baecbdda-49c0-43ec-a931-777810f34c13")!
     let appleWebsite = UUID(uuidString: "9cd776c0-f1a6-43c2-861b-f6c6ec8cf513")!
+    let appleMusicImages = UUID(uuidString: "236c92c9-a06c-4f68-9f1a-74e76163ae07")!
+    let amazonMusicArtwork = UUID(uuidString: "64c7ec3b-92cb-46e2-9d0b-11e43725c683")!
     let gifs = UUID(uuidString: "087628b2-742c-4164-a3cc-717c4ac72c1a")!
     let spotlightSearches = UUID(uuidString: "df7fb156-488a-497b-aa12-c585d3fa4e6c")!
     let whatsAppFeatures = UUID(uuidString: "8e337c3c-2efb-404a-8eb3-781661231844")!
