@@ -71,6 +71,18 @@ const EmailInputForm: React.FC<Props> = ({
     >
       Signup &rarr;
     </Button>
+    <p className="mt-4 text-xs text-center text-slate-400">
+      By signing up, you agree to our{` `}
+      <a
+        className="text-slate-500 underline decoration-dotted underline-offset-2"
+        href="https://gertrude.app/docs/terms"
+        target="_blank"
+        rel="noreferrer"
+      >
+        terms of service
+      </a>
+      .
+    </p>
   </form>
 );
 

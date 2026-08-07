@@ -13,6 +13,7 @@ interface Props {
     href: string;
   };
   bottomLinkExplanation?: string;
+  disclaimer?: React.ReactNode;
 }
 
 const UnauthedForm: React.FC<Props> = ({
@@ -23,6 +24,7 @@ const UnauthedForm: React.FC<Props> = ({
   onSubmit,
   bottomLink,
   bottomLinkExplanation,
+  disclaimer,
 }) => (
   <VStack
     as="form"
@@ -45,6 +47,11 @@ const UnauthedForm: React.FC<Props> = ({
         {inputs}
       </VStack>
       <VStack gap={3}>{buttons}</VStack>
+      {disclaimer && (
+        <Text as="p" variant="captionMuted" className="-mt-4 text-center text-balance">
+          {disclaimer}
+        </Text>
+      )}
     </VStack>
     <Spacer hideAbove="xs" />
     {bottomLink && (
