@@ -91,6 +91,7 @@ jobs:
       - name: test-x-stripe
         run: cd swift/x-stripe && swift test
 
+  # local mac aarm build instructions: https://gist.github.com/jaredh159/3bc74065d19a2f58561e603c2cc5e22d
   linux-api-build:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
