@@ -265,10 +265,9 @@ const PincodeScreen: React.FC<PincodeScreenProps> = ({ isVisible }) => {
   const filledCount = 4;
 
   useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => setSheetVisible(true), 2500);
-      return () => clearTimeout(timer);
-    }
+    if (!isVisible) return undefined;
+    const timer = setTimeout(() => setSheetVisible(true), 2500);
+    return () => clearTimeout(timer);
   }, [isVisible]);
 
   return (

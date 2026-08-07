@@ -25,7 +25,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = `sm` })
   return (
     <span
       className={`inline-flex items-center rounded-lg font-medium ring-1 ring-inset ${sizeClass} ${
-        statusStyles[status] ?? statusStyles.unknown
+        statusStyles[status] ?? statusStyles[`unknown`]
       }`}
     >
       {statusLabels[status] ?? status}
@@ -86,7 +86,7 @@ export const PlanBadge: React.FC<PlanBadgeProps> = ({
   status,
   size = `sm`,
 }) => {
-  const tierStyles = planBadgeStyles[planCase] ?? planBadgeStyles.free;
+  const tierStyles = planBadgeStyles[planCase] ?? planBadgeStyles[`free`];
   const style = tierStyles?.[status] ?? `bg-slate-50 text-slate-600 ring-slate-500/20`;
   const tierLabel =
     planCase === `free`

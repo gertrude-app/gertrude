@@ -1,6 +1,5 @@
 import { RatIcon } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 import type { NextPage } from 'next';
 import MainFooter from '@/components/MainFooter';
 import MainHeader from '@/components/MainHeader';

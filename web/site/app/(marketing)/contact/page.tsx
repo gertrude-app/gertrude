@@ -1,4 +1,3 @@
-import React from 'react';
 import type { NextPage } from 'next';
 import ContactForm from '@/components/ContactForm';
 import Logo from '@/components/Logo';

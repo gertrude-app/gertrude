@@ -56,7 +56,7 @@ export default reactReducer;
 
 export function useUserObserver(userId: UUID): ReducerObserver<typeof reactReducer> {
   return useCallback(
-    (state, action) => {
+    (_state, action) => {
       const key = `extra_monitoring:${userId}`;
       switch (action.type) {
         case `updateExtraMonitoring`:

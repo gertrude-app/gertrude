@@ -12,7 +12,7 @@ interface OgExport {
 }
 
 const REPO_ROOT = resolve(__dirname, `../../..`);
-const STORYBOOK_URL = process.env.STORYBOOK_URL ?? `http://localhost:6006`;
+const STORYBOOK_URL = process.env[`STORYBOOK_URL`] ?? `http://localhost:6006`;
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 627;
 
@@ -64,7 +64,7 @@ async function main(): Promise<void> {
   const browser = await puppeteer.launch({
     headless: true,
     product: `chrome`,
-    args: process.env.CI ? [`--no-sandbox`, `--disable-setuid-sandbox`] : [],
+    args: process.env[`CI`] ? [`--no-sandbox`, `--disable-setuid-sandbox`] : [],
   });
   const page = await browser.newPage();
 

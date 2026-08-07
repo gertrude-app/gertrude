@@ -65,13 +65,13 @@ async function generateDomain(config: DomainConfig): Promise<void> {
   const domainDir = path.join(PACKAGE_ROOT, `src`, config.domain);
   cleanDir(domainDir);
 
-  const inputDir = process.env.CODEGEN_INPUT_DIR;
+  const inputDir = process.env[`CODEGEN_INPUT_DIR`];
   let output: CodegenOutput;
   if (inputDir) {
     const filePath = path.join(inputDir, `${config.domain}.json`);
     output = JSON.parse(fs.readFileSync(filePath, `utf-8`));
   } else {
-    const apiPort = process.env.API_PORT ?? `8080`;
+    const apiPort = process.env[`API_PORT`] ?? `8080`;
     const endpoint = `http://127.0.0.1:${apiPort}/${config.domain}-ts-codegen`;
     output = await fetchCodegenData(endpoint);
   }

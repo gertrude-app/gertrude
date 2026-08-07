@@ -43,16 +43,16 @@ export function isPqlError(input: unknown): input is PqlError {
     return false;
   }
   const object = input as Record<string, unknown>;
-  if (object.isPqlError !== true) {
+  if (object[`isPqlError`] !== true) {
     return false;
   }
-  if (typeof object.id !== `string`) {
+  if (typeof object[`id`] !== `string`) {
     return false;
   }
-  if (typeof object.type !== `string`) {
+  if (typeof object[`type`] !== `string`) {
     return false;
   }
-  return TYPES.includes(object.type as PqlErrorType);
+  return TYPES.includes(object[`type`] as PqlErrorType);
 }
 
 export function toClientError(serverError: ServerPqlError): PqlError {

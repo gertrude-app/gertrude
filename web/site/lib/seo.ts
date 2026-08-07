@@ -27,9 +27,9 @@ export function description(description: string): string {
 }
 
 function metadataBase(): URL {
-  const isCloudflarePages = process.env.CF_PAGES === `1`;
-  const branch = process.env.CF_PAGES_BRANCH;
-  const deployUrl = process.env.CF_PAGES_URL;
+  const isCloudflarePages = process.env[`CF_PAGES`] === `1`;
+  const branch = process.env[`CF_PAGES_BRANCH`];
+  const deployUrl = process.env[`CF_PAGES_URL`];
 
   switch (true) {
     case isCloudflarePages && branch !== `master` && deployUrl !== undefined:

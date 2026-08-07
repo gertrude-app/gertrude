@@ -29,7 +29,7 @@ import type {
 } from '@dash/types';
 
 export class QueryKey<T> {
-  private phantom?: T;
+  protected phantom?: T;
 
   // do not construct directly, use `Key` static methods
   public readonly __taint: `66e66bd61e2f4e009ca94f3fac98fd33`;
