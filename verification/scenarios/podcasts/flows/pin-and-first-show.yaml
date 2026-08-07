@@ -1,0 +1,41 @@
+appId: com.netrivet.gertrude.am.dev
+---
+- assertVisible:
+    text: ".*all set.*"
+- tapOn: "Continue"
+- assertVisible:
+    id: "onboarding-screen-explain-set-passcode"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    id: "onboarding-screen-strong-passcode"
+- tapOn:
+    id: "btn-primary"
+- assertVisible: "Set PIN"
+- runFlow: enter-pin.yaml
+- assertVisible: "Confirm PIN"
+- runFlow: enter-pin.yaml
+- assertVisible: "No shows yet"
+- tapOn: "Add Show"
+- runFlow: enter-pin.yaml
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    text: "Search for podcasts.*"
+- tapOn:
+    text: "Search for podcasts.*"
+- inputText: "This"
+- assertVisible:
+    text: ".*This American Life.*"
+- tapOn:
+    text: ".*This American Life.*"
+- assertVisible: "Show podcast and episode images?"
+- tapOn:
+    id: "btn-primary"
+- assertVisible:
+    text: ".*This American Life.*"
+- tapOn:
+    text: ".*This American Life.*"
+- assertVisible: "Play Latest"
+- tapOn: "Play Latest"
+- assertVisible: "Pause"

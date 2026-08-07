@@ -25,6 +25,7 @@ struct OnboardingView: View {
             text: lstr(.onboardingAreYouParent),
             primary: self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
             secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped),
+            screenIdentifier: "onboarding-screen-are-you-the-parent",
           )
 
         case .parentRequired:
@@ -48,6 +49,7 @@ struct OnboardingView: View {
           ButtonScreenView(
             text: lstr(.onboardingExplainAccount),
             primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
+            screenIdentifier: "onboarding-screen-explain-account-required",
           )
 
         case .connectAccountOrSkip:
@@ -55,12 +57,14 @@ struct OnboardingView: View {
             text: lstr(.onboardingConnectOrSkip),
             primary: self.btn(lstr(.onboardingConnectNow), action: .primaryBtnTapped),
             secondary: self.btn(lstr(.onboardingSkipForNow), action: .secondaryBtnTapped),
+            screenIdentifier: "onboarding-screen-connect-account-or-skip",
           )
 
         case .explainSetPasscode:
           ButtonScreenView(
             text: lstr(.onboardingExplainPin),
             primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
+            screenIdentifier: "onboarding-screen-explain-set-passcode",
           )
 
         case .strongPasscode:
@@ -71,6 +75,7 @@ struct OnboardingView: View {
                 : .onboardingStrongPin,
             ),
             primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped),
+            screenIdentifier: "onboarding-screen-strong-passcode",
           )
         }
       }

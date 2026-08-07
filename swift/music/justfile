@@ -1,6 +1,8 @@
 import '../watch-helpers.just'
 
 swiftly := "${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly"
+bundle_id := env("GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER", "com.netrivet.gertrude.music.dev")
+sim_derived_data := ".derived-data/sim"
 
 _default:
   @just --choose
@@ -32,8 +34,36 @@ build:
   @just build-views
   @just build-tca
 
-build-app:
-  @xcodebuild -project GertrudeMusic.xcodeproj -scheme 'Gertrude Music' -configuration Debug -destination 'generic/platform=iOS Simulator' build
+build-app: sim-build
+
+sim-build destination="generic/platform=iOS Simulator":
+  @just gen
+  @xcodebuild \
+    -project GertrudeMusic.xcodeproj \
+    -scheme 'Gertrude Music' \
+    -configuration Debug \
+    -destination '{{destination}}' \
+    -derivedDataPath {{sim_derived_data}} \
+    -skipMacroValidation \
+    -skipPackagePluginValidation \
+    -quiet \
+    build
+
+sim-install simulator="booted":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  app_path="$(find {{sim_derived_data}}/Build/Products/Debug-iphonesimulator -maxdepth 1 -name 'Gertrude Music.app' -print -quit)"
+  if [[ -z "$app_path" ]]; then
+    echo "Gertrude Music simulator app not found. Run: just sim-build" >&2
+    exit 66
+  fi
+  xcrun simctl install {{simulator}} "$app_path"
+
+sim-launch simulator="booted":
+  @xcrun simctl launch {{simulator}} {{bundle_id}}
+
+sim-uninstall simulator="booted":
+  @xcrun simctl uninstall {{simulator}} {{bundle_id}} || true
 
 test:
   @cd lib-views && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test

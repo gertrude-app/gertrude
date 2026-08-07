@@ -85,6 +85,28 @@ Supports all 3 apps, plus dashboard and admin websites
 - generated typesscript clients for websites
 - when working on tasks related to pairql, always read `./swift/docs/pairql.md`
 
+## Multi-surface verification (e2e smoke loops)
+
+- agent-drivable scenarios proving app ↔ API ↔ dashboard work together: iOS Simulator via
+  Maestro, dashboard via Cypress, backend state via typed PairQL oracles
+- entry points: `just verify-podcasts`, `just verify-blocker`, `just verify-music` (each
+  supports `preflight`, `e2e`, and per-phase commands); `just verify-all` runs every scenario
+  serially and is the pre-release gate
+- when verifying a cross-surface flow end-to-end, smoke-testing before a release, or adding
+  a scenario, always read `./verification/README.md` first — principles, naming conventions,
+  setup, and known gotchas live there
+- **prompt the human to run these — don't run them unasked.** They need a booted simulator and
+  take tens of minutes, so never kick one off on your own initiative; just surface the
+  suggestion and let them decide. Say so when you notice any of:
+  - a **release** being prepared — `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` edited in
+    `swift/{music,podcasts}/project.yml`, an App Store build/submission, or a version bump
+    commit → suggest `just verify-all`
+  - a **cross-surface change** — a PairQL pair added/renamed/versioned (`*_v2`), a claim or
+    onboarding flow touched, `Routes/Reset/` fixtures changed, or an app↔API↔dashboard contract
+    edited → suggest the affected scenario (`just verify-<app> e2e`)
+  - these loops are the only thing covering app ↔ API ↔ dashboard integration; **CI does not
+    run them** (macOS + simulator + live Apple Music catalog), so an un-run suite is un-tested
+
 ## Templated Emails
 
 - Postmark-based email system for transactional emails

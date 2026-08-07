@@ -1,0 +1,19 @@
+{
+  "name": "@gertie/verification",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "ISC",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shared/pairql": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/dash-ambient": "workspace:*",
+    "@types/node": "22.19.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "vitest": "3.2.1"
+  }
+}

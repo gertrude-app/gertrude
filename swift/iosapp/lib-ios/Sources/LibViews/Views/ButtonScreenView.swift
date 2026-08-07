@@ -51,6 +51,7 @@ struct ButtonScreenView: View {
   let listItems: [String]?
   let image: String?
   let screenType: ScreenType
+  let screenIdentifier: String?
 
   @State private var showBg = true
   @State private var iconOffset = Vector(x: 0, y: -20)
@@ -77,9 +78,11 @@ struct ButtonScreenView: View {
     image: String? = nil,
     screenType: ScreenType = .info,
     primaryLooksLikeSecondary: Bool = false,
+    screenIdentifier: String? = nil,
   ) {
     self.text = text
     self.screenType = screenType
+    self.screenIdentifier = screenIdentifier
     self.listItems = listItems
     self.image = image
     self.primaryButtonConfig = primary
@@ -139,6 +142,7 @@ struct ButtonScreenView: View {
       Text(self.text)
         .font(.system(size: 18 * self.bodyScale, weight: .medium))
         .fixedSize(horizontal: false, vertical: true)
+        .optionalAccessibilityIdentifier(self.screenIdentifier)
         .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
 
       if let listItems = self.listItems {
@@ -177,6 +181,7 @@ struct ButtonScreenView: View {
             ),
             variant: self.primaryLooksLikeSecondary ? .secondary : .primary,
             disabled: config.disabled,
+            accessibilityIdentifier: "btn-primary",
           )
           .swooshIn(
             tracking: self.$primaryButtonStatus.offset,
@@ -202,6 +207,7 @@ struct ButtonScreenView: View {
             ),
             variant: .secondary,
             disabled: config.disabled,
+            accessibilityIdentifier: "btn-secondary",
           )
           .swooshIn(
             tracking: self.$secondaryButtonStatus.offset,
@@ -226,6 +232,7 @@ struct ButtonScreenView: View {
             ),
             variant: .secondary,
             disabled: config.disabled,
+            accessibilityIdentifier: "onboarding-tertiary-button",
           )
           .swooshIn(
             tracking: self.$tertiaryButtonStatus.offset,

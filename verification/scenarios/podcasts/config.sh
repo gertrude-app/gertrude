@@ -1,0 +1,5 @@
+scenario_name="podcasts"
+bundle_id="com.netrivet.gertrude.am.dev"
+claim_parent_fixture_name="blanca"
+claim_parent_creds="BE400000-0000-0000-0000-000000000000"
+claim_child_name="${DASHBOARD_CLAIM_CHILD_NAME:-Verification Child}"

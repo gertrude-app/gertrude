@@ -1,0 +1,271 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/lib/common.sh"
+source "$verification_root/scenarios/blocker/config.sh"
+
+command=""
+headed=""
+browser=""
+for arg in "$@"; do
+  case "$arg" in
+    --headed) headed="--headed" ;;
+    --chrome) browser="--browser chrome"; headed="--headed" ;;
+    *) [[ -z "$command" ]] && command="$arg" ;;
+  esac
+done
+command="${command:-preflight}"
+
+preflight() {
+  echo "blocker verification preflight"
+  echo ""
+  echo "api:       $api_url"
+  echo "bundle:    $bundle_id"
+  echo "reset:     ${reset_url:-unavailable}"
+  echo ""
+
+  [[ -d "$root/swift/iosapp" ]] && ok "swift/iosapp exists" || missing "swift/iosapp"
+  [[ -f "$ports_file" ]] && ok "ports file loaded (${ports_file#$root/})" || warn "no ports file; using env/defaults ($api_url, $dash_url)"
+  check_shared_env
+
+  for tool in just xcrun maestro pnpm; do
+    have "$tool" && ok "$tool available" || missing "$tool"
+  done
+
+  if xcrun simctl list devices booted 2>/dev/null | grep -q "Booted"; then
+    ok "simulator booted"
+    report_sim_os
+  else
+    warn "no booted simulator"
+  fi
+
+  if [[ -d "$app_bundle_path" ]]; then
+    ok "simulator app build found: $app_bundle_path"
+  else
+    warn "simulator app build not found; run: just verify-blocker app"
+  fi
+
+  if http_ready "$api_url/releases"; then
+    ok "api reachable"
+  else
+    warn "api not reachable; start with: just watch-api"
+  fi
+
+  echo ""
+  echo "next:"
+  echo "  just verify-blocker app"
+  echo "  just verify-blocker flow"
+  echo "  just verify-blocker claim"
+  echo "  just verify-blocker e2e"
+}
+
+read_dashboard_creds() {
+  admin_id="${DASHBOARD_ADMIN_ID:-$claim_parent_creds}"
+  admin_token="${DASHBOARD_PARENT_TOKEN:-$claim_parent_creds}"
+  ok "dashboard parent: $claim_parent_fixture_name fixture ($admin_id)"
+}
+
+run_cypress_dashboard() {
+  local spec="$1"
+  local project="$root/verification/scenarios/blocker/dashboard"
+
+  (cd "$root/web" \
+    && DASH_PORT="$dash_port" \
+       CYPRESS_CLAIM_CODE="$connection_code" \
+       CYPRESS_ADMIN_ID="$admin_id" \
+       CYPRESS_ADMIN_TOKEN="$admin_token" \
+       CYPRESS_CHILD_NAME="$child_name" \
+       pnpm cypress run --project "$project" --spec "$project/e2e/$spec" $browser $headed)
+}
+
+extract_connection_code() {
+  local simulator="$1"
+  local deadline=$((SECONDS + 20))
+
+  while (( SECONDS < deadline )); do
+    connection_code="$(
+      maestro --udid "$simulator" hierarchy --compact \
+        | grep -Eo 'https://gertrude\.app/b/[0-9]{6}' \
+        | head -1 \
+        | sed 's#.*/##' || true
+    )"
+    if [[ "$connection_code" =~ ^[0-9]{6}$ ]]; then
+      ok "iOS connection code: $connection_code"
+      return 0
+    fi
+    sleep 1
+  done
+
+  diagnose_missing_claim_code blocker
+  exit 70
+}
+
+claim_connection_code() {
+  read_dashboard_creds
+  child_name="${BLOCKER_CHILD_NAME:-$connection_child_name}"
+
+  echo "driving dashboard blocker claim via cypress (behavior under test)"
+  run_cypress_dashboard claim.cy.js
+  ok "dashboard blocker claim completed for $child_name"
+}
+
+app() {
+  echo "blocker app lifecycle"
+  echo ""
+
+  for tool in just xcrun; do
+    if ! have "$tool"; then
+      missing "$tool"
+      exit 69
+    fi
+  done
+
+  simulator="$(selected_simulator)"
+  simulator_name="$(selected_simulator_name "$simulator")"
+  ok "target simulator: ${simulator_name:-unknown} ($simulator)"
+
+  echo ""
+  echo "writing local simulator API config"
+  (cd "$root" && LOCAL_API_ENDPOINT="$api_url" just swift iosconfig)
+
+  echo ""
+  echo "building simulator app"
+  (cd "$root" && just swift iosapp-xcode-build)
+
+  if [[ ! -d "$app_bundle_path" ]]; then
+    echo "$app_name simulator app not found after build: $app_bundle_path" >&2
+    exit 70
+  fi
+  ok "simulator app build: $app_bundle_path"
+
+  echo ""
+  echo "installing simulator app"
+  xcrun simctl install "$simulator" "$app_bundle_path"
+
+  app_container="$(xcrun simctl get_app_container "$simulator" "$bundle_id" app)"
+  ok "installed app container: $app_container"
+
+  echo ""
+  echo "launching simulator app"
+  xcrun simctl launch "$simulator" "$bundle_id"
+  ok "launch command completed"
+
+  echo ""
+  echo "next:"
+  echo "  just verify-blocker flow"
+}
+
+flow() {
+  echo "blocker maestro flow"
+  echo ""
+
+  for tool in maestro xcrun; do
+    if ! have "$tool"; then
+      missing "$tool"
+      exit 69
+    fi
+  done
+
+  simulator="$(selected_simulator)"
+  simulator_name="$(selected_simulator_name "$simulator")"
+  ok "target simulator: ${simulator_name:-unknown} ($simulator)"
+
+  maestro test --udid "$simulator" "$verification_root/scenarios/blocker/flows/onboarding.yaml"
+}
+
+claim() {
+  echo "blocker cross-surface claim"
+  echo ""
+
+  for tool in maestro pnpm; do
+    if ! have "$tool"; then
+      missing "$tool"
+      exit 69
+    fi
+  done
+
+  simulator="$(selected_simulator)"
+  simulator_name="$(selected_simulator_name "$simulator")"
+  ok "target simulator: ${simulator_name:-unknown} ($simulator)"
+
+  extract_connection_code "$simulator"
+  claim_connection_code
+  maestro test --udid "$simulator" "$verification_root/scenarios/blocker/flows/connected.yaml"
+  ok "app observed dashboard claim"
+}
+
+reset_api() {
+  echo "blocker api fixture reset"
+  echo ""
+
+  reset_server_state
+}
+
+reset_sim() {
+  echo "blocker simulator state reset"
+  echo ""
+
+  if ! have xcrun; then
+    missing xcrun
+    exit 69
+  fi
+
+  simulator="$(selected_simulator)"
+  simulator_name="$(selected_simulator_name "$simulator")"
+  ok "target simulator: ${simulator_name:-unknown} ($simulator)"
+
+  xcrun simctl terminate "$simulator" "$bundle_id" >/dev/null 2>&1 || true
+  xcrun simctl uninstall "$simulator" "$bundle_id" >/dev/null 2>&1 || true
+  ok "app uninstalled"
+  xcrun simctl keychain "$simulator" reset
+  ok "simulator keychain reset"
+}
+
+e2e() {
+  reset_api
+  echo ""
+  reset_sim
+  echo ""
+  app
+  echo ""
+  flow
+  echo ""
+  claim
+}
+
+case "$command" in
+  preflight)
+    preflight
+    ;;
+  app)
+    app
+    ;;
+  flow)
+    flow
+    ;;
+  claim)
+    claim
+    ;;
+  reset-api)
+    reset_api
+    ;;
+  reset-sim)
+    reset_sim
+    ;;
+  e2e)
+    e2e
+    ;;
+  env)
+    echo "API_PORT=$api_port"
+    echo "BUNDLE_ID=$bundle_id"
+    ;;
+  ""|-h|--help|help)
+    cat <<EOF
+usage: just verify-blocker [preflight|app|flow|claim|reset-api|reset-sim|e2e|env] [--headed] [--chrome]
+EOF
+    ;;
+  *)
+    echo "unknown blocker verification command: $command" >&2
+    exit 64
+    ;;
+esac

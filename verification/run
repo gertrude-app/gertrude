@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+
+scenario="${1:-}"
+
+case "$scenario" in
+  blocker)
+    "$verification_root/scenarios/blocker/run" "${@:2}"
+    ;;
+  music)
+    "$verification_root/scenarios/music/run" "${@:2}"
+    ;;
+  podcasts)
+    "$verification_root/scenarios/podcasts/run" "${@:2}"
+    ;;
+  all)
+    if [[ $# -gt 1 ]]; then
+      scenario_args=("${@:2}")
+    else
+      scenario_args=(e2e)
+    fi
+    failures=""
+    for name in podcasts blocker music; do
+      printf '\n=== %s ===\n\n' "$name"
+      if "$verification_root/scenarios/$name/run" "${scenario_args[@]}"; then
+        ok "$name passed"
+      else
+        failures="$failures $name"
+      fi
+    done
+    printf '\n=== summary ===\n'
+    for name in podcasts blocker music; do
+      case " $failures " in
+        *" $name "*) echo "fail    $name" ;;
+        *) ok "$name" ;;
+      esac
+    done
+    [[ -z "$failures" ]] || exit 1
+    ;;
+  ""|-h|--help|help)
+    cat <<EOF
+usage: just verify-<scenario> [command]
+       just verify-all [command]   (every scenario in turn; defaults to e2e)
+       (dispatcher: ./verification/run <scenario|all> [command])
+
+scenarios:
+  blocker
+  music
+  podcasts
+EOF
+    ;;
+  *)
+    echo "unknown verification scenario: $scenario" >&2
+    exit 64
+    ;;
+esac

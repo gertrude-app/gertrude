@@ -1,0 +1,25 @@
+appId: com.netrivet.gertrude.music.dev
+---
+- assertVisible: "No music yet"
+# reloading the approved library hits the live Apple catalog and can transiently come
+# back empty or errored; retry (Check again / Try again) until the approved album appears.
+- repeat:
+    times: 5
+    commands:
+      - runFlow:
+          when:
+            notVisible: "Stories from the Outside"
+          commands:
+            - tapOn:
+                text: "Check again|Try again"
+            - waitForAnimationToEnd:
+                timeout: 6000
+- extendedWaitUntil:
+    visible: "Stories from the Outside"
+    timeout: 20000
+- tapOn: "Stories from the Outside"
+- assertVisible: "Play"
+- tapOn: "Play"
+- assertVisible: "Pause"
+- tapOn: "Pause"
+- assertVisible: "Play"

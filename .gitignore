@@ -15,6 +15,7 @@ node_modules/
 **/.swiftpm/
 **/xcuserdata/
 **/DerivedData/
+**/.derived-data
 buildServer.json
 
 # SQL dumps
@@ -49,6 +50,7 @@ swift/music/GertrudeMusic.xcodeproj/
 
 # Podcasts app
 swift/podcasts/previews
+swift/podcasts/.derived-data/
 
 # Local task files
 agent.task.md

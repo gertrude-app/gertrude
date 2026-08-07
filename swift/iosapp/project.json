@@ -21,7 +21,7 @@
     "xcode-build": {
       "cache": true,
       "inputs": ["xcode-sources", "^sources"],
-      "command": "cd iosapp && xcodebuild -project Gertrude-iOS.xcodeproj -scheme Gertrude-iOS -skipMacroValidation -destination 'generic/platform=iOS Simulator' build"
+      "command": "cd iosapp && xcodebuild -project Gertrude-iOS.xcodeproj -scheme Gertrude-iOS -skipMacroValidation -skipPackagePluginValidation -destination 'generic/platform=iOS Simulator' -derivedDataPath .derived-data/sim -quiet build"
     }
   }
 }

@@ -1,0 +1,26 @@
+appId: com.netrivet.gertrude.music.dev
+---
+# after the dashboard claim, the app polls and shows the "Account connected" device-recognized
+# screen; continue past it (on the simulator Apple Music auth/subscription auto-resolve) into
+# the approved-music library.
+- extendedWaitUntil:
+    visible: "Account connected"
+    timeout: 25000
+- waitForAnimationToEnd:
+    timeout: 4000
+- tapOn: "Continue"
+# lands on the Library screen; the first load can transiently fail into a "Couldn't load
+# library" / "Try again" state, so retry that before asserting the empty "No music yet" state.
+- repeat:
+    times: 3
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 6000
+      - runFlow:
+          when:
+            visible: "Try again"
+          commands:
+            - tapOn: "Try again"
+- extendedWaitUntil:
+    visible: "No music yet"
+    timeout: 20000

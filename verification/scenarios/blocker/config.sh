@@ -1,0 +1,7 @@
+scenario_name="blocker"
+bundle_id="com.netrivet.gertrude-ios.app"
+app_name="Gertrude-iOS"
+app_bundle_path="$root/swift/iosapp/.derived-data/sim/Build/Products/Debug-iphonesimulator/app.app"
+claim_parent_fixture_name="blanca"
+claim_parent_creds="BE400000-0000-0000-0000-000000000000"
+connection_child_name="Blocker Verification Child"
