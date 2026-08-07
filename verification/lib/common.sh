@@ -111,6 +111,16 @@ require_supported_sim_os() {
   return 0
 }
 
+diagnose_missing_claim_code() {
+  local scenario="$1"
+  if find "$HOME/Library/Logs/DiagnosticReports" -name 'SpringBoard-*.ips' -mmin -3 2>/dev/null | grep -q .; then
+    echo "SpringBoard crashed during this run (XCTAutomationSupport respring — see verification/README.md gotchas); the app was killed with it." >&2
+    echo "rerun: just verify-$scenario flow, then: just verify-$scenario claim" >&2
+  else
+    echo "claim code not found in simulator hierarchy; run: just verify-$scenario flow" >&2
+  fi
+}
+
 report_one_sim_os() {
   local sim="$1" sdk="$2" version major label
   version="$(simulator_os_version "$sim")"

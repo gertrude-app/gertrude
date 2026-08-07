@@ -96,7 +96,7 @@ extract_connection_code() {
     sleep 1
   done
 
-  echo "unable to read generated blocker connection code from simulator hierarchy" >&2
+  diagnose_missing_claim_code blocker
   exit 70
 }
 

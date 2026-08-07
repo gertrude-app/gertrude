@@ -102,7 +102,7 @@ extract_claim_code() {
     sleep 1
   done
 
-  echo "unable to read generated music claim code from simulator hierarchy" >&2
+  diagnose_missing_claim_code music
   exit 70
 }
 

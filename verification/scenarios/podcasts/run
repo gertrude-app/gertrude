@@ -171,15 +171,6 @@ extract_claim_code() {
   return 1
 }
 
-diagnose_missing_claim_code() {
-  if find "$HOME/Library/Logs/DiagnosticReports" -name 'SpringBoard-*.ips' -mmin -3 2>/dev/null | grep -q .; then
-    echo "SpringBoard crashed during this run (XCTAutomationSupport respring — see verification/README.md gotchas); the app was killed with it." >&2
-    echo "rerun: just verify-podcasts flow, then: just verify-podcasts claim" >&2
-  else
-    echo "claim code not found in simulator hierarchy; run: just verify-podcasts flow" >&2
-  fi
-}
-
 now_playing_snapshot() {
   local simulator="$1"
   local data_container db
@@ -245,7 +236,7 @@ claim() {
 
   claim_code="$(extract_claim_code "$simulator" || true)"
   if [[ -z "$claim_code" ]]; then
-    diagnose_missing_claim_code
+    diagnose_missing_claim_code podcasts
     exit 70
   fi
   ok "claim code: $claim_code"
