@@ -32,11 +32,6 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
-    <key>NSAppTransportSecurity</key>
-    <dict>
-      <key>NSAllowsLocalNetworking</key>
-      <string>$(ALLOW_LOCAL_NETWORKING)</string>
-    </dict>
     <key>UIBackgroundModes</key>
     <array>
       <string>audio</string>
