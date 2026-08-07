@@ -121,6 +121,7 @@ extension Configure {
     app.migrations.add(BackfillUnrestrictedMacApps())
     app.migrations.add(AddDashAnnouncementCampaign())
     app.migrations.add(WidenRouteTelemetryErrorId())
+    app.migrations.add(AddCardFingerprint())
   }
 }
 

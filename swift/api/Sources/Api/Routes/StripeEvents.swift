@@ -45,6 +45,8 @@ enum StripeEventsRoute {
         try await handleSubscriptionUpdated(event: event, stripeEvent: stripeEvent, db: db)
       case "customer.subscription.deleted":
         try await handleSubscriptionDeleted(event: event, stripeEvent: stripeEvent, db: db)
+      case "charge.succeeded", "payment_method.attached":
+        try await handleCardFingerprint(event: event, db: db)
       default:
         break
       }
@@ -193,6 +195,27 @@ private func handleInvoicePaid(
   }
 }
 
+private func handleCardFingerprint(
+  event: EventInfo?,
+  db: any DuetSQL.Client,
+) async throws {
+  let object = event?.data?.object
+  let fingerprint = object?.payment_method_details?.card?.fingerprint ?? object?.card?.fingerprint
+  guard let fingerprint, !fingerprint.isEmpty, let customerId = object?.customer else {
+    return
+  }
+
+  guard var identity = try? await BillingIdentity.query()
+    .where(.stripeCustomerId == .init(customerId))
+    .first(in: db) else {
+    return
+  }
+
+  guard identity.cardFingerprint != fingerprint else { return }
+  identity.cardFingerprint = fingerprint
+  try await db.update(identity)
+}
+
 private func handleSubscriptionUpdated(
   event: EventInfo?,
   stripeEvent: StripeEvent,
@@ -303,6 +326,12 @@ private func handleSubscriptionDeleted(
 }
 
 private func slackNotify(_ event: EventInfo?) {
+  switch event?.type {
+  case "charge.succeeded", "payment_method.attached", "customer.subscription.updated":
+    return
+  default:
+    break
+  }
   var message = """
     *Received Gertrude Stripe Event:*
     - type: `\(event?.type ?? "(nil)")`
@@ -357,7 +386,17 @@ private struct EventInfo: Decodable {
         var data: [Item]?
       }
 
+      struct Card: Decodable {
+        var fingerprint: String?
+      }
+
+      struct PaymentMethodDetails: Decodable {
+        var card: Card?
+      }
+
       var amount_due: Int?
+      var card: Card?
+      var payment_method_details: PaymentMethodDetails?
       var customer: String?
       var customer_email: String?
       var cancellation_details: CancellationDetails?

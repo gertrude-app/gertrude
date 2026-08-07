@@ -710,6 +710,121 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       expect(retrieved.tier).toEqual(.light)
     })
   }
+
+  func testChargeSucceededStoresCardFingerprint() async throws {
+    let customerId = "cus_".random
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init(customerId),
+    ))
+
+    let json = """
+      {
+        "type": "charge.succeeded",
+        "data": {
+          "object": {
+            "customer": "\(customerId)",
+            "payment_method_details": { "card": { "fingerprint": "fPrInT123" } }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await parent.model.billingIdentity(in: self.db)
+      expect(retrieved?.cardFingerprint).toEqual("fPrInT123")
+    })
+  }
+
+  func testPaymentMethodAttachedStoresCardFingerprint() async throws {
+    let customerId = "cus_".random
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init(customerId),
+    ))
+
+    let json = """
+      {
+        "type": "payment_method.attached",
+        "data": {
+          "object": {
+            "customer": "\(customerId)",
+            "card": { "fingerprint": "aTtAcHeD99" }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await parent.model.billingIdentity(in: self.db)
+      expect(retrieved?.cardFingerprint).toEqual("aTtAcHeD99")
+    })
+  }
+
+  func testCardFingerprintUnknownCustomerIsIgnored() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_".random),
+    ))
+
+    let json = """
+      {
+        "type": "charge.succeeded",
+        "data": {
+          "object": {
+            "customer": "cus_neverSeenBefore",
+            "payment_method_details": { "card": { "fingerprint": "orphan777" } }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent) // must not 500 on an unmatched customer
+      let retrieved = try await parent.model.billingIdentity(in: self.db)
+      expect(retrieved?.cardFingerprint).toBeNil()
+    })
+  }
+
+  func testSharedCardFingerprintAcrossParentsIsCorrelatable() async throws {
+    let customerOne = "cus_".random
+    let customerTwo = "cus_".random
+    let parentOne = try await self.parent()
+    let parentTwo = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parentOne.id,
+      stripeCustomerId: .init(customerOne),
+    ))
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parentTwo.id,
+      stripeCustomerId: .init(customerTwo),
+    ))
+
+    for customerId in [customerOne, customerTwo] {
+      let json = """
+        {
+          "type": "charge.succeeded",
+          "data": {
+            "object": {
+              "customer": "\(customerId)",
+              "payment_method_details": { "card": { "fingerprint": "sHaReDcArD" } }
+            }
+          }
+        }
+      """
+      try await app.test(.POST, "stripe-events", body: .init(string: json))
+    }
+
+    let matches = try await BillingIdentity.query()
+      .where(.cardFingerprint == "sHaReDcArD")
+      .all(in: self.db)
+    expect(matches.count).toEqual(2) // the whole point: one card, two accounts
+  }
 }
 
 private func invoicePaidJson(

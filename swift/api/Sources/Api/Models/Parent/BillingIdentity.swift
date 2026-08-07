@@ -13,6 +13,7 @@ struct BillingIdentity: Codable, Sendable {
   var trialEmailLifecycle: TrialEmailLifecycle
   var isComplimentary: Bool
   var legacyAmIapPaidAt: Date?
+  var cardFingerprint: String?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -26,6 +27,7 @@ struct BillingIdentity: Codable, Sendable {
     trialEmailLifecycle: TrialEmailLifecycle = .none,
     isComplimentary: Bool = false,
     legacyAmIapPaidAt: Date? = nil,
+    cardFingerprint: String? = nil,
   ) {
     self.id = id
     self.parentId = parentId
@@ -36,6 +38,7 @@ struct BillingIdentity: Codable, Sendable {
     self.trialEmailLifecycle = trialEmailLifecycle
     self.isComplimentary = isComplimentary
     self.legacyAmIapPaidAt = legacyAmIapPaidAt
+    self.cardFingerprint = cardFingerprint
   }
 }
 
