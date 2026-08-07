@@ -11,6 +11,7 @@
     "@types/react": "19.2.14",
     "@typescript-eslint/eslint-plugin": "8.62.1",
     "@typescript-eslint/parser": "8.62.1",
+    "@typescript/native": "npm:typescript@7.0.2",
     "concurrently": "10.0.3",
     "cypress": "15.18.0",
     "eslint": "9.39.4",
@@ -23,13 +24,13 @@
     "next": "16.2.9",
     "nx": "23.0.1",
     "prettier": "3.9.3",
-    "typescript": "6.0.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
     "vitest": "4.1.9",
     "x-chalk": "^1.0.1"
   },
   "pnpm": {
     "overrides": {
-      "typescript": "6.0.3"
+      "typescript": "npm:@typescript/typescript6@6.0.2"
     }
   }
 }
