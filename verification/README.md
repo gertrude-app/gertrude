@@ -22,7 +22,7 @@ order (first match wins):
 2. **Explicit env vars** (when no ports file) — `API_ENDPOINT` / `DASH_URL` (full URLs), or
    `API_PORT` / `DASH_PORT` (loopback ports). Set these however your workflow exposes them.
 3. **Repo defaults** — `API_PORT=8080`, `DASH_PORT=8081`, matching a vanilla `just watch-api`
-   and `just dash`, so a plain checkout with the standard local stack running needs no config.
+   and `just web dash`, so a plain checkout with the standard local stack running needs no config.
 
 Shared shell helpers live in `lib/common.sh`. Scenario-specific constants live next to each
 scenario in `config.sh`; keep new app-surface values there instead of scattering them through
@@ -106,7 +106,7 @@ Run `just verify-<scenario> preflight` first — it checks every prerequisite be
 
 - **Tools** (macOS only — these loops drive the iOS Simulator): `just`, `xcrun` (Xcode),
   `maestro`, `xcodegen`, `pnpm`, and `sqlite3`. Cypress is installed by `pnpm --dir web install`.
-- **Local stack running**: `just watch-api` and `just dash`, plus a booted Simulator. The app
+- **Local stack running**: `just watch-api` and `just web dash`, plus a booted Simulator. The app
   under test must be built + installed — `just verify-<scenario> e2e` does the reset → build →
   install → drive chain end-to-end; `flow` assumes the app is already installed.
 - **Simulator on iOS 26+.** The flows rely on native `.searchable`, which hangs on older
@@ -127,11 +127,11 @@ Run `just verify-<scenario> preflight` first — it checks every prerequisite be
 When a flow fails in a way that looks like an app or product bug, suspect the **environment**
 first — most of the time sunk here has been stale infrastructure, not real regressions:
 
-- **Stale dashboard dev server.** `just dash` (Vite) can run for days and silently serve stale
+- **Stale dashboard dev server.** `just web dash` (Vite) can run for days and silently serve stale
   code if its file-watcher dies — a newly added dashboard route then matches nothing and renders
   a blank page, so a Cypress claim fails at `cy.get('form')` with *no error*. Check what's
   actually served, not just what's on disk: `curl -s localhost:$DASH_PORT/src/App.tsx | grep
-  <route>`. Fix by restarting `just dash` (kill this task's own vite only; leave sibling tasks'
+  <route>`. Fix by restarting `just web dash` (kill this task's own vite only; leave sibling tasks'
   servers alone).
 - **Stale installed iOS app.** The simulator keeps the last-built binary. After app or API
   changes (e.g. a PairQL contract change) the old binary can crash mid-flow — e.g. blocker code
