@@ -59,6 +59,20 @@ const SignupPage: React.FC<Props> = ({
         ]}
         heading="Create an Account"
         subheading="Make an account to start protecting your children."
+        disclaimer={
+          <>
+            By signing up, you agree to our{` `}
+            <a
+              href="https://gertrude.app/docs/terms"
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-dotted underline-offset-2"
+            >
+              terms of service
+            </a>
+            .
+          </>
+        }
         bottomLink={{
           text: `Login instead`,
           href: `/login`,

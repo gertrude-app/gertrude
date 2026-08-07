@@ -32,6 +32,9 @@
 /podcasts /#podcasts 301
 /about / 301
 /privacy /docs/iosapp-privacy 301
+/terms /docs/terms 301
+/tos /docs/terms 301
+/aup /docs/terms 301
 
 #################
 # parent rename #
