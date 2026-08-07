@@ -44,6 +44,8 @@ sim-build destination="generic/platform=iOS Simulator":
     -configuration Debug \
     -destination '{{destination}}' \
     -derivedDataPath {{sim_derived_data}} \
+    -skipMacroValidation \
+    -skipPackagePluginValidation \
     -quiet \
     build
 
