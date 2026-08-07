@@ -54,47 +54,89 @@ booted_simulators() {
     | sed -nE 's/^[[:space:]]*(.*) \(([0-9A-Fa-f-]{36})\) \(Booted\).*$/\2\t\1/p'
 }
 
-simulator_os_major() {
+simulator_os_version() {
   local udid="$1"
   xcrun simctl list devices booted 2>/dev/null | awk -v id="$udid" '
     /^-- / { rt = $0; next }
     index($0, id) {
-      if (match(rt, /[0-9]+/)) print substr(rt, RSTART, RLENGTH)
+      if (match(rt, /[0-9]+(\.[0-9]+)*/)) print substr(rt, RSTART, RLENGTH)
       exit
     }'
 }
 
+simulator_os_major() {
+  local version
+  version="$(simulator_os_version "$1")"
+  echo "${version%%.*}"
+}
+
+simulator_sdk_version() {
+  xcrun --sdk iphonesimulator --show-sdk-version 2>/dev/null || true
+}
+
+version_lt() {
+  [[ "$1" != "$2" && "$(printf '%s\n%s\n' "$1" "$2" | sort -V | head -1)" == "$1" ]]
+}
+
 require_supported_sim_os() {
-  local sim="$1" major
-  major="$(simulator_os_major "$sim")"
-  if [[ -z "$major" ]]; then
+  local sim="$1" version major sdk
+  version="$(simulator_os_version "$sim")"
+  if [[ -z "$version" ]]; then
     echo "warn    could not determine iOS version for $sim; continuing" >&2
     return 0
   fi
+  major="${version%%.*}"
   if (( major < 26 )); then
     if [[ -n "${VERIFY_ALLOW_OLD_SIM:-}" ]]; then
-      echo "warn    simulator is iOS $major (<26); VERIFY_ALLOW_OLD_SIM set, continuing" >&2
+      echo "warn    simulator is iOS $version (<26); VERIFY_ALLOW_OLD_SIM set, continuing" >&2
       return 0
     fi
-    echo "simulator is iOS $major; these flows require iOS 26+ (native .searchable hangs on older sims)." >&2
+    echo "simulator is iOS $version; these flows require iOS 26+ (native .searchable hangs on older sims)." >&2
     echo "boot an iOS 26+ simulator, or set VERIFY_ALLOW_OLD_SIM=1 to override." >&2
+    return 66
+  fi
+
+  sdk="$(simulator_sdk_version)"
+  if [[ -n "$sdk" ]] && version_lt "$version" "$sdk"; then
+    if [[ -n "${VERIFY_ALLOW_OLD_SIM:-}" ]]; then
+      echo "warn    simulator iOS $version is older than the iOS $sdk SDK; VERIFY_ALLOW_OLD_SIM set, continuing" >&2
+      return 0
+    fi
+    echo "simulator is iOS $version but the apps build against the iOS $sdk SDK." >&2
+    echo "symbols introduced after iOS $version (e.g. SwiftUI's .glassEffect) link weakly and are" >&2
+    echo "missing at runtime, so the app aborts mid-flow with 'a reference to a missing weak symbol'." >&2
+    echo "boot an iOS $sdk simulator, or set VERIFY_ALLOW_OLD_SIM=1 to override." >&2
     return 66
   fi
   return 0
 }
 
-report_sim_os() {
-  local count sim major
-  count="$(booted_simulators | wc -l | tr -d ' ')"
-  [[ "$count" == "1" ]] || return 0
-  sim="$(booted_simulators | cut -f1)"
-  major="$(simulator_os_major "$sim")"
-  [[ -n "$major" ]] || return 0
-  if (( major >= 26 )); then
-    ok "simulator iOS $major (>=26)"
+report_one_sim_os() {
+  local sim="$1" sdk="$2" version major label
+  version="$(simulator_os_version "$sim")"
+  [[ -n "$version" ]] || return 0
+  label="$(selected_simulator_name "$sim")"
+  label="${label:-$sim}"
+  major="${version%%.*}"
+  if (( major < 26 )); then
+    warn "$label: iOS $version (<26); flows require iOS 26+ (set VERIFY_ALLOW_OLD_SIM=1 to override)"
+  elif [[ -n "$sdk" ]] && version_lt "$version" "$sdk"; then
+    warn "$label: iOS $version is older than the iOS $sdk SDK; expect missing-weak-symbol crashes"
   else
-    warn "simulator iOS $major (<26); flows require iOS 26+ (set VERIFY_ALLOW_OLD_SIM=1 to override)"
+    ok "$label: iOS $version (matches iOS ${sdk:-?} SDK)"
   fi
+}
+
+report_sim_os() {
+  local sim sdk
+  sdk="$(simulator_sdk_version)"
+  if [[ -n "${SIMULATOR_UDID:-}" ]]; then
+    report_one_sim_os "$SIMULATOR_UDID" "$sdk"
+    return 0
+  fi
+  while IFS=$'\t' read -r sim _; do
+    [[ -n "$sim" ]] && report_one_sim_os "$sim" "$sdk"
+  done < <(booted_simulators)
 }
 
 selected_simulator() {

@@ -138,6 +138,18 @@ first — most of the time sunk here has been stale infrastructure, not real reg
   generation drops to the home screen (or whatever app was last foregrounded), which *looks* like
   a UI regression. Rebuild+reinstall with `just verify-<scenario> app` before trusting a flow
   failure.
+- **Simulator runtime older than the iOS SDK ⇒ missing-weak-symbol aborts.** A sim that clears
+  the "iOS 26+" bar can still be older than the SDK Xcode builds against (e.g. an iOS 26.0 sim
+  against the iOS 26.1 SDK). Newer-SDK symbols link weakly, so the app builds and installs fine
+  and then aborts the moment it renders a view that uses one — Gertrude Music dies on
+  `.glassEffect` as soon as the library grid loads. It reads as a mid-flow app bug: Maestro
+  reports the *next* element as not found because the app is gone and the home screen is
+  showing. The tell is in the sim log, not the flow output:
+  `xcrun simctl spawn <udid> log show --last 5m --predicate 'process == "<App Name>"'` →
+  `Failed to look up symbolic reference … likely a reference to a missing weak symbol`. The
+  crash `.ips` shows only `swift_getTypeByMangledName` → `abort` with no app frames, which
+  misleadingly looks like build staleness (a clean rebuild does not fix it). `preflight` now
+  hard-fails on this; boot a sim matching `xcrun --sdk iphonesimulator --show-sdk-version`.
 - **Assert stable screens, not transient ones.** Reducers auto-advance the instant backend state
   changes: the blocker app's 5s poll sees the claim and jumps past the transient
   `connect-account-success` view straight to `connectSuccess`, so asserting the transient id never
