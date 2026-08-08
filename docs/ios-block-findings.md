@@ -269,6 +269,31 @@ a more surgical block target before re-offering, may not be possible.
 
 ## Spotify
 
+### 2026-08-07: Spotify share-sheet artwork not cleanly blockable
+
+**Trigger:** customer report: Spotify artwork was hidden throughout the Spotify app but
+appeared immediately after opening the iOS share sheet for a track.
+
+**Reproduction:** local USB capture while opening Spotify share UI. Exact user-observed
+artwork appearance was `2026-08-07 16:26:36 EDT`.
+
+**Findings:** broad scan of the `16:26:20`-`16:26:40` window showed no Apple daemon,
+Messages/LinkPresentation process, or other sibling bundle fetching Spotify artwork. The
+only successful Spotify traffic near the moment of appearance was
+`2FNC3A47ZF.com.spotify.client` to `guc3-spclient.spotify.com`. Artwork-looking hosts in
+the same window were already dropped, including `image-cdn-fa.spotifycdn.com`,
+`misc.scdn.co`, and `scontent-*.xx.fbcdn.net`.
+
+**Failed diagnostic:** added a temporary device-scoped rule for
+`com.spotify.client` + `guc3-spclient.spotify.com`. It made Spotify too broken to reach a
+useful reproduction path, matching prior findings that `spclient` is core Spotify
+backend traffic rather than an artwork-specific endpoint. Removed the diagnostic rule.
+
+**Verdict:** no shippable block rule identified. The share-sheet artwork is likely coming
+from Spotify's already-open backend/cache path or from image bytes Spotify has already
+loaded locally, not from a narrow artwork host analogous to Apple Music's
+`itunescloudd` leak.
+
 ### 2026-05-01: Spotify Messages chat unblockable
 
 **Trigger:** customer asked whether Gertrude blocks Spotify Messages (in-app DMs, launched
