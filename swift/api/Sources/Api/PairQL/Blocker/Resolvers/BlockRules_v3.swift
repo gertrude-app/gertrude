@@ -10,6 +10,10 @@ extension BlockRules_v3: Resolver {
     let deviceId: IOSDevice.Id? = input.deviceId == .init(.zero) ? nil : .init(input.deviceId)
     let (device, optInExclusions) = try await optInBlockGroupExclusions(deviceId, in: ctx.db)
     disabledGroupIds.append(contentsOf: optInExclusions)
+    disabledGroupIds.append(contentsOf: amazonMusicArtworkExclusions(
+      device,
+      explicitlyDisabledGroups: input.disabledGroups,
+    ))
 
     let rules = try await BlockerApp.BlockRule.query()
       .where(.or(
@@ -62,4 +66,20 @@ func optInBlockGroupExclusions(
     .where(.optIn == true)
     .all(in: db)
   return (device, optInGroups.map { Postgres.Data.uuid($0.id.rawValue) })
+}
+
+func amazonMusicArtworkExclusions(
+  _ device: IOSDevice?,
+  explicitlyDisabledGroups: [UUID],
+) -> [Postgres.Data] {
+  let ids = CreateBlockGroups.GroupIds()
+  let introducedAt = ISO8601DateFormatter().date(from: "2026-08-07T20:00:00Z")!
+  let disabled = Set(explicitlyDisabledGroups)
+  let existingInstall = device?.createdAt ?? .distantFuture
+  if existingInstall < introducedAt
+    || disabled.contains(ids.appleMusicImages)
+    || disabled.contains(ids.spotifyImages) {
+    return [.uuid(ids.amazonMusicArtwork)]
+  }
+  return []
 }
