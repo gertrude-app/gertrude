@@ -21,7 +21,7 @@ if CommandLine.arguments.contains("ts-codegen") {
     app.asyncCommands.use(ScrubDbCommand(), as: "scrub-db")
     try app.run()
   }
-} else if CommandLine.arguments.contains("scheduled-marketing-dry-run") {
+} else if CommandLine.arguments.contains("scheduled-marketing-email-dry-run") {
   try withDependencies { deps in
     deps.logger = app.logger
     deps.uuid = UUIDGenerator { UUID() }
@@ -29,8 +29,8 @@ if CommandLine.arguments.contains("ts-codegen") {
     deps.db = PgClient(threadCount: System.coreCount, env: deps.env)
   } operation: {
     app.asyncCommands.use(
-      ScheduledMarketingCampaignDryRunCommand(),
-      as: "scheduled-marketing-dry-run",
+      ScheduledMarketingEmailCampaignDryRunCommand(),
+      as: "scheduled-marketing-email-dry-run",
     )
     try app.run()
   }

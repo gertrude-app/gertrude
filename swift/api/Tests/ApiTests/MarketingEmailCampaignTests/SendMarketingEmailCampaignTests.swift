@@ -11,25 +11,25 @@ import XExpect
 
 @testable import Api
 
-final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
+final class SendMarketingEmailCampaignTests: ApiTestCase, @unchecked Sendable {
   func testRouteParses() throws {
     let token = UUID(uuidString: "deadbeef-dead-beef-dead-beefdeadbeef")!
-    let input = SendMarketingCampaign.Input(campaign: "launch", dryRun: true, limit: 10)
-    var request = URLRequest(url: URL(string: "super-admin/SendMarketingCampaign")!)
+    let input = SendMarketingEmailCampaign.Input(campaign: "launch", dryRun: true, limit: 10)
+    var request = URLRequest(url: URL(string: "super-admin/SendMarketingEmailCampaign")!)
     request.httpMethod = "POST"
     request.addValue(token.uuidString, forHTTPHeaderField: "X-SuperAdminToken")
     request.httpBody = try JSONEncoder().encode(input)
 
     let matched = try PairQLRoute.router.match(request: request)
 
-    expect(matched).toEqual(.superAdmin(.authed(token, .sendMarketingCampaign(input))))
+    expect(matched).toEqual(.superAdmin(.authed(token, .sendMarketingEmailCampaign(input))))
   }
 
   func testDryRunUsesRegisteredManualCampaignBySlug() async throws {
     let slug = "test_manual_marketing_dry_run"
     let parent1 = try await self.parent()
     let parent2 = try await self.parent()
-    let campaign = TestManualMarketingCampaign(
+    let campaign = TestManualMarketingEmailCampaign(
       slug: slug,
       recipients: [
         .init(parentId: parent1.id, email: parent1.email),
@@ -37,7 +37,7 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
       ],
     )
 
-    let output = try await SendMarketingCampaign.resolve(
+    let output = try await SendMarketingEmailCampaign.resolve(
       with: .init(campaign: slug, dryRun: true, limit: 1),
       in: .mock,
       campaigns: [campaign],
@@ -58,7 +58,7 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
     let slug = "test_manual_marketing_send"
     let parent1 = try await self.parent()
     let parent2 = try await self.parent()
-    let campaign = TestManualMarketingCampaign(
+    let campaign = TestManualMarketingEmailCampaign(
       slug: slug,
       templateAlias: "manual-template",
       from: "Jared from Gertrude <jared@gertrude.app>",
@@ -79,7 +79,7 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await SendMarketingCampaign.resolve(
+      try await SendMarketingEmailCampaign.resolve(
         with: .init(campaign: slug, dryRun: false, limit: 1),
         in: .mock,
         campaigns: [campaign],
@@ -104,7 +104,7 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
   func testRealSendOutsideProdThrowsBadRequest() async throws {
     let slug = "test_manual_marketing_non_prod_send"
     let parent = try await self.parent()
-    let campaign = TestManualMarketingCampaign(
+    let campaign = TestManualMarketingEmailCampaign(
       slug: slug,
       recipients: [.init(parentId: parent.id, email: parent.email)],
     )
@@ -116,7 +116,7 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
           return .success([])
         }
       } operation: {
-        try await SendMarketingCampaign.resolve(
+        try await SendMarketingEmailCampaign.resolve(
           with: .init(campaign: slug, dryRun: false, limit: nil),
           in: .mock,
           campaigns: [campaign],
@@ -124,7 +124,7 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
       }
       XCTFail("expected non-prod send error")
     } catch let error as PqlError {
-      expect(error.id).toEqual("send_marketing_campaign.non_prod_send")
+      expect(error.id).toEqual("send_marketing_email_campaign.non_prod_send")
       expect(error.type).toEqual(.badRequest)
     }
 
@@ -134,28 +134,28 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
 
   func testUnknownManualCampaignThrowsBadRequest() async throws {
     do {
-      _ = try await SendMarketingCampaign.resolve(
+      _ = try await SendMarketingEmailCampaign.resolve(
         with: .init(campaign: "unknown", dryRun: true, limit: nil),
         in: .mock,
         campaigns: [],
       )
       XCTFail("expected unknown campaign error")
     } catch let error as PqlError {
-      expect(error.id).toEqual("send_marketing_campaign.unknown_campaign")
+      expect(error.id).toEqual("send_marketing_email_campaign.unknown_campaign")
       expect(error.type).toEqual(.badRequest)
     }
   }
 
   func testNegativeLimitThrowsBadRequest() async throws {
     do {
-      _ = try await SendMarketingCampaign.resolve(
+      _ = try await SendMarketingEmailCampaign.resolve(
         with: .init(campaign: "test", dryRun: true, limit: -1),
         in: .mock,
-        campaigns: [TestManualMarketingCampaign(slug: "test", recipients: [])],
+        campaigns: [TestManualMarketingEmailCampaign(slug: "test", recipients: [])],
       )
       XCTFail("expected invalid limit error")
     } catch let error as PqlError {
-      expect(error.id).toEqual("send_marketing_campaign.invalid_limit")
+      expect(error.id).toEqual("send_marketing_email_campaign.invalid_limit")
       expect(error.type).toEqual(.badRequest)
     }
   }
@@ -167,14 +167,14 @@ final class SendMarketingCampaignTests: ApiTestCase, @unchecked Sendable {
   }
 }
 
-private struct TestManualMarketingCampaign: MarketingCampaign {
+private struct TestManualMarketingEmailCampaign: MarketingEmailCampaign {
   var slug: String
   var templateAlias = "test-manual-template"
   var from = "Gertrude App <noreply@gertrude.app>"
   var replyTo: String?
-  var recipients: [MarketingCampaignRecipient]
+  var recipients: [MarketingEmailCampaignRecipient]
 
-  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient] {
     self.recipients
   }
 }

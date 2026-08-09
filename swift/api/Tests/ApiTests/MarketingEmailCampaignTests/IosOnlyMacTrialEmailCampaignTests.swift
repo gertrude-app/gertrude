@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class IosOnlyMacTrialCampaignTests: ApiTestCase, @unchecked Sendable {
+final class IosOnlyMacTrialEmailCampaignTests: ApiTestCase, @unchecked Sendable {
   func testAudienceIncludesVerifiedIosOnlyParentsWithOldConnectedCheckin() async throws {
     let now = Date()
     let eligible = try await self.verifiedIOSChild(tokenCreatedAt: now - .days(8))
@@ -18,7 +18,7 @@ final class IosOnlyMacTrialCampaignTests: ApiTestCase, @unchecked Sendable {
     try await self.setTokenCreatedAt(unverified.token.id, to: now - .days(8))
     _ = try await self.createCheckin(for: unverified.device, at: now - .days(8))
 
-    let audience = try await IosOnlyMacTrialCampaign().audience(in: self.db)
+    let audience = try await IosOnlyMacTrialEmailCampaign().audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 
     expect(audienceParentIds.contains(eligible.parent.model.id)).toEqual(true)
@@ -50,7 +50,7 @@ final class IosOnlyMacTrialCampaignTests: ApiTestCase, @unchecked Sendable {
       currentPeriodEnd: now + .days(30),
     ))
 
-    let audience = try await IosOnlyMacTrialCampaign().audience(in: self.db)
+    let audience = try await IosOnlyMacTrialEmailCampaign().audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 
     expect(audienceParentIds.contains(eligible.parent.model.id)).toEqual(true)
@@ -67,7 +67,7 @@ final class IosOnlyMacTrialCampaignTests: ApiTestCase, @unchecked Sendable {
       modelIdentifier: "iPhone15,2",
     )
 
-    let audience = try await IosOnlyMacTrialCampaign().audience(in: self.db)
+    let audience = try await IosOnlyMacTrialEmailCampaign().audience(in: self.db)
     let recipient = try XCTUnwrap(audience.first { $0.parentId == child.parent.model.id })
 
     expect(recipient.templateModel).toEqual(["deviceFragment": "Sarah's iPhone"])

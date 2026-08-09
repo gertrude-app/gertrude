@@ -31,7 +31,7 @@ all notes.
   — capabilities are a union of entitlements from `BillingAccountSnapshot` (per-tier
   table), not the lossy `PlanStatus` projection; Medium-tier-ready by design.
 
-- **[007 — Measuring marketing campaigns without a held-back cohort](./007-marketing-campaign-measurement.md)**
+- **[007 — Measuring marketing email campaigns without a held-back cohort](./007-marketing-campaign-measurement.md)**
   — deliberately no holdout/A-B machinery (too few accounts for significance); instead
   throttle to manual daily waves, capture a `variant`, and read directionally from
   near-zero base rates + replies.

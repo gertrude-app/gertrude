@@ -1,13 +1,13 @@
 import DuetSQL
 
-struct IosOnlyMacTrialCampaign: MarketingCampaign {
+struct IosOnlyMacTrialEmailCampaign: MarketingEmailCampaign {
   let slug = "ios_only_mac_trial"
   let templateAlias = IosOnlyMacTrial.alias
   let variant = "v2"
   let from = "Jared Henderson <jared@gertrude.app>"
   let replyTo: String? = "jared@netrivet.com"
 
-  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient] {
     let rows = try await db.customQuery(IosOnlyMacTrialAudienceRow.self)
     var order: [Parent.Id] = []
     var byParent: [Parent.Id: (email: EmailAddress, kids: [IosOnlyMacTrialKid])] = [:]
