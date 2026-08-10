@@ -71,13 +71,15 @@ extension DatabaseWriter {
   }
 
   func insertRecord(id: Record.ID, value: String = "", detail: String? = nil) {
-    if let existing = self.record(id: id) {
-      log(.warn, .setup, "c59c4548", detail: "\(id): \(existing)")
-      return
-    }
     self.tryWrite { db in
+      // NB: on conflict do nothing prevents a race toc/tou crash observed
+      // locally where onboarding and kill switch raced to set install id
       try Record
-        .insert { Record.Draft(id: id, value: value, detail: detail) }
+        .insert {
+          Record.Draft(id: id, value: value, detail: detail)
+        } onConflict: {
+          $0.id
+        }
         .execute(db)
     }
   }
