@@ -119,6 +119,7 @@ extension Configure {
     app.migrations.add(AddMusicTrackGrants())
     app.migrations.add(CreateUnrestrictedMacApps())
     app.migrations.add(BackfillUnrestrictedMacApps())
+    app.migrations.add(AddDashAnnouncementCampaign())
   }
 }
 

@@ -24,6 +24,8 @@ struct CleanupJob: AsyncScheduledJob {
     let now = Date()
     var logs: [String] = []
 
+    // NB: we deliberately do not cleanup dash_anouncements for audit trail
+
     let deletedScreenshots = try await Screenshot.query()
       .where(.and(
         .or(
@@ -79,12 +81,6 @@ struct CleanupJob: AsyncScheduledJob {
       .delete(in: self.db, force: true)
 
     logs.append("Deleted \(deletedSuperAdminTokens) super admin tokens")
-
-    let deletedAnnouncements = try await DashAnnouncement.query()
-      .where(.deletedAt < now)
-      .delete(in: self.db, force: true)
-
-    logs.append("Deleted \(deletedAnnouncements) dash announcements")
 
     let suspendFilterRequests = try await MacApp.SuspendFilterRequest.query()
       .where(.createdAt < 3.daysAgo)
