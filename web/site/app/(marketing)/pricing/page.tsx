@@ -134,7 +134,7 @@ const PricingPage: NextPage = () => (
     </section>
 
     <section className="relative px-5 xs:px-8 sm:px-12 lg:px-20 pb-6">
-      <div className="max-w-md lg:max-w-4xl xl:max-w-7xl mx-auto grid gap-5 xs:gap-6 lg:grid-cols-2 xl:grid-cols-4 items-stretch">
+      <div className="mx-auto grid max-w-md items-stretch gap-5 xs:gap-6 md:max-w-3xl md:grid-cols-2 xl:max-w-7xl xl:grid-cols-4">
         {TIERS.map((tier, index) => (
           <TierCard key={tier.name} tier={tier} index={index} />
         ))}
@@ -147,10 +147,13 @@ const PricingPage: NextPage = () => (
           </li>
         ))}
       </ul>
+      <p className="mx-auto mt-4 max-w-2xl text-center text-xs leading-relaxed text-violet-200/55">
+        Gertrude Music requires an active Apple Music subscription, sold separately.
+      </p>
     </section>
 
     <section className="relative px-5 xs:px-8 sm:px-12 lg:px-20 pt-14 pb-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <h2 className="text-center text-2xl font-semibold text-white mb-8">
           Compare plans
         </h2>
@@ -205,7 +208,7 @@ export default PricingPage;
 const TierCard: React.FC<{ tier: Tier; index: number }> = ({ tier, index }) => (
   <div
     className={cx(`relative rounded-3xl animate-fadeIn opacity-0`, {
-      'bg-gradient-to-b from-violet-400 to-fuchsia-500 p-[1.5px] shadow-2xl shadow-fuchsia-500/20 lg:-translate-y-3':
+      'bg-gradient-to-b from-violet-400 to-fuchsia-500 p-[1.5px] shadow-2xl shadow-fuchsia-500/20 xl:-translate-y-3':
         tier.featured,
       'bg-white/10 p-px': !tier.featured,
     })}
@@ -290,7 +293,7 @@ const ComparisonTable: React.FC = () => (
     <table className="hidden md:table w-full border-collapse text-left">
       <thead>
         <tr>
-          <th className="w-2/5" />
+          <th className="w-1/3" />
           {TIERS.map((tier) => (
             <th
               key={tier.name}
@@ -345,10 +348,10 @@ const ComparisonTable: React.FC = () => (
           <h3 className="text-center text-sm font-semibold text-violet-50">
             {row.label}
           </h3>
-          <div className="mt-3 grid grid-cols-4 gap-1.5">
+          <div className="mt-3 grid grid-cols-4 gap-1 xs:gap-2">
             <MobileMatrixCell plan="Free" value={row.free} />
             <MobileMatrixCell plan="Light" value={row.light} />
-            <MobileMatrixCell plan="Med" value={row.medium} />
+            <MobileMatrixCell plan="Medium" value={row.medium} />
             <MobileMatrixCell plan="Full" value={row.full} featured />
           </div>
         </div>

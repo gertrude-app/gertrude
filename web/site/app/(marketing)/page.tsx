@@ -4,6 +4,7 @@ import Button from '@/components/Button';
 import GertrudeForIOS from '@/components/GertrudeForIOS';
 import GertrudeForMac from '@/components/GertrudeForMac';
 import HiImJared from '@/components/HiImJared';
+import MusicBlock from '@/components/MusicBlock';
 import PodcastsBlock from '@/components/PodcastsBlock';
 import ToolsForSafetyBlock from '@/components/ToolsForSafetyBlock';
 import { createMetadata } from '@/lib/seo';
@@ -22,6 +23,7 @@ const HomePage: NextPage = () => (
     <ToolsForSafetyBlock />
     <GertrudeForMac />
     <GertrudeForIOS />
+    <MusicBlock />
     <PodcastsBlock />
     <section className="relative overflow-hidden bg-violet-900 px-6 py-10 sm:py-12">
       <div className="[background:radial-gradient(#e879f933,transparent_70%)] pointer-events-none absolute -right-32 -top-32 h-80 w-80" />

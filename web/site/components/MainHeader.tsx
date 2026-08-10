@@ -6,7 +6,7 @@ import { ChevronDownIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import Button from './Button';
-import Logo from './Logo';
+import Logo, { type LogoProduct } from './Logo';
 import MobileLoginDropdown from './MobileLoginDropdown';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
@@ -16,18 +16,24 @@ const MainHeader: React.FC<{
   theme: HeaderTheme;
   showAuthButtons?: boolean;
   overlay?: boolean;
-  badge?: string;
+  logoProduct?: LogoProduct;
   linkVariant?: `default` | `flat`;
+  darkAppsDropdown?: boolean;
+  compactNavigation?: boolean;
 }> = ({
   theme,
   showAuthButtons = true,
   overlay = false,
-  badge,
+  logoProduct,
   linkVariant = `default`,
+  darkAppsDropdown = false,
+  compactNavigation = false,
 }) => (
   <header
     className={cx(
-      `flex justify-between items-center px-6 xs:px-8 top-0 left-0 right-0 z-50 py-6`,
+      `flex justify-between top-0 left-0 right-0 z-50 py-6`,
+      logoProduct ? `items-start` : `items-center`,
+      compactNavigation ? `px-4 xs:px-8` : `px-6 xs:px-8`,
       overlay ? `absolute` : `relative`,
     )}
   >
@@ -35,13 +41,23 @@ const MainHeader: React.FC<{
       <Logo
         className={cx(`transition-opacity duration-500`)}
         type={theme === `violet` ? `inverted` : `default`}
-        badge={badge}
+        product={logoProduct}
       />
     </a>
-    <MobileLoginDropdown theme={theme} alwaysShow={!showAuthButtons} />
+    <MobileLoginDropdown
+      theme={theme}
+      alwaysShow={!showAuthButtons}
+      dark={darkAppsDropdown}
+      compactNavigation={compactNavigation}
+    />
     {showAuthButtons && (
-      <div className="hidden md:flex items-center justify-end gap-1.5 transition-opacity duration-500">
-        <DesktopAppsDropdown theme={theme} />
+      <div
+        className={cx(
+          `items-center justify-end gap-1.5 transition-opacity duration-500`,
+          compactNavigation ? `hidden md+:flex` : `hidden md:flex`,
+        )}
+      >
+        <DesktopAppsDropdown theme={theme} dark={darkAppsDropdown} />
         <DesktopNavLink href="/pricing" theme={theme}>
           Pricing
         </DesktopNavLink>
@@ -79,7 +95,10 @@ const MainHeader: React.FC<{
 
 export default MainHeader;
 
-const DesktopAppsDropdown: React.FC<{ theme: HeaderTheme }> = ({ theme }) => (
+const DesktopAppsDropdown: React.FC<{ theme: HeaderTheme; dark: boolean }> = ({
+  theme,
+  dark,
+}) => (
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
       type="button"
@@ -92,13 +111,25 @@ const DesktopAppsDropdown: React.FC<{ theme: HeaderTheme }> = ({ theme }) => (
       <DropdownMenu.Content
         align="end"
         sideOffset={8}
-        className="z-50 min-w-44 rounded-2xl border border-violet-100 bg-white/90 p-1.5 shadow-xl shadow-black/10 backdrop-blur-md"
+        className={cx(
+          `z-50 min-w-44 rounded-2xl border p-1.5 shadow-xl backdrop-blur-md`,
+          dark
+            ? `border-white/10 bg-slate-950/90 shadow-black/30`
+            : `border-violet-100 bg-white/90 shadow-black/10`,
+        )}
       >
-        <DesktopDropdownLink href="/mac">Mac</DesktopDropdownLink>
-        <DesktopDropdownLink href="/iphone-and-ipad">
+        <DesktopDropdownLink href="/mac" dark={dark}>
+          Mac
+        </DesktopDropdownLink>
+        <DesktopDropdownLink href="/iphone-and-ipad" dark={dark}>
           iPhone &amp; iPad
         </DesktopDropdownLink>
-        <DesktopDropdownLink href="/#podcasts">Podcasts</DesktopDropdownLink>
+        <DesktopDropdownLink href="/music" dark={dark}>
+          Music
+        </DesktopDropdownLink>
+        <DesktopDropdownLink href="/#podcasts" dark={dark}>
+          Podcasts
+        </DesktopDropdownLink>
       </DropdownMenu.Content>
     </DropdownMenu.Portal>
   </DropdownMenu.Root>
@@ -114,14 +145,20 @@ const DesktopNavLink: React.FC<{
   </Link>
 );
 
-const DesktopDropdownLink: React.FC<{ href: string; children: React.ReactNode }> = ({
-  href,
-  children,
-}) => (
+const DesktopDropdownLink: React.FC<{
+  href: string;
+  dark: boolean;
+  children: React.ReactNode;
+}> = ({ href, dark, children }) => (
   <DropdownMenu.Item asChild>
     <Link
       href={href}
-      className="block rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition-colors duration-200 hover:bg-violet-100 hover:text-violet-700 focus:bg-violet-100 focus:text-violet-700 focus:outline-none"
+      className={cx(
+        `block rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200 focus:outline-none`,
+        dark
+          ? `text-violet-100/80 hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white`
+          : `text-slate-700 hover:bg-violet-100 hover:text-violet-700 focus:bg-violet-100 focus:text-violet-700`,
+      )}
     >
       {children}
     </Link>

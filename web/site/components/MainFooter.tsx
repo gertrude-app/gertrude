@@ -5,7 +5,7 @@ import Logo from './Logo';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
 const MainFooter: React.FC = () => (
-  <footer className="px-8 sm:px-12 lg:px-20 pt-14 pb-8 gap-20 relative border-t border-violet-400 flex flex-col bg-violet-500">
+  <footer className="px-8 sm:px-12 lg:px-20 pt-14 pb-8 gap-20 relative border-t border-violet-500 flex flex-col bg-violet-600">
     <div className="flex flex-col lg:flex-row justify-between">
       <div className="self-center lg:self-start">
         <a href="/">
@@ -14,7 +14,7 @@ const MainFooter: React.FC = () => (
       </div>
       <div className="flex gap-8 sm:gap-16 mt-12 lg:mt-0 self-center lg:self-start">
         <div className="flex flex-col items-center sm:items-start gap-2">
-          <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
+          <h4 className="text-white/90 text-sm font-medium uppercase tracking-wider mb-1">
             General
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
@@ -26,17 +26,18 @@ const MainFooter: React.FC = () => (
           </ul>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-2">
-          <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
+          <h4 className="text-white/90 text-sm font-medium uppercase tracking-wider mb-1">
             Apps
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
             <FooterLink href="/mac">Mac</FooterLink>
             <FooterLink href="/iphone-and-ipad">iPhone &amp; iPad</FooterLink>
+            <FooterLink href="/music">Gertrude Music</FooterLink>
             <FooterLink href="/#podcasts">Gertrude Podcasts</FooterLink>
           </ul>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-2">
-          <h4 className="text-white/40 text-sm font-medium uppercase tracking-wider mb-1">
+          <h4 className="text-white/90 text-sm font-medium uppercase tracking-wider mb-1">
             Account
           </h4>
           <ul className="flex flex-col items-center sm:items-start gap-1">
@@ -47,8 +48,8 @@ const MainFooter: React.FC = () => (
       </div>
     </div>
     <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8">
-      <span className="text-white/70">© {new Date().getFullYear()} NetRivet Inc.</span>
-      <span className="text-white/70">
+      <span className="text-white/90">© {new Date().getFullYear()} NetRivet Inc.</span>
+      <span className="text-white/90">
         <span className="lg:hidden">
           <Link href="https://github.com/gertrude-app/gertrude" className="underline">
             OSS
@@ -64,14 +65,14 @@ const MainFooter: React.FC = () => (
       <div className="flex items-center gap-4 self-center">
         <Link
           href="https://www.youtube.com/@gertrudeapp"
-          className="text-white/60 hover:text-white/80 transition-colors duration-200"
+          className="text-white/70 hover:text-white transition-colors duration-200"
           aria-label="YouTube channel"
         >
           <YoutubeIcon size={30} />
         </Link>
         <Link
           href="https://github.com/gertrude-app"
-          className="text-white/60 hover:text-white/80 transition-colors duration-200"
+          className="text-white/70 hover:text-white transition-colors duration-200"
           aria-label="GitHub organization"
         >
           <GithubIcon size={30} />
@@ -94,7 +95,7 @@ const FooterLink: React.FC<FooterLinkProps> = ({ children, href }) => {
     <li>
       <Element
         href={href}
-        className="text-lg text-white/60 hover:text-white/80 block w-fit transition-colors duration-200 sm:whitespace-nowrap"
+        className="text-lg text-white/90 hover:text-white block w-fit transition-colors duration-200 sm:whitespace-nowrap"
       >
         {children}
       </Element>
