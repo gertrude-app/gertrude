@@ -84,8 +84,8 @@ sync-staging-data: build-api
 normalize-music-policy: build-api
   @just exec-api normalize-music-policy
 
-scheduled-marketing-dry-run: build-api
-  @just exec-api scheduled-marketing-dry-run
+scheduled-marketing-email-dry-run: build-api
+  @just exec-api scheduled-marketing-email-dry-run
 
 nuke-test-db:
   @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); dropdb --if-exists --force "$db"; createdb "$db"

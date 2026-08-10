@@ -102,16 +102,8 @@ public struct IOSReducer: Sendable {
 
     #if DEBUG
       case .receivedShake where state.screen == .onboarding(.happyPath(.hiThere)):
-        state.screen = .onboarding(.supervision(.resume(.websiteWarning(childName: "Test User"))))
-        return .run { [deps = self.deps] _ in
-          await deps.receiveAccountConnection(.init(
-            childId: UUID(),
-            token: UUID(),
-            deviceId: UUID(),
-            childName: "Test User",
-            supervised: .byGertrude(claimCode: 123_456),
-          ))
-        }
+        state.screen = .onboarding(.happyPath(.dontGetTrickedPreAuth))
+        return .none
     #endif
 
     case .onboardingClearCache(.completeBtnTapped),

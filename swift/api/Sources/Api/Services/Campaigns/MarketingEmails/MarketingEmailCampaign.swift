@@ -1,7 +1,7 @@
 import Dependencies
 import DuetSQL
 
-struct MarketingCampaignRecipient: Sendable, Equatable {
+struct MarketingEmailCampaignRecipient: Sendable, Equatable {
   var parentId: Parent.Id
   var email: EmailAddress
   var templateModel: [String: String]
@@ -13,34 +13,34 @@ struct MarketingCampaignRecipient: Sendable, Equatable {
   }
 }
 
-protocol MarketingCampaign: Sendable {
+protocol MarketingEmailCampaign: Sendable {
   var slug: String { get }
   var templateAlias: String { get }
   var variant: String { get }
   var from: String { get }
   var replyTo: String? { get }
 
-  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient]
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient]
 }
 
-extension MarketingCampaign {
+extension MarketingEmailCampaign {
   var variant: String { "v1" }
   var from: String { "Gertrude App <noreply@gertrude.app>" }
   var replyTo: String? { nil }
 }
 
-func scheduledMarketingCampaigns(env: Env) -> [any MarketingCampaign] {
+func scheduledMarketingEmailCampaigns(env: Env) -> [any MarketingEmailCampaign] {
   [
-    MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
-    IosOnlyMacTrialCampaign(),
+    MacSetup24hEmailCampaign(dashboardUrl: env.dashboardUrl),
+    IosOnlyMacTrialEmailCampaign(),
   ]
 }
 
-func manualMarketingCampaigns(env _: Env) -> [any MarketingCampaign] {
-  [IosOnlyMacTrialCampaign()]
+func manualMarketingEmailCampaigns(env _: Env) -> [any MarketingEmailCampaign] {
+  [IosOnlyMacTrialEmailCampaign()]
 }
 
-struct MarketingCampaignRunResult: Sendable, Equatable {
+struct MarketingEmailCampaignRunResult: Sendable, Equatable {
   var campaign: String
   var audienceSize: Int
   var alreadySent: Int
@@ -51,43 +51,24 @@ struct MarketingCampaignRunResult: Sendable, Equatable {
   var toSend: [String]
 }
 
-struct PreparedMarketingCampaignRecipients: Sendable, Equatable {
-  var audience: [MarketingCampaignRecipient]
-  var alreadySent: [MarketingCampaignRecipient]
-  var toSend: [MarketingCampaignRecipient]
-}
-
-func prepareMarketingCampaignRecipients(
-  audience: [MarketingCampaignRecipient],
-  priorSends: [MarketingEmailSend],
-) -> PreparedMarketingCampaignRecipients {
-  let audience = uniqueRecipients(audience)
-  let alreadySentParentIds = Set(priorSends.map(\.parentId))
-  return .init(
-    audience: audience,
-    alreadySent: audience.filter { alreadySentParentIds.contains($0.parentId) },
-    toSend: audience.filter { !alreadySentParentIds.contains($0.parentId) },
-  )
-}
-
-struct MarketingCampaignRunner {
+struct MarketingEmailCampaignRunner {
   @Dependency(\.db) var db
   @Dependency(\.postmark) var postmark
 
   func dryRun(
-    _ campaign: any MarketingCampaign,
+    _ campaign: any MarketingEmailCampaign,
     limit: Int? = nil,
-  ) async throws -> MarketingCampaignRunResult {
+  ) async throws -> MarketingEmailCampaignRunResult {
     let prepared = try await self.prepare(campaign)
     return self.result(for: campaign, prepared: prepared, limit: limit, sent: 0, failed: 0)
   }
 
   func send(
-    _ campaign: any MarketingCampaign,
+    _ campaign: any MarketingEmailCampaign,
     limit: Int? = nil,
-  ) async throws -> MarketingCampaignRunResult {
+  ) async throws -> MarketingEmailCampaignRunResult {
     let prepared = try await self.prepare(campaign)
-    let toSend = self.toSend(from: prepared, limit: limit)
+    let toSend = prepared.selectedRecipients(limit: limit)
     guard !toSend.isEmpty else {
       return self.result(for: campaign, prepared: prepared, limit: limit, sent: 0, failed: 0)
     }
@@ -127,54 +108,39 @@ struct MarketingCampaignRunner {
   }
 
   private func prepare(
-    _ campaign: any MarketingCampaign,
-  ) async throws -> PreparedMarketingCampaignRecipients {
+    _ campaign: any MarketingEmailCampaign,
+  ) async throws -> PreparedCampaignAudience<MarketingEmailCampaignRecipient> {
     let audience = try await campaign.audience(in: self.db)
-    let priorSends = try await MarketingEmailSend.query()
-      .where(.campaign == campaign.slug)
-      .all(in: self.db)
-    return prepareMarketingCampaignRecipients(
+    let deliveredParentIds = try await Set(
+      MarketingEmailSend.query()
+        .where(.campaign == campaign.slug)
+        .all(in: self.db)
+        .map(\.parentId),
+    )
+    return prepareCampaignAudience(
       audience: audience,
-      priorSends: priorSends,
+      deliveredIds: deliveredParentIds,
+      identifiedBy: \.parentId,
     )
   }
 
   private func result(
-    for campaign: any MarketingCampaign,
-    prepared: PreparedMarketingCampaignRecipients,
+    for campaign: any MarketingEmailCampaign,
+    prepared: PreparedCampaignAudience<MarketingEmailCampaignRecipient>,
     limit: Int?,
     sent: Int,
     failed: Int,
-  ) -> MarketingCampaignRunResult {
-    let toSend = self.toSend(from: prepared, limit: limit)
+  ) -> MarketingEmailCampaignRunResult {
+    let toSend = prepared.selectedRecipients(limit: limit)
     return .init(
       campaign: campaign.slug,
       audienceSize: prepared.audience.count,
-      alreadySent: prepared.alreadySent.count,
-      eligible: prepared.toSend.count,
+      alreadySent: prepared.alreadyDelivered.count,
+      eligible: prepared.eligible.count,
       sent: sent,
       failed: failed,
       audience: prepared.audience.map(\.email.rawValue),
       toSend: toSend.map(\.email.rawValue),
     )
   }
-
-  private func toSend(
-    from prepared: PreparedMarketingCampaignRecipients,
-    limit: Int?,
-  ) -> [MarketingCampaignRecipient] {
-    guard let limit else { return prepared.toSend }
-    return Array(prepared.toSend.prefix(max(0, limit)))
-  }
-}
-
-private func uniqueRecipients(
-  _ recipients: [MarketingCampaignRecipient],
-) -> [MarketingCampaignRecipient] {
-  var seen = Set<Parent.Id>()
-  var unique: [MarketingCampaignRecipient] = []
-  for recipient in recipients where seen.insert(recipient.parentId).inserted {
-    unique.append(recipient)
-  }
-  return unique
 }

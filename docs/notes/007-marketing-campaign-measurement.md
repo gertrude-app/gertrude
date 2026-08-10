@@ -1,18 +1,18 @@
-# 007 — Measuring marketing campaigns without a held-back cohort
+# 007 — Measuring marketing email campaigns without a held-back cohort
 
 _Date: 2026-06-05._
 
 ## What we changed
 
-The automated marketing system measures campaigns with a deliberately thin layer: a
+The automated marketing email system measures campaigns with a deliberately thin layer: a
 `variant` column on `parent.marketing_email_sends` (plus the row's existing `parent_id` /
 `campaign` / `created_at`), and nothing else. There is **no** treatment/control holdout,
 no cohort-assignment table, and no concurrent A/B machinery.
 
 `mac_setup_24h` (activation) runs on the scheduled job, which was also dropped from hourly
 to once daily. `ios_only_mac_trial` (upsell) is registered **only** in
-`manualMarketingCampaigns` and is sent by hand in `limit`-capped waves via the
-`SendMarketingCampaign` super-admin endpoint, so it cannot auto-fire against its backlog
+`manualMarketingEmailCampaigns` and is sent by hand in `limit`-capped waves via the
+`SendMarketingEmailCampaign` super-admin endpoint, so it cannot auto-fire against its backlog
 while the copy is still being tuned. Idempotency stays `(parent_id, campaign)` — one email
 per parent per campaign.
 
@@ -55,6 +55,6 @@ v1 drains the backlog, v2 mostly sees fresh flow. Treat those diffs as direction
 
 The manual routing for `ios_only_mac_trial` means a human has to drive each wave; that is
 intentional during the learning phase. When the copy settles, automating it is a one-line
-move: add `IosOnlyMacTrialCampaign()` to `scheduledMarketingCampaigns`. If the userbase
+move: add `IosOnlyMacTrialEmailCampaign()` to `scheduledMarketingEmailCampaigns`. If the userbase
 ever grows by an order of magnitude, a real held-back cohort becomes worth building and
 this decision should be revisited.

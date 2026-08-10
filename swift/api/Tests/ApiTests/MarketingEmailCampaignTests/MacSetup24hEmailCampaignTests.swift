@@ -5,7 +5,7 @@ import XExpect
 
 @testable import Api
 
-final class MacSetup24hCampaignTests: ApiTestCase, @unchecked Sendable {
+final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
   func testAudienceIncludesDueActiveTrialParentsWithChildren() async throws {
     let now = Date()
     let eligible = try await self.child()
@@ -33,7 +33,7 @@ final class MacSetup24hCampaignTests: ApiTestCase, @unchecked Sendable {
     try await self.setChildCreatedAt(expiredTrial.model.id, to: now - .days(23))
     try await self.setChildCreatedAt(tooRecent.model.id, to: now - .hours(30))
 
-    let audience = try await MacSetup24hCampaign(dashboardUrl: "https://dash.test")
+    let audience = try await MacSetup24hEmailCampaign(dashboardUrl: "https://dash.test")
       .audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 
@@ -59,7 +59,7 @@ final class MacSetup24hCampaignTests: ApiTestCase, @unchecked Sendable {
     try await self.setChildCreatedAt(dueWithoutMac.model.id, to: now - .hours(30))
     try await self.setChildCreatedAt(dueWithMac.model.id, to: now - .hours(30))
 
-    let audience = try await MacSetup24hCampaign(dashboardUrl: "https://dash.test")
+    let audience = try await MacSetup24hEmailCampaign(dashboardUrl: "https://dash.test")
       .audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 
@@ -76,7 +76,7 @@ final class MacSetup24hCampaignTests: ApiTestCase, @unchecked Sendable {
     ))
     try await self.setChildCreatedAt(child.model.id, to: now - .hours(30))
 
-    let audience = try await MacSetup24hCampaign(
+    let audience = try await MacSetup24hEmailCampaign(
       dashboardUrl: "https://dash.test/",
     ).audience(in: self.db)
     let recipient = try XCTUnwrap(audience.first { $0.parentId == child.parent.model.id })
@@ -100,7 +100,7 @@ final class MacSetup24hCampaignTests: ApiTestCase, @unchecked Sendable {
     try await self.setChildCreatedAt(child1.id, to: now - .hours(30))
     try await self.setChildCreatedAt(child2.id, to: now - .hours(29))
 
-    let audience = try await MacSetup24hCampaign(
+    let audience = try await MacSetup24hEmailCampaign(
       dashboardUrl: "https://dash.test",
     ).audience(in: self.db)
     let recipient = try XCTUnwrap(audience.first { $0.parentId == parent.id })
@@ -128,7 +128,7 @@ final class MacSetup24hCampaignTests: ApiTestCase, @unchecked Sendable {
     try await self.setChildCreatedAt(due.model.id, to: now - .hours(25))
     try await self.setChildCreatedAt(notDue.model.id, to: now - .hours(23))
 
-    let audience = try await MacSetup24hCampaign(dashboardUrl: "https://dash.test")
+    let audience = try await MacSetup24hEmailCampaign(dashboardUrl: "https://dash.test")
       .audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 

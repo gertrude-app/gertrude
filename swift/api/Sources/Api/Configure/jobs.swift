@@ -9,7 +9,7 @@ public extension Configure {
     app.queues.schedule(CleanupJob()).daily().at(2, 30, .am)
     app.queues.schedule(SubscriptionManager()).daily().at(6, 30, .am)
     app.queues.schedule(DiskSpaceJob()).hourly().at(0)
-    app.queues.schedule(ScheduledMarketingCampaignJob()).daily().at(10, 30, .am)
+    app.queues.schedule(ScheduledMarketingEmailCampaignJob()).daily().at(10, 30, .am)
     app.queues.schedule(CrashReporterJob()).hourly().at(25)
     app.queues.schedule(DailyReviewEmailJob()).hourly().at(15)
     app.queues.schedule(MusicCatalogRefreshJob()).daily().at(3, 30, .am)

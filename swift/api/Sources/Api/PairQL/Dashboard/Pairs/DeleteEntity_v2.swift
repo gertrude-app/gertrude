@@ -36,7 +36,7 @@ extension DeleteEntity_v2: Resolver {
       try await DashAnnouncement.query()
         .where(.id == input.id)
         .where(.parentId == context.parent.id)
-        .delete(in: context.db, force: true)
+        .delete(in: context.db, force: false) // only soft-delete for audit trail
 
     case .parent:
       guard input.id == context.parent.id else {

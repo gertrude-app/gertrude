@@ -6,10 +6,10 @@ import XExpect
 
 @testable import Api
 
-final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable {
+final class ScheduledMarketingEmailCampaignJobTests: ApiTestCase, @unchecked Sendable {
   func testTickContinuesAfterCampaignFailure() async throws {
     let parent = try await self.parent()
-    let successful = SuccessfulMarketingCampaign(
+    let successful = SuccessfulMarketingEmailCampaign(
       parentId: parent.id,
       email: parent.email,
     )
@@ -20,8 +20,8 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await ScheduledMarketingCampaignJob().tick(campaigns: [
-        FailingMarketingCampaign(),
+      try await ScheduledMarketingEmailCampaignJob().tick(campaigns: [
+        FailingMarketingEmailCampaign(),
         successful,
       ])
     }
@@ -36,7 +36,7 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
     var env = Env.fromProcess(mode: .testing)
     env.dashboardUrl = "https://dash.test/"
     try await self.markCurrentAudienceAsAlreadySent(
-      MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
+      MacSetup24hEmailCampaign(dashboardUrl: env.dashboardUrl),
     )
 
     let now = Date()
@@ -54,8 +54,8 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await ScheduledMarketingCampaignJob().tick(campaigns: [
-        MacSetup24hCampaign(dashboardUrl: env.dashboardUrl),
+      try await ScheduledMarketingEmailCampaignJob().tick(campaigns: [
+        MacSetup24hEmailCampaign(dashboardUrl: env.dashboardUrl),
       ])
     }
 
@@ -84,7 +84,7 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
   }
 
   private func markCurrentAudienceAsAlreadySent(
-    _ campaign: any MarketingCampaign,
+    _ campaign: any MarketingEmailCampaign,
   ) async throws {
     let audience = try await campaign.audience(in: self.db)
     let prior = try await MarketingEmailSend.query()
@@ -110,23 +110,23 @@ final class ScheduledMarketingCampaignJobTests: ApiTestCase, @unchecked Sendable
   }
 }
 
-private struct FailingMarketingCampaign: MarketingCampaign {
+private struct FailingMarketingEmailCampaign: MarketingEmailCampaign {
   let slug = "failing_campaign"
   let templateAlias = "failing-template"
 
-  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient] {
     throw TestCampaignError()
   }
 }
 
-private struct SuccessfulMarketingCampaign: MarketingCampaign {
+private struct SuccessfulMarketingEmailCampaign: MarketingEmailCampaign {
   let slug = "healthy_campaign"
   let templateAlias = "healthy-template"
   let parentId: Parent.Id
   let email: EmailAddress
 
-  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
-    [MarketingCampaignRecipient(parentId: self.parentId, email: self.email)]
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient] {
+    [MarketingEmailCampaignRecipient(parentId: self.parentId, email: self.email)]
   }
 }
 

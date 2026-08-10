@@ -1,14 +1,14 @@
 import DuetSQL
 
-struct MacSetup24hCampaign: MarketingCampaign {
+struct MacSetup24hEmailCampaign: MarketingEmailCampaign {
   let slug = "mac_setup_24h"
   let templateAlias = MacSetup24h.alias
   let dashboardUrl: String
 
-  func audience(in db: any DuetSQL.Client) async throws -> [MarketingCampaignRecipient] {
+  func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient] {
     let rows = try await db.customQuery(MacSetup24hAudienceRow.self)
     return rows.map {
-      MarketingCampaignRecipient(
+      MarketingEmailCampaignRecipient(
         parentId: $0.parentId,
         email: $0.email,
         templateModel: self.templateModel(for: $0),

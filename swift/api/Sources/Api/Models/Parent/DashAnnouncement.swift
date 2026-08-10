@@ -5,6 +5,7 @@ import DuetSQL
 struct DashAnnouncement: Codable, Sendable {
   var id: Id
   var parentId: Parent.Id
+  var campaign: String?
   var kind: Kind
   var icon: String?
   var html: String
@@ -25,6 +26,7 @@ struct DashAnnouncement: Codable, Sendable {
   init(
     id: Id? = nil,
     parentId: Parent.Id,
+    campaign: String? = nil,
     kind: Kind = .news,
     icon: String? = nil,
     html: String,
@@ -33,6 +35,7 @@ struct DashAnnouncement: Codable, Sendable {
   ) {
     self.id = id ?? .init(get(dependency: \.uuid)())
     self.parentId = parentId
+    self.campaign = campaign
     self.kind = kind
     self.icon = icon
     self.html = html
