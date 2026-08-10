@@ -10,9 +10,6 @@ current task unless explicity instructed.
 
 ## Other instructions
 
-- I am usually dictating my prompts, and the transcribing model is not Gertrude or
-  SWE-aware, so you may see numerous misspellings and mistranscriptions, keep this in mind
-  when inferring my instructions.
 - NEVER try to find a SSH key and use it when trying to complete a task. If you don't have
   what you need, stop and ask.
 - If I ask you for SQL to run in production, give me simple, copy-paste SQL, not

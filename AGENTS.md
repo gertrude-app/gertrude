@@ -5,6 +5,12 @@ Apps and supporting libraries for Gertrude parental controls.
 Depending on the task, read relevant sub AGENTS.md files or other doc files as noted
 below.
 
+## Prompt interpretation
+
+Prompts may be dictated, and transcription may mishear Gertrude or software-engineering
+terminology. Account for likely misspellings and mistranscriptions when inferring intent;
+ask a concise clarifying question only when ambiguity would materially affect the work.
+
 ## Production Apps:
 
 ### Mac App
@@ -37,13 +43,12 @@ below.
 
 ## Apple OS version numbering
 
-Starting at WWDC 2025, Apple switched all platform OSes to year-based version
-numbers. The releases after iOS/iPadOS 18, macOS 15 Sequoia, watchOS 11, tvOS 18,
-and visionOS 2 were iOS/iPadOS 26, macOS 26 Tahoe, watchOS 26, tvOS 26, and
-visionOS 26. Do not invent intermediate major versions that don't exist: for example,
-there is no iOS/iPadOS 19-25, macOS 16-25, watchOS 12-25, tvOS 19-25, or
-visionOS 3-25. When someone says "iOS 17-27", interpret that as the actual versions
-in that span, not a continuous numeric set.
+Starting at WWDC 2025, Apple switched all platform OSes to year-based version numbers. The
+releases after iOS/iPadOS 18, macOS 15 Sequoia, watchOS 11, tvOS 18, and visionOS 2 were
+iOS/iPadOS 26, macOS 26 Tahoe, watchOS 26, tvOS 26, and visionOS 26. Do not invent
+intermediate major versions that don't exist: for example, there is no iOS/iPadOS 19-25,
+macOS 16-25, watchOS 12-25, tvOS 19-25, or visionOS 3-25. When someone says "iOS 17-27",
+interpret that as the actual versions in that span, not a continuous numeric set.
 
 ## Production Websites:
 
@@ -90,22 +95,23 @@ Supports all 3 apps, plus dashboard and admin websites
 - agent-drivable scenarios proving app ↔ API ↔ dashboard work together: iOS Simulator via
   Maestro, dashboard via Cypress, backend state via typed PairQL oracles
 - entry points: `just verify-podcasts`, `just verify-blocker`, `just verify-music` (each
-  supports `preflight`, `e2e`, and per-phase commands); `just verify-all` runs every scenario
-  serially and is the pre-release gate
-- when verifying a cross-surface flow end-to-end, smoke-testing before a release, or adding
-  a scenario, always read `./verification/README.md` first — principles, naming conventions,
-  setup, and known gotchas live there
-- **prompt the human to run these — don't run them unasked.** They need a booted simulator and
-  take tens of minutes, so never kick one off on your own initiative; just surface the
+  supports `preflight`, `e2e`, and per-phase commands); `just verify-all` runs every
+  scenario serially and is the pre-release gate
+- when verifying a cross-surface flow end-to-end, smoke-testing before a release, or
+  adding a scenario, always read `./verification/README.md` first — principles, naming
+  conventions, setup, and known gotchas live there
+- **prompt the human to run these — don't run them unasked.** They need a booted simulator
+  and take tens of minutes, so never kick one off on your own initiative; just surface the
   suggestion and let them decide. Say so when you notice any of:
-  - a **release** being prepared — `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` edited in
-    `swift/{music,podcasts}/project.yml`, an App Store build/submission, or a version bump
-    commit → suggest `just verify-all`
-  - a **cross-surface change** — a PairQL pair added/renamed/versioned (`*_v2`), a claim or
-    onboarding flow touched, `Routes/Reset/` fixtures changed, or an app↔API↔dashboard contract
-    edited → suggest the affected scenario (`just verify-<app> e2e`)
-  - these loops are the only thing covering app ↔ API ↔ dashboard integration; **CI does not
-    run them** (macOS + simulator + live Apple Music catalog), so an un-run suite is un-tested
+  - a **release** being prepared — `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` edited
+    in `swift/{music,podcasts}/project.yml`, an App Store build/submission, or a version
+    bump commit → suggest `just verify-all`
+  - a **cross-surface change** — a PairQL pair added/renamed/versioned (`*_v2`), a claim
+    or onboarding flow touched, `Routes/Reset/` fixtures changed, or an app↔API↔dashboard
+    contract edited → suggest the affected scenario (`just verify-<app> e2e`)
+  - these loops are the only thing covering app ↔ API ↔ dashboard integration; **CI does
+    not run them** (macOS + simulator + live Apple Music catalog), so an un-run suite is
+    un-tested
 
 ## Templated Emails
 
@@ -189,8 +195,8 @@ Proactively copy complex URLs and other likely copy-paste values (email text, SQ
 commands) to my macOS clipboard when I will use them in a browser, another app, or another
 terminal — actually pipe the value through `pbcopy`, every time; the 📋 marker is not a
 substitute for that call and must only be added after `pbcopy` has actually run. Mark the
-rendered value with 📋 only; don't mention it in prose. I use clipboard history, so copying
-multiple values is fine.
+rendered value with 📋 only; don't mention it in prose. I use clipboard history, so
+copying multiple values is fine.
 
 ## Further user-specific instructions
 
