@@ -185,23 +185,14 @@ public struct ButtonScreenView: View {
         }
 
         if let remoteImage = self.remoteImage, let url = URL(string: remoteImage.url) {
-          AsyncImage(url: url) { phase in
-            switch phase {
-            case .success(let image):
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxHeight: 270)
-                .accessibilityLabel(remoteImage.label ?? "")
-            case .empty:
-              ProgressView()
-            case .failure(let error):
-              Color.clear
-                .frame(width: 0, height: 0)
-                .onAppear { remoteImage.onLoadFailure?(error) }
-            @unknown default:
-              EmptyView()
-            }
+          RetryingAsyncImage(url: url, onFailure: remoteImage.onLoadFailure) { image in
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .frame(maxHeight: 270)
+              .accessibilityLabel(remoteImage.label ?? "")
+          } placeholder: {
+            ProgressView()
           }
           .frame(maxWidth: .infinity)
           .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))

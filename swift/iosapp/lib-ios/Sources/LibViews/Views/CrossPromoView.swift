@@ -70,34 +70,26 @@ struct CrossPromoView: View {
       Spacer(minLength: m.isCompact ? 0 : nil)
 
       if let image = campaign.image, let url = URL(string: image.url) {
-        AsyncImage(
+        RetryingAsyncImage(
           url: url,
-          transaction: Transaction(animation: .smooth(duration: 0.4)),
-        ) { phase in
-          switch phase {
-          case .success(let loaded):
-            loaded
-              .resizable()
-              .scaledToFit()
-              .accessibilityLabel(image.description ?? "")
-              .transition(.opacity)
-          case .failure(let error):
-            Color.clear
-              .frame(width: 0, height: 0)
-              .onAppear {
-                log(
-                  .warn,
-                  "670a86df",
-                  detail: "cross promo image load failed"
-                    + " campaign=\(campaign.campaignId) placement=\(campaign.placement)"
-                    + " url=\(image.url) error=\(error)",
-                )
-              }
-          case .empty:
-            EmptyView()
-          @unknown default:
-            EmptyView()
-          }
+          animation: .smooth(duration: 0.4),
+          onFailure: { error in
+            log(
+              .warn,
+              "670a86df",
+              detail: "cross promo image load failed"
+                + " campaign=\(campaign.campaignId) placement=\(campaign.placement)"
+                + " url=\(image.url) error=\(error)",
+            )
+          },
+        ) { loaded in
+          loaded
+            .resizable()
+            .scaledToFit()
+            .accessibilityLabel(image.description ?? "")
+            .transition(.opacity)
+        } placeholder: {
+          EmptyView()
         }
         .frame(maxWidth: .infinity)
         .frame(height: m.imageHeight)
