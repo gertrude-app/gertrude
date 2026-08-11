@@ -84,6 +84,7 @@ extension EventLabel {
     case "b62d4a8f": "Cross promo cta"
     case "c9e35b21": "Cross promo dismiss"
     case "b9e1a7c4": "Cross promo dropped"
+    case "af5b46ca": "⚠ Cross promo image load failed"
     // --- Unexpected / assertions ---
     case "60324a0d": "Unexpected: episode not in show state"
     case "e975479b": "Unexpected: now playing default case"

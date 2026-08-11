@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import GertieApp
 import GertieTcaFeatures
+import LibClients
 import SwiftUI
 
 struct CrossPromoView: View {
@@ -73,12 +74,29 @@ struct CrossPromoView: View {
           url: url,
           transaction: Transaction(animation: .smooth(duration: 0.4)),
         ) { phase in
-          if let loaded = phase.image {
+          switch phase {
+          case .success(let loaded):
             loaded
               .resizable()
               .scaledToFit()
               .accessibilityLabel(image.description ?? "")
               .transition(.opacity)
+          case .failure(let error):
+            Color.clear
+              .frame(width: 0, height: 0)
+              .onAppear {
+                log(
+                  .warn,
+                  "670a86df",
+                  detail: "cross promo image load failed"
+                    + " campaign=\(campaign.campaignId) placement=\(campaign.placement)"
+                    + " url=\(image.url) error=\(error)",
+                )
+              }
+          case .empty:
+            EmptyView()
+          @unknown default:
+            EmptyView()
           }
         }
         .frame(maxWidth: .infinity)

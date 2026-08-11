@@ -58,6 +58,13 @@ extension LogAppEvent {
       let msg = "`\(name)`\(input.detail.map { " - \($0)" } ?? "")"
       await slack.internal(.podcasts, "Podcast app event: \(search) \(msg)")
 
+      if input.eventId == podcastCrossPromoImageFailedEventId {
+        let device = "`\(input.modelName)`, iOS `\(input.iosVersion)`, app `\(input.appVersion)`"
+        await slack.error(
+          "*Podcasts Cross Promo Image Failed* \(device)\n\(input.detail ?? "(no detail)")",
+        )
+      }
+
       if try await isPodcastFirstPayment(input, in: context) {
         await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
         await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
@@ -124,6 +131,8 @@ private func alertSuperAdminOfMidClaimPinSet(
       + "claim and PIN setup). Consider emailing the parent about a dashboard PIN reset.",
   )
 }
+
+private let podcastCrossPromoImageFailedEventId = "af5b46ca"
 
 private let suppressedEventIds: Set<String> = [
   "7785c87b", // subscribe event, noisy, not super interesting

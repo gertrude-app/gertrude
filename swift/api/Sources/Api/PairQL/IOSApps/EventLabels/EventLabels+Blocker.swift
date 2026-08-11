@@ -228,6 +228,7 @@ extension EventLabel {
     case "3d8f1b6a": "Cross promo impression"
     case "7e2c9f04": "Cross promo cta"
     case "a5b1d8e3": "Cross promo dismiss"
+    case "670a86df": "⚠ Cross promo image load failed"
     // --- Legacy (old app versions, no longer emitted) ---
     case "dcd721aa": "🚀 First launch"
     case "d317c73c": "✓ Authorization succeeded"

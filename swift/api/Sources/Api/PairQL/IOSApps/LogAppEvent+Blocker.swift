@@ -64,6 +64,18 @@ extension LogAppEvent {
       get(dependency: \.postmark).unexpected("7c039b10", "\(device)<br/><br/>\(eventDetail)")
     }
 
+    if context.env.mode == .prod, input.eventId == blockerCrossPromoImageFailedEventId {
+      let device = "`\(input.modelName)`, iOS `\(input.iosVersion)`, app `\(input.appVersion)`"
+      var message = "*iOS Cross Promo Image Failed* \(device)\n\(detail ?? "(no detail)")"
+      if let vendorId = input.deviceId {
+        let events = AdminLink().slack(to: .iosDeviceEvents(vendorId: vendorId), text: "see events")
+        message += " \(events)"
+      }
+      await get(dependency: \.slack).error(message)
+    }
+
     return .success
   }
 }
+
+private let blockerCrossPromoImageFailedEventId = "670a86df"
