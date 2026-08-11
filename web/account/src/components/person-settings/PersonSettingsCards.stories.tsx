@@ -42,7 +42,6 @@ const ScheduledKeychainCard: React.FC = () => {
       schedule={schedule}
       setSchedule={setSchedule}
       onRemove={noop}
-      onEdit={noop}
     />
   );
 };
@@ -128,6 +127,21 @@ export const AddBlockedDomain = {
   ),
 };
 
+export const EditBlockedDomain = {
+  name: 'Edit blocked domain modal',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddBlockedDomainModal
+        open
+        onOpenChange={noop}
+        onAdd={noop}
+        initialDomain="Reddit.COM"
+      />
+    </StoryCanvas>
+  ),
+};
+
 export const AddKeychains = {
   name: 'Add keychains slide-over',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
@@ -140,6 +154,24 @@ export const AddKeychains = {
         keychains={keychains}
         assignedKeychainIds={[`keychain-school`]}
         onAdd={noop}
+      />
+    </StoryCanvas>
+  ),
+};
+
+export const PublicKeychainWarning = {
+  name: 'Public keychain warning',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddKeychainSlideOver
+        open
+        onOpenChange={noop}
+        personName="Jude"
+        keychains={keychains}
+        assignedKeychainIds={[]}
+        onAdd={noop}
+        defaultTab="public"
       />
     </StoryCanvas>
   ),

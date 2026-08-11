@@ -1,8 +1,8 @@
-import type { PersonRelationship } from '@shared/pairql/src/account';
+import type { BlockRule, PersonRelationship } from '@shared/pairql/src/account';
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
-export type { PersonRelationship };
+export type { BlockRule, PersonRelationship };
 
 export type LoadableState<Data> =
   | { status: `loading` }
@@ -106,8 +106,15 @@ export type Keychain = {
   id: string;
   name: string;
   description?: string;
+  warning?: string;
   numKeys: number;
   isPublic: boolean;
+};
+
+export type CustomAlwaysBlockedRule = {
+  id: string;
+  rule: BlockRule;
+  comment?: string;
 };
 
 export type InstalledMacApp = {

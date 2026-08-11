@@ -156,10 +156,58 @@
     }
   },
   {
+    "id": "account-components-person-settings-cards-and-pickers--edit-blocked-domain",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--edit-blocked-domain&viewMode=story",
+    "name": "Edit blocked domain modal",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--edit-blocked-domain.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--edit-blocked-domain",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--edit-blocked-domain&viewMode=story",
+    "name": "Edit blocked domain modal",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--edit-blocked-domain.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-components-person-settings-cards-and-pickers--open-schedule-editor",
     "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--open-schedule-editor&viewMode=story",
     "name": "Open schedule editor",
     "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--open-schedule-editor.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--public-keychain-warning",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--public-keychain-warning&viewMode=story",
+    "name": "Public keychain warning",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--public-keychain-warning.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--public-keychain-warning",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--public-keychain-warning&viewMode=story",
+    "name": "Public keychain warning",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--public-keychain-warning.png",
     "title": "Account/Components/Person Settings/Cards and Pickers",
     "viewport": {
       "width": 1440,
@@ -816,6 +864,342 @@
     }
   },
   {
+    "id": "account-pages-people-person-mac-settings--always-blocked-unsupported",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--always-blocked-unsupported&viewMode=story",
+    "name": "Always Blocked unsupported",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--always-blocked-unsupported.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--always-blocked-unsupported",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--always-blocked-unsupported&viewMode=story",
+    "name": "Always Blocked unsupported",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--always-blocked-unsupported.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--custom-rule-variants",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--custom-rule-variants&viewMode=story",
+    "name": "Custom rule variants",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--custom-rule-variants.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--custom-rule-variants",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--custom-rule-variants&viewMode=story",
+    "name": "Custom rule variants",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--custom-rule-variants.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--error",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--error.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--error",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--error.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--filtering-disabled",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--filtering-disabled&viewMode=story",
+    "name": "Internet filtering disabled",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--filtering-disabled.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--filtering-disabled",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--filtering-disabled&viewMode=story",
+    "name": "Internet filtering disabled",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--filtering-disabled.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--filtering-requires-update",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--filtering-requires-update&viewMode=story",
+    "name": "Internet filtering requires Mac update",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--filtering-requires-update.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--filtering-requires-update",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--filtering-requires-update&viewMode=story",
+    "name": "Internet filtering requires Mac update",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--filtering-requires-update.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--internet-filtering",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--internet-filtering&viewMode=story",
+    "name": "Internet filtering",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--internet-filtering.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--internet-filtering",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--internet-filtering&viewMode=story",
+    "name": "Internet filtering",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--internet-filtering.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--loading.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--loading.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--monitoring",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--monitoring&viewMode=story",
+    "name": "Monitoring",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--monitoring.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--monitoring",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--monitoring&viewMode=story",
+    "name": "Monitoring",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--monitoring.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--no-always-blocked-selections",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-always-blocked-selections&viewMode=story",
+    "name": "No Always Blocked selections",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--no-always-blocked-selections.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--no-always-blocked-selections",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-always-blocked-selections&viewMode=story",
+    "name": "No Always Blocked selections",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--no-always-blocked-selections.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--no-assigned-keychains",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-assigned-keychains&viewMode=story",
+    "name": "No assigned keychains",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--no-assigned-keychains.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--no-assigned-keychains",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-assigned-keychains&viewMode=story",
+    "name": "No assigned keychains",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--no-assigned-keychains.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--no-connected-mac",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-connected-mac&viewMode=story",
+    "name": "No connected Mac",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--no-connected-mac.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--no-connected-mac",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--no-connected-mac&viewMode=story",
+    "name": "No connected Mac",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--no-connected-mac.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--overview",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--overview&viewMode=story",
+    "name": "Overview",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--overview.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--overview",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--overview&viewMode=story",
+    "name": "Overview",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--overview.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--screenshots-required",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--screenshots-required&viewMode=story",
+    "name": "Screenshots required while filtering is disabled",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--screenshots-required.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--screenshots-required",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--screenshots-required&viewMode=story",
+    "name": "Screenshots required while filtering is disabled",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--screenshots-required.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--unsaved-changes",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--unsaved-changes&viewMode=story",
+    "name": "Unsaved changes",
+    "path": "screenshots/mobile/account-pages-people-person-mac-settings--unsaved-changes.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--unsaved-changes",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--unsaved-changes&viewMode=story",
+    "name": "Unsaved changes",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--unsaved-changes.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--basic",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic&viewMode=story",
     "name": "Basic",
@@ -1048,30 +1432,6 @@
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-all-sections-expanded&viewMode=story",
     "name": "Mac all sections expanded",
     "path": "screenshots/desktop/account-pages-people-person-settings--mac-all-sections-expanded.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--mac-coming-soon",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-coming-soon&viewMode=story",
-    "name": "Mac coming soon",
-    "path": "screenshots/mobile/account-pages-people-person-settings--mac-coming-soon.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--mac-coming-soon",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--mac-coming-soon&viewMode=story",
-    "name": "Mac coming soon",
-    "path": "screenshots/desktop/account-pages-people-person-settings--mac-coming-soon.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import type { PersonRelationship } from '#/components/types';
+import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
 import PersonBasicSettingsPage from '#/components/pages/people/PersonBasicSettingsPage';
 import { toPersonCardPerson } from '#/lib/people';
 import { liveClient } from '#/pairql/client';
@@ -29,6 +30,12 @@ const PersonBasicSettingsRoute: React.FC = () => {
   const [relationshipDraft, setRelationshipDraft] = React.useState<PersonRelationship>(
     personRelationship ?? `child`,
   );
+  const [allowNavigation, setAllowNavigation] = React.useState(false);
+  const draftPersonId = React.useRef<string | undefined>(undefined);
+  const hasUnsavedChanges =
+    person !== undefined &&
+    draftPersonId.current === person.id &&
+    (nameDraft.trim() !== person.name || relationshipDraft !== person.relationship);
   const updateDetails = useMutation(liveClient.updatePersonBasicDetails, {
     invalidating: [Key.people],
     toast: {
@@ -48,47 +55,56 @@ const PersonBasicSettingsRoute: React.FC = () => {
   });
 
   React.useEffect(() => {
-    if (personName !== undefined) {
+    if (
+      resolvedPersonId !== undefined &&
+      personName !== undefined &&
+      personRelationship !== undefined &&
+      (draftPersonId.current !== resolvedPersonId || !hasUnsavedChanges)
+    ) {
+      draftPersonId.current = resolvedPersonId;
       setNameDraft(personName);
-    }
-  }, [resolvedPersonId, personName]);
-
-  React.useEffect(() => {
-    if (personRelationship !== undefined) {
       setRelationshipDraft(personRelationship);
+      setAllowNavigation(false);
     }
-  }, [resolvedPersonId, personRelationship]);
+  }, [hasUnsavedChanges, personName, personRelationship, resolvedPersonId]);
 
   if (!person) {
     return null;
   }
 
   return (
-    <PersonBasicSettingsPage
-      personName={person.name}
-      nameDraft={nameDraft}
-      setNameDraft={setNameDraft}
-      relationship={person.relationship}
-      relationshipDraft={relationshipDraft}
-      setRelationshipDraft={setRelationshipDraft}
-      devices={person.devices}
-      savingDetails={updateDetails.isPending}
-      deletingPerson={deletePerson.isPending}
-      selfRelationshipUnavailable={selfRelationshipUnavailable}
-      onSaveDetails={() =>
-        updateDetails.mutate({
-          personId: person.id,
-          name: nameDraft,
-          relationship: relationshipDraft,
-        })
-      }
-      onDeletePerson={() =>
-        deletePerson.mutateAsync({ personId: person.id }).then(
-          () => undefined,
-          () => undefined,
-        )
-      }
-    />
+    <>
+      <PersonBasicSettingsPage
+        personName={person.name}
+        nameDraft={nameDraft}
+        setNameDraft={setNameDraft}
+        relationship={person.relationship}
+        relationshipDraft={relationshipDraft}
+        setRelationshipDraft={setRelationshipDraft}
+        devices={person.devices}
+        savingDetails={updateDetails.isPending}
+        deletingPerson={deletePerson.isPending}
+        selfRelationshipUnavailable={selfRelationshipUnavailable}
+        onSaveDetails={() =>
+          updateDetails.mutate({
+            personId: person.id,
+            name: nameDraft,
+            relationship: relationshipDraft,
+          })
+        }
+        onDeletePerson={() => {
+          setAllowNavigation(true);
+          return deletePerson.mutateAsync({ personId: person.id }).then(
+            () => undefined,
+            () => setAllowNavigation(false),
+          );
+        }}
+      />
+      <UnsavedChangesGuard
+        hasUnsavedChanges={hasUnsavedChanges && !allowNavigation}
+        description="Your basic settings haven't been saved."
+      />
+    </>
   );
 };
 

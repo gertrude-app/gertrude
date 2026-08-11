@@ -5,12 +5,25 @@ type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAdd: (domain: string) => void;
+  initialDomain?: string;
 };
 
-const AddBlockedDomainModal: React.FC<Props> = ({ open, onOpenChange, onAdd }) => {
+const AddBlockedDomainModal: React.FC<Props> = ({
+  open,
+  onOpenChange,
+  onAdd,
+  initialDomain,
+}) => {
   const formId = React.useId();
-  const [domain, setDomain] = React.useState(``);
-  const normalizedDomain = domain.trim().toLowerCase();
+  const [domain, setDomain] = React.useState(initialDomain ?? ``);
+  const trimmedDomain = domain.trim();
+  const editing = initialDomain !== undefined;
+
+  React.useEffect(() => {
+    if (open) {
+      setDomain(initialDomain ?? ``);
+    }
+  }, [initialDomain, open]);
 
   const handleOpenChange = (nextOpen: boolean): void => {
     onOpenChange(nextOpen);
@@ -22,12 +35,13 @@ const AddBlockedDomainModal: React.FC<Props> = ({ open, onOpenChange, onAdd }) =
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
+    event.stopPropagation();
 
-    if (!normalizedDomain) {
+    if (!trimmedDomain) {
       return;
     }
 
-    onAdd(normalizedDomain);
+    onAdd(trimmedDomain);
     handleOpenChange(false);
   };
 
@@ -35,7 +49,7 @@ const AddBlockedDomainModal: React.FC<Props> = ({ open, onOpenChange, onAdd }) =
     <Modal
       open={open}
       onOpenChange={handleOpenChange}
-      title="Add blocked domain"
+      title={editing ? `Edit blocked domain` : `Add blocked domain`}
       description="This domain will be blocked at all times, even when the filter is suspended."
       size="small"
       footer={
@@ -43,13 +57,8 @@ const AddBlockedDomainModal: React.FC<Props> = ({ open, onOpenChange, onAdd }) =
           <Button type="button" variant="ghost" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            form={formId}
-            variant="primary"
-            disabled={!normalizedDomain}
-          >
-            Add Domain
+          <Button type="submit" form={formId} variant="primary" disabled={!trimmedDomain}>
+            {editing ? `Save Domain` : `Add Domain`}
           </Button>
         </>
       }

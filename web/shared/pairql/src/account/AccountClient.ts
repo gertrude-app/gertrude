@@ -104,6 +104,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public getPersonMacSettings = (
+    input: P.GetPersonMacSettings.Input,
+  ): Promise<Result<P.GetPersonMacSettings.Output>> => {
+    return this.query<P.GetPersonMacSettings.Output>(
+      input,
+      `GetPersonMacSettings`,
+      `parent`,
+    );
+  };
+
   public getSuspensionRequests = (
     input: P.GetSuspensionRequests.Input,
   ): Promise<Result<P.GetSuspensionRequests.Output>> => {
@@ -126,6 +136,26 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.UpdatePersonBasicDetails.Output>(
       input,
       `UpdatePersonBasicDetails`,
+      `parent`,
+    );
+  };
+
+  public updatePersonMacInternetFiltering = (
+    input: P.UpdatePersonMacInternetFiltering.Input,
+  ): Promise<Result<P.UpdatePersonMacInternetFiltering.Output>> => {
+    return this.query<P.UpdatePersonMacInternetFiltering.Output>(
+      input,
+      `UpdatePersonMacInternetFiltering`,
+      `parent`,
+    );
+  };
+
+  public updatePersonMacMonitoringSettings = (
+    input: P.UpdatePersonMacMonitoringSettings.Input,
+  ): Promise<Result<P.UpdatePersonMacMonitoringSettings.Output>> => {
+    return this.query<P.UpdatePersonMacMonitoringSettings.Output>(
+      input,
+      `UpdatePersonMacMonitoringSettings`,
       `parent`,
     );
   };

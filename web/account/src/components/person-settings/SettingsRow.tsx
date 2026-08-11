@@ -13,6 +13,7 @@ type Props = {
   | {
       type: `toggle`;
       enabled: boolean;
+      disabled?: boolean;
       setEnabled: (enabled: boolean) => void;
     }
   | {
@@ -22,6 +23,7 @@ type Props = {
 
 const SettingsRow: React.FC<Props> = (props) => {
   const showWarning = !!(props.warning && props.showWarning);
+  const contentVisible = props.type === `alwaysOn` || props.enabled;
 
   return (
     <VStack className="@lg/main:border-x border-y border-stone-200 @lg/main:rounded-md -mx-3 @lg/main:mx-0">
@@ -37,16 +39,21 @@ const SettingsRow: React.FC<Props> = (props) => {
             <Text variant="bodySubtle">{props.description}</Text>
           </VStack>
           {props.type === `toggle` && (
-            <Toggle checked={props.enabled} setChecked={props.setEnabled} />
+            <Toggle
+              checked={props.enabled}
+              setChecked={props.setEnabled}
+              disabled={props.disabled}
+              ariaLabel={props.title}
+            />
           )}
         </HStack>
         {props.children && (
           <div
+            aria-hidden={!contentVisible}
+            inert={!contentVisible}
             className={cx(
               `overflow-hidden transition-[height,opacity] duration-200`,
-              props.type === `alwaysOn` || props.enabled
-                ? `h-auto opacity-100`
-                : `h-0 opacity-0`,
+              contentVisible ? `h-auto opacity-100` : `h-0 opacity-0 pointer-events-none`,
             )}
           >
             <div className="px-3 pb-3">{props.children}</div>

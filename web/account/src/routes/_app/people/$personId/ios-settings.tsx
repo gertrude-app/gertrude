@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
-import PersonSettingsComingSoonPage from '#/components/pages/person-settings/PersonSettingsComingSoonPage';
+import IosSettingsComingSoonPage from '#/components/pages/person-settings/IosSettingsComingSoonPage';
 
-const IosSettingsRoute: React.FC = () => <PersonSettingsComingSoonPage platform="ios" />;
+const IosSettingsRoute: React.FC = () => <IosSettingsComingSoonPage />;
 
 export const Route = createFileRoute(`/_app/people/$personId/ios-settings`)({
   component: IosSettingsRoute,
