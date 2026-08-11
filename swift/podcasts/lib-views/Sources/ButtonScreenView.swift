@@ -61,10 +61,16 @@ public struct ButtonScreenView: View {
   public struct RemoteImage: Sendable {
     var url: String
     var label: String?
+    var onLoadFailure: (@MainActor @Sendable (any Error) -> Void)?
 
-    public init(url: String, label: String? = nil) {
+    public init(
+      url: String,
+      label: String? = nil,
+      onLoadFailure: (@MainActor @Sendable (any Error) -> Void)? = nil,
+    ) {
       self.url = url
       self.label = label
+      self.onLoadFailure = onLoadFailure
     }
   }
 
@@ -189,7 +195,11 @@ public struct ButtonScreenView: View {
                 .accessibilityLabel(remoteImage.label ?? "")
             case .empty:
               ProgressView()
-            default:
+            case .failure(let error):
+              Color.clear
+                .frame(width: 0, height: 0)
+                .onAppear { remoteImage.onLoadFailure?(error) }
+            @unknown default:
               EmptyView()
             }
           }

@@ -26,7 +26,7 @@ struct CrossPromoView: View {
           self.store.send(.tertiaryBtnTapped)
         }
       },
-      remoteImage: self.store.campaign.image.map { .init(url: $0.url, label: $0.description) },
+      remoteImage: self.remoteImage,
       screenType: .announcement,
     )
     .interactiveDismissDisabled(!self.store.campaign.dismissable)
@@ -36,6 +36,20 @@ struct CrossPromoView: View {
       #else
         EmptyView()
       #endif
+    }
+  }
+
+  private var remoteImage: ButtonScreenView.RemoteImage? {
+    let campaign = self.store.campaign
+    guard let image = campaign.image else { return nil }
+    return .init(url: image.url, label: image.description) { error in
+      log(
+        .warn,
+        .setup,
+        "af5b46ca",
+        detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
+          + "url=\(image.url) error=\(error)",
+      )
     }
   }
 }
