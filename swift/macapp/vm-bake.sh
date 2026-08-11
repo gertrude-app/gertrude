@@ -33,9 +33,10 @@ fi
 
 sudo defaults write /Library/Preferences/com.apple.loginwindow autoLoginUser franny
 sudo /usr/bin/python3 -c "
-import struct
+import subprocess
 passwd = 'franny'
-key = [125,137,82,35,210,188,221,234,163,185,31]
+major = int(subprocess.check_output(['/usr/bin/sw_vers', '-productVersion'], text=True).split('.')[0])
+key = [125,137,82,35,210,188,221,141,101,208,108,44] if major >= 27 else [125,137,82,35,210,188,221,234,163,185,31]
 padded = (passwd + '\0' * (len(key) - len(passwd) % len(key))).encode()
 encrypted = bytes([b ^ key[i % len(key)] for i, b in enumerate(padded)])
 with open('/etc/kcpassword', 'wb') as f:

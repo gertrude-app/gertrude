@@ -62,9 +62,10 @@ vm os="tahoe":
   set -euo pipefail
   if [ "{{os}}" = "sequoia" ]; then IMAGE="gertrude-base"
   elif [ "{{os}}" = "tahoe" ]; then IMAGE="gertrude-tahoe"
+  elif [ "{{os}}" = "golden-gate" ]; then IMAGE="gertrude-golden-gate"
   elif [ "{{os}}" = "sonoma" ]; then IMAGE="gertrude-sonoma"
   elif [ "{{os}}" = "ventura" ]; then IMAGE="gertrude-ventura"
-  else echo "✗ unknown os: {{os}} (expected sequoia, tahoe, sonoma, or ventura)" >&2; exit 1
+  else echo "✗ unknown os: {{os}} (expected golden-gate, tahoe, sequoia, sonoma, or ventura)" >&2; exit 1
   fi
   APP=$(just macapp find-app)
   APP_DIR=$(dirname "$APP")
@@ -97,9 +98,10 @@ vm-edit os="tahoe":
   set -euo pipefail
   if [ "{{os}}" = "sequoia" ]; then IMAGE="gertrude-base"
   elif [ "{{os}}" = "tahoe" ]; then IMAGE="gertrude-tahoe"
+  elif [ "{{os}}" = "golden-gate" ]; then IMAGE="gertrude-golden-gate"
   elif [ "{{os}}" = "sonoma" ]; then IMAGE="gertrude-sonoma"
   elif [ "{{os}}" = "ventura" ]; then IMAGE="gertrude-ventura"
-  else echo "✗ unknown os: {{os}} (expected sequoia, tahoe, sonoma, or ventura)" >&2; exit 1
+  else echo "✗ unknown os: {{os}} (expected golden-gate, tahoe, sequoia, sonoma, or ventura)" >&2; exit 1
   fi
   if ! tart list 2>/dev/null | grep -q "$IMAGE"; then
     echo "✗ $IMAGE does not exist" >&2; exit 1
@@ -133,6 +135,32 @@ vm-tahoe-sip:
   wait $TART_PID 2>/dev/null || true
   sleep 5
   echo "→ launching Tahoe SIP-enabled VM with display..."
+  echo "   ⚠ SIP is ENABLED — install Gertrude beta via download, not dev build"
+  echo "   connect: 'just swift macapp vm-connect'"
+  echo ""
+  tart run "$VM"
+
+vm-golden-gate-sip:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  if ! tart list 2>/dev/null | grep -q "gertrude-golden-gate-sip"; then
+    echo "✗ gertrude-golden-gate-sip doesn't exist" >&2
+    exit 1
+  fi
+  just macapp vm-clean
+  VM="gertrude-gui-$(date +%s)"
+  echo "→ cloning gertrude-golden-gate-sip..."
+  tart clone gertrude-golden-gate-sip "$VM"
+  echo "→ booting headless to get IP..."
+  tart run --no-graphics "$VM" >/dev/null 2>&1 &
+  TART_PID=$!
+  IP=$(just macapp vm-wait-for-ip "$VM")
+  echo "VM_IP=$IP" > .env.vm
+  echo "→ stopping headless VM..."
+  tart stop "$VM" 2>/dev/null || true
+  wait $TART_PID 2>/dev/null || true
+  sleep 5
+  echo "→ launching Golden Gate SIP-enabled VM with display..."
   echo "   ⚠ SIP is ENABLED — install Gertrude beta via download, not dev build"
   echo "   connect: 'just swift macapp vm-connect'"
   echo ""

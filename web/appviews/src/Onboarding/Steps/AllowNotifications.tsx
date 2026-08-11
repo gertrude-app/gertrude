@@ -52,7 +52,11 @@ const AllowNotifications: React.FC<Props> = ({ step }) => {
             {` `}to watch a short troubleshooting video.
           </InformationModal>
           <div className="flex flex-col !ml-0">
-            <Onboarding.Heading>Set notifications to “Alerts”</Onboarding.Heading>
+            <Onboarding.Heading>
+              {osVersion.major >= 26
+                ? `Set Alert Style to “Persistent”`
+                : `Set notifications to “Alerts”`}
+            </Onboarding.Heading>
             <Onboarding.Text className="mt-4 max-w-xl">
               {osVersion.major >= 26 ? (
                 <>
