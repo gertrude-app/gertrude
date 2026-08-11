@@ -124,22 +124,39 @@ describe(`music claim flow`, () => {
         });
     });
 
-    it(`returns to the dashboard root rather than the device page plan gate`, () => {
+    it(`deep-links into the device settings page`, () => {
       cy.interceptPql(`GetMusicClaimData`, doneClaimData);
-      cy.interceptPql(`DashboardWidgets_v3`, {
-        children: [],
-        unlockRequests: [],
-        childActivitySummaries: [],
-        recentScreenshots: [],
-        numParentNotifications: 0,
-        pendingIOSDevices: [],
-      });
 
       cy.visit(`/claim-music-device/687084/claim`);
       cy.location(`pathname`).should(`eq`, `/claim-music-device/687084/done`);
 
-      cy.contains(`Return to dashboard`).click();
-      cy.location(`pathname`).should(`eq`, `/`); // never /children/:id/ios-devices/:id
+      cy.interceptPql(`GetIOSDevice_v2`, {
+        childName: `Luke`,
+        deviceType: `iPhone`,
+        osVersion: `18.2`,
+        musicConnected: true,
+        music: { requiresPayment: true },
+      });
+      cy.contains(`iPhone settings`).click();
+      cy.location(`pathname`).should(`eq`, `/children/child-2/ios-devices/device-2`);
+    });
+
+    it(`lands on a neutral music card, not a plan gate`, () => {
+      cy.interceptPql(`GetMusicClaimData`, doneClaimData);
+
+      cy.visit(`/claim-music-device/687084/claim`);
+
+      cy.interceptPql(`GetIOSDevice_v2`, {
+        childName: `Luke`,
+        deviceType: `iPhone`,
+        osVersion: `18.2`,
+        musicConnected: true,
+        music: { requiresPayment: true },
+      });
+      cy.contains(`iPhone settings`).click();
+      cy.wait(`@GetIOSDevice_v2`);
+
+      cy.contains(`Music not available for this account`).should(`be.visible`);
     });
 
     it(`redirects to the claim step when reached without nav state`, () => {

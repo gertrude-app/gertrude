@@ -120,6 +120,7 @@ extension Configure {
     app.migrations.add(CreateUnrestrictedMacApps())
     app.migrations.add(BackfillUnrestrictedMacApps())
     app.migrations.add(AddDashAnnouncementCampaign())
+    app.migrations.add(WidenRouteTelemetryErrorId())
   }
 }
 

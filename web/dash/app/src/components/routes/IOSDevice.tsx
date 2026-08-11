@@ -4,10 +4,10 @@ import {
   /*ConfirmDeleteEntity*/
   AppHeader,
   BlockGroupList,
+  EmptyState,
   Loading,
   PageHeading,
   // EditBlockRules,
-  PlanTeaser,
   // BlockRuleEditor,
   PodcastsDeviceSection,
   ToggleCard,
@@ -164,6 +164,14 @@ const IOSDevice: React.FC = () => {
         {deviceQuery.data.childName}'s {deviceQuery.data.deviceType}
       </PageHeading>
       <div className="mt-8 space-y-16">
+        {deviceQuery.data.musicConnected && (
+          <MusicDeviceSection
+            childId={childId}
+            childName={deviceQuery.data.childName}
+            deviceType={dt}
+            requiresPayment={music?.requiresPayment ?? false}
+          />
+        )}
         {am && podcastsRunway && (
           <PodcastsDeviceSection
             status={TIER_TO_STATUS[podcastsRunway.tier]}
@@ -172,13 +180,6 @@ const IOSDevice: React.FC = () => {
             accessEndsAt={podcastsRunway.accessEndsAt}
             trialDaysRemaining={podcastsRunway.trialDaysRemaining}
             requestPinCode={requestPinCode}
-          />
-        )}
-        {deviceQuery.data.musicConnected && (
-          <MusicDeviceSection
-            childId={childId}
-            childName={deviceQuery.data.childName}
-            requiresPayment={music?.requiresPayment ?? false}
           />
         )}
         {blocker && (
@@ -570,27 +571,21 @@ const IOSDevice: React.FC = () => {
 const MusicDeviceSection: React.FC<{
   childId: string;
   childName: string;
+  deviceType: string;
   requiresPayment: boolean;
-}> = ({ childId, childName, requiresPayment }) => (
+}> = ({ childId, childName, deviceType, requiresPayment }) => (
   <div className="max-w-3xl">
     <AppHeader app="music" />
     {requiresPayment ? (
-      <div className="mt-4">
-        <p className="text-slate-500 mb-4">
-          Paused — your Gertrude account needs the Medium plan (or Full) to manage
-          Gertrude Music.
-        </p>
-        <PlanTeaser
-          className="mb-4"
-          plan="medium"
-          extraBullets={[
-            `Includes Gertrude Music for approved Apple Music artists and albums`,
-          ]}
-        />
-        <Button type="link" to="/settings" color="primary" size="small">
-          Manage subscription
-        </Button>
-      </div>
+      <EmptyState
+        className="mt-5"
+        heading="Music not available for this account"
+        secondaryText={`This ${deviceType} is connected, but Gertrude Music isn’t available for this account.`}
+        icon="user-gear"
+        buttonText="Manage plan"
+        buttonIcon="arrow-right"
+        action="/settings"
+      />
     ) : (
       <MusicCuration childId={childId} childName={childName} className="mt-6" />
     )}

@@ -293,7 +293,7 @@ private func recordTelemetry(
     operation: operation,
     durationMs: durationMs,
     result: result,
-    errorId: errorId,
+    errorId: errorId.map(truncateErrorId),
     errorType: errorType,
     errorMessage: errorMessage.map(truncateErrorMessage),
     parentId: context.telemetry.parentId,
@@ -317,6 +317,10 @@ private func truncateUserAgent(_ s: String) -> String {
 
 private func truncateErrorMessage(_ s: String) -> String {
   s.count <= 2000 ? s : String(s.prefix(2000)) + "…"
+}
+
+private func truncateErrorId(_ s: String) -> String {
+  s.count <= 64 ? s : String(s.prefix(64))
 }
 
 private func parsingErrorSummary(_ req: Request) -> String {

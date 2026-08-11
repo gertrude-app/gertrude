@@ -7,7 +7,7 @@ const MusicDoneScreen: React.FC<{
   childName: string;
   modelName: string;
   iosVersion: string;
-  onDone: () => void;
+  onManageSettings: () => void;
 }> = (props) => {
   const deviceType = props.modelName.toLowerCase().includes(`ipad`) ? `iPad` : `iPhone`;
   return (
@@ -30,8 +30,8 @@ const MusicDoneScreen: React.FC<{
       </div>
 
       <div className="flex justify-end">
-        <Button type="button" color="primary" onClick={props.onDone}>
-          Return to dashboard
+        <Button type="button" color="primary" onClick={props.onManageSettings}>
+          {deviceType} settings
         </Button>
       </div>
     </div>
