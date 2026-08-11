@@ -9,6 +9,7 @@ import { createMetadata } from '@/lib/seo';
 export const metadata = createMetadata(
   `Gertrude Music | Parent-Approved Apple Music App for Kids`,
   `Gertrude Music is a parent-managed music app without open-ended browsing. Approve Apple Music artists and albums; kids listen only to the library you choose.`,
+  `/og-images/music.png`,
 );
 
 const MusicPage: NextPage = () => (
