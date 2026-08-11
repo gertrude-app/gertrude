@@ -23,6 +23,8 @@ const ClaimMusicDeviceClaim: React.FC = () => {
     if (query.data.resumeStep) {
       const state: MusicDoneNavState = {
         childName: query.data.resumeStep.childName,
+        childId: query.data.resumeStep.childId,
+        deviceId: query.data.resumeStep.deviceId,
         modelName: query.data.modelName,
         iosVersion: query.data.iosVersion,
       };
@@ -71,6 +73,8 @@ const ClaimMusicDeviceClaim: React.FC = () => {
     const output = result.valueOrThrow();
     const state: MusicDoneNavState = {
       childName: output.childName,
+      childId: output.childId,
+      deviceId: output.deviceId,
       modelName: output.modelName,
       iosVersion: output.iosVersion,
     };
