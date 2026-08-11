@@ -139,3 +139,7 @@ private struct AddShowURLScreen: View {
     }
   }
 }
+
+#Preview("Add show by URL") {
+  AddShowURLScreen { _ in }
+}

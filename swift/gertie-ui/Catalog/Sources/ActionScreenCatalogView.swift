@@ -40,104 +40,37 @@ struct ActionScreenCatalogView: View {
 private struct ActionScreenSequenceDemo: View {
   @Environment(\.dismiss) private var dismiss
   @State private var step = Step.defaultScreen
-  @State private var shouldFinishProgress = false
 
   var body: some View {
     Group {
       switch self.step {
       case .defaultScreen:
-        GertieActionScreen(
-          message: "The setup usually takes 5–7 minutes.",
-          action: .button("Continue", behavior: .afterExitAnimation) {
-            self.step = .question
-          },
-        )
+        DefaultActionScreenDemo {
+          self.step = .question
+        }
       case .question:
-        GertieActionScreen(
-          message: "How old is the person who will use this device?",
-          icon: .question,
-          actions: [
-            .button(
-              "Under 18",
-              emphasis: .secondary,
-              behavior: .afterExitAnimation,
-            ) {
-              self.step = .error
-            },
-            .button("18 or older", behavior: .afterExitAnimation) {
-              self.step = .error
-            },
-          ],
-        )
+        QuestionActionScreenDemo {
+          self.step = .error
+        }
       case .error:
-        GertieActionScreen(
-          message: "Couldn’t reach Gertrude’s servers.",
-          icon: .error,
-          actions: [
-            .button("Try again", behavior: .afterExitAnimation) {
-              self.step = .bullets
-            },
-            .link(
-              "Contact support",
-              destination: URL(string: "https://gertrude.app/support")!,
-            ),
-          ],
-        )
+        ErrorActionScreenDemo {
+          self.step = .bullets
+        }
       case .bullets:
-        GertieActionScreen(
-          message: "Before continuing, make sure:",
-          bullets: [
-            "The device is connected to the internet.",
-            "You know the device passcode.",
-          ],
-          actions: [
-            .button("Waiting for permission", isEnabled: false) {},
-            .button("Continue", behavior: .afterExitAnimation) {
-              self.step = .progress
-            },
-          ],
-        )
+        BulletsActionScreenDemo {
+          self.step = .progress
+        }
       case .progress:
-        GertieActionScreen(
-          message: "Gertrude needs permission before setup can continue.",
-          action: .button("Allow permission", behavior: .showProgress) {
-            self.shouldFinishProgress = true
-          },
-        )
-        .task(id: self.shouldFinishProgress) {
-          await self.finishProgressIfNeeded()
+        ProgressActionScreenDemo {
+          self.step = .supplement
         }
       case .supplement:
-        GertieActionScreen(
-          message: "Follow the steps shown here, then return to Gertrude.",
-          action: .button("Finish", behavior: .afterExitAnimation) {
-            self.dismiss()
-          },
-          supplementPlacement: .beforeMessage,
-        ) {
-          Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-            .font(.system(size: 72, weight: .light))
-            .foregroundStyle(Color.violet500)
-            .frame(maxWidth: .infinity)
-            .padding(.bottom, 12)
-            .accessibilityLabel("iPhone setup illustration")
+        SupplementActionScreenDemo {
+          self.dismiss()
         }
       }
     }
     .toolbar(.hidden, for: .navigationBar)
-  }
-
-  @MainActor private func finishProgressIfNeeded() async {
-    guard self.shouldFinishProgress else { return }
-
-    do {
-      try await Task.sleep(for: .milliseconds(800))
-    } catch {
-      return
-    }
-
-    guard !Task.isCancelled, self.step == .progress else { return }
-    self.step = .supplement
   }
 
   private enum Step {
@@ -153,41 +86,79 @@ private struct ActionScreenSequenceDemo: View {
 private struct DefaultActionScreenDemo: View {
   @Environment(\.dismiss) private var dismiss
 
+  let onComplete: (@MainActor () -> Void)?
+
+  init(onComplete: (@MainActor () -> Void)? = nil) {
+    self.onComplete = onComplete
+  }
+
   var body: some View {
     GertieActionScreen(
       message: "The setup usually takes 5–7 minutes.",
-      action: .button("Continue") {
-        self.dismiss()
+      action: .button("Continue", behavior: .afterExitAnimation) {
+        self.complete()
       },
     )
     .navigationTitle("Default")
     .navigationBarTitleDisplayMode(.inline)
+  }
+
+  @MainActor private func complete() {
+    if let onComplete = self.onComplete {
+      onComplete()
+    } else {
+      self.dismiss()
+    }
   }
 }
 
 private struct QuestionActionScreenDemo: View {
   @Environment(\.dismiss) private var dismiss
 
+  let onComplete: (@MainActor () -> Void)?
+
+  init(onComplete: (@MainActor () -> Void)? = nil) {
+    self.onComplete = onComplete
+  }
+
   var body: some View {
     GertieActionScreen(
       message: "How old is the person who will use this device?",
       icon: .question,
       actions: [
-        .button("Under 18", emphasis: .secondary) {
-          self.dismiss()
+        .button(
+          "Under 18",
+          emphasis: .secondary,
+          behavior: .afterExitAnimation,
+        ) {
+          self.complete()
         },
-        .button("18 or older") {
-          self.dismiss()
+        .button("18 or older", behavior: .afterExitAnimation) {
+          self.complete()
         },
       ],
     )
     .navigationTitle("Question")
     .navigationBarTitleDisplayMode(.inline)
   }
+
+  @MainActor private func complete() {
+    if let onComplete = self.onComplete {
+      onComplete()
+    } else {
+      self.dismiss()
+    }
+  }
 }
 
 private struct ErrorActionScreenDemo: View {
   @Environment(\.dismiss) private var dismiss
+
+  let onComplete: (@MainActor () -> Void)?
+
+  init(onComplete: (@MainActor () -> Void)? = nil) {
+    self.onComplete = onComplete
+  }
 
   var body: some View {
     GertieActionScreen(
@@ -195,7 +166,7 @@ private struct ErrorActionScreenDemo: View {
       icon: .error,
       actions: [
         .button("Try again", behavior: .afterExitAnimation) {
-          self.dismiss()
+          self.complete()
         },
         .link(
           "Contact support",
@@ -206,10 +177,24 @@ private struct ErrorActionScreenDemo: View {
     .navigationTitle("Error")
     .navigationBarTitleDisplayMode(.inline)
   }
+
+  @MainActor private func complete() {
+    if let onComplete = self.onComplete {
+      onComplete()
+    } else {
+      self.dismiss()
+    }
+  }
 }
 
 private struct BulletsActionScreenDemo: View {
   @Environment(\.dismiss) private var dismiss
+
+  let onComplete: (@MainActor () -> Void)?
+
+  init(onComplete: (@MainActor () -> Void)? = nil) {
+    self.onComplete = onComplete
+  }
 
   var body: some View {
     GertieActionScreen(
@@ -220,35 +205,75 @@ private struct BulletsActionScreenDemo: View {
       ],
       actions: [
         .button("Waiting for permission", isEnabled: false) {},
-        .button("Go back") {
-          self.dismiss()
+        .button("Continue", behavior: .afterExitAnimation) {
+          self.complete()
         },
       ],
     )
     .navigationTitle("Bullets")
     .navigationBarTitleDisplayMode(.inline)
   }
+
+  @MainActor private func complete() {
+    if let onComplete = self.onComplete {
+      onComplete()
+    } else {
+      self.dismiss()
+    }
+  }
 }
 
 private struct ProgressActionScreenDemo: View {
+  @State private var shouldFinish = false
+
+  let onComplete: (@MainActor () -> Void)?
+
+  init(onComplete: (@MainActor () -> Void)? = nil) {
+    self.onComplete = onComplete
+  }
+
   var body: some View {
     GertieActionScreen(
       message: "Gertrude needs permission before setup can continue.",
-      action: .button("Allow permission", behavior: .showProgress) {},
+      action: .button("Allow permission", behavior: .showProgress) {
+        self.shouldFinish = true
+      },
     )
     .navigationTitle("Progress")
     .navigationBarTitleDisplayMode(.inline)
+    .task(id: self.shouldFinish) {
+      await self.finishIfNeeded()
+    }
+  }
+
+  @MainActor private func finishIfNeeded() async {
+    guard self.shouldFinish, let onComplete = self.onComplete else { return }
+
+    do {
+      try await Task.sleep(for: .milliseconds(800))
+    } catch {
+      return
+    }
+
+    guard !Task.isCancelled, self.shouldFinish else { return }
+    onComplete()
   }
 }
 
 private struct SupplementActionScreenDemo: View {
   @Environment(\.dismiss) private var dismiss
 
+  let onComplete: (@MainActor () -> Void)?
+
+  init(onComplete: (@MainActor () -> Void)? = nil) {
+    self.onComplete = onComplete
+  }
+
   var body: some View {
     GertieActionScreen(
       message: "Follow the steps shown here, then return to Gertrude.",
-      action: .button("Got it") {
-        self.dismiss()
+      action: .button("Finish", behavior: .afterExitAnimation) {
+        self.complete()
       },
       supplementPlacement: .beforeMessage,
     ) {
@@ -261,5 +286,13 @@ private struct SupplementActionScreenDemo: View {
     }
     .navigationTitle("Supplement")
     .navigationBarTitleDisplayMode(.inline)
+  }
+
+  @MainActor private func complete() {
+    if let onComplete = self.onComplete {
+      onComplete()
+    } else {
+      self.dismiss()
+    }
   }
 }

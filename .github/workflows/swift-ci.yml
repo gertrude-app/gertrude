@@ -444,11 +444,13 @@ jobs:
               - swift/pairql/**
               - swift/gertie/**
               - swift/gertie-tca-features/**
+              - swift/gertie-ui/**
               - swift/x-kit/**
               - swift/x-expect/**
               - swift/ts-codable-macro/**
             podcasts:
               - swift/podcasts/**
+              - swift/gertie-ui/**
               - swift/pairql/**
               - swift/pairql-podcasts/**
               - swift/pairql-ios-apps/**
@@ -462,6 +464,7 @@ jobs:
               - swift/music/**
               - swift/gertie/**
               - swift/gertie-tca-features/**
+              - swift/gertie-ui/**
               - swift/pairql/**
               - swift/pairql-ios-apps/**
               - swift/pairql-music/**

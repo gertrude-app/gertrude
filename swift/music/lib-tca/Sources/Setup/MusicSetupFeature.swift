@@ -31,6 +31,7 @@ struct MusicSetupFeature: Sendable {
       case deviceRecognized(childName: String)
       case musicAccessUnavailable(childName: String)
       case appleMusicPermission
+      case requestingAppleMusicPermission
       case appleMusicDenied
       case appleMusicRestricted
       case appleMusicPrivacyAcknowledgementRequired
@@ -139,6 +140,7 @@ struct MusicSetupFeature: Sendable {
         return self.checkAppleMusicAuthorization()
 
       case .appleMusicPermissionButtonTapped:
+        state.screen = .requestingAppleMusicPermission
         return .run { send in
           await send(.appleMusicAuthorizationStatusLoaded(self.musicSetup.requestAuthorization()))
         }

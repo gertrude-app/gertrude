@@ -8,6 +8,7 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case selfManagerNudge
   case explainAccount
   case appleMusicPermission
+  case requestingAppleMusicPermission
   case appleMusicDenied
   case appleMusicRestricted
   case appleMusicPrivacyAcknowledgementRequired
@@ -113,10 +114,13 @@ public struct MusicSetupView: View {
       GertieActionScreen(
         message: "Gertrude Music needs permission to use Apple Music so music albums can play.",
         icon: .system("music.note.list"),
-        action: .button("Continue", behavior: .showProgress) {
+        action: .button("Continue") {
           self.onEvent(.appleMusicPermissionTapped)
         },
       )
+
+    case .requestingAppleMusicPermission:
+      GertieLoadingScreen(message: "Requesting Apple Music permission…")
 
     case .appleMusicDenied:
       GertieActionScreen(
@@ -240,6 +244,10 @@ public struct MusicSetupView: View {
 
 #Preview("Apple Music Permission") {
   MusicSetupView(state: .appleMusicPermission)
+}
+
+#Preview("Requesting Apple Music Permission") {
+  MusicSetupView(state: .requestingAppleMusicPermission)
 }
 
 #Preview("Apple Music Denied") {

@@ -3,8 +3,6 @@ import SwiftUI
 public struct GertiePrimaryButtonStyle: PrimitiveButtonStyle {
   @Environment(\.isEnabled) private var isEnabled
 
-  public init() {}
-
   public func makeBody(configuration: Configuration) -> some View {
     GertieButtonInteraction(isEnabled: self.isEnabled) { pressState in
       Button(configuration)
@@ -15,8 +13,6 @@ public struct GertiePrimaryButtonStyle: PrimitiveButtonStyle {
 
 public struct GertieSecondaryButtonStyle: PrimitiveButtonStyle {
   @Environment(\.isEnabled) private var isEnabled
-
-  public init() {}
 
   public func makeBody(configuration: Configuration) -> some View {
     GertieButtonInteraction(isEnabled: self.isEnabled) { pressState in

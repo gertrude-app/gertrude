@@ -659,75 +659,15 @@ private struct GertieActionScreenExitModifier: ViewModifier {
   )
 }
 
-#Preview("One action") {
+#Preview("Accessibility text") {
   GertieActionScreen(
-    message: "The setup usually takes 5–7 minutes.",
-    action: .button("Next") {},
-  )
-}
-
-#Preview("Question") {
-  GertieActionScreen(
-    message: "How old is the person who will use this device?",
-    icon: .question,
+    message: "Gertrude needs permission before setup can continue. Review the details carefully, then choose whether to continue.",
     actions: [
-      .button("Under 18", emphasis: .secondary) {},
-      .button("18 or older") {},
-    ],
-  )
-}
-
-#Preview("Error and link") {
-  GertieActionScreen(
-    message: "Couldn’t reach Gertrude’s servers.",
-    icon: .error,
-    actions: [
-      .button("Try again", behavior: .afterExitAnimation) {},
-      .link(
-        "Contact support",
-        destination: URL(string: "https://gertrude.app/support")!,
-      ),
-    ],
-  )
-  .preferredColorScheme(.dark)
-}
-
-#Preview("Bullets and disabled") {
-  GertieActionScreen(
-    message: "Before continuing, make sure:",
-    bullets: [
-      "The device is connected to the internet.",
-      "You know the device passcode.",
-    ],
-    actions: [
-      .button("Waiting for permission", isEnabled: false) {},
+      .button("Continue") {},
       .button("Go back") {},
-      .share("Share setup instructions", item: "https://gertrude.app"),
     ],
   )
   .environment(\.dynamicTypeSize, .accessibility2)
-}
-
-#Preview("Progress") {
-  GertieActionScreen(
-    message: "Gertrude needs permission before setup can continue.",
-    action: .button("Allow permission", behavior: .showProgress) {},
-  )
-}
-
-#Preview("Supplement") {
-  GertieActionScreen(
-    message: "Follow the steps shown here, then return to Gertrude.",
-    action: .button("Got it") {},
-    supplementPlacement: .beforeMessage,
-  ) {
-    Image(systemName: "iphone.gen3.radiowaves.left.and.right")
-      .font(.system(size: 72, weight: .light))
-      .foregroundStyle(Color.violet500)
-      .frame(maxWidth: .infinity)
-      .padding(.bottom, 12)
-      .accessibilityLabel("iPhone setup illustration")
-  }
 }
 
 #Preview("Form supplement") {
