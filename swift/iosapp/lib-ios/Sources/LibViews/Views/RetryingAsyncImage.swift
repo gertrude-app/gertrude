@@ -36,7 +36,10 @@ public struct RetryingAsyncImage<Content: View, Placeholder: View>: View {
   }
 
   public var body: some View {
-    Group {
+    ZStack {
+      // load-bearing: `.task` never runs if every branch below is an EmptyView
+      // placeholder, so this zero-size anchor keeps the container rendered
+      Color.clear.frame(width: 0, height: 0)
       if let image = self.image {
         self.content(image)
       } else if !self.failed {
