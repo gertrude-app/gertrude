@@ -15,6 +15,11 @@ appId: com.netrivet.gertrude.am.dev
 - runFlow: enter-pin.yaml
 - assertVisible: "Confirm PIN"
 - runFlow: enter-pin.yaml
+- runFlow:
+    when:
+      visible: "No thanks"
+    commands:
+      - tapOn: "No thanks"
 - assertVisible: "No shows yet"
 - tapOn: "Add Show"
 - runFlow: enter-pin.yaml
