@@ -221,10 +221,13 @@ private func handleSubscriptionUpdated(
   guard var subscription = try? await StripeSubscription.query()
     .where(.stripeId == .init(stripeSubId))
     .first(in: db) else {
-    unexpected(
-      "61f0e37c",
-      detail: "no local sub for stripe sub id: \(stripeSubId), event: \(stripeEvent.id)",
-    )
+    let isFirstActivation = event?.data?.previous_attributes?.status == "incomplete"
+    if !isFirstActivation {
+      unexpected(
+        "61f0e37c",
+        detail: "no local sub for stripe sub id: \(stripeSubId), event: \(stripeEvent.id)",
+      )
+    }
     return
   }
 
@@ -368,7 +371,7 @@ private func slackNotify(_ event: EventInfo?) {
   }
 }
 
-private struct EventInfo: Decodable {
+struct EventInfo: Decodable {
   struct Data: Decodable {
     struct Object: Decodable {
       var id: String?
@@ -430,7 +433,12 @@ private struct EventInfo: Decodable {
       var current_period_end: Int?
     }
 
+    struct PreviousAttributes: Decodable {
+      var status: String?
+    }
+
     var object: Object?
+    var previous_attributes: PreviousAttributes?
   }
 
   var id: String?

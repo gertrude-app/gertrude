@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import XCore
 import XCTest
 import XCTVapor
 import XExpect
@@ -916,6 +917,34 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       expect(subscription.currentPeriodEnd) // status/period writes still land
         .toEqual(Date(timeIntervalSince1970: TimeInterval(newPeriodEnd)))
     })
+  }
+
+  func testDecodesPreviousAttributesStatus() throws {
+    let activation = """
+      {
+        "id": "evt_\("".random)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": { "id": "sub_x", "status": "active" },
+          "previous_attributes": { "status": "incomplete" }
+        }
+      }
+    """
+    // suppresses `61f0e37c`: `invoice.paid` owns row creation, and loses the race
+    expect(try JSON.decode(activation, as: EventInfo.self).data?.previous_attributes?.status)
+      .toEqual("incomplete")
+
+    let periodRoll = """
+      {
+        "id": "evt_\("".random)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": { "id": "sub_x", "status": "active" }
+        }
+      }
+    """
+    expect(try JSON.decode(periodRoll, as: EventInfo.self).data?.previous_attributes?.status)
+      .toBeNil()
   }
 }
 
