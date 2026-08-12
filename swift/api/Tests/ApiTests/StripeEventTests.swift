@@ -825,6 +825,98 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       .all(in: self.db)
     expect(matches.count).toEqual(2) // the whole point: one card, two accounts
   }
+
+  func testCompedParentInvoicePaidSkipsIdentityWrites() async throws {
+    let subscriptionId = "subId_".random
+    let customerId = "cus_".random
+    let eventId = "evt_\("".random)"
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      isComplimentary: true, // `complimentary_has_no_stripe_state` forbids stripe state here
+    ))
+
+    let json = """
+      {
+        "id": "\(eventId)",
+        "type": "invoice.paid",
+        "data": {
+          "object": {
+            "amount_due": 1000,
+            "customer": "\(customerId)",
+            "customer_email": "\(parent.email)",
+            "subscription": "\(subscriptionId)",
+            "lines": {
+              "data": [
+                { "price": { "id": "\(self.env.stripe.priceIdFull)" } }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent) // used to 500 on the CHECK violation
+      let identity = try await parent.model.billingIdentity(in: self.db)!
+      expect(identity.isComplimentary).toBeTrue()
+      expect(identity.stripeCustomerId).toBeNil()
+      expect(identity.lastStripeSubscriptionId).toBeNil()
+      expect(identity.lastPaidTier).toBeNil()
+      let subscription = try await parent.model.subscription(in: self.db)
+      expect(subscription?.stripeId.rawValue).toEqual(subscriptionId) // sub writes still land
+    })
+
+    let storedEvents = try await StripeEvent.query()
+      .where(.stripeEventId == .string(eventId))
+      .all(in: self.db)
+    expect(storedEvents.count).toEqual(1) // the rollback used to erase its own evidence
+  }
+
+  func testCompedParentSubscriptionUpdatedSkipsIdentityWrites() async throws {
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let newPeriodEnd = 1_704_050_627
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id, isComplimentary: true))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: subscriptionId,
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
+
+    let json = """
+      {
+        "id": "evt_\("".random)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": {
+            "id": "\(subscriptionId.rawValue)",
+            "customer": "\("cus_".random)",
+            "status": "active",
+            "current_period_end": \(newPeriodEnd),
+            "items": {
+              "data": [
+                { "price": { "id": "\(self.env.stripe.priceIdFull)" } }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let identity = try await parent.model.billingIdentity(in: self.db)!
+      expect(identity.stripeCustomerId).toBeNil()
+      expect(identity.lastStripeSubscriptionId).toBeNil()
+      expect(identity.lastPaidTier).toBeNil()
+      let subscription = try await parent.model.subscription(in: self.db)!
+      expect(subscription.currentPeriodEnd) // status/period writes still land
+        .toEqual(Date(timeIntervalSince1970: TimeInterval(newPeriodEnd)))
+    })
+  }
 }
 
 private func invoicePaidJson(

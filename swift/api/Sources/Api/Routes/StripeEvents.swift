@@ -166,24 +166,16 @@ private func handleInvoicePaid(
     notifyFirstPayment(parent, eventTier, referrer)
   }
 
-  if var identity = try await parent.billingIdentity(in: db) {
-    var changed = false
-    if let customerId, identity.stripeCustomerId?.rawValue != customerId {
-      identity.stripeCustomerId = .init(customerId)
-      changed = true
-    }
-    if identity.stripeCustomerId != nil,
-       identity.lastStripeSubscriptionId?.rawValue != eventSubscriptionId {
-      identity.lastStripeSubscriptionId = .init(eventSubscriptionId)
-      changed = true
-    }
-    if identity.stripeCustomerId != nil, identity.lastPaidTier != eventTier {
-      identity.lastPaidTier = eventTier
-      changed = true
-    }
-    if changed {
-      try await db.update(identity)
-    }
+  if let identity = try await parent.billingIdentity(in: db) {
+    try await updateStripeIdentityState(
+      identity,
+      parentId: parent.id,
+      customerId: customerId,
+      subscriptionId: eventSubscriptionId,
+      tier: eventTier,
+      stripeEvent: stripeEvent,
+      db: db,
+    )
   } else if let customerId {
     let identity = BillingIdentity(
       parentId: parent.id,
@@ -279,26 +271,57 @@ private func handleSubscriptionUpdated(
   }
   try await db.update(subscription)
 
-  if stripeStatus.isPaying, var identity = try await db.find(subscription.parentId)
+  if stripeStatus.isPaying, let identity = try await db.find(subscription.parentId)
     .billingIdentity(in: db) {
-    var changed = false
-    if let customer = event?.data?.object?.customer,
-       identity.stripeCustomerId?.rawValue != customer {
-      identity.stripeCustomerId = .init(customer)
-      changed = true
-    }
-    if identity.stripeCustomerId != nil,
-       identity.lastStripeSubscriptionId?.rawValue != stripeSubId {
-      identity.lastStripeSubscriptionId = .init(stripeSubId)
-      changed = true
-    }
-    if identity.stripeCustomerId != nil, identity.lastPaidTier != eventTier {
-      identity.lastPaidTier = eventTier
-      changed = true
-    }
-    if changed {
-      try await db.update(identity)
-    }
+    try await updateStripeIdentityState(
+      identity,
+      parentId: subscription.parentId,
+      customerId: event?.data?.object?.customer,
+      subscriptionId: stripeSubId,
+      tier: eventTier,
+      stripeEvent: stripeEvent,
+      db: db,
+    )
+  }
+}
+
+private func updateStripeIdentityState(
+  _ identity: BillingIdentity,
+  parentId: Parent.Id,
+  customerId: String?,
+  subscriptionId: String,
+  tier: StripeSubscription.Tier,
+  stripeEvent: StripeEvent,
+  db: any DuetSQL.Client,
+) async throws {
+  guard !identity.isComplimentary else {
+    unexpected(
+      "e5f31c92",
+      parentId,
+      "comped parent paid stripe, identity writes skipped; "
+        + "customer: \(customerId ?? "(nil)"), subscription: \(subscriptionId), "
+        + "tier: \(tier.rawValue), event: \(stripeEvent.id)",
+    )
+    return
+  }
+
+  var identity = identity
+  var changed = false
+  if let customerId, identity.stripeCustomerId?.rawValue != customerId {
+    identity.stripeCustomerId = .init(customerId)
+    changed = true
+  }
+  if identity.stripeCustomerId != nil,
+     identity.lastStripeSubscriptionId?.rawValue != subscriptionId {
+    identity.lastStripeSubscriptionId = .init(subscriptionId)
+    changed = true
+  }
+  if identity.stripeCustomerId != nil, identity.lastPaidTier != tier {
+    identity.lastPaidTier = tier
+    changed = true
+  }
+  if changed {
+    try await db.update(identity)
   }
 }
 
