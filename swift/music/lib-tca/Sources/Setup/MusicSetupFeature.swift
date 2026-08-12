@@ -12,6 +12,7 @@ struct MusicSetupFeature: Sendable {
     var screen = Screen.checking
     var claimAudience = MusicClaimAudience.parentPartner
     var prefetch = Prefetch.loading
+    var resumedStoredConnection = false
 
     enum Prefetch: Equatable {
       case loading
@@ -90,6 +91,8 @@ struct MusicSetupFeature: Sendable {
         state.screen = .checking
         // a returning user already has a connection; skip onboarding, resolve Apple Music
         if self.keychain.loadConnection() != nil {
+          state.resumedStoredConnection = true
+          log(.debug, .setup, "9cfe15f7")
           return self.checkAppleMusicAuthorization()
         }
         state.screen = .welcome
@@ -290,7 +293,9 @@ struct MusicSetupFeature: Sendable {
       return .cancel(id: CancelID.musicAppStatusPolling)
     }
     state.screen = .ready(childName: childName)
-    log(.info, .setup, "8af8b414")
+    if !state.resumedStoredConnection {
+      log(.info, .setup, "8af8b414")
+    }
     return .merge(
       .cancel(id: CancelID.musicAppStatusPolling),
       .send(.delegate(.completed(childName: childName))),
