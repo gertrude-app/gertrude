@@ -1,7 +1,7 @@
 ---
 title: 'Introducing Gertrude Music: An Approved-Only Music App'
 date: '2026-07-27T23:00:00.000Z'
-image: /docs/images/gertrude-music-v1.png
+image: /og-images/music.png
 description:
   Gertrude Music lets a parent or accountability partner choose which artists and albums
   are available to a listener, with no discovery feeds, recommendations, or access to
