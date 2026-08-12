@@ -56,7 +56,15 @@ export type OnboardingStep =
   | 'finish';
 
 export interface MacOSVersion {
-  name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia' | 'tahoe';
+  name:
+    | 'catalina'
+    | 'bigSur'
+    | 'monterey'
+    | 'ventura'
+    | 'sonoma'
+    | 'sequoia'
+    | 'tahoe'
+    | 'goldenGate';
   major: number;
 }
 
@@ -120,7 +128,15 @@ export interface PlainTimeWindow {
 
 export interface AppState {
   osVersion: {
-    name: 'catalina' | 'bigSur' | 'monterey' | 'ventura' | 'sonoma' | 'sequoia' | 'tahoe';
+    name:
+      | 'catalina'
+      | 'bigSur'
+      | 'monterey'
+      | 'ventura'
+      | 'sonoma'
+      | 'sequoia'
+      | 'tahoe'
+      | 'goldenGate';
     major: number;
   };
   windowOpen: boolean;

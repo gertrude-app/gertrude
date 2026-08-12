@@ -6,6 +6,7 @@ public enum MacOSName: String, Codable, Sendable, CaseIterable {
   case sonoma
   case sequoia
   case tahoe
+  case goldenGate
 
   public init(major: Int, minor: Int) {
     switch (major, minor) {
@@ -16,7 +17,8 @@ public enum MacOSName: String, Codable, Sendable, CaseIterable {
     case (14, _): self = .sonoma
     case (15, _): self = .sequoia
     case (26, _): self = .tahoe
-    default: self = .tahoe
+    case (27, _): self = .goldenGate
+    default: self = .goldenGate
     }
   }
 }

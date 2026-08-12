@@ -29,6 +29,7 @@ const MACOS_VERSION_NAMES: Record<string, string> = {
   '14': `Sonoma`,
   '15': `Sequoia`,
   '26': `Tahoe`,
+  '27': `Golden Gate`,
 };
 
 const colorForVersion = (version: string, seed: number): string => {
