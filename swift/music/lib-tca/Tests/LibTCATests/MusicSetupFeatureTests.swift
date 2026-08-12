@@ -239,22 +239,64 @@ struct MusicSetupFeatureTests {
 
   @Test
   func returningUserSkipsOnboardingToAppleMusic() async {
+    let logged = LockIsolated<[String]>([])
     let keychain = KeychainStore()
     keychain.client.save(connection: .init(token: UUID(1), childId: UUID(2), childName: "Harriet"))
     let store = TestStore(initialState: .init()) {
       MusicSetupFeature()
     } withDependencies: {
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.eventId) } }
       $0.keychain = keychain.client
       $0.musicSetup.authorizationStatus = { .authorized }
       $0.musicSetup.subscriptionStatus = { .canPlayCatalogContent }
     }
 
-    await store.send(.onAppear) // stays on .checking: no welcome, no prefetch
+    await store.send(.onAppear) { // stays on .checking: no welcome, no prefetch
+      $0.resumedStoredConnection = true
+    }
+    #expect(logged.value == ["9cfe15f7"]) // logged at launch, not at ready
     await store.receive(.appleMusicAuthorizationStatusLoaded(.authorized))
     await store.receive(.appleMusicSubscriptionStatusLoaded(.canPlayCatalogContent)) {
       $0.screen = .ready(childName: "Harriet")
     }
     await store.receive(.delegate(.completed(childName: "Harriet")))
+
+    #expect(logged.value == ["9cfe15f7"]) // a relaunch, NOT an onboarding completion
+  }
+
+  @Test
+  func firstTimeSetupCompletionLogsOnboardingComplete() async {
+    let logged = LockIsolated<[String]>([])
+    let keychain = KeychainStore()
+    var state = MusicSetupFeature.State()
+    state.screen = .welcome
+    state.prefetch = .loaded(.claimed(
+      token: UUID(1),
+      childId: UUID(2),
+      childName: "Harriet",
+      entitlement: .active,
+    ))
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.appEvent.record = { event in logged.withValue { $0.append(event.eventId) } }
+      $0.keychain = keychain.client
+      $0.musicSetup.authorizationStatus = { .authorized }
+      $0.musicSetup.subscriptionStatus = { .canPlayCatalogContent }
+    }
+
+    await store.send(.getStartedButtonTapped) {
+      $0.screen = .deviceRecognized(childName: "Harriet")
+    }
+    await store.send(.deviceRecognizedContinueButtonTapped)
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.authorized))
+    await store.receive(.appleMusicSubscriptionStatusLoaded(.canPlayCatalogContent)) {
+      $0.screen = .ready(childName: "Harriet")
+    }
+    await store.receive(.delegate(.completed(childName: "Harriet")))
+
+    #expect(logged.value.contains("8af8b414"))
+    #expect(!logged.value.contains("9cfe15f7"))
   }
 
   @Test

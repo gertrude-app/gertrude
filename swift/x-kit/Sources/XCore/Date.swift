@@ -32,6 +32,12 @@ public extension Date {
     let days = DateComponents(day: -numDays)
     self = calendar.date(byAdding: days, to: reference)!
   }
+
+  init(subtractingHours numHours: Int, from reference: Date = Date()) {
+    let calendar = Calendar.current
+    let hours = DateComponents(hour: -numHours)
+    self = calendar.date(byAdding: hours, to: reference)!
+  }
 }
 
 // helpers

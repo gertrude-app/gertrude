@@ -5,6 +5,7 @@ struct AdminLink {
   enum Path {
     case parent(Parent.Id)
     case iosDeviceEvents(vendorId: UUID)
+    case musicInstall(deviceId: UUID)
     case verify(token: UUID)
 
     var pathComponent: String {
@@ -13,6 +14,8 @@ struct AdminLink {
         "parents/\(id.lowercased)"
       case .iosDeviceEvents(let vendorId):
         "blocker/\(vendorId.lowercased)/events"
+      case .musicInstall(let deviceId):
+        "music/\(deviceId.lowercased)/detail"
       case .verify(let token):
         "verify/\(token.uuidString.lowercased())"
       }
