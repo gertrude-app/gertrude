@@ -28,16 +28,19 @@ enum StripeEventsRoute {
     }
 
     let event = try? JSON.decode(json, as: EventInfo.self)
+    let eventDb = request.context.db
 
-    let stripeEvent: StripeEvent? = try await request.context.db.withTransaction { db in
-      guard let stripeEvent = try await StripeEvent.insertIdempotent(
-        json: json,
-        stripeEventId: event?.id,
-        in: db,
-      ) else {
-        return nil
-      }
+    let stripeEvent = try await StripeEvent.recordReceipt(
+      json: json,
+      stripeEventId: event?.id,
+      in: eventDb,
+    )
 
+    guard stripeEvent.handledAt == nil else {
+      return Response(status: .noContent)
+    }
+
+    try await eventDb.withTransaction { db in
       switch event?.type {
       case "invoice.paid":
         try await handleInvoicePaid(event: event, stripeEvent: stripeEvent, db: db)
@@ -50,11 +53,9 @@ enum StripeEventsRoute {
       default:
         break
       }
-      return stripeEvent
-    }
-
-    guard stripeEvent != nil else {
-      return Response(status: .noContent)
+      var handled = stripeEvent
+      handled.handledAt = get(dependency: \.date.now)
+      try await db.update(handled)
     }
 
     slackNotify(event)
