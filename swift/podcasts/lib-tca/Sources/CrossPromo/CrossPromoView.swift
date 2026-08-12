@@ -5,6 +5,7 @@ import LibViews
 import SwiftUI
 
 struct CrossPromoView: View {
+  @Environment(\.colorScheme) var cs
   let store: StoreOf<CrossPromoFeature>
 
   var body: some View {
@@ -37,6 +38,7 @@ struct CrossPromoView: View {
         EmptyView()
       #endif
     }
+    .background(Color(self.cs, light: .white, dark: .black))
   }
 
   private var remoteImage: ButtonScreenView.RemoteImage? {
