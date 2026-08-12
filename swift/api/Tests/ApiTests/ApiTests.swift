@@ -199,3 +199,11 @@ extension Context {
     )
   }
 }
+
+extension Env {
+  static var prodMode: Self {
+    var env = Env.fromProcess(mode: .testing)
+    env.mode = .prod
+    return env
+  }
+}

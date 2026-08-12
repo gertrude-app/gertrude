@@ -1,6 +1,8 @@
+import Dependencies
 import DuetSQL
 import GertieApp
 import IOSAppsRoute
+import XCore
 import XCTest
 import XExpect
 
@@ -71,6 +73,76 @@ final class LogAppEventResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.deviceId == IOSDevice.Id(input.deviceId!))
       .first(in: self.db)
     expect(install.appVersion).toEqual("1.2.3")
+  }
+
+  func testSlacksMusicOnboardingCompleteOnlyOnFirstOccurrence() async throws {
+    let child = try await self.child()
+    let (device, _) = try await self.claimedMusicInstall(for: child)
+
+    try await withDependencies {
+      $0.env = .prodMode
+    } operation: {
+      let input = LogEventRequest(
+        app: .music,
+        eventId: "8af8b414", // "Onboarding setup completed"
+        level: .info,
+        domain: "setup",
+        deviceId: device.id.rawValue,
+        modelIdentifier: "iPhone16,1",
+        appVersion: "1.0.0",
+        iosVersion: "18.5",
+      )
+
+      _ = try await LogAppEvent.resolve(with: input, in: .mock)
+
+      expect(self.sent.slacks).toHaveCount(1)
+      expect(self.sent.slacks[0].message.text).toContain("Onboarding setup completed")
+      expect(self.sent.slacks[0].message.text).toContain(child.name) // enriched w/ identity
+
+      // the app re-emits this on every cold launch of an already set-up device
+      _ = try await LogAppEvent.resolve(with: input, in: .mock)
+      _ = try await LogAppEvent.resolve(with: input, in: .mock)
+
+      expect(self.sent.slacks).toHaveCount(1)
+      let events = try await MusicApp.Event.query()
+        .where(.deviceId == device.id)
+        .where(.eventId == "8af8b414")
+        .all(in: self.db)
+      expect(events).toHaveCount(3) // ...but all 3 are still stored
+    }
+  }
+
+  func testThrottlesMusicPlaybackFailedSlackToOncePerDevicePerHour() async throws {
+    let child = try await self.child()
+    let (device, _) = try await self.claimedMusicInstall(for: child)
+
+    try await withDependencies {
+      $0.env = .prodMode
+    } operation: {
+      let input = LogEventRequest(
+        app: .music,
+        eventId: "f357b375", // "Playback failed"
+        level: .err,
+        domain: "playback",
+        detail: "playbackFailed NSError (MPMusicPlayerControllerErrorDomain error 1.)",
+        deviceId: device.id.rawValue,
+        modelIdentifier: "iPhone16,1",
+        appVersion: "1.0.0",
+        iosVersion: "18.5",
+      )
+
+      for _ in 1 ... 5 { // a burst, as seen in prod
+        _ = try await LogAppEvent.resolve(with: input, in: .mock)
+      }
+
+      expect(self.sent.slacks).toHaveCount(1)
+      expect(self.sent.slacks[0].message.text).toContain(child.name) // enriched w/ identity
+      let events = try await MusicApp.Event.query()
+        .where(.deviceId == device.id)
+        .where(.eventId == "f357b375")
+        .all(in: self.db)
+      expect(events).toHaveCount(5) // ...but all 5 are still stored
+    }
   }
 
   func testLogsPodcastEventAndEnsuresInstall() async throws {
