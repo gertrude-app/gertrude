@@ -2,7 +2,8 @@
 
 > Gertrude is parental-control software for Apple devices, built by a Christian
 > homeschool dad to give families strict, reliable internet-safety tools. The
-> lineup covers Mac, iPhone/iPad, and a PIN-gated podcast app for kids.
+> lineup covers Mac, iPhone/iPad, a PIN-gated podcast app for kids, and a
+> parent-curated music app.
 
 Gertrude was created by Jared Henderson to protect his own children before it
 became a product. The Mac app is the flagship: a deny-by-default internet
@@ -12,14 +13,17 @@ holes in Apple's Screen Time — blocking `#images` GIF search in Messages,
 Spotlight image search, Maps business-listing images, and similar loopholes.
 Gertrude Podcasts is a podcast app that lets kids listen to parent-approved shows
 while gating the ability to add new podcasts behind a PIN; it connects to a
-Gertrude parent account for subscription and PIN management.
+Gertrude parent account for subscription and PIN management. Gertrude Music is
+an Apple Music player with no open-ended browsing — kids can only play the
+artists and albums a parent has approved from the dashboard.
 
 ## Products
 
 - [Gertrude for Mac](https://gertrude.app/mac): Deny-by-default internet filter
   with optional screenshot and keystroke monitoring, downtime schedules, app
-  blocking, and parent-approved unlock requests. $10/month covers the whole
-  family. 21-day free trial, no credit card required.
+  blocking, and parent-approved unlock requests. Requires the Full plan
+  ($10/month), which covers the whole family. 21-day free trial, no credit card
+  required.
 - [Gertrude Blocker for iPhone & iPad](https://gertrude.app/iphone-and-ipad):
   Free iOS content filter that closes known Screen Time gaps — Messages GIF
   search, Spotlight internet image search, Apple Maps imagery, App Store
@@ -34,11 +38,32 @@ Gertrude parent account for subscription and PIN management.
   A kid-friendly podcast app where adding new shows requires a parent-set 6-digit PIN.
   Connects to a Gertrude parent account; free to try for 30 days, then requires at
   least a Light plan ($10/year for the whole family) to keep adding and updating shows.
+- [Gertrude Music](https://gertrude.app/music): A parent-managed Apple Music
+  player for kids, with no open-ended browsing or search. Parents approve
+  artists and albums from the Gertrude dashboard, and the child can only play
+  from that approved library. Kids can build their own playlists, but playlist
+  membership never grants permission to play music a parent hasn't approved.
+  Connects to a Gertrude parent account; requires at least a Medium plan
+  ($5/month for the whole family) and an active Apple Music subscription on the
+  device.
+
+## Plans
+
+Gertrude uses one family account with four stacked plan tiers, each including
+everything below it. Every paid plan covers the whole family, with no ads.
+
+- **Free** — basic iOS blocking (GIF, Spotlight, and Maps loopholes) plus a
+  30-day Gertrude Podcasts trial.
+- **Light** ($10/year) — adds Gertrude Podcasts and iOS device supervision.
+- **Medium** ($5/month) — adds Gertrude Music.
+- **Full** ($10/month) — adds Gertrude for Mac. Includes a 21-day free trial.
 
 ## Documentation
 
 - [Documentation index](https://gertrude.app/docs): Product documentation and
   support guides for Gertrude for Mac and the iOS Blocker app.
+- [Pricing and plans](https://gertrude.app/pricing): Full plan comparison across
+  the Free, Light, Medium, and Full tiers.
 - [iOS app privacy policy](https://gertrude.app/docs/iosapp-privacy): Privacy
   policy for the Gertrude Blocker iOS app. Gertrude collects no personal data
   from the iOS app — only anonymous error logs and install counts.
@@ -46,6 +71,9 @@ Gertrude parent account for subscription and PIN management.
   policy for the Gertrude Podcasts podcast app. The app sends a small amount of
   anonymous usage and diagnostic data to operate subscriptions, understand usage
   patterns, and fix bugs.
+- [Gertrude Music privacy policy](https://gertrude.app/docs/music-privacy): Privacy
+  policy for the Gertrude Music app. Gertrude collects no email addresses, contact
+  information, location, contacts, or advertising identifiers from the app.
 
 ## Blog & contact
 

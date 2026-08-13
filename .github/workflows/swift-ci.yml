@@ -443,6 +443,7 @@ jobs:
               - swift/pairql-ios-apps/**
               - swift/pairql/**
               - swift/gertie/**
+              - swift/gertie-tca-features/**
               - swift/x-kit/**
               - swift/x-expect/**
               - swift/ts-codable-macro/**
@@ -450,7 +451,12 @@ jobs:
               - swift/podcasts/**
               - swift/pairql/**
               - swift/pairql-podcasts/**
+              - swift/pairql-ios-apps/**
               - swift/api/Sources/Api/PairQL/Podcast/**
+              - swift/gertie/**
+              - swift/gertie-tca-features/**
+              - swift/x-kit/**
+              - swift/x-expect/**
               - swift/ts-codable-macro/**
             music:
               - swift/music/**

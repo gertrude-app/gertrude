@@ -44,7 +44,7 @@ map below is orientation for *where to look* — discover the live tables/column
 - **macapp** — macOS app: keystroke lines, releases, unlock & suspend-filter requests
 - **blocker_app** — iOS blocker/filter app: block groups & rules, installs, supervisions, tokens, events
 - **podcast_app** — Gertrude Podcasts podcast app: installs, tokens, events
-- **music** — Gertrude Music: parent-approved Apple Music albums per child
+- **music** — Gertrude Music: parent-approved artists, albums & tracks per child, playlists, library snapshots
 - **music_app** — Gertrude Music iOS app: installs, tokens
 - **macos** — macOS app reference catalog: bundle ids, categories, browsers, identified/unidentified apps
 - **appstore** — App Store ratings & reviews data

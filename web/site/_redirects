@@ -63,8 +63,9 @@
 # sonoma and sequoia are the same
 /cu-sn https://youtu.be/ntnFEW0bRVQ 302
 /cu-sq https://youtu.be/ntnFEW0bRVQ 302
-# tahoe
+# tahoe and golden gate are the same
 /cu-th https://youtu.be/eFbbe3pBpH4 302
+/cu-gg https://youtu.be/eFbbe3pBpH4 302
 
 # DEMOTE MACOS USER (current: 2.5.0+)
 # catalina, big sur, and monterey are same
@@ -76,8 +77,9 @@
 # sonoma and sequoia are the same
 /du-sn https://youtu.be/jn0Iv4brL94 302
 /du-sq https://youtu.be/jn0Iv4brL94 302
-# tahoe
+# tahoe and golden gate are the same
 /du-th https://youtu.be/ceKliUSDvR4 302
+/du-gg https://youtu.be/ceKliUSDvR4 302
 
 # SWITCH MACOS USER (current: 2.5.0+)
 # catalina, big sur, and monterey are same
@@ -89,8 +91,9 @@
 # sonoma and sequoia are the same
 /su-sn https://youtu.be/CV8AqA5nTqs 302
 /su-sq https://youtu.be/CV8AqA5nTqs 302
-# tahoe
+# tahoe and golden gate are the same
 /su-th https://youtu.be/mjI6l_Hx-CU 302
+/su-gg https://youtu.be/mjI6l_Hx-CU 302
 
 # edit children
 /a-c https://parents.gertrude.app/children 302
