@@ -7,6 +7,7 @@ enum LocalizedStringKey: String {
   case addShowEnterUrl = "addShow.enterUrl"
   case addShowError = "addShow.error"
   case addShowHowToAdd = "addShow.howToAdd"
+  case addShowInsecureError = "addShow.insecureError"
   case addShowNoImages = "addShow.noImages"
   case addShowSearch = "addShow.search"
   case addShowShowArtworkQuestion = "addShow.showArtworkQuestion"

@@ -33,9 +33,6 @@ targets:
         buildPhase: resources
       - path: app/LaunchScreen.storyboard
         group: app
-      - path: app/StoreConfig.storekit
-        buildPhase: none
-        group: app
     dependencies:
       - package: LibCore
       - package: LibViews
@@ -48,8 +45,8 @@ targets:
         DEVELOPMENT_TEAM: "WFN83LM943"
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_FILE: app/Info.plist
-        MARKETING_VERSION: 1.6.3
-        CURRENT_PROJECT_VERSION: 28
+        MARKETING_VERSION: 1.6.4
+        CURRENT_PROJECT_VERSION: 29
         ALWAYS_SEARCH_USER_PATHS: NO
       configs:
         Release:
@@ -62,8 +59,6 @@ targets:
           ASSETCATALOG_COMPILER_APPICON_NAME: AppIconDev
           INFOPLIST_FILE: app/Info.Debug.plist
           API_ENDPOINT: "${LOCAL_API_ENDPOINT}"
-    scheme:
-      storeKitConfiguration: "app/StoreConfig.storekit"
     info:
       path: app/Info.plist
       properties:

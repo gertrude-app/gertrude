@@ -554,6 +554,44 @@ import Testing
       #expect(store.state.alert == nil)
     }
   }
+
+  @Test func `server copy override reaches both the screens that name a price`() async {
+    let keychainStore = LockIsolated<[String: Data]>([:])
+    let config = GetPodcastAppConfig.Output(
+      explainAccountText: "Connect a Gertrude account to keep listening.",
+      accountPriceText: "Covers every device",
+    )
+    await withDependencies {
+      $0.api.appConfig = { config }
+      $0.api.getTrialStatus = {
+        .legacyGrandfathered(accessEndsAt: .reference, showMigrationNag: false, migrationUrl: nil)
+      }
+      $0.date = .constant(.reference)
+      $0.locale = Locale(identifier: "en_US")
+      $0.defaultDatabase = try! appDatabase()
+      $0.device.vendorId = { UUID() }
+      $0.keychain = dictKeychain(keychainStore)
+      $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
+      $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
+      $0.mainQueue = .immediate
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: AppReducer.init)
+
+      await store.send(.appDidLaunch) {
+        $0.mode = .onboarding(.init())
+      }
+
+      await store.receive(.receivedAppConfig(config)) {
+        $0.$appConfig.withLock { $0 = config }
+      }
+
+      await store.finish()
+
+      // vvv --- both screens read the same shared key, no threading through navigation
+      #expect(OnboardingFeature.State().appConfig.explainAccountText == config.explainAccountText)
+      #expect(SettingsFeature.State().appConfig.accountPriceText == config.accountPriceText)
+    }
+  }
 }
 
 private func childHomeCampaign(id: String) -> CrossPromoCampaign {

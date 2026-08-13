@@ -559,23 +559,6 @@
         }
       }
     },
-    "settings.subscription.price" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "$10/year"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "$10/año"
-          }
-        }
-      }
-    },
     "settings.subscription.privacy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2031,13 +2014,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "$10/year per family"
+            "value" : "Covers all your family’s devices"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "$10/año por familia"
+            "value" : "Cubre todos los dispositivos de tu familia"
           }
         }
       }

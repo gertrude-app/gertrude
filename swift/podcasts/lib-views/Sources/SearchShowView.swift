@@ -8,17 +8,20 @@ public struct SearchShowView: View {
   let isSearching: Bool
   let results: [SearchResult]
   let onResultTap: @MainActor @Sendable (SearchResult) -> Void
+  let onSubmit: @MainActor @Sendable () -> Void
 
   public init(
     searchText: Binding<String>,
     isSearching: Bool = false,
     results: [SearchResult],
     onResultTap: @MainActor @escaping @Sendable (SearchResult) -> Void,
+    onSubmit: @MainActor @escaping @Sendable () -> Void = {},
   ) {
     self._searchText = searchText
     self.isSearching = isSearching
     self.results = results
     self.onResultTap = onResultTap
+    self.onSubmit = onSubmit
   }
 
   public var body: some View {
@@ -42,6 +45,7 @@ public struct SearchShowView: View {
       .textInputAutocapitalization(.never)
       .autocorrectionDisabled(true)
       .searchFocused(self.$isSearchFocused)
+      .onSubmit(of: .search) { self.onSubmit() }
   }
 
   private var legacySearch: some View {
@@ -77,6 +81,7 @@ public struct SearchShowView: View {
         .disableAutocorrection(true)
         .submitLabel(.search)
         .focused(self.$isSearchFocused)
+        .onSubmit { self.onSubmit() }
         .accessibilityIdentifier("podcast-search-field")
     }
     .font(.system(size: 18, weight: .medium))

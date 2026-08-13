@@ -51,6 +51,7 @@ struct AddShowView: View {
           isSearching: self.store.searchInFlight,
           results: self.store.searchResults,
           onResultTap: { self.store.send(.selectShow($0)) },
+          onSubmit: { self.store.send(.searchSubmitted) },
         )
         .task(id: self.store.searchText) {
           do {

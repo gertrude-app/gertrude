@@ -41,6 +41,7 @@ struct AddShowFeature {
     case selectDontAllowArtworkTapped
     case setSearchText(String)
     case searchSetDebounced
+    case searchSubmitted
     case selectShow(SearchResult)
     case setSearchResults([SearchResult])
     case setScreen(State.Screen)
@@ -66,6 +67,7 @@ struct AddShowFeature {
     Reduce { state, action in
       switch action {
       case .setSearchText(let text):
+        guard text != state.searchText else { return .none }
         state.searchText = text
         state.searchResults = []
         state.searchInFlight = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -75,12 +77,13 @@ struct AddShowFeature {
         state.screen = screen
         return .none
 
-      case .searchSetDebounced:
+      case .searchSetDebounced, .searchSubmitted:
         let query = state.searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
           state.searchInFlight = false
           return .none
         }
+        state.searchInFlight = true
         return .run { send in
           await send(.setSearchResults((try? self.podcasts.search(query)) ?? []))
         }
@@ -162,8 +165,10 @@ struct AddShowFeature {
     }
   }
 
-  func subscribe(to feedUrl: String, artwork withArtwork: Bool) -> EffectOf<AddShowFeature> {
+  func subscribe(to requestedUrl: String, artwork withArtwork: Bool) -> EffectOf<AddShowFeature> {
     .run { send in
+      let feedUrl = upgradeToHttps(requestedUrl)
+      let upgraded = feedUrl != requestedUrl
       do {
         log(.info, .library, "7785c87b", detail: "\(feedUrl), artwork: \(withArtwork)")
         let feed = try await self.podcasts.getFeed(feedUrl)
@@ -177,6 +182,13 @@ struct AddShowFeature {
           await send(.delegate(.alert(lstr(.addShowAlreadySubscribed))))
           try? await self.clock.sleep(for: .seconds(2))
           await self.dismiss()
+          return
+        }
+        if let audioUrl = feed.episodes.first?.audioUrl,
+           await !self.podcasts.canReachSecurely(audioUrl) {
+          log(.err, .library, "5d1f8a63", detail: "insecure media: \(audioUrl)")
+          await send(.setScreen(.choosingMethod))
+          await send(.delegate(.alert(lstr(.addShowInsecureError))))
           return
         }
         let show = try await self.db.write { db in
@@ -202,7 +214,7 @@ struct AddShowFeature {
       } catch {
         log(.err, .library, "8c5abff7", detail: "\(feedUrl): \(error)")
         await send(.setScreen(.choosingMethod))
-        await send(.delegate(.alert(lstr(.addShowError))))
+        await send(.delegate(.alert(lstr(upgraded ? .addShowInsecureError : .addShowError))))
       }
     }
   }

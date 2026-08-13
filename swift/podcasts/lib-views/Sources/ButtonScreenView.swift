@@ -61,10 +61,16 @@ public struct ButtonScreenView: View {
   public struct RemoteImage: Sendable {
     var url: String
     var label: String?
+    var onLoadFailure: (@MainActor @Sendable (any Error) -> Void)?
 
-    public init(url: String, label: String? = nil) {
+    public init(
+      url: String,
+      label: String? = nil,
+      onLoadFailure: (@MainActor @Sendable (any Error) -> Void)? = nil,
+    ) {
       self.url = url
       self.label = label
+      self.onLoadFailure = onLoadFailure
     }
   }
 
@@ -179,19 +185,14 @@ public struct ButtonScreenView: View {
         }
 
         if let remoteImage = self.remoteImage, let url = URL(string: remoteImage.url) {
-          AsyncImage(url: url) { phase in
-            switch phase {
-            case .success(let image):
-              image
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxHeight: 270)
-                .accessibilityLabel(remoteImage.label ?? "")
-            case .empty:
-              ProgressView()
-            default:
-              EmptyView()
-            }
+          RetryingAsyncImage(url: url, onFailure: remoteImage.onLoadFailure) { image in
+            image
+              .resizable()
+              .aspectRatio(contentMode: .fit)
+              .frame(maxHeight: 270)
+              .accessibilityLabel(remoteImage.label ?? "")
+          } placeholder: {
+            ProgressView()
           }
           .frame(maxWidth: .infinity)
           .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))

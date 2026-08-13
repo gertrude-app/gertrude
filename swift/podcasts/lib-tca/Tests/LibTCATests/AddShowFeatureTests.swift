@@ -43,6 +43,55 @@ import Testing
     }
   }
 
+  @Test func `submitting unchanged search text re-searches instead of stranding spinner`()
+    async throws {
+    let result = SearchResult(
+      id: 1,
+      title: "Lancaster Baptist Church Audio Podcast",
+      artistName: "Lancaster Baptist Church",
+      feedUrl: "https://feeds.podtrac.com/2kW40nLGkY_a",
+      episodeCount: 10,
+    )
+    let searches = LockIsolated(0)
+
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase()
+      $0.podcasts.search = { _ in
+        searches.setValue(searches.value + 1)
+        return [result]
+      }
+    } operation: {
+      let store = TestStore(
+        initialState: .init(screen: .searching),
+        reducer: AddShowFeature.init,
+      )
+
+      await store.send(.setSearchText("Lancaster Baptist")) {
+        $0.searchText = "Lancaster Baptist"
+        $0.searchInFlight = true
+      }
+      await store.send(.searchSetDebounced)
+      await store.receive(.setSearchResults([result])) {
+        $0.searchResults = [result]
+        $0.searchInFlight = false
+      }
+
+      // tapping the keyboard's search key re-commits the binding with identical text
+      await store.send(.setSearchText("Lancaster Baptist")) // must be inert, not a state wipe
+      #expect(searches.value == 1)
+
+      await store.send(.searchSubmitted) {
+        $0.searchInFlight = true
+      }
+      await store.receive(.setSearchResults([result])) {
+        $0.searchInFlight = false // spinner clears; previously hung here forever
+      }
+      #expect(searches.value == 2)
+      #expect(store.state.searchResults == [result])
+    }
+  }
+
   @Test func `changing search text cancels the stale in-flight search`() async throws {
     let clock = TestClock()
     let staleResult = SearchResult(
@@ -119,6 +168,85 @@ import Testing
         try Show.all.fetchAll($0)
       }
       #expect(allShows.map(\.id) == [Show.ID(1)])
+    }
+  }
+
+  @Test func `insecure feed url is silently upgraded, probed, and persisted as https`()
+    async throws {
+    let insecureFeed = "http://feeds.podtrac.com/2kW40nLGkY_a"
+    let secureFeed = "https://feeds.podtrac.com/2kW40nLGkY_a"
+    let fetched = LockIsolated<[String]>([])
+    let probed = LockIsolated<[String]>([])
+
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.continuousClock = TestClock()
+      $0.defaultDatabase = try! appDatabase()
+      $0.podcasts.getFeed = { url in
+        fetched.setValue(fetched.value + [url])
+        return Feed(
+          show: .mock(1) { $0.sourceUrl = url },
+          episodes: [.mock(1, showId: 1)],
+        )
+      }
+      $0.podcasts.canReachSecurely = { url in
+        probed.setValue(probed.value + [url])
+        return true
+      }
+    } operation: {
+      let store = TestStore(
+        initialState: .init(screen: .chooseArtworkPolicy(insecureFeed)),
+        reducer: AddShowFeature.init,
+      )
+      store.exhaustivity = .off
+
+      await store.send(.selectAllowArtworkTapped) {
+        $0.screen = .subscribing
+      }
+      await store.receive(\.subscribed)
+
+      #expect(fetched.value == [secureFeed]) // never attempted over cleartext
+      #expect(probed.value == ["https://mock1.com/episode1.mp3"])
+
+      let shows = dep(\.db).tryRead { try Show.all.fetchAll($0) }
+      #expect(shows.map(\.feedUrl) == [secureFeed]) // https persisted, so refreshes work
+    }
+  }
+
+  @Test func `feeds unreachable over https are refused with the insecure message`() async throws {
+    let probeSucceeds = LockIsolated(false)
+    let feedThrows = LockIsolated(true)
+
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.continuousClock = TestClock()
+      $0.defaultDatabase = try! appDatabase()
+      $0.podcasts.getFeed = { url in
+        if feedThrows.value { throw PodcastFeedError.networkError }
+        return Feed(show: .mock(1) { $0.sourceUrl = url }, episodes: [.mock(1, showId: 1)])
+      }
+      $0.podcasts.canReachSecurely = { _ in probeSucceeds.value }
+    } operation: {
+      let store = TestStore(
+        initialState: .init(screen: .chooseArtworkPolicy("http://funny115.com/historians.xml")),
+        reducer: AddShowFeature.init,
+      )
+      store.exhaustivity = .off
+
+      await store.send(.selectAllowArtworkTapped)
+      await store.receive(.delegate(.alert(lstr(.addShowInsecureError))))
+
+      feedThrows.setValue(false) // feed now loads, but its media is cleartext-only
+      await store.send(.setScreen(.chooseArtworkPolicy("http://funny115.com/historians.xml")))
+      await store.send(.selectAllowArtworkTapped)
+      await store.receive(.delegate(.alert(lstr(.addShowInsecureError))))
+
+      #expect(dep(\.db).tryRead { try Show.all.fetchAll($0) }.isEmpty) // no half-added show
+
+      feedThrows.setValue(true) // an https feed failing is an ordinary error, not an https problem
+      await store.send(.setScreen(.chooseArtworkPolicy("https://example.com/feed.rss")))
+      await store.send(.selectAllowArtworkTapped)
+      await store.receive(.delegate(.alert(lstr(.addShowError))))
     }
   }
 

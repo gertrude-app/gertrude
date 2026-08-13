@@ -2,8 +2,16 @@
 
 ## Releases
 
-- `x.x.x` (dev)
+- `1.6.4` (8/12/26)
+  - fix record insert race crash
+  - fix rendering issues with cross-promos
+  - tweak subscription/cost strings w/ api override
+  - fix search hang on keyboard search key
+  - fix error message alerts not showing
+  - handle insecure feed urls w/ auto upgrade when possible
+  - pin reset escape hatch
   - improve podcast search ux, branch pre ios 26
+  - new app icon and splash screen
 - `1.6.3` (7/2/26)
   - metadata only release, add "Gertrude AM" to searchable fields for findability
 - `1.6.2` (7/1/26)

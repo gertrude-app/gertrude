@@ -29,7 +29,6 @@ struct AppView: View {
         ) { store in
           PodcastsView(store: store)
         }
-        .alert(self.$store.scope(state: \.alert, action: \.alert))
         .sheet(item: self.crossPromoStore(style: .sheet)) { store in
           CrossPromoView(store: store)
         }
@@ -39,6 +38,7 @@ struct AppView: View {
         }
       #endif
     }
+    .alert(self.$store.scope(state: \.alert, action: \.alert))
     .overlay(alignment: .bottom) {
       if let nowPlaying = self.store.nowPlaying.data {
         NowPlayingView(

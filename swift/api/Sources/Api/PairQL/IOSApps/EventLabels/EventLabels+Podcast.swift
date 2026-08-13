@@ -12,6 +12,7 @@ extension EventLabel {
     case "c3e9a1f4": "Pin set after mid-claim relaunch"
     case "0c045f6c": "Pin changed"
     case "5f2c8e04": "Pin reset"
+    case "bf86c342": "Pin reset escape hatch authorized"
     case "17cb36cc": "Missing pincode"
     case "7e312b0f": "Pin lockout set"
     case "e86bd7f3-2": "Pin lockout set"
@@ -22,6 +23,7 @@ extension EventLabel {
     case "b8139e22": "Duplicate subscribe"
     case "98916a65": "Subscribe fail"
     case "8c5abff7": "Subscribe fail"
+    case "5d1f8a63": "Subscribe fail: insecure media"
     case "2c229d59": "Special action"
     case "b4c8d7e2": "Upload db fail: unexpected response"
     case "a5f6b9c3": "Upload db success"
@@ -82,6 +84,7 @@ extension EventLabel {
     case "b62d4a8f": "Cross promo cta"
     case "c9e35b21": "Cross promo dismiss"
     case "b9e1a7c4": "Cross promo dropped"
+    case "af5b46ca": "⚠ Cross promo image load failed"
     // --- Unexpected / assertions ---
     case "60324a0d": "Unexpected: episode not in show state"
     case "e975479b": "Unexpected: now playing default case"

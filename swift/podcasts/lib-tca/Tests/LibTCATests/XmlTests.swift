@@ -245,25 +245,63 @@ func `missing guid falls back to audio url`() throws {
 }
 
 @Test
-func `http audio url is upgraded to https`() throws {
+func `http audio and artwork urls are upgraded to https`() throws {
   let xmlString = """
   <?xml version="1.0" encoding="UTF-8"?>
-  <rss version="2.0">
+  <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
     <channel>
       <title>Test Podcast</title>
+      <itunes:image href="http://example.com/show-artwork.jpg"/>
 
       <item>
         <title>Episode One</title>
         <guid>ep-1</guid>
         <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
         <enclosure url="http://s3.us-east-2.amazonaws.com/bucket/ep1.mp3" type="audio/mpeg" length="5000000"/>
+        <itunes:image href="http://example.com/ep1-artwork.jpg"/>
+      </item>
+      <item>
+        <title>Episode Two</title>
+        <guid>ep-2</guid>
+        <pubDate>Tue, 02 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://cdn.example.com/ep2.mp3" type="audio/mpeg" length="5000000"/>
       </item>
     </channel>
   </rss>
   """
 
   let feed = try parsePodcastFeed(xmlString, source: "")
+  #expect(feed.show.artworkUrl == "https://example.com/show-artwork.jpg")
   #expect(feed.episodes[0].audioUrl == "https://s3.us-east-2.amazonaws.com/bucket/ep1.mp3")
+  #expect(feed.episodes[0].artworkUrl == "https://example.com/ep1-artwork.jpg")
+  #expect(feed.episodes[1]
+    .audioUrl == "https://cdn.example.com/ep2.mp3") // already secure, untouched
+
+  let textNodeArtwork = """
+  <?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Test Podcast</title>
+      <image>
+        <url>http://example.com/channel-image.png</url>
+      </image>
+
+      <item>
+        <title>Episode One</title>
+        <guid>ep-1</guid>
+        <pubDate>Mon, 01 Jan 2024 12:00:00 +0000</pubDate>
+        <enclosure url="https://cdn.example.com/ep1.mp3" type="audio/mpeg" length="5000000"/>
+        <image>
+          <url>http://example.com/ep1-image.png</url>
+        </image>
+      </item>
+    </channel>
+  </rss>
+  """
+
+  let imageFeed = try parsePodcastFeed(textNodeArtwork, source: "")
+  #expect(imageFeed.show.artworkUrl == "https://example.com/channel-image.png")
+  #expect(imageFeed.episodes[0].artworkUrl == "https://example.com/ep1-image.png")
 }
 
 @Test

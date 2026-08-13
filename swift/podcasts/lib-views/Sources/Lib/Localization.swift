@@ -92,7 +92,6 @@ enum LocalizedStringKey: String {
   case settingsSubscriptionFriendMessage = "settings.subscription.friendMessage"
   case settingsSubscriptionHeader = "settings.subscription.header"
   case settingsSubscriptionLabel = "settings.subscription.label"
-  case settingsSubscriptionPrice = "settings.subscription.price"
   case settingsSubscriptionPrivacy = "settings.subscription.privacy"
   case settingsSubscriptionRenews = "settings.subscription.renews"
   case settingsSubscriptionStatus = "settings.subscription.status"
@@ -130,4 +129,11 @@ enum LocalizedStringKey: String {
 
 func lstr(_ key: LocalizedStringKey) -> String {
   String(localized: String.LocalizationValue(key.rawValue), bundle: .module)
+}
+
+public func remoteCopy(_ override: String?, or fallback: String) -> String {
+  guard let override,
+        !override.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+  else { return fallback }
+  return override
 }

@@ -18,6 +18,7 @@ struct AppReducer: Sendable {
     var killSwitch = KillSwitchFeature.State()
     @Presents var crossPromo: CrossPromoFeature.State?
     var crossPromos = CrossPromos.Output(promos: [])
+    @Shared(.appConfig) var appConfig
     @Fetch(CurrentSubscription()) var subscription: Subscription = .fallback
 
     var canPresentSuggestedKillSwitch: Bool {
@@ -37,6 +38,7 @@ struct AppReducer: Sendable {
     case killSwitch(KillSwitchFeature.Action)
     case crossPromo(PresentationAction<CrossPromoFeature.Action>)
     case receivedCrossPromos(CrossPromos.Output)
+    case receivedAppConfig(GetPodcastAppConfig.Output)
     case nowPlaying(NowPlayingFeature.Action)
     case mode(PresentationAction<Mode.Action>)
     case alert(PresentationAction<AlertAction>)
@@ -127,6 +129,11 @@ struct AppReducer: Sendable {
               await send(.receivedCrossPromos(crossPromos))
             }
           },
+          .run { send in
+            if let appConfig = try? await self.api.appConfig(), !appConfig.isEmpty {
+              await send(.receivedAppConfig(appConfig))
+            }
+          },
           .publisher {
             self.audio.systemEvents()
               .map { .nowPlaying(.system($0)) }
@@ -151,6 +158,9 @@ struct AppReducer: Sendable {
           self.logUnpresentable(dropped),
           self.presentCrossPromo(&state, for: .childHome),
         )
+      case .receivedAppConfig(let appConfig):
+        state.$appConfig.withLock { $0 = appConfig }
+        return .none
       case .appInForegroundChanged(let foregrounded):
         let wasInForeground = state.appInForeground
         state.$appInForeground.withLock { $0 = foregrounded }
@@ -435,6 +445,12 @@ func unexpected(
 extension SharedKey where Self == InMemoryKey<Bool>.Default {
   static var appInForeground: Self {
     Self[.inMemory("appInForeground"), default: true]
+  }
+}
+
+extension SharedKey where Self == InMemoryKey<GetPodcastAppConfig.Output>.Default {
+  static var appConfig: Self {
+    Self[.inMemory("appConfig"), default: .init()]
   }
 }
 
