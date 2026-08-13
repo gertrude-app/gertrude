@@ -174,7 +174,7 @@ enum AccountLifecycle {
   }
 
   struct OverdueToUnpaid: TemplateEmailModel {
-    static var subject: String { "[action required] Gertrude account disabled" }
+    static var subject: String { "[action required] Gertrude paid features disabled" }
   }
 
   struct PaidToOverdue: TemplateEmailModel {
