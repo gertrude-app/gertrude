@@ -7,7 +7,6 @@ import type {
   NotificationMethod,
   PersonCardPerson,
   PersonIosSettingsConfiguration,
-  PersonMacSettingsConfiguration,
   Schedule,
   SecurityEvent,
   SuspensionRequest,
@@ -180,40 +179,6 @@ export const albums: AllowedAlbum[] = [
     showAlbumArt: true,
   },
 ];
-
-export const macSettings: PersonMacSettingsConfiguration = {
-  keyloggingEnabled: true,
-  screenshots: { resolution: 1080, frequency: 120 },
-  emphasizeSuspensionActivity: true,
-  downtime: { start: { hour: 21, minute: 0 }, end: { hour: 7, minute: 0 } },
-  filteringOn: true,
-  keychainIds: [`keychain-school`, `keychain-games`],
-  keychainSchedules: { 'keychain-games': weekdaySchedule },
-  alwaysBlockedGroups: {
-    adultContent: true,
-    messagesGifSearch: true,
-    socialMedia: false,
-    spotlightSearch: true,
-  },
-  customAlwaysBlockedDomains: [`reddit.com`, `discord.com`],
-  blockedApps: [
-    {
-      nameOrBundleId: `Minecraft`,
-      appIconUrl: `/example-app-icons/minecraft.webp`,
-      schedule: weekdaySchedule,
-    },
-    {
-      nameOrBundleId: `Discord`,
-      appIconUrl: `/example-app-icons/discord.webp`,
-    },
-  ],
-  unrestrictedApps: [
-    {
-      nameOrBundleId: `Khan Academy`,
-      appIconUrl: `/example-app-icons/khan-academy.webp`,
-    },
-  ],
-};
 
 export const iosSettings: PersonIosSettingsConfiguration = {
   blockedGroups: {

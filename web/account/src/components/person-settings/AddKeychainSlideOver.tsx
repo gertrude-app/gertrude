@@ -7,6 +7,7 @@ import {
   Input,
   SlideOver,
   Text,
+  Textarea,
   Tooltip,
   VStack,
   inflect,
@@ -17,15 +18,21 @@ import React from 'react';
 import type { Keychain } from '#/components/types';
 
 type KeychainTab = `own` | `public`;
+type SelectableKeychain = Keychain & { isOwn?: boolean };
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   personName: string;
-  keychains: Keychain[];
+  keychains: SelectableKeychain[];
   assignedKeychainIds: string[];
   onAdd: (keychainIds: string[]) => void;
+  onRequestPublicKeychain?: (input: {
+    searchQuery: string;
+    description: string;
+  }) => Promise<void>;
   defaultTab?: KeychainTab;
+  defaultSearchQuery?: string;
 };
 
 const AddKeychainSlideOver: React.FC<Props> = ({
@@ -35,28 +42,49 @@ const AddKeychainSlideOver: React.FC<Props> = ({
   keychains,
   assignedKeychainIds,
   onAdd,
+  onRequestPublicKeychain,
   defaultTab = `own`,
+  defaultSearchQuery = ``,
 }) => {
   const [selectedKeychainIds, setSelectedKeychainIds] = React.useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = React.useState(``);
+  const [searchQuery, setSearchQuery] = React.useState(defaultSearchQuery);
   const [tab, setTab] = React.useState<KeychainTab>(defaultTab);
+  const [requestDescription, setRequestDescription] = React.useState(``);
+  const [requestState, setRequestState] = React.useState<
+    `idle` | `submitting` | `succeeded` | `failed`
+  >(`idle`);
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+  const isOwnKeychain = (keychain: SelectableKeychain): boolean =>
+    keychain.isOwn ?? !keychain.isPublic;
   const tabKeychains = keychains.filter((keychain) =>
-    tab === `public` ? keychain.isPublic : !keychain.isPublic,
+    tab === `public`
+      ? keychain.isPublic && !isOwnKeychain(keychain)
+      : isOwnKeychain(keychain),
   );
-  const filteredKeychains = tabKeychains.filter((keychain) =>
-    keychain.name.toLowerCase().includes(normalizedSearchQuery),
+  const filteredKeychains = tabKeychains.filter(
+    (keychain) =>
+      keychain.name.toLowerCase().includes(normalizedSearchQuery) ||
+      keychain.description?.toLowerCase().includes(normalizedSearchQuery),
   );
   const selectedKeychains = keychains.filter((keychain) =>
     selectedKeychainIds.includes(keychain.id),
   );
-  const ownKeychainCount = keychains.filter((keychain) => !keychain.isPublic).length;
-  const publicKeychainCount = keychains.filter((keychain) => keychain.isPublic).length;
+  const ownKeychainCount = keychains.filter(isOwnKeychain).length;
+  const publicKeychainCount = keychains.filter(
+    (keychain) => keychain.isPublic && !isOwnKeychain(keychain),
+  ).length;
+  const requestingPublicKeychain =
+    tab === `public` &&
+    normalizedSearchQuery.length > 0 &&
+    filteredKeychains.length === 0 &&
+    onRequestPublicKeychain !== undefined;
 
   const reset = (): void => {
     setSelectedKeychainIds([]);
-    setSearchQuery(``);
+    setSearchQuery(defaultSearchQuery);
     setTab(defaultTab);
+    setRequestDescription(``);
+    setRequestState(`idle`);
   };
   const handleOpenChange = (nextOpen: boolean): void => {
     if (!nextOpen) {
@@ -84,6 +112,22 @@ const AddKeychainSlideOver: React.FC<Props> = ({
     onAdd(selectedKeychainIds);
     handleOpenChange(false);
   };
+  const requestPublicKeychain = (): void => {
+    const trimmedSearchQuery = searchQuery.trim();
+    const description = requestDescription.trim();
+    if (!onRequestPublicKeychain || !trimmedSearchQuery || !description) {
+      return;
+    }
+
+    setRequestState(`submitting`);
+    void onRequestPublicKeychain({
+      searchQuery: trimmedSearchQuery,
+      description,
+    }).then(
+      () => setRequestState(`succeeded`),
+      () => setRequestState(`failed`),
+    );
+  };
 
   return (
     <SlideOver
@@ -91,7 +135,7 @@ const AddKeychainSlideOver: React.FC<Props> = ({
       onOpenChange={handleOpenChange}
       ariaLabel={`Add keychains to ${personName}`}
       heading="Add keychains"
-      subheading={`Choose keychains to assign to ${personName}.`}
+      subheading={`Choose keychains to assign to ${personName}. You can set schedules after adding them.`}
       size="large"
     >
       <VStack className="h-full">
@@ -99,7 +143,11 @@ const AddKeychainSlideOver: React.FC<Props> = ({
           <Input
             type="text"
             value={searchQuery}
-            setValue={setSearchQuery}
+            setValue={(value) => {
+              setSearchQuery(value);
+              setRequestDescription(``);
+              setRequestState(`idle`);
+            }}
             placeholder="Search keychains..."
           />
           <div className="grid grid-cols-2 rounded-xl bg-stone-100 p-1.5">
@@ -115,7 +163,11 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                 type="button"
                 justify="center"
                 gap={2}
-                onClick={() => setTab(value)}
+                onClick={() => {
+                  setTab(value);
+                  setRequestDescription(``);
+                  setRequestState(`idle`);
+                }}
                 className={cx(
                   `rounded-lg border px-3 py-1.5 text-sm font-medium transition-[background-color,border-color,box-shadow,color] duration-100`,
                   tab === value
@@ -218,6 +270,54 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                 );
               })}
             </div>
+          ) : requestingPublicKeychain ? (
+            requestState === `succeeded` ? (
+              <EmptyState
+                icon={CheckIcon}
+                title="Request Received"
+                description="We'll review your request and follow up if we need more information."
+              />
+            ) : (
+              <VStack gap={4} className="mt-2">
+                <VStack gap={1}>
+                  <Text variant="bodyLargeStrong">Request a Public Keychain</Text>
+                  <Text variant="bodyMuted">
+                    We couldn't find a public keychain matching “{searchQuery}.” Tell us
+                    what you'd like it to allow.
+                  </Text>
+                </VStack>
+                <Textarea
+                  label="What are you looking for?"
+                  value={requestDescription}
+                  setValue={(value) => {
+                    setRequestDescription(value);
+                    if (requestState === `failed`) {
+                      setRequestState(`idle`);
+                    }
+                  }}
+                  placeholder="For example, websites and apps used by a specific curriculum…"
+                  rows={3}
+                  resize="vertical"
+                  disabled={requestState === `submitting`}
+                  error={
+                    requestState === `failed`
+                      ? `We couldn't submit your request. Please try again.`
+                      : undefined
+                  }
+                />
+                <HStack justify="end">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={requestPublicKeychain}
+                    disabled={!requestDescription.trim() || requestState === `submitting`}
+                    loading={requestState === `submitting`}
+                  >
+                    Request Keychain
+                  </Button>
+                </HStack>
+              </VStack>
+            )
           ) : (
             <EmptyState
               icon={KeyIcon}
@@ -230,29 +330,31 @@ const AddKeychainSlideOver: React.FC<Props> = ({
             />
           )}
         </SlideOver.Body>
-        <SlideOver.Footer>
-          <Text variant="bodyMuted">
-            {selectedKeychains.length === 0
-              ? `Select one or more keychains`
-              : `${selectedKeychains.length} ${inflect(
-                  `keychain`,
-                  selectedKeychains.length,
-                )} selected`}
-          </Text>
-          <Button
-            type="button"
-            variant="primary"
-            disabled={selectedKeychains.length === 0}
-            onClick={addSelectedKeychains}
-          >
-            {selectedKeychains.length === 0
-              ? `Add Keychains`
-              : `Add ${selectedKeychains.length} ${inflect(
-                  `Keychain`,
-                  selectedKeychains.length,
-                )}`}
-          </Button>
-        </SlideOver.Footer>
+        {!requestingPublicKeychain && (
+          <SlideOver.Footer>
+            <Text variant="bodyMuted">
+              {selectedKeychains.length === 0
+                ? `Select one or more keychains`
+                : `${selectedKeychains.length} ${inflect(
+                    `keychain`,
+                    selectedKeychains.length,
+                  )} selected`}
+            </Text>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={selectedKeychains.length === 0}
+              onClick={addSelectedKeychains}
+            >
+              {selectedKeychains.length === 0
+                ? `Add Keychains`
+                : `Add ${selectedKeychains.length} ${inflect(
+                    `Keychain`,
+                    selectedKeychains.length,
+                  )}`}
+            </Button>
+          </SlideOver.Footer>
+        )}
       </VStack>
     </SlideOver>
   );

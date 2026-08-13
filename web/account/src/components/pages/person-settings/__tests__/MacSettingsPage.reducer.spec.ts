@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'vitest';
 import type { MacKeychain, MacSettingsConfiguration } from '../MacSettingsPage.types';
 import macSettingsReducer, {
+  appsConfiguration,
+  appsHaveUnsavedChanges,
   createMacSettingsFormState,
+  defaultDowntime,
   internetFilteringConfiguration,
   internetFilteringHasUnsavedChanges,
   monitoringConfiguration,
@@ -15,6 +18,7 @@ const familyKeychain = (): MacKeychain => ({
   name: `Family`,
   description: `Everyday websites and services.`,
   isPublic: false,
+  isOwn: true,
   numKeys: 42,
 });
 
@@ -22,6 +26,7 @@ const schoolKeychain = (): MacKeychain => ({
   id: `school`,
   name: `School`,
   isPublic: true,
+  isOwn: false,
   numKeys: 18,
 });
 
@@ -62,6 +67,21 @@ const settings = (): MacSettingsConfiguration => ({
       },
     ],
   },
+  apps: {
+    blocked: [
+      {
+        id: `blocked-minecraft`,
+        identifier: `com.mojang.minecraftlauncher`,
+      },
+    ],
+    unrestricted: [
+      {
+        id: `unrestricted-browser`,
+        scope: { type: `identifiedAppSlug`, identifiedAppSlug: `chrome` },
+      },
+    ],
+    publicUnrestricted: [],
+  },
   hasMacDevices: true,
 });
 
@@ -71,6 +91,7 @@ describe(`macSettingsReducer()`, () => {
 
     expect(monitoringHasUnsavedChanges(state.monitoring)).toBe(false);
     expect(internetFilteringHasUnsavedChanges(state.internetFiltering)).toBe(false);
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(false);
     expect(monitoringConfiguration(state.monitoring.draft)).toEqual({
       keyloggingEnabled: false,
       showSuspensionActivity: false,
@@ -82,6 +103,7 @@ describe(`macSettingsReducer()`, () => {
     });
     expect(internetFilteringConfiguration(state.internetFiltering.draft)).toEqual({
       filteringEnabled: true,
+      downtime: undefined,
       keychains: [{ id: `family`, schedule: undefined }],
       alwaysBlockedGroupIds: [`adult-content`],
       customAlwaysBlockedRules: [
@@ -91,6 +113,246 @@ describe(`macSettingsReducer()`, () => {
         },
       ],
     });
+  });
+
+  test(`updates blocked apps while preserving unrestricted apps`, () => {
+    let state = createMacSettingsFormState(settings());
+    const schedule = {
+      type: `inactive`,
+      days: {
+        sunday: true,
+        monday: true,
+        tuesday: true,
+        wednesday: true,
+        thursday: true,
+        friday: true,
+        saturday: true,
+      },
+      startTime: { hour: 8, minute: 0 },
+      endTime: { hour: 15, minute: 0 },
+    } as const;
+
+    state = macSettingsReducer(state, {
+      type: `blockedAppsAdded`,
+      apps: [
+        {
+          id: `blocked-discord`,
+          identifier: `com.hnc.Discord`,
+          name: `Discord`,
+        },
+      ],
+    });
+    state = macSettingsReducer(state, {
+      type: `blockedAppScheduleChanged`,
+      id: `blocked-discord`,
+      schedule,
+    });
+    state = macSettingsReducer(state, {
+      type: `blockedAppRemoved`,
+      id: `blocked-minecraft`,
+    });
+
+    expect(appsConfiguration(state.apps.draft)).toEqual({
+      blockedApps: [
+        {
+          id: `blocked-discord`,
+          identifier: `com.hnc.Discord`,
+          schedule,
+        },
+      ],
+      unrestrictedApps: [
+        {
+          id: `unrestricted-browser`,
+          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `chrome` },
+          schedule: undefined,
+        },
+      ],
+    });
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(true);
+
+    state = macSettingsReducer(state, {
+      type: `appsSaveSucceeded`,
+      submitted: state.apps.draft,
+    });
+
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(false);
+  });
+
+  test(`keeps public unrestricted apps outside the editable save payload`, () => {
+    const configuration = settings();
+    configuration.apps.publicUnrestricted = [
+      {
+        keychainId: `school`,
+        keychainName: `School`,
+        scope: { type: `bundleId`, bundleId: `edu.mit.scratch` },
+      },
+    ];
+    const state = createMacSettingsFormState(configuration);
+
+    expect(appsConfiguration(state.apps.draft)).toEqual({
+      blockedApps: [
+        {
+          id: `blocked-minecraft`,
+          identifier: `com.mojang.minecraftlauncher`,
+          schedule: undefined,
+        },
+      ],
+      unrestrictedApps: [
+        {
+          id: `unrestricted-browser`,
+          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `chrome` },
+          schedule: undefined,
+        },
+      ],
+    });
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(false);
+  });
+
+  test(`refreshes public unrestricted apps while editable apps are dirty`, () => {
+    let state = createMacSettingsFormState(settings());
+    state = macSettingsReducer(state, {
+      type: `blockedAppRemoved`,
+      id: `blocked-minecraft`,
+    });
+    const received = settings();
+    received.apps.publicUnrestricted = [
+      {
+        keychainId: `school`,
+        keychainName: `School`,
+        scope: { type: `bundleId`, bundleId: `edu.mit.scratch` },
+      },
+    ];
+
+    state = macSettingsReducer(state, { type: `settingsReceived`, settings: received });
+
+    expect(state.apps.draft.blocked).toEqual([]);
+    expect(state.apps.draft.publicUnrestricted).toEqual(received.apps.publicUnrestricted);
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(true);
+  });
+
+  test(`updates unrestricted apps while preserving blocked apps`, () => {
+    let state = createMacSettingsFormState(settings());
+    const schedule = {
+      type: `active`,
+      days: {
+        sunday: false,
+        monday: true,
+        tuesday: true,
+        wednesday: true,
+        thursday: true,
+        friday: true,
+        saturday: false,
+      },
+      startTime: { hour: 8, minute: 0 },
+      endTime: { hour: 15, minute: 0 },
+    } as const;
+
+    state = macSettingsReducer(state, {
+      type: `unrestrictedAppsAdded`,
+      apps: [
+        {
+          id: `unrestricted-scratch`,
+          scope: { type: `bundleId`, bundleId: `edu.mit.scratch` },
+          name: `Scratch`,
+        },
+      ],
+    });
+    state = macSettingsReducer(state, {
+      type: `unrestrictedAppScheduleChanged`,
+      id: `unrestricted-scratch`,
+      schedule,
+    });
+    state = macSettingsReducer(state, {
+      type: `unrestrictedAppRemoved`,
+      id: `unrestricted-browser`,
+    });
+
+    expect(appsConfiguration(state.apps.draft)).toEqual({
+      blockedApps: [
+        {
+          id: `blocked-minecraft`,
+          identifier: `com.mojang.minecraftlauncher`,
+          schedule: undefined,
+        },
+      ],
+      unrestrictedApps: [
+        {
+          id: `unrestricted-scratch`,
+          scope: { type: `bundleId`, bundleId: `edu.mit.scratch` },
+          schedule,
+        },
+      ],
+    });
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(true);
+  });
+
+  test(`uses identified app scopes and serializes display metadata away`, () => {
+    let state = createMacSettingsFormState(settings());
+
+    state = macSettingsReducer(state, {
+      type: `unrestrictedAppsAdded`,
+      apps: [
+        {
+          id: `unrestricted-discord`,
+          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `discord` },
+          name: `Discord`,
+          appIconUrl: `/discord.png`,
+        },
+      ],
+    });
+
+    expect(appsConfiguration(state.apps.draft).unrestrictedApps[1]).toEqual({
+      id: `unrestricted-discord`,
+      scope: { type: `identifiedAppSlug`, identifiedAppSlug: `discord` },
+      schedule: undefined,
+    });
+  });
+
+  test(`does not add duplicate unrestricted scopes`, () => {
+    let state = createMacSettingsFormState(settings());
+
+    state = macSettingsReducer(state, {
+      type: `unrestrictedAppsAdded`,
+      apps: [
+        {
+          id: `duplicate-browser`,
+          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `chrome` },
+        },
+      ],
+    });
+
+    expect(state.apps.draft.unrestricted).toHaveLength(1);
+    expect(appsHaveUnsavedChanges(state.apps)).toBe(false);
+  });
+
+  test(`updates downtime and includes it in the filtering configuration`, () => {
+    let state = createMacSettingsFormState(settings());
+
+    state = macSettingsReducer(state, {
+      type: `downtimeEnabledChanged`,
+      enabled: true,
+    });
+
+    expect(state.internetFiltering.draft.downtime).toEqual(defaultDowntime);
+    expect(internetFilteringHasUnsavedChanges(state.internetFiltering)).toBe(true);
+
+    const downtime = {
+      start: { hour: 22, minute: 30 },
+      end: { hour: 6, minute: 15 },
+    };
+    state = macSettingsReducer(state, { type: `downtimeChanged`, downtime });
+
+    expect(
+      internetFilteringConfiguration(state.internetFiltering.draft).downtime,
+    ).toEqual(downtime);
+
+    state = macSettingsReducer(state, {
+      type: `downtimeEnabledChanged`,
+      enabled: false,
+    });
+
+    expect(state.internetFiltering.draft.downtime).toBeUndefined();
+    expect(internetFilteringHasUnsavedChanges(state.internetFiltering)).toBe(false);
   });
 
   test(`validates monitoring drafts and restores hidden screenshot values`, () => {
@@ -266,6 +528,7 @@ describe(`macSettingsReducer()`, () => {
 
     expect(internetFilteringConfiguration(state.internetFiltering.draft)).toEqual({
       filteringEnabled: true,
+      downtime: undefined,
       keychains: [{ id: `school`, schedule }],
       alwaysBlockedGroupIds: [`adult-content`],
       customAlwaysBlockedRules: rules,

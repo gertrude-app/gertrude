@@ -8,8 +8,11 @@ enum AuthedAccountRoute: PairRoute {
   case updatePersonBasicDetails(UpdatePersonBasicDetails.Input)
   case deletePerson(DeletePerson.Input)
   case getPersonMacSettings(GetPersonMacSettings.Input)
+  case getPersonInstalledMacApps(GetPersonInstalledMacApps.Input)
   case updatePersonMacMonitoringSettings(UpdatePersonMacMonitoringSettings.Input)
   case updatePersonMacInternetFiltering(UpdatePersonMacInternetFiltering.Input)
+  case updatePersonMacApps(UpdatePersonMacApps.Input)
+  case requestAccountPublicKeychain(RequestAccountPublicKeychain.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
   case getActivitySummaries(GetActivitySummaries.Input)
@@ -39,6 +42,10 @@ enum AuthedAccountRoute: PairRoute {
       Operation(GetPersonMacSettings.self)
       Body(.accountInput(GetPersonMacSettings.self))
     }
+    Route(.case(Self.getPersonInstalledMacApps)) {
+      Operation(GetPersonInstalledMacApps.self)
+      Body(.accountInput(GetPersonInstalledMacApps.self))
+    }
     Route(.case(Self.updatePersonMacMonitoringSettings)) {
       Operation(UpdatePersonMacMonitoringSettings.self)
       Body(.accountInput(UpdatePersonMacMonitoringSettings.self))
@@ -46,6 +53,14 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.updatePersonMacInternetFiltering)) {
       Operation(UpdatePersonMacInternetFiltering.self)
       Body(.accountInput(UpdatePersonMacInternetFiltering.self))
+    }
+    Route(.case(Self.updatePersonMacApps)) {
+      Operation(UpdatePersonMacApps.self)
+      Body(.accountInput(UpdatePersonMacApps.self))
+    }
+    Route(.case(Self.requestAccountPublicKeychain)) {
+      Operation(RequestAccountPublicKeychain.self)
+      Body(.accountInput(RequestAccountPublicKeychain.self))
     }
     Route(.case(Self.getSuspensionRequests)) {
       Operation(GetSuspensionRequests.self)
@@ -99,11 +114,20 @@ extension AuthedAccountRoute: RouteResponder {
     case .getPersonMacSettings(let input):
       let output = try await GetPersonMacSettings.resolve(with: input, in: context)
       return try await self.respond(with: output)
+    case .getPersonInstalledMacApps(let input):
+      let output = try await GetPersonInstalledMacApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .updatePersonMacMonitoringSettings(let input):
       let output = try await UpdatePersonMacMonitoringSettings.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .updatePersonMacInternetFiltering(let input):
       let output = try await UpdatePersonMacInternetFiltering.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .updatePersonMacApps(let input):
+      let output = try await UpdatePersonMacApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .requestAccountPublicKeychain(let input):
+      let output = try await RequestAccountPublicKeychain.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getSuspensionRequests:
       let output = try await GetSuspensionRequests.resolve(in: context)

@@ -5,6 +5,16 @@ export namespace UpdatePersonMacInternetFiltering {
   export interface Input {
     personId: UUID;
     filteringEnabled: boolean;
+    downtime?: {
+      start: {
+        hour: number;
+        minute: number;
+      };
+      end: {
+        hour: number;
+        minute: number;
+      };
+    };
     keychains: Array<{
       id: UUID;
       schedule?: {

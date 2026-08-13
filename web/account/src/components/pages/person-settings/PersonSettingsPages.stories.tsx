@@ -1,20 +1,10 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
-import type {
-  PersonIosSettingsConfiguration,
-  PersonMacSettingsConfiguration,
-} from '#/components/types';
+import type { PersonIosSettingsConfiguration } from '#/components/types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
 import IosSettingsComingSoonPage from './IosSettingsComingSoonPage';
 import IosSettingsPage from './IosSettingsPage';
-import MacSettingsPage from './MacSettingsPage.reference';
-import {
-  albums,
-  installedMacApps,
-  iosSettings,
-  keychains,
-  macSettings,
-} from '#/components/storybook/fixtures';
+import { albums, iosSettings } from '#/components/storybook/fixtures';
 
 const meta = {
   title: 'Account/Pages/People/Person Settings',
@@ -22,29 +12,6 @@ const meta = {
 };
 
 export default meta;
-
-const MacSettingsStory: React.FC<{
-  defaultExpandedSections?: React.ComponentProps<
-    typeof MacSettingsPage
-  >[`defaultExpandedSections`];
-}> = ({ defaultExpandedSections }) => {
-  const [config, setConfig] = React.useState<PersonMacSettingsConfiguration>(macSettings);
-
-  return (
-    <MacSettingsPage
-      config={config}
-      personName="Jude"
-      hasMacDevices
-      assignedKeychains={keychains.filter((keychain) =>
-        config.keychainIds.includes(keychain.id),
-      )}
-      allKeychains={keychains}
-      installedMacApps={installedMacApps}
-      defaultExpandedSections={defaultExpandedSections}
-      patchConfig={(patch) => setConfig((current) => ({ ...current, ...patch }))}
-    />
-  );
-};
 
 const IosSettingsStory: React.FC<{
   defaultExpandedSections?: React.ComponentProps<
@@ -81,31 +48,12 @@ export const IosComingSoon = {
   ),
 };
 
-export const Mac = {
-  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => (
-    <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
-      <MacSettingsStory />
-    </StoryScreen>
-  ),
-};
-
 export const Ios = {
   name: 'iPhone and iPad',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
       <IosSettingsStory />
-    </StoryScreen>
-  ),
-};
-
-export const MacAllSectionsExpanded = {
-  name: 'Mac all sections expanded',
-  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => (
-    <StoryScreen className="p-12" innerClassName="max-w-[1200px]">
-      <MacSettingsStory defaultExpandedSections={[`monitoring`, `filtering`, `apps`]} />
     </StoryScreen>
   ),
 };
