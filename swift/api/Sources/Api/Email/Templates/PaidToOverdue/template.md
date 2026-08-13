@@ -1,10 +1,10 @@
 Gertrude parent account holder,
 
 This is Jared from Gertrude, writing to let you know that we did not receive payment for
-your Gertrude account this month, and it is now considered <b>overdue.</b> This can happen
-for a number of reasons, but the most common is that your credit card expired, or your
-bank declined the charge for some reason. To resolve the issue and guarantee uninterrupted
-protection of your children, please login to the parents website here:
+your Gertrude account, and it is now considered OVERDUE. This can happen for a number of
+reasons, but the most common is that your credit card expired, or your bank declined the
+charge for some reason. To resolve the issue and guarantee uninterrupted protection of
+your children, please login to the parents website here:
 
 https://parents.gertrude.app/settings
 

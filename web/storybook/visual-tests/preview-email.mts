@@ -67,6 +67,26 @@ const SAMPLES: Record<string, Sample> = {
     layout: `personal`,
     model: { deviceFragment: `Franny’s iPhone` },
   },
+  'trial-ending-soon': {
+    dir: `TrialEndingSoon`,
+    layout: `base`,
+    model: { length: `21`, remaining: `3` },
+  },
+  'trial-expired': {
+    dir: `TrialExpired`,
+    layout: `base`,
+    model: { length: `21` },
+  },
+  'overdue-to-unpaid': {
+    dir: `OverdueToUnpaid`,
+    layout: `base`,
+    model: {},
+  },
+  'paid-to-overdue': {
+    dir: `PaidToOverdue`,
+    layout: `base`,
+    model: {},
+  },
 };
 
 function layoutHtml(layout: Layout): string {
