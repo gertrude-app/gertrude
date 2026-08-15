@@ -125,12 +125,6 @@ export type InstalledMacApp = {
   appIconUrl: string;
 };
 
-export type ConfiguredMacApp = {
-  nameOrBundleId: string;
-  appIconUrl: string;
-  schedule?: Schedule;
-};
-
 export type AllowedAlbum = {
   title: string;
   artist: string;
@@ -177,34 +171,6 @@ export type Notification = {
   trigger: NotificationTrigger;
   enabled: boolean;
   method: NotificationMethod;
-};
-
-export type PersonMacSettingsConfiguration = {
-  keyloggingEnabled: boolean;
-  screenshots?: {
-    resolution: number;
-    frequency: number;
-  };
-  emphasizeSuspensionActivity: boolean;
-  downtime?: {
-    start: TimeOfDay;
-    end: TimeOfDay;
-  };
-  filteringOn: boolean;
-  keychainIds: string[];
-  keychainSchedules?: Record<string, Schedule | undefined>;
-  alwaysBlockedGroups: {
-    adultContent: boolean;
-    messagesGifSearch: boolean;
-    socialMedia: boolean;
-    spotlightSearch: boolean;
-  };
-  customAlwaysBlockedDomains: string[];
-  blockedApps: ConfiguredMacApp[];
-  unrestrictedApps: Array<{
-    nameOrBundleId: string;
-    appIconUrl: string;
-  }>;
 };
 
 export type PersonIosSettingsConfiguration = {

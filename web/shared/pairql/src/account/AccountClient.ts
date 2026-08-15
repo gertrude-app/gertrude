@@ -104,6 +104,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public getPersonInstalledMacApps = (
+    input: P.GetPersonInstalledMacApps.Input,
+  ): Promise<Result<P.GetPersonInstalledMacApps.Output>> => {
+    return this.query<P.GetPersonInstalledMacApps.Output>(
+      input,
+      `GetPersonInstalledMacApps`,
+      `parent`,
+    );
+  };
+
   public getPersonMacSettings = (
     input: P.GetPersonMacSettings.Input,
   ): Promise<Result<P.GetPersonMacSettings.Output>> => {
@@ -124,6 +134,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public requestAccountPublicKeychain = (
+    input: P.RequestAccountPublicKeychain.Input,
+  ): Promise<Result<P.RequestAccountPublicKeychain.Output>> => {
+    return this.query<P.RequestAccountPublicKeychain.Output>(
+      input,
+      `RequestAccountPublicKeychain`,
+      `parent`,
+    );
+  };
+
   public toggleActivityFlag = (
     input: P.ToggleActivityFlag.Input,
   ): Promise<Result<P.ToggleActivityFlag.Output>> => {
@@ -136,6 +156,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.UpdatePersonBasicDetails.Output>(
       input,
       `UpdatePersonBasicDetails`,
+      `parent`,
+    );
+  };
+
+  public updatePersonMacApps = (
+    input: P.UpdatePersonMacApps.Input,
+  ): Promise<Result<P.UpdatePersonMacApps.Output>> => {
+    return this.query<P.UpdatePersonMacApps.Output>(
+      input,
+      `UpdatePersonMacApps`,
       `parent`,
     );
   };

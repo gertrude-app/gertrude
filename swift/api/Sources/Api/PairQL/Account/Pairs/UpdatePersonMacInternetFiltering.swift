@@ -1,3 +1,4 @@
+import Gertie
 import PairQL
 
 struct UpdatePersonMacInternetFiltering: Pair {
@@ -11,6 +12,7 @@ struct UpdatePersonMacInternetFiltering: Pair {
 
     let personId: Child.Id
     let filteringEnabled: Bool
+    let downtime: PlainTimeWindow?
     let keychains: [Keychain]
     let alwaysBlockedGroupIds: [AlwaysBlockedGroup.Id]
     let customAlwaysBlockedRules: [GetPersonMacSettings.CustomAlwaysBlockedRule]
@@ -27,7 +29,7 @@ extension UpdatePersonMacInternetFiltering: Resolver {
       with: .init(
         id: person.id,
         filteringDisabled: !input.filteringEnabled,
-        downtime: person.downtime,
+        downtime: input.downtime,
         keychains: input.keychains.map {
           .init(id: $0.id, schedule: $0.schedule?.ruleSchedule)
         },

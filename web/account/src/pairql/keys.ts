@@ -4,6 +4,7 @@ import type {
   GetPeople,
   GetPersonActivitySummaries,
   GetPersonDayActivity,
+  GetPersonInstalledMacApps,
   GetPersonMacSettings,
   GetSuspensionRequests,
 } from '@shared/pairql/src/account';
@@ -52,6 +53,12 @@ export class Key extends QueryKey<never> {
 
   static personMacSettings(personId: string): QueryKey<GetPersonMacSettings.Output> {
     return new QueryKey([`people`, personId, `mac-settings`]);
+  }
+
+  static personInstalledMacApps(
+    personId: string,
+  ): QueryKey<GetPersonInstalledMacApps.Output> {
+    return new QueryKey([`people`, personId, `installed-mac-apps`]);
   }
 
   private constructor() {

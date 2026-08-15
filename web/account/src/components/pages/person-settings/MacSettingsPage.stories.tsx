@@ -1,7 +1,7 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
 import type { LoadableState } from '#/components/types';
-import type { MacSettingsConfiguration } from './MacSettingsPage.types';
+import type { InstalledMacApp, MacSettingsConfiguration } from './MacSettingsPage.types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
 import MacSettingsPage from './MacSettingsPage';
 
@@ -30,12 +30,17 @@ const defaultSettings: MacSettingsConfiguration = {
   internetFiltering: {
     enabled: true,
     canBeDisabled: true,
+    downtime: {
+      start: { hour: 21, minute: 0 },
+      end: { hour: 5, minute: 0 },
+    },
     keychains: [
       {
         id: `family`,
         name: `Family`,
         description: `Everyday websites and services.`,
         isPublic: false,
+        isOwn: true,
         numKeys: 42,
         schedule: {
           type: `active`,
@@ -97,6 +102,7 @@ const defaultSettings: MacSettingsConfiguration = {
         name: `Family`,
         description: `Everyday websites and services.`,
         isPublic: false,
+        isOwn: true,
         numKeys: 42,
       },
       {
@@ -104,12 +110,94 @@ const defaultSettings: MacSettingsConfiguration = {
         name: `School`,
         description: `Educational resources and research.`,
         isPublic: true,
+        isOwn: false,
         numKeys: 18,
+      },
+    ],
+  },
+  apps: {
+    blocked: [
+      {
+        id: `blocked-minecraft`,
+        identifier: `com.mojang.minecraftlauncher`,
+        schedule: {
+          type: `inactive`,
+          days: {
+            sunday: false,
+            monday: true,
+            tuesday: true,
+            wednesday: true,
+            thursday: true,
+            friday: true,
+            saturday: false,
+          },
+          startTime: { hour: 8, minute: 0 },
+          endTime: { hour: 16, minute: 0 },
+        },
+      },
+      {
+        id: `blocked-discord`,
+        identifier: `com.hnc.Discord`,
+      },
+    ],
+    unrestricted: [
+      {
+        id: `unrestricted-scratch`,
+        scope: { type: `bundleId`, bundleId: `edu.mit.scratch` },
+        schedule: {
+          type: `active`,
+          days: {
+            sunday: false,
+            monday: true,
+            tuesday: true,
+            wednesday: true,
+            thursday: true,
+            friday: true,
+            saturday: false,
+          },
+          startTime: { hour: 8, minute: 0 },
+          endTime: { hour: 16, minute: 0 },
+        },
+      },
+    ],
+    publicUnrestricted: [
+      {
+        keychainId: `school`,
+        keychainName: `School`,
+        scope: { type: `identifiedAppSlug`, identifiedAppSlug: `chrome` },
       },
     ],
   },
   hasMacDevices: true,
 };
+
+const installedApps: InstalledMacApp[] = [
+  {
+    id: `minecraft`,
+    name: `Minecraft`,
+    bundleId: `com.mojang.minecraftlauncher`,
+    appIconUrl: `/example-app-icons/minecraft.webp`,
+  },
+  {
+    id: `discord`,
+    name: `Discord`,
+    bundleId: `com.hnc.Discord`,
+    appIconUrl: `/example-app-icons/discord.webp`,
+  },
+  {
+    id: `scratch`,
+    name: `Scratch`,
+    bundleId: `edu.mit.scratch`,
+    appIconUrl: `/example-app-icons/scratch.webp`,
+  },
+  {
+    id: `chrome`,
+    name: `Google Chrome`,
+    bundleId: `com.google.Chrome`,
+    identifiedAppSlug: `chrome`,
+    appIconUrl: `/example-app-icons/chrome.webp`,
+  },
+];
 
 const expandSection = (canvasElement: HTMLElement, title: string): void => {
   const button = Array.from(canvasElement.querySelectorAll(`button`)).find(
@@ -137,7 +225,9 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
       >
         <MacSettingsPage
           state={state}
+          installedApps={installedApps}
           savingMonitoring={savingMonitoring}
+          onRequestPublicKeychain={async () => {}}
           onSaveMonitoring={(configuration) => {
             if (state.status === `success`) {
               setState({
@@ -154,8 +244,24 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
               });
             }
           }}
+          onSaveApps={({ blockedApps, unrestrictedApps }) => {
+            if (state.status === `success`) {
+              setState({
+                status: `success`,
+                data: {
+                  ...state.data,
+                  apps: {
+                    ...state.data.apps,
+                    blocked: blockedApps,
+                    unrestricted: unrestrictedApps,
+                  },
+                },
+              });
+            }
+          }}
           onSaveInternetFiltering={({
             filteringEnabled,
+            downtime,
             keychains,
             alwaysBlockedGroupIds,
             customAlwaysBlockedRules,
@@ -168,6 +274,7 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
                   internetFiltering: {
                     ...state.data.internetFiltering,
                     enabled: filteringEnabled,
+                    downtime,
                     alwaysBlockedGroupIds,
                     customAlwaysBlockedRules,
                     keychains: keychains.map((keychain) => ({
@@ -209,6 +316,76 @@ export const InternetFiltering = {
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <MacSettingsStory initialState={{ status: `success`, data: defaultSettings }} />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Internet Filtering`);
+  },
+};
+
+export const Apps = {
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory initialState={{ status: `success`, data: defaultSettings }} />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const NoBlockedApps = {
+  name: 'No blocked apps',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          apps: { ...defaultSettings.apps, blocked: [] },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const NoUnrestrictedApps = {
+  name: 'No unrestricted apps',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          apps: { ...defaultSettings.apps, unrestricted: [] },
+        },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const NoDowntime = {
+  name: 'No downtime',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          internetFiltering: {
+            ...defaultSettings.internetFiltering,
+            downtime: undefined,
+          },
+        },
+      }}
+    />
   ),
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
     expandSection(canvasElement, `Internet Filtering`);

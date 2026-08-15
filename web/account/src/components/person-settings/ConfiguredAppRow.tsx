@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Card,
   Divider,
@@ -8,49 +9,75 @@ import {
   Text,
   VStack,
 } from '@gertrude/ui';
-import { EllipsisIcon, TrashIcon, XIcon } from 'lucide-react';
+import { EllipsisIcon, TrashIcon, TriangleAlertIcon, XIcon } from 'lucide-react';
 import React from 'react';
-import type { ConfiguredMacApp, Schedule } from '#/components/types';
+import type { Schedule } from '#/components/types';
 import ScheduleButton, { ScheduleEditor } from './ScheduleButton';
 import { formatSchedule } from '#/components/utils';
 
 interface Props {
-  app: ConfiguredMacApp;
-  onRemove: () => void;
+  app: {
+    name: string;
+    appIconUrl?: string;
+    schedule?: Schedule;
+  };
+  onRemove?: () => void;
   setSchedule?: (schedule?: Schedule) => void;
+  sourceLabel?: string;
+  ineffective?: boolean;
+  statusLabel?: string;
 }
 
-const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
+const ConfiguredAppRow: React.FC<Props> = ({
+  app,
+  onRemove,
+  setSchedule,
+  sourceLabel,
+  ineffective = false,
+  statusLabel,
+}) => (
   <Card padding={3} className="flex items-center justify-between gap-2">
-    <HStack gap={3}>
+    <HStack gap={4}>
       <div className="shrink-0">
-        <img
-          src={app.appIconUrl}
-          alt=""
-          className="w-10 h-10 absolute blur-xs opacity-50"
-        />
-        <img
-          src={app.appIconUrl}
-          alt=""
-          className="w-10 h-10 shadow rounded-[11px] relative"
-        />
-      </div>
-      <VStack>
-        <Text variant="bodyStrong">{app.nameOrBundleId}</Text>
-        {app.schedule && (
-          <Text variant="captionSubtle" className="-mt-0.25">
-            {formatSchedule(app.schedule)}
-          </Text>
+        {app.appIconUrl ? (
+          <div className="h-11 w-11 shrink-0 -m-1.5">
+            <img src={app.appIconUrl} alt="" className="w-full h-full" />
+          </div>
+        ) : (
+          <HStack
+            justify="center"
+            className="h-9 w-9 rounded-lg bg-stone-200 text-lg font-semibold text-stone-500 -m-0.5"
+          >
+            {app.name.slice(0, 1).toUpperCase()}
+          </HStack>
         )}
+      </div>
+      <VStack gap={0.5}>
+        <Text variant="bodyStrong">{app.name}</Text>
+        <HStack gap={2} wrap>
+          {app.schedule && (
+            <Text variant="captionSubtle">{formatSchedule(app.schedule)}</Text>
+          )}
+          {ineffective ? (
+            <Badge size="small" color="yellow" icon={TriangleAlertIcon}>
+              Blocked — no effect
+            </Badge>
+          ) : statusLabel ? (
+            <Badge size="small" color="green">
+              {statusLabel}
+            </Badge>
+          ) : null}
+          {sourceLabel && <Badge size="small">From {sourceLabel}</Badge>}
+        </HStack>
       </VStack>
     </HStack>
-    {setSchedule ? (
+    {setSchedule && onRemove ? (
       <>
         <HStack gap={2} hideBelow="sm">
           <ScheduleButton schedule={app.schedule} setSchedule={setSchedule} />
           <Button
             type="button"
-            ariaLabel={`Remove ${app.nameOrBundleId}`}
+            ariaLabel={`Remove ${app.name}`}
             onClick={onRemove}
             icon={XIcon}
             size="small"
@@ -63,7 +90,7 @@ const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
             trigger={
               <Button
                 type="button"
-                ariaLabel={`More actions for ${app.nameOrBundleId}`}
+                ariaLabel={`More actions for ${app.name}`}
                 onClick={() => {}}
                 icon={EllipsisIcon}
                 size="small"
@@ -83,16 +110,16 @@ const ConfiguredAppRow: React.FC<Props> = ({ app, onRemove, setSchedule }) => (
           </DropdownMenu>
         </div>
       </>
-    ) : (
+    ) : onRemove ? (
       <Button
         type="button"
-        ariaLabel={`Remove ${app.nameOrBundleId}`}
+        ariaLabel={`Remove ${app.name}`}
         onClick={onRemove}
         icon={XIcon}
         size="small"
         variant="ghost"
       />
-    )}
+    ) : null}
   </Card>
 );
 

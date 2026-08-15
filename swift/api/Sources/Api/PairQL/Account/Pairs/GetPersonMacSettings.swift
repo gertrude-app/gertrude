@@ -44,6 +44,7 @@ struct GetPersonMacSettings: Pair {
     let description: String?
     let warning: String?
     let isPublic: Bool
+    let isOwn: Bool
     let numKeys: Int
     let schedule: KeychainSchedule?
   }
@@ -64,6 +65,7 @@ struct GetPersonMacSettings: Pair {
   struct InternetFilteringSettings: PairNestable {
     let enabled: Bool
     let canBeDisabled: Bool
+    let downtime: PlainTimeWindow?
     let keychains: [KeychainSettings]
     let availableKeychains: [KeychainSettings]
     let supportsAlwaysBlocked: Bool
@@ -72,11 +74,37 @@ struct GetPersonMacSettings: Pair {
     let customAlwaysBlockedRules: [CustomAlwaysBlockedRule]
   }
 
+  struct BlockedAppSettings: PairNestable {
+    let id: BlockedMacApp.Id
+    let identifier: String
+    let schedule: KeychainSchedule?
+  }
+
+  struct UnrestrictedAppSettings: PairNestable {
+    let id: UnrestrictedMacApp.Id
+    let scope: AppScope.Single
+    let schedule: KeychainSchedule?
+  }
+
+  struct PublicUnrestrictedAppSettings: PairNestable {
+    let keychainId: Keychain.Id
+    let keychainName: String
+    let scope: AppScope.Single
+    let schedule: KeychainSchedule?
+  }
+
+  struct AppSettings: PairNestable {
+    let blocked: [BlockedAppSettings]
+    let unrestricted: [UnrestrictedAppSettings]
+    let publicUnrestricted: [PublicUnrestrictedAppSettings]
+  }
+
   struct Output: PairOutput {
     let keyloggingEnabled: Bool
     let showSuspensionActivity: Bool
     let screenshots: ScreenshotSettings
     let internetFiltering: InternetFilteringSettings
+    let apps: AppSettings
     let hasMacDevices: Bool
   }
 }
@@ -93,8 +121,9 @@ extension GetPersonMacSettings: Resolver {
     let versions = try await computerUsers.concurrentMap {
       try await $0.computer(in: context.db).filterVersion ?? .zero
     }
-    async let assignedKeychains = childKeychainSettings(
+    async let assignedKeychainSettings = childKeychainSettings(
       for: person.id,
+      parentId: person.parentId,
       in: context.db,
     )
     async let availableAlwaysBlockedGroups = AlwaysBlockedGroup.query()
@@ -119,12 +148,47 @@ extension GetPersonMacSettings: Resolver {
       .map {
         CustomAlwaysBlockedRule(id: $0.id, rule: $0.rule, comment: $0.comment)
       }
+    async let blockedApps = BlockedMacApp.query()
+      .where(.childId == person.id)
+      .orderBy(.createdAt, .asc)
+      .all(in: context.db)
+      .map {
+        BlockedAppSettings(
+          id: $0.id,
+          identifier: $0.identifier,
+          schedule: $0.schedule.map(KeychainSchedule.init),
+        )
+      }
+    async let unrestrictedApps = UnrestrictedMacApp.query()
+      .where(.childId == person.id)
+      .orderBy(.createdAt, .asc)
+      .all(in: context.db)
+      .map {
+        UnrestrictedAppSettings(
+          id: $0.id,
+          scope: $0.scope,
+          schedule: $0.schedule.map(KeychainSchedule.init),
+        )
+      }
     let availableKeychains = try await Keychain.query()
       .where(.parentId == person.parentId .|| .isPublic == true)
+      .orderBy(.name, .asc)
       .all(in: context.db)
-      .concurrentMap {
-        try await GetPersonMacSettings.KeychainSettings(from: $0, in: context.db)
+    let availableKeychainIds = availableKeychains.map(\.id)
+    let availableKeychainCounts = try await Key.query()
+      .where(.keychainId |=| availableKeychainIds)
+      .all(in: context.db)
+      .reduce(into: [Keychain.Id: Int]()) { counts, key in
+        counts[key.keychainId, default: 0] += 1
       }
+    let availableKeychainSettings = availableKeychains.map {
+      GetPersonMacSettings.KeychainSettings(
+        from: $0,
+        isOwn: $0.parentId == person.parentId,
+        numKeys: availableKeychainCounts[$0.id] ?? 0,
+      )
+    }
+    let (assignedKeychains, publicUnrestrictedApps) = try await assignedKeychainSettings
     return try await .init(
       keyloggingEnabled: person.keyloggingEnabled,
       showSuspensionActivity: person.showSuspensionActivity,
@@ -138,13 +202,19 @@ extension GetPersonMacSettings: Resolver {
         enabled: !person.filteringDisabled,
         canBeDisabled: !versions.isEmpty
           && versions.allSatisfy { $0 >= .init("2.9.0")! },
+        downtime: person.downtime,
         keychains: assignedKeychains,
-        availableKeychains: availableKeychains,
+        availableKeychains: availableKeychainSettings,
         supportsAlwaysBlocked: !versions.isEmpty
           && versions.allSatisfy { $0 >= .init("2.9.1")! },
         availableAlwaysBlockedGroups: availableAlwaysBlockedGroups,
         alwaysBlockedGroupIds: alwaysBlockedGroupIds,
         customAlwaysBlockedRules: customAlwaysBlockedRules,
+      ),
+      apps: .init(
+        blocked: blockedApps,
+        unrestricted: unrestrictedApps,
+        publicUnrestricted: publicUnrestrictedApps,
       ),
       hasMacDevices: !computerUsers.isEmpty,
     )
@@ -153,38 +223,65 @@ extension GetPersonMacSettings: Resolver {
 
 private func childKeychainSettings(
   for personId: Child.Id,
+  parentId: Parent.Id,
   in db: any DuetSQL.Client,
-) async throws -> [GetPersonMacSettings.KeychainSettings] {
+) async throws -> (
+  keychains: [GetPersonMacSettings.KeychainSettings],
+  publicUnrestrictedApps: [GetPersonMacSettings.PublicUnrestrictedAppSettings],
+) {
   let assignments = try await ChildKeychain.query()
     .where(.childId == personId)
     .all(in: db)
-  guard !assignments.isEmpty else { return [] }
-  return try await Keychain.query()
+  guard !assignments.isEmpty else { return ([], []) }
+  let keychains = try await Keychain.query()
     .where(.id |=| assignments.map(\.keychainId))
     .all(in: db)
-    .concurrentMap { keychain in
-      let schedule = assignments.first { $0.keychainId == keychain.id }?.schedule
-      return try await GetPersonMacSettings.KeychainSettings(
-        from: keychain,
-        schedule: schedule.map(GetPersonMacSettings.KeychainSchedule.init),
-        in: db,
-      )
-    }
+  let keys = try await Key.query()
+    .where(.keychainId |=| keychains.map(\.id))
+    .all(in: db)
+  let countsByKeychain = keys.reduce(into: [Keychain.Id: Int]()) { counts, key in
+    counts[key.keychainId, default: 0] += 1
+  }
+  let settings = keychains.map { keychain in
+    let schedule = assignments.first { $0.keychainId == keychain.id }?.schedule
+    return GetPersonMacSettings.KeychainSettings(
+      from: keychain,
+      isOwn: keychain.parentId == parentId,
+      numKeys: countsByKeychain[keychain.id] ?? 0,
+      schedule: schedule.map(GetPersonMacSettings.KeychainSchedule.init),
+    )
+  }
+  let publicUnrestrictedApps = keychains.filter(\.isPublic).flatMap { keychain in
+    let schedule = assignments.first { $0.keychainId == keychain.id }?.schedule
+    return keys
+      .filter { $0.keychainId == keychain.id }
+      .compactMap { key -> GetPersonMacSettings.PublicUnrestrictedAppSettings? in
+        guard case .skeleton(let scope) = key.key else { return nil }
+        return GetPersonMacSettings.PublicUnrestrictedAppSettings(
+          keychainId: keychain.id,
+          keychainName: keychain.name,
+          scope: scope,
+          schedule: schedule.map(GetPersonMacSettings.KeychainSchedule.init),
+        )
+      }
+  }
+  return (settings, publicUnrestrictedApps)
 }
 
 extension GetPersonMacSettings.KeychainSettings {
   init(
     from keychain: Keychain,
+    isOwn: Bool,
+    numKeys: Int,
     schedule: GetPersonMacSettings.KeychainSchedule? = nil,
-    in db: any DuetSQL.Client,
-  ) async throws {
-    let numKeys = try await db.count(Key.self, where: .keychainId == keychain.id)
+  ) {
     self.init(
       id: keychain.id,
       name: keychain.name,
       description: keychain.description,
       warning: keychain.warning,
       isPublic: keychain.isPublic,
+      isOwn: isOwn,
       numKeys: numKeys,
       schedule: schedule,
     )

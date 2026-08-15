@@ -1,31 +1,41 @@
 import { Button, Card, HStack, SlideOver, Text, Tooltip, VStack } from '@gertrude/ui';
 import { CheckIcon } from 'lucide-react';
 import React from 'react';
-import type { ConfiguredMacApp, InstalledMacApp } from '#/components/types';
+import type {
+  BlockedMacApp,
+  InstalledMacApp,
+  PublicUnrestrictedMacApp,
+  UnrestrictedMacApp,
+} from '#/components/pages/person-settings/MacSettingsPage.types';
 
 type AddAppSlideOverType = `blocked` | `unrestricted`;
-
-type ConfiguredAppReference = {
-  nameOrBundleId: string;
-};
 
 interface Props {
   open: boolean;
   type: AddAppSlideOverType;
   personName: string;
   installedApps: InstalledMacApp[];
-  blockedApps: ConfiguredMacApp[];
-  unrestrictedApps: ConfiguredAppReference[];
+  blockedApps: BlockedMacApp[];
+  unrestrictedApps: UnrestrictedMacApp[];
+  publicUnrestrictedApps?: PublicUnrestrictedMacApp[];
   onOpenChange: (open: boolean) => void;
   onAdd: (apps: InstalledMacApp[]) => void;
 }
 
-const configuredAppMatchesInstalledApp = (
-  configuredApp: ConfiguredAppReference,
+const blockedAppMatchesInstalledApp = (
+  configuredApp: BlockedMacApp,
   installedApp: InstalledMacApp,
 ): boolean =>
-  configuredApp.nameOrBundleId === installedApp.name ||
-  configuredApp.nameOrBundleId === installedApp.bundleId;
+  configuredApp.identifier === installedApp.bundleId ||
+  configuredApp.identifier.toLowerCase() === installedApp.name.toLowerCase();
+
+const unrestrictedAppMatchesInstalledApp = (
+  configuredApp: Pick<UnrestrictedMacApp, `scope`>,
+  installedApp: InstalledMacApp,
+): boolean =>
+  configuredApp.scope.type === `identifiedAppSlug`
+    ? configuredApp.scope.identifiedAppSlug === installedApp.identifiedAppSlug
+    : configuredApp.scope.bundleId === installedApp.bundleId;
 
 const AddMacAppSlideOver: React.FC<Props> = ({
   open,
@@ -34,6 +44,7 @@ const AddMacAppSlideOver: React.FC<Props> = ({
   installedApps,
   blockedApps,
   unrestrictedApps,
+  publicUnrestrictedApps = [],
   onOpenChange,
   onAdd,
 }) => {
@@ -45,21 +56,33 @@ const AddMacAppSlideOver: React.FC<Props> = ({
   );
   const getInstalledAppConfigurationType = (
     app: InstalledMacApp,
-  ): AddAppSlideOverType | null => {
+  ): AddAppSlideOverType | `publicUnrestricted` | null => {
     if (
-      blockedApps.some((configuredApp) =>
-        configuredAppMatchesInstalledApp(configuredApp, app),
+      blockedApps.some(
+        (configuredApp) =>
+          (type === `blocked` || configuredApp.schedule === undefined) &&
+          blockedAppMatchesInstalledApp(configuredApp, app),
       )
     ) {
       return `blocked`;
     }
 
     if (
+      type === `unrestricted` &&
       unrestrictedApps.some((configuredApp) =>
-        configuredAppMatchesInstalledApp(configuredApp, app),
+        unrestrictedAppMatchesInstalledApp(configuredApp, app),
       )
     ) {
       return `unrestricted`;
+    }
+
+    if (
+      type === `unrestricted` &&
+      publicUnrestrictedApps.some((configuredApp) =>
+        unrestrictedAppMatchesInstalledApp(configuredApp, app),
+      )
+    ) {
+      return `publicUnrestricted`;
     }
 
     return null;
@@ -111,11 +134,13 @@ const AddMacAppSlideOver: React.FC<Props> = ({
               const configurationType = getInstalledAppConfigurationType(app);
               const disabled = configurationType !== null;
               const disabledLabel =
-                configurationType === type
+                configurationType === type ||
+                (type === `blocked` && configurationType === `unrestricted`)
                   ? `Already added`
                   : configurationType === `blocked`
                     ? `Blocked`
-                    : configurationType === `unrestricted`
+                    : configurationType === `unrestricted` ||
+                        configurationType === `publicUnrestricted`
                       ? `Unrestricted`
                       : null;
               const disabledTooltip =
@@ -124,10 +149,12 @@ const AddMacAppSlideOver: React.FC<Props> = ({
                     ? `This app is already in Blocked Apps.`
                     : `This app is already in Unrestricted Apps.`
                   : configurationType === `blocked`
-                    ? `Remove this app from Blocked Apps before adding it to Unrestricted Apps.`
+                    ? `Remove its always-on block before adding it to Unrestricted Apps.`
                     : configurationType === `unrestricted`
                       ? `Remove this app from Unrestricted Apps before adding it to Blocked Apps.`
-                      : null;
+                      : configurationType === `publicUnrestricted`
+                        ? `This app already has unrestricted internet through an assigned keychain.`
+                        : null;
               const appButton = (
                 <Card
                   as="button"
@@ -141,16 +168,16 @@ const AddMacAppSlideOver: React.FC<Props> = ({
                   className="group relative flex min-h-34 w-full flex-col items-center justify-center text-center"
                 >
                   <div className="relative mb-2">
-                    <img
-                      src={app.appIconUrl}
-                      alt=""
-                      className="w-10 h-10 absolute blur-xs opacity-50"
-                    />
-                    <img
-                      src={app.appIconUrl}
-                      alt=""
-                      className="w-10 h-10 shadow rounded-[11px] relative"
-                    />
+                    {app.appIconUrl ? (
+                      <img src={app.appIconUrl} alt="" className="h-12 w-12" />
+                    ) : (
+                      <HStack
+                        justify="center"
+                        className="h-12 w-12 bg-stone-200 text-lg font-semibold text-stone-500"
+                      >
+                        {app.name.slice(0, 1).toUpperCase()}
+                      </HStack>
+                    )}
                     {selected && !disabled && (
                       <HStack
                         justify="center"

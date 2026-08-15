@@ -14,21 +14,29 @@ import {
   LaptopIcon,
   PlusIcon,
   RefreshCwIcon,
+  SquareDashedIcon,
 } from 'lucide-react';
 import React from 'react';
 import type { LoadableState } from '#/components/types';
 import type {
+  AppsFormState,
   InternetFilteringFormState,
   MacSettingsAction,
   MonitoringFormState,
 } from './MacSettingsPage.reducer';
 import type {
+  InstalledMacApp,
   InternetFilteringConfiguration,
+  MacAppsConfiguration,
   MacMonitoringConfiguration,
   MacSettingsConfiguration,
+  UnrestrictedMacApp,
 } from './MacSettingsPage.types';
 import macSettingsReducer, {
+  appsConfiguration,
+  appsHaveUnsavedChanges,
   createMacSettingsFormState,
+  defaultDowntime,
   internetFilteringConfiguration,
   internetFilteringHasUnsavedChanges,
   monitoringHasUnsavedChanges,
@@ -37,20 +45,34 @@ import macSettingsReducer, {
 } from './MacSettingsPage.reducer';
 import CardContainer from '#/components/layout/CardContainer';
 import AddKeychainSlideOver from '#/components/person-settings/AddKeychainSlideOver';
+import AddMacAppSlideOver from '#/components/person-settings/AddMacAppSlideOver';
 import BlockGroup from '#/components/person-settings/BlockGroup';
+import ConfiguredAppRow from '#/components/person-settings/ConfiguredAppRow';
 import CustomAlwaysBlockedRules from '#/components/person-settings/CustomAlwaysBlockedRules';
 import KeychainCard from '#/components/person-settings/KeychainCard';
 import PersonSettingsExpandableSection from '#/components/person-settings/PersonSettingsExpandableSection';
 import SettingsRow from '#/components/person-settings/SettingsRow';
+import {
+  formatTime,
+  inputValueToTimeOfDay,
+  timeOfDayToInputValue,
+} from '#/components/utils';
 
 interface Props {
   state: LoadableState<MacSettingsConfiguration>;
+  installedApps?: InstalledMacApp[];
   savingMonitoring?: boolean;
   savingInternetFiltering?: boolean;
+  savingApps?: boolean;
   onSaveMonitoring: (configuration: MacMonitoringConfiguration) => void | Promise<void>;
   onSaveInternetFiltering: (
     configuration: InternetFilteringConfiguration,
   ) => void | Promise<void>;
+  onSaveApps: (configuration: MacAppsConfiguration) => void | Promise<void>;
+  onRequestPublicKeychain: (input: {
+    searchQuery: string;
+    description: string;
+  }) => Promise<void>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
 }
 
@@ -227,6 +249,10 @@ interface InternetFilteringSettingsProps {
   dispatch: React.Dispatch<MacSettingsAction>;
   saving: boolean;
   onSave: (configuration: InternetFilteringConfiguration) => void | Promise<void>;
+  onRequestPublicKeychain: (input: {
+    searchQuery: string;
+    description: string;
+  }) => Promise<void>;
 }
 
 const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
@@ -235,15 +261,28 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
   dispatch,
   saving,
   onSave,
+  onRequestPublicKeychain,
 }) => {
   const [addKeychainSlideOverOpen, setAddKeychainSlideOverOpen] = React.useState(false);
   const { draft } = state;
   const hasUnsavedChanges = internetFilteringHasUnsavedChanges(state);
   const canDisable =
     settings.internetFiltering.canBeDisabled && settings.screenshots.enabled;
+  const downtime = draft.downtime ?? defaultDowntime;
+  const downtimeError =
+    draft.downtime &&
+    draft.downtime.start.hour === draft.downtime.end.hour &&
+    draft.downtime.start.minute === draft.downtime.end.minute
+      ? `Start and end times must be different.`
+      : undefined;
 
   const save = (): void => {
-    if (!hasUnsavedChanges || saving || (!draft.filteringEnabled && !canDisable)) {
+    if (
+      !hasUnsavedChanges ||
+      saving ||
+      downtimeError ||
+      (!draft.filteringEnabled && !canDisable)
+    ) {
       return;
     }
 
@@ -259,6 +298,17 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
       title="Internet Filtering"
       hasUnsavedChanges={hasUnsavedChanges}
       previewChips={[
+        draft.downtime
+          ? {
+              title: `Downtime`,
+              values: [
+                {
+                  text: `${formatTime(draft.downtime.start)} – ${formatTime(draft.downtime.end)}`,
+                  color: `violet`,
+                },
+              ],
+            }
+          : null,
         {
           title: `Filter`,
           values: [
@@ -301,6 +351,55 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
         }}
       >
         <VStack gap={3}>
+          <SettingsRow
+            type="toggle"
+            title="Enable Downtime"
+            description="Completely restrict all internet access during specified hours."
+            enabled={draft.downtime !== undefined}
+            disabled={saving}
+            setEnabled={(enabled) =>
+              dispatch({ type: `downtimeEnabledChanged`, enabled })
+            }
+          >
+            <Stack
+              direction={{ default: `vertical`, '@lg/main': `horizontal` }}
+              gap={{ default: 4, '@lg/main': 2 }}
+            >
+              <Input
+                label="Start Time"
+                type="time"
+                value={timeOfDayToInputValue(downtime.start)}
+                setValue={(value) => {
+                  const start = inputValueToTimeOfDay(value);
+                  if (start) {
+                    dispatch({
+                      type: `downtimeChanged`,
+                      downtime: { ...downtime, start },
+                    });
+                  }
+                }}
+                disabled={saving}
+                className="w-full @lg/main:w-1/2"
+              />
+              <Input
+                label="End Time"
+                type="time"
+                value={timeOfDayToInputValue(downtime.end)}
+                setValue={(value) => {
+                  const end = inputValueToTimeOfDay(value);
+                  if (end) {
+                    dispatch({
+                      type: `downtimeChanged`,
+                      downtime: { ...downtime, end },
+                    });
+                  }
+                }}
+                error={downtimeError}
+                disabled={saving}
+                className="w-full @lg/main:w-1/2"
+              />
+            </Stack>
+          </SettingsRow>
           <SettingsRow
             type="toggle"
             title="Filter Internet Access"
@@ -415,7 +514,10 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
               type="submit"
               variant="primary"
               disabled={
-                !hasUnsavedChanges || saving || (!draft.filteringEnabled && !canDisable)
+                !hasUnsavedChanges ||
+                saving ||
+                !!downtimeError ||
+                (!draft.filteringEnabled && !canDisable)
               }
               loading={saving}
               className="w-full @lg/main:w-auto"
@@ -431,6 +533,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
         personName="this person"
         keychains={settings.internetFiltering.availableKeychains}
         assignedKeychainIds={draft.keychains.map((keychain) => keychain.id)}
+        onRequestPublicKeychain={onRequestPublicKeychain}
         onAdd={(ids) =>
           dispatch({
             type: `keychainsAdded`,
@@ -444,39 +547,400 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
   );
 };
 
+interface AppsSettingsProps {
+  state: AppsFormState;
+  installedApps: InstalledMacApp[];
+  dispatch: React.Dispatch<MacSettingsAction>;
+  saving: boolean;
+  onSave: (configuration: MacAppsConfiguration) => void | Promise<void>;
+}
+
+const AppsSettings: React.FC<AppsSettingsProps> = ({
+  state,
+  installedApps,
+  dispatch,
+  saving,
+  onSave,
+}) => {
+  const [addAppSlideOverType, setAddAppSlideOverType] = React.useState<
+    `blocked` | `unrestricted` | null
+  >(null);
+  const { draft } = state;
+  const hasUnsavedChanges = appsHaveUnsavedChanges(state);
+  const isAlwaysBlocked = (scope: UnrestrictedMacApp[`scope`]): boolean => {
+    const installedApp = installedApps.find((app) =>
+      scope.type === `identifiedAppSlug`
+        ? app.identifiedAppSlug === scope.identifiedAppSlug
+        : app.bundleId === scope.bundleId,
+    );
+    if (!installedApp) {
+      return false;
+    }
+
+    return draft.blocked.some(
+      (blockedApp) =>
+        blockedApp.schedule === undefined &&
+        (blockedApp.identifier === installedApp.bundleId ||
+          blockedApp.identifier.toLowerCase() === installedApp.name.toLowerCase()),
+    );
+  };
+
+  const save = (): void => {
+    if (!hasUnsavedChanges || saving) {
+      return;
+    }
+
+    const submitted = draft;
+    void Promise.resolve(onSave(appsConfiguration(submitted))).then(
+      () => dispatch({ type: `appsSaveSucceeded`, submitted }),
+      () => undefined,
+    );
+  };
+
+  return (
+    <PersonSettingsExpandableSection
+      title="Apps"
+      hasUnsavedChanges={hasUnsavedChanges}
+      previewChips={[
+        {
+          title: `Blocked Apps`,
+          values: [
+            {
+              text: `${draft.blocked.length}`,
+              color: draft.blocked.length > 0 ? `violet` : `neutral`,
+            },
+          ],
+        },
+        {
+          title: `Unrestricted Apps`,
+          values: [
+            {
+              text: `${draft.unrestricted.length + draft.publicUnrestricted.length}`,
+              color:
+                draft.unrestricted.length + draft.publicUnrestricted.length > 0
+                  ? `violet`
+                  : `neutral`,
+            },
+          ],
+        },
+      ]}
+    >
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          save();
+        }}
+      >
+        <VStack gap={3}>
+          <SettingsRow
+            type="alwaysOn"
+            title="Blocked Apps"
+            description="These apps can't open at all. Add a schedule to only block them at certain times."
+          >
+            {draft.blocked.length > 0 ? (
+              <VStack gap={3}>
+                {draft.blocked.map((app) => (
+                  <ConfiguredAppRow
+                    key={app.id}
+                    app={{
+                      name: app.name ?? app.identifier,
+                      appIconUrl: app.appIconUrl,
+                      schedule: app.schedule,
+                    }}
+                    setSchedule={(schedule) =>
+                      dispatch({
+                        type: `blockedAppScheduleChanged`,
+                        id: app.id,
+                        schedule,
+                      })
+                    }
+                    onRemove={() => dispatch({ type: `blockedAppRemoved`, id: app.id })}
+                  />
+                ))}
+                <HStack justify="end">
+                  <Button
+                    type="button"
+                    onClick={() => setAddAppSlideOverType(`blocked`)}
+                    icon={PlusIcon}
+                    disabled={saving || installedApps.length === 0}
+                  >
+                    Add Blocked App
+                  </Button>
+                </HStack>
+              </VStack>
+            ) : (
+              <EmptyState
+                icon={SquareDashedIcon}
+                title="No Blocked Apps"
+                description={
+                  installedApps.length > 0
+                    ? `Choose apps that shouldn't be able to open.`
+                    : `No installed apps have been reported yet.`
+                }
+                button={
+                  installedApps.length > 0
+                    ? {
+                        text: `Add Blocked App`,
+                        type: `button`,
+                        onClick: () => setAddAppSlideOverType(`blocked`),
+                        icon: PlusIcon,
+                        variant: `primary`,
+                      }
+                    : undefined
+                }
+              />
+            )}
+          </SettingsRow>
+          <SettingsRow
+            type="alwaysOn"
+            title="Apps With Unrestricted Internet Access"
+            description="By default apps can't reach the internet. These apps are granted full, unrestricted access. Add a schedule to limit when they can connect."
+          >
+            {draft.unrestricted.length + draft.publicUnrestricted.length > 0 ? (
+              <VStack gap={3}>
+                {draft.unrestricted.map((app) => (
+                  <ConfiguredAppRow
+                    key={app.id}
+                    app={{
+                      name:
+                        app.name ??
+                        (app.scope.type === `identifiedAppSlug`
+                          ? app.scope.identifiedAppSlug
+                          : app.scope.bundleId),
+                      appIconUrl: app.appIconUrl,
+                      schedule: app.schedule,
+                    }}
+                    ineffective={isAlwaysBlocked(app.scope)}
+                    statusLabel="Unrestricted Internet"
+                    setSchedule={(schedule) =>
+                      dispatch({
+                        type: `unrestrictedAppScheduleChanged`,
+                        id: app.id,
+                        schedule,
+                      })
+                    }
+                    onRemove={() =>
+                      dispatch({ type: `unrestrictedAppRemoved`, id: app.id })
+                    }
+                  />
+                ))}
+                {draft.publicUnrestricted.map((app, index) => (
+                  <ConfiguredAppRow
+                    key={`${app.keychainId}-${JSON.stringify(app.scope)}-${index}`}
+                    app={{
+                      name:
+                        app.name ??
+                        (app.scope.type === `identifiedAppSlug`
+                          ? app.scope.identifiedAppSlug
+                          : app.scope.bundleId),
+                      appIconUrl: app.appIconUrl,
+                      schedule: app.schedule,
+                    }}
+                    sourceLabel={app.keychainName}
+                    ineffective={isAlwaysBlocked(app.scope)}
+                    statusLabel="Unrestricted Internet"
+                  />
+                ))}
+                <HStack justify="end">
+                  <Button
+                    type="button"
+                    onClick={() => setAddAppSlideOverType(`unrestricted`)}
+                    icon={PlusIcon}
+                    disabled={saving || installedApps.length === 0}
+                  >
+                    Add Unrestricted App
+                  </Button>
+                </HStack>
+              </VStack>
+            ) : (
+              <EmptyState
+                icon={SquareDashedIcon}
+                title="No Unrestricted Apps"
+                description={
+                  installedApps.length > 0
+                    ? `Choose apps that should have unrestricted internet access.`
+                    : `No installed apps have been reported yet.`
+                }
+                button={
+                  installedApps.length > 0
+                    ? {
+                        text: `Add Unrestricted App`,
+                        type: `button`,
+                        onClick: () => setAddAppSlideOverType(`unrestricted`),
+                        icon: PlusIcon,
+                        variant: `primary`,
+                      }
+                    : undefined
+                }
+              />
+            )}
+          </SettingsRow>
+          <HStack justify="end">
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={!hasUnsavedChanges || saving}
+              loading={saving}
+              className="w-full @lg/main:w-auto"
+            >
+              Save Changes
+            </Button>
+          </HStack>
+        </VStack>
+      </form>
+      {addAppSlideOverType && (
+        <AddMacAppSlideOver
+          open
+          type={addAppSlideOverType}
+          personName="this person"
+          installedApps={installedApps}
+          blockedApps={draft.blocked}
+          unrestrictedApps={draft.unrestricted}
+          publicUnrestrictedApps={draft.publicUnrestricted}
+          onOpenChange={(open) => {
+            if (!open) {
+              setAddAppSlideOverType(null);
+            }
+          }}
+          onAdd={(apps) => {
+            if (addAppSlideOverType === `blocked`) {
+              dispatch({
+                type: `blockedAppsAdded`,
+                apps: apps.map((app) => ({
+                  id: crypto.randomUUID(),
+                  identifier: app.bundleId,
+                  name: app.name,
+                  appIconUrl: app.appIconUrl,
+                })),
+              });
+            } else {
+              dispatch({
+                type: `unrestrictedAppsAdded`,
+                apps: apps.map((app) => ({
+                  id: crypto.randomUUID(),
+                  scope: app.identifiedAppSlug
+                    ? {
+                        type: `identifiedAppSlug`,
+                        identifiedAppSlug: app.identifiedAppSlug,
+                      }
+                    : { type: `bundleId`, bundleId: app.bundleId },
+                  name: app.name,
+                  appIconUrl: app.appIconUrl,
+                })),
+              });
+            }
+          }}
+        />
+      )}
+    </PersonSettingsExpandableSection>
+  );
+};
+
 interface MacSettingsEditorProps {
   settings: MacSettingsConfiguration;
+  installedApps: InstalledMacApp[];
   savingMonitoring: boolean;
   savingInternetFiltering: boolean;
+  savingApps: boolean;
   onSaveMonitoring: (configuration: MacMonitoringConfiguration) => void | Promise<void>;
   onSaveInternetFiltering: (
     configuration: InternetFilteringConfiguration,
   ) => void | Promise<void>;
+  onSaveApps: (configuration: MacAppsConfiguration) => void | Promise<void>;
+  onRequestPublicKeychain: (input: {
+    searchQuery: string;
+    description: string;
+  }) => Promise<void>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
 }
 
 const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
   settings,
+  installedApps,
   savingMonitoring,
   savingInternetFiltering,
+  savingApps,
   onSaveMonitoring,
   onSaveInternetFiltering,
+  onSaveApps,
+  onRequestPublicKeychain,
   onUnsavedChangesChange,
 }) => {
+  const hydratedSettings = React.useMemo<MacSettingsConfiguration>(
+    () => ({
+      ...settings,
+      apps: {
+        ...settings.apps,
+        blocked: settings.apps.blocked.map((blockedApp) => {
+          const lowerIdentifier = blockedApp.identifier.toLowerCase();
+          const installedApp = installedApps.find(
+            (app) =>
+              app.bundleId === blockedApp.identifier ||
+              app.name.toLowerCase() === lowerIdentifier,
+          );
+          return installedApp
+            ? {
+                ...blockedApp,
+                name: installedApp.name,
+                appIconUrl: installedApp.appIconUrl,
+              }
+            : blockedApp;
+        }),
+        unrestricted: settings.apps.unrestricted.map((unrestrictedApp) => {
+          const installedApp = installedApps.find((app) =>
+            unrestrictedApp.scope.type === `identifiedAppSlug`
+              ? app.identifiedAppSlug === unrestrictedApp.scope.identifiedAppSlug
+              : app.bundleId === unrestrictedApp.scope.bundleId,
+          );
+          return installedApp
+            ? {
+                ...unrestrictedApp,
+                name: installedApp.name,
+                appIconUrl: installedApp.appIconUrl,
+              }
+            : unrestrictedApp;
+        }),
+        publicUnrestricted: settings.apps.publicUnrestricted.map(
+          (publicUnrestrictedApp) => {
+            const installedApp = installedApps.find((app) =>
+              publicUnrestrictedApp.scope.type === `identifiedAppSlug`
+                ? app.identifiedAppSlug === publicUnrestrictedApp.scope.identifiedAppSlug
+                : app.bundleId === publicUnrestrictedApp.scope.bundleId,
+            );
+            return installedApp
+              ? {
+                  ...publicUnrestrictedApp,
+                  name: installedApp.name,
+                  appIconUrl: installedApp.appIconUrl,
+                }
+              : publicUnrestrictedApp;
+          },
+        ),
+      },
+    }),
+    [installedApps, settings],
+  );
   const [formState, dispatch] = React.useReducer(
     macSettingsReducer,
-    settings,
+    hydratedSettings,
     createMacSettingsFormState,
   );
   const monitoringHasChanges = monitoringHasUnsavedChanges(formState.monitoring);
   const internetFilteringHasChanges = internetFilteringHasUnsavedChanges(
     formState.internetFiltering,
   );
-  const hasUnsavedChanges = monitoringHasChanges || internetFilteringHasChanges;
+  const appsHaveChanges = appsHaveUnsavedChanges(formState.apps);
+  const hasUnsavedChanges =
+    monitoringHasChanges || internetFilteringHasChanges || appsHaveChanges;
 
   React.useEffect(() => {
-    dispatch({ type: `settingsReceived`, settings });
-  }, [internetFilteringHasChanges, monitoringHasChanges, settings]);
+    dispatch({ type: `settingsReceived`, settings: hydratedSettings });
+  }, [
+    appsHaveChanges,
+    hydratedSettings,
+    internetFilteringHasChanges,
+    monitoringHasChanges,
+  ]);
 
   React.useEffect(() => {
     onUnsavedChangesChange?.(hasUnsavedChanges);
@@ -491,7 +955,7 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
 
   return (
     <CardContainer className="flex flex-col gap-4">
-      {(savingMonitoring || savingInternetFiltering) && (
+      {(savingMonitoring || savingInternetFiltering || savingApps) && (
         <span role="status" className="sr-only">
           Saving Mac settings
         </span>
@@ -509,6 +973,14 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
         dispatch={dispatch}
         saving={savingInternetFiltering}
         onSave={onSaveInternetFiltering}
+        onRequestPublicKeychain={onRequestPublicKeychain}
+      />
+      <AppsSettings
+        state={formState.apps}
+        installedApps={installedApps}
+        dispatch={dispatch}
+        saving={savingApps}
+        onSave={onSaveApps}
       />
     </CardContainer>
   );
@@ -516,10 +988,14 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
 
 const MacSettingsPage: React.FC<Props> = ({
   state,
+  installedApps = [],
   savingMonitoring = false,
   savingInternetFiltering = false,
+  savingApps = false,
   onSaveMonitoring,
   onSaveInternetFiltering,
+  onSaveApps,
+  onRequestPublicKeychain,
   onUnsavedChangesChange,
 }) => {
   if (state.status === `loading`) {
@@ -571,10 +1047,14 @@ const MacSettingsPage: React.FC<Props> = ({
   return (
     <MacSettingsEditor
       settings={state.data}
+      installedApps={installedApps}
       savingMonitoring={savingMonitoring}
       savingInternetFiltering={savingInternetFiltering}
+      savingApps={savingApps}
       onSaveMonitoring={onSaveMonitoring}
       onSaveInternetFiltering={onSaveInternetFiltering}
+      onSaveApps={onSaveApps}
+      onRequestPublicKeychain={onRequestPublicKeychain}
       onUnsavedChangesChange={onUnsavedChangesChange}
     />
   );

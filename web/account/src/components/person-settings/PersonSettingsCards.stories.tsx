@@ -82,7 +82,7 @@ export const Cards = {
       <StorySection title="Configured apps" contentClassName="flex-col items-stretch">
         <ConfiguredAppRow
           app={{
-            nameOrBundleId: `Minecraft`,
+            name: `Minecraft`,
             appIconUrl: `/example-app-icons/minecraft.webp`,
             schedule: weekdaySchedule,
           }}
@@ -91,10 +91,10 @@ export const Cards = {
         />
         <ConfiguredAppRow
           app={{
-            nameOrBundleId: `Khan Academy`,
+            name: `Khan Academy`,
             appIconUrl: `/example-app-icons/khan-academy.webp`,
           }}
-          onRemove={noop}
+          sourceLabel="School"
         />
       </StorySection>
       <StorySection title="Schedule button">
@@ -171,7 +171,28 @@ export const PublicKeychainWarning = {
         keychains={keychains}
         assignedKeychainIds={[]}
         onAdd={noop}
+        onRequestPublicKeychain={async () => {}}
         defaultTab="public"
+      />
+    </StoryCanvas>
+  ),
+};
+
+export const RequestPublicKeychain = {
+  name: 'Request public keychain',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddKeychainSlideOver
+        open
+        onOpenChange={noop}
+        personName="Jude"
+        keychains={keychains}
+        assignedKeychainIds={[]}
+        onAdd={noop}
+        onRequestPublicKeychain={async () => {}}
+        defaultTab="public"
+        defaultSearchQuery="geometry curriculum"
       />
     </StoryCanvas>
   ),
@@ -189,11 +210,49 @@ export const AddMacApps = {
         installedApps={installedMacApps}
         blockedApps={[
           {
-            nameOrBundleId: installedMacApps[0]!.name,
+            id: `blocked-safari`,
+            identifier: installedMacApps[0]!.bundleId,
+            name: installedMacApps[0]!.name,
             appIconUrl: installedMacApps[0]!.appIconUrl,
           },
         ]}
-        unrestrictedApps={[{ nameOrBundleId: installedMacApps[1]!.name }]}
+        unrestrictedApps={[
+          {
+            id: `unrestricted-chrome`,
+            scope: { type: `bundleId`, bundleId: installedMacApps[1]!.bundleId },
+          },
+        ]}
+        onOpenChange={noop}
+        onAdd={noop}
+      />
+    </StoryCanvas>
+  ),
+};
+
+export const AddUnrestrictedMacApps = {
+  name: 'Add unrestricted Mac apps slide-over',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddMacAppSlideOver
+        open
+        type="unrestricted"
+        personName="Jude"
+        installedApps={installedMacApps}
+        blockedApps={[
+          {
+            id: `blocked-safari`,
+            identifier: installedMacApps[0]!.bundleId,
+            name: installedMacApps[0]!.name,
+            appIconUrl: installedMacApps[0]!.appIconUrl,
+          },
+        ]}
+        unrestrictedApps={[
+          {
+            id: `unrestricted-chrome`,
+            scope: { type: `bundleId`, bundleId: installedMacApps[1]!.bundleId },
+          },
+        ]}
         onOpenChange={noop}
         onAdd={noop}
       />

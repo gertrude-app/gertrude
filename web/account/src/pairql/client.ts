@@ -3,7 +3,7 @@ import type { PqlError } from '@shared/pairql';
 import type { ClientAuth } from '@shared/pairql/src/account';
 import { getToken } from './auth';
 
-const apiEndpoint = getApiEndpoint();
+export const apiEndpoint = getApiEndpoint();
 
 export const liveClient = new AccountClient(apiEndpoint, prepareRequest);
 
