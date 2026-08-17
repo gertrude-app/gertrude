@@ -75,10 +75,10 @@ func amazonMusicArtworkExclusions(
   let ids = CreateBlockGroups.GroupIds()
   let introducedAt = ISO8601DateFormatter().date(from: "2026-08-07T20:00:00Z")!
   let disabled = Set(explicitlyDisabledGroups)
-  let existingInstall = device?.createdAt ?? .distantFuture
-  if existingInstall < introducedAt
-    || disabled.contains(ids.appleMusicImages)
-    || disabled.contains(ids.spotifyImages) {
+  let existingInstall = (device?.createdAt ?? .now) < introducedAt
+  if existingInstall,
+     disabled.contains(ids.appleMusicImages),
+     disabled.contains(ids.spotifyImages) {
     return [.uuid(ids.amazonMusicArtwork)]
   }
   return []

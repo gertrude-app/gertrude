@@ -86,43 +86,48 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
   func testBlockRulesV3_AmazonMusicArtworkRollout() async throws {
     let ids = CreateBlockGroups.GroupIds()
     let amazonMusicArtwork = BlockerApp.BlockGroup.Id(ids.amazonMusicArtwork)
-    let oldVendorId = UUID()
-    let newVendorId = UUID()
-    let disabledSpotifyVendorId = UUID()
+    let beforeIntroduced = ISO8601DateFormatter().date(from: "2026-08-07T19:59:59Z")!
+    let afterIntroduced = ISO8601DateFormatter().date(from: "2026-08-07T20:00:01Z")!
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    var oldDevice = try await self.db.create(IOSDevice(
-      id: .init(oldVendorId),
-      childId: child.id,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.0",
-    ))
-    var newDevice = try await self.db.create(IOSDevice(
-      id: .init(newVendorId),
-      childId: child.id,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.0",
-    ))
-    var disabledSpotifyDevice = try await self.db.create(IOSDevice(
-      id: .init(disabledSpotifyVendorId),
-      childId: child.id,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.0",
-    ))
-    try await oldDevice
-      .modifyCreatedAt(.exact(ISO8601DateFormatter().date(from: "2026-08-07T19:59:59Z")!))
-    try await newDevice
-      .modifyCreatedAt(.exact(ISO8601DateFormatter().date(from: "2026-08-07T20:00:01Z")!))
-    try await disabledSpotifyDevice
-      .modifyCreatedAt(.exact(ISO8601DateFormatter().date(from: "2026-08-07T20:00:01Z")!))
 
+    func device(createdAt: Date) async throws -> UUID {
+      let vendorId = UUID()
+      var device = try await self.db.create(IOSDevice(
+        id: .init(vendorId),
+        childId: child.id,
+        modelIdentifier: "iPhone15,2",
+        iosVersion: "18.0",
+      ))
+      try await device.modifyCreatedAt(.exact(createdAt))
+      return vendorId
+    }
+
+    let grandfathered = try await device(createdAt: beforeIntroduced)
+    let grandfatheredNoSpotify = try await device(createdAt: beforeIntroduced)
+    let grandfatheredNoAppleMusic = try await device(createdAt: beforeIntroduced)
+    let grandfatheredNoMusicArtwork = try await device(createdAt: beforeIntroduced)
+    let new = try await device(createdAt: afterIntroduced)
+    let newOptedOut = try await device(createdAt: afterIntroduced)
+    let newNoMusicArtwork = try await device(createdAt: afterIntroduced)
+
+    let appleMusicImages = BlockerApp.BlockGroup.Id(ids.appleMusicImages)
     try await self.db.delete(amazonMusicArtwork)
-    try await self.db.create(BlockerApp.BlockGroup(
-      id: amazonMusicArtwork,
-      name: "Amazon Music artwork",
-      description: "Block images from the Amazon Music app.",
-      longDescription: "",
-    ))
+    try await self.db.delete(appleMusicImages)
+    try await self.db.create([
+      BlockerApp.BlockGroup(
+        id: amazonMusicArtwork,
+        name: "Amazon Music artwork",
+        description: "Block images from the Amazon Music app.",
+        longDescription: "",
+      ),
+      BlockerApp.BlockGroup(
+        id: appleMusicImages,
+        name: "Apple Music images",
+        description: "Block images from the Apple Music app.",
+        longDescription: "",
+      ),
+    ])
     try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.create([
       BlockerApp.BlockRule(
@@ -130,34 +135,50 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
         groupId: .init(ids.amazonMusicArtwork),
       ),
       BlockerApp.BlockRule(rule: .urlContains(value: "spotify"), groupId: .init(ids.spotifyImages)),
+      BlockerApp.BlockRule(
+        rule: .urlContains(value: "applemusic"),
+        groupId: .init(ids.appleMusicImages),
+      ),
       BlockerApp.BlockRule(rule: .urlContains(value: "gif"), groupId: .init(ids.gifs)),
     ])
 
-    let oldRules = try await BlockRules_v3.resolve(
-      with: .init(deviceId: oldVendorId, appVersion: "2.0.0", disabledGroups: []),
-      in: .mock,
-    )
-    let newRules = try await BlockRules_v3.resolve(
-      with: .init(deviceId: newVendorId, appVersion: "2.0.0", disabledGroups: []),
-      in: .mock,
-    )
-    let disabledSpotifyRules = try await BlockRules_v3.resolve(
-      with: .init(
-        deviceId: disabledSpotifyVendorId,
-        appVersion: "2.0.0",
-        disabledGroups: [ids.spotifyImages],
-      ),
-      in: .mock,
-    )
+    func rules(_ deviceId: UUID, disabled: [UUID] = []) async throws -> Set<BlockRule> {
+      try await Set(BlockRules_v3.resolve(
+        with: .init(deviceId: deviceId, appVersion: "2.0.0", disabledGroups: disabled),
+        in: .mock,
+      ))
+    }
 
-    expect(Set(oldRules)).toEqual([.urlContains(value: "spotify"), .urlContains(value: "gif")])
-    expect(Set(newRules)).toEqual([
-      .urlContains(value: "amazon"),
-      .urlContains(value: "spotify"),
-      .urlContains(value: "gif"),
-    ])
-    expect(Set(disabledSpotifyRules)).toEqual([.urlContains(value: "gif")])
+    let amazon = BlockRule.urlContains(value: "amazon")
+    let spotify = BlockRule.urlContains(value: "spotify")
+    let appleMusic = BlockRule.urlContains(value: "applemusic")
+    let gif = BlockRule.urlContains(value: "gif")
+
+    // pre-existing installs never saw the amazon group during onboarding, so we
+    // backport it to anyone still receiving any album artwork rules at all
+    await expect(try rules(grandfathered))
+      .toEqual([amazon, spotify, appleMusic, gif])
+    await expect(try rules(grandfatheredNoSpotify, disabled: [ids.spotifyImages]))
+      .toEqual([amazon, appleMusic, gif])
+    await expect(try rules(grandfatheredNoAppleMusic, disabled: [ids.appleMusicImages]))
+      .toEqual([amazon, spotify, gif])
+    await expect(try rules( // only opting out of every artwork group reads as uninterested
+      grandfatheredNoMusicArtwork,
+      disabled: [ids.spotifyImages, ids.appleMusicImages],
+    )).toEqual([gif])
+
+    // newer installs chose during onboarding, so we honor what they sent us
+    await expect(try rules(new)).toEqual([amazon, spotify, appleMusic, gif])
+    await expect(try rules(newOptedOut, disabled: [ids.amazonMusicArtwork]))
+      .toEqual([spotify, appleMusic, gif])
+    await expect(try rules( // opting out of both others doesn't revoke an explicit opt-in
+      newNoMusicArtwork,
+      disabled: [ids.spotifyImages, ids.appleMusicImages],
+    )).toEqual([amazon, gif])
+
+    try await self.db.delete(all: BlockerApp.BlockRule.self)
     try await self.db.delete(amazonMusicArtwork)
+    try await self.db.delete(appleMusicImages)
   }
 
   // MARK: v2 tests
