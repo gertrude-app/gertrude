@@ -7,6 +7,7 @@ import XExpect
 final class AppleMusicClientTests: XCTestCase {
   func testBuildsCatalogMixedSearchURL() throws {
     let url = try appleMusicCatalogMixedSearchURL(.init(
+      storefront: .default,
       term: "Lena Jonsson Trio",
       limit: 25,
     ))
@@ -25,6 +26,7 @@ final class AppleMusicClientTests: XCTestCase {
 
   func testBuildsCatalogAlbumURL() throws {
     let url = try appleMusicCatalogAlbumURL(.init(
+      storefront: .default,
       albumId: .init(rawValue: "1511628001"),
     ))
 
@@ -434,7 +436,7 @@ final class AppleMusicClientTests: XCTestCase {
     }
 
     let results = try await searchAppleMusicCatalog(
-      .init(term: "track search", limit: 10),
+      .init(storefront: .default, term: "track search", limit: 10),
       load: loader.dataLoader,
     )
 
@@ -558,7 +560,7 @@ final class AppleMusicClientTests: XCTestCase {
     }
 
     let results = try await searchAppleMusicCatalog(
-      .init(term: "tracks"),
+      .init(storefront: .default, term: "tracks"),
       load: loader.dataLoader,
     )
 
@@ -702,6 +704,7 @@ final class AppleMusicClientTests: XCTestCase {
 
   func testDefaultTestClientResolvesKnownTrack() async throws {
     let resolution = try await AppleMusicClient.testValue.resolveTrack(.init(
+      storefront: .default,
       trackId: "1511628002",
       preferredAlbumId: "1511628001",
     ))
@@ -728,7 +731,7 @@ final class AppleMusicClientTests: XCTestCase {
     from data: Data,
   ) async throws -> AppleMusicCatalogSearchResults {
     try await searchAppleMusicCatalog(
-      .init(term: "test"),
+      .init(storefront: .default, term: "test"),
       load: { url in
         switch url.path {
         case "/v1/catalog/us/search":

@@ -6,7 +6,7 @@ import XExpect
 
 final class AppleMusicResolutionTests: XCTestCase {
   func testArtistResolutionURLUsesUSAndAllViews() throws {
-    let url = try appleMusicCatalogArtistResolutionURL("artist-1")
+    let url = try appleMusicCatalogArtistResolutionURL("artist-1", storefront: .default)
     let components = try XCTUnwrap(URLComponents(url: url, resolvingAgainstBaseURL: false))
 
     expect(components.path).toEqual("/v1/catalog/us/artists/artist-1")
@@ -18,6 +18,7 @@ final class AppleMusicResolutionTests: XCTestCase {
   func testResolutionURLsRequestRequiredRelationships() throws {
     let directAlbumURL = try appleMusicCatalogAlbumResolutionURL(
       ["album-1"],
+      storefront: .default,
       requiringArtistRelationship: false,
     )
     let directAlbumComponents = try XCTUnwrap(
@@ -29,6 +30,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     let artistAlbumURL = try appleMusicCatalogAlbumResolutionURL(
       ["album-1"],
+      storefront: .default,
       requiringArtistRelationship: true,
     )
     let artistAlbumComponents = try XCTUnwrap(
@@ -38,7 +40,7 @@ final class AppleMusicResolutionTests: XCTestCase {
       .toEqual("artists,tracks")
     expect(artistAlbumComponents.queryItems?.map(\.name)).toEqual(["ids", "include"])
 
-    let songsURL = try appleMusicCatalogSongsURL(["song-1"])
+    let songsURL = try appleMusicCatalogSongsURL(["song-1"], storefront: .default)
     let songComponents = try XCTUnwrap(
       URLComponents(url: songsURL, resolvingAgainstBaseURL: false),
     )
@@ -78,6 +80,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     let album = try await resolveAppleMusicCatalogAlbum(
       "album-1",
+      storefront: .default,
       load: loader.dataLoader,
     )
 
@@ -169,7 +172,7 @@ final class AppleMusicResolutionTests: XCTestCase {
     }
 
     let resolution = try await resolveAppleMusicCatalogTrack(
-      .init(trackId: "song-2", preferredAlbumId: "album-1"),
+      .init(storefront: .default, trackId: "song-2", preferredAlbumId: "album-1"),
       load: loader.dataLoader,
     )
 
@@ -230,7 +233,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     do {
       _ = try await resolveAppleMusicCatalogTrack(
-        .init(trackId: "song-1", preferredAlbumId: "album-1"),
+        .init(storefront: .default, trackId: "song-1", preferredAlbumId: "album-1"),
         load: loader.dataLoader,
       )
       XCTFail("expected preferred album mismatch")
@@ -272,7 +275,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     do {
       _ = try await resolveAppleMusicCatalogTrack(
-        .init(trackId: "song-1", preferredAlbumId: "album-1"),
+        .init(storefront: .default, trackId: "song-1", preferredAlbumId: "album-1"),
         load: loader.dataLoader,
       )
       XCTFail("expected preferred album to contain track")
@@ -299,6 +302,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     let album = try await resolveAppleMusicCatalogAlbum(
       "album-1",
+      storefront: .default,
       load: loader.dataLoader,
     )
 
@@ -424,6 +428,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     let artist = try await resolveAppleMusicCatalogArtist(
       "artist-1",
+      storefront: .default,
       load: loader.dataLoader,
     )
 
@@ -476,6 +481,7 @@ final class AppleMusicResolutionTests: XCTestCase {
 
     let artist = try await resolveAppleMusicCatalogArtist(
       "artist-1",
+      storefront: .default,
       load: loader.dataLoader,
     )
 
@@ -495,6 +501,7 @@ final class AppleMusicResolutionTests: XCTestCase {
     do {
       _ = try await resolveAppleMusicCatalogAlbum(
         "missing",
+        storefront: .default,
         load: missingLoader.dataLoader,
       )
       XCTFail("expected missing album error")
@@ -533,6 +540,7 @@ final class AppleMusicResolutionTests: XCTestCase {
     do {
       _ = try await resolveAppleMusicCatalogArtist(
         "artist-1",
+        storefront: .default,
         load: partialLoader.dataLoader,
       )
       XCTFail("expected pagination error")

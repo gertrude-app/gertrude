@@ -226,8 +226,10 @@ extension ApiTestCase {
     )
   }
 
-  func musicChild() async throws -> ChildEntities {
-    let child = try await self.child()
+  func musicChild(
+    with childConfig: (inout Child) -> Void = { _ in },
+  ) async throws -> ChildEntities {
+    let child = try await self.child(with: childConfig)
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let (_, install) = try await self.claimedMusicInstall(for: child)
     _ = try await self.db.create(MusicApp.Token(installId: install.id))

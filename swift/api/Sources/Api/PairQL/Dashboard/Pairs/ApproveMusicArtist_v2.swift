@@ -19,9 +19,10 @@ struct ApproveMusicArtist_v2: Pair {
 extension ApproveMusicArtist_v2: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let child = try await context.verifiedChildWithConnectedMusicApp(from: input.childId)
-    let resolution = try await get(dependency: \.appleMusic).resolveArtist(
-      input.appleMusicArtistId,
-    )
+    let resolution = try await get(dependency: \.appleMusic).resolveArtist(.init(
+      storefront: child.appleMusicStorefront,
+      artistId: input.appleMusicArtistId,
+    ))
     let now = get(dependency: \.date.now)
     return try await context.db.withTransaction { db in
       try await Music.LibrarySnapshotRepository.lock(childId: child.id, in: db)

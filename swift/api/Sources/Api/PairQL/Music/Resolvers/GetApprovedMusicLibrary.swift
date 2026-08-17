@@ -31,7 +31,7 @@ extension GetApprovedMusicLibrary: NoInputResolver {
     }
 
     let albums = try await ctx.child.approvedMusicAlbums(in: ctx.db)
-    let tracksByAlbum = try await self.tracksByAlbum(for: albums)
+    let tracksByAlbum = try await self.tracksByAlbum(for: albums, ctx.child.appleMusicStorefront)
     let outputAlbums = albums.map { album in
       let tracks = tracksByAlbum[album.appleMusicAlbumId.rawValue] ?? []
       return Output.Album(
@@ -56,12 +56,14 @@ extension GetApprovedMusicLibrary: NoInputResolver {
 
   private static func tracksByAlbum(
     for albums: [Music.ApprovedAlbum],
+    _ storefront: Music.Storefront,
   ) async throws -> [String: [AppleMusicCatalogTrack]] {
     let appleMusic = get(dependency: \.appleMusic)
     var tracksByAlbum: [String: [AppleMusicCatalogTrack]] = [:]
     for album in albums {
       do {
         tracksByAlbum[album.appleMusicAlbumId.rawValue] = try await appleMusic.albumTracks(.init(
+          storefront: storefront,
           albumId: album.appleMusicAlbumId,
         ))
       } catch {
