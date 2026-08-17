@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import XCore
 import XCTest
 import XCTVapor
 import XExpect
@@ -709,6 +710,343 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
       let retrieved = try await parent.model.subscription(in: self.db)!
       expect(retrieved.tier).toEqual(.light)
     })
+  }
+
+  func testChargeSucceededStoresCardFingerprint() async throws {
+    let customerId = "cus_".random
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init(customerId),
+    ))
+
+    let json = """
+      {
+        "type": "charge.succeeded",
+        "data": {
+          "object": {
+            "customer": "\(customerId)",
+            "payment_method_details": { "card": { "fingerprint": "fPrInT123" } }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await parent.model.billingIdentity(in: self.db)
+      expect(retrieved?.cardFingerprint).toEqual("fPrInT123")
+    })
+  }
+
+  func testPaymentMethodAttachedStoresCardFingerprint() async throws {
+    let customerId = "cus_".random
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init(customerId),
+    ))
+
+    let json = """
+      {
+        "type": "payment_method.attached",
+        "data": {
+          "object": {
+            "customer": "\(customerId)",
+            "card": { "fingerprint": "aTtAcHeD99" }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let retrieved = try await parent.model.billingIdentity(in: self.db)
+      expect(retrieved?.cardFingerprint).toEqual("aTtAcHeD99")
+    })
+  }
+
+  func testCardFingerprintUnknownCustomerIsIgnored() async throws {
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      stripeCustomerId: .init("cus_".random),
+    ))
+
+    let json = """
+      {
+        "type": "charge.succeeded",
+        "data": {
+          "object": {
+            "customer": "cus_neverSeenBefore",
+            "payment_method_details": { "card": { "fingerprint": "orphan777" } }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent) // must not 500 on an unmatched customer
+      let retrieved = try await parent.model.billingIdentity(in: self.db)
+      expect(retrieved?.cardFingerprint).toBeNil()
+    })
+  }
+
+  func testSharedCardFingerprintAcrossParentsIsCorrelatable() async throws {
+    let customerOne = "cus_".random
+    let customerTwo = "cus_".random
+    let parentOne = try await self.parent()
+    let parentTwo = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parentOne.id,
+      stripeCustomerId: .init(customerOne),
+    ))
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parentTwo.id,
+      stripeCustomerId: .init(customerTwo),
+    ))
+
+    for customerId in [customerOne, customerTwo] {
+      let json = """
+        {
+          "type": "charge.succeeded",
+          "data": {
+            "object": {
+              "customer": "\(customerId)",
+              "payment_method_details": { "card": { "fingerprint": "sHaReDcArD" } }
+            }
+          }
+        }
+      """
+      try await app.test(.POST, "stripe-events", body: .init(string: json))
+    }
+
+    let matches = try await BillingIdentity.query()
+      .where(.cardFingerprint == "sHaReDcArD")
+      .all(in: self.db)
+    expect(matches.count).toEqual(2) // the whole point: one card, two accounts
+  }
+
+  func testCompedParentInvoicePaidSkipsIdentityWrites() async throws {
+    let subscriptionId = "subId_".random
+    let customerId = "cus_".random
+    let eventId = "evt_\("".random)"
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: parent.id,
+      isComplimentary: true, // `complimentary_has_no_stripe_state` forbids stripe state here
+    ))
+
+    let json = """
+      {
+        "id": "\(eventId)",
+        "type": "invoice.paid",
+        "data": {
+          "object": {
+            "amount_due": 1000,
+            "customer": "\(customerId)",
+            "customer_email": "\(parent.email)",
+            "subscription": "\(subscriptionId)",
+            "lines": {
+              "data": [
+                { "price": { "id": "\(self.env.stripe.priceIdFull)" } }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent) // used to 500 on the CHECK violation
+      let identity = try await parent.model.billingIdentity(in: self.db)!
+      expect(identity.isComplimentary).toBeTrue()
+      expect(identity.stripeCustomerId).toBeNil()
+      expect(identity.lastStripeSubscriptionId).toBeNil()
+      expect(identity.lastPaidTier).toBeNil()
+      let subscription = try await parent.model.subscription(in: self.db)
+      expect(subscription?.stripeId.rawValue).toEqual(subscriptionId) // sub writes still land
+    })
+
+    let storedEvents = try await StripeEvent.query()
+      .where(.stripeEventId == .string(eventId))
+      .all(in: self.db)
+    expect(storedEvents.count).toEqual(1) // the rollback used to erase its own evidence
+  }
+
+  func testCompedParentSubscriptionUpdatedSkipsIdentityWrites() async throws {
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let newPeriodEnd = 1_704_050_627
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id, isComplimentary: true))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: subscriptionId,
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
+
+    let json = """
+      {
+        "id": "evt_\("".random)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": {
+            "id": "\(subscriptionId.rawValue)",
+            "customer": "\("cus_".random)",
+            "status": "active",
+            "current_period_end": \(newPeriodEnd),
+            "items": {
+              "data": [
+                { "price": { "id": "\(self.env.stripe.priceIdFull)" } }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let identity = try await parent.model.billingIdentity(in: self.db)!
+      expect(identity.stripeCustomerId).toBeNil()
+      expect(identity.lastStripeSubscriptionId).toBeNil()
+      expect(identity.lastPaidTier).toBeNil()
+      let subscription = try await parent.model.subscription(in: self.db)!
+      expect(subscription.currentPeriodEnd) // status/period writes still land
+        .toEqual(Date(timeIntervalSince1970: TimeInterval(newPeriodEnd)))
+    })
+  }
+
+  func testStampsHandledAtOnSuccess() async throws {
+    let eventId = "evt_\("".random)"
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
+
+    let json = invoicePaidJson(
+      eventId: eventId,
+      email: parent.email.rawValue,
+      subscriptionId: "subId_".random,
+      priceId: self.env.stripe.priceIdFull,
+    )
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      let stored = try await StripeEvent.query()
+        .where(.stripeEventId == .string(eventId))
+        .first(in: self.db)
+      expect(stored.handledAt).not.toBeNil()
+    })
+  }
+
+  func testHandlerThrowLeavesEventUnhandledForDeadLetterQueue() async throws {
+    let eventId = "evt_\("".random)"
+    let takenCustomerId = "cus_".random
+    let otherParent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(
+      parentId: otherParent.id,
+      stripeCustomerId: .init(takenCustomerId), // unique index makes the 2nd claim throw
+    ))
+
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
+    _ = try await self.db.create(StripeSubscription(
+      parentId: parent.id,
+      tier: .full,
+      stripeId: subscriptionId,
+      stripeStatus: .active,
+      currentPeriodEnd: .reference + .days(30),
+    ))
+
+    let json = """
+      {
+        "id": "\(eventId)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": {
+            "id": "\(subscriptionId.rawValue)",
+            "customer": "\(takenCustomerId)",
+            "status": "active",
+            "current_period_end": 1704050627,
+            "items": {
+              "data": [
+                { "price": { "id": "\(self.env.stripe.priceIdFull)" } }
+              ]
+            }
+          }
+        }
+      }
+    """
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.internalServerError) // so stripe retries
+      let subscription = try await parent.model.subscription(in: self.db)!
+      expect(subscription.currentPeriodEnd).toEqual(.reference + .days(30)) // rolled back
+    })
+
+    let stored = try await StripeEvent.query()
+      .where(.stripeEventId == .string(eventId))
+      .all(in: self.db)
+    expect(stored.count).toEqual(1) // survived the throw, unlike the old shared transaction
+    expect(stored.first?.handledAt).toBeNil() // `where handled_at is null` finds it
+  }
+
+  func testRedeliveryOfUnhandledEventRunsHandler() async throws {
+    let eventId = "evt_\("".random)"
+    let subscriptionId = "subId_".random
+    let parent = try await self.parent()
+    _ = try await self.db.create(BillingIdentity(parentId: parent.id))
+
+    let json = invoicePaidJson(
+      eventId: eventId,
+      email: parent.email.rawValue,
+      subscriptionId: subscriptionId,
+      priceId: self.env.stripe.priceIdFull,
+    )
+    _ = try await self.db.create(StripeEvent(json: json, stripeEventId: eventId))
+
+    try await app.test(.POST, "stripe-events", body: .init(string: json), afterResponse: { res in
+      expect(res.status).toEqual(.noContent)
+      // naive split would 204 here on the row alone and never process it again
+      let retrieved = try await parent.model.subscription(in: self.db)
+      expect(retrieved?.stripeId.rawValue).toEqual(subscriptionId)
+    })
+
+    let stored = try await StripeEvent.query()
+      .where(.stripeEventId == .string(eventId))
+      .all(in: self.db)
+    expect(stored.count).toEqual(1)
+    expect(stored.first?.handledAt).not.toBeNil()
+  }
+
+  func testDecodesPreviousAttributesStatus() throws {
+    let activation = """
+      {
+        "id": "evt_\("".random)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": { "id": "sub_x", "status": "active" },
+          "previous_attributes": { "status": "incomplete" }
+        }
+      }
+    """
+    // suppresses `61f0e37c`: `invoice.paid` owns row creation, and loses the race
+    expect(try JSON.decode(activation, as: EventInfo.self).data?.previous_attributes?.status)
+      .toEqual("incomplete")
+
+    let periodRoll = """
+      {
+        "id": "evt_\("".random)",
+        "type": "customer.subscription.updated",
+        "data": {
+          "object": { "id": "sub_x", "status": "active" }
+        }
+      }
+    """
+    expect(try JSON.decode(periodRoll, as: EventInfo.self).data?.previous_attributes?.status)
+      .toBeNil()
   }
 }
 

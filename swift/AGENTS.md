@@ -296,6 +296,10 @@ just macapp-test                    # macOS app package tests
 just iosapp-test                    # iOS library package tests
 ```
 
+`--filter` takes a single substring. `just` doesn't preserve quotes, so a regex like
+`--filter "FooTests|BarTests"` reaches the shell as a pipe and dies with exit 127 — run
+one filter at a time instead.
+
 When writing swift unit test helpers, check if existing helpers already exist, or should
 be generalized and moved to a shared location before creating duplicates.
 
