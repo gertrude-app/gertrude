@@ -105,6 +105,7 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
 
     let grandfathered = try await device(createdAt: beforeIntroduced)
     let grandfatheredNoSpotify = try await device(createdAt: beforeIntroduced)
+    let grandfatheredNoAppleMusic = try await device(createdAt: beforeIntroduced)
     let grandfatheredNoMusicArtwork = try await device(createdAt: beforeIntroduced)
     let new = try await device(createdAt: afterIntroduced)
     let newOptedOut = try await device(createdAt: afterIntroduced)
@@ -154,12 +155,14 @@ final class BlockRulesResolverTests: ApiTestCase, @unchecked Sendable {
     let gif = BlockRule.urlContains(value: "gif")
 
     // pre-existing installs never saw the amazon group during onboarding, so we
-    // backport it unless they opted out of both other music artwork groups
+    // backport it to anyone still receiving any album artwork rules at all
     await expect(try rules(grandfathered))
       .toEqual([amazon, spotify, appleMusic, gif])
     await expect(try rules(grandfatheredNoSpotify, disabled: [ids.spotifyImages]))
       .toEqual([amazon, appleMusic, gif])
-    await expect(try rules(
+    await expect(try rules(grandfatheredNoAppleMusic, disabled: [ids.appleMusicImages]))
+      .toEqual([amazon, spotify, gif])
+    await expect(try rules( // only opting out of every artwork group reads as uninterested
       grandfatheredNoMusicArtwork,
       disabled: [ids.spotifyImages, ids.appleMusicImages],
     )).toEqual([gif])
