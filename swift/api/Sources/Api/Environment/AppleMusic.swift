@@ -13,28 +13,42 @@ struct AppleMusicClient: Sendable {
   var albumTracks:
     @Sendable (_ lookup: AppleMusicAlbumTracksLookup) async throws -> [AppleMusicCatalogTrack]
   var resolveAlbum:
-    @Sendable (_ albumId: Music.AlbumId) async throws -> Music.ResolvedAlbum
+    @Sendable (_ lookup: AppleMusicAlbumResolutionLookup) async throws -> Music.ResolvedAlbum
   var resolveTrack:
     @Sendable (_ lookup: AppleMusicTrackResolutionLookup) async throws -> AppleMusicTrackResolution
   var resolveArtist:
-    @Sendable (_ artistId: Music.ArtistId) async throws -> Music.ResolvedArtist
+    @Sendable (_ lookup: AppleMusicArtistResolutionLookup) async throws -> Music.ResolvedArtist
 }
 
 struct AppleMusicCatalogSearch: Equatable, Sendable {
+  var storefront: Music.Storefront
   var term: String
   var limit: Int
 
-  init(term: String, limit: Int = 10) {
+  init(storefront: Music.Storefront, term: String, limit: Int = 10) {
+    self.storefront = storefront
     self.term = term
     self.limit = limit
   }
 }
 
 struct AppleMusicAlbumTracksLookup: Equatable, Sendable {
+  var storefront: Music.Storefront
   var albumId: Music.AlbumId
 }
 
+struct AppleMusicAlbumResolutionLookup: Equatable, Sendable {
+  var storefront: Music.Storefront
+  var albumId: Music.AlbumId
+}
+
+struct AppleMusicArtistResolutionLookup: Equatable, Sendable {
+  var storefront: Music.Storefront
+  var artistId: Music.ArtistId
+}
+
 struct AppleMusicTrackResolutionLookup: Equatable, Sendable {
+  var storefront: Music.Storefront
   var trackId: Music.TrackId
   var preferredAlbumId: Music.AlbumId
 }
@@ -186,10 +200,11 @@ extension AppleMusicClient: DependencyKey {
         let token = try await generateAppleMusicDeveloperToken()
         return try await fetchAppleMusicCatalogAlbumTracks(lookup, developerToken: token)
       },
-      resolveAlbum: { albumId in
+      resolveAlbum: { lookup in
         let token = try await generateAppleMusicDeveloperToken()
         return try await resolveAppleMusicCatalogAlbum(
-          albumId,
+          lookup.albumId,
+          storefront: lookup.storefront,
           load: appleMusicDataLoader(developerToken: token),
         )
       },
@@ -200,10 +215,11 @@ extension AppleMusicClient: DependencyKey {
           load: appleMusicDataLoader(developerToken: token),
         )
       },
-      resolveArtist: { artistId in
+      resolveArtist: { lookup in
         let token = try await generateAppleMusicDeveloperToken()
         return try await resolveAppleMusicCatalogArtist(
-          artistId,
+          lookup.artistId,
+          storefront: lookup.storefront,
           load: appleMusicDataLoader(developerToken: token),
         )
       },
@@ -218,9 +234,9 @@ extension AppleMusicClient: TestDependencyKey {
       placeholder: .init(items: []),
     ),
     albumTracks: unimplemented("AppleMusicClient.albumTracks()", placeholder: []),
-    resolveAlbum: { try Self.testResolvedAlbum($0) },
+    resolveAlbum: { try Self.testResolvedAlbum($0.albumId) },
     resolveTrack: { try Self.testResolvedTrack($0) },
-    resolveArtist: { try Self.testResolvedArtist($0) },
+    resolveArtist: { try Self.testResolvedArtist($0.artistId) },
   )
 }
 
@@ -276,8 +292,19 @@ func searchAppleMusicCatalog(
   )
 }
 
+func appleMusicCatalogPath(
+  _ storefront: Music.Storefront,
+  _ suffix: String,
+) throws -> String {
+  guard storefront.isValid else {
+    throw AppleMusicError.invalidStorefront(storefront.rawValue)
+  }
+  return "/v1/catalog/\(storefront.rawValue)\(suffix)"
+}
+
 func appleMusicCatalogMixedSearchURL(_ search: AppleMusicCatalogSearch) throws -> URL {
   try appleMusicCatalogSearchURL(
+    storefront: search.storefront,
     term: search.term,
     limit: search.limit,
     types: ["songs", "albums", "artists"],
@@ -286,6 +313,7 @@ func appleMusicCatalogMixedSearchURL(_ search: AppleMusicCatalogSearch) throws -
 }
 
 private func appleMusicCatalogSearchURL(
+  storefront: Music.Storefront,
   term: String,
   limit: Int,
   types: [String],
@@ -294,7 +322,7 @@ private func appleMusicCatalogSearchURL(
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/us/search"
+  components.path = try appleMusicCatalogPath(storefront, "/search")
   components.queryItems = [
     .init(name: "term", value: term),
     .init(name: "types", value: types.joined(separator: ",")),
@@ -361,7 +389,10 @@ func appleMusicCatalogAlbumURL(_ lookup: AppleMusicAlbumTracksLookup) throws -> 
   var components = URLComponents()
   components.scheme = "https"
   components.host = "api.music.apple.com"
-  components.path = "/v1/catalog/us/albums/\(lookup.albumId.rawValue)"
+  components.path = try appleMusicCatalogPath(
+    lookup.storefront,
+    "/albums/\(lookup.albumId.rawValue)",
+  )
   components.queryItems = [
     .init(name: "include", value: "tracks"),
   ]
@@ -380,6 +411,7 @@ func searchAppleMusicCatalog(
   let response = try JSONDecoder().decode(AppleMusicCatalogSearchResponse.self, from: data)
   let hydratedSongs = try await hydratedAppleMusicCatalogSongsForSearch(
     catalogSearchSongIds(from: response),
+    storefront: search.storefront,
     load: load,
   )
   return catalogSearchResults(
@@ -760,6 +792,7 @@ private struct AppleMusicCatalogAlbumResponse: Decodable {
 
 enum AppleMusicError: Error, CustomStringConvertible {
   case missingEnv(String)
+  case invalidStorefront(String)
   case invalidSearchUrl
   case invalidCatalogPaginationUrl
   case invalidAlbumUrl
@@ -770,6 +803,8 @@ enum AppleMusicError: Error, CustomStringConvertible {
     switch self {
     case .missingEnv(let key):
       "Missing required environment variable: `\(key)`"
+    case .invalidStorefront(let storefront):
+      "Invalid Apple Music storefront: `\(storefront)`"
     case .invalidSearchUrl:
       "Invalid Apple Music search URL"
     case .invalidCatalogPaginationUrl:

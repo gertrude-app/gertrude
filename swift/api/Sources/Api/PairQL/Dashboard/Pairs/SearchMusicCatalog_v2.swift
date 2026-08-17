@@ -111,6 +111,7 @@ extension SearchMusicCatalog_v2: Resolver {
     let query = input.query.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !query.isEmpty else { return .init(revision: revision, items: []) }
     let results = try await get(dependency: \.appleMusic).searchCatalog(.init(
+      storefront: child.appleMusicStorefront,
       term: query,
       limit: min(max(input.limit ?? 10, 1), 25),
     ))

@@ -18,9 +18,10 @@ struct SaveMusicAlbumCuration: Pair {
 extension SaveMusicAlbumCuration: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let child = try await context.verifiedChildWithConnectedMusicApp(from: input.childId)
-    let album = try await get(dependency: \.appleMusic).resolveAlbum(
-      input.appleMusicAlbumId,
-    )
+    let album = try await get(dependency: \.appleMusic).resolveAlbum(.init(
+      storefront: child.appleMusicStorefront,
+      albumId: input.appleMusicAlbumId,
+    ))
     let now = get(dependency: \.date.now)
     return try await context.db.withTransaction { db in
       try await Music.LibrarySnapshotRepository.lock(childId: child.id, in: db)

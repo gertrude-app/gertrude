@@ -55,61 +55,89 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
         .all(in: self.db)
         .filter { filter?.contains($0.childId) ?? true }
 
-      let albumIds = Set(albums.map(\.appleMusicAlbumId) + tracks.map(\.preferredAlbumId))
-      var albumResolutions: [Music.AlbumId: Music.ResolvedAlbum] = [:]
-      var failedAlbumIds = Set<Music.AlbumId>()
-      for albumId in albumIds.sorted(by: { $0.rawValue < $1.rawValue }) {
-        do {
-          let resolution = try await self.appleMusic.resolveAlbum(albumId)
-          guard resolution.id == albumId else {
-            throw Music.LibrarySnapshotCompiler.CompilerError.albumResolutionIdMismatch(
-              expected: albumId,
-              actual: resolution.id,
-            )
-          }
-          albumResolutions[albumId] = resolution
-        } catch {
-          failedAlbumIds.insert(albumId)
-          self.logger.error(
-            "Apple Music refresh failed for album `\(albumId.rawValue)`: \(error)",
-          )
-        }
-      }
-
-      let artistIds = Set(artists.map(\.appleMusicArtistId))
-      var artistResolutions: [Music.ArtistId: Music.ResolvedArtist] = [:]
-      var failedArtistIds = Set<Music.ArtistId>()
-      for artistId in artistIds.sorted(by: { $0.rawValue < $1.rawValue }) {
-        do {
-          let resolution = try await self.appleMusic.resolveArtist(artistId)
-          guard resolution.id == artistId else {
-            throw Music.LibrarySnapshotCompiler.CompilerError.artistResolutionIdMismatch(
-              expected: artistId,
-              actual: resolution.id,
-            )
-          }
-          artistResolutions[artistId] = resolution
-        } catch {
-          failedArtistIds.insert(artistId)
-          self.logger.error(
-            "Apple Music refresh failed for artist `\(artistId.rawValue)`: \(error)",
-          )
-        }
-      }
-
       let affectedChildIds = Set(
         albums.map(\.childId) + artists.map(\.childId) + tracks.map(\.childId),
       )
+      let storefronts = try await Child.query()
+        .where(.id |=| Array(affectedChildIds))
+        .all(in: self.db)
+        .reduce(into: [Child.Id: Music.Storefront]()) { $0[$1.id] = $1.appleMusicStorefront }
+
+      var albumIdsByStorefront: [Music.Storefront: Set<Music.AlbumId>] = [:]
+      for album in albums {
+        let storefront = storefronts[album.childId] ?? .default
+        albumIdsByStorefront[storefront, default: []].insert(album.appleMusicAlbumId)
+      }
+      for track in tracks {
+        let storefront = storefronts[track.childId] ?? .default
+        albumIdsByStorefront[storefront, default: []].insert(track.preferredAlbumId)
+      }
+      var albumResolutions: [Music.Storefront: [Music.AlbumId: Music.ResolvedAlbum]] = [:]
+      var failedAlbumIds: [Music.Storefront: Set<Music.AlbumId>] = [:]
+      for (storefront, albumIds) in albumIdsByStorefront.sorted(by: Self.storefrontOrder) {
+        for albumId in albumIds.sorted(by: { $0.rawValue < $1.rawValue }) {
+          do {
+            let resolution = try await self.appleMusic.resolveAlbum(.init(
+              storefront: storefront,
+              albumId: albumId,
+            ))
+            guard resolution.id == albumId else {
+              throw Music.LibrarySnapshotCompiler.CompilerError.albumResolutionIdMismatch(
+                expected: albumId,
+                actual: resolution.id,
+              )
+            }
+            albumResolutions[storefront, default: [:]][albumId] = resolution
+          } catch {
+            failedAlbumIds[storefront, default: []].insert(albumId)
+            self.logger.error(
+              "Apple Music refresh failed for album `\(albumId.rawValue)` in storefront `\(storefront.rawValue)`: \(error)",
+            )
+          }
+        }
+      }
+
+      var artistIdsByStorefront: [Music.Storefront: Set<Music.ArtistId>] = [:]
+      for artist in artists {
+        let storefront = storefronts[artist.childId] ?? .default
+        artistIdsByStorefront[storefront, default: []].insert(artist.appleMusicArtistId)
+      }
+      var artistResolutions: [Music.Storefront: [Music.ArtistId: Music.ResolvedArtist]] = [:]
+      var failedArtistIds: [Music.Storefront: Set<Music.ArtistId>] = [:]
+      for (storefront, artistIds) in artistIdsByStorefront.sorted(by: Self.storefrontOrder) {
+        for artistId in artistIds.sorted(by: { $0.rawValue < $1.rawValue }) {
+          do {
+            let resolution = try await self.appleMusic.resolveArtist(.init(
+              storefront: storefront,
+              artistId: artistId,
+            ))
+            guard resolution.id == artistId else {
+              throw Music.LibrarySnapshotCompiler.CompilerError.artistResolutionIdMismatch(
+                expected: artistId,
+                actual: resolution.id,
+              )
+            }
+            artistResolutions[storefront, default: [:]][artistId] = resolution
+          } catch {
+            failedArtistIds[storefront, default: []].insert(artistId)
+            self.logger.error(
+              "Apple Music refresh failed for artist `\(artistId.rawValue)` in storefront `\(storefront.rawValue)`: \(error)",
+            )
+          }
+        }
+      }
+
       for childId in affectedChildIds.sorted(by: {
         $0.rawValue.uuidString < $1.rawValue.uuidString
       }) {
         do {
+          let storefront = storefronts[childId] ?? .default
           let delta = try await self.refreshChild(
             childId,
-            albumResolutions: albumResolutions,
-            failedAlbumIds: failedAlbumIds,
-            artistResolutions: artistResolutions,
-            failedArtistIds: failedArtistIds,
+            albumResolutions: albumResolutions[storefront] ?? [:],
+            failedAlbumIds: failedAlbumIds[storefront] ?? [],
+            artistResolutions: artistResolutions[storefront] ?? [:],
+            failedArtistIds: failedArtistIds[storefront] ?? [],
           )
           summary.merge(delta)
         } catch {
@@ -266,6 +294,13 @@ struct MusicCatalogRefreshJob: AsyncScheduledJob {
       }
       return summary
     }
+  }
+
+  private static func storefrontOrder<Value>(
+    _ lhs: (key: Music.Storefront, value: Value),
+    _ rhs: (key: Music.Storefront, value: Value),
+  ) -> Bool {
+    lhs.key.rawValue < rhs.key.rawValue
   }
 
   private func albumMatches(

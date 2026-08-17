@@ -13,6 +13,7 @@ struct Child: Codable, Sendable {
   var screenshotsFrequency: Int
   var showSuspensionActivity: Bool
   var filteringDisabled: Bool
+  var appleMusicStorefront: Music.Storefront
   var downtime: PlainTimeWindow?
   var createdAt = Date()
   var updatedAt = Date()
@@ -28,6 +29,7 @@ struct Child: Codable, Sendable {
     screenshotsFrequency: Int = 180,
     showSuspensionActivity: Bool = true,
     filteringDisabled: Bool = false,
+    appleMusicStorefront: Music.Storefront = .default,
     downtime: PlainTimeWindow? = nil,
   ) {
     self.id = id
@@ -40,6 +42,7 @@ struct Child: Codable, Sendable {
     self.screenshotsFrequency = screenshotsFrequency
     self.showSuspensionActivity = showSuspensionActivity
     self.filteringDisabled = filteringDisabled
+    self.appleMusicStorefront = appleMusicStorefront
     self.downtime = downtime
   }
 }

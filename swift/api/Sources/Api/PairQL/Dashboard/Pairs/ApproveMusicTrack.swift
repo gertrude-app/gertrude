@@ -18,6 +18,7 @@ extension ApproveMusicTrack: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let child = try await context.verifiedChildWithConnectedMusicApp(from: input.childId)
     let resolution = try await get(dependency: \.appleMusic).resolveTrack(.init(
+      storefront: child.appleMusicStorefront,
       trackId: input.appleMusicTrackId,
       preferredAlbumId: input.preferredAlbumId,
     ))

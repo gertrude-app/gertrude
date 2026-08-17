@@ -123,6 +123,7 @@ extension Configure {
     app.migrations.add(WidenRouteTelemetryErrorId())
     app.migrations.add(AddCardFingerprint())
     app.migrations.add(AddStripeEventHandledAt())
+    app.migrations.add(AddChildMusicStorefront())
   }
 }
 

@@ -375,8 +375,8 @@ final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
     let summary = await withDependencies {
       $0.db = self.db
       $0.date.now = .reference + 100
-      $0.appleMusic.resolveAlbum = { albumId in
-        switch albumId.rawValue {
+      $0.appleMusic.resolveAlbum = { lookup in
+        switch lookup.albumId.rawValue {
         case "album-1": expandedAlbum
         case "album-2": preferredAlbum
         default: throw RefreshError.unavailable
