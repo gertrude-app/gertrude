@@ -74,6 +74,7 @@ class CdnAssets implements ExhaustiveAssets {
       ...new OsCdnAssets(`ventura`).all(),
       ...new OsCdnAssets(`sonoma`).all(),
       ...new OsCdnAssets(`sequoia`).all(),
+      ...new OsCdnAssets(`tahoe`).all(),
       ...new OsCdnAssets(`goldenGate`).all(),
     ];
   }

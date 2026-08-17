@@ -327,8 +327,9 @@ const StartRemediation: React.FC<StartRemediationProps> = ({ action }) => {
       case `sequoia`:
         return `sq`;
       case `tahoe`:
-      case `goldenGate`:
         return `th`;
+      case `goldenGate`:
+        return `gg`;
     }
   })();
   let lead: string;

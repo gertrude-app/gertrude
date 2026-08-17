@@ -25,6 +25,7 @@ files-changed:
     macapp: ... # triggers macapp-lib job
     iosapp: ... # triggers iosapp-lib job
     podcasts: ... # triggers podcasts-lib job
+    music: ... # triggers music-lib job
     libs: ... # triggers linux-build-libs-* and linux-lib-test-* jobs
     api: ... # triggers linux-api-build and linux-api-test jobs
     swift: ... # triggers swift-lint and xml-lint jobs
@@ -122,8 +123,22 @@ Kept (restorable): `web/storybook/visual-tests/`, the `visual-test` / `build-sto
 justfile recipes, the `@argos-ci/puppeteer` dep, and the `storybook` `files-changed`
 output + filter. This is separate from the build-only `storybook_v2` job. To restore,
 re-add the job from git history and check the `ARGOS_TOKEN` secret + branch-protection
-required checks. **If not restored before long, delete the kept machinery and rip it all
-out.**
+required checks.
+
+**Decide at the Account cutover.** When `web/account` replaces the `web/dash` dashboard,
+make a real call rather than letting it sit — restore it, or delete the machinery. That's
+the right forcing function because most of what the legacy Storybook covers is about to
+become obsolete anyway. Deliberately not a date: there's no value in ripping it out on a
+timer while the thing it covers is still shipping.
+
+Two things to know before deleting, because "rip it all out" is not as clean as it sounds:
+
+- **The legacy Storybook isn't only dash.** Of its ~86 stories, ~60 are dash, but the rest
+  are not (`macos-app`, `site`, `shared`, `supervise`) and don't go away with the
+  dashboard. Deleting the package drops those too.
+- **`visual-tests/` holds non-Argos tooling wired to live recipes** — `export-og-images.ts`
+  (`web/justfile`) and `preview-email.mts` (`swift/justfile`). Both break if the directory
+  is deleted wholesale; they'd need rehoming first.
 
 ## Agent/LLM-Facing Content
 
@@ -163,9 +178,21 @@ Two drift-prone buckets inside this file:
 
 ### `AGENTS.md` files (repo root + per-app)
 
-Current set (as of this writing): `./AGENTS.md`, `./web/AGENTS.md`, `./swift/AGENTS.md`,
-`./web/supervise/AGENTS.md`, `./swift/podcasts/AGENTS.md`. These describe paths, ports,
-commands, and architecture to coding agents. Drifts when:
+Current set (as of this writing):
+
+- `./AGENTS.md`
+- `./swift/AGENTS.md`
+- `./swift/music/AGENTS.md`
+- `./swift/podcasts/AGENTS.md`
+- `./web/AGENTS.md`
+- `./web/account/AGENTS.md`
+- `./web/account/src/components/AGENTS.md`
+- `./web/supervise/AGENTS.md`
+
+Re-derive the list with `find . -name AGENTS.md -not -path "*/node_modules/*" | sort`
+rather than trusting the above — new ones get added without this doc being touched.
+
+These describe paths, ports, commands, and architecture to coding agents. Drifts when:
 
 - Apps are added/removed/renamed (e.g., a new `web/*` app or `swift/*` package).
 - Dev commands change (`just` recipes renamed, ports moved).
@@ -178,12 +205,32 @@ decisions read this first to find the right note to load. **Drifts whenever a ne
 added or an existing one materially changes scope — append (or update) the matching entry
 in the same change.**
 
-### `.agents/skills/database/SKILL.md` — DB schema orientation
+### `.agents/skills/*/SKILL.md` — agent skills
 
-The database skill carries a hand-authored, one-line-per-schema orientation map. Table
-detail is discovered live, so it can't drift — but the schema list and purpose
-descriptions can. Re-sync after any schema is added, removed, or renamed: run `\dn` and
-reconcile against the map.
+Every skill is hand-authored, and most of them orient an agent by naming concrete things
+in the repo. Those references are what rot. List the current set with
+`ls .agents/skills/` rather than working from a list here, and when reviewing one, look
+for the reference types that go stale silently:
+
+- **File and directory paths** — the most common, and they move when apps get
+  restructured.
+- **Line-number references** (e.g. "lines 41-60 of X") — accurate when written, wrong
+  after the next edit to that file, and wrong without looking wrong.
+- **External URLs** as a source of truth — a third-party site can restructure or
+  disappear without anything here changing.
+- **Command and recipe names** — `just` recipes get renamed.
+- **Filename or format contracts** — e.g. an exact asset-naming scheme the UI relies on.
+- **Hand-authored inventories** — any list purporting to enumerate something that lives
+  elsewhere in the repo.
+
+A skill is worth re-reading whenever the code it describes is restructured. Two that
+carry more hardcoded detail than the rest, and so are worth checking first:
+
+- **`database`** — a one-line-per-schema orientation map. Table detail is discovered
+  live, so it can't drift, but the schema list and the purpose descriptions can. Re-sync
+  after any schema is added, removed, or renamed: run `\dn` and reconcile against the map.
+- **`public-keychain`** — points at specific model/source files _and_ a line range in
+  another doc.
 
 ### `docs/support/*.md` — product overview docs
 
@@ -311,21 +358,46 @@ hostnames, and free-text request comments — re-evaluate if the trust model cha
 ## Annual: New macOS Release
 
 Apple's cadence: the next macOS version name is announced at WWDC in early June, then
-ships mid-to-late September. Updates happen in two waves:
+ships mid-to-late September.
 
-**Wave 1 — after WWDC announcement (as early as June).** Safe to add the name as soon as
-it's known:
+**Start here.** `swift/gertie/Sources/Gertie/MacOSName.swift` is the shared source of
+truth — add a `case` to the enum and a `switch` arm in `init(major:minor:)`, and point the
+`default:` arm at the new case. Everything else keys off this enum, directly or by
+mirroring its names.
 
-- `swift/gertie/Sources/Gertie/MacOSName.swift` — add a new `case` to the enum and a new
-  `switch` arm in `init(major:minor:)`. This is the shared source of truth consumed by the
-  macapp (`DeviceClient+Os.swift`) and the api (`ConnectUser.debugVMOsName`).
+**Then find the rest by grepping the previous release's name.** Any site that needs the
+new version necessarily already names the old one, so the previous codename is a reliable
+index of the work. Check both the camelCase enum spelling and the human display name:
 
-**Wave 2 — after public release (late September or later).** Deliberately deferred until
-the final release ships — don't record demo videos against buggy betas:
+```bash
+grep -rniE "goldenGate|golden.?gate" . \
+  --include="*.swift" --include="*.ts" --include="*.tsx" --include="*.js" \
+  --include="*.just" --include="justfile" --include="*.md" --include="*.yml" \
+  | grep -v node_modules
+```
 
-- `web/site/_redirects` — add a new `/cu-*` `/du-*` `/su-*` suffix and YouTube URL for the
-  user-management video, and bump the `# CREATE MACOS USER (current: X.Y.Z+)` marker
-  comment (see the `_redirects` section above).
-- `web/site/app/(marketing)/download-mac-app/page.tsx` — add a `SupportedOSCard` for the
-  new version and import the matching `macos-{name}.png` image from
-  `web/site/public/supported-os/`.
+Don't trust a list of paths written a year earlier — the set moves as apps come and go.
+Grep, then work through what you find. As of the macOS 27 pass, the hits clustered into
+these kinds of work, which is what to expect:
+
+- **Shared enum + its consumers** — the macapp and api read `MacOSName` directly.
+- **Onboarding assets and flow** — by far the largest bucket. Per-OS screenshots and
+  videos on the CDN, their hand-measured image coordinates, the step components that
+  branch on OS, and the macapp's onboarding webview.
+- **Internal display maps** — admin views that turn a major version number into a name.
+- **Dev tooling** — a VM recipe for the new OS so it can actually be tested against.
+- **Marketing site** — a supported-OS card plus its image asset.
+
+**Assets carry forward; they aren't re-made up front.** The working pattern for anything
+remote — onboarding images, GIFs, demo videos — is to duplicate the previous version's
+assets under the new version's name, then replace individual ones later, only where the
+new OS's UI actually changed enough to confuse someone following along. Most of it keeps
+working untouched across a release.
+
+That applies to the `/cu-*` `/du-*` `/su-*` user-management video redirects in
+`web/site/_redirects` too: give the new version its own suffix immediately, pointed at the
+previous version's YouTube URLs, and swap individual URLs if and when demos get re-recorded
+(then bump the `# CREATE MACOS USER (current: X.Y.Z+)` marker). The point is that the new
+version gets a complete, real slot from day one rather than falling through to the old
+version's — a fall-through in the OS-to-suffix mapping is a bug, not a placeholder, because
+it leaves nowhere to hang a new video later.
