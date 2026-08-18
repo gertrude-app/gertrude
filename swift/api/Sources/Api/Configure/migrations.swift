@@ -124,6 +124,7 @@ extension Configure {
     app.migrations.add(AddCardFingerprint())
     app.migrations.add(AddStripeEventHandledAt())
     app.migrations.add(AddChildMusicStorefront())
+    app.migrations.add(CreateSiteFormSubmissions())
   }
 }
 

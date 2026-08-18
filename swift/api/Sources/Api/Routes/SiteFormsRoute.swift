@@ -3,29 +3,36 @@ import Vapor
 import XCore
 
 private struct FormData: Codable {
-  enum Form: String, Codable {
-    case contact
-    case lockdownGuide
-    case fiveThings
-  }
-
   enum App: String, Codable {
     case mac
-    case ios
+    case blocker
     case podcasts
+    case music
     case unsure
+    case ios
+
+    var stored: SiteFormSubmission.App {
+      switch self {
+      case .mac: .mac
+      case .blocker, .ios: .blocker
+      case .podcasts: .podcasts
+      case .music: .music
+      case .unsure: .unsure
+      }
+    }
 
     var display: String {
       switch self {
       case .mac: "Gertrude Mac"
-      case .ios: "Gertrude Blocker (iOS)"
+      case .blocker, .ios: "Gertrude Blocker (iOS)"
       case .podcasts: "Gertrude Podcasts"
+      case .music: "Gertrude Music"
       case .unsure: "(not sure)"
       }
     }
   }
 
-  var form: Form
+  var form: SiteFormSubmission.Form
   var app: App?
   var name: String
   var email: String
@@ -53,6 +60,8 @@ enum SiteFormsRoute {
     let parent = try? await Parent.query()
       .where(.email == data.normalizedEmail)
       .first(in: req.context.db)
+
+    await data.persist(parent: parent, in: req.context.db)
 
     Task {
       await with(dependency: \.slack).internal(.contactForm, data.slackText(parent: parent))
@@ -123,6 +132,26 @@ private func spamChallenge(_ data: FormData) async throws {
 // extensions
 
 extension FormData {
+  func persist(parent: Parent?, in db: any DuetSQL.Client) async {
+    do {
+      try await db.create(SiteFormSubmission(
+        form: self.form,
+        app: self.app?.stored,
+        name: self.name,
+        email: self.email,
+        subject: self.subject,
+        message: self.message,
+        parentId: parent?.id,
+      ))
+    } catch {
+      await with(dependency: \.slack).error("""
+      *Error persisting site form submission*
+      Form: `\(self.form.rawValue)`, email: `\(self.normalizedEmail)`
+      Error: \(String(reflecting: error))
+      """)
+    }
+  }
+
   func emailBody(parent: Parent?) -> String {
     let fromLine: String
     if let parent {
@@ -159,7 +188,7 @@ extension FormData {
   }
 }
 
-extension FormData.Form {
+extension SiteFormSubmission.Form {
   var name: String {
     switch self {
     case .contact: "Contact Form"
