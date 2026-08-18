@@ -11,6 +11,9 @@ struct ApiClient: Sendable {
   var addToMusicPlaylist:
     @Sendable (_ token: UUID, _ input: AddToMusicPlaylist.Input) async throws
     -> AddToMusicPlaylist.Output
+  var addMusicToPlaylist:
+    @Sendable (_ token: UUID, _ input: AddMusicToPlaylist.Input) async throws
+    -> AddMusicToPlaylist.Output
   var createMusicPlaylist:
     @Sendable (_ token: UUID, _ input: CreateMusicPlaylist.Input) async throws
     -> CreateMusicPlaylist.Output
@@ -39,6 +42,13 @@ extension ApiClient: DependencyKey {
         try await pairql.call(
           AddToMusicPlaylist.self,
           authed: .addToMusicPlaylist(input),
+          token: token,
+        )
+      },
+      addMusicToPlaylist: { token, input in
+        try await pairql.call(
+          AddMusicToPlaylist.self,
+          authed: .addMusicToPlaylist(input),
           token: token,
         )
       },

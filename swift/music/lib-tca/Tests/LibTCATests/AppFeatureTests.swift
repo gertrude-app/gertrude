@@ -379,6 +379,68 @@ struct AppFeatureTests {
   }
 
   @Test
+  func invalidConnectionClearsConnectionBoundStateAndReturnsToSetup() async throws {
+    let connection = MusicAppConnection(
+      token: UUID(1),
+      childId: UUID(2),
+      childName: "Harriet",
+    )
+    let storedConnection = try LockIsolated<Data?>(JSONEncoder().encode(connection))
+    let deletedCacheChildIDs = LockIsolated<[UUID]>([])
+    let deletedKeychainKeys = LockIsolated<[KeychainClient.Key]>([])
+    let deletedPlaybackChildIDs = LockIsolated<[UUID]>([])
+    let stopCount = LockIsolated(0)
+    let item = playbackItem("track-1")
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(.mock)
+    state.pendingLibraryPlayNowOrigin = .init(kind: .album, id: "album-1")
+    state.playback.session = .init(currentItem: item)
+    state.search.applyLibraryStatus(.loaded(.mock))
+    state.selectedTab = .queue
+    state.setup.screen = .ready(childName: connection.childName)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    } withDependencies: {
+      $0.approvedMusicLibraryCache._delete = { childID in
+        deletedCacheChildIDs.withValue { $0.append(childID) }
+      }
+      $0.keychain._load = { key in
+        key == .connection ? storedConnection.value : nil
+      }
+      $0.keychain.delete = { key in
+        deletedKeychainKeys.withValue { $0.append(key) }
+        if key == .connection {
+          storedConnection.withValue { $0 = nil }
+        }
+      }
+      $0.playback.stop = {
+        stopCount.withValue { $0 += 1 }
+      }
+      $0.playbackSessionCache._deleteForChild = { childID in
+        deletedPlaybackChildIDs.withValue { $0.append(childID) }
+      }
+    }
+
+    await store.send(.library(.delegate(.connectionInvalid))) {
+      $0.isNowPlayingPresented = false
+      $0.library = .init()
+      $0.pendingLibraryPlayNowOrigin = nil
+      $0.playback = .init()
+      $0.search = .init()
+      $0.selectedTab = .library
+      $0.setup = .init()
+    }
+    await store.finish()
+
+    expectNoDifference(deletedCacheChildIDs.value, [connection.childId])
+    expectNoDifference(deletedKeychainKeys.value, [.connection])
+    expectNoDifference(deletedPlaybackChildIDs.value, [connection.childId])
+    #expect(stopCount.value == 1)
+    #expect(storedConnection.value == nil)
+  }
+
+  @Test
   func libraryPlayNowDelegateStartsRequestedSuffix() async {
     let items = [
       playbackItem("track-1"),

@@ -7,6 +7,7 @@ public enum AuthedRoute: PairRoute {
   case renameMusicPlaylist(RenameMusicPlaylist.Input)
   case deleteMusicPlaylist(DeleteMusicPlaylist.Input)
   case addToMusicPlaylist(AddToMusicPlaylist.Input)
+  case addMusicToPlaylist(AddMusicToPlaylist.Input)
   case removeMusicPlaylistEntry(RemoveMusicPlaylistEntry.Input)
   case reorderMusicPlaylistEntries(ReorderMusicPlaylistEntries.Input)
 }
@@ -35,6 +36,10 @@ public extension AuthedRoute {
     Route(.case(Self.addToMusicPlaylist)) {
       Operation(AddToMusicPlaylist.self)
       Body(.json(AddToMusicPlaylist.Input.self))
+    }
+    Route(.case(Self.addMusicToPlaylist)) {
+      Operation(AddMusicToPlaylist.self)
+      Body(.json(AddMusicToPlaylist.Input.self))
     }
     Route(.case(Self.removeMusicPlaylistEntry)) {
       Operation(RemoveMusicPlaylistEntry.self)

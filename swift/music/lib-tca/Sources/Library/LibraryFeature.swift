@@ -10,12 +10,15 @@ struct LibraryFeature: Sendable {
     var status = Status.loading
     var addToPlaylist: AddToPlaylistState?
     var collectionRecency = LibraryCollectionRecency()
+    var isLibraryRefreshFailurePresented = false
     var isRefreshingRemoteLibrary = false
     var hasStartedInitialLibraryLoad = false
     var isPlaylistMutationInFlight = false
     var playlistMutationFailure: PlaylistMutationFailure?
     var playlistIDsBeforeCreate: Set<MusicPlaylist.ID>?
+    @Presents var playlistMusicPicker: PlaylistMusicPickerFeature.State?
     var path = StackState<LibraryPath.State>()
+    var shouldPresentCreatedPlaylist = false
 
     var albumDetail: AlbumDetailFeature.State? {
       get {
@@ -80,6 +83,16 @@ struct LibraryFeature: Sendable {
     case updated(ApprovedMusicLibrary)
   }
 
+  enum PlaylistMusicPickerMutationOutcome: Equatable {
+    case batchConfirmationRequired(
+      ApprovedMusicLibrary,
+      MusicPlaylistBatchDuplicateConfirmation,
+    )
+    case conflict(ApprovedMusicLibrary)
+    case failed
+    case updated(ApprovedMusicLibrary)
+  }
+
   enum PlaylistMutationFailure: Equatable {
     case conflict
     case failed
@@ -102,6 +115,7 @@ struct LibraryFeature: Sendable {
       items: [PlaybackItem],
       context: PlaybackContext,
     )
+    case connectionInvalid
     case dismissPlaybackFailure
     case playbackFailureActionTapped
     case playNext(items: [PlaybackItem])
@@ -137,6 +151,7 @@ struct LibraryFeature: Sendable {
     case debugResetOnboardingButtonTapped
     case delegate(DelegateAction)
     case createPlaylistSubmitted(String)
+    case libraryRefreshFailureDismissed
     case onAppear
     case path(StackActionOf<LibraryPath>)
     case playlistAddToQueueTapped(MusicPlaylist.ID)
@@ -149,6 +164,9 @@ struct LibraryFeature: Sendable {
       expectedRevision: Int64,
       entryID: MusicPlaylistEntry.ID,
     )
+    case playlistMusicPicker(PresentationAction<PlaylistMusicPickerFeature.Action>)
+    case playlistMusicPickerMutationResponse(PlaylistMusicPickerMutationOutcome)
+    case playlistMusicPickerRequested(MusicPlaylist.ID)
     case playlistMutationFailureDismissed
     case playlistMutationResponse(
       PlaylistMutationOutcome,
@@ -214,6 +232,7 @@ struct LibraryFeature: Sendable {
         state.isPlaylistMutationInFlight = true
         state.playlistMutationFailure = nil
         state.playlistIDsBeforeCreate = state.status.playlistIDs
+        state.shouldPresentCreatedPlaylist = false
         return self.performAddToPlaylistMutation {
           try await self.approvedMusic.createPlaylist(.init(
             name: name,
@@ -264,20 +283,29 @@ struct LibraryFeature: Sendable {
         case .updated(let library):
           effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.addToPlaylist = nil
-          if state.playlistIDsBeforeCreate != nil {
-            recencyToSave = state.prioritizeCreatedPlaylist(in: library, at: self.now)
+          if state.playlistIDsBeforeCreate != nil,
+             let playlist = state.createdPlaylist(in: library, at: self.now) {
+            recencyToSave = state.collectionRecency
+            if state.shouldPresentCreatedPlaylist {
+              state.presentPlaylistDetail(playlistID: playlist.id)
+              state.playlistMusicPicker = .init(playlist: playlist, library: library)
+            }
           }
+          state.shouldPresentCreatedPlaylist = false
         case .confirmationRequired(let library, let confirmation):
           effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.addToPlaylist?.confirmation = confirmation
           state.playlistIDsBeforeCreate = nil
+          state.shouldPresentCreatedPlaylist = false
         case .conflict(let library):
           effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.playlistMutationFailure = .conflict
           state.playlistIDsBeforeCreate = nil
+          state.shouldPresentCreatedPlaylist = false
         case .failed:
           state.playlistMutationFailure = .failed
           state.playlistIDsBeforeCreate = nil
+          state.shouldPresentCreatedPlaylist = false
         }
         if let recencyToSave {
           effects.append(self.saveCollectionRecency(recencyToSave))
@@ -311,6 +339,7 @@ struct LibraryFeature: Sendable {
         state.isPlaylistMutationInFlight = true
         state.playlistMutationFailure = nil
         state.playlistIDsBeforeCreate = state.status.playlistIDs
+        state.shouldPresentCreatedPlaylist = true
         return self.performPlaylistMutation {
           try await self.approvedMusic.createPlaylist(.init(name: name))
         }
@@ -482,7 +511,10 @@ struct LibraryFeature: Sendable {
           ))
 
         case .addMusic:
-          state.path.pop(from: id)
+          guard !state.isPlaylistMutationInFlight,
+                case .loaded(let library) = state.status else { return .none }
+          state.playlistMusicPicker = .init(playlist: detail.playlist, library: library)
+          state.playlistMutationFailure = nil
           return .none
 
         case .addToQueue(let items):
@@ -555,6 +587,7 @@ struct LibraryFeature: Sendable {
         )
 
       case .approvedLibraryLoaded(let library):
+        state.isLibraryRefreshFailurePresented = false
         if library.isEmpty {
           log(.debug, .library, "e24738fc")
         }
@@ -562,17 +595,23 @@ struct LibraryFeature: Sendable {
 
       case .approvedLibraryLoadFailed:
         log(.err, .library, "cd55459e")
-        guard !state.status.isDisplayingLibrary else { return .none }
-        state.status = .failed
+        if state.status.isDisplayingLibrary {
+          state.isLibraryRefreshFailurePresented = true
+        } else {
+          state.status = .failed
+        }
         return .none
 
       case .approvedLibraryMusicAccessUnavailable:
+        state.isLibraryRefreshFailurePresented = false
         state.status = .musicAccessUnavailable
         state.addToPlaylist = nil
         state.isPlaylistMutationInFlight = false
         state.playlistIDsBeforeCreate = nil
+        state.playlistMusicPicker = nil
         state.playlistMutationFailure = nil
         state.path.removeAll()
+        state.shouldPresentCreatedPlaylist = false
         log(.warn, .subs, "ded74480")
         return .send(.delegate(.approvedTrackIDsUpdated([])))
 
@@ -595,6 +634,64 @@ struct LibraryFeature: Sendable {
         state.collectionRecency = recency
         return .none
 
+      case .libraryRefreshFailureDismissed:
+        state.isLibraryRefreshFailurePresented = false
+        return .none
+
+      case .playlistMusicPickerRequested(let playlistID):
+        guard !state.isPlaylistMutationInFlight,
+              case .loaded(let library) = state.status,
+              let playlist = library.playlist(id: playlistID) else { return .none }
+        state.playlistMusicPicker = .init(playlist: playlist, library: library)
+        state.playlistMutationFailure = nil
+        return .none
+
+      case .playlistMusicPicker(.presented(.delegate(.addRequested(
+        let sources,
+        let duplicateResolution,
+      )))):
+        guard !state.isPlaylistMutationInFlight,
+              case .loaded(let library) = state.status,
+              let picker = state.playlistMusicPicker,
+              library.playlist(id: picker.playlistID) != nil else { return .none }
+        state.isPlaylistMutationInFlight = true
+        state.playlistMutationFailure = nil
+        return self.performPlaylistMusicPickerMutation {
+          try await self.approvedMusic.addMusicToPlaylist(.init(
+            playlistId: picker.playlistID.rawValue,
+            sources: sources,
+            duplicateResolution: duplicateResolution,
+          ))
+        }
+
+      case .playlistMusicPicker(.dismiss):
+        state.playlistMutationFailure = nil
+        return .none
+
+      case .playlistMusicPicker(.presented):
+        return .none
+
+      case .playlistMusicPickerMutationResponse(let outcome):
+        state.isPlaylistMutationInFlight = false
+        state.isRefreshingRemoteLibrary = false
+        switch outcome {
+        case .updated(let library):
+          state.playlistMusicPicker = nil
+          return self.applyAuthoritativeLibrary(library, to: &state)
+        case .batchConfirmationRequired(let library, let confirmation):
+          let effect = self.applyAuthoritativeLibrary(library, to: &state)
+          return .merge(
+            effect,
+            .send(.playlistMusicPicker(.presented(.duplicateConfirmationReceived(confirmation)))),
+          )
+        case .conflict(let library):
+          state.playlistMutationFailure = .conflict
+          return self.applyAuthoritativeLibrary(library, to: &state)
+        case .failed:
+          state.playlistMutationFailure = .failed
+          return .none
+        }
+
       case .playlistMutationFailureDismissed:
         state.playlistMutationFailure = nil
         return .none
@@ -607,19 +704,27 @@ struct LibraryFeature: Sendable {
         switch outcome {
         case .updated(let library):
           effects.append(self.applyAuthoritativeLibrary(library, to: &state))
-          if state.playlistIDsBeforeCreate != nil {
-            recencyToSave = state.prioritizeCreatedPlaylist(in: library, at: self.now)
+          if state.playlistIDsBeforeCreate != nil,
+             let playlist = state.createdPlaylist(in: library, at: self.now) {
+            recencyToSave = state.collectionRecency
+            if state.shouldPresentCreatedPlaylist {
+              state.presentPlaylistDetail(playlistID: playlist.id)
+              state.playlistMusicPicker = .init(playlist: playlist, library: library)
+            }
           }
+          state.shouldPresentCreatedPlaylist = false
         case .conflict(let library):
           effects.append(self.applyAuthoritativeLibrary(library, to: &state))
           state.playlistMutationFailure = .conflict
           state.playlistIDsBeforeCreate = nil
+          state.shouldPresentCreatedPlaylist = false
         case .failed:
           if let rollback {
             state.applyLibrary(rollback)
           }
           state.playlistMutationFailure = .failed
           state.playlistIDsBeforeCreate = nil
+          state.shouldPresentCreatedPlaylist = false
         }
         if let recencyToSave {
           effects.append(self.saveCollectionRecency(recencyToSave))
@@ -632,6 +737,7 @@ struct LibraryFeature: Sendable {
 
       case .refreshPulled:
         guard !state.isPlaylistMutationInFlight else { return .none }
+        state.isLibraryRefreshFailurePresented = false
         state.isRefreshingRemoteLibrary = true
         if !state.status.isDisplayingLibrary {
           state.status = .loading
@@ -639,6 +745,7 @@ struct LibraryFeature: Sendable {
         return self.refreshRemoteApprovedLibrary(loadCache: false)
 
       case .retryButtonTapped:
+        state.isLibraryRefreshFailurePresented = false
         state.isRefreshingRemoteLibrary = true
         if !state.status.isDisplayingLibrary {
           state.status = .loading
@@ -682,6 +789,9 @@ struct LibraryFeature: Sendable {
     }
     .forEach(\.path, action: \.path) {
       LibraryPath.body
+    }
+    .ifLet(\.$playlistMusicPicker, action: \.playlistMusicPicker) {
+      PlaylistMusicPickerFeature()
     }
   }
 
@@ -870,13 +980,46 @@ struct LibraryFeature: Sendable {
               library,
               confirmation,
             )))
-          case .conflict(let library):
+          case .batchDuplicateConfirmationRequired(let library, _),
+               .conflict(let library):
             await send(.addToPlaylistMutationResponse(.conflict(library)))
           }
+        } catch ApprovedMusicClientError.invalidConnection {
+          await send(.delegate(.connectionInvalid))
         } catch ApprovedMusicClientError.musicAccessUnavailable {
           await send(.approvedLibraryMusicAccessUnavailable)
         } catch {
           await send(.addToPlaylistMutationResponse(.failed))
+        }
+      },
+    )
+  }
+
+  private func performPlaylistMusicPickerMutation(
+    operation: @escaping @Sendable () async throws -> MusicPlaylistMutationResult,
+  ) -> EffectOf<Self> {
+    .merge(
+      .cancel(id: CancelID.approvedLibraryRefresh),
+      .run { send in
+        do {
+          switch try await operation() {
+          case .updated(let library):
+            await send(.playlistMusicPickerMutationResponse(.updated(library)))
+          case .batchDuplicateConfirmationRequired(let library, let confirmation):
+            await send(.playlistMusicPickerMutationResponse(.batchConfirmationRequired(
+              library,
+              confirmation,
+            )))
+          case .duplicateConfirmationRequired(let library, _),
+               .conflict(let library):
+            await send(.playlistMusicPickerMutationResponse(.conflict(library)))
+          }
+        } catch ApprovedMusicClientError.invalidConnection {
+          await send(.delegate(.connectionInvalid))
+        } catch ApprovedMusicClientError.musicAccessUnavailable {
+          await send(.approvedLibraryMusicAccessUnavailable)
+        } catch {
+          await send(.playlistMusicPickerMutationResponse(.failed))
         }
       },
     )
@@ -894,9 +1037,12 @@ struct LibraryFeature: Sendable {
           case .updated(let library):
             await send(.playlistMutationResponse(.updated(library), rollback: rollback))
           case .conflict(let library),
-               .duplicateConfirmationRequired(let library, _):
+               .duplicateConfirmationRequired(let library, _),
+               .batchDuplicateConfirmationRequired(let library, _):
             await send(.playlistMutationResponse(.conflict(library), rollback: rollback))
           }
+        } catch ApprovedMusicClientError.invalidConnection {
+          await send(.delegate(.connectionInvalid))
         } catch ApprovedMusicClientError.musicAccessUnavailable {
           await send(.approvedLibraryMusicAccessUnavailable)
         } catch {
@@ -939,6 +1085,9 @@ struct LibraryFeature: Sendable {
       }
       do {
         try await send(.approvedLibraryLoaded(self.approvedMusic.loadRemoteApprovedLibrary()))
+      } catch ApprovedMusicClientError.invalidConnection {
+        await send(.delegate(.connectionInvalid))
+        return
       } catch ApprovedMusicClientError.musicAccessUnavailable {
         await send(.approvedLibraryMusicAccessUnavailable)
       } catch {
@@ -971,12 +1120,19 @@ extension LibraryFeature.State {
   mutating func applyLibrary(_ library: ApprovedMusicLibrary) {
     self.status = library.isEmpty ? .empty : .loaded(library)
     self.path.reconcile(with: library)
+    if var picker = self.playlistMusicPicker,
+       library.playlist(id: picker.playlistID) != nil {
+      picker.applyLibrary(library)
+      self.playlistMusicPicker = picker
+    } else {
+      self.playlistMusicPicker = nil
+    }
   }
 
-  mutating func prioritizeCreatedPlaylist(
+  mutating func createdPlaylist(
     in library: ApprovedMusicLibrary,
     at date: Date,
-  ) -> LibraryCollectionRecency? {
+  ) -> MusicPlaylist? {
     guard let playlistIDsBeforeCreate = self.playlistIDsBeforeCreate else { return nil }
     self.playlistIDsBeforeCreate = nil
     guard let playlist = library.playlists
@@ -993,7 +1149,7 @@ extension LibraryFeature.State {
       observedAddedAt: playlist.createdAt,
       at: date,
     )
-    return self.collectionRecency
+    return playlist
   }
 
   @discardableResult

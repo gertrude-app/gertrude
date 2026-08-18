@@ -13,6 +13,12 @@ public enum MusicPlaylistDuplicateResolution: String, PairNestable {
   case addOnlyNew
 }
 
+public enum MusicPlaylistBatchDuplicateResolution: String, PairNestable {
+  case requestConfirmation
+  case addAll
+  case addOnlyNew
+}
+
 public struct MusicPlaylistDuplicate: PairNestable {
   public var trackId: String
   public var title: String
@@ -30,11 +36,25 @@ public enum MusicPlaylistDuplicateConfirmation: PairNestable {
   case album(playlistId: UUID, albumId: String, duplicates: [MusicPlaylistDuplicate])
 }
 
+public struct MusicPlaylistBatchDuplicateConfirmation: PairNestable {
+  public var playlistId: UUID
+  public var duplicates: [MusicPlaylistDuplicate]
+
+  public init(playlistId: UUID, duplicates: [MusicPlaylistDuplicate]) {
+    self.playlistId = playlistId
+    self.duplicates = duplicates
+  }
+}
+
 public enum MusicPlaylistMutationOutput: PairOutput {
   case updated(MusicLibrarySnapshot)
   case duplicateConfirmationRequired(
     snapshot: MusicLibrarySnapshot,
     confirmation: MusicPlaylistDuplicateConfirmation,
+  )
+  case batchDuplicateConfirmationRequired(
+    snapshot: MusicLibrarySnapshot,
+    confirmation: MusicPlaylistBatchDuplicateConfirmation,
   )
   case conflict(MusicLibrarySnapshot)
 }
@@ -104,6 +124,28 @@ public struct AddToMusicPlaylist: Pair {
     ) {
       self.playlistId = playlistId
       self.source = source
+      self.duplicateResolution = duplicateResolution
+    }
+  }
+
+  public typealias Output = MusicPlaylistMutationOutput
+}
+
+public struct AddMusicToPlaylist: Pair {
+  public static let auth: ClientAuth = .child
+
+  public struct Input: PairInput {
+    public var playlistId: UUID
+    public var sources: [MusicPlaylistSourceSelection]
+    public var duplicateResolution: MusicPlaylistBatchDuplicateResolution
+
+    public init(
+      playlistId: UUID,
+      sources: [MusicPlaylistSourceSelection],
+      duplicateResolution: MusicPlaylistBatchDuplicateResolution = .requestConfirmation,
+    ) {
+      self.playlistId = playlistId
+      self.sources = sources
       self.duplicateResolution = duplicateResolution
     }
   }

@@ -88,11 +88,14 @@ public struct AddToPlaylistSheet: View {
   private let playlists: [PlaylistData]
   private let duplicatePrompt: PlaylistDuplicatePrompt?
   private let errorMessage: String?
+  private let errorTitle: String
+  private let errorTone: NoticeBannerTone
   private let isMutating: Bool
   private let onCancel: @MainActor @Sendable () -> Void
   private let onCreatePlaylist: @MainActor @Sendable (String) -> Void
   private let onDuplicateCancel: @MainActor @Sendable () -> Void
   private let onDuplicateChoice: @MainActor @Sendable (PlaylistDuplicateChoice) -> Void
+  private let onErrorDismissTap: (@MainActor @Sendable () -> Void)?
   private let onSelectPlaylist: @MainActor @Sendable (String) -> Void
 
   @State private var isNamePromptPresented = false
@@ -102,34 +105,33 @@ public struct AddToPlaylistSheet: View {
     playlists: [PlaylistData],
     duplicatePrompt: PlaylistDuplicatePrompt? = nil,
     errorMessage: String? = nil,
+    errorTitle: String = "Couldn’t update playlist",
+    errorTone: NoticeBannerTone = .error,
     isMutating: Bool = false,
     onCancel: @MainActor @escaping @Sendable () -> Void = {},
     onCreatePlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onDuplicateCancel: @MainActor @escaping @Sendable () -> Void = {},
     onDuplicateChoice: @MainActor @escaping @Sendable (PlaylistDuplicateChoice) -> Void = { _ in },
+    onErrorDismissTap: (@MainActor @Sendable () -> Void)? = nil,
     onSelectPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
   ) {
     self.playlists = playlists
     self.duplicatePrompt = duplicatePrompt
     self.errorMessage = errorMessage
+    self.errorTitle = errorTitle
+    self.errorTone = errorTone
     self.isMutating = isMutating
     self.onCancel = onCancel
     self.onCreatePlaylist = onCreatePlaylist
     self.onDuplicateCancel = onDuplicateCancel
     self.onDuplicateChoice = onDuplicateChoice
+    self.onErrorDismissTap = onErrorDismissTap
     self.onSelectPlaylist = onSelectPlaylist
   }
 
   public var body: some View {
     NavigationStack {
       List {
-        if let errorMessage = self.errorMessage {
-          Section {
-            Label(errorMessage, systemImage: "exclamationmark.triangle.fill")
-              .foregroundStyle(.red)
-          }
-        }
-
         Section {
           Button(action: self.newPlaylistButtonTapped) {
             Label("New Playlist", systemImage: "plus.circle.fill")
@@ -173,6 +175,20 @@ public struct AddToPlaylistSheet: View {
         }
       }
       .navigationTitle("Add to Playlist")
+      .safeAreaInset(edge: .bottom, spacing: 0) {
+        if let errorMessage = self.errorMessage {
+          NoticeBanner(
+            tone: self.errorTone,
+            title: self.errorTitle,
+            message: errorMessage,
+            onDismissTap: self.onErrorDismissTap,
+          )
+          .padding(.horizontal, 16)
+          .padding(.vertical, 10)
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+      }
+      .animation(.snappy(duration: 0.24), value: self.errorMessage)
       .disabled(self.isMutating)
       .overlay {
         if self.isMutating {

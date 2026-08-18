@@ -54,6 +54,17 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
         )),
       ),
       (
+        AddMusicToPlaylist.name,
+        JSONEncoder().encode(AddMusicToPlaylist.Input(
+          playlistId: UUID(1),
+          sources: [.album(albumId: "album-1")],
+        )),
+        .addMusicToPlaylist(.init(
+          playlistId: UUID(1),
+          sources: [.album(albumId: "album-1")],
+        )),
+      ),
+      (
         RemoveMusicPlaylistEntry.name,
         JSONEncoder().encode(RemoveMusicPlaylistEntry.Input(
           playlistId: UUID(1),
@@ -261,6 +272,65 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
     ])
   }
 
+  func testBatchDuplicateChoicesCollapseOverlappingSelections() async throws {
+    let (_, ctx) = try await self.setup(albums: [playlistResolvedAlbum(
+      id: "album-1",
+      tracks: [
+        playlistResolvedTrack(id: "track-1", albumId: "album-1", title: "One"),
+        playlistResolvedTrack(id: "track-2", albumId: "album-1", title: "Two"),
+        playlistResolvedTrack(id: "track-3", albumId: "album-1", title: "Three"),
+      ],
+    )])
+    let created = try await updatedSnapshot(CreateMusicPlaylist.resolve(
+      with: .init(
+        name: "Partial",
+        source: .track(trackId: "track-2", albumId: "album-1"),
+      ),
+      in: ctx,
+    ))
+    let playlist = try XCTUnwrap(created.playlists.first)
+    let sources: [MusicPlaylistSourceSelection] = [
+      .track(trackId: "track-1", albumId: "album-1"),
+      .album(albumId: "album-1"),
+    ]
+
+    let confirmationOutput = try await AddMusicToPlaylist.resolve(
+      with: .init(playlistId: playlist.id, sources: sources),
+      in: ctx,
+    )
+    let (_, confirmation) = try batchDuplicateConfirmation(confirmationOutput)
+    expect(confirmation).toEqual(.init(
+      playlistId: playlist.id,
+      duplicates: [.init(trackId: "track-2", title: "Two", existingCount: 1)],
+    ))
+
+    let updated = try await updatedSnapshot(AddMusicToPlaylist.resolve(
+      with: .init(
+        playlistId: playlist.id,
+        sources: sources,
+        duplicateResolution: .addOnlyNew,
+      ),
+      in: ctx,
+    ))
+
+    expect(updated.playlists.first?.entries.map(\.track.id)).toEqual([
+      "track-2", "track-1", "track-3",
+    ])
+
+    let addedAll = try await updatedSnapshot(AddMusicToPlaylist.resolve(
+      with: .init(
+        playlistId: playlist.id,
+        sources: sources,
+        duplicateResolution: .addAll,
+      ),
+      in: ctx,
+    ))
+
+    expect(addedAll.playlists.first?.entries.map(\.track.id)).toEqual([
+      "track-2", "track-1", "track-3", "track-1", "track-2", "track-3",
+    ])
+  }
+
   func testReordersExactEntryIdsAndRejectsStaleRevision() async throws {
     let (_, ctx) = try await self.setup(albums: [playlistResolvedAlbum(
       id: "album-1",
@@ -445,6 +515,18 @@ private func duplicateConfirmation(
 ) throws -> (MusicLibrarySnapshot, MusicPlaylistDuplicateConfirmation) {
   guard case .duplicateConfirmationRequired(let snapshot, let confirmation) = output else {
     XCTFail("expected duplicate confirmation", file: file, line: line)
+    throw PlaylistMutationTestError.unexpectedOutput
+  }
+  return (snapshot, confirmation)
+}
+
+private func batchDuplicateConfirmation(
+  _ output: MusicPlaylistMutationOutput,
+  file: StaticString = #filePath,
+  line: UInt = #line,
+) throws -> (MusicLibrarySnapshot, MusicPlaylistBatchDuplicateConfirmation) {
+  guard case .batchDuplicateConfirmationRequired(let snapshot, let confirmation) = output else {
+    XCTFail("expected batch duplicate confirmation", file: file, line: line)
     throw PlaylistMutationTestError.unexpectedOutput
   }
   return (snapshot, confirmation)

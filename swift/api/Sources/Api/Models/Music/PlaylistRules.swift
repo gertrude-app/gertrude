@@ -65,6 +65,11 @@ extension Music {
       case confirmationRequired(MusicPlaylistDuplicateConfirmation)
     }
 
+    enum BatchAdditionPlan: Equatable, Sendable {
+      case append([EntryAddition])
+      case confirmationRequired(MusicPlaylistBatchDuplicateConfirmation)
+    }
+
     enum RuleError: Error, Equatable {
       case unauthorizedAlbum(AlbumId)
       case unauthorizedTrack(trackId: TrackId, albumId: AlbumId)
@@ -181,6 +186,61 @@ extension Music {
           existingCounts[TrackId(rawValue: $0.track.id)] == nil
         }
       case .requestConfirmation, .addAgain, .addAll:
+        candidates
+      }
+      return .append(candidatesToAppend.map { candidate in
+        EntryAddition(
+          trackId: TrackId(rawValue: candidate.track.id),
+          preferredAlbumId: candidate.albumId,
+        )
+      })
+    }
+
+    static func planBatchAddition(
+      selections: [MusicPlaylistSourceSelection],
+      duplicateResolution: MusicPlaylistBatchDuplicateResolution,
+      to playlist: Playlist,
+      using index: EffectiveTrackIndex,
+    ) throws -> BatchAdditionPlan {
+      var candidates: [EffectiveTrackIndex.Candidate] = []
+      var seenTrackIDs = Set<TrackId>()
+      for selection in selections {
+        for candidate in try index.candidates(for: selection) {
+          let trackID = TrackId(rawValue: candidate.track.id)
+          if seenTrackIDs.insert(trackID).inserted {
+            candidates.append(candidate)
+          }
+        }
+      }
+
+      let reconciliation = self.reconcile(entries: playlist.entries, using: index)
+      var existingCounts: [TrackId: Int] = [:]
+      for resolved in reconciliation.entries {
+        existingCounts[resolved.entry.trackId, default: 0] += 1
+      }
+      let duplicates = candidates.compactMap { candidate -> MusicPlaylistDuplicate? in
+        let trackID = TrackId(rawValue: candidate.track.id)
+        guard let existingCount = existingCounts[trackID] else { return nil }
+        return .init(
+          trackId: candidate.track.id,
+          title: candidate.track.title,
+          existingCount: existingCount,
+        )
+      }
+
+      if duplicateResolution == .requestConfirmation, !duplicates.isEmpty {
+        return .confirmationRequired(.init(
+          playlistId: playlist.id,
+          duplicates: duplicates,
+        ))
+      }
+
+      let candidatesToAppend: [EffectiveTrackIndex.Candidate] = switch duplicateResolution {
+      case .addOnlyNew:
+        candidates.filter {
+          existingCounts[TrackId(rawValue: $0.track.id)] == nil
+        }
+      case .requestConfirmation, .addAll:
         candidates
       }
       return .append(candidatesToAppend.map { candidate in

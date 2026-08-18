@@ -102,6 +102,31 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func invalidConnectionDelegatesToAppWithoutShowingRefreshFailure() async {
+    let store = TestStore(initialState: .init()) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.continuousClock = ImmediateClock()
+      $0.approvedMusic.loadCachedApprovedLibrary = { .mock }
+      $0.approvedMusic.loadRemoteApprovedLibrary = {
+        throw ApprovedMusicClientError.invalidConnection
+      }
+    }
+
+    await store.send(.onAppear) {
+      $0.isRefreshingRemoteLibrary = true
+      $0.hasStartedInitialLibraryLoad = true
+    }
+    await store.receive(.cachedApprovedLibraryLoaded(.mock)) {
+      $0.status = .loaded(.mock)
+    }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(
+      ApprovedMusicLibrary.mock.approvedTrackIDs,
+    )))
+    await store.receive(.delegate(.connectionInvalid))
+  }
+
+  @Test
   func showsMusicUnavailableWhenApprovedLibraryRequiresPayment() async {
     let store = TestStore(initialState: .init()) {
       LibraryFeature()
@@ -168,7 +193,10 @@ struct LibraryFeatureTests {
   func pullToRefreshReloadsRemoteLibrary() async {
     let cached = cachedApprovedMusicLibrary
     let remote = ApprovedMusicLibrary.mock
-    let store = TestStore(initialState: .init(status: .loaded(cached))) {
+    let store = TestStore(initialState: .init(
+      status: .loaded(cached),
+      isLibraryRefreshFailurePresented: true,
+    )) {
       LibraryFeature()
     } withDependencies: {
       $0.continuousClock = ImmediateClock()
@@ -176,6 +204,7 @@ struct LibraryFeatureTests {
     }
 
     await store.send(.refreshPulled) {
+      $0.isLibraryRefreshFailurePresented = false
       $0.isRefreshingRemoteLibrary = true
     }
     await store.receive(.approvedLibraryLoaded(remote)) {
@@ -288,9 +317,14 @@ struct LibraryFeatureTests {
       $0.status = .loaded(cached)
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
-    await store.receive(.approvedLibraryLoadFailed)
+    await store.receive(.approvedLibraryLoadFailed) {
+      $0.isLibraryRefreshFailurePresented = true
+    }
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
+    }
+    await store.send(.libraryRefreshFailureDismissed) {
+      $0.isLibraryRefreshFailurePresented = false
     }
   }
 
@@ -611,7 +645,7 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func createsEmptyPlaylistAndStaysInLibrary() async {
+  func createsEmptyPlaylistThenOpensItForAddingMusic() async {
     let playlist = self.playlistLibrary().playlists[0]
     let updatedLibrary = ApprovedMusicLibrary(playlists: [playlist])
     let now = Date(timeIntervalSince1970: 100)
@@ -627,6 +661,7 @@ struct LibraryFeatureTests {
     await store.send(.createPlaylistSubmitted("  Favorites  ")) {
       $0.isPlaylistMutationInFlight = true
       $0.playlistIDsBeforeCreate = []
+      $0.shouldPresentCreatedPlaylist = true
     }
     await store.receive(.playlistMutationResponse(
       .updated(updatedLibrary),
@@ -640,6 +675,9 @@ struct LibraryFeatureTests {
         observedAddedAt: playlist.createdAt,
         at: now,
       )
+      $0.path[id: 0] = .playlist(.init(playlist: playlist))
+      $0.playlistMusicPicker = .init(playlist: playlist, library: updatedLibrary)
+      $0.shouldPresentCreatedPlaylist = false
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
     await store.finish()
@@ -675,6 +713,7 @@ struct LibraryFeatureTests {
     await store.send(.createPlaylistSubmitted("Favorites")) {
       $0.isPlaylistMutationInFlight = true
       $0.playlistIDsBeforeCreate = Set(library.playlists.map(\.id))
+      $0.shouldPresentCreatedPlaylist = true
     }
     await store.receive(.playlistMutationResponse(
       .updated(updatedLibrary),
@@ -688,6 +727,9 @@ struct LibraryFeatureTests {
         observedAddedAt: playlist.createdAt,
         at: now,
       )
+      $0.path[id: 0] = .playlist(.init(playlist: playlist))
+      $0.playlistMusicPicker = .init(playlist: playlist, library: updatedLibrary)
+      $0.shouldPresentCreatedPlaylist = false
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
     await store.finish()
@@ -904,10 +946,12 @@ struct LibraryFeatureTests {
     await store.send(.createPlaylistSubmitted("Road Trip")) { // not swallowed by a stuck latch
       $0.isPlaylistMutationInFlight = true
       $0.playlistIDsBeforeCreate = [playlist.id]
+      $0.shouldPresentCreatedPlaylist = true
     }
     await store.receive(.playlistMutationResponse(.updated(library), rollback: nil)) {
       $0.isPlaylistMutationInFlight = false
       $0.playlistIDsBeforeCreate = nil
+      $0.shouldPresentCreatedPlaylist = false
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
   }

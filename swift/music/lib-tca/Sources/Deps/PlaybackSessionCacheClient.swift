@@ -4,9 +4,10 @@ import Foundation
 
 @DependencyClient
 struct PlaybackSessionCacheClient: Sendable {
+  var _delete: @Sendable () async -> Void
+  var _deleteForChild: @Sendable (_ childId: UUID) async -> Void
   var _load: @Sendable () async throws -> PlaybackCheckpoint?
   var _save: @Sendable (_ checkpoint: PlaybackCheckpoint) async throws -> Void
-  var _delete: @Sendable () async -> Void
 }
 
 extension PlaybackSessionCacheClient {
@@ -20,6 +21,10 @@ extension PlaybackSessionCacheClient {
 
   func delete() async {
     await self._delete()
+  }
+
+  func delete(childId: UUID) async {
+    await self._deleteForChild(childId)
   }
 }
 
@@ -44,6 +49,14 @@ extension PlaybackSessionCacheClient {
   static func live(directory: URL) -> Self {
     let storage = PlaybackCheckpointStorage(directory: directory)
     return Self(
+      _delete: {
+        @Dependency(\.keychain) var keychain
+        guard let childId = keychain.loadConnection()?.childId else { return }
+        await storage.delete(childId: childId)
+      },
+      _deleteForChild: { childId in
+        await storage.delete(childId: childId)
+      },
       _load: {
         @Dependency(\.keychain) var keychain
         guard let childId = keychain.loadConnection()?.childId else { return nil }
@@ -55,18 +68,14 @@ extension PlaybackSessionCacheClient {
         try Task.checkCancellation()
         try await storage.save(checkpoint, childId: childId)
       },
-      _delete: {
-        @Dependency(\.keychain) var keychain
-        guard let childId = keychain.loadConnection()?.childId else { return }
-        await storage.delete(childId: childId)
-      },
     )
   }
 
   static let noop = Self(
+    _delete: {},
+    _deleteForChild: { _ in },
     _load: { nil },
     _save: { _ in },
-    _delete: {},
   )
 }
 

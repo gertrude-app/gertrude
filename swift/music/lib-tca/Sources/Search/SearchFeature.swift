@@ -278,8 +278,9 @@ struct SearchFeature: Sendable {
           ))))
 
         case .addMusic:
-          state.path.pop(from: id)
-          return .send(.delegate(.browseLibrary))
+          return .send(.delegate(.library(.playlistMusicPickerRequested(
+            detail.playlist.id,
+          ))))
 
         case .addToQueue(let items):
           return .send(.delegate(.playback(.addToQueue(items: items))))

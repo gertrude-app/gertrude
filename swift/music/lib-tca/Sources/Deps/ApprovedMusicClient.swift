@@ -8,6 +8,8 @@ import PairQL
 struct ApprovedMusicClient: Sendable {
   var addToPlaylist:
     @Sendable (_ input: AddToMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var addMusicToPlaylist:
+    @Sendable (_ input: AddMusicToPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var createPlaylist:
     @Sendable (_ input: CreateMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var deletePlaylist:
@@ -29,6 +31,11 @@ extension ApprovedMusicClient: DependencyKey {
       addToPlaylist: { input in
         try await performPlaylistMutation { api, token in
           try await api.addToMusicPlaylist(token, input)
+        }
+      },
+      addMusicToPlaylist: { input in
+        try await performPlaylistMutation { api, token in
+          try await api.addMusicToPlaylist(token, input)
         }
       },
       createPlaylist: { input in
@@ -74,6 +81,8 @@ extension ApprovedMusicClient: DependencyKey {
               cache: cache,
             )
           }
+        } catch let error as PqlError where error.type == .loggedOut {
+          throw ApprovedMusicClientError.invalidConnection
         } catch let error as PqlError where error.type == .paymentRequired {
           throw ApprovedMusicClientError.musicAccessUnavailable
         }
@@ -108,6 +117,7 @@ extension ApprovedMusicClient {
   #if DEBUG
     static let mock = Self(
       addToPlaylist: { _ in .updated(.mock) },
+      addMusicToPlaylist: { _ in .updated(.mock) },
       createPlaylist: { _ in .updated(.mock) },
       deletePlaylist: { _ in .updated(.mock) },
       loadCachedApprovedLibrary: { .mock },
@@ -120,6 +130,7 @@ extension ApprovedMusicClient {
 
   static let empty = Self(
     addToPlaylist: { _ in .updated(.empty) },
+    addMusicToPlaylist: { _ in .updated(.empty) },
     createPlaylist: { _ in .updated(.empty) },
     deletePlaylist: { _ in .updated(.empty) },
     loadCachedApprovedLibrary: { .empty },
@@ -135,6 +146,10 @@ enum MusicPlaylistMutationResult: Equatable, Sendable {
   case duplicateConfirmationRequired(
     library: ApprovedMusicLibrary,
     confirmation: MusicPlaylistDuplicateConfirmation,
+  )
+  case batchDuplicateConfirmationRequired(
+    library: ApprovedMusicLibrary,
+    confirmation: MusicPlaylistBatchDuplicateConfirmation,
   )
   case conflict(ApprovedMusicLibrary)
 }
@@ -171,6 +186,17 @@ private func performPlaylistMutation(
         library: library,
         confirmation: confirmation,
       )
+    case .batchDuplicateConfirmationRequired(let snapshot, let confirmation):
+      let library = try await receiveSnapshot(
+        snapshot,
+        cached: cached,
+        childId: connection.childId,
+        cache: cache,
+      )
+      return .batchDuplicateConfirmationRequired(
+        library: library,
+        confirmation: confirmation,
+      )
     case .conflict(let snapshot):
       let library = try await receiveSnapshot(
         snapshot,
@@ -180,6 +206,8 @@ private func performPlaylistMutation(
       )
       return .conflict(library)
     }
+  } catch let error as PqlError where error.type == .loggedOut {
+    throw ApprovedMusicClientError.invalidConnection
   } catch let error as PqlError where error.type == .paymentRequired {
     throw ApprovedMusicClientError.musicAccessUnavailable
   }
@@ -358,9 +386,10 @@ private extension MusicLibrarySnapshot.Track {
   }
 }
 
-enum ApprovedMusicClientError: Error {
+enum ApprovedMusicClientError: Error, Equatable {
   case incompleteSnapshot
   case inconsistentSnapshot
+  case invalidConnection
   case invalidRevision
   case invalidUnchangedRevision
   case missingConnection

@@ -3,6 +3,7 @@ import Dependencies
 import Foundation
 import LibViews
 import MusicRoute
+import PairQL
 import Testing
 
 @testable import LibTCA
@@ -44,6 +45,59 @@ struct ApprovedMusicClientTests {
     expectNoDifference(savedWrites, [
       .init(library: approvedMusicLibrary, childId: approvedMusicClientConnection.childId),
     ])
+  }
+
+  @Test
+  func liveClientMapsLoggedOutLibraryLoadToInvalidConnection() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+
+    do {
+      _ = try await withDependencies {
+        $0.api.getApprovedMusicLibrary = { _, _ in
+          throw PqlError(
+            id: "missing-token",
+            requestId: "request-id",
+            type: .loggedOut,
+            debugMessage: "music app token not found",
+          )
+        }
+        $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
+      }
+      Issue.record("expected invalid connection")
+    } catch let error as ApprovedMusicClientError {
+      expectNoDifference(error, .invalidConnection)
+    }
+  }
+
+  @Test
+  func liveClientMapsLoggedOutMutationToInvalidConnection() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+
+    do {
+      _ = try await withDependencies {
+        $0.api.createMusicPlaylist = { _, _ in
+          throw PqlError(
+            id: "missing-token",
+            requestId: "request-id",
+            type: .loggedOut,
+            debugMessage: "music app token not found",
+          )
+        }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.createPlaylist(.init(name: "Road Trip"))
+      }
+      Issue.record("expected invalid connection")
+    } catch let error as ApprovedMusicClientError {
+      expectNoDifference(error, .invalidConnection)
+    }
   }
 
   @Test
@@ -139,6 +193,43 @@ struct ApprovedMusicClientTests {
     expectNoDifference(
       result,
       .duplicateConfirmationRequired(
+        library: approvedMusicLibrary,
+        confirmation: confirmation,
+      ),
+    )
+  }
+
+  @Test
+  func liveClientMapsBatchDuplicateConfirmationWithAuthoritativeLibrary() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    let confirmation = MusicPlaylistBatchDuplicateConfirmation(
+      playlistId: UUID(3),
+      duplicates: [.init(trackId: "track-1", title: "Library Track", existingCount: 1)],
+    )
+    let input = AddMusicToPlaylist.Input(
+      playlistId: UUID(3),
+      sources: [.track(trackId: "track-1", albumId: "album-1")],
+    )
+
+    let result = try await withDependencies {
+      $0.api.addMusicToPlaylist = { _, receivedInput in
+        #expect(receivedInput == input)
+        return .batchDuplicateConfirmationRequired(
+          snapshot: remoteApprovedMusicLibrary,
+          confirmation: confirmation,
+        )
+      }
+      $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+      $0.keychain._load = { key in
+        key == .connection ? connectionData : nil
+      }
+    } operation: {
+      try await ApprovedMusicClient.liveValue.addMusicToPlaylist(input)
+    }
+
+    expectNoDifference(
+      result,
+      .batchDuplicateConfirmationRequired(
         library: approvedMusicLibrary,
         confirmation: confirmation,
       ),

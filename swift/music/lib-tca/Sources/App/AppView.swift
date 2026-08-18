@@ -12,13 +12,15 @@ struct AppView: View {
     Group {
       #if os(iOS)
         self.iOSContent
-          .overlay(alignment: .top) {
-            if !self.isPlaybackFailurePresentedInDetail,
-               let failure = self.store.playback.failure {
-              self.playbackFailureBanner(failure)
-            }
-          }
           .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
+          .animation(
+            .snappy(duration: 0.24),
+            value: self.store.library.playlistMutationFailure,
+          )
+          .animation(
+            .snappy(duration: 0.24),
+            value: self.store.library.isLibraryRefreshFailurePresented,
+          )
           .task(id: self.store.setup.isReady) {
             guard self.store.setup.isReady else { return }
             _ = self.store.send(.playback(.observePlayback))
@@ -26,6 +28,21 @@ struct AppView: View {
           }
       #else
         self.libraryView
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            if let failure = self.standalonePlaylistMutationFailure {
+              self.playlistMutationFailureBanner(failure)
+            } else if self.shouldPresentLibraryRefreshFailure {
+              self.libraryRefreshFailureBanner
+            }
+          }
+          .animation(
+            .snappy(duration: 0.24),
+            value: self.store.library.playlistMutationFailure,
+          )
+          .animation(
+            .snappy(duration: 0.24),
+            value: self.store.library.isLibraryRefreshFailurePresented,
+          )
       #endif
     }
     .onChange(of: self.scenePhase) { _, scenePhase in
@@ -148,11 +165,30 @@ struct AppView: View {
     private func iOSTabContent(_ content: some View) -> some View {
       if #available(iOS 26.0, *) {
         content
+          .safeAreaInset(edge: .bottom, spacing: 0) {
+            self.appNotice
+          }
       } else {
         content
           .safeAreaInset(edge: .bottom, spacing: 0) {
+            self.appNotice
+          }
+          .safeAreaInset(edge: .bottom, spacing: 0) {
             self.nowPlayingSafeAreaInset
           }
+      }
+    }
+
+    @ViewBuilder
+    private var appNotice: some View {
+      if !self.isPlaybackFailurePresentedInDetail,
+         let failure = self.store.playback.failure {
+        self.playbackFailureBanner(failure)
+      } else if self.store.playback.failure == nil,
+                let failure = self.standalonePlaylistMutationFailure {
+        self.playlistMutationFailureBanner(failure)
+      } else if self.shouldPresentLibraryRefreshFailure {
+        self.libraryRefreshFailureBanner
       }
     }
 
@@ -286,7 +322,7 @@ struct AppView: View {
   #if os(iOS)
     @ViewBuilder
     private var nowPlayingSheet: some View {
-      ZStack(alignment: .top) {
+      Group {
         if let session = self.store.playback.session {
           NowPlayingScreenView(
             title: session.currentItem.title,
@@ -341,19 +377,27 @@ struct AppView: View {
             },
           )
         }
-
+      }
+      .safeAreaInset(edge: .bottom, spacing: 0) {
         if let failure = self.store.playback.failure {
           self.playbackFailureBanner(failure)
+        } else if let failure = self.standalonePlaylistMutationFailure {
+          self.playlistMutationFailureBanner(failure)
         }
       }
       .animation(.snappy(duration: 0.22), value: self.store.playback.failure)
+      .animation(
+        .snappy(duration: 0.24),
+        value: self.store.library.playlistMutationFailure,
+      )
       .libraryPresentations(
         store: self.store.scope(state: \.library, action: \.library),
       )
     }
 
     private func playbackFailureBanner(_ failure: PlaybackFailure) -> some View {
-      PlaybackErrorBanner(
+      NoticeBanner(
+        tone: .error,
         title: failure.title,
         message: failure.message,
         systemImage: failure.systemImage,
@@ -363,10 +407,55 @@ struct AppView: View {
       )
       .frame(maxWidth: 640)
       .padding(.horizontal, 18)
-      .padding(.top, 12)
-      .transition(.move(edge: .top).combined(with: .opacity))
+      .padding(.bottom, 12)
+      .transition(.move(edge: .bottom).combined(with: .opacity))
     }
   #endif
+
+  private func playlistMutationFailureBanner(
+    _ failure: LibraryFeature.PlaylistMutationFailure,
+  ) -> some View {
+    NoticeBanner(
+      tone: failure.tone,
+      title: failure.title,
+      message: failure.message,
+      onDismissTap: {
+        self.store.send(.library(.playlistMutationFailureDismissed))
+      },
+    )
+    .frame(maxWidth: 640)
+    .padding(.horizontal, 18)
+    .padding(.bottom, 12)
+    .transition(.move(edge: .bottom).combined(with: .opacity))
+  }
+
+  private var libraryRefreshFailureBanner: some View {
+    NoticeBanner(
+      tone: .warning,
+      title: "Can’t refresh library",
+      message: "Gertrude Music is showing cached music. It may be out of date.",
+      systemImage: "wifi.exclamationmark",
+      actionTitle: "Try Again",
+      onActionTap: { self.store.send(.library(.retryButtonTapped)) },
+      onDismissTap: { self.store.send(.library(.libraryRefreshFailureDismissed)) },
+    )
+    .frame(maxWidth: 640)
+    .padding(.horizontal, 18)
+    .padding(.bottom, 12)
+    .transition(.move(edge: .bottom).combined(with: .opacity))
+  }
+
+  private var standalonePlaylistMutationFailure: LibraryFeature.PlaylistMutationFailure? {
+    guard self.store.library.addToPlaylist == nil,
+          self.store.library.playlistMusicPicker == nil else { return nil }
+    return self.store.library.playlistMutationFailure
+  }
+
+  private var shouldPresentLibraryRefreshFailure: Bool {
+    self.store.library.isLibraryRefreshFailurePresented
+      && self.store.library.playlistMutationFailure == nil
+      && self.store.playback.failure == nil
+  }
 
   private var isPlaybackFailurePresentedInDetail: Bool {
     switch self.store.selectedTab {

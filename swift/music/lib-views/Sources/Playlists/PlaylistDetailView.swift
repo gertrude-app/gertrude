@@ -139,6 +139,14 @@ public struct PlaylistDetailView: View {
     .detailNavigationBarBackground()
     .toolbar {
       ToolbarItem(placement: self.menuPlacement) {
+        Button(action: self.onAddMusicTap) {
+          Label("Add Music", systemImage: "plus")
+        }
+        .tint(.primary)
+        .disabled(self.isMutating)
+      }
+
+      ToolbarItem(placement: self.menuPlacement) {
         if self.isMutating {
           ProgressView()
             .controlSize(.small)
@@ -304,7 +312,7 @@ public struct PlaylistDetailView: View {
         .foregroundStyle(.secondary)
         .multilineTextAlignment(.center)
 
-      Button("Browse Library", action: self.onAddMusicTap)
+      Button("Add Music", action: self.onAddMusicTap)
         .buttonStyle(.borderedProminent)
         .tint(Color.gertrudeBrandAccent)
     }

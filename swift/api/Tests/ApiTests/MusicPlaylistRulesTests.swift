@@ -81,6 +81,22 @@ final class MusicPlaylistRulesTests: XCTestCase {
     expect(decoded).toEqual(output)
   }
 
+  func testBatchDuplicateMutationOutputRoundTripsAuthoritativeSnapshot() throws {
+    let snapshot = playlistCatalogSnapshot(albums: [])
+    let output = MusicPlaylistMutationOutput.batchDuplicateConfirmationRequired(
+      snapshot: snapshot,
+      confirmation: .init(
+        playlistId: UUID(1),
+        duplicates: [.init(trackId: "track-1", title: "Track", existingCount: 2)],
+      ),
+    )
+
+    let data = try JSONEncoder().encode(output)
+    let decoded = try JSONDecoder().decode(MusicPlaylistMutationOutput.self, from: data)
+
+    expect(decoded).toEqual(output)
+  }
+
   func testSnapshotWithoutPlaylistFieldDecodesAsEmpty() throws {
     let snapshot = playlistCatalogSnapshot(albums: [])
     let encoded = try JSONEncoder().encode(snapshot)

@@ -229,7 +229,7 @@ private struct MusicSearchResultRow: View {
   }
 }
 
-private struct MusicSearchResultArtwork: View {
+struct MusicSearchResultArtwork: View {
   let result: MusicSearchResultData
   let transitionNamespace: Namespace.ID?
 

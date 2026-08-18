@@ -11,6 +11,7 @@ extension EventLabel {
     case "aa99a570": "Music device claimed"
     case "d3cb7281": "Music app status failed"
     case "0f92a6a8": "Music app status polling failed"
+    case "bc86178a": "Music connection invalidated"
     // --- Onboarding funnel ---
     case "8502ee88": "Onboarding welcome shown"
     case "7606fe61": "Onboarding: is parent or partner"

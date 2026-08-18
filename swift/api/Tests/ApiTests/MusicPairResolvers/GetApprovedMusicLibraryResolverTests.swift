@@ -466,7 +466,7 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     }
   }
 
-  func testUnauthorizedAfterTokenRowDeleted() async throws {
+  func testLoggedOutAfterTokenRowDeleted() async throws {
     let child = try await self.child()
     let (_, install) = try await self.claimedMusicInstall(for: child)
     let token = try await self.db.create(MusicApp.Token(installId: install.id))
@@ -481,9 +481,10 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
         to: .music(.authed(tokenValue, .getApprovedMusicLibrary)),
         in: .mock,
       )
-      XCTFail("expected unauthorized error after token row deleted")
+      XCTFail("expected logged-out error after token row deleted")
     } catch let error as PqlError {
-      expect(error.type).toEqual(.unauthorized)
+      expect(error.type).toEqual(.loggedOut)
+      expect(error.id).toEqual("2b2a110a")
     }
   }
 }

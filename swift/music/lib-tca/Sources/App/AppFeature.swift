@@ -40,9 +40,11 @@ struct AppFeature: Sendable {
     case albumResolution
   }
 
-  @Dependency(\.keychain) var keychain
+  @Dependency(\.approvedMusicLibraryCache) var approvedMusicLibraryCache
   @Dependency(\.device) var device
+  @Dependency(\.keychain) var keychain
   @Dependency(\.playback) var playback
+  @Dependency(\.playbackSessionCache) var playbackSessionCache
   @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
@@ -109,21 +111,14 @@ struct AppFeature: Sendable {
 
       #if DEBUG
         case .library(.debugResetOnboardingButtonTapped):
-          self.keychain.deleteConnection()
           self.keychain.save(deviceId: self.uuid())
-          state.isNowPlayingPresented = false
-          state.library = .init()
-          state.playback = .init()
-          state.pendingLibraryPlayNowOrigin = nil
-          state.search = .init()
-          state.setup = .init()
-          state.selectedTab = .library
-          return .merge(
-            .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
-            .cancel(id: PlaybackFeature.CancelID.playbackEvents),
-            .run { _ in await self.playback.stop() },
-          )
+          return self.resetConnectionBoundState(&state)
       #endif
+
+      case .library(.delegate(.connectionInvalid)):
+        guard self.keychain.loadConnection() != nil else { return .none }
+        log(.warn, .setup, "bc86178a")
+        return self.resetConnectionBoundState(&state)
 
       case .library(.delegate(.addToQueue(let items))):
         state.pendingLibraryPlayNowOrigin = nil
@@ -254,6 +249,35 @@ struct AppFeature: Sendable {
         return .none
       }
     }
+  }
+
+  private func resetConnectionBoundState(
+    _ state: inout State,
+  ) -> EffectOf<Self> {
+    let childID = self.keychain.loadConnection()?.childId
+    self.keychain.deleteConnection()
+    state.isNowPlayingPresented = false
+    state.library = .init()
+    state.playback = .init()
+    state.pendingLibraryPlayNowOrigin = nil
+    state.search = .init()
+    state.setup = .init()
+    state.selectedTab = .library
+    return .merge(
+      .cancel(id: CancelID.albumResolution),
+      .cancel(id: LibraryFeature.CancelID.approvedLibraryRefresh),
+      .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
+      .cancel(id: PlaybackFeature.CancelID.checkpointSave),
+      .cancel(id: PlaybackFeature.CancelID.playbackEvents),
+      .cancel(id: PlaybackFeature.CancelID.playbackStart),
+      .cancel(id: PlaybackFeature.CancelID.seek),
+      .run { _ in
+        await self.playback.stop()
+        guard let childID else { return }
+        await self.approvedMusicLibraryCache.delete(childId: childID)
+        await self.playbackSessionCache.delete(childId: childID)
+      },
+    )
   }
 
   private func synchronizeDetailPlayback(state: inout State) {

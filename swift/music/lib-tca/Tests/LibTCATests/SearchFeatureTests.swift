@@ -180,10 +180,10 @@ struct SearchFeatureTests {
     await store.send(.path(.element(
       id: pathID,
       action: .playlist(.delegate(.addMusic)),
-    ))) {
-      $0.path.removeAll()
-    }
-    await store.receive(.delegate(.browseLibrary))
+    )))
+    await store.receive(.delegate(.library(.playlistMusicPickerRequested(
+      playlist.id,
+    ))))
   }
 
   @Test
