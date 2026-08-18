@@ -45,12 +45,49 @@ final class FilterFeatureTests: XCTestCase {
   }
 
   @MainActor
+  func testSuspensionEndReportsResultingFilterState() async {
+    let (store, _) = AppReducer.testStore {
+      $0.filter.currentSuspensionExpiration = Date(timeIntervalSince1970: 60)
+      $0.filter.extension = .installedAndRunning
+      $0.user.data = .mock { $0.filteringDisabled = true }
+    }
+    let send = succeed(with: (), capturing: WebSocketMessage.FromAppToApi.self)
+    store.deps.websocket.send = send.fn
+
+    await store.send(.xpc(.receivedExtensionMessage(.userFilterSuspensionEnded(502)))) {
+      $0.filter.currentSuspensionExpiration = nil
+    }
+
+    await expect(send.calls).toEqual([
+      .currentFilterState_v2(.unfiltered),
+    ])
+  }
+
+  @MainActor
   func testEveryMinuteSendsAliveMsgToFilter() async {
     let (store, _) = AppReducer.testStore()
     let alive = mock(once: Result<Bool, XPCErr>.success(true))
     store.deps.filterXpc.sendAlive = alive.fn
     await store.send(.heartbeat(.everyMinute))
     await expect(alive.called).toEqual(true)
+  }
+
+  @MainActor
+  func testEveryMinuteReportsCurrentFilterStateWhenWebsocketConnected() async {
+    let expiration = Date(timeIntervalSince1970: 60)
+    let (store, _) = AppReducer.testStore {
+      $0.user.data = .mock
+      $0.filter.extension = .installedAndRunning
+      $0.filter.currentSuspensionExpiration = expiration
+    }
+    let send = succeed(with: (), capturing: WebSocketMessage.FromAppToApi.self)
+    store.deps.websocket.send = send.fn
+
+    await store.send(.heartbeat(.everyMinute))
+
+    await expect(send.calls).toEqual([
+      .currentFilterState_v2(.suspended(resuming: expiration)),
+    ])
   }
 
   @MainActor
@@ -115,6 +152,25 @@ final class FilterFeatureTests: XCTestCase {
     // and 3) relaunch
     await expect(stopWatcher.called).toEqual(true)
     await expect(relaunch.called).toEqual(true)
+  }
+
+  @MainActor
+  func testAdminSuspensionReportsEffectiveFilterState() async {
+    let (store, _) = AppReducer.testStore {
+      $0.filter.extension = .installedButNotRunning
+    }
+    let send = succeed(with: (), capturing: WebSocketMessage.FromAppToApi.self)
+    store.deps.websocket.send = send.fn
+
+    await store.send(
+      .adminAuthed(.requestSuspension(.webview(.grantSuspensionClicked(durationInSeconds: 30)))),
+    ) {
+      $0.filter.currentSuspensionExpiration = Date(timeIntervalSince1970: 30)
+    }
+
+    await expect(send.calls).toEqual([
+      .currentFilterState_v2(.off),
+    ])
   }
 
   @MainActor
@@ -227,6 +283,55 @@ final class FilterFeatureTests: XCTestCase {
     await expect(showNotification.calls.count).toEqual(3)
     await expect(showNotification.calls[2].a).toContain("browsers quitting soon")
     await expect(quitBrowsers.calls.count).toEqual(1)
+  }
+
+  @MainActor
+  func testAcceptedWebsocketSuspensionReportsCurrentFilterStateImmediately() async {
+    let expiration = Date(timeIntervalSince1970: 120)
+    let (store, _) = AppReducer.testStore {
+      $0.filter.extension = .installedAndRunning
+    }
+    let send = succeed(with: (), capturing: WebSocketMessage.FromAppToApi.self)
+    store.deps.websocket.send = send.fn
+
+    await store.send(.websocket(.receivedMessage(.filterSuspensionRequestDecided_v2(
+      id: .init(),
+      decision: .accepted(duration: 120, extraMonitoring: nil),
+      comment: nil,
+    )))) {
+      $0.filter.currentSuspensionExpiration = expiration
+    }
+
+    await expect(send.calls).toEqual([
+      .currentFilterState_v2(.suspended(resuming: expiration)),
+    ])
+  }
+
+  @MainActor
+  func testFallbackApprovalReportsCurrentFilterStateWhenWebsocketConnected() async {
+    let expiration = Date(timeIntervalSince1970: 33)
+    let output = CheckIn_v2.Output.mock {
+      $0.resolvedFilterSuspension = .init(
+        id: .deadbeef,
+        decision: .accepted(duration: 33, extraMonitoring: nil),
+        comment: nil,
+      )
+    }
+    let (store, _) = AppReducer.testStore {
+      $0.filter.extension = .installedAndRunning
+      $0.requestSuspension.pending = .init(id: .deadbeef, createdAt: .epoch)
+    }
+    let send = succeed(with: (), capturing: WebSocketMessage.FromAppToApi.self)
+    store.deps.websocket.send = send.fn
+
+    await store.send(.checkIn(result: .success(output), reason: .pendingRequest)) {
+      $0.filter.currentSuspensionExpiration = expiration
+      $0.requestSuspension.pending = nil
+    }
+
+    await expect(send.calls).toEqual([
+      .currentFilterState_v2(.suspended(resuming: expiration)),
+    ])
   }
 
   @MainActor

@@ -205,11 +205,19 @@ extension FilterFeature.RootReducer {
         state.requestSuspension.pending = nil
         switch resolvedSuspension.decision {
         case .accepted(let duration, let extraMonitoring):
-          return self.suspendFilter(
+          let suspend = self.suspendFilter(
             for: duration,
             with: &state,
             comment: resolvedSuspension.comment,
             extraMonitoring: extraMonitoring != nil,
+          )
+          let updatedState = state
+          return .merge(
+            suspend,
+            .exec { _ in
+              guard try await self.websocket.state() == .connected else { return }
+              try await self.websocket.sendFilterState(updatedState)
+            },
           )
         case .rejected:
           return .exec { _ in
@@ -261,12 +269,12 @@ extension FilterFeature.RootReducer {
     case .menuBar(.resumeFilterClicked):
       state.menuBar.dropdownOpen = false
       state.filter.currentSuspensionExpiration = nil
-      return self.handleFilterSuspensionEnded(browsers: state.browsers, early: true)
+      return self.handleFilterSuspensionEnded(state: state, early: true)
 
     case .xpc(.receivedExtensionMessage(.userFilterSuspensionEnded(let userId)))
       where userId == device.currentUserId():
       state.filter.currentSuspensionExpiration = nil
-      return self.handleFilterSuspensionEnded(browsers: state.browsers, early: false)
+      return self.handleFilterSuspensionEnded(state: state, early: false)
 
     case .xpc(.receivedExtensionMessage(.logs(let events))):
       return .exec { _ in await self.api.logFilterEvents(events) }
@@ -385,17 +393,17 @@ extension FilterFeature.RootReducer {
   }
 
   func handleFilterSuspensionEnded(
-    browsers: [BrowserMatch],
+    state: State,
     early endedEarly: Bool = false,
   ) -> Effect<Action> {
     .exec { send in
       if endedEarly { _ = await self.xpc.endFilterSuspension() }
       await self.api
         .securityEvent(endedEarly ? .filterSuspensionEndedEarly : .filterSuspensionExpired)
-      try? await self.websocket.send(.currentFilterState_v2(.on))
+      try? await self.websocket.sendFilterState(state)
       await self.device.notifyBrowsersQuitting()
       try await self.mainQueue.sleep(for: .seconds(60))
-      await self.device.quitBrowsers(browsers)
+      await self.device.quitBrowsers(state.browsers)
     }
     .cancellable(id: FilterFeature.CancelId.quitBrowsers, cancelInFlight: true)
   }

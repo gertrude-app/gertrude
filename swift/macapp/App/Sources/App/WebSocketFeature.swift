@@ -17,7 +17,6 @@ enum WebSocketFeature {
     @Dependency(\.device) var device
     @Dependency(\.websocket) var websocket
     @Dependency(\.network) var network
-    @Dependency(\.date.now) var now
   }
 }
 
@@ -33,8 +32,9 @@ extension WebSocketFeature.RootReducer {
             network.isConnected() else {
         return .none
       }
-      return .exec { [state] send in
-        guard try await websocket.state() != .connected else {
+      return .exec { [state] _ in
+        if try await websocket.state() == .connected {
+          try await websocket.sendFilterState(state)
           return
         }
         // try to repair any broken/disconnected websocket connection status
@@ -73,11 +73,10 @@ extension WebSocketFeature.RootReducer {
         try await websocket.disconnect()
       }
 
-    case .adminAuthed(.requestSuspension(.webview(.grantSuspensionClicked(let durationInSeconds)))):
+    case .adminAuthed(.requestSuspension(.webview(.grantSuspensionClicked))):
       guard state.admin.accountStatus != .inactive else { return .none }
-      return .exec { _ in
-        let expiration = self.now + .seconds(durationInSeconds)
-        try await websocket.send(.currentFilterState_v2(.suspended(resuming: expiration)))
+      return .exec { [state] _ in
+        try await websocket.sendFilterState(state)
       }
 
     case .application(.didWake):
@@ -123,7 +122,12 @@ extension WebSocketFeature.RootReducer {
       case .receivedMessage(.userUpdated):
         return .none // handled by user feature, which triggers a checkin
 
-      case .receivedMessage(.filterSuspensionRequestDecided_v2):
+      case .receivedMessage(.filterSuspensionRequestDecided_v2(_, .accepted, _)):
+        return .exec { [state] _ in
+          try await websocket.sendFilterState(state)
+        }
+
+      case .receivedMessage(.filterSuspensionRequestDecided_v2(_, .rejected, _)):
         return .none // handled by filter feature AND monitoring feature
       }
 
