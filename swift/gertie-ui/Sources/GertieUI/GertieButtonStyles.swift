@@ -90,44 +90,29 @@ private struct GertiePrimaryButtonAppearance: ButtonStyle {
       configurationIsPressed: configuration.isPressed,
     )
 
-    VStack {
-      configuration.label
-        .font(.headline)
-        .multilineTextAlignment(.center)
-        .foregroundStyle(.white)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(
-          Gradient(colors: [Color.violet500, Color.violet600])
-            .opacity(
-              self.isEnabled
-                ? (isPressed ? 0.8 : 1) : 0,
-            ),
-        )
-        .clipShape(.rect(cornerRadius: 16, style: .continuous))
-    }
-    .padding(.vertical, 2)
-    .padding(.horizontal, 1)
-    .background(
-      Gradient(colors: [
-        Color.violet400,
-        self.isEnabled ? Color.violet800 : Color.violet500,
-      ]),
-    )
-    .clipShape(.rect(cornerRadius: 18, style: .continuous))
-    .opacity(
-      self.isEnabled
-        ? (isPressed ? 0.8 : 1)
-        : (self.cs == .light ? 0.6 : 0.4),
-    )
-    .scaleEffect(isPressed ? 0.98 : 1)
-    .sensoryFeedback(
-      .impact(weight: .medium, intensity: 0.7),
-      trigger: isPressed,
-    ) { wasPressed, isPressed in
-      self.isEnabled && !wasPressed && isPressed
-    }
+    configuration.label
+      .font(.headline)
+      .multilineTextAlignment(.center)
+      .foregroundStyle(.white)
+      .frame(maxWidth: .infinity)
+      .padding(.horizontal, 20)
+      .padding(.vertical, 14)
+      .background(
+        Color(
+          self.cs,
+          light: .violet500,
+          dark: .violet600.opacity(0.9),
+        ),
+      )
+      .clipShape(.rect(cornerRadius: 16, style: .continuous))
+      .opacity(self.isEnabled ? 1 : 0.5)
+      .scaleEffect(isPressed ? 0.98 : 1)
+      .sensoryFeedback(
+        .impact(weight: .medium, intensity: 0.7),
+        trigger: isPressed,
+      ) { wasPressed, isPressed in
+        self.isEnabled && !wasPressed && isPressed
+      }
   }
 }
 
@@ -142,69 +127,31 @@ private struct GertieSecondaryButtonAppearance: ButtonStyle {
       configurationIsPressed: configuration.isPressed,
     )
 
-    VStack {
-      configuration.label
-        .font(.headline)
-        .multilineTextAlignment(.center)
-        .foregroundStyle(
-          Color(self.cs, light: Color.violet700, dark: Color.violet100),
-        )
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 20)
-        .padding(.vertical, 14)
-        .background(
-          Gradient(colors: [
-            Color(
-              self.cs,
-              light: Color.violet100.opacity(0.5),
-              dark: .black.opacity(0.3),
-            ),
-            Color(
-              self.cs,
-              light: Color.violet200,
-              dark: .white.opacity(0.03),
-            ),
-          ])
-          .opacity(
-            self.isEnabled
-              ? (isPressed ? 0.8 : 1) : 0,
-          ),
-        )
-        .clipShape(.rect(cornerRadius: 16, style: .continuous))
-    }
-    .padding(.vertical, 2)
-    .padding(.horizontal, 1)
-    .background(
-      Gradient(colors: [
+    configuration.label
+      .font(.headline)
+      .multilineTextAlignment(.center)
+      .foregroundStyle(
+        Color(self.cs, light: .violet500, dark: .violet400),
+      )
+      .frame(maxWidth: .infinity)
+      .padding(.horizontal, 20)
+      .padding(.vertical, 14)
+      .background(
         Color(
           self.cs,
-          light: Color.violet100.opacity(self.isEnabled ? 0.3 : 0.8),
-          dark: .white.opacity(0.15),
+          light: .violet500.opacity(0.1),
+          dark: .violet500.opacity(0.15),
         ),
-        self.isEnabled
-          ? Color(
-            self.cs,
-            light: Color.violet300.opacity(0.8),
-            dark: .white.opacity(0.05),
-          )
-          : Color(
-            self.cs,
-            light: Color.violet100.opacity(0.8),
-            dark: .white.opacity(0.1),
-          ),
-      ]),
-    )
-    .clipShape(.rect(cornerRadius: 18, style: .continuous))
-    .opacity(
-      self.isEnabled ? (isPressed ? 0.8 : 1) : 0.4,
-    )
-    .scaleEffect(isPressed ? 0.98 : 1)
-    .sensoryFeedback(
-      .impact(weight: .medium, intensity: 0.7),
-      trigger: isPressed,
-    ) { wasPressed, isPressed in
-      self.isEnabled && !wasPressed && isPressed
-    }
+      )
+      .clipShape(.rect(cornerRadius: 16, style: .continuous))
+      .opacity(self.isEnabled ? 1 : 0.5)
+      .scaleEffect(isPressed ? 0.98 : 1)
+      .sensoryFeedback(
+        .impact(weight: .medium, intensity: 0.7),
+        trigger: isPressed,
+      ) { wasPressed, isPressed in
+        self.isEnabled && !wasPressed && isPressed
+      }
   }
 }
 

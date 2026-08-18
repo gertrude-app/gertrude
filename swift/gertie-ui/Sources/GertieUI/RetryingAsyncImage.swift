@@ -6,26 +6,26 @@ import SwiftUI
   import AppKit
 #endif
 
-// NB: duplicated verbatim in the podcasts and blocker apps — hoist into
-// GertieUI (swift/gertie-ui) once #861 lands, and keep the copies in sync until then
-public struct RetryingAsyncImage<Content: View, Placeholder: View>: View {
+struct RetryingAsyncImage<Content: View, Placeholder: View, Failure: View>: View {
   let url: URL
   let maxAttempts: Int
   let animation: Animation?
   let onFailure: (@MainActor @Sendable (any Error) -> Void)?
   let content: (Image) -> Content
   let placeholder: () -> Placeholder
+  let failure: () -> Failure
 
   @State private var image: Image?
   @State private var failed = false
 
-  public init(
+  init(
     url: URL,
     maxAttempts: Int = 3,
     animation: Animation? = nil,
     onFailure: (@MainActor @Sendable (any Error) -> Void)? = nil,
     @ViewBuilder content: @escaping (Image) -> Content,
     @ViewBuilder placeholder: @escaping () -> Placeholder,
+    @ViewBuilder failure: @escaping () -> Failure,
   ) {
     self.url = url
     self.maxAttempts = maxAttempts
@@ -33,16 +33,19 @@ public struct RetryingAsyncImage<Content: View, Placeholder: View>: View {
     self.onFailure = onFailure
     self.content = content
     self.placeholder = placeholder
+    self.failure = failure
   }
 
-  public var body: some View {
+  var body: some View {
     ZStack {
       // load-bearing: `.task` never runs if every branch below is an EmptyView
       // placeholder, so this zero-size anchor keeps the container rendered
       Color.clear.frame(width: 0, height: 0)
       if let image = self.image {
         self.content(image)
-      } else if !self.failed {
+      } else if self.failed {
+        self.failure()
+      } else {
         self.placeholder()
       }
     }
@@ -77,7 +80,7 @@ public struct RetryingAsyncImage<Content: View, Placeholder: View>: View {
   }
 }
 
-public enum RemoteImageError: Error {
+enum RemoteImageError: Error {
   case httpStatus(Int)
   case undecodable(bytes: Int)
 }

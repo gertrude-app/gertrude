@@ -10,28 +10,24 @@ struct CrossPromoView: View {
 
   var body: some View {
     let campaign = self.store.campaign
-    GertieActionScreen(
-      message: "\(campaign.headline)\n\n\(campaign.body)",
-      icon: .announcement,
-      actions: self.actions,
-      supplementPlacement: .beforeMessage,
-    ) {
-      if let image = campaign.image {
-        CrossPromoImage(
-          url: image.url,
-          label: image.description,
-          onLoadFailure: { error in
-            log(
-              .warn,
-              .setup,
-              "af5b46ca",
-              detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
-                + "url=\(image.url) error=\(error)",
-            )
-          },
-        )
-      }
-    }
+    GertieCrossPromoScreen(
+      headline: campaign.headline,
+      body: campaign.body,
+      image: self.remoteImage,
+      primaryAction: .button(campaign.primaryCta.label) {
+        self.store.send(.primaryBtnTapped)
+      },
+      secondaryAction: campaign.secondaryCta.map { cta in
+        .button(cta.label) {
+          self.store.send(.secondaryBtnTapped)
+        }
+      },
+      tertiaryAction: campaign.tertiaryCta.map { cta in
+        .button(cta.label) {
+          self.store.send(.tertiaryBtnTapped)
+        }
+      },
+    )
     .interactiveDismissDisabled(!campaign.dismissable)
     .background {
       #if os(iOS)
@@ -42,25 +38,21 @@ struct CrossPromoView: View {
     }
   }
 
-  private var actions: [GertieScreenAction] {
-    var actions: [GertieScreenAction] = [
-      .button(self.store.campaign.primaryCta.label) {
-        self.store.send(.primaryBtnTapped)
+  private var remoteImage: GertieCrossPromoScreen.RemoteImage? {
+    let campaign = self.store.campaign
+    guard let image = campaign.image, let url = URL(string: image.url) else { return nil }
+    return .init(
+      url: url,
+      accessibilityLabel: image.description,
+      onLoadFailure: { error in
+        log(
+          .warn,
+          .setup,
+          "af5b46ca",
+          detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
+            + "url=\(image.url) error=\(error)",
+        )
       },
-    ]
-
-    if let cta = self.store.campaign.secondaryCta {
-      actions.append(.button(cta.label) {
-        self.store.send(.secondaryBtnTapped)
-      })
-    }
-
-    if let cta = self.store.campaign.tertiaryCta {
-      actions.append(.button(cta.label) {
-        self.store.send(.tertiaryBtnTapped)
-      })
-    }
-
-    return actions
+    )
   }
 }

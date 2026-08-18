@@ -9,6 +9,12 @@ public extension View {
 struct GertieScreenBackground: View {
   @Environment(\.colorScheme) private var colorScheme
 
+  let gradientOpacity: Double
+
+  init(gradientOpacity: Double = 1) {
+    self.gradientOpacity = gradientOpacity
+  }
+
   var body: some View {
     Color(self.colorScheme, light: .white, dark: .black)
       .overlay {
@@ -24,6 +30,7 @@ struct GertieScreenBackground: View {
           startPoint: .top,
           endPoint: .bottom,
         )
+        .opacity(self.gradientOpacity)
       }
   }
 }
@@ -34,8 +41,7 @@ private struct GertieScreenBackgroundModifier: ViewModifier {
 
   func body(content: Content) -> some View {
     ZStack {
-      GertieScreenBackground()
-        .opacity(self.isVisible ? 1 : 0)
+      GertieScreenBackground(gradientOpacity: self.isVisible ? 1 : 0)
         .ignoresSafeArea()
 
       content
