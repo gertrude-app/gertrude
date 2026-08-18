@@ -28,22 +28,25 @@ ended up taking matters into our own hands and built
 [a free iOS app called “Gertrude Blocker”](https://apps.apple.com/us/app/gertrude-blocker/id6736368820)
 to solve this problem for parents.
 
+Apple still has not given parents a way to turn `#images` off. Gertrude Blocker is
+actively maintained and works on current iOS, including iOS 26 — everything below applies
+whatever version your child's iPhone or iPad is running.
+
 ## Introducing “Gertrude Blocker”
 
 {% image src="lockdown-iphone/gertrude-blocker-ios-app.png" alt="Gertrude Blocker free iOS app allows parents to block unwanted GIFs in #images texting app" /%}
 
 [Gertrude Blocker](https://apps.apple.com/us/app/gertrude-blocker/id6736368820) is a free
 iOS app that allows parents to install a network content filter that plugs several glaring
-holes in Apple's Screen Time parental controls, including: (at the time of this writing in
-10/2024):
+holes in Apple's Screen Time parental controls, including:
 
 - **disabling #images GIF search** in Apple's Messages text-messaging app
 - blocking animated GIFs in **WhatsApp, Skype,** and other messaging apps
-- prevents **images searched via Spotlight** from loading (not currently possible to
-  restrict by parents in iOS 18)
+- prevents **images searched via Spotlight** from loading (still not possible for parents
+  to restrict with Apple's built-in controls)
 - **removing images from the App Store** iMessage mini-app in Apple Messages (not
   currently removable by parents)
-- **blocking AI search results** embedded in iOS 18 Photos App
+- **blocking AI search results** embedded in the Photos app
 
 {% callout title="Who can use Gertrude Blocker?" %}
 
@@ -158,7 +161,7 @@ see only **empty gray boxes**, which shows that the blocker is working correctly
 
 Or, you can check that **Spotlight image searching** now turns up only empty placeholders
 by searching your phone. (Note: this feature can be disabled under Settings -> Search ->
-Show Related Content &mdash; but parents have no way in iOS 18 to restrict children from
+Show Related Content &mdash; but Apple gives parents no way to stop children from
 re-enabling it.)
 
 {% image src="lockdown-iphone/blank-spotlight-images.png" caption="Spotlight image search should show empty images" /%}
