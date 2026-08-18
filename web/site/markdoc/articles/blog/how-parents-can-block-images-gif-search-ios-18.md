@@ -1,6 +1,7 @@
 ---
 title: 'SOLVED: How to Block or Disable GIFs on iPhone'
 date: '2024-10-24T18:23:01.633Z'
+updated: '2026-08-18'
 image: /og-images/gif-images.png
 description:
   'Apple still won’t let parents turn off #images GIF search in Messages. Gertrude Blocker

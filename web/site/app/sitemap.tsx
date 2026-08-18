@@ -28,10 +28,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogSlugs = await getArticleSlugs(`blog`);
   const blogEntries: MetadataRoute.Sitemap = await Promise.all(
     blogSlugs.map(async (slug) => {
-      const { date } = await getArticle(slug, `blog`);
+      const { date, updated } = await getArticle(slug, `blog`);
       return {
         url: `${BASE_URL}/blog/${slug}`,
-        lastModified: new Date(date),
+        lastModified: new Date(updated ?? date),
       };
     }),
   );

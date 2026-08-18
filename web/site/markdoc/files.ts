@@ -29,6 +29,7 @@ export interface DocsArticle extends Article {
 export interface BlogArticle extends Article {
   type: `blog`;
   date: string;
+  updated?: string;
   category: `engineering` | `mac` | `ios`;
 }
 
@@ -63,7 +64,7 @@ export async function getArticle<T extends ArticleType>(
   }
   const rawText = fs.readFileSync(filePath, `utf-8`);
   const matterResult = matter(rawText);
-  const { title, description, image, date, category } = matterResult.data;
+  const { title, description, image, date, updated, category } = matterResult.data;
   const ast = Markdoc.parse(rawText);
   const content = Markdoc.transform(ast, config);
 
@@ -75,6 +76,10 @@ export async function getArticle<T extends ArticleType>(
     if (typeof date === `string`)
       throw new Error(
         `Unnecessary date in ${slug}.md\nDocumentation articles do not need a date`,
+      );
+    if (typeof updated === `string`)
+      throw new Error(
+        `Unnecessary updated in ${slug}.md\nDocumentation articles do not need dates`,
       );
     if (typeof category === `string`)
       throw new Error(
@@ -90,6 +95,10 @@ export async function getArticle<T extends ArticleType>(
   }
 
   if (!date || typeof date !== `string`) throw new Error(`Missing date in ${slug}.md`);
+  if (updated !== undefined) {
+    if (typeof updated !== `string` || Number.isNaN(new Date(updated).getTime()))
+      throw new Error(`Invalid updated date in ${slug}.md`);
+  }
   if (
     !category ||
     typeof category !== `string` ||
@@ -102,6 +111,7 @@ export async function getArticle<T extends ArticleType>(
     description,
     image,
     date,
+    updated,
     category,
     slug,
   } as ArticleOfType<T>;
