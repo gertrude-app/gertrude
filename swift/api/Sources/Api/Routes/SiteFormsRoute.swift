@@ -61,24 +61,18 @@ enum SiteFormsRoute {
       .where(.email == data.normalizedEmail)
       .first(in: req.context.db)
 
-    await data.persist(parent: parent, in: req.context.db)
+    let assignee = await nextAssignee(in: req.context.db)
+    await data.persist(parent: parent, assignee: assignee, in: req.context.db)
 
     Task {
-      await with(dependency: \.slack).internal(.contactForm, data.slackText(parent: parent))
+      await with(dependency: \.slack)
+        .internal(.contactForm, data.slackText(parent: parent, assignee: assignee))
       try await with(dependency: \.postmark).send(
-        to: req.env.primarySupportEmail,
+        to: assignee,
         replyTo: data.email,
         subject: data.form.name + " Submission",
         html: data.emailBody(parent: parent),
       )
-      if let backupEmail = req.env.get("BACKUP_SUPPORT_EMAIL") {
-        try await with(dependency: \.postmark).send(
-          to: backupEmail,
-          replyTo: data.email,
-          subject: data.form.name + " Submission",
-          html: data.emailBody(parent: parent),
-        )
-      }
     }
 
     return Response(
@@ -112,6 +106,12 @@ enum SiteFormsRoute {
   }
 }
 
+private func nextAssignee(in db: any DuetSQL.Client) async -> String {
+  let rotation = get(dependency: \.env).supportRotationEmails
+  let count = await (try? SiteFormSubmission.query().count(in: db)) ?? 0
+  return rotation[count % rotation.count]
+}
+
 private func spamChallenge(_ data: FormData) async throws {
   switch await get(dependency: \.cloudflare)
     .verifyTurnstileToken(data.turnstileToken) {
@@ -132,7 +132,7 @@ private func spamChallenge(_ data: FormData) async throws {
 // extensions
 
 extension FormData {
-  func persist(parent: Parent?, in db: any DuetSQL.Client) async {
+  func persist(parent: Parent?, assignee: String, in db: any DuetSQL.Client) async {
     do {
       try await db.create(SiteFormSubmission(
         form: self.form,
@@ -142,6 +142,7 @@ extension FormData {
         subject: self.subject,
         message: self.message,
         parentId: parent?.id,
+        assignee: assignee,
       ))
     } catch {
       await with(dependency: \.slack).error("""
@@ -169,7 +170,7 @@ extension FormData {
     """
   }
 
-  func slackText(parent: Parent?) -> String {
+  func slackText(parent: Parent?, assignee: String) -> String {
     let fromLine: String
     if let parent {
       let link = AdminLink().slack(to: .parent(parent.id), text: self.normalizedEmail)
@@ -182,6 +183,7 @@ extension FormData {
     \(fromLine)
     \(self.subject.map { "_Subject:_ \($0)" } ?? "")
     \(self.app.map { "_App:_ `\($0.display)`" } ?? "")
+    _Assigned:_ `\(assignee)`
     _Message:_
     \(self.message)
     """

@@ -14,6 +14,7 @@ struct CreateSiteFormSubmissions: GertieMigration {
         subject text,
         message text NOT NULL,
         parent_id uuid REFERENCES parent.parents(id) ON DELETE SET NULL,
+        assignee text NOT NULL,
         created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT chk_site_form_submissions_subject
           CHECK (form <> 'contact' OR subject IS NOT NULL)

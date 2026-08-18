@@ -33,11 +33,45 @@ final class SiteFormsRouteTests: ApiTestCase, @unchecked Sendable {
     expect(submission.message).toEqual("How much per device?")
     expect(submission.parentId).toEqual(parent.id) // links via email
   }
+
+  func testSubmissionsAlternateBetweenRotationEmails() async throws {
+    let rotation = ["rotate-a@example.com", "rotate-b@example.com"]
+    let firstEmail = "first-\(UUID())@example.com"
+    let secondEmail = "second-\(UUID())@example.com"
+
+    try await withDependencies {
+      $0.env.supportRotationEmails = rotation
+    } operation: {
+      try await self.submitSiteForm(self.contactFields(email: firstEmail))
+      try await self.submitSiteForm(self.contactFields(email: secondEmail))
+    }
+
+    let first = try await SiteFormSubmission.query()
+      .where(.email == firstEmail)
+      .first(in: self.db)
+    let second = try await SiteFormSubmission.query()
+      .where(.email == secondEmail)
+      .first(in: self.db)
+    expect(first.assignee).not.toEqual(second.assignee) // consecutive submissions rotate
+    expect([first.assignee, second.assignee].sorted()).toEqual(rotation)
+  }
 }
 
 // helpers
 
 extension SiteFormsRouteTests {
+  func contactFields(email: String) -> [String: String] {
+    [
+      "form": "contact",
+      "app": "mac",
+      "name": "Jane Doe",
+      "email": email,
+      "subject": "Help",
+      "message": "hi",
+      "turnstileToken": "turnstile-token",
+    ]
+  }
+
   func submitSiteForm(_ fields: [String: String]) async throws {
     let body = fields
       .map { "\($0)=\($1.addingPercentEncoding(withAllowedCharacters: .alphanumerics)!)" }

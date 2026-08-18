@@ -13,6 +13,7 @@ public struct Env: Sendable {
   public var stripe: Stripe
   public var appStoreConnect: AppStoreConnect
   public var primarySupportEmail: String
+  public var supportRotationEmails: [String]
   public var superAdminEmail: String
   public var cloudflareSecret: String
   public var keychainCrawler: KeychainCrawler
@@ -157,6 +158,7 @@ extension Env: DependencyKey {
         privateKey: processEnv("APPSTORE_PRIVATE_KEY"),
       ),
       primarySupportEmail: processEnv("PRIMARY_SUPPORT_EMAIL"),
+      supportRotationEmails: processEnvList("SUPPORT_ROTATION_EMAILS"),
       superAdminEmail: processEnv("SUPER_ADMIN_EMAIL"),
       cloudflareSecret: processEnv("CLOUDFLARE_SECRET"),
       keychainCrawler: KeychainCrawler(
@@ -181,6 +183,17 @@ public extension DependencyValues {
     get { self[Env.self] }
     set { self[Env.self] = newValue }
   }
+}
+
+func processEnvList(_ key: String) -> [String] {
+  let values = processEnv(key)
+    .split(separator: ",")
+    .map { $0.trimmingCharacters(in: .whitespaces) }
+    .filter { !$0.isEmpty }
+  if values.isEmpty {
+    fatalError("Empty required environment variable list: `\(key)`")
+  }
+  return values
 }
 
 func processEnv(_ key: String) -> String {

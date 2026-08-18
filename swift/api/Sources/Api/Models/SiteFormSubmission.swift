@@ -11,6 +11,7 @@ struct SiteFormSubmission: Codable, Sendable {
   var subject: String?
   var message: String
   var parentId: Parent.Id?
+  var assignee: String
   var createdAt = Date()
 
   enum Form: String, Codable, Sendable {
@@ -36,6 +37,7 @@ struct SiteFormSubmission: Codable, Sendable {
     subject: String? = nil,
     message: String,
     parentId: Parent.Id? = nil,
+    assignee: String,
   ) {
     self.id = id
     self.form = form
@@ -45,5 +47,6 @@ struct SiteFormSubmission: Codable, Sendable {
     self.subject = subject
     self.message = message
     self.parentId = parentId
+    self.assignee = assignee
   }
 }
