@@ -158,6 +158,46 @@ Street-View endpoints. Rolled back 2026-03-04, no replacement.
   successful via cache for hours — always test in an unbrowsed region or cache-clear
   before declaring success.
 
+### 2026-08-18: follow-up — customer (B. Harlan) reports Street View blocked near
+
+Destin FL but not in Miami — found a second UI entry point, `gspe72`
+
+**Trigger:** customer screenshots showing Street View blocked around Destin but rendering
+for Miami-area place-card searches (e.g. "Four Seasons Hotel Miami"), on a kid's device.
+
+**Tested:** first tried to rule out `gspe76` being regionally load-balanced (i.e. the
+customer's device landing on a different edge than ours) by tunneling the test device
+through WireGuard VPNs in three distinct networks — home (Ohio), and DigitalOcean
+droplets in Atlanta and San Francisco — reinstalling Maps fresh each time. Street View hit
+`gspe76` and got DROPped identically in all three; this ruled out the load-balancing
+theory (pinning now n=5+, up from n=2), but didn't explain the customer's report.
+
+Replicating the customer's exact repro path (search a named place → tap its card → tap the **"Look
+Around" button**, rather than the map-pin/zoomed-tease entry points used in the original
+investigation) surfaced a previously-unseen host: `gspe72-ssl.ls.apple.com`, `ALLOW`ed.
+The zoomed-map-tease entry point still correctly hits `gspe76` (already covered) — only
+the place-card button path was missed.
+
+**Verdict:** Street View has multiple distinct UI entry points in Maps that route to
+different `gspeN` hosts. Confirmed `gspe72` is the place-card-specific host (not shared
+nav infra) via the same narrow `hostnameEquals` + reinstall-verified methodology as
+`gspe76`.
+
+**Shipped 2026-08-18** to `Apple Maps images`:
+
+```json
+{
+  "a": { "case": "bundleIdContains", "value": ".com.apple.Maps" },
+  "b": { "case": "hostnameEquals", "value": "gspe72-ssl.ls.apple.com" },
+  "case": "both"
+}
+```
+
+**Residual risk:** confirms the existing `gspeN` pool risk applies per-entry-point, not
+just per-region — there could be further undiscovered entry points (or hosts) beyond the
+three now covered (`gspe76`, `gspe72`, `gspe7`). Revisit if another customer reports a
+leak via a UI path we haven't tested.
+
 ---
 
 ## Music Recognition (Shazam / Control Center)
@@ -284,15 +324,15 @@ only successful Spotify traffic near the moment of appearance was
 the same window were already dropped, including `image-cdn-fa.spotifycdn.com`,
 `misc.scdn.co`, and `scontent-*.xx.fbcdn.net`.
 
-**Failed diagnostic:** added a temporary device-scoped rule for
-`com.spotify.client` + `guc3-spclient.spotify.com`. It made Spotify too broken to reach a
-useful reproduction path, matching prior findings that `spclient` is core Spotify
-backend traffic rather than an artwork-specific endpoint. Removed the diagnostic rule.
+**Failed diagnostic:** added a temporary device-scoped rule for `com.spotify.client` +
+`guc3-spclient.spotify.com`. It made Spotify too broken to reach a useful reproduction
+path, matching prior findings that `spclient` is core Spotify backend traffic rather than
+an artwork-specific endpoint. Removed the diagnostic rule.
 
 **Verdict:** no shippable block rule identified. The share-sheet artwork is likely coming
 from Spotify's already-open backend/cache path or from image bytes Spotify has already
-loaded locally, not from a narrow artwork host analogous to Apple Music's
-`itunescloudd` leak.
+loaded locally, not from a narrow artwork host analogous to Apple Music's `itunescloudd`
+leak.
 
 ### 2026-05-01: Spotify Messages chat unblockable
 
@@ -315,3 +355,101 @@ exists.
 
 **Customer reply:** Spotify has an in-app account-level toggle to disable Messages and a
 per-user block; if that's not enough, don't allow Spotify.
+
+### 2026-08-18: Music Videos (newer feature, distinct from Canvas) — cleanly blockable
+
+**Trigger:** customer report (Connor) — Spotify video content not blocked. Refers to
+Spotify's newer Premium-only "Music Videos" feature (Now Playing "Switch to Video" toggle,
+"Videos for You" playlist), not the older Canvas looping-video feature already covered by
+the existing (undocumented, pre-dates this doc) `Spotify images` group and its blanket
+`hostnameEndsWith: .scdn.co` rule.
+
+**Tested:** USB capture on `com.spotify.client` under a Premium trial while watching
+videos from the "Videos for You" playlist. `video-cf.spotifycdn.com` was the only
+`ALLOW`ed host not already covered by the existing `.scdn.co` wildcard or the legacy
+`video-*` rules — confirmed as the actual delivery host.
+
+**Verdict:** cleanly blockable. Blocking it kills both Music Videos and video podcasts
+(same host serves both); regular audio (music tracks and a non-video podcast) unaffected.
+Untested: whether a video podcast's audio still plays with its video suppressed.
+
+**Shipped 2026-08-18** to the existing `Spotify images` group:
+
+```json
+{
+  "a": { "case": "bundleIdContains", "value": "com.spotify.client" },
+  "b": { "case": "hostnameEquals", "value": "video-cf.spotifycdn.com" },
+  "case": "both"
+}
+```
+
+---
+
+## Gabb Music
+
+### 2026-08-18: album artwork (in-app, lock screen, Control Center) — cleanly blockable
+
+**Trigger:** customer queue item asking whether album artwork can be blocked in the Gabb
+Music app.
+
+**Context:** `com.gabb.music`, installable on any iOS 14+ device (no Gabb phone required).
+Not built on Apple Music or Spotify — white-labeled via Tuned Global, a B2B music
+licensing platform. No free tier; needed a paid trial account to test.
+
+**Tested:** USB capture on iPhone Air (iOS 26.6, new test device — old iPhone 12 mini
+retired) while browsing/playing. Artwork and audio split across three random-subdomain
+CloudFront hosts:
+
+- `dd8l2wcg0g8nf.cloudfront.net` — **audio**. Blocking it killed playback; not a target.
+- `dxfve6m7pg0pq.cloudfront.net` — **in-app artwork**. Verified clean via full
+  delete+reinstall (rules out the cache false-positive that bit the Maps investigation).
+- `d16npyvi7pcxgr.cloudfront.net` — **lock screen / Control Center artwork**, a sibling
+  fetch distinct from the in-app host (same shape as the Apple Music `itunescloudd`
+  finding). Confirmed on two never-before-played artists.
+
+**Verdict:** cleanly blockable, no collateral (playback + both widgets tested clean).
+
+**Shipped 2026-08-18:** new default (non-opt-in) block group `Gabb Music artwork`:
+
+```json
+{"a":{"case":"bundleIdContains","value":"com.gabb.music"},"b":{"case":"hostnameEquals","value":"dxfve6m7pg0pq.cloudfront.net"},"case":"both"}
+{"a":{"case":"bundleIdContains","value":"com.gabb.music"},"b":{"case":"hostnameEquals","value":"d16npyvi7pcxgr.cloudfront.net"},"case":"both"}
+```
+
+**Residual risk:** unlike `mzstatic.com`/`images-na.ssl-images-amazon.com`, these are
+auto-generated per-distribution CloudFront hostnames with no stability guarantee — could
+go stale silently on a Gabb app update. Revisit if artwork reappears.
+
+---
+
+## Discord (Klipy GIFs)
+
+### 2026-08-18: GIF picker/search blockable, sent GIFs are not
+
+**Trigger:** customer report (thread w/ H. Stannie) — Discord's GIF picker slipping past
+the blocker. Discord switched its default GIF provider from Tenor to Klipy in 2026, after
+Google shut down Tenor's third-party API.
+
+**Tested:** USB capture on `com.hammerandchisel.discord` while browsing, searching, and
+sending GIFs.
+
+- `static.klipy.com` — picker/search thumbnails.
+- `images-ext-1.discordapp.net` — the actual GIF once sent. Confirmed via a
+  precisely-timed test (sent at 14:31:02; the only flow in that window was this host).
+  It's Discord's general external-image proxy — also carries link-preview embeds for any
+  pasted URL — and the filter only sees hostname, not request path, so a Klipy GIF and an
+  unrelated link preview are indistinguishable here. Too broad to block.
+
+**Verdict:** partial win only. Picker/search can be blinded; a sent/received GIF still
+renders. Shipped anyway as meaningful harm reduction — a kid can no longer browse/preview
+to find explicit GIFs, only send blind.
+
+**Shipped 2026-08-18** to the existing `GIFs` group:
+
+```json
+{
+  "a": { "case": "bundleIdContains", "value": "com.hammerandchisel.discord" },
+  "b": { "case": "targetContains", "value": "klipy.com" },
+  "case": "both"
+}
+```
