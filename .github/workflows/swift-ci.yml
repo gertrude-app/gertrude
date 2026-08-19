@@ -526,6 +526,7 @@ env:
   POSTMARK_API_KEY: not-real
   POSTMARK_SERVER_ID: 12345
   PRIMARY_SUPPORT_EMAIL: not-real
+  SUPPORT_ROTATION_EMAILS: rotation-one@not-real,rotation-two@not-real
   SUPER_ADMIN_EMAIL: not-real
   STRIPE_SECRET_KEY: not-real
   STRIPE_PRICE_ID_FULL: price_full_not_real

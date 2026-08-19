@@ -14,6 +14,8 @@ extension GertrudeIOSApp: @retroactive PostgresRawBindable {}
 extension StripeSubscription.StripeStatus: PostgresRawBindable {}
 extension BillingIdentity.TrialEmailLifecycle: PostgresRawBindable {}
 extension RouteTelemetry.Result: PostgresRawBindable {}
+extension SiteFormSubmission.Form: PostgresRawBindable {}
+extension SiteFormSubmission.App: PostgresRawBindable {}
 
 extension Semver: @retroactive PostgresBindable {
   public var postgresData: Postgres.Data { .string(self.string) }

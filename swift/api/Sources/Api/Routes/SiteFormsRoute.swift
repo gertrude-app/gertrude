@@ -3,29 +3,36 @@ import Vapor
 import XCore
 
 private struct FormData: Codable {
-  enum Form: String, Codable {
-    case contact
-    case lockdownGuide
-    case fiveThings
-  }
-
   enum App: String, Codable {
     case mac
-    case ios
+    case blocker
     case podcasts
+    case music
     case unsure
+    case ios
+
+    var stored: SiteFormSubmission.App {
+      switch self {
+      case .mac: .mac
+      case .blocker, .ios: .blocker
+      case .podcasts: .podcasts
+      case .music: .music
+      case .unsure: .unsure
+      }
+    }
 
     var display: String {
       switch self {
       case .mac: "Gertrude Mac"
-      case .ios: "Gertrude Blocker (iOS)"
+      case .blocker, .ios: "Gertrude Blocker (iOS)"
       case .podcasts: "Gertrude Podcasts"
+      case .music: "Gertrude Music"
       case .unsure: "(not sure)"
       }
     }
   }
 
-  var form: Form
+  var form: SiteFormSubmission.Form
   var app: App?
   var name: String
   var email: String
@@ -54,22 +61,18 @@ enum SiteFormsRoute {
       .where(.email == data.normalizedEmail)
       .first(in: req.context.db)
 
+    let assignee = await nextAssignee(in: req.context.db)
+    await data.persist(parent: parent, assignee: assignee, in: req.context.db)
+
     Task {
-      await with(dependency: \.slack).internal(.contactForm, data.slackText(parent: parent))
+      await with(dependency: \.slack)
+        .internal(.contactForm, data.slackText(parent: parent, assignee: assignee))
       try await with(dependency: \.postmark).send(
-        to: req.env.primarySupportEmail,
+        to: assignee,
         replyTo: data.email,
         subject: data.form.name + " Submission",
         html: data.emailBody(parent: parent),
       )
-      if let backupEmail = req.env.get("BACKUP_SUPPORT_EMAIL") {
-        try await with(dependency: \.postmark).send(
-          to: backupEmail,
-          replyTo: data.email,
-          subject: data.form.name + " Submission",
-          html: data.emailBody(parent: parent),
-        )
-      }
     }
 
     return Response(
@@ -103,6 +106,12 @@ enum SiteFormsRoute {
   }
 }
 
+private func nextAssignee(in db: any DuetSQL.Client) async -> String {
+  let rotation = get(dependency: \.env).supportRotationEmails
+  let count = await (try? SiteFormSubmission.query().count(in: db)) ?? 0
+  return rotation[count % rotation.count]
+}
+
 private func spamChallenge(_ data: FormData) async throws {
   switch await get(dependency: \.cloudflare)
     .verifyTurnstileToken(data.turnstileToken) {
@@ -123,6 +132,27 @@ private func spamChallenge(_ data: FormData) async throws {
 // extensions
 
 extension FormData {
+  func persist(parent: Parent?, assignee: String, in db: any DuetSQL.Client) async {
+    do {
+      try await db.create(SiteFormSubmission(
+        form: self.form,
+        app: self.app?.stored,
+        name: self.name,
+        email: self.email,
+        subject: self.subject,
+        message: self.message,
+        parentId: parent?.id,
+        assignee: assignee,
+      ))
+    } catch {
+      await with(dependency: \.slack).error("""
+      *Error persisting site form submission*
+      Form: `\(self.form.rawValue)`, email: `\(self.normalizedEmail)`
+      Error: \(String(reflecting: error))
+      """)
+    }
+  }
+
   func emailBody(parent: Parent?) -> String {
     let fromLine: String
     if let parent {
@@ -140,7 +170,7 @@ extension FormData {
     """
   }
 
-  func slackText(parent: Parent?) -> String {
+  func slackText(parent: Parent?, assignee: String) -> String {
     let fromLine: String
     if let parent {
       let link = AdminLink().slack(to: .parent(parent.id), text: self.normalizedEmail)
@@ -153,13 +183,14 @@ extension FormData {
     \(fromLine)
     \(self.subject.map { "_Subject:_ \($0)" } ?? "")
     \(self.app.map { "_App:_ `\($0.display)`" } ?? "")
+    _Assigned:_ `\(assignee)`
     _Message:_
     \(self.message)
     """
   }
 }
 
-extension FormData.Form {
+extension SiteFormSubmission.Form {
   var name: String {
     switch self {
     case .contact: "Contact Form"
