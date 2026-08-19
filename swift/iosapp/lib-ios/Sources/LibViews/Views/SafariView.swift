@@ -86,13 +86,7 @@ struct ProfileDownloadView: View {
     .frame(maxWidth: 500)
     .padding(30)
     .gertieScreenBackground()
-    .task {
-      do {
-        try await Task.sleep(for: .milliseconds(300))
-      } catch {
-        return
-      }
-      guard !Task.isCancelled else { return }
+    .delayedTask(for: .milliseconds(300)) {
       self.showSafari = true
     }
     .sheet(isPresented: self.$showSafari, onDismiss: self.onSafariDismissed) {

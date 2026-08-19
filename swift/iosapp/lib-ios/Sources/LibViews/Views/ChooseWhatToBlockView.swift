@@ -290,13 +290,8 @@ struct ChooseWhatToBlockView: View {
               .position(x: 98, y: -22)
               .opacity(self.showTooltip ? 1 : 0)
               .offset(y: self.showTooltip ? 0 : -10)
-              .task {
-                do {
-                  try await Task.sleep(for: .seconds(1.5))
-                } catch {
-                  return
-                }
-                guard !Task.isCancelled, !self.isExiting else { return }
+              .delayedTask(for: .seconds(1.5)) {
+                guard !self.isExiting else { return }
                 withAnimation(.bouncy(duration: 0.4, extraBounce: 0.3)) {
                   self.showTooltip = true
                 }

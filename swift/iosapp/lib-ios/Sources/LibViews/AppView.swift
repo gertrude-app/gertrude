@@ -225,7 +225,11 @@ public struct AppView: View {
           )
 
         case .onboarding(.happyPath(.doneQuit)):
-          FinishedView()
+          GertieResultScreen(
+            icon: "party.popper",
+            title: "Quit the app, you’re done!",
+            message: "Gertrude will keep blocking even when the app is not running.",
+          )
 
         case .onboarding(.authFail(.invalidAccount(.letsFigureThisOut))):
           GertieActionScreen(
@@ -862,19 +866,30 @@ private struct SupervisionNetworkErrorView: View {
 }
 
 private struct OnboardingInstructionImage: View {
+  @Environment(\.gertieActionScreenLayout) private var layout
+
   let name: String
   let accessibilityLabel: String
 
-  var body: some View {
-    Image(self.name)
-      .resizable()
-      .scaledToFit()
-      .frame(
-        maxWidth: .infinity,
-        maxHeight: self.name.contains("IOS26") ? 260 : 300,
-      )
-      .padding(.bottom, 8)
-      .accessibilityLabel(Text(verbatim: self.accessibilityLabel))
+  @ViewBuilder var body: some View {
+    switch self.layout {
+    case .regular:
+      Image(self.name)
+        .scaleEffect(self.name.contains("IOS26") ? 1.25 : 1.0)
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, 50)
+        .accessibilityLabel(Text(verbatim: self.accessibilityLabel))
+    case .compact:
+      Image(self.name)
+        .resizable()
+        .scaledToFit()
+        .frame(
+          maxWidth: .infinity,
+          maxHeight: self.name.contains("IOS26") ? 260 : 300,
+        )
+        .padding(.bottom, 8)
+        .accessibilityLabel(Text(verbatim: self.accessibilityLabel))
+    }
   }
 }
 
@@ -895,6 +910,46 @@ extension URL {
     osMajorVersion: 26,
     deviceType: "iPhone",
   )
+}
+
+#Preview("Instruction image regular", traits: .fixedLayout(width: 390, height: 844)) {
+  GertieActionScreen(
+    message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+    action: .button("Got it, next") {},
+    supplementPlacement: .beforeMessage,
+  ) {
+    OnboardingInstructionImage(
+      name: "AllowScreenTimeAccessIOS26",
+      accessibilityLabel: "Screen Time permission alert showing the Continue button",
+    )
+  }
+}
+
+#Preview("Instruction image compact", traits: .fixedLayout(width: 375, height: 667)) {
+  GertieActionScreen(
+    message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+    action: .button("Got it, next") {},
+    supplementPlacement: .beforeMessage,
+  ) {
+    OnboardingInstructionImage(
+      name: "AllowScreenTimeAccessIOS26",
+      accessibilityLabel: "Screen Time permission alert showing the Continue button",
+    )
+  }
+}
+
+#Preview("Instruction image accessibility text") {
+  GertieActionScreen(
+    message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+    action: .button("Got it, next") {},
+    supplementPlacement: .beforeMessage,
+  ) {
+    OnboardingInstructionImage(
+      name: "AllowScreenTimeAccessIOS26",
+      accessibilityLabel: "Screen Time permission alert showing the Continue button",
+    )
+  }
+  .environment(\.dynamicTypeSize, .accessibility2)
 }
 
 #Preview("Account connected") {

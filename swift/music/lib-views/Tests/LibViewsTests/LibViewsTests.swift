@@ -229,12 +229,3 @@ private func queueEntry(_ id: String) -> PlaybackQueueEntryData {
 func packageLoads() {
   _ = MusicSetupView(state: .checking)
 }
-
-@MainActor
-@Test
-func comparesResolvedColorLuminance() {
-  let environment = EnvironmentValues()
-
-  #expect(Color.black.isDarker(than: .white, in: environment))
-  #expect(!Color.white.isDarker(than: .black, in: environment))
-}

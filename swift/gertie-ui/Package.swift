@@ -9,5 +9,9 @@ let package = Package(
   ],
   targets: [
     .target(name: "GertieUI"),
+    .testTarget(
+      name: "GertieUITests",
+      dependencies: ["GertieUI"],
+    ),
   ],
 )

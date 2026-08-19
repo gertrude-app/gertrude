@@ -85,13 +85,7 @@ struct ShowCodeView: View {
         )
         .opacity(self.showWaiting ? 1 : 0)
         .accessibilityHidden(!self.showWaiting)
-        .task {
-          do {
-            try await Task.sleep(for: .seconds(45))
-          } catch {
-            return
-          }
-          guard !Task.isCancelled else { return }
+        .delayedTask(for: .seconds(45)) {
           withAnimation(.smooth(duration: 0.5)) {
             self.showWaiting = true
           }

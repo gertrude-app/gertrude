@@ -2,6 +2,13 @@ import Foundation
 import SwiftUI
 
 public extension Color {
+  static let slate200 = Color(hex: "#e2e8f0")!
+  static let slate300 = Color(hex: "#cbd5e1")!
+  static let slate400 = Color(hex: "#94a3b8")!
+  static let slate700 = Color(hex: "#334155")!
+  static let slate800 = Color(hex: "#1e293b")!
+  static let slate900 = Color(hex: "#0f172a")!
+
   static let violet100 = Color(hex: "#ede9fe")!
   static let violet200 = Color(hex: "#ddd6fe")!
   static let violet300 = Color(hex: "#c4b5fd")!
@@ -62,5 +69,19 @@ public extension Color {
 
   init(_ colorScheme: ColorScheme, light: Color, dark: Color) {
     self = colorScheme == .dark ? dark : light
+  }
+
+  func isDarker(
+    than other: Color,
+    in environment: EnvironmentValues,
+  ) -> Bool {
+    self.resolve(in: environment).relativeLuminance
+      < other.resolve(in: environment).relativeLuminance
+  }
+}
+
+private extension Color.Resolved {
+  var relativeLuminance: Float {
+    0.2126 * self.red + 0.7152 * self.green + 0.0722 * self.blue
   }
 }

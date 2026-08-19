@@ -115,10 +115,20 @@ public enum GertieActionScreenSupplementPlacement {
   case afterMessage
 }
 
+public enum GertieActionScreenLayout {
+  case regular
+  case compact
+}
+
+public extension EnvironmentValues {
+  @Entry var gertieActionScreenLayout = GertieActionScreenLayout.regular
+}
+
 public struct GertieActionScreen<Supplement: View>: View {
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @Environment(\.colorScheme) private var cs
-  @ScaledMetric(relativeTo: .title) private var iconSize = 40.0
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @ScaledMetric(relativeTo: .title) private var iconScale = 1.0
   @ScaledMetric(relativeTo: .body) private var messageSize = 18.0
   @ScaledMetric(relativeTo: .body) private var bulletSize = 16.0
   @ScaledMetric(relativeTo: .body) private var bulletDotSize = 6.0
@@ -186,10 +196,14 @@ public struct GertieActionScreen<Supplement: View>: View {
         .ignoresSafeArea()
 
       GeometryReader { proxy in
+        let metrics = proxy.size.height <= 700 || self.dynamicTypeSize.isAccessibilitySize
+          ? Metrics.compact
+          : Metrics.regular
+
         ScrollView {
-          VStack(alignment: .leading, spacing: 16) {
+          VStack(alignment: .leading, spacing: metrics.spacing) {
             Image(systemName: self.icon.systemName)
-              .font(.system(size: self.iconSize, weight: .regular))
+              .font(.system(size: metrics.iconSize * self.iconScale, weight: .regular))
               .foregroundStyle(
                 Color(
                   self.cs,
@@ -213,11 +227,12 @@ public struct GertieActionScreen<Supplement: View>: View {
                 ),
               )
 
-            Spacer(minLength: 24)
+            Spacer(minLength: metrics.spacerMinLength)
 
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: metrics.spacing) {
               if self.supplementPlacement == .beforeMessage {
                 self.supplement
+                  .environment(\.gertieActionScreenLayout, metrics.layout)
               }
 
               Text(verbatim: self.message)
@@ -241,6 +256,7 @@ public struct GertieActionScreen<Supplement: View>: View {
 
               if self.supplementPlacement == .afterMessage {
                 self.supplement
+                  .environment(\.gertieActionScreenLayout, metrics.layout)
               }
 
               if !self.bullets.isEmpty {
@@ -290,6 +306,7 @@ public struct GertieActionScreen<Supplement: View>: View {
                     .padding(.leading, self.bulletIndent)
                   }
                 }
+                .padding(.bottom, metrics.listPadBottom)
               }
             }
             .modifier(
@@ -308,7 +325,7 @@ public struct GertieActionScreen<Supplement: View>: View {
             )
 
             if !self.actions.isEmpty {
-              VStack(spacing: 12) {
+              VStack(spacing: metrics.spacing) {
                 ForEach(self.actions.indices, id: \.self) {
                   index in
                   GertieScreenActionView(
@@ -347,15 +364,18 @@ public struct GertieActionScreen<Supplement: View>: View {
                   )
                 }
               }
-              .padding(.top, 12)
+              .padding(.top, metrics.buttonPadTop)
             }
           }
           .disabled(self.isResponding)
           .frame(
-            minHeight: max(0, proxy.size.height - 60),
+            minHeight: max(
+              0,
+              proxy.size.height - metrics.insets.top - metrics.insets.bottom,
+            ),
             alignment: .top,
           )
-          .padding(30)
+          .padding(metrics.insets)
           .frame(maxWidth: 500)
           .frame(maxWidth: .infinity)
         }
@@ -366,6 +386,40 @@ public struct GertieActionScreen<Supplement: View>: View {
     .onAppear(perform: self.beginEntranceAnimations)
     .task(id: self.exitTaskID) {
       await self.invokeExitActionIfNeeded()
+    }
+  }
+
+  private struct Metrics {
+    let layout: GertieActionScreenLayout
+    let spacing: CGFloat
+    let iconSize: CGFloat
+    let spacerMinLength: CGFloat?
+    let listPadBottom: CGFloat
+    let buttonPadTop: CGFloat
+    let insets: EdgeInsets
+
+    static var regular: Self {
+      Self(
+        layout: .regular,
+        spacing: 16,
+        iconSize: 40,
+        spacerMinLength: nil,
+        listPadBottom: 20,
+        buttonPadTop: 12,
+        insets: EdgeInsets(top: 80, leading: 30, bottom: 30, trailing: 30),
+      )
+    }
+
+    static var compact: Self {
+      Self(
+        layout: .compact,
+        spacing: 12,
+        iconSize: 34,
+        spacerMinLength: 10,
+        listPadBottom: 8,
+        buttonPadTop: 8,
+        insets: EdgeInsets(top: 42, leading: 22, bottom: 22, trailing: 22),
+      )
     }
   }
 
@@ -719,6 +773,20 @@ private struct GertieActionScreenExitModifier: ViewModifier {
       .padding(.bottom, 12)
       .accessibilityLabel("iPhone setup illustration")
   }
+}
+
+#Preview("Compact height", traits: .fixedLayout(width: 375, height: 667)) {
+  GertieActionScreen(
+    message: "Before continuing, make sure the device is ready and review each requirement carefully.",
+    bullets: [
+      "The device is connected to the internet.",
+      "You know the device passcode.",
+    ],
+    actions: [
+      .button("Continue") {},
+      .button("Go back") {},
+    ],
+  )
 }
 
 #Preview("No action") {

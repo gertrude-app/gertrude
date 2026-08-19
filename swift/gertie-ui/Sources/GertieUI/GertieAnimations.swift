@@ -1,6 +1,22 @@
 import SwiftUI
 
 public extension View {
+  func delayedTask(
+    for delay: Duration,
+    action: @escaping @MainActor @Sendable () -> Void,
+  ) -> some View {
+    self.task {
+      do {
+        try await Task.sleep(for: delay)
+      } catch {
+        return
+      }
+
+      guard !Task.isCancelled else { return }
+      action()
+    }
+  }
+
   func swooshIn(
     fromYOffset yOffset: CGFloat,
     after delay: Duration = .zero,

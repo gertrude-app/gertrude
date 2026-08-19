@@ -5,7 +5,6 @@ options:
   developmentLanguage: en
   knownRegions:
     - en
-  postGenCommand: python3 ../../scripts/fix-xcodegen-local-package-backlink.py GertrudeMusic.xcodeproj/project.pbxproj GertieUI ../gertie-ui
 
 configs:
   Debug: debug
@@ -30,8 +29,6 @@ targets:
       - path: app/LaunchScreen.storyboard
         group: app
     dependencies:
-      - package: GertieUI
-        product: GertieUI
       - package: LibTCA
         product: LibTCA
     settings:
@@ -95,8 +92,6 @@ schemes:
       config: Release
 
 packages:
-  GertieUI:
-    path: ../gertie-ui
   LibViews:
     path: ./lib-views
   LibTCA:

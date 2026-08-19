@@ -133,7 +133,7 @@ public struct GertieCrossPromoScreen: View {
     static let regular = Self(
       isCompact: false,
       spacing: 16,
-      headlineSize: 26,
+      headlineSize: 24,
       bodySize: 17,
       imageHeight: 200,
       imagePadBottom: 24,
@@ -144,7 +144,7 @@ public struct GertieCrossPromoScreen: View {
     static let compact = Self(
       isCompact: true,
       spacing: 12,
-      headlineSize: 24,
+      headlineSize: 22,
       bodySize: 16,
       imageHeight: 140,
       imagePadBottom: 8,

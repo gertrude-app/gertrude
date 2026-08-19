@@ -2,7 +2,7 @@ name: GertiePodcastsPreviews
 options:
   deploymentTarget:
     iOS: "17.0"
-  postGenCommand: python3 ../../../scripts/fix-xcodegen-local-package-backlink.py GertiePodcastsPreviews.xcodeproj/project.pbxproj GertieUI ../gertie-ui ../../gertie-ui
+  postGenCommand: python3 ../fix-xcodegen-local-package-backlink.py GertiePodcastsPreviews.xcodeproj/project.pbxproj GertieUI ../gertie-ui ../../gertie-ui
 
 configs:
   Debug: debug
