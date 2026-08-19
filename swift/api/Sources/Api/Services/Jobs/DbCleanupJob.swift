@@ -94,10 +94,21 @@ struct CleanupJob: AsyncScheduledJob {
 
     logs.append("Deleted \(smokeAdmins) smoke test admin accounts")
 
-    let checkinEvents = try await IOSEvent.query()
-      .where(.domain == "checkin")
-      .where(.createdAt < 14.daysAgo)
-      .delete(in: self.db)
+    // cleanup keeping at least the single most recent check-in per ios device
+    let eventId = IOSEvent.columnName(.id)
+    let eventDomain = IOSEvent.columnName(.domain)
+    let eventDeviceId = IOSEvent.columnName(.deviceId)
+    let checkinEvents = try await self.db.execute(raw: """
+    DELETE FROM \(table: IOSEvent.self) e
+    WHERE e.\(col: eventDomain) = 'checkin'
+      AND e.created_at < now() - interval '14 days'
+      AND (e.\(col: eventDeviceId) IS NULL
+           OR EXISTS (SELECT 1 FROM \(table: IOSEvent.self) n
+                      WHERE n.\(col: eventDeviceId) = e.\(col: eventDeviceId)
+                        AND n.\(col: eventDomain) = 'checkin'
+                        AND n.created_at > e.created_at))
+    RETURNING e.\(col: eventId)
+    """).count
 
     logs.append("Deleted \(checkinEvents) iOS check-in events")
 
