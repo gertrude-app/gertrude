@@ -83,6 +83,7 @@ const KeychainsContent: React.FC<Props> = ({ state, onAssignmentChange }) => {
         <KeychainCard
           key={keychain.id}
           name={keychain.name}
+          nameHref={`/keychains/${keychain.id}`}
           description={keychain.description}
           numKeys={keychain.numKeys}
           isPublic={keychain.isPublic}

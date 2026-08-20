@@ -10,8 +10,8 @@ import {
 } from '@gertrude/ui';
 import React from 'react';
 import type { UnlockRequest, UnlockRequestKeyDraft } from '#/components/types';
-import RequestReasonBubble from './RequestReasonBubble';
 import UnlockRequestResponsePanel from './UnlockRequestResponsePanel';
+import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
   request: UnlockRequest;
@@ -65,7 +65,7 @@ const UnlockRequestCard: React.FC<Props> = ({
           )}
         </HStack>
       </VStack>
-      {request.reason && <RequestReasonBubble>{request.reason}</RequestReasonBubble>}
+      {request.reason && <MessageBubble>{request.reason}</MessageBubble>}
       <HStack
         justify="end"
         gap={2}

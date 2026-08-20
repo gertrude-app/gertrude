@@ -7,6 +7,7 @@ export * from './pairs/CreatePerson';
 export * from './pairs/DecideSuspensionRequest';
 export * from './pairs/DeleteActivity';
 export * from './pairs/DeletePerson';
+export * from './pairs/GetAccountKeychain';
 export * from './pairs/GetAccountKeychains';
 export * from './pairs/GetActivitySummaries';
 export * from './pairs/GetDayActivity';

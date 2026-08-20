@@ -20,6 +20,7 @@ import { Route as AppActivityIndexRouteImport } from './routes/_app/activity/ind
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as AppPeopleNewRouteImport } from './routes/_app/people/new'
+import { Route as AppKeychainsKeychainIdRouteImport } from './routes/_app/keychains/$keychainId'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
 import { Route as AppPeoplePersonIdRouteRouteImport } from './routes/_app/people/$personId/route'
 import { Route as AppPeoplePersonIdIndexRouteImport } from './routes/_app/people/$personId/index'
@@ -84,6 +85,11 @@ const AppPeopleNewRoute = AppPeopleNewRouteImport.update({
   path: '/new',
   getParentRoute: () => AppPeopleRouteRoute,
 } as any)
+const AppKeychainsKeychainIdRoute = AppKeychainsKeychainIdRouteImport.update({
+  id: '/keychains/$keychainId',
+  path: '/keychains/$keychainId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const unauthedOtpTokenRoute = unauthedOtpTokenRouteImport.update({
   id: '/(unauthed)/otp/$token',
   path: '/otp/$token',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/signout': typeof AppSignoutRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
+  '/_app/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/_app/people/new': typeof AppPeopleNewRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/_app/requests/unlock': typeof AppRequestsUnlockRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/signout'
     | '/people/$personId'
     | '/otp/$token'
+    | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/signout'
     | '/'
     | '/otp/$token'
+    | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/people/$personId'
     | '/(unauthed)/otp/$token'
+    | '/_app/keychains/$keychainId'
     | '/_app/people/new'
     | '/_app/requests/suspension'
     | '/_app/requests/unlock'
@@ -347,6 +359,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/people/new'
       preLoaderRoute: typeof AppPeopleNewRouteImport
       parentRoute: typeof AppPeopleRouteRoute
+    }
+    '/_app/keychains/$keychainId': {
+      id: '/_app/keychains/$keychainId'
+      path: '/keychains/$keychainId'
+      fullPath: '/keychains/$keychainId'
+      preLoaderRoute: typeof AppKeychainsKeychainIdRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/otp/$token': {
       id: '/(unauthed)/otp/$token'
@@ -465,6 +484,7 @@ interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
   AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRouteWithChildren
   AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
   AppActivityIndexRoute: typeof AppActivityIndexRoute
@@ -478,6 +498,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
+  AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,
   AppRequestsSuspensionRoute: AppRequestsSuspensionRouteWithChildren,
   AppRequestsUnlockRoute: AppRequestsUnlockRoute,
   AppActivityIndexRoute: AppActivityIndexRoute,

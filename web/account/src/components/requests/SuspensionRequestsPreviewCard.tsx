@@ -3,8 +3,8 @@ import { Link } from '@tanstack/react-router';
 import { ArrowRightIcon, InboxIcon } from 'lucide-react';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
-import RequestReasonBubble from './RequestReasonBubble';
 import RightColumnCard from './RightColumnCard';
+import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
   suspensionRequests: SuspensionRequest[];
@@ -34,7 +34,7 @@ const RequestPreview: React.FC<RequestPreviewProps> = ({ request, href }) => (
           : request.duration}
       </Text>
     </VStack>
-    {request.reason && <RequestReasonBubble>{request.reason}</RequestReasonBubble>}
+    {request.reason && <MessageBubble>{request.reason}</MessageBubble>}
   </VStack>
 );
 

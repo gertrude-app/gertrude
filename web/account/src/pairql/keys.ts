@@ -1,4 +1,5 @@
 import type {
+  GetAccountKeychain,
   GetAccountKeychains,
   GetActivitySummaries,
   GetDayActivity,
@@ -25,6 +26,10 @@ export class Key extends QueryKey<never> {
 
   static get keychains(): QueryKey<GetAccountKeychains.Output> {
     return new QueryKey([`keychains`]);
+  }
+
+  static keychain(keychainId: string): QueryKey<GetAccountKeychain.Output> {
+    return new QueryKey([`keychains`, keychainId]);
   }
 
   static get suspensionRequests(): QueryKey<GetSuspensionRequests.Output> {

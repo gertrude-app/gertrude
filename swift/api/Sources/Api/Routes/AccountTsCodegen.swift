@@ -21,6 +21,9 @@ enum AccountTsCodegenRoute {
       ("SuccessOutput", SuccessOutput.self),
       ("ClientAuth", ClientAuth.self),
       ("PersonRelationship", Child.Relationship.self),
+      ("SingleAppScope", AppScope.Single.self),
+      ("AppScope", AppScope.self),
+      ("SharedKey", Gertie.Key.self),
       ("BlockRule", Gertie.BlockRule.self),
     ]
   }
@@ -35,6 +38,7 @@ enum AccountTsCodegenRoute {
       UpdatePersonBasicDetails.self,
       DeletePerson.self,
       GetAccountKeychains.self,
+      GetAccountKeychain.self,
       SetAccountKeychainAssignment.self,
       GetPersonMacSettings.self,
       GetPersonInstalledMacApps.self,

@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { BlockRule } from '../shared';
+import type { BlockRule, SingleAppScope } from '../shared';
 
 export namespace GetPersonMacSettings {
   export interface Input {
@@ -127,15 +127,7 @@ export namespace GetPersonMacSettings {
       }>;
       unrestricted: Array<{
         id: UUID;
-        scope:
-          | {
-              type: 'bundleId';
-              bundleId: string;
-            }
-          | {
-              type: 'identifiedAppSlug';
-              identifiedAppSlug: string;
-            };
+        scope: SingleAppScope;
         schedule?: {
           type: 'active' | 'inactive';
           days: {
@@ -160,15 +152,7 @@ export namespace GetPersonMacSettings {
       publicUnrestricted: Array<{
         keychainId: UUID;
         keychainName: string;
-        scope:
-          | {
-              type: 'bundleId';
-              bundleId: string;
-            }
-          | {
-              type: 'identifiedAppSlug';
-              identifiedAppSlug: string;
-            };
+        scope: SingleAppScope;
         schedule?: {
           type: 'active' | 'inactive';
           days: {

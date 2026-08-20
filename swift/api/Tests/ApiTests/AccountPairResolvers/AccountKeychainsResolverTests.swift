@@ -1,4 +1,5 @@
 import DuetSQL
+import Foundation
 import Gertie
 import XCTest
 import XExpect
@@ -175,5 +176,85 @@ final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
       .where(.keychainId == keychain.id)
       .all(in: self.db)
     expect(assignments).toBeEmpty()
+  }
+
+  func testMapsLegacyKeychainAndResolvesAppNames() async throws {
+    let parent = try await self.parent()
+    let keychain = try await self.db.create(Keychain(
+      parentId: parent.id,
+      name: "School",
+      isPublic: true,
+      description: "School resources",
+      warning: "Includes broad access",
+    ))
+    let app = try await self.db.create(IdentifiedApp(
+      name: "Minecraft",
+      slug: "minecraft",
+      launchable: true,
+    ))
+    try await self.db.create(AppBundleId(
+      identifiedAppId: app.id,
+      bundleId: "com.minecraft.launcher",
+    ))
+    let expiration = Date(timeIntervalSince1970: 1_800_000_000)
+    let slugKey = Key(
+      keychainId: keychain.id,
+      key: .domain(
+        domain: .init("api.example.com")!,
+        scope: .single(.identifiedAppSlug("minecraft")),
+      ),
+      comment: "School portal",
+      deletedAt: expiration,
+    )
+    let bundleKey = Key(
+      keychainId: keychain.id,
+      key: .skeleton(scope: .bundleId(".com.minecraft.launcher")),
+    )
+    let unknownAppKey = Key(
+      keychainId: keychain.id,
+      key: .anySubdomain(
+        domain: .init("example.com")!,
+        scope: .single(.bundleId("com.unknown.app")),
+      ),
+    )
+    try await self.db.create([slugKey, bundleKey, unknownAppKey])
+
+    let output = try await GetAccountKeychain.resolve(
+      with: .init(keychainId: keychain.id),
+      in: self.accountContext(parent),
+    )
+
+    expect(output.id).toEqual(keychain.id)
+    expect(output.name).toEqual("School")
+    expect(output.description).toEqual("School resources")
+    expect(output.warning).toEqual("Includes broad access")
+    expect(output.isPublic).toBeTrue()
+    expect(Set(output.keys.map(\.key)))
+      .toEqual(Set([slugKey.key, bundleKey.key, unknownAppKey.key]))
+
+    let returnedSlugKey = try XCTUnwrap(output.keys.first { $0.id == slugKey.id })
+    expect(returnedSlugKey.comment).toEqual("School portal")
+    expect(returnedSlugKey.expiration).toEqual(expiration)
+    expect(returnedSlugKey.appName).toEqual("Minecraft")
+    expect(try XCTUnwrap(output.keys.first { $0.id == bundleKey.id }).appName)
+      .toEqual("Minecraft")
+    expect(try XCTUnwrap(output.keys.first { $0.id == unknownAppKey.id }).appName)
+      .toBeNil()
+  }
+
+  func testRejectsKeychainDetailsOwnedByAnotherAccount() async throws {
+    let parent = try await self.parent()
+    let otherParent = try await self.parent()
+    let otherKeychain = try await self.db.create(Keychain(
+      parentId: otherParent.id,
+      name: "Other Account",
+    ))
+
+    try await expectErrorFrom {
+      try await GetAccountKeychain.resolve(
+        with: .init(keychainId: otherKeychain.id),
+        in: self.accountContext(parent),
+      )
+    }.toContain("notFound")
   }
 }

@@ -600,6 +600,102 @@
     }
   },
   {
+    "id": "account-pages-keychain-detail--default",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-keychain-detail--default.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--default",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-keychain-detail--default.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--empty",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/mobile/account-pages-keychain-detail--empty.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--empty",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/desktop/account-pages-keychain-detail--empty.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--error",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/mobile/account-pages-keychain-detail--error.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--error",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/desktop/account-pages-keychain-detail--error.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--loading",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/mobile/account-pages-keychain-detail--loading.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-keychain-detail--loading",
+    "iframePath": "/iframe.html?id=account-pages-keychain-detail--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/desktop/account-pages-keychain-detail--loading.png",
+    "title": "Account/Pages/Keychain Detail",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-keychains--default",
     "iframePath": "/iframe.html?id=account-pages-keychains--default&viewMode=story",
     "name": "Default",

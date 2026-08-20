@@ -64,6 +64,12 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
   };
 
+  public getAccountKeychain = (
+    input: P.GetAccountKeychain.Input,
+  ): Promise<Result<P.GetAccountKeychain.Output>> => {
+    return this.query<P.GetAccountKeychain.Output>(input, `GetAccountKeychain`, `parent`);
+  };
+
   public getAccountKeychains = (
     input: P.GetAccountKeychains.Input,
   ): Promise<Result<P.GetAccountKeychains.Output>> => {

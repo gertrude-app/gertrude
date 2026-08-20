@@ -25,6 +25,7 @@ export const Assortment = {
       >
         <KeychainCard
           name={keychains[0]!.name}
+          nameHref={`/keychains/${keychains[0]!.id}`}
           description={keychains[0]!.description}
           numKeys={keychains[0]!.numKeys}
           isPublic={keychains[0]!.isPublic}
@@ -39,6 +40,7 @@ export const Assortment = {
         />
         <KeychainCard
           name={keychains[2]!.name}
+          nameHref={`/keychains/${keychains[2]!.id}`}
           description={keychains[2]!.description}
           numKeys={keychains[2]!.numKeys}
           isPublic={keychains[2]!.isPublic}

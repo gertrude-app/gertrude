@@ -1,7 +1,7 @@
 import { Button, Card, HStack, Text, VStack } from '@gertrude/ui';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
-import RequestReasonBubble from './RequestReasonBubble';
+import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
   request: SuspensionRequest;
@@ -21,9 +21,7 @@ const SuspensionRequestCard: React.FC<Props> = ({ request, responseHref }) => (
             : request.duration}
         </Text>
       </VStack>
-      {request.reason && (
-        <RequestReasonBubble className="mt-2">{request.reason}</RequestReasonBubble>
-      )}
+      {request.reason && <MessageBubble className="mt-2">{request.reason}</MessageBubble>}
     </VStack>
     <HStack justify="end" gap={2} className="mt-4">
       <Button type="link" href={responseHref} size="small">
