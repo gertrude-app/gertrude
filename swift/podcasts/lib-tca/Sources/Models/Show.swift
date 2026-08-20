@@ -36,10 +36,6 @@ extension Show {
   var localArtworkImage: UIImage? {
     showLocalArtworkImage(showId: self.id)
   }
-
-  func removeLocalFilesDir() {
-    removeShowLocalFilesDir(id: self.id)
-  }
 }
 
 func removeShowLocalFilesDir(id: Show.ID) {

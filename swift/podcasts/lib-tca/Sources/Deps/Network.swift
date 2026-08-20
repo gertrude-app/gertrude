@@ -35,10 +35,6 @@ extension NetworkClient {
   }
 }
 
-extension NetworkClient {
-  struct NotConnected: Error, Equatable {}
-}
-
 extension DependencyValues {
   var network: NetworkClient {
     get { self[NetworkClient.self] }

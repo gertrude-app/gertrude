@@ -1,5 +1,5 @@
 import BlockerRoute
-import LibApp
+import GertieUI
 import SwiftUI
 
 struct ChooseWhatToBlockView: View {
@@ -11,13 +11,10 @@ struct ChooseWhatToBlockView: View {
   let onDone: () -> Void
 
   @State private var sheetItem: GetBlockGroups.BlockGroupInfo? = nil
-  @State private var iconOffset = Vector(x: 0, y: 20)
-  @State private var titleOffset = Vector(x: 0, y: 20)
-  @State private var paragraphOffset = Vector(x: 0, y: 20)
-  @State private var itemOffsets: [Vector]
-  @State private var buttonOffset = Vector(x: 0, y: 20)
   @State private var showBg = false
   @State private var showTooltip = false
+  @State private var isExiting = false
+  @State private var isButtonExiting = false
 
   init(
     allGroups: [GetBlockGroups.BlockGroupInfo],
@@ -29,22 +26,22 @@ struct ChooseWhatToBlockView: View {
     self.disabledGroupIds = disabledGroupIds
     self.onGroupToggle = onGroupToggle
     self.onDone = onDone
-    self._itemOffsets = State(initialValue: Array(
-      repeating: Vector(x: 0, y: 40),
-      count: allGroups.count,
-    ))
   }
 
   var body: some View {
     ScrollView {
       VStack(alignment: .center) {
         Image(systemName: "party.popper")
-          .font(.system(size: 30, weight: .semibold))
-          .foregroundStyle(Color(self.cs, light: .violet800, dark: .violet400))
-          .padding(12)
-          .background(Color(self.cs, light: .violet300.opacity(0.6), dark: .violet950))
-          .cornerRadius(24)
-          .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .seconds(0.6))
+          .font(.system(size: 40, weight: .regular))
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+          .accessibilityHidden(true)
+          .swooshIn(
+            fromYOffset: 20,
+            animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+          )
+          .offset(y: self.isExiting ? -20 : 0)
+          .opacity(self.isExiting ? 0 : 1)
+          .blur(radius: self.isExiting ? 10 : 0)
 
         Text("Success! We're nearly done.")
           .multilineTextAlignment(.center)
@@ -52,11 +49,13 @@ struct ChooseWhatToBlockView: View {
           .padding(.top, 28)
           .padding(.bottom, 8)
           .swooshIn(
-            tracking: self.$titleOffset,
-            to: .zero,
-            after: .seconds(0.1),
-            for: .seconds(0.6),
+            fromYOffset: 20,
+            after: .milliseconds(100),
+            animation: .bouncy(duration: 0.6, extraBounce: 0.3),
           )
+          .offset(y: self.isExiting ? -20 : 0)
+          .opacity(self.isExiting ? 0 : 1)
+          .blur(radius: self.isExiting ? 10 : 0)
 
         Text(
           "Gertrude is all set to block content. Take a moment to decide if there are any of these types of content that you don't want to block:",
@@ -66,33 +65,34 @@ struct ChooseWhatToBlockView: View {
         .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
         .padding(.bottom, 20)
         .swooshIn(
-          tracking: self.$paragraphOffset,
-          to: .zero,
-          after: .seconds(0.2),
-          for: .seconds(0.6),
+          fromYOffset: 20,
+          after: .milliseconds(200),
+          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
         )
+        .offset(y: self.isExiting ? -20 : 0)
+        .opacity(self.isExiting ? 0 : 1)
+        .blur(radius: self.isExiting ? 10 : 0)
 
         self.selectableGroups
 
-        BigButton(
-          "Done, continue",
-          type: .button {
-            self.vanishingAnimations()
-            delayed(by: .seconds(0.5)) {
-              self.onDone()
-            }
-          },
-          variant: .primary,
-          disabled: !self.allGroups.isEmpty
-            && self.allGroups.allSatisfy { self.disabledGroupIds.contains($0.id) },
-          accessibilityIdentifier: "btn-primary",
+        Button("Done, continue") {
+          self.beginExit()
+        }
+        .buttonStyle(.gertiePrimary)
+        .accessibilityIdentifier("btn-primary")
+        .disabled(
+          self.isExiting
+            || (!self.allGroups.isEmpty
+              && self.allGroups.allSatisfy { self.disabledGroupIds.contains($0.id) }),
         )
         .swooshIn(
-          tracking: self.$buttonOffset,
-          to: .zero,
-          after: .seconds(0.2),
-          for: .seconds(0.6),
+          fromYOffset: 20,
+          after: .milliseconds(200),
+          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
         )
+        .offset(y: self.isButtonExiting ? -20 : 0)
+        .opacity(self.isButtonExiting ? 0 : 1)
+        .blur(radius: self.isButtonExiting ? 10 : 0)
       }
       .frame(maxWidth: 500)
       .padding(.top, 100)
@@ -108,11 +108,14 @@ struct ChooseWhatToBlockView: View {
       }
     }
     .ignoresSafeArea()
+    .task(id: self.isExiting) {
+      await self.finishExit()
+    }
     .sheet(item: self.$sheetItem) { item in
       NavigationStack {
         ZStack {
           Color(self.cs, light: .white, dark: .violet950.opacity(0.3))
-            .edgesIgnoringSafeArea(.vertical)
+            .ignoresSafeArea(.container, edges: .vertical)
           VStack {
             if let imageName = item.imageSlug {
               Image(imageName)
@@ -160,7 +163,7 @@ struct ChooseWhatToBlockView: View {
                       dark: .white.opacity(0.08),
                     ),
                   )
-                  .cornerRadius(16)
+                  .clipShape(.rect(cornerRadius: 16, style: .continuous))
               }
             }
           }
@@ -196,7 +199,7 @@ struct ChooseWhatToBlockView: View {
                       dark: .black,
                     ),
                 )
-                .cornerRadius(6)
+                .clipShape(.rect(cornerRadius: 6, style: .continuous))
                 .overlay {
                   RoundedRectangle(cornerRadius: 6)
                     .stroke(
@@ -255,7 +258,7 @@ struct ChooseWhatToBlockView: View {
                 Color(self.cs, light: .white.opacity(0.7), dark: .white.opacity(0.07)),
               ]),
             )
-            .cornerRadius(16)
+            .clipShape(.rect(cornerRadius: 16, style: .continuous))
             .shadow(
               color: Color(self.cs, light: .violet200, dark: .violet900.opacity(0.3)),
               radius: 3,
@@ -271,7 +274,7 @@ struct ChooseWhatToBlockView: View {
                   .padding(.horizontal, 8)
                   .padding(.vertical, 6)
                   .background(Color(self.cs, light: .violet500, dark: .violet300))
-                  .cornerRadius(8)
+                  .clipShape(.rect(cornerRadius: 8, style: .continuous))
                   .frame(width: 120, height: 80)
                   .shadow(
                     color: Color(self.cs, light: .violet900, dark: .black).opacity(0.3),
@@ -287,11 +290,10 @@ struct ChooseWhatToBlockView: View {
               .position(x: 98, y: -22)
               .opacity(self.showTooltip ? 1 : 0)
               .offset(y: self.showTooltip ? 0 : -10)
-              .onAppear {
-                delayed(by: .seconds(1.5)) {
-                  withAnimation(.bouncy(duration: 0.4, extraBounce: 0.3)) {
-                    self.showTooltip = true
-                  }
+              .delayedTask(for: .seconds(1.5)) {
+                guard !self.isExiting else { return }
+                withAnimation(.bouncy(duration: 0.4, extraBounce: 0.3)) {
+                  self.showTooltip = true
                 }
               }
             }
@@ -300,11 +302,13 @@ struct ChooseWhatToBlockView: View {
         .buttonStyle(BounceButtonStyle())
         .sensoryFeedback(.selection, trigger: self.isEnabled(item))
         .swooshIn(
-          tracking: self.$itemOffsets[index],
-          to: .zero,
+          fromYOffset: 40,
           after: .seconds(Double(index) / 15.0 + 0.3),
-          for: .milliseconds(600),
+          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
         )
+        .offset(y: self.isExiting ? -20 : 0)
+        .opacity(self.isExiting ? 0 : 1)
+        .blur(radius: self.isExiting ? 10 : 0)
       }
     }
     .frame(maxWidth: .infinity)
@@ -315,20 +319,36 @@ struct ChooseWhatToBlockView: View {
     !self.disabledGroupIds.contains(group.id)
   }
 
-  func vanishingAnimations() {
+  func beginExit() {
+    guard !self.isExiting else { return }
     withAnimation {
-      self.iconOffset.y = -20
-      self.titleOffset.y = -20
-      self.paragraphOffset.y = -20
-      self.itemOffsets = Array(repeating: .init(x: 0, y: -20), count: self.allGroups.count)
+      self.isExiting = true
+    }
+  }
+
+  @MainActor
+  func finishExit() async {
+    guard self.isExiting else { return }
+
+    do {
+      try await Task.sleep(for: .milliseconds(100))
+    } catch {
+      return
+    }
+    guard !Task.isCancelled else { return }
+
+    withAnimation {
+      self.isButtonExiting = true
+      self.showBg = false
     }
 
-    delayed(by: .milliseconds(100)) {
-      withAnimation {
-        self.buttonOffset.y = -20
-        self.showBg = false
-      }
+    do {
+      try await Task.sleep(for: .milliseconds(400))
+    } catch {
+      return
     }
+    guard !Task.isCancelled else { return }
+    self.onDone()
   }
 }
 

@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 struct MusicClaimCodeView: View {
@@ -12,12 +13,13 @@ struct MusicClaimCodeView: View {
       Image(systemName: "link.circle")
         .font(.system(size: 40, weight: .regular))
         .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
+        .accessibilityHidden(true)
         .frame(maxWidth: .infinity, alignment: .center)
 
       Spacer()
       Spacer()
 
-      WaitingStatus(label: "Waiting for account connection…", delay: self.statusDelay)
+      GertieWaitingStatus(label: "Waiting for account connection…", delay: self.statusDelay)
 
       Spacer()
 
@@ -39,17 +41,18 @@ struct MusicClaimCodeView: View {
         .padding(.vertical, 8)
         .textSelection(.enabled)
 
-      BigButton(
-        "Send link",
-        type: .share(self.claimLink.url.absoluteString),
-        variant: .primary,
-        icon: "square.and.arrow.up",
-      )
+      ShareLink(item: self.claimLink.url.absoluteString) {
+        HStack(spacing: 8) {
+          Text("Send link")
+          Image(systemName: "square.and.arrow.up")
+        }
+      }
+      .buttonStyle(.gertiePrimary)
     }
     .frame(maxWidth: 500)
     .padding(30)
     .padding(.top, 50)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   init(

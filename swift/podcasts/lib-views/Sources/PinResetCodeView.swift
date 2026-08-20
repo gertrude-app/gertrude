@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct PinResetCodeView: View {
@@ -5,10 +6,6 @@ public struct PinResetCodeView: View {
   @FocusState private var isFocused: Bool
   @State private var input: String = ""
   @State private var showBg = false
-  @State private var titleOffset = Vector(x: 0, y: 20)
-  @State private var subtitleOffset = Vector(x: 0, y: 20)
-  @State private var fieldOffset = Vector(x: 0, y: 20)
-  @State private var buttonOffset = Vector(x: 0, y: 20)
   @State private var currentTime = Date()
   @State private var lockoutTimer: Timer?
 
@@ -66,17 +63,19 @@ public struct PinResetCodeView: View {
         Text(lstr(.pinResetTitle))
           .font(.system(size: 28, weight: .bold))
           .multilineTextAlignment(.center)
-          .swooshIn(tracking: self.$titleOffset, to: .zero, after: .zero, for: .seconds(0.6))
+          .swooshIn(
+            fromYOffset: 20,
+            animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+          )
 
         Text(lstr(.pinResetSubtitle))
           .font(.system(size: 16, weight: .medium))
           .multilineTextAlignment(.center)
           .foregroundStyle(Color(self.cs, light: .black.opacity(0.8), dark: .white.opacity(0.8)))
           .swooshIn(
-            tracking: self.$subtitleOffset,
-            to: .zero,
+            fromYOffset: 20,
             after: .seconds(0.1),
-            for: .seconds(0.6),
+            animation: .bouncy(duration: 0.6, extraBounce: 0.3),
           )
       }
       .padding(.horizontal, 30)
@@ -100,10 +99,9 @@ public struct PinResetCodeView: View {
               )
           }
           .swooshIn(
-            tracking: self.$fieldOffset,
-            to: .zero,
+            fromYOffset: 20,
             after: .seconds(0.2),
-            for: .seconds(0.6),
+            animation: .bouncy(duration: 0.6, extraBounce: 0.3),
           )
 
         if self.showError {
@@ -113,17 +111,20 @@ public struct PinResetCodeView: View {
             .multilineTextAlignment(.center)
         }
 
-        BigButton(
-          lstr(.pinResetContinue),
-          type: .button {
-            self.onSubmit(self.code ?? 0)
-            self.input = ""
-          },
-          disabled: self.code == nil,
+        Button(lstr(.pinResetContinue)) {
+          self.onSubmit(self.code ?? 0)
+          self.input = ""
+        }
+        .buttonStyle(.gertiePrimary)
+        .disabled(self.code == nil)
+        .swooshIn(
+          fromYOffset: 20,
+          after: .seconds(0.3),
+          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
         )
-        .swooshIn(tracking: self.$buttonOffset, to: .zero, after: .seconds(0.3), for: .seconds(0.6))
 
-        BigButton(lstr(.pinCancel), type: .button(self.onCancel), variant: .secondary)
+        Button(lstr(.pinCancel), action: self.onCancel)
+          .buttonStyle(.gertieSecondary)
       }
       .padding(.horizontal, 30)
 
@@ -142,7 +143,8 @@ public struct PinResetCodeView: View {
         .multilineTextAlignment(.center)
         .padding(.horizontal, 60)
       Spacer()
-      BigButton(lstr(.pinCancel), type: .button(self.onCancel), variant: .secondary)
+      Button(lstr(.pinCancel), action: self.onCancel)
+        .buttonStyle(.gertieSecondary)
         .padding(.horizontal, 30)
         .padding(.bottom, 30)
     }

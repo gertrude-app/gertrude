@@ -33,9 +33,7 @@ import Testing
   }
   await clock.advance(by: .seconds(5)) // first poll tick
   await store.receive(.polled(.connected(childData)))
-  await store.receive(.connectionSucceeded(childData: childData)) {
-    $0.screen = .connected(childName: "Franny")
-  }
+  await store.receive(.connectionSucceeded(childData: childData))
 }
 
 @MainActor
@@ -69,9 +67,7 @@ import Testing
   await store.receive(.polled(.pending)) // still waiting, no state change
   await clock.advance(by: .seconds(5))
   await store.receive(.polled(.connected(childData)))
-  await store.receive(.connectionSucceeded(childData: childData)) {
-    $0.screen = .connected(childName: "Bob")
-  }
+  await store.receive(.connectionSucceeded(childData: childData))
 }
 
 @MainActor
@@ -106,9 +102,7 @@ import Testing
   await store.send(.onAppear) // re-appear while showing code: no-op, no fresh code
   await clock.advance(by: .seconds(5))
   await store.receive(.polled(.connected(childData)))
-  await store.receive(.connectionSucceeded(childData: childData)) {
-    $0.screen = .connected(childName: "Roo")
-  }
+  await store.receive(.connectionSucceeded(childData: childData))
 }
 
 @MainActor

@@ -6,10 +6,15 @@ let package = Package(
   name: "LibViews",
   platforms: [.macOS(.v15), .iOS(.v17)],
   products: [.library(name: "LibViews", targets: ["LibViews"])],
+  dependencies: [
+    .package(path: "../../gertie-ui"),
+  ],
   targets: [
     .target(
       name: "LibViews",
-      exclude: ["FakeEntry.swift"],
+      dependencies: [
+        .product(name: "GertieUI", package: "gertie-ui"),
+      ],
       resources: [.process("Resources")],
     ),
     .testTarget(

@@ -124,6 +124,30 @@ struct MusicSetupFeatureTests {
   }
 
   @Test
+  func permissionRemainingNotDeterminedCanBeRequestedAgain() async {
+    var state = MusicSetupFeature.State()
+    state.screen = .appleMusicPermission
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.musicSetup.requestAuthorization = { .notDetermined }
+    }
+
+    await store.send(.appleMusicPermissionButtonTapped) {
+      $0.screen = .requestingAppleMusicPermission
+    }
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.notDetermined)) {
+      $0.screen = .appleMusicPermission
+    }
+    await store.send(.appleMusicPermissionButtonTapped) {
+      $0.screen = .requestingAppleMusicPermission
+    }
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.notDetermined)) {
+      $0.screen = .appleMusicPermission
+    }
+  }
+
+  @Test
   func recognizedEntitledDeviceSkipsQuestion() async {
     let token = UUID(1)
     let childId = UUID(2)

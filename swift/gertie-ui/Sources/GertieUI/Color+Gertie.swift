@@ -2,12 +2,9 @@ import Foundation
 import SwiftUI
 
 public extension Color {
-  static let slate100 = Color(hex: "#f1f5f9")!
   static let slate200 = Color(hex: "#e2e8f0")!
   static let slate300 = Color(hex: "#cbd5e1")!
   static let slate400 = Color(hex: "#94a3b8")!
-  static let slate500 = Color(hex: "#64748b")!
-  static let slate600 = Color(hex: "#475569")!
   static let slate700 = Color(hex: "#334155")!
   static let slate800 = Color(hex: "#1e293b")!
   static let slate900 = Color(hex: "#0f172a")!
@@ -42,32 +39,23 @@ public extension Color {
     opacity: 1,
   )
 
-  internal static func artworkPlaceholder(in colorScheme: ColorScheme) -> Color {
-    Color(
-      colorScheme,
-      light: Color(red: 0.90, green: 0.90, blue: 0.92),
-      dark: Color(red: 0.14, green: 0.14, blue: 0.16),
-    )
-  }
-
-  internal init?(hex: String) {
-    let r, g, b: Double
-
-    var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-    hexSanitized = hexSanitized.hasPrefix("#") ? String(hexSanitized.dropFirst()) : hexSanitized
+  init?(hex: String) {
+    let red, green, blue: Double
+    var hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+    hex = hex.hasPrefix("#") ? String(hex.dropFirst()) : hex
 
     var rgb: UInt64 = 0
-    Scanner(string: hexSanitized).scanHexInt64(&rgb)
+    Scanner(string: hex).scanHexInt64(&rgb)
 
-    switch hexSanitized.count {
+    switch hex.count {
     case 3:
-      (r, g, b) = (
+      (red, green, blue) = (
         Double((rgb >> 8) & 0xF) / 15.0,
         Double((rgb >> 4) & 0xF) / 15.0,
         Double(rgb & 0xF) / 15.0,
       )
     case 6:
-      (r, g, b) = (
+      (red, green, blue) = (
         Double((rgb >> 16) & 0xFF) / 255.0,
         Double((rgb >> 8) & 0xFF) / 255.0,
         Double(rgb & 0xFF) / 255.0,
@@ -76,48 +64,19 @@ public extension Color {
       return nil
     }
 
-    self.init(red: r, green: g, blue: b)
+    self.init(red: red, green: green, blue: blue)
   }
 
-  internal init(_ cs: ColorScheme, light: Color, dark: Color) {
-    self = cs == .dark ? dark : light
+  init(_ colorScheme: ColorScheme, light: Color, dark: Color) {
+    self = colorScheme == .dark ? dark : light
   }
 
-  internal func isDarker(
+  func isDarker(
     than other: Color,
     in environment: EnvironmentValues,
   ) -> Bool {
     self.resolve(in: environment).relativeLuminance
       < other.resolve(in: environment).relativeLuminance
-  }
-}
-
-struct ArtworkPaletteColors {
-  let darker: Color
-  let lighter: Color
-}
-
-extension ArtworkPalette {
-  var backgroundColor: Color? {
-    self.bgColor.flatMap(Color.init(hex:))
-  }
-
-  func orderedColors(in environment: EnvironmentValues) -> ArtworkPaletteColors? {
-    guard let backgroundColor = self.backgroundColor,
-          let primaryTextColor = self.textColor1.flatMap(Color.init(hex:))
-    else { return nil }
-
-    if backgroundColor.isDarker(than: primaryTextColor, in: environment) {
-      return ArtworkPaletteColors(
-        darker: backgroundColor,
-        lighter: primaryTextColor,
-      )
-    }
-
-    return ArtworkPaletteColors(
-      darker: primaryTextColor,
-      lighter: backgroundColor,
-    )
   }
 }
 

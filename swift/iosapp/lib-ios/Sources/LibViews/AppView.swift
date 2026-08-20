@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import GertieApp
 import GertieTcaFeatures
+import GertieUI
 import LibApp
 import SwiftUI
 
@@ -15,9 +16,6 @@ public struct AppView: View {
     self.deviceType = deviceType
   }
 
-  @Environment(\.colorScheme) var cs
-  @Environment(\.openURL) var openLink
-
   public var body: some View {
     Group {
       if let clearCacheStore = self.store.scope(
@@ -26,7 +24,7 @@ public struct AppView: View {
       ) {
         ClearingCacheView(
           store: clearCacheStore,
-          clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+          clearedMessage: "Previously downloaded GIFs should be gone!",
           clearedBtnLabel: "Next",
         )
         .onAppear { clearCacheStore.send(.onAppear) }
@@ -49,7 +47,11 @@ public struct AppView: View {
         case .launching: EmptyView()
 
         case .onboarding(.happyPath(.hiThere)):
-          WelcomeView {
+          GertieWelcomeScreen(
+            greeting: "Hi there!",
+            message: "Gertrude blocks unwanted stuff, like GIFs, from your device.",
+            actionTitle: "Get started",
+          ) {
             self.store.send(.interactive(.onboardingBtnTapped(.primary, "Get Started")))
           }
           .onShake {
@@ -59,121 +61,140 @@ public struct AppView: View {
           }
 
         case .onboarding(.happyPath(.timeExpectation)):
-          ButtonScreenView(
-            text: "The setup usually takes about 5-7 minutes, but in some cases extra steps are required.",
-            primary: self.btn(text: "Next", .primary),
-            screenIdentifier: "onboarding-screen-time-expectation",
+          GertieActionScreen(
+            message: "The setup usually takes about 5-7 minutes, but in some cases extra steps are required.",
+            action: self.action(text: "Next", .primary),
+            accessibilityIdentifier: "onboarding-screen-time-expectation",
           )
 
         case .onboarding(.happyPath(.confirmChildsDevice)):
-          ButtonScreenView(
-            text: "Is this the \(self.deviceType) you want to protect?",
-            primary: self.btn(text: "Yes", .primary),
-            secondary: self.btn(text: "No", .secondary),
-            screenIdentifier: "onboarding-screen-confirm-childs-device",
+          GertieActionScreen(
+            message: "Is this the \(self.deviceType) you want to protect?",
+            actions: [
+              self.action(text: "Yes", .primary),
+              self.action(text: "No", .secondary),
+            ],
+            accessibilityIdentifier: "onboarding-screen-confirm-childs-device",
           )
 
         case .onboarding(.happyPath(.explainPermissionDependsOnAge)):
-          ButtonScreenView(
-            text: "To protect privacy, Apple requires special permission before we can block unwanted internet access. How we get that permission depends on the AGE of the \(self.deviceType) user.",
-            primary: self.btn(text: "Got it, next", .primary),
-            screenIdentifier: "onboarding-screen-explain-permission-depends-on-age",
+          GertieActionScreen(
+            message: "To protect privacy, Apple requires special permission before we can block unwanted internet access. How we get that permission depends on the AGE of the \(self.deviceType) user.",
+            action: self.action(text: "Got it, next", .primary),
+            accessibilityIdentifier: "onboarding-screen-explain-permission-depends-on-age",
           )
 
         case .onboarding(.happyPath(.confirmMinorDevice)):
-          ButtonScreenView(
-            text: "How old is the user of this \(self.deviceType)?",
-            primary: self.btn(text: "Under 18", .primary),
-            secondary: self.btn(text: "18 or older", .secondary),
-            primaryLooksLikeSecondary: true,
-            screenIdentifier: "onboarding-screen-confirm-minor-device",
+          GertieActionScreen(
+            message: "How old is the user of this \(self.deviceType)?",
+            actions: [
+              self.action(text: "Under 18", .primary, emphasis: .secondary),
+              self.action(text: "18 or older", .secondary),
+            ],
+            accessibilityIdentifier: "onboarding-screen-confirm-minor-device",
           )
 
         case .onboarding(.happyPath(.confirmParentIsOnboarding)):
-          ButtonScreenView(
-            text: "Are you the parent or guardian?",
-            primary: self.btn(text: "Yes", .primary),
-            secondary: self.btn(text: "No", .secondary),
-            screenIdentifier: "onboarding-screen-confirm-parent-is-onboarding",
+          GertieActionScreen(
+            message: "Are you the parent or guardian?",
+            actions: [
+              self.action(text: "Yes", .primary),
+              self.action(text: "No", .secondary),
+            ],
+            accessibilityIdentifier: "onboarding-screen-confirm-parent-is-onboarding",
           )
 
         case .onboarding(.happyPath(.confirmInAppleFamily)):
-          ButtonScreenView(
-            text: "Apple also requires that the child’s \(self.deviceType) be part of an Apple Family. Is the Apple Account for this \(self.deviceType) already in an Apple Family?",
-            primary: self.btn(text: "Yes, it’s in an Apple Family", .primary),
-            secondary: self.btn(text: "No", .secondary),
-            tertiary: self.btn(text: "I’m not sure", .tertiary),
-            screenIdentifier: "onboarding-screen-confirm-in-apple-family",
+          GertieActionScreen(
+            message: "Apple also requires that the child’s \(self.deviceType) be part of an Apple Family. Is the Apple Account for this \(self.deviceType) already in an Apple Family?",
+            actions: [
+              self.action(text: "Yes, it’s in an Apple Family", .primary),
+              self.action(text: "No", .secondary),
+              self.action(text: "I’m not sure", .tertiary),
+            ],
+            accessibilityIdentifier: "onboarding-screen-confirm-in-apple-family",
           )
 
         case .onboarding(.happyPath(.explainTwoInstallSteps)):
-          ButtonScreenView(
-            text: "Next we’ll authorize and install the content filter. It takes TWO steps, both of which are required.",
-            primary: self.btn(text: "Next", .primary),
-            screenIdentifier: "onboarding-screen-explain-two-install-steps",
+          GertieActionScreen(
+            message: "Next we’ll authorize and install the content filter. It takes TWO steps, both of which are required.",
+            action: self.action(text: "Next", .primary),
+            accessibilityIdentifier: "onboarding-screen-explain-two-install-steps",
           )
 
         case .onboarding(.happyPath(.explainAuthWithParentAppleAccount)):
-          ButtonScreenView(
-            text: "For the first step, you’ll authorize Gertrude to access Screen Time using YOUR Apple ID (the parent/guardian, not the child’s).",
-            primary: self.btn(text: "Got it, next", .primary),
-            screenIdentifier: "onboarding-screen-explain-auth-with-parent-apple-account",
+          GertieActionScreen(
+            message: "For the first step, you’ll authorize Gertrude to access Screen Time using YOUR Apple ID (the parent/guardian, not the child’s).",
+            action: self.action(text: "Got it, next", .primary),
+            accessibilityIdentifier: "onboarding-screen-explain-auth-with-parent-apple-account",
           )
 
         case .onboarding(.happyPath(.dontGetTrickedPreAuth)):
-          ButtonScreenView(
-            text: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
-            primary: self.btn(text: "Got it, next", .primary, animate: false, async: true),
-            image: self.iosVersionImage("AllowScreenTimeAccess"),
-            screenIdentifier: "onboarding-screen-dont-get-tricked-pre-auth",
-          )
+          GertieActionScreen(
+            message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+            action: self.action(text: "Got it, next", .primary, behavior: .showProgress),
+            accessibilityIdentifier: "onboarding-screen-dont-get-tricked-pre-auth",
+            supplementPlacement: .beforeMessage,
+          ) {
+            OnboardingInstructionImage(
+              name: self.iosVersionImage("AllowScreenTimeAccess"),
+              accessibilityLabel: "Screen Time permission alert showing the Continue button",
+            )
+          }
 
         case .onboarding(.happyPath(.explainInstallWithDevicePasscode)):
-          ButtonScreenView(
-            text: "Great! Half way there. In the next step, use the passcode of THIS \(self.deviceType.uppercased()) (the one you’re holding), not your own.",
-            primary: self.btn(text: "Got it, next", .primary),
-            screenIdentifier: "onboarding-screen-explain-install-with-device-passcode",
+          GertieActionScreen(
+            message: "Great! Half way there. In the next step, use the passcode of THIS \(self.deviceType.uppercased()) (the one you’re holding), not your own.",
+            action: self.action(text: "Got it, next", .primary),
+            accessibilityIdentifier: "onboarding-screen-explain-install-with-device-passcode",
           )
 
         case .onboarding(.happyPath(.dontGetTrickedPreInstall)):
-          ButtonScreenView(
-            text: "Again, don’t get tricked! Be sure to click “Allow”, even though it looks like you’re supposed to click “Don’t Allow”.",
-            primary: self.btn(text: "Got it, next", .primary, animate: false, async: true),
-            image: self.iosVersionImage("AllowContentFilter"),
-            screenIdentifier: "onboarding-screen-dont-get-tricked-pre-install",
-          )
+          GertieActionScreen(
+            message: "Again, don’t get tricked! Be sure to click “Allow”, even though it looks like you’re supposed to click “Don’t Allow”.",
+            action: self.action(text: "Got it, next", .primary, behavior: .showProgress),
+            accessibilityIdentifier: "onboarding-screen-dont-get-tricked-pre-install",
+            supplementPlacement: .beforeMessage,
+          ) {
+            OnboardingInstructionImage(
+              name: self.iosVersionImage("AllowContentFilter"),
+              accessibilityLabel: "Content Filter permission alert showing the Allow button",
+            )
+          }
 
         case .onboarding(.happyPath(.offerAccountConnect)):
-          ButtonScreenView(
-            text: self.store.onboarding.connectFeature.offerScreenText ??
+          GertieActionScreen(
+            message: self.store.onboarding.connectFeature.offerScreenText ??
               "You can connect this device to a Gertrude parent account for more controls and features.",
-            primary: self.btn(
-              text: self.store.onboarding.connectFeature.offerScreenConnectBtnText ??
-                "Connect to account",
-              .primary,
-            ),
-            secondary: self.btn(
-              text: self.store.onboarding.connectFeature.offerScreenSkipBtnText ?? "No thanks",
-              .secondary,
-            ),
-            tertiary: self.btn(text: "Tell me more", .tertiary),
-            screenIdentifier: "onboarding-screen-offer-account-connect",
+            actions: [
+              self.action(
+                text: self.store.onboarding.connectFeature.offerScreenConnectBtnText ??
+                  "Connect to account",
+                .primary,
+              ),
+              self.action(
+                text: self.store.onboarding.connectFeature.offerScreenSkipBtnText ?? "No thanks",
+                .secondary,
+              ),
+              self.action(text: "Tell me more", .tertiary),
+            ],
+            accessibilityIdentifier: "onboarding-screen-offer-account-connect",
           )
 
         case .onboarding(.happyPath(.explainAccountConnect)):
-          ButtonScreenView(
-            text: self.store.onboarding.connectFeature.explainScreenText ??
+          GertieActionScreen(
+            message: self.store.onboarding.connectFeature.explainScreenText ??
               "Connecting to a Gertrude account allows the parent to modify settings remotely after installation, safe-list websites in Safari, and more. It is not required, all the core blocking features will always work without an account or payment.",
-            primary: self.btn(text: "Back", .primary),
-            secondary: .init(text: "Read the blog post", type: .link(.connect), animate: false),
+            actions: [
+              self.action(text: "Back", .primary),
+              .link("Read the blog post", destination: .connect),
+            ],
           )
 
         case .onboarding(.happyPath(.connectSuccess)):
-          ButtonScreenView(
-            text: "Success! This \(self.deviceType) is now connected to your Gertrude parent account.",
-            primary: self.btn(text: "Next", .primary),
-            screenIdentifier: "onboarding-screen-connect-success",
-          )
+          AccountConnectionSuccessView(deviceType: self.deviceType) {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next")))
+          }
 
         case .onboarding(.happyPath(.optOutBlockGroups)):
           ChooseWhatToBlockView(
@@ -185,201 +206,222 @@ public struct AppView: View {
 
         case .onboarding(.happyPath(.promptClearCache)),
              .onboarding(.supervision(.resume(.promptClearCache))):
-          ButtonScreenView(
-            text: "Gertrude is now blocking new content, like when a new and unique search is made for GIFs. But content ALREADY VIEWED will still be visible unless we clear the cache.",
-            primary: self.btn(text: "Clear the cache", .primary),
-            secondary: self.btn(text: "No need, skip", .secondary),
+          GertieActionScreen(
+            message: "Gertrude is now blocking new content, like when a new and unique search is made for GIFs. But content ALREADY VIEWED will still be visible unless we clear the cache.",
+            actions: [
+              self.action(text: "Clear the cache", .primary),
+              self.action(text: "No need, skip", .secondary),
+            ],
           )
 
         case .onboarding(.happyPath(.requestAppStoreRating)):
-          ButtonScreenView(
-            text: "All set! But, if you’d like to help other parents protect their kids, tap to give us a rating on the App Store.",
-            primary: self.btn(text: "Give a rating", .primary),
-            secondary: self.btn(text: "Leave a review", .secondary),
-            tertiary: self.btn(text: "No thanks", .tertiary),
-            screenType: .info,
+          GertieActionScreen(
+            message: "All set! But, if you’d like to help other parents protect their kids, tap to give us a rating on the App Store.",
+            actions: [
+              self.action(text: "Give a rating", .primary),
+              self.action(text: "Leave a review", .secondary),
+              self.action(text: "No thanks", .tertiary),
+            ],
           )
 
         case .onboarding(.happyPath(.doneQuit)):
-          FinishedView()
+          GertieResultScreen(
+            icon: "party.popper",
+            title: "Quit the app, you’re done!",
+            message: "Gertrude will keep blocking even when the app is not running.",
+          )
 
         case .onboarding(.authFail(.invalidAccount(.letsFigureThisOut))):
-          ButtonScreenView(
-            text: "Hmmm... Something didn’t work right, let’s get to the bottom of it.",
-            primary: self.btn(text: "Next", .primary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Hmmm... Something didn’t work right, let’s get to the bottom of it.",
+            icon: .error,
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.authFail(.invalidAccount(.confirmInAppleFamily))):
-          ButtonScreenView(
-            text: "It might be that the Apple Account is not part of an Apple Family. Apple won’t allow the installation if it’s not. Is the Apple Account a member of an Apple Family?",
-            primary: self.btn(text: "Yes", .primary),
-            secondary: self.btn(text: "No", .secondary),
-            tertiary: self.btn(text: "I’m not sure", .tertiary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "It might be that the Apple Account is not part of an Apple Family. Apple won’t allow the installation if it’s not. Is the Apple Account a member of an Apple Family?",
+            icon: .error,
+            actions: [
+              self.action(text: "Yes", .primary),
+              self.action(text: "No", .secondary),
+              self.action(text: "I’m not sure", .tertiary),
+            ],
           )
 
         case .onboarding(.authFail(.invalidAccount(.confirmIsMinor))):
-          ButtonScreenView(
-            text: "Are you sure the birthday on the Apple Account is for someone under 18?\n\nGood to know: Apple does permit the birthday to be changed one time.",
-            primary: self.btn(text: "Age is 18 or over", .primary),
-            secondary: self.btn(text: "Age is under 18", .secondary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Are you sure the birthday on the Apple Account is for someone under 18?\n\nGood to know: Apple does permit the birthday to be changed one time.",
+            icon: .error,
+            actions: [
+              self.action(text: "Age is 18 or over", .primary),
+              self.action(text: "Age is under 18", .secondary),
+            ],
           )
 
         case .onboarding(.authFail(.invalidAccount(.unexpected))):
-          ButtonScreenView(
-            text: "Well gosh, we’re not sure what’s wrong then. Try powering the \(self.deviceType) off completely, then start the installation again. If you get here again, please contact us for more help using the link below.",
-            primary: .init(text: "Contact us", type: .link(.support), animate: false),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Well gosh, we’re not sure what’s wrong then. Try powering the \(self.deviceType) off completely, then start the installation again. If you get here again, please contact us for more help using the link below.",
+            icon: .error,
+            action: .link("Contact us", destination: .support),
           )
 
         case .onboarding(.authFail(.authCanceled)):
-          ButtonScreenView(
-            text: "Whoops! Looks like you either clicked the wrong button, or canceled the process mid-way. No problem, we’ll just try again.",
-            primary: self.btn(text: "Try again", .primary),
-            secondary: .init(text: "Contact us", type: .link(.support), animate: false),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Whoops! Looks like you either clicked the wrong button, or canceled the process mid-way. No problem, we’ll just try again.",
+            icon: .error,
+            actions: [
+              self.action(text: "Try again", .primary),
+              .link("Contact us", destination: .support),
+            ],
           )
 
         case .onboarding(.authFail(.restricted)):
-          ButtonScreenView(
-            text: "A restriction is preventing Gertrude from being installed. Is this \(self.deviceType) enrolled in mobile device management (MDM) by an organization or school? If so, try again on a device not managed by MDM.",
-            primary: .init(text: "Contact support", type: .link(.support), animate: false),
-            secondary: self.btn(text: "Start over", .secondary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "A restriction is preventing Gertrude from being installed. Is this \(self.deviceType) enrolled in mobile device management (MDM) by an organization or school? If so, try again on a device not managed by MDM.",
+            icon: .error,
+            actions: [
+              .link("Contact support", destination: .support),
+              self.action(text: "Start over", .secondary),
+            ],
           )
 
         case .onboarding(.authFail(.authConflict)):
-          ButtonScreenView(
-            text: "We got an error that there was a conflict with another parental controls app. If you know what that might be and can remove it, do so and then try again.",
-            primary: self.btn(text: "Done, continue", .primary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "We got an error that there was a conflict with another parental controls app. If you know what that might be and can remove it, do so and then try again.",
+            icon: .error,
+            action: self.action(text: "Done, continue", .primary),
           )
 
         case .onboarding(.authFail(.networkError)):
-          ButtonScreenView(
-            text: "Hmmm.. Are you sure you’re connected to the internet? Double-check and try again when you’re online.",
-            primary: self.btn(text: "Try again", .primary),
-            screenType: .error,
-          )
+          AuthorizationNetworkErrorView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Try again")))
+          }
 
         case .onboarding(.authFail(.passcodeRequired)):
-          ButtonScreenView(
-            text: "Sorry, Apple won’t let us install unless this \(self.deviceType) has a passcode set. Go to the Settings app and set one up, then try again.",
-            primary: self.btn(text: "Try again", .primary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Sorry, Apple won’t let us install unless this \(self.deviceType) has a passcode set. Go to the Settings app and set one up, then try again.",
+            icon: .error,
+            action: self.action(text: "Try again", .primary),
           )
 
         case .onboarding(.authFail(.unexpected)):
-          ButtonScreenView(
-            text: "Shucks, something went wrong, but we’re not exactly sure what. Please try again, and if you end up here again, contact us for help.",
-            primary: self.btn(text: "Try again", .primary),
-            secondary: .init(text: "Contact us", type: .link(.support), animate: false),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Shucks, something went wrong, but we’re not exactly sure what. Please try again, and if you end up here again, contact us for help.",
+            icon: .error,
+            actions: [
+              self.action(text: "Try again", .primary),
+              .link("Contact us", destination: .support),
+            ],
           )
 
         case .onboarding(.installFail(.permissionDenied)):
-          ButtonScreenView(
-            text: "Whoops! Looks like you either clicked the wrong button, or canceled the process mid-way. No problem, we’ll just try again.",
-            primary: self.btn(text: "Try again", .primary),
-            secondary: .init(text: "Contact us", type: .link(.support), animate: false),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Whoops! Looks like you either clicked the wrong button, or canceled the process mid-way. No problem, we’ll just try again.",
+            icon: .error,
+            actions: [
+              self.action(text: "Try again", .primary),
+              .link("Contact us", destination: .support),
+            ],
           )
 
         case .onboarding(.installFail(.other)):
-          ButtonScreenView(
-            text: "Shucks, something went wrong, but we’re not exactly sure what. Please try again, and if you end up here again, contact us for help.",
-            primary: self.btn(text: "Try again", .primary),
-            secondary: .init(text: "Contact us", type: .link(.support), animate: false),
-            screenType: .error,
+          GertieActionScreen(
+            message: "Shucks, something went wrong, but we’re not exactly sure what. Please try again, and if you end up here again, contact us for help.",
+            icon: .error,
+            actions: [
+              self.action(text: "Try again", .primary),
+              .link("Contact us", destination: .support),
+            ],
           )
 
         case .onboarding(.onParentDeviceFail):
-          ButtonScreenView(
-            text: "Gertrude must be installed on the device you want to protect, not on a parent or guardian’s device. Delete the app and start over by installing it on the device you want to protect.",
+          GertieActionScreen(
+            message: "Gertrude must be installed on the device you want to protect, not on a parent or guardian’s device. Delete the app and start over by installing it on the device you want to protect.",
           )
 
         case .onboarding(.mdmSupervisionExplainer):
-          ButtonScreenView(
-            text: "Gertrude’s content filter for adults (18+) requires a supervised device, per Apple’s own rules. This process is not compatible with MDM-managed devices.\n\nTo use this app, you’ll need a personal device that is not managed by an organization.",
-            primary: self.btn(text: "OK", .primary),
+          GertieActionScreen(
+            message: "Gertrude’s content filter for adults (18+) requires a supervised device, per Apple’s own rules. This process is not compatible with MDM-managed devices.\n\nTo use this app, you’ll need a personal device that is not managed by an organization.",
+            action: self.action(text: "OK", .primary),
           )
 
         case .onboarding(.childIsOnboardingFail):
-          ButtonScreenView(
-            text: "Setting up Gertrude requires your parent or guardian. Give your \(self.deviceType) to them so they can finish the setup.",
-            primary: self.btn(text: "Done, continue", .primary),
+          GertieActionScreen(
+            message: "Setting up Gertrude requires your parent or guardian. Give your \(self.deviceType) to them so they can finish the setup.",
+            action: self.action(text: "Done, continue", .primary),
           )
 
         case .onboarding(.appleFamily(.explainRequiredForFiltering)):
-          ButtonScreenView(
-            text: "Sorry, Apple doesn’t allow a content blocker to be installed on a device that’s not in an Apple Family.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "Sorry, Apple doesn’t allow a content blocker to be installed on a device that’s not in an Apple Family.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.appleFamily(.explainSetupFreeAndEasy)):
-          ButtonScreenView(
-            text: "Luckily, setting up an Apple family only takes a few minutes, and it’s free.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "Luckily, setting up an Apple family only takes a few minutes, and it’s free.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.appleFamily(.howToSetupAppleFamily)):
-          ButtonScreenView(
-            text: "You’ll need to start the setup on your iPhone or Mac.",
-            primary: .init(text: "Instructions", type: .link(.appleFamily), animate: false),
-            secondary: .init(
-              text: "Send me the info",
-              type: .share(URL.appleFamily.absoluteString),
-              animate: false,
-            ),
-            tertiary: self.btn(text: "Done, continue", .tertiary),
+          GertieActionScreen(
+            message: "You’ll need to start the setup on your iPhone or Mac.",
+            actions: [
+              .link("Instructions", destination: .appleFamily),
+              .share("Send me the info", item: URL.appleFamily.absoluteString),
+              self.action(text: "Done, continue", .tertiary),
+            ],
           )
 
         case .onboarding(.appleFamily(.explainWhatIsAppleFamily)):
-          ButtonScreenView(
-            text: "An Apple Family group allows sharing of apps and services, plus it gives parents additional controls over their kids devices. There’s no cost, and it’s easy to set one up.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "An Apple Family group allows sharing of apps and services, plus it gives parents additional controls over their kids devices. There’s no cost, and it’s easy to set one up.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.appleFamily(.checkIfInAppleFamily)):
-          ButtonScreenView(
-            text: "You can check if you’re already setup by opening the Settings app on this \(self.deviceType). If you see a Family section right below the Apple Account name and picture, you’re already set.",
-            primary: self.btn(text: "Yes, in a family", .primary),
-            secondary: self.btn(text: "Not in a family yet", .secondary),
+          GertieActionScreen(
+            message: "You can check if you’re already setup by opening the Settings app on this \(self.deviceType). If you see a Family section right below the Apple Account name and picture, you’re already set.",
+            actions: [
+              self.action(text: "Yes, in a family", .primary),
+              self.action(text: "Not in a family yet", .secondary),
+            ],
           )
 
         // supervision setup
 
         case .onboarding(.supervision(.setup(.adultNeedsSupervision))):
-          ButtonScreenView(
-            text: "Got it, over 18. So for adults, Apple doesn’t allow internet blocking unless the \(self.deviceType) is put into a special mode called SUPERVISED MODE.",
-            primary: self.btn(text: "Tell me more", .primary),
+          GertieActionScreen(
+            message: "Got it, over 18. So for adults, Apple doesn’t allow internet blocking unless the \(self.deviceType) is put into a special mode called SUPERVISED MODE.",
+            action: self.action(text: "Tell me more", .primary),
           )
 
         case .onboarding(.supervision(.setup(.whatIsSupervisedMode))):
-          ButtonScreenView(
-            text: "Supervised mode was originally designed for devices owned by schools and businesses. It allows access to settings and features that normal devices don’t have.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "Supervised mode was originally designed for devices owned by schools and businesses. It allows access to settings and features that normal devices don’t have.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.supervision(.setup(.supervisedDeviceReassurance))):
-          ButtonScreenView(
-            text: "Other than allowing access to these extra features and controls, a supervised \(self.deviceType) is the same as any other \(self.deviceType). You get to decide which extra features to use.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "Other than allowing access to these extra features and controls, a supervised \(self.deviceType) is the same as any other \(self.deviceType). You get to decide which extra features to use.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.supervision(.setup(.explainSupervision))):
-          ButtonScreenView(
-            text: "So, to get Gertrude blocking unwanted content for you, we’ll need this \(self.deviceType) to be in supervised mode, which takes a little more up-front setup.",
-            primary: self.btn(text: "Got it, next", .primary),
+          GertieActionScreen(
+            message: "So, to get Gertrude blocking unwanted content for you, we’ll need this \(self.deviceType) to be in supervised mode, which takes a little more up-front setup.",
+            action: self.action(text: "Got it, next", .primary),
           )
 
         case .onboarding(.supervision(.setup(.costAndBranchPoint))):
-          ButtonScreenView(
-            text: "The easiest way to supervise a device is with a Gertrude account ($10/year).\n\nThere are free alternatives, but they have downsides.",
-            primary: self.btn(text: "Continue with Gertrude", .primary),
-            secondary: self.btn(text: "Show me the free alternatives", .secondary),
+          GertieActionScreen(
+            message: "The easiest way to supervise a device is with a Gertrude account ($10/year).\n\nThere are free alternatives, but they have downsides.",
+            actions: [
+              self.action(text: "Continue with Gertrude", .primary),
+              self.action(text: "Show me the free alternatives", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.freeAlternativesHub))):
@@ -399,118 +441,135 @@ public struct AppView: View {
           )
 
         case .onboarding(.supervision(.setup(.birthdayAlternativeExplain))):
-          ButtonScreenView(
-            text: "Apple allows you to change your Apple Account birthday one time. If you change it to make yourself under 18, Gertrude will work without supervision.",
-            primary: self.btn(text: "What are the downsides?", .primary),
-            secondary: self.btn(text: "Back to alternatives", .secondary),
+          GertieActionScreen(
+            message: "Apple allows you to change your Apple Account birthday one time. If you change it to make yourself under 18, Gertrude will work without supervision.",
+            actions: [
+              self.action(text: "What are the downsides?", .primary),
+              self.action(text: "Back to alternatives", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.birthdayAlternativeCons))):
-          ButtonScreenView(
-            text: "You’ll be treated as a child in Apple’s system:",
-            primary: self.btn(text: "This works for me", .primary),
-            secondary: self.btn(text: "Back to alternatives", .secondary),
-            listItems: [
+          GertieActionScreen(
+            message: "You’ll be treated as a child in Apple’s system:",
+            icon: .error,
+            bullets: [
               "You’ll need to be a part of an Apple Family",
               "Purchases may need approval",
               "You can’t be a family organizer",
               "Can be hard to undo later",
             ],
-            screenType: .error,
+            actions: [
+              self.action(text: "This works for me", .primary),
+              self.action(text: "Back to alternatives", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.birthdayAlternativeInstructions))):
-          ButtonScreenView(
-            text: "To change your birthday: Go to Settings, tap your name, then Personal Information, then Birthday. Change it so you’re under 18, then come back to this app.",
-            primary: self.btn(text: "I’ve updated my birthday", .primary),
+          GertieActionScreen(
+            message: "To change your birthday: Go to Settings, tap your name, then Personal Information, then Birthday. Change it so you’re under 18, then come back to this app.",
+            action: self.action(text: "I’ve updated my birthday", .primary),
           )
 
         case .onboarding(.supervision(.setup(.siblingAlternativeExplain))):
-          ButtonScreenView(
-            text: "If you have a younger sibling (under 18) in your Apple Family, you can sign into their Apple Account on this \(self.deviceType). Gertrude will then work without supervision.",
-            primary: self.btn(text: "What are the downsides?", .primary),
-            secondary: self.btn(text: "Back to alternatives", .secondary),
+          GertieActionScreen(
+            message: "If you have a younger sibling (under 18) in your Apple Family, you can sign into their Apple Account on this \(self.deviceType). Gertrude will then work without supervision.",
+            actions: [
+              self.action(text: "What are the downsides?", .primary),
+              self.action(text: "Back to alternatives", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.siblingAlternativeCons))):
-          ButtonScreenView(
-            text: "This \(self.deviceType) becomes your sibling’s in Apple’s eyes:",
-            primary: self.btn(text: "This works for me", .primary),
-            secondary: self.btn(text: "Back to alternatives", .secondary),
-            listItems: [
+          GertieActionScreen(
+            message: "This \(self.deviceType) becomes your sibling’s in Apple’s eyes:",
+            icon: .error,
+            bullets: [
               "iMessage and FaceTime use their account",
               "App purchases go to their account",
               "Other data may mix or sync",
             ],
-            screenType: .error,
+            actions: [
+              self.action(text: "This works for me", .primary),
+              self.action(text: "Back to alternatives", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.siblingAlternativeInstructions))):
-          ButtonScreenView(
-            text: "To switch accounts: Go to Settings, tap your name at the top, scroll down and tap Sign Out. Then sign in with your sibling’s Apple ID and come back to this app.",
-            primary: self.btn(text: "I’ve switched accounts", .primary),
+          GertieActionScreen(
+            message: "To switch accounts: Go to Settings, tap your name at the top, scroll down and tap Sign Out. Then sign in with your sibling’s Apple ID and come back to this app.",
+            action: self.action(text: "I’ve switched accounts", .primary),
           )
 
         case .onboarding(.supervision(.setup(.accountNowUnder18))):
-          ButtonScreenView(
-            text: "Great! Assuming the account is now set up as under 18, we can proceed with the standard setup.",
-            primary: self.btn(text: "Continue", .primary),
+          GertieActionScreen(
+            message: "Great! Assuming the account is now set up as under 18, we can proceed with the standard setup.",
+            action: self.action(text: "Continue", .primary),
           )
 
         case .onboarding(.supervision(.setup(.appleConfiguratorExplain))):
-          ButtonScreenView(
-            text: "You can use Apple’s free tool called Apple Configurator to supervise your own \(self.deviceType). This gives you full control without needing a Gertrude account.",
-            primary: self.btn(text: "What are the downsides?", .primary),
-            secondary: self.btn(text: "Back to alternatives", .secondary),
+          GertieActionScreen(
+            message: "You can use Apple’s free tool called Apple Configurator to supervise your own \(self.deviceType). This gives you full control without needing a Gertrude account.",
+            actions: [
+              self.action(text: "What are the downsides?", .primary),
+              self.action(text: "Back to alternatives", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.appleConfiguratorCons(let step)))):
           switch step {
           case 1:
-            ButtonScreenView(
-              text: "This method requires completely erasing this \(self.deviceType). You can restore from a backup afterward, but sometimes a few customizations can be lost.",
-              primary: self.btn(text: "Next", .primary),
-              secondary: self.btn(text: "Back to alternatives", .secondary),
-              screenType: .error,
+            GertieActionScreen(
+              message: "This method requires completely erasing this \(self.deviceType). You can restore from a backup afterward, but sometimes a few customizations can be lost.",
+              icon: .error,
+              actions: [
+                self.action(text: "Next", .primary),
+                self.action(text: "Back to alternatives", .secondary),
+              ],
             )
           case 2:
-            ButtonScreenView(
-              text: "You’ll need a Mac computer and physical access to this \(self.deviceType) every time you want to make changes to the supervision settings.",
-              primary: self.btn(text: "Next", .primary),
-              secondary: self.btn(text: "Back to alternatives", .secondary),
-              screenType: .error,
+            GertieActionScreen(
+              message: "You’ll need a Mac computer and physical access to this \(self.deviceType) every time you want to make changes to the supervision settings.",
+              icon: .error,
+              actions: [
+                self.action(text: "Next", .primary),
+                self.action(text: "Back to alternatives", .secondary),
+              ],
             )
           default:
-            ButtonScreenView(
-              text: "The process takes about an hour, and is slightly technical, compared to ~5 minutes with Gertrude. Ready to proceed?",
-              primary: .init(
-                text: "Show me how",
-                type: .link(.supervisionTutorial),
-                animate: false,
-              ),
-              secondary: self.btn(text: "Back to alternatives", .secondary),
-              screenType: .error,
+            GertieActionScreen(
+              message: "The process takes about an hour, and is slightly technical, compared to ~5 minutes with Gertrude. Ready to proceed?",
+              icon: .error,
+              actions: [
+                .link("Show me how", destination: .supervisionTutorial),
+                self.action(text: "Back to alternatives", .secondary),
+              ],
             )
           }
 
         case .onboarding(.supervision(.setup(.explainNeedSomeoneElse))):
-          ButtonScreenView(
-            text: "A supervised \(self.deviceType) needs someone ELSE to manage it—typically a parent, spouse, or accountability partner. They’ll need to plug this \(self.deviceType) into a computer to get started.",
-            primary: self.btn(text: "Got it, no problem", .primary),
-            secondary: self.btn(text: "I need to manage myself", .secondary),
+          GertieActionScreen(
+            message: "A supervised \(self.deviceType) needs someone ELSE to manage it—typically a parent, spouse, or accountability partner. They’ll need to plug this \(self.deviceType) into a computer to get started.",
+            actions: [
+              self.action(text: "Got it, no problem", .primary),
+              self.action(text: "I need to manage myself", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.selfManagementPlaceholder))):
-          ButtonScreenView(
-            text: "Self-management is coming soon! For now, you’ll need someone else to help supervise your \(self.deviceType). We’re working on a solution for self-management.",
-            primary: self.btn(text: "Start over", .primary),
-            secondary: .init(text: "Contact support", type: .link(.support), animate: false),
+          GertieActionScreen(
+            message: "Self-management is coming soon! For now, you’ll need someone else to help supervise your \(self.deviceType). We’re working on a solution for self-management.",
+            actions: [
+              self.action(text: "Start over", .primary),
+              .link("Contact support", destination: .support),
+            ],
           )
 
         case .onboarding(.supervision(.setup(.generateSetupCode(let didError)))):
           SpinnerErrorView(
             loadingText: "Generating your setup code...",
-            errorText: "Something went wrong generating your setup code. Please try again.",
+            errorTitle: "Couldn’t generate a setup code",
+            errorMessage: "Please try again.",
             isError: didError,
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
@@ -527,47 +586,51 @@ public struct AppView: View {
         // supervision resume
 
         case .onboarding(.supervision(.resume(.codeClaimedNotSupervised))):
-          ButtonScreenView(
-            text: "We haven’t been able to confirm that this \(self.deviceType) is supervised yet. To finish, a parent needs to connect this \(self.deviceType) to a computer and complete supervision with the Gertrude supervision tool. Once that’s done, tap below to check again, or contact us if you’re stuck.",
-            primary: self.btn(text: "Check again", .primary),
-            secondary: .init(text: "Contact support", type: .link(.support), animate: false),
+          GertieActionScreen(
+            message: "We haven’t been able to confirm that this \(self.deviceType) is supervised yet. To finish, a parent needs to connect this \(self.deviceType) to a computer and complete supervision with the Gertrude supervision tool. Once that’s done, tap below to check again, or contact us if you’re stuck.",
+            actions: [
+              self.action(text: "Check again", .primary),
+              .link("Contact support", destination: .support),
+            ],
           )
 
         case .onboarding(.supervision(.resume(.retrySupervision))):
-          ButtonScreenView(
-            text: "No worries. Let’s try setting up supervision again.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "No worries. Let’s try setting up supervision again.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.supervision(.resume(.codeNotClaimed))):
-          ButtonScreenView(
-            text: "Hmmm... the supervision setup code hasn’t been claimed by a Gertrude account yet. Let’s try again.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "Hmmm... the supervision setup code hasn’t been claimed by a Gertrude account yet. Let’s try again.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.supervision(.resume(.codeExpired))):
-          ButtonScreenView(
-            text: "Your supervision setup code is no longer valid. No problem, we can make a fresh one and pick up from there.",
-            primary: self.btn(text: "Get a new code", .primary),
-            secondary: self.btn(text: "Start over", .secondary),
+          GertieActionScreen(
+            message: "Your supervision setup code is no longer valid. No problem, we can make a fresh one and pick up from there.",
+            actions: [
+              self.action(text: "Get a new code", .primary),
+              self.action(text: "Start over", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.resume(.profileRemovedRecovery))):
-          ButtonScreenView(
-            text: "The supervision profile is no longer installed on this \(self.deviceType), preventing Gertrude from doing its job.",
-            primary: self.btn(text: "Reinstall profile", .primary),
+          GertieActionScreen(
+            message: "The supervision profile is no longer installed on this \(self.deviceType), preventing Gertrude from doing its job.",
+            action: self.action(text: "Reinstall profile", .primary),
           )
 
         case .onboarding(.supervision(.resume(.promptInstallProfile))):
-          ButtonScreenView(
-            text: "One more step: we need to install something called a “profile” to allow blocking.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "One more step: we need to install something called a “profile” to allow blocking.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.supervision(.resume(.explainProfileDownload))):
-          ButtonScreenView(
-            text: "When the mini-browser opens, tap “Allow” to download the profile.",
-            primary: self.btn(text: "Got it", .primary),
+          GertieActionScreen(
+            message: "When the mini-browser opens, tap “Allow” to download the profile.",
+            action: self.action(text: "Got it", .primary),
           )
 
         case .onboarding(.supervision(.resume(.installingProfile(let profileUrl)))):
@@ -576,22 +639,21 @@ public struct AppView: View {
           }
 
         case .onboarding(.supervision(.resume(.profileDownloaded))):
-          ButtonScreenView(
-            text: "Great, profile downloaded! Now we need to install it. You’ll do this in the Settings app—we’ll explain how.",
-            primary: self.btn(text: "Next", .primary),
+          GertieActionScreen(
+            message: "Great, profile downloaded! Now we need to install it. You’ll do this in the Settings app—we’ll explain how.",
+            action: self.action(text: "Next", .primary),
           )
 
         case .onboarding(.supervision(.resume(.profileNotRemovableWarning))):
-          ButtonScreenView(
-            text: "When installing the profile, your \(self.deviceType) will warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude website.",
-            primary: self.btn(text: "Got it", .primary),
+          GertieActionScreen(
+            message: "When installing the profile, your \(self.deviceType) will warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude website.",
+            action: self.action(text: "Got it", .primary),
           )
 
         case .onboarding(.supervision(.resume(.explainProfileInstall(let regainedFocus)))):
-          ButtonScreenView(
-            text: "Now, open the Settings app:",
-            primary: self.btn(text: "Done, continue", .primary, disabled: !regainedFocus),
-            listItems: [
+          GertieActionScreen(
+            message: "Now, open the Settings app:",
+            bullets: [
               self.deviceType == "iPad"
                 ? "In the left column, tap “Profile Downloaded” near the top"
                 : "Tap “Profile Downloaded” near the top",
@@ -599,61 +661,66 @@ public struct AppView: View {
               "Enter your passcode",
               "Come back to this app",
             ],
+            action: self.action(text: "Done, continue", .primary, isEnabled: regainedFocus),
           )
 
         case .onboarding(.supervision(.resume(.verifyingProfileInstall(let didError)))):
           SpinnerErrorView(
             loadingText: "Verifying profile installation...",
-            errorText: "Profile not detected. Make sure you installed the profile in Settings.",
+            errorTitle: "Profile not detected",
+            errorMessage: "Make sure you installed the profile in Settings.",
             isError: didError,
             onRetry: { self.store.send(.interactive(.onboardingBtnTapped(.primary, "Retry"))) },
           )
 
         case .onboarding(.supervision(.resume(.profileInstalled))):
-          ButtonScreenView(
-            text: "Profile installed successfully! Gertrude can now block unwanted content.\n\nFrom the website, the account holder can manage what gets blocked and also remove the supervision.",
-            primary: self.btn(text: "Next", .primary),
-          )
+          ProfileInstalledView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next")))
+          }
 
         case .onboarding(.supervision(.resume(.websiteWarning(let childName)))):
-          ButtonScreenView(
-            text: "Because protection is controlled from the website, that also means it’s important that \(childName ?? "the \(self.deviceType) user") doesn’t know the website password.",
-            primary: self.btn(text: "Got it", .primary),
+          GertieActionScreen(
+            message: "Because protection is controlled from the website, that also means it’s important that \(childName ?? "the \(self.deviceType) user") doesn’t know the website password.",
+            action: self.action(text: "Got it", .primary),
           )
 
         case .onboarding(.supervision(.resume(.offerScreenTimeAccess))):
-          ButtonScreenView(
-            text: "We’re working on adding more control for the account holder via Screen Time. If you grant access now, you’ll be able to opt into these new features from the Gertrude website.\n\nFor safety and accountability, make sure there is a 4-digit Screen Time passcode set that only the account holder knows.",
-            primary: self.btn(text: "Grant Screen Time access", .primary),
-            secondary: self.btn(text: "Not now", .secondary),
+          GertieActionScreen(
+            message: "We’re working on adding more control for the account holder via Screen Time. If you grant access now, you’ll be able to opt into these new features from the Gertrude website.\n\nFor safety and accountability, make sure there is a 4-digit Screen Time passcode set that only the account holder knows.",
+            actions: [
+              self.action(text: "Grant Screen Time access", .primary),
+              self.action(text: "Not now", .secondary),
+            ],
           )
 
         case .onboarding(.supervision(.resume(.dontGetTrickedPreScreenTime))):
-          ButtonScreenView(
-            text: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
-            primary: self.btn(text: "Got it, next", .primary, animate: false, async: true),
-            image: self.iosVersionImage("AllowScreenTimeAccess"),
-          )
+          GertieActionScreen(
+            message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+            action: self.action(text: "Got it, next", .primary, behavior: .showProgress),
+            supplementPlacement: .beforeMessage,
+          ) {
+            OnboardingInstructionImage(
+              name: self.iosVersionImage("AllowScreenTimeAccess"),
+              accessibilityLabel: "Screen Time permission alert showing the Continue button",
+            )
+          }
 
         case .onboarding(.supervision(.resume(.networkError))):
-          ButtonScreenView(
-            text: "Couldn’t reach Gertrude’s servers. Please check your internet connection and try again.",
-            primary: self.btn(text: "Try again", .primary),
-            screenType: .error,
-          )
+          SupervisionNetworkErrorView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Try again")))
+          }
 
         case .onboarding(.supervision(.resume(.requiresSubscription))):
-          ButtonScreenView(
-            text: "A Gertrude subscription is required to use supervision. Have a parent subscribe at parents.gertrude.app, then tap Try Again.",
-            primary: self.btn(text: "Try Again", .primary),
-            screenType: .error,
+          GertieActionScreen(
+            message: "A Gertrude subscription is required to use supervision. Have a parent subscribe at parents.gertrude.app, then tap Try Again.",
+            icon: .error,
+            action: self.action(text: "Try Again", .primary),
           )
 
         case .supervisionSuccessFirstLaunch:
-          ButtonScreenView(
-            text: "Excellent! Looks like you’ve installed Gertrude under Supervised mode. Just a couple steps to get you all set up.",
-            primary: self.btn(text: "Next", .primary),
-          )
+          SupervisionDetectedView {
+            self.store.send(.interactive(.onboardingBtnTapped(.primary, "Next")))
+          }
 
         case .running:
           RunningView(store: self.store)
@@ -697,33 +764,132 @@ public struct AppView: View {
     )
   }
 
-  func btn(
+  private func action(
     text: String,
-    _ type: ButtonType,
-    animate: Bool = true,
-    async: Bool = false,
-    disabled: Bool = false,
-  ) -> ButtonScreenView.Config {
-    .init(text, animate: animate, asyncAction: async, disabled: disabled) {
-      switch type {
-      case .primary:
-        self.store.send(.interactive(.onboardingBtnTapped(.primary, text)))
-      case .secondary:
-        self.store.send(.interactive(.onboardingBtnTapped(.secondary, text)))
-      case .tertiary:
-        self.store.send(.interactive(.onboardingBtnTapped(.tertiary, text)))
-      }
+    _ slot: IOSReducer.Action.Interactive.OnboardingBtn,
+    emphasis: GertieScreenAction.Emphasis = .automatic,
+    behavior: GertieScreenAction.TriggerBehavior = .afterExitAnimation,
+    isEnabled: Bool = true,
+  ) -> GertieScreenAction {
+    .button(
+      text,
+      emphasis: emphasis,
+      isEnabled: isEnabled,
+      behavior: behavior,
+    ) {
+      self.store.send(.interactive(.onboardingBtnTapped(slot, text)))
     }
   }
 
-  func iosVersionImage(_ baseName: String) -> String {
+  private func iosVersionImage(_ baseName: String) -> String {
     self.osMajorVersion >= 26 ? "\(baseName)IOS26" : baseName
   }
+}
 
-  enum ButtonType {
-    case primary
-    case secondary
-    case tertiary
+private struct AccountConnectionSuccessView: View {
+  let deviceType: String
+  let onNext: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Successfully connected!",
+      message: "This \(self.deviceType) is now connected to your Gertrude parent account.",
+      accessibilityIdentifier: "onboarding-screen-connect-success",
+      action: .button("Next", behavior: .afterExitAnimation) {
+        self.onNext()
+      },
+    )
+  }
+}
+
+private struct ProfileInstalledView: View {
+  let onNext: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Profile installed successfully!",
+      message: "Gertrude can now block unwanted content.\n\nFrom the website, the account holder can manage what gets blocked and also remove the supervision.",
+      action: .button("Next", behavior: .afterExitAnimation) {
+        self.onNext()
+      },
+    )
+  }
+}
+
+private struct SupervisionDetectedView: View {
+  let onNext: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Excellent!",
+      message: "Looks like you’ve installed Gertrude under Supervised mode. Just a couple steps to get you all set up.",
+      action: .button("Next", behavior: .afterExitAnimation) {
+        self.onNext()
+      },
+    )
+  }
+}
+
+private struct AuthorizationNetworkErrorView: View {
+  let onRetry: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "xmark.circle.fill",
+      tone: .error,
+      title: "Couldn’t connect to the internet",
+      message: "Double-check your connection and try again when you’re online.",
+      action: .button("Try again", behavior: .afterExitAnimation) {
+        self.onRetry()
+      },
+    )
+  }
+}
+
+private struct SupervisionNetworkErrorView: View {
+  let onRetry: @MainActor () -> Void
+
+  var body: some View {
+    GertieResultScreen(
+      icon: "xmark.circle.fill",
+      tone: .error,
+      title: "Couldn’t reach Gertrude",
+      message: "Please check your internet connection and try again.",
+      action: .button("Try again", behavior: .afterExitAnimation) {
+        self.onRetry()
+      },
+    )
+  }
+}
+
+private struct OnboardingInstructionImage: View {
+  @Environment(\.gertieActionScreenLayout) private var layout
+
+  let name: String
+  let accessibilityLabel: String
+
+  @ViewBuilder var body: some View {
+    switch self.layout {
+    case .regular:
+      Image(self.name)
+        .scaleEffect(self.name.contains("IOS26") ? 1.25 : 1.0)
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, 50)
+        .accessibilityLabel(Text(verbatim: self.accessibilityLabel))
+    case .compact:
+      Image(self.name)
+        .resizable()
+        .scaledToFit()
+        .frame(
+          maxWidth: .infinity,
+          maxHeight: self.name.contains("IOS26") ? 260 : 300,
+        )
+        .padding(.bottom, 8)
+        .accessibilityLabel(Text(verbatim: self.accessibilityLabel))
+    }
   }
 }
 
@@ -736,12 +902,74 @@ extension URL {
 
 #Preview {
   AppView(
-    store: Store(initialState: IOSReducer.State()) {
+    store: Store(initialState: IOSReducer.State(
+      screen: .onboarding(.happyPath(.hiThere)),
+    )) {
       IOSReducer()
     },
     osMajorVersion: 26,
     deviceType: "iPhone",
   )
+}
+
+#Preview("Instruction image regular", traits: .fixedLayout(width: 390, height: 844)) {
+  GertieActionScreen(
+    message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+    action: .button("Got it, next") {},
+    supplementPlacement: .beforeMessage,
+  ) {
+    OnboardingInstructionImage(
+      name: "AllowScreenTimeAccessIOS26",
+      accessibilityLabel: "Screen Time permission alert showing the Continue button",
+    )
+  }
+}
+
+#Preview("Instruction image compact", traits: .fixedLayout(width: 375, height: 667)) {
+  GertieActionScreen(
+    message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+    action: .button("Got it, next") {},
+    supplementPlacement: .beforeMessage,
+  ) {
+    OnboardingInstructionImage(
+      name: "AllowScreenTimeAccessIOS26",
+      accessibilityLabel: "Screen Time permission alert showing the Continue button",
+    )
+  }
+}
+
+#Preview("Instruction image accessibility text") {
+  GertieActionScreen(
+    message: "Don’t get tricked! Be sure to click “Continue”, even though it looks like you’re supposed to click “Don’t Allow”.",
+    action: .button("Got it, next") {},
+    supplementPlacement: .beforeMessage,
+  ) {
+    OnboardingInstructionImage(
+      name: "AllowScreenTimeAccessIOS26",
+      accessibilityLabel: "Screen Time permission alert showing the Continue button",
+    )
+  }
+  .environment(\.dynamicTypeSize, .accessibility2)
+}
+
+#Preview("Account connected") {
+  AccountConnectionSuccessView(deviceType: "iPhone") {}
+}
+
+#Preview("Authorization network error") {
+  AuthorizationNetworkErrorView {}
+}
+
+#Preview("Supervision network error") {
+  SupervisionNetworkErrorView {}
+}
+
+#Preview("Supervision detected") {
+  SupervisionDetectedView {}
+}
+
+#Preview("Profile Flow: Installed") {
+  ProfileInstalledView {}
 }
 
 #Preview("Profile Flow: Prompt Install") {

@@ -1,6 +1,6 @@
 import BlockerRoute
 import ComposableArchitecture
-import Dependencies
+import GertieUI
 import LibApp
 import LibCore
 import SwiftUI
@@ -21,7 +21,7 @@ struct InfoView: View {
       ) {
         ClearingCacheView(
           store: clearCacheStore,
-          clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+          clearedMessage: "Previously downloaded GIFs should be gone!",
           clearedBtnLabel: "Back",
         )
         .onAppear { clearCacheStore.send(.onAppear) }
@@ -47,28 +47,23 @@ struct InfoView: View {
             self.store.send(.profileDownloadDismissed)
           }
         case .syncProfileDownloaded:
-          ButtonScreenView(
-            text: "Great, profile downloaded! To finish the sync, we just need to reinstall it. You’ll do this in the Settings app—we’ll explain how.",
-            primary: ButtonScreenView.Config(text: "Next", type: .button {
+          GertieActionScreen(
+            message: "Great, profile downloaded! To finish the sync, we just need to reinstall it. You’ll do this in the Settings app—we’ll explain how.",
+            action: .button("Next", behavior: .afterExitAnimation) {
               self.store.send(.syncProfileNextTapped)
-            }),
+            },
           )
         case .syncProfileNotRemovableWarning:
-          ButtonScreenView(
-            text: "When reinstalling the profile, your \(self.deviceType) may warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude account.",
-            primary: ButtonScreenView.Config(text: "Got it", type: .button {
+          GertieActionScreen(
+            message: "When reinstalling the profile, your \(self.deviceType) may warn you that it can’t be removed. Don’t worry—it can be removed at any time from the Gertrude account.",
+            action: .button("Got it", behavior: .afterExitAnimation) {
               self.store.send(.syncProfileNextTapped)
-            }),
+            },
           )
         case .syncProfileExplainInstall(let regainedFocus):
-          ButtonScreenView(
-            text: "Now, open the Settings app:",
-            primary: ButtonScreenView.Config(
-              text: "Done, continue",
-              type: .button { self.store.send(.syncProfileNextTapped) },
-              disabled: !regainedFocus,
-            ),
-            listItems: [
+          GertieActionScreen(
+            message: "Now, open the Settings app:",
+            bullets: [
               self.deviceType == "iPad"
                 ? "In the left column, tap “Profile Downloaded” near the top"
                 : "Tap “Profile Downloaded” near the top",
@@ -76,6 +71,13 @@ struct InfoView: View {
               "Enter your passcode",
               "Come back to this app",
             ],
+            action: .button(
+              "Done, continue",
+              isEnabled: regainedFocus,
+              behavior: .afterExitAnimation,
+            ) {
+              self.store.send(.syncProfileNextTapped)
+            },
           )
         }
       }
@@ -129,12 +131,15 @@ struct InfoView: View {
           Spacer()
 
           VStack(spacing: 12) {
-            BigButton(
-              "Clear cache",
-              type: .button { self.store.send(.clearCacheTapped) },
-              variant: .primary,
-              icon: "trash",
-            )
+            Button {
+              self.store.send(.clearCacheTapped)
+            } label: {
+              HStack(spacing: 8) {
+                Text("Clear cache")
+                Image(systemName: "trash")
+              }
+            }
+            .buttonStyle(.gertiePrimary)
           }
           .padding(.top, 8)
           .padding(.bottom, 16)
@@ -197,19 +202,25 @@ struct InfoView: View {
 
           VStack(spacing: 12) {
             if connection.supervisedByGertrude {
-              BigButton(
-                "Sync Profile",
-                type: .button { self.store.send(.syncProfileTapped) },
-                variant: .primary,
-                icon: "arrow.triangle.2.circlepath",
-              )
+              Button {
+                self.store.send(.syncProfileTapped)
+              } label: {
+                HStack(spacing: 8) {
+                  Text("Sync Profile")
+                  Image(systemName: "arrow.triangle.2.circlepath")
+                }
+              }
+              .buttonStyle(.gertiePrimary)
             }
-            BigButton(
-              "Clear Cache",
-              type: .button { self.store.send(.clearCacheTapped) },
-              variant: .secondary,
-              icon: "trash",
-            )
+            Button {
+              self.store.send(.clearCacheTapped)
+            } label: {
+              HStack(spacing: 8) {
+                Text("Clear Cache")
+                Image(systemName: "trash")
+              }
+            }
+            .buttonStyle(.gertieSecondary)
           }
           .padding(.top, 8)
           .padding(.bottom, 16)
@@ -276,26 +287,30 @@ struct InfoView: View {
   }
 
   var explainClearCacheView1: some View {
-    ButtonScreenView(
-      text: "Clearing the cache can help if there are images still visible that were downloaded BEFORE Gertrude was installed, especially if the #images GIF search is showing a mixture of images and grey squares.",
-      primary: ButtonScreenView.Config(text: "Next", type: .button {
-        self.store.send(.explainClearCacheNextTapped)
-      }),
-      secondary: ButtonScreenView.Config(text: "Cancel", type: .button {
-        self.store.send(.cancelClearCacheTapped)
-      }),
+    GertieActionScreen(
+      message: "Clearing the cache can help if there are images still visible that were downloaded BEFORE Gertrude was installed, especially if the #images GIF search is showing a mixture of images and grey squares.",
+      actions: [
+        .button("Next", behavior: .afterExitAnimation) {
+          self.store.send(.explainClearCacheNextTapped)
+        },
+        .button("Cancel", behavior: .afterExitAnimation) {
+          self.store.send(.cancelClearCacheTapped)
+        },
+      ],
     )
   }
 
   var explainClearCacheView2: some View {
-    ButtonScreenView(
-      text: "However, clearing the cache does not always remove all of these images. If you find that images persist, the only guaranteed way to remove them is to backup the device, do a factory reset, and then restore the backup.",
-      primary: ButtonScreenView.Config(text: "Next", type: .button {
-        self.store.send(.explainClearCacheNextTapped)
-      }),
-      secondary: ButtonScreenView.Config(text: "Cancel", type: .button {
-        self.store.send(.cancelClearCacheTapped)
-      }),
+    GertieActionScreen(
+      message: "However, clearing the cache does not always remove all of these images. If you find that images persist, the only guaranteed way to remove them is to backup the device, do a factory reset, and then restore the backup.",
+      actions: [
+        .button("Next", behavior: .afterExitAnimation) {
+          self.store.send(.explainClearCacheNextTapped)
+        },
+        .button("Cancel", behavior: .afterExitAnimation) {
+          self.store.send(.cancelClearCacheTapped)
+        },
+      ],
     )
   }
 }

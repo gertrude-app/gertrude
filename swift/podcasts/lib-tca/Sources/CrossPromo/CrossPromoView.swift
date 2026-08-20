@@ -1,36 +1,34 @@
 import ComposableArchitecture
 import GertieApp
 import GertieTcaFeatures
+import GertieUI
 import LibViews
 import SwiftUI
 
 struct CrossPromoView: View {
-  @Environment(\.colorScheme) var cs
   let store: StoreOf<CrossPromoFeature>
 
   var body: some View {
-    ButtonScreenView(
-      text: "\(self.store.campaign.headline)\n\n\(self.store.campaign.body)",
-      primary: .init(
-        self.store.campaign.primaryCta.label,
-        animate: false,
-      ) {
+    let campaign = self.store.campaign
+    GertieCrossPromoScreen(
+      headline: campaign.headline,
+      body: campaign.body,
+      image: self.remoteImage,
+      primaryAction: .button(campaign.primaryCta.label) {
         self.store.send(.primaryBtnTapped)
       },
-      secondary: self.store.campaign.secondaryCta.map { cta in
-        .init(cta.label, animate: false) {
+      secondaryAction: campaign.secondaryCta.map { cta in
+        .button(cta.label) {
           self.store.send(.secondaryBtnTapped)
         }
       },
-      tertiary: self.store.campaign.tertiaryCta.map { cta in
-        .init(cta.label, animate: false) {
+      tertiaryAction: campaign.tertiaryCta.map { cta in
+        .button(cta.label) {
           self.store.send(.tertiaryBtnTapped)
         }
       },
-      remoteImage: self.remoteImage,
-      screenType: .announcement,
     )
-    .interactiveDismissDisabled(!self.store.campaign.dismissable)
+    .interactiveDismissDisabled(!campaign.dismissable)
     .background {
       #if os(iOS)
         SharePresenter(text: self.store.share?.text) { self.store.send(.shareCompleted($0)) }
@@ -38,20 +36,23 @@ struct CrossPromoView: View {
         EmptyView()
       #endif
     }
-    .background(Color(self.cs, light: .white, dark: .black))
   }
 
-  private var remoteImage: ButtonScreenView.RemoteImage? {
+  private var remoteImage: GertieCrossPromoScreen.RemoteImage? {
     let campaign = self.store.campaign
-    guard let image = campaign.image else { return nil }
-    return .init(url: image.url, label: image.description) { error in
-      log(
-        .warn,
-        .setup,
-        "af5b46ca",
-        detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
-          + "url=\(image.url) error=\(error)",
-      )
-    }
+    guard let image = campaign.image, let url = URL(string: image.url) else { return nil }
+    return .init(
+      url: url,
+      accessibilityLabel: image.description,
+      onLoadFailure: { error in
+        log(
+          .warn,
+          .setup,
+          "af5b46ca",
+          detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
+            + "url=\(image.url) error=\(error)",
+        )
+      },
+    )
   }
 }

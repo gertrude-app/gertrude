@@ -227,14 +227,5 @@ private func queueEntry(_ id: String) -> PlaybackQueueEntryData {
 @MainActor
 @Test
 func packageLoads() {
-  _ = GertrudeMusicView()
-}
-
-@MainActor
-@Test
-func comparesResolvedColorLuminance() {
-  let environment = EnvironmentValues()
-
-  #expect(Color.black.isDarker(than: .white, in: environment))
-  #expect(!Color.white.isDarker(than: .black, in: environment))
+  _ = MusicSetupView(state: .checking)
 }

@@ -1,0 +1,12 @@
+{
+  "root": "gertie-ui",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "command": "cd gertie-ui && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd gertie-ui && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

@@ -69,8 +69,7 @@ public struct ConnectAccount {
           return .none
         }
 
-      case .connectionSucceeded(childData: let data):
-        state.screen = .connected(childName: data.childName)
+      case .connectionSucceeded:
         return .none
       }
     }
@@ -105,6 +104,5 @@ public extension ConnectAccount.State {
     case generatingCode
     case showingCode(code: Int)
     case codeGenerationFailed
-    case connected(childName: String)
   }
 }

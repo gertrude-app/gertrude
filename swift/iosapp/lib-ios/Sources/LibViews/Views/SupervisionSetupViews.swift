@@ -1,62 +1,29 @@
+import GertieUI
 import SwiftUI
 
 struct FreeAlternativesHubView: View {
   @Environment(\.colorScheme) var cs
+  @ScaledMetric(relativeTo: .subheadline) private var orTextSize = 14.0
 
   let onBirthdayTapped: () -> Void
   let onSiblingTapped: () -> Void
   let onAppleConfiguratorTapped: () -> Void
   let onGertrudeTapped: () -> Void
 
-  @State private var showBg = false
-  @State private var iconOffset = Vector(x: 0, y: -20)
-  @State private var textOffset = Vector(x: 0, y: 20)
-  @State private var card1Offset = Vector(x: 0, y: 20)
-  @State private var card2Offset = Vector(x: 0, y: 20)
-  @State private var card3Offset = Vector(x: 0, y: 20)
-  @State private var orTextOffset = Vector(x: 0, y: 20)
-  @State private var buttonOffset = Vector(x: 0, y: 20)
-
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
-
+    GertieActionScreen(
+      message: "There are three free alternatives:",
+      icon: .system("arrow.triangle.branch"),
+      action: .button("Go with Gertrude ($10/year)") {
+        self.onGertrudeTapped()
+      },
+      supplementPlacement: .afterMessage,
+    ) {
       VStack(alignment: .leading, spacing: 16) {
-        Image(systemName: "arrow.triangle.branch")
-          .font(.system(size: 40, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .swooshIn(tracking: self.$iconOffset, to: .zero, after: .zero, for: .milliseconds(800))
-          .frame(maxWidth: .infinity, alignment: .center)
-
-        Spacer()
-
-        Text("There are three free alternatives:")
-          .font(.system(size: 18, weight: .medium))
-          .swooshIn(tracking: self.$textOffset, to: .zero, after: .zero, for: .milliseconds(800))
-
         AlternativeCard(
           icon: "birthday.cake",
           title: "Change your birthday",
           onTap: self.onBirthdayTapped,
-        )
-        .swooshIn(
-          tracking: self.$card1Offset,
-          to: .zero,
-          after: .milliseconds(100),
-          for: .milliseconds(800),
         )
 
         AlternativeCard(
@@ -64,58 +31,30 @@ struct FreeAlternativesHubView: View {
           title: "Use a sibling’s account",
           onTap: self.onSiblingTapped,
         )
-        .swooshIn(
-          tracking: self.$card2Offset,
-          to: .zero,
-          after: .milliseconds(200),
-          for: .milliseconds(800),
-        )
 
         AlternativeCard(
           icon: "desktopcomputer",
           title: "Supervise yourself",
           onTap: self.onAppleConfiguratorTapped,
         )
-        .swooshIn(
-          tracking: self.$card3Offset,
-          to: .zero,
-          after: .milliseconds(300),
-          for: .milliseconds(800),
-        )
 
         Text("or")
-          .font(.system(size: 14, weight: .medium))
+          .font(.system(size: self.orTextSize, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet400))
           .frame(maxWidth: .infinity, alignment: .center)
           .padding(.top, 8)
-          .swooshIn(
-            tracking: self.$orTextOffset,
-            to: .zero,
-            after: .milliseconds(350),
-            for: .milliseconds(800),
-          )
-
-        BigButton(
-          "Go with Gertrude ($10/year)",
-          type: .button { self.onGertrudeTapped() },
-          variant: .primary,
-        )
-        .swooshIn(
-          tracking: self.$buttonOffset,
-          to: .zero,
-          after: .milliseconds(400),
-          for: .milliseconds(800),
-        )
       }
-      .frame(maxWidth: 500)
-      .padding(30)
-      .padding(.top, 50)
+      .frame(maxWidth: .infinity)
     }
   }
 }
 
 struct AlternativeCard: View {
   @Environment(\.colorScheme) var cs
+  @ScaledMetric(relativeTo: .title3) private var iconSize = 22.0
+  @ScaledMetric(relativeTo: .title3) private var iconWidth = 36.0
+  @ScaledMetric(relativeTo: .body) private var titleSize = 16.0
+  @ScaledMetric(relativeTo: .caption) private var chevronSize = 12.0
 
   let icon: String
   let title: String
@@ -127,18 +66,18 @@ struct AlternativeCard: View {
     } label: {
       HStack(spacing: 14) {
         Image(systemName: self.icon)
-          .font(.system(size: 22, weight: .medium))
+          .font(.system(size: self.iconSize, weight: .medium))
           .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .frame(width: 36)
+          .frame(width: self.iconWidth)
 
         Text(self.title)
-          .font(.system(size: 16, weight: .semibold))
+          .font(.system(size: self.titleSize, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet950, dark: .violet100))
 
         Spacer()
 
         Image(systemName: "chevron.right")
-          .font(.system(size: 12, weight: .semibold))
+          .font(.system(size: self.chevronSize, weight: .semibold))
           .foregroundStyle(Color(self.cs, light: .violet400, dark: .violet500))
       }
       .padding(.horizontal, 16)
@@ -146,7 +85,7 @@ struct AlternativeCard: View {
       .background(
         Color(self.cs, light: .violet500.opacity(0.1), dark: .violet500.opacity(0.15)),
       )
-      .cornerRadius(16)
+      .clipShape(.rect(cornerRadius: 16, style: .continuous))
     }
     .buttonStyle(.plain)
   }
@@ -158,8 +97,6 @@ struct InstructionsForProtectorView: View {
   let code: Int
   let onNext: () -> Void
 
-  @State private var showBg = false
-
   var codeString: String {
     String(format: "%06d", self.code)
   }
@@ -169,69 +106,30 @@ struct InstructionsForProtectorView: View {
   }
 
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
-
-      VStack(alignment: .leading, spacing: 16) {
-        Image(systemName: "link.circle")
-          .font(.system(size: 40, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .frame(maxWidth: .infinity, alignment: .center)
-
-        Spacer()
-
-        Text(
-          "The parent/spouse/accountability partner will need to open this link on their computer (Mac or Windows) to setup the account and perform the supervision.",
-        )
-        .font(.system(size: 18, weight: .medium))
-
-        Text(self.supervisionUrl)
-          .font(.system(size: 20, weight: .semibold, design: .monospaced))
-          .minimumScaleFactor(0.7)
-          .lineLimit(1)
-          .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
-          .frame(maxWidth: .infinity, alignment: .center)
-          .padding(.vertical, 8)
-
-        Spacer()
-          .frame(height: 40)
-
-        BigButton(
-          "Send link",
-          type: .share(self.supervisionUrl),
-          variant: .secondary,
-          icon: "square.and.arrow.up",
-        )
-
-        BigButton("Next", type: .button { self.onNext() }, variant: .primary)
-          .padding(.top, 8)
-      }
-      .frame(maxWidth: 500)
-      .padding(30)
-      .padding(.top, 50)
+    GertieActionScreen(
+      message: "The parent/spouse/accountability partner will need to open this link on their computer (Mac or Windows) to setup the account and perform the supervision.",
+      icon: .system("link.circle"),
+      actions: [
+        .share("Send link", item: self.supervisionUrl, emphasis: .secondary),
+        .button("Next", emphasis: .primary) {
+          self.onNext()
+        },
+      ],
+      supplementPlacement: .afterMessage,
+    ) {
+      Text(self.supervisionUrl)
+        .font(.system(size: 20, weight: .semibold, design: .monospaced))
+        .minimumScaleFactor(0.7)
+        .lineLimit(1)
+        .foregroundStyle(Color(self.cs, light: .violet600, dark: .violet300))
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.vertical, 8)
     }
   }
 }
 
 struct WaitingForSupervisionView: View {
-  @Environment(\.colorScheme) var cs
-
   let code: Int
-
-  @State private var showBg = false
 
   var codeString: String {
     String(format: "%06d", self.code)
@@ -242,50 +140,15 @@ struct WaitingForSupervisionView: View {
   }
 
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
-
-      VStack(alignment: .leading, spacing: 16) {
-        Image(systemName: "hourglass")
-          .font(.system(size: 40, weight: .regular))
-          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-          .frame(maxWidth: .infinity, alignment: .center)
-
-        Spacer()
-
-        Text("Now close this app and have the helper create the account from that link.")
-          .font(.system(size: 18, weight: .medium))
-
-        Text("After the account is created, they’ll be walked through the supervision process.")
-          .font(.system(size: 18, weight: .medium))
-
-        Spacer()
-          .frame(height: 40)
-
-        BigButton(
-          "Send link again",
-          type: .share(self.supervisionUrl),
-          variant: .secondary,
-          icon: "square.and.arrow.up",
-        )
-      }
-      .frame(maxWidth: 500)
-      .padding(30)
-      .padding(.top, 50)
-    }
+    GertieActionScreen(
+      message: "Now close this app and have the helper create the account from that link.\n\nAfter the account is created, they’ll be walked through the supervision process.",
+      icon: .system("hourglass"),
+      action: .share(
+        "Send link again",
+        item: self.supervisionUrl,
+        emphasis: .secondary,
+      ),
+    )
   }
 }
 

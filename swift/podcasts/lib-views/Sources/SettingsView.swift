@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct SettingsView: View {
@@ -17,34 +18,12 @@ public struct SettingsView: View {
     case complimentary
     case unpaid
 
-    var displayName: String {
-      switch self {
-      case .trialing: lstr(.settingsSubscriptionStatusFreeTrial)
-      case .active, .legacy: lstr(.settingsSubscriptionStatusActive)
-      case .complimentary: lstr(.settingsSubscriptionStatusFreeForever)
-      case .unpaid: lstr(.settingsSubscriptionStatusUnpaid)
-      }
-    }
-
     var isTrialing: Bool {
       if case .trialing = self { true } else { false }
     }
 
     var isUnpaid: Bool {
       if case .unpaid = self { true } else { false }
-    }
-
-    var badgeBgColor: Color {
-      switch self {
-      case .trialing: Color(red: 0.2, green: 0.4, blue: 0.8)
-      case .active, .legacy: Color(red: 0.2, green: 0.6, blue: 0.3)
-      case .complimentary: Color(red: 0.5, green: 0.3, blue: 0.7)
-      case .unpaid: Color(red: 0.8, green: 0.2, blue: 0.2)
-      }
-    }
-
-    var badgeTextColor: Color {
-      .white
     }
   }
 
@@ -242,17 +221,12 @@ public struct SettingsView: View {
             if self.status.isTrialing || self.status.isUnpaid {
               VStack(spacing: 16) {
                 VStack(spacing: 8) {
-                  Button {
+                  Button(
+                    self.isClaimed ? lstr(.accountCtaSubscribe) : lstr(.accountCtaConnect),
+                  ) {
                     self.onEvent(.subscribeNowTapped)
-                  } label: {
-                    Text(self.isClaimed ? lstr(.accountCtaSubscribe) : lstr(.accountCtaConnect))
-                      .font(.headline)
-                      .foregroundColor(.white)
-                      .frame(maxWidth: .infinity)
-                      .padding(.vertical, 12)
-                      .background(Color(red: 0.4, green: 0.3, blue: 0.8))
-                      .cornerRadius(10)
                   }
+                  .buttonStyle(.gertiePrimary)
 
                   Text(remoteCopy(self.priceTextOverride, or: lstr(.accountPrice)))
                     .font(.subheadline)
@@ -273,17 +247,12 @@ public struct SettingsView: View {
             }
 
             if self.legacyMigrationNag {
-              Button {
+              Button(
+                self.isClaimed ? lstr(.accountCtaSubscribe) : lstr(.accountCtaConnect),
+              ) {
                 self.onEvent(.subscribeNowTapped)
-              } label: {
-                Text(self.isClaimed ? lstr(.accountCtaSubscribe) : lstr(.accountCtaConnect))
-                  .font(.headline)
-                  .foregroundColor(.white)
-                  .frame(maxWidth: .infinity)
-                  .padding(.vertical, 12)
-                  .background(Color(red: 0.4, green: 0.3, blue: 0.8))
-                  .cornerRadius(10)
               }
+              .buttonStyle(.gertiePrimary)
             }
           }
 

@@ -81,6 +81,8 @@ private extension MusicSetupFeature.State {
       .gertrudeConnection(.checking)
     case .appleMusicPermission:
       .appleMusicPermission
+    case .requestingAppleMusicPermission:
+      .requestingAppleMusicPermission
     case .appleMusicDenied:
       .appleMusicDenied
     case .appleMusicRestricted:

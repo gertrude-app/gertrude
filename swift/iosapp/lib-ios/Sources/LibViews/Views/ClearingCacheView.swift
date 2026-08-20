@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieUI
 import LibApp
 import SwiftUI
 
@@ -10,10 +11,6 @@ struct ClearingCacheView: View {
   var clearedMessage: String
   var clearedBtnLabel: String
 
-  @State private var spinnerOffset = Vector(x: 0, y: 20)
-  @State private var titleOffset = Vector(x: 0, y: 20)
-  @State private var subtitleOffset = Vector(x: 0, y: 20)
-  @State private var amountClearedOffset = Vector(x: 0, y: 20)
   @State private var showBg = false
 
   var body: some View {
@@ -30,18 +27,20 @@ struct ClearingCacheView: View {
   }
 
   var batteryWarningView: some View {
-    ButtonScreenView(
-      text: "Clearing the cache uses a lot of battery; we recommend you plug in the device now.",
-      primary: .init("Next") {
+    GertieActionScreen(
+      message: "Clearing the cache uses a lot of battery; we recommend you plug in the device now.",
+      action: .button("Next", behavior: .afterExitAnimation) {
         self.store.send(.batteryWarningContinueTapped)
       },
     )
   }
 
   var clearedView: some View {
-    ButtonScreenView(
-      text: self.clearedMessage,
-      primary: .init(self.clearedBtnLabel) {
+    GertieResultScreen(
+      icon: "checkmark.circle.fill",
+      title: "Done!",
+      message: self.clearedMessage,
+      action: .button(self.clearedBtnLabel, behavior: .afterExitAnimation) {
         self.store.send(.completeBtnTapped)
       },
     )
@@ -60,20 +59,18 @@ struct ClearingCacheView: View {
       VStack(spacing: 0) {
         ProgressView()
           .swooshIn(
-            tracking: self.$spinnerOffset,
-            to: .zero,
-            after: .seconds(0.2),
-            for: .seconds(0.5),
+            fromYOffset: 20,
+            after: .milliseconds(200),
+            animation: .bouncy(duration: 0.5, extraBounce: 0.3),
           )
 
         Text("Clearing cache...")
           .font(.system(size: 24, weight: .medium))
           .padding(.top, 16)
           .swooshIn(
-            tracking: self.$titleOffset,
-            to: .zero,
-            after: .seconds(0.3),
-            for: .seconds(0.5),
+            fromYOffset: 20,
+            after: .milliseconds(300),
+            animation: .bouncy(duration: 0.5, extraBounce: 0.3),
           )
 
         Text("This may take a little while.")
@@ -81,10 +78,9 @@ struct ClearingCacheView: View {
           .font(.system(size: 18, weight: .regular))
           .foregroundStyle(Color(self.cs, light: .black.opacity(0.7), dark: .white.opacity(0.7)))
           .swooshIn(
-            tracking: self.$subtitleOffset,
-            to: .zero,
-            after: .seconds(0.4),
-            for: .seconds(0.5),
+            fromYOffset: 20,
+            after: .milliseconds(400),
+            animation: .bouncy(duration: 0.5, extraBounce: 0.3),
           )
 
         if let availableSpace = self.store.availableDiskSpaceInBytes {
@@ -98,10 +94,9 @@ struct ClearingCacheView: View {
           .padding(.horizontal, 60)
           .padding(.top, 20)
           .swooshIn(
-            tracking: self.$amountClearedOffset,
-            to: .zero,
-            after: .seconds(0.5),
-            for: .seconds(0.5),
+            fromYOffset: 20,
+            after: .milliseconds(500),
+            animation: .bouncy(duration: 0.5, extraBounce: 0.3),
           )
         }
 
@@ -112,26 +107,53 @@ struct ClearingCacheView: View {
         .foregroundStyle(Color(self.cs, light: .black.opacity(0.4), dark: .white.opacity(0.4)))
         .padding(.top, 15)
         .swooshIn(
-          tracking: self.$amountClearedOffset,
-          to: .zero,
-          after: .seconds(0.5),
-          for: .seconds(0.5),
+          fromYOffset: 20,
+          after: .milliseconds(500),
+          animation: .bouncy(duration: 0.5, extraBounce: 0.3),
         )
       }
     }
   }
 }
 
-#Preview {
+#Preview("Battery warning") {
   ClearingCacheView(
     store: .init(initialState: .init(
       context: .onboarding,
+      screen: .batteryWarning,
+    )) {
+      ClearCacheFeature()
+    },
+    clearedMessage: "Previously downloaded GIFs should be gone!",
+    clearedBtnLabel: "Next",
+  )
+}
+
+#Preview("Clearing") {
+  ClearingCacheView(
+    store: .init(initialState: .init(
+      context: .onboarding,
+      screen: .clearing,
       availableDiskSpaceInBytes: 3_000_000_000,
       bytesCleared: 1_040_031_000,
     )) {
       ClearCacheFeature()
     },
-    clearedMessage: "Done! Previously downloaded GIFs should be gone!",
+    clearedMessage: "Previously downloaded GIFs should be gone!",
+    clearedBtnLabel: "Next",
+  )
+  .tint(.gertrudeBrandAccent)
+}
+
+#Preview("Cleared") {
+  ClearingCacheView(
+    store: .init(initialState: .init(
+      context: .onboarding,
+      screen: .cleared,
+    )) {
+      ClearCacheFeature()
+    },
+    clearedMessage: "Previously downloaded GIFs should be gone!",
     clearedBtnLabel: "Next",
   )
 }

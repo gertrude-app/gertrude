@@ -1,122 +1,45 @@
+import GertieUI
 import SwiftUI
 
 struct SpinnerErrorView: View {
-  @Environment(\.colorScheme) var cs
-
   let loadingText: String
-  let errorText: String
+  let errorTitle: String
+  let errorMessage: String?
   let isError: Bool
   let onRetry: () -> Void
 
-  @State private var showBg = false
-
   var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
-
-      VStack(spacing: 24) {
-        Spacer()
-
-        if self.isError {
-          Image(systemName: "exclamationmark.triangle")
-            .font(.system(size: 50, weight: .light))
-            .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
-
-          Text(self.errorText)
-            .font(.system(size: 18, weight: .medium))
-            .multilineTextAlignment(.center)
-
-          BigButton("Try again", type: .button { self.onRetry() }, variant: .primary)
-            .padding(.top, 12)
-        } else {
-          ProgressView()
-            .scaleEffect(1.5)
-            .tint(Color(self.cs, light: .violet500, dark: .violet400))
-
-          Text(self.loadingText)
-            .font(.system(size: 18, weight: .medium))
-        }
-
-        Spacer()
-      }
-      .frame(maxWidth: 500)
-      .padding(30)
+    if self.isError {
+      GertieResultScreen(
+        icon: "xmark.circle.fill",
+        tone: .error,
+        title: self.errorTitle,
+        message: self.errorMessage,
+        action: .button("Try again") {
+          self.onRetry()
+        },
+      )
+    } else {
+      GertieLoadingScreen(message: self.loadingText)
     }
   }
 }
 
-struct SpinnerView: View {
-  @Environment(\.colorScheme) var cs
-
-  let text: String
-
-  @State private var showBg = false
-
-  var body: some View {
-    ZStack {
-      Rectangle()
-        .fill(
-          Gradient(colors: [
-            Color(self.cs, light: .violet200, dark: .violet950.opacity(0.7)),
-            .clear,
-          ]),
-        )
-        .ignoresSafeArea()
-        .opacity(self.showBg ? 1 : 0)
-        .onAppear {
-          withAnimation(.smooth(duration: 0.7)) {
-            self.showBg = true
-          }
-        }
-
-      VStack(spacing: 24) {
-        Spacer()
-
-        ProgressView()
-          .scaleEffect(1.5)
-          .tint(Color(self.cs, light: .violet500, dark: .violet400))
-
-        Text(self.text)
-          .font(.system(size: 18, weight: .medium))
-
-        Spacer()
-      }
-      .frame(maxWidth: 500)
-      .padding(30)
-    }
-  }
-}
-
-#Preview("SpinnerView") {
-  SpinnerView(text: "Loading...")
-}
-
-#Preview("SpinnerErrorView - Loading") {
+#Preview("Loading") {
   SpinnerErrorView(
     loadingText: "Doing something...",
-    errorText: "Something went wrong.",
+    errorTitle: "Something went wrong",
+    errorMessage: nil,
     isError: false,
     onRetry: {},
   )
 }
 
-#Preview("SpinnerErrorView - Error") {
+#Preview("Setup code error") {
   SpinnerErrorView(
-    loadingText: "Doing something...",
-    errorText: "Something went wrong.",
+    loadingText: "Generating your setup code...",
+    errorTitle: "Couldn’t generate a setup code",
+    errorMessage: "Please try again.",
     isError: true,
     onRetry: {},
   )

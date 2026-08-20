@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 public struct ClaimPaymentView: View {
@@ -41,12 +42,13 @@ public struct ClaimPaymentView: View {
       Image(systemName: "creditcard.circle")
         .font(.system(size: 40, weight: .regular))
         .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .accessibilityHidden(true)
         .frame(maxWidth: .infinity, alignment: .center)
 
       Spacer()
       Spacer()
 
-      WaitingStatus(label: lstr(.claimPaymentWatching), delay: self.statusDelay)
+      GertieWaitingStatus(label: lstr(.claimPaymentWatching), delay: self.statusDelay)
 
       Spacer()
 
@@ -62,23 +64,23 @@ public struct ClaimPaymentView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.vertical, 8)
 
-      BigButton(
-        self.dismissLabel,
-        type: .button { self.onEvent(.dismissTapped) },
-        variant: .secondary,
-      )
+      Button(self.dismissLabel) {
+        self.onEvent(.dismissTapped)
+      }
+      .buttonStyle(.gertieSecondary)
 
-      BigButton(
-        lstr(.claimSendLink),
-        type: .share(self.shareUrl),
-        variant: .primary,
-        icon: "square.and.arrow.up",
-      )
+      ShareLink(item: self.shareUrl) {
+        HStack(spacing: 8) {
+          Text(lstr(.claimSendLink))
+          Image(systemName: "square.and.arrow.up")
+        }
+      }
+      .buttonStyle(.gertiePrimary)
     }
     .frame(maxWidth: 500)
     .padding(30)
     .padding(.top, 50)
-    .screenGradientBackground()
+    .gertieScreenBackground()
   }
 
   private var bodyText: String {

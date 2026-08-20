@@ -22,7 +22,7 @@ xcode:
   @open GertiePodcasts.xcodeproj
 
 previews: gen-previews
-  @open previews/GertiePodcastsPreviews.xcodeproj
+  @open GertiePodcastsPreviews.xcworkspace
 
 dev:
   @pnpm concurrently --raw \
@@ -127,14 +127,14 @@ gen-previews:
   @xcodegen -s previews.yml --project previews
 
 sync-previews:
-  @rsync -rc lib-views/Sources/ previews/sources
-  @rsync -rc app/Assets.xcassets/ previews/Assets.xcassets
+  @rsync -rc --delete lib-views/Sources/ previews/sources
+  @rsync -rc --delete app/Assets.xcassets/ previews/Assets.xcassets
 
 watch-sync-previews:
   @watchexec --project-origin . --clear --restart \
     --watch lib-views/Sources --watch app/Assets.xcassets --exts swift,html,png,json \
     --ignore '**/.build/*/**' --ignore '**/index.html' \
-    'rsync -rc lib-views/Sources/ previews/sources && rsync -rc app/Assets.xcassets/ previews/Assets.xcassets && printf "synced: " && date'
+    'rsync -rc --delete lib-views/Sources/ previews/sources && rsync -rc --delete app/Assets.xcassets/ previews/Assets.xcassets && printf "synced: " && date'
 
 
 sim-docs-dir := `ls -dt ~/Library/Developer/CoreSimulator/Devices/*/data/Containers/Data/Application/*/Documents | head -1`

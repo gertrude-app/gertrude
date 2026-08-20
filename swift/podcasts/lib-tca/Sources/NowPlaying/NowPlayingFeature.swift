@@ -249,8 +249,3 @@ struct NowPlayingFeature {
     }
   }
 }
-
-extension NowPlayingFeature.State {
-  var viewExpanded: Bool { self.data?.minimized == false }
-  var expandedViewVisible: Bool { self.viewExpanded && self.appInForeground }
-}

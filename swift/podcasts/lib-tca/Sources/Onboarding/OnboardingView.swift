@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import GertieUI
 import LibCore
 import LibViews
 import PodcastRoute
@@ -10,101 +11,106 @@ struct OnboardingView: View {
   @Dependency(\.haptics) var haptics
 
   var body: some View {
-    Group {
-      if let claimStore = self.store.scope(state: \.claimFlow, action: \.claimFlow.presented) {
-        ClaimFlowView(store: claimStore)
-      } else {
-        switch self.store.screen {
-        case .hiThere:
-          WelcomeView {
-            self.store.send(.primaryBtnTapped)
-          }
-
-        case .areYouTheParent:
-          ButtonScreenView(
-            text: lstr(.onboardingAreYouParent),
-            primary: self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
-            secondary: self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped),
-            screenIdentifier: "onboarding-screen-are-you-the-parent",
-          )
-
-        case .parentRequired:
-          ButtonScreenView(
-            text: lstr(.onboardingParentRequired),
-            primary: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped),
-          )
-
-        case .connecting:
-          LoadingScreenView(text: lstr(.onboardingConnecting))
-
-        case .accountDetected:
-          ClaimSuccessView(
-            entitlement: nil,
-            deviceName: self.autoDetectDeviceName,
-            buttonLabel: lstr(.claimContinue),
-            onEvent: { _ in self.store.send(.primaryBtnTapped) },
-          )
-
-        case .explainAccountRequired:
-          ButtonScreenView(
-            text: remoteCopy(
-              self.store.appConfig.explainAccountText,
-              or: lstr(.onboardingExplainAccount),
-            ),
-            primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
-            screenIdentifier: "onboarding-screen-explain-account-required",
-          )
-
-        case .connectAccountOrSkip:
-          ButtonScreenView(
-            text: lstr(.onboardingConnectOrSkip),
-            primary: self.btn(lstr(.onboardingConnectNow), action: .primaryBtnTapped),
-            secondary: self.btn(lstr(.onboardingSkipForNow), action: .secondaryBtnTapped),
-            screenIdentifier: "onboarding-screen-connect-account-or-skip",
-          )
-
-        case .explainSetPasscode:
-          ButtonScreenView(
-            text: lstr(.onboardingExplainPin),
-            primary: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
-            screenIdentifier: "onboarding-screen-explain-set-passcode",
-          )
-
-        case .strongPasscode:
-          ButtonScreenView(
-            text: lstr(
-              self.store.pinRecoveryAvailable
-                ? .onboardingStrongPinConnected
-                : .onboardingStrongPin,
-            ),
-            primary: self.btn(lstr(.onboardingOkLetsGo), animate: false, action: .primaryBtnTapped),
-            screenIdentifier: "onboarding-screen-strong-passcode",
-          )
-        }
+    self.content
+      .navigationBarBackButtonHidden(true)
+      .task { self.store.send(.onAppear) }
+      .sheet(isPresented: self.$store.showingPasscodeSheet.sending(\.setShowingPasscodeSheet)) {
+        self.store.send(.setShowingPasscodeSheet(false))
+      } content: {
+        PinCodeView(
+          mode: .set(
+            onComplete: { self.store.send(.passcodeSet($0)) },
+            onConfirmFail: { self.store.send(.passcodeConfirmFailed) },
+          ),
+          onCancel: { self.store.send(.setShowingPasscodeSheet(false)) },
+          onPrepHaptics: self.haptics.prepare,
+        )
       }
-    }
-    .navigationBarBackButtonHidden(true)
-    .task { self.store.send(.onAppear) }
-    .sheet(isPresented: self.$store.showingPasscodeSheet.sending(\.setShowingPasscodeSheet)) {
-      self.store.send(.setShowingPasscodeSheet(false))
-    } content: {
-      PinCodeView(
-        mode: .set(
-          onComplete: { self.store.send(.passcodeSet($0)) },
-          onConfirmFail: { self.store.send(.passcodeConfirmFailed) },
-        ),
-        onCancel: { self.store.send(.setShowingPasscodeSheet(false)) },
-        onPrepHaptics: self.haptics.prepare,
-      )
+  }
+
+  @ViewBuilder private var content: some View {
+    if let claimStore = self.store.scope(state: \.claimFlow, action: \.claimFlow.presented) {
+      ClaimFlowView(store: claimStore)
+    } else {
+      switch self.store.screen {
+      case .hiThere:
+        PodcastsWelcomeScreen {
+          self.store.send(.primaryBtnTapped)
+        }
+
+      case .areYouTheParent:
+        GertieActionScreen(
+          message: lstr(.onboardingAreYouParent),
+          actions: [
+            self.btn(lstr(.onboardingYesParent), action: .primaryBtnTapped),
+            self.btn(lstr(.onboardingNoChild), action: .secondaryBtnTapped),
+          ],
+          accessibilityIdentifier: "onboarding-screen-are-you-the-parent",
+        )
+
+      case .parentRequired:
+        GertieActionScreen(
+          message: lstr(.onboardingParentRequired),
+          action: self.btn(lstr(.onboardingContinue), action: .primaryBtnTapped),
+        )
+
+      case .connecting:
+        GertieLoadingScreen(message: lstr(.onboardingConnecting))
+
+      case .accountDetected:
+        ClaimSuccessView(
+          entitlement: nil,
+          deviceName: self.autoDetectDeviceName,
+          buttonLabel: lstr(.claimContinue),
+          onEvent: { _ in self.store.send(.primaryBtnTapped) },
+        )
+
+      case .explainAccountRequired:
+        GertieActionScreen(
+          message: remoteCopy(
+            self.store.appConfig.explainAccountText,
+            or: lstr(.onboardingExplainAccount),
+          ),
+          action: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
+          accessibilityIdentifier: "onboarding-screen-explain-account-required",
+        )
+
+      case .connectAccountOrSkip:
+        GertieActionScreen(
+          message: lstr(.onboardingConnectOrSkip),
+          actions: [
+            self.btn(lstr(.onboardingConnectNow), action: .primaryBtnTapped),
+            self.btn(lstr(.onboardingSkipForNow), action: .secondaryBtnTapped),
+          ],
+          accessibilityIdentifier: "onboarding-screen-connect-account-or-skip",
+        )
+
+      case .explainSetPasscode:
+        GertieActionScreen(
+          message: lstr(.onboardingExplainPin),
+          action: self.btn(lstr(.onboardingGotItNext), action: .primaryBtnTapped),
+          accessibilityIdentifier: "onboarding-screen-explain-set-passcode",
+        )
+
+      case .strongPasscode:
+        GertieActionScreen(
+          message: lstr(
+            self.store.pinRecoveryAvailable
+              ? .onboardingStrongPinConnected
+              : .onboardingStrongPin,
+          ),
+          action: self.btn(lstr(.onboardingOkLetsGo), action: .primaryBtnTapped),
+          accessibilityIdentifier: "onboarding-screen-strong-passcode",
+        )
+      }
     }
   }
 
-  func btn(
+  private func btn(
     _ text: String,
-    animate: Bool = false,
     action: OnboardingFeature.Action,
-  ) -> ButtonScreenView.Config {
-    .init(text, animate: animate) {
+  ) -> GertieScreenAction {
+    .button(text) {
       self.store.send(action)
     }
   }
