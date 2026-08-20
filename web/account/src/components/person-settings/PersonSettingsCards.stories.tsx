@@ -9,8 +9,8 @@ import AddBlockedDomainModal from './AddBlockedDomainModal';
 import AddKeychainSlideOver from './AddKeychainSlideOver';
 import AddMacAppSlideOver from './AddMacAppSlideOver';
 import AllowedAlbumCard from './AllowedAlbumCard';
+import AssignedKeychainCard from './AssignedKeychainCard';
 import ConfiguredAppRow from './ConfiguredAppRow';
-import KeychainCard from './KeychainCard';
 import ScheduleButton from './ScheduleButton';
 import {
   albums,
@@ -34,7 +34,7 @@ const ScheduledKeychainCard: React.FC = () => {
   );
 
   return (
-    <KeychainCard
+    <AssignedKeychainCard
       name={keychains[0]!.name}
       description={keychains[0]!.description}
       numKeys={keychains[0]!.numKeys}
@@ -55,7 +55,7 @@ export const Cards = {
         contentClassName="grid grid-cols-1 gap-3 @3xl/main:grid-cols-2"
       >
         <ScheduledKeychainCard />
-        <KeychainCard
+        <AssignedKeychainCard
           name={keychains[2]!.name}
           description={keychains[2]!.description}
           numKeys={keychains[2]!.numKeys}

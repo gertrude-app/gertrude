@@ -111,6 +111,20 @@ export type Keychain = {
   isPublic: boolean;
 };
 
+export type AccountKeychain = Keychain & {
+  assignedPersonIds: string[];
+};
+
+export type AssignablePerson = {
+  id: string;
+  name: string;
+};
+
+export type KeychainsPageData = {
+  keychains: AccountKeychain[];
+  people: AssignablePerson[];
+};
+
 export type CustomAlwaysBlockedRule = {
   id: string;
   rule: BlockRule;

@@ -17,13 +17,22 @@ export function useQuery<T>(
   });
 }
 
-export function useOptimism(): { update<T>(key: QueryKey<T>, to: T): void } {
+export function useOptimism(): {
+  update<T>(key: QueryKey<T>, to: T): void;
+  modify<T>(key: QueryKey<T>, transform: (current: T) => T): void;
+} {
   const queryClient = useQueryClient();
   return {
     update<T>(key: QueryKey<T>, to: T) {
       // cancel in-flight refetches that would clobber the optimistic value
       queryClient.cancelQueries({ queryKey: key.segments });
       queryClient.setQueryData(key.segments, to);
+    },
+    modify<T>(key: QueryKey<T>, transform: (current: T) => T) {
+      queryClient.cancelQueries({ queryKey: key.segments });
+      queryClient.setQueryData<T>(key.segments, (current) =>
+        current === undefined ? undefined : transform(current),
+      );
     },
   };
 }

@@ -64,6 +64,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
   };
 
+  public getAccountKeychains = (
+    input: P.GetAccountKeychains.Input,
+  ): Promise<Result<P.GetAccountKeychains.Output>> => {
+    return this.query<P.GetAccountKeychains.Output>(
+      input,
+      `GetAccountKeychains`,
+      `parent`,
+    );
+  };
+
   public getActivitySummaries = (
     input: P.GetActivitySummaries.Input,
   ): Promise<Result<P.GetActivitySummaries.Output>> => {
@@ -140,6 +150,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.RequestAccountPublicKeychain.Output>(
       input,
       `RequestAccountPublicKeychain`,
+      `parent`,
+    );
+  };
+
+  public setAccountKeychainAssignment = (
+    input: P.SetAccountKeychainAssignment.Input,
+  ): Promise<Result<P.SetAccountKeychainAssignment.Output>> => {
+    return this.query<P.SetAccountKeychainAssignment.Output>(
+      input,
+      `SetAccountKeychainAssignment`,
       `parent`,
     );
   };

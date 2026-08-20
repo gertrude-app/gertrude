@@ -34,6 +34,8 @@ enum AccountTsCodegenRoute {
       CreatePerson.self,
       UpdatePersonBasicDetails.self,
       DeletePerson.self,
+      GetAccountKeychains.self,
+      SetAccountKeychainAssignment.self,
       GetPersonMacSettings.self,
       GetPersonInstalledMacApps.self,
       UpdatePersonMacMonitoringSettings.self,

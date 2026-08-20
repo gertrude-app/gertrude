@@ -121,7 +121,9 @@ const DropdownMenu: React.FC<Props> = ({
 
   const selectActiveItem = (): void => {
     const menuItems = Array.from(
-      document.querySelectorAll<HTMLElement>(`[role="menuitem"]`),
+      document.querySelectorAll<HTMLElement>(
+        `[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]`,
+      ),
     );
     const activeMenuItem = menuItems[activeIndex];
 
