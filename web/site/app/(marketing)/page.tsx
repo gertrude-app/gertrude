@@ -84,11 +84,6 @@ const JSON_LD = {
         priceCurrency: `USD`,
         priceValidUntil: `2026-12-31`,
       },
-      aggregateRating: {
-        '@type': `AggregateRating`,
-        ratingValue: `5`,
-        ratingCount: `50`,
-      },
     },
     {
       '@type': `SoftwareApplication`,
@@ -104,7 +99,7 @@ const JSON_LD = {
       aggregateRating: {
         '@type': `AggregateRating`,
         ratingValue: `4.9`,
-        ratingCount: `100`,
+        ratingCount: `121`,
       },
     },
     {
@@ -122,8 +117,8 @@ const JSON_LD = {
       },
       aggregateRating: {
         '@type': `AggregateRating`,
-        ratingValue: `5`,
-        ratingCount: `25`,
+        ratingValue: `4.8`,
+        ratingCount: `26`,
       },
     },
   ],

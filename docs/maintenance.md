@@ -114,10 +114,10 @@ Current scope:
 
 ## Paused: Argos Visual Regression
 
-**Paused 2026-06-23.** Removed the `storybook` job from `web-ci.yml` — it built
-Storybook, ran `just visual-test`, uploaded to [Argos](https://argos-ci.com), and opened
-automated "update screenshots from CI" PRs. Too noisy (flaky diffs, agent-driven PR
-volume) and over the Argos free tier.
+**Paused 2026-06-23.** Removed the `storybook` job from `web-ci.yml` — it built Storybook,
+ran `just visual-test`, uploaded to [Argos](https://argos-ci.com), and opened automated
+"update screenshots from CI" PRs. Too noisy (flaky diffs, agent-driven PR volume) and over
+the Argos free tier.
 
 Kept (restorable): `web/storybook/visual-tests/`, the `visual-test` / `build-storybook`
 justfile recipes, the `@argos-ci/puppeteer` dep, and the `storybook` `files-changed`
@@ -136,9 +136,9 @@ Two things to know before deleting, because "rip it all out" is not as clean as 
 - **The legacy Storybook isn't only dash.** Of its ~86 stories, ~60 are dash, but the rest
   are not (`macos-app`, `site`, `shared`, `supervise`) and don't go away with the
   dashboard. Deleting the package drops those too.
-- **`visual-tests/` holds non-Argos tooling wired to live recipes** — `export-og-images.ts`
-  (`web/justfile`) and `preview-email.mts` (`swift/justfile`). Both break if the directory
-  is deleted wholesale; they'd need rehoming first.
+- **`visual-tests/` holds non-Argos tooling wired to live recipes** —
+  `export-og-images.ts` (`web/justfile`) and `preview-email.mts` (`swift/justfile`). Both
+  break if the directory is deleted wholesale; they'd need rehoming first.
 
 ## Agent/LLM-Facing Content
 
@@ -208,27 +208,27 @@ in the same change.**
 ### `.agents/skills/*/SKILL.md` — agent skills
 
 Every skill is hand-authored, and most of them orient an agent by naming concrete things
-in the repo. Those references are what rot. List the current set with
-`ls .agents/skills/` rather than working from a list here, and when reviewing one, look
-for the reference types that go stale silently:
+in the repo. Those references are what rot. List the current set with `ls .agents/skills/`
+rather than working from a list here, and when reviewing one, look for the reference types
+that go stale silently:
 
 - **File and directory paths** — the most common, and they move when apps get
   restructured.
 - **Line-number references** (e.g. "lines 41-60 of X") — accurate when written, wrong
   after the next edit to that file, and wrong without looking wrong.
-- **External URLs** as a source of truth — a third-party site can restructure or
-  disappear without anything here changing.
+- **External URLs** as a source of truth — a third-party site can restructure or disappear
+  without anything here changing.
 - **Command and recipe names** — `just` recipes get renamed.
 - **Filename or format contracts** — e.g. an exact asset-naming scheme the UI relies on.
 - **Hand-authored inventories** — any list purporting to enumerate something that lives
   elsewhere in the repo.
 
-A skill is worth re-reading whenever the code it describes is restructured. Two that
-carry more hardcoded detail than the rest, and so are worth checking first:
+A skill is worth re-reading whenever the code it describes is restructured. Two that carry
+more hardcoded detail than the rest, and so are worth checking first:
 
-- **`database`** — a one-line-per-schema orientation map. Table detail is discovered
-  live, so it can't drift, but the schema list and the purpose descriptions can. Re-sync
-  after any schema is added, removed, or renamed: run `\dn` and reconcile against the map.
+- **`database`** — a one-line-per-schema orientation map. Table detail is discovered live,
+  so it can't drift, but the schema list and the purpose descriptions can. Re-sync after
+  any schema is added, removed, or renamed: run `\dn` and reconcile against the map.
 - **`public-keychain`** — points at specific model/source files _and_ a line range in
   another doc.
 
@@ -280,13 +280,13 @@ The api's external dependencies are prebuilt into the CI image at `/prewarm` (so
 reuse them instead of recompiling Vapor/NIO/etc). The api + its local path-dependency
 closure is hand-listed in three places that must stay in sync:
 
-- `swift/api/Dockerfile.ci` — one `COPY <pkg> ${PREWARM}/<pkg>` line per package (these are
-  copied in and prebuilt during the image build).
+- `swift/api/Dockerfile.ci` — one `COPY <pkg> ${PREWARM}/<pkg>` line per package (these
+  are copied in and prebuilt during the image build).
 - `.github/workflows/swift-ci.yml` — the `API_PREWARM_PKGS` env var (the `build-api` and
   `test-api` jobs rsync each one's freshly-checked-out sources into `/prewarm`).
-- `swift/api/Package.swift` — the `.package(path:)` deps are the source of truth (find them
-  with `grep '\.package(path:' swift/api/Package.swift`, then add their transitive `x-*`/
-  `pairql*` deps).
+- `swift/api/Package.swift` — the `.package(path:)` deps are the source of truth (find
+  them with `grep '\.package(path:' swift/api/Package.swift`, then add their transitive
+  `x-*`/ `pairql*` deps).
 
 Drifts whenever the api adds/removes/renames a local path dependency. Failure modes: a
 package missing from the `COPY` list breaks the **image build** (swift can't resolve the
@@ -321,16 +321,16 @@ instead of the checked-out code. Keep all three lists identical.
 
 - `web/storybook/stories/dash/Profile/SubscriptionPanel.stories.tsx` hand-mirrors every
   branch of the resolver at
-  `swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel_v2.swift`. The grid is
-  intended to cover all possible shapes of `GetSubscriptionPanel_v2.Output`.
-- Drifts whenever the resolver gains, removes, or restructures a branch (new
-  entitlement state, new action shape, change to primary/secondary composition, etc.).
-  Nothing enforces the correspondence — drift silently degrades the design surface for
-  the dashboard subscription panel.
-- The story labels also embed real-world percentages (e.g. `(57.1%, n=433)`) sourced
-  from a one-off prod-sync snapshot. These are a guide, not load-bearing — refresh from
-  a current snapshot when the cohort distribution materially changes (e.g. after a
-  pricing change or major migration).
+  `swift/api/Sources/Api/PairQL/Dashboard/Pairs/GetSubscriptionPanel_v2.swift`. The grid
+  is intended to cover all possible shapes of `GetSubscriptionPanel_v2.Output`.
+- Drifts whenever the resolver gains, removes, or restructures a branch (new entitlement
+  state, new action shape, change to primary/secondary composition, etc.). Nothing
+  enforces the correspondence — drift silently degrades the design surface for the
+  dashboard subscription panel.
+- The story labels also embed real-world percentages (e.g. `(57.1%, n=433)`) sourced from
+  a one-off prod-sync snapshot. These are a guide, not load-bearing — refresh from a
+  current snapshot when the cohort distribution materially changes (e.g. after a pricing
+  change or major migration).
 
 ### Podcast background task identifiers
 
@@ -339,6 +339,42 @@ instead of the checked-out code. Keep all three lists identical.
 - `swift/podcasts/project.yml` lists the same strings under
   `BGTaskSchedulerPermittedIdentifiers`. Both files carry in-line "keep in sync" comments
   but nothing automated. Drifts whenever a background task is added, removed, or renamed.
+
+### App Store ratings in marketing-site JSON-LD — `web/site/app/(marketing)/page.tsx`
+
+- The `JSON_LD` graph's `SoftwareApplication` nodes for **Gertrude Blocker** and
+  **Gertrude Podcasts** each carry a hand-typed `aggregateRating` (`ratingValue` +
+  `ratingCount`). These are transcribed from what the App Store publicly displays, so they
+  go stale continuously as ratings accrue — nothing refreshes them.
+- Source of truth is the `appstore.rating_snapshots` table, refreshed on a schedule. Pull
+  current values during a maintenance pass:
+
+  ```sql
+  SELECT DISTINCT ON (app) app, average_rating, total_count, created_at
+  FROM appstore.rating_snapshots ORDER BY app, created_at DESC;
+  ```
+
+  Use `total_count` for `ratingCount` (all star ratings, not just written reviews) and
+  `average_rating` rounded to one decimal for `ratingValue`, matching what the App Store
+  itself shows so the numbers stay verifiable against the live listing.
+
+- Failure mode is asymmetric. Understating drifts quietly and costs a little credibility.
+  **Overstating** violates Google's review-snippet guideline that ratings "must be sourced
+  directly from users" and risks a spammy-structured-markup manual action, which makes
+  Google ignore the page's structured data until it's fixed and reconsidered.
+- **Gertrude for Mac deliberately has no `aggregateRating`** — it has no App Store
+  listing, so no honest rating source exists. Don't add one back.
+- **There is no `SoftwareApplication` node for Gertrude Music yet.** Music is on the App
+  Store but had 0 ratings as of 2026-08-18. Once it starts accruing real ratings, adding a
+  node for it is worthwhile — `aggregateRating` (or `review`) is a _required_ property for
+  the Software App rich result, so add the node only once there are genuine ratings to put
+  in it, never with a placeholder.
+- The standing fix that retires this chore: drive all of these from
+  `appstore.rating_snapshots` at build time rather than hand-typing them, and surface the
+  ratings visibly on the page (Google also requires marked-up review content be "readily
+  available to users from the marked-up page", which the homepage currently isn't).
+- Same block, same decay: the `offers.priceValidUntil` dates (currently `2026-12-31`) go
+  stale on a fixed date — bump them while you're in here.
 
 ## Dev DB Scrubbing — `swift run Run scrub-db`
 
@@ -396,8 +432,8 @@ working untouched across a release.
 
 That applies to the `/cu-*` `/du-*` `/su-*` user-management video redirects in
 `web/site/_redirects` too: give the new version its own suffix immediately, pointed at the
-previous version's YouTube URLs, and swap individual URLs if and when demos get re-recorded
-(then bump the `# CREATE MACOS USER (current: X.Y.Z+)` marker). The point is that the new
-version gets a complete, real slot from day one rather than falling through to the old
-version's — a fall-through in the OS-to-suffix mapping is a bug, not a placeholder, because
-it leaves nowhere to hang a new video later.
+previous version's YouTube URLs, and swap individual URLs if and when demos get
+re-recorded (then bump the `# CREATE MACOS USER (current: X.Y.Z+)` marker). The point is
+that the new version gets a complete, real slot from day one rather than falling through
+to the old version's — a fall-through in the OS-to-suffix mapping is a bug, not a
+placeholder, because it leaves nowhere to hang a new video later.
