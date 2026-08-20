@@ -6,6 +6,7 @@ struct ConnectedApps: Sendable {
   var disconnectAll: @Sendable () async -> Void
   var remove: @Sendable (AppConnection) async -> Void
   var status: @Sendable (ComputerUser.Id) async -> ChildComputerStatus
+  var statusDetails: @Sendable (ComputerUser.Id) async -> ComputerUserStatus
   var sendEvent: @Sendable (AppEvent) async throws -> Void
 }
 
@@ -35,6 +36,7 @@ extension ConnectedApps: DependencyKey {
       disconnectAll: { await AppConnections.shared.disconnectAll() },
       remove: { await AppConnections.shared.remove($0) },
       status: { await AppConnections.shared.status(for: $0) },
+      statusDetails: { await AppConnections.shared.statusDetails(for: $0) },
       sendEvent: { try await AppConnections.shared.send($0) },
     )
   }
@@ -48,6 +50,10 @@ extension ConnectedApps: DependencyKey {
         disconnectAll: unimplemented("ConnectedApps.disconnectAll()"),
         remove: unimplemented("ConnectedApps.remove()"),
         status: unimplemented("ConnectedApps.status()", placeholder: .filterOn),
+        statusDetails: unimplemented(
+          "ConnectedApps.statusDetails()",
+          placeholder: .unreachable,
+        ),
         sendEvent: unimplemented("ConnectedApps.sendEvent()"),
       )
     }

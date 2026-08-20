@@ -11,6 +11,7 @@ export namespace GetAllDevices {
       modelIdentifier: string;
       modelTitle: string;
       users: Array<{
+        computerUserId: UUID;
         id: UUID;
         name: string;
         status: ChildComputerStatus;

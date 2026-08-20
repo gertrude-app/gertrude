@@ -134,7 +134,12 @@ export interface Device {
   id: UUID;
   name?: string;
   releaseChannel: ReleaseChannel;
-  users: Array<{ id: UUID; name: string; status: ChildComputerStatus }>;
+  users: Array<{
+    computerUserId: UUID;
+    id: UUID;
+    name: string;
+    status: ChildComputerStatus;
+  }>;
   appVersion: string;
   serialNumber: string;
   modelIdentifier: string;

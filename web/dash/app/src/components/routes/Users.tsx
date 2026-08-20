@@ -2,11 +2,12 @@ import { ApiErrorMessage, ListChildren, Loading } from '@dash/components';
 import React from 'react';
 import type { DeviceModelFamily } from '@dash/types';
 import Current from '../../environment';
-import { Key, useMutation, useQuery } from '../../hooks';
+import { Key, useComputerStatuses, useMutation, useQuery } from '../../hooks';
 import ReqState from '../../lib/ReqState';
 
 const Users: React.FC = () => {
   const query = useQuery(Key.children, Current.api.getChildren);
+  const statusesQuery = useComputerStatuses();
 
   const addDevice = useMutation((childId: UUID) =>
     Current.api.macAppConnectionCode({ childId }),
@@ -21,9 +22,19 @@ const Users: React.FC = () => {
     return <ApiErrorMessage error={query.error} />;
   }
 
+  const children = query.data.map((child) => ({
+    ...child,
+    computers: child.computers.map((computer) => ({
+      ...computer,
+      status:
+        statusesQuery.data?.find((status) => status.computerUserId === computer.id)
+          ?.status ?? computer.status,
+    })),
+  }));
+
   return (
     <ListChildren
-      users={query.data.map((child) => ({
+      users={children.map((child) => ({
         id: child.id,
         name: child.name,
         computers: child.computers,

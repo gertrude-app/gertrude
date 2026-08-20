@@ -205,19 +205,11 @@ extension FilterFeature.RootReducer {
         state.requestSuspension.pending = nil
         switch resolvedSuspension.decision {
         case .accepted(let duration, let extraMonitoring):
-          let suspend = self.suspendFilter(
+          return self.suspendFilter(
             for: duration,
             with: &state,
             comment: resolvedSuspension.comment,
             extraMonitoring: extraMonitoring != nil,
-          )
-          let updatedState = state
-          return .merge(
-            suspend,
-            .exec { _ in
-              guard try await self.websocket.state() == .connected else { return }
-              try await self.websocket.sendFilterState(updatedState)
-            },
           )
         case .rejected:
           return .exec { _ in
@@ -368,6 +360,7 @@ extension FilterFeature.RootReducer {
     let expiration = now.advanced(by: Double(seconds.rawValue))
     state.filter.currentSuspensionExpiration = expiration
     state.requestSuspension.pending = nil
+    let updatedState = state
     return .merge(
       .exec { _ in
         _ = await self.xpc.suspendFilter(seconds)
@@ -387,6 +380,10 @@ extension FilterFeature.RootReducer {
             : .filterSuspendedRemotely,
           "for \(self.now.shortDuration(until: expiration))",
         )
+      },
+      .exec { _ in
+        guard try await self.websocket.state() == .connected else { return }
+        try await self.websocket.sendFilterState(updatedState)
       },
       .cancel(id: FilterFeature.CancelId.quitBrowsers),
     )

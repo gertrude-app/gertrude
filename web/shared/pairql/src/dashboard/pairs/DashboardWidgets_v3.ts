@@ -10,6 +10,7 @@ export namespace DashboardWidgets_v3 {
       name: string;
       devices: Array<{
         platform: 'mac' | 'ios';
+        computerUserId?: UUID;
         deviceName: string;
         macStatus?: ChildComputerStatus;
         iosStatus?: 'setupComplete' | 'pendingSetup';

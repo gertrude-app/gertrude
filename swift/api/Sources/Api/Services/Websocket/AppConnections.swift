@@ -9,6 +9,9 @@ import Gertie
 
   @Dependency(\.logger) private var logger
 
+  private static let latestVersionWithoutSemanticHeartbeat: Semver = "2.9.7"
+  private static let maxFilterStateAge: TimeInterval = 150
+
   func start() async {
     while true {
       try? await Task.sleep(seconds: 120)
@@ -43,20 +46,42 @@ import Gertie
   }
 
   func status(for computerId: ComputerUser.Id) async -> ChildComputerStatus {
-    for connection in self.connections.values {
-      if connection.ids.computerUser == computerId {
-        let state = connection.filterState.withLock { $0 }
-        switch state {
-        case .withoutTimes(let filterState):
-          return filterState.status
-        case .withTimes(let filterState):
-          return filterState.status
-        case nil:
-          return .offline
-        }
-      }
+    await self.statusDetails(for: computerId).legacyStatus
+  }
+
+  func statusDetails(for computerId: ComputerUser.Id) async -> ComputerUserStatus {
+    await self.flush()
+    guard let connection = connections.values.first(where: {
+      $0.ids.computerUser == computerId
+    }) else {
+      return .unreachable
     }
-    return .offline
+    guard let state = connection.filterState.withLock({ $0 }) else {
+      return ComputerUserStatus(
+        apiReachable: true,
+        effectiveFilterStatus: nil,
+        snapshotReceivedAt: nil,
+        snapshotFreshness: .missing,
+      )
+    }
+    let filterStatus = switch state.value {
+    case .withoutTimes(let filterState): filterState.status
+    case .withTimes(let filterState): filterState.status
+    }
+    let freshness: ComputerUserStatus.SnapshotFreshness =
+      if connection.appVersion <= Self.latestVersionWithoutSemanticHeartbeat {
+        .unsupported
+      } else if Date().timeIntervalSince(state.receivedAt) >= Self.maxFilterStateAge {
+        .stale
+      } else {
+        .fresh
+      }
+    return ComputerUserStatus(
+      apiReachable: true,
+      effectiveFilterStatus: filterStatus,
+      snapshotReceivedAt: state.receivedAt,
+      snapshotFreshness: freshness,
+    )
   }
 
   func flush() async {

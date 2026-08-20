@@ -73,12 +73,6 @@ extension WebSocketFeature.RootReducer {
         try await websocket.disconnect()
       }
 
-    case .adminAuthed(.requestSuspension(.webview(.grantSuspensionClicked))):
-      guard state.admin.accountStatus != .inactive else { return .none }
-      return .exec { [state] _ in
-        try await websocket.sendFilterState(state)
-      }
-
     case .application(.didWake):
       guard state.admin.accountStatus != .inactive else { return .none }
       guard let user = state.user.data else { return .none }
@@ -123,9 +117,7 @@ extension WebSocketFeature.RootReducer {
         return .none // handled by user feature, which triggers a checkin
 
       case .receivedMessage(.filterSuspensionRequestDecided_v2(_, .accepted, _)):
-        return .exec { [state] _ in
-          try await websocket.sendFilterState(state)
-        }
+        return .none
 
       case .receivedMessage(.filterSuspensionRequestDecided_v2(_, .rejected, _)):
         return .none // handled by filter feature AND monitoring feature

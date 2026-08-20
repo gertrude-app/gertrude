@@ -11,6 +11,7 @@ struct GetDevice: Pair {
 
   struct Output: PairOutput {
     struct User: PairNestable {
+      var computerUserId: Api.ComputerUser.Id
       var id: Api.Child.Id
       var name: String
       var status: ChildComputerStatus
@@ -65,6 +66,7 @@ extension GetDevice: Resolver {
       releaseChannel: computer.appReleaseChannel,
       users: computerUsers.concurrentMap { userDevice in
         try await .init(
+          computerUserId: userDevice.id,
           id: userDevice.childId,
           name: (userDevice.child(in: context.db)).name,
           status: websockets.status(userDevice.id),
