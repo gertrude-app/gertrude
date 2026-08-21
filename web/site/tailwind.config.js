@@ -5,8 +5,6 @@ module.exports = {
   plugins: [require(`@tailwindcss/typography`)],
   darkMode: `class`,
   content: [
-    `./docs/**/*.tsx`,
-    `./pages/**/*.tsx`,
     `./markdoc/**/*.md`,
     `./app/**/*.tsx`,
     `./components/**/*.tsx`,

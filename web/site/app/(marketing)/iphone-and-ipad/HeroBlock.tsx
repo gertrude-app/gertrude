@@ -29,7 +29,7 @@ const HeroBlock: React.FC = () => (
       </Button>
       <Button
         type="link"
-        href="/blog/how-parents-can-block-images-gif-search-ios-18#step-by-step"
+        href="/help/iphone-ipad/block-gif-search-in-messages#step-by-step"
         size="lg"
         color="secondary"
         inverted

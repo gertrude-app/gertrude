@@ -7,6 +7,13 @@ description:
 category: mac
 ---
 
+{% callout type="warning" title="This article contains outdated information" %}
+
+This article was published in 2023 and is preserved unchanged. Some statistics, product
+details, and screenshots below may no longer be accurate. We’re working on updating it.
+
+{% /callout %}
+
 {% .lead %} More and more kids are using Mac computers for school these days. To keep your
 kids safe and innocent, you need a high-quality mac internet filter to keep them exactly
 and only where you want them to be.

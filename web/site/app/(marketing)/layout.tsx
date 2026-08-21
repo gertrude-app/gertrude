@@ -1,9 +1,9 @@
 'use client';
 
 import { GoogleTagManager } from '@next/third-parties/google';
-import cx from 'classnames';
 import { usePathname } from 'next/navigation';
 import React from 'react';
+import type { LogoProduct } from '@/components/Logo';
 import MainFooter from '@/components/MainFooter';
 import MainHeader from '@/components/MainHeader';
 
@@ -12,34 +12,37 @@ const MarketingLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   const isHomePage = path === `/`;
   const isIOSPage = path === `/iphone-and-ipad`;
   const isMusicPage = path === `/music`;
-  const theme = path.includes(`blog`) || isHomePage ? `white` : `violet`;
+  const isPublishingPage =
+    path === `/refer-a-friend` ||
+    [`/resources`, `/help`, `/guides`, `/updates`, `/legal`].some((prefix) =>
+      path.startsWith(prefix),
+    );
+  const theme =
+    path.includes(`blog`) || isHomePage || isPublishingPage ? `white` : `violet`;
   const lang = path.includes(`bloquear`) ? `es` : `en`;
-  const isMacPage =
-    path === `/mac` || path === `/download-mac-app` || path.startsWith(`/docs`);
-  const logoProduct = isMacPage
-    ? `macos`
-    : isIOSPage
-      ? `ios-ipados`
-      : isMusicPage
-        ? `music`
-        : undefined;
+  const isMacPage = path === `/mac` || path === `/download-mac-app`;
+  let logoProduct: LogoProduct | undefined;
+  if (isMacPage) {
+    logoProduct = `macos`;
+  } else if (isIOSPage) {
+    logoProduct = `ios-ipados`;
+  } else if (isMusicPage) {
+    logoProduct = `music`;
+  }
   const linkVariant = isMacPage || isIOSPage || isMusicPage ? `flat` : `default`;
   const overlay = isHomePage || isIOSPage || isMusicPage || path === `/pricing`;
+  let bodyBackground = `bg-white`;
+  if (isMusicPage) {
+    bodyBackground = `bg-slate-950`;
+  } else if (isPublishingPage) {
+    bodyBackground = `bg-violet-50/50`;
+  } else if (theme === `violet` && !isIOSPage) {
+    bodyBackground = `bg-violet-500`;
+  }
   return (
     <html lang={lang}>
       <GoogleTagManager gtmId="GTM-KRRP8HFW" />
-      <body
-        className={cx(
-          `min-h-screen flex flex-col`,
-          isHomePage || isIOSPage
-            ? `bg-white`
-            : isMusicPage
-              ? `bg-slate-950`
-              : theme === `violet`
-                ? `bg-violet-500`
-                : `bg-white`,
-        )}
-      >
+      <body className={`min-h-screen flex flex-col ${bodyBackground}`}>
         <MainHeader
           theme={theme}
           overlay={overlay}

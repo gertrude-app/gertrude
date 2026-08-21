@@ -26,7 +26,7 @@ const CTABlock: React.FC = () => (
         </Button>
         <Button
           type="link"
-          href="/docs/getting-started"
+          href="/guides/getting-started-with-gertrude-for-mac"
           Icon={RouteIcon}
           inverted
           size="lg"

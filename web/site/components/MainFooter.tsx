@@ -21,8 +21,8 @@ const MainFooter: React.FC = () => (
             <FooterLink href="/">Home</FooterLink>
             <FooterLink href="/pricing">Pricing</FooterLink>
             <FooterLink href="/contact">Contact</FooterLink>
-            <FooterLink href="/blog">Blog</FooterLink>
-            <FooterLink href="/docs/terms">Terms</FooterLink>
+            <FooterLink href="/resources">Resources</FooterLink>
+            <FooterLink href="/legal/terms">Terms</FooterLink>
           </ul>
         </div>
         <div className="flex flex-col items-center sm:items-start gap-2">

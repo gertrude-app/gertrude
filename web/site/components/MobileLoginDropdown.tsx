@@ -66,8 +66,8 @@ const MobileLoginDropdown: React.FC<{
         <DropdownLink href="/pricing" dark={dark}>
           Pricing
         </DropdownLink>
-        <DropdownLink href="/blog" dark={dark}>
-          Blog
+        <DropdownLink href="/resources" dark={dark}>
+          Resources
         </DropdownLink>
         <DropdownLink href="/contact" dark={dark}>
           Contact

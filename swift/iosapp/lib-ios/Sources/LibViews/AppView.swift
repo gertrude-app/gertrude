@@ -896,7 +896,8 @@ private struct OnboardingInstructionImage: View {
 extension URL {
   static let support = URL(string: "https://gertrude.app/iosapp-contact")!
   static let connect = URL(string: "https://gertrude.app/iosapp-connect")!
-  static let supervisionTutorial = URL(string: "https://gertrude.app/iosapp-supervise")!
+  static let supervisionTutorial =
+    URL(string: "https://gertrude.app/help/iphone-ipad/use-blocker-over-18")!
   static let appleFamily = URL(string: "https://gertrude.app/iosapp-apple-fam")!
 }
 

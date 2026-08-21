@@ -1,92 +1,48 @@
-import cx from 'classnames';
-import Link from 'next/link';
+import { formatUtcDate } from '@shared/datetime';
 import type { NextPage } from 'next';
-import Logo from '@/components/Logo';
-import * as seo from '@/lib/seo';
-import { getArticle, getArticleSlugs } from '@/markdoc/files';
+import CollectionIndexPage from '@/components/articles/CollectionIndexPage';
+import { createMetadata } from '@/lib/seo';
+import {
+  type BlogArticle,
+  getArticle,
+  getArticleSlugs,
+  getBlogArticlePath,
+} from '@/markdoc/files';
 
-export const metadata = seo.createMetadata(
-  `Blog | Gertrude Internet Filter and Parental Controls`,
-  seo.description(`Gertrude Blog`),
+export const metadata = createMetadata(
+  `Blog | Gertrude`,
+  `Research and practical writing about internet safety, parental controls, and the ideas behind Gertrude.`,
 );
 
-const Blog: NextPage = async () => {
+const CATEGORY_LABELS: Record<BlogArticle[`category`], string> = {
+  engineering: `Research`,
+  mac: `Mac`,
+  ios: `iPhone & iPad`,
+};
+
+const BlogPage: NextPage = async () => {
   const slugs = await getArticleSlugs(`blog`);
   const articles = await Promise.all(slugs.map((slug) => getArticle(slug, `blog`)));
+  articles.sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
 
   return (
-    <div>
-      <section className="py-16 md:py-32 lg:py-40 flex items-center justify-center gap-5 md:gap-7 lg:gap-9 bg-white bg-gradient-to-b from-white to-fuchsia-100 rounded-b-3xl">
-        <Logo iconOnly size={120} className="!size-20 md:!size-[120px]" />
-        <h1 className="text-7xl md:text-8xl lg:text-9xl text-slate-900 font-semibold">
-          Blog
-        </h1>
-      </section>
-      <section className="bg-white flex flex-col items-center px-8 sm:px-12 md:px-20 py-20">
-        <div className="flex flex-col">
-          {articles
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .map((article, index) => {
-              const formatedDate = new Date(article.date).toLocaleDateString(`en-us`, {
-                year: `numeric`,
-                month: `long`,
-                day: `numeric`,
-              });
-              return (
-                <div className="flex items-start gap-4" key={article.title}>
-                  <div className="w-52 lg:flex flex-col items-end justify-center hidden">
-                    <span className="text-lg text-slate-500 mt-[30px]">
-                      {formatedDate}
-                    </span>
-                  </div>
-                  <div className="hidden xs:flex flex-col items-center justify-start self-stretch w-4 group relative shrink-0">
-                    <div
-                      className={cx(
-                        `absolute h-full border border-dashed border-slate-300`,
-                        index === 0 && `!h-[calc(100%-36px)] bottom-0`,
-                        index === articles.length - 1 && `!h-9 top-0`,
-                      )}
-                    />
-                    <div className="absolute w-4 h-4 border-2 border-slate-300 bg-white rounded-full top-[35px]" />
-                  </div>
-                  <Link
-                    href={`/blog/${article.slug}`}
-                    className={cx(
-                      `w-auto md:w-152 mb-10 p-3 -m-3 rounded-xl transition-colors duration-200 flex flex-col items-start`,
-                      article.category === `engineering` && `hover:bg-amber-50`,
-                      article.category === `mac` && `hover:bg-violet-50`,
-                      article.category === `ios` && `hover:bg-fuchsia-50`,
-                    )}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cx(
-                          `font-medium text-sm px-3 py-0.5 rounded-full`,
-                          article.category === `engineering` &&
-                            `bg-amber-100 text-amber-600`,
-                          article.category === `mac` && `bg-violet-100 text-violet-600`,
-                          article.category === `ios` && `bg-fuchsia-100 text-fuchsia-600`,
-                        )}
-                      >
-                        {article.category === `ios` ? `iOS` : article.category}
-                      </span>
-                      <span className="text-sm xs:text-base text-slate-500 block lg:hidden">
-                        {formatedDate}
-                      </span>
-                    </div>
-                    <h2
-                      className={`text-xl xs:text-2xl font-medium mt-1 mb-2`}
-                      dangerouslySetInnerHTML={{ __html: article.title }}
-                    />
-                    <p className="text-slate-500">{article.description}</p>
-                  </Link>
-                </div>
-              );
-            })}
-        </div>
-      </section>
-    </div>
+    <CollectionIndexPage
+      title="Blog"
+      description="Research and practical writing about internet safety, parental controls, and the ideas behind Gertrude."
+      items={articles.map((article) => ({
+        href: getBlogArticlePath(article),
+        title: article.title,
+        description: article.description,
+        meta: (
+          <>
+            <span>{CATEGORY_LABELS[article.category]}</span>
+            <span aria-hidden="true">·</span>
+            <time dateTime={article.date}>{formatUtcDate(article.date)}</time>
+          </>
+        ),
+      }))}
+    />
   );
 };
 
-export default Blog;
+export default BlogPage;

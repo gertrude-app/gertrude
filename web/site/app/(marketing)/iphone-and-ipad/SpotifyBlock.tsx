@@ -32,7 +32,7 @@ const SpotifyBlock: React.FC = () => (
           <>
             Also blocks artwork and videos in{` `}
             <a
-              href="/blog/block-apple-music-images-iphone"
+              href="/help/iphone-ipad/block-apple-music-artwork"
               className="underline underline-offset-2 decoration-white/40 hover:decoration-white/80 transition-colors"
             >
               Apple Music

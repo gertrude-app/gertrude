@@ -295,7 +295,7 @@ const ChildMacSettingsLegacy: React.FC<Props> = ({
                 <p className="text-slate-500 text-sm text-center">
                   Read more about what blocked apps are{` `}
                   <Link
-                    to="https://gertrude.app/docs/block-mac-apps"
+                    to="https://gertrude.app/help/mac/block-apps"
                     className="text-blue-500 font-medium underline"
                   >
                     here.

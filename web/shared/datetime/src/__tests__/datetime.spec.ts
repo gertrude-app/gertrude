@@ -1,11 +1,17 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { formatTime, relativeTime, time } from '../';
+import { formatTime, formatUtcDate, relativeTime, time } from '../';
 
 afterEach(() => vi.useRealTimers());
 
 describe(`formatTime`, () => {
   test(`formats a local time without seconds`, () => {
     expect(formatTime(new Date(2026, 6, 3, 9, 5))).toBe(`9:05 AM`);
+  });
+});
+
+describe(`formatUtcDate`, () => {
+  test(`formats dates in UTC`, () => {
+    expect(formatUtcDate(`2026-07-27T23:00:00-07:00`)).toBe(`July 28, 2026`);
   });
 });
 

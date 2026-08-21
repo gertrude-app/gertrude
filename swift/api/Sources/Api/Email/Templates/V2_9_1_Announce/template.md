@@ -4,7 +4,7 @@ Today we're announcing version 2.9 — our biggest Mac app update ever. It inclu
 completely rebuilt setup wizard, always-blocked items, an unfiltered mode, major browser
 and performance improvements, privacy enhancements, and much more.
 
-View this email on our blog: https://gertrude.app/blog/gertrude-2-9-0
+View this email on our blog: https://gertrude.app/updates/gertrude-for-mac-2-9-0
 
 
 A Completely Rebuilt Setup Experience
@@ -80,4 +80,4 @@ To use the new features, update the Gertrude app on your child's computer to the
 version. We'd love to know what you think we should be working on next — if you have
 ideas or feature requests, please reach out: https://gertrude.app/contact
 
-Read more about the new release on our blog: https://gertrude.app/blog/gertrude-2-9-0
+Read more about the new release on our blog: https://gertrude.app/updates/gertrude-for-mac-2-9-0

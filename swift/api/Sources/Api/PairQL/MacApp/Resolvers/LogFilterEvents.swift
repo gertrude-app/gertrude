@@ -156,7 +156,7 @@ func notifyScreenTimeConflict(
         """,
         action: .init(
           label: "Learn more",
-          url: "https://gertrude.app/blog/screen-time-web-filter-conflict",
+          url: "https://gertrude.app/help/mac/screen-time-filter-conflict",
         ),
       ))
     }

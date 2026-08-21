@@ -49,17 +49,16 @@ const tags: Config[`tags`] = {
     },
     render: `ClickToReveal`,
   },
-  'article-feedback-form': {
+  'ios-version-picker': {
+    selfClosing: true,
     attributes: {
-      name: { type: String },
-      lang: {
+      current: {
         type: String,
-        default: `en`,
-        matches: [`en`, `es`],
+        matches: [`ios-16`, `ios-17`, `ios-18`],
         errorLevel: `critical`,
       },
     },
-    render: `ArticleFeedbackForm`,
+    render: `IOSVersionPicker`,
   },
   'quick-links': {
     render: `QuickLinks`,

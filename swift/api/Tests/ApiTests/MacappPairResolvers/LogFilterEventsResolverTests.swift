@@ -96,7 +96,7 @@ final class LogFilterEventsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(announcements.count).toEqual(1)
     expect(announcements[0].kind).toEqual(DashAnnouncement.Kind.warning)
     expect(announcements[0].action).toEqual(
-      .init(label: "Learn more", url: "https://gertrude.app/blog/screen-time-web-filter-conflict"),
+      .init(label: "Learn more", url: "https://gertrude.app/help/mac/screen-time-filter-conflict"),
     )
 
     _ = try await LogFilterEvents.resolve(with: input, in: child.context)

@@ -260,7 +260,7 @@ public struct SettingsView: View {
 
           Link(
             lstr(.settingsSubscriptionPrivacy),
-            destination: URL(string: "https://gertrude.app/docs/podcasts-privacy")!,
+            destination: URL(string: "https://gertrude.app/legal/privacy/podcasts")!,
           )
           .font(.caption)
           .frame(maxWidth: .infinity, alignment: .center)

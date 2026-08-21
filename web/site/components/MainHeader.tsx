@@ -61,8 +61,8 @@ const MainHeader: React.FC<{
         <DesktopNavLink href="/pricing" theme={theme}>
           Pricing
         </DesktopNavLink>
-        <DesktopNavLink href="/blog" theme={theme}>
-          Blog
+        <DesktopNavLink href="/resources" theme={theme}>
+          Resources
         </DesktopNavLink>
         <DesktopNavLink href="/contact" theme={theme}>
           Contact

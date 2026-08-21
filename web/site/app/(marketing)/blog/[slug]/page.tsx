@@ -1,15 +1,10 @@
-import path from 'path';
 import Markdoc from '@markdoc/markdoc';
-import cx from 'classnames';
-import { ChevronLeftIcon } from 'lucide-react';
-import Link from 'next/link';
 import React from 'react';
 import type { Metadata, NextPage } from 'next';
-import PageBottomCTA from '@/components/PageBottomCTA';
-import Prose from '@/components/articles/Prose';
+import PublishingArticlePage from '@/components/articles/PublishingArticlePage';
 import { createMetadata } from '@/lib/seo';
 import { components } from '@/markdoc/config';
-import { getArticle, getArticlePaths } from '@/markdoc/files';
+import { getArticle, getArticleSlugs, getBlogArticlePath } from '@/markdoc/files';
 
 type Params = {
   slug: string;
@@ -20,53 +15,37 @@ type PageProps = {
 };
 
 export async function generateStaticParams(): Promise<Params[]> {
-  const articlePaths = await getArticlePaths(`blog`);
-  return articlePaths.map((postPath) => ({
-    slug: path.basename(postPath, path.extname(postPath)),
-  }));
+  const slugs = await getArticleSlugs(`blog`);
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const { title, description, image } = await getArticle(slug, `blog`);
-  return createMetadata(title, description, image);
+  const article = await getArticle(slug, `blog`);
+  return {
+    ...createMetadata(
+      `${article.title} | Gertrude Blog`,
+      article.description,
+      article.image,
+    ),
+    alternates: {
+      canonical: getBlogArticlePath(article),
+    },
+  };
 }
 
-const BlogArticle: NextPage<PageProps> = async (props) => {
-  const { slug } = await props.params;
-  const { title, content, category } = await getArticle(slug, `blog`);
+const BlogArticlePage: NextPage<PageProps> = async ({ params }) => {
+  const { slug } = await params;
+  const article = await getArticle(slug, `blog`);
 
   return (
-    <div className="flex flex-col items-center">
-      <section className="self-stretch p-8 bg-fuchsia-50 sm:rounded-3xl sm:m-8">
-        <Link
-          href="/blog"
-          className="flex items-center gap-2 text-violet-500 hover:text-violet-700 transition-colors duration-200 w-fit"
-        >
-          <ChevronLeftIcon />
-          <span className="text-lg font-medium">Back to blog</span>
-        </Link>
-      </section>
-      <div className="max-w-[calc(100vw-48px)] xs:max-w-[calc(100vw-64px)] md+:max-w-3xl pt-12 md:pt-28 relative mx-6 xs:mx-8 pb-32">
-        <span
-          className={cx(
-            `font-medium text-sm px-3 py-0.5 rounded-full`,
-            category === `engineering` && `bg-amber-100 text-amber-600`,
-            category === `mac` && `bg-violet-100 text-violet-600`,
-            category === `ios` && `bg-fuchsia-100 text-fuchsia-600`,
-          )}
-        >
-          {category === `ios` ? `iOS` : category}
-        </span>
-        <h1
-          className="text-4xl font-bold mb-8 mt-2 break-words"
-          dangerouslySetInnerHTML={{ __html: title }}
-        />
-        <Prose>{Markdoc.renderers.react(content, React, { components })}</Prose>
-        <PageBottomCTA clickId="blog-cta" />
-      </div>
-    </div>
+    <PublishingArticlePage
+      article={article}
+      backLink={{ href: `/blog`, label: `All blog posts` }}
+    >
+      {Markdoc.renderers.react(article.content, React, { components })}
+    </PublishingArticlePage>
   );
 };
 
-export default BlogArticle;
+export default BlogArticlePage;

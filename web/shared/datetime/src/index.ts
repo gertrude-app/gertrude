@@ -1,5 +1,11 @@
 import { inflect } from '@shared/string';
 
+const utcDateFormatter = new Intl.DateTimeFormat(`en-US`, {
+  month: `long`,
+  day: `numeric`,
+  year: `numeric`,
+  timeZone: `UTC`,
+});
 const relativeTimeFormatter = new Intl.RelativeTimeFormat(`en`, { numeric: `auto` });
 const relativeTimeUnits = [
   [`year`, 24 * 60 * 60 * 1000 * 365],
@@ -12,6 +18,10 @@ const relativeTimeUnits = [
 
 export function isoToDateInput(iso: string): string {
   return formatDate(new Date(iso), `dateInput`);
+}
+
+export function formatUtcDate(date: Date | string): string {
+  return utcDateFormatter.format(typeof date === `string` ? new Date(date) : date);
 }
 
 export function formatDate(

@@ -2,13 +2,59 @@
 # marketing site redesign #
 ###########################
 /download /download-mac-app 301
-/docs/mac-internet-filter /blog/mac-internet-filter 301
 /docs/mac-keylogger /blog/mac-keylogger 301
-/docs/ios-17-cant-delete-messages-images /blog/ios-17-cant-delete-messages-images 301
-/docs/definitive-guide-to-locking-down-an-iphone /blog/definitive-guide-to-locking-down-an-iphone 301
-/docs/five-things-you-forgot-when-locking-down-your-kids-iphone /blog/five-things-you-forgot-when-locking-down-your-kids-iphone 301
-/docs/guia-definitiva-para-bloquear-un-iphone /blog/guia-definitiva-para-bloquear-un-iphone 301
-/docs/am-privacy /docs/podcasts-privacy 301
+
+###############################
+# publishing reorganization #
+###############################
+/blog/refer-a-friend /refer-a-friend 301
+/docs/mac-internet-filter /blog/mac-internet-filter 301
+/docs/block-mac-apps /help/mac/block-apps 301
+/docs/faqs /help 301
+/blog/approved-only-music-app /updates/gertrude-music-launch 301
+/blog/daily-screenshot-review-reminders /updates/daily-screenshot-review-reminders 301
+/blog/flag-activity /updates/flag-child-activity 301
+/blog/gertrude-2-5-0 /updates/gertrude-for-mac-2-5-0 301
+/blog/gertrude-2-7-0 /updates/gertrude-for-mac-2-7-0 301
+/blog/gertrude-2-9-0 /updates/gertrude-for-mac-2-9-0 301
+/blog/gertrude-ios-account-connection /updates/blocker-account-connection 301
+/blog/gertrude-ios-released /updates/gertrude-blocker-launch 301
+/blog/safe-podcast-app-for-kids /updates/gertrude-podcasts-launch 301
+/blog/security-event-notifications /updates/security-event-notifications 301
+/blog/block-apple-music-images-iphone /help/iphone-ipad/block-apple-music-artwork 301
+/blog/gertrude-ios-supervised-mode /help/iphone-ipad/use-blocker-over-18 301
+/blog/how-parents-can-block-images-gif-search-ios-18 /help/iphone-ipad/block-gif-search-in-messages 301
+/blog/ios-17-cant-delete-messages-images /help/iphone-ipad/block-gif-search-in-messages 301
+/docs/ios-17-cant-delete-messages-images /help/iphone-ipad/block-gif-search-in-messages 301
+/blog/five-things-you-forgot-when-locking-down-your-kids-iphone /guides/iphone-lockdown-loopholes 301
+/docs/five-things-you-forgot-when-locking-down-your-kids-iphone /guides/iphone-lockdown-loopholes 301
+/blog/cinco-coasas-que-olvidaste-bloquear-en-el-iphone-de-tu-hijo /guides/iphone-lockdown-loopholes 301
+/blog/definitive-guide-to-locking-down-an-iphone /guides/locking-down-an-iphone/ios-18 301
+/docs/definitive-guide-to-locking-down-an-iphone /guides/locking-down-an-iphone/ios-18 301
+/blog/ios-17-definitive-guide-to-locking-down-an-iphone /guides/locking-down-an-iphone/ios-17 301
+/blog/ios-16-definitive-guide-to-locking-down-an-iphone /guides/locking-down-an-iphone/ios-16 301
+/blog/ios18-screentime-what-parents-should-know /guides/locking-down-an-iphone/ios-18 301
+/blog/guia-definitiva-para-bloquear-un-iphone /guides/locking-down-an-iphone/ios-16 301
+/docs/guia-definitiva-para-bloquear-un-iphone /guides/locking-down-an-iphone/ios-16 301
+/lockdown /guides/locking-down-an-iphone/ios-18 301
+/iosapp-supervise /help/iphone-ipad/use-blocker-over-18 301
+/blog/screen-time-web-filter-conflict /help/mac/screen-time-filter-conflict 301
+/docs/ios-account-connection-help /help/iphone-ipad/get-connection-code 301
+/iosapp-connect-help /help/iphone-ipad/get-connection-code 301
+/docs/troubleshooting /help/mac 301
+/docs/unblocking-guide /guides/unblocking-websites-and-apps-on-mac 301
+/docs/getting-started /guides/getting-started-with-gertrude-for-mac 301
+/docs/keeping-children-safe /guides/keeping-kids-safe-online 301
+/docs/keeping-users-safe /guides/keeping-kids-safe-online 301
+/docs/iosapp-privacy /legal/privacy/blocker 301
+/privacy /legal/privacy/blocker 301
+/docs/music-privacy /legal/privacy/music 301
+/docs/podcasts-privacy /legal/privacy/podcasts 301
+/docs/am-privacy /legal/privacy/podcasts 301
+/docs/terms /legal/terms 301
+/terms /legal/terms 301
+/tos /legal/terms 301
+/aup /legal/terms 301
 
 ###################
 # temp conference #
@@ -20,7 +66,6 @@
 # misc #
 ########
 /support /contact 301
-/lockdown /blog/definitive-guide-to-locking-down-an-iphone 302
 
 ##########################
 # common-path agent hits #
@@ -31,21 +76,16 @@
 /am /#podcasts 301
 /podcasts /#podcasts 301
 /about / 301
-/privacy /docs/iosapp-privacy 301
-/terms /docs/terms 301
-/tos /docs/terms 301
-/aup /docs/terms 301
 
 #################
 # parent rename #
 #################
-/docs/keeping-users-safe /docs/keeping-children-safe 301
-/docs /docs/getting-started 302
+/docs /help 301
 
 #############
 # macos app #
 #############
-/app-redir/connect/more-info /docs/getting-started 301
+/app-redir/connect/more-info /guides/getting-started-with-gertrude-for-mac 301
 /app-redir/connect/contact-support /contact 301
 
 ##############
@@ -113,11 +153,9 @@
 # ios app #
 ###########
 /iosapp-contact https://gertrude.app/contact 302
-/iosapp-supervise https://gertrude.app/blog/gertrude-ios-supervised-mode 302
 /iosapp-apple-fam https://support.apple.com/en-us/108380 302
 /iosapp-main https://gertrude.app 302
-/iosapp-connect https://gertrude.app/blog/gertrude-ios-account-connection 302
-/iosapp-connect-help https://gertrude.app/docs/ios-account-connection-help 302
+/iosapp-connect /updates/blocker-account-connection 301
 /s/:code https://api.gertrude.app/claim-pending-supervision/:code 302
 /a/:code https://api.gertrude.app/claim-pending-am/:code 302
 /p/:code https://api.gertrude.app/claim-pending-podcasts/:code 302
