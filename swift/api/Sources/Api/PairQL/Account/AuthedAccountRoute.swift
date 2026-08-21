@@ -7,6 +7,9 @@ enum AuthedAccountRoute: PairRoute {
   case createPerson(CreatePerson.Input)
   case updatePersonBasicDetails(UpdatePersonBasicDetails.Input)
   case deletePerson(DeletePerson.Input)
+  case getAccountKeychains
+  case getAccountKeychain(GetAccountKeychain.Input)
+  case setAccountKeychainAssignment(SetAccountKeychainAssignment.Input)
   case getPersonMacSettings(GetPersonMacSettings.Input)
   case getPersonInstalledMacApps(GetPersonInstalledMacApps.Input)
   case updatePersonMacMonitoringSettings(UpdatePersonMacMonitoringSettings.Input)
@@ -37,6 +40,17 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.deletePerson)) {
       Operation(DeletePerson.self)
       Body(.accountInput(DeletePerson.self))
+    }
+    Route(.case(Self.getAccountKeychains)) {
+      Operation(GetAccountKeychains.self)
+    }
+    Route(.case(Self.getAccountKeychain)) {
+      Operation(GetAccountKeychain.self)
+      Body(.accountInput(GetAccountKeychain.self))
+    }
+    Route(.case(Self.setAccountKeychainAssignment)) {
+      Operation(SetAccountKeychainAssignment.self)
+      Body(.accountInput(SetAccountKeychainAssignment.self))
     }
     Route(.case(Self.getPersonMacSettings)) {
       Operation(GetPersonMacSettings.self)
@@ -110,6 +124,15 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .deletePerson(let input):
       let output = try await DeletePerson.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getAccountKeychains:
+      let output = try await GetAccountKeychains.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getAccountKeychain(let input):
+      let output = try await GetAccountKeychain.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .setAccountKeychainAssignment(let input):
+      let output = try await SetAccountKeychainAssignment.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getPersonMacSettings(let input):
       let output = try await GetPersonMacSettings.resolve(with: input, in: context)

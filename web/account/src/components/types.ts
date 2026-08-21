@@ -1,8 +1,12 @@
-import type { BlockRule, PersonRelationship } from '@shared/pairql/src/account';
+import type {
+  BlockRule,
+  PersonRelationship,
+  SharedKey,
+} from '@shared/pairql/src/account';
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
-export type { BlockRule, PersonRelationship };
+export type { BlockRule, PersonRelationship, SharedKey };
 
 export type LoadableState<Data> =
   | { status: `loading` }
@@ -109,6 +113,36 @@ export type Keychain = {
   warning?: string;
   numKeys: number;
   isPublic: boolean;
+};
+
+export type AccountKeychain = Keychain & {
+  assignedPersonIds: string[];
+};
+
+export type KeychainKey = {
+  id: string;
+  key: SharedKey;
+  comment?: string;
+  expiration?: string;
+  appName?: string;
+};
+
+export type KeychainDetail = Pick<
+  Keychain,
+  `id` | `name` | `description` | `isPublic`
+> & {
+  warning?: string;
+  keys: KeychainKey[];
+};
+
+export type AssignablePerson = {
+  id: string;
+  name: string;
+};
+
+export type KeychainsPageData = {
+  keychains: AccountKeychain[];
+  people: AssignablePerson[];
 };
 
 export type CustomAlwaysBlockedRule = {

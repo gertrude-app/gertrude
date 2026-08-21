@@ -11,6 +11,7 @@ export type {
 } from './components/ConfirmationDialog';
 export { default as DateTimePicker } from './components/DateTimePicker';
 export { default as DropdownMenu } from './components/DropdownMenu';
+export { default as DropdownMenuCheckboxItem } from './components/DropdownMenuCheckboxItem';
 export { default as DropdownMenuItem } from './components/DropdownMenuItem';
 export { default as EmptyState } from './components/EmptyState';
 export { default as Input } from './components/Input';

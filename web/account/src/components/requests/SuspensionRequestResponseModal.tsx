@@ -11,7 +11,7 @@ import {
 import { time } from '@shared/datetime';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
-import RequestReasonBubble from './RequestReasonBubble';
+import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
   request: SuspensionRequest;
@@ -173,7 +173,7 @@ const SuspensionRequestResponseModal: React.FC<Props> = ({
       }
     >
       <VStack gap={4}>
-        {request.reason && <RequestReasonBubble>{request.reason}</RequestReasonBubble>}
+        {request.reason && <MessageBubble>{request.reason}</MessageBubble>}
         <VStack gap={3}>
           <Select
             label="Duration"

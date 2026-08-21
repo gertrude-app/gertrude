@@ -20,6 +20,7 @@ import { fn } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/tanstack-react';
 import Button from './Button';
 import DropdownMenu from './DropdownMenu';
+import DropdownMenuCheckboxItem from './DropdownMenuCheckboxItem';
 import DropdownMenuItem from './DropdownMenuItem';
 import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryLayout';
 
@@ -192,6 +193,34 @@ export const OpenSearchable: Story = {
               selected={preset === `Bedtime`}
               icon={ShieldCheckIcon}
               onSelect={menuAction}
+            />
+          ))}
+        </DropdownMenu>
+      </StorySection>
+    </StoryCanvas>
+  ),
+};
+
+export const CheckboxItems: Story = {
+  name: 'Checkbox items',
+  parameters: { ...galleryParameters, screenshotsAt: [`desktop`] },
+  render: () => (
+    <StoryCanvas>
+      <StorySection title="Multiple selections">
+        <DropdownMenu
+          open
+          trigger={
+            <Button type="button" variant="default" onClick={menuAction}>
+              Assigned to 2 people
+            </Button>
+          }
+        >
+          {children.slice(0, 4).map((child) => (
+            <DropdownMenuCheckboxItem
+              key={child}
+              title={child}
+              checked={child === `Sally` || child === `Jimmy`}
+              onCheckedChange={menuAction}
             />
           ))}
         </DropdownMenu>

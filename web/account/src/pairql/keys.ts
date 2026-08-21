@@ -1,4 +1,6 @@
 import type {
+  GetAccountKeychain,
+  GetAccountKeychains,
   GetActivitySummaries,
   GetDayActivity,
   GetPeople,
@@ -20,6 +22,14 @@ export class QueryKey<T> {
 export class Key extends QueryKey<never> {
   static get people(): QueryKey<GetPeople.Output> {
     return new QueryKey([`people`]);
+  }
+
+  static get keychains(): QueryKey<GetAccountKeychains.Output> {
+    return new QueryKey([`keychains`]);
+  }
+
+  static keychain(keychainId: string): QueryKey<GetAccountKeychain.Output> {
+    return new QueryKey([`keychains`, keychainId]);
   }
 
   static get suspensionRequests(): QueryKey<GetSuspensionRequests.Output> {

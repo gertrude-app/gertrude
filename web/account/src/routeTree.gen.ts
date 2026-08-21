@@ -15,10 +15,12 @@ import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
 import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
+import { Route as AppKeychainsIndexRouteImport } from './routes/_app/keychains/index'
 import { Route as AppActivityIndexRouteImport } from './routes/_app/activity/index'
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as AppPeopleNewRouteImport } from './routes/_app/people/new'
+import { Route as AppKeychainsKeychainIdRouteImport } from './routes/_app/keychains/$keychainId'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
 import { Route as AppPeoplePersonIdRouteRouteImport } from './routes/_app/people/$personId/route'
 import { Route as AppPeoplePersonIdIndexRouteImport } from './routes/_app/people/$personId/index'
@@ -58,6 +60,11 @@ const AppPeopleIndexRoute = AppPeopleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppPeopleRouteRoute,
 } as any)
+const AppKeychainsIndexRoute = AppKeychainsIndexRouteImport.update({
+  id: '/keychains/',
+  path: '/keychains/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppActivityIndexRoute = AppActivityIndexRouteImport.update({
   id: '/activity/',
   path: '/activity/',
@@ -77,6 +84,11 @@ const AppPeopleNewRoute = AppPeopleNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => AppPeopleRouteRoute,
+} as any)
+const AppKeychainsKeychainIdRoute = AppKeychainsKeychainIdRouteImport.update({
+  id: '/keychains/$keychainId',
+  path: '/keychains/$keychainId',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const unauthedOtpTokenRoute = unauthedOtpTokenRouteImport.update({
   id: '/(unauthed)/otp/$token',
@@ -136,10 +148,12 @@ export interface FileRoutesByFullPath {
   '/signout': typeof AppSignoutRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity/': typeof AppActivityIndexRoute
+  '/keychains/': typeof AppKeychainsIndexRoute
   '/people/': typeof AppPeopleIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
   '/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsRoute
@@ -154,10 +168,12 @@ export interface FileRoutesByTo {
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity': typeof AppActivityIndexRoute
+  '/keychains': typeof AppKeychainsIndexRoute
   '/people': typeof AppPeopleIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
   '/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsRoute
@@ -176,10 +192,12 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
+  '/_app/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/_app/people/new': typeof AppPeopleNewRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/_app/requests/unlock': typeof AppRequestsUnlockRoute
   '/_app/activity/': typeof AppActivityIndexRoute
+  '/_app/keychains/': typeof AppKeychainsIndexRoute
   '/_app/people/': typeof AppPeopleIndexRoute
   '/_app/activity/day/$day': typeof AppActivityDayDayRoute
   '/_app/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsRoute
@@ -198,10 +216,12 @@ export interface FileRouteTypes {
     | '/signout'
     | '/people/$personId'
     | '/otp/$token'
+    | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
     | '/activity/'
+    | '/keychains/'
     | '/people/'
     | '/activity/day/$day'
     | '/people/$personId/ios-settings'
@@ -216,10 +236,12 @@ export interface FileRouteTypes {
     | '/signout'
     | '/'
     | '/otp/$token'
+    | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
     | '/activity'
+    | '/keychains'
     | '/people'
     | '/activity/day/$day'
     | '/people/$personId/ios-settings'
@@ -237,10 +259,12 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/people/$personId'
     | '/(unauthed)/otp/$token'
+    | '/_app/keychains/$keychainId'
     | '/_app/people/new'
     | '/_app/requests/suspension'
     | '/_app/requests/unlock'
     | '/_app/activity/'
+    | '/_app/keychains/'
     | '/_app/people/'
     | '/_app/activity/day/$day'
     | '/_app/people/$personId/ios-settings'
@@ -301,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeopleIndexRouteImport
       parentRoute: typeof AppPeopleRouteRoute
     }
+    '/_app/keychains/': {
+      id: '/_app/keychains/'
+      path: '/keychains'
+      fullPath: '/keychains/'
+      preLoaderRoute: typeof AppKeychainsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/activity/': {
       id: '/_app/activity/'
       path: '/activity'
@@ -328,6 +359,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/people/new'
       preLoaderRoute: typeof AppPeopleNewRouteImport
       parentRoute: typeof AppPeopleRouteRoute
+    }
+    '/_app/keychains/$keychainId': {
+      id: '/_app/keychains/$keychainId'
+      path: '/keychains/$keychainId'
+      fullPath: '/keychains/$keychainId'
+      preLoaderRoute: typeof AppKeychainsKeychainIdRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/otp/$token': {
       id: '/(unauthed)/otp/$token'
@@ -446,9 +484,11 @@ interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
   AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRouteWithChildren
   AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
   AppActivityIndexRoute: typeof AppActivityIndexRoute
+  AppKeychainsIndexRoute: typeof AppKeychainsIndexRoute
   AppActivityDayDayRoute: typeof AppActivityDayDayRoute
   AppActivityPersonPersonIdIndexRoute: typeof AppActivityPersonPersonIdIndexRoute
   AppActivityPersonPersonIdDayDayRoute: typeof AppActivityPersonPersonIdDayDayRoute
@@ -458,9 +498,11 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
+  AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,
   AppRequestsSuspensionRoute: AppRequestsSuspensionRouteWithChildren,
   AppRequestsUnlockRoute: AppRequestsUnlockRoute,
   AppActivityIndexRoute: AppActivityIndexRoute,
+  AppKeychainsIndexRoute: AppKeychainsIndexRoute,
   AppActivityDayDayRoute: AppActivityDayDayRoute,
   AppActivityPersonPersonIdIndexRoute: AppActivityPersonPersonIdIndexRoute,
   AppActivityPersonPersonIdDayDayRoute: AppActivityPersonPersonIdDayDayRoute,

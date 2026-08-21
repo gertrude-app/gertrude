@@ -2,8 +2,8 @@ import { Card, HStack, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import type { UnlockRequest } from '#/components/types';
-import RequestReasonBubble from './RequestReasonBubble';
 import RightColumnCard from './RightColumnCard';
+import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
   unlockRequests: UnlockRequest[];
@@ -48,7 +48,7 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({ unlockRequests, viewAllHre
               )}
             </HStack>
             {request.reason && (
-              <RequestReasonBubble className="mt-3">{request.reason}</RequestReasonBubble>
+              <MessageBubble className="mt-3">{request.reason}</MessageBubble>
             )}
           </VStack>
         ))}

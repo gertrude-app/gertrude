@@ -1,32 +1,19 @@
-import {
-  Badge,
-  Button,
-  Card,
-  DropdownMenu,
-  DropdownMenuItem,
-  HStack,
-  Text,
-  VStack,
-  inflect,
-} from '@gertrude/ui';
+import { Button, DropdownMenu, DropdownMenuItem, HStack, Text } from '@gertrude/ui';
 import { EllipsisIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
-import type { Schedule } from '#/components/types';
+import type { Keychain, Schedule } from '#/components/types';
 import ScheduleButton from './ScheduleButton';
+import KeychainCard from '#/components/keychains/KeychainCard';
 import { formatSchedule } from '#/components/utils';
 
-type Props = {
-  name: string;
-  description?: string;
-  numKeys: number;
-  isPublic: boolean;
+interface Props extends Pick<Keychain, `name` | `description` | `numKeys` | `isPublic`> {
   onRemove: () => void;
   schedule?: Schedule;
   setSchedule: (schedule?: Schedule) => void;
   showSchedule?: boolean;
-};
+}
 
-const KeychainCard: React.FC<Props> = ({
+const AssignedKeychainCard: React.FC<Props> = ({
   isPublic,
   name,
   description,
@@ -36,23 +23,19 @@ const KeychainCard: React.FC<Props> = ({
   setSchedule,
   showSchedule = true,
 }) => (
-  <Card padding={3} className="flex flex-col">
-    <VStack gap={0.5} className="flex-grow">
-      <HStack gap={2}>
-        <Text variant="bodyLargeStrong">{name}</Text>
-        {isPublic && <Badge size="small">Public</Badge>}
-      </HStack>
-      {description && <Text variant="captionSubtle">{description}</Text>}
-      {schedule && (
+  <KeychainCard
+    isPublic={isPublic}
+    name={name}
+    description={description}
+    numKeys={numKeys}
+    details={
+      schedule && (
         <Text variant="captionStrong" className="mt-1">
           {formatSchedule(schedule)}
         </Text>
-      )}
-    </VStack>
-    <HStack justify="between" gap={3} className="mt-3">
-      <Text variant="captionMuted">
-        {numKeys} {inflect(`key`, numKeys)}
-      </Text>
+      )
+    }
+    actions={
       <HStack gap={2}>
         {showSchedule && <ScheduleButton schedule={schedule} setSchedule={setSchedule} />}
         <DropdownMenu
@@ -74,8 +57,8 @@ const KeychainCard: React.FC<Props> = ({
           />
         </DropdownMenu>
       </HStack>
-    </HStack>
-  </Card>
+    }
+  />
 );
 
-export default KeychainCard;
+export default AssignedKeychainCard;

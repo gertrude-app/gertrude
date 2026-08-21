@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { SuccessOutput } from '../shared';
+import type { SingleAppScope, SuccessOutput } from '../shared';
 
 export namespace UpdatePersonMacApps {
   export interface Input {
@@ -30,15 +30,7 @@ export namespace UpdatePersonMacApps {
     }>;
     unrestrictedApps: Array<{
       id: UUID;
-      scope:
-        | {
-            type: 'bundleId';
-            bundleId: string;
-          }
-        | {
-            type: 'identifiedAppSlug';
-            identifiedAppSlug: string;
-          };
+      scope: SingleAppScope;
       schedule?: {
         type: 'active' | 'inactive';
         days: {

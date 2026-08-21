@@ -46,10 +46,10 @@ import macSettingsReducer, {
 import CardContainer from '#/components/layout/CardContainer';
 import AddKeychainSlideOver from '#/components/person-settings/AddKeychainSlideOver';
 import AddMacAppSlideOver from '#/components/person-settings/AddMacAppSlideOver';
+import AssignedKeychainCard from '#/components/person-settings/AssignedKeychainCard';
 import BlockGroup from '#/components/person-settings/BlockGroup';
 import ConfiguredAppRow from '#/components/person-settings/ConfiguredAppRow';
 import CustomAlwaysBlockedRules from '#/components/person-settings/CustomAlwaysBlockedRules';
-import KeychainCard from '#/components/person-settings/KeychainCard';
 import PersonSettingsExpandableSection from '#/components/person-settings/PersonSettingsExpandableSection';
 import SettingsRow from '#/components/person-settings/SettingsRow';
 import {
@@ -424,7 +424,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
               <VStack gap={3}>
                 <div className="grid grid-cols-1 gap-3 @4xl/main:grid-cols-2 @6xl/main:grid-cols-3">
                   {draft.keychains.map((keychain) => (
-                    <KeychainCard
+                    <AssignedKeychainCard
                       key={keychain.id}
                       name={keychain.name}
                       description={keychain.description}
