@@ -1,31 +1,19 @@
-import type { CustomAlwaysBlockedRule, Schedule, TimeOfDay } from '#/components/types';
+import type {
+  GetPersonMacSettings,
+  UpdatePersonMacApps,
+  UpdatePersonMacInternetFiltering,
+} from '@shared/pairql/src/account';
 
-export interface MacKeychain {
-  id: string;
-  name: string;
-  description?: string;
-  warning?: string;
-  isPublic: boolean;
-  isOwn: boolean;
-  numKeys: number;
-  schedule?: Schedule;
-}
+type MacSettings = GetPersonMacSettings.Output;
+type MacInternetFiltering = MacSettings[`internetFiltering`];
+type Flatten<T> = { [K in keyof T]: T[K] };
+type Enriched<Row> = Flatten<Row & { name?: string; appIconUrl?: string }>;
 
-export interface DowntimeWindow {
-  start: TimeOfDay;
-  end: TimeOfDay;
-}
+export type MacKeychain = MacInternetFiltering[`keychains`][number];
 
-interface AlwaysBlockedGroup {
-  id: string;
-  name: string;
-  description: string;
-  longDescription: string;
-}
+export type DowntimeWindow = NonNullable<MacInternetFiltering[`downtime`]>;
 
-export type MacAppScope =
-  | { type: `bundleId`; bundleId: string }
-  | { type: `identifiedAppSlug`; identifiedAppSlug: string };
+export type MacAppScope = MacSettings[`apps`][`unrestricted`][number][`scope`];
 
 export interface InstalledMacApp {
   id: string;
@@ -35,58 +23,23 @@ export interface InstalledMacApp {
   appIconUrl?: string;
 }
 
-export interface BlockedMacApp {
-  id: string;
-  identifier: string;
-  name?: string;
-  appIconUrl?: string;
-  schedule?: Schedule;
-}
+export type BlockedMacApp = Enriched<MacSettings[`apps`][`blocked`][number]>;
 
-export interface UnrestrictedMacApp {
-  id: string;
-  scope: MacAppScope;
-  name?: string;
-  appIconUrl?: string;
-  schedule?: Schedule;
-}
+export type UnrestrictedMacApp = Enriched<MacSettings[`apps`][`unrestricted`][number]>;
 
-export interface PublicUnrestrictedMacApp {
-  keychainId: string;
-  keychainName: string;
-  scope: MacAppScope;
-  name?: string;
-  appIconUrl?: string;
-  schedule?: Schedule;
-}
+export type PublicUnrestrictedMacApp = Enriched<
+  MacSettings[`apps`][`publicUnrestricted`][number]
+>;
 
-export interface MacSettingsConfiguration {
-  keyloggingEnabled: boolean;
-  showSuspensionActivity: boolean;
-  screenshots: {
-    enabled: boolean;
-    resolution: number;
-    frequency: number;
-    canBeDisabled: boolean;
-  };
-  internetFiltering: {
-    enabled: boolean;
-    canBeDisabled: boolean;
-    downtime?: DowntimeWindow;
-    keychains: MacKeychain[];
-    availableKeychains: MacKeychain[];
-    supportsAlwaysBlocked: boolean;
-    availableAlwaysBlockedGroups: AlwaysBlockedGroup[];
-    alwaysBlockedGroupIds: string[];
-    customAlwaysBlockedRules: CustomAlwaysBlockedRule[];
-  };
-  apps: {
-    blocked: BlockedMacApp[];
-    unrestricted: UnrestrictedMacApp[];
-    publicUnrestricted: PublicUnrestrictedMacApp[];
-  };
-  hasMacDevices: boolean;
-}
+export type MacSettingsConfiguration = Flatten<
+  Omit<MacSettings, `apps`> & {
+    apps: {
+      blocked: BlockedMacApp[];
+      unrestricted: UnrestrictedMacApp[];
+      publicUnrestricted: PublicUnrestrictedMacApp[];
+    };
+  }
+>;
 
 export interface MacMonitoringConfiguration {
   keyloggingEnabled: boolean;
@@ -98,23 +51,9 @@ export interface MacMonitoringConfiguration {
   };
 }
 
-export interface MacAppsConfiguration {
-  blockedApps: Array<{
-    id: string;
-    identifier: string;
-    schedule?: Schedule;
-  }>;
-  unrestrictedApps: Array<{
-    id: string;
-    scope: MacAppScope;
-    schedule?: Schedule;
-  }>;
-}
+export type MacAppsConfiguration = Omit<UpdatePersonMacApps.Input, `personId`>;
 
-export interface InternetFilteringConfiguration {
-  filteringEnabled: boolean;
-  downtime?: DowntimeWindow;
-  keychains: Array<{ id: string; schedule?: Schedule }>;
-  alwaysBlockedGroupIds: string[];
-  customAlwaysBlockedRules: CustomAlwaysBlockedRule[];
-}
+export type InternetFilteringConfiguration = Omit<
+  UpdatePersonMacInternetFiltering.Input,
+  `personId`
+>;

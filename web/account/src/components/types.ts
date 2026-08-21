@@ -1,5 +1,6 @@
 import type {
   BlockRule,
+  GetPersonMacSettings,
   PersonRelationship,
   SharedKey,
 } from '@shared/pairql/src/account';
@@ -7,6 +8,8 @@ import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 
 export type { BlockRule, PersonRelationship, SharedKey };
+
+type MacSettings = GetPersonMacSettings.Output;
 
 export type LoadableState<Data> =
   | { status: `loading` }
@@ -84,25 +87,13 @@ export type SuspensionRequest = {
   extraMonitoringOptions: Record<string, string>;
 };
 
-export type TimeOfDay = {
-  hour: number;
-  minute: number;
-};
+export type TimeOfDay = NonNullable<
+  MacSettings[`internetFiltering`][`downtime`]
+>[`start`];
 
-export type Schedule = {
-  type: `active` | `inactive`;
-  days: {
-    sunday: boolean;
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-  };
-  startTime: TimeOfDay;
-  endTime: TimeOfDay;
-};
+export type Schedule = NonNullable<
+  MacSettings[`internetFiltering`][`keychains`][number][`schedule`]
+>;
 
 export type Keychain = {
   id: string;
@@ -143,19 +134,8 @@ export type KeychainsPageData = {
   people: AssignablePerson[];
 };
 
-export type CustomAlwaysBlockedRule = {
-  id: string;
-  rule: BlockRule;
-  comment?: string;
-};
-
-export type InstalledMacApp = {
-  id: string;
-  personId?: string;
-  name: string;
-  bundleId: string;
-  appIconUrl: string;
-};
+export type CustomAlwaysBlockedRule =
+  MacSettings[`internetFiltering`][`customAlwaysBlockedRules`][number];
 
 export type AllowedAlbum = {
   title: string;
@@ -203,35 +183,6 @@ export type Notification = {
   trigger: NotificationTrigger;
   enabled: boolean;
   method: NotificationMethod;
-};
-
-export type PersonIosSettingsConfiguration = {
-  blockedGroups: {
-    appleMusic: boolean;
-    whatsApp: boolean;
-    musicRecognition: boolean;
-    gifs: boolean;
-    appleMapsImages: boolean;
-    aiFeatures: boolean;
-    appStoreImages: boolean;
-    spotlight: boolean;
-    ads: boolean;
-    appleDotCom: boolean;
-    spotifyImages: boolean;
-  };
-  preventProtectionRemoval: boolean;
-  allowDeletingApps: boolean;
-  allowFactoryReset: boolean;
-  allowInstallingApps: boolean;
-  allowedAlbums: AllowedAlbum[];
-};
-
-export type BlockGroupState = {
-  id: string;
-  title: string;
-  shortDescription: string;
-  longExplanation: string;
-  blocked: boolean;
 };
 
 export type KeyAddressType = `standard` | `strict` | `ipAddress` | `regExp`;
