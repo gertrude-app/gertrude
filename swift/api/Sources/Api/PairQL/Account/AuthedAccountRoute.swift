@@ -16,6 +16,10 @@ enum AuthedAccountRoute: PairRoute {
   case updatePersonMacMonitoringSettings(UpdatePersonMacMonitoringSettings.Input)
   case updatePersonMacInternetFiltering(UpdatePersonMacInternetFiltering.Input)
   case updatePersonMacApps(UpdatePersonMacApps.Input)
+  case getIosDeviceSettings(GetIosDeviceSettings.Input)
+  case updateIosDeviceBlockedGroups(UpdateIosDeviceBlockedGroups.Input)
+  case updateIosDeviceProfileSettings(UpdateIosDeviceProfileSettings.Input)
+  case requestPodcastsPinReset(RequestPodcastsPinReset.Input)
   case requestAccountPublicKeychain(RequestAccountPublicKeychain.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
@@ -76,6 +80,22 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.updatePersonMacApps)) {
       Operation(UpdatePersonMacApps.self)
       Body(.accountInput(UpdatePersonMacApps.self))
+    }
+    Route(.case(Self.getIosDeviceSettings)) {
+      Operation(GetIosDeviceSettings.self)
+      Body(.accountInput(GetIosDeviceSettings.self))
+    }
+    Route(.case(Self.updateIosDeviceBlockedGroups)) {
+      Operation(UpdateIosDeviceBlockedGroups.self)
+      Body(.accountInput(UpdateIosDeviceBlockedGroups.self))
+    }
+    Route(.case(Self.updateIosDeviceProfileSettings)) {
+      Operation(UpdateIosDeviceProfileSettings.self)
+      Body(.accountInput(UpdateIosDeviceProfileSettings.self))
+    }
+    Route(.case(Self.requestPodcastsPinReset)) {
+      Operation(RequestPodcastsPinReset.self)
+      Body(.accountInput(RequestPodcastsPinReset.self))
     }
     Route(.case(Self.requestAccountPublicKeychain)) {
       Operation(RequestAccountPublicKeychain.self)
@@ -159,6 +179,18 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .updatePersonMacApps(let input):
       let output = try await UpdatePersonMacApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getIosDeviceSettings(let input):
+      let output = try await GetIosDeviceSettings.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .updateIosDeviceBlockedGroups(let input):
+      let output = try await UpdateIosDeviceBlockedGroups.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .updateIosDeviceProfileSettings(let input):
+      let output = try await UpdateIosDeviceProfileSettings.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .requestPodcastsPinReset(let input):
+      let output = try await RequestPodcastsPinReset.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .requestAccountPublicKeychain(let input):
       let output = try await RequestAccountPublicKeychain.resolve(with: input, in: context)

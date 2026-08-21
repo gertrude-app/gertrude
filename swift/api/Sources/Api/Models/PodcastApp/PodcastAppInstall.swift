@@ -18,6 +18,26 @@ extension PodcastApp {
   }
 }
 
+extension PodcastApp.Install {
+  func device(in db: any DuetSQL.Client) async throws -> IOSDevice {
+    try await IOSDevice.query()
+      .where(.id == self.deviceId)
+      .first(in: db)
+  }
+
+  func token(in db: any DuetSQL.Client) async throws -> PodcastApp.Token? {
+    try await PodcastApp.Token.query()
+      .where(.installId == self.id)
+      .first(in: db)
+  }
+
+  func hasToken(in db: any DuetSQL.Client) async throws -> Bool {
+    try await PodcastApp.Token.query()
+      .where(.installId == self.id)
+      .exists(in: db)
+  }
+}
+
 extension PodcastApp.Install: IOSAppInstall {
   static let trialPeriod: TimeInterval = .days(30)
 

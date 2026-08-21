@@ -45,6 +45,7 @@ struct GetPeople: Pair {
     let iOSVersion: String
     let modelName: String
     let modelIdentifier: String
+    let blockerConnected: Bool
   }
 
   typealias Output = [Person]
@@ -69,6 +70,18 @@ extension GetPeople: NoInputResolver {
 
     let computerUsers = try await computerUsersAsync
     let iOSDevices = try await iOSDevicesAsync
+    let blockerInstalls = try await BlockerApp.Install.query()
+      .where(.deviceId |=| iOSDevices.map(\.id))
+      .all(in: context.db)
+    let tokenedInstallIds = try await Set(
+      BlockerApp.Token.query()
+        .where(.installId |=| blockerInstalls.map(\.id))
+        .all(in: context.db)
+        .map(\.installId),
+    )
+    let blockerConnectedDeviceIds = Set(
+      blockerInstalls.filter { tokenedInstallIds.contains($0.id) }.map(\.deviceId),
+    )
     let computerUserIdsByPersonId = Dictionary(grouping: computerUsers, by: \.childId)
       .mapValues { $0.map(\.id) }
     let recentScreenshotCutoff = Date(subtractingDays: 14)
@@ -124,6 +137,7 @@ extension GetPeople: NoInputResolver {
           iOSVersion: device.iosVersion,
           modelName: device.modelName,
           modelIdentifier: device.modelIdentifier,
+          blockerConnected: blockerConnectedDeviceIds.contains(device.id),
         )),
       )
     }

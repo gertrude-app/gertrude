@@ -102,6 +102,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.GetDevices.Output>(input, `GetDevices`, `parent`);
   };
 
+  public getIosDeviceSettings = (
+    input: P.GetIosDeviceSettings.Input,
+  ): Promise<Result<P.GetIosDeviceSettings.Output>> => {
+    return this.query<P.GetIosDeviceSettings.Output>(
+      input,
+      `GetIosDeviceSettings`,
+      `parent`,
+    );
+  };
+
   public getPeople = (input: P.GetPeople.Input): Promise<Result<P.GetPeople.Output>> => {
     return this.query<P.GetPeople.Output>(input, `GetPeople`, `parent`);
   };
@@ -172,6 +182,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public requestPodcastsPinReset = (
+    input: P.RequestPodcastsPinReset.Input,
+  ): Promise<Result<P.RequestPodcastsPinReset.Output>> => {
+    return this.query<P.RequestPodcastsPinReset.Output>(
+      input,
+      `RequestPodcastsPinReset`,
+      `parent`,
+    );
+  };
+
   public setAccountKeychainAssignment = (
     input: P.SetAccountKeychainAssignment.Input,
   ): Promise<Result<P.SetAccountKeychainAssignment.Output>> => {
@@ -186,6 +206,26 @@ export default class AccountClient extends Client<Auth> {
     input: P.ToggleActivityFlag.Input,
   ): Promise<Result<P.ToggleActivityFlag.Output>> => {
     return this.query<P.ToggleActivityFlag.Output>(input, `ToggleActivityFlag`, `parent`);
+  };
+
+  public updateIosDeviceBlockedGroups = (
+    input: P.UpdateIosDeviceBlockedGroups.Input,
+  ): Promise<Result<P.UpdateIosDeviceBlockedGroups.Output>> => {
+    return this.query<P.UpdateIosDeviceBlockedGroups.Output>(
+      input,
+      `UpdateIosDeviceBlockedGroups`,
+      `parent`,
+    );
+  };
+
+  public updateIosDeviceProfileSettings = (
+    input: P.UpdateIosDeviceProfileSettings.Input,
+  ): Promise<Result<P.UpdateIosDeviceProfileSettings.Output>> => {
+    return this.query<P.UpdateIosDeviceProfileSettings.Output>(
+      input,
+      `UpdateIosDeviceProfileSettings`,
+      `parent`,
+    );
   };
 
   public updatePersonBasicDetails = (
