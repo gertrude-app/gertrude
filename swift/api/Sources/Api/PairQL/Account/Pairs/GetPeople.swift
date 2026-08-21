@@ -70,17 +70,9 @@ extension GetPeople: NoInputResolver {
 
     let computerUsers = try await computerUsersAsync
     let iOSDevices = try await iOSDevicesAsync
-    let blockerInstalls = try await BlockerApp.Install.query()
-      .where(.deviceId |=| iOSDevices.map(\.id))
-      .all(in: context.db)
-    let tokenedInstallIds = try await Set(
-      BlockerApp.Token.query()
-        .where(.installId |=| blockerInstalls.map(\.id))
-        .all(in: context.db)
-        .map(\.installId),
-    )
-    let blockerConnectedDeviceIds = Set(
-      blockerInstalls.filter { tokenedInstallIds.contains($0.id) }.map(\.deviceId),
+    let blockerConnectedDeviceIds = try await BlockerApp.Token.connectedDeviceIds(
+      among: iOSDevices.map(\.id),
+      in: context.db,
     )
     let computerUserIdsByPersonId = Dictionary(grouping: computerUsers, by: \.childId)
       .mapValues { $0.map(\.id) }
