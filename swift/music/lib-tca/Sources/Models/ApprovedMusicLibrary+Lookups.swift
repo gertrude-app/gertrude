@@ -9,6 +9,27 @@ extension ApprovedMusicLibrary {
     self.artists.first { $0.id == id }
   }
 
+  func artist(matching item: PlaybackItem) -> ApprovedArtist? {
+    let topSongArtists = self.artists.filter { artist in
+      artist.topSongs?.contains(where: { $0.id == item.id }) == true
+    }
+    if let artist = self.uniqueArtist(from: topSongArtists, matching: item.artistName) {
+      return artist
+    }
+
+    if let albumID = item.albumID {
+      let releaseArtists = self.artists.filter {
+        $0.releaseAlbumIds?.contains(albumID) == true
+      }
+      let artistName = self.album(id: albumID)?.artistName ?? item.artistName
+      if let artist = self.uniqueArtist(from: releaseArtists, matching: artistName) {
+        return artist
+      }
+    }
+
+    return nil
+  }
+
   func artistReleaseAlbums(for artist: ApprovedArtist) -> [ApprovedAlbum] {
     let releases = if let releaseAlbumIDs = artist.releaseAlbumIds {
       releaseAlbumIDs.compactMap(self.album(id:))
@@ -86,6 +107,19 @@ extension ApprovedMusicLibrary {
         return lhs.id.rawValue < rhs.id.rawValue
       }
       .first
+  }
+
+  private func uniqueArtist(
+    from artists: [ApprovedArtist],
+    matching artistName: String,
+  ) -> ApprovedArtist? {
+    let namedArtists = artists.filter {
+      $0.name.localizedCaseInsensitiveCompare(artistName) == .orderedSame
+    }
+    if namedArtists.count == 1 {
+      return namedArtists[0]
+    }
+    return artists.count == 1 ? artists[0] : nil
   }
 
   func playbackArtworkURL(

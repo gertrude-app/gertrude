@@ -189,7 +189,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func nowPlayingAlbumInfoTapDismissesNowPlayingAndPresentsCurrentAlbum() async {
+  func nowPlayingViewAlbumTapDismissesNowPlayingAndPresentsCurrentAlbum() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     let track = album.tracks[1]
@@ -207,7 +207,7 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.nowPlayingAlbumInfoTapped) {
+    await store.send(.nowPlayingViewAlbumTapped) {
       $0.isNowPlayingPresented = false
       $0.selectedTab = .library
       $0.library.albumDetail = .init(
@@ -219,7 +219,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func nowPlayingAlbumInfoTapPushesCurrentAlbumAgain() async {
+  func nowPlayingViewAlbumTapPushesCurrentAlbumAgain() async {
     let loadedAlbum = ApprovedMusicLibrary.mock.albums[0]
     let track = loadedAlbum.tracks[1]
     var library = ApprovedMusicLibrary.mock
@@ -241,7 +241,7 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.nowPlayingAlbumInfoTapped) {
+    await store.send(.nowPlayingViewAlbumTapped) {
       $0.isNowPlayingPresented = false
       $0.library.path.append(.album(.init(
         album: library.albums[0],
@@ -253,7 +253,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func nowPlayingAlbumInfoTapPushesAfterAnotherAlbumDetail() async {
+  func nowPlayingViewAlbumTapPushesAfterAnotherAlbumDetail() async {
     let library = ApprovedMusicLibrary.mock
     let currentAlbum = library.albums[0]
     let visibleAlbum = library.albums[1]
@@ -275,7 +275,7 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.nowPlayingAlbumInfoTapped) {
+    await store.send(.nowPlayingViewAlbumTapped) {
       $0.isNowPlayingPresented = false
       $0.library.path.append(.album(.init(
         album: currentAlbum,
@@ -288,7 +288,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func nowPlayingAlbumInfoTapWithoutAlbumIDDoesNothing() async {
+  func nowPlayingViewAlbumTapWithoutAlbumIDDoesNothing() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let item = PlaybackItem(
       id: album.tracks[0].id,
@@ -304,7 +304,84 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.nowPlayingAlbumInfoTapped)
+    await store.send(.nowPlayingViewAlbumTapped)
+  }
+
+  @Test
+  func nowPlayingViewArtistTapDismissesNowPlayingAndPresentsApprovedArtist() async throws {
+    let library = ApprovedMusicLibrary.mock
+    let artist = try #require(library.artists.first)
+    let albumID = try #require(artist.releaseAlbumIds?.first)
+    let album = try #require(library.album(id: albumID))
+    let track = try #require(album.tracks.first)
+    let item = PlaybackItem(
+      track: track,
+      artworkURL: album.artworkURL,
+      albumID: album.id,
+    )
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(library)
+    state.playback.session = .init(playStatus: .playing, currentItem: item)
+    state.selectedTab = .search
+    #expect(state.nowPlayingArtistID == artist.id)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingViewArtistTapped) {
+      $0.isNowPlayingPresented = false
+      $0.library.path.append(.artist(.init(artistID: artist.id)))
+      $0.selectedTab = .library
+    }
+  }
+
+  @Test
+  func nowPlayingViewArtistTapDoesNothingWhenApprovedArtistIsAmbiguous() async {
+    let album = ApprovedAlbum(
+      id: "shared-album",
+      title: "Shared Album",
+      artistName: "First & Second",
+      tracks: [
+        .init(
+          id: "shared-track",
+          title: "Shared Track",
+          artistName: "First & Second",
+        ),
+      ],
+    )
+    let library = ApprovedMusicLibrary(
+      albums: [album],
+      artists: [
+        .init(
+          id: "first-artist",
+          name: "First",
+          releaseAlbumIds: [album.id],
+          topSongs: [],
+        ),
+        .init(
+          id: "second-artist",
+          name: "Second",
+          releaseAlbumIds: [album.id],
+          topSongs: [],
+        ),
+      ],
+    )
+    let item = PlaybackItem(
+      track: album.tracks[0],
+      artworkURL: album.artworkURL,
+      albumID: album.id,
+    )
+    var state = AppFeature.State()
+    state.isNowPlayingPresented = true
+    state.library.status = .loaded(library)
+    state.playback.session = .init(currentItem: item)
+    #expect(state.nowPlayingArtistID == nil)
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    }
+
+    await store.send(.nowPlayingViewArtistTapped)
   }
 
   @Test

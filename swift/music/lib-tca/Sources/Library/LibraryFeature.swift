@@ -1219,6 +1219,16 @@ extension LibraryFeature.State {
   }
 
   @discardableResult
+  mutating func pushArtistDetail(artistID: ApprovedArtist.ID) -> Bool {
+    guard case .loaded(let library) = self.status,
+          library.artist(id: artistID) != nil
+    else { return false }
+
+    self.path.append(.artist(.init(artistID: artistID)))
+    return true
+  }
+
+  @discardableResult
   mutating func presentAlbumDetail(
     albumID: ApprovedAlbum.ID,
     transitionSourceID: String?,

@@ -395,8 +395,11 @@ struct AppView: View {
             onAddToPlaylistTap: {
               self.store.send(.nowPlayingAddToPlaylistTapped)
             },
-            onAlbumInfoTap: session.currentItem.albumID == nil ? nil : { @MainActor @Sendable in
-              self.store.send(.nowPlayingAlbumInfoTapped)
+            onViewArtistTap: self.store.nowPlayingArtistID == nil ? nil : { @MainActor @Sendable in
+              self.store.send(.nowPlayingViewArtistTapped)
+            },
+            onViewAlbumTap: self.store.nowPlayingAlbumID == nil ? nil : { @MainActor @Sendable in
+              self.store.send(.nowPlayingViewAlbumTapped)
             },
           )
         } else {

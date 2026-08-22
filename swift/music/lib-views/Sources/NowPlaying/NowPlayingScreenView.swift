@@ -23,7 +23,8 @@ public struct NowPlayingScreenView: View {
   private let onRepeatTap: @MainActor @Sendable () -> Void
   private let onScrub: @MainActor @Sendable (TimeInterval) -> Void
   private let onShuffleTap: @MainActor @Sendable () -> Void
-  private let onAlbumInfoTap: (@MainActor @Sendable () -> Void)?
+  private let onViewAlbumTap: (@MainActor @Sendable () -> Void)?
+  private let onViewArtistTap: (@MainActor @Sendable () -> Void)?
 
   public init(
     title: String,
@@ -47,7 +48,8 @@ public struct NowPlayingScreenView: View {
     isAddToPlaylistEnabled: Bool = true,
     onCloseTap: @MainActor @escaping @Sendable () -> Void = {},
     onAddToPlaylistTap: @MainActor @escaping @Sendable () -> Void = {},
-    onAlbumInfoTap: (@MainActor @Sendable () -> Void)? = nil,
+    onViewArtistTap: (@MainActor @Sendable () -> Void)? = nil,
+    onViewAlbumTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.title = title
     self.artist = artist
@@ -70,7 +72,8 @@ public struct NowPlayingScreenView: View {
     self.onRepeatTap = onRepeatTap
     self.onScrub = onScrub
     self.onShuffleTap = onShuffleTap
-    self.onAlbumInfoTap = onAlbumInfoTap
+    self.onViewAlbumTap = onViewAlbumTap
+    self.onViewArtistTap = onViewArtistTap
   }
 
   @ViewBuilder
@@ -93,6 +96,22 @@ public struct NowPlayingScreenView: View {
                 }
                 .tint(.primary)
                 .disabled(!self.isAddToPlaylistEnabled)
+
+                if self.onViewArtistTap != nil || self.onViewAlbumTap != nil {
+                  Divider()
+                }
+
+                if let onViewArtistTap = self.onViewArtistTap {
+                  Button(action: onViewArtistTap) {
+                    Label("View Artist", systemImage: "person")
+                  }
+                }
+
+                if let onViewAlbumTap = self.onViewAlbumTap {
+                  Button(action: onViewAlbumTap) {
+                    Label("View Album", systemImage: "square")
+                  }
+                }
               } label: {
                 Label("Now Playing Actions", systemImage: "ellipsis")
               }
@@ -242,8 +261,8 @@ public struct NowPlayingScreenView: View {
 
   @ViewBuilder
   private var albumInfoView: some View {
-    if let onAlbumInfoTap {
-      Button(action: onAlbumInfoTap) {
+    if let onViewAlbumTap {
+      Button(action: onViewAlbumTap) {
         self.albumInfoText
           .contentShape(Rectangle())
       }

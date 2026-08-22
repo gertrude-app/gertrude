@@ -24,6 +24,21 @@ struct AppFeature: Sendable {
     var setup = MusicSetupFeature.State()
     var isNowPlayingPresented = false
     var selectedTab = Tab.library
+
+    var nowPlayingAlbumID: ApprovedAlbum.ID? {
+      guard let albumID = self.playback.session?.currentItem.albumID,
+            case .loaded(let library) = self.library.status,
+            library.album(id: albumID) != nil
+      else { return nil }
+      return albumID
+    }
+
+    var nowPlayingArtistID: ApprovedArtist.ID? {
+      guard let item = self.playback.session?.currentItem,
+            case .loaded(let library) = self.library.status
+      else { return nil }
+      return library.artist(matching: item)?.id
+    }
   }
 
   enum Action: Equatable {
@@ -34,8 +49,9 @@ struct AppFeature: Sendable {
     case killSwitch(KillSwitchFeature.Action)
     case library(LibraryFeature.Action)
     case nowPlayingAddToPlaylistTapped
-    case nowPlayingAlbumInfoTapped
     case nowPlayingPresentationChanged(Bool)
+    case nowPlayingViewAlbumTapped
+    case nowPlayingViewArtistTapped
     case playback(PlaybackFeature.Action)
     case playbackAlbumIDsResolved(ApprovedTrack.ID, [ApprovedAlbum.ID])
     case queueBrowseLibraryButtonTapped
@@ -152,12 +168,21 @@ struct AppFeature: Sendable {
           albumID: albumID,
         )))
 
-      case .nowPlayingAlbumInfoTapped:
-        guard let albumID = state.playback.session?.currentItem.albumID else { return .none }
-        guard state.library.pushAlbumDetail(albumID: albumID) else { return .none }
+      case .nowPlayingViewAlbumTapped:
+        guard let albumID = state.nowPlayingAlbumID,
+              state.library.pushAlbumDetail(albumID: albumID)
+        else { return .none }
         state.isNowPlayingPresented = false
         state.selectedTab = .library
         self.synchronizeDetailPlayback(state: &state)
+        return .none
+
+      case .nowPlayingViewArtistTapped:
+        guard let artistID = state.nowPlayingArtistID,
+              state.library.pushArtistDetail(artistID: artistID)
+        else { return .none }
+        state.isNowPlayingPresented = false
+        state.selectedTab = .library
         return .none
 
       case .killSwitch:
