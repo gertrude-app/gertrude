@@ -32,24 +32,27 @@ struct SearchFeatureTests {
   }
 
   @Test
-  func songTapDelegatesTrustedSingleItemPlayback() async {
+  func songTapDelegatesApprovedAlbumPlaybackFromSelectedTrack() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[2]
-    let track = album.tracks[0]
+    let track = album.tracks[1]
     var state = SearchFeature.State()
     state.applyLibraryStatus(.loaded(library))
-    state.query = "brewed"
+    state.query = track.title
     state.results = state.librarySearch.results(query: state.query)
     let store = TestStore(initialState: state) {
       SearchFeature()
     }
 
     await store.send(.resultTapped(.song(track.id)))
-    await store.receive(.delegate(.songTapped(PlaybackItem(
-      track: track,
-      artworkURL: track.artworkURL ?? album.artworkURL,
-      albumID: album.id,
-    ))))
+    await store.receive(.delegate(.songTapped(
+      items: playbackItems(album: album),
+      start: .selectedEntry(index: 1),
+      context: PlaybackContext(
+        identity: .album(album.id),
+        title: album.title,
+      ),
+    )))
   }
 
   @Test
@@ -81,6 +84,65 @@ struct SearchFeatureTests {
     await store.send(.resultTapped(.artist(artist.id))) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
+  }
+
+  @Test
+  func artistDetailKeepsDiscographyAndTopSongsPlaybackSourcesDistinct() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      releaseDate: "2025-06-01",
+      tracks: [
+        ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
+        ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
+      ],
+    )
+    let topSongs = [album.tracks[1]]
+    let artist = ApprovedArtist(
+      id: "artist",
+      name: "Artist",
+      releaseAlbumIds: [album.id],
+      topSongs: topSongs,
+    )
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    var state = SearchFeature.State()
+    state.applyLibraryStatus(.loaded(library))
+    state.path.append(.artist(.init(artistID: artist.id)))
+    let pathID = state.path.ids.last!
+    let discographyItems = playbackItems(album: album)
+    let topSongItems = topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
+    }
+    let discographyContext = PlaybackContext(
+      identity: .artist(artist.id),
+      title: artist.name,
+      artistSource: .discography,
+    )
+    let topSongsContext = PlaybackContext(
+      identity: .artist(artist.id),
+      title: artist.name,
+      artistSource: .topSongs,
+    )
+    let store = TestStore(initialState: state) {
+      SearchFeature()
+    }
+
+    await store.send(.path(.element(id: pathID, action: .artist(.playButtonTapped))))
+    await store.receive(.delegate(.playback(.artistPlaybackButtonTapped(
+      items: discographyItems,
+      context: discographyContext,
+    ))))
+
+    await store.send(.path(.element(
+      id: pathID,
+      action: .artist(.topSongTapped(topSongs[0].id)),
+    )))
+    await store.receive(.delegate(.playback(.playNow(
+      items: topSongItems,
+      start: .selectedEntry(index: 0),
+      context: topSongsContext,
+    ))))
   }
 
   @Test

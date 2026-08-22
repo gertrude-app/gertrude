@@ -23,6 +23,7 @@ struct AppView: View {
           )
           .task(id: self.store.setup.isReady) {
             guard self.store.setup.isReady else { return }
+            await self.store.send(.playback(.restorePlaybackPreferences)).finish()
             _ = self.store.send(.playback(.observePlayback))
             await self.store.send(.playback(.restoreCachedSession)).finish()
           }
@@ -198,7 +199,7 @@ struct AppView: View {
           PlaybackQueueView(
             currentEntry: session.queue.currentEntry.viewData,
             queuedEntries: session.queue.queuedEntries.map(\.viewData),
-            contextTitle: self.store.playback.playbackContext?.title,
+            contextTitle: self.store.playback.queueContextTitle,
             contextEntries: session.queue.contextEntries.map(\.viewData),
             isPlaying: session.isPlaying,
             onClearQueue: {
@@ -286,6 +287,8 @@ struct AppView: View {
       )
       let nextItem = session?.queue.upcomingEntries.first.map {
         self.nowPlayingBarItem($0)
+      } ?? self.store.playback.repeatCollectionWrapEntry.map {
+        self.nowPlayingBarItem($0)
       }
       return NowPlayingBar(
         item: item,
@@ -312,10 +315,25 @@ struct AppView: View {
     private func nowPlayingBarItem(_ entry: PlaybackQueueEntry) -> NowPlayingBarItem {
       NowPlayingBarItem(
         id: entry.viewID,
+        playbackID: entry.sourceEntryID.map { self.sourcePlaybackID($0) },
         title: entry.item.title,
         artist: entry.item.artistName,
         artworkURL: entry.item.artworkURL,
       )
+    }
+
+    private func nowPlayingBarItem(_ entry: PlaybackSource.Entry) -> NowPlayingBarItem {
+      NowPlayingBarItem(
+        id: "repeat-source:\(entry.id)",
+        playbackID: self.sourcePlaybackID(entry.id),
+        title: entry.item.title,
+        artist: entry.item.artistName,
+        artworkURL: entry.item.artworkURL,
+      )
+    }
+
+    private func sourcePlaybackID(_ entryID: PlaybackSource.Entry.ID) -> String {
+      "source:\(entryID)"
     }
   #endif
 
@@ -333,6 +351,9 @@ struct AppView: View {
             isLoading: session.isLoading,
             progress: self.store.playback.progress.fraction,
             duration: self.store.playback.progress.duration,
+            isShuffleEnabled: self.store.playback.preferences.isShuffleEnabled,
+            isInfiniteEnabled: self.store.playback.preferences.endBehavior == .infinite,
+            repeatMode: self.store.playback.preferences.endBehavior.nowPlayingRepeatMode,
             onPlayPauseTap: {
               self.store.send(.playback(.togglePlayPause))
             },
@@ -344,6 +365,15 @@ struct AppView: View {
             },
             onScrub: { time in
               self.store.send(.playback(.seek(time)))
+            },
+            onShuffleTap: {
+              self.store.send(.playback(.shuffleButtonTapped))
+            },
+            onRepeatTap: {
+              self.store.send(.playback(.repeatButtonTapped))
+            },
+            onInfiniteTap: {
+              self.store.send(.playback(.infiniteButtonTapped))
             },
             isAddToPlaylistEnabled: session.currentItem.albumID != nil
               && !self.store.library.isPlaylistMutationInFlight,
@@ -367,10 +397,22 @@ struct AppView: View {
             isLoading: false,
             progress: 0,
             duration: 0,
+            isShuffleEnabled: self.store.playback.preferences.isShuffleEnabled,
+            isInfiniteEnabled: self.store.playback.preferences.endBehavior == .infinite,
+            repeatMode: self.store.playback.preferences.endBehavior.nowPlayingRepeatMode,
             onPlayPauseTap: {},
             onPreviousTap: {},
             onNextTap: {},
             onScrub: { _ in },
+            onShuffleTap: {
+              self.store.send(.playback(.shuffleButtonTapped))
+            },
+            onRepeatTap: {
+              self.store.send(.playback(.repeatButtonTapped))
+            },
+            onInfiniteTap: {
+              self.store.send(.playback(.infiniteButtonTapped))
+            },
             isAddToPlaylistEnabled: false,
             onCloseTap: {
               self.store.send(.nowPlayingPresentationChanged(false))
@@ -476,6 +518,19 @@ struct AppView: View {
 
   private var selectedTab: Binding<AppFeature.Tab> {
     self.$store.selectedTab.sending(\.tabSelected)
+  }
+}
+
+private extension PlaybackEndBehavior {
+  var nowPlayingRepeatMode: NowPlayingRepeatMode {
+    switch self {
+    case .finite, .infinite:
+      .off
+    case .loopCollection:
+      .collection
+    case .loopTrack:
+      .track
+    }
   }
 }
 

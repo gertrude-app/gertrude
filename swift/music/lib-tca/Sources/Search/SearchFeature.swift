@@ -61,7 +61,11 @@ struct SearchFeature: Sendable {
     case browseLibrary
     case library(LibraryFeature.Action)
     case playback(LibraryFeature.DelegateAction)
-    case songTapped(PlaybackItem)
+    case songTapped(
+      items: [PlaybackItem],
+      start: PlaybackStartIntent,
+      context: PlaybackContext?,
+    )
   }
 
   enum Action: Equatable {
@@ -99,9 +103,26 @@ struct SearchFeature: Sendable {
         case .playlist(let playlist):
           state.path.append(.playlist(.init(playlist: playlist)))
           return .none
-        case .song:
+        case .song(let track, let albumID, _, _):
           guard let item = result.playbackItems.first else { return .none }
-          return .send(.delegate(.songTapped(item)))
+          guard let albumResult = state.librarySearch.result(id: .album(albumID)),
+                case .album(let album) = albumResult.source,
+                let startIndex = album.tracks.firstIndex(where: { $0.id == track.id })
+          else {
+            return .send(.delegate(.songTapped(
+              items: [item],
+              start: .selectedEntry(index: 0),
+              context: nil,
+            )))
+          }
+          return .send(.delegate(.songTapped(
+            items: albumResult.playbackItems,
+            start: .selectedEntry(index: startIndex),
+            context: PlaybackContext(
+              identity: .album(album.id),
+              title: album.title,
+            ),
+          )))
         }
 
       case .resultAddToPlaylistTapped(let resultID):
@@ -150,10 +171,10 @@ struct SearchFeature: Sendable {
           return .send(.delegate(.playback(.playbackFailureActionTapped)))
         case .playNext(let items):
           return .send(.delegate(.playback(.playNext(items: items))))
-        case .playNow(let items, let startIndex):
+        case .playNow(let items, let start):
           return .send(.delegate(.playback(.playNow(
             items: items,
-            startIndex: startIndex,
+            start: start,
             context: PlaybackContext(
               identity: .album(album.id),
               title: album.title,
@@ -169,12 +190,17 @@ struct SearchFeature: Sendable {
         }
 
       case .path(.element(id: let id, action: .artist(.addToQueueTapped))):
-        guard let items = self.artistPlaybackItems(pathID: id, state: state) else { return .none }
+        guard let items = self.artistDiscographyPlaybackItems(pathID: id, state: state)
+        else { return .none }
         return .send(.delegate(.playback(.addToQueue(items: items))))
 
       case .path(.element(id: let id, action: .artist(.playButtonTapped))):
-        guard let items = self.artistPlaybackItems(pathID: id, state: state),
-              let context = self.artistPlaybackContext(pathID: id, state: state)
+        guard let items = self.artistDiscographyPlaybackItems(pathID: id, state: state),
+              let context = self.artistPlaybackContext(
+                pathID: id,
+                source: .discography,
+                state: state,
+              )
         else { return .none }
         return .send(.delegate(.playback(.artistPlaybackButtonTapped(
           items: items,
@@ -182,7 +208,8 @@ struct SearchFeature: Sendable {
         ))))
 
       case .path(.element(id: let id, action: .artist(.playNextTapped))):
-        guard let items = self.artistPlaybackItems(pathID: id, state: state) else { return .none }
+        guard let items = self.artistDiscographyPlaybackItems(pathID: id, state: state)
+        else { return .none }
         return .send(.delegate(.playback(.playNext(items: items))))
 
       case .path(.element(
@@ -238,7 +265,7 @@ struct SearchFeature: Sendable {
         id: let id,
         action: .artist(.topSongAddToQueueTapped(let trackID)),
       )):
-        guard let item = self.artistPlaybackItems(pathID: id, state: state)?
+        guard let item = self.artistTopSongsPlaybackItems(pathID: id, state: state)?
           .first(where: { $0.id == trackID }) else { return .none }
         return .send(.delegate(.playback(.addToQueue(items: [item]))))
 
@@ -246,7 +273,7 @@ struct SearchFeature: Sendable {
         id: let id,
         action: .artist(.topSongPlayNextTapped(let trackID)),
       )):
-        guard let item = self.artistPlaybackItems(pathID: id, state: state)?
+        guard let item = self.artistTopSongsPlaybackItems(pathID: id, state: state)?
           .first(where: { $0.id == trackID }) else { return .none }
         return .send(.delegate(.playback(.playNext(items: [item]))))
 
@@ -254,13 +281,17 @@ struct SearchFeature: Sendable {
         id: let id,
         action: .artist(.topSongTapped(let trackID)),
       )):
-        guard let items = self.artistPlaybackItems(pathID: id, state: state),
+        guard let items = self.artistTopSongsPlaybackItems(pathID: id, state: state),
               let startIndex = items.firstIndex(where: { $0.id == trackID }),
-              let context = self.artistPlaybackContext(pathID: id, state: state)
+              let context = self.artistPlaybackContext(
+                pathID: id,
+                source: .topSongs,
+                state: state,
+              )
         else { return .none }
         return .send(.delegate(.playback(.playNow(
           items: items,
-          startIndex: startIndex,
+          start: .selectedEntry(index: startIndex),
           context: context,
         ))))
 
@@ -300,10 +331,10 @@ struct SearchFeature: Sendable {
         case .playNext(let items):
           return .send(.delegate(.playback(.playNext(items: items))))
 
-        case .playNow(let items, let startIndex):
+        case .playNow(let items, let start):
           return .send(.delegate(.playback(.playNow(
             items: items,
-            startIndex: startIndex,
+            start: start,
             context: PlaybackContext(
               identity: .playlist(detail.playlist.id),
               title: detail.playlist.name,
@@ -350,28 +381,43 @@ struct SearchFeature: Sendable {
     state: State,
   ) -> EffectOf<Self> {
     guard state.results.contains(where: { $0.id == resultID }),
-          let result = state.librarySearch.result(id: resultID),
-          !result.playbackItems.isEmpty else { return .none }
+          let result = state.librarySearch.result(id: resultID) else { return .none }
+    let items = switch result.source {
+    case .artist(let artist):
+      state.librarySearch.artistDiscographyPlaybackItems(for: artist.id)
+    case .album, .playlist, .song:
+      result.playbackItems
+    }
+    guard !items.isEmpty else { return .none }
     switch position {
     case .next:
-      return .send(.delegate(.playback(.playNext(items: result.playbackItems))))
+      return .send(.delegate(.playback(.playNext(items: items))))
     case .tail:
-      return .send(.delegate(.playback(.addToQueue(items: result.playbackItems))))
+      return .send(.delegate(.playback(.addToQueue(items: items))))
     }
   }
 
-  private func artistPlaybackItems(
+  private func artistDiscographyPlaybackItems(
     pathID: StackElementID,
     state: State,
   ) -> [PlaybackItem]? {
-    guard let artistID = state.path[id: pathID, case: \.artist]?.artistID,
-          let result = state.librarySearch.result(id: .artist(artistID)),
-          !result.playbackItems.isEmpty else { return nil }
-    return result.playbackItems
+    guard let artistID = state.path[id: pathID, case: \.artist]?.artistID else { return nil }
+    let items = state.librarySearch.artistDiscographyPlaybackItems(for: artistID)
+    return items.isEmpty ? nil : items
+  }
+
+  private func artistTopSongsPlaybackItems(
+    pathID: StackElementID,
+    state: State,
+  ) -> [PlaybackItem]? {
+    guard let artistID = state.path[id: pathID, case: \.artist]?.artistID else { return nil }
+    let items = state.librarySearch.artistTopSongsPlaybackItems(for: artistID)
+    return items.isEmpty ? nil : items
   }
 
   private func artistPlaybackContext(
     pathID: StackElementID,
+    source: PlaybackContext.ArtistSource,
     state: State,
   ) -> PlaybackContext? {
     guard let artistID = state.path[id: pathID, case: \.artist]?.artistID,
@@ -380,6 +426,7 @@ struct SearchFeature: Sendable {
     return PlaybackContext(
       identity: .artist(artist.id),
       title: artist.name,
+      artistSource: source,
     )
   }
 

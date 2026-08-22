@@ -140,7 +140,7 @@ public struct ArtistDetailView: View {
           Label("Artist Actions", systemImage: "ellipsis")
         }
         .tint(.primary)
-        .disabled(self.topSongs.isEmpty)
+        .disabled(self.releases.isEmpty)
       }
     }
   }

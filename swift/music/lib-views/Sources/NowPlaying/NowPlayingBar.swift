@@ -4,17 +4,20 @@ import SwiftUI
 #if os(iOS)
   public struct NowPlayingBarItem: Equatable, Identifiable, Sendable {
     public let id: String
+    public let playbackID: String
     public let title: String
     public let artist: String
     public let artworkURL: URL?
 
     public init(
       id: String,
+      playbackID: String? = nil,
       title: String,
       artist: String,
       artworkURL: URL?,
     ) {
       self.id = id
+      self.playbackID = playbackID ?? id
       self.title = title
       self.artist = artist
       self.artworkURL = artworkURL

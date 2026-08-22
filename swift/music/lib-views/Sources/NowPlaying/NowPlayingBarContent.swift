@@ -199,8 +199,8 @@ import SwiftUI
       .onChange(of: self.gestureIsActive) { _, isActive in
         self.gestureActivityChanged(isActive)
       }
-      .onChange(of: self.item.id) { _, itemID in
-        self.currentItemChanged(to: itemID)
+      .onChange(of: self.item.id) { _, _ in
+        self.currentItemChanged(to: self.item.playbackID)
       }
       .task(id: self.transition?.id) {
         guard let transitionID = self.transition?.id else { return }
@@ -346,9 +346,9 @@ import SwiftUI
       }
     }
 
-    private func currentItemChanged(to itemID: String) {
+    private func currentItemChanged(to playbackID: String) {
       guard var transition = self.transition else { return }
-      guard itemID == transition.nextItem.id else {
+      guard playbackID == transition.nextItem.playbackID else {
         self.resetTransition()
         return
       }

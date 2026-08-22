@@ -9,6 +9,46 @@ extension ApprovedMusicLibrary {
     self.artists.first { $0.id == id }
   }
 
+  func artistReleaseAlbums(for artist: ApprovedArtist) -> [ApprovedAlbum] {
+    let releases = if let releaseAlbumIDs = artist.releaseAlbumIds {
+      releaseAlbumIDs.compactMap(self.album(id:))
+    } else {
+      self.albums.filter {
+        $0.artistName.localizedCaseInsensitiveContains(artist.name)
+      }
+    }
+    return releases.enumerated().sorted { lhs, rhs in
+      let lhsDate = lhs.element.releaseDate ?? ""
+      let rhsDate = rhs.element.releaseDate ?? ""
+      if lhsDate != rhsDate {
+        return lhsDate > rhsDate
+      }
+      return lhs.offset < rhs.offset
+    }.map(\.element)
+  }
+
+  func artistDiscographyPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    guard let artist = self.artist(id: artistID) else { return [] }
+    var trackIDs = Set<ApprovedTrack.ID>()
+    return self.artistReleaseAlbums(for: artist).flatMap { album in
+      album.tracks.compactMap { track in
+        guard trackIDs.insert(track.id).inserted else { return nil }
+        return PlaybackItem(
+          track: track,
+          artworkURL: album.artworkURL,
+          albumID: album.id,
+        )
+      }
+    }
+  }
+
+  func artistTopSongsPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    guard let topSongs = self.artist(id: artistID)?.topSongs else { return [] }
+    return topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
+    }
+  }
+
   func playlist(id: MusicPlaylist.ID) -> MusicPlaylist? {
     self.playlists.first { $0.id == id }
   }

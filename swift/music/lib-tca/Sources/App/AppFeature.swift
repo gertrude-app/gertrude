@@ -124,19 +124,25 @@ struct AppFeature: Sendable {
         state.pendingLibraryPlayNowOrigin = nil
         return .send(.playback(.addToQueue(items)))
 
-      case .library(.delegate(.approvedTrackIDsUpdated(let approvedTrackIDs))):
-        return .send(.playback(.approvedTrackIDsUpdated(approvedTrackIDs)))
+      case .library(.delegate(.approvedTrackIDsUpdated)):
+        let approvedLibrary = if case .loaded(let library) = state.library.status {
+          library
+        } else {
+          ApprovedMusicLibrary.empty
+        }
+        return .send(.playback(.approvedLibraryUpdated(approvedLibrary)))
 
       case .library(.delegate(.artistPlaybackButtonTapped(let items, let context))):
         guard !items.isEmpty else { return .none }
-        if state.playback.activePlaybackContext?.identity == context.identity {
+        if state.playback.activePlaybackContext?.identity == context.identity,
+           state.playback.activePlaybackContext?.artistSource == context.artistSource {
           state.pendingLibraryPlayNowOrigin = nil
           return .send(.playback(.togglePlayPause))
         }
         state.pendingLibraryPlayNowOrigin = context.identity
         return .send(.playback(.playNow(
           items: items,
-          startIndex: 0,
+          start: .collection,
           context: context,
         )))
 
@@ -150,11 +156,11 @@ struct AppFeature: Sendable {
         state.pendingLibraryPlayNowOrigin = nil
         return .send(.playback(.playNext(items)))
 
-      case .library(.delegate(.playNow(let items, let startIndex, let context))):
+      case .library(.delegate(.playNow(let items, let start, let context))):
         state.pendingLibraryPlayNowOrigin = context.identity
         return .send(.playback(.playNow(
           items: items,
-          startIndex: startIndex,
+          start: start,
           context: context,
         )))
 
@@ -186,7 +192,9 @@ struct AppFeature: Sendable {
 
       case .playback(.playbackEvent(.queueEnded)):
         state.pendingLibraryPlayNowOrigin = nil
-        state.isNowPlayingPresented = false
+        if state.playback.session == nil {
+          state.isNowPlayingPresented = false
+        }
         self.synchronizeDetailPlayback(state: &state)
         return .cancel(id: CancelID.albumResolution)
 
@@ -230,15 +238,23 @@ struct AppFeature: Sendable {
       case .search(.delegate(.playback(let action))):
         return .send(.library(.delegate(action)))
 
-      case .search(.delegate(.songTapped(let item))):
-        state.pendingLibraryPlayNowOrigin = nil
-        if state.playback.session?.currentTrackID == item.id {
+      case .search(.delegate(.songTapped(let items, let start, let context))):
+        let selectedIndex = switch start {
+        case .collection:
+          items.startIndex
+        case .selectedEntry(let index):
+          index
+        }
+        guard items.indices.contains(selectedIndex) else { return .none }
+        if state.playback.session?.currentTrackID == items[selectedIndex].id {
+          state.pendingLibraryPlayNowOrigin = nil
           return .send(.playback(.togglePlayPause))
         }
+        state.pendingLibraryPlayNowOrigin = context?.identity
         return .send(.playback(.playNow(
-          items: [item],
-          startIndex: 0,
-          context: nil,
+          items: items,
+          start: start,
+          context: context,
         )))
 
       case .search:
@@ -255,10 +271,11 @@ struct AppFeature: Sendable {
     _ state: inout State,
   ) -> EffectOf<Self> {
     let childID = self.keychain.loadConnection()?.childId
+    let playbackPreferences = state.playback.preferences
     self.keychain.deleteConnection()
     state.isNowPlayingPresented = false
     state.library = .init()
-    state.playback = .init()
+    state.playback = .init(preferences: playbackPreferences)
     state.pendingLibraryPlayNowOrigin = nil
     state.search = .init()
     state.setup = .init()

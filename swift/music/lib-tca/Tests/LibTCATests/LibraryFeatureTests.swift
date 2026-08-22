@@ -358,30 +358,43 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func artistPlayTapRequestsPlaybackForAllTopSongs() async {
-    let topSongs = [
-      ApprovedTrack(
-        id: "song-1",
-        title: "First",
-        artistName: "Artist",
-        artworkURL: URL(string: "https://example.com/first.jpg"),
-      ),
-      ApprovedTrack(
-        id: "song-2",
-        title: "Second",
-        artistName: "Artist",
-        artworkURL: URL(string: "https://example.com/second.jpg"),
-      ),
-    ]
+  func artistPlayTapRequestsNewestFirstDeduplicatedDiscography() async {
+    let repeatedTrack = ApprovedTrack(
+      id: "repeated",
+      title: "Repeated",
+      artistName: "Artist",
+    )
+    let olderAlbum = ApprovedAlbum(
+      id: "older",
+      title: "Older",
+      artistName: "Artist",
+      releaseDate: "2020-03-01",
+      tracks: [
+        ApprovedTrack(id: "older-first", title: "Older First", artistName: "Artist"),
+        repeatedTrack,
+      ],
+    )
+    let newestAlbum = ApprovedAlbum(
+      id: "newest",
+      title: "Newest",
+      artistName: "Artist",
+      releaseDate: "2025-06-01",
+      tracks: [
+        ApprovedTrack(id: "newest-first", title: "Newest First", artistName: "Artist"),
+        repeatedTrack,
+      ],
+    )
     let artist = ApprovedArtist(
       id: "artist-1",
       name: "Artist",
-      topSongs: topSongs,
+      releaseAlbumIds: [olderAlbum.id, newestAlbum.id],
+      topSongs: [olderAlbum.tracks[0]],
     )
-    let library = ApprovedMusicLibrary(artists: [artist])
-    let items = topSongs.map {
-      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
-    }
+    let library = ApprovedMusicLibrary(
+      albums: [olderAlbum, newestAlbum],
+      artists: [artist],
+    )
+    let items = playbackItems(album: newestAlbum) + [playbackItems(album: olderAlbum)[0]]
     let store = TestStore(initialState: .init(status: .loaded(library))) {
       LibraryFeature()
     }
@@ -392,6 +405,7 @@ struct LibraryFeatureTests {
       context: PlaybackContext(
         identity: .artist(artist.id),
         title: artist.name,
+        artistSource: .discography,
       ),
     )))
   }
@@ -421,27 +435,38 @@ struct LibraryFeatureTests {
     ))
     await store.receive(.delegate(.playNow(
       items: items,
-      startIndex: 1,
+      start: .selectedEntry(index: 1),
       context: PlaybackContext(
         identity: .artist(artist.id),
         title: artist.name,
+        artistSource: .topSongs,
       ),
     )))
   }
 
   @Test
-  func artistDetailQueueActionsDelegateApprovedTopSongs() async {
-    let topSongs = [
-      ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
-      ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
-    ]
+  func artistDetailQueueActionsUseDiscographyAndTopSongsSources() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      releaseDate: "2025-06-01",
+      tracks: [
+        ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
+        ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
+        ApprovedTrack(id: "song-3", title: "Third", artistName: "Artist"),
+      ],
+    )
+    let topSongs = [album.tracks[1], album.tracks[0]]
     let artist = ApprovedArtist(
       id: "artist-1",
       name: "Artist",
+      releaseAlbumIds: [album.id],
       topSongs: topSongs,
     )
-    let library = ApprovedMusicLibrary(artists: [artist])
-    let items = topSongs.map {
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    let discographyItems = playbackItems(album: album)
+    let topSongItems = topSongs.map {
       PlaybackItem(track: $0, artworkURL: $0.artworkURL)
     }
     let store = TestStore(initialState: .init(status: .loaded(library))) {
@@ -452,19 +477,19 @@ struct LibraryFeatureTests {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
     await store.send(.path(.element(id: 0, action: .artist(.playNextTapped))))
-    await store.receive(.delegate(.playNext(items: items)))
+    await store.receive(.delegate(.playNext(items: discographyItems)))
     await store.send(.path(.element(id: 0, action: .artist(.addToQueueTapped))))
-    await store.receive(.delegate(.addToQueue(items: items)))
+    await store.receive(.delegate(.addToQueue(items: discographyItems)))
     await store.send(.path(.element(
       id: 0,
       action: .artist(.topSongPlayNextTapped(topSongs[1].id)),
     )))
-    await store.receive(.delegate(.playNext(items: [items[1]])))
+    await store.receive(.delegate(.playNext(items: [topSongItems[1]])))
     await store.send(.path(.element(
       id: 0,
       action: .artist(.topSongAddToQueueTapped(topSongs[0].id)),
     )))
-    await store.receive(.delegate(.addToQueue(items: [items[0]])))
+    await store.receive(.delegate(.addToQueue(items: [topSongItems[0]])))
   }
 
   @Test
@@ -621,11 +646,11 @@ struct LibraryFeatureTests {
     let items = [playbackItem("track-1")]
     await store.send(.path(.element(
       id: 0,
-      action: .album(.delegate(.playNow(items: items, startIndex: 0))),
+      action: .album(.delegate(.playNow(items: items, start: .collection))),
     )))
     await store.receive(.delegate(.playNow(
       items: items,
-      startIndex: 0,
+      start: .collection,
       context: PlaybackContext(
         identity: .album(album.id),
         title: album.title,
