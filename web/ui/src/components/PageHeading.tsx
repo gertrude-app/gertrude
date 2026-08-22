@@ -92,7 +92,7 @@ const PageHeading: React.FC<Props> = ({
           </HStack>
         </nav>
       )}
-      <HStack justify="between" align="end">
+      <HStack justify="between" align="end" gap={4}>
         <VStack gap={2}>
           <Text as="h1" variant="display" className="flex-grow @2xl/main:-mb-2">
             {title}

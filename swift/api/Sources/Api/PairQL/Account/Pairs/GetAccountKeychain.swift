@@ -18,6 +18,13 @@ struct GetAccountKeychain: Pair {
     let appName: String?
   }
 
+  struct AppOption: PairNestable {
+    let name: String
+    let slug: String
+    let bundleId: String?
+    let iconHash: String?
+  }
+
   struct Output: PairOutput {
     let id: Keychain.Id
     let name: String
@@ -25,6 +32,7 @@ struct GetAccountKeychain: Pair {
     let warning: String?
     let isPublic: Bool
     let keys: [KeyRecord]
+    let apps: [AppOption]
   }
 }
 
@@ -37,7 +45,21 @@ extension GetAccountKeychain: Resolver {
       with: input.keychainId,
       in: context.legacyContext,
     )
-    let appNames = try await appNames(for: legacyOutput.keys.map(\.key), in: context.db)
+    let apps = try await IdentifiedApp.query()
+      .orderBy(.name, .asc)
+      .all(in: context.db)
+    let appIds = apps.map(\.id)
+    let appBundleIds = appIds.isEmpty
+      ? []
+      : try await AppBundleId.query()
+      .where(.identifiedAppId |=| appIds)
+      .all(in: context.db)
+    let appNames = appNames(apps: apps, bundleIds: appBundleIds)
+    let appOptions = try await appOptions(
+      apps: apps,
+      bundleIds: appBundleIds,
+      in: context.db,
+    )
 
     return .init(
       id: legacyOutput.summary.id,
@@ -54,6 +76,7 @@ extension GetAccountKeychain: Resolver {
           appName: appNames.name(for: $0.key),
         )
       },
+      apps: appOptions,
     )
   }
 }
@@ -74,48 +97,21 @@ private struct KeyAppNames {
 }
 
 private func appNames(
-  for keys: [Gertie.Key],
-  in db: any DuetSQL.Client,
-) async throws -> KeyAppNames {
-  let scopes = keys.compactMap(singleAppScope)
-  let slugs = Set(scopes.compactMap { scope -> String? in
-    guard case .identifiedAppSlug(let slug) = scope else { return nil }
-    return slug
-  })
-  let bundleIds = Set(scopes.compactMap { scope -> String? in
-    guard case .bundleId(let bundleId) = scope else { return nil }
-    return normalizedBundleId(bundleId)
-  })
-
-  let slugApps = slugs.isEmpty
-    ? []
-    : try await IdentifiedApp.query()
-    .where(.slug |=| Array(slugs))
-    .all(in: db)
-  let bundleCandidates = bundleIds.flatMap { [$0, ".\($0)"] }
-  let bundleRows = bundleCandidates.isEmpty
-    ? []
-    : try await AppBundleId.query()
-    .where(.bundleId |=| bundleCandidates)
-    .all(in: db)
-  let bundleAppIds = Set(bundleRows.map(\.identifiedAppId))
-  let bundleApps = bundleAppIds.isEmpty
-    ? []
-    : try await IdentifiedApp.query()
-    .where(.id |=| Array(bundleAppIds))
-    .all(in: db)
+  apps: [IdentifiedApp],
+  bundleIds: [AppBundleId],
+) -> KeyAppNames {
   let namesByAppId = Dictionary(
-    bundleApps.map { ($0.id, $0.name) },
+    apps.map { ($0.id, $0.name) },
     uniquingKeysWith: { first, _ in first },
   )
 
   return KeyAppNames(
     bySlug: Dictionary(
-      slugApps.map { ($0.slug, $0.name) },
+      apps.map { ($0.slug, $0.name) },
       uniquingKeysWith: { first, _ in first },
     ),
     byBundleId: Dictionary(
-      bundleRows.compactMap { row in
+      bundleIds.compactMap { row in
         namesByAppId[row.identifiedAppId].map {
           (normalizedBundleId(row.bundleId), $0)
         }
@@ -123,6 +119,76 @@ private func appNames(
       uniquingKeysWith: { first, _ in first },
     ),
   )
+}
+
+private func appOptions(
+  apps: [IdentifiedApp],
+  bundleIds: [AppBundleId],
+  in db: any DuetSQL.Client,
+) async throws -> [GetAccountKeychain.AppOption] {
+  let bundleIdsByAppId = Dictionary(grouping: bundleIds, by: \.identifiedAppId)
+  let primaryBundleIds = Dictionary(uniqueKeysWithValues: apps.compactMap { app in
+    preferredBundleId(in: bundleIdsByAppId[app.id] ?? []).map { (app.id, $0) }
+  })
+  let normalizedBundleIds = Array(Set(bundleIds.map {
+    normalizedBundleId($0.bundleId)
+  }))
+  let catalogedApps = normalizedBundleIds.isEmpty
+    ? []
+    : try await CatalogedApp.query()
+    .where(.bundleId |=| normalizedBundleIds)
+    .all(in: db)
+  let iconHashesByBundleId = Dictionary(
+    catalogedApps.compactMap { app in
+      app.iconContentHash.map { (app.bundleId, $0) }
+    },
+    uniquingKeysWith: { first, _ in first },
+  )
+
+  return apps.map { app in
+    let bundleId = primaryBundleIds[app.id]
+    return .init(
+      name: app.name,
+      slug: app.slug,
+      bundleId: bundleId,
+      iconHash: preferredIconHash(
+        in: bundleIdsByAppId[app.id] ?? [],
+        iconHashesByBundleId: iconHashesByBundleId,
+      ),
+    )
+  }
+}
+
+private func preferredIconHash(
+  in bundleIds: [AppBundleId],
+  iconHashesByBundleId: [String: String],
+) -> String? {
+  for bundleId in sortedBundleIds(bundleIds) {
+    if let iconHash = iconHashesByBundleId[normalizedBundleId(bundleId.bundleId)] {
+      return iconHash
+    }
+  }
+  return nil
+}
+
+private func preferredBundleId(in bundleIds: [AppBundleId]) -> String? {
+  sortedBundleIds(bundleIds)
+    .first
+    .map { normalizedBundleId($0.bundleId) }
+}
+
+private func sortedBundleIds(_ bundleIds: [AppBundleId]) -> [AppBundleId] {
+  bundleIds.sorted { lhs, rhs in
+    if lhs.count != rhs.count {
+      return lhs.count > rhs.count
+    }
+    let lhsId = normalizedBundleId(lhs.bundleId)
+    let rhsId = normalizedBundleId(rhs.bundleId)
+    if lhsId.count != rhsId.count {
+      return lhsId.count < rhsId.count
+    }
+    return lhsId < rhsId
+  }
 }
 
 private func singleAppScope(for key: Gertie.Key) -> AppScope.Single? {
@@ -141,5 +207,15 @@ private func singleAppScope(for key: Gertie.Key) -> AppScope.Single? {
 }
 
 private func normalizedBundleId(_ bundleId: String) -> String {
-  bundleId.first == "." ? String(bundleId.dropFirst()) : bundleId
+  var id = bundleId
+  if id.first == "." {
+    id = String(id.dropFirst())
+  }
+  let parts = id.split(separator: ".", maxSplits: 1)
+  if parts.count == 2,
+     parts[0].count == 10,
+     parts[0].allSatisfy({ $0.isNumber || ($0.isLetter && $0.isUppercase) }) {
+    id = String(parts[1])
+  }
+  return id
 }

@@ -38,6 +38,7 @@
     "@tanstack/react-router": "1.170.16",
     "clsx": "2.1.1",
     "lucide-react": "0.545.0",
+    "parse-domain": "7.0.1",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "tailwindcss": "4.3.0"

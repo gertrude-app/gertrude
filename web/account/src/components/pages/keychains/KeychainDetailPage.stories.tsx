@@ -8,6 +8,26 @@ const keychain = {
   description: `Websites and app connections used for classes, research, and creative work.`,
   warning: `This keychain allows searching for images within Google Docs. It is possible to find images that are mildly or moderately sexual or inappropriate in the image search. Please familiarize yourself with the image search and weigh the risk before using this keychain.`,
   isPublic: true,
+  apps: [
+    {
+      name: `Minecraft`,
+      slug: `minecraft`,
+      bundleId: `com.mojang.minecraftlauncher`,
+      appIconUrl: `/example-app-icons/minecraft.webp`,
+    },
+    {
+      name: `Safari`,
+      slug: `safari`,
+      bundleId: `com.apple.Safari`,
+      appIconUrl: `/example-app-icons/safari.webp`,
+    },
+    {
+      name: `Spotify`,
+      slug: `spotify`,
+      bundleId: `com.spotify.client`,
+      appIconUrl: `/example-app-icons/spotify.webp`,
+    },
+  ],
   keys: [
     {
       id: `subdomain-key`,
@@ -91,6 +111,11 @@ const keychain = {
   ],
 } satisfies KeychainDetail;
 
+const pageActions = {
+  onSaveKey: () => Promise.resolve(),
+  onDeleteKey: () => Promise.resolve(),
+};
+
 const meta = {
   title: 'Account/Pages/Keychain Detail',
   component: KeychainDetailPage,
@@ -103,7 +128,32 @@ export const Default = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <KeychainDetailPage state={{ status: `success`, data: keychain }} />
+      <KeychainDetailPage
+        state={{ status: `success`, data: keychain }}
+        {...pageActions}
+      />
+    </StoryScreen>
+  ),
+};
+
+export const Editable = {
+  parameters: galleryParameters,
+  render: () => (
+    <StoryScreen>
+      <KeychainDetailPage
+        state={{
+          status: `success`,
+          data: {
+            ...keychain,
+            name: `School websites`,
+            description: `Sites used for homework and class projects.`,
+            warning: undefined,
+            isPublic: false,
+            keys: keychain.keys.slice(0, 4),
+          },
+        }}
+        {...pageActions}
+      />
     </StoryScreen>
   ),
 };
@@ -121,8 +171,10 @@ export const Empty = {
             description: `Ready for keys when you need them.`,
             isPublic: false,
             keys: [],
+            apps: keychain.apps,
           },
         }}
+        {...pageActions}
       />
     </StoryScreen>
   ),
@@ -132,7 +184,7 @@ export const Loading = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <KeychainDetailPage state={{ status: `loading` }} />
+      <KeychainDetailPage state={{ status: `loading` }} {...pageActions} />
     </StoryScreen>
   ),
 };
@@ -147,6 +199,7 @@ export const Error = {
           message: `This keychain may have been deleted or belong to another account.`,
           onRetry: () => {},
         }}
+        {...pageActions}
       />
     </StoryScreen>
   ),

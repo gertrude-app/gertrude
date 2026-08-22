@@ -13,6 +13,7 @@ export type DropdownMenuItemIcon = LucideIcon | React.ReactNode;
 interface Props {
   title: string;
   description?: React.ReactNode;
+  descriptionClassName?: string;
   icon?: DropdownMenuItemIcon;
   selected?: boolean;
   active?: boolean;
@@ -66,6 +67,7 @@ const renderIcon = (
 const DropdownMenuItem: React.FC<Props> = ({
   title,
   description,
+  descriptionClassName,
   icon,
   selected,
   active,
@@ -91,7 +93,11 @@ const DropdownMenuItem: React.FC<Props> = ({
       {description && (
         <Text
           variant="captionMuted"
-          className={cx(`-mt-0.25 leading-4`, destructive && `!text-red-900/70`)}
+          className={cx(
+            `-mt-0.25 leading-4`,
+            descriptionClassName,
+            destructive && `!text-red-900/70`,
+          )}
         >
           {description}
         </Text>
