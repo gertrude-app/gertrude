@@ -30,6 +30,7 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
+    "@dash/keys": "workspace:*",
     "@gertrude/ui": "workspace:*",
     "@shared/datetime": "workspace:*",
     "@shared/pairql": "workspace:*",

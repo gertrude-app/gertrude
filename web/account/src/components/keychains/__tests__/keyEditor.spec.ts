@@ -99,13 +99,17 @@ describe(`key editor`, () => {
     expect(keyFromEditorState(editorState)).toBeNull();
   });
 
-  test(`warns about subdomain access for known broad domains`, () => {
+  test(`uses legacy unsafe domains for broad access warnings`, () => {
     expect(broadAccessWarning(state({ address: `google.com` }))).toContain(
       `every subdomain of google.com`,
+    );
+    expect(broadAccessWarning(state({ address: `pages.dev` }))).toContain(
+      `every subdomain of pages.dev`,
     );
     expect(
       broadAccessWarning(state({ address: `google.com`, domainMatch: `strict` })),
     ).toBeNull();
+    expect(broadAccessWarning(state({ address: `discord.com` }))).toBeNull();
     expect(broadAccessWarning(state({ address: `example.com` }))).toBeNull();
   });
 

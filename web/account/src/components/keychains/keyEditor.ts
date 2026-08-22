@@ -1,3 +1,4 @@
+import { UNSAFE_DOMAINS } from '@dash/keys';
 import { ParseResultType, parseDomain } from 'parse-domain';
 import type { KeychainKey, SharedKey } from '#/components/types';
 import type { AppScope, SingleAppScope } from '@shared/pairql/src/account';
@@ -25,31 +26,6 @@ export type DomainDetails = {
   registrableDomain: string;
   hasSubdomain: boolean;
 };
-
-const broadDomainWarnings = new Set([
-  `amazonaws.com`,
-  `appspot.com`,
-  `blogspot.com`,
-  `cloudfront.net`,
-  `discord.com`,
-  `facebook.com`,
-  `firebaseapp.com`,
-  `github.io`,
-  `google.com`,
-  `googleusercontent.com`,
-  `instagram.com`,
-  `netlify.app`,
-  `reddit.com`,
-  `tiktok.com`,
-  `tumblr.com`,
-  `twitter.com`,
-  `vercel.app`,
-  `web.app`,
-  `wikipedia.org`,
-  `wordpress.com`,
-  `x.com`,
-  `youtube.com`,
-]);
 
 const domainRegexMaxLength = 200;
 const domainRegexCanaryHostname = `nothing-to-do-with-anything.invalid`;
@@ -328,7 +304,7 @@ export const keyEditorError = (state: KeyEditorState): string | null => {
 
 export const broadAccessWarning = (state: KeyEditorState): string | null => {
   const key = keyFromEditorState({ ...state, scopeType: `webBrowsers` });
-  if (key?.type !== `anySubdomain` || !broadDomainWarnings.has(key.domain)) {
+  if (key?.type !== `anySubdomain` || !UNSAFE_DOMAINS.includes(key.domain)) {
     return null;
   }
 

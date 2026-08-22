@@ -83,6 +83,9 @@ importers:
 
   account:
     dependencies:
+      '@dash/keys':
+        specifier: workspace:*
+        version: link:../dash/keys
       '@gertrude/ui':
         specifier: workspace:*
         version: link:../ui
