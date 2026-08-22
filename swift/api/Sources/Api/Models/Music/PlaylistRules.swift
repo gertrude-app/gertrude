@@ -71,9 +71,11 @@ extension Music {
     }
 
     enum RuleError: Error, Equatable {
-      case unauthorizedAlbum(AlbumId)
-      case unauthorizedTrack(trackId: TrackId, albumId: AlbumId)
       case invalidDuplicateResolution(MusicPlaylistDuplicateResolution)
+      case unauthorizedAlbum(AlbumId)
+      case unauthorizedArtist(ArtistId)
+      case unauthorizedPlaylist(UUID)
+      case unauthorizedTrack(trackId: TrackId, albumId: AlbumId)
     }
 
     struct EffectiveTrackIndex: Equatable, Sendable {
@@ -84,9 +86,15 @@ extension Music {
 
       var albums: [MusicLibrarySnapshot.Album]
       private var candidatesByAlbumId: [AlbumId: [Candidate]]
+      private var candidatesByArtistId: [ArtistId: [Candidate]]
+      private var candidatesByPlaylistId: [UUID: [Candidate]]
       private var candidatesByTrackId: [TrackId: [Candidate]]
 
-      init(albums: [MusicLibrarySnapshot.Album]) {
+      init(
+        albums: [MusicLibrarySnapshot.Album],
+        artists: [MusicLibrarySnapshot.Artist] = [],
+        playlists: [Playlist] = [],
+      ) {
         var indexedAlbums: [MusicLibrarySnapshot.Album] = []
         var candidatesByAlbumId: [AlbumId: [Candidate]] = [:]
         var candidatesByTrackId: [TrackId: [Candidate]] = [:]
@@ -110,8 +118,50 @@ extension Music {
           candidatesByAlbumId[albumId] = candidates
         }
 
+        let indexedAlbumsById = Dictionary(
+          uniqueKeysWithValues: indexedAlbums.map { (AlbumId(rawValue: $0.id), $0) },
+        )
+        var candidatesByArtistId: [ArtistId: [Candidate]] = [:]
+        var seenArtistIds = Set<ArtistId>()
+        for artist in artists {
+          let artistId = ArtistId(rawValue: artist.id)
+          guard !artist.id.isEmpty, seenArtistIds.insert(artistId).inserted else { continue }
+          let releases = artist.releaseAlbumIds.enumerated().compactMap { offset, rawAlbumId in
+            let albumId = AlbumId(rawValue: rawAlbumId)
+            return indexedAlbumsById[albumId].map { (offset, albumId, $0) }
+          }.sorted { lhs, rhs in
+            let lhsDate = lhs.2.releaseDate ?? ""
+            let rhsDate = rhs.2.releaseDate ?? ""
+            return lhsDate == rhsDate ? lhs.0 < rhs.0 : lhsDate > rhsDate
+          }
+          var candidates: [Candidate] = []
+          var seenTrackIds = Set<TrackId>()
+          for (_, albumId, _) in releases {
+            for candidate in candidatesByAlbumId[albumId] ?? [] {
+              let trackId = TrackId(rawValue: candidate.track.id)
+              if seenTrackIds.insert(trackId).inserted {
+                candidates.append(candidate)
+              }
+            }
+          }
+          candidatesByArtistId[artistId] = candidates
+        }
+
+        var candidatesByPlaylistId: [UUID: [Candidate]] = [:]
+        var seenPlaylistIds = Set<UUID>()
+        for playlist in playlists {
+          guard seenPlaylistIds.insert(playlist.id).inserted else { continue }
+          candidatesByPlaylistId[playlist.id] = playlist.entries.compactMap { entry in
+            guard let candidates = candidatesByTrackId[entry.trackId] else { return nil }
+            return candidates.first(where: { $0.albumId == entry.preferredAlbumId })
+              ?? candidates.first
+          }
+        }
+
         self.albums = indexedAlbums
         self.candidatesByAlbumId = candidatesByAlbumId
+        self.candidatesByArtistId = candidatesByArtistId
+        self.candidatesByPlaylistId = candidatesByPlaylistId
         self.candidatesByTrackId = candidatesByTrackId
       }
 
@@ -131,6 +181,17 @@ extension Music {
           let albumId = AlbumId(rawValue: rawAlbumId)
           guard let candidates = self.candidatesByAlbumId[albumId] else {
             throw RuleError.unauthorizedAlbum(albumId)
+          }
+          return candidates
+        case .artist(let rawArtistId):
+          let artistId = ArtistId(rawValue: rawArtistId)
+          guard let candidates = self.candidatesByArtistId[artistId] else {
+            throw RuleError.unauthorizedArtist(artistId)
+          }
+          return candidates
+        case .playlist(let playlistId):
+          guard let candidates = self.candidatesByPlaylistId[playlistId] else {
+            throw RuleError.unauthorizedPlaylist(playlistId)
           }
           return candidates
         }
@@ -174,6 +235,18 @@ extension Music {
           .album(
             playlistId: playlist.id,
             albumId: albumId,
+            duplicates: duplicates,
+          )
+        case .artist(let artistId):
+          .artist(
+            playlistId: playlist.id,
+            artistId: artistId,
+            duplicates: duplicates,
+          )
+        case .playlist(let sourcePlaylistId):
+          .playlist(
+            playlistId: playlist.id,
+            sourcePlaylistId: sourcePlaylistId,
             duplicates: duplicates,
           )
         }
@@ -294,11 +367,17 @@ extension Music {
       case (_, .requestConfirmation),
            (.track, .addAgain),
            (.album, .addAll),
-           (.album, .addOnlyNew):
+           (.album, .addOnlyNew),
+           (.artist, .addAll),
+           (.artist, .addOnlyNew),
+           (.playlist, .addAll),
+           (.playlist, .addOnlyNew):
         return
       case (.track, .addAll),
            (.track, .addOnlyNew),
-           (.album, .addAgain):
+           (.album, .addAgain),
+           (.artist, .addAgain),
+           (.playlist, .addAgain):
         throw RuleError.invalidDuplicateResolution(resolution)
       }
     }

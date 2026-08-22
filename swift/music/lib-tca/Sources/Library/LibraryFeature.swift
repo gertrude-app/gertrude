@@ -129,6 +129,8 @@ struct LibraryFeature: Sendable {
 
   enum Action: Equatable {
     case addAlbumToPlaylistTapped(ApprovedAlbum.ID)
+    case addArtistToPlaylistTapped(ApprovedArtist.ID)
+    case addPlaylistToPlaylistTapped(MusicPlaylist.ID)
     case addToPlaylistCancelled
     case addToPlaylistCreateSubmitted(String)
     case addToPlaylistDestinationSelected(MusicPlaylist.ID)
@@ -142,6 +144,8 @@ struct LibraryFeature: Sendable {
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
     case approvedLibraryMusicAccessUnavailable
+    case artistAddToQueueTapped(ApprovedArtist.ID)
+    case artistPlayNextTapped(ApprovedArtist.ID)
     case artistPlayTapped(ApprovedArtist.ID)
     case artistTapped(ApprovedArtist.ID)
     case artistTopSongTapped(artistID: ApprovedArtist.ID, trackID: ApprovedTrack.ID)
@@ -206,6 +210,24 @@ struct LibraryFeature: Sendable {
         state.playlistMutationFailure = nil
         return .none
 
+      case .addArtistToPlaylistTapped(let artistID):
+        guard !state.isPlaylistMutationInFlight,
+              case .loaded(let library) = state.status,
+              library.artist(id: artistID) != nil,
+              !library.artistDiscographyPlaybackItems(for: artistID).isEmpty else { return .none }
+        state.addToPlaylist = .init(source: .artist(artistId: artistID.rawValue))
+        state.playlistMutationFailure = nil
+        return .none
+
+      case .addPlaylistToPlaylistTapped(let playlistID):
+        guard !state.isPlaylistMutationInFlight,
+              case .loaded(let library) = state.status,
+              let playlist = library.playlist(id: playlistID),
+              !playlist.entries.isEmpty else { return .none }
+        state.addToPlaylist = .init(source: .playlist(playlistId: playlistID.rawValue))
+        state.playlistMutationFailure = nil
+        return .none
+
       case .addTrackToPlaylistTapped(let trackID, let albumID):
         guard !state.isPlaylistMutationInFlight,
               case .loaded(let library) = state.status,
@@ -245,6 +267,8 @@ struct LibraryFeature: Sendable {
               case .loaded(let library) = state.status,
               library.playlist(id: playlistID) != nil,
               let source = state.addToPlaylist?.source else { return .none }
+        if case .playlist(let sourcePlaylistID) = source,
+           sourcePlaylistID == playlistID.rawValue { return .none }
         state.addToPlaylist?.destinationPlaylistID = playlistID
         state.isPlaylistMutationInFlight = true
         state.playlistMutationFailure = nil
@@ -393,6 +417,20 @@ struct LibraryFeature: Sendable {
         state.presentPlaylistDetail(playlistID: playlistID)
         return .none
 
+      case .artistAddToQueueTapped(let artistID):
+        guard let items = self.artistDiscographyPlaybackItems(
+          for: artistID,
+          in: state.status,
+        ) else { return .none }
+        return .send(.delegate(.addToQueue(items: items)))
+
+      case .artistPlayNextTapped(let artistID):
+        guard let items = self.artistDiscographyPlaybackItems(
+          for: artistID,
+          in: state.status,
+        ) else { return .none }
+        return .send(.delegate(.playNext(items: items)))
+
       case .artistTapped(let artistID):
         guard case .loaded(let library) = state.status,
               library.artist(id: artistID) != nil
@@ -430,6 +468,11 @@ struct LibraryFeature: Sendable {
           start: .selectedEntry(index: startIndex),
           context: context,
         )))
+
+      case .path(.element(id: let id, action: .artist(.addToPlaylistTapped))):
+        guard let artistID = state.path[id: id, case: \.artist]?.artistID
+        else { return .none }
+        return .send(.addArtistToPlaylistTapped(artistID))
 
       case .path(.element(id: let id, action: .artist(.addToQueueTapped))):
         guard let artistID = state.path[id: id, case: \.artist]?.artistID,
@@ -502,6 +545,9 @@ struct LibraryFeature: Sendable {
       case .path(.element(id: let id, action: .playlist(.delegate(let delegateAction)))):
         guard let detail = state.path[id: id, case: \.playlist] else { return .none }
         switch delegateAction {
+        case .addToPlaylist:
+          return .send(.addPlaylistToPlaylistTapped(detail.playlist.id))
+
         case .addEntryToPlaylist(let entryID):
           guard let track = detail.playlist.entries.first(where: {
             $0.id == entryID
@@ -1239,7 +1285,11 @@ private extension MusicPlaylistDuplicateConfirmation {
     switch (self, resolution) {
     case (.track, .addAgain),
          (.album, .addAll),
-         (.album, .addOnlyNew):
+         (.album, .addOnlyNew),
+         (.artist, .addAll),
+         (.artist, .addOnlyNew),
+         (.playlist, .addAll),
+         (.playlist, .addOnlyNew):
       true
     default:
       false

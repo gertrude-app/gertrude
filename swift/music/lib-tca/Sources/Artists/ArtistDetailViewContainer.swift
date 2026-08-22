@@ -29,6 +29,7 @@ struct ArtistDetailViewContainer: View {
         isPlaying: isDiscographyContext && self.isPlaybackPlaying,
         isLoading: isDiscographyContext && self.isPlaybackLoading,
         isCurrentTrackPlaying: isCurrentArtist && self.isPlaybackPlaying,
+        onAddToPlaylist: { self.store.send(.addToPlaylistTapped) },
         onAddToQueue: { self.store.send(.addToQueueTapped) },
         onPlayNext: { self.store.send(.playNextTapped) },
         onPlayTap: { self.store.send(.playButtonTapped) },

@@ -21,8 +21,12 @@ public struct LibraryView: View {
   private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
   private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
+  private let onArtistAddToPlaylist: @MainActor @Sendable (String) -> Void
+  private let onArtistAddToQueue: @MainActor @Sendable (String) -> Void
+  private let onArtistPlayNext: @MainActor @Sendable (String) -> Void
   private let onArtistTap: @MainActor @Sendable (String) -> Void
   private let onCreatePlaylist: @MainActor @Sendable (String) -> Void
+  private let onPlaylistAddToPlaylist: @MainActor @Sendable (String) -> Void
   private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
   private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
   private let onPlaylistTap: @MainActor @Sendable (String) -> Void
@@ -43,8 +47,12 @@ public struct LibraryView: View {
     onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onCreatePlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -61,8 +69,12 @@ public struct LibraryView: View {
     self.onAlbumAddToQueue = onAlbumAddToQueue
     self.onAlbumPlayNext = onAlbumPlayNext
     self.onAlbumTap = onAlbumTap
+    self.onArtistAddToPlaylist = onArtistAddToPlaylist
+    self.onArtistAddToQueue = onArtistAddToQueue
+    self.onArtistPlayNext = onArtistPlayNext
     self.onArtistTap = onArtistTap
     self.onCreatePlaylist = onCreatePlaylist
+    self.onPlaylistAddToPlaylist = onPlaylistAddToPlaylist
     self.onPlaylistAddToQueue = onPlaylistAddToQueue
     self.onPlaylistPlayNext = onPlaylistPlayNext
     self.onPlaylistTap = onPlaylistTap
@@ -192,7 +204,11 @@ public struct LibraryView: View {
         onAlbumAddToQueue: self.onAlbumAddToQueue,
         onAlbumPlayNext: self.onAlbumPlayNext,
         onAlbumTap: self.onAlbumTap,
+        onArtistAddToPlaylist: self.onArtistAddToPlaylist,
+        onArtistAddToQueue: self.onArtistAddToQueue,
+        onArtistPlayNext: self.onArtistPlayNext,
         onArtistTap: self.onArtistTap,
+        onPlaylistAddToPlaylist: self.onPlaylistAddToPlaylist,
         onPlaylistAddToQueue: self.onPlaylistAddToQueue,
         onPlaylistPlayNext: self.onPlaylistPlayNext,
         onPlaylistTap: self.onPlaylistTap,

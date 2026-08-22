@@ -4,6 +4,8 @@ import PairQL
 public enum MusicPlaylistSourceSelection: PairNestable {
   case track(trackId: String, albumId: String)
   case album(albumId: String)
+  case artist(artistId: String)
+  case playlist(playlistId: UUID)
 }
 
 public enum MusicPlaylistDuplicateResolution: String, PairNestable {
@@ -34,6 +36,8 @@ public struct MusicPlaylistDuplicate: PairNestable {
 public enum MusicPlaylistDuplicateConfirmation: PairNestable {
   case track(playlistId: UUID, duplicate: MusicPlaylistDuplicate)
   case album(playlistId: UUID, albumId: String, duplicates: [MusicPlaylistDuplicate])
+  case artist(playlistId: UUID, artistId: String, duplicates: [MusicPlaylistDuplicate])
+  case playlist(playlistId: UUID, sourcePlaylistId: UUID, duplicates: [MusicPlaylistDuplicate])
 }
 
 public struct MusicPlaylistBatchDuplicateConfirmation: PairNestable {

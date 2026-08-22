@@ -1,5 +1,11 @@
 import Foundation
+import OSLog
 import SwiftUI
+
+private let artworkImageLogger = Logger(
+  subsystem: "com.netrivet.gertrude.music",
+  category: "ArtworkImage",
+)
 
 #if os(iOS)
   import UIKit
@@ -32,7 +38,13 @@ final class ArtworkImageCache {
 
     let data = await self.data(for: url)
     if let image = self.cachedImage(for: url) { return image }
-    guard let data, let image = PlatformArtworkImage(data: data) else { return nil }
+    guard let data else { return nil }
+    guard let image = PlatformArtworkImage(data: data) else {
+      artworkImageLogger.error(
+        "Artwork decode failed url=\(url.absoluteString, privacy: .public) bytes=\(data.count)",
+      )
+      return nil
+    }
 
     self.cache.setObject(image, forKey: url as NSURL, cost: data.count)
     return image
@@ -45,9 +57,19 @@ final class ArtworkImageCache {
 
     let task = Task.detached(priority: .utility) { () -> Data? in
       do {
-        let (data, _) = try await URLSession.shared.data(from: url)
+        let (data, response) = try await URLSession.shared.data(from: url)
+        if let response = response as? HTTPURLResponse,
+           !(200 ... 299).contains(response.statusCode) {
+          artworkImageLogger.error(
+            "Artwork request failed status=\(response.statusCode) url=\(url.absoluteString, privacy: .public)",
+          )
+          return nil
+        }
         return data
       } catch {
+        artworkImageLogger.error(
+          "Artwork request failed error=\(String(describing: error), privacy: .public) url=\(url.absoluteString, privacy: .public)",
+        )
         return nil
       }
     }

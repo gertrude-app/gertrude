@@ -27,6 +27,7 @@ struct PlaylistDetailFeature {
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
+      case addToPlaylist
       case addEntryToPlaylist(MusicPlaylistEntry.ID)
       case addMusic
       case addToQueue(items: [PlaybackItem])
@@ -42,6 +43,7 @@ struct PlaylistDetailFeature {
     }
 
     case addMusicTapped
+    case addToPlaylistTapped
     case addToQueueTapped
     case delegate(DelegateAction)
     case deleteTapped
@@ -63,6 +65,10 @@ struct PlaylistDetailFeature {
       switch action {
       case .addMusicTapped:
         return .send(.delegate(.addMusic))
+
+      case .addToPlaylistTapped:
+        guard !state.playlist.entries.isEmpty else { return .none }
+        return .send(.delegate(.addToPlaylist))
 
       case .addToQueueTapped:
         guard !state.playbackItems.isEmpty else { return .none }

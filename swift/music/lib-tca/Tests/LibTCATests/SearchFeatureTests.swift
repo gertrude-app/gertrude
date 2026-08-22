@@ -81,6 +81,8 @@ struct SearchFeatureTests {
       $0.query = "vasen"
       $0.results = $0.librarySearch.results(query: "vasen")
     }
+    await store.send(.resultAddToPlaylistTapped(.artist(artist.id)))
+    await store.receive(.delegate(.library(.addArtistToPlaylistTapped(artist.id))))
     await store.send(.resultTapped(.artist(artist.id))) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
@@ -127,6 +129,9 @@ struct SearchFeatureTests {
     let store = TestStore(initialState: state) {
       SearchFeature()
     }
+
+    await store.send(.path(.element(id: pathID, action: .artist(.addToPlaylistTapped))))
+    await store.receive(.delegate(.library(.addArtistToPlaylistTapped(artist.id))))
 
     await store.send(.path(.element(id: pathID, action: .artist(.playButtonTapped))))
     await store.receive(.delegate(.playback(.artistPlaybackButtonTapped(
@@ -203,6 +208,8 @@ struct SearchFeatureTests {
       SearchFeature()
     }
 
+    await store.send(.resultAddToPlaylistTapped(.playlist(playlist.id)))
+    await store.receive(.delegate(.library(.addPlaylistToPlaylistTapped(playlist.id))))
     await store.send(.resultAddToQueueTapped(.playlist(playlist.id)))
     await store.receive(.delegate(.playback(.addToQueue(items: expectedItems))))
 
@@ -228,6 +235,12 @@ struct SearchFeatureTests {
     let store = TestStore(initialState: state) {
       SearchFeature()
     }
+
+    await store.send(.path(.element(
+      id: pathID,
+      action: .playlist(.delegate(.addToPlaylist)),
+    )))
+    await store.receive(.delegate(.library(.addPlaylistToPlaylistTapped(playlist.id))))
 
     await store.send(.path(.element(
       id: pathID,

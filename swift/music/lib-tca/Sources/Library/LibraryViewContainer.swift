@@ -30,8 +30,15 @@ struct LibraryViewContainer: View {
         onAlbumAddToQueue: { self.store.send(.albumAddToQueueTapped(.init($0))) },
         onAlbumPlayNext: { self.store.send(.albumPlayNextTapped(.init($0))) },
         onAlbumTap: { self.store.send(.albumTapped(.init($0))) },
+        onArtistAddToPlaylist: { self.store.send(.addArtistToPlaylistTapped(.init($0))) },
+        onArtistAddToQueue: { self.store.send(.artistAddToQueueTapped(.init($0))) },
+        onArtistPlayNext: { self.store.send(.artistPlayNextTapped(.init($0))) },
         onArtistTap: { self.store.send(.artistTapped(.init($0))) },
         onCreatePlaylist: { self.store.send(.createPlaylistSubmitted($0)) },
+        onPlaylistAddToPlaylist: {
+          guard let id = UUID(uuidString: $0) else { return }
+          self.store.send(.addPlaylistToPlaylistTapped(.init(rawValue: id)))
+        },
         onPlaylistAddToQueue: {
           guard let id = UUID(uuidString: $0) else { return }
           self.store.send(.playlistAddToQueueTapped(.init(rawValue: id)))

@@ -10,7 +10,11 @@ struct LibraryGridView: View {
   private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
   private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
   private let onAlbumTap: @MainActor @Sendable (String) -> Void
+  private let onArtistAddToPlaylist: @MainActor @Sendable (String) -> Void
+  private let onArtistAddToQueue: @MainActor @Sendable (String) -> Void
+  private let onArtistPlayNext: @MainActor @Sendable (String) -> Void
   private let onArtistTap: @MainActor @Sendable (String) -> Void
+  private let onPlaylistAddToPlaylist: @MainActor @Sendable (String) -> Void
   private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
   private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
   private let onPlaylistTap: @MainActor @Sendable (String) -> Void
@@ -27,7 +31,11 @@ struct LibraryGridView: View {
     onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onArtistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlaylistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
@@ -41,7 +49,11 @@ struct LibraryGridView: View {
     self.onAlbumAddToQueue = onAlbumAddToQueue
     self.onAlbumPlayNext = onAlbumPlayNext
     self.onAlbumTap = onAlbumTap
+    self.onArtistAddToPlaylist = onArtistAddToPlaylist
+    self.onArtistAddToQueue = onArtistAddToQueue
+    self.onArtistPlayNext = onArtistPlayNext
     self.onArtistTap = onArtistTap
+    self.onPlaylistAddToPlaylist = onPlaylistAddToPlaylist
     self.onPlaylistAddToQueue = onPlaylistAddToQueue
     self.onPlaylistPlayNext = onPlaylistPlayNext
     self.onPlaylistTap = onPlaylistTap
@@ -129,6 +141,11 @@ struct LibraryGridView: View {
               )
             }
             .buttonStyle(.plain)
+            .playbackQueueContextMenu(
+              onPlayNext: { self.onArtistPlayNext(artist.id) },
+              onAddToQueue: { self.onArtistAddToQueue(artist.id) },
+              onAddToPlaylist: { self.onArtistAddToPlaylist(artist.id) },
+            )
             .frame(maxWidth: .infinity, alignment: .leading)
 
           case .playlist(let playlist):
@@ -137,6 +154,7 @@ struct LibraryGridView: View {
               artworkSize: metrics.artworkSize,
               isPlaying: item.id == self.playingItemID,
               transitionNamespace: self.transitionNamespace,
+              onAddToPlaylist: { self.onPlaylistAddToPlaylist(playlist.id) },
               onAddToQueue: { self.onPlaylistAddToQueue(playlist.id) },
               onPlayNext: { self.onPlaylistPlayNext(playlist.id) },
               onTap: { self.onPlaylistTap(playlist.id) },

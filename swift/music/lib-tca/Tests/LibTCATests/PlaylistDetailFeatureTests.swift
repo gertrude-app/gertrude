@@ -92,6 +92,18 @@ struct PlaylistDetailFeatureTests {
   }
 
   @Test
+  func addToPlaylistDelegatesForNonemptyPlaylist() async {
+    let store = TestStore(initialState: PlaylistDetailFeature.State(
+      playlist: self.musicPlaylist(),
+    )) {
+      PlaylistDetailFeature()
+    }
+
+    await store.send(.addToPlaylistTapped)
+    await store.receive(.delegate(.addToPlaylist))
+  }
+
+  @Test
   func playbackFailureActionsDelegateToApp() async {
     let store = TestStore(initialState: PlaylistDetailFeature.State(
       playlist: self.musicPlaylist(),

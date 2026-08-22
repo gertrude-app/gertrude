@@ -9,6 +9,7 @@ public struct PlaylistDetailView: View {
   private let isCurrentTrackPlaying: Bool
   private let isMutating: Bool
   private let onAddMusicTap: @MainActor @Sendable () -> Void
+  private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onDelete: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
@@ -33,6 +34,7 @@ public struct PlaylistDetailView: View {
     isCurrentTrackPlaying: Bool = false,
     isMutating: Bool = false,
     onAddMusicTap: @MainActor @escaping @Sendable () -> Void = {},
+    onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onDelete: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
@@ -52,6 +54,7 @@ public struct PlaylistDetailView: View {
     self.isCurrentTrackPlaying = isCurrentTrackPlaying
     self.isMutating = isMutating
     self.onAddMusicTap = onAddMusicTap
+    self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onDelete = onDelete
     self.onPlayNext = onPlayNext
@@ -162,6 +165,12 @@ public struct PlaylistDetailView: View {
 
             Button(action: self.onAddToQueue) {
               Label("Add to Queue", systemImage: "text.badge.plus")
+            }
+            .tint(.primary)
+            .disabled(self.playlist.entries.isEmpty)
+
+            Button(action: self.onAddToPlaylist) {
+              Label("Add to Playlist", systemImage: "music.note.list")
             }
             .tint(.primary)
             .disabled(self.playlist.entries.isEmpty)

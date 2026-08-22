@@ -70,6 +70,46 @@ func queueSectionsAreConditional() {
 }
 
 @Test
+func queueShowsAllExplicitEntriesAndOnlyTenContextEntries() {
+  let queuedEntries = (1 ... 3).map { queueEntry("queued-\($0)") }
+  let contextEntries = (1 ... 12).map { queueEntry("context-\($0)") }
+  let rows = PlaybackQueueListRow.makeRows(
+    queuedEntries: queuedEntries,
+    contextTitle: "Album",
+    contextEntries: contextEntries,
+  )
+  let visibleRows = PlaybackQueueListRow.visibleRows(rows)
+
+  #expect(visibleRows.map(\.id) == [
+    .entry("queued-1"),
+    .entry("queued-2"),
+    .entry("queued-3"),
+    .contextHeader,
+    .entry("context-1"),
+    .entry("context-2"),
+    .entry("context-3"),
+    .entry("context-4"),
+    .entry("context-5"),
+    .entry("context-6"),
+    .entry("context-7"),
+    .entry("context-8"),
+    .entry("context-9"),
+    .entry("context-10"),
+  ])
+  #expect(PlaybackQueueListRow.order(
+    rows: rows,
+    moving: [visibleRows.count - 1],
+    toOffset: 0,
+  ) == PlaybackQueueOrder(
+    entryIDs: ["context-10"]
+      + queuedEntries.map(\.id)
+      + (1 ... 9).map { "context-\($0)" }
+      + ["context-11", "context-12"],
+    queuedEntryCount: 4,
+  ))
+}
+
+@Test
 func queueReorderingPreservesSectionsWhenItemsStayWithinThem() {
   let rows = PlaybackQueueListRow.makeRows(
     queuedEntries: [queueEntry("queued-1"), queueEntry("queued-2")],

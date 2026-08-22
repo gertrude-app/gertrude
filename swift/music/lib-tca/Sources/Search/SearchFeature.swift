@@ -132,13 +132,15 @@ struct SearchFeature: Sendable {
         case .album(let album):
           guard !album.tracks.isEmpty else { return .none }
           return .send(.delegate(.library(.addAlbumToPlaylistTapped(album.id))))
+        case .artist(let artist):
+          return .send(.delegate(.library(.addArtistToPlaylistTapped(artist.id))))
         case .song(let track, let albumID, _, _):
           return .send(.delegate(.library(.addTrackToPlaylistTapped(
             trackID: track.id,
             albumID: albumID,
           ))))
-        case .artist, .playlist:
-          return .none
+        case .playlist(let playlist):
+          return .send(.delegate(.library(.addPlaylistToPlaylistTapped(playlist.id))))
         }
 
       case .resultAddToQueueTapped(let resultID):
@@ -188,6 +190,11 @@ struct SearchFeature: Sendable {
             albumID: albumID,
           ))))
         }
+
+      case .path(.element(id: let id, action: .artist(.addToPlaylistTapped))):
+        guard let artistID = state.path[id: id, case: \.artist]?.artistID
+        else { return .none }
+        return .send(.delegate(.library(.addArtistToPlaylistTapped(artistID))))
 
       case .path(.element(id: let id, action: .artist(.addToQueueTapped))):
         guard let items = self.artistDiscographyPlaybackItems(pathID: id, state: state)
@@ -298,6 +305,11 @@ struct SearchFeature: Sendable {
       case .path(.element(id: let id, action: .playlist(.delegate(let delegateAction)))):
         guard let detail = state.path[id: id, case: \.playlist] else { return .none }
         switch delegateAction {
+        case .addToPlaylist:
+          return .send(.delegate(.library(.addPlaylistToPlaylistTapped(
+            detail.playlist.id,
+          ))))
+
         case .addEntryToPlaylist(let entryID):
           guard let track = detail.playlist.entries.first(where: {
             $0.id == entryID

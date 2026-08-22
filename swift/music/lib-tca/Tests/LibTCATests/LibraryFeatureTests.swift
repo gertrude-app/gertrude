@@ -411,6 +411,82 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func artistCanBeAddedToPlaylistFromCardAndDetail() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      tracks: [ApprovedTrack(id: "song", title: "Song", artistName: "Artist")],
+    )
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      releaseAlbumIds: [album.id],
+    )
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    let source = MusicPlaylistSourceSelection.artist(artistId: artist.id.rawValue)
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.addArtistToPlaylistTapped(artist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+    await store.send(.addToPlaylistCancelled) {
+      $0.addToPlaylist = nil
+    }
+    await store.send(.artistTapped(artist.id)) {
+      $0.path.append(.artist(.init(artistID: artist.id)))
+    }
+    await store.send(.path(.element(id: 0, action: .artist(.addToPlaylistTapped))))
+    await store.receive(.addArtistToPlaylistTapped(artist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+  }
+
+  @Test
+  func playlistCanBeAddedToAnotherPlaylistFromCardAndDetail() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      tracks: [ApprovedTrack(id: "song", title: "Song", artistName: "Artist")],
+    )
+    let playlist = MusicPlaylist(
+      id: .init(rawValue: UUID(1)),
+      name: "Source",
+      revision: 1,
+      createdAt: Date(timeIntervalSince1970: 1),
+      updatedAt: Date(timeIntervalSince1970: 1),
+      entries: [
+        .init(id: .init(rawValue: UUID(2)), track: album.tracks[0]),
+      ],
+    )
+    let library = ApprovedMusicLibrary(albums: [album], playlists: [playlist])
+    let source = MusicPlaylistSourceSelection.playlist(playlistId: playlist.id.rawValue)
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.addPlaylistToPlaylistTapped(playlist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+    await store.send(.addToPlaylistCancelled) {
+      $0.addToPlaylist = nil
+    }
+    await store.send(.playlistTapped(playlist.id)) {
+      $0.path.append(.playlist(.init(playlist: playlist)))
+    }
+    await store.send(.path(.element(
+      id: 0,
+      action: .playlist(.delegate(.addToPlaylist)),
+    )))
+    await store.receive(.addPlaylistToPlaylistTapped(playlist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+  }
+
+  @Test
   func artistTopSongTapQueuesAllTopSongsFromTappedSong() async {
     let topSongs = [
       ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
@@ -473,6 +549,10 @@ struct LibraryFeatureTests {
       LibraryFeature()
     }
 
+    await store.send(.artistPlayNextTapped(artist.id))
+    await store.receive(.delegate(.playNext(items: discographyItems)))
+    await store.send(.artistAddToQueueTapped(artist.id))
+    await store.receive(.delegate(.addToQueue(items: discographyItems)))
     await store.send(.artistTapped(artist.id)) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }

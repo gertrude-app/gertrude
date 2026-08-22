@@ -87,4 +87,30 @@ extension ApprovedMusicLibrary {
       }
       .first
   }
+
+  func playbackArtworkURL(
+    for item: PlaybackItem,
+    sourceAlbumID: ApprovedAlbum.ID?,
+  ) -> URL? {
+    if item.artworkURL?.isWebArtworkURL == true {
+      return item.artworkURL
+    }
+    let album = sourceAlbumID.flatMap(self.album(id:))
+      ?? self.album(matching: item)
+      ?? self.albums.first(where: { album in
+        album.tracks.contains(where: { $0.id == item.id })
+      })
+    let track = album?.tracks.first(where: { $0.id == item.id })
+    if track?.artworkURL?.isWebArtworkURL == true {
+      return track?.artworkURL
+    }
+    return album?.artworkURL?.isWebArtworkURL == true ? album?.artworkURL : nil
+  }
+}
+
+private extension URL {
+  var isWebArtworkURL: Bool {
+    guard let scheme = self.scheme?.lowercased() else { return false }
+    return scheme == "http" || scheme == "https"
+  }
 }

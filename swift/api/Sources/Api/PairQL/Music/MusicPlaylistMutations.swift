@@ -22,23 +22,35 @@ private func playlistRuleError(
   in ctx: MusicApp.InstallContext,
 ) -> PqlError {
   switch error {
+  case .invalidDuplicateResolution(let resolution):
+    ctx.error(
+      "f8e8fa4c",
+      .badRequest,
+      "Duplicate resolution `\(resolution.rawValue)` does not match the playlist source",
+    )
   case .unauthorizedAlbum(let albumId):
     ctx.error(
       "36642b7a",
       .unauthorized,
       "Music album `\(albumId.rawValue)` is not approved for this child",
     )
+  case .unauthorizedArtist(let artistId):
+    ctx.error(
+      "36642b7a",
+      .unauthorized,
+      "Music artist `\(artistId.rawValue)` is not approved for this child",
+    )
+  case .unauthorizedPlaylist(let playlistId):
+    ctx.error(
+      "36642b7a",
+      .unauthorized,
+      "Music playlist `\(playlistId)` is not available for this child",
+    )
   case .unauthorizedTrack(let trackId, let albumId):
     ctx.error(
       "165a701e",
       .unauthorized,
       "Music track `\(trackId.rawValue)` is not approved from album `\(albumId.rawValue)`",
-    )
-  case .invalidDuplicateResolution(let resolution):
-    ctx.error(
-      "f8e8fa4c",
-      .badRequest,
-      "Duplicate resolution `\(resolution.rawValue)` does not match the playlist source",
     )
   }
 }
@@ -63,7 +75,15 @@ private func playlistIndex(
     for: childId,
     in: db,
   )
-  return .init(albums: content.albums)
+  let playlists = try await Music.PlaylistRepository.rulesPlaylists(
+    for: childId,
+    in: db,
+  )
+  return .init(
+    albums: content.albums,
+    artists: content.artists,
+    playlists: playlists,
+  )
 }
 
 private func additions(

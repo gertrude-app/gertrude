@@ -2388,6 +2388,47 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func playbackSnapshotReplacesTransientArtworkWithApprovedWebArtwork() async {
+    let webURL = URL(string: "https://example.com/album.jpg")!
+    let transientURL = URL(string: "musicKit://artwork/transient/600x600?id=artwork")!
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      artworkURL: webURL,
+      tracks: [ApprovedTrack(id: "track", title: "Track", artistName: "Artist")],
+    )
+    let library = ApprovedMusicLibrary(albums: [album])
+    let transientItem = PlaybackItem(
+      id: album.tracks[0].id,
+      title: album.tracks[0].title,
+      artistName: album.tracks[0].artistName,
+      artworkURL: transientURL,
+    )
+    let snapshot = playbackSnapshot(items: [transientItem])
+    let restoredSnapshot = playbackSnapshot(items: [
+      transientItem.withArtworkURL(webURL),
+    ])
+    let sourceAlbumIDs = [album.tracks[0].id: album.id]
+    let store = TestStore(initialState: PlaybackFeature.State(
+      approvedLibrary: library,
+      approvedTrackIDs: library.approvedTrackIDs,
+      sourceAlbumIDs: sourceAlbumIDs,
+    )) {
+      PlaybackFeature()
+    }
+
+    await store.send(.playbackEvent(.snapshotChanged(snapshot))) {
+      $0.hasAuthoritativeSnapshot = true
+      $0.lastCachedProgressBucket = 0
+      $0.session = PlaybackFeature.Session(
+        snapshot: restoredSnapshot,
+        sourceAlbumIDs: sourceAlbumIDs,
+      )
+    }
+  }
+
+  @Test
   func progressOnlySnapshotsHaveTheSameSession() {
     let items = [playbackItem("track-1")]
     let initial = playbackSnapshot(items: items)

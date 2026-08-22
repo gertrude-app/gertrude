@@ -372,6 +372,7 @@ struct PlaybackFeature: Sendable {
 
       case .approvedLibraryUpdated(let approvedLibrary):
         state.approvedLibrary = approvedLibrary
+        state.restoreWebArtwork(using: approvedLibrary)
         return self.updateApprovedTrackIDs(
           approvedLibrary.approvedTrackIDs,
           state: &state,
@@ -1476,6 +1477,30 @@ struct PlaybackFeature: Sendable {
     )
   }
 
+  private static func restoringWebArtwork(
+    in snapshot: PlaybackSnapshot,
+    library: ApprovedMusicLibrary?,
+    sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID],
+  ) -> PlaybackSnapshot {
+    guard let library else { return snapshot }
+    return PlaybackSnapshot(
+      entries: snapshot.entries.map { entry in
+        PlaybackQueueEntry(
+          id: entry.id,
+          item: entry.item.withArtworkURL(library.playbackArtworkURL(
+            for: entry.item,
+            sourceAlbumID: sourceAlbumIDs[entry.item.id] ?? entry.item.albumID,
+          )),
+          sourceEntryID: entry.sourceEntryID,
+          viewID: entry.viewID,
+        )
+      },
+      currentEntryID: snapshot.currentEntryID,
+      playStatus: snapshot.playStatus,
+      progress: snapshot.progress,
+    )
+  }
+
   private func applySnapshot(
     _ receivedSnapshot: PlaybackSnapshot,
     state: inout State,
@@ -1490,9 +1515,14 @@ struct PlaybackFeature: Sendable {
       in: entryMetadataSnapshot,
       from: state.temporarilyMissingUpcomingEntries,
     )
-    let snapshot = Self.preservingPlannedArtwork(
+    let plannedArtworkSnapshot = Self.preservingPlannedArtwork(
       in: missingMetadataRestoration.snapshot,
       plan: metadataPlan,
+    )
+    let snapshot = Self.restoringWebArtwork(
+      in: plannedArtworkSnapshot,
+      library: state.approvedLibrary,
+      sourceAlbumIDs: state.sourceAlbumIDs,
     )
     if let expectedViewIDs = state.pendingQueueReplacementViewIDs {
       guard let receivedQueue = Queue(
@@ -2292,6 +2322,22 @@ extension PlaybackFeature.State {
       self.queueRoleHints[entry.id] = entry.item.queueRole
       self.sourceEntryIDHints[entry.id] = entry.sourceEntryID
     }
+  }
+
+  mutating func restoreWebArtwork(using library: ApprovedMusicLibrary) {
+    guard var session = self.session else { return }
+    session.queue.entries = session.queue.entries.map { entry in
+      PlaybackQueueEntry(
+        id: entry.id,
+        item: entry.item.withArtworkURL(library.playbackArtworkURL(
+          for: entry.item,
+          sourceAlbumID: self.sourceAlbumIDs[entry.item.id] ?? entry.item.albumID,
+        )),
+        sourceEntryID: entry.sourceEntryID,
+        viewID: entry.viewID,
+      )
+    }
+    self.session = session
   }
 
   mutating func prepareMetadataPlan(checkpoint: PlaybackCheckpoint) {

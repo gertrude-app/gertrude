@@ -93,7 +93,15 @@ private struct LibraryPresentationModifier: ViewModifier {
 
   private var playlists: [PlaylistData] {
     guard case .loaded(let library) = self.store.status else { return [] }
-    return library.playlists.map(PlaylistData.init)
+    let sourcePlaylistID: UUID? = if case .playlist(let playlistID) =
+      self.store.addToPlaylist?.source {
+      playlistID
+    } else {
+      nil
+    }
+    return library.playlists
+      .filter { $0.id.rawValue != sourcePlaylistID }
+      .map(PlaylistData.init)
   }
 
   private var duplicatePrompt: PlaylistDuplicatePrompt? {
@@ -103,7 +111,9 @@ private struct LibraryPresentationModifier: ViewModifier {
     case .track(let playlistID, let duplicate):
       guard let playlist = library.playlist(id: .init(rawValue: playlistID)) else { return nil }
       return .track(trackTitle: duplicate.title, playlistName: playlist.name)
-    case .album(let playlistID, _, let duplicates):
+    case .album(let playlistID, _, let duplicates),
+         .artist(let playlistID, _, let duplicates),
+         .playlist(let playlistID, _, let duplicates):
       guard let playlist = library.playlist(id: .init(rawValue: playlistID)) else { return nil }
       return .album(playlistName: playlist.name, duplicateCount: duplicates.count)
     }

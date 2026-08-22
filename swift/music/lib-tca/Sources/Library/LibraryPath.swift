@@ -51,6 +51,7 @@ struct ArtistDetailFeature {
   }
 
   enum Action: Equatable {
+    case addToPlaylistTapped
     case addToQueueTapped
     case playButtonTapped
     case playNextTapped

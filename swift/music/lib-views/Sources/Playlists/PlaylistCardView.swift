@@ -5,6 +5,7 @@ public struct PlaylistCardView: View {
   private let artworkSize: CGFloat
   private let isPlaying: Bool
   private let transitionNamespace: Namespace.ID?
+  private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
   private let onTap: @MainActor @Sendable () -> Void
@@ -14,6 +15,7 @@ public struct PlaylistCardView: View {
     artworkSize: CGFloat = 148,
     isPlaying: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
+    onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
     onTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -22,6 +24,7 @@ public struct PlaylistCardView: View {
     self.artworkSize = artworkSize
     self.isPlaying = isPlaying
     self.transitionNamespace = transitionNamespace
+    self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
     self.onTap = onTap
@@ -55,6 +58,7 @@ public struct PlaylistCardView: View {
     .playbackQueueContextMenu(
       onPlayNext: self.playlist.entries.isEmpty ? nil : self.onPlayNext,
       onAddToQueue: self.playlist.entries.isEmpty ? nil : self.onAddToQueue,
+      onAddToPlaylist: self.playlist.entries.isEmpty ? nil : self.onAddToPlaylist,
     )
     .accessibilityLabel(
       "\(self.isPlaying ? "Playing, " : "")\(self.playlist.name), \(self.trackCountText)",
