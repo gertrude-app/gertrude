@@ -92,6 +92,13 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
         in: self.accountContext(parent),
       )
     }.toContain("notFound")
+
+    try await expectErrorFrom {
+      try await DeleteAccountKey.resolve(
+        with: .init(keychainId: keychain.id, keyId: otherKey.id),
+        in: self.accountContext(parent),
+      )
+    }.toContain("notFound")
   }
 
   func testRejectsKeychainOwnedByAnotherAccount() async throws {
@@ -100,6 +107,10 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
     let keychain = try await self.db.create(Keychain(
       parentId: otherParent.id,
       name: "Other Account",
+    ))
+    let key = try await self.db.create(Key(
+      keychainId: keychain.id,
+      key: .mock,
     ))
 
     try await expectErrorFrom {
@@ -111,6 +122,13 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
           comment: nil,
           expiration: nil,
         ),
+        in: self.accountContext(parent),
+      )
+    }.toContain("notFound")
+
+    try await expectErrorFrom {
+      try await DeleteAccountKey.resolve(
+        with: .init(keychainId: keychain.id, keyId: key.id),
         in: self.accountContext(parent),
       )
     }.toContain("notFound")
@@ -127,6 +145,10 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
       parentId: parent.id,
       name: "Private",
     ))
+    let publicKey = try await self.db.create(Key(
+      keychainId: publicKeychain.id,
+      key: .mock,
+    ))
     let context = self.accountContext(parent)
 
     try await expectErrorFrom {
@@ -138,6 +160,13 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
           comment: nil,
           expiration: nil,
         ),
+        in: context,
+      )
+    }.toContain("Public keychains")
+
+    try await expectErrorFrom {
+      try await DeleteAccountKey.resolve(
+        with: .init(keychainId: publicKeychain.id, keyId: publicKey.id),
         in: context,
       )
     }.toContain("Public keychains")

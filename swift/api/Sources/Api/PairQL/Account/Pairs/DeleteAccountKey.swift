@@ -28,14 +28,14 @@ extension DeleteAccountKey: Resolver {
         showContactSupport: false,
       )
     }
-    let key = try await Key.query()
+    _ = try await Key.query()
       .where(.id == input.keyId)
       .where(.keychainId == keychain.id)
       .first(in: context.db)
 
-    try await context.db.delete(key, force: true)
-    try await with(dependency: \.websockets)
-      .send(.userUpdated, to: .usersWith(keychain: keychain.id))
-    return .success
+    return try await DeleteEntity_v2.resolve(
+      with: .init(id: input.keyId.rawValue, type: .key),
+      in: context.legacyContext,
+    )
   }
 }
