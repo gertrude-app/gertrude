@@ -10,11 +10,10 @@ import {
 } from '@gertrude/ui';
 import { CircleAlertIcon, PlusIcon, RefreshCwIcon, UsersIcon } from 'lucide-react';
 import React from 'react';
+import type { KeyEditorSaveData } from '#/components/keychains/keyEditor';
 import type { KeychainDetail, KeychainKey, LoadableState } from '#/components/types';
-import CreateKeySlideOver, {
-  EditKeySlideOver,
-  type KeyEditorSaveData,
-} from '#/components/keychains/KeyEditorSlideOver';
+import CreateKeySlideOver from '#/components/keychains/CreateKeySlideOver';
+import EditKeySlideOver from '#/components/keychains/EditKeySlideOver';
 import KeyList from '#/components/keychains/KeyList';
 import CardContainer from '#/components/layout/CardContainer';
 import DashboardPage from '#/components/layout/DashboardPage';

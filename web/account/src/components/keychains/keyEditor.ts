@@ -21,6 +21,19 @@ export type KeyEditorState = {
   comment: string;
 };
 
+export type KeyEditorApp = {
+  name: string;
+  slug: string;
+  bundleId?: string;
+  appIconUrl?: string;
+};
+
+export type KeyEditorSaveData = {
+  key: SharedKey;
+  comment?: string;
+  expiration?: Date;
+};
+
 export type DomainDetails = {
   hostname: string;
   registrableDomain: string;
@@ -40,6 +53,38 @@ export const newKeyEditorState = (): KeyEditorState => ({
   appSlug: ``,
   appBundleId: ``,
   comment: ``,
+});
+
+export const changeKeyEditorTargetType = (
+  state: KeyEditorState,
+  targetType: KeyTargetType,
+): KeyEditorState => ({
+  ...state,
+  targetType,
+  address: targetType === state.targetType ? state.address : ``,
+  domainMatch: `standard`,
+  matchingOverridden: false,
+});
+
+export const changeKeyEditorAddress = (
+  state: KeyEditorState,
+  address: string,
+): KeyEditorState => ({
+  ...state,
+  address,
+  domainMatch:
+    state.targetType === `website` && !state.matchingOverridden
+      ? inferredDomainMatch(address)
+      : state.domainMatch,
+});
+
+export const changeKeyEditorDomainMatch = (
+  state: KeyEditorState,
+  domainMatch: DomainMatchType,
+): KeyEditorState => ({
+  ...state,
+  domainMatch,
+  matchingOverridden: true,
 });
 
 export const keyToEditorState = (record: KeychainKey): KeyEditorState | null => {

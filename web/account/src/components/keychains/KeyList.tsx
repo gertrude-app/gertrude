@@ -341,7 +341,7 @@ const KeyList: React.FC<Props> = ({ keys, onEdit }) => {
           </Text>
         </VStack>
         {keys.length >= 8 && (
-          <HStack gap={2} align="center" className="min-w-0 flex-grow @2xl/main:w-auto">
+          <HStack gap={2} align="center" className="min-w-0 w-full @2xl/main:w-auto">
             <Text
               as="label"
               htmlFor={searchInputId}

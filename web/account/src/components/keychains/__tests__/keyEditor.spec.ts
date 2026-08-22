@@ -2,6 +2,9 @@ import { describe, expect, test } from 'vitest';
 import type { KeyEditorState } from '../keyEditor';
 import {
   broadAccessWarning,
+  changeKeyEditorAddress,
+  changeKeyEditorDomainMatch,
+  changeKeyEditorTargetType,
   domainDetails,
   domainRegexError,
   inferredDomainMatch,
@@ -31,6 +34,37 @@ describe(`key editor`, () => {
       hostname: `kids.nationalgeographic.com`,
       registrableDomain: `nationalgeographic.com`,
       hasSubdomain: true,
+    });
+  });
+
+  test(`resets address and matching when the target type changes`, () => {
+    expect(
+      changeKeyEditorTargetType(
+        state({
+          address: `school.example.com`,
+          domainMatch: `strict`,
+          matchingOverridden: true,
+        }),
+        `ipAddress`,
+      ),
+    ).toMatchObject({
+      targetType: `ipAddress`,
+      address: ``,
+      domainMatch: `standard`,
+      matchingOverridden: false,
+    });
+  });
+
+  test(`infers matching until it is manually overridden`, () => {
+    const inferred = changeKeyEditorAddress(state(), `school.example.com`);
+    expect(inferred.domainMatch).toBe(`strict`);
+
+    const overridden = changeKeyEditorDomainMatch(inferred, `standard`);
+    expect(
+      changeKeyEditorAddress(overridden, `another.school.example.com`),
+    ).toMatchObject({
+      domainMatch: `standard`,
+      matchingOverridden: true,
     });
   });
 

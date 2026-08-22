@@ -1,6 +1,7 @@
 import { StoryCanvas, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import type { KeychainKey } from '#/components/types';
-import CreateKeySlideOver, { EditKeySlideOver } from './KeyEditorSlideOver';
+import CreateKeySlideOver from './CreateKeySlideOver';
+import EditKeySlideOver from './EditKeySlideOver';
 
 const apps = [
   { name: `Brave Browser`, slug: `brave`, bundleId: `com.brave.Browser` },
