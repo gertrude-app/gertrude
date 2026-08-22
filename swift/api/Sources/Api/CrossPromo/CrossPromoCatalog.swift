@@ -4,6 +4,7 @@ import GertieApp
 enum CrossPromoCatalog {
   enum App: Hashable, Sendable {
     case gertrudeAm
+    case gertrudeMusic
     case iosBlocker
   }
 
@@ -20,6 +21,7 @@ enum CrossPromoCatalog {
       Self.gertrudeMusicAmOnboardingParent,
       Self.gertrudeMusicAmChildHome,
     ],
+    .gertrudeMusic: [],
     .iosBlocker: [
       Self.gertrudeMusicBlockerOnboarding,
       Self.gertrudeMusicBlockerHome,

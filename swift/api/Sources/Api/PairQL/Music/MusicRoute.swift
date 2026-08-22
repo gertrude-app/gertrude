@@ -38,6 +38,9 @@ extension MusicRoute: RouteResponder {
 
     case .unauthed(let unauthed):
       switch unauthed {
+      case .crossPromos(let input):
+        let output = try await CrossPromos.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .getMusicAppStatus(let input):
         let output = try await GetMusicAppStatus.resolve(with: input, in: context)
         return try await self.respond(with: output)

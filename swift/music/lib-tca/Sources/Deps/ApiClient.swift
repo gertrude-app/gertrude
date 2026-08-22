@@ -17,6 +17,7 @@ struct ApiClient: Sendable {
   var createMusicPlaylist:
     @Sendable (_ token: UUID, _ input: CreateMusicPlaylist.Input) async throws
     -> CreateMusicPlaylist.Output
+  var crossPromos: @Sendable () async throws -> CrossPromos.Output = { .init(promos: []) }
   var deleteMusicPlaylist:
     @Sendable (_ token: UUID, _ input: DeleteMusicPlaylist.Input) async throws
     -> DeleteMusicPlaylist.Output
@@ -57,6 +58,22 @@ extension ApiClient: DependencyKey {
           CreateMusicPlaylist.self,
           authed: .createMusicPlaylist(input),
           token: token,
+        )
+      },
+      crossPromos: {
+        @Dependency(\.device) var device
+        @Dependency(\.locale) var locale
+        let (deviceId, iosVersion, modelIdentifier, appVersion) = await device.data()
+        guard let deviceId else { return .init(promos: []) }
+        return try await pairql.call(
+          CrossPromos.self,
+          unauthed: .crossPromos(.init(
+            deviceId: deviceId,
+            appVersion: appVersion,
+            modelIdentifier: modelIdentifier,
+            iosVersion: iosVersion,
+            locale: locale.identifier,
+          )),
         )
       },
       deleteMusicPlaylist: { token, input in

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieApp
 import GertieTcaFeatures
 import LibViews
 import SwiftUI
@@ -51,7 +52,7 @@ struct AppView: View {
       case .background, .inactive:
         self.store.send(.playback(.saveCachedSession))
       case .active:
-        break
+        self.store.send(.appEnteredForeground)
       @unknown default:
         break
       }
@@ -64,6 +65,17 @@ struct AppView: View {
       store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.setup.isReady,
     )
+    #if os(iOS)
+    .task {
+      await self.store.send(.appDidLaunch).finish()
+    }
+    .sheet(item: self.crossPromoStore(style: .sheet)) { store in
+      CrossPromoView(store: store)
+    }
+    .fullScreenCover(item: self.crossPromoStore(style: .screen)) { store in
+      CrossPromoView(store: store)
+    }
+    #endif
   }
 
   private var libraryView: some View {
@@ -510,6 +522,16 @@ struct AppView: View {
       self.store.search.albumDetail != nil
         || self.store.search.playlistDetail != nil
     }
+  }
+
+  private func crossPromoStore(
+    style: CrossPromoStyle,
+  ) -> Binding<StoreOf<CrossPromoFeature>?> {
+    let base = self.$store.scope(state: \.crossPromo, action: \.crossPromo)
+    return Binding(
+      get: { base.wrappedValue.flatMap { $0.campaign.style == style ? $0 : nil } },
+      set: { base.wrappedValue = $0 },
+    )
   }
 
   private var nowPlayingPresented: Binding<Bool> {

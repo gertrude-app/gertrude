@@ -1,6 +1,8 @@
 import ComposableArchitecture
+import Foundation
 import GertieApp
 import GertieTcaFeatures
+import MusicRoute
 
 @Reducer
 struct AppFeature: Sendable {
@@ -12,6 +14,8 @@ struct AppFeature: Sendable {
 
   @ObservableState
   struct State: Equatable {
+    @Presents var crossPromo: CrossPromoFeature.State?
+    var crossPromos = CrossPromos.Output(promos: [])
     var killSwitch = KillSwitchFeature.State()
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
@@ -23,6 +27,10 @@ struct AppFeature: Sendable {
   }
 
   enum Action: Equatable {
+    case appDidLaunch
+    case appEnteredForeground
+    case crossPromo(PresentationAction<CrossPromoFeature.Action>)
+    case crossPromosReceived(CrossPromos.Output)
     case killSwitch(KillSwitchFeature.Action)
     case library(LibraryFeature.Action)
     case nowPlayingAddToPlaylistTapped
@@ -40,7 +48,38 @@ struct AppFeature: Sendable {
     case albumResolution
   }
 
+  enum CrossPromoTrigger: Equatable {
+    case home
+    case postOnboarding
+
+    var placement: String {
+      switch self {
+      case .home: "musicHome"
+      case .postOnboarding: "musicOnboarding"
+      }
+    }
+  }
+
+  enum CrossPromoEvent: String {
+    case cta
+    case dismiss
+    case impression
+
+    var id: String {
+      switch self {
+      case .cta: "4a82fd13"
+      case .dismiss: "0d39be76"
+      case .impression: "71e4c6a9"
+      }
+    }
+  }
+
+  static let crossPromoThrottle: TimeInterval = 60 * 60 * 72
+
+  @Dependency(\.api) var api
   @Dependency(\.approvedMusicLibraryCache) var approvedMusicLibraryCache
+  @Dependency(\.crossPromoStorage) var crossPromoStorage
+  @Dependency(\.date.now) var now
   @Dependency(\.device) var device
   @Dependency(\.keychain) var keychain
   @Dependency(\.playback) var playback
@@ -75,6 +114,36 @@ struct AppFeature: Sendable {
 
     Reduce { state, action in
       switch action {
+      case .appDidLaunch:
+        return .run { send in
+          guard let crossPromos = try? await self.api.crossPromos(),
+                !crossPromos.promos.isEmpty else { return }
+          await send(.crossPromosReceived(crossPromos))
+        }
+
+      case .appEnteredForeground:
+        return self.presentCrossPromo(&state, for: .home)
+
+      case .crossPromo(.presented(.delegate(.ctaTapped(let slot)))):
+        return self.closeCrossPromo(&state, event: .cta, ctaSlot: slot)
+
+      case .crossPromo(.dismiss), .crossPromo(.presented(.delegate(.dismissed))):
+        return self.closeCrossPromo(&state, event: .dismiss, ctaSlot: nil)
+
+      case .crossPromo:
+        return .none
+
+      case .crossPromosReceived(let crossPromos):
+        let dropped = crossPromos.promos.filter { !$0.hasGuaranteedExit }
+        state.crossPromos = .init(promos: crossPromos.promos.filter(\.hasGuaranteedExit))
+        let trigger: CrossPromoTrigger = state.setup.resumedStoredConnection
+          ? .home
+          : .postOnboarding
+        return .merge(
+          self.logUnpresentableCrossPromos(dropped),
+          self.presentCrossPromo(&state, for: trigger),
+        )
+
       case .nowPlayingAddToPlaylistTapped:
         guard let currentItem = state.playback.session?.currentItem,
               let albumID = currentItem.albumID else { return .none }
@@ -261,9 +330,94 @@ struct AppFeature: Sendable {
         self.synchronizeDetailPlayback(state: &state)
         return .none
 
+      case .setup(.delegate(.completed)):
+        let trigger: CrossPromoTrigger = state.setup.resumedStoredConnection
+          ? .home
+          : .postOnboarding
+        return self.presentCrossPromo(&state, for: trigger)
+
       case .setup:
         return .none
       }
+    }
+    .ifLet(\.$crossPromo, action: \.crossPromo) {
+      CrossPromoFeature()
+    }
+  }
+
+  private func presentCrossPromo(
+    _ state: inout State,
+    for trigger: CrossPromoTrigger,
+  ) -> EffectOf<Self> {
+    guard state.crossPromo == nil,
+          state.setup.isReady,
+          !state.isNowPlayingPresented,
+          state.library.addToPlaylist == nil,
+          state.library.playlistMusicPicker == nil
+    else { return .none }
+    let dismissedCampaignIDs = self.crossPromoStorage.dismissedCampaignIDs()
+    guard let campaign = state.crossPromos.promos.firstEligible(
+      at: trigger.placement,
+      excluding: dismissedCampaignIDs,
+    ) else { return .none }
+    if trigger == .home,
+       let lastShownAt = self.crossPromoStorage.lastShownAt(),
+       self.now.timeIntervalSince(lastShownAt) < Self.crossPromoThrottle {
+      return .none
+    }
+    let now = self.now
+    state.crossPromo = .init(campaign: campaign)
+    return .merge(
+      .run { _ in self.crossPromoStorage.saveLastShownAt(now) },
+      self.logCrossPromoEvent(.impression, campaign),
+    )
+  }
+
+  private func closeCrossPromo(
+    _ state: inout State,
+    event: CrossPromoEvent,
+    ctaSlot: CrossPromoFeature.CtaSlot?,
+  ) -> EffectOf<Self> {
+    guard let campaign = state.crossPromo?.campaign else {
+      state.crossPromo = nil
+      return .none
+    }
+    state.crossPromo = nil
+    let extra = ctaSlot.map { slot in
+      "slot=\(slot.rawValue) action=\(campaign.action(for: slot)?.analyticsLabel ?? "-")"
+    }
+    return .merge(
+      self.logCrossPromoEvent(event, campaign, extra: extra),
+      .run { _ in self.crossPromoStorage.insertDismissedCampaignID(campaign.campaignId) },
+    )
+  }
+
+  private func logUnpresentableCrossPromos(
+    _ campaigns: [CrossPromoCampaign],
+  ) -> EffectOf<Self> {
+    .merge(campaigns.map { campaign in
+      .run { _ in
+        await log(
+          .warn,
+          .setup,
+          "c6f17a24",
+          detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement)",
+        ).value
+      }
+    })
+  }
+
+  private func logCrossPromoEvent(
+    _ event: CrossPromoEvent,
+    _ campaign: CrossPromoCampaign,
+    extra: String? = nil,
+  ) -> EffectOf<Self> {
+    let base = "campaign=\(campaign.campaignId)"
+      + " variant=\(campaign.variant ?? "-")"
+      + " placement=\(campaign.placement)"
+    let detail = extra.map { "\(base) \($0)" } ?? base
+    return .run { _ in
+      await log(.info, .setup, event.id, detail: detail).value
     }
   }
 
@@ -273,6 +427,7 @@ struct AppFeature: Sendable {
     let childID = self.keychain.loadConnection()?.childId
     let playbackPreferences = state.playback.preferences
     self.keychain.deleteConnection()
+    state.crossPromo = nil
     state.isNowPlayingPresented = false
     state.library = .init()
     state.playback = .init(preferences: playbackPreferences)

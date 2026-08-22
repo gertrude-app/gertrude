@@ -20,6 +20,12 @@ extension EventLabel {
     case "9b438d26": "Onboarding device recognized (no claim needed)"
     case "8af8b414": "Onboarding setup completed"
     case "9cfe15f7": "Returning launch"
+    // --- Cross promo ---
+    case "71e4c6a9": "Cross promo impression"
+    case "4a82fd13": "Cross promo cta"
+    case "0d39be76": "Cross promo dismiss"
+    case "c6f17a24": "Cross promo dropped"
+    case "9b5e208d": "⚠ Cross promo image load failed"
     // --- Subscription ---
     case "bfa4b9e6": "Apple Music subscription required"
     case "e1c0d002": "Apple Music subscription status unavailable"
