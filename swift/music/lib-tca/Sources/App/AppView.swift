@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import GertieApp
 import GertieTcaFeatures
+import GertieUI
 import LibViews
 import SwiftUI
 
@@ -47,9 +48,10 @@ struct AppView: View {
           )
       #endif
     }
-    .onChange(of: self.scenePhase) { _, scenePhase in
+    .onChange(of: self.scenePhase, initial: true) { _, scenePhase in
       switch scenePhase {
       case .background, .inactive:
+        self.store.send(.appBecameInactive)
         self.store.send(.playback(.saveCachedSession))
       case .active:
         self.store.send(.appEnteredForeground)
@@ -68,6 +70,21 @@ struct AppView: View {
     #if os(iOS)
     .task {
       await self.store.send(.appDidLaunch).finish()
+    }
+    .sheet(
+      item: self.$store.scope(
+        state: \.reviewPrompt,
+        action: \.reviewPrompt,
+      ),
+    ) { store in
+      GertieActionScreen(
+        message: "Enjoying Gertrude Music? A quick App Store rating helps more families discover safer music listening. We won’t ask again.",
+        actions: [
+          .button("Give a rating") { store.send(.giveRatingButtonTapped) },
+          .button("Leave a review") { store.send(.leaveReviewButtonTapped) },
+          .button("No thanks") { store.send(.noThanksButtonTapped) },
+        ],
+      )
     }
     .sheet(item: self.crossPromoStore(style: .sheet)) { store in
       CrossPromoView(store: store)

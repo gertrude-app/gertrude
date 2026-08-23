@@ -96,7 +96,9 @@ struct CrossPromoTests {
       $0.crossPromoStorage.lastShownAt = { now.addingTimeInterval(-3600) }
       $0.date.now = now
     }
-    await throttledStore.send(.appEnteredForeground)
+    await throttledStore.send(.appEnteredForeground) {
+      $0.isAppActive = true
+    }
 
     let dismissedStore = TestStore(initialState: state) {
       AppFeature()
@@ -104,7 +106,9 @@ struct CrossPromoTests {
       $0.crossPromoStorage.dismissedCampaignIDs = { [campaign.campaignId] }
       $0.date.now = now
     }
-    await dismissedStore.send(.appEnteredForeground)
+    await dismissedStore.send(.appEnteredForeground) {
+      $0.isAppActive = true
+    }
   }
 
   @Test

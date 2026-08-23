@@ -538,7 +538,7 @@ struct PlaybackFeatureTests {
 
     let recordedItems = await recorder.items
     expectNoDifference(recordedItems, restartedItems)
-    expectNoDifference(store.state.session?.queue.entries.map(\.sourceEntryID), cycleEntryIDs)
+    expectNoDifference(store.state.session?.queue.entries.compactMap(\.sourceEntryID), cycleEntryIDs)
   }
 
   @Test
@@ -4182,6 +4182,30 @@ struct PlaybackFeatureTests {
     await store.send(.resume) {
       $0.session?.playStatus = .playing
     }
+    await store.receive(.resumeFinished)
+  }
+
+  @Test
+  func failedResumeDoesNotReportSuccess() async {
+    struct ResumeError: Error {}
+
+    let item = playbackItem("track-1")
+    let store = TestStore(initialState: .init(session: .init(
+      playStatus: .paused,
+      currentItem: item,
+    ))) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.resume = { throw ResumeError() }
+    }
+
+    await store.send(.resume) {
+      $0.session?.playStatus = .playing
+    }
+    await store.receive(.playbackFailed(.init(failure: .playbackFailed))) {
+      $0.failure = .playbackFailed
+      $0.session?.playStatus = .paused
+    }
   }
 
   @Test
@@ -4211,6 +4235,7 @@ struct PlaybackFeatureTests {
     await store.receive(.resume) {
       $0.session?.playStatus = .playing
     }
+    await store.receive(.resumeFinished)
   }
 
   @Test
@@ -4260,6 +4285,7 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.skipToNext)
+    await store.receive(.skipToNextFinished(.advanced))
 
     #expect(await recorder.skipToNextCount == 1)
   }
@@ -4299,6 +4325,7 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.skipToNext)
+    await store.receive(.skipToNextFinished(.queueEnded))
     await store.receive(.playbackEvent(.queueEnded)) {
       $0.failure = nil
       $0.hasAuthoritativeSnapshot = false
@@ -4333,6 +4360,7 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.skipToPrevious)
+    await store.receive(.skipToPreviousFinished)
 
     #expect(await recorder.restartCurrentEntryCount == 1)
   }
@@ -4353,6 +4381,7 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.skipToPrevious)
+    await store.receive(.skipToPreviousFinished)
 
     #expect(await recorder.skipToPreviousCount == 1)
   }
@@ -4373,6 +4402,7 @@ struct PlaybackFeatureTests {
     }
 
     await store.send(.skipToPrevious)
+    await store.receive(.skipToPreviousFinished)
 
     #expect(await recorder.restartCurrentEntryCount == 1)
     #expect(await recorder.skipToPreviousCount == 0)

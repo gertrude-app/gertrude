@@ -605,6 +605,7 @@ struct AppFeatureTests {
       start: .selectedEntry(index: 1),
       context: context,
     )))) {
+      $0.isIntentionalPlayNowPending = true
       $0.pendingLibraryPlayNowOrigin = context.identity
     }
     await store.receive(.playback(.playNow(
@@ -624,6 +625,7 @@ struct AppFeatureTests {
       )
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
+      $0.isIntentionalPlayNowPending = false
       $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
@@ -695,6 +697,7 @@ struct AppFeatureTests {
       items: items,
       context: context,
     )))) {
+      $0.isIntentionalPlayNowPending = true
       $0.pendingLibraryPlayNowOrigin = context.identity
     }
     await store.receive(.playback(.playNow(
@@ -717,6 +720,7 @@ struct AppFeatureTests {
       )
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
+      $0.isIntentionalPlayNowPending = false
       $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0
@@ -1038,6 +1042,7 @@ struct AppFeatureTests {
       start: .selectedEntry(index: 1),
       context: context,
     )))) {
+      $0.isIntentionalPlayNowPending = true
       $0.pendingLibraryPlayNowOrigin = context.identity
     }
     await store.receive(.playback(.playNow(
@@ -1057,6 +1062,7 @@ struct AppFeatureTests {
       )
     }
     await store.receive(.playback(.playNowFinished(snapshot))) {
+      $0.isIntentionalPlayNowPending = false
       $0.pendingLibraryPlayNowOrigin = nil
       $0.playback.hasAuthoritativeSnapshot = true
       $0.playback.lastCachedProgressBucket = 0

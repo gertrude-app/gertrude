@@ -16,14 +16,18 @@ struct AppFeature: Sendable {
   struct State: Equatable {
     @Presents var crossPromo: CrossPromoFeature.State?
     var crossPromos = CrossPromos.Output(promos: [])
+    var isAppActive = false
+    var isIntentionalPlayNowPending = false
+    var isNowPlayingPresented = false
+    var isReviewPromptPending = false
     var killSwitch = KillSwitchFeature.State()
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
     var pendingLibraryPlayNowOrigin: LibraryCollectionIdentity?
+    @Presents var reviewPrompt: ReviewPromptFeature.State?
     var search = SearchFeature.State()
-    var setup = MusicSetupFeature.State()
-    var isNowPlayingPresented = false
     var selectedTab = Tab.library
+    var setup = MusicSetupFeature.State()
 
     var nowPlayingAlbumID: ApprovedAlbum.ID? {
       guard let albumID = self.playback.session?.currentItem.albumID,
@@ -42,6 +46,7 @@ struct AppFeature: Sendable {
   }
 
   enum Action: Equatable {
+    case appBecameInactive
     case appDidLaunch
     case appEnteredForeground
     case crossPromo(PresentationAction<CrossPromoFeature.Action>)
@@ -55,6 +60,8 @@ struct AppFeature: Sendable {
     case playback(PlaybackFeature.Action)
     case playbackAlbumIDsResolved(ApprovedTrack.ID, [ApprovedAlbum.ID])
     case queueBrowseLibraryButtonTapped
+    case reviewPrompt(PresentationAction<ReviewPromptFeature.Action>)
+    case reviewPromptDelayFinished
     case search(SearchFeature.Action)
     case setup(MusicSetupFeature.Action)
     case tabSelected(Tab)
@@ -62,6 +69,7 @@ struct AppFeature: Sendable {
 
   enum CancelID: Hashable {
     case albumResolution
+    case reviewPromptDelay
   }
 
   enum CrossPromoTrigger: Equatable {
@@ -91,15 +99,19 @@ struct AppFeature: Sendable {
   }
 
   static let crossPromoThrottle: TimeInterval = 60 * 60 * 72
+  static let reviewPromptDelay: Duration = .seconds(1.5)
+  static let reviewPromptMinimumAge: TimeInterval = 60 * 60 * 24
 
   @Dependency(\.api) var api
   @Dependency(\.approvedMusicLibraryCache) var approvedMusicLibraryCache
+  @Dependency(\.continuousClock) var clock
   @Dependency(\.crossPromoStorage) var crossPromoStorage
   @Dependency(\.date.now) var now
   @Dependency(\.device) var device
   @Dependency(\.keychain) var keychain
   @Dependency(\.playback) var playback
   @Dependency(\.playbackSessionCache) var playbackSessionCache
+  @Dependency(\.reviewPromptStorage) var reviewPromptStorage
   @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
@@ -130,6 +142,11 @@ struct AppFeature: Sendable {
 
     Reduce { state, action in
       switch action {
+      case .appBecameInactive:
+        state.isAppActive = false
+        state.isReviewPromptPending = false
+        return .cancel(id: CancelID.reviewPromptDelay)
+
       case .appDidLaunch:
         return .run { send in
           guard let crossPromos = try? await self.api.crossPromos(),
@@ -138,6 +155,9 @@ struct AppFeature: Sendable {
         }
 
       case .appEnteredForeground:
+        state.isAppActive = true
+        let reviewPrompt = self.scheduleReviewPromptIfEligible(state: &state)
+        guard !state.isReviewPromptPending else { return reviewPrompt }
         return self.presentCrossPromo(&state, for: .home)
 
       case .crossPromo(.presented(.delegate(.ctaTapped(let slot)))):
@@ -190,7 +210,7 @@ struct AppFeature: Sendable {
 
       case .nowPlayingPresentationChanged(let isPresented):
         state.isNowPlayingPresented = isPresented
-        return .none
+        return isPresented ? .none : self.scheduleReviewPromptIfEligible(state: &state)
 
       case .queueBrowseLibraryButtonTapped:
         state.selectedTab = .library
@@ -233,6 +253,7 @@ struct AppFeature: Sendable {
           state.pendingLibraryPlayNowOrigin = nil
           return .send(.playback(.togglePlayPause))
         }
+        state.isIntentionalPlayNowPending = true
         state.pendingLibraryPlayNowOrigin = context.identity
         return .send(.playback(.playNow(
           items: items,
@@ -251,6 +272,7 @@ struct AppFeature: Sendable {
         return .send(.playback(.playNext(items)))
 
       case .library(.delegate(.playNow(let items, let start, let context))):
+        state.isIntentionalPlayNowPending = true
         state.pendingLibraryPlayNowOrigin = context.identity
         return .send(.playback(.playNow(
           items: items,
@@ -268,23 +290,27 @@ struct AppFeature: Sendable {
 
       case .playback(.playNowFinished):
         let origin = state.pendingLibraryPlayNowOrigin
+        let wasIntentional = state.isIntentionalPlayNowPending
+        state.isIntentionalPlayNowPending = false
         state.pendingLibraryPlayNowOrigin = nil
         self.synchronizeDetailPlayback(state: &state)
-        let resolveAlbum = self.resolveCurrentPlaybackAlbum(state: &state)
-        guard state.playback.hasAuthoritativeSnapshot, let origin else {
-          return resolveAlbum
+        var effects = [self.resolveCurrentPlaybackAlbum(state: &state)]
+        if state.playback.hasAuthoritativeSnapshot, let origin {
+          effects.append(.send(.library(.collectionPlayNowSucceeded(origin))))
         }
-        return .merge(
-          resolveAlbum,
-          .send(.library(.collectionPlayNowSucceeded(origin))),
-        )
+        if state.playback.hasAuthoritativeSnapshot, wasIntentional {
+          effects.append(self.recordIntentionalPlay(state: &state))
+        }
+        return .merge(effects)
 
       case .playback(.playbackFailed):
+        state.isIntentionalPlayNowPending = false
         state.pendingLibraryPlayNowOrigin = nil
         self.synchronizeDetailPlayback(state: &state)
         return self.resolveCurrentPlaybackAlbum(state: &state)
 
       case .playback(.playbackEvent(.queueEnded)):
+        state.isIntentionalPlayNowPending = false
         state.pendingLibraryPlayNowOrigin = nil
         if state.playback.session == nil {
           state.isNowPlayingPresented = false
@@ -295,6 +321,14 @@ struct AppFeature: Sendable {
       case .playback(.playbackEvent(.progressChanged)):
         return .none
 
+      case .playback(.resumeFinished),
+           .playback(.skipToNextFinished(.advanced)),
+           .playback(.skipToPreviousFinished):
+        return self.recordIntentionalPlay(state: &state)
+
+      case .playback(.skipToNextFinished(.queueEnded)):
+        return .none
+
       case .playback(let playbackAction):
         switch playbackAction {
         case .addToQueue,
@@ -303,6 +337,7 @@ struct AppFeature: Sendable {
              .queueEntryRemoveRequested,
              .reorderUpcoming,
              .stop:
+          state.isIntentionalPlayNowPending = false
           state.pendingLibraryPlayNowOrigin = nil
         default:
           break
@@ -344,12 +379,26 @@ struct AppFeature: Sendable {
           state.pendingLibraryPlayNowOrigin = nil
           return .send(.playback(.togglePlayPause))
         }
+        state.isIntentionalPlayNowPending = true
         state.pendingLibraryPlayNowOrigin = context?.identity
         return .send(.playback(.playNow(
           items: items,
           start: start,
           context: context,
         )))
+
+      case .reviewPrompt:
+        return .none
+
+      case .reviewPromptDelayFinished:
+        state.isReviewPromptPending = false
+        var progress = self.reviewPromptStorage.load()
+        guard progress.isEligible(at: self.now, minimumAge: Self.reviewPromptMinimumAge),
+              self.canPresentReviewPrompt(state) else { return .none }
+        progress.hasPrompted = true
+        self.reviewPromptStorage.save(progress)
+        state.reviewPrompt = .init()
+        return .none
 
       case .search:
         self.synchronizeDetailPlayback(state: &state)
@@ -368,6 +417,46 @@ struct AppFeature: Sendable {
     .ifLet(\.$crossPromo, action: \.crossPromo) {
       CrossPromoFeature()
     }
+    .ifLet(\.$reviewPrompt, action: \.reviewPrompt) {
+      ReviewPromptFeature()
+    }
+  }
+
+  private func recordIntentionalPlay(
+    state: inout State,
+  ) -> EffectOf<Self> {
+    var progress = self.reviewPromptStorage.load()
+    guard !progress.hasPrompted else { return .none }
+    progress.recordIntentionalPlay(at: self.now)
+    self.reviewPromptStorage.save(progress)
+    return self.scheduleReviewPromptIfEligible(state: &state, progress: progress)
+  }
+
+  private func scheduleReviewPromptIfEligible(
+    state: inout State,
+    progress: ReviewPromptProgress? = nil,
+  ) -> EffectOf<Self> {
+    let progress = progress ?? self.reviewPromptStorage.load()
+    guard progress.isEligible(at: self.now, minimumAge: Self.reviewPromptMinimumAge),
+          self.canPresentReviewPrompt(state) else { return .none }
+    state.isReviewPromptPending = true
+    return .run { send in
+      try await self.clock.sleep(for: Self.reviewPromptDelay)
+      await send(.reviewPromptDelayFinished)
+    }
+    .cancellable(id: CancelID.reviewPromptDelay, cancelInFlight: true)
+  }
+
+  private func canPresentReviewPrompt(_ state: State) -> Bool {
+    state.isAppActive
+      && !state.isReviewPromptPending
+      && state.reviewPrompt == nil
+      && state.crossPromo == nil
+      && state.setup.isReady
+      && !state.setup.isSubscriptionOfferPresented
+      && !state.isNowPlayingPresented
+      && state.library.addToPlaylist == nil
+      && state.library.playlistMusicPicker == nil
   }
 
   private func presentCrossPromo(
@@ -375,6 +464,8 @@ struct AppFeature: Sendable {
     for trigger: CrossPromoTrigger,
   ) -> EffectOf<Self> {
     guard state.crossPromo == nil,
+          state.reviewPrompt == nil,
+          !state.isReviewPromptPending,
           state.setup.isReady,
           !state.isNowPlayingPresented,
           state.library.addToPlaylist == nil,
@@ -453,15 +544,19 @@ struct AppFeature: Sendable {
     let playbackPreferences = state.playback.preferences
     self.keychain.deleteConnection()
     state.crossPromo = nil
+    state.isIntentionalPlayNowPending = false
     state.isNowPlayingPresented = false
+    state.isReviewPromptPending = false
     state.library = .init()
     state.playback = .init(preferences: playbackPreferences)
     state.pendingLibraryPlayNowOrigin = nil
+    state.reviewPrompt = nil
     state.search = .init()
     state.setup = .init()
     state.selectedTab = .library
     return .merge(
       .cancel(id: CancelID.albumResolution),
+      .cancel(id: CancelID.reviewPromptDelay),
       .cancel(id: LibraryFeature.CancelID.approvedLibraryRefresh),
       .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
       .cancel(id: PlaybackFeature.CancelID.checkpointSave),

@@ -336,11 +336,14 @@ struct PlaybackFeature: Sendable {
     case restoreCachedSession
     case restorePlaybackPreferences
     case resume
+    case resumeFinished
     case saveCachedSession
     case seek(TimeInterval)
     case shuffleButtonTapped
     case skipToNext
+    case skipToNextFinished(PlaybackSkipOutcome)
     case skipToPrevious
+    case skipToPreviousFinished
     case stop
     case togglePlayPause
     case upcomingQueueUpdateFailed(
@@ -789,11 +792,15 @@ struct PlaybackFeature: Sendable {
           .run { send in
             do {
               try await self.playback.resume()
+              await send(.resumeFinished)
             } catch {
               await send(.playbackFailed(.init(error: error)))
             }
           },
         )
+
+      case .resumeFinished:
+        return .none
 
       case .saveCachedSession:
         return self.saveCheckpoint(state)
@@ -827,23 +834,35 @@ struct PlaybackFeature: Sendable {
               !state.shouldClearPlaybackOnUpcomingUpdateFailure,
               state.session != nil else { return .none }
         return .run { send in
-          guard let outcome = try? await self.playback.skipToNext(),
-                outcome == .queueEnded else { return }
-          await send(.playbackEvent(.queueEnded))
+          guard let outcome = try? await self.playback.skipToNext() else { return }
+          await send(.skipToNextFinished(outcome))
         }
+
+      case .skipToNextFinished(.advanced):
+        return .none
+
+      case .skipToNextFinished(.queueEnded):
+        return .send(.playbackEvent(.queueEnded))
 
       case .skipToPrevious:
         guard state.pendingQueueReplacementViewIDs == nil,
               !state.shouldClearPlaybackOnUpcomingUpdateFailure,
               let session = state.session else { return .none }
         if state.progress.elapsedTime > 3 || session.queue.currentIndex == 0 {
-          return .run { _ in
+          return .run { send in
             await self.playback.restartCurrentEntry()
+            await send(.skipToPreviousFinished)
           }
         }
-        return .run { _ in
-          try? await self.playback.skipToPrevious()
+        return .run { send in
+          do {
+            try await self.playback.skipToPrevious()
+            await send(.skipToPreviousFinished)
+          } catch {}
         }
+
+      case .skipToPreviousFinished:
+        return .none
 
       case .stop:
         if state.pendingQueueReplacementViewIDs != nil,
