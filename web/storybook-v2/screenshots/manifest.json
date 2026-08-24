@@ -960,6 +960,30 @@
     }
   },
   {
+    "id": "account-pages-people--security-events-refreshing",
+    "iframePath": "/iframe.html?id=account-pages-people--security-events-refreshing&viewMode=story",
+    "name": "Security events refreshing",
+    "path": "screenshots/mobile/account-pages-people--security-events-refreshing.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--security-events-refreshing",
+    "iframePath": "/iframe.html?id=account-pages-people--security-events-refreshing&viewMode=story",
+    "name": "Security events refreshing",
+    "path": "screenshots/desktop/account-pages-people--security-events-refreshing.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people--suspension-requests-error",
     "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-error&viewMode=story",
     "name": "Suspension requests error",
@@ -2009,6 +2033,150 @@
     "name": "Unlock",
     "path": "screenshots/desktop/account-pages-requests--unlock.png",
     "title": "Account/Pages/Requests",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-security-events--default",
+    "iframePath": "/iframe.html?id=account-pages-security-events--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-security-events--default.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-security-events--default",
+    "iframePath": "/iframe.html?id=account-pages-security-events--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-security-events--default.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-security-events--empty",
+    "iframePath": "/iframe.html?id=account-pages-security-events--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/mobile/account-pages-security-events--empty.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-security-events--empty",
+    "iframePath": "/iframe.html?id=account-pages-security-events--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/desktop/account-pages-security-events--empty.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-security-events--error",
+    "iframePath": "/iframe.html?id=account-pages-security-events--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/mobile/account-pages-security-events--error.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-security-events--error",
+    "iframePath": "/iframe.html?id=account-pages-security-events--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/desktop/account-pages-security-events--error.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-security-events--filtered",
+    "iframePath": "/iframe.html?id=account-pages-security-events--filtered&viewMode=story",
+    "name": "Filtered",
+    "path": "screenshots/mobile/account-pages-security-events--filtered.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-security-events--filtered",
+    "iframePath": "/iframe.html?id=account-pages-security-events--filtered&viewMode=story",
+    "name": "Filtered",
+    "path": "screenshots/desktop/account-pages-security-events--filtered.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-security-events--loading",
+    "iframePath": "/iframe.html?id=account-pages-security-events--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/mobile/account-pages-security-events--loading.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-security-events--loading",
+    "iframePath": "/iframe.html?id=account-pages-security-events--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/desktop/account-pages-security-events--loading.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-security-events--no-matches",
+    "iframePath": "/iframe.html?id=account-pages-security-events--no-matches&viewMode=story",
+    "name": "No filter matches",
+    "path": "screenshots/mobile/account-pages-security-events--no-matches.png",
+    "title": "Account/Pages/Security Events",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-security-events--no-matches",
+    "iframePath": "/iframe.html?id=account-pages-security-events--no-matches&viewMode=story",
+    "name": "No filter matches",
+    "path": "screenshots/desktop/account-pages-security-events--no-matches.png",
+    "title": "Account/Pages/Security Events",
     "viewport": {
       "width": 1440,
       "height": 900,

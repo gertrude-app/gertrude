@@ -16,6 +16,7 @@ export * from './pairs/GetPersonActivitySummaries';
 export * from './pairs/GetPersonDayActivity';
 export * from './pairs/GetPersonInstalledMacApps';
 export * from './pairs/GetPersonMacSettings';
+export * from './pairs/GetSecurityEvents';
 export * from './pairs/GetSuspensionRequests';
 export * from './pairs/RequestAccountPublicKeychain';
 export * from './pairs/SetAccountKeychainAssignment';

@@ -48,6 +48,7 @@ enum AccountTsCodegenRoute {
       RequestAccountPublicKeychain.self,
       GetSuspensionRequests.self,
       DecideSuspensionRequest.self,
+      GetSecurityEvents.self,
       GetActivitySummaries.self,
       GetDayActivity.self,
       GetPersonActivitySummaries.self,

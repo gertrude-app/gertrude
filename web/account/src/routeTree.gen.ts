@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
+import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
 import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
@@ -43,6 +44,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppSignoutRoute = AppSignoutRouteImport.update({
   id: '/signout',
   path: '/signout',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSecurityEventsRoute = AppSecurityEventsRouteImport.update({
+  id: '/security-events',
+  path: '/security-events',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const unauthedLoginRoute = unauthedLoginRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/people': typeof AppPeopleRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
+  '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof unauthedLoginRoute
+  '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
@@ -188,6 +196,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/people': typeof AppPeopleRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
+  '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
@@ -213,6 +222,7 @@ export interface FileRouteTypes {
     | '/'
     | '/people'
     | '/login'
+    | '/security-events'
     | '/signout'
     | '/people/$personId'
     | '/otp/$token'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/security-events'
     | '/signout'
     | '/'
     | '/otp/$token'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/people'
     | '/(unauthed)/login'
+    | '/_app/security-events'
     | '/_app/signout'
     | '/_app/'
     | '/_app/people/$personId'
@@ -302,6 +314,13 @@ declare module '@tanstack/react-router' {
       path: '/signout'
       fullPath: '/signout'
       preLoaderRoute: typeof AppSignoutRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/security-events': {
+      id: '/_app/security-events'
+      path: '/security-events'
+      fullPath: '/security-events'
+      preLoaderRoute: typeof AppSecurityEventsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/login': {
@@ -482,6 +501,7 @@ const AppRequestsSuspensionRouteWithChildren =
 
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
+  AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
   AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
@@ -496,6 +516,7 @@ interface AppRouteRouteChildren {
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
+  AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
   AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,

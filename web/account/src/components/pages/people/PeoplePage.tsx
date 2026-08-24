@@ -10,22 +10,28 @@ import React from 'react';
 import type {
   LoadableState,
   PersonCardPerson,
+  SecurityEvent,
   SuspensionRequest,
 } from '#/components/types';
 import CardContainer from '#/components/layout/CardContainer';
 import DashboardPage from '#/components/layout/DashboardPage';
 import PersonCard from '#/components/people/PersonCard';
 import RightColumnCard from '#/components/requests/RightColumnCard';
+import SecurityEventsPreviewCard from '#/components/requests/SecurityEventsPreviewCard';
 import SuspensionRequestsPreviewCard from '#/components/requests/SuspensionRequestsPreviewCard';
 
 interface Props {
   peopleState: LoadableState<PersonCardPerson[]>;
   suspensionRequestsState: LoadableState<SuspensionRequest[]>;
+  securityEventsState: LoadableState<SecurityEvent[]>;
   onRefreshSuspensionRequests: () => void;
   refreshingSuspensionRequests?: boolean;
+  onRefreshSecurityEvents: () => void;
+  refreshingSecurityEvents?: boolean;
   addPersonHref: string;
   suspensionRequestsHref: string;
   suspensionRequestHrefForRequest: (id: string) => string;
+  securityEventsHref: string;
   monitorHref: string;
   settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
@@ -184,11 +190,15 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
 const PeoplePage: React.FC<Props> = ({
   peopleState,
   suspensionRequestsState,
+  securityEventsState,
   onRefreshSuspensionRequests,
   refreshingSuspensionRequests,
+  onRefreshSecurityEvents,
+  refreshingSecurityEvents,
   addPersonHref,
   suspensionRequestsHref,
   suspensionRequestHrefForRequest,
+  securityEventsHref,
   monitorHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
@@ -230,6 +240,12 @@ const PeoplePage: React.FC<Props> = ({
           refreshing={refreshingSuspensionRequests}
           viewAllHref={suspensionRequestsHref}
           responseHrefForRequest={suspensionRequestHrefForRequest}
+        />
+        <SecurityEventsPreviewCard
+          state={securityEventsState}
+          onRefresh={onRefreshSecurityEvents}
+          refreshing={refreshingSecurityEvents}
+          viewAllHref={securityEventsHref}
         />
       </VStack>
     </Stack>

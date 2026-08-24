@@ -1,7 +1,11 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import type { ComponentProps, ReactElement } from 'react';
 import PeoplePage from './PeoplePage';
-import { people, suspensionRequests } from '#/components/storybook/fixtures';
+import {
+  people,
+  securityEvents,
+  suspensionRequests,
+} from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
 
@@ -10,10 +14,13 @@ type PeoplePageProps = ComponentProps<typeof PeoplePage>;
 const defaultProps: PeoplePageProps = {
   peopleState: { status: `success`, data: people },
   suspensionRequestsState: { status: `success`, data: suspensionRequests },
+  securityEventsState: { status: `success`, data: securityEvents },
   onRefreshSuspensionRequests: noop,
+  onRefreshSecurityEvents: noop,
   addPersonHref: `/people/new`,
   suspensionRequestsHref: `/requests/suspension`,
   suspensionRequestHrefForRequest: (id) => `/requests/suspension/${id}`,
+  securityEventsHref: `/security-events`,
   monitorHref: `/activity`,
   settingsHrefForPerson: (personId) => `/people/${personId}`,
   monitorHrefForPerson: (personId) => `/activity/person/${personId}`,
@@ -44,6 +51,7 @@ export const Empty = {
     renderPage({
       peopleState: { status: `success`, data: [] },
       suspensionRequestsState: { status: `success`, data: [] },
+      securityEventsState: { status: `success`, data: [] },
     }),
 };
 
@@ -53,6 +61,7 @@ export const Loading = {
     renderPage({
       peopleState: { status: `loading` },
       suspensionRequestsState: { status: `loading` },
+      securityEventsState: { status: `loading` },
     }),
 };
 
@@ -101,5 +110,15 @@ export const SuspensionRequestsRefreshing = {
     renderPage({
       suspensionRequestsState: { status: `success`, data: [] },
       refreshingSuspensionRequests: true,
+    }),
+};
+
+export const SecurityEventsRefreshing = {
+  name: 'Security events refreshing',
+  parameters: galleryParameters,
+  render: () =>
+    renderPage({
+      securityEventsState: { status: `success`, data: [] },
+      refreshingSecurityEvents: true,
     }),
 };

@@ -34,6 +34,7 @@ export const Default = {
         suspensionRequestsHref="/requests/suspension"
         suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
         onRefreshSuspensionRequests={noop}
+        onRefreshSecurityEvents={noop}
         unlockRequestsHref="/requests/unlock"
         securityEventsHref="/security-events"
       />

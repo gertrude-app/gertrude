@@ -18,6 +18,7 @@ enum AuthedAccountRoute: PairRoute {
   case requestAccountPublicKeychain(RequestAccountPublicKeychain.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
+  case getSecurityEvents
   case getActivitySummaries(GetActivitySummaries.Input)
   case getDayActivity(GetDayActivity.Input)
   case getPersonActivitySummaries(GetPersonActivitySummaries.Input)
@@ -82,6 +83,9 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.decideSuspensionRequest)) {
       Operation(DecideSuspensionRequest.self)
       Body(.accountInput(DecideSuspensionRequest.self))
+    }
+    Route(.case(Self.getSecurityEvents)) {
+      Operation(GetSecurityEvents.self)
     }
     Route(.case(Self.getActivitySummaries)) {
       Operation(GetActivitySummaries.self)
@@ -157,6 +161,9 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .decideSuspensionRequest(let input):
       let output = try await DecideSuspensionRequest.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getSecurityEvents:
+      let output = try await GetSecurityEvents.resolve(in: context)
       return try await self.respond(with: output)
     case .getActivitySummaries(let input):
       let output = try await GetActivitySummaries.resolve(with: input, in: context)

@@ -3,10 +3,12 @@ import React from 'react';
 import type {
   LoadableState,
   PersonCardPerson,
+  SecurityEvent,
   SuspensionRequest,
 } from '#/components/types';
 import PeoplePage from '#/components/pages/people/PeoplePage';
 import { toPersonCardPerson } from '#/lib/people';
+import { toSecurityEvent } from '#/lib/securityEvents';
 import { toSuspensionRequest } from '#/lib/suspensionRequests';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -16,6 +18,9 @@ const PeopleRoute: React.FC = () => {
   const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
   const suspensionRequestsQuery = useQuery(Key.suspensionRequests, () =>
     liveClient.getSuspensionRequests(),
+  );
+  const securityEventsQuery = useQuery(Key.securityEvents, () =>
+    liveClient.getSecurityEvents(),
   );
 
   const peopleState: LoadableState<PersonCardPerson[]> =
@@ -49,15 +54,35 @@ const PeopleRoute: React.FC = () => {
           }
         : { status: `loading` };
 
+  const securityEventsState: LoadableState<SecurityEvent[]> =
+    securityEventsQuery.data !== undefined
+      ? {
+          status: `success`,
+          data: securityEventsQuery.data.map(toSecurityEvent),
+        }
+      : securityEventsQuery.isError
+        ? {
+            status: `error`,
+            message:
+              securityEventsQuery.error.userMessage ??
+              `Check your connection and try again.`,
+            onRetry: () => void securityEventsQuery.refetch(),
+          }
+        : { status: `loading` };
+
   return (
     <PeoplePage
       peopleState={peopleState}
       suspensionRequestsState={suspensionRequestsState}
+      securityEventsState={securityEventsState}
       onRefreshSuspensionRequests={() => void suspensionRequestsQuery.refetch()}
       refreshingSuspensionRequests={suspensionRequestsQuery.isFetching}
+      onRefreshSecurityEvents={() => void securityEventsQuery.refetch()}
+      refreshingSecurityEvents={securityEventsQuery.isFetching}
       addPersonHref="/people/new"
       suspensionRequestsHref="/requests/suspension"
       suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
+      securityEventsHref="/security-events"
       monitorHref="/activity"
       settingsHrefForPerson={(personId) => `/people/${personId}`}
       monitorHrefForPerson={(personId) => `/activity/person/${personId}`}

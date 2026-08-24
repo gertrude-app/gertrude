@@ -140,6 +140,12 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public getSecurityEvents = (
+    input: P.GetSecurityEvents.Input,
+  ): Promise<Result<P.GetSecurityEvents.Output>> => {
+    return this.query<P.GetSecurityEvents.Output>(input, `GetSecurityEvents`, `parent`);
+  };
+
   public getSuspensionRequests = (
     input: P.GetSuspensionRequests.Input,
   ): Promise<Result<P.GetSuspensionRequests.Output>> => {
