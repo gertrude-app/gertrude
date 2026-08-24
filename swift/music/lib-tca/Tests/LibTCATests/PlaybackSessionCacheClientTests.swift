@@ -236,6 +236,7 @@ struct PlaybackSessionCacheClientTests {
       checkpoint,
       PlaybackCheckpoint(
         songIDs: ["current", "up-next"],
+        albumIDs: ["album-current", "album-next"],
         currentIndex: 0,
         elapsedTime: 42,
         durationFallback: 180,
@@ -245,6 +246,31 @@ struct PlaybackSessionCacheClientTests {
         ],
       ),
     )
+  }
+
+  @Test
+  func checkpointPersistsAlbumPerDuplicateOccurrence() throws {
+    let session = PlaybackFeature.Session(
+      playStatus: .paused,
+      queue: .init(items: [
+        playbackItem("duplicate").withAlbumID("album-a"),
+        playbackItem("duplicate").withAlbumID("album-b"),
+      ]),
+    )
+    let checkpoint = PlaybackCheckpoint(
+      session: session,
+      progress: .zero,
+      sourceAlbumIDs: ["duplicate": "album-b"],
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackCheckpoint.self,
+      from: JSONEncoder().encode(checkpoint),
+    )
+
+    expectNoDifference(decoded.albumIDs, ["album-a", "album-b"])
+    expectNoDifference(decoded.albumID(at: 0), "album-a")
+    expectNoDifference(decoded.albumID(at: 1), "album-b")
   }
 
   @Test
@@ -404,6 +430,8 @@ struct PlaybackSessionCacheClientTests {
       from: JSONEncoder().encode(previousCheckpoint),
     )
 
+    expectNoDifference(decoded.albumIDs, nil)
+    expectNoDifference(decoded.albumID(at: 0), "album-1")
     expectNoDifference(decoded.playbackSource, nil)
     expectNoDifference(decoded.sourceEntryIDs, nil)
     expectNoDifference(

@@ -22,11 +22,10 @@ extension ArtistData {
     self.init(
       id: artist.id.rawValue,
       name: artist.name,
-      artworkUrl: metadata?.artwork?.artistCardURL,
+      artworkUrl: metadata?.artwork?.artworkURL,
       artworkPalette: metadata?.artwork?.palette,
       subtitle: metadata?.artistSubtitle,
       editorialNotes: metadata?.artistEditorialNotes,
-      releaseAlbumIds: artist.releaseAlbumIds?.map(\.rawValue) ?? [],
       topSongs: artist.topSongs?.map(ArtistTopSongData.init) ?? [],
     )
   }
@@ -89,17 +88,6 @@ private extension ApprovedMusicCatalogMetadata {
 }
 
 private extension ApprovedMusicArtwork {
-  var artistCardURL: URL? {
-    self.artworkURL
-  }
-
-  var artworkURL: URL? {
-    guard var url = self.url else { return nil }
-    url = url.replacingOccurrences(of: "{w}", with: "600")
-    url = url.replacingOccurrences(of: "{h}", with: "600")
-    return URL(string: url)
-  }
-
   var palette: ArtworkPalette? {
     let palette = ArtworkPalette(
       bgColor: self.bgColor,

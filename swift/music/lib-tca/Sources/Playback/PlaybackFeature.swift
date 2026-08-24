@@ -116,7 +116,7 @@ struct PlaybackFeature: Sendable {
     var infinitePlaybackPlan: InfinitePlaybackPlan?
     var isRestoringCheckpoint = false
     var lastCachedProgressBucket: Int?
-    var pendingAlbumResolutionSongID: ApprovedTrack.ID?
+    var pendingAlbumResolutionViewID: PlaybackQueueEntry.ID?
     var pendingInfiniteLookaheadInsertion: InfiniteLookaheadInsertion?
     var pendingMetadataPlan: [PlaybackMetadataHintMatcher.Occurrence]?
     var pendingPlayNowItems: [PlaybackItem]?
@@ -276,7 +276,7 @@ struct PlaybackFeature: Sendable {
         PlaybackQueueEntry(
           id: entry.id,
           item: entry.item
-            .withAlbumID(sourceAlbumIDs[entry.item.id])
+            .withAlbumID(entry.item.albumID ?? sourceAlbumIDs[entry.item.id])
             .withPlaylistSource(
               playlistSourceHints[entry.id] ?? entry.item.playlistSource,
             )
@@ -488,7 +488,7 @@ struct PlaybackFeature: Sendable {
         state.infinitePlaybackPlan = nil
         state.isRestoringCheckpoint = false
         state.lastCachedProgressBucket = nil
-        state.pendingAlbumResolutionSongID = nil
+        state.pendingAlbumResolutionViewID = nil
         state.pendingInfiniteLookaheadInsertion = nil
         state.pendingMetadataPlan = nil
         state.pendingPlayNowItems = nil
@@ -576,12 +576,7 @@ struct PlaybackFeature: Sendable {
           start: plannerStart,
           explicitEntries: explicitEntries,
           isShuffleEnabled: state.preferences.isShuffleEnabled,
-          shuffle: { entries in
-            let unshuffledEntries = entries
-            entries = self.withRandomNumberGenerator {
-              unshuffledEntries.shuffled(using: &$0)
-            }
-          },
+          shuffle: { $0 = self.shuffled($0) },
         ) else { return .none }
         var projectedEntries = plannedEntries
         var infinitePlaybackPlan: InfinitePlaybackPlan?
@@ -1076,6 +1071,12 @@ struct PlaybackFeature: Sendable {
     }
   }
 
+  private func shuffled<Element: Sendable>(_ elements: [Element]) -> [Element] {
+    self.withRandomNumberGenerator {
+      elements.shuffled(using: &$0)
+    }
+  }
+
   private func makeInfinitePlaybackPlan(
     source: PlaybackSource,
     plannedEntries: [PlaybackSourceQueuePlanEntry],
@@ -1087,12 +1088,7 @@ struct PlaybackFeature: Sendable {
     ) else { return nil }
     let randomizedPlan = InfinitePlaybackCandidatePlanner.randomizedInitialPlan(
       candidatePlan,
-      shuffle: { items in
-        let unshuffledItems = items
-        items = self.withRandomNumberGenerator {
-          unshuffledItems.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     var sourceEntryIDs = Set<PlaybackSource.Entry.ID>()
     var sourceEntries = plannedEntries.compactMap { entry -> PlaybackSource.Entry? in
@@ -1132,12 +1128,7 @@ struct PlaybackFeature: Sendable {
       generatedItems: plan.generatedItems,
       library: library,
       previousTrackID: currentEntry.item.id,
-      shuffle: { items in
-        let unshuffledItems = items
-        items = self.withRandomNumberGenerator {
-          unshuffledItems.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     let lookaheadEntries = InfinitePlaybackLookaheadPlanner.entries(
       remainingSourceEntries: remainingSourceEntries,
@@ -1279,10 +1270,7 @@ struct PlaybackFeature: Sendable {
     )
     var sourceEntries = sourceEntryIDs.compactMap { sourceEntriesByID[$0] }
     if state.preferences.isShuffleEnabled {
-      let unshuffledEntries = sourceEntries
-      sourceEntries = self.withRandomNumberGenerator {
-        unshuffledEntries.shuffled(using: &$0)
-      }
+      sourceEntries = self.shuffled(sourceEntries)
     } else {
       let sourceEntryIDSet = Set(sourceEntries.map(\.id))
       sourceEntries = source.entries.filter {
@@ -1316,12 +1304,7 @@ struct PlaybackFeature: Sendable {
     ) else { return nil }
     let randomizedPlan = InfinitePlaybackCandidatePlanner.randomizedInitialPlan(
       candidatePlan,
-      shuffle: { items in
-        let unshuffledItems = items
-        items = self.withRandomNumberGenerator {
-          unshuffledItems.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     return randomizedPlan.relatedItems + randomizedPlan.otherItems
   }
@@ -1337,12 +1320,7 @@ struct PlaybackFeature: Sendable {
       generatedItems: generatedItems,
       library: library,
       previousTrackID: queue.currentItem.id,
-      shuffle: { items in
-        let unshuffledItems = items
-        items = self.withRandomNumberGenerator {
-          unshuffledItems.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     let lookaheadEntries = InfinitePlaybackLookaheadPlanner.entries(
       remainingSourceEntries: sourceEntries,
@@ -1431,9 +1409,7 @@ struct PlaybackFeature: Sendable {
       newlyApprovedTrackIDs.contains($0.id) && !visibleTrackIDs.contains($0.id)
     }
     let shuffledNewItems = if newItems.count > 1 {
-      self.withRandomNumberGenerator {
-        newItems.shuffled(using: &$0)
-      }
+      self.shuffled(newItems)
     } else {
       newItems
     }
@@ -1469,23 +1445,28 @@ struct PlaybackFeature: Sendable {
     }
   }
 
-  private static func preservingPlannedArtwork(
+  private static func preservingPlannedItemMetadata(
     in snapshot: PlaybackSnapshot,
     plan: [PlaybackMetadataHintMatcher.Occurrence],
   ) -> PlaybackSnapshot {
+    let albumIDHints = PlaybackMetadataHintMatcher.match(
+      plan: plan,
+      entries: snapshot.entries,
+      value: { $0.albumID },
+    )
     let artworkURLHints = PlaybackMetadataHintMatcher.match(
       plan: plan,
       entries: snapshot.entries,
       value: { $0.artworkURL },
     )
-    guard !artworkURLHints.isEmpty else { return snapshot }
+    guard !albumIDHints.isEmpty || !artworkURLHints.isEmpty else { return snapshot }
     return PlaybackSnapshot(
       entries: snapshot.entries.map { entry in
         PlaybackQueueEntry(
           id: entry.id,
-          item: entry.item.withArtworkURL(
-            artworkURLHints[entry.id] ?? entry.item.artworkURL,
-          ),
+          item: entry.item
+            .withAlbumID(albumIDHints[entry.id] ?? entry.item.albumID)
+            .withArtworkURL(artworkURLHints[entry.id] ?? entry.item.artworkURL),
           sourceEntryID: entry.sourceEntryID,
           viewID: entry.viewID,
         )
@@ -1508,7 +1489,7 @@ struct PlaybackFeature: Sendable {
           id: entry.id,
           item: entry.item.withArtworkURL(library.playbackArtworkURL(
             for: entry.item,
-            sourceAlbumID: sourceAlbumIDs[entry.item.id] ?? entry.item.albumID,
+            sourceAlbumID: entry.item.albumID ?? sourceAlbumIDs[entry.item.id],
           )),
           sourceEntryID: entry.sourceEntryID,
           viewID: entry.viewID,
@@ -1534,12 +1515,12 @@ struct PlaybackFeature: Sendable {
       in: entryMetadataSnapshot,
       from: state.temporarilyMissingUpcomingEntries,
     )
-    let plannedArtworkSnapshot = Self.preservingPlannedArtwork(
+    let plannedMetadataSnapshot = Self.preservingPlannedItemMetadata(
       in: missingMetadataRestoration.snapshot,
       plan: metadataPlan,
     )
     let snapshot = Self.restoringWebArtwork(
-      in: plannedArtworkSnapshot,
+      in: plannedMetadataSnapshot,
       library: state.approvedLibrary,
       sourceAlbumIDs: state.sourceAlbumIDs,
     )
@@ -1678,12 +1659,7 @@ struct PlaybackFeature: Sendable {
         library: library,
         previousTrackID: visibleContextEntries.last?.item.id ?? queue.currentItem.id,
         additionalVisibleTrackIDs: Set(visibleContextEntries.map(\.item.id)),
-        shuffle: { items in
-          let unshuffledItems = items
-          items = self.withRandomNumberGenerator {
-            unshuffledItems.shuffled(using: &$0)
-          }
-        },
+        shuffle: { $0 = self.shuffled($0) },
       )
     }
     let lookaheadEntries = InfinitePlaybackLookaheadPlanner.entries(
@@ -1807,7 +1783,7 @@ struct PlaybackFeature: Sendable {
     let retainedTrackIDs = Set(entries.map(\.item.id))
     state.failure = nil
     state.lastCachedProgressBucket = 0
-    state.pendingAlbumResolutionSongID = nil
+    state.pendingAlbumResolutionViewID = nil
     state.pendingMetadataPlan = nil
     state.pendingPlayNowItems = nil
     state.pendingQueueReplacementViewIDs = expectedViewIDs
@@ -1881,12 +1857,7 @@ struct PlaybackFeature: Sendable {
       remainingSourceEntryIDs: remainingSourceEntryIDs,
       explicitEntries: queue.queuedEntries,
       isShuffleEnabled: state.preferences.isShuffleEnabled,
-      shuffle: { entries in
-        let unshuffledEntries = entries
-        entries = self.withRandomNumberGenerator {
-          unshuffledEntries.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     let upcomingEntries = plannedEntries.compactMap { entry in
       switch entry {
@@ -2067,12 +2038,7 @@ struct PlaybackFeature: Sendable {
       source: source,
       isShuffleEnabled: isShuffleEnabled,
       avoidingFirstTrackID: previousTrackID,
-      shuffle: { entries in
-        let unshuffledEntries = entries
-        entries = self.withRandomNumberGenerator {
-          unshuffledEntries.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
   }
 
@@ -2089,12 +2055,7 @@ struct PlaybackFeature: Sendable {
     var cycleItems = InfinitePlaybackCandidatePlanner.libraryCycleItems(
       library: library,
       avoidingFirstTrackID: previousItem.id,
-      shuffle: { items in
-        let unshuffledItems = items
-        items = self.withRandomNumberGenerator {
-          unshuffledItems.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     guard let currentItem = cycleItems.first else { return nil }
     cycleItems.removeFirst()
@@ -2103,12 +2064,7 @@ struct PlaybackFeature: Sendable {
       generatedItems: cycleItems,
       library: library,
       previousTrackID: currentItem.id,
-      shuffle: { items in
-        let unshuffledItems = items
-        items = self.withRandomNumberGenerator {
-          unshuffledItems.shuffled(using: &$0)
-        }
-      },
+      shuffle: { $0 = self.shuffled($0) },
     )
     let lookaheadItems = InfinitePlaybackLookaheadPlanner.entries(
       remainingSourceEntries: [],
@@ -2127,7 +2083,7 @@ struct PlaybackFeature: Sendable {
       generatedItems: Array(cycleItems.dropFirst(lookaheadItems.count)),
     )
     state.lastCachedProgressBucket = nil
-    state.pendingAlbumResolutionSongID = nil
+    state.pendingAlbumResolutionViewID = nil
     state.pendingInfiniteLookaheadInsertion = nil
     state.pendingPlayNowItems = items
     state.pendingQueueReplacementViewIDs = nil
@@ -2194,7 +2150,7 @@ struct PlaybackFeature: Sendable {
     state.hasAuthoritativeSnapshot = false
     state.isRestoringCheckpoint = false
     state.lastCachedProgressBucket = nil
-    state.pendingAlbumResolutionSongID = nil
+    state.pendingAlbumResolutionViewID = nil
     state.pendingPlayNowItems = items
     state.pendingQueueReplacementViewIDs = nil
     state.pendingRepeatCycleEntryIDs = nil
@@ -2350,7 +2306,7 @@ extension PlaybackFeature.State {
         id: entry.id,
         item: entry.item.withArtworkURL(library.playbackArtworkURL(
           for: entry.item,
-          sourceAlbumID: self.sourceAlbumIDs[entry.item.id] ?? entry.item.albumID,
+          sourceAlbumID: entry.item.albumID ?? self.sourceAlbumIDs[entry.item.id],
         )),
         sourceEntryID: entry.sourceEntryID,
         viewID: entry.viewID,
@@ -2367,6 +2323,7 @@ extension PlaybackFeature.State {
           title: "",
           artistName: "",
           artworkURL: nil,
+          albumID: checkpoint.albumID(at: index),
           playlistSource: checkpoint.playlistSourceHints[index],
           queueRole: checkpoint.queueRoles?[index],
         ),
@@ -2461,7 +2418,9 @@ extension PlaybackFeature.State {
       && self.queueRoleHints.isEmpty
       && self.sourceEntryIDHints.isEmpty
       && plan.allSatisfy {
-        $0.item.playlistSource == nil
+        $0.item.albumID == nil
+          && $0.item.artworkURL == nil
+          && $0.item.playlistSource == nil
           && $0.item.queueRole == nil
           && $0.sourceEntryID == nil
       }
@@ -2478,45 +2437,47 @@ extension PlaybackFeature.State {
   }
 
   mutating func resolveCurrentAlbum(in library: ApprovedMusicLibrary) -> Bool {
-    guard let item = self.session?.currentItem else { return false }
-    if let albumID = self.sourceAlbumIDs[item.id],
+    guard let entry = self.session?.queue.currentEntry else { return false }
+    if let albumID = entry.item.albumID,
        library.album(id: albumID) != nil {
-      if item.albumID != albumID {
-        self.setSourceAlbumID(albumID, for: item.id)
-      }
       return true
     }
-    self.sourceAlbumIDs[item.id] = nil
-    guard let album = library.album(matching: item) else {
-      if item.albumID != nil {
-        self.setSourceAlbumID(nil, for: item.id)
+    if let albumID = self.sourceAlbumIDs[entry.item.id],
+       library.album(id: albumID) != nil {
+      self.setCurrentAlbumID(albumID, for: entry.viewID)
+      return true
+    }
+    self.sourceAlbumIDs[entry.item.id] = nil
+    guard let album = library.album(matching: entry.item) else {
+      if entry.item.albumID != nil {
+        self.setCurrentAlbumID(nil, for: entry.viewID)
       }
       return false
     }
-    if item.albumID != album.id {
-      self.setSourceAlbumID(album.id, for: item.id)
+    if entry.item.albumID != album.id {
+      self.setCurrentAlbumID(album.id, for: entry.viewID)
     }
     return true
   }
 
-  mutating func setSourceAlbumID(
+  mutating func setCurrentAlbumID(
     _ albumID: ApprovedAlbum.ID?,
-    for songID: ApprovedTrack.ID,
+    for entryViewID: PlaybackQueueEntry.ID,
   ) {
-    self.sourceAlbumIDs[songID] = albumID
-    guard var session = self.session else { return }
-    session.queue.entries = session.queue.entries.map { entry in
-      guard entry.item.id == songID else { return entry }
-      return PlaybackQueueEntry(
-        id: entry.id,
-        item: entry.item.withAlbumID(albumID),
-        sourceEntryID: entry.sourceEntryID,
-        viewID: entry.viewID,
-      )
-    }
+    guard var session = self.session,
+          session.queue.currentEntry.viewID == entryViewID else { return }
+    let index = session.queue.currentIndex
+    let entry = session.queue.entries[index]
+    self.sourceAlbumIDs[entry.item.id] = albumID
+    session.queue.entries[index] = PlaybackQueueEntry(
+      id: entry.id,
+      item: entry.item.withAlbumID(albumID),
+      sourceEntryID: entry.sourceEntryID,
+      viewID: entry.viewID,
+    )
     self.session = session
-    if self.pendingAlbumResolutionSongID == songID, albumID != nil {
-      self.pendingAlbumResolutionSongID = nil
+    if self.pendingAlbumResolutionViewID == entryViewID, albumID != nil {
+      self.pendingAlbumResolutionViewID = nil
     }
   }
 

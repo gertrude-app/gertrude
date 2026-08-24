@@ -64,15 +64,6 @@ struct PlaybackSource: Codable, Equatable, Sendable {
     Set(self.entries.map(\.item.artistName))
   }
 
-  var selectedAndFollowingItems: [PlaybackItem] {
-    guard let selectedIndex = self.entries.firstIndex(where: {
-      $0.id == self.selectedEntryID
-    }) else { return [] }
-    return self.entries[selectedIndex...].compactMap { entry in
-      self.removedEntryIDs.contains(entry.id) ? nil : entry.item
-    }
-  }
-
   var isValid: Bool {
     !self.entries.isEmpty
       && Set(self.entries.map(\.id)).count == self.entries.count
@@ -652,7 +643,8 @@ enum PlaybackMetadataHintMatcher {
     return plan.indices.allSatisfy { index in
       let occurrence = plan[index]
       guard occurrence.retainedEntryID == nil,
-            occurrence.item.artworkURL != nil
+            occurrence.item.albumID != nil
+            || occurrence.item.artworkURL != nil
             || occurrence.item.playlistSource != nil
             || occurrence.item.queueRole != nil
             || occurrence.sourceEntryID != nil else { return true }

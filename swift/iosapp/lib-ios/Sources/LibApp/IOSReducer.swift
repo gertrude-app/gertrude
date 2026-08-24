@@ -26,6 +26,8 @@ public struct IOSReducer: Sendable {
     @Dependency(\.keychain) var keychain
   }
 
+  static let appStoreID = "6736368820"
+
   @ObservationIgnored
   let deps = Deps()
 
@@ -337,7 +339,9 @@ public struct IOSReducer: Sendable {
     case (.onboarding(.happyPath(.requestAppStoreRating)), .secondary):
       self.deps.log(state.screen, action, "a9480aa2")
       return .merge(
-        .run { [deps = self.deps] _ in await deps.appStore.requestReview() },
+        .run { [deps = self.deps] _ in
+          await deps.appStore.requestReview(Self.appStoreID)
+        },
         self.presentOnboardingCrossPromo(&state),
       )
 

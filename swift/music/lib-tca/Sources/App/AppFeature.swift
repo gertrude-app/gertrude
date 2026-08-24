@@ -24,7 +24,7 @@ struct AppFeature: Sendable {
     var library = LibraryFeature.State()
     var playback = PlaybackFeature.State()
     var pendingLibraryPlayNowOrigin: LibraryCollectionIdentity?
-    @Presents var reviewPrompt: ReviewPromptFeature.State?
+    @Presents var reviewPrompt: AppStoreReviewFeature.State?
     var search = SearchFeature.State()
     var selectedTab = Tab.library
     var setup = MusicSetupFeature.State()
@@ -58,9 +58,13 @@ struct AppFeature: Sendable {
     case nowPlayingViewAlbumTapped
     case nowPlayingViewArtistTapped
     case playback(PlaybackFeature.Action)
-    case playbackAlbumIDsResolved(ApprovedTrack.ID, [ApprovedAlbum.ID])
+    case playbackAlbumIDsResolved(
+      entryViewID: PlaybackQueueEntry.ID,
+      songID: ApprovedTrack.ID,
+      albumIDs: [ApprovedAlbum.ID],
+    )
     case queueBrowseLibraryButtonTapped
-    case reviewPrompt(PresentationAction<ReviewPromptFeature.Action>)
+    case reviewPrompt(PresentationAction<AppStoreReviewFeature.Action>)
     case reviewPromptDelayFinished
     case search(SearchFeature.Action)
     case setup(MusicSetupFeature.Action)
@@ -98,6 +102,7 @@ struct AppFeature: Sendable {
     }
   }
 
+  static let appStoreID = "6782194077"
   static let crossPromoThrottle: TimeInterval = 60 * 60 * 72
   static let reviewPromptDelay: Duration = .seconds(1.5)
   static let reviewPromptMinimumAge: TimeInterval = 60 * 60 * 24
@@ -345,15 +350,16 @@ struct AppFeature: Sendable {
         self.synchronizeDetailPlayback(state: &state)
         return self.resolveCurrentPlaybackAlbum(state: &state)
 
-      case .playbackAlbumIDsResolved(let songID, let albumIDs):
-        guard state.playback.session?.currentTrackID == songID,
+      case .playbackAlbumIDsResolved(let entryViewID, let songID, let albumIDs):
+        guard state.playback.session?.queue.currentEntry.viewID == entryViewID,
+              state.playback.session?.currentTrackID == songID,
               case .loaded(let library) = state.library.status else { return .none }
         let approvedAlbumIDs = Set(library.albums.map(\.id))
         guard let albumID = albumIDs
           .filter({ approvedAlbumIDs.contains($0) })
           .sorted(by: { $0.rawValue < $1.rawValue })
           .first else { return .none }
-        state.playback.setSourceAlbumID(albumID, for: songID)
+        state.playback.setCurrentAlbumID(albumID, for: entryViewID)
         self.synchronizeDetailPlayback(state: &state)
         return .send(.playback(.saveCachedSession))
 
@@ -397,7 +403,7 @@ struct AppFeature: Sendable {
               self.canPresentReviewPrompt(state) else { return .none }
         progress.hasPrompted = true
         self.reviewPromptStorage.save(progress)
-        state.reviewPrompt = .init()
+        state.reviewPrompt = .init(appStoreID: Self.appStoreID)
         return .none
 
       case .search:
@@ -418,7 +424,7 @@ struct AppFeature: Sendable {
       CrossPromoFeature()
     }
     .ifLet(\.$reviewPrompt, action: \.reviewPrompt) {
-      ReviewPromptFeature()
+      AppStoreReviewFeature()
     }
   }
 
@@ -600,20 +606,24 @@ struct AppFeature: Sendable {
   ) -> EffectOf<Self> {
     guard state.playback.hasAuthoritativeSnapshot,
           case .loaded(let library) = state.library.status,
-          let currentItem = state.playback.session?.currentItem else { return .none }
-    let previousAlbumID = currentItem.albumID
+          let currentEntry = state.playback.session?.queue.currentEntry else { return .none }
+    let previousAlbumID = currentEntry.item.albumID
     _ = state.playback.resolveCurrentAlbum(in: library)
     if state.playback.session?.currentItem.albumID != previousAlbumID {
       self.synchronizeDetailPlayback(state: &state)
       return .send(.playback(.saveCachedSession))
     }
     guard state.playback.session?.currentItem.albumID == nil,
-          state.playback.pendingAlbumResolutionSongID != currentItem.id else { return .none }
-    state.playback.pendingAlbumResolutionSongID = currentItem.id
+          state.playback.pendingAlbumResolutionViewID != currentEntry.viewID else { return .none }
+    state.playback.pendingAlbumResolutionViewID = currentEntry.viewID
     return .run { send in
-      let albumIDs = await (try? self.playback.loadAlbumIDs(currentItem.id)) ?? []
+      let albumIDs = await (try? self.playback.loadAlbumIDs(currentEntry.item.id)) ?? []
       try Task.checkCancellation()
-      await send(.playbackAlbumIDsResolved(currentItem.id, albumIDs))
+      await send(.playbackAlbumIDsResolved(
+        entryViewID: currentEntry.viewID,
+        songID: currentEntry.item.id,
+        albumIDs: albumIDs,
+      ))
     }
     .cancellable(id: CancelID.albumResolution, cancelInFlight: true)
   }

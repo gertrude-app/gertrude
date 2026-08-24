@@ -6,18 +6,9 @@ struct LibraryGridView: View {
   private let playingItemID: String?
   private let isLoading: Bool
   private let transitionNamespace: Namespace.ID?
-  private let onAlbumAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
-  private let onAlbumTap: @MainActor @Sendable (String) -> Void
-  private let onArtistAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onArtistAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onArtistPlayNext: @MainActor @Sendable (String) -> Void
-  private let onArtistTap: @MainActor @Sendable (String) -> Void
-  private let onPlaylistAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
-  private let onPlaylistTap: @MainActor @Sendable (String) -> Void
+  private let albumActions: LibraryItemActions
+  private let artistActions: LibraryItemActions
+  private let playlistActions: LibraryItemActions
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   @State private var filter: LibraryFilter?
@@ -27,36 +18,18 @@ struct LibraryGridView: View {
     playingItemID: String? = nil,
     isLoading: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
-    onAlbumAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    albumActions: LibraryItemActions = .init(),
+    artistActions: LibraryItemActions = .init(),
+    playlistActions: LibraryItemActions = .init(),
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.items = items
     self.playingItemID = playingItemID
     self.isLoading = isLoading
     self.transitionNamespace = transitionNamespace
-    self.onAlbumAddToPlaylist = onAlbumAddToPlaylist
-    self.onAlbumAddToQueue = onAlbumAddToQueue
-    self.onAlbumPlayNext = onAlbumPlayNext
-    self.onAlbumTap = onAlbumTap
-    self.onArtistAddToPlaylist = onArtistAddToPlaylist
-    self.onArtistAddToQueue = onArtistAddToQueue
-    self.onArtistPlayNext = onArtistPlayNext
-    self.onArtistTap = onArtistTap
-    self.onPlaylistAddToPlaylist = onPlaylistAddToPlaylist
-    self.onPlaylistAddToQueue = onPlaylistAddToQueue
-    self.onPlaylistPlayNext = onPlaylistPlayNext
-    self.onPlaylistTap = onPlaylistTap
+    self.albumActions = albumActions
+    self.artistActions = artistActions
+    self.playlistActions = playlistActions
     self.onDebugResetTap = onDebugResetTap
   }
 
@@ -122,17 +95,17 @@ struct LibraryGridView: View {
               artworkSize: metrics.artworkSize,
               isPlaying: item.id == self.playingItemID,
               transitionNamespace: self.transitionNamespace,
-              onAddToPlaylist: { self.onAlbumAddToPlaylist(album.id) },
-              onAddToQueue: { self.onAlbumAddToQueue(album.id) },
-              onPlayNext: { self.onAlbumPlayNext(album.id) },
+              onAddToPlaylist: { self.albumActions.onAddToPlaylist(album.id) },
+              onAddToQueue: { self.albumActions.onAddToQueue(album.id) },
+              onPlayNext: { self.albumActions.onPlayNext(album.id) },
             ) {
-              self.onAlbumTap(album.id)
+              self.albumActions.onTap(album.id)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
           case .artist(let artist):
             Button {
-              self.onArtistTap(artist.id)
+              self.artistActions.onTap(artist.id)
             } label: {
               ArtistCardView(
                 artist: artist,
@@ -142,9 +115,9 @@ struct LibraryGridView: View {
             }
             .buttonStyle(.plain)
             .playbackQueueContextMenu(
-              onPlayNext: { self.onArtistPlayNext(artist.id) },
-              onAddToQueue: { self.onArtistAddToQueue(artist.id) },
-              onAddToPlaylist: { self.onArtistAddToPlaylist(artist.id) },
+              onPlayNext: { self.artistActions.onPlayNext(artist.id) },
+              onAddToQueue: { self.artistActions.onAddToQueue(artist.id) },
+              onAddToPlaylist: { self.artistActions.onAddToPlaylist(artist.id) },
             )
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -154,10 +127,10 @@ struct LibraryGridView: View {
               artworkSize: metrics.artworkSize,
               isPlaying: item.id == self.playingItemID,
               transitionNamespace: self.transitionNamespace,
-              onAddToPlaylist: { self.onPlaylistAddToPlaylist(playlist.id) },
-              onAddToQueue: { self.onPlaylistAddToQueue(playlist.id) },
-              onPlayNext: { self.onPlaylistPlayNext(playlist.id) },
-              onTap: { self.onPlaylistTap(playlist.id) },
+              onAddToPlaylist: { self.playlistActions.onAddToPlaylist(playlist.id) },
+              onAddToQueue: { self.playlistActions.onAddToQueue(playlist.id) },
+              onPlayNext: { self.playlistActions.onPlayNext(playlist.id) },
+              onTap: { self.playlistActions.onTap(playlist.id) },
             )
             .frame(maxWidth: .infinity, alignment: .leading)
           }

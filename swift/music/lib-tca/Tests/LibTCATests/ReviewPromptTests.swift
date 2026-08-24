@@ -37,7 +37,7 @@ struct ReviewPromptTests {
     await clock.advance(by: AppFeature.reviewPromptDelay)
     await store.receive(.reviewPromptDelayFinished) {
       $0.isReviewPromptPending = false
-      $0.reviewPrompt = .init()
+      $0.reviewPrompt = .init(appStoreID: AppFeature.appStoreID)
     }
     #expect(progress.value.hasPrompted)
   }
@@ -100,7 +100,7 @@ struct ReviewPromptTests {
     await clock.advance(by: AppFeature.reviewPromptDelay)
     await store.receive(.reviewPromptDelayFinished) {
       $0.isReviewPromptPending = false
-      $0.reviewPrompt = .init()
+      $0.reviewPrompt = .init(appStoreID: AppFeature.appStoreID)
     }
   }
 
@@ -126,42 +126,6 @@ struct ReviewPromptTests {
       at: firstPlayAt.addingTimeInterval(AppFeature.reviewPromptMinimumAge),
       minimumAge: AppFeature.reviewPromptMinimumAge,
     ))
-  }
-
-  @Test
-  func giveRatingRequestsSystemPromptThenDismisses() async {
-    let clock = TestClock()
-    let dismissed = LockIsolated(false)
-    let requestCount = LockIsolated(0)
-    let store = TestStore(initialState: ReviewPromptFeature.State()) {
-      ReviewPromptFeature()
-    } withDependencies: {
-      $0.appStore.requestRating = { requestCount.withValue { $0 += 1 } }
-      $0.continuousClock = clock
-      $0.dismiss = DismissEffect { dismissed.setValue(true) }
-    }
-
-    await store.send(.giveRatingButtonTapped)
-    await clock.advance(by: .seconds(5))
-    await store.finish()
-
-    expectNoDifference(requestCount.value, 1)
-    #expect(dismissed.value)
-  }
-
-  @Test
-  func noThanksDismissesPrompt() async {
-    let dismissed = LockIsolated(false)
-    let store = TestStore(initialState: ReviewPromptFeature.State()) {
-      ReviewPromptFeature()
-    } withDependencies: {
-      $0.dismiss = DismissEffect { dismissed.setValue(true) }
-    }
-
-    await store.send(.noThanksButtonTapped)
-    await store.finish()
-
-    #expect(dismissed.value)
   }
 
   @Test

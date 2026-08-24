@@ -26,31 +26,37 @@ struct LibraryViewContainer: View {
         onRefresh: {
           self.store.send(.refreshPulled)
         },
-        onAlbumAddToPlaylist: { self.store.send(.addAlbumToPlaylistTapped(.init($0))) },
-        onAlbumAddToQueue: { self.store.send(.albumAddToQueueTapped(.init($0))) },
-        onAlbumPlayNext: { self.store.send(.albumPlayNextTapped(.init($0))) },
-        onAlbumTap: { self.store.send(.albumTapped(.init($0))) },
-        onArtistAddToPlaylist: { self.store.send(.addArtistToPlaylistTapped(.init($0))) },
-        onArtistAddToQueue: { self.store.send(.artistAddToQueueTapped(.init($0))) },
-        onArtistPlayNext: { self.store.send(.artistPlayNextTapped(.init($0))) },
-        onArtistTap: { self.store.send(.artistTapped(.init($0))) },
         onCreatePlaylist: { self.store.send(.createPlaylistSubmitted($0)) },
-        onPlaylistAddToPlaylist: {
-          guard let id = UUID(uuidString: $0) else { return }
-          self.store.send(.addPlaylistToPlaylistTapped(.init(rawValue: id)))
-        },
-        onPlaylistAddToQueue: {
-          guard let id = UUID(uuidString: $0) else { return }
-          self.store.send(.playlistAddToQueueTapped(.init(rawValue: id)))
-        },
-        onPlaylistPlayNext: {
-          guard let id = UUID(uuidString: $0) else { return }
-          self.store.send(.playlistPlayNextTapped(.init(rawValue: id)))
-        },
-        onPlaylistTap: {
-          guard let id = UUID(uuidString: $0) else { return }
-          self.store.send(.playlistTapped(.init(rawValue: id)))
-        },
+        albumActions: .init(
+          onTap: { self.store.send(.albumTapped(.init($0))) },
+          onPlayNext: { self.store.send(.albumPlayNextTapped(.init($0))) },
+          onAddToQueue: { self.store.send(.albumAddToQueueTapped(.init($0))) },
+          onAddToPlaylist: { self.store.send(.addAlbumToPlaylistTapped(.init($0))) },
+        ),
+        artistActions: .init(
+          onTap: { self.store.send(.artistTapped(.init($0))) },
+          onPlayNext: { self.store.send(.artistPlayNextTapped(.init($0))) },
+          onAddToQueue: { self.store.send(.artistAddToQueueTapped(.init($0))) },
+          onAddToPlaylist: { self.store.send(.addArtistToPlaylistTapped(.init($0))) },
+        ),
+        playlistActions: .init(
+          onTap: {
+            guard let id = UUID(uuidString: $0) else { return }
+            self.store.send(.playlistTapped(.init(rawValue: id)))
+          },
+          onPlayNext: {
+            guard let id = UUID(uuidString: $0) else { return }
+            self.store.send(.playlistPlayNextTapped(.init(rawValue: id)))
+          },
+          onAddToQueue: {
+            guard let id = UUID(uuidString: $0) else { return }
+            self.store.send(.playlistAddToQueueTapped(.init(rawValue: id)))
+          },
+          onAddToPlaylist: {
+            guard let id = UUID(uuidString: $0) else { return }
+            self.store.send(.addPlaylistToPlaylistTapped(.init(rawValue: id)))
+          },
+        ),
         onDebugResetTap: { self.store.send(.debugResetOnboardingButtonTapped) },
       )
       .onAppear {

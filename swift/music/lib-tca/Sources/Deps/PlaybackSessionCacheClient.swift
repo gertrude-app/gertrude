@@ -124,6 +124,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
   }
 
   var songIDs: [ApprovedTrack.ID]
+  var albumIDs: [ApprovedAlbum.ID?]?
   var context: PlaybackContext?
   var currentIndex: Int
   var elapsedTime: TimeInterval
@@ -137,6 +138,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
 
   init(
     songIDs: [ApprovedTrack.ID],
+    albumIDs: [ApprovedAlbum.ID?]? = nil,
     currentIndex: Int,
     elapsedTime: TimeInterval,
     durationFallback: TimeInterval? = nil,
@@ -149,6 +151,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     context: PlaybackContext? = nil,
   ) {
     self.songIDs = songIDs
+    self.albumIDs = albumIDs
     self.context = context
     self.currentIndex = currentIndex
     self.elapsedTime = elapsedTime.isFinite ? max(0, elapsedTime) : 0
@@ -174,16 +177,18 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
   ) {
     let entries = Array(session.queue.entries.dropFirst(session.queue.currentIndex))
     let items = entries.map(\.item)
+    let albumIDs = items.map(\.albumID)
     var seenSongIDs = Set<ApprovedTrack.ID>()
     let sourceAlbumHints = items.compactMap { item -> SourceAlbumHint? in
       guard seenSongIDs.insert(item.id).inserted,
-            let albumID = sourceAlbumIDs[item.id] ?? item.albumID else { return nil }
+            let albumID = item.albumID ?? sourceAlbumIDs[item.id] else { return nil }
       return SourceAlbumHint(songID: item.id, albumID: albumID)
     }
     let queueRoles = items.map(\.queueRole)
     let sourceEntryIDs = entries.map(\.sourceEntryID)
     self.init(
       songIDs: items.map(\.id),
+      albumIDs: albumIDs.contains(where: { $0 != nil }) ? albumIDs : nil,
       currentIndex: 0,
       elapsedTime: progress.elapsedTime,
       durationFallback: progress.duration,
@@ -202,6 +207,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
       ? legacySession.currentIndex
       : 0
     let items = Array(legacySession.items.dropFirst(currentIndex))
+    let albumIDs = items.map(\.albumID)
     var seenSongIDs = Set<ApprovedTrack.ID>()
     let sourceAlbumHints = items.compactMap { item -> SourceAlbumHint? in
       guard seenSongIDs.insert(item.id).inserted,
@@ -211,6 +217,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     let queueRoles = items.map(\.queueRole)
     self.init(
       songIDs: items.map(\.id),
+      albumIDs: albumIDs.contains(where: { $0 != nil }) ? albumIDs : nil,
       currentIndex: 0,
       elapsedTime: legacySession.progress.elapsedTime,
       durationFallback: legacySession.progress.duration,
@@ -226,6 +233,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     let retainedSongIDs = Set(songIDs)
     return Self(
       songIDs: songIDs,
+      albumIDs: self.albumIDs.map { Array($0.dropFirst(self.currentIndex)) },
       currentIndex: 0,
       elapsedTime: self.elapsedTime,
       durationFallback: self.durationFallback,
@@ -256,6 +264,9 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
     playbackSource?.removeTracks(notIn: approvedTrackIDs)
     return Self(
       songIDs: songIDs,
+      albumIDs: checkpoint.albumIDs.map { albumIDs in
+        retainedIndices.map { albumIDs[$0] }
+      },
       currentIndex: 0,
       elapsedTime: currentItemWasRetained ? checkpoint.elapsedTime : 0,
       durationFallback: currentItemWasRetained ? checkpoint.durationFallback : nil,
@@ -287,6 +298,7 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
   var isValid: Bool {
     !self.songIDs.isEmpty
       && self.songIDs.indices.contains(self.currentIndex)
+      && (self.albumIDs == nil || self.albumIDs?.count == self.songIDs.count)
       && self.playlistSourceHints.count == self.songIDs.count
       && (self.playbackSource?.isValid ?? true)
       && (self.infinitePlaybackPlan?.remainingSourceEntryIDs.allSatisfy { sourceEntryID in
@@ -298,6 +310,10 @@ struct PlaybackCheckpoint: Codable, Equatable, Sendable {
         guard let sourceEntryID else { return true }
         return self.playbackSource?.entries.contains(where: { $0.id == sourceEntryID }) == true
       } ?? true)
+  }
+
+  func albumID(at index: Int) -> ApprovedAlbum.ID? {
+    self.albumIDs?[index] ?? self.sourceAlbumIDs[self.songIDs[index]]
   }
 
   var sourceAlbumIDs: [ApprovedTrack.ID: ApprovedAlbum.ID] {

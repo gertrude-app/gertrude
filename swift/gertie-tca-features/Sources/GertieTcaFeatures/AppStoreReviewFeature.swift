@@ -1,11 +1,17 @@
 import ComposableArchitecture
 
 @Reducer
-struct ReviewPromptFeature {
+public struct AppStoreReviewFeature: Sendable {
   @ObservableState
-  struct State: Equatable {}
+  public struct State: Equatable {
+    public let appStoreID: String
 
-  enum Action: Equatable {
+    public init(appStoreID: String) {
+      self.appStoreID = appStoreID
+    }
+  }
+
+  public enum Action: Equatable {
     case giveRatingButtonTapped
     case leaveReviewButtonTapped
     case noThanksButtonTapped
@@ -15,25 +21,28 @@ struct ReviewPromptFeature {
   @Dependency(\.continuousClock) var clock
   @Dependency(\.dismiss) var dismiss
 
-  var body: some ReducerOf<Self> {
-    Reduce { _, action in
+  public init() {}
+
+  public var body: some ReducerOf<Self> {
+    Reduce { state, action in
       switch action {
       case .giveRatingButtonTapped:
-        .run { _ in
+        return .run { _ in
           await self.appStore.requestRating()
           try? await self.clock.sleep(for: .seconds(5))
           await self.dismiss()
         }
 
       case .leaveReviewButtonTapped:
-        .run { _ in
-          await self.appStore.requestReview()
+        let appStoreID = state.appStoreID
+        return .run { _ in
+          await self.appStore.requestReview(appStoreID)
           try? await self.clock.sleep(for: .seconds(5))
           await self.dismiss()
         }
 
       case .noThanksButtonTapped:
-        .run { _ in
+        return .run { _ in
           await self.dismiss()
         }
       }

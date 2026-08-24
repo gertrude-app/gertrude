@@ -448,10 +448,14 @@ struct AppFeatureTests {
     }
 
     await store.send(.playback(.playbackEvent(.snapshotChanged(snapshot)))) {
-      $0.playback.pendingAlbumResolutionSongID = item.id
+      $0.playback.pendingAlbumResolutionViewID = "entry-0"
     }
-    await store.receive(.playbackAlbumIDsResolved(item.id, [album.id])) {
-      $0.playback.pendingAlbumResolutionSongID = nil
+    await store.receive(.playbackAlbumIDsResolved(
+      entryViewID: "entry-0",
+      songID: item.id,
+      albumIDs: [album.id],
+    )) {
+      $0.playback.pendingAlbumResolutionViewID = nil
       $0.playback.sourceAlbumIDs[item.id] = album.id
       $0.playback.session?.queue.entries[0] = PlaybackQueueEntry(
         id: "entry-0",

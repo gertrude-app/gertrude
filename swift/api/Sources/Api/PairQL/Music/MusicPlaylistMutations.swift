@@ -266,7 +266,7 @@ extension DeleteMusicPlaylist: Resolver {
   }
 }
 
-extension AddToMusicPlaylist: Resolver {
+extension AddSourceToMusicPlaylist: Resolver {
   static func resolve(
     with input: Input,
     in ctx: MusicApp.InstallContext,
@@ -329,7 +329,7 @@ extension AddToMusicPlaylist: Resolver {
   }
 }
 
-extension AddMusicToPlaylist: Resolver {
+extension AddMusicBatchToPlaylist: Resolver {
   static func resolve(
     with input: Input,
     in ctx: MusicApp.InstallContext,

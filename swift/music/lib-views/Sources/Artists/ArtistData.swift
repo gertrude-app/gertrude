@@ -7,7 +7,6 @@ public struct ArtistData: Identifiable, Equatable, Hashable, Sendable {
   public let artworkPalette: ArtworkPalette?
   public let subtitle: String?
   public let editorialNotes: String?
-  public let releaseAlbumIds: [String]
   public let topSongs: [ArtistTopSongData]
 
   public init(
@@ -17,7 +16,6 @@ public struct ArtistData: Identifiable, Equatable, Hashable, Sendable {
     artworkPalette: ArtworkPalette? = nil,
     subtitle: String? = nil,
     editorialNotes: String? = nil,
-    releaseAlbumIds: [String] = [],
     topSongs: [ArtistTopSongData] = [],
   ) {
     self.id = id
@@ -26,7 +24,6 @@ public struct ArtistData: Identifiable, Equatable, Hashable, Sendable {
     self.artworkPalette = artworkPalette
     self.subtitle = subtitle
     self.editorialNotes = editorialNotes
-    self.releaseAlbumIds = releaseAlbumIds
     self.topSongs = topSongs
   }
 }

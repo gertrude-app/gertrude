@@ -55,9 +55,15 @@ struct PodcastsView: View {
         GertieActionScreen(
           message: lstr(.podcastsRequestReviewMessage),
           actions: [
-            .button(lstr(.podcastsRequestReviewGiveRating)) { store.send(.leaveRating) },
-            .button(lstr(.podcastsRequestReviewLeaveReview)) { store.send(.leaveReview) },
-            .button(lstr(.podcastsRequestReviewNoThanks)) { store.send(.noThanks) },
+            .button(lstr(.podcastsRequestReviewGiveRating)) {
+              store.send(.giveRatingButtonTapped)
+            },
+            .button(lstr(.podcastsRequestReviewLeaveReview)) {
+              store.send(.leaveReviewButtonTapped)
+            },
+            .button(lstr(.podcastsRequestReviewNoThanks)) {
+              store.send(.noThanksButtonTapped)
+            },
           ],
         )
       },

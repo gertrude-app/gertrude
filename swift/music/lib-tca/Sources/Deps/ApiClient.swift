@@ -8,12 +8,12 @@ import PairQLClient
 
 @DependencyClient
 struct ApiClient: Sendable {
-  var addToMusicPlaylist:
-    @Sendable (_ token: UUID, _ input: AddToMusicPlaylist.Input) async throws
-    -> AddToMusicPlaylist.Output
-  var addMusicToPlaylist:
-    @Sendable (_ token: UUID, _ input: AddMusicToPlaylist.Input) async throws
-    -> AddMusicToPlaylist.Output
+  var addSourceToMusicPlaylist:
+    @Sendable (_ token: UUID, _ input: AddSourceToMusicPlaylist.Input) async throws
+    -> AddSourceToMusicPlaylist.Output
+  var addMusicBatchToPlaylist:
+    @Sendable (_ token: UUID, _ input: AddMusicBatchToPlaylist.Input) async throws
+    -> AddMusicBatchToPlaylist.Output
   var createMusicPlaylist:
     @Sendable (_ token: UUID, _ input: CreateMusicPlaylist.Input) async throws
     -> CreateMusicPlaylist.Output
@@ -39,17 +39,17 @@ struct ApiClient: Sendable {
 extension ApiClient: DependencyKey {
   static var liveValue: ApiClient {
     .init(
-      addToMusicPlaylist: { token, input in
+      addSourceToMusicPlaylist: { token, input in
         try await pairql.call(
-          AddToMusicPlaylist.self,
-          authed: .addToMusicPlaylist(input),
+          AddSourceToMusicPlaylist.self,
+          authed: .addSourceToMusicPlaylist(input),
           token: token,
         )
       },
-      addMusicToPlaylist: { token, input in
+      addMusicBatchToPlaylist: { token, input in
         try await pairql.call(
-          AddMusicToPlaylist.self,
-          authed: .addMusicToPlaylist(input),
+          AddMusicBatchToPlaylist.self,
+          authed: .addMusicBatchToPlaylist(input),
           token: token,
         )
       },

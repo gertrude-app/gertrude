@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Dependencies
+import GertieApp
 import GertieTcaFeatures
 import LibViews
 import PodcastRoute
@@ -29,14 +30,10 @@ struct AppView: View {
         ) { store in
           PodcastsView(store: store)
         }
-        .sheet(item: self.crossPromoStore(style: .sheet)) { store in
-          CrossPromoView(store: store)
-        }
-      #if os(iOS)
-        .fullScreenCover(item: self.crossPromoStore(style: .screen)) { store in
-          CrossPromoView(store: store)
-        }
-      #endif
+        .crossPromoPresentations(
+          store: self.$store.scope(state: \.crossPromo, action: \.crossPromo),
+          onImageLoadFailure: Self.crossPromoImageLoadFailed,
+        )
     }
     .alert(self.$store.scope(state: \.alert, action: \.alert))
     .overlay(alignment: .bottom) {
@@ -68,13 +65,18 @@ struct AppView: View {
     self.store.nowPlaying.data?.minimized == true && !self.store.hideNowPlaying
   }
 
-  private func crossPromoStore(
-    style: CrossPromoStyle,
-  ) -> Binding<StoreOf<CrossPromoFeature>?> {
-    let base = self.$store.scope(state: \.crossPromo, action: \.crossPromo)
-    return Binding(
-      get: { base.wrappedValue.flatMap { $0.campaign.style == style ? $0 : nil } },
-      set: { base.wrappedValue = $0 },
+  @MainActor
+  private static func crossPromoImageLoadFailed(
+    _ campaign: CrossPromoCampaign,
+    _ image: CrossPromoImage,
+    _ error: any Error,
+  ) {
+    log(
+      .warn,
+      .setup,
+      "af5b46ca",
+      detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
+        + "url=\(image.url) error=\(error)",
     )
   }
 

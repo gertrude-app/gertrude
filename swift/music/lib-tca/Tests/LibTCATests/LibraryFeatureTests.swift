@@ -882,7 +882,7 @@ struct LibraryFeatureTests {
     let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
       LibraryFeature()
     } withDependencies: {
-      $0.approvedMusic.addToPlaylist = { _ in await results.next() }
+      $0.approvedMusic.addSourceToPlaylist = { _ in await results.next() }
     }
 
     await store.send(.addTrackToPlaylistTapped(
@@ -1020,7 +1020,7 @@ struct LibraryFeatureTests {
     let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
       LibraryFeature()
     } withDependencies: {
-      $0.approvedMusic.addToPlaylist = { _ in
+      $0.approvedMusic.addSourceToPlaylist = { _ in
         throw ApprovedMusicClientError.musicAccessUnavailable
       }
       $0.approvedMusic.createPlaylist = { _ in .updated(library) }

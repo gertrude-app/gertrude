@@ -136,7 +136,7 @@ import Testing
       }
       await clock.advance(by: .seconds(1.5))
       await store.receive(.promptReview) {
-        $0.destination = .requestReview(.init())
+        $0.destination = .requestReview(.init(appStoreID: PodcastsFeature.appStoreID))
       }
       #expect(dep(\.db).record(id: .promptedReview) != nil)
       var numShows = try await dep(\.db).read { try Show.count().fetchOne($0) }

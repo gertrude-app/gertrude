@@ -86,12 +86,10 @@ struct AppView: View {
         ],
       )
     }
-    .sheet(item: self.crossPromoStore(style: .sheet)) { store in
-      CrossPromoView(store: store)
-    }
-    .fullScreenCover(item: self.crossPromoStore(style: .screen)) { store in
-      CrossPromoView(store: store)
-    }
+    .crossPromoPresentations(
+      store: self.$store.scope(state: \.crossPromo, action: \.crossPromo),
+      onImageLoadFailure: Self.crossPromoImageLoadFailed,
+    )
     #endif
   }
 
@@ -544,13 +542,18 @@ struct AppView: View {
     }
   }
 
-  private func crossPromoStore(
-    style: CrossPromoStyle,
-  ) -> Binding<StoreOf<CrossPromoFeature>?> {
-    let base = self.$store.scope(state: \.crossPromo, action: \.crossPromo)
-    return Binding(
-      get: { base.wrappedValue.flatMap { $0.campaign.style == style ? $0 : nil } },
-      set: { base.wrappedValue = $0 },
+  @MainActor
+  private static func crossPromoImageLoadFailed(
+    _ campaign: CrossPromoCampaign,
+    _ image: CrossPromoImage,
+    _ error: any Error,
+  ) {
+    log(
+      .warn,
+      .setup,
+      "9b5e208d",
+      detail: "campaign=\(campaign.campaignId) placement=\(campaign.placement) "
+        + "url=\(image.url) error=\(error)",
     )
   }
 

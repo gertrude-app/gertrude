@@ -70,6 +70,12 @@ extension Music {
       case confirmationRequired(MusicPlaylistBatchDuplicateConfirmation)
     }
 
+    private struct AdditionAnalysis {
+      var allAdditions: [EntryAddition]
+      var newAdditions: [EntryAddition]
+      var duplicates: [MusicPlaylistDuplicate]
+    }
+
     enum RuleError: Error, Equatable {
       case invalidDuplicateResolution(MusicPlaylistDuplicateResolution)
       case unauthorizedAlbum(AlbumId)
@@ -212,61 +218,41 @@ extension Music {
     ) throws -> AdditionPlan {
       try self.validate(duplicateResolution, for: selection)
       let candidates = try index.candidates(for: selection)
-      let reconciliation = self.reconcile(entries: playlist.entries, using: index)
-      var existingCounts: [TrackId: Int] = [:]
-      for resolved in reconciliation.entries {
-        existingCounts[resolved.entry.trackId, default: 0] += 1
-      }
-      let duplicates = candidates.compactMap { candidate -> MusicPlaylistDuplicate? in
-        let trackId = TrackId(rawValue: candidate.track.id)
-        guard let existingCount = existingCounts[trackId] else { return nil }
-        return .init(
-          trackId: candidate.track.id,
-          title: candidate.track.title,
-          existingCount: existingCount,
-        )
-      }
+      let analysis = self.analyze(candidates, for: playlist, using: index)
 
-      if duplicateResolution == .requestConfirmation, !duplicates.isEmpty {
+      if duplicateResolution == .requestConfirmation, !analysis.duplicates.isEmpty {
         let confirmation: MusicPlaylistDuplicateConfirmation = switch selection {
         case .track:
-          .track(playlistId: playlist.id, duplicate: duplicates[0])
+          .track(playlistId: playlist.id, duplicate: analysis.duplicates[0])
         case .album(let albumId):
           .album(
             playlistId: playlist.id,
             albumId: albumId,
-            duplicates: duplicates,
+            duplicates: analysis.duplicates,
           )
         case .artist(let artistId):
           .artist(
             playlistId: playlist.id,
             artistId: artistId,
-            duplicates: duplicates,
+            duplicates: analysis.duplicates,
           )
         case .playlist(let sourcePlaylistId):
           .playlist(
             playlistId: playlist.id,
             sourcePlaylistId: sourcePlaylistId,
-            duplicates: duplicates,
+            duplicates: analysis.duplicates,
           )
         }
         return .confirmationRequired(confirmation)
       }
 
-      let candidatesToAppend: [EffectiveTrackIndex.Candidate] = switch duplicateResolution {
+      let additions = switch duplicateResolution {
       case .addOnlyNew:
-        candidates.filter {
-          existingCounts[TrackId(rawValue: $0.track.id)] == nil
-        }
+        analysis.newAdditions
       case .requestConfirmation, .addAgain, .addAll:
-        candidates
+        analysis.allAdditions
       }
-      return .append(candidatesToAppend.map { candidate in
-        EntryAddition(
-          trackId: TrackId(rawValue: candidate.track.id),
-          preferredAlbumId: candidate.albumId,
-        )
-      })
+      return .append(additions)
     }
 
     static func planBatchAddition(
@@ -286,42 +272,60 @@ extension Music {
         }
       }
 
+      let analysis = self.analyze(candidates, for: playlist, using: index)
+
+      if duplicateResolution == .requestConfirmation, !analysis.duplicates.isEmpty {
+        return .confirmationRequired(.init(
+          playlistId: playlist.id,
+          duplicates: analysis.duplicates,
+        ))
+      }
+
+      let additions = switch duplicateResolution {
+      case .addOnlyNew:
+        analysis.newAdditions
+      case .requestConfirmation, .addAll:
+        analysis.allAdditions
+      }
+      return .append(additions)
+    }
+
+    private static func analyze(
+      _ candidates: [EffectiveTrackIndex.Candidate],
+      for playlist: Playlist,
+      using index: EffectiveTrackIndex,
+    ) -> AdditionAnalysis {
       let reconciliation = self.reconcile(entries: playlist.entries, using: index)
       var existingCounts: [TrackId: Int] = [:]
       for resolved in reconciliation.entries {
         existingCounts[resolved.entry.trackId, default: 0] += 1
       }
-      let duplicates = candidates.compactMap { candidate -> MusicPlaylistDuplicate? in
-        let trackID = TrackId(rawValue: candidate.track.id)
-        guard let existingCount = existingCounts[trackID] else { return nil }
-        return .init(
-          trackId: candidate.track.id,
-          title: candidate.track.title,
-          existingCount: existingCount,
-        )
-      }
 
-      if duplicateResolution == .requestConfirmation, !duplicates.isEmpty {
-        return .confirmationRequired(.init(
-          playlistId: playlist.id,
-          duplicates: duplicates,
-        ))
-      }
-
-      let candidatesToAppend: [EffectiveTrackIndex.Candidate] = switch duplicateResolution {
-      case .addOnlyNew:
-        candidates.filter {
-          existingCounts[TrackId(rawValue: $0.track.id)] == nil
-        }
-      case .requestConfirmation, .addAll:
-        candidates
-      }
-      return .append(candidatesToAppend.map { candidate in
-        EntryAddition(
-          trackId: TrackId(rawValue: candidate.track.id),
+      var allAdditions: [EntryAddition] = []
+      var newAdditions: [EntryAddition] = []
+      var duplicates: [MusicPlaylistDuplicate] = []
+      for candidate in candidates {
+        let trackId = TrackId(rawValue: candidate.track.id)
+        let addition = EntryAddition(
+          trackId: trackId,
           preferredAlbumId: candidate.albumId,
         )
-      })
+        allAdditions.append(addition)
+        if let existingCount = existingCounts[trackId] {
+          duplicates.append(.init(
+            trackId: candidate.track.id,
+            title: candidate.track.title,
+            existingCount: existingCount,
+          ))
+        } else {
+          newAdditions.append(addition)
+        }
+      }
+      return .init(
+        allAdditions: allAdditions,
+        newAdditions: newAdditions,
+        duplicates: duplicates,
+      )
     }
 
     static func reconcile(

@@ -538,7 +538,10 @@ struct PlaybackFeatureTests {
 
     let recordedItems = await recorder.items
     expectNoDifference(recordedItems, restartedItems)
-    expectNoDifference(store.state.session?.queue.entries.compactMap(\.sourceEntryID), cycleEntryIDs)
+    expectNoDifference(
+      store.state.session?.queue.entries.compactMap(\.sourceEntryID),
+      cycleEntryIDs,
+    )
   }
 
   @Test
@@ -1116,7 +1119,6 @@ struct PlaybackFeatureTests {
     expectNoDifference(source.selectedEntryID, 1)
     expectNoDifference(source.context, context)
     expectNoDifference(source.removedEntryIDs, [0, 2])
-    expectNoDifference(source.selectedAndFollowingItems, [duplicate])
     expectNoDifference(source.artistNames, ["Artist"])
     #expect(source.isValid)
   }
@@ -1979,6 +1981,39 @@ struct PlaybackFeatureTests {
         playlistSourceHints: fullHints,
       )
     }
+  }
+
+  @Test
+  func progressiveSnapshotsRetainAlbumPlanUntilAllOccurrencesMaterialize() async {
+    let plan = [
+      playbackItem("first").withAlbumID("album-a"),
+      playbackItem("second").withAlbumID("album-b"),
+    ].map {
+      PlaybackMetadataHintMatcher.Occurrence(item: $0)
+    }
+    let firstSnapshot = playbackSnapshot(items: [playbackItem("first")])
+    let fullSnapshot = playbackSnapshot(items: [
+      playbackItem("first"),
+      playbackItem("second"),
+    ])
+    let store = TestStore(initialState: PlaybackFeature.State(
+      pendingMetadataPlan: plan,
+    )) {
+      PlaybackFeature()
+    }
+    store.exhaustivity = .off
+
+    await store.send(.playbackEvent(.snapshotChanged(firstSnapshot)))
+    #expect(store.state.pendingMetadataPlan != nil)
+    expectNoDifference(store.state.session?.currentItem.albumID, "album-a")
+
+    await store.send(.playbackEvent(.snapshotChanged(fullSnapshot)))
+    await store.finish()
+    #expect(store.state.pendingMetadataPlan == nil)
+    expectNoDifference(
+      store.state.session?.queue.items.map(\.albumID),
+      ["album-a", "album-b"],
+    )
   }
 
   @Test
@@ -4124,6 +4159,52 @@ struct PlaybackFeatureTests {
   }
 
   @Test
+  func playbackSnapshotPreservesAlbumPerDuplicateOccurrence() async {
+    let item = playbackItem("duplicate")
+    let items = [
+      item.withAlbumID("album-a"),
+      item.withAlbumID("album-b"),
+    ]
+    let store = TestStore(initialState: PlaybackFeature.State(
+      session: .init(queue: .init(items: items)),
+      sourceAlbumIDs: [item.id: "album-b"],
+    )) {
+      PlaybackFeature()
+    }
+    store.exhaustivity = .off
+
+    await store.send(.playbackEvent(.snapshotChanged(playbackSnapshot(items: [item, item]))))
+    await store.finish()
+
+    expectNoDifference(
+      store.state.session?.queue.entries.map(\.item.albumID),
+      ["album-a", "album-b"],
+    )
+  }
+
+  @Test
+  func albumResolutionDoesNotUpdateDifferentCurrentOccurrence() throws {
+    let item = playbackItem("duplicate")
+    let entries = [
+      PlaybackQueueEntry(id: "first", item: item, viewID: "first-view"),
+      PlaybackQueueEntry(id: "second", item: item, viewID: "second-view"),
+    ]
+    let queue = try #require(PlaybackFeature.Queue(
+      entries: entries,
+      currentEntryID: "second",
+    ))
+    var state = PlaybackFeature.State(
+      session: .init(queue: queue),
+      pendingAlbumResolutionViewID: "first-view",
+    )
+
+    state.setCurrentAlbumID("album-a", for: "first-view")
+
+    expectNoDifference(state.session?.queue.items.map(\.albumID), [nil, nil])
+    expectNoDifference(state.pendingAlbumResolutionViewID, "first-view")
+  }
+
+  @Test
   func playbackSnapshotWithUnknownCurrentEntryDoesNothing() async {
     let items = [playbackItem("track-1"), playbackItem("track-2")]
     let initialSnapshot = playbackSnapshot(items: items)
@@ -4304,7 +4385,7 @@ struct PlaybackFeatureTests {
       failure: .trackUnavailable,
       hasAuthoritativeSnapshot: true,
       lastCachedProgressBucket: 8,
-      pendingAlbumResolutionSongID: item.id,
+      pendingAlbumResolutionViewID: "pending:0:track-1",
       playbackSource: playbackSource,
       preferences: preferences,
       progress: .init(elapsedTime: 42, duration: 180),
@@ -4330,7 +4411,7 @@ struct PlaybackFeatureTests {
       $0.failure = nil
       $0.hasAuthoritativeSnapshot = false
       $0.lastCachedProgressBucket = nil
-      $0.pendingAlbumResolutionSongID = nil
+      $0.pendingAlbumResolutionViewID = nil
       $0.playbackSource = nil
       $0.progress = .zero
       $0.session = nil
@@ -4597,6 +4678,39 @@ struct PlaybackFeatureTests {
     expectNoDifference(
       store.state.session?.queue.items.map(\.playlistSource),
       [firstSource, secondSource],
+    )
+  }
+
+  @Test
+  func restoreCachedSessionPreservesAlbumPerDuplicateOccurrence() async {
+    let item = playbackItem("duplicate")
+    let checkpoint = PlaybackCheckpoint(
+      songIDs: [item.id, item.id],
+      albumIDs: ["album-a", "album-b"],
+      currentIndex: 0,
+      elapsedTime: 12,
+    )
+    let snapshot = playbackSnapshot(
+      items: [item, item],
+      playStatus: .paused,
+    )
+    let store = TestStore(initialState: PlaybackFeature.State()) {
+      PlaybackFeature()
+    } withDependencies: {
+      $0.playback.restoreQueue = { _ in snapshot }
+      $0.playbackSessionCache._load = { checkpoint }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.restoreCachedSession)
+    await store.receive(.checkpointLoaded(checkpoint))
+    await store.receive(.checkpointRestorationFinished(snapshot))
+    await store.receive(.playbackEvent(.snapshotChanged(snapshot)))
+    await store.finish()
+
+    expectNoDifference(
+      store.state.session?.queue.entries.map(\.item.albumID),
+      ["album-a", "album-b"],
     )
   }
 

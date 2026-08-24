@@ -1,6 +1,25 @@
 import Foundation
 import SwiftUI
 
+public struct LibraryItemActions: Sendable {
+  let onTap: @MainActor @Sendable (String) -> Void
+  let onPlayNext: @MainActor @Sendable (String) -> Void
+  let onAddToQueue: @MainActor @Sendable (String) -> Void
+  let onAddToPlaylist: @MainActor @Sendable (String) -> Void
+
+  public init(
+    onTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    onAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+  ) {
+    self.onTap = onTap
+    self.onPlayNext = onPlayNext
+    self.onAddToQueue = onAddToQueue
+    self.onAddToPlaylist = onAddToPlaylist
+  }
+}
+
 public enum LibraryViewState: Equatable, Sendable {
   case loading
   case loaded(items: [LibraryCollectionItemData])
@@ -17,19 +36,10 @@ public struct LibraryView: View {
   private let transitionNamespace: Namespace.ID?
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onRefresh: @MainActor @Sendable () async -> Void
-  private let onAlbumAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onAlbumAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onAlbumPlayNext: @MainActor @Sendable (String) -> Void
-  private let onAlbumTap: @MainActor @Sendable (String) -> Void
-  private let onArtistAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onArtistAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onArtistPlayNext: @MainActor @Sendable (String) -> Void
-  private let onArtistTap: @MainActor @Sendable (String) -> Void
   private let onCreatePlaylist: @MainActor @Sendable (String) -> Void
-  private let onPlaylistAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onPlaylistAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onPlaylistPlayNext: @MainActor @Sendable (String) -> Void
-  private let onPlaylistTap: @MainActor @Sendable (String) -> Void
+  private let albumActions: LibraryItemActions
+  private let artistActions: LibraryItemActions
+  private let playlistActions: LibraryItemActions
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   @State private var createPlaylistName = ""
@@ -43,19 +53,10 @@ public struct LibraryView: View {
     transitionNamespace: Namespace.ID? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onRefresh: @MainActor @escaping @Sendable () async -> Void = {},
-    onAlbumAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAlbumAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAlbumPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAlbumTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onArtistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     onCreatePlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlaylistTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
+    albumActions: LibraryItemActions = .init(),
+    artistActions: LibraryItemActions = .init(),
+    playlistActions: LibraryItemActions = .init(),
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.state = state
@@ -65,19 +66,10 @@ public struct LibraryView: View {
     self.transitionNamespace = transitionNamespace
     self.onRetryTap = onRetryTap
     self.onRefresh = onRefresh
-    self.onAlbumAddToPlaylist = onAlbumAddToPlaylist
-    self.onAlbumAddToQueue = onAlbumAddToQueue
-    self.onAlbumPlayNext = onAlbumPlayNext
-    self.onAlbumTap = onAlbumTap
-    self.onArtistAddToPlaylist = onArtistAddToPlaylist
-    self.onArtistAddToQueue = onArtistAddToQueue
-    self.onArtistPlayNext = onArtistPlayNext
-    self.onArtistTap = onArtistTap
     self.onCreatePlaylist = onCreatePlaylist
-    self.onPlaylistAddToPlaylist = onPlaylistAddToPlaylist
-    self.onPlaylistAddToQueue = onPlaylistAddToQueue
-    self.onPlaylistPlayNext = onPlaylistPlayNext
-    self.onPlaylistTap = onPlaylistTap
+    self.albumActions = albumActions
+    self.artistActions = artistActions
+    self.playlistActions = playlistActions
     self.onDebugResetTap = onDebugResetTap
   }
 
@@ -200,18 +192,9 @@ public struct LibraryView: View {
         items: items,
         playingItemID: self.playingItemID,
         transitionNamespace: self.transitionNamespace,
-        onAlbumAddToPlaylist: self.onAlbumAddToPlaylist,
-        onAlbumAddToQueue: self.onAlbumAddToQueue,
-        onAlbumPlayNext: self.onAlbumPlayNext,
-        onAlbumTap: self.onAlbumTap,
-        onArtistAddToPlaylist: self.onArtistAddToPlaylist,
-        onArtistAddToQueue: self.onArtistAddToQueue,
-        onArtistPlayNext: self.onArtistPlayNext,
-        onArtistTap: self.onArtistTap,
-        onPlaylistAddToPlaylist: self.onPlaylistAddToPlaylist,
-        onPlaylistAddToQueue: self.onPlaylistAddToQueue,
-        onPlaylistPlayNext: self.onPlaylistPlayNext,
-        onPlaylistTap: self.onPlaylistTap,
+        albumActions: self.albumActions,
+        artistActions: self.artistActions,
+        playlistActions: self.playlistActions,
         onDebugResetTap: self.onDebugResetTap,
       )
 

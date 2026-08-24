@@ -173,7 +173,7 @@ struct ApprovedMusicClientTests {
     )
 
     let result = try await withDependencies {
-      $0.api.addToMusicPlaylist = { _, _ in
+      $0.api.addSourceToMusicPlaylist = { _, _ in
         .duplicateConfirmationRequired(
           snapshot: remoteApprovedMusicLibrary,
           confirmation: confirmation,
@@ -184,7 +184,7 @@ struct ApprovedMusicClientTests {
         key == .connection ? connectionData : nil
       }
     } operation: {
-      try await ApprovedMusicClient.liveValue.addToPlaylist(.init(
+      try await ApprovedMusicClient.liveValue.addSourceToPlaylist(.init(
         playlistId: UUID(3),
         source: .track(trackId: "track-1", albumId: "album-1"),
       ))
@@ -206,13 +206,13 @@ struct ApprovedMusicClientTests {
       playlistId: UUID(3),
       duplicates: [.init(trackId: "track-1", title: "Library Track", existingCount: 1)],
     )
-    let input = AddMusicToPlaylist.Input(
+    let input = AddMusicBatchToPlaylist.Input(
       playlistId: UUID(3),
       sources: [.track(trackId: "track-1", albumId: "album-1")],
     )
 
     let result = try await withDependencies {
-      $0.api.addMusicToPlaylist = { _, receivedInput in
+      $0.api.addMusicBatchToPlaylist = { _, receivedInput in
         #expect(receivedInput == input)
         return .batchDuplicateConfirmationRequired(
           snapshot: remoteApprovedMusicLibrary,
@@ -224,7 +224,7 @@ struct ApprovedMusicClientTests {
         key == .connection ? connectionData : nil
       }
     } operation: {
-      try await ApprovedMusicClient.liveValue.addMusicToPlaylist(input)
+      try await ApprovedMusicClient.liveValue.addMusicBatchToPlaylist(input)
     }
 
     expectNoDifference(
@@ -426,7 +426,6 @@ struct ApprovedMusicClientTests {
     #expect(album.trackCount == 1)
     #expect(album.releaseDate == "2024-04-12")
     #expect(album.releaseType == "Album")
-    #expect(artist.releaseAlbumIds == ["album-1"])
     #expect(artist.topSongs.map(\.duration) == ["3:20"])
   }
 }

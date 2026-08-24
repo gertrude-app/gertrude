@@ -6,10 +6,10 @@ import PairQL
 
 @DependencyClient
 struct ApprovedMusicClient: Sendable {
-  var addToPlaylist:
-    @Sendable (_ input: AddToMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
-  var addMusicToPlaylist:
-    @Sendable (_ input: AddMusicToPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var addSourceToPlaylist:
+    @Sendable (_ input: AddSourceToMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var addMusicBatchToPlaylist:
+    @Sendable (_ input: AddMusicBatchToPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var createPlaylist:
     @Sendable (_ input: CreateMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var deletePlaylist:
@@ -28,14 +28,14 @@ struct ApprovedMusicClient: Sendable {
 extension ApprovedMusicClient: DependencyKey {
   static var liveValue: Self {
     Self(
-      addToPlaylist: { input in
+      addSourceToPlaylist: { input in
         try await performPlaylistMutation { api, token in
-          try await api.addToMusicPlaylist(token, input)
+          try await api.addSourceToMusicPlaylist(token, input)
         }
       },
-      addMusicToPlaylist: { input in
+      addMusicBatchToPlaylist: { input in
         try await performPlaylistMutation { api, token in
-          try await api.addMusicToPlaylist(token, input)
+          try await api.addMusicBatchToPlaylist(token, input)
         }
       },
       createPlaylist: { input in
@@ -116,8 +116,8 @@ extension DependencyValues {
 extension ApprovedMusicClient {
   #if DEBUG
     static let mock = Self(
-      addToPlaylist: { _ in .updated(.mock) },
-      addMusicToPlaylist: { _ in .updated(.mock) },
+      addSourceToPlaylist: { _ in .updated(.mock) },
+      addMusicBatchToPlaylist: { _ in .updated(.mock) },
       createPlaylist: { _ in .updated(.mock) },
       deletePlaylist: { _ in .updated(.mock) },
       loadCachedApprovedLibrary: { .mock },
@@ -129,8 +129,8 @@ extension ApprovedMusicClient {
   #endif
 
   static let empty = Self(
-    addToPlaylist: { _ in .updated(.empty) },
-    addMusicToPlaylist: { _ in .updated(.empty) },
+    addSourceToPlaylist: { _ in .updated(.empty) },
+    addMusicBatchToPlaylist: { _ in .updated(.empty) },
     createPlaylist: { _ in .updated(.empty) },
     deletePlaylist: { _ in .updated(.empty) },
     loadCachedApprovedLibrary: { .empty },
@@ -360,15 +360,6 @@ private extension ApprovedTrack {
       discNumber: track.discNumber,
       trackNumber: track.trackNumber,
     )
-  }
-}
-
-private extension ApprovedMusicArtwork {
-  var artworkURL: URL? {
-    guard var url = self.url else { return nil }
-    url = url.replacingOccurrences(of: "{w}", with: "600")
-    url = url.replacingOccurrences(of: "{h}", with: "600")
-    return URL(string: url)
   }
 }
 
