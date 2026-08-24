@@ -282,7 +282,7 @@ const IosSettingsPage: React.FC<Props> = ({
           </SettingsRow>
         </PersonSettingsExpandableSection>
         <PersonSettingsExpandableSection
-          appIconUrl="/gertrude-app-icons/am.webp"
+          appIconUrl="/gertrude-app-icons/podcasts.webp"
           title="Gertrude Podcasts"
           defaultExpanded={defaultExpandedSections.includes(`podcasts`)}
           previewChips={[]}

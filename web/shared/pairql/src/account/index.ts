@@ -11,6 +11,7 @@ export * from './pairs/GetAccountKeychain';
 export * from './pairs/GetAccountKeychains';
 export * from './pairs/GetActivitySummaries';
 export * from './pairs/GetDayActivity';
+export * from './pairs/GetDevices';
 export * from './pairs/GetPeople';
 export * from './pairs/GetPersonActivitySummaries';
 export * from './pairs/GetPersonDayActivity';

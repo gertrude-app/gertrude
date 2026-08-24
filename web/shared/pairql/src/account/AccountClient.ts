@@ -96,6 +96,12 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.GetDayActivity.Output>(input, `GetDayActivity`, `parent`);
   };
 
+  public getDevices = (
+    input: P.GetDevices.Input,
+  ): Promise<Result<P.GetDevices.Output>> => {
+    return this.query<P.GetDevices.Output>(input, `GetDevices`, `parent`);
+  };
+
   public getPeople = (input: P.GetPeople.Input): Promise<Result<P.GetPeople.Output>> => {
     return this.query<P.GetPeople.Output>(input, `GetPeople`, `parent`);
   };

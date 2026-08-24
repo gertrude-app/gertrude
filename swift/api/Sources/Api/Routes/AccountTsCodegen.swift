@@ -34,6 +34,7 @@ enum AccountTsCodegenRoute {
       AccountRequestMagicLink.self,
       AccountLoginMagicLink.self,
       GetPeople.self,
+      GetDevices.self,
       CreatePerson.self,
       UpdatePersonBasicDetails.self,
       DeletePerson.self,
