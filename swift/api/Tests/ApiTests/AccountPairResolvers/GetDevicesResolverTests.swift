@@ -65,14 +65,13 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
     )
     try await self.db.create(MusicApp.Token(installId: musicInstall.id))
     try await self.db.create(BlockerApp.Supervision(deviceId: phone.id))
-    try await self.db.create(Claim(
-      code: 123_456,
-      intent: .blockerSupervise,
-      deviceId: phone.id,
-      childId: jude.id,
+    try await self.createClaim(
+      .blockerSupervise,
+      phone.id,
+      jude.id,
       expiresAt: .distantFuture,
       claimedAt: .reference,
-    ))
+    )
 
     let output = try await GetDevices.resolve(in: self.accountContext(parent))
 
@@ -105,23 +104,21 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
 
     let pendingClaim = try await self.device(for: person, modelIdentifier: "iPhone16,1")
     try await self.db.create(BlockerApp.Supervision(deviceId: pendingClaim.id))
-    try await self.db.create(Claim(
-      code: 111_111,
-      intent: .blockerSupervise,
-      deviceId: pendingClaim.id,
+    try await self.createClaim(
+      .blockerSupervise,
+      pendingClaim.id,
       expiresAt: .distantFuture,
-    ))
+    )
 
     let claimed = try await self.device(for: person, modelIdentifier: "iPhone16,2")
     try await self.db.create(BlockerApp.Supervision(deviceId: claimed.id))
-    try await self.db.create(Claim(
-      code: 222_222,
-      intent: .blockerSupervise,
-      deviceId: claimed.id,
-      childId: person.id,
+    try await self.createClaim(
+      .blockerSupervise,
+      claimed.id,
+      person.id,
       expiresAt: .distantFuture,
       claimedAt: .reference,
-    ))
+    )
 
     let supervised = try await self.device(for: person, modelIdentifier: "iPhone17,1")
     try await self.db.create(BlockerApp.Supervision(
