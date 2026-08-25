@@ -47,18 +47,24 @@ export const Cards = {
           viewAllHref="/requests/unlock"
         />
         <SecurityEventsPreviewCard
-          securityEvents={securityEvents}
-          viewAllHref="/events"
+          state={{ status: `success`, data: securityEvents }}
+          onRefresh={noop}
+          viewAllHref="/security-events"
         />
       </StorySection>
-      <StorySection title="Empty preview card">
-        <div className="w-72">
-          <SuspensionRequestsPreviewCard
-            suspensionRequests={[]}
-            onRefresh={noop}
-            responseHrefForRequest={responseHrefForRequest}
-          />
-        </div>
+      <StorySection
+        title="Empty preview cards"
+        contentClassName="grid grid-cols-1 gap-6 @3xl/main:grid-cols-3"
+      >
+        <SuspensionRequestsPreviewCard
+          suspensionRequests={[]}
+          onRefresh={noop}
+          responseHrefForRequest={responseHrefForRequest}
+        />
+        <SecurityEventsPreviewCard
+          state={{ status: `success`, data: [] }}
+          onRefresh={noop}
+        />
       </StorySection>
       <StorySection
         title="Request cards"

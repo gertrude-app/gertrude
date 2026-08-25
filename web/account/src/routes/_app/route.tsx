@@ -1,6 +1,13 @@
 import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
 import { Outlet, createFileRoute, redirect, useLocation } from '@tanstack/react-router';
-import { InboxIcon, KeyIcon, LogOutIcon, ScanEyeIcon, UsersIcon } from 'lucide-react';
+import {
+  InboxIcon,
+  KeyIcon,
+  LogOutIcon,
+  ScanEyeIcon,
+  ShieldCheckIcon,
+  UsersIcon,
+} from 'lucide-react';
 import React from 'react';
 import { authRedirectForPath } from '#/lib/authRedirect';
 import { isAuthed } from '#/pairql/auth';
@@ -57,6 +64,12 @@ const AuthedLayout: React.FC = () => {
             icon={KeyIcon}
             href="/keychains"
             selected={isSelected(`/keychains`)}
+          />
+          <SidebarItem
+            title="Security"
+            icon={ShieldCheckIcon}
+            href="/security-events"
+            selected={isSelected(`/security-events`)}
           />
         </SidebarSection>
       </Sidebar>

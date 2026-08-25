@@ -27,6 +27,7 @@ interface Props {
   suspensionRequestsHref: string;
   suspensionRequestHrefForRequest: (id: string) => string;
   onRefreshSuspensionRequests: () => void;
+  onRefreshSecurityEvents: () => void;
   unlockRequestsHref: string;
   securityEventsHref?: string;
 }
@@ -44,6 +45,7 @@ const PeoplePageReference: React.FC<Props> = ({
   suspensionRequestsHref,
   suspensionRequestHrefForRequest,
   onRefreshSuspensionRequests,
+  onRefreshSecurityEvents,
   unlockRequestsHref,
   securityEventsHref,
 }) => (
@@ -92,7 +94,8 @@ const PeoplePageReference: React.FC<Props> = ({
           viewAllHref={unlockRequestsHref}
         />
         <SecurityEventsPreviewCard
-          securityEvents={securityEvents}
+          state={{ status: `success`, data: securityEvents }}
+          onRefresh={onRefreshSecurityEvents}
           viewAllHref={securityEventsHref}
         />
       </VStack>

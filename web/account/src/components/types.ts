@@ -47,23 +47,21 @@ export type PersonCardPerson = {
 export type SecurityEvent = {
   id: string;
   title: string;
-  subtitle?: string;
+  detail?: string;
   explanation: string;
-  time: string;
-  date: string;
+  createdAt: Date;
   severity: `high` | `medium` | `low`;
 } & (
   | {
       type: `mac-app`;
+      personId: string;
       personName: string;
+      deviceId: string;
       deviceName: string;
-      personHref?: string;
-      deviceHref?: string;
     }
   | {
-      type: `admin-dashboard`;
-      ipAddress: string;
-      ipAddressHref?: string;
+      type: `account`;
+      ipAddress?: string;
     }
 );
 
