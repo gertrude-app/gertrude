@@ -1,4 +1,4 @@
-import { Button, Input, Text, VStack } from '@gertrude/ui';
+import { Button, HStack, Input, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import AppAd from '#/components/unauthed/AppAd';
@@ -67,6 +67,14 @@ const LoginPage: React.FC<Props> = ({
           >
             Login
           </Button>,
+          <HStack
+            key="reset-password"
+            as="a"
+            href="/reset-password"
+            className="self-end text-xs font-medium text-stone-500 transition-colors hover:text-stone-700"
+          >
+            Forgot password?
+          </HStack>,
         ]}
         heading="Log in"
         subheading="Sign in with your password or a magic link."

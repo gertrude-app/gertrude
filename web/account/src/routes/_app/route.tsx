@@ -6,6 +6,7 @@ import {
   LogOutIcon,
   MonitorSmartphoneIcon,
   ScanEyeIcon,
+  SettingsIcon,
   ShieldCheckIcon,
   UsersIcon,
 } from 'lucide-react';
@@ -77,6 +78,12 @@ const AuthedLayout: React.FC = () => {
             icon={ShieldCheckIcon}
             href="/security-events"
             selected={isSelected(`/security-events`)}
+          />
+          <SidebarItem
+            title="Settings"
+            icon={SettingsIcon}
+            href="/settings"
+            selected={isSelected(`/settings`)}
           />
         </SidebarSection>
       </Sidebar>

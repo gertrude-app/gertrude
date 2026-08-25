@@ -34,6 +34,7 @@
     "@gertrude/ui": "workspace:*",
     "@shared/datetime": "workspace:*",
     "@shared/pairql": "workspace:*",
+    "@shared/phone-numbers": "workspace:*",
     "@tailwindcss/vite": "4.3.0",
     "@tanstack/react-query": "5.90.12",
     "@tanstack/react-router": "1.170.16",

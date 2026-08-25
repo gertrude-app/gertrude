@@ -10,42 +10,57 @@ import {
 
 type Props = {
   method: NotificationMethod;
-  notificationCount: number;
+  deletable: boolean;
+  deleteBlockedReason?: string;
   onDelete: () => void;
 };
 
 const NotificationMethodChip: React.FC<Props> = ({
   method,
-  notificationCount,
+  deletable,
+  deleteBlockedReason,
   onDelete,
 }) => (
   <HStack className="rounded-xl border border-stone-200 bg-white p-1.5 pl-3 shadow shadow-stone-300/30">
     {notificationMethodIcon(method)}
     {methodLabel(method)}
-    <ConfirmationDialog
-      confirmationQuestion="Delete notification method?"
-      description={methodDeleteDescription(notificationCount)}
-      trigger={
-        <Button
-          type="button"
-          onClick={() => {}}
-          ariaLabel={`Delete ${notificationMethodSelectLabel(method)}`}
-          size="small"
-          variant="ghost"
-          icon={XIcon}
-          className="ml-2"
-        />
-      }
-      actions={[
-        { text: `Cancel` },
-        {
-          text: `Delete method`,
-          icon: XIcon,
-          variant: `destructive`,
-          onClick: onDelete,
-        },
-      ]}
-    />
+    {deletable ? (
+      <ConfirmationDialog
+        confirmationQuestion="Delete notification method?"
+        description="This method will no longer be available for new notifications."
+        trigger={
+          <Button
+            type="button"
+            onClick={() => {}}
+            ariaLabel={`Delete ${notificationMethodSelectLabel(method)}`}
+            size="small"
+            variant="ghost"
+            icon={XIcon}
+            className="ml-2"
+          />
+        }
+        actions={[
+          { text: `Cancel` },
+          {
+            text: `Delete method`,
+            icon: XIcon,
+            variant: `destructive`,
+            onClick: onDelete,
+          },
+        ]}
+      />
+    ) : (
+      <Button
+        type="button"
+        onClick={() => {}}
+        ariaLabel={deleteBlockedReason}
+        size="small"
+        variant="ghost"
+        icon={XIcon}
+        className="ml-2"
+        disabled
+      />
+    )}
   </HStack>
 );
 
@@ -81,19 +96,5 @@ function methodLabel(method: NotificationMethod): React.ReactNode {
           Notify <span className={targetClasses}>{target}</span> via ntfy
         </Text>
       );
-    case `push`:
-      return (
-        <Text variant="body" className={baseClasses}>
-          Push
-        </Text>
-      );
   }
-}
-
-function methodDeleteDescription(notificationCount: number): string {
-  if (notificationCount === 0) {
-    return `This method will no longer be available for new notifications.`;
-  }
-
-  return `This will also delete ${notificationCount} ${notificationCount === 1 ? `notification` : `notifications`} that use this method.`;
 }

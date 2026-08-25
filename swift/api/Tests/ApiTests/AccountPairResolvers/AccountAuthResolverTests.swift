@@ -12,6 +12,20 @@ final class AccountAuthResolverTests: ApiTestCase, @unchecked Sendable {
     telemetry: TelemetryBag(),
   )
 
+  func testPasswordResetEmailUsesAccountUrl() async throws {
+    let parent = try await self.db.create(Parent.random)
+
+    let output = try await AccountSendPasswordResetEmail.resolve(
+      with: .init(email: parent.email.rawValue),
+      in: self.accountContext,
+    )
+
+    expect(output).toEqual(.success)
+    expect(self.sent.emails).toHaveCount(1)
+    expect(self.sent.emails[0].templateModel["dashboardUrl"])
+      .toEqual("https://account.example")
+  }
+
   func testMagicLinkPreservesLocalRedirects() async throws {
     let parent = try await self.db.create(Parent.random)
     let redirects = [

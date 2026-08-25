@@ -27,8 +27,9 @@ type Props = {
   open: boolean;
   notification?: Notification;
   methods: NotificationMethod[];
+  defaultMethodId?: string;
   onOpenChange: (open: boolean) => void;
-  onSave: (draft: NotificationDraft) => void;
+  onSave: (draft: NotificationDraft) => Promise<void>;
 };
 
 const triggerCategoryOptions = [
@@ -68,6 +69,7 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
   open,
   notification,
   methods,
+  defaultMethodId,
   onOpenChange,
   onSave,
 }) => {
@@ -75,6 +77,7 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
   const [draftTrigger, setDraftTrigger] = React.useState<NotificationTrigger>(
     `suspendFilterRequestSubmitted`,
   );
+  const [saving, setSaving] = React.useState(false);
   const methodOptions = methods.map((method) => ({
     value: method.id,
     label: notificationMethodSelectLabel(method),
@@ -85,16 +88,23 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
   const hasChanges = notification
     ? draftMethodId !== notification.methodId || draftTrigger !== notification.trigger
     : true;
-  const saveDisabled = draftMethodId === `` || !hasChanges;
+  const saveDisabled = draftMethodId === `` || !hasChanges || saving;
 
   React.useEffect(() => {
     if (!open) {
       return;
     }
 
-    setDraftMethodId(notification?.methodId ?? methods[0]?.id ?? ``);
+    setDraftMethodId(notification?.methodId ?? defaultMethodId ?? methods[0]?.id ?? ``);
     setDraftTrigger(notification?.trigger ?? `suspendFilterRequestSubmitted`);
-  }, [open, notification?.id, notification?.methodId, notification?.trigger, methods]);
+  }, [
+    defaultMethodId,
+    open,
+    notification?.id,
+    notification?.methodId,
+    notification?.trigger,
+    methods,
+  ]);
 
   const changeTriggerCategory = (category: NotificationTriggerCategory): void => {
     setDraftTrigger(
@@ -106,18 +116,29 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
     setDraftTrigger(notificationTriggerFromSecurityLevel(level));
   };
 
-  const handleSave = (): void => {
+  const handleSave = async (): Promise<void> => {
     if (saveDisabled) {
       return;
     }
 
-    onSave({ methodId: draftMethodId, trigger: draftTrigger });
+    setSaving(true);
+    try {
+      await onSave({ methodId: draftMethodId, trigger: draftTrigger });
+    } catch {
+      return;
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <SlideOver
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(nextOpen) => {
+        if (!saving) {
+          onOpenChange(nextOpen);
+        }
+      }}
       ariaLabel={notification ? `Edit notification` : `Add notification`}
       heading={notification ? `Edit notification` : `Add notification`}
       subheading="Choose a verified method and the event that should trigger it."
@@ -158,14 +179,20 @@ const NotificationEditorSlideOver: React.FC<Props> = ({
           )}
         </SlideOver.Body>
         <SlideOver.Footer bleedX>
-          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="ghost"
+            disabled={saving}
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button
             type="button"
             variant="primary"
             disabled={saveDisabled}
-            onClick={handleSave}
+            loading={saving}
+            onClick={() => void handleSave()}
           >
             {notification ? `Save changes` : `Create notification`}
           </Button>

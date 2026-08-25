@@ -171,9 +171,6 @@ export type NotificationMethod = {
       type: `ntfy`;
       topicId: string;
     }
-  | {
-      type: `push`;
-    }
 );
 
 export type NotificationTrigger =
@@ -187,7 +184,6 @@ export type Notification = {
   id: string;
   methodId: string;
   trigger: NotificationTrigger;
-  enabled: boolean;
   method: NotificationMethod;
 };
 

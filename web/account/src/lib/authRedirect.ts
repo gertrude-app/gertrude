@@ -30,8 +30,8 @@ export const validateAuthRedirectSearch = (
   return redirect ? { redirect } : {};
 };
 
-export type PostAuthLocation = { href: AuthRedirect };
+export type PostAuthLocation = { to: `/people` };
 
 export const postAuthLocation = (
   redirect: AuthRedirect | undefined,
-): PostAuthLocation => ({ href: redirect ?? `/people` });
+): PostAuthLocation => ({ to: (redirect ?? `/people`) as `/people` });

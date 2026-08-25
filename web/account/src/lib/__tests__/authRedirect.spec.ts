@@ -16,7 +16,7 @@ describe(`Account auth redirects`, () => {
     for (const path of paths) {
       expect(authRedirectForPath(path)).toBe(path);
       expect(validateAuthRedirectSearch({ redirect: path })).toEqual({ redirect: path });
-      expect(postAuthLocation(path)).toEqual({ href: path });
+      expect(postAuthLocation(path)).toEqual({ to: path });
     }
   });
 
@@ -24,7 +24,7 @@ describe(`Account auth redirects`, () => {
     const path = `/activity?person=Jude%20Henderson#screenshots` as const;
 
     expect(authRedirectForPath(path)).toBe(path);
-    expect(postAuthLocation(path)).toEqual({ href: path });
+    expect(postAuthLocation(path)).toEqual({ to: path });
   });
 
   test(`discards external, protocol-relative, and relative destinations`, () => {
@@ -43,6 +43,6 @@ describe(`Account auth redirects`, () => {
       expect(validateAuthRedirectSearch({ redirect: path })).toEqual({});
     }
     expect(validateAuthRedirectSearch({ redirect: 42 })).toEqual({});
-    expect(postAuthLocation(undefined)).toEqual({ href: `/people` });
+    expect(postAuthLocation(undefined)).toEqual({ to: `/people` });
   });
 });
