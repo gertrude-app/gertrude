@@ -8,17 +8,6 @@ description:
   bizarrely unintuitive steps it takes to fix them.
 ---
 
-{% callout type="warning" title="This guide contains outdated instructions" %}
-
-This guide was written for an older version of iOS. Some settings, screenshots, and
-recommendations no longer match current best practices. We’re working on an updated
-version.
-
-For Messages GIF search, see the dedicated
-[Gertrude Blocker Help article](/help/iphone-ipad/block-gif-search-in-messages).
-
-{% /callout %}
-
 {% .lead .mb-12 %} I consider myself pretty tech-savvy&mdash;I've been a software
 developer for 15 years, and even have apps in the App store. So when I locked down my
 oldest son's first iPhone, I was fairly confident I had covered all my bases. But boy, was

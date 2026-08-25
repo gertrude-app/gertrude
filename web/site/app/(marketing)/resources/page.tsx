@@ -25,6 +25,7 @@ export const metadata = createMetadata(
 
 const GUIDE_ORDER = [
   `getting-started-with-gertrude-for-mac`,
+  `locking-down-an-iphone/ios-18`,
   `iphone-lockdown-loopholes`,
   `unblocking-websites-and-apps-on-mac`,
   `keeping-kids-safe-online`,
@@ -96,7 +97,7 @@ const ResourcesPage: NextPage = async () => {
                 linkLabel={`All ${guides.length} guides`}
               >
                 <div className="divide-y divide-stone-200">
-                  {guides.slice(0, 4).map((guide) => (
+                  {guides.slice(0, 5).map((guide) => (
                     <GuideRow key={guide.slug} article={guide} />
                   ))}
                 </div>

@@ -9,14 +9,6 @@ description:
   online activity.
 ---
 
-{% callout type="warning" title="This guide is outdated" %}
-
-This guide documents iOS 18 and has not been updated for current versions of iOS and
-Gertrude. Some instructions, settings, and screenshots below are outdated. We’re working
-on updating it.
-
-{% /callout %}
-
 {% ios-version-picker current="ios-18" /%}
 
 {% .lead %} With a little hard work, it's possible to entirely lock down an iPhone or iPad

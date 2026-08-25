@@ -6,13 +6,6 @@ products: [mac]
 platforms: [macos]
 ---
 
-{% callout type="warning" title="This guide is outdated" %}
-
-Some screenshots and instructions in this guide no longer match the current Gertrude app
-and parents website. We’re working on updating it.
-
-{% /callout %}
-
 There are a handful of things you need to do to get up and running with Gertrude. This
 tutorial is meant to walk you through the required steps, and also to give you a bit of
 practice using all of the core features of Gertrude. {% .lead %}

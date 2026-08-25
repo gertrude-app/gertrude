@@ -8,11 +8,11 @@ description:
   online activity.
 ---
 
-{% callout type="warning" title="This guide is outdated" %}
+{% callout type="warning" title="This guide is only for iOS 16" %}
 
-This guide documents iOS 16 and has not been updated for current versions of iOS and
-Gertrude. Some instructions, settings, and screenshots below are outdated. We’re working
-on updating it.
+iOS 16 is an older version of iOS, and most iPhones and iPads now run a newer version.
+Before continuing, check your device’s iOS version and make sure it is running iOS 16. If
+it isn’t, choose the correct guide below.
 
 {% /callout %}
 

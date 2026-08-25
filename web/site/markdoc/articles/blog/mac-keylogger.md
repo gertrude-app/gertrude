@@ -8,14 +8,6 @@ description:
 category: mac
 ---
 
-{% callout type="warning" title="This article contains outdated information" %}
-
-This article was published in 2023 and is preserved unchanged. Some product details,
-instructions, and screenshots below may no longer be accurate. We’re working on updating
-it.
-
-{% /callout %}
-
 {% .lead %} With an internet increasingly filled with dangerous, inappopriate and damaging
 content, more and more parents are looking for ways to monitor their kids online time.
 Gertrude can help, with a built-in, easy-to-use mac keylogger.
