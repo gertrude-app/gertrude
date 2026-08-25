@@ -4,6 +4,7 @@ import {
   InboxIcon,
   KeyIcon,
   LogOutIcon,
+  MonitorSmartphoneIcon,
   ScanEyeIcon,
   ShieldCheckIcon,
   UsersIcon,
@@ -45,6 +46,12 @@ const AuthedLayout: React.FC = () => {
             icon={UsersIcon}
             href="/people"
             selected={isSelected(`/people`)}
+          />
+          <SidebarItem
+            title="Devices"
+            icon={MonitorSmartphoneIcon}
+            href="/devices"
+            selected={isSelected(`/devices`)}
           />
           <SidebarItem
             title="Requests"

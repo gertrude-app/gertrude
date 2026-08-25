@@ -600,6 +600,174 @@
     }
   },
   {
+    "id": "account-pages-devices--default",
+    "iframePath": "/iframe.html?id=account-pages-devices--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-devices--default.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--default",
+    "iframePath": "/iframe.html?id=account-pages-devices--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-devices--default.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices--empty",
+    "iframePath": "/iframe.html?id=account-pages-devices--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/mobile/account-pages-devices--empty.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--empty",
+    "iframePath": "/iframe.html?id=account-pages-devices--empty&viewMode=story",
+    "name": "Empty",
+    "path": "screenshots/desktop/account-pages-devices--empty.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices--error",
+    "iframePath": "/iframe.html?id=account-pages-devices--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/mobile/account-pages-devices--error.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--error",
+    "iframePath": "/iframe.html?id=account-pages-devices--error&viewMode=story",
+    "name": "Error",
+    "path": "screenshots/desktop/account-pages-devices--error.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices--loading",
+    "iframePath": "/iframe.html?id=account-pages-devices--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/mobile/account-pages-devices--loading.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--loading",
+    "iframePath": "/iframe.html?id=account-pages-devices--loading&viewMode=story",
+    "name": "Loading",
+    "path": "screenshots/desktop/account-pages-devices--loading.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices--mac-only",
+    "iframePath": "/iframe.html?id=account-pages-devices--mac-only&viewMode=story",
+    "name": "Macs only",
+    "path": "screenshots/mobile/account-pages-devices--mac-only.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--mac-only",
+    "iframePath": "/iframe.html?id=account-pages-devices--mac-only&viewMode=story",
+    "name": "Macs only",
+    "path": "screenshots/desktop/account-pages-devices--mac-only.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices--mobile-only",
+    "iframePath": "/iframe.html?id=account-pages-devices--mobile-only&viewMode=story",
+    "name": "iPhones and iPads only",
+    "path": "screenshots/mobile/account-pages-devices--mobile-only.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--mobile-only",
+    "iframePath": "/iframe.html?id=account-pages-devices--mobile-only&viewMode=story",
+    "name": "iPhones and iPads only",
+    "path": "screenshots/desktop/account-pages-devices--mobile-only.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices--supervision-states",
+    "iframePath": "/iframe.html?id=account-pages-devices--supervision-states&viewMode=story",
+    "name": "Supervision states",
+    "path": "screenshots/mobile/account-pages-devices--supervision-states.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices--supervision-states",
+    "iframePath": "/iframe.html?id=account-pages-devices--supervision-states&viewMode=story",
+    "name": "Supervision states",
+    "path": "screenshots/desktop/account-pages-devices--supervision-states.png",
+    "title": "Account/Pages/Devices",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-keychain-detail--default",
     "iframePath": "/iframe.html?id=account-pages-keychain-detail--default&viewMode=story",
     "name": "Default",

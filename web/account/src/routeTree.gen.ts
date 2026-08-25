@@ -17,6 +17,7 @@ import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
 import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
 import { Route as AppKeychainsIndexRouteImport } from './routes/_app/keychains/index'
+import { Route as AppDevicesIndexRouteImport } from './routes/_app/devices/index'
 import { Route as AppActivityIndexRouteImport } from './routes/_app/activity/index'
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
@@ -69,6 +70,11 @@ const AppPeopleIndexRoute = AppPeopleIndexRouteImport.update({
 const AppKeychainsIndexRoute = AppKeychainsIndexRouteImport.update({
   id: '/keychains/',
   path: '/keychains/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDevicesIndexRoute = AppDevicesIndexRouteImport.update({
+  id: '/devices/',
+  path: '/devices/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppActivityIndexRoute = AppActivityIndexRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity/': typeof AppActivityIndexRoute
+  '/devices/': typeof AppDevicesIndexRoute
   '/keychains/': typeof AppKeychainsIndexRoute
   '/people/': typeof AppPeopleIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
   '/activity': typeof AppActivityIndexRoute
+  '/devices': typeof AppDevicesIndexRoute
   '/keychains': typeof AppKeychainsIndexRoute
   '/people': typeof AppPeopleIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/_app/requests/unlock': typeof AppRequestsUnlockRoute
   '/_app/activity/': typeof AppActivityIndexRoute
+  '/_app/devices/': typeof AppDevicesIndexRoute
   '/_app/keychains/': typeof AppKeychainsIndexRoute
   '/_app/people/': typeof AppPeopleIndexRoute
   '/_app/activity/day/$day': typeof AppActivityDayDayRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/requests/suspension'
     | '/requests/unlock'
     | '/activity/'
+    | '/devices/'
     | '/keychains/'
     | '/people/'
     | '/activity/day/$day'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/requests/suspension'
     | '/requests/unlock'
     | '/activity'
+    | '/devices'
     | '/keychains'
     | '/people'
     | '/activity/day/$day'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/_app/requests/suspension'
     | '/_app/requests/unlock'
     | '/_app/activity/'
+    | '/_app/devices/'
     | '/_app/keychains/'
     | '/_app/people/'
     | '/_app/activity/day/$day'
@@ -349,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/keychains'
       fullPath: '/keychains/'
       preLoaderRoute: typeof AppKeychainsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/devices/': {
+      id: '/_app/devices/'
+      path: '/devices'
+      fullPath: '/devices/'
+      preLoaderRoute: typeof AppDevicesIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/activity/': {
@@ -508,6 +527,7 @@ interface AppRouteRouteChildren {
   AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRouteWithChildren
   AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
   AppActivityIndexRoute: typeof AppActivityIndexRoute
+  AppDevicesIndexRoute: typeof AppDevicesIndexRoute
   AppKeychainsIndexRoute: typeof AppKeychainsIndexRoute
   AppActivityDayDayRoute: typeof AppActivityDayDayRoute
   AppActivityPersonPersonIdIndexRoute: typeof AppActivityPersonPersonIdIndexRoute
@@ -523,6 +543,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppRequestsSuspensionRoute: AppRequestsSuspensionRouteWithChildren,
   AppRequestsUnlockRoute: AppRequestsUnlockRoute,
   AppActivityIndexRoute: AppActivityIndexRoute,
+  AppDevicesIndexRoute: AppDevicesIndexRoute,
   AppKeychainsIndexRoute: AppKeychainsIndexRoute,
   AppActivityDayDayRoute: AppActivityDayDayRoute,
   AppActivityPersonPersonIdIndexRoute: AppActivityPersonPersonIdIndexRoute,

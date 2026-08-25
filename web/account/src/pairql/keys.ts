@@ -3,6 +3,7 @@ import type {
   GetAccountKeychains,
   GetActivitySummaries,
   GetDayActivity,
+  GetDevices,
   GetPeople,
   GetPersonActivitySummaries,
   GetPersonDayActivity,
@@ -23,6 +24,10 @@ export class QueryKey<T> {
 export class Key extends QueryKey<never> {
   static get people(): QueryKey<GetPeople.Output> {
     return new QueryKey([`people`]);
+  }
+
+  static get devices(): QueryKey<GetDevices.Output> {
+    return new QueryKey([`devices`]);
   }
 
   static get keychains(): QueryKey<GetAccountKeychains.Output> {
