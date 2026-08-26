@@ -150,19 +150,24 @@ or major repo reorganization).
 ### `web/site/public/llms.txt`
 
 The llms.txt index served at `https://gertrude.app/llms.txt`. Describes products, pricing,
-key URLs, and positioning for AI crawlers. Drifts whenever:
+positioning, and public publishing content for AI crawlers. It is comprehensive for the
+publishing hierarchy: every Resources, Guides, Help, Updates, Blog, Program, and Legal
+collection or detail route must be represented. Other product and marketing routes remain
+a curated set of key URLs. It drifts whenever:
 
 - Pricing changes (`$10/month`, `$10/year`, trial lengths are all baked in as prose).
 - A product gains or loses a marketing page.
 - Product positioning or audience language changes.
-- New top-level marketing URLs are added (or existing ones move/redirect).
+- A public publishing collection or detail route is added, moved, or retired.
+- A key top-level marketing URL is added, moved, or redirected.
 
 ### `web/site/app/sitemap.tsx` — `STATIC_ROUTES`
 
-Hardcoded list of non-blog, non-docs marketing routes. Blog posts and docs slugs are
-auto-discovered from the filesystem, but top-level marketing pages are not. Drifts
-whenever a new marketing route is added under `web/site/app/` (e.g., a new product landing
-page, a pricing page, a press kit). Audit against the actual route tree.
+Hardcoded list of non-article marketing routes. Publishing article slugs are
+auto-discovered from the filesystem, but top-level marketing and collection pages are
+not. Drifts whenever a new marketing or collection route is added under `web/site/app/`
+(e.g., a product landing page, publishing index, pricing page, or press kit). Audit against
+the actual route tree.
 
 ### `web/site/_redirects`
 

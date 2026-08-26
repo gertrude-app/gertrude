@@ -65,7 +65,7 @@ struct ShowCodeView: View {
         .share("Send link", item: self.connectUrl),
         .link(
           "Help me connect...",
-          destination: URL(string: "https://gertrude.app/iosapp-connect-help")!,
+          destination: URL(string: "https://gertrude.app/help/iphone-ipad/get-connection-code")!,
         ),
       ],
       supplementPlacement: .afterMessage,

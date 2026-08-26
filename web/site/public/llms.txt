@@ -33,7 +33,7 @@ artists and albums a parent has approved from the dashboard.
   use the Blocker on an adult-owned device, Gertrude offers a free companion
   supervision tool (Mac and Windows) that places a device into Apple
   Supervised Mode. See the [Supervised Mode setup
-  guide](https://gertrude.app/blog/gertrude-ios-supervised-mode) for details.
+  guide](https://gertrude.app/help/iphone-ipad/use-blocker-over-18) for details.
 - [Gertrude Podcasts](https://gertrude.app/#podcasts) (formerly Gertrude AM):
   A kid-friendly podcast app where adding new shows requires a parent-set 6-digit PIN.
   Connects to a Gertrude parent account; free to try for 30 days, then requires at
@@ -58,28 +58,169 @@ everything below it. Every paid plan covers the whole family, with no ads.
 - **Medium** ($5/month) — adds Gertrude Music.
 - **Full** ($10/month) — adds Gertrude for Mac. Includes a 21-day free trial.
 
-## Documentation
+## Resources
 
-- [Documentation index](https://gertrude.app/docs): Product documentation and
-  support guides for Gertrude for Mac and the iOS Blocker app.
+- [Gertrude Resources](https://gertrude.app/resources): Browse setup guides,
+  troubleshooting help, product updates, and articles for Gertrude families.
 - [Pricing and plans](https://gertrude.app/pricing): Full plan comparison across
   the Free, Light, Medium, and Full tiers.
-- [iOS app privacy policy](https://gertrude.app/docs/iosapp-privacy): Privacy
+
+## Guides
+
+- [Gertrude Guides](https://gertrude.app/guides): Step-by-step guidance for protecting
+  devices and making thoughtful internet-safety choices for your family.
+- [Getting started with Gertrude for Mac](https://gertrude.app/guides/getting-started-with-gertrude-for-mac):
+  A comprehensive tutorial covering account setup, Mac installation, notifications,
+  filter suspensions, keychains, unlock requests, and activity review. Some instructions
+  and screenshots are outdated while Gertrude prepares an update.
+- [Tips for keeping users safe](https://gertrude.app/guides/keeping-kids-safe-online):
+  Internet-safety guidance for parents covering passwords, monitoring, conversations,
+  layered protections, friends’ devices, and Gertrude’s Internet Safety 101 video.
+- [Unblocking websites and apps on a Mac](https://gertrude.app/guides/unblocking-websites-and-apps-on-mac):
+  Understand Gertrude's keys and keychains, why websites need access to multiple domains,
+  and how to isolate and request the supporting addresses a website or app needs.
+- [Five overlooked iPhone lockdown loopholes](https://gertrude.app/guides/iphone-lockdown-loopholes):
+  Older guidance about GIF search, Maps images, device search, Look Up, Siri, and household
+  devices. A warning identifies instructions that need updating for current iOS versions.
+- [Locking down an iPhone or iPad running iOS 16](https://gertrude.app/guides/locking-down-an-iphone/ios-16):
+  An outdated, version-specific walkthrough of Screen Time restrictions and common
+  loopholes for devices that still run iOS 16.
+- [Locking down an iPhone or iPad running iOS 17](https://gertrude.app/guides/locking-down-an-iphone/ios-17):
+  An outdated, version-specific walkthrough of Screen Time and Gertrude Blocker for
+  devices that still run iOS 17.
+- [Locking down an iPhone or iPad running iOS 18](https://gertrude.app/guides/locking-down-an-iphone/ios-18):
+  An outdated, version-specific walkthrough of Screen Time and Gertrude Blocker for
+  devices that still run iOS 18. Gertrude is working on updated guidance.
+
+## Updates
+
+- [Gertrude Updates](https://gertrude.app/updates): Product announcements and release
+  notes from Gertrude.
+- [Introducing Gertrude Music](https://gertrude.app/updates/gertrude-music-launch):
+  The launch announcement for Gertrude’s approved-only music app for iPhone and iPad,
+  including its design, requirements, and family pricing.
+- [Introducing Gertrude Podcasts](https://gertrude.app/updates/gertrude-podcasts-launch):
+  The launch announcement for Gertrude’s kid-friendly podcast app, where a parent-set PIN
+  controls which shows children can add.
+- [Daily screenshot review reminders](https://gertrude.app/updates/daily-screenshot-review-reminders):
+  Gertrude for Mac can send parents a daily email reminder when their kids have new,
+  unreviewed screenshots.
+- [Security event notifications](https://gertrude.app/updates/security-event-notifications):
+  Gertrude for Mac can notify parents by email, text, or Slack about filter suspensions,
+  password changes, login attempts, and other security events.
+- [Flag child activity](https://gertrude.app/updates/flag-child-activity): Parents can flag
+  screenshots and keystrokes so they remain available for review for up to 60 days.
+- [Gertrude for Mac 2.5.0](https://gertrude.app/updates/gertrude-for-mac-2-5-0):
+  Introduced scheduled keychains, Mac downtime, security events, a redesigned keychain
+  picker, and the first version of Gertrude Blocker.
+- [Gertrude for Mac 2.7.0](https://gertrude.app/updates/gertrude-for-mac-2-7-0):
+  Introduced Mac app blocking, a monitoring safeguard, macOS Sequoia compatibility,
+  keychain risk warnings, and more detailed filter status.
+- [Gertrude for Mac 2.9.0](https://gertrude.app/updates/gertrude-for-mac-2-9-0):
+  Introduced unfiltered mode, always-blocked items, batch unlock requests, more private
+  screenshots, faster filtering, improved non-Safari support, and a rebuilt setup wizard.
+- [Gertrude Blocker account connection](https://gertrude.app/updates/blocker-account-connection):
+  Announced parent-account connection for remotely managing an iPhone or iPad’s block
+  groups and receiving future connected-device features.
+- [Gertrude Blocker 1.0 launch](https://gertrude.app/updates/gertrude-blocker-launch):
+  Announced the first version of Gertrude for iPhone and iPad, focused on closing holes in
+  Apple’s Screen Time controls.
+
+## Help
+
+- [Gertrude Help](https://gertrude.app/help): Browse support articles by device and app.
+- [Mac help](https://gertrude.app/help/mac): Help with Gertrude’s Mac internet filter,
+  monitoring, settings, and troubleshooting.
+- [iPhone & iPad help](https://gertrude.app/help/iphone-ipad): Help with Gertrude Blocker
+  on iPhone and iPad.
+- [SOLVED: How to Block or Disable GIFs on iPhone](https://gertrude.app/help/iphone-ipad/block-gif-search-in-messages):
+  Apple still won’t let parents turn off #images GIF search in Messages. Gertrude Blocker
+  is a free iOS app that does and works on current iOS. The article preserves older setup
+  instructions while a current version is prepared.
+- [Block explicit images in Maps on iPhone or iPad](https://gertrude.app/help/iphone-ipad/block-explicit-images-in-maps):
+  Older instructions for removing Maps apps that expose business photos; the article
+  identifies that its instructions need updating for current iOS versions.
+- [Block web content in device search](https://gertrude.app/help/iphone-ipad/block-web-content-in-device-search):
+  Older Screen Time instructions for preventing iPhone and iPad search from displaying
+  images and other internet content.
+- [Block Look Up web results](https://gertrude.app/help/iphone-ipad/block-look-up-web-results):
+  Older Screen Time instructions for preventing Look Up in reading and notes apps from
+  displaying internet results.
+- [Block Siri internet access](https://gertrude.app/help/iphone-ipad/block-siri-internet-access):
+  Older Screen Time instructions for preventing Siri from displaying internet content.
+- [Use Gertrude Blocker when the user is 18 or older](https://gertrude.app/help/iphone-ipad/use-blocker-over-18):
+  Put an adult-owned iPhone or iPad into Apple Supervised Mode so Gertrude Blocker can use
+  its content filter. The article is awaiting an update for Gertrude’s current Mac and
+  Windows supervision tool.
+- [Block album artwork in Apple Music on iPhone or iPad](https://gertrude.app/help/iphone-ipad/block-apple-music-artwork):
+  Enable Gertrude Blocker’s Apple Music block group during setup or from a connected
+  Gertrude parent account.
+- [Fix a Screen Time conflict with Gertrude's Mac filter](https://gertrude.app/help/mac/screen-time-filter-conflict):
+  Disable Screen Time's Content & Privacy restrictions and restart the Mac when Apple's
+  web content filter conflicts with Gertrude's filtering.
+- [Connect Gertrude Blocker to a parent account](https://gertrude.app/help/iphone-ipad/get-connection-code):
+  Use the six-digit code and connection link shown in Gertrude Blocker to connect an
+  iPhone or iPad, choose its child, and manage blocking from the parent website.
+- [Run Gertrude's Mac health check](https://gertrude.app/help/mac/run-health-check): Find
+  and fix common problems with the Mac filter, monitoring permissions, account, and
+  settings.
+- [Block Mac apps](https://gertrude.app/help/mac/block-apps): Block any macOS app for a
+  child either all the time or on a schedule, and understand when app blocking adds useful
+  protection beyond Gertrude's internet filter.
+- [Can two kids share a Mac with different protections?](https://gertrude.app/help/mac/use-one-mac-for-multiple-children):
+  Give each child a separate macOS user account and connect each user to their own
+  Gertrude child profile and settings.
+- [Decide whether to unblock YouTube](https://gertrude.app/help/mac/decide-whether-to-unblock-youtube):
+  Keep YouTube blocked by default or use a temporary filter suspension for assigned
+  videos, with optional screenshot review afterward.
+- [Why browsers quit after a filter suspension](https://gertrude.app/help/mac/why-browsers-quit-after-filter-suspension):
+  Understand why Gertrude closes browsers after temporary unrestricted access ends.
+- [How to give a Mac admin user internet access](https://gertrude.app/help/mac/give-admin-user-internet-access):
+  Exempt a password-protected Mac administrator account from Gertrude's internet filter.
+- [Unblock a website or app on a Mac](https://gertrude.app/help/mac/unblock-website-or-app):
+  Assign a public or personal keychain to allow a website, or grant an installed Mac app
+  unrestricted internet access.
+- [Why a website still looks broken after unblocking it](https://gertrude.app/help/mac/website-still-broken-after-unblocking):
+  Learn why websites need access to multiple domains and how to allow their supporting
+  images, code, video, sign-in, and other requests.
+- [Diagnose blocked network requests on a Mac](https://gertrude.app/help/mac/diagnose-blocked-network-requests):
+  Filter, clear, reproduce, and pause Gertrude's Blocked Requests list to isolate the
+  domains preventing a website or app from working, then send an unlock request.
+- [Send an unlock request on a Mac](https://gertrude.app/help/mac/send-unlock-request):
+  Select blocked website or app requests in Gertrude for Mac and send them to a parent for
+  review.
+- [Restart Gertrude's Mac filter](https://gertrude.app/help/mac/restart-filter): Manually
+  remove and restart the internet filter when it cannot communicate with the menu bar app.
+
+## Legal
+
+- [Terms of Service](https://gertrude.app/legal/terms): The terms and acceptable use
+  policy governing Gertrude accounts, apps, and subscriptions.
+- [Gertrude Blocker privacy policy](https://gertrude.app/legal/privacy/blocker): Privacy
   policy for the Gertrude Blocker iOS app. Gertrude collects no personal data
   from the iOS app — only anonymous error logs and install counts.
-- [Gertrude Podcasts privacy policy](https://gertrude.app/docs/podcasts-privacy): Privacy
+- [Gertrude Music privacy policy](https://gertrude.app/legal/privacy/music): Privacy
+  policy for the Gertrude Music app and its parent-account connection.
+- [Gertrude Podcasts privacy policy](https://gertrude.app/legal/privacy/podcasts): Privacy
   policy for the Gertrude Podcasts podcast app. The app sends a small amount of
   anonymous usage and diagnostic data to operate subscriptions, understand usage
   patterns, and fix bugs.
-- [Gertrude Music privacy policy](https://gertrude.app/docs/music-privacy): Privacy
-  policy for the Gertrude Music app. Gertrude collects no email addresses, contact
-  information, location, contacts, or advertising identifiers from the app.
 
-## Blog & contact
+## Blog, program & contact
 
-- [Gertrude blog](https://gertrude.app/blog): Long-form articles on internet
-  safety, parental controls, locking down iPhones and Macs, and product
-  updates.
+- [Gertrude blog](https://gertrude.app/blog): Long-form essays and research on internet
+  safety, parental controls, and the ideas behind Gertrude.
+- [Gertrude: The Best Mac Internet Filter](https://gertrude.app/blog/mac-internet-filter):
+  An older explanation of Gertrude’s deny-by-default approach to filtering the internet
+  on a Mac. Some statistics, product details, and screenshots are outdated.
+- [Gertrude: The Best Mac Keylogger](https://gertrude.app/blog/mac-keylogger): An older
+  overview of Gertrude’s keystroke and screenshot monitoring for Mac. Some product
+  details, instructions, and screenshots are outdated.
+- [How Much of the Internet is Porn? A Detective Story](https://gertrude.app/blog/how-much-of-the-internet-is-porn):
+  Research based on a randomized sample of reachable `.com` domains that estimated what
+  proportion contained pornographic content.
+- [Refer a friend](https://gertrude.app/refer-a-friend): Existing Gertrude customers can
+  view and copy their personalized referral link and review the program terms.
 - [Contact Gertrude](https://gertrude.app/contact): Support, feedback, and
   public-keychain requests.
 - [Download the Mac app](https://gertrude.app/download-mac-app): Direct DMG

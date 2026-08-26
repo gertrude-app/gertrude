@@ -18,12 +18,6 @@ admin:
 account:
   @pnpm --filter account exec vite dev --port ${ACCOUNT_PORT:-9347}
 
-hmr-docs:
-  @watchexec --watch site/markdoc --exts .md "just hmr-comment"
-
-hmr-blog:
-  @watchexec --watch site/markdoc/articles/blog --exts .md "just hmr-blog-comment"
-
 storybook:
   @PORT=${STORYBOOK_PORT:-6006} pnpm --filter @storybook/app start
 
@@ -145,11 +139,3 @@ sync-supervise-ui:
   cp shared/datetime/src/index.ts "$GEN/shared/datetime/index.ts"
   cp shared/string/src/index.ts "$GEN/shared/string/index.ts"
   echo "Synced supervise UI to $HOME/supervise/src/generated"
-
-[private]
-hmr-comment:
-  @bash -c "echo // $(date) >> './site/app/docs/[slug]/page.tsx'"
-
-[private]
-hmr-blog-comment:
-  @bash -c "echo // $(date) >> './site/app/(marketing)/blog/[slug]/page.tsx'"

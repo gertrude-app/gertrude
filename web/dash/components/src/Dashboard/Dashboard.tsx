@@ -222,7 +222,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               <OnboardingRecommendation
                 title="Read our getting started guide"
                 icon="fa-solid fa-question-circle"
-                href="https://gertrude.app/docs/getting-started"
+                href="https://gertrude.app/guides/getting-started-with-gertrude-for-mac"
                 openInNewTab
               />
             </div>

@@ -1,5 +1,12 @@
 import type { MetadataRoute } from 'next';
-import { getArticle, getArticleSlugs } from '@/markdoc/files';
+import {
+  getArticle,
+  getArticleSlugs,
+  getGuideArticlePath,
+  getHelpArticlePath,
+  getLegalArticlePath,
+  getUpdateArticlePath,
+} from '@/markdoc/files';
 
 export const dynamic = `force-static`;
 
@@ -11,10 +18,16 @@ const STATIC_ROUTES = [
   `/iphone-and-ipad`,
   `/music`,
   `/pricing`,
+  `/refer-a-friend`,
   `/download-mac-app`,
+  `/resources`,
   `/blog`,
+  `/guides`,
+  `/updates`,
+  `/help`,
+  `/help/mac`,
+  `/help/iphone-ipad`,
   `/contact`,
-  `/docs/getting-started`,
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -36,11 +49,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  const docsSlugs = await getArticleSlugs(`docs`);
-  const docsEntries: MetadataRoute.Sitemap = docsSlugs.map((slug) => ({
-    url: `${BASE_URL}/docs/${slug}`,
-    lastModified: now,
-  }));
+  const helpSlugs = await getArticleSlugs(`help`);
+  const helpEntries: MetadataRoute.Sitemap = await Promise.all(
+    helpSlugs.map(async (slug) => {
+      const article = await getArticle(slug, `help`);
+      return {
+        url: `${BASE_URL}${getHelpArticlePath(article)}`,
+        lastModified: article.updated ? new Date(article.updated) : now,
+      };
+    }),
+  );
 
-  return [...staticEntries, ...blogEntries, ...docsEntries];
+  const guideSlugs = await getArticleSlugs(`guide`);
+  const guideEntries: MetadataRoute.Sitemap = await Promise.all(
+    guideSlugs.map(async (slug) => {
+      const article = await getArticle(slug, `guide`);
+      return {
+        url: `${BASE_URL}${getGuideArticlePath(article)}`,
+        lastModified: article.updated ? new Date(article.updated) : now,
+      };
+    }),
+  );
+
+  const updateSlugs = await getArticleSlugs(`update`);
+  const updateEntries: MetadataRoute.Sitemap = await Promise.all(
+    updateSlugs.map(async (slug) => {
+      const article = await getArticle(slug, `update`);
+      return {
+        url: `${BASE_URL}${getUpdateArticlePath(article)}`,
+        lastModified: new Date(article.updated ?? article.date),
+      };
+    }),
+  );
+
+  const legalSlugs = await getArticleSlugs(`legal`);
+  const legalEntries: MetadataRoute.Sitemap = await Promise.all(
+    legalSlugs.map(async (slug) => {
+      const article = await getArticle(slug, `legal`);
+      return {
+        url: `${BASE_URL}${getLegalArticlePath(article)}`,
+        lastModified: article.updated ? new Date(article.updated) : now,
+      };
+    }),
+  );
+
+  return [
+    ...staticEntries,
+    ...blogEntries,
+    ...helpEntries,
+    ...guideEntries,
+    ...updateEntries,
+    ...legalEntries,
+  ];
 }

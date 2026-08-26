@@ -63,7 +63,7 @@ const SignupPage: React.FC<Props> = ({
           <>
             By signing up, you agree to our{` `}
             <a
-              href="https://gertrude.app/docs/terms"
+              href="https://gertrude.app/legal/terms"
               target="_blank"
               rel="noreferrer"
               className="underline decoration-dotted underline-offset-2"

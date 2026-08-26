@@ -75,7 +75,7 @@ const EmailInputForm: React.FC<Props> = ({
       By signing up, you agree to our{` `}
       <a
         className="text-slate-500 underline decoration-dotted underline-offset-2"
-        href="https://gertrude.app/docs/terms"
+        href="https://gertrude.app/legal/terms"
         target="_blank"
         rel="noreferrer"
       >

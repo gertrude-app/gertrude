@@ -10,19 +10,33 @@ type Props = {
 };
 
 const ArticleImage: React.FC<Props> = ({ src, caption, alt, small, noBorder }) => (
-  <div className={cx(`mt-8 flex flex-col items-center`, small && `max-w-lg mx-auto`)}>
-    <img
-      className={cx(`m-0 rounded-3xl`, noBorder !== true && `border border-slate-300`)}
-      src={`/docs/images/${src}`}
-      alt={alt ?? caption ?? ``}
-    />
-    {caption && (
-      <div
-        className="mb-4 pt-2.5 text-center *text-[15px] italic text-slate-400 leading-tight"
-        dangerouslySetInnerHTML={{ __html: caption }}
-      />
-    )}
-  </div>
+  <figure className="not-prose relative isolate mb-12 mt-9">
+    <div
+      className={cx(
+        `mx-auto flex flex-col items-center`,
+        small ? `max-w-lg` : `max-w-4xl`,
+      )}
+    >
+      <div>
+        <div className="rounded-[24px] border border-white bg-white/50 p-2 shadow-md shadow-violet-950/5">
+          <img
+            className={cx(
+              `m-0 w-full rounded-2xl bg-white`,
+              noBorder !== true && `shadow shadow-stone-950/10`,
+            )}
+            src={`/docs/images/${src}`}
+            alt={alt ?? caption ?? ``}
+          />
+        </div>
+      </div>
+      {caption && (
+        <figcaption
+          className="mt-4 max-w-2xl text-center text-sm font-medium leading-5 text-violet-950/80 [&_a]:font-semibold [&_a]:text-violet-700 [&_a]:underline [&_a]:decoration-violet-300 [&_a]:underline-offset-2"
+          dangerouslySetInnerHTML={{ __html: caption }}
+        />
+      )}
+    </div>
+  </figure>
 );
 
 export default ArticleImage;

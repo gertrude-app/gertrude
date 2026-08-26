@@ -8,6 +8,6 @@ ability to block websites.
 The good news: this is easy to fix. You just need to disable Screen Time's web content
 filtering on this Mac, then restart the computer.
 
-View instructions: https://gertrude.app/blog/screen-time-web-filter-conflict
+View instructions: https://gertrude.app/help/mac/screen-time-filter-conflict
 
 If you have questions or need help, just reply to this email and we'll be happy to assist.
