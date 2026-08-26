@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: getGuideArticlePath(article),
     },
+    ...(article.noindex ? { robots: { index: false, follow: true } } : {}),
   };
 }
 

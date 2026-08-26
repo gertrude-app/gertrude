@@ -335,11 +335,11 @@ Then tap to _disable Siri & Dictation_:
 ## Bonus: Protecting Household Devices
 
 If you checked and fixed all of the loopholes we've shown so far, and have
-[locked down your child's iPhone](/guides/locking-down-an-iphone/ios-18) using Screen
-Time, then you're doing great. But there's one more thing most parents forget: **most
-households have many internet-connected devices, ALL of which must be protected with
-passwords.** Take a minute to do a thorough review of all the phones, computers, and
-devices in your house, including:
+[locked down your child's iPhone](/guides/locking-down-an-iphone) using Screen Time, then
+you're doing great. But there's one more thing most parents forget: **most households have
+many internet-connected devices, ALL of which must be protected with passwords.** Take a
+minute to do a thorough review of all the phones, computers, and devices in your house,
+including:
 
 - your phone and your spouse's
 - all computers, including yours
@@ -374,6 +374,6 @@ is **completely worth it**.
 {% callout title="Step-by-step guide to locking down an iPhone" %}
 
 If you haven't taken the time to carefully lock down your child's iPhone, we have a
-[step-by-step guide](/guides/locking-down-an-iphone/ios-18).
+[step-by-step guide](/guides/locking-down-an-iphone).
 
 {% /callout %}

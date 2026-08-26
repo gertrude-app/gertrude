@@ -313,7 +313,8 @@ describe(`getGuideArticlePath()`, () => {
       `/guides/getting-started-with-gertrude-for-mac`,
     ],
     [`keeping-kids-safe-online`, `/guides/keeping-kids-safe-online`],
-    [`locking-down-an-iphone/ios-18`, `/guides/locking-down-an-iphone/ios-18`],
+    [`locking-down-an-iphone`, `/guides/locking-down-an-iphone`],
+    [`locking-down-an-iphone/ios-17`, `/guides/locking-down-an-iphone/ios-17`],
   ])(`uses the Guides URL for %s`, (slug, expectedPath) => {
     expect(getGuideArticlePath({ slug })).toBe(expectedPath);
   });

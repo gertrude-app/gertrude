@@ -82,15 +82,11 @@ everything below it. Every paid plan covers the whole family, with no ads.
 - [Five overlooked iPhone lockdown loopholes](https://gertrude.app/guides/iphone-lockdown-loopholes):
   Older guidance about GIF search, Maps images, device search, Look Up, Siri, and household
   devices. A warning identifies instructions that need updating for current iOS versions.
-- [Locking down an iPhone or iPad running iOS 16](https://gertrude.app/guides/locking-down-an-iphone/ios-16):
-  An outdated, version-specific walkthrough of Screen Time restrictions and common
-  loopholes for devices that still run iOS 16.
-- [Locking down an iPhone or iPad running iOS 17](https://gertrude.app/guides/locking-down-an-iphone/ios-17):
-  An outdated, version-specific walkthrough of Screen Time and Gertrude Blocker for
-  devices that still run iOS 17.
-- [Locking down an iPhone or iPad running iOS 18](https://gertrude.app/guides/locking-down-an-iphone/ios-18):
-  An outdated, version-specific walkthrough of Screen Time and Gertrude Blocker for
-  devices that still run iOS 18. Gertrude is working on updated guidance.
+- [Locking down an iPhone or iPad](https://gertrude.app/guides/locking-down-an-iphone):
+  The canonical, continuously updated step-by-step walkthrough of Screen Time restrictions,
+  common loopholes, and Gertrude Blocker for iPhone and iPad. Always covers the current iOS
+  version. Version-specific archives for older iOS releases are linked from the version
+  picker on the page.
 
 ## Updates
 

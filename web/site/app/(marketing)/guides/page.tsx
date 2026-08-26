@@ -15,7 +15,8 @@ export const metadata = createMetadata(
 
 const GuidesPage: NextPage = async () => {
   const slugs = await getArticleSlugs(`guide`);
-  const guides = await Promise.all(slugs.map((slug) => getArticle(slug, `guide`)));
+  const allGuides = await Promise.all(slugs.map((slug) => getArticle(slug, `guide`)));
+  const guides = allGuides.filter((guide) => !guide.noindex);
   guides.sort((a, b) => a.title.localeCompare(b.title));
 
   return (

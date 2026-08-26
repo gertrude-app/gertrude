@@ -51,6 +51,7 @@ export interface PublishingArticle extends Article {
   type: PublishingArticleType;
   products: ArticleProduct[];
   platforms: ArticlePlatform[];
+  noindex?: boolean;
 }
 
 export interface HelpArticle extends PublishingArticle {
@@ -79,6 +80,7 @@ interface PublishingMetadata {
   updated?: string;
   products: ArticleProduct[];
   platforms: ArticlePlatform[];
+  noindex?: boolean;
 }
 
 interface HelpMetadata extends PublishingMetadata {
@@ -118,6 +120,7 @@ const SHARED_PUBLISHING_FIELDS = [
   `updated`,
   `products`,
   `platforms`,
+  `noindex`,
 ];
 
 // returns all paths by default unless certain slugs are specified
@@ -174,6 +177,7 @@ export function validatePublishingMetadata<T extends PublishingArticleType>(
     updated: optionalDate(metadata, `updated`, slug),
     products: optionalEnumArray(metadata, `products`, ARTICLE_PRODUCTS, slug),
     platforms: optionalEnumArray(metadata, `platforms`, ARTICLE_PLATFORMS, slug),
+    noindex: optionalBoolean(metadata, `noindex`, slug),
   };
 
   if (type === `help`) {
@@ -317,6 +321,19 @@ function requiredString(
   const value = metadata[field];
   if (typeof value !== `string` || value.trim() === ``) {
     throw new Error(`Missing or invalid ${field} in ${slug}.md`);
+  }
+  return value;
+}
+
+function optionalBoolean(
+  metadata: Record<string, unknown>,
+  field: string,
+  slug: string,
+): boolean | undefined {
+  const value = metadata[field];
+  if (value === undefined) return undefined;
+  if (typeof value !== `boolean`) {
+    throw new Error(`Invalid ${field} in ${slug}.md`);
   }
   return value;
 }
