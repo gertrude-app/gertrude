@@ -10,7 +10,7 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
   func testFetchIncludingPendingDevice() async throws {
     let child = try await self.child()
 
-    let pendingCode = Int.random(in: 100_000 ... 999_999)
+    let pendingCode = uniqueClaimCode()
     let pendingDevice = try await self.db.create(IOSDevice.random { $0.childId = child.id })
     try await self.createClaim(
       .blockerSupervise,
@@ -30,7 +30,6 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
       .blockerSupervise,
       completedDevice.id,
       child.id,
-      code: Int.random(in: 100_000 ... 999_999),
       expiresAt: .distantFuture,
       claimedAt: .reference,
     )
@@ -65,7 +64,6 @@ final class GetChildResolverTests: ApiTestCase, @unchecked Sendable {
     try await self.createClaim(
       .blockerSupervise,
       familyConnectedDevice.id,
-      code: Int.random(in: 100_000 ... 999_999),
       expiresAt: .reference - .days(7),
     )
     try await self.db.create(BlockerApp.Supervision(

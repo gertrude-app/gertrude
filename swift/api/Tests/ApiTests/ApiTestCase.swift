@@ -133,7 +133,6 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
       .music,
       device.id,
       child.model.id,
-      code: Int.random(in: 100_000 ... 999_999),
       claimedAt: .reference,
     )
     let install = try await self.db.create(

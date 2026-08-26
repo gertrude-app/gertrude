@@ -37,14 +37,14 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   func testCodeNotFound_throwsError() async throws {
     try await expectErrorFrom {
       try await GetPendingSupervision.resolve(
-        with: .init(code: Int.random(in: 100_000 ... 999_999), platform: "macos"),
+        with: .init(code: uniqueClaimCode(), platform: "macos"),
         in: .mock,
       )
     }.toContain("not found")
   }
 
   func testCodeNotClaimed_throwsError() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random { $0.childId = nil })
     try await self.createClaim(.blockerSupervise, device.id, code: code)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
@@ -62,7 +62,7 @@ final class GetPendingSupervisionResolverTests: ApiTestCase, @unchecked Sendable
   }
 
   func testUnclaimedCode_throwsClaimStepError() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random { $0.childId = nil })
     try await self.createClaim(
       .blockerSupervise,

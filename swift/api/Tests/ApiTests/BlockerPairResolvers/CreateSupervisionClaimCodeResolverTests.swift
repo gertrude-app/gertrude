@@ -9,7 +9,7 @@ import XExpect
 final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_andIdempotency() async throws {
     let deviceId = UUID()
-    let fixedCode = Int.random(in: 100_000 ... 999_999)
+    let fixedCode = uniqueClaimCode()
 
     let output = try await withDependencies {
       $0.verificationCode = .init(generate: { fixedCode })
@@ -46,7 +46,7 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     expect(supervision.deviceId).toEqual(device.id)
 
     let secondOutput = try await withDependencies {
-      $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
+      $0.verificationCode = .init(generate: { uniqueClaimCode() })
       $0.date = .constant(.reference)
     } operation: {
       try await CreateSupervisionClaimCode.resolve(
@@ -76,15 +76,16 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
       modelIdentifier: "iPhone18,2",
       iosVersion: "17.0",
     ))
+    let expiredCode = uniqueClaimCode()
     try await self.createClaim(
       .blockerSupervise,
       device.id,
-      code: 111_111,
+      code: expiredCode,
       expiresAt: .reference - .days(8),
     ) // <-- expired
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
-    let newCode = Int.random(in: 100_000 ... 999_999)
+    let newCode = uniqueClaimCode()
     let output = try await withDependencies {
       $0.verificationCode = .init(generate: { newCode })
       $0.date = .constant(.reference)
@@ -101,7 +102,7 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
     }
 
     expect(output.code).toEqual(newCode)
-    expect(output.code).not.toEqual(111_111)
+    expect(output.code).not.toEqual(expiredCode)
 
     let claim = try await Claim.find(code: newCode, in: self.db)
     expect(claim?.deviceId).toEqual(device.id)
@@ -114,7 +115,7 @@ final class CreateSupervisionClaimCodeResolverTests: ApiTestCase, @unchecked Sen
       iosVersion: "17.0",
     ))
 
-    let newCode = Int.random(in: 100_000 ... 999_999)
+    let newCode = uniqueClaimCode()
     let output = try await withDependencies {
       $0.verificationCode = .init(generate: { newCode })
       $0.date = .constant(.reference)

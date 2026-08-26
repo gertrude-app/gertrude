@@ -7,7 +7,7 @@ import XExpect
 final class ClaimBlockerDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testFreshClaim_newChild_setsDeviceFields_seedsBlockGroups() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random)
     try await self.createClaim(.blockerConnect, device.id, code: code)
 

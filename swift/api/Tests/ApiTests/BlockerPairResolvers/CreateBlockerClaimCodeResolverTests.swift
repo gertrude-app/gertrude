@@ -9,7 +9,7 @@ import XExpect
 final class CreateBlockerClaimCodeResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_createsCodeWithoutSupervision() async throws {
     let deviceId = UUID()
-    let fixedCode = Int.random(in: 100_000 ... 999_999)
+    let fixedCode = uniqueClaimCode()
 
     let output = try await withDependencies {
       $0.verificationCode = .init(generate: { fixedCode })
@@ -46,7 +46,7 @@ final class CreateBlockerClaimCodeResolverTests: ApiTestCase, @unchecked Sendabl
 
   func testIdempotency_reusesExistingValidCode() async throws {
     let deviceId = UUID()
-    let fixedCode = Int.random(in: 100_000 ... 999_999)
+    let fixedCode = uniqueClaimCode()
     let input = CreateBlockerClaimCode.Input(
       deviceId: deviceId,
       modelIdentifier: "iPhone18,2",
@@ -62,7 +62,7 @@ final class CreateBlockerClaimCodeResolverTests: ApiTestCase, @unchecked Sendabl
     }
 
     let second = try await withDependencies {
-      $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
+      $0.verificationCode = .init(generate: { uniqueClaimCode() })
       $0.date = .constant(.reference)
     } operation: {
       try await CreateBlockerClaimCode.resolve(with: input, in: .mock)

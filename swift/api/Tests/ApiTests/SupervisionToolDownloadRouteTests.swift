@@ -7,7 +7,7 @@ import XExpect
 
 final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidDownload_redirectsAndLogsEvent() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let parent = try await self.parentWithSubscription { _, sub in
       sub.tier = .light
       sub.stripeId = .init("sub_123")
@@ -54,7 +54,7 @@ final class SupervisionToolDownloadRouteTests: ApiTestCase, @unchecked Sendable 
   }
 
   func testDownload_blockedForFreeUser() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let parent = try await self.parent()
     let child = try await self.db.create(Child(parentId: parent.id, name: "Test Child"))
     let device = try await self.db.create(IOSDevice(

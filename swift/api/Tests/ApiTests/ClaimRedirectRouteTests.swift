@@ -8,7 +8,7 @@ import XExpect
 
 final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   func testValidCode_redirectsWithDeviceInfo() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
@@ -35,7 +35,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testExpiredButClaimedCode_stillRedirectsWithDeviceInfo() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let child = try await self.child()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
@@ -94,7 +94,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testExpiredUnclaimedCode_redirectsWithExpiredCodeError() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
@@ -123,7 +123,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
 
   // remaining handler logic is exercised by the supervision tests above
   func testPodcastClaimRoutes_redirectToPodcastFunnel() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
@@ -162,7 +162,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testBlockerConnectValidCode_redirectsToBlockerClaimFunnel() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
@@ -187,7 +187,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testMusicValidCode_redirectsToMusicClaimFunnel() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
@@ -233,19 +233,14 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testNewStyleClaim_selfCorrectsMismatchedRedirectRoute() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
     ))
-    try await self.db.create(Claim(
-      code: code,
-      intent: .music, // <- a music code...
-      deviceId: device.id,
-      expiresAt: .reference + .days(7),
-    ))
+    try await self.createClaim(.music, device.id, code: code) // <- a music code...
 
     try await app.test(
       .GET,
@@ -263,19 +258,14 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
   }
 
   func testNewStyleClaim_matchingRouteUsesClaimIntent() async throws {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
     ))
-    try await self.db.create(Claim(
-      code: code,
-      intent: .blockerConnect,
-      deviceId: device.id,
-      expiresAt: .reference + .days(7),
-    ))
+    try await self.createClaim(.blockerConnect, device.id, code: code)
 
     try await app.test(
       .GET,

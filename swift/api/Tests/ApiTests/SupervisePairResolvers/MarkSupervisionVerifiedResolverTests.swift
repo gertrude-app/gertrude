@@ -41,7 +41,7 @@ final class MarkSupervisionVerifiedResolverTests: ApiTestCase, @unchecked Sendab
   func testCodeNotFound_throwsError() async throws {
     try await expectErrorFrom {
       try await MarkSupervisionVerified.resolve(
-        with: .init(code: Int.random(in: 100_000 ... 999_999)),
+        with: .init(code: uniqueClaimCode()),
         in: .mock,
       )
     }.toContain("not found")

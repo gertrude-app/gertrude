@@ -143,7 +143,6 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
       .blockerSupervise,
       iosDevice.id,
       child.id,
-      code: 111_111,
       claimedAt: .reference,
     )
     let install = try await self.db.create(

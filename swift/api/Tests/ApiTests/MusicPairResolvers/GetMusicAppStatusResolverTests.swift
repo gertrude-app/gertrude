@@ -47,7 +47,7 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testDelegatesUnclaimedToV2() async throws {
     let deviceId = UUID()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
 
     let output = try await withDependencies {
       $0.verificationCode = .init(generate: { code })
@@ -114,7 +114,6 @@ extension GetMusicAppStatusResolverTests {
       .music,
       device.id,
       child.id,
-      code: Int.random(in: 100_000 ... 999_999),
       claimedAt: .reference,
     )
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "0.2.0"))
