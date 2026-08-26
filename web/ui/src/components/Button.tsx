@@ -47,6 +47,8 @@ type Props = CommonProps &
     | {
         type: `link`;
         href: string;
+        target?: string;
+        rel?: string;
       }
   );
 

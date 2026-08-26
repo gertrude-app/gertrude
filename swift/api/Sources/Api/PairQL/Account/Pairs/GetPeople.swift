@@ -45,6 +45,7 @@ struct GetPeople: Pair {
     let iOSVersion: String
     let modelName: String
     let modelIdentifier: String
+    let blockerConnected: Bool
   }
 
   typealias Output = [Person]
@@ -69,6 +70,10 @@ extension GetPeople: NoInputResolver {
 
     let computerUsers = try await computerUsersAsync
     let iOSDevices = try await iOSDevicesAsync
+    let blockerConnectedDeviceIds = try await BlockerApp.Token.connectedDeviceIds(
+      among: iOSDevices.map(\.id),
+      in: context.db,
+    )
     let computerUserIdsByPersonId = Dictionary(grouping: computerUsers, by: \.childId)
       .mapValues { $0.map(\.id) }
     let recentScreenshotCutoff = Date(subtractingDays: 14)
@@ -124,6 +129,7 @@ extension GetPeople: NoInputResolver {
           iOSVersion: device.iosVersion,
           modelName: device.modelName,
           modelIdentifier: device.modelIdentifier,
+          blockerConnected: blockerConnectedDeviceIds.contains(device.id),
         )),
       )
     }

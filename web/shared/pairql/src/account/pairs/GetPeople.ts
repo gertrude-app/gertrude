@@ -25,6 +25,7 @@ export namespace GetPeople {
           iOSVersion: string;
           modelName: string;
           modelIdentifier: string;
+          blockerConnected: boolean;
         }
     >;
     screenshot?: {

@@ -128,6 +128,51 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
     expect(returnedPersonWithoutDevices.screenshot).toBeNil()
   }
 
+  func testIOSDeviceBlockerConnectedFlag() async throws {
+    let parent = try await self.parent()
+    let person = try await self.db.create(Child(parentId: parent.id, name: "Jude"))
+    let connected = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: person.id,
+      modelIdentifier: "iPhone16,1",
+      iosVersion: "18.5",
+    ))
+    let connectedInstall = try await self.db.create(BlockerApp.Install(
+      deviceId: connected.id,
+      appVersion: "1.8.0",
+    ))
+    try await self.db.create(BlockerApp.Token(installId: connectedInstall.id))
+
+    // install but no token: a sibling app's claim bound the child, blocker never connected
+    let installOnly = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: person.id,
+      modelIdentifier: "iPad13,16",
+      iosVersion: "18.6",
+    ))
+    try await self.db.create(BlockerApp.Install(
+      deviceId: installOnly.id,
+      appVersion: "1.8.0",
+    ))
+
+    let noInstall = try await self.db.create(IOSDevice(
+      id: .init(),
+      childId: person.id,
+      modelIdentifier: "iPhone14,7",
+      iosVersion: "18.4",
+    ))
+
+    let output = try await GetPeople.resolve(in: self.accountContext(parent))
+
+    let devices = try XCTUnwrap(output.first { $0.id == person.id }).devices
+    let flags = devices.reduce(into: [IOSDevice.Id: Bool]()) { acc, device in
+      if case .ios(let ios) = device { acc[ios.id] = ios.blockerConnected }
+    }
+    expect(flags[connected.id]).toEqual(true)
+    expect(flags[installOnly.id]).toEqual(false) // install alone is not connected
+    expect(flags[noInstall.id]).toEqual(false)
+  }
+
   func testOmitsScreenshotsOlderThanTwoWeeks() async throws {
     let person = try await self.childWithComputer()
     try await self.db.create(Screenshot(

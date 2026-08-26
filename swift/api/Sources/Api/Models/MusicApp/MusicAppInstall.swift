@@ -18,6 +18,26 @@ extension MusicApp {
   }
 }
 
+extension MusicApp.Install {
+  func device(in db: any DuetSQL.Client) async throws -> IOSDevice {
+    try await IOSDevice.query()
+      .where(.id == self.deviceId)
+      .first(in: db)
+  }
+
+  func token(in db: any DuetSQL.Client) async throws -> MusicApp.Token? {
+    try await MusicApp.Token.query()
+      .where(.installId == self.id)
+      .first(in: db)
+  }
+
+  func hasToken(in db: any DuetSQL.Client) async throws -> Bool {
+    try await MusicApp.Token.query()
+      .where(.installId == self.id)
+      .exists(in: db)
+  }
+}
+
 extension MusicApp.Install: IOSAppInstall {
   init(deviceId: IOSDevice.Id, appVersion: String) {
     self.init(id: .init(), deviceId: deviceId, appVersion: appVersion)

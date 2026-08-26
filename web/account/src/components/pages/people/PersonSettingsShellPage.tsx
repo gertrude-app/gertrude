@@ -37,7 +37,6 @@ const PersonSettingsShellPage: React.FC<Props> = ({
         {
           label: `iPhone/iPad`,
           href: `${baseHref}/ios-settings`,
-          badgeText: `Coming soon`,
         },
       ]}
     >

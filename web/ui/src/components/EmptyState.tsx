@@ -18,6 +18,8 @@ interface Props {
     | {
         type: `link`;
         href: string;
+        target?: string;
+        rel?: string;
       }
     | {
         type: `button`;
@@ -54,6 +56,8 @@ const EmptyState: React.FC<Props> = ({
         <Button
           type="link"
           href={button.href}
+          target={button.target}
+          rel={button.rel}
           icon={button.icon}
           variant={button.variant}
           loading={button.loading}

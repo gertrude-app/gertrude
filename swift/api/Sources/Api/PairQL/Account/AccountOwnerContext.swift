@@ -25,6 +25,20 @@ struct AccountOwnerContext: ResolverContext {
       .first(in: self.db)
   }
 
+  func iosDevice(_ id: IOSDevice.Id) async throws -> (device: IOSDevice, person: Child) {
+    let device: IOSDevice = try await self.db.find(id)
+    guard let personId = device.childId,
+          let person = try? await self.person(personId) else {
+      throw self.error("a1f4c07b", .notFound, user: "Device not found.")
+    }
+    return (device, person)
+  }
+
+  func currentBillingAccount() async throws -> BillingAccountSnapshot {
+    @Dependency(\.date.now) var now
+    return try await self.accountOwner.billingAccountSnapshot(in: self.db, at: now)
+  }
+
   func validatePersonRelationship(
     _ relationship: Child.Relationship,
     excluding excludedPersonId: Child.Id? = nil,

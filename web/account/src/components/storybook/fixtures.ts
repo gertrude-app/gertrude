@@ -1,12 +1,16 @@
 import type {
+  IosBlockGroup,
+  IosBlockerSettings,
+  IosDeviceSettingsConfiguration,
+} from '#/components/pages/person-settings/IosSettingsPage.types';
+import type { InstalledMacApp } from '#/components/pages/person-settings/MacSettingsPage.types';
+import type {
   AllowedAlbum,
   Device,
-  InstalledMacApp,
   Keychain,
   Notification,
   NotificationMethod,
   PersonCardPerson,
-  PersonIosSettingsConfiguration,
   Schedule,
   SecurityEvent,
   SuspensionRequest,
@@ -180,25 +184,130 @@ export const albums: AllowedAlbum[] = [
   },
 ];
 
-export const iosSettings: PersonIosSettingsConfiguration = {
-  blockedGroups: {
-    appleMusic: true,
-    whatsApp: true,
-    musicRecognition: true,
-    gifs: true,
-    appleMapsImages: false,
-    aiFeatures: true,
-    appStoreImages: false,
-    spotlight: true,
-    ads: true,
-    appleDotCom: false,
-    spotifyImages: true,
+export const iosBlockGroups: IosBlockGroup[] = [
+  {
+    id: `bg-ads`,
+    name: `Ads`,
+    description: `Block the most common ad providers across all apps.`,
+    longDescription: `Blocks the 20 most common ad providers, including Google ads, in all browsers and apps. Does not guarantee to block all ads, but should make a noticeable difference.`,
+    optIn: false,
   },
-  preventProtectionRemoval: true,
-  allowDeletingApps: false,
-  allowFactoryReset: false,
-  allowInstallingApps: true,
-  allowedAlbums: albums.slice(0, 3),
+  {
+    id: `bg-ai-features`,
+    name: `AI features`,
+    description: `Block certain cloud-based AI features like image recognition.`,
+    longDescription: `Blocks certain cloud-based AI features like image recognition. For example, the iOS 18 feature where an item in a photo can be long-pressed, identified, and searched for online.`,
+    optIn: false,
+  },
+  {
+    id: `bg-apple-music`,
+    name: `Apple Music`,
+    description: `Block artwork and video content in the Apple Music app.`,
+    longDescription: `Blocks album artwork, artist photos, music videos, and Apple TV content in the Apple Music app. Enabling this group will show grey placeholder squares in place of artwork.`,
+    optIn: false,
+  },
+  {
+    id: `bg-gifs`,
+    name: `GIFs`,
+    description: `Block GIFs in Messages #images, WhatsApp, Signal, and more.`,
+    longDescription: `Blocks viewing and searching for GIFs in the #images feature of Apple's texting app, plus in other common messaging apps like WhatsApp, Skype, and Signal.`,
+    optIn: false,
+  },
+  {
+    id: `bg-spotlight`,
+    name: `Spotlight`,
+    description: `Block internet searches through Spotlight.`,
+    longDescription: `The built in search bar in iOS (called Spotlight) allows searching for information and images from the internet. This group stops all spotlight internet searches.`,
+    optIn: false,
+  },
+  {
+    id: `bg-music-recognition`,
+    name: `Music Recognition`,
+    description: `Block iOS music recognition (Shazam, Control Center identify song, etc.)`,
+    longDescription: `Blocks Apple's built-in music recognition daemon, which powers the Control Center "identify song" button, the Shazam app, and other system surfaces.`,
+    optIn: true,
+  },
+  {
+    id: `bg-whatsapp`,
+    name: `WhatsApp`,
+    description: `Partial WhatsApp blocking. WARNING: likely breaks voice/video calls.`,
+    longDescription: `Aggressive WhatsApp blocking, including channel media, in-app browsing, and Meta AI traffic. WARNING: likely breaks voice and video calls.`,
+    optIn: true,
+  },
+];
+
+const iosBlockerSettings: IosBlockerSettings = {
+  allBlockGroups: iosBlockGroups,
+  enabledBlockGroupIds: [`bg-ads`, `bg-ai-features`, `bg-gifs`, `bg-spotlight`],
+  isSupervised: true,
+  profileSettings: {
+    preventProtectionRemoval: true,
+    allowDeletingApps: false,
+    allowFactoryReset: false,
+    allowInstallingApps: true,
+  },
+};
+
+export const iosDeviceSettings: IosDeviceSettingsConfiguration = {
+  deviceId: `ios-device-1`,
+  personId: `person-1`,
+  deviceName: `iPhone 15 Pro`,
+  modelIdentifier: `iPhone16,1`,
+  iosVersion: `18.5`,
+  blocker: iosBlockerSettings,
+};
+
+export const iosDeviceSettingsUnsupervised: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  blocker: { ...iosBlockerSettings, isSupervised: false },
+};
+
+export const iosDeviceSettingsNoBlocker: IosDeviceSettingsConfiguration = {
+  deviceId: `ios-device-2`,
+  personId: `person-1`,
+  deviceName: `iPad Air`,
+  modelIdentifier: `iPad13,16`,
+  iosVersion: `18.6`,
+};
+
+const daysFromNow = (days: number): string =>
+  new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+
+export const iosDeviceSettingsWithPodcasts: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  podcasts: { subscription: { case: `active`, expiresAt: daysFromNow(300) } },
+};
+
+export const iosDeviceSettingsPodcastsTrial: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  podcasts: { subscription: { case: `amTrial`, expiresAt: daysFromNow(21) } },
+};
+
+export const iosDeviceSettingsPodcastsExpiring: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  // inside the 7-day soft-push window, so this renders the access-ends-on line
+  podcasts: { subscription: { case: `amTrial`, expiresAt: `2026-08-27T12:00:00.000Z` } },
+};
+
+export const iosDeviceSettingsPodcastsPaused: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  podcasts: { subscription: { case: `unpaid` } },
+};
+
+export const iosDeviceSettingsMusicConnected: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  music: { requiresPayment: false },
+};
+
+export const iosDeviceSettingsMusicUnavailable: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  music: { requiresPayment: true },
+};
+
+export const iosDeviceSettingsAllAppsConnected: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  music: { requiresPayment: false },
+  podcasts: { subscription: { case: `active`, expiresAt: daysFromNow(300) } },
 };
 
 export const unlockRequests: UnlockRequest[] = [

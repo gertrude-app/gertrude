@@ -24,6 +24,19 @@ const normalizePath = (path: string): string => {
     : withLeadingSlash.replace(/\/+$/, ``);
 };
 
+// a nested route (`/people/1/ios-settings/<deviceId>`) must still light up its tab,
+// and the longest match wins so it beats the parent `/people/1` tab
+export const matchingTabHref = (
+  tabHrefs: string[],
+  currentPath: string,
+): string | undefined => {
+  const current = normalizePath(currentPath);
+  return tabHrefs
+    .map(normalizePath)
+    .filter((href) => current === href || current.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
+};
+
 const SegmentedTabLinks: React.FC<Props> = ({
   tabs,
   selectedHref,
@@ -31,6 +44,14 @@ const SegmentedTabLinks: React.FC<Props> = ({
   className,
 }) => {
   const normalizedSelectedHref = normalizePath(selectedHref);
+  const selectedTabHref = React.useMemo(
+    () =>
+      matchingTabHref(
+        tabs.map((tab) => tab.href),
+        selectedHref,
+      ),
+    [tabs, selectedHref],
+  );
   const scrollRef = React.useRef<HTMLElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
@@ -87,7 +108,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
         >
           {tabs.map((tab) => {
             const href = normalizePath(tab.href);
-            const isSelected = normalizedSelectedHref === href;
+            const isSelected = href === selectedTabHref;
 
             return (
               <Link

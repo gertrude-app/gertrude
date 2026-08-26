@@ -23,7 +23,7 @@ const appDetails: Record<
   music: {
     name: `Gertrude Music`,
     shortName: `Music`,
-    iconUrl: `/gertrude-app-icons/music.png`,
+    iconUrl: `/gertrude-app-icons/music.webp`,
   },
 };
 

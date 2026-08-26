@@ -76,6 +76,18 @@ extension BlockerApp.Install {
       .first(in: db)
   }
 
+  func token(in db: any DuetSQL.Client) async throws -> BlockerApp.Token? {
+    try await BlockerApp.Token.query()
+      .where(.installId == self.id)
+      .first(in: db)
+  }
+
+  func hasToken(in db: any DuetSQL.Client) async throws -> Bool {
+    try await BlockerApp.Token.query()
+      .where(.installId == self.id)
+      .exists(in: db)
+  }
+
   func webContentFilterPolicy(
     in db: any DuetSQL.Client,
   ) async throws -> WebContentFilterPolicy {
