@@ -1,6 +1,7 @@
 ---
 title: The Definitive Guide to Locking Down an iPhone (iOS 16)
 platforms: [ios, ipados]
+noindex: true
 image: /og-images/lockdown.en.png
 description:
   A step-by-step guide to completely locking down an iPhone or iPad for iOS 16, for

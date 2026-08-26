@@ -25,7 +25,7 @@ export const metadata = createMetadata(
 
 const GUIDE_ORDER = [
   `getting-started-with-gertrude-for-mac`,
-  `locking-down-an-iphone/ios-18`,
+  `locking-down-an-iphone`,
   `iphone-lockdown-loopholes`,
   `unblocking-websites-and-apps-on-mac`,
   `keeping-kids-safe-online`,
@@ -60,7 +60,10 @@ const ResourcesPage: NextPage = async () => {
   ]);
 
   const blog = [...blogArticles].sort(byNewestDate);
-  const guides = prioritizeArticles(guideArticles, GUIDE_ORDER);
+  const guides = prioritizeArticles(
+    guideArticles.filter((article) => !article.noindex),
+    GUIDE_ORDER,
+  );
   const macHelp = prioritizeArticles(
     helpArticles.filter((article) => article.platforms.includes(`macos`)),
     MAC_HELP_ORDER,

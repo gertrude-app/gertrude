@@ -61,15 +61,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const guideSlugs = await getArticleSlugs(`guide`);
-  const guideEntries: MetadataRoute.Sitemap = await Promise.all(
-    guideSlugs.map(async (slug) => {
-      const article = await getArticle(slug, `guide`);
-      return {
-        url: `${BASE_URL}${getGuideArticlePath(article)}`,
-        lastModified: article.updated ? new Date(article.updated) : now,
-      };
-    }),
+  const guideArticles = await Promise.all(
+    guideSlugs.map((slug) => getArticle(slug, `guide`)),
   );
+  const guideEntries: MetadataRoute.Sitemap = guideArticles
+    .filter((article) => !article.noindex)
+    .map((article) => ({
+      url: `${BASE_URL}${getGuideArticlePath(article)}`,
+      lastModified: article.updated ? new Date(article.updated) : now,
+    }));
 
   const updateSlugs = await getArticleSlugs(`update`);
   const updateEntries: MetadataRoute.Sitemap = await Promise.all(

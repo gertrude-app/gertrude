@@ -451,8 +451,8 @@ including:
   safety
 - Our companion [iOS app](/help/iphone-ipad/block-gif-search-in-messages) which plugs
   holes in Apple's Screen Time
-- The internet's best [step-by-step guide](/guides/locking-down-an-iphone/ios-18) to
-  locking down an iPhone for a child.
+- The internet's best [step-by-step guide](/guides/locking-down-an-iphone) to locking down
+  an iPhone for a child.
 
 If you have any questions, feature requests, or need help with anything, please don't
 hesitate to [contact us](/contact). We'd love to hear from you!

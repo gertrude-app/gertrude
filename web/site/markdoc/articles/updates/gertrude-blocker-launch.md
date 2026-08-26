@@ -19,9 +19,8 @@ to bring Gertrude to iPhones and iPads. While we've always been open to the poss
 1. There are certain major Gertrude features, like screenshots, which we are not able to
    build on iOS, due to restrictions within Apple's frameworks for privacy and battery
    usage.
-2. By a [careful use of Apple's Screen Time](/guides/locking-down-an-iphone/ios-18)
-   parental controls, it was possible to very strictly lock down an iPhone, even without
-   Gertrude.
+2. By a [careful use of Apple's Screen Time](/guides/locking-down-an-iphone) parental
+   controls, it was possible to very strictly lock down an iPhone, even without Gertrude.
 
 While #1 still holds, #2 has been becoming less and less true as recent releases of iOS
 have introduced [more and](/help/iphone-ipad/block-gif-search-in-messages)
@@ -46,6 +45,6 @@ what our Gertrude parents want us to work on next!
 
 In the meantime, if your child has an iPhone or iPad running iOS 17 or 18, we highly
 recommend you familiarize yourself with the
-[dangerous loopholes in Screen Time,](/guides/locking-down-an-iphone/ios-18) and give
-Gertrude Blocker a try. Detailed installation instructions
+[dangerous loopholes in Screen Time,](/guides/locking-down-an-iphone) and give Gertrude
+Blocker a try. Detailed installation instructions
 [can be found here.](/help/iphone-ipad/block-gif-search-in-messages)

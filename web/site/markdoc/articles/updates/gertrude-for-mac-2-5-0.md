@@ -69,7 +69,7 @@ can create a public keychain for it, we're always looking to grow the list.
 {% image src="lockdown-iphone/gertrude-blocker-ios-app.png" alt="Gertrude Blocker free iOS app allows parents to block unwanted GIFs in #images texting app" /%}
 
 When iOS 18 was released this fall, we were
-[dissapointed to find](/guides/locking-down-an-iphone/ios-18) that Apple had not fixed a
+[dissapointed to find](/guides/locking-down-an-iphone) that Apple had not fixed a
 [glaring loophole in Screen Time](/help/iphone-ipad/block-gif-search-in-messages)
 introduced a year earlier in iOS 17&mdash;the inability for parents to block _searching
 for animated GIFs_ in the Apple texting app Messages. Also, several new loopholes

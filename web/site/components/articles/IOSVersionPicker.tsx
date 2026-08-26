@@ -8,11 +8,19 @@ type Props = {
   current: IOSVersion;
 };
 
+const GUIDE_PATH = `/guides/locking-down-an-iphone`;
+
+const LATEST: IOSVersion = `ios-18`;
+
 const versions: Array<{ id: IOSVersion; label: string }> = [
   { id: `ios-16`, label: `iOS 16` },
   { id: `ios-17`, label: `iOS 17` },
   { id: `ios-18`, label: `iOS 18` },
 ];
+
+function versionHref(id: IOSVersion): string {
+  return id === LATEST ? GUIDE_PATH : `${GUIDE_PATH}/${id}`;
+}
 
 const IOSVersionPicker: React.FC<Props> = ({ current }) => (
   <nav
@@ -28,7 +36,7 @@ const IOSVersionPicker: React.FC<Props> = ({ current }) => (
         return (
           <Link
             key={version.id}
-            href={`/guides/locking-down-an-iphone/${version.id}`}
+            href={versionHref(version.id)}
             aria-current={selected ? `page` : undefined}
             className={cx(
               `rounded-xl px-4 py-2 text-center text-sm font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-violet-50`,
