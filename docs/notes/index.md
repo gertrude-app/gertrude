@@ -57,3 +57,7 @@ all notes.
   — first-class child-scoped unrestricted-app model (near-mirror of the blocked-app
   model) replacing the emergent keychain/key projection; legacy keychain shape is
   synthesized back at the Mac-app wire boundary so the wire contract is unchanged.
+
+- **[012 — MacSim simulated-OS harness](./012-macsim-simulated-os-harness.md)** — why the
+  mac app keeps a deterministic world-sim (real reducers, modeled OS) with a conformance
+  loop, instead of relying on VM integration tests or unit tests alone.

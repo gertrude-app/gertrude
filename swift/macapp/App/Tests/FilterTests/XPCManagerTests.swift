@@ -141,6 +141,6 @@ private class AcceptAllDelegate: NSObject, NSXPCListenerDelegate {
 
 private extension XPCManager {
   var connectionIds: [uid_t: ObjectIdentifier] {
-    self.connections.withValue { $0.entries.mapValues(\.id) }
+    self.connections.withValue { $0.entries.mapValues(\.connection.id) }
   }
 }

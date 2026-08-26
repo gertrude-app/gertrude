@@ -66,6 +66,12 @@ duet-test *args:
 macapp-test *args:
   @cd macapp/App && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 
+macsim-test:
+  @just macapp-test --filter MacSimTests
+
+macsim-hunt seeds="80" steps="45":
+  @EXPLORE_SEEDS={{seeds}} EXPLORE_STEPS={{steps}} just macapp-test --filter MacExplorerTests
+
 iosapp-test *args:
   @cd iosapp/lib-ios && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 

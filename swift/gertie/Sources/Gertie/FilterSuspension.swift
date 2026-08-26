@@ -8,7 +8,11 @@ public struct FilterSuspension: Equatable, Codable, Sendable {
   public let expiresAt: Date
 
   public var isActive: Bool {
-    self.expiresAt > Date()
+    self.isActive(at: Date())
+  }
+
+  public func isActive(at date: Date) -> Bool {
+    self.expiresAt > date
   }
 
   public init(scope: AppScope, duration: Seconds<Int>, now: Date = Date()) {

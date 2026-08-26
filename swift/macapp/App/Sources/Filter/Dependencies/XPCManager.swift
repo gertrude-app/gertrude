@@ -10,20 +10,10 @@ class XPCManager: NSObject, NSXPCListenerDelegate, XPCSender {
   struct AppConnection: Sendable {
     let id: ObjectIdentifier
     let connection: Connection
-    let seq: Int
-  }
-
-  struct ConnectionMap: Sendable {
-    var entries: [uid_t: AppConnection] = [:]
-    var nextSeq = 0
-
-    var mostRecent: AppConnection? {
-      self.entries.values.max { $0.seq < $1.seq }
-    }
   }
 
   var listener: NSXPCListener?
-  let connections = Mutex(ConnectionMap())
+  let connections = Mutex(UserConnectionMap<AppConnection>())
 
   @Dependency(\.mainQueue) var scheduler
 
@@ -43,6 +33,7 @@ class XPCManager: NSObject, NSXPCListenerDelegate, XPCSender {
       "[G•] FILTER XPCManager: sending blocked request: %{public}@",
       String(describing: request),
     )
+    // sync:1e9446b4 blocked-request payload encoding
     let requestData = try XPC.encode(request)
     try await withTimeout(connection: connection) { appProxy, continuation in
       appProxy.receiveBlockedRequest(requestData, userId: userId, reply: continuation.dataHandler)
@@ -50,6 +41,7 @@ class XPCManager: NSObject, NSXPCListenerDelegate, XPCSender {
   }
 
   func sendLogs(_ logs: FilterLogs) async throws {
+    // sync:31af50b5 per-user xpc routing
     guard let connection = self.connections.withValue({ $0.mostRecent?.connection }) else {
       throw XPCErr.noConnection
     }
@@ -72,7 +64,7 @@ class XPCManager: NSObject, NSXPCListenerDelegate, XPCSender {
   func stopListener() {
     self.listener?.invalidate()
     self.listener = nil
-    self.connections.replace(with: ConnectionMap())
+    self.connections.replace(with: UserConnectionMap())
     os_log("[G•] FILTER XPCManager: stopped listener")
   }
 
@@ -106,26 +98,28 @@ class XPCManager: NSObject, NSXPCListenerDelegate, XPCSender {
     // ⛔️⛔️⛔️ WARNING ⛔️⛔️⛔️ `newConnection` has been "moved" into
     // the Connection object, and may not be accessed again !!!
     let connection = Connection(taking: Move(configure(connection: newConnection)))
+    // sync:31af50b5 per-user xpc routing
     self.connections.transition { map in
       var map = map
-      map.entries[userId] = AppConnection(id: id, connection: connection, seq: map.nextSeq)
-      map.nextSeq += 1
+      map.connect(AppConnection(id: id, connection: connection), for: userId)
       return map
     }
   }
 
   func removeConnection(userId: uid_t, id: ObjectIdentifier) {
     os_log("[G•] FILTER XPCManager: connection invalidated for user %{public}d", userId)
+    // sync:31af50b5 per-user xpc routing
     self.connections.transition { map in
-      guard map.entries[userId]?.id == id else { return map }
       var map = map
-      map.entries[userId] = nil
+      map.disconnect(userId) { $0.id == id }
       return map
     }
   }
 
   private func connection(for userId: uid_t) throws -> Connection {
-    guard let connection = self.connections.withValue({ $0.entries[userId]?.connection }) else {
+    // sync:31af50b5 per-user xpc routing
+    guard let connection = self.connections.withValue({ $0.connection(for: userId)?.connection })
+    else {
       throw XPCErr.noConnection
     }
     return connection
