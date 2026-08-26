@@ -9,7 +9,7 @@ import XExpect
 final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testFreshClaim_newChild_setsDeviceFields_returnsAmTrial() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedAmDevice(code: code)
 
     let output = try await ClaimAmDevice.resolve(
@@ -49,7 +49,7 @@ final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       stripeStatus: .active,
       currentPeriodEnd: .reference + .days(30),
     ))
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     try await self.unclaimedAmDevice(code: code)
 
     let output = try await ClaimAmDevice.resolve(
@@ -62,7 +62,7 @@ final class ClaimAmDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFreshClaim_legacyIapCustomer_stampsPaidAt_returnsGrandfathered() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedAmDevice(code: code)
     try await self.db.create(PodcastEvent(
       eventId: "af0a338f",

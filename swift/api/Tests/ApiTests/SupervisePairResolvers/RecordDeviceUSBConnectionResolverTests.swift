@@ -46,7 +46,7 @@ final class RecordDeviceUSBConnectionResolverTests: ApiTestCase, @unchecked Send
     try await expectErrorFrom {
       try await RecordDeviceUSBConnection.resolve(
         with: .init(
-          code: Int.random(in: 100_000 ... 999_999),
+          code: uniqueClaimCode(),
           udid: "fake-udid",
           modelIdentifier: "iPhone17,1",
         ),

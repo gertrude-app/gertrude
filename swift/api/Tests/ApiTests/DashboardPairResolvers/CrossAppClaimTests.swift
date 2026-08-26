@@ -39,15 +39,10 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     var device = try await self.db.create(IOSDevice.random)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
-    try await self.db.create(Claim(
-      code: code,
-      intent: .music,
-      deviceId: device.id,
-      expiresAt: .reference + .days(7),
-    ))
+    try await self.createClaim(.music, device.id, code: code)
     try await device.bindChild(child, in: self.db) // childId set, claimedAt nil → resume path
 
     let pending = try await Claim.find(code: code, in: self.db)
@@ -91,7 +86,7 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
     // an AM code is intent-specific: once claimed via AM, the blocker funnel rejects it
     // rather than resuming cross-app (the legacy shared-code fallback is gone, #737)
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random)
     try await self.createClaim(.podcasts, device.id, code: code)
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
@@ -112,15 +107,10 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
 
   func testClaimCode_rejectedInWrongAppFunnel() async throws {
     let parent = try await self.parent()
-    let amCode = Int.random(in: 100_000 ... 999_999)
+    let amCode = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random)
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
-    try await self.db.create(Claim(
-      code: amCode,
-      intent: .podcasts,
-      deviceId: device.id,
-      expiresAt: .reference + .days(7),
-    ))
+    try await self.createClaim(.podcasts, device.id, code: amCode)
 
     // the AM funnel accepts its own code
     let amData = try await withDependencies {
@@ -142,15 +132,10 @@ final class CrossAppClaimTests: ApiTestCase, @unchecked Sendable {
 
   func testMusicCode_rejectedInBlockerConnectFunnel() async throws {
     let parent = try await self.parent()
-    let musicCode = Int.random(in: 100_000 ... 999_999)
+    let musicCode = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random)
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
-    try await self.db.create(Claim(
-      code: musicCode,
-      intent: .music,
-      deviceId: device.id,
-      expiresAt: .reference + .days(7),
-    ))
+    try await self.createClaim(.music, device.id, code: musicCode)
 
     // the blocker connect funnel rejects the music code (#737)
     try await expectErrorFrom {

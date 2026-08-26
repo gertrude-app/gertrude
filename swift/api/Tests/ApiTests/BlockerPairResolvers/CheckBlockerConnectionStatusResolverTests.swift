@@ -12,7 +12,7 @@ final class CheckBlockerConnectionStatusResolverTests: ApiTestCase, @unchecked S
       $0.date = .constant(.reference)
     } operation: {
       try await CheckBlockerConnectionStatus.resolve(
-        with: .init(vendorId: UUID(), code: Int.random(in: 100_000 ... 999_999)),
+        with: .init(vendorId: UUID(), code: uniqueClaimCode()),
         in: .mock,
       )
     }

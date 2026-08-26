@@ -42,11 +42,7 @@ final class ConnectDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let device = try await self.db.create(IOSDevice.random {
       $0.id = .init(vendorId)
     })
-    try await self.createClaim(
-      .blockerSupervise,
-      device.id,
-      code: Int.random(in: 100_000 ... 999_999),
-    )
+    try await self.createClaim(.blockerSupervise, device.id)
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
     let data = try await withDependencies {

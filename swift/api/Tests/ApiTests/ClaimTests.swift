@@ -12,7 +12,7 @@ final class ClaimTests: ApiTestCase, @unchecked Sendable {
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
     ))
-    let fixedCode = Int.random(in: 100_000 ... 999_999)
+    let fixedCode = uniqueClaimCode()
 
     let first = try await withDependencies {
       $0.verificationCode = .init(generate: { fixedCode })
@@ -27,7 +27,7 @@ final class ClaimTests: ApiTestCase, @unchecked Sendable {
     expect(first.expiresAt).toEqual(.reference + .days(7))
 
     let second = try await withDependencies {
-      $0.verificationCode = .init(generate: { Int.random(in: 100_000 ... 999_999) })
+      $0.verificationCode = .init(generate: { uniqueClaimCode() })
       $0.date = .constant(.reference)
     } operation: {
       try await Claim.ensureActive(intent: .blockerConnect, deviceId: device.id, in: self.db)
@@ -46,7 +46,7 @@ final class ClaimTests: ApiTestCase, @unchecked Sendable {
       modelIdentifier: "iPhone15,2",
       iosVersion: "18.2",
     ))
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     _ = try await withDependencies {
       $0.verificationCode = .init(generate: { code })
       $0.date = .constant(.reference)

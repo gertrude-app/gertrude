@@ -8,7 +8,7 @@ import XExpect
 final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testHappyPath_newChild_createsChildAndAssignsBlockGroups() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: nil,
@@ -95,7 +95,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testAlreadyBoundUnclaimedCodeCompletesForExistingChildAndLogsClaimedEvent() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,
@@ -135,7 +135,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     try await expectErrorFrom {
       try await ClaimIOSDevice.resolve(
-        with: .init(code: Int.random(in: 100_000 ... 999_999), child: .newChild(name: "Test")),
+        with: .init(code: uniqueClaimCode(), child: .newChild(name: "Test")),
         in: parent.context,
       )
     }.toContain("not found")
@@ -261,7 +261,7 @@ final class ClaimIOSDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testClaimedCodeDoesNotExpire_andIsIdempotent() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,

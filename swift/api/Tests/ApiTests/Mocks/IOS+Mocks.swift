@@ -4,13 +4,24 @@ import Gertie
 
 @testable import Api
 
+private let claimCodes = LockIsolated(100_000)
+
+// test db persists between tests, so ensure unique claim codes
+func uniqueClaimCode() -> Int {
+  claimCodes.withValue { code in
+    code += 1
+    precondition(code <= 999_999, "exhausted unique 6-digit test claim codes")
+    return code
+  }
+}
+
 extension ApiTestCase {
   @discardableResult
   func createClaim(
     _ intent: ClaimIntent,
     _ deviceId: IOSDevice.Id,
     _ childId: Child.Id? = nil,
-    code: Int = Int.random(in: 100_000 ... 999_999),
+    code: Int = uniqueClaimCode(),
     expiresAt: Date = .reference + .days(7),
     claimedAt: Date? = nil,
   ) async throws -> Claim {

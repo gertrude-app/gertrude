@@ -23,7 +23,6 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
       .podcasts,
       device.id,
       child.model.id,
-      code: Int.random(in: 100_000 ... 999_999),
       claimedAt: .reference,
     )
     var install = try await self.db.create(

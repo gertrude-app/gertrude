@@ -71,7 +71,7 @@ final class GetIOSDeviceSupervisionStatusResolverTests: ApiTestCase, @unchecked 
 extension GetIOSDeviceSupervisionStatusResolverTests {
   func claimedDevice(parentId: Parent.Id) async throws -> (Int, IOSDevice) {
     let child = try await self.db.create(Child(parentId: parentId, name: "Test Child"))
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
       childId: child.id,

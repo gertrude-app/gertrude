@@ -38,7 +38,7 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
 
   func testFreshDeviceCreatesInstallAndReturnsClaimCode() async throws {
     let deviceId = UUID()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
 
     let output = try await withDependencies {
       $0.verificationCode = .init(generate: { code })
@@ -67,14 +67,14 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
     let deviceId = UUID()
 
     let first = try await withDependencies {
-      $0.verificationCode = .init(generate: { 123_456 })
+      $0.verificationCode = .init(generate: { uniqueClaimCode() })
       $0.date = .constant(.reference)
     } operation: {
       try await GetMusicAppStatus_v2.resolve(with: self.input(deviceId), in: .mock)
     }
 
     let second = try await withDependencies {
-      $0.verificationCode = .init(generate: { 654_321 })
+      $0.verificationCode = .init(generate: { uniqueClaimCode() })
       $0.date = .constant(.reference + .days(1))
     } operation: {
       try await GetMusicAppStatus_v2.resolve(
@@ -106,7 +106,6 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
       .music,
       device.id,
       child.id,
-      code: Int.random(in: 100_000 ... 999_999),
       claimedAt: .reference,
     )
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
@@ -143,7 +142,6 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
       .music,
       device.id,
       child.id,
-      code: Int.random(in: 100_000 ... 999_999),
       claimedAt: .reference,
     )
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
@@ -170,7 +168,6 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
       .music,
       device.id,
       child.id,
-      code: Int.random(in: 100_000 ... 999_999),
       claimedAt: .reference,
     )
     let install = try await self.db.create(
@@ -196,7 +193,7 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let deviceId = UUID()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
       childId: child.id,
@@ -238,7 +235,7 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
     let parent = try await self.parent() // no subscription -> free -> not entitled
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let deviceId = UUID()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
       childId: child.id,

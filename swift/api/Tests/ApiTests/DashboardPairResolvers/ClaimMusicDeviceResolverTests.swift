@@ -26,7 +26,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testFreshClaimNewChildSetsDeviceFields() async throws {
     let parent = try await self.parent()
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedMusicDevice(code: code)
 
     let output = try await ClaimMusicDevice.resolve(
@@ -56,7 +56,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parent()
     try await self.addPaidSubscription(for: parent.id, tier: .medium)
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedMusicDevice(code: code)
 
     let output = try await ClaimMusicDevice.resolve(
@@ -118,7 +118,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testFreshClaimNewChildWithoutMusicAccessSucceeds() async throws {
     let parent = try await self.parent() // no subscription, no music entitlement
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedMusicDevice(code: code)
 
     let output = try await ClaimMusicDevice.resolve(
@@ -144,7 +144,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
   func testFreshClaimExistingChildWithoutMusicAccessSucceeds() async throws {
     let parent = try await self.parent() // no subscription, no music entitlement
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedMusicDevice(code: code)
 
     let output = try await ClaimMusicDevice.resolve(
@@ -166,7 +166,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
       $1.tier = .full
       $1.stripeStatus = .pastDue // past due revokes music entitlement
     }
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.unclaimedMusicDevice(code: code)
 
     let output = try await ClaimMusicDevice.resolve(
@@ -200,7 +200,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testClaimWithoutMusicInstallThrowsNotFound() async throws {
     let parent = try await self.parent()
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice.random)
     try await self.createClaim(.music, device.id, code: code)
 

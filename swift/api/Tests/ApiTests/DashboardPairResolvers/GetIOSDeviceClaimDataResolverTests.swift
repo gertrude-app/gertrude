@@ -191,7 +191,7 @@ extension GetIOSDeviceClaimDataResolverTests {
     for parent: ParentEntities,
     supervisedAt: Date? = nil,
   ) async throws -> (device: IOSDevice, code: Int) {
-    let code = Int.random(in: 100_000 ... 999_999)
+    let code = uniqueClaimCode()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let device = try await self.db.create(IOSDevice(
       id: .init(),

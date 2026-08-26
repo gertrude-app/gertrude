@@ -305,6 +305,11 @@ one filter at a time instead.
 When writing swift unit test helpers, check if existing helpers already exist, or should
 be generalized and moved to a shared location before creating duplicates.
 
+The api test db is migrated once per run and never truncated between tests, so rows
+accumulate for the whole run. Claim codes live in a 6-digit space under a unique
+constraint, so always source them from `uniqueClaimCode()` (or `createClaim(...)`, whose
+default uses it) — never `Int.random(in: 100_000 ... 999_999)`, which collides.
+
 ### Package Manager
 
 - **SPM** - Primary package manager
