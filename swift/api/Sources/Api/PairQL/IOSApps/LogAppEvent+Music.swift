@@ -53,7 +53,7 @@ private func musicEventShouldSlack(
   switch input.eventId {
   case musicOnboardingCompleteEventId:
     await isFirstMusicEvent(input.eventId, deviceId: deviceId, since: nil, in: context)
-  case musicPlaybackFailedEventId:
+  case musicPlaybackFailedEventId, musicTrackUnavailableEventId:
     await isFirstMusicEvent(
       input.eventId,
       deviceId: deviceId,
@@ -110,3 +110,4 @@ private func musicEventSlackMessage(
 
 private let musicOnboardingCompleteEventId = "8af8b414"
 private let musicPlaybackFailedEventId = "f357b375"
+private let musicTrackUnavailableEventId = "e1423c41"

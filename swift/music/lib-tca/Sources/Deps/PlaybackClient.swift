@@ -350,13 +350,13 @@ extension PlaybackClient {
       )
       do {
         guard let song = try await request.response().items.first else {
-          throw PlaybackClientError.trackUnavailable
+          throw await self.trackUnavailable(for: [songID.rawValue])
         }
         let detailedSong = try await song.with(.albums)
         return detailedSong.albums?.map { ApprovedAlbum.ID($0.id.rawValue) } ?? []
       } catch let error as MusicDataRequest.Error {
         if error.status == 404 {
-          throw PlaybackClientError.trackUnavailable
+          throw await self.trackUnavailable(for: [songID.rawValue])
         }
         throw PlaybackClientError.catalogLookupFailed(.init(error))
       } catch let error as MusicTokenRequestError {
@@ -871,7 +871,7 @@ extension PlaybackClient {
             songsByID[songID.rawValue].map { (index, $0) }
           }
         guard !availableSongs.isEmpty else {
-          throw PlaybackClientError.trackUnavailable
+          throw await self.trackUnavailable(for: checkpoint.songIDs.map(\.rawValue))
         }
         let exactCurrentIndex = availableSongs.firstIndex {
           $0.originalIndex == checkpoint.currentIndex
@@ -886,7 +886,7 @@ extension PlaybackClient {
         )
       } catch let error as MusicDataRequest.Error {
         if error.status == 404 {
-          throw PlaybackClientError.trackUnavailable
+          throw await self.trackUnavailable(for: checkpoint.songIDs.map(\.rawValue))
         }
         throw PlaybackClientError.catalogLookupFailed(.init(error))
       } catch let error as MusicTokenRequestError {
@@ -913,15 +913,17 @@ extension PlaybackClient {
         let response = try await request.response()
         let songsByID = Dictionary(uniqueKeysWithValues: response.items
           .map { ($0.id.rawValue, $0) })
-        return try items.map { item in
+        var songs: [Song] = []
+        for item in items {
           guard let song = songsByID[item.id.rawValue] else {
-            throw PlaybackClientError.trackUnavailable
+            throw await self.trackUnavailable(for: [item.id.rawValue])
           }
-          return song
+          songs.append(song)
         }
+        return songs
       } catch let error as MusicDataRequest.Error {
         if error.status == 404 {
-          throw PlaybackClientError.trackUnavailable
+          throw await self.trackUnavailable(for: items.map(\.id.rawValue))
         }
         throw PlaybackClientError.catalogLookupFailed(.init(error))
       } catch let error as MusicTokenRequestError {
@@ -936,6 +938,18 @@ extension PlaybackClient {
       } catch {
         throw PlaybackClientError.catalogLookupFailed(.init(unexpected: error))
       }
+    }
+
+    private static func trackUnavailable(for trackIDs: [String]) async -> PlaybackClientError {
+      let storefront = await (try? MusicDataRequest.currentCountryCode) ?? "unknown"
+      let trackDetail = if trackIDs.count == 1, let trackID = trackIDs.first {
+        "trackId=\(trackID)"
+      } else {
+        "trackIds=\(trackIDs.joined(separator: ","))"
+      }
+      return .trackUnavailable(
+        PlaybackDiagnostic(summary: "\(trackDetail) storefront=\(storefront)"),
+      )
     }
   #endif
 }
@@ -1328,19 +1342,19 @@ enum PlaybackClientError: Error, Equatable, Sendable {
   case musicAccessRestricted
   case playbackFailed(PlaybackDiagnostic?)
   case privacyAcknowledgementRequired
-  case trackUnavailable
+  case trackUnavailable(PlaybackDiagnostic?)
 
   var diagnostic: PlaybackDiagnostic? {
     switch self {
     case .appleMusicSignInRequired(let diagnostic),
          .catalogLookupFailed(let diagnostic),
-         .playbackFailed(let diagnostic):
+         .playbackFailed(let diagnostic),
+         .trackUnavailable(let diagnostic):
       diagnostic
     case .appleMusicSubscriptionRequired,
          .musicAccessDenied,
          .musicAccessRestricted,
-         .privacyAcknowledgementRequired,
-         .trackUnavailable:
+         .privacyAcknowledgementRequired:
       nil
     }
   }
