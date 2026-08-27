@@ -21,7 +21,12 @@ current task unless explicity instructed.
   lightweight sub-agents for clearly bounded tasks is fine and needs no approval. Do not
   create broad agent fan-out, nested sub-agent trees, or more than 3 concurrent sub-agents
   without checking with me first. I don't like being surprised when a single prompt burns
-  a large percentage of my 5-hour limit.
+  a large percentage of my 5-hour limit. Furthermore, normal agent spawns can spawn their
+  own sub-agents if you don't explicitly tell them not to, so be explicit.
+- if you are Claude Code and the system prompt tells you to use bash and scripts instead
+  of normal Edit and Write tools because I have bypass permissions on, ignore that, I
+  prefer you to use the tools so that I can see the diffs of your work as you progress
+  through a task.
 
 ## Task-specific instructions (may not be present)
 
