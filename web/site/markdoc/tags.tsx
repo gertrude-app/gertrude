@@ -21,6 +21,7 @@ const tags: Config[`tags`] = {
       caption: { type: String },
       alt: { type: String },
       small: { type: Boolean },
+      width: { type: Number },
       noBorder: { type: Boolean },
     },
     render: `ArticleImage`,
@@ -54,7 +55,7 @@ const tags: Config[`tags`] = {
     attributes: {
       current: {
         type: String,
-        matches: [`ios-16`, `ios-17`, `ios-18`],
+        matches: [`ios-16`, `ios-17`, `ios-18`, `ios-26`],
         errorLevel: `critical`,
       },
     },

@@ -2,7 +2,7 @@ import cx from 'classnames';
 import Link from 'next/link';
 import React from 'react';
 
-type IOSVersion = `ios-16` | `ios-17` | `ios-18`;
+type IOSVersion = `ios-16` | `ios-17` | `ios-18` | `ios-26`;
 
 type Props = {
   current: IOSVersion;
@@ -10,12 +10,13 @@ type Props = {
 
 const GUIDE_PATH = `/guides/locking-down-an-iphone`;
 
-const LATEST: IOSVersion = `ios-18`;
+const LATEST: IOSVersion = `ios-26`;
 
 const versions: Array<{ id: IOSVersion; label: string }> = [
   { id: `ios-16`, label: `iOS 16` },
   { id: `ios-17`, label: `iOS 17` },
   { id: `ios-18`, label: `iOS 18` },
+  { id: `ios-26`, label: `iOS 26` },
 ];
 
 function versionHref(id: IOSVersion): string {
@@ -30,7 +31,7 @@ const IOSVersionPicker: React.FC<Props> = ({ current }) => (
     <span className="block px-2 pb-3 text-base font-semibold text-stone-950 xs:pb-0">
       Choose your iOS version
     </span>
-    <div className="grid grid-cols-3 gap-1 rounded-2xl bg-white/50 p-1">
+    <div className="grid grid-cols-4 gap-1 rounded-2xl bg-white/50 p-1">
       {versions.map((version) => {
         const selected = version.id === current;
         return (
