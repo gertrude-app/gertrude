@@ -162,14 +162,14 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
         ),
         in: context,
       )
-    }.toContain("Public keychains")
+    }.toContain("serverError")
 
     try await expectErrorFrom {
       try await DeleteAccountKey.resolve(
         with: .init(keychainId: publicKeychain.id, keyId: publicKey.id),
         in: context,
       )
-    }.toContain("Public keychains")
+    }.toContain("serverError")
 
     try await expectErrorFrom {
       try await SaveAccountKey.resolve(
@@ -182,6 +182,6 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
         ),
         in: context,
       )
-    }.toContain("Mac Apps")
+    }.toContain("serverError")
   }
 }

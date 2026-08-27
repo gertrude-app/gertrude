@@ -56,6 +56,11 @@ extension PairOutput {
 }
 
 extension ResolverContext {
+  func unexpectedError(_ id: String, _ debugMessage: String) -> PqlError {
+    slackErr("\(id) \(debugMessage)")
+    return self.error(id, .serverError, debugMessage)
+  }
+
   func error(
     _ id: String,
     _ type: PqlError.Kind,

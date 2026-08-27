@@ -25,32 +25,14 @@ extension SaveAccountKey: Resolver {
       .where(.parentId == context.accountOwner.id)
       .first(in: context.db)
     guard !keychain.isPublic else {
-      throw context.error(
-        id: "68c0a4fb",
-        type: .badRequest,
-        debugMessage: "account site attempted to edit public keychain \(keychain.id)",
-        userMessage: "Public keychains are maintained by Gertrude and can't be edited.",
-        showContactSupport: false,
-      )
+      throw context.unexpectedError("68c0a4fb", "account public keychain edit \(keychain.id)")
     }
 
     switch input.key {
     case .path:
-      throw context.error(
-        id: "2272f45f",
-        type: .badRequest,
-        debugMessage: "account site attempted to save legacy path key",
-        userMessage: "Legacy path keys can't be edited. Delete this key and create a replacement instead.",
-        showContactSupport: false,
-      )
+      throw context.unexpectedError("2272f45f", "account save legacy path key")
     case .skeleton:
-      throw context.error(
-        id: "c48110cc",
-        type: .badRequest,
-        debugMessage: "account site attempted to save skeleton key",
-        userMessage: "App internet access is managed from the person's Mac Apps settings.",
-        showContactSupport: false,
-      )
+      throw context.unexpectedError("c48110cc", "account save skeleton key")
     case .anySubdomain, .domain, .domainRegex, .ipAddress:
       break
     }

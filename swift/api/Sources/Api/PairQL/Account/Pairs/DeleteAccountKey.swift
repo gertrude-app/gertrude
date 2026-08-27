@@ -20,13 +20,7 @@ extension DeleteAccountKey: Resolver {
       .where(.parentId == context.accountOwner.id)
       .first(in: context.db)
     guard !keychain.isPublic else {
-      throw context.error(
-        id: "4addf574",
-        type: .badRequest,
-        debugMessage: "account site attempted to delete key from public keychain \(keychain.id)",
-        userMessage: "Public keychains are maintained by Gertrude and can't be edited.",
-        showContactSupport: false,
-      )
+      throw context.unexpectedError("4addf574", "account public keychain delete \(keychain.id)")
     }
     _ = try await Key.query()
       .where(.id == input.keyId)
