@@ -45,6 +45,7 @@ Next.js, Vite, Tailwind.
 # Local development
 just account              # Run Account
 just storybook-v2         # Run Storybook v2
+just hmr-articles         # Live-reload the browser while writing markdoc articles
 
 # Testing & QA
 just test                 # Run unit tests (vitest)
