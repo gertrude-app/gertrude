@@ -254,7 +254,14 @@ describe(`getHelpArticlePath()`, () => {
 
   it.each([
     [`get-connection-code`, `/help/iphone-ipad/get-connection-code`],
-    [`use-blocker-over-18`, `/help/iphone-ipad/use-blocker-over-18`],
+    [
+      `supervise-iphone-without-erasing`,
+      `/help/iphone-ipad/supervise-iphone-without-erasing`,
+    ],
+    [
+      `supervise-iphone-with-apple-configurator`,
+      `/help/iphone-ipad/supervise-iphone-with-apple-configurator`,
+    ],
     [`block-gif-search-in-messages`, `/help/iphone-ipad/block-gif-search-in-messages`],
     [`block-explicit-images-in-maps`, `/help/iphone-ipad/block-explicit-images-in-maps`],
     [

@@ -40,7 +40,7 @@ const MAC_HELP_ORDER = [
 
 const MOBILE_HELP_ORDER = [
   `get-connection-code`,
-  `use-blocker-over-18`,
+  `supervise-iphone-without-erasing`,
   `block-apple-music-artwork`,
   `block-gif-search-in-messages`,
 ];

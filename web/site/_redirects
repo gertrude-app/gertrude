@@ -22,7 +22,8 @@
 /blog/safe-podcast-app-for-kids /updates/gertrude-podcasts-launch 301
 /blog/security-event-notifications /updates/security-event-notifications 301
 /blog/block-apple-music-images-iphone /help/iphone-ipad/block-apple-music-artwork 301
-/blog/gertrude-ios-supervised-mode /help/iphone-ipad/use-blocker-over-18 301
+/blog/gertrude-ios-supervised-mode /help/iphone-ipad/supervise-iphone-without-erasing 301
+/help/iphone-ipad/use-blocker-over-18 /help/iphone-ipad/supervise-iphone-without-erasing 301
 /blog/how-parents-can-block-images-gif-search-ios-18 /help/iphone-ipad/block-gif-search-in-messages 301
 /blog/ios-17-cant-delete-messages-images /help/iphone-ipad/block-gif-search-in-messages 301
 /docs/ios-17-cant-delete-messages-images /help/iphone-ipad/block-gif-search-in-messages 301
@@ -37,7 +38,7 @@
 /blog/guia-definitiva-para-bloquear-un-iphone /guides/locking-down-an-iphone 301
 /docs/guia-definitiva-para-bloquear-un-iphone /guides/locking-down-an-iphone 301
 /lockdown /guides/locking-down-an-iphone 301
-/iosapp-supervise /help/iphone-ipad/use-blocker-over-18 301
+/iosapp-supervise /help/iphone-ipad/supervise-iphone-without-erasing 301
 /blog/screen-time-web-filter-conflict /help/mac/screen-time-filter-conflict 301
 /docs/ios-account-connection-help /help/iphone-ipad/get-connection-code 301
 /iosapp-connect-help /help/iphone-ipad/get-connection-code 301
