@@ -122,6 +122,12 @@ export type KeychainDetail = Pick<
 > & {
   warning?: string;
   keys: KeychainKey[];
+  apps: Array<{
+    name: string;
+    slug: string;
+    bundleId?: string;
+    appIconUrl?: string;
+  }>;
 };
 
 export type AssignablePerson = {

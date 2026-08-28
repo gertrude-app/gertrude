@@ -192,9 +192,23 @@ final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
       slug: "minecraft",
       launchable: true,
     ))
-    try await self.db.create(AppBundleId(
-      identifiedAppId: app.id,
+    try await self.db.create([
+      AppBundleId(
+        identifiedAppId: app.id,
+        bundleId: "com.minecraft.primary",
+        count: 2,
+      ),
+      AppBundleId(
+        identifiedAppId: app.id,
+        bundleId: "AB12CD34EF.com.minecraft.launcher",
+        count: 1,
+      ),
+    ])
+    try await self.db.create(CatalogedApp(
       bundleId: "com.minecraft.launcher",
+      name: "Minecraft",
+      icon: Data([1]),
+      iconContentHash: "minecraft-icon",
     ))
     let expiration = Date(timeIntervalSince1970: 1_800_000_000)
     let slugKey = Key(
@@ -208,7 +222,7 @@ final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
     )
     let bundleKey = Key(
       keychainId: keychain.id,
-      key: .skeleton(scope: .bundleId(".com.minecraft.launcher")),
+      key: .skeleton(scope: .bundleId(".AB12CD34EF.com.minecraft.launcher")),
     )
     let unknownAppKey = Key(
       keychainId: keychain.id,
@@ -229,6 +243,10 @@ final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.description).toEqual("School resources")
     expect(output.warning).toEqual("Includes broad access")
     expect(output.isPublic).toBeTrue()
+    expect(output.apps.map(\.name)).toEqual(["Minecraft"])
+    expect(output.apps.map(\.slug)).toEqual(["minecraft"])
+    expect(output.apps.map(\.bundleId)).toEqual(["com.minecraft.primary"])
+    expect(output.apps.map(\.iconHash)).toEqual(["minecraft-icon"])
     expect(Set(output.keys.map(\.key)))
       .toEqual(Set([slugKey.key, bundleKey.key, unknownAppKey.key]))
 

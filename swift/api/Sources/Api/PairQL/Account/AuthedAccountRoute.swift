@@ -10,6 +10,8 @@ enum AuthedAccountRoute: PairRoute {
   case deletePerson(DeletePerson.Input)
   case getAccountKeychains
   case getAccountKeychain(GetAccountKeychain.Input)
+  case saveAccountKey(SaveAccountKey.Input)
+  case deleteAccountKey(DeleteAccountKey.Input)
   case setAccountKeychainAssignment(SetAccountKeychainAssignment.Input)
   case getPersonMacSettings(GetPersonMacSettings.Input)
   case getPersonInstalledMacApps(GetPersonInstalledMacApps.Input)
@@ -56,6 +58,14 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.getAccountKeychain)) {
       Operation(GetAccountKeychain.self)
       Body(.accountInput(GetAccountKeychain.self))
+    }
+    Route(.case(Self.saveAccountKey)) {
+      Operation(SaveAccountKey.self)
+      Body(.accountInput(SaveAccountKey.self))
+    }
+    Route(.case(Self.deleteAccountKey)) {
+      Operation(DeleteAccountKey.self)
+      Body(.accountInput(DeleteAccountKey.self))
     }
     Route(.case(Self.setAccountKeychainAssignment)) {
       Operation(SetAccountKeychainAssignment.self)
@@ -161,6 +171,12 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getAccountKeychain(let input):
       let output = try await GetAccountKeychain.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveAccountKey(let input):
+      let output = try await SaveAccountKey.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .deleteAccountKey(let input):
+      let output = try await DeleteAccountKey.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .setAccountKeychainAssignment(let input):
       let output = try await SetAccountKeychainAssignment.resolve(with: input, in: context)

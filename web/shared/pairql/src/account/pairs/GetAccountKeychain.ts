@@ -19,5 +19,11 @@ export namespace GetAccountKeychain {
       expiration?: ISODateString;
       appName?: string;
     }>;
+    apps: Array<{
+      name: string;
+      slug: string;
+      bundleId?: string;
+      iconHash?: string;
+    }>;
   }
 }

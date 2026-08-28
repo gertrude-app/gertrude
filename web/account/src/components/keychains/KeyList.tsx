@@ -10,6 +10,7 @@ import {
   inflect,
 } from '@gertrude/ui';
 import { formatDate, formatTime } from '@shared/datetime';
+import cx from 'clsx';
 import {
   AppWindowIcon,
   ClockIcon,
@@ -49,6 +50,7 @@ export type KeyPresentation = {
 
 interface Props {
   keys: KeychainKey[];
+  onEdit?: (key: KeychainKey) => void;
 }
 
 const targetPresentation = (key: SharedKey): KeyTargetPresentation => {
@@ -147,7 +149,9 @@ const scopePresentation = (
   }
 };
 
-export const keyPresentation = (record: KeychainKey): KeyPresentation => ({
+type KeyDisplayRecord = Omit<KeychainKey, `id`>;
+
+export const keyPresentation = (record: KeyDisplayRecord): KeyPresentation => ({
   target: targetPresentation(record.key),
   scope: scopePresentation(record.key.scope, record.appName),
 });
@@ -158,16 +162,28 @@ const expirationText = (expiration: string): string => {
   return `${prefix} ${formatDate(date, `medium`)} at ${formatTime(date)}`;
 };
 
-const KeyRow: React.FC<{ record: KeychainKey }> = ({ record }) => {
+export const KeyDisplay: React.FC<{
+  record: KeyDisplayRecord;
+  alwaysShowLabels?: boolean;
+  className?: string;
+}> = ({ record, alwaysShowLabels = false, className }) => {
   const presentation = keyPresentation(record);
   const TargetIcon = presentation.target.Icon;
 
   return (
-    <li className="grid grid-cols-1 gap-4 border-b border-stone-200/70 px-3 py-2.5 last:border-b-0 @2xl/main:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.8fr)] @2xl/main:items-center @2xl/main:gap-6 @2xl/main:px-4">
+    <div
+      className={cx(
+        `grid grid-cols-1 gap-4 px-3 py-2.5 @2xl/main:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.8fr)] @2xl/main:items-center @2xl/main:gap-6 @2xl/main:px-4`,
+        className,
+      )}
+    >
       <VStack gap={0.5} className="min-w-0">
         <Text
           variant="captionMuted"
-          className="uppercase tracking-[0.12em] @2xl/main:hidden"
+          className={cx(
+            `uppercase tracking-[0.12em]`,
+            !alwaysShowLabels && `@2xl/main:hidden`,
+          )}
         >
           Unlocks:
         </Text>
@@ -222,7 +238,10 @@ const KeyRow: React.FC<{ record: KeychainKey }> = ({ record }) => {
       <VStack gap={0.5} className="min-w-0">
         <Text
           variant="captionMuted"
-          className="uppercase tracking-[0.12em] @2xl/main:hidden"
+          className={cx(
+            `uppercase tracking-[0.12em]`,
+            !alwaysShowLabels && `@2xl/main:hidden`,
+          )}
         >
           For:
         </Text>
@@ -239,6 +258,33 @@ const KeyRow: React.FC<{ record: KeychainKey }> = ({ record }) => {
           </Text>
         </VStack>
       </VStack>
+    </div>
+  );
+};
+
+const KeyRow: React.FC<{
+  record: KeychainKey;
+  onEdit?: (key: KeychainKey) => void;
+}> = ({ record, onEdit }) => {
+  const presentation = keyPresentation(record);
+  const editable =
+    onEdit !== undefined && record.key.type !== `path` && record.key.type !== `skeleton`;
+  const content = <KeyDisplay record={record} />;
+
+  return (
+    <li className="border-b border-stone-200/70 last:border-b-0">
+      {editable ? (
+        <button
+          type="button"
+          onClick={() => onEdit?.(record)}
+          className="block w-full cursor-pointer text-left outline-none transition-colors hover:bg-violet-50/40 focus-visible:bg-violet-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300/80"
+          aria-label={`Edit key for ${presentation.target.target}`}
+        >
+          {content}
+        </button>
+      ) : (
+        content
+      )}
     </li>
   );
 };
@@ -258,7 +304,7 @@ const searchableText = (record: KeychainKey): string => {
     .toLowerCase();
 };
 
-const KeyList: React.FC<Props> = ({ keys }) => {
+const KeyList: React.FC<Props> = ({ keys, onEdit }) => {
   const [searchQuery, setSearchQuery] = React.useState(``);
   const searchInputId = React.useId();
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -295,8 +341,13 @@ const KeyList: React.FC<Props> = ({ keys }) => {
           </Text>
         </VStack>
         {keys.length >= 8 && (
-          <HStack gap={2} align="center" className="w-full @2xl/main:w-auto">
-            <Text as="label" htmlFor={searchInputId} variant="label" className="shrink-0">
+          <HStack gap={2} align="center" className="min-w-0 w-full @2xl/main:w-auto">
+            <Text
+              as="label"
+              htmlFor={searchInputId}
+              variant="label"
+              className="hidden shrink-0 @lg/main:block"
+            >
               Search keys
             </Text>
             <Input
@@ -323,7 +374,7 @@ const KeyList: React.FC<Props> = ({ keys }) => {
       {filteredKeys.length > 0 ? (
         <ul>
           {filteredKeys.map((key) => (
-            <KeyRow key={key.id} record={key} />
+            <KeyRow key={key.id} record={key} onEdit={onEdit} />
           ))}
         </ul>
       ) : (

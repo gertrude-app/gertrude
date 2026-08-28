@@ -8,15 +8,22 @@ import {
   Skeleton,
   VStack,
 } from '@gertrude/ui';
-import { CircleAlertIcon, RefreshCwIcon, UsersIcon } from 'lucide-react';
+import { CircleAlertIcon, PlusIcon, RefreshCwIcon, UsersIcon } from 'lucide-react';
 import React from 'react';
-import type { KeychainDetail, LoadableState } from '#/components/types';
+import type { KeyEditorSaveData } from '#/components/keychains/keyEditor';
+import type { KeychainDetail, KeychainKey, LoadableState } from '#/components/types';
+import CreateKeySlideOver from '#/components/keychains/CreateKeySlideOver';
+import EditKeySlideOver from '#/components/keychains/EditKeySlideOver';
 import KeyList from '#/components/keychains/KeyList';
 import CardContainer from '#/components/layout/CardContainer';
 import DashboardPage from '#/components/layout/DashboardPage';
 
 interface Props {
   state: LoadableState<KeychainDetail>;
+  savingKey?: boolean;
+  deletingKey?: boolean;
+  onSaveKey: (keyId: string | undefined, data: KeyEditorSaveData) => Promise<void>;
+  onDeleteKey: (keyId: string) => Promise<void>;
 }
 
 const breadcrumbs = [{ text: `Keychains`, href: `/keychains` }];
@@ -82,7 +89,16 @@ const KeychainDetailError: React.FC<Extract<Props[`state`], { status: `error` }>
   </DashboardPage>
 );
 
-const KeychainDetailPage: React.FC<Props> = ({ state }) => {
+const KeychainDetailPage: React.FC<Props> = ({
+  state,
+  savingKey = false,
+  deletingKey = false,
+  onSaveKey,
+  onDeleteKey,
+}) => {
+  const [editorOpen, setEditorOpen] = React.useState(false);
+  const [editingKey, setEditingKey] = React.useState<KeychainKey>();
+
   if (state.status === `loading`) {
     return <KeychainDetailLoading />;
   }
@@ -92,31 +108,80 @@ const KeychainDetailPage: React.FC<Props> = ({ state }) => {
   }
 
   const keychain = state.data;
+  const openNewKeyEditor = (): void => {
+    setEditingKey(undefined);
+    setEditorOpen(true);
+  };
+  const openExistingKeyEditor = (key: KeychainKey): void => {
+    setEditingKey(key);
+    setEditorOpen(true);
+  };
+  const handleEditorOpenChange = (open: boolean): void => {
+    setEditorOpen(open);
+  };
 
   return (
-    <DashboardPage
-      heading={
-        <PageHeading
-          title={keychain.name}
-          subtitle={keychain.description}
-          breadcrumbs={breadcrumbs}
-        />
-      }
-    >
-      <VStack gap={4}>
-        {keychain.isPublic && (
-          <HStack>
-            <Badge color="green" size="small" icon={UsersIcon}>
-              Public keychain
-            </Badge>
-          </HStack>
-        )}
-        {keychain.warning && <Banner variant="warning">{keychain.warning}</Banner>}
-        <CardContainer>
-          <KeyList keys={keychain.keys} />
-        </CardContainer>
-      </VStack>
-    </DashboardPage>
+    <>
+      <DashboardPage
+        heading={
+          <PageHeading
+            title={keychain.name}
+            subtitle={keychain.description}
+            breadcrumbs={breadcrumbs}
+            buttons={
+              keychain.isPublic
+                ? undefined
+                : [
+                    {
+                      text: `Add key`,
+                      variant: `primary`,
+                      icon: PlusIcon,
+                      onClick: openNewKeyEditor,
+                    },
+                  ]
+            }
+          />
+        }
+      >
+        <VStack gap={4}>
+          {keychain.isPublic && (
+            <HStack>
+              <Badge color="green" size="small" icon={UsersIcon}>
+                Public keychain
+              </Badge>
+            </HStack>
+          )}
+          {keychain.warning && <Banner variant="warning">{keychain.warning}</Banner>}
+          <CardContainer>
+            <KeyList
+              keys={keychain.keys}
+              onEdit={keychain.isPublic ? undefined : openExistingKeyEditor}
+            />
+          </CardContainer>
+        </VStack>
+      </DashboardPage>
+      {!keychain.isPublic &&
+        (editingKey ? (
+          <EditKeySlideOver
+            open={editorOpen}
+            keyRecord={editingKey}
+            apps={keychain.apps}
+            saving={savingKey}
+            deleting={deletingKey}
+            onOpenChange={handleEditorOpenChange}
+            onSave={(data) => onSaveKey(editingKey.id, data)}
+            onDelete={() => onDeleteKey(editingKey.id)}
+          />
+        ) : (
+          <CreateKeySlideOver
+            open={editorOpen}
+            apps={keychain.apps}
+            saving={savingKey}
+            onOpenChange={handleEditorOpenChange}
+            onSave={(data) => onSaveKey(undefined, data)}
+          />
+        ))}
+    </>
   );
 };
 

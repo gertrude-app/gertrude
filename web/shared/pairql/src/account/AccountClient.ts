@@ -52,6 +52,12 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public deleteAccountKey = (
+    input: P.DeleteAccountKey.Input,
+  ): Promise<Result<P.DeleteAccountKey.Output>> => {
+    return this.query<P.DeleteAccountKey.Output>(input, `DeleteAccountKey`, `parent`);
+  };
+
   public deleteActivity = (
     input: P.DeleteActivity.Input,
   ): Promise<Result<P.DeleteActivity.Output>> => {
@@ -190,6 +196,12 @@ export default class AccountClient extends Client<Auth> {
       `RequestPodcastsPinReset`,
       `parent`,
     );
+  };
+
+  public saveAccountKey = (
+    input: P.SaveAccountKey.Input,
+  ): Promise<Result<P.SaveAccountKey.Output>> => {
+    return this.query<P.SaveAccountKey.Output>(input, `SaveAccountKey`, `parent`);
   };
 
   public setAccountKeychainAssignment = (
