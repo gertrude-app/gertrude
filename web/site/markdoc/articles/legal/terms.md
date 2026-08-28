@@ -136,8 +136,8 @@ license, and nothing here restricts rights you have under it.
 ## Privacy
 
 How each app handles data is covered by its privacy policy:
-[Gertrude for iOS](/docs/iosapp-privacy), [Gertrude Podcasts](/docs/podcasts-privacy), and
-[Gertrude Music](/docs/music-privacy).
+[Gertrude for iOS](/legal/privacy/blocker), [Gertrude Podcasts](/legal/privacy/podcasts),
+and [Gertrude Music](/legal/privacy/music).
 
 ## No Warranty, And Limits On Our Liability
 

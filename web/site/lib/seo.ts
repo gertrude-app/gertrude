@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 
-export function createMetadata(
-  title: string,
-  description: string,
-  image?: string,
-): Metadata {
+export function createMetadata(title: string, summary: string, image?: string): Metadata {
+  const description = expandDescription(summary);
+
   return {
     metadataBase: metadataBase(),
     title,
     description,
     openGraph: {
+      type: `website`,
       title,
       description,
       images: image
@@ -20,10 +19,14 @@ export function createMetadata(
 }
 
 export function description(description: string): string {
+  return expandDescription(description);
+}
+
+function expandDescription(description: string): string {
   if (description.length > 80) {
     return description;
   }
-  return `${description}. Protect your kids online with easy-to-use Mac internet filtering, internet blocking, and mac keylogging.`;
+  return `${description}. Protect your iPhones, iPads, and Macs with super strict filtering, monitoring, and curated content apps.`;
 }
 
 function metadataBase(): URL {
