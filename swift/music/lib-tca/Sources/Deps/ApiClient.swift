@@ -22,7 +22,7 @@ struct ApiClient: Sendable {
     @Sendable (_ token: UUID, _ input: DeleteMusicPlaylist.Input) async throws
     -> DeleteMusicPlaylist.Output
   var getApprovedMusicLibrary:
-    @Sendable (_ token: UUID, _ knownRevision: Int64?) async throws
+    @Sendable (_ token: UUID, _ knownRevision: Int64?, _ storefront: String?) async throws
     -> GetApprovedMusicLibrary_v2.Output
   var getMusicAppStatus: @Sendable () async throws -> GetMusicAppStatus_v2.Output
   var removeMusicPlaylistEntry:
@@ -83,8 +83,11 @@ extension ApiClient: DependencyKey {
           token: token,
         )
       },
-      getApprovedMusicLibrary: { token, knownRevision in
-        let input = GetApprovedMusicLibrary_v2.Input(knownRevision: knownRevision)
+      getApprovedMusicLibrary: { token, knownRevision, storefront in
+        let input = GetApprovedMusicLibrary_v2.Input(
+          knownRevision: knownRevision,
+          storefront: storefront,
+        )
         return try await pairql.call(
           GetApprovedMusicLibrary_v2.self,
           authed: .getApprovedMusicLibrary_v2(input),

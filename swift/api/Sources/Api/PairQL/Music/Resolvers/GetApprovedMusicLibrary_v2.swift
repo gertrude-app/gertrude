@@ -5,6 +5,14 @@ import MusicRoute
 extension GetApprovedMusicLibrary_v2: Resolver {
   static func resolve(with input: Input, in ctx: MusicApp.InstallContext) async throws -> Output {
     try await requireMusicAccess(in: ctx)
+    if try await self.syncStorefront(input.storefront, in: ctx) {
+      let refresh = Task {
+        await MusicCatalogRefreshJob().exec(childIds: [ctx.child.id])
+      }
+      if ctx.env.mode == .test {
+        _ = await refresh.value
+      }
+    }
 
     if let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
       for: ctx.child.id,
@@ -100,5 +108,25 @@ extension GetApprovedMusicLibrary_v2: Resolver {
       return .unchanged(revision: 0)
     }
     return .snapshot(empty)
+  }
+
+  private static func syncStorefront(
+    _ rawValue: String?,
+    in ctx: MusicApp.InstallContext,
+  ) async throws -> Bool {
+    guard let rawValue else { return false }
+    let storefront = Music.Storefront(rawValue: rawValue.lowercased())
+    guard storefront.isValid else {
+      throw ctx.error(
+        "2c9e5f95",
+        .badRequest,
+        "Invalid Apple Music storefront: `\(rawValue)`",
+      )
+    }
+    guard storefront != ctx.child.appleMusicStorefront else { return false }
+    var child = ctx.child
+    child.appleMusicStorefront = storefront
+    try await ctx.db.update(child)
+    return true
   }
 }

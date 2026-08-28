@@ -58,14 +58,24 @@ extension ApprovedMusicClient: DependencyKey {
         @Dependency(\.api) var api
         @Dependency(\.approvedMusicLibraryCache) var cache
         @Dependency(\.keychain) var keychain
+        @Dependency(\.musicSetup) var musicSetup
         guard let connection = keychain.loadConnection() else {
           throw ApprovedMusicClientError.missingConnection
         }
         do {
           let cached = try? await cache.load(childId: connection.childId)
+          let storefront: String?
+          do {
+            storefront = try await musicSetup.currentCountryCode()
+          } catch is CancellationError {
+            throw CancellationError()
+          } catch {
+            storefront = nil
+          }
           let output = try await api.getApprovedMusicLibrary(
             connection.token,
             cached?.revision,
+            storefront,
           )
           switch output {
           case .unchanged(let revision):
