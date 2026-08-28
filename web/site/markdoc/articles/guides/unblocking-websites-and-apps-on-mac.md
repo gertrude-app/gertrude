@@ -138,8 +138,8 @@ the effort, but **there are several things that make this process easier:**
 5. Once you have a site fully unlocked, with Gertrude's _keychains_ feature you can easily
    _share the full set of keys_ with all of the children you are protecting&mdash;you
    won't have to repeat the process again.
-6. You can always [reach out to us](https://gertrude.app/support) if you're having trouble
-   getting a site unlocked.
+6. You can always [reach out to us](/contact) if you're having trouble getting a site
+   unlocked.
 7. While you're getting the hang of unblocking sites, and before you've got everything set
    the way you want it, feel free to use lots of **filter suspensions** to smooth your
    transition to using Gertrude. If you've not disabled screenshot monitoring, there's

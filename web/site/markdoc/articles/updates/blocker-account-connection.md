@@ -51,9 +51,10 @@ features will always be free.
 
 That said, if the iPhone or iPad is used by an individual who is _over 18 years of age,_
 then you either need to
-[supervise the device yourself with Apple Configurator](https://youtu.be/G7W1d0EWmmQ), or
-supervise it with a $10/year paid Gertrude light account in order to use Gertrude on that
-device. The supervision requirement is imposed on us by Apple — it's not our decision.
+[supervise the device yourself with Apple Configurator](https://www.youtube.com/watch?v=G7W1d0EWmmQ),
+or supervise it with a $10/year paid Gertrude light account in order to use Gertrude on
+that device. The supervision requirement is imposed on us by Apple — it's not our
+decision.
 
 ## How do I set it up?
 

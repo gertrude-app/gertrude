@@ -62,8 +62,8 @@ my second at a similar age. Many generations of kids have survived their pre-tee
 adolescent years without a phone, and yours can too. I realize it's going against an
 extremely strong societal norm, but absolutely nothing beats the simplicity and safety of
 them simply not having a phone. And there's a growing amount of
-[research](https://www.frontiersin.org/articles/10.3389/fpsyt.2021.669042/full) showing
-that you might be greatly helping their cognitive and emotional development.
+[research](https://www.frontiersin.org/journals/psychiatry/articles/10.3389/fpsyt.2021.669042/full)
+showing that you might be greatly helping their cognitive and emotional development.
 
 {% callout title="iPhones, iPads &nbsp; . . . and Androids" %}
 
@@ -75,8 +75,8 @@ there certainly are some tools and apps for parental controls on an Android, in 
 opinion, they are **far less powerful and safe** than the deeply integrated controls Apple
 provides. It's enough of a difference to warrant spending the extra money on an Apple
 device, or considering a phone designed for parental controls like
-[Gabb](https://gabbwireless.com/) or [Bark](https://www.bark.us/bark-phone/) rather than
-an Android.
+[Gabb](https://gabb.com/) or [Bark](https://www.bark.us/bark-phone/) rather than an
+Android.
 
 {% /callout %}
 
@@ -117,8 +117,8 @@ options:
   device will still be much safer than it was before.
 
 You might also explore
-[supervised mode](https://www.techlockdown.com/blog/screen-time-alternative)&mdash; which
-give extra controls and works for any age. We're hoping to eventually make Gertrude
+[supervised mode](https://www.techlockdown.com/articles/screen-time-alternative)&mdash;
+which give extra controls and works for any age. We're hoping to eventually make Gertrude
 Blocker compatible with supervised mode as well. For now it's not, but supervised mode
 does allow you to block the #images feature in Messages.
 
@@ -583,8 +583,8 @@ Once you've got your kids iPhone locked down, I urge you to think carefully abou
 
 Finally, if you'd like some encouragement if you're feeling overwhelmed, plus general
 techniques for working through this stuff with your kids while keeping your relationships
-healthy, check out [this workshop I gave](https://youtu.be/syC94X5LBIc) at a Christian
-Homeschool conference in 2024.
+healthy, check out [this workshop I gave](https://www.youtube.com/watch?v=syC94X5LBIc) at
+a Christian Homeschool conference in 2024.
 
 {% callout %}
 
