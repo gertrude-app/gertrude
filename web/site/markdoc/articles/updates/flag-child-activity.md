@@ -10,7 +10,7 @@ description:
   discuss with your child.'
 ---
 
-{% .lead .mb-8 %} **TLDR;** Parents can now _flag screenshots and keystrokes_ while
+{% .lead .mb-8 %} **TL;DR** Parents can now _flag screenshots and keystrokes_ while
 reviewing child activity. Flagged items can't be deleted for 60 days, giving your more
 time to review with a spouse or discuss with your child.
 

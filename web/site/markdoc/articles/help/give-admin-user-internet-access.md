@@ -7,7 +7,7 @@ products: [mac]
 platforms: [macos]
 ---
 
-_TLDR_&mdash;Sign in as your child, open the "Health Check" screen, click the icon that
+_TL;DR_&mdash;Sign in as your child, open the "Health Check" screen, click the icon that
 looks like three people on the left-side of the window, then click to allow unrestricted
 access for the admin user account.
 
