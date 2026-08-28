@@ -22,6 +22,38 @@ describe(`heading nodes`, () => {
   });
 });
 
+describe(`link nodes`, () => {
+  it(`marks outbound links nofollow so they don't pass link equity`, () => {
+    expect(render(`[Bark](https://www.bark.us/blog/google-maps-safety/)`)).toContain(
+      `<a href="https://www.bark.us/blog/google-maps-safety/" rel="nofollow noopener">`,
+    );
+  });
+
+  it(`leaves internal links alone`, () => {
+    expect(render(`[our app](/iphone-and-ipad)`)).toContain(
+      `<a href="/iphone-and-ipad">`,
+    );
+  });
+
+  it(`treats our own domains as internal`, () => {
+    expect(render(`[dash](https://parents.gertrude.app/login)`)).not.toContain(
+      `nofollow`,
+    );
+  });
+
+  it(`ignores mailto and other non-http schemes`, () => {
+    expect(render(`[mail](mailto:support@gertrude.app)`)).not.toContain(`nofollow`);
+  });
+
+  it(`passes link equity to allied filtering sites`, () => {
+    expect(render(`[tl](https://www.techlockdown.com/articles/x)`)).not.toContain(
+      `nofollow`,
+    );
+    expect(render(`[p](https://pluckyfilter.com/)`)).not.toContain(`nofollow`);
+    expect(render(`[pe](https://docs.pluckeye.net/faq)`)).not.toContain(`nofollow`);
+  });
+});
+
 function render(markdown: string): string {
   const content = Markdoc.transform(Markdoc.parse(markdown), { nodes });
   return Markdoc.renderers.html(content);

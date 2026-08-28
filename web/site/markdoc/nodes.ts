@@ -9,6 +9,17 @@ const nodes: Config[`nodes`] = {
     render: `CodeBlock`,
     attributes: markdocNodes.fence.attributes,
   },
+  link: {
+    ...markdocNodes.link,
+    transform(node, config) {
+      const attributes = node.transformAttributes(config);
+      const children = node.transformChildren(config);
+      if (!isOutbound(String(attributes[`href`] ?? ``))) {
+        return new Tag(`a`, attributes, children);
+      }
+      return new Tag(`a`, { ...attributes, rel: `nofollow noopener` }, children);
+    },
+  },
   heading: {
     ...markdocNodes.heading,
     transform(node, config) {
@@ -35,6 +46,25 @@ const nodes: Config[`nodes`] = {
 };
 
 export default nodes;
+
+const FOLLOWED_HOSTS = [
+  `gertrude.app`,
+  `techlockdown.com`,
+  `pluckyfilter.com`,
+  `pluckeye.net`,
+];
+
+function isOutbound(href: string): boolean {
+  if (!/^https?:\/\//i.test(href)) return false;
+  try {
+    const { hostname } = new URL(href);
+    return !FOLLOWED_HOSTS.some(
+      (host) => hostname === host || hostname.endsWith(`.${host}`),
+    );
+  } catch {
+    return false;
+  }
+}
 
 function headingText(node: Node): string {
   return [...node.walk()]
