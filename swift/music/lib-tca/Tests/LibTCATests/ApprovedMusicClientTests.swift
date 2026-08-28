@@ -197,7 +197,7 @@ struct ApprovedMusicClientTests {
     )
 
     let result = try await withDependencies {
-      $0.api.addSourceToMusicPlaylist = { _, _ in
+      $0.api.addToMusicPlaylist = { _, _ in
         .duplicateConfirmationRequired(
           snapshot: remoteApprovedMusicLibrary,
           confirmation: confirmation,
@@ -208,7 +208,7 @@ struct ApprovedMusicClientTests {
         key == .connection ? connectionData : nil
       }
     } operation: {
-      try await ApprovedMusicClient.liveValue.addSourceToPlaylist(.init(
+      try await ApprovedMusicClient.liveValue.addToPlaylist(.init(
         playlistId: UUID(3),
         source: .track(trackId: "track-1", albumId: "album-1"),
       ))

@@ -6,14 +6,6 @@ extension GertrudeIOSApp {
     [.blocker, .podcasts, .music]
   }
 
-  var appStoreAppleId: String {
-    switch self {
-    case .blocker: "6736368820"
-    case .podcasts: "6753187429"
-    case .music: "6782194077"
-    }
-  }
-
   var marketingName: String {
     switch self {
     case .blocker: "Gertrude Blocker"

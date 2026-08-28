@@ -273,7 +273,7 @@ struct LibraryFeature: Sendable {
         state.isPlaylistMutationInFlight = true
         state.playlistMutationFailure = nil
         return self.performAddToPlaylistMutation {
-          try await self.approvedMusic.addSourceToPlaylist(.init(
+          try await self.approvedMusic.addToPlaylist(.init(
             playlistId: playlistID.rawValue,
             source: source,
           ))
@@ -291,7 +291,7 @@ struct LibraryFeature: Sendable {
         state.addToPlaylist?.confirmation = nil
         state.isPlaylistMutationInFlight = true
         return self.performAddToPlaylistMutation {
-          try await self.approvedMusic.addSourceToPlaylist(.init(
+          try await self.approvedMusic.addToPlaylist(.init(
             playlistId: playlistID.rawValue,
             source: presentation.source,
             duplicateResolution: resolution,

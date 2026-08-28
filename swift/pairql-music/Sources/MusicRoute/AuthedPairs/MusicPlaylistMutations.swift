@@ -113,7 +113,7 @@ public struct DeleteMusicPlaylist: Pair {
   public typealias Output = MusicPlaylistMutationOutput
 }
 
-public struct AddSourceToMusicPlaylist: Pair {
+public struct AddToMusicPlaylist: Pair {
   public static let auth: ClientAuth = .child
 
   public struct Input: PairInput {

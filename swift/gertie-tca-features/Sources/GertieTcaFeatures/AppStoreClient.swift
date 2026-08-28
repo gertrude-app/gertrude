@@ -1,4 +1,5 @@
 import Dependencies
+import DependenciesMacros
 import Foundation
 
 #if os(iOS)
@@ -6,26 +7,14 @@ import Foundation
   import UIKit
 #endif
 
+@DependencyClient
 public struct AppStoreClient: Sendable {
   public var requestRating: @Sendable () async -> Void
   public var requestReview: @Sendable (_ appStoreID: String) async -> Void
-
-  public init(
-    requestRating: @escaping @Sendable () async -> Void,
-    requestReview: @escaping @Sendable (_ appStoreID: String) async -> Void,
-  ) {
-    self.requestRating = requestRating
-    self.requestReview = requestReview
-  }
 }
 
 extension AppStoreClient: TestDependencyKey {
-  public static var testValue: Self {
-    .init(
-      requestRating: {},
-      requestReview: { _ in },
-    )
-  }
+  public static var testValue: Self { .init() }
 }
 
 extension AppStoreClient: DependencyKey {

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import GertieApp
 import GertieTcaFeatures
 import LibViews
 import SQLiteData
@@ -56,7 +57,7 @@ struct PodcastsFeature {
     case confirmTrialEnding
   }
 
-  static let appStoreID = "6753187429"
+  static let appStoreID = GertrudeIOSApp.podcasts.appStoreAppleId
 
   @Dependency(\.db) var database
   @Dependency(\.continuousClock) var clock

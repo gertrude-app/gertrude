@@ -202,6 +202,19 @@ struct PlaybackSourceQueuePlannerTests {
   }
 
   @Test
+  func fullyRemovedPreparedSourceCycleIsRejected() {
+    var source = playbackSource(selectedIndex: 0)
+    source.removeTracks(notIn: [])
+
+    let entries = PlaybackSourceQueuePlanner.sourceCycleEntries(
+      source: source,
+      entryIDs: source.entries.map(\.id),
+    )
+
+    expectNoDifference(entries, nil)
+  }
+
+  @Test
   func enablingShuffleRandomizesOnlyRemainingSourceOccurrences() {
     let source = playbackSource(selectedIndex: 0)
     let explicitEntries = playbackExplicitEntries()

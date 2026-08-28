@@ -102,7 +102,7 @@ struct AppFeature: Sendable {
     }
   }
 
-  static let appStoreID = "6782194077"
+  static let appStoreID = GertrudeIOSApp.music.appStoreAppleId
   static let crossPromoThrottle: TimeInterval = 60 * 60 * 72
   static let reviewPromptDelay: Duration = .seconds(1.5)
   static let reviewPromptMinimumAge: TimeInterval = 60 * 60 * 24

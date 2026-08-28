@@ -8,9 +8,9 @@ import PairQLClient
 
 @DependencyClient
 struct ApiClient: Sendable {
-  var addSourceToMusicPlaylist:
-    @Sendable (_ token: UUID, _ input: AddSourceToMusicPlaylist.Input) async throws
-    -> AddSourceToMusicPlaylist.Output
+  var addToMusicPlaylist:
+    @Sendable (_ token: UUID, _ input: AddToMusicPlaylist.Input) async throws
+    -> AddToMusicPlaylist.Output
   var addMusicBatchToPlaylist:
     @Sendable (_ token: UUID, _ input: AddMusicBatchToPlaylist.Input) async throws
     -> AddMusicBatchToPlaylist.Output
@@ -39,10 +39,10 @@ struct ApiClient: Sendable {
 extension ApiClient: DependencyKey {
   static var liveValue: ApiClient {
     .init(
-      addSourceToMusicPlaylist: { token, input in
+      addToMusicPlaylist: { token, input in
         try await pairql.call(
-          AddSourceToMusicPlaylist.self,
-          authed: .addSourceToMusicPlaylist(input),
+          AddToMusicPlaylist.self,
+          authed: .addToMusicPlaylist(input),
           token: token,
         )
       },

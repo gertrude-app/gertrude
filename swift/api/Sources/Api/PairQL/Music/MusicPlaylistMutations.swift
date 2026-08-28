@@ -36,13 +36,13 @@ private func playlistRuleError(
     )
   case .unauthorizedArtist(let artistId):
     ctx.error(
-      "36642b7a",
+      "2cdf04d6",
       .unauthorized,
       "Music artist `\(artistId.rawValue)` is not approved for this child",
     )
   case .unauthorizedPlaylist(let playlistId):
     ctx.error(
-      "36642b7a",
+      "0c0d5363",
       .unauthorized,
       "Music playlist `\(playlistId)` is not available for this child",
     )
@@ -266,7 +266,7 @@ extension DeleteMusicPlaylist: Resolver {
   }
 }
 
-extension AddSourceToMusicPlaylist: Resolver {
+extension AddToMusicPlaylist: Resolver {
   static func resolve(
     with input: Input,
     in ctx: MusicApp.InstallContext,

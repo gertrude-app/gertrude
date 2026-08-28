@@ -6,8 +6,8 @@ import PairQL
 
 @DependencyClient
 struct ApprovedMusicClient: Sendable {
-  var addSourceToPlaylist:
-    @Sendable (_ input: AddSourceToMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
+  var addToPlaylist:
+    @Sendable (_ input: AddToMusicPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var addMusicBatchToPlaylist:
     @Sendable (_ input: AddMusicBatchToPlaylist.Input) async throws -> MusicPlaylistMutationResult
   var createPlaylist:
@@ -28,9 +28,9 @@ struct ApprovedMusicClient: Sendable {
 extension ApprovedMusicClient: DependencyKey {
   static var liveValue: Self {
     Self(
-      addSourceToPlaylist: { input in
+      addToPlaylist: { input in
         try await performPlaylistMutation { api, token in
-          try await api.addSourceToMusicPlaylist(token, input)
+          try await api.addToMusicPlaylist(token, input)
         }
       },
       addMusicBatchToPlaylist: { input in
@@ -126,7 +126,7 @@ extension DependencyValues {
 extension ApprovedMusicClient {
   #if DEBUG
     static let mock = Self(
-      addSourceToPlaylist: { _ in .updated(.mock) },
+      addToPlaylist: { _ in .updated(.mock) },
       addMusicBatchToPlaylist: { _ in .updated(.mock) },
       createPlaylist: { _ in .updated(.mock) },
       deletePlaylist: { _ in .updated(.mock) },
@@ -139,7 +139,7 @@ extension ApprovedMusicClient {
   #endif
 
   static let empty = Self(
-    addSourceToPlaylist: { _ in .updated(.empty) },
+    addToPlaylist: { _ in .updated(.empty) },
     addMusicBatchToPlaylist: { _ in .updated(.empty) },
     createPlaylist: { _ in .updated(.empty) },
     deletePlaylist: { _ in .updated(.empty) },

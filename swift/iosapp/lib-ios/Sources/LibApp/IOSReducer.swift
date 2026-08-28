@@ -26,7 +26,7 @@ public struct IOSReducer: Sendable {
     @Dependency(\.keychain) var keychain
   }
 
-  static let appStoreID = "6736368820"
+  static let appStoreID = GertrudeIOSApp.blocker.appStoreAppleId
 
   @ObservationIgnored
   let deps = Deps()

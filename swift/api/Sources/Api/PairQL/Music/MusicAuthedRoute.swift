@@ -43,8 +43,8 @@ extension AuthedRoute: RouteResponder {
     case .deleteMusicPlaylist(let input):
       let output = try await DeleteMusicPlaylist.resolve(with: input, in: ctx)
       return try await self.respond(with: output)
-    case .addSourceToMusicPlaylist(let input):
-      let output = try await AddSourceToMusicPlaylist.resolve(with: input, in: ctx)
+    case .addToMusicPlaylist(let input):
+      let output = try await AddToMusicPlaylist.resolve(with: input, in: ctx)
       return try await self.respond(with: output)
     case .addMusicBatchToPlaylist(let input):
       let output = try await AddMusicBatchToPlaylist.resolve(with: input, in: ctx)

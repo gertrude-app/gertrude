@@ -43,12 +43,12 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
         .deleteMusicPlaylist(.init(playlistId: UUID(1), expectedRevision: 2)),
       ),
       (
-        AddSourceToMusicPlaylist.name,
-        JSONEncoder().encode(AddSourceToMusicPlaylist.Input(
+        "AddToMusicPlaylist",
+        JSONEncoder().encode(AddToMusicPlaylist.Input(
           playlistId: UUID(1),
           source: .artist(artistId: "artist-1"),
         )),
-        .addSourceToMusicPlaylist(.init(
+        .addToMusicPlaylist(.init(
           playlistId: UUID(1),
           source: .artist(artistId: "artist-1"),
         )),
@@ -178,7 +178,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
     let destination = try XCTUnwrap(destinationSnapshot.playlists.first(where: {
       $0.name == "Destination"
     }))
-    let confirmationOutput = try await AddSourceToMusicPlaylist.resolve(
+    let confirmationOutput = try await AddToMusicPlaylist.resolve(
       with: .init(
         playlistId: destination.id,
         source: .playlist(playlistId: source.id),
@@ -192,7 +192,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
       duplicates: [.init(trackId: "track-2", title: "Two", existingCount: 1)],
     ))
 
-    let updated = try await updatedSnapshot(AddSourceToMusicPlaylist.resolve(
+    let updated = try await updatedSnapshot(AddToMusicPlaylist.resolve(
       with: .init(
         playlistId: destination.id,
         source: .playlist(playlistId: source.id),
@@ -281,7 +281,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
     let playlist = try XCTUnwrap(created.playlists.first)
     let originalEntryId = try XCTUnwrap(playlist.entries.first?.id)
 
-    let confirmationOutput = try await AddSourceToMusicPlaylist.resolve(
+    let confirmationOutput = try await AddToMusicPlaylist.resolve(
       with: .init(
         playlistId: playlist.id,
         source: .track(trackId: "track-1", albumId: "album-1"),
@@ -295,7 +295,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
       duplicate: .init(trackId: "track-1", title: "Track", existingCount: 1),
     ))
 
-    let added = try await updatedSnapshot(AddSourceToMusicPlaylist.resolve(
+    let added = try await updatedSnapshot(AddToMusicPlaylist.resolve(
       with: .init(
         playlistId: playlist.id,
         source: .track(trackId: "track-1", albumId: "album-1"),
@@ -342,7 +342,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
     ))
     let playlist = try XCTUnwrap(created.playlists.first)
 
-    let confirmationOutput = try await AddSourceToMusicPlaylist.resolve(
+    let confirmationOutput = try await AddToMusicPlaylist.resolve(
       with: .init(playlistId: playlist.id, source: .album(albumId: "album-1")),
       in: ctx,
     )
@@ -353,7 +353,7 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
       duplicates: [.init(trackId: "track-2", title: "Two", existingCount: 1)],
     ))
 
-    let updated = try await updatedSnapshot(AddSourceToMusicPlaylist.resolve(
+    let updated = try await updatedSnapshot(AddToMusicPlaylist.resolve(
       with: .init(
         playlistId: playlist.id,
         source: .album(albumId: "album-1"),

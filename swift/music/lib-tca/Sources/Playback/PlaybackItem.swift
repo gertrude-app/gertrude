@@ -500,7 +500,8 @@ enum PlaybackSourceQueuePlanner {
       source: source,
       entryIDs: entryIDs,
     )
-    guard entries.count == retainedEntries.count,
+    guard !entries.isEmpty,
+          entries.count == retainedEntries.count,
           Set(entries.map(\.id)) == Set(retainedEntries.map(\.id)) else { return nil }
     return entries
   }

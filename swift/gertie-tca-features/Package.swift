@@ -40,6 +40,7 @@ let package = Package(
         .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Dependencies", package: "swift-dependencies"),
+        .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ],
     ),
