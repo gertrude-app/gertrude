@@ -57,7 +57,11 @@ build-api:
 api-build:
   @just build-api
 
+# sharded across processes w/ a db each (macos only, ~8s vs ~70s serial)
 api-test *args:
+  @node ../scripts/api-test-parallel.mjs {{args}}
+
+api-test-serial *args:
   @cd api && SWIFT_DETERMINISTIC_HASHING=1 {{swiftly}} run swift test {{args}}
 
 duet-test *args:
@@ -94,7 +98,10 @@ scheduled-marketing-email-dry-run: build-api
   @just exec-api scheduled-marketing-email-dry-run
 
 nuke-test-db:
-  @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); dropdb --if-exists --force "$db"; createdb "$db"
+  @killall -q Postico; db=$(grep '^TEST_DATABASE_NAME=' api/.env | cut -d= -f2); \
+  for name in $(psql -d postgres -tAc "select datname from pg_database where datname = '$db' or datname like '${db}\_p%'"); do \
+    dropdb --if-exists --force "$name"; createdb "$name"; \
+  done
 
 hurl-dev *args:
   @hurl --variable API_URL="http://127.0.0.1:{{api_port}}" {{args}}

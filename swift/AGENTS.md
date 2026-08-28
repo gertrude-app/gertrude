@@ -275,7 +275,7 @@ All `x-*` libraries:
 just build         # Build all packages
 just test          # Run all tests
 just api-build     # Build the API
-just api-test      # Run API tests
+just api-test      # Run API tests (sharded, ~8s)
 just api-test --filter SomeTestName
 just macapp-test   # Run the macOS app package tests
 just iosapp-test   # Run the iOS library package tests
@@ -292,8 +292,9 @@ just lint-fix      # Fix formatting
 
 ```bash
 just test                           # All tests
-just api-test                       # API tests only
+just api-test                       # API tests, sharded across processes (~8s)
 just api-test --filter SomeTestName # API tests filtered by substring
+just api-test-serial                # one process, one db (~56s) — rarely needed
 just macapp-test                    # macOS app package tests
 just iosapp-test                    # iOS library package tests
 ```
@@ -305,10 +306,38 @@ one filter at a time instead.
 When writing swift unit test helpers, check if existing helpers already exist, or should
 be generalized and moved to a shared location before creating duplicates.
 
-The api test db is migrated once per run and never truncated between tests, so rows
-accumulate for the whole run. Claim codes live in a 6-digit space under a unique
-constraint, so always source them from `uniqueClaimCode()` (or `createClaim(...)`, whose
-default uses it) — never `Int.random(in: 100_000 ... 999_999)`, which collides.
+#### How `just api-test` runs
+
+`scripts/api-test-parallel.mjs` shards the suite over N processes (macOS only), each
+running the built `.xctest` bundle against **its own** postgres database
+(`$TEST_DATABASE_NAME_p1`…`_pN`, created on first use and left behind after —
+`just nuke-test-db` drops them all). CI and linux run the suite serially instead, which is
+what `just api-test-serial`, `just check`, and `ci-local.sh` also do.
+
+Passing tests are silent; a failing one prints its whole block — name, its own
+`print(...)` output, and the `file:line: error:` diff. A shard that dies mid-run names the
+test it died in, and the summary reads `N of M tests`, so a truncated run can't look
+clean. Each shard line carries `(est Ns)` from the last run's timings — far over estimate
+means the machine was busy, not that the tests regressed (one contended run skews the
+next run's estimate, then it re-settles).
+
+- `--workers N` (default `cores - 2`, max 8), `--filter REGEX` (against
+  `ApiTests.Suite/testName`, and implies `--verbose`), `--build`/`--skip-build`
+- `--shuffle` deals suites out randomly instead of balancing them, re-partitioning which
+  classes share a db — run it a few times after adding fixture-heavy tests to catch one
+  that only passed because another class seeded a row
+- don't hand-roll this: concurrent `swift test` invocations serialize on an exclusive
+  `.build` lock, and `swift test --parallel` forks a process **per test method** (1000+),
+  each paying ~2.5s of app boot and migration
+
+The api test db is migrated once per process and never truncated between tests, so rows
+accumulate for the whole run — for that shard's slice of it, when sharded. Claim
+codes live in a 6-digit space under a unique constraint, so always source them from
+`uniqueClaimCode()` (or `createClaim(...)`, whose default uses it) — never
+`Int.random(in: 100_000 ... 999_999)`, which collides.
+
+Tests must not depend on rows created by a different test class, since sharding puts
+classes in different processes and databases.
 
 ### Package Manager
 
