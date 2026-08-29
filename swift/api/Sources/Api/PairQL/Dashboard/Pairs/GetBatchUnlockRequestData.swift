@@ -74,7 +74,7 @@ extension GetBatchUnlockRequestData: Resolver {
         try await .init(
           from: $0,
           in: context,
-          catalogedApp: catalogedByBundleId[normalizedBundleId($0.appBundleId)],
+          catalogedApp: catalogedByBundleId[$0.appBundleId.normalizedBundleId],
         )
       },
       keychains: sortedKeychains.concurrentMap { try await .init(from: $0) },
@@ -121,27 +121,12 @@ private func catalogedApps(
   forBundleIds bundleIds: [String],
   in db: any DuetSQL.Client,
 ) async throws -> [String: CatalogedApp] {
-  let forms = Set(bundleIds.flatMap { [$0, normalizedBundleId($0)] })
+  let forms = Set(bundleIds.flatMap { [$0, $0.normalizedBundleId] })
   guard !forms.isEmpty else { return [:] }
   let apps = try await CatalogedApp.query()
     .where(.bundleId |=| Array(forms))
     .all(in: db)
   return apps.reduce(into: [:]) { dict, app in
-    dict[normalizedBundleId(app.bundleId)] = app
+    dict[app.bundleId.normalizedBundleId] = app
   }
-}
-
-private func normalizedBundleId(_ bundleId: String) -> String {
-  var id = bundleId
-  if id.first == "." {
-    id = String(id.dropFirst())
-  }
-  // strip a leading 10-char Apple team-id prefix, e.g. "9QW8UQUTAA."
-  let parts = id.split(separator: ".", maxSplits: 1)
-  if parts.count == 2,
-     parts[0].count == 10,
-     parts[0].allSatisfy({ $0.isNumber || ($0.isLetter && $0.isUppercase) }) {
-    id = String(parts[1])
-  }
-  return id
 }

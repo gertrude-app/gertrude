@@ -85,13 +85,3 @@ import MacAppRoute
     }
   }
 }
-
-#if DEBUG
-  import Darwin
-
-  func eprint(_ items: Any...) {
-    let s = items.map { "\($0)" }.joined(separator: " ")
-    fputs(s + "\n", stderr)
-    fflush(stderr)
-  }
-#endif

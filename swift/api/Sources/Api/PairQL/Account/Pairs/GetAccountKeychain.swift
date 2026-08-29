@@ -91,7 +91,7 @@ private struct KeyAppNames {
     case .identifiedAppSlug(let slug):
       return self.bySlug[slug]
     case .bundleId(let bundleId):
-      return self.byBundleId[normalizedBundleId(bundleId)]
+      return self.byBundleId[bundleId.normalizedBundleId]
     }
   }
 }
@@ -113,7 +113,7 @@ private func appNames(
     byBundleId: Dictionary(
       bundleIds.compactMap { row in
         namesByAppId[row.identifiedAppId].map {
-          (normalizedBundleId(row.bundleId), $0)
+          (row.bundleId.normalizedBundleId, $0)
         }
       },
       uniquingKeysWith: { first, _ in first },
@@ -130,9 +130,7 @@ private func appOptions(
   let primaryBundleIds = Dictionary(uniqueKeysWithValues: apps.compactMap { app in
     preferredBundleId(in: bundleIdsByAppId[app.id] ?? []).map { (app.id, $0) }
   })
-  let normalizedBundleIds = Array(Set(bundleIds.map {
-    normalizedBundleId($0.bundleId)
-  }))
+  let normalizedBundleIds = Array(Set(bundleIds.map(\.bundleId.normalizedBundleId)))
   let catalogedApps = normalizedBundleIds.isEmpty
     ? []
     : try await CatalogedApp.query()
@@ -164,7 +162,7 @@ private func preferredIconHash(
   iconHashesByBundleId: [String: String],
 ) -> String? {
   for bundleId in sortedBundleIds(bundleIds) {
-    if let iconHash = iconHashesByBundleId[normalizedBundleId(bundleId.bundleId)] {
+    if let iconHash = iconHashesByBundleId[bundleId.bundleId.normalizedBundleId] {
       return iconHash
     }
   }
@@ -174,7 +172,7 @@ private func preferredIconHash(
 private func preferredBundleId(in bundleIds: [AppBundleId]) -> String? {
   sortedBundleIds(bundleIds)
     .first
-    .map { normalizedBundleId($0.bundleId) }
+    .map(\.bundleId.normalizedBundleId)
 }
 
 private func sortedBundleIds(_ bundleIds: [AppBundleId]) -> [AppBundleId] {
@@ -182,8 +180,8 @@ private func sortedBundleIds(_ bundleIds: [AppBundleId]) -> [AppBundleId] {
     if lhs.count != rhs.count {
       return lhs.count > rhs.count
     }
-    let lhsId = normalizedBundleId(lhs.bundleId)
-    let rhsId = normalizedBundleId(rhs.bundleId)
+    let lhsId = lhs.bundleId.normalizedBundleId
+    let rhsId = rhs.bundleId.normalizedBundleId
     if lhsId.count != rhsId.count {
       return lhsId.count < rhsId.count
     }
@@ -204,18 +202,4 @@ private func singleAppScope(for key: Gertie.Key) -> AppScope.Single? {
   case .domain, .anySubdomain, .domainRegex, .path, .ipAddress:
     nil
   }
-}
-
-private func normalizedBundleId(_ bundleId: String) -> String {
-  var id = bundleId
-  if id.first == "." {
-    id = String(id.dropFirst())
-  }
-  let parts = id.split(separator: ".", maxSplits: 1)
-  if parts.count == 2,
-     parts[0].count == 10,
-     parts[0].allSatisfy({ $0.isNumber || ($0.isLetter && $0.isUppercase) }) {
-    id = String(parts[1])
-  }
-  return id
 }

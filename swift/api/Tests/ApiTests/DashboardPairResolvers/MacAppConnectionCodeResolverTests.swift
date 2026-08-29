@@ -1,18 +1,11 @@
-import Dependencies
 import DuetSQL
 import XCTest
 import XExpect
 
 @testable import Api
 
-final class MacAppConnectionCodeResolverTests: ApiTestCase, @unchecked Sendable {
-  override func invokeTest() {
-    withDependencies {
-      $0.verificationCode.generate = { 123_456 }
-    } operation: {
-      super.invokeTest()
-    }
-  }
+final class MacAppConnectionCodeResolverTests: FixedVerificationCodeApiTestCase,
+  @unchecked Sendable {
 
   func testFullPaidUser_noGate() async throws {
     let parent = try await self.parentWithSubscription { _, sub in

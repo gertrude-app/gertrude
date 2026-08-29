@@ -86,7 +86,10 @@ final class MarketingEmailCampaignRunnerTests: ApiTestCase, @unchecked Sendable 
     expect(result.failed).toEqual(0)
     expect(result.toSend).toEqual([parent1.email.rawValue, parent2.email.rawValue])
     expect(self.sent.emails.map(\.to)).toEqual([parent1.email.rawValue, parent2.email.rawValue])
-    await expect(try self.sends(for: slug).map(\.parentId)).toEqual([parent1.id, parent2.id])
+    await expect(try self.marketingEmailSends(for: slug).map(\.parentId)).toEqual([
+      parent1.id,
+      parent2.id,
+    ])
   }
 
   func testSendUsesMarketingBatchAndRecordsSuccessfulSends() async throws {
@@ -146,7 +149,7 @@ final class MarketingEmailCampaignRunnerTests: ApiTestCase, @unchecked Sendable 
     expect(self.sent.emails.map(\.tag)).toEqual([slug, slug])
     expect(self.sent.emails[0].templateModel["name"]).toEqual("One")
     expect(self.sent.emails[1].templateModel["name"]).toEqual("Three")
-    await expect(try Set(self.sends(for: slug).map(\.parentId))).toEqual(Set([
+    await expect(try Set(self.marketingEmailSends(for: slug).map(\.parentId))).toEqual(Set([
       parent1.id,
       parent2.id,
       parent3.id,
@@ -180,7 +183,7 @@ final class MarketingEmailCampaignRunnerTests: ApiTestCase, @unchecked Sendable 
     expect(result.sent).toEqual(1)
     expect(result.failed).toEqual(1)
     expect(self.sent.emails.map(\.to)).toEqual([parent1.email.rawValue, parent2.email.rawValue])
-    await expect(try self.sends(for: slug).map(\.parentId)).toEqual([parent1.id])
+    await expect(try self.marketingEmailSends(for: slug).map(\.parentId)).toEqual([parent1.id])
   }
 
   func testSendChunksLargeAudienceAndRecordsEarlierSuccessesWhenLaterChunkFails() async throws {
@@ -215,13 +218,7 @@ final class MarketingEmailCampaignRunnerTests: ApiTestCase, @unchecked Sendable 
     expect(result.failed > 0).toBeTrue()
     expect(result.sent + result.failed).toEqual(501)
     expect(self.sent.emails.count).toEqual(501)
-    await expect(try self.sends(for: slug).count).toEqual(result.sent)
-  }
-
-  private func sends(for slug: String) async throws -> [MarketingEmailSend] {
-    try await MarketingEmailSend.query()
-      .where(.campaign == slug)
-      .all(in: self.db)
+    await expect(try self.marketingEmailSends(for: slug).count).toEqual(result.sent)
   }
 }
 

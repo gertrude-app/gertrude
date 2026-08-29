@@ -51,7 +51,7 @@ final class SendMarketingEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     expect(output.audience).toEqual([parent1.email.rawValue, parent2.email.rawValue])
     expect(output.toSend).toEqual([parent1.email.rawValue])
     expect(self.sent.emails).toHaveCount(0)
-    await expect(try self.sends(for: slug)).toHaveCount(0)
+    await expect(try self.marketingEmailSends(for: slug)).toHaveCount(0)
   }
 
   func testSendUsesRegisteredManualCampaignBySlug() async throws {
@@ -98,7 +98,7 @@ final class SendMarketingEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     expect(self.sent.emails.map(\.messageStream)).toEqual(["broadcast"])
     expect(self.sent.emails.map(\.tag)).toEqual([slug])
     expect(self.sent.emails[0].templateModel["name"]).toEqual("One")
-    await expect(try self.sends(for: slug).map(\.parentId)).toEqual([parent1.id])
+    await expect(try self.marketingEmailSends(for: slug).map(\.parentId)).toEqual([parent1.id])
   }
 
   func testRealSendOutsideProdThrowsBadRequest() async throws {
@@ -129,7 +129,7 @@ final class SendMarketingEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     }
 
     expect(self.sent.emails).toHaveCount(0)
-    await expect(try self.sends(for: slug)).toHaveCount(0)
+    await expect(try self.marketingEmailSends(for: slug)).toHaveCount(0)
   }
 
   func testUnknownManualCampaignThrowsBadRequest() async throws {
@@ -158,12 +158,6 @@ final class SendMarketingEmailCampaignTests: ApiTestCase, @unchecked Sendable {
       expect(error.id).toEqual("send_marketing_email_campaign.invalid_limit")
       expect(error.type).toEqual(.badRequest)
     }
-  }
-
-  private func sends(for slug: String) async throws -> [MarketingEmailSend] {
-    try await MarketingEmailSend.query()
-      .where(.campaign == slug)
-      .all(in: self.db)
   }
 }
 

@@ -123,6 +123,62 @@ public extension LockIsolated where Value: RangeReplaceableCollection {
 
 public let IS_CI = ProcessInfo.processInfo.environment["CI"] != nil
 
+public func makeTLSClientHello(
+  serverName: String?,
+  sessionId: Data = Data(),
+  serverNameTrailingBytes: Data = Data(),
+) -> Data {
+  var clientHello = Data()
+  clientHello.append(contentsOf: [0x03, 0x03])
+  clientHello.append(Data(repeating: 0x11, count: 32))
+  clientHello.append(UInt8(sessionId.count))
+  clientHello.append(sessionId)
+  clientHello.append(contentsOf: [0x00, 0x02])
+  clientHello.append(contentsOf: [0x13, 0x01])
+  clientHello.append(0x01)
+  clientHello.append(0x00)
+
+  var extensions = Data()
+  if let serverName {
+    let hostname = Data(serverName.utf8)
+    var serverNameExtension = Data()
+    let listLength = UInt16(1 + 2 + hostname.count + serverNameTrailingBytes.count)
+    serverNameExtension.append(tlsUInt16Bytes(listLength))
+    serverNameExtension.append(0x00)
+    serverNameExtension.append(tlsUInt16Bytes(UInt16(hostname.count)))
+    serverNameExtension.append(hostname)
+    serverNameExtension.append(serverNameTrailingBytes)
+
+    extensions.append(tlsUInt16Bytes(0x0000))
+    extensions.append(tlsUInt16Bytes(UInt16(serverNameExtension.count)))
+    extensions.append(serverNameExtension)
+  }
+
+  clientHello.append(tlsUInt16Bytes(UInt16(extensions.count)))
+  clientHello.append(extensions)
+
+  var handshake = Data([0x01])
+  handshake.append(tlsUInt24Bytes(clientHello.count))
+  handshake.append(clientHello)
+
+  var record = Data([0x16, 0x03, 0x01])
+  record.append(tlsUInt16Bytes(UInt16(handshake.count)))
+  record.append(handshake)
+  return record
+}
+
+private func tlsUInt16Bytes(_ value: UInt16) -> Data {
+  Data([UInt8((value >> 8) & 0xFF), UInt8(value & 0xFF)])
+}
+
+private func tlsUInt24Bytes(_ value: Int) -> Data {
+  Data([
+    UInt8((value >> 16) & 0xFF),
+    UInt8((value >> 8) & 0xFF),
+    UInt8(value & 0xFF),
+  ])
+}
+
 // if/when tuples become Sendable, this, `Three`, and `Four` can be removed
 public struct Both<A, B> {
   public var a: A
