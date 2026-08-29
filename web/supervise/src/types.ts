@@ -72,7 +72,12 @@ export interface ConfirmSupervisionProps {
   onNo: () => void;
 }
 
-export type ErrorType = `findMyEnabled` | `invokeFailed` | `userReportedNo`;
+export type ErrorType =
+  | `findMyEnabled`
+  | `invokeFailed`
+  | `userReportedNo`
+  | `deviceLimitReached`
+  | `serverRejected`;
 
 export interface ErrorProps {
   deviceType: string;

@@ -217,6 +217,34 @@ export const Frame_Error_InvokeFailed: Story = {
   ),
 };
 
+export const Frame_Error_DeviceLimitReached: Story = {
+  render: () => (
+    <Window>
+      <Error
+        deviceType="iPhone"
+        errorType="deviceLimitReached"
+        errorMessage="This account has supervised more iPhones and iPads than Gertrude allows. Gertrude is built for parents and accountability partners helping kids and friends. If that describes you and you need more devices, get in touch and we'll sort it out with you."
+        onRetry={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const Frame_Error_ServerRejected: Story = {
+  render: () => (
+    <Window>
+      <Error
+        deviceType="iPhone"
+        errorType="serverRejected"
+        errorMessage="This code has expired. Open the Gertrude app on the iPhone to get a new code."
+        onRetry={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
 export const Frame_Error_UserReportedNo: Story = {
   render: () => (
     <Window>
