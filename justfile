@@ -65,6 +65,11 @@ fix:
   @cd swift && just fix
   @cd web && just fix
 
+# duplication
+
+dup *args:
+  @node .agents/skills/duplication/find-duplication.mjs {{args}}
+
 update-ui-screenshots:
   @cd web && just update-ui-screenshots
 

@@ -1,0 +1,73 @@
+{
+  "$comment": "Duplication that is deliberate. Every entry needs a real reason (enforced). Prefer explicit file pairs over broad globs — this is documentation of a decision, not a suppression bucket. See .agents/skills/duplication/SKILL.md",
+  "skipPaths": [
+    "**/Package.swift",
+    "swift/api/Sources/Api/Database/Migrations/**",
+    "web/storybook/**",
+    "web/storybook-v2/**",
+    "**/*.stories.tsx"
+  ],
+  "skipNames": [],
+  "intentionalPairs": [
+    {
+      "a": "**/CheckInResolverTests.swift",
+      "b": "**/CheckIn_v2ResolverTests.swift",
+      "reason": "pairql pair versioning: v1 tests are frozen against the old contract on purpose, so the v2 copies must be able to drift independently"
+    },
+    {
+      "a": "**/GetMusicAppStatusResolverTests.swift",
+      "b": "**/GetMusicAppStatus_v2ResolverTests.swift",
+      "reason": "pairql pair versioning, same rationale as the CheckIn v1/v2 resolver tests above"
+    },
+    {
+      "a": "swift/api/Sources/Api/Routes/Reset/**",
+      "b": "swift/api/Sources/Api/Routes/Reset/**",
+      "reason": "reset fixtures are parallel-by-design: each seeded account is meant to be read top-to-bottom in isolation"
+    },
+    {
+      "a": "swift/api/Sources/Api/Models/**",
+      "b": "swift/api/Sources/Api/Models/**",
+      "reason": "duet relation accessors (`func child(in db:)`, `func device(in db:)`) are formulaic per-model boilerplate — each is typed to a different model, so collapsing them would need generics that read worse than the repetition"
+    },
+    {
+      "a": "swift/macapp/App/Tests/AppTests/AppMigratorTests.swift",
+      "b": "swift/macapp/App/Tests/FilterTests/FilterMigratorTests.swift",
+      "reason": "identical test text exercising different production types: each suite's own `testMigrator` resolves to AppMigrator vs FilterMigrator, so the shared body is not shared behavior. sharing it would need generics over the migrator. NB the two deliberately differ on the storage-key assertion — Filter pins the literal \"persistent.state.v2\" so a key rename fails the test"
+    },
+    {
+      "a": "swift/iosapp/lib-ios/Tests/LibFilterTests/FilterTests.swift",
+      "b": "swift/macapp/App/Tests/FilterTests/BlockRuleMacFlowTests.swift",
+      "reason": "separate swift packages for separate apps (iosapp lib-ios vs macapp App). the shared `init` is a local test DSL for building flow fixtures; coupling two apps' test suites to share it is a worse trade than the duplication"
+    },
+    {
+      "a": "swift/api/Tests/ApiTests/EnumCodableFixtureTests.swift",
+      "b": "swift/macapp/App/Tests/AppTests/CodableFixtureTests.swift",
+      "reason": "separate packages with no shared dependency, and the copies are not equivalent: api decodes with the suite's configured `decoder`, macapp with a fresh `JSONDecoder()`"
+    },
+    {
+      "a": "swift/api/Tests/ApiTests/DashboardPairResolvers/ClaimMusicDeviceResolverTests.swift",
+      "b": "swift/api/Tests/ApiTests/DashboardPairResolvers/GetMusicClaimDataResolverTests.swift",
+      "reason": "claim vs claim-data resolvers for the same flow: the repeated seed-and-claim setup is what makes each scenario readable on its own"
+    },
+    {
+      "a": "swift/api/Tests/ApiTests/DashboardPairResolvers/ClaimAmDeviceResolverTests.swift",
+      "b": "swift/api/Tests/ApiTests/DashboardPairResolvers/GetAmClaimDataResolverTests.swift",
+      "reason": "same claim/claim-data pairing as the music resolvers, for apple music"
+    },
+    {
+      "a": "swift/api/Tests/ApiTests/DashboardPairResolvers/GetAmClaimDataResolverTests.swift",
+      "b": "swift/api/Tests/ApiTests/DashboardPairResolvers/GetBlockerClaimDataResolverTests.swift",
+      "reason": "the same claim-data preconditions asserted per app (apple music, blocker); parallel by product shape, not copied"
+    },
+    {
+      "a": "swift/api/Tests/ApiTests/AccountPairResolvers/GetPeopleResolverTests.swift",
+      "b": "swift/api/Tests/ApiTests/AccountPairResolvers/GetSuspensionRequestsResolverTests.swift",
+      "reason": "the same empty-account precondition asserted against two different resolvers — similar by nature of the scenario, not copied"
+    },
+    {
+      "a": "swift/macapp/App/Tests/AppTests/FullDiskAccessOnboardingTests.swift",
+      "b": "swift/macapp/App/Tests/AppTests/OnboardingFeatureTests.swift",
+      "reason": "distinct onboarding scenarios that necessarily share TestStore setup; the setup is the context that makes each step's failure interpretable"
+    }
+  ]
+}

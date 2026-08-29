@@ -177,6 +177,15 @@ Supports all 3 apps, plus dashboard and admin websites
   critical setup line buried in boilerplate to the assertion it drives); reach for a block
   comment above a test only rarely, for what genuinely can't be said at line-end.
 
+## Duplication
+
+- before writing a new test helper, fixture, or setup block, search for an existing one
+  first — most duplication here comes from not knowing a helper already existed
+- read `./.agents/skills/duplication/SKILL.md` when adding shared helpers, reviewing a
+  diff for reuse, or asked to deduplicate/extract/consolidate
+- `just dup` reports clones across the repo; `just dup --diff` reports only the ones
+  the current branch introduces, and is what CI gates on
+
 ## Continuous Improvement
 
 If during the task you overcame something non-obvious that took time and tokens to figure
