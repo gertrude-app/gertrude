@@ -51,7 +51,7 @@ runs on Windows as well as macOS, and doesn't erase the device.
 The video below walks through every screen, start to finish. If you'd rather read than
 watch, the same steps are written out underneath it.
 
-{% video videoId="G7W1d0EWmmQ" title="Gertrude | Supervise an iOS Device" /%}
+{% video videoId="G7W1d0EWmmQ" title="How to Supervise an iPhone with Apple Configurator" description="A complete walkthrough of putting an iPhone into Supervised Mode with Apple Configurator: preparing the device, creating a restrictions profile, restoring apps, and enabling the Gertrude content filter." uploadDate="2024-12-30T13:18:07-08:00" duration="PT29M8S" /%}
 
 ## Step-by-step instructions
 

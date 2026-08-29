@@ -31,6 +31,9 @@ const tags: Config[`tags`] = {
     attributes: {
       videoId: { type: String },
       title: { type: String },
+      description: { type: String },
+      uploadDate: { type: String },
+      duration: { type: String },
     },
     render: `EmbeddedVideo`,
   },
