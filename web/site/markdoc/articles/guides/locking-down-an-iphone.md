@@ -118,9 +118,12 @@ the app using their own Apple ID/Account, as well as the child's device passcode
 
 **18 or older:** Apple won't allow an internet filter on an adult's device unless that
 device is _supervised,_ so there's one extra step&mdash;**supervising the phone.**
-Gertrude's desktop supervision tool does this over USB without erasing the device, and the
-app's onboarding will walk you through it. Supervision requires a Gertrude account on the
-[Light plan](/pricing), which is $10 per **year**.
+Gertrude's desktop supervision tool
+[does this over USB without erasing the device](/help/iphone-ipad/supervise-iphone-without-erasing),
+and the app's onboarding will walk you through it. Supervision requires a Gertrude account
+on the [Light plan](/pricing), which is $10 per **year**. If you'd rather use Apple's own
+tooling and don't mind wiping the phone, you can also
+[supervise with Apple Configurator](/help/iphone-ipad/supervise-iphone-with-apple-configurator).
 
 {% /callout %}
 

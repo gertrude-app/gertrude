@@ -351,6 +351,12 @@ removed. If this seems extreme, I assure you it's not. A couple I know found out
 that their 13 year old son was taking a laptop from their bedroom at night while they
 slept in order to fuel a growing pornography addiction.
 
+The grown-ups' phones are the awkward case, because Apple won't allow an internet filter
+on an adult's device unless that device is _supervised._ You can
+[supervise an iPhone or iPad without erasing it](/help/iphone-ipad/supervise-iphone-without-erasing)
+in about five minutes, or do it the traditional way
+[with Apple Configurator](/help/iphone-ipad/supervise-iphone-with-apple-configurator).
+
 Also, if your devices are protected with passwords, you need to **change those passwords
 regularly.** Most people re-use the same passwords for many accounts and devices. Kids are
 smart enough to figure this out, and yours probably already know your favorite password.
