@@ -1,4 +1,5 @@
 import { Badge, Card, HStack, Text, VStack } from '@gertrude/ui';
+import { Link } from '@tanstack/react-router';
 import {
   CircleDashedIcon,
   ShieldAlertIcon,
@@ -68,7 +69,13 @@ const MobileDeviceCard: React.FC<Props> = ({ device }) => (
         <VStack className="min-w-0" gap={1.5}>
           <VStack gap={0.5}>
             <Text as="h3" variant="heading" lineClamp={2}>
-              {possessive(device.person.name)} {device.modelName}
+              <Link
+                to="/people/$personId/ios-settings/$deviceId"
+                params={{ personId: device.person.id, deviceId: device.id }}
+                className="rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+              >
+                {possessive(device.person.name)} {device.modelName}
+              </Link>
             </Text>
             <Text variant="bodyMuted">
               {device.type === `iphone` ? `iOS` : `iPadOS`} {device.iOSVersion}

@@ -47,7 +47,7 @@ const MacDeviceCard: React.FC<Props> = ({ device }) => {
                   className="min-w-0 py-1 first:pt-0 last:pb-0"
                 >
                   <Link
-                    to="/people/$personId"
+                    to="/people/$personId/mac-settings"
                     params={{ personId: person.id }}
                     className="min-w-0 truncate rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
                   >
