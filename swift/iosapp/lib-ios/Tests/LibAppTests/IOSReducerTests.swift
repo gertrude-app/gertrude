@@ -519,22 +519,20 @@ final class IOSReducerTests: XCTestCase {
 
   @MainActor
   func testChooseWriteReview() async throws {
-    let writeReviewInvocations = LockIsolated(0)
+    let requestedAppStoreID = LockIsolated<String?>(nil)
     let store = TestStore(
       initialState: IOSReducer.State(screen: .onboarding(.happyPath(.requestAppStoreRating))),
     ) {
       IOSReducer()
     } withDependencies: {
-      $0.appStore.requestReview = {
-        writeReviewInvocations.withValue { $0 += 1 }
-      }
+      $0.appStore.requestReview = { requestedAppStoreID.setValue($0) }
     }
 
     await store.send(.interactive(.onboardingBtnTapped(.secondary, ""))) {
       $0.screen = .onboarding(.happyPath(.doneQuit))
     }
 
-    expect(writeReviewInvocations.value).toEqual(1)
+    expect(requestedAppStoreID.value).toEqual(IOSReducer.appStoreID)
   }
 
   @MainActor

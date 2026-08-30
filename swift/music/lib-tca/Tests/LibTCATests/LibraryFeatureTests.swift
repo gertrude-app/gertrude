@@ -102,6 +102,31 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func invalidConnectionDelegatesToAppWithoutShowingRefreshFailure() async {
+    let store = TestStore(initialState: .init()) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.continuousClock = ImmediateClock()
+      $0.approvedMusic.loadCachedApprovedLibrary = { .mock }
+      $0.approvedMusic.loadRemoteApprovedLibrary = {
+        throw ApprovedMusicClientError.invalidConnection
+      }
+    }
+
+    await store.send(.onAppear) {
+      $0.isRefreshingRemoteLibrary = true
+      $0.hasStartedInitialLibraryLoad = true
+    }
+    await store.receive(.cachedApprovedLibraryLoaded(.mock)) {
+      $0.status = .loaded(.mock)
+    }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(
+      ApprovedMusicLibrary.mock.approvedTrackIDs,
+    )))
+    await store.receive(.delegate(.connectionInvalid))
+  }
+
+  @Test
   func showsMusicUnavailableWhenApprovedLibraryRequiresPayment() async {
     let store = TestStore(initialState: .init()) {
       LibraryFeature()
@@ -168,7 +193,10 @@ struct LibraryFeatureTests {
   func pullToRefreshReloadsRemoteLibrary() async {
     let cached = cachedApprovedMusicLibrary
     let remote = ApprovedMusicLibrary.mock
-    let store = TestStore(initialState: .init(status: .loaded(cached))) {
+    let store = TestStore(initialState: .init(
+      status: .loaded(cached),
+      isLibraryRefreshFailurePresented: true,
+    )) {
       LibraryFeature()
     } withDependencies: {
       $0.continuousClock = ImmediateClock()
@@ -176,6 +204,7 @@ struct LibraryFeatureTests {
     }
 
     await store.send(.refreshPulled) {
+      $0.isLibraryRefreshFailurePresented = false
       $0.isRefreshingRemoteLibrary = true
     }
     await store.receive(.approvedLibraryLoaded(remote)) {
@@ -288,9 +317,14 @@ struct LibraryFeatureTests {
       $0.status = .loaded(cached)
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(cached.approvedTrackIDs)))
-    await store.receive(.approvedLibraryLoadFailed)
+    await store.receive(.approvedLibraryLoadFailed) {
+      $0.isLibraryRefreshFailurePresented = true
+    }
     await store.receive(.refreshPresentationFinished) {
       $0.isRefreshingRemoteLibrary = false
+    }
+    await store.send(.libraryRefreshFailureDismissed) {
+      $0.isLibraryRefreshFailurePresented = false
     }
   }
 
@@ -324,30 +358,43 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func artistPlayTapRequestsPlaybackForAllTopSongs() async {
-    let topSongs = [
-      ApprovedTrack(
-        id: "song-1",
-        title: "First",
-        artistName: "Artist",
-        artworkURL: URL(string: "https://example.com/first.jpg"),
-      ),
-      ApprovedTrack(
-        id: "song-2",
-        title: "Second",
-        artistName: "Artist",
-        artworkURL: URL(string: "https://example.com/second.jpg"),
-      ),
-    ]
+  func artistPlayTapRequestsNewestFirstDeduplicatedDiscography() async {
+    let repeatedTrack = ApprovedTrack(
+      id: "repeated",
+      title: "Repeated",
+      artistName: "Artist",
+    )
+    let olderAlbum = ApprovedAlbum(
+      id: "older",
+      title: "Older",
+      artistName: "Artist",
+      releaseDate: "2020-03-01",
+      tracks: [
+        ApprovedTrack(id: "older-first", title: "Older First", artistName: "Artist"),
+        repeatedTrack,
+      ],
+    )
+    let newestAlbum = ApprovedAlbum(
+      id: "newest",
+      title: "Newest",
+      artistName: "Artist",
+      releaseDate: "2025-06-01",
+      tracks: [
+        ApprovedTrack(id: "newest-first", title: "Newest First", artistName: "Artist"),
+        repeatedTrack,
+      ],
+    )
     let artist = ApprovedArtist(
       id: "artist-1",
       name: "Artist",
-      topSongs: topSongs,
+      releaseAlbumIds: [olderAlbum.id, newestAlbum.id],
+      topSongs: [olderAlbum.tracks[0]],
     )
-    let library = ApprovedMusicLibrary(artists: [artist])
-    let items = topSongs.map {
-      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
-    }
+    let library = ApprovedMusicLibrary(
+      albums: [olderAlbum, newestAlbum],
+      artists: [artist],
+    )
+    let items = playbackItems(album: newestAlbum) + [playbackItems(album: olderAlbum)[0]]
     let store = TestStore(initialState: .init(status: .loaded(library))) {
       LibraryFeature()
     }
@@ -358,8 +405,85 @@ struct LibraryFeatureTests {
       context: PlaybackContext(
         identity: .artist(artist.id),
         title: artist.name,
+        artistSource: .discography,
       ),
     )))
+  }
+
+  @Test
+  func artistCanBeAddedToPlaylistFromCardAndDetail() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      tracks: [ApprovedTrack(id: "song", title: "Song", artistName: "Artist")],
+    )
+    let artist = ApprovedArtist(
+      id: "artist-1",
+      name: "Artist",
+      releaseAlbumIds: [album.id],
+    )
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    let source = MusicPlaylistSourceSelection.artist(artistId: artist.id.rawValue)
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.addArtistToPlaylistTapped(artist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+    await store.send(.addToPlaylistCancelled) {
+      $0.addToPlaylist = nil
+    }
+    await store.send(.artistTapped(artist.id)) {
+      $0.path.append(.artist(.init(artistID: artist.id)))
+    }
+    await store.send(.path(.element(id: 0, action: .artist(.addToPlaylistTapped))))
+    await store.receive(.addArtistToPlaylistTapped(artist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+  }
+
+  @Test
+  func playlistCanBeAddedToAnotherPlaylistFromCardAndDetail() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      tracks: [ApprovedTrack(id: "song", title: "Song", artistName: "Artist")],
+    )
+    let playlist = MusicPlaylist(
+      id: .init(rawValue: UUID(1)),
+      name: "Source",
+      revision: 1,
+      createdAt: Date(timeIntervalSince1970: 1),
+      updatedAt: Date(timeIntervalSince1970: 1),
+      entries: [
+        .init(id: .init(rawValue: UUID(2)), track: album.tracks[0]),
+      ],
+    )
+    let library = ApprovedMusicLibrary(albums: [album], playlists: [playlist])
+    let source = MusicPlaylistSourceSelection.playlist(playlistId: playlist.id.rawValue)
+    let store = TestStore(initialState: .init(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.addPlaylistToPlaylistTapped(playlist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
+    await store.send(.addToPlaylistCancelled) {
+      $0.addToPlaylist = nil
+    }
+    await store.send(.playlistTapped(playlist.id)) {
+      $0.path.append(.playlist(.init(playlist: playlist)))
+    }
+    await store.send(.path(.element(
+      id: 0,
+      action: .playlist(.delegate(.addToPlaylist)),
+    )))
+    await store.receive(.addPlaylistToPlaylistTapped(playlist.id)) {
+      $0.addToPlaylist = .init(source: source)
+    }
   }
 
   @Test
@@ -387,50 +511,65 @@ struct LibraryFeatureTests {
     ))
     await store.receive(.delegate(.playNow(
       items: items,
-      startIndex: 1,
+      start: .selectedEntry(index: 1),
       context: PlaybackContext(
         identity: .artist(artist.id),
         title: artist.name,
+        artistSource: .topSongs,
       ),
     )))
   }
 
   @Test
-  func artistDetailQueueActionsDelegateApprovedTopSongs() async {
-    let topSongs = [
-      ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
-      ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
-    ]
+  func artistDetailQueueActionsUseDiscographyAndTopSongsSources() async {
+    let album = ApprovedAlbum(
+      id: "album",
+      title: "Album",
+      artistName: "Artist",
+      releaseDate: "2025-06-01",
+      tracks: [
+        ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
+        ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
+        ApprovedTrack(id: "song-3", title: "Third", artistName: "Artist"),
+      ],
+    )
+    let topSongs = [album.tracks[1], album.tracks[0]]
     let artist = ApprovedArtist(
       id: "artist-1",
       name: "Artist",
+      releaseAlbumIds: [album.id],
       topSongs: topSongs,
     )
-    let library = ApprovedMusicLibrary(artists: [artist])
-    let items = topSongs.map {
+    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
+    let discographyItems = playbackItems(album: album)
+    let topSongItems = topSongs.map {
       PlaybackItem(track: $0, artworkURL: $0.artworkURL)
     }
     let store = TestStore(initialState: .init(status: .loaded(library))) {
       LibraryFeature()
     }
 
+    await store.send(.artistPlayNextTapped(artist.id))
+    await store.receive(.delegate(.playNext(items: discographyItems)))
+    await store.send(.artistAddToQueueTapped(artist.id))
+    await store.receive(.delegate(.addToQueue(items: discographyItems)))
     await store.send(.artistTapped(artist.id)) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
     await store.send(.path(.element(id: 0, action: .artist(.playNextTapped))))
-    await store.receive(.delegate(.playNext(items: items)))
+    await store.receive(.delegate(.playNext(items: discographyItems)))
     await store.send(.path(.element(id: 0, action: .artist(.addToQueueTapped))))
-    await store.receive(.delegate(.addToQueue(items: items)))
+    await store.receive(.delegate(.addToQueue(items: discographyItems)))
     await store.send(.path(.element(
       id: 0,
       action: .artist(.topSongPlayNextTapped(topSongs[1].id)),
     )))
-    await store.receive(.delegate(.playNext(items: [items[1]])))
+    await store.receive(.delegate(.playNext(items: [topSongItems[1]])))
     await store.send(.path(.element(
       id: 0,
       action: .artist(.topSongAddToQueueTapped(topSongs[0].id)),
     )))
-    await store.receive(.delegate(.addToQueue(items: [items[0]])))
+    await store.receive(.delegate(.addToQueue(items: [topSongItems[0]])))
   }
 
   @Test
@@ -587,11 +726,11 @@ struct LibraryFeatureTests {
     let items = [playbackItem("track-1")]
     await store.send(.path(.element(
       id: 0,
-      action: .album(.delegate(.playNow(items: items, startIndex: 0))),
+      action: .album(.delegate(.playNow(items: items, start: .collection))),
     )))
     await store.receive(.delegate(.playNow(
       items: items,
-      startIndex: 0,
+      start: .collection,
       context: PlaybackContext(
         identity: .album(album.id),
         title: album.title,
@@ -611,7 +750,7 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func createsEmptyPlaylistAndStaysInLibrary() async {
+  func createsEmptyPlaylistThenOpensItForAddingMusic() async {
     let playlist = self.playlistLibrary().playlists[0]
     let updatedLibrary = ApprovedMusicLibrary(playlists: [playlist])
     let now = Date(timeIntervalSince1970: 100)
@@ -627,6 +766,7 @@ struct LibraryFeatureTests {
     await store.send(.createPlaylistSubmitted("  Favorites  ")) {
       $0.isPlaylistMutationInFlight = true
       $0.playlistIDsBeforeCreate = []
+      $0.shouldPresentCreatedPlaylist = true
     }
     await store.receive(.playlistMutationResponse(
       .updated(updatedLibrary),
@@ -640,6 +780,9 @@ struct LibraryFeatureTests {
         observedAddedAt: playlist.createdAt,
         at: now,
       )
+      $0.path[id: 0] = .playlist(.init(playlist: playlist))
+      $0.playlistMusicPicker = .init(playlist: playlist, library: updatedLibrary)
+      $0.shouldPresentCreatedPlaylist = false
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
     await store.finish()
@@ -675,6 +818,7 @@ struct LibraryFeatureTests {
     await store.send(.createPlaylistSubmitted("Favorites")) {
       $0.isPlaylistMutationInFlight = true
       $0.playlistIDsBeforeCreate = Set(library.playlists.map(\.id))
+      $0.shouldPresentCreatedPlaylist = true
     }
     await store.receive(.playlistMutationResponse(
       .updated(updatedLibrary),
@@ -688,6 +832,9 @@ struct LibraryFeatureTests {
         observedAddedAt: playlist.createdAt,
         at: now,
       )
+      $0.path[id: 0] = .playlist(.init(playlist: playlist))
+      $0.playlistMusicPicker = .init(playlist: playlist, library: updatedLibrary)
+      $0.shouldPresentCreatedPlaylist = false
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
     await store.finish()
@@ -904,10 +1051,12 @@ struct LibraryFeatureTests {
     await store.send(.createPlaylistSubmitted("Road Trip")) { // not swallowed by a stuck latch
       $0.isPlaylistMutationInFlight = true
       $0.playlistIDsBeforeCreate = [playlist.id]
+      $0.shouldPresentCreatedPlaylist = true
     }
     await store.receive(.playlistMutationResponse(.updated(library), rollback: nil)) {
       $0.isPlaylistMutationInFlight = false
       $0.playlistIDsBeforeCreate = nil
+      $0.shouldPresentCreatedPlaylist = false
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
   }

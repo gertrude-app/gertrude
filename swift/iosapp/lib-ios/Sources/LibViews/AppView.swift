@@ -3,6 +3,7 @@ import GertieApp
 import GertieTcaFeatures
 import GertieUI
 import LibApp
+import LibClients
 import SwiftUI
 
 public struct AppView: View {
@@ -32,7 +33,10 @@ public struct AppView: View {
         state: \.onboarding.crossPromo,
         action: \.interactive.onboardingCrossPromo,
       ) {
-        CrossPromoView(store: crossPromoStore)
+        CrossPromoFeatureView(
+          store: crossPromoStore,
+          onImageLoadFailure: Self.crossPromoImageLoadFailed,
+        )
       } else if let connectStore = self.store.scope(
         state: \.onboarding.connect,
         action: \.interactive.onboardingConnect,
@@ -737,30 +741,31 @@ public struct AppView: View {
         .onShake { store.send(.receivedShake) }
         .pageSheet()
     }
-    .sheet(item: self.crossPromoStore(style: .sheet)) { store in
-      CrossPromoView(store: store)
-    }
-    #if os(iOS)
-    .fullScreenCover(item: self.crossPromoStore(style: .screen)) { store in
-      CrossPromoView(store: store)
-    }
-    #endif
+    .crossPromoPresentations(
+      store: self.$store.scope(
+        state: \.destination?.crossPromo,
+        action: \.destination.crossPromo,
+      ),
+      onImageLoadFailure: Self.crossPromoImageLoadFailed,
+    )
     .killSwitch(
       store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.screen.isRunning,
     )
   }
 
-  private func crossPromoStore(
-    style: CrossPromoStyle,
-  ) -> Binding<StoreOf<CrossPromoFeature>?> {
-    let base = self.$store.scope(
-      state: \.destination?.crossPromo,
-      action: \.destination.crossPromo,
-    )
-    return Binding(
-      get: { base.wrappedValue.flatMap { $0.campaign.style == style ? $0 : nil } },
-      set: { base.wrappedValue = $0 },
+  @MainActor
+  private static func crossPromoImageLoadFailed(
+    _ campaign: CrossPromoCampaign,
+    _ image: CrossPromoImage,
+    _ error: any Error,
+  ) {
+    log(
+      .warn,
+      "670a86df",
+      detail: "cross promo image load failed"
+        + " campaign=\(campaign.campaignId) placement=\(campaign.placement)"
+        + " url=\(image.url) error=\(error)",
     )
   }
 

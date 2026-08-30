@@ -43,14 +43,25 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
         .deleteMusicPlaylist(.init(playlistId: UUID(1), expectedRevision: 2)),
       ),
       (
-        AddToMusicPlaylist.name,
+        "AddToMusicPlaylist",
         JSONEncoder().encode(AddToMusicPlaylist.Input(
           playlistId: UUID(1),
-          source: .album(albumId: "album-1"),
+          source: .artist(artistId: "artist-1"),
         )),
         .addToMusicPlaylist(.init(
           playlistId: UUID(1),
-          source: .album(albumId: "album-1"),
+          source: .artist(artistId: "artist-1"),
+        )),
+      ),
+      (
+        AddMusicBatchToPlaylist.name,
+        JSONEncoder().encode(AddMusicBatchToPlaylist.Input(
+          playlistId: UUID(1),
+          sources: [.album(albumId: "album-1")],
+        )),
+        .addMusicBatchToPlaylist(.init(
+          playlistId: UUID(1),
+          sources: [.album(albumId: "album-1")],
         )),
       ),
       (
@@ -134,6 +145,101 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
     )
     expect(entries.map(\.position)).toEqual([0, 1])
     expect(entries.map(\.preferredAlbumId)).toEqual(["album-1", "album-1"])
+  }
+
+  func testCopiesPlaylistIntoNewAndExistingPlaylists() async throws {
+    let (_, ctx) = try await self.setup(albums: [playlistResolvedAlbum(
+      id: "album-1",
+      tracks: [
+        playlistResolvedTrack(id: "track-2", albumId: "album-1", title: "Two"),
+        playlistResolvedTrack(id: "track-1", albumId: "album-1", title: "One"),
+      ],
+    )])
+    let sourceSnapshot = try await updatedSnapshot(CreateMusicPlaylist.resolve(
+      with: .init(name: "Source", source: .album(albumId: "album-1")),
+      in: ctx,
+    ))
+    let source = try XCTUnwrap(sourceSnapshot.playlists.first(where: { $0.name == "Source" }))
+
+    let copySnapshot = try await updatedSnapshot(CreateMusicPlaylist.resolve(
+      with: .init(name: "Copy", source: .playlist(playlistId: source.id)),
+      in: ctx,
+    ))
+    let copy = try XCTUnwrap(copySnapshot.playlists.first(where: { $0.name == "Copy" }))
+    expect(copy.entries.map(\.track.id)).toEqual(["track-2", "track-1"])
+
+    let destinationSnapshot = try await updatedSnapshot(CreateMusicPlaylist.resolve(
+      with: .init(
+        name: "Destination",
+        source: .track(trackId: "track-2", albumId: "album-1"),
+      ),
+      in: ctx,
+    ))
+    let destination = try XCTUnwrap(destinationSnapshot.playlists.first(where: {
+      $0.name == "Destination"
+    }))
+    let confirmationOutput = try await AddToMusicPlaylist.resolve(
+      with: .init(
+        playlistId: destination.id,
+        source: .playlist(playlistId: source.id),
+      ),
+      in: ctx,
+    )
+    let (_, confirmation) = try duplicateConfirmation(confirmationOutput)
+    expect(confirmation).toEqual(.playlist(
+      playlistId: destination.id,
+      sourcePlaylistId: source.id,
+      duplicates: [.init(trackId: "track-2", title: "Two", existingCount: 1)],
+    ))
+
+    let updated = try await updatedSnapshot(AddToMusicPlaylist.resolve(
+      with: .init(
+        playlistId: destination.id,
+        source: .playlist(playlistId: source.id),
+        duplicateResolution: .addOnlyNew,
+      ),
+      in: ctx,
+    ))
+    let updatedDestination = try XCTUnwrap(updated.playlists.first(where: {
+      $0.id == destination.id
+    }))
+    expect(updatedDestination.entries.map(\.track.id)).toEqual(["track-2", "track-1"])
+  }
+
+  func testAtomicallyCreatesPlaylistFromApprovedArtistDiscography() async throws {
+    let olderAlbum = playlistResolvedAlbum(
+      id: "older",
+      releaseDate: "2020-03-01",
+      tracks: [
+        playlistResolvedTrack(id: "older-first", albumId: "older"),
+        playlistResolvedTrack(id: "shared", albumId: "older"),
+      ],
+    )
+    let newestAlbum = playlistResolvedAlbum(
+      id: "newest",
+      releaseDate: "2025-06-01",
+      tracks: [
+        playlistResolvedTrack(id: "newest-first", albumId: "newest"),
+        playlistResolvedTrack(id: "shared", albumId: "newest"),
+      ],
+    )
+    let artist = Music.ResolvedArtist(
+      id: "artist-1",
+      name: "Artist",
+      topSongs: [],
+      albums: [olderAlbum, newestAlbum],
+    )
+    let (_, ctx) = try await self.setup(artists: [artist])
+
+    let output = try await CreateMusicPlaylist.resolve(
+      with: .init(name: "Artist", source: .artist(artistId: artist.id.rawValue)),
+      in: ctx,
+    )
+    let snapshot = try updatedSnapshot(output)
+
+    expect(snapshot.playlists.first?.entries.map(\.track.id)).toEqual([
+      "newest-first", "shared", "older-first",
+    ])
   }
 
   func testRejectsCraftedUnapprovedSelectionAndInvalidName() async throws {
@@ -258,6 +364,65 @@ final class MusicPlaylistMutationResolverTests: ApiTestCase, @unchecked Sendable
 
     expect(updated.playlists.first?.entries.map(\.track.id)).toEqual([
       "track-2", "track-1", "track-3",
+    ])
+  }
+
+  func testBatchDuplicateChoicesCollapseOverlappingSelections() async throws {
+    let (_, ctx) = try await self.setup(albums: [playlistResolvedAlbum(
+      id: "album-1",
+      tracks: [
+        playlistResolvedTrack(id: "track-1", albumId: "album-1", title: "One"),
+        playlistResolvedTrack(id: "track-2", albumId: "album-1", title: "Two"),
+        playlistResolvedTrack(id: "track-3", albumId: "album-1", title: "Three"),
+      ],
+    )])
+    let created = try await updatedSnapshot(CreateMusicPlaylist.resolve(
+      with: .init(
+        name: "Partial",
+        source: .track(trackId: "track-2", albumId: "album-1"),
+      ),
+      in: ctx,
+    ))
+    let playlist = try XCTUnwrap(created.playlists.first)
+    let sources: [MusicPlaylistSourceSelection] = [
+      .track(trackId: "track-1", albumId: "album-1"),
+      .album(albumId: "album-1"),
+    ]
+
+    let confirmationOutput = try await AddMusicBatchToPlaylist.resolve(
+      with: .init(playlistId: playlist.id, sources: sources),
+      in: ctx,
+    )
+    let (_, confirmation) = try batchDuplicateConfirmation(confirmationOutput)
+    expect(confirmation).toEqual(.init(
+      playlistId: playlist.id,
+      duplicates: [.init(trackId: "track-2", title: "Two", existingCount: 1)],
+    ))
+
+    let updated = try await updatedSnapshot(AddMusicBatchToPlaylist.resolve(
+      with: .init(
+        playlistId: playlist.id,
+        sources: sources,
+        duplicateResolution: .addOnlyNew,
+      ),
+      in: ctx,
+    ))
+
+    expect(updated.playlists.first?.entries.map(\.track.id)).toEqual([
+      "track-2", "track-1", "track-3",
+    ])
+
+    let addedAll = try await updatedSnapshot(AddMusicBatchToPlaylist.resolve(
+      with: .init(
+        playlistId: playlist.id,
+        sources: sources,
+        duplicateResolution: .addAll,
+      ),
+      in: ctx,
+    ))
+
+    expect(addedAll.playlists.first?.entries.map(\.track.id)).toEqual([
+      "track-2", "track-1", "track-3", "track-1", "track-2", "track-3",
     ])
   }
 
@@ -450,6 +615,18 @@ private func duplicateConfirmation(
   return (snapshot, confirmation)
 }
 
+private func batchDuplicateConfirmation(
+  _ output: MusicPlaylistMutationOutput,
+  file: StaticString = #filePath,
+  line: UInt = #line,
+) throws -> (MusicLibrarySnapshot, MusicPlaylistBatchDuplicateConfirmation) {
+  guard case .batchDuplicateConfirmationRequired(let snapshot, let confirmation) = output else {
+    XCTFail("expected batch duplicate confirmation", file: file, line: line)
+    throw PlaylistMutationTestError.unexpectedOutput
+  }
+  return (snapshot, confirmation)
+}
+
 private enum PlaylistMutationTestError: Error {
   case unexpectedOutput
 }
@@ -457,6 +634,7 @@ private enum PlaylistMutationTestError: Error {
 private func playlistResolvedAlbum(
   id: Music.AlbumId,
   title: String = "Album",
+  releaseDate: String? = nil,
   tracks: [Music.ResolvedTrack],
 ) -> Music.ResolvedAlbum {
   .init(
@@ -465,6 +643,7 @@ private func playlistResolvedAlbum(
     artistName: "Artist",
     artistIds: ["artist-1"],
     trackCount: tracks.count,
+    releaseDate: releaseDate,
     tracks: tracks,
   )
 }

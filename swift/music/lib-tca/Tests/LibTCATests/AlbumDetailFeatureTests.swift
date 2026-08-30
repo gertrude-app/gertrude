@@ -21,7 +21,7 @@ struct AlbumDetailFeatureTests {
   }
 
   @Test
-  func playTappedRequestsAlbumQueuePlaybackFromFirstTrack() async {
+  func playTappedRequestsCollectionPlayback() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let store = TestStore(initialState: .init(album: album)) {
       AlbumDetailFeature()
@@ -30,7 +30,7 @@ struct AlbumDetailFeatureTests {
     await store.send(.playTapped)
     await store.receive(.delegate(.playNow(
       items: playbackItems(album: album),
-      startIndex: 0,
+      start: .collection,
     )))
   }
 
@@ -45,7 +45,21 @@ struct AlbumDetailFeatureTests {
     await store.send(.trackTapped(track.id))
     await store.receive(.delegate(.playNow(
       items: playbackItems(album: album),
-      startIndex: 2,
+      start: .selectedEntry(index: 2),
+    )))
+  }
+
+  @Test
+  func firstTrackTappedRequestsSelectedEntryPlayback() async {
+    let album = ApprovedMusicLibrary.mock.albums[0]
+    let store = TestStore(initialState: .init(album: album)) {
+      AlbumDetailFeature()
+    }
+
+    await store.send(.trackTapped(album.tracks[0].id))
+    await store.receive(.delegate(.playNow(
+      items: playbackItems(album: album),
+      start: .selectedEntry(index: 0),
     )))
   }
 
@@ -157,7 +171,7 @@ struct AlbumDetailFeatureTests {
     await store.send(.playTapped)
     await store.receive(.delegate(.playNow(
       items: playbackItems(album: album),
-      startIndex: 0,
+      start: .collection,
     )))
   }
 

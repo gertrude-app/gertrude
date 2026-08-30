@@ -11,7 +11,7 @@ extension MusicRoute: RouteResponder {
         .where(.value == uuid)
         .first(in: context.db, orThrow: context.error(
           id: "2b2a110a",
-          type: .unauthorized,
+          type: .loggedOut,
           debugMessage: "music app token not found",
         ))
 
@@ -20,7 +20,7 @@ extension MusicRoute: RouteResponder {
       guard let child = try await device.child(in: context.db) else {
         throw context.error(
           id: "364b4b8d",
-          type: .unauthorized,
+          type: .loggedOut,
           debugMessage: "music device has no associated child",
         )
       }
@@ -38,6 +38,9 @@ extension MusicRoute: RouteResponder {
 
     case .unauthed(let unauthed):
       switch unauthed {
+      case .crossPromos(let input):
+        let output = try await CrossPromos.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       case .getMusicAppStatus(let input):
         let output = try await GetMusicAppStatus.resolve(with: input, in: context)
         return try await self.respond(with: output)

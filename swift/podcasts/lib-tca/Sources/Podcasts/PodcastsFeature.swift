@@ -1,4 +1,6 @@
 import ComposableArchitecture
+import GertieApp
+import GertieTcaFeatures
 import LibViews
 import SQLiteData
 import SwiftUI
@@ -34,7 +36,7 @@ struct PodcastsFeature {
     case show(ShowFeature)
     case settings(SettingsFeature)
     case confirm(ConfirmationDialogState<ConfirmAction>)
-    case requestReview(RequestReviewFeature)
+    case requestReview(AppStoreReviewFeature)
   }
 
   enum Action: Equatable {
@@ -54,6 +56,8 @@ struct PodcastsFeature {
     case confirmDelete(show: Show.ID)
     case confirmTrialEnding
   }
+
+  static let appStoreID = GertrudeIOSApp.podcasts.appStoreAppleId
 
   @Dependency(\.db) var database
   @Dependency(\.continuousClock) var clock
@@ -162,7 +166,19 @@ struct PodcastsFeature {
         }
 
       case .promptReview:
-        state.destination = .requestReview(.init())
+        state.destination = .requestReview(.init(appStoreID: Self.appStoreID))
+        return .none
+
+      case .destination(.presented(.requestReview(.giveRatingButtonTapped))):
+        log(.info, .review, "71393f94")
+        return .none
+
+      case .destination(.presented(.requestReview(.leaveReviewButtonTapped))):
+        log(.info, .review, "b96de934")
+        return .none
+
+      case .destination(.presented(.requestReview(.noThanksButtonTapped))):
+        log(.info, .review, "ecef1f7f")
         return .none
 
       case .destination(.dismiss):

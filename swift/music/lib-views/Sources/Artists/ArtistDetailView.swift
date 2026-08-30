@@ -9,6 +9,7 @@ public struct ArtistDetailView: View {
   private let isPlaying: Bool
   private let isLoading: Bool
   private let isCurrentTrackPlaying: Bool
+  private let onAddToPlaylist: @MainActor @Sendable () -> Void
   private let onAddToQueue: @MainActor @Sendable () -> Void
   private let onPlayNext: @MainActor @Sendable () -> Void
   private let onPlayTap: @MainActor @Sendable () -> Void
@@ -30,6 +31,7 @@ public struct ArtistDetailView: View {
     isPlaying: Bool = false,
     isLoading: Bool = false,
     isCurrentTrackPlaying: Bool = false,
+    onAddToPlaylist: @MainActor @escaping @Sendable () -> Void = {},
     onAddToQueue: @MainActor @escaping @Sendable () -> Void = {},
     onPlayNext: @MainActor @escaping @Sendable () -> Void = {},
     onPlayTap: @MainActor @escaping @Sendable () -> Void = {},
@@ -50,6 +52,7 @@ public struct ArtistDetailView: View {
     self.isPlaying = isPlaying
     self.isLoading = isLoading
     self.isCurrentTrackPlaying = isCurrentTrackPlaying
+    self.onAddToPlaylist = onAddToPlaylist
     self.onAddToQueue = onAddToQueue
     self.onPlayNext = onPlayNext
     self.onPlayTap = onPlayTap
@@ -136,11 +139,16 @@ public struct ArtistDetailView: View {
             Label("Add to Queue", systemImage: "text.badge.plus")
           }
           .tint(.primary)
+
+          Button(action: self.onAddToPlaylist) {
+            Label("Add to Playlist", systemImage: "music.note.list")
+          }
+          .tint(.primary)
         } label: {
           Label("Artist Actions", systemImage: "ellipsis")
         }
         .tint(.primary)
-        .disabled(self.topSongs.isEmpty)
+        .disabled(self.releases.isEmpty)
       }
     }
   }

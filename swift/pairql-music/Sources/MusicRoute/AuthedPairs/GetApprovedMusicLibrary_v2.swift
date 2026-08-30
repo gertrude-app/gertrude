@@ -265,9 +265,14 @@ public struct GetApprovedMusicLibrary_v2: Pair {
 
   public struct Input: PairInput {
     public var knownRevision: Int64?
+    public var storefront: String?
 
-    public init(knownRevision: Int64? = nil) {
+    public init(
+      knownRevision: Int64? = nil,
+      storefront: String? = nil,
+    ) {
       self.knownRevision = knownRevision
+      self.storefront = storefront
     }
   }
 

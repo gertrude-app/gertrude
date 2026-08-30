@@ -238,6 +238,13 @@ struct ApprovedMusicArtwork: Codable, Equatable, Sendable {
     self.textColor3 = textColor3
     self.textColor4 = textColor4
   }
+
+  var artworkURL: URL? {
+    guard var url = self.url else { return nil }
+    url = url.replacingOccurrences(of: "{w}", with: "600")
+    url = url.replacingOccurrences(of: "{h}", with: "600")
+    return URL(string: url)
+  }
 }
 
 struct ApprovedMusicEditorialNotes: Codable, Equatable, Sendable {

@@ -1,6 +1,12 @@
 import Foundation
 import GertieUI
+import OSLog
 import SwiftUI
+
+private let queueArtworkLogger = Logger(
+  subsystem: "com.netrivet.gertrude.music",
+  category: "QueueArtwork",
+)
 
 public struct PlaybackQueueEntryData: Equatable, Identifiable, Sendable {
   public let id: String
@@ -63,7 +69,9 @@ public struct PlaybackQueueView: View {
     self.isPlaying = isPlaying
     self.hasQueuedEntries = !queuedEntries.isEmpty
     self.rows = rows
-    self.displayRows = PlaybackQueueDisplayRow.makeRows(rows)
+    self.displayRows = PlaybackQueueDisplayRow.makeRows(
+      PlaybackQueueListRow.visibleRows(rows),
+    )
     self.onClearQueue = onClearQueue
     self.onRemove = onRemove
     self.onReorder = onReorder
@@ -142,6 +150,22 @@ public struct PlaybackQueueView: View {
         .tint(.primary)
       }
     }
+    .task(id: self.missingArtworkDiagnostic) {
+      guard !self.missingArtworkDiagnostic.isEmpty else { return }
+      queueArtworkLogger.notice(
+        "Queue entries missing artwork metadata: \(self.missingArtworkDiagnostic, privacy: .public)",
+      )
+    }
+  }
+
+  private var missingArtworkDiagnostic: String {
+    ([self.currentEntry] + self.rows.compactMap { row in
+      guard case .entry(let entry) = row else { return nil }
+      return entry
+    })
+    .filter { $0.artworkURL == nil }
+    .map { "\($0.id)|\($0.title)|\($0.artist)" }
+    .joined(separator: "; ")
   }
 
   private func move(fromOffsets: IndexSet, toOffset: Int) {
@@ -155,6 +179,8 @@ public struct PlaybackQueueView: View {
 }
 
 enum PlaybackQueueListRow: Equatable, Identifiable {
+  private static let maximumVisibleContextEntries = 10
+
   enum ID: Hashable {
     case contextHeader
     case entry(String)
@@ -183,6 +209,16 @@ enum PlaybackQueueListRow: Equatable, Identifiable {
       rows.append(contentsOf: contextEntries.map(Self.entry))
     }
     return rows
+  }
+
+  static func visibleRows(_ rows: [Self]) -> [Self] {
+    guard let contextHeaderIndex = rows.firstIndex(where: {
+      if case .contextHeader = $0 { return true }
+      return false
+    }) else { return rows }
+    return Array(rows.prefix(
+      contextHeaderIndex + 1 + Self.maximumVisibleContextEntries,
+    ))
   }
 
   static func order(

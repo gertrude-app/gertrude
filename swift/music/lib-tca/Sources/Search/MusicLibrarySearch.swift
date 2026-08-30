@@ -3,9 +3,19 @@ import LibViews
 
 struct MusicLibrarySearch: Equatable, Sendable {
   private var documents: [Document]
+  private var library: ApprovedMusicLibrary?
 
   init(library: ApprovedMusicLibrary? = nil) {
     self.documents = library.map(Self.documents) ?? []
+    self.library = library
+  }
+
+  func artistDiscographyPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    self.library?.artistDiscographyPlaybackItems(for: artistID) ?? []
+  }
+
+  func artistTopSongsPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    self.library?.artistTopSongsPlaybackItems(for: artistID) ?? []
   }
 
   func result(id: MusicSearchResult.ID) -> MusicSearchResult? {

@@ -11,14 +11,18 @@ struct ApiClient: Sendable {
   var addToMusicPlaylist:
     @Sendable (_ token: UUID, _ input: AddToMusicPlaylist.Input) async throws
     -> AddToMusicPlaylist.Output
+  var addMusicBatchToPlaylist:
+    @Sendable (_ token: UUID, _ input: AddMusicBatchToPlaylist.Input) async throws
+    -> AddMusicBatchToPlaylist.Output
   var createMusicPlaylist:
     @Sendable (_ token: UUID, _ input: CreateMusicPlaylist.Input) async throws
     -> CreateMusicPlaylist.Output
+  var crossPromos: @Sendable () async throws -> CrossPromos.Output = { .init(promos: []) }
   var deleteMusicPlaylist:
     @Sendable (_ token: UUID, _ input: DeleteMusicPlaylist.Input) async throws
     -> DeleteMusicPlaylist.Output
   var getApprovedMusicLibrary:
-    @Sendable (_ token: UUID, _ knownRevision: Int64?) async throws
+    @Sendable (_ token: UUID, _ knownRevision: Int64?, _ storefront: String?) async throws
     -> GetApprovedMusicLibrary_v2.Output
   var getMusicAppStatus: @Sendable () async throws -> GetMusicAppStatus_v2.Output
   var removeMusicPlaylistEntry:
@@ -42,11 +46,34 @@ extension ApiClient: DependencyKey {
           token: token,
         )
       },
+      addMusicBatchToPlaylist: { token, input in
+        try await pairql.call(
+          AddMusicBatchToPlaylist.self,
+          authed: .addMusicBatchToPlaylist(input),
+          token: token,
+        )
+      },
       createMusicPlaylist: { token, input in
         try await pairql.call(
           CreateMusicPlaylist.self,
           authed: .createMusicPlaylist(input),
           token: token,
+        )
+      },
+      crossPromos: {
+        @Dependency(\.device) var device
+        @Dependency(\.locale) var locale
+        let (deviceId, iosVersion, modelIdentifier, appVersion) = await device.data()
+        guard let deviceId else { return .init(promos: []) }
+        return try await pairql.call(
+          CrossPromos.self,
+          unauthed: .crossPromos(.init(
+            deviceId: deviceId,
+            appVersion: appVersion,
+            modelIdentifier: modelIdentifier,
+            iosVersion: iosVersion,
+            locale: locale.identifier,
+          )),
         )
       },
       deleteMusicPlaylist: { token, input in
@@ -56,8 +83,11 @@ extension ApiClient: DependencyKey {
           token: token,
         )
       },
-      getApprovedMusicLibrary: { token, knownRevision in
-        let input = GetApprovedMusicLibrary_v2.Input(knownRevision: knownRevision)
+      getApprovedMusicLibrary: { token, knownRevision, storefront in
+        let input = GetApprovedMusicLibrary_v2.Input(
+          knownRevision: knownRevision,
+          storefront: storefront,
+        )
         return try await pairql.call(
           GetApprovedMusicLibrary_v2.self,
           authed: .getApprovedMusicLibrary_v2(input),

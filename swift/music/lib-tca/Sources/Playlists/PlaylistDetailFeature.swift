@@ -27,6 +27,7 @@ struct PlaylistDetailFeature {
 
   enum Action: Equatable {
     enum DelegateAction: Equatable {
+      case addToPlaylist
       case addEntryToPlaylist(MusicPlaylistEntry.ID)
       case addMusic
       case addToQueue(items: [PlaybackItem])
@@ -34,7 +35,7 @@ struct PlaylistDetailFeature {
       case dismissPlaybackFailure
       case playbackFailureActionTapped
       case playNext(items: [PlaybackItem])
-      case playNow(items: [PlaybackItem], startIndex: Int)
+      case playNow(items: [PlaybackItem], start: PlaybackStartIntent)
       case removeEntry(MusicPlaylistEntry.ID)
       case rename(String)
       case reorder([MusicPlaylistEntry.ID])
@@ -42,6 +43,7 @@ struct PlaylistDetailFeature {
     }
 
     case addMusicTapped
+    case addToPlaylistTapped
     case addToQueueTapped
     case delegate(DelegateAction)
     case deleteTapped
@@ -63,6 +65,10 @@ struct PlaylistDetailFeature {
       switch action {
       case .addMusicTapped:
         return .send(.delegate(.addMusic))
+
+      case .addToPlaylistTapped:
+        guard !state.playlist.entries.isEmpty else { return .none }
+        return .send(.delegate(.addToPlaylist))
 
       case .addToQueueTapped:
         guard !state.playbackItems.isEmpty else { return .none }
@@ -86,7 +92,7 @@ struct PlaylistDetailFeature {
           return .send(.delegate(.togglePlayPause))
         }
         guard !state.playbackItems.isEmpty else { return .none }
-        return .send(.delegate(.playNow(items: state.playbackItems, startIndex: 0)))
+        return .send(.delegate(.playNow(items: state.playbackItems, start: .collection)))
 
       case .removeEntryTapped(let entryID):
         guard state.playlist.entries.contains(where: { $0.id == entryID }) else { return .none }
@@ -118,7 +124,10 @@ struct PlaylistDetailFeature {
         if state.currentEntryID == entryID {
           return .send(.delegate(.togglePlayPause))
         }
-        return .send(.delegate(.playNow(items: state.playbackItems, startIndex: startIndex)))
+        return .send(.delegate(.playNow(
+          items: state.playbackItems,
+          start: .selectedEntry(index: startIndex),
+        )))
 
       case .delegate:
         return .none

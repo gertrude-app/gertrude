@@ -19,6 +19,71 @@ struct PlaybackSessionCacheClientTests {
   }
 
   @Test
+  func playbackContextPersistsArtistSourceAndDecodesLegacyContext() throws {
+    let context = PlaybackContext(
+      identity: .init(kind: .artist, id: "artist"),
+      title: "Artist",
+      artistSource: .topSongs,
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackContext.self,
+      from: JSONEncoder().encode(context),
+    )
+    let legacy = try JSONDecoder().decode(
+      PlaybackContext.self,
+      from: Data(#"{"identity":{"id":"artist","kind":"artist"},"title":"Artist"}"#.utf8),
+    )
+
+    expectNoDifference(decoded, context)
+    expectNoDifference(
+      legacy,
+      PlaybackContext(identity: context.identity, title: context.title),
+    )
+  }
+
+  @Test
+  func roundTripsFullPlaybackSource() throws {
+    let items = [
+      playbackItem("first"),
+      playbackItem("duplicate"),
+      playbackItem("duplicate"),
+    ]
+    let context = PlaybackContext(
+      identity: .init(kind: .playlist, id: "playlist"),
+      title: "Playlist",
+    )
+    var playbackSource = PlaybackSource(
+      items: items,
+      selectedIndex: 1,
+      context: context,
+    )
+    playbackSource.remove(2)
+    let infinitePlaybackPlan = InfinitePlaybackPlan(
+      remainingSourceEntryIDs: [0],
+      generatedItems: [playbackItem("generated")],
+    )
+    let checkpoint = PlaybackCheckpoint(
+      session: .init(queue: .init(items: Array(items.dropFirst()))),
+      infinitePlaybackPlan: infinitePlaybackPlan,
+      playbackSource: playbackSource,
+      context: context,
+      progress: .zero,
+      sourceAlbumIDs: [:],
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackCheckpoint.self,
+      from: JSONEncoder().encode(checkpoint),
+    )
+
+    expectNoDifference(decoded.infinitePlaybackPlan, infinitePlaybackPlan)
+    expectNoDifference(decoded.playbackSource, playbackSource)
+    expectNoDifference(decoded.activeQueue.infinitePlaybackPlan, infinitePlaybackPlan)
+    expectNoDifference(decoded.activeQueue.playbackSource, playbackSource)
+  }
+
+  @Test
   func returnsNilWhenCacheIsMissing() throws {
     let directory = try temporaryDirectory(named: "returnsNilWhenCacheIsMissing")
     defer { try? FileManager.default.removeItem(at: directory) }
@@ -55,6 +120,18 @@ struct PlaybackSessionCacheClientTests {
     let loaded = try playbackCheckpointCache(directory: directory).load(childId: childId)
 
     expectNoDifference(loaded, nil)
+  }
+
+  @Test
+  func rejectsSourceOccurrenceIdentityWithoutSource() {
+    let checkpoint = PlaybackCheckpoint(
+      songIDs: ["track"],
+      currentIndex: 0,
+      elapsedTime: 0,
+      sourceEntryIDs: [0],
+    )
+
+    #expect(!checkpoint.isValid)
   }
 
   @Test
@@ -159,6 +236,7 @@ struct PlaybackSessionCacheClientTests {
       checkpoint,
       PlaybackCheckpoint(
         songIDs: ["current", "up-next"],
+        albumIDs: ["album-current", "album-next"],
         currentIndex: 0,
         elapsedTime: 42,
         durationFallback: 180,
@@ -168,6 +246,31 @@ struct PlaybackSessionCacheClientTests {
         ],
       ),
     )
+  }
+
+  @Test
+  func checkpointPersistsAlbumPerDuplicateOccurrence() throws {
+    let session = PlaybackFeature.Session(
+      playStatus: .paused,
+      queue: .init(items: [
+        playbackItem("duplicate").withAlbumID("album-a"),
+        playbackItem("duplicate").withAlbumID("album-b"),
+      ]),
+    )
+    let checkpoint = PlaybackCheckpoint(
+      session: session,
+      progress: .zero,
+      sourceAlbumIDs: ["duplicate": "album-b"],
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackCheckpoint.self,
+      from: JSONEncoder().encode(checkpoint),
+    )
+
+    expectNoDifference(decoded.albumIDs, ["album-a", "album-b"])
+    expectNoDifference(decoded.albumID(at: 0), "album-a")
+    expectNoDifference(decoded.albumID(at: 1), "album-b")
   }
 
   @Test
@@ -192,9 +295,62 @@ struct PlaybackSessionCacheClientTests {
   }
 
   @Test
+  func checkpointPersistsSourceOccurrenceIdentity() throws {
+    let duplicate = playbackItem("duplicate")
+    let source = PlaybackSource(
+      items: [duplicate, duplicate],
+      selectedIndex: 0,
+      context: nil,
+    )
+    let entries = [
+      PlaybackQueueEntry(
+        id: "first",
+        item: duplicate.withQueueRole(.context),
+        sourceEntryID: 0,
+      ),
+      PlaybackQueueEntry(
+        id: "explicit",
+        item: playbackItem("explicit").withQueueRole(.queued),
+      ),
+      PlaybackQueueEntry(
+        id: "second",
+        item: duplicate.withQueueRole(.context),
+        sourceEntryID: 1,
+      ),
+    ]
+    let queue = try #require(PlaybackFeature.Queue(
+      entries: entries,
+      currentEntryID: "first",
+    ))
+    let checkpoint = PlaybackCheckpoint(
+      session: .init(queue: queue),
+      playbackSource: source,
+      progress: .zero,
+      sourceAlbumIDs: [:],
+    )
+
+    let decoded = try JSONDecoder().decode(
+      PlaybackCheckpoint.self,
+      from: JSONEncoder().encode(checkpoint),
+    )
+
+    expectNoDifference(decoded.sourceEntryIDs, [0, nil, 1])
+    expectNoDifference(decoded.playbackSource, source)
+  }
+
+  @Test
   func existingCheckpointNormalizesToCurrentAndUpcomingItems() {
     let currentSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(2))
     let nextSource = PlaylistPlaybackSource(playlistID: UUID(1), entryID: UUID(3))
+    let playbackSource = PlaybackSource(
+      items: [
+        playbackItem("consumed"),
+        playbackItem("current"),
+        playbackItem("up-next"),
+      ],
+      selectedIndex: 0,
+      context: nil,
+    )
     let checkpoint = PlaybackCheckpoint(
       songIDs: ["consumed", "current", "up-next"],
       currentIndex: 1,
@@ -204,7 +360,9 @@ struct PlaybackSessionCacheClientTests {
         .init(songID: "consumed", albumID: "album-consumed"),
         .init(songID: "current", albumID: "album-current"),
       ],
+      playbackSource: playbackSource,
       playlistSourceHints: [nil, currentSource, nextSource],
+      sourceEntryIDs: [0, 1, 2],
     )
 
     expectNoDifference(
@@ -217,7 +375,9 @@ struct PlaybackSessionCacheClientTests {
         sourceAlbumHints: [
           .init(songID: "current", albumID: "album-current"),
         ],
+        playbackSource: playbackSource,
         playlistSourceHints: [currentSource, nextSource],
+        sourceEntryIDs: [1, 2],
       ),
     )
   }
@@ -270,6 +430,10 @@ struct PlaybackSessionCacheClientTests {
       from: JSONEncoder().encode(previousCheckpoint),
     )
 
+    expectNoDifference(decoded.albumIDs, nil)
+    expectNoDifference(decoded.albumID(at: 0), "album-1")
+    expectNoDifference(decoded.playbackSource, nil)
+    expectNoDifference(decoded.sourceEntryIDs, nil)
     expectNoDifference(
       decoded,
       PlaybackCheckpoint(

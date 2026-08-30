@@ -25,7 +25,9 @@ private struct LibraryPresentationModifier: ViewModifier {
         AddToPlaylistSheet(
           playlists: self.playlists,
           duplicatePrompt: self.duplicatePrompt,
-          errorMessage: self.store.playlistMutationFailure?.message,
+          errorMessage: self.store.playlistMutationFailure?.addToPlaylistMessage,
+          errorTitle: self.store.playlistMutationFailure?.addMusicTitle ?? "Couldn’t add music",
+          errorTone: self.store.playlistMutationFailure?.tone ?? .error,
           isMutating: self.store.isPlaylistMutationInFlight,
           onCancel: { self.store.send(.addToPlaylistCancelled) },
           onCreatePlaylist: { self.store.send(.addToPlaylistCreateSubmitted($0)) },
@@ -40,16 +42,26 @@ private struct LibraryPresentationModifier: ViewModifier {
               self.store.send(.addToPlaylistDuplicateResolutionSelected(.addOnlyNew))
             }
           },
+          onErrorDismissTap: {
+            self.store.send(.playlistMutationFailureDismissed)
+          },
           onSelectPlaylist: {
             guard let id = UUID(uuidString: $0) else { return }
             self.store.send(.addToPlaylistDestinationSelected(.init(rawValue: id)))
           },
         )
       }
-      .alert("Couldn’t Update Playlist", isPresented: self.mutationFailureBinding) {
-        Button("OK", role: .cancel) {}
-      } message: {
-        Text(self.store.playlistMutationFailure?.message ?? "Please try again.")
+      .sheet(item: self.playlistMusicPickerBinding) { store in
+        PlaylistMusicPickerViewContainer(
+          store: store,
+          errorMessage: self.store.playlistMutationFailure?.musicPickerMessage,
+          errorTitle: self.store.playlistMutationFailure?.addMusicTitle ?? "Couldn’t add music",
+          errorTone: self.store.playlistMutationFailure?.tone ?? .error,
+          isMutating: self.store.isPlaylistMutationInFlight,
+          onErrorDismissTap: {
+            self.store.send(.playlistMutationFailureDismissed)
+          },
+        )
       }
   }
 
@@ -64,16 +76,16 @@ private struct LibraryPresentationModifier: ViewModifier {
     )
   }
 
-  private var mutationFailureBinding: Binding<Bool> {
-    Binding(
-      get: {
-        self.isEnabled
-          && self.store.addToPlaylist == nil
-          && self.store.playlistMutationFailure != nil
-      },
-      set: { isPresented in
-        if !isPresented {
-          self.store.send(.playlistMutationFailureDismissed)
+  private var playlistMusicPickerBinding: Binding<StoreOf<PlaylistMusicPickerFeature>?> {
+    let binding = self.$store.scope(
+      state: \.playlistMusicPicker,
+      action: \.playlistMusicPicker,
+    )
+    return Binding(
+      get: { self.isEnabled ? binding.wrappedValue : nil },
+      set: { store in
+        if self.isEnabled {
+          binding.wrappedValue = store
         }
       },
     )
@@ -81,7 +93,15 @@ private struct LibraryPresentationModifier: ViewModifier {
 
   private var playlists: [PlaylistData] {
     guard case .loaded(let library) = self.store.status else { return [] }
-    return library.playlists.map(PlaylistData.init)
+    let sourcePlaylistID: UUID? = if case .playlist(let playlistID) =
+      self.store.addToPlaylist?.source {
+      playlistID
+    } else {
+      nil
+    }
+    return library.playlists
+      .filter { $0.id.rawValue != sourcePlaylistID }
+      .map(PlaylistData.init)
   }
 
   private var duplicatePrompt: PlaylistDuplicatePrompt? {
@@ -91,20 +111,67 @@ private struct LibraryPresentationModifier: ViewModifier {
     case .track(let playlistID, let duplicate):
       guard let playlist = library.playlist(id: .init(rawValue: playlistID)) else { return nil }
       return .track(trackTitle: duplicate.title, playlistName: playlist.name)
-    case .album(let playlistID, _, let duplicates):
+    case .album(let playlistID, _, let duplicates),
+         .artist(let playlistID, _, let duplicates),
+         .playlist(let playlistID, _, let duplicates):
       guard let playlist = library.playlist(id: .init(rawValue: playlistID)) else { return nil }
       return .album(playlistName: playlist.name, duplicateCount: duplicates.count)
     }
   }
 }
 
-private extension LibraryFeature.PlaylistMutationFailure {
+extension LibraryFeature.PlaylistMutationFailure {
+  var addToPlaylistMessage: String {
+    switch self {
+    case .conflict:
+      self.message
+    case .failed:
+      "The music wasn’t added. Please try again."
+    }
+  }
+
+  var musicPickerMessage: String {
+    switch self {
+    case .conflict:
+      self.message
+    case .failed:
+      "Your selection is still here. Try adding it again."
+    }
+  }
+
+  var addMusicTitle: String {
+    switch self {
+    case .conflict:
+      self.title
+    case .failed:
+      "Couldn’t add music"
+    }
+  }
+
   var message: String {
     switch self {
     case .conflict:
       "This playlist changed on another device. The latest version is now shown."
     case .failed:
       "Your change wasn’t saved. Please try again."
+    }
+  }
+
+  var title: String {
+    switch self {
+    case .conflict:
+      "Playlist changed"
+    case .failed:
+      "Couldn’t update playlist"
+    }
+  }
+
+  var tone: NoticeBannerTone {
+    switch self {
+    case .conflict:
+      .information
+    case .failed:
+      .error
     }
   }
 }

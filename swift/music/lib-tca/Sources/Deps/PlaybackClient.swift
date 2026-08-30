@@ -77,6 +77,7 @@ struct PlaybackClient: Sendable {
   var restoreQueue: @Sendable (_ checkpoint: PlaybackCheckpoint) async throws -> PlaybackSnapshot
   var resume: @Sendable () async throws -> Void
   var seek: @Sendable (_ time: TimeInterval) async -> Void
+  var setRepeatsCurrentEntry: @Sendable (_ repeatsCurrentEntry: Bool) async -> Void
   var setUpcoming: @Sendable (_ entries: [PlaybackQueueEntry]) async throws -> PlaybackSnapshot
   var skipToNext: @Sendable () async throws -> PlaybackSkipOutcome
   var skipToPrevious: @Sendable () async throws -> Void
@@ -138,6 +139,9 @@ extension PlaybackClient {
       seek: { time in
         await Self.seekPlayback(to: time)
       },
+      setRepeatsCurrentEntry: { repeatsCurrentEntry in
+        await Self.setPlaybackRepeatsCurrentEntry(repeatsCurrentEntry)
+      },
       setUpcoming: { entries in
         try await Self.setUpcoming(entries)
       },
@@ -165,6 +169,7 @@ extension PlaybackClient {
     restoreQueue: { _ in .empty },
     resume: {},
     seek: { _ in },
+    setRepeatsCurrentEntry: { _ in },
     setUpcoming: { _ in .empty },
     skipToNext: { .advanced },
     skipToPrevious: {},
@@ -218,6 +223,9 @@ extension PlaybackClient {
       },
       seek: { time in
         await state.seek(to: time)
+      },
+      setRepeatsCurrentEntry: { repeatsCurrentEntry in
+        await state.setRepeatsCurrentEntry(repeatsCurrentEntry)
       },
       setUpcoming: { entries in
         await state.setUpcoming(entries)
@@ -319,8 +327,6 @@ extension PlaybackClient {
       player.stop()
       try Task.checkCancellation()
       player.queue = ApplicationMusicPlayer.Queue(entries, startingAt: firstEntry)
-      try Task.checkCancellation()
-      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
       try Task.checkCancellation()
       do {
         try await ApplicationMusicPlayer.shared.play()
@@ -444,7 +450,8 @@ extension PlaybackClient {
         return self.playbackSnapshot(for: player)
       }
       var availableEntries = Array(entries.dropFirst(currentIndex + 1))
-      var matchedEntries: [MusicKit.MusicPlayer.Queue.Entry] = []
+      var plannedEntries: [MusicKit.MusicPlayer.Queue.Entry?] = []
+      var newItems: [PlaybackItem] = []
       for requestedEntry in requestedEntries {
         let matchingIndex = availableEntries.firstIndex(where: {
           $0.id == requestedEntry.id
@@ -452,17 +459,39 @@ extension PlaybackClient {
         }) ?? availableEntries.firstIndex(where: {
           self.playbackQueueEntry(for: $0)?.item.id == requestedEntry.item.id
         })
-        guard let matchingIndex else { return self.playbackSnapshot(for: player) }
-        matchedEntries.append(availableEntries.remove(at: matchingIndex))
+        if let matchingIndex {
+          plannedEntries.append(availableEntries.remove(at: matchingIndex))
+        } else {
+          plannedEntries.append(nil)
+          newItems.append(requestedEntry.item)
+        }
+      }
+      let resolvedNewEntries: [MusicKit.MusicPlayer.Queue.Entry]
+      if newItems.isEmpty {
+        resolvedNewEntries = []
+      } else {
+        try await self.requestAuthorization()
+        try Task.checkCancellation()
+        try await self.ensureSubscriptionAllowsPlayback()
+        try Task.checkCancellation()
+        resolvedNewEntries = try await self.songs(for: newItems).map {
+          MusicKit.MusicPlayer.Queue.Entry($0)
+        }
+      }
+      var newEntryIterator = resolvedNewEntries.makeIterator()
+      let resolvedEntries = plannedEntries.compactMap { entry in
+        entry ?? newEntryIterator.next()
+      }
+      guard resolvedEntries.count == requestedEntries.count else {
+        throw PlaybackClientError.playbackFailed(.init(summary: "updated queue unresolved"))
       }
       var updatedEntries = player.queue.entries
       updatedEntries.replaceSubrange(
         (currentIndex + 1)...,
-        with: matchedEntries,
+        with: resolvedEntries,
       )
       try Task.checkCancellation()
       player.queue.entries = updatedEntries
-      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
       let snapshot = try await self.playbackSnapshot(
         for: player,
         matchingCurrentItemID: currentItemID,
@@ -521,7 +550,6 @@ extension PlaybackClient {
       try Task.checkCancellation()
       player.stop()
       player.queue = ApplicationMusicPlayer.Queue(matchedEntries, startingAt: firstEntry)
-      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
       do {
         if shouldPlay {
           try await ApplicationMusicPlayer.shared.play()
@@ -580,7 +608,6 @@ extension PlaybackClient {
         for: songs,
         startingAt: songs[restoredQueue.currentIndex],
       )
-      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
       do {
         try await player.prepareToPlay()
         try Task.checkCancellation()
@@ -784,7 +811,6 @@ extension PlaybackClient {
       var entries = player.queue.entries
       entries.removeAll()
       player.queue.entries = entries
-      player.state.repeatMode = MusicKit.MusicPlayer.RepeatMode.none
     }
 
     @MainActor
@@ -807,6 +833,13 @@ extension PlaybackClient {
     private static func seekPlayback(to time: TimeInterval) async {
       guard time.isFinite else { return }
       ApplicationMusicPlayer.shared.playbackTime = max(0, time)
+    }
+
+    @MainActor
+    private static func setPlaybackRepeatsCurrentEntry(_ repeatsCurrentEntry: Bool) async {
+      ApplicationMusicPlayer.shared.state.repeatMode = repeatsCurrentEntry
+        ? MusicKit.MusicPlayer.RepeatMode.one
+        : MusicKit.MusicPlayer.RepeatMode.none
     }
 
     @MainActor
@@ -967,6 +1000,7 @@ private actor SimulatorPlaybackState {
   private var playStatus: PlaybackFeature.PlayStatus = .paused
   private var progressTicker: Task<Void, Never>?
   private var queueGeneration = 0
+  private var repeatsCurrentEntry = false
 
   init(
     defaultDuration: TimeInterval,
@@ -1132,8 +1166,11 @@ private actor SimulatorPlaybackState {
       }) ?? availableEntries.firstIndex(where: {
         $0.item.id == requestedEntry.item.id
       })
-      guard let matchingIndex else { return self.snapshot }
-      matchedEntries.append(availableEntries.remove(at: matchingIndex))
+      if let matchingIndex {
+        matchedEntries.append(availableEntries.remove(at: matchingIndex))
+      } else {
+        matchedEntries.append((self.makeEntryID(), requestedEntry.item))
+      }
     }
     self.entryIDs.replaceSubrange(
       upcomingStartIndex...,
@@ -1180,6 +1217,10 @@ private actor SimulatorPlaybackState {
     guard time.isFinite else { return }
     self.elapsedTime = min(self.duration, max(0, time))
     self.sendProgress()
+  }
+
+  func setRepeatsCurrentEntry(_ repeatsCurrentEntry: Bool) {
+    self.repeatsCurrentEntry = repeatsCurrentEntry
   }
 
   func skipToNext() -> PlaybackSkipOutcome {
@@ -1325,7 +1366,10 @@ private actor SimulatorPlaybackState {
   }
 
   private func finishCurrentItem() {
-    if self.items.count > 1, self.currentIndex < self.items.index(before: self.items.endIndex) {
+    if self.repeatsCurrentEntry {
+      self.restartCurrentEntry()
+    } else if self.items.count > 1,
+              self.currentIndex < self.items.index(before: self.items.endIndex) {
       self.currentIndex += 1
       self.restartCurrentEntry()
     } else {

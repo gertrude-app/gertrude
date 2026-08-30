@@ -8,6 +8,9 @@ public struct NowPlayingScreenView: View {
   private let showsBackground: Bool
   private let isPlaying: Bool
   private let isLoading: Bool
+  private let isInfiniteEnabled: Bool
+  private let isShuffleEnabled: Bool
+  private let repeatMode: NowPlayingRepeatMode
   private let progress: Double
   private let duration: TimeInterval
   private let isAddToPlaylistEnabled: Bool
@@ -16,8 +19,12 @@ public struct NowPlayingScreenView: View {
   private let onPlayPauseTap: @MainActor @Sendable () -> Void
   private let onPreviousTap: @MainActor @Sendable () -> Void
   private let onNextTap: @MainActor @Sendable () -> Void
+  private let onInfiniteTap: @MainActor @Sendable () -> Void
+  private let onRepeatTap: @MainActor @Sendable () -> Void
   private let onScrub: @MainActor @Sendable (TimeInterval) -> Void
-  private let onAlbumInfoTap: (@MainActor @Sendable () -> Void)?
+  private let onShuffleTap: @MainActor @Sendable () -> Void
+  private let onViewAlbumTap: (@MainActor @Sendable () -> Void)?
+  private let onViewArtistTap: (@MainActor @Sendable () -> Void)?
 
   public init(
     title: String,
@@ -28,14 +35,21 @@ public struct NowPlayingScreenView: View {
     isLoading: Bool,
     progress: Double,
     duration: TimeInterval,
+    isShuffleEnabled: Bool = false,
+    isInfiniteEnabled: Bool = false,
+    repeatMode: NowPlayingRepeatMode = .off,
     onPlayPauseTap: @MainActor @escaping @Sendable () -> Void,
     onPreviousTap: @MainActor @escaping @Sendable () -> Void,
     onNextTap: @MainActor @escaping @Sendable () -> Void,
     onScrub: @MainActor @escaping @Sendable (TimeInterval) -> Void,
+    onShuffleTap: @MainActor @escaping @Sendable () -> Void = {},
+    onRepeatTap: @MainActor @escaping @Sendable () -> Void = {},
+    onInfiniteTap: @MainActor @escaping @Sendable () -> Void = {},
     isAddToPlaylistEnabled: Bool = true,
     onCloseTap: @MainActor @escaping @Sendable () -> Void = {},
     onAddToPlaylistTap: @MainActor @escaping @Sendable () -> Void = {},
-    onAlbumInfoTap: (@MainActor @Sendable () -> Void)? = nil,
+    onViewArtistTap: (@MainActor @Sendable () -> Void)? = nil,
+    onViewAlbumTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.title = title
     self.artist = artist
@@ -43,6 +57,9 @@ public struct NowPlayingScreenView: View {
     self.showsBackground = showsBackground
     self.isPlaying = isPlaying
     self.isLoading = isLoading
+    self.isInfiniteEnabled = isInfiniteEnabled
+    self.isShuffleEnabled = isShuffleEnabled
+    self.repeatMode = repeatMode
     self.progress = progress
     self.duration = duration
     self.isAddToPlaylistEnabled = isAddToPlaylistEnabled
@@ -51,8 +68,12 @@ public struct NowPlayingScreenView: View {
     self.onPlayPauseTap = onPlayPauseTap
     self.onPreviousTap = onPreviousTap
     self.onNextTap = onNextTap
+    self.onInfiniteTap = onInfiniteTap
+    self.onRepeatTap = onRepeatTap
     self.onScrub = onScrub
-    self.onAlbumInfoTap = onAlbumInfoTap
+    self.onShuffleTap = onShuffleTap
+    self.onViewAlbumTap = onViewAlbumTap
+    self.onViewArtistTap = onViewArtistTap
   }
 
   @ViewBuilder
@@ -75,6 +96,22 @@ public struct NowPlayingScreenView: View {
                 }
                 .tint(.primary)
                 .disabled(!self.isAddToPlaylistEnabled)
+
+                if self.onViewArtistTap != nil || self.onViewAlbumTap != nil {
+                  Divider()
+                }
+
+                if let onViewArtistTap = self.onViewArtistTap {
+                  Button(action: onViewArtistTap) {
+                    Label("View Artist", systemImage: "person")
+                  }
+                }
+
+                if let onViewAlbumTap = self.onViewAlbumTap {
+                  Button(action: onViewAlbumTap) {
+                    Label("View Album", systemImage: "square")
+                  }
+                }
               } label: {
                 Label("Now Playing Actions", systemImage: "ellipsis")
               }
@@ -123,7 +160,7 @@ public struct NowPlayingScreenView: View {
         .padding(.top, 36)
         .padding(.bottom, 36)
 
-      self.progressBar
+      self.progressAndModeControls
         .frame(maxWidth: 560)
         .padding(.horizontal, 2)
 
@@ -155,7 +192,7 @@ public struct NowPlayingScreenView: View {
 
           self.transportControls
 
-          self.progressBar
+          self.progressAndModeControls
             .frame(maxWidth: 500)
         }
         .frame(maxWidth: .infinity)
@@ -181,7 +218,7 @@ public struct NowPlayingScreenView: View {
         self.transportControls
           .padding(.top, 22)
 
-        self.progressBar
+        self.progressAndModeControls
           .padding(.top, 22)
           .padding(.bottom, 24)
       }
@@ -203,18 +240,29 @@ public struct NowPlayingScreenView: View {
     )
   }
 
-  private var progressBar: some View {
-    NowPlayingProgressBar(
-      progress: self.progress,
-      duration: self.duration,
-      onScrub: self.onScrub,
-    )
+  private var progressAndModeControls: some View {
+    VStack(spacing: 12) {
+      NowPlayingProgressBar(
+        progress: self.progress,
+        duration: self.duration,
+        onScrub: self.onScrub,
+      )
+
+      NowPlayingModeControls(
+        isShuffleEnabled: self.isShuffleEnabled,
+        isInfiniteEnabled: self.isInfiniteEnabled,
+        repeatMode: self.repeatMode,
+        onInfiniteTap: self.onInfiniteTap,
+        onRepeatTap: self.onRepeatTap,
+        onShuffleTap: self.onShuffleTap,
+      )
+    }
   }
 
   @ViewBuilder
   private var albumInfoView: some View {
-    if let onAlbumInfoTap {
-      Button(action: onAlbumInfoTap) {
+    if let onViewAlbumTap {
+      Button(action: onViewAlbumTap) {
         self.albumInfoText
           .contentShape(Rectangle())
       }
@@ -309,7 +357,7 @@ private enum NowPlayingScreenLayout {
 }
 
 #if DEBUG
-  #Preview("Now playing") {
+  #Preview("Now playing — shuffle and repeat all") {
     NowPlayingScreenView(
       title: PreviewMusicData.nowPlayingTitle,
       artist: PreviewMusicData.nowPlayingArtist,
@@ -318,6 +366,8 @@ private enum NowPlayingScreenLayout {
       isLoading: false,
       progress: 0.38,
       duration: 214,
+      isShuffleEnabled: true,
+      repeatMode: .collection,
       onPlayPauseTap: {},
       onPreviousTap: {},
       onNextTap: {},
@@ -334,6 +384,7 @@ private enum NowPlayingScreenLayout {
       isLoading: false,
       progress: 0.62,
       duration: 214,
+      repeatMode: .track,
       onPlayPauseTap: {},
       onPreviousTap: {},
       onNextTap: {},

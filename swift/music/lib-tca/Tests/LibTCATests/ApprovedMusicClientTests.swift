@@ -3,6 +3,7 @@ import Dependencies
 import Foundation
 import LibViews
 import MusicRoute
+import PairQL
 import Testing
 
 @testable import LibTCA
@@ -21,9 +22,10 @@ struct ApprovedMusicClientTests {
     )
 
     let library = try await withDependencies {
-      $0.api.getApprovedMusicLibrary = { token, knownRevision in
+      $0.api.getApprovedMusicLibrary = { token, knownRevision, storefront in
         #expect(token == approvedMusicClientConnection.token)
         #expect(knownRevision == nil)
+        #expect(storefront == "DE")
         return .snapshot(remoteLibrary)
       }
       $0.approvedMusicLibraryCache._load = { _ in nil }
@@ -33,6 +35,7 @@ struct ApprovedMusicClientTests {
       $0.keychain._load = { key in
         key == .connection ? connectionData : nil
       }
+      $0.musicSetup.currentCountryCode = { "DE" }
     } operation: {
       try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
     }
@@ -47,6 +50,81 @@ struct ApprovedMusicClientTests {
   }
 
   @Test
+  func liveClientLoadsLibraryWhenCountryCodeLookupFails() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+
+    let library = try await withDependencies {
+      $0.api.getApprovedMusicLibrary = { _, _, storefront in
+        #expect(storefront == nil)
+        return .snapshot(remoteApprovedMusicLibrary)
+      }
+      $0.approvedMusicLibraryCache._load = { _ in nil }
+      $0.approvedMusicLibraryCache._save = { _, _ in }
+      $0.keychain._load = { key in
+        key == .connection ? connectionData : nil
+      }
+      $0.musicSetup.currentCountryCode = { throw TestError() }
+    } operation: {
+      try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
+    }
+
+    expectNoDifference(library, approvedMusicLibrary)
+  }
+
+  @Test
+  func liveClientMapsLoggedOutLibraryLoadToInvalidConnection() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+
+    do {
+      _ = try await withDependencies {
+        $0.api.getApprovedMusicLibrary = { _, _, _ in
+          throw PqlError(
+            id: "missing-token",
+            requestId: "request-id",
+            type: .loggedOut,
+            debugMessage: "music app token not found",
+          )
+        }
+        $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.loadRemoteApprovedLibrary()
+      }
+      Issue.record("expected invalid connection")
+    } catch let error as ApprovedMusicClientError {
+      expectNoDifference(error, .invalidConnection)
+    }
+  }
+
+  @Test
+  func liveClientMapsLoggedOutMutationToInvalidConnection() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+
+    do {
+      _ = try await withDependencies {
+        $0.api.createMusicPlaylist = { _, _ in
+          throw PqlError(
+            id: "missing-token",
+            requestId: "request-id",
+            type: .loggedOut,
+            debugMessage: "music app token not found",
+          )
+        }
+        $0.keychain._load = { key in
+          key == .connection ? connectionData : nil
+        }
+      } operation: {
+        try await ApprovedMusicClient.liveValue.createPlaylist(.init(name: "Road Trip"))
+      }
+      Issue.record("expected invalid connection")
+    } catch let error as ApprovedMusicClientError {
+      expectNoDifference(error, .invalidConnection)
+    }
+  }
+
+  @Test
   func liveClientPreservesCatalogTrackViewData() async throws {
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
     var numberedRemote = remoteApprovedMusicLibrary
@@ -57,7 +135,7 @@ struct ApprovedMusicClientTests {
     let remote = numberedRemote
 
     let library = try await withDependencies {
-      $0.api.getApprovedMusicLibrary = { _, _ in .snapshot(remote) }
+      $0.api.getApprovedMusicLibrary = { _, _, _ in .snapshot(remote) }
       $0.approvedMusicLibraryCache._load = { _ in nil }
       $0.approvedMusicLibraryCache._save = { _, _ in }
       $0.keychain._load = { key in
@@ -146,11 +224,48 @@ struct ApprovedMusicClientTests {
   }
 
   @Test
+  func liveClientMapsBatchDuplicateConfirmationWithAuthoritativeLibrary() async throws {
+    let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
+    let confirmation = MusicPlaylistBatchDuplicateConfirmation(
+      playlistId: UUID(3),
+      duplicates: [.init(trackId: "track-1", title: "Library Track", existingCount: 1)],
+    )
+    let input = AddMusicBatchToPlaylist.Input(
+      playlistId: UUID(3),
+      sources: [.track(trackId: "track-1", albumId: "album-1")],
+    )
+
+    let result = try await withDependencies {
+      $0.api.addMusicBatchToPlaylist = { _, receivedInput in
+        #expect(receivedInput == input)
+        return .batchDuplicateConfirmationRequired(
+          snapshot: remoteApprovedMusicLibrary,
+          confirmation: confirmation,
+        )
+      }
+      $0.approvedMusicLibraryCache._load = { _ in approvedMusicLibrary }
+      $0.keychain._load = { key in
+        key == .connection ? connectionData : nil
+      }
+    } operation: {
+      try await ApprovedMusicClient.liveValue.addMusicBatchToPlaylist(input)
+    }
+
+    expectNoDifference(
+      result,
+      .batchDuplicateConfirmationRequired(
+        library: approvedMusicLibrary,
+        confirmation: confirmation,
+      ),
+    )
+  }
+
+  @Test
   func liveClientReturnsCachedLibraryForUnchangedRevisionWithoutWriting() async throws {
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
 
     let library = try await withDependencies {
-      $0.api.getApprovedMusicLibrary = { token, knownRevision in
+      $0.api.getApprovedMusicLibrary = { token, knownRevision, _ in
         #expect(token == approvedMusicClientConnection.token)
         #expect(knownRevision == approvedMusicLibrary.revision)
         return .unchanged(revision: approvedMusicLibrary.revision)
@@ -178,7 +293,7 @@ struct ApprovedMusicClientTests {
 
     await #expect(throws: ApprovedMusicClientError.self) {
       try await withDependencies {
-        $0.api.getApprovedMusicLibrary = { _, knownRevision in
+        $0.api.getApprovedMusicLibrary = { _, knownRevision, _ in
           #expect(knownRevision == nil)
           return .unchanged(revision: 7)
         }
@@ -201,7 +316,7 @@ struct ApprovedMusicClientTests {
 
     await #expect(throws: ApprovedMusicClientError.self) {
       try await withDependencies {
-        $0.api.getApprovedMusicLibrary = { _, knownRevision in
+        $0.api.getApprovedMusicLibrary = { _, knownRevision, _ in
           #expect(knownRevision == approvedMusicLibrary.revision)
           return .snapshot(stale)
         }
@@ -227,7 +342,7 @@ struct ApprovedMusicClientTests {
 
     await #expect(throws: ApprovedMusicClientError.self) {
       try await withDependencies {
-        $0.api.getApprovedMusicLibrary = { _, _ in .snapshot(incomplete) }
+        $0.api.getApprovedMusicLibrary = { _, _, _ in .snapshot(incomplete) }
         $0.approvedMusicLibraryCache._load = { _ in nil }
         $0.approvedMusicLibraryCache._save = { _, _ in
           Issue.record("incomplete snapshot should not write cache")
@@ -246,7 +361,7 @@ struct ApprovedMusicClientTests {
     let connectionData = try JSONEncoder().encode(approvedMusicClientConnection)
 
     let library = try await withDependencies {
-      $0.api.getApprovedMusicLibrary = { _, _ in .snapshot(remoteApprovedMusicLibrary) }
+      $0.api.getApprovedMusicLibrary = { _, _, _ in .snapshot(remoteApprovedMusicLibrary) }
       $0.approvedMusicLibraryCache._load = { _ in nil }
       $0.approvedMusicLibraryCache._save = { _, _ in throw TestError() }
       $0.keychain._load = { key in
@@ -335,7 +450,6 @@ struct ApprovedMusicClientTests {
     #expect(album.trackCount == 1)
     #expect(album.releaseDate == "2024-04-12")
     #expect(album.releaseType == "Album")
-    #expect(artist.releaseAlbumIds == ["album-1"])
     #expect(artist.topSongs.map(\.duration) == ["3:20"])
   }
 }

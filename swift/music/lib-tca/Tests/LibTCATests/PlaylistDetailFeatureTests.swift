@@ -17,7 +17,10 @@ struct PlaylistDetailFeatureTests {
     }
 
     await store.send(.trackTapped(playlist.entries[1].id))
-    await store.receive(.delegate(.playNow(items: items, startIndex: 1)))
+    await store.receive(.delegate(.playNow(
+      items: items,
+      start: .selectedEntry(index: 1),
+    )))
 
     expectNoDifference(items.map(\.playlistSource), [
       PlaylistPlaybackSource(
@@ -67,7 +70,7 @@ struct PlaylistDetailFeatureTests {
     await store.send(.playTapped)
     await store.receive(.delegate(.playNow(
       items: state.playbackItems,
-      startIndex: 0,
+      start: .collection,
     )))
   }
 
@@ -86,6 +89,18 @@ struct PlaylistDetailFeatureTests {
     #expect(state.currentEntryID == playlist.entries[0].id)
     #expect(state.isCurrentTrackPlaying)
     #expect(!state.isPlaying)
+  }
+
+  @Test
+  func addToPlaylistDelegatesForNonemptyPlaylist() async {
+    let store = TestStore(initialState: PlaylistDetailFeature.State(
+      playlist: self.musicPlaylist(),
+    )) {
+      PlaylistDetailFeature()
+    }
+
+    await store.send(.addToPlaylistTapped)
+    await store.receive(.delegate(.addToPlaylist))
   }
 
   @Test

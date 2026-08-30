@@ -25,6 +25,10 @@ enum AppleMusicSubscriptionStatus: Equatable, Sendable {
 @DependencyClient
 struct MusicSetupClient: Sendable {
   var authorizationStatus: @Sendable () async -> AppleMusicAuthorizationStatus = { .unknown }
+  var currentCountryCode: @Sendable () async throws -> String = {
+    throw URLError(.notConnectedToInternet)
+  }
+
   var requestAuthorization: @Sendable () async -> AppleMusicAuthorizationStatus = { .unknown }
   var subscriptionStatus: @Sendable () async -> AppleMusicSubscriptionStatus = { .unknown }
 }
@@ -51,6 +55,7 @@ extension DependencyValues {
 extension MusicSetupClient {
   static let noop = Self(
     authorizationStatus: { .authorized },
+    currentCountryCode: { throw URLError(.notConnectedToInternet) },
     requestAuthorization: { .authorized },
     subscriptionStatus: { .canPlayCatalogContent },
   )
@@ -63,6 +68,9 @@ extension MusicSetupClient {
     static let live = Self(
       authorizationStatus: {
         Self.authorizationStatus(from: MusicAuthorization.currentStatus)
+      },
+      currentCountryCode: {
+        try await MusicDataRequest.currentCountryCode
       },
       requestAuthorization: {
         await Self.authorizationStatus(from: MusicAuthorization.request())

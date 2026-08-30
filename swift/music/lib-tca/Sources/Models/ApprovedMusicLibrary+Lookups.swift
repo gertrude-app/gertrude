@@ -9,6 +9,67 @@ extension ApprovedMusicLibrary {
     self.artists.first { $0.id == id }
   }
 
+  func artist(matching item: PlaybackItem) -> ApprovedArtist? {
+    let topSongArtists = self.artists.filter { artist in
+      artist.topSongs?.contains(where: { $0.id == item.id }) == true
+    }
+    if let artist = self.uniqueArtist(from: topSongArtists, matching: item.artistName) {
+      return artist
+    }
+
+    if let albumID = item.albumID {
+      let releaseArtists = self.artists.filter {
+        $0.releaseAlbumIds?.contains(albumID) == true
+      }
+      let artistName = self.album(id: albumID)?.artistName ?? item.artistName
+      if let artist = self.uniqueArtist(from: releaseArtists, matching: artistName) {
+        return artist
+      }
+    }
+
+    return nil
+  }
+
+  func artistReleaseAlbums(for artist: ApprovedArtist) -> [ApprovedAlbum] {
+    let releases = if let releaseAlbumIDs = artist.releaseAlbumIds {
+      releaseAlbumIDs.compactMap(self.album(id:))
+    } else {
+      self.albums.filter {
+        $0.artistName.localizedCaseInsensitiveContains(artist.name)
+      }
+    }
+    return releases.enumerated().sorted { lhs, rhs in
+      let lhsDate = lhs.element.releaseDate ?? ""
+      let rhsDate = rhs.element.releaseDate ?? ""
+      if lhsDate != rhsDate {
+        return lhsDate > rhsDate
+      }
+      return lhs.offset < rhs.offset
+    }.map(\.element)
+  }
+
+  func artistDiscographyPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    guard let artist = self.artist(id: artistID) else { return [] }
+    var trackIDs = Set<ApprovedTrack.ID>()
+    return self.artistReleaseAlbums(for: artist).flatMap { album in
+      album.tracks.compactMap { track in
+        guard trackIDs.insert(track.id).inserted else { return nil }
+        return PlaybackItem(
+          track: track,
+          artworkURL: album.artworkURL,
+          albumID: album.id,
+        )
+      }
+    }
+  }
+
+  func artistTopSongsPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    guard let topSongs = self.artist(id: artistID)?.topSongs else { return [] }
+    return topSongs.map {
+      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
+    }
+  }
+
   func playlist(id: MusicPlaylist.ID) -> MusicPlaylist? {
     self.playlists.first { $0.id == id }
   }
@@ -46,5 +107,44 @@ extension ApprovedMusicLibrary {
         return lhs.id.rawValue < rhs.id.rawValue
       }
       .first
+  }
+
+  private func uniqueArtist(
+    from artists: [ApprovedArtist],
+    matching artistName: String,
+  ) -> ApprovedArtist? {
+    let namedArtists = artists.filter {
+      $0.name.localizedCaseInsensitiveCompare(artistName) == .orderedSame
+    }
+    if namedArtists.count == 1 {
+      return namedArtists[0]
+    }
+    return artists.count == 1 ? artists[0] : nil
+  }
+
+  func playbackArtworkURL(
+    for item: PlaybackItem,
+    sourceAlbumID: ApprovedAlbum.ID?,
+  ) -> URL? {
+    if item.artworkURL?.isWebArtworkURL == true {
+      return item.artworkURL
+    }
+    let album = sourceAlbumID.flatMap(self.album(id:))
+      ?? self.album(matching: item)
+      ?? self.albums.first(where: { album in
+        album.tracks.contains(where: { $0.id == item.id })
+      })
+    let track = album?.tracks.first(where: { $0.id == item.id })
+    if track?.artworkURL?.isWebArtworkURL == true {
+      return track?.artworkURL
+    }
+    return album?.artworkURL?.isWebArtworkURL == true ? album?.artworkURL : nil
+  }
+}
+
+private extension URL {
+  var isWebArtworkURL: Bool {
+    guard let scheme = self.scheme?.lowercased() else { return false }
+    return scheme == "http" || scheme == "https"
   }
 }

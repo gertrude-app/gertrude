@@ -22,23 +22,35 @@ private func playlistRuleError(
   in ctx: MusicApp.InstallContext,
 ) -> PqlError {
   switch error {
+  case .invalidDuplicateResolution(let resolution):
+    ctx.error(
+      "f8e8fa4c",
+      .badRequest,
+      "Duplicate resolution `\(resolution.rawValue)` does not match the playlist source",
+    )
   case .unauthorizedAlbum(let albumId):
     ctx.error(
       "36642b7a",
       .unauthorized,
       "Music album `\(albumId.rawValue)` is not approved for this child",
     )
+  case .unauthorizedArtist(let artistId):
+    ctx.error(
+      "2cdf04d6",
+      .unauthorized,
+      "Music artist `\(artistId.rawValue)` is not approved for this child",
+    )
+  case .unauthorizedPlaylist(let playlistId):
+    ctx.error(
+      "0c0d5363",
+      .unauthorized,
+      "Music playlist `\(playlistId)` is not available for this child",
+    )
   case .unauthorizedTrack(let trackId, let albumId):
     ctx.error(
       "165a701e",
       .unauthorized,
       "Music track `\(trackId.rawValue)` is not approved from album `\(albumId.rawValue)`",
-    )
-  case .invalidDuplicateResolution(let resolution):
-    ctx.error(
-      "f8e8fa4c",
-      .badRequest,
-      "Duplicate resolution `\(resolution.rawValue)` does not match the playlist source",
     )
   }
 }
@@ -63,7 +75,15 @@ private func playlistIndex(
     for: childId,
     in: db,
   )
-  return .init(albums: content.albums)
+  let playlists = try await Music.PlaylistRepository.rulesPlaylists(
+    for: childId,
+    in: db,
+  )
+  return .init(
+    albums: content.albums,
+    artists: content.artists,
+    playlists: playlists,
+  )
 }
 
 private func additions(
@@ -77,6 +97,26 @@ private func additions(
   do {
     return try Music.PlaylistRules.planAddition(
       selection: source,
+      duplicateResolution: duplicateResolution,
+      to: Music.PlaylistRepository.rulesPlaylist(playlist, entries: entries),
+      using: index,
+    )
+  } catch let error as Music.PlaylistRules.RuleError {
+    throw playlistRuleError(error, in: ctx)
+  }
+}
+
+private func batchAdditions(
+  for sources: [MusicPlaylistSourceSelection],
+  duplicateResolution: MusicPlaylistBatchDuplicateResolution,
+  playlist: Music.Playlist,
+  entries: [Music.PlaylistEntry],
+  using index: Music.PlaylistRules.EffectiveTrackIndex,
+  in ctx: MusicApp.InstallContext,
+) throws -> Music.PlaylistRules.BatchAdditionPlan {
+  do {
+    return try Music.PlaylistRules.planBatchAddition(
+      selections: sources,
       duplicateResolution: duplicateResolution,
       to: Music.PlaylistRepository.rulesPlaylist(playlist, entries: entries),
       using: index,
@@ -259,6 +299,69 @@ extension AddToMusicPlaylist: Resolver {
       switch plan {
       case .confirmationRequired(let confirmation):
         return try await .duplicateConfirmationRequired(
+          snapshot: publishPlaylistSnapshot(
+            childId: ctx.child.id,
+            at: now,
+            in: db,
+          ),
+          confirmation: confirmation,
+        )
+      case .append(let additions):
+        let newEntries = createEntries(
+          additions,
+          playlistId: playlist.id,
+          startingAt: entries.count,
+          createdAt: now,
+        )
+        if !newEntries.isEmpty {
+          try await db.create(newEntries)
+          playlist.revision += 1
+          playlist.updatedAt = now
+          try await db.update(playlist)
+        }
+        return try await .updated(publishPlaylistSnapshot(
+          childId: ctx.child.id,
+          at: now,
+          in: db,
+        ))
+      }
+    }
+  }
+}
+
+extension AddMusicBatchToPlaylist: Resolver {
+  static func resolve(
+    with input: Input,
+    in ctx: MusicApp.InstallContext,
+  ) async throws -> Output {
+    try await requireMusicAccess(in: ctx)
+    let now = get(dependency: \.date.now)
+    return try await ctx.db.withTransaction { db in
+      try await Music.LibrarySnapshotRepository.lock(childId: ctx.child.id, in: db)
+      guard var playlist = try await Music.PlaylistRepository.playlist(
+        id: .init(rawValue: input.playlistId),
+        childId: ctx.child.id,
+        in: db,
+      ) else {
+        return try await .conflict(publishPlaylistSnapshot(
+          childId: ctx.child.id,
+          at: now,
+          in: db,
+        ))
+      }
+      let entries = try await Music.PlaylistRepository.entries(for: playlist.id, in: db)
+      let index = try await playlistIndex(childId: ctx.child.id, in: db)
+      let plan = try batchAdditions(
+        for: input.sources,
+        duplicateResolution: input.duplicateResolution,
+        playlist: playlist,
+        entries: entries,
+        using: index,
+        in: ctx,
+      )
+      switch plan {
+      case .confirmationRequired(let confirmation):
+        return try await .batchDuplicateConfirmationRequired(
           snapshot: publishPlaylistSnapshot(
             childId: ctx.child.id,
             at: now,

@@ -17,7 +17,8 @@ struct ArtistDetailViewContainer: View {
       let isCurrentArtist = self.currentTrackID.map { currentTrackID in
         artistData.topSongs.contains(where: { $0.id == currentTrackID.rawValue })
       } ?? false
-      let isArtistContext = self.activePlaybackContext?.identity == .artist(artist.id)
+      let isDiscographyContext = self.activePlaybackContext?.identity == .artist(artist.id)
+        && self.activePlaybackContext?.artistSource == .discography
 
       ArtistDetailView(
         artist: ArtistDetailData(artist: artistData),
@@ -25,9 +26,10 @@ struct ArtistDetailViewContainer: View {
         releases: self.releases(for: artist),
         transitionNamespace: self.transitionNamespace,
         currentTrackID: isCurrentArtist ? self.currentTrackID?.rawValue : nil,
-        isPlaying: isArtistContext && self.isPlaybackPlaying,
-        isLoading: isArtistContext && self.isPlaybackLoading,
+        isPlaying: isDiscographyContext && self.isPlaybackPlaying,
+        isLoading: isDiscographyContext && self.isPlaybackLoading,
         isCurrentTrackPlaying: isCurrentArtist && self.isPlaybackPlaying,
+        onAddToPlaylist: { self.store.send(.addToPlaylistTapped) },
         onAddToQueue: { self.store.send(.addToQueueTapped) },
         onPlayNext: { self.store.send(.playNextTapped) },
         onPlayTap: { self.store.send(.playButtonTapped) },
@@ -48,12 +50,7 @@ struct ArtistDetailViewContainer: View {
   }
 
   private func releases(for artist: ApprovedArtist) -> [ArtistReleaseData] {
-    let releaseAlbumIDs = Set(artist.releaseAlbumIds ?? [])
-    return self.library.albums.compactMap { album in
-      let belongsToArtist = releaseAlbumIDs.isEmpty
-        ? album.artistName.localizedCaseInsensitiveContains(artist.name)
-        : releaseAlbumIDs.contains(album.id)
-      guard belongsToArtist else { return nil }
+    self.library.artistReleaseAlbums(for: artist).map { album in
       let albumData = AlbumData(album: album)
       return ArtistReleaseData(
         id: albumData.id,

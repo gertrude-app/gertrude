@@ -81,6 +81,22 @@ final class MusicPlaylistRulesTests: XCTestCase {
     expect(decoded).toEqual(output)
   }
 
+  func testBatchDuplicateMutationOutputRoundTripsAuthoritativeSnapshot() throws {
+    let snapshot = playlistCatalogSnapshot(albums: [])
+    let output = MusicPlaylistMutationOutput.batchDuplicateConfirmationRequired(
+      snapshot: snapshot,
+      confirmation: .init(
+        playlistId: UUID(1),
+        duplicates: [.init(trackId: "track-1", title: "Track", existingCount: 2)],
+      ),
+    )
+
+    let data = try JSONEncoder().encode(output)
+    let decoded = try JSONDecoder().decode(MusicPlaylistMutationOutput.self, from: data)
+
+    expect(decoded).toEqual(output)
+  }
+
   func testSnapshotWithoutPlaylistFieldDecodesAsEmpty() throws {
     let snapshot = playlistCatalogSnapshot(albums: [])
     let encoded = try JSONEncoder().encode(snapshot)
@@ -303,6 +319,162 @@ final class MusicPlaylistRulesTests: XCTestCase {
     ]))
   }
 
+  func testArtistSelectionUsesNewestFirstDeduplicatedDiscography() throws {
+    let repeatedTrack = playlistTrack(id: "shared", albumId: "newest", title: "Shared")
+    let newestAlbum = playlistAlbum(
+      id: "newest",
+      releaseDate: "2025-06-01",
+      tracks: [
+        playlistTrack(id: "newest-first", albumId: "newest", title: "Newest"),
+        repeatedTrack,
+      ],
+    )
+    let olderAlbum = playlistAlbum(
+      id: "older",
+      releaseDate: "2020-03-01",
+      tracks: [
+        playlistTrack(id: "older-first", albumId: "older", title: "Older"),
+        playlistTrack(id: "shared", albumId: "older", title: "Shared"),
+      ],
+    )
+    let artist = MusicLibrarySnapshot.Artist(
+      id: "artist-1",
+      name: "Artist",
+      releaseAlbumIds: [olderAlbum.id, newestAlbum.id],
+      topSongs: [],
+      addedAt: .reference,
+    )
+    let index = Music.PlaylistRules.EffectiveTrackIndex(
+      albums: [olderAlbum, newestAlbum],
+      artists: [artist],
+    )
+
+    let plan = try Music.PlaylistRules.planAddition(
+      selection: .artist(artistId: artist.id),
+      duplicateResolution: .requestConfirmation,
+      to: emptyPlaylist(),
+      using: index,
+    )
+
+    expect(plan).toEqual(.append([
+      .init(trackId: "newest-first", preferredAlbumId: "newest"),
+      .init(trackId: "shared", preferredAlbumId: "newest"),
+      .init(trackId: "older-first", preferredAlbumId: "older"),
+    ]))
+
+    var playlist = emptyPlaylist()
+    playlist.entries = [
+      .init(id: UUID(2), trackId: "shared", preferredAlbumId: "newest"),
+    ]
+    let confirmation = try Music.PlaylistRules.planAddition(
+      selection: .artist(artistId: artist.id),
+      duplicateResolution: .requestConfirmation,
+      to: playlist,
+      using: index,
+    )
+    let addOnlyNew = try Music.PlaylistRules.planAddition(
+      selection: .artist(artistId: artist.id),
+      duplicateResolution: .addOnlyNew,
+      to: playlist,
+      using: index,
+    )
+    expect(confirmation).toEqual(.confirmationRequired(.artist(
+      playlistId: playlist.id,
+      artistId: artist.id,
+      duplicates: [.init(trackId: "shared", title: "Shared", existingCount: 1)],
+    )))
+    expect(addOnlyNew).toEqual(.append([
+      .init(trackId: "newest-first", preferredAlbumId: "newest"),
+      .init(trackId: "older-first", preferredAlbumId: "older"),
+    ]))
+
+    XCTAssertThrowsError(try Music.PlaylistRules.planAddition(
+      selection: .artist(artistId: "artist-2"),
+      duplicateResolution: .requestConfirmation,
+      to: emptyPlaylist(),
+      using: index,
+    )) { error in
+      expect(error as? Music.PlaylistRules.RuleError).toEqual(
+        .unauthorizedArtist("artist-2"),
+      )
+    }
+  }
+
+  func testPlaylistSelectionPreservesSourceOrderAndDuplicatePolicies() throws {
+    let tracks = [
+      playlistTrack(id: "track-1", albumId: "album-1", title: "One"),
+      playlistTrack(id: "track-2", albumId: "album-1", title: "Two"),
+    ]
+    let source = Music.PlaylistRules.Playlist(
+      id: UUID(2),
+      name: "Source",
+      revision: 1,
+      createdAt: .reference,
+      updatedAt: .reference,
+      entries: [
+        .init(id: UUID(3), trackId: "track-2", preferredAlbumId: "album-1"),
+        .init(id: UUID(4), trackId: "track-1", preferredAlbumId: "album-1"),
+        .init(id: UUID(5), trackId: "track-2", preferredAlbumId: "album-1"),
+      ],
+    )
+    let index = Music.PlaylistRules.EffectiveTrackIndex(
+      albums: [playlistAlbum(id: "album-1", tracks: tracks)],
+      playlists: [source],
+    )
+    let selection = MusicPlaylistSourceSelection.playlist(playlistId: source.id)
+
+    let append = try Music.PlaylistRules.planAddition(
+      selection: selection,
+      duplicateResolution: .requestConfirmation,
+      to: emptyPlaylist(),
+      using: index,
+    )
+    expect(append).toEqual(.append([
+      .init(trackId: "track-2", preferredAlbumId: "album-1"),
+      .init(trackId: "track-1", preferredAlbumId: "album-1"),
+      .init(trackId: "track-2", preferredAlbumId: "album-1"),
+    ]))
+
+    var destination = emptyPlaylist()
+    destination.entries = [
+      .init(id: UUID(6), trackId: "track-2", preferredAlbumId: "album-1"),
+    ]
+    let confirmation = try Music.PlaylistRules.planAddition(
+      selection: selection,
+      duplicateResolution: .requestConfirmation,
+      to: destination,
+      using: index,
+    )
+    let addOnlyNew = try Music.PlaylistRules.planAddition(
+      selection: selection,
+      duplicateResolution: .addOnlyNew,
+      to: destination,
+      using: index,
+    )
+    expect(confirmation).toEqual(.confirmationRequired(.playlist(
+      playlistId: destination.id,
+      sourcePlaylistId: source.id,
+      duplicates: [
+        .init(trackId: "track-2", title: "Two", existingCount: 1),
+        .init(trackId: "track-2", title: "Two", existingCount: 1),
+      ],
+    )))
+    expect(addOnlyNew).toEqual(.append([
+      .init(trackId: "track-1", preferredAlbumId: "album-1"),
+    ]))
+
+    XCTAssertThrowsError(try Music.PlaylistRules.planAddition(
+      selection: .playlist(playlistId: UUID(7)),
+      duplicateResolution: .requestConfirmation,
+      to: destination,
+      using: index,
+    )) { error in
+      expect(error as? Music.PlaylistRules.RuleError).toEqual(
+        .unauthorizedPlaylist(UUID(7)),
+      )
+    }
+  }
+
   func testDuplicateResolutionMustMatchSelectionKind() {
     let index = Music.PlaylistRules.EffectiveTrackIndex(albums: [
       playlistAlbum(
@@ -395,6 +567,7 @@ private func playlistCatalogSnapshot(
 private func playlistAlbum(
   id: String,
   title: String = "Album",
+  releaseDate: String? = nil,
   tracks: [MusicLibrarySnapshot.Track],
 ) -> MusicLibrarySnapshot.Album {
   .init(
@@ -402,6 +575,7 @@ private func playlistAlbum(
     title: title,
     artistName: "Artist",
     trackCount: tracks.count,
+    releaseDate: releaseDate,
     showsArtwork: true,
     addedAt: .reference,
     tracks: tracks,

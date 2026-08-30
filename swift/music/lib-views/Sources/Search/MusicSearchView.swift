@@ -210,10 +210,8 @@ private struct MusicSearchResultRow: View {
 
   private var addToPlaylistAction: (@MainActor @Sendable () -> Void)? {
     switch self.result.kind {
-    case .album, .song:
+    case .album, .artist, .playlist, .song:
       self.onAddToPlaylist
-    case .artist, .playlist:
-      nil
     }
   }
 
@@ -229,7 +227,7 @@ private struct MusicSearchResultRow: View {
   }
 }
 
-private struct MusicSearchResultArtwork: View {
+struct MusicSearchResultArtwork: View {
   let result: MusicSearchResultData
   let transitionNamespace: Namespace.ID?
 

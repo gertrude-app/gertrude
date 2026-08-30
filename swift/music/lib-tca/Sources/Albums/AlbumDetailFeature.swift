@@ -34,7 +34,7 @@ struct AlbumDetailFeature {
       case addToQueue(items: [PlaybackItem])
       case dismissPlaybackFailure
       case playbackFailureActionTapped
-      case playNow(items: [PlaybackItem], startIndex: Int)
+      case playNow(items: [PlaybackItem], start: PlaybackStartIntent)
       case playNext(items: [PlaybackItem])
       case togglePlayPause
       case addTrackToPlaylist(trackID: ApprovedTrack.ID, albumID: ApprovedAlbum.ID)
@@ -74,7 +74,7 @@ struct AlbumDetailFeature {
 
         let items = state.playbackItems
         guard !items.isEmpty else { return .none }
-        return .send(.delegate(.playNow(items: items, startIndex: 0)))
+        return .send(.delegate(.playNow(items: items, start: .collection)))
 
       case .trackAddToPlaylistTapped(let trackID):
         guard state.tracks.contains(where: { $0.id == trackID }) else { return .none }
@@ -101,7 +101,7 @@ struct AlbumDetailFeature {
         }
         return .send(.delegate(.playNow(
           items: state.playbackItems,
-          startIndex: startIndex,
+          start: .selectedEntry(index: startIndex),
         )))
 
       case .playbackFailureDismissed:

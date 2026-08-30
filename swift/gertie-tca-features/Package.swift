@@ -11,6 +11,7 @@ let package = Package(
   ],
   dependencies: [
     .package(path: "../gertie"),
+    .package(path: "../gertie-ui"),
     .package(path: "../pairql"),
     .package(path: "../pairql-ios-apps"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
@@ -35,9 +36,11 @@ let package = Package(
       dependencies: [
         "AppEvents",
         .product(name: "GertieApp", package: "gertie"),
+        .product(name: "GertieUI", package: "gertie-ui"),
         .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Dependencies", package: "swift-dependencies"),
+        .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
       ],
     ),
