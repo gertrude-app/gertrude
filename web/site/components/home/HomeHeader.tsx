@@ -1,14 +1,7 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
-import {
-  ArrowRightIcon,
-  BookOpenIcon,
-  ChevronDownIcon,
-  MailIcon,
-  MenuIcon,
-  NewspaperIcon,
-} from 'lucide-react';
+import { ArrowRightIcon, ChevronDownIcon, MenuIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import Logo from '@/components/Logo';
@@ -63,7 +56,7 @@ const HomeHeader: React.FC = () => {
           <ProductsMenu />
           <NavLink href="/#why-gertrude">Why Gertrude</NavLink>
           <NavLink href="/#pricing">Pricing</NavLink>
-          <ResourcesMenu />
+          <NavLink href="/resources">Resources</NavLink>
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
@@ -196,65 +189,6 @@ const ProductMenuItem: React.FC<ProductMenuItemProps> = ({
   </Menu.Item>
 );
 
-const ResourcesMenu: React.FC = () => (
-  <Menu.Root modal={false}>
-    <MenuTrigger>Resources</MenuTrigger>
-    <Menu.Portal>
-      <Menu.Positioner align="end" sideOffset={10} className={menuPositionerClasses}>
-        <Menu.Popup className={`${popupClasses} w-72`}>
-          <ResourceMenuItem
-            href="/blog"
-            icon={NewspaperIcon}
-            title="Blog"
-            description="Guidance for protecting kids online"
-          />
-          <ResourceMenuItem
-            href="/docs/getting-started"
-            icon={BookOpenIcon}
-            title="Help and documentation"
-            description="Setup guides and product help"
-          />
-          <ResourceMenuItem
-            href="/contact"
-            icon={MailIcon}
-            title="Contact"
-            description="Talk with our small team"
-          />
-        </Menu.Popup>
-      </Menu.Positioner>
-    </Menu.Portal>
-  </Menu.Root>
-);
-
-interface ResourceMenuItemProps {
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-}
-
-const ResourceMenuItem: React.FC<ResourceMenuItemProps> = ({
-  href,
-  icon: Icon,
-  title,
-  description,
-}) => (
-  <Menu.Item
-    render={<Link href={href} />}
-    className="group flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 outline-none transition-colors duration-150 hover:bg-stone-100 data-[highlighted]:bg-stone-100"
-  >
-    <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 shadow-sm">
-      <Icon className="size-4" />
-    </span>
-    <span>
-      <span className="block text-sm font-semibold text-stone-800 group-hover:text-violet-800 group-data-[highlighted]:text-violet-800">
-        {title}
-      </span>
-      <span className="mt-0.5 block text-xs leading-4 text-stone-500">{description}</span>
-    </span>
-  </Menu.Item>
-);
-
 const MobileMenu: React.FC = () => (
   <Menu.Root modal={false}>
     <Menu.Trigger
@@ -276,11 +210,7 @@ const MobileMenu: React.FC = () => (
           <Menu.Separator className="mx-2 my-2 h-px bg-stone-200" />
           <MobileLink href="/#why-gertrude">Why Gertrude</MobileLink>
           <MobileLink href="/#pricing">Pricing</MobileLink>
-          <Menu.Separator className="mx-2 my-2 h-px bg-stone-200" />
-          <MobileGroupLabel>Resources</MobileGroupLabel>
-          <MobileLink href="/blog">Blog</MobileLink>
-          <MobileLink href="/docs/getting-started">Help and documentation</MobileLink>
-          <MobileLink href="/contact">Contact</MobileLink>
+          <MobileLink href="/resources">Resources</MobileLink>
           <Menu.Separator className="mx-2 my-2 h-px bg-stone-200" />
           <Menu.Item
             render={<a href={PARENTS_APP_URL} aria-label="Log in" />}

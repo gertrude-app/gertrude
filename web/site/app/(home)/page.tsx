@@ -1,33 +1,17 @@
 import type { NextPage } from 'next';
+import HomeBlockerSection from '@/components/home/HomeBlockerSection';
 import HomeHero from '@/components/home/HomeHero';
+import HomeMacAppSection from '@/components/home/HomeMacAppSection';
+import HomeProblemSection from '@/components/home/HomeProblemSection';
+import HomeTrustStrip from '@/components/home/HomeTrustStrip';
 
 const HomePage: NextPage = () => (
   <main>
     <HomeHero />
-    <section
-      id="internet-safety"
-      className="mx-auto max-w-7xl scroll-mt-24 border p-20 text-4xl"
-    >
-      lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate, quia? Quidem,
-      voluptas. Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum,
-      doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos
-      doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia?
-      Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas.
-      Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque,
-      quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia?
-      Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas.
-      Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque,
-      quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia?
-      Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas.
-      Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque,
-      quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia?
-      Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas.
-      Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque,
-      quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia?
-      Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas.
-      Dolorum, doloremque, quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque,
-      quos doloremque, quia? Quidem, voluptas. Dolorum, doloremque, quos doloremque, quia?
-    </section>
+    <HomeTrustStrip />
+    <HomeProblemSection />
+    <HomeMacAppSection />
+    <HomeBlockerSection />
   </main>
 );
 

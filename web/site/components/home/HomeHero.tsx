@@ -7,11 +7,15 @@ import {
 } from 'lucide-react';
 import { Rubik } from 'next/font/google';
 import React from 'react';
+import HomeAppIcon from '@/components/home/HomeAppIcon';
 import HomeButtonLink from '@/components/home/HomeButtonLink';
+import HomeHeroBackground from '@/components/home/HomeHeroBackground';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
 // eslint-disable-next-line @stylistic/quotes
 const rubik = Rubik({ subsets: ['latin'], display: 'swap' });
+
+export { rubik as homeRubik };
 
 interface HeroWordProps {
   children: React.ReactNode;
@@ -25,27 +29,15 @@ const HeroWord: React.FC<HeroWordProps> = ({ children, delay }) => (
 );
 
 const HomeHero: React.FC = () => (
-  <section
-    className="-mt-[4.5rem] flex min-h-screen w-full flex-col items-center justify-center bg-cover bg-bottom"
-    style={{
-      backgroundImage: `linear-gradient(to bottom, rgb(255 255 255) 0%, rgb(255 255 255) 8%, rgb(255 255 255 / 0) 28%), url('/home/hero-background.png')`,
-    }}
-  >
+  <section className="relative isolate z-10 -mt-[4.5rem] flex min-h-screen w-full flex-col items-center justify-center">
+    <HomeHeroBackground />
     <div aria-hidden className="mb-12 flex items-center">
-      <img
-        src="/app-icons/music.webp"
-        alt=""
-        className="-rotate-12 size-14 rounded-[14px] shadow-lg shadow-stone-900/10 ring-1 ring-black/5 z-0 -mr-1"
-      />
-      <img
-        src="/app-icons/gertrude.webp"
-        alt=""
-        className="size-14 rounded-[14px] shadow-lg shadow-stone-900/10 ring-1 ring-black/5 z-10 -mt-4"
-      />
-      <img
+      <HomeAppIcon src="/app-icons/music.webp" alt="" className="-rotate-12 z-0 -mr-1" />
+      <HomeAppIcon src="/app-icons/gertrude.webp" alt="" className="z-10 -mt-4" />
+      <HomeAppIcon
         src="/app-icons/podcasts.webp"
         alt=""
-        className="rotate-12 size-14 rounded-[14px] shadow-lg shadow-stone-900/10 ring-1 ring-black/5 z-20 -ml-1"
+        className="rotate-12 z-20 -ml-1"
       />
     </div>
     <h1
