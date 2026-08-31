@@ -5,6 +5,20 @@ import Vapor
 enum AuthedAccountRoute: PairRoute {
   case getPeople
   case getDevices
+  case getAccountSettings
+  case createAccountNotificationMethod(CreateAccountNotificationMethod.Input)
+  case confirmAccountNotificationMethod(ConfirmAccountNotificationMethod.Input)
+  case saveAccountNotification(SaveAccountNotification.Input)
+  case deleteAccountNotification(DeleteAccountNotification.Input)
+  case deleteAccountNotificationMethod(DeleteAccountNotificationMethod.Input)
+  case setAccountDailyReviewEmail(SetAccountDailyReviewEmail.Input)
+  case getAccountBilling
+  case startAccountCheckout(StartAccountCheckout.Input)
+  case openAccountBillingPortal(OpenAccountBillingPortal.Input)
+  case changeAccountSubscriptionTier(ChangeAccountSubscriptionTier.Input)
+  case startAccountFullTrial
+  case handleAccountCheckoutSuccess(HandleAccountCheckoutSuccess.Input)
+  case handleAccountCheckoutCancel(HandleAccountCheckoutCancel.Input)
   case createPerson(CreatePerson.Input)
   case updatePersonBasicDetails(UpdatePersonBasicDetails.Input)
   case deletePerson(DeletePerson.Input)
@@ -39,6 +53,59 @@ enum AuthedAccountRoute: PairRoute {
     }
     Route(.case(Self.getDevices)) {
       Operation(GetDevices.self)
+    }
+    Route(.case(Self.getAccountSettings)) {
+      Operation(GetAccountSettings.self)
+    }
+    Route(.case(Self.createAccountNotificationMethod)) {
+      Operation(CreateAccountNotificationMethod.self)
+      Body(.accountInput(CreateAccountNotificationMethod.self))
+    }
+    Route(.case(Self.confirmAccountNotificationMethod)) {
+      Operation(ConfirmAccountNotificationMethod.self)
+      Body(.accountInput(ConfirmAccountNotificationMethod.self))
+    }
+    Route(.case(Self.saveAccountNotification)) {
+      Operation(SaveAccountNotification.self)
+      Body(.accountInput(SaveAccountNotification.self))
+    }
+    Route(.case(Self.deleteAccountNotification)) {
+      Operation(DeleteAccountNotification.self)
+      Body(.accountInput(DeleteAccountNotification.self))
+    }
+    Route(.case(Self.deleteAccountNotificationMethod)) {
+      Operation(DeleteAccountNotificationMethod.self)
+      Body(.accountInput(DeleteAccountNotificationMethod.self))
+    }
+    Route(.case(Self.setAccountDailyReviewEmail)) {
+      Operation(SetAccountDailyReviewEmail.self)
+      Body(.accountInput(SetAccountDailyReviewEmail.self))
+    }
+    Route(.case(Self.getAccountBilling)) {
+      Operation(GetAccountBilling.self)
+    }
+    Route(.case(Self.startAccountCheckout)) {
+      Operation(StartAccountCheckout.self)
+      Body(.accountInput(StartAccountCheckout.self))
+    }
+    Route(.case(Self.openAccountBillingPortal)) {
+      Operation(OpenAccountBillingPortal.self)
+      Body(.accountInput(OpenAccountBillingPortal.self))
+    }
+    Route(.case(Self.changeAccountSubscriptionTier)) {
+      Operation(ChangeAccountSubscriptionTier.self)
+      Body(.accountInput(ChangeAccountSubscriptionTier.self))
+    }
+    Route(.case(Self.startAccountFullTrial)) {
+      Operation(StartAccountFullTrial.self)
+    }
+    Route(.case(Self.handleAccountCheckoutSuccess)) {
+      Operation(HandleAccountCheckoutSuccess.self)
+      Body(.accountInput(HandleAccountCheckoutSuccess.self))
+    }
+    Route(.case(Self.handleAccountCheckoutCancel)) {
+      Operation(HandleAccountCheckoutCancel.self)
+      Body(.accountInput(HandleAccountCheckoutCancel.self))
     }
     Route(.case(Self.createPerson)) {
       Operation(CreatePerson.self)
@@ -156,6 +223,48 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getDevices:
       let output = try await GetDevices.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getAccountSettings:
+      let output = try await GetAccountSettings.resolve(in: context)
+      return try await self.respond(with: output)
+    case .createAccountNotificationMethod(let input):
+      let output = try await CreateAccountNotificationMethod.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .confirmAccountNotificationMethod(let input):
+      let output = try await ConfirmAccountNotificationMethod.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveAccountNotification(let input):
+      let output = try await SaveAccountNotification.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .deleteAccountNotification(let input):
+      let output = try await DeleteAccountNotification.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .deleteAccountNotificationMethod(let input):
+      let output = try await DeleteAccountNotificationMethod.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .setAccountDailyReviewEmail(let input):
+      let output = try await SetAccountDailyReviewEmail.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getAccountBilling:
+      let output = try await GetAccountBilling.resolve(in: context)
+      return try await self.respond(with: output)
+    case .startAccountCheckout(let input):
+      let output = try await StartAccountCheckout.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .openAccountBillingPortal(let input):
+      let output = try await OpenAccountBillingPortal.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .changeAccountSubscriptionTier(let input):
+      let output = try await ChangeAccountSubscriptionTier.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .startAccountFullTrial:
+      let output = try await StartAccountFullTrial.resolve(in: context)
+      return try await self.respond(with: output)
+    case .handleAccountCheckoutSuccess(let input):
+      let output = try await HandleAccountCheckoutSuccess.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .handleAccountCheckoutCancel(let input):
+      let output = try await HandleAccountCheckoutCancel.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .createPerson(let input):
       let output = try await CreatePerson.resolve(with: input, in: context)

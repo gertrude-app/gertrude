@@ -457,17 +457,11 @@ export const ntfyNotificationMethod: NotificationMethod = {
   topicId: `gertrude-family-alerts-8k4tq9`,
 };
 
-export const pushNotificationMethod: NotificationMethod = {
-  id: `method-push`,
-  type: `push`,
-};
-
 export const notificationMethods: NotificationMethod[] = [
   emailNotificationMethod,
   textNotificationMethod,
   slackNotificationMethod,
   ntfyNotificationMethod,
-  pushNotificationMethod,
 ];
 
 export const notifications: Notification[] = [
@@ -475,14 +469,12 @@ export const notifications: Notification[] = [
     id: `notification-1`,
     methodId: `method-email`,
     trigger: `unlockRequestSubmitted`,
-    enabled: true,
     method: emailNotificationMethod,
   },
   {
     id: `notification-2`,
     methodId: `method-ntfy`,
     trigger: `securityEventsRecommended`,
-    enabled: true,
     method: ntfyNotificationMethod,
   },
 ];

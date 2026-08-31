@@ -10,6 +10,12 @@ import NotificationMethodChip from './NotificationMethodChip';
 import { notificationMethods, notifications } from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
+const createPending = async (): Promise<{ methodId: string; ntfyTopic: string }> => ({
+  methodId: `method-preview`,
+  ntfyTopic: `gertrude-family-alerts-8k4tq9`,
+});
+const confirm = async (): Promise<void> => {};
+const save = async (): Promise<void> => {};
 
 const meta = {
   title: 'Account/Components/Settings/Notifications',
@@ -28,7 +34,8 @@ export const MethodsAndNotifications = {
           <NotificationMethodChip
             key={method.id}
             method={method}
-            notificationCount={index}
+            deletable={index === 0}
+            deleteBlockedReason={index === 0 ? undefined : `This method is in use.`}
             onDelete={noop}
           />
         ))}
@@ -55,7 +62,13 @@ export const AddMethod = {
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
     <StoryCanvas>
-      <AddNotificationMethodSlideOver open onOpenChange={noop} onComplete={noop} />
+      <AddNotificationMethodSlideOver
+        open
+        onOpenChange={noop}
+        onCreatePending={createPending}
+        onConfirm={confirm}
+        onComplete={noop}
+      />
     </StoryCanvas>
   ),
 };
@@ -68,10 +81,13 @@ export const AddMethodVerification = {
       <AddNotificationMethodSlideOver
         open
         onOpenChange={noop}
+        onCreatePending={createPending}
+        onConfirm={confirm}
         onComplete={noop}
         defaultState={{
           methodType: `email`,
           flowState: `codeSent`,
+          pendingMethodId: `method-preview`,
           emailAddress: `parent@example.com`,
           confirmationCode: `123456`,
         }}
@@ -88,8 +104,14 @@ export const AddMethodNtfySuccess = {
       <AddNotificationMethodSlideOver
         open
         onOpenChange={noop}
+        onCreatePending={createPending}
+        onConfirm={confirm}
         onComplete={noop}
-        defaultState={{ methodType: `ntfy`, flowState: `ntfyCreated` }}
+        defaultState={{
+          methodType: `ntfy`,
+          flowState: `ntfyCreated`,
+          pendingMethodId: `method-preview`,
+        }}
       />
     </StoryCanvas>
   ),
@@ -105,7 +127,7 @@ export const EditNotification = {
         notification={notifications[1]!}
         methods={notificationMethods}
         onOpenChange={noop}
-        onSave={noop}
+        onSave={save}
       />
     </StoryCanvas>
   ),

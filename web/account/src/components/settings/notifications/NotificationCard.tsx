@@ -20,7 +20,7 @@ type Props = {
 };
 
 const NotificationCard: React.FC<Props> = ({ notification, onEdit, onDelete }) => (
-  <Card padding={0} className="overflow-hidden">
+  <Card padding={0} className="flex flex-col overflow-hidden">
     <Card.Body padding={4} className="flex-grow">
       <NotificationSummary method={notification.method} trigger={notification.trigger} />
     </Card.Body>

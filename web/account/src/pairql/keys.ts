@@ -1,6 +1,8 @@
 import type {
+  GetAccountBilling,
   GetAccountKeychain,
   GetAccountKeychains,
+  GetAccountSettings,
   GetActivitySummaries,
   GetDayActivity,
   GetDevices,
@@ -29,6 +31,14 @@ export class Key extends QueryKey<never> {
 
   static get devices(): QueryKey<GetDevices.Output> {
     return new QueryKey([`devices`]);
+  }
+
+  static get accountSettings(): QueryKey<GetAccountSettings.Output> {
+    return new QueryKey([`settings`]);
+  }
+
+  static get accountBilling(): QueryKey<GetAccountBilling.Output> {
+    return new QueryKey([`settings`, `billing`]);
   }
 
   static get keychains(): QueryKey<GetAccountKeychains.Output> {

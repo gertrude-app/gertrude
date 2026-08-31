@@ -2556,6 +2556,30 @@
     }
   },
   {
+    "id": "account-pages-settings--billing",
+    "iframePath": "/iframe.html?id=account-pages-settings--billing&viewMode=story",
+    "name": "Billing — Medium, current",
+    "path": "screenshots/mobile/account-pages-settings--billing.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-settings--billing",
+    "iframePath": "/iframe.html?id=account-pages-settings--billing&viewMode=story",
+    "name": "Billing — Medium, current",
+    "path": "screenshots/desktop/account-pages-settings--billing.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-settings--notifications",
     "iframePath": "/iframe.html?id=account-pages-settings--notifications&viewMode=story",
     "name": "Notifications",
@@ -2580,6 +2604,30 @@
     }
   },
   {
+    "id": "account-pages-unauthed--choose-new-password",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--choose-new-password&viewMode=story",
+    "name": "Choose New Password",
+    "path": "screenshots/mobile/account-pages-unauthed--choose-new-password.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--choose-new-password",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--choose-new-password&viewMode=story",
+    "name": "Choose New Password",
+    "path": "screenshots/desktop/account-pages-unauthed--choose-new-password.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-unauthed--login",
     "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
     "name": "Login",
@@ -2596,6 +2644,30 @@
     "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
     "name": "Login",
     "path": "screenshots/desktop/account-pages-unauthed--login.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--request-password-reset",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--request-password-reset&viewMode=story",
+    "name": "Request Password Reset",
+    "path": "screenshots/mobile/account-pages-unauthed--request-password-reset.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--request-password-reset",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--request-password-reset&viewMode=story",
+    "name": "Request Password Reset",
+    "path": "screenshots/desktop/account-pages-unauthed--request-password-reset.png",
     "title": "Account/Pages/Unauthed",
     "viewport": {
       "width": 1440,

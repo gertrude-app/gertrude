@@ -9,8 +9,8 @@ import {
   Text,
   VStack,
 } from '@gertrude/ui';
+import { parseE164 } from '@shared/phone-numbers';
 import {
-  BellDotIcon,
   CheckIcon,
   CopyIcon,
   ExternalLinkIcon,
@@ -27,17 +27,20 @@ type FlowState = `compose` | `codeSent` | `ntfyCreated`;
 type Platform = `ios` | `android` | `unknown`;
 
 export type NotificationMethodDraft =
-  | { type: `email`; emailAddress: string; confirmationCode: string }
-  | { type: `text`; phoneNumber: string; confirmationCode: string }
+  | { type: `email`; emailAddress: string }
+  | { type: `text`; phoneNumber: string }
   | {
       type: `slack`;
       channelName: string;
       channelId: string;
       botToken: string;
-      confirmationCode: string;
     }
-  | { type: `ntfy`; topicId: string }
-  | { type: `push` };
+  | { type: `ntfy` };
+
+export type PendingNotificationMethod = {
+  methodId: string;
+  ntfyTopic?: string;
+};
 
 type MethodSelectOption = {
   value: NotificationMethodType;
@@ -49,6 +52,7 @@ type MethodSelectOption = {
 type DefaultState = Partial<{
   methodType: NotificationMethodType;
   flowState: FlowState;
+  pendingMethodId: string;
   emailAddress: string;
   phoneNumber: string;
   slackChannelName: string;
@@ -60,7 +64,9 @@ type DefaultState = Partial<{
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete?: (draft: NotificationMethodDraft) => void | Promise<void>;
+  onCreatePending: (draft: NotificationMethodDraft) => Promise<PendingNotificationMethod>;
+  onConfirm: (methodId: string, code: number) => Promise<void>;
+  onComplete?: (methodId: string) => void;
   defaultNtfyTopic?: string;
   defaultState?: DefaultState;
 };
@@ -92,12 +98,6 @@ const methodOptions = [
       <img src="/ntfy-logo.svg" alt="" className="h-3.5 w-3.5 shrink-0 rounded-[3px]" />
     ),
   },
-  {
-    value: `push`,
-    label: `Push`,
-    description: `Receive Gertrude notifications on this browser or device.`,
-    icon: BellDotIcon,
-  },
 ] satisfies MethodSelectOption[];
 
 const IOS_APP_URL = `https://apps.apple.com/us/app/ntfy/id1625396347`;
@@ -106,6 +106,8 @@ const ANDROID_APP_URL = `https://play.google.com/store/apps/details?id=io.heckel
 const AddNotificationMethodSlideOver: React.FC<Props> = ({
   open,
   onOpenChange,
+  onCreatePending,
+  onConfirm,
   onComplete,
   defaultNtfyTopic = `gertrude-family-alerts-8k4tq9`,
   defaultState,
@@ -115,6 +117,9 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   );
   const [flowState, setFlowState] = React.useState<FlowState>(
     defaultState?.flowState ?? `compose`,
+  );
+  const [pendingMethodId, setPendingMethodId] = React.useState(
+    defaultState?.pendingMethodId ?? ``,
   );
   const [emailAddress, setEmailAddress] = React.useState(
     defaultState?.emailAddress ?? ``,
@@ -134,11 +139,11 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   );
   const [ntfyTopic, setNtfyTopic] = React.useState(defaultNtfyTopic);
   const [submitting, setSubmitting] = React.useState(false);
-  const needsCode = [`email`, `text`, `slack`].includes(methodType);
   const primaryButtonLabel = getPrimaryButtonLabel(methodType, flowState);
   const primaryButtonDisabled = getPrimaryButtonDisabled({
     methodType,
     flowState,
+    pendingMethodId,
     emailAddress,
     phoneNumber,
     slackChannelName,
@@ -150,6 +155,7 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   const reset = (): void => {
     setMethodType(defaultState?.methodType ?? `email`);
     setFlowState(defaultState?.flowState ?? `compose`);
+    setPendingMethodId(defaultState?.pendingMethodId ?? ``);
     setEmailAddress(defaultState?.emailAddress ?? ``);
     setPhoneNumber(defaultState?.phoneNumber ?? ``);
     setSlackChannelName(defaultState?.slackChannelName ?? ``);
@@ -171,15 +177,58 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   const selectMethodType = (nextMethodType: NotificationMethodType): void => {
     setMethodType(nextMethodType);
     setFlowState(`compose`);
+    setPendingMethodId(``);
     setConfirmationCode(``);
   };
 
-  const complete = (draft: NotificationMethodDraft): void => {
+  const sendVerification = async (): Promise<void> => {
+    if (submitting) {
+      return;
+    }
+
     setSubmitting(true);
-    void Promise.resolve(onComplete?.(draft)).finally(() => {
+    try {
+      const pending = await onCreatePending(
+        methodDraft({
+          methodType,
+          emailAddress,
+          phoneNumber,
+          slackChannelName,
+          slackChannelId,
+          slackBotToken,
+        }),
+      );
+      setPendingMethodId(pending.methodId);
+      setConfirmationCode(``);
+      if (methodType === `ntfy`) {
+        setNtfyTopic(pending.ntfyTopic ?? defaultNtfyTopic);
+        setFlowState(`ntfyCreated`);
+      } else {
+        setFlowState(`codeSent`);
+      }
+    } catch {
+      return;
+    } finally {
       setSubmitting(false);
+    }
+  };
+
+  const confirm = async (code: number): Promise<void> => {
+    if (!pendingMethodId || submitting) {
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await onConfirm(pendingMethodId, code);
+      const completedMethodId = pendingMethodId;
       handleOpenChange(false);
-    });
+      onComplete?.(completedMethodId);
+    } catch {
+      return;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handlePrimaryAction = (): void => {
@@ -187,40 +236,12 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
       return;
     }
 
-    if (flowState === `ntfyCreated`) {
-      complete({ type: `ntfy`, topicId: ntfyTopic });
+    if (flowState === `compose`) {
+      void sendVerification();
       return;
     }
 
-    if (methodType === `ntfy`) {
-      setNtfyTopic(defaultNtfyTopic);
-      setFlowState(`ntfyCreated`);
-      return;
-    }
-
-    if (methodType === `push`) {
-      complete({ type: `push` });
-      return;
-    }
-
-    if (flowState === `codeSent`) {
-      if (methodType === `email`) {
-        complete({ type: `email`, emailAddress, confirmationCode });
-      } else if (methodType === `text`) {
-        complete({ type: `text`, phoneNumber, confirmationCode });
-      } else if (methodType === `slack`) {
-        complete({
-          type: `slack`,
-          channelName: slackChannelName,
-          channelId: slackChannelId,
-          botToken: slackBotToken,
-          confirmationCode,
-        });
-      }
-      return;
-    }
-
-    setFlowState(`codeSent`);
+    void confirm(flowState === `ntfyCreated` ? 0 : Number(confirmationCode));
   };
 
   return (
@@ -241,10 +262,11 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
               selected={methodType}
               setSelected={selectMethodType}
               possibleValues={methodOptions}
+              disabled={flowState !== `compose` || submitting}
             />
             {flowState === `ntfyCreated` ? (
               <NtfySuccess topic={ntfyTopic} />
-            ) : flowState === `codeSent` && needsCode ? (
+            ) : flowState === `codeSent` ? (
               <VerificationCodeForm
                 methodType={methodType}
                 confirmationCode={confirmationCode}
@@ -276,7 +298,8 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
               <Button
                 type="button"
                 variant="default"
-                onClick={() => setConfirmationCode(``)}
+                onClick={() => void sendVerification()}
+                disabled={submitting}
               >
                 Resend
               </Button>
@@ -349,7 +372,7 @@ const MethodFields: React.FC<{
           placeholder="+1 555 555 0142"
           autoComplete="tel"
           required
-          helperText="Use an E.164 number so messages can be delivered reliably."
+          helperText="Include the country code so messages can be delivered reliably."
         />
       );
     case `slack`:
@@ -384,8 +407,6 @@ const MethodFields: React.FC<{
       );
     case `ntfy`:
       return <NtfyIntro />;
-    case `push`:
-      return <PushIntro />;
   }
 };
 
@@ -515,17 +536,30 @@ const NtfySuccess: React.FC<{ topic: string }> = ({ topic }) => {
   );
 };
 
-const PushIntro: React.FC = () => (
-  <VStack>
-    <Text as="p" variant="proseSubtle">
-      Push notifications send Gertrude alerts directly to this browser or device. The
-      browser will ask for permission when you enable this method.
-    </Text>
-    <Text as="p" variant="bodyMuted" className="mt-3">
-      If you use multiple browsers or devices, add each one separately.
-    </Text>
-  </VStack>
-);
+function methodDraft(input: {
+  methodType: NotificationMethodType;
+  emailAddress: string;
+  phoneNumber: string;
+  slackChannelName: string;
+  slackChannelId: string;
+  slackBotToken: string;
+}): NotificationMethodDraft {
+  switch (input.methodType) {
+    case `email`:
+      return { type: `email`, emailAddress: input.emailAddress };
+    case `text`:
+      return { type: `text`, phoneNumber: input.phoneNumber };
+    case `slack`:
+      return {
+        type: `slack`,
+        channelName: input.slackChannelName,
+        channelId: input.slackChannelId,
+        botToken: input.slackBotToken,
+      };
+    case `ntfy`:
+      return { type: `ntfy` };
+  }
+}
 
 function detectPlatform(): Platform {
   if (typeof navigator === `undefined`) {
@@ -555,8 +589,6 @@ function verificationDestination(methodType: NotificationMethodType): string {
       return `Slack channel`;
     case `ntfy`:
       return `ntfy topic`;
-    case `push`:
-      return `device`;
   }
 }
 
@@ -572,19 +604,13 @@ function getPrimaryButtonLabel(
     return `Verify code`;
   }
 
-  switch (methodType) {
-    case `ntfy`:
-      return `Create ntfy topic`;
-    case `push`:
-      return `Enable push notifications`;
-    default:
-      return `Send verification code`;
-  }
+  return methodType === `ntfy` ? `Create ntfy topic` : `Send verification code`;
 }
 
 function getPrimaryButtonDisabled(input: {
   methodType: NotificationMethodType;
   flowState: FlowState;
+  pendingMethodId: string;
   emailAddress: string;
   phoneNumber: string;
   slackChannelName: string;
@@ -593,18 +619,20 @@ function getPrimaryButtonDisabled(input: {
   confirmationCode: string;
 }): boolean {
   if (input.flowState === `codeSent`) {
-    return input.confirmationCode.match(/^\d{6}$/) === null;
+    return (
+      input.pendingMethodId === `` || input.confirmationCode.match(/^\d{6}$/) === null
+    );
   }
 
-  if (input.flowState !== `compose`) {
-    return false;
+  if (input.flowState === `ntfyCreated`) {
+    return input.pendingMethodId === ``;
   }
 
   switch (input.methodType) {
     case `email`:
       return input.emailAddress.match(/^.+@.+\..+$/) === null;
     case `text`:
-      return input.phoneNumber.match(/^\+?[0-9 ().-]{7,}$/) === null;
+      return parseE164(input.phoneNumber) === null;
     case `slack`:
       return !(
         input.slackBotToken.startsWith(`xoxb-`) &&
@@ -612,7 +640,6 @@ function getPrimaryButtonDisabled(input: {
         input.slackChannelId.length > 3
       );
     case `ntfy`:
-    case `push`:
       return false;
   }
 }

@@ -14,18 +14,27 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
+import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
+import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppPeopleIndexRouteImport } from './routes/_app/people/index'
 import { Route as AppKeychainsIndexRouteImport } from './routes/_app/keychains/index'
 import { Route as AppDevicesIndexRouteImport } from './routes/_app/devices/index'
 import { Route as AppActivityIndexRouteImport } from './routes/_app/activity/index'
+import { Route as unauthedResetPasswordIndexRouteImport } from './routes/(unauthed)/reset-password/index'
+import { Route as AppSettingsNotificationsRouteImport } from './routes/_app/settings/notifications'
 import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/unlock'
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as AppPeopleNewRouteImport } from './routes/_app/people/new'
 import { Route as AppKeychainsKeychainIdRouteImport } from './routes/_app/keychains/$keychainId'
+import { Route as unauthedResetPasswordTokenRouteImport } from './routes/(unauthed)/reset-password/$token'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
+import { Route as AppSettingsBillingRouteRouteImport } from './routes/_app/settings/billing/route'
 import { Route as AppPeoplePersonIdRouteRouteImport } from './routes/_app/people/$personId/route'
+import { Route as AppSettingsBillingIndexRouteImport } from './routes/_app/settings/billing/index'
 import { Route as AppPeoplePersonIdIndexRouteImport } from './routes/_app/people/$personId/index'
+import { Route as AppSettingsBillingCheckoutSuccessRouteImport } from './routes/_app/settings/billing/checkout-success'
+import { Route as AppSettingsBillingCheckoutCancelRouteImport } from './routes/_app/settings/billing/checkout-cancel'
 import { Route as AppRequestsSuspensionRequestIdRouteImport } from './routes/_app/requests/suspension/$requestId'
 import { Route as AppPeoplePersonIdMacSettingsRouteImport } from './routes/_app/people/$personId/mac-settings'
 import { Route as AppActivityDayDayRouteImport } from './routes/_app/activity/day/$day'
@@ -58,10 +67,20 @@ const unauthedLoginRoute = unauthedLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSettingsRouteRoute = AppSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppPeopleRouteRoute = AppPeopleRouteRouteImport.update({
   id: '/people',
   path: '/people',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSettingsIndexRoute = AppSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppSettingsRouteRoute,
 } as any)
 const AppPeopleIndexRoute = AppPeopleIndexRouteImport.update({
   id: '/',
@@ -83,6 +102,18 @@ const AppActivityIndexRoute = AppActivityIndexRouteImport.update({
   path: '/activity/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const unauthedResetPasswordIndexRoute =
+  unauthedResetPasswordIndexRouteImport.update({
+    id: '/(unauthed)/reset-password/',
+    path: '/reset-password/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppSettingsNotificationsRoute =
+  AppSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AppSettingsRouteRoute,
+  } as any)
 const AppRequestsUnlockRoute = AppRequestsUnlockRouteImport.update({
   id: '/requests/unlock',
   path: '/requests/unlock',
@@ -103,21 +134,49 @@ const AppKeychainsKeychainIdRoute = AppKeychainsKeychainIdRouteImport.update({
   path: '/keychains/$keychainId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const unauthedResetPasswordTokenRoute =
+  unauthedResetPasswordTokenRouteImport.update({
+    id: '/(unauthed)/reset-password/$token',
+    path: '/reset-password/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const unauthedOtpTokenRoute = unauthedOtpTokenRouteImport.update({
   id: '/(unauthed)/otp/$token',
   path: '/otp/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppSettingsBillingRouteRoute = AppSettingsBillingRouteRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AppSettingsRouteRoute,
 } as any)
 const AppPeoplePersonIdRouteRoute = AppPeoplePersonIdRouteRouteImport.update({
   id: '/$personId',
   path: '/$personId',
   getParentRoute: () => AppPeopleRouteRoute,
 } as any)
+const AppSettingsBillingIndexRoute = AppSettingsBillingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppSettingsBillingRouteRoute,
+} as any)
 const AppPeoplePersonIdIndexRoute = AppPeoplePersonIdIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppPeoplePersonIdRouteRoute,
 } as any)
+const AppSettingsBillingCheckoutSuccessRoute =
+  AppSettingsBillingCheckoutSuccessRouteImport.update({
+    id: '/checkout-success',
+    path: '/checkout-success',
+    getParentRoute: () => AppSettingsBillingRouteRoute,
+  } as any)
+const AppSettingsBillingCheckoutCancelRoute =
+  AppSettingsBillingCheckoutCancelRouteImport.update({
+    id: '/checkout-cancel',
+    path: '/checkout-cancel',
+    getParentRoute: () => AppSettingsBillingRouteRoute,
+  } as any)
 const AppRequestsSuspensionRequestIdRoute =
   AppRequestsSuspensionRequestIdRouteImport.update({
     id: '/$requestId',
@@ -163,23 +222,32 @@ const AppActivityPersonPersonIdDayDayRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/people': typeof AppPeopleRouteRouteWithChildren
+  '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
+  '/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
   '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
+  '/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/reset-password/': typeof unauthedResetPasswordIndexRoute
   '/activity/': typeof AppActivityIndexRoute
   '/devices/': typeof AppDevicesIndexRoute
   '/keychains/': typeof AppKeychainsIndexRoute
   '/people/': typeof AppPeopleIndexRoute
+  '/settings/': typeof AppSettingsIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
   '/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
+  '/settings/billing/checkout-cancel': typeof AppSettingsBillingCheckoutCancelRoute
+  '/settings/billing/checkout-success': typeof AppSettingsBillingCheckoutSuccessRoute
   '/people/$personId/': typeof AppPeoplePersonIdIndexRoute
+  '/settings/billing/': typeof AppSettingsBillingIndexRoute
   '/people/$personId/ios-settings/$deviceId': typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   '/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/people/$personId/ios-settings/': typeof AppPeoplePersonIdIosSettingsIndexRoute
@@ -191,18 +259,25 @@ export interface FileRoutesByTo {
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
+  '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
   '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/requests/unlock': typeof AppRequestsUnlockRoute
+  '/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/reset-password': typeof unauthedResetPasswordIndexRoute
   '/activity': typeof AppActivityIndexRoute
   '/devices': typeof AppDevicesIndexRoute
   '/keychains': typeof AppKeychainsIndexRoute
   '/people': typeof AppPeopleIndexRoute
+  '/settings': typeof AppSettingsIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
   '/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
+  '/settings/billing/checkout-cancel': typeof AppSettingsBillingCheckoutCancelRoute
+  '/settings/billing/checkout-success': typeof AppSettingsBillingCheckoutSuccessRoute
   '/people/$personId': typeof AppPeoplePersonIdIndexRoute
+  '/settings/billing': typeof AppSettingsBillingIndexRoute
   '/people/$personId/ios-settings/$deviceId': typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   '/activity/person/$personId': typeof AppActivityPersonPersonIdIndexRoute
   '/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsIndexRoute
@@ -212,24 +287,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/people': typeof AppPeopleRouteRouteWithChildren
+  '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
+  '/_app/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
+  '/(unauthed)/reset-password/$token': typeof unauthedResetPasswordTokenRoute
   '/_app/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/_app/people/new': typeof AppPeopleNewRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
   '/_app/requests/unlock': typeof AppRequestsUnlockRoute
+  '/_app/settings/notifications': typeof AppSettingsNotificationsRoute
+  '/(unauthed)/reset-password/': typeof unauthedResetPasswordIndexRoute
   '/_app/activity/': typeof AppActivityIndexRoute
   '/_app/devices/': typeof AppDevicesIndexRoute
   '/_app/keychains/': typeof AppKeychainsIndexRoute
   '/_app/people/': typeof AppPeopleIndexRoute
+  '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/activity/day/$day': typeof AppActivityDayDayRoute
   '/_app/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/_app/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
+  '/_app/settings/billing/checkout-cancel': typeof AppSettingsBillingCheckoutCancelRoute
+  '/_app/settings/billing/checkout-success': typeof AppSettingsBillingCheckoutSuccessRoute
   '/_app/people/$personId/': typeof AppPeoplePersonIdIndexRoute
+  '/_app/settings/billing/': typeof AppSettingsBillingIndexRoute
   '/_app/people/$personId/ios-settings/$deviceId': typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   '/_app/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/_app/people/$personId/ios-settings/': typeof AppPeoplePersonIdIosSettingsIndexRoute
@@ -240,23 +324,32 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/people'
+    | '/settings'
     | '/login'
     | '/security-events'
     | '/signout'
     | '/people/$personId'
+    | '/settings/billing'
     | '/otp/$token'
+    | '/reset-password/$token'
     | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
+    | '/settings/notifications'
+    | '/reset-password/'
     | '/activity/'
     | '/devices/'
     | '/keychains/'
     | '/people/'
+    | '/settings/'
     | '/activity/day/$day'
     | '/people/$personId/mac-settings'
     | '/requests/suspension/$requestId'
+    | '/settings/billing/checkout-cancel'
+    | '/settings/billing/checkout-success'
     | '/people/$personId/'
+    | '/settings/billing/'
     | '/people/$personId/ios-settings/$deviceId'
     | '/activity/person/$personId/'
     | '/people/$personId/ios-settings/'
@@ -268,18 +361,25 @@ export interface FileRouteTypes {
     | '/signout'
     | '/'
     | '/otp/$token'
+    | '/reset-password/$token'
     | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
     | '/requests/unlock'
+    | '/settings/notifications'
+    | '/reset-password'
     | '/activity'
     | '/devices'
     | '/keychains'
     | '/people'
+    | '/settings'
     | '/activity/day/$day'
     | '/people/$personId/mac-settings'
     | '/requests/suspension/$requestId'
+    | '/settings/billing/checkout-cancel'
+    | '/settings/billing/checkout-success'
     | '/people/$personId'
+    | '/settings/billing'
     | '/people/$personId/ios-settings/$deviceId'
     | '/activity/person/$personId'
     | '/people/$personId/ios-settings'
@@ -288,24 +388,33 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_app/people'
+    | '/_app/settings'
     | '/(unauthed)/login'
     | '/_app/security-events'
     | '/_app/signout'
     | '/_app/'
     | '/_app/people/$personId'
+    | '/_app/settings/billing'
     | '/(unauthed)/otp/$token'
+    | '/(unauthed)/reset-password/$token'
     | '/_app/keychains/$keychainId'
     | '/_app/people/new'
     | '/_app/requests/suspension'
     | '/_app/requests/unlock'
+    | '/_app/settings/notifications'
+    | '/(unauthed)/reset-password/'
     | '/_app/activity/'
     | '/_app/devices/'
     | '/_app/keychains/'
     | '/_app/people/'
+    | '/_app/settings/'
     | '/_app/activity/day/$day'
     | '/_app/people/$personId/mac-settings'
     | '/_app/requests/suspension/$requestId'
+    | '/_app/settings/billing/checkout-cancel'
+    | '/_app/settings/billing/checkout-success'
     | '/_app/people/$personId/'
+    | '/_app/settings/billing/'
     | '/_app/people/$personId/ios-settings/$deviceId'
     | '/_app/activity/person/$personId/'
     | '/_app/people/$personId/ios-settings/'
@@ -316,6 +425,8 @@ export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   unauthedLoginRoute: typeof unauthedLoginRoute
   unauthedOtpTokenRoute: typeof unauthedOtpTokenRoute
+  unauthedResetPasswordTokenRoute: typeof unauthedResetPasswordTokenRoute
+  unauthedResetPasswordIndexRoute: typeof unauthedResetPasswordIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -355,12 +466,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unauthedLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/people': {
       id: '/_app/people'
       path: '/people'
       fullPath: '/people'
       preLoaderRoute: typeof AppPeopleRouteRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/_app/settings/': {
+      id: '/_app/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AppSettingsIndexRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
     }
     '/_app/people/': {
       id: '/_app/people/'
@@ -390,6 +515,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppActivityIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/(unauthed)/reset-password/': {
+      id: '/(unauthed)/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof unauthedResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/settings/notifications': {
+      id: '/_app/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof AppSettingsNotificationsRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
+    }
     '/_app/requests/unlock': {
       id: '/_app/requests/unlock'
       path: '/requests/unlock'
@@ -418,12 +557,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppKeychainsKeychainIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/(unauthed)/reset-password/$token': {
+      id: '/(unauthed)/reset-password/$token'
+      path: '/reset-password/$token'
+      fullPath: '/reset-password/$token'
+      preLoaderRoute: typeof unauthedResetPasswordTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(unauthed)/otp/$token': {
       id: '/(unauthed)/otp/$token'
       path: '/otp/$token'
       fullPath: '/otp/$token'
       preLoaderRoute: typeof unauthedOtpTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/settings/billing': {
+      id: '/_app/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof AppSettingsBillingRouteRouteImport
+      parentRoute: typeof AppSettingsRouteRoute
     }
     '/_app/people/$personId': {
       id: '/_app/people/$personId'
@@ -432,12 +585,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeoplePersonIdRouteRouteImport
       parentRoute: typeof AppPeopleRouteRoute
     }
+    '/_app/settings/billing/': {
+      id: '/_app/settings/billing/'
+      path: '/'
+      fullPath: '/settings/billing/'
+      preLoaderRoute: typeof AppSettingsBillingIndexRouteImport
+      parentRoute: typeof AppSettingsBillingRouteRoute
+    }
     '/_app/people/$personId/': {
       id: '/_app/people/$personId/'
       path: '/'
       fullPath: '/people/$personId/'
       preLoaderRoute: typeof AppPeoplePersonIdIndexRouteImport
       parentRoute: typeof AppPeoplePersonIdRouteRoute
+    }
+    '/_app/settings/billing/checkout-success': {
+      id: '/_app/settings/billing/checkout-success'
+      path: '/checkout-success'
+      fullPath: '/settings/billing/checkout-success'
+      preLoaderRoute: typeof AppSettingsBillingCheckoutSuccessRouteImport
+      parentRoute: typeof AppSettingsBillingRouteRoute
+    }
+    '/_app/settings/billing/checkout-cancel': {
+      id: '/_app/settings/billing/checkout-cancel'
+      path: '/checkout-cancel'
+      fullPath: '/settings/billing/checkout-cancel'
+      preLoaderRoute: typeof AppSettingsBillingCheckoutCancelRouteImport
+      parentRoute: typeof AppSettingsBillingRouteRoute
     }
     '/_app/requests/suspension/$requestId': {
       id: '/_app/requests/suspension/$requestId'
@@ -529,6 +703,41 @@ const AppPeopleRouteRouteWithChildren = AppPeopleRouteRoute._addFileChildren(
   AppPeopleRouteRouteChildren,
 )
 
+interface AppSettingsBillingRouteRouteChildren {
+  AppSettingsBillingCheckoutCancelRoute: typeof AppSettingsBillingCheckoutCancelRoute
+  AppSettingsBillingCheckoutSuccessRoute: typeof AppSettingsBillingCheckoutSuccessRoute
+  AppSettingsBillingIndexRoute: typeof AppSettingsBillingIndexRoute
+}
+
+const AppSettingsBillingRouteRouteChildren: AppSettingsBillingRouteRouteChildren =
+  {
+    AppSettingsBillingCheckoutCancelRoute:
+      AppSettingsBillingCheckoutCancelRoute,
+    AppSettingsBillingCheckoutSuccessRoute:
+      AppSettingsBillingCheckoutSuccessRoute,
+    AppSettingsBillingIndexRoute: AppSettingsBillingIndexRoute,
+  }
+
+const AppSettingsBillingRouteRouteWithChildren =
+  AppSettingsBillingRouteRoute._addFileChildren(
+    AppSettingsBillingRouteRouteChildren,
+  )
+
+interface AppSettingsRouteRouteChildren {
+  AppSettingsBillingRouteRoute: typeof AppSettingsBillingRouteRouteWithChildren
+  AppSettingsNotificationsRoute: typeof AppSettingsNotificationsRoute
+  AppSettingsIndexRoute: typeof AppSettingsIndexRoute
+}
+
+const AppSettingsRouteRouteChildren: AppSettingsRouteRouteChildren = {
+  AppSettingsBillingRouteRoute: AppSettingsBillingRouteRouteWithChildren,
+  AppSettingsNotificationsRoute: AppSettingsNotificationsRoute,
+  AppSettingsIndexRoute: AppSettingsIndexRoute,
+}
+
+const AppSettingsRouteRouteWithChildren =
+  AppSettingsRouteRoute._addFileChildren(AppSettingsRouteRouteChildren)
+
 interface AppRequestsSuspensionRouteChildren {
   AppRequestsSuspensionRequestIdRoute: typeof AppRequestsSuspensionRequestIdRoute
 }
@@ -544,6 +753,7 @@ const AppRequestsSuspensionRouteWithChildren =
 
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
+  AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -560,6 +770,7 @@ interface AppRouteRouteChildren {
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
+  AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
   AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
@@ -582,6 +793,8 @@ const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   unauthedLoginRoute: unauthedLoginRoute,
   unauthedOtpTokenRoute: unauthedOtpTokenRoute,
+  unauthedResetPasswordTokenRoute: unauthedResetPasswordTokenRoute,
+  unauthedResetPasswordIndexRoute: unauthedResetPasswordIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,6 +1,7 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
 import LoginPage from './LoginPage';
+import { ChooseNewPasswordPage, RequestPasswordResetPage } from './PasswordResetPages';
 import SignupPage from './SignupPage';
 import { testimonials } from '#/components/storybook/fixtures';
 
@@ -30,6 +31,37 @@ const LoginStory: React.FC = () => {
   );
 };
 
+const RequestPasswordResetStory: React.FC = () => {
+  const [email, setEmail] = React.useState(`parent@example.com`);
+
+  return (
+    <RequestPasswordResetPage
+      email={email}
+      setEmail={setEmail}
+      submitting={false}
+      sent={false}
+      backLink={{ text: `Back to login`, href: `/login` }}
+      onSubmit={preventSubmit}
+    />
+  );
+};
+
+const ChooseNewPasswordStory: React.FC = () => {
+  const [password, setPassword] = React.useState(``);
+
+  return (
+    <ChooseNewPasswordPage
+      password={password}
+      setPassword={setPassword}
+      submitting={false}
+      succeeded={false}
+      invalidToken={false}
+      backLink={{ text: `Back to login`, href: `/login` }}
+      onSubmit={preventSubmit}
+    />
+  );
+};
+
 const SignupStory: React.FC = () => {
   const [email, setEmail] = React.useState(``);
   const [password, setPassword] = React.useState(``);
@@ -51,6 +83,24 @@ export const Login = {
   render: () => (
     <StoryScreen>
       <LoginStory />
+    </StoryScreen>
+  ),
+};
+
+export const RequestPasswordReset = {
+  parameters: galleryParameters,
+  render: () => (
+    <StoryScreen>
+      <RequestPasswordResetStory />
+    </StoryScreen>
+  ),
+};
+
+export const ChooseNewPassword = {
+  parameters: galleryParameters,
+  render: () => (
+    <StoryScreen>
+      <ChooseNewPasswordStory />
     </StoryScreen>
   ),
 };

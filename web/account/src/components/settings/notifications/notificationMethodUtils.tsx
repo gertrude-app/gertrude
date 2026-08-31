@@ -1,5 +1,6 @@
+import { prettyE164 } from '@shared/phone-numbers';
 import cx from 'clsx';
-import { BellDotIcon, MailIcon, MessageCircleIcon } from 'lucide-react';
+import { MailIcon, MessageCircleIcon } from 'lucide-react';
 import type { NotificationMethod } from '#/components/types';
 import type React from 'react';
 
@@ -20,8 +21,6 @@ export function notificationMethodIcon(
       return (
         <img src="/ntfy-logo.svg" alt="" className={cx(className, `rounded-[3px]`)} />
       );
-    case `push`:
-      return <BellDotIcon className={className} />;
   }
 }
 
@@ -35,8 +34,6 @@ export function notificationMethodTypeLabel(method: NotificationMethod): string 
       return `Slack`;
     case `ntfy`:
       return `Ntfy`;
-    case `push`:
-      return `Push`;
   }
 }
 
@@ -45,13 +42,11 @@ export function notificationMethodTarget(method: NotificationMethod): string | n
     case `email`:
       return method.emailAddress;
     case `text`:
-      return formatPhoneNumber(method.phoneNumber);
+      return prettyE164(method.phoneNumber);
     case `slack`:
       return `#${method.channelName.replace(/^#/, ``)}`;
     case `ntfy`:
       return truncateNtfyTopic(method.topicId);
-    case `push`:
-      return null;
   }
 }
 
@@ -64,14 +59,4 @@ export function notificationMethodSelectLabel(method: NotificationMethod): strin
 
 function truncateNtfyTopic(topic: string): string {
   return topic.length > 15 ? `${topic.slice(0, 12)}...` : topic;
-}
-
-function formatPhoneNumber(phoneNumber: string): string {
-  const match = phoneNumber.match(/^\+1(\d{3})(\d{3})(\d{4})$/);
-
-  if (!match) {
-    return phoneNumber;
-  }
-
-  return `+1 (${match[1]}) ${match[2]}-${match[3]}`;
 }

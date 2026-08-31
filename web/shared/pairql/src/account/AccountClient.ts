@@ -36,6 +36,56 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public accountResetPassword = (
+    input: P.AccountResetPassword.Input,
+  ): Promise<Result<P.AccountResetPassword.Output>> => {
+    return this.query<P.AccountResetPassword.Output>(
+      input,
+      `AccountResetPassword`,
+      `none`,
+    );
+  };
+
+  public accountSendPasswordResetEmail = (
+    input: P.AccountSendPasswordResetEmail.Input,
+  ): Promise<Result<P.AccountSendPasswordResetEmail.Output>> => {
+    return this.query<P.AccountSendPasswordResetEmail.Output>(
+      input,
+      `AccountSendPasswordResetEmail`,
+      `none`,
+    );
+  };
+
+  public changeAccountSubscriptionTier = (
+    input: P.ChangeAccountSubscriptionTier.Input,
+  ): Promise<Result<P.ChangeAccountSubscriptionTier.Output>> => {
+    return this.query<P.ChangeAccountSubscriptionTier.Output>(
+      input,
+      `ChangeAccountSubscriptionTier`,
+      `parent`,
+    );
+  };
+
+  public confirmAccountNotificationMethod = (
+    input: P.ConfirmAccountNotificationMethod.Input,
+  ): Promise<Result<P.ConfirmAccountNotificationMethod.Output>> => {
+    return this.query<P.ConfirmAccountNotificationMethod.Output>(
+      input,
+      `ConfirmAccountNotificationMethod`,
+      `parent`,
+    );
+  };
+
+  public createAccountNotificationMethod = (
+    input: P.CreateAccountNotificationMethod.Input,
+  ): Promise<Result<P.CreateAccountNotificationMethod.Output>> => {
+    return this.query<P.CreateAccountNotificationMethod.Output>(
+      input,
+      `CreateAccountNotificationMethod`,
+      `parent`,
+    );
+  };
+
   public createPerson = (
     input: P.CreatePerson.Input,
   ): Promise<Result<P.CreatePerson.Output>> => {
@@ -58,6 +108,26 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeleteAccountKey.Output>(input, `DeleteAccountKey`, `parent`);
   };
 
+  public deleteAccountNotification = (
+    input: P.DeleteAccountNotification.Input,
+  ): Promise<Result<P.DeleteAccountNotification.Output>> => {
+    return this.query<P.DeleteAccountNotification.Output>(
+      input,
+      `DeleteAccountNotification`,
+      `parent`,
+    );
+  };
+
+  public deleteAccountNotificationMethod = (
+    input: P.DeleteAccountNotificationMethod.Input,
+  ): Promise<Result<P.DeleteAccountNotificationMethod.Output>> => {
+    return this.query<P.DeleteAccountNotificationMethod.Output>(
+      input,
+      `DeleteAccountNotificationMethod`,
+      `parent`,
+    );
+  };
+
   public deleteActivity = (
     input: P.DeleteActivity.Input,
   ): Promise<Result<P.DeleteActivity.Output>> => {
@@ -68,6 +138,12 @@ export default class AccountClient extends Client<Auth> {
     input: P.DeletePerson.Input,
   ): Promise<Result<P.DeletePerson.Output>> => {
     return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
+  };
+
+  public getAccountBilling = (
+    input: P.GetAccountBilling.Input,
+  ): Promise<Result<P.GetAccountBilling.Output>> => {
+    return this.query<P.GetAccountBilling.Output>(input, `GetAccountBilling`, `parent`);
   };
 
   public getAccountKeychain = (
@@ -84,6 +160,12 @@ export default class AccountClient extends Client<Auth> {
       `GetAccountKeychains`,
       `parent`,
     );
+  };
+
+  public getAccountSettings = (
+    input: P.GetAccountSettings.Input,
+  ): Promise<Result<P.GetAccountSettings.Output>> => {
+    return this.query<P.GetAccountSettings.Output>(input, `GetAccountSettings`, `parent`);
   };
 
   public getActivitySummaries = (
@@ -178,6 +260,36 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public handleAccountCheckoutCancel = (
+    input: P.HandleAccountCheckoutCancel.Input,
+  ): Promise<Result<P.HandleAccountCheckoutCancel.Output>> => {
+    return this.query<P.HandleAccountCheckoutCancel.Output>(
+      input,
+      `HandleAccountCheckoutCancel`,
+      `parent`,
+    );
+  };
+
+  public handleAccountCheckoutSuccess = (
+    input: P.HandleAccountCheckoutSuccess.Input,
+  ): Promise<Result<P.HandleAccountCheckoutSuccess.Output>> => {
+    return this.query<P.HandleAccountCheckoutSuccess.Output>(
+      input,
+      `HandleAccountCheckoutSuccess`,
+      `parent`,
+    );
+  };
+
+  public openAccountBillingPortal = (
+    input: P.OpenAccountBillingPortal.Input,
+  ): Promise<Result<P.OpenAccountBillingPortal.Output>> => {
+    return this.query<P.OpenAccountBillingPortal.Output>(
+      input,
+      `OpenAccountBillingPortal`,
+      `parent`,
+    );
+  };
+
   public requestAccountPublicKeychain = (
     input: P.RequestAccountPublicKeychain.Input,
   ): Promise<Result<P.RequestAccountPublicKeychain.Output>> => {
@@ -204,12 +316,52 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.SaveAccountKey.Output>(input, `SaveAccountKey`, `parent`);
   };
 
+  public saveAccountNotification = (
+    input: P.SaveAccountNotification.Input,
+  ): Promise<Result<P.SaveAccountNotification.Output>> => {
+    return this.query<P.SaveAccountNotification.Output>(
+      input,
+      `SaveAccountNotification`,
+      `parent`,
+    );
+  };
+
+  public setAccountDailyReviewEmail = (
+    input: P.SetAccountDailyReviewEmail.Input,
+  ): Promise<Result<P.SetAccountDailyReviewEmail.Output>> => {
+    return this.query<P.SetAccountDailyReviewEmail.Output>(
+      input,
+      `SetAccountDailyReviewEmail`,
+      `parent`,
+    );
+  };
+
   public setAccountKeychainAssignment = (
     input: P.SetAccountKeychainAssignment.Input,
   ): Promise<Result<P.SetAccountKeychainAssignment.Output>> => {
     return this.query<P.SetAccountKeychainAssignment.Output>(
       input,
       `SetAccountKeychainAssignment`,
+      `parent`,
+    );
+  };
+
+  public startAccountCheckout = (
+    input: P.StartAccountCheckout.Input,
+  ): Promise<Result<P.StartAccountCheckout.Output>> => {
+    return this.query<P.StartAccountCheckout.Output>(
+      input,
+      `StartAccountCheckout`,
+      `parent`,
+    );
+  };
+
+  public startAccountFullTrial = (
+    input: P.StartAccountFullTrial.Input,
+  ): Promise<Result<P.StartAccountFullTrial.Output>> => {
+    return this.query<P.StartAccountFullTrial.Output>(
+      input,
+      `StartAccountFullTrial`,
       `parent`,
     );
   };
