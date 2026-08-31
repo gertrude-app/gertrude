@@ -179,7 +179,14 @@ const ProductMenuItem: React.FC<ProductMenuItemProps> = ({
     render={<Link href={href} />}
     className="group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 outline-none transition-colors duration-150 hover:bg-white data-[highlighted]:bg-white data-[highlighted]:shadow-sm"
   >
-    <img src={iconSrc} alt="" className="size-10 shrink-0 rounded-[10px]" />
+    <img
+      src={iconSrc}
+      alt=""
+      width={40}
+      height={40}
+      decoding="async"
+      className="size-10 shrink-0 rounded-[10px]"
+    />
     <span className="min-w-0">
       <span className="block text-sm font-semibold text-stone-800 group-hover:text-violet-800 group-data-[highlighted]:text-violet-800">
         {title}

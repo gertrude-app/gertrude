@@ -79,8 +79,14 @@ const blockerGroups = [
 const BlockerGroupsFeature: React.FC = () => (
   <div className="relative -mx-8 aspect-video min-h-[52rem] w-[calc(100%+4rem)] bg-white sm:min-h-[48rem] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:min-h-0">
     <img
-      src="/home/grainy-gradient.png"
+      src="/home/grainy-gradient.webp"
+      srcSet="/home/grainy-gradient-1000.webp 1000w, /home/grainy-gradient-1280.webp 1280w, /home/grainy-gradient-1600.webp 1600w, /home/grainy-gradient.webp 2000w"
+      sizes="(min-width: 1280px) 1280px, 100vw"
       alt=""
+      width={2000}
+      height={2000}
+      loading="lazy"
+      decoding="async"
       className="pointer-events-none absolute inset-0 size-full object-fill opacity-20"
       style={{ transform: `scaleY(-1)` }}
     />
@@ -101,11 +107,24 @@ const BlockerGroupsFeature: React.FC = () => (
       aria-hidden
       className="pointer-events-none absolute left-[8%] top-[22%] z-[1] h-[78%] w-[110%] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-white/85 blur-[80px] sm:blur-[110px]"
     />
-    <img
-      src="/home/landscape-bg-no-background.png"
-      alt=""
-      className="pointer-events-none absolute inset-0 z-[2] size-full object-cover object-bottom"
-    />
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center overflow-hidden"
+    >
+      <div className="relative aspect-[3/2] min-h-full min-w-full shrink-0">
+        <img
+          src="/home/landscape-bg-no-background.webp"
+          srcSet="/home/landscape-bg-no-background-1600.webp 1600w, /home/landscape-bg-no-background-2400.webp 2400w, /home/landscape-bg-no-background-2560.webp 2560w, /home/landscape-bg-no-background.webp 3024w"
+          sizes="(min-width: 1280px) 1280px, (min-width: 640px) 1152px, 1248px"
+          alt=""
+          width={3024}
+          height={457}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-x-0 bottom-0 w-full"
+        />
+      </div>
+    </div>
     <p className="relative z-10 max-w-2xl py-8 pr-8 pl-20 text-lg leading-7 text-stone-600 sm:py-12 sm:pr-12 sm:pl-24 lg:py-16 lg:pr-16 lg:pl-[6.5rem]">
       <strong className="mb-2 block text-xl font-semibold text-stone-950">
         Block whole categories with one choice.
@@ -226,8 +245,14 @@ const BlockerCoverageGraph: React.FC = () => {
       className="relative -mx-8 mt-24 flex w-[calc(100%+4rem)] flex-col items-center bg-white px-6 py-20 sm:px-12 lg:-mx-10 lg:w-[calc(100%+5rem)] lg:px-20 lg:py-24"
     >
       <img
-        src="/home/grainy-gradient.png"
+        src="/home/grainy-gradient.webp"
+        srcSet="/home/grainy-gradient-1000.webp 1000w, /home/grainy-gradient-1280.webp 1280w, /home/grainy-gradient-1600.webp 1600w, /home/grainy-gradient.webp 2000w"
+        sizes="(min-width: 1280px) 1280px, 100vw"
         alt=""
+        width={2000}
+        height={2000}
+        loading="lazy"
+        decoding="async"
         className="pointer-events-none absolute inset-0 z-0 size-full object-fill opacity-20"
       />
       <div
@@ -389,6 +414,8 @@ const BlockerCoverageGraph: React.FC = () => {
           alt="Download Gertrude Blocker on the App Store"
           width={168}
           height={56}
+          loading="lazy"
+          decoding="async"
           className="h-12 w-auto sm:h-14"
         />
       </a>
