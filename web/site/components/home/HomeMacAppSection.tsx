@@ -41,27 +41,32 @@ export default HomeMacAppSection;
 
 const macFeatures = [
   {
-    image: `/home/mac-suspension-requests.png`,
-    titleBackground: `/home/mac-suspension-requests-bg.png`,
+    image: `/home/mac-suspension-requests.webp`,
+    imageSrcSet: `/home/mac-suspension-requests-900.webp 900w, /home/mac-suspension-requests-1200.webp 1200w, /home/mac-suspension-requests-1440.webp 1440w, /home/mac-suspension-requests.webp 1800w`,
+    titleBackground: `/home/mac-suspension-requests-bg.webp`,
     alt: `Gertrude suspension request duration picker`,
     title: `Suspension requests.`,
     description: `Request a temporary filter suspension for a parent to approve.`,
   },
   {
-    image: `/home/mac-menu-transparency.png`,
-    titleBackground: `/home/mac-menu-transparency-bg.png`,
+    image: `/home/mac-menu-transparency.webp`,
+    imageSrcSet: `/home/mac-menu-transparency-900.webp 900w, /home/mac-menu-transparency-1200.webp 1200w, /home/mac-menu-transparency-1440.webp 1440w, /home/mac-menu-transparency.webp 1800w`,
+    titleBackground: `/home/mac-menu-transparency-bg.webp`,
     alt: `Gertrude menu showing filtering and monitoring status`,
     title: `Complete transparency.`,
     description: `See filtering and monitoring status right from the menu bar.`,
   },
   {
-    image: `/home/mac-unlock-requests.png`,
-    titleBackground: `/home/mac-unlock-requests-bg.png`,
+    image: `/home/mac-unlock-requests.webp`,
+    imageSrcSet: `/home/mac-unlock-requests-900.webp 900w, /home/mac-unlock-requests-1200.webp 1200w, /home/mac-unlock-requests-1440.webp 1440w, /home/mac-unlock-requests.webp 1800w`,
+    titleBackground: `/home/mac-unlock-requests-bg.webp`,
     alt: `Gertrude blocked requests selected for an unlock request`,
     title: `Simple unlock requests.`,
     description: `Select blocked domains and ask a parent for access in seconds.`,
   },
 ];
+
+const macFeatureImageSizes = `(min-width: 1280px) 384px, (min-width: 768px) calc((100vw - 10rem) / 3), calc(100vw - 4rem)`;
 
 const MacFeatureGallery: React.FC = () => (
   <div className="mt-24 grid gap-10 md:grid-cols-3 md:gap-6">
@@ -70,12 +75,24 @@ const MacFeatureGallery: React.FC = () => (
         <div className="relative rounded-2xl">
           <img
             src={feature.image}
+            srcSet={feature.imageSrcSet}
+            sizes={macFeatureImageSizes}
             alt={feature.alt}
+            width={1800}
+            height={1230}
+            loading="lazy"
+            decoding="async"
             className="aspect-[1800/1230] w-full object-cover absolute rounded-2xl opacity-50 blur-sm"
           />
           <img
             src={feature.image}
+            srcSet={feature.imageSrcSet}
+            sizes={macFeatureImageSizes}
             alt={feature.alt}
+            width={1800}
+            height={1230}
+            loading="lazy"
+            decoding="async"
             className="aspect-[1800/1230] w-full object-cover rounded-2xl relative"
           />
           <div
@@ -85,14 +102,14 @@ const MacFeatureGallery: React.FC = () => (
         </div>
         <p className="mt-5 text-lg leading-7 text-stone-500">
           <strong className="relative inline-block font-semibold text-stone-950 mr-1.5">
-            <span
-              aria-hidden
-              className="absolute inset-y-0 -inset-x-1 rounded-lg opacity-25"
-              style={{
-                backgroundImage: `url(${feature.titleBackground})`,
-                backgroundPosition: `center`,
-                backgroundSize: `cover`,
-              }}
+            <img
+              src={feature.titleBackground}
+              alt=""
+              width={600}
+              height={100}
+              loading="lazy"
+              decoding="async"
+              className="pointer-events-none absolute inset-y-0 -inset-x-1 h-full w-[calc(100%+0.5rem)] rounded-lg object-cover opacity-25"
             />
             <span className="relative">{feature.title}</span>
           </strong>
@@ -107,8 +124,14 @@ const MacFeatureGallery: React.FC = () => (
 const MacAccountabilityFeature: React.FC = () => (
   <div className="relative -mx-8 mt-28 aspect-video min-h-[52rem] w-[calc(100%+4rem)] sm:min-h-[52rem] lg:-mx-10 lg:w-[calc(100%+5rem)] xl:min-h-0">
     <img
-      src="/home/ribbon.png"
+      src="/home/ribbon.webp"
+      srcSet="/home/ribbon-800.webp 800w, /home/ribbon-1200.webp 1200w, /home/ribbon-1600.webp 1600w, /home/ribbon-2560.webp 2560w, /home/ribbon.webp 4000w"
+      sizes="(min-width: 1280px) 1280px, 100vw"
       alt=""
+      width={4000}
+      height={2800}
+      loading="lazy"
+      decoding="async"
       className="pointer-events-none absolute inset-0 size-full object-fill"
     />
     <p className="relative z-10 max-w-2xl py-8 pr-8 pl-20 text-lg leading-7 text-stone-600 sm:py-12 sm:pr-12 sm:pl-24 lg:py-16 lg:pr-16 lg:pl-[6.5rem]">
@@ -128,7 +151,13 @@ const MacAccountabilityFeature: React.FC = () => (
       }}
     >
       <div className="space-y-3">
-        <MacActivityScreenshot src="/home/accountability-screenshot.png" time="9:30 AM" />
+        <MacActivityScreenshot
+          src="/home/accountability-screenshot.webp"
+          srcSet="/home/accountability-screenshot-800.webp 800w, /home/accountability-screenshot-1000.webp 1000w, /home/accountability-screenshot-1200.webp 1200w, /home/accountability-screenshot.webp 1600w"
+          width={1600}
+          height={983}
+          time="9:30 AM"
+        />
 
         <div className="relative pl-3.5">
           <div className="absolute inset-y-0 left-0 w-1 rounded-full bg-white" />
@@ -145,7 +174,10 @@ const MacAccountabilityFeature: React.FC = () => (
           <div className="space-y-3">
             <MacActivityKeylog />
             <MacActivityScreenshot
-              src="/home/accountability-screenshot-programmer.png"
+              src="/home/accountability-screenshot-programmer.webp"
+              srcSet="/home/accountability-screenshot-programmer-800.webp 800w, /home/accountability-screenshot-programmer-1000.webp 1000w, /home/accountability-screenshot-programmer-1200.webp 1200w, /home/accountability-screenshot-programmer.webp 1586w"
+              width={1586}
+              height={992}
               time="9:44 AM"
             />
           </div>
@@ -155,15 +187,36 @@ const MacAccountabilityFeature: React.FC = () => (
   </div>
 );
 
+const macActivityScreenshotSizes = `(min-width: 1280px) 486px, (min-width: 1024px) 46vw, (min-width: 768px) 60vw, (min-width: 640px) 64vw, 72vw`;
+
 interface MacActivityScreenshotProps {
   src: string;
+  srcSet: string;
+  width: number;
+  height: number;
   time: string;
 }
 
-const MacActivityScreenshot: React.FC<MacActivityScreenshotProps> = ({ src, time }) => (
+const MacActivityScreenshot: React.FC<MacActivityScreenshotProps> = ({
+  src,
+  srcSet,
+  width,
+  height,
+  time,
+}) => (
   <div className="w-full min-w-0 overflow-hidden rounded-xl border-0 bg-transparent shadow shadow-stone-300/30 backdrop-blur-sm">
     <div className="relative">
-      <img src={src} alt="" className="block h-auto w-full rounded-t-xl opacity-90" />
+      <img
+        src={src}
+        srcSet={srcSet}
+        sizes={macActivityScreenshotSizes}
+        alt=""
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+        className="block h-auto w-full rounded-t-xl opacity-90"
+      />
       <div className="pointer-events-none absolute inset-x-[1px] top-[1px] bottom-0 rounded-t-[11.5px] border-x border-t border-white/50" />
       <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 rounded-t-[12px] border-x border-t border-black/30" />
     </div>

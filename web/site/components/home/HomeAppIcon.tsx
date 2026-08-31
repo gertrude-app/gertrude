@@ -10,6 +10,9 @@ const HomeAppIcon: React.FC<HomeAppIconProps> = ({ src, alt, className = `` }) =
   <img
     src={src}
     alt={alt}
+    width={56}
+    height={56}
+    decoding="async"
     className={`size-14 rounded-[14px] shadow-lg shadow-stone-900/10 ring-[0.5px] ring-black/10 ${className}`}
   />
 );

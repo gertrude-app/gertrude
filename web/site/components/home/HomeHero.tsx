@@ -89,7 +89,14 @@ const HomeHero: React.FC = () => (
       <span className="hero-phrase hero-phrase-apple rounded-3xl inline-flex items-center">
         <span className="hero-phrase-icon">
           <span className="hero-phrase-icon-graphic">
-            <img src="/apple-logo.svg" alt="" className="size-10 translate-y-[-3px]" />
+            <img
+              src="/apple-logo.svg"
+              alt=""
+              width={40}
+              height={40}
+              decoding="async"
+              className="size-10 translate-y-[-3px]"
+            />
           </span>
         </span>
         <span>

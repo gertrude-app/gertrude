@@ -55,8 +55,14 @@ export default HomeProblemSection;
 const SolutionCard: React.FC = () => (
   <div className="relative w-full overflow-hidden px-6 py-20 text-center sm:px-12 lg:px-20 lg:py-28">
     <img
-      src="/home/grainy-gradient.png"
+      src="/home/grainy-gradient.webp"
+      srcSet="/home/grainy-gradient-1000.webp 1000w, /home/grainy-gradient-1280.webp 1280w, /home/grainy-gradient-1600.webp 1600w, /home/grainy-gradient.webp 2000w"
+      sizes="(min-width: 1280px) 1280px, 100vw"
       alt=""
+      width={2000}
+      height={2000}
+      loading="lazy"
+      decoding="async"
       className="pointer-events-none absolute inset-0 z-0 size-full object-fill opacity-20"
     />
     <div
@@ -75,13 +81,33 @@ const SolutionCard: React.FC = () => (
       aria-hidden
       className="relative z-10 mx-auto flex items-center justify-center gap-5"
     >
-      <img src="/home/safety-padlock.svg" alt="" className="h-11 w-auto sm:h-[3.75rem]" />
+      <img
+        src="/home/safety-padlock.svg"
+        alt=""
+        width={317}
+        height={370}
+        loading="lazy"
+        decoding="async"
+        className="h-11 w-auto sm:h-[3.75rem]"
+      />
       <img
         src="/home/safety-logo-stone.svg"
         alt=""
+        width={365}
+        height={365}
+        loading="lazy"
+        decoding="async"
         className="size-12 shrink-0 sm:size-16"
       />
-      <img src="/home/safety-shield.svg" alt="" className="h-11 w-auto sm:h-[3.75rem]" />
+      <img
+        src="/home/safety-shield.svg"
+        alt=""
+        width={290}
+        height={362}
+        loading="lazy"
+        decoding="async"
+        className="h-11 w-auto sm:h-[3.75rem]"
+      />
     </div>
     <h3
       className={`${rubik.className} relative z-10 mx-auto mt-10 max-w-4xl text-4xl font-semibold leading-[1.12] tracking-[-0.04em] text-stone-950 sm:text-5xl`}
