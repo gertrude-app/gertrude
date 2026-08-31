@@ -1,6 +1,6 @@
-import { Card, HStack, Text, VStack } from '@gertrude/ui';
+import { Button, Card, HStack, Text, VStack } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
-import { Clock3Icon } from 'lucide-react';
+import { Clock3Icon, PencilIcon } from 'lucide-react';
 import React from 'react';
 import type { MacDevice } from '#/components/devices/types';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
@@ -23,7 +23,7 @@ const MacDeviceCard: React.FC<Props> = ({ device }) => {
           <div className="grid h-14 w-18 shrink-0 place-items-center">
             <DeviceArtwork device={device} size="card" />
           </div>
-          <VStack className="min-w-0" gap={0.5}>
+          <VStack className="min-w-0 flex-grow" gap={0.5}>
             <Text as="h3" variant="heading" lineClamp={2}>
               {title}
             </Text>
@@ -31,6 +31,15 @@ const MacDeviceCard: React.FC<Props> = ({ device }) => {
               {subtitle}
             </Text>
           </VStack>
+          <Button
+            type="link"
+            href={`/devices/${device.id}`}
+            size="small"
+            icon={PencilIcon}
+            className="shrink-0"
+          >
+            Edit
+          </Button>
         </HStack>
       </Card.Body>
       <Card.Footer className="flex grow flex-col px-2.5 py-2.5">

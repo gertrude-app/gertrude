@@ -33,6 +33,15 @@ export type BlockRule =
   | { case: 'both'; a: BlockRule; b: BlockRule }
   | { case: 'unless'; rule: BlockRule; negatedBy: BlockRule[] };
 
+export type ChildComputerStatus =
+  | { case: 'filterSuspended'; resuming?: ISODateString }
+  | { case: 'downtime'; ending?: ISODateString }
+  | { case: 'downtimePaused'; resuming?: ISODateString }
+  | { case: 'offline' }
+  | { case: 'filterOff' }
+  | { case: 'filterOn' }
+  | { case: 'unfiltered' };
+
 export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
 
 export type NotificationMethodConfig =
@@ -91,6 +100,8 @@ export type PlanStatus =
     }
   | { case: 'free' }
   | { case: 'complimentary' };
+
+export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
 export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }

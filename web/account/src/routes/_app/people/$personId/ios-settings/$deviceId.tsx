@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
+import type { ConnectedIOSApp } from '#/components/devices/types';
 import type { ProfileDraft } from '#/components/pages/person-settings/IosSettingsPage.reducer';
 import type { IosDeviceSettingsConfiguration } from '#/components/pages/person-settings/IosSettingsPage.types';
 import type { LoadableState } from '#/components/types';
@@ -10,8 +11,15 @@ import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
 import { useQuery } from '#/pairql/query';
 
+interface IosDeviceSettingsSearch {
+  section?: ConnectedIOSApp;
+}
+
+const sections: ConnectedIOSApp[] = [`blocker`, `podcasts`, `music`];
+
 const IosDeviceSettingsRoute: React.FC = () => {
   const { deviceId } = Route.useParams();
+  const { section } = Route.useSearch();
   const [hasUnsavedChanges, setHasUnsavedChanges] = React.useState(false);
   const settingsKey = Key.iosDeviceSettings(deviceId);
   const settingsQuery = useQuery(settingsKey, () =>
@@ -62,6 +70,7 @@ const IosDeviceSettingsRoute: React.FC = () => {
         savingProfile={updateProfile.isPending}
         requestingPinReset={requestPinReset.isPending}
         onUnsavedChangesChange={setHasUnsavedChanges}
+        defaultExpandedSection={section}
         onSaveBlockedGroups={(enabledBlockGroupIds: string[]) =>
           updateBlockedGroups
             .mutateAsync({ deviceId, enabledBlockGroupIds })
@@ -88,5 +97,12 @@ const IosDeviceSettingsRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/_app/people/$personId/ios-settings/$deviceId`)({
+  validateSearch: (search): IosDeviceSettingsSearch => ({
+    section:
+      typeof search[`section`] === `string` &&
+      sections.includes(search[`section`] as ConnectedIOSApp)
+        ? (search[`section`] as ConnectedIOSApp)
+        : undefined,
+  }),
   component: IosDeviceSettingsRoute,
 });

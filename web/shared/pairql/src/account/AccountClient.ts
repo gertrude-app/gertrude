@@ -200,6 +200,12 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public getMacDevice = (
+    input: P.GetMacDevice.Input,
+  ): Promise<Result<P.GetMacDevice.Output>> => {
+    return this.query<P.GetMacDevice.Output>(input, `GetMacDevice`, `parent`);
+  };
+
   public getPeople = (input: P.GetPeople.Input): Promise<Result<P.GetPeople.Output>> => {
     return this.query<P.GetPeople.Output>(input, `GetPeople`, `parent`);
   };
@@ -390,6 +396,12 @@ export default class AccountClient extends Client<Auth> {
       `UpdateIosDeviceProfileSettings`,
       `parent`,
     );
+  };
+
+  public updateMacDevice = (
+    input: P.UpdateMacDevice.Input,
+  ): Promise<Result<P.UpdateMacDevice.Output>> => {
+    return this.query<P.UpdateMacDevice.Output>(input, `UpdateMacDevice`, `parent`);
   };
 
   public updatePersonBasicDetails = (

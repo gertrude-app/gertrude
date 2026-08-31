@@ -159,27 +159,27 @@ export const installedMacApps: InstalledMacApp[] = [
 
 export const albums: AllowedAlbum[] = [
   {
-    title: `Abbey Road`,
-    artist: `The Beatles`,
-    artworkUrl: `https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/df/db/61/dfdb615d-47f8-06e9-9533-b96daccc029f/18UMGIM31076.rgb.jpg/300x300bb.jpg`,
+    title: `Midnight Signals`,
+    artist: `Nova Vale`,
+    artworkUrl: `/example-album-art/midnight-signals.webp`,
     showAlbumArt: true,
   },
   {
-    title: `The Muppet Movie`,
-    artist: `Kermit the Frog`,
-    artworkUrl: `https://is1-ssl.mzstatic.com/image/thumb/Music118/v4/0f/d8/15/0fd815cb-45f4-b334-e26d-0ea9875795e3/00050087348533.rgb.jpg/300x300bb.jpg`,
+    title: `Orange Light`,
+    artist: `Lumen Fields`,
+    artworkUrl: `/example-album-art/orange-light.webp`,
     showAlbumArt: true,
   },
   {
-    title: `The Planets`,
-    artist: `Gustav Holst`,
-    artworkUrl: `https://picsum.photos/seed/the-planets/300/300`,
+    title: `Echoes & Pines`,
+    artist: `Hollow Pines`,
+    artworkUrl: `/example-album-art/echoes-and-pines.webp`,
     showAlbumArt: false,
   },
   {
-    title: `Minecraft Volume Alpha`,
-    artist: `C418`,
-    artworkUrl: `https://picsum.photos/seed/minecraft-volume-alpha/300/300`,
+    title: `Tide Bloom`,
+    artist: `Mira Saint`,
+    artworkUrl: `/example-album-art/tide-bloom.webp`,
     showAlbumArt: true,
   },
 ];

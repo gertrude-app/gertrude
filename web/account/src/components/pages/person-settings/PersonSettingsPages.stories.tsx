@@ -1,5 +1,6 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
+import type { ConnectedIOSApp } from '#/components/devices/types';
 import type { IosDeviceSettingsConfiguration } from './IosSettingsPage.types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
 import IosSettingsPage from './IosSettingsPage';
@@ -34,11 +35,13 @@ const InPageContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   </StoryScreen>
 );
 
-const IosSettings: React.FC<{ settings: IosDeviceSettingsConfiguration }> = ({
-  settings,
-}) => (
+const IosSettings: React.FC<{
+  settings: IosDeviceSettingsConfiguration;
+  defaultExpandedSection?: ConnectedIOSApp;
+}> = ({ settings, defaultExpandedSection }) => (
   <IosSettingsPage
     state={{ status: `success`, data: settings }}
+    defaultExpandedSection={defaultExpandedSection}
     onSaveBlockedGroups={() => {}}
     onSaveProfile={() => {}}
     onRequestPodcastsPinReset={() => Promise.resolve(481_920)}
@@ -78,6 +81,18 @@ export const IosAllAppsConnected = {
       `Gertrude Podcasts`,
     ]);
   },
+};
+
+export const IosLinkedMusicSection = {
+  name: 'iPhone and iPad (linked Music section)',
+  render: () => (
+    <InPageContext>
+      <IosSettings
+        settings={iosDeviceSettingsAllAppsConnected}
+        defaultExpandedSection="music"
+      />
+    </InPageContext>
+  ),
 };
 
 export const IosUnsupervised = {

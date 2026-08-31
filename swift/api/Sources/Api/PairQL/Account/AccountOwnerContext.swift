@@ -25,6 +25,13 @@ struct AccountOwnerContext: ResolverContext {
       .first(in: self.db)
   }
 
+  func computer(_ id: Computer.Id) async throws -> Computer {
+    try await Computer.query()
+      .where(.id == id)
+      .where(.parentId == self.accountOwner.id)
+      .first(in: self.db)
+  }
+
   func iosDevice(_ id: IOSDevice.Id) async throws -> (device: IOSDevice, person: Child) {
     let device: IOSDevice = try await self.db.find(id)
     guard let personId = device.childId,

@@ -888,6 +888,66 @@
     }
   },
   {
+    "id": "account-pages-devices-mac-device--default",
+    "iframePath": "/iframe.html?id=account-pages-devices-mac-device--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-devices-mac-device--default.png",
+    "title": "Account/Pages/Devices/Mac Device",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices-mac-device--default",
+    "iframePath": "/iframe.html?id=account-pages-devices-mac-device--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/medium/account-pages-devices-mac-device--default.png",
+    "title": "Account/Pages/Devices/Mac Device",
+    "viewport": {
+      "width": 600,
+      "height": 900,
+      "name": "medium"
+    }
+  },
+  {
+    "id": "account-pages-devices-mac-device--default",
+    "iframePath": "/iframe.html?id=account-pages-devices-mac-device--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-devices-mac-device--default.png",
+    "title": "Account/Pages/Devices/Mac Device",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-devices-mac-device--without-custom-name-or-version",
+    "iframePath": "/iframe.html?id=account-pages-devices-mac-device--without-custom-name-or-version&viewMode=story",
+    "name": "Without custom name or version",
+    "path": "screenshots/mobile/account-pages-devices-mac-device--without-custom-name-or-version.png",
+    "title": "Account/Pages/Devices/Mac Device",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-devices-mac-device--without-custom-name-or-version",
+    "iframePath": "/iframe.html?id=account-pages-devices-mac-device--without-custom-name-or-version&viewMode=story",
+    "name": "Without custom name or version",
+    "path": "screenshots/desktop/account-pages-devices-mac-device--without-custom-name-or-version.png",
+    "title": "Account/Pages/Devices/Mac Device",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-keychain-detail--default",
     "iframePath": "/iframe.html?id=account-pages-keychain-detail--default&viewMode=story",
     "name": "Default",

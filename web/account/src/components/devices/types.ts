@@ -1,3 +1,12 @@
+import type {
+  ChildComputerStatus,
+  GetMacDevice,
+  ReleaseChannel,
+} from '@shared/pairql/src/account';
+
+export type { ChildComputerStatus, ReleaseChannel };
+export type MacDeviceDetails = GetMacDevice.Output;
+
 export type MacDevice = {
   id: string;
   type: `mac`;

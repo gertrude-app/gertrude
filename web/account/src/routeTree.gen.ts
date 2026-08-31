@@ -27,6 +27,7 @@ import { Route as AppRequestsUnlockRouteImport } from './routes/_app/requests/un
 import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/requests/suspension'
 import { Route as AppPeopleNewRouteImport } from './routes/_app/people/new'
 import { Route as AppKeychainsKeychainIdRouteImport } from './routes/_app/keychains/$keychainId'
+import { Route as AppDevicesDeviceIdRouteImport } from './routes/_app/devices/$deviceId'
 import { Route as unauthedResetPasswordTokenRouteImport } from './routes/(unauthed)/reset-password/$token'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
 import { Route as AppSettingsBillingRouteRouteImport } from './routes/_app/settings/billing/route'
@@ -134,6 +135,11 @@ const AppKeychainsKeychainIdRoute = AppKeychainsKeychainIdRouteImport.update({
   path: '/keychains/$keychainId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppDevicesDeviceIdRoute = AppDevicesDeviceIdRouteImport.update({
+  id: '/devices/$deviceId',
+  path: '/devices/$deviceId',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const unauthedResetPasswordTokenRoute =
   unauthedResetPasswordTokenRouteImport.update({
     id: '/(unauthed)/reset-password/$token',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
+  '/devices/$deviceId': typeof AppDevicesDeviceIdRoute
   '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
+  '/devices/$deviceId': typeof AppDevicesDeviceIdRoute
   '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
   '/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/_app/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
   '/(unauthed)/reset-password/$token': typeof unauthedResetPasswordTokenRoute
+  '/_app/devices/$deviceId': typeof AppDevicesDeviceIdRoute
   '/_app/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/_app/people/new': typeof AppPeopleNewRoute
   '/_app/requests/suspension': typeof AppRequestsSuspensionRouteWithChildren
@@ -332,6 +341,7 @@ export interface FileRouteTypes {
     | '/settings/billing'
     | '/otp/$token'
     | '/reset-password/$token'
+    | '/devices/$deviceId'
     | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/'
     | '/otp/$token'
     | '/reset-password/$token'
+    | '/devices/$deviceId'
     | '/keychains/$keychainId'
     | '/people/new'
     | '/requests/suspension'
@@ -397,6 +408,7 @@ export interface FileRouteTypes {
     | '/_app/settings/billing'
     | '/(unauthed)/otp/$token'
     | '/(unauthed)/reset-password/$token'
+    | '/_app/devices/$deviceId'
     | '/_app/keychains/$keychainId'
     | '/_app/people/new'
     | '/_app/requests/suspension'
@@ -555,6 +567,13 @@ declare module '@tanstack/react-router' {
       path: '/keychains/$keychainId'
       fullPath: '/keychains/$keychainId'
       preLoaderRoute: typeof AppKeychainsKeychainIdRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/devices/$deviceId': {
+      id: '/_app/devices/$deviceId'
+      path: '/devices/$deviceId'
+      fullPath: '/devices/$deviceId'
+      preLoaderRoute: typeof AppDevicesDeviceIdRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/reset-password/$token': {
@@ -757,6 +776,7 @@ interface AppRouteRouteChildren {
   AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppDevicesDeviceIdRoute: typeof AppDevicesDeviceIdRoute
   AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
   AppRequestsSuspensionRoute: typeof AppRequestsSuspensionRouteWithChildren
   AppRequestsUnlockRoute: typeof AppRequestsUnlockRoute
@@ -774,6 +794,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppIndexRoute: AppIndexRoute,
+  AppDevicesDeviceIdRoute: AppDevicesDeviceIdRoute,
   AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,
   AppRequestsSuspensionRoute: AppRequestsSuspensionRouteWithChildren,
   AppRequestsUnlockRoute: AppRequestsUnlockRoute,

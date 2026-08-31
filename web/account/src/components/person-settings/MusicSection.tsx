@@ -7,9 +7,10 @@ import PersonSettingsExpandableSection from './PersonSettingsExpandableSection';
 
 interface Props {
   music: IosMusicSettings;
+  defaultExpanded?: boolean;
 }
 
-const MusicSection: React.FC<Props> = ({ music }) => {
+const MusicSection: React.FC<Props> = ({ music, defaultExpanded }) => {
   const previewChips: PersonSettingsPreviewChip[] = [
     {
       title: `Status`,
@@ -25,6 +26,7 @@ const MusicSection: React.FC<Props> = ({ music }) => {
     <PersonSettingsExpandableSection
       appIconUrl="/gertrude-app-icons/music.webp"
       title="Gertrude Music"
+      defaultExpanded={defaultExpanded}
       previewChips={previewChips}
     >
       {music.requiresPayment ? (
