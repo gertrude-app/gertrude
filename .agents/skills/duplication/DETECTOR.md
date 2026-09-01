@@ -8,12 +8,12 @@ directory, or `.github/workflows/duplication.yml`.
 The detector is a deterministic, offline candidate generator. It compares Swift,
 TypeScript, and TSX declarations, then reports four tiers:
 
-| Tier | Meaning | CI behavior |
-| --- | --- | --- |
-| `mechanical` | Exact cross-file declaration | Fails `--diff` |
-| `drifted` at 90% or higher | Likely lightly edited paste | Fails `--diff` |
-| Other `drifted` | Similar code with meaningful divergence | Reports only |
-| `design` / `same-file` | Refactor candidate or repeated cases | Reports only |
+| Tier                       | Meaning                                 | CI behavior    |
+| -------------------------- | --------------------------------------- | -------------- |
+| `mechanical`               | Exact cross-file declaration            | Fails `--diff` |
+| `drifted` at 90% or higher | Likely lightly edited paste             | Fails `--diff` |
+| Other `drifted`            | Similar code with meaningful divergence | Reports only   |
+| `design` / `same-file`     | Refactor candidate or repeated cases    | Reports only   |
 
 The gate intentionally does not fail on lower-similarity findings. Blocking those trains
 contributors to suppress legitimate parallel tests instead of acting on actionable copies.
@@ -27,8 +27,8 @@ coverage.
 ## Intentional-duplication ledger
 
 Each `intentionalPairs` entry must name both sides and explain the decision. Prefer exact
-file pairs. A broad glob can hide a future accidental clone, so use one only for a genuine,
-stable category such as append-only migrations.
+file pairs. A broad glob can hide a future accidental clone, so use one only for a
+genuine, stable category such as append-only migrations.
 
 Use the ledger for a deliberate boundary or semantically distinct tests—not for a clone
 that should have been extracted. `--all` audits ignored findings.

@@ -30,23 +30,29 @@ when dealing with the database.
 
 ## Related skills
 
-- For verifying non-trivial migrations (data backfill, column drop, transforms)
-  before merging, see `../migration-verification/SKILL.md`.
+- For verifying non-trivial migrations (data backfill, column drop, transforms) before
+  merging, see `../migration-verification/SKILL.md`.
 
 ## Database Structure
 
 Data is spread across multiple non-`public` Postgres schemas (don't assume `public`). The
-map below is orientation for *where to look* — discover the live tables/columns yourself
+map below is orientation for _where to look_ — discover the live tables/columns yourself
 (`\dn`, `\dt <schema>.*`), since table-level detail drifts.
 
-- **parent** — parent accounts, children, computers, keychains, keys, billing, notifications
-- **child** — per-child device data: mac computer users, iOS devices, screenshots, app tokens
+- **parent** — parent accounts, children, computers, keychains, keys, billing,
+  notifications
+- **child** — per-child device data: mac computer users, iOS devices, screenshots, app
+  tokens
 - **macapp** — macOS app: keystroke lines, releases, unlock & suspend-filter requests
-- **blocker_app** — iOS blocker/filter app: block groups & rules, installs, supervisions, tokens, events
+- **blocker_app** — iOS blocker/filter app: block groups & rules, installs, supervisions,
+  tokens, events
 - **podcast_app** — Gertrude Podcasts podcast app: installs, tokens, events
-- **music** — Gertrude Music: parent-approved artists, albums & tracks per child, playlists, library snapshots
+- **music** — Gertrude Music: parent-approved artists, albums & tracks per child,
+  playlists, library snapshots
 - **music_app** — Gertrude Music iOS app: installs, tokens
-- **macos** — macOS app reference catalog: bundle ids, categories, browsers, identified/unidentified apps
+- **macos** — macOS app reference catalog: bundle ids, categories, browsers,
+  identified/unidentified apps
 - **appstore** — App Store ratings & reviews data
-- **system** — cross-cutting: deleted entities, telemetry, security/interesting events, sms, stripe events, short urls
+- **system** — cross-cutting: deleted entities, telemetry, security/interesting events,
+  sms, stripe events, short urls
 - **public** — Fluent migration tracking and jobs metadata

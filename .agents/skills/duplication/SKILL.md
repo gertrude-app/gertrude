@@ -8,8 +8,8 @@ description:
 
 # Duplication
 
-Search before creating a helper. Most duplication comes from not knowing a suitable
-helper already exists.
+Search before creating a helper. Most duplication comes from not knowing a suitable helper
+already exists.
 
 ## Before writing a helper or fixture
 
@@ -24,16 +24,16 @@ rg -n '^\s+(func|var) ' swift/api/Tests/ApiTests/ApiTestCase.swift
 If no suitable helper exists, put one used by multiple files in the appropriate shared
 home—not as a `private` helper in the first test file that needs it.
 
-| Kind | Shared home |
-| --- | --- |
-| API setup/factories | `swift/api/Tests/ApiTests/ApiTestCase.swift` |
-| API entity builders | `swift/api/Tests/ApiTests/Entities.swift` |
-| API mocks | `swift/api/Tests/ApiTests/Mocks/` |
-| Mac helper used by multiple test targets | `swift/macapp/App/Sources/TestSupport/` (`public`) |
-| Mac helper used only by `AppTests` | `swift/macapp/App/Tests/AppTests/TestSupport.swift` |
-| Podcasts / Music test support | their target's existing `TestSupport` / fixture file |
-| Cross-app Swift | an appropriate target under `swift/` |
-| Shared web UI / logic | `web/ui/src/` / `web/shared/` |
+| Kind                                     | Shared home                                          |
+| ---------------------------------------- | ---------------------------------------------------- |
+| API setup/factories                      | `swift/api/Tests/ApiTests/ApiTestCase.swift`         |
+| API entity builders                      | `swift/api/Tests/ApiTests/Entities.swift`            |
+| API mocks                                | `swift/api/Tests/ApiTests/Mocks/`                    |
+| Mac helper used by multiple test targets | `swift/macapp/App/Sources/TestSupport/` (`public`)   |
+| Mac helper used only by `AppTests`       | `swift/macapp/App/Tests/AppTests/TestSupport.swift`  |
+| Podcasts / Music test support            | their target's existing `TestSupport` / fixture file |
+| Cross-app Swift                          | an appropriate target under `swift/`                 |
+| Shared web UI / logic                    | `web/ui/src/` / `web/shared/`                        |
 
 ## Finding and evaluating clones
 
@@ -65,9 +65,9 @@ comment. Do not silence a finding merely because extraction is inconvenient.
 
 ## Validation
 
-Run affected tests after an extraction, then `just dup --diff`. If you change the detector,
-ledger, or CI gate, first read [detector maintenance](DETECTOR.md)
-and run `just dup --self-test`.
+Run affected tests after an extraction, then `just dup --diff`. If you change the
+detector, ledger, or CI gate, first read [detector maintenance](DETECTOR.md) and run
+`just dup --self-test`.
 
 ## Limits
 
