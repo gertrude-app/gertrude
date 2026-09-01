@@ -1,104 +1,119 @@
 ---
 title: How to Block Explicit Images in Maps on iPhone and iPad
 description:
-  'Older Screen Time instructions for removing Maps apps that can expose children to
-  explicit business photos.'
+  'Apple Maps and Google Maps both display photos uploaded by businesses, including nude
+  photos posted by strip clubs. Gertrude blocks those images inside Apple Maps, and Google
+  Maps can be deleted.'
 products: [blocker]
 platforms: [ios, ipados]
 ---
 
-{% callout type="warning" title="These instructions are outdated" %}
+{% .lead .mb-12 %} **TL;DR:** both the built-in **Apple Maps** app and **Google Maps**
+will show _any image_ that a business owner or a customer has uploaded, and plenty of
+strip clubs post nude photos. No Screen Time setting stops this. Gertrude blocks those
+images inside Apple Maps, but Google Maps isn't supported yet, so we recommend deleting
+it.
 
-This article preserves instructions written in 2023 for an older version of iOS. Current
-settings and best practices may differ. We’re working on an updated version.
+{% image src="lockdown-iphone/maps-images-ios26.png" width=450 caption="The images from strip clubs and adult bookstores aren't so innocent" alt="five things you forgot locking down your kids iPhone: Apple Maps and Google Maps can show explicit photos to your child" /%}
+
+## Why the map apps aren't safe
+
+Every business listing in both apps has a photo section, and a good portion of what's in
+it was uploaded by the public. Nobody is reviewing those photos with a child in mind, so
+the listing for a strip club or an adult bookstore contains about what you'd expect. Your
+child doesn't have to go looking for it, either. The photos are one tap away from an
+ordinary map search.
+
+Sadly, this loophole has become well-known enough that there are locations where users
+deliberately upload pornographic images. Bark
+[wrote about one](https://www.bark.us/blog/google-maps-safety/): a fake Google Maps place
+called "Milk Island" that fills back up with explicit photos and video every time Google
+clears it out.
+
+Furthermore, "Street View" mode in both apps also can occasionally show inappropriate
+content.
+
+Screen Time has no restriction that covers this. Nor are there settings provided by Apple
+or Google for parents to forbid access to these features. For a few years we recommended
+that both apps be deleted, and recommended using Waze instead. Thankfully now, with our
+own [free iOS app for iPhone and iPad](/iphone-and-ipad), we can completely block the
+images and street view within Apple Maps.
+
+We have not yet done the same with Google Maps, but are actively working on it.
+
+## Apple Maps
+
+[Gertrude Blocker](https://apps.apple.com/us/app/gertrude-blocker/id6736368820) is a free
+app (iOS 17 and up) that blocks content _inside_ other apps, including all of the images
+from Apple Maps business listings, and Street View. Install it on the device you're
+protecting and Apple Maps is taken care of. For detailed setup instructions,
+[see here](/help/iphone-ipad/block-gif-search-in-messages#step-by-step).
+
+The block group is called **Apple Maps images**, and it's turned on by default when you
+run through setup.
+
+{% callout type="warning" title="If you'd rather not install Gertrude" %}
+
+Then Apple Maps is still a problem, and we'd recommend deleting it along with Google Maps.
+The **Waze** app doesn't allow viewing business photos, and works well as a replacement
+for an older teen who needs turn-by-turn directions.
 
 {% /callout %}
 
-The built-in Apple Maps app and Google Maps are (surprisingly) not safe for kids, and
-should be deleted. They are unsafe because both apps will show _any images_ that may have
-been uploaded by business owners or patrons. For instance, _many strip clubs post nude
-photos_ which can be accessed through these apps. No Screen Time setting can prevent these
-images from being viewed, the only way to secure your child's phone is to delete the apps.
-(In the "how to fix" section below we recommend an alternate map/navigation app.)
+## How to delete a map app
 
-{% image src="lockdown-iphone/maps-images.png" caption="The images from strip clubs and adult bookstores aren't so innocent" alt="five things you forgot locking down your kids iPhone: Apple Maps and Google Maps can show explicit photos to your child" /%}
+**Step 1.** Temporarily _allow deleting apps_ by going to "Settings > Screen Time >
+Content & Privacy Restrictions > iTunes & App Store Purchases":
 
-{% click-to-reveal title="Show me how to fix it" %}
+{% image src="lockdown-iphone/itunes-app-store-purchases-ios26.png" width=450 caption="Go to \"Content & Privacy Restrictions > iTunes & App Store Purchases\"" alt="how to block explicit images in maps: Content & Privacy Restrictions > iTunes & App Store Purchases" /%}
 
-**Step 1.** Temporarily _allow deleting apps_ in Screen Time by going to "Settings >
-Screen Time > Content & Privacy Restrictions > iTunes & App Store Purchases", as shown
-below:
+Then tap **Deleting Apps** and set it to **Allow**:
 
-{% image src="lockdown-iphone/screentime-content-privacy-restrictions.png" caption="Go to \"Settings > Screen Time > Content & Privacy Restrictions\"" alt="five things you forgot locking down your kids iPhone: go to Settings > Screen Time > Content & Privacy Restrictions" /%}
+{% image src="lockdown-iphone/allow-deleting-apps-ios26.png" width=450 caption="Temporarily ALLOW deleting apps" alt="how to block explicit images in maps: temporarily allow deleting apps" /%}
 
-{% image src="lockdown-iphone/itunes-app-store-purchases.png" caption="Then to \"iTunes & App Store Purchases\"" alt="five things you forgot locking down your kids iPhone: iTunes and App Store Purchases" /%}
+You may find that deleting apps is already allowed. If so, leave it as it is, but we do
+recommend revoking that privilege once you're done.
 
-{% image src="lockdown-iphone/allow-deleting-apps.png" caption="Temporarily ALLOW deleting apps" alt="five things you forgot locking down your kids iPhone: temporarily allow deleting apps" /%}
+**Step 2.** Delete the app.
 
-You may find that you are already allowing Deleting apps. If so, just leave the setting as
-is, but we do recommend you revoke that privilege after deleting the map apps.
+Press and hold the app icon on the home screen and choose to delete it.
 
-**Step 2.** Power off and restart the phone.
+{% image src="lockdown-iphone/delete-google-maps-ios26.png" width=450 caption="Press and hold the icon, then choose <b>Remove App</b>" alt="how to block explicit images in maps: how to delete the Google Maps app with Screen Time" /%}
 
 {% callout alt=true %}
 
-If you've already deleted Apple Maps and are **only deleting Google Maps**, you can skip
-this step.
+If you're trying to delete Apple Maps, and for some reason it won't delete, try powering
+the phone all the way off and back on again, then try once more. Older versions of iOS
+required that before they would allow deleting of Apple Maps.
 
 {% /callout %}
 
-Once you've allowed deleting apps, you won't actually be able to delete _Apple Maps_ until
-you fully power off the phone and restart. To power off the phone, hold down the "side"
-button and the "volume down" button at the same time.
+**Step 3.** Turn deleting apps back off.
 
-{% image src="lockdown-iphone/slide-to-power-off.png" caption="Strangely, you have to power off before you can delete Apple maps" alt="five things you forgot locking down your kids iPhone: hold down side and volume down buttons to power off" /%}
+Go back to "Settings > Screen Time > Content & Privacy Restrictions > iTunes & App Store
+Purchases" and set **Deleting Apps** back to **Don't Allow**:
 
-After the phone has powered off, turn it on again by holding the right side button until
-the Apple logo appears.
+{% image src="lockdown-iphone/dont-allow-installing-deleting-apps-ios26.png" width=450 caption="Remove the ability to delete apps again" alt="how to block explicit images in maps: then re-disable deleting apps" /%}
 
-**Step 3.** Delete the app/s.
+**Step 4.** Disable automatic software updates. _(Apple Maps only)_
 
-Once you've allowed deleting apps and restarted the phone after a full power-off, you can
-_now_ click and hold the icon of the Apple maps (and/or the Google Maps app) and choose to
-delete it.
-
-{% image src="lockdown-iphone/delete-apple-maps.png" caption="Press and hold the icon to delete Apple Maps" alt="five things you forgot locking down your kids iPhone: how to delete Apple Maps with Screen Time" /%}
-
-**Step 4.** Now that the app is deleted, _forbid again the ability to delete apps_ by
-going back to "Settings > Screen Time > Content & Privacy Restrictions > iTunes & App
-Store Purchases":
-
-{% image src="lockdown-iphone/disallow-deleting-apps.png" caption="Remove the ability to delete apps again" alt="five things you forgot locking down your kids iPhone: then re-disable deleting apps" /%}
-
-**Step 5.** Disable automatic software updates.
-
-Every time iOS updates (which can happen automatically, without any intervention, during
-the night when the phone is charging), the Apple Maps app _may_ come back. We aren't 100%
-sure how often it does, it may only be for the large, yearly major iOS versions that
-usually happen in the fall, or it may be more often&mdash;but it _definitely_ happens.
+Every time iOS updates, which can happen on its own overnight while the phone is charging,
+the Apple Maps app _may_ come back. We aren't 100% sure how often it does. It may only be
+the large yearly versions that come out in the fall, or it may be more often, but it
+_definitely_ has happened, at least in the iOS 17/18 era.
 
 Go to the Settings app on your child's phone, then navigate to "General > Software
-Update > Automatic Update", and disable all three options shown below:
+Update > Automatic Updates", and disable all three options shown below:
 
-{% image src="lockdown-iphone/disable-automatic-updates.png" caption="In Settings > General > Software Updates" alt="five things you forgot locking down your kids iPhone: disable automatic iOS software updates" /%}
+{% image src="lockdown-iphone/disable-automatic-updates-ios26.png" width=450 caption="In Settings > General > Software Update" alt="how to block explicit images in maps: disable automatic iOS software updates" /%}
 
 {% callout alt=true type="warning" %}
 
 Sadly, there is no way for you to prevent your child from turning automatic updates back
-on. Therefore, we recommend that you **a)** don't show them this setting area, and **b)**
-check this setting on their phone frequently, ideally when you notice your own phone has
-updated, and **c)** proactively update their phones manually on a regular basis, so you
-can check for the reappearance of Maps and other safety concerns, and also remove any
-incentive for them to change this setting.
+on. So we recommend that you **a)** don't show them this setting area, **b)** check it on
+their phone from time to time, ideally when you notice your own phone has updated, and
+**c)** update their phone manually on a regular basis, so that you can check for the
+reappearance of Maps and other safety concerns, and remove any incentive for them to
+change the setting.
 
 {% /callout %}
-
-{% callout alt=true %}
-
-If your child needs a map/navigation app, at the time of this writing (2/8/2023) the
-**Waze** app does not allow viewing of business images, and should be a safe alternative
-for older teens who need a turn-by-turn direction app.
-
-{% /callout %}
-
-{% /click-to-reveal %}

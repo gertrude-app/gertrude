@@ -97,7 +97,7 @@ safety. A child's phone is a tool, not an entertainment device. It should defini
 **not** allow them to surf the web, play non-educational games, search for and install
 apps, or access music, videos, or social media content from the internet.
 
-To delete an app, tap and _hold_ it's icon, until you see the option to _remove_ it:
+To delete an app, tap and _hold_ its icon, until you see the option to _remove_ it:
 
 {% image src="lockdown-iphone/remove-app.png" alt="locking down an iPhone: how to delete an app" /%}
 
@@ -156,7 +156,7 @@ internet through their phone's search and look up features.
 Now that we've got apps deleted and Siri integrations turned off, we'll turn our attention
 to **Screen Time**, which is the main tool Apple gives you to lock down an iOS device. You
 may already be familiar with Screen Time, because many adults use it to track how much
-time they spend on their phones, which is one of it's primary purposes. But it also has
+time they spend on their phones, which is one of its primary purposes. But it also has
 some really powerful features to _completely control what your kid has access to._
 
 To get started, go to **Settings &rarr; Screen Time**, as shown below:
@@ -268,7 +268,8 @@ for your child.
 
 Be sure to select **Block at Downtime** as well (shown below). If you _don't_ enable it,
 your child will be able to ignore the Downtime schedule, rendering it little more than a
-suggestion.
+suggestion. If you don't see the toggle at all, you probably skipped locking Screen Time
+with a passcode&mdash;[do that first](#setting-a-passcode).
 
 {% /callout %}
 
@@ -314,7 +315,7 @@ The next section on the main screen is for **Always Allowed**.
 {% image src="lockdown-iphone/always-allowed.png" caption="Always Allowed" alt="locking down an iPhone: Always Allowed lets you specify apps not subject to Downtime" /%}
 
 This section is a bit confusing. In my opinion it should be a screen within the Downtime
-settings area. It's only normal purpose is to _bypass Downtime restrictions_ in certain
+settings area. Its only normal purpose is to _bypass Downtime restrictions_ in certain
 ways.
 
 {% image src="lockdown-iphone/always-allowed-settings.png" caption="These settings allow you to <b>bypass</b> Downtime restrictions" alt="locking down an iPhone: Always Allowed settings let you pick apps that are not subject to Downtime schedule restrictions" /%}
@@ -351,7 +352,7 @@ For a safe iPhone, all three of these options should be set to **Don't allow**.
 
 {% callout title="Managing Apps Over Time" %}
 
-You can still add new apps you approve when you child needs them. You just temporarily
+You can still add new apps you approve when your child needs them. You just temporarily
 allow installing apps in this section, install the app, and then revoke the installation
 privilege again.
 
@@ -384,6 +385,15 @@ approach: kids' phones should be very minimal. The more apps you allow, the more
 you've accidentally opened up something that could allow them unrestricted access to the
 internet.
 
+{% callout title="Couldn't delete an app earlier?" %}
+
+Remember the apps [earlier in this guide](#start-by-deleting-apps) that Apple wouldn't let
+you delete? This is where you vanquish them. Find the app in this list and toggle it
+**off**&mdash;it disappears from the Home Screen and can't be opened, even though it stays
+on the device.
+
+{% /callout %}
+
 {% callout title="How do I know if an app is safe?" %}
 
 The only way to really know is to **thoroughly test** it. It's very important to
@@ -396,7 +406,7 @@ as long as I controlled which books were downloaded (because my kids didn't have
 ability to purchase a new book), the app should be safe, right? I took a few minutes to
 explore the app, and found that there was a feature where you could search for new
 audiobooks. A few simple search terms filled the screen with **adult books with
-semi-pornagraphic covers.** I deleted the app.
+semi-pornographic covers.** I deleted the app.
 
 Whenever you're about to allow a new app, take 5 minutes exploring the app. Imagine
 someone will give you $10,000 if you can find inappropriate content on it. You'd be
@@ -429,7 +439,7 @@ something up, and she will happily respond with snippets of content **including 
 ### Content Restrictions
 
 Next, tap the back button to get back to the _Content & Privacy Restrictions_ screen, and
-then tap to move into the second section, labled **Content Restrictions**:
+then tap to move into the third section, labeled **Content Restrictions**:
 
 {% image src="lockdown-iphone/content-restrictions.png" caption="Go back one screen, then choose <b>Content Restrictions</b>" alt="locking down an iPhone: Content Restrictions, where many of the most important settings live" /%}
 
@@ -449,7 +459,7 @@ Three of the sub-sections deserve particular attention, the first is **Apps**:
 
 ### Content Restrictions &rarr; Apps
 
-Within _Content & Privacy Restrictions_, there is another section labled **Apps**, as
+Within _Content & Privacy Restrictions_, there is another section labeled **Apps**, as
 shown below:
 
 {% image src="lockdown-iphone/content-restrictions-apps.png" alt="locking down an iPhone: the 'Apps' section of Content Restrictions has to do with app age ratings" /%}
@@ -470,7 +480,7 @@ apps (see below).
 {% callout title="An app I installed for my child won't show up!" type="warning" %}
 
 If you chose a very conservative value like `4+` for your app _age rating_, some apps you
-want your kids to use may **dissappear**. To fix this, just make sure you have removed the
+want your kids to use may **disappear**. To fix this, just make sure you have removed the
 right to install apps, and then set the age limit to a higher level and the app should
 reappear.
 
@@ -487,11 +497,11 @@ It is critical that you choose **Allowed Websites Only** for this section.
 
 {% image src="lockdown-iphone/allowed-websites-only.png" caption="Make <b>sure</b> you select 'Allowed Websites Only'" alt="locking down an iPhone: Content Restrictions > Web Content should be set to 'Allowed Websites Only'" /%}
 
-Even if you have taken our recomendation to _entirely disable web-browsing by removing the
-Safari app_, you still need to set this setting to _Allowed Websites Only_. That's because
-many apps have what amounts to a built-in web-browser, and reach out to the internet to
-load content when your child is using them. Without this setting chosen, otherwise safe
-apps can become alternative portals to the internet.
+Even if you have taken our recommendation to _entirely disable web-browsing by removing
+the Safari app_, you still need to set this setting to _Allowed Websites Only_. That's
+because many apps have what amounts to a built-in web-browser, and reach out to the
+internet to load content when your child is using them. Without this setting chosen,
+otherwise safe apps can become alternative portals to the internet.
 
 {% callout title="Why not 'Limit Adult Websites'?" type="warning" %}
 

@@ -25,6 +25,11 @@ Next.js, Vite, Tailwind.
 - When asked to run or design a usability/UX eval of the site, read
   `./site/docs/usability-personas.md` (the marketing persona set; it uses the shared
   method in `../.agents/skills/usability-eval/SKILL.md`).
+- **Guide/help screenshots:** never hand-draw or regenerate the purple arrows and
+  highlight boxes used in step-by-step articles. Read
+  `../scripts/annotate-screenshot/README.md` — it has the scripts, the house style, the
+  retina sizing rule (source ~900px, render at 450 via the `width` attribute), the
+  `pngquant` compression step, and where to source screenshots from.
 
 ## Key Packages
 
@@ -40,6 +45,7 @@ Next.js, Vite, Tailwind.
 # Local development
 just account              # Run Account
 just storybook-v2         # Run Storybook v2
+just hmr-articles         # Live-reload the browser while writing markdoc articles
 
 # Testing & QA
 just test                 # Run unit tests (vitest)

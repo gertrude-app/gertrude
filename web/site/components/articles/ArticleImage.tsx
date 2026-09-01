@@ -4,12 +4,13 @@ import React from 'react';
 type Props = {
   src: string;
   small?: boolean;
+  width?: number;
   caption?: string;
   alt?: string;
   noBorder?: boolean;
 };
 
-const ArticleImage: React.FC<Props> = ({ src, caption, alt, small, noBorder }) => (
+const ArticleImage: React.FC<Props> = ({ src, caption, alt, small, width, noBorder }) => (
   <figure className="not-prose relative isolate mb-12 mt-9">
     <div
       className={cx(
@@ -20,8 +21,10 @@ const ArticleImage: React.FC<Props> = ({ src, caption, alt, small, noBorder }) =
       <div>
         <div className="rounded-[24px] border border-white bg-white/50 p-2 shadow-md shadow-violet-950/5">
           <img
+            style={width ? { width: `${width}px` } : undefined}
             className={cx(
-              `m-0 w-full rounded-2xl bg-white`,
+              `m-0 rounded-2xl bg-white`,
+              width ? `max-w-full` : `w-full`,
               noBorder !== true && `shadow shadow-stone-950/10`,
             )}
             src={`/docs/images/${src}`}

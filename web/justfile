@@ -18,6 +18,23 @@ admin:
 account:
   @pnpm --filter account exec vite dev --port ${ACCOUNT_PORT:-9347}
 
+# live-reload the browser while writing markdoc articles (.md files aren't in the
+# module graph, so nudge a module every article route imports)
+hmr-articles:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  trap 'just _hmr-unstamp' EXIT
+  watchexec --watch site/markdoc/articles --exts md "just _hmr-stamp"
+
+[private]
+_hmr-stamp:
+  @just _hmr-unstamp
+  @echo "// hmr $(date +%s)" >> site/markdoc/files.ts
+
+[private]
+_hmr-unstamp:
+  @perl -0pi -e 's{\n*// hmr \d+\n?\z}{\n}' site/markdoc/files.ts
+
 storybook:
   @PORT=${STORYBOOK_PORT:-6006} pnpm --filter @storybook/app start
 
