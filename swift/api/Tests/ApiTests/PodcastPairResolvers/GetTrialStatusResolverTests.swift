@@ -124,6 +124,38 @@ final class GetTrialStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(afterNewVersion[0].updatedAt > afterInsert.updatedAt).toBeTrue() // bumped: CASE -> THEN
   }
 
+  func testReinstallAfterExpiredTrialDoesNotStartSecondTrial() async throws {
+    let deviceId = UUID()
+
+    let firstOutput = try await GetTrialStatus.resolve(
+      with: self.input(deviceId, appVersion: "1.6.0"),
+      in: .mock,
+    )
+    guard case .trial = firstOutput else {
+      return XCTFail("expected initial .trial, got \(firstOutput)")
+    }
+    let initialInstall = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .first(in: self.db)
+
+    let repeatOutput = try await withDependencies {
+      $0.date = .constant(initialInstall.createdAt + .days(31))
+    } operation: {
+      try await GetTrialStatus.resolve(
+        with: self.input(deviceId, appVersion: "2.0.0"),
+        in: .mock,
+      )
+    }
+
+    expect(repeatOutput).toEqual(.trialExpired(since: initialInstall.createdAt + .days(30)))
+    let installs = try await PodcastApp.Install.query()
+      .where(.deviceId == IOSDevice.Id(deviceId))
+      .all(in: self.db)
+    expect(installs.count).toEqual(1)
+    expect(installs[0].createdAt).toEqual(initialInstall.createdAt)
+    expect(installs[0].appVersion).toEqual("2.0.0")
+  }
+
   // MARK: - trial window (createdAt + 30d vs now)
 
   func testActiveTrialReturnsExpiresAt() async throws {
