@@ -8,6 +8,7 @@ export * from './pairs/AccountSendPasswordResetEmail';
 export * from './pairs/ChangeAccountSubscriptionTier';
 export * from './pairs/ConfirmAccountNotificationMethod';
 export * from './pairs/CreateAccountNotificationMethod';
+export * from './pairs/CreateMacConnectionCode';
 export * from './pairs/CreatePerson';
 export * from './pairs/DecideSuspensionRequest';
 export * from './pairs/DeleteAccountKey';

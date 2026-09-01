@@ -111,7 +111,7 @@ export type {
 } from './primitives/polymorphic';
 
 // utils
-export { inflect } from './lib/utils';
+export { inflect, normalizePath } from './lib/utils';
 export { toast } from './lib/toast';
 export type {
   ToastAsyncFunction,

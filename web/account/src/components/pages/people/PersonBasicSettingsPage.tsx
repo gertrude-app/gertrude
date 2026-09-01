@@ -8,7 +8,7 @@ import {
   VStack,
   inflect,
 } from '@gertrude/ui';
-import { MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
+import { LaptopIcon, MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonRelationship } from '#/components/types';
 import CardContainer from '#/components/layout/CardContainer';
@@ -28,6 +28,7 @@ interface Props {
   selfRelationshipUnavailable?: boolean;
   onSaveDetails: () => void;
   onDeletePerson: () => void | Promise<void>;
+  onConnectMac: () => void;
 }
 
 const PersonBasicSettingsPage: React.FC<Props> = ({
@@ -43,6 +44,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
   selfRelationshipUnavailable = false,
   onSaveDetails,
   onDeletePerson,
+  onConnectMac,
 }) => {
   const trimmedNameDraft = nameDraft.trim();
   const nameError = trimmedNameDraft.length === 0 ? `Name is required.` : undefined;
@@ -118,6 +120,19 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               ? `${devices.length} ${inflect(`device`, devices.length)} connected to ${personName}.`
               : undefined
           }
+          buttons={
+            devices.length > 0 ? (
+              <Button
+                type="button"
+                variant="default"
+                icon={LaptopIcon}
+                disabled={savingDetails || deletingPerson}
+                onClick={onConnectMac}
+              >
+                Connect a Mac
+              </Button>
+            ) : undefined
+          }
         >
           {devices.length > 0 ? (
             <VStack gap={3}>
@@ -130,6 +145,14 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               icon={MonitorSmartphoneIcon}
               title="No Devices"
               description={`No devices are connected to ${personName} yet.`}
+              button={{
+                type: `button`,
+                text: `Connect a Mac`,
+                icon: LaptopIcon,
+                variant: `primary`,
+                disabled: savingDetails || deletingPerson,
+                onClick: onConnectMac,
+              }}
             />
           )}
         </CardContainer>

@@ -14,6 +14,7 @@ interface Props {
     icon?: LucideIcon;
     variant?: `primary` | `default` | `ghost` | `destructive`;
     loading?: boolean;
+    disabled?: boolean;
   } & (
     | {
         type: `link`;
@@ -58,6 +59,7 @@ const EmptyState: React.FC<Props> = ({
           href={button.href}
           target={button.target}
           rel={button.rel}
+          disabled={button.disabled}
           icon={button.icon}
           variant={button.variant}
           loading={button.loading}
@@ -68,6 +70,7 @@ const EmptyState: React.FC<Props> = ({
         <Button
           type="button"
           onClick={button.onClick}
+          disabled={button.disabled}
           icon={button.icon}
           variant={button.variant}
           loading={button.loading}
