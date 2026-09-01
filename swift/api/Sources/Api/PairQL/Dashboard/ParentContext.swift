@@ -27,15 +27,14 @@ struct ParentContext: ResolverContext {
 
   func verifiedChildWithConnectedMusicApp(from id: Child.Id) async throws -> Child {
     let child = try await self.verifiedChild(from: id)
-    let account = try await self.currentBillingAccount()
-    try requireGertrudeMusicAccess(in: self, billing: account)
-
     let devices = try await child.iosDevices(in: self.db)
-    let connectedDeviceIds = try await MusicApp.Token.connectedDeviceIds(
+    let tokens = try await MusicApp.Token.connectedTokens(
       among: devices.map(\.id),
       in: self.db,
     )
-    guard !connectedDeviceIds.isEmpty else {
+    let account = try await self.currentBillingAccount()
+    try requireGertrudeMusicAccess(in: self, billing: account, tokens: tokens)
+    guard !tokens.isEmpty else {
       throw self.error(
         "1fa9493f",
         .badRequest,

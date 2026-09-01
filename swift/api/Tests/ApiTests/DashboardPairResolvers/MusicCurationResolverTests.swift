@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import PairQL
 import XCTest
 import XExpect
 
@@ -72,6 +73,50 @@ final class MusicCurationResolverTests: ApiTestCase, @unchecked Sendable {
       let matched = try PairQLRoute.router.match(request: request)
 
       expect(matched).toEqual(.dashboard(.adminAuthed(token, route)))
+    }
+  }
+
+  func testCurationAllowsAnyActiveDeviceTrial() async throws {
+    let child = try await self.child()
+    let (_, firstInstall) = try await self.claimedMusicInstall(for: child)
+    var firstToken = try await self.db.create(MusicApp.Token(installId: firstInstall.id))
+    try await firstToken.modifyCreatedAt(.exact(.reference))
+    let (_, secondInstall) = try await self.claimedMusicInstall(for: child)
+    var secondToken = try await self.db.create(MusicApp.Token(installId: secondInstall.id))
+    try await secondToken.modifyCreatedAt(.exact(.reference + .days(10)))
+
+    let output = try await withDependencies {
+      $0.date.now = .reference + .days(25)
+    } operation: {
+      try await GetMusicCuration.resolve(
+        with: .init(childId: child.id),
+        in: child.parent.context,
+      )
+    }
+
+    expect(output.revision).toEqual(0)
+    expect(output.albums).toEqual([])
+    expect(output.artists).toEqual([])
+  }
+
+  func testCurationRequiresPaymentAtTrialExpiration() async throws {
+    let child = try await self.child()
+    let (_, install) = try await self.claimedMusicInstall(for: child)
+    var token = try await self.db.create(MusicApp.Token(installId: install.id))
+    try await token.modifyCreatedAt(.exact(.reference))
+
+    do {
+      _ = try await withDependencies {
+        $0.date.now = .reference + .days(21)
+      } operation: {
+        try await GetMusicCuration.resolve(
+          with: .init(childId: child.id),
+          in: child.parent.context,
+        )
+      }
+      XCTFail("expected payment required")
+    } catch let error as PqlError {
+      expect(error.type).toEqual(.paymentRequired)
     }
   }
 

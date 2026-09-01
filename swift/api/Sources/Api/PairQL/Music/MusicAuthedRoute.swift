@@ -6,6 +6,7 @@ extension MusicApp {
   struct InstallContext: ResolverContext {
     let requestId: String
     let dashboardUrl: String
+    let token: MusicApp.Token
     let install: MusicApp.Install
     let device: IOSDevice
     let child: Child
@@ -22,7 +23,7 @@ func requireMusicAccess(in ctx: MusicApp.InstallContext) async throws {
     in: ctx.db,
     at: get(dependency: \.date.now),
   )
-  try requireGertrudeMusicAccess(in: ctx, billing: account)
+  try requireGertrudeMusicAccess(in: ctx, billing: account, token: ctx.token)
 }
 
 extension AuthedRoute: RouteResponder {

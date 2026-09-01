@@ -21,6 +21,16 @@ extension MusicApp {
 }
 
 extension MusicApp.Token {
+  static let trialDuration: TimeInterval = .days(21)
+
+  var trialExpiresAt: Date {
+    self.createdAt + Self.trialDuration
+  }
+
+  func hasActiveTrial(at date: Date) -> Bool {
+    date < self.trialExpiresAt
+  }
+
   func install(in db: any DuetSQL.Client) async throws -> MusicApp.Install {
     try await MusicApp.Install.query()
       .where(.id == self.installId)
@@ -43,5 +53,20 @@ extension MusicApp.Token {
         .map(\.installId),
     )
     return Set(installs.filter { tokenedInstallIds.contains($0.id) }.map(\.deviceId))
+  }
+
+  static func connectedTokens(
+    among deviceIds: [IOSDevice.Id],
+    in db: any DuetSQL.Client,
+  ) async throws -> [MusicApp.Token] {
+    guard !deviceIds.isEmpty else { return [] }
+    let installIds = try await MusicApp.Install.query()
+      .where(.deviceId |=| deviceIds)
+      .all(in: db)
+      .map(\.id)
+    guard !installIds.isEmpty else { return [] }
+    return try await MusicApp.Token.query()
+      .where(.installId |=| installIds)
+      .all(in: db)
   }
 }

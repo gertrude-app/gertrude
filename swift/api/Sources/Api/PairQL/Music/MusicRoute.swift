@@ -29,6 +29,7 @@ extension MusicRoute: RouteResponder {
       let installContext = MusicApp.InstallContext(
         requestId: context.requestId,
         dashboardUrl: context.dashboardUrl,
+        token: token,
         install: install,
         device: device,
         child: child,
@@ -47,6 +48,9 @@ extension MusicRoute: RouteResponder {
       case .getMusicAppStatus_v2(let input):
         let output = try await GetMusicAppStatus_v2.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .getMusicAppStatus_v3(let input):
+        let output = try await GetMusicAppStatus_v3.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       }
     }
   }
@@ -55,8 +59,30 @@ extension MusicRoute: RouteResponder {
 func requireGertrudeMusicAccess(
   in context: some ResolverContext,
   billing: BillingAccountSnapshot,
+  token: MusicApp.Token,
 ) throws {
-  guard billing.can(.useGertrudeMusic) else {
+  try requireGertrudeMusicAccess(
+    in: context,
+    hasAccess: billing.hasMusicAccess(for: token),
+  )
+}
+
+func requireGertrudeMusicAccess(
+  in context: some ResolverContext,
+  billing: BillingAccountSnapshot,
+  tokens: [MusicApp.Token],
+) throws {
+  try requireGertrudeMusicAccess(
+    in: context,
+    hasAccess: billing.hasMusicAccess(forAny: tokens),
+  )
+}
+
+private func requireGertrudeMusicAccess(
+  in context: some ResolverContext,
+  hasAccess: Bool,
+) throws {
+  guard hasAccess else {
     throw context.error(
       "ad0437fe",
       .paymentRequired,

@@ -244,13 +244,29 @@ final class GetApprovedMusicLibraryResolverTests: ApiTestCase, @unchecked Sendab
     expect(output.albums.map { $0.tracks.map(\.id) }).toEqual([["1440935468", "1440935469"]])
   }
 
-  func testV2RequiresMusicAccess() async throws {
+  func testV2AllowsActiveMusicTrial() async throws {
+    let child = try await self.child()
+    let ctx = try await self.musicContext(for: child)
+
+    let output = try await GetApprovedMusicLibrary_v2.resolve(with: .init(), in: ctx)
+
+    expect(output).toEqual(.snapshot(.init(
+      revision: 0,
+      generatedAt: .init(timeIntervalSince1970: 0),
+      albums: [],
+      artists: [],
+    )))
+  }
+
+  func testV2RequiresMusicAccessAfterTrialExpires() async throws {
     let child = try await self.child()
     let (_, install) = try await self.claimedMusicInstall(for: child)
-    _ = try await self.db.create(MusicApp.Token(installId: install.id))
+    var token = try await self.db.create(MusicApp.Token(installId: install.id))
+    try await token.modifyCreatedAt(.exact(.reference - .days(21)))
     let ctx = try await MusicApp.InstallContext(
       requestId: "mock-req-id",
       dashboardUrl: "/",
+      token: token,
       install: install,
       device: install.device(in: self.db),
       child: child.model,

@@ -118,6 +118,124 @@ final class MusicAppInstallTests: ApiTestCase, @unchecked Sendable {
   }
 }
 
+final class MusicAppTokenTrialTests: DependencyTestCase {
+  func testTrialExpiresTwentyOneDaysAfterTokenCreation() {
+    var token = MusicApp.Token(installId: .init())
+    token.createdAt = .reference
+
+    expect(MusicApp.Token.trialDuration).toEqual(.days(21))
+    expect(token.trialExpiresAt).toEqual(.reference + .days(21))
+  }
+
+  func testTrialIsActiveBeforeTwentyOneDayBoundary() {
+    var token = MusicApp.Token(installId: .init())
+    token.createdAt = .reference
+
+    expect(token.hasActiveTrial(at: .reference + .days(21) - 1)).toBeTrue()
+  }
+
+  func testTrialIsExpiredAtTwentyOneDayBoundary() {
+    var token = MusicApp.Token(installId: .init())
+    token.createdAt = .reference
+
+    expect(token.hasActiveTrial(at: .reference + .days(21))).toBeFalse()
+  }
+
+  func testFreeAccountReceivesActiveTokenTrial() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(date: .reference + .days(20)).musicSubscriptionState(for: token),
+    ).toEqual(.trial(expiresAt: .reference + .days(21)))
+  }
+
+  func testExpiredTokenIsUnavailableForFreeAccount() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(date: .reference + .days(21)).musicSubscriptionState(for: token),
+    ).toEqual(.unavailable)
+  }
+
+  func testPaidMusicAccountIsActiveDespiteExpiredToken() {
+    let token = self.token(createdAt: .reference)
+
+    for tier in [StripeSubscription.Tier.medium, .full] {
+      expect(
+        billing(tier: tier, date: .reference + .days(30)).musicSubscriptionState(for: token),
+      ).toEqual(.active)
+    }
+  }
+
+  func testComplimentaryAccountIsActiveDespiteExpiredToken() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(comp: true, date: .reference + .days(30)).musicSubscriptionState(for: token),
+    ).toEqual(.active)
+  }
+
+  func testLightAccountFallsBackToTokenTrial() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(tier: .light, date: .reference + .days(20)).musicSubscriptionState(for: token),
+    ).toEqual(.trial(expiresAt: .reference + .days(21)))
+  }
+
+  func testPastDueMusicAccountFallsBackToTokenTrial() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(
+        tier: .medium,
+        status: .pastDue,
+        date: .reference + .days(20),
+      ).musicSubscriptionState(for: token),
+    ).toEqual(.trial(expiresAt: .reference + .days(21)))
+  }
+
+  func testCanceledMusicAccountFallsBackToTokenTrial() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(
+        tier: .full,
+        status: .canceled,
+        date: .reference + .days(20),
+      ).musicSubscriptionState(for: token),
+    ).toEqual(.trial(expiresAt: .reference + .days(21)))
+  }
+
+  func testMacFullTrialDoesNotReplaceActiveTokenTrial() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(
+        trialStartedAt: .reference + .days(20),
+        date: .reference + .days(20),
+      ).musicSubscriptionState(for: token),
+    ).toEqual(.trial(expiresAt: .reference + .days(21)))
+  }
+
+  func testMacFullTrialDoesNotGrantMusicAfterTokenTrialExpires() {
+    let token = self.token(createdAt: .reference)
+
+    expect(
+      billing(
+        trialStartedAt: .reference + .days(20),
+        date: .reference + .days(21),
+      ).musicSubscriptionState(for: token),
+    ).toEqual(.unavailable)
+  }
+
+  private func token(createdAt: Date) -> MusicApp.Token {
+    var token = MusicApp.Token(installId: .init())
+    token.createdAt = createdAt
+    return token
+  }
+}
+
 private struct MusicAppTokenInstallIdUnique: CustomQueryable {
   var constraintCount: Int
 

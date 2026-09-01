@@ -335,7 +335,7 @@ final class CapabilityTests: DependencyTestCase {
   }
 }
 
-private func billing(
+func billing(
   comp: Bool = false,
   trialStartedAt: Date? = nil,
   tier: StripeSubscription.Tier? = nil,

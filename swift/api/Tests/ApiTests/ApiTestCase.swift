@@ -143,9 +143,11 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
 
   func musicContext(for child: ChildEntities) async throws -> MusicApp.InstallContext {
     let (device, install) = try await self.claimedMusicInstall(for: child)
+    let token = try await self.db.create(MusicApp.Token(installId: install.id))
     return MusicApp.InstallContext(
       requestId: "mock-req-id",
       dashboardUrl: "/",
+      token: token,
       install: install,
       device: device,
       child: child.model,

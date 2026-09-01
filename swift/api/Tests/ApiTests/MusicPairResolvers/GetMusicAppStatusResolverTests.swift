@@ -11,7 +11,7 @@ import XExpect
 
 @testable import Api
 
-/// deprecated: behavior lives in `GetMusicAppStatus_v2ResolverTests`, this only covers
+/// deprecated: behavior lives in `GetMusicAppStatus_v3ResolverTests`, this only covers
 /// the legacy shim's own mapping. delete with `GetMusicAppStatus`.
 final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
   static let dashboardUrl = "https://parents.gertrude.app"
@@ -83,8 +83,8 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(token).toEqual(tokens[0].value.rawValue)
   }
 
-  func testMapsUnavailableToLegacyUnpaidWithSettingsUrl() async throws {
-    let child = try await self.child() // no subscription -> v2 reports .unavailable
+  func testMapsTrialToLegacyActive() async throws {
+    let child = try await self.child()
     let deviceId = UUID()
     _ = try await self.claimedMusicDevice(deviceId, child: child.model)
 
@@ -96,7 +96,37 @@ final class GetMusicAppStatusResolverTests: ApiTestCase, @unchecked Sendable {
     guard case .claimed(_, _, _, let entitlement) = output else {
       return XCTFail("expected .claimed, got \(output)")
     }
-    // 0.2.0 substitutes the settings url when nil, so the shim keeps sending the real one
+    expect(entitlement).toEqual(.active)
+  }
+
+  func testMapsExpiredTrialToLegacyUnpaidWithSettingsUrl() async throws {
+    let child = try await self.child()
+    let deviceId = UUID()
+    let device = try await self.claimedMusicDevice(deviceId, child: child.model)
+
+    _ = try await GetMusicAppStatus.resolve(
+      with: self.input(deviceId),
+      in: self.legacyCtx,
+    )
+    let install = try await MusicApp.Install.query()
+      .where(.deviceId == device.id)
+      .first(in: self.db)
+    let token = try await MusicApp.Token.query()
+      .where(.installId == install.id)
+      .first(in: self.db)
+
+    let output = try await withDependencies {
+      $0.date = .constant(token.trialExpiresAt)
+    } operation: {
+      try await GetMusicAppStatus.resolve(
+        with: self.input(deviceId),
+        in: self.legacyCtx,
+      )
+    }
+
+    guard case .claimed(_, _, _, let entitlement) = output else {
+      return XCTFail("expected .claimed, got \(output)")
+    }
     expect(entitlement).toEqual(.unpaid(remediationUrl: self.remediationUrl))
   }
 }
