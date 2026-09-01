@@ -1,4 +1,4 @@
-import { PlusIcon, SaveIcon, SettingsIcon } from 'lucide-react';
+import { PlusIcon, SaveIcon, SettingsIcon, SmartphoneIcon } from 'lucide-react';
 import { fn } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/tanstack-react';
 import PageHeading from './PageHeading';
@@ -28,6 +28,7 @@ const meta = {
     subtitle: { control: `text` },
     breadcrumbs: { control: false },
     buttons: { control: false },
+    rightContent: { control: false },
   },
   parameters: { layout: `fullscreen`, screenshotsAt: [`desktop`] },
 } satisfies Meta<typeof PageHeading>;
@@ -49,6 +50,11 @@ export const Assortment: Story = {
               { text: `Devices`, href: `/devices` },
               { text: `Mobile devices`, href: `/devices/mobile` },
             ]}
+            rightContent={
+              <div className="grid h-12 w-12 place-items-center rounded-xl bg-violet-100 text-violet-700">
+                <SmartphoneIcon className="h-6 w-6" />
+              </div>
+            }
           />
           <PageHeading
             title="Family settings"

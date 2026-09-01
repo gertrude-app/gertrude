@@ -5,6 +5,8 @@ import Vapor
 enum AuthedAccountRoute: PairRoute {
   case getPeople
   case getDevices
+  case getMacDevice(GetMacDevice.Input)
+  case updateMacDevice(UpdateMacDevice.Input)
   case getAccountSettings
   case createAccountNotificationMethod(CreateAccountNotificationMethod.Input)
   case confirmAccountNotificationMethod(ConfirmAccountNotificationMethod.Input)
@@ -53,6 +55,14 @@ enum AuthedAccountRoute: PairRoute {
     }
     Route(.case(Self.getDevices)) {
       Operation(GetDevices.self)
+    }
+    Route(.case(Self.getMacDevice)) {
+      Operation(GetMacDevice.self)
+      Body(.accountInput(GetMacDevice.self))
+    }
+    Route(.case(Self.updateMacDevice)) {
+      Operation(UpdateMacDevice.self)
+      Body(.accountInput(UpdateMacDevice.self))
     }
     Route(.case(Self.getAccountSettings)) {
       Operation(GetAccountSettings.self)
@@ -223,6 +233,12 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getDevices:
       let output = try await GetDevices.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getMacDevice(let input):
+      let output = try await GetMacDevice.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .updateMacDevice(let input):
+      let output = try await UpdateMacDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getAccountSettings:
       let output = try await GetAccountSettings.resolve(in: context)

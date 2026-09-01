@@ -1,5 +1,7 @@
 import { Badge, Card, HStack, Text, VStack } from '@gertrude/ui';
+import { Link } from '@tanstack/react-router';
 import {
+  ChevronRightIcon,
   CircleDashedIcon,
   ShieldAlertIcon,
   ShieldCheckIcon,
@@ -52,20 +54,24 @@ const SupervisionBadge: React.FC<{ status: IOSDeviceSupervisionStatus }> = ({
 };
 
 const MobileDeviceCard: React.FC<Props> = ({ device }) => (
-  <Card preset="big" padding={0} className="flex flex-col overflow-hidden">
+  <Card preset="big" padding={0} className="relative flex flex-col overflow-hidden">
+    <Link
+      to="/people/$personId/ios-settings/$deviceId"
+      params={{ personId: device.person.id, deviceId: device.id }}
+      aria-label={`Open settings for ${possessive(device.person.name)} ${device.modelName}`}
+      className="peer absolute inset-0 z-10 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300"
+    />
     <Card.Body
       padding={2.5}
-      className={
-        device.connectedApps.length === 0 || device.supervisionStatus
-          ? `shrink-0 !pb-3`
-          : `shrink-0`
-      }
+      className={`shrink-0 transition-colors peer-hover:bg-stone-50/80 peer-focus-visible:bg-stone-50/80 ${
+        device.connectedApps.length === 0 || device.supervisionStatus ? `!pb-3` : ``
+      }`}
     >
       <HStack align="center" gap={2.5}>
         <div className="grid h-14 w-18 shrink-0 place-items-center">
           <DeviceArtwork device={device} size="card" />
         </div>
-        <VStack className="min-w-0" gap={1.5}>
+        <VStack className="min-w-0 flex-grow" gap={1.5}>
           <VStack gap={0.5}>
             <Text as="h3" variant="heading" lineClamp={2}>
               {possessive(device.person.name)} {device.modelName}
@@ -87,12 +93,20 @@ const MobileDeviceCard: React.FC<Props> = ({ device }) => (
             </HStack>
           )}
         </VStack>
+        <ChevronRightIcon
+          className="h-5 w-5 shrink-0 text-stone-400 transition-colors peer-hover:text-stone-600"
+          aria-hidden="true"
+        />
       </HStack>
     </Card.Body>
     <Card.Footer className="flex grow flex-col px-2.5 py-2.5">
       <VStack gap={2}>
         <Text variant="label">Connected apps</Text>
-        <ConnectedAppList apps={device.connectedApps} />
+        <ConnectedAppList
+          apps={device.connectedApps}
+          personId={device.person.id}
+          deviceId={device.id}
+        />
       </VStack>
     </Card.Footer>
   </Card>

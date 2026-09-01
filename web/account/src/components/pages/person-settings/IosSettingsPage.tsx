@@ -7,6 +7,7 @@ import {
   SmartphoneIcon,
 } from 'lucide-react';
 import React from 'react';
+import type { ConnectedIOSApp } from '#/components/devices/types';
 import type { PersonSettingsPreviewChip } from '#/components/person-settings/PersonSettingsExpandableSection';
 import type { LoadableState } from '#/components/types';
 import type {
@@ -41,6 +42,7 @@ interface Props {
   onSaveProfile: (profileSettings: ProfileDraft) => void | Promise<void>;
   onRequestPodcastsPinReset?: () => Promise<number | null>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
+  defaultExpandedSection?: ConnectedIOSApp;
 }
 
 const SaveButton: React.FC<{ disabled: boolean; saving: boolean }> = ({
@@ -224,6 +226,7 @@ interface EditorProps {
   onSaveBlockedGroups: (enabledBlockGroupIds: string[]) => void | Promise<void>;
   onSaveProfile: (profileSettings: ProfileDraft) => void | Promise<void>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
+  defaultExpanded?: boolean;
 }
 
 const IosSettingsEditor: React.FC<EditorProps> = ({
@@ -233,6 +236,7 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
   onSaveBlockedGroups,
   onSaveProfile,
   onUnsavedChangesChange,
+  defaultExpanded,
 }) => {
   const [formState, dispatch] = React.useReducer(
     iosSettingsReducer,
@@ -301,6 +305,7 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
       <PersonSettingsExpandableSection
         appIconUrl="/gertrude-app-icons/blocker.webp"
         title="Gertrude Blocker"
+        defaultExpanded={defaultExpanded}
         hasUnsavedChanges={hasUnsavedChanges}
         previewChips={previewChips}
       >
@@ -336,6 +341,7 @@ const IosSettingsPage: React.FC<Props> = ({
   onSaveProfile,
   onRequestPodcastsPinReset,
   onUnsavedChangesChange,
+  defaultExpandedSection,
 }) => {
   if (state.status === `loading`) {
     return (
@@ -382,11 +388,13 @@ const IosSettingsPage: React.FC<Props> = ({
           onSaveBlockedGroups={onSaveBlockedGroups}
           onSaveProfile={onSaveProfile}
           onUnsavedChangesChange={onUnsavedChangesChange}
+          defaultExpanded={defaultExpandedSection === `blocker`}
         />
       ) : (
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/blocker.webp"
           title="Gertrude Blocker"
+          defaultExpanded={defaultExpandedSection === `blocker`}
           previewChips={[
             {
               title: `Status`,
@@ -403,10 +411,14 @@ const IosSettingsPage: React.FC<Props> = ({
         </PersonSettingsExpandableSection>
       )}
       {music ? (
-        <MusicSection music={music} />
+        <MusicSection
+          music={music}
+          defaultExpanded={defaultExpandedSection === `music`}
+        />
       ) : (
         <AppNotInstalledSection
           appIconUrl="/gertrude-app-icons/music.webp"
+          defaultExpanded={defaultExpandedSection === `music`}
           appName="Gertrude Music"
           icon={MusicIcon}
           description="Gertrude Music is a music app that only plays albums you’ve approved, with no artwork, no radio, and nothing to stumble into."
@@ -419,10 +431,12 @@ const IosSettingsPage: React.FC<Props> = ({
           deviceName={deviceName}
           requestingPinReset={requestingPinReset}
           onRequestPinReset={onRequestPodcastsPinReset}
+          defaultExpanded={defaultExpandedSection === `podcasts`}
         />
       ) : (
         <AppNotInstalledSection
           appIconUrl="/gertrude-app-icons/podcasts.webp"
+          defaultExpanded={defaultExpandedSection === `podcasts`}
           appName="Gertrude Podcasts"
           icon={PodcastIcon}
           description="Gertrude Podcasts plays only the shows you’ve approved, with a PIN you control so the lineup can’t be changed."

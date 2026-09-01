@@ -10,6 +10,7 @@ interface Props {
   icon: LucideIcon;
   description: string;
   appStoreUrl: string;
+  defaultExpanded?: boolean;
 }
 
 const AppNotInstalledSection: React.FC<Props> = ({
@@ -18,10 +19,12 @@ const AppNotInstalledSection: React.FC<Props> = ({
   icon,
   description,
   appStoreUrl,
+  defaultExpanded,
 }) => (
   <PersonSettingsExpandableSection
     appIconUrl={appIconUrl}
     title={appName}
+    defaultExpanded={defaultExpanded}
     previewChips={[
       { title: `Status`, values: [{ text: `Not installed`, color: `neutral` }] },
     ]}

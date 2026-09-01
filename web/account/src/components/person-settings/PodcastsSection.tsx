@@ -14,6 +14,7 @@ interface Props {
   deviceName: string;
   requestingPinReset?: boolean;
   onRequestPinReset: () => Promise<number | null>;
+  defaultExpanded?: boolean;
 }
 
 const CHIP_TEXT: Record<PodcastsRunwayTier, string> = {
@@ -40,6 +41,7 @@ const PodcastsSection: React.FC<Props> = ({
   deviceName,
   requestingPinReset = false,
   onRequestPinReset,
+  defaultExpanded,
 }) => {
   const [code, setCode] = React.useState<number | null>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -71,6 +73,7 @@ const PodcastsSection: React.FC<Props> = ({
       <PersonSettingsExpandableSection
         appIconUrl="/gertrude-app-icons/podcasts.webp"
         title="Gertrude Podcasts"
+        defaultExpanded={defaultExpanded}
         previewChips={previewChips}
       >
         <VStack gap={3}>

@@ -7,6 +7,7 @@ import type {
   GetDayActivity,
   GetDevices,
   GetIosDeviceSettings,
+  GetMacDevice,
   GetPeople,
   GetPersonActivitySummaries,
   GetPersonDayActivity,
@@ -31,6 +32,10 @@ export class Key extends QueryKey<never> {
 
   static get devices(): QueryKey<GetDevices.Output> {
     return new QueryKey([`devices`]);
+  }
+
+  static macDevice(deviceId: string): QueryKey<GetMacDevice.Output> {
+    return new QueryKey([`devices`, deviceId]);
   }
 
   static get accountSettings(): QueryKey<GetAccountSettings.Output> {

@@ -23,6 +23,7 @@ interface Props {
   title: string;
   subtitle?: string;
   buttons?: PageHeadingButton[];
+  rightContent?: React.ReactNode;
   breadcrumbs?: Array<{ text: string; href: string }>;
 }
 
@@ -38,6 +39,7 @@ const PageHeading: React.FC<Props> = ({
   title,
   subtitle,
   buttons = [],
+  rightContent,
   breadcrumbs = [],
 }) => {
   const navigate = useNavigate();
@@ -93,8 +95,8 @@ const PageHeading: React.FC<Props> = ({
         </nav>
       )}
       <HStack justify="between" align="end" gap={4}>
-        <VStack gap={2}>
-          <Text as="h1" variant="display" className="flex-grow @2xl/main:-mb-2">
+        <VStack gap={2} className="min-w-0 flex-grow">
+          <Text as="h1" variant="display" className="@2xl/main:-mb-2">
             {title}
           </Text>
           {subtitle && (
@@ -103,48 +105,55 @@ const PageHeading: React.FC<Props> = ({
             </Text>
           )}
         </VStack>
-        {buttons.length > 0 && (
-          <>
-            <HStack hideAbove="@2xl/main">
-              <DropdownMenu
-                trigger={<Button type="button" onClick={() => {}} icon={EllipsisIcon} />}
-              >
-                {buttons.map((button) => (
-                  <DropdownMenuItem
-                    key={button.text}
-                    title={button.text}
-                    icon={button.icon}
-                    onSelect={() => handleDropdownSelect(button)}
-                  />
-                ))}
-              </DropdownMenu>
-            </HStack>
-            <HStack hideBelow="@2xl/main" gap={2}>
-              {buttons.map((button) =>
-                isLinkButton(button) ? (
-                  <Button
-                    key={button.text}
-                    type="link"
-                    href={button.href}
-                    variant={button.variant === `primary` ? `primary` : `default`}
-                    icon={button.icon}
+        {(rightContent != null || buttons.length > 0) && (
+          <HStack align="center" gap={2} className="shrink-0">
+            {rightContent}
+            {buttons.length > 0 && (
+              <>
+                <HStack hideAbove="@2xl/main">
+                  <DropdownMenu
+                    trigger={
+                      <Button type="button" onClick={() => {}} icon={EllipsisIcon} />
+                    }
                   >
-                    {button.text}
-                  </Button>
-                ) : (
-                  <Button
-                    key={button.text}
-                    type="button"
-                    variant={button.variant === `primary` ? `primary` : `default`}
-                    onClick={button.onClick}
-                    icon={button.icon}
-                  >
-                    {button.text}
-                  </Button>
-                ),
-              )}
-            </HStack>
-          </>
+                    {buttons.map((button) => (
+                      <DropdownMenuItem
+                        key={button.text}
+                        title={button.text}
+                        icon={button.icon}
+                        onSelect={() => handleDropdownSelect(button)}
+                      />
+                    ))}
+                  </DropdownMenu>
+                </HStack>
+                <HStack hideBelow="@2xl/main" gap={2}>
+                  {buttons.map((button) =>
+                    isLinkButton(button) ? (
+                      <Button
+                        key={button.text}
+                        type="link"
+                        href={button.href}
+                        variant={button.variant === `primary` ? `primary` : `default`}
+                        icon={button.icon}
+                      >
+                        {button.text}
+                      </Button>
+                    ) : (
+                      <Button
+                        key={button.text}
+                        type="button"
+                        variant={button.variant === `primary` ? `primary` : `default`}
+                        onClick={button.onClick}
+                        icon={button.icon}
+                      >
+                        {button.text}
+                      </Button>
+                    ),
+                  )}
+                </HStack>
+              </>
+            )}
+          </HStack>
         )}
       </HStack>
       <Divider hideBelow="@2xl/main" className="mt-4 !bg-stone-200/60" />
