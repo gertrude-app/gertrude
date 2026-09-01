@@ -311,13 +311,11 @@ instead of the checked-out code. Keep all three lists identical.
 ### `web/justfile` `check` recipe ↔ `web-ci.yml` build jobs
 
 - `web/justfile`'s `check:` recipe lists per-app builds as dependencies (`build-site`,
-  `build-storybook`, `build-admin`, etc.). Root `just check` and the final pre-PR
-  verification command `just ci-local` both delegate here, so this recipe is the local
-  mirror of the per-app build jobs in `.github/workflows/web-ci.yml`.
+  `build-storybook`, `build-admin`, etc.). Root `just check` delegates here, so this
+  recipe is the local mirror of the per-app build jobs in `.github/workflows/web-ci.yml`.
 - Whenever a new per-app build job is added to `web-ci.yml`, the matching `build-*` recipe
-  **must** be appended to `web/justfile:check` — otherwise the final pre-PR verification
-  command (`just ci-local`) will silently skip it and PRs can pass locally while failing
-  in CI.
+  **must** be appended to `web/justfile:check` — otherwise `just check` will silently skip
+  it and PRs can pass locally while failing in CI.
 - The `build-*` recipes should use `pnpm exec nx run <project>:build` (not
   `pnpm --filter <project> build`) so they benefit from nx caching during the
   frequently-run `just check` loop.

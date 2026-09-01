@@ -625,7 +625,7 @@ func decodeAppleMusicCatalogAlbumTracks(from data: Data) throws -> [AppleMusicCa
   } ?? []
 }
 
-private func sizedAppleMusicArtworkUrl(_ url: String?) -> String? {
+func sizedAppleMusicArtworkUrl(_ url: String?) -> String? {
   url?
     .replacingOccurrences(of: "{w}", with: "600")
     .replacingOccurrences(of: "{h}", with: "600")
@@ -660,14 +660,7 @@ private struct AppleMusicCatalogSearchResponse: Decodable {
     var isSingle: Bool?
     var url: String?
 
-    var releaseType: String? {
-      if self.name.lowercased().hasSuffix(" - ep") {
-        "EP"
-      } else if let isSingle = self.isSingle {
-        isSingle ? "Single" : "Album"
-      } else {
-        nil
-      }
+    var releaseType: String? { appleMusicAlbumReleaseType(name: self.name, isSingle: self.isSingle)
     }
   }
 
@@ -753,6 +746,16 @@ private struct AppleMusicCatalogSearchResponse: Decodable {
 
   struct ResultsMeta: Decodable {
     var order: [String]?
+  }
+}
+
+func appleMusicAlbumReleaseType(name: String, isSingle: Bool?) -> String? {
+  if name.lowercased().hasSuffix(" - ep") {
+    "EP"
+  } else if let isSingle {
+    isSingle ? "Single" : "Album"
+  } else {
+    nil
   }
 }
 

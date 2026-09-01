@@ -153,6 +153,12 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
     )
   }
 
+  func marketingEmailSends(for slug: String) async throws -> [MarketingEmailSend] {
+    try await MarketingEmailSend.query()
+      .where(.campaign == slug)
+      .all(in: self.db)
+  }
+
   @discardableResult
   func createAutoIncludeKeychain() async throws -> (Keychain, Api.Key) {
     guard let autoIdStr = self.env.get("AUTO_INCLUDED_KEYCHAIN_ID"),
@@ -175,6 +181,16 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
       key: .domain(domain: "foo.com", scope: .webBrowsers),
     ))
     return (keychain, key)
+  }
+}
+
+class FixedVerificationCodeApiTestCase: ApiTestCase, @unchecked Sendable {
+  override func invokeTest() {
+    withDependencies {
+      $0.verificationCode.generate = { 123_456 }
+    } operation: {
+      super.invokeTest()
+    }
   }
 }
 

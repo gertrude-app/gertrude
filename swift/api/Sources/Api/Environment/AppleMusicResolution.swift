@@ -331,7 +331,7 @@ func hydratedAppleMusicCatalogSongsForSearch(
         artistIds: song.artistIds,
         albumIds: song.albumIds,
         albumTitle: attributes.albumName,
-        artworkUrl: sizedAppleMusicResolutionArtworkUrl(attributes.artwork?.url),
+        artworkUrl: sizedAppleMusicArtworkUrl(attributes.artwork?.url),
         artwork: attributes.artwork?.catalogArtwork,
         durationInMillis: attributes.durationInMillis,
         discNumber: attributes.discNumber,
@@ -558,14 +558,7 @@ private struct AppleMusicRawAlbum: Decodable {
     var isSingle: Bool?
     var url: String?
 
-    var releaseType: String? {
-      if self.name.lowercased().hasSuffix(" - ep") {
-        "EP"
-      } else if let isSingle = self.isSingle {
-        isSingle ? "Single" : "Album"
-      } else {
-        nil
-      }
+    var releaseType: String? { appleMusicAlbumReleaseType(name: self.name, isSingle: self.isSingle)
     }
   }
 
@@ -633,7 +626,7 @@ private struct AppleMusicRawAlbum: Decodable {
         artistIds: [],
         albumId: albumId,
         albumTitle: attributes.albumName ?? self.attributes.name,
-        artworkUrl: sizedAppleMusicResolutionArtworkUrl(attributes.artwork?.url),
+        artworkUrl: sizedAppleMusicArtworkUrl(attributes.artwork?.url),
         durationInMillis: attributes.durationInMillis,
         discNumber: attributes.discNumber,
         trackNumber: attributes.trackNumber,
@@ -647,7 +640,7 @@ private struct AppleMusicRawAlbum: Decodable {
       title: self.attributes.name,
       artistName: self.attributes.artistName,
       artistIds: artistIds.map(Music.ArtistId.init(rawValue:)),
-      artworkUrl: sizedAppleMusicResolutionArtworkUrl(self.attributes.artwork?.url),
+      artworkUrl: sizedAppleMusicArtworkUrl(self.attributes.artwork?.url),
       artwork: self.attributes.artwork?.catalogArtwork,
       trackCount: self.attributes.trackCount,
       releaseDate: self.attributes.releaseDate,
@@ -704,7 +697,7 @@ private struct AppleMusicRawSong: Decodable {
       artistIds: self.artistIds,
       albumId: album.id,
       albumTitle: album.title,
-      artworkUrl: sizedAppleMusicResolutionArtworkUrl(attributes.artwork?.url),
+      artworkUrl: sizedAppleMusicArtworkUrl(attributes.artwork?.url),
       durationInMillis: attributes.durationInMillis,
       discNumber: attributes.discNumber,
       trackNumber: attributes.trackNumber,
@@ -756,12 +749,6 @@ private struct EditorialNotes: Decodable {
   var short: String?
   var standard: String?
   var name: String?
-}
-
-private func sizedAppleMusicResolutionArtworkUrl(_ url: String?) -> String? {
-  url?
-    .replacingOccurrences(of: "{w}", with: "600")
-    .replacingOccurrences(of: "{h}", with: "600")
 }
 
 extension AppleMusicClient {

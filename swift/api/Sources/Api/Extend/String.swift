@@ -22,4 +22,19 @@ extension String {
     }
     return copy
   }
+
+  var normalizedBundleId: String {
+    var id = self
+    if id.first == "." {
+      id = String(id.dropFirst())
+    }
+    // strip a leading 10-char Apple team-id prefix, e.g. "9QW8UQUTAA."
+    let parts = id.split(separator: ".", maxSplits: 1)
+    if parts.count == 2,
+       parts[0].count == 10,
+       parts[0].allSatisfy({ $0.isNumber || ($0.isLetter && $0.isUppercase) }) {
+      id = String(parts[1])
+    }
+    return id
+  }
 }

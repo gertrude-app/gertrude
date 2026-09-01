@@ -1,18 +1,11 @@
-import Dependencies
 import DuetSQL
 import XCTest
 import XExpect
 
 @testable import Api
 
-final class PrepIOSAppConnectionResolverTests: ApiTestCase, @unchecked Sendable {
-  override func invokeTest() {
-    withDependencies {
-      $0.verificationCode.generate = { 123_456 }
-    } operation: {
-      super.invokeTest()
-    }
-  }
+final class PrepIOSAppConnectionResolverTests: FixedVerificationCodeApiTestCase,
+  @unchecked Sendable {
 
   func testNewChild_getsMonitoringEnabledByDefault() async throws {
     let parent = try await self.parent()

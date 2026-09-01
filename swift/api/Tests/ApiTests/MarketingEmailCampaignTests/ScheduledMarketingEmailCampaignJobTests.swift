@@ -45,7 +45,7 @@ final class ScheduledMarketingEmailCampaignJobTests: ApiTestCase, @unchecked Sen
       parentId: child.parent.model.id,
       fullTrialStartedAt: now - .hours(25),
     ))
-    try await self.setChildCreatedAt(child.model.id, to: now - .hours(30))
+    try await child.model.modifyCreatedAt(.exact(now - .hours(30)))
 
     let results = try await withDependencies {
       $0.env = env
@@ -97,16 +97,6 @@ final class ScheduledMarketingEmailCampaignJobTests: ApiTestCase, @unchecked Sen
     if !sends.isEmpty {
       try await self.db.create(sends)
     }
-  }
-
-  private func setChildCreatedAt(_ childId: Child.Id, to date: Date) async throws {
-    var stmt = SQL.Statement("""
-    UPDATE \(table: Child.self) SET \(Child.columnName(.createdAt)) =
-    """)
-    stmt.components.append(.binding(.date(date)))
-    stmt.components.append(.sql(" WHERE \(Child.columnName(.id)) = "))
-    stmt.components.append(.binding(.uuid(childId)))
-    try await self.db.execute(statement: stmt)
   }
 }
 

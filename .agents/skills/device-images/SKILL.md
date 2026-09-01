@@ -1,8 +1,8 @@
 ---
 name: device-images
 description:
-  Update local Apple device artwork for the Account site from ipsw.dev. Use when asked
-  to add, refresh, audit, crop, or wire up Mac, iPhone, or iPad model images in
+  Update local Apple device artwork for the Account site from ipsw.dev. Use when asked to
+  add, refresh, audit, crop, or wire up Mac, iPhone, or iPad model images in
   web/account/public/devices, especially after new Apple model releases.
 ---
 
@@ -17,8 +17,8 @@ The Account site stores device images here:
 - `web/account/public/devices/ipads/`
 
 The UI expects `.png` files named exactly by model identifier, commas included, e.g.
-`Mac14,2.png`, `iPhone14,7.png`, `iPad13,18.png`. Do not URL-encode commas in local
-image paths.
+`Mac14,2.png`, `iPhone14,7.png`, `iPad13,18.png`. Do not URL-encode commas in local image
+paths.
 
 ## Source pages
 
@@ -71,7 +71,8 @@ This trims excess transparent space around the actual device art.
 
 Run this from the repo root to list identifiers present on ipsw.dev but missing locally.
 It does not delete extra local files. Do not delete old Mac images without asking; ipsw's
-Mac page focuses on newer Macs, while existing local Intel Mac artwork may still be useful.
+Mac page focuses on newer Macs, while existing local Intel Mac artwork may still be
+useful.
 
 ```bash
 work_dir=$(mktemp -d)
@@ -210,16 +211,15 @@ The API stores canonical iOS model identifiers on `child.ios_devices.model_ident
 store the identifier directly; they point to the `IOSDevice` row by `device_id`.
 
 The iOS apps send the identifier from `DeviceClient.getModelIdentifier()` (`uname`) via
-`ConnectDevice_v2` / `ConnectedRules_v2`; the API creates or updates `IOSDevice` with
-that value. Legacy rows may contain `iPhone,unknown` / `iPad,unknown`, so UI should avoid
+`ConnectDevice_v2` / `ConnectedRules_v2`; the API creates or updates `IOSDevice` with that
+value. Legacy rows may contain `iPhone,unknown` / `iPad,unknown`, so UI should avoid
 showing a broken image if the identifier is unknown or absent.
 
 Account's `GetPeople` PairQL output exposes `modelIdentifier` for Mac, iPhone, and iPad
 devices. `web/account/src/lib/people.ts` maps those values into Account's device types,
-and `web/account/src/components/people/DeviceArtwork.tsx` falls back to a generic icon
-for unknown identifiers or missing images. If another Account PairQL output starts
-supplying device artwork, include `modelIdentifier` there and regenerate the TypeScript
-clients.
+and `web/account/src/components/people/DeviceArtwork.tsx` falls back to a generic icon for
+unknown identifiers or missing images. If another Account PairQL output starts supplying
+device artwork, include `modelIdentifier` there and regenerate the TypeScript clients.
 
 The helper in `web/account/src/components/utils.ts` maps device type to the matching
 public folder:

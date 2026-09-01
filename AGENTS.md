@@ -148,9 +148,7 @@ Supports all 3 apps, plus dashboard and admin websites
 - all lowercase commits, with a short prefix, e.g. `dash: fix bug in xyz`
 - keep commit subjects tight: target ~50 chars, hard cap 72 (github elides past that);
   subject line only — no body or extended description
-- before opening a PR, ensure `just fix` and targeted tests pass, then reserve
-  `just ci-local` for the final pre-PR verification run; prefer the human to run it unless
-  explicitly asked otherwise
+- before opening a PR, ensure `just fix` and targeted tests pass
 - when opening PRs, make title match commit style, and create with EMPTY body
 - commit messages MUST BE all lowercase
 
@@ -176,6 +174,15 @@ Supports all 3 apps, plus dashboard and admin websites
   callouts on non-obvious or load-bearing lines (a few per test is fine — e.g. tying a
   critical setup line buried in boilerplate to the assertion it drives); reach for a block
   comment above a test only rarely, for what genuinely can't be said at line-end.
+
+## Duplication
+
+- before writing a new test helper, fixture, or setup block, search for an existing one
+  first — most duplication here comes from not knowing a helper already existed
+- read `./.agents/skills/duplication/SKILL.md` when adding shared helpers, reviewing a
+  diff for reuse, or asked to deduplicate/extract/consolidate
+- `just dup` reports clones across the repo; `just dup --diff` reports only the ones
+  the current branch introduces, and is what CI gates on
 
 ## Continuous Improvement
 

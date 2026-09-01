@@ -46,9 +46,6 @@ check:
   @cd swift && just check
   @cd web && just check
 
-ci-local:
-  @./scripts/ci-local.sh
-
 api-build:
   @cd swift && just api-build
 
@@ -64,6 +61,11 @@ scheduled-marketing-email-dry-run:
 fix:
   @cd swift && just fix
   @cd web && just fix
+
+# duplication
+
+dup *args:
+  @node .agents/skills/duplication/find-duplication.mjs {{args}}
 
 update-ui-screenshots:
   @cd web && just update-ui-screenshots

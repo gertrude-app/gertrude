@@ -1,0 +1,30 @@
+name: duplication
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.swift'
+      - '**.ts'
+      - '**.tsx'
+      - '.agents/skills/duplication/find-duplication.mjs'
+      - '.agents/skills/duplication/duplication-ignore.json'
+      - '.github/workflows/duplication.yml'
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: detector self-test
+        run: node .agents/skills/duplication/find-duplication.mjs --self-test
+      - name: check for new duplication
+        run: node .agents/skills/duplication/find-duplication.mjs --diff origin/${{ github.base_ref }}
