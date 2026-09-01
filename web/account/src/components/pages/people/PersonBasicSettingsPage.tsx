@@ -8,7 +8,7 @@ import {
   VStack,
   inflect,
 } from '@gertrude/ui';
-import { MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
+import { LaptopIcon, MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonRelationship } from '#/components/types';
 import CardContainer from '#/components/layout/CardContainer';
@@ -28,6 +28,7 @@ interface Props {
   selfRelationshipUnavailable?: boolean;
   onSaveDetails: () => void;
   onDeletePerson: () => void | Promise<void>;
+  onConnectMac: () => void;
 }
 
 const PersonBasicSettingsPage: React.FC<Props> = ({
@@ -43,6 +44,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
   selfRelationshipUnavailable = false,
   onSaveDetails,
   onDeletePerson,
+  onConnectMac,
 }) => {
   const trimmedNameDraft = nameDraft.trim();
   const nameError = trimmedNameDraft.length === 0 ? `Name is required.` : undefined;
@@ -117,6 +119,17 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
             devices.length > 0
               ? `${devices.length} ${inflect(`device`, devices.length)} connected to ${personName}.`
               : undefined
+          }
+          buttons={
+            <Button
+              type="button"
+              variant="default"
+              icon={LaptopIcon}
+              disabled={savingDetails || deletingPerson}
+              onClick={onConnectMac}
+            >
+              Connect a Mac
+            </Button>
           }
         >
           {devices.length > 0 ? (
