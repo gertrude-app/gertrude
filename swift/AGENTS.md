@@ -312,7 +312,7 @@ be generalized and moved to a shared location before creating duplicates.
 running the built `.xctest` bundle against **its own** postgres database
 (`$TEST_DATABASE_NAME_p1`…`_pN`, created on first use and left behind after —
 `just nuke-test-db` drops them all). CI and linux run the suite serially instead, which is
-what `just api-test-serial`, `just check`, and `ci-local.sh` also do.
+what `just api-test-serial` and `just check` also do.
 
 Passing tests are silent; a failing one prints its whole block — name, its own
 `print(...)` output, and the `file:line: error:` diff. A shard that dies mid-run names the

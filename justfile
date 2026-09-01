@@ -46,9 +46,6 @@ check:
   @cd swift && just check
   @cd web && just check
 
-ci-local:
-  @./scripts/ci-local.sh
-
 api-build:
   @cd swift && just api-build
 

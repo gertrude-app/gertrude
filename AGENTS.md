@@ -148,9 +148,7 @@ Supports all 3 apps, plus dashboard and admin websites
 - all lowercase commits, with a short prefix, e.g. `dash: fix bug in xyz`
 - keep commit subjects tight: target ~50 chars, hard cap 72 (github elides past that);
   subject line only — no body or extended description
-- before opening a PR, ensure `just fix` and targeted tests pass, then reserve
-  `just ci-local` for the final pre-PR verification run; prefer the human to run it unless
-  explicitly asked otherwise
+- before opening a PR, ensure `just fix` and targeted tests pass
 - when opening PRs, make title match commit style, and create with EMPTY body
 - commit messages MUST BE all lowercase
 
