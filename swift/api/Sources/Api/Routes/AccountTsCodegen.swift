@@ -64,6 +64,7 @@ enum AccountTsCodegenRoute {
       HandleAccountCheckoutSuccess.self,
       HandleAccountCheckoutCancel.self,
       CreatePerson.self,
+      CreateMacConnectionCode.self,
       UpdatePersonBasicDetails.self,
       DeletePerson.self,
       GetAccountKeychains.self,
