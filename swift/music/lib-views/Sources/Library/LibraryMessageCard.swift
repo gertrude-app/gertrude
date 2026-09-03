@@ -1,6 +1,10 @@
 import SwiftUI
 
 struct LibraryMessageCard: View {
+  static let musicAccessUnavailableTitle = "Subscription needs attention"
+  static let musicAccessUnavailableMessage =
+    "Gertrude Music requires at least an active $5/month Medium subscription. Ask the parent or accountability partner who manages the connected account to check its subscription or payment method."
+
   let title: String
   let message: String
   let systemImage: String

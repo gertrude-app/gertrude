@@ -60,6 +60,8 @@ struct MusicSetupViewContainer: View {
       self.store.send(.settingsButtonTapped)
     case .subscriptionOfferTapped:
       self.store.send(.appleMusicSubscriptionOfferButtonTapped)
+    case .trialStartedContinueTapped:
+      self.store.send(.trialStartedContinueButtonTapped)
     }
   }
 }
@@ -101,6 +103,8 @@ private extension MusicSetupFeature.State {
       .gertrudeConnection(.failed)
     case .deviceRecognized(let childName):
       .deviceRecognized(childName: childName)
+    case .trialStarted(let childName, let expiresAt):
+      .trialStarted(childName: childName, expiresAt: expiresAt)
     case .musicAccessUnavailable(let childName):
       .musicAccessUnavailable(childName: childName)
     case .ready:

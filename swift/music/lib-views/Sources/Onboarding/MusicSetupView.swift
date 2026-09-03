@@ -16,6 +16,7 @@ public enum MusicSetupViewState: Equatable, Sendable {
   case appleMusicSubscriptionRequired(canShowOffer: Bool)
   case gertrudeConnection(MusicSetupConnectionViewState)
   case deviceRecognized(childName: String)
+  case trialStarted(childName: String, expiresAt: Date)
   case musicAccessUnavailable(childName: String)
 }
 
@@ -43,6 +44,7 @@ public enum MusicSetupViewEvent: Equatable, Sendable {
   case retryTapped
   case settingsTapped
   case subscriptionOfferTapped
+  case trialStartedContinueTapped
 }
 
 public struct MusicSetupView: View {
@@ -106,6 +108,15 @@ public struct MusicSetupView: View {
       MusicDeviceRecognizedView(childName: childName) {
         self.onEvent(.deviceRecognizedContinueTapped)
       }
+
+    case .trialStarted(let childName, let expiresAt):
+      GertieActionScreen(
+        message: "Your 21-day Gertrude Music free trial has started for \(musicDeviceLabel(childName)). It ends on \(expiresAt.formatted(date: .long, time: .omitted)). After that, Gertrude Music is $5/month for your whole family. You won’t be charged automatically.",
+        icon: .system("music.note"),
+        action: .button("Continue") {
+          self.onEvent(.trialStartedContinueTapped)
+        },
+      )
 
     case .musicAccessUnavailable(let childName):
       MusicUnavailableView(childName: childName)
@@ -236,6 +247,13 @@ public struct MusicSetupView: View {
 
 #Preview("Device Recognized") {
   MusicSetupView(state: .deviceRecognized(childName: "Billy Bob"))
+}
+
+#Preview("Trial Started") {
+  MusicSetupView(state: .trialStarted(
+    childName: "Billy Bob",
+    expiresAt: Date(timeIntervalSince1970: 1_800_000_000),
+  ))
 }
 
 #Preview("Music Unavailable") {
