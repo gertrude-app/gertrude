@@ -290,6 +290,30 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.subscription).toEqual(.active(expiresAt: lightRenewal))
   }
 
+  func testPaidLightUnderFullTrialGraceReportsActiveAtLightRenewal() async throws {
+    // full trial ended (started 24d ago, 21d period) but is within its 7d grace
+    // window; the underlying paid light sub must still grant podcast access — the
+    // trial-grace overlay must not mask the paid substrate. (james wood, 9/5/26)
+    let trialStart = Date.reference - .days(24)
+    let lightRenewal = Date.reference + .days(180)
+    let child = try await self.child()
+    try await self.db.create(BillingIdentity(
+      parentId: child.parent.model.id,
+      fullTrialStartedAt: trialStart,
+    ))
+    try await self.db.create(StripeSubscription(
+      parentId: child.parent.model.id,
+      tier: .light,
+      stripeId: "sub_light_under_trial_grace",
+      stripeStatus: .active,
+      currentPeriodEnd: lightRenewal,
+    ))
+
+    let output = try await self.resolveStatus(for: child)
+
+    expect(output.subscription).toEqual(.active(expiresAt: lightRenewal))
+  }
+
   // MARK: - authed route plumbing
 
   func testAuthedRouteResolvesTokenAndReturnsAccountStatus() async throws {

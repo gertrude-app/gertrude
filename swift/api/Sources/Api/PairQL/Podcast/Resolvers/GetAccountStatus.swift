@@ -39,7 +39,14 @@ extension BillingAccountSnapshot {
         return .amTrial(expiresAt: max(amTrialEnd, legacyFloor))
       }
       return .fullTrial(expiresAt: max(trialExpiration, legacyFloor))
-    case .free, .fullTrialGrace, .full(.pastDue), .medium(.pastDue), .light(.pastDue):
+    case .fullTrialGrace(_, let substrate):
+      // a full-trial-grace overlay must not mask a current paid substrate: the
+      // underlying paid sub (e.g. light) still grants podcast access
+      if case .current(let renewalDate) = substrate?.status {
+        return .active(expiresAt: renewalDate)
+      }
+      fallthrough
+    case .free, .full(.pastDue), .medium(.pastDue), .light(.pastDue):
       let legacyPaidAt = self.billingIdentity?.legacyAmIapPaidAt
       let legacyAccessEnd = legacyPaidAt.map { $0 + PodcastApp.LegacyIap.grantWindow }
       let legacyActive = legacyAccessEnd.map { self.date < $0 } ?? false
