@@ -10,6 +10,7 @@
     "typecheck:watch": "tsc --noEmit --watch --preserveWatchOutput"
   },
   "dependencies": {
+    "@base-ui/react": "1.5.0",
     "@docsearch/react": "4.4.0",
     "@headlessui/react": "2.2.9",
     "@markdoc/markdoc": "0.4.0",
