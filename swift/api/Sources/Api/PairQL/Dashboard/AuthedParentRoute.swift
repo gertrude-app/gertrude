@@ -15,6 +15,7 @@ enum AuthedParentRoute: PairRoute {
   case getAdminKeychain(GetAdminKeychain.Input)
   case getAdminKeychains
   case getAllDevices
+  case getComputerStatuses
   case getBatchUnlockRequestData(GetBatchUnlockRequestData.Input)
   case handleUnlockRequests(HandleUnlockRequests.Input)
   case getDevice(GetDevice.Input)
@@ -130,6 +131,9 @@ extension AuthedParentRoute {
         }
         Route(.case(Self.getAllDevices)) {
           Operation(GetAllDevices.self)
+        }
+        Route(.case(Self.getComputerStatuses)) {
+          Operation(GetComputerStatuses.self)
         }
         Route(.case(Self.getDevice)) {
           Operation(GetDevice.self)
@@ -453,6 +457,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getAllDevices:
       let output = try await GetAllDevices.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getComputerStatuses:
+      let output = try await GetComputerStatuses.resolve(in: context)
       return try await self.respond(with: output)
     case .getDevice(let input):
       let output = try await GetDevice.resolve(with: input, in: context)

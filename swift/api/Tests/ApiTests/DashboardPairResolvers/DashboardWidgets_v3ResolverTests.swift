@@ -16,6 +16,25 @@ final class DashboardWidgets_v3ResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.children[0].devices.count).toEqual(1)
   }
 
+  func testStableMacIdIsOnlyPresentForMacDevices() async throws {
+    let child = try await self.childWithComputer()
+    try await self.db.create(IOSDevice.random {
+      $0.childId = child.id
+    })
+
+    let output = try await withDependencies {
+      $0.websockets.status = { _ in .filterOn }
+      $0.aws._signedS3GetUrl = { _ in URL(string: "https://signed.test/img.jpg")! }
+    } operation: {
+      try await DashboardWidgets_v3.resolve(in: context(child.parent))
+    }
+
+    let mac = try XCTUnwrap(output.children[0].devices.first { $0.platform == .mac })
+    let ios = try XCTUnwrap(output.children[0].devices.first { $0.platform == .ios })
+    expect(mac.computerUserId).toEqual(child.computerUser.id)
+    expect(ios.computerUserId).toBeNil()
+  }
+
   func testAmConnectedIOSDeviceShowsSetupComplete() async throws {
     let child = try await self.child()
     let iosDevice = try await self.db.create(IOSDevice.mock {

@@ -2,6 +2,7 @@ import { Button } from '@shared/components';
 import React from 'react';
 import type { DashboardWidgets_v3 } from '@dash/types';
 import UserStatus from '../UserStatus';
+import { consolidatedComputerStatus } from '../computerStatus';
 import DashboardWidget from './DashboardWidget';
 import WidgetTitle from './WidgetTitle';
 
@@ -24,15 +25,18 @@ const UsersOverview: React.FC<Props> = ({ className, users }) => {
           </Button>
         </div>
         <div className="flex flex-col gap-2 @container">
-          {macUsers.map((user) => (
-            <UserStatus
-              key={user.id}
-              name={user.name}
-              status={
-                user.devices.find((d) => d.macStatus)?.macStatus ?? { case: `offline` }
-              }
-            />
-          ))}
+          {macUsers.map((user) => {
+            const statuses = user.devices.flatMap((device) =>
+              device.macStatus ? [device.macStatus] : [],
+            );
+            return (
+              <UserStatus
+                key={user.id}
+                name={user.name}
+                status={consolidatedComputerStatus(statuses)}
+              />
+            );
+          })}
         </div>
       </DashboardWidget>
     );

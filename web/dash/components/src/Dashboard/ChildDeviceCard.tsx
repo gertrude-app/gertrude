@@ -1,3 +1,4 @@
+import { relativeTime } from '@dash/datetime';
 import cx from 'classnames';
 import React from 'react';
 import type { ChildComputerStatus, DashboardWidgets_v3 } from '@dash/types';
@@ -65,7 +66,7 @@ function iosStatusInfo(status: `setupComplete` | `pendingSetup`): {
   }
 }
 
-function macStatusInfo(status: ChildComputerStatus): {
+export function macStatusInfo(status: ChildComputerStatus): {
   pillClasses: string;
   text: string;
 } {
@@ -75,13 +76,28 @@ function macStatusInfo(status: ChildComputerStatus): {
     case `filterOff`:
       return { pillClasses: `bg-red-50 text-red-700`, text: `Filter off` };
     case `filterSuspended`:
-      return { pillClasses: `bg-yellow-50 text-yellow-700`, text: `Suspended` };
+      return {
+        pillClasses: `bg-yellow-50 text-yellow-700`,
+        text: status.resuming
+          ? `Suspended · resumes ${relativeTime(status.resuming)}`
+          : `Suspended`,
+      };
     case `offline`:
       return { pillClasses: `bg-slate-100 text-slate-500`, text: `Offline` };
     case `downtime`:
-      return { pillClasses: `bg-purple-50 text-purple-700`, text: `Downtime` };
+      return {
+        pillClasses: `bg-purple-50 text-purple-700`,
+        text: status.ending
+          ? `Downtime · ends ${relativeTime(status.ending)}`
+          : `Downtime`,
+      };
     case `downtimePaused`:
-      return { pillClasses: `bg-yellow-50 text-yellow-700`, text: `Paused` };
+      return {
+        pillClasses: `bg-yellow-50 text-yellow-700`,
+        text: status.resuming
+          ? `Paused · resumes ${relativeTime(status.resuming)}`
+          : `Paused`,
+      };
     case `unfiltered`:
       return { pillClasses: `bg-orange-50 text-orange-700`, text: `Unfiltered` };
   }

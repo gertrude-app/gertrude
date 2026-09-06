@@ -16,6 +16,7 @@ struct GetAllDevices: Pair {
   }
 
   struct ComputerChild: PairNestable {
+    var computerUserId: ComputerUser.Id
     var id: Api.Child.Id
     var name: String
     var status: ChildComputerStatus
@@ -95,6 +96,7 @@ extension GetAllDevices: NoInputResolver {
         modelTitle: computer.model.shortDescription,
         users: users.concurrentMap { computerUser in
           await ComputerChild(
+            computerUserId: computerUser.id,
             id: computerUser.childId,
             name: childMap[computerUser.childId]?.name ?? "",
             status: websockets.status(computerUser.id),

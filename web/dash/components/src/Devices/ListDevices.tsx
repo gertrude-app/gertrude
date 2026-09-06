@@ -6,6 +6,7 @@ import ComputerCard from '../Computers/ComputerCard';
 import EmptyState from '../EmptyState';
 import PageHeading from '../PageHeading';
 import DeviceCard from '../Users/DeviceCard';
+import { consolidatedComputerStatus } from '../computerStatus';
 
 export type IOSDeviceItem = {
   id: string;
@@ -23,6 +24,7 @@ export type MacDeviceItem = {
   modelIdentifier: string;
   modelTitle: string;
   users: Array<{
+    computerUserId: string;
     id: string;
     name: string;
     status: ChildComputerStatus;
@@ -53,8 +55,8 @@ const ListDevices: React.FC<Props> = ({ computers, iosDevices }) => (
         <h2 className="text-2xl font-bold text-slate-600">Computers</h2>
         <div className="mt-3.5 grid grid-cols-1 lg+:grid-cols-2 2xl:grid-cols-3 gap-x-8 gap-y-6">
           {computers.map((device) => {
-            const onlineUser = device.users.find(
-              (user) => user.status.case !== `offline`,
+            const status = consolidatedComputerStatus(
+              device.users.map((user) => user.status),
             );
             return (
               <div key={device.id}>
@@ -63,12 +65,12 @@ const ListDevices: React.FC<Props> = ({ computers, iosDevices }) => (
                   id={device.id}
                   modelTitle={device.modelTitle}
                   modelIdentifier={device.modelIdentifier}
-                  user={onlineUser ? { ...onlineUser, name: `` } : undefined}
+                  user={{ name: ``, status }}
                 />
                 <p className="text-right text-base text-slate-500 mt-3.5 mr-1">
                   Used by:{` `}
                   {device.users.map((user, i) => (
-                    <React.Fragment key={user.id}>
+                    <React.Fragment key={user.computerUserId}>
                       {i > 0 && `, `}
                       <Link
                         to={`/children/${user.id}/mac`}

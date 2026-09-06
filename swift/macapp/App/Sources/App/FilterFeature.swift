@@ -261,12 +261,12 @@ extension FilterFeature.RootReducer {
     case .menuBar(.resumeFilterClicked):
       state.menuBar.dropdownOpen = false
       state.filter.currentSuspensionExpiration = nil
-      return self.handleFilterSuspensionEnded(browsers: state.browsers, early: true)
+      return self.handleFilterSuspensionEnded(state: state, early: true)
 
     case .xpc(.receivedExtensionMessage(.userFilterSuspensionEnded(let userId)))
       where userId == device.currentUserId():
       state.filter.currentSuspensionExpiration = nil
-      return self.handleFilterSuspensionEnded(browsers: state.browsers, early: false)
+      return self.handleFilterSuspensionEnded(state: state, early: false)
 
     case .xpc(.receivedExtensionMessage(.logs(let events))):
       return .exec { _ in await self.api.logFilterEvents(events) }
@@ -360,6 +360,7 @@ extension FilterFeature.RootReducer {
     let expiration = now.advanced(by: Double(seconds.rawValue))
     state.filter.currentSuspensionExpiration = expiration
     state.requestSuspension.pending = nil
+    let updatedState = state
     return .merge(
       .exec { _ in
         _ = await self.xpc.suspendFilter(seconds)
@@ -380,22 +381,26 @@ extension FilterFeature.RootReducer {
           "for \(self.now.shortDuration(until: expiration))",
         )
       },
+      .exec { _ in
+        guard try await self.websocket.state() == .connected else { return }
+        try await self.websocket.sendFilterState(updatedState)
+      },
       .cancel(id: FilterFeature.CancelId.quitBrowsers),
     )
   }
 
   func handleFilterSuspensionEnded(
-    browsers: [BrowserMatch],
+    state: State,
     early endedEarly: Bool = false,
   ) -> Effect<Action> {
     .exec { send in
       if endedEarly { _ = await self.xpc.endFilterSuspension() }
       await self.api
         .securityEvent(endedEarly ? .filterSuspensionEndedEarly : .filterSuspensionExpired)
-      try? await self.websocket.send(.currentFilterState_v2(.on))
+      try? await self.websocket.sendFilterState(state)
       await self.device.notifyBrowsersQuitting()
       try await self.mainQueue.sleep(for: .seconds(60))
-      await self.device.quitBrowsers(browsers)
+      await self.device.quitBrowsers(state.browsers)
     }
     .cancellable(id: FilterFeature.CancelId.quitBrowsers, cancelInFlight: true)
   }
