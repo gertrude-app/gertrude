@@ -45,7 +45,7 @@ export const EnterTransition: React.FC<{
     <div
       className={cx(
         `transition-[opacity,transform] duration-300 ease-out`,
-        shown ? `opacity-100 translate-y-0` : `opacity-0 -translate-y-2`,
+        shown ? `opacity-100` : `opacity-0 -translate-y-2`,
       )}
     >
       {children}
