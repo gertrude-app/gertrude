@@ -1,4 +1,6 @@
 // auto-generated, do not edit
+import type { MusicSubscriptionState } from '../shared';
+
 export namespace GetIosDeviceSettings {
   export interface Input {
     deviceId: UUID;
@@ -61,7 +63,7 @@ export namespace GetIosDeviceSettings {
           };
     };
     music?: {
-      requiresPayment: boolean;
+      subscription: MusicSubscriptionState;
     };
   }
 }

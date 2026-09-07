@@ -44,6 +44,11 @@ export type ChildComputerStatus =
 
 export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
 
+export type MusicSubscriptionState =
+  | { case: 'trial'; expiresAt: ISODateString }
+  | { case: 'active' }
+  | { case: 'unavailable' };
+
 export type NotificationMethodConfig =
   | { case: 'slack'; channelId: string; channelName: string; token: string }
   | { case: 'email'; email: string }

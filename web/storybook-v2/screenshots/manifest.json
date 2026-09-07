@@ -2136,6 +2136,30 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--ios-music-trial",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-trial&viewMode=story",
+    "name": "iPhone and iPad (Music free trial)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-trial.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-trial",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-trial&viewMode=story",
+    "name": "iPhone and iPad (Music free trial)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-trial.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--ios-music-unavailable",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-unavailable&viewMode=story",
     "name": "iPhone and iPad (music unavailable)",
