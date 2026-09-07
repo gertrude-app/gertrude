@@ -41,6 +41,9 @@ Apple still has not given parents a way to turn `#images` off. Gertrude Blocker 
 actively maintained and works on current iOS, including iOS 26 — everything below applies
 whatever version your child's iPhone or iPad is running.
 
+If your child uses an Apple Watch, read
+[whether you can block GIFs on their Apple Watch](/help/iphone-ipad/block-gifs-on-apple-watch).
+
 ## Introducing “Gertrude Blocker”
 
 {% image src="lockdown-iphone/gertrude-blocker-ios-app.png" alt="Gertrude Blocker free iOS app allows parents to block unwanted GIFs in #images texting app" /%}

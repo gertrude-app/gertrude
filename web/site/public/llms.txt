@@ -133,6 +133,9 @@ everything below it. Every paid plan covers the whole family, with no ads.
   Apple still won’t let parents turn off #images GIF search in Messages. Gertrude Blocker
   is a free iOS app that does and works on current iOS. The article preserves older setup
   instructions while a current version is prepared.
+- [Can You Block GIFs on a Kid’s Apple Watch?](https://gertrude.app/help/iphone-ipad/block-gifs-on-apple-watch):
+  Explains why standalone and Family Setup watches cannot filter #images GIF search, and
+  the limited coverage possible while a watch is connected to a Gertrude-filtered iPhone.
 - [Block explicit images in Maps on iPhone or iPad](https://gertrude.app/help/iphone-ipad/block-explicit-images-in-maps):
   Older instructions for removing Maps apps that expose business photos; the article
   identifies that its instructions need updating for current iOS versions.
