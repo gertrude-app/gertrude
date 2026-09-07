@@ -227,9 +227,9 @@ export default class DashboardClient extends Client<Auth> {
   };
 
   public getIOSDevice = (
-    input: P.GetIOSDevice_v2.Input,
-  ): Promise<Result<P.GetIOSDevice_v2.Output>> => {
-    return this.query<P.GetIOSDevice_v2.Output>(input, `GetIOSDevice_v2`, `parent`);
+    input: P.GetIOSDevice_v3.Input,
+  ): Promise<Result<P.GetIOSDevice_v3.Output>> => {
+    return this.query<P.GetIOSDevice_v3.Output>(input, `GetIOSDevice_v3`, `parent`);
   };
 
   public getIOSDeviceClaimData = (

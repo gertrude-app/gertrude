@@ -12,8 +12,10 @@ import {
   PodcastsDeviceSection,
   ToggleCard,
   TrashBtn,
+  TrialStatusCard,
 } from '@dash/components';
 // import { PlusIcon } from '@heroicons/react/24/solid';
+import { formatDate } from '@dash/datetime';
 import { Button /* SelectMenu */ } from '@shared/components';
 // import { Result } from '@shared/pairql';
 // import { notNullish } from '@shared/ts-utils';
@@ -23,6 +25,7 @@ import { useParams } from 'react-router-dom';
 // import type { WebPolicy } from '@dash/types';
 import type { PodcastsRunwayTier } from '../../podcastsSubscriptionRunway';
 import type { PodcastsStatus } from '@dash/components';
+import type { T } from '@shared/pairql/dashboard';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
 import {
@@ -169,7 +172,7 @@ const IOSDevice: React.FC = () => {
             childId={childId}
             childName={deviceQuery.data.childName}
             deviceType={dt}
-            requiresPayment={music?.requiresPayment ?? false}
+            subscription={music?.subscription ?? { case: `unavailable` }}
           />
         )}
         {am && podcastsRunway && (
@@ -572,11 +575,22 @@ const MusicDeviceSection: React.FC<{
   childId: string;
   childName: string;
   deviceType: string;
-  requiresPayment: boolean;
-}> = ({ childId, childName, deviceType, requiresPayment }) => (
+  subscription: NonNullable<
+    NonNullable<T.GetIOSDevice_v3.Output[`music`]>[`subscription`]
+  >;
+}> = ({ childId, childName, deviceType, subscription }) => (
   <div className="max-w-3xl">
     <AppHeader app="music" />
-    {requiresPayment ? (
+    {subscription.case === `trial` ? (
+      <div className="mt-5">
+        <TrialStatusCard heading="21 Day Free Trial Active">
+          After {formatDate(new Date(subscription.expiresAt), `long`)}, Gertrude Music is
+          {` `}
+          <b>$5/month for the whole family</b>. You won&rsquo;t be charged automatically.
+        </TrialStatusCard>
+        <MusicCuration childId={childId} childName={childName} className="mt-6" />
+      </div>
+    ) : subscription.case === `unavailable` ? (
       <EmptyState
         className="mt-5"
         heading="Music not available for this account"

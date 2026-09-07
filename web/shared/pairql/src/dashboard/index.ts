@@ -30,7 +30,7 @@ export * from './pairs/GetChildren';
 export * from './pairs/GetDevice';
 export * from './pairs/GetIdentifiedApps';
 export * from './pairs/GetInstalledMacApps';
-export * from './pairs/GetIOSDevice_v2';
+export * from './pairs/GetIOSDevice_v3';
 export * from './pairs/GetIOSDeviceClaimData';
 export * from './pairs/GetIOSDeviceSupervisionStatus';
 export * from './pairs/GetMusicAlbumCuration';

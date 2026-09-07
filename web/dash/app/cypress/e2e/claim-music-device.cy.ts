@@ -130,12 +130,12 @@ describe(`music claim flow`, () => {
       cy.visit(`/claim-music-device/687084/claim`);
       cy.location(`pathname`).should(`eq`, `/claim-music-device/687084/done`);
 
-      cy.interceptPql(`GetIOSDevice_v2`, {
+      cy.interceptPql(`GetIOSDevice_v3`, {
         childName: `Luke`,
         deviceType: `iPhone`,
         osVersion: `18.2`,
         musicConnected: true,
-        music: { requiresPayment: true },
+        music: { subscription: { case: `unavailable` } },
       });
       cy.contains(`iPhone settings`).click();
       cy.location(`pathname`).should(`eq`, `/children/child-2/ios-devices/device-2`);
@@ -146,15 +146,15 @@ describe(`music claim flow`, () => {
 
       cy.visit(`/claim-music-device/687084/claim`);
 
-      cy.interceptPql(`GetIOSDevice_v2`, {
+      cy.interceptPql(`GetIOSDevice_v3`, {
         childName: `Luke`,
         deviceType: `iPhone`,
         osVersion: `18.2`,
         musicConnected: true,
-        music: { requiresPayment: true },
+        music: { subscription: { case: `unavailable` } },
       });
       cy.contains(`iPhone settings`).click();
-      cy.wait(`@GetIOSDevice_v2`);
+      cy.wait(`@GetIOSDevice_v3`);
 
       cy.contains(`Music not available for this account`).should(`be.visible`);
     });

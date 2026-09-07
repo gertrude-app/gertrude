@@ -3,10 +3,11 @@ import type {
   AmSubscriptionState,
   BlockRule,
   ExtendedSupervisionControls,
+  MusicSubscriptionState,
   WebPolicy,
 } from '../shared';
 
-export namespace GetIOSDevice_v2 {
+export namespace GetIOSDevice_v3 {
   export type Input = UUID;
 
   export interface Output {
@@ -38,7 +39,7 @@ export namespace GetIOSDevice_v2 {
       subscription: AmSubscriptionState;
     };
     music?: {
-      requiresPayment: boolean;
+      subscription: MusicSubscriptionState;
     };
     musicConnected: boolean;
   }

@@ -1,5 +1,18 @@
 /// <reference types="cypress" />
+import type { T } from '@shared/pairql/dashboard';
 import * as mock from '../../src/reducers/__tests__/mocks';
+
+const interceptMusicDevice = (
+  subscription: T.MusicSubscriptionState = { case: `active` },
+): void => {
+  cy.interceptPql(`GetIOSDevice_v3`, {
+    childName: `Huck`,
+    deviceType: `iPhone`,
+    osVersion: `18.2`,
+    musicConnected: true,
+    music: { subscription },
+  });
+};
 
 describe(`children screen`, () => {
   beforeEach(() => {
@@ -91,12 +104,7 @@ describe(`children screen`, () => {
 
   describe(`iOS device details`, () => {
     it(`shows Gertrude Music curation for a music-only device`, () => {
-      cy.interceptPql(`GetIOSDevice_v2`, {
-        childName: `Huck`,
-        deviceType: `iPhone`,
-        osVersion: `18.2`,
-        musicConnected: true,
-      });
+      interceptMusicDevice();
       cy.interceptPql(`GetMusicCuration`, {
         revision: 0,
         albums: [],
@@ -113,13 +121,27 @@ describe(`children screen`, () => {
       cy.contains(`No allowed music yet`);
     });
 
-    it(`shows allowed music newest first and explains artist grants`, () => {
-      cy.interceptPql(`GetIOSDevice_v2`, {
-        childName: `Huck`,
-        deviceType: `iPhone`,
-        osVersion: `18.2`,
-        musicConnected: true,
+    it(`shows active Gertrude Music trial details and curation`, () => {
+      interceptMusicDevice({
+        case: `trial`,
+        expiresAt: `2026-09-25T16:00:00.000Z`,
       });
+      cy.interceptPql(`GetMusicCuration`, {
+        revision: 0,
+        albums: [],
+        artists: [],
+      });
+
+      cy.visit(`/children/user-123/ios-devices/ios-device-123`);
+
+      cy.contains(`21 Day Free Trial Active`);
+      cy.contains(`After Friday, September 25, 2026`);
+      cy.contains(`$5/month for the whole family`);
+      cy.contains(`Search Apple Music`);
+    });
+
+    it(`shows allowed music newest first and explains artist grants`, () => {
+      interceptMusicDevice();
       cy.interceptPql(`GetMusicCuration`, {
         revision: 2,
         albums: [
@@ -158,12 +180,7 @@ describe(`children screen`, () => {
     });
 
     it(`allows an exact track from child-scoped catalog search`, () => {
-      cy.interceptPql(`GetIOSDevice_v2`, {
-        childName: `Huck`,
-        deviceType: `iPhone`,
-        osVersion: `18.2`,
-        musicConnected: true,
-      });
+      interceptMusicDevice();
       cy.interceptPql(`GetMusicCuration`, {
         revision: 0,
         albums: [],
@@ -234,12 +251,7 @@ describe(`children screen`, () => {
     });
 
     it(`saves an album checklist as one revision-checked selection`, () => {
-      cy.interceptPql(`GetIOSDevice_v2`, {
-        childName: `Huck`,
-        deviceType: `iPhone`,
-        osVersion: `18.2`,
-        musicConnected: true,
-      });
+      interceptMusicDevice();
       cy.interceptPql(`GetMusicCuration`, {
         revision: 4,
         albums: [

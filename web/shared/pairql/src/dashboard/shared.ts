@@ -198,6 +198,11 @@ export interface KeychainSummary {
   numKeys: number;
 }
 
+export type MusicSubscriptionState =
+  | { case: 'trial'; expiresAt: ISODateString }
+  | { case: 'active' }
+  | { case: 'unavailable' };
+
 export interface PaidSubscription {
   tier: 'light' | 'medium' | 'full';
   status:

@@ -62,7 +62,7 @@ describe(`blocker connect claim flow`, () => {
       cy.contains(`Gertrude Blocker is now installed on Emma`).should(`be.visible`);
 
       // primary button deep-links into the device settings page, not the dashboard root
-      cy.interceptPql(`GetIOSDevice_v2`, {
+      cy.interceptPql(`GetIOSDevice_v3`, {
         childName: `Emma`,
         deviceType: `iPhone`,
         osVersion: `18.2`,

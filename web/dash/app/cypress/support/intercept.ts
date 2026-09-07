@@ -107,8 +107,8 @@ export function interceptPql(
   output: T.GetIOSDeviceSupervisionStatus.Output,
 ): void;
 export function interceptPql(
-  slug: `GetIOSDevice_v2`,
-  output: T.GetIOSDevice_v2.Output,
+  slug: `GetIOSDevice_v3`,
+  output: T.GetIOSDevice_v3.Output,
 ): void;
 export function interceptPql(
   slug: `GetIdentifiedApps`,
@@ -313,7 +313,7 @@ export function forcePqlErr(
     | `GetDevice`
     | `GetIOSDeviceClaimData`
     | `GetIOSDeviceSupervisionStatus`
-    | `GetIOSDevice_v2`
+    | `GetIOSDevice_v3`
     | `GetIdentifiedApps`
     | `GetInstalledMacApps`
     | `GetMusicAlbumCuration`
