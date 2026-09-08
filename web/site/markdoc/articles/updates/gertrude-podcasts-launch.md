@@ -44,6 +44,9 @@ approved.
 But they can't search the podcast directory. They can't subscribe to new shows. They're
 restricted to exactly what you've already decided is appropriate.
 
+For a closer look at why families want this kind of control, read
+[how to require parent approval for podcasts on iPhone](/help/iphone-ipad/how-to-require-parent-approval-for-podcasts-on-iphone).
+
 Set your PIN, approve the shows your kids can listen to, and you're done. No complicated
 settings, no workarounds, just a safe way for kids to listen to podcasts on their iPhone.
 
