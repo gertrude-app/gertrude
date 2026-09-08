@@ -28,21 +28,26 @@ extension ClaimMusicDevice: Resolver {
       baseId: "43ecc09c", // 43ecc09c-1, 43ecc09c-2, 43ecc09c-3, 43ecc09c-4
       in: context,
       onResume: { device, child in
-        try await self.output(device: device, child: child, code: input.code, in: context)
+        try await self.output(device, child, input.code, in: context)
       },
       beforeClaim: { device in
         try await self.requireMusicInstall(for: device, eventId: "11369678", in: context)
       },
       onFresh: { device, child in
-        try await self.output(device: device, child: child, code: input.code, in: context)
+        let output = try await self.output(device, child, input.code, in: context)
+        let account = try await context.currentBillingAccount()
+        if !account.can(.useGertrudeMusic) {
+          await RepeatTrialCanary.alertIfReclaimed(.music, device, child, in: context)
+        }
+        return output
       },
     )
   }
 
   static func output(
-    device: IOSDevice,
-    child: Child,
-    code: Int,
+    _ device: IOSDevice,
+    _ child: Child,
+    _ code: Int,
     in context: ParentContext,
   ) async throws -> Output {
     try await self.requireMusicInstall(for: device, eventId: "7e6db2f2", in: context)
