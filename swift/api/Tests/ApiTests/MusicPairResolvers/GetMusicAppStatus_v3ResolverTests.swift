@@ -33,6 +33,15 @@ final class GetMusicAppStatus_v3ResolverTests: ApiTestCase, @unchecked Sendable 
     expect(matched).toEqual(.music(.unauthed(.getMusicAppStatus_v3(input))))
   }
 
+  func testTrialEntitlementEncodesTypeScriptDiscriminator() throws {
+    let encoded = try JSONEncoder().encode(
+      MusicSubscriptionState.trial(expiresAt: Date(timeIntervalSince1970: 0)),
+    )
+    let json = try XCTUnwrap(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+
+    expect(json["case"] as? String).toEqual("trial")
+  }
+
   func testFreshClaimedFreeAccountStartsTokenTrial() async throws {
     let child = try await self.child()
     let (device, install) = try await self.claimedMusicInstall(for: child)

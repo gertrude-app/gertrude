@@ -38,6 +38,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.modelName).toEqual(device.modelName)
     expect(output.iosVersion).toEqual(device.iosVersion)
     expect(output.code).toEqual(code)
+    expect(output.subscription).toEqual(.active)
 
     let children = try await Child.query()
       .where(.parentId == parent.id)
@@ -128,6 +129,7 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
 
     expect(output.childName).toEqual("Luke")
     expect(output.deviceId).toEqual(device.id)
+    expect(output.subscription).toBeNil()
 
     let children = try await Child.query()
       .where(.parentId == parent.id)
@@ -159,6 +161,20 @@ final class ClaimMusicDeviceResolverTests: ApiTestCase, @unchecked Sendable {
     expect(updated.childId).toEqual(child.id)
     let claim = try await Claim.find(code: code, in: self.db)
     expect(claim?.claimedAt).not.toBeNil()
+  }
+
+  func testFreshClaimComplimentaryAccountReturnsActiveSubscription() async throws {
+    let parent = try await self.parent()
+    try await self.db.create(BillingIdentity(parentId: parent.id, isComplimentary: true))
+    let code = uniqueClaimCode()
+    _ = try await self.unclaimedMusicDevice(code: code)
+
+    let output = try await ClaimMusicDevice.resolve(
+      with: .init(code: code, child: .newChild(name: "Luke")),
+      in: parent.context,
+    )
+
+    expect(output.subscription).toEqual(.active)
   }
 
   func testFreshClaimPastDueSucceeds() async throws {

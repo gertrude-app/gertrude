@@ -134,7 +134,7 @@ describe(`children screen`, () => {
 
       cy.visit(`/children/user-123/ios-devices/ios-device-123`);
 
-      cy.contains(`21 Day Free Trial Active`);
+      cy.contains(`Music Free Trial Active`);
       cy.contains(`After Friday, September 25, 2026`);
       cy.contains(`$5/month for the whole family`);
       cy.contains(`Search Apple Music`);

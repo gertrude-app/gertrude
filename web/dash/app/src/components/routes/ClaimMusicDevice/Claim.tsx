@@ -27,6 +27,7 @@ const ClaimMusicDeviceClaim: React.FC = () => {
         deviceId: query.data.resumeStep.deviceId,
         modelName: query.data.modelName,
         iosVersion: query.data.iosVersion,
+        subscription: query.data.resumeStep.subscription,
       };
       navigate(`/claim-music-device/${code}/done`, { replace: true, state });
     }
@@ -77,6 +78,7 @@ const ClaimMusicDeviceClaim: React.FC = () => {
       deviceId: output.deviceId,
       modelName: output.modelName,
       iosVersion: output.iosVersion,
+      subscription: output.subscription,
     };
     navigate(`/claim-music-device/${code}/done`, { state });
   };

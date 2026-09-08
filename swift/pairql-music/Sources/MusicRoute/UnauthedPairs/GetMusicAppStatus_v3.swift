@@ -1,6 +1,8 @@
 import Foundation
 import PairQL
+import TSCodable
 
+@TSCodable
 public enum MusicSubscriptionState: PairNestable {
   case active
   case trial(expiresAt: Date)
