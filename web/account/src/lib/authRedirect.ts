@@ -14,6 +14,7 @@ export const authRedirectForPath = (path: string): AuthRedirect | undefined => {
   try {
     const url = new URL(path, accountBaseUrl);
     if (url.origin !== accountBaseUrl.origin) return undefined;
+    if (url.pathname === `/login`) return undefined;
     return `${url.pathname}${url.search}${url.hash}` as AuthRedirect;
   } catch {
     return undefined;
