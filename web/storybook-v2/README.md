@@ -48,9 +48,14 @@ locale (`en-US`), timezone (`UTC`), light mode, pixel density, and reduced motio
 browser's date is fixed at `2026-07-07T12:00:00Z` (matching the existing calendar
 fixtures) without stopping timers, so date-dependent stories stay consistent between days.
 Each capture uses a fresh page to keep browser memory from accumulating across hundreds of
-stories in the Linux VM. Before capturing, the runner waits for fonts, image elements, and
-decoded CSS background images (including `::before` and `::after`). Broken or stalled
-background images fail the run instead of silently producing incomplete baselines.
+stories in the Linux VM. Before capturing, the runner waits for the requested story's
+successful `storyFinished` event, including its `play` function and after-each hooks. It
+rejects cached Storybook render/play errors even if the runtime subsequently reports
+completion; a finished phase alone is not proof of success. A story that never completes
+times out. Only then does it wait for fonts, image elements, and decoded CSS background
+images (including `::before` and `::after`), so assets introduced by `play` are included.
+Broken or stalled background images fail the run instead of silently producing incomplete
+baselines.
 
 To compare results without replacing tracked screenshots, set `SCREENSHOT_DIR` to an
 absolute directory outside `web/`. Relative paths resolve from `web/storybook-v2`.
@@ -78,9 +83,16 @@ parameters: {
 The named sizes live in `.storybook/preview.tsx` under `parameters.screenshotViewports`.
 Set `screenshotsAt: []` on a story to opt out of a meta-level setting.
 
-Known follow-up: keep screenshot coverage declarative. When an interactive state matters,
-add a dedicated story/prop for that open or expanded state rather than making the runner
-click through the UI.
+Keep visual stories declarative: initialize their intended state rather than playing a
+long click-through sequence whenever someone opens them. Small `play` functions can still
+set up an otherwise inaccessible state, but behavioral walkthroughs belong in the separate
+browser tests. Unlock review's four visual stories have no `play`; their matching,
+coverage, draft restoration, warnings, and conflict-resolution checks live in
+`scripts/__tests__/unlock-review.browser.js`. The main example starts with a few decisions
+already made, but all subsequent interactions use the real editor behavior: clearing or
+denying an approval discards its settings, so allowing again starts with exact matching
+and the original app scope. Automatic coverage and whole-app overrides instead preserve
+dormant address drafts. There is no separate fresh/prepared mode or story-only reset.
 
 ## Maintenance
 
@@ -93,9 +105,20 @@ The image is tagged `gertrude-ui-screenshots:local`. Docker retains build caches
 runs; these consume disk space and can be removed using Docker's normal cache-management
 tools when needed.
 
-Image builds run browser tests against deliberately delayed, broken, and stalled CSS
-background images before the image can be used for capture. These use the same pinned
-Chromium as screenshots.
+Image builds run browser tests before capture using the same pinned Chromium as
+screenshots. These cover delayed/failed story completion, late/broken/stalled backgrounds,
+and unlock review interactions at mobile and desktop widths. They run separately from the
+visual stories and never write screenshot baselines.
+
+To run these tests locally (requires a Playwright Chromium installation), rebuild
+Storybook first; tests serve that static build on an ephemeral local port, not your
+running dev server:
+
+```bash
+cd web
+pnpm --filter storybook-v2 build
+pnpm --filter storybook-v2 test:browser
+```
 
 Wrapper tests (no Docker daemon required):
 

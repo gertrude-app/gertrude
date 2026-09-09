@@ -19,5 +19,5 @@ RUN pnpm --filter storybook-v2... --filter account... install --offline --frozen
     && pnpm --filter storybook-v2 build
 
 WORKDIR /workspace/storybook-v2
-RUN node --test scripts/__tests__/wait-for-story.browser.js
+RUN pnpm test:browser
 CMD ["node", "scripts/screenshot-stories.js"]

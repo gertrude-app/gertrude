@@ -3,6 +3,7 @@ import type {
   GetAccountKeychain,
   GetAccountKeychains,
   GetAccountSettings,
+  GetAccountUnlockRequestSummary,
   GetActivitySummaries,
   GetDayActivity,
   GetDevices,
@@ -13,6 +14,7 @@ import type {
   GetPersonDayActivity,
   GetPersonInstalledMacApps,
   GetPersonMacSettings,
+  GetPersonUnlockRequests,
   GetSecurityEvents,
   GetSuspensionRequests,
 } from '@shared/pairql/src/account';
@@ -52,6 +54,16 @@ export class Key extends QueryKey<never> {
 
   static keychain(keychainId: string): QueryKey<GetAccountKeychain.Output> {
     return new QueryKey([`keychains`, keychainId]);
+  }
+
+  static get unlockRequests(): QueryKey<GetAccountUnlockRequestSummary.Output> {
+    return new QueryKey([`requests`, `unlock`]);
+  }
+
+  static personUnlockRequests(
+    personId: string,
+  ): QueryKey<GetPersonUnlockRequests.Output> {
+    return new QueryKey([`requests`, `unlock`, personId]);
   }
 
   static get suspensionRequests(): QueryKey<GetSuspensionRequests.Output> {
