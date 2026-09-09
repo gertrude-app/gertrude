@@ -12,9 +12,11 @@ const queryClient = createAccountQueryClient(handleLoggedOut);
 const router = createRouter(queryClient);
 
 function handleLoggedOut(): void {
-  const loginRedirect = authRedirectForPath(router.state.location.href);
+  const location = router.state.location;
   clearAuth();
   queryClient.clear();
+  if (location.pathname === `/login`) return;
+  const loginRedirect = authRedirectForPath(location.href);
   void router.navigate({
     to: `/login`,
     search: { redirect: loginRedirect },

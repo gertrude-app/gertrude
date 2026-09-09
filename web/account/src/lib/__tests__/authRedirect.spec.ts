@@ -35,6 +35,8 @@ describe(`Account auth redirects`, () => {
       `/\t/example.com/activity`,
       [`java`, `script:alert(1)`].join(``),
       `activity`,
+      `/login`,
+      `/login?redirect=%2Fpeople`,
       ``,
     ];
 
