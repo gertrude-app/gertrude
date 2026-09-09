@@ -1,0 +1,15 @@
+**/node_modules
+**/.env*
+**/.DS_Store
+**/.next
+**/.nx
+**/dist
+**/out
+**/build
+**/storybook-static
+**/screenshots
+**/cypress/videos
+**/cypress/downloads
+**/*.log
+**/*.tsbuildinfo
+**/.eslintcache
