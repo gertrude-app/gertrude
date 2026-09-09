@@ -5,12 +5,14 @@ import SegmentedTabLinks from '#/components/navigation/SegmentedTabLinks';
 
 interface Props {
   selected: `unlock` | `suspension`;
+  unlockRequestCount?: number;
   suspensionRequestCount?: number;
   children: React.ReactNode;
 }
 
 const RequestsShellPage: React.FC<Props> = ({
   selected,
+  unlockRequestCount,
   suspensionRequestCount,
   children,
 }) => (
@@ -21,7 +23,7 @@ const RequestsShellPage: React.FC<Props> = ({
         {
           label: `Unlock Requests`,
           href: `/requests/unlock`,
-          badgeText: `Coming soon`,
+          badgeCount: unlockRequestCount,
         },
         {
           label: `Suspension Requests`,

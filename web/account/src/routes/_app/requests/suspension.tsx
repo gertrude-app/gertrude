@@ -12,6 +12,9 @@ const SuspensionRequestsRoute: React.FC = () => {
   const query = useQuery(Key.suspensionRequests, () =>
     liveClient.getSuspensionRequests(),
   );
+  const unlockRequests = useQuery(Key.unlockRequests, () =>
+    liveClient.getAccountUnlockRequestSummary(),
+  );
 
   const state: SuspensionRequestsState =
     query.data !== undefined
@@ -31,6 +34,7 @@ const SuspensionRequestsRoute: React.FC = () => {
     <>
       <SuspensionRequestsPage
         state={state}
+        unlockRequestCount={unlockRequests.data?.totalCount}
         refreshing={query.isFetching}
         onRefresh={() => void query.refetch()}
         responseHrefForRequest={(id) => `/requests/suspension/${id}`}
