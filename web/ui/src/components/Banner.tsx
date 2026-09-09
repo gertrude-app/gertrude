@@ -50,7 +50,7 @@ const Banner: React.FC<BannerProps> = ({ children, variant = `neutral`, classNam
       <Text
         as="div"
         variant="body"
-        className="leading-5 [&_strong]:font-semibold"
+        className="text-pretty leading-5 [&_strong]:font-semibold"
         style={{ color: `inherit` }}
       >
         {children}

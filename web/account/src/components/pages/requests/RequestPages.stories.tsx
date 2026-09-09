@@ -1,17 +1,25 @@
-import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
-import type { ComponentProps, ReactElement } from 'react';
+import {
+  StoryScreen,
+  galleryParameters,
+  useSyncedStoryState,
+} from '@gertrude/ui/src/storybook/StoryLayout';
+import React, { type ComponentProps, type ReactElement } from 'react';
+import type { UnlockReviewEntry } from '#/lib/unlockRequests';
 import SuspensionRequestsPage from './SuspensionRequestsPage';
+import { UnlockRequestReviewEditor } from './UnlockRequestReviewPage';
 import UnlockRequestsPage from './UnlockRequestsPage';
 import SuspensionRequestResponseModal from '#/components/requests/SuspensionRequestResponseModal';
 import SuspensionRequestStatusModal from '#/components/requests/SuspensionRequestStatusModal';
-import { suspensionRequests } from '#/components/storybook/fixtures';
+import {
+  keychains,
+  suspensionRequests,
+  unlockRequest,
+} from '#/components/storybook/fixtures';
+import { unlockReviewDraft, waitForRender } from '#/components/storybook/unlockReview';
+import { updateGroupKeyAddressMatch } from '#/lib/unlockRequests';
 
 const noop = (): void => {};
 const resolve = async (): Promise<void> => {};
-const waitForRender = (): Promise<void> =>
-  new Promise((resolveRender) =>
-    requestAnimationFrame(() => requestAnimationFrame(() => resolveRender())),
-  );
 const responseHrefForRequest = (id: string): string => `/requests/suspension/${id}`;
 
 type SuspensionRequestsPageProps = ComponentProps<typeof SuspensionRequestsPage>;
@@ -153,11 +161,208 @@ export const SuspensionCustomDurationDialog = {
   },
 };
 
+const unlockSummary = {
+  totalCount: 7,
+  people: [
+    {
+      id: `person-jude`,
+      name: `Jude`,
+      pendingCount: 5,
+      targets: [
+        `youtube.com`,
+        `school.example.com`,
+        `scratch.mit.edu`,
+        `wikipedia.org`,
+        `khanacademy.org`,
+      ],
+    },
+    {
+      id: `person-lucy`,
+      name: `Lucy`,
+      pendingCount: 2,
+      targets: [`192.0.2.1`, `minecraft.net`],
+    },
+  ],
+};
+
 export const Unlock = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <UnlockRequestsPage suspensionRequestCount={suspensionRequests.length} />
+      <UnlockRequestsPage
+        state={{ status: `success`, data: unlockSummary }}
+        suspensionRequestCount={suspensionRequests.length}
+        onRefresh={noop}
+        reviewHrefForPerson={(personId) => `/requests/unlock/${personId}`}
+      />
     </StoryScreen>
+  ),
+};
+
+const scratchApp = {
+  appName: `Scratch`,
+  appSlug: `scratch`,
+  appBundleId: `edu.mit.scratch`,
+  appIconHash: `scratch`,
+  appCategories: [`productivity`],
+};
+
+const unknownApp = {
+  appName: undefined,
+  appSlug: undefined,
+  appBundleId: `com.example.study-helper`,
+  appCategories: [`education`],
+};
+
+const chromeApp = {
+  appName: `Google Chrome`,
+  appSlug: `chrome`,
+  appBundleId: `com.google.Chrome`,
+  appCategories: [`browser`],
+};
+
+const unlockReviewPerson = {
+  personId: `person-jude`,
+  personName: `Jude`,
+  keychains: keychains.slice(0, 2),
+};
+
+const unlockReviewProps = {
+  saving: false,
+  appIconUrl: (hash: string) => `/example-app-icons/${hash}.webp`,
+  onSubmit: noop,
+  onRefresh: noop,
+};
+
+const UnlockReviewStory: React.FC<{
+  initialEntries: UnlockReviewEntry[];
+  saving?: boolean;
+}> = ({ initialEntries, saving = false }) => {
+  const [entries, setEntries] = useSyncedStoryState(initialEntries);
+  return (
+    <StoryScreen>
+      <UnlockRequestReviewEditor
+        {...unlockReviewProps}
+        data={{
+          ...unlockReviewPerson,
+          requests: initialEntries.flatMap((entry) =>
+            (entry.kind === `web` ? [entry.group] : entry.groups).flatMap(
+              (group) => group.requests,
+            ),
+          ),
+        }}
+        entries={entries}
+        setEntries={setEntries}
+        saving={saving}
+      />
+    </StoryScreen>
+  );
+};
+
+export const UnlockReview = {
+  name: 'Unlock review',
+  parameters: galleryParameters,
+  render: () => (
+    <UnlockReviewStory
+      initialEntries={unlockReviewDraft(
+        [
+          unlockRequest(`docs.example.com`, { requestComment: `For my homework.` }),
+          unlockRequest(`docs.example.com`, chromeApp),
+          unlockRequest(`lesson.docs.example.com`),
+          unlockRequest(`school.example.com`),
+          unlockRequest(`khanacademy.org`),
+          unlockRequest(`youtube.com`, {
+            requestComment: `Can I watch a math tutorial?`,
+          }),
+          unlockRequest(`support.example.com`, {
+            appName: `Discord`,
+            appSlug: `discord`,
+            appBundleId: `com.hnc.Discord`,
+            appIconHash: `discord`,
+            appCategories: [`communication`],
+          }),
+          unlockRequest(`other.example.org`, { appCategories: [] }),
+          unlockRequest(`class.example.org`),
+          unlockRequest(`class.example.org`, chromeApp),
+          unlockRequest(`api.studybuddy.dev`, unknownApp),
+        ],
+        (group) => {
+          if ([`docs.example.com`, `other.example.org`].includes(group.target)) {
+            return { ...updateGroupKeyAddressMatch(group, `parent`), decision: `allow` };
+          }
+          return group.target === `school.example.com`
+            ? { ...group, decision: `allow`, comment: `For homework.` }
+            : group;
+        },
+      ).map((entry) =>
+        entry.kind === `app` && entry.name === `Unknown app`
+          ? { ...entry, choice: `unrestricted` }
+          : entry,
+      )}
+    />
+  ),
+};
+
+export const UnlockReviewPermissionIssues = {
+  name: 'Unlock review exceptions',
+  parameters: galleryParameters,
+  render: () => (
+    <UnlockReviewStory
+      initialEntries={unlockReviewDraft(
+        [
+          unlockRequest(`docs.example.com`),
+          unlockRequest(`school.example.com`),
+          unlockRequest(`docs.example.net`),
+          unlockRequest(`school.example.net`),
+          unlockRequest(`expired.study.test`),
+          unlockRequest(`api.scratch.mit.edu`, scratchApp),
+        ],
+        (group) => {
+          switch (group.target) {
+            case `school.example.com`:
+              return { ...group, decision: `deny` };
+            case `docs.example.net`:
+              return {
+                ...updateGroupKeyAddressMatch(group, `parent`),
+                decision: `allow`,
+                expiration: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              };
+            case `school.example.net`:
+              return { ...group, decision: `allow` };
+            case `expired.study.test`:
+              return { ...group, decision: `allow`, expiration: `2020-01-15T12:00:00Z` };
+            case `api.scratch.mit.edu`:
+              return {
+                ...group,
+                decision: `allow`,
+                key: {
+                  type: `domain`,
+                  domain: group.target,
+                  scope: { type: `webBrowsers` },
+                },
+              };
+            default:
+              return {
+                ...updateGroupKeyAddressMatch(group, `parent`),
+                decision: `allow`,
+              };
+          }
+        },
+      )}
+    />
+  ),
+};
+
+export const UnlockReviewSaving = {
+  name: 'Unlock review saving',
+  parameters: galleryParameters,
+  render: () => (
+    <UnlockReviewStory
+      initialEntries={unlockReviewDraft([unlockRequest(`docs.example.com`)], (group) => ({
+        ...group,
+        decision: `allow`,
+      }))}
+      saving
+    />
   ),
 };

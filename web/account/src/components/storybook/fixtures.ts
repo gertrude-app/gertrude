@@ -18,6 +18,7 @@ import type {
 } from '#/components/types';
 import type { Testimonial } from '#/components/unauthed/RotatingTestimonials';
 import type { ActivityItem, DaySummary } from '#/lib/activity';
+import type { UnlockRequestRow } from '#/lib/unlockRequests';
 
 export const weekdaySchedule: Schedule = {
   type: `active`,
@@ -309,6 +310,20 @@ export const iosDeviceSettingsAllAppsConnected: IosDeviceSettingsConfiguration =
   music: { requiresPayment: false },
   podcasts: { subscription: { case: `active`, expiresAt: daysFromNow(300) } },
 };
+
+export const unlockRequest = (
+  domain: string,
+  overrides: Partial<UnlockRequestRow> = {},
+): UnlockRequestRow => ({
+  id: `request-${domain}-${overrides.appBundleId ?? `safari`}`,
+  domain,
+  appName: `Safari`,
+  appSlug: `safari`,
+  appBundleId: `com.apple.Safari`,
+  appCategories: [`browser`],
+  createdAt: `2026-07-03T14:05:00Z`,
+  ...overrides,
+});
 
 export const unlockRequests: UnlockRequest[] = [
   {

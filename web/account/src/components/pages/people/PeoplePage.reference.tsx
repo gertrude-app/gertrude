@@ -90,8 +90,20 @@ const PeoplePageReference: React.FC<Props> = ({
           responseHrefForRequest={suspensionRequestHrefForRequest}
         />
         <UnlockRequestsPreviewCard
-          unlockRequests={unlockRequests}
+          summary={{
+            totalCount: unlockRequests.reduce(
+              (sum, request) => sum + request.domains.length,
+              0,
+            ),
+            people: unlockRequests.map((request) => ({
+              id: request.id,
+              name: request.personName,
+              pendingCount: request.domains.length,
+              targets: request.domains,
+            })),
+          }}
           viewAllHref={unlockRequestsHref}
+          reviewHrefForPerson={() => unlockRequestsHref}
         />
         <SecurityEventsPreviewCard
           state={{ status: `success`, data: securityEvents }}

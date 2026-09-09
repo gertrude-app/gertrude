@@ -53,7 +53,11 @@ const SidebarLayout: React.FC<Props> = ({ content, children, mobileLogo }) => {
 
   return (
     <SidebarContext.Provider value={sidebarContext}>
-      <Stack direction="horizontal" align="stretch" className="min-h-screen relative">
+      <Stack
+        direction="horizontal"
+        align="stretch"
+        className="relative min-h-screen [--sidebar-width:0rem] min-[940px]:[--sidebar-width:17rem]"
+      >
         <div className="hidden min-[940px]:block">{children}</div>
         <div
           className={cx(

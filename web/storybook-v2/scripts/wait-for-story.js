@@ -1,4 +1,27 @@
 export async function waitForStoryToSettle(page) {
+  await page.waitForFunction(() => {
+    const channel = window.__STORYBOOK_ADDONS_CHANNEL__;
+    const storyId = new URL(window.location.href).searchParams.get(`id`);
+    for (const event of [
+      `configError`,
+      `storyMissing`,
+      `storyErrored`,
+      `storyThrewException`,
+      `playFunctionThrewException`,
+      `unhandledErrorsWhilePlaying`,
+    ]) {
+      const error = channel?.last(event);
+      if (error) {
+        throw new Error(`Story ${storyId} failed (${event}): ${JSON.stringify(error)}`);
+      }
+    }
+    const finished = channel?.last(`storyFinished`)?.[0];
+    if (!finished || finished.storyId !== storyId) return false;
+    if (finished.status !== `success`) {
+      throw new Error(`Story ${storyId} failed: ${JSON.stringify(finished)}`);
+    }
+    return true;
+  });
   await page.waitForSelector(`#storybook-root`, { state: `attached` });
   await page.waitForFunction(
     () => document.querySelector(`#storybook-root`)?.childNodes.length > 0,

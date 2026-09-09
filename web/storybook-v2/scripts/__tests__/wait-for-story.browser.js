@@ -46,12 +46,70 @@ async function createStory(t, css, status = 200) {
       });
     }
   });
-  await page.goto(`http://storybook.test/`);
-  await page.evaluate(() => document.fonts.ready);
+  await page.goto(`http://storybook.test/?id=test-story`);
+  await page.evaluate(() => {
+    window.storyEvents = {
+      storyFinished: [{ storyId: `test-story`, status: `success` }],
+    };
+    window.__STORYBOOK_ADDONS_CHANNEL__ = {
+      last: (event) => window.storyEvents[event],
+    };
+    return document.fonts.ready;
+  });
   if (css) {
     await page.addStyleTag({ content: css });
   }
   return { page, requested: requested.promise, release: response.resolve };
+}
+
+test(`waits for play to finish before discovering its final assets`, async (t) => {
+  const { page, requested, release } = await createStory(t, ``);
+  await page.evaluate(() => delete window.storyEvents.storyFinished);
+  const settled = waitForStoryToSettle(page).then(() => `settled`);
+  assert.equal(await Promise.race([settled, delay(100, `waiting`)]), `waiting`);
+
+  await page.addStyleTag({ content: `#tile { background-image: url('/late.svg'); }` });
+  await page.evaluate(() => {
+    window.storyEvents.storyFinished = [{ storyId: `test-story`, status: `success` }];
+  });
+  await requested;
+  assert.equal(await Promise.race([settled, delay(100, `waiting`)]), `waiting`);
+  release();
+  assert.equal(await settled, `settled`);
+});
+
+for (const event of [
+  `configError`,
+  `storyMissing`,
+  `storyErrored`,
+  `storyThrewException`,
+  `playFunctionThrewException`,
+  `unhandledErrorsWhilePlaying`,
+]) {
+  test(`rejects cached ${event} even when the story subsequently reports success`, async (t) => {
+    const { page } = await createStory(t, ``);
+    await page.evaluate((event) => {
+      window.storyEvents[event] = [{ message: `Expected covered request` }];
+    }, event);
+    await assert.rejects(waitForStoryToSettle(page), /Expected covered request/);
+  });
+}
+
+test(`rejects an unsuccessful finished report without a thrown exception`, async (t) => {
+  const { page } = await createStory(t, ``);
+  await page.evaluate(() => (window.storyEvents.storyFinished[0].status = `error`));
+  await assert.rejects(waitForStoryToSettle(page), /Story test-story failed/);
+});
+
+for (const completion of [undefined, { storyId: `another-story`, status: `success` }]) {
+  test(`times out without a successful completion for the requested story (${completion?.storyId ?? `never finished`})`, async (t) => {
+    const { page } = await createStory(t, ``);
+    page.setDefaultTimeout(200);
+    await page.evaluate((completion) => {
+      window.storyEvents.storyFinished = completion ? [completion] : undefined;
+    }, completion);
+    await assert.rejects(waitForStoryToSettle(page), /Timeout 200ms exceeded/);
+  });
 }
 
 const backgrounds = {
