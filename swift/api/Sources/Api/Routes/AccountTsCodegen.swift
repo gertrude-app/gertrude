@@ -1,5 +1,6 @@
 import Foundation
 import Gertie
+import MusicRoute
 import PairQL
 import TypeScriptInterop
 
@@ -36,6 +37,7 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       ("BillingStatus", BillingStatus.self),
       ("SubscriptionTier", StripeSubscription.Tier.self),
       ("SubscriptionPanelAction", GetSubscriptionPanel_v2.Action.self),
+      ("MusicSubscriptionState", MusicSubscriptionState.self),
     ]
   }
 

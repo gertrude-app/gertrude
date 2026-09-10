@@ -1,4 +1,5 @@
 import DuetSQL
+import MusicRoute
 import PairQL
 import PodcastRoute
 
@@ -36,7 +37,7 @@ struct GetIosDeviceSettings: Pair {
   }
 
   struct Music: PairNestable {
-    let requiresPayment: Bool
+    let subscription: MusicSubscriptionState
   }
 
   struct Output: PairOutput {
@@ -77,9 +78,12 @@ extension GetIosDeviceSettings: Resolver {
           try await install.hasToken(in: context.db) else {
       return nil
     }
-    let requiresPayment = try await context.currentBillingAccount()
-      .paymentActionForMissingCapability(.useGertrudeMusic) != nil
-    return Music(requiresPayment: requiresPayment)
+    let token = try await MusicApp.Token.query()
+      .where(.installId == install.id)
+      .first(in: context.db)
+    let subscription = try await context.currentBillingAccount()
+      .musicSubscriptionState(for: token)
+    return Music(subscription: subscription)
   }
 
   static func podcasts(

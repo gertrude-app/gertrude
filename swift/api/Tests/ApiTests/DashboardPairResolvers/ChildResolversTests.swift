@@ -1,6 +1,7 @@
 import DuetSQL
 import Gertie
 import PairQL
+import XCore
 import XCTest
 import XExpect
 
@@ -54,6 +55,56 @@ final class ChildResolversTests: ApiTestCase, @unchecked Sendable {
       .init(.userUpdated, to: .user(child.id)),
       .init(.userDeleted, to: .user(child.id)),
     ])
+  }
+
+  func testDeletingChildRecordsIosAppTrialSnapshot() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let musicDevice = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let podcastDevice = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let unstartedMusicDevice = try await self.db.create(
+      IOSDevice.random { $0.childId = child.id },
+    )
+    let musicInstall = try await self.db.create(
+      MusicApp.Install(deviceId: musicDevice.id, appVersion: "1.0.0"),
+    )
+    let musicToken = try await self.db.create(MusicApp.Token(installId: musicInstall.id))
+    let podcastInstall = try await self.db.create(
+      PodcastApp.Install(deviceId: podcastDevice.id, appVersion: "1.6.0"),
+    )
+    try await self.db.create(
+      MusicApp.Install(deviceId: unstartedMusicDevice.id, appVersion: "1.0.0"),
+    )
+
+    _ = try await DeleteEntity_v2.resolve(
+      with: .init(id: child.id.rawValue, type: .child),
+      in: parent.context,
+    )
+
+    var record = try await DeletedEntity.query()
+      .where(.type == RepeatTrialCanary.snapshotType)
+      .first(in: self.db)
+    let snapshot = try JSON.decode(
+      record.data,
+      as: RepeatTrialCanary.Snapshot.self,
+      [.isoDates],
+    )
+    expect(snapshot.parentId).toEqual(parent.id)
+    expect(snapshot.childId).toEqual(child.id)
+    expect(snapshot.music.map(\.deviceId)).toEqual([musicDevice.id])
+    expect(abs(snapshot.music[0].startedAt.timeIntervalSince(musicToken.createdAt)) < 1).toBeTrue()
+    expect(snapshot.podcasts.map(\.deviceId)).toEqual([podcastDevice.id])
+    expect(abs(snapshot.podcasts[0].startedAt.timeIntervalSince(podcastInstall.createdAt)) < 1)
+      .toBeTrue()
+
+    try await record.modifyCreatedAt(.exact(.reference - .hours(25)))
+    let recent = try await RepeatTrialCanary.recentTrial(
+      deviceId: musicDevice.id,
+      intent: .music,
+      since: .reference - .hours(24),
+      in: self.db,
+    )
+    expect(recent).toBeNil()
   }
 
   func testExistingChildUpdated() async throws {

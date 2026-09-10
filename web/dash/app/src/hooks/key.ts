@@ -15,7 +15,7 @@ import type {
   GetDevice,
   GetIOSDeviceClaimData,
   GetIOSDeviceSupervisionStatus,
-  GetIOSDevice_v2,
+  GetIOSDevice_v3,
   GetIdentifiedApps,
   GetInstalledMacApps,
   GetMusicAlbumCuration,
@@ -96,7 +96,7 @@ export class Key extends QueryKey<never> {
     return new QueryKey(`computers/:id`, [`computers`, id], id);
   }
 
-  static iOSDevice(id: UUID): QueryKey<GetIOSDevice_v2.Output> {
+  static iOSDevice(id: UUID): QueryKey<GetIOSDevice_v3.Output> {
     return new QueryKey(`ios-devices/:id`, [`ios-devices`, id], id);
   }
 

@@ -296,17 +296,24 @@ export const iosDeviceSettingsPodcastsPaused: IosDeviceSettingsConfiguration = {
 
 export const iosDeviceSettingsMusicConnected: IosDeviceSettingsConfiguration = {
   ...iosDeviceSettings,
-  music: { requiresPayment: false },
+  music: { subscription: { case: `active` } },
+};
+
+export const iosDeviceSettingsMusicTrial: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  music: {
+    subscription: { case: `trial`, expiresAt: `2026-09-25T16:00:00.000Z` },
+  },
 };
 
 export const iosDeviceSettingsMusicUnavailable: IosDeviceSettingsConfiguration = {
   ...iosDeviceSettings,
-  music: { requiresPayment: true },
+  music: { subscription: { case: `unavailable` } },
 };
 
 export const iosDeviceSettingsAllAppsConnected: IosDeviceSettingsConfiguration = {
   ...iosDeviceSettings,
-  music: { requiresPayment: false },
+  music: { subscription: { case: `active` } },
   podcasts: { subscription: { case: `active`, expiresAt: daysFromNow(300) } },
 };
 

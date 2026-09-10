@@ -6,6 +6,7 @@ import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
 import IosSettingsPage from './IosSettingsPage';
 import {
   iosDeviceSettingsAllAppsConnected,
+  iosDeviceSettingsMusicTrial,
   iosDeviceSettingsMusicUnavailable,
   iosDeviceSettingsNoBlocker,
   iosDeviceSettingsPodcastsExpiring,
@@ -197,6 +198,19 @@ export const IosMusicUnavailable = {
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
     expandSections(canvasElement, [`Gertrude Music`]);
   },
+};
+
+export const IosMusicTrial = {
+  name: 'iPhone and iPad (Music free trial)',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <InPageContext>
+      <IosSettings
+        settings={iosDeviceSettingsMusicTrial}
+        defaultExpandedSection="music"
+      />
+    </InPageContext>
+  ),
 };
 
 export const IosLoading = {

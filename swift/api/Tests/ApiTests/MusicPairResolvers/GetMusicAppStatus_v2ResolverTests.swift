@@ -129,8 +129,8 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
     expect(token).toEqual(tokens[0].value.rawValue)
   }
 
-  func testClaimedDeviceWithoutMusicAccessReportsUnavailable() async throws {
-    let child = try await self.child() // no subscription -> free -> not entitled
+  func testClaimedDeviceWithTrialReportsActiveToLegacyClient() async throws {
+    let child = try await self.child()
     let deviceId = UUID()
     let device = try await self.db.create(IOSDevice(
       id: .init(deviceId),
@@ -152,7 +152,7 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
       return XCTFail("expected .claimed, got \(output)")
     }
     expect(childName).toEqual(child.model.name)
-    expect(entitlement).toEqual(.unavailable) // no remediation url anywhere in the v2 contract
+    expect(entitlement).toEqual(.active)
   }
 
   func testClaimedDeviceReusesExistingToken() async throws {
@@ -231,8 +231,8 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
     expect(token).toEqual(tokens[0].value.rawValue)
   }
 
-  func testAlreadyBoundDeviceWithoutMusicAccessClaimsAndReportsUnavailable() async throws {
-    let parent = try await self.parent() // no subscription -> free -> not entitled
+  func testAlreadyBoundDeviceClaimsAndReportsTrialAsActive() async throws {
+    let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
     let deviceId = UUID()
     let code = uniqueClaimCode()
@@ -255,7 +255,7 @@ final class GetMusicAppStatus_v2ResolverTests: ApiTestCase, @unchecked Sendable 
     }
     expect(childId).toEqual(child.id.rawValue)
     expect(childName).toEqual(child.name)
-    expect(entitlement).toEqual(.unavailable)
+    expect(entitlement).toEqual(.active)
 
     let claim = try await Claim.find(code: code, in: self.db) // claim completed despite unavailable
     expect(claim?.deviceId).toEqual(device.id)

@@ -40,7 +40,7 @@ describe(`music claim flow`, () => {
   });
 
   describe(`happy path`, () => {
-    it(`claims to an existing child and lands on a neutral connected screen`, () => {
+    it(`claims to an existing child and shows the pending free trial`, () => {
       cy.interceptPql(`GetMusicClaimData`, claimData);
       cy.interceptPql(`ClaimMusicDevice`, {
         childName: `Emma`,
@@ -60,6 +60,8 @@ describe(`music claim flow`, () => {
       cy.location(`pathname`).should(`eq`, `/claim-music-device/687084/done`);
       cy.contains(`iPhone connected`).should(`be.visible`);
       cy.contains(`Gertrude Music is now connected on Emma`).should(`be.visible`);
+      cy.contains(`Music Free Trial Ready`).should(`be.visible`);
+      cy.contains(`The 21-day free trial will begin automatically`).should(`be.visible`);
     });
 
     it(`completes without ever routing through a payment step`, () => {
@@ -96,6 +98,7 @@ describe(`music claim flow`, () => {
         childName: `Luke`,
         childId: `child-2`,
         deviceId: `device-2`,
+        subscription: { case: `active` as const },
       },
     };
 
@@ -124,18 +127,58 @@ describe(`music claim flow`, () => {
         });
     });
 
+    it(`shows the dated trial after the music app connects`, () => {
+      cy.interceptPql(`GetMusicClaimData`, {
+        ...doneClaimData,
+        resumeStep: {
+          ...doneClaimData.resumeStep,
+          subscription: {
+            case: `trial`,
+            expiresAt: `2026-09-25T12:00:00.000Z`,
+          },
+        },
+      });
+
+      cy.visit(`/claim-music-device/687084/claim`);
+      cy.location(`pathname`).should(`eq`, `/claim-music-device/687084/done`);
+
+      cy.contains(`Music Free Trial Active`).should(`be.visible`);
+      cy.contains(`After Friday, September 25, 2026`).should(`be.visible`);
+      cy.contains(`$5/month for the whole family`).should(`be.visible`);
+    });
+
+    it(`shows an actionable warning when music needs attention`, () => {
+      cy.interceptPql(`GetMusicClaimData`, {
+        ...doneClaimData,
+        resumeStep: {
+          ...doneClaimData.resumeStep,
+          subscription: { case: `unavailable` },
+        },
+      });
+
+      cy.visit(`/claim-music-device/687084/claim`);
+      cy.location(`pathname`).should(`eq`, `/claim-music-device/687084/done`);
+
+      cy.contains(`Gertrude Music Needs Attention`).should(`be.visible`);
+      cy.contains(`Review your plan or billing details to restore access`).should(
+        `be.visible`,
+      );
+      cy.contains(`Manage plan`).click();
+      cy.location(`pathname`).should(`eq`, `/settings`);
+    });
+
     it(`deep-links into the device settings page`, () => {
       cy.interceptPql(`GetMusicClaimData`, doneClaimData);
 
       cy.visit(`/claim-music-device/687084/claim`);
       cy.location(`pathname`).should(`eq`, `/claim-music-device/687084/done`);
 
-      cy.interceptPql(`GetIOSDevice_v2`, {
+      cy.interceptPql(`GetIOSDevice_v3`, {
         childName: `Luke`,
         deviceType: `iPhone`,
         osVersion: `18.2`,
         musicConnected: true,
-        music: { requiresPayment: true },
+        music: { subscription: { case: `unavailable` } },
       });
       cy.contains(`iPhone settings`).click();
       cy.location(`pathname`).should(`eq`, `/children/child-2/ios-devices/device-2`);
@@ -146,15 +189,15 @@ describe(`music claim flow`, () => {
 
       cy.visit(`/claim-music-device/687084/claim`);
 
-      cy.interceptPql(`GetIOSDevice_v2`, {
+      cy.interceptPql(`GetIOSDevice_v3`, {
         childName: `Luke`,
         deviceType: `iPhone`,
         osVersion: `18.2`,
         musicConnected: true,
-        music: { requiresPayment: true },
+        music: { subscription: { case: `unavailable` } },
       });
       cy.contains(`iPhone settings`).click();
-      cy.wait(`@GetIOSDevice_v2`);
+      cy.wait(`@GetIOSDevice_v3`);
 
       cy.contains(`Music not available for this account`).should(`be.visible`);
     });

@@ -35,6 +35,7 @@ enum AuthedParentRoute: PairRoute {
   case handleCheckoutCancel(HandleCheckoutCancel.Input)
   case handleCheckoutSuccess(HandleCheckoutSuccess.Input)
   case iosDevice_v2(IOSDevice.Id)
+  case iosDevice_v3(IOSDevice.Id)
   case latestAppVersions
   case logEvent(LogEvent.Input)
   case userActivityFeed(UserActivityFeed.Input)
@@ -201,6 +202,10 @@ extension AuthedParentRoute {
         Route(.case(Self.iosDevice_v2)) {
           Operation(GetIOSDevice_v2.self)
           Body(.dashboardInput(GetIOSDevice_v2.self))
+        }
+        Route(.case(Self.iosDevice_v3)) {
+          Operation(GetIOSDevice_v3.self)
+          Body(.dashboardInput(GetIOSDevice_v3.self))
         }
         Route(.case(Self.logEvent)) {
           Operation(LogEvent.self)
@@ -474,6 +479,9 @@ extension AuthedParentRoute: RouteResponder {
       return try await self.respond(with: output)
     case .iosDevice_v2(let input):
       let output = try await GetIOSDevice_v2.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .iosDevice_v3(let input):
+      let output = try await GetIOSDevice_v3.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .latestAppVersions:
       let output = try await LatestAppVersions.resolve(in: context)

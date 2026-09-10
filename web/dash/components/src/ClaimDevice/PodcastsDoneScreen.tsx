@@ -1,6 +1,7 @@
 import { Button } from '@shared/components';
 import { posessive } from '@shared/string';
 import React from 'react';
+import TrialStatusCard from '../TrialStatusCard';
 import PlanTeaser from './PlanTeaser';
 import ScreenHeader from './ScreenHeader';
 
@@ -158,15 +159,13 @@ const PodcastsDoneActive: React.FC<{
     </p>
 
     {trialDaysRemaining !== undefined && (
-      <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
-        <p className="text-slate-800 font-semibold">
-          You have {trialDaysRemaining} days of free trial.
-        </p>
-        <p className="text-slate-600 text-sm mt-1">
-          Subscribe to <b>Gertrude Light</b> any time to keep Gertrude Podcasts going
-          after your trial ends — no waiting for the deadline.
-        </p>
-      </div>
+      <TrialStatusCard
+        className="mb-6"
+        heading={`You have ${trialDaysRemaining} days of free trial.`}
+      >
+        Subscribe to <b>Gertrude Light</b> any time to keep Gertrude Podcasts going after
+        your trial ends — no waiting for the deadline.
+      </TrialStatusCard>
     )}
 
     <div className="flex justify-end items-center gap-3">

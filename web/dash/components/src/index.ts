@@ -15,6 +15,7 @@ export {
   detectClaimPending,
 } from './gertrudeApps';
 export { default as CodeChip } from './CodeChip';
+export { MusicTrialStatusCard, default as TrialStatusCard } from './TrialStatusCard';
 export { default as AppHeader } from './iOS/AppHeader';
 export { default as ResetPinModal } from './iOS/ResetPinModal';
 export { default as PodcastsDeviceSection } from './iOS/PodcastsDeviceSection';

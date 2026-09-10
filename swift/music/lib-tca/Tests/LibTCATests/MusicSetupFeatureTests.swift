@@ -124,6 +124,33 @@ struct MusicSetupFeatureTests {
   }
 
   @Test
+  func trialClaimShowsTrialSuccessThenContinuesToPermission() async {
+    let expiresAt = Date(timeIntervalSince1970: 1_800_000_000)
+    var state = MusicSetupFeature.State()
+    state.screen = .welcome
+    state.prefetch = .loaded(.claimed(
+      token: UUID(1),
+      childId: UUID(2),
+      childName: "Harriet",
+      entitlement: .trial(expiresAt: expiresAt),
+    ))
+    let store = TestStore(initialState: state) {
+      MusicSetupFeature()
+    } withDependencies: {
+      $0.keychain = KeychainStore().client
+      $0.musicSetup.authorizationStatus = { .notDetermined }
+    }
+
+    await store.send(.getStartedButtonTapped) {
+      $0.screen = .trialStarted(childName: "Harriet", expiresAt: expiresAt)
+    }
+    await store.send(.trialStartedContinueButtonTapped)
+    await store.receive(.appleMusicAuthorizationStatusLoaded(.notDetermined)) {
+      $0.screen = .appleMusicPermission
+    }
+  }
+
+  @Test
   func permissionRemainingNotDeterminedCanBeRequestedAgain() async {
     var state = MusicSetupFeature.State()
     state.screen = .appleMusicPermission
@@ -377,13 +404,13 @@ private final class KeychainStore: @unchecked Sendable {
 }
 
 private actor MusicAppStatusProvider {
-  var outputs: [GetMusicAppStatus_v2.Output]
+  var outputs: [GetMusicAppStatus_v3.Output]
 
-  init(outputs: [GetMusicAppStatus_v2.Output]) {
+  init(outputs: [GetMusicAppStatus_v3.Output]) {
     self.outputs = outputs
   }
 
-  func next() throws -> GetMusicAppStatus_v2.Output {
+  func next() throws -> GetMusicAppStatus_v3.Output {
     guard !self.outputs.isEmpty else { throw TestError() }
     return self.outputs.removeFirst()
   }

@@ -1,11 +1,13 @@
+import Dependencies
 import DuetSQL
+import MusicRoute
 import PodcastRoute
 import XCTest
 import XExpect
 
 @testable import Api
 
-final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
+final class GetIOSDevice_v3ResolverTests: ApiTestCase, @unchecked Sendable {
   func testAmInstall_nilWhenInstallExistsButNoToken() async throws {
     let parent = try await self.parent()
     let child = try await self.db.create(Child.random { $0.parentId = parent.id })
@@ -14,7 +16,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     })
     try await self.db.create(PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.am).toBeNil()
   }
@@ -27,7 +29,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     })
     try await self.db.create(MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.music).toBeNil()
     expect(output.musicConnected).toEqual(false)
@@ -44,10 +46,46 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     )
     try await self.db.create(MusicApp.Token(installId: install.id))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
-    expect(output.music?.requiresPayment).toEqual(true)
+    guard case .trial = output.music?.subscription else {
+      XCTFail("Expected an active Music trial")
+      return
+    }
     expect(output.musicConnected).toEqual(true)
+  }
+
+  func testMusicInstall_activeWhenAccountHasMusicAccess() async throws {
+    let parent = try await self.parent()
+    try await self.addPaidSubscription(for: parent.id, tier: .medium)
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let install = try await self.db.create(
+      MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
+    )
+    try await self.db.create(MusicApp.Token(installId: install.id))
+
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
+
+    expect(output.music?.subscription).toEqual(.active)
+  }
+
+  func testMusicInstall_unavailableWhenTrialHasExpired() async throws {
+    let parent = try await self.parent()
+    let child = try await self.db.create(Child.random { $0.parentId = parent.id })
+    let device = try await self.db.create(IOSDevice.random { $0.childId = child.id })
+    let install = try await self.db.create(
+      MusicApp.Install(deviceId: device.id, appVersion: "1.0.0"),
+    )
+    try await self.db.create(MusicApp.Token(installId: install.id))
+
+    let output = try await withDependencies {
+      $0.date.now = Date() + .days(21)
+    } operation: {
+      try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
+    }
+
+    expect(output.music?.subscription).toEqual(.unavailable)
   }
 
   func testBlocker_nilWhenInstallExistsButNoToken() async throws {
@@ -59,7 +97,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     // bare install, no token -> a ghost from app events, never really connected
     try await self.db.create(BlockerApp.Install(deviceId: device.id, appVersion: "1.0.0"))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.blocker).toBeNil()
   }
@@ -75,7 +113,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     // until the device checks in -- a device stuck mid-claim shouldn't show the UI
     try await self.db.create(BlockerApp.Supervision(deviceId: device.id))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.blocker).toBeNil()
   }
@@ -91,7 +129,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     )
     try await self.db.create(BlockerApp.Token(installId: install.id))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.blocker).not.toBeNil()
   }
@@ -114,7 +152,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     settings.webAllowList = [.init(url: "https://gertrude.app", title: "Gertrude")]
     try await self.db.update(settings)
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     let controls = output.blocker?.extendedSupervisionControls
     expect(controls?.whitelistedAppBundleIds).toEqual(["com.apple.mobilesafari"])
@@ -135,7 +173,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
       supervisedAt: .reference,
     ))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.blocker?.isSupervised).toEqual(true)
     expect(output.blocker?.extendedSupervisionControls).toBeNil()
@@ -151,7 +189,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     )
     try await self.db.create(BlockerApp.Token(installId: install.id))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     expect(output.blocker?.isSupervised).toEqual(false)
     expect(output.blocker?.extendedSupervisionControls).toBeNil()
@@ -168,7 +206,7 @@ final class GetIOSDevice_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     )
     try await self.db.create(PodcastApp.Token(installId: install.id))
 
-    let output = try await GetIOSDevice_v2.resolve(with: device.id, in: parent.context)
+    let output = try await GetIOSDevice_v3.resolve(with: device.id, in: parent.context)
 
     let persisted = try await self.db.find(install.id)
     expect(output.am?.subscription)

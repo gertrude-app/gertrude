@@ -4,6 +4,7 @@ public enum UnauthedRoute: PairRoute {
   case crossPromos(CrossPromos.Input)
   case getMusicAppStatus(GetMusicAppStatus.Input)
   case getMusicAppStatus_v2(GetMusicAppStatus_v2.Input)
+  case getMusicAppStatus_v3(GetMusicAppStatus_v3.Input)
 }
 
 public extension UnauthedRoute {
@@ -19,6 +20,10 @@ public extension UnauthedRoute {
     Route(.case(Self.getMusicAppStatus_v2)) {
       Operation(GetMusicAppStatus_v2.self)
       Body(.json(GetMusicAppStatus_v2.Input.self))
+    }
+    Route(.case(Self.getMusicAppStatus_v3)) {
+      Operation(GetMusicAppStatus_v3.self)
+      Body(.json(GetMusicAppStatus_v3.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

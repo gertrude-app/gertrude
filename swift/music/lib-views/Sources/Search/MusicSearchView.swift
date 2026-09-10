@@ -114,8 +114,8 @@ public struct MusicSearchView: View {
 
     case .musicAccessUnavailable:
       self.messageContent(
-        title: "Music unavailable",
-        message: "This device is connected, but Gertrude Music isn’t available for this account.",
+        title: LibraryMessageCard.musicAccessUnavailableTitle,
+        message: LibraryMessageCard.musicAccessUnavailableMessage,
         systemImage: "music.note",
         buttonTitle: "Check again",
       )

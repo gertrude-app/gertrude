@@ -1,5 +1,6 @@
 import DuetSQL
 import Foundation
+import MusicRoute
 import PairQL
 import TSCodable
 import Vapor
@@ -13,7 +14,12 @@ struct GetMusicClaimData: Pair {
 
   @TSCodable
   enum ResumeStep: Equatable, Sendable {
-    case done(childName: String, childId: Child.Id, deviceId: IOSDevice.Id)
+    case done(
+      childName: String,
+      childId: Child.Id,
+      deviceId: IOSDevice.Id,
+      subscription: MusicSubscriptionState?,
+    )
   }
 
   struct Output: PairOutput {
@@ -33,17 +39,23 @@ extension GetMusicClaimData: Resolver {
       baseId: "5052a8c5", // 5052a8c5-1, 5052a8c5-2, 5052a8c5-3, 5052a8c5-4
       in: context,
       onResume: { device, child in
-        guard try await device.musicInstall(in: context.db) != nil else {
+        guard let install = try await device.musicInstall(in: context.db) else {
           logIOSUnusual("b903b698", "Music claim resume on device with no music install")
           let msg = "Code not found. Double-check and try again."
           throw context.error("b903b698", .notFound, user: msg)
         }
+        let subscription = try await ClaimMusicDevice.subscription(for: install, in: context)
         return Output(
           children: [],
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: .done(childName: child.name, childId: child.id, deviceId: device.id),
+          resumeStep: .done(
+            childName: child.name,
+            childId: child.id,
+            deviceId: device.id,
+            subscription: subscription,
+          ),
         )
       },
       onUnclaimed: { device, children in
@@ -61,18 +73,24 @@ extension GetMusicClaimData: Resolver {
         )
       },
       onUnclaimedBound: { claim, device, child in
-        guard try await device.musicInstall(in: context.db) != nil else {
+        guard let install = try await device.musicInstall(in: context.db) else {
           logIOSUnusual("12ec95d0", "Music claim data on bound device with no music install")
           let msg = "Code not found. Double-check and try again."
           throw context.error("12ec95d0", .notFound, user: msg)
         }
         try await completeClaim(claim, for: child, in: context.db)
+        let subscription = try await ClaimMusicDevice.subscription(for: install, in: context)
         return Output(
           children: [],
           modelName: device.modelName,
           deviceType: device.deviceType,
           iosVersion: device.iosVersion,
-          resumeStep: .done(childName: child.name, childId: child.id, deviceId: device.id),
+          resumeStep: .done(
+            childName: child.name,
+            childId: child.id,
+            deviceId: device.id,
+            subscription: subscription,
+          ),
         )
       },
     )

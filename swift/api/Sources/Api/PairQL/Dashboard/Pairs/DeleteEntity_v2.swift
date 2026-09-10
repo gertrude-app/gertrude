@@ -135,6 +135,7 @@ extension DeleteEntity_v2: Resolver {
         .all(in: context.db)
         .map(\.keychainId)
 
+      await RepeatTrialCanary.recordSnapshot(child: child, devices: devices, in: context.db)
       try await context.db.delete(child)
 
       await deleteUnusedEmptyAutogenKeychain(childKeychainIds, context.db)

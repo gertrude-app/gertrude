@@ -168,7 +168,7 @@ describe(`supervise device claim flow`, () => {
         requiresPayment: false,
         paymentAction: { case: `startCheckout`, tier: `light` },
       });
-      cy.interceptPql(`GetIOSDevice_v2`, {
+      cy.interceptPql(`GetIOSDevice_v3`, {
         childName: `Jacob`,
         deviceType: `iPhone`,
         osVersion: `26.0`,

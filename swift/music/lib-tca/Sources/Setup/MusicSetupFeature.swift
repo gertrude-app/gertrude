@@ -16,7 +16,7 @@ struct MusicSetupFeature: Sendable {
 
     enum Prefetch: Equatable {
       case loading
-      case loaded(GetMusicAppStatus_v2.Output)
+      case loaded(GetMusicAppStatus_v3.Output)
       case failed
     }
 
@@ -29,6 +29,7 @@ struct MusicSetupFeature: Sendable {
       case connecting
       case gertrudeConnection(ConnectionStatus)
       case deviceRecognized(childName: String)
+      case trialStarted(childName: String, expiresAt: Date)
       case musicAccessUnavailable(childName: String)
       case appleMusicPermission
       case requestingAppleMusicPermission
@@ -62,17 +63,18 @@ struct MusicSetupFeature: Sendable {
     case explainAccountContinueButtonTapped
     case getStartedButtonTapped
     case musicAppStatusFailed(hasStoredConnection: Bool)
-    case musicAppStatusLoaded(GetMusicAppStatus_v2.Output)
+    case musicAppStatusLoaded(GetMusicAppStatus_v3.Output)
     case musicAppStatusPollingFailed
     case nudgeContinueButtonTapped
     case onAppear
     case parentNoButtonTapped
     case parentYesButtonTapped
     case prefetchStatusFailed
-    case prefetchStatusLoaded(GetMusicAppStatus_v2.Output)
+    case prefetchStatusLoaded(GetMusicAppStatus_v3.Output)
     case refreshConnectionButtonTapped
     case retryButtonTapped
     case settingsButtonTapped
+    case trialStartedContinueButtonTapped
   }
 
   enum CancelID {
@@ -134,6 +136,9 @@ struct MusicSetupFeature: Sendable {
         return self.fetchMusicAppStatus(hasStoredConnection: false)
 
       case .deviceRecognizedContinueButtonTapped:
+        return self.checkAppleMusicAuthorization()
+
+      case .trialStartedContinueButtonTapped:
         return self.checkAppleMusicAuthorization()
 
       case .retryButtonTapped:
@@ -269,7 +274,7 @@ struct MusicSetupFeature: Sendable {
     token: UUID,
     childId: UUID,
     childName: String,
-    entitlement: GetMusicAppStatus_v2.Entitlement,
+    entitlement: MusicSubscriptionState,
   ) -> EffectOf<Self> {
     let wasAlreadyShowing = state.isShowingMusicAccessUnavailable
     if !wasAlreadyShowing {
@@ -279,6 +284,9 @@ struct MusicSetupFeature: Sendable {
     switch entitlement {
     case .active:
       state.screen = .deviceRecognized(childName: childName)
+      return .cancel(id: CancelID.musicAppStatusPolling)
+    case .trial(let expiresAt):
+      state.screen = .trialStarted(childName: childName, expiresAt: expiresAt)
       return .cancel(id: CancelID.musicAppStatusPolling)
     case .unavailable:
       state.screen = .musicAccessUnavailable(childName: childName)

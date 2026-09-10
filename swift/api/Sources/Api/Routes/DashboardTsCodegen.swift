@@ -1,6 +1,7 @@
 import Foundation
 import Gertie
 import GertieBlocker
+import MusicRoute
 import PairQL
 import PodcastRoute
 import Tagged
@@ -65,6 +66,7 @@ enum DashboardTsCodegenRoute: PairQLTsCodegenRoute {
       ("SubscriptionTier", StripeSubscription.Tier.self),
       ("SubscriptionPanelAction", GetSubscriptionPanel_v2.Action.self),
       ("AmSubscriptionState", AmSubscriptionState.self),
+      ("MusicSubscriptionState", MusicSubscriptionState.self),
       ("IOSDeviceChildAssignment", ClaimIOSDevice.ChildAssignment.self),
       ("ClaimChildOption", GetIOSDeviceClaimData.ChildOption.self),
       ("ExtendedSupervisionControls", SaveExtendedSupervisionControls.Controls.self),
@@ -135,7 +137,7 @@ enum DashboardTsCodegenRoute: PairQLTsCodegenRoute {
       StartFullTrial.self,
       RequestPublicKeychain.self,
       FlagActivityItems.self,
-      GetIOSDevice_v2.self,
+      GetIOSDevice_v3.self,
       UpsertBlockRule.self,
       UpdateIOSDevice.self,
       SaveExtendedSupervisionControls.self,

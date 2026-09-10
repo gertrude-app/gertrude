@@ -6,6 +6,7 @@ import {
   BlockGroupList,
   EmptyState,
   Loading,
+  MusicTrialStatusCard,
   PageHeading,
   // EditBlockRules,
   // BlockRuleEditor,
@@ -23,6 +24,7 @@ import { useParams } from 'react-router-dom';
 // import type { WebPolicy } from '@dash/types';
 import type { PodcastsRunwayTier } from '../../podcastsSubscriptionRunway';
 import type { PodcastsStatus } from '@dash/components';
+import type { T } from '@shared/pairql/dashboard';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
 import {
@@ -169,7 +171,7 @@ const IOSDevice: React.FC = () => {
             childId={childId}
             childName={deviceQuery.data.childName}
             deviceType={dt}
-            requiresPayment={music?.requiresPayment ?? false}
+            subscription={music?.subscription ?? { case: `unavailable` }}
           />
         )}
         {am && podcastsRunway && (
@@ -572,15 +574,22 @@ const MusicDeviceSection: React.FC<{
   childId: string;
   childName: string;
   deviceType: string;
-  requiresPayment: boolean;
-}> = ({ childId, childName, deviceType, requiresPayment }) => (
+  subscription: NonNullable<
+    NonNullable<T.GetIOSDevice_v3.Output[`music`]>[`subscription`]
+  >;
+}> = ({ childId, childName, deviceType, subscription }) => (
   <div className="max-w-3xl">
     <AppHeader app="music" />
-    {requiresPayment ? (
+    {subscription.case === `trial` ? (
+      <div className="mt-5">
+        <MusicTrialStatusCard status="active" expiresAt={subscription.expiresAt} />
+        <MusicCuration childId={childId} childName={childName} className="mt-6" />
+      </div>
+    ) : subscription.case === `unavailable` ? (
       <EmptyState
         className="mt-5"
         heading="Music not available for this account"
-        secondaryText={`This ${deviceType} is connected, but Gertrude Music isn’t available for this account.`}
+        secondaryText={`This ${deviceType} is connected, but Gertrude Music requires an active Medium subscription of $5/month for the whole family.`}
         icon="user-gear"
         buttonText="Manage plan"
         buttonIcon="arrow-right"

@@ -1,3 +1,5 @@
+import Dependencies
+import MusicRoute
 import XCTest
 import XExpect
 
@@ -166,22 +168,24 @@ final class IosDeviceSettingsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.music).toBeNil()
   }
 
-  func testMusicRequiresPaymentOnUnentitledAccount() async throws {
+  func testMusicReturnsTrialForFreshToken() async throws {
     let child = try await self.childWithIOSDevice()
     let install = try await self.db.create(
       MusicApp.Install(deviceId: child.device.id, appVersion: "1.0.0"),
     )
-    try await self.db.create(MusicApp.Token(installId: install.id))
+    let token = try await self.db.create(MusicApp.Token(installId: install.id))
+    let persistedToken: MusicApp.Token = try await self.db.find(token.id)
 
     let output = try await GetIosDeviceSettings.resolve(
       with: .init(deviceId: child.device.id),
       in: self.accountContext(child.parent),
     )
 
-    expect(try XCTUnwrap(output.music).requiresPayment).toBeTrue()
+    expect(try XCTUnwrap(output.music).subscription)
+      .toEqual(.trial(expiresAt: persistedToken.trialExpiresAt))
   }
 
-  func testMusicDoesNotRequirePaymentOnEntitledAccount() async throws {
+  func testMusicReturnsActiveForEntitledAccount() async throws {
     let child = try await self.childWithIOSDevice()
     try await self.addPaidSubscription(for: child.parent.model.id, tier: .medium)
     let install = try await self.db.create(
@@ -194,7 +198,27 @@ final class IosDeviceSettingsResolverTests: ApiTestCase, @unchecked Sendable {
       in: self.accountContext(child.parent),
     )
 
-    expect(try XCTUnwrap(output.music).requiresPayment).toBeFalse()
+    expect(try XCTUnwrap(output.music).subscription).toEqual(.active)
+  }
+
+  func testMusicReturnsUnavailableWhenTrialExpires() async throws {
+    let child = try await self.childWithIOSDevice()
+    let install = try await self.db.create(
+      MusicApp.Install(deviceId: child.device.id, appVersion: "1.0.0"),
+    )
+    let token = try await self.db.create(MusicApp.Token(installId: install.id))
+    let persistedToken: MusicApp.Token = try await self.db.find(token.id)
+
+    let output = try await withDependencies {
+      $0.date.now = persistedToken.trialExpiresAt
+    } operation: {
+      try await GetIosDeviceSettings.resolve(
+        with: .init(deviceId: child.device.id),
+        in: self.accountContext(child.parent),
+      )
+    }
+
+    expect(try XCTUnwrap(output.music).subscription).toEqual(.unavailable)
   }
 
   func testCannotGetSettingsForDeviceFromAnotherAccount() async throws {

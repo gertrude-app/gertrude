@@ -32,18 +32,22 @@ extension ClaimAmDevice: Resolver {
       baseId: "894c4af3", // 894c4af3-1, 894c4af3-2, 894c4af3-3, 894c4af3-4
       in: context,
       onResume: { device, child in
-        try await self.output(device: device, child: child, code: input.code, in: context)
+        try await self.output(device, child, input.code, in: context)
       },
       onFresh: { device, child in
-        try await self.output(device: device, child: child, code: input.code, in: context)
+        let output = try await self.output(device, child, input.code, in: context)
+        if case .amTrial = output.subscription {
+          await RepeatTrialCanary.alertIfReclaimed(.podcasts, device, child, in: context)
+        }
+        return output
       },
     )
   }
 
   static func output(
-    device: IOSDevice,
-    child: Child,
-    code: Int,
+    _ device: IOSDevice,
+    _ child: Child,
+    _ code: Int,
     in context: ParentContext,
   ) async throws -> Output {
     guard let install = try await device.podcastInstall(in: context.db) else {

@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { IOSDeviceChildAssignment } from '../shared';
+import type { IOSDeviceChildAssignment, MusicSubscriptionState } from '../shared';
 
 export namespace ClaimMusicDevice {
   export interface Input {
@@ -14,5 +14,6 @@ export namespace ClaimMusicDevice {
     code: number;
     childId: UUID;
     deviceId: UUID;
+    subscription?: MusicSubscriptionState;
   }
 }

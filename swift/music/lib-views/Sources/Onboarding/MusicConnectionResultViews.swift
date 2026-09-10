@@ -41,7 +41,7 @@ struct MusicUnavailableView: View {
           .font(.system(size: 24, weight: .bold))
 
         Text(
-          "This is \(musicDeviceLabel(self.childName)). It’s connected, but Gertrude Music isn’t available for this account.",
+          "This is \(musicDeviceLabel(self.childName)). Its 21-day free trial has expired. The connected Gertrude account now needs at least a paid Medium subscription, which costs $5/month.",
         )
         .font(.system(size: 17, weight: .medium))
         .foregroundStyle(Color(
@@ -55,7 +55,10 @@ struct MusicUnavailableView: View {
 
       Spacer()
 
-      GertieWaitingStatus(label: "Still checking availability…", delay: self.statusDelay)
+      GertieWaitingStatus(
+        label: "Checking subscription status…",
+        delay: self.statusDelay,
+      )
     }
     .frame(maxWidth: 500)
     .padding(30)

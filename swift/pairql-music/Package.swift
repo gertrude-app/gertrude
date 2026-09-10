@@ -11,6 +11,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-url-routing", from: "0.6.2"),
     .package(path: "../gertie"),
     .package(path: "../pairql"),
+    .package(path: "../ts-codable-macro"),
   ],
   targets: [
     .target(
@@ -19,6 +20,7 @@ let package = Package(
         .product(name: "GertieApp", package: "gertie"),
         .product(name: "URLRouting", package: "swift-url-routing"),
         .product(name: "PairQL", package: "pairql"),
+        .product(name: "TSCodable", package: "ts-codable-macro"),
       ],
       swiftSettings: [.unsafeFlags(["-Xfrontend", "-warnings-as-errors"])],
     ),

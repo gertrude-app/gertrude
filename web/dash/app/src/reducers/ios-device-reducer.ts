@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 import type { ExtControlsState } from '../lib/extendedRestrictions';
 import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
-import type { AllowListBookmark, GetIOSDevice_v2, WebPolicy } from '@dash/types';
+import type { AllowListBookmark, GetIOSDevice_v3, WebPolicy } from '@dash/types';
 import { normalizeExtended } from '../lib/extendedRestrictions';
 
 export type State = {
@@ -47,7 +47,7 @@ export type Action =
   | { type: `setAllowEraseContentAndSettings`; value: boolean }
   | { type: `setAllowAppInstallation`; value: boolean }
   | { type: `setExtendedControls`; values: Partial<ExtControlsState> }
-  | { type: `receiveData`; data: GetIOSDevice_v2.Output };
+  | { type: `receiveData`; data: GetIOSDevice_v3.Output };
 
 function reducer(state: State, action: Action): void {
   switch (action.type) {
