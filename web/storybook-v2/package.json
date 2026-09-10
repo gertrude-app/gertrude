@@ -19,9 +19,7 @@
     "start": "storybook dev --port ${PORT:-6007} --config-dir ./.storybook --ci --disable-telemetry",
     "build": "storybook build --config-dir ./.storybook --disable-telemetry",
     "typecheck": "tsc --noEmit",
-    "visual:update": "pnpm run build && node scripts/screenshot-stories.js && rm -rf storybook-static",
-    "visual:update:existing": "node scripts/screenshot-stories.js",
-    "playwright:install": "playwright install chromium"
+    "visual:update": "bash scripts/update-screenshots.sh"
   },
   "dependencies": {
     "@gertrude/ui": "workspace:*",

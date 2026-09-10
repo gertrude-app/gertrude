@@ -1,15 +1,15 @@
 import { createReadStream } from 'node:fs';
 import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { cpus } from 'node:os';
 import { dirname, extname, join, normalize, relative, resolve, sep } from 'node:path';
 import { chromium } from 'playwright';
+import { waitForStoryToSettle } from './wait-for-story.js';
 
 const storybookDir = resolve(process.env.STORYBOOK_DIR ?? `storybook-static`);
 const outputDir = resolve(process.env.SCREENSHOT_DIR ?? `screenshots`);
 const host = process.env.STORYBOOK_HOST ?? `127.0.0.1`;
 const port = Number(process.env.STORYBOOK_PORT ?? 0);
-const defaultConcurrency = Math.min(Math.max(cpus().length - 1, 1), 4);
+const defaultConcurrency = 6;
 
 const mimeTypes = new Map([
   [`.css`, `text/css; charset=utf-8`],
@@ -124,31 +124,6 @@ async function readStories() {
   }
 
   return stories;
-}
-
-async function waitForStoryToSettle(page) {
-  await page.waitForSelector(`#storybook-root`, { state: `attached` });
-  await page.waitForFunction(
-    () => document.querySelector(`#storybook-root`)?.childNodes.length > 0,
-  );
-  await page.evaluate(async () => {
-    await document.fonts?.ready;
-    await Promise.all(
-      Array.from(document.images, (image) => {
-        if (image.complete) {
-          return undefined;
-        }
-
-        return new Promise((resolveImage) => {
-          image.addEventListener(`load`, resolveImage, { once: true });
-          image.addEventListener(`error`, resolveImage, { once: true });
-        });
-      }),
-    );
-    await new Promise((resolveAnimationFrame) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolveAnimationFrame)),
-    );
-  });
 }
 
 function cleanFileName(value) {
@@ -338,15 +313,15 @@ async function runWorkers(jobs, context, baseUrl) {
 
   await Promise.all(
     Array.from({ length: workerCount }, async () => {
-      const page = await context.newPage();
-      try {
-        while (nextJobIndex < jobs.length) {
-          const jobIndex = nextJobIndex;
-          nextJobIndex += 1;
+      while (nextJobIndex < jobs.length) {
+        const jobIndex = nextJobIndex;
+        nextJobIndex += 1;
+        const page = await context.newPage();
+        try {
           manifest[jobIndex] = await captureScreenshot(page, jobs[jobIndex], baseUrl);
+        } finally {
+          await page.close();
         }
-      } finally {
-        await page.close();
       }
     }),
   );
@@ -368,8 +343,12 @@ async function main() {
     const context = await browser.newContext({
       colorScheme: `light`,
       deviceScaleFactor: 2,
+      locale: `en-US`,
+      timezoneId: `UTC`,
       reducedMotion: `reduce`,
     });
+
+    await context.clock.setFixedTime(new Date(`2026-07-07T12:00:00Z`));
 
     const runtimeData = await readScreenshotParameters(context, stories, baseUrl);
     const jobs = createCaptureJobs(stories, runtimeData);
