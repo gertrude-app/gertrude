@@ -13,15 +13,18 @@ import type {
   SecurityEvent,
   SuspensionRequest,
 } from '#/components/types';
+import type { GetAccountUnlockRequestSummary } from '@shared/pairql/src/account';
 import CardContainer from '#/components/layout/CardContainer';
 import DashboardPage from '#/components/layout/DashboardPage';
 import PersonCard from '#/components/people/PersonCard';
 import RightColumnCard from '#/components/requests/RightColumnCard';
 import SecurityEventsPreviewCard from '#/components/requests/SecurityEventsPreviewCard';
 import SuspensionRequestsPreviewCard from '#/components/requests/SuspensionRequestsPreviewCard';
+import UnlockRequestsPreviewCard from '#/components/requests/UnlockRequestsPreviewCard';
 
 interface Props {
   peopleState: LoadableState<PersonCardPerson[]>;
+  unlockRequestSummary?: GetAccountUnlockRequestSummary.Output;
   suspensionRequestsState: LoadableState<SuspensionRequest[]>;
   securityEventsState: LoadableState<SecurityEvent[]>;
   onRefreshSuspensionRequests: () => void;
@@ -29,6 +32,8 @@ interface Props {
   onRefreshSecurityEvents: () => void;
   refreshingSecurityEvents?: boolean;
   addPersonHref: string;
+  unlockRequestsHref: string;
+  unlockRequestHrefForPerson: (personId: string) => string;
   suspensionRequestsHref: string;
   suspensionRequestHrefForRequest: (id: string) => string;
   securityEventsHref: string;
@@ -189,6 +194,7 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
 
 const PeoplePage: React.FC<Props> = ({
   peopleState,
+  unlockRequestSummary,
   suspensionRequestsState,
   securityEventsState,
   onRefreshSuspensionRequests,
@@ -196,6 +202,8 @@ const PeoplePage: React.FC<Props> = ({
   onRefreshSecurityEvents,
   refreshingSecurityEvents,
   addPersonHref,
+  unlockRequestsHref,
+  unlockRequestHrefForPerson,
   suspensionRequestsHref,
   suspensionRequestHrefForRequest,
   securityEventsHref,
@@ -234,6 +242,13 @@ const PeoplePage: React.FC<Props> = ({
         />
       </CardContainer>
       <VStack gap={6} className="shrink-0 @5xl/main:w-72">
+        {unlockRequestSummary && (
+          <UnlockRequestsPreviewCard
+            summary={unlockRequestSummary}
+            viewAllHref={unlockRequestsHref}
+            reviewHrefForPerson={unlockRequestHrefForPerson}
+          />
+        )}
         <SuspensionRequestsContent
           state={suspensionRequestsState}
           onRefresh={onRefreshSuspensionRequests}

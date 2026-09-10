@@ -19,11 +19,18 @@ import { useQuery } from '#/pairql/query';
 
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
+  const unlockRequests = useQuery(
+    Key.unlockRequests,
+    () => liveClient.getAccountUnlockRequestSummary(),
+    { refetchInterval: 30_000 },
+  );
   const suspensionRequests = useQuery(
     Key.suspensionRequests,
     () => liveClient.getSuspensionRequests(),
     { refetchInterval: 30_000 },
   );
+  const requestCount =
+    (unlockRequests.data?.totalCount ?? 0) + (suspensionRequests.data?.length ?? 0);
   const isSelected = (href: string): boolean =>
     pathname === href || pathname.startsWith(`${href}/`);
 
@@ -57,9 +64,9 @@ const AuthedLayout: React.FC = () => {
           <SidebarItem
             title="Requests"
             icon={InboxIcon}
-            href="/requests/suspension"
+            href="/requests/unlock"
             selected={isSelected(`/requests`)}
-            badgeCount={suspensionRequests.data?.length}
+            badgeCount={requestCount || undefined}
           />
           <SidebarItem
             title="Activity"

@@ -10,6 +10,7 @@ export type SuspensionRequestsState = LoadableState<SuspensionRequest[]>;
 
 interface Props {
   state: SuspensionRequestsState;
+  unlockRequestCount?: number;
   refreshing?: boolean;
   onRefresh: () => void;
   responseHrefForRequest: (id: string) => string;
@@ -108,12 +109,14 @@ const RequestsContent: React.FC<RequestsContentProps> = ({
 
 const SuspensionRequestsPage: React.FC<Props> = ({
   state,
+  unlockRequestCount,
   refreshing,
   onRefresh,
   responseHrefForRequest,
 }) => (
   <RequestsShellPage
     selected="suspension"
+    unlockRequestCount={unlockRequestCount}
     suspensionRequestCount={state.status === `success` ? state.data.length : undefined}
   >
     <RequestsContent

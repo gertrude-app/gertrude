@@ -187,29 +187,6 @@ export type Notification = {
   method: NotificationMethod;
 };
 
-export type KeyAddressType = `standard` | `strict` | `ipAddress` | `regExp`;
-
-export type KeyScopeType = `allApps` | `webBrowsers` | `singleApp`;
-
-export type UnlockKey = {
-  domain: string;
-  addressType: KeyAddressType;
-  scope: {
-    type: KeyScopeType;
-    bundleId?: string;
-  };
-  expiration?: Date;
-  note?: string;
-};
-
-export type UnlockRequestKeyDraft = {
-  id: string;
-  allowed: boolean;
-  key: UnlockKey;
-  moreOptionsExpanded: boolean;
-  keychainId: string;
-};
-
 export type ButtonLink = {
   text: string;
   href: string;

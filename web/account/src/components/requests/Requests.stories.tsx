@@ -1,6 +1,5 @@
 import {
   StoryCanvas,
-  StoryScreen,
   StorySection,
   galleryParameters,
 } from '@gertrude/ui/src/storybook/StoryLayout';
@@ -8,18 +7,42 @@ import SecurityEventsPreviewCard from './SecurityEventsPreviewCard';
 import SuspensionRequestCard from './SuspensionRequestCard';
 import SuspensionRequestsPreviewCard from './SuspensionRequestsPreviewCard';
 import UnlockRequestCard from './UnlockRequestCard';
-import UnlockRequestResponsePanel from './UnlockRequestResponsePanel';
 import UnlockRequestsPreviewCard from './UnlockRequestsPreviewCard';
 import {
   keychains,
   securityEvents,
   suspensionRequests,
-  unlockRequests,
 } from '#/components/storybook/fixtures';
+import { buildUnlockReview } from '#/lib/unlockRequests';
 
 const noop = (): void => {};
 const responseHrefForRequest = (id: string): string => `/requests/suspension/${id}`;
-const expandedUnlockDomain = unlockRequests[0]!.domains[0]!;
+const unlockSummary = {
+  totalCount: 4,
+  people: [
+    {
+      id: `person-jude`,
+      name: `Jude`,
+      pendingCount: 4,
+      targets: [`youtube.com`, `school.example.com`, `scratch.mit.edu`, `wikipedia.org`],
+    },
+  ],
+};
+const unlockReview = buildUnlockReview(
+  [
+    {
+      id: `request-youtube`,
+      domain: `youtube.com`,
+      requestComment: `Can I watch a tutorial?`,
+      appName: `Safari`,
+      appSlug: `safari`,
+      appBundleId: `com.apple.Safari`,
+      appCategories: [`browser`],
+      createdAt: `2026-07-03T14:05:00Z`,
+    },
+  ],
+  keychains[0]!.id,
+)[0]!;
 
 const meta = {
   title: 'Account/Components/Requests/Cards and Panels',
@@ -43,8 +66,9 @@ export const Cards = {
           responseHrefForRequest={responseHrefForRequest}
         />
         <UnlockRequestsPreviewCard
-          unlockRequests={unlockRequests}
+          summary={unlockSummary}
           viewAllHref="/requests/unlock"
+          reviewHrefForPerson={(personId) => `/requests/unlock/${personId}`}
         />
         <SecurityEventsPreviewCard
           state={{ status: `success`, data: securityEvents }}
@@ -74,37 +98,17 @@ export const Cards = {
           request={suspensionRequests[0]!}
           responseHref={responseHrefForRequest(suspensionRequests[0]!.id)}
         />
-        <UnlockRequestCard
-          request={unlockRequests[0]!}
-          keychainOptions={keychains.map((keychain) => ({
-            id: keychain.id,
-            name: keychain.name,
-          }))}
-          onDeny={noop}
-          onAllow={noop}
-        />
+        {unlockReview.kind === `web` && (
+          <UnlockRequestCard
+            group={unlockReview.group}
+            keychainOptions={keychains.map((keychain) => ({
+              id: keychain.id,
+              name: keychain.name,
+            }))}
+            onChange={noop}
+          />
+        )}
       </StorySection>
     </StoryCanvas>
-  ),
-};
-
-export const UnlockResponsePanel = {
-  name: 'Unlock response panel',
-  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => (
-    <StoryScreen>
-      <div className="h-screen bg-white pt-8">
-        <UnlockRequestResponsePanel
-          domains={unlockRequests[0]!.domains}
-          defaultExpandedDomains={[expandedUnlockDomain]}
-          keychainOptions={keychains.map((keychain) => ({
-            id: keychain.id,
-            name: keychain.name,
-          }))}
-          onDenyAll={noop}
-          onSave={noop}
-        />
-      </div>
-    </StoryScreen>
   ),
 };

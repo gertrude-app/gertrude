@@ -1,60 +1,72 @@
-import { Card, HStack, Text, VStack } from '@gertrude/ui';
+import { Badge, Card, HStack, Text, VStack, inflect } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
-import type { UnlockRequest } from '#/components/types';
+import type { GetAccountUnlockRequestSummary } from '@shared/pairql/src/account';
 import RightColumnCard from './RightColumnCard';
-import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
-  unlockRequests: UnlockRequest[];
+  summary: GetAccountUnlockRequestSummary.Output;
   viewAllHref: string;
+  reviewHrefForPerson: (personId: string) => string;
 }
 
-const UnlockRequestsPreviewCard: React.FC<Props> = ({ unlockRequests, viewAllHref }) => (
-  <RightColumnCard
-    title="Unlock Requests"
-    links={[
-      {
-        text: `View all`,
-        href: viewAllHref,
-        icon: ArrowRightIcon,
-        iconPosition: `right`,
-        variant: `ghost`,
-      },
-    ]}
-  >
-    <Card padding={3}>
-      <VStack>
-        {unlockRequests.slice(0, 3).map((request) => (
-          <VStack
-            as="a"
-            key={request.id}
-            href={request.reviewHref ?? viewAllHref}
-            className="border-b last:border-b-0 border-stone-200/80 py-3 first:pt-0 last:pb-0 cursor-pointer"
-          >
-            <Text variant="bodyStrong">{request.personName}</Text>
-            <HStack wrap gap={1} className="mt-0.5">
-              {request.domains.slice(0, 4).map((domain) => (
-                <Text
-                  key={domain}
-                  variant="captionSubtleStrong"
-                  className="bg-stone-50 border border-stone-200 px-1 rounded"
-                >
-                  {domain}
-                </Text>
-              ))}
-              {request.domains.length > 4 && (
-                <Text variant="captionMuted">+ {request.domains.length - 4} more</Text>
-              )}
-            </HStack>
-            {request.reason && (
-              <MessageBubble className="mt-3">{request.reason}</MessageBubble>
-            )}
-          </VStack>
-        ))}
-      </VStack>
-    </Card>
-  </RightColumnCard>
-);
+const UnlockRequestsPreviewCard: React.FC<Props> = ({
+  summary,
+  viewAllHref,
+  reviewHrefForPerson,
+}) => {
+  if (summary.people.length === 0) {
+    return null;
+  }
+
+  return (
+    <RightColumnCard
+      title="Unlock Requests"
+      links={[
+        {
+          text: `View all`,
+          href: viewAllHref,
+          icon: ArrowRightIcon,
+          iconPosition: `right`,
+          variant: `ghost`,
+        },
+      ]}
+    >
+      <Card padding={3}>
+        <VStack>
+          {summary.people.slice(0, 3).map((person) => (
+            <VStack
+              as="a"
+              key={person.id}
+              href={reviewHrefForPerson(person.id)}
+              className="cursor-pointer border-b border-stone-200/80 py-3 first:pt-0 last:border-b-0 last:pb-0"
+            >
+              <HStack justify="between" gap={2}>
+                <Text variant="bodyStrong">{person.name}</Text>
+                <Badge color="violet" size="xsmall">
+                  {person.pendingCount} {inflect(`request`, person.pendingCount)}
+                </Badge>
+              </HStack>
+              <HStack wrap gap={1} className="mt-0.5">
+                {person.targets.slice(0, 3).map((target) => (
+                  <Text
+                    key={target}
+                    variant="captionSubtleStrong"
+                    className="max-w-full truncate rounded border border-stone-200 bg-stone-50 px-1"
+                  >
+                    {target}
+                  </Text>
+                ))}
+                {person.targets.length > 3 && (
+                  <Text variant="captionMuted">+ {person.targets.length - 3} more</Text>
+                )}
+              </HStack>
+            </VStack>
+          ))}
+        </VStack>
+      </Card>
+    </RightColumnCard>
+  );
+};
 
 export default UnlockRequestsPreviewCard;
