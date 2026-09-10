@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
+import { normalizePath } from '../lib/utils';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
 import VStack from '../primitives/VStack';
@@ -16,13 +17,6 @@ interface Props {
   tabs: Tab[];
   className?: string;
 }
-
-const normalizePath = (path: string): string => {
-  const withLeadingSlash = path.startsWith(`/`) ? path : `/${path}`;
-  return withLeadingSlash === `/`
-    ? withLeadingSlash
-    : withLeadingSlash.replace(/\/+$/, ``);
-};
 
 const normalizeSegment = (segment: string): string => segment.replace(/^\/+|\/+$/g, ``);
 
