@@ -1,7 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { QueryResult } from './query';
-import type { Child, GetIdentifiedApps, KeychainSummary } from '@dash/types';
+import type {
+  Child,
+  GetComputerStatuses,
+  GetIdentifiedApps,
+  KeychainSummary,
+} from '@dash/types';
 import type { MutableRefObject } from 'react';
 import Current from '../environment';
 import { useAuth } from './auth';
@@ -24,6 +29,12 @@ export function useSelectableKeychains(): QueryResult<{
 
 export function useApps(): QueryResult<GetIdentifiedApps.Output> {
   return useQuery(Key.apps, Current.api.getIdentifiedApps);
+}
+
+export function useComputerStatuses(): QueryResult<GetComputerStatuses.Output> {
+  return useQuery(Key.computerStatuses, Current.api.getComputerStatuses, {
+    refetchIntervalSeconds: 30,
+  });
 }
 
 export function useLoginRedirect(): string | null {

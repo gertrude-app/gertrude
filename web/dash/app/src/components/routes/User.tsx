@@ -4,7 +4,13 @@ import { Navigate, useParams } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 import type { Child, PrepIOSAppConnection } from '@dash/types';
 import Current from '../../environment';
-import { Key, useConfirmableDelete, useMutation, useQuery } from '../../hooks';
+import {
+  Key,
+  useComputerStatuses,
+  useConfirmableDelete,
+  useMutation,
+  useQuery,
+} from '../../hooks';
 import ReqState from '../../lib/ReqState';
 import * as empty from '../../lib/empty';
 import { isDirty } from '../../lib/helpers';
@@ -23,6 +29,7 @@ const UserRoute: React.FC = () => {
     onReceive: (child) => dispatch({ type: `setChild`, child }),
     enabled: id !== `new` && state.child?.isNew !== true,
   });
+  const statusesQuery = useComputerStatuses();
 
   const addDevice = useMutation((childId: UUID) =>
     Current.api.macAppConnectionCode({ childId }),
@@ -83,6 +90,12 @@ const UserRoute: React.FC = () => {
 
   const { child } = state;
   const { draft, original } = child;
+  const computers = original.computers.map((computer) => ({
+    ...computer,
+    status:
+      statusesQuery.data?.find((status) => status.computerUserId === computer.id)
+        ?.status ?? computer.status,
+  }));
 
   return (
     <EditChild
@@ -90,7 +103,7 @@ const UserRoute: React.FC = () => {
       name={draft.name}
       id={draft.id}
       setName={(name) => dispatch({ type: `setName`, name })}
-      computers={original.computers}
+      computers={computers}
       iosDevices={original.iosDevices}
       deleteUser={deleteChild}
       startAddDevice={() => addDevice.mutate(id)}

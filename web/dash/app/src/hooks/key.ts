@@ -12,6 +12,7 @@ import type {
   GetBlockerClaimData,
   GetChild,
   GetChildren,
+  GetComputerStatuses,
   GetDevice,
   GetIOSDeviceClaimData,
   GetIOSDeviceSupervisionStatus,
@@ -90,6 +91,10 @@ export class Key extends QueryKey<never> {
 
   static get allDevices(): QueryKey<GetAllDevices.Output> {
     return new QueryKey(`devices`, [`devices`]);
+  }
+
+  static get computerStatuses(): QueryKey<GetComputerStatuses.Output> {
+    return new QueryKey(`computer-statuses`, [`computer-statuses`]);
   }
 
   static computer(id: UUID): QueryKey<GetDevice.Output> {

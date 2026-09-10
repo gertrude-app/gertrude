@@ -19,6 +19,7 @@ struct DashboardWidgets_v3: Pair {
 
   struct DeviceInfo: PairNestable {
     var platform: DevicePlatform
+    var computerUserId: ComputerUser.Id?
     var deviceName: String
     var macStatus: ChildComputerStatus?
     var iosStatus: IOSDeviceStatus?
@@ -178,6 +179,7 @@ extension DashboardWidgets_v3: NoInputResolver {
               ?? "Mac"
             return await DeviceInfo(
               platform: .mac,
+              computerUserId: computerUser.id,
               deviceName: deviceName,
               macStatus: computerUser.status(),
               iosStatus: nil,
@@ -195,6 +197,7 @@ extension DashboardWidgets_v3: NoInputResolver {
                 : .pendingSetup
             return DeviceInfo(
               platform: .ios,
+              computerUserId: nil,
               deviceName: device.modelName,
               macStatus: nil,
               iosStatus: status,

@@ -26,6 +26,7 @@ export const MacOnly: Story = props({
       modelTitle: `16" MacBook Pro (2023)`,
       users: [
         {
+          computerUserId: `computer-user-1`,
           name: `Franny`,
           status: { case: `filterOn` },
           id: `child-1`,
@@ -38,6 +39,7 @@ export const MacOnly: Story = props({
       modelTitle: `15" MacBook Air (2023)`,
       users: [
         {
+          computerUserId: `computer-user-2`,
           name: `Zooey`,
           status: {
             case: `filterSuspended`,
@@ -54,11 +56,13 @@ export const MacOnly: Story = props({
       modelTitle: `27" iMac (2021)`,
       users: [
         {
+          computerUserId: `computer-user-3`,
           name: `Franny`,
           status: { case: `offline` },
           id: `child-1`,
         },
         {
+          computerUserId: `computer-user-4`,
           name: `Zooey`,
           status: { case: `filterOn` },
           id: `child-2`,
@@ -110,6 +114,7 @@ export const Mixed: Story = props({
       modelTitle: `16" MacBook Pro (2023)`,
       users: [
         {
+          computerUserId: `computer-user-5`,
           name: `Franny`,
           status: { case: `filterOn` },
           id: `child-1`,
@@ -123,11 +128,13 @@ export const Mixed: Story = props({
       modelTitle: `27" iMac (2021)`,
       users: [
         {
+          computerUserId: `computer-user-6`,
           name: `Franny`,
           status: { case: `offline` },
           id: `child-1`,
         },
         {
+          computerUserId: `computer-user-7`,
           name: `Zooey`,
           status: { case: `filterOn` },
           id: `child-2`,

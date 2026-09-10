@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { ReleaseChannel } from '@dash/types';
 import Current from '../../environment';
-import { Key, useMutation, useQuery, useZip } from '../../hooks';
+import { Key, useComputerStatuses, useMutation, useQuery, useZip } from '../../hooks';
 
 const Computer: React.FC = () => {
   const { computerId: id = `` } = useParams<{ computerId: string }>();
@@ -17,6 +17,7 @@ const Computer: React.FC = () => {
   const latestAppVersions = useQuery(Key.latestAppVersions, () =>
     Current.api.latestAppVersions(),
   );
+  const statusesQuery = useComputerStatuses();
   const saveComputer = useMutation(
     () =>
       Current.api.saveDevice({
@@ -37,6 +38,12 @@ const Computer: React.FC = () => {
   if (zip.isPending) return <Loading />;
   if (zip.isError) return <ApiErrorMessage error={zip.error} />;
   const [deviceData, appVersionsData] = zip.data;
+  const users = deviceData.users.map((user) => ({
+    ...user,
+    status:
+      statusesQuery.data?.find((status) => status.computerUserId === user.computerUserId)
+        ?.status ?? user.status,
+  }));
 
   return (
     <EditComputer
@@ -49,7 +56,7 @@ const Computer: React.FC = () => {
       modelIdentifier={deviceData.modelIdentifier}
       appVersion={deviceData.appVersion}
       latestReleaseVersion={appVersionsData[releaseChannel]}
-      users={deviceData.users}
+      users={users}
       saveButtonDisabled={
         releaseChannel === deviceData.releaseChannel &&
         name.trim() === (deviceData.name ?? ``).trim()

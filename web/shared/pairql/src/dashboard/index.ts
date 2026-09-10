@@ -27,6 +27,7 @@ export * from './pairs/GetBatchUnlockRequestData';
 export * from './pairs/GetBlockerClaimData';
 export * from './pairs/GetChild';
 export * from './pairs/GetChildren';
+export * from './pairs/GetComputerStatuses';
 export * from './pairs/GetDevice';
 export * from './pairs/GetIdentifiedApps';
 export * from './pairs/GetInstalledMacApps';

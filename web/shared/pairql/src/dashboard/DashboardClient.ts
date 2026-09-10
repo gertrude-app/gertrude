@@ -222,6 +222,16 @@ export default class DashboardClient extends Client<Auth> {
     return this.query<P.GetChildren.Output>(input, `GetChildren`, `parent`);
   };
 
+  public getComputerStatuses = (
+    input: P.GetComputerStatuses.Input,
+  ): Promise<Result<P.GetComputerStatuses.Output>> => {
+    return this.query<P.GetComputerStatuses.Output>(
+      input,
+      `GetComputerStatuses`,
+      `parent`,
+    );
+  };
+
   public getDevice = (input: P.GetDevice.Input): Promise<Result<P.GetDevice.Output>> => {
     return this.query<P.GetDevice.Output>(input, `GetDevice`, `parent`);
   };

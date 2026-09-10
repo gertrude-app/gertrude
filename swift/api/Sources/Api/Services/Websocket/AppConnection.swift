@@ -5,6 +5,32 @@ import Tagged
 import Vapor
 import XCore
 
+struct ComputerUserStatus: Equatable, Sendable {
+  enum SnapshotFreshness: Equatable, Sendable {
+    case fresh
+    case stale
+    case unsupported
+    case missing
+  }
+
+  let apiReachable: Bool
+  let effectiveFilterStatus: ChildComputerStatus?
+  let snapshotReceivedAt: Date?
+  let snapshotFreshness: SnapshotFreshness
+
+  var legacyStatus: ChildComputerStatus {
+    guard self.apiReachable, self.snapshotFreshness != .stale else { return .offline }
+    return self.effectiveFilterStatus ?? .offline
+  }
+
+  static let unreachable = Self(
+    apiReachable: false,
+    effectiveFilterStatus: nil,
+    snapshotReceivedAt: nil,
+    snapshotFreshness: .missing,
+  )
+}
+
 final class AppConnection: Sendable {
   struct Ids: Sendable {
     let computerUser: ComputerUser.Id
@@ -12,20 +38,27 @@ final class AppConnection: Sendable {
     let keychains: [Keychain.Id]
   }
 
-  enum FilterStateData: Sendable {
-    case withoutTimes(FilterState.WithoutTimes)
-    case withTimes(FilterState.WithTimes)
+  struct FilterStateData: Sendable {
+    enum Value: Sendable {
+      case withoutTimes(FilterState.WithoutTimes)
+      case withTimes(FilterState.WithTimes)
+    }
+
+    let value: Value
+    let receivedAt: Date
   }
 
   let id: Id
   let ids: Ids
+  let appVersion: Semver
   let ws: any WebsocketProtocol
   let filterState: Mutex<FilterStateData?> = Mutex(nil)
   let lastActivity = Mutex(Date())
 
-  init(ws: any WebsocketProtocol, ids: Ids) {
+  init(ws: any WebsocketProtocol, ids: Ids, appVersion: Semver) {
     self.id = .init(UUID())
     self.ids = ids
+    self.appVersion = appVersion
     self.ws = ws
     // https://github.com/vapor/websocket-kit/issues/139
     self.ws.eventLoop.execute {
@@ -79,9 +112,13 @@ final class AppConnection: Sendable {
     self.log("got message", extra: "\(message)")
     switch message {
     case .currentFilterState(let filterStateWithoutTimes):
-      self.filterState.withLock { $0 = .withoutTimes(filterStateWithoutTimes) }
+      self.filterState.withLock {
+        $0 = .init(value: .withoutTimes(filterStateWithoutTimes), receivedAt: Date())
+      }
     case .currentFilterState_v2(let filterState):
-      self.filterState.withLock { $0 = .withTimes(filterState) }
+      self.filterState.withLock {
+        $0 = .init(value: .withTimes(filterState), receivedAt: Date())
+      }
     case .goingOffline:
       Task { await with(dependency: \.websockets).remove(self) }
     }
