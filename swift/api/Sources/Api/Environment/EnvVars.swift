@@ -14,6 +14,7 @@ public struct Env: Sendable {
   public var appStoreConnect: AppStoreConnect
   public var primarySupportEmail: String
   public var supportRotationEmails: [String]
+  public var signupNotificationEmail: String
   public var superAdminEmail: String
   public var cloudflareSecret: String
   public var keychainCrawler: KeychainCrawler
@@ -159,6 +160,7 @@ extension Env: DependencyKey {
       ),
       primarySupportEmail: processEnv("PRIMARY_SUPPORT_EMAIL"),
       supportRotationEmails: processEnvList("SUPPORT_ROTATION_EMAILS"),
+      signupNotificationEmail: processEnv("SIGNUP_NOTIFICATION_EMAIL"),
       superAdminEmail: processEnv("SUPER_ADMIN_EMAIL"),
       cloudflareSecret: processEnv("CLOUDFLARE_SECRET"),
       keychainCrawler: KeychainCrawler(
