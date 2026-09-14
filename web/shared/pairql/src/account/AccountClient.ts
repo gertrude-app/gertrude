@@ -102,6 +102,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public decideUnlockRequests = (
+    input: P.DecideUnlockRequests.Input,
+  ): Promise<Result<P.DecideUnlockRequests.Output>> => {
+    return this.query<P.DecideUnlockRequests.Output>(
+      input,
+      `DecideUnlockRequests`,
+      `parent`,
+    );
+  };
+
   public deleteAccountKey = (
     input: P.DeleteAccountKey.Input,
   ): Promise<Result<P.DeleteAccountKey.Output>> => {
@@ -166,6 +176,16 @@ export default class AccountClient extends Client<Auth> {
     input: P.GetAccountSettings.Input,
   ): Promise<Result<P.GetAccountSettings.Output>> => {
     return this.query<P.GetAccountSettings.Output>(input, `GetAccountSettings`, `parent`);
+  };
+
+  public getAccountUnlockRequestSummary = (
+    input: P.GetAccountUnlockRequestSummary.Input,
+  ): Promise<Result<P.GetAccountUnlockRequestSummary.Output>> => {
+    return this.query<P.GetAccountUnlockRequestSummary.Output>(
+      input,
+      `GetAccountUnlockRequestSummary`,
+      `parent`,
+    );
   };
 
   public getActivitySummaries = (
@@ -246,6 +266,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.GetPersonMacSettings.Output>(
       input,
       `GetPersonMacSettings`,
+      `parent`,
+    );
+  };
+
+  public getPersonUnlockRequests = (
+    input: P.GetPersonUnlockRequests.Input,
+  ): Promise<Result<P.GetPersonUnlockRequests.Output>> => {
+    return this.query<P.GetPersonUnlockRequests.Output>(
+      input,
+      `GetPersonUnlockRequests`,
       `parent`,
     );
   };

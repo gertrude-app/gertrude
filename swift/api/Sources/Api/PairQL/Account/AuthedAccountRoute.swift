@@ -41,6 +41,9 @@ enum AuthedAccountRoute: PairRoute {
   case requestAccountPublicKeychain(RequestAccountPublicKeychain.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
+  case getAccountUnlockRequestSummary
+  case getPersonUnlockRequests(GetPersonUnlockRequests.Input)
+  case decideUnlockRequests(DecideUnlockRequests.Input)
   case getSecurityEvents
   case getActivitySummaries(GetActivitySummaries.Input)
   case getDayActivity(GetDayActivity.Input)
@@ -195,6 +198,17 @@ enum AuthedAccountRoute: PairRoute {
       Operation(DecideSuspensionRequest.self)
       Body(.accountInput(DecideSuspensionRequest.self))
     }
+    Route(.case(Self.getAccountUnlockRequestSummary)) {
+      Operation(GetAccountUnlockRequestSummary.self)
+    }
+    Route(.case(Self.getPersonUnlockRequests)) {
+      Operation(GetPersonUnlockRequests.self)
+      Body(.accountInput(GetPersonUnlockRequests.self))
+    }
+    Route(.case(Self.decideUnlockRequests)) {
+      Operation(DecideUnlockRequests.self)
+      Body(.accountInput(DecideUnlockRequests.self))
+    }
     Route(.case(Self.getSecurityEvents)) {
       Operation(GetSecurityEvents.self)
     }
@@ -341,6 +355,15 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .decideSuspensionRequest(let input):
       let output = try await DecideSuspensionRequest.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getAccountUnlockRequestSummary:
+      let output = try await GetAccountUnlockRequestSummary.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getPersonUnlockRequests(let input):
+      let output = try await GetPersonUnlockRequests.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .decideUnlockRequests(let input):
+      let output = try await DecideUnlockRequests.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getSecurityEvents:
       let output = try await GetSecurityEvents.resolve(in: context)
