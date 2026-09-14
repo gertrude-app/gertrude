@@ -76,6 +76,11 @@ struct BillingAccountSnapshot: Sendable {
     self.capabilities.contains(capability)
   }
 
+  var supervisedIOSDeviceLimit: Int? {
+    if self.billingIdentity?.isComplimentary == true { return nil }
+    return self.liveSubscription?.tier.supervisedIOSDeviceLimit ?? 0
+  }
+
   var monthlyPrice: Cents<Int>? {
     guard let sub = self.stripeSubscription, sub.stripeStatus.isPaying else {
       return nil
@@ -112,6 +117,14 @@ extension StripeSubscription.Tier {
     case .light: [.superviseIosDevice]
     case .medium: [.superviseIosDevice, .useGertrudeMusic]
     case .full: [.superviseIosDevice, .connectMacApp, .useGertrudeMusic]
+    }
+  }
+
+  var supervisedIOSDeviceLimit: Int {
+    switch self {
+    case .light: 5
+    case .medium: 10
+    case .full: 20
     }
   }
 }

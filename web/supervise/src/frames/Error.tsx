@@ -22,6 +22,20 @@ function getErrorContent(
         title: `Supervision Unsuccessful`,
         message: `The ${deviceType} doesn't appear to be supervised. You can try the process again, or contact support for help.`,
       };
+    case `deviceLimitReached`:
+      return {
+        title: `Device Limit Reached`,
+        message:
+          errorMessage ??
+          `This account has supervised more devices than Gertrude allows. Get in touch and we'll sort it out with you.`,
+      };
+    case `serverRejected`:
+      return {
+        title: `Can't Continue`,
+        message:
+          errorMessage ??
+          `Gertrude couldn't start supervising this ${deviceType}. Please try again or contact support.`,
+      };
     case `invokeFailed`:
     default:
       return {
@@ -71,14 +85,16 @@ const Error: React.FC<ErrorProps> = ({
             <Button
               type="button"
               onClick={onContactSupport}
-              color="secondary"
+              color={errorType === `deviceLimitReached` ? `gradient` : `secondary`}
               size="large"
             >
               Contact Support
             </Button>
-            <Button type="button" onClick={onRetry} color="gradient" size="large">
-              Try Again &rarr;
-            </Button>
+            {errorType !== `deviceLimitReached` && (
+              <Button type="button" onClick={onRetry} color="gradient" size="large">
+                Try Again &rarr;
+              </Button>
+            )}
           </div>
         </div>
       </div>

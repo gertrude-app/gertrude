@@ -188,6 +188,14 @@ final class CapabilityTests: DependencyTestCase {
     ).toEqual(.startCheckout(tier: .light))
   }
 
+  func testSupervisedDeviceLimits() {
+    expect(billing(tier: .light, status: .active).supervisedIOSDeviceLimit).toEqual(5)
+    expect(billing(tier: .medium, status: .active).supervisedIOSDeviceLimit).toEqual(10)
+    expect(billing(tier: .full, status: .active).supervisedIOSDeviceLimit).toEqual(20)
+    expect(billing(comp: true).supervisedIOSDeviceLimit).toBeNil()
+    expect(billing().supervisedIOSDeviceLimit).toEqual(0)
+  }
+
   func testCanConnectMacAppForFull() {
     expect(billing(tier: .full, status: .active).can(.connectMacApp)).toBeTrue()
   }
