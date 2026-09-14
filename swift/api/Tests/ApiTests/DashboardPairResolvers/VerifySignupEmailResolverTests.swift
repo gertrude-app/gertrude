@@ -25,6 +25,27 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
     expect(method.config).toEqual(.email(email: parent.email.rawValue))
   }
 
+  func testCompletedSignupNotifiesSignupRecipientInsteadOfSuperAdmin() async throws {
+    let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
+    let token = await with(dependency: \.ephemeral).createParentIdToken(parent.id)
+    let emailSent = self.expectation(description: "Signup notification sent")
+    emailSent.assertForOverFulfill = true
+
+    try await withDependencies {
+      $0.env.mode = .prod
+      $0.env.signupNotificationEmail = "welcome@example.com"
+      $0.env.superAdminEmail = "operations@example.com"
+      $0.postmark._sendEmail = { email in
+        expect(email.to).toEqual("welcome@example.com")
+        emailSent.fulfill()
+        return .success(())
+      }
+    } operation: {
+      _ = try await VerifySignupEmail.resolve(with: .init(token: token), in: self.context)
+      await self.fulfillment(of: [emailSent], timeout: 2)
+    }
+  }
+
   func testVerifySignupEmailReturnsClaimCodeAndApp() async throws {
     let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let token = await with(dependency: \.ephemeral).createParentIdToken(

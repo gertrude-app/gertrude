@@ -3,6 +3,22 @@
 Gertrude uses Postmark for sending templated emails. Templates are stored locally and
 synced to Postmark.
 
+## Internal Signup Notifications
+
+Completed-signup alerts are ordinary Postmark emails, not synced templates. They are sent
+immediately after the first successful email verification in production and include a link
+to the parent's staff-admin page. Recognized test signups do not send alerts.
+
+`SIGNUP_NOTIFICATION_EMAIL` is required in every API runtime environment. It does not copy
+or fall back to `SUPER_ADMIN_EMAIL`, which continues to receive other operational alerts.
+Set it in staging and production before deploying code that requires it; changing a local
+`.env` does not configure either server. Non-production environments still never send
+completed-signup alerts.
+
+This setting does not send customer welcome emails or delay notifications. For manual
+welcomes, wait at least 90 minutes, check the linked account's app usage, and compose a new
+email to the parent rather than replying to the internal notification.
+
 ## Template Locations
 
 ```

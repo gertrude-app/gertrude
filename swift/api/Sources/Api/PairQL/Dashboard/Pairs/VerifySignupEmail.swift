@@ -60,8 +60,13 @@ extension VerifySignupEmail: Resolver {
             .email(to: .parent(referrer.id), text: referrer.email.rawValue)
           body += "<br/>referral: \(referrer.referralCode ?? "(unknown)") from \(referrerLink)"
         }
-        with(dependency: \.postmark)
-          .toSuperAdmin(referrer != nil ? "REFERRED signup completed" : "signup completed", body)
+        Task { [body] in
+          try await with(dependency: \.postmark).send(
+            to: context.env.signupNotificationEmail,
+            subject: referrer != nil ? "REFERRED signup completed" : "signup completed",
+            html: body,
+          )
+        }
         await with(dependency: \.slack)
           .internal(.signups, "email verified: `\(parent.email.rawValue)`")
       }
