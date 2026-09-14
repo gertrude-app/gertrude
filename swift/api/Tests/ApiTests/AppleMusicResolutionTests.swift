@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 import XCTest
 import XExpect
@@ -445,35 +446,26 @@ final class AppleMusicResolutionTests: XCTestCase {
     expect(artist.topSongs.map(\.albumId)).toEqual(["own-a", "own-b"])
   }
 
-  func testAlbumHydrationBatchesAtOneHundred() async throws {
+  func testAlbumHydrationCompletesEachBatchBeforeFetchingNext() async throws {
     let ids = (0 ... 100).map { "album-\($0)" }
-    let references = ids.map { "{\"id\":\"\($0)\",\"type\":\"albums\"}" }
-      .joined(separator: ",")
     let loader = StubAppleMusicLoader { url in
       switch url.path {
       case "/v1/catalog/us/artists/artist-1":
-        return data("""
-        {
-          "data": [{
-            "id": "artist-1",
-            "attributes": {"name": "Artist"},
-            "views": {
-              "full-albums": {"data": [\(references)]},
-              "singles": {"data": []},
-              "live-albums": {"data": []},
-              "compilation-albums": {"data": []},
-              "top-songs": {"data": []}
-            }
-          }]
-        }
-        """)
+        return artistCollection(albumIds: ids)
       case "/v1/catalog/us/albums":
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         let batch = components?.queryItems?.first { $0.name == "ids" }?.value?
           .split(separator: ",").map(String.init) ?? []
-        return albumCollection(batch.map {
-          albumJson(id: $0, title: $0, artistIds: ["artist-1"])
+        return albumCollection(batch.reversed().map {
+          albumJson(
+            id: $0,
+            title: $0,
+            artistIds: $0 == "album-1" ? ["artist-1", "artist-2"] : ["artist-1"],
+            tracksNext: $0 == "album-0" ? "/album-0-tracks" : nil,
+          )
         })
+      case "/album-0-tracks":
+        return data("{\"data\":[\(songJson(id: "song-1", title: "Song", artistName: "Artist"))]}")
       default:
         throw StubError.unexpectedURL(url.absoluteString)
       }
@@ -485,9 +477,110 @@ final class AppleMusicResolutionTests: XCTestCase {
       load: loader.dataLoader,
     )
 
-    expect(artist.albums).toHaveCount(101)
+    expectNoDifference(artist.albums.map(\.id.rawValue), ids.filter { $0 != "album-1" })
+    expectNoDifference(artist.albums.first?.tracks.map(\.id.rawValue), ["song-1"])
     let albumBatchSizes = await loader.albumBatchSizes()
-    expect(albumBatchSizes).toEqual([100, 1])
+    expectNoDifference(albumBatchSizes, [100, 1])
+    let paths = await loader.requestPaths()
+    expectNoDifference(paths, [
+      "/v1/catalog/us/artists/artist-1",
+      "/v1/catalog/us/albums",
+      "/album-0-tracks",
+      "/v1/catalog/us/albums",
+    ])
+  }
+
+  func testArtistResolutionFailsWhenLaterBatchOmitsAnAlbum() async throws {
+    let ids = (0 ... 100).map { "album-\($0)" }
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/artists/artist-1":
+        return artistCollection(albumIds: ids)
+      case "/v1/catalog/us/albums":
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let batch = components?.queryItems?.first { $0.name == "ids" }?.value?
+          .split(separator: ",").map(String.init) ?? []
+        return albumCollection(batch.filter { $0 != "album-100" }.map {
+          albumJson(id: $0, title: $0, artistIds: ["artist-1"])
+        })
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    do {
+      _ = try await resolveAppleMusicCatalogArtist(
+        "artist-1",
+        storefront: .default,
+        load: loader.dataLoader,
+      )
+      XCTFail("expected missing album error")
+    } catch let error as AppleMusicResolutionError {
+      expectNoDifference(error, .missingResource(type: "album", id: "album-100"))
+    }
+  }
+
+  func testArtistResolutionRejectsMalformedTracksOnExcludedAlbums() async throws {
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/artists/artist-1":
+        artistCollection(albumIds: ["collab"])
+      case "/v1/catalog/us/albums":
+        albumCollection([albumJson(
+          id: "collab",
+          title: "Collaboration",
+          artistIds: ["artist-1", "artist-2"],
+          tracks: ["{\"id\":\"song-1\",\"type\":\"songs\"}"],
+        )])
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    do {
+      _ = try await resolveAppleMusicCatalogArtist(
+        "artist-1",
+        storefront: .default,
+        load: loader.dataLoader,
+      )
+      XCTFail("expected malformed track error")
+    } catch let error as AppleMusicResolutionError {
+      expectNoDifference(
+        error,
+        .incompleteResource(type: "song", id: "song-1", relationship: "attributes"),
+      )
+    }
+  }
+
+  func testArtistResolutionPropagatesTrackPaginationFailureOnExcludedAlbums() async throws {
+    let loader = StubAppleMusicLoader { url in
+      switch url.path {
+      case "/v1/catalog/us/artists/artist-1":
+        artistCollection(albumIds: ["collab"])
+      case "/v1/catalog/us/albums":
+        albumCollection([albumJson(
+          id: "collab",
+          title: "Collaboration",
+          artistIds: ["artist-1", "artist-2"],
+          tracksNext: "/failed-page",
+        )])
+      case "/failed-page":
+        throw StubError.pageFailed
+      default:
+        throw StubError.unexpectedURL(url.absoluteString)
+      }
+    }
+
+    do {
+      _ = try await resolveAppleMusicCatalogArtist(
+        "artist-1",
+        storefront: .default,
+        load: loader.dataLoader,
+      )
+      XCTFail("expected pagination error")
+    } catch let error as StubError {
+      expectNoDifference(error, .pageFailed)
+    }
   }
 
   func testMissingAlbumAndPartialPaginationFailTheWholeResolution() async throws {
@@ -588,6 +681,25 @@ actor StubAppleMusicLoader {
 enum StubError: Error, Equatable {
   case pageFailed
   case unexpectedURL(String)
+}
+
+private func artistCollection(albumIds: [String]) -> Data {
+  let references = albumIds.map { "{\"id\":\"\($0)\",\"type\":\"albums\"}" }.joined(separator: ",")
+  return data("""
+  {
+    "data": [{
+      "id": "artist-1",
+      "attributes": {"name": "Artist"},
+      "views": {
+        "full-albums": {"data": [\(references)]},
+        "singles": {"data": []},
+        "live-albums": {"data": []},
+        "compilation-albums": {"data": []},
+        "top-songs": {"data": []}
+      }
+    }]
+  }
+  """)
 }
 
 private func albumCollection(_ albums: [String]) -> Data {

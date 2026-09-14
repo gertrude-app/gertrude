@@ -1,3 +1,4 @@
+import CustomDump
 import DuetSQL
 import Foundation
 import XCTest
@@ -6,6 +7,36 @@ import XExpect
 @testable import Api
 
 final class MusicLibrarySnapshotRepositoryTests: ApiTestCase, @unchecked Sendable {
+  func testPolicyChangeReplacesUndecodablePayloadAndReturnsPersistedFields() async throws {
+    let child = try await self.child()
+    let first = try await Music.LibrarySnapshotRepository.publishAfterPolicyChange(
+      childId: child.id,
+      generatedAt: .reference + 0.123456789,
+      in: self.db,
+    )
+    try await self.db.execute(raw: """
+    UPDATE music.library_snapshots SET payload = '{}'::jsonb
+    WHERE id = \(bind: first.id.rawValue)
+    """)
+
+    let updated = try await Music.LibrarySnapshotRepository.publishAfterPolicyChange(
+      childId: child.id,
+      generatedAt: .reference + 100.123456789,
+      in: self.db,
+    )
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(for: child.id, in: self.db)
+    let persisted = try XCTUnwrap(snapshot)
+
+    expectNoDifference(updated.id, first.id)
+    expectNoDifference(updated.revision, first.revision + 1)
+    expectNoDifference(updated.payload.albums, [])
+    expectNoDifference(updated.id, persisted.id)
+    expectNoDifference(updated.childId, persisted.childId)
+    expectNoDifference(updated.revision, persisted.revision)
+    expectNoDifference(updated.createdAt, persisted.createdAt)
+    expectNoDifference(updated.payload, persisted.payload)
+  }
+
   func testPublishesAndRoundTripsCompleteSnapshot() async throws {
     let child = try await self.child()
     _ = try await self.db.create(Music.ApprovedAlbum(
