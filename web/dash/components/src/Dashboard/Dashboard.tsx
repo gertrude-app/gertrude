@@ -342,7 +342,7 @@ export const IOSConnectionCodeScreen: React.FC<{ childName: string; code: number
       <OnboardingRecommendation
         title="Download from the App Store"
         icon="fa-brands fa-app-store-ios"
-        href="https://apps.apple.com/app/gertrude/id6740543928"
+        href="https://apps.apple.com/us/app/gertrude-blocker/id6736368820"
         openInNewTab
         primary
       />
