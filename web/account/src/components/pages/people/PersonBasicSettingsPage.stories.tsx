@@ -3,6 +3,7 @@ import React from 'react';
 import type { Device, PersonRelationship } from '#/components/types';
 import PersonBasicSettingsPage from './PersonBasicSettingsPage';
 import PersonSettingsShellPage from './PersonSettingsShellPage';
+import ConnectMacModal from '#/components/devices/ConnectMacModal';
 import { devices } from '#/components/storybook/fixtures';
 
 const meta = {
@@ -32,6 +33,7 @@ const BasicSettingsStory: React.FC<BasicSettingsStoryProps> = ({
   const [relationshipDraft, setRelationshipDraft] = React.useState<PersonRelationship>(
     initialRelationshipDraft ?? relationship,
   );
+  const [connectMacOpen, setConnectMacOpen] = React.useState(false);
 
   return (
     <StoryScreen>
@@ -55,8 +57,17 @@ const BasicSettingsStory: React.FC<BasicSettingsStoryProps> = ({
             setRelationship(relationshipDraft);
           }}
           onDeletePerson={() => {}}
+          onConnectMac={() => setConnectMacOpen(true)}
         />
       </PersonSettingsShellPage>
+      <ConnectMacModal
+        open={connectMacOpen}
+        onOpenChange={setConnectMacOpen}
+        personName={personName}
+        state={{ case: `instructions` }}
+        onRequestCode={() => {}}
+        onStartTrial={() => {}}
+      />
     </StoryScreen>
   );
 };

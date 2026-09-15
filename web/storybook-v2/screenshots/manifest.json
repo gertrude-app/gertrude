@@ -288,6 +288,30 @@
     }
   },
   {
+    "id": "account-components-promo-card--trial-offer",
+    "iframePath": "/iframe.html?id=account-components-promo-card--trial-offer&viewMode=story",
+    "name": "Trial offer",
+    "path": "screenshots/mobile/account-components-promo-card--trial-offer.png",
+    "title": "Account/Components/Promo Card",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-promo-card--trial-offer",
+    "iframePath": "/iframe.html?id=account-components-promo-card--trial-offer&viewMode=story",
+    "name": "Trial offer",
+    "path": "screenshots/desktop/account-components-promo-card--trial-offer.png",
+    "title": "Account/Components/Promo Card",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-components-requests-cards-and-panels--unlock-response-panel",
     "iframePath": "/iframe.html?id=account-components-requests-cards-and-panels--unlock-response-panel&viewMode=story",
     "name": "Unlock response panel",
@@ -401,6 +425,54 @@
     "name": "Default",
     "path": "screenshots/desktop/account-design-references-people--default.png",
     "title": "Account/Design References/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-devices-connect-mac-modal--connection-code",
+    "iframePath": "/iframe.html?id=account-devices-connect-mac-modal--connection-code&viewMode=story",
+    "name": "Connection code",
+    "path": "screenshots/mobile/account-devices-connect-mac-modal--connection-code.png",
+    "title": "Account/Devices/Connect Mac Modal",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-devices-connect-mac-modal--connection-code",
+    "iframePath": "/iframe.html?id=account-devices-connect-mac-modal--connection-code&viewMode=story",
+    "name": "Connection code",
+    "path": "screenshots/desktop/account-devices-connect-mac-modal--connection-code.png",
+    "title": "Account/Devices/Connect Mac Modal",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-devices-connect-mac-modal--instructions",
+    "iframePath": "/iframe.html?id=account-devices-connect-mac-modal--instructions&viewMode=story",
+    "name": "Instructions",
+    "path": "screenshots/mobile/account-devices-connect-mac-modal--instructions.png",
+    "title": "Account/Devices/Connect Mac Modal",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-devices-connect-mac-modal--instructions",
+    "iframePath": "/iframe.html?id=account-devices-connect-mac-modal--instructions&viewMode=story",
+    "name": "Instructions",
+    "path": "screenshots/desktop/account-devices-connect-mac-modal--instructions.png",
+    "title": "Account/Devices/Connect Mac Modal",
     "viewport": {
       "width": 1440,
       "height": 900,

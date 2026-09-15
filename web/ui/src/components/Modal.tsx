@@ -2,6 +2,7 @@ import { Dialog } from '@base-ui/react/dialog';
 import cx from 'clsx';
 import React from 'react';
 import { Drawer } from 'vaul';
+import { useMediaQuery } from '../lib/utils';
 import Divider from '../primitives/Divider';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
@@ -12,6 +13,7 @@ export interface ModalProps {
   children?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
+  showHeader?: boolean;
   footer?: React.ReactNode;
   trigger?: React.ReactNode;
   open?: boolean;
@@ -21,23 +23,8 @@ export interface ModalProps {
   dismissible?: boolean;
   className?: string;
   bodyClassName?: string;
+  bodyPadding?: boolean;
 }
-
-const useMediaQuery = (query: string): boolean => {
-  const [matches, setMatches] = React.useState(false);
-
-  React.useEffect(() => {
-    const mediaQueryList = window.matchMedia(query);
-    const updateMatches = (): void => setMatches(mediaQueryList.matches);
-
-    updateMatches();
-    mediaQueryList.addEventListener(`change`, updateMatches);
-
-    return () => mediaQueryList.removeEventListener(`change`, updateMatches);
-  }, [query]);
-
-  return matches;
-};
 
 const sizeClasses = {
   small: `md:max-w-md`,
@@ -49,6 +36,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   title,
   description,
+  showHeader = true,
   footer,
   trigger,
   open,
@@ -58,6 +46,7 @@ const Modal: React.FC<ModalProps> = ({
   dismissible = true,
   className,
   bodyClassName,
+  bodyPadding = true,
 }) => {
   const isDesktop = useMediaQuery(`(min-width: 768px)`);
   const hasBody = children !== undefined && children !== null && children !== false;
@@ -105,18 +94,40 @@ const Modal: React.FC<ModalProps> = ({
           >
             <OverlayPortalProvider container={overlayPortalContainer}>
               <VStack className="max-h-[min(82vh,720px)] w-full overflow-hidden rounded-[inherit] bg-white">
-                <VStack gap={1} className="px-5 pb-4 pt-5">
-                  <Text as={Dialog.Title} variant="title">
-                    {title}
-                  </Text>
-                  {description && (
-                    <Text as={Dialog.Description} variant="prose">
-                      {description}
+                {showHeader ? (
+                  <VStack gap={1} className="px-5 pb-4 pt-5">
+                    <Text as={Dialog.Title} variant="title">
+                      {title}
                     </Text>
-                  )}
-                </VStack>
+                    {description && (
+                      <Text
+                        as={Dialog.Description}
+                        variant="prose"
+                        className="text-pretty"
+                      >
+                        {description}
+                      </Text>
+                    )}
+                  </VStack>
+                ) : (
+                  <>
+                    <Dialog.Title className="sr-only">{title}</Dialog.Title>
+                    {description && (
+                      <Dialog.Description className="sr-only">
+                        {description}
+                      </Dialog.Description>
+                    )}
+                  </>
+                )}
                 {hasBody && (
-                  <div className={cx(`overflow-auto px-5 pb-5`, bodyClassName)}>
+                  <div
+                    className={cx(
+                      `overflow-auto`,
+                      bodyPadding && `px-5 pb-5`,
+                      bodyPadding && !showHeader && `pt-5`,
+                      bodyClassName,
+                    )}
+                  >
                     {children}
                   </div>
                 )}
@@ -161,18 +172,36 @@ const Modal: React.FC<ModalProps> = ({
           <OverlayPortalProvider container={overlayPortalContainer}>
             <VStack className="max-h-[calc(100svh-1rem)] w-full overflow-hidden rounded-[inherit] bg-white">
               <Drawer.Handle className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-stone-300" />
-              <VStack gap={1} className="px-5 pb-4 pt-4">
-                <Text as={Drawer.Title} variant="title">
-                  {title}
-                </Text>
-                {description && (
-                  <Text as={Drawer.Description} variant="prose">
-                    {description}
+              {showHeader ? (
+                <VStack gap={1} className="px-5 pb-4 pt-4">
+                  <Text as={Drawer.Title} variant="title">
+                    {title}
                   </Text>
-                )}
-              </VStack>
+                  {description && (
+                    <Text as={Drawer.Description} variant="prose" className="text-pretty">
+                      {description}
+                    </Text>
+                  )}
+                </VStack>
+              ) : (
+                <>
+                  <Drawer.Title className="sr-only">{title}</Drawer.Title>
+                  {description && (
+                    <Drawer.Description className="sr-only">
+                      {description}
+                    </Drawer.Description>
+                  )}
+                </>
+              )}
               {hasBody && (
-                <div className={cx(`overflow-auto px-5 pb-5`, bodyClassName)}>
+                <div
+                  className={cx(
+                    `overflow-auto`,
+                    bodyPadding && `px-5 pb-5`,
+                    bodyPadding && !showHeader && `pt-5`,
+                    bodyClassName,
+                  )}
+                >
                   {children}
                 </div>
               )}

@@ -6,6 +6,7 @@ import type {
   ResponsiveStackGap,
   ResponsiveStackJustify,
 } from '../primitives/stack-utils';
+import { normalizePath, useMediaQuery } from '../lib/utils';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
 import VStack from '../primitives/VStack';
@@ -47,22 +48,6 @@ type SlideOverComponent = React.FC<SlideOverProps> & {
   Footer: typeof SlideOverFooter;
 };
 
-const useMediaQuery = (query: string): boolean => {
-  const [matches, setMatches] = React.useState(false);
-
-  React.useEffect(() => {
-    const mediaQueryList = window.matchMedia(query);
-    const updateMatches = (): void => setMatches(mediaQueryList.matches);
-
-    updateMatches();
-    mediaQueryList.addEventListener(`change`, updateMatches);
-
-    return () => mediaQueryList.removeEventListener(`change`, updateMatches);
-  }, [query]);
-
-  return matches;
-};
-
 const sizeClasses = {
   small: `md:w-[24rem]`,
   medium: `md:w-[30rem]`,
@@ -70,13 +55,6 @@ const sizeClasses = {
 };
 
 const horizontalPaddingClasses = `px-4 @lg/slide:px-6`;
-
-const normalizePath = (path: string): string => {
-  const withLeadingSlash = path.startsWith(`/`) ? path : `/${path}`;
-  return withLeadingSlash === `/`
-    ? withLeadingSlash
-    : withLeadingSlash.replace(/\/+$/, ``);
-};
 
 const getParentPath = (path: string): string => {
   const normalizedPath = normalizePath(path);

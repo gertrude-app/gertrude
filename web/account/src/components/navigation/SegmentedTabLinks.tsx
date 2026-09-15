@@ -1,4 +1,4 @@
-import { HStack, VStack } from '@gertrude/ui';
+import { HStack, VStack, normalizePath } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
@@ -16,13 +16,6 @@ interface Props {
   children?: React.ReactNode;
   className?: string;
 }
-
-const normalizePath = (path: string): string => {
-  const withLeadingSlash = path.startsWith(`/`) ? path : `/${path}`;
-  return withLeadingSlash === `/`
-    ? withLeadingSlash
-    : withLeadingSlash.replace(/\/+$/, ``);
-};
 
 // a nested route (`/people/1/ios-settings/<deviceId>`) must still light up its tab,
 // and the longest match wins so it beats the parent `/people/1` tab

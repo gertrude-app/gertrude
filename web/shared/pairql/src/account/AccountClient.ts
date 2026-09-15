@@ -86,6 +86,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public createMacConnectionCode = (
+    input: P.CreateMacConnectionCode.Input,
+  ): Promise<Result<P.CreateMacConnectionCode.Output>> => {
+    return this.query<P.CreateMacConnectionCode.Output>(
+      input,
+      `CreateMacConnectionCode`,
+      `parent`,
+    );
+  };
+
   public createPerson = (
     input: P.CreatePerson.Input,
   ): Promise<Result<P.CreatePerson.Output>> => {
