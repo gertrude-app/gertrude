@@ -56,6 +56,10 @@ extension ClientInterfaces.WebSocketClient: @retroactive DependencyKey {
             var request = URLRequest(url: Self.endpoint)
             request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            request.setValue(
+              Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0",
+              forHTTPHeaderField: WebSocketMessage.appVersionHeader,
+            )
             return WebSocket(request: request)
           }
 

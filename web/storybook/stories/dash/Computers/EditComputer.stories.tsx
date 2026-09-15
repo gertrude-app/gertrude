@@ -25,11 +25,13 @@ export const Default: Story = props({
   latestReleaseVersion: `2.2.1`,
   users: [
     {
+      computerUserId: `computer-user-456`,
       name: `Sally`,
       id: `456`,
       status: { case: `offline` },
     },
     {
+      computerUserId: `computer-user-123`,
       name: `Little Jimmy`,
       id: `123`,
       status: { case: `filterOn` },

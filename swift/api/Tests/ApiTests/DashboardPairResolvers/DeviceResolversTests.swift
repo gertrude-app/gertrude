@@ -19,7 +19,7 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
     let child2 = try await self.db.create(Child(parentId: child.parentId, name: "Bob"))
 
     // proves that we take the highest app version
-    try await self.db.create(ComputerUser(
+    let child2ComputerUser = try await self.db.create(ComputerUser(
       childId: child2.id,
       computerId: device.id,
       isAdmin: false,
@@ -41,6 +41,8 @@ final class DeviceResolversTests: ApiTestCase, @unchecked Sendable {
       expect(mac.modelIdentifier).toEqual("MacBookPro16,1")
       expect(mac.modelTitle).toEqual("16\" MacBook Pro (2019)")
       expect(mac.users.count).toEqual(2)
+      expect(mac.users.contains { $0.computerUserId == child.computerUser.id }).toBeTrue()
+      expect(mac.users.contains { $0.computerUserId == child2ComputerUser.id }).toBeTrue()
       let userNames = mac.users.map(\.name)
       expect(userNames.contains("Bob")).toBeTrue()
       expect(userNames.contains(child.name)).toBeTrue()

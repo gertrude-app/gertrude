@@ -107,6 +107,7 @@ export function userDevice(override: Partial<Device> = {}): Device {
     appVersion: `2.2.0`,
     users: [
       {
+        computerUserId: uuid(),
         name: `Little Jimmy`,
         id: uuid(),
         status: { case: `filterOn` },

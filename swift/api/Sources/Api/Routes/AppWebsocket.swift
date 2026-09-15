@@ -35,8 +35,19 @@ enum AppWebsocket {
       keychains: keychains.map(\.id),
     )
 
-    let connection = AppConnection(ws: ws, ids: ids)
+    let connection = AppConnection(
+      ws: ws,
+      ids: ids,
+      appVersion: self.resolveAppVersion(
+        reported: req.headers.first(name: WebSocketMessage.appVersionHeader),
+        stored: computerUser.appVersion,
+      ),
+    )
     await with(dependency: \.websockets).add(connection)
+  }
+
+  static func resolveAppVersion(reported: String?, stored: String) -> Semver {
+    reported.flatMap(Semver.init) ?? Semver(stored) ?? .zero
   }
 }
 

@@ -2,6 +2,8 @@ import Foundation
 import TaggedTime
 
 public enum WebSocketMessage {
+  public static let appVersionHeader = "X-Gertrude-App-Version"
+
   public enum FromApiToApp: Codable, Equatable, Sendable {
     case currentFilterStateRequested
     case userDeleted

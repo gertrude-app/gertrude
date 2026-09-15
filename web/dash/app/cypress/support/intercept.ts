@@ -97,6 +97,10 @@ export function interceptPql(
 ): void;
 export function interceptPql(slug: `GetChild`, output: T.GetChild.Output): void;
 export function interceptPql(slug: `GetChildren`, output: T.GetChildren.Output): void;
+export function interceptPql(
+  slug: `GetComputerStatuses`,
+  output: T.GetComputerStatuses.Output,
+): void;
 export function interceptPql(slug: `GetDevice`, output: T.GetDevice.Output): void;
 export function interceptPql(
   slug: `GetIOSDeviceClaimData`,
@@ -310,6 +314,7 @@ export function forcePqlErr(
     | `GetBlockerClaimData`
     | `GetChild`
     | `GetChildren`
+    | `GetComputerStatuses`
     | `GetDevice`
     | `GetIOSDeviceClaimData`
     | `GetIOSDeviceSupervisionStatus`

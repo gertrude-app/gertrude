@@ -16,6 +16,7 @@ interface Props {
   appVersion: string;
   latestReleaseVersion: string;
   users: Array<{
+    computerUserId: string;
     name: string;
     id: string;
     status: ChildComputerStatus;
@@ -119,7 +120,7 @@ const EditComputer: React.FC<Props> = ({
       <h3 className="text-xl font-bold text-slate-900">Children using this computer:</h3>
       <div className="mt-4 flex flex-col gap-2">
         {users.map((user) => (
-          <UserStatus key={user.id} {...user} />
+          <UserStatus key={user.computerUserId} name={user.name} status={user.status} />
         ))}
       </div>
     </div>
