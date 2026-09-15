@@ -52,6 +52,7 @@ public extension SQL.Statement {
     returning: SQL.Returning<M> = .none,
   ) throws -> SQL.Statement {
     let targetList = try self.conflictTargetSQL(targets, M.self)
+    var firstInsertValues: [M.ColumnName: Postgres.Data]?
     let assignments: String
     switch action {
     case .update(let columns):
@@ -60,7 +61,9 @@ public extension SQL.Statement {
         .list
     case .updateAllExcept(let except):
       let excluded = Set(except.map { M.columnName($0) }).union(["id", "created_at"])
-      assignments = models[0].insertValues.keys
+      let values = models[0].insertValues
+      firstInsertValues = values
+      assignments = values.keys
         .map { M.columnName($0) }
         .filter { !excluded.contains($0) }
         .sorted()
@@ -72,7 +75,11 @@ public extension SQL.Statement {
     guard !assignments.isEmpty else {
       throw DuetSQLError.emptyConflictUpdate
     }
-    var stmt = self.insert(models, as: action.aliasesTarget ? "existing" : nil)
+    var stmt = self.insert(
+      models,
+      as: action.aliasesTarget ? "existing" : nil,
+      firstInsertValues: firstInsertValues,
+    )
     stmt.components.append(.sql("\nON CONFLICT (\(targetList)) DO UPDATE SET \(assignments)"))
     if let clause = self.returningClause(returning) {
       stmt.components.append(.sql("\n\(clause)"))
@@ -117,18 +124,22 @@ public extension SQL.Statement {
     return targets.map { "\"\(M.columnName($0))\"" }.list
   }
 
-  private static func insert<M: Model>(_ models: [M], as alias: String?) -> SQL.Statement {
-    let first = models[0]
-    let insert = first.insertValues
+  private static func insert<M: Model>(
+    _ models: [M],
+    as alias: String?,
+    firstInsertValues: [M.ColumnName: Postgres.Data]? = nil,
+  ) -> SQL.Statement {
+    let insert = firstInsertValues ?? models[0].insertValues
     let sorted = insert.keys.map { ($0, M.columnName($0)) }.sorted { $0.1 < $1.1 }
     let colList: String = sorted.map(\.1).quotedList
     let columns: [M.ColumnName] = sorted.map(\.0)
     let aliasClause = alias.map { " AS \($0)" } ?? ""
     var stmt = SQL.Statement("INSERT INTO \(table: M.self)\(aliasClause)\n(\(colList))\nVALUES\n")
-    for model in models {
+    for (index, model) in models.enumerated() {
+      let values = index == 0 ? insert : model.insertValues
       stmt.components.append(.sql("("))
       for column in columns {
-        let value = model.insertValues[column]!
+        let value = values[column]!
         stmt.components.append(.binding(value))
         stmt.components.append(.sql(", "))
       }

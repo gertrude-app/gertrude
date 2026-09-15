@@ -228,15 +228,13 @@ func resolveAppleMusicCatalogArtist(
   ).map(Music.TrackId.init(rawValue:))
   var seenTopSongIds = Set<Music.TrackId>()
   let topSongIds = topSongReferences.filter { seenTopSongIds.insert($0).inserted }
-  let hydratedAlbums = try await resolvedAppleMusicAlbums(
+  let qualifyingAlbums = try await resolvedAppleMusicAlbums(
     releaseIds,
     storefront: storefront,
     requiringArtistRelationship: true,
+    soleArtistId: artistId,
     load: load,
   )
-  let qualifyingAlbums = hydratedAlbums.filter { album in
-    Set(album.artistIds) == [artistId]
-  }
   let qualifyingAlbumsById = Dictionary(
     uniqueKeysWithValues: qualifyingAlbums.map { ($0.id, $0) },
   )
@@ -263,10 +261,11 @@ private func resolvedAppleMusicAlbums(
   _ albumIds: [Music.AlbumId],
   storefront: Music.Storefront,
   requiringArtistRelationship: Bool,
+  soleArtistId: Music.ArtistId? = nil,
   load: AppleMusicDataLoader,
 ) async throws -> [Music.ResolvedAlbum] {
   guard !albumIds.isEmpty else { return [] }
-  var rawAlbumsById: [Music.AlbumId: AppleMusicRawAlbum] = [:]
+  var resolved: [Music.ResolvedAlbum] = []
   for start in stride(from: 0, to: albumIds.count, by: 100) {
     let end = min(start + 100, albumIds.count)
     let batch = Array(albumIds[start ..< end])
@@ -279,20 +278,21 @@ private func resolvedAppleMusicAlbums(
       AppleMusicAlbumResolutionResponse.self,
       from: load(url),
     )
+    var rawAlbumsById: [Music.AlbumId: AppleMusicRawAlbum] = [:]
     for album in response.data where album.type == "albums" {
       rawAlbumsById[album.typedId] = album
     }
-  }
-
-  var resolved: [Music.ResolvedAlbum] = []
-  for albumId in albumIds {
-    guard let album = rawAlbumsById[albumId] else {
-      throw AppleMusicResolutionError.missingResource(type: "album", id: albumId.rawValue)
+    for albumId in batch {
+      guard let album = rawAlbumsById[albumId] else {
+        throw AppleMusicResolutionError.missingResource(type: "album", id: albumId.rawValue)
+      }
+      let resolution = try await album.resolved(
+        requiringArtistRelationship: requiringArtistRelationship,
+        load: load,
+      )
+      if let soleArtistId, Set(resolution.artistIds) != [soleArtistId] { continue }
+      resolved.append(resolution)
     }
-    try await resolved.append(album.resolved(
-      requiringArtistRelationship: requiringArtistRelationship,
-      load: load,
-    ))
   }
   return resolved
 }

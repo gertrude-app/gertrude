@@ -120,6 +120,11 @@ extension Music {
       case afterPolicyChange
     }
 
+    private struct PersistedFields: Decodable, Sendable {
+      var id: LibrarySnapshot.Id
+      var createdAt: Date
+    }
+
     private static func publish(
       childId: Child.Id,
       generatedAt: Date,
@@ -135,27 +140,49 @@ extension Music {
         in: db,
       )
       content.playlists = PlaylistRules.compile(playlists: playlists, using: index)
-      let existing = try await self.snapshot(for: childId, in: db)
-      if case .ifContentChanged = publication,
-         let existing,
-         existing.revision == existing.payload.revision,
-         existing.payload.hasSameContent(as: content) {
-        return existing
+      let previousRevision: Int64
+      switch publication {
+      case .ifContentChanged:
+        let existing = try await self.snapshot(for: childId, in: db)
+        if let existing,
+           existing.revision == existing.payload.revision,
+           existing.payload.hasSameContent(as: content) {
+          return existing
+        }
+        previousRevision = existing?.revision ?? 0
+      case .afterPolicyChange:
+        let rows = try await db.execute(raw: """
+          SELECT \(col: LibrarySnapshot.columnName(.revision))
+          FROM \(table: LibrarySnapshot.self)
+          WHERE \(col: LibrarySnapshot.columnName(.childId)) = '\(id: childId)';
+        """)
+        previousRevision = try rows.first?.decode(
+          column: LibrarySnapshot.columnName(.revision),
+          as: Int64.self,
+        ) ?? 0
       }
 
-      let revision = (existing?.revision ?? 0) + 1
+      let revision = previousRevision + 1
       let payload = content.snapshot(revision: revision, generatedAt: generatedAt)
-      let snapshot = LibrarySnapshot(
+      var snapshot = LibrarySnapshot(
         childId: childId,
         revision: revision,
         payload: payload,
         createdAt: generatedAt,
       )
-      return try await db.upsert(
-        snapshot,
+      let rows = try await db.upsert(
+        [snapshot],
         conflictOn: [.childId],
         do: .update(set: [.revision, .payload, .createdAt]),
+        returning: [.id, .createdAt],
+        as: PersistedFields.self,
       )
+      guard let persisted = rows.first else {
+        throw DuetSQLError.notFound("LibrarySnapshot")
+      }
+      snapshot.id = persisted.id
+      snapshot.createdAt = persisted.createdAt
+      return snapshot
     }
   }
 }

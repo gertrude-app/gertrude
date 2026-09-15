@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 import Logging
 import NIOEmbedded
@@ -10,6 +11,37 @@ import XExpect
 @testable import DuetSQL
 
 final class SqlTests: XCTestCase {
+  func testInsertAndUpsertEncodeEachRowsJsonExactlyOnce() throws {
+    let actions: [SQL.ConflictAction<EncodingProbeModel>?] = [
+      nil,
+      .update(set: [.payload]),
+      .updateAllExcept([]),
+      .updateAllExcept([.payload]),
+    ]
+    for action in actions {
+      let first = EncodingProbeModel(payload: .init(value: "first"))
+      let second = EncodingProbeModel(payload: .init(value: "second"))
+      let statement: SQL.Statement = if let action {
+        try SQL.Statement.create(
+          [first, second],
+          onConflict: [.id],
+          do: action,
+          returning: .columns([.id]),
+        )
+      } else {
+        SQL.Statement.create([first, second])
+      }
+      let jsonValues = statement.params.compactMap { value -> String? in
+        if case .json(let json) = value { return json }
+        return nil
+      }
+
+      expectNoDifference(first.payload.encodes.withValue { $0 }, 1)
+      expectNoDifference(second.payload.encodes.withValue { $0 }, 1)
+      expectNoDifference(jsonValues, ["{\"value\":\"first\"}", "{\"value\":\"second\"}"])
+    }
+  }
+
   func testPostgresBindable() {
     expect("foo".postgresData).toEqual(.string("foo"))
     expect(33.postgresData).toEqual(.int(33))
@@ -870,6 +902,29 @@ private final class Locked<Value>: @unchecked Sendable {
 public extension Date {
   static let epoch = Date(timeIntervalSince1970: 0)
   static let reference = Date(timeIntervalSinceReferenceDate: 0)
+}
+
+@DuetModel(schema: "public", table: "encoding_probes")
+private struct EncodingProbeModel: Codable {
+  var id: Id = .init(UUID())
+  var payload: EncodingProbePayload
+  var label = "probe"
+  var createdAt = Date.reference
+}
+
+private struct EncodingProbePayload: PostgresJsonable, Sendable {
+  var value: String
+  var encodes = Locked(0)
+
+  enum CodingKeys: String, CodingKey {
+    case value
+  }
+
+  func encode(to encoder: any Encoder) throws {
+    self.encodes.withValue { $0 += 1 }
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(self.value, forKey: .value)
+  }
 }
 
 private struct TestError: Error {}

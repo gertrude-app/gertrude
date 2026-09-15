@@ -1,3 +1,4 @@
+import CustomDump
 import Dependencies
 import DuetSQL
 import XCTest
@@ -6,6 +7,88 @@ import XExpect
 @testable import Api
 
 final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
+  func testEmptyChildFilterDoesNotQueryDatabase() async throws {
+    let summary = await withDependencies {
+      $0.db = DuetSQL.ThrowingClient()
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [])
+    }
+
+    expectNoDifference(summary, .init())
+  }
+
+  func testFilteredRefreshDoesNotDecodeAnotherChildsResolution() async throws {
+    let child = try await self.child()
+    let otherChild = try await self.child()
+    let resolution = refreshArtist(albumIds: ["album-1"])
+    _ = try await self.db.create(Music.ApprovedArtist(
+      childId: child.id,
+      appleMusicArtistId: resolution.id,
+      name: resolution.name,
+      resolution: resolution,
+      resolvedAt: .reference,
+    ))
+    let unrelated = try await self.db.create(Music.ApprovedArtist(
+      childId: otherChild.id,
+      appleMusicArtistId: resolution.id,
+      name: resolution.name,
+      resolution: resolution,
+      resolvedAt: .reference,
+    ))
+    try await self.db.execute(raw: """
+    UPDATE music.approved_artists SET resolution = '{}'::jsonb
+    WHERE id = \(bind: unrelated.id.rawValue)
+    """)
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.appleMusic.resolveArtist = { _ in resolution }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [child.id])
+    }
+    try await self.db.delete(unrelated.id)
+
+    expectNoDifference(summary, .init(unchangedArtists: 1))
+  }
+
+  func testPersistsEachChildBeforeResolvingUnrelatedCatalog() async throws {
+    let firstChild = try await self.child()
+    let secondChild = try await self.child()
+    let childIds = [firstChild.id, secondChild.id]
+      .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+    let firstAlbum = try await self.db.create(Music.ApprovedAlbum(
+      childId: childIds[0],
+      appleMusicAlbumId: "album-1",
+      title: "Old",
+      artistName: "Artist",
+      resolution: refreshAlbum(id: "album-1", title: "Old"),
+      resolvedAt: .reference,
+    ))
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: childIds[1],
+      appleMusicAlbumId: "album-2",
+      title: "Old",
+      artistName: "Artist",
+      resolution: refreshAlbum(id: "album-2", title: "Old"),
+      resolvedAt: .reference,
+    ))
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.appleMusic.resolveAlbum = { lookup in
+        if lookup.albumId == "album-2" {
+          let refreshed = try await self.db.find(firstAlbum.id)
+          expectNoDifference(refreshed.title, "Updated")
+        }
+        return refreshAlbum(id: lookup.albumId, title: "Updated")
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: Set(childIds))
+    }
+
+    expectNoDifference(summary, .init(refreshedAlbums: 2))
+  }
+
   func testNoOpRefreshDoesNotRewriteOrBumpSnapshot() async throws {
     let child = try await self.child()
     let resolution = refreshAlbum(id: "album-1", title: "Album")
@@ -399,6 +482,149 @@ final class MusicCatalogRefreshJobTests: ApiTestCase, @unchecked Sendable {
     expect(snapshot?.revision).toEqual(first.revision + 1)
     expect(snapshot?.payload.albums.map(\.id)).toEqual(["album-1"])
     expect(snapshot?.payload.albums[0].tracks.map(\.id)).toEqual(["track-1", "track-2"])
+  }
+
+  func testSharedCatalogIdsAreResolvedSeparatelyForEachStorefront() async throws {
+    let german = try await self.child(with: { $0.appleMusicStorefront = "de" })
+    let american = try await self.child()
+    let album = refreshAlbum(id: "album-1")
+    let artist = refreshArtist(albumIds: ["artist-album"])
+    for child in [german, american] {
+      _ = try await self.db.create(Music.ApprovedAlbum(
+        childId: child.id,
+        appleMusicAlbumId: album.id,
+        title: album.title,
+        artistName: album.artistName,
+        trackCount: album.trackCount,
+        resolution: album,
+        resolvedAt: .reference,
+      ))
+      _ = try await self.db.create(Music.ApprovedArtist(
+        childId: child.id,
+        appleMusicArtistId: artist.id,
+        name: artist.name,
+        resolution: artist,
+        resolvedAt: .reference,
+      ))
+    }
+    let albumCalls = RefreshCallCounter()
+    let artistCalls = RefreshCallCounter()
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.appleMusic.resolveAlbum = { lookup in
+        await albumCalls.increment()
+        return refreshAlbum(id: lookup.albumId, title: lookup.storefront.rawValue)
+      }
+      $0.appleMusic.resolveArtist = { lookup in
+        await artistCalls.increment()
+        var localized = artist
+        localized.name = lookup.storefront.rawValue
+        return localized
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [german.id, american.id])
+    }
+
+    await expect(albumCalls.value()).toEqual(2)
+    await expect(artistCalls.value()).toEqual(2)
+    expectNoDifference(summary, .init(refreshedAlbums: 2, refreshedArtists: 2))
+    for (child, storefront) in [(german, "de"), (american, "us")] {
+      let refreshedAlbum = try await Music.ApprovedAlbum.query()
+        .where(.childId == child.id)
+        .first(in: self.db)
+      let refreshedArtist = try await Music.ApprovedArtist.query()
+        .where(.childId == child.id)
+        .first(in: self.db)
+      expectNoDifference(refreshedAlbum.title, storefront)
+      expectNoDifference(refreshedArtist.name, storefront)
+    }
+  }
+
+  func testSharedArtistResolutionSurvivesFailureAndInterveningChild() async throws {
+    let firstChild = try await self.child()
+    let secondChild = try await self.child()
+    let thirdChild = try await self.child()
+    let childIds = [firstChild.id, secondChild.id, thirdChild.id]
+      .sorted { $0.rawValue.uuidString < $1.rawValue.uuidString }
+    let resolution = refreshArtist(albumIds: ["artist-album"])
+    let grants = try await self.db.create([childIds[0], childIds[2]].map { childId in
+      Music.ApprovedArtist(
+        childId: childId,
+        appleMusicArtistId: resolution.id,
+        name: "Old",
+        resolution: resolution,
+        resolvedAt: .reference,
+      )
+    })
+    try await self.db.execute(raw: """
+    UPDATE music.approved_artists SET resolution = '{}'::jsonb
+    WHERE id = \(bind: grants[0].id.rawValue)
+    """)
+    let album = refreshAlbum(id: "unrelated-album")
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: childIds[1],
+      appleMusicAlbumId: album.id,
+      title: album.title,
+      artistName: album.artistName,
+      trackCount: album.trackCount,
+      resolution: album,
+      resolvedAt: .reference,
+    ))
+    let calls = RefreshCallCounter()
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.appleMusic.resolveAlbum = { _ in album }
+      $0.appleMusic.resolveArtist = { _ in
+        await calls.increment()
+        return resolution
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: Set(childIds))
+    }
+    try await self.db.delete(grants[0].id)
+    let refreshed = try await self.db.find(grants[1].id)
+    let snapshot = try await Music.LibrarySnapshotRepository.snapshot(
+      for: childIds[2],
+      in: self.db,
+    )
+
+    await expect(calls.value()).toEqual(1)
+    expectNoDifference(summary, .init(refreshedArtists: 1, unchangedAlbums: 1, failures: 1))
+    expectNoDifference(refreshed.name, resolution.name)
+    expectNoDifference(refreshed.resolution, resolution)
+    expectNoDifference(snapshot?.revision, 1)
+    expectNoDifference(snapshot?.payload.albums.map(\.id), ["artist-album"])
+  }
+
+  func testSharedArtistFailureIsNotRetriedForEachChild() async throws {
+    let firstChild = try await self.child()
+    let secondChild = try await self.child()
+    let artist = refreshArtist(albumIds: ["artist-album"])
+    for childId in [firstChild.id, secondChild.id] {
+      _ = try await self.db.create(Music.ApprovedArtist(
+        childId: childId,
+        appleMusicArtistId: artist.id,
+        name: artist.name,
+        resolution: artist,
+        resolvedAt: .reference,
+      ))
+    }
+    let calls = RefreshCallCounter()
+
+    let summary = await withDependencies {
+      $0.db = self.db
+      $0.appleMusic.resolveArtist = { _ in
+        await calls.increment()
+        throw RefreshError.unavailable
+      }
+    } operation: {
+      await MusicCatalogRefreshJob().exec(childIds: [firstChild.id, secondChild.id])
+    }
+
+    await expect(calls.value()).toEqual(1)
+    expectNoDifference(summary, .init(failures: 2))
   }
 
   func testDuplicateAppleIdsResolveOnceAcrossChildren() async throws {
