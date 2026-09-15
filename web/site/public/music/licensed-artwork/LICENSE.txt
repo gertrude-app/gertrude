@@ -1,0 +1,179 @@
+GERTRUDE HOMEPAGE ALBUM ARTWORK
+
+Source and license review: 2026-09-05
+
+These are third-party copyrighted album covers, not Gertrude-owned artwork.
+The licenses below apply to the respective image files and our adaptations of
+that artwork. They do not license Gertrude's branding or application code.
+Artist and label endorsement is not implied. Selection in the example library
+is illustrative, not a judgment about the other albums shown.
+
+Modifications by Gertrude: made square, up to 640 x 640 pixels, and converted
+to WebP. Lower-resolution sources have not been enlarged.
+Non-square originals have been padded without cropping or stretching the art.
+The homepage applies rounded masks, animated movement and scaling, shadows,
+opacity, brightness, and saturation effects. Our artwork adaptations are
+available under the same license listed for each original below.
+
+Each source page reports that Wikimedia's Volunteer Response Team reviewed
+copyright-holder permission. Ticket references are recorded below; the private
+permission correspondence itself is not publicly accessible.
+
+CC BY-SA 4.0 International:
+https://creativecommons.org/licenses/by-sa/4.0/
+https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+CC BY-SA 3.0 Unported:
+https://creativecommons.org/licenses/by-sa/3.0/
+https://creativecommons.org/licenses/by-sa/3.0/legalcode
+
+Both licenses permit commercial reuse with attribution and require qualifying
+adaptations to retain the same or a compatible license. Refer to the legal
+codes for the complete conditions, limitations, and warranty disclaimers.
+
+THE SEASONS - BEN WENDEL
+File: the-seasons.webp
+Cover credited to: Ben Wendel
+License: CC BY-SA 4.0 International
+Source: https://commons.wikimedia.org/wiki/File:The_Seasons_Ben_Wendel_Album_Cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=867534767
+Permission ticket: 2023092910007451
+
+HIGH HEART - BEN WENDEL
+File: high-heart.webp
+Cover credited to: Ben Wendel
+License: CC BY-SA 4.0 International
+Source: https://commons.wikimedia.org/wiki/File:High_Heart_Ben_Wendel_Album_Cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1126245219
+Permission ticket: 2023092910007451
+
+ALL ONE - BEN WENDEL
+File: all-one.webp
+Cover credited to: Ben Wendel
+License: CC BY-SA 4.0 International
+Source: https://commons.wikimedia.org/wiki/File:All_One_Ben_Wendel_Album_Cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1003678052
+Permission ticket: 2023092910007451
+
+MIRAGE - BRIAN LANDRUS KALEIDOSCOPE
+File: mirage.webp
+Cover credited to: Brian Landrus
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Brian_Landrus_Kaleidoscope_Mirage_Cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=832851186
+Permission ticket: 2013032610005907
+
+CAPSULE - THE BRIAN LANDRUS KALEIDOSCOPE
+File: capsule.webp
+Cover credited to: Brian Landrus
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Landrus_Kaleidoscope_Capsule_Cover.JPG
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1153728377
+Permission ticket: 2013032610005943
+
+BLU-ESCAPE - HANK HEHMSOTH
+File: blu-escape.webp
+Cover credited to: Hank Hehmsoth / Time Space Fabrics
+License: CC BY-SA 4.0 International
+Source: https://commons.wikimedia.org/wiki/File:Blu-Escape-Album-Cover-Hank-Hehmsoth-2024.webp
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1218740883
+Permission ticket: 2026041810002686
+Copyright notice in original metadata: (c) 2024 Hank Hehmsoth, All Rights Reserved
+The source page records the subsequent CC BY-SA 4.0 grant.
+
+EUROPA - RON KORB
+File: europa.webp
+Cover credited to: Hsiao-Tsui Yeh and Ron Korb
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Ron_Korb_Album_Europa.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=747700461
+Permission ticket: 2013032610001018
+CC BY-SA 3.0 selected from the source's alternative licenses.
+
+DINAS - CALAN
+File: dinas.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Dinas,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1153180691
+Permission ticket: 2017050910011681
+
+HYN - CARREG LAFAR
+File: hyn.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Hyn,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=565490022
+Permission ticket: 2017050910011681
+
+PROFIAD - CARREG LAFAR
+File: profiad.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Profiad,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=565473710
+Permission ticket: 2017050910011681
+
+YSBRYD Y WERIN - CARREG LAFAR
+File: ysbryd-y-werin.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Ysbryd_Y_Werin,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=565473774
+Permission ticket: 2017050910011681
+
+CRASDANT - CRASDANT
+File: crasdant.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Crasdant,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=870712919
+Permission ticket: 2017050910011681
+
+DWNDWR - THE GREAT NOISE - CRASDANT
+File: dwndwr.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Dwndwr_-_The_Great_Noise,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1216236026
+Permission ticket: 2017050910011681
+
+NOS SADWRN BACH - NOT YET SATURDAY - CRASDANT
+File: nos-sadwrn-bach.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Nos_Sadwrn_Bach_-_Not_Yet_Saturday,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=932816694
+Permission ticket: 2017050910011681
+
+AR Y FFIN - DELYTH JENKINS
+File: ar-y-ffin.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Ar_Y_Ffin,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=800377959
+Permission ticket: 2017050910011681
+
+HEN AELWYD - OLD HEARTH - ROBIN HUW BOWEN
+File: hen-aelwyd.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Hen_Aelwyd_-_Old_Hearth,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1094021439
+Permission ticket: 2017050910011681
+
+IAITH ENAID - THE LANGUAGE OF THE SOUL - ROBIN HUW BOWEN
+File: iaith-enaid.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Iaith_Enaid_-_The_Language_Of_The_Soul,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1094021355
+Permission ticket: 2017050910011681
+
+Y FFORDD I ABERYSTWYTH - THE ROAD TO ABERYSTWYTH - ROBIN HUW BOWEN
+File: y-ffordd-i-aberystwyth.webp
+Cover credited to: Sain (Recordiau) Cyf.
+License: CC BY-SA 3.0 Unported
+Source: https://commons.wikimedia.org/wiki/File:Y_Ffordd_I_Aberystwyth_-_The_Road_To_Aberystwyth,_album_cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1094021326
+Permission ticket: 2017050910011681

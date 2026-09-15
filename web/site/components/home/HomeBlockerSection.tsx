@@ -16,7 +16,7 @@ const HomeBlockerSection: React.FC = () => (
     aria-labelledby="blocker-heading"
     className="border-t border-stone-200/80 bg-white"
   >
-    <HomeSectionRails className="bg-white px-8 py-28 lg:px-10 lg:py-40">
+    <HomeSectionRails className="bg-white px-8 pt-28 lg:px-10 lg:pt-40">
       <div className="max-w-4xl pl-12 sm:pl-16">
         <Link
           href="/iphone-and-ipad"
@@ -109,13 +109,13 @@ const BlockerGroupsFeature: React.FC = () => (
     />
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center overflow-hidden"
+      className="pointer-events-none absolute bottom-0 left-1/2 z-[2] flex h-full w-screen -translate-x-1/2 items-end justify-center overflow-hidden"
     >
       <div className="relative aspect-[3/2] min-h-full min-w-full shrink-0">
         <img
           src="/home/landscape-bg-no-background.webp"
           srcSet="/home/landscape-bg-no-background-1600.webp 1600w, /home/landscape-bg-no-background-2400.webp 2400w, /home/landscape-bg-no-background-2560.webp 2560w, /home/landscape-bg-no-background.webp 3024w"
-          sizes="(min-width: 1280px) 1280px, (min-width: 640px) 1152px, 1248px"
+          sizes="(min-width: 1280px) 100vw, (min-width: 640px) max(100vw, 1152px), max(100vw, 1248px)"
           alt=""
           width={3024}
           height={457}

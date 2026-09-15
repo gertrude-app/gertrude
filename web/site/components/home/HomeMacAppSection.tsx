@@ -1,8 +1,9 @@
 'use client';
 
-import { ChevronRightIcon, FlagIcon } from 'lucide-react';
+import { ChevronRightIcon, DownloadIcon, FlagIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
+import HomeButtonLink from '@/components/home/HomeButtonLink';
 import HomeSectionRails from '@/components/home/HomeSectionRails';
 
 const HomeMacAppSection: React.FC = () => (
@@ -33,6 +34,24 @@ const HomeMacAppSection: React.FC = () => (
       </div>
       <MacFeatureGallery />
       <MacAccountabilityFeature />
+      <div className="mx-auto mt-20 max-w-2xl text-center">
+        <h3 className="text-2xl font-semibold tracking-[-0.025em] text-stone-950">
+          Free to start.
+        </h3>
+        <p className="mt-3 text-lg leading-7 text-stone-600">
+          Try Gertrude for Mac free for 21 days—no credit card required.
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <HomeButtonLink href="/mac" size="hero" variant="secondary">
+            Learn more
+            <ChevronRightIcon className="size-4" />
+          </HomeButtonLink>
+          <HomeButtonLink href="/download-mac-app" size="hero" variant="primary">
+            Download
+            <DownloadIcon className="size-4" />
+          </HomeButtonLink>
+        </div>
+      </div>
     </HomeSectionRails>
   </section>
 );

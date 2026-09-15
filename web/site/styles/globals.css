@@ -395,7 +395,76 @@
   }
 }
 
+.home-music-marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: home-music-marquee 34s linear infinite;
+}
+
+.home-music-marquee-track-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes home-music-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.home-podcasts-demo {
+  --podcast-surface: #fafaf9;
+  --podcast-inset: #f5f5f4;
+  --podcast-line: #e7e5e4;
+  --podcast-ink: #1c1917;
+  --podcast-muted: #78716c;
+  --podcast-accent: #7c3aed;
+  --podcast-accent-soft: #ede9fe;
+}
+
+.home-podcasts-demo-dark {
+  --podcast-surface: #0c0a09;
+  --podcast-inset: #211e1b;
+  --podcast-line: #34302b;
+  --podcast-ink: #fafaf9;
+  --podcast-muted: #a8a29e;
+  --podcast-accent: #c4b5fd;
+  --podcast-accent-soft: #2c2340;
+}
+
+.home-podcasts-key-pressed {
+  animation: home-podcasts-key-press 850ms ease-out;
+}
+
+@keyframes home-podcasts-key-press {
+  from {
+    background-color: var(--podcast-accent);
+    color: var(--podcast-surface);
+    transform: scale(0.95);
+  }
+  to {
+    background-color: var(--podcast-inset);
+    color: var(--podcast-ink);
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .home-podcasts-key-pressed {
+    animation: none;
+  }
+
+  .home-podcasts-demo * {
+    transition-duration: 0s;
+  }
+
+  .home-music-marquee-track {
+    animation: none;
+  }
+
   .home-mac-letter-ripple-visible {
     font-weight: 600;
     animation: none;
