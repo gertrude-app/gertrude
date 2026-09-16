@@ -33,18 +33,10 @@ public extension BlockRule {
       return a.blocksFlow(flow) && b.blocksFlow(flow)
     case .unless(let rule, let negatedBy):
       if rule.blocksFlow(flow) {
-        return !negatedBy.blocksFlow(flow)
+        return !negatedBy.contains { $0.blocksFlow(flow) }
       } else {
         return false
       }
-    }
-  }
-}
-
-public extension [BlockRule] {
-  func blocksFlow(_ flow: FilterFlow) -> Bool {
-    self.contains { rule in
-      rule.blocksFlow(flow)
     }
   }
 }
