@@ -3,6 +3,7 @@ export { fromUrl };
 
 export function sanitizeUserInput(input: string): string {
   return input
+    .trim()
     .replace(/^https?:\/\//, ``) // remove protocol
     .replace(/\/.*/, ``) // remove path
     .toLowerCase();

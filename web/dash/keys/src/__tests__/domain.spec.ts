@@ -22,6 +22,7 @@ describe(`sanitizeUserInput()`, () => {
     [`https://example.com`, `example.com`],
     [`http://example.com`, `example.com`],
     [`http://eXamPle.Com`, `example.com`],
+    [`  YouTube.com  `, `youtube.com`],
     [`example.com/foo/bar`, `example.com`],
     [`https://example.com/foo/bar`, `example.com`],
     [`example.com/foo?lol=rofl`, `example.com`],

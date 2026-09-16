@@ -1,3 +1,4 @@
+import { domain } from '@dash/keys';
 import { defaults } from '@dash/types';
 import { produce } from 'immer';
 import { v4 as uuid } from 'uuid';
@@ -202,7 +203,7 @@ function reducer(state: State, action: Action): State | undefined {
     case `saveAlwaysBlockedRule`: {
       const editing = state.editingAlwaysBlockedRule;
       if (!editing) return;
-      const value = editing.primaryValue.trim();
+      const value = domain.sanitizeUserInput(editing.primaryValue);
       if (!value) return;
       const rule = { case: `hostnameOrSubdomain`, value } as const;
       const rules = state.child.draft.customAlwaysBlockedRules;
