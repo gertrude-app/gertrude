@@ -43,7 +43,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
           className="w-full p-3 cursor-pointer select-none text-left rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
           onClick={() => setExpanded(!expanded)}
         >
-          <HStack gap={4} wrap className="gap-y-0.5">
+          <HStack gap={4} wrap className={appIconUrl ? `gap-y-2` : `gap-y-0.5`}>
             {appIconUrl && (
               <div className="relative">
                 <img

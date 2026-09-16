@@ -2208,6 +2208,78 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--ios-multiple-devices",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-multiple-devices&viewMode=story",
+    "name": "iPhone and iPad (shared and device settings)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-multiple-devices.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-multiple-devices",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-multiple-devices&viewMode=story",
+    "name": "iPhone and iPad (shared and device settings)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-multiple-devices.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-mixed-device-states",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-mixed-device-states&viewMode=story",
+    "name": "iPhone and iPad (Music mixed device states)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-mixed-device-states.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-mixed-device-states",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-mixed-device-states&viewMode=story",
+    "name": "iPhone and iPad (Music mixed device states)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-mixed-device-states.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-not-connected",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-not-connected&viewMode=story",
+    "name": "iPhone and iPad (Music not connected)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-not-connected.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-one-of-two-devices",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-one-of-two-devices&viewMode=story",
+    "name": "iPhone and iPad (Music on one device)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-one-of-two-devices.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--ios-music-trial",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-trial&viewMode=story",
     "name": "iPhone and iPad (Music free trial)",

@@ -41,7 +41,6 @@ import { Route as AppPeoplePersonIdMacSettingsRouteImport } from './routes/_app/
 import { Route as AppActivityDayDayRouteImport } from './routes/_app/activity/day/$day'
 import { Route as AppPeoplePersonIdIosSettingsIndexRouteImport } from './routes/_app/people/$personId/ios-settings/index'
 import { Route as AppActivityPersonPersonIdIndexRouteImport } from './routes/_app/activity/person/$personId/index'
-import { Route as AppPeoplePersonIdIosSettingsDeviceIdRouteImport } from './routes/_app/people/$personId/ios-settings/$deviceId'
 import { Route as AppActivityPersonPersonIdDayDayRouteImport } from './routes/_app/activity/person/$personId/day/$day'
 
 const AppRouteRoute = AppRouteRouteImport.update({
@@ -212,12 +211,6 @@ const AppActivityPersonPersonIdIndexRoute =
     path: '/activity/person/$personId/',
     getParentRoute: () => AppRouteRoute,
   } as any)
-const AppPeoplePersonIdIosSettingsDeviceIdRoute =
-  AppPeoplePersonIdIosSettingsDeviceIdRouteImport.update({
-    id: '/ios-settings/$deviceId',
-    path: '/ios-settings/$deviceId',
-    getParentRoute: () => AppPeoplePersonIdRouteRoute,
-  } as any)
 const AppActivityPersonPersonIdDayDayRoute =
   AppActivityPersonPersonIdDayDayRouteImport.update({
     id: '/activity/person/$personId/day/$day',
@@ -255,7 +248,6 @@ export interface FileRoutesByFullPath {
   '/settings/billing/checkout-success': typeof AppSettingsBillingCheckoutSuccessRoute
   '/people/$personId/': typeof AppPeoplePersonIdIndexRoute
   '/settings/billing/': typeof AppSettingsBillingIndexRoute
-  '/people/$personId/ios-settings/$deviceId': typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   '/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/people/$personId/ios-settings/': typeof AppPeoplePersonIdIosSettingsIndexRoute
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
@@ -286,7 +278,6 @@ export interface FileRoutesByTo {
   '/settings/billing/checkout-success': typeof AppSettingsBillingCheckoutSuccessRoute
   '/people/$personId': typeof AppPeoplePersonIdIndexRoute
   '/settings/billing': typeof AppSettingsBillingIndexRoute
-  '/people/$personId/ios-settings/$deviceId': typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   '/activity/person/$personId': typeof AppActivityPersonPersonIdIndexRoute
   '/people/$personId/ios-settings': typeof AppPeoplePersonIdIosSettingsIndexRoute
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
@@ -323,7 +314,6 @@ export interface FileRoutesById {
   '/_app/settings/billing/checkout-success': typeof AppSettingsBillingCheckoutSuccessRoute
   '/_app/people/$personId/': typeof AppPeoplePersonIdIndexRoute
   '/_app/settings/billing/': typeof AppSettingsBillingIndexRoute
-  '/_app/people/$personId/ios-settings/$deviceId': typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   '/_app/activity/person/$personId/': typeof AppActivityPersonPersonIdIndexRoute
   '/_app/people/$personId/ios-settings/': typeof AppPeoplePersonIdIosSettingsIndexRoute
   '/_app/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
@@ -360,7 +350,6 @@ export interface FileRouteTypes {
     | '/settings/billing/checkout-success'
     | '/people/$personId/'
     | '/settings/billing/'
-    | '/people/$personId/ios-settings/$deviceId'
     | '/activity/person/$personId/'
     | '/people/$personId/ios-settings/'
     | '/activity/person/$personId/day/$day'
@@ -391,7 +380,6 @@ export interface FileRouteTypes {
     | '/settings/billing/checkout-success'
     | '/people/$personId'
     | '/settings/billing'
-    | '/people/$personId/ios-settings/$deviceId'
     | '/activity/person/$personId'
     | '/people/$personId/ios-settings'
     | '/activity/person/$personId/day/$day'
@@ -427,7 +415,6 @@ export interface FileRouteTypes {
     | '/_app/settings/billing/checkout-success'
     | '/_app/people/$personId/'
     | '/_app/settings/billing/'
-    | '/_app/people/$personId/ios-settings/$deviceId'
     | '/_app/activity/person/$personId/'
     | '/_app/people/$personId/ios-settings/'
     | '/_app/activity/person/$personId/day/$day'
@@ -667,13 +654,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppActivityPersonPersonIdIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/people/$personId/ios-settings/$deviceId': {
-      id: '/_app/people/$personId/ios-settings/$deviceId'
-      path: '/ios-settings/$deviceId'
-      fullPath: '/people/$personId/ios-settings/$deviceId'
-      preLoaderRoute: typeof AppPeoplePersonIdIosSettingsDeviceIdRouteImport
-      parentRoute: typeof AppPeoplePersonIdRouteRoute
-    }
     '/_app/activity/person/$personId/day/$day': {
       id: '/_app/activity/person/$personId/day/$day'
       path: '/activity/person/$personId/day/$day'
@@ -687,7 +667,6 @@ declare module '@tanstack/react-router' {
 interface AppPeoplePersonIdRouteRouteChildren {
   AppPeoplePersonIdMacSettingsRoute: typeof AppPeoplePersonIdMacSettingsRoute
   AppPeoplePersonIdIndexRoute: typeof AppPeoplePersonIdIndexRoute
-  AppPeoplePersonIdIosSettingsDeviceIdRoute: typeof AppPeoplePersonIdIosSettingsDeviceIdRoute
   AppPeoplePersonIdIosSettingsIndexRoute: typeof AppPeoplePersonIdIosSettingsIndexRoute
 }
 
@@ -695,8 +674,6 @@ const AppPeoplePersonIdRouteRouteChildren: AppPeoplePersonIdRouteRouteChildren =
   {
     AppPeoplePersonIdMacSettingsRoute: AppPeoplePersonIdMacSettingsRoute,
     AppPeoplePersonIdIndexRoute: AppPeoplePersonIdIndexRoute,
-    AppPeoplePersonIdIosSettingsDeviceIdRoute:
-      AppPeoplePersonIdIosSettingsDeviceIdRoute,
     AppPeoplePersonIdIosSettingsIndexRoute:
       AppPeoplePersonIdIosSettingsIndexRoute,
   }

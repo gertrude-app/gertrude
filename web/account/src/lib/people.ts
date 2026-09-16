@@ -1,8 +1,16 @@
 import { relativeTime } from '@shared/datetime';
-import type { PersonCardPerson } from '#/components/types';
+import type { Device, PersonCardPerson } from '#/components/types';
 import type { GetPeople } from '@shared/pairql/src/account';
 
 export const selfRelationshipUnavailableMessage = `Another protected person is already set to Myself. Change their relationship first.`;
+
+type IOSDevice = Extract<Device, { type: `iphone` | `ipad` }>;
+
+export function toIosSettingsDevices(person: GetPeople.Output[number]): IOSDevice[] {
+  return toPersonCardPerson(person).devices.filter(
+    (device): device is IOSDevice => device.type !== `mac`,
+  );
+}
 
 export function toPersonCardPerson(person: GetPeople.Output[number]): PersonCardPerson {
   return {
