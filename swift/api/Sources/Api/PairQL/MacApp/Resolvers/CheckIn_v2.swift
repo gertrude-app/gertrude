@@ -474,11 +474,36 @@ func loadAlwaysBlockedRules(
     .where(.groupId |=| groupIds)
     .all(in: context.db)
 
-  let rules = try await groupRules.map(\.rule) + customRules.map(\.rule)
+  let rules = try await (groupRules.map(\.rule) + customRules.map(\.rule))
+    .map(\.lowercasingHostnames)
   // filtering-disabled children opted into monitoring-only, so sni enforcement is moot
   if context.child.filteringDisabled { return rules }
   // try to prevent sni obfuscation/hiding, which interferes with hostname detection
   return rules + [.hostnameOrSubdomain(value: "cloudflare-ech.com")]
+}
+
+private extension BlockRule {
+  var lowercasingHostnames: Self {
+    switch self {
+    case .hostnameContains(let value):
+      .hostnameContains(value: value.lowercased())
+    case .hostnameEquals(let value):
+      .hostnameEquals(value: value.lowercased())
+    case .hostnameEndsWith(let value):
+      .hostnameEndsWith(value: value.lowercased())
+    case .hostnameOrSubdomain(let value):
+      .hostnameOrSubdomain(value: value.lowercased())
+    case .both(let a, let b):
+      .both(a: a.lowercasingHostnames, b: b.lowercasingHostnames)
+    case .unless(let rule, let negatedBy):
+      .unless(
+        rule: rule.lowercasingHostnames,
+        negatedBy: negatedBy.map(\.lowercasingHostnames),
+      )
+    default:
+      self
+    }
+  }
 }
 
 func ruleKeychains(

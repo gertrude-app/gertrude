@@ -10,16 +10,29 @@ final class BlockRuleMacFlowTests: XCTestCase {
       (.hostnameContains(value: "a.com"), .init(host: "bla.com.uk", block: true)),
       (.hostnameContains(value: "a.com"), .init(host: "blah.com", block: false)),
       (.hostnameContains(value: "a.com"), .init(host: "b.com", url: "b.com/a.com", block: false)),
+      (.hostnameContains(value: "A.COM"), .init(host: "BLA.COM", block: true)),
       // hostnameEquals()
       (.hostnameEquals(value: "a.com"), .init(host: "a.com", block: true)),
       (.hostnameEquals(value: "a.com"), .init(host: "a.com.uk", block: false)),
       (.hostnameEquals(value: "a.com"), .init(host: "bla.com", block: false)),
       (.hostnameEquals(value: "a.com"), .init(host: "b.com", block: false)),
       (.hostnameEquals(value: "a.com"), .init(host: "b.com", url: "a.com", block: false)),
+      (.hostnameEquals(value: "A.COM"), .init(host: "a.com", block: true)),
       // hostnameEndsWith()
       (.hostnameEndsWith(value: "a.com"), .init(host: "bla.com", block: true)),
       (.hostnameEndsWith(value: "a.com"), .init(host: "www.a.com", block: true)),
       (.hostnameEndsWith(value: "a.com"), .init(host: "bla.com.uk", block: false)),
+      (.hostnameEndsWith(value: "A.COM"), .init(host: "WWW.A.COM", block: true)),
+      // hostnameOrSubdomain()
+      (.hostnameOrSubdomain(value: "YouTube.com"), .init(host: "youtube.com", block: true)),
+      (
+        .hostnameOrSubdomain(value: "YouTube.com"),
+        .init(host: "WWW.YOUTUBE.COM", block: true),
+      ),
+      (
+        .hostnameOrSubdomain(value: "YouTube.com"),
+        .init(host: "notyoutube.com", block: false),
+      ),
       // safely deriving hostname from url only
       (.hostnameEndsWith(value: "a.com"), .init(host: nil, url: "https://bla.com/", block: true)),
       (.hostnameEndsWith(value: "a.com"), .init(host: nil, url: "https://bla.com", block: true)),

@@ -476,7 +476,7 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
 
     try await self.db.create(ChildAlwaysBlockedRule(
       childId: child.model.id,
-      rule: .hostnameEquals(value: "example.com"),
+      rule: .hostnameOrSubdomain(value: "YouTube.com"),
     ))
 
     let output = try await CheckIn_v2.resolve(
@@ -485,7 +485,7 @@ final class CheckIn_v2ResolverTests: ApiTestCase, @unchecked Sendable {
     )
 
     expect(output.alwaysBlocked).toEqual([
-      .hostnameEquals(value: "example.com"),
+      .hostnameOrSubdomain(value: "youtube.com"),
     ])
   }
 

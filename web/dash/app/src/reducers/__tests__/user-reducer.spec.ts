@@ -90,6 +90,21 @@ describe(`userReducer() blocked apps`, () => {
   });
 });
 
+describe(`userReducer() always blocked rules`, () => {
+  test(`normalizes domain input before saving`, () => {
+    let state = reducer(withChild(), { type: `addAlwaysBlockedRule` });
+    state = reducer(state, {
+      type: `editAlwaysBlockedRuleForm`,
+      event: { type: `setPrimaryValue`, value: `  https://YouTube.COM/watch  ` },
+    });
+    state = reducer(state, { type: `saveAlwaysBlockedRule` });
+
+    expect(
+      state.child?.draft.customAlwaysBlockedRules.map((entry) => entry.rule),
+    ).toEqual([{ case: `hostnameOrSubdomain`, value: `youtube.com` }]);
+  });
+});
+
 describe(`userReducer() unrestricted apps`, () => {
   test(`addUnrestrictedApps appends one entry per scope with unique ids`, () => {
     const next = reducer(withChild(), {

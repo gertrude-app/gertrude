@@ -7,6 +7,7 @@ public extension BlockRule {
       guard $0.hasPrefix("http://") || $0.hasPrefix("https://") else { return nil }
       return URL(string: $0)?.host
     }
+    let lowercasedHostname = hostname?.lowercased()
     let target = flow.url ?? flow.hostname
     switch self {
     case .bundleIdContains(let fragment):
@@ -16,14 +17,16 @@ public extension BlockRule {
     case .urlContains(let fragment):
       return flow.url?.contains(fragment) == true
     case .hostnameContains(let fragment):
-      return hostname?.contains(fragment) == true
+      return lowercasedHostname?.contains(fragment.lowercased()) == true
     case .hostnameEquals(let fragment):
-      return hostname == fragment
+      return lowercasedHostname == fragment.lowercased()
     case .hostnameEndsWith(let fragment):
-      return hostname?.hasSuffix(fragment) == true
+      return lowercasedHostname?.hasSuffix(fragment.lowercased()) == true
     case .hostnameOrSubdomain(let domain):
-      guard let hostname else { return false }
-      return hostname == domain || hostname.hasSuffix("." + domain)
+      guard let lowercasedHostname else { return false }
+      let lowercasedDomain = domain.lowercased()
+      return lowercasedHostname == lowercasedDomain
+        || lowercasedHostname.hasSuffix("." + lowercasedDomain)
     case .flowTypeIs(let type):
       return flow.flowType == type
     case .both(let a, let b):

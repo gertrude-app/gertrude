@@ -1,3 +1,4 @@
+import { domain as domainUtils } from '@dash/keys';
 import { Button, Input, Modal } from '@gertrude/ui';
 import React from 'react';
 
@@ -16,7 +17,7 @@ const AddBlockedDomainModal: React.FC<Props> = ({
 }) => {
   const formId = React.useId();
   const [domain, setDomain] = React.useState(initialDomain ?? ``);
-  const trimmedDomain = domain.trim();
+  const normalizedDomain = domainUtils.sanitizeUserInput(domain);
   const editing = initialDomain !== undefined;
 
   React.useEffect(() => {
@@ -37,11 +38,11 @@ const AddBlockedDomainModal: React.FC<Props> = ({
     event.preventDefault();
     event.stopPropagation();
 
-    if (!trimmedDomain) {
+    if (!normalizedDomain) {
       return;
     }
 
-    onAdd(trimmedDomain);
+    onAdd(normalizedDomain);
     handleOpenChange(false);
   };
 
@@ -57,7 +58,12 @@ const AddBlockedDomainModal: React.FC<Props> = ({
           <Button type="button" variant="ghost" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button type="submit" form={formId} variant="primary" disabled={!trimmedDomain}>
+          <Button
+            type="submit"
+            form={formId}
+            variant="primary"
+            disabled={!normalizedDomain}
+          >
             {editing ? `Save Domain` : `Add Domain`}
           </Button>
         </>
