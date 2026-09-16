@@ -17,8 +17,8 @@ interface Props {
   className?: string;
 }
 
-// a nested route (`/people/1/ios-settings/<deviceId>`) must still light up its tab,
-// and the longest match wins so it beats the parent `/people/1` tab
+// nested routes must still light up their closest tab, and the longest match wins
+// so a specific settings tab beats its parent tab
 export const matchingTabHref = (
   tabHrefs: string[],
   currentPath: string,
@@ -108,7 +108,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
                 key={`${tab.href}-${tab.label}`}
                 to={tab.href}
                 className={cx(
-                  `flex shrink-0 justify-center rounded-lg border px-3 py-1 text-center whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow,color] duration-100 select-none @sm/main:flex-grow`,
+                  `flex grow shrink-0 justify-center rounded-lg border px-3 py-1 text-center whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow,color] duration-100 select-none`,
                   isSelected
                     ? `border-stone-200 bg-white text-stone-900 shadow shadow-stone-300/30`
                     : `border-transparent text-stone-600 hover:bg-stone-200/50 focus-visible:bg-stone-200/50`,

@@ -21,6 +21,7 @@ export type MacDevice = {
 };
 
 export type ConnectedIOSApp = `blocker` | `podcasts` | `music`;
+export type DeviceSettingsIOSApp = Exclude<ConnectedIOSApp, `music`>;
 
 export type IOSDeviceSupervisionStatus =
   `pendingClaim` | `claimed` | `supervised` | `complete`;

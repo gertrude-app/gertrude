@@ -11,7 +11,7 @@ describe(`matchingTabHref`, () => {
   });
 
   test(`nested route still selects its tab`, () => {
-    // regression: /ios-settings/<deviceId> used to select nothing
+    // nested pages should keep their closest settings tab selected
     expect(matchingTabHref(personTabs, `/people/1/ios-settings/abc-123`)).toBe(
       `/people/1/ios-settings`,
     );

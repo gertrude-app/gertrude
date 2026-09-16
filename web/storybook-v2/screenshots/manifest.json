@@ -2148,10 +2148,22 @@
     }
   },
   {
-    "id": "account-pages-people-person-settings--ios-all-apps-connected",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-all-apps-connected&viewMode=story",
-    "name": "iPhone and iPad (all apps connected)",
-    "path": "screenshots/mobile/account-pages-people-person-settings--ios-all-apps-connected.png",
+    "id": "account-pages-people-person-settings--ios-alternate-states",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-alternate-states&viewMode=story",
+    "name": "iPhone and iPad (alternate states)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-alternate-states.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-expanded-settings",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-expanded-settings&viewMode=story",
+    "name": "iPhone and iPad (expanded settings)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-expanded-settings.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 390,
@@ -2160,10 +2172,10 @@
     }
   },
   {
-    "id": "account-pages-people-person-settings--ios-all-apps-connected",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-all-apps-connected&viewMode=story",
-    "name": "iPhone and iPad (all apps connected)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-all-apps-connected.png",
+    "id": "account-pages-people-person-settings--ios-expanded-settings",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-expanded-settings&viewMode=story",
+    "name": "iPhone and iPad (expanded settings)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-expanded-settings.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,
@@ -2172,10 +2184,10 @@
     }
   },
   {
-    "id": "account-pages-people-person-settings--ios-apps-not-connected",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-apps-not-connected&viewMode=story",
-    "name": "iPhone and iPad (apps not connected)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-apps-not-connected.png",
+    "id": "account-pages-people-person-settings--ios-loading-and-error",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-loading-and-error&viewMode=story",
+    "name": "iPhone and iPad (loading and error)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-loading-and-error.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,
@@ -2184,34 +2196,10 @@
     }
   },
   {
-    "id": "account-pages-people-person-settings--ios-error",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-error&viewMode=story",
-    "name": "iPhone and iPad (error)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-error.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-loading",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-loading&viewMode=story",
-    "name": "iPhone and iPad (loading)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-loading.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-music-trial",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-trial&viewMode=story",
-    "name": "iPhone and iPad (Music free trial)",
-    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-trial.png",
+    "id": "account-pages-people-person-settings--ios-overview-story",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-overview-story&viewMode=story",
+    "name": "iPhone and iPad (overview)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-overview-story.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 390,
@@ -2220,46 +2208,10 @@
     }
   },
   {
-    "id": "account-pages-people-person-settings--ios-music-trial",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-trial&viewMode=story",
-    "name": "iPhone and iPad (Music free trial)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-trial.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-music-unavailable",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-unavailable&viewMode=story",
-    "name": "iPhone and iPad (music unavailable)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-unavailable.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-podcasts-expiring",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-podcasts-expiring&viewMode=story",
-    "name": "iPhone and iPad (podcasts expiring)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-podcasts-expiring.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-podcasts-paused",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-podcasts-paused&viewMode=story",
-    "name": "iPhone and iPad (podcasts paused)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-podcasts-paused.png",
+    "id": "account-pages-people-person-settings--ios-overview-story",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-overview-story&viewMode=story",
+    "name": "iPhone and iPad (overview)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-overview-story.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,
@@ -2272,30 +2224,6 @@
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-podcasts-pin-reset&viewMode=story",
     "name": "iPhone and iPad (podcasts PIN reset)",
     "path": "screenshots/desktop/account-pages-people-person-settings--ios-podcasts-pin-reset.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-podcasts-trial",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-podcasts-trial&viewMode=story",
-    "name": "iPhone and iPad (podcasts trial)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-podcasts-trial.png",
-    "title": "Account/Pages/People/Person Settings",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people-person-settings--ios-unsupervised",
-    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-unsupervised&viewMode=story",
-    "name": "iPhone and iPad (unsupervised)",
-    "path": "screenshots/desktop/account-pages-people-person-settings--ios-unsupervised.png",
     "title": "Account/Pages/People/Person Settings",
     "viewport": {
       "width": 1440,

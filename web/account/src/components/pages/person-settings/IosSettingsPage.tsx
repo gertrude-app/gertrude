@@ -1,13 +1,12 @@
 import { Banner, Button, Card, EmptyState, HStack, Skeleton, VStack } from '@gertrude/ui';
 import {
   CircleAlertIcon,
-  MusicIcon,
   PodcastIcon,
   RefreshCwIcon,
   SmartphoneIcon,
 } from 'lucide-react';
 import React from 'react';
-import type { ConnectedIOSApp } from '#/components/devices/types';
+import type { DeviceSettingsIOSApp } from '#/components/devices/types';
 import type { PersonSettingsPreviewChip } from '#/components/person-settings/PersonSettingsExpandableSection';
 import type { LoadableState } from '#/components/types';
 import type {
@@ -25,10 +24,8 @@ import iosSettingsReducer, {
   createIosSettingsFormState,
   profileHasUnsavedChanges,
 } from './IosSettingsPage.reducer';
-import CardContainer from '#/components/layout/CardContainer';
 import AppNotInstalledSection from '#/components/person-settings/AppNotInstalledSection';
 import BlockGroup from '#/components/person-settings/BlockGroup';
-import MusicSection from '#/components/person-settings/MusicSection';
 import PersonSettingsExpandableSection from '#/components/person-settings/PersonSettingsExpandableSection';
 import PodcastsSection from '#/components/person-settings/PodcastsSection';
 import SettingsRow from '#/components/person-settings/SettingsRow';
@@ -42,7 +39,7 @@ interface Props {
   onSaveProfile: (profileSettings: ProfileDraft) => void | Promise<void>;
   onRequestPodcastsPinReset?: () => Promise<number | null>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
-  defaultExpandedSection?: ConnectedIOSApp;
+  defaultExpandedSection?: DeviceSettingsIOSApp;
 }
 
 const SaveButton: React.FC<{ disabled: boolean; saving: boolean }> = ({
@@ -305,6 +302,7 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
       <PersonSettingsExpandableSection
         appIconUrl="/gertrude-app-icons/blocker.webp"
         title="Gertrude Blocker"
+        headingLevel="h4"
         defaultExpanded={defaultExpanded}
         hasUnsavedChanges={hasUnsavedChanges}
         previewChips={previewChips}
@@ -345,41 +343,39 @@ const IosSettingsPage: React.FC<Props> = ({
 }) => {
   if (state.status === `loading`) {
     return (
-      <CardContainer className="flex flex-col gap-4">
+      <VStack gap={4}>
         <span role="status" className="sr-only">
           Loading iPhone/iPad settings
         </span>
         <Skeleton className="h-14 w-full" radius="large" />
         <Skeleton className="h-28 w-full" radius="large" />
-      </CardContainer>
+      </VStack>
     );
   }
 
   if (state.status === `error`) {
     return (
-      <CardContainer>
-        <div role="alert">
-          <EmptyState
-            icon={CircleAlertIcon}
-            title="Couldn't load iPhone/iPad settings"
-            description={state.message}
-            button={{
-              text: `Try again`,
-              type: `button`,
-              onClick: state.onRetry,
-              icon: RefreshCwIcon,
-            }}
-            className="bg-white"
-          />
-        </div>
-      </CardContainer>
+      <div role="alert">
+        <EmptyState
+          icon={CircleAlertIcon}
+          title="Couldn't load iPhone/iPad settings"
+          description={state.message}
+          button={{
+            text: `Try again`,
+            type: `button`,
+            onClick: state.onRetry,
+            icon: RefreshCwIcon,
+          }}
+          className="bg-white"
+        />
+      </div>
     );
   }
 
-  const { blocker, podcasts, music, deviceName } = state.data;
+  const { blocker, podcasts, deviceName } = state.data;
 
   return (
-    <CardContainer className="flex flex-col gap-4">
+    <VStack gap={4}>
       {blocker ? (
         <IosSettingsEditor
           blocker={blocker}
@@ -394,6 +390,7 @@ const IosSettingsPage: React.FC<Props> = ({
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/blocker.webp"
           title="Gertrude Blocker"
+          headingLevel="h4"
           defaultExpanded={defaultExpandedSection === `blocker`}
           previewChips={[
             {
@@ -410,25 +407,11 @@ const IosSettingsPage: React.FC<Props> = ({
           />
         </PersonSettingsExpandableSection>
       )}
-      {music ? (
-        <MusicSection
-          music={music}
-          defaultExpanded={defaultExpandedSection === `music`}
-        />
-      ) : (
-        <AppNotInstalledSection
-          appIconUrl="/gertrude-app-icons/music.webp"
-          defaultExpanded={defaultExpandedSection === `music`}
-          appName="Gertrude Music"
-          icon={MusicIcon}
-          description="Gertrude Music is a music app that only plays albums you’ve approved, with no artwork, no radio, and nothing to stumble into."
-          appStoreUrl="https://apps.apple.com/us/app/gertrude-music/id6782194077"
-        />
-      )}
       {podcasts && onRequestPodcastsPinReset ? (
         <PodcastsSection
           subscription={podcasts.subscription}
           deviceName={deviceName}
+          headingLevel="h4"
           requestingPinReset={requestingPinReset}
           onRequestPinReset={onRequestPodcastsPinReset}
           defaultExpanded={defaultExpandedSection === `podcasts`}
@@ -436,6 +419,7 @@ const IosSettingsPage: React.FC<Props> = ({
       ) : (
         <AppNotInstalledSection
           appIconUrl="/gertrude-app-icons/podcasts.webp"
+          headingLevel="h4"
           defaultExpanded={defaultExpandedSection === `podcasts`}
           appName="Gertrude Podcasts"
           icon={PodcastIcon}
@@ -443,7 +427,7 @@ const IosSettingsPage: React.FC<Props> = ({
           appStoreUrl="https://apps.apple.com/us/app/gertrude-podcasts/id6753187429"
         />
       )}
-    </CardContainer>
+    </VStack>
   );
 };
 

@@ -1,9 +1,19 @@
-import { useQuery as useReactQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useQueries as useReactQueries,
+  useQuery as useReactQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import type { QueryKey } from './keys';
 import type { PqlError, Result } from '@shared/pairql';
 import type { UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 
 type QueryOptions<T> = Omit<UseQueryOptions<T, PqlError>, `queryKey` | `queryFn`>;
+
+interface QueryDefinition<T> {
+  key: QueryKey<T>;
+  fn: () => Promise<Result<T, PqlError>>;
+  options?: QueryOptions<T>;
+}
 
 export function useQuery<T>(
   key: QueryKey<T>,
@@ -14,6 +24,18 @@ export function useQuery<T>(
     queryKey: key.segments,
     queryFn: async () => (await fn()).valueOrThrow(),
     ...options,
+  });
+}
+
+export function useQueries<T>(
+  definitions: QueryDefinition<T>[],
+): UseQueryResult<T, PqlError>[] {
+  return useReactQueries({
+    queries: definitions.map(({ key, fn, options }) => ({
+      queryKey: key.segments,
+      queryFn: async () => (await fn()).valueOrThrow(),
+      ...options,
+    })),
   });
 }
 
