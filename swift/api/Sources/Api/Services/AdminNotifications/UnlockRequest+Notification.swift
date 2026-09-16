@@ -68,6 +68,11 @@ extension AdminEvent.UnlockRequestSubmitted: AdminNotifying {
 
 extension AdminEvent.UnlockRequestSubmitted {
   private var url: String {
-    "\(dashboardUrl)/children/\(userId.lowercased)/unlock-requests"
+    switch self.notificationDestination {
+    case .legacyDashboard(baseUrl: let baseUrl):
+      "\(baseUrl)/children/\(userId.lowercased)/unlock-requests"
+    case .accountSite(baseUrl: let baseUrl):
+      "\(baseUrl.withoutTrailingSlashes)/requests/unlock/\(userId.lowercased)"
+    }
   }
 }
