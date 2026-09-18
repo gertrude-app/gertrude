@@ -10,7 +10,7 @@ interface ArtworkDevice {
 
 interface Props {
   device: ArtworkDevice;
-  size?: `small` | `large` | `card`;
+  size?: `small` | `medium` | `large` | `card`;
 }
 
 const DeviceArtwork: React.FC<Props> = ({ device, size = `small` }) => {
@@ -29,19 +29,25 @@ const DeviceArtwork: React.FC<Props> = ({ device, size = `small` }) => {
       ? `h-12 w-16 shrink-0`
       : size === `large`
         ? `h-10 w-12 shrink-0`
-        : `h-5.5 w-7 shrink-0`;
+        : size === `medium`
+          ? `h-8 w-10 shrink-0`
+          : `h-5.5 w-7 shrink-0`;
   const fallbackClass =
     size === `card`
       ? `h-8 w-8 text-stone-500`
       : size === `large`
         ? `h-8 w-8 text-stone-500`
-        : `h-5 w-5 text-stone-500`;
+        : size === `medium`
+          ? `h-7 w-7 text-stone-500`
+          : `h-5 w-5 text-stone-500`;
   const imageClass =
     size === `card`
       ? `h-12 w-16 object-contain drop-shadow-sm`
       : size === `large`
         ? `h-9 w-11 object-contain drop-shadow-sm`
-        : `h-5.5 w-7 object-contain drop-shadow-sm`;
+        : size === `medium`
+          ? `h-7 w-9 object-contain drop-shadow-sm`
+          : `h-5.5 w-7 object-contain drop-shadow-sm`;
 
   return (
     <HStack justify="center" align="center" className={wrapperClass}>

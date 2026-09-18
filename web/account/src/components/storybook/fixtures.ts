@@ -45,7 +45,7 @@ export const macDevice: Device = {
   online: true,
 };
 
-export const iphoneDevice: Device = {
+export const iphoneDevice: Extract<Device, { type: `iphone` | `ipad` }> = {
   id: `iphone-1`,
   personId: `person-1`,
   type: `iphone`,
@@ -54,7 +54,7 @@ export const iphoneDevice: Device = {
   modelIdentifier: `iPhone16,1`,
 };
 
-export const ipadDevice: Device = {
+export const ipadDevice: Extract<Device, { type: `iphone` | `ipad` }> = {
   id: `ipad-1`,
   personId: `person-2`,
   type: `ipad`,
