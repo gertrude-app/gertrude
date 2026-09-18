@@ -602,6 +602,9 @@ importers:
 
   site:
     dependencies:
+      '@base-ui/react':
+        specifier: 1.5.0
+        version: 1.5.0(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@docsearch/react':
         specifier: 4.4.0
         version: 4.4.0(@algolia/client-search@5.46.2)(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.13.0)
@@ -683,7 +686,7 @@ importers:
         version: typescript@7.0.2
       autoprefixer:
         specifier: 10.4.14
-        version: 10.4.14(postcss@8.5.14)
+        version: 10.4.14(postcss@8.5.4)
       glob:
         specifier: 10.3.10
         version: 10.3.10
