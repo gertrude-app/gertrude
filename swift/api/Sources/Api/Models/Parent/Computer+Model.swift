@@ -86,6 +86,7 @@ extension Computer.Model {
 
 extension Computer.Model {
   enum Chip: String, Encodable {
+    case m6 = "M6"
     case m5 = "M5"
     case m4 = "M4"
     case m3 = "M3"
@@ -175,6 +176,14 @@ extension Computer {
         screenSizeInInches: 13.0,
       )
     // MacBook Air @link https://support.apple.com/en-us/HT201862
+    case "Mac17,4":
+      .init(
+        type: .macBookAir,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2026],
+        screenSizeInInches: 15.0,
+      )
     case "Mac17,3":
       .init(
         type: .macBookAir,
@@ -326,6 +335,30 @@ extension Computer {
         newestCompatibleOS: .catalina,
       )
     // Macbook Pro @link https://support.apple.com/en-us/HT201300
+    case "Mac17,7", "Mac17,9":
+      .init(
+        type: .macBookPro,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2026],
+        screenSizeInInches: 14.0,
+      )
+    case "Mac17,6", "Mac17,8":
+      .init(
+        type: .macBookPro,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2026],
+        screenSizeInInches: 16.0,
+      )
+    case "Mac17,2":
+      .init(
+        type: .macBookPro,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2025],
+        screenSizeInInches: 14.0,
+      )
     case "Mac16,1", "Mac16,6", "Mac16,8":
       .init(
         type: .macBookPro,
@@ -733,6 +766,20 @@ extension Computer {
         newestCompatibleOS: .catalina,
       )
     // Mac Mini @link https://support.apple.com/en-us/HT201894
+    case "Mac18,5":
+      .init(
+        type: .mini,
+        identifier: modelIdentifier,
+        chip: .m6,
+        manufactureDates: [2026],
+      )
+    case "Mac17,16":
+      .init(
+        type: .mini,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2026],
+      )
     case "Mac16,11", "Mac16,10":
       .init(
         type: .mini,
@@ -782,6 +829,13 @@ extension Computer {
         newestCompatibleOS: .catalina,
       )
     // Mac Studio @link https://support.apple.com/en-us/HT213073
+    case "Mac17,14", "Mac17,15":
+      .init(
+        type: .studio,
+        identifier: modelIdentifier,
+        chip: .m5,
+        manufactureDates: [2026],
+      )
     case "Mac16,9":
       .init(
         type: .studio,
