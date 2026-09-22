@@ -5,7 +5,6 @@ export namespace GetPersonUnlockRequests {
   }
 
   export interface Output {
-    personId: UUID;
     personName: string;
     requests: Array<{
       id: UUID;
@@ -23,7 +22,28 @@ export namespace GetPersonUnlockRequests {
     keychains: Array<{
       id: UUID;
       name: string;
-      numKeys: number;
+      schedule?: {
+        type: 'active' | 'inactive';
+        days: {
+          sunday: boolean;
+          monday: boolean;
+          tuesday: boolean;
+          wednesday: boolean;
+          thursday: boolean;
+          friday: boolean;
+          saturday: boolean;
+        };
+        startTime: {
+          hour: number;
+          minute: number;
+        };
+        endTime: {
+          hour: number;
+          minute: number;
+        };
+      };
+      otherPeople: string[];
     }>;
+    defaultKeychainId?: UUID;
   }
 }

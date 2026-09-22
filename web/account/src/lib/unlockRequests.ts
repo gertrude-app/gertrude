@@ -10,6 +10,10 @@ import type {
 export type UnlockRequestRow = GetPersonUnlockRequests.Output[`requests`][number];
 export type UnlockDecisionInput = DecideUnlockRequests.Input[`decisions`][number];
 export type UnlockDecision = `undecided` | `allow` | `deny`;
+export type UnlockKey = Extract<
+  SharedKey,
+  { type: `domain` | `anySubdomain` | `ipAddress` }
+>;
 export type UnlockRisk = {
   level: `strongWarning` | `caution`;
   reason: string;
@@ -20,13 +24,13 @@ export type UnlockDomainGroup = {
   requestIds: string[];
   requests: UnlockRequestRow[];
   target: string;
-  originalHost?: string;
-  key: SharedKey;
+  key: UnlockKey;
   decision: UnlockDecision;
   risk?: UnlockRisk;
   keychainId?: string;
   comment?: string;
   expiration?: string;
+  edited?: boolean;
 };
 
 export type UnlockWebEntry = {
@@ -35,18 +39,14 @@ export type UnlockWebEntry = {
   group: UnlockDomainGroup;
 };
 
-export type UnlockAppChoice =
-  `undecided` | `deny` | `requestedAddresses` | `perAddress` | `unrestricted`;
-
 export type UnlockAppEntry = {
   kind: `app`;
   id: string;
   name: string;
-  slug?: string;
   bundleId?: string;
   iconHash?: string;
   scope: SingleAppScope;
-  choice: UnlockAppChoice;
+  unrestricted: boolean;
   groups: UnlockDomainGroup[];
 };
 
@@ -85,7 +85,7 @@ const requestScope = (request: UnlockRequestRow): AppScope => {
   return { type: `webBrowsers` };
 };
 
-export const keyForUnlockRequest = (request: UnlockRequestRow): SharedKey => {
+export const keyForUnlockRequest = (request: UnlockRequestRow): UnlockKey => {
   const scope = requestScope(request);
   const host = requestHost(request) ?? ``;
   if (!host && request.ipAddress) {
@@ -95,10 +95,10 @@ export const keyForUnlockRequest = (request: UnlockRequestRow): SharedKey => {
   if (domainTools.isIpAddress(host)) {
     return { type: `ipAddress`, ipAddress: host.replace(/^\[|\]$/g, ``), scope };
   }
-  return { type: `domain`, domain: host, scope };
+  return { type: `domain`, domain: host.replace(/^www\./, ``), scope };
 };
 
-const scopeIdentity = (scope: SharedKey[`scope`]): string => {
+const scopeIdentity = (scope: AppScope): string => {
   if (scope.type === `single`) {
     return scope.single.type === `identifiedAppSlug`
       ? `slug:${scope.single.identifiedAppSlug}`
@@ -107,26 +107,20 @@ const scopeIdentity = (scope: SharedKey[`scope`]): string => {
   return scope.type;
 };
 
-const keyIdentity = (key: SharedKey): string => {
-  const scope = `scope` in key ? scopeIdentity(key.scope) : ``;
+const keyIdentity = (key: UnlockKey): string => {
+  const scope = scopeIdentity(key.scope);
   switch (key.type) {
     case `anySubdomain`:
     case `domain`:
       return `${key.type}:${key.domain}:${scope}`;
     case `ipAddress`:
       return `${key.type}:${key.ipAddress}:${scope}`;
-    case `domainRegex`:
-      return `${key.type}:${key.pattern}:${scope}`;
-    case `path`:
-      return `${key.type}:${key.path}:${scope}`;
-    case `skeleton`:
-      return `${key.type}:${scopeIdentity(key.scope)}`;
   }
 };
 
 const warningForRequest = (
   request: UnlockRequestRow,
-  key: SharedKey,
+  key: UnlockKey,
 ): UnlockRisk | undefined => {
   if (key.type === `ipAddress`) {
     return {
@@ -177,7 +171,7 @@ const warningForRequest = (
 
 const strongestRisk = (
   requests: UnlockRequestRow[],
-  key: SharedKey,
+  key: UnlockKey,
 ): UnlockRisk | undefined => {
   const risks = requests.flatMap((request) => {
     const risk = warningForRequest(request, key);
@@ -191,13 +185,14 @@ export const updateGroupDecision = (
   decision: UnlockDecision,
   defaultKeychainId?: string,
 ): UnlockDomainGroup => {
-  if (decision === `allow`) return { ...group, decision };
+  if (decision === `allow`) return { ...group, decision, edited: true };
   const request = group.requests[0];
   if (!request) throw new Error(`Unlock request group cannot be empty`);
   const key = keyForUnlockRequest(request);
   return {
     ...group,
     decision,
+    edited: true,
     key,
     risk: strongestRisk(group.requests, key),
     keychainId: defaultKeychainId,
@@ -206,24 +201,18 @@ export const updateGroupDecision = (
   };
 };
 
-const targetForKey = (key: SharedKey): string => {
+const targetForKey = (key: UnlockKey): string => {
   switch (key.type) {
     case `anySubdomain`:
     case `domain`:
       return key.domain;
     case `ipAddress`:
       return key.ipAddress;
-    case `domainRegex`:
-      return key.pattern;
-    case `path`:
-      return key.path;
-    case `skeleton`:
-      return `All internet access`;
   }
 };
 
-const appScope = (key: SharedKey): SingleAppScope | undefined =>
-  `scope` in key && key.scope.type === `single` ? key.scope.single : undefined;
+const appScope = (key: UnlockKey): SingleAppScope | undefined =>
+  key.scope.type === `single` ? key.scope.single : undefined;
 
 const appIdentity = (scope: SingleAppScope): string =>
   scope.type === `identifiedAppSlug`
@@ -234,7 +223,7 @@ export const buildUnlockReview = (
   requests: UnlockRequestRow[],
   defaultKeychainId?: string,
 ): UnlockReviewEntry[] => {
-  const grouped = new Map<string, { key: SharedKey; requests: UnlockRequestRow[] }>();
+  const grouped = new Map<string, { key: UnlockKey; requests: UnlockRequestRow[] }>();
   for (const request of requests) {
     const key = keyForUnlockRequest(request);
     const identity = keyIdentity(key);
@@ -263,7 +252,6 @@ export const buildUnlockReview = (
       requestIds: sorted.map((request) => request.id),
       requests: sorted,
       target: targetForKey(key),
-      originalHost: requestHost(representative),
       key,
       decision:
         risk?.level === `strongWarning` ? (`deny` as const) : (`undecided` as const),
@@ -292,31 +280,16 @@ export const buildUnlockReview = (
         kind: `app`,
         id: `app:${identity}`,
         name: representative.appName ?? `Unknown app`,
-        slug: representative.appSlug,
         bundleId: representative.appBundleId,
         iconHash: representative.appIconHash,
         scope,
-        choice: `undecided`,
+        unrestricted: false,
         groups: [],
       };
       apps.set(identity, entry);
       entries.push(entry);
     }
     entry.groups.push(group);
-  }
-
-  for (const entry of apps.values()) {
-    const hasStrongWarning = entry.groups.some(
-      (group) => group.risk?.level === `strongWarning`,
-    );
-    const hasOtherRiskLevel = entry.groups.some(
-      (group) => group.risk?.level !== `strongWarning`,
-    );
-    if (hasStrongWarning && hasOtherRiskLevel) {
-      entry.choice = `perAddress`;
-    } else if (hasStrongWarning) {
-      entry.choice = `perAddress`;
-    }
   }
 
   return entries;
@@ -343,9 +316,6 @@ const requestCountForEntry = (entry: UnlockReviewEntry): number =>
 export const totalRequestCount = (entries: UnlockReviewEntry[]): number =>
   entries.reduce((sum, entry) => sum + requestCountForEntry(entry), 0);
 
-export const decidedRequestCount = (entries: UnlockReviewEntry[]): number =>
-  planUnlockReview(entries).decidedCount;
-
 const acceptedKeyAction = (
   group: UnlockDomainGroup,
 ): Extract<UnlockDecisionInput[`action`], { case: `acceptedKey` }> => ({
@@ -355,10 +325,6 @@ const acceptedKeyAction = (
   comment: group.comment?.trim() || undefined,
   expiration: group.expiration,
 });
-
-export const decisionsForSubmission = (
-  entries: UnlockReviewEntry[],
-): UnlockDecisionInput[] => planUnlockReview(entries).decisions;
 
 export const denyAllDecisions = (entries: UnlockReviewEntry[]): UnlockDecisionInput[] => {
   const requestIds = entries.flatMap((entry) =>
@@ -371,19 +337,35 @@ export const denyAllDecisions = (entries: UnlockReviewEntry[]): UnlockDecisionIn
 
 export type UnlockAddressMatch = `exact` | `subdomains` | `parent`;
 
+const subdomainPermissionLabel = (host: string): string => `${host} and its subdomains`;
+
 export const addressMatchOptions = (
   group: UnlockDomainGroup,
-): Array<{ value: UnlockAddressMatch; label: string }> => {
+): Array<{ value: UnlockAddressMatch; label: string; domain: string }> => {
   if (group.key.type !== `domain` && group.key.type !== `anySubdomain`) {
     return [];
   }
-  const host = group.originalHost ?? group.target;
+  const host = group.target;
   const parent = domainTools.registrable(host);
   return [
-    { value: `exact`, label: `Only ${host}` },
-    { value: `subdomains`, label: `${host} and its subdomains` },
+    {
+      value: `exact`,
+      label: `Only ${host}`,
+      domain: host,
+    },
+    {
+      value: `subdomains`,
+      label: subdomainPermissionLabel(host),
+      domain: host,
+    },
     ...(parent && parent !== host
-      ? [{ value: `parent` as const, label: `${parent} and all its subdomains` }]
+      ? [
+          {
+            value: `parent` as const,
+            label: `${parent} and all its subdomains`,
+            domain: parent,
+          },
+        ]
       : []),
   ];
 };
@@ -391,7 +373,7 @@ export const addressMatchOptions = (
 export const groupAddressMatch = (group: UnlockDomainGroup): UnlockAddressMatch =>
   group.key.type !== `anySubdomain`
     ? `exact`
-    : group.key.domain === (group.originalHost ?? group.target)
+    : group.key.domain === group.target
       ? `subdomains`
       : `parent`;
 
@@ -405,25 +387,31 @@ export const updateGroupKeyAddressMatch = (
   ) {
     return group;
   }
-  const host = group.originalHost ?? group.target;
-  const key: SharedKey = {
+  const host = group.target;
+  const key: UnlockKey = {
     ...group.key,
     type: match === `exact` ? `domain` : `anySubdomain`,
     domain: match === `parent` ? (domainTools.registrable(host) ?? host) : host,
   };
-  return { ...group, key, risk: strongestRisk(group.requests, key) };
+  return { ...group, key, edited: true, risk: strongestRisk(group.requests, key) };
 };
 
-export const permissionLabel = (group: UnlockDomainGroup): string =>
-  group.key.type === `anySubdomain`
-    ? `${group.key.domain} and its subdomains`
-    : targetForKey(group.key);
+export const permissionLabel = (group: UnlockDomainGroup): string => {
+  switch (group.key.type) {
+    case `domain`:
+      return group.key.domain;
+    case `anySubdomain`:
+      return subdomainPermissionLabel(group.key.domain);
+    default:
+      return targetForKey(group.key);
+  }
+};
 
 export type UnlockRowState = {
   decision: UnlockDecision;
   coveredBy: UnlockDomainGroup[];
   coveredRequestCount: number;
-  preservedApproval?: `longer` | `broader`;
+  overlaps: boolean;
   problem?: string;
 };
 
@@ -440,17 +428,20 @@ const scopePermitsRequest = (scope: AppScope, request: UnlockRequestRow): boolea
   }
 };
 
-const domainMatches = (domain: string, host: string): boolean =>
-  host === domain || host.endsWith(`.${domain}`);
+const exactDomainMatches = (domain: string, host: string): boolean =>
+  host === domain || host === `www.${domain}` || domain === `www.${host}`;
 
-const keyPermitsRequest = (key: SharedKey, request: UnlockRequestRow): boolean => {
-  if (key.type === `skeleton` || !scopePermitsRequest(key.scope, request)) {
+const domainMatches = (domain: string, host: string): boolean =>
+  exactDomainMatches(domain, host) || host.endsWith(`.${domain}`);
+
+const keyPermitsRequest = (key: UnlockKey, request: UnlockRequestRow): boolean => {
+  if (!scopePermitsRequest(key.scope, request)) {
     return false;
   }
   const host = requestHost(request) ?? ``;
   switch (key.type) {
     case `domain`:
-      return key.domain === host;
+      return exactDomainMatches(key.domain, host);
     case `anySubdomain`:
       return domainMatches(key.domain, host);
     case `ipAddress`:
@@ -466,27 +457,33 @@ const keyPermitsRequest = (key: SharedKey, request: UnlockRequestRow): boolean =
 const expirationTime = (group: UnlockDomainGroup): number =>
   group.expiration ? new Date(group.expiration).getTime() : Infinity;
 
-const permissionContains = (
-  source: UnlockDomainGroup,
-  target: UnlockDomainGroup,
-): boolean => {
-  const a = source.key;
-  const b = target.key;
-  if (
-    a.type === `skeleton` ||
-    b.type === `skeleton` ||
-    expirationTime(source) < expirationTime(target) ||
-    (a.scope.type !== `unrestricted` && scopeIdentity(a.scope) !== scopeIdentity(b.scope))
-  ) {
-    return false;
-  }
-  if (a.type === `ipAddress` && b.type === `ipAddress`) {
-    return a.ipAddress === b.ipAddress;
-  }
-  if (a.type === `anySubdomain` && (b.type === `domain` || b.type === `anySubdomain`)) {
-    return domainMatches(a.domain, b.domain);
-  }
-  return a.type === `domain` && b.type === `domain` && a.domain === b.domain;
+export const reconcileUnlockReview = (
+  entries: UnlockReviewEntry[],
+  requests: UnlockRequestRow[],
+  defaultKeychainId?: string,
+): UnlockReviewEntry[] => {
+  const previousGroups = new Map(
+    entries.flatMap((entry) =>
+      (entry.kind === `web` ? [entry.group] : entry.groups).map(
+        (group) => [group.id, group] as const,
+      ),
+    ),
+  );
+  const merge = (group: UnlockDomainGroup): UnlockDomainGroup => {
+    const previous = previousGroups.get(group.id);
+    return previous
+      ? { ...previous, requests: group.requests, requestIds: group.requestIds }
+      : group;
+  };
+  return buildUnlockReview(requests, defaultKeychainId).map((entry) => {
+    if (entry.kind === `web`) return { ...entry, group: merge(entry.group) };
+    const previous = entries.find((old) => old.id === entry.id);
+    return {
+      ...entry,
+      unrestricted: previous?.kind === `app` && previous.unrestricted,
+      groups: entry.groups.map(merge),
+    };
+  });
 };
 
 export const planUnlockReview = (
@@ -501,15 +498,8 @@ export const planUnlockReview = (
   const records = entries.flatMap((entry) =>
     (entry.kind === `web` ? [entry.group] : entry.groups).map((group) => ({
       group,
-      unrestricted: entry.kind === `app` && entry.choice === `unrestricted`,
-      decision:
-        entry.kind === `web` || entry.choice === `perAddress`
-          ? group.decision
-          : entry.choice === `deny`
-            ? (`deny` as const)
-            : entry.choice === `undecided`
-              ? (`undecided` as const)
-              : (`allow` as const),
+      unrestricted: entry.kind === `app` && entry.unrestricted,
+      decision: group.decision,
     })),
   );
   const invalid = new Map<string, string>();
@@ -533,19 +523,10 @@ export const planUnlockReview = (
     }
     return [group];
   });
-  const activeGrants = grants.filter(
-    (group, index) =>
-      !grants.some(
-        (other, otherIndex) =>
-          otherIndex !== index &&
-          permissionContains(other, group) &&
-          (!permissionContains(group, other) || otherIndex < index),
-      ),
-  );
   const rows = new Map<string, UnlockRowState>();
-  const assignedIds = new Map(activeGrants.map((group) => [group.id, [] as string[]]));
+  const assignedIds = new Map(grants.map((group) => [group.id, [...group.requestIds]]));
   const decisions: UnlockDecisionInput[] = entries.flatMap((entry) =>
-    entry.kind === `app` && entry.choice === `unrestricted`
+    entry.kind === `app` && entry.unrestricted
       ? [
           {
             requestIds: entry.groups.flatMap((group) => group.requestIds),
@@ -557,64 +538,39 @@ export const planUnlockReview = (
   let decidedCount = 0;
 
   for (const { group, decision, unrestricted } of records) {
-    const ownGrant = activeGrants.find((grant) => grant.id === group.id);
-    const containingGrant = grants.includes(group)
-      ? activeGrants.find((grant) => permissionContains(grant, group))
-      : undefined;
     const providers = unrestricted
       ? []
       : group.requests.flatMap((request) => {
-          const provider =
-            ownGrant ??
-            containingGrant ??
-            activeGrants.find((grant) => keyPermitsRequest(grant.key, request));
-          if (!provider) {
-            return [];
-          }
-          if (decision !== `deny`) {
-            assignedIds.get(provider.id)?.push(request.id);
-          }
+          const provider = grants.find(
+            (grant) => grant.id !== group.id && keyPermitsRequest(grant.key, request),
+          );
+          if (!provider) return [];
+          if (decision === `undecided`) assignedIds.get(provider.id)?.push(request.id);
           return [provider];
         });
-    const coveredBy = Array.from(
-      new Set(providers.filter((provider) => provider.id !== group.id)),
-    );
-    const overlappingGrants = ownGrant
-      ? activeGrants.filter(
-          (other) =>
-            other.id !== group.id &&
-            group.requests.some((request) => keyPermitsRequest(other.key, request)),
-        )
-      : [];
-    const coveredRequestCount = providers.filter(
-      (provider) => provider.id !== group.id,
-    ).length;
-    const problem =
-      decision === `deny` && providers.length > 0
-        ? `Deny conflicts with an allowed permission. Allow this request, or narrow or clear the covering permission.`
-        : providers.length < group.requestIds.length
-          ? invalid.get(group.id)
-          : undefined;
+    const coveredBy = decision === `allow` ? [] : Array.from(new Set(providers));
+    const coveredRequestCount = decision === `undecided` ? providers.length : 0;
+    const problem = unrestricted
+      ? undefined
+      : decision === `deny` && providers.length > 0
+        ? `You denied this request, but your ${coveredBy.length === 1 ? `approval` : `approvals`} of ${coveredBy.map(permissionLabel).join(`, `)} would still allow it. Narrow or clear ${coveredBy.length === 1 ? `that broader approval` : `those broader approvals`} to keep this request denied.`
+        : invalid.get(group.id);
     rows.set(group.id, {
-      decision,
+      decision: unrestricted ? `allow` : decision,
       coveredBy,
       coveredRequestCount,
-      preservedApproval: overlappingGrants.some(
-        (other) => expirationTime(other) < expirationTime(group),
-      )
-        ? `longer`
-        : overlappingGrants.length > 0
-          ? `broader`
-          : undefined,
+      overlaps: decision === `allow` && providers.length > 0,
       problem,
     });
-    if (decision === `deny`) {
+    if (!unrestricted && decision === `deny`) {
       decisions.push({ requestIds: group.requestIds, action: { case: `rejected` } });
     }
     decidedCount +=
-      decision !== `undecided` ? group.requestIds.length : coveredRequestCount;
+      unrestricted || decision !== `undecided`
+        ? group.requestIds.length
+        : coveredRequestCount;
   }
-  for (const grant of activeGrants) {
+  for (const grant of grants) {
     const requestIds = assignedIds.get(grant.id) ?? [];
     if (requestIds.length > 0) {
       decisions.push({ requestIds, action: acceptedKeyAction(grant) });

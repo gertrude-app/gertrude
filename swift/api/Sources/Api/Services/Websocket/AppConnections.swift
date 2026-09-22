@@ -74,9 +74,15 @@ import Gertie
   func send(_ event: AppEvent) async throws {
     let conns = await self.currentConnections()
     let matching = conns.filter { $0.ids.satisfies(matcher: event.matcher) }
+    var sendError: (any Error)?
     for conn in matching {
-      try await conn.ws.send(app: event.message)
+      do {
+        try await conn.ws.send(app: event.message)
+      } catch {
+        sendError = error
+      }
     }
+    if let sendError { throw sendError }
   }
 
   deinit {

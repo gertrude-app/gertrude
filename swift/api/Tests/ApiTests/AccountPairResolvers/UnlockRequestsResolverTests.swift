@@ -1,4 +1,6 @@
 import CustomDump
+import Dependencies
+import DuetSQL
 import Gertie
 import XCTest
 import XExpect
@@ -99,7 +101,7 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       .toEqual(["school.example.com/lesson"])
   }
 
-  func testPersonDetailCreatesAndReusesLegacyDefaultKeychain() async throws {
+  func testPersonDetailDoesNotCreateAKeychainJustForReading() async throws {
     let child = try await self.child().withDevice()
     try await self.db.create(UnlockRequest(
       computerUserId: child.computerUser.id,
@@ -112,20 +114,9 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       in: self.accountContext(child.parent),
     )
 
-    let keychains = try await child.model.keychains(in: self.db)
-    expect(keychains).toHaveCount(1)
-    let keychain = try XCTUnwrap(keychains.first)
-    expectNoDifference(output.keychains.map(\.id), [keychain.id])
-    expectNoDifference(output.keychains.first?.name, "\(child.model.name)'s Keychain")
-    expectNoDifference(output.keychains.first?.numKeys, 0)
-    await expect(try keychain.keys(in: self.db)).toBeEmpty()
-
-    let refreshed = try await GetPersonUnlockRequests.resolve(
-      with: .init(personId: child.model.id),
-      in: self.accountContext(child.parent),
-    )
-    expectNoDifference(refreshed.keychains.map(\.id), [keychain.id])
-    await expect(try child.model.keychains(in: self.db)).toHaveCount(1)
+    expectNoDifference(output.keychains.count, 0)
+    expectNoDifference(output.defaultKeychainId, nil)
+    await expect(try child.model.keychains(in: self.db)).toBeEmpty()
   }
 
   func testInvalidKeyRollsBackEntireUnlockDecisionBatch() async throws {
@@ -198,7 +189,7 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
     ))
     let key = Gertie.Key.domainRegex(pattern: "^harvard\\.edu$", scope: .webBrowsers)
 
-    let output = try await DecideUnlockRequests.resolve(
+    _ = try await DecideUnlockRequests.resolve(
       with: .init(
         personId: child.model.id,
         decisions: [.init(
@@ -209,9 +200,6 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       ),
       in: self.accountContext(child.parent),
     )
-
-    expectNoDifference(output.handledCount, 1)
-    expectNoDifference(output.remainingCount, 0)
     let resolved = try await self.db.find(request.id)
     expectNoDifference(resolved.status, .accepted)
     let keychains = try await child.model.keychains(in: self.db)
@@ -253,9 +241,7 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       in: self.accountContext(child.parent),
     )
 
-    expect(output.handledCount).toEqual(2)
     expect(output.skippedCount).toEqual(0)
-    expect(output.remainingCount).toEqual(0)
     await expect(try self.db.find(first.id).status).toEqual(.accepted)
     await expect(try self.db.find(second.id).status).toEqual(.accepted)
 
@@ -307,7 +293,6 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       in: self.accountContext(child.parent),
     )
 
-    expect(output.handledCount).toEqual(0)
     expect(output.skippedCount).toEqual(1)
     await expect(try child.model.keychains(in: self.db)).toBeEmpty()
   }
@@ -345,9 +330,7 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       in: self.accountContext(child.parent),
     )
 
-    expect(output.handledCount).toEqual(2)
     expect(output.skippedCount).toEqual(1)
-    expect(output.remainingCount).toEqual(0)
     await expect(try self.db.find(first.id).responseComment).toEqual("Not right now")
     await expect(try self.db.find(second.id).responseComment).toEqual("Not right now")
     expect(sent.websocketMessages).toHaveCount(2)
@@ -380,6 +363,196 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
         in: self.accountContext(child.parent),
       )
     }.toContain("badRequest")
+  }
+
+  func testKeychainMetadataAvoidsScheduledAndSharedDefaults() async throws {
+    let child = try await self.childWithComputer()
+    let other = try await self.db.create(Child.random { $0.parentId = child.parentId
+      $0.name = "Lucy"
+    })
+    let scheduled = try await self.db.create(Keychain(
+      parentId: child.parentId,
+      name: "Weekend games",
+    ))
+    let personal = try await self.db.create(Keychain(parentId: child.parentId, name: "School"))
+    let schedule = RuleSchedule(mode: .active, days: .all, window: "09:00-12:00")
+    try await self.db.create(ChildKeychain(
+      childId: child.id,
+      keychainId: scheduled.id,
+      schedule: schedule,
+    ))
+    try await self.db.create(ChildKeychain(childId: other.id, keychainId: scheduled.id))
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: personal.id))
+    let output = try await GetPersonUnlockRequests.resolve(
+      with: .init(personId: child.id),
+      in: self.accountContext(child.parent),
+    )
+    expectNoDifference(output.defaultKeychainId, personal.id)
+    let option = try XCTUnwrap(output.keychains.first { $0.id == scheduled.id })
+    expectNoDifference(option.schedule?.ruleSchedule, schedule)
+    expectNoDifference(option.otherPeople, ["Lucy"])
+  }
+
+  func testExplicitKeySettingsArePreservedAndIdenticalApprovalsAreReused() async throws {
+    let (child, request) = try await self.reviewFixture()
+    let keychain = try await self.db.create(Keychain(parentId: child.parentId, name: "School"))
+    try await self.db.create(ChildKeychain(childId: child.id, keychainId: keychain.id))
+    let key = Gertie.Key.domain(domain: "example.com", scope: .webBrowsers)
+    try await self.db.create(Key(
+      keychainId: keychain.id,
+      key: key,
+      comment: "Existing",
+      deletedAt: .distantFuture,
+    ))
+    let action = DecideUnlockRequests.Action.acceptedKey(
+      keychainId: keychain.id,
+      key: key,
+      comment: "Permanent school access",
+      expiration: nil,
+    )
+    _ = try await DecideUnlockRequests.resolve(
+      with: .init(
+        personId: child.id,
+        decisions: [.init(requestIds: [request.id], action: action)],
+        responseComment: nil,
+      ),
+      in: self.accountContext(child.parent),
+    )
+    let second = try await self.db.create(UnlockRequest(
+      computerUserId: child.computerUser.id,
+      appBundleId: ".com.apple.Safari",
+      hostname: "example.com",
+    ))
+    _ = try await DecideUnlockRequests.resolve(
+      with: .init(
+        personId: child.id,
+        decisions: [.init(requestIds: [second.id], action: action)],
+        responseComment: nil,
+      ),
+      in: self.accountContext(child.parent),
+    )
+    let keys = try await keychain.keys(in: self.db)
+    expectNoDifference(keys.count, 2)
+    expectNoDifference(
+      keys.filter { $0.comment == "Permanent school access" }.first?.deletedAt,
+      nil,
+    )
+    let events = try await Api.SecurityEvent.query().where(.parentId == child.parentId)
+      .all(in: self.db)
+    let keyCreatedEvents = events.filter {
+      $0.event == Gertie.SecurityEvent.Dashboard.keyCreated.rawValue
+    }
+    expectNoDifference(keyCreatedEvents.count, 1)
+    expectNoDifference(
+      keyCreatedEvents.first?.detail,
+      "key opening \(key.simpleDescription) added to keychain 'School'",
+    )
+  }
+
+  func testFullAppApprovalRemovesExistingScheduleAndLogsTheChange() async throws {
+    let (child, request) = try await self.reviewFixture()
+    let grant = try await self.db.create(UnrestrictedMacApp(
+      scope: .bundleId(".com.apple.Safari"),
+      childId: child.id,
+      schedule: .init(mode: .active, days: .all, window: "09:00-12:00"),
+    ))
+    _ = try await DecideUnlockRequests.resolve(
+      with: .init(personId: child.id, decisions: [.init(
+        requestIds: [request.id],
+        action: .acceptedApp(scope: grant.scope),
+      )], responseComment: nil),
+      in: self.accountContext(child.parent),
+    )
+    let updated = try await self.db.find(grant.id)
+    expectNoDifference(updated.schedule, nil)
+    let events = try await Api.SecurityEvent.query().where(.parentId == child.parentId)
+      .all(in: self.db)
+    expectNoDifference(
+      events.map(\.event),
+      [Gertie.SecurityEvent.Dashboard.unrestrictedAppsChanged.rawValue],
+    )
+  }
+
+  func testCommentedDenialUsesTheCommentBearingMessageOnModernMacs() async throws {
+    let (child, request) = try await self.reviewFixture()
+    _ = try await DecideUnlockRequests.resolve(
+      with: .init(personId: child.id, decisions: [.init(
+        requestIds: [request.id],
+        action: .rejected,
+      )], responseComment: "Let's talk after dinner"),
+      in: self.accountContext(child.parent),
+    )
+    expectNoDifference(
+      self.sent.websocketMessages,
+      [.init(
+        .unlockRequestUpdated_v2(
+          id: request.id.rawValue,
+          status: .rejected,
+          target: "example.com",
+          comment: "Let's talk after dinner",
+        ),
+        to: .userDevice(child.computerUser.id),
+      )],
+    )
+  }
+
+  func testNotificationFailureDoesNotFailCommittedDecisions() async throws {
+    let (child, request) = try await self.reviewFixture()
+    struct DeliveryError: Error {}
+    _ = try await withDependencies {
+      $0.websockets.sendEvent = { _ in throw DeliveryError() }
+    } operation: {
+      try await DecideUnlockRequests.resolve(
+        with: .init(personId: child.id, decisions: [.init(
+          requestIds: [request.id],
+          action: .rejected,
+        )], responseComment: nil),
+        in: self.accountContext(child.parent),
+      )
+    }
+    let updated = try await self.db.find(request.id)
+    expectNoDifference(updated.status, .rejected)
+  }
+
+  func testConcurrentAllowAndDenyHandleARequestOnlyOnce() async throws {
+    let (child, request) = try await self.reviewFixture()
+    let context = self.accountContext(child.parent)
+    let allow = DecideUnlockRequests.Input(
+      personId: child.id,
+      decisions: [.init(
+        requestIds: [request.id],
+        action: .acceptedKey(
+          keychainId: nil,
+          key: .domain(domain: "example.com", scope: .webBrowsers),
+          comment: nil,
+          expiration: nil,
+        ),
+      )],
+      responseComment: nil,
+    )
+    let deny = DecideUnlockRequests.Input(
+      personId: child.id,
+      decisions: [.init(requestIds: [request.id], action: .rejected)],
+      responseComment: nil,
+    )
+    async let first = DecideUnlockRequests.resolve(with: allow, in: context)
+    async let second = DecideUnlockRequests.resolve(with: deny, in: context)
+    let results = try await [first, second]
+    expectNoDifference(results.map(\.skippedCount).reduce(0, +), 1)
+    let resolved = try await self.db.find(request.id)
+    let keychains = try await child.model.keychains(in: self.db)
+    let keys = try await Key.query().where(.keychainId |=| keychains.map(\.id)).all(in: self.db)
+    expectNoDifference(keys.count, resolved.status == .accepted ? 1 : 0)
+  }
+
+  private func reviewFixture() async throws -> (ChildWithComputerEntities, UnlockRequest) {
+    let child = try await self.child().withDevice { $0.appVersion = "2.9.0" }
+    let request = try await self.db.create(UnlockRequest(
+      computerUserId: child.computerUser.id,
+      appBundleId: ".com.apple.Safari",
+      hostname: "example.com",
+    ))
+    return (child, request)
   }
 
   func testRejectsRequestFromAnotherAccountPerson() async throws {

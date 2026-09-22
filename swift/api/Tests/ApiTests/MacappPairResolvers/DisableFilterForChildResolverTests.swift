@@ -41,6 +41,9 @@ final class DisableFilterForChildResolverTests: ApiTestCase, @unchecked Sendable
       event: .securityEvent(.init(
         source: .macApp(childName: child.name, event: .filteringDisabledDuringOnboarding),
         detail: nil,
+        notificationDestination: .legacyDashboard(
+          baseUrl: get(dependency: \.env).dashboardUrl,
+        ),
       )),
     )])
   }

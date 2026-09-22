@@ -102,8 +102,8 @@ export const Cards = {
           <UnlockRequestCard
             group={unlockReview.group}
             keychainOptions={keychains.map((keychain) => ({
-              id: keychain.id,
-              name: keychain.name,
+              ...keychain,
+              otherPeople: [],
             }))}
             onChange={noop}
           />

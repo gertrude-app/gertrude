@@ -26,8 +26,6 @@ export namespace DecideUnlockRequests {
   }
 
   export interface Output {
-    handledCount: number;
     skippedCount: number;
-    remainingCount: number;
   }
 }

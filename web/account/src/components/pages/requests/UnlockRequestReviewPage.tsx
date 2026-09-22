@@ -2,6 +2,7 @@ import {
   Banner,
   Button,
   ConfirmationDialog,
+  CountBadge,
   DropdownMenu,
   DropdownMenuItem,
   HStack,
@@ -37,6 +38,7 @@ import {
   buildUnlockReview,
   denyAllDecisions,
   planUnlockReview,
+  reconcileUnlockReview,
   totalRequestCount,
   updateGroupDecision,
 } from '#/lib/unlockRequests';
@@ -48,8 +50,10 @@ interface Props {
   onSubmit: (
     decisions: DecideUnlockRequests.Input[`decisions`],
     responseComment?: string,
-  ) => void;
+  ) => Promise<void>;
   onRefresh: () => void;
+  onDirtyChange?: (dirty: boolean) => void;
+  initialEntries?: UnlockReviewEntry[];
 }
 
 const appRequestCount = (entry: UnlockAppEntry): number =>
@@ -65,17 +69,11 @@ const AppRequestSection: React.FC<{
   onChange: (entry: UnlockAppEntry) => void;
 }> = ({ entry, keychainOptions, iconUrl, rowStates, onChange }) => {
   const applyBulkDecision = (decision: AppBulkDecision): void => {
-    const choice =
-      decision === `allow`
-        ? (`requestedAddresses` as const)
-        : decision === `deny`
-          ? (`deny` as const)
-          : (`perAddress` as const);
     onChange({
       ...entry,
-      choice,
+      unrestricted: false,
       groups: entry.groups.map((group) =>
-        updateGroupDecision(group, decision, keychainOptions[0]?.id),
+        updateGroupDecision(group, decision, group.keychainId),
       ),
     });
   };
@@ -83,15 +81,16 @@ const AppRequestSection: React.FC<{
   const toggleUnrestricted = (): void => {
     onChange({
       ...entry,
-      choice: entry.choice === `unrestricted` ? `perAddress` : `unrestricted`,
+      unrestricted: !entry.unrestricted,
     });
   };
 
   const updateGroup = (updated: UnlockDomainGroup): void => {
     onChange({
       ...entry,
-      choice: `perAddress`,
-      groups: entry.groups.map((group) => (group.id === updated.id ? updated : group)),
+      groups: entry.groups.map((group) =>
+        group.id === updated.id ? { ...updated, edited: true } : group,
+      ),
     });
   };
 
@@ -105,21 +104,20 @@ const AppRequestSection: React.FC<{
     },
     { allow: 0, deny: 0, undecided: 0, covered: 0 },
   );
-  const decisionSummary =
-    entry.choice === `unrestricted`
-      ? `Full internet access selected`
-      : [
-          decisionCounts.allow > 0 ? `${decisionCounts.allow} allowed` : undefined,
-          decisionCounts.covered > 0 ? `${decisionCounts.covered} covered` : undefined,
-          decisionCounts.deny > 0 ? `${decisionCounts.deny} denied` : undefined,
-          decisionCounts.undecided > 0
-            ? `${decisionCounts.undecided} undecided`
-            : undefined,
-        ]
-          .filter((part): part is string => part !== undefined)
-          .join(` · `);
+  const decisionSummary = entry.unrestricted
+    ? `Full internet access selected`
+    : [
+        decisionCounts.allow > 0 ? `${decisionCounts.allow} allowed` : undefined,
+        decisionCounts.covered > 0 ? `${decisionCounts.covered} covered` : undefined,
+        decisionCounts.deny > 0 ? `${decisionCounts.deny} denied` : undefined,
+        decisionCounts.undecided > 0
+          ? `${decisionCounts.undecided} undecided`
+          : undefined,
+      ]
+        .filter((part): part is string => part !== undefined)
+        .join(` · `);
   const unknownApp = entry.name === `Unknown app`;
-  const unrestricted = entry.choice === `unrestricted`;
+  const unrestricted = entry.unrestricted;
   const allAllowed =
     !unrestricted && decisionCounts.deny === 0 && decisionCounts.undecided === 0;
   const allDenied =
@@ -147,12 +145,7 @@ const AppRequestSection: React.FC<{
               <Text as="h2" variant="bodyLargeStrong">
                 {entry.name}
               </Text>
-              <Text
-                variant="caption"
-                className="min-w-5 shrink-0 rounded-full bg-stone-200/70 px-1.5 text-center font-medium leading-5 tabular-nums !text-stone-600"
-              >
-                {appRequestCount(entry)}
-              </Text>
+              <CountBadge>{appRequestCount(entry)}</CountBadge>
             </HStack>
             {unknownApp && (
               <Text variant="captionMuted" truncate>
@@ -221,7 +214,7 @@ const AppRequestSection: React.FC<{
             className="pointer-events-none absolute -top-[17px] -bottom-4 left-3 border-l-2 border-stone-300 @3xl/main:-top-4 @3xl/main:-left-4"
           />
           <Banner
-            variant={unknownApp ? `error` : `warning`}
+            variant={unknownApp ? `warning` : `neutral`}
             className="rounded-lg py-2 [&>svg]:h-4 [&>svg]:w-4"
           >
             <strong>
@@ -234,12 +227,13 @@ const AppRequestSection: React.FC<{
               ? `Only grant full internet access if you recognize the bundle identifier above and trust the app.`
               : `It can reach sites and services that were not included in these requests.`}
             {` `}
-            Turn this off to respond to individual addresses.
+            Existing app-access schedules will be removed. Always Blocked and other
+            restrictions still apply. Turn this off to respond to individual addresses.
           </Banner>
         </div>
       )}
 
-      <div className="relative pb-5">
+      <div className="relative pb-4">
         <div
           aria-hidden="true"
           className={cx(
@@ -271,21 +265,85 @@ const AppRequestSection: React.FC<{
 };
 
 const UnlockRequestReviewPage: React.FC<Props> = (props) => {
-  const [entries, setEntries] = React.useState<UnlockReviewEntry[]>(() =>
-    buildUnlockReview(props.data.requests, props.data.keychains[0]?.id),
+  const [entries, setEntries] = React.useState<UnlockReviewEntry[]>(
+    () =>
+      props.initialEntries ??
+      buildUnlockReview(props.data.requests, props.data.defaultKeychainId),
   );
+  React.useEffect(() => {
+    setEntries((current) =>
+      reconcileUnlockReview(current, props.data.requests, props.data.defaultKeychainId),
+    );
+  }, [props.data.requests, props.data.defaultKeychainId]);
   return (
     <UnlockRequestReviewEditor {...props} entries={entries} setEntries={setEntries} />
   );
 };
 
-export const UnlockRequestReviewEditor: React.FC<
+const UnlockRequestReviewEditor: React.FC<
   Props & {
     entries: UnlockReviewEntry[];
     setEntries: React.Dispatch<React.SetStateAction<UnlockReviewEntry[]>>;
   }
-> = ({ data, saving, appIconUrl, onSubmit, onRefresh, entries, setEntries }) => {
-  const [denyAllResponseComment, setDenyAllResponseComment] = React.useState(``);
+> = ({
+  data,
+  saving,
+  appIconUrl,
+  onSubmit,
+  onRefresh,
+  onDirtyChange,
+  entries,
+  setEntries,
+}) => {
+  const [responseComment, setResponseComment] = React.useState(``);
+  const [submitError, setSubmitError] = React.useState(false);
+  const hasDeniedRequests = entries.some((entry) =>
+    entry.kind === `web`
+      ? entry.group.decision === `deny`
+      : !entry.unrestricted && entry.groups.some((group) => group.decision === `deny`),
+  );
+  const dirty =
+    (hasDeniedRequests && responseComment.length > 0) ||
+    entries.some((entry) =>
+      entry.kind === `web`
+        ? entry.group.edited
+        : entry.unrestricted || entry.groups.some((group) => group.edited),
+    );
+  React.useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+  const submit = async (
+    decisions: DecideUnlockRequests.Input[`decisions`],
+  ): Promise<void> => {
+    if (saving) return;
+    setSubmitError(false);
+    try {
+      const includesDenial = decisions.some(
+        (decision) => decision.action.case === `rejected`,
+      );
+      await onSubmit(
+        decisions,
+        includesDenial ? responseComment.trim() || undefined : undefined,
+      );
+      const submitted = new Set(decisions.flatMap((decision) => decision.requestIds));
+      setEntries((current) =>
+        reconcileUnlockReview(
+          current,
+          current
+            .flatMap((entry) =>
+              (entry.kind === `web` ? [entry.group] : entry.groups).flatMap(
+                (group) => group.requests,
+              ),
+            )
+            .filter((request) => !submitted.has(request.id)),
+          data.defaultKeychainId,
+        ),
+      );
+      setResponseComment(``);
+    } catch {
+      setSubmitError(true);
+    }
+  };
 
   const [reviewTime, setReviewTime] = React.useState(Date.now);
   React.useEffect(() => {
@@ -296,10 +354,7 @@ export const UnlockRequestReviewEditor: React.FC<
   const decidedCount = plan.decidedCount;
   const totalCount = totalRequestCount(entries);
   const recommendedDenyCount = entries.reduce((sum, entry) => {
-    if (
-      entry.kind === `app` &&
-      (entry.choice === `requestedAddresses` || entry.choice === `unrestricted`)
-    ) {
+    if (entry.kind === `app` && entry.unrestricted) {
       return sum;
     }
     const groups = entry.kind === `web` ? [entry.group] : entry.groups;
@@ -317,6 +372,7 @@ export const UnlockRequestReviewEditor: React.FC<
   }, 0);
 
   const updateEntry = (updated: UnlockReviewEntry): void => {
+    if (saving) return;
     setEntries((current) =>
       current.map((entry) => (entry.id === updated.id ? updated : entry)),
     );
@@ -329,142 +385,172 @@ export const UnlockRequestReviewEditor: React.FC<
           title={`Review ${data.personName}'s requests`}
           subtitle={`${totalCount} pending ${inflect(`request`, totalCount)}`}
           breadcrumbs={[{ text: `Requests`, href: `/requests/unlock` }]}
-          buttons={[
-            {
-              text: `Refresh`,
-              onClick: onRefresh,
-            },
-          ]}
+          buttons={
+            saving
+              ? []
+              : [
+                  {
+                    text: `Refresh`,
+                    onClick: onRefresh,
+                  },
+                ]
+          }
         />
       }
     >
-      <div className="flex w-full flex-col gap-3 pb-28 @lg/main:pb-24">
-        {plan.problemCount > 0 && (
-          <div role="alert">
+      <fieldset disabled={saving} className="min-w-0">
+        <div className="flex w-full flex-col gap-3 pb-44 @lg/main:pb-28">
+          {submitError && (
             <Banner variant="error">
-              <strong>
-                Resolve {plan.problemCount}
-                {` `}
-                {inflect(`permission issue`, plan.problemCount)} before submitting.
-              </strong>
-              {` `}Review the highlighted cards below.
+              Couldn't save your decisions. Your edits are still here. Try again.
             </Banner>
-          </div>
-        )}
-        {recommendedDenyCount > 0 && (
-          <Banner
-            variant="error"
-            className="rounded-lg py-2 [&>svg]:h-4 [&>svg]:w-4 [&>div]:text-xs [&>div]:leading-4"
-          >
-            <strong>Deny was pre-selected</strong> for {recommendedDenyCount}
-            {` `}
-            higher-risk {inflect(`request`, recommendedDenyCount)}. Review the warning
-            before changing it.
-          </Banner>
-        )}
-
-        <CardContainer className="flex flex-col gap-6">
-          {entries.map((entry) =>
-            entry.kind === `web` ? (
-              <UnlockRequestCard
-                key={entry.id}
-                group={entry.group}
-                keychainOptions={data.keychains}
-                rowState={plan.rows.get(entry.group.id)}
-                onChange={(group) => updateEntry({ ...entry, group })}
-              />
-            ) : (
-              <AppRequestSection
-                key={entry.id}
-                entry={entry}
-                keychainOptions={data.keychains}
-                iconUrl={entry.iconHash ? appIconUrl(entry.iconHash) : undefined}
-                rowStates={plan.rows}
-                onChange={updateEntry}
-              />
-            ),
           )}
-        </CardContainer>
-      </div>
-
-      <div className="fixed right-0 bottom-0 left-[var(--sidebar-width,0px)] z-20 border-t border-stone-200 bg-white/95 px-3 py-2 shadow-[0_-6px_24px_rgba(28,25,23,0.08)] backdrop-blur">
-        <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-2 px-3 @lg/main:px-4 @xl/main:px-8 @3xl/main:px-12">
-          <div className="min-w-0 shrink-0">
-            <Text variant="bodyStrong" className="whitespace-nowrap">
-              <span className="@sm/main:hidden">
-                {decidedCount} of {totalCount} decided
-              </span>
-              <span className="hidden @sm/main:inline">
-                {decidedCount} of {totalCount} requests decided
-              </span>
-            </Text>
-            <Text variant="captionMuted" className="hidden @lg/main:block">
-              Undecided requests stay in the queue.
-            </Text>
-          </div>
-          <HStack justify="end" gap={2} className="shrink-0">
-            <ConfirmationDialog
-              confirmationQuestion={`Deny all ${totalCount} requests?`}
-              description={
-                <VStack gap={4}>
-                  <Text variant="bodySubtle">
-                    This will deny every pending request shown here. No keys will be
-                    created.
-                  </Text>
-                  <Textarea
-                    label="Optional message"
-                    placeholder={`For example: Let's talk about this after dinner.`}
-                    rows={3}
-                    resize="vertical"
-                    value={denyAllResponseComment}
-                    setValue={setDenyAllResponseComment}
-                  />
-                </VStack>
-              }
-              trigger={
-                <Button
-                  type="button"
-                  size="medium"
-                  variant="destructive"
-                  onClick={() => {}}
-                >
-                  Deny all
-                </Button>
-              }
-              actions={[
-                { text: `Cancel` },
-                {
-                  text: `Deny all`,
-                  variant: `destructive`,
-                  disabled: saving,
-                  onClick: () =>
-                    onSubmit(
-                      denyAllDecisions(entries),
-                      denyAllResponseComment.trim() || undefined,
-                    ),
-                },
-              ]}
-            />
-            <Button
-              type="button"
-              size="medium"
-              variant="primary"
-              loading={saving}
-              disabled={decidedCount === 0 || plan.problemCount > 0}
-              onClick={() => {
-                const currentTime = Date.now();
-                setReviewTime(currentTime);
-                const currentPlan = planUnlockReview(entries, currentTime);
-                if (currentPlan.problemCount === 0 && currentPlan.decisions.length > 0) {
-                  onSubmit(currentPlan.decisions);
-                }
-              }}
+          <Text variant="bodySubtle">
+            New keys default to{` `}
+            {data.keychains.find((keychain) => keychain.id === data.defaultKeychainId)
+              ?.name ?? `${data.personName}'s new personal keychain`}
+            . You can change this in key settings.
+          </Text>
+          {totalCount === 0 && (
+            <Banner>All requests in this review have been answered.</Banner>
+          )}
+          {plan.problemCount > 0 && (
+            <div role="alert">
+              <Banner variant="error">
+                <strong>
+                  Resolve {plan.problemCount}
+                  {` `}
+                  {inflect(`permission issue`, plan.problemCount)} before submitting.
+                </strong>
+                {` `}Review the highlighted cards below.
+              </Banner>
+            </div>
+          )}
+          {recommendedDenyCount > 0 && (
+            <Banner
+              variant="error"
+              className="rounded-lg py-2 [&>svg]:h-4 [&>svg]:w-4 [&>div]:text-xs [&>div]:leading-4"
             >
-              Submit decided
-            </Button>
-          </HStack>
+              <strong>Deny was pre-selected</strong> for {recommendedDenyCount}
+              {` `}
+              higher-risk {inflect(`request`, recommendedDenyCount)}. Review the warning
+              before changing it.
+            </Banner>
+          )}
+
+          <CardContainer className="flex flex-col gap-6">
+            {entries.map((entry) =>
+              entry.kind === `web` ? (
+                <UnlockRequestCard
+                  key={entry.id}
+                  group={entry.group}
+                  keychainOptions={data.keychains}
+                  rowState={plan.rows.get(entry.group.id)}
+                  onChange={(group) =>
+                    updateEntry({ ...entry, group: { ...group, edited: true } })
+                  }
+                />
+              ) : (
+                <AppRequestSection
+                  key={entry.id}
+                  entry={entry}
+                  keychainOptions={data.keychains}
+                  iconUrl={entry.iconHash ? appIconUrl(entry.iconHash) : undefined}
+                  rowStates={plan.rows}
+                  onChange={updateEntry}
+                />
+              ),
+            )}
+          </CardContainer>
+          {hasDeniedRequests && (
+            <Textarea
+              label="Message for declined requests (optional)"
+              placeholder="For example: Let's talk about this after dinner."
+              value={responseComment}
+              setValue={setResponseComment}
+              rows={2}
+            />
+          )}
         </div>
-      </div>
+
+        <div className="fixed right-0 bottom-0 left-[var(--sidebar-width,0px)] z-20 border-t border-stone-200 bg-white/95 px-3 py-2 shadow-[0_-6px_24px_rgba(28,25,23,0.08)] backdrop-blur">
+          <div className="mx-auto flex w-full max-w-[1200px] flex-col items-stretch justify-between gap-2 px-1 @lg/main:flex-row @lg/main:items-center @lg/main:px-4 @xl/main:px-8 @3xl/main:px-12">
+            <div className="min-w-0 shrink-0">
+              <Text variant="bodyStrong" className="whitespace-nowrap">
+                <span className="@sm/main:hidden">
+                  {decidedCount} of {totalCount} decided
+                </span>
+                <span className="hidden @sm/main:inline">
+                  {decidedCount} of {totalCount} requests decided
+                </span>
+              </Text>
+              <Text variant="captionMuted" className="hidden @lg/main:block">
+                Undecided requests stay in the queue.
+              </Text>
+            </div>
+            <HStack justify="end" gap={2} className="shrink-0">
+              <ConfirmationDialog
+                confirmationQuestion={`Deny all ${totalCount} requests?`}
+                description={
+                  <VStack gap={4}>
+                    <Text variant="bodySubtle">
+                      This will deny every pending request shown here. No keys will be
+                      created.
+                    </Text>
+                    <Textarea
+                      label="Optional message"
+                      placeholder={`For example: Let's talk about this after dinner.`}
+                      rows={3}
+                      resize="vertical"
+                      value={responseComment}
+                      setValue={setResponseComment}
+                    />
+                  </VStack>
+                }
+                trigger={
+                  <Button
+                    type="button"
+                    size="medium"
+                    variant="destructive"
+                    onClick={() => {}}
+                  >
+                    Deny all
+                  </Button>
+                }
+                actions={[
+                  { text: `Cancel` },
+                  {
+                    text: `Deny all`,
+                    variant: `destructive`,
+                    disabled: saving || totalCount === 0,
+                    onClick: () => submit(denyAllDecisions(entries)),
+                  },
+                ]}
+              />
+              <Button
+                type="button"
+                size="medium"
+                variant="primary"
+                loading={saving}
+                disabled={decidedCount === 0 || plan.problemCount > 0}
+                onClick={() => {
+                  const currentTime = Date.now();
+                  setReviewTime(currentTime);
+                  const currentPlan = planUnlockReview(entries, currentTime);
+                  if (
+                    currentPlan.problemCount === 0 &&
+                    currentPlan.decisions.length > 0
+                  ) {
+                    void submit(currentPlan.decisions);
+                  }
+                }}
+              >
+                Submit decided
+              </Button>
+            </HStack>
+          </div>
+        </div>
+      </fieldset>
     </DashboardPage>
   );
 };

@@ -1,12 +1,9 @@
-import {
-  StoryScreen,
-  galleryParameters,
-  useSyncedStoryState,
-} from '@gertrude/ui/src/storybook/StoryLayout';
+import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React, { type ComponentProps, type ReactElement } from 'react';
 import type { UnlockReviewEntry } from '#/lib/unlockRequests';
+import type { GetPersonUnlockRequests } from '@shared/pairql/src/account';
 import SuspensionRequestsPage from './SuspensionRequestsPage';
-import { UnlockRequestReviewEditor } from './UnlockRequestReviewPage';
+import UnlockRequestReviewPage from './UnlockRequestReviewPage';
 import UnlockRequestsPage from './UnlockRequestsPage';
 import SuspensionRequestResponseModal from '#/components/requests/SuspensionRequestResponseModal';
 import SuspensionRequestStatusModal from '#/components/requests/SuspensionRequestStatusModal';
@@ -16,7 +13,7 @@ import {
   unlockRequest,
 } from '#/components/storybook/fixtures';
 import { unlockReviewDraft, waitForRender } from '#/components/storybook/unlockReview';
-import { updateGroupKeyAddressMatch } from '#/lib/unlockRequests';
+import { buildUnlockReview, updateGroupKeyAddressMatch } from '#/lib/unlockRequests';
 
 const noop = (): void => {};
 const resolve = async (): Promise<void> => {};
@@ -199,169 +196,168 @@ export const Unlock = {
   ),
 };
 
-const scratchApp = {
-  appName: `Scratch`,
-  appSlug: `scratch`,
-  appBundleId: `edu.mit.scratch`,
-  appIconHash: `scratch`,
-  appCategories: [`productivity`],
-};
+const reviewKeychains: GetPersonUnlockRequests.Output[`keychains`] = [
+  { ...keychains[0]!, name: `Jude's keychain`, otherPeople: [] },
+  {
+    ...keychains[1]!,
+    name: `Weekend games`,
+    otherPeople: [`Lucy`],
+    schedule: {
+      type: `active`,
+      days: {
+        sunday: true,
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false,
+        friday: false,
+        saturday: true,
+      },
+      startTime: { hour: 9, minute: 0 },
+      endTime: { hour: 18, minute: 0 },
+    },
+  },
+];
 
-const unknownApp = {
-  appName: undefined,
-  appSlug: undefined,
-  appBundleId: `com.example.study-helper`,
-  appCategories: [`education`],
-};
-
-const chromeApp = {
-  appName: `Google Chrome`,
-  appSlug: `chrome`,
-  appBundleId: `com.google.Chrome`,
-  appCategories: [`browser`],
-};
-
-const unlockReviewPerson = {
-  personId: `person-jude`,
-  personName: `Jude`,
-  keychains: keychains.slice(0, 2),
-};
-
-const unlockReviewProps = {
-  saving: false,
-  appIconUrl: (hash: string) => `/example-app-icons/${hash}.webp`,
-  onSubmit: noop,
-  onRefresh: noop,
-};
+const reviewRequests = [
+  unlockRequest(`docs.example.com`, { requestComment: `For my homework.` }),
+  unlockRequest(`www.docs.example.com`, {
+    requestComment: `The same lesson in Chrome.`,
+    appSlug: `chrome`,
+  }),
+  unlockRequest(`school.example.com`),
+  unlockRequest(`lesson.docs.example.com`),
+  unlockRequest(`youtube.com`, { requestComment: `Can I watch a math tutorial?` }),
+];
 
 const UnlockReviewStory: React.FC<{
-  initialEntries: UnlockReviewEntry[];
+  requests?: GetPersonUnlockRequests.Output[`requests`];
+  initialEntries?: UnlockReviewEntry[];
   saving?: boolean;
-}> = ({ initialEntries, saving = false }) => {
-  const [entries, setEntries] = useSyncedStoryState(initialEntries);
+}> = ({ requests: initialRequests = reviewRequests, initialEntries, saving = false }) => {
+  const [requests, setRequests] = React.useState(initialRequests);
+  const [pending, setPending] = React.useState(false);
   return (
     <StoryScreen>
-      <UnlockRequestReviewEditor
-        {...unlockReviewProps}
+      <UnlockRequestReviewPage
+        initialEntries={initialEntries}
         data={{
-          ...unlockReviewPerson,
-          requests: initialEntries.flatMap((entry) =>
-            (entry.kind === `web` ? [entry.group] : entry.groups).flatMap(
-              (group) => group.requests,
-            ),
-          ),
+          personName: `Jude`,
+          requests,
+          keychains: reviewKeychains,
+          defaultKeychainId: reviewKeychains[0]!.id,
         }}
-        entries={entries}
-        setEntries={setEntries}
-        saving={saving}
+        saving={saving || pending}
+        appIconUrl={(hash) => `/example-app-icons/${hash}.webp`}
+        onRefresh={() => setRequests((current) => [...current])}
+        onSubmit={async (decisions) => {
+          setPending(true);
+          await new Promise((resolve) => setTimeout(resolve, 600));
+          setPending(false);
+          const ids = new Set(decisions.flatMap((decision) => decision.requestIds));
+          setRequests((current) => current.filter((request) => !ids.has(request.id)));
+        }}
       />
     </StoryScreen>
   );
 };
 
 export const UnlockReview = {
-  name: 'Unlock review',
+  name: 'Unlock review — start here',
+  parameters: galleryParameters,
+  render: () => <UnlockReviewStory />,
+};
+
+const overlapRequests = [
+  unlockRequest(`docs.example.com`),
+  unlockRequest(`school.example.com`),
+  unlockRequest(`lesson.docs.example.com`),
+];
+export const UnlockReviewExplicitApprovals = {
+  name: 'Unlock review — explicit approvals and schedules',
   parameters: galleryParameters,
   render: () => (
     <UnlockReviewStory
-      initialEntries={unlockReviewDraft(
-        [
-          unlockRequest(`docs.example.com`, { requestComment: `For my homework.` }),
-          unlockRequest(`docs.example.com`, chromeApp),
-          unlockRequest(`lesson.docs.example.com`),
-          unlockRequest(`school.example.com`),
-          unlockRequest(`khanacademy.org`),
-          unlockRequest(`youtube.com`, {
-            requestComment: `Can I watch a math tutorial?`,
-          }),
-          unlockRequest(`support.example.com`, {
-            appName: `Discord`,
-            appSlug: `discord`,
-            appBundleId: `com.hnc.Discord`,
-            appIconHash: `discord`,
-            appCategories: [`communication`],
-          }),
-          unlockRequest(`other.example.org`, { appCategories: [] }),
-          unlockRequest(`class.example.org`),
-          unlockRequest(`class.example.org`, chromeApp),
-          unlockRequest(`api.studybuddy.dev`, unknownApp),
-        ],
-        (group) => {
-          if ([`docs.example.com`, `other.example.org`].includes(group.target)) {
-            return { ...updateGroupKeyAddressMatch(group, `parent`), decision: `allow` };
-          }
-          return group.target === `school.example.com`
-            ? { ...group, decision: `allow`, comment: `For homework.` }
-            : group;
-        },
-      ).map((entry) =>
-        entry.kind === `app` && entry.name === `Unknown app`
-          ? { ...entry, choice: `unrestricted` }
-          : entry,
+      requests={overlapRequests}
+      initialEntries={unlockReviewDraft(overlapRequests, (group) =>
+        group.target === `docs.example.com`
+          ? {
+              ...updateGroupKeyAddressMatch(group, `parent`),
+              decision: `allow`,
+              keychainId: reviewKeychains[1]!.id,
+            }
+          : group.target === `school.example.com`
+            ? {
+                ...group,
+                decision: `allow`,
+                keychainId: reviewKeychains[0]!.id,
+                comment: `Keep this school permission separate.`,
+                expiration: `2099-01-01T18:00:00Z`,
+              }
+            : group,
       )}
     />
   ),
 };
 
 export const UnlockReviewPermissionIssues = {
-  name: 'Unlock review exceptions',
+  name: 'Unlock review — denial conflict',
   parameters: galleryParameters,
   render: () => (
     <UnlockReviewStory
-      initialEntries={unlockReviewDraft(
-        [
-          unlockRequest(`docs.example.com`),
-          unlockRequest(`school.example.com`),
-          unlockRequest(`docs.example.net`),
-          unlockRequest(`school.example.net`),
-          unlockRequest(`expired.study.test`),
-          unlockRequest(`api.scratch.mit.edu`, scratchApp),
-        ],
-        (group) => {
-          switch (group.target) {
-            case `school.example.com`:
-              return { ...group, decision: `deny` };
-            case `docs.example.net`:
-              return {
-                ...updateGroupKeyAddressMatch(group, `parent`),
-                decision: `allow`,
-                expiration: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-              };
-            case `school.example.net`:
-              return { ...group, decision: `allow` };
-            case `expired.study.test`:
-              return { ...group, decision: `allow`, expiration: `2020-01-15T12:00:00Z` };
-            case `api.scratch.mit.edu`:
-              return {
-                ...group,
-                decision: `allow`,
-                key: {
-                  type: `domain`,
-                  domain: group.target,
-                  scope: { type: `webBrowsers` },
-                },
-              };
-            default:
-              return {
-                ...updateGroupKeyAddressMatch(group, `parent`),
-                decision: `allow`,
-              };
-          }
-        },
+      requests={overlapRequests}
+      initialEntries={unlockReviewDraft(overlapRequests, (group) =>
+        group.target === `docs.example.com`
+          ? { ...updateGroupKeyAddressMatch(group, `parent`), decision: `allow` }
+          : group.target === `school.example.com`
+            ? { ...group, decision: `deny` }
+            : group,
       )}
     />
   ),
 };
 
+const appRequests = [
+  unlockRequest(`api.scratch.mit.edu`, {
+    appName: `Scratch`,
+    appSlug: `scratch`,
+    appBundleId: `edu.mit.scratch`,
+    appCategories: [`productivity`],
+    appIconHash: `scratch`,
+  }),
+  unlockRequest(`assets.scratch.mit.edu`, {
+    appName: `Scratch`,
+    appSlug: `scratch`,
+    appBundleId: `edu.mit.scratch`,
+    appCategories: [`productivity`],
+    appIconHash: `scratch`,
+  }),
+  unlockRequest(`api.studybuddy.dev`, {
+    appName: undefined,
+    appSlug: undefined,
+    appBundleId: `com.example.study-helper`,
+    appCategories: [],
+  }),
+  unlockRequest(`192.0.2.1`, { domain: undefined, ipAddress: `192.0.2.1` }),
+];
+export const UnlockReviewApps = {
+  name: 'Unlock review — apps and direct IP addresses',
+  parameters: galleryParameters,
+  render: () => <UnlockReviewStory requests={appRequests} />,
+};
+
 export const UnlockReviewSaving = {
-  name: 'Unlock review saving',
+  name: 'Unlock review — saving',
   parameters: galleryParameters,
   render: () => (
     <UnlockReviewStory
-      initialEntries={unlockReviewDraft([unlockRequest(`docs.example.com`)], (group) => ({
-        ...group,
-        decision: `allow`,
-      }))}
+      requests={[reviewRequests[0]!]}
+      initialEntries={buildUnlockReview([reviewRequests[0]!], reviewKeychains[0]!.id).map(
+        (entry) =>
+          entry.kind === `web`
+            ? { ...entry, group: { ...entry.group, decision: `allow` } }
+            : entry,
+      )}
       saving
     />
   ),

@@ -23,7 +23,7 @@ extension AdminNotifier: DependencyKey {
       do {
         let parent = try await db.find(parentId)
         let event = parent.accountSiteBetaEnabled
-          ? event.routingRequests(toAccountSiteAt: env.accountDashboardUrl)
+          ? event.routingNotifications(toAccountSiteAt: env.accountDashboardUrl)
           : event
         let notifications = try await parent.notifications(in: db)
 

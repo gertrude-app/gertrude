@@ -1,5 +1,15 @@
 import type { AllowedAlbum, Device, Schedule, TimeOfDay } from './types';
 
+export const withResetOnClose =
+  (reset: () => void, onOpenChange: (open: boolean) => void): ((open: boolean) => void) =>
+  (open): void => {
+    if (!open) {
+      reset();
+    }
+
+    onOpenChange(open);
+  };
+
 const deviceImageBaseUrls = {
   mac: `/devices/macs`,
   iphone: `/devices/iphones`,

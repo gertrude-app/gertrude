@@ -63,6 +63,7 @@ export const Empty = {
   render: () =>
     renderPage({
       peopleState: { status: `success`, data: [] },
+      unlockRequestSummary: { totalCount: 0, people: [] },
       suspensionRequestsState: { status: `success`, data: [] },
       securityEventsState: { status: `success`, data: [] },
     }),
@@ -73,6 +74,7 @@ export const Loading = {
   render: () =>
     renderPage({
       peopleState: { status: `loading` },
+      unlockRequestSummary: undefined,
       suspensionRequestsState: { status: `loading` },
       securityEventsState: { status: `loading` },
     }),

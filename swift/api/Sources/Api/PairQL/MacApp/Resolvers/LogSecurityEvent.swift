@@ -39,6 +39,7 @@ extension LogSecurityEvent: Resolver {
       .securityEvent(.init(
         source: .macApp(childName: context.child.name, event: event),
         detail: input.detail,
+        notificationDestination: .legacyDashboard(baseUrl: context.env.dashboardUrl),
       )),
     )
 

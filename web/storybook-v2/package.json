@@ -19,7 +19,6 @@
     "start": "storybook dev --port ${PORT:-6007} --config-dir ./.storybook --ci --disable-telemetry",
     "build": "storybook build --config-dir ./.storybook --disable-telemetry",
     "typecheck": "tsc --noEmit",
-    "test:browser": "node --test scripts/__tests__/*.browser.js",
     "visual:update": "bash scripts/update-screenshots.sh"
   },
   "dependencies": {

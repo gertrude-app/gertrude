@@ -1,4 +1,5 @@
 import { Badge, Card, HStack, Text, VStack, inflect } from '@gertrude/ui';
+import { Link } from '@tanstack/react-router';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import type { GetAccountUnlockRequestSummary } from '@shared/pairql/src/account';
@@ -36,9 +37,9 @@ const UnlockRequestsPreviewCard: React.FC<Props> = ({
         <VStack>
           {summary.people.slice(0, 3).map((person) => (
             <VStack
-              as="a"
+              as={Link}
               key={person.id}
-              href={reviewHrefForPerson(person.id)}
+              to={reviewHrefForPerson(person.id)}
               className="cursor-pointer border-b border-stone-200/80 py-3 first:pt-0 last:border-b-0 last:pb-0"
             >
               <HStack justify="between" gap={2}>

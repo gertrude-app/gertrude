@@ -32,9 +32,7 @@ struct DecideUnlockRequests: Pair {
   }
 
   struct Result: PairOutput {
-    let handledCount: Int
     let skippedCount: Int
-    let remainingCount: Int
   }
 
   typealias Output = Result
@@ -86,12 +84,12 @@ extension DecideUnlockRequests: Resolver {
             userMessage: "The requested app could not be verified. Refresh and try again.",
           )
         }
-        return normalizedUnlockBundleId(bundleId)
+        return bundleId.normalizedBundleId.lowercased()
       }
       let allowedBundleIds: Set<String>
       switch scope {
       case .bundleId(let bundleId):
-        allowedBundleIds = [normalizedUnlockBundleId(bundleId)]
+        allowedBundleIds = [bundleId.normalizedBundleId.lowercased()]
       case .identifiedAppSlug(let slug):
         guard let app = try? await IdentifiedApp.query()
           .where(.slug == slug)
@@ -105,7 +103,7 @@ extension DecideUnlockRequests: Resolver {
           )
         }
         allowedBundleIds = try await Set(app.bundleIds(in: context.db).map {
-          normalizedUnlockBundleId($0.bundleId)
+          $0.bundleId.normalizedBundleId.lowercased()
         })
       }
       guard requestedBundleIds.allSatisfy(allowedBundleIds.contains) else {
@@ -118,13 +116,9 @@ extension DecideUnlockRequests: Resolver {
       }
     }
 
-    let needsDefaultKeychain = input.decisions.contains { decision in
-      if case .acceptedKey(let keychainId, _, _, _) = decision.action {
-        return keychainId == nil && decision.requestIds.contains {
-          requestsById[$0]?.status == .pending
-        }
-      }
-      return false
+    struct CreatedKey: Sendable {
+      let key: Key
+      let keychainName: String
     }
 
     struct TransactionResult: Sendable {
@@ -132,28 +126,43 @@ extension DecideUnlockRequests: Resolver {
       let skippedCount: Int
       let updatedKeychainIds: Set<Keychain.Id>
       let grantedApp: Bool
+      let createdKeys: [CreatedKey]
     }
 
     let result = try await context.db.withTransaction { tx in
+      try await tx
+        .execute(
+          raw: "SELECT id FROM parent.children WHERE id = \(bind: person.id.rawValue) FOR UPDATE",
+        )
+      let currentRequests = try await UnlockRequest.query().where(.id |=| allIds).all(in: tx)
+      let requestsById = Dictionary(uniqueKeysWithValues: currentRequests.map { ($0.id, $0) })
+      let needsDefaultKeychain = input.decisions.contains { decision in
+        if case .acceptedKey(let keychainId, _, _, _) = decision.action {
+          return keychainId == nil && decision.requestIds
+            .contains { requestsById[$0]?.status == .pending }
+        }
+        return false
+      }
       var eligibleKeychains = try await person.keychains(in: tx)
-        .filter { $0.parentId == context.accountOwner.id }
-      if needsDefaultKeychain, eligibleKeychains.isEmpty {
+        .filter { $0.parentId == context.accountOwner.id && !$0.isPublic }
+      let options = try await unlockRequestKeychainOptions(for: person, in: tx)
+      var defaultKeychainId = unlockRequestDefaultKeychainId(options)
+      if needsDefaultKeychain, defaultKeychainId == nil {
         let keychain = try await createAccountDefaultKeychain(for: person, in: tx)
         eligibleKeychains.append(keychain)
+        defaultKeychainId = keychain.id
       }
       let keychainsById = Dictionary(
         uniqueKeysWithValues: eligibleKeychains.map { ($0.id, $0) },
       )
-      let defaultKeychain = eligibleKeychains.first
+      let defaultKeychain = defaultKeychainId.flatMap { keychainsById[$0] }
       var existingKeysByKeychainId: [Keychain.Id: [Key]] = [:]
-      var existingAppScopes = try await Set(
-        person.unrestrictedMacApps(in: tx)
-          .map { unrestrictedMacAppScopeKey($0.scope) },
-      )
+      var existingApps = try await person.unrestrictedMacApps(in: tx)
       var handled: [UnlockRequest] = []
       var skippedCount = 0
       var updatedKeychainIds = Set<Keychain.Id>()
       var grantedApp = false
+      var createdKeys: [CreatedKey] = []
 
       for decision in input.decisions {
         let decisionRequests = decision.requestIds.compactMap { requestsById[$0] }
@@ -171,6 +180,14 @@ extension DecideUnlockRequests: Resolver {
           }
 
         case .acceptedKey(let requestedKeychainId, let key, let comment, let expiration):
+          if let expiration, expiration <= get(dependency: \.date.now) {
+            throw context.error(
+              id: "5b05b0eb",
+              type: .badRequest,
+              debugMessage: "expired unlock permission",
+              userMessage: "Choose a future expiration for this permission.",
+            )
+          }
           switch key {
           case .path, .skeleton:
             throw context.error(
@@ -217,7 +234,9 @@ extension DecideUnlockRequests: Resolver {
           if existingKeys == nil {
             existingKeys = try await keychain.keys(in: tx)
           }
-          if existingKeys?.contains(where: { $0.key == key }) != true {
+          if existingKeys?
+            .contains(where: { $0.key == key && $0.deletedAt == expiration && $0.comment == comment
+            }) != true {
             let created = try await tx.create(Key(
               keychainId: keychain.id,
               key: key,
@@ -225,6 +244,7 @@ extension DecideUnlockRequests: Resolver {
               deletedAt: expiration,
             ))
             existingKeys?.append(created)
+            createdKeys.append(.init(key: created, keychainName: keychain.name))
             updatedKeychainIds.insert(keychain.id)
           }
           existingKeysByKeychainId[keychain.id] = existingKeys
@@ -237,8 +257,18 @@ extension DecideUnlockRequests: Resolver {
           }
 
         case .acceptedApp(let scope):
-          if existingAppScopes.insert(unrestrictedMacAppScopeKey(scope)).inserted {
-            try await tx.create(UnrestrictedMacApp(scope: scope, childId: person.id))
+          if let index = existingApps
+            .firstIndex(where: { $0.scope.normalized == scope.normalized }) {
+            if existingApps[index].schedule != nil {
+              existingApps[index].schedule = nil
+              try await tx.update(existingApps[index])
+              grantedApp = true
+            }
+          } else {
+            try await existingApps.append(tx.create(UnrestrictedMacApp(
+              scope: scope,
+              childId: person.id,
+            )))
             grantedApp = true
           }
           for var request in pending {
@@ -255,15 +285,27 @@ extension DecideUnlockRequests: Resolver {
         skippedCount: skippedCount,
         updatedKeychainIds: updatedKeychainIds,
         grantedApp: grantedApp,
+        createdKeys: createdKeys,
       )
     }
 
-    let websockets = get(dependency: \.websockets)
     for keychainId in result.updatedKeychainIds {
-      try await websockets.send(.userUpdated, to: .usersWith(keychain: keychainId))
+      await sendUnlockEvent(.userUpdated, to: .usersWith(keychain: keychainId))
     }
     if result.grantedApp {
-      try await websockets.send(.userUpdated, to: .user(person.id))
+      await sendUnlockEvent(.userUpdated, to: .user(person.id))
+      await recordDashSecurityEvent(
+        .unrestrictedAppsChanged,
+        "child: \(person.name)",
+        in: context,
+      )
+    }
+    for created in result.createdKeys {
+      await recordDashSecurityEvent(
+        .keyCreated,
+        "key opening \(created.key.key.simpleDescription) added to keychain '\(created.keychainName)'",
+        in: context,
+      )
     }
 
     let computerUsersById = Dictionary(
@@ -271,64 +313,47 @@ extension DecideUnlockRequests: Resolver {
     )
     for (computerUserId, handled) in Dictionary(grouping: result.handled, by: \.computerUserId) {
       guard let computerUser = computerUsersById[computerUserId] else { continue }
-      if computerUser.appSemver >= Semver("2.9.0") {
-        try await websockets.send(
+      let commented = handled
+        .filter {
+          $0.responseComment?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        }
+      let aggregate = handled.filter { !commented.map(\.id).contains($0.id) }
+      if computerUser.appSemver >= Semver("2.9.0"), !aggregate.isEmpty {
+        await sendUnlockEvent(
           .unlockRequestsHandled(
-            ids: handled.map(\.id.rawValue),
-            accepted: handled.count { $0.status == .accepted },
-            rejected: handled.count { $0.status == .rejected },
-            targets: handled.compactMap(\.target).sorted(),
+            ids: aggregate.map(\.id.rawValue),
+            accepted: aggregate.count { $0.status == .accepted },
+            rejected: aggregate.count { $0.status == .rejected },
+            targets: aggregate.compactMap(\.target).sorted(),
           ),
           to: .userDevice(computerUser.id),
         )
-      } else {
-        for request in handled {
-          try await websockets.send(
-            .unlockRequestUpdated_v2(
-              id: request.id.rawValue,
-              status: request.status,
-              target: request.target ?? "",
-              comment: request.responseComment,
-            ),
-            to: .userDevice(computerUser.id),
-          )
-        }
+      }
+      for request in computerUser.appSemver >= Semver("2.9.0") ? commented : handled {
+        await sendUnlockEvent(
+          .unlockRequestUpdated_v2(
+            id: request.id.rawValue,
+            status: request.status,
+            target: request.target ?? "",
+            comment: request.responseComment,
+          ),
+          to: .userDevice(computerUser.id),
+        )
       }
     }
 
-    let remainingCount = computerUserIds.isEmpty
-      ? 0
-      : try await UnlockRequest.query()
-      .where(.computerUserId |=| computerUserIds)
-      .where(.status == RequestStatus.pending)
-      .count(in: context.db)
-
-    return .init(
-      handledCount: result.handled.count,
-      skippedCount: result.skippedCount,
-      remainingCount: remainingCount,
-    )
+    return .init(skippedCount: result.skippedCount)
   }
 }
 
-private func normalizedUnlockBundleId(_ bundleId: String) -> String {
-  var id = bundleId
-  if id.first == "." {
-    id.removeFirst()
-  }
-  let parts = id.split(separator: ".", maxSplits: 1)
-  if parts.count == 2,
-     parts[0].count == 10,
-     parts[0].allSatisfy({ $0.isNumber || ($0.isLetter && $0.isUppercase) }) {
-    id = String(parts[1])
-  }
-  return id.lowercased()
-}
-
-private func unrestrictedMacAppScopeKey(_ scope: AppScope.Single) -> String {
-  switch scope.normalized {
-  case .bundleId(let id): "bundle:\(id)"
-  case .identifiedAppSlug(let slug): "slug:\(slug)"
+private func sendUnlockEvent(
+  _ message: WebSocketMessage.FromApiToApp,
+  to matcher: AppEvent.Matcher,
+) async {
+  do {
+    try await with(dependency: \.websockets).send(message, to: matcher)
+  } catch {
+    get(dependency: \.logger).error("Failed to deliver unlock decision: \(error)")
   }
 }
 

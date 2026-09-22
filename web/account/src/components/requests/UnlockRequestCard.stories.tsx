@@ -12,7 +12,10 @@ import { buildUnlockReview, updateGroupKeyAddressMatch } from '#/lib/unlockReque
 const initialGroups: UnlockDomainGroup[] = buildUnlockReview(
   [
     unlockRequest(`docs.example.com`, { requestComment: `For my homework.` }),
-    unlockRequest(`docs.example.com`, { id: `request-docs-again` }),
+    unlockRequest(`docs.example.com`, {
+      id: `request-docs-again`,
+      requestComment: ` For my homework. `,
+    }),
     unlockRequest(`192.0.2.1`, { domain: undefined, ipAddress: `192.0.2.1` }),
     unlockRequest(`school.s3.amazonaws.com`),
     unlockRequest(`classroom.google.com`),
@@ -53,7 +56,9 @@ const SettingsAssortment: React.FC = () => {
             <UnlockRequestCard
               key={group.id}
               group={group}
-              keychainOptions={keychains.slice(0, 2)}
+              keychainOptions={keychains
+                .slice(0, 2)
+                .map((keychain) => ({ ...keychain, otherPeople: [] }))}
               defaultSettingsOpen={
                 group.target === `docs.example.com` || group.key.type === `ipAddress`
               }

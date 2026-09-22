@@ -1,8 +1,9 @@
 import { Card, EmptyState, PageHeading, Skeleton, VStack, toast } from '@gertrude/ui';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { CircleAlertIcon, InboxIcon, RefreshCwIcon } from 'lucide-react';
 import React from 'react';
 import type { DecideUnlockRequests } from '@shared/pairql/src/account';
+import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
 import DashboardPage from '#/components/layout/DashboardPage';
 import UnlockRequestReviewPage from '#/components/pages/requests/UnlockRequestReviewPage';
 import { apiEndpoint, liveClient } from '#/pairql/client';
@@ -36,7 +37,7 @@ const LoadingPage: React.FC = () => (
 
 const UnlockRequestReviewRoute: React.FC = () => {
   const { personId } = Route.useParams();
-  const navigate = useNavigate();
+  const [dirty, setDirty] = React.useState(false);
   const query = useQuery(
     Key.personUnlockRequests(personId),
     () => liveClient.getPersonUnlockRequests({ personId }),
@@ -54,9 +55,6 @@ const UnlockRequestReviewRoute: React.FC = () => {
         toast.info(
           `${output.skippedCount} ${output.skippedCount === 1 ? `request was` : `requests were`} already handled and skipped.`,
         );
-      }
-      if (output.remainingCount === 0) {
-        void navigate({ to: `/requests/unlock` });
       }
     },
   });
@@ -122,19 +120,25 @@ const UnlockRequestReviewRoute: React.FC = () => {
   const submit = (
     decisions: DecideUnlockRequests.Input[`decisions`],
     responseComment?: string,
-  ): void => {
-    mutation.mutate({ personId, decisions, responseComment });
-  };
+  ): Promise<void> =>
+    mutation.mutateAsync({ personId, decisions, responseComment }).then(() => undefined);
 
   return (
-    <UnlockRequestReviewPage
-      key={query.data.requests.map((request) => request.id).join(`:`)}
-      data={query.data}
-      saving={mutation.isPending}
-      appIconUrl={(hash) => `${apiEndpoint}/app-icon/${hash}`}
-      onSubmit={submit}
-      onRefresh={() => void query.refetch()}
-    />
+    <>
+      <UnsavedChangesGuard
+        hasUnsavedChanges={dirty || mutation.isPending}
+        description="Your unlock request decisions haven't been saved."
+      />
+      <UnlockRequestReviewPage
+        key={personId}
+        data={query.data}
+        saving={mutation.isPending}
+        appIconUrl={(hash) => `${apiEndpoint}/app-icon/${hash}`}
+        onSubmit={submit}
+        onRefresh={() => void query.refetch()}
+        onDirtyChange={setDirty}
+      />
+    </>
   );
 };
 

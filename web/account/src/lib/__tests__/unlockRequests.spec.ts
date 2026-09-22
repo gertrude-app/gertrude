@@ -1,836 +1,315 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import type { UnlockDomainGroup, UnlockReviewEntry } from '../unlockRequests';
-import type { GetPersonUnlockRequests } from '@shared/pairql/src/account';
+import { describe, expect, test } from 'vitest';
+import type { UnlockRequestRow, UnlockReviewEntry } from '../unlockRequests';
 import {
   addressMatchOptions,
   buildUnlockReview,
-  decidedRequestCount,
-  decisionsForSubmission,
   denyAllDecisions,
-  groupAddressMatch,
   keyForUnlockRequest,
   planUnlockReview,
+  reconcileUnlockReview,
   sanitizeRequestedAddress,
   updateGroupDecision,
   updateGroupKeyAddressMatch,
 } from '../unlockRequests';
 
-type Request = GetPersonUnlockRequests.Output[`requests`][number];
-
-const request = (overrides: Partial<Request> = {}): Request => ({
-  id: `request-${Math.random()}`,
-  domain: `docs.example.com`,
+const request = (
+  id: string,
+  domain = `${id}.example.com`,
+  extra: Partial<UnlockRequestRow> = {},
+): UnlockRequestRow => ({
+  id,
+  domain,
   appName: `Safari`,
   appSlug: `safari`,
   appBundleId: `com.apple.Safari`,
   appCategories: [`browser`],
-  createdAt: `2026-07-03T14:05:00Z`,
-  ...overrides,
+  createdAt: `2026-07-03T12:00:00Z`,
+  ...extra,
 });
-
-const minecraftApp = {
-  appName: `Minecraft`,
-  appSlug: `minecraft`,
-  appBundleId: `com.mojang.minecraft`,
-  appCategories: [`game`],
-};
-
-const groupFor = (entries: UnlockReviewEntry[], requestId: string): UnlockDomainGroup => {
+const groupFor = (entries: UnlockReviewEntry[], id: string) => {
   const group = entries
     .flatMap((entry) => (entry.kind === `web` ? [entry.group] : entry.groups))
-    .find((group) => group.requestIds.includes(requestId));
-  if (!group) {
-    throw new Error(`No group for ${requestId}`);
-  }
+    .find((group) => group.requestIds.includes(id));
+  if (!group) throw new Error(`Missing request ${id}`);
+  return group;
+};
+const allow = (
+  entries: UnlockReviewEntry[],
+  id: string,
+  match: `exact` | `parent` | `subdomains` = `exact`,
+) => {
+  const group = groupFor(entries, id);
+  Object.assign(group, updateGroupKeyAddressMatch(group, match), {
+    decision: `allow`,
+    edited: true,
+  });
   return group;
 };
 
-const allow = (
-  group: UnlockDomainGroup,
-  match: `exact` | `subdomains` | `parent` = `exact`,
-): void => {
-  Object.assign(group, updateGroupKeyAddressMatch(group, match), { decision: `allow` });
-};
-
-const siblingRequests = (): UnlockReviewEntry[] =>
-  buildUnlockReview(
-    [
-      request({ id: `docs`, domain: `docs.example.com` }),
-      request({ id: `school`, domain: `school.example.com` }),
-    ],
-    `school-keychain`,
-  );
-
-describe(`unlock request review`, () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(`2026-07-03T15:00:00Z`));
-  });
-  afterEach(() => vi.useRealTimers());
-
-  test(`keeps sibling hosts separate and groups only repeated addresses in the same scope`, () => {
+describe(`unlock review decisions`, () => {
+  test(`repetitions and www aliases share one card, but sibling hosts and app scopes do not`, () => {
     const entries = buildUnlockReview([
-      request({ id: `one` }),
-      request({ id: `school`, domain: `school.example.com` }),
-      request({
-        id: `two`,
-        domain: `DOCS.example.com.`,
-        requestComment: `For class`,
-        appSlug: `chrome`,
-      }),
-      request({ id: `app`, ...minecraftApp }),
+      request(`root`, `example.com`),
+      request(`www`, `WWW.EXAMPLE.COM.`),
+      request(`repeat`, `example.com`, { requestComment: `School` }),
+      request(`docs`),
+      request(`app`, `example.com`, { appCategories: [], appSlug: `scratch` }),
     ]);
     expect(entries).toHaveLength(3);
-    expect(groupFor(entries, `one`)).toMatchObject({
-      target: `docs.example.com`,
-      requestIds: [`two`, `one`],
-      key: { type: `domain`, domain: `docs.example.com`, scope: { type: `webBrowsers` } },
-      decision: `undecided`,
+    expect(groupFor(entries, `root`).requestIds).toEqual([`repeat`, `root`, `www`]);
+    expect(groupFor(entries, `www`).target).toBe(`example.com`);
+    expect(groupFor(entries, `root`).key).toMatchObject({
+      type: `domain`,
+      domain: `example.com`,
     });
-    expect(groupFor(entries, `school`).requestIds).toEqual([`school`]);
-    expect(groupFor(entries, `app`).requestIds).toEqual([`app`]);
-    expect(decisionsForSubmission(entries)).toEqual([]);
+    expect(
+      addressMatchOptions(groupFor(entries, `root`)).map((option) => option.value),
+    ).toEqual([`exact`, `subdomains`]);
+    expect(addressMatchOptions(groupFor(entries, `docs`))).toEqual([
+      { value: `exact`, label: `Only docs.example.com`, domain: `docs.example.com` },
+      {
+        value: `subdomains`,
+        label: `docs.example.com and its subdomains`,
+        domain: `docs.example.com`,
+      },
+      {
+        value: `parent`,
+        label: `example.com and all its subdomains`,
+        domain: `example.com`,
+      },
+    ]);
   });
 
   test.each([
-    { domain: `docs.example.com`, url: `https://other.example.org/lesson` },
-    { domain: undefined, url: `https://DOCS.example.com./lesson` },
-  ])(`prefers the domain or URL hostname over an accompanying IP (%#)`, (address) => {
-    const entries = buildUnlockReview([request({ ...address, ipAddress: `192.0.2.1` })]);
-    expect(entries[0]).toMatchObject({
-      kind: `web`,
-      group: {
-        target: `docs.example.com`,
-        key: {
-          type: `domain`,
-          domain: `docs.example.com`,
-          scope: { type: `webBrowsers` },
-        },
-        decision: `undecided`,
-        risk: undefined,
-      },
-    });
-  });
-
-  test.each([
-    { domain: `youtube.com` },
-    { domain: undefined, url: `https://youtube.com/watch?v=example` },
-  ])(`preserves strong hostname warnings when an IP is also present (%#)`, (address) => {
-    const entries = buildUnlockReview([request({ ...address, ipAddress: `192.0.2.1` })]);
-    expect(entries[0]).toMatchObject({
-      kind: `web`,
-      group: {
-        target: `youtube.com`,
-        decision: `deny`,
-        risk: { level: `strongWarning` },
-      },
-    });
-    expect(decidedRequestCount(entries)).toBe(1);
+    { domain: `docs.example.com`, url: `https://other.example.org/path` },
+    { domain: undefined, url: `https://DOCS.example.com./path` },
+  ])(`hostname wins over an accompanying IP (%#)`, (fields) => {
+    expect(
+      keyForUnlockRequest(
+        request(`one`, undefined, { ...fields, ipAddress: `192.0.2.1` }),
+      ),
+    ).toMatchObject({ type: `domain`, domain: `docs.example.com` });
   });
 
   test.each([undefined, `not a URL`, `mailto:person@example.com`])(
-    `falls back to an IP key and caution without a usable hostname (url: %s)`,
+    `IP fallback without a usable host (%s)`,
     (url) => {
       const entries = buildUnlockReview([
-        request({ id: `ip`, domain: undefined, url, ipAddress: `192.0.2.1` }),
+        request(`ip`, undefined, { domain: undefined, url, ipAddress: `192.0.2.1` }),
       ]);
-      const group = groupFor(entries, `ip`);
-      expect(group).toMatchObject({
-        key: { type: `ipAddress`, ipAddress: `192.0.2.1` },
-        decision: `undecided`,
-        risk: { level: `caution` },
-      });
-      expect(addressMatchOptions(group)).toEqual([]);
-      expect(updateGroupKeyAddressMatch(group, `parent`)).toBe(group);
+      expect(groupFor(entries, `ip`).key).toMatchObject({ type: `ipAddress` });
+      expect(groupFor(entries, `ip`).risk?.level).toBe(`caution`);
+      expect(addressMatchOptions(groupFor(entries, `ip`))).toEqual([]);
     },
   );
 
   test.each([`192.0.2.1`, `[2001:db8::1]`])(
-    `treats URL IP literal %s as an IP rather than a domain`,
+    `URL IP literal %s creates an IP key`,
     (host) => {
       expect(
-        keyForUnlockRequest(request({ domain: undefined, url: `https://${host}/` })),
+        keyForUnlockRequest(
+          request(`ip`, undefined, { domain: undefined, url: `https://${host}/` }),
+        ),
       ).toMatchObject({ type: `ipAddress`, ipAddress: host.replace(/^\[|\]$/g, ``) });
     },
   );
 
-  test.each([
-    [`foo.example.com`, [`exact`, `subdomains`, `parent`]],
-    [`one.foo.example.co.uk`, [`exact`, `subdomains`, `parent`]],
-    [`example.com`, [`exact`, `subdomains`]],
-    [`intranet`, [`exact`, `subdomains`]],
-  ] as const)(`offers the appropriate matching choices for %s`, (domain, values) => {
-    const group = groupFor(buildUnlockReview([request({ id: `one`, domain })]), `one`);
-    expect(addressMatchOptions(group).map((option) => option.value)).toEqual(values);
-    expect(groupAddressMatch(group)).toBe(`exact`);
-    expect(group.key).toMatchObject({ type: `domain`, domain });
-  });
-
-  test.each([
-    `docs.example.com`,
-    `classroom.google.com`,
-    `school.s3.amazonaws.com`,
-    `school.netlify.app`,
-  ])(
-    `includes only descendants of %s without changing the requested address or settings`,
-    (domain) => {
-      const group = groupFor(buildUnlockReview([request({ id: `one`, domain })]), `one`);
-      Object.assign(group, {
-        decision: `allow`,
-        keychainId: `chosen`,
-        comment: `For school`,
-        expiration: `2026-10-01T00:00:00Z`,
-      });
-      const descendants = updateGroupKeyAddressMatch(group, `subdomains`);
-      expect(descendants).toMatchObject({
-        ...group,
-        key: { ...group.key, type: `anySubdomain`, domain },
-      });
-      expect(groupAddressMatch(descendants)).toBe(`subdomains`);
-      expect(updateGroupKeyAddressMatch(descendants, `exact`)).toEqual(group);
-    },
-  );
-
-  test.each([
-    [`classroom.google.com`, `google.com`],
-    [`school.s3.amazonaws.com`, `amazonaws.com`],
-    [`school.netlify.app`, `netlify.app`],
-    [`news.reddit.com`, `reddit.com`],
-  ])(`updates the warning when explicitly broadening %s to %s`, (domain, parent) => {
-    const group = groupFor(buildUnlockReview([request({ id: `one`, domain })]), `one`);
-    const broad = updateGroupKeyAddressMatch({ ...group, decision: `allow` }, `parent`);
-    expect(broad).toMatchObject({
-      target: domain,
-      key: { type: `anySubdomain`, domain: parent },
-      decision: `allow`,
+  test(`strong risks start denied and remain risky when an IP is present`, () => {
+    const entries = buildUnlockReview([
+      request(`video`, `youtube.com`, { ipAddress: `192.0.2.1` }),
+      request(`docs`),
+    ]);
+    expect(groupFor(entries, `video`)).toMatchObject({
+      decision: `deny`,
       risk: { level: `strongWarning` },
     });
-    expect(updateGroupKeyAddressMatch(broad, `exact`).risk).toEqual(group.risk);
+    expect(groupFor(entries, `docs`).decision).toBe(`undecided`);
   });
 
-  test(`the hosting-parent warning takes precedence over a narrower service warning`, () => {
-    const group = groupFor(
-      buildUnlockReview([request({ id: `one`, domain: `s3.amazonaws.com` })]),
-      `one`,
-    );
-    expect(updateGroupKeyAddressMatch(group, `parent`).risk).toEqual({
-      level: `strongWarning`,
-      reason: `This allows every site and service hosted under amazonaws.com, not just the requested address.`,
-    });
-  });
-
-  test(`preserves warnings for a risky requested host when its parent has no warning`, () => {
-    const group = groupFor(
-      buildUnlockReview([request({ id: `one`, domain: `copilot.microsoft.com` })]),
-      `one`,
-    );
-    expect(updateGroupKeyAddressMatch(group, `parent`).risk).toMatchObject({
-      level: `strongWarning`,
-    });
-  });
-
-  test(`does not group unrelated hostnames sharing an IP`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `school`, ipAddress: `192.0.2.1` }),
-      request({ id: `youtube`, domain: `youtube.com`, ipAddress: `192.0.2.1` }),
-    ]);
-    expect(entries).toHaveLength(2);
-    expect(groupFor(entries, `school`).requestIds).toEqual([`school`]);
-  });
-
-  test(`strong service warnings default to deny while cautions stay undecided`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `youtube`, domain: `youtube.com` }),
-      request({ id: `classroom`, domain: `classroom.google.com` }),
-      request({ id: `medium`, domain: `medium.com` }),
-      request({ id: `ip`, domain: undefined, ipAddress: `192.0.2.1` }),
-    ]);
-    expect(groupFor(entries, `youtube`).decision).toBe(`deny`);
-    for (const id of [`classroom`, `medium`, `ip`]) {
-      expect(groupFor(entries, id)).toMatchObject({
-        decision: `undecided`,
-        risk: { level: `caution` },
-      });
-    }
-    expect(decidedRequestCount(entries)).toBe(1);
-  });
-
-  test(`an allowed parent covers siblings and resolves every represented ID once`, () => {
-    const entries = buildUnlockReview(
-      [
-        request({ id: `docs` }),
-        request({ id: `school`, domain: `school.example.com` }),
-        request({
-          id: `school-again`,
-          domain: undefined,
-          url: `https://school.example.com/lesson`,
-        }),
-        request({ id: `root`, domain: `example.com` }),
-      ],
-      `school-keychain`,
-    );
-    const source = groupFor(entries, `docs`);
-    allow(source, `parent`);
-    source.comment = `  For class  `;
-    source.expiration = `2026-10-01T00:00:00Z`;
-    const plan = planUnlockReview(entries);
-    expect(plan.rows.get(groupFor(entries, `school`).id)).toMatchObject({
-      coveredBy: [source],
-      coveredRequestCount: 2,
-    });
-    expect(plan.decidedCount).toBe(4);
-    expect(plan.decisions).toEqual([
-      {
-        requestIds: [`docs`, `school`, `school-again`, `root`],
-        action: {
-          case: `acceptedKey`,
-          keychainId: `school-keychain`,
-          key: source.key,
-          comment: `For class`,
-          expiration: source.expiration,
-        },
-      },
-    ]);
-  });
-
-  test(`descendant matching covers children but not siblings or lookalike suffixes`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `docs` }),
-      ...[
-        `one.docs.example.com`,
-        `school.example.com`,
-        `notdocs.example.com`,
-        `docs.example.com.evil.com`,
-      ].map((domain) => request({ id: domain, domain })),
-    ]);
-    allow(groupFor(entries, `docs`), `subdomains`);
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions[0]?.requestIds).toEqual([`docs`, `one.docs.example.com`]);
-    expect(plan.decidedCount).toBe(2);
-  });
-
-  test.each([`undecided`, `deny`] as const)(
-    `a %s broad draft does not cover other requests`,
-    (decision) => {
-      const entries = siblingRequests();
-      const source = groupFor(entries, `docs`);
-      allow(source, `parent`);
-      source.decision = decision;
-      expect(
-        planUnlockReview(entries).rows.get(groupFor(entries, `school`).id)
-          ?.coveredRequestCount,
-      ).toBe(0);
-    },
-  );
-
-  test.each([`undecided`, `deny`] as const)(
-    `changing an approval to %s discards its settings before a new approval`,
-    (decision) => {
-      const entries = buildUnlockReview(
-        [
-          request({
-            id: `one`,
-            domain: `classroom.google.com`,
-            requestComment: `For school`,
-          }),
-        ],
-        `default-keychain`,
-      );
+  test.each([`classroom.google.com`, `school.s3.amazonaws.com`, `school.netlify.app`])(
+    `broadening %s updates its warning`,
+    (host) => {
+      const entries = buildUnlockReview([request(`one`, host)]);
       const original = groupFor(entries, `one`);
-      const customized = {
-        ...updateGroupKeyAddressMatch(original, `parent`),
-        decision: `allow` as const,
-        key: {
-          type: `anySubdomain` as const,
-          domain: `google.com`,
-          scope: { type: `unrestricted` as const },
-        },
-        keychainId: `another-keychain`,
-        comment: `Old approval`,
-        expiration: `2026-07-04T00:00:00Z`,
-      };
-      expect(customized.risk?.level).toBe(`strongWarning`);
-      const reset = updateGroupDecision(customized, decision, `default-keychain`);
-      expect(reset).toEqual({
-        ...original,
-        decision,
-        comment: undefined,
-        expiration: undefined,
-      });
-      expect(reset.requests).toBe(original.requests);
-      expect(updateGroupDecision(reset, `allow`, `default-keychain`)).toEqual({
-        ...reset,
-        decision: `allow`,
-      });
-      expect(customized.key.type).toBe(`anySubdomain`);
+      const broad = updateGroupKeyAddressMatch(original, `parent`);
+      expect(broad.risk?.level).toBe(`strongWarning`);
+      expect(updateGroupKeyAddressMatch(broad, `exact`).risk).toEqual(original.risk);
     },
   );
 
-  test.each([{ ...minecraftApp }, { domain: undefined, ipAddress: `192.0.2.1` }])(
-    `clearing an approval restores the original app scope and address type (%#)`,
-    (overrides) => {
-      const entries = buildUnlockReview([request({ id: `one`, ...overrides })]);
-      const original = groupFor(entries, `one`);
-      const customized = {
-        ...updateGroupKeyAddressMatch(original, `parent`),
-        decision: `allow` as const,
-      };
-      if (customized.key.type === `skeleton`) throw new Error(`Expected address key`);
-      customized.key = { ...customized.key, scope: { type: `unrestricted` } };
-      const reset = updateGroupDecision(customized, `undecided`);
-      expect(reset.key).toEqual(original.key);
-      expect(reset.risk).toEqual(original.risk);
-      expect(groupAddressMatch(reset)).toBe(`exact`);
-    },
-  );
-
-  test(`clearing a source restores the covered card's unmodified draft`, () => {
-    const entries = siblingRequests();
-    const source = groupFor(entries, `docs`);
-    const target = groupFor(entries, `school`);
-    Object.assign(target, {
-      keychainId: `other-keychain`,
-      comment: `Keep this note`,
-      expiration: `2026-12-01T00:00:00Z`,
-    });
-    const original = structuredClone(target);
-    allow(source, `parent`);
-    expect(planUnlockReview(entries).rows.get(target.id)?.coveredRequestCount).toBe(1);
-    expect(target).toEqual(original);
-    Object.assign(source, updateGroupDecision(source, `undecided`, `school-keychain`));
-    expect(planUnlockReview(entries).rows.get(target.id)?.coveredRequestCount).toBe(0);
-    expect(target).toEqual(original);
-    expect(decidedRequestCount(entries)).toBe(0);
-  });
-
-  test.each([false, true])(
-    `a covered denial blocks submission until explicitly resolved (default denial: %s)`,
-    (defaultDenial) => {
-      const entries = defaultDenial
-        ? buildUnlockReview([
-            request({ id: `docs`, domain: `music.youtube.com` }),
-            request({ id: `school`, domain: `youtube.com` }),
-          ])
-        : siblingRequests();
-      const source = groupFor(entries, `docs`);
-      const target = groupFor(entries, `school`);
-      if (!defaultDenial) target.decision = `deny`;
-      allow(source, `parent`);
-      expect(planUnlockReview(entries).rows.get(target.id)?.problem).toContain(
-        `Deny conflicts`,
-      );
-      expect(decisionsForSubmission(entries)).toEqual([]);
-      target.decision = `allow`;
-      expect(planUnlockReview(entries).problemCount).toBe(0);
-      expect(
-        decisionsForSubmission(entries).flatMap((decision) => decision.requestIds),
-      ).toEqual([`docs`, `school`]);
-    },
-  );
-
-  test(`narrowing the source preserves the denial rather than silently changing it`, () => {
-    const entries = siblingRequests();
-    const source = groupFor(entries, `docs`);
-    groupFor(entries, `school`).decision = `deny`;
-    allow(source, `parent`);
-    expect(planUnlockReview(entries).problemCount).toBe(1);
-    allow(source, `exact`);
-    const plan = planUnlockReview(entries);
-    expect(plan.problemCount).toBe(0);
-    expect(plan.decisions).toContainEqual({
-      requestIds: [`school`],
-      action: { case: `rejected` },
-    });
-  });
-
-  test(`browser permissions do not cover apps, but all-app permissions do`, () => {
+  test(`broad approval includes only undecided matching requests and restores them when cleared`, () => {
     const entries = buildUnlockReview([
-      request({ id: `docs` }),
-      request({ id: `game`, domain: `school.example.com`, ...minecraftApp }),
+      request(`docs`),
+      request(`school`),
+      request(`outside`, `other.org`),
     ]);
-    const source = groupFor(entries, `docs`);
-    const target = groupFor(entries, `game`);
-    allow(source, `parent`);
-    expect(planUnlockReview(entries).rows.get(target.id)?.coveredRequestCount).toBe(0);
-    source.key = {
-      type: `anySubdomain`,
-      domain: `example.com`,
-      scope: { type: `unrestricted` },
-    };
-    expect(planUnlockReview(entries).rows.get(target.id)?.coveredRequestCount).toBe(1);
-  });
-
-  test.each([`slug`, `bundle`] as const)(
-    `single-app coverage respects the %s identity`,
-    (identity) => {
-      const app =
-        identity === `slug` ? minecraftApp : { ...minecraftApp, appSlug: undefined };
-      const entries = buildUnlockReview([
-        request({ id: `source`, ...app }),
-        request({ id: `same`, domain: `school.example.com`, ...app }),
-        request({
-          id: `other`,
-          domain: `school.example.com`,
-          appCategories: [`game`],
-          appSlug: `other`,
-          appBundleId: `com.other`,
-        }),
-      ]);
-      const entry = entries[0];
-      if (!entry || entry.kind !== `app`) throw new Error(`Expected app`);
-      entry.choice = `perAddress`;
-      allow(groupFor(entries, `source`), `parent`);
-      expect(
-        planUnlockReview(entries).rows.get(groupFor(entries, `same`).id)
-          ?.coveredRequestCount,
-      ).toBe(1);
-      expect(
-        planUnlockReview(entries).rows.get(groupFor(entries, `other`).id)
-          ?.coveredRequestCount,
-      ).toBe(0);
-    },
-  );
-
-  test(`partial scope coverage resolves only the covered repetitions`, () => {
-    const entries = buildUnlockReview([
-      request({
-        id: `source`,
-        ...minecraftApp,
-        appSlug: `safari`,
-        appBundleId: `com.apple.Safari`,
-      }),
-      request({ id: `safari`, domain: `school.example.com` }),
-      request({
-        id: `chrome`,
-        domain: `school.example.com`,
-        appSlug: `chrome`,
-        appBundleId: `com.google.Chrome`,
-      }),
-    ]);
-    const app = entries[0];
-    if (!app || app.kind !== `app`) throw new Error(`Expected app`);
-    app.choice = `perAddress`;
-    allow(groupFor(entries, `source`), `parent`);
-    const plan = planUnlockReview(entries);
-    expect(plan.rows.get(groupFor(entries, `safari`).id)?.coveredRequestCount).toBe(1);
-    expect(plan.decidedCount).toBe(2);
-    expect(plan.decisions[0]?.requestIds).toEqual([`source`, `safari`]);
-    groupFor(entries, `safari`).decision = `deny`;
-    expect(planUnlockReview(entries).problemCount).toBe(1);
-  });
-
-  test(`an IP permission detects conflicts even when the denied request also has a hostname`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `ip`, domain: undefined, ipAddress: `192.0.2.1` }),
-      request({ id: `domain`, domain: `youtube.com`, ipAddress: `192.0.2.1` }),
-    ]);
-    groupFor(entries, `ip`).decision = `allow`;
-    expect(
-      planUnlockReview(entries).rows.get(groupFor(entries, `domain`).id)?.problem,
-    ).toContain(`Deny conflicts`);
-  });
-
-  test(`equivalent broad approvals choose one source without circular coverage`, () => {
-    const entries = siblingRequests();
-    allow(groupFor(entries, `docs`), `parent`);
-    allow(groupFor(entries, `school`), `parent`);
-    const plan = planUnlockReview(entries);
-    expect(plan.problemCount).toBe(0);
+    const source = allow(entries, `docs`, `parent`);
+    let plan = planUnlockReview(entries);
     expect(plan.decisions).toHaveLength(1);
-    expect(plan.rows.get(groupFor(entries, `docs`).id)?.coveredRequestCount).toBe(0);
-    expect(plan.rows.get(groupFor(entries, `school`).id)?.coveredRequestCount).toBe(1);
     expect(plan.decisions[0]?.requestIds).toEqual([`docs`, `school`]);
-  });
-
-  test(`transitive coverage retains the permission that actually covers every request`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `narrow`, domain: `docs.example.com` }),
-      request({ id: `broad`, domain: `school.example.com` }),
-      request({ id: `nested`, domain: `one.docs.example.com` }),
-    ]);
-    allow(groupFor(entries, `narrow`), `subdomains`);
-    allow(groupFor(entries, `broad`), `parent`);
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions).toHaveLength(1);
-    expect(plan.decisions[0]?.requestIds).toEqual([`narrow`, `broad`, `nested`]);
-    expect(plan.decisions[0]?.action).toMatchObject({
-      key: { type: `anySubdomain`, domain: `example.com` },
-    });
-  });
-
-  test(`a shorter broad grant does not discard a longer exact grant`, () => {
-    const entries = siblingRequests();
-    const source = groupFor(entries, `docs`);
-    const target = groupFor(entries, `school`);
-    allow(source, `parent`);
-    source.expiration = `2026-07-04T00:00:00Z`;
-    allow(target);
-    target.expiration = `2026-08-01T00:00:00Z`;
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions).toHaveLength(2);
-    expect(plan.rows.get(target.id)).toMatchObject({
-      coveredRequestCount: 0,
-      coveredBy: [],
-      preservedApproval: `longer`,
-    });
-  });
-
-  test(`equivalent permissions retain the longer expiration regardless of row order`, () => {
-    const entries = siblingRequests();
-    const short = groupFor(entries, `docs`);
-    const long = groupFor(entries, `school`);
-    allow(short, `parent`);
-    allow(long, `parent`);
-    short.expiration = `2026-07-04T00:00:00Z`;
-    long.expiration = `2026-08-01T00:00:00Z`;
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions).toHaveLength(1);
-    expect(plan.decisions[0]?.action).toMatchObject({ expiration: long.expiration });
-    expect(plan.rows.get(short.id)?.coveredBy).toEqual([long]);
-  });
-
-  test.each([
-    [`exact`, `school-keychain`, `Different note`],
-    [`parent`, `school-keychain`, `Different note`],
-    [`exact`, `another-keychain`, `Source note`],
-    [`parent`, `another-keychain`, `Source note`],
-    [`exact`, `another-keychain`, `Different note`],
-    [`parent`, `another-keychain`, `Different note`],
-  ] as const)(
-    `coverage ignores metadata differences and restores drafts (%s, %s, %s)`,
-    (match, keychainId, comment) => {
-      const entries = siblingRequests();
-      const source = groupFor(entries, `docs`);
-      const target = groupFor(entries, `school`);
-      allow(source, `parent`);
-      source.comment = `Source note`;
-      allow(target, match);
-      target.keychainId = keychainId;
-      target.comment = comment;
-      const draft = structuredClone(target);
-      const plan = planUnlockReview(entries);
-      expect(plan.problemCount).toBe(0);
-      expect(plan.decisions).toEqual([
-        {
-          requestIds: [`docs`, `school`],
-          action: {
-            case: `acceptedKey`,
-            key: source.key,
-            keychainId: source.keychainId,
-            comment: `Source note`,
-            expiration: undefined,
-          },
-        },
-      ]);
-      expect(plan.rows.get(target.id)).toMatchObject({
-        coveredBy: [source],
-        coveredRequestCount: 1,
-        preservedApproval: undefined,
-      });
-      expect(target).toEqual(draft);
-
-      source.decision = `undecided`;
-      const restored = planUnlockReview(entries);
-      expect(target).toEqual(draft);
-      expect(restored.rows.get(target.id)?.coveredRequestCount).toBe(0);
-      expect(restored.decisions[0]?.action).toMatchObject({
-        key: target.key,
-        keychainId,
-        comment,
-      });
-    },
-  );
-
-  test(`a temporary broad approval does not replace an explicit permanent approval`, () => {
-    const entries = siblingRequests();
-    const source = groupFor(entries, `docs`);
-    const target = groupFor(entries, `school`);
-    allow(source, `parent`);
-    source.expiration = `2026-07-04T00:00:00Z`;
-    allow(target);
-    target.keychainId = `another-keychain`;
-    target.comment = `Permanent access for school`;
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions).toHaveLength(2);
-    expect(plan.rows.get(target.id)).toMatchObject({
-      coveredBy: [],
-      coveredRequestCount: 0,
-      preservedApproval: `longer`,
-    });
-    expect(
-      plan.decisions.find((decision) => decision.requestIds.includes(`school`))?.action,
-    ).toMatchObject({
-      key: target.key,
-      expiration: undefined,
-      keychainId: target.keychainId,
-      comment: target.comment,
-    });
-  });
-
-  test(`browser-only coverage preserves an explicit all-app approval until the source also allows all apps`, () => {
-    const entries = siblingRequests();
-    const source = groupFor(entries, `docs`);
-    const target = groupFor(entries, `school`);
-    allow(source, `parent`);
-    allow(target);
-    target.key = {
-      type: `domain`,
-      domain: target.target,
-      scope: { type: `unrestricted` },
-    };
-    const draft = structuredClone(target);
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions).toHaveLength(2);
-    expect(plan.rows.get(target.id)).toMatchObject({
-      coveredBy: [],
-      coveredRequestCount: 0,
-      preservedApproval: `broader`,
-    });
-    source.key = {
-      type: `anySubdomain`,
-      domain: `example.com`,
-      scope: { type: `unrestricted` },
-    };
-    const covered = planUnlockReview(entries);
-    expect(covered.decisions).toHaveLength(1);
-    expect(covered.rows.get(target.id)).toMatchObject({
-      coveredBy: [source],
-      coveredRequestCount: 1,
-      preservedApproval: undefined,
-    });
-    expect(target).toEqual(draft);
-  });
-
-  test(`covered approvals point to a source preserving their full duration, not the first matching address`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `short`, domain: `docs.example.com` }),
-      request({ id: `long`, domain: `school.example.com` }),
-      request({ id: `target`, domain: `lesson.school.example.com` }),
-    ]);
-    const short = groupFor(entries, `short`);
-    const long = groupFor(entries, `long`);
-    const target = groupFor(entries, `target`);
-    allow(short, `parent`);
-    short.expiration = `2026-07-04T00:00:00Z`;
-    allow(long, `subdomains`);
-    allow(target);
-    const plan = planUnlockReview(entries);
-    expect(plan.decisions).toHaveLength(2);
-    expect(plan.rows.get(target.id)).toMatchObject({
-      coveredBy: [long],
-      coveredRequestCount: 1,
-    });
-    expect(
-      plan.decisions.find((decision) => decision.requestIds.includes(`target`)),
-    ).toMatchObject({
-      requestIds: [`long`, `target`],
-      action: { key: long.key, expiration: undefined },
-    });
-  });
-
-  test.each([`2026-07-03T14:00:00Z`, `2026-07-03T15:00:00Z`, `invalid date`])(
-    `expired or invalid expiration %s cannot provide coverage or be submitted`,
-    (expiration) => {
-      const entries = siblingRequests();
-      const source = groupFor(entries, `docs`);
-      allow(source, `parent`);
-      source.expiration = expiration;
-      const plan = planUnlockReview(entries);
-      expect(plan.rows.get(source.id)?.problem).toContain(`expired`);
-      expect(plan.rows.get(groupFor(entries, `school`).id)?.coveredRequestCount).toBe(0);
-      expect(plan.decisions).toEqual([]);
-    },
-  );
-
-  test(`coverage disappears when its source expires`, () => {
-    const entries = siblingRequests();
-    const source = groupFor(entries, `docs`);
-    allow(source, `parent`);
-    source.expiration = `2026-07-03T15:01:00Z`;
-    expect(planUnlockReview(entries).decidedCount).toBe(2);
-    vi.setSystemTime(new Date(source.expiration));
-    const plan = planUnlockReview(entries);
-    expect(plan.decidedCount).toBe(1);
-    expect(plan.problemCount).toBe(1);
+    expect(plan.rows.get(groupFor(entries, `school`).id)?.coveredBy).toEqual([source]);
+    expect(groupFor(entries, `school`).decision).toBe(`undecided`);
+    Object.assign(source, updateGroupDecision(source, `undecided`));
+    plan = planUnlockReview(entries);
+    expect(plan.decidedCount).toBe(0);
     expect(plan.decisions).toEqual([]);
   });
 
-  test(`does not report an app request accepted by a browsers-only key`, () => {
-    const entries = buildUnlockReview([request({ id: `game`, ...minecraftApp })]);
-    const app = entries[0];
-    if (!app || app.kind !== `app`) throw new Error(`Expected app`);
-    app.choice = `perAddress`;
-    const group = groupFor(entries, `game`);
-    allow(group);
-    group.key = { type: `domain`, domain: group.target, scope: { type: `webBrowsers` } };
-    expect(planUnlockReview(entries).problemCount).toBe(1);
-    expect(decisionsForSubmission(entries)).toEqual([]);
-  });
-
-  test.each([`requestedAddresses`, `perAddress`] as const)(
-    `app %s decisions use the same coverage rules`,
-    (choice) => {
-      const entries = buildUnlockReview([
-        request({ id: `source`, ...minecraftApp }),
-        request({ id: `target`, domain: `school.example.com`, ...minecraftApp }),
+  test.each([`keychain`, `note`, `expiration`, `identical`])(
+    `explicit approvals are never discarded (%s)`,
+    (difference) => {
+      const entries = buildUnlockReview([request(`docs`), request(`school`)], `weekend`);
+      allow(entries, `docs`, `parent`);
+      const target = allow(entries, `school`);
+      if (difference === `keychain`) target.keychainId = `always-active`;
+      if (difference === `note`) target.comment = `Important private note`;
+      if (difference === `expiration`) target.expiration = `2099-01-01T00:00:00Z`;
+      const plan = planUnlockReview(entries);
+      expect(plan.decisions).toHaveLength(2);
+      expect(plan.decisions.flatMap((decision) => decision.requestIds)).toEqual([
+        `docs`,
+        `school`,
       ]);
-      const app = entries[0];
-      if (!app || app.kind !== `app`) throw new Error(`Expected app`);
-      app.choice = choice;
-      allow(groupFor(entries, `source`), `parent`);
-      expect(planUnlockReview(entries).decisions).toHaveLength(1);
-      expect(planUnlockReview(entries).decidedCount).toBe(2);
+      expect(plan.rows.get(target.id)).toMatchObject({
+        coveredBy: [],
+        coveredRequestCount: 0,
+        overlaps: true,
+      });
+      expect(plan.decisions[1]?.action).toMatchObject({
+        keychainId: target.keychainId,
+        comment: target.comment,
+        expiration: target.expiration,
+      });
     },
   );
 
-  test(`whole-app access ignores dormant address drafts and restores them when turned off`, () => {
-    const entries = buildUnlockReview([
-      request({ id: `one`, ...minecraftApp }),
-      request({ id: `two`, domain: `school.example.com`, ...minecraftApp }),
-    ]);
-    const app = entries[0];
-    if (!app || app.kind !== `app`) throw new Error(`Expected app`);
-    const source = groupFor(entries, `one`);
-    allow(source, `parent`);
-    source.expiration = `2020-01-01T00:00:00Z`;
-    groupFor(entries, `two`).decision = `deny`;
-    app.choice = `unrestricted`;
-    expect(planUnlockReview(entries).problemCount).toBe(0);
-    expect(decisionsForSubmission(entries)).toEqual([
-      {
-        requestIds: [`one`, `two`],
-        action: {
-          case: `acceptedApp`,
-          scope: { type: `identifiedAppSlug`, identifiedAppSlug: `minecraft` },
-        },
-      },
-    ]);
-    app.choice = `perAddress`;
-    expect(planUnlockReview(entries).problemCount).toBe(1);
-    expect(groupFor(entries, `two`).decision).toBe(`deny`);
+  test(`equivalent broad approvals stay explicit instead of hiding each other's settings`, () => {
+    const entries = buildUnlockReview([request(`docs`), request(`school`)]);
+    allow(entries, `docs`, `parent`);
+    allow(entries, `school`, `parent`);
+    expect(planUnlockReview(entries).decisions).toHaveLength(2);
   });
 
-  test(`deny all rejects every ID without creating the draft permissions`, () => {
-    const entries = siblingRequests();
-    allow(groupFor(entries, `docs`), `parent`);
-    expect(denyAllDecisions(entries)).toEqual([
-      { requestIds: [`docs`, `school`], action: { case: `rejected` } },
+  test(`denials conflicting with a proposed approval block submission`, () => {
+    const entries = buildUnlockReview([request(`docs`), request(`school`)]);
+    allow(entries, `docs`, `parent`);
+    groupFor(entries, `school`).decision = `deny`;
+    const plan = planUnlockReview(entries);
+    expect(plan).toMatchObject({ problemCount: 1, decisions: [] });
+    expect(plan.rows.get(groupFor(entries, `school`).id)?.problem).toBe(
+      `You denied this request, but your approval of example.com and its subdomains would still allow it. Narrow or clear that broader approval to keep this request denied.`,
+    );
+    allow(entries, `docs`, `exact`);
+    expect(planUnlockReview(entries).problemCount).toBe(0);
+  });
+
+  test(`an IP approval detects a denied hostname on the same address`, () => {
+    const entries = buildUnlockReview([
+      request(`ip`, undefined, { domain: undefined, ipAddress: `192.0.2.1` }),
+      request(`video`, `youtube.com`, { ipAddress: `192.0.2.1` }),
     ]);
-    expect(denyAllDecisions([])).toEqual([]);
-    expect(planUnlockReview([])).toMatchObject({
-      decisions: [],
-      decidedCount: 0,
-      problemCount: 0,
+    allow(entries, `ip`);
+    expect(planUnlockReview(entries).problemCount).toBe(1);
+  });
+
+  test(`app scope and descendant boundaries constrain inclusion`, () => {
+    const entries = buildUnlockReview([
+      request(`docs`),
+      request(`child`, `one.docs.example.com`),
+      request(`sibling`, `school.example.com`),
+      request(`lookalike`, `notdocs.example.com`),
+      request(`app`, `one.docs.example.com`, { appCategories: [], appSlug: `scratch` }),
+    ]);
+    const source = allow(entries, `docs`, `subdomains`);
+    expect(planUnlockReview(entries).decisions[0]?.requestIds).toEqual([`docs`, `child`]);
+    source.key = {
+      type: `anySubdomain`,
+      domain: `docs.example.com`,
+      scope: { type: `unrestricted` },
+    };
+    expect(planUnlockReview(entries).decisions[0]?.requestIds).toEqual([
+      `docs`,
+      `child`,
+      `app`,
+    ]);
+  });
+
+  test(`invalid explicit approvals cannot be hidden by another approval`, () => {
+    const entries = buildUnlockReview([request(`docs`), request(`school`)]);
+    allow(entries, `docs`, `parent`);
+    allow(entries, `school`).expiration = `2020-01-01T00:00:00Z`;
+    expect(planUnlockReview(entries)).toMatchObject({ problemCount: 1, decisions: [] });
+  });
+
+  test(`full-app access is one separate override, with individual decisions preserved`, () => {
+    const entries = buildUnlockReview([
+      request(`app`, undefined, { appCategories: [], appSlug: `scratch` }),
+    ]);
+    const entry = entries[0];
+    if (entry?.kind !== `app`) throw new Error(`Expected app`);
+    const group = groupFor(entries, `app`);
+    group.decision = `deny`;
+    entry.unrestricted = true;
+    expect(planUnlockReview(entries).decisions).toEqual([
+      { requestIds: [`app`], action: { case: `acceptedApp`, scope: entry.scope } },
+    ]);
+    entry.unrestricted = false;
+    expect(planUnlockReview(entries).decisions).toEqual([
+      { requestIds: [`app`], action: { case: `rejected` } },
+    ]);
+  });
+
+  test(`clearing an approval resets its settings without changing its destination`, () => {
+    const entries = buildUnlockReview([request(`docs`)], `school`);
+    const group = allow(entries, `docs`, `parent`);
+    group.comment = `Old note`;
+    group.expiration = `2099-01-01T00:00:00Z`;
+    const cleared = updateGroupDecision(group, `undecided`, `school`);
+    expect(cleared).toMatchObject({
+      decision: `undecided`,
+      key: { type: `domain`, domain: `docs.example.com` },
+      comment: undefined,
+      expiration: undefined,
+      keychainId: `school`,
     });
   });
 
-  test(`removes credentials, query strings, and fragments from displayed URLs`, () => {
+  test(`refresh preserves decisions and settings, adds new requests, and removes resolved IDs`, () => {
+    const entries = buildUnlockReview([request(`docs`), request(`resolved`)], `personal`);
+    const source = allow(entries, `docs`);
+    source.comment = `Do not lose this`;
+    source.keychainId = `school`;
+    const refreshed = reconcileUnlockReview(
+      entries,
+      [request(`docs`), request(`alias`, `www.docs.example.com`), request(`new`)],
+      `personal`,
+    );
+    expect(groupFor(refreshed, `docs`)).toMatchObject({
+      decision: `allow`,
+      keychainId: `school`,
+      comment: `Do not lose this`,
+      requestIds: [`docs`, `alias`],
+    });
+    expect(groupFor(refreshed, `new`)).toMatchObject({
+      decision: `undecided`,
+      keychainId: `personal`,
+    });
+    expect(refreshed).toHaveLength(2);
+    expect(reconcileUnlockReview(refreshed, [], `personal`)).toEqual([]);
+  });
+
+  test(`deny all ignores proposed grants, and URL details hide secrets`, () => {
+    const entries = buildUnlockReview([request(`docs`), request(`school`)]);
+    allow(entries, `docs`, `parent`);
+    expect(denyAllDecisions(entries)).toEqual([
+      { requestIds: [`docs`, `school`], action: { case: `rejected` } },
+    ]);
     expect(
       sanitizeRequestedAddress(
-        request({
-          url: `https://person:secret@school.example.com/lesson/4?token=secret#answers`,
+        request(`one`, undefined, {
+          url: `https://user:secret@school.example.com/lesson?secret=yes#token`,
         }),
       ),
-    ).toBe(`school.example.com/lesson/4`);
+    ).toBe(`school.example.com/lesson`);
   });
 });

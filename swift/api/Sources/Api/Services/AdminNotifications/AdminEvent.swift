@@ -9,6 +9,7 @@ enum AdminEvent: Equatable {
   struct SecurityEventPayload: Equatable {
     var source: Source
     var detail: String?
+    var notificationDestination: NotificationDestination
 
     enum Source: Equatable {
       case macApp(childName: String, event: Gertie.SecurityEvent.MacApp)
@@ -58,7 +59,7 @@ enum AdminEvent: Equatable {
 }
 
 extension AdminEvent {
-  func routingRequests(toAccountSiteAt accountDashboardUrl: String) -> Self {
+  func routingNotifications(toAccountSiteAt accountDashboardUrl: String) -> Self {
     switch self {
     case .unlockRequestSubmitted(var request):
       request.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
@@ -69,8 +70,9 @@ extension AdminEvent {
       }
       request.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
       return .suspendFilterRequestSubmitted(request)
-    case .securityEvent:
-      return self
+    case .securityEvent(var event):
+      event.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
+      return .securityEvent(event)
     }
   }
 }

@@ -18,5 +18,5 @@ export const unlockReviewDraft = (
   buildUnlockReview(requests, keychains[0]?.id).map((entry) =>
     entry.kind === `web`
       ? { ...entry, group: customize(entry.group) }
-      : { ...entry, choice: `perAddress`, groups: entry.groups.map(customize) },
+      : { ...entry, groups: entry.groups.map(customize) },
   );

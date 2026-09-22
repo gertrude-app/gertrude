@@ -1,4 +1,4 @@
-import { Card, EmptyState, HStack, Skeleton, Text } from '@gertrude/ui';
+import { Card, CountBadge, EmptyState, HStack, Skeleton, Text } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
 import {
   ChevronRightIcon,
@@ -112,12 +112,7 @@ const UnlockRequestsPage: React.FC<Props> = ({
               <Text as="h2" variant="bodyLargeStrong" className="min-w-0 break-words">
                 {person.name}
               </Text>
-              <Text
-                variant="caption"
-                className="min-w-5 shrink-0 rounded-full bg-stone-100 px-1.5 text-center font-medium leading-5 tabular-nums !text-stone-600"
-              >
-                {person.pendingCount}
-              </Text>
+              <CountBadge>{person.pendingCount}</CountBadge>
             </HStack>
             <HStack wrap gap={1.5} className="col-start-1 row-start-2 min-w-0">
               {person.targets.slice(0, 3).map((target) => (

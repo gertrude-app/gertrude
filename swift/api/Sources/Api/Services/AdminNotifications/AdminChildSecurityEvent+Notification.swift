@@ -42,8 +42,7 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
   }
 
   func sendNtfy(topic: String) async throws {
-    let url = "https://parents.gertrude.app/security-events"
-    let shortUrl = await self.shortUrl(for: url)
+    let shortUrl = await self.shortUrl(for: self.url)
     let message = """
     Security event \(self.context): \(self.desc).
 
@@ -62,7 +61,14 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
     case .dashboard:
       "in parent website"
     }
-    let message = "Gertrude security event \(who): \(desc.truncatedForSms(max: 67)).\n\n\(ShortUrl.securityEvents)"
+    let linkUrl = switch self.notificationDestination {
+    case .legacyDashboard:
+      ShortUrl.securityEvents
+    case .accountSite:
+      await (try? with(dependency: \.db)
+        .create(ShortUrl(target: self.url)).publicUrl) ?? self.url
+    }
+    let message = "Gertrude security event \(who): \(desc.truncatedForSms(max: 67)).\n\n\(linkUrl)"
     return try await with(dependency: \.twilio)
       .send(Text(to: .init(phoneNumber), message: message))
   }
@@ -87,5 +93,9 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
     """
     try await with(dependency: \.slack)
       .send(Slack(text: text, channel: channel, token: token))
+  }
+
+  private var url: String {
+    "\(self.notificationDestination.baseUrl.withoutTrailingSlashes)/security-events"
   }
 }

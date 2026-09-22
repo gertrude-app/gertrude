@@ -1,7 +1,8 @@
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, join, relative, resolve } from 'node:path';
+import { createReadStream } from 'node:fs';
+import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { createServer } from 'node:http';
+import { dirname, extname, join, normalize, relative, resolve, sep } from 'node:path';
 import { chromium } from 'playwright';
-import { serveStorybook } from './serve-storybook.js';
 import { waitForStoryToSettle } from './wait-for-story.js';
 
 const storybookDir = resolve(process.env.STORYBOOK_DIR ?? `storybook-static`);
@@ -9,6 +10,22 @@ const outputDir = resolve(process.env.SCREENSHOT_DIR ?? `screenshots`);
 const host = process.env.STORYBOOK_HOST ?? `127.0.0.1`;
 const port = Number(process.env.STORYBOOK_PORT ?? 0);
 const defaultConcurrency = 6;
+
+const mimeTypes = new Map([
+  [`.css`, `text/css; charset=utf-8`],
+  [`.gif`, `image/gif`],
+  [`.html`, `text/html; charset=utf-8`],
+  [`.ico`, `image/x-icon`],
+  [`.jpg`, `image/jpeg`],
+  [`.js`, `text/javascript; charset=utf-8`],
+  [`.json`, `application/json; charset=utf-8`],
+  [`.map`, `application/json; charset=utf-8`],
+  [`.png`, `image/png`],
+  [`.svg`, `image/svg+xml; charset=utf-8`],
+  [`.webp`, `image/webp`],
+  [`.woff`, `font/woff`],
+  [`.woff2`, `font/woff2`],
+]);
 
 const disableAnimationsCss = `
   *, *::before, *::after {
@@ -33,6 +50,57 @@ const concurrency = positiveInteger(
   process.env.SCREENSHOT_CONCURRENCY,
   defaultConcurrency,
 );
+
+function safeJoin(root, urlPathname) {
+  const relativePath = normalize(decodeURIComponent(urlPathname)).replace(/^[/\\]+/, ``);
+  const filePath = join(root, relativePath || `index.html`);
+  return filePath === root || filePath.startsWith(`${root}${sep}`) ? filePath : undefined;
+}
+
+async function fileExists(filePath) {
+  try {
+    return (await stat(filePath)).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function serveStatic(root) {
+  const server = createServer(async (request, response) => {
+    try {
+      const requestUrl = new URL(request.url ?? `/`, `http://${host}`);
+      const filePath = safeJoin(root, requestUrl.pathname);
+
+      if (!filePath) {
+        response.writeHead(403);
+        response.end(`Forbidden`);
+        return;
+      }
+
+      if (!(await fileExists(filePath))) {
+        response.writeHead(404);
+        response.end(`Not found`);
+        return;
+      }
+
+      response.writeHead(200, {
+        [`Content-Type`]: mimeTypes.get(extname(filePath)) ?? `application/octet-stream`,
+      });
+      createReadStream(filePath).pipe(response);
+    } catch (error) {
+      response.writeHead(500);
+      response.end(error instanceof Error ? error.message : `Internal server error`);
+    }
+  });
+
+  return new Promise((resolveServer, reject) => {
+    server.once(`error`, reject);
+    server.listen(port, host, () => {
+      server.off(`error`, reject);
+      resolveServer(server);
+    });
+  });
+}
 
 async function readStories() {
   const indexPath = join(storybookDir, `index.json`);
@@ -264,8 +332,10 @@ async function runWorkers(jobs, context, baseUrl) {
 async function main() {
   const stories = await readStories();
 
-  const server = await serveStorybook(storybookDir, { host, port });
-  const { baseUrl } = server;
+  const server = await serveStatic(storybookDir);
+  const address = server.address();
+  const actualPort = typeof address === `object` && address ? address.port : port;
+  const baseUrl = `http://${host}:${actualPort}`;
   let browser;
 
   try {
@@ -303,7 +373,7 @@ async function main() {
     );
   } finally {
     await browser?.close();
-    await server.close();
+    await new Promise((resolveServer) => server.close(resolveServer));
   }
 }
 

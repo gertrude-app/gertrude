@@ -5,6 +5,7 @@ import { normalizePath } from '../lib/utils';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
 import VStack from '../primitives/VStack';
+import CountBadge from './CountBadge';
 
 interface Tab {
   label: string;
@@ -109,17 +110,9 @@ const SegmentedTabs: React.FC<Props> = ({ basePath, tabs, className }) => {
                     {tab.label}
                   </Text>
                   {tab.badgeCount !== undefined && (
-                    <Text
-                      variant="caption"
-                      className={cx(
-                        `min-w-5 rounded-full px-1.5 py-0.25 font-medium tabular-nums`,
-                        isSelected
-                          ? `bg-stone-100 !text-stone-700`
-                          : `bg-stone-200/70 !text-stone-600`,
-                      )}
-                    >
+                    <CountBadge shade={isSelected ? `light` : `dark`}>
                       {tab.badgeCount}
-                    </Text>
+                    </CountBadge>
                   )}
                 </HStack>
               </Link>

@@ -52,7 +52,7 @@ final class SuspendFilterRequestNotificationTests: ApiTestCase, @unchecked Senda
       context: .iosapp(deviceId: child.device.id, requestId: .init()),
     ))
 
-    expect(event.routingRequests(toAccountSiteAt: "https://account.example"))
+    expect(event.routingNotifications(toAccountSiteAt: "https://account.example"))
       .toEqual(event)
   }
 

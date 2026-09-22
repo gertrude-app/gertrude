@@ -13,6 +13,7 @@ export type SelectOption<Value extends string> =
   | {
       value: Value;
       label: string;
+      labelContent?: React.ReactNode;
       description?: React.ReactNode;
       icon?: DropdownMenuItemIcon;
       disabled?: boolean;
@@ -36,6 +37,7 @@ interface Props<Options extends readonly SelectOption<string>[]> {
   disabled?: boolean;
   size?: SelectSize;
   className?: string;
+  wrapLabels?: boolean;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -46,6 +48,11 @@ const getOptionValue = <Value extends string>(option: SelectOption<Value>): Valu
 
 const getOptionLabel = <Value extends string>(option: SelectOption<Value>): string =>
   typeof option === `string` ? option : option.label;
+
+const getOptionLabelContent = <Value extends string>(
+  option: SelectOption<Value>,
+): React.ReactNode =>
+  typeof option === `string` ? option : (option.labelContent ?? option.label);
 
 const getOptionDescription = <Value extends string>(
   option: SelectOption<Value>,
@@ -95,6 +102,7 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
   disabled,
   size = `medium`,
   className,
+  wrapLabels = false,
   open,
   defaultOpen,
   onOpenChange,
@@ -103,7 +111,7 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
   const selectedOption = possibleValues.find(
     (option) => getOptionValue(option) === selected,
   );
-  const selectedLabel = selectedOption ? getOptionLabel(selectedOption) : selected;
+  const selectedLabel = selectedOption ? getOptionLabelContent(selectedOption) : selected;
   const SelectedIcon = selectedOption ? getOptionIcon(selectedOption) : undefined;
 
   return (
@@ -127,6 +135,7 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
         </Text>
       )}
       <DropdownMenu
+        contentClassName={wrapLabels ? `w-96 max-w-[calc(100vw-2rem)]` : undefined}
         disabled={disabled}
         open={open}
         defaultOpen={defaultOpen}
@@ -163,7 +172,15 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
                   size === `small` ? `h-3 w-3` : `h-3.5 w-3.5`,
                 ),
               )}
-              <span className="truncate">{selectedLabel}</span>
+              <span
+                className={
+                  wrapLabels
+                    ? `min-w-0 whitespace-normal [overflow-wrap:anywhere]`
+                    : `truncate`
+                }
+              >
+                {selectedLabel}
+              </span>
             </span>
             <span
               className={cx(
@@ -189,6 +206,8 @@ const Select = <const Options extends readonly SelectOption<string>[]>({
             <DropdownMenuItem
               key={value}
               title={optionLabel}
+              titleContent={getOptionLabelContent(option)}
+              wrapTitle={wrapLabels}
               description={optionDescription}
               icon={OptionIcon}
               selected={value === selected}

@@ -1,8 +1,8 @@
 import {
-  Badge,
   Banner,
   Button,
   Card,
+  CountBadge,
   DateTimePicker,
   HStack,
   Select,
@@ -16,29 +16,31 @@ import cx from 'clsx';
 import {
   BanIcon,
   CheckIcon,
+  ChevronRightIcon,
   GlobeIcon,
   LayoutGridIcon,
   MonitorIcon,
   SettingsIcon,
 } from 'lucide-react';
 import React from 'react';
-import type { SharedKey } from '#/components/types';
-import type { UnlockDomainGroup, UnlockRowState } from '#/lib/unlockRequests';
+import type { UnlockDomainGroup, UnlockKey, UnlockRowState } from '#/lib/unlockRequests';
 import type { SelectOption } from '@gertrude/ui';
-import type { AppScope } from '@shared/pairql/src/account';
+import type { AppScope, GetPersonUnlockRequests } from '@shared/pairql/src/account';
 import MessageBubble from '#/components/MessageBubble';
+import { formatSchedule } from '#/components/utils';
 import {
   addressMatchOptions,
   groupAddressMatch,
   keyForUnlockRequest,
   permissionLabel,
+  sanitizeRequestedAddress,
   updateGroupDecision,
   updateGroupKeyAddressMatch,
 } from '#/lib/unlockRequests';
 
 interface Props {
   group: UnlockDomainGroup;
-  keychainOptions: Array<{ id: string; name: string }>;
+  keychainOptions: GetPersonUnlockRequests.Output[`keychains`];
   appName?: string;
   rowState?: UnlockRowState;
   defaultSettingsOpen?: boolean;
@@ -50,21 +52,18 @@ type ScopeChoice = `webBrowsers` | `singleApp` | `unrestricted`;
 
 const requestCount = (group: UnlockDomainGroup): number => group.requestIds.length;
 
-const scopeChoice = (key: SharedKey): ScopeChoice => {
-  if (!(`scope` in key) || key.scope.type === `webBrowsers`) {
+const scopeChoice = (key: UnlockKey): ScopeChoice => {
+  if (key.scope.type === `webBrowsers`) {
     return `webBrowsers`;
   }
   return key.scope.type === `single` ? `singleApp` : `unrestricted`;
 };
 
 const withScope = (
-  key: SharedKey,
+  key: UnlockKey,
   choice: ScopeChoice,
   originalScope: AppScope,
-): SharedKey => {
-  if (key.type === `skeleton`) {
-    return key;
-  }
+): UnlockKey => {
   const scope: AppScope =
     choice === `webBrowsers`
       ? { type: `webBrowsers` }
@@ -80,12 +79,16 @@ const scopeOptions = (
   appName: string | undefined,
   canSelectApp: boolean,
 ): Array<SelectOption<ScopeChoice>> => [
-  {
-    value: `webBrowsers`,
-    label: `Web browsers`,
-    description: `Safari, Chrome, Firefox, and other browsers`,
-    icon: GlobeIcon,
-  },
+  ...(!canSelectApp
+    ? [
+        {
+          value: `webBrowsers` as const,
+          label: `Web browsers`,
+          description: `Safari, Chrome, Firefox, and other browsers`,
+          icon: GlobeIcon,
+        },
+      ]
+    : []),
   ...(canSelectApp
     ? [
         {
@@ -106,34 +109,46 @@ const scopeOptions = (
 
 const DecisionButtons: React.FC<{
   decision: UnlockDomainGroup[`decision`];
+  included?: boolean;
   setDecision: (decision: UnlockDomainGroup[`decision`]) => void;
-}> = ({ decision, setDecision }) => (
+}> = ({ decision, included = false, setDecision }) => (
   <div className="inline-flex shrink-0 flex-col rounded-full border border-stone-200 bg-stone-100 p-0.5">
-    {([`deny`, `allow`] as const).map((choice) => {
-      const Icon = choice === `deny` ? BanIcon : CheckIcon;
-      const selected = decision === choice;
-      const label = choice === `deny` ? `Deny request` : `Allow request`;
-      return (
-        <Tooltip key={choice} content={selected ? `Clear decision` : label} side="left">
-          <button
-            type="button"
-            aria-label={selected ? `Clear decision` : label}
-            aria-pressed={selected}
-            onClick={() => setDecision(selected ? `undecided` : choice)}
-            className={cx(
-              `flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border outline-none transition-colors focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-1`,
-              selected
-                ? choice === `deny`
-                  ? `border-stone-300 bg-white text-red-600 shadow-sm`
-                  : `border-stone-300 bg-white text-violet-600 shadow-sm`
-                : `border-transparent text-stone-400 hover:bg-stone-200 hover:text-stone-700`,
-            )}
-          >
-            <Icon className="h-4 w-4" />
-          </button>
-        </Tooltip>
-      );
-    })}
+    {([`deny`, `allow`] as const)
+      .filter((choice) => !included || choice === `allow`)
+      .map((choice) => {
+        const Icon = choice === `deny` ? BanIcon : CheckIcon;
+        const selected = included || decision === choice;
+        const label = included
+          ? `Included in another approval`
+          : selected
+            ? `Clear decision`
+            : choice === `deny`
+              ? `Deny request`
+              : `Allow request`;
+        return (
+          <Tooltip key={choice} content={label} side="left">
+            <button
+              type="button"
+              aria-label={label}
+              aria-pressed={selected}
+              disabled={included}
+              onClick={
+                included ? undefined : () => setDecision(selected ? `undecided` : choice)
+              }
+              className={cx(
+                `flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border outline-none transition-colors focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-1 disabled:cursor-default`,
+                selected
+                  ? choice === `deny`
+                    ? `border-stone-300 bg-white text-red-600 shadow-sm`
+                    : `border-stone-300 bg-white text-violet-600 shadow-sm`
+                  : `border-transparent text-stone-400 hover:bg-stone-200 hover:text-stone-700`,
+              )}
+            >
+              <Icon className="h-4 w-4" />
+            </button>
+          </Tooltip>
+        );
+      })}
   </div>
 );
 
@@ -153,25 +168,57 @@ const UnlockRequestCard: React.FC<Props> = ({
   const requestedKey = group.requests[0]
     ? keyForUnlockRequest(group.requests[0])
     : group.key;
-  const originalScope = React.useRef<AppScope>(
-    requestedKey.type === `skeleton` ? { type: `webBrowsers` } : requestedKey.scope,
-  );
-  const matchingOptions = addressMatchOptions(group);
+  const originalScope = React.useRef<AppScope>(requestedKey.scope);
+  const matchingOptions = addressMatchOptions(group).map(({ domain, ...option }) => {
+    const domainStart = option.label.indexOf(domain);
+    return {
+      ...option,
+      labelContent: (
+        <span className="font-normal">
+          {option.label.slice(0, domainStart)}
+          <code className="inline-block max-w-full rounded-md border-[0.5px] border-stone-200 bg-stone-200/40 px-1.5 py-0.5 font-mono text-[0.9em] font-medium">
+            {domain}
+          </code>
+          {option.label.slice(domainStart + domain.length)}
+        </span>
+      ),
+    };
+  });
   const decision = rowState?.decision ?? group.decision;
   const covered =
     !rowState?.problem && rowState?.coveredRequestCount === group.requestIds.length;
   const canCustomize = decision === `allow` && !covered;
   const canSelectApp = originalScope.current.type === `single`;
   const selectedScope = scopeChoice(group.key);
-  const keychainSelectOptions = keychainOptions.map((keychain) => ({
-    value: keychain.id,
-    label: keychain.name,
-  }));
+  const keychainSelectOptions = [
+    ...keychainOptions.map((keychain) => ({ value: keychain.id, label: keychain.name })),
+    { value: `personal`, label: `Personal keychain (automatic)` },
+  ];
+  const selectedKeychain = keychainOptions.find(
+    (keychain) => keychain.id === group.keychainId,
+  );
 
-  const requestMessage = group.requests.find(
-    (request) => request.requestComment,
-  )?.requestComment;
-  const visibleRisk = decision === `deny` || covered ? undefined : group.risk;
+  const requestMessages = Array.from(
+    new Set(
+      group.requests.flatMap((request) => {
+        const comment = request.requestComment?.trim();
+        return comment ? [comment] : [];
+      }),
+    ),
+  );
+  const visibleRisk = group.risk;
+  const domainHeadingRef = React.useRef<HTMLHeadingElement>(null);
+  const [domainOverflowing, setDomainOverflowing] = React.useState(false);
+  React.useLayoutEffect(() => {
+    const heading = domainHeadingRef.current;
+    if (!heading) return;
+    const update = (): void =>
+      setDomainOverflowing(heading.scrollWidth > heading.clientWidth + 1);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(heading);
+    return () => observer.disconnect();
+  }, [group.target, canCustomize]);
 
   return (
     <div
@@ -184,17 +231,15 @@ const UnlockRequestCard: React.FC<Props> = ({
         className={cx(
           `row-start-1 flex h-full items-center`,
           visibleRisk && `row-span-2`,
-          covered && `w-8.5`,
         )}
       >
-        {!covered && (
-          <DecisionButtons
-            decision={decision}
-            setDecision={(decision) =>
-              onChange(updateGroupDecision(group, decision, keychainOptions[0]?.id))
-            }
-          />
-        )}
+        <DecisionButtons
+          decision={decision}
+          included={covered}
+          setDecision={(decision) =>
+            onChange(updateGroupDecision(group, decision, group.keychainId))
+          }
+        />
       </div>
       <Card
         padding={0}
@@ -205,48 +250,82 @@ const UnlockRequestCard: React.FC<Props> = ({
         )}
       >
         <VStack gap={covered ? 1 : 2.5} className="p-3">
-          <VStack gap={1.5} className={cx(`relative min-w-0`, canCustomize && `pr-32`)}>
-            <HStack wrap gap={1.5}>
-              <Text
-                as="h3"
-                variant="bodyLargeStrong"
-                className={cx(
-                  `leading-5 break-all`,
-                  decision === `deny` && `line-through decoration-stone-500`,
+          <VStack gap={1.5} className="min-w-0">
+            <HStack
+              gap={2}
+              className={cx(`relative`, canCustomize && (customize ? `pr-32` : `pr-28`))}
+            >
+              <HStack gap={1.5} className="min-w-0 max-w-full">
+                <Text
+                  ref={domainHeadingRef}
+                  as="h3"
+                  variant="bodyLargeStrong"
+                  className={cx(
+                    `min-w-0 overflow-hidden leading-5 whitespace-nowrap @2xl/main:overflow-visible @2xl/main:whitespace-normal @2xl/main:break-all @2xl/main:[mask-image:none]`,
+                    domainOverflowing &&
+                      `[mask-image:linear-gradient(to_right,black_calc(100%-1.25rem),transparent)]`,
+                    decision === `deny` && `line-through decoration-stone-500`,
+                  )}
+                >
+                  {group.target}
+                </Text>
+                {requestCount(group) > 1 && (
+                  <CountBadge size="compact">{requestCount(group)}</CountBadge>
                 )}
-              >
-                {group.target}
-              </Text>
-              {requestCount(group) > 1 && (
-                <Badge size="small" color="neutral" className="max-w-full">
-                  Requested {requestCount(group)} times
-                </Badge>
+              </HStack>
+              {canCustomize && (
+                <Button
+                  type="button"
+                  size="small"
+                  variant="ghost"
+                  icon={customize ? undefined : SettingsIcon}
+                  className="!absolute -top-1 -right-1"
+                  onClick={() => setCustomize((current) => !current)}
+                  aria-expanded={customize}
+                >
+                  {customize ? `Close key settings` : `Key settings`}
+                </Button>
               )}
             </HStack>
-            {requestMessage && (
-              <MessageBubble size="compact">{requestMessage}</MessageBubble>
+            {requestMessages.length > 0 && (
+              <HStack wrap gap={1.5} align="start">
+                {requestMessages.map((message) => (
+                  <MessageBubble
+                    key={message}
+                    size="compact"
+                    className="max-w-full break-words"
+                  >
+                    {message}
+                  </MessageBubble>
+                ))}
+              </HStack>
             )}
-            {canCustomize && (
-              <Button
-                type="button"
-                size="small"
-                variant="ghost"
-                icon={customize ? undefined : SettingsIcon}
-                className="!absolute -right-1 -bottom-1"
-                onClick={() => setCustomize((current) => !current)}
-                aria-expanded={customize}
-              >
-                {customize ? `Close key settings` : `Key settings`}
-              </Button>
+            {group.requests.length > 1 && (
+              <details className="group/requests mt-1 text-xs text-stone-600">
+                <summary className="flex cursor-pointer list-none items-center gap-1 [&::-webkit-details-marker]:hidden">
+                  <span>View all {group.requests.length} requests</span>
+                  <ChevronRightIcon
+                    aria-hidden="true"
+                    className="size-3.5 shrink-0 transition-transform duration-150 group-open/requests:rotate-90 motion-reduce:transition-none"
+                  />
+                </summary>
+                <ul className="mt-2 space-y-2">
+                  {group.requests.map((request) => (
+                    <li key={request.id} className="break-all">
+                      {sanitizeRequestedAddress(request)}
+                    </li>
+                  ))}
+                </ul>
+              </details>
             )}
           </VStack>
 
           {rowState && rowState.coveredBy.length > 0 && (
-            <div className="flex flex-wrap items-baseline gap-x-0.5 text-xs text-violet-800">
+            <div className="flex flex-wrap items-baseline gap-x-0.5 text-xs text-violet-950/75">
               <span>
                 {covered || rowState.problem
-                  ? `Allowed by`
-                  : `${rowState.coveredRequestCount} of ${group.requestIds.length} requests allowed by`}
+                  ? `Included in your approval of`
+                  : `${rowState.coveredRequestCount} of ${group.requestIds.length} requests included in your approval of`}
               </span>
               {rowState.coveredBy.map((source) => (
                 <span
@@ -282,26 +361,22 @@ const UnlockRequestCard: React.FC<Props> = ({
             </div>
           )}
 
-          {rowState?.preservedApproval && (
+          {rowState?.overlaps && (
             <Text variant="captionSubtle">
-              Your {rowState.preservedApproval} approval is kept.
+              Another approval also includes this address. Both permissions will be saved;
+              changing one won't restrict the other.
             </Text>
           )}
+          {canCustomize &&
+            selectedKeychain &&
+            (selectedKeychain.schedule || selectedKeychain.otherPeople.length > 0) && (
+              <KeychainDetails keychain={selectedKeychain} />
+            )}
 
           {rowState?.problem && (
             <Banner variant="error" className="rounded-lg py-2 [&>div]:text-xs">
               {rowState.problem}
             </Banner>
-          )}
-
-          {canCustomize && (group.key.type === `anySubdomain` || group.expiration) && (
-            <Text variant="captionSubtle" className="break-words">
-              Allows {permissionLabel(group)}
-              {group.expiration
-                ? ` until ${formatDate(new Date(group.expiration), `medium`)}`
-                : ``}
-              .
-            </Text>
           )}
 
           {canCustomize && (
@@ -311,19 +386,20 @@ const UnlockRequestCard: React.FC<Props> = ({
                   gap={3}
                   className="rounded-lg border border-stone-200 bg-stone-50 p-3"
                 >
-                  {matchingOptions.length > 0 && (
-                    <Select
-                      label="Allow access to"
-                      defaultOpen={defaultMatchOptionsOpen}
-                      selected={groupAddressMatch(group)}
-                      possibleValues={matchingOptions}
-                      setSelected={(match) =>
-                        onChange(updateGroupKeyAddressMatch(group, match))
-                      }
-                    />
-                  )}
-
                   <div className="grid grid-cols-1 gap-3 @2xl/main:grid-cols-2">
+                    {matchingOptions.length > 0 && (
+                      <Select
+                        label="Allow access to"
+                        wrapLabels
+                        defaultOpen={defaultMatchOptionsOpen}
+                        selected={groupAddressMatch(group)}
+                        possibleValues={matchingOptions}
+                        setSelected={(match) =>
+                          onChange(updateGroupKeyAddressMatch(group, match))
+                        }
+                      />
+                    )}
+
                     <Select
                       label="Works in"
                       selected={selectedScope}
@@ -338,30 +414,35 @@ const UnlockRequestCard: React.FC<Props> = ({
                     {keychainSelectOptions.length > 0 && (
                       <Select
                         label="Save to keychain"
-                        selected={
-                          group.keychainId ?? keychainSelectOptions[0]?.value ?? ``
+                        selected={group.keychainId ?? `personal`}
+                        setSelected={(keychainId) =>
+                          onChange({
+                            ...group,
+                            keychainId:
+                              keychainId === `personal` ? undefined : keychainId,
+                          })
                         }
-                        setSelected={(keychainId) => onChange({ ...group, keychainId })}
                         possibleValues={keychainSelectOptions}
                       />
                     )}
                     <DateTimePicker
-                      label="Expiration date"
+                      label="Key expiration"
+                      allowPast={false}
                       notRequired
                       date={group.expiration ? new Date(group.expiration) : undefined}
                       setDate={(expiration) =>
                         onChange({ ...group, expiration: expiration?.toISOString() })
                       }
                     />
-                    <Textarea
-                      label="Private note"
-                      placeholder="Optional note for this key..."
-                      rows={2}
-                      resize="vertical"
-                      value={group.comment ?? ``}
-                      setValue={(comment) => onChange({ ...group, comment })}
-                    />
                   </div>
+                  <Textarea
+                    label="Private note"
+                    placeholder="Optional note for this key..."
+                    rows={2}
+                    resize="vertical"
+                    value={group.comment ?? ``}
+                    setValue={(comment) => onChange({ ...group, comment })}
+                  />
                 </VStack>
               )}
             </>
@@ -385,5 +466,17 @@ const UnlockRequestCard: React.FC<Props> = ({
     </div>
   );
 };
+
+const KeychainDetails: React.FC<{
+  keychain?: GetPersonUnlockRequests.Output[`keychains`][number];
+}> = ({ keychain }) => (
+  <span className="block text-xs text-stone-600">
+    {keychain?.name ?? `Personal keychain`} ·{` `}
+    {keychain?.schedule ? formatSchedule(keychain.schedule) : `Always active`}
+    {keychain &&
+      keychain.otherPeople.length > 0 &&
+      ` · Also grants access to ${keychain.otherPeople.join(`, `)}`}
+  </span>
+);
 
 export default UnlockRequestCard;

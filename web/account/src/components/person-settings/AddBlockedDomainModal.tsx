@@ -1,6 +1,7 @@
 import { domain as domainUtils } from '@dash/keys';
 import { Button, Input, Modal } from '@gertrude/ui';
 import React from 'react';
+import { withResetOnClose } from '#/components/utils';
 
 type Props = {
   open: boolean;
@@ -26,13 +27,8 @@ const AddBlockedDomainModal: React.FC<Props> = ({
     }
   }, [initialDomain, open]);
 
-  const handleOpenChange = (nextOpen: boolean): void => {
-    onOpenChange(nextOpen);
-
-    if (!nextOpen) {
-      setDomain(``);
-    }
-  };
+  const reset = (): void => setDomain(``);
+  const handleOpenChange = withResetOnClose(reset, onOpenChange);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();

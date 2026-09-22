@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import type { NotificationMethod } from '#/components/types';
+import { withResetOnClose } from '#/components/utils';
 
 type NotificationMethodType = NotificationMethod[`type`];
 type FlowState = `compose` | `codeSent` | `ntfyCreated`;
@@ -166,13 +167,7 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
     setSubmitting(false);
   };
 
-  const handleOpenChange = (nextOpen: boolean): void => {
-    if (!nextOpen) {
-      reset();
-    }
-
-    onOpenChange(nextOpen);
-  };
+  const handleOpenChange = withResetOnClose(reset, onOpenChange);
 
   const selectMethodType = (nextMethodType: NotificationMethodType): void => {
     setMethodType(nextMethodType);

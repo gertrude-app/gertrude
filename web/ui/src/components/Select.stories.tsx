@@ -158,6 +158,42 @@ export const Assortment: Story = {
   ),
 };
 
+export const WrappedLabels: Story = {
+  parameters: { ...galleryParameters, screenshotsAt: [`mobile`, `desktop`] },
+  render: () => (
+    <StoryCanvas innerClassName="max-w-md">
+      <StorySection title="Long labels" contentClassName="block">
+        <StatefulSelect
+          label="Allow access to"
+          selected="exact"
+          setSelected={() => undefined}
+          wrapLabels
+          defaultOpen
+          possibleValues={[
+            {
+              value: `exact`,
+              label: `Only school-project-downloads.classroom.resources.example.com`,
+              labelContent: (
+                <>
+                  <span className="font-normal">Only </span>
+                  <code className="inline-block max-w-full rounded-md border-[0.5px] border-stone-200 bg-stone-200/40 px-1.5 py-0.5 font-mono text-[0.9em] font-medium">
+                    school-project-downloads.classroom.resources.example.com
+                  </code>
+                </>
+              ),
+            },
+            {
+              value: `subdomains`,
+              label: `school-project-downloads.classroom.resources.example.com and its subdomains`,
+            },
+            { value: `parent`, label: `example.com and all its subdomains` },
+          ]}
+        />
+      </StorySection>
+    </StoryCanvas>
+  ),
+};
+
 export const OpenMenu: Story = {
   parameters: galleryParameters,
   render: () => (
