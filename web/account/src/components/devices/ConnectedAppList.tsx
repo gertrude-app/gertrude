@@ -42,9 +42,10 @@ const ConnectedAppList: React.FC<Props> = ({ apps, personId, deviceId }) => {
         return (
           <Tooltip key={app} content={`Open ${details.name} settings`} side="top">
             <Link
-              to="/people/$personId/ios-settings/$deviceId"
-              params={{ personId, deviceId }}
+              to="/people/$personId/ios-settings"
+              params={{ personId }}
               search={{ section: app }}
+              hash={app === `music` ? `music` : deviceId}
               aria-label={`Open ${details.name} settings`}
               className="group relative z-20 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
             >

@@ -7,6 +7,7 @@ import type { InstalledMacApp } from '#/components/pages/person-settings/MacSett
 import type {
   AllowedAlbum,
   Device,
+  IOSDevice,
   Keychain,
   Notification,
   NotificationMethod,
@@ -45,7 +46,7 @@ export const macDevice: Device = {
   online: true,
 };
 
-export const iphoneDevice: Device = {
+export const iphoneDevice: IOSDevice = {
   id: `iphone-1`,
   personId: `person-1`,
   type: `iphone`,
@@ -54,7 +55,7 @@ export const iphoneDevice: Device = {
   modelIdentifier: `iPhone16,1`,
 };
 
-export const ipadDevice: Device = {
+export const ipadDevice: IOSDevice = {
   id: `ipad-1`,
   personId: `person-2`,
   type: `ipad`,

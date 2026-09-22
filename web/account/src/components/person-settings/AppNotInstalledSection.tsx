@@ -1,6 +1,7 @@
 import { EmptyState } from '@gertrude/ui';
 import { ExternalLinkIcon } from 'lucide-react';
 import React from 'react';
+import type { PersonSettingsHeadingLevel } from './PersonSettingsExpandableSection';
 import type { LucideIcon } from 'lucide-react';
 import PersonSettingsExpandableSection from './PersonSettingsExpandableSection';
 
@@ -11,6 +12,7 @@ interface Props {
   description: string;
   appStoreUrl: string;
   defaultExpanded?: boolean;
+  headingLevel?: PersonSettingsHeadingLevel;
 }
 
 const AppNotInstalledSection: React.FC<Props> = ({
@@ -20,10 +22,12 @@ const AppNotInstalledSection: React.FC<Props> = ({
   description,
   appStoreUrl,
   defaultExpanded,
+  headingLevel,
 }) => (
   <PersonSettingsExpandableSection
     appIconUrl={appIconUrl}
     title={appName}
+    headingLevel={headingLevel}
     defaultExpanded={defaultExpanded}
     previewChips={[
       { title: `Status`, values: [{ text: `Not installed`, color: `neutral` }] },

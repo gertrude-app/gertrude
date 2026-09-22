@@ -1,3 +1,4 @@
+import type { IOSDevice } from '#/components/types';
 import type { GetIosDeviceSettings } from '@shared/pairql/src/account';
 
 export type IosDeviceSettingsConfiguration = GetIosDeviceSettings.Output;
@@ -13,3 +14,8 @@ export type IosPodcastsSettings = NonNullable<IosDeviceSettingsConfiguration[`po
 export type IosPodcastsSubscription = IosPodcastsSettings[`subscription`];
 
 export type IosMusicSettings = NonNullable<IosDeviceSettingsConfiguration[`music`]>;
+
+export interface MusicDeviceConnection {
+  device: IOSDevice;
+  music: IosMusicSettings;
+}

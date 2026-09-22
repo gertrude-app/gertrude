@@ -9,10 +9,13 @@ export type PersonSettingsPreviewChip = {
   values: PreviewChipValue[];
 } | null;
 
+export type PersonSettingsHeadingLevel = `h2` | `h3` | `h4`;
+
 export type PersonSettingsExpandableSectionProps = {
   title: string;
   previewChips: PersonSettingsPreviewChip[];
   appIconUrl?: string;
+  headingLevel?: PersonSettingsHeadingLevel;
   defaultExpanded?: boolean;
   hasUnsavedChanges?: boolean;
   children: React.ReactNode;
@@ -22,16 +25,18 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
   title,
   previewChips,
   appIconUrl,
+  headingLevel = `h2`,
   defaultExpanded = false,
   hasUnsavedChanges = false,
   children,
 }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const contentId = React.useId();
+  const Heading = headingLevel;
 
   return (
     <VStack className="bg-white @xl/main:border-x border-y border-stone-200 @xl/main:rounded-xl shadow shadow-stone-300/30 -mx-3 @lg/main:-mx-4 @xl/main:mx-0">
-      <h2>
+      <Heading>
         <HStack
           as="button"
           type="button"
@@ -43,7 +48,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
           className="w-full p-3 cursor-pointer select-none text-left rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50"
           onClick={() => setExpanded(!expanded)}
         >
-          <HStack gap={4} wrap className="gap-y-0.5">
+          <HStack gap={4} wrap className={appIconUrl ? `gap-y-2` : `gap-y-0.5`}>
             {appIconUrl && (
               <div className="relative">
                 <img
@@ -90,7 +95,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
             />
           </HStack>
         </HStack>
-      </h2>
+      </Heading>
       <div
         id={contentId}
         role="region"

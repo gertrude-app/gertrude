@@ -2,7 +2,10 @@ import { Button, HStack, Text, VStack } from '@gertrude/ui';
 import { KeyIcon } from 'lucide-react';
 import React from 'react';
 import type { IosPodcastsSubscription } from '#/components/pages/person-settings/IosSettingsPage.types';
-import type { PersonSettingsPreviewChip } from './PersonSettingsExpandableSection';
+import type {
+  PersonSettingsHeadingLevel,
+  PersonSettingsPreviewChip,
+} from './PersonSettingsExpandableSection';
 import type { PodcastsRunway, PodcastsRunwayTier } from './podcastsSubscriptionRunway';
 import PersonSettingsExpandableSection from './PersonSettingsExpandableSection';
 import PodcastsPinResetModal from './PodcastsPinResetModal';
@@ -15,6 +18,7 @@ interface Props {
   requestingPinReset?: boolean;
   onRequestPinReset: () => Promise<number | null>;
   defaultExpanded?: boolean;
+  headingLevel?: PersonSettingsHeadingLevel;
 }
 
 const CHIP_TEXT: Record<PodcastsRunwayTier, string> = {
@@ -42,6 +46,7 @@ const PodcastsSection: React.FC<Props> = ({
   requestingPinReset = false,
   onRequestPinReset,
   defaultExpanded,
+  headingLevel,
 }) => {
   const [code, setCode] = React.useState<number | null>(null);
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -73,6 +78,7 @@ const PodcastsSection: React.FC<Props> = ({
       <PersonSettingsExpandableSection
         appIconUrl="/gertrude-app-icons/podcasts.webp"
         title="Gertrude Podcasts"
+        headingLevel={headingLevel}
         defaultExpanded={defaultExpanded}
         previewChips={previewChips}
       >

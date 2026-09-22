@@ -56,8 +56,9 @@ const SupervisionBadge: React.FC<{ status: IOSDeviceSupervisionStatus }> = ({
 const MobileDeviceCard: React.FC<Props> = ({ device }) => (
   <Card preset="big" padding={0} className="relative flex flex-col overflow-hidden">
     <Link
-      to="/people/$personId/ios-settings/$deviceId"
-      params={{ personId: device.person.id, deviceId: device.id }}
+      to="/people/$personId/ios-settings"
+      params={{ personId: device.person.id }}
+      hash={device.id}
       aria-label={`Open settings for ${possessive(device.person.name)} ${device.modelName}`}
       className="peer absolute inset-0 z-10 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300"
     />

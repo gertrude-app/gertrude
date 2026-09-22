@@ -36,6 +36,8 @@ export type Device =
       modelIdentifier: string;
     };
 
+export type IOSDevice = Extract<Device, { type: `iphone` | `ipad` }>;
+
 export type PersonCardPerson = {
   id: string;
   name: string;

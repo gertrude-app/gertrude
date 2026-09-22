@@ -8,10 +8,38 @@ interface ArtworkDevice {
   modelIdentifier: string;
 }
 
+type ArtworkSize = `small` | `medium` | `large` | `card`;
+
 interface Props {
   device: ArtworkDevice;
-  size?: `small` | `large` | `card`;
+  size?: ArtworkSize;
 }
+
+const sizeClasses: Record<
+  ArtworkSize,
+  { wrapper: string; fallback: string; image: string }
+> = {
+  small: {
+    wrapper: `h-5.5 w-7 shrink-0`,
+    fallback: `h-5 w-5 text-stone-500`,
+    image: `h-5.5 w-7 object-contain drop-shadow-sm`,
+  },
+  medium: {
+    wrapper: `h-8 w-10 shrink-0`,
+    fallback: `h-7 w-7 text-stone-500`,
+    image: `h-7 w-9 object-contain drop-shadow-sm`,
+  },
+  large: {
+    wrapper: `h-10 w-12 shrink-0`,
+    fallback: `h-8 w-8 text-stone-500`,
+    image: `h-9 w-11 object-contain drop-shadow-sm`,
+  },
+  card: {
+    wrapper: `h-12 w-16 shrink-0`,
+    fallback: `h-8 w-8 text-stone-500`,
+    image: `h-12 w-16 object-contain drop-shadow-sm`,
+  },
+};
 
 const DeviceArtwork: React.FC<Props> = ({ device, size = `small` }) => {
   const imageUrl = deviceImageUrl(device.type, device.modelIdentifier);
@@ -24,34 +52,17 @@ const DeviceArtwork: React.FC<Props> = ({ device, size = `small` }) => {
         : TabletIcon;
   const showFallback =
     device.modelIdentifier.endsWith(`,unknown`) || failedUrl === imageUrl;
-  const wrapperClass =
-    size === `card`
-      ? `h-12 w-16 shrink-0`
-      : size === `large`
-        ? `h-10 w-12 shrink-0`
-        : `h-5.5 w-7 shrink-0`;
-  const fallbackClass =
-    size === `card`
-      ? `h-8 w-8 text-stone-500`
-      : size === `large`
-        ? `h-8 w-8 text-stone-500`
-        : `h-5 w-5 text-stone-500`;
-  const imageClass =
-    size === `card`
-      ? `h-12 w-16 object-contain drop-shadow-sm`
-      : size === `large`
-        ? `h-9 w-11 object-contain drop-shadow-sm`
-        : `h-5.5 w-7 object-contain drop-shadow-sm`;
+  const classes = sizeClasses[size];
 
   return (
-    <HStack justify="center" align="center" className={wrapperClass}>
+    <HStack justify="center" align="center" className={classes.wrapper}>
       {showFallback ? (
-        <FallbackIcon className={fallbackClass} aria-hidden="true" />
+        <FallbackIcon className={classes.fallback} aria-hidden="true" />
       ) : (
         <img
           src={imageUrl}
           alt=""
-          className={imageClass}
+          className={classes.image}
           onError={() => setFailedUrl(imageUrl)}
         />
       )}

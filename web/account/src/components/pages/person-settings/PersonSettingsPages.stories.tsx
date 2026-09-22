@@ -1,8 +1,13 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
-import type { ConnectedIOSApp } from '#/components/devices/types';
-import type { IosDeviceSettingsConfiguration } from './IosSettingsPage.types';
+import type { IOSDevice } from '#/components/types';
+import type {
+  IosDeviceSettingsConfiguration,
+  MusicDeviceConnection,
+} from './IosSettingsPage.types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
+import IosDeviceSettingsSection from './IosDeviceSettingsSection';
+import IosPersonSettingsPage from './IosPersonSettingsPage';
 import IosSettingsPage from './IosSettingsPage';
 import {
   iosDeviceSettingsAllAppsConnected,
@@ -14,6 +19,8 @@ import {
   iosDeviceSettingsPodcastsTrial,
   iosDeviceSettingsUnsupervised,
   iosDeviceSettingsWithPodcasts,
+  ipadDevice,
+  iphoneDevice,
 } from '#/components/storybook/fixtures';
 
 const meta = {
@@ -22,6 +29,25 @@ const meta = {
 };
 
 export default meta;
+
+interface DeviceStorySettings {
+  device: IOSDevice;
+  settings: IosDeviceSettingsConfiguration;
+}
+
+const alternateIphone: IOSDevice = {
+  ...iphoneDevice,
+  id: `iphone-2`,
+  modelName: `iPhone 15`,
+  modelIdentifier: `iPhone15,4`,
+};
+
+const alternateIpad: IOSDevice = {
+  ...ipadDevice,
+  id: `ipad-2`,
+  modelName: `iPad`,
+  modelIdentifier: `iPad13,18`,
+};
 
 const InPageContext: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <StoryScreen>
@@ -36,21 +62,54 @@ const InPageContext: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   </StoryScreen>
 );
 
-const IosSettings: React.FC<{
+const settingsForDevice = (
+  device: IOSDevice,
+  settings: IosDeviceSettingsConfiguration,
+): IosDeviceSettingsConfiguration => ({
+  ...settings,
+  deviceId: device.id,
+  deviceName: device.modelName,
+  modelIdentifier: device.modelIdentifier,
+  iosVersion: device.iOSVersion,
+});
+
+const DeviceSettings: React.FC<{
   settings: IosDeviceSettingsConfiguration;
-  defaultExpandedSection?: ConnectedIOSApp;
-}> = ({ settings, defaultExpandedSection }) => (
+}> = ({ settings }) => (
   <IosSettingsPage
     state={{ status: `success`, data: settings }}
-    defaultExpandedSection={defaultExpandedSection}
     onSaveBlockedGroups={() => {}}
     onSaveProfile={() => {}}
     onRequestPodcastsPinReset={() => Promise.resolve(481_920)}
   />
 );
 
-const expandSections = (canvasElement: HTMLElement, titles: string[]): void => {
-  const buttons = Array.from(canvasElement.querySelectorAll<HTMLButtonElement>(`button`));
+const IosOverview: React.FC<{
+  devices: DeviceStorySettings[];
+}> = ({ devices }) => {
+  const normalizedDevices = devices.map(({ device, settings }) => ({
+    device,
+    settings: settingsForDevice(device, settings),
+  }));
+  const musicConnections: MusicDeviceConnection[] = normalizedDevices.flatMap(
+    ({ device, settings }) => (settings.music ? [{ device, music: settings.music }] : []),
+  );
+
+  return (
+    <InPageContext>
+      <IosPersonSettingsPage personName="Jude" musicConnections={musicConnections}>
+        {normalizedDevices.map(({ device, settings }) => (
+          <IosDeviceSettingsSection key={device.id} device={device}>
+            <DeviceSettings settings={settings} />
+          </IosDeviceSettingsSection>
+        ))}
+      </IosPersonSettingsPage>
+    </InPageContext>
+  );
+};
+
+const expandSections = (scope: ParentNode, titles: string[]): void => {
+  const buttons = Array.from(scope.querySelectorAll<HTMLButtonElement>(`button`));
   for (const title of titles) {
     const button = buttons.find(
       (element) => element.getAttribute(`aria-label`) === title,
@@ -62,106 +121,105 @@ const expandSections = (canvasElement: HTMLElement, titles: string[]): void => {
   }
 };
 
+const expandDeviceSections = (
+  canvasElement: HTMLElement,
+  deviceId: string,
+  titles: string[],
+): void => {
+  const deviceSection = canvasElement.querySelector<HTMLElement>(`[id="${deviceId}"]`);
+  if (!deviceSection) {
+    throw new globalThis.Error(`${deviceId} device section not found`);
+  }
+  expandSections(deviceSection, titles);
+};
+
 const waitForRender = (): Promise<void> =>
   new Promise((resolveRender) =>
     requestAnimationFrame(() => requestAnimationFrame(() => resolveRender())),
   );
 
-export const IosAllAppsConnected = {
-  name: 'iPhone and iPad (all apps connected)',
+export const IosOverviewStory = {
+  name: 'iPhone and iPad (overview)',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsAllAppsConnected} />
-    </InPageContext>
+    <IosOverview
+      devices={[
+        { device: iphoneDevice, settings: iosDeviceSettingsAllAppsConnected },
+        { device: ipadDevice, settings: iosDeviceSettingsNoBlocker },
+      ]}
+    />
+  ),
+};
+
+export const IosExpandedSettings = {
+  name: 'iPhone and iPad (expanded settings)',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <IosOverview
+      devices={[
+        { device: iphoneDevice, settings: iosDeviceSettingsAllAppsConnected },
+        {
+          device: ipadDevice,
+          settings: {
+            ...iosDeviceSettingsNoBlocker,
+            music: iosDeviceSettingsMusicTrial.music,
+          },
+        },
+      ]}
+    />
   ),
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
     expandSections(canvasElement, [
-      `Gertrude Blocker`,
       `Gertrude Music`,
+      `Gertrude Blocker`,
       `Gertrude Podcasts`,
     ]);
   },
 };
 
-export const IosLinkedMusicSection = {
-  name: 'iPhone and iPad (linked Music section)',
-  render: () => (
-    <InPageContext>
-      <IosSettings
-        settings={iosDeviceSettingsAllAppsConnected}
-        defaultExpandedSection="music"
-      />
-    </InPageContext>
-  ),
-};
-
-export const IosUnsupervised = {
-  name: 'iPhone and iPad (unsupervised)',
+export const IosAlternateStates = {
+  name: 'iPhone and iPad (alternate states)',
   parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
   render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsUnsupervised} />
-    </InPageContext>
+    <IosOverview
+      devices={[
+        {
+          device: iphoneDevice,
+          settings: {
+            ...iosDeviceSettingsNoBlocker,
+            music: iosDeviceSettingsMusicUnavailable.music,
+          },
+        },
+        {
+          device: ipadDevice,
+          settings: {
+            ...iosDeviceSettingsUnsupervised,
+            podcasts: iosDeviceSettingsPodcastsTrial.podcasts,
+          },
+        },
+        { device: alternateIphone, settings: iosDeviceSettingsPodcastsExpiring },
+        {
+          device: alternateIpad,
+          settings: {
+            ...iosDeviceSettingsNoBlocker,
+            podcasts: iosDeviceSettingsPodcastsPaused.podcasts,
+          },
+        },
+      ]}
+    />
   ),
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    expandSections(canvasElement, [`Gertrude Blocker`]);
-  },
-};
-
-export const IosAppsNotConnected = {
-  name: 'iPhone and iPad (apps not connected)',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsNoBlocker} />
-    </InPageContext>
-  ),
-  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    expandSections(canvasElement, [
+    expandSections(canvasElement, [`Gertrude Music`]);
+    expandDeviceSections(canvasElement, iphoneDevice.id, [
       `Gertrude Blocker`,
-      `Gertrude Music`,
       `Gertrude Podcasts`,
     ]);
-  },
-};
-
-export const IosPodcastsTrial = {
-  name: 'iPhone and iPad (podcasts trial)',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsPodcastsTrial} />
-    </InPageContext>
-  ),
-  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    expandSections(canvasElement, [`Gertrude Podcasts`]);
-  },
-};
-
-export const IosPodcastsExpiring = {
-  name: 'iPhone and iPad (podcasts expiring)',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsPodcastsExpiring} />
-    </InPageContext>
-  ),
-  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    expandSections(canvasElement, [`Gertrude Podcasts`]);
-  },
-};
-
-export const IosPodcastsPaused = {
-  name: 'iPhone and iPad (podcasts paused)',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsPodcastsPaused} />
-    </InPageContext>
-  ),
-  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    expandSections(canvasElement, [`Gertrude Podcasts`]);
+    expandDeviceSections(canvasElement, ipadDevice.id, [
+      `Gertrude Blocker`,
+      `Gertrude Podcasts`,
+    ]);
+    expandDeviceSections(canvasElement, alternateIphone.id, [`Gertrude Podcasts`]);
+    expandDeviceSections(canvasElement, alternateIpad.id, [`Gertrude Podcasts`]);
   },
 };
 
@@ -169,9 +227,9 @@ export const IosPodcastsPinReset = {
   name: 'iPhone and iPad (podcasts PIN reset)',
   parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
   render: () => (
-    <InPageContext>
-      <IosSettings settings={iosDeviceSettingsWithPodcasts} />
-    </InPageContext>
+    <IosOverview
+      devices={[{ device: iphoneDevice, settings: iosDeviceSettingsWithPodcasts }]}
+    />
   ),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     expandSections(canvasElement, [`Gertrude Podcasts`]);
@@ -187,60 +245,31 @@ export const IosPodcastsPinReset = {
   },
 };
 
-export const IosMusicUnavailable = {
-  name: 'iPhone and iPad (music unavailable)',
+export const IosLoadingAndError = {
+  name: 'iPhone and iPad (loading and error)',
   parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
   render: () => (
     <InPageContext>
-      <IosSettings settings={iosDeviceSettingsMusicUnavailable} />
-    </InPageContext>
-  ),
-  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    expandSections(canvasElement, [`Gertrude Music`]);
-  },
-};
-
-export const IosMusicTrial = {
-  name: 'iPhone and iPad (Music free trial)',
-  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettings
-        settings={iosDeviceSettingsMusicTrial}
-        defaultExpandedSection="music"
-      />
-    </InPageContext>
-  ),
-};
-
-export const IosLoading = {
-  name: 'iPhone and iPad (loading)',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettingsPage
-        state={{ status: `loading` }}
-        onSaveBlockedGroups={() => {}}
-        onSaveProfile={() => {}}
-      />
-    </InPageContext>
-  ),
-};
-
-export const IosError = {
-  name: 'iPhone and iPad (error)',
-  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
-  render: () => (
-    <InPageContext>
-      <IosSettingsPage
-        state={{
-          status: `error`,
-          message: `Check your connection and try again.`,
-          onRetry: () => {},
-        }}
-        onSaveBlockedGroups={() => {}}
-        onSaveProfile={() => {}}
-      />
+      <IosPersonSettingsPage personName="Jude" musicConnections={[]}>
+        <IosDeviceSettingsSection device={iphoneDevice}>
+          <IosSettingsPage
+            state={{ status: `loading` }}
+            onSaveBlockedGroups={() => {}}
+            onSaveProfile={() => {}}
+          />
+        </IosDeviceSettingsSection>
+        <IosDeviceSettingsSection device={ipadDevice}>
+          <IosSettingsPage
+            state={{
+              status: `error`,
+              message: `Check your connection and try again.`,
+              onRetry: () => {},
+            }}
+            onSaveBlockedGroups={() => {}}
+            onSaveProfile={() => {}}
+          />
+        </IosDeviceSettingsSection>
+      </IosPersonSettingsPage>
     </InPageContext>
   ),
 };
