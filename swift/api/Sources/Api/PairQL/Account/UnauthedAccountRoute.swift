@@ -3,6 +3,8 @@ import PairQL
 import Vapor
 
 enum UnauthedAccountRoute: PairRoute {
+  case accountSignup(AccountSignup.Input)
+  case accountVerifySignupEmail(AccountVerifySignupEmail.Input)
   case accountLogin(AccountLogin.Input)
   case accountRequestMagicLink(AccountRequestMagicLink.Input)
   case accountLoginMagicLink(AccountLoginMagicLink.Input)
@@ -10,6 +12,14 @@ enum UnauthedAccountRoute: PairRoute {
   case accountResetPassword(AccountResetPassword.Input)
 
   nonisolated(unsafe) static let router = OneOf {
+    Route(.case(Self.accountSignup)) {
+      Operation(AccountSignup.self)
+      Body(.accountInput(AccountSignup.self))
+    }
+    Route(.case(Self.accountVerifySignupEmail)) {
+      Operation(AccountVerifySignupEmail.self)
+      Body(.accountInput(AccountVerifySignupEmail.self))
+    }
     Route(.case(Self.accountLogin)) {
       Operation(AccountLogin.self)
       Body(.accountInput(AccountLogin.self))
@@ -36,6 +46,12 @@ enum UnauthedAccountRoute: PairRoute {
 extension UnauthedAccountRoute: RouteResponder {
   static func respond(to route: Self, in context: Context) async throws -> Response {
     switch route {
+    case .accountSignup(let input):
+      let output = try await AccountSignup.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .accountVerifySignupEmail(let input):
+      let output = try await AccountVerifySignupEmail.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .accountLogin(let input):
       let output = try await AccountLogin.resolve(with: input, in: context)
       return try await self.respond(with: output)

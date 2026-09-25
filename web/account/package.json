@@ -13,6 +13,9 @@
           "^default",
           {
             "env": "VITE_API_ENDPOINT"
+          },
+          {
+            "env": "VITE_TURNSTILE_SITEKEY"
           }
         ],
         "outputs": [
@@ -38,16 +41,19 @@
     "@tailwindcss/vite": "4.3.0",
     "@tanstack/react-query": "5.90.12",
     "@tanstack/react-router": "1.170.16",
+    "canvas-confetti": "1.9.4",
     "clsx": "2.1.1",
     "lucide-react": "0.545.0",
     "parse-domain": "7.0.1",
     "react": "19.2.6",
     "react-dom": "19.2.6",
+    "react-turnstile": "1.1.4",
     "tailwindcss": "4.3.0"
   },
   "devDependencies": {
     "@tailwindcss/typography": "0.5.19",
     "@tanstack/router-plugin": "1.168.18",
+    "@types/canvas-confetti": "1.9.0",
     "@types/dash-ambient": "workspace:*",
     "@types/node": "22.19.3",
     "@types/react": "19.2.14",

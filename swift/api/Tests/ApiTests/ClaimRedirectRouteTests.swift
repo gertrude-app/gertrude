@@ -7,7 +7,7 @@ import XExpect
 @testable import Api
 
 final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
-  func testValidCode_redirectsWithDeviceInfo() async throws {
+  func testValidCode_redirectsToAccountSupervision() async throws {
     let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
@@ -24,17 +24,13 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("claimPendingSupervision=\(code)")
-        expect(location).toContain("modelName=iPad%20mini%20(6th%20gen)")
-        expect(location).toContain("iosVersion=17.5")
-        expect(location).toContain("redirect=/supervise-device/\(code)/claim")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerSupervise/\(code)")
         expect(location).not.toContain("error=")
       },
     )
   }
 
-  func testExpiredButClaimedCode_stillRedirectsWithDeviceInfo() async throws {
+  func testExpiredButClaimedCode_stillRedirectsToAccount() async throws {
     let code = uniqueClaimCode()
     let child = try await self.child()
     let device = try await self.db.create(IOSDevice(
@@ -59,41 +55,37 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("claimPendingSupervision=\(code)")
-        expect(location).toContain("modelName=iPhone%2016%20Pro")
-        expect(location).toContain("redirect=/supervise-device/\(code)/claim")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerSupervise/\(code)")
         expect(location).not.toContain("error=")
       },
     )
   }
 
-  func testMissingCodeParam_redirectsWithMissingCodeError() async throws {
+  func testMissingCodeParam_redirectsToAccountInvalidCode() async throws {
     try await app.test(
       .GET,
       "claim-pending-supervision/abc",
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("error=invalid_code")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerSupervise/invalid")
       },
     )
   }
 
-  func testCodeNotFound_redirectsWithInvalidCodeError() async throws {
+  func testCodeNotFound_redirectsToAccountCodePage() async throws {
     try await app.test(
       .GET,
       "claim-pending-supervision/999999",
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("error=missing_code")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerSupervise/999999")
       },
     )
   }
 
-  func testExpiredUnclaimedCode_redirectsWithExpiredCodeError() async throws {
+  func testExpiredUnclaimedCode_redirectsToAccountForRecovery() async throws {
     let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(
       id: .init(),
@@ -115,8 +107,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("error=expired_code")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerSupervise/\(code)")
       },
     )
   }
@@ -140,10 +131,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("claimPendingPodcastsDevice=\(code)")
-        expect(location).toContain("iosVersion=18.2")
-        expect(location).toContain("redirect=/claim-podcasts-device/\(code)/claim")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/podcasts/\(code)")
         expect(location).not.toContain("error=")
       },
     )
@@ -155,8 +143,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("claimPendingPodcastsDevice=\(code)")
-        expect(location).toContain("redirect=/claim-podcasts-device/\(code)/claim")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/podcasts/\(code)")
       },
     )
   }
@@ -177,10 +164,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/signup")
-        expect(location).toContain("claimPendingBlocker=\(code)")
-        expect(location).toContain("iosVersion=18.2")
-        expect(location).toContain("redirect=/claim-blocker-device/\(code)/claim")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerConnect/\(code)")
         expect(location).not.toContain("error=")
       },
     )
@@ -202,23 +186,20 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login") // music lands login-first
-        expect(location).not.toContain("/signup")
-        expect(location).toContain("claimPendingMusicDevice=\(code)")
-        expect(location).toContain("iosVersion=18.2")
-        expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
+        expect(location)
+          .toEqual("\(self.env.accountDashboardUrl)/connect/music/\(code)") // Account handles login-first
         expect(location).not.toContain("error=")
       },
     )
   }
 
-  func testMusicErrorCodes_alsoLandOnLogin() async throws {
+  func testMusicErrorCodes_landOnAccountRecovery() async throws {
     try await app.test(
       .GET,
       "claim-pending-music/abc",
       afterResponse: { (res: XCTHTTPResponse) async throws in
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login?error=invalid_code")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/music/invalid")
       },
     )
 
@@ -227,7 +208,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       "claim-pending-music/999999",
       afterResponse: { (res: XCTHTTPResponse) async throws in
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("\(self.env.dashboardUrl)/login?error=missing_code")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/music/999999")
       },
     )
   }
@@ -248,11 +229,31 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("claimPendingMusicDevice=\(code)") // routed by claim intent
-        expect(location).toContain("\(self.env.dashboardUrl)/login") // ...so login-first too
-        expect(location).toContain("redirect=/claim-music-device/\(code)/claim")
-        expect(location).not.toContain("claimPendingBlocker")
+        expect(location)
+          .toEqual("\(self.env.accountDashboardUrl)/connect/music/\(code)") // routed by claim intent; Account handles login-first
         expect(location).not.toContain("error=")
+      },
+    )
+  }
+
+  func testCutoverDisabled_preservesLegacyRedirect() async throws {
+    let device = try await self.db.create(IOSDevice.random)
+    let claim = try await self.createClaim(.blockerConnect, device.id)
+
+    let originalContext = self.app.context
+    var legacyContext = originalContext
+    legacyContext.env.accountPairingRedirectsEnabled = false
+    self.app.context = legacyContext
+    defer { self.app.context = originalContext }
+
+    try await app.test(
+      .GET,
+      "claim-pending-blocker/\(claim.code)",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        let location = res.headers.first(name: .location)!
+        expect(location).toContain("\(self.env.dashboardUrl)/signup")
+        expect(location).toContain("claimPendingBlocker=\(claim.code)")
+        expect(location).toContain("redirect=/claim-blocker-device/\(claim.code)/claim")
       },
     )
   }
@@ -273,8 +274,7 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toContain("claimPendingBlocker=\(code)")
-        expect(location).toContain("redirect=/claim-blocker-device/\(code)/claim")
+        expect(location).toEqual("\(self.env.accountDashboardUrl)/connect/blockerConnect/\(code)")
         expect(location).not.toContain("error=")
       },
     )

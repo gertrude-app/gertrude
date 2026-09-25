@@ -31,6 +31,14 @@ export const validateAuthRedirectSearch = (
   return redirect ? { redirect } : {};
 };
 
+export const pairingReturnPath = (): AuthRedirect | undefined => {
+  const path = sessionStorage.getItem(`pairingReturnPath`);
+  return path &&
+    /^\/connect\/(blockerConnect|blockerSupervise|podcasts|music)\/\d{6}$/.test(path)
+    ? (path as AuthRedirect)
+    : undefined;
+};
+
 export type PostAuthLocation = { to: `/people` };
 
 export const postAuthLocation = (

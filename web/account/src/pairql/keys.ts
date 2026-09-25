@@ -1,5 +1,6 @@
 import type {
   GetAccountBilling,
+  GetAccountIOSClaimData,
   GetAccountKeychain,
   GetAccountKeychains,
   GetAccountSettings,
@@ -32,6 +33,10 @@ export class Key extends QueryKey<never> {
 
   static get devices(): QueryKey<GetDevices.Output> {
     return new QueryKey([`devices`]);
+  }
+
+  static iosClaim(flow: string, code: string): QueryKey<GetAccountIOSClaimData.Output> {
+    return new QueryKey([`ios-claim`, flow, code]);
   }
 
   static macDevice(deviceId: string): QueryKey<GetMacDevice.Output> {

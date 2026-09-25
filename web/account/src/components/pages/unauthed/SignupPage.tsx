@@ -14,6 +14,9 @@ interface Props {
   setPassword: (password: string) => void;
   testimonials: Testimonial[];
   onSubmit: (event: React.FormEvent) => void;
+  loginHref?: string;
+  turnstile?: React.ReactNode;
+  submitting?: boolean;
 }
 
 const SignupPage: React.FC<Props> = ({
@@ -23,6 +26,9 @@ const SignupPage: React.FC<Props> = ({
   setPassword,
   testimonials,
   onSubmit,
+  loginHref = `/login`,
+  turnstile,
+  submitting = false,
 }) => (
   <UnauthedPageLayout
     form={
@@ -45,6 +51,7 @@ const SignupPage: React.FC<Props> = ({
             label="Password"
             placeholder="••••••••••"
           />,
+          turnstile,
         ]}
         buttons={[
           <Button
@@ -53,6 +60,8 @@ const SignupPage: React.FC<Props> = ({
             variant="primary"
             icon={ArrowRightIcon}
             iconPosition="right"
+            disabled={submitting}
+            loading={submitting}
           >
             Signup
           </Button>,
@@ -75,7 +84,7 @@ const SignupPage: React.FC<Props> = ({
         }
         bottomLink={{
           text: `Login instead`,
-          href: `/login`,
+          href: loginHref,
         }}
         bottomLinkExplanation="Already have an account?"
       />
@@ -83,13 +92,21 @@ const SignupPage: React.FC<Props> = ({
     rightDisplay={
       <VStack align="center" className="h-full overflow-hidden pt-20 relative">
         <img src="/logo-wordmark.svg" alt="Gertrude" className="w-36 relative" />
-        <Text as="h2" variant="display" className="mt-8 relative">
-          Here's what parents are saying.
-        </Text>
-        <Text as="h3" variant="subheading" className="mt-1 relative mb-4">
-          Just in case you'd be inclined to doubt us.
-        </Text>
-        <RotatingTestimonials testimonials={testimonials} />
+        {testimonials.length > 0 ? (
+          <>
+            <Text as="h2" variant="display" className="mt-8 relative">
+              Here's what parents are saying.
+            </Text>
+            <Text as="h3" variant="subheading" className="mt-1 relative mb-4">
+              Just in case you'd be inclined to doubt us.
+            </Text>
+            <RotatingTestimonials testimonials={testimonials} />
+          </>
+        ) : (
+          <Text as="h2" variant="display" className="mt-12 max-w-sm text-center">
+            One account for every Gertrude app.
+          </Text>
+        )}
       </VStack>
     }
   />
