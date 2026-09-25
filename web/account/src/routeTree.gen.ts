@@ -13,6 +13,7 @@ import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
+import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
@@ -28,6 +29,7 @@ import { Route as AppRequestsSuspensionRouteImport } from './routes/_app/request
 import { Route as AppPeopleNewRouteImport } from './routes/_app/people/new'
 import { Route as AppKeychainsKeychainIdRouteImport } from './routes/_app/keychains/$keychainId'
 import { Route as AppDevicesDeviceIdRouteImport } from './routes/_app/devices/$deviceId'
+import { Route as unauthedVerifySignupEmailTokenRouteImport } from './routes/(unauthed)/verify-signup-email/$token'
 import { Route as unauthedResetPasswordTokenRouteImport } from './routes/(unauthed)/reset-password/$token'
 import { Route as unauthedOtpTokenRouteImport } from './routes/(unauthed)/otp/$token'
 import { Route as AppSettingsBillingRouteRouteImport } from './routes/_app/settings/billing/route'
@@ -61,6 +63,11 @@ const AppSecurityEventsRoute = AppSecurityEventsRouteImport.update({
   id: '/security-events',
   path: '/security-events',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const unauthedSignupRoute = unauthedSignupRouteImport.update({
+  id: '/(unauthed)/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const unauthedLoginRoute = unauthedLoginRouteImport.update({
   id: '/(unauthed)/login',
@@ -139,6 +146,12 @@ const AppDevicesDeviceIdRoute = AppDevicesDeviceIdRouteImport.update({
   path: '/devices/$deviceId',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const unauthedVerifySignupEmailTokenRoute =
+  unauthedVerifySignupEmailTokenRouteImport.update({
+    id: '/(unauthed)/verify-signup-email/$token',
+    path: '/verify-signup-email/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const unauthedResetPasswordTokenRoute =
   unauthedResetPasswordTokenRouteImport.update({
     id: '/(unauthed)/reset-password/$token',
@@ -223,12 +236,14 @@ export interface FileRoutesByFullPath {
   '/people': typeof AppPeopleRouteRouteWithChildren
   '/settings': typeof AppSettingsRouteRouteWithChildren
   '/login': typeof unauthedLoginRoute
+  '/signup': typeof unauthedSignupRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
+  '/verify-signup-email/$token': typeof unauthedVerifySignupEmailTokenRoute
   '/devices/$deviceId': typeof AppDevicesDeviceIdRoute
   '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
@@ -254,11 +269,13 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof unauthedLoginRoute
+  '/signup': typeof unauthedSignupRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
+  '/verify-signup-email/$token': typeof unauthedVerifySignupEmailTokenRoute
   '/devices/$deviceId': typeof AppDevicesDeviceIdRoute
   '/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/people/new': typeof AppPeopleNewRoute
@@ -288,6 +305,7 @@ export interface FileRoutesById {
   '/_app/people': typeof AppPeopleRouteRouteWithChildren
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
   '/(unauthed)/login': typeof unauthedLoginRoute
+  '/(unauthed)/signup': typeof unauthedSignupRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/': typeof AppIndexRoute
@@ -295,6 +313,7 @@ export interface FileRoutesById {
   '/_app/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/(unauthed)/otp/$token': typeof unauthedOtpTokenRoute
   '/(unauthed)/reset-password/$token': typeof unauthedResetPasswordTokenRoute
+  '/(unauthed)/verify-signup-email/$token': typeof unauthedVerifySignupEmailTokenRoute
   '/_app/devices/$deviceId': typeof AppDevicesDeviceIdRoute
   '/_app/keychains/$keychainId': typeof AppKeychainsKeychainIdRoute
   '/_app/people/new': typeof AppPeopleNewRoute
@@ -325,12 +344,14 @@ export interface FileRouteTypes {
     | '/people'
     | '/settings'
     | '/login'
+    | '/signup'
     | '/security-events'
     | '/signout'
     | '/people/$personId'
     | '/settings/billing'
     | '/otp/$token'
     | '/reset-password/$token'
+    | '/verify-signup-email/$token'
     | '/devices/$deviceId'
     | '/keychains/$keychainId'
     | '/people/new'
@@ -356,11 +377,13 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/signup'
     | '/security-events'
     | '/signout'
     | '/'
     | '/otp/$token'
     | '/reset-password/$token'
+    | '/verify-signup-email/$token'
     | '/devices/$deviceId'
     | '/keychains/$keychainId'
     | '/people/new'
@@ -389,6 +412,7 @@ export interface FileRouteTypes {
     | '/_app/people'
     | '/_app/settings'
     | '/(unauthed)/login'
+    | '/(unauthed)/signup'
     | '/_app/security-events'
     | '/_app/signout'
     | '/_app/'
@@ -396,6 +420,7 @@ export interface FileRouteTypes {
     | '/_app/settings/billing'
     | '/(unauthed)/otp/$token'
     | '/(unauthed)/reset-password/$token'
+    | '/(unauthed)/verify-signup-email/$token'
     | '/_app/devices/$deviceId'
     | '/_app/keychains/$keychainId'
     | '/_app/people/new'
@@ -423,8 +448,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   unauthedLoginRoute: typeof unauthedLoginRoute
+  unauthedSignupRoute: typeof unauthedSignupRoute
   unauthedOtpTokenRoute: typeof unauthedOtpTokenRoute
   unauthedResetPasswordTokenRoute: typeof unauthedResetPasswordTokenRoute
+  unauthedVerifySignupEmailTokenRoute: typeof unauthedVerifySignupEmailTokenRoute
   unauthedResetPasswordIndexRoute: typeof unauthedResetPasswordIndexRoute
 }
 
@@ -457,6 +484,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/security-events'
       preLoaderRoute: typeof AppSecurityEventsRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/(unauthed)/signup': {
+      id: '/(unauthed)/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof unauthedSignupRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(unauthed)/login': {
       id: '/(unauthed)/login'
@@ -562,6 +596,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/devices/$deviceId'
       preLoaderRoute: typeof AppDevicesDeviceIdRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/(unauthed)/verify-signup-email/$token': {
+      id: '/(unauthed)/verify-signup-email/$token'
+      path: '/verify-signup-email/$token'
+      fullPath: '/verify-signup-email/$token'
+      preLoaderRoute: typeof unauthedVerifySignupEmailTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/(unauthed)/reset-password/$token': {
       id: '/(unauthed)/reset-password/$token'
@@ -790,8 +831,10 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   unauthedLoginRoute: unauthedLoginRoute,
+  unauthedSignupRoute: unauthedSignupRoute,
   unauthedOtpTokenRoute: unauthedOtpTokenRoute,
   unauthedResetPasswordTokenRoute: unauthedResetPasswordTokenRoute,
+  unauthedVerifySignupEmailTokenRoute: unauthedVerifySignupEmailTokenRoute,
   unauthedResetPasswordIndexRoute: unauthedResetPasswordIndexRoute,
 }
 export const routeTree = rootRouteImport

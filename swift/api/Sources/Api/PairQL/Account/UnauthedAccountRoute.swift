@@ -4,6 +4,8 @@ import Vapor
 
 enum UnauthedAccountRoute: PairRoute {
   case accountLogin(AccountLogin.Input)
+  case accountSignup(AccountSignup.Input)
+  case accountVerifySignupEmail(AccountVerifySignupEmail.Input)
   case accountRequestMagicLink(AccountRequestMagicLink.Input)
   case accountLoginMagicLink(AccountLoginMagicLink.Input)
   case accountSendPasswordResetEmail(AccountSendPasswordResetEmail.Input)
@@ -13,6 +15,14 @@ enum UnauthedAccountRoute: PairRoute {
     Route(.case(Self.accountLogin)) {
       Operation(AccountLogin.self)
       Body(.accountInput(AccountLogin.self))
+    }
+    Route(.case(Self.accountSignup)) {
+      Operation(AccountSignup.self)
+      Body(.accountInput(AccountSignup.self))
+    }
+    Route(.case(Self.accountVerifySignupEmail)) {
+      Operation(AccountVerifySignupEmail.self)
+      Body(.accountInput(AccountVerifySignupEmail.self))
     }
     Route(.case(Self.accountRequestMagicLink)) {
       Operation(AccountRequestMagicLink.self)
@@ -38,6 +48,12 @@ extension UnauthedAccountRoute: RouteResponder {
     switch route {
     case .accountLogin(let input):
       let output = try await AccountLogin.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .accountSignup(let input):
+      let output = try await AccountSignup.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .accountVerifySignupEmail(let input):
+      let output = try await AccountVerifySignupEmail.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .accountRequestMagicLink(let input):
       let output = try await AccountRequestMagicLink.resolve(with: input, in: context)
