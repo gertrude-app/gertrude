@@ -5,6 +5,8 @@ export * from './pairs/AccountLoginMagicLink';
 export * from './pairs/AccountRequestMagicLink';
 export * from './pairs/AccountResetPassword';
 export * from './pairs/AccountSendPasswordResetEmail';
+export * from './pairs/AccountSignup';
+export * from './pairs/AccountVerifySignupEmail';
 export * from './pairs/ChangeAccountSubscriptionTier';
 export * from './pairs/ConfirmAccountNotificationMethod';
 export * from './pairs/CreateAccountNotificationMethod';

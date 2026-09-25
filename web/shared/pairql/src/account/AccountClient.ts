@@ -56,6 +56,22 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public accountSignup = (
+    input: P.AccountSignup.Input,
+  ): Promise<Result<P.AccountSignup.Output>> => {
+    return this.query<P.AccountSignup.Output>(input, `AccountSignup`, `none`);
+  };
+
+  public accountVerifySignupEmail = (
+    input: P.AccountVerifySignupEmail.Input,
+  ): Promise<Result<P.AccountVerifySignupEmail.Output>> => {
+    return this.query<P.AccountVerifySignupEmail.Output>(
+      input,
+      `AccountVerifySignupEmail`,
+      `none`,
+    );
+  };
+
   public changeAccountSubscriptionTier = (
     input: P.ChangeAccountSubscriptionTier.Input,
   ): Promise<Result<P.ChangeAccountSubscriptionTier.Output>> => {

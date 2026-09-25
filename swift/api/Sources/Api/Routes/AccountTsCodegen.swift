@@ -44,6 +44,8 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
   static var pairqlPairs: [any Pair.Type] {
     [
       AccountLogin.self,
+      AccountSignup.self,
+      AccountVerifySignupEmail.self,
       AccountRequestMagicLink.self,
       AccountLoginMagicLink.self,
       AccountSendPasswordResetEmail.self,

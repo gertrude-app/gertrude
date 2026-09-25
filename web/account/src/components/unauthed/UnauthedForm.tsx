@@ -31,8 +31,8 @@ const UnauthedForm: React.FC<Props> = ({
     onSubmit={onSubmit}
     className="min-h-screen overflow-hidden bg-stone-50 shadow-stone-500/20 xs:min-h-0 xs:w-96 xs:rounded-2xl xs:border xs:border-stone-200 xs:bg-white xs:shadow-2xl"
   >
-    <VStack className="p-6 pt-20 xs:pt-6" gap={1}>
-      <Text as="h2" variant="title">
+    <VStack className="px-6 pb-5 pt-18 xs:pt-5" gap={0.5}>
+      <Text as="h2" variant="title" className="text-[18px]">
         {heading}
       </Text>
       <Text as="p" variant="bodyMuted" className="max-w-80">
@@ -40,7 +40,7 @@ const UnauthedForm: React.FC<Props> = ({
       </Text>
     </VStack>
     <VStack
-      className="xs:bg-stone-100/50 xs:border border-stone-200 p-5 rounded-xl m-1"
+      className="xs:bg-stone-100/50 xs:border border-stone-200 p-5 rounded-xl mx-1"
       gap={8}
     >
       <VStack className="w-full rounded-2xl" gap={3}>
@@ -55,7 +55,7 @@ const UnauthedForm: React.FC<Props> = ({
     </VStack>
     <Spacer hideAbove="xs" />
     {bottomLink && (
-      <HStack justify="between" className="pb-4 pt-3 px-6">
+      <HStack justify="between" className="py-3.5 px-6">
         <img src="/logo-icon.svg" alt="" className="w-6 grayscale opacity-20" />
         <VStack align="end">
           <Text variant="captionMuted">{bottomLinkExplanation}</Text>
