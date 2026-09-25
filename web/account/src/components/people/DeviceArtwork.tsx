@@ -8,7 +8,7 @@ interface ArtworkDevice {
   modelIdentifier: string;
 }
 
-type ArtworkSize = `small` | `medium` | `large` | `card`;
+type ArtworkSize = `small` | `medium` | `large` | `card` | `pairing`;
 
 interface Props {
   device: ArtworkDevice;
@@ -38,6 +38,11 @@ const sizeClasses: Record<
     wrapper: `h-12 w-16 shrink-0`,
     fallback: `h-8 w-8 text-stone-500`,
     image: `h-12 w-16 object-contain drop-shadow-sm`,
+  },
+  pairing: {
+    wrapper: `h-10 w-auto shrink-0`,
+    fallback: `h-8 w-8 text-stone-500`,
+    image: `h-10 w-auto drop-shadow-sm`,
   },
 };
 

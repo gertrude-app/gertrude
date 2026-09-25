@@ -8,11 +8,12 @@ import {
 import React from 'react';
 import CardContainer from '#/components/layout/CardContainer';
 
-type Props =
+type Props = (
   | { status: `loading` }
   | { status: `success` }
   | { status: `error`; message: string }
-  | { status: `canceled` };
+  | { status: `canceled` }
+) & { returnHref?: string };
 
 const CheckoutResultPage: React.FC<Props> = (props) => {
   if (props.status === `loading`) {
@@ -65,8 +66,12 @@ const CheckoutResultPage: React.FC<Props> = (props) => {
           {content.description}
         </Text>
         <div className="mt-3 flex flex-col gap-2 xs:flex-row">
-          <Button type="link" href="/settings/billing" variant="primary">
-            Back to Billing
+          <Button
+            type="link"
+            href={props.returnHref ?? `/settings/billing`}
+            variant="primary"
+          >
+            {props.returnHref ? `Continue device setup` : `Back to Billing`}
           </Button>
           {props.status !== `success` && (
             <Button

@@ -31,6 +31,13 @@ const AuthedLayout: React.FC = () => {
   );
   const requestCount =
     (unlockRequests.data?.totalCount ?? 0) + (suspensionRequests.data?.length ?? 0);
+  React.useEffect(() => {
+    if (pathname !== `/settings/billing` && !pathname.startsWith(`/settings/billing/`)) {
+      sessionStorage.removeItem(`pairingReturnPath`);
+    }
+  }, [pathname]);
+  if (pathname.startsWith(`/connect/`)) return <Outlet />;
+
   const isSelected = (href: string): boolean =>
     pathname === href || pathname.startsWith(`${href}/`);
 

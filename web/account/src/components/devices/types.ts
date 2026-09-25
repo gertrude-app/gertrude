@@ -38,6 +38,7 @@ export type MobileDevice = {
   };
   connectedApps: ConnectedIOSApp[];
   supervisionStatus?: IOSDeviceSupervisionStatus;
+  supervisionSetupPath?: string;
 };
 
 export type DevicesPageData = {

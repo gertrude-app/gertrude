@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Domain } from './types';
 
 interface CodegenPair {
@@ -20,7 +21,7 @@ interface DomainConfig {
   cypressInterceptFile?: string;
 }
 
-const PACKAGE_ROOT = new URL(`..`, import.meta.url).pathname;
+const PACKAGE_ROOT = fileURLToPath(new URL(`..`, import.meta.url));
 
 const DOMAINS: DomainConfig[] = [
   {
