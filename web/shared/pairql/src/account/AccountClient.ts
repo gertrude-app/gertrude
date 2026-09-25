@@ -56,12 +56,38 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public accountSignup = (
+    input: P.AccountSignup.Input,
+  ): Promise<Result<P.AccountSignup.Output>> => {
+    return this.query<P.AccountSignup.Output>(input, `AccountSignup`, `none`);
+  };
+
+  public accountVerifySignupEmail = (
+    input: P.AccountVerifySignupEmail.Input,
+  ): Promise<Result<P.AccountVerifySignupEmail.Output>> => {
+    return this.query<P.AccountVerifySignupEmail.Output>(
+      input,
+      `AccountVerifySignupEmail`,
+      `none`,
+    );
+  };
+
   public changeAccountSubscriptionTier = (
     input: P.ChangeAccountSubscriptionTier.Input,
   ): Promise<Result<P.ChangeAccountSubscriptionTier.Output>> => {
     return this.query<P.ChangeAccountSubscriptionTier.Output>(
       input,
       `ChangeAccountSubscriptionTier`,
+      `parent`,
+    );
+  };
+
+  public claimAccountIOSDevice = (
+    input: P.ClaimAccountIOSDevice.Input,
+  ): Promise<Result<P.ClaimAccountIOSDevice.Output>> => {
+    return this.query<P.ClaimAccountIOSDevice.Output>(
+      input,
+      `ClaimAccountIOSDevice`,
       `parent`,
     );
   };
@@ -154,6 +180,26 @@ export default class AccountClient extends Client<Auth> {
     input: P.GetAccountBilling.Input,
   ): Promise<Result<P.GetAccountBilling.Output>> => {
     return this.query<P.GetAccountBilling.Output>(input, `GetAccountBilling`, `parent`);
+  };
+
+  public getAccountBlockerClaimData = (
+    input: P.GetAccountBlockerClaimData.Input,
+  ): Promise<Result<P.GetAccountBlockerClaimData.Output>> => {
+    return this.query<P.GetAccountBlockerClaimData.Output>(
+      input,
+      `GetAccountBlockerClaimData`,
+      `parent`,
+    );
+  };
+
+  public getAccountIOSClaimData = (
+    input: P.GetAccountIOSClaimData.Input,
+  ): Promise<Result<P.GetAccountIOSClaimData.Output>> => {
+    return this.query<P.GetAccountIOSClaimData.Output>(
+      input,
+      `GetAccountIOSClaimData`,
+      `parent`,
+    );
   };
 
   public getAccountKeychain = (

@@ -32,10 +32,19 @@ extension ClaimBlockerDevice: Resolver {
         self.output(device: device, child: child, code: input.code)
       },
       onFresh: { device, child in
-        try await device.ensureBlockerBlockGroups(in: context.db)
-        return self.output(device: device, child: child, code: input.code)
+        try await self.didClaim(device, child, input.code, in: context)
       },
     )
+  }
+
+  static func didClaim(
+    _ device: IOSDevice,
+    _ child: Child,
+    _ code: Int,
+    in context: ParentContext,
+  ) async throws -> Output {
+    try await device.ensureBlockerBlockGroups(in: context.db)
+    return self.output(device: device, child: child, code: code)
   }
 
   static func output(device: IOSDevice, child: Child, code: Int) -> Output {

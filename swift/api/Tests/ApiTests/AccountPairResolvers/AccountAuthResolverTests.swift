@@ -32,6 +32,7 @@ final class AccountAuthResolverTests: ApiTestCase, @unchecked Sendable {
       "/requests/suspension/\(parent.id.lowercased)",
       "/activity/person/\(parent.id.lowercased)/day/2026-07-24?view=screenshots&query=school#results",
       "/a-page-that-does-not-exist",
+      "/connect/music/123456",
     ]
 
     for redirect in redirects {

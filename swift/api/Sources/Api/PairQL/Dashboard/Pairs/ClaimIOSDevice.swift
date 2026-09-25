@@ -45,21 +45,30 @@ extension ClaimIOSDevice: Resolver {
         self.output(device: device, child: child, code: input.code)
       },
       onFresh: { device, child in
-        // start with ALL non-opt-in block groups, parent controls from web ui
-        try await device.ensureBlockerBlockGroups(in: context.db)
-
-        try await context.db.create(IOSEvent(
-          eventId: "f2c3863b",
-          domain: "supervision",
-          detail: "code_claimed: code=\(input.code)",
-          deviceId: device.id,
-          modelIdentifier: device.modelIdentifier,
-          iosVersion: device.iosVersion,
-        ))
-
-        return self.output(device: device, child: child, code: input.code)
+        try await self.didClaim(device, child, input.code, in: context)
       },
     )
+  }
+
+  static func didClaim(
+    _ device: IOSDevice,
+    _ child: Child,
+    _ code: Int,
+    in context: ParentContext,
+  ) async throws -> Output {
+    // start with ALL non-opt-in block groups, parent controls from web ui
+    try await device.ensureBlockerBlockGroups(in: context.db)
+
+    try await context.db.create(IOSEvent(
+      eventId: "f2c3863b",
+      domain: "supervision",
+      detail: "code_claimed: code=\(code)",
+      deviceId: device.id,
+      modelIdentifier: device.modelIdentifier,
+      iosVersion: device.iosVersion,
+    ))
+
+    return self.output(device: device, child: child, code: code)
   }
 
   static func output(device: IOSDevice, child: Child, code: Int) -> Output {

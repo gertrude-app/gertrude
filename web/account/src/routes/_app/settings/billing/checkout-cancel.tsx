@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import CheckoutResultPage from '#/components/pages/settings/CheckoutResultPage';
+import { pairingReturnPath } from '#/lib/authRedirect';
 import { liveClient } from '#/pairql/client';
 import { useMutation } from '#/pairql/mutation';
 
@@ -18,7 +19,7 @@ const CheckoutCancelRoute: React.FC = () => {
     mutation.mutate({ stripeCheckoutSessionId: sessionId });
   }, [mutation, sessionId]);
 
-  return <CheckoutResultPage status="canceled" />;
+  return <CheckoutResultPage status="canceled" returnHref={pairingReturnPath()} />;
 };
 
 export const Route = createFileRoute(`/_app/settings/billing/checkout-cancel`)({
