@@ -11,6 +11,8 @@ describe(`Account auth redirects`, () => {
       `/requests/suspension/${crypto.randomUUID()}`,
       `/activity/person/${crypto.randomUUID()}/day/2026-07-24`,
       `/a-page-that-does-not-exist`,
+      `/connect/blockerSupervise/123456`,
+      `/connect/podcasts/654321`,
     ] as const;
 
     for (const path of paths) {

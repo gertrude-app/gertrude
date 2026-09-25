@@ -9,6 +9,7 @@ public struct Env: Sendable {
   public var database: Database
   public var dashboardUrl: String
   public var accountDashboardUrl: String
+  public var accountPairingRedirectsEnabled: Bool
   public var twilio: Twilio
   public var stripe: Stripe
   public var appStoreConnect: AppStoreConnect
@@ -135,6 +136,8 @@ extension Env: DependencyKey {
       ),
       dashboardUrl: processEnv("DASHBOARD_URL"),
       accountDashboardUrl: processEnv("ACCOUNT_DASHBOARD_URL"),
+      accountPairingRedirectsEnabled: mode == .test || ProcessInfo.processInfo
+        .environment["ACCOUNT_PAIRING_REDIRECTS_ENABLED"] == "true",
       twilio: Twilio(
         accountSid: processEnv("TWILIO_ACCOUNT_SID"),
         authToken: processEnv("TWILIO_AUTH_TOKEN"),

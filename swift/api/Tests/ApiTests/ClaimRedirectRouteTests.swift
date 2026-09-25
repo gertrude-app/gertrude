@@ -7,6 +7,11 @@ import XExpect
 @testable import Api
 
 final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
+  override func setUp() {
+    super.setUp()
+    self.app.context.env.accountPairingRedirectsEnabled = false
+  }
+
   func testValidCode_redirectsWithDeviceInfo() async throws {
     let code = uniqueClaimCode()
     let device = try await self.db.create(IOSDevice(

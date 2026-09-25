@@ -5,6 +5,8 @@ import Vapor
 enum AuthedAccountRoute: PairRoute {
   case getPeople
   case getDevices
+  case getAccountIOSClaimData(GetAccountIOSClaimData.Input)
+  case claimAccountIOSDevice(ClaimAccountIOSDevice.Input)
   case getMacDevice(GetMacDevice.Input)
   case updateMacDevice(UpdateMacDevice.Input)
   case getAccountSettings
@@ -56,6 +58,14 @@ enum AuthedAccountRoute: PairRoute {
     }
     Route(.case(Self.getDevices)) {
       Operation(GetDevices.self)
+    }
+    Route(.case(Self.getAccountIOSClaimData)) {
+      Operation(GetAccountIOSClaimData.self)
+      Body(.accountInput(GetAccountIOSClaimData.self))
+    }
+    Route(.case(Self.claimAccountIOSDevice)) {
+      Operation(ClaimAccountIOSDevice.self)
+      Body(.accountInput(ClaimAccountIOSDevice.self))
     }
     Route(.case(Self.getMacDevice)) {
       Operation(GetMacDevice.self)
@@ -238,6 +248,12 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getDevices:
       let output = try await GetDevices.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getAccountIOSClaimData(let input):
+      let output = try await GetAccountIOSClaimData.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .claimAccountIOSDevice(let input):
+      let output = try await ClaimAccountIOSDevice.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .getMacDevice(let input):
       let output = try await GetMacDevice.resolve(with: input, in: context)

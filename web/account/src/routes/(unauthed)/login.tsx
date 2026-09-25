@@ -55,6 +55,9 @@ const LoginRoute: React.FC = () => {
       sendingLink={sendingLink}
       onSubmit={handleSubmit}
       onMagicLink={handleMagicLink}
+      signupHref={
+        authRedirect ? `/signup?redirect=${encodeURIComponent(authRedirect)}` : `/signup`
+      }
     />
   );
 };

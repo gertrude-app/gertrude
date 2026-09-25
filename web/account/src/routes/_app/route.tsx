@@ -24,6 +24,13 @@ const AuthedLayout: React.FC = () => {
     () => liveClient.getSuspensionRequests(),
     { refetchInterval: 30_000 },
   );
+  React.useEffect(() => {
+    if (pathname !== `/settings/billing` && !pathname.startsWith(`/settings/billing/`)) {
+      sessionStorage.removeItem(`pairingReturnPath`);
+    }
+  }, [pathname]);
+  if (pathname.startsWith(`/connect/`)) return <Outlet />;
+
   const isSelected = (href: string): boolean =>
     pathname === href || pathname.startsWith(`${href}/`);
 

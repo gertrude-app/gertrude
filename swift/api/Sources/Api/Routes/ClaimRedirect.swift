@@ -7,6 +7,31 @@ enum ClaimRedirectRoute {
     _ request: Request,
     intent urlIntent: ClaimIntent,
   ) async throws -> Response {
+    if !request.env.accountPairingRedirectsEnabled {
+      return try await self.handleLegacy(request, intent: urlIntent)
+    }
+    let accountUrl = request.env.accountDashboardUrl
+    guard let code = Int(request.parameters.get("code") ?? ""),
+          (100_000 ... 999_999).contains(code) else {
+      let flow = AccountIOSFlow(urlIntent)!
+      return request.redirect(
+        to: "\(accountUrl)/connect/\(flow.rawValue)/invalid",
+        redirectType: .temporary,
+      )
+    }
+
+    let claim = try await Claim.find(code: code, in: request.context.db)
+    let flow = AccountIOSFlow(claim?.intent ?? urlIntent)!
+    return request.redirect(
+      to: "\(accountUrl)\(flow.path(code: code))",
+      redirectType: .temporary,
+    )
+  }
+
+  private static func handleLegacy(
+    _ request: Request,
+    intent urlIntent: ClaimIntent,
+  ) async throws -> Response {
     let dashboardUrl = request.env.dashboardUrl
 
     guard let code = Int(request.parameters.get("code") ?? ""),
