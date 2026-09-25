@@ -16,6 +16,9 @@ import { useQuery } from '#/pairql/query';
 
 const PeopleRoute: React.FC = () => {
   const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
+  const unlockRequestsQuery = useQuery(Key.unlockRequests, () =>
+    liveClient.getAccountUnlockRequestSummary(),
+  );
   const suspensionRequestsQuery = useQuery(Key.suspensionRequests, () =>
     liveClient.getSuspensionRequests(),
   );
@@ -73,6 +76,7 @@ const PeopleRoute: React.FC = () => {
   return (
     <PeoplePage
       peopleState={peopleState}
+      unlockRequestSummary={unlockRequestsQuery.data}
       suspensionRequestsState={suspensionRequestsState}
       securityEventsState={securityEventsState}
       onRefreshSuspensionRequests={() => void suspensionRequestsQuery.refetch()}
@@ -80,6 +84,8 @@ const PeopleRoute: React.FC = () => {
       onRefreshSecurityEvents={() => void securityEventsQuery.refetch()}
       refreshingSecurityEvents={securityEventsQuery.isFetching}
       addPersonHref="/people/new"
+      unlockRequestsHref="/requests/unlock"
+      unlockRequestHrefForPerson={(personId) => `/requests/unlock/${personId}`}
       suspensionRequestsHref="/requests/suspension"
       suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
       securityEventsHref="/security-events"

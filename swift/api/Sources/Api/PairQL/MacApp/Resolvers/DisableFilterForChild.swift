@@ -39,6 +39,7 @@ extension DisableFilterForChild: NoInputResolver {
         .securityEvent(.init(
           source: .macApp(childName: child.name, event: .filteringDisabledDuringOnboarding),
           detail: nil,
+          notificationDestination: .legacyDashboard(baseUrl: context.env.dashboardUrl),
         )),
       )
     }

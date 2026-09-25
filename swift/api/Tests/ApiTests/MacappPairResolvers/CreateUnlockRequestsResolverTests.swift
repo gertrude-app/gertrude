@@ -46,7 +46,7 @@ final class CreateUnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable 
     expect(sent.parentNotifications).toEqual([.init(
       parentId: child.parentId,
       event: .unlockRequestSubmitted(.init(
-        dashboardUrl: "",
+        notificationDestination: .legacyDashboard(baseUrl: ""),
         userId: child.id,
         userName: child.name,
         requestIds: [unlockReq1.id, unlockReq2.id],

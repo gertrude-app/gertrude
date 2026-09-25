@@ -1,4 +1,4 @@
-import { HStack, VStack, normalizePath } from '@gertrude/ui';
+import { CountBadge, HStack, VStack, normalizePath } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
@@ -102,6 +102,7 @@ const SegmentedTabLinks: React.FC<Props> = ({
           {tabs.map((tab) => {
             const href = normalizePath(tab.href);
             const isSelected = href === selectedTabHref;
+            const badge = tab.badgeText ?? tab.badgeCount;
 
             return (
               <Link
@@ -117,17 +118,8 @@ const SegmentedTabLinks: React.FC<Props> = ({
               >
                 <HStack as="span" gap={2}>
                   <span>{tab.label}</span>
-                  {(tab.badgeCount !== undefined || tab.badgeText !== undefined) && (
-                    <span
-                      className={cx(
-                        `min-w-5 rounded-full px-1.5 py-0.25 text-xs font-medium tabular-nums`,
-                        isSelected
-                          ? `bg-stone-100 text-stone-700`
-                          : `bg-stone-200/70 text-stone-600`,
-                      )}
-                    >
-                      {tab.badgeText ?? tab.badgeCount}
-                    </span>
+                  {badge !== undefined && (
+                    <CountBadge shade={isSelected ? `light` : `dark`}>{badge}</CountBadge>
                   )}
                 </HStack>
               </Link>

@@ -234,6 +234,9 @@ final class MacAppResolverTests: ApiTestCase, @unchecked Sendable {
       event: .securityEvent(.init(
         source: .macApp(childName: child.name, event: .appQuit),
         detail: "foo",
+        notificationDestination: .legacyDashboard(
+          baseUrl: get(dependency: \.env).dashboardUrl,
+        ),
       )),
     )])
   }

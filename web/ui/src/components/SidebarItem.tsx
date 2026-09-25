@@ -4,6 +4,7 @@ import { type LucideIcon } from 'lucide-react';
 import React from 'react';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
+import CountBadge from './CountBadge';
 import { useSidebarContext } from './SidebarContext';
 
 interface Props {
@@ -52,17 +53,7 @@ const SidebarItem: React.FC<Props> = ({
           {title}
         </Text>
         {badgeCount !== undefined && (
-          <Text
-            variant="caption"
-            className={cx(
-              `min-w-5 shrink-0 rounded-full px-1.5 py-0.25 text-center font-medium leading-5 tabular-nums`,
-              selected
-                ? `bg-stone-100 !text-stone-700`
-                : `bg-stone-200/70 !text-stone-600`,
-            )}
-          >
-            {badgeCount}
-          </Text>
+          <CountBadge shade={selected ? `light` : `dark`}>{badgeCount}</CountBadge>
         )}
       </HStack>
     </>

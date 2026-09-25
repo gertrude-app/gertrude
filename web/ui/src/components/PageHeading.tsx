@@ -113,7 +113,12 @@ const PageHeading: React.FC<Props> = ({
                 <HStack hideAbove="@2xl/main">
                   <DropdownMenu
                     trigger={
-                      <Button type="button" onClick={() => {}} icon={EllipsisIcon} />
+                      <Button
+                        type="button"
+                        onClick={() => {}}
+                        icon={EllipsisIcon}
+                        ariaLabel="Page actions"
+                      />
                     }
                   >
                     {buttons.map((button) => (

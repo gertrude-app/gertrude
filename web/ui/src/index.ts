@@ -1,5 +1,6 @@
 // components
 export { default as Badge } from './components/Badge';
+export { default as CountBadge } from './components/CountBadge';
 export { default as Banner } from './components/Banner';
 export type { BannerProps, BannerVariant } from './components/Banner';
 export { default as Button } from './components/Button';

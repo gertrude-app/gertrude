@@ -18,6 +18,19 @@ const defaultProps: PeoplePageProps = {
   onRefreshSuspensionRequests: noop,
   onRefreshSecurityEvents: noop,
   addPersonHref: `/people/new`,
+  unlockRequestSummary: {
+    totalCount: 3,
+    people: [
+      {
+        id: people[0]!.id,
+        name: people[0]!.name,
+        pendingCount: 3,
+        targets: [`youtube.com`, `school.example.com`, `scratch.mit.edu`],
+      },
+    ],
+  },
+  unlockRequestsHref: `/requests/unlock`,
+  unlockRequestHrefForPerson: (personId) => `/requests/unlock/${personId}`,
   suspensionRequestsHref: `/requests/suspension`,
   suspensionRequestHrefForRequest: (id) => `/requests/suspension/${id}`,
   securityEventsHref: `/security-events`,
@@ -50,6 +63,7 @@ export const Empty = {
   render: () =>
     renderPage({
       peopleState: { status: `success`, data: [] },
+      unlockRequestSummary: { totalCount: 0, people: [] },
       suspensionRequestsState: { status: `success`, data: [] },
       securityEventsState: { status: `success`, data: [] },
     }),
@@ -60,6 +74,7 @@ export const Loading = {
   render: () =>
     renderPage({
       peopleState: { status: `loading` },
+      unlockRequestSummary: undefined,
       suspensionRequestsState: { status: `loading` },
       securityEventsState: { status: `loading` },
     }),

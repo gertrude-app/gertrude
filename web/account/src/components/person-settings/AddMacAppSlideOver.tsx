@@ -7,6 +7,7 @@ import type {
   PublicUnrestrictedMacApp,
   UnrestrictedMacApp,
 } from '#/components/pages/person-settings/MacSettingsPage.types';
+import { withResetOnClose } from '#/components/utils';
 
 type AddAppSlideOverType = `blocked` | `unrestricted`;
 
@@ -90,13 +91,7 @@ const AddMacAppSlideOver: React.FC<Props> = ({
   const reset = (): void => {
     setSelectedInstalledAppIds([]);
   };
-  const handleOpenChange = (nextOpen: boolean): void => {
-    if (!nextOpen) {
-      reset();
-    }
-
-    onOpenChange(nextOpen);
-  };
+  const handleOpenChange = withResetOnClose(reset, onOpenChange);
   const toggleSelectedInstalledApp = (app: InstalledMacApp): void => {
     if (getInstalledAppConfigurationType(app)) {
       return;

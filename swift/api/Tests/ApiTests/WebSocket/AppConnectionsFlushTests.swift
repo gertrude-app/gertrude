@@ -9,6 +9,27 @@ import XCTest
 @testable import Api
 
 final class AppConnectionsFlushTests: XCTestCase {
+  func testSendAttemptsEveryMatchingConnectionBeforeThrowing() async {
+    let connections = AppConnections()
+    let childId = Child.Id(UUID())
+    let sockets = (0 ..< 4)
+      .map { MockWebSocket(eventLoop: EmbeddedEventLoop(), failSends: $0 != 0) }
+    for socket in sockets {
+      await connections.add(AppConnection(
+        ws: socket,
+        ids: .init(computerUser: .init(UUID()), child: childId, keychains: []),
+      ))
+    }
+    do {
+      try await connections.send(.init(.userUpdated, to: .user(childId)))
+      XCTFail("Expected the failed sends to be reported")
+    } catch MockWebSocket.Failure.send {} catch {
+      XCTFail("Unexpected error: \(error)")
+    }
+    XCTAssertEqual(sockets.map(\.sendCount), [1, 1, 1, 1])
+    await connections.disconnectAll()
+  }
+
   func testFlushClosesWebSocketBeforeRemoving() async {
     let eventLoop = EmbeddedEventLoop()
     let mock = MockWebSocket(eventLoop: eventLoop)
@@ -33,7 +54,11 @@ final class AppConnectionsFlushTests: XCTestCase {
 }
 
 final class MockWebSocket: WebsocketProtocol, @unchecked Sendable {
+  enum Failure: Error { case send }
   let eventLoop: EventLoop
+  private let failSends: Bool
+  private let _sendCount = NIOLockedValueBox(0)
+  var sendCount: Int { self._sendCount.withLockedValue { $0 } }
   private let _isClosed: NIOLockedValueBox<Bool>
   private let _closeWasCalled: NIOLockedValueBox<Bool>
   let onClose: EventLoopFuture<Void>
@@ -42,8 +67,9 @@ final class MockWebSocket: WebsocketProtocol, @unchecked Sendable {
   var isClosed: Bool { self._isClosed.withLockedValue { $0 } }
   var closeWasCalled: Bool { self._closeWasCalled.withLockedValue { $0 } }
 
-  init(eventLoop: EventLoop) {
+  init(eventLoop: EventLoop, failSends: Bool = false) {
     self.eventLoop = eventLoop
+    self.failSends = failSends
     self._isClosed = NIOLockedValueBox(false)
     self._closeWasCalled = NIOLockedValueBox(false)
     self.closePromise = eventLoop.makePromise(of: Void.self)
@@ -66,5 +92,8 @@ final class MockWebSocket: WebsocketProtocol, @unchecked Sendable {
     return self.onClose
   }
 
-  func send(_ text: String) async throws {}
+  func send(_ text: String) async throws {
+    self._sendCount.withLockedValue { $0 += 1 }
+    if self.failSends { throw Failure.send }
+  }
 }

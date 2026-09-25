@@ -2,6 +2,7 @@ import {
   Badge,
   Button,
   Card,
+  CountBadge,
   EmptyState,
   HStack,
   Input,
@@ -16,6 +17,7 @@ import cx from 'clsx';
 import { CheckIcon, KeyIcon, ShieldAlertIcon } from 'lucide-react';
 import React from 'react';
 import type { Keychain } from '#/components/types';
+import { withResetOnClose } from '#/components/utils';
 
 type KeychainTab = `own` | `public`;
 type SelectableKeychain = Keychain & { isOwn?: boolean };
@@ -86,13 +88,7 @@ const AddKeychainSlideOver: React.FC<Props> = ({
     setRequestDescription(``);
     setRequestState(`idle`);
   };
-  const handleOpenChange = (nextOpen: boolean): void => {
-    if (!nextOpen) {
-      reset();
-    }
-
-    onOpenChange(nextOpen);
-  };
+  const handleOpenChange = withResetOnClose(reset, onOpenChange);
   const toggleKeychain = (keychain: Keychain): void => {
     if (assignedKeychainIds.includes(keychain.id)) {
       return;
@@ -176,16 +172,7 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                 )}
               >
                 <span>{label}</span>
-                <span
-                  className={cx(
-                    `min-w-5 rounded-full px-1.5 py-0.25 text-xs font-medium tabular-nums`,
-                    tab === value
-                      ? `bg-stone-100 text-stone-700`
-                      : `bg-stone-200/70 text-stone-600`,
-                  )}
-                >
-                  {count}
-                </span>
+                <CountBadge shade={tab === value ? `light` : `dark`}>{count}</CountBadge>
               </HStack>
             ))}
           </div>

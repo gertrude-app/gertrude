@@ -9,6 +9,7 @@ enum AdminEvent: Equatable {
   struct SecurityEventPayload: Equatable {
     var source: Source
     var detail: String?
+    var notificationDestination: NotificationDestination
 
     enum Source: Equatable {
       case macApp(childName: String, event: Gertie.SecurityEvent.MacApp)
@@ -16,8 +17,21 @@ enum AdminEvent: Equatable {
     }
   }
 
+  enum NotificationDestination: Equatable {
+    case legacyDashboard(baseUrl: String)
+    case accountSite(baseUrl: String)
+
+    var baseUrl: String {
+      switch self {
+      case .legacyDashboard(baseUrl: let baseUrl),
+           .accountSite(baseUrl: let baseUrl):
+        baseUrl
+      }
+    }
+  }
+
   struct UnlockRequestSubmitted: Equatable {
-    var dashboardUrl: String
+    var notificationDestination: NotificationDestination
     var userId: Child.Id
     var userName: String
     var requestIds: [UnlockRequest.Id]
@@ -35,19 +49,6 @@ enum AdminEvent: Equatable {
       )
     }
 
-    enum NotificationDestination: Equatable {
-      case legacyDashboard(baseUrl: String)
-      case accountSite(baseUrl: String)
-
-      var baseUrl: String {
-        switch self {
-        case .legacyDashboard(baseUrl: let baseUrl),
-             .accountSite(baseUrl: let baseUrl):
-          baseUrl
-        }
-      }
-    }
-
     var notificationDestination: NotificationDestination
     var childId: Child.Id
     var childName: String
@@ -58,13 +59,20 @@ enum AdminEvent: Equatable {
 }
 
 extension AdminEvent {
-  func routingMacSuspensionRequest(toAccountSiteAt accountDashboardUrl: String) -> Self {
-    guard case .suspendFilterRequestSubmitted(var request) = self,
-          case .macapp = request.context else {
-      return self
+  func routingNotifications(toAccountSiteAt accountDashboardUrl: String) -> Self {
+    switch self {
+    case .unlockRequestSubmitted(var request):
+      request.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
+      return .unlockRequestSubmitted(request)
+    case .suspendFilterRequestSubmitted(var request):
+      guard case .macapp = request.context else {
+        return self
+      }
+      request.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
+      return .suspendFilterRequestSubmitted(request)
+    case .securityEvent(var event):
+      event.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
+      return .securityEvent(event)
     }
-
-    request.notificationDestination = .accountSite(baseUrl: accountDashboardUrl)
-    return .suspendFilterRequestSubmitted(request)
   }
 }

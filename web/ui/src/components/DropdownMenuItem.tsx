@@ -12,6 +12,8 @@ export type DropdownMenuItemIcon = LucideIcon | React.ReactNode;
 
 interface Props {
   title: string;
+  titleContent?: React.ReactNode;
+  wrapTitle?: boolean;
   description?: React.ReactNode;
   descriptionClassName?: string;
   icon?: DropdownMenuItemIcon;
@@ -66,6 +68,8 @@ const renderIcon = (
 
 const DropdownMenuItem: React.FC<Props> = ({
   title,
+  titleContent,
+  wrapTitle = false,
   description,
   descriptionClassName,
   icon,
@@ -85,10 +89,14 @@ const DropdownMenuItem: React.FC<Props> = ({
     <VStack className="min-w-0">
       <Text
         variant="bodyStrong"
-        truncate
-        className={cx(selected && `!text-violet-800`, destructive && `!text-red-800`)}
+        truncate={!wrapTitle}
+        className={cx(
+          wrapTitle && `whitespace-normal [overflow-wrap:anywhere]`,
+          selected && `!text-violet-800`,
+          destructive && `!text-red-800`,
+        )}
       >
-        {title}
+        {titleContent ?? title}
       </Text>
       {description && (
         <Text
@@ -135,7 +143,7 @@ const DropdownMenuItem: React.FC<Props> = ({
   if (children) {
     return (
       <Menu.SubmenuRoot open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
-        <Menu.SubmenuTrigger className={itemClasses(active, destructive)}>
+        <Menu.SubmenuTrigger label={title} className={itemClasses(active, destructive)}>
           <HStack align={description ? `start` : `center`} gap={2} className="min-w-0">
             {renderIcon(
               icon,
@@ -162,6 +170,7 @@ const DropdownMenuItem: React.FC<Props> = ({
 
   const item = (
     <Menu.Item
+      label={title}
       disabled={disabled}
       onClick={() => onSelect?.()}
       className={itemClasses(active, destructive, disabled)}
