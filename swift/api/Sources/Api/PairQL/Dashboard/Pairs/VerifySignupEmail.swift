@@ -91,7 +91,12 @@ extension VerifySignupEmail: Resolver {
           claimIntent: claimIntent,
           in: context,
         )
-        throw context.error("84a6c609", .badRequest, user: EXPIRED_TOKEN_MSG)
+        throw context.error(
+          "84a6c609",
+          .badRequest,
+          .verificationEmailResent,
+          user: EXPIRED_TOKEN_MSG,
+        )
       } else {
         throw context.error(
           "beb1b493",
@@ -111,7 +116,12 @@ extension VerifySignupEmail: Resolver {
           claimIntent: claimIntent,
           in: context,
         )
-        throw context.error("6257bfb9", .badRequest, user: UNEXPECTED_RESEND_MSG)
+        throw context.error(
+          "6257bfb9",
+          .badRequest,
+          .verificationEmailResent,
+          user: UNEXPECTED_RESEND_MSG,
+        )
       } else {
         throw context.error(
           "f2b70e49",

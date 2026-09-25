@@ -17,7 +17,6 @@ import type {
   SuspensionRequest,
   UnlockRequest,
 } from '#/components/types';
-import type { Testimonial } from '#/components/unauthed/RotatingTestimonials';
 import type { ActivityItem, DaySummary } from '#/lib/activity';
 import type { UnlockRequestRow } from '#/lib/unlockRequests';
 
@@ -576,32 +575,5 @@ export const activityItems: ActivityItem[] = [
     url: `/example-screenshots/programmer.png`,
     width: 1200,
     height: 760,
-  },
-];
-
-export const testimonials: Testimonial[] = [
-  {
-    quote: `Thanks for the hard work you put into making this app. An absolute masterpiece and likely the greatest blessing an app has had on our lives.`,
-    name: `Austin944`,
-  },
-  {
-    quote: `Saved my young son from looking at porn through the maps app. You are a lifesaver.`,
-    name: `GratefulMom55`,
-  },
-  {
-    quote: `Finally a way to block GIFS!!! Thank you, thank you, thank you!!!`,
-    name: `HAAS1988`,
-  },
-  {
-    quote: `Using this for my kids’ iPhones with Apple Configurator and screen time controls has made the phones far safer.`,
-    name: `sraragan`,
-  },
-  {
-    quote: `This app is meeting a great need since Apple has not allowed parents to properly protect their children.`,
-    name: `Apple280`,
-  },
-  {
-    quote: `Apple Screen Time has some helpful features, but Gertrude Blocker plugs the holes Apple missed.`,
-    name: `Henderjay`,
   },
 ];

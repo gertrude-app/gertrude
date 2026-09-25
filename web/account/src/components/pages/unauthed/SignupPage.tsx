@@ -1,4 +1,4 @@
-import { Button, Input, Text, VStack } from '@gertrude/ui';
+import { Banner, Button, Input, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import RotatingTestimonials, {
@@ -14,6 +14,14 @@ interface Props {
   setPassword: (password: string) => void;
   testimonials: Testimonial[];
   onSubmit: (event: React.FormEvent) => void;
+  submitting?: boolean;
+  error?: string | null;
+  sent?: boolean;
+  resendSeconds?: number;
+  onResend: () => void;
+  onChangeEmail: () => void;
+  securityCheck?: React.ReactNode;
+  securityReady?: boolean;
 }
 
 const SignupPage: React.FC<Props> = ({
@@ -23,60 +31,134 @@ const SignupPage: React.FC<Props> = ({
   setPassword,
   testimonials,
   onSubmit,
+  submitting = false,
+  error,
+  sent = false,
+  resendSeconds = 0,
+  onResend,
+  onChangeEmail,
+  securityCheck,
+  securityReady = true,
 }) => (
   <UnauthedPageLayout
     form={
       <UnauthedForm
-        onSubmit={onSubmit}
+        onSubmit={sent ? (event) => event.preventDefault() : onSubmit}
         inputs={[
-          <Input
-            key="email"
-            type="email"
-            value={email}
-            setValue={setEmail}
-            label="Email"
-            placeholder="john@doe.com"
-          />,
-          <Input
-            key="password"
-            type="password"
-            value={password}
-            setValue={setPassword}
-            label="Password"
-            placeholder="••••••••••"
-          />,
+          ...(sent
+            ? [
+                <VStack key="sent" gap={3} className="py-1" role="status">
+                  <Text as="p" variant="bodyMuted" className="break-words">
+                    We sent an email to
+                    <span className="block break-all text-stone-900">{email}</span>
+                  </Text>
+                  <Text as="p" variant="bodyMuted">
+                    Open it to finish signing up, or to get help logging in if you already
+                    have an account. Check your spam folder if it doesn't arrive.
+                  </Text>
+                </VStack>,
+              ]
+            : [
+                <Input
+                  key="email"
+                  type="email"
+                  name="email"
+                  value={email}
+                  setValue={setEmail}
+                  label="Email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                  disabled={submitting}
+                />,
+                <Input
+                  key="password"
+                  type="password"
+                  name="password"
+                  value={password}
+                  setValue={setPassword}
+                  label="Password"
+                  placeholder="Choose a password"
+                  autoComplete="new-password"
+                  helperText="Use at least five characters."
+                  required
+                  disabled={submitting}
+                />,
+              ]),
+          error && (
+            <div key="error" role="alert">
+              <Banner variant="error">{error}</Banner>
+            </div>
+          ),
+          securityCheck && (
+            <div key="security" className="self-center">
+              {securityCheck}
+            </div>
+          ),
         ]}
-        buttons={[
-          <Button
-            key="signup"
-            type="submit"
-            variant="primary"
-            icon={ArrowRightIcon}
-            iconPosition="right"
-          >
-            Signup
-          </Button>,
-        ]}
-        heading="Create an Account"
-        subheading="Make an account to start protecting your children."
-        disclaimer={
-          <>
-            By signing up, you agree to our{` `}
-            <a
-              href="https://gertrude.app/legal/terms"
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-dotted underline-offset-2"
-            >
-              terms of service
-            </a>
-            .
-          </>
+        buttons={
+          sent
+            ? [
+                <Button
+                  key="resend"
+                  type="button"
+                  onClick={onResend}
+                  loading={submitting}
+                  disabled={submitting || !securityReady || resendSeconds > 0}
+                >
+                  {resendSeconds > 0
+                    ? `Resend email in ${resendSeconds}s`
+                    : `Resend email`}
+                </Button>,
+                <Button
+                  key="change-email"
+                  type="button"
+                  variant="ghost"
+                  onClick={onChangeEmail}
+                  disabled={submitting}
+                >
+                  Use a different email
+                </Button>,
+              ]
+            : [
+                <Button
+                  key="signup"
+                  type="submit"
+                  variant="primary"
+                  icon={ArrowRightIcon}
+                  iconPosition="right"
+                  loading={submitting}
+                  disabled={
+                    !email.trim() || password.length < 5 || submitting || !securityReady
+                  }
+                >
+                  Create account
+                </Button>,
+              ]
         }
-        bottomLink={{
-          text: `Login instead`,
-          href: `/login`,
-        }}
+        heading={sent ? `Check your email` : `Create your account`}
+        subheading={
+          sent
+            ? `One last step to get started.`
+            : `One account for all your Gertrude apps.`
+        }
+        disclaimer={
+          !sent && (
+            <>
+              By signing up, you agree to our{` `}
+              <a
+                href="https://gertrude.app/legal/terms"
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-dotted underline-offset-2"
+              >
+                terms of service
+              </a>
+              .
+            </>
+          )
+        }
+        bottomLink={{ text: `Log in instead`, href: `/login` }}
         bottomLinkExplanation="Already have an account?"
       />
     }

@@ -1,5 +1,6 @@
 import Dependencies
 import DuetSQL
+import PairQL
 import XCTest
 import XExpect
 import XStripe
@@ -146,6 +147,11 @@ final class VerifySignupEmailResolverTests: ApiTestCase, @unchecked Sendable {
 
     let result = await VerifySignupEmail.result(with: .init(token: token), in: self.context)
     expect(result).toBeError(containing: "we sent a new verification email")
+    guard case .failure(let error) = result else {
+      XCTFail("Expected a verification error")
+      return
+    }
+    expect((error as? PqlError)?.dashboardTag).toEqual(.verificationEmailResent)
     expect(sent.emails).toHaveCount(1)
     expect(sent.emails[0].templateModel["redirect"]) // <-- resend keeps funnel
       .toEqual("%2Fclaim-podcasts-device%2F123456%2Fclaim")

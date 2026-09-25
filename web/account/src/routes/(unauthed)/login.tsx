@@ -13,10 +13,22 @@ const LoginRoute: React.FC = () => {
   const [password, setPassword] = React.useState(``);
   const [submitting, setSubmitting] = React.useState(false);
   const [sendingLink, setSendingLink] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  function handleEmailChange(value: string): void {
+    setEmail(value);
+    setError(null);
+  }
+
+  function handlePasswordChange(value: string): void {
+    setPassword(value);
+    setError(null);
+  }
 
   async function handleSubmit(event: React.FormEvent): Promise<void> {
     event.preventDefault();
     if (!email || !password || submitting) return;
+    setError(null);
     setSubmitting(true);
     const result = await liveClient.accountLogin({ email, password });
     setSubmitting(false);
@@ -26,13 +38,14 @@ const LoginRoute: React.FC = () => {
         void navigate(postAuthLocation(authRedirect));
       },
       error: (err) => {
-        toast.error(err.userMessage ?? `Login failed — check your email and password.`);
+        setError(err.userMessage ?? `Couldn't log in. Please try again.`);
       },
     });
   }
 
   async function handleMagicLink(): Promise<void> {
     if (!email || sendingLink) return;
+    setError(null);
     setSendingLink(true);
     const result = await liveClient.accountRequestMagicLink({
       email,
@@ -41,16 +54,18 @@ const LoginRoute: React.FC = () => {
     setSendingLink(false);
     result.with({
       success: () => toast.success(`Check your email for a sign-in link.`),
-      error: (err) => toast.error(err.userMessage ?? `Couldn't send the magic link.`),
+      error: (err) =>
+        setError(err.userMessage ?? `Couldn't send the magic link. Please try again.`),
     });
   }
 
   return (
     <LoginPage
       email={email}
-      setEmail={setEmail}
+      setEmail={handleEmailChange}
       password={password}
-      setPassword={setPassword}
+      setPassword={handlePasswordChange}
+      error={error}
       submitting={submitting}
       sendingLink={sendingLink}
       onSubmit={handleSubmit}
