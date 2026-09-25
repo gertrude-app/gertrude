@@ -239,9 +239,10 @@ export default meta;
 
 interface BillingStoryProps {
   billing: Billing;
+  returnHref?: string;
 }
 
-const BillingStory: React.FC<BillingStoryProps> = ({ billing }) => (
+const BillingStory: React.FC<BillingStoryProps> = ({ billing, returnHref }) => (
   <StoryScreen>
     <SettingsShellPage
       email="parent@example.com"
@@ -250,14 +251,14 @@ const BillingStory: React.FC<BillingStoryProps> = ({ billing }) => (
       billingHref="/settings/billing"
       onChangePassword={noop}
     >
-      <BillingSettingsPage billing={billing} onAction={noop} />
+      <BillingSettingsPage billing={billing} returnHref={returnHref} onAction={noop} />
     </SettingsShellPage>
   </StoryScreen>
 );
 
-const billingStory = (billing: Billing) => ({
+const billingStory = (billing: Billing, returnHref?: string) => ({
   parameters: galleryParameters,
-  render: () => <BillingStory billing={billing} />,
+  render: () => <BillingStory billing={billing} returnHref={returnHref} />,
 });
 
 export const Notifications = {
@@ -300,6 +301,12 @@ export const Billing = {
 export const BillingFreeNew = {
   name: 'Billing — Free, new account',
   ...billingStory(freeNew),
+};
+
+export const BillingDuringDeviceSetup = {
+  name: 'Billing — during device setup',
+  ...billingStory(freeNew, `/connect/blockerSupervise/123456`),
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
 };
 
 export const BillingFreeTrialUsed = {

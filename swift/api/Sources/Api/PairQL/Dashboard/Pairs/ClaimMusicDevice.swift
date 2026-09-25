@@ -36,14 +36,23 @@ extension ClaimMusicDevice: Resolver {
         try await self.requireMusicInstall(for: device, eventId: "11369678", in: context)
       },
       onFresh: { device, child in
-        let output = try await self.output(device, child, input.code, in: context)
-        let account = try await context.currentBillingAccount()
-        if !account.can(.useGertrudeMusic) {
-          await RepeatTrialCanary.alertIfReclaimed(.music, device, child, in: context)
-        }
-        return output
+        try await self.didClaim(device, child, input.code, in: context)
       },
     )
+  }
+
+  static func didClaim(
+    _ device: IOSDevice,
+    _ child: Child,
+    _ code: Int,
+    in context: ParentContext,
+  ) async throws -> Output {
+    let output = try await self.output(device, child, code, in: context)
+    let account = try await context.currentBillingAccount()
+    if !account.can(.useGertrudeMusic) {
+      await RepeatTrialCanary.alertIfReclaimed(.music, device, child, in: context)
+    }
+    return output
   }
 
   static func output(

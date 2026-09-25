@@ -26,6 +26,7 @@ export namespace GetDevices {
       };
       connectedApps: Array<'blocker' | 'podcasts' | 'music'>;
       supervisionStatus?: 'pendingClaim' | 'claimed' | 'supervised' | 'complete';
+      supervisionSetupPath?: string;
     }>;
   }
 }

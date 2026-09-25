@@ -2,12 +2,11 @@ import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/u
 import {
   InboxIcon,
   KeyIcon,
-  LaptopIcon,
   LogOutIcon,
-  MusicIcon,
+  MonitorSmartphoneIcon,
   ScanEyeIcon,
   SettingsIcon,
-  SmartphoneIcon,
+  ShieldCheckIcon,
   UsersIcon,
 } from 'lucide-react';
 import React from 'react';
@@ -20,9 +19,7 @@ interface Props {
 
 const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) => {
   const isSelected = (href: string): boolean =>
-    href === `/`
-      ? pathname === href
-      : pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <SidebarLayout
@@ -46,25 +43,17 @@ const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) 
             selected={isSelected(`/people`)}
           />
           <SidebarItem
-            title="Settings"
-            icon={SettingsIcon}
-            href="/settings/notifications"
-            selected={isSelected(`/settings`)}
-          />
-        </SidebarSection>
-        <SidebarSection title="Computers">
-          <SidebarItem
-            title="Macs"
-            icon={LaptopIcon}
-            href="/macs"
-            selected={isSelected(`/macs`)}
+            title="Devices"
+            icon={MonitorSmartphoneIcon}
+            href="/devices"
+            selected={isSelected(`/devices`)}
           />
           <SidebarItem
             title="Requests"
             icon={InboxIcon}
             href="/requests/unlock"
             selected={isSelected(`/requests`)}
-            badgeCount={requestCount}
+            badgeCount={requestCount || undefined}
           />
           <SidebarItem
             title="Activity"
@@ -78,19 +67,17 @@ const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) 
             href="/keychains"
             selected={isSelected(`/keychains`)}
           />
-        </SidebarSection>
-        <SidebarSection title="iPhones & iPads">
           <SidebarItem
-            title="Devices"
-            icon={SmartphoneIcon}
-            href="/ios-devices"
-            selected={isSelected(`/ios-devices`)}
+            title="Security"
+            icon={ShieldCheckIcon}
+            href="/security-events"
+            selected={isSelected(`/security-events`)}
           />
           <SidebarItem
-            title="Media"
-            icon={MusicIcon}
-            href="/media"
-            selected={isSelected(`/media`)}
+            title="Settings"
+            icon={SettingsIcon}
+            href="/settings"
+            selected={isSelected(`/settings`)}
           />
         </SidebarSection>
       </Sidebar>

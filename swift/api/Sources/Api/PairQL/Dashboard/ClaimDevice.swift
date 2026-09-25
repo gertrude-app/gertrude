@@ -10,6 +10,7 @@ func claimDevice<Output>(
   in context: ParentContext,
   onResume: (IOSDevice, Child) async throws -> Output,
   beforeClaim: ((IOSDevice) async throws -> Void)? = nil,
+  createNewChild: ((String) async throws -> Child)? = nil,
   onFresh: (IOSDevice, Child) async throws -> Output,
 ) async throws -> Output {
   guard let claim = try await Claim.find(code: code, in: context.db) else {
@@ -78,7 +79,11 @@ func claimDevice<Output>(
     case .existingChild(id: let id):
       try await context.verifiedChild(from: id)
     case .newChild(name: let name):
-      try await context.db.create(Child(parentId: context.parent.id, name: name))
+      if let createNewChild {
+        try await createNewChild(name)
+      } else {
+        try await context.db.create(Child(parentId: context.parent.id, name: name))
+      }
     }
   }
 

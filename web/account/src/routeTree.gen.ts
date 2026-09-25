@@ -43,6 +43,7 @@ import { Route as AppSettingsBillingCheckoutCancelRouteImport } from './routes/_
 import { Route as AppRequestsUnlockPersonIdRouteImport } from './routes/_app/requests/unlock/$personId'
 import { Route as AppRequestsSuspensionRequestIdRouteImport } from './routes/_app/requests/suspension/$requestId'
 import { Route as AppPeoplePersonIdMacSettingsRouteImport } from './routes/_app/people/$personId/mac-settings'
+import { Route as AppConnectFlowCodeRouteImport } from './routes/_app/connect/$flow/$code'
 import { Route as AppChildrenPersonIdUnlockRequestsRouteImport } from './routes/_app/children/$personId/unlock-requests'
 import { Route as AppActivityDayDayRouteImport } from './routes/_app/activity/day/$day'
 import { Route as AppPeoplePersonIdIosSettingsIndexRouteImport } from './routes/_app/people/$personId/ios-settings/index'
@@ -227,6 +228,11 @@ const AppPeoplePersonIdMacSettingsRoute =
     path: '/mac-settings',
     getParentRoute: () => AppPeoplePersonIdRouteRoute,
   } as any)
+const AppConnectFlowCodeRoute = AppConnectFlowCodeRouteImport.update({
+  id: '/connect/$flow/$code',
+  path: '/connect/$flow/$code',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppChildrenPersonIdUnlockRequestsRoute =
   AppChildrenPersonIdUnlockRequestsRouteImport.update({
     id: '/children/$personId/unlock-requests',
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AppSettingsIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
   '/children/$personId/unlock-requests': typeof AppChildrenPersonIdUnlockRequestsRoute
+  '/connect/$flow/$code': typeof AppConnectFlowCodeRoute
   '/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
   '/requests/unlock/$personId': typeof AppRequestsUnlockPersonIdRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsIndexRoute
   '/activity/day/$day': typeof AppActivityDayDayRoute
   '/children/$personId/unlock-requests': typeof AppChildrenPersonIdUnlockRequestsRoute
+  '/connect/$flow/$code': typeof AppConnectFlowCodeRoute
   '/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
   '/requests/unlock/$personId': typeof AppRequestsUnlockPersonIdRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/activity/day/$day': typeof AppActivityDayDayRoute
   '/_app/children/$personId/unlock-requests': typeof AppChildrenPersonIdUnlockRequestsRoute
+  '/_app/connect/$flow/$code': typeof AppConnectFlowCodeRoute
   '/_app/people/$personId/mac-settings': typeof AppPeoplePersonIdMacSettingsRoute
   '/_app/requests/suspension/$requestId': typeof AppRequestsSuspensionRequestIdRoute
   '/_app/requests/unlock/$personId': typeof AppRequestsUnlockPersonIdRoute
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/activity/day/$day'
     | '/children/$personId/unlock-requests'
+    | '/connect/$flow/$code'
     | '/people/$personId/mac-settings'
     | '/requests/suspension/$requestId'
     | '/requests/unlock/$personId'
@@ -439,6 +449,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/activity/day/$day'
     | '/children/$personId/unlock-requests'
+    | '/connect/$flow/$code'
     | '/people/$personId/mac-settings'
     | '/requests/suspension/$requestId'
     | '/requests/unlock/$personId'
@@ -480,6 +491,7 @@ export interface FileRouteTypes {
     | '/_app/settings/'
     | '/_app/activity/day/$day'
     | '/_app/children/$personId/unlock-requests'
+    | '/_app/connect/$flow/$code'
     | '/_app/people/$personId/mac-settings'
     | '/_app/requests/suspension/$requestId'
     | '/_app/requests/unlock/$personId'
@@ -743,6 +755,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeoplePersonIdMacSettingsRouteImport
       parentRoute: typeof AppPeoplePersonIdRouteRoute
     }
+    '/_app/connect/$flow/$code': {
+      id: '/_app/connect/$flow/$code'
+      path: '/connect/$flow/$code'
+      fullPath: '/connect/$flow/$code'
+      preLoaderRoute: typeof AppConnectFlowCodeRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/children/$personId/unlock-requests': {
       id: '/_app/children/$personId/unlock-requests'
       path: '/children/$personId/unlock-requests'
@@ -893,6 +912,7 @@ interface AppRouteRouteChildren {
   AppRequestsIndexRoute: typeof AppRequestsIndexRoute
   AppActivityDayDayRoute: typeof AppActivityDayDayRoute
   AppChildrenPersonIdUnlockRequestsRoute: typeof AppChildrenPersonIdUnlockRequestsRoute
+  AppConnectFlowCodeRoute: typeof AppConnectFlowCodeRoute
   AppActivityPersonPersonIdIndexRoute: typeof AppActivityPersonPersonIdIndexRoute
   AppActivityPersonPersonIdDayDayRoute: typeof AppActivityPersonPersonIdDayDayRoute
 }
@@ -914,6 +934,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppActivityDayDayRoute: AppActivityDayDayRoute,
   AppChildrenPersonIdUnlockRequestsRoute:
     AppChildrenPersonIdUnlockRequestsRoute,
+  AppConnectFlowCodeRoute: AppConnectFlowCodeRoute,
   AppActivityPersonPersonIdIndexRoute: AppActivityPersonPersonIdIndexRoute,
   AppActivityPersonPersonIdDayDayRoute: AppActivityPersonPersonIdDayDayRoute,
 }

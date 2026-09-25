@@ -1,4 +1,4 @@
-import { HStack, Text, Tooltip } from '@gertrude/ui';
+import { Button, HStack, Text, Tooltip } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
 import React from 'react';
 import type { ConnectedIOSApp } from '#/components/devices/types';
@@ -7,6 +7,7 @@ interface Props {
   apps: ConnectedIOSApp[];
   personId: string;
   deviceId: string;
+  supervisionSetupPath?: string;
 }
 
 const appDetails: Record<
@@ -30,14 +31,27 @@ const appDetails: Record<
   },
 };
 
-const ConnectedAppList: React.FC<Props> = ({ apps, personId, deviceId }) => {
-  if (apps.length === 0) {
+const ConnectedAppList: React.FC<Props> = ({
+  apps,
+  personId,
+  deviceId,
+  supervisionSetupPath,
+}) => {
+  const displayedApps = ([`blocker`, `podcasts`, `music`] as const).filter(
+    (app) => apps.includes(app) || (app === `blocker` && !!supervisionSetupPath),
+  );
+  if (displayedApps.length === 0) {
     return <Text variant="captionMuted">No Gertrude apps connected</Text>;
   }
 
   return (
-    <HStack wrap gap={2} aria-label="Connected Gertrude apps">
-      {apps.map((app) => {
+    <HStack wrap gap={2} aria-label="Connected Gertrude apps" className="relative z-20">
+      {supervisionSetupPath && (
+        <Button type="link" href={supervisionSetupPath} variant="primary" size="small">
+          Continue setup
+        </Button>
+      )}
+      {displayedApps.map((app) => {
         const details = appDetails[app];
         return (
           <Tooltip key={app} content={`Open ${details.name} settings`} side="top">
@@ -47,7 +61,7 @@ const ConnectedAppList: React.FC<Props> = ({ apps, personId, deviceId }) => {
               search={{ section: app }}
               hash={app === `music` ? `music` : deviceId}
               aria-label={`Open ${details.name} settings`}
-              className="group relative z-20 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+              className="group rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
             >
               <HStack
                 gap={1.5}
