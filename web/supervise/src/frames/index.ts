@@ -11,3 +11,5 @@ export { default as SwipeToUpgrade } from './SwipeToUpgrade';
 export { default as ConfirmSupervision } from './ConfirmSupervision';
 export { default as Error } from './Error';
 export { default as Complete } from './Complete';
+export { default as UnsuperviseConnect } from './UnsuperviseConnect';
+export { default as UnsuperviseComplete } from './UnsuperviseComplete';

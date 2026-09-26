@@ -21,7 +21,7 @@ const DisableFindMy: React.FC<DisableFindMyProps> = ({
     step={4}
     totalSteps={8}
     title={`Temporarily Disable Find My ${deviceType}`}
-    subtitle="You can re-enable it after supervision is complete."
+    subtitle="You can re-enable it after the process is complete."
     imageSrc={deviceType === `iPad` ? ipadSrc : iphoneSrc}
     imageAlt={`Find My ${deviceType} settings`}
     footer={
@@ -37,7 +37,9 @@ const DisableFindMy: React.FC<DisableFindMyProps> = ({
           subtitle: `To the main, outermost screen`,
         },
         {
-          title: `Tap ${posessive(childName)} name at the top`,
+          title: childName
+            ? `Tap ${posessive(childName)} name at the top`
+            : `Tap your name at the top`,
           subtitle: `This leads to the Apple Account settings`,
         },
         {

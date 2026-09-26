@@ -35,6 +35,7 @@ export interface DeviceMismatchProps {
 }
 
 export interface ConfirmDeviceProps {
+  unsupervising?: boolean;
   deviceName: string;
   deviceType: string;
   iosVersion: string;
@@ -43,7 +44,7 @@ export interface ConfirmDeviceProps {
 }
 
 export interface DisableFindMyProps {
-  childName: string;
+  childName?: string;
   deviceType: string;
   onContinue: () => void;
 }
@@ -53,6 +54,7 @@ export interface DisablePrivateRelayProps {
 }
 
 export interface GetReadyProps {
+  unsupervising?: boolean;
   deviceType: string;
   onStart: () => void;
 }
@@ -67,6 +69,7 @@ export interface SwipeToUpgradeProps {
 }
 
 export interface ConfirmSupervisionProps {
+  unsupervising?: boolean;
   deviceType: string;
   onYes: () => void;
   onNo: () => void;
@@ -75,6 +78,7 @@ export interface ConfirmSupervisionProps {
 export type ErrorType = `findMyEnabled` | `invokeFailed` | `userReportedNo`;
 
 export interface ErrorProps {
+  unsupervising?: boolean;
   deviceType: string;
   errorType: ErrorType;
   errorMessage?: string;
@@ -84,6 +88,15 @@ export interface ErrorProps {
 
 export interface CompleteProps {
   childName: string;
+  deviceType: string;
+  onDone: () => void;
+}
+
+export interface UnsuperviseConnectProps {
+  isWindows?: boolean;
+}
+
+export interface UnsuperviseCompleteProps {
   deviceType: string;
   onDone: () => void;
 }
