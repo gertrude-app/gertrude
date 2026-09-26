@@ -9,6 +9,7 @@ const img: any = confirmSupervisedImg;
 const imgSrc: string = typeof img === `string` ? img : img.src;
 
 const ConfirmSupervision: React.FC<ConfirmSupervisionProps> = ({
+  unsupervising = false,
   deviceType,
   onYes,
   onNo,
@@ -16,17 +17,21 @@ const ConfirmSupervision: React.FC<ConfirmSupervisionProps> = ({
   <InstructionLayout
     step={8}
     totalSteps={8}
-    title="Confirm Supervision"
-    subtitle="Let’s verify that supervision was enabled successfully."
+    title={unsupervising ? `Confirm Removal` : `Confirm Supervision`}
+    subtitle={
+      unsupervising
+        ? `Let’s verify that supervision was removed successfully.`
+        : `Let’s verify that supervision was enabled successfully.`
+    }
     imageSrc={imgSrc}
     imageAlt="Settings showing iPhone/iPad is supervised"
     footer={
       <div className="flex gap-4">
         <Button type="button" onClick={onNo} color="secondary" size="large">
-          No, it&rsquo;s not there
+          {unsupervising ? `No, it’s still there` : `No, it’s not there`}
         </Button>
         <Button type="button" onClick={onYes} color="gradient" size="large">
-          Yes, I see it &rarr;
+          {unsupervising ? `Yes, it’s gone` : `Yes, I see it`} &rarr;
         </Button>
       </div>
     }
@@ -35,11 +40,13 @@ const ConfirmSupervision: React.FC<ConfirmSupervisionProps> = ({
       steps={[
         {
           title: `Open the Settings app`,
-          subtitle: `On the ${deviceType} you just supervised`,
+          subtitle: `On the ${deviceType} you just ${unsupervising ? `removed supervision from` : `supervised`}`,
         },
         {
           title: `Look at the top of the screen`,
-          subtitle: `You should see "This ${deviceType} is supervised and managed by Gertrude."`,
+          subtitle: unsupervising
+            ? `The notice shown in the example should NO LONGER APPEAR: "This ${deviceType} is supervised and managed by Gertrude."`
+            : `You should see "This ${deviceType} is supervised and managed by Gertrude."`,
         },
       ]}
     />

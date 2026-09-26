@@ -1,40 +1,41 @@
 # Supervise UI Package
 
-React UI for Mac/Windows iOS device supervision app.
+Presentational React UI for Mac/Windows supervision and removal apps. Components accept
+typed props and callbacks; state, API calls, and Tauri/Rust operations live in
+`~/gertie/supervise`.
 
-## Architecture
+## Structure and Conventions
 
-This package contains **purely presentational React components** for a Tauri desktop app
-that supervises iOS devices. The actual Tauri/Rust code and orchestration logic live in a
-separate private repo.
+- `src/frames/index.ts` lists the frames; `src/types.ts` defines props and `src/index.ts`
+  exports the public API.
+- Use `InstructionLayout` for instructional screens. It provides progress and footer
+  placement; omitting image/placeholder props removes the image column.
+- All screens must fit the fixed **900×700px** window.
+- Shared screens use `unsupervising?: boolean`, defaulting to `false`, for
+  action-dependent copy. Currently: `ConfirmDevice`, `GetReady`, `ConfirmSupervision`, and
+  `Error`. Keep neutral instructions shared without a mode flag.
+- `ConfirmSupervision.onYes` means success in either mode: notice present for supervision,
+  absent for removal.
+- `DisableFindMy.childName` is optional because removal has no child context.
 
-Components accept typed props and fire callbacks — they have no knowledge of state
-management, API calls, or Tauri operations. The private repo owns the state machine and
-wires these components together.
+## Removal Flow
 
-## Structure
+Gertrude Unsupervisor is a separate executable on the private repo's `unsupervise` branch,
+with no claim code or API lookup:
 
-- `src/frames/` — 9 frame components (CodeEntry, PersonalizedConnect, ChooseDirection,
-  etc.)
-- `src/types.ts` — Prop interfaces for all components
-- `src/index.ts` — Public exports
-- `src/FrameBackground.tsx` — Shared background wrapper with subtle gradient
-- `src/assets/` — Images used by frames
+`ITunesRequired` (Windows only) → `UnsuperviseConnect` → `ConfirmDevice` → `DisableFindMy`
+→ `DisablePrivateRelay` → `GetReady` → `Supervising` → `SwipeToUpgrade` →
+`ConfirmSupervision` → `UnsuperviseComplete`.
+
+Connection and completion have dedicated removal screens; the middle screens are shared.
+Progress uses eight steps: iTunes 1, connection 2, verification/completion 8.
 
 ## Workflow
 
-1. Develop UI here with Storybook (`pnpm --filter @storybook/app start`)
-2. Sync to private repo: `cd web/ && just sync-supervise-ui` (copies `src/` into
-   `~/gertie/supervise/src/generated/supervise/`)
-3. Wire up new screens in the supervise repo's state machine (`~/gertie/supervise/src/`)
-4. Run Tauri app: `cd ~/gertie/supervise && just dev`
-
-## Storybook
-
-Stories at `../storybook/stories/supervise/`. Each story renders a frame with specific
-props to preview different visual states.
-
-## Window Size
-
-The Tauri app window is fixed at **900×700px** (matching macOS onboarding). All frames
-must fit this constraint.
+1. Develop here: `pnpm --filter @storybook/app start` from `web/`.
+2. Follow `../storybook/stories/supervise/SuperviseWizard.stories.tsx`; removal stories
+   use the `Unsupervise_` prefix.
+3. Sync: `cd web/ && just sync-supervise-ui`. Compare first: this overwrites generated UI,
+   shared components, and API clients in `~/gertie/supervise/src/generated/`. Preserve
+   desktop-only changes.
+4. Wire behavior in the desktop repo, then run `just dev` there.

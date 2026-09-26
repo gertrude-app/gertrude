@@ -8,7 +8,11 @@ import appleProgressImg from '../assets/apple-progress.png';
 const img: any = appleProgressImg;
 const imgSrc: string = typeof img === `string` ? img : img.src;
 
-const GetReady: React.FC<GetReadyProps> = ({ deviceType, onStart }) => (
+const GetReady: React.FC<GetReadyProps> = ({
+  deviceType,
+  onStart,
+  unsupervising = false,
+}) => (
   <InstructionLayout
     step={6}
     totalSteps={8}
@@ -18,7 +22,7 @@ const GetReady: React.FC<GetReadyProps> = ({ deviceType, onStart }) => (
     imageAlt="Device showing progress bar"
     footer={
       <Button type="button" onClick={onStart} color="gradient" size="large">
-        Enable Supervised Mode &rarr;
+        {unsupervising ? `Remove Supervision` : `Enable Supervised Mode`} &rarr;
       </Button>
     }
   >
