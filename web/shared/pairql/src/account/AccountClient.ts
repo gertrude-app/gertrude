@@ -56,6 +56,32 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public approveMusicAlbum = (
+    input: P.ApproveMusicAlbum_v2.Input,
+  ): Promise<Result<P.ApproveMusicAlbum_v2.Output>> => {
+    return this.query<P.ApproveMusicAlbum_v2.Output>(
+      input,
+      `ApproveMusicAlbum_v2`,
+      `parent`,
+    );
+  };
+
+  public approveMusicArtist = (
+    input: P.ApproveMusicArtist_v2.Input,
+  ): Promise<Result<P.ApproveMusicArtist_v2.Output>> => {
+    return this.query<P.ApproveMusicArtist_v2.Output>(
+      input,
+      `ApproveMusicArtist_v2`,
+      `parent`,
+    );
+  };
+
+  public approveMusicTrack = (
+    input: P.ApproveMusicTrack.Input,
+  ): Promise<Result<P.ApproveMusicTrack.Output>> => {
+    return this.query<P.ApproveMusicTrack.Output>(input, `ApproveMusicTrack`, `parent`);
+  };
+
   public changeAccountSubscriptionTier = (
     input: P.ChangeAccountSubscriptionTier.Input,
   ): Promise<Result<P.ChangeAccountSubscriptionTier.Output>> => {
@@ -216,6 +242,22 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.GetMacDevice.Output>(input, `GetMacDevice`, `parent`);
   };
 
+  public getMusicAlbumCuration = (
+    input: P.GetMusicAlbumCuration.Input,
+  ): Promise<Result<P.GetMusicAlbumCuration.Output>> => {
+    return this.query<P.GetMusicAlbumCuration.Output>(
+      input,
+      `GetMusicAlbumCuration`,
+      `parent`,
+    );
+  };
+
+  public getMusicCuration = (
+    input: P.GetMusicCuration.Input,
+  ): Promise<Result<P.GetMusicCuration.Output>> => {
+    return this.query<P.GetMusicCuration.Output>(input, `GetMusicCuration`, `parent`);
+  };
+
   public getPeople = (input: P.GetPeople.Input): Promise<Result<P.GetPeople.Output>> => {
     return this.query<P.GetPeople.Output>(input, `GetPeople`, `parent`);
   };
@@ -306,6 +348,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public removeApprovedMusicArtist = (
+    input: P.RemoveApprovedMusicArtist.Input,
+  ): Promise<Result<P.RemoveApprovedMusicArtist.Output>> => {
+    return this.query<P.RemoveApprovedMusicArtist.Output>(
+      input,
+      `RemoveApprovedMusicArtist`,
+      `parent`,
+    );
+  };
+
   public requestAccountPublicKeychain = (
     input: P.RequestAccountPublicKeychain.Input,
   ): Promise<Result<P.RequestAccountPublicKeychain.Output>> => {
@@ -338,6 +390,26 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.SaveAccountNotification.Output>(
       input,
       `SaveAccountNotification`,
+      `parent`,
+    );
+  };
+
+  public saveMusicAlbumCuration = (
+    input: P.SaveMusicAlbumCuration.Input,
+  ): Promise<Result<P.SaveMusicAlbumCuration.Output>> => {
+    return this.query<P.SaveMusicAlbumCuration.Output>(
+      input,
+      `SaveMusicAlbumCuration`,
+      `parent`,
+    );
+  };
+
+  public searchMusicCatalog = (
+    input: P.SearchMusicCatalog_v2.Input,
+  ): Promise<Result<P.SearchMusicCatalog_v2.Output>> => {
+    return this.query<P.SearchMusicCatalog_v2.Output>(
+      input,
+      `SearchMusicCatalog_v2`,
       `parent`,
     );
   };

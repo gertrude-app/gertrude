@@ -14,6 +14,9 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       .init(NoInput.self, as: "void"),
       .init(Date.self, as: "ISODateString"),
       .init(URL.self, as: "string"),
+      .init(Music.AlbumId.self, as: "string"),
+      .init(Music.ArtistId.self, as: "string"),
+      .init(Music.TrackId.self, as: "string"),
     ]
   }
 
@@ -84,6 +87,14 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       UpdateIosDeviceBlockedGroups.self,
       UpdateIosDeviceProfileSettings.self,
       RequestPodcastsPinReset.self,
+      GetMusicCuration.self,
+      GetMusicAlbumCuration.self,
+      SearchMusicCatalog_v2.self,
+      ApproveMusicTrack.self,
+      ApproveMusicAlbum_v2.self,
+      ApproveMusicArtist_v2.self,
+      RemoveApprovedMusicArtist.self,
+      SaveMusicAlbumCuration.self,
       RequestAccountPublicKeychain.self,
       GetSuspensionRequests.self,
       DecideSuspensionRequest.self,

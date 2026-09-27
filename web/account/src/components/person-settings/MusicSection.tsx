@@ -1,6 +1,6 @@
 import { Badge, EmptyState, HStack, Text, VStack } from '@gertrude/ui';
 import { formatDate } from '@shared/datetime';
-import { ClockIcon, MusicIcon } from 'lucide-react';
+import { MusicIcon } from 'lucide-react';
 import React from 'react';
 import type {
   IosMusicSettings,
@@ -13,6 +13,7 @@ import { deviceSubtitle, deviceTitle } from '#/components/utils';
 
 interface Props {
   connections: MusicDeviceConnection[];
+  children: React.ReactNode;
   defaultExpanded?: boolean;
 }
 
@@ -33,7 +34,7 @@ const connectionStatus = (
   }
 };
 
-const MusicSection: React.FC<Props> = ({ connections, defaultExpanded }) => {
+const MusicSection: React.FC<Props> = ({ connections, children, defaultExpanded }) => {
   const hasActiveConnection = connections.some(
     ({ music }) => music.subscription.case === `active`,
   );
@@ -111,17 +112,13 @@ const MusicSection: React.FC<Props> = ({ connections, defaultExpanded }) => {
           </div>
         </VStack>
         {hasAvailableConnection ? (
-          <EmptyState
-            icon={ClockIcon}
-            title="Album approvals are coming soon"
-            description="Approving albums for Gertrude Music isn’t available on the new site yet. For now, you can manage them from your existing Gertrude dashboard."
-            className="bg-white"
-          />
+          children
         ) : (
           <EmptyState
             icon={MusicIcon}
             title="Gertrude Music isn’t available for this account"
-            description="Music is connected, but it isn’t currently available for this account."
+            description="Music is connected, but it requires an active Medium plan or a free trial to manage the library."
+            button={{ type: `link`, href: `/settings/billing`, text: `Manage plan` }}
             className="bg-white"
           />
         )}

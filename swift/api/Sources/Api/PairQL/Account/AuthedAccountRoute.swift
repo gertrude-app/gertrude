@@ -39,6 +39,14 @@ enum AuthedAccountRoute: PairRoute {
   case updateIosDeviceBlockedGroups(UpdateIosDeviceBlockedGroups.Input)
   case updateIosDeviceProfileSettings(UpdateIosDeviceProfileSettings.Input)
   case requestPodcastsPinReset(RequestPodcastsPinReset.Input)
+  case getMusicCuration(GetMusicCuration.Input)
+  case getMusicAlbumCuration(GetMusicAlbumCuration.Input)
+  case searchMusicCatalog_v2(SearchMusicCatalog_v2.Input)
+  case approveMusicTrack(ApproveMusicTrack.Input)
+  case approveMusicAlbum_v2(ApproveMusicAlbum_v2.Input)
+  case approveMusicArtist_v2(ApproveMusicArtist_v2.Input)
+  case removeApprovedMusicArtist(RemoveApprovedMusicArtist.Input)
+  case saveMusicAlbumCuration(SaveMusicAlbumCuration.Input)
   case requestAccountPublicKeychain(RequestAccountPublicKeychain.Input)
   case getSuspensionRequests
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
@@ -188,6 +196,38 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.requestPodcastsPinReset)) {
       Operation(RequestPodcastsPinReset.self)
       Body(.accountInput(RequestPodcastsPinReset.self))
+    }
+    Route(.case(Self.getMusicCuration)) {
+      Operation(GetMusicCuration.self)
+      Body(.accountInput(GetMusicCuration.self))
+    }
+    Route(.case(Self.getMusicAlbumCuration)) {
+      Operation(GetMusicAlbumCuration.self)
+      Body(.accountInput(GetMusicAlbumCuration.self))
+    }
+    Route(.case(Self.searchMusicCatalog_v2)) {
+      Operation(SearchMusicCatalog_v2.self)
+      Body(.accountInput(SearchMusicCatalog_v2.self))
+    }
+    Route(.case(Self.approveMusicTrack)) {
+      Operation(ApproveMusicTrack.self)
+      Body(.accountInput(ApproveMusicTrack.self))
+    }
+    Route(.case(Self.approveMusicAlbum_v2)) {
+      Operation(ApproveMusicAlbum_v2.self)
+      Body(.accountInput(ApproveMusicAlbum_v2.self))
+    }
+    Route(.case(Self.approveMusicArtist_v2)) {
+      Operation(ApproveMusicArtist_v2.self)
+      Body(.accountInput(ApproveMusicArtist_v2.self))
+    }
+    Route(.case(Self.removeApprovedMusicArtist)) {
+      Operation(RemoveApprovedMusicArtist.self)
+      Body(.accountInput(RemoveApprovedMusicArtist.self))
+    }
+    Route(.case(Self.saveMusicAlbumCuration)) {
+      Operation(SaveMusicAlbumCuration.self)
+      Body(.accountInput(SaveMusicAlbumCuration.self))
     }
     Route(.case(Self.requestAccountPublicKeychain)) {
       Operation(RequestAccountPublicKeychain.self)
@@ -340,6 +380,33 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .requestPodcastsPinReset(let input):
       let output = try await RequestPodcastsPinReset.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .getMusicCuration(let input):
+      let output = try await GetMusicCuration.resolve(with: input, in: context.legacyContext)
+      return try await self.respond(with: output)
+    case .getMusicAlbumCuration(let input):
+      let output = try await GetMusicAlbumCuration.resolve(with: input, in: context.legacyContext)
+      return try await self.respond(with: output)
+    case .searchMusicCatalog_v2(let input):
+      let output = try await SearchMusicCatalog_v2.resolve(with: input, in: context.legacyContext)
+      return try await self.respond(with: output)
+    case .approveMusicTrack(let input):
+      let output = try await ApproveMusicTrack.resolve(with: input, in: context.legacyContext)
+      return try await self.respond(with: output)
+    case .approveMusicAlbum_v2(let input):
+      let output = try await ApproveMusicAlbum_v2.resolve(with: input, in: context.legacyContext)
+      return try await self.respond(with: output)
+    case .approveMusicArtist_v2(let input):
+      let output = try await ApproveMusicArtist_v2.resolve(with: input, in: context.legacyContext)
+      return try await self.respond(with: output)
+    case .removeApprovedMusicArtist(let input):
+      let output = try await RemoveApprovedMusicArtist.resolve(
+        with: input,
+        in: context.legacyContext,
+      )
+      return try await self.respond(with: output)
+    case .saveMusicAlbumCuration(let input):
+      let output = try await SaveMusicAlbumCuration.resolve(with: input, in: context.legacyContext)
       return try await self.respond(with: output)
     case .requestAccountPublicKeychain(let input):
       let output = try await RequestAccountPublicKeychain.resolve(with: input, in: context)
