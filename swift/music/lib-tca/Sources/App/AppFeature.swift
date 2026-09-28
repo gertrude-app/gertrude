@@ -534,12 +534,8 @@ struct AppFeature: Sendable {
     _ campaign: CrossPromoCampaign,
     extra: String? = nil,
   ) -> EffectOf<Self> {
-    let base = "campaign=\(campaign.campaignId)"
-      + " variant=\(campaign.variant ?? "-")"
-      + " placement=\(campaign.placement)"
-    let detail = extra.map { "\(base) \($0)" } ?? base
-    return .run { _ in
-      await log(.info, .setup, event.id, detail: detail).value
+    .run { _ in
+      await log(.info, .setup, event.id, detail: campaign.eventLogDetail(extra: extra)).value
     }
   }
 

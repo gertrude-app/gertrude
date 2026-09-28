@@ -18,13 +18,13 @@ struct SettingsViewContainer: View {
     )
     .onAppear { self.store.send(.onAppear) }
     .sheet(
-      item: self.$store.scope(state: \.claimFlow, action: \.claimFlow),
+      item: self.$store.scope(\.claimFlow, action: \.claimFlow),
       content: { store in
         ClaimFlowView(store: store)
       },
     )
     .sheet(
-      item: self.$store.scope(state: \.pinReset, action: \.pinReset),
+      item: self.$store.scope(\.pinReset, action: \.pinReset),
       content: { store in
         PinResetView(store: store)
       },
@@ -36,7 +36,7 @@ struct SettingsViewContainer: View {
       ),
       onDismiss: { self.store.send(.pinChallengeDismissed) },
       content: {
-        if let store = self.store.scope(state: \.pinChallenge, action: \.pinChallenge) {
+        if let store = self.store.scope(\.pinChallenge, action: \.pinChallenge) {
           PinChallengeView(store: store, context: .settings)
         }
       },

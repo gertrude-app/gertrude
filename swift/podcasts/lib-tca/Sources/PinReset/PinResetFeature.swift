@@ -40,7 +40,7 @@ struct PinResetFeature {
   @Dependency(\.dismiss) var dismiss
 
   var body: some ReducerOf<Self> {
-    Scope(state: \.pinChallenge, action: \.pinChallenge) {
+    Scope(\.pinChallenge, action: \.pinChallenge) {
       PinChallengeFeature(logBaseId: "b3d9f1a7") // b3d9f1a7-1, b3d9f1a7-2
     }
     Reduce { state, action in

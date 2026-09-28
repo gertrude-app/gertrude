@@ -157,6 +157,16 @@ struct CrossPromoCampaignBehaviorTests {
     #expect(c.action(for: .tertiary) == .openUrl("y"))
   }
 
+  @Test func `event log detail includes campaign context and optional extra`() {
+    var promo = campaign(.dismiss)
+    #expect(promo.eventLogDetail() == "campaign=fm-launch variant=- placement=amOnboardingParent")
+    promo.variant = "v2"
+    #expect(
+      promo.eventLogDetail(extra: "slot=primary")
+        == "campaign=fm-launch variant=v2 placement=amOnboardingParent slot=primary",
+    )
+  }
+
   @Test func `analyticsLabel describes each action`() {
     #expect(CrossPromoAction.openUrl("x").analyticsLabel == "open-url")
     #expect(CrossPromoAction.openAppStoreProduct("1").analyticsLabel == "open-app-store-product")

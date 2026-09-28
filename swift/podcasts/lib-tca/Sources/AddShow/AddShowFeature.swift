@@ -61,7 +61,7 @@ struct AddShowFeature {
   private enum CancelID { case search }
 
   var body: some Reducer<State, Action> {
-    Scope(state: \.pinChallenge, action: \.pinChallenge) {
+    Scope(\.pinChallenge, action: \.pinChallenge) {
       PinChallengeFeature(logBaseId: "e86bd7f3") // e86bd7f3-1, e86bd7f3-2
     }
     Reduce { state, action in

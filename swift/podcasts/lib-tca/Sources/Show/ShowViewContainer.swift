@@ -26,7 +26,7 @@ struct ShowViewContainer: View {
     )
     .navigationDestination(
       item: self.$store.scope(
-        state: \.destination?.episode,
+        \.destination?.episode,
         action: \.destination.episode,
       ),
       destination: { store in
