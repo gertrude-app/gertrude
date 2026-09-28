@@ -13,7 +13,7 @@ let package = Package(
     .package(path: "../../gertie-ui"),
     .package(path: "../../pairql"),
     .package(path: "../../pairql-music"),
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.25.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "1.26.2"),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
     .package(url: "https://github.com/jaredh159/swift-tagged", exact: "0.10.1"),

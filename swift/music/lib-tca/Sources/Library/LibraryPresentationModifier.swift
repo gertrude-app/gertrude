@@ -78,7 +78,7 @@ private struct LibraryPresentationModifier: ViewModifier {
 
   private var playlistMusicPickerBinding: Binding<StoreOf<PlaylistMusicPickerFeature>?> {
     let binding = self.$store.scope(
-      state: \.playlistMusicPicker,
+      \.playlistMusicPicker,
       action: \.playlistMusicPicker,
     )
     return Binding(

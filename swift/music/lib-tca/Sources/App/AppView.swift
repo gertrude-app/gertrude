@@ -60,11 +60,11 @@ struct AppView: View {
       }
     }
     .libraryPresentations(
-      store: self.store.scope(state: \.library, action: \.library),
+      store: self.store.scope(\.library, action: \.library),
       isEnabled: !self.store.isNowPlayingPresented,
     )
     .killSwitch(
-      store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
+      store: self.store.scope(\.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.setup.isReady,
     )
     #if os(iOS)
@@ -95,7 +95,7 @@ struct AppView: View {
 
   private var libraryView: some View {
     LibraryViewContainer(
-      store: self.store.scope(state: \.library, action: \.library),
+      store: self.store.scope(\.library, action: \.library),
       currentTrackID: self.store.playback.session?.currentTrackID,
       activePlaybackContext: self.store.playback.activePlaybackContext,
       isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
@@ -110,7 +110,7 @@ struct AppView: View {
         self.iOSLibraryContent
       } else {
         MusicSetupViewContainer(
-          store: self.store.scope(state: \.setup, action: \.setup),
+          store: self.store.scope(\.setup, action: \.setup),
         )
       }
     }
@@ -260,7 +260,7 @@ struct AppView: View {
 
     private var searchView: some View {
       SearchViewContainer(
-        store: self.store.scope(state: \.search, action: \.search),
+        store: self.store.scope(\.search, action: \.search),
         library: self.approvedLibrary,
         currentTrackID: self.store.playback.session?.currentTrackID,
         activePlaybackContext: self.store.playback.activePlaybackContext,
@@ -463,7 +463,7 @@ struct AppView: View {
         value: self.store.library.playlistMutationFailure,
       )
       .libraryPresentations(
-        store: self.store.scope(state: \.library, action: \.library),
+        store: self.store.scope(\.library, action: \.library),
       )
     }
 

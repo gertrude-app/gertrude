@@ -120,7 +120,7 @@ struct AppFeature: Sendable {
   @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
-    Scope(state: \.killSwitch, action: \.killSwitch) {
+    Scope(\.killSwitch, action: \.killSwitch) {
       KillSwitchFeature(app: .music) {
         guard let deviceId = await self.device.vendorId() else {
           throw KillSwitchDeviceIdError.missingDeviceId
@@ -129,19 +129,19 @@ struct AppFeature: Sendable {
       }
     }
 
-    Scope(state: \.library, action: \.library) {
+    Scope(\.library, action: \.library) {
       LibraryFeature()
     }
 
-    Scope(state: \.playback, action: \.playback) {
+    Scope(\.playback, action: \.playback) {
       PlaybackFeature()
     }
 
-    Scope(state: \.search, action: \.search) {
+    Scope(\.search, action: \.search) {
       SearchFeature()
     }
 
-    Scope(state: \.setup, action: \.setup) {
+    Scope(\.setup, action: \.setup) {
       MusicSetupFeature()
     }
 
