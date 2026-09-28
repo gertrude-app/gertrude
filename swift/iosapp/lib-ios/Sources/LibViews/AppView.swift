@@ -20,7 +20,7 @@ public struct AppView: View {
   public var body: some View {
     Group {
       if let clearCacheStore = self.store.scope(
-        state: \.onboarding.clearCache,
+        \.onboarding.clearCache,
         action: \.interactive.onboardingClearCache,
       ) {
         ClearingCacheView(
@@ -30,7 +30,7 @@ public struct AppView: View {
         )
         .onAppear { clearCacheStore.send(.onAppear) }
       } else if let crossPromoStore = self.store.scope(
-        state: \.onboarding.crossPromo,
+        \.onboarding.crossPromo,
         action: \.interactive.onboardingCrossPromo,
       ) {
         CrossPromoFeatureView(
@@ -38,7 +38,7 @@ public struct AppView: View {
           onImageLoadFailure: Self.crossPromoImageLoadFailed,
         )
       } else if let connectStore = self.store.scope(
-        state: \.onboarding.connect,
+        \.onboarding.connect,
         action: \.interactive.onboardingConnect,
       ) {
         ConnectingView(
@@ -733,7 +733,7 @@ public struct AppView: View {
       }
     }
     .sheet(item: self.$store.scope(
-      state: \.destination?.info,
+      \.destination?.info,
       action: \.destination.info,
     )) { store in
       InfoView(store: store)
@@ -743,13 +743,13 @@ public struct AppView: View {
     }
     .crossPromoPresentations(
       store: self.$store.scope(
-        state: \.destination?.crossPromo,
+        \.destination?.crossPromo,
         action: \.destination.crossPromo,
       ),
       onImageLoadFailure: Self.crossPromoImageLoadFailed,
     )
     .killSwitch(
-      store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
+      store: self.store.scope(\.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.screen.isRunning,
     )
   }

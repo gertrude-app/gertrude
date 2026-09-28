@@ -16,7 +16,7 @@ struct InfoView: View {
       Color(self.cs, light: .violet100, dark: .black)
         .ignoresSafeArea()
       if let clearCacheStore = self.store.scope(
-        state: \.clearCache,
+        \.clearCache,
         action: \.clearCache,
       ) {
         ClearingCacheView(
