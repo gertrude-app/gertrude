@@ -14,7 +14,7 @@ struct LibraryViewContainer: View {
 
   var body: some View {
     NavigationStack(
-      path: self.$store.scope(state: \.path, action: \.path),
+      path: self.$store.scope(\.path, action: \.path),
     ) {
       LibraryView(
         state: self.store.viewState,

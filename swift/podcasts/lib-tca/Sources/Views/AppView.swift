@@ -16,7 +16,7 @@ struct AppView: View {
       EmptyView()
         .navigationDestination(
           item: self.$store.scope(
-            state: \.mode?.onboarding,
+            \.mode?.onboarding,
             action: \.mode.onboarding,
           ),
         ) { store in
@@ -24,18 +24,18 @@ struct AppView: View {
         }
         .navigationDestination(
           item: self.$store.scope(
-            state: \.mode?.podcasts,
+            \.mode?.podcasts,
             action: \.mode.podcasts,
           ),
         ) { store in
           PodcastsView(store: store)
         }
         .crossPromoPresentations(
-          store: self.$store.scope(state: \.crossPromo, action: \.crossPromo),
+          store: self.$store.scope(\.crossPromo, action: \.crossPromo),
           onImageLoadFailure: Self.crossPromoImageLoadFailed,
         )
     }
-    .alert(self.$store.scope(state: \.alert, action: \.alert))
+    .alert(self.$store.scope(\.alert, action: \.alert))
     .overlay(alignment: .bottom) {
       if let nowPlaying = self.store.nowPlaying.data {
         NowPlayingView(
@@ -43,11 +43,11 @@ struct AppView: View {
           show: .init(from: nowPlaying.show),
           minimized: nowPlaying.minimized,
           emit: { event in
-            self.store.send(
-              .nowPlaying(.view(event)),
-              animation: event == .miniPlayerTapped || event == .dismissed
-                ? .nowPlayingSpring : nil,
-            )
+            let animation: Animation? = event == .miniPlayerTapped || event == .dismissed
+              ? .nowPlayingSpring : nil
+            withAnimation(animation) {
+              _ = self.store.send(.nowPlaying(.view(event)))
+            }
           },
         )
         .opacity(self.store.hideNowPlaying ? 0 : 1)
@@ -56,7 +56,7 @@ struct AppView: View {
     .environment(\.miniNowPlayingVisible, self.miniNowPlayingVisible)
     .environment(\.lang, Lang(locale: self.locale))
     .killSwitch(
-      store: self.store.scope(state: \.killSwitch, action: \.killSwitch),
+      store: self.store.scope(\.killSwitch, action: \.killSwitch),
       suggestedUpdatesEnabled: self.store.canPresentSuggestedKillSwitch,
     )
   }

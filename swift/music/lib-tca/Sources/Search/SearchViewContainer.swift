@@ -15,7 +15,7 @@ struct SearchViewContainer: View {
 
   var body: some View {
     NavigationStack(
-      path: self.$store.scope(state: \.path, action: \.path),
+      path: self.$store.scope(\.path, action: \.path),
     ) {
       MusicSearchView(
         state: self.store.viewState,

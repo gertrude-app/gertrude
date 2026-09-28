@@ -29,7 +29,7 @@ struct OnboardingView: View {
   }
 
   @ViewBuilder private var content: some View {
-    if let claimStore = self.store.scope(state: \.claimFlow, action: \.claimFlow.presented) {
+    if let claimStore = self.store.scope(\.claimFlow, action: \.claimFlow.presented) {
       ClaimFlowView(store: claimStore)
     } else {
       switch self.store.screen {

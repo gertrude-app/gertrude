@@ -89,7 +89,7 @@ struct AppReducer: Sendable {
   @Dependency(\.locale) var locale
 
   var body: some Reducer<State, Action> {
-    Scope(state: \.killSwitch, action: \.killSwitch) {
+    Scope(\.killSwitch, action: \.killSwitch) {
       KillSwitchFeature(app: .podcasts) {
         await self.ensureDeviceId()
         guard let deviceId = self.keychain.loadDeviceId() else {
@@ -98,7 +98,7 @@ struct AppReducer: Sendable {
         return deviceId
       }
     }
-    Scope(state: \.nowPlaying, action: \.nowPlaying) {
+    Scope(\.nowPlaying, action: \.nowPlaying) {
       NowPlayingFeature()
     }
     Reduce { state, action in
@@ -319,12 +319,8 @@ struct AppReducer: Sendable {
     _ campaign: CrossPromoCampaign,
     extra: String? = nil,
   ) -> EffectOf<Self> {
-    let base = "campaign=\(campaign.campaignId)"
-      + " variant=\(campaign.variant ?? "-")"
-      + " placement=\(campaign.placement)"
-    let detail = extra.map { "\(base) \($0)" } ?? base
-    return .run { _ in
-      await log(.info, .setup, event.id, detail: detail).value
+    .run { _ in
+      await log(.info, .setup, event.id, detail: campaign.eventLogDetail(extra: extra)).value
     }
   }
 

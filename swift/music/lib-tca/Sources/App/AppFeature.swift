@@ -120,7 +120,7 @@ struct AppFeature: Sendable {
   @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
-    Scope(state: \.killSwitch, action: \.killSwitch) {
+    Scope(\.killSwitch, action: \.killSwitch) {
       KillSwitchFeature(app: .music) {
         guard let deviceId = await self.device.vendorId() else {
           throw KillSwitchDeviceIdError.missingDeviceId
@@ -129,19 +129,19 @@ struct AppFeature: Sendable {
       }
     }
 
-    Scope(state: \.library, action: \.library) {
+    Scope(\.library, action: \.library) {
       LibraryFeature()
     }
 
-    Scope(state: \.playback, action: \.playback) {
+    Scope(\.playback, action: \.playback) {
       PlaybackFeature()
     }
 
-    Scope(state: \.search, action: \.search) {
+    Scope(\.search, action: \.search) {
       SearchFeature()
     }
 
-    Scope(state: \.setup, action: \.setup) {
+    Scope(\.setup, action: \.setup) {
       MusicSetupFeature()
     }
 
@@ -534,12 +534,8 @@ struct AppFeature: Sendable {
     _ campaign: CrossPromoCampaign,
     extra: String? = nil,
   ) -> EffectOf<Self> {
-    let base = "campaign=\(campaign.campaignId)"
-      + " variant=\(campaign.variant ?? "-")"
-      + " placement=\(campaign.placement)"
-    let detail = extra.map { "\(base) \($0)" } ?? base
-    return .run { _ in
-      await log(.info, .setup, event.id, detail: detail).value
+    .run { _ in
+      await log(.info, .setup, event.id, detail: campaign.eventLogDetail(extra: extra)).value
     }
   }
 

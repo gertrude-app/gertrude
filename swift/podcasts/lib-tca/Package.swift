@@ -19,7 +19,7 @@ let package = Package(
     .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.10.0"),
     .package(
       url: "https://github.com/pointfreeco/swift-composable-architecture",
-      from: "1.25.0",
+      from: "1.26.2",
       traits: ["ComposableArchitecture2Deprecations"],
     ),
     .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.3.3"),

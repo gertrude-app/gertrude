@@ -310,14 +310,14 @@ jobs:
   iosapp-build:
     needs: files-changed
     if: needs.files-changed.outputs.iosapp == 'true' && github.event_name == 'pull_request'
-    runs-on: macos-15
+    runs-on: xcode-27
     steps:
       - name: checkout
         uses: actions/checkout@v4
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 27.1
       - name: build
         run: |
           cd swift/iosapp
@@ -328,7 +328,7 @@ jobs:
   podcasts-lib:
     needs: files-changed
     if: needs.files-changed.outputs.podcasts == 'true'
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 20
     steps:
       - name: checkout
@@ -336,15 +336,15 @@ jobs:
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 26.6
       - uses: actions/cache@v4
         with:
           path: |
             swift/podcasts/lib-tca/.build
             swift/podcasts/lib-core/.build
             swift/podcasts/lib-views/.build
-          key: podcasts-xc26.1.1-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
-          restore-keys: podcasts-xc26.1.1-
+          key: podcasts-xc26.6-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
+          restore-keys: podcasts-xc26.6-
       - name: build
         run: |
           cd swift/podcasts/lib-tca && swift build

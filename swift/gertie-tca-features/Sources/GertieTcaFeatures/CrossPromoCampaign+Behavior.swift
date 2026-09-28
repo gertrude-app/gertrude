@@ -18,6 +18,13 @@ public extension CrossPromoCampaign {
     case .tertiary: self.tertiaryCta?.action
     }
   }
+
+  func eventLogDetail(extra: String? = nil) -> String {
+    let base = "campaign=\(self.campaignId)"
+      + " variant=\(self.variant ?? "-")"
+      + " placement=\(self.placement)"
+    return extra.map { "\(base) \($0)" } ?? base
+  }
 }
 
 public extension [CrossPromoCampaign] {

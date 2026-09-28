@@ -12,7 +12,7 @@ struct AddShowView: View {
       switch self.store.screen {
       case .enteringPin:
         PinChallengeView(
-          store: self.store.scope(state: \.pinChallenge, action: \.pinChallenge),
+          store: self.store.scope(\.pinChallenge, action: \.pinChallenge),
           context: .addShow,
         )
 

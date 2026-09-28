@@ -21,7 +21,7 @@ struct PodcastsView: View {
     .navigationBarBackButtonHidden(true)
     .navigationDestination(
       item: self.$store.scope(
-        state: \.destination?.addShow,
+        \.destination?.addShow,
         action: \.destination.addShow,
       ),
       destination: { store in
@@ -30,7 +30,7 @@ struct PodcastsView: View {
     )
     .navigationDestination(
       item: self.$store.scope(
-        state: \.destination?.show,
+        \.destination?.show,
         action: \.destination.show,
       ),
       destination: { store in
@@ -39,7 +39,7 @@ struct PodcastsView: View {
     )
     .sheet(
       item: self.$store.scope(
-        state: \.destination?.settings,
+        \.destination?.settings,
         action: \.destination.settings,
       ),
       content: { store in
@@ -48,7 +48,7 @@ struct PodcastsView: View {
     )
     .sheet(
       item: self.$store.scope(
-        state: \.destination?.requestReview,
+        \.destination?.requestReview,
         action: \.destination.requestReview,
       ),
       content: { store in
@@ -69,7 +69,7 @@ struct PodcastsView: View {
       },
     )
     .confirmationDialog(self.$store.scope(
-      state: \.destination?.confirm,
+      \.destination?.confirm,
       action: \.destination.confirm,
     ))
     .onAppear {

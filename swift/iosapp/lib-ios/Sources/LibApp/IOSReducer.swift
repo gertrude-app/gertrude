@@ -34,7 +34,7 @@ public struct IOSReducer: Sendable {
   public init() {}
 
   public var body: some ReducerOf<Self> {
-    Scope(state: \.killSwitch, action: \.killSwitch) {
+    Scope(\.killSwitch, action: \.killSwitch) {
       KillSwitchFeature(app: .blocker) {
         guard let deviceId = await self.deps.device.deviceId() else {
           throw KillSwitchDeviceIdError.missingDeviceId
