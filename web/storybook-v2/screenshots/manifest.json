@@ -2196,6 +2196,246 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--ios-music-album-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-album-loading&viewMode=story",
+    "name": "iPhone and iPad (loading album tracks)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-album-loading.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-album-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-album-loading&viewMode=story",
+    "name": "iPhone and iPad (loading album tracks)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-album-loading.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-album-saving",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-album-saving&viewMode=story",
+    "name": "iPhone and iPad (saving album tracks)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-album-saving.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-album-saving",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-album-saving&viewMode=story",
+    "name": "iPhone and iPad (saving album tracks)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-album-saving.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-album-tracks",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-album-tracks&viewMode=story",
+    "name": "iPhone and iPad (album tracks)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-album-tracks.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-album-tracks",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-album-tracks&viewMode=story",
+    "name": "iPhone and iPad (album tracks)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-album-tracks.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-empty",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-empty&viewMode=story",
+    "name": "iPhone and iPad (no music yet)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-empty.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-empty",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-empty&viewMode=story",
+    "name": "iPhone and iPad (no music yet)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-empty.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-library",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-library&viewMode=story",
+    "name": "iPhone and iPad (allowed music)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-library.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-library",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-library&viewMode=story",
+    "name": "iPhone and iPad (allowed music)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-library.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-library-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-library-loading&viewMode=story",
+    "name": "iPhone and iPad (loading allowed music)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-library-loading.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-library-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-library-loading&viewMode=story",
+    "name": "iPhone and iPad (loading allowed music)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-library-loading.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-remove-album",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-remove-album&viewMode=story",
+    "name": "iPhone and iPad (remove album)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-remove-album.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-remove-album",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-remove-album&viewMode=story",
+    "name": "iPhone and iPad (remove album)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-remove-album.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-search",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-search&viewMode=story",
+    "name": "iPhone and iPad (searching music)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-search.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-search",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-search&viewMode=story",
+    "name": "iPhone and iPad (searching music)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-search.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-search-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-search-loading&viewMode=story",
+    "name": "iPhone and iPad (search in progress)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-search-loading.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-search-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-search-loading&viewMode=story",
+    "name": "iPhone and iPad (search in progress)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-search-loading.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-search-tracks",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-search-tracks&viewMode=story",
+    "name": "iPhone and iPad (choose tracks from search)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-music-search-tracks.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-music-search-tracks",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-music-search-tracks&viewMode=story",
+    "name": "iPhone and iPad (choose tracks from search)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-music-search-tracks.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--ios-overview-story",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-overview-story&viewMode=story",
     "name": "iPhone and iPad (overview)",

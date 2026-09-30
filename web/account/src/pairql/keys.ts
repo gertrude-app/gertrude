@@ -9,6 +9,8 @@ import type {
   GetDevices,
   GetIosDeviceSettings,
   GetMacDevice,
+  GetMusicAlbumCuration,
+  GetMusicCuration,
   GetPeople,
   GetPersonActivitySummaries,
   GetPersonDayActivity,
@@ -105,6 +107,17 @@ export class Key extends QueryKey<never> {
 
   static iosDeviceSettings(deviceId: string): QueryKey<GetIosDeviceSettings.Output> {
     return new QueryKey([`ios-devices`, deviceId, `settings`]);
+  }
+
+  static musicCuration(personId: string): QueryKey<GetMusicCuration.Output> {
+    return new QueryKey([`people`, personId, `music`, `summary`]);
+  }
+
+  static musicAlbumCuration(
+    personId: string,
+    albumId: string,
+  ): QueryKey<GetMusicAlbumCuration.Output> {
+    return new QueryKey([`people`, personId, `music`, `album`, albumId]);
   }
 
   static personInstalledMacApps(

@@ -7,6 +7,7 @@ import MusicSection from '#/components/person-settings/MusicSection';
 interface Props {
   personName: string;
   musicConnections: MusicDeviceConnection[];
+  musicCuration: React.ReactNode;
   defaultExpandedMusic?: boolean;
   children: React.ReactNode;
 }
@@ -26,6 +27,7 @@ const SectionHeading: React.FC<{ title: string; description: string }> = ({
 const IosPersonSettingsPage: React.FC<Props> = ({
   personName,
   musicConnections,
+  musicCuration,
   defaultExpandedMusic,
   children,
 }) => {
@@ -48,7 +50,9 @@ const IosPersonSettingsPage: React.FC<Props> = ({
             <MusicSection
               connections={musicConnections}
               defaultExpanded={defaultExpandedMusic}
-            />
+            >
+              {musicCuration}
+            </MusicSection>
           </CardContainer>
         </VStack>
       )}

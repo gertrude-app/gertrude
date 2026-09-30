@@ -13,6 +13,8 @@ import CardContainer from '#/components/layout/CardContainer';
 import IosDeviceSettings from '#/components/pages/person-settings/IosDeviceSettings';
 import IosDeviceSettingsSection from '#/components/pages/person-settings/IosDeviceSettingsSection';
 import IosPersonSettingsPage from '#/components/pages/person-settings/IosPersonSettingsPage';
+import MusicCuration from '#/components/person-settings/MusicCuration';
+import useMusicCuration from '#/components/person-settings/useMusicCuration';
 import { toPersonCardPerson } from '#/lib/people';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -63,6 +65,19 @@ const DeviceSettingsSection: React.FC<DeviceSettingsSectionProps> = ({
   );
 };
 
+const PersonMusicCuration: React.FC<{
+  personId: string;
+  personName: string;
+  onUnsavedChangesChange: (hasUnsavedChanges: boolean) => void;
+}> = ({ personId, personName, onUnsavedChangesChange }) => {
+  const state = useMusicCuration({
+    personId,
+    client: liveClient,
+    onUnsavedChangesChange,
+  });
+  return <MusicCuration personId={personId} personName={personName} state={state} />;
+};
+
 const IosSettingsIndexPage: React.FC<{ person: Person }> = ({ person }) => {
   const { section } = Route.useSearch();
   const { hash } = useLocation();
@@ -86,6 +101,7 @@ const IosSettingsIndexPage: React.FC<{ person: Person }> = ({ person }) => {
   const [unsavedDeviceIds, setUnsavedDeviceIds] = React.useState<Set<string>>(
     () => new Set(),
   );
+  const [hasUnsavedMusic, setHasUnsavedMusic] = React.useState(false);
   const updateUnsavedChanges = React.useCallback(
     (deviceId: string, hasUnsavedChanges: boolean) => {
       setUnsavedDeviceIds((current) => {
@@ -132,6 +148,13 @@ const IosSettingsIndexPage: React.FC<{ person: Person }> = ({ person }) => {
       <IosPersonSettingsPage
         personName={person.name}
         musicConnections={musicConnections}
+        musicCuration={
+          <PersonMusicCuration
+            personId={person.id}
+            personName={person.name}
+            onUnsavedChangesChange={setHasUnsavedMusic}
+          />
+        }
         defaultExpandedMusic={section === `music`}
       >
         {deviceQueries.map(({ device, query }) => (
@@ -145,8 +168,14 @@ const IosSettingsIndexPage: React.FC<{ person: Person }> = ({ person }) => {
         ))}
       </IosPersonSettingsPage>
       <UnsavedChangesGuard
-        hasUnsavedChanges={unsavedDeviceIds.size > 0}
-        description="Your iPhone/iPad settings haven't been saved."
+        hasUnsavedChanges={unsavedDeviceIds.size > 0 || hasUnsavedMusic}
+        description={
+          hasUnsavedMusic
+            ? unsavedDeviceIds.size > 0
+              ? `Your iPhone/iPad settings and music selection haven't been saved.`
+              : `Your music selection hasn't been saved.`
+            : `Your iPhone/iPad settings haven't been saved.`
+        }
       />
     </>
   );
