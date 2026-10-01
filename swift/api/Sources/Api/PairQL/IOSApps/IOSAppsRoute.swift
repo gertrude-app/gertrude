@@ -13,6 +13,9 @@ extension IOSAppsRoute: RouteResponder {
       case .logEvent(let input):
         let output = try await LogAppEvent.resolve(with: input, in: context)
         return try await self.respond(with: output)
+      case .reportIdentityTransition(let input):
+        let output = try await ReportIdentityTransition.resolve(with: input, in: context)
+        return try await self.respond(with: output)
       }
     }
   }
