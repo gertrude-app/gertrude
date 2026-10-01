@@ -1,4 +1,4 @@
-import { Button, HStack, Input, Text, VStack } from '@gertrude/ui';
+import { Banner, Button, HStack, Input, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import AppAd from '#/components/unauthed/AppAd';
@@ -10,6 +10,7 @@ interface Props {
   setEmail: (email: string) => void;
   password: string;
   setPassword: (password: string) => void;
+  error?: string | null;
   submitting?: boolean;
   sendingLink?: boolean;
   onSubmit: (event: React.FormEvent) => void;
@@ -21,6 +22,7 @@ const LoginPage: React.FC<Props> = ({
   setEmail,
   password,
   setPassword,
+  error,
   submitting = false,
   sendingLink = false,
   onSubmit,
@@ -38,6 +40,7 @@ const LoginPage: React.FC<Props> = ({
             setValue={setEmail}
             label="Email"
             placeholder="john@doe.com"
+            autoComplete="email"
           />,
           <Input
             key="password"
@@ -46,7 +49,26 @@ const LoginPage: React.FC<Props> = ({
             setValue={setPassword}
             label="Password"
             placeholder="••••••••••"
+            autoComplete="current-password"
           />,
+          ...(error
+            ? [
+                <div key="error" role="alert">
+                  <Banner variant="error">
+                    {error === `Incorrect email or password` ? (
+                      <>
+                        <strong className="block">Email or password didn't match</strong>
+                        <span className="mt-1 block text-sm">
+                          Check your details, or send a magic link instead.
+                        </span>
+                      </>
+                    ) : (
+                      error
+                    )}
+                  </Banner>
+                </div>,
+              ]
+            : []),
         ]}
         buttons={[
           <Button
@@ -64,6 +86,7 @@ const LoginPage: React.FC<Props> = ({
             icon={ArrowRightIcon}
             iconPosition="right"
             disabled={!email || !password || submitting}
+            loading={submitting}
           >
             Login
           </Button>,

@@ -32,6 +32,7 @@
   "dependencies": {
     "@dash/keys": "workspace:*",
     "@gertrude/ui": "workspace:*",
+    "@marsidev/react-turnstile": "1.6.1",
     "@shared/datetime": "workspace:*",
     "@shared/pairql": "workspace:*",
     "@shared/phone-numbers": "workspace:*",

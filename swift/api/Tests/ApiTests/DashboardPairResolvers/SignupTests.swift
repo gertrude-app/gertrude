@@ -13,18 +13,23 @@ final class SignupTests: ApiTestCase, @unchecked Sendable {
     expect(result).toBeError(containing: "Bad Request")
   }
 
-  func testInitiateSignupWithExistingVerifiedEmailButBadPasswordSendsEmail() async throws {
-    let existing = try await self.db.create(Parent.random {
-      $0.password = "nope"
-      $0.emailVerifiedAt = .reference - .days(1)
-    })
+  func testSignupWithExistingEmailAndBadPasswordSendsEmailAndPreservesPassword() async throws {
+    for emailVerified in [true, false] {
+      self.sent.emails = []
+      let existing = try await self.db.create(Parent.random {
+        $0.password = "nope"
+        $0.emailVerifiedAt = emailVerified ? .reference - .days(1) : nil
+      })
 
-    let input = Signup.Input(email: existing.email.rawValue, password: "pass")
-    let output = try await Signup.resolve(with: input, in: self.context)
+      let input = Signup.Input(email: existing.email.rawValue, password: "pass")
+      let output = try await Signup.resolve(with: input, in: self.context)
 
-    expect(output).toEqual(.init(admin: nil))
-    expect(sent.emails.count).toEqual(1)
-    expect(sent.emails[0].template).toBe("re-signup")
+      expect(output).toEqual(.init(admin: nil))
+      expect(sent.emails.count).toEqual(1)
+      expect(sent.emails[0].template).toBe(emailVerified ? "re-signup" : "initial-signup")
+      let unchanged = try await self.db.find(existing.id)
+      expect(unchanged.password).toEqual("nope")
+    }
   }
 
   func testInitiateSignupHappyPath() async throws {

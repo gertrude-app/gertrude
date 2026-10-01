@@ -89,6 +89,9 @@ importers:
       '@gertrude/ui':
         specifier: workspace:*
         version: link:../ui
+      '@marsidev/react-turnstile':
+        specifier: 1.6.1
+        version: 1.6.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@shared/datetime':
         specifier: workspace:*
         version: link:../shared/datetime
@@ -2550,6 +2553,12 @@ packages:
         optional: true
       react:
         optional: true
+
+  '@marsidev/react-turnstile@1.6.1':
+    resolution: {integrity: sha512-ojI9NLYv821IRKi7KraTkxTto6KC/m58hNNyKxvYxm/cQBu5MI5eMkaiJs2JSQBFiXE3LPQI3seJVjv/2lgALA==}
+    peerDependencies:
+      react: ^17.0.2 || ^18.0.0 || ^19.0
+      react-dom: ^17.0.2 || ^18.0.0 || ^19.0
 
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
@@ -10440,6 +10449,11 @@ snapshots:
       '@types/markdown-it': 12.2.3
       '@types/react': 19.2.14
       react: 19.2.6
+
+  '@marsidev/react-turnstile@1.6.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:

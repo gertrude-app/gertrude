@@ -63,6 +63,7 @@ public extension PqlError {
     case magicLinkTokenNotFound
     case slackVerificationFailed
     case emailAlreadyVerified
+    case verificationEmailResent
   }
 
   enum AppTag: String, Codable, CaseIterable, Sendable {

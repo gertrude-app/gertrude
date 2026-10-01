@@ -5,6 +5,8 @@ export * from './pairs/AccountLoginMagicLink';
 export * from './pairs/AccountRequestMagicLink';
 export * from './pairs/AccountResetPassword';
 export * from './pairs/AccountSendPasswordResetEmail';
+export * from './pairs/AccountSignup';
+export * from './pairs/AccountVerifySignupEmail';
 export * from './pairs/ApproveMusicAlbum_v2';
 export * from './pairs/ApproveMusicArtist_v2';
 export * from './pairs/ApproveMusicTrack';
