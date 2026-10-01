@@ -12,6 +12,8 @@ import {
   PersonalizedConnect,
   Supervising,
   SwipeToUpgrade,
+  UnsuperviseComplete,
+  UnsuperviseConnect,
 } from '@supervise/ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { appWindow } from '../story-helpers';
@@ -226,6 +228,43 @@ export const Frame_Error_UserReportedNo: Story = {
         onRetry={() => {}}
         onContactSupport={() => {}}
       />
+    </Window>
+  ),
+};
+
+export const Unsupervise_Connect: Story = {
+  render: () => (
+    <Window>
+      <UnsuperviseConnect />
+    </Window>
+  ),
+};
+
+export const Unsupervise_GetReady: Story = {
+  render: () => (
+    <Window>
+      <GetReady unsupervising deviceType="iPhone" onStart={() => {}} />
+    </Window>
+  ),
+};
+
+export const Unsupervise_ConfirmRemoval: Story = {
+  render: () => (
+    <Window>
+      <ConfirmSupervision
+        unsupervising
+        deviceType="iPhone"
+        onYes={() => {}}
+        onNo={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const Unsupervise_Complete: Story = {
+  render: () => (
+    <Window>
+      <UnsuperviseComplete deviceType="iPhone" onDone={() => {}} />
     </Window>
   ),
 };

@@ -26,7 +26,7 @@ const SwipeToUpgrade: React.FC<SwipeToUpgradeProps> = ({ deviceType, onContinue 
       steps={[
         {
           title: `The ${deviceType} will go black, then white`,
-          subtitle: `This is normal during the supervision process`,
+          subtitle: `This is normal during the restart process`,
         },
         {
           title: `Swipe up to confirm when prompted`,

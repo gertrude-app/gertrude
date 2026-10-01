@@ -12,6 +12,8 @@ export {
   PersonalizedConnect,
   Supervising,
   SwipeToUpgrade,
+  UnsuperviseComplete,
+  UnsuperviseConnect,
 } from './frames';
 
 export type {
@@ -30,4 +32,6 @@ export type {
   PersonalizedConnectProps,
   SupervisingProps,
   SwipeToUpgradeProps,
+  UnsuperviseCompleteProps,
+  UnsuperviseConnectProps,
 } from './types';

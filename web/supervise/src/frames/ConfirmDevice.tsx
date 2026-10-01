@@ -8,6 +8,7 @@ const img: any = connectDeviceImg;
 const imgSrc: string = typeof img === `string` ? img : img.src;
 
 const ConfirmDevice: React.FC<ConfirmDeviceProps> = ({
+  unsupervising = false,
   deviceName,
   deviceType,
   iosVersion,
@@ -18,7 +19,11 @@ const ConfirmDevice: React.FC<ConfirmDeviceProps> = ({
     step={3}
     totalSteps={8}
     title={`${deviceType} Found`}
-    subtitle={`Is this the ${deviceType} you want to supervise?`}
+    subtitle={
+      unsupervising
+        ? `Is this the ${deviceType} you want to remove supervision from?`
+        : `Is this the ${deviceType} you want to supervise?`
+    }
     imageSrc={imgSrc}
     imageAlt="Connected device"
     footer={
