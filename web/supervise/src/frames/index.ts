@@ -13,3 +13,4 @@ export { default as Error } from './Error';
 export { default as Complete } from './Complete';
 export { default as UnsuperviseConnect } from './UnsuperviseConnect';
 export { default as UnsuperviseComplete } from './UnsuperviseComplete';
+export { default as FinishSetup } from './FinishSetup';
