@@ -61,3 +61,9 @@ all notes.
 - **[012 — MacSim simulated-OS harness](./012-macsim-simulated-os-harness.md)** — why the
   mac app keeps a deterministic world-sim (real reducers, modeled OS) with a conformance
   loop, instead of relying on VM integration tests or unit tests alone.
+
+- **[013 — Shared iOS device identity](./013-shared-ios-device-identity.md)** — one
+  keychain identity shared by all iOS apps plus a `ThisDeviceOnly` canary that detects
+  migration to new hardware; five resolver rules, a proof-gated transition pair, and a
+  server that never merges or deletes rows. Fixes #913 splits and the post-migration
+  supervision dead end.
