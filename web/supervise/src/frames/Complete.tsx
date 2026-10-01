@@ -40,7 +40,8 @@ const Complete: React.FC<CompleteProps> = ({ childName, deviceType, onDone }) =>
       ]}
     />
     <p className="mt-12 text-sm text-slate-500">
-      Don’t forget to re-enable Find My and Private Relay.
+      Don’t forget to re-enable Find My, Private Relay, and any Screen Time restrictions
+      you turned off.
     </p>
   </InstructionLayout>
 );

@@ -12,6 +12,7 @@ const GetReady: React.FC<GetReadyProps> = ({
   deviceType,
   onStart,
   unsupervising = false,
+  requiresSetup = false,
 }) => (
   <InstructionLayout
     step={6}
@@ -28,16 +29,29 @@ const GetReady: React.FC<GetReadyProps> = ({
   >
     <NumberedSteps
       variant="checkmark"
-      steps={[
-        {
-          title: `No data will be lost`,
-          subtitle: `Your apps, photos, and settings will remain intact`,
-        },
-        {
-          title: `Keep the ${deviceType} connected`,
-          subtitle: `Don't unplug the USB cable during the process`,
-        },
-      ]}
+      steps={
+        requiresSetup
+          ? [
+              {
+                title: `Have your Apple ID password ready`,
+                subtitle: `You may need to sign in again after the restart.`,
+              },
+              {
+                title: `Keep your ${deviceType} connected`,
+                subtitle: `It may restart more than once during setup.`,
+              },
+            ]
+          : [
+              {
+                title: `No data will be lost`,
+                subtitle: `Your apps, photos, and settings will remain intact`,
+              },
+              {
+                title: `Keep the ${deviceType} connected`,
+                subtitle: `Don't unplug the USB cable during the process`,
+              },
+            ]
+      }
     />
   </InstructionLayout>
 );

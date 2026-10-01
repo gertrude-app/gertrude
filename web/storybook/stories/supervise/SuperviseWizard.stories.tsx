@@ -7,6 +7,7 @@ import {
   DisableFindMy,
   DisablePrivateRelay,
   Error,
+  FinishSetup,
   GetReady,
   ITunesRequired,
   PersonalizedConnect,
@@ -270,3 +271,89 @@ export const Unsupervise_Complete: Story = {
 };
 
 export default meta;
+
+export const GetReady_iOS27: Story = {
+  render: () => (
+    <Window>
+      <GetReady deviceType="iPhone" requiresSetup onStart={() => {}} />
+    </Window>
+  ),
+};
+
+export const FinishSetup_Waiting: Story = {
+  render: () => (
+    <Window>
+      <FinishSetup
+        deviceType="iPhone"
+        phase="restart"
+        onFinished={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const FinishSetup_Ready: Story = {
+  render: () => (
+    <Window>
+      <FinishSetup
+        deviceType="iPad"
+        phase="ready"
+        onFinished={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const FinishSetup_Uncertain: Story = {
+  render: () => (
+    <Window>
+      <FinishSetup
+        deviceType="iPhone"
+        phase="uncertain"
+        onFinished={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const FinishSetup_Recovery: Story = {
+  render: () => (
+    <Window>
+      <FinishSetup
+        deviceType="iPad"
+        phase="ready"
+        onBack={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const FinishSetup_RestartFailed: Story = {
+  render: () => (
+    <Window>
+      <FinishSetup
+        deviceType="iPhone"
+        phase="restartFailed"
+        onFinished={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};
+
+export const Frame_Error_SetupUnconfirmed: Story = {
+  render: () => (
+    <Window>
+      <Error
+        deviceType="iPhone"
+        errorType="setupUnconfirmed"
+        onRetry={() => {}}
+        onContactSupport={() => {}}
+      />
+    </Window>
+  ),
+};

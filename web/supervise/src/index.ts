@@ -7,6 +7,7 @@ export {
   DisableFindMy,
   DisablePrivateRelay,
   Error,
+  FinishSetup,
   GetReady,
   ITunesRequired,
   PersonalizedConnect,

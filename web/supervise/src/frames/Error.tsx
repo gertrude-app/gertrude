@@ -18,12 +18,31 @@ function getErrorContent(
         title: `Find My ${deviceType} is Enabled`,
         message: `Find My ${deviceType} must be disabled before ${unsupervising ? `supervision can be removed` : `supervision can complete`}. Please disable it in Settings → [Your Name] → Find My, then try again.`,
       };
+    case `setupUnconfirmed`:
+      return {
+        title: `Let’s get some help`,
+        message: `If the supervision message is missing from Settings, contact Support. Don’t run supervision again.`,
+      };
     case `userReportedNo`:
       return {
         title: unsupervising ? `Removal Unsuccessful` : `Supervision Unsuccessful`,
         message: unsupervising
           ? `The ${deviceType} still appears to be supervised. You can try the process again, or contact support for help.`
           : `The ${deviceType} doesn't appear to be supervised. You can try the process again, or contact support for help.`,
+      };
+    case `deviceLimitReached`:
+      return {
+        title: `Device Limit Reached`,
+        message:
+          errorMessage ??
+          `This account has supervised more devices than Gertrude allows. Get in touch and we'll sort it out with you.`,
+      };
+    case `serverRejected`:
+      return {
+        title: `Can't Continue`,
+        message:
+          errorMessage ??
+          `Gertrude couldn't start supervising this ${deviceType}. Please try again or contact support.`,
       };
     case `invokeFailed`:
     default:
@@ -80,14 +99,20 @@ const Error: React.FC<ErrorProps> = ({
             <Button
               type="button"
               onClick={onContactSupport}
-              color="secondary"
+              color={
+                [`deviceLimitReached`, `setupUnconfirmed`].includes(errorType)
+                  ? `gradient`
+                  : `secondary`
+              }
               size="large"
             >
               Contact Support
             </Button>
-            <Button type="button" onClick={onRetry} color="gradient" size="large">
-              Try Again &rarr;
-            </Button>
+            {![`deviceLimitReached`, `setupUnconfirmed`].includes(errorType) && (
+              <Button type="button" onClick={onRetry} color="gradient" size="large">
+                Try Again &rarr;
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ export interface ITunesRequiredProps {
 }
 
 export interface CodeEntryProps {
+  onRecover?: () => void;
   code: string;
   onCodeChange: (code: string) => void;
   onSubmit: () => void;
@@ -55,6 +56,7 @@ export interface DisablePrivateRelayProps {
 
 export interface GetReadyProps {
   unsupervising?: boolean;
+  requiresSetup?: boolean;
   deviceType: string;
   onStart: () => void;
 }
@@ -75,7 +77,13 @@ export interface ConfirmSupervisionProps {
   onNo: () => void;
 }
 
-export type ErrorType = `findMyEnabled` | `invokeFailed` | `userReportedNo`;
+export type ErrorType =
+  | `findMyEnabled`
+  | `invokeFailed`
+  | `setupUnconfirmed`
+  | `userReportedNo`
+  | `deviceLimitReached`
+  | `serverRejected`;
 
 export interface ErrorProps {
   unsupervising?: boolean;

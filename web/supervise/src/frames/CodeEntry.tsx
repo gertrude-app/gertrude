@@ -4,6 +4,7 @@ import type { CodeEntryProps } from '../types';
 import FrameBackground from '../FrameBackground';
 
 const CodeEntry: React.FC<CodeEntryProps> = ({
+  onRecover,
   code,
   onCodeChange,
   onSubmit,
@@ -41,6 +42,15 @@ const CodeEntry: React.FC<CodeEntryProps> = ({
         >
           {loading ? `Verifying...` : <>Continue &rarr;</>}
         </Button>
+        {onRecover && (
+          <button
+            type="button"
+            className="mt-6 text-sm text-violet-600 underline"
+            onClick={onRecover}
+          >
+            Already started? Check device setup
+          </button>
+        )}
       </div>
     </FrameBackground>
   );
