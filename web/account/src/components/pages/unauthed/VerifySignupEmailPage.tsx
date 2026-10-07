@@ -19,6 +19,7 @@ const VerifySignupEmailPage: React.FC<Props> = ({ state, onRetry }) => (
   <UnauthedPageLayout
     form={
       <UnauthedForm
+        icon={state.status === `alreadyVerified` ? CheckIcon : undefined}
         heading={
           state.status === `verifying`
             ? `Verifying your email`
@@ -37,30 +38,34 @@ const VerifySignupEmailPage: React.FC<Props> = ({ state, onRetry }) => (
                 ? `Open the newest verification link to finish signing up.`
                 : `Let's get you back on track.`
         }
-        inputs={[
-          state.status === `verifying` ? (
-            <VStack key="verifying" align="center" gap={3} className="py-5" role="status">
-              <LoadingDots />
-              <Text as="p" variant="bodyMuted">
-                Confirming your email address…
-              </Text>
-            </VStack>
-          ) : state.status === `alreadyVerified` ? (
-            <VStack key="verified" align="center" className="py-4">
-              <div className="rounded-full bg-violet-100 p-3 text-violet-600">
-                <CheckIcon className="size-7" aria-hidden="true" />
-              </div>
-            </VStack>
-          ) : state.status === `resent` ? (
-            <div key="resent" role="status">
-              <Banner>{state.message}</Banner>
-            </div>
-          ) : (
-            <div key="error" role="alert">
-              <Banner variant="error">{state.message}</Banner>
-            </div>
-          ),
-        ]}
+        inputs={
+          state.status === `alreadyVerified`
+            ? []
+            : [
+                state.status === `verifying` ? (
+                  <VStack
+                    key="verifying"
+                    align="center"
+                    gap={3}
+                    className="py-5"
+                    role="status"
+                  >
+                    <LoadingDots />
+                    <Text as="p" variant="bodyMuted">
+                      Confirming your email address…
+                    </Text>
+                  </VStack>
+                ) : state.status === `resent` ? (
+                  <div key="resent" role="status">
+                    <Banner>{state.message}</Banner>
+                  </div>
+                ) : (
+                  <div key="error" role="alert">
+                    <Banner variant="error">{state.message}</Banner>
+                  </div>
+                ),
+              ]
+        }
         buttons={
           state.status === `verifying`
             ? []

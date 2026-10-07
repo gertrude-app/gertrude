@@ -170,6 +170,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeleteAccountKey.Output>(input, `DeleteAccountKey`, `parent`);
   };
 
+  public deleteAccountKeychain = (
+    input: P.DeleteAccountKeychain.Input,
+  ): Promise<Result<P.DeleteAccountKeychain.Output>> => {
+    return this.query<P.DeleteAccountKeychain.Output>(
+      input,
+      `DeleteAccountKeychain`,
+      `parent`,
+    );
+  };
+
   public deleteAccountNotification = (
     input: P.DeleteAccountNotification.Input,
   ): Promise<Result<P.DeleteAccountNotification.Output>> => {
@@ -428,6 +438,16 @@ export default class AccountClient extends Client<Auth> {
     input: P.SaveAccountKey.Input,
   ): Promise<Result<P.SaveAccountKey.Output>> => {
     return this.query<P.SaveAccountKey.Output>(input, `SaveAccountKey`, `parent`);
+  };
+
+  public saveAccountKeychain = (
+    input: P.SaveAccountKeychain.Input,
+  ): Promise<Result<P.SaveAccountKeychain.Output>> => {
+    return this.query<P.SaveAccountKeychain.Output>(
+      input,
+      `SaveAccountKeychain`,
+      `parent`,
+    );
   };
 
   public saveAccountNotification = (

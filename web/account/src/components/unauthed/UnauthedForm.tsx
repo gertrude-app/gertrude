@@ -1,5 +1,6 @@
 import { HStack, Spacer, Text, VStack } from '@gertrude/ui';
-import { ArrowRightIcon } from 'lucide-react';
+import cx from 'clsx';
+import { ArrowRightIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
   buttons: React.ReactNode[];
   heading: string;
   subheading: string;
+  icon?: LucideIcon;
   onSubmit?: (event: React.FormEvent) => void;
   bottomLink?: {
     text: string;
@@ -21,6 +23,7 @@ const UnauthedForm: React.FC<Props> = ({
   buttons,
   heading,
   subheading,
+  icon: Icon,
   onSubmit,
   bottomLink,
   bottomLinkExplanation,
@@ -31,7 +34,16 @@ const UnauthedForm: React.FC<Props> = ({
     onSubmit={onSubmit}
     className="min-h-screen overflow-hidden bg-stone-50 shadow-stone-500/20 xs:min-h-0 xs:w-96 xs:rounded-2xl xs:border xs:border-stone-200 xs:bg-white xs:shadow-2xl"
   >
-    <VStack className="px-6 pb-5 pt-18 xs:pt-5" gap={0.5}>
+    <VStack
+      align={Icon ? `center` : `stretch`}
+      className={cx(`px-6 pb-5 pt-18 xs:pt-5`, Icon && `text-center`)}
+      gap={0.5}
+    >
+      {Icon && (
+        <div className="mb-2 rounded-full bg-violet-100 p-2 text-violet-600">
+          <Icon className="size-5" aria-hidden="true" />
+        </div>
+      )}
       <Text as="h2" variant="title" className="text-[18px]">
         {heading}
       </Text>
@@ -40,13 +52,15 @@ const UnauthedForm: React.FC<Props> = ({
       </Text>
     </VStack>
     <VStack
-      className="xs:bg-stone-100/50 xs:border border-stone-200 p-5 rounded-xl mx-1"
+      className="xs:bg-stone-100/50 xs:border border-stone-200 p-5 rounded-xl mx-1 mb-1"
       gap={8}
     >
-      <VStack className="w-full rounded-2xl" gap={3}>
-        {inputs}
-      </VStack>
-      <VStack gap={3}>{buttons}</VStack>
+      {inputs.length > 0 && (
+        <VStack className="w-full rounded-2xl" gap={3}>
+          {inputs}
+        </VStack>
+      )}
+      {buttons.length > 0 && <VStack gap={3}>{buttons}</VStack>}
       {disclaimer && (
         <Text as="p" variant="captionMuted" className="-mt-4 text-center text-balance">
           {disclaimer}

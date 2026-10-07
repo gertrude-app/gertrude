@@ -25,5 +25,9 @@ export namespace GetAccountKeychain {
       bundleId?: string;
       iconHash?: string;
     }>;
+    assignedPeople: Array<{
+      id: UUID;
+      name: string;
+    }>;
   }
 }

@@ -33,6 +33,7 @@ struct GetAccountKeychain: Pair {
     let isPublic: Bool
     let keys: [KeyRecord]
     let apps: [AppOption]
+    let assignedPeople: [GetAccountKeychains.Person]
   }
 }
 
@@ -45,6 +46,17 @@ extension GetAccountKeychain: Resolver {
       with: input.keychainId,
       in: context.legacyContext,
     )
+    let assignments = try await ChildKeychain.query()
+      .where(.keychainId == input.keychainId)
+      .all(in: context.db)
+    let personIds = assignments.map(\.childId)
+    let assignedPeople = personIds.isEmpty
+      ? []
+      : try await Child.query()
+      .where(.id |=| personIds)
+      .where(.parentId == context.accountOwner.id)
+      .orderBy(.name, .asc)
+      .all(in: context.db)
     let apps = try await IdentifiedApp.query()
       .orderBy(.name, .asc)
       .all(in: context.db)
@@ -77,6 +89,7 @@ extension GetAccountKeychain: Resolver {
         )
       },
       apps: appOptions,
+      assignedPeople: assignedPeople.map { .init(id: $0.id, name: $0.name) },
     )
   }
 }
