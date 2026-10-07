@@ -7,6 +7,136 @@ import XExpect
 @testable import Api
 
 final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
+  func testMapsKeychainLifecycleInputsAndNormalizesMetadata() async throws {
+    let parent = try await self.parent()
+    let context = self.accountContext(parent)
+    let output = try await SaveAccountKeychain.resolve(
+      with: .init(keychainId: nil, name: "  School \n", description: "  Class resources  "),
+      in: context,
+    )
+
+    let created: Keychain = try await self.db.find(output.id)
+    expect(created.name).toEqual("School")
+    expect(created.description).toEqual("Class resources")
+    let updatedOutput = try await SaveAccountKeychain.resolve(
+      with: .init(keychainId: output.id, name: " Homework ", description: " \n\t "),
+      in: context,
+    )
+
+    expect(updatedOutput.id).toEqual(output.id)
+    let updated: Keychain = try await self.db.find(updatedOutput.id)
+    expect(updated.name).toEqual("Homework")
+    expect(updated.description).toBeNil()
+
+    let deletion = try await DeleteAccountKeychain.resolve(
+      with: .init(keychainId: output.id),
+      in: context,
+    )
+    expect(deletion).toEqual(.success)
+    await expect(try Keychain.query().where(.id == output.id).exists(in: self.db)).toBeFalse()
+  }
+
+  func testRejectsBlankKeychainNamesForCreationAndEditing() async throws {
+    let parent = try await self.parent()
+    let owned = try await parent.withKeychain { keychain, _ in
+      keychain.isPublic = false
+    }
+    let context = self.accountContext(parent)
+
+    for keychainId in [nil, owned.keychain.id] {
+      try await expectErrorFrom {
+        try await SaveAccountKeychain.resolve(
+          with: .init(keychainId: keychainId, name: " \n\t ", description: "Ignored"),
+          in: context,
+        )
+      }.toContain("badRequest")
+    }
+
+    let keychains = try await Keychain.query().where(.parentId == parent.id).all(in: self.db)
+    expect(keychains.map(\.id)).toEqual([owned.keychain.id])
+    expect(keychains.first?.name).toEqual(owned.keychain.name)
+  }
+
+  func testRejectsMetadataChangesAndDeletionOfAnotherAccountsKeychain() async throws {
+    let parent = try await self.parent()
+    let otherParent = try await self.parent()
+    let owned = try await otherParent.withKeychain { keychain, _ in
+      keychain.isPublic = false
+    }
+    let context = self.accountContext(parent)
+
+    try await expectErrorFrom {
+      try await SaveAccountKeychain.resolve(
+        with: .init(keychainId: owned.keychain.id, name: "Changed", description: nil),
+        in: context,
+      )
+    }.toContain("notFound")
+    try await expectErrorFrom {
+      try await DeleteAccountKeychain.resolve(
+        with: .init(keychainId: owned.keychain.id),
+        in: context,
+      )
+    }.toContain("notFound")
+
+    await expect(try self.db.find(owned.keychain.id).name).toEqual(owned.keychain.name)
+    await expect(try self.db.find(owned.keychain.id).description)
+      .toEqual(owned.keychain.description)
+    await expect(try self.db.find(owned.key.id).key).toEqual(owned.key.key)
+    expect(sent.websocketMessages).toBeEmpty()
+  }
+
+  func testRejectsMetadataChangesAndDeletionOfPublicKeychains() async throws {
+    let parent = try await self.parent()
+    let owned = try await parent.withKeychain { keychain, _ in
+      keychain.isPublic = true
+    }
+    let context = self.accountContext(parent)
+
+    try await expectErrorFrom {
+      try await SaveAccountKeychain.resolve(
+        with: .init(keychainId: owned.keychain.id, name: "Changed", description: nil),
+        in: context,
+      )
+    }.toContain("badRequest")
+    try await expectErrorFrom {
+      try await DeleteAccountKeychain.resolve(
+        with: .init(keychainId: owned.keychain.id),
+        in: context,
+      )
+    }.toContain("badRequest")
+
+    await expect(try self.db.find(owned.keychain.id).name).toEqual(owned.keychain.name)
+    await expect(try self.db.find(owned.keychain.id).description)
+      .toEqual(owned.keychain.description)
+    await expect(try self.db.find(owned.key.id).key).toEqual(owned.key.key)
+    expect(sent.websocketMessages).toBeEmpty()
+  }
+
+  func testDetailsIncludeOnlyAssignedPeopleFromTheOwningAccount() async throws {
+    let parent = try await self.parent()
+    let keychain = try await self.db.create(Keychain(
+      parentId: parent.id,
+      name: "Shared",
+      isPublic: true,
+    ))
+    let mabel = try await self.db.create(Child(parentId: parent.id, name: "Mabel"))
+    let jude = try await self.db.create(Child(parentId: parent.id, name: "Jude"))
+    let other = try await self.child()
+    try await self.db.create([
+      ChildKeychain(childId: mabel.id, keychainId: keychain.id),
+      ChildKeychain(childId: jude.id, keychainId: keychain.id),
+      ChildKeychain(childId: other.id, keychainId: keychain.id),
+    ])
+
+    let output = try await GetAccountKeychain.resolve(
+      with: .init(keychainId: keychain.id),
+      in: self.accountContext(parent),
+    )
+
+    expect(output.assignedPeople.map(\.name)).toEqual(["Jude", "Mabel"])
+    expect(output.assignedPeople.map(\.id)).toEqual([jude.id, mabel.id])
+  }
+
   func testReturnsParentOwnedKeychainsWithPeopleAssignmentsAndKeyCounts() async throws {
     let parent = try await self.parent()
     let jude = try await self.db.create(Child(parentId: parent.id, name: "Jude"))

@@ -25,6 +25,17 @@ struct AccountOwnerContext: ResolverContext {
       .first(in: self.db)
   }
 
+  func privateKeychain(_ id: Keychain.Id) async throws -> Keychain {
+    let keychain = try await Keychain.query()
+      .where(.id == id)
+      .where(.parentId == self.accountOwner.id)
+      .first(in: self.db)
+    guard !keychain.isPublic else {
+      throw self.error("9ee63543", .badRequest, user: "Public keychains are read-only.")
+    }
+    return keychain
+  }
+
   func computer(_ id: Computer.Id) async throws -> Computer {
     try await Computer.query()
       .where(.id == id)

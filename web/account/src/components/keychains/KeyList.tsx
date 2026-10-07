@@ -173,7 +173,9 @@ export const KeyDisplay: React.FC<{
   return (
     <div
       className={cx(
-        `grid grid-cols-1 gap-4 px-3 py-2.5 @2xl/main:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.8fr)] @2xl/main:items-center @2xl/main:gap-6 @2xl/main:px-4`,
+        `grid grid-cols-1 gap-4 px-3 @2xl/main:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.8fr)] @2xl/main:items-center @2xl/main:gap-6 @2xl/main:px-4`,
+        alwaysShowLabels ? `pt-2.5` : `pt-1.25`,
+        alwaysShowLabels || record.expiration ? `pb-2.5` : `pb-1.25`,
         className,
       )}
     >
@@ -277,7 +279,7 @@ const KeyRow: React.FC<{
         <button
           type="button"
           onClick={() => onEdit?.(record)}
-          className="block w-full cursor-pointer text-left outline-none transition-colors hover:bg-violet-50/40 focus-visible:bg-violet-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300/80"
+          className="block w-full cursor-pointer text-left outline-none transition-colors hover:bg-stone-50 focus-visible:bg-violet-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300/80"
           aria-label={`Edit key for ${presentation.target.target}`}
         >
           {content}
