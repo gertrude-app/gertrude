@@ -11,6 +11,8 @@ import type { PersonSettingsPreviewChip } from '#/components/person-settings/Per
 import type { LoadableState } from '#/components/types';
 import type {
   BlockedGroupsFormState,
+  ExtendedControlsDraft,
+  ExtendedControlsFormState,
   IosSettingsAction,
   ProfileDraft,
   ProfileFormState,
@@ -22,10 +24,12 @@ import type {
 import iosSettingsReducer, {
   blockedGroupsHaveUnsavedChanges,
   createIosSettingsFormState,
+  extendedControlsHaveUnsavedChanges,
   profileHasUnsavedChanges,
 } from './IosSettingsPage.reducer';
 import AppNotInstalledSection from '#/components/person-settings/AppNotInstalledSection';
 import BlockGroup from '#/components/person-settings/BlockGroup';
+import ExtendedSupervisionControls from '#/components/person-settings/ExtendedSupervisionControls';
 import PersonSettingsExpandableSection from '#/components/person-settings/PersonSettingsExpandableSection';
 import PodcastsSection from '#/components/person-settings/PodcastsSection';
 import SettingsRow from '#/components/person-settings/SettingsRow';
@@ -36,15 +40,19 @@ interface Props {
   savingProfile?: boolean;
   requestingPinReset?: boolean;
   onSaveBlockedGroups: (enabledBlockGroupIds: string[]) => void | Promise<void>;
-  onSaveProfile: (profileSettings: ProfileDraft) => void | Promise<void>;
+  onSaveProfile: (
+    profileSettings: ProfileDraft,
+    controls?: ExtendedControlsDraft,
+  ) => void | Promise<void>;
   onRequestPodcastsPinReset?: () => Promise<number | null>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
   defaultExpandedSection?: DeviceSettingsIOSApp;
 }
 
-const SaveButton: React.FC<{ disabled: boolean; saving: boolean }> = ({
+const SaveButton: React.FC<{ disabled: boolean; saving: boolean; label?: string }> = ({
   disabled,
   saving,
+  label = `Save Changes`,
 }) => (
   <HStack justify="end">
     <Button
@@ -54,7 +62,7 @@ const SaveButton: React.FC<{ disabled: boolean; saving: boolean }> = ({
       loading={saving}
       className="w-full @lg/main:w-auto"
     >
-      Save Changes
+      {label}
     </Button>
   </HStack>
 );
@@ -132,22 +140,42 @@ const BlockedGroupsForm: React.FC<BlockedGroupsFormProps> = ({
 
 interface ProfileFormProps {
   state: ProfileFormState;
+  extendedState?: ExtendedControlsFormState;
+  deviceType: `iPhone` | `iPad`;
   dispatch: React.Dispatch<IosSettingsAction>;
   saving: boolean;
-  onSave: (profileSettings: ProfileDraft) => void | Promise<void>;
+  onSave: (
+    profileSettings: ProfileDraft,
+    controls?: ExtendedControlsDraft,
+  ) => void | Promise<void>;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ state, dispatch, saving, onSave }) => {
+const ProfileForm: React.FC<ProfileFormProps> = ({
+  state,
+  extendedState,
+  deviceType,
+  dispatch,
+  saving,
+  onSave,
+}) => {
   const { draft } = state;
-  const hasUnsavedChanges = profileHasUnsavedChanges(state);
+  const hasUnsavedChanges =
+    profileHasUnsavedChanges(state) || extendedControlsHaveUnsavedChanges(extendedState);
 
   const save = (): void => {
-    if (!hasUnsavedChanges || saving) {
-      return;
-    }
+    if (!hasUnsavedChanges || saving) return;
     const submitted = { ...draft };
-    void Promise.resolve(onSave(submitted)).then(
-      () => dispatch({ type: `profileSaveSucceeded`, submitted }),
+    const submittedControls = extendedState ? { ...extendedState.draft } : undefined;
+    void Promise.resolve(onSave(submitted, submittedControls)).then(
+      () => {
+        dispatch({ type: `profileSaveSucceeded`, submitted });
+        if (submittedControls) {
+          dispatch({
+            type: `extendedControlsSaveSucceeded`,
+            submitted: submittedControls,
+          });
+        }
+      },
       () => undefined,
     );
   };
@@ -160,13 +188,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ state, dispatch, saving, onSa
       }}
     >
       <Banner variant="warning">
-        After changing any setting below, you’ll need to sync the profile on the device by
-        opening the Gertrude app and going to <strong>Info → Sync Profile</strong>.
+        After changing any setting below, you’ll need to sync the profile on the{` `}
+        {deviceType} by opening the Gertrude app and going to{` `}
+        <strong>Info → Sync Profile</strong>.
       </Banner>
       <VStack gap={3} className="mt-3">
         <SettingsRow
-          title="Prevent Protection Removal"
-          description="Make it impossible for the device user to remove Gertrude’s protection."
+          title="Prevent protection removal"
+          description={`Make it impossible for the ${deviceType} user to remove Gertrude’s protection.`}
           type="toggle"
           enabled={draft.preventProtectionRemoval}
           setEnabled={(enabled) =>
@@ -176,41 +205,55 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ state, dispatch, saving, onSa
               enabled,
             })
           }
-          warning="The device user may remove the profile in order to stop Gertrude’s protection and uninstall."
+          warning={`The ${deviceType} user may remove the profile in order to stop Gertrude’s protection and uninstall.`}
           showWarning={!draft.preventProtectionRemoval}
         />
         <SettingsRow
-          title="Allow Deleting Apps"
-          description="Keeping this off prevents the device user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps, then re-enable."
+          title="Allow deleting apps"
+          description={`Keeping this off prevents the ${deviceType} user from deleting the Gertrude app, but also prevents them from deleting any app. Enable temporarily if you need to delete some apps from the ${deviceType}, then re-enable.`}
           type="toggle"
           enabled={draft.allowDeletingApps}
           setEnabled={(enabled) =>
             dispatch({ type: `profileFlagChanged`, flag: `allowDeletingApps`, enabled })
           }
-          warning="The user can delete apps (including Gertrude Blocker) from their device."
+          warning={`The user can delete apps (including Gertrude) from their ${deviceType}`}
           showWarning={draft.allowDeletingApps}
         />
         <SettingsRow
-          title="Allow Factory Reset"
-          description="Allow the device to be erased and reset to factory settings, bypassing protection."
+          title="Allow factory reset"
+          description={`Allow the ${deviceType} to be erased and reset to factory settings, bypassing protection.`}
           type="toggle"
           enabled={draft.allowFactoryReset}
           setEnabled={(enabled) =>
             dispatch({ type: `profileFlagChanged`, flag: `allowFactoryReset`, enabled })
           }
-          warning="The user will be able to erase the device, removing Gertrude and all restrictions."
+          warning={`The user will be able to erase the ${deviceType} removing Gertrude and all restrictions`}
           showWarning={draft.allowFactoryReset}
         />
         <SettingsRow
-          title="Allow Installing Apps"
-          description="Allow the device user to install new apps from the App Store. Turn this off to remove the App Store icon entirely and block app installation."
+          title="Allow installing apps"
+          description={`Allow the ${deviceType} user to install new apps from the App Store. Turn this off to remove the App Store icon entirely and block app installation.`}
           type="toggle"
           enabled={draft.allowInstallingApps}
           setEnabled={(enabled) =>
             dispatch({ type: `profileFlagChanged`, flag: `allowInstallingApps`, enabled })
           }
         />
-        <SaveButton disabled={!hasUnsavedChanges || saving} saving={saving} />
+        {extendedState && (
+          <>
+            <SubsectionDivider title="Extended controls" />
+            <ExtendedSupervisionControls
+              deviceType={deviceType}
+              draft={extendedState.draft}
+              onChange={(values) => dispatch({ type: `extendedControlsChanged`, values })}
+            />
+          </>
+        )}
+        <SaveButton
+          disabled={!hasUnsavedChanges || saving}
+          saving={saving}
+          label="Save settings"
+        />
       </VStack>
     </form>
   );
@@ -220,8 +263,12 @@ interface EditorProps {
   blocker: IosBlockerSettings;
   savingBlockedGroups: boolean;
   savingProfile: boolean;
+  deviceType: `iPhone` | `iPad`;
   onSaveBlockedGroups: (enabledBlockGroupIds: string[]) => void | Promise<void>;
-  onSaveProfile: (profileSettings: ProfileDraft) => void | Promise<void>;
+  onSaveProfile: (
+    profileSettings: ProfileDraft,
+    controls?: ExtendedControlsDraft,
+  ) => void | Promise<void>;
   onUnsavedChangesChange?: (hasUnsavedChanges: boolean) => void;
   defaultExpanded?: boolean;
 }
@@ -230,6 +277,7 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
   blocker,
   savingBlockedGroups,
   savingProfile,
+  deviceType,
   onSaveBlockedGroups,
   onSaveProfile,
   onUnsavedChangesChange,
@@ -244,12 +292,18 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
     formState.blockedGroups,
   );
   const profileHasChanges = profileHasUnsavedChanges(formState.profile);
+  const extendedControlsHaveChanges = extendedControlsHaveUnsavedChanges(
+    formState.extended,
+  );
   const hasUnsavedChanges =
-    blockedGroupsHaveChanges || (blocker.isSupervised && profileHasChanges);
+    blockedGroupsHaveChanges ||
+    (blocker.isSupervised &&
+      (profileHasChanges ||
+        (!!blocker.extendedSupervisionControls && extendedControlsHaveChanges)));
 
   React.useEffect(() => {
     dispatch({ type: `settingsReceived`, blocker });
-  }, [blocker, blockedGroupsHaveChanges, profileHasChanges]);
+  }, [blocker, blockedGroupsHaveChanges, profileHasChanges, extendedControlsHaveChanges]);
 
   React.useEffect(() => {
     onUnsavedChangesChange?.(hasUnsavedChanges);
@@ -319,6 +373,10 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
             <SubsectionDivider title="Supervision Profile Settings" />
             <ProfileForm
               state={formState.profile}
+              extendedState={
+                blocker.extendedSupervisionControls ? formState.extended : undefined
+              }
+              deviceType={deviceType}
               dispatch={dispatch}
               saving={savingProfile}
               onSave={onSaveProfile}
@@ -381,6 +439,7 @@ const IosSettingsPage: React.FC<Props> = ({
           blocker={blocker}
           savingBlockedGroups={savingBlockedGroups}
           savingProfile={savingProfile}
+          deviceType={state.data.modelIdentifier.startsWith(`iPad`) ? `iPad` : `iPhone`}
           onSaveBlockedGroups={onSaveBlockedGroups}
           onSaveProfile={onSaveProfile}
           onUnsavedChangesChange={onUnsavedChangesChange}

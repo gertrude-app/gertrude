@@ -440,6 +440,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public saveExtendedSupervisionControls = (
+    input: P.SaveExtendedSupervisionControls.Input,
+  ): Promise<Result<P.SaveExtendedSupervisionControls.Output>> => {
+    return this.query<P.SaveExtendedSupervisionControls.Output>(
+      input,
+      `SaveExtendedSupervisionControls`,
+      `parent`,
+    );
+  };
+
   public saveMusicAlbumCuration = (
     input: P.SaveMusicAlbumCuration.Input,
   ): Promise<Result<P.SaveMusicAlbumCuration.Output>> => {

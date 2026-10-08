@@ -27,6 +27,7 @@ const meta = {
   args: { type: `text`, value: `school.edu`, setValue: () => undefined },
   argTypes: {
     type: { options: types, control: { type: `inline-radio` } },
+    size: { options: [`small`, `medium`], control: { type: `inline-radio` } },
     value: { control: `text` },
     label: { control: `text` },
     placeholder: { control: `text` },
@@ -90,6 +91,46 @@ export const TypeVariants: Story = {
           setValue={() => undefined}
         />
       </StorySection>
+    </StoryCanvas>
+  ),
+};
+
+export const Sizes: Story = {
+  parameters: galleryParameters,
+  render: () => (
+    <StoryCanvas innerClassName="max-w-4xl">
+      {([`medium`, `small`] as const).map((size) => (
+        <StorySection
+          key={size}
+          title={size === `small` ? `Small` : `Default`}
+          contentClassName="grid items-end gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          <StatefulInput
+            type="text"
+            size={size}
+            label="Website"
+            prefix="https://"
+            value="weather.com"
+            setValue={() => undefined}
+          />
+          <StatefulInput
+            type="number"
+            size={size}
+            label="Delay"
+            value="30"
+            suffix="days"
+            setValue={() => undefined}
+          />
+          <StatefulInput
+            type="text"
+            size={size}
+            label="Search action"
+            value="math"
+            setValue={() => undefined}
+            button={{ label: `Search`, icon: SearchIcon, onClick: inputAction }}
+          />
+        </StorySection>
+      ))}
     </StoryCanvas>
   ),
 };

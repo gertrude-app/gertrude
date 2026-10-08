@@ -18,6 +18,7 @@ import IosSettingsPage from './IosSettingsPage';
 import MusicCuration from '#/components/person-settings/MusicCuration';
 import {
   iosDeviceSettingsAllAppsConnected,
+  iosDeviceSettingsExtendedControls,
   iosDeviceSettingsMusicConnected,
   iosDeviceSettingsMusicTrial,
   iosDeviceSettingsMusicUnavailable,
@@ -439,6 +440,19 @@ export const IosExpandedSettings = {
       `Gertrude Blocker`,
       `Gertrude Podcasts`,
     ]);
+  },
+};
+
+export const IosExtendedSupervision = {
+  name: 'iPhone and iPad (extended supervision controls)',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <IosOverview
+      devices={[{ device: iphoneDevice, settings: iosDeviceSettingsExtendedControls }]}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSections(canvasElement, [`Gertrude Blocker`]);
   },
 };
 
