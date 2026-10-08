@@ -1,4 +1,4 @@
-import type { ExtendedSupervisionControls } from '@dash/types';
+import type { ExtendedSupervisionControls } from './account/shared';
 
 export type ExtControlsState = {
   allowItunes: boolean | null;
@@ -237,6 +237,14 @@ export function groupValues(
     }),
     {},
   );
+}
+
+export function clampSoftwareUpdateDelay(raw: string): number {
+  const parsed = parseInt(raw, 10);
+  if (Number.isNaN(parsed)) {
+    return SOFTWARE_UPDATE_DELAY_DEFAULT;
+  }
+  return Math.min(SOFTWARE_UPDATE_DELAY_MAX, Math.max(SOFTWARE_UPDATE_DELAY_MIN, parsed));
 }
 
 export function normalizeExtended(

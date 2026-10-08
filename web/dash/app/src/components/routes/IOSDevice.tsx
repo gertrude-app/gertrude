@@ -18,6 +18,11 @@ import {
 import { Button /* SelectMenu */ } from '@shared/components';
 // import { Result } from '@shared/pairql';
 // import { notNullish } from '@shared/ts-utils';
+import {
+  EMPTY_EXTENDED,
+  extendedControlsPayload,
+  normalizeExtended,
+} from '@shared/pairql/supervision';
 import isEqual from 'lodash.isequal';
 import React, { useReducer } from 'react';
 import { useParams } from 'react-router-dom';
@@ -27,11 +32,6 @@ import type { PodcastsStatus } from '@dash/components';
 import type { T } from '@shared/pairql/dashboard';
 import Current from '../../environment';
 import { Key, /*useConfirmableDelete, */ useMutation, useQuery } from '../../hooks';
-import {
-  EMPTY_EXTENDED,
-  extendedControlsPayload,
-  normalizeExtended,
-} from '../../lib/extendedRestrictions';
 import { podcastsSubscriptionRunway } from '../../podcastsSubscriptionRunway';
 import reducer from '../../reducers/ios-device-reducer';
 import ExtendedRestrictions from './ExtendedRestrictions';

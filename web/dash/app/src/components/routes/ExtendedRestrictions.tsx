@@ -1,23 +1,24 @@
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Toggle } from '@shared/components';
-import cx from 'classnames';
-import React from 'react';
-import type {
-  ExtControlsState,
-  RestrictionControl,
-  RestrictionGroup,
-} from '../../lib/extendedRestrictions';
-import type { Action } from '../../reducers/ios-device-reducer';
 import {
   EXTENDED_RESTRICTION_GROUPS,
   SOFTWARE_UPDATE_DELAY_DEFAULT,
   SOFTWARE_UPDATE_DELAY_MAX,
   SOFTWARE_UPDATE_DELAY_MIN,
+  clampSoftwareUpdateDelay,
   controlOffValues,
   controlOnValues,
   groupValues,
   isControlOn,
-} from '../../lib/extendedRestrictions';
+} from '@shared/pairql/supervision';
+import cx from 'classnames';
+import React from 'react';
+import type { Action } from '../../reducers/ios-device-reducer';
+import type {
+  ExtControlsState,
+  RestrictionControl,
+  RestrictionGroup,
+} from '@shared/pairql/supervision';
 
 interface Props {
   extended: ExtControlsState;
@@ -152,7 +153,9 @@ const ControlRow: React.FC<{
             onChange={(e) =>
               dispatch({
                 type: `setExtendedControls`,
-                values: { enforcedSoftwareUpdateDelay: clampDelay(e.target.value) },
+                values: {
+                  enforcedSoftwareUpdateDelay: clampSoftwareUpdateDelay(e.target.value),
+                },
               })
             }
             className="w-20 border border-slate-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-violet-300"
@@ -163,13 +166,5 @@ const ControlRow: React.FC<{
     </div>
   );
 };
-
-function clampDelay(raw: string): number {
-  const parsed = parseInt(raw, 10);
-  if (Number.isNaN(parsed)) {
-    return SOFTWARE_UPDATE_DELAY_DEFAULT;
-  }
-  return Math.min(SOFTWARE_UPDATE_DELAY_MAX, Math.max(SOFTWARE_UPDATE_DELAY_MIN, parsed));
-}
 
 export default ExtendedRestrictions;

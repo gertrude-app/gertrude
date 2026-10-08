@@ -9,6 +9,7 @@ type Props = {
   children?: React.ReactNode;
   warning?: string;
   showWarning?: boolean;
+  warningPosition?: `beforeContent` | `afterContent`;
 } & (
   | {
       type: `toggle`;
@@ -24,6 +25,14 @@ type Props = {
 const SettingsRow: React.FC<Props> = (props) => {
   const showWarning = !!(props.warning && props.showWarning);
   const contentVisible = props.type === `alwaysOn` || props.enabled;
+  const warningBanner = showWarning ? (
+    <HStack align="start" gap={3} className="p-3 bg-amber-200/30 rounded-b-md">
+      <InfoIcon className="h-4 w-4 text-amber-800 mt-0.5 shrink-0" />
+      <Text as="p" variant="warning">
+        {props.warning}
+      </Text>
+    </HStack>
+  ) : null;
 
   return (
     <VStack className="@lg/main:border-x border-y border-stone-200 @lg/main:rounded-md -mx-3 @lg/main:mx-0">
@@ -47,6 +56,7 @@ const SettingsRow: React.FC<Props> = (props) => {
             />
           )}
         </HStack>
+        {props.warningPosition === `beforeContent` && warningBanner}
         {props.children && (
           <div
             aria-hidden={!contentVisible}
@@ -60,14 +70,7 @@ const SettingsRow: React.FC<Props> = (props) => {
           </div>
         )}
       </VStack>
-      {showWarning && (
-        <HStack align="start" gap={3} className="p-3 bg-amber-200/30 rounded-b-md">
-          <InfoIcon className="h-4 w-4 text-amber-800 mt-0.5 shrink-0" />
-          <Text as="p" variant="warning">
-            {props.warning}
-          </Text>
-        </HStack>
-      )}
+      {props.warningPosition !== `beforeContent` && warningBanner}
     </VStack>
   );
 };
