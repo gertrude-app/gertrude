@@ -38,6 +38,7 @@ enum AuthedAccountRoute: PairRoute {
   case getIosDeviceSettings(GetIosDeviceSettings.Input)
   case updateIosDeviceBlockedGroups(UpdateIosDeviceBlockedGroups.Input)
   case updateIosDeviceProfileSettings(UpdateIosDeviceProfileSettings.Input)
+  case saveExtendedSupervisionControls(SaveExtendedSupervisionControls.Input)
   case requestPodcastsPinReset(RequestPodcastsPinReset.Input)
   case getMusicCuration(GetMusicCuration.Input)
   case getMusicAlbumCuration(GetMusicAlbumCuration.Input)
@@ -195,6 +196,10 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.updateIosDeviceProfileSettings)) {
       Operation(UpdateIosDeviceProfileSettings.self)
       Body(.accountInput(UpdateIosDeviceProfileSettings.self))
+    }
+    Route(.case(Self.saveExtendedSupervisionControls)) {
+      Operation(SaveExtendedSupervisionControls.self)
+      Body(.accountInput(SaveExtendedSupervisionControls.self))
     }
     Route(.case(Self.requestPodcastsPinReset)) {
       Operation(RequestPodcastsPinReset.self)
@@ -391,6 +396,12 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .updateIosDeviceProfileSettings(let input):
       let output = try await UpdateIosDeviceProfileSettings.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveExtendedSupervisionControls(let input):
+      let output = try await SaveExtendedSupervisionControls.resolve(
+        with: input,
+        in: context.legacyContext,
+      )
       return try await self.respond(with: output)
     case .requestPodcastsPinReset(let input):
       let output = try await RequestPodcastsPinReset.resolve(with: input, in: context)

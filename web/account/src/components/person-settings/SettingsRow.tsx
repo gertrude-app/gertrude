@@ -7,14 +7,17 @@ type Props = {
   title: string;
   description: string;
   children?: React.ReactNode;
+  badge?: React.ReactNode;
   warning?: string;
   showWarning?: boolean;
+  warningPosition?: `beforeContent` | `afterContent`;
 } & (
   | {
       type: `toggle`;
       enabled: boolean;
       disabled?: boolean;
       setEnabled: (enabled: boolean) => void;
+      toggleLabel?: string;
     }
   | {
       type: `alwaysOn`;
@@ -23,30 +26,45 @@ type Props = {
 
 const SettingsRow: React.FC<Props> = (props) => {
   const showWarning = !!(props.warning && props.showWarning);
+  const warningBeforeContent = props.warningPosition === `beforeContent`;
   const contentVisible = props.type === `alwaysOn` || props.enabled;
+  const warningBanner = showWarning ? (
+    <HStack align="start" gap={3} className="p-3 bg-amber-200/30">
+      <InfoIcon className="h-4 w-4 text-amber-800 mt-0.5 shrink-0" />
+      <Text as="p" variant="warning">
+        {props.warning}
+      </Text>
+    </HStack>
+  ) : null;
 
   return (
-    <VStack className="@lg/main:border-x border-y border-stone-200 @lg/main:rounded-md -mx-3 @lg/main:mx-0">
+    <VStack className="@lg/main:border-x border-y border-stone-200 @lg/main:rounded-md overflow-hidden -mx-3 @lg/main:mx-0">
       <VStack
         className={cx(
-          `bg-stone-50 rounded-t-md border-stone-200`,
-          showWarning ? `border-b` : `rounded-b-md`,
+          `bg-stone-50 border-stone-200`,
+          showWarning && !warningBeforeContent && `border-b`,
         )}
       >
         <HStack justify="between" className="p-3 pr-5" gap={5}>
-          <VStack>
+          <VStack className="flex-1 min-w-0">
             <Text variant="bodyStrong">{props.title}</Text>
             <Text variant="bodySubtle">{props.description}</Text>
           </VStack>
-          {props.type === `toggle` && (
-            <Toggle
-              checked={props.enabled}
-              setChecked={props.setEnabled}
-              disabled={props.disabled}
-              ariaLabel={props.title}
-            />
+          {(props.badge || props.type === `toggle`) && (
+            <HStack gap={2} className="shrink-0">
+              {props.badge}
+              {props.type === `toggle` && (
+                <Toggle
+                  checked={props.enabled}
+                  setChecked={props.setEnabled}
+                  disabled={props.disabled}
+                  ariaLabel={props.toggleLabel ?? props.title}
+                />
+              )}
+            </HStack>
           )}
         </HStack>
+        {warningBeforeContent && warningBanner}
         {props.children && (
           <div
             aria-hidden={!contentVisible}
@@ -60,14 +78,7 @@ const SettingsRow: React.FC<Props> = (props) => {
           </div>
         )}
       </VStack>
-      {showWarning && (
-        <HStack align="start" gap={3} className="p-3 bg-amber-200/30 rounded-b-md">
-          <InfoIcon className="h-4 w-4 text-amber-800 mt-0.5 shrink-0" />
-          <Text as="p" variant="warning">
-            {props.warning}
-          </Text>
-        </HStack>
-      )}
+      {!warningBeforeContent && warningBanner}
     </VStack>
   );
 };

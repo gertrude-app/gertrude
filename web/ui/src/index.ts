@@ -63,6 +63,7 @@ export type {
 } from './primitives/Divider';
 export { default as HStack } from './primitives/HStack';
 export type { HStackOwnProps, HStackProps } from './primitives/HStack';
+export { default as SelectionCircle } from './primitives/SelectionCircle';
 export { default as Spacer } from './primitives/Spacer';
 export type { SpacerOwnProps, SpacerProps } from './primitives/Spacer';
 export { default as Stack } from './primitives/Stack';

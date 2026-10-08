@@ -30,6 +30,7 @@ struct GetIosDeviceSettings: Pair {
     let enabledBlockGroupIds: [BlockerApp.BlockGroup.Id]
     let isSupervised: Bool
     let profileSettings: ProfileSettings
+    let extendedSupervisionControls: SaveExtendedSupervisionControls.Controls?
   }
 
   struct Podcasts: PairNestable {
@@ -120,7 +121,7 @@ extension GetIosDeviceSettings: Resolver {
     let settings = try await BlockerApp.ProfileSettings
       .ensure(for: device.id, in: context.db)
 
-    return Blocker(
+    return try await Blocker(
       allBlockGroups: allBlockGroups.map { .init(
         id: $0.id,
         name: $0.name,
@@ -135,6 +136,11 @@ extension GetIosDeviceSettings: Resolver {
         allowDeletingApps: settings.allowAppRemoval,
         allowFactoryReset: settings.allowEraseContentAndSettings,
         allowInstallingApps: settings.allowAppInstallation,
+      ),
+      extendedSupervisionControls: GetIOSDevice_v3.extendedControls(
+        settings: settings,
+        isSupervised: supervision?.supervised ?? false,
+        in: context.legacyContext,
       ),
     )
   }
