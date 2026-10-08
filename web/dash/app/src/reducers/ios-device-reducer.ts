@@ -1,8 +1,8 @@
+import { normalizeExtended } from '@shared/pairql/supervision';
 import { produce } from 'immer';
-import type { ExtControlsState } from '../lib/extendedRestrictions';
 import type { EditBlockRuleProps, EditEvent } from '@dash/block-rules';
 import type { AllowListBookmark, GetIOSDevice_v3, WebPolicy } from '@dash/types';
-import { normalizeExtended } from '../lib/extendedRestrictions';
+import type { ExtControlsState } from '@shared/pairql/supervision';
 
 export type State = {
   enabledBlockGroups: UUID[];

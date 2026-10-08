@@ -11,6 +11,7 @@ type Props = {
   value: string;
   setValue: (value: string) => void;
   label?: string;
+  ariaLabel?: string;
   placeholder?: string;
   prefix?: string;
   suffix?: string;
@@ -25,6 +26,7 @@ type Props = {
   required?: boolean;
   autoComplete?: string;
   min?: number;
+  max?: number;
   step?: number;
   helperText?: string;
   error?: string;
@@ -81,11 +83,13 @@ const Input: React.FC<Props> = ({ ...props }) => {
           placeholder={props.placeholder}
           type={props.type}
           min={props.min}
+          max={props.max}
           step={props.type === `time` ? 60 : props.step}
           value={props.value}
           disabled={props.disabled}
           required={props.required}
           autoComplete={props.autoComplete}
+          aria-label={props.ariaLabel}
           aria-invalid={props.error ? true : undefined}
           aria-describedby={descriptionId}
           onChange={(e) => props.setValue(e.target.value)}

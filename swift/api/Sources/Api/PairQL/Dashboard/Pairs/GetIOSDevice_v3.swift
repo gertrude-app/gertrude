@@ -99,34 +99,11 @@ extension GetIOSDevice_v3: Resolver {
     let supervision = try await device.supervision(in: ctx.db)
     let settings = try await BlockerApp.ProfileSettings.ensure(for: device.id, in: ctx.db)
     let isSupervised = supervision?.supervised ?? false
-    let billing = try await ctx.currentBillingAccount()
-    var extendedControls: SaveExtendedSupervisionControls.Controls?
-    if isSupervised, billing.can(.manageExtendedSupervisionControls) {
-      extendedControls = .init(
-        whitelistedAppBundleIds: settings.whitelistedAppBundleIds,
-        webAllowList: settings.webAllowList
-          .map { $0.map { .init(url: $0.url, title: $0.title) } },
-        allowItunes: settings.allowItunes,
-        allowMusicService: settings.allowMusicService,
-        allowRadioService: settings.allowRadioService,
-        allowNews: settings.allowNews,
-        allowBookstore: settings.allowBookstore,
-        allowExplicitContent: settings.allowExplicitContent,
-        ratingMovies: settings.ratingMovies,
-        ratingTvShows: settings.ratingTvShows,
-        allowSafari: settings.allowSafari,
-        allowSpotlightInternetResults: settings.allowSpotlightInternetResults,
-        allowDefinitionLookup: settings.allowDefinitionLookup,
-        allowAutomaticAppDownloads: settings.allowAutomaticAppDownloads,
-        allowAppClips: settings.allowAppClips,
-        allowSystemAppRemoval: settings.allowSystemAppRemoval,
-        allowAssistant: settings.allowAssistant,
-        allowGameCenter: settings.allowGameCenter,
-        forceDelayedSoftwareUpdates: settings.forceDelayedSoftwareUpdates,
-        enforcedSoftwareUpdateDelay: settings.enforcedSoftwareUpdateDelay,
-        forceAutomaticDateAndTime: settings.forceAutomaticDateAndTime,
-      )
-    }
+    let extendedControls = try await self.extendedControls(
+      settings: settings,
+      isSupervised: isSupervised,
+      in: ctx,
+    )
     return Output.Blocker(
       allBlockGroups: allBlockGroups.map {
         .init(
@@ -146,6 +123,41 @@ extension GetIOSDevice_v3: Resolver {
       allowEraseContentAndSettings: settings.allowEraseContentAndSettings,
       allowAppInstallation: settings.allowAppInstallation,
       extendedSupervisionControls: extendedControls,
+    )
+  }
+
+  static func extendedControls(
+    settings: BlockerApp.ProfileSettings,
+    isSupervised: Bool,
+    in ctx: ParentContext,
+  ) async throws -> SaveExtendedSupervisionControls.Controls? {
+    let billing = try await ctx.currentBillingAccount()
+    guard isSupervised, billing.can(.manageExtendedSupervisionControls) else {
+      return nil
+    }
+    return .init(
+      whitelistedAppBundleIds: settings.whitelistedAppBundleIds,
+      webAllowList: settings.webAllowList
+        .map { $0.map { .init(url: $0.url, title: $0.title) } },
+      allowItunes: settings.allowItunes,
+      allowMusicService: settings.allowMusicService,
+      allowRadioService: settings.allowRadioService,
+      allowNews: settings.allowNews,
+      allowBookstore: settings.allowBookstore,
+      allowExplicitContent: settings.allowExplicitContent,
+      ratingMovies: settings.ratingMovies,
+      ratingTvShows: settings.ratingTvShows,
+      allowSafari: settings.allowSafari,
+      allowSpotlightInternetResults: settings.allowSpotlightInternetResults,
+      allowDefinitionLookup: settings.allowDefinitionLookup,
+      allowAutomaticAppDownloads: settings.allowAutomaticAppDownloads,
+      allowAppClips: settings.allowAppClips,
+      allowSystemAppRemoval: settings.allowSystemAppRemoval,
+      allowAssistant: settings.allowAssistant,
+      allowGameCenter: settings.allowGameCenter,
+      forceDelayedSoftwareUpdates: settings.forceDelayedSoftwareUpdates,
+      enforcedSoftwareUpdateDelay: settings.enforcedSoftwareUpdateDelay,
+      forceAutomaticDateAndTime: settings.forceAutomaticDateAndTime,
     )
   }
 

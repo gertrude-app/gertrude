@@ -12,6 +12,11 @@ export interface AccountNotificationMethod {
   config: NotificationMethodConfig;
 }
 
+export interface AllowListBookmark {
+  url: string;
+  title: string;
+}
+
 export type AppScope =
   | { type: 'unrestricted' }
   | { type: 'webBrowsers' }
@@ -43,6 +48,30 @@ export type ChildComputerStatus =
   | { case: 'unfiltered' };
 
 export type ClientAuth = 'none' | 'child' | 'parent' | 'superAdmin';
+
+export interface ExtendedSupervisionControls {
+  whitelistedAppBundleIds?: string[];
+  webAllowList?: Array<{ url: string; title: string }>;
+  allowItunes?: boolean;
+  allowMusicService?: boolean;
+  allowRadioService?: boolean;
+  allowNews?: boolean;
+  allowBookstore?: boolean;
+  allowExplicitContent?: boolean;
+  ratingMovies?: number;
+  ratingTvShows?: number;
+  allowSafari?: boolean;
+  allowSpotlightInternetResults?: boolean;
+  allowDefinitionLookup?: boolean;
+  allowAutomaticAppDownloads?: boolean;
+  allowAppClips?: boolean;
+  allowSystemAppRemoval?: boolean;
+  allowAssistant?: boolean;
+  allowGameCenter?: boolean;
+  forceDelayedSoftwareUpdates?: boolean;
+  enforcedSoftwareUpdateDelay?: number;
+  forceAutomaticDateAndTime?: boolean;
+}
 
 export type MusicSubscriptionState =
   | { case: 'trial'; expiresAt: ISODateString }
