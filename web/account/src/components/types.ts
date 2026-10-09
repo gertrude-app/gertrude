@@ -123,6 +123,7 @@ export type KeychainDetail = Pick<
   `id` | `name` | `description` | `isPublic`
 > & {
   warning?: string;
+  assignedPeople: AssignablePerson[];
   keys: KeychainKey[];
   apps: Array<{
     name: string;

@@ -311,6 +311,83 @@ final class AuthedParentResolverTests: ApiTestCase, @unchecked Sendable {
     ])
   }
 
+  func testDeletingKeychainNotifiesAssignedPeople() async throws {
+    let child = try await self.child()
+    let keychain = try await self.db.create(Keychain(parentId: child.parent.id, name: "School"))
+    let secondChild = try await self.db.create(Child(parentId: child.parent.id, name: "Mabel"))
+    try await self.db.create([
+      ChildKeychain(childId: child.id, keychainId: keychain.id),
+      ChildKeychain(childId: secondChild.id, keychainId: keychain.id),
+    ])
+
+    let output = try await DeleteEntity_v2.resolve(
+      with: .init(id: keychain.id.rawValue, type: .keychain),
+      in: self.context(child.parent),
+    )
+
+    expect(output).toEqual(.success)
+    await expect(try Keychain.query().where(.id == keychain.id).exists(in: self.db)).toBeFalse()
+    expect(sent.websocketMessages).toHaveCount(2)
+    expect(sent.websocketMessages.contains(.init(.userUpdated, to: .user(child.id)))).toBeTrue()
+    expect(sent.websocketMessages.contains(.init(.userUpdated, to: .user(secondChild.id))))
+      .toBeTrue()
+  }
+
+  func testNotificationFailureDoesNotFailDeletionOrSkipOtherAssignedPeople() async throws {
+    let child = try await self.child()
+    let keychain = try await self.db.create(Keychain(parentId: child.parent.id, name: "School"))
+    let secondChild = try await self.db.create(Child(parentId: child.parent.id, name: "Mabel"))
+    try await self.db.create([
+      ChildKeychain(childId: child.id, keychainId: keychain.id),
+      ChildKeychain(childId: secondChild.id, keychainId: keychain.id),
+    ])
+    struct DeliveryError: Error {}
+
+    let output = try await withDependencies {
+      $0.websockets.sendEvent = {
+        self.sent.websocketMessages.append($0)
+        throw DeliveryError()
+      }
+    } operation: {
+      try await DeleteEntity_v2.resolve(
+        with: .init(id: keychain.id.rawValue, type: .keychain),
+        in: self.context(child.parent),
+      )
+    }
+
+    expect(output).toEqual(.success)
+    await expect(try Keychain.query().where(.id == keychain.id).exists(in: self.db)).toBeFalse()
+    expect(sent.websocketMessages).toHaveCount(2)
+    expect(sent.websocketMessages.contains(.init(.userUpdated, to: .user(child.id)))).toBeTrue()
+    expect(sent.websocketMessages.contains(.init(.userUpdated, to: .user(secondChild.id))))
+      .toBeTrue()
+  }
+
+  func testDeletingMissingOrForeignKeychainIsSuccessfulNoOp() async throws {
+    let parent = try await self.parent()
+    let otherChild = try await self.child()
+    let foreign = try await otherChild.parent.withKeychain { keychain, _ in
+      keychain.isPublic = false
+    }
+    let assignment = try await self.db.create(ChildKeychain(
+      childId: otherChild.id,
+      keychainId: foreign.keychain.id,
+    ))
+
+    for id in [foreign.keychain.id, Keychain.Id()] {
+      let output = try await DeleteEntity_v2.resolve(
+        with: .init(id: id.rawValue, type: .keychain),
+        in: self.context(parent),
+      )
+      expect(output).toEqual(.success)
+    }
+
+    await expect(try self.db.find(foreign.keychain.id).name).toEqual(foreign.keychain.name)
+    await expect(try self.db.find(foreign.key.id).key).toEqual(foreign.key.key)
+    await expect(try self.db.find(assignment.id).keychainId).toEqual(foreign.keychain.id)
+    expect(sent.websocketMessages).toBeEmpty()
+  }
+
   func testDeletingLastUserDeviceDeletesDevice() async throws {
     let child = try await self.childWithComputer()
     _ = try await DeleteEntity_v2.resolve(

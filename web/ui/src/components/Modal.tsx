@@ -102,6 +102,7 @@ const Modal: React.FC<ModalProps> = ({
                     {description && (
                       <Text
                         as={Dialog.Description}
+                        render={<div />}
                         variant="prose"
                         className="text-pretty"
                       >
@@ -113,7 +114,7 @@ const Modal: React.FC<ModalProps> = ({
                   <>
                     <Dialog.Title className="sr-only">{title}</Dialog.Title>
                     {description && (
-                      <Dialog.Description className="sr-only">
+                      <Dialog.Description className="sr-only" render={<div />}>
                         {description}
                       </Dialog.Description>
                     )}
@@ -178,17 +179,19 @@ const Modal: React.FC<ModalProps> = ({
                     {title}
                   </Text>
                   {description && (
-                    <Text as={Drawer.Description} variant="prose" className="text-pretty">
-                      {description}
-                    </Text>
+                    <Drawer.Description asChild>
+                      <Text as="div" variant="prose" className="text-pretty">
+                        {description}
+                      </Text>
+                    </Drawer.Description>
                   )}
                 </VStack>
               ) : (
                 <>
                   <Drawer.Title className="sr-only">{title}</Drawer.Title>
                   {description && (
-                    <Drawer.Description className="sr-only">
-                      {description}
+                    <Drawer.Description asChild>
+                      <div className="sr-only">{description}</div>
                     </Drawer.Description>
                   )}
                 </>

@@ -1,6 +1,6 @@
 import { Badge, Button, Card, HStack, Text, VStack, inflect } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
-import { ArrowRightIcon } from 'lucide-react';
+import { SettingsIcon } from 'lucide-react';
 import React from 'react';
 import type { Keychain } from '#/components/types';
 
@@ -54,10 +54,9 @@ const KeychainCard: React.FC<Props> = ({
               href={nameHref}
               variant="default"
               size="small"
-              icon={ArrowRightIcon}
-              iconPosition="right"
+              icon={SettingsIcon}
             >
-              View keys
+              Settings
             </Button>
           )}
         </HStack>

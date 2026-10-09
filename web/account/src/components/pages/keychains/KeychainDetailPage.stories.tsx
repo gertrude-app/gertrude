@@ -1,6 +1,7 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import type { KeychainDetail } from '#/components/types';
 import KeychainDetailPage from './KeychainDetailPage';
+import { people } from '#/components/storybook/fixtures';
 
 const keychain = {
   id: `school-keychain`,
@@ -8,6 +9,7 @@ const keychain = {
   description: `Websites and app connections used for classes, research, and creative work.`,
   warning: `This keychain allows searching for images within Google Docs. It is possible to find images that are mildly or moderately sexual or inappropriate in the image search. Please familiarize yourself with the image search and weigh the risk before using this keychain.`,
   isPublic: true,
+  assignedPeople: [],
   apps: [
     {
       name: `Minecraft`,
@@ -111,7 +113,11 @@ const keychain = {
   ],
 } satisfies KeychainDetail;
 
-const pageActions = {
+const pageProps = {
+  people,
+  onAssignmentChange: () => Promise.resolve(),
+  onSaveKeychain: () => Promise.resolve(),
+  onDeleteKeychain: () => Promise.resolve(),
   onSaveKey: () => Promise.resolve(),
   onDeleteKey: () => Promise.resolve(),
 };
@@ -128,10 +134,7 @@ export const Default = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <KeychainDetailPage
-        state={{ status: `success`, data: keychain }}
-        {...pageActions}
-      />
+      <KeychainDetailPage state={{ status: `success`, data: keychain }} {...pageProps} />
     </StoryScreen>
   ),
 };
@@ -149,10 +152,11 @@ export const Editable = {
             description: `Sites used for homework and class projects.`,
             warning: undefined,
             isPublic: false,
+            assignedPeople: people.slice(0, 2),
             keys: keychain.keys.slice(0, 4),
           },
         }}
-        {...pageActions}
+        {...pageProps}
       />
     </StoryScreen>
   ),
@@ -170,11 +174,12 @@ export const Empty = {
             name: `New keychain`,
             description: `Ready for keys when you need them.`,
             isPublic: false,
+            assignedPeople: [],
             keys: [],
             apps: keychain.apps,
           },
         }}
-        {...pageActions}
+        {...pageProps}
       />
     </StoryScreen>
   ),
@@ -184,7 +189,7 @@ export const Loading = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <KeychainDetailPage state={{ status: `loading` }} {...pageActions} />
+      <KeychainDetailPage state={{ status: `loading` }} {...pageProps} />
     </StoryScreen>
   ),
 };
@@ -199,7 +204,7 @@ export const Error = {
           message: `This keychain may have been deleted or belong to another account.`,
           onRetry: () => {},
         }}
-        {...pageActions}
+        {...pageProps}
       />
     </StoryScreen>
   ),

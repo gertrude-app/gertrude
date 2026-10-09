@@ -1,14 +1,18 @@
 import { Card, EmptyState, PageHeading, Skeleton, Text, VStack } from '@gertrude/ui';
-import { CircleAlertIcon, KeyIcon, RefreshCwIcon } from 'lucide-react';
+import { CircleAlertIcon, KeyIcon, PlusIcon, RefreshCwIcon } from 'lucide-react';
 import React from 'react';
+import type { KeychainMetadata } from '#/components/keychains/KeychainEditorModal';
 import type { KeychainsPageData, LoadableState } from '#/components/types';
 import KeychainAssignmentMenu from '#/components/keychains/KeychainAssignmentMenu';
 import KeychainCard from '#/components/keychains/KeychainCard';
+import KeychainEditorModal from '#/components/keychains/KeychainEditorModal';
 import CardContainer from '#/components/layout/CardContainer';
 import DashboardPage from '#/components/layout/DashboardPage';
 
 interface Props {
   state: LoadableState<KeychainsPageData>;
+  creatingKeychain?: boolean;
+  onCreateKeychain: (data: KeychainMetadata) => Promise<void>;
   onAssignmentChange: (
     keychainId: string,
     personId: string,
@@ -35,7 +39,9 @@ const KeychainsLoadingState: React.FC = () => (
   </div>
 );
 
-const KeychainsContent: React.FC<Props> = ({ state, onAssignmentChange }) => {
+const KeychainsContent: React.FC<
+  Pick<Props, `state` | `onAssignmentChange`> & { onCreate: () => void }
+> = ({ state, onAssignmentChange, onCreate }) => {
   if (state.status === `loading`) {
     return (
       <>
@@ -71,7 +77,14 @@ const KeychainsContent: React.FC<Props> = ({ state, onAssignmentChange }) => {
       <EmptyState
         icon={KeyIcon}
         title="No keychains yet"
-        description="No keychains have been created for this account."
+        description="Create a keychain, add keys, then assign it to the people who need it."
+        button={{
+          text: `Create keychain`,
+          type: `button`,
+          variant: `primary`,
+          icon: PlusIcon,
+          onClick: onCreate,
+        }}
         className="bg-white"
       />
     );
@@ -102,25 +115,55 @@ const KeychainsContent: React.FC<Props> = ({ state, onAssignmentChange }) => {
   );
 };
 
-const KeychainsPage: React.FC<Props> = (props) => (
-  <DashboardPage
-    heading={
-      <PageHeading
-        title="Keychains"
-        subtitle="Group allowed websites and apps, then choose who can use them."
-      />
-    }
-  >
-    <VStack gap={4}>
-      <Text variant="bodyMuted" className="max-w-3xl">
-        Each keychain holds related keys that unlock parts of the internet on protected
-        Macs.
-      </Text>
-      <CardContainer>
-        <KeychainsContent {...props} />
-      </CardContainer>
-    </VStack>
-  </DashboardPage>
-);
+const KeychainsPage: React.FC<Props> = ({
+  state,
+  creatingKeychain = false,
+  onCreateKeychain,
+  onAssignmentChange,
+}) => {
+  const [creating, setCreating] = React.useState(false);
+
+  return (
+    <>
+      <DashboardPage
+        heading={
+          <PageHeading
+            title="Keychains"
+            subtitle="Group allowed websites and apps, then choose who can use them."
+            buttons={[
+              {
+                text: `Create keychain`,
+                variant: `primary`,
+                icon: PlusIcon,
+                onClick: () => setCreating(true),
+              },
+            ]}
+          />
+        }
+      >
+        <VStack gap={4}>
+          <Text variant="bodyMuted" className="max-w-3xl">
+            Each keychain holds related keys that unlock parts of the internet on
+            protected Macs.
+          </Text>
+          <CardContainer>
+            <KeychainsContent
+              state={state}
+              onAssignmentChange={onAssignmentChange}
+              onCreate={() => setCreating(true)}
+            />
+          </CardContainer>
+        </VStack>
+      </DashboardPage>
+      {creating && (
+        <KeychainEditorModal
+          saving={creatingKeychain}
+          onClose={() => setCreating(false)}
+          onSave={onCreateKeychain}
+        />
+      )}
+    </>
+  );
+};
 
 export default KeychainsPage;
