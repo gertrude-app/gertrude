@@ -14,6 +14,7 @@ interface Props {
   setPassword: (password: string) => void;
   testimonials: Testimonial[];
   onSubmit: (event: React.FormEvent) => void;
+  loginHref?: string;
   submitting?: boolean;
   error?: string | null;
   sent?: boolean;
@@ -31,6 +32,7 @@ const SignupPage: React.FC<Props> = ({
   setPassword,
   testimonials,
   onSubmit,
+  loginHref = `/login`,
   submitting = false,
   error,
   sent = false,
@@ -158,7 +160,7 @@ const SignupPage: React.FC<Props> = ({
             </>
           )
         }
-        bottomLink={{ text: `Log in instead`, href: `/login` }}
+        bottomLink={{ text: `Log in instead`, href: loginHref }}
         bottomLinkExplanation="Already have an account?"
       />
     }

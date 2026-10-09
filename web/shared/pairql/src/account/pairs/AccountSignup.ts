@@ -6,6 +6,7 @@ export namespace AccountSignup {
     gclid?: string;
     abTestVariant?: string;
     referralCode?: string;
+    redirect?: string;
     turnstileToken?: string;
   }
 

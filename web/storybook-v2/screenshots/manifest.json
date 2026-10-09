@@ -792,6 +792,534 @@
     }
   },
   {
+    "id": "account-pages-connect-ios-app--add-someone-new",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--add-someone-new&viewMode=story",
+    "name": "Add someone new",
+    "path": "screenshots/mobile/account-pages-connect-ios-app--add-someone-new.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--add-someone-new",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--add-someone-new&viewMode=story",
+    "name": "Add someone new",
+    "path": "screenshots/desktop/account-pages-connect-ios-app--add-someone-new.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--choose-person",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--choose-person&viewMode=story",
+    "name": "Choose a person",
+    "path": "screenshots/mobile/account-pages-connect-ios-app--choose-person.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--choose-person",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--choose-person&viewMode=story",
+    "name": "Choose a person",
+    "path": "screenshots/desktop/account-pages-connect-ios-app--choose-person.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--claim-failed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--claim-failed&viewMode=story",
+    "name": "Claim failed",
+    "path": "screenshots/mobile/account-pages-connect-ios-app--claim-failed.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--claim-failed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--claim-failed&viewMode=story",
+    "name": "Claim failed",
+    "path": "screenshots/desktop/account-pages-connect-ios-app--claim-failed.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--self-managed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--self-managed&viewMode=story",
+    "name": "Yourself",
+    "path": "screenshots/mobile/account-pages-connect-ios-app--self-managed.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app--self-managed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app--self-managed&viewMode=story",
+    "name": "Yourself",
+    "path": "screenshots/desktop/account-pages-connect-ios-app--self-managed.png",
+    "title": "Account/Pages/Connect iOS App",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--blocker-connected",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--blocker-connected&viewMode=story",
+    "name": "Blocker connected",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-after-assignment--blocker-connected.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--blocker-connected",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--blocker-connected&viewMode=story",
+    "name": "Blocker connected",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-after-assignment--blocker-connected.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--ipad-connected",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--ipad-connected&viewMode=story",
+    "name": "iPad connected",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-after-assignment--ipad-connected.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--ipad-connected",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--ipad-connected&viewMode=story",
+    "name": "iPad connected",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-after-assignment--ipad-connected.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--music-unavailable",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--music-unavailable&viewMode=story",
+    "name": "Music unavailable",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-after-assignment--music-unavailable.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--music-unavailable",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--music-unavailable&viewMode=story",
+    "name": "Music unavailable",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-after-assignment--music-unavailable.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--podcasts-ending",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--podcasts-ending&viewMode=story",
+    "name": "Podcasts access ending",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-after-assignment--podcasts-ending.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--podcasts-ending",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--podcasts-ending&viewMode=story",
+    "name": "Podcasts access ending",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-after-assignment--podcasts-ending.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--podcasts-lapsed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--podcasts-lapsed&viewMode=story",
+    "name": "Podcasts trial ended",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-after-assignment--podcasts-lapsed.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-after-assignment--podcasts-lapsed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-after-assignment--podcasts-lapsed&viewMode=story",
+    "name": "Podcasts trial ended",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-after-assignment--podcasts-lapsed.png",
+    "title": "Account/Pages/Connect iOS App/After assignment",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--check-failed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--check-failed&viewMode=story",
+    "name": "Could not check code",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-code-and-recovery--check-failed.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--check-failed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--check-failed&viewMode=story",
+    "name": "Could not check code",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-code-and-recovery--check-failed.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--checking-code",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--checking-code&viewMode=story",
+    "name": "Checking code",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-code-and-recovery--checking-code.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--checking-code",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--checking-code&viewMode=story",
+    "name": "Checking code",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-code-and-recovery--checking-code.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--expired-code",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--expired-code&viewMode=story",
+    "name": "Code expired",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-code-and-recovery--expired-code.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--expired-code",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--expired-code&viewMode=story",
+    "name": "Code expired",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-code-and-recovery--expired-code.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--invalid-code",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--invalid-code&viewMode=story",
+    "name": "Code not found",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-code-and-recovery--invalid-code.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-code-and-recovery--invalid-code",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-code-and-recovery--invalid-code&viewMode=story",
+    "name": "Code not found",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-code-and-recovery--invalid-code.png",
+    "title": "Account/Pages/Connect iOS App/Code and recovery",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--checking-failed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--checking-failed&viewMode=story",
+    "name": "Checking failed",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--checking-failed.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--checking-failed",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--checking-failed&viewMode=story",
+    "name": "Checking failed",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--checking-failed.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--computer-required",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--computer-required&viewMode=story",
+    "name": "Computer required",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--computer-required.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--computer-required",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--computer-required&viewMode=story",
+    "name": "Computer required",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--computer-required.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--connect-by-usb",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--connect-by-usb&viewMode=story",
+    "name": "Connect by USB",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--connect-by-usb.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--connect-by-usb",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--connect-by-usb&viewMode=story",
+    "name": "Connect by USB",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--connect-by-usb.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--download-helper",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--download-helper&viewMode=story",
+    "name": "Download helper",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--download-helper.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--download-helper",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--download-helper&viewMode=story",
+    "name": "Download helper",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--download-helper.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--finish-on-device",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--finish-on-device&viewMode=story",
+    "name": "Finish on device",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--finish-on-device.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--finish-on-device",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--finish-on-device&viewMode=story",
+    "name": "Finish on device",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--finish-on-device.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--launch-helper",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--launch-helper&viewMode=story",
+    "name": "Open helper",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--launch-helper.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--launch-helper",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--launch-helper&viewMode=story",
+    "name": "Open helper",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--launch-helper.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--setup-complete",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--setup-complete&viewMode=story",
+    "name": "Setup complete",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--setup-complete.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--setup-complete",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--setup-complete&viewMode=story",
+    "name": "Setup complete",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--setup-complete.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--subscription-required",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-required&viewMode=story",
+    "name": "Subscription required",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--subscription-required.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--subscription-required",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-required&viewMode=story",
+    "name": "Subscription required",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--subscription-required.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--windows-download",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--windows-download&viewMode=story",
+    "name": "Windows download warning",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--windows-download.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--windows-download",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--windows-download&viewMode=story",
+    "name": "Windows download warning",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--windows-download.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-devices--default",
     "iframePath": "/iframe.html?id=account-pages-devices--default&viewMode=story",
     "name": "Default",
@@ -3072,6 +3600,30 @@
     }
   },
   {
+    "id": "account-pages-unauthed--email-already-verified",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--email-already-verified&viewMode=story",
+    "name": "Email Already Verified",
+    "path": "screenshots/mobile/account-pages-unauthed--email-already-verified.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--email-already-verified",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--email-already-verified&viewMode=story",
+    "name": "Email Already Verified",
+    "path": "screenshots/desktop/account-pages-unauthed--email-already-verified.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-unauthed--login",
     "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
     "name": "Login",
@@ -3088,6 +3640,30 @@
     "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
     "name": "Login",
     "path": "screenshots/desktop/account-pages-unauthed--login.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--login-error",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--login-error&viewMode=story",
+    "name": "Login Error",
+    "path": "screenshots/mobile/account-pages-unauthed--login-error.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--login-error",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--login-error&viewMode=story",
+    "name": "Login Error",
+    "path": "screenshots/desktop/account-pages-unauthed--login-error.png",
     "title": "Account/Pages/Unauthed",
     "viewport": {
       "width": 1440,
@@ -3136,6 +3712,102 @@
     "iframePath": "/iframe.html?id=account-pages-unauthed--signup&viewMode=story",
     "name": "Signup",
     "path": "screenshots/desktop/account-pages-unauthed--signup.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-email-sent",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-email-sent&viewMode=story",
+    "name": "Signup Email Sent",
+    "path": "screenshots/mobile/account-pages-unauthed--signup-email-sent.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-email-sent",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-email-sent&viewMode=story",
+    "name": "Signup Email Sent",
+    "path": "screenshots/desktop/account-pages-unauthed--signup-email-sent.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-error",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-error&viewMode=story",
+    "name": "Signup Error",
+    "path": "screenshots/mobile/account-pages-unauthed--signup-error.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-error",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-error&viewMode=story",
+    "name": "Signup Error",
+    "path": "screenshots/desktop/account-pages-unauthed--signup-error.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--verification-expired",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--verification-expired&viewMode=story",
+    "name": "Verification Expired",
+    "path": "screenshots/mobile/account-pages-unauthed--verification-expired.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--verification-expired",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--verification-expired&viewMode=story",
+    "name": "Verification Expired",
+    "path": "screenshots/desktop/account-pages-unauthed--verification-expired.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--verification-invalid",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--verification-invalid&viewMode=story",
+    "name": "Verification Invalid",
+    "path": "screenshots/mobile/account-pages-unauthed--verification-invalid.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--verification-invalid",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--verification-invalid&viewMode=story",
+    "name": "Verification Invalid",
+    "path": "screenshots/desktop/account-pages-unauthed--verification-invalid.png",
     "title": "Account/Pages/Unauthed",
     "viewport": {
       "width": 1440,

@@ -108,6 +108,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public claimAccountIOSDevice = (
+    input: P.ClaimAccountIOSDevice.Input,
+  ): Promise<Result<P.ClaimAccountIOSDevice.Output>> => {
+    return this.query<P.ClaimAccountIOSDevice.Output>(
+      input,
+      `ClaimAccountIOSDevice`,
+      `parent`,
+    );
+  };
+
   public confirmAccountNotificationMethod = (
     input: P.ConfirmAccountNotificationMethod.Input,
   ): Promise<Result<P.ConfirmAccountNotificationMethod.Output>> => {
@@ -206,6 +216,16 @@ export default class AccountClient extends Client<Auth> {
     input: P.GetAccountBilling.Input,
   ): Promise<Result<P.GetAccountBilling.Output>> => {
     return this.query<P.GetAccountBilling.Output>(input, `GetAccountBilling`, `parent`);
+  };
+
+  public getAccountIOSClaimData = (
+    input: P.GetAccountIOSClaimData.Input,
+  ): Promise<Result<P.GetAccountIOSClaimData.Output>> => {
+    return this.query<P.GetAccountIOSClaimData.Output>(
+      input,
+      `GetAccountIOSClaimData`,
+      `parent`,
+    );
   };
 
   public getAccountKeychain = (

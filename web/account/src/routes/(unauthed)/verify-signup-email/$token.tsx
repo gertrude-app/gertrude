@@ -3,6 +3,7 @@ import React from 'react';
 import VerifySignupEmailPage, {
   type VerificationState,
 } from '#/components/pages/unauthed/VerifySignupEmailPage';
+import { authRedirectForPath, postAuthLocation } from '#/lib/authRedirect';
 import { setAuth } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 
@@ -29,9 +30,12 @@ const VerifySignupEmailRoute: React.FC = () => {
     void request.current.result.then((result) => {
       if (!active) return;
       result.with({
-        success: ({ accountId, token: authToken }) => {
+        success: ({ accountId, token: authToken, redirect }) => {
           setAuth(accountId, authToken);
-          void navigate({ to: `/people`, replace: true });
+          void navigate({
+            ...postAuthLocation(redirect ? authRedirectForPath(redirect) : undefined),
+            replace: true,
+          });
         },
         error: (error) => {
           setState(

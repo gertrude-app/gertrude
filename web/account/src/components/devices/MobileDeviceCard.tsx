@@ -107,6 +107,7 @@ const MobileDeviceCard: React.FC<Props> = ({ device }) => (
           apps={device.connectedApps}
           personId={device.person.id}
           deviceId={device.id}
+          supervisionSetupPath={device.supervisionSetupPath}
         />
       </VStack>
     </Card.Footer>

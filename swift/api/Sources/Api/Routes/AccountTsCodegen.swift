@@ -55,6 +55,8 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       AccountResetPassword.self,
       GetPeople.self,
       GetDevices.self,
+      GetAccountIOSClaimData.self,
+      ClaimAccountIOSDevice.self,
       GetMacDevice.self,
       UpdateMacDevice.self,
       GetAccountSettings.self,

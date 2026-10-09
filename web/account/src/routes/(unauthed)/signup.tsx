@@ -4,6 +4,7 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import SignupPage from '#/components/pages/unauthed/SignupPage';
 import { testimonials } from '#/components/unauthed/testimonials';
+import { postAuthLocation, validateAuthRedirectSearch } from '#/lib/authRedirect';
 import { signupAttribution } from '#/lib/signup';
 import { isAuthed, setAuth } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
@@ -12,6 +13,7 @@ const sitekey = import.meta.env.DEV ? undefined : import.meta.env.VITE_TURNSTILE
 const missingSecurityConfig = !sitekey && !import.meta.env.DEV;
 
 const SignupRoute: React.FC = () => {
+  const { redirect: authRedirect } = Route.useSearch();
   const navigate = useNavigate();
   const [email, setEmail] = React.useState(``);
   const [password, setPassword] = React.useState(``);
@@ -65,6 +67,7 @@ const SignupRoute: React.FC = () => {
       password,
       ...attribution,
       turnstileToken: turnstileToken ?? undefined,
+      redirect: authRedirect,
     });
     setSubmitting(false);
     resetChallenge();
@@ -72,7 +75,7 @@ const SignupRoute: React.FC = () => {
       success: ({ account }) => {
         if (account) {
           setAuth(account.accountId, account.token);
-          void navigate({ to: `/people`, replace: true });
+          void navigate({ ...postAuthLocation(authRedirect), replace: true });
         } else {
           setEmail(email.trim());
           setSent(true);
@@ -99,6 +102,9 @@ const SignupRoute: React.FC = () => {
         setError(null);
       }}
       testimonials={testimonials}
+      loginHref={
+        authRedirect ? `/login?redirect=${encodeURIComponent(authRedirect)}` : `/login`
+      }
       submitting={submitting}
       sent={sent}
       error={
@@ -180,8 +186,9 @@ const SignupRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/(unauthed)/signup`)({
-  beforeLoad: () => {
-    if (isAuthed()) throw redirect({ to: `/people` });
+  validateSearch: validateAuthRedirectSearch,
+  beforeLoad: ({ search }) => {
+    if (isAuthed()) throw redirect(postAuthLocation(search.redirect));
   },
   component: SignupRoute,
 });

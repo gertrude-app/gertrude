@@ -48,6 +48,7 @@ const mobileDevices: DevicesPageData[`mobileDevices`] = [
     person: { id: `person-mabel`, name: `Mabel` },
     connectedApps: [`blocker`],
     supervisionStatus: `claimed`,
+    supervisionSetupPath: `/connect/blockerSupervise/123456`,
   },
   {
     id: `iphone-caleb`,
@@ -118,6 +119,7 @@ export const SupervisionStates = {
               id: `ipad-pending-claim`,
               person: { id: `person-caleb`, name: `Caleb` },
               supervisionStatus: `pendingClaim`,
+              supervisionSetupPath: undefined,
             },
           ],
         },
