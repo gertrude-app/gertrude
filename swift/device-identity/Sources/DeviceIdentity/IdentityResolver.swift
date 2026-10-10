@@ -4,6 +4,10 @@ import GertieApp
 import IOSAppsRoute
 import Security
 
+#if os(iOS)
+  import UIKit
+#endif
+
 @MainActor
 public final class IdentityResolver {
   @Dependency(\.uuid) private var uuid
@@ -181,11 +185,11 @@ public final class IdentityResolver {
     alreadyCleared: Bool = false,
   ) -> Outcome {
     self.deviceId = nil
-    if pending.kind == .sameDevice, !self.hooks.migrationPending() {
-      let identity = self.hooks.credentialDeviceId() ?? pending.oldDeviceId
-      return self.publish(identity, outcome: .adopted(identity))
-    }
     do {
+      if pending.kind == .sameDevice, try !self.hooks.migrationPending() {
+        let identity = self.hooks.credentialDeviceId() ?? pending.oldDeviceId
+        return self.publish(identity, outcome: .adopted(identity))
+      }
       self.hooks.publishIdentity(nil)
       if !alreadyCleared { try self.hooks.clearDeviceBoundState() }
       try self.hooks.markMigration()
@@ -200,9 +204,14 @@ public final class IdentityResolver {
     guard self.prepare(pending) != .deferred else { return .retry }
     var resolvedAsMigration = false
     defer {
-      if pending.kind == .sameDevice, !resolvedAsMigration, !self.hooks.migrationPending(),
-         case .value = self.readPending() {
-        _ = self.prepare(pending)
+      do {
+        if pending.kind == .sameDevice, !resolvedAsMigration,
+           case .value = self.readPending(), try !self.hooks.migrationPending() {
+          _ = self.prepare(pending)
+        }
+      } catch {
+        self.deviceId = nil
+        self.hooks.telemetry(.consumerFailure)
       }
     }
     let metadata = self.hooks.metadata()
@@ -317,6 +326,27 @@ public extension IdentityResolver {
     public var appVersion: String
     public var liveVendorId: UUID?
 
+    @MainActor
+    public static func live(
+      app: GertrudeIOSApp,
+      modelIdentifier: String,
+      appVersion: String,
+    ) -> Self {
+      let version = ProcessInfo.processInfo.operatingSystemVersion
+      #if os(iOS)
+        let liveVendorId = UIDevice.current.identifierForVendor
+      #else
+        let liveVendorId: UUID? = nil
+      #endif
+      return .init(
+        app: app,
+        modelIdentifier: modelIdentifier,
+        iosVersion: "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)",
+        appVersion: appVersion,
+        liveVendorId: liveVendorId,
+      )
+    }
+
     public init(
       app: GertrudeIOSApp,
       modelIdentifier: String,
@@ -338,7 +368,7 @@ public extension IdentityResolver {
     public var credentialDeviceId: () -> UUID?
     public var clearDeviceBoundState: () throws -> Void
     public var markMigration: () throws -> Void
-    public var migrationPending: () -> Bool
+    public var migrationPending: () throws -> Bool
     public var applyCredentials: (ReportIdentityTransition.Output) throws -> Void
     public var publishIdentity: (UUID?) -> Void
     public var report: @MainActor (ReportIdentityTransition.Input) async throws
@@ -351,7 +381,7 @@ public extension IdentityResolver {
       credentialDeviceId: @escaping () -> UUID?,
       clearDeviceBoundState: @escaping () throws -> Void,
       markMigration: @escaping () throws -> Void,
-      migrationPending: @escaping () -> Bool,
+      migrationPending: @escaping () throws -> Bool,
       applyCredentials: @escaping (ReportIdentityTransition.Output) throws -> Void,
       publishIdentity: @escaping (UUID?) -> Void,
       report: @escaping @MainActor (ReportIdentityTransition.Input) async throws

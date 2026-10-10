@@ -31,7 +31,10 @@ public struct AppStore {
 
   public init() {
     self.inner = Store(
-      initialState: .init(),
+      initialState: .init(
+        identityGeneration: 0,
+        identity: .init(available: false),
+      ),
       reducer: { AppFeature() },
     )
   }

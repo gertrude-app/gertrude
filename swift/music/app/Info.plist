@@ -26,6 +26,10 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>IdentityPrivateAccessGroup</key>
+    <string>$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>IdentitySharedAccessGroup</key>
+    <string>$(AppIdentifierPrefix)com.netrivet.gertrude.identity</string>
     <key>NSAppleMusicUsageDescription</key>
     <string>Gertrude Music needs access to Apple Music to play approved music.</string>
     <key>UIBackgroundModes</key>

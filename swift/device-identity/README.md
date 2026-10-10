@@ -1,7 +1,7 @@
 # DeviceIdentity
 
-Foreground device identity resolution shared by Blocker, Music, and Podcasts. Blocker
-now consumes the package; Music and Podcasts adoption remains pending. It depends on Apple
+Foreground device identity resolution shared by Blocker, Music, and Podcasts. Blocker and Music
+now consume the package; Podcasts adoption remains pending. It depends on Apple
 Security and client-side dependencies, so it stays separate from the server-safe `gertie` package.
 
 ## Consumer contract
@@ -52,7 +52,8 @@ The resolver takes these app-specific hooks:
   until the walkthrough finishes, even after the pending report is acknowledged. Throw
   if persistence fails. A sibling's `.resolvedAsMigration` response also invokes cleanup
   and this hook before acknowledgement writes.
-- `migrationPending`: read that durable marker. A pending same-device receipt can have
+- `migrationPending`: read that durable marker; throw if it cannot be read so resolution
+  defers without clearing device-bound state. A pending same-device receipt can have
   already received `.resolvedAsMigration`; this prevents an offline restart from
   publishing its identity before acknowledgement has completed.
 - `applyCredentials`: persist the returned child/token and its device ID together as one

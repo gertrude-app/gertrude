@@ -16,6 +16,8 @@ struct AppFeature: Sendable {
   struct State: Equatable {
     @Presents var crossPromo: CrossPromoFeature.State?
     var crossPromos = CrossPromos.Output(promos: [])
+    var identityGeneration: Int?
+    var identity = MusicIdentityClient.Resolution()
     var isAppActive = false
     var isIntentionalPlayNowPending = false
     var isNowPlayingPresented = false
@@ -46,6 +48,9 @@ struct AppFeature: Sendable {
   }
 
   enum Action: Equatable {
+    case identityReportRequested
+    case identityResolved(MusicIdentityClient.Resolution)
+    case identityRetryTapped
     case appBecameInactive
     case appDidLaunch
     case appEnteredForeground
@@ -114,10 +119,10 @@ struct AppFeature: Sendable {
   @Dependency(\.date.now) var now
   @Dependency(\.device) var device
   @Dependency(\.keychain) var keychain
+  @Dependency(\.musicIdentity) var musicIdentity
   @Dependency(\.playback) var playback
   @Dependency(\.playbackSessionCache) var playbackSessionCache
   @Dependency(\.reviewPromptStorage) var reviewPromptStorage
-  @Dependency(\.uuid) var uuid
 
   var body: some ReducerOf<Self> {
     Scope(\.killSwitch, action: \.killSwitch) {
@@ -153,11 +158,67 @@ struct AppFeature: Sendable {
         return .cancel(id: CancelID.reviewPromptDelay)
 
       case .appDidLaunch:
+        guard state.identity.available else { return .none }
         return .run { send in
           guard let crossPromos = try? await self.api.crossPromos(),
                 !crossPromos.promos.isEmpty else { return }
           await send(.crossPromosReceived(crossPromos))
         }
+
+      case .identityReportRequested:
+        return .run { send in
+          await send(.identityResolved(self.musicIdentity.report()))
+        }
+
+      case .identityRetryTapped:
+        return self.resolveIdentity()
+
+      case .identityResolved(let resolution):
+        let previous = state.identity
+        state.identity = resolution
+        var effects: [EffectOf<Self>] = []
+        if previous.deviceId != resolution.deviceId || previous.connection != resolution.connection
+          || previous.available != resolution.available {
+          state.identityGeneration = (state.identityGeneration ?? 0) + 1
+          state.setup.generation = state.identityGeneration
+          state.library.generation = state.identityGeneration
+          state.library.isPlaylistMutationInFlight = false
+          state.library.isRefreshingRemoteLibrary = false
+          state.library.playlistIDsBeforeCreate = nil
+          state.library.shouldPresentCreatedPlaylist = false
+          effects.append(.cancel(id: LibraryFeature.CancelID.playlistMutation))
+          effects.append(.cancel(id: MusicSetupFeature.CancelID.identityWork))
+          effects.append(.cancel(id: LibraryFeature.CancelID.approvedLibraryRefresh))
+        }
+        let lostConnection = resolution.available && previous.connection != nil
+          && previous.connection?.childId != resolution.connection?.childId
+        if (resolution.migrationPending && !previous.migrationPending)
+          || lostConnection {
+          effects.append(self.resetRuntimeState(&state))
+        }
+        state.setup.deviceId = resolution.deviceId
+        state.setup.generation = state.identityGeneration
+        state.setup.requiresMigrationSetup = resolution.migrationPending
+        if resolution.available, !previous.available || lostConnection
+          || (resolution.migrationPending && !previous.migrationPending) {
+          effects.append(.send(.setup(.onAppear)))
+          effects.append(.send(.appDidLaunch))
+        } else if resolution.available,
+                  previous.connection != resolution.connection || previous.deviceId != resolution
+                  .deviceId {
+          if state.setup.isReady {
+            effects.append(.send(.library(.refreshPulled)))
+          } else {
+            effects.append(.send(.setup(.onAppear)))
+          }
+        }
+        if resolution.available {
+          effects.append(self.scheduleReviewPromptIfEligible(state: &state))
+          if !state.isReviewPromptPending {
+            effects.append(self.presentCrossPromo(&state, for: .home))
+          }
+        }
+        return .merge(effects)
 
       case .appEnteredForeground:
         state.isAppActive = true
@@ -230,14 +291,15 @@ struct AppFeature: Sendable {
 
       #if DEBUG
         case .library(.debugResetOnboardingButtonTapped):
-          self.keychain.save(deviceId: self.uuid())
           return self.resetConnectionBoundState(&state)
       #endif
 
+      case .library(.response(let generation, .delegate(.connectionInvalid))):
+        guard generation == state.library.generation else { return .none }
+        return self.invalidateConnection(&state)
+
       case .library(.delegate(.connectionInvalid)):
-        guard self.keychain.loadConnection() != nil else { return .none }
-        log(.warn, .setup, "bc86178a")
-        return self.resetConnectionBoundState(&state)
+        return self.invalidateConnection(&state)
 
       case .library(.delegate(.addToQueue(let items))):
         state.pendingLibraryPlayNowOrigin = nil
@@ -539,37 +601,70 @@ struct AppFeature: Sendable {
     }
   }
 
+  private func resolveIdentity() -> EffectOf<Self> {
+    .run { send in
+      let resolution = await self.musicIdentity.resolve()
+      await send(.identityResolved(resolution))
+      if resolution.needsReport {
+        await send(.identityResolved(self.musicIdentity.report()))
+      }
+    }
+  }
+
+  private func invalidateConnection(_ state: inout State) -> EffectOf<Self> {
+    guard self.keychain.loadConnection() != nil else { return .none }
+    log(.warn, .setup, "bc86178a")
+    return self.resetConnectionBoundState(&state)
+  }
+
   private func resetConnectionBoundState(
     _ state: inout State,
   ) -> EffectOf<Self> {
     let childID = self.keychain.loadConnection()?.childId
-    let playbackPreferences = state.playback.preferences
     self.keychain.deleteConnection()
+    let reset = self.resetRuntimeState(&state)
+    return .merge(
+      reset,
+      state.identityGeneration == nil ? .none : .send(.setup(.onAppear)),
+      .run { _ in
+        guard let childID else { return }
+        await self.approvedMusicLibraryCache.delete(childId: childID)
+        await self.playbackSessionCache.delete(childId: childID)
+      },
+    )
+  }
+
+  private func resetRuntimeState(_ state: inout State) -> EffectOf<Self> {
+    let playbackPreferences = state.playback.preferences
     state.crossPromo = nil
     state.isIntentionalPlayNowPending = false
     state.isNowPlayingPresented = false
     state.isReviewPromptPending = false
-    state.library = .init()
+    state.library = .init(generation: state.identityGeneration)
     state.playback = .init(preferences: playbackPreferences)
     state.pendingLibraryPlayNowOrigin = nil
     state.reviewPrompt = nil
     state.search = .init()
-    state.setup = .init()
+    state.setup = .init(
+      generation: state.identityGeneration,
+      deviceId: state.identity.deviceId,
+      requiresMigrationSetup: state.identity.migrationPending,
+    )
     state.selectedTab = .library
     return .merge(
       .cancel(id: CancelID.albumResolution),
       .cancel(id: CancelID.reviewPromptDelay),
       .cancel(id: LibraryFeature.CancelID.approvedLibraryRefresh),
+      .cancel(id: LibraryFeature.CancelID.playlistMutation),
       .cancel(id: MusicSetupFeature.CancelID.musicAppStatusPolling),
+      .cancel(id: MusicSetupFeature.CancelID.identityWork),
+      .cancel(id: PlaybackFeature.CancelID.checkpointLoad),
       .cancel(id: PlaybackFeature.CancelID.checkpointSave),
       .cancel(id: PlaybackFeature.CancelID.playbackEvents),
       .cancel(id: PlaybackFeature.CancelID.playbackStart),
       .cancel(id: PlaybackFeature.CancelID.seek),
       .run { _ in
         await self.playback.stop()
-        guard let childID else { return }
-        await self.approvedMusicLibraryCache.delete(childId: childID)
-        await self.playbackSessionCache.delete(childId: childID)
       },
     )
   }

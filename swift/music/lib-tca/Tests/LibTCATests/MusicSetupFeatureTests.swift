@@ -384,25 +384,6 @@ struct MusicSetupFeatureTests {
   }
 }
 
-private final class KeychainStore: @unchecked Sendable {
-  private let lock = NSLock()
-  private var storage: [KeychainClient.Key: Data] = [:]
-  private var connectionSaves = 0
-
-  var connectionSaveCount: Int { self.lock.withLock { self.connectionSaves } }
-
-  var client: KeychainClient {
-    KeychainClient(
-      _load: { key in self.lock.withLock { self.storage[key] } },
-      _save: { key, data in self.lock.withLock {
-        self.storage[key] = data
-        if key == .connection { self.connectionSaves += 1 } // count connection re-saves
-      } },
-      delete: { key in self.lock.withLock { _ = self.storage.removeValue(forKey: key) } },
-    )
-  }
-}
-
 private actor MusicAppStatusProvider {
   var outputs: [GetMusicAppStatus_v3.Output]
 

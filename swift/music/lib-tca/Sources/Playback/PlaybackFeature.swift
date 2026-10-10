@@ -353,6 +353,7 @@ struct PlaybackFeature: Sendable {
   }
 
   enum CancelID: Hashable {
+    case checkpointLoad
     case checkpointSave
     case playbackEvents
     case playbackPreferencesSave
@@ -769,8 +770,11 @@ struct PlaybackFeature: Sendable {
         guard state.session == nil,
               !state.isRestoringCheckpoint else { return .none }
         return .run { send in
-          await send(.checkpointLoaded(try? self.playbackSessionCache.load()))
+          let checkpoint = try? await self.playbackSessionCache.load()
+          try Task.checkCancellation()
+          await send(.checkpointLoaded(checkpoint))
         }
+        .cancellable(id: CancelID.checkpointLoad, cancelInFlight: true)
 
       case .restorePlaybackPreferences:
         return .run { send in

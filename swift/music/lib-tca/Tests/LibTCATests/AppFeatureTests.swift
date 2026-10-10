@@ -477,7 +477,7 @@ struct AppFeatureTests {
   }
 
   @Test
-  func debugResetOnboardingRotatesDeviceConnectionAndRestartsSetup() async {
+  func debugResetOnboardingClearsConnectionAndRestartsSetup() async {
     let item = playbackItem("track-1")
     var state = AppFeature.State()
     state.isNowPlayingPresented = true

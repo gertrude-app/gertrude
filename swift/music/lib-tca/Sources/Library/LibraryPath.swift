@@ -11,6 +11,44 @@ extension LibraryPath.State: Equatable {}
 extension LibraryPath.Action: Equatable {}
 
 extension StackState<LibraryPath.State> {
+  var albumDetail: AlbumDetailFeature.State? {
+    get {
+      guard let id = self.ids.last else { return nil }
+      return self[id: id, case: \.album]
+    }
+    set {
+      if let id = self.ids.last,
+         self[id: id, case: \.album] != nil {
+        if let newValue {
+          self[id: id] = .album(newValue)
+        } else {
+          self.pop(from: id)
+        }
+      } else if let newValue {
+        self.append(.album(newValue))
+      }
+    }
+  }
+
+  var playlistDetail: PlaylistDetailFeature.State? {
+    get {
+      guard let id = self.ids.last else { return nil }
+      return self[id: id, case: \.playlist]
+    }
+    set {
+      if let id = self.ids.last,
+         self[id: id, case: \.playlist] != nil {
+        if let newValue {
+          self[id: id] = .playlist(newValue)
+        } else {
+          self.pop(from: id)
+        }
+      } else if let newValue {
+        self.append(.playlist(newValue))
+      }
+    }
+  }
+
   mutating func reconcile(with library: ApprovedMusicLibrary) {
     for id in Array(self.ids) {
       switch self[id: id] {

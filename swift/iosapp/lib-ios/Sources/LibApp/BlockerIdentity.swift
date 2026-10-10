@@ -8,10 +8,6 @@ import LibClients
 import LibCore
 import PairQLClient
 
-#if os(iOS)
-  import UIKit
-#endif
-
 @DependencyClient
 public struct BlockerIdentityClient: Sendable {
   public var resolve: @MainActor @Sendable () -> Resolution = { .init() }
@@ -90,12 +86,10 @@ public final class BlockerIdentity {
       hooks: .init(
         metadata: metadata ?? {
           @Dependency(\.device) var device
-          return .init(
+          return .live(
             app: .blocker,
             modelIdentifier: device.modelIdentifier(),
-            iosVersion: Self.osVersion,
             appVersion: device.installedVersion(),
-            liveVendorId: Self.liveVendorId,
           )
         },
         proofToken: { sharedStorage.loadAccountConnection()?.token },
@@ -159,19 +153,6 @@ public final class BlockerIdentity {
       migrationPending: self.storage.migrationPending(),
       needsReport: needsReport,
     )
-  }
-
-  private static var osVersion: String {
-    let version = ProcessInfo.processInfo.operatingSystemVersion
-    return "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
-  }
-
-  private static var liveVendorId: UUID? {
-    #if os(iOS)
-      UIDevice.current.identifierForVendor
-    #else
-      nil
-    #endif
   }
 
   private static func log(_ event: IdentityResolver.Event) {

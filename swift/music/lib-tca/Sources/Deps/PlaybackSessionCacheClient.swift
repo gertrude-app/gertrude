@@ -50,21 +50,23 @@ extension PlaybackSessionCacheClient {
     let storage = PlaybackCheckpointStorage(directory: directory)
     return Self(
       _delete: {
-        @Dependency(\.keychain) var keychain
-        guard let childId = keychain.loadConnection()?.childId else { return }
+        @Dependency(\.musicIdentity) var identity
+        guard let childId = try? await identity.connection()?.childId else { return }
         await storage.delete(childId: childId)
       },
       _deleteForChild: { childId in
         await storage.delete(childId: childId)
       },
       _load: {
-        @Dependency(\.keychain) var keychain
-        guard let childId = keychain.loadConnection()?.childId else { return nil }
-        return try await storage.load(childId: childId)
+        @Dependency(\.musicIdentity) var identity
+        guard let connection = try await identity.connection() else { return nil }
+        let checkpoint = try await storage.load(childId: connection.childId)
+        try await identity.validate(connection)
+        return checkpoint
       },
       _save: { checkpoint in
-        @Dependency(\.keychain) var keychain
-        guard let childId = keychain.loadConnection()?.childId else { return }
+        @Dependency(\.musicIdentity) var identity
+        guard let childId = try? await identity.connection()?.childId else { return }
         try Task.checkCancellation()
         try await storage.save(checkpoint, childId: childId)
       },

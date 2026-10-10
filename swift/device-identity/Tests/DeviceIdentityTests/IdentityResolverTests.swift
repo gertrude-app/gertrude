@@ -8,6 +8,38 @@ import Testing
 
 @MainActor
 struct IdentityResolverTests {
+  @Test(arguments: [true, false])
+  func unreadableMigrationMarkerDefersWithoutClearingState(duringReport: Bool) async {
+    let h = IdentityHarness(a: newId, b: newId, c: oldId)
+    let resolver = h.resolver()
+    _ = resolver.resolveOnForeground()
+    let receipt = h.data[.pendingTransition]
+    if duringReport {
+      h.transport = { _ in
+        h.markerReadFails = true
+        throw IdentityHarness.Failure.network
+      }
+    } else {
+      h.markerReadFails = true
+    }
+
+    _ = await resolver.reportPendingTransition()
+
+    expectNoDifference(resolver.deviceId, nil)
+    expectNoDifference(h.connection, proofId)
+    expectNoDifference(h.mirror, oldId)
+    expectNoDifference(h.data[.pendingTransition], receipt)
+    expectNoDifference(h.actions.contains("clear"), false)
+    expectNoDifference(h.migrationRequired, false)
+    expectNoDifference(h.requests.count, duringReport ? 1 : 0)
+
+    h.markerReadFails = false
+    h.transport = nil
+    _ = await resolver.reportPendingTransition()
+    expectNoDifference(resolver.deviceId, newId)
+    expectNoDifference(h.data[.pendingTransition], nil)
+  }
+
   @Test func firstLaunchPromotesLegacyIdInsteadOfLiveVendorId() async {
     let h = IdentityHarness(c: oldId)
     let resolver = h.resolver()

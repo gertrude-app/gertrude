@@ -7,7 +7,9 @@
     "gertie",
     "gertie-tca-features",
     "pairql",
-    "pairql-music"
+    "pairql-music",
+    "device-identity",
+    "pairql-ios-apps"
   ],
   "targets": {
     "build": {

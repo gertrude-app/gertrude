@@ -21,6 +21,7 @@ final class IdentityHarness {
   var clearFails = false
   var credentialsFail = false
   var credentialsFailAfterSave = false
+  var markerReadFails = false
   var markerFails = false
   var reportFails = false
   var proof: UUID? = proofId
@@ -104,7 +105,10 @@ final class IdentityHarness {
           if self.markerFails { throw Failure.consumer }
           self.migrationRequired = true
         },
-        migrationPending: { self.migrationRequired },
+        migrationPending: {
+          if self.markerReadFails { throw Failure.consumer }
+          return self.migrationRequired
+        },
         applyCredentials: { output in
           self.actions.append("credentials")
           if self.credentialsFail { throw Failure.consumer }
