@@ -96,7 +96,7 @@ public struct InfoFeature {
         }
 
       case .syncProfileTapped:
-        let deviceId = state.connection?.deviceId ?? state.deviceId ?? .init(6)
+        guard let deviceId = state.deviceId else { return .none }
         state.subScreen = .syncingProfile(.profileDownload(deviceId: deviceId))
         return .none
 

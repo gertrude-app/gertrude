@@ -103,6 +103,7 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
 
     await store.receive(.programmatic(.setFirstLaunch(.reference))) {
       $0.onboarding.firstLaunch = .reference
@@ -387,6 +388,7 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
 
     await store.receive(.programmatic(.setFirstLaunch(.reference))) {
       $0.onboarding.firstLaunch = .reference
@@ -443,6 +445,7 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
 
     await store.receive(.programmatic(.setFirstLaunch(.reference))) {
       $0.onboarding.firstLaunch = .reference
@@ -512,6 +515,7 @@ final class IOSReducerTests: XCTestCase {
 
     store.exhaustivity = .off
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
 
     expect(savedProtectionModes.value)
       .toEqual([.onboarding(BlockRule.Legacy.defaults.map(\.current))])
@@ -633,6 +637,7 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -673,6 +678,7 @@ final class IOSReducerTests: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
 
     await store.receive(.programmatic(.setFirstLaunch(.reference))) {
       $0.onboarding.firstLaunch = .reference
@@ -805,14 +811,15 @@ final class IOSReducerTests: XCTestCase {
       IOSReducer()
     } withDependencies: {
       $0.sharedStorage.loadAccountConnection = { @Sendable in nil }
-      $0.keychain._load = { @Sendable _ in vendorId.uuidString.data(using: .utf8) }
+      $0.device.deviceId = { vendorId }
       $0.sharedStorage.loadProtectionMode = { @Sendable in
         .normal([.urlContains(value: "test")])
       }
       $0.sharedStorage.loadDisabledBlockGroupIds = { @Sendable in [UUID()] }
     }
 
-    await store.send(.interactive(.infoBtnTapped)) {
+    await store.send(.interactive(.infoBtnTapped))
+    await store.receive(.programmatic(.showInfo(vendorId))) {
       $0.destination = .info(InfoFeature.State(
         connection: nil,
         deviceId: vendorId,

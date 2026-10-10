@@ -182,11 +182,8 @@ public final class IdentityResolver {
   ) -> Outcome {
     self.deviceId = nil
     if pending.kind == .sameDevice, !self.hooks.migrationPending() {
-      if let identity = self.storage.readId(.identity).value,
-         self.storage.readId(.canary).value == identity {
-        return self.publish(identity, outcome: .adopted(identity))
-      }
-      return .retry
+      let identity = self.hooks.credentialDeviceId() ?? pending.oldDeviceId
+      return self.publish(identity, outcome: .adopted(identity))
     }
     do {
       self.hooks.publishIdentity(nil)
@@ -338,6 +335,7 @@ public extension IdentityResolver {
   struct Hooks {
     public var metadata: () -> Metadata
     public var proofToken: () -> UUID?
+    public var credentialDeviceId: () -> UUID?
     public var clearDeviceBoundState: () throws -> Void
     public var markMigration: () throws -> Void
     public var migrationPending: () -> Bool
@@ -350,6 +348,7 @@ public extension IdentityResolver {
     public init(
       metadata: @escaping () -> Metadata,
       proofToken: @escaping () -> UUID?,
+      credentialDeviceId: @escaping () -> UUID?,
       clearDeviceBoundState: @escaping () throws -> Void,
       markMigration: @escaping () throws -> Void,
       migrationPending: @escaping () -> Bool,
@@ -361,6 +360,7 @@ public extension IdentityResolver {
     ) {
       self.metadata = metadata
       self.proofToken = proofToken
+      self.credentialDeviceId = credentialDeviceId
       self.clearDeviceBoundState = clearDeviceBoundState
       self.markMigration = markMigration
       self.migrationPending = migrationPending

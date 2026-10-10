@@ -50,6 +50,25 @@ public struct AppView: View {
         switch self.store.screen {
         case .launching: EmptyView()
 
+        case .identityUnavailable(let migrationPending):
+          GertieActionScreen(
+            message: migrationPending
+              ? "New device detected. Gertrude needs to finish preparing this device before you can set up protection. Connect to the internet and try again."
+              : "Gertrude couldn’t finish preparing this device. Please try again.",
+            action: self.action(text: "Try again", .primary, behavior: .immediate),
+            accessibilityIdentifier: "onboarding-screen-identity-unavailable",
+          )
+
+        case .onboarding(.migratedHardware):
+          GertieActionScreen(
+            message: "New device detected. Apple’s supervision doesn’t transfer from your old device. Let’s set up protection on this one.",
+            actions: [
+              self.action(text: "Set up supervision", .primary),
+              self.action(text: "Use Screen Time for a child under 18", .secondary),
+            ],
+            accessibilityIdentifier: "onboarding-screen-migrated-hardware",
+          )
+
         case .onboarding(.happyPath(.hiThere)):
           GertieWelcomeScreen(
             greeting: "Hi there!",

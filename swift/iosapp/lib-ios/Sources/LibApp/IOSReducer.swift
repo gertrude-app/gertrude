@@ -23,7 +23,7 @@ public struct IOSReducer: Sendable {
     @Dependency(\.date.now) var now
     @Dependency(\.locale) var locale
     @Dependency(\.mainQueue) var mainQueue
-    @Dependency(\.keychain) var keychain
+    @Dependency(\.blockerIdentity) var identity
   }
 
   static let appStoreID = GertrudeIOSApp.blocker.appStoreAppleId
@@ -92,15 +92,10 @@ public struct IOSReducer: Sendable {
       return .none
 
     case .infoBtnTapped:
-      state.destination = .info(.init(
-        connection: self.deps.sharedStorage.loadAccountConnection(),
+      return .run { [deps = self.deps] send in
         // TODO: should async call device.deviceId() instead
-        deviceId: self.deps.keychain.loadVendorId(),
-        numRules: self.deps.sharedStorage.loadProtectionMode()?.rules?.count ?? 0,
-        numDisabledBlockGroups: self.deps.sharedStorage.loadDisabledBlockGroupIds()?.count ?? 0,
-        numTotalBlockGroups: state.allBlockGroups.isEmpty ? 9 : state.allBlockGroups.count,
-      ))
-      return .none
+        await send(.programmatic(.showInfo(deps.device.deviceId())))
+      }
 
     #if DEBUG
       case .receivedShake where state.screen == .onboarding(.happyPath(.hiThere)):
@@ -159,6 +154,17 @@ public struct IOSReducer: Sendable {
     action: Action.Interactive,
   ) -> EffectOf<IOSReducer> {
     switch (state.screen, btn) {
+    case (.identityUnavailable, .primary):
+      return self.resolveIdentity(launching: true)
+
+    case (.onboarding(.migratedHardware), .primary):
+      state.screen = .onboarding(.supervision(.setup(.explainSupervision)))
+      return .none
+
+    case (.onboarding(.migratedHardware), .secondary):
+      state.screen = .onboarding(.happyPath(.confirmParentIsOnboarding))
+      return .none
+
     case (.onboarding(.happyPath(.hiThere)), .primary):
       self.deps.log(state.screen, action, "6f97eb1b")
       state.screen = .onboarding(.happyPath(.timeExpectation))
@@ -588,7 +594,12 @@ public struct IOSReducer: Sendable {
     case (.onboarding(.supervision(.resume(.explainProfileDownload))), .primary):
       self.deps.log(state.screen, action, "0cc9747d")
       return .run { [deps = self.deps] send in
-        let deviceId = deps.sharedStorage.loadAccountConnection()?.deviceId ?? .init(6)
+        guard let deviceId = await deps.device.deviceId() else {
+          await send(.programmatic(.setScreen(.identityUnavailable(
+            migrationPending: deps.sharedStorage.migrationPending(),
+          ))))
+          return
+        }
         let profileUrl = URL.profileDownload(deviceId: deviceId)
         await send(.programmatic(.setScreen(.onboarding(
           .supervision(.resume(.installingProfile(profileUrl: profileUrl))),
@@ -789,149 +800,60 @@ public struct IOSReducer: Sendable {
   func programmatic(state: inout State, action: Action.Programmatic) -> EffectOf<IOSReducer> {
     switch action {
     case .appDidLaunch:
-      return .merge(
-        // detect current state and set screen
-        .run { [deps = self.deps] send in
-          // controller proxy also tries to migrate, but we do it here as safeguard
-          if await deps.sharedStorage.migrateLegacyData() {
-            deps.log("migration performed by app", "5258e97c")
-          }
+      return self.resolveIdentity(launching: true)
 
-          switch await deps.launchState() {
+    case .identityResolved(let result, let launching):
+      if result.needsReport { state.destination = nil }
+      let startup: EffectOf<IOSReducer>
+      if !result.available {
+        state.destination = nil
+        state.onboarding.clearCache = nil
+        state.onboarding.connect = nil
+        state.onboarding.crossPromo = nil
+        state.screen = .identityUnavailable(migrationPending: result.migrationPending)
+        startup = .cancel(id: CancelId.launch)
+      } else if launching || state.screen.isIdentityUnavailable
+        || (result.migrationPending && state.screen.isRunning) {
+        startup = self.launch()
+      } else {
+        if state.screen == .onboarding(.supervision(.resume(.explainProfileInstall()))) {
+          state
+            .screen =
+            .onboarding(.supervision(.resume(.explainProfileInstall(regainedFocus: true))))
+        }
+        startup = self.presentHomeCrossPromo(&state)
+      }
+      guard result.needsReport else { return startup }
+      return .merge(startup, .run { [deps = self.deps] send in
+        let reported = await deps.identity.report()
+        await send(.programmatic(.identityReported(
+          reported,
+          restart: !result.available || reported.identityChanged
+            || (!result.migrationPending && reported.migrationPending),
+        )))
+      })
 
-          case .running(.unconnected):
-            await send(.programmatic(.setScreen(.running(state: .notConnected))))
+    case .identityReported(let result, let restart):
+      if !result.available {
+        state.destination = nil
+        state.onboarding = .init()
+        state.screen = .identityUnavailable(migrationPending: result.migrationPending)
+        return .cancel(id: CancelId.launch)
+      }
+      guard restart else { return .none }
+      state.destination = nil
+      state.onboarding = .init()
+      return self.launch()
 
-          case .running(.connected(let conn)):
-            await send(.programmatic(.setScreen(.running(state: .connected))))
-            await deps.receiveAccountConnection(conn)
-            deps.sharedStorage.clearPendingSupervisionCode()
-
-          case .onboardingNeeded:
-            deps.log("onboarding needed on launch", "7a539f70")
-            await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
-
-          case .gertrudeSupervisionReboot(.codeNotClaimed(let code)):
-            deps.log("supervision reboot code not claimed", "e9b86e6b")
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.codeNotClaimed(code: code))))),
-            ))
-
-          case .gertrudeSupervisionReboot(.requiresSubscription(let conn)):
-            deps.log("supervision reboot requires subscription", "a7d41f0e")
-            await deps.receiveAccountConnection(conn)
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.requiresSubscription)))),
-            ))
-
-          case .gertrudeSupervisionReboot(.codeClaimedNotSupervised(let conn)):
-            deps.log("supervision reboot code claimed not supervised", "80580cd5")
-            await deps.receiveAccountConnection(conn)
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised)))),
-            ))
-
-          case .gertrudeSupervisionReboot(.codeExpired), .gertrudeSupervisionReboot(.codeNotFound):
-            deps.log("supervision reboot code expired/not found", "0b15e23f")
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.codeExpired)))),
-            ))
-
-          case .gertrudeSupervisionReboot(.supervisedButNeedsProfile(let conn)):
-            deps.log("supervision reboot supervised but needs profile", "05a47c3a")
-            await deps.receiveAccountConnection(conn)
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
-            ))
-
-          case .gertrudeSupervisionReboot(.serverClientDisagreement(let conn)):
-            deps.log("server/client supervision state disagreement", "94991de7")
-            await deps.receiveAccountConnection(conn)
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
-            ))
-
-          case .configuratorSupervisionFirstLaunch:
-            deps.log("configurator supervision success first launch", "bad8adcc")
-            await send(.programmatic(.setScreen(.supervisionSuccessFirstLaunch)))
-
-          case .profileRemovedRecovery(let conn):
-            deps.log("profile removed recovery for supervised user", "4f22bd20")
-            await deps.receiveAccountConnection(conn)
-            await send(.programmatic(.setProfileRecovery))
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.profileRemovedRecovery)))),
-            ))
-
-          case .filterNoLongerRunning:
-            // NB: if they remove the filter via Settings then launch app, we'll get here
-            deps.log("non-running filter w/ stored groups", "23c207e2")
-            await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
-
-          case .gertrudeSupervisionReboot(.networkError):
-            deps.log("supervision reboot network error after retries", "b7f3a2d1")
-            await send(.programmatic(
-              .setScreen(.onboarding(.supervision(.resume(.networkError)))),
-            ))
-          }
-          if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
-            await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
-          }
-          if let ids = deps.sharedStorage.loadDisabledBlockGroupIds() {
-            await send(.programmatic(.receivedDisabledBlockGroupIds(ids)))
-          }
-          if let groups = deps.sharedStorage.loadAllBlockGroups() {
-            await send(.programmatic(.receivedAllBlockGroups(groups)))
-          } else if let deviceId = await deps.device.deviceId(),
-                    let groups = try? await deps.api.fetchAllBlockGroups(deviceId),
-                    !groups.isEmpty {
-            deps.sharedStorage.saveAllBlockGroups(groups)
-            await send(.programmatic(.receivedAllBlockGroups(groups)))
-          }
-        },
-        // handle first launch
-        .run { [deps = self.deps] send in
-          if let firstLaunch = deps.sharedStorage.loadFirstLaunchDate() {
-            await send(.programmatic(.setFirstLaunch(firstLaunch)))
-          } else {
-            let now = deps.now
-            deps.sharedStorage.saveFirstLaunchDate(now)
-            await send(.programmatic(.setFirstLaunch(now)))
-            let deviceId = await deps.device.deviceId()
-            // prefetch the default block groups for onboarding
-            let defaultRules = try? await deps.api.fetchDefaultBlockRules(deviceId)
-            if let defaultRules, !defaultRules.isEmpty {
-              deps.sharedStorage.saveProtectionMode(.onboarding(defaultRules))
-            } else {
-              deps.sharedStorage
-                .saveProtectionMode(.onboarding(BlockRule.Legacy.defaults.map(\.current)))
-            }
-            // prefetch block group catalog so it's ready when user reaches opt-out screen
-            if let deviceId,
-               let groups = try? await deps.api.fetchAllBlockGroups(deviceId),
-               !groups.isEmpty {
-              deps.sharedStorage.saveAllBlockGroups(groups)
-              await send(.programmatic(.receivedAllBlockGroups(groups)))
-            }
-            log(
-              .info,
-              .onboarding,
-              "8d35f043",
-              detail: "first launch, region: `\(deps.locale.region?.identifier ?? "(nil)")`",
-            )
-          }
-        },
-        // safeguard in case app crashed trying to fill the disk
-        .run { [deps = self.deps] send in
-          await deps.device.deleteCacheFillDir()
-        },
-        // fetch cross-promo campaigns for later presentation
-        .run { [deps = self.deps] send in
-          if let output = try? await deps.api.crossPromos(), !output.promos.isEmpty {
-            await send(.programmatic(.receivedCrossPromos(output)))
-          }
-        },
-      )
+    case .showInfo(let deviceId):
+      state.destination = .info(.init(
+        connection: self.deps.sharedStorage.loadAccountConnection(),
+        deviceId: deviceId,
+        numRules: self.deps.sharedStorage.loadProtectionMode()?.rules?.count ?? 0,
+        numDisabledBlockGroups: self.deps.sharedStorage.loadDisabledBlockGroupIds()?.count ?? 0,
+        numTotalBlockGroups: state.allBlockGroups.isEmpty ? 9 : state.allBlockGroups.count,
+      ))
+      return .none
 
     case .receivedCrossPromos(let output):
       let dropped = output.promos.filter { !$0.hasGuaranteedExit }
@@ -1062,13 +984,8 @@ public struct IOSReducer: Sendable {
       state.screen = .onboarding(.supervision(.resume(.verifyingProfileInstall(didError: true))))
       return .none
 
-    case .appDidEnterForeground
-      where state.screen == .onboarding(.supervision(.resume(.explainProfileInstall()))):
-      state.screen = .onboarding(.supervision(.resume(.explainProfileInstall(regainedFocus: true))))
-      return .none
-
     case .appDidEnterForeground:
-      return self.presentHomeCrossPromo(&state)
+      return self.resolveIdentity(launching: state.screen == .launching)
 
     case .appDidEnterBackground:
       return .none
@@ -1089,7 +1006,9 @@ public struct IOSReducer: Sendable {
 
 extension IOSReducer.Deps {
   func receiveAccountConnection(_ conn: ChildIOSDeviceData_v2) async {
+    guard !Task.isCancelled else { return }
     await self.api.setAccountConnection(conn)
+    guard !Task.isCancelled else { return }
     self.sharedStorage.saveAccountConnection(conn)
   }
 
@@ -1156,5 +1075,168 @@ extension IOSReducer {
     if app[0] != store[0] { return app[0] > store[0] }
     if app[1] != store[1] { return app[1] > store[1] }
     return app[2] > store[2]
+  }
+}
+
+extension IOSReducer {
+  enum CancelId { case launch }
+
+  func resolveIdentity(launching: Bool) -> EffectOf<IOSReducer> {
+    .run { [deps = self.deps] send in
+      let result = await deps.identity.resolve()
+      await send(.programmatic(.identityResolved(result, launching: launching)))
+    }
+  }
+
+  func launch() -> EffectOf<IOSReducer> {
+    .merge(
+      // detect current state and set screen
+      .run { [deps = self.deps] send in
+        // controller proxy also tries to migrate, but we do it here as safeguard
+        if await deps.sharedStorage.migrateLegacyData() {
+          deps.log("migration performed by app", "5258e97c")
+        }
+
+        let launchState = await deps.launchState()
+        guard !Task.isCancelled else { return }
+        switch launchState {
+
+        case .running(.unconnected):
+          await send(.programmatic(.setScreen(.running(state: .notConnected))))
+
+        case .running(.connected(let conn)):
+          await send(.programmatic(.setScreen(.running(state: .connected))))
+          await deps.receiveAccountConnection(conn)
+          deps.sharedStorage.clearPendingSupervisionCode()
+
+        case .migratedHardware:
+          await send(.programmatic(.setScreen(.onboarding(.migratedHardware))))
+
+        case .onboardingNeeded:
+          deps.log("onboarding needed on launch", "7a539f70")
+          await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
+
+        case .gertrudeSupervisionReboot(.codeNotClaimed(let code)):
+          deps.log("supervision reboot code not claimed", "e9b86e6b")
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.codeNotClaimed(code: code))))),
+          ))
+
+        case .gertrudeSupervisionReboot(.requiresSubscription(let conn)):
+          deps.log("supervision reboot requires subscription", "a7d41f0e")
+          await deps.receiveAccountConnection(conn)
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.requiresSubscription)))),
+          ))
+
+        case .gertrudeSupervisionReboot(.codeClaimedNotSupervised(let conn)):
+          deps.log("supervision reboot code claimed not supervised", "80580cd5")
+          await deps.receiveAccountConnection(conn)
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.codeClaimedNotSupervised)))),
+          ))
+
+        case .gertrudeSupervisionReboot(.codeExpired), .gertrudeSupervisionReboot(.codeNotFound):
+          deps.log("supervision reboot code expired/not found", "0b15e23f")
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.codeExpired)))),
+          ))
+
+        case .gertrudeSupervisionReboot(.supervisedButNeedsProfile(let conn)):
+          deps.log("supervision reboot supervised but needs profile", "05a47c3a")
+          await deps.receiveAccountConnection(conn)
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
+          ))
+
+        case .gertrudeSupervisionReboot(.serverClientDisagreement(let conn)):
+          deps.log("server/client supervision state disagreement", "94991de7")
+          await deps.receiveAccountConnection(conn)
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.promptInstallProfile)))),
+          ))
+
+        case .configuratorSupervisionFirstLaunch:
+          deps.log("configurator supervision success first launch", "bad8adcc")
+          await send(.programmatic(.setScreen(.supervisionSuccessFirstLaunch)))
+
+        case .profileRemovedRecovery(let conn):
+          deps.log("profile removed recovery for supervised user", "4f22bd20")
+          await deps.receiveAccountConnection(conn)
+          await send(.programmatic(.setProfileRecovery))
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.profileRemovedRecovery)))),
+          ))
+
+        case .filterNoLongerRunning:
+          // NB: if they remove the filter via Settings then launch app, we'll get here
+          deps.log("non-running filter w/ stored groups", "23c207e2")
+          await send(.programmatic(.setScreen(.onboarding(.happyPath(.hiThere)))))
+
+        case .gertrudeSupervisionReboot(.networkError):
+          deps.log("supervision reboot network error after retries", "b7f3a2d1")
+          await send(.programmatic(
+            .setScreen(.onboarding(.supervision(.resume(.networkError)))),
+          ))
+        }
+        if let featureFlag = try? await deps.api.connectAccountFeatureFlag() {
+          await send(.programmatic(.receivedConnectAccountFeatureFlag(featureFlag)))
+        }
+        if let ids = deps.sharedStorage.loadDisabledBlockGroupIds() {
+          await send(.programmatic(.receivedDisabledBlockGroupIds(ids)))
+        }
+        if let groups = deps.sharedStorage.loadAllBlockGroups() {
+          await send(.programmatic(.receivedAllBlockGroups(groups)))
+        } else if let deviceId = await deps.device.deviceId(),
+                  let groups = try? await deps.api.fetchAllBlockGroups(deviceId),
+                  !groups.isEmpty {
+          deps.sharedStorage.saveAllBlockGroups(groups)
+          await send(.programmatic(.receivedAllBlockGroups(groups)))
+        }
+      },
+      // handle first launch
+      .run { [deps = self.deps] send in
+        if let firstLaunch = deps.sharedStorage.loadFirstLaunchDate() {
+          await send(.programmatic(.setFirstLaunch(firstLaunch)))
+        } else {
+          let now = deps.now
+          deps.sharedStorage.saveFirstLaunchDate(now)
+          await send(.programmatic(.setFirstLaunch(now)))
+          let deviceId = await deps.device.deviceId()
+          // prefetch the default block groups for onboarding
+          let defaultRules = try? await deps.api.fetchDefaultBlockRules(deviceId)
+          if let defaultRules, !defaultRules.isEmpty {
+            deps.sharedStorage.saveProtectionMode(.onboarding(defaultRules))
+          } else {
+            deps.sharedStorage
+              .saveProtectionMode(.onboarding(BlockRule.Legacy.defaults.map(\.current)))
+          }
+          // prefetch block group catalog so it's ready when user reaches opt-out screen
+          if let deviceId,
+             let groups = try? await deps.api.fetchAllBlockGroups(deviceId),
+             !groups.isEmpty {
+            deps.sharedStorage.saveAllBlockGroups(groups)
+            await send(.programmatic(.receivedAllBlockGroups(groups)))
+          }
+          log(
+            .info,
+            .onboarding,
+            "8d35f043",
+            detail: "first launch, region: `\(deps.locale.region?.identifier ?? "(nil)")`",
+          )
+        }
+      },
+      // safeguard in case app crashed trying to fill the disk
+      .run { [deps = self.deps] send in
+        await deps.device.deleteCacheFillDir()
+      },
+      // fetch cross-promo campaigns for later presentation
+      .run { [deps = self.deps] send in
+        if let output = try? await deps.api.crossPromos(), !output.promos.isEmpty {
+          await send(.programmatic(.receivedCrossPromos(output)))
+        }
+      },
+    )
+    .cancellable(id: CancelId.launch, cancelInFlight: true)
   }
 }

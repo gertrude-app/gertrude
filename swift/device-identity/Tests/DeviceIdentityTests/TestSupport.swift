@@ -20,10 +20,12 @@ final class IdentityHarness {
   var repairFails = false
   var clearFails = false
   var credentialsFail = false
+  var credentialsFailAfterSave = false
   var markerFails = false
   var reportFails = false
   var proof: UUID? = proofId
   var connection: UUID? = proofId
+  var credentialDeviceId: UUID?
   var mirror: UUID? = oldId
   var publishedIdentities: [UUID?] = []
   var migrationRequired = false
@@ -36,6 +38,7 @@ final class IdentityHarness {
   var liveVendorId: UUID? = newId
 
   init(a: UUID? = nil, b: UUID? = nil, c: UUID? = nil) {
+    self.credentialDeviceId = c
     for (slot, id) in [(IdentitySlot.identity, a), (.canary, b), (.appMemory, c)] {
       if let id { self.data[slot] = Data(id.uuidString.utf8) }
     }
@@ -87,9 +90,11 @@ final class IdentityHarness {
           )
         },
         proofToken: { self.proof },
+        credentialDeviceId: { self.credentialDeviceId },
         clearDeviceBoundState: {
           self.actions.append("clear")
           self.connection = nil
+          self.credentialDeviceId = nil
           self.proof = nil
           self.mirror = nil
           if self.clearFails { throw Failure.consumer }
@@ -105,8 +110,14 @@ final class IdentityHarness {
           if self.credentialsFail { throw Failure.consumer }
           if let token = output.token {
             self.connection = token
+            self.credentialDeviceId = output.deviceId
             self.proof = token
+          } else if self.credentialDeviceId != output.deviceId {
+            self.connection = nil
+            self.credentialDeviceId = nil
+            self.proof = nil
           }
+          if self.credentialsFailAfterSave { throw Failure.consumer }
         },
         publishIdentity: {
           self.mirror = $0

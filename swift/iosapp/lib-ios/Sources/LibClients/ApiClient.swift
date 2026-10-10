@@ -25,6 +25,7 @@ public struct ApiClient: Sendable {
     async throws -> String?
   public var setAccountConnection: @Sendable (ChildIOSDeviceData_v2?)
     async -> Void
+  public var clearAccountConnection: @Sendable () -> Void
   public var connectAccountFeatureFlag: @Sendable ()
     async throws -> ConnectAccountFeatureFlag.Output
   public var createSupervisionClaimCode: @Sendable ()
@@ -131,6 +132,7 @@ extension ApiClient: DependencyKey {
       setAccountConnection: { conn in
         _accountConnection.withLock { $0 = conn }
       },
+      clearAccountConnection: { _accountConnection.withLock { $0 = nil } },
       connectAccountFeatureFlag: {
         try await pairql.call(
           ConnectAccountFeatureFlag.self,
@@ -232,10 +234,12 @@ func authed<T: Pair>(
   _ pair: T.Type,
   _ route: AuthedRoute,
 ) async throws -> T.Output {
-  guard let token = _accountConnection.withLock({ $0?.token }) else {
+  @Dependency(\.device) var device
+  guard let conn = _accountConnection.withLock({ $0 }),
+        await device.deviceId() == conn.deviceId else {
     throw ApiClient.Error.missingAccountConnection
   }
-  return try await pairql.call(pair, authed: route, token: token)
+  return try await pairql.call(pair, authed: route, token: conn.token)
 }
 
 public extension ApiClient {

@@ -27,6 +27,8 @@ let package = Package(
       traits: ["ComposableArchitecture2Deprecations"],
     ),
     .package(path: "../../pairql"),
+    .package(path: "../../device-identity"),
+    .package(path: "../../pairql-ios-apps"),
     .package(path: "../../pairql-blocker"),
     .package(path: "../../gertie"),
     .package(path: "../../gertie-tca-features"),
@@ -57,6 +59,8 @@ let package = Package(
       dependencies: [
         "LibCore",
         "LibClients",
+        .product(name: "DeviceIdentity", package: "device-identity"),
+        .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
         .product(name: "GertieBlocker", package: "gertie"),
         .product(name: "GertieApp", package: "gertie"),
         .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),

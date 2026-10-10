@@ -25,6 +25,10 @@ extension IOSReducer {
   static let crossPromoThrottle: TimeInterval = 60 * 60 * 72
 
   func presentOnboardingCrossPromo(_ state: inout State) -> EffectOf<IOSReducer> {
+    // All rating-screen exits converge here, making this the logical point to clear the pending migration marker.
+    if self.deps.sharedStorage.migrationPending() {
+      try? self.deps.sharedStorage.setMigrationPending(false)
+    }
     let placement = Self.onboardingCrossPromoPlacement
     guard state.crossPromos.promos
       .contains(where: { $0.placement == placement && $0.hasDismissCta })

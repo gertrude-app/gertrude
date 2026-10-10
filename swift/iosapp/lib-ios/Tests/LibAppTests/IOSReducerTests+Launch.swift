@@ -28,6 +28,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -59,6 +60,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -90,6 +92,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -125,6 +128,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -161,6 +165,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -198,6 +203,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -244,6 +250,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -261,6 +268,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.receive(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast)))
     await store.receive(.programmatic(
       .setScreen(.onboarding(.supervision(.resume(.codeNotClaimed(code: code))))),
@@ -291,6 +299,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -326,6 +335,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -366,6 +376,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }
@@ -516,6 +527,7 @@ final class IOSReducerTestsLaunch: XCTestCase {
     }
 
     await store.send(.programmatic(.appDidLaunch))
+    await store.receive(.programmatic(.identityResolved(.init(), launching: true)))
     await store.receive(.programmatic(.setFirstLaunch(.distantPast))) {
       $0.onboarding.firstLaunch = .distantPast
     }

@@ -64,6 +64,7 @@ extension IOSReducer {
   }
 
   public enum Onboarding: Equatable {
+    case migratedHardware
     case happyPath(HappyPath)
     case appleFamily(AppleFamily)
     case supervision(Supervision)
@@ -185,9 +186,15 @@ extension IOSReducer {
 
   public enum Screen: Equatable {
     case launching
+    case identityUnavailable(migrationPending: Bool)
     case onboarding(Onboarding)
     case supervisionSuccessFirstLaunch
     case running(state: RunningState = .notConnected)
+
+    public var isIdentityUnavailable: Bool {
+      if case .identityUnavailable = self { return true }
+      return false
+    }
 
     public var isRunning: Bool {
       if case .running = self { return true }

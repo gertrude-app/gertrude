@@ -8,6 +8,7 @@ struct IOSAppEntry: App {
   let store: StoreOf<IOSReducer>
   @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
   @Environment(\.scenePhase) private var scenePhase
+  @State private var launched = false
 
   var osMajorVersion: Int {
     ProcessInfo.processInfo.operatingSystemVersion.majorVersion
@@ -18,6 +19,7 @@ struct IOSAppEntry: App {
   }
 
   init() {
+    BlockerIdentity.configureApp()
     self.store = Store(
       initialState: IOSReducer.State(),
       reducer: { IOSReducer()._printChanges() },
@@ -30,13 +32,11 @@ struct IOSAppEntry: App {
   var body: some Scene {
     WindowGroup {
       AppView(store: self.store, osMajorVersion: self.osMajorVersion, deviceType: self.deviceType)
-        .onAppear {
-          self.store.send(.programmatic(.appDidLaunch))
-        }
-        .onChange(of: self.scenePhase) { _, newPhase in
+        .onChange(of: self.scenePhase, initial: true) { _, newPhase in
           switch newPhase {
           case .active:
-            self.store.send(.programmatic(.appDidEnterForeground))
+            self.store.send(.programmatic(self.launched ? .appDidEnterForeground : .appDidLaunch))
+            self.launched = true
           case .background:
             self.store.send(.programmatic(.appDidEnterBackground))
           case .inactive:

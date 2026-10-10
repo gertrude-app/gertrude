@@ -3,6 +3,8 @@ typealias OnboardingBtn = IOSReducer.Action.Interactive.OnboardingBtn
 extension IOSReducer.Screen {
   func fallbackDestination(from btn: OnboardingBtn) -> Self {
     switch self {
+    case .identityUnavailable:
+      self
     case .launching:
       .onboarding(.happyPath(.hiThere))
     case .onboarding(let onboarding):
@@ -18,6 +20,8 @@ extension IOSReducer.Screen {
 extension IOSReducer.Onboarding {
   func fallbackDestination(from btn: OnboardingBtn) -> IOSReducer.Screen {
     switch self {
+    case .migratedHardware:
+      .onboarding(.migratedHardware)
     case .appleFamily(let appleFamily):
       appleFamily.fallbackDestination(from: btn)
     case .authFail(let authFail):

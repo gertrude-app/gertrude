@@ -64,12 +64,12 @@ struct IdentityResolverTests {
     expectNoDifference(h.mirror, oldId)
   }
 
-  @Test func sameDeviceIdentityIsAvailableBeforeAnyNetworkWork() throws {
+  @Test func sameDeviceKeepsOriginalIdentityBeforeAnyNetworkWork() throws {
     let h = IdentityHarness(a: newId, b: newId, c: oldId)
     let resolver = h.resolver()
-    expectNoDifference(resolver.resolveOnForeground(), .adopted(newId))
-    expectNoDifference(resolver.deviceId, newId)
-    expectNoDifference(h.mirror, newId)
+    expectNoDifference(resolver.resolveOnForeground(), .adopted(oldId))
+    expectNoDifference(resolver.deviceId, oldId)
+    expectNoDifference(h.mirror, oldId)
     expectNoDifference(h.requests, [])
     let pending = try JSONDecoder().decode(
       PendingIdentityTransition.self, from: #require(h.data[.pendingTransition]),
@@ -77,8 +77,8 @@ struct IdentityResolverTests {
     expectNoDifference(pending.kind, .sameDevice)
     expectNoDifference(pending.proofToken, proofId)
     let restarted = h.resolver()
-    expectNoDifference(restarted.resolveOnForeground(), .adopted(newId))
-    expectNoDifference(restarted.deviceId, newId)
+    expectNoDifference(restarted.resolveOnForeground(), .adopted(oldId))
+    expectNoDifference(restarted.deviceId, oldId)
     expectNoDifference(h.requests, [])
   }
 
@@ -87,11 +87,11 @@ struct IdentityResolverTests {
     h.reportFails = true
     for _ in 0 ..< 3 {
       let resolver = h.resolver()
-      expectNoDifference(resolver.resolveOnForeground(), .adopted(newId))
+      expectNoDifference(resolver.resolveOnForeground(), .adopted(oldId))
       let outcome = await resolver.reportPendingTransition()
       expectNoDifference(outcome, .retry)
-      expectNoDifference(resolver.deviceId, newId)
-      expectNoDifference(h.mirror, newId)
+      expectNoDifference(resolver.deviceId, oldId)
+      expectNoDifference(h.mirror, oldId)
       #expect(h.data[.pendingTransition] != nil)
     }
     expectNoDifference(h.requests.count, 3)
@@ -113,6 +113,52 @@ struct IdentityResolverTests {
     expectNoDifference(h.mirror, nil)
   }
 
+  @Test(arguments: ["appMemory", "credentials", "credentialsAfterSave", "delete"])
+  func interruptedSameDeviceAcknowledgementUsesPersistedCredentialIdentity(
+    step: String,
+  ) async throws {
+    let h = IdentityHarness(a: newId, b: newId, c: oldId)
+    h.response = .init(deviceId: newId, reason: .normal, childId: childId, token: newId)
+    h.writeFailures = step == "appMemory" ? [.appMemory] : []
+    h.credentialsFail = step == "credentials"
+    h.credentialsFailAfterSave = step == "credentialsAfterSave"
+    h.deleteFails = step == "delete"
+    let resolver = h.resolver()
+    expectNoDifference(resolver.resolveOnForeground(), .adopted(oldId))
+    let reported = await resolver.reportPendingTransition()
+    expectNoDifference(reported, .retry)
+    let expected = step == "delete" || step == "credentialsAfterSave" ? newId : oldId
+    expectNoDifference(h.credentialDeviceId, expected)
+    expectNoDifference(resolver.deviceId, expected)
+    expectNoDifference(h.mirror, expected)
+    #expect(h.data[.pendingTransition] != nil)
+
+    h.reportFails = true
+    let restarted = h.resolver()
+    expectNoDifference(restarted.resolveOnForeground(), .adopted(expected))
+    let retried = await restarted.reportPendingTransition()
+    expectNoDifference(retried, .retry)
+    expectNoDifference(restarted.deviceId, expected)
+    expectNoDifference(h.mirror, expected)
+    expectNoDifference(h.requests.last?.proofToken, proofId)
+  }
+
+  @Test func unconnectedSameDeviceRetryKeepsOriginalIdentityAfterPartialAcknowledgement() async {
+    let h = IdentityHarness(a: newId, b: newId, c: oldId)
+    h.credentialDeviceId = nil
+    h.connection = nil
+    h.proof = nil
+    h.response = .init(deviceId: newId, reason: .normal)
+    h.deleteFails = true
+    let reported = await h.resolver().resolveAndReport()
+    expectNoDifference(reported, .retry)
+    expectNoDifference(h.storage.readId(.appMemory), .value(newId))
+    h.reportFails = true
+    let restarted = h.resolver()
+    expectNoDifference(restarted.resolveOnForeground(), .adopted(oldId))
+    expectNoDifference(h.mirror, oldId)
+  }
+
   @Test(arguments: [IdentitySlot.identity, .appMemory])
   func offlineRetryRespectsPartiallyWrittenCanonicalAcknowledgement(slot: IdentitySlot) async {
     let h = IdentityHarness(a: newId, b: newId, c: oldId)
@@ -122,7 +168,7 @@ struct IdentityResolverTests {
     _ = resolver.resolveOnForeground()
     let outcome = await resolver.reportPendingTransition()
     expectNoDifference(outcome, .retry)
-    let expected: UUID? = slot == .identity ? nil : oldId
+    let expected: UUID? = oldId
     expectNoDifference(resolver.deviceId, expected)
     h.reportFails = true
     let restarted = h.resolver()
@@ -139,7 +185,7 @@ struct IdentityResolverTests {
     h.response = .init(deviceId: newId, reason: .resolvedAsMigration)
     h.credentialsFail = true
     let resolver = h.resolver()
-    expectNoDifference(resolver.resolveOnForeground(), .adopted(newId))
+    expectNoDifference(resolver.resolveOnForeground(), .adopted(oldId))
     let outcome = await resolver.reportPendingTransition()
     expectNoDifference(outcome, .retry)
     expectNoDifference(resolver.deviceId, nil)
@@ -161,7 +207,10 @@ struct IdentityResolverTests {
     expectNoDifference(outcome, .adopted(newId))
     expectNoDifference(h.storage.readId(.canary), .value(newId))
     expectNoDifference(h.requests.first?.kind, .sameDevice)
-    expectNoDifference(h.events, [.resolution(.adopted(newId), matchesLiveVendorId: true)])
+    expectNoDifference(h.events, [
+      .resolution(.adopted(oldId), matchesLiveVendorId: false),
+      .resolution(.adopted(newId), matchesLiveVendorId: true),
+    ])
     #expect(!h.actions.contains("clear"))
   }
 
@@ -359,7 +408,6 @@ struct IdentityResolverTests {
     expectNoDifference(h.storage.readId(.canary), .value(oldId))
     #expect(!h.migrationRequired)
     expectNoDifference(h.events, [
-      .resolution(.adopted(newId), matchesLiveVendorId: true),
       .resolution(.adopted(oldId), matchesLiveVendorId: false),
     ])
   }
@@ -390,7 +438,7 @@ struct IdentityResolverTests {
     let resolver = h.resolver()
     let outcome = await resolver.resolveAndReport()
     expectNoDifference(outcome, .retry)
-    expectNoDifference(resolver.deviceId, newId)
+    expectNoDifference(resolver.deviceId, oldId)
     #expect(h.data[.pendingTransition] != nil)
     h.writeFailures = []
     let retried = await h.resolver().resolveAndReport()
@@ -538,9 +586,9 @@ struct IdentityResolverTests {
         return await resolver.resolveAndReport()
       }
     }
-    expectNoDifference(resolver.deviceId, newId)
+    expectNoDifference(resolver.deviceId, oldId)
     expectNoDifference(h.requests.count, 1)
-    expectNoDifference(h.events, [.resolution(.adopted(newId), matchesLiveVendorId: true)])
+    expectNoDifference(h.events, [.resolution(.adopted(oldId), matchesLiveVendorId: false)])
     reply?.resume(returning: .init(deviceId: newId, reason: .normal))
     let outcome = await first?.value
     expectNoDifference(outcome, .adopted(newId))
@@ -548,6 +596,9 @@ struct IdentityResolverTests {
     expectNoDifference(retried, .adopted(newId))
     expectNoDifference(h.requests.count, 1)
     expectNoDifference(resolver.deviceId, newId)
-    expectNoDifference(h.events, [.resolution(.adopted(newId), matchesLiveVendorId: true)])
+    expectNoDifference(h.events, [
+      .resolution(.adopted(oldId), matchesLiveVendorId: false),
+      .resolution(.adopted(newId), matchesLiveVendorId: true),
+    ])
   }
 }
