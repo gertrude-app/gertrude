@@ -40,27 +40,28 @@ struct ClaimFlow {
   }
 
   enum Action: Equatable {
-    case accountStatusResponse(GetAccountStatus.Output)
+    case accountStatusResponse(GetAccountStatus.Output, generation: Int? = nil)
     case cancelTapped
-    case claimCodeFailed
-    case claimCodeResponse(code: Int)
+    case claimCodeFailed(generation: Int? = nil)
+    case claimCodeResponse(code: Int, generation: Int? = nil)
     case doneTapped
     case nextTapped
     case notNowTapped
     case onAppear
-    case polled(GetTrialStatus.Output)
+    case polled(GetTrialStatus.Output, generation: Int? = nil)
     case retryTapped
   }
 
   enum CancelID {
     case poll
+    case identityWork
   }
 
+  @Shared(.podcastIdentityGeneration) var generation
+  @Dependency(\.podcastIdentity) var identity
   @Dependency(\.api) var api
   @Dependency(\.continuousClock) var clock
-  @Dependency(\.date.now) var now
   @Dependency(\.dismiss) var dismiss
-  @Dependency(\.keychain) var keychain
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
@@ -79,23 +80,24 @@ struct ClaimFlow {
       case .retryTapped:
         return self.startShowingCode(&state)
 
-      case .claimCodeResponse(let code):
+      case .claimCodeResponse(let code, let generation):
+        guard generation == nil || generation == self.generation else { return .none }
         log(.info, .claim, "de4909f1")
         state.claimCode = code
         state.claimCodeFailed = false
         return .none
 
-      case .claimCodeFailed:
+      case .claimCodeFailed(let generation):
+        guard generation == nil || generation == self.generation else { return .none }
         log(.err, .claim, "b2cb8725")
         state.claimCodeFailed = true
         return .none
 
-      case .polled(let output):
-        guard case .connected(let token, _, let childName, let subscription) = output else {
+      case .polled(let output, let generation):
+        guard generation == nil || generation == self.generation else { return .none }
+        guard case .connected(_, _, let childName, let subscription) = output else {
           return .none
         }
-        self.keychain.save(amToken: token)
-        subscription.writeLocal(now: self.now)
         log(.info, .subs, "9b9ea2d6", detail: "\(subscription)")
         state.childName = childName
         state.entitlement = subscription
@@ -110,9 +112,9 @@ struct ClaimFlow {
         state.step = .payment
         return self.startPayment()
 
-      case .accountStatusResponse(let output):
+      case .accountStatusResponse(let output, let generation):
+        guard generation == nil || generation == self.generation else { return .none }
         state.entitlement = output.subscription
-        output.subscription.writeLocal(now: self.now)
         guard output.subscription.isEntitled else { return .none }
         log(.info, .subs, "c6cae011", detail: "\(output.subscription)")
         return self.dismissFlow()
@@ -139,22 +141,28 @@ struct ClaimFlow {
   }
 
   func startShowingCode(_ state: inout State) -> EffectOf<ClaimFlow> {
+    let generation = self.generation
     state.claimCode = nil
     state.claimCodeFailed = false
     return .merge(
       .run { send in
         do {
+          let session = await self.identity.current()
           let output = try await self.api.createClaimCode()
-          await send(.claimCodeResponse(code: output.code))
+          try await self.identity.validate(session)
+          await send(.claimCodeResponse(code: output.code, generation: generation))
         } catch {
-          await send(.claimCodeFailed)
+          await send(.claimCodeFailed(generation: generation))
         }
-      },
+      }
+      .cancellable(id: CancelID.identityWork, cancelInFlight: true),
       .run { send in
         while !Task.isCancelled {
           try await self.clock.sleep(for: .seconds(5))
+          let session = await self.identity.current()
           if let output = try? await self.api.getTrialStatus() {
-            await send(.polled(output))
+            try await self.identity.acceptTrialStatus(output, for: session)
+            await send(.polled(output, generation: generation))
           }
         }
       }
@@ -163,11 +171,14 @@ struct ClaimFlow {
   }
 
   func startPayment() -> EffectOf<ClaimFlow> {
-    .run { send in
+    let generation = self.generation
+    return .run { send in
       while !Task.isCancelled {
         try await self.clock.sleep(for: .seconds(5))
+        let session = await self.identity.current()
         if let output = try? await self.api.getAccountStatus() {
-          await send(.accountStatusResponse(output))
+          try await self.identity.acceptAccountStatus(output, for: session)
+          await send(.accountStatusResponse(output, generation: generation))
         }
       }
     }

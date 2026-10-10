@@ -24,8 +24,8 @@ struct OnboardingFeature {
     }
 
     case onAppear
-    case trialStatusResponse(GetTrialStatus.Output)
-    case connectingTimedOut
+    case trialStatusResponse(GetTrialStatus.Output, generation: Int? = nil)
+    case connectingTimedOut(generation: Int? = nil)
     case primaryBtnTapped
     case secondaryBtnTapped
     case finished(Int)
@@ -38,12 +38,13 @@ struct OnboardingFeature {
 
   enum CancelID {
     case connecting
+    case identityWork
   }
 
+  @Shared(.podcastIdentityGeneration) var generation
+  @Dependency(\.podcastIdentity) var identity
   @Dependency(\.api) var api
   @Dependency(\.continuousClock) var clock
-  @Dependency(\.date.now) var now
-  @Dependency(\.db) var database
   @Dependency(\.keychain) var keychain
   @Dependency(\.haptics) var haptics
 
@@ -53,12 +54,14 @@ struct OnboardingFeature {
       case (_, .onAppear):
         guard state.trialStatus == nil else { return .none }
         return self.fetchTrialStatus()
-      case (_, .trialStatusResponse(let output)):
+      case (_, .trialStatusResponse(let output, let generation)):
+        guard generation == nil || generation == self.generation else { return .none }
         state.trialStatus = output
         guard state.screen == .connecting else { return .none }
         state.screen = output.isConnected ? .accountDetected : .explainAccountRequired
         return .cancel(id: CancelID.connecting)
-      case (_, .connectingTimedOut):
+      case (_, .connectingTimedOut(let generation)):
+        guard generation == nil || generation == self.generation else { return .none }
         guard state.screen == .connecting else { return .none }
         state.screen = .explainAccountRequired
         return .cancel(id: CancelID.connecting)
@@ -75,11 +78,12 @@ struct OnboardingFeature {
           return .none
         case .none:
           state.screen = .connecting
+          let generation = self.generation
           return .merge(
             self.fetchTrialStatus(),
             .run { send in
               try await self.clock.sleep(for: .seconds(3))
-              await send(.connectingTimedOut)
+              await send(.connectingTimedOut(generation: generation))
             },
           )
           .cancellable(id: CancelID.connecting)
@@ -103,7 +107,8 @@ struct OnboardingFeature {
       case (.connectAccountOrSkip, .secondaryBtnTapped):
         state.screen = .explainSetPasscode
         return .none
-      case (_, .claimFlow(.presented(.polled(let output)))):
+      case (_, .claimFlow(.presented(.polled(let output, let generation)))):
+        guard generation == nil || generation == self.generation else { return .none }
         state.trialStatus = output
         return .none
       case (_, .claimFlow(.dismiss)):
@@ -152,14 +157,14 @@ struct OnboardingFeature {
   }
 
   func fetchTrialStatus() -> EffectOf<OnboardingFeature> {
-    .run { send in
+    let generation = self.generation
+    return .run { send in
+      let session = await self.identity.current()
       guard let output = try? await self.api.getTrialStatus() else { return }
-      if case .connected(let token, _, _, let subscription) = output {
-        self.keychain.save(amToken: token)
-        subscription.writeLocal(now: self.now)
-      }
-      await send(.trialStatusResponse(output))
+      try await self.identity.acceptTrialStatus(output, for: session)
+      await send(.trialStatusResponse(output, generation: generation))
     }
+    .cancellable(id: CancelID.identityWork, cancelInFlight: true)
   }
 }
 

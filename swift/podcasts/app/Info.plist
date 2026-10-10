@@ -32,6 +32,10 @@
     <string>$(MARKETING_VERSION)</string>
     <key>CFBundleVersion</key>
     <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>IdentityPrivateAccessGroup</key>
+    <string>$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>IdentitySharedAccessGroup</key>
+    <string>$(AppIdentifierPrefix)com.netrivet.gertrude.identity</string>
     <key>UIBackgroundModes</key>
     <array>
       <string>audio</string>

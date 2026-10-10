@@ -1,7 +1,7 @@
 # DeviceIdentity
 
-Foreground device identity resolution shared by Blocker, Music, and Podcasts. Blocker and Music
-now consume the package; Podcasts adoption remains pending. It depends on Apple
+Foreground device identity resolution shared by Blocker, Music, and Podcasts. All three apps
+now consume the package. It depends on Apple
 Security and client-side dependencies, so it stays separate from the server-safe `gertie` package.
 
 ## Consumer contract
@@ -102,6 +102,26 @@ slots intact so a later activation can converge after ownership is corrected.
 Holding a known migrated identity unavailable until acknowledgement is a deliberate
 refinement of the original proposal: it prevents onboarding with the minted identity
 before the server has resolved ownership. It does not gate same-device offline use.
+
+## Podcasts consumer
+
+Podcasts binds its legacy `amToken` to private slot C before adopting the shared identity,
+then stores token, device ID, and child ID together. Its legacy account suffixes remain
+`.sim.6` and `.dev.2`; the shared slots use the package's standard suffixes.
+
+Hardware migration resets playback and the cached subscription before deleting credentials.
+The parent PIN, install date, approved shows, downloaded files, and episode progress remain.
+The durable migration marker blocks listening until a fresh entitlement response has been
+saved. Existing PIN users then return to their library; users without a PIN resume the
+existing onboarding flow. A storage or network failure leaves a retry screen.
+
+Same-device adoption keeps the saved credential identity usable offline. Requests and
+responses are checked against the current identity and connection; claim and onboarding
+effects are cancelled and their queued responses rejected when the identity generation changes.
+
+The pre-1.4.0 random-install-ID event migration remains supported. Its original source and
+destination are saved before C is established, and retried independently of the shared
+identity report. It moves historical events only, not device ownership or credentials.
 
 ## Tests
 

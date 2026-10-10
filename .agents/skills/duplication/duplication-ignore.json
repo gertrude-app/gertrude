@@ -68,6 +68,11 @@
       "a": "swift/macapp/App/Tests/AppTests/FullDiskAccessOnboardingTests.swift",
       "b": "swift/macapp/App/Tests/AppTests/OnboardingFeatureTests.swift",
       "reason": "distinct onboarding scenarios that necessarily share TestStore setup; the setup is the context that makes each step's failure interpretable"
+    },
+    {
+      "a": "swift/music/lib-tca/Sources/Deps/KeychainClient.swift",
+      "b": "swift/podcasts/lib-tca/Sources/Deps/Keychain.swift",
+      "reason": "app-specific dependency adapters retain their own key enums and credential formats; checked Security operations are shared through DeviceIdentity.PrivateKeychain, leaving only the typed adapter wiring duplicated"
     }
   ]
 }

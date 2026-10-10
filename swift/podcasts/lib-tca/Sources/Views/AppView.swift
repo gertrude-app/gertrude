@@ -35,6 +35,21 @@ struct AppView: View {
           onImageLoadFailure: Self.crossPromoImageLoadFailed,
         )
     }
+    .overlay {
+      if !self.store.identity.available || self.store.identity.migrationPending {
+        VStack(spacing: 16) {
+          Text("Setting up Podcasts")
+            .font(.title2.bold())
+          Text("Connect to the internet to finish checking this device, then try again.")
+            .multilineTextAlignment(.center)
+          Button("Try again") { self.store.send(.identityRetryTapped) }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.background)
+      }
+    }
     .alert(self.$store.scope(\.alert, action: \.alert))
     .overlay(alignment: .bottom) {
       if let nowPlaying = self.store.nowPlaying.data {

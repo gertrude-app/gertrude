@@ -7,7 +7,7 @@ extension AddShowFeature {
   func handleSpecialAction(input: String) -> EffectOf<AddShowFeature>? {
     if input == "am: upload db" {
       return .run { send in
-        guard let deviceId = self.keychain.loadDeviceId() else { return }
+        guard let deviceId = await dep(\.podcastIdentity).current().deviceId else { return }
         // can't just upload current file, data might be in WAL, so export
         let queue = try DatabaseQueue(path: URL.localDb.path)
         try queue.backup(to: DatabaseQueue(path: URL.tempDb.path))
@@ -37,7 +37,7 @@ extension AddShowFeature {
       }
 
       return .run { send in
-        guard let deviceId = self.keychain.loadDeviceId() else {
+        guard let deviceId = await dep(\.podcastIdentity).current().deviceId else {
           await send(.delegate(.alert("DB download failed: no device id")))
           return
         }
@@ -54,6 +54,8 @@ extension AddShowFeature {
           await send(.delegate(.alert("DB download failed, bad response")))
           return
         }
+        guard await dep(\.podcastIdentity).current().deviceId == deviceId else { return }
+        try Task.checkCancellation()
         try data.write(to: .tempDb)
         log(.info, .library, "f1a2b3c4")
         await send(.delegate(.alert("DB download success, restart app")))
@@ -63,11 +65,13 @@ extension AddShowFeature {
     if input.starts(with: "am: promo ") {
       let code = String(input.dropFirst("am: promo ".count))
       return .run { send in
-        guard let deviceId = self.keychain.loadDeviceId() else {
+        guard let deviceId = await dep(\.podcastIdentity).current().deviceId else {
           await send(.delegate(.alert("Promo failed: no device id")))
           return
         }
         let verified = try await self.api.verifyPromoCode(deviceId, code)
+        guard await dep(\.podcastIdentity).current().deviceId == deviceId else { return }
+        try Task.checkCancellation()
         if verified {
           try CurrentSubscription.set(status: .complimentary, expiringAt: .distantFuture)
           log(.info, .library, "111b15d5")

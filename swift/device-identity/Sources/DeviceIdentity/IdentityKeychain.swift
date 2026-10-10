@@ -166,3 +166,46 @@ public struct IdentityKeychain {
     }
   }
 }
+
+public enum PrivateKeychain {
+  public struct StorageError: Error {
+    public let status: OSStatus
+  }
+
+  public static func read(account: String) throws -> Data? {
+    var query = self.query(account)
+    query[kSecReturnData as String] = true
+    query[kSecMatchLimit as String] = kSecMatchLimitOne
+    var result: AnyObject?
+    let status = SecItemCopyMatching(query as CFDictionary, &result)
+    if status == errSecItemNotFound { return nil }
+    guard status == errSecSuccess, let data = result as? Data else {
+      throw StorageError(status: status)
+    }
+    return data
+  }
+
+  public static func write(_ data: Data, account: String) throws {
+    let query = self.query(account)
+    let attributes: [String: Any] = [kSecValueData as String: data]
+    var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+    if status == errSecItemNotFound {
+      var item = query
+      item[kSecValueData as String] = data
+      item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+      status = SecItemAdd(item as CFDictionary, nil)
+    }
+    guard status == errSecSuccess else { throw StorageError(status: status) }
+  }
+
+  public static func delete(account: String) throws {
+    let status = SecItemDelete(self.query(account) as CFDictionary)
+    guard status == errSecSuccess || status == errSecItemNotFound else {
+      throw StorageError(status: status)
+    }
+  }
+
+  private static func query(_ account: String) -> [String: Any] {
+    [kSecClass as String: kSecClassGenericPassword, kSecAttrAccount as String: account]
+  }
+}

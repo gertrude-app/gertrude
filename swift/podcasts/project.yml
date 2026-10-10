@@ -33,6 +33,12 @@ targets:
         buildPhase: resources
       - path: app/LaunchScreen.storyboard
         group: app
+    entitlements:
+      path: app/Podcasts.entitlements
+      properties:
+        keychain-access-groups:
+          - "$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)"
+          - "$(AppIdentifierPrefix)com.netrivet.gertrude.identity"
     dependencies:
       - package: LibCore
       - package: LibViews
@@ -71,6 +77,8 @@ targets:
           - en
           - es
         API_ENDPOINT: $(API_ENDPOINT)
+        IdentityPrivateAccessGroup: $(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)
+        IdentitySharedAccessGroup: $(AppIdentifierPrefix)com.netrivet.gertrude.identity
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:

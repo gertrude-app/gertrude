@@ -1,7 +1,7 @@
 import Dependencies
 import DependenciesMacros
+import DeviceIdentity
 import Foundation
-import Security
 
 struct MusicAppConnection: Codable, Equatable, Sendable {
   var token: UUID
@@ -72,8 +72,6 @@ extension KeychainClient {
 }
 
 extension KeychainClient {
-  struct StorageError: Error { let status: OSStatus }
-
   var migrationPending: Bool {
     get throws { try self._load(.migration) != nil }
   }
@@ -91,45 +89,12 @@ extension KeychainClient {
 extension KeychainClient: DependencyKey {
   static var liveValue: KeychainClient {
     .init(
-      _load: { key in
-        var query = key.query
-        query[kSecReturnData as String] = true
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        if status == errSecItemNotFound { return nil }
-        guard status == errSecSuccess, let data = result as? Data else {
-          throw StorageError(status: status)
-        }
-        return data
-      },
+      _load: { try PrivateKeychain.read(account: $0.secAttrAccount) },
       _save: { key, data in
-        let attributes: [String: Any] = [kSecValueData as String: data]
-        var status = SecItemUpdate(key.query as CFDictionary, attributes as CFDictionary)
-        if status == errSecItemNotFound {
-          var item = key.query
-          item[kSecValueData as String] = data
-          item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-          status = SecItemAdd(item as CFDictionary, nil)
-        }
-        guard status == errSecSuccess else { throw StorageError(status: status) }
+        try PrivateKeychain.write(data, account: key.secAttrAccount)
       },
-      delete: { key in
-        let status = SecItemDelete(key.query as CFDictionary)
-        guard status == errSecSuccess || status == errSecItemNotFound else {
-          throw StorageError(status: status)
-        }
-      },
+      delete: { try PrivateKeychain.delete(account: $0.secAttrAccount) },
     )
-  }
-}
-
-private extension KeychainClient.Key {
-  var query: [String: Any] {
-    [
-      kSecClass as String: kSecClassGenericPassword,
-      kSecAttrAccount as String: self.secAttrAccount,
-    ]
   }
 }
 
