@@ -1,6 +1,7 @@
 import { Button } from '@gertrude/ui';
 import { ChevronLeftIcon } from 'lucide-react';
 import React from 'react';
+import StandalonePagePanel from '#/components/layout/StandalonePagePanel';
 
 interface Props {
   form: React.ReactNode;
@@ -9,9 +10,7 @@ interface Props {
 
 const UnauthedPageLayout: React.FC<Props> = ({ form, rightDisplay }) => (
   <div className="flex min-h-screen">
-    <div
-      className={`flex flex-col xs:justify-center xs:items-center w-full relative xs:[background-image:url(/dot-noise-pattern.svg),url(/bg.svg)] xs:[background-size:1440px_1440px,cover] xs:[background-repeat:repeat,no-repeat] ${rightDisplay ? `xl:w-1/2` : ``}`}
-    >
+    <StandalonePagePanel className={rightDisplay ? `xl:w-1/2` : undefined}>
       <div className="absolute top-2 left-2">
         <Button
           type="link"
@@ -23,7 +22,7 @@ const UnauthedPageLayout: React.FC<Props> = ({ form, rightDisplay }) => (
         </Button>
       </div>
       {form}
-    </div>
+    </StandalonePagePanel>
     {rightDisplay && (
       <div className="h-screen overflow-hidden bg-white w-1/2 border-l border-stone-200 hidden xl:block">
         {rightDisplay}

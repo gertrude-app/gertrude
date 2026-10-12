@@ -50,9 +50,52 @@ final class AccountAuthResolverTests: ApiTestCase, @unchecked Sendable {
       from: verifyResponse.body.data!,
     )
     expectNoDifference(verified.accountId, parent.id)
+    expectNoDifference(verified.redirect, nil)
     let authToken = try await Parent.DashToken.query().where(.value == verified.token)
       .first(in: self.db)
     expectNoDifference(authToken.parentId, parent.id)
+  }
+
+  func testSignupAndVerificationPreservePairingDestination() async throws {
+    let email = "pairing".random + "@example.com"
+    let signup = try await AccountSignup.resolve(
+      with: .init(
+        email: email,
+        password: "secret",
+        redirect: "/connect/blockerSupervise/123456",
+        turnstileToken: nil,
+      ),
+      in: self.accountContext,
+    )
+    expect(signup.account).toBeNil()
+    expect(self.sent.emails.count).toEqual(1)
+    expect(self.sent.emails[0].templateModel["dashboardUrl"]).toEqual("https://account.example")
+    let token = UUID(uuidString: self.sent.emails[0].templateModel["token"] ?? "")!
+
+    let verified = try await AccountVerifySignupEmail.resolve(
+      with: .init(token: token),
+      in: self.accountContext,
+    )
+    expect(verified.redirect).toEqual("/connect/blockerSupervise/123456")
+  }
+
+  func testSignupIgnoresExternalOrUnrecognizedRedirect() async throws {
+    let email = "pairing".random + "@example.com"
+    _ = try await AccountSignup.resolve(
+      with: .init(
+        email: email,
+        password: "secret",
+        redirect: "//evil.example",
+        turnstileToken: nil,
+      ),
+      in: self.accountContext,
+    )
+    let token = UUID(uuidString: self.sent.emails[0].templateModel["token"] ?? "")!
+    let verified = try await AccountVerifySignupEmail.resolve(
+      with: .init(token: token),
+      in: self.accountContext,
+    )
+    expect(verified.redirect).toBeNil()
   }
 
   func testSignupForwardsAttribution() async throws {
@@ -139,11 +182,13 @@ final class AccountAuthResolverTests: ApiTestCase, @unchecked Sendable {
     }
   }
 
-  func testExpiredVerificationResendsToAccountSite() async throws {
+  func testExpiredVerificationResendsToAccountSiteAndPreservesPairing() async throws {
     let parent = try await self.parent(with: \.emailVerifiedAt, of: nil)
     let token = await with(dependency: \.ephemeral).createParentIdToken(
       parent.id,
       expiration: .reference - .days(1),
+      claimCode: "123456",
+      claimIntent: .podcasts,
     )
     let result = await AccountVerifySignupEmail.result(
       with: .init(token: token),
@@ -156,6 +201,15 @@ final class AccountAuthResolverTests: ApiTestCase, @unchecked Sendable {
     expectNoDifference((error as? PqlError)?.dashboardTag, .verificationEmailResent)
     expect(self.sent.emails).toHaveCount(1)
     expectNoDifference(self.sent.emails[0].templateModel["dashboardUrl"], "https://account.example")
+    let replacementToken = try XCTUnwrap(
+      UUID(uuidString: self.sent.emails[0].templateModel["token"]!),
+    )
+    let verified = try await AccountVerifySignupEmail.resolve(
+      with: .init(token: replacementToken),
+      in: self.accountContext,
+    )
+    expectNoDifference(verified.accountId, parent.id)
+    expectNoDifference(verified.redirect, "/connect/podcasts/123456")
   }
 
   func testPasswordResetEmailUsesAccountUrl() async throws {

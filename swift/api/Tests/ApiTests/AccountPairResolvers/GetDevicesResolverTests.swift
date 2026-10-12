@@ -65,7 +65,7 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
     )
     try await self.db.create(MusicApp.Token(installId: musicInstall.id))
     try await self.db.create(BlockerApp.Supervision(deviceId: phone.id))
-    try await self.createClaim(
+    let claim = try await self.createClaim(
       .blockerSupervise,
       phone.id,
       jude.id,
@@ -96,9 +96,10 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
     expect(mobile.person.name).toEqual("Jude")
     expect(mobile.connectedApps).toEqual([.blocker, .music])
     expect(mobile.supervisionStatus).toEqual(.claimed)
+    expect(mobile.supervisionSetupPath).toEqual("/connect/blockerSupervise/\(claim.code)")
   }
 
-  func testReturnsEachSupervisionPhase() async throws {
+  func testReturnsEachSupervisionPhaseAndUnfinishedSetupLinks() async throws {
     let parent = try await self.parent()
     let person = try await self.db.create(Child(parentId: parent.id, name: "Jude"))
 
@@ -112,12 +113,12 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
 
     let claimed = try await self.device(for: person, modelIdentifier: "iPhone16,2")
     try await self.db.create(BlockerApp.Supervision(deviceId: claimed.id))
-    try await self.createClaim(
+    let claimedClaim = try await self.createClaim(
       .blockerSupervise,
       claimed.id,
       person.id,
-      expiresAt: .distantFuture,
-      claimedAt: .reference,
+      expiresAt: .reference - .days(1),
+      claimedAt: .reference - .days(2),
     )
 
     let supervised = try await self.device(for: person, modelIdentifier: "iPhone17,1")
@@ -126,6 +127,13 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
       supervisedAt: .reference,
     ))
 
+    let supervisedClaim = try await self.createClaim(
+      .blockerSupervise,
+      supervised.id,
+      person.id,
+      claimedAt: .reference,
+    )
+
     let complete = try await self.device(for: person, modelIdentifier: "iPhone17,2")
     try await self.db.create(BlockerApp.Supervision(
       deviceId: complete.id,
@@ -133,21 +141,42 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
       profileInstalledAt: .reference,
     ))
 
+    try await self.createClaim(
+      .blockerSupervise,
+      complete.id,
+      person.id,
+      claimedAt: .reference,
+    )
+
     let ordinary = try await self.device(for: person, modelIdentifier: "iPhone17,3")
 
     let output = try await GetDevices.resolve(in: self.accountContext(parent))
-    let statuses = Dictionary(
-      uniqueKeysWithValues: output.mobileDevices.map { ($0.id, $0.supervisionStatus) },
+    let devices = Dictionary(
+      uniqueKeysWithValues: output.mobileDevices.map { ($0.id, $0) },
     )
 
-    expect(statuses[pendingClaim.id]).toEqual(.pendingClaim)
-    expect(statuses[claimed.id]).toEqual(.claimed)
-    expect(statuses[supervised.id]).toEqual(.supervised)
-    expect(statuses[complete.id]).toEqual(.complete)
+    expect(devices[pendingClaim.id]?.supervisionStatus).toEqual(.pendingClaim)
+    expect(devices[pendingClaim.id]?.supervisionSetupPath).toBeNil()
+    expect(devices[claimed.id]?.supervisionStatus).toEqual(.claimed)
+    expect(devices[claimed.id]?.supervisionSetupPath)
+      .toEqual("/connect/blockerSupervise/\(claimedClaim.code)")
+    expect(devices[supervised.id]?.supervisionStatus).toEqual(.supervised)
+    expect(devices[supervised.id]?.supervisionSetupPath)
+      .toEqual("/connect/blockerSupervise/\(supervisedClaim.code)")
+    expect(devices[complete.id]?.supervisionStatus).toEqual(.complete)
+    expect(devices[complete.id]?.supervisionSetupPath).toBeNil()
     let ordinaryOutput = try XCTUnwrap(
       output.mobileDevices.first { $0.id == ordinary.id },
     )
     expect(ordinaryOutput.supervisionStatus).toBeNil()
+    expect(ordinaryOutput.supervisionSetupPath).toBeNil()
+
+    let resumed = try await GetAccountIOSClaimData.resolve(
+      with: .init(flow: .blockerSupervise, code: claimedClaim.code),
+      in: self.accountContext(parent),
+    )
+    expect(resumed.assignment?.personId).toEqual(person.id)
+    expect(resumed.assignment?.deviceId).toEqual(claimed.id)
   }
 
   func testExcludesDevicesOutsideAccountAndUnassignedIOSDevices() async throws {

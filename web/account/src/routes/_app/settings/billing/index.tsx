@@ -4,6 +4,7 @@ import { CircleAlertIcon, RefreshCwIcon } from 'lucide-react';
 import React from 'react';
 import type { SubscriptionPanelAction } from '@shared/pairql/src/account';
 import BillingSettingsPage from '#/components/pages/settings/BillingSettingsPage';
+import { pairingReturnPath } from '#/lib/authRedirect';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
@@ -106,6 +107,7 @@ const BillingSettingsRoute: React.FC = () => {
     <BillingSettingsPage
       billing={query.data}
       pendingAction={pendingAction}
+      returnHref={pairingReturnPath()}
       onAction={handleAction}
     />
   );

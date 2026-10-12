@@ -15,6 +15,7 @@ interface Props {
   sendingLink?: boolean;
   onSubmit: (event: React.FormEvent) => void;
   onMagicLink: () => void;
+  signupHref?: string;
 }
 
 const LoginPage: React.FC<Props> = ({
@@ -27,6 +28,7 @@ const LoginPage: React.FC<Props> = ({
   sendingLink = false,
   onSubmit,
   onMagicLink,
+  signupHref = `/signup`,
 }) => (
   <UnauthedPageLayout
     form={
@@ -103,7 +105,7 @@ const LoginPage: React.FC<Props> = ({
         subheading="Sign in with your password or a magic link."
         bottomLink={{
           text: `Signup instead`,
-          href: `/signup`,
+          href: signupHref,
         }}
         bottomLinkExplanation="Don't have an account?"
       />

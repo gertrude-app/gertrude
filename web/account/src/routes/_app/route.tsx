@@ -1,16 +1,6 @@
-import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
 import { Outlet, createFileRoute, redirect, useLocation } from '@tanstack/react-router';
-import {
-  InboxIcon,
-  KeyIcon,
-  LogOutIcon,
-  MonitorSmartphoneIcon,
-  ScanEyeIcon,
-  SettingsIcon,
-  ShieldCheckIcon,
-  UsersIcon,
-} from 'lucide-react';
 import React from 'react';
+import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
 import { authRedirectForPath } from '#/lib/authRedirect';
 import { isAuthed } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
@@ -31,70 +21,17 @@ const AuthedLayout: React.FC = () => {
   );
   const requestCount =
     (unlockRequests.data?.totalCount ?? 0) + (suspensionRequests.data?.length ?? 0);
-  const isSelected = (href: string): boolean =>
-    pathname === href || pathname.startsWith(`${href}/`);
+  React.useEffect(() => {
+    if (pathname !== `/settings/billing` && !pathname.startsWith(`/settings/billing/`)) {
+      sessionStorage.removeItem(`pairingReturnPath`);
+    }
+  }, [pathname]);
+  if (pathname.startsWith(`/connect/`)) return <Outlet />;
 
   return (
-    <SidebarLayout
-      content={<Outlet />}
-      mobileLogo={<img src="/logo-wordmark.svg" alt="Gertrude" width={140} />}
-    >
-      <Sidebar
-        logoUrl="/logo-wordmark.svg"
-        logoWidth={140}
-        bottomButton={{
-          text: `Sign out`,
-          href: `/signout`,
-          icon: LogOutIcon,
-        }}
-      >
-        <SidebarSection>
-          <SidebarItem
-            title="People"
-            icon={UsersIcon}
-            href="/people"
-            selected={isSelected(`/people`)}
-          />
-          <SidebarItem
-            title="Devices"
-            icon={MonitorSmartphoneIcon}
-            href="/devices"
-            selected={isSelected(`/devices`)}
-          />
-          <SidebarItem
-            title="Requests"
-            icon={InboxIcon}
-            href="/requests/unlock"
-            selected={isSelected(`/requests`)}
-            badgeCount={requestCount || undefined}
-          />
-          <SidebarItem
-            title="Activity"
-            icon={ScanEyeIcon}
-            href="/activity"
-            selected={isSelected(`/activity`)}
-          />
-          <SidebarItem
-            title="Keychains"
-            icon={KeyIcon}
-            href="/keychains"
-            selected={isSelected(`/keychains`)}
-          />
-          <SidebarItem
-            title="Security"
-            icon={ShieldCheckIcon}
-            href="/security-events"
-            selected={isSelected(`/security-events`)}
-          />
-          <SidebarItem
-            title="Settings"
-            icon={SettingsIcon}
-            href="/settings"
-            selected={isSelected(`/settings`)}
-          />
-        </SidebarSection>
-      </Sidebar>
-    </SidebarLayout>
+    <AuthedAppLayout pathname={pathname} requestCount={requestCount}>
+      <Outlet />
+    </AuthedAppLayout>
   );
 };
 

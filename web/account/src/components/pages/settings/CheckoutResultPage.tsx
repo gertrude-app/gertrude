@@ -1,4 +1,4 @@
-import { Button, LoadingDots, Text, VStack } from '@gertrude/ui';
+import { Button, HStack, LoadingDots, Text, VStack } from '@gertrude/ui';
 import {
   CheckCircleIcon,
   CircleAlertIcon,
@@ -8,11 +8,12 @@ import {
 import React from 'react';
 import CardContainer from '#/components/layout/CardContainer';
 
-type Props =
+type Props = (
   | { status: `loading` }
   | { status: `success` }
   | { status: `error`; message: string }
-  | { status: `canceled` };
+  | { status: `canceled` }
+) & { returnHref?: string };
 
 const CheckoutResultPage: React.FC<Props> = (props) => {
   if (props.status === `loading`) {
@@ -57,16 +58,30 @@ const CheckoutResultPage: React.FC<Props> = (props) => {
   return (
     <CardContainer className="mt-4">
       <VStack align="center" gap={3} className="py-10 text-center">
-        <Icon className={`h-12 w-12 ${content.iconClassName}`} />
-        <Text as="h2" variant="title">
-          {content.title}
-        </Text>
-        <Text as="p" variant="proseSubtle" className="max-w-lg">
+        <HStack align="center" gap={3}>
+          <Icon
+            className={`h-5 w-5 shrink-0 ${content.iconClassName}`}
+            strokeWidth={2.5}
+            aria-hidden="true"
+          />
+          <Text as="h2" variant="title">
+            {content.title}
+          </Text>
+        </HStack>
+        <Text
+          as="p"
+          variant="proseSubtle"
+          className={props.status === `success` ? `max-w-sm` : `max-w-lg`}
+        >
           {content.description}
         </Text>
         <div className="mt-3 flex flex-col gap-2 xs:flex-row">
-          <Button type="link" href="/settings/billing" variant="primary">
-            Back to Billing
+          <Button
+            type="link"
+            href={props.returnHref ?? `/settings/billing`}
+            variant="primary"
+          >
+            {props.returnHref ? `Continue device setup` : `Back to Billing`}
           </Button>
           {props.status !== `success` && (
             <Button

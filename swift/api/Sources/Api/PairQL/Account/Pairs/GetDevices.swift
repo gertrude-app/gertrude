@@ -51,6 +51,7 @@ struct GetDevices: Pair {
     let person: Person
     let connectedApps: [ConnectedApp]
     let supervisionStatus: SupervisionStatus?
+    let supervisionSetupPath: String?
   }
 
   struct Output: PairOutput {
@@ -173,6 +174,15 @@ extension GetDevices: NoInputResolver {
         )
       }
 
+      let supervisionSetupPath: String? = if supervisionStatus != .complete,
+                                             let claim = supervisionClaims.first(where: {
+                                               $0.deviceId == device.id && $0.claimedAt != nil
+                                             }) {
+        ClaimIntent.blockerSupervise.accountClaimPath(code: claim.code)
+      } else {
+        nil
+      }
+
       return Mobile(
         id: device.id,
         type: device.deviceType == "iPad" ? .ipad : .iphone,
@@ -182,6 +192,7 @@ extension GetDevices: NoInputResolver {
         person: .init(id: person.id, name: person.name),
         connectedApps: connectedApps,
         supervisionStatus: supervisionStatus,
+        supervisionSetupPath: supervisionSetupPath,
       )
     }
 

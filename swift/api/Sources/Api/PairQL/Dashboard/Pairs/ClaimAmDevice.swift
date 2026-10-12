@@ -35,13 +35,22 @@ extension ClaimAmDevice: Resolver {
         try await self.output(device, child, input.code, in: context)
       },
       onFresh: { device, child in
-        let output = try await self.output(device, child, input.code, in: context)
-        if case .amTrial = output.subscription {
-          await RepeatTrialCanary.alertIfReclaimed(.podcasts, device, child, in: context)
-        }
-        return output
+        try await self.didClaim(device, child, input.code, in: context)
       },
     )
+  }
+
+  static func didClaim(
+    _ device: IOSDevice,
+    _ child: Child,
+    _ code: Int,
+    in context: ParentContext,
+  ) async throws -> Output {
+    let output = try await self.output(device, child, code, in: context)
+    if case .amTrial = output.subscription {
+      await RepeatTrialCanary.alertIfReclaimed(.podcasts, device, child, in: context)
+    }
+    return output
   }
 
   static func output(

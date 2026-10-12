@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import CheckoutResultPage from '#/components/pages/settings/CheckoutResultPage';
+import { pairingReturnPath } from '#/lib/authRedirect';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
@@ -36,7 +37,12 @@ const CheckoutSuccessRoute: React.FC = () => {
     );
   }
 
-  return <CheckoutResultPage status={mutation.isSuccess ? `success` : `loading`} />;
+  return (
+    <CheckoutResultPage
+      status={mutation.isSuccess ? `success` : `loading`}
+      returnHref={pairingReturnPath()}
+    />
+  );
 };
 
 export const Route = createFileRoute(`/_app/settings/billing/checkout-success`)({
