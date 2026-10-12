@@ -77,6 +77,8 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       DeletePerson.self,
       GetAccountKeychains.self,
       GetAccountKeychain.self,
+      SaveAccountKeychain.self,
+      DeleteAccountKeychain.self,
       SaveAccountKey.self,
       DeleteAccountKey.self,
       SetAccountKeychainAssignment.self,

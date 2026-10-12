@@ -90,10 +90,22 @@ extension DeleteEntity_v2: Resolver {
         .send(.userUpdated, to: .usersWith(keychain: keychain.id))
 
     case .keychain:
-      try await Keychain.query()
+      let keychainQuery = Keychain.query()
         .where(.id == input.id)
         .where(.parentId == context.parent.id)
-        .delete(in: context.db)
+      guard try await keychainQuery.exists(in: context.db) else { return .success }
+      let assignments = try await ChildKeychain.query()
+        .where(.keychainId == input.id)
+        .all(in: context.db)
+      try await keychainQuery.delete(in: context.db)
+      for assignment in assignments {
+        do {
+          try await with(dependency: \.websockets)
+            .send(.userUpdated, to: .user(assignment.childId))
+        } catch {
+          get(dependency: \.logger).error("Failed to deliver keychain deletion: \(error)")
+        }
+      }
 
     case .blockRule:
       let blockRule = try await context.db.find(BlockerApp.BlockRule.Id(input.id))

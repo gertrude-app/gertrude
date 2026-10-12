@@ -18,6 +18,7 @@ import {
   KeyIcon,
   type LucideIcon,
   NetworkIcon,
+  PlusIcon,
   RegexIcon,
   RouteIcon,
   SearchXIcon,
@@ -50,6 +51,7 @@ export type KeyPresentation = {
 
 interface Props {
   keys: KeychainKey[];
+  onAdd?: () => void;
   onEdit?: (key: KeychainKey) => void;
 }
 
@@ -173,7 +175,9 @@ export const KeyDisplay: React.FC<{
   return (
     <div
       className={cx(
-        `grid grid-cols-1 gap-4 px-3 py-2.5 @2xl/main:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.8fr)] @2xl/main:items-center @2xl/main:gap-6 @2xl/main:px-4`,
+        `grid grid-cols-1 gap-4 px-3 @2xl/main:grid-cols-[minmax(0,1.35fr)_minmax(13rem,0.8fr)] @2xl/main:items-center @2xl/main:gap-6 @2xl/main:px-4`,
+        alwaysShowLabels ? `pt-2.5` : `pt-1.75`,
+        alwaysShowLabels ? `pb-2.5` : record.expiration ? `pb-3` : `pb-1.75`,
         className,
       )}
     >
@@ -245,7 +249,7 @@ export const KeyDisplay: React.FC<{
         >
           For:
         </Text>
-        <VStack gap={0.5} className="min-w-0">
+        <VStack gap={0} className="min-w-0">
           <Text
             as={presentation.scope.monospace ? `code` : `span`}
             variant={presentation.scope.monospace ? `code` : `bodyStrong`}
@@ -277,7 +281,7 @@ const KeyRow: React.FC<{
         <button
           type="button"
           onClick={() => onEdit?.(record)}
-          className="block w-full cursor-pointer text-left outline-none transition-colors hover:bg-violet-50/40 focus-visible:bg-violet-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300/80"
+          className="block w-full cursor-pointer text-left outline-none transition-colors hover:bg-stone-50 focus-visible:bg-violet-50 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300/80"
           aria-label={`Edit key for ${presentation.target.target}`}
         >
           {content}
@@ -304,7 +308,7 @@ const searchableText = (record: KeychainKey): string => {
     .toLowerCase();
 };
 
-const KeyList: React.FC<Props> = ({ keys, onEdit }) => {
+const KeyList: React.FC<Props> = ({ keys, onAdd, onEdit }) => {
   const [searchQuery, setSearchQuery] = React.useState(``);
   const searchInputId = React.useId();
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -318,6 +322,17 @@ const KeyList: React.FC<Props> = ({ keys, onEdit }) => {
         icon={KeyIcon}
         title="No keys"
         description="This keychain doesn't unlock anything yet."
+        button={
+          onAdd
+            ? {
+                text: `Add key`,
+                type: `button`,
+                variant: `primary`,
+                icon: PlusIcon,
+                onClick: onAdd,
+              }
+            : undefined
+        }
         className="bg-white"
       />
     );
