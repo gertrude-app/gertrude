@@ -242,6 +242,26 @@ extension PlaybackClient {
     )
   }
 
+  static func catalogSongs<Song: Sendable>(
+    for songIDs: [ApprovedTrack.ID],
+    request: @Sendable ([ApprovedTrack.ID]) async throws -> [String: Song],
+  ) async throws -> [String: Song] {
+    try Task.checkCancellation()
+    var seenIDs = Set<ApprovedTrack.ID>()
+    let uniqueIDs = songIDs.filter { seenIDs.insert($0).inserted }
+    var songsByID: [String: Song] = [:]
+    let batchSize = 300
+    for startIndex in stride(from: 0, to: uniqueIDs.count, by: batchSize) {
+      try Task.checkCancellation()
+      let endIndex = min(startIndex + batchSize, uniqueIDs.count)
+      let batch = Array(uniqueIDs[startIndex ..< endIndex])
+      let response = try await request(batch)
+      try Task.checkCancellation()
+      songsByID.merge(response) { _, song in song }
+    }
+    return songsByID
+  }
+
   #if canImport(MusicKit)
     private static func requestAuthorization() async throws {
       switch MusicAuthorization.currentStatus {
@@ -885,19 +905,25 @@ extension PlaybackClient {
       var currentItemWasAvailable: Bool
     }
 
+    private static func catalogSongBatch(
+      for songIDs: [ApprovedTrack.ID],
+    ) async throws -> [String: Song] {
+      let request = MusicCatalogResourceRequest<Song>(
+        matching: \.id,
+        memberOf: songIDs.map { MusicItemID($0.rawValue) },
+      )
+      let response = try await request.response()
+      return Dictionary(uniqueKeysWithValues: response.items.map { ($0.id.rawValue, $0) })
+    }
+
     private static func restoredQueue(
       from checkpoint: PlaybackCheckpoint,
     ) async throws -> RestoredQueue {
-      let songIDs = checkpoint.songIDs.map { MusicItemID($0.rawValue) }
-      let request = MusicCatalogResourceRequest<Song>(
-        matching: \.id,
-        memberOf: songIDs,
-      )
       do {
-        let response = try await request.response()
-        let songsByID = Dictionary(uniqueKeysWithValues: response.items.map {
-          ($0.id.rawValue, $0)
-        })
+        let songsByID = try await self.catalogSongs(
+          for: checkpoint.songIDs,
+          request: self.catalogSongBatch,
+        )
         let availableSongs: [(originalIndex: Int, song: Song)] = checkpoint.songIDs
           .enumerated()
           .compactMap { index, songID in
@@ -937,15 +963,11 @@ extension PlaybackClient {
     }
 
     private static func songs(for items: [PlaybackItem]) async throws -> [Song] {
-      let songIds = items.map { MusicItemID($0.id.rawValue) }
-      let request = MusicCatalogResourceRequest<Song>(
-        matching: \.id,
-        memberOf: songIds,
-      )
       do {
-        let response = try await request.response()
-        let songsByID = Dictionary(uniqueKeysWithValues: response.items
-          .map { ($0.id.rawValue, $0) })
+        let songsByID = try await self.catalogSongs(
+          for: items.map(\.id),
+          request: self.catalogSongBatch,
+        )
         var songs: [Song] = []
         for item in items {
           guard let song = songsByID[item.id.rawValue] else {
