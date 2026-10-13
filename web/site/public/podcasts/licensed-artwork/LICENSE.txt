@@ -1,0 +1,164 @@
+GERTRUDE HOMEPAGE PODCAST ARTWORK
+Sources and published reuse permissions checked 2026-09-10.
+
+These are illustrations of a family-chosen library, not endorsements by the
+publishers or recommendations that every episode is suitable for every child.
+No audio is redistributed. Two entries are public-domain audiobook podcast feeds.
+Some shows are completed archives. Names and marks identify their respective
+shows; they are not Gertrude branding.
+
+The downloaded TuxDigital WebP files are reproduced byte-for-byte, without
+cropping, masking, retouching, or recoloring. Their CC BY-ND license permits
+commercial redistribution but not sharing adaptations. Preserve these originals.
+The TuxDigital covers sit inside rounded, color-matched frames with a 4 px inset;
+the artwork itself is not clipped. The other six files were proportionally
+resized (no enlargement, maximum 640 px) and converted to WebP; their presentation
+uses rounded corner masks. The demo scales and moves images and changes the
+opacity of its interface.
+
+Permissions below cover the artwork, not Gertrude's application code or branding.
+Wikimedia entries here are uploader-published grants, not VRT-reviewed permissions.
+
+1. MATERIALISM: A MATERIALS SCIENCE PODCAST
+Local: materialism.webp
+Credit: Andrew Falkowski (co-host; Commons uploader Redsox1dude)
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+Source: https://commons.wikimedia.org/wiki/File:Materialism_Cover_Art.png
+Source revision: https://commons.wikimedia.org/w/index.php?oldid=1103862082
+Original: https://upload.wikimedia.org/wikipedia/commons/3/33/Materialism_Cover_Art.png
+The file description identifies the finished cover and Andrew Falkowski's own
+work, with a self CC BY 4.0 grant. The official show site identifies Falkowski as
+co-host. Show: https://materialismpodcast.com/
+Feed: https://pinecast.com/feed/materialism
+
+2. NEW RUSTACEAN
+Local: new-rustacean.webp
+Credit: Chris Krycho; incorporated Rust logo by the Rust Foundation
+Original: https://newrustacean.com/podcast.png
+Source and permission: https://newrustacean.com/
+The publisher's page displays this cover and states:
+"All content licensed under a Creative Commons Attribution license: do whatever
+you like with this; just credit me!"
+The publisher does not specify a license version on that page; none is invented
+here. This statement is the permission relied on for the finished cover.
+Underlying Rust logo art and trademark policy:
+https://foundation.rust-lang.org/policies/logo-policy-and-media-guide/
+That policy licenses Rust logo artwork under CC BY. The publisher's cover
+incorporates a modified Rust logo; Gertrude did not create that modification.
+The Rust Foundation and Rust Project are not affiliated with Gertrude.
+Feed: https://newrustacean.com/feed.xml
+
+3-7. TUXDIGITAL PODCAST COVERS
+Credit for each: TuxDigital
+License: Creative Commons Attribution-NoDerivatives 4.0 International
+https://creativecommons.org/licenses/by-nd/4.0/
+Publisher's licensing policy: https://tuxdigital.com/license/
+The policy states:
+"Our publicly released content are released under a Creative Commons license
+(CC BY-ND 4.0)."
+"All we ask is that you give TuxDigital appropriate credit, use our content as-is
+and do not modify it in a way that changes its meaning, and clearly identify
+TuxDigital as the original source."
+Each cover below is the show-art image on the corresponding publisher page;
+each of those pages links the publisher's licensing policy. These are not
+third-party podcast-directory downloads. They are already 340 px WebP files
+provided by the publisher. Do not run an image optimizer over them or add crops,
+rounded masks, recoloring, text overlays, or other changes to the artwork.
+SHA-256 hashes below identify the unchanged downloaded and distributed bytes.
+
+3. Destination Linux
+Local: destination-linux.webp
+Source: https://tuxdigital.com/podcasts/destination-linux/
+Original: https://tuxdigital.com/wp-content/uploads/tuxdigital-podcast-art-destination-linux-340.webp
+Feed: https://feeds.fireside.fm/destinationlinux/rss
+SHA-256: e38e1a7589c8c61e3c15f686f28486cec00765dcd7c9440573cbcd57332b44ba
+
+4. Hardware Addicts
+Local: hardware-addicts.webp
+Source: https://tuxdigital.com/podcasts/hardware-addicts/
+Original: https://tuxdigital.com/wp-content/uploads/tuxdigital-podcast-art-hardware-addicts-340.webp
+Feed: https://feeds.fireside.fm/hardwareaddicts/rss
+SHA-256: 1dab599f734cee521c683d1bacf57d011bb1f0cf519590cc8d98d74b5f0453fb
+
+5. Linux Out Loud
+Local: linux-out-loud.webp
+Source: https://tuxdigital.com/podcasts/linux-out-loud/
+Original: https://tuxdigital.com/wp-content/uploads/tuxdigital-podcast-art-linux-out-loud-340.webp
+Feed: https://feeds.fireside.fm/dlnxtend/rss
+SHA-256: 89898a37bde3a40e79e28ae2e8466f56227ea9406331f808dba6b99cab5f22ad
+
+6. This Week in Linux
+Local: this-week-in-linux.webp
+Source: https://tuxdigital.com/podcasts/this-week-in-linux/
+Original: https://tuxdigital.com/wp-content/uploads/tuxdigital-podcast-art-this-week-in-linux-340.webp
+Feed: https://feeds.fireside.fm/thisweekinlinux/rss
+SHA-256: 182870b3b18ffad0a17e9b3c2e1b159935e98bb98089a2b46759f29d87cfcf67
+
+7. Sudo Show
+Local: sudo-show.webp
+Source: https://tuxdigital.com/podcasts/sudo-show/
+Original: https://tuxdigital.com/wp-content/uploads/tuxdigital-podcast-art-sudo-show-340.webp
+Feed: https://feeds.fireside.fm/sudoshow/rss
+SHA-256: 63bdb42d0585c739ce0553c01b9ec56e7ae3530fbff4170a1ab2752cebbe88af
+
+8. FRETS WITH DJ FEY
+Local: frets.webp
+Credit: DJFey58
+License: CC0 1.0 Universal public-domain dedication
+https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://commons.wikimedia.org/wiki/File:Frets_Logo_1200_rnd.png
+Source revision: https://commons.wikimedia.org/w/index.php?oldid=1261505993
+Original: https://upload.wikimedia.org/wikipedia/commons/e/e7/Frets_Logo_1200_rnd.png
+The file description identifies the finished podcast logo as DJFey58's own work,
+dedicated under CC0. It is an earlier cover version, not the 2026 replacement.
+Show: https://www.fretspodcast.com/
+Feed: https://rss.buzzsprout.com/1898249.rss
+
+9. WEB, BUT GREEN!
+Local: web-but-green.webp
+Credit: Tbeyer01 (Dr. Torsten Beyer)
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+Source: https://commons.wikimedia.org/wiki/File:Web_But_Green_Podcast_Cover.jpg
+Source revision: https://commons.wikimedia.org/w/index.php?oldid=1108425546
+Original: https://upload.wikimedia.org/wikipedia/commons/f/f0/Web_But_Green_Podcast_Cover.jpg
+The file description identifies the official finished cover, uploaded as own work
+by Tbeyer01 under CC BY 4.0. The publisher identifies Torsten Beyer as the host.
+This is a German-language technical podcast about resource-efficient websites.
+Show: https://webbutgreen.de/
+Feed: https://web-but-green.podigee.io/feed/mp3
+
+10. THE GREAT BIG TREASURY OF BEATRIX POTTER
+Local: beatrix-potter.webp
+Credit: Beatrix Potter; cover design by Bart de Leeuw / LibriVox
+Source: https://librivox.org/the-great-big-treasury-of-beatrix-potter-by-beatrix-potter/
+Original: https://archive.org/download/LibrivoxCdCoverArt18/potter_1205.jpg
+Cover insert and credits: https://archive.org/download/LibrivoxCdCoverArt18/potter_1205.pdf
+The insert credits artwork from the original book by Beatrix Potter (1902) and
+cover design by Bart de Leeuw. It states all LibriVox productions are public
+domain and bears the "NO RIGHTS RESERVED" notice. Potter died in 1943; the cited
+illustrations are also out of copyright in life-plus-70 jurisdictions.
+Feed: https://librivox.org/rss/2990
+
+11. THE VELVETEEN RABBIT
+Local: velveteen-rabbit.webp
+Credit: William Nicholson; cover design by Janette Brown / LibriVox
+Source: https://librivox.org/the-velveteen-rabbit-by-margery-williams/
+Original: https://archive.org/download/velveteen_rabbit_librivox/Velveteen_Rabbit_1104.jpg
+Cover insert and credits: https://archive.org/download/velveteen_rabbit_librivox/Velveteen_Rabbit_1104.pdf
+The insert explicitly states:
+"Cover pictures by William Nicholson (1922). Copyright expired in U.S., Canada,
+EU, and all countries with author's life +70 yrs laws. Cover design by Janette
+Brown. This design is in the public domain."
+Feed: https://librivox.org/rss/432
+
+LIBRIVOX FINISHED-COVER POLICY (entries 10 and 11)
+https://librivox.org/pages/public-domain/
+"In addition, book summaries, CD cover art, and any other material that goes into
+our catalog with the audio recordings are in the public domain."
+This policy is not being extrapolated to unrelated commercial audiobook covers.
+The specific cover inserts above also identify the source art and cover designers.
+Public-domain status can vary by jurisdiction; the identified original images
+are from 1902/1922 and the designers' LibriVox contributions are dedicated to the
+public domain. No claim of universal clearance for every jurisdiction is made.
