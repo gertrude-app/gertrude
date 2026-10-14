@@ -54,6 +54,7 @@ export * from './pairs/RequestPodcastsPinReset';
 export * from './pairs/SaveAccountKey';
 export * from './pairs/SaveAccountKeychain';
 export * from './pairs/SaveAccountNotification';
+export * from './pairs/SaveExtendedSupervisionControls';
 export * from './pairs/SaveMusicAlbumCuration';
 export * from './pairs/SearchMusicCatalog_v2';
 export * from './pairs/SetAccountDailyReviewEmail';

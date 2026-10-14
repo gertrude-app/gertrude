@@ -1,6 +1,6 @@
-import { Badge, HStack, Text, VStack } from '@gertrude/ui';
+import { Badge, HStack, SelectionCircle, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
-import { CheckIcon, CircleQuestionMarkIcon } from 'lucide-react';
+import { CircleQuestionMarkIcon } from 'lucide-react';
 import React from 'react';
 
 interface Props {
@@ -29,18 +29,7 @@ const BlockGroup: React.FC<Props> = ({
     >
       <HStack justify="between" gap={2}>
         <HStack gap={4}>
-          <HStack
-            justify="center"
-            className={cx(
-              `w-5 h-5 rounded-full border shrink-0`,
-              blocked ? `bg-violet-500 border-violet-500` : `bg-white border-stone-200`,
-            )}
-          >
-            <CheckIcon
-              className="w-3.5 h-3.5 text-white translate-y-[0.5px]"
-              strokeWidth={3}
-            />
-          </HStack>
+          <SelectionCircle selected={blocked} />
           <VStack>
             <HStack gap={2}>
               <Text variant="bodyLarge">{title}</Text>

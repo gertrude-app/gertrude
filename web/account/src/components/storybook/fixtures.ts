@@ -258,6 +258,23 @@ export const iosDeviceSettings: IosDeviceSettingsConfiguration = {
   blocker: iosBlockerSettings,
 };
 
+export const iosDeviceSettingsExtendedControls: IosDeviceSettingsConfiguration = {
+  ...iosDeviceSettings,
+  blocker: {
+    ...iosBlockerSettings,
+    extendedSupervisionControls: {
+      whitelistedAppBundleIds: [`com.apple.mobilesafari`, `com.apple.MobileSMS`],
+      webAllowList: [{ title: `Weather`, url: `https://weather.com` }],
+      allowSpotlightInternetResults: false,
+      allowExplicitContent: false,
+      ratingMovies: 0,
+      allowAssistant: false,
+      forceDelayedSoftwareUpdates: true,
+      enforcedSoftwareUpdateDelay: 45,
+    },
+  },
+};
+
 export const iosDeviceSettingsUnsupervised: IosDeviceSettingsConfiguration = {
   ...iosDeviceSettings,
   blocker: { ...iosBlockerSettings, isSupervised: false },

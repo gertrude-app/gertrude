@@ -41,6 +41,8 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       ("SubscriptionTier", StripeSubscription.Tier.self),
       ("SubscriptionPanelAction", GetSubscriptionPanel_v2.Action.self),
       ("MusicSubscriptionState", MusicSubscriptionState.self),
+      ("ExtendedSupervisionControls", SaveExtendedSupervisionControls.Controls.self),
+      ("AllowListBookmark", SaveExtendedSupervisionControls.Bookmark.self),
     ]
   }
 
@@ -92,6 +94,7 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       GetIosDeviceSettings.self,
       UpdateIosDeviceBlockedGroups.self,
       UpdateIosDeviceProfileSettings.self,
+      SaveExtendedSupervisionControls.self,
       RequestPodcastsPinReset.self,
       GetMusicCuration.self,
       GetMusicAlbumCuration.self,

@@ -276,6 +276,30 @@
     }
   },
   {
+    "id": "account-components-person-settings-extended-supervision-controls--states",
+    "iframePath": "/iframe.html?id=account-components-person-settings-extended-supervision-controls--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/mobile/account-components-person-settings-extended-supervision-controls--states.png",
+    "title": "Account/Components/Person Settings/Extended Supervision Controls",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-extended-supervision-controls--states",
+    "iframePath": "/iframe.html?id=account-components-person-settings-extended-supervision-controls--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/account-components-person-settings-extended-supervision-controls--states.png",
+    "title": "Account/Components/Person Settings/Extended Supervision Controls",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-components-person-settings-settings-row--types",
     "iframePath": "/iframe.html?id=account-components-person-settings-settings-row--types&viewMode=story",
     "name": "Types",
@@ -2784,6 +2808,30 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--ios-extended-supervision",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-extended-supervision&viewMode=story",
+    "name": "iPhone and iPad (extended supervision controls)",
+    "path": "screenshots/mobile/account-pages-people-person-settings--ios-extended-supervision.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--ios-extended-supervision",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-extended-supervision&viewMode=story",
+    "name": "iPhone and iPad (extended supervision controls)",
+    "path": "screenshots/desktop/account-pages-people-person-settings--ios-extended-supervision.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--ios-loading-and-error",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--ios-loading-and-error&viewMode=story",
     "name": "iPhone and iPad (loading and error)",
@@ -4224,6 +4272,18 @@
     }
   },
   {
+    "id": "ui-components-input--sizes",
+    "iframePath": "/iframe.html?id=ui-components-input--sizes&viewMode=story",
+    "name": "Sizes",
+    "path": "screenshots/desktop/ui-components-input--sizes.png",
+    "title": "UI/Components/Input",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "ui-components-input--type-variants",
     "iframePath": "/iframe.html?id=ui-components-input--type-variants&viewMode=story",
     "name": "Type Variants",
@@ -4625,6 +4685,18 @@
     "name": "Wrapping",
     "path": "screenshots/desktop/ui-primitives-hstack--wrapping.png",
     "title": "UI/Primitives/HStack",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-primitives-selection-circle--states",
+    "iframePath": "/iframe.html?id=ui-primitives-selection-circle--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/ui-primitives-selection-circle--states.png",
+    "title": "UI/Primitives/Selection Circle",
     "viewport": {
       "width": 1440,
       "height": 900,

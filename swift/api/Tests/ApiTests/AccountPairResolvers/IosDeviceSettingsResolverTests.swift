@@ -55,6 +55,7 @@ final class IosDeviceSettingsResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testProfileSettingsDefaultsAndSupervisionFlag() async throws {
     let child = try await self.childWithIOSDevice()
+    try await self.db.create(BillingIdentity(parentId: child.parent.id, isComplimentary: true))
 
     let output = try await GetIosDeviceSettings.resolve(
       with: .init(deviceId: child.device.id),
@@ -67,6 +68,13 @@ final class IosDeviceSettingsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(blocker.profileSettings.allowDeletingApps).toBeFalse()
     expect(blocker.profileSettings.allowFactoryReset).toBeFalse()
     expect(blocker.profileSettings.allowInstallingApps).toBeTrue()
+    expect(blocker.extendedSupervisionControls).toBeNil()
+    try await expectErrorFrom {
+      _ = try await AuthedAccountRoute.respond(
+        to: .saveExtendedSupervisionControls(.init(deviceId: child.device.id, controls: .init())),
+        in: self.accountContext(child.parent),
+      )
+    }.toContain("badRequest")
   }
 
   func testReportsSupervisedDevice() async throws {
@@ -291,6 +299,57 @@ final class IosDeviceSettingsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(settings.allowAppRemoval).toBeTrue()
     expect(settings.allowEraseContentAndSettings).toBeTrue()
     expect(settings.allowAppInstallation).toBeFalse()
+  }
+
+  func testExtendedControlsRoundTripThroughAccountRoute() async throws {
+    let child = try await self.childWithIOSDevice()
+    try await self.db.create(BillingIdentity(parentId: child.parent.id, isComplimentary: true))
+    try await self.db.create(BlockerApp.Supervision(
+      deviceId: child.device.id,
+      supervisedAt: .reference,
+    ))
+
+    let response = try await AuthedAccountRoute.respond(
+      to: .saveExtendedSupervisionControls(.init(deviceId: child.device.id, controls: .init(
+        whitelistedAppBundleIds: [],
+        webAllowList: [.init(url: "https://gertrude.app", title: "Gertrude")],
+        ratingMovies: 0,
+        allowSafari: false,
+        forceDelayedSoftwareUpdates: true,
+        enforcedSoftwareUpdateDelay: 45,
+      ))),
+      in: self.accountContext(child.parent),
+    )
+    expect(response.status).toEqual(.ok)
+
+    let output = try await GetIosDeviceSettings.resolve(
+      with: .init(deviceId: child.device.id),
+      in: self.accountContext(child.parent),
+    )
+    let controls = try XCTUnwrap(output.blocker?.extendedSupervisionControls)
+    expect(controls.whitelistedAppBundleIds).toEqual([])
+    expect(controls.webAllowList?.first?.url).toEqual("https://gertrude.app")
+    expect(controls.webAllowList?.first?.title).toEqual("Gertrude")
+    expect(controls.allowSafari).toEqual(false)
+    expect(controls.ratingMovies).toEqual(0)
+    expect(controls.forceDelayedSoftwareUpdates).toEqual(true)
+    expect(controls.enforcedSoftwareUpdateDelay).toEqual(45)
+  }
+
+  func testExtendedControlsHiddenForEveryPaidTier() async throws {
+    for tier in [StripeSubscription.Tier.light, .medium, .full] {
+      let child = try await self.childWithIOSDevice()
+      try await self.addPaidSubscription(for: child.parent.id, tier: tier)
+      try await self.db.create(BlockerApp.Supervision(
+        deviceId: child.device.id,
+        supervisedAt: .reference,
+      ))
+      let output = try await GetIosDeviceSettings.resolve(
+        with: .init(deviceId: child.device.id),
+        in: self.accountContext(child.parent),
+      )
+      expect(try XCTUnwrap(output.blocker).extendedSupervisionControls).toBeNil()
+    }
   }
 
   func testCannotUpdateProfileSettingsForDeviceFromAnotherAccount() async throws {
