@@ -64,6 +64,8 @@ enum ModelIdentifier {
   // NB: use https://github.com/devicekit/DeviceKit as source of truth for new devices
   // search model identifier and see changelog for marketing names
   private static let mapping: [String: String] = [
+    "iPhone19,4": "iPhone Duo",
+
     // iPhone 18 Pro series (2026)
     "iPhone19,2": "iPhone 18 Pro",
     "iPhone19,3": "iPhone 18 Pro Max",

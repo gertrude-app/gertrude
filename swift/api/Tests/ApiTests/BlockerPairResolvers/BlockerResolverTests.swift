@@ -87,6 +87,7 @@ final class BlockerResolverTests: ApiTestCase, @unchecked Sendable {
         iosVersion: "18.0",
       )
     }
+    expect(device("arm64").shouldUpdateModelIdentifier(to: "iPhone19,4")).toEqual(true)
     expect(device("iPhone,unknown").shouldUpdateModelIdentifier(to: "iPhone14,2")).toEqual(true)
     expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPhone14,3")).toEqual(true)
     expect(device("iPhone14,2").shouldUpdateModelIdentifier(to: "iPhone14,2")).toEqual(false)
