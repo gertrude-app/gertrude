@@ -222,6 +222,26 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
   };
 
+  public dismissAccountAnnouncement = (
+    input: P.DismissAccountAnnouncement.Input,
+  ): Promise<Result<P.DismissAccountAnnouncement.Output>> => {
+    return this.query<P.DismissAccountAnnouncement.Output>(
+      input,
+      `DismissAccountAnnouncement`,
+      `parent`,
+    );
+  };
+
+  public getAccountAnnouncement = (
+    input: P.GetAccountAnnouncement.Input,
+  ): Promise<Result<P.GetAccountAnnouncement.Output>> => {
+    return this.query<P.GetAccountAnnouncement.Output>(
+      input,
+      `GetAccountAnnouncement`,
+      `parent`,
+    );
+  };
+
   public getAccountBilling = (
     input: P.GetAccountBilling.Input,
   ): Promise<Result<P.GetAccountBilling.Output>> => {

@@ -1,5 +1,6 @@
 import type {
   BlockRule,
+  GetAccountAnnouncement,
   GetPersonMacSettings,
   PersonRelationship,
   SharedKey,
@@ -10,6 +11,8 @@ import type React from 'react';
 export type { BlockRule, PersonRelationship, SharedKey };
 
 type MacSettings = GetPersonMacSettings.Output;
+
+export type Announcement = NonNullable<GetAccountAnnouncement.Output[`announcement`]>;
 
 export type LoadableState<Data> =
   | { status: `loading` }

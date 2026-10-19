@@ -1,6 +1,7 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import type { ComponentProps, ReactElement } from 'react';
 import PeoplePage from './PeoplePage';
+import AnnouncementBanner from '#/components/announcements/AnnouncementBanner';
 import {
   people,
   securityEvents,
@@ -56,6 +57,25 @@ export default meta;
 export const Default = {
   parameters: galleryParameters,
   render: () => renderPage(),
+};
+
+export const WithAnnouncement = {
+  name: 'With announcement',
+  parameters: galleryParameters,
+  render: () =>
+    renderPage({
+      announcement: (
+        <AnnouncementBanner
+          announcement={{
+            id: `people-news`,
+            kind: `news`,
+            html: `<b>A little more peace of mind.</b> You can now manage all of your protected people and their devices together in Gertrude Account.`,
+            action: undefined,
+          }}
+          onDismiss={noop}
+        />
+      ),
+    }),
 };
 
 export const Empty = {
