@@ -24,6 +24,30 @@
     }
   },
   {
+    "id": "account-components-announcement-banner--assortment",
+    "iframePath": "/iframe.html?id=account-components-announcement-banner--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/mobile/account-components-announcement-banner--assortment.png",
+    "title": "Account/Components/Announcement Banner",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-announcement-banner--assortment",
+    "iframePath": "/iframe.html?id=account-components-announcement-banner--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/account-components-announcement-banner--assortment.png",
+    "title": "Account/Components/Announcement Banner",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-components-layout-authed-app-layout--with-request-badge",
     "iframePath": "/iframe.html?id=account-components-layout-authed-app-layout--with-request-badge&viewMode=story",
     "name": "With request badge",
@@ -2092,6 +2116,30 @@
     "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-refreshing&viewMode=story",
     "name": "Suspension requests refreshing",
     "path": "screenshots/desktop/account-pages-people--suspension-requests-refreshing.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--with-announcement",
+    "iframePath": "/iframe.html?id=account-pages-people--with-announcement&viewMode=story",
+    "name": "With announcement",
+    "path": "screenshots/mobile/account-pages-people--with-announcement.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--with-announcement",
+    "iframePath": "/iframe.html?id=account-pages-people--with-announcement&viewMode=story",
+    "name": "With announcement",
+    "path": "screenshots/desktop/account-pages-people--with-announcement.png",
     "title": "Account/Pages/People",
     "viewport": {
       "width": 1440,
