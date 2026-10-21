@@ -20,42 +20,35 @@ struct LibraryFeature: Sendable {
     var path = StackState<LibraryPath.State>()
     var shouldPresentCreatedPlaylist = false
 
-    var albumDetail: AlbumDetailFeature.State? {
-      get {
-        guard let id = self.path.ids.last else { return nil }
-        return self.path[id: id, case: \.album]
-      }
-      set {
-        if let id = self.path.ids.last,
-           self.path[id: id, case: \.album] != nil {
-          if let newValue {
-            self.path[id: id] = .album(newValue)
-          } else {
-            self.path.pop(from: id)
-          }
-        } else if let newValue {
-          self.path.append(.album(newValue))
-        }
+    var selectedCollectionIdentity: LibraryCollectionIdentity? {
+      switch self.path.first {
+      case .album(let detail):
+        .album(detail.album.id)
+      case .artist(let detail):
+        .artist(detail.artistID)
+      case .playlist(let detail):
+        .playlist(detail.playlist.id)
+      case nil:
+        nil
       }
     }
 
+    var detailPath: StackState<LibraryPath.State> {
+      var path = self.path
+      if !path.isEmpty {
+        path.removeFirst()
+      }
+      return path
+    }
+
+    var albumDetail: AlbumDetailFeature.State? {
+      get { self.path[last: \.album] }
+      set { self.path[last: \.album] = newValue }
+    }
+
     var playlistDetail: PlaylistDetailFeature.State? {
-      get {
-        guard let id = self.path.ids.last else { return nil }
-        return self.path[id: id, case: \.playlist]
-      }
-      set {
-        if let id = self.path.ids.last,
-           self.path[id: id, case: \.playlist] != nil {
-          if let newValue {
-            self.path[id: id] = .playlist(newValue)
-          } else {
-            self.path.pop(from: id)
-          }
-        } else if let newValue {
-          self.path.append(.playlist(newValue))
-        }
-      }
+      get { self.path[last: \.playlist] }
+      set { self.path[last: \.playlist] = newValue }
     }
   }
 
@@ -191,6 +184,7 @@ struct LibraryFeature: Sendable {
     case refreshPresentationFinished
     case refreshPulled
     case retryButtonTapped
+    case selectionChanged(LibraryCollectionIdentity?)
   }
 
   @Dependency(\.approvedMusic) var approvedMusic
@@ -335,6 +329,32 @@ struct LibraryFeature: Sendable {
           effects.append(self.saveCollectionRecency(recencyToSave))
         }
         return .merge(effects)
+
+      case .selectionChanged(let selection):
+        guard let selection else {
+          state.path.removeAll()
+          return .none
+        }
+        guard selection != state.selectedCollectionIdentity,
+              case .loaded(let library) = state.status else { return .none }
+
+        let destination: LibraryPath.State
+        switch selection.kind {
+        case .album:
+          guard let album = library.album(id: .init(rawValue: selection.id)) else { return .none }
+          destination = .album(.init(album: album, transitionSourceID: album.id.rawValue))
+        case .artist:
+          let artistID = ApprovedArtist.ID(rawValue: selection.id)
+          guard library.artist(id: artistID) != nil else { return .none }
+          destination = .artist(.init(artistID: artistID))
+        case .playlist:
+          guard let id = UUID(uuidString: selection.id),
+                let playlist = library.playlist(id: .init(rawValue: id)) else { return .none }
+          destination = .playlist(.init(playlist: playlist))
+        }
+        state.path.removeAll()
+        state.path.append(destination)
+        return .none
 
       case .albumAddToQueueTapped(let albumID):
         return self.queueAlbum(

@@ -67,68 +67,21 @@ public struct ArtistDetailView: View {
   }
 
   public var body: some View {
-    GeometryReader { proxy in
+    DetailContentLayout(artworkURL: self.artist.artworkUrl) { proxy, bookGeometry in
+      self.scrollingContent(proxy: proxy, bookGeometry: bookGeometry)
+    } hero: { width, maximumArtworkSize in
+      self.heroContent(containerWidth: width, maximumArtworkSize: maximumArtworkSize)
+    } content: {
       ScrollView {
-        VStack(alignment: .leading, spacing: 30) {
-          ArtistDetailHeroView(
-            artist: self.artist,
-            containerWidth: proxy.size.width,
-            isPlaying: self.isPlaying,
-            isLoading: self.isLoading,
-            onPlayTap: self.onPlayTap,
-          )
-          .padding(.horizontal, 20)
-          .padding(.top, proxy.safeAreaInsets.top + 18)
-          .padding(.bottom, 24)
-          .background {
-            if let backgroundColor = self.artist.artworkPalette?.backgroundColor {
-              LinearGradient(
-                colors: [
-                  .clear,
-                  backgroundColor.opacity(0.3),
-                ],
-                startPoint: .top,
-                endPoint: .bottom,
-              )
-              .ignoresSafeArea(edges: .top)
-            }
-          }
-
-          ArtistTopSongsShelf(
-            songs: self.topSongs,
-            currentTrackID: self.currentTrackID,
-            isPlaying: self.isCurrentTrackPlaying,
-            onSongAddToPlaylist: self.onSongAddToPlaylist,
-            onSongAddToQueue: self.onSongAddToQueue,
-            onSongPlayNext: self.onSongPlayNext,
-            onSongTap: self.onSongTap,
-          )
-
-          ArtistReleasesShelf(
-            releases: self.releases,
-            transitionNamespace: self.transitionNamespace,
-            onReleaseAddToPlaylist: self.onReleaseAddToPlaylist,
-            onReleaseAddToQueue: self.onReleaseAddToQueue,
-            onReleasePlayNext: self.onReleasePlayNext,
-            onReleaseTap: self.onReleaseTap,
-          )
-
-          if let editorialNotes = self.artist.editorialNotes?.nonEmpty {
-            ArtistEditorialNotesSection(notes: editorialNotes)
-              .frame(maxWidth: 700)
-              .frame(maxWidth: .infinity)
-              .padding(.horizontal, 20)
-          }
-        }
-        .padding(.bottom, 96)
+        self.artistContent
+          .padding(.bottom, 96)
       }
       .background(.background)
-      .ignoresSafeArea(edges: .top)
     }
     .navigationTitle("")
     .detailNavigationBarBackground()
     .toolbar {
-      ToolbarItem(placement: self.menuPlacement) {
+      ToolbarItem(placement: .detailActions) {
         Menu {
           Button(action: self.onPlayNext) {
             Label("Play Next", systemImage: "text.line.first.and.arrowtriangle.forward")
@@ -153,12 +106,86 @@ public struct ArtistDetailView: View {
     }
   }
 
-  private var menuPlacement: ToolbarItemPlacement {
-    #if os(iOS)
-      .topBarTrailing
-    #else
-      .automatic
-    #endif
+  private func scrollingContent(
+    proxy: GeometryProxy,
+    bookGeometry: FoldedContentGeometry?,
+  ) -> some View {
+    ScrollView {
+      VStack(alignment: .leading, spacing: 30) {
+        Group {
+          if let bookGeometry {
+            BookDetailHero(geometry: bookGeometry) { size in
+              ArtistArtworkView(artworkUrl: self.artist.artworkUrl, size: min(280, size))
+            } metadata: {
+              ArtistDetailMetadataView(
+                artist: self.artist,
+                isPlaying: self.isPlaying,
+                isLoading: self.isLoading,
+                onPlayTap: self.onPlayTap,
+              )
+              .frame(maxWidth: 440)
+              .padding(.horizontal, 24)
+            }
+          } else {
+            self.heroContent(containerWidth: proxy.size.width)
+          }
+        }
+        .padding(.top, proxy.safeAreaInsets.top + 18)
+        .padding(.bottom, 24)
+        .anchorPreference(key: DetailHeroBoundsPreferenceKey.self, value: .bounds) { $0 }
+
+        self.artistContent
+      }
+      .padding(.bottom, 96)
+    }
+    .detailHeroBackground(artworkURL: self.artist.artworkUrl)
+    .background(.background)
+    .ignoresSafeArea(edges: .top)
+  }
+
+  private func heroContent(
+    containerWidth: CGFloat,
+    maximumArtworkSize: CGFloat = 320,
+  ) -> some View {
+    ArtistDetailHeroView(
+      artist: self.artist,
+      containerWidth: containerWidth,
+      isPlaying: self.isPlaying,
+      isLoading: self.isLoading,
+      onPlayTap: self.onPlayTap,
+      maximumArtworkSize: maximumArtworkSize,
+    )
+    .padding(.horizontal, 20)
+  }
+
+  private var artistContent: some View {
+    VStack(alignment: .leading, spacing: 30) {
+      ArtistTopSongsShelf(
+        songs: self.topSongs,
+        currentTrackID: self.currentTrackID,
+        isPlaying: self.isCurrentTrackPlaying,
+        onSongAddToPlaylist: self.onSongAddToPlaylist,
+        onSongAddToQueue: self.onSongAddToQueue,
+        onSongPlayNext: self.onSongPlayNext,
+        onSongTap: self.onSongTap,
+      )
+
+      ArtistReleasesShelf(
+        releases: self.releases,
+        transitionNamespace: self.transitionNamespace,
+        onReleaseAddToPlaylist: self.onReleaseAddToPlaylist,
+        onReleaseAddToQueue: self.onReleaseAddToQueue,
+        onReleasePlayNext: self.onReleasePlayNext,
+        onReleaseTap: self.onReleaseTap,
+      )
+
+      if let editorialNotes = self.artist.editorialNotes?.nonEmpty {
+        ArtistEditorialNotesSection(notes: editorialNotes)
+          .frame(maxWidth: 700)
+          .frame(maxWidth: .infinity)
+          .padding(.horizontal, 20)
+      }
+    }
   }
 }
 

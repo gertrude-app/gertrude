@@ -19,41 +19,13 @@ struct SearchFeature: Sendable {
     var results: [MusicSearchResult] = []
 
     var albumDetail: AlbumDetailFeature.State? {
-      get {
-        guard let id = self.path.ids.last else { return nil }
-        return self.path[id: id, case: \.album]
-      }
-      set {
-        if let id = self.path.ids.last,
-           self.path[id: id, case: \.album] != nil {
-          if let newValue {
-            self.path[id: id] = .album(newValue)
-          } else {
-            self.path.pop(from: id)
-          }
-        } else if let newValue {
-          self.path.append(.album(newValue))
-        }
-      }
+      get { self.path[last: \.album] }
+      set { self.path[last: \.album] = newValue }
     }
 
     var playlistDetail: PlaylistDetailFeature.State? {
-      get {
-        guard let id = self.path.ids.last else { return nil }
-        return self.path[id: id, case: \.playlist]
-      }
-      set {
-        if let id = self.path.ids.last,
-           self.path[id: id, case: \.playlist] != nil {
-          if let newValue {
-            self.path[id: id] = .playlist(newValue)
-          } else {
-            self.path.pop(from: id)
-          }
-        } else if let newValue {
-          self.path.append(.playlist(newValue))
-        }
-      }
+      get { self.path[last: \.playlist] }
+      set { self.path[last: \.playlist] = newValue }
     }
   }
 
