@@ -31,6 +31,7 @@ public enum LibraryViewState: Equatable, Sendable {
 public struct LibraryView: View {
   private let state: LibraryViewState
   private let playingItemID: String?
+  private let selectedItemID: String?
   private let isRefreshing: Bool
   private let isPlaylistMutationInFlight: Bool
   private let transitionNamespace: Namespace.ID?
@@ -48,6 +49,7 @@ public struct LibraryView: View {
   public init(
     state: LibraryViewState,
     playingItemID: String? = nil,
+    selectedItemID: String? = nil,
     isRefreshing: Bool = false,
     isPlaylistMutationInFlight: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
@@ -61,6 +63,7 @@ public struct LibraryView: View {
   ) {
     self.state = state
     self.playingItemID = playingItemID
+    self.selectedItemID = selectedItemID
     self.isRefreshing = isRefreshing
     self.isPlaylistMutationInFlight = isPlaylistMutationInFlight
     self.transitionNamespace = transitionNamespace
@@ -191,6 +194,7 @@ public struct LibraryView: View {
       LibraryGridView(
         items: items,
         playingItemID: self.playingItemID,
+        selectedItemID: self.selectedItemID,
         transitionNamespace: self.transitionNamespace,
         albumActions: self.albumActions,
         artistActions: self.artistActions,

@@ -11,6 +11,24 @@ extension LibraryPath.State: Equatable {}
 extension LibraryPath.Action: Equatable {}
 
 extension StackState<LibraryPath.State> {
+  subscript<Detail>(last casePath: CaseKeyPath<LibraryPath.State, Detail>) -> Detail? {
+    get {
+      guard let id = self.ids.last else { return nil }
+      return self[id: id, case: casePath]
+    }
+    set {
+      if let id = self.ids.last, self[id: id, case: casePath] != nil {
+        if let newValue {
+          self[id: id, case: casePath] = newValue
+        } else {
+          self.pop(from: id)
+        }
+      } else if let newValue {
+        self.append(AnyCasePath(casePath).embed(newValue))
+      }
+    }
+  }
+
   mutating func reconcile(with library: ApprovedMusicLibrary) {
     for id in Array(self.ids) {
       switch self[id: id] {

@@ -8,31 +8,22 @@ import SwiftUI
       @ViewBuilder content: @escaping () -> some View,
     ) -> some View {
       self.fullScreenCover(isPresented: isPresented) {
-        NowPlayingPresentationContent(
-          isPresented: isPresented,
-          content: content(),
-        )
-        .presentationBackground {
-          background()
-        }
+        content()
+          .presentationBackground {
+            background()
+          }
       }
     }
   }
 
-  private struct NowPlayingPresentationContent<Content: View>: View {
-    @Binding var isPresented: Bool
-    @State private var dragOffset: CGFloat = 0
-    let content: Content
+  struct NowPlayingDismissGesture: ViewModifier {
+    @Binding var dragOffset: CGFloat
+    let onDismiss: @MainActor @Sendable () -> Void
 
-    var body: some View {
-      self.content
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    func body(content: Content) -> some View {
+      content
         .contentShape(Rectangle())
-        .offset(y: self.dragOffset)
         .simultaneousGesture(self.dismissGesture)
-        .accessibilityAction(.escape) {
-          self.isPresented = false
-        }
     }
 
     private var dismissGesture: some Gesture {
@@ -49,7 +40,7 @@ import SwiftUI
             return
           }
           if value.translation.height > 90 || value.predictedEndTranslation.height > 180 {
-            self.isPresented = false
+            self.onDismiss()
           } else {
             self.resetDrag()
           }

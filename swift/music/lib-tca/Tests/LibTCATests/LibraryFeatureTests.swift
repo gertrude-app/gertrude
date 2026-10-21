@@ -599,6 +599,130 @@ struct LibraryFeatureTests {
     await store.send(.albumPlayNextTapped(album.id))
   }
 
+  @Test(arguments: [
+    LibraryCollectionIdentity.Kind.album,
+    .artist,
+    .playlist,
+  ])
+  func selectingLibraryItemReplacesDetailHistoryWithoutPlaying(
+    kind: LibraryCollectionIdentity.Kind,
+  ) async {
+    let library = self.playlistLibrary()
+    let selection: LibraryCollectionIdentity
+    let destination: LibraryPath.State
+    switch kind {
+    case .album:
+      let album = library.albums[0]
+      selection = .album(album.id)
+      destination = .album(.init(album: album, transitionSourceID: album.id.rawValue))
+    case .artist:
+      let artist = library.artists[0]
+      selection = .artist(artist.id)
+      destination = .artist(.init(artistID: artist.id))
+    case .playlist:
+      let playlist = library.playlists[0]
+      selection = .playlist(playlist.id)
+      destination = .playlist(.init(playlist: playlist))
+    }
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushAlbumDetail(albumID: library.albums[1].id)
+    state.pushArtistDetail(artistID: library.artists[0].id)
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(selection)) {
+      $0.path.removeAll()
+      $0.path.append(destination)
+    }
+    #expect(store.state.selectedCollectionIdentity == selection)
+    #expect(store.state.detailPath.isEmpty)
+  }
+
+  @Test
+  func selectingCurrentLibraryItemPreservesNestedNavigation() async {
+    let library = ApprovedMusicLibrary.mock
+    let artist = library.artists[0]
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushArtistDetail(artistID: artist.id)
+    state.pushAlbumDetail(albumID: library.albums[0].id)
+    let pathIDs = state.path.ids
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(.artist(artist.id)))
+    #expect(store.state.path.ids == pathIDs)
+    #expect(store.state.selectedCollectionIdentity == .artist(artist.id))
+  }
+
+  @Test
+  func poppingNestedDetailKeepsLibrarySelection() async {
+    let library = ApprovedMusicLibrary.mock
+    let artist = library.artists[0]
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushArtistDetail(artistID: artist.id)
+    state.pushAlbumDetail(albumID: library.albums[0].id)
+    let nestedID = state.path.ids.last!
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.path(.popFrom(id: nestedID))) {
+      $0.path.pop(from: nestedID)
+    }
+    #expect(store.state.selectedCollectionIdentity == .artist(artist.id))
+    #expect(store.state.detailPath.isEmpty)
+  }
+
+  @Test
+  func returningToLibraryClearsSelectionAndNestedNavigation() async {
+    let library = ApprovedMusicLibrary.mock
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushArtistDetail(artistID: library.artists[0].id)
+    state.pushAlbumDetail(albumID: library.albums[0].id)
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(nil)) {
+      $0.path.removeAll()
+    }
+    #expect(store.state.selectedCollectionIdentity == nil)
+    #expect(store.state.detailPath.isEmpty)
+  }
+
+  @Test
+  func selectingUnavailableLibraryItemPreservesCurrentDetail() async {
+    let library = ApprovedMusicLibrary.mock
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushAlbumDetail(albumID: library.albums[0].id)
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(.album("unavailable-album")))
+  }
+
+  @Test
+  func detailNavigationKeepsSelectionSeparateAndPreservesStackIDs() {
+    let library = ApprovedMusicLibrary.mock
+    let artist = library.artists[0]
+    let album = library.albums[0]
+    var state = LibraryFeature.State(status: .loaded(library))
+    #expect(state.detailPath.isEmpty)
+    #expect(state.selectedCollectionIdentity == nil)
+
+    state.pushArtistDetail(artistID: artist.id)
+    #expect(state.detailPath.isEmpty)
+    #expect(state.selectedCollectionIdentity == .artist(artist.id))
+
+    state.pushAlbumDetail(albumID: album.id)
+    #expect(Array(state.detailPath.ids) == Array(state.path.ids.dropFirst()))
+    #expect(state.detailPath.first == .album(.init(album: album)))
+    #expect(state.selectedCollectionIdentity == .artist(artist.id))
+  }
+
   @Test
   func albumTapNavigatesToAlbumScreen() async {
     let library = ApprovedMusicLibrary.mock

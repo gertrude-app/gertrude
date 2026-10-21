@@ -56,88 +56,19 @@ public struct AlbumDetailView: View {
   }
 
   public var body: some View {
-    GeometryReader { proxy in
-      List {
-        self.heroContent(containerWidth: proxy.size.width)
-          .frame(maxWidth: .infinity)
-          .padding(.top, proxy.safeAreaInsets.top + 18)
-          .padding(.bottom, 24)
-          .background {
-            if let backgroundColor = self.album.artworkPalette?.backgroundColor {
-              LinearGradient(
-                colors: [
-                  .clear,
-                  backgroundColor.opacity(0.3),
-                ],
-                startPoint: .top,
-                endPoint: .bottom,
-              )
-              .ignoresSafeArea(edges: .top)
-            }
-          }
-          .padding(.bottom, 30)
-          .listRowInsets(EdgeInsets())
-          .listRowSeparator(.hidden)
-          .listRowBackground(Color.clear)
-
-        if self.rows.isEmpty {
-          AlbumDetailEmptyTracksView()
-            .frame(maxWidth: 600)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 20)
-            .listRowInsets(EdgeInsets())
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-        } else {
-          ForEach(self.rows) { row in
-            TrackRowView(
-              number: row.number,
-              track: row.track,
-              showsArtwork: false,
-              isCurrent: row.track.id == self.currentTrackID,
-              isPlaying: self.isCurrentTrackPlaying && row.track.id == self.currentTrackID,
-              palette: self.album.artworkPalette,
-              onTap: { self.onTrackTap(row.track.id) },
-            )
-            .frame(maxWidth: 800)
-            .frame(maxWidth: .infinity)
-            .playbackQueueContextMenu(
-              onPlayNext: { self.onTrackPlayNext(row.track.id) },
-              onAddToQueue: { self.onTrackAddToQueue(row.track.id) },
-              onAddToPlaylist: { self.onTrackAddToPlaylist(row.track.id) },
-            )
-            .swipeActions(edge: .trailing) {
-              Button {
-                self.onTrackAddToQueue(row.track.id)
-              } label: {
-                Label("Add to Queue", systemImage: "text.badge.plus")
-                  .labelStyle(.iconOnly)
-              }
-              .tint(Color.gertrudeBrandAccent)
-              .accessibilityLabel("Add to Queue")
-            }
-            .listRowInsets(EdgeInsets())
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-          }
-        }
-
-        Color.clear
-          .frame(height: 112)
-          .listRowInsets(EdgeInsets())
-          .listRowSeparator(.hidden)
-          .listRowBackground(Color.clear)
-          .accessibilityHidden(true)
+    DetailContentLayout(artworkURL: self.album.artworkUrl) { proxy, bookGeometry in
+      self.scrollingContent(proxy: proxy, bookGeometry: bookGeometry)
+    } hero: { width, maximumArtworkSize in
+      self.heroContent(containerWidth: width, maximumArtworkSize: maximumArtworkSize)
+    } content: {
+      DetailTrackList {
+        self.trackRows
       }
-      .listStyle(.plain)
-      .scrollContentBackground(.hidden)
-      .background(.background)
-      .ignoresSafeArea(edges: .top)
     }
     .navigationTitle("")
     .detailNavigationBarBackground()
     .toolbar {
-      ToolbarItem(placement: self.menuPlacement) {
+      ToolbarItem(placement: .detailActions) {
         Menu {
           Button(action: self.onPlayNext) {
             Label("Play Next", systemImage: "text.line.first.and.arrowtriangle.forward")
@@ -162,18 +93,82 @@ public struct AlbumDetailView: View {
     }
   }
 
-  private var menuPlacement: ToolbarItemPlacement {
-    #if os(iOS)
-      .topBarTrailing
-    #else
-      .automatic
-    #endif
+  private func scrollingContent(
+    proxy: GeometryProxy,
+    bookGeometry: FoldedContentGeometry?,
+  ) -> some View {
+    DetailTrackList(headerArtworkURL: self.album.artworkUrl) {
+      Group {
+        if let bookGeometry {
+          BookDetailHero(geometry: bookGeometry) { size in
+            AlbumArtworkView(album: self.album, size: size, cornerRadius: 16)
+          } metadata: {
+            self.heroMetadata
+              .padding(.horizontal, 24)
+          }
+        } else {
+          self.heroContent(containerWidth: proxy.size.width)
+        }
+      }
+      .detailHeroRow(topInset: proxy.safeAreaInsets.top)
+
+      self.trackRows
+    }
+    .ignoresSafeArea(edges: .top)
   }
 
   @ViewBuilder
-  private func heroContent(containerWidth: CGFloat) -> some View {
-    if containerWidth >= 800 {
-      let artworkSize = min(300, max(220, (containerWidth - 96) * 0.38))
+  private var trackRows: some View {
+    if self.rows.isEmpty {
+      AlbumDetailEmptyTracksView()
+        .frame(maxWidth: 600)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+    } else {
+      ForEach(self.rows) { row in
+        TrackRowView(
+          number: row.number,
+          track: row.track,
+          showsArtwork: false,
+          isCurrent: row.track.id == self.currentTrackID,
+          isPlaying: self.isCurrentTrackPlaying && row.track.id == self.currentTrackID,
+          palette: self.album.artworkPalette,
+          onTap: { self.onTrackTap(row.track.id) },
+        )
+        .frame(maxWidth: 800)
+        .frame(maxWidth: .infinity)
+        .playbackQueueContextMenu(
+          onPlayNext: { self.onTrackPlayNext(row.track.id) },
+          onAddToQueue: { self.onTrackAddToQueue(row.track.id) },
+          onAddToPlaylist: { self.onTrackAddToPlaylist(row.track.id) },
+        )
+        .swipeActions(edge: .trailing) {
+          Button {
+            self.onTrackAddToQueue(row.track.id)
+          } label: {
+            Label("Add to Queue", systemImage: "text.badge.plus")
+              .labelStyle(.iconOnly)
+          }
+          .tint(Color.gertrudeBrandAccent)
+          .accessibilityLabel("Add to Queue")
+        }
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+      }
+    }
+  }
+
+  @ViewBuilder
+  private func heroContent(
+    containerWidth: CGFloat,
+    maximumArtworkSize: CGFloat = 320,
+  ) -> some View {
+    if DetailHeroLayout.usesHorizontalLayout(containerWidth: containerWidth) {
+      let artworkSize = min(maximumArtworkSize, min(300, max(220, (containerWidth - 96) * 0.38)))
       HStack(spacing: 36) {
         AlbumArtworkView(
           album: self.album,
@@ -181,13 +176,7 @@ public struct AlbumDetailView: View {
           cornerRadius: 16,
         )
 
-        VStack(spacing: 18) {
-          self.albumMetadata
-
-          self.playButton
-            .frame(maxWidth: 440)
-        }
-        .frame(maxWidth: 440)
+        self.heroMetadata
       }
       .frame(maxWidth: 900)
       .padding(.horizontal, 32)
@@ -195,7 +184,7 @@ public struct AlbumDetailView: View {
       VStack(spacing: 16) {
         AlbumArtworkView(
           album: self.album,
-          size: self.artworkSize(for: containerWidth),
+          size: min(maximumArtworkSize, self.artworkSize(for: containerWidth)),
           cornerRadius: 16,
         )
 
@@ -209,6 +198,16 @@ public struct AlbumDetailView: View {
           .padding(.top, 4)
       }
     }
+  }
+
+  private var heroMetadata: some View {
+    VStack(spacing: 18) {
+      self.albumMetadata
+
+      self.playButton
+        .frame(maxWidth: 440)
+    }
+    .frame(maxWidth: 440)
   }
 
   private var albumMetadata: some View {

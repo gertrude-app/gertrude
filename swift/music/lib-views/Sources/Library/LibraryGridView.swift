@@ -2,8 +2,11 @@ import GertieUI
 import SwiftUI
 
 struct LibraryGridView: View {
+  @Environment(\.colorScheme) private var colorScheme
+
   private let items: [LibraryCollectionItemData]
   private let playingItemID: String?
+  private let selectedItemID: String?
   private let isLoading: Bool
   private let transitionNamespace: Namespace.ID?
   private let albumActions: LibraryItemActions
@@ -16,6 +19,7 @@ struct LibraryGridView: View {
   init(
     items: [LibraryCollectionItemData],
     playingItemID: String? = nil,
+    selectedItemID: String? = nil,
     isLoading: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
     albumActions: LibraryItemActions = .init(),
@@ -25,6 +29,7 @@ struct LibraryGridView: View {
   ) {
     self.items = items
     self.playingItemID = playingItemID
+    self.selectedItemID = selectedItemID
     self.isLoading = isLoading
     self.transitionNamespace = transitionNamespace
     self.albumActions = albumActions
@@ -88,52 +93,63 @@ struct LibraryGridView: View {
     } else {
       LazyVGrid(columns: metrics.columns, alignment: .leading, spacing: 24) {
         ForEach(self.filteredItems) { item in
-          switch item {
-          case .album(let album):
-            AlbumCardView(
-              album: album,
-              artworkSize: metrics.artworkSize,
-              isPlaying: item.id == self.playingItemID,
-              transitionNamespace: self.transitionNamespace,
-              onAddToPlaylist: { self.albumActions.onAddToPlaylist(album.id) },
-              onAddToQueue: { self.albumActions.onAddToQueue(album.id) },
-              onPlayNext: { self.albumActions.onPlayNext(album.id) },
-            ) {
-              self.albumActions.onTap(album.id)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-          case .artist(let artist):
-            Button {
-              self.artistActions.onTap(artist.id)
-            } label: {
-              ArtistCardView(
-                artist: artist,
+          Group {
+            switch item {
+            case .album(let album):
+              AlbumCardView(
+                album: album,
                 artworkSize: metrics.artworkSize,
+                isPlaying: item.id == self.playingItemID,
                 transitionNamespace: self.transitionNamespace,
-              )
-            }
-            .buttonStyle(.plain)
-            .playbackQueueContextMenu(
-              onPlayNext: { self.artistActions.onPlayNext(artist.id) },
-              onAddToQueue: { self.artistActions.onAddToQueue(artist.id) },
-              onAddToPlaylist: { self.artistActions.onAddToPlaylist(artist.id) },
-            )
-            .frame(maxWidth: .infinity, alignment: .leading)
+                onAddToPlaylist: { self.albumActions.onAddToPlaylist(album.id) },
+                onAddToQueue: { self.albumActions.onAddToQueue(album.id) },
+                onPlayNext: { self.albumActions.onPlayNext(album.id) },
+              ) {
+                self.albumActions.onTap(album.id)
+              }
+              .frame(maxWidth: .infinity, alignment: .leading)
 
-          case .playlist(let playlist):
-            PlaylistCardView(
-              playlist: playlist,
-              artworkSize: metrics.artworkSize,
-              isPlaying: item.id == self.playingItemID,
-              transitionNamespace: self.transitionNamespace,
-              onAddToPlaylist: { self.playlistActions.onAddToPlaylist(playlist.id) },
-              onAddToQueue: { self.playlistActions.onAddToQueue(playlist.id) },
-              onPlayNext: { self.playlistActions.onPlayNext(playlist.id) },
-              onTap: { self.playlistActions.onTap(playlist.id) },
-            )
-            .frame(maxWidth: .infinity, alignment: .leading)
+            case .artist(let artist):
+              Button {
+                self.artistActions.onTap(artist.id)
+              } label: {
+                ArtistCardView(
+                  artist: artist,
+                  artworkSize: metrics.artworkSize,
+                  transitionNamespace: self.transitionNamespace,
+                )
+              }
+              .buttonStyle(.plain)
+              .playbackQueueContextMenu(
+                onPlayNext: { self.artistActions.onPlayNext(artist.id) },
+                onAddToQueue: { self.artistActions.onAddToQueue(artist.id) },
+                onAddToPlaylist: { self.artistActions.onAddToPlaylist(artist.id) },
+              )
+              .frame(maxWidth: .infinity, alignment: .leading)
+
+            case .playlist(let playlist):
+              PlaylistCardView(
+                playlist: playlist,
+                artworkSize: metrics.artworkSize,
+                isPlaying: item.id == self.playingItemID,
+                transitionNamespace: self.transitionNamespace,
+                onAddToPlaylist: { self.playlistActions.onAddToPlaylist(playlist.id) },
+                onAddToQueue: { self.playlistActions.onAddToQueue(playlist.id) },
+                onPlayNext: { self.playlistActions.onPlayNext(playlist.id) },
+                onTap: { self.playlistActions.onTap(playlist.id) },
+              )
+              .frame(maxWidth: .infinity, alignment: .leading)
+            }
           }
+          .background {
+            if item.id == self.selectedItemID {
+              RoundedRectangle(cornerRadius: 18)
+                .fill(Color.primary.opacity(self.colorScheme == .dark ? 0.16 : 0.10))
+                .padding(-10)
+                .allowsHitTesting(false)
+            }
+          }
+          .accessibilityAddTraits(item.id == self.selectedItemID ? .isSelected : [])
         }
       }
       .frame(width: metrics.contentWidth, alignment: .leading)
@@ -193,9 +209,7 @@ struct LibraryCardMetadataView: View {
       HStack(alignment: .top, spacing: 6) {
         Text(self.title)
           .font(.system(size: 14, weight: .semibold))
-          .foregroundStyle(
-            self.isPlaying ? Color.gertrudeBrandAccent : self.titleColor,
-          )
+          .foregroundStyle(self.titleColor)
           .lineLimit(2)
           .multilineTextAlignment(.leading)
           .layoutPriority(1)
@@ -225,11 +239,7 @@ struct LibraryCardMetadataView: View {
 
       Text(self.subtitle)
         .font(.system(size: 12, weight: .medium))
-        .foregroundStyle(
-          self.isPlaying
-            ? Color.gertrudeBrandAccent.opacity(0.68)
-            : self.subtitleColor,
-        )
+        .foregroundStyle(self.subtitleColor)
         .lineLimit(1)
     }
   }

@@ -35,10 +35,15 @@ struct AppFeatureTests {
   func updatesNowPlayingPresentation() async {
     let store = TestStore(initialState: .init()) {
       AppFeature()
+    } withDependencies: {
+      $0.date = .constant(.distantPast)
     }
 
     await store.send(.nowPlayingPresentationChanged(true)) {
       $0.isNowPlayingPresented = true
+    }
+    await store.send(.nowPlayingPresentationChanged(false)) {
+      $0.isNowPlayingPresented = false
     }
   }
 

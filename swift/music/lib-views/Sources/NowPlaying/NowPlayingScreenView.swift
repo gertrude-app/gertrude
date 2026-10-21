@@ -25,6 +25,9 @@ public struct NowPlayingScreenView: View {
   private let onShuffleTap: @MainActor @Sendable () -> Void
   private let onViewAlbumTap: (@MainActor @Sendable () -> Void)?
   private let onViewArtistTap: (@MainActor @Sendable () -> Void)?
+  #if os(iOS)
+    @State private var dragOffset: CGFloat = 0
+  #endif
 
   public init(
     title: String,
@@ -81,6 +84,10 @@ public struct NowPlayingScreenView: View {
     #if os(iOS)
       NavigationStack {
         self.screenContent
+          .modifier(NowPlayingDismissGesture(
+            dragOffset: self.$dragOffset,
+            onDismiss: self.onCloseTap,
+          ))
           .toolbar {
             ToolbarItem(placement: .topBarLeading) {
               Button(action: self.onCloseTap) {
@@ -120,6 +127,8 @@ public struct NowPlayingScreenView: View {
           }
           .toolbarBackground(.hidden, for: .navigationBar)
       }
+      .offset(y: self.dragOffset)
+      .accessibilityAction(.escape, self.onCloseTap)
     #else
       self.screenContent
     #endif
@@ -132,17 +141,117 @@ public struct NowPlayingScreenView: View {
           NowPlayingBackgroundView(artworkURL: self.artworkURL)
         }
 
-        switch self.layout(for: proxy.size) {
-        case .vertical:
-          self.verticalContent(in: proxy.size)
-        case .horizontal:
-          self.horizontalContent(in: proxy.size)
-        case .compact:
-          self.compactContent(in: proxy.size)
-        }
+        self.adaptiveContent(in: proxy)
       }
       .frame(width: proxy.size.width, height: proxy.size.height)
     }
+  }
+
+  @ViewBuilder
+  private func adaptiveContent(in proxy: GeometryProxy) -> some View {
+    #if os(iOS) && compiler(>=6.4)
+      if #available(iOS 27.1, *),
+         let geometry = FoldedContentGeometry.resolve(
+           containerSize: proxy.size,
+           divisions: proxy.reservedRegions(kind: .division).map(\.frame),
+         ) {
+        self.foldedContent(geometry: geometry)
+      } else {
+        self.flatContent(in: proxy.size)
+      }
+    #else
+      self.flatContent(in: proxy.size)
+    #endif
+  }
+
+  @ViewBuilder
+  private func flatContent(in size: CGSize) -> some View {
+    switch self.layout(for: size) {
+    case .vertical:
+      self.verticalContent(in: size)
+    case .horizontal:
+      self.horizontalContent(in: size)
+    case .compact:
+      self.compactContent(in: size)
+    }
+  }
+
+  private func foldedContent(geometry: FoldedContentGeometry) -> some View {
+    FoldedContentLayout(geometry: geometry) { size in
+      self.foldedArtworkContent(in: size, axis: geometry.axis)
+    } secondary: { _ in
+      self.foldedControls
+    }
+  }
+
+  private func foldedArtworkContent(in size: CGSize, axis: Axis) -> some View {
+    ViewThatFits(in: .vertical) {
+      self.foldedArtworkCandidate(in: size, axis: axis, maximumArtworkSize: 330)
+      self.foldedArtworkCandidate(in: size, axis: axis, maximumArtworkSize: 220)
+      self.foldedArtworkCandidate(in: size, axis: axis, maximumArtworkSize: 140)
+      ScrollView {
+        self.foldedArtworkCandidate(in: size, axis: axis, maximumArtworkSize: 140)
+      }
+      .scrollBounceBehavior(.basedOnSize)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+
+  private func foldedArtworkCandidate(
+    in size: CGSize,
+    axis: Axis,
+    maximumArtworkSize: CGFloat,
+  ) -> some View {
+    Group {
+      if axis == .vertical {
+        let artworkSize = min(
+          maximumArtworkSize,
+          self.horizontalArtworkSize(for: size, horizontalPadding: 24, contentSpacing: 24),
+        )
+        let metadataWidth = max(1, min(320, size.width - artworkSize - 72))
+
+        HStack(spacing: 24) {
+          self.artworkView(size: artworkSize)
+
+          NowPlayingMetadataLayout(maximumWidth: metadataWidth) {
+            self.albumInfoView(alignment: .leading)
+          }
+        }
+      } else {
+        VStack(spacing: 20) {
+          self.artworkView(size: min(maximumArtworkSize, max(1, size.width - 48)))
+
+          self.albumInfoView
+            .frame(maxWidth: 520)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity)
+    .padding(24)
+    .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private var foldedControls: some View {
+    ViewThatFits(in: .vertical) {
+      self.foldedControlContent
+      ScrollView {
+        self.foldedControlContent
+      }
+      .scrollBounceBehavior(.basedOnSize)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+
+  private var foldedControlContent: some View {
+    VStack(spacing: 24) {
+      self.transportControls
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+      self.progressAndModeControls
+        .frame(maxWidth: 560)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .padding(24)
   }
 
   private func verticalContent(in size: CGSize) -> some View {
@@ -259,22 +368,26 @@ public struct NowPlayingScreenView: View {
     }
   }
 
-  @ViewBuilder
   private var albumInfoView: some View {
+    self.albumInfoView(alignment: .center)
+  }
+
+  @ViewBuilder
+  private func albumInfoView(alignment: HorizontalAlignment) -> some View {
     if let onViewAlbumTap {
       Button(action: onViewAlbumTap) {
-        self.albumInfoText
+        self.albumInfoText(alignment: alignment)
           .contentShape(Rectangle())
       }
       .buttonStyle(.plain)
       .accessibilityHint("Open album")
     } else {
-      self.albumInfoText
+      self.albumInfoText(alignment: alignment)
     }
   }
 
-  private var albumInfoText: some View {
-    VStack(spacing: 4) {
+  private func albumInfoText(alignment: HorizontalAlignment) -> some View {
+    VStack(alignment: alignment, spacing: 4) {
       Text(self.title)
         .font(
           .system(
@@ -284,8 +397,8 @@ public struct NowPlayingScreenView: View {
           ),
         )
         .foregroundStyle(.white)
-        .multilineTextAlignment(.center)
         .lineLimit(2)
+        .fixedSize(horizontal: false, vertical: true)
 
       Text(self.artist)
         .font(
@@ -296,9 +409,10 @@ public struct NowPlayingScreenView: View {
           ),
         )
         .foregroundStyle(.white.opacity(0.7))
-        .multilineTextAlignment(.center)
         .lineLimit(2)
+        .fixedSize(horizontal: false, vertical: true)
     }
+    .multilineTextAlignment(alignment == .leading ? .leading : .center)
   }
 
   private func artworkView(size: CGFloat) -> some View {
@@ -346,6 +460,27 @@ public struct NowPlayingScreenView: View {
       220,
       max(1, size.width - 48),
       max(120, size.height * 0.34),
+    )
+  }
+}
+
+struct NowPlayingMetadataLayout: Layout {
+  let maximumWidth: CGFloat
+
+  func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+    subviews.first?.sizeThatFits(ProposedViewSize(width: self.maximumWidth, height: nil)) ?? .zero
+  }
+
+  func placeSubviews(
+    in bounds: CGRect,
+    proposal: ProposedViewSize,
+    subviews: Subviews,
+    cache: inout (),
+  ) {
+    subviews.first?.place(
+      at: bounds.origin,
+      anchor: .topLeading,
+      proposal: ProposedViewSize(width: self.maximumWidth, height: nil),
     )
   }
 }
