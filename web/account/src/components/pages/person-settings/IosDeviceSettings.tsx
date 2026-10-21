@@ -1,9 +1,10 @@
 import React from 'react';
 import type { DeviceSettingsIOSApp } from '#/components/devices/types';
 import type { LoadableState } from '#/components/types';
-import type { ProfileDraft } from './IosSettingsPage.reducer';
+import type { ExtendedControlsDraft, ProfileDraft } from './IosSettingsPage.reducer';
 import type { IosDeviceSettingsConfiguration } from './IosSettingsPage.types';
 import IosSettingsPage from './IosSettingsPage';
+import { extendedControlsInput } from './IosSettingsPage.reducer';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
@@ -37,14 +38,33 @@ const IosDeviceSettings: React.FC<Props> = ({
       error: `Failed to generate PIN reset code`,
     },
   });
-  const updateProfile = useMutation(liveClient.updateIosDeviceProfileSettings, {
-    invalidating: [settingsKey],
-    toast: {
-      loading: `Saving supervision settings…`,
-      success: `Supervision settings saved`,
-      error: `Failed to save supervision settings`,
+  const updateProfile = useMutation(
+    async ({
+      profileSettings,
+      controls,
+    }: {
+      profileSettings: ProfileDraft;
+      controls?: ExtendedControlsDraft;
+    }) => {
+      const result = await liveClient.updateIosDeviceProfileSettings({
+        deviceId,
+        ...profileSettings,
+      });
+      if (result.isError || !controls) return result;
+      return liveClient.saveExtendedSupervisionControls({
+        deviceId,
+        controls: extendedControlsInput(controls),
+      });
     },
-  });
+    {
+      invalidating: [settingsKey],
+      toast: {
+        loading: `Updating iOS device...`,
+        success: `IOS device updated!`,
+        error: `Failed to update iOS device`,
+      },
+    },
+  );
 
   return (
     <IosSettingsPage
@@ -59,8 +79,8 @@ const IosDeviceSettings: React.FC<Props> = ({
           .mutateAsync({ deviceId, enabledBlockGroupIds })
           .then(() => undefined)
       }
-      onSaveProfile={(profileSettings: ProfileDraft) =>
-        updateProfile.mutateAsync({ deviceId, ...profileSettings }).then(() => undefined)
+      onSaveProfile={(profileSettings, controls) =>
+        updateProfile.mutateAsync({ profileSettings, controls }).then(() => undefined)
       }
       onRequestPodcastsPinReset={() =>
         requestPinReset

@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { MusicSubscriptionState } from '../shared';
+import type { ExtendedSupervisionControls, MusicSubscriptionState } from '../shared';
 
 export namespace GetIosDeviceSettings {
   export interface Input {
@@ -28,6 +28,7 @@ export namespace GetIosDeviceSettings {
         allowFactoryReset: boolean;
         allowInstallingApps: boolean;
       };
+      extendedSupervisionControls?: ExtendedSupervisionControls;
     };
     podcasts?: {
       subscription:
