@@ -6,6 +6,7 @@ import type {
   SecurityEvent,
   SuspensionRequest,
 } from '#/components/types';
+import AccountAnnouncement from '#/components/announcements/AccountAnnouncement';
 import PeoplePage from '#/components/pages/people/PeoplePage';
 import { toPersonCardPerson } from '#/lib/people';
 import { toSecurityEvent } from '#/lib/securityEvents';
@@ -75,6 +76,7 @@ const PeopleRoute: React.FC = () => {
 
   return (
     <PeoplePage
+      announcement={<AccountAnnouncement />}
       peopleState={peopleState}
       unlockRequestSummary={unlockRequestsQuery.data}
       suspensionRequestsState={suspensionRequestsState}

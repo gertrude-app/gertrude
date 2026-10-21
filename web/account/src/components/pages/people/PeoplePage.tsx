@@ -23,6 +23,7 @@ import SuspensionRequestsPreviewCard from '#/components/requests/SuspensionReque
 import UnlockRequestsPreviewCard from '#/components/requests/UnlockRequestsPreviewCard';
 
 interface Props {
+  announcement?: React.ReactNode;
   peopleState: LoadableState<PersonCardPerson[]>;
   unlockRequestSummary?: GetAccountUnlockRequestSummary.Output;
   suspensionRequestsState: LoadableState<SuspensionRequest[]>;
@@ -193,6 +194,7 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
 };
 
 const PeoplePage: React.FC<Props> = ({
+  announcement,
   peopleState,
   unlockRequestSummary,
   suspensionRequestsState,
@@ -232,6 +234,7 @@ const PeoplePage: React.FC<Props> = ({
       />
     }
   >
+    {announcement}
     <Stack direction={{ default: `vertical`, '@5xl/main': `horizontal` }} gap={12}>
       <CardContainer className="flex flex-grow flex-col gap-4 @xl/main:gap-6">
         <PeopleContent

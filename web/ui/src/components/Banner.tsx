@@ -9,6 +9,7 @@ export type BannerVariant = `neutral` | `warning` | `error`;
 export interface BannerProps {
   children: React.ReactNode;
   variant?: BannerVariant;
+  showIcon?: boolean;
   className?: string;
 }
 
@@ -36,7 +37,12 @@ const variantStyles: Record<BannerVariant, VariantStyles> = {
   },
 };
 
-const Banner: React.FC<BannerProps> = ({ children, variant = `neutral`, className }) => {
+const Banner: React.FC<BannerProps> = ({
+  children,
+  variant = `neutral`,
+  showIcon = true,
+  className,
+}) => {
   const styles = variantStyles[variant];
   const Icon = styles.Icon;
 
@@ -46,7 +52,7 @@ const Banner: React.FC<BannerProps> = ({ children, variant = `neutral`, classNam
       gap={3}
       className={cx(`rounded-xl border p-3`, styles.container, className)}
     >
-      <Icon className={cx(`h-5 w-5 shrink-0`, styles.icon)} />
+      {showIcon && <Icon className={cx(`h-5 w-5 shrink-0`, styles.icon)} />}
       <Text
         as="div"
         variant="body"

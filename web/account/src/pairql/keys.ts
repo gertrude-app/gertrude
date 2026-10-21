@@ -1,4 +1,5 @@
 import type {
+  GetAccountAnnouncement,
   GetAccountBilling,
   GetAccountIOSClaimData,
   GetAccountKeychain,
@@ -31,6 +32,10 @@ export class QueryKey<T> {
 }
 
 export class Key extends QueryKey<never> {
+  static get announcement(): QueryKey<GetAccountAnnouncement.Output> {
+    return new QueryKey([`announcement`]);
+  }
+
   static get people(): QueryKey<GetPeople.Output> {
     return new QueryKey([`people`]);
   }
