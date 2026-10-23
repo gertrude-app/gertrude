@@ -29,6 +29,7 @@ struct GetSubscriptionPanel_v2: Pair {
     var availableTiers: [StripeSubscription.Tier]
     var fullTrialStartedAt: Date?
     var lastPaidTier: StripeSubscription.Tier?
+    var currentPriceInCents: Int?
   }
 }
 
@@ -155,6 +156,9 @@ func panelOutput_v2(billing: BillingAccountSnapshot) -> GetSubscriptionPanel_v2.
     availableTiers: availableTiers(primary: primary, secondary: secondary),
     fullTrialStartedAt: identity?.fullTrialStartedAt,
     lastPaidTier: identity?.lastPaidTier,
+    currentPriceInCents: billing.liveSubscription?.tier == .light
+      ? 1000
+      : billing.monthlyPrice?.rawValue,
   )
 }
 
