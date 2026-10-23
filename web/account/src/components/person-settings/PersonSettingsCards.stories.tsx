@@ -35,6 +35,7 @@ const ScheduledKeychainCard: React.FC = () => {
 
   return (
     <AssignedKeychainCard
+      id={keychains[0]!.id}
       name={keychains[0]!.name}
       description={keychains[0]!.description}
       numKeys={keychains[0]!.numKeys}
@@ -56,6 +57,7 @@ export const Cards = {
       >
         <ScheduledKeychainCard />
         <AssignedKeychainCard
+          id={keychains[2]!.id}
           name={keychains[2]!.name}
           description={keychains[2]!.description}
           numKeys={keychains[2]!.numKeys}
