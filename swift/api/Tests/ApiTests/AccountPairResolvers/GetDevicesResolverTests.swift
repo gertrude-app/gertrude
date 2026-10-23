@@ -1,3 +1,4 @@
+import Dependencies
 import DuetSQL
 import Gertie
 import XCTest
@@ -17,7 +18,7 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
       modelIdentifier: "Mac14,2",
       serialNumber: "family-macbook",
     ))
-    try await self.db.create([
+    let computerUsers = try await self.db.create([
       ComputerUser(
         childId: jude.id,
         computerId: computer.id,
@@ -73,7 +74,13 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
       claimedAt: .reference,
     )
 
-    let output = try await GetDevices.resolve(in: self.accountContext(parent))
+    let output = try await withDependencies {
+      $0.websockets.status = { id in
+        id == computerUsers[1].id ? .filterOn : .offline
+      }
+    } operation: {
+      try await GetDevices.resolve(in: self.accountContext(parent))
+    }
 
     expect(output.macs).toHaveCount(1)
     let mac = try XCTUnwrap(output.macs.first)
@@ -84,6 +91,7 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
     expect(mac.macOSVersion).toEqual("26.0.0")
     expect(mac.people.map(\.id)).toEqual([jude.id, mabel.id])
     expect(mac.people.map(\.name)).toEqual(["Jude", "Mabel"])
+    expect(mac.people.map(\.online)).toEqual([true, false])
 
     expect(output.mobileDevices).toHaveCount(1)
     let mobile = try XCTUnwrap(output.mobileDevices.first)

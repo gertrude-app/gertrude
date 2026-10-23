@@ -17,6 +17,7 @@ export type MacDevice = {
   people: Array<{
     id: string;
     name: string;
+    online: boolean;
   }>;
 };
 
