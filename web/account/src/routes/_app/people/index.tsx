@@ -15,8 +15,12 @@ import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useQuery } from '#/pairql/query';
 
+const NINE_MINUTES = 9 * 60 * 1000;
+
 const PeopleRoute: React.FC = () => {
-  const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
+  const peopleQuery = useQuery(Key.people, () => liveClient.getPeople(), {
+    refetchInterval: NINE_MINUTES,
+  });
   const unlockRequestsQuery = useQuery(Key.unlockRequests, () =>
     liveClient.getAccountUnlockRequestSummary(),
   );

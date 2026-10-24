@@ -9,6 +9,7 @@ struct GetDevices: Pair {
     struct Person: PairNestable {
       let id: Child.Id
       let name: String
+      let online: Bool
     }
 
     let id: Computer.Id
@@ -127,6 +128,11 @@ extension GetDevices: NoInputResolver {
       }
     }
 
+    let onlineComputerUsers = try await computerUsers.concurrentMap {
+      computerUser -> ComputerUser? in
+      await computerUser.status() == .offline ? nil : computerUser
+    }.compactMap(\.self)
+
     let macs = computers.map { computer in
       var seenPersonIds = Set<Child.Id>()
       let connectedPeople = computerUsers
@@ -137,7 +143,13 @@ extension GetDevices: NoInputResolver {
           else {
             return nil
           }
-          return .init(id: person.id, name: person.name)
+          return .init(
+            id: person.id,
+            name: person.name,
+            online: onlineComputerUsers.contains {
+              $0.computerId == computer.id && $0.childId == person.id
+            },
+          )
         }
 
       return Mac(

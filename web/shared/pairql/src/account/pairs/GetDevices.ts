@@ -12,6 +12,7 @@ export namespace GetDevices {
       people: Array<{
         id: UUID;
         name: string;
+        online: boolean;
       }>;
     }>;
     mobileDevices: Array<{

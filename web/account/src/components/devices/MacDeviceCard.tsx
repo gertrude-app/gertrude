@@ -1,6 +1,7 @@
 import { Button, Card, HStack, Text, VStack } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
-import { Clock3Icon, PencilIcon } from 'lucide-react';
+import cx from 'clsx';
+import { PencilIcon } from 'lucide-react';
 import React from 'react';
 import type { MacDevice } from '#/components/devices/types';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
@@ -62,9 +63,17 @@ const MacDeviceCard: React.FC<Props> = ({ device }) => {
                   >
                     <Text variant="bodyStrong">{person.name}</Text>
                   </Link>
-                  <HStack gap={1.5} className="shrink-0 text-stone-400">
-                    <Clock3Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    <Text variant="captionMuted">Filter status coming soon</Text>
+                  <HStack gap={1.5} className="shrink-0">
+                    <span
+                      aria-hidden="true"
+                      className={cx(
+                        `size-1.5 shrink-0 rounded-full`,
+                        person.online ? `bg-green-500` : `bg-stone-300`,
+                      )}
+                    />
+                    <Text variant="captionMuted">
+                      {person.online ? `Online` : `Offline`}
+                    </Text>
                   </HStack>
                 </HStack>
               ))}

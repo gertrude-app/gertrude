@@ -426,6 +426,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
                   {draft.keychains.map((keychain) => (
                     <AssignedKeychainCard
                       key={keychain.id}
+                      id={keychain.id}
                       name={keychain.name}
                       description={keychain.description}
                       numKeys={keychain.numKeys}
