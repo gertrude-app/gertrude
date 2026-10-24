@@ -1,3 +1,4 @@
+import { Dialog } from '@base-ui/react/dialog';
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
@@ -113,13 +114,117 @@ const SlideOverRoot: React.FC<SlideOverProps> = ({
     onOpenChange?.(nextOpen);
   };
 
+  const Title = isDesktop ? Dialog.Title : Drawer.Title;
+  const content = (
+    <OverlayPortalProvider container={overlayPortalContainer}>
+      <div className="h-full w-full overflow-hidden rounded-[inherit] @container/slide">
+        {hasHeading ? (
+          <VStack className="h-full">
+            <div
+              className={cx(
+                `shrink-0 pt-6 pb-4 @lg/slide:pt-8`,
+                horizontalPaddingClasses,
+              )}
+            >
+              {heading ? (
+                <Text as={Title} variant="title">
+                  {heading}
+                </Text>
+              ) : (
+                <Title className="sr-only">{ariaLabel}</Title>
+              )}
+              {subheading && (
+                <Text as="p" variant="body" className="mt-1">
+                  {subheading}
+                </Text>
+              )}
+            </div>
+            <div className={cx(`min-h-0 flex-1`, withPx && horizontalPaddingClasses)}>
+              {children}
+            </div>
+          </VStack>
+        ) : (
+          <>
+            <Title className="sr-only">{ariaLabel}</Title>
+            {withPx ? (
+              <div className={cx(`h-full`, horizontalPaddingClasses)}>{children}</div>
+            ) : (
+              children
+            )}
+          </>
+        )}
+      </div>
+    </OverlayPortalProvider>
+  );
+  const contentClassName = cx(
+    `fixed z-50 flex overflow-visible border border-stone-200 bg-stone-50 shadow-2xl shadow-stone-950/20 outline-none`,
+    isDesktop
+      ? cx(
+          `inset-y-0 right-0 h-dvh max-w-[calc(100vw-1rem)] border-y-0 border-r-0`,
+          sizeClasses[size],
+        )
+      : `inset-x-0 bottom-0 h-[calc(100svh-1rem)] rounded-t-[28px] border-b-0`,
+    className,
+  );
+  const backdropClassName = cx(
+    `fixed inset-0 z-50 bg-stone-950/25 backdrop-blur-[1px]`,
+    overlayClassName,
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog.Root
+        open={resolvedOpen}
+        defaultOpen={normalizedPath ? undefined : defaultOpen}
+        onOpenChange={(nextOpen, eventDetails) => {
+          if (
+            !dismissible &&
+            !nextOpen &&
+            (eventDetails.reason === `outside-press` ||
+              eventDetails.reason === `escape-key`)
+          ) {
+            eventDetails.cancel();
+            return;
+          }
+
+          handleOpenChange(nextOpen);
+        }}
+        disablePointerDismissal={!dismissible}
+      >
+        {triggerElement ? (
+          <Dialog.Trigger render={triggerElement} />
+        ) : trigger ? (
+          <Dialog.Trigger>{trigger}</Dialog.Trigger>
+        ) : null}
+        <Dialog.Portal>
+          <Dialog.Backdrop
+            className={cx(
+              backdropClassName,
+              `transition-opacity duration-500 data-[starting-style]:opacity-0 data-[ending-style]:opacity-0`,
+            )}
+          />
+          <Dialog.Popup
+            ref={setContentRef}
+            aria-describedby={undefined}
+            className={cx(
+              contentClassName,
+              `transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full`,
+            )}
+          >
+            {content}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }
+
   return (
     <Drawer.Root
       open={resolvedOpen}
       defaultOpen={normalizedPath ? undefined : defaultOpen}
       onOpenChange={handleOpenChange}
       dismissible={dismissible}
-      direction={isDesktop ? `right` : `bottom`}
+      direction="bottom"
       autoFocus
     >
       {triggerElement ? (
@@ -128,69 +233,13 @@ const SlideOverRoot: React.FC<SlideOverProps> = ({
         <Drawer.Trigger>{trigger}</Drawer.Trigger>
       ) : null}
       <Drawer.Portal>
-        <Drawer.Overlay
-          className={cx(
-            `fixed inset-0 z-50 bg-stone-950/25 backdrop-blur-[1px]`,
-            overlayClassName,
-          )}
-        />
+        <Drawer.Overlay className={backdropClassName} />
         <Drawer.Content
           ref={setContentRef}
           aria-describedby={undefined}
-          className={cx(
-            `fixed z-50 flex overflow-visible border border-stone-200 bg-stone-50 shadow-2xl shadow-stone-950/20 outline-none`,
-            isDesktop
-              ? cx(
-                  `inset-y-0 right-0 h-dvh max-w-[calc(100vw-1rem)] border-y-0 border-r-0`,
-                  sizeClasses[size],
-                )
-              : `inset-x-0 bottom-0 h-[calc(100svh-1rem)] rounded-t-[28px] border-b-0`,
-            className,
-          )}
+          className={contentClassName}
         >
-          <OverlayPortalProvider container={overlayPortalContainer}>
-            <div className="h-full w-full overflow-hidden rounded-[inherit] @container/slide">
-              {hasHeading ? (
-                <VStack className="h-full">
-                  <div
-                    className={cx(
-                      `shrink-0 pt-6 pb-4 @lg/slide:pt-8`,
-                      horizontalPaddingClasses,
-                    )}
-                  >
-                    {heading ? (
-                      <Text as={Drawer.Title} variant="title">
-                        {heading}
-                      </Text>
-                    ) : (
-                      <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
-                    )}
-                    {subheading && (
-                      <Text as="p" variant="body" className="mt-1">
-                        {subheading}
-                      </Text>
-                    )}
-                  </div>
-                  <div
-                    className={cx(`min-h-0 flex-1`, withPx && horizontalPaddingClasses)}
-                  >
-                    {children}
-                  </div>
-                </VStack>
-              ) : (
-                <>
-                  <Drawer.Title className="sr-only">{ariaLabel}</Drawer.Title>
-                  {withPx ? (
-                    <div className={cx(`h-full`, horizontalPaddingClasses)}>
-                      {children}
-                    </div>
-                  ) : (
-                    children
-                  )}
-                </>
-              )}
-            </div>
-          </OverlayPortalProvider>
+          {content}
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>
