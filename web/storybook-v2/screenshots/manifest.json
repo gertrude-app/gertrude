@@ -2748,6 +2748,54 @@
     }
   },
   {
+    "id": "account-pages-people-person-settings--basic-disconnect-confirmation",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-disconnect-confirmation&viewMode=story",
+    "name": "Basic disconnect confirmation",
+    "path": "screenshots/mobile/account-pages-people-person-settings--basic-disconnect-confirmation.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-disconnect-confirmation",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-disconnect-confirmation&viewMode=story",
+    "name": "Basic disconnect confirmation",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic-disconnect-confirmation.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-multiple-mac-logins",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-multiple-mac-logins&viewMode=story",
+    "name": "Basic with multiple Mac logins",
+    "path": "screenshots/mobile/account-pages-people-person-settings--basic-multiple-mac-logins.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people-person-settings--basic-multiple-mac-logins",
+    "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-multiple-mac-logins&viewMode=story",
+    "name": "Basic with multiple Mac logins",
+    "path": "screenshots/desktop/account-pages-people-person-settings--basic-multiple-mac-logins.png",
+    "title": "Account/Pages/People/Person Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people-person-settings--basic-no-devices",
     "iframePath": "/iframe.html?id=account-pages-people-person-settings--basic-no-devices&viewMode=story",
     "name": "Basic with no devices",

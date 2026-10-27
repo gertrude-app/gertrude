@@ -60,6 +60,22 @@ const PersonBasicSettingsRoute: React.FC = () => {
     onSuccess: () => void navigate({ to: `/people`, replace: true }),
   });
   const createMacConnectionCode = useMutation(liveClient.createMacConnectionCode);
+  const disconnectMac = useMutation(liveClient.disconnectMacConnection, {
+    invalidating: [
+      Key.people,
+      Key.devices,
+      Key.activity,
+      Key.unlockRequests,
+      Key.suspensionRequests,
+      Key.securityEvents,
+      Key.accountBilling,
+    ],
+    toast: {
+      loading: `Disconnecting Mac…`,
+      success: `Mac disconnected`,
+      error: `Couldn't disconnect Mac`,
+    },
+  });
   const startMacTrial = useMutation(liveClient.startAccountFullTrial, {
     invalidating: [Key.accountBilling],
     toast: {
@@ -131,6 +147,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
         devices={person.devices}
         savingDetails={updateDetails.isPending}
         deletingPerson={deletePerson.isPending}
+        disconnectingMac={disconnectMac.isPending}
         selfRelationshipUnavailable={selfRelationshipUnavailable}
         onSaveDetails={() =>
           updateDetails.mutate({
@@ -152,6 +169,12 @@ const PersonBasicSettingsRoute: React.FC = () => {
           setMacTrialStarted(false);
           setConnectMacOpen(true);
         }}
+        onDisconnectMac={(connectionId) =>
+          disconnectMac.mutateAsync({ connectionId }).then(
+            () => true,
+            () => false,
+          )
+        }
       />
       <ConnectMacModal
         open={connectMacOpen}
