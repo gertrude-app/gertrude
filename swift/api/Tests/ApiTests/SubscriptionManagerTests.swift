@@ -194,7 +194,7 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
         expect(email.templateModel["currentPlan"]).toEqual(tier?.rawValue.capitalized ?? "")
         expect(email.templateModel["pastDuePlan"]).toEqual("")
         expect(email.templateModel["billingUrl"]).toEqual(
-          get(dependency: \.env.accountDashboardUrl) + "/settings/billing",
+          get(dependency: \.env.accountDashboardUrl).withoutTrailingSlashes + "/settings/billing",
         )
         let notice = email.templateModel["planNotice"] ?? ""
         expect(notice.contains("plan isn’t changing")).toEqual(tier != nil)
@@ -202,6 +202,32 @@ final class SubscriptionManagerTests: ApiTestCase, @unchecked Sendable {
         let identity = try await parent.model.billingIdentity(in: self.db)!
         expect(identity.trialEmailLifecycle).toEqual(lifecycle)
       }
+    }
+  }
+
+  func testTrialEmailBillingUrlsPreserveLeadingSlashesAndRemoveTrailingSlashes() async throws {
+    let cases = [
+      ("https://account.example", "https://account.example/settings/billing"),
+      ("https://account.example/", "https://account.example/settings/billing"),
+      ("https://account.example///", "https://account.example/settings/billing"),
+      ("/account", "/account/settings/billing"),
+      ("/account/", "/account/settings/billing"),
+      ("/account///", "/account/settings/billing"),
+      ("/", "/settings/billing"),
+    ]
+    for (baseUrl, expected) in cases {
+      let parent = try await self.parent()
+      _ = try await self.db.create(BillingIdentity(
+        parentId: parent.id,
+        fullTrialStartedAt: .reference - .days(21),
+      ))
+      _ = try await withDependencies {
+        $0.env.accountDashboardUrl = baseUrl
+      } operation: {
+        try await SubscriptionManager().advanceTrialEmails()
+      }
+      let email = try XCTUnwrap(self.sent.emails.first { $0.to == parent.email.rawValue })
+      expect(email.templateModel["billingUrl"]).toEqual(expected)
     }
   }
 

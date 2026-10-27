@@ -113,8 +113,7 @@ struct SubscriptionManager: AsyncScheduledJob {
         formatter.timeZone = parent.timeZone.flatMap { TimeZone(identifier: $0) }
           ?? TimeZone(secondsFromGMT: 0)
         let context = AccountLifecycle.FullTrialContext(
-          billingUrl: self.env.accountDashboardUrl.trimmingCharacters(in: .init(charactersIn: "/"))
-            + "/settings/billing",
+          billingUrl: self.env.accountDashboardUrl.withoutTrailingSlashes + "/settings/billing",
           graceEndsOn: formatter
             .string(from: trialStart + PlanStatus.trialPeriod + PlanStatus.gracePeriod),
           currentTier: sub?.stripeStatus == .active ? sub?.tier : nil,
