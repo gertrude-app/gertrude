@@ -63,6 +63,8 @@ extension PostmarkClient {
          .reSignup(let recipient, _),
          .trialEndingSoon(let recipient, _),
          .trialExpired(let recipient, _),
+         .trialExpiredNoMac(let recipient, _),
+         .trialGraceEnded(let recipient, _),
          .overdueToUnpaid(let recipient, _),
          .paidToOverdue(let recipient, _),
          .passwordReset(let recipient, _),

@@ -13,6 +13,11 @@ import Vapor
       let postmark = get(dependency: \.postmark)
       let logger = get(dependency: \.logger)
       let localDash = "http://localhost:8081"
+      let trialContext = AccountLifecycle.FullTrialContext(
+        billingUrl: env.accountDashboardUrl + "/settings/billing",
+        graceEndsOn: "November 2, 2026",
+        currentTier: .medium,
+      )
 
       guard let to = env.get("TEST_EMAIL_RECIPIENT") else {
         throw Abort(
@@ -138,10 +143,28 @@ import Vapor
 
       case "admin-trial-ending-soon":
         try await postmark
-          .send(template: .trialEndingSoon(to: to, model: .init(length: 21, remaining: 3)))
+          .send(template: .trialEndingSoon(
+            to: to,
+            model: .init(length: 21, remaining: 3, context: trialContext),
+          ))
 
       case "admin-trial-expired":
-        try await postmark.send(template: .trialExpired(to: to, model: .init(length: 21)))
+        try await postmark.send(template: .trialExpired(
+          to: to,
+          model: .init(length: 21, context: trialContext),
+        ))
+
+      case "admin-trial-expired-no-mac":
+        try await postmark.send(template: .trialExpiredNoMac(
+          to: to,
+          model: .init(context: trialContext),
+        ))
+
+      case "admin-trial-grace-ended":
+        try await postmark.send(template: .trialGraceEnded(
+          to: to,
+          model: .init(context: trialContext),
+        ))
 
       case "admin-overdue-to-unpaid":
         try await postmark.send(template: .overdueToUnpaid(to: to, model: .init()))
@@ -217,6 +240,10 @@ import Vapor
         return write(template: AccountLifecycle.TrialEndingSoon.self)
       case "admin-trial-expired":
         return write(template: AccountLifecycle.TrialExpired.self)
+      case "admin-trial-expired-no-mac":
+        return write(template: AccountLifecycle.TrialExpiredNoMac.self)
+      case "admin-trial-grace-ended":
+        return write(template: AccountLifecycle.TrialGraceEnded.self)
       case "admin-overdue-to-unpaid":
         return write(template: AccountLifecycle.OverdueToUnpaid.self)
       case "admin-paid-to-overdue":

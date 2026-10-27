@@ -157,20 +157,75 @@ struct ScreenTimeWarning: TemplateEmailModel {
 }
 
 enum AccountLifecycle {
+  struct FullTrialContext: Sendable {
+    var billingUrl: String
+    var graceEndsOn: String
+    var currentTier: StripeSubscription.Tier?
+    var pastDueTier: StripeSubscription.Tier?
+
+    var templateModel: [String: String] {
+      let planNotice: String
+      if let currentTier {
+        let features = currentTier == .medium
+          ? "Gertrude Music, Gertrude Podcasts, and iPhone/iPad supervision"
+          : "Gertrude Podcasts and iPhone/iPad supervision"
+        planNotice = "Your \(currentTier.rawValue.capitalized) plan isn’t changing. "
+          + "It still includes \(features). You don’t need Full to keep these features."
+      } else if let pastDueTier {
+        planNotice = "Your \(pastDueTier.rawValue.capitalized) subscription has a separate payment "
+          + "issue. Ending this Full trial does not change that. Review your billing settings "
+          + "to update your payment method."
+      } else {
+        planNotice = "Gertrude Blocker’s free features on children’s iPhones and iPads "
+          + "remain available."
+      }
+      return [
+        "billingUrl": self.billingUrl,
+        "graceEndsOn": self.graceEndsOn,
+        "planNotice": planNotice,
+        "currentPlan": self.currentTier?.rawValue.capitalized ?? "",
+        "pastDuePlan": self.pastDueTier?.rawValue.capitalized ?? "",
+      ]
+    }
+  }
+
   struct TrialEndingSoon: TemplateEmailModel {
-    static var subject: String { "[action required] Gertrude trial ending soon" }
+    static var subject: String { "Your Gertrude Full trial ends in {{remainingText}}" }
     var length: Int
     var remaining: Int
-    var templateModel: [String: String] { [
-      "length": "\(self.length)",
-      "remaining": "\(self.remaining)",
-    ] }
+    var context: FullTrialContext
+    var templateModel: [String: String] {
+      self.context.templateModel.merging([
+        "length": "\(self.length)",
+        "remaining": "\(self.remaining)",
+        "remainingText": self.remaining == 1 ? "1 day" : "\(self.remaining) days",
+      ]) { _, new in new }
+    }
   }
 
   struct TrialExpired: TemplateEmailModel {
-    static var subject: String { "[action required] Gertrude trial ended" }
+    static var subject: String { "Your Gertrude Full trial has ended" }
     var length: Int
-    var templateModel: [String: String] { ["length": "\(self.length)"] }
+    var context: FullTrialContext
+    var templateModel: [String: String] {
+      self.context.templateModel.merging(["length": "\(self.length)"]) { _, new in new }
+    }
+  }
+
+  struct TrialExpiredNoMac: TemplateEmailModel {
+    static var subject: String { "Your Gertrude Full trial has ended{{subjectSuffix}}" }
+    var context: FullTrialContext
+    var templateModel: [String: String] {
+      self.context.templateModel.merging([
+        "subjectSuffix": self.context.pastDueTier == nil ? " — no action needed" : "",
+      ]) { _, new in new }
+    }
+  }
+
+  struct TrialGraceEnded: TemplateEmailModel {
+    static var subject: String { "Your Gertrude Full trial grace period has ended" }
+    var context: FullTrialContext
+    var templateModel: [String: String] { self.context.templateModel }
   }
 
   struct OverdueToUnpaid: TemplateEmailModel {

@@ -1,21 +1,22 @@
-Gertrude parent account holder,
+Hi there,
 
-This is Jared from Gertrude, writing to let you know that your {{length}} day free trial
-has ended. If you'd like to continue using Gertrude for Mac, please login to the parents
-website here:
+Your {{length}}-day free trial of Gertrude Full has ended.
 
-https://parents.gertrude.app/settings
+{{planNotice}}
 
-And then click the "Start subscription" button.
+You’ll no longer receive new screenshots, keystrokes, unlock requests, or filter
+suspension requests from your Macs.
 
-If you don't set up payment within 7 days, any Gertrude Mac apps connected to your
-account will lose SOME functionality. They will continue blocking the internet according
-to the rules already in place, but no rules can be created or edited after that point, all
-screenshots and keylogging will cease, and the app will no longer be able to issue or
-respond to unlock requests or filter suspension requests. Basically, we turn off all of
-the features that actively cost us money, until your subscription is paid.
+Your Macs’ existing internet restrictions will remain in place for safety. You have until
+{{graceEndsOn}} to make any final changes to what’s allowed; after that, you’ll need Full.
 
-If you're having any kind of trouble with Gertrude, or have any questions at all, please
-don't hesitate to reach out. If you reply to this email, it will come straight to me.
+To continue using all of Full’s Mac features, review the Full plan in your billing
+settings:
+
+{{billingUrl}}
+
+You won’t be charged for Full unless you choose to upgrade.
+
+If you have questions, reply to this email and it will come straight to me.
 
 - Jared
