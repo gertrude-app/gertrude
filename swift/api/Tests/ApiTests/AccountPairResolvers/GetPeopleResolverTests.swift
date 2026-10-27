@@ -93,6 +93,7 @@ final class GetPeopleResolverTests: ApiTestCase, @unchecked Sendable {
       return XCTFail("Expected a Mac device")
     }
     expect(mac.id).toEqual(computerUser.id)
+    expect(mac.username).toEqual("jude")
     expect(mac.name).toEqual("Jude's MacBook")
     expect(mac.macOSVersion).toEqual("15.6.0")
     expect(mac.modelName).toEqual("M2 MacBook Air (2022)")

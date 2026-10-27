@@ -4,7 +4,7 @@ import type { Device, PersonRelationship } from '#/components/types';
 import PersonBasicSettingsPage from './PersonBasicSettingsPage';
 import PersonSettingsShellPage from './PersonSettingsShellPage';
 import ConnectMacModal from '#/components/devices/ConnectMacModal';
-import { devices } from '#/components/storybook/fixtures';
+import { devices, macDevice } from '#/components/storybook/fixtures';
 
 const meta = {
   title: 'Account/Pages/People/Person Settings',
@@ -34,6 +34,7 @@ const BasicSettingsStory: React.FC<BasicSettingsStoryProps> = ({
     initialRelationshipDraft ?? relationship,
   );
   const [connectMacOpen, setConnectMacOpen] = React.useState(false);
+  const [connectedDevices, setConnectedDevices] = React.useState(personDevices);
 
   return (
     <StoryScreen>
@@ -50,7 +51,7 @@ const BasicSettingsStory: React.FC<BasicSettingsStoryProps> = ({
           relationship={relationship}
           relationshipDraft={relationshipDraft}
           setRelationshipDraft={setRelationshipDraft}
-          devices={personDevices}
+          devices={connectedDevices}
           selfRelationshipUnavailable={selfRelationshipUnavailable}
           onSaveDetails={() => {
             setPersonName(nameDraft.trim());
@@ -58,6 +59,12 @@ const BasicSettingsStory: React.FC<BasicSettingsStoryProps> = ({
           }}
           onDeletePerson={() => {}}
           onConnectMac={() => setConnectMacOpen(true)}
+          onDisconnectMac={async (connectionId) => {
+            setConnectedDevices((current) =>
+              current.filter((device) => device.id !== connectionId),
+            );
+            return true;
+          }}
         />
       </PersonSettingsShellPage>
       <ConnectMacModal
@@ -132,6 +139,38 @@ export const BasicNoDevices = {
   name: 'Basic with no devices',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => <BasicSettingsStory personDevices={[]} />,
+};
+
+export const BasicMultipleMacLogins = {
+  name: 'Basic with multiple Mac logins',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <BasicSettingsStory
+      personDevices={[
+        macDevice,
+        { ...macDevice, id: `mac-school`, username: `jude-school` },
+        ...devices.slice(1, 2),
+      ]}
+    />
+  ),
+};
+
+export const BasicDisconnectConfirmation = {
+  name: 'Basic disconnect confirmation',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => <BasicSettingsStory personDevices={devices.slice(0, 2)} />,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const disconnectButton = Array.from(
+      canvasElement.querySelectorAll<HTMLButtonElement>(`button`),
+    ).find((button) => button.textContent?.trim() === `Disconnect`);
+
+    if (!disconnectButton) {
+      throw new Error(`Couldn't find Mac disconnect button`);
+    }
+
+    disconnectButton.click();
+    await waitForRender();
+  },
 };
 
 export const BasicDeleteConfirmation = {

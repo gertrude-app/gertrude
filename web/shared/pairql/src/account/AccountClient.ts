@@ -222,6 +222,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
   };
 
+  public disconnectMacConnection = (
+    input: P.DisconnectMacConnection.Input,
+  ): Promise<Result<P.DisconnectMacConnection.Output>> => {
+    return this.query<P.DisconnectMacConnection.Output>(
+      input,
+      `DisconnectMacConnection`,
+      `parent`,
+    );
+  };
+
   public dismissAccountAnnouncement = (
     input: P.DismissAccountAnnouncement.Input,
   ): Promise<Result<P.DismissAccountAnnouncement.Output>> => {

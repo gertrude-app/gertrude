@@ -24,6 +24,7 @@ export type Device =
       id: string;
       personId: string;
       type: `mac`;
+      username: string;
       name?: string;
       macOSVersion?: string;
       modelName: string;
