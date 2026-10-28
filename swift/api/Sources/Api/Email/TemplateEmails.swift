@@ -190,6 +190,8 @@ enum AccountLifecycle {
   }
 
   struct TrialEndingSoon: TemplateEmailModel {
+    static var alias: String { "trial-ending-soon-v2" }
+    static var displayName: String { "Trial Ending Soon v2" }
     static var subject: String { "Your Gertrude Full trial ends in {{remainingText}}" }
     var length: Int
     var remaining: Int
@@ -204,6 +206,8 @@ enum AccountLifecycle {
   }
 
   struct TrialExpired: TemplateEmailModel {
+    static var alias: String { "trial-expired-v2" }
+    static var displayName: String { "Trial Expired v2" }
     static var subject: String { "Your Gertrude Full trial has ended" }
     var length: Int
     var context: FullTrialContext
@@ -215,9 +219,22 @@ enum AccountLifecycle {
   struct TrialExpiredNoMac: TemplateEmailModel {
     static var subject: String { "Your Gertrude Full trial has ended{{subjectSuffix}}" }
     var context: FullTrialContext
+    var podcastsAccessEnded = false
     var templateModel: [String: String] {
       self.context.templateModel.merging([
-        "subjectSuffix": self.context.pastDueTier == nil ? " — no action needed" : "",
+        "subjectSuffix": self.context.pastDueTier == nil && !self.podcastsAccessEnded
+          ? " — no action needed" : "",
+        "impactNotice": self.podcastsAccessEnded
+          ? "If you’d like to keep adding shows and getting new episodes in Gertrude Podcasts, "
+          + "you can subscribe to Light for $10 a year. You don’t need Full for Podcasts."
+          : "Since you don’t have any Macs connected to your account, this won’t affect the "
+          + "features you’re currently using.",
+        "billingPrompt": self.podcastsAccessEnded
+          ? "You can"
+          : "If you decide to use Gertrude on a Mac in the future, you can",
+        "billingLinkText": self.podcastsAccessEnded
+          ? "subscribe to Light here"
+          : "review the Full plan in your billing settings",
       ]) { _, new in new }
     }
   }

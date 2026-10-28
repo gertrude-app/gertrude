@@ -138,6 +138,10 @@ footer .physical-address {
     color: #cbd5e1;
   }
 
+  a {
+    color: #93c5fd;
+  }
+
   .subtle {
     color: #94a3b8;
   }
@@ -151,7 +155,7 @@ footer .physical-address {
   }
 
   footer a {
-    color: #64748b;
+    color: #94a3b8;
   }
 
   footer .physical-address {

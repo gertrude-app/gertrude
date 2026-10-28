@@ -1,6 +1,7 @@
 Hi there,
 
-Your {{length}}-day free trial of Gertrude Full has ended.
+This is Jared from Gertrude. I just wanted to let you know your {{length}}-day free Full
+trial has ended.
 
 {{planNotice}}
 

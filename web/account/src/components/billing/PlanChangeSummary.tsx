@@ -4,7 +4,6 @@ import { CheckIcon, MinusIcon } from 'lucide-react';
 import React from 'react';
 import {
   FEATURES,
-  type FeatureId,
   PLANS,
   type PlanId,
   planFeatures,
@@ -15,17 +14,9 @@ interface Props {
   from: PlanId;
   to: PlanId;
   currentPriceInCents?: number;
-  trialFeatures?: FeatureId[];
-  trialFeatureHeading?: string;
 }
 
-const PlanChangeSummary: React.FC<Props> = ({
-  from,
-  to,
-  currentPriceInCents,
-  trialFeatures = [],
-  trialFeatureHeading = `What you’ll keep after your trial`,
-}) => {
+const PlanChangeSummary: React.FC<Props> = ({ from, to, currentPriceInCents }) => {
   const arrowGradientId = React.useId();
   const current = PLANS[from];
   const destination = PLANS[to];
@@ -62,12 +53,7 @@ const PlanChangeSummary: React.FC<Props> = ({
   const groups = [
     {
       heading: `What you’re adding`,
-      features: added.filter((feature) => !trialFeatures.includes(feature)),
-      removed: false,
-    },
-    {
-      heading: trialFeatureHeading,
-      features: added.filter((feature) => trialFeatures.includes(feature)),
+      features: added,
       removed: false,
     },
     {
@@ -92,7 +78,7 @@ const PlanChangeSummary: React.FC<Props> = ({
           >
             {higherIndex === index && (
               <div aria-hidden className="pointer-events-none absolute -inset-3 -z-10">
-                <div className="absolute -inset-x-8 -inset-y-5 bg-[radial-gradient(ellipse_closest-side_at_center,var(--color-violet-400),transparent)] opacity-20" />
+                <div className="absolute -inset-x-8 -inset-y-5 bg-[radial-gradient(ellipse_closest-side_at_center,var(--color-violet-400),transparent)] opacity-15" />
                 {[
                   `left-0 top-3 size-1 bg-violet-400`,
                   `right-1 top-0 size-1 bg-fuchsia-400`,

@@ -107,13 +107,27 @@ struct SubscriptionManager: AsyncScheduledJob {
       guard let decision else { continue }
 
       if let event = decision.send {
+        var podcastsAccessEnded = false
+        if event == .trialExpiredNoMac {
+          let postTrialBilling = BillingAccountSnapshot(
+            billingIdentity: identity,
+            stripeSubscription: sub,
+            date: trialStart + PlanStatus.trialPeriod,
+          )
+          podcastsAccessEnded = try await self.podcastsAccessEndedWithTrial(
+            for: parent,
+            billing: postTrialBilling,
+          )
+        }
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
         formatter.dateStyle = .long
         formatter.timeZone = parent.timeZone.flatMap { TimeZone(identifier: $0) }
           ?? TimeZone(secondsFromGMT: 0)
         let context = AccountLifecycle.FullTrialContext(
-          billingUrl: self.env.accountDashboardUrl.withoutTrailingSlashes + "/settings/billing",
+          billingUrl: parent.accountSiteBetaEnabled
+            ? self.env.accountDashboardUrl.withoutTrailingSlashes + "/settings/billing"
+            : self.env.dashboardUrl.withoutTrailingSlashes + "/settings",
           graceEndsOn: formatter
             .string(from: trialStart + PlanStatus.trialPeriod + PlanStatus.gracePeriod),
           currentTier: sub?.stripeStatus == .active ? sub?.tier : nil,
@@ -123,6 +137,7 @@ struct SubscriptionManager: AsyncScheduledJob {
           event,
           to: parent.email,
           context: context,
+          podcastsAccessEnded: podcastsAccessEnded,
         ))
         logs.append("Sent `.\(event)` email to parent \(parentLink)")
       }
@@ -133,6 +148,26 @@ struct SubscriptionManager: AsyncScheduledJob {
       logs.append("Skipped trial email lifecycle for \(skippedPaidFull) paid-full parent(s)")
     }
     return logs
+  }
+
+  private func podcastsAccessEndedWithTrial(
+    for parent: Parent,
+    billing: BillingAccountSnapshot,
+  ) async throws -> Bool {
+    let children = try await parent.children(in: self.db)
+    for child in children {
+      for device in try await child.iosDevices(in: self.db) {
+        guard let install = try await device.podcastInstall(in: self.db),
+              try await install.hasToken(in: self.db) else { continue }
+        switch billing.amSubscriptionState(forInstall: install) {
+        case .unpaid, .legacyExpired:
+          return true
+        default:
+          continue
+        }
+      }
+    }
+    return false
   }
 
   func refreshStaleSubscriptions() async throws -> [String] {
@@ -240,6 +275,7 @@ private func emailTemplate(
   _ event: SubscriptionEmail,
   to address: EmailAddress,
   context: AccountLifecycle.FullTrialContext,
+  podcastsAccessEnded: Bool,
 ) -> TemplateEmail {
   switch event {
   case .trialEndingSoon(let length, let remaining):
@@ -250,7 +286,10 @@ private func emailTemplate(
   case .trialExpired(let length):
     .trialExpired(to: address.rawValue, model: .init(length: length, context: context))
   case .trialExpiredNoMac:
-    .trialExpiredNoMac(to: address.rawValue, model: .init(context: context))
+    .trialExpiredNoMac(
+      to: address.rawValue,
+      model: .init(context: context, podcastsAccessEnded: podcastsAccessEnded),
+    )
   case .trialGraceEnded:
     .trialGraceEnded(to: address.rawValue, model: .init(context: context))
   }

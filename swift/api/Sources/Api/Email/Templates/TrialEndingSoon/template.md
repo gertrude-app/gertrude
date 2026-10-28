@@ -1,7 +1,8 @@
 Hi there,
 
-Your {{length}}-day free trial of Gertrude Full ends in {{remainingText}}. This email is
-about the extra Mac features included in that trial.
+This is Jared from Gertrude. I just wanted to let you know your {{length}}-day free Full
+trial ends in {{remainingText}}. This email is about the extra Mac features included in
+that trial.
 
 {{planNotice}}
 

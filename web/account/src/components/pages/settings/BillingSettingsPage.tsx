@@ -34,6 +34,7 @@ import { FEATURES, PLANS, PLAN_IDS, planPriceDisplay } from '#/lib/plans';
 interface Props {
   billing: GetAccountBilling.Output;
   pendingAction?: SubscriptionPanelAction;
+  defaultPlanChangeTo?: SubscriptionTier;
   returnHref?: string;
   onAction: (action: SubscriptionPanelAction) => void | Promise<void>;
 }
@@ -41,13 +42,17 @@ interface Props {
 const BillingSettingsPage: React.FC<Props> = ({
   billing,
   pendingAction,
+  defaultPlanChangeTo,
   returnHref,
   onAction,
 }) => {
-  const [planChange, setPlanChange] =
-    React.useState<
-      Extract<SubscriptionPanelAction, { case: `changeSubscriptionTier` }>
-    >();
+  const [planChange, setPlanChange] = React.useState<
+    Extract<SubscriptionPanelAction, { case: `changeSubscriptionTier` }> | undefined
+  >(
+    defaultPlanChangeTo
+      ? { case: `changeSubscriptionTier`, to: defaultPlanChangeTo }
+      : undefined,
+  );
   const statusBadge = planBadge(billing);
   const selectedPlan = currentPlan(billing.planStatus);
   const groupedActions = actionsByPlan(billing);
@@ -260,11 +265,10 @@ const PlanChangeDescription: React.FC<{
   to: SubscriptionTier;
 }> = ({ billing, to }) => {
   const { planStatus } = billing;
-  const trial =
+  const from =
     planStatus.case === `fullTrial` || planStatus.case === `fullTrialGrace`
-      ? planStatus
-      : undefined;
-  const from = trial ? trial.substrate?.tier : currentPlan(planStatus);
+      ? planStatus.substrate?.tier
+      : currentPlan(planStatus);
   if (!from) return null;
 
   return (
@@ -273,12 +277,6 @@ const PlanChangeDescription: React.FC<{
         from={from}
         to={to}
         currentPriceInCents={billing.currentPriceInCents}
-        trialFeatures={trial ? PLANS.full.features : []}
-        trialFeatureHeading={
-          planStatus.case === `fullTrialGrace`
-            ? `What you’ll keep after your grace period`
-            : undefined
-        }
       />
       <Text as="p" variant="bodyMuted">
         Your new plan and billing cycle start today. We’ll credit unused time on your

@@ -141,14 +141,14 @@ import Vapor
           ),
         ))
 
-      case "admin-trial-ending-soon":
+      case "admin-trial-ending-soon-v2":
         try await postmark
           .send(template: .trialEndingSoon(
             to: to,
             model: .init(length: 21, remaining: 3, context: trialContext),
           ))
 
-      case "admin-trial-expired":
+      case "admin-trial-expired-v2":
         try await postmark.send(template: .trialExpired(
           to: to,
           model: .init(length: 21, context: trialContext),
@@ -158,6 +158,18 @@ import Vapor
         try await postmark.send(template: .trialExpiredNoMac(
           to: to,
           model: .init(context: trialContext),
+        ))
+
+      case "admin-trial-expired-no-mac-podcasts":
+        try await postmark.send(template: .trialExpiredNoMac(
+          to: to,
+          model: .init(
+            context: .init(
+              billingUrl: trialContext.billingUrl,
+              graceEndsOn: trialContext.graceEndsOn,
+            ),
+            podcastsAccessEnded: true,
+          ),
         ))
 
       case "admin-trial-grace-ended":
@@ -236,11 +248,11 @@ import Vapor
         return write(template: IosOnlyMacTrial.self)
       case "mac-setup-24h":
         return write(template: MacSetup24h.self)
-      case "admin-trial-ending-soon":
+      case "admin-trial-ending-soon-v2":
         return write(template: AccountLifecycle.TrialEndingSoon.self)
-      case "admin-trial-expired":
+      case "admin-trial-expired-v2":
         return write(template: AccountLifecycle.TrialExpired.self)
-      case "admin-trial-expired-no-mac":
+      case "admin-trial-expired-no-mac", "admin-trial-expired-no-mac-podcasts":
         return write(template: AccountLifecycle.TrialExpiredNoMac.self)
       case "admin-trial-grace-ended":
         return write(template: AccountLifecycle.TrialGraceEnded.self)

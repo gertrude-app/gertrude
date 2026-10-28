@@ -5,7 +5,6 @@ import {
 } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
 import PlanChangeSummary from './PlanChangeSummary';
-import { PLANS } from '#/lib/plans';
 
 const meta = {
   title: 'Account/Components/Billing/Plan Change Summary',
@@ -24,12 +23,8 @@ const cases: {
     props: { from: `medium`, to: `full` },
   },
   {
-    title: `Full trial — keep Mac features`,
-    props: { from: `medium`, to: `full`, trialFeatures: PLANS.full.features },
-  },
-  {
-    title: `Full trial on Light — add Music and keep Mac features`,
-    props: { from: `light`, to: `full`, trialFeatures: PLANS.full.features },
+    title: `Upgrade — Light to Full`,
+    props: { from: `light`, to: `full` },
   },
   {
     title: `Downgrade — Medium to yearly Light`,
@@ -38,15 +33,6 @@ const cases: {
   {
     title: `Legacy Full to Medium — same price, fewer features`,
     props: { from: `full`, to: `medium`, currentPriceInCents: 500 },
-  },
-  {
-    title: `Full trial grace period`,
-    props: {
-      from: `medium`,
-      to: `full`,
-      trialFeatures: PLANS.full.features,
-      trialFeatureHeading: `What you’ll keep after your grace period`,
-    },
   },
 ];
 

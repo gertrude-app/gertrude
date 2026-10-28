@@ -74,12 +74,12 @@ const SAMPLES: Record<string, Sample> = {
     layout: `personal`,
     model: { deviceFragment: `Franny’s iPhone` },
   },
-  'trial-ending-soon': {
+  'trial-ending-soon-v2': {
     dir: `TrialEndingSoon`,
     layout: `base`,
     model: { ...TRIAL_CONTEXT, length: `21`, remaining: `3`, remainingText: `3 days` },
   },
-  'trial-expired': {
+  'trial-expired-v2': {
     dir: `TrialExpired`,
     layout: `base`,
     model: { ...TRIAL_CONTEXT, length: `21` },
@@ -87,7 +87,26 @@ const SAMPLES: Record<string, Sample> = {
   'trial-expired-no-mac': {
     dir: `TrialExpiredNoMac`,
     layout: `base`,
-    model: { ...TRIAL_CONTEXT, subjectSuffix: ` — no action needed` },
+    model: {
+      ...TRIAL_CONTEXT,
+      subjectSuffix: ` — no action needed`,
+      impactNotice: `Since you don’t have any Macs connected to your account, this won’t affect the features you’re currently using.`,
+      billingPrompt: `If you decide to use Gertrude on a Mac in the future, you can`,
+      billingLinkText: `review the Full plan in your billing settings`,
+    },
+  },
+  'trial-expired-no-mac-podcasts': {
+    dir: `TrialExpiredNoMac`,
+    layout: `base`,
+    model: {
+      ...TRIAL_CONTEXT,
+      currentPlan: ``,
+      planNotice: `Gertrude Blocker’s free features on children’s iPhones and iPads remain available.`,
+      subjectSuffix: ``,
+      impactNotice: `If you’d like to keep adding shows and getting new episodes in Gertrude Podcasts, you can subscribe to Light for $10 a year. You don’t need Full for Podcasts.`,
+      billingPrompt: `You can`,
+      billingLinkText: `subscribe to Light here`,
+    },
   },
   'trial-grace-ended': {
     dir: `TrialGraceEnded`,

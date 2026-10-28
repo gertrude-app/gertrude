@@ -3768,6 +3768,54 @@
     }
   },
   {
+    "id": "account-pages-settings--confirm-downgrade",
+    "iframePath": "/iframe.html?id=account-pages-settings--confirm-downgrade&viewMode=story",
+    "name": "Billing — confirm downgrade",
+    "path": "screenshots/mobile/account-pages-settings--confirm-downgrade.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-settings--confirm-downgrade",
+    "iframePath": "/iframe.html?id=account-pages-settings--confirm-downgrade&viewMode=story",
+    "name": "Billing — confirm downgrade",
+    "path": "screenshots/desktop/account-pages-settings--confirm-downgrade.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-settings--confirm-upgrade",
+    "iframePath": "/iframe.html?id=account-pages-settings--confirm-upgrade&viewMode=story",
+    "name": "Billing — confirm upgrade during trial",
+    "path": "screenshots/mobile/account-pages-settings--confirm-upgrade.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-settings--confirm-upgrade",
+    "iframePath": "/iframe.html?id=account-pages-settings--confirm-upgrade&viewMode=story",
+    "name": "Billing — confirm upgrade during trial",
+    "path": "screenshots/desktop/account-pages-settings--confirm-upgrade.png",
+    "title": "Account/Pages/Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-settings--notifications",
     "iframePath": "/iframe.html?id=account-pages-settings--notifications&viewMode=story",
     "name": "Notifications",

@@ -1,6 +1,7 @@
 Hi there,
 
-The grace period for your free Gertrude Full trial has ended.
+This is Jared from Gertrude. I just wanted to let you know the grace period for your free
+Full trial has ended.
 
 {{planNotice}}
 
