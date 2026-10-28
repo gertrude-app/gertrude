@@ -79,6 +79,7 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       HandleAccountCheckoutCancel.self,
       CreatePerson.self,
       CreateMacConnectionCode.self,
+      DisconnectMacConnection.self,
       UpdatePersonBasicDetails.self,
       DeletePerson.self,
       GetAccountKeychains.self,

@@ -24,6 +24,7 @@ export * from './pairs/DeleteAccountNotification';
 export * from './pairs/DeleteAccountNotificationMethod';
 export * from './pairs/DeleteActivity';
 export * from './pairs/DeletePerson';
+export * from './pairs/DisconnectMacConnection';
 export * from './pairs/DismissAccountAnnouncement';
 export * from './pairs/GetAccountAnnouncement';
 export * from './pairs/GetAccountBilling';
