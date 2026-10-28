@@ -73,32 +73,32 @@ h1 {
 
 @media (prefers-color-scheme: dark) {
   h1 {
-    color: white;
+    color: white !important;
   }
 
   .subheading {
-    color: #cbd5e1;
+    color: #cbd5e1 !important;
   }
 
   .feature {
-    background: #1e293b;
+    background: #1e293b !important;
   }
 
   .feature h2 {
-    color: white;
+    color: white !important;
   }
 
   .feature p {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
 
   .blog-callout {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
 
   .feature a,
   .subheading a,
   .blog-callout a {
-    color: #e879f9;
+    color: #e879f9 !important;
   }
 }

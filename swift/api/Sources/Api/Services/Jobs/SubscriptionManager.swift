@@ -7,7 +7,7 @@ import Vapor
 import XCore
 import XStripe
 
-enum SubscriptionEmail: Equatable {
+enum TrialEmail: Equatable {
   case trialEndingSoon(length: Int, remaining: Int)
   case trialExpired(length: Int)
   case trialExpiredNoMac
@@ -15,7 +15,7 @@ enum SubscriptionEmail: Equatable {
 }
 
 struct TrialEmailDecision: Equatable {
-  let send: SubscriptionEmail?
+  let send: TrialEmail?
   let nextLifecycle: BillingIdentity.TrialEmailLifecycle
 }
 
@@ -272,7 +272,7 @@ private func terminal(_ status: StripeSubscription.StripeStatus) -> Bool {
 }
 
 private func emailTemplate(
-  _ event: SubscriptionEmail,
+  _ event: TrialEmail,
   to address: EmailAddress,
   context: AccountLifecycle.FullTrialContext,
   podcastsAccessEnded: Bool,
