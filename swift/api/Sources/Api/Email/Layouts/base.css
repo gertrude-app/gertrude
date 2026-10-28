@@ -127,15 +127,15 @@ footer .physical-address {
 
 @media (prefers-color-scheme: dark) {
   body {
-    background: #0f172a;
+    background: #0f172a !important;
   }
 
   h1 {
-    color: #f1f5f9;
+    color: #f1f5f9 !important;
   }
 
   p {
-    color: #cbd5e1;
+    color: #cbd5e1 !important;
   }
 
   a {
@@ -143,31 +143,31 @@ footer .physical-address {
   }
 
   .subtle {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
 
   footer {
-    background-color: #02061788;
+    background-color: #02061788 !important;
   }
 
   footer .copy {
-    color: #64748b;
+    color: #64748b !important;
   }
 
   footer a {
-    color: #94a3b8;
+    color: #94a3b8 !important;
   }
 
   footer .physical-address {
-    color: #64748b;
+    color: #64748b !important;
   }
 
   .action-button {
-    background-color: #7c3aed;
+    background-color: #7c3aed !important;
   }
 
   .code {
-    color: #ddd6fe;
-    background-color: #8b5cf644;
+    color: #ddd6fe !important;
+    background-color: #8b5cf644 !important;
   }
 }
