@@ -10,8 +10,8 @@ import XStripe
 enum SubscriptionEmail: Equatable {
   case trialEndingSoon(length: Int, remaining: Int)
   case trialExpired(length: Int)
-  case overdueToUnpaid
-  case paidToOverdue
+  case trialExpiredNoMac
+  case trialGraceEnded
 }
 
 struct TrialEmailDecision: Equatable {
@@ -97,17 +97,48 @@ struct SubscriptionManager: AsyncScheduledJob {
         continue
       }
 
-      let onboarded = try await parent.hasConnectedApp(self.db)
+      let hasMac = try await parent.hasConnectedMac(self.db)
       let decision = nextTrialEmailDecision(
         lifecycle: identity.trialEmailLifecycle,
         trialStartedAt: trialStart,
-        hasConnectedApp: onboarded,
+        hasConnectedMac: hasMac,
         now: self.now,
       )
       guard let decision else { continue }
 
       if let event = decision.send {
-        try await self.postmark.send(template: emailTemplate(event, to: parent.email))
+        var podcastsAccessEnded = false
+        if event == .trialExpiredNoMac {
+          let postTrialBilling = BillingAccountSnapshot(
+            billingIdentity: identity,
+            stripeSubscription: sub,
+            date: trialStart + PlanStatus.trialPeriod,
+          )
+          podcastsAccessEnded = try await self.podcastsAccessEndedWithTrial(
+            for: parent,
+            billing: postTrialBilling,
+          )
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateStyle = .long
+        formatter.timeZone = parent.timeZone.flatMap { TimeZone(identifier: $0) }
+          ?? TimeZone(secondsFromGMT: 0)
+        let context = AccountLifecycle.FullTrialContext(
+          billingUrl: parent.accountSiteBetaEnabled
+            ? self.env.accountDashboardUrl.withoutTrailingSlashes + "/settings/billing"
+            : self.env.dashboardUrl.withoutTrailingSlashes + "/settings",
+          graceEndsOn: formatter
+            .string(from: trialStart + PlanStatus.trialPeriod + PlanStatus.gracePeriod),
+          currentTier: sub?.stripeStatus == .active ? sub?.tier : nil,
+          pastDueTier: sub?.stripeStatus == .pastDue ? sub?.tier : nil,
+        )
+        try await self.postmark.send(template: emailTemplate(
+          event,
+          to: parent.email,
+          context: context,
+          podcastsAccessEnded: podcastsAccessEnded,
+        ))
         logs.append("Sent `.\(event)` email to parent \(parentLink)")
       }
       identity.trialEmailLifecycle = decision.nextLifecycle
@@ -117,6 +148,26 @@ struct SubscriptionManager: AsyncScheduledJob {
       logs.append("Skipped trial email lifecycle for \(skippedPaidFull) paid-full parent(s)")
     }
     return logs
+  }
+
+  private func podcastsAccessEndedWithTrial(
+    for parent: Parent,
+    billing: BillingAccountSnapshot,
+  ) async throws -> Bool {
+    let children = try await parent.children(in: self.db)
+    for child in children {
+      for device in try await child.iosDevices(in: self.db) {
+        guard let install = try await device.podcastInstall(in: self.db),
+              try await install.hasToken(in: self.db) else { continue }
+        switch billing.amSubscriptionState(forInstall: install) {
+        case .unpaid, .legacyExpired:
+          return true
+        default:
+          continue
+        }
+      }
+    }
+    return false
   }
 
   func refreshStaleSubscriptions() async throws -> [String] {
@@ -151,10 +202,16 @@ struct SubscriptionManager: AsyncScheduledJob {
       let onboarded = try await parent.hasConnectedApp(self.db)
 
       if oldStatus != .pastDue, newStatus == .pastDue {
-        try await self.postmark.send(template: emailTemplate(.paidToOverdue, to: parent.email))
+        try await self.postmark.send(template: .paidToOverdue(
+          to: parent.email.rawValue,
+          model: .init(),
+        ))
         logs.append("Sent `.paidToOverdue` email to parent \(self.adminLink(for: parent))")
       } else if !terminal(oldStatus), terminal(newStatus), onboarded {
-        try await self.postmark.send(template: emailTemplate(.overdueToUnpaid, to: parent.email))
+        try await self.postmark.send(template: .overdueToUnpaid(
+          to: parent.email.rawValue,
+          model: .init(),
+        ))
         logs.append("Sent `.overdueToUnpaid` email to parent \(self.adminLink(for: parent))")
       }
     }
@@ -169,39 +226,42 @@ struct SubscriptionManager: AsyncScheduledJob {
 func nextTrialEmailDecision(
   lifecycle: BillingIdentity.TrialEmailLifecycle,
   trialStartedAt: Date,
-  hasConnectedApp: Bool,
+  hasConnectedMac: Bool,
   now: Date,
 ) -> TrialEmailDecision? {
+  guard lifecycle != .finalSent, lifecycle != .skipped else { return nil }
   let endingSoonAt = trialStartedAt + PlanStatus.trialPeriod - .days(3)
   let expiredAt = trialStartedAt + PlanStatus.trialPeriod
-  let finalAt = trialStartedAt + PlanStatus.trialPeriod + PlanStatus.gracePeriod
+  let finalAt = expiredAt + PlanStatus.gracePeriod
   if now >= finalAt + PlanStatus.gracePeriod {
-    switch lifecycle {
-    case .none, .endingSoonSent, .expiredSent:
-      return .init(send: nil, nextLifecycle: .finalSent)
-    case .finalSent, .skipped:
-      return nil
-    }
+    return .init(send: nil, nextLifecycle: .finalSent)
   }
-  switch lifecycle {
-  case .none where now >= endingSoonAt:
+  if !hasConnectedMac {
+    if lifecycle == .expiredSent {
+      return .init(send: nil, nextLifecycle: .finalSent)
+    }
+    return now >= expiredAt
+      ? .init(send: .trialExpiredNoMac, nextLifecycle: .finalSent)
+      : nil
+  }
+  if now >= finalAt {
+    return .init(send: .trialGraceEnded, nextLifecycle: .finalSent)
+  }
+  if now >= expiredAt {
+    return lifecycle == .expiredSent
+      ? nil
+      : .init(send: .trialExpired(length: 21), nextLifecycle: .expiredSent)
+  }
+  if lifecycle == .none, now >= endingSoonAt {
     return .init(
-      send: .trialEndingSoon(length: 21, remaining: 3),
+      send: .trialEndingSoon(
+        length: 21,
+        remaining: Int(ceil(expiredAt.timeIntervalSince(now) / TimeInterval.days(1))),
+      ),
       nextLifecycle: .endingSoonSent,
     )
-  case .endingSoonSent where now >= expiredAt:
-    return .init(
-      send: hasConnectedApp ? .trialExpired(length: 21) : nil,
-      nextLifecycle: .expiredSent,
-    )
-  case .expiredSent where now >= finalAt:
-    return .init(
-      send: hasConnectedApp ? .overdueToUnpaid : nil,
-      nextLifecycle: .finalSent,
-    )
-  default:
-    return nil
   }
+  return nil
 }
 
 private func terminal(_ status: StripeSubscription.StripeStatus) -> Bool {
@@ -214,30 +274,38 @@ private func terminal(_ status: StripeSubscription.StripeStatus) -> Bool {
 private func emailTemplate(
   _ event: SubscriptionEmail,
   to address: EmailAddress,
+  context: AccountLifecycle.FullTrialContext,
+  podcastsAccessEnded: Bool,
 ) -> TemplateEmail {
   switch event {
   case .trialEndingSoon(let length, let remaining):
     .trialEndingSoon(
       to: address.rawValue,
-      model: .init(length: length, remaining: remaining),
+      model: .init(length: length, remaining: remaining, context: context),
     )
   case .trialExpired(let length):
-    .trialExpired(to: address.rawValue, model: .init(length: length))
-  case .overdueToUnpaid:
-    .overdueToUnpaid(to: address.rawValue, model: .init())
-  case .paidToOverdue:
-    .paidToOverdue(to: address.rawValue, model: .init())
+    .trialExpired(to: address.rawValue, model: .init(length: length, context: context))
+  case .trialExpiredNoMac:
+    .trialExpiredNoMac(
+      to: address.rawValue,
+      model: .init(context: context, podcastsAccessEnded: podcastsAccessEnded),
+    )
+  case .trialGraceEnded:
+    .trialGraceEnded(to: address.rawValue, model: .init(context: context))
   }
 }
 
 private extension Parent {
-  func hasConnectedApp(_ db: any DuetSQL.Client) async throws -> Bool {
+  func hasConnectedMac(_ db: any DuetSQL.Client) async throws -> Bool {
     let children = try await children(in: db)
-    let computers = try await children.concurrentMap {
+    return try await children.concurrentMap {
       try await $0.computerUsers(in: db)
-    }.flatMap(\.self)
-    if !computers.isEmpty { return true }
+    }.contains { !$0.isEmpty }
+  }
 
+  func hasConnectedApp(_ db: any DuetSQL.Client) async throws -> Bool {
+    if try await self.hasConnectedMac(db) { return true }
+    let children = try await children(in: db)
     let iosDevices = try await children.concurrentMap {
       try await $0.iosDevices(in: db)
     }.flatMap(\.self)

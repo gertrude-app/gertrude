@@ -237,13 +237,17 @@ const meta = {
 
 export default meta;
 
-interface BillingStoryProps {
-  billing: Billing;
-  returnHref?: string;
-}
+type BillingStoryProps = Pick<
+  React.ComponentProps<typeof BillingSettingsPage>,
+  `billing` | `returnHref` | `defaultPlanChangeTo`
+>;
 
-const BillingStory: React.FC<BillingStoryProps> = ({ billing, returnHref }) => (
-  <StoryScreen>
+const BillingStory: React.FC<BillingStoryProps> = ({
+  billing,
+  returnHref,
+  defaultPlanChangeTo,
+}) => (
+  <StoryScreen className={defaultPlanChangeTo ? `h-screen overflow-hidden` : undefined}>
     <SettingsShellPage
       email="parent@example.com"
       selectedHref="/settings/billing"
@@ -251,14 +255,22 @@ const BillingStory: React.FC<BillingStoryProps> = ({ billing, returnHref }) => (
       billingHref="/settings/billing"
       onChangePassword={noop}
     >
-      <BillingSettingsPage billing={billing} returnHref={returnHref} onAction={noop} />
+      <BillingSettingsPage
+        billing={billing}
+        returnHref={returnHref}
+        defaultPlanChangeTo={defaultPlanChangeTo}
+        onAction={noop}
+      />
     </SettingsShellPage>
   </StoryScreen>
 );
 
-const billingStory = (billing: Billing, returnHref?: string) => ({
+const billingStory = (
+  billing: Billing,
+  options: Omit<BillingStoryProps, `billing`> = {},
+) => ({
   parameters: galleryParameters,
-  render: () => <BillingStory billing={billing} returnHref={returnHref} />,
+  render: () => <BillingStory billing={billing} {...options} />,
 });
 
 export const Notifications = {
@@ -305,7 +317,7 @@ export const BillingFreeNew = {
 
 export const BillingDuringDeviceSetup = {
   name: 'Billing — during device setup',
-  ...billingStory(freeNew, `/connect/blockerSupervise/123456`),
+  ...billingStory(freeNew, { returnHref: `/connect/blockerSupervise/123456` }),
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
 };
 
@@ -382,4 +394,16 @@ export const BillingFullTrialGrace = {
 export const BillingFullTrialGraceFromMedium = {
   name: 'Billing — Full trial grace from Medium',
   ...billingStory(fullTrialGraceFromMedium),
+};
+
+export const ConfirmUpgrade = {
+  name: 'Billing — confirm upgrade during trial',
+  ...billingStory(fullTrialFromMedium, { defaultPlanChangeTo: `full` }),
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+};
+
+export const ConfirmDowngrade = {
+  name: 'Billing — confirm downgrade',
+  ...billingStory(fullCurrentSwitchable, { defaultPlanChangeTo: `medium` }),
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
 };

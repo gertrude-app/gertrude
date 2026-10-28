@@ -1,5 +1,6 @@
 import Dependencies
 import Vapor
+import XCore
 import XPostmark
 
 struct PostmarkClient: Sendable {
@@ -63,6 +64,8 @@ extension PostmarkClient {
          .reSignup(let recipient, _),
          .trialEndingSoon(let recipient, _),
          .trialExpired(let recipient, _),
+         .trialExpiredNoMac(let recipient, _),
+         .trialGraceEnded(let recipient, _),
          .overdueToUnpaid(let recipient, _),
          .paidToOverdue(let recipient, _),
          .passwordReset(let recipient, _),
@@ -235,12 +238,4 @@ func isJaredTestAddress(_ email: String) -> Bool {
 
 func isTestAddress(_ email: String) -> Bool {
   isCypressTestAddress(email) || isProdSmokeTestAddress(email)
-}
-
-private extension Array {
-  func chunked(into size: Int) -> [[Element]] {
-    stride(from: 0, to: count, by: size).map {
-      Array(self[$0 ..< Swift.min($0 + size, count)])
-    }
-  }
 }

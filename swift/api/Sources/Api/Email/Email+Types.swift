@@ -17,6 +17,8 @@ enum TemplateEmail {
   case macSetup24h(to: String, model: MacSetup24h)
   case trialEndingSoon(to: String, model: AccountLifecycle.TrialEndingSoon)
   case trialExpired(to: String, model: AccountLifecycle.TrialExpired)
+  case trialExpiredNoMac(to: String, model: AccountLifecycle.TrialExpiredNoMac)
+  case trialGraceEnded(to: String, model: AccountLifecycle.TrialGraceEnded)
   case overdueToUnpaid(to: String, model: AccountLifecycle.OverdueToUnpaid)
   case paidToOverdue(to: String, model: AccountLifecycle.PaidToOverdue)
   case screenTimeWarning(to: String, model: ScreenTimeWarning)
@@ -77,6 +79,8 @@ extension TemplateEmail {
     case .macSetup24h(_, let model): model
     case .trialEndingSoon(_, let model): model
     case .trialExpired(_, let model): model
+    case .trialExpiredNoMac(_, let model): model
+    case .trialGraceEnded(_, let model): model
     case .overdueToUnpaid(_, let model): model
     case .paidToOverdue(_, let model): model
     case .passwordReset(_, let model): model

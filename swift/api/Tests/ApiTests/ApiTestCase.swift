@@ -141,6 +141,29 @@ class ApiTestCase: XCTestCase, @unchecked Sendable {
     return (device, install)
   }
 
+  func claimedPodcastInstall(
+    for child: ChildEntities,
+    installedDaysAgo: Int = 60,
+  ) async throws -> (IOSDevice, PodcastApp.Install) {
+    let device = try await self.db.create(IOSDevice(
+      id: .init(UUID()),
+      childId: child.model.id,
+      modelIdentifier: "iPhone15,2",
+      iosVersion: "18.2",
+    ))
+    try await self.createClaim(
+      .podcasts,
+      device.id,
+      child.model.id,
+      claimedAt: .reference,
+    )
+    var install = try await self.db.create(
+      PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
+    )
+    try await install.modifyCreatedAt(.exact(.reference - .days(installedDaysAgo)))
+    return (device, install)
+  }
+
   func musicContext(for child: ChildEntities) async throws -> MusicApp.InstallContext {
     let (device, install) = try await self.claimedMusicInstall(for: child)
     let token = try await self.db.create(MusicApp.Token(installId: install.id))

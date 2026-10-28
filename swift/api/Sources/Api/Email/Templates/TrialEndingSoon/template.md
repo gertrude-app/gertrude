@@ -1,19 +1,25 @@
-Hi there! 👋
+Hi there,
 
-This is Jared from Gertrude, writing to let you know that your {{length}} day free trial
-is ending in {{remaining}} days. If you'd like to continue using Gertrude for Mac, please
-login to the parents website here:
+This is Jared from Gertrude. I just wanted to let you know your {{length}}-day free Full
+trial ends in {{remainingText}}. This email is about the extra Mac features included in
+that trial.
 
-https://parents.gertrude.app/settings
+{{planNotice}}
 
-And then click the "Start subscription" button.
+When the trial ends, you’ll stop receiving new screenshots, keystrokes, unlock requests,
+and filter suspension requests from your Macs.
 
-If you're having any kind of trouble with Gertrude, or have any questions at all, please
-don't hesitate to reach out. If you reply to this email, it will come straight to me.
+Your Macs’ existing internet restrictions will remain in place for safety. You’ll have
+until {{graceEndsOn}} to make any final changes to what’s allowed; after that, you’ll need
+Full.
 
-By the way, if you're only using Gertrude on an iPhone or iPad, you don't need a Mac
-subscription. Basic protection on iOS is free with our Gertrude Blocker app, and you can
-keep using it from this same parent account—this email is only about Gertrude for Mac
-computers.
+If you’d like to keep Full’s Mac features after the trial, you can review the Full plan in
+your billing settings:
+
+{{billingUrl}}
+
+You won’t be charged for Full unless you choose to upgrade.
+
+If you have questions, reply to this email and it will come straight to me.
 
 - Jared

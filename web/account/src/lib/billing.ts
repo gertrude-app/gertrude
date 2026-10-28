@@ -6,75 +6,19 @@ import type {
   SubscriptionPanelAction,
   SubscriptionTier,
 } from '@shared/pairql/src/account';
+import { PLANS, PLAN_IDS, type PlanId } from './plans';
 
 type Input = GetAccountBilling.Output;
-export type CurrentPlan = `free` | `light` | `medium` | `full`;
+export type CurrentPlan = PlanId;
 
 const EXPIRING_SOON_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000;
 
-export const PLAN_FEATURES: Record<
-  CurrentPlan,
-  {
-    name: string;
-    price: string;
-    cadence?: string;
-    billingNote?: string;
-    features: string[];
+export function planTitle({ planStatus }: Input): string {
+  if (planStatus.case === `complimentary`) return `Complimentary`;
+  if (planStatus.case === `fullTrial` || planStatus.case === `fullTrialGrace`) {
+    return `Full trial`;
   }
-> = {
-  free: {
-    name: `Free`,
-    price: `$0`,
-    features: [`Protect iPhones and iPads for kids under 18 with Gertrude Blocker`],
-  },
-  light: {
-    name: `Light`,
-    price: `83¢`,
-    cadence: `per month`,
-    billingNote: `Billed $10 annually`,
-    features: [
-      `Everything in Free`,
-      `Parent-curated podcast listening with Gertrude Podcasts`,
-      `Protect supervised iPhones and iPads for adults 18+`,
-      `Additional supervision-only restrictions`,
-    ],
-  },
-  medium: {
-    name: `Medium`,
-    price: `$5`,
-    cadence: `per month`,
-    features: [
-      `Everything in Light`,
-      `Parent-curated music listening with Gertrude Music`,
-    ],
-  },
-  full: {
-    name: `Full`,
-    price: `$10`,
-    cadence: `per month`,
-    features: [
-      `Everything in Medium`,
-      `Mac internet filtering, screenshots, app blocking, downtime, and more`,
-    ],
-  },
-};
-
-export function planTitle(input: Input): string {
-  switch (input.planStatus.case) {
-    case `free`:
-      return `Free plan`;
-    case `light`:
-      return `Light plan`;
-    case `medium`:
-      return `Medium plan`;
-    case `complimentary`:
-      return `Complimentary`;
-    case `full`:
-      return `Full plan`;
-    case `fullTrial`:
-    case `fullTrialGrace`:
-      return `Full trial`;
-  }
+  return `${PLANS[planStatus.case].name} plan`;
 }
 
 export function planSubtext(input: Input): string {
@@ -85,7 +29,7 @@ export function planSubtext(input: Input): string {
     case `light`:
       return `$10/year. Protect child and adult supervised iPhones and iPads.`;
     case `medium`:
-      return `$5/month. Everything in Light, plus parent-curated music listening with Gertrude Music.`;
+      return `$5/month. Everything in Light, plus parent- or accountability partner-curated music listening with Gertrude Music.`;
     case `complimentary`:
       return `Complete access to all Gertrude apps on all of your family’s devices.`;
     case `full`:
@@ -158,10 +102,10 @@ export function actionLabel(action: SubscriptionPanelAction, input: Input): stri
   switch (action.case) {
     case `startCheckout`: {
       const isBrandNew = input.planStatus.case === `free` && !input.fullTrialStartedAt;
-      return `${isBrandNew ? `Upgrade to` : `Subscribe to`} ${tierName(action.tier)}`;
+      return `${isBrandNew ? `Upgrade to` : `Subscribe to`} ${PLANS[action.tier].name}`;
     }
     case `reactivateViaCheckout`:
-      return `${input.lastPaidTier === action.tier ? `Reactivate` : `Subscribe to`} ${tierName(action.tier)}`;
+      return `${input.lastPaidTier === action.tier ? `Reactivate` : `Subscribe to`} ${PLANS[action.tier].name}`;
     case `changeSubscriptionTier`:
       return changeTierLabel(action.to, input);
     case `openBillingPortal`:
@@ -271,20 +215,12 @@ export function planBadge(input: Input): {
   }
 }
 
-export function currentPlan(planStatus: PlanStatus): CurrentPlan {
-  switch (planStatus.case) {
-    case `free`:
-      return `free`;
-    case `light`:
-      return `light`;
-    case `medium`:
-      return `medium`;
-    case `full`:
-    case `complimentary`:
-    case `fullTrial`:
-    case `fullTrialGrace`:
-      return `full`;
-  }
+export function currentPlan({ case: status }: PlanStatus): CurrentPlan {
+  return status === `fullTrial` ||
+    status === `fullTrialGrace` ||
+    status === `complimentary`
+    ? `full`
+    : status;
 }
 
 export function actionKey(action: SubscriptionPanelAction): string {
@@ -346,26 +282,13 @@ function offersNonFullPurchase(input: Input): boolean {
   );
 }
 
-function changeTierLabel(to: SubscriptionTier, input: Input): string {
-  switch (to) {
-    case `full`:
-      return `Upgrade to Full`;
-    case `medium`:
-      return input.planStatus.case === `full` ? `Switch to Medium` : `Upgrade to Medium`;
-    case `light`:
-      return `Switch to Light`;
-  }
-}
-
-function tierName(tier: SubscriptionTier): string {
-  switch (tier) {
-    case `light`:
-      return `Light`;
-    case `medium`:
-      return `Medium`;
-    case `full`:
-      return `Full`;
-  }
+function changeTierLabel(to: SubscriptionTier, { planStatus }: Input): string {
+  const from =
+    planStatus.case === `fullTrial` || planStatus.case === `fullTrialGrace`
+      ? (planStatus.substrate?.tier ?? `free`)
+      : currentPlan(planStatus);
+  const verb = PLAN_IDS.indexOf(to) > PLAN_IDS.indexOf(from) ? `Upgrade to` : `Switch to`;
+  return `${verb} ${PLANS[to].name}`;
 }
 
 function long(iso: string): string {
