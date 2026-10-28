@@ -10,6 +10,7 @@ public enum ApplicationAction: Equatable, Sendable {
   case willTerminate
   case systemClockOrTimeZoneChanged
   case appLaunched(pid: pid_t)
+  case siriUIPresented(pid: pid_t)
 }
 
 enum ApplicationFeature {
@@ -123,7 +124,8 @@ extension ApplicationFeature.RootReducer: RootReducing {
         }
       }
 
-    case .application(.appLaunched(let pid)):
+    case .application(.appLaunched(let pid)),
+         .application(.siriUIPresented(let pid)):
       let blockedApps = state.user.data?.blockedApps ?? []
       let screenTimeConflict = state.screenTimeConflictDetected
       let browsers = state.browsers

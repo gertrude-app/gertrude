@@ -82,6 +82,8 @@ import MacAppRoute
       self.store.send(.application(.systemClockOrTimeZoneChanged))
     case .appLaunched(let pid):
       self.store.send(.application(.appLaunched(pid: pid)))
+    case .siriUIPresented(let pid):
+      self.store.send(.application(.siriUIPresented(pid: pid)))
     }
   }
 }
