@@ -1,6 +1,8 @@
 import App
 import AppKit
 import Cocoa
+import Core
+import Gertie
 import LiveApiClient
 import LiveAppClient
 import LiveFilterExtensionClient
@@ -10,6 +12,8 @@ import LiveWebSocketClient
 
 class AppDelegate: NSViewController, NSApplicationDelegate, NSWindowDelegate {
   let app = App()
+  private var runningAppsObservation: NSKeyValueObservation?
+  private var siriUITracker = SiriUITracker()
 
   func applicationDidFinishLaunching(_ notification: Notification) {
     self.app.send(.didFinishLaunching)
@@ -40,6 +44,20 @@ class AppDelegate: NSViewController, NSApplicationDelegate, NSWindowDelegate {
       }
     }
 
+    self.runningAppsObservation = NSWorkspace.shared.observe(
+      \.runningApplications,
+      options: [.initial, .new],
+    ) { [weak self] workspace, _ in
+      let apps = workspace.runningApplications.filter {
+        $0.bundleIdentifier == SiriBundleId.app.rawValue
+          || $0.bundleIdentifier == SiriBundleId.uiService.rawValue
+      }.compactMap(\.runningApp)
+      DispatchQueue.main.async { [weak self] in
+        guard let self, let host = self.siriUITracker.newlyPresentedHost(in: apps) else { return }
+        self.app.send(.siriUIPresented(pid: host.pid))
+      }
+    }
+
     // NB: clock/tz changes are NOT posted to NSWorkspace.shared.notificationCenter
     NotificationCenter.default.addObserver(
       forName: NSNotification.Name.NSSystemClockDidChange,
@@ -59,6 +77,7 @@ class AppDelegate: NSViewController, NSApplicationDelegate, NSWindowDelegate {
   }
 
   func applicationWillTerminate(_ notification: Notification) {
+    self.runningAppsObservation = nil
     self.app.send(.willTerminate)
     NSWorkspace.shared.notificationCenter.removeObserver(self)
   }

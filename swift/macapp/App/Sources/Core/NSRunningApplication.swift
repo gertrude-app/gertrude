@@ -49,3 +49,20 @@ public extension RunningApp {
     NSRunningApplication(processIdentifier: self.pid)
   }
 }
+
+public struct SiriUITracker: Sendable {
+  private var handledServicePids: Set<Int32> = []
+
+  public init() {}
+
+  public mutating func newlyPresentedHost(in apps: [RunningApp]) -> RunningApp? {
+    let servicePids = Set(apps.filter { $0.bundleId == SiriBundleId.uiService.rawValue }.map(\.pid))
+    self.handledServicePids.formIntersection(servicePids)
+    guard !servicePids.subtracting(self.handledServicePids).isEmpty,
+          let host = apps.first(where: { $0.bundleId == SiriBundleId.app.rawValue }) else {
+      return nil
+    }
+    self.handledServicePids.formUnion(servicePids)
+    return host
+  }
+}
