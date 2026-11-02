@@ -72,7 +72,7 @@
             html { padding: 0.5em; }
             code { color: rebeccapurple; font-size: 1.2em;}
           </style>
-          <h2>Reset complete</h2>
+          <h2>Reset complete!</h2>
           <h3>Betsy (Mac-focused)</h3>
           <p>
             To auto login as "Betsy" set this <code>.env</code> variable

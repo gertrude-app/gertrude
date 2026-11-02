@@ -49,19 +49,6 @@ const MainFooter: React.FC = () => (
     </div>
     <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8">
       <span className="text-white/90">© {new Date().getFullYear()} NetRivet Inc.</span>
-      <span className="text-white/90">
-        <span className="lg:hidden">
-          <Link href="https://github.com/gertrude-app/gertrude" className="underline">
-            OSS
-          </Link>
-        </span>
-        <span className="hidden lg:inline">
-          Gertrude is{` `}
-          <Link href="https://github.com/gertrude-app/gertrude" className="underline">
-            open source
-          </Link>
-        </span>
-      </span>
       <div className="flex items-center gap-4 self-center">
         <Link
           href="https://www.youtube.com/@gertrudeapp"
