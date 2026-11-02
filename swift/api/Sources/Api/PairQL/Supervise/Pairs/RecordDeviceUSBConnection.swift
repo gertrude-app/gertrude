@@ -1,3 +1,4 @@
+import Dependencies
 import DuetSQL
 import PairQL
 
@@ -39,6 +40,33 @@ extension RecordDeviceUSBConnection: Resolver {
       throw context.error("6eaabffb", .badRequest, user: "Unexpected error")
     }
 
+    let child = try await context.db.find(validated.claimedChildId)
+    let parent = try await child.parent(in: context.db)
+    let account = try await parent.billingAccountSnapshot(
+      in: context.db,
+      at: get(dependency: \.date.now),
+    )
+    if account.can(.superviseIosDevice), let limit = account.supervisedIOSDeviceLimit {
+      let supervised = try await parent.supervisedIOSDevices(in: context.db)
+      if !supervised.alreadyIncludes(udid: input.udid), supervised.count >= limit {
+        let parentLink = AdminLink().slack(to: .parent(parent.id), text: parent.email.rawValue)
+        Task {
+          await get(dependency: \.slack)
+            .internal(
+              .info,
+              "*iOS supervision:* new device blocked (over device limit), \(parentLink)",
+            )
+        }
+        throw context.error(
+          id: "d6c63cab",
+          type: .badRequest,
+          debugMessage: "supervised device limit reached (\(supervised.count)/\(limit))",
+          userMessage: SUPERVISED_DEVICE_LIMIT_MESSAGE,
+          showContactSupport: true,
+        )
+      }
+    }
+
     supervision.udid = input.udid
     try await context.db.update(supervision)
 
@@ -53,3 +81,9 @@ extension RecordDeviceUSBConnection: Resolver {
     return .success
   }
 }
+
+let SUPERVISED_DEVICE_LIMIT_MESSAGE = """
+This account has supervised more iPhones and iPads than Gertrude allows. Gertrude is \
+built for parents and accountability partners helping kids and friends. If that \
+describes you and you need more devices, get in touch and we'll sort it out with you.
+"""
