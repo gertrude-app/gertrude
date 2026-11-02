@@ -52,7 +52,7 @@ targets:
         CODE_SIGN_STYLE: Automatic
         INFOPLIST_FILE: app/Info.plist
         MARKETING_VERSION: 1.6.5
-        CURRENT_PROJECT_VERSION: 29
+        CURRENT_PROJECT_VERSION: 30
         ALWAYS_SEARCH_USER_PATHS: NO
       configs:
         Release:
