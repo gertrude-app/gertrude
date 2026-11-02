@@ -28,6 +28,12 @@ targets:
         buildPhase: resources
       - path: app/LaunchScreen.storyboard
         group: app
+    entitlements:
+      path: app/Music.entitlements
+      properties:
+        keychain-access-groups:
+          - "$(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)"
+          - "$(AppIdentifierPrefix)com.netrivet.gertrude.identity"
     dependencies:
       - package: LibTCA
         product: LibTCA
@@ -66,6 +72,8 @@ targets:
         CFBundleLocalizations:
           - en
         API_ENDPOINT: $(API_ENDPOINT)
+        IdentityPrivateAccessGroup: $(AppIdentifierPrefix)$(PRODUCT_BUNDLE_IDENTIFIER)
+        IdentitySharedAccessGroup: $(AppIdentifierPrefix)com.netrivet.gertrude.identity
         NSAppleMusicUsageDescription: Gertrude Music needs access to Apple Music to play approved music.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

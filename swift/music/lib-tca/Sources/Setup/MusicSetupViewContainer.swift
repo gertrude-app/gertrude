@@ -11,10 +11,6 @@ struct MusicSetupViewContainer: View {
 
   var body: some View {
     self.content
-      .task {
-        guard self.store.screen == .checking else { return }
-        _ = self.store.send(.onAppear)
-      }
   }
 
   @ViewBuilder

@@ -7,6 +7,7 @@ import NetworkExtension
 import Testing
 import XExpect
 
+@testable import LibClients
 @testable import LibController
 
 struct ControllerProxyTest {
@@ -43,8 +44,13 @@ func setup(
   apiNormalRules: [BlockRule] = [.targetContains(value: "api.com")],
   apiConnectedRules: [BlockRule] = [.targetContains(value: "connected.com")],
   apiWebPolicy: WebContentFilterPolicy? = nil,
+  deviceId: UUID? = UUID(1),
+  identityAfterFetch: UUID? = nil,
+  useLegacyIdentity: Bool = false,
+  legacyVendorId: UUID? = nil,
 ) async -> ControllerProxyTest {
   let test = ControllerProxyTest()
+  let identity = LockIsolated(deviceId)
 
   withDependencies {
     $0.date = .constant(.reference)
@@ -55,7 +61,10 @@ func setup(
       test.migrateCalled.withValue { $0 = true }
       return performsMigration
     }
-    $0.device.deviceId = { UUID(1) }
+    $0.device.deviceId = { identity.value }
+    $0.sharedStorage.loadDeviceIdentity = { identity.value }
+    $0.keychain._load = { _ in legacyVendorId.map { Data($0.uuidString.utf8) } }
+    $0.keychain.delete = { _ in }
     $0.appEvent.record = { event in test.loggedApiEvents.withValue { $0.append(event.eventId) } }
     $0.api.fetchBlockRules = { vendorId, disabledGroups in
       test.fetchBlockRulesCalls.withValue { $0.append(Both(vendorId, disabledGroups)) }
@@ -63,6 +72,7 @@ func setup(
     }
     $0.api.connectedRules = {
       test.connectedRulesCalls.withValue { $0 += 1 }
+      if let identityAfterFetch { identity.setValue(identityAfterFetch) }
       return .init(blockRules: apiConnectedRules, webPolicy: apiWebPolicy)
     }
     $0.api.setAccountConnection = { conn in
@@ -79,9 +89,9 @@ func setup(
     $0.sharedStorage.loadAccountConnection = {
       test.loadAccountConnectionCalled.withValue { $0 += 1 }
       return !accountConnected ? nil : ChildIOSDeviceData_v2(
-        childId: UUID(),
+        childId: UUID(3),
         token: UUID(2),
-        deviceId: UUID(),
+        deviceId: UUID(1),
         childName: "Little Jimmy",
         supervised: nil,
       )
@@ -90,11 +100,19 @@ func setup(
       test.savedProtectionModes.withValue { $0.append(mode) }
     }
   } operation: {
-    test._proxy.withValue { $0 = ControllerProxy() }
-    test.proxy.notifyRulesChanged.withValue { $0 = {
-      test.notifyRulesChangedCount.withValue { $0 += 1 }
-    }}
-    test.proxy.lastRefresh.withValue { $0 = .distantPast }
+    withEscapedDependencies { dependencies in
+      withDependencies {
+        if useLegacyIdentity {
+          $0.device.deviceId = { dependencies.yield { extensionDeviceId() } }
+        }
+      } operation: {
+        test._proxy.withValue { $0 = ControllerProxy() }
+        test.proxy.notifyRulesChanged.withValue { $0 = {
+          test.notifyRulesChangedCount.withValue { $0 += 1 }
+        }}
+        test.proxy.lastRefresh.withValue { $0 = .distantPast }
+      }
+    }
   }
 
   let task = test.proxy.migrateTask.withValue { $0! }
@@ -131,7 +149,7 @@ func setup(
 
   await test.proxy.refreshRules(reason: .startup)
 
-  #expect(test.loadAccountConnectionCalled.value == 1)
+  #expect(test.loadAccountConnectionCalled.value == 2)
   #expect(test.proxy.lastRefresh.value == .reference - .minutes(2)) // not touched
   #expect(test.proxy.managedSettings.withValue { $0 == nil } == true) // cleared
   #expect(test.loadDisabledBlockGroupIdsCalls.value == 1)
@@ -301,4 +319,50 @@ public struct Both<A: Equatable & Sendable, B: Equatable & Sendable>: Equatable,
 public extension Date {
   static let epoch = Date(timeIntervalSince1970: 0)
   static let reference = Date(timeIntervalSinceReferenceDate: 0)
+}
+
+@MainActor
+@Test func connectedRefreshStopsWhenIdentityIsUnavailable() async {
+  let test = await setup(accountConnected: true, deviceId: nil)
+  #expect(await test.proxy.refreshRules(reason: .startup) == false)
+  #expect(test.connectedRulesCalls.value == 0)
+  #expect(test.setAuthTokenCalls.value.isEmpty)
+}
+
+@MainActor
+@Test func connectedRefreshRejectsCarriedConnectionForDifferentIdentity() async {
+  let test = await setup(accountConnected: true, deviceId: UUID(4))
+  #expect(await test.proxy.refreshRules(reason: .startup) == false)
+  #expect(test.connectedRulesCalls.value == 0)
+  #expect(test.setAuthTokenCalls.value.isEmpty)
+}
+
+@MainActor
+@Test func connectedRefreshDiscardsResponseAfterIdentityChanges() async {
+  let test = await setup(accountConnected: true, identityAfterFetch: UUID(4))
+  #expect(await test.proxy.refreshRules(reason: .startup) == false)
+  #expect(test.connectedRulesCalls.value == 1)
+  #expect(test.savedProtectionModes.value.isEmpty)
+  #expect(test.notifyRulesChangedCount.value == 0)
+}
+
+@MainActor
+@Test(arguments: [UUID?.none, UUID(7)])
+func connectedRefreshWorksBeforeFirstAppLaunch(legacyVendorId: UUID?) async {
+  let test = await setup(
+    accountConnected: true, deviceId: nil, useLegacyIdentity: true,
+    legacyVendorId: legacyVendorId,
+  )
+  #expect(await test.proxy.refreshRules(reason: .startup))
+  #expect(test.connectedRulesCalls.value == 1)
+  #expect(test.setAuthTokenCalls.value == [UUID(2)])
+  #expect(test.savedProtectionModes.value.count == 1)
+}
+
+@MainActor
+@Test func unconnectedRefreshWorksBeforeFirstAppLaunch() async {
+  let test = await setup(deviceId: nil, useLegacyIdentity: true, legacyVendorId: UUID(1))
+  #expect(await test.proxy.refreshRules(reason: .startup))
+  #expect(test.fetchBlockRulesCalls.value == [Both(UUID(1), [])])
+  #expect(test.savedProtectionModes.value.count == 1)
 }

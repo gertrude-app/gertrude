@@ -131,3 +131,40 @@ extension CachedPlaybackSession {
     progress: .init(elapsedTime: 12, duration: 120),
   )
 }
+
+final class KeychainStore: @unchecked Sendable {
+  private let lock = NSLock()
+  private var storage: [KeychainClient.Key: Data] = [:]
+  private var connectionSaves = 0
+  let readFailuresRemaining = LockIsolated<[KeychainClient.Key: Int]>([:])
+  let readFailures = LockIsolated<Set<KeychainClient.Key>>([])
+  let writeFailures = LockIsolated<Set<KeychainClient.Key>>([])
+  let deleteFailures = LockIsolated<Set<KeychainClient.Key>>([])
+
+  var connectionSaveCount: Int { self.lock.withLock { self.connectionSaves } }
+
+  var client: KeychainClient {
+    KeychainClient(
+      _load: { key in
+        let failOnce = self.readFailuresRemaining.withValue { remaining in
+          guard remaining[key, default: 0] > 0 else { return false }
+          remaining[key, default: 0] -= 1
+          return true
+        }
+        if failOnce || self.readFailures.value.contains(key) { throw TestError() }
+        return self.lock.withLock { self.storage[key] }
+      },
+      _save: { key, data in
+        if self.writeFailures.value.contains(key) { throw TestError() }
+        self.lock.withLock {
+          self.storage[key] = data
+          if key == .connection { self.connectionSaves += 1 } // count connection re-saves
+        }
+      },
+      delete: { key in
+        if self.deleteFailures.value.contains(key) { throw TestError() }
+        self.lock.withLock { _ = self.storage.removeValue(forKey: key) }
+      },
+    )
+  }
+}

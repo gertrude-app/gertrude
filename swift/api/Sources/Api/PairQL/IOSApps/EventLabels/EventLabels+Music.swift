@@ -1,7 +1,14 @@
 extension EventLabel {
   static func music(_ eventId: String) -> String? {
     switch eventId {
-
+    case "84407100": "Device identity resolution"
+    case "805ddd69": "Device identity canary mismatch"
+    case "4a9a8cee": "Persistent unknown identity read"
+    case "58426fa7": "Device identity write failed"
+    case "22f040dc": "Invalid identity transition receipt"
+    case "4fea87e1": "Identity transition report failed"
+    case "6bf203b3": "Device identity consumer failure"
+    case "f16c1152": "Device identity child conflict pin"
     // --- Setup / Apple Music ---
     case "e145e6b5": "Apple Music authorization denied"
     case "c58a3b1d": "Apple Music authorization restricted"

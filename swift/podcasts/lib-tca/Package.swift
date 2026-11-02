@@ -10,6 +10,8 @@ let package = Package(
     .package(path: "../lib-core"),
     .package(path: "../lib-views"),
     .package(path: "../../gertie-ui"),
+    .package(path: "../../device-identity"),
+    .package(path: "../../pairql-ios-apps"),
     .package(path: "../../pairql"),
     .package(path: "../../pairql-podcasts"),
     .package(path: "../../x-kit"),
@@ -34,6 +36,8 @@ let package = Package(
     .target(
       name: "LibTCA",
       dependencies: [
+        .product(name: "DeviceIdentity", package: "device-identity"),
+        .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
         .product(name: "SQLiteData", package: "sqlite-data"),
         .product(name: "LibCore", package: "lib-core"),
         .product(name: "LibViews", package: "lib-views"),

@@ -8,6 +8,9 @@ import MusicRoute
 struct MusicSetupFeature: Sendable {
   @ObservableState
   struct State: Equatable {
+    var generation: Int?
+    var deviceId: UUID?
+    var requiresMigrationSetup = false
     var isSubscriptionOfferPresented = false
     var screen = Screen.checking
     var claimAudience = MusicClaimAudience.parentPartner
@@ -48,7 +51,8 @@ struct MusicSetupFeature: Sendable {
     }
   }
 
-  enum Action: Equatable {
+  indirect enum Action: Equatable {
+    case response(Int, Action)
     enum DelegateAction: Equatable {
       case completed(childName: String)
     }
@@ -66,6 +70,8 @@ struct MusicSetupFeature: Sendable {
     case musicAppStatusLoaded(GetMusicAppStatus_v3.Output)
     case musicAppStatusPollingFailed
     case nudgeContinueButtonTapped
+    case migrationCompleted
+    case migrationCompletionFailed
     case onAppear
     case parentNoButtonTapped
     case parentYesButtonTapped
@@ -79,28 +85,43 @@ struct MusicSetupFeature: Sendable {
 
   enum CancelID {
     case musicAppStatusPolling
+    case identityWork
   }
 
   @Dependency(\.api) var api
   @Dependency(\.continuousClock) var clock
   @Dependency(\.keychain) var keychain
   @Dependency(\.musicSetup) var musicSetup
+  @Dependency(\.musicIdentity) var musicIdentity
   @Dependency(\.systemSettings) var systemSettings
 
   var body: some ReducerOf<Self> {
     Reduce { state, action in
+      var action = action
+      if case .response(let generation, let response) = action {
+        guard state.generation == generation else { return .none }
+        action = response
+      }
       switch action {
+      case .response:
+        return .none
+
       case .onAppear:
         state.screen = .checking
+        state.prefetch = .loading
+        if state.requiresMigrationSetup {
+          return self.fetchMusicAppStatus(hasStoredConnection: false, generation: state.generation)
+        }
         // a returning user already has a connection; skip onboarding, resolve Apple Music
-        if self.keychain.loadConnection() != nil {
+        if let connection = self.keychain.loadConnection(),
+           state.generation == nil || connection.deviceId == state.deviceId {
           state.resumedStoredConnection = true
           log(.debug, .setup, "9cfe15f7")
-          return self.checkAppleMusicAuthorization()
+          return self.checkAppleMusicAuthorization(generation: state.generation)
         }
         state.screen = .welcome
         log(.info, .setup, "8502ee88")
-        return self.prefetchStatus()
+        return self.prefetchStatus(generation: state.generation)
 
       case .prefetchStatusLoaded(let output):
         state.prefetch = .loaded(output)
@@ -133,27 +154,32 @@ struct MusicSetupFeature: Sendable {
 
       case .explainAccountContinueButtonTapped:
         state.screen = .gertrudeConnection(.checking)
-        return self.fetchMusicAppStatus(hasStoredConnection: false)
+        return self.fetchMusicAppStatus(hasStoredConnection: false, generation: state.generation)
 
       case .deviceRecognizedContinueButtonTapped:
-        return self.checkAppleMusicAuthorization()
+        return self.checkAppleMusicAuthorization(generation: state.generation)
 
       case .trialStartedContinueButtonTapped:
-        return self.checkAppleMusicAuthorization()
+        return self.checkAppleMusicAuthorization(generation: state.generation)
 
       case .retryButtonTapped:
-        return self.checkAppleMusicAuthorization()
+        return self.checkAppleMusicAuthorization(generation: state.generation)
 
       case .appleMusicPermissionButtonTapped:
         state.screen = .requestingAppleMusicPermission
+        let generation = state.generation
         return .run { send in
-          await send(.appleMusicAuthorizationStatusLoaded(self.musicSetup.requestAuthorization()))
+          await send(Self.response(
+            generation,
+            .appleMusicAuthorizationStatusLoaded(self.musicSetup.requestAuthorization()),
+          ))
         }
+        .cancellable(id: CancelID.identityWork)
 
       case .appleMusicAuthorizationStatusLoaded(let status):
         switch status {
         case .authorized:
-          return self.checkAppleMusicSubscription()
+          return self.checkAppleMusicSubscription(generation: state.generation)
         case .denied:
           state.screen = .appleMusicDenied
           log(.err, .setup, "e145e6b5")
@@ -201,23 +227,29 @@ struct MusicSetupFeature: Sendable {
       case .appleMusicSubscriptionOfferPresentationChanged(let isPresented):
         state.isSubscriptionOfferPresented = isPresented
         guard !isPresented else { return .none }
-        return self.checkAppleMusicSubscription()
+        return self.checkAppleMusicSubscription(generation: state.generation)
 
       case .refreshConnectionButtonTapped:
         state.screen = .gertrudeConnection(.checking)
         return .merge(
           .cancel(id: CancelID.musicAppStatusPolling),
-          self.fetchMusicAppStatus(hasStoredConnection: false),
+          self.fetchMusicAppStatus(hasStoredConnection: false, generation: state.generation),
         )
 
       case .musicAppStatusLoaded(.unclaimed(let code, let expiresAt)):
-        self.keychain.deleteConnection()
+        do {
+          try self.keychain.delete(.connection)
+        } catch {
+          state.screen = .gertrudeConnection(.failed)
+          return .cancel(id: CancelID.musicAppStatusPolling)
+        }
         let wasAlreadyPolling = state.isShowingUnclaimedConnection
         state.screen = .gertrudeConnection(.unclaimed(code: code, expiresAt: expiresAt))
         if !wasAlreadyPolling {
           log(.info, .setup, "ffbbb03c")
         }
-        return wasAlreadyPolling ? .none : self.startMusicAppStatusPolling()
+        return wasAlreadyPolling ? .none : self
+          .startMusicAppStatusPolling(generation: state.generation)
 
       case .musicAppStatusLoaded(.claimed(let token, let childId, let childName, let entitlement)):
         return self.enterClaimed(
@@ -242,6 +274,14 @@ struct MusicSetupFeature: Sendable {
         return .run { _ in
           await self.systemSettings.openAppSettings()
         }
+
+      case .migrationCompleted:
+        state.requiresMigrationSetup = false
+        return self.finishSetup(&state)
+
+      case .migrationCompletionFailed:
+        state.screen = .gertrudeConnection(.failed)
+        return .none
 
       case .delegate:
         return .none
@@ -278,7 +318,14 @@ struct MusicSetupFeature: Sendable {
   ) -> EffectOf<Self> {
     let wasAlreadyShowing = state.isShowingMusicAccessUnavailable
     if !wasAlreadyShowing {
-      self.keychain.save(connection: .init(token: token, childId: childId, childName: childName))
+      do {
+        try self.keychain.writeConnection(.init(
+          token: token, childId: childId, childName: childName, deviceId: state.deviceId,
+        ))
+      } catch {
+        state.screen = .gertrudeConnection(.failed)
+        return .cancel(id: CancelID.musicAppStatusPolling)
+      }
       log(.info, .setup, "aa99a570")
     }
     switch entitlement {
@@ -293,7 +340,8 @@ struct MusicSetupFeature: Sendable {
       if !wasAlreadyShowing {
         log(.warn, .subs, "6ad351da")
       }
-      return wasAlreadyShowing ? .none : self.startMusicAppStatusPolling()
+      return wasAlreadyShowing ? .none : self
+        .startMusicAppStatusPolling(generation: state.generation)
     }
   }
 
@@ -301,6 +349,18 @@ struct MusicSetupFeature: Sendable {
     guard let childName = self.keychain.loadConnection()?.childName else {
       state.screen = .gertrudeConnection(.failed)
       return .cancel(id: CancelID.musicAppStatusPolling)
+    }
+    if state.requiresMigrationSetup {
+      let generation = state.generation
+      return .run { send in
+        do {
+          try await self.musicIdentity.completeMigration()
+          await send(Self.response(generation, .migrationCompleted))
+        } catch {
+          await send(Self.response(generation, .migrationCompletionFailed))
+        }
+      }
+      .cancellable(id: CancelID.identityWork)
     }
     state.screen = .ready(childName: childName)
     if !state.resumedStoredConnection {
@@ -312,50 +372,77 @@ struct MusicSetupFeature: Sendable {
     )
   }
 
-  private func prefetchStatus() -> EffectOf<Self> {
+  private static func response(_ generation: Int?, _ action: Action) -> Action {
+    generation.map { .response($0, action) } ?? action
+  }
+
+  private func prefetchStatus(generation: Int?) -> EffectOf<Self> {
     .run { send in
       do {
-        try await send(.prefetchStatusLoaded(self.api.getMusicAppStatus()))
+        try await send(Self.response(
+          generation,
+          .prefetchStatusLoaded(self.api.getMusicAppStatus()),
+        ))
       } catch {
-        await send(.prefetchStatusFailed)
+        await send(Self.response(generation, .prefetchStatusFailed))
       }
     }
+    .cancellable(id: CancelID.identityWork)
   }
 
-  private func checkAppleMusicAuthorization() -> EffectOf<Self> {
+  private func checkAppleMusicAuthorization(generation: Int?) -> EffectOf<Self> {
     .run { send in
-      await send(.appleMusicAuthorizationStatusLoaded(self.musicSetup.authorizationStatus()))
+      await send(Self.response(
+        generation,
+        .appleMusicAuthorizationStatusLoaded(self.musicSetup.authorizationStatus()),
+      ))
     }
+    .cancellable(id: CancelID.identityWork)
   }
 
-  private func checkAppleMusicSubscription() -> EffectOf<Self> {
+  private func checkAppleMusicSubscription(generation: Int?) -> EffectOf<Self> {
     .run { send in
-      await send(.appleMusicSubscriptionStatusLoaded(self.musicSetup.subscriptionStatus()))
+      await send(Self.response(
+        generation,
+        .appleMusicSubscriptionStatusLoaded(self.musicSetup.subscriptionStatus()),
+      ))
     }
+    .cancellable(id: CancelID.identityWork)
   }
 
-  private func fetchMusicAppStatus(hasStoredConnection: Bool) -> EffectOf<Self> {
+  private func fetchMusicAppStatus(hasStoredConnection: Bool, generation: Int?) -> EffectOf<Self> {
     .run { send in
       do {
-        try await send(.musicAppStatusLoaded(self.api.getMusicAppStatus()))
+        try await send(Self.response(
+          generation,
+          .musicAppStatusLoaded(self.api.getMusicAppStatus()),
+        ))
       } catch {
-        await send(.musicAppStatusFailed(hasStoredConnection: hasStoredConnection))
+        await send(Self.response(
+          generation,
+          .musicAppStatusFailed(hasStoredConnection: hasStoredConnection),
+        ))
       }
     }
+    .cancellable(id: CancelID.identityWork)
   }
 
-  private func startMusicAppStatusPolling() -> EffectOf<Self> {
+  private func startMusicAppStatusPolling(generation: Int?) -> EffectOf<Self> {
     .run { send in
       while !Task.isCancelled {
         try await self.clock.sleep(for: .seconds(5))
         do {
-          try await send(.musicAppStatusLoaded(self.api.getMusicAppStatus()))
+          try await send(Self.response(
+            generation,
+            .musicAppStatusLoaded(self.api.getMusicAppStatus()),
+          ))
         } catch {
-          await send(.musicAppStatusPollingFailed)
+          await send(Self.response(generation, .musicAppStatusPollingFailed))
         }
       }
     }
     .cancellable(id: CancelID.musicAppStatusPolling, cancelInFlight: true)
+    .cancellable(id: CancelID.identityWork)
   }
 }
 

@@ -2,6 +2,8 @@
 
 ## Releases
 
+- `1.6.5` (11/2/26)
+  - fix device migration bug and identity correlation with other Gertrude apps
 - `1.6.4` (8/12/26)
   - fix record insert race crash
   - fix rendering issues with cross-promos

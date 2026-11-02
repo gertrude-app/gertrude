@@ -74,14 +74,15 @@ extension DeviceClient: DependencyKey {
           UIDevice.current.systemVersion
         }},
         deviceId: {
-          await getFrozenVendorId()
+          extensionDeviceId()
         },
         modelIdentifier: { IOSDeviceInfo.modelIdentifier() },
         installedVersion: {
           Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
         },
         data: {
-          let deviceId = await getFrozenVendorId()
+          @Dependency(\.device) var device
+          let deviceId = await device.deviceId()
           let modelIdentifier = IOSDeviceInfo.modelIdentifier()
           return await MainActor.run { .init(
             type: UIDevice.current.userInterfaceIdiom == .pad ? .iPad : .iPhone,
@@ -155,22 +156,15 @@ extension DeviceClient: TestDependencyKey {
   }
 #endif
 
-@Sendable func getFrozenVendorId() async -> UUID? {
+@Sendable func extensionDeviceId() -> UUID? {
+  @Dependency(\.sharedStorage) var storage
   @Dependency(\.keychain) var keychain
-  if let stored = keychain.loadVendorId() {
-    return stored
+  if let id = storage.loadDeviceIdentity() {
+    keychain.delete(.vendorId)
+    return id
   }
-  let current: UUID? = await MainActor.run {
-    #if os(iOS)
-      UIDevice.current.identifierForVendor
-    #else
-      UUID()
-    #endif
-  }
-  if let current {
-    keychain.save(vendorId: current)
-  }
-  return current
+  guard !storage.migrationPending() else { return nil }
+  return storage.loadAccountConnection()?.deviceId ?? keychain.loadVendorId()
 }
 
 @Sendable func getAvailableDiskSpaceInBytes() -> Int? {

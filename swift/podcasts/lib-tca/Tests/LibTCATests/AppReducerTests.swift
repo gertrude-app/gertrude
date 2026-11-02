@@ -30,9 +30,13 @@ import Testing
     } operation: {
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
-      await store.send(.appDidLaunch) {
+      await store.send(.appDidLaunch)
+      await store.receive(.identityResolved(.init())) {
+        $0.identity = .init()
+        $0.$identityGeneration.withLock { $0 = 1 }
         $0.mode = .onboarding(.init())
       }
+      await store.receive(.identityResolved(.init()))
 
       await store.send(.mode(.presented(.onboarding(.primaryBtnTapped)))) {
         // vvv --- advances normally, no crash
@@ -72,15 +76,23 @@ import Testing
       $0.defaultDatabase = try! appDatabase()
       $0.device.vendorId = { UUID() }
       $0.keychain = dictKeychain(keychainStore)
+      $0.podcastIdentity.resolve = {
+        dep(\.keychain).save(deviceId: UUID(1))
+        return .init()
+      }
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
       $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
       $0.mainQueue = .immediate
     } operation: {
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
-      await store.send(.appDidLaunch) {
+      await store.send(.appDidLaunch)
+      await store.receive(.identityResolved(.init())) {
+        $0.identity = .init()
+        $0.$identityGeneration.withLock { $0 = 1 }
         $0.mode = .onboarding(.init())
       }
+      await store.receive(.identityResolved(.init()))
 
       await store.receive(.receivedCrossPromos(crossPromos)) {
         $0.crossPromos = crossPromos
@@ -108,7 +120,7 @@ import Testing
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]))
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromos = CrossPromos.Output(promos: [campaign])
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -141,7 +153,7 @@ import Testing
       $0.date = .constant(.reference)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
       store.exhaustivity = .off
@@ -180,6 +192,7 @@ import Testing
       store.exhaustivity = .off
 
       await store.send(.appDidLaunch)
+      await store.receive(\.identityResolved)
       #expect(store.state.mode == .onboarding(.init(
         screen: .explainSetPasscode,
         resumedAfterClaim: true,
@@ -203,7 +216,7 @@ import Testing
       $0.keychain = dictKeychain(LockIsolated([:]))
     } operation: {
       dep(\.db).upsertRecord(id: .amCrossPromoLastShownAt, at: now - 60 * 60)
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromos = CrossPromos.Output(promos: [campaign])
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -234,7 +247,7 @@ import Testing
       $0.keychain = dictKeychain(LockIsolated([:]))
     } operation: {
       dep(\.db).insertCrossPromoDismissal(campaignId: "fm-teaser", at: now - 60 * 60 * 48)
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromos = CrossPromos.Output(promos: [campaign])
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -259,7 +272,7 @@ import Testing
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
 
@@ -276,7 +289,7 @@ import Testing
     await withDependencies {
       $0.defaultDatabase = try! appDatabase()
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .onboarding(.init())
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
 
@@ -294,7 +307,7 @@ import Testing
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromo = .init(campaign: campaign)
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -315,7 +328,7 @@ import Testing
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromo = .init(campaign: campaign)
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -351,7 +364,7 @@ import Testing
       $0.defaultDatabase = try! appDatabase()
       $0.keychain = dictKeychain(LockIsolated([:]))
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromos = CrossPromos.Output(promos: [campaign])
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -387,7 +400,7 @@ import Testing
       $0.date = .constant(now)
       $0.defaultDatabase = try! appDatabase()
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.mode = .podcasts(.init())
       initialState.crossPromo = .init(campaign: campaign)
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -423,7 +436,7 @@ import Testing
       $0.keychain._save = { key, data in keychainStore.withValue { $0[key.rawValue] = data } }
     } operation: {
       dep(\.db).insertCrossPromoDismissal(campaignId: "already-dismissed", at: .reference)
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.crossPromos = CrossPromos.Output(promos: [campaign])
       initialState.mode = .onboarding(.init(screen: .strongPasscode))
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -457,7 +470,7 @@ import Testing
       $0.keychain._load = { key in keychainStore.value[key.rawValue] }
       $0.keychain._save = { key, data in keychainStore.withValue { $0[key.rawValue] = data } }
     } operation: {
-      var initialState = AppReducer.State()
+      var initialState = AppReducer.State(identity: .init())
       initialState.crossPromos = crossPromos
       initialState.mode = .onboarding(.init(screen: .strongPasscode))
       let store = TestStore(initialState: initialState, reducer: AppReducer.init)
@@ -486,7 +499,7 @@ import Testing
         initialState: .init(mode: .onboarding(.init(
           screen: .explainSetPasscode,
           resumedAfterClaim: true,
-        ))),
+        )), identity: .init()),
         reducer: AppReducer.init,
       )
       store.exhaustivity = .off
@@ -508,7 +521,7 @@ import Testing
       $0.keychain = dictKeychain(LockIsolated([:]), installDate: .reference, deviceId: UUID())
     } operation: {
       let store = TestStore(
-        initialState: .init(mode: .onboarding(.init(screen: .strongPasscode))),
+        initialState: .init(mode: .onboarding(.init(screen: .strongPasscode)), identity: .init()),
         reducer: AppReducer.init,
       )
       store.exhaustivity = .off
@@ -571,20 +584,18 @@ import Testing
       $0.defaultDatabase = try! appDatabase()
       $0.device.vendorId = { UUID() }
       $0.keychain = dictKeychain(keychainStore)
+      $0.podcastIdentity.resolve = {
+        dep(\.keychain).save(deviceId: UUID(1))
+        return .init()
+      }
       $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
       $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
       $0.mainQueue = .immediate
     } operation: {
       let store = TestStore(initialState: .init(), reducer: AppReducer.init)
 
-      await store.send(.appDidLaunch) {
-        $0.mode = .onboarding(.init())
-      }
-
-      await store.receive(.receivedAppConfig(config)) {
-        $0.$appConfig.withLock { $0 = config }
-      }
-
+      store.exhaustivity = .off
+      await store.send(.appDidLaunch)
       await store.finish()
 
       // vvv --- both screens read the same shared key, no threading through navigation

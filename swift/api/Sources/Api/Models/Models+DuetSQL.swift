@@ -3,6 +3,7 @@ import DuetSQL
 import Gertie
 import GertieApp
 import GertieBlocker
+import IOSAppsRoute
 import MusicRoute
 import Tagged
 
@@ -11,6 +12,7 @@ extension Child.Relationship: PostgresRawBindable {}
 extension ClaimIntent: PostgresRawBindable {}
 extension EventLevel: @retroactive PostgresRawBindable {}
 extension GertrudeIOSApp: @retroactive PostgresRawBindable {}
+extension ReportIdentityTransition.Kind: @retroactive PostgresRawBindable {}
 extension StripeSubscription.StripeStatus: PostgresRawBindable {}
 extension BillingIdentity.TrialEmailLifecycle: PostgresRawBindable {}
 extension RouteTelemetry.Result: PostgresRawBindable {}

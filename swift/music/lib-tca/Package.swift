@@ -9,6 +9,8 @@ let package = Package(
   dependencies: [
     .package(path: "../lib-views"),
     .package(path: "../../gertie"),
+    .package(path: "../../device-identity"),
+    .package(path: "../../pairql-ios-apps"),
     .package(path: "../../gertie-tca-features"),
     .package(path: "../../gertie-ui"),
     .package(path: "../../pairql"),
@@ -26,6 +28,8 @@ let package = Package(
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
         .product(name: "GertieApp", package: "gertie"),
+        .product(name: "DeviceIdentity", package: "device-identity"),
+        .product(name: "IOSAppsRoute", package: "pairql-ios-apps"),
         .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
         .product(name: "GertieUI", package: "gertie-ui"),
         .product(name: "LibViews", package: "lib-views"),

@@ -5,6 +5,7 @@ import PairQL
 public enum UnauthedRoute: PairRoute {
   case killSwitchCheck(KillSwitchCheck.Input)
   case logEvent(LogAppEvent.Input)
+  case reportIdentityTransition(ReportIdentityTransition.Input)
 }
 
 public extension UnauthedRoute {
@@ -16,6 +17,10 @@ public extension UnauthedRoute {
     Route(AnyCasePath(\UnauthedRoute.Cases.logEvent)) {
       Operation(LogAppEvent.self)
       Body(.json(LogAppEvent.Input.self))
+    }
+    Route(AnyCasePath(\UnauthedRoute.Cases.reportIdentityTransition)) {
+      Operation(ReportIdentityTransition.self)
+      Body(.json(ReportIdentityTransition.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

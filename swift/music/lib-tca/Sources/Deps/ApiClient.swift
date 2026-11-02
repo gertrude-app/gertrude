@@ -100,7 +100,7 @@ extension ApiClient: DependencyKey {
         guard let deviceId else {
           throw ApiClient.ApiError.noDeviceId
         }
-        return try await pairql.call(
+        let output = try await pairql.call(
           GetMusicAppStatus_v3.self,
           unauthed: .getMusicAppStatus_v3(.init(
             deviceId: deviceId,
@@ -109,6 +109,9 @@ extension ApiClient: DependencyKey {
             appVersion: appVersion,
           )),
         )
+        try Task.checkCancellation()
+        guard await device.vendorId() == deviceId else { throw CancellationError() }
+        return output
       },
       removeMusicPlaylistEntry: { token, input in
         try await pairql.call(

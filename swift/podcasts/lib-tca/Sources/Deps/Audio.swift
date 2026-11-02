@@ -10,6 +10,7 @@ import XCore
 @DependencyClient
 struct AudioPlayer: Sendable {
   var play: @Sendable (_ episode: Episode, _ show: Show) async throws -> Void
+  var reset: @Sendable () -> Void
   var pause: @Sendable () async -> Void
   var seek: @Sendable (_ to: Double) async -> Void = { _ in }
   var setPlaybackRate: @Sendable (_ rate: Double) async -> Void = { _ in }
@@ -40,8 +41,16 @@ extension AudioPlayer: DependencyKey {
   static var liveValue: AudioPlayer {
     AudioPlayer(
       play: { episode, show in
-        try sharedPlayer.withLock { try $0.play(episode, show) }
+        try await MainActor.run {
+          let identity = PodcastIdentity.shared.resolution()
+          guard identity.available, !identity.migrationPending,
+                dep(\.db).nowPlaying()?.episode.id == episode.id else {
+            throw CancellationError()
+          }
+          try sharedPlayer.withLock { try $0.play(episode, show) }
+        }
       },
+      reset: { sharedPlayer.withLock { $0.reset() } },
       pause: {
         sharedPlayer.withLock { $0.pause() }
       },
@@ -123,6 +132,14 @@ private final class Player: Sendable {
       guard $0?.player.timeControlStatus == .playing else { return }
       $0?.player.rate = Float(rate)
     }
+  }
+
+  func reset() {
+    self.pause()
+    self.removeCompletionObserver()
+    self.player.withLock { $0 = nil }
+    self.episode.withLock { $0 = nil }
+    MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
   }
 
   func pause() {

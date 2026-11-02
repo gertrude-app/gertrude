@@ -12,6 +12,8 @@ struct AppReducer: Sendable {
   @ObservableState
   struct State: Equatable {
     @Presents var mode: Mode.State?
+    var identity = PodcastIdentityClient.Resolution(available: false)
+    @Shared(.podcastIdentityGeneration) var identityGeneration
     var nowPlaying = NowPlayingFeature.State()
     @Shared(.appInForeground) var appInForeground
     @Presents var alert: AlertState<AlertAction>?
@@ -33,6 +35,8 @@ struct AppReducer: Sendable {
   }
 
   enum Action: Equatable {
+    case identityResolved(PodcastIdentityClient.Resolution)
+    case identityRetryTapped
     case appDidLaunch
     case appInForegroundChanged(Bool)
     case killSwitch(KillSwitchFeature.Action)
@@ -78,9 +82,9 @@ struct AppReducer: Sendable {
 
   static let amCrossPromoThrottle: TimeInterval = 60 * 60 * 72
 
+  @Dependency(\.podcastIdentity) var identity
   @Dependency(\.api) var api
   @Dependency(\.db) var database
-  @Dependency(\.device) var device
   @Dependency(\.keychain) var keychain
   @Dependency(\.audio) var audio
   @Dependency(\.mainQueue) var mainQueue
@@ -91,8 +95,7 @@ struct AppReducer: Sendable {
   var body: some Reducer<State, Action> {
     Scope(\.killSwitch, action: \.killSwitch) {
       KillSwitchFeature(app: .podcasts) {
-        await self.ensureDeviceId()
-        guard let deviceId = self.keychain.loadDeviceId() else {
+        guard let deviceId = await self.identity.current().deviceId else {
           throw KillSwitchDeviceIdError.missingDeviceId
         }
         return deviceId
@@ -111,24 +114,8 @@ struct AppReducer: Sendable {
           self.database.insertRecord(id: .installDate)
         }
 
-        if self.keychain.hasPincode() {
-          state.mode = .podcasts(.init())
-        } else if self.keychain.isClaimed() {
-          state.mode = .onboarding(.init(screen: .explainSetPasscode, resumedAfterClaim: true))
-        } else {
-          state.mode = .onboarding(.init())
-        }
         return .merge(
-          .run { send in
-            await self.ensureDeviceId()
-            if isFirstLaunch {
-              self.logFirstLaunch()
-            }
-            await self.refreshEntitlement()
-            if let crossPromos = try? await self.api.crossPromos(), !crossPromos.promos.isEmpty {
-              await send(.receivedCrossPromos(crossPromos))
-            }
-          },
+          self.resolveIdentity(firstLaunch: isFirstLaunch),
           .run { send in
             if let appConfig = try? await self.api.appConfig(), !appConfig.isEmpty {
               await send(.receivedAppConfig(appConfig))
@@ -149,6 +136,47 @@ struct AppReducer: Sendable {
             self.cleanupTasks()
           },
         )
+      case .identityRetryTapped:
+        return self.resolveIdentity()
+      case .identityResolved(let resolution):
+        let previous = state.identity
+        state.identity = resolution
+        let changed = previous.deviceId != resolution.deviceId
+          || previous.connection != resolution.connection
+          || previous.migrationPending != resolution.migrationPending
+          || previous.available != resolution.available
+        if changed {
+          state.$identityGeneration.withLock { $0 += 1 }
+          state.crossPromo = nil
+          if resolution.available,
+             previous.deviceId != resolution.deviceId || previous.connection != resolution
+             .connection {
+            state.mode = nil
+          }
+        }
+        let cancel: EffectOf<Self> = changed ? .merge(
+          .cancel(id: ClaimFlow.CancelID.poll),
+          .cancel(id: ClaimFlow.CancelID.identityWork),
+          .cancel(id: OnboardingFeature.CancelID.connecting),
+          .cancel(id: OnboardingFeature.CancelID.identityWork),
+        ) : .none
+        if resolution.migrationPending {
+          state.mode = nil
+          return cancel
+        }
+        guard resolution.available else { return cancel }
+        if state.mode == nil || previous.migrationPending {
+          if self.keychain.hasPincode() {
+            state.mode = .podcasts(.init())
+          } else if self.keychain.isClaimed() {
+            state.mode = .onboarding(.init(screen: .explainSetPasscode, resumedAfterClaim: true))
+          } else {
+            state.mode = .onboarding(.init())
+          }
+        } else if changed, case .podcasts = state.mode {
+          state.mode = .podcasts(.init())
+        }
+        return cancel
       case .killSwitch:
         return .none
       case .receivedCrossPromos(let crossPromos):
@@ -167,7 +195,7 @@ struct AppReducer: Sendable {
         if !foregrounded {
           return .send(.nowPlaying(.appBackgrounded))
         }
-        var effects: [EffectOf<Self>] = [.run { _ in await self.refreshEntitlement() }]
+        var effects: [EffectOf<Self>] = [self.resolveIdentity()]
         if !wasInForeground {
           effects.append(self.presentCrossPromo(&state, for: .childHome))
         }
@@ -324,48 +352,88 @@ struct AppReducer: Sendable {
     }
   }
 
+  private func resolveIdentity(firstLaunch: Bool = false) -> EffectOf<Self> {
+    .run { send in
+      let resolution = await self.resolveAndPublish(send)
+      if firstLaunch { self.logFirstLaunch() }
+      await withTaskGroup(of: Void.self) { group in
+        group.addTask {
+          await self.refreshAndPublish(send)
+          await self.fetchCrossPromos(send)
+        }
+        if resolution.needsReport {
+          group.addTask {
+            await self.reportAndPublish(send)
+          }
+        }
+      }
+    }
+    .cancellable(id: CancelID.identity, cancelInFlight: true)
+  }
+
+  @MainActor
+  private func resolveAndPublish(_ send: Send<Action>) -> PodcastIdentityClient.Resolution {
+    let resolution = self.identity.resolve()
+    send(.identityResolved(resolution))
+    return resolution
+  }
+
+  @MainActor
+  private func refreshAndPublish(_ send: Send<Action>) async {
+    await self.refreshEntitlement()
+    send(.identityResolved(self.identity.current()))
+  }
+
+  @MainActor
+  private func reportAndPublish(_ send: Send<Action>) async {
+    _ = await self.identity.report()
+    send(.identityResolved(self.identity.current()))
+    await self.refreshAndPublish(send)
+  }
+
+  @MainActor
+  private func fetchCrossPromos(_ send: Send<Action>) async {
+    let session = self.identity.current()
+    if let promos = try? await self.api.crossPromos(), !promos.promos.isEmpty,
+       (try? self.identity.validate(session)) != nil {
+      send(.receivedCrossPromos(promos))
+    }
+  }
+
+  enum CancelID { case identity }
+
+  @MainActor
   func refreshEntitlement() async {
+    let session = self.identity.current()
+    guard session.available else { return }
     if self.keychain.isClaimed() {
-      await self.refreshAccountStatus()
+      do {
+        let output = try await self.api.getAccountStatus()
+        try self.identity.validate(session)
+        output.subscription.writeLocal(now: self.date.now)
+        try self.identity.completeMigration()
+      } catch let error as PqlError where error.statusCode == 401 {
+        guard (try? self.identity.validate(session)) != nil else { return }
+        guard (try? self.identity.removeToken()) != nil else { return }
+        await self.refreshTrialStatus()
+      } catch is CancellationError {
+      } catch is URLError {
+      } catch {
+        log(.err, .setup, "a1f4c2d9", detail: "\(error)")
+      }
     } else {
       await self.refreshTrialStatus()
     }
   }
 
+  @MainActor
   func refreshTrialStatus() async {
-    guard let output = try? await self.api.getTrialStatus() else { return }
-    switch output {
-    case .trial(let expiresAt):
-      _ = try? CurrentSubscription.set(status: .trialing, expiringAt: expiresAt)
-    case .trialExpired(let since):
-      _ = try? CurrentSubscription.set(status: .unpaid, expiringAt: since)
-    case .legacyGrandfathered(let accessEndsAt, let showMigrationNag, _):
-      _ = try? CurrentSubscription.set(
-        status: .legacy,
-        expiringAt: accessEndsAt,
-        legacyMigrationNag: showMigrationNag,
-      )
-    case .connected(let token, _, _, let subscription):
-      self.keychain.save(amToken: token)
-      self.applyAccountStatus(subscription)
-    }
-  }
-
-  func refreshAccountStatus() async {
+    let session = self.identity.current()
     do {
-      let output = try await self.api.getAccountStatus()
-      self.applyAccountStatus(output.subscription)
-    } catch let error as PqlError where error.statusCode == 401 {
-      self.keychain.deleteAmToken()
-      await self.refreshTrialStatus()
-    } catch is URLError {
-    } catch {
-      log(.err, .setup, "a1f4c2d9", detail: "\(error)")
-    }
-  }
-
-  func applyAccountStatus(_ state: AmSubscriptionState) {
-    state.writeLocal(now: self.date.now)
+      let output = try await self.api.getTrialStatus()
+      try self.identity.acceptTrialStatus(output, for: session)
+      try self.identity.completeMigration()
+    } catch {}
   }
 
   func cleanupTasks() {
@@ -389,22 +457,11 @@ struct AppReducer: Sendable {
       detail: "region: `\(region)`, language: `\(lang)`",
     )
   }
-
-  func ensureDeviceId() async {
-    guard self.keychain.loadDeviceId() == nil else { return }
-    // we record the ios vendor id as our device id, same as
-    // in the ios app, to correlate installs between apps
-    // prior to 1.4.0 we used a random uuid as identifier
-    guard let deviceId = await self.device.vendorId() else { return }
-    self.keychain.save(deviceId: deviceId)
-    self.database.insertRecord(id: .deviceId, value: "\(deviceId)")
-    guard let oldInstallId = self.keychain.loadDeprecatedInstallId() else { return }
-    try? await self.api.migrateDeviceId(oldInstallId, deviceId)
-  }
 }
 
 extension AppReducer.State {
   var hideNowPlaying: Bool {
+    if !self.identity.available || self.identity.migrationPending { return true }
     if case .some(.podcasts(let podcasts)) = self.mode,
        case .some(.addShow) = podcasts.destination {
       return true
@@ -452,3 +509,9 @@ extension SharedKey where Self == InMemoryKey<GetPodcastAppConfig.Output>.Defaul
 
 extension AppReducer.Mode.State: Equatable {}
 extension AppReducer.Mode.Action: Equatable {}
+
+extension SharedKey where Self == InMemoryKey<Int>.Default {
+  static var podcastIdentityGeneration: Self {
+    Self[.inMemory("podcastIdentityGeneration"), default: 0]
+  }
+}

@@ -125,6 +125,7 @@ extension Configure {
     app.migrations.add(AddStripeEventHandledAt())
     app.migrations.add(AddChildMusicStorefront())
     app.migrations.add(CreateSiteFormSubmissions())
+    app.migrations.add(CreateIOSDeviceTransitions())
   }
 }
 

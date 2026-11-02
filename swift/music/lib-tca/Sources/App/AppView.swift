@@ -9,6 +9,7 @@ struct AppView: View {
   @Bindable var store: StoreOf<AppFeature>
   @Environment(\.colorScheme) private var colorScheme
   @Environment(\.scenePhase) private var scenePhase
+  @Dependency(\.musicIdentity) private var identity
 
   var body: some View {
     Group {
@@ -54,7 +55,10 @@ struct AppView: View {
         self.store.send(.appBecameInactive)
         self.store.send(.playback(.saveCachedSession))
       case .active:
+        let resolution = self.identity.resolve()
+        self.store.send(.identityResolved(resolution))
         self.store.send(.appEnteredForeground)
+        if resolution.needsReport { self.store.send(.identityReportRequested) }
       @unknown default:
         break
       }
@@ -62,10 +66,6 @@ struct AppView: View {
     .libraryPresentations(
       store: self.store.scope(\.library, action: \.library),
       isEnabled: !self.store.isNowPlayingPresented,
-    )
-    .killSwitch(
-      store: self.store.scope(\.killSwitch, action: \.killSwitch),
-      suggestedUpdatesEnabled: self.store.setup.isReady,
     )
     #if os(iOS)
     .task {
@@ -106,11 +106,27 @@ struct AppView: View {
   #if os(iOS)
     @ViewBuilder
     private var iOSContent: some View {
-      if self.store.setup.isReady {
-        self.iOSLibraryContent
+      if !self.store.identity.available {
+        ContentUnavailableView {
+          Label("Connecting Gertrude Music", systemImage: "music.note")
+        } description: {
+          Text(self.store.identity.migrationPending
+            ? "We’re connecting this phone to your account. Connect to the internet and try again."
+            : "We couldn’t prepare this device. Please try again.")
+        } actions: {
+          Button("Try Again") { self.store.send(.identityRetryTapped) }
+        }
       } else {
-        MusicSetupViewContainer(
-          store: self.store.scope(\.setup, action: \.setup),
+        Group {
+          if self.store.setup.isReady {
+            self.iOSLibraryContent
+          } else {
+            MusicSetupViewContainer(store: self.store.scope(\.setup, action: \.setup))
+          }
+        }
+        .killSwitch(
+          store: self.store.scope(\.killSwitch, action: \.killSwitch),
+          suggestedUpdatesEnabled: self.store.setup.isReady,
         )
       }
     }

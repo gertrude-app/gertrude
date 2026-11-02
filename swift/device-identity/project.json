@@ -1,0 +1,13 @@
+{
+  "root": "device-identity",
+  "projectType": "library",
+  "implicitDependencies": ["pairql-ios-apps"],
+  "targets": {
+    "build": {
+      "command": "cd device-identity && ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift build"
+    },
+    "test": {
+      "command": "cd device-identity && SWIFT_DETERMINISTIC_HASHING=1 ${SWIFTLY_HOME_DIR:-$HOME/.swiftly}/bin/swiftly run swift test"
+    }
+  }
+}

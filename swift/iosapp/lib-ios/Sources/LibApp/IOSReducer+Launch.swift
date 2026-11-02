@@ -20,6 +20,7 @@ extension IOSReducer.Deps {
     }
 
     case running(Running)
+    case migratedHardware
     case onboardingNeeded
     case filterNoLongerRunning
     case profileRemovedRecovery(ChildIOSDeviceData_v2)
@@ -31,7 +32,13 @@ extension IOSReducer.Deps {
     let filterRunning = await self.systemExtension.filterRunning()
     let supervisionData = self.sharedStorage.loadPendingSupervisionCode()
 
-    if !filterRunning, let code = supervisionData?.code {
+    let migrating = self.sharedStorage.migrationPending()
+    if migrating, supervisionData == nil {
+      guard filterRunning else { return .migratedHardware }
+      try? self.sharedStorage.setMigrationPending(false)
+    }
+
+    if !filterRunning || migrating, let code = supervisionData?.code {
       for attempt in 0 ..< 4 {
         if attempt > 0 {
           try? await self.clock.sleep(for: .seconds(2))
@@ -53,6 +60,10 @@ extension IOSReducer.Deps {
         case .missingProfile(let conn):
           return .gertrudeSupervisionReboot(.supervisedButNeedsProfile(conn))
         case .complete(let conn):
+          if migrating, filterRunning {
+            try? self.sharedStorage.setMigrationPending(false)
+            return .running(.connected(conn))
+          }
           return .gertrudeSupervisionReboot(.serverClientDisagreement(conn))
         }
       }

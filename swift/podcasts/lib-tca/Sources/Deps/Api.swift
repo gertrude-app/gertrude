@@ -95,6 +95,9 @@ extension ApiClient: DependencyKey {
         )
       },
       pinResetEscapeHatch: {
+        let identity = dep(\.podcastIdentity)
+        let session = await identity.current()
+        guard session.available, session.deviceId != nil else { throw ApiError.noDeviceId }
         let metadata = await podcastDeviceMetadata()
         let input = PinResetEscapeHatch.Input(
           deviceId: metadata.deviceId,
@@ -108,10 +111,11 @@ extension ApiClient: DependencyKey {
           PinResetEscapeHatch.self,
           unauthed: .pinResetEscapeHatch(input),
         )
+        try await identity.validate(session)
         return output.authorized
       },
       createClaimCode: {
-        guard let deviceId = dep(\.keychain).loadDeviceId() else {
+        guard let deviceId = await dep(\.podcastIdentity).current().deviceId else {
           throw ApiClient.ApiError.noDeviceId
         }
         return try await pairql.call(
@@ -156,10 +160,14 @@ func authed<P: Pair>(
   _ pair: P.Type,
   _ route: AuthedRoute,
 ) async throws -> P.Output {
-  guard let token = dep(\.keychain).loadAmToken() else {
+  let identity = dep(\.podcastIdentity)
+  let session = await identity.current()
+  guard session.available, let token = session.connection?.token else {
     throw ApiClient.ApiError.noToken
   }
-  return try await pairql.call(pair, authed: route, token: token)
+  let output = try await pairql.call(pair, authed: route, token: token)
+  try await identity.validate(session)
+  return output
 }
 
 private struct PodcastDeviceMetadata {
@@ -173,8 +181,8 @@ private struct PodcastDeviceMetadata {
 
 private func podcastDeviceMetadata() async -> PodcastDeviceMetadata {
   let (vendorId, iosVersion, modelIdentifier) = await dep(\.device).data()
-  return .init(
-    deviceId: dep(\.keychain).loadDeviceId(),
+  return await .init(
+    deviceId: dep(\.podcastIdentity).current().deviceId,
     vendorId: vendorId,
     appVersion: Bundle.main
       .infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0",

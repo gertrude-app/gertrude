@@ -67,7 +67,7 @@ func sendAppEvent(
   await postAppEvent(
     .podcasts, level, domain, eventId,
     detail: detail,
-  ) { dep(\.keychain).loadDeviceId() }.value
+  ) { await dep(\.podcastIdentity).current().deviceId }.value
 }
 
 private func localKind(_ level: EventLevel, _ domain: LogDomain?) -> DbEventKind {

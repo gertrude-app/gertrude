@@ -8,6 +8,12 @@ import os.log
 
 @DependencyClient
 public struct SharedStorageClient: Sendable {
+  public var loadDeviceIdentity: @Sendable () -> UUID?
+  public var saveDeviceIdentity: @Sendable (UUID?) -> Void
+  public var migrationPending: @Sendable () -> Bool = { false }
+  public var setMigrationPending: @Sendable (Bool) throws -> Void
+  public var clearDeviceBoundState: @Sendable () throws -> Void
+  public var clearAccountConnection: @Sendable () -> Void
   public var loadAccountConnection: @Sendable () -> ChildIOSDeviceData_v2?
   public var saveAccountConnection: @Sendable (ChildIOSDeviceData_v2) -> Void
 
@@ -47,6 +53,8 @@ public struct SharedStorageReaderClient: Sendable {
 }
 
 private enum Key: String {
+  case deviceIdentity = "v1.10.0--device-id"
+  case migrationPending = "v1.10.0--migration-pending"
   case accountConnection_v2 = "v1.7.0--account-connection-v2"
   case debugLogs = "v1.5.0--debug-logs"
   case legacyProtectionMode = "ProtectionMode.v1.3.0"
@@ -65,6 +73,30 @@ extension SharedStorageClient: DependencyKey {
   public static var liveValue: SharedStorageClient {
     let reader = SharedStorageReaderClient.liveValue
     return .init(
+      loadDeviceIdentity: { loadCodable(forKey: .deviceIdentity) },
+      saveDeviceIdentity: {
+        if let id = $0 { saveCodable(id, forKey: .deviceIdentity) }
+        else {
+          UserDefaults.gertrude.set(true, forKey: Key.migrationPending.rawValue)
+          removeKey(.deviceIdentity)
+        }
+      },
+      migrationPending: { UserDefaults.gertrude.bool(forKey: Key.migrationPending.rawValue) },
+      setMigrationPending: { UserDefaults.gertrude.set($0, forKey: Key.migrationPending.rawValue) },
+      clearDeviceBoundState: {
+        UserDefaults.gertrude.set(true, forKey: Key.migrationPending.rawValue)
+        for key in [
+          Key.deviceIdentity,
+          .accountConnection_v2,
+          .pendingSupervisionCode,
+          .protectionMode,
+          .legacyProtectionMode,
+          .legacyV1StorageKey,
+        ] {
+          removeKey(key)
+        }
+      },
+      clearAccountConnection: { removeKey(.accountConnection_v2) },
       loadAccountConnection: reader.loadAccountConnection,
       saveAccountConnection: { saveCodable($0, forKey: .accountConnection_v2) },
       loadProtectionMode: reader.loadProtectionMode,
@@ -90,7 +122,11 @@ extension SharedStorageClient: DependencyKey {
 }
 
 extension SharedStorageClient: TestDependencyKey {
-  public static let testValue = SharedStorageClient()
+  public static var testValue: SharedStorageClient {
+    var client = SharedStorageClient()
+    client.migrationPending = { false }
+    return client
+  }
 }
 
 public extension SharedStorageClient {
@@ -116,6 +152,7 @@ extension SharedStorageReaderClient: TestDependencyKey {
 }
 
 func migrateLegacyStorage() async -> Bool {
+  guard !UserDefaults.gertrude.bool(forKey: Key.migrationPending.rawValue) else { return false }
   if UserDefaults.gertrude.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
     let legacyGroups: [BlockGroup]? = loadCodable(forKey: .disabledBlockGroups)
     let isUpgrader = legacyGroups != nil

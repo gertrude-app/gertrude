@@ -50,16 +50,18 @@ extension ApprovedMusicClient: DependencyKey {
       },
       loadCachedApprovedLibrary: {
         @Dependency(\.approvedMusicLibraryCache) var cache
-        @Dependency(\.keychain) var keychain
-        guard let connection = keychain.loadConnection() else { return nil }
-        return try? await cache.load(childId: connection.childId)
+        @Dependency(\.musicIdentity) var identity
+        guard let connection = try? await identity.connection() else { return nil }
+        let library = try? await cache.load(childId: connection.childId)
+        guard await (try? identity.validate(connection)) != nil else { return nil }
+        return library
       },
       loadRemoteApprovedLibrary: {
         @Dependency(\.api) var api
         @Dependency(\.approvedMusicLibraryCache) var cache
-        @Dependency(\.keychain) var keychain
+        @Dependency(\.musicIdentity) var identity
         @Dependency(\.musicSetup) var musicSetup
-        guard let connection = keychain.loadConnection() else {
+        guard let connection = try await identity.connection() else {
           throw ApprovedMusicClientError.missingConnection
         }
         do {
@@ -72,11 +74,13 @@ extension ApprovedMusicClient: DependencyKey {
           } catch {
             storefront = nil
           }
+          try await identity.validate(connection)
           let output = try await api.getApprovedMusicLibrary(
             connection.token,
             cached?.revision,
             storefront,
           )
+          try await identity.validate(connection)
           switch output {
           case .unchanged(let revision):
             guard let cached, cached.revision == revision else {
@@ -87,13 +91,15 @@ extension ApprovedMusicClient: DependencyKey {
             return try await receiveSnapshot(
               snapshot,
               cached: cached,
-              childId: connection.childId,
+              connection: connection,
               cache: cache,
             )
           }
         } catch let error as PqlError where error.type == .loggedOut {
+          try await identity.validate(connection)
           throw ApprovedMusicClientError.invalidConnection
         } catch let error as PqlError where error.type == .paymentRequired {
+          try await identity.validate(connection)
           throw ApprovedMusicClientError.musicAccessUnavailable
         }
       },
@@ -169,19 +175,21 @@ private func performPlaylistMutation(
 ) async throws -> MusicPlaylistMutationResult {
   @Dependency(\.api) var api
   @Dependency(\.approvedMusicLibraryCache) var cache
-  @Dependency(\.keychain) var keychain
-  guard let connection = keychain.loadConnection() else {
+  @Dependency(\.musicIdentity) var identity
+  guard let connection = try await identity.connection() else {
     throw ApprovedMusicClientError.missingConnection
   }
   do {
     let output = try await operation(api, connection.token)
+    try await identity.validate(connection)
     let cached = try? await cache.load(childId: connection.childId)
+    try await identity.validate(connection)
     switch output {
     case .updated(let snapshot):
       let library = try await receiveSnapshot(
         snapshot,
         cached: cached,
-        childId: connection.childId,
+        connection: connection,
         cache: cache,
       )
       return .updated(library)
@@ -189,7 +197,7 @@ private func performPlaylistMutation(
       let library = try await receiveSnapshot(
         snapshot,
         cached: cached,
-        childId: connection.childId,
+        connection: connection,
         cache: cache,
       )
       return .duplicateConfirmationRequired(
@@ -200,7 +208,7 @@ private func performPlaylistMutation(
       let library = try await receiveSnapshot(
         snapshot,
         cached: cached,
-        childId: connection.childId,
+        connection: connection,
         cache: cache,
       )
       return .batchDuplicateConfirmationRequired(
@@ -211,14 +219,16 @@ private func performPlaylistMutation(
       let library = try await receiveSnapshot(
         snapshot,
         cached: cached,
-        childId: connection.childId,
+        connection: connection,
         cache: cache,
       )
       return .conflict(library)
     }
   } catch let error as PqlError where error.type == .loggedOut {
+    try await identity.validate(connection)
     throw ApprovedMusicClientError.invalidConnection
   } catch let error as PqlError where error.type == .paymentRequired {
+    try await identity.validate(connection)
     throw ApprovedMusicClientError.musicAccessUnavailable
   }
 }
@@ -226,9 +236,11 @@ private func performPlaylistMutation(
 private func receiveSnapshot(
   _ snapshot: MusicLibrarySnapshot,
   cached: ApprovedMusicLibrary?,
-  childId: UUID,
+  connection: MusicAppConnection,
   cache: ApprovedMusicLibraryCacheClient,
 ) async throws -> ApprovedMusicLibrary {
+  @Dependency(\.musicIdentity) var identity
+  try await identity.validate(connection)
   guard snapshot.schemaVersion == MusicLibrarySnapshot.currentSchemaVersion else {
     throw ApprovedMusicClientError.unsupportedSchema(snapshot.schemaVersion)
   }
@@ -250,7 +262,8 @@ private func receiveSnapshot(
       return cached
     }
   }
-  try? await cache.save(library, childId: childId)
+  try? await cache.save(library, childId: connection.childId)
+  try await identity.validate(connection)
   return library
 }
 

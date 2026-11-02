@@ -31,6 +31,9 @@ public extension IOSReducer {
     }
 
     public enum Programmatic: Equatable {
+      case identityResolved(BlockerIdentityClient.Resolution, launching: Bool)
+      case identityReported(BlockerIdentityClient.Resolution, restart: Bool)
+      case showInfo(UUID?)
       case appDidLaunch
       case receivedCrossPromos(CrossPromos.Output)
       case appWillTerminate

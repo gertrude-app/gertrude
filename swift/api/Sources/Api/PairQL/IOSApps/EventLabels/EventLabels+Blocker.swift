@@ -1,7 +1,14 @@
 extension EventLabel {
   static func blocker(_ eventId: String) -> String? {
     switch eventId {
-
+    case "2e78387a": "Device identity resolution"
+    case "565caa05": "Device identity canary mismatch"
+    case "a4f83335": "Persistent unknown identity read"
+    case "204bb316": "Device identity write failed"
+    case "f45172f1": "Invalid identity transition receipt"
+    case "41b907cc": "Identity transition report failed"
+    case "fcc1f378": "Device identity consumer failure"
+    case "bfaf49a3": "Device identity child conflict pin"
     // --- Launch & Lifecycle ---
     case "8d35f043": "🚀 First launch"
     case "7a539f70": "Onboarding needed on launch"

@@ -1,7 +1,14 @@
 extension EventLabel {
   static func podcast(_ eventId: String) -> String? {
     switch eventId {
-
+    case "de0b2521": "Device identity resolution"
+    case "beae470b": "Device identity canary mismatch"
+    case "442b546f": "Device identity persistent unknown read"
+    case "07624c2e": "Device identity write failed"
+    case "6cced663": "Device identity invalid pending transition"
+    case "8d52f68f": "Device identity report failed"
+    case "f961a170": "Device identity consumer failure"
+    case "2ff8675b": "Device identity child conflict pin"
     // --- Launch & Onboarding ---
     case "27c4f26a": "First launch"
     case "4936b4ff": "Onboarding, not parent"

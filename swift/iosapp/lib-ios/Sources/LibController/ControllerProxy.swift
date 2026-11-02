@@ -83,7 +83,12 @@ public final class ControllerProxy: Sendable {
 
   @discardableResult
   func refreshRules(reason: RefreshReason) async -> Bool {
+    guard let deviceId = await self.deps.device.deviceId() else {
+      self.deps.logger.log("no vendor id, skipping rule update")
+      return false
+    }
     let conn = self.deps.storage.loadAccountConnection()
+    guard conn == nil || conn?.deviceId == deviceId else { return false }
 
     if reason == .fauxHeartbeat {
       let interval = conn != nil
@@ -98,11 +103,8 @@ public final class ControllerProxy: Sendable {
 
     if let conn {
       return await self.refreshConnectedRules(conn)
-    } else if let deviceId = await self.deps.device.deviceId() {
-      return await self.refreshNormalRules(deviceId)
     } else {
-      self.deps.logger.log("no vendor id, skipping rule update")
-      return false
+      return await self.refreshNormalRules(deviceId)
     }
   }
 
@@ -116,6 +118,8 @@ public final class ControllerProxy: Sendable {
     do {
       self.deps.logger.log("fetching rules from API")
       let apiRules = try await deps.api.fetchBlockRules(vendorId, disabled)
+      guard await self.deps.device.deviceId() == vendorId,
+            self.deps.storage.loadAccountConnection() == nil else { return false }
 
       guard apiRules.count > 0 else {
         self.deps.logger.log("unexpected empty rules from api")
@@ -144,6 +148,8 @@ public final class ControllerProxy: Sendable {
       // NB: always set the token, controller doesn't know when connection is made
       await self.deps.api.setAccountConnection(connection)
       let config = try await self.deps.api.connectedRules()
+      guard await self.deps.device.deviceId() == connection.deviceId,
+            self.deps.storage.loadAccountConnection() == connection else { return false }
       guard config.blockRules.count > 0 else {
         self.deps.logger.log("unexpected empty rules from api (connected)")
         return false

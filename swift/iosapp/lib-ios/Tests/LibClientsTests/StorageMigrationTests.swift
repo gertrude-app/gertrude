@@ -1,3 +1,4 @@
+import ConcurrencyExtras
 import Dependencies
 import Foundation
 import GertieBlocker
@@ -17,6 +18,7 @@ import Testing
     try await `block group migration is idempotent`()
     try await test_v1_3_to_v15_migration()
     try await test_v1_0_to_v15_migration()
+    try await migrationCleanupPreventsLegacyStateResurrection()
   }
 }
 
@@ -124,6 +126,88 @@ func test_v1_0_to_v15_migration() async throws {
     #expect(rules == [.targetContains(value: "def.com")])
   default:
     Issue.record("Unexpected protection mode: \(protectionMode)")
+  }
+}
+
+func migrationCleanupPreventsLegacyStateResurrection() async throws {
+  let defaults = getUserDefaults()
+  let storage = SharedStorageClient.liveValue
+  storage.saveDeviceIdentity(UUID(1))
+  storage.saveAccountConnection(.init(
+    childId: UUID(2), token: UUID(3), deviceId: UUID(1), childName: "Child",
+    supervised: .byGertrude(claimCode: 123_456),
+  ))
+  storage.savePendingSupervisionCode(.init(code: 123_456, expiresAt: .distantFuture))
+  storage.saveProtectionMode(.normal([.targetContains(value: "old.com")]))
+  defaults.set(Data([1]), forKey: "ProtectionMode.v1.3.0")
+  defaults.set(Data([1]), forKey: "blockRules.v1")
+  storage.saveDisabledBlockGroupIds([UUID(4)])
+
+  storage.saveDeviceIdentity(nil)
+  #expect(storage.migrationPending())
+  #expect(storage.loadAccountConnection() != nil)
+  withDependencies {
+    $0.sharedStorage = storage
+  } operation: {
+    #expect(extensionDeviceId() == nil)
+  }
+
+  try storage.clearDeviceBoundState()
+  #expect(storage.migrationPending())
+  #expect(storage.loadDeviceIdentity() == nil)
+  #expect(storage.loadAccountConnection() == nil)
+  #expect(storage.loadPendingSupervisionCode() == nil)
+  #expect(storage.loadProtectionMode() == nil)
+  #expect(storage.loadDisabledBlockGroupIds() == [UUID(4)])
+  #expect(await migrateLegacyStorage() == false)
+  try storage.setMigrationPending(false)
+  #expect(await migrateLegacyStorage() == false)
+  #expect(storage.loadProtectionMode() == nil)
+}
+
+@Test func extensionIdentityDoesNotFallBackDuringMigration() {
+  withDependencies {
+    $0.sharedStorage.loadDeviceIdentity = { nil }
+    $0.sharedStorage.migrationPending = { true }
+  } operation: {
+    #expect(extensionDeviceId() == nil)
+  }
+}
+
+@Test(arguments: [false, true])
+func extensionIdentityUsesMirrorAndDeletesLegacyCopy(migrationPending: Bool) {
+  let deleted = LockIsolated(false)
+  withDependencies {
+    $0.sharedStorage.loadDeviceIdentity = { UUID(4) }
+    $0.sharedStorage.migrationPending = { migrationPending }
+    $0.keychain.delete = { _ in deleted.setValue(true) }
+  } operation: {
+    #expect(extensionDeviceId() == UUID(4))
+    #expect(deleted.value)
+  }
+}
+
+@Test(arguments: [UUID?.none, UUID(7)])
+func extensionIdentityUsesLegacyConnectionBeforeAdoption(legacyVendorId: UUID?) {
+  withDependencies {
+    $0.sharedStorage.loadDeviceIdentity = { nil }
+    $0.sharedStorage.loadAccountConnection = { .init(
+      childId: UUID(2), token: UUID(3), deviceId: UUID(1), childName: "Child",
+    ) }
+    $0.keychain._load = { _ in legacyVendorId.map { Data($0.uuidString.utf8) } }
+  } operation: {
+    #expect(extensionDeviceId() == UUID(1))
+  }
+}
+
+@Test(arguments: [UUID?.none, UUID(7)])
+func unconnectedExtensionReadsLegacyIdentityWithoutFreezing(legacyVendorId: UUID?) {
+  withDependencies {
+    $0.sharedStorage.loadDeviceIdentity = { nil }
+    $0.sharedStorage.loadAccountConnection = { nil }
+    $0.keychain._load = { _ in legacyVendorId.map { Data($0.uuidString.utf8) } }
+  } operation: {
+    #expect(extensionDeviceId() == legacyVendorId)
   }
 }
 

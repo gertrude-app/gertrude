@@ -24,7 +24,7 @@ extension DeviceClient {
 extension DeviceClient: DependencyKey {
   static var liveValue: DeviceClient {
     .init(
-      vendorId: { await frozenVendorId() },
+      vendorId: { await MusicIdentity.shared.deviceId },
       iOSVersion: {
         #if os(iOS)
           await MainActor.run { UIDevice.current.systemVersion }
@@ -45,24 +45,6 @@ extension DependencyValues {
     get { self[DeviceClient.self] }
     set { self[DeviceClient.self] = newValue }
   }
-}
-
-@Sendable private func frozenVendorId() async -> UUID? {
-  @Dependency(\.keychain) var keychain
-  if let stored = keychain.loadDeviceId() {
-    return stored
-  }
-  let current: UUID? = await MainActor.run {
-    #if os(iOS)
-      UIDevice.current.identifierForVendor
-    #else
-      UUID()
-    #endif
-  }
-  if let current {
-    keychain.save(deviceId: current)
-  }
-  return current
 }
 
 #if DEBUG
