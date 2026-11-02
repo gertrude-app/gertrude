@@ -43,15 +43,6 @@ enum ClaimIntent: String, Codable, Sendable, Equatable, CaseIterable {
     }
   }
 
-  var claimPendingQueryKey: String {
-    switch self {
-    case .blockerSupervise: "claimPendingSupervision"
-    case .blockerConnect: "claimPendingBlocker"
-    case .podcasts: "claimPendingPodcastsDevice"
-    case .music: "claimPendingMusicDevice"
-    }
-  }
-
   func claimFunnelPath(code: Int) -> String {
     "/\(self.funnelPathSegment)/\(code)/claim"
   }

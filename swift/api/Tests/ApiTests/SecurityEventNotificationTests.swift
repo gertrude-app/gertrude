@@ -6,20 +6,8 @@ import XCTest
 @testable import Api
 
 final class SecurityEventNotificationTests: ApiTestCase, @unchecked Sendable {
-  func testNonBetaParentReceivesLegacyLinks() async throws {
-    try await self.assertNotificationLinks(accountSiteBetaEnabled: false)
-  }
-
-  func testBetaParentReceivesAccountLinks() async throws {
-    try await self.assertNotificationLinks(accountSiteBetaEnabled: true)
-  }
-
-  private func assertNotificationLinks(
-    accountSiteBetaEnabled: Bool,
-  ) async throws {
-    let parent = try await self.parent(with: {
-      $0.accountSiteBetaEnabled = accountSiteBetaEnabled
-    })
+  func testParentReceivesAccountLinks() async throws {
+    let parent = try await self.parent()
     let configs: [Parent.NotificationMethod.Config] = [
       .text(phoneNumber: "1234567890"),
       .ntfy(topic: "test-topic"),
@@ -59,21 +47,11 @@ final class SecurityEventNotificationTests: ApiTestCase, @unchecked Sendable {
     let smsLink = try XCTUnwrap(text.message.components(separatedBy: "\n\n").last)
     let ntfyLink = try XCTUnwrap(ntfyLinks.value.first)
 
-    if accountSiteBetaEnabled {
-      let expectedUrl = "https://account.example/security-events"
-      let shortUrls = try await ShortUrl.query()
-        .where(.target == expectedUrl)
-        .all(in: self.db)
-      expectNoDifference(shortUrls.count, 2)
-      expectNoDifference(Set(shortUrls.map(\.publicUrl)), Set([smsLink, ntfyLink]))
-    } else {
-      let expectedUrl = "https://legacy.example/security-events"
-      let shortUrls = try await ShortUrl.query()
-        .where(.target == expectedUrl)
-        .all(in: self.db)
-      expectNoDifference(smsLink, ShortUrl.securityEvents)
-      expectNoDifference(shortUrls.count, 1)
-      expectNoDifference(shortUrls.first?.publicUrl, ntfyLink)
-    }
+    let expectedUrl = "https://account.example/security-events"
+    let shortUrls = try await ShortUrl.query()
+      .where(.target == expectedUrl)
+      .all(in: self.db)
+    expectNoDifference(shortUrls.count, 2)
+    expectNoDifference(Set(shortUrls.map(\.publicUrl)), Set([smsLink, ntfyLink]))
   }
 }
