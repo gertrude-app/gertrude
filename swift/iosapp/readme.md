@@ -11,6 +11,8 @@ LOCAL_API_ENDPOINT = http:/$()/<wifi-ip>:<API_PORT>
 
 ## Release notes
 
+- `1.9.1` (11/2/26)
+  - fix device migration bug and identity correlation with other Gertrude apps
 - `1.9.0` (7/21/26)
   - button screen affordances for clipped text on small ios screens (i.e. iphone se)
   - don't show "sync profile" button for configurator supervised devices
