@@ -2,12 +2,10 @@ Gertrude parent account holder,
 
 This is Jared from Gertrude, writing to let you know that because we still haven't
 received payment for your Gertrude subscription, we've turned off the paid features on
-your account. If you'd like to turn them back on, please login to the parents website
-here:
+your account. If you'd like to turn them back on, open Billing in the Gertrude account
+website and reactivate your subscription:
 
-https://parents.gertrude.app/settings
-
-And then click the "Manage subscription" button.
+https://account.gertrude.app/settings/billing
 
 Any Gertrude Mac apps connected to your account have lost SOME functionality. They will
 continue blocking the internet according to the rules already in place, but no rules can
