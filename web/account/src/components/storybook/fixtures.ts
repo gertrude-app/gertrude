@@ -35,10 +35,11 @@ export const weekdaySchedule: Schedule = {
   endTime: { hour: 16, minute: 0 },
 };
 
-export const macDevice: Device = {
+export const macDevice: Extract<Device, { type: `mac` }> = {
   id: `mac-1`,
   personId: `person-1`,
   type: `mac`,
+  username: `jude`,
   name: `Jude's MacBook`,
   macOSVersion: `15.6`,
   modelName: `MacBook Air`,

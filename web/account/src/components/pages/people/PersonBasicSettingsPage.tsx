@@ -13,6 +13,7 @@ import React from 'react';
 import type { Device, PersonRelationship } from '#/components/types';
 import CardContainer from '#/components/layout/CardContainer';
 import DeviceListRow from '#/components/people/DeviceListRow';
+import { deviceTitle } from '#/components/utils';
 import { selfRelationshipUnavailableMessage } from '#/lib/people';
 
 interface Props {
@@ -25,10 +26,12 @@ interface Props {
   devices: Device[];
   savingDetails?: boolean;
   deletingPerson?: boolean;
+  disconnectingMac?: boolean;
   selfRelationshipUnavailable?: boolean;
   onSaveDetails: () => void;
   onDeletePerson: () => void | Promise<void>;
   onConnectMac: () => void;
+  onDisconnectMac: (connectionId: string) => Promise<boolean>;
 }
 
 const PersonBasicSettingsPage: React.FC<Props> = ({
@@ -41,11 +44,18 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
   devices,
   savingDetails,
   deletingPerson,
+  disconnectingMac,
   selfRelationshipUnavailable = false,
   onSaveDetails,
   onDeletePerson,
   onConnectMac,
+  onDisconnectMac,
 }) => {
+  const [disconnectDevice, setDisconnectDevice] = React.useState<Extract<
+    Device,
+    { type: `mac` }
+  > | null>(null);
+  const busy = savingDetails || deletingPerson || disconnectingMac;
   const trimmedNameDraft = nameDraft.trim();
   const nameError = trimmedNameDraft.length === 0 ? `Name is required.` : undefined;
   const detailsChanged =
@@ -78,7 +88,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
             className="grid grid-cols-1 gap-3 @lg/main:grid-cols-2 @2xl/main:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] @2xl/main:items-start"
             onSubmit={(event) => {
               event.preventDefault();
-              if (canSaveDetails && !savingDetails && !deletingPerson) {
+              if (canSaveDetails && !busy) {
                 onSaveDetails();
               }
             }}
@@ -89,7 +99,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               value={nameDraft}
               setValue={setNameDraft}
               error={nameError}
-              disabled={savingDetails || deletingPerson}
+              disabled={busy}
               className="min-w-0"
             />
             <Select
@@ -97,13 +107,13 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               selected={relationshipDraft}
               setSelected={setRelationshipDraft}
               possibleValues={relationshipOptions}
-              disabled={savingDetails || deletingPerson}
+              disabled={busy}
               className="min-w-0"
             />
             <Button
               type="submit"
               variant="primary"
-              disabled={!canSaveDetails || savingDetails || deletingPerson}
+              disabled={!canSaveDetails || busy}
               loading={savingDetails}
               className="@lg/main:col-span-2 @2xl/main:col-span-1 @2xl/main:mt-[22px]"
             >
@@ -126,7 +136,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
                 type="button"
                 variant="default"
                 icon={LaptopIcon}
-                disabled={savingDetails || deletingPerson}
+                disabled={busy}
                 onClick={onConnectMac}
               >
                 Connect a Mac
@@ -137,7 +147,24 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
           {devices.length > 0 ? (
             <VStack gap={3}>
               {devices.map((device) => (
-                <DeviceListRow key={device.id} device={device} />
+                <DeviceListRow
+                  key={device.id}
+                  device={device}
+                  action={
+                    device.type === `mac` ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        icon={TrashIcon}
+                        size="small"
+                        disabled={busy}
+                        onClick={() => setDisconnectDevice(device)}
+                      >
+                        Disconnect
+                      </Button>
+                    ) : undefined
+                  }
+                />
               ))}
             </VStack>
           ) : (
@@ -150,7 +177,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
                 text: `Connect a Mac`,
                 icon: LaptopIcon,
                 variant: `primary`,
-                disabled: savingDetails || deletingPerson,
+                disabled: busy,
                 onClick: onConnectMac,
               }}
             />
@@ -173,7 +200,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               onClick={() => {}}
               icon={TrashIcon}
               variant="destructive"
-              disabled={savingDetails}
+              disabled={busy}
               loading={deletingPerson}
               className="w-full"
             >
@@ -186,7 +213,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               text: `Delete ${personName}`,
               icon: TrashIcon,
               variant: `destructive`,
-              disabled: savingDetails,
+              disabled: busy,
               loading: deletingPerson,
               autoClose: false,
               onClick: onDeletePerson,
@@ -194,6 +221,47 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
           ]}
         />
       </CardContainer>
+      <ConfirmationDialog
+        open={disconnectDevice !== null}
+        onOpenChange={(open) => {
+          if (!open && !disconnectingMac) {
+            setDisconnectDevice(null);
+          }
+        }}
+        confirmationQuestion="Disconnect this Mac?"
+        description={
+          disconnectDevice && (
+            <VStack gap={3}>
+              <p>
+                Disconnect {personName} from {deviceTitle(disconnectDevice)} (Mac user:
+                {` `}
+                {disconnectDevice.username})? Activity and requests from this connection
+                will be deleted.
+              </p>
+              <p>
+                {personName}, their settings, and other device connections will be kept.
+                This does not uninstall Gertrude or turn off its Mac filter. Reconnecting
+                requires a new connection code.
+              </p>
+            </VStack>
+          )
+        }
+        actions={[
+          { text: `Cancel`, disabled: disconnectingMac },
+          {
+            text: `Disconnect Mac`,
+            icon: TrashIcon,
+            variant: `destructive`,
+            loading: disconnectingMac,
+            autoClose: false,
+            onClick: async () => {
+              if (disconnectDevice && (await onDisconnectMac(disconnectDevice.id))) {
+                setDisconnectDevice(null);
+              }
+            },
+          },
+        ]}
+      />
     </div>
   );
 };

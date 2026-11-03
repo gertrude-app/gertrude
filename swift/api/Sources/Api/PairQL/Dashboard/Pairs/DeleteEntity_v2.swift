@@ -78,6 +78,12 @@ extension DeleteEntity_v2: Resolver {
         "child: \(child.name), computer serial: \(computer.serialNumber)",
         in: context,
       )
+      do {
+        try await with(dependency: \.websockets)
+          .send(.userDeleted, to: .userDevice(computerUser.id))
+      } catch {
+        get(dependency: \.logger).error("Failed to deliver Mac disconnection: \(error)")
+      }
 
     case .key:
       let key = try await context.db.find(Key.Id(input.id))

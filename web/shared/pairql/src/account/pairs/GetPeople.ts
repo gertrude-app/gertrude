@@ -12,6 +12,7 @@ export namespace GetPeople {
       | {
           case: 'mac';
           id: UUID;
+          username: string;
           name?: string;
           macOSVersion?: string;
           modelName: string;

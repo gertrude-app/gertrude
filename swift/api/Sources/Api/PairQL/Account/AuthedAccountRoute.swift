@@ -27,6 +27,7 @@ enum AuthedAccountRoute: PairRoute {
   case handleAccountCheckoutCancel(HandleAccountCheckoutCancel.Input)
   case createPerson(CreatePerson.Input)
   case createMacConnectionCode(CreateMacConnectionCode.Input)
+  case disconnectMacConnection(DisconnectMacConnection.Input)
   case updatePersonBasicDetails(UpdatePersonBasicDetails.Input)
   case deletePerson(DeletePerson.Input)
   case getAccountKeychains
@@ -158,6 +159,10 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.createMacConnectionCode)) {
       Operation(CreateMacConnectionCode.self)
       Body(.accountInput(CreateMacConnectionCode.self))
+    }
+    Route(.case(Self.disconnectMacConnection)) {
+      Operation(DisconnectMacConnection.self)
+      Body(.accountInput(DisconnectMacConnection.self))
     }
     Route(.case(Self.updatePersonBasicDetails)) {
       Operation(UpdatePersonBasicDetails.self)
@@ -392,6 +397,9 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .createMacConnectionCode(let input):
       let output = try await CreateMacConnectionCode.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .disconnectMacConnection(let input):
+      let output = try await DisconnectMacConnection.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .updatePersonBasicDetails(let input):
       let output = try await UpdatePersonBasicDetails.resolve(with: input, in: context)
