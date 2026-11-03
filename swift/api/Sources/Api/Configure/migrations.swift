@@ -126,6 +126,7 @@ extension Configure {
     app.migrations.add(AddChildMusicStorefront())
     app.migrations.add(CreateSiteFormSubmissions())
     app.migrations.add(CreateIOSDeviceTransitions())
+    app.migrations.add(RemoveParentAccountSiteBeta())
   }
 }
 
