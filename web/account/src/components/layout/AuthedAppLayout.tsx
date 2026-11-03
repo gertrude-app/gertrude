@@ -2,7 +2,6 @@ import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/u
 import {
   InboxIcon,
   KeyIcon,
-  LogOutIcon,
   MonitorSmartphoneIcon,
   ScanEyeIcon,
   SettingsIcon,
@@ -15,9 +14,17 @@ interface Props {
   children: React.ReactNode;
   pathname: string;
   requestCount: number;
+  sidebarContent?: React.ReactNode;
+  showMacSection?: boolean;
 }
 
-const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) => {
+const AuthedAppLayout: React.FC<Props> = ({
+  children,
+  pathname,
+  requestCount,
+  sidebarContent,
+  showMacSection = true,
+}) => {
   const isSelected = (href: string): boolean =>
     pathname === href || pathname.startsWith(`${href}/`);
 
@@ -29,13 +36,19 @@ const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) 
       <Sidebar
         logoUrl="/logo-wordmark.svg"
         logoWidth={140}
-        bottomButton={{
-          text: `Sign out`,
-          href: `/signout`,
-          icon: LogOutIcon,
-        }}
+        bottomContent={
+          <>
+            {sidebarContent}
+            <SidebarItem
+              title="Settings"
+              icon={SettingsIcon}
+              href="/settings"
+              selected={isSelected(`/settings`)}
+            />
+          </>
+        }
       >
-        <SidebarSection>
+        <SidebarSection title={showMacSection ? `Platform` : undefined}>
           <SidebarItem
             title="People"
             icon={UsersIcon}
@@ -49,37 +62,35 @@ const AuthedAppLayout: React.FC<Props> = ({ children, pathname, requestCount }) 
             selected={isSelected(`/devices`)}
           />
           <SidebarItem
-            title="Requests"
-            icon={InboxIcon}
-            href="/requests/unlock"
-            selected={isSelected(`/requests`)}
-            badgeCount={requestCount || undefined}
-          />
-          <SidebarItem
-            title="Activity"
-            icon={ScanEyeIcon}
-            href="/activity"
-            selected={isSelected(`/activity`)}
-          />
-          <SidebarItem
-            title="Keychains"
-            icon={KeyIcon}
-            href="/keychains"
-            selected={isSelected(`/keychains`)}
-          />
-          <SidebarItem
             title="Security"
             icon={ShieldCheckIcon}
             href="/security-events"
             selected={isSelected(`/security-events`)}
           />
-          <SidebarItem
-            title="Settings"
-            icon={SettingsIcon}
-            href="/settings"
-            selected={isSelected(`/settings`)}
-          />
         </SidebarSection>
+        {showMacSection && (
+          <SidebarSection title="Mac">
+            <SidebarItem
+              title="Requests"
+              icon={InboxIcon}
+              href="/requests/unlock"
+              selected={isSelected(`/requests`)}
+              badgeCount={requestCount || undefined}
+            />
+            <SidebarItem
+              title="Activity"
+              icon={ScanEyeIcon}
+              href="/activity"
+              selected={isSelected(`/activity`)}
+            />
+            <SidebarItem
+              title="Keychains"
+              icon={KeyIcon}
+              href="/keychains"
+              selected={isSelected(`/keychains`)}
+            />
+          </SidebarSection>
+        )}
       </Sidebar>
     </SidebarLayout>
   );

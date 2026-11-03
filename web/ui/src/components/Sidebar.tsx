@@ -8,6 +8,7 @@ interface Props {
   children: React.ReactNode;
   logoUrl: string;
   logoWidth: number;
+  bottomContent?: React.ReactNode;
   bottomButton?: {
     text: string;
     href: string;
@@ -15,7 +16,13 @@ interface Props {
   };
 }
 
-const Sidebar: React.FC<Props> = ({ children, logoUrl, logoWidth, bottomButton }) => (
+const Sidebar: React.FC<Props> = ({
+  children,
+  logoUrl,
+  logoWidth,
+  bottomContent,
+  bottomButton,
+}) => (
   <VStack
     justify="between"
     className="sticky top-0 h-dvh w-68 shrink-0 overflow-y-auto border-r border-stone-300/80 bg-stone-50 p-5 min-[940px]:overflow-visible min-[940px]:border-stone-200"
@@ -26,17 +33,22 @@ const Sidebar: React.FC<Props> = ({ children, logoUrl, logoWidth, bottomButton }
       </div>
       <VStack gap={7}>{children}</VStack>
     </VStack>
-    {bottomButton && (
-      <HStack>
-        <Button
-          type="link"
-          href={bottomButton.href}
-          size="small"
-          icon={bottomButton.icon}
-        >
-          {bottomButton.text}
-        </Button>
-      </HStack>
+    {(bottomContent || bottomButton) && (
+      <VStack gap={4} className="pt-9">
+        {bottomContent}
+        {bottomButton && (
+          <HStack>
+            <Button
+              type="link"
+              href={bottomButton.href}
+              size="small"
+              icon={bottomButton.icon}
+            >
+              {bottomButton.text}
+            </Button>
+          </HStack>
+        )}
+      </VStack>
     )}
   </VStack>
 );

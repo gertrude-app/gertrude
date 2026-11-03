@@ -1,4 +1,5 @@
 // components
+export { default as AppIcon } from './components/AppIcon';
 export { default as Badge } from './components/Badge';
 export { default as CountBadge } from './components/CountBadge';
 export { default as Banner } from './components/Banner';

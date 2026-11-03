@@ -1,0 +1,77 @@
+export type SetupApp = `mac` | `blocker` | `music` | `podcasts`;
+
+export const setupApps: {
+  id: SetupApp;
+  name: string;
+  platforms: (`mac` | `iphone` | `ipad`)[];
+  description: string;
+  instructions: string;
+  icon: string;
+}[] = [
+  {
+    id: `mac`,
+    name: `Gertrude for Mac`,
+    platforms: [`mac`],
+    description: `Deny-by-default filtering and activity monitoring.`,
+    instructions: `Install Gertrude on their Mac and connect it to your account.`,
+    icon: `/gertrude-app-icons/blocker.webp`,
+  },
+  {
+    id: `blocker`,
+    name: `Gertrude Blocker`,
+    platforms: [`iphone`, `ipad`],
+    description: `Close the gaps in Apple’s Screen Time protections.`,
+    instructions: `Connect their iPhone or iPad and choose what to block.`,
+    icon: `/gertrude-app-icons/blocker.webp`,
+  },
+  {
+    id: `music`,
+    name: `Gertrude Music`,
+    platforms: [`iphone`, `ipad`],
+    description: `Parent-approved music, without open-ended browsing.`,
+    instructions: `Choose the music they can listen to, then connect the app on their device.`,
+    icon: `/gertrude-app-icons/music.webp`,
+  },
+  {
+    id: `podcasts`,
+    name: `Gertrude Podcasts`,
+    platforms: [`iphone`, `ipad`],
+    description: `Approved podcasts, with a PIN to add new shows.`,
+    instructions: `Connect the app on their device and set a PIN for adding new shows.`,
+    icon: `/gertrude-app-icons/podcasts.webp`,
+  },
+];
+
+export type SetupStepId = `person` | `choose-apps` | SetupApp;
+
+export type SetupStep = {
+  id: SetupStepId;
+  title: string;
+  description: string;
+  icon?: string;
+};
+
+export const personSetupStep: SetupStep = {
+  id: `person`,
+  title: `Who would you like to protect?`,
+  description: `Create a profile for your child, yourself, or someone you’re helping protect.`,
+};
+
+export const getAppSetupSteps = (selectedApps: SetupApp[]): SetupStep[] => {
+  const apps = setupApps.filter((app) => selectedApps.includes(app.id));
+  if (apps.length === 0) {
+    return [
+      {
+        id: `choose-apps`,
+        title: `Choose an app to set up`,
+        description: `Pick the Gertrude app you’d like to use first.`,
+      },
+    ];
+  }
+  return apps.map((app) => ({
+    id: app.id,
+    title: `Set up ${app.name}`,
+    description: app.instructions,
+    icon: app.icon,
+  }));
+};

@@ -1,8 +1,13 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
+import type { SetupApp, SetupStepId } from '#/components/onboarding/setupApps';
+import type { PersonCardPerson } from '#/components/types';
 import type { ComponentProps, ReactElement } from 'react';
 import PeoplePage from './PeoplePage';
 import AnnouncementBanner from '#/components/announcements/AnnouncementBanner';
+import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
+import SetupChecklist from '#/components/onboarding/SetupChecklist';
 import {
+  macDevice,
   people,
   securityEvents,
   suspensionRequests,
@@ -87,6 +92,85 @@ export const Empty = {
       suspensionRequestsState: { status: `success`, data: [] },
       securityEventsState: { status: `success`, data: [] },
     }),
+};
+
+const firstPerson: PersonCardPerson = {
+  id: `new-person`,
+  name: `Jude`,
+  relationship: `child`,
+  devices: [],
+  screenshot: null,
+};
+
+const renderGettingStarted = (
+  selectedApps: SetupApp[],
+  person?: PersonCardPerson,
+  completedSteps: SetupStepId[] = [`person`],
+): ReactElement => (
+  <AuthedAppLayout
+    pathname="/people"
+    requestCount={0}
+    showMacSection={person?.devices.some((device) => device.type === `mac`) ?? false}
+    sidebarContent={
+      person && (
+        <SetupChecklist
+          selectedApps={selectedApps}
+          completedSteps={completedSteps}
+          onSelectStep={noop}
+        />
+      )
+    }
+  >
+    {renderPage({
+      peopleState: { status: `success`, data: person ? [person] : [] },
+      unlockRequestSummary: { totalCount: 0, people: [] },
+      suspensionRequestsState: { status: `success`, data: [] },
+      securityEventsState: { status: `success`, data: [] },
+      addDeviceHrefForPerson: (personId) => `/people/${personId}/devices/new`,
+      gettingStarted: { selectedApps, onAddPerson: noop, onChangeApps: noop },
+    })}
+  </AuthedAppLayout>
+);
+
+export const GettingStarted = {
+  name: 'Getting started / Mac and Music',
+  parameters: galleryParameters,
+  render: () => renderGettingStarted([`mac`, `music`]),
+};
+
+export const GettingStartedBlocker = {
+  name: 'Getting started / Blocker only',
+  parameters: galleryParameters,
+  render: () => renderGettingStarted([`blocker`]),
+};
+
+export const GettingStartedAllApps = {
+  name: 'Getting started / All apps',
+  parameters: galleryParameters,
+  render: () => renderGettingStarted([`mac`, `blocker`, `music`, `podcasts`]),
+};
+
+export const GettingStartedUndecided = {
+  name: 'Getting started / Apps undecided',
+  parameters: galleryParameters,
+  render: () => renderGettingStarted([]),
+};
+
+export const GettingStartedPersonAdded = {
+  name: 'Getting started / First person added',
+  parameters: galleryParameters,
+  render: () => renderGettingStarted([`mac`, `music`], firstPerson),
+};
+
+export const GettingStartedMacConnected = {
+  name: 'Getting started / Mac connected',
+  parameters: galleryParameters,
+  render: () =>
+    renderGettingStarted(
+      [`mac`, `music`],
+      { ...firstPerson, devices: [{ ...macDevice, personId: firstPerson.id }] },
+      [`person`, `mac`],
+    ),
 };
 
 export const Loading = {
