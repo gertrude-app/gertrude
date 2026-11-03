@@ -31,7 +31,7 @@ extension MarketingEmailCampaign {
 
 func scheduledMarketingEmailCampaigns(env: Env) -> [any MarketingEmailCampaign] {
   [
-    MacSetup24hEmailCampaign(dashboardUrl: env.dashboardUrl),
+    MacSetup24hEmailCampaign(accountUrl: env.accountDashboardUrl),
     IosOnlyMacTrialEmailCampaign(),
   ]
 }

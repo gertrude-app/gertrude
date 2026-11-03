@@ -3,7 +3,7 @@ import DuetSQL
 struct MacSetup24hEmailCampaign: MarketingEmailCampaign {
   let slug = "mac_setup_24h"
   let templateAlias = MacSetup24h.alias
-  let dashboardUrl: String
+  let accountUrl: String
 
   func audience(in db: any DuetSQL.Client) async throws -> [MarketingEmailCampaignRecipient] {
     let rows = try await db.customQuery(MacSetup24hAudienceRow.self)
@@ -17,20 +17,20 @@ struct MacSetup24hEmailCampaign: MarketingEmailCampaign {
   }
 
   private func templateModel(for row: MacSetup24hAudienceRow) -> [String: String] {
-    let dashboardUrl = self.dashboardUrl.withoutTrailingSlashes
+    let accountUrl = self.accountUrl.withoutTrailingSlashes
     if row.childCount == 1,
        let childId = row.childId,
        let childName = row.childName {
       return [
         "childName": childName,
-        "dashboardUrl": dashboardUrl,
-        "primaryCtaUrl": "\(dashboardUrl)/children/\(childId.lowercased)/mac",
+        "dashboardUrl": accountUrl,
+        "primaryCtaUrl": "\(accountUrl)/people/\(childId.lowercased)",
       ]
     } else {
       return [
         "childName": "your child",
-        "dashboardUrl": dashboardUrl,
-        "primaryCtaUrl": "\(dashboardUrl)/children",
+        "dashboardUrl": accountUrl,
+        "primaryCtaUrl": "\(accountUrl)/people",
       ]
     }
   }
