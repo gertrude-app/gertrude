@@ -1,6 +1,6 @@
 import type { SetupApp, SetupStepId } from '#/components/onboarding/setupApps';
 import type { GetAccountSetup } from '@shared/pairql/src/account';
-import { getAppSetupSteps } from '#/components/onboarding/setupApps';
+import { getAppSetupSteps, getChecklistSteps } from '#/components/onboarding/setupApps';
 
 export function needsOnboarding(setup: GetAccountSetup.Output): boolean {
   return setup.selectedApps == null && !setup.hasPeople;
@@ -24,4 +24,16 @@ export function setupChecklist(setup: GetAccountSetup.Output): {
     completedSteps.includes(step.id),
   );
   return complete ? null : { selectedApps, completedSteps, includeNotifications };
+}
+
+export function setupProgress(checklist: {
+  selectedApps: SetupApp[];
+  completedSteps: SetupStepId[];
+  includeNotifications: boolean;
+}): { completed: number; total: number } {
+  const steps = getChecklistSteps(checklist.selectedApps, checklist.includeNotifications);
+  return {
+    completed: steps.filter((step) => checklist.completedSteps.includes(step.id)).length,
+    total: steps.length,
+  };
 }

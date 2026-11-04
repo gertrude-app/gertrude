@@ -6,6 +6,7 @@ import PeoplePage from './PeoplePage';
 import AnnouncementBanner from '#/components/announcements/AnnouncementBanner';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
 import SetupChecklist from '#/components/onboarding/SetupChecklist';
+import { getChecklistSteps } from '#/components/onboarding/setupApps';
 import {
   macDevice,
   people,
@@ -110,6 +111,12 @@ const renderGettingStarted = (
     pathname="/people"
     requestCount={0}
     showMacSection={person?.devices.some((device) => device.type === `mac`) ?? false}
+    menuProgress={
+      person && {
+        completed: completedSteps.length,
+        total: getChecklistSteps(selectedApps).length,
+      }
+    }
     sidebarContent={
       person && (
         <SetupChecklist

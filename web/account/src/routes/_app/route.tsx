@@ -13,7 +13,7 @@ import { useConnectMac } from '#/components/devices/useConnectMac';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
 import SetupChecklist from '#/components/onboarding/SetupChecklist';
 import { appStoreUrls, setupApps } from '#/components/onboarding/setupApps';
-import { setupChecklist } from '#/lib/accountSetup';
+import { setupChecklist, setupProgress } from '#/lib/accountSetup';
 import { authRedirectForPath } from '#/lib/authRedirect';
 import { useShareLink } from '#/lib/shareLink';
 import { isAuthed } from '#/pairql/auth';
@@ -54,7 +54,12 @@ const AuthedLayout: React.FC = () => {
       sessionStorage.removeItem(`pairingReturnPath`);
     }
   }, [pathname]);
-  if (pathname.startsWith(`/connect/`) || pathname === `/welcome`) return <Outlet />;
+  if (
+    pathname.startsWith(`/connect/`) ||
+    pathname === `/welcome` ||
+    pathname === `/how-did-you-hear`
+  )
+    return <Outlet />;
 
   const selectStep = (step: SetupStepId): void => {
     switch (step) {
@@ -87,6 +92,7 @@ const AuthedLayout: React.FC = () => {
       pathname={pathname}
       requestCount={requestCount}
       showMacSection={setupQuery.data?.completedApps.includes(`mac`) ?? true}
+      menuProgress={checklist ? setupProgress(checklist) : undefined}
       sidebarContent={
         checklist && (
           <SetupChecklist

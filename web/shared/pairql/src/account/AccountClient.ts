@@ -516,6 +516,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public saveAccountReferralSource = (
+    input: P.SaveAccountReferralSource.Input,
+  ): Promise<Result<P.SaveAccountReferralSource.Output>> => {
+    return this.query<P.SaveAccountReferralSource.Output>(
+      input,
+      `SaveAccountReferralSource`,
+      `parent`,
+    );
+  };
+
   public saveExtendedSupervisionControls = (
     input: P.SaveExtendedSupervisionControls.Input,
   ): Promise<Result<P.SaveExtendedSupervisionControls.Output>> => {

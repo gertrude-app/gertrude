@@ -135,6 +135,16 @@ export type PlanStatus =
   | { case: 'free' }
   | { case: 'complimentary' };
 
+export type ReferralSource =
+  | 'friend_family'
+  | 'community_group'
+  | 'search_engine'
+  | 'ai_chat'
+  | 'app_store'
+  | 'social_media'
+  | 'article_news'
+  | 'other';
+
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
 export type SetupApp = 'mac' | 'blocker' | 'music' | 'podcasts';

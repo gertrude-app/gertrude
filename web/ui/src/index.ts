@@ -23,6 +23,7 @@ export { default as Modal } from './components/Modal';
 export type { ModalProps } from './components/Modal';
 export { default as PageHeading } from './components/PageHeading';
 export { default as RadioGroup } from './components/RadioGroup';
+export { default as ProgressRing } from './components/ProgressRing';
 export { default as RadioList } from './components/RadioList';
 export type { RadioListOption } from './components/RadioList';
 export { default as Select } from './components/Select';

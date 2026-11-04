@@ -105,3 +105,11 @@ export const getAppSetupSteps = (
   steps.splice(macIndex === -1 ? steps.length : macIndex + 1, 0, notificationsSetupStep);
   return steps;
 };
+
+export const getChecklistSteps = (
+  selectedApps: SetupApp[],
+  includeNotifications?: boolean,
+): SetupStep[] => [
+  { id: `person`, title: `Add a person`, description: `` },
+  ...getAppSetupSteps(selectedApps, includeNotifications),
+];

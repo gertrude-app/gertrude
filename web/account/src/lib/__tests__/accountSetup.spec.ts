@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import type { GetAccountSetup } from '@shared/pairql/src/account';
-import { needsOnboarding, setupChecklist } from '../accountSetup';
+import { needsOnboarding, setupChecklist, setupProgress } from '../accountSetup';
 import { getAppSetupSteps } from '#/components/onboarding/setupApps';
 
 const setup = (
@@ -71,5 +71,12 @@ describe(`Account setup`, () => {
       completedSteps: [`person`, `music`, `mac`],
       includeNotifications: true,
     });
+  });
+
+  test(`counts checklist progress including the person and notifications steps`, () => {
+    const checklist = setupChecklist(
+      setup({ selectedApps: [`mac`, `music`], completedApps: [`mac`] }),
+    );
+    expect(checklist && setupProgress(checklist)).toEqual({ completed: 2, total: 4 });
   });
 });

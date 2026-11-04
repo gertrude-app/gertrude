@@ -213,7 +213,7 @@ const PeoplePage: React.FC<Props> = ({
     peopleState.data.length === 0
   ) {
     return (
-      <div className="relative isolate flex min-h-screen flex-col justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-12">
+      <div className="relative isolate flex min-h-screen flex-col justify-start overflow-hidden px-4 py-8 sm:justify-center sm:px-6 sm:py-12">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-3/4 -z-10 h-[150%] w-full rounded-[100%] [background-image:radial-gradient(ellipse_at_center,oklch(60.6%_0.25_292.717_/_0.2)_0%,rgba(255,255,255,1.0)_65%),url(/dot-noise-pattern.svg),url(/bg.svg)]"

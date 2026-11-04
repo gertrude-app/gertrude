@@ -2028,6 +2028,54 @@
     }
   },
   {
+    "id": "account-pages-onboarding-referral-source--default",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-referral-source--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-onboarding-referral-source--default.png",
+    "title": "Account/Pages/Onboarding/Referral Source",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-referral-source--default",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-referral-source--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-onboarding-referral-source--default.png",
+    "title": "Account/Pages/Onboarding/Referral Source",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-referral-source--something-else",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-referral-source--something-else&viewMode=story",
+    "name": "Something else",
+    "path": "screenshots/mobile/account-pages-onboarding-referral-source--something-else.png",
+    "title": "Account/Pages/Onboarding/Referral Source",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-referral-source--something-else",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-referral-source--something-else&viewMode=story",
+    "name": "Something else",
+    "path": "screenshots/desktop/account-pages-onboarding-referral-source--something-else.png",
+    "title": "Account/Pages/Onboarding/Referral Source",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people--default",
     "iframePath": "/iframe.html?id=account-pages-people--default&viewMode=story",
     "name": "Default",

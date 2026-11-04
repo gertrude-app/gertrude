@@ -14,6 +14,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppWelcomeRouteImport } from './routes/_app/welcome'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
+import { Route as AppHowDidYouHearRouteImport } from './routes/_app/how-did-you-hear'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as unauthedLinkExpiredRouteImport } from './routes/(unauthed)/link-expired'
@@ -74,6 +75,11 @@ const AppSignoutRoute = AppSignoutRouteImport.update({
 const AppSecurityEventsRoute = AppSecurityEventsRouteImport.update({
   id: '/security-events',
   path: '/security-events',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppHowDidYouHearRoute = AppHowDidYouHearRouteImport.update({
+  id: '/how-did-you-hear',
+  path: '/how-did-you-hear',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const unauthedSignupRoute = unauthedSignupRouteImport.update({
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/welcome': typeof AppWelcomeRoute
@@ -322,6 +329,7 @@ export interface FileRoutesByTo {
   '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
   '/welcome': typeof AppWelcomeRoute
@@ -364,6 +372,7 @@ export interface FileRoutesById {
   '/(unauthed)/link-expired': typeof unauthedLinkExpiredRoute
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
+  '/_app/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
   '/_app/welcome': typeof AppWelcomeRoute
@@ -410,6 +419,7 @@ export interface FileRouteTypes {
     | '/link-expired'
     | '/login'
     | '/signup'
+    | '/how-did-you-hear'
     | '/security-events'
     | '/signout'
     | '/welcome'
@@ -450,6 +460,7 @@ export interface FileRouteTypes {
     | '/link-expired'
     | '/login'
     | '/signup'
+    | '/how-did-you-hear'
     | '/security-events'
     | '/signout'
     | '/welcome'
@@ -491,6 +502,7 @@ export interface FileRouteTypes {
     | '/(unauthed)/link-expired'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
+    | '/_app/how-did-you-hear'
     | '/_app/security-events'
     | '/_app/signout'
     | '/_app/welcome'
@@ -575,6 +587,13 @@ declare module '@tanstack/react-router' {
       path: '/security-events'
       fullPath: '/security-events'
       preLoaderRoute: typeof AppSecurityEventsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/how-did-you-hear': {
+      id: '/_app/how-did-you-hear'
+      path: '/how-did-you-hear'
+      fullPath: '/how-did-you-hear'
+      preLoaderRoute: typeof AppHowDidYouHearRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/signup': {
@@ -938,6 +957,7 @@ const AppRequestsUnlockRouteWithChildren =
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
+  AppHowDidYouHearRoute: typeof AppHowDidYouHearRoute
   AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
   AppWelcomeRoute: typeof AppWelcomeRoute
@@ -960,6 +980,7 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
+  AppHowDidYouHearRoute: AppHowDidYouHearRoute,
   AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
   AppWelcomeRoute: AppWelcomeRoute,

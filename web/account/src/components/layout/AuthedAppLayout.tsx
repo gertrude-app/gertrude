@@ -15,6 +15,7 @@ interface Props {
   pathname: string;
   requestCount: number;
   sidebarContent?: React.ReactNode;
+  menuProgress?: { completed: number; total: number };
   showMacSection?: boolean;
 }
 
@@ -23,6 +24,7 @@ const AuthedAppLayout: React.FC<Props> = ({
   pathname,
   requestCount,
   sidebarContent,
+  menuProgress,
   showMacSection = true,
 }) => {
   const isSelected = (href: string): boolean =>
@@ -30,6 +32,7 @@ const AuthedAppLayout: React.FC<Props> = ({
 
   return (
     <SidebarLayout
+      menuProgress={menuProgress}
       content={children}
       mobileLogo={<img src="/logo-wordmark.svg" alt="Gertrude" width={140} />}
     >

@@ -5,7 +5,7 @@ import React from 'react';
 import {
   type SetupApp,
   type SetupStepId,
-  getAppSetupSteps,
+  getChecklistSteps,
 } from '#/components/onboarding/setupApps';
 
 interface Props {
@@ -26,10 +26,7 @@ const SetupChecklist: React.FC<Props> = ({
   const headingId = React.useId();
   const listId = React.useId();
   const [expanded, setExpanded] = React.useState(defaultExpanded);
-  const steps = [
-    { id: `person` as const, title: `Add a person`, description: `` },
-    ...getAppSetupSteps(selectedApps, includeNotifications),
-  ];
+  const steps = getChecklistSteps(selectedApps, includeNotifications);
   const completedCount = steps.filter((step) => completedSteps.includes(step.id)).length;
   const currentStep = steps.find((step) => !completedSteps.includes(step.id));
 
