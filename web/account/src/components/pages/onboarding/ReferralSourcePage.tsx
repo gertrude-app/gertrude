@@ -54,9 +54,11 @@ const SourceButton: React.FC<{
   icon: LucideIcon;
   label: string;
   onClick: () => void;
-}> = ({ icon: Icon, label, onClick }) => (
+  trackConversion?: boolean;
+}> = ({ icon: Icon, label, onClick, trackConversion = false }) => (
   <button
     type="button"
+    data-track-conversion={trackConversion ? true : undefined}
     onClick={onClick}
     className="flex w-full cursor-pointer items-center gap-3.5 rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-left shadow-sm shadow-stone-300/30 transition-[border-color,background-color,scale] duration-100 outline-none hover:border-stone-300 hover:bg-stone-50 focus-visible:ring-2 focus-visible:ring-violet-300 active:scale-[0.99]"
   >
@@ -91,6 +93,7 @@ const ReferralSourcePage: React.FC<Props> = ({
           key={source.id}
           icon={source.icon}
           label={source.label}
+          trackConversion
           onClick={() => onChoose(source.id)}
         />
       ))}
@@ -129,6 +132,7 @@ const ReferralSourcePage: React.FC<Props> = ({
             />
             <Button
               type="submit"
+              data-track-conversion
               variant="primary"
               icon={ArrowRightIcon}
               iconPosition="right"
