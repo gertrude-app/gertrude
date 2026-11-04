@@ -56,7 +56,7 @@ const Logo: React.FC<Props> = ({
   if (iconOnly) {
     return (
       <img
-        src="/logo-icon.svg"
+        src={type === `inverted` ? `/logo-icon-dark.svg` : `/logo-icon.svg`}
         alt="Gertrude"
         className={cx(`block`, className)}
         style={{ width: size, height: size }}
