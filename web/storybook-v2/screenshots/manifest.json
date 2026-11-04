@@ -1392,6 +1392,30 @@
     }
   },
   {
+    "id": "account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled&viewMode=story",
+    "name": "Subscription checkout canceled",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled&viewMode=story",
+    "name": "Subscription checkout canceled",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-connect-ios-app-supervision-setup--subscription-required",
     "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-required&viewMode=story",
     "name": "Subscription required",

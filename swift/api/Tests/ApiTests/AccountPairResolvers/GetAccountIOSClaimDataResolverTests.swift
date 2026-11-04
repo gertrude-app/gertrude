@@ -65,6 +65,26 @@ final class GetAccountIOSClaimDataResolverTests: ApiTestCase, @unchecked Sendabl
     expect(output.assignment?.deviceId).toEqual(device.id)
   }
 
+  func testSuperviseClaim_unpaidParentGetsLightCheckoutPaymentAction() async throws {
+    let parent = try await self.parent()
+    let person = try await self.db.create(Child(parentId: parent.id, name: "Jude"))
+    let device = try await self.db.create(IOSDevice.random { $0.childId = person.id })
+    let claim = try await self.createClaim(
+      .blockerSupervise,
+      device.id,
+      person.id,
+      claimedAt: .reference,
+    )
+
+    let output = try await GetAccountIOSClaimData.resolve(
+      with: .init(flow: .blockerSupervise, code: claim.code),
+      in: self.accountContext(parent),
+    )
+
+    expect(output.assignment?.requiresPayment).toEqual(true)
+    expect(output.assignment?.paymentAction).toEqual(.startCheckout(tier: .light))
+  }
+
   func testBoundUnclaimedCode_completesClaimAndSeedsBlockGroups() async throws {
     let parent = try await self.parent()
     let person = try await self.db.create(Child(parentId: parent.id, name: "Jude"))

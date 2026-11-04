@@ -17,7 +17,13 @@ type Props = {
   onPrimary: () => void;
   onFinishLater?: () => void;
 } & (
-  | { stage: `plan` }
+  | {
+      stage: `plan`;
+      actionLabel?: string;
+      working?: boolean;
+      checkoutCanceled?: boolean;
+      error?: string;
+    }
   | { stage: `computerRequired`; onThisIsComputer: () => void }
   | {
       stage: `download`;
@@ -37,11 +43,13 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
   const deviceModelLabel = `${personName}’s ${device.modelName}`;
   const canCheck = props.stage === `supervise` || props.stage === `finishOnDevice`;
   const checking = canCheck && props.checking;
+  const working = checking || (props.stage === `plan` && props.working);
   const { title, step, primaryLabel } = {
     plan: {
       title: `Get ready to supervise this ${device.type}`,
       step: null,
-      primaryLabel: `View subscription options`,
+      primaryLabel:
+        (props.stage === `plan` && props.actionLabel) || `View subscription options`,
     },
     computerRequired: {
       title: `Continue on a computer`,
@@ -149,6 +157,16 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
             {device.type}. The process uses a computer and USB cable, but won’t erase the
             device.
           </p>
+        )}
+        {props.stage === `plan` && props.checkoutCanceled && !props.error && (
+          <div role="status" className="mt-4">
+            <Banner>Checkout was canceled. No changes were made to your plan.</Banner>
+          </div>
+        )}
+        {props.stage === `plan` && props.error && (
+          <div role="alert" className="mt-4">
+            <Banner variant="error">{props.error}</Banner>
+          </div>
         )}
 
         {props.stage === `computerRequired` && (
@@ -298,7 +316,7 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
           variant="primary"
           icon={props.stage === `download` ? undefined : ArrowRightIcon}
           iconPosition="right"
-          loading={checking}
+          loading={working}
           disabled={props.stage === `download` && !props.downloaded}
           onClick={props.onPrimary}
         >
