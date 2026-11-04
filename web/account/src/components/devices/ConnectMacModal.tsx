@@ -5,9 +5,9 @@ import {
   DownloadIcon,
   ExternalLinkIcon,
   LinkIcon,
-  type LucideIcon,
 } from 'lucide-react';
 import React from 'react';
+import InstructionStep from './InstructionStep';
 import PromoCard from '#/components/PromoCard';
 
 export type ConnectMacState =
@@ -250,24 +250,6 @@ const ConnectionInstructions: React.FC<{ personName: string }> = ({ personName }
       When the welcome screen asks for a code, return here and get one below.
     </InstructionStep>
   </VStack>
-);
-
-const InstructionStep: React.FC<{
-  icon: LucideIcon;
-  title: string;
-  children: React.ReactNode;
-}> = ({ icon: Icon, title, children }) => (
-  <div className="rounded-xl border border-stone-200 bg-stone-50/70 p-3.5">
-    <HStack align="start" gap={3}>
-      <Icon className="mt-1 h-5 w-5 shrink-0 text-stone-600" />
-      <VStack gap={1} className="min-w-0">
-        <Text variant="bodyStrong">{title}</Text>
-        <Text as="div" variant="proseSubtle">
-          {children}
-        </Text>
-      </VStack>
-    </HStack>
-  </div>
 );
 
 const TrialRequiredContent: React.FC = () => (

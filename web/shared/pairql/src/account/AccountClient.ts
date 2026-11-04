@@ -290,6 +290,12 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.GetAccountSettings.Output>(input, `GetAccountSettings`, `parent`);
   };
 
+  public getAccountSetup = (
+    input: P.GetAccountSetup.Input,
+  ): Promise<Result<P.GetAccountSetup.Output>> => {
+    return this.query<P.GetAccountSetup.Output>(input, `GetAccountSetup`, `parent`);
+  };
+
   public getAccountUnlockRequestSummary = (
     input: P.GetAccountUnlockRequestSummary.Input,
   ): Promise<Result<P.GetAccountUnlockRequestSummary.Output>> => {
@@ -556,6 +562,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.SetAccountKeychainAssignment.Output>(
       input,
       `SetAccountKeychainAssignment`,
+      `parent`,
+    );
+  };
+
+  public setAccountSetupApps = (
+    input: P.SetAccountSetupApps.Input,
+  ): Promise<Result<P.SetAccountSetupApps.Output>> => {
+    return this.query<P.SetAccountSetupApps.Output>(
+      input,
+      `SetAccountSetupApps`,
       `parent`,
     );
   };

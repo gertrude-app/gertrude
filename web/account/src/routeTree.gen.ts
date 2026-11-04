@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppWelcomeRouteImport } from './routes/_app/welcome'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
@@ -58,6 +59,11 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppWelcomeRoute = AppWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSignoutRoute = AppSignoutRouteImport.update({
@@ -278,6 +284,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof unauthedSignupRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
+  '/welcome': typeof AppWelcomeRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/signup': typeof unauthedSignupRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
+  '/welcome': typeof AppWelcomeRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
@@ -358,6 +366,7 @@ export interface FileRoutesById {
   '/(unauthed)/signup': typeof unauthedSignupRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
+  '/_app/welcome': typeof AppWelcomeRoute
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/_app/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
@@ -403,6 +412,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/security-events'
     | '/signout'
+    | '/welcome'
     | '/people/$personId'
     | '/settings/billing'
     | '/otp/$token'
@@ -442,6 +452,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/security-events'
     | '/signout'
+    | '/welcome'
     | '/'
     | '/otp/$token'
     | '/reset-password/$token'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/(unauthed)/signup'
     | '/_app/security-events'
     | '/_app/signout'
+    | '/_app/welcome'
     | '/_app/'
     | '/_app/people/$personId'
     | '/_app/settings/billing'
@@ -542,6 +554,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/welcome': {
+      id: '/_app/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AppWelcomeRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/signout': {
@@ -921,6 +940,7 @@ interface AppRouteRouteChildren {
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
   AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
+  AppWelcomeRoute: typeof AppWelcomeRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDevicesDeviceIdRoute: typeof AppDevicesDeviceIdRoute
   AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
@@ -942,6 +962,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
   AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
+  AppWelcomeRoute: AppWelcomeRoute,
   AppIndexRoute: AppIndexRoute,
   AppDevicesDeviceIdRoute: AppDevicesDeviceIdRoute,
   AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,

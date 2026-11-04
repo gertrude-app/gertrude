@@ -1,7 +1,19 @@
-import { Outlet, createFileRoute, redirect, useLocation } from '@tanstack/react-router';
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useLocation,
+  useNavigate,
+} from '@tanstack/react-router';
 import React from 'react';
+import type { IOSSetupApp, SetupStepId } from '#/components/onboarding/setupApps';
+import InstallIOSAppModal from '#/components/devices/InstallIOSAppModal';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
+import SetupChecklist from '#/components/onboarding/SetupChecklist';
+import { appStoreUrls, setupApps } from '#/components/onboarding/setupApps';
+import { setupChecklist } from '#/lib/accountSetup';
 import { authRedirectForPath } from '#/lib/authRedirect';
+import { useShareLink } from '#/lib/shareLink';
 import { isAuthed } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -9,6 +21,7 @@ import { useQuery } from '#/pairql/query';
 
 const AuthedLayout: React.FC = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const unlockRequests = useQuery(
     Key.unlockRequests,
     () => liveClient.getAccountUnlockRequestSummary(),
@@ -19,6 +32,18 @@ const AuthedLayout: React.FC = () => {
     () => liveClient.getSuspensionRequests(),
     { refetchInterval: 30_000 },
   );
+  const setupQuery = useQuery(Key.accountSetup, () => liveClient.getAccountSetup(), {
+    refetchInterval: ({ state }) =>
+      state.data && setupChecklist(state.data) ? 30_000 : false,
+  });
+  const checklist = setupQuery.data && setupChecklist(setupQuery.data);
+  const peopleQuery = useQuery(Key.people, () => liveClient.getPeople(), {
+    enabled: !!checklist,
+  });
+  const onlyPerson = peopleQuery.data?.length === 1 ? peopleQuery.data[0] : undefined;
+  const [installApp, setInstallApp] = React.useState<IOSSetupApp>(`blocker`);
+  const [installOpen, setInstallOpen] = React.useState(false);
+  const shareLink = useShareLink();
   const requestCount =
     (unlockRequests.data?.totalCount ?? 0) + (suspensionRequests.data?.length ?? 0);
   React.useEffect(() => {
@@ -26,11 +51,63 @@ const AuthedLayout: React.FC = () => {
       sessionStorage.removeItem(`pairingReturnPath`);
     }
   }, [pathname]);
-  if (pathname.startsWith(`/connect/`)) return <Outlet />;
+  if (pathname.startsWith(`/connect/`) || pathname === `/welcome`) return <Outlet />;
+
+  const selectStep = (step: SetupStepId): void => {
+    switch (step) {
+      case `person`:
+        void navigate({ to: `/people/new` });
+        return;
+      case `choose-apps`:
+        void navigate({ to: `/welcome` });
+        return;
+      case `mac`: {
+        if (onlyPerson) {
+          void navigate({ to: `/people/$personId`, params: { personId: onlyPerson.id } });
+        } else {
+          void navigate({ to: `/people` });
+        }
+        return;
+      }
+      default:
+        shareLink.reset();
+        setInstallApp(step);
+        setInstallOpen(true);
+    }
+  };
 
   return (
-    <AuthedAppLayout pathname={pathname} requestCount={requestCount}>
+    <AuthedAppLayout
+      pathname={pathname}
+      requestCount={requestCount}
+      showMacSection={setupQuery.data?.completedApps.includes(`mac`) ?? true}
+      sidebarContent={
+        checklist && (
+          <SetupChecklist
+            selectedApps={checklist.selectedApps}
+            completedSteps={checklist.completedSteps}
+            onSelectStep={selectStep}
+          />
+        )
+      }
+    >
       <Outlet />
+      <InstallIOSAppModal
+        open={installOpen}
+        onOpenChange={setInstallOpen}
+        app={installApp}
+        personName={onlyPerson?.name}
+        shareMethod={shareLink.method}
+        copied={shareLink.copied}
+        onShareLink={() => {
+          const name = setupApps.find((app) => app.id === installApp)?.name ?? `Gertrude`;
+          shareLink.share({
+            title: name,
+            text: `Install ${name} from the App Store`,
+            url: appStoreUrls[installApp],
+          });
+        }}
+      />
     </AuthedAppLayout>
   );
 };

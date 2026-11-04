@@ -137,6 +137,8 @@ export type PlanStatus =
 
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 
+export type SetupApp = 'mac' | 'blocker' | 'music' | 'podcasts';
+
 export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }
   | { type: 'domain'; domain: string; scope: AppScope }

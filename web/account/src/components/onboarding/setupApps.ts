@@ -1,4 +1,14 @@
-export type SetupApp = `mac` | `blocker` | `music` | `podcasts`;
+import type { SetupApp } from '@shared/pairql/src/account';
+
+export type { SetupApp };
+
+export type IOSSetupApp = Exclude<SetupApp, `mac`>;
+
+export const appStoreUrls: Record<IOSSetupApp, string> = {
+  blocker: `https://apps.apple.com/app/id6736368820`,
+  music: `https://apps.apple.com/app/id6782194077`,
+  podcasts: `https://apps.apple.com/app/id6753187429`,
+};
 
 export const setupApps: {
   id: SetupApp;
@@ -21,7 +31,7 @@ export const setupApps: {
     name: `Gertrude Blocker`,
     platforms: [`iphone`, `ipad`],
     description: `Close the gaps in Apple’s Screen Time protections.`,
-    instructions: `Connect their iPhone or iPad and choose what to block.`,
+    instructions: `Install it on their iPhone or iPad and connect it to your account. Then choose what to block.`,
     icon: `/gertrude-app-icons/blocker.webp`,
   },
   {
@@ -29,7 +39,7 @@ export const setupApps: {
     name: `Gertrude Music`,
     platforms: [`iphone`, `ipad`],
     description: `Parent-approved music, without open-ended browsing.`,
-    instructions: `Choose the music they can listen to, then connect the app on their device.`,
+    instructions: `Install it on their iPhone or iPad and connect it to your account. Then choose the music they can play.`,
     icon: `/gertrude-app-icons/music.webp`,
   },
   {
@@ -37,7 +47,7 @@ export const setupApps: {
     name: `Gertrude Podcasts`,
     platforms: [`iphone`, `ipad`],
     description: `Approved podcasts, with a PIN to add new shows.`,
-    instructions: `Connect the app on their device and set a PIN for adding new shows.`,
+    instructions: `Install it on their iPhone or iPad, connect it to your account, and set a PIN for adding new shows.`,
     icon: `/gertrude-app-icons/podcasts.webp`,
   },
 ];

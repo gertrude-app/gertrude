@@ -21,7 +21,6 @@ const defaultProps: PeoplePageProps = {
   peopleState: { status: `success`, data: people },
   suspensionRequestsState: { status: `success`, data: suspensionRequests },
   securityEventsState: { status: `success`, data: securityEvents },
-  onRefreshSuspensionRequests: noop,
   onRefreshSecurityEvents: noop,
   addPersonHref: `/people/new`,
   unlockRequestSummary: {
@@ -190,12 +189,6 @@ export const PeopleLoading = {
   render: () => renderPage({ peopleState: { status: `loading` } }),
 };
 
-export const SuspensionRequestsLoading = {
-  name: 'Suspension requests loading independently',
-  parameters: galleryParameters,
-  render: () => renderPage({ suspensionRequestsState: { status: `loading` } }),
-};
-
 export const PeopleError = {
   name: 'People error',
   parameters: galleryParameters,
@@ -219,16 +212,6 @@ export const SuspensionRequestsError = {
         message: `Check your connection and try again.`,
         onRetry: noop,
       },
-    }),
-};
-
-export const SuspensionRequestsRefreshing = {
-  name: 'Suspension requests refreshing',
-  parameters: galleryParameters,
-  render: () =>
-    renderPage({
-      suspensionRequestsState: { status: `success`, data: [] },
-      refreshingSuspensionRequests: true,
     }),
 };
 

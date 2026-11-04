@@ -51,7 +51,12 @@ const PersonBasicSettingsRoute: React.FC = () => {
     },
   });
   const deletePerson = useMutation(liveClient.deletePerson, {
-    invalidating: [Key.people, Key.activitySummaries, Key.suspensionRequests],
+    invalidating: [
+      Key.people,
+      Key.accountSetup,
+      Key.activitySummaries,
+      Key.suspensionRequests,
+    ],
     toast: {
       loading: `Deleting person…`,
       success: `Person deleted`,
@@ -132,6 +137,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
       setMacTrialStarted(false);
       void peopleQuery.refetch();
       void queryClient.invalidateQueries({ queryKey: Key.devices.segments });
+      void queryClient.invalidateQueries({ queryKey: Key.accountSetup.segments });
     }
   };
 

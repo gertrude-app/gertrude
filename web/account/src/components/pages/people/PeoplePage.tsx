@@ -40,8 +40,6 @@ interface Props {
   unlockRequestSummary?: GetAccountUnlockRequestSummary.Output;
   suspensionRequestsState: LoadableState<SuspensionRequest[]>;
   securityEventsState: LoadableState<SecurityEvent[]>;
-  onRefreshSuspensionRequests: () => void;
-  refreshingSuspensionRequests?: boolean;
   onRefreshSecurityEvents: () => void;
   refreshingSecurityEvents?: boolean;
   addPersonHref: string;
@@ -153,37 +151,19 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
   ));
 };
 
-const SuspensionRequestsLoadingState: React.FC = () => (
-  <RightColumnCard title="Suspension Requests">
-    <Card padding={3}>
-      <span role="status" className="sr-only">
-        Loading suspension requests
-      </span>
-      <VStack gap={3}>
-        <Skeleton className="h-4 w-28" />
-        <Skeleton radius="large" className="h-20 w-full" />
-      </VStack>
-    </Card>
-  </RightColumnCard>
-);
-
 interface SuspensionRequestsContentProps {
   state: LoadableState<SuspensionRequest[]>;
-  onRefresh: () => void;
-  refreshing?: boolean;
   viewAllHref: string;
   responseHrefForRequest: (id: string) => string;
 }
 
 const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
   state,
-  onRefresh,
-  refreshing,
   viewAllHref,
   responseHrefForRequest,
 }) => {
   if (state.status === `loading`) {
-    return <SuspensionRequestsLoadingState />;
+    return null;
   }
 
   if (state.status === `error`) {
@@ -201,8 +181,6 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
   return (
     <SuspensionRequestsPreviewCard
       suspensionRequests={state.data}
-      onRefresh={onRefresh}
-      refreshing={refreshing}
       viewAllHref={viewAllHref}
       responseHrefForRequest={responseHrefForRequest}
     />
@@ -216,8 +194,6 @@ const PeoplePage: React.FC<Props> = ({
   unlockRequestSummary,
   suspensionRequestsState,
   securityEventsState,
-  onRefreshSuspensionRequests,
-  refreshingSuspensionRequests,
   onRefreshSecurityEvents,
   refreshingSecurityEvents,
   addPersonHref,
@@ -303,8 +279,6 @@ const PeoplePage: React.FC<Props> = ({
           )}
           <SuspensionRequestsContent
             state={suspensionRequestsState}
-            onRefresh={onRefreshSuspensionRequests}
-            refreshing={refreshingSuspensionRequests}
             viewAllHref={suspensionRequestsHref}
             responseHrefForRequest={suspensionRequestHrefForRequest}
           />

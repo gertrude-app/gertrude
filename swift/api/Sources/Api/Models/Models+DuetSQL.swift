@@ -27,6 +27,7 @@ extension Semver: @retroactive PostgresBindable {
 extension GertieBlocker.BlockRule: @retroactive PostgresJsonable {}
 
 extension BlockerApp.ProfileSettings.Bookmark: PostgresJsonable, PostgresArrayBindable {}
+extension Parent.SetupApp: PostgresJsonable, PostgresArrayBindable {}
 
 extension Parent.NotificationMethod.Config: PostgresJsonable {}
 

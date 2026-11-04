@@ -84,6 +84,18 @@
     }
   },
   {
+    "id": "account-components-onboarding-setup-checklist--states",
+    "iframePath": "/iframe.html?id=account-components-onboarding-setup-checklist--states&viewMode=story",
+    "name": "States",
+    "path": "screenshots/desktop/account-components-onboarding-setup-checklist--states.png",
+    "title": "Account/Components/Onboarding/Setup Checklist",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-components-person-settings-block-group--states",
     "iframePath": "/iframe.html?id=account-components-person-settings-block-group--states&viewMode=story",
     "name": "States",
@@ -533,6 +545,30 @@
     "name": "Instructions",
     "path": "screenshots/desktop/account-devices-connect-mac-modal--instructions.png",
     "title": "Account/Devices/Connect Mac Modal",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-devices-install-ios-app-modal--music",
+    "iframePath": "/iframe.html?id=account-devices-install-ios-app-modal--music&viewMode=story",
+    "name": "Music",
+    "path": "screenshots/mobile/account-devices-install-ios-app-modal--music.png",
+    "title": "Account/Devices/Install iOS App Modal",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-devices-install-ios-app-modal--music",
+    "iframePath": "/iframe.html?id=account-devices-install-ios-app-modal--music&viewMode=story",
+    "name": "Music",
+    "path": "screenshots/desktop/account-devices-install-ios-app-modal--music.png",
+    "title": "Account/Devices/Install iOS App Modal",
     "viewport": {
       "width": 1440,
       "height": 900,
@@ -1968,6 +2004,54 @@
     }
   },
   {
+    "id": "account-pages-onboarding-choose-apps--default",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-onboarding-choose-apps--default.png",
+    "title": "Account/Pages/Onboarding/Choose Apps",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-choose-apps--default",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-onboarding-choose-apps--default.png",
+    "title": "Account/Pages/Onboarding/Choose Apps",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-choose-apps--multiple-apps-selected",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--multiple-apps-selected&viewMode=story",
+    "name": "Multiple apps selected",
+    "path": "screenshots/mobile/account-pages-onboarding-choose-apps--multiple-apps-selected.png",
+    "title": "Account/Pages/Onboarding/Choose Apps",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-choose-apps--multiple-apps-selected",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--multiple-apps-selected&viewMode=story",
+    "name": "Multiple apps selected",
+    "path": "screenshots/desktop/account-pages-onboarding-choose-apps--multiple-apps-selected.png",
+    "title": "Account/Pages/Onboarding/Choose Apps",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-people--default",
     "iframePath": "/iframe.html?id=account-pages-people--default&viewMode=story",
     "name": "Default",
@@ -2008,6 +2092,150 @@
     "iframePath": "/iframe.html?id=account-pages-people--empty&viewMode=story",
     "name": "Empty",
     "path": "screenshots/desktop/account-pages-people--empty.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started&viewMode=story",
+    "name": "Getting started / Mac and Music",
+    "path": "screenshots/mobile/account-pages-people--getting-started.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started&viewMode=story",
+    "name": "Getting started / Mac and Music",
+    "path": "screenshots/desktop/account-pages-people--getting-started.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-all-apps",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-all-apps&viewMode=story",
+    "name": "Getting started / All apps",
+    "path": "screenshots/mobile/account-pages-people--getting-started-all-apps.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-all-apps",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-all-apps&viewMode=story",
+    "name": "Getting started / All apps",
+    "path": "screenshots/desktop/account-pages-people--getting-started-all-apps.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-blocker",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-blocker&viewMode=story",
+    "name": "Getting started / Blocker only",
+    "path": "screenshots/mobile/account-pages-people--getting-started-blocker.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-blocker",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-blocker&viewMode=story",
+    "name": "Getting started / Blocker only",
+    "path": "screenshots/desktop/account-pages-people--getting-started-blocker.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-mac-connected",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-mac-connected&viewMode=story",
+    "name": "Getting started / Mac connected",
+    "path": "screenshots/mobile/account-pages-people--getting-started-mac-connected.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-mac-connected",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-mac-connected&viewMode=story",
+    "name": "Getting started / Mac connected",
+    "path": "screenshots/desktop/account-pages-people--getting-started-mac-connected.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-person-added",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-person-added&viewMode=story",
+    "name": "Getting started / First person added",
+    "path": "screenshots/mobile/account-pages-people--getting-started-person-added.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-person-added",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-person-added&viewMode=story",
+    "name": "Getting started / First person added",
+    "path": "screenshots/desktop/account-pages-people--getting-started-person-added.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-undecided",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-undecided&viewMode=story",
+    "name": "Getting started / Apps undecided",
+    "path": "screenshots/mobile/account-pages-people--getting-started-undecided.png",
+    "title": "Account/Pages/People",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-people--getting-started-undecided",
+    "iframePath": "/iframe.html?id=account-pages-people--getting-started-undecided&viewMode=story",
+    "name": "Getting started / Apps undecided",
+    "path": "screenshots/desktop/account-pages-people--getting-started-undecided.png",
     "title": "Account/Pages/People",
     "viewport": {
       "width": 1440,
@@ -2128,54 +2356,6 @@
     "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-error&viewMode=story",
     "name": "Suspension requests error",
     "path": "screenshots/desktop/account-pages-people--suspension-requests-error.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people--suspension-requests-loading",
-    "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-loading&viewMode=story",
-    "name": "Suspension requests loading independently",
-    "path": "screenshots/mobile/account-pages-people--suspension-requests-loading.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-pages-people--suspension-requests-loading",
-    "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-loading&viewMode=story",
-    "name": "Suspension requests loading independently",
-    "path": "screenshots/desktop/account-pages-people--suspension-requests-loading.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people--suspension-requests-refreshing",
-    "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-refreshing&viewMode=story",
-    "name": "Suspension requests refreshing",
-    "path": "screenshots/mobile/account-pages-people--suspension-requests-refreshing.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-pages-people--suspension-requests-refreshing",
-    "iframePath": "/iframe.html?id=account-pages-people--suspension-requests-refreshing&viewMode=story",
-    "name": "Suspension requests refreshing",
-    "path": "screenshots/desktop/account-pages-people--suspension-requests-refreshing.png",
     "title": "Account/Pages/People",
     "viewport": {
       "width": 1440,
@@ -4157,6 +4337,18 @@
     "name": "Verification Invalid",
     "path": "screenshots/desktop/account-pages-unauthed--verification-invalid.png",
     "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "ui-components-app-icon--assortment",
+    "iframePath": "/iframe.html?id=ui-components-app-icon--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-app-icon--assortment.png",
+    "title": "UI/Components/App Icon",
     "viewport": {
       "width": 1440,
       "height": 900,

@@ -26,7 +26,6 @@ interface Props {
   addDeviceHrefForPerson?: (personId: string) => string;
   suspensionRequestsHref: string;
   suspensionRequestHrefForRequest: (id: string) => string;
-  onRefreshSuspensionRequests: () => void;
   onRefreshSecurityEvents: () => void;
   unlockRequestsHref: string;
   securityEventsHref?: string;
@@ -44,7 +43,6 @@ const PeoplePageReference: React.FC<Props> = ({
   addDeviceHrefForPerson,
   suspensionRequestsHref,
   suspensionRequestHrefForRequest,
-  onRefreshSuspensionRequests,
   onRefreshSecurityEvents,
   unlockRequestsHref,
   securityEventsHref,
@@ -85,7 +83,6 @@ const PeoplePageReference: React.FC<Props> = ({
       <VStack gap={6} className="@5xl/main:w-72 shrink-0">
         <SuspensionRequestsPreviewCard
           suspensionRequests={suspensionRequests}
-          onRefresh={onRefreshSuspensionRequests}
           viewAllHref={suspensionRequestsHref}
           responseHrefForRequest={suspensionRequestHrefForRequest}
         />

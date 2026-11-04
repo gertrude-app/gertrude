@@ -33,7 +33,6 @@ export const Default = {
         addDeviceHrefForPerson={(personId) => `/people/${personId}/devices/new`}
         suspensionRequestsHref="/requests/suspension"
         suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
-        onRefreshSuspensionRequests={noop}
         onRefreshSecurityEvents={noop}
         unlockRequestsHref="/requests/unlock"
         securityEventsHref="/security-events"

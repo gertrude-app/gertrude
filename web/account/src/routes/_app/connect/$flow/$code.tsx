@@ -104,7 +104,7 @@ const ConnectFlow: React.FC<{
     },
   );
   const claim = useMutation(liveClient.claimAccountIOSDevice, {
-    invalidating: [queryKey, Key.devices, Key.people],
+    invalidating: [queryKey, Key.devices, Key.people, Key.accountSetup],
   });
   const startCheckout = useMutation(liveClient.startAccountCheckout);
   const openPortal = useMutation(liveClient.openAccountBillingPortal);
