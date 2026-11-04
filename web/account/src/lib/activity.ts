@@ -194,9 +194,13 @@ export function dayRange(day: string): { start: string; end: string } {
 export function chunkActivityBySuspension(
   items: readonly ActivityItem[],
 ): ActivityChunk[] {
-  return items.reduce<ActivityChunk[]>((chunks, item) => {
-    const chunkType = item.duringSuspension ? `duringSuspension` : `normal`;
+  return items.reduce<ActivityChunk[]>((chunks, item, index) => {
     const lastChunk = chunks.at(-1);
+    const duringSuspension =
+      item.duringSuspension ||
+      (lastChunk?.type === `duringSuspension` &&
+        shouldMergeKeystrokeIntoSuspension(items, index));
+    const chunkType = duringSuspension ? `duringSuspension` : `normal`;
 
     if (lastChunk && lastChunk.type === chunkType) {
       lastChunk.items.push(item);
@@ -208,4 +212,42 @@ export function chunkActivityBySuspension(
 
     return chunks;
   }, []);
+}
+
+function shouldMergeKeystrokeIntoSuspension(
+  items: readonly ActivityItem[],
+  index: number,
+): boolean {
+  const item = items[index];
+  const previous = items[index - 1];
+  if (item?.type !== `keylog` || !previous) return false;
+
+  for (const next of items.slice(index + 1, index + 5)) {
+    if (next.type === `screenshot`) {
+      return (
+        next.duringSuspension &&
+        Math.abs(previous.date.getTime() - next.date.getTime()) < 4 * 60 * 1000
+      );
+    }
+    if (next.duringSuspension) return false;
+  }
+  return false;
+}
+
+export function chunkActivityForDeletion(
+  items: readonly ActivityItem[],
+  chunkSize = 100,
+): Array<{ chunks: ActivityChunk[]; previousItems: ActivityItem[] }> {
+  if (!Number.isInteger(chunkSize) || chunkSize < 1) {
+    throw new Error(`Activity chunk size must be a positive integer`);
+  }
+  const batches = [];
+  for (let offset = 0; offset < items.length; offset += chunkSize) {
+    const end = offset + chunkSize;
+    batches.push({
+      chunks: chunkActivityBySuspension(items.slice(offset, end)),
+      previousItems: end < items.length ? items.slice(0, end) : [],
+    });
+  }
+  return batches;
 }

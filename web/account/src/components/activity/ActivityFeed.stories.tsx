@@ -47,3 +47,16 @@ export const GroupedAndSinglePerson = {
     </StoryCanvas>
   ),
 };
+
+export const Chunked = {
+  render: () => (
+    <StoryCanvas innerClassName="max-w-4xl">
+      <ActivityFeed
+        items={activityItems}
+        chunkSize={2}
+        onDeleteItems={noop}
+        onDeletePersonActivity={noop}
+      />
+    </StoryCanvas>
+  ),
+};

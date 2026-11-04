@@ -1,12 +1,12 @@
 import { Button, HStack, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { TrashIcon } from 'lucide-react';
-import React from 'react';
+import React, { useRef } from 'react';
 import type { ActivityChunk, ActivityItem } from '#/lib/activity';
 import KeylogActivityItem from './KeylogActivityItem';
 import ScreenshotActivityItem from './ScreenshotActivityItem';
 import CardContainer from '#/components/layout/CardContainer';
-import { chunkActivityBySuspension } from '#/lib/activity';
+import { chunkActivityForDeletion } from '#/lib/activity';
 
 interface Props {
   personId: string;
@@ -15,6 +15,8 @@ interface Props {
   showHeading?: boolean;
   onToggleFlag?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onDeleteItems?: (ids: string[]) => void;
+  chunkSize?: number;
   onDeleteAll?: (personId: string) => void;
 }
 
@@ -25,23 +27,49 @@ const ActivityPersonSection: React.FC<Props> = ({
   showHeading = true,
   onToggleFlag,
   onDelete,
+  onDeleteItems,
+  chunkSize,
   onDeleteAll,
 }) => {
-  const chunkedItems = chunkActivityBySuspension(items);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const batches = chunkActivityForDeletion(items, chunkSize);
   const hasFlaggedItems = items.some((item) => item.flagged);
   const allItemsFlagged = items.every((item) => item.flagged);
 
   return (
-    <VStack gap={3}>
+    <VStack gap={3} ref={sectionRef}>
       {showHeading && <Text variant="heading">{personName}'s activity</Text>}
       <CardContainer className="flex flex-col gap-6">
-        {chunkedItems.map((chunk, index) => (
-          <ActivitySuspensionChunk
-            key={`${chunk.type}-${index}-${chunk.items[0]?.id ?? `empty`}`}
-            chunk={chunk}
-            onToggleFlag={onToggleFlag}
-            onDelete={onDelete}
-          />
+        {batches.map(({ chunks, previousItems }) => (
+          <React.Fragment key={chunks[0]?.items[0]?.id}>
+            {chunks.map((chunk) => (
+              <ActivitySuspensionChunk
+                key={chunk.items[0]?.id}
+                chunk={chunk}
+                onToggleFlag={onToggleFlag}
+                onDelete={onDelete}
+              />
+            ))}
+            {onDeleteItems && previousItems.length > 0 && (
+              <HStack justify="center">
+                <Button
+                  type="button"
+                  icon={TrashIcon}
+                  disabled={previousItems.every((item) => item.flagged)}
+                  onClick={() => {
+                    onDeleteItems(previousItems.map((item) => item.id));
+                    requestAnimationFrame(() => {
+                      sectionRef.current?.scrollIntoView({ block: `start` });
+                    });
+                  }}
+                >
+                  {previousItems.some((item) => item.flagged)
+                    ? `Delete unflagged activity in previous ${previousItems.length} items`
+                    : `Delete previous ${previousItems.length} items`}
+                </Button>
+              </HStack>
+            )}
+          </React.Fragment>
         ))}
         {onDeleteAll && (
           <HStack justify="center">

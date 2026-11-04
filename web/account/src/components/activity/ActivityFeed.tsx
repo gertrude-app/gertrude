@@ -10,6 +10,8 @@ interface Props {
   showPersonHeading?: boolean;
   onToggleFlag?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onDeleteItems?: (ids: string[]) => void;
+  chunkSize?: number;
   onDeletePersonActivity?: (personId: string) => void;
 }
 
@@ -25,6 +27,8 @@ const ActivityFeed: React.FC<Props> = ({
   showPersonHeading = true,
   onToggleFlag,
   onDelete,
+  onDeleteItems,
+  chunkSize = 100,
   onDeletePersonActivity,
 }) => {
   const visibleItems = items.filter((item) => !item.deleted);
@@ -71,6 +75,8 @@ const ActivityFeed: React.FC<Props> = ({
           showHeading={personName ? showPersonHeading : true}
           onToggleFlag={onToggleFlag}
           onDelete={onDelete}
+          onDeleteItems={onDeleteItems}
+          chunkSize={chunkSize}
           onDeleteAll={onDeletePersonActivity}
         />
       ))}
