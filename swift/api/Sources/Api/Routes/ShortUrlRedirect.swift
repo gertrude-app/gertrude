@@ -3,7 +3,7 @@ import Vapor
 
 enum ShortUrlRedirectRoute {
   @Sendable static func handler(_ request: Request) async throws -> Response {
-    let dashboardFallback = "\(request.env.dashboardUrl)/link-expired"
+    let dashboardFallback = "\(request.env.accountDashboardUrl.withoutTrailingSlashes)/link-expired"
     guard let shortId = request.parameters.get("shortId"),
           !shortId.isEmpty else {
       slackErr("Short URL redirect missing shortId parameter")

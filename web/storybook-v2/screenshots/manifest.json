@@ -3912,6 +3912,30 @@
     }
   },
   {
+    "id": "account-pages-unauthed--link-expired",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--link-expired&viewMode=story",
+    "name": "Link Expired",
+    "path": "screenshots/mobile/account-pages-unauthed--link-expired.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--link-expired",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--link-expired&viewMode=story",
+    "name": "Link Expired",
+    "path": "screenshots/desktop/account-pages-unauthed--link-expired.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-unauthed--login",
     "iframePath": "/iframe.html?id=account-pages-unauthed--login&viewMode=story",
     "name": "Login",

@@ -1,5 +1,6 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
+import LinkExpiredPage from './LinkExpiredPage';
 import LoginPage from './LoginPage';
 import { ChooseNewPasswordPage, RequestPasswordResetPage } from './PasswordResetPages';
 import SignupPage from './SignupPage';
@@ -170,6 +171,14 @@ export const VerificationInvalid = {
         }}
         onRetry={noop}
       />
+    </StoryScreen>
+  ),
+};
+
+export const LinkExpired = {
+  render: () => (
+    <StoryScreen>
+      <LinkExpiredPage />
     </StoryScreen>
   ),
 };

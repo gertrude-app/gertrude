@@ -15,6 +15,7 @@ import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
+import { Route as unauthedLinkExpiredRouteImport } from './routes/(unauthed)/link-expired'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
@@ -77,6 +78,11 @@ const unauthedSignupRoute = unauthedSignupRouteImport.update({
 const unauthedLoginRoute = unauthedLoginRouteImport.update({
   id: '/(unauthed)/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const unauthedLinkExpiredRoute = unauthedLinkExpiredRouteImport.update({
+  id: '/(unauthed)/link-expired',
+  path: '/link-expired',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppSettingsRouteRoute = AppSettingsRouteRouteImport.update({
@@ -267,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/people': typeof AppPeopleRouteRouteWithChildren
   '/settings': typeof AppSettingsRouteRouteWithChildren
+  '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
   '/security-events': typeof AppSecurityEventsRoute
@@ -305,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRoutesByTo {
+  '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
   '/security-events': typeof AppSecurityEventsRoute
@@ -345,6 +353,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/people': typeof AppPeopleRouteRouteWithChildren
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
+  '/(unauthed)/link-expired': typeof unauthedLinkExpiredRoute
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
@@ -389,6 +398,7 @@ export interface FileRouteTypes {
     | '/'
     | '/people'
     | '/settings'
+    | '/link-expired'
     | '/login'
     | '/signup'
     | '/security-events'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/activity/person/$personId/day/$day'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/link-expired'
     | '/login'
     | '/signup'
     | '/security-events'
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/people'
     | '/_app/settings'
+    | '/(unauthed)/link-expired'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
     | '/_app/security-events'
@@ -507,6 +519,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  unauthedLinkExpiredRoute: typeof unauthedLinkExpiredRoute
   unauthedLoginRoute: typeof unauthedLoginRoute
   unauthedSignupRoute: typeof unauthedSignupRoute
   unauthedOtpTokenRoute: typeof unauthedOtpTokenRoute
@@ -557,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof unauthedLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(unauthed)/link-expired': {
+      id: '/(unauthed)/link-expired'
+      path: '/link-expired'
+      fullPath: '/link-expired'
+      preLoaderRoute: typeof unauthedLinkExpiredRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/settings': {
@@ -945,6 +965,7 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
+  unauthedLinkExpiredRoute: unauthedLinkExpiredRoute,
   unauthedLoginRoute: unauthedLoginRoute,
   unauthedSignupRoute: unauthedSignupRoute,
   unauthedOtpTokenRoute: unauthedOtpTokenRoute,
