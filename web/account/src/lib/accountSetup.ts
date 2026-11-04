@@ -6,14 +6,22 @@ export function needsOnboarding(setup: GetAccountSetup.Output): boolean {
   return setup.selectedApps == null && !setup.hasPeople;
 }
 
-export function setupChecklist(
-  setup: GetAccountSetup.Output,
-): { selectedApps: SetupApp[]; completedSteps: SetupStepId[] } | null {
+export function setupChecklist(setup: GetAccountSetup.Output): {
+  selectedApps: SetupApp[];
+  completedSteps: SetupStepId[];
+  includeNotifications: boolean;
+} | null {
   const { selectedApps } = setup;
   if (selectedApps == null || !setup.hasPeople) return null;
-  const completedSteps: SetupStepId[] = [`person`, ...setup.completedApps];
-  const complete = getAppSetupSteps(selectedApps).every((step) =>
+  const includeNotifications =
+    selectedApps.includes(`mac`) || setup.completedApps.includes(`mac`);
+  const completedSteps: SetupStepId[] = [
+    `person`,
+    ...setup.completedApps,
+    ...(setup.hasNotifications ? [`notifications` as const] : []),
+  ];
+  const complete = getAppSetupSteps(selectedApps, includeNotifications).every((step) =>
     completedSteps.includes(step.id),
   );
-  return complete ? null : { selectedApps, completedSteps };
+  return complete ? null : { selectedApps, completedSteps, includeNotifications };
 }

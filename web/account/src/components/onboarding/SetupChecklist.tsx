@@ -10,6 +10,7 @@ import {
 
 interface Props {
   selectedApps: SetupApp[];
+  includeNotifications?: boolean;
   completedSteps: SetupStepId[];
   onSelectStep: (step: SetupStepId) => void;
   defaultExpanded?: boolean;
@@ -17,6 +18,7 @@ interface Props {
 
 const SetupChecklist: React.FC<Props> = ({
   selectedApps,
+  includeNotifications,
   completedSteps,
   onSelectStep,
   defaultExpanded = true,
@@ -26,7 +28,7 @@ const SetupChecklist: React.FC<Props> = ({
   const [expanded, setExpanded] = React.useState(defaultExpanded);
   const steps = [
     { id: `person` as const, title: `Add a person`, description: `` },
-    ...getAppSetupSteps(selectedApps),
+    ...getAppSetupSteps(selectedApps, includeNotifications),
   ];
   const completedCount = steps.filter((step) => completedSteps.includes(step.id)).length;
   const currentStep = steps.find((step) => !completedSteps.includes(step.id));

@@ -4632,6 +4632,18 @@
     }
   },
   {
+    "id": "ui-components-radiolist--assortment",
+    "iframePath": "/iframe.html?id=ui-components-radiolist--assortment&viewMode=story",
+    "name": "Assortment",
+    "path": "screenshots/desktop/ui-components-radiolist--assortment.png",
+    "title": "UI/Components/RadioList",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "ui-components-segmentedtabs--assortment",
     "iframePath": "/iframe.html?id=ui-components-segmentedtabs--assortment&viewMode=story",
     "name": "Assortment",

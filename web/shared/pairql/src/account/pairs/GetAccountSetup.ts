@@ -8,5 +8,6 @@ export namespace GetAccountSetup {
     selectedApps?: SetupApp[];
     hasPeople: boolean;
     completedApps: SetupApp[];
+    hasNotifications: boolean;
   }
 }

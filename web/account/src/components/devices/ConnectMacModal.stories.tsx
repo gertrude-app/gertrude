@@ -25,6 +25,20 @@ const renderModal = (state: ConnectMacState) => (
   </StoryCanvas>
 );
 
+export const ChoosePerson = {
+  name: 'Choose person',
+  parameters: galleryParameters,
+  render: () =>
+    renderModal({
+      case: `choosePerson`,
+      people: [
+        { id: `jude`, name: `Jude` },
+        { id: `kara`, name: `Kara` },
+        { id: `george`, name: `George` },
+      ],
+    }),
+};
+
 export const Instructions = {
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
   render: () => renderModal({ case: `instructions` }),

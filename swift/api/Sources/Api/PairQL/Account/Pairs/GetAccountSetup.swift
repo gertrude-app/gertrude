@@ -8,17 +8,22 @@ struct GetAccountSetup: Pair {
     var selectedApps: [Parent.SetupApp]?
     var hasPeople: Bool
     var completedApps: [Parent.SetupApp]
+    var hasNotifications: Bool
   }
 }
 
 extension GetAccountSetup: NoInputResolver {
   static func resolve(in context: AccountOwnerContext) async throws -> Output {
     let people = try await context.people()
+    let hasNotifications = try await Parent.Notification.query()
+      .where(.parentId == context.accountOwner.id)
+      .count(in: context.db) > 0
     guard !people.isEmpty else {
       return .init(
         selectedApps: context.accountOwner.setupApps,
         hasPeople: false,
         completedApps: [],
+        hasNotifications: hasNotifications,
       )
     }
 
@@ -47,6 +52,7 @@ extension GetAccountSetup: NoInputResolver {
       selectedApps: context.accountOwner.setupApps,
       hasPeople: true,
       completedApps: Parent.SetupApp.allCases.filter { completed[$0] == true },
+      hasNotifications: hasNotifications,
     )
   }
 }

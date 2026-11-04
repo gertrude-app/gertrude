@@ -27,7 +27,7 @@ const NotificationSettingsRoute: React.FC = () => {
     },
   });
   const saveNotification = useMutation(liveClient.saveAccountNotification, {
-    invalidating: [Key.accountSettings],
+    invalidating: [Key.accountSettings, Key.accountSetup],
     toast: {
       loading: `Saving notification…`,
       success: `Notification saved`,
@@ -35,7 +35,7 @@ const NotificationSettingsRoute: React.FC = () => {
     },
   });
   const deleteNotification = useMutation(liveClient.deleteAccountNotification, {
-    invalidating: [Key.accountSettings],
+    invalidating: [Key.accountSettings, Key.accountSetup],
     toast: {
       loading: `Deleting notification…`,
       success: `Notification deleted`,
@@ -43,7 +43,7 @@ const NotificationSettingsRoute: React.FC = () => {
     },
   });
   const deleteMethod = useMutation(liveClient.deleteAccountNotificationMethod, {
-    invalidating: [Key.accountSettings],
+    invalidating: [Key.accountSettings, Key.accountSetup],
     toast: {
       loading: `Deleting method…`,
       success: `Notification method deleted`,

@@ -1,4 +1,4 @@
-import { Banner, Button, HStack, Modal, Text, VStack } from '@gertrude/ui';
+import { Banner, Button, HStack, Modal, RadioList, Text, VStack } from '@gertrude/ui';
 import {
   CheckIcon,
   CopyIcon,
@@ -11,6 +11,7 @@ import InstructionStep from './InstructionStep';
 import PromoCard from '#/components/PromoCard';
 
 export type ConnectMacState =
+  | { case: `choosePerson`; people: { id: string; name: string }[] }
   | { case: `instructions`; requesting?: boolean }
   | { case: `error`; message: string }
   | { case: `trialRequired`; startingTrial?: boolean }
@@ -23,6 +24,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   personName: string;
   state: ConnectMacState;
+  onChoosePerson?: (personId: string) => void;
   onRequestCode: () => void;
   onStartTrial: () => void;
 };
@@ -32,10 +34,12 @@ const ConnectMacModal: React.FC<Props> = ({
   onOpenChange,
   personName,
   state,
+  onChoosePerson,
   onRequestCode,
   onStartTrial,
 }) => {
   const [copied, setCopied] = React.useState(false);
+  const [chosenPersonId, setChosenPersonId] = React.useState<string>();
   const busy =
     (state.case === `instructions` && state.requesting === true) ||
     (state.case === `trialRequired` && state.startingTrial === true);
@@ -44,6 +48,7 @@ const ConnectMacModal: React.FC<Props> = ({
 
   React.useEffect(() => {
     setCopied(false);
+    setChosenPersonId(undefined);
   }, [open, state.case]);
 
   const handleCopy = async (code: string): Promise<void> => {
@@ -61,6 +66,36 @@ const ConnectMacModal: React.FC<Props> = ({
   let footer: React.ReactNode;
 
   switch (state.case) {
+    case `choosePerson`:
+      title = `Connect a Mac`;
+      description = `Who will use this Mac?`;
+      body = (
+        <RadioList
+          ariaLabel="Who will use this Mac?"
+          options={state.people.map((person) => ({
+            value: person.id,
+            label: person.name,
+          }))}
+          selected={chosenPersonId}
+          onSelect={setChosenPersonId}
+        />
+      );
+      footer = (
+        <>
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            disabled={chosenPersonId === undefined}
+            onClick={() => chosenPersonId && onChoosePerson?.(chosenPersonId)}
+          >
+            Continue
+          </Button>
+        </>
+      );
+      break;
     case `instructions`:
       body = <ConnectionInstructions personName={personName} />;
       footer = (

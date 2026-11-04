@@ -7,7 +7,9 @@ import {
 } from '@tanstack/react-router';
 import React from 'react';
 import type { IOSSetupApp, SetupStepId } from '#/components/onboarding/setupApps';
+import ConnectMacModal from '#/components/devices/ConnectMacModal';
 import InstallIOSAppModal from '#/components/devices/InstallIOSAppModal';
+import { useConnectMac } from '#/components/devices/useConnectMac';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
 import SetupChecklist from '#/components/onboarding/SetupChecklist';
 import { appStoreUrls, setupApps } from '#/components/onboarding/setupApps';
@@ -44,6 +46,7 @@ const AuthedLayout: React.FC = () => {
   const [installApp, setInstallApp] = React.useState<IOSSetupApp>(`blocker`);
   const [installOpen, setInstallOpen] = React.useState(false);
   const shareLink = useShareLink();
+  const { connectMac, modalProps: connectMacModalProps } = useConnectMac();
   const requestCount =
     (unlockRequests.data?.totalCount ?? 0) + (suspensionRequests.data?.length ?? 0);
   React.useEffect(() => {
@@ -61,14 +64,17 @@ const AuthedLayout: React.FC = () => {
       case `choose-apps`:
         void navigate({ to: `/welcome` });
         return;
-      case `mac`: {
-        if (onlyPerson) {
-          void navigate({ to: `/people/$personId`, params: { personId: onlyPerson.id } });
-        } else {
-          void navigate({ to: `/people` });
-        }
+      case `notifications`:
+        void navigate({ to: `/settings/notifications` });
         return;
-      }
+      case `mac`:
+        connectMac(
+          (peopleQuery.data ?? []).map((person) => ({
+            id: person.id,
+            name: person.name,
+          })),
+        );
+        return;
       default:
         shareLink.reset();
         setInstallApp(step);
@@ -85,6 +91,7 @@ const AuthedLayout: React.FC = () => {
         checklist && (
           <SetupChecklist
             selectedApps={checklist.selectedApps}
+            includeNotifications={checklist.includeNotifications}
             completedSteps={checklist.completedSteps}
             onSelectStep={selectStep}
           />
@@ -92,6 +99,7 @@ const AuthedLayout: React.FC = () => {
       }
     >
       <Outlet />
+      <ConnectMacModal {...connectMacModalProps} />
       <InstallIOSAppModal
         open={installOpen}
         onOpenChange={setInstallOpen}

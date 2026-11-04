@@ -12,6 +12,24 @@ final class AccountSetupResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.selectedApps).toBeNil()
     expect(output.hasPeople).toBeFalse()
     expect(output.completedApps).toEqual([])
+    expect(output.hasNotifications).toBeFalse()
+  }
+
+  func testCreatingANotificationCompletesNotificationSetup() async throws {
+    let parent = try await self.parent()
+    let method = try await self.db.create(Parent.NotificationMethod(
+      parentId: parent.id,
+      config: .email(email: "parent@example.com"),
+    ))
+    try await self.db.create(Parent.Notification(
+      parentId: parent.id,
+      methodId: method.id,
+      trigger: .suspendFilterRequestSubmitted,
+    ))
+
+    let output = try await GetAccountSetup.resolve(in: self.accountContext(parent))
+
+    expect(output.hasNotifications).toBeTrue()
   }
 
   func testSetupAppsAreSavedDedupedInCanonicalOrder() async throws {

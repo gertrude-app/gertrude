@@ -1,10 +1,9 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import type { ConnectMacState } from '#/components/devices/ConnectMacModal';
 import type { PersonRelationship } from '#/components/types';
 import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
 import ConnectMacModal from '#/components/devices/ConnectMacModal';
+import { useConnectMac } from '#/components/devices/useConnectMac';
 import PersonBasicSettingsPage from '#/components/pages/people/PersonBasicSettingsPage';
 import { toPersonCardPerson } from '#/lib/people';
 import { liveClient } from '#/pairql/client';
@@ -15,7 +14,6 @@ import { useQuery } from '#/pairql/query';
 const PersonBasicSettingsRoute: React.FC = () => {
   const { personId } = Route.useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
   const personData = peopleQuery.data?.find(
     (candidate) => candidate.id.toLowerCase() === personId.toLowerCase(),
@@ -35,8 +33,6 @@ const PersonBasicSettingsRoute: React.FC = () => {
     personRelationship ?? `child`,
   );
   const [allowNavigation, setAllowNavigation] = React.useState(false);
-  const [connectMacOpen, setConnectMacOpen] = React.useState(false);
-  const [macTrialStarted, setMacTrialStarted] = React.useState(false);
   const draftPersonId = React.useRef<string | undefined>(undefined);
   const hasUnsavedChanges =
     person !== undefined &&
@@ -64,7 +60,6 @@ const PersonBasicSettingsRoute: React.FC = () => {
     },
     onSuccess: () => void navigate({ to: `/people`, replace: true }),
   });
-  const createMacConnectionCode = useMutation(liveClient.createMacConnectionCode);
   const disconnectMac = useMutation(liveClient.disconnectMacConnection, {
     invalidating: [
       Key.people,
@@ -81,15 +76,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
       error: `Couldn't disconnect Mac`,
     },
   });
-  const startMacTrial = useMutation(liveClient.startAccountFullTrial, {
-    invalidating: [Key.accountBilling],
-    toast: {
-      loading: `Starting trial…`,
-      success: `Full trial started`,
-      error: `Couldn't start the trial`,
-    },
-    onSuccess: () => setMacTrialStarted(true),
-  });
+  const { connectMac, modalProps: connectMacModalProps } = useConnectMac();
 
   React.useEffect(() => {
     if (
@@ -108,38 +95,6 @@ const PersonBasicSettingsRoute: React.FC = () => {
   if (!person) {
     return null;
   }
-
-  const connectionOutput = createMacConnectionCode.data;
-  const connectMacState: ConnectMacState = createMacConnectionCode.isPending
-    ? { case: `instructions`, requesting: true }
-    : createMacConnectionCode.isError
-      ? {
-          case: `error`,
-          message:
-            createMacConnectionCode.error.userMessage ??
-            `Couldn't create a connection code. Check your connection and try again.`,
-        }
-      : connectionOutput?.gate === `trialRequired` && !macTrialStarted
-        ? { case: `trialRequired`, startingTrial: startMacTrial.isPending }
-        : connectionOutput?.gate === `planUpgradeRequired`
-          ? { case: `planUpgradeRequired` }
-          : connectionOutput?.gate === `subscriptionFixRequired`
-            ? { case: `subscriptionFixRequired` }
-            : connectionOutput
-              ? { case: `ready`, code: connectionOutput.code }
-              : { case: `instructions` };
-
-  const handleConnectMacOpenChange = (open: boolean): void => {
-    setConnectMacOpen(open);
-    if (!open) {
-      createMacConnectionCode.reset();
-      startMacTrial.reset();
-      setMacTrialStarted(false);
-      void peopleQuery.refetch();
-      void queryClient.invalidateQueries({ queryKey: Key.devices.segments });
-      void queryClient.invalidateQueries({ queryKey: Key.accountSetup.segments });
-    }
-  };
 
   return (
     <>
@@ -169,12 +124,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
             () => setAllowNavigation(false),
           );
         }}
-        onConnectMac={() => {
-          createMacConnectionCode.reset();
-          startMacTrial.reset();
-          setMacTrialStarted(false);
-          setConnectMacOpen(true);
-        }}
+        onConnectMac={() => connectMac([{ id: person.id, name: person.name }])}
         onDisconnectMac={(connectionId) =>
           disconnectMac.mutateAsync({ connectionId }).then(
             () => true,
@@ -182,14 +132,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
           )
         }
       />
-      <ConnectMacModal
-        open={connectMacOpen}
-        onOpenChange={handleConnectMacOpenChange}
-        personName={person.name}
-        state={connectMacState}
-        onRequestCode={() => createMacConnectionCode.mutate({ personId: person.id })}
-        onStartTrial={() => startMacTrial.mutate(undefined)}
-      />
+      <ConnectMacModal {...connectMacModalProps} />
       <UnsavedChangesGuard
         hasUnsavedChanges={hasUnsavedChanges && !allowNavigation}
         description="Your basic settings haven't been saved."

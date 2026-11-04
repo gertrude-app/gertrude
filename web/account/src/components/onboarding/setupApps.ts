@@ -57,7 +57,7 @@ export const setupApps: {
   },
 ];
 
-export type SetupStepId = `person` | `choose-apps` | SetupApp;
+export type SetupStepId = `person` | `choose-apps` | `notifications` | SetupApp;
 
 export type SetupStep = {
   id: SetupStepId;
@@ -73,22 +73,35 @@ export const personSetupStep: SetupStep = {
   description: `Create a profile for your child, yourself, or someone you’re helping protect.`,
 };
 
-export const getAppSetupSteps = (selectedApps: SetupApp[]): SetupStep[] => {
+export const notificationsSetupStep: SetupStep = {
+  id: `notifications`,
+  title: `Set up notifications`,
+  description: `Choose how Gertrude alerts you about requests and security events.`,
+};
+
+export const getAppSetupSteps = (
+  selectedApps: SetupApp[],
+  includeNotifications = selectedApps.includes(`mac`),
+): SetupStep[] => {
   const apps = setupApps.filter((app) => selectedApps.includes(app.id));
-  if (apps.length === 0) {
-    return [
-      {
-        id: `choose-apps`,
-        title: `Choose an app to set up`,
-        description: `Pick the Gertrude app you’d like to use first.`,
-      },
-    ];
-  }
-  return apps.map((app) => ({
-    id: app.id,
-    title: `Set up ${app.name}`,
-    description: app.instructions,
-    icon: app.icon,
-    iconOutlined: app.iconOutlined,
-  }));
+  const steps: SetupStep[] =
+    apps.length === 0
+      ? [
+          {
+            id: `choose-apps`,
+            title: `Choose an app to set up`,
+            description: `Pick the Gertrude app you’d like to use first.`,
+          },
+        ]
+      : apps.map((app) => ({
+          id: app.id,
+          title: `Set up ${app.name}`,
+          description: app.instructions,
+          icon: app.icon,
+          iconOutlined: app.iconOutlined,
+        }));
+  if (!includeNotifications) return steps;
+  const macIndex = steps.findIndex((step) => step.id === `mac`);
+  steps.splice(macIndex === -1 ? steps.length : macIndex + 1, 0, notificationsSetupStep);
+  return steps;
 };

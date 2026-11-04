@@ -46,7 +46,7 @@ const Sidebar: React.FC<Props> = ({
   }, []);
 
   return (
-    <div className="sticky top-0 flex h-dvh w-68 shrink-0 flex-col border-r border-stone-300/80 bg-stone-50 min-[940px]:border-stone-200">
+    <div className="sticky top-0 flex h-dvh w-68 shrink-0 flex-col overflow-y-clip border-r border-stone-300/80 bg-stone-50 min-[940px]:border-stone-200">
       <div
         ref={scrollRef}
         className={cx(

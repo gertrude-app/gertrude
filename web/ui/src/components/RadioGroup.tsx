@@ -1,9 +1,9 @@
 import cx from 'clsx';
 import React from 'react';
-import HStack from '../primitives/HStack';
 import Stack from '../primitives/Stack';
 import Text from '../primitives/Text';
 import VStack from '../primitives/VStack';
+import RadioDot from './RadioDot';
 
 interface Props {
   selected: string;
@@ -71,24 +71,10 @@ const RadioGroup: React.FC<Props> = ({
                 onChange={() => setSelected(value)}
                 className="peer sr-only"
               />
-              <HStack
-                as="span"
-                justify="center"
-                aria-hidden="true"
-                className={cx(
-                  `h-4.5 w-4.5 shrink-0 rounded-full border bg-white shadow-sm transition-[border-color,box-shadow] duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50`,
-                  checked
-                    ? `border-violet-800 shadow-violet-500/20`
-                    : `border-stone-300/80 shadow-stone-300/30`,
-                )}
-              >
-                <span
-                  className={cx(
-                    `h-2.25 w-2.25 rounded-full bg-violet-500 transition-[opacity,scale] duration-150`,
-                    checked ? `scale-100 opacity-100` : `scale-50 opacity-0`,
-                  )}
-                />
-              </HStack>
+              <RadioDot
+                checked={checked}
+                className="peer-focus-visible:ring-2 peer-focus-visible:ring-violet-300/80 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-stone-50"
+              />
               <Text variant="bodyStrong">{value}</Text>
             </label>
           );
