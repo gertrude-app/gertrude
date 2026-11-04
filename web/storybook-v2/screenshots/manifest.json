@@ -3840,10 +3840,10 @@
     }
   },
   {
-    "id": "account-pages-settings-checkout-result--checkout-succeeded",
-    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-succeeded&viewMode=story",
-    "name": "Checkout succeeded",
-    "path": "screenshots/mobile/account-pages-settings-checkout-result--checkout-succeeded.png",
+    "id": "account-pages-settings-checkout-result--checkout-failed",
+    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-failed&viewMode=story",
+    "name": "Checkout failed",
+    "path": "screenshots/mobile/account-pages-settings-checkout-result--checkout-failed.png",
     "title": "Account/Pages/Settings/Checkout result",
     "viewport": {
       "width": 390,
@@ -3852,10 +3852,10 @@
     }
   },
   {
-    "id": "account-pages-settings-checkout-result--checkout-succeeded",
-    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-succeeded&viewMode=story",
-    "name": "Checkout succeeded",
-    "path": "screenshots/desktop/account-pages-settings-checkout-result--checkout-succeeded.png",
+    "id": "account-pages-settings-checkout-result--checkout-failed",
+    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-failed&viewMode=story",
+    "name": "Checkout failed",
+    "path": "screenshots/desktop/account-pages-settings-checkout-result--checkout-failed.png",
     "title": "Account/Pages/Settings/Checkout result",
     "viewport": {
       "width": 1440,
