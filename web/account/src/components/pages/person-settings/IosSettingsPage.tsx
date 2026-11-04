@@ -355,6 +355,7 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
       )}
       <PersonSettingsExpandableSection
         appIconUrl="/gertrude-app-icons/blocker.webp"
+        appIconOutlined
         title="Gertrude Blocker"
         headingLevel="h4"
         defaultExpanded={defaultExpanded}
@@ -448,6 +449,7 @@ const IosSettingsPage: React.FC<Props> = ({
       ) : (
         <PersonSettingsExpandableSection
           appIconUrl="/gertrude-app-icons/blocker.webp"
+          appIconOutlined
           title="Gertrude Blocker"
           headingLevel="h4"
           defaultExpanded={defaultExpandedSection === `blocker`}

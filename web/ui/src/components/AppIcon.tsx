@@ -4,10 +4,16 @@ import React from 'react';
 interface Props {
   src: string;
   size?: `small` | `medium` | `large`;
+  outlined?: boolean;
   className?: string;
 }
 
-const AppIcon: React.FC<Props> = ({ src, size = `small`, className }) => (
+const AppIcon: React.FC<Props> = ({
+  src,
+  size = `small`,
+  outlined = false,
+  className,
+}) => (
   <span
     aria-hidden="true"
     className={cx(
@@ -28,8 +34,11 @@ const AppIcon: React.FC<Props> = ({ src, size = `small`, className }) => (
     <img
       src={src}
       alt=""
-      className="relative size-full rounded-[inherit] border border-stone-200/70 shadow shadow-stone-300/30"
+      className="relative size-full rounded-[inherit] shadow shadow-stone-300/30"
     />
+    {outlined && (
+      <span className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-stone-900/10" />
+    )}
   </span>
 );
 

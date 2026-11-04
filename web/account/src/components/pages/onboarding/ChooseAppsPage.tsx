@@ -137,6 +137,7 @@ const ChooseAppsPage: React.FC<Props> = ({
                       <AppIcon
                         src={app.icon}
                         size="medium"
+                        outlined={app.iconOutlined}
                         className="@2xl/main:size-12"
                       />
                       <Text

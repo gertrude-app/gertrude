@@ -70,7 +70,13 @@ const InstallIOSAppModal: React.FC<Props> = ({
                 <QrCode
                   value={appStoreUrls[app]}
                   label={`QR code for ${details.name} on the App Store`}
-                  center={<AppIcon src={details.icon} size="medium" />}
+                  center={
+                    <AppIcon
+                      src={details.icon}
+                      size="medium"
+                      outlined={details.iconOutlined}
+                    />
+                  }
                   className="size-52"
                 />
               </div>

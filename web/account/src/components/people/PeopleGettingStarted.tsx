@@ -89,7 +89,7 @@ const PeopleGettingStarted: React.FC<PeopleGettingStartedProps> = ({
             </HStack>
             {step.icon && (
               <div className="flex w-18 shrink-0 items-center justify-center border-l border-stone-200/70 bg-stone-50">
-                <AppIcon src={step.icon} />
+                <AppIcon src={step.icon} outlined={step.iconOutlined} />
               </div>
             )}
           </Card>

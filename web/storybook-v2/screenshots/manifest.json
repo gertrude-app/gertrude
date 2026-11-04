@@ -2004,30 +2004,6 @@
     }
   },
   {
-    "id": "account-pages-onboarding-choose-apps--default",
-    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--default&viewMode=story",
-    "name": "Default",
-    "path": "screenshots/mobile/account-pages-onboarding-choose-apps--default.png",
-    "title": "Account/Pages/Onboarding/Choose Apps",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-pages-onboarding-choose-apps--default",
-    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--default&viewMode=story",
-    "name": "Default",
-    "path": "screenshots/desktop/account-pages-onboarding-choose-apps--default.png",
-    "title": "Account/Pages/Onboarding/Choose Apps",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
     "id": "account-pages-onboarding-choose-apps--multiple-apps-selected",
     "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--multiple-apps-selected&viewMode=story",
     "name": "Multiple apps selected",
@@ -2116,54 +2092,6 @@
     "iframePath": "/iframe.html?id=account-pages-people--getting-started&viewMode=story",
     "name": "Getting started / Mac and Music",
     "path": "screenshots/desktop/account-pages-people--getting-started.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people--getting-started-all-apps",
-    "iframePath": "/iframe.html?id=account-pages-people--getting-started-all-apps&viewMode=story",
-    "name": "Getting started / All apps",
-    "path": "screenshots/mobile/account-pages-people--getting-started-all-apps.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-pages-people--getting-started-all-apps",
-    "iframePath": "/iframe.html?id=account-pages-people--getting-started-all-apps&viewMode=story",
-    "name": "Getting started / All apps",
-    "path": "screenshots/desktop/account-pages-people--getting-started-all-apps.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "account-pages-people--getting-started-blocker",
-    "iframePath": "/iframe.html?id=account-pages-people--getting-started-blocker&viewMode=story",
-    "name": "Getting started / Blocker only",
-    "path": "screenshots/mobile/account-pages-people--getting-started-blocker.png",
-    "title": "Account/Pages/People",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-pages-people--getting-started-blocker",
-    "iframePath": "/iframe.html?id=account-pages-people--getting-started-blocker&viewMode=story",
-    "name": "Getting started / Blocker only",
-    "path": "screenshots/desktop/account-pages-people--getting-started-blocker.png",
     "title": "Account/Pages/People",
     "viewport": {
       "width": 1440,

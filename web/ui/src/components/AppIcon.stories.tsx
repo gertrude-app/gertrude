@@ -21,7 +21,12 @@ export const Assortment: Story = {
     <StoryCanvas>
       <StorySection title="Sizes">
         {sizes.map((size) => (
-          <AppIcon key={size} src="/gertrude-app-icons/blocker.webp" size={size} />
+          <AppIcon
+            key={size}
+            src="/gertrude-app-icons/blocker.webp"
+            size={size}
+            outlined
+          />
         ))}
       </StorySection>
       <StorySection title="App artwork">

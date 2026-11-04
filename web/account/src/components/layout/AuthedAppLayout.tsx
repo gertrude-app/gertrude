@@ -36,16 +36,14 @@ const AuthedAppLayout: React.FC<Props> = ({
       <Sidebar
         logoUrl="/logo-wordmark.svg"
         logoWidth={140}
-        bottomContent={
-          <>
-            {sidebarContent}
-            <SidebarItem
-              title="Settings"
-              icon={SettingsIcon}
-              href="/settings"
-              selected={isSelected(`/settings`)}
-            />
-          </>
+        bottomContent={sidebarContent}
+        footer={
+          <SidebarItem
+            title="Settings"
+            icon={SettingsIcon}
+            href="/settings"
+            selected={isSelected(`/settings`)}
+          />
         }
       >
         <SidebarSection title={showMacSection ? `Platform` : undefined}>

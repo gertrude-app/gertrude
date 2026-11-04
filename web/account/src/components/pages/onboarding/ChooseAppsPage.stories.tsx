@@ -1,6 +1,5 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
-import type { ReactElement } from 'react';
-import ChooseAppsPage, { type SetupApp } from './ChooseAppsPage';
+import ChooseAppsPage from './ChooseAppsPage';
 
 const noop = (): void => {};
 
@@ -16,22 +15,16 @@ const meta = {
 
 export default meta;
 
-const renderPage = (selectedApps: SetupApp[]): ReactElement => (
-  <StoryScreen>
-    <ChooseAppsPage
-      selectedApps={selectedApps}
-      onSelectedAppsChange={noop}
-      onContinue={noop}
-      onSkip={noop}
-    />
-  </StoryScreen>
-);
-
-export const Default = {
-  render: () => renderPage([]),
-};
-
 export const MultipleAppsSelected = {
   name: 'Multiple apps selected',
-  render: () => renderPage([`mac`, `music`]),
+  render: () => (
+    <StoryScreen>
+      <ChooseAppsPage
+        selectedApps={[`mac`, `music`]}
+        onSelectedAppsChange={noop}
+        onContinue={noop}
+        onSkip={noop}
+      />
+    </StoryScreen>
+  ),
 };

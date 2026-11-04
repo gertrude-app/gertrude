@@ -15,6 +15,7 @@ export type PersonSettingsExpandableSectionProps = {
   title: string;
   previewChips: PersonSettingsPreviewChip[];
   appIconUrl?: string;
+  appIconOutlined?: boolean;
   headingLevel?: PersonSettingsHeadingLevel;
   defaultExpanded?: boolean;
   hasUnsavedChanges?: boolean;
@@ -25,6 +26,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
   title,
   previewChips,
   appIconUrl,
+  appIconOutlined = false,
   headingLevel = `h2`,
   defaultExpanded = false,
   hasUnsavedChanges = false,
@@ -49,7 +51,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
           onClick={() => setExpanded(!expanded)}
         >
           <HStack gap={4} wrap className={appIconUrl ? `gap-y-2` : `gap-y-0.5`}>
-            {appIconUrl && <AppIcon src={appIconUrl} />}
+            {appIconUrl && <AppIcon src={appIconUrl} outlined={appIconOutlined} />}
             <Text as="span" variant="heading">
               {title}
             </Text>

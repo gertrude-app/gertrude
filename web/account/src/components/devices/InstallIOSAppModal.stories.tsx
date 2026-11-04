@@ -44,21 +44,3 @@ export const Podcasts = {
   parameters: galleryParameters,
   render: () => renderModal(`podcasts`),
 };
-
-export const CopyLink = {
-  name: 'Copy link (no share sheet)',
-  parameters: galleryParameters,
-  render: () => renderModal(`music`, { shareMethod: `copy` }),
-};
-
-export const LinkCopied = {
-  name: 'Link copied',
-  parameters: galleryParameters,
-  render: () => renderModal(`music`, { shareMethod: `copy`, copied: true }),
-};
-
-export const SeveralPeople = {
-  name: 'Several people',
-  parameters: galleryParameters,
-  render: () => renderModal(`blocker`, { personName: undefined }),
-};

@@ -17,6 +17,7 @@ export const setupApps: {
   description: string;
   instructions: string;
   icon: string;
+  iconOutlined: boolean;
 }[] = [
   {
     id: `mac`,
@@ -25,6 +26,7 @@ export const setupApps: {
     description: `Deny-by-default filtering and activity monitoring.`,
     instructions: `Install Gertrude on their Mac and connect it to your account.`,
     icon: `/gertrude-app-icons/blocker.webp`,
+    iconOutlined: true,
   },
   {
     id: `blocker`,
@@ -33,6 +35,7 @@ export const setupApps: {
     description: `Close the gaps in Apple’s Screen Time protections.`,
     instructions: `Install it on their iPhone or iPad and connect it to your account. Then choose what to block.`,
     icon: `/gertrude-app-icons/blocker.webp`,
+    iconOutlined: true,
   },
   {
     id: `music`,
@@ -41,6 +44,7 @@ export const setupApps: {
     description: `Parent-approved music, without open-ended browsing.`,
     instructions: `Install it on their iPhone or iPad and connect it to your account. Then choose the music they can play.`,
     icon: `/gertrude-app-icons/music.webp`,
+    iconOutlined: false,
   },
   {
     id: `podcasts`,
@@ -49,6 +53,7 @@ export const setupApps: {
     description: `Approved podcasts, with a PIN to add new shows.`,
     instructions: `Install it on their iPhone or iPad, connect it to your account, and set a PIN for adding new shows.`,
     icon: `/gertrude-app-icons/podcasts.webp`,
+    iconOutlined: false,
   },
 ];
 
@@ -59,6 +64,7 @@ export type SetupStep = {
   title: string;
   description: string;
   icon?: string;
+  iconOutlined?: boolean;
 };
 
 export const personSetupStep: SetupStep = {
@@ -83,5 +89,6 @@ export const getAppSetupSteps = (selectedApps: SetupApp[]): SetupStep[] => {
     title: `Set up ${app.name}`,
     description: app.instructions,
     icon: app.icon,
+    iconOutlined: app.iconOutlined,
   }));
 };

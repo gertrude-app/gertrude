@@ -137,18 +137,6 @@ export const GettingStarted = {
   render: () => renderGettingStarted([`mac`, `music`]),
 };
 
-export const GettingStartedBlocker = {
-  name: 'Getting started / Blocker only',
-  parameters: galleryParameters,
-  render: () => renderGettingStarted([`blocker`]),
-};
-
-export const GettingStartedAllApps = {
-  name: 'Getting started / All apps',
-  parameters: galleryParameters,
-  render: () => renderGettingStarted([`mac`, `blocker`, `music`, `podcasts`]),
-};
-
 export const GettingStartedUndecided = {
   name: 'Getting started / Apps undecided',
   parameters: galleryParameters,
