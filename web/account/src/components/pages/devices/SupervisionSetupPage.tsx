@@ -152,10 +152,10 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
       <div className="px-6 pb-6 text-sm text-stone-700">
         {props.stage === `plan` && (
           <p>
-            A minimum Gertrude Light subscription is required to supervise this
+            A Gertrude Light subscription or higher is required to supervise this
             {` `}
-            {device.type}. The process uses a computer and USB cable, but won’t erase the
-            device.
+            {device.type}. A Light subscription costs only $10 per year which is just 83
+            cents per month.
           </p>
         )}
         {props.stage === `plan` && props.checkoutCanceled && !props.error && (
@@ -172,9 +172,10 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
         {props.stage === `computerRequired` && (
           <div className="space-y-4">
             <p>
-              To supervise {deviceLabel}, sign in to Gertrude Account on a Mac or Windows
-              computer with a USB port. Open Devices and choose Continue setup for{` `}
-              {deviceLabel}. You won’t need to assign the device again.
+              The next step requires a computer with a USB port. Sign in to this Gertrude
+              Account website on a Mac or Windows computer, then go to “Devices” and
+              choose “Continue setup” for {deviceLabel}. You’ll be guided through the
+              supervision process.
             </p>
           </div>
         )}
@@ -183,7 +184,7 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
           <div className="space-y-4">
             <p>
               The Supervision Helper is a one-time app for your computer. It guides you
-              through connecting {deviceLabel} by USB without erasing it.
+              through supervising {deviceLabel} by USB without erasing it.
             </p>
             <div className="grid gap-2 xs:grid-cols-2">
               <Button
@@ -252,7 +253,7 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
         {props.stage === `connect` && (
           <div className="space-y-4">
             <p>
-              Plug {deviceLabel} into this computer. If asked on the device, tap Trust.
+              Plug {deviceLabel} into this computer. If asked on the device, tap “Trust”.
               Then enter this code in the Supervision Helper:
             </p>
             <div className="py-5 text-center">
@@ -282,18 +283,16 @@ const SupervisionSetupPage: React.FC<Props> = (props) => {
 
         {props.stage === `supervise` && (
           <p>
-            Follow the Supervision Helper’s instructions, including turning off Find My if
-            prompted. {deviceLabel} will restart during supervision. When the helper
-            confirms it’s done, return here to check the status.
+            Follow the Supervision Helper’s instructions. When the helper app confirms
+            it’s done, return here to check the status.
           </p>
         )}
 
         {props.stage === `finishOnDevice` && (
           <p>
-            {deviceLabel} is supervised, but blocking isn’t active yet. After it restarts,
-            open Gertrude Blocker on the {device.type} and follow the steps to download
-            and install the content-filter profile in Settings. Then return here to check
-            that setup is complete.
+            {deviceLabel} is supervised, but blocking isn’t active yet. Open Gertrude
+            Blocker on the {device.type}, and it will walk you through the final step.
+            Then return here to check that setup is complete.
           </p>
         )}
 
