@@ -11,5 +11,6 @@ export namespace GetAccountBilling {
     availableTiers: SubscriptionTier[];
     fullTrialStartedAt?: ISODateString;
     lastPaidTier?: SubscriptionTier;
+    currentPriceInCents?: number;
   }
 }

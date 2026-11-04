@@ -11,5 +11,6 @@ export namespace GetSubscriptionPanel_v2 {
     availableTiers: SubscriptionTier[];
     fullTrialStartedAt?: ISODateString;
     lastPaidTier?: SubscriptionTier;
+    currentPriceInCents?: number;
   }
 }

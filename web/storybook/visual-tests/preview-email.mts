@@ -23,6 +23,13 @@ const EMAIL_DIR = resolve(import.meta.dirname, `../../../swift/api/Sources/Api/E
 const LAYOUTS = `${EMAIL_DIR}/Layouts`;
 const TEMPLATES = `${EMAIL_DIR}/Templates`;
 const LOCAL_DASH = `http://localhost:8081`;
+const TRIAL_CONTEXT = {
+  billingUrl: `${LOCAL_DASH}/settings/billing`,
+  graceEndsOn: `November 2, 2026`,
+  planNotice: `Your Medium plan isn’t changing. It still includes Gertrude Music, Gertrude Podcasts, and iPhone/iPad supervision. You don’t need Full to keep these features.`,
+  currentPlan: `Medium`,
+  pastDuePlan: ``,
+};
 
 type Layout = `base` | `top-logo` | `personal`;
 
@@ -67,15 +74,44 @@ const SAMPLES: Record<string, Sample> = {
     layout: `personal`,
     model: { deviceFragment: `Franny’s iPhone` },
   },
-  'trial-ending-soon': {
+  'trial-ending-soon-v2': {
     dir: `TrialEndingSoon`,
     layout: `base`,
-    model: { length: `21`, remaining: `3` },
+    model: { ...TRIAL_CONTEXT, length: `21`, remaining: `3`, remainingText: `3 days` },
   },
-  'trial-expired': {
+  'trial-expired-v2': {
     dir: `TrialExpired`,
     layout: `base`,
-    model: { length: `21` },
+    model: { ...TRIAL_CONTEXT, length: `21` },
+  },
+  'trial-expired-no-mac': {
+    dir: `TrialExpiredNoMac`,
+    layout: `base`,
+    model: {
+      ...TRIAL_CONTEXT,
+      subjectSuffix: ` — no action needed`,
+      impactNotice: `Since you don’t have any Macs connected to your account, this won’t affect the features you’re currently using.`,
+      billingPrompt: `If you decide to use Gertrude on a Mac in the future, you can`,
+      billingLinkText: `review the Full plan in your billing settings`,
+    },
+  },
+  'trial-expired-no-mac-podcasts': {
+    dir: `TrialExpiredNoMac`,
+    layout: `base`,
+    model: {
+      ...TRIAL_CONTEXT,
+      currentPlan: ``,
+      planNotice: `Gertrude Blocker’s free features on children’s iPhones and iPads remain available.`,
+      subjectSuffix: ``,
+      impactNotice: `If you’d like to keep adding shows and getting new episodes in Gertrude Podcasts, you can subscribe to Light for $10 a year. You don’t need Full for Podcasts.`,
+      billingPrompt: `You can`,
+      billingLinkText: `subscribe to Light here`,
+    },
+  },
+  'trial-grace-ended': {
+    dir: `TrialGraceEnded`,
+    layout: `base`,
+    model: TRIAL_CONTEXT,
   },
   'overdue-to-unpaid': {
     dir: `OverdueToUnpaid`,

@@ -30,6 +30,8 @@ import XHttp
       await self.syncTemplate(DailyReviewDigest.self)
       await self.syncTemplate(AccountLifecycle.TrialEndingSoon.self)
       await self.syncTemplate(AccountLifecycle.TrialExpired.self)
+      await self.syncTemplate(AccountLifecycle.TrialExpiredNoMac.self)
+      await self.syncTemplate(AccountLifecycle.TrialGraceEnded.self)
       await self.syncTemplate(AccountLifecycle.OverdueToUnpaid.self)
       await self.syncTemplate(AccountLifecycle.PaidToOverdue.self)
       await self.syncTemplate(ScreenTimeWarning.self)

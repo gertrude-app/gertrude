@@ -5,6 +5,7 @@ import Foundation
 import GertieBlocker
 import LibCore
 import os.log
+import XCore
 
 @DependencyClient
 public struct SharedStorageClient: Sendable {

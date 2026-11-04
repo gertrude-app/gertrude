@@ -137,6 +137,21 @@ body {
   }
 }
 
+@keyframes plan-price-dot-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  35% {
+    transform: translate3d(1px, -3px, 0);
+  }
+
+  65% {
+    transform: translate3d(-1px, 2px, 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .supervision-complete-device {
     animation: none;

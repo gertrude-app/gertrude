@@ -4,6 +4,7 @@ import {
   Card,
   ConfirmationDialog,
   HStack,
+  Modal,
   Text,
   VStack,
 } from '@gertrude/ui';
@@ -13,11 +14,12 @@ import React from 'react';
 import type {
   GetAccountBilling,
   SubscriptionPanelAction,
+  SubscriptionTier,
 } from '@shared/pairql/src/account';
+import PlanChangeSummary from '#/components/billing/PlanChangeSummary';
 import CardContainer from '#/components/layout/CardContainer';
 import {
   type CurrentPlan,
-  PLAN_FEATURES,
   actionKey,
   actionLabel,
   actionsByPlan,
@@ -27,22 +29,30 @@ import {
   planOverview,
   planTitle,
 } from '#/lib/billing';
+import { FEATURES, PLANS, PLAN_IDS, planPriceDisplay } from '#/lib/plans';
 
 interface Props {
   billing: GetAccountBilling.Output;
   pendingAction?: SubscriptionPanelAction;
+  defaultPlanChangeTo?: SubscriptionTier;
   returnHref?: string;
   onAction: (action: SubscriptionPanelAction) => void | Promise<void>;
 }
 
-const PLAN_TIERS = Object.keys(PLAN_FEATURES) as CurrentPlan[];
-
 const BillingSettingsPage: React.FC<Props> = ({
   billing,
   pendingAction,
+  defaultPlanChangeTo,
   returnHref,
   onAction,
 }) => {
+  const [planChange, setPlanChange] = React.useState<
+    Extract<SubscriptionPanelAction, { case: `changeSubscriptionTier` }> | undefined
+  >(
+    defaultPlanChangeTo
+      ? { case: `changeSubscriptionTier`, to: defaultPlanChangeTo }
+      : undefined,
+  );
   const statusBadge = planBadge(billing);
   const selectedPlan = currentPlan(billing.planStatus);
   const groupedActions = actionsByPlan(billing);
@@ -79,8 +89,13 @@ const BillingSettingsPage: React.FC<Props> = ({
           subheading="Each plan includes everything from the plans before it."
         >
           <div className="mt-4 grid items-stretch gap-3 @2xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-            {PLAN_TIERS.map((tier) => {
-              const plan = PLAN_FEATURES[tier];
+            {PLAN_IDS.map((tier) => {
+              const plan = PLANS[tier];
+              const price = planPriceDisplay(plan.price);
+              const features = [
+                ...(plan.includes ? [`Everything in ${PLANS[plan.includes].name}`] : []),
+                ...plan.features.map((feature) => FEATURES[feature]),
+              ];
               const selected = tier === selectedPlan;
               const badge = planCardBadge(billing, tier);
               const actions = groupedActions[tier];
@@ -104,14 +119,16 @@ const BillingSettingsPage: React.FC<Props> = ({
                         </Text>
                         <div className="flex items-baseline gap-1.5">
                           <span className="text-2xl font-semibold tracking-tight text-stone-950">
-                            {plan.price}
+                            {price.amount}
                           </span>
-                          {plan.cadence && (
-                            <span className="text-sm text-stone-500">{plan.cadence}</span>
+                          {price.cadence && (
+                            <span className="text-sm text-stone-500">
+                              {price.cadence}
+                            </span>
                           )}
                         </div>
-                        {plan.billingNote && (
-                          <Text variant="captionMuted">{plan.billingNote}</Text>
+                        {price.billingNote && (
+                          <Text variant="captionMuted">{price.billingNote}</Text>
                         )}
                       </VStack>
                       {badge && (
@@ -122,7 +139,7 @@ const BillingSettingsPage: React.FC<Props> = ({
                     </HStack>
 
                     <VStack as="ul" gap={2} className="mt-4 flex-1">
-                      {plan.features.map((feature) => (
+                      {features.map((feature) => (
                         <HStack as="li" key={feature} align="start" gap={2}>
                           <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
                           <Text variant="bodyMuted">{feature}</Text>
@@ -148,7 +165,9 @@ const BillingSettingsPage: React.FC<Props> = ({
                                   disabled={pendingAction !== undefined}
                                   loading={key === pendingActionKey}
                                   onClick={() => {
-                                    if (action.case !== `startFullTrial`) {
+                                    if (action.case === `changeSubscriptionTier`) {
+                                      setPlanChange(action);
+                                    } else if (action.case !== `startFullTrial`) {
                                       void onAction(action);
                                     }
                                   }}
@@ -193,11 +212,79 @@ const BillingSettingsPage: React.FC<Props> = ({
           </div>
         </CardContainer>
       </VStack>
+      {planChange && (
+        <Modal
+          open
+          onOpenChange={(open) => {
+            if (!open && pendingAction === undefined) {
+              setPlanChange(undefined);
+            }
+          }}
+          title={`${actionLabel(planChange, billing)}?`}
+          size="medium"
+          dismissible={pendingAction === undefined}
+          footer={
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={pendingAction !== undefined}
+                onClick={() => setPlanChange(undefined)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                disabled={pendingAction !== undefined}
+                loading={pendingAction !== undefined}
+                onClick={async () => {
+                  await onAction(planChange);
+                  setPlanChange(undefined);
+                }}
+              >
+                Confirm{` `}
+                {actionLabel(planChange, billing).replace(/^./, (letter) =>
+                  letter.toLowerCase(),
+                )}
+              </Button>
+            </>
+          }
+        >
+          <PlanChangeDescription billing={billing} to={planChange.to} />
+        </Modal>
+      )}
     </>
   );
 };
 
 export default BillingSettingsPage;
+
+const PlanChangeDescription: React.FC<{
+  billing: GetAccountBilling.Output;
+  to: SubscriptionTier;
+}> = ({ billing, to }) => {
+  const { planStatus } = billing;
+  const from =
+    planStatus.case === `fullTrial` || planStatus.case === `fullTrialGrace`
+      ? planStatus.substrate?.tier
+      : currentPlan(planStatus);
+  if (!from) return null;
+
+  return (
+    <VStack gap={4}>
+      <PlanChangeSummary
+        from={from}
+        to={to}
+        currentPriceInCents={billing.currentPriceInCents}
+      />
+      <Text as="p" variant="bodyMuted">
+        Your new plan and billing cycle start today. We’ll credit unused time on your
+        current plan and charge any amount due to your saved payment method.
+      </Text>
+    </VStack>
+  );
+};
 
 function planFootnote(
   billing: GetAccountBilling.Output,

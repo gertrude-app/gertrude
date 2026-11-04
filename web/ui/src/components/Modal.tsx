@@ -165,6 +165,7 @@ const Modal: React.FC<ModalProps> = ({
         <Drawer.Overlay className="fixed inset-0 z-50 bg-stone-950/35 backdrop-blur-[2px]" />
         <Drawer.Content
           ref={setContentRef}
+          {...(!description && { 'aria-describedby': undefined })}
           className={cx(
             `fixed inset-x-0 bottom-0 z-50 flex max-h-[calc(100svh-1rem)] flex-col overflow-visible rounded-t-[28px] border border-b-0 border-stone-200 bg-white shadow-2xl shadow-stone-950/20 outline-none`,
             className,

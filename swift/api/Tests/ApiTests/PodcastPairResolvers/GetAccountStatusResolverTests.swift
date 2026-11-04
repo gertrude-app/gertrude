@@ -9,34 +9,11 @@ import XExpect
 @testable import Api
 
 final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
-  func claimedDevice(
-    for child: ChildEntities,
-    installedDaysAgo: Int = 60,
-  ) async throws -> (IOSDevice, PodcastApp.Install) {
-    let device = try await self.db.create(IOSDevice(
-      id: .init(UUID()),
-      childId: child.model.id,
-      modelIdentifier: "iPhone15,2",
-      iosVersion: "18.2",
-    ))
-    try await self.createClaim(
-      .podcasts,
-      device.id,
-      child.model.id,
-      claimedAt: .reference,
-    )
-    var install = try await self.db.create(
-      PodcastApp.Install(deviceId: device.id, appVersion: "1.6.0"),
-    )
-    try await install.modifyCreatedAt(.exact(.reference - .days(installedDaysAgo)))
-    return (device, install)
-  }
-
   func resolveStatus(
     for child: ChildEntities,
     installedDaysAgo: Int = 60,
   ) async throws -> GetAccountStatus.Output {
-    let (device, install) = try await self.claimedDevice(
+    let (device, install) = try await self.claimedPodcastInstall(
       for: child,
       installedDaysAgo: installedDaysAgo,
     )
@@ -315,7 +292,7 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testAuthedRouteResolvesTokenAndReturnsAccountStatus() async throws {
     let child = try await self.child()
-    let (_, install) = try await self.claimedDevice(for: child)
+    let (_, install) = try await self.claimedPodcastInstall(for: child)
     let token = try await self.db.create(PodcastApp.Token(installId: install.id))
 
     let response = try await PairQLRoute.respond(
@@ -336,7 +313,7 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
   func testUnauthorizedAfterTokenRowDeleted() async throws {
     let child = try await self.child()
-    let (_, install) = try await self.claimedDevice(for: child)
+    let (_, install) = try await self.claimedPodcastInstall(for: child)
     let token = try await self.db.create(PodcastApp.Token(installId: install.id))
     let tokenValue = token.value.rawValue
 

@@ -16,8 +16,8 @@ Set it in staging and production before deploying code that requires it; changin
 completed-signup alerts.
 
 This setting does not send customer welcome emails or delay notifications. For manual
-welcomes, wait at least 90 minutes, check the linked account's app usage, and compose a new
-email to the parent rather than replying to the internal notification.
+welcomes, wait at least 90 minutes, check the linked account's app usage, and compose a
+new email to the parent rather than replying to the internal notification.
 
 ## Template Locations
 
@@ -85,9 +85,10 @@ sample data and writes an HTML file + screenshot to a temp dir (path is printed)
 — handy for fast visual iteration and for agents (who can read the PNG).
 
 The script lives at `web/storybook/visual-tests/preview-email.mts` (that package has the
-puppeteer dependency). It's a plain `.mts` run by `node` via type-stripping — no `ts-node`.
-Its `SAMPLES` map mirrors the sample models in `TestEmail.swift`, which is the source of
-truth — when you add a template, add a `SAMPLES` entry there too (see the next section).
+puppeteer dependency). It's a plain `.mts` run by `node` via type-stripping — no
+`ts-node`. Its `SAMPLES` map mirrors the sample models in `TestEmail.swift`, which is the
+source of truth — when you add a template, add a `SAMPLES` entry there too (see the next
+section).
 
 ## Adding a New Template
 
@@ -109,16 +110,33 @@ truth — when you add a template, add a `SAMPLES` entry there too (see the next
 
 ### Optional vars in a section: use `{{.}}`, not `{{var}}`
 
-Mustachio makes the section value the context, so `{{var}}` inside `{{#var}}`
-resolves against the string and renders **empty**:
+Mustachio makes the section value the context, so `{{var}}` inside `{{#var}}` resolves
+against the string and renders **empty**:
 
 ```
 ✗  {{#redirect}}?redirect={{redirect}}{{/redirect}}   → "?redirect="
 ✓  {{#redirect}}?redirect={{.}}{{/redirect}}          → "?redirect=<value>"
 ```
 
-Fails silently, and only when the var is non-nil — a nil/empty test renders
-identically to a correct one, so always test with the value populated.
+Fails silently, and only when the var is non-nil — a nil/empty test renders identically to
+a correct one, so always test with the value populated.
+
+### Postmark inlining can override dark-mode styles
+
+Local previews render the source HTML without Postmark's CSS inlining. Postmark attaches
+light-mode colors directly to elements, so dark-mode rules overriding those colors need
+`!important`. The shared layout must also declare `color-scheme` as `light dark`.
+
+Keep the generic dark-mode `a` color rule non-important so it does not override white
+action-button labels. Use specific important rules for links with inlined colors, such as
+footer and top-logo feature links.
+
+Before syncing shared layouts, validate the fully assembled local HTML with sample content
+through `/templates/validate`, with `InlineCssForHtmlTestRender` enabled. Inspect that
+processed HTML in light and dark mode, including WebKit. Referencing the live layout
+instead would test its old styles, not the local changes. Validation neither saves a
+template nor sends an email; the rendered output can be sent as an ordinary test email to
+check a real inbox without updating shared layouts first.
 
 ### Gmail strips `margin`/`inline-block` gaps — the preview won't catch it
 

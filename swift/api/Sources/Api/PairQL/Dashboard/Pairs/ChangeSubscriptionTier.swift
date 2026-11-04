@@ -71,6 +71,7 @@ extension ChangeSubscriptionTier: Resolver {
 
     let periodEnd = Date(timeIntervalSince1970: TimeInterval(updated.currentPeriodEnd))
     subscription.tier = input.to
+    subscription.isLegacyPrice = false
     subscription.stripeStatus = newStatus
     subscription.currentPeriodEnd = periodEnd
     try await context.db.update(subscription)
