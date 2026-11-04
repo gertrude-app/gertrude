@@ -238,45 +238,38 @@ Siri & Dictation.
 Most apps that deal with text (like ebook readers, Bible apps, Notes, and **many more**)
 allow the user to _highlight a search term and **"Look Up"**_.
 
-{% image src="lockdown-iphone/lookup-books.png" caption="Most apps let you highlight a word, then tap 'Look Up'" alt="five things you forgot locking down your kids iPhone: highlight a word and tap 'Look Up'" /%}
+{% image src="lockdown-iphone/lookup-selection.png" width=450 caption="Select a word, then tap 'Look Up'" alt="The word 'goats' selected in a book, with a purple arrow pointing to Look Up" /%}
 
-Which brings up this:
+_Look Up_ can display images and other results **from the web,** right inside the app.
+This includes showing images that many parents and individuals would consider
+inappropriate or suggestive.
 
-{% image src="lockdown-iphone/look-up-results.png" caption="An example of images pulled from the web in response to a 'Look Up'" alt="five things you forgot locking down your kids iPhone: Look Up on iOS can access and display to your child images from the web" /%}
+{% image src="lockdown-iphone/lookup-results.png" width=450 caption="Look Up results can include images from the web" alt="Look Up results for 'goats', showing Siri Knowledge and two rows of images from the web" /%}
 
 {% click-to-reveal title="Show me how to fix it" %}
 
-{% callout alt=true %}
+Start by going to the main Settings app once again, and this time choose **Search**:
 
-These steps are nearly identical to the fix for _Internet Content in Searches_, except for
-what setting to disable in step 2.
+{% image src="lockdown-iphone/search-settings-ios26.png" width=450 caption="Tap Search" alt="locking down an iPhone: Search settings" /%}
+
+Then disable these two settings:
+
+{% image src="lockdown-iphone/disable-spotlight-ios26.png" width=450 caption="Disable both of these" alt="locking down an iPhone: Keep your child from looking up images and other internet content" /%}
+
+After changing those settings, _Look Up_ will no longer display any results or images from
+the web.
+
+{% callout type="warning" title="" %}
+
+Sadly, there is no Screen Time setting to prevent this setting from being toggled back on.
+But we've found because it is so strangely labeled and unintuitive, most kids don't know
+where to toggle it, and so it's still fairly effective.
+
+To completely block these web results, you can install the
+[Gertrude Blocker app](/iphone-and-ipad), which will prevent Look Up web content from
+loading no matter what the settings are.
 
 {% /callout %}
-
-**Step 1.** Temporarily _allow_ the use of Siri by going to: Settings > Screen Time >
-Content & Privacy Restrictions > Allowed Apps. (We need Siri enabled to get to the
-settings shown below.)
-
-{% image src="lockdown-iphone/allowed-apps.png" caption="Go to 'Allowed Apps'" alt="five things you forgot locking down your kids iPhone: Screen Time -> Content & Privacy Restrictions > Allowed Apps" /%}
-
-Tap to **temporarily enable** Siri & Dictation.
-
-{% image src="lockdown-iphone/enable-siri-dictation.png" caption="Temporarily <b>enable</b> Siri" alt="five things you forgot locking down your kids iPhone: temporarily enable Siri to fix the other settings" /%}
-
-**Step 2.** Go back to the _main settings screen_, where you should now be able to see an
-option for **Siri & Search**
-
-{% image src="lockdown-iphone/siri-search-main.png" caption="Now you can go back to 'Settings > Siri & Search'" alt="five things you forgot locking down your kids iPhone: now you can find 'Siri & Search' under the main Settings screen" /%}
-
-Click to **disable "Show in Look Up"**:
-
-{% image src="lockdown-iphone/disable-show-in-lookup.png" caption="DISABLE 'Show in Look Up'" alt="five things you forgot locking down your kids iPhone: disable 'Show in Look Up' to prevent showing your child images and content from the internet" /%}
-
-**Step 3.** Finally, now that Siri can no longer provide results to "Look Up", you need to
-_reverse step 1_ by disabling Siri & Dictation. Go to Settings > Screen Time > Content &
-Privacy Restrictions, and disallow Siri & Dictation.
-
-{% image src="lockdown-iphone/disable-siri-dictation.png" caption="<b>Disable</b> Siri again (same location as step 1)" alt="five things you forgot locking down your kids iPhone: re-disable Siri in Screen Time after fixing the other settings" /%}
 
 {% /click-to-reveal %}
 
@@ -287,48 +280,32 @@ can provide help for many harmless tasks, it can also bypass other restrictions 
 and _display almost any content on the internet._ To test if your child's device is
 vulnerable, **ask Siri to show you pictures of something.**
 
-{% image src="lockdown-iphone/siri-search.png" caption="An example of images found by asking Siri" alt="five things you forgot locking down your kids iPhone: Siri can show your child images and content from anywhere on the internet" /%}
-
-Unfortunately, simply disabling Siri from the Screen Time settings is not sufficient to
-fix this. Follow the steps below for instructions.
+{% image src="lockdown-iphone/siri-web-results.png" width=450 caption="An example of images found by asking Siri" alt="Siri displaying nine images from the web in response to 'Hey Siri show me pictures of goats'" /%}
 
 {% click-to-reveal title="Show me how to fix it" %}
 
-**Step 1.** Before we disable Siri, we need to _adjust some settings._ Go to Settings >
-Siri & Search:
+Start by going to the main **Settings App**.
 
-{% image src="lockdown-iphone/siri-search-main.png" caption="Settings > Siri & Search" alt="five things you forgot locking down your kids iPhone: Settings > Search (in the main Settings app screen)" /%}
+{% image src="lockdown-iphone/main-settings-app-ios26.png" width=450 caption="Go to the main <b>Settings</b> app" alt="locking down an iPhone: the main Settings app" /%}
 
-Then disable all of the options shown below. Doing so prevents Siri from providing
-internet images and content when searching (Spotlight) or looking up definitions (Look
-Up).
+Scroll down, and tap **Apple Intelligence &amp; Siri**.
 
-{% image src="lockdown-iphone/siri-disable-all.png" caption="Turn <b>all</b> of these settings OFF" alt="five things you forgot locking down your kids iPhone: disable all Siri system integrations for safety" /%}
+{% image src="lockdown-iphone/siri-settings-ios26.png" width=450 caption="Tap Apple Intelligence &amp; Siri" alt="locking down an iPhone: Apple Intelligence and Siri settings" /%}
 
-**Step 2.** Disable app/Siri integrations. On the same settings screen from _Step 1_,
-scroll down a bit further to find **individual app settings** for Siri, shown below:
+Then turn **Apple Intelligence** off, and **disable** all the settings shown below:
 
-{% image src="lockdown-iphone/siri-app-settings.png" caption="Individual app + Siri settings" alt="five things you forgot locking down your kids iPhone: here's where individual apps' integration with Siri can be controlled" /%}
+{% image src="lockdown-iphone/disable-siri-1-ios26.png" width=450 caption="Turn these settings OFF..." alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
 
-_Tap on each app_ one at a time, and completely disable Siri from accessing/integrating
-with the app:
+{% image src="lockdown-iphone/disable-siri-2-ios26.png" width=450 caption="...and <b>all</b> of these settings OFF" alt="locking down an iPhone: disable all Siri system integrations for safety" /%}
 
-{% image src="lockdown-iphone/disable-siri-app-settings.png" caption="Turn these all OFF for <b>every</b> app." alt="five things you forgot locking down your kids iPhone: turn off all app Siri connections for safety" /%}
+Finally, to make sure that these settings can't be toggled back on, we recommend you use
+Screen Time to completely disable Siri & Dictation. The option to do that is under
+**Content & Privacy Restrictions** -> **Intelligence & Siri**.
 
-**Step 3.** Disable Siri in Screen Time.
+From there, turn **Siri & Dictation** off, and set every other option on this screen to
+**Don't Allow:**
 
-Go to the main _Settings_ app, and then navigate to "Screen Time > Content & Privacy
-Restrictions"
-
-{% image src="lockdown-iphone/content-privacy-restrictions.png" caption="Settings > Screen Time > Content & Privacy Restrictions" alt="five things you forgot locking down your kids iPhone: Settings > Screen Time > Content & Privacy Restrictions" /%}
-
-Then to _Allowed Apps_:
-
-{% image src="lockdown-iphone/allowed-apps.png" caption="Screen Time > Content & Privacy Restrictions > Allowed Apps" alt="five things you forgot locking down your kids iPhone: Allowed Apps (in Screen Time)" /%}
-
-Then tap to _disable Siri & Dictation_:
-
-{% image src="lockdown-iphone/disable-siri-dictation.png" caption="<b>Disable</b> Siri & Dictation" alt="five things you forgot locking down your kids iPhone: disable Siri and Dictation" /%}
+{% image src="lockdown-iphone/intelligence-siri-ios26.png" width=450 caption="Turn <b>Siri &amp; Dictation</b> off, and set everything else to <b>Don't Allow</b>" alt="locking down an iPhone: disable Apple Intelligence features and Siri web search content" /%}
 
 {% /click-to-reveal %}
 
