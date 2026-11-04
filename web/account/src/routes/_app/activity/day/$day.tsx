@@ -96,6 +96,7 @@ const ActivityDayPage: React.FC = () => {
           items={toCombinedActivityItems(query.data)}
           onToggleFlag={handleToggleFlag}
           onDelete={(id) => handleDelete([id])}
+          onDeleteItems={handleDelete}
           onDeletePersonActivity={handleDeletePerson}
         />
       )}

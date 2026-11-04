@@ -108,6 +108,7 @@ const PersonDayActivityPage: React.FC = () => {
           showPersonHeading={false}
           onToggleFlag={handleToggleFlag}
           onDelete={(id) => handleDelete([id])}
+          onDeleteItems={handleDelete}
           onDeletePersonActivity={handleDeleteAll}
         />
       )}

@@ -1,5 +1,17 @@
 [
   {
+    "id": "account-components-activity-activity-feed--chunked",
+    "iframePath": "/iframe.html?id=account-components-activity-activity-feed--chunked&viewMode=story",
+    "name": "Chunked",
+    "path": "screenshots/desktop/account-components-activity-activity-feed--chunked.png",
+    "title": "Account/Components/Activity/Activity Feed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-components-activity-activity-feed--grouped-and-single-person",
     "iframePath": "/iframe.html?id=account-components-activity-activity-feed--grouped-and-single-person&viewMode=story",
     "name": "Grouped and single person",
