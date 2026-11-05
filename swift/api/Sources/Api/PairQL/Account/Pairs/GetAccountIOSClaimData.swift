@@ -32,6 +32,7 @@ struct GetAccountIOSClaimData: Pair {
     let musicSubscription: MusicSubscriptionState?
     let supervisionStatus: GetDevices.Mobile.SupervisionStatus?
     let requiresPayment: Bool
+    let paymentAction: GetSubscriptionPanel_v2.Action?
   }
 
   struct Output: PairOutput {
@@ -133,11 +134,11 @@ extension GetAccountIOSClaimData: Resolver {
     } else {
       nil
     }
-    let requiresPayment = if flow == .blockerSupervise {
+    let paymentAction = if flow == .blockerSupervise {
       try await (context.currentBillingAccount())
-        .paymentActionForMissingCapability(.superviseIosDevice) != nil
+        .paymentActionForMissingCapability(.superviseIosDevice)
     } else {
-      false
+      GetSubscriptionPanel_v2.Action?.none
     }
     return .init(
       people: [],
@@ -152,7 +153,8 @@ extension GetAccountIOSClaimData: Resolver {
         amSubscription: amSubscription,
         musicSubscription: musicSubscription,
         supervisionStatus: supervisionStatus,
-        requiresPayment: requiresPayment,
+        requiresPayment: paymentAction != nil,
+        paymentAction: paymentAction,
       ),
     )
   }

@@ -1,18 +1,10 @@
 import { Button, HStack, LoadingDots, Text, VStack } from '@gertrude/ui';
-import {
-  CheckCircleIcon,
-  CircleAlertIcon,
-  ExternalLinkIcon,
-  XCircleIcon,
-} from 'lucide-react';
+import { CircleAlertIcon, ExternalLinkIcon, XCircleIcon } from 'lucide-react';
 import React from 'react';
 import CardContainer from '#/components/layout/CardContainer';
 
 type Props = (
-  | { status: `loading` }
-  | { status: `success` }
-  | { status: `error`; message: string }
-  | { status: `canceled` }
+  { status: `loading` } | { status: `error`; message: string } | { status: `canceled` }
 ) & { returnHref?: string };
 
 const CheckoutResultPage: React.FC<Props> = (props) => {
@@ -33,26 +25,19 @@ const CheckoutResultPage: React.FC<Props> = (props) => {
   }
 
   const content =
-    props.status === `success`
+    props.status === `canceled`
       ? {
-          icon: CheckCircleIcon,
-          iconClassName: `text-green-600`,
-          title: `Payment setup complete`,
-          description: `Your Gertrude subscription is ready. You can manage or cancel it from Billing at any time.`,
+          icon: XCircleIcon,
+          iconClassName: `text-stone-500`,
+          title: `Payment setup canceled`,
+          description: `No plan changes were made. You can return to Billing whenever you're ready.`,
         }
-      : props.status === `canceled`
-        ? {
-            icon: XCircleIcon,
-            iconClassName: `text-stone-500`,
-            title: `Payment setup canceled`,
-            description: `No plan changes were made. You can return to Billing whenever you're ready.`,
-          }
-        : {
-            icon: CircleAlertIcon,
-            iconClassName: `text-red-600`,
-            title: `Couldn't confirm the subscription`,
-            description: props.message,
-          };
+      : {
+          icon: CircleAlertIcon,
+          iconClassName: `text-red-600`,
+          title: `Couldn't confirm the subscription`,
+          description: props.message,
+        };
   const Icon = content.icon;
 
   return (
@@ -68,11 +53,7 @@ const CheckoutResultPage: React.FC<Props> = (props) => {
             {content.title}
           </Text>
         </HStack>
-        <Text
-          as="p"
-          variant="proseSubtle"
-          className={props.status === `success` ? `max-w-sm` : `max-w-lg`}
-        >
+        <Text as="p" variant="proseSubtle" className="max-w-lg">
           {content.description}
         </Text>
         <div className="mt-3 flex flex-col gap-2 xs:flex-row">
@@ -83,16 +64,14 @@ const CheckoutResultPage: React.FC<Props> = (props) => {
           >
             {props.returnHref ? `Continue device setup` : `Back to Billing`}
           </Button>
-          {props.status !== `success` && (
-            <Button
-              type="link"
-              href="https://gertrude.app/contact"
-              variant="default"
-              icon={ExternalLinkIcon}
-            >
-              Contact support
-            </Button>
-          )}
+          <Button
+            type="link"
+            href="https://gertrude.app/contact"
+            variant="default"
+            icon={ExternalLinkIcon}
+          >
+            Contact support
+          </Button>
         </div>
       </VStack>
     </CardContainer>

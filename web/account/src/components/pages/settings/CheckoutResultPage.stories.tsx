@@ -30,9 +30,12 @@ const meta = {
 
 export default meta;
 
-export const CheckoutSucceeded = {
-  name: 'Checkout succeeded',
-  args: { status: `success` } satisfies ComponentProps<typeof CheckoutResultPage>,
+export const CheckoutFailed = {
+  name: 'Checkout failed',
+  args: {
+    status: `error`,
+    message: `Check your connection and try again.`,
+  } satisfies ComponentProps<typeof CheckoutResultPage>,
 };
 
 export const CheckoutCanceled = {

@@ -52,7 +52,7 @@ const ConnectIosAppResultPage: React.FC<Props> = (props) => {
       : `${appName} connected`;
   const primaryLabel = supervision
     ? props.nextStep === `plan`
-      ? `Review your plan`
+      ? `Continue`
       : `Continue setup`
     : needsPlan
       ? `Manage your plan`
@@ -155,7 +155,7 @@ const ConnectIosAppResultPage: React.FC<Props> = (props) => {
             </p>
             {props.nextStep === `plan` && (
               <p className="mt-3 font-medium text-stone-900">
-                First, check your Gertrude subscription to continue.
+                You’ll need a Gertrude subscription to continue.
               </p>
             )}
             {props.nextStep === `computer` && (

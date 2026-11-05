@@ -173,6 +173,20 @@ export function actionLabel(action: SubscriptionPanelAction, input: Input): stri
   }
 }
 
+export function planGateLabel(action: SubscriptionPanelAction): string {
+  switch (action.case) {
+    case `startCheckout`:
+      return `Subscribe to ${tierName(action.tier)}`;
+    case `reactivateViaCheckout`:
+      return `Reactivate ${tierName(action.tier)}`;
+    case `openBillingPortal`:
+      return `Update payment method`;
+    case `changeSubscriptionTier`:
+    case `startFullTrial`:
+      return `View subscription options`;
+  }
+}
+
 export function planOverview(input: Input): string[] {
   const overview = manageBlurb(input);
   if (

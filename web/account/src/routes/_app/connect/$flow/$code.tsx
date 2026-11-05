@@ -1,5 +1,6 @@
+import { LoadingDots, toast } from '@gertrude/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import type {
   ClaimAccountIOSDevice,
@@ -10,6 +11,7 @@ import ConnectIosAppPage from '#/components/pages/devices/ConnectIosAppPage';
 import ConnectIosAppResultPage from '#/components/pages/devices/ConnectIosAppResultPage';
 import SupervisionSetupPage from '#/components/pages/devices/SupervisionSetupPage';
 import { podcastsSubscriptionRunway } from '#/components/person-settings/podcastsSubscriptionRunway';
+import { planGateLabel } from '#/lib/billing';
 import { apiEndpoint, liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
@@ -35,12 +37,47 @@ const appDetails: Record<Flow, { name: string; icon: string }> = {
   music: { name: `Gertrude Music`, icon: `/gertrude-app-icons/music.webp` },
 };
 
-const ConnectRoute: React.FC = () => {
-  const { flow, code } = Route.useParams();
-  return <ConnectFlow key={`${flow}/${code}`} flow={flow} code={code} />;
+type ConnectSearch = {
+  checkout?: `success` | `canceled`;
+  session_id?: string;
+  step?: `download`;
 };
 
-const ConnectFlow: React.FC<{ flow: string; code: string }> = ({ flow, code }) => {
+const computerStage = (): ManualStage =>
+  /iPhone|iPad|Android/i.test(navigator.userAgent) ||
+  (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
+    ? `computerRequired`
+    : `download`;
+
+const ConnectRoute: React.FC = () => {
+  const { flow, code } = Route.useParams();
+  const { checkout, step } = Route.useSearch();
+  const { checkoutError } = Route.useLoaderData();
+  return (
+    <ConnectFlow
+      key={`${flow}/${code}`}
+      flow={flow}
+      code={code}
+      initialStage={
+        step === `download`
+          ? computerStage()
+          : checkout === `canceled` || checkoutError
+            ? `plan`
+            : undefined
+      }
+      checkoutCanceled={checkout === `canceled`}
+      checkoutError={checkoutError}
+    />
+  );
+};
+
+const ConnectFlow: React.FC<{
+  flow: string;
+  code: string;
+  initialStage?: ManualStage;
+  checkoutCanceled: boolean;
+  checkoutError?: string;
+}> = ({ flow, code, initialStage, checkoutCanceled, checkoutError }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const validFlow = flow in appDetails ? (flow as Flow) : undefined;
@@ -69,7 +106,9 @@ const ConnectFlow: React.FC<{ flow: string; code: string }> = ({ flow, code }) =
   const claim = useMutation(liveClient.claimAccountIOSDevice, {
     invalidating: [queryKey, Key.devices, Key.people],
   });
-  const [stage, setStage] = React.useState<ManualStage>();
+  const startCheckout = useMutation(liveClient.startAccountCheckout);
+  const openPortal = useMutation(liveClient.openAccountBillingPortal);
+  const [stage, setStage] = React.useState<ManualStage | undefined>(initialStage);
   const [downloaded, setDownloaded] = React.useState(false);
   const [platform, setPlatform] = React.useState<`mac` | `windows`>();
   const [copied, setCopied] = React.useState(false);
@@ -235,15 +274,46 @@ const ConnectFlow: React.FC<{ flow: string; code: string }> = ({ flow, code }) =
   }
 
   const onContinue = (): void => {
-    if (assignment.requiresPayment) setStage(`plan`);
-    else
-      setStage(
-        /iPhone|iPad|Android/i.test(navigator.userAgent) ||
-          (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1)
-          ? `computerRequired`
-          : `download`,
-      );
+    setStage(assignment.requiresPayment ? `plan` : computerStage());
   };
+  const flowPath = `/connect/${validFlow}/${code}`;
+  const handlePlanAction = async (): Promise<void> => {
+    const action = assignment.paymentAction;
+    try {
+      switch (action?.case) {
+        case `startCheckout`:
+        case `reactivateViaCheckout`: {
+          const output = await startCheckout.mutateAsync({
+            tier: action.tier,
+            successPath: `${flowPath}?checkout=success`,
+            cancelPath: `${flowPath}?checkout=canceled`,
+            associatedIosDeviceId: assignment.deviceId,
+          });
+          window.location.assign(output.url);
+          return;
+        }
+        case `openBillingPortal`: {
+          const output = await openPortal.mutateAsync({
+            returnPath: flowPath,
+            configuration: action.config,
+          });
+          window.location.assign(output.url);
+          return;
+        }
+        default:
+          goToBilling();
+      }
+    } catch {
+      return;
+    }
+  };
+  const planError = startCheckout.isError
+    ? (startCheckout.error.userMessage ?? `Couldn’t open checkout. Please try again.`)
+    : openPortal.isError
+      ? (openPortal.error.userMessage ??
+        `Couldn’t open the billing portal. Please try again.`)
+      : checkoutError;
+  const requestedStage = stage ?? `result`;
   const currentStage =
     assignment.supervisionStatus === `complete`
       ? `complete`
@@ -251,7 +321,9 @@ const ConnectFlow: React.FC<{ flow: string; code: string }> = ({ flow, code }) =
         ? assignment.requiresPayment
           ? `plan`
           : `finishOnDevice`
-        : (stage ?? `result`);
+        : assignment.requiresPayment && requestedStage !== `result`
+          ? `plan`
+          : requestedStage;
   if (currentStage === `result`) {
     return (
       <ConnectIosAppResultPage
@@ -271,7 +343,24 @@ const ConnectFlow: React.FC<{ flow: string; code: string }> = ({ flow, code }) =
   };
   switch (currentStage) {
     case `plan`:
-      return <SupervisionSetupPage {...common} stage="plan" onPrimary={goToBilling} />;
+      return (
+        <SupervisionSetupPage
+          {...common}
+          stage="plan"
+          actionLabel={
+            assignment.paymentAction && planGateLabel(assignment.paymentAction)
+          }
+          working={
+            startCheckout.isPending ||
+            startCheckout.isSuccess ||
+            openPortal.isPending ||
+            openPortal.isSuccess
+          }
+          checkoutCanceled={checkoutCanceled}
+          error={planError}
+          onPrimary={() => void handlePlanAction()}
+        />
+      );
     case `computerRequired`:
       return (
         <SupervisionSetupPage
@@ -345,5 +434,60 @@ const ConnectFlow: React.FC<{ flow: string; code: string }> = ({ flow, code }) =
 };
 
 export const Route = createFileRoute(`/_app/connect/$flow/$code`)({
+  validateSearch: (search): ConnectSearch => ({
+    checkout:
+      search[`checkout`] === `success` || search[`checkout`] === `canceled`
+        ? search[`checkout`]
+        : undefined,
+    session_id:
+      typeof search[`session_id`] === `string` ? search[`session_id`] : undefined,
+    step: search[`step`] === `download` ? `download` : undefined,
+  }),
+  loaderDeps: ({ search }) => ({
+    checkout: search.checkout,
+    sessionId: search.session_id,
+  }),
+  loader: async ({ params, deps: { checkout, sessionId }, context, cause }) => {
+    if (cause === `preload` || !checkout || !sessionId) {
+      return { checkoutError: undefined };
+    }
+
+    if (checkout === `canceled`) {
+      void liveClient.handleAccountCheckoutCancel({ stripeCheckoutSessionId: sessionId });
+      throw redirect({
+        to: `/connect/$flow/$code`,
+        params,
+        search: { checkout: `canceled` },
+        replace: true,
+      });
+    }
+
+    const result = await liveClient.handleAccountCheckoutSuccess({
+      stripeCheckoutSessionId: sessionId,
+    });
+    if (result.error) {
+      return {
+        checkoutError:
+          result.error.userMessage ??
+          `We couldn’t confirm your subscription. Check your connection and try again.`,
+      };
+    }
+
+    await context.queryClient.invalidateQueries({
+      queryKey: Key.iosClaim(params.flow, params.code).segments,
+    });
+    toast.success(`Your Gertrude subscription is ready`);
+    throw redirect({
+      to: `/connect/$flow/$code`,
+      params,
+      search: { step: `download` },
+      replace: true,
+    });
+  },
+  pendingComponent: () => (
+    <div className="flex min-h-screen items-center justify-center bg-stone-50">
+      <LoadingDots />
+    </div>
+  ),
   component: ConnectRoute,
 });

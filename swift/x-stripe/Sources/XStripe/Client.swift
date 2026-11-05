@@ -162,8 +162,8 @@ private func _createCheckoutSession(
   secretKey: String,
 ) async throws -> Stripe.Api.CheckoutSession {
   var params = [
-    "success_url": data.successUrl,
-    "cancel_url": data.cancelUrl,
+    "success_url": data.successUrl.replacingOccurrences(of: "&", with: "%26"),
+    "cancel_url": data.cancelUrl.replacingOccurrences(of: "&", with: "%26"),
     "mode": data.mode.rawValue,
   ]
 

@@ -1404,6 +1404,30 @@
     }
   },
   {
+    "id": "account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled&viewMode=story",
+    "name": "Subscription checkout canceled",
+    "path": "screenshots/mobile/account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled",
+    "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled&viewMode=story",
+    "name": "Subscription checkout canceled",
+    "path": "screenshots/desktop/account-pages-connect-ios-app-supervision-setup--subscription-checkout-canceled.png",
+    "title": "Account/Pages/Connect iOS App/Supervision setup",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-connect-ios-app-supervision-setup--subscription-required",
     "iframePath": "/iframe.html?id=account-pages-connect-ios-app-supervision-setup--subscription-required&viewMode=story",
     "name": "Subscription required",
@@ -3852,10 +3876,10 @@
     }
   },
   {
-    "id": "account-pages-settings-checkout-result--checkout-succeeded",
-    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-succeeded&viewMode=story",
-    "name": "Checkout succeeded",
-    "path": "screenshots/mobile/account-pages-settings-checkout-result--checkout-succeeded.png",
+    "id": "account-pages-settings-checkout-result--checkout-failed",
+    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-failed&viewMode=story",
+    "name": "Checkout failed",
+    "path": "screenshots/mobile/account-pages-settings-checkout-result--checkout-failed.png",
     "title": "Account/Pages/Settings/Checkout result",
     "viewport": {
       "width": 390,
@@ -3864,10 +3888,10 @@
     }
   },
   {
-    "id": "account-pages-settings-checkout-result--checkout-succeeded",
-    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-succeeded&viewMode=story",
-    "name": "Checkout succeeded",
-    "path": "screenshots/desktop/account-pages-settings-checkout-result--checkout-succeeded.png",
+    "id": "account-pages-settings-checkout-result--checkout-failed",
+    "iframePath": "/iframe.html?id=account-pages-settings-checkout-result--checkout-failed&viewMode=story",
+    "name": "Checkout failed",
+    "path": "screenshots/desktop/account-pages-settings-checkout-result--checkout-failed.png",
     "title": "Account/Pages/Settings/Checkout result",
     "viewport": {
       "width": 1440,
@@ -3916,6 +3940,30 @@
     "iframePath": "/iframe.html?id=account-pages-unauthed--email-already-verified&viewMode=story",
     "name": "Email Already Verified",
     "path": "screenshots/desktop/account-pages-unauthed--email-already-verified.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--link-expired",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--link-expired&viewMode=story",
+    "name": "Link Expired",
+    "path": "screenshots/mobile/account-pages-unauthed--link-expired.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--link-expired",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--link-expired&viewMode=story",
+    "name": "Link Expired",
+    "path": "screenshots/desktop/account-pages-unauthed--link-expired.png",
     "title": "Account/Pages/Unauthed",
     "viewport": {
       "width": 1440,
