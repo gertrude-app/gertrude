@@ -1,10 +1,15 @@
 import ComposableArchitecture
+import GertieApp
 import GertieUI
 import LibViews
 import SwiftUI
 
 #if canImport(UIKit)
   import UIKit
+#endif
+
+#if os(iOS) && !canImport(SwiftUI, _version: 8.0.85) && !DEBUG
+  #error("Archive Gertrude Music with Xcode 27.1 or newer, or the iPhone Duo layouts are left out.")
 #endif
 
 public struct EntryPoint: View {
@@ -24,6 +29,23 @@ public struct EntryPoint: View {
       .tint(.gertrudeBrandAccent)
   }
 }
+
+#if canImport(UIKit)
+  public final class MusicAppDelegate: NSObject, UIApplicationDelegate {
+    public func application(
+      _: UIApplication,
+      supportedInterfaceOrientationsFor _: UIWindow?,
+    ) -> UIInterfaceOrientationMask {
+      if UIDevice.current.userInterfaceIdiom == .pad {
+        return .all
+      }
+      if IOSDeviceInfo.modelIdentifier() == "iPhone19,4" {
+        return .allButUpsideDown
+      }
+      return .portrait
+    }
+  }
+#endif
 
 @MainActor
 public struct AppStore {

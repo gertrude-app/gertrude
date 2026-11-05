@@ -1,10 +1,60 @@
+import GertieUI
 import SwiftUI
 
 struct ArtistDetailHeroView: View {
+  let artist: ArtistDetailData
+  let containerWidth: CGFloat
+  let isPlaying: Bool
+  let isLoading: Bool
+  let onPlayTap: @MainActor @Sendable () -> Void
+  var maximumArtworkSize: CGFloat = 320
+
+  var body: some View {
+    Group {
+      if DetailHeroLayout.usesHorizontalLayout(containerWidth: self.containerWidth) {
+        HStack(spacing: 36) {
+          ArtistArtworkView(
+            artworkUrl: self.artist.artworkUrl,
+            size: min(
+              self.maximumArtworkSize,
+              min(280, max(220, (self.containerWidth - 96) * 0.36)),
+            ),
+          )
+
+          ArtistDetailMetadataView(
+            artist: self.artist,
+            isPlaying: self.isPlaying,
+            isLoading: self.isLoading,
+            onPlayTap: self.onPlayTap,
+          )
+          .frame(maxWidth: 440)
+        }
+        .frame(maxWidth: 900)
+      } else {
+        VStack(spacing: 18) {
+          ArtistArtworkView(
+            artworkUrl: self.artist.artworkUrl,
+            size: max(1, min(self.maximumArtworkSize, min(220, self.containerWidth - 80))),
+          )
+
+          ArtistDetailMetadataView(
+            artist: self.artist,
+            isPlaying: self.isPlaying,
+            isLoading: self.isLoading,
+            onPlayTap: self.onPlayTap,
+          )
+        }
+      }
+    }
+    .frame(maxWidth: .infinity)
+    .accessibilityElement(children: .contain)
+  }
+}
+
+struct ArtistDetailMetadataView: View {
   @Environment(\.self) private var environment
 
   let artist: ArtistDetailData
-  let containerWidth: CGFloat
   let isPlaying: Bool
   let isLoading: Bool
   let onPlayTap: @MainActor @Sendable () -> Void
@@ -15,39 +65,12 @@ struct ArtistDetailHeroView: View {
       environment: self.environment,
     )
 
-    Group {
-      if self.containerWidth >= 800 {
-        HStack(spacing: 36) {
-          ArtistArtworkView(
-            artworkUrl: self.artist.artworkUrl,
-            size: min(280, max(220, (self.containerWidth - 96) * 0.36)),
-          )
+    VStack(spacing: 18) {
+      self.artistName
 
-          VStack(spacing: 18) {
-            self.artistName
-
-            self.playButton(colors: colors)
-              .frame(maxWidth: 440)
-          }
-          .frame(maxWidth: 440)
-        }
-        .frame(maxWidth: 900)
-      } else {
-        VStack(spacing: 18) {
-          ArtistArtworkView(
-            artworkUrl: self.artist.artworkUrl,
-            size: max(1, min(220, self.containerWidth - 80)),
-          )
-
-          self.artistName
-
-          self.playButton(colors: colors)
-            .frame(maxWidth: 520)
-        }
-      }
+      self.playButton(colors: colors)
+        .frame(maxWidth: 520)
     }
-    .frame(maxWidth: .infinity)
-    .accessibilityElement(children: .contain)
   }
 
   private var artistName: some View {
@@ -69,7 +92,7 @@ struct ArtistDetailHeroView: View {
             .font(.system(size: 15, weight: .bold))
         }
 
-        Text("\(self.isPlaying ? "Playing" : "Play") \(self.artist.name)")
+        Text(self.isPlaying ? "Playing" : "Play")
           .font(.headline)
           .multilineTextAlignment(.center)
           .lineLimit(2)
@@ -79,8 +102,10 @@ struct ArtistDetailHeroView: View {
       .padding(.horizontal, 16)
       .padding(.vertical, 14)
       .background(colors.background, in: .capsule)
+      .contentShape(.capsule)
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.gertiePressable)
     .disabled(self.isLoading)
+    .accessibilityLabel("\(self.isPlaying ? "Playing" : "Play") \(self.artist.name)")
   }
 }

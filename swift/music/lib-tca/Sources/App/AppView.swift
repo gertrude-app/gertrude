@@ -10,6 +10,7 @@ struct AppView: View {
   @Environment(\.colorScheme) private var colorScheme
   @Environment(\.scenePhase) private var scenePhase
   @Dependency(\.musicIdentity) private var identity
+  @Namespace private var nowPlayingNamespace
 
   var body: some View {
     Group {
@@ -134,6 +135,7 @@ struct AppView: View {
       self.iOSTabView
         .nowPlayingPresentation(
           isPresented: self.nowPlayingPresented,
+          zoomNamespace: self.nowPlayingNamespace,
           background: {
             NowPlayingBackgroundView(
               artworkURL: self.store.playback.session?.currentItem.artworkURL,
@@ -155,6 +157,7 @@ struct AppView: View {
                 showsBackground: false,
               )
             }
+            .nowPlayingZoomSource(in: self.nowPlayingNamespace)
           }
           .tabBarMinimizeBehavior(.onScrollDown)
       } else if #available(iOS 18.0, *) {

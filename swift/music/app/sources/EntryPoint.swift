@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct AppEntryPoint: App {
+  @UIApplicationDelegateAdaptor(MusicAppDelegate.self) private var appDelegate
   private let store: AppStore
 
   init() {

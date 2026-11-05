@@ -3,56 +3,99 @@ import SwiftUI
 
 struct MusicClaimCodeView: View {
   @Environment(\.colorScheme) private var colorScheme
+  @State private var statusStartedAt = ContinuousClock.now
 
   let code: Int
   let audience: MusicClaimAudience
   let statusDelay: Duration
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      Image(systemName: "link.circle")
-        .font(.system(size: 40, weight: .regular))
-        .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
-        .accessibilityHidden(true)
-        .frame(maxWidth: .infinity, alignment: .center)
-
-      Spacer()
-      Spacer()
-
-      GertieWaitingStatus(label: "Waiting for account connection…", delay: self.statusDelay)
-
-      Spacer()
-
-      Text(self.instructions)
-        .font(.system(size: 17, weight: .medium))
-        .foregroundStyle(Color(
-          self.colorScheme,
-          light: .black.opacity(0.8),
-          dark: .white.opacity(0.8),
-        ))
-        .fixedSize(horizontal: false, vertical: true)
-
-      Text(self.claimLink.url.absoluteString)
-        .font(.system(size: 20, weight: .semibold, design: .monospaced))
-        .minimumScaleFactor(0.7)
-        .lineLimit(1)
-        .foregroundStyle(Color(self.colorScheme, light: .violet600, dark: .violet300))
-        .frame(maxWidth: .infinity, alignment: .center)
-        .padding(.vertical, 8)
-        .textSelection(.enabled)
-
-      ShareLink(item: self.claimLink.url.absoluteString) {
-        HStack(spacing: 8) {
-          Text("Send link")
-          Image(systemName: "square.and.arrow.up")
-        }
+    GertieFoldAwareScreen(
+      spacing: 16,
+      alignment: .leading,
+      centersFlatContentOnPad: true,
+    ) {
+      self.flatContent
+    } icon: {
+      self.icon
+    } message: {
+      VStack(alignment: .leading, spacing: 16) {
+        self.waitingStatus
+        self.instructionsView
+        self.linkView
       }
-      .buttonStyle(.gertiePrimary)
+    } actions: {
+      self.shareButton
+    }
+  }
+
+  private var flatContent: some View {
+    VStack(alignment: .leading, spacing: 16) {
+      self.icon
+
+      Spacer()
+      Spacer()
+
+      self.waitingStatus
+
+      Spacer()
+
+      self.instructionsView
+      self.linkView
+      self.shareButton
     }
     .frame(maxWidth: 500)
     .padding(30)
     .padding(.top, 50)
-    .gertieScreenBackground()
+  }
+
+  private var icon: some View {
+    Image(systemName: "link.circle")
+      .font(.system(size: 40, weight: .regular))
+      .foregroundStyle(Color(self.colorScheme, light: .violet500, dark: .violet400))
+      .accessibilityHidden(true)
+      .frame(maxWidth: .infinity, alignment: .center)
+  }
+
+  private var waitingStatus: some View {
+    GertieWaitingStatus(
+      label: "Waiting for account connection…",
+      delay: self.statusDelay,
+      startedAt: self.statusStartedAt,
+    )
+  }
+
+  private var instructionsView: some View {
+    Text(self.instructions)
+      .font(.system(size: 17, weight: .medium))
+      .foregroundStyle(Color(
+        self.colorScheme,
+        light: .black.opacity(0.8),
+        dark: .white.opacity(0.8),
+      ))
+      .fixedSize(horizontal: false, vertical: true)
+      .gertieScreenTextAlignment()
+  }
+
+  private var linkView: some View {
+    Text(self.claimLink.url.absoluteString)
+      .font(.system(size: 20, weight: .semibold, design: .monospaced))
+      .minimumScaleFactor(0.7)
+      .lineLimit(1)
+      .foregroundStyle(Color(self.colorScheme, light: .violet600, dark: .violet300))
+      .frame(maxWidth: .infinity, alignment: .center)
+      .padding(.vertical, 8)
+      .textSelection(.enabled)
+  }
+
+  private var shareButton: some View {
+    ShareLink(item: self.claimLink.url.absoluteString) {
+      HStack(spacing: 8) {
+        Text("Send link")
+        Image(systemName: "square.and.arrow.up")
+      }
+    }
+    .buttonStyle(.gertiePrimary)
   }
 
   init(
