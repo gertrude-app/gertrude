@@ -9,7 +9,6 @@ struct AppFeature: Sendable {
   enum Tab: Equatable, Hashable, Sendable {
     case library
     case queue
-    case search
   }
 
   @ObservableState
@@ -119,12 +118,22 @@ struct AppFeature: Sendable {
   @Dependency(\.date.now) var now
   @Dependency(\.device) var device
   @Dependency(\.keychain) var keychain
+  @Dependency(\.libraryLastSelection) var libraryLastSelection
   @Dependency(\.musicIdentity) var musicIdentity
   @Dependency(\.playback) var playback
   @Dependency(\.playbackSessionCache) var playbackSessionCache
   @Dependency(\.reviewPromptStorage) var reviewPromptStorage
 
   var body: some ReducerOf<Self> {
+    self.features
+      .onChange(of: \.library.selectedCollectionIdentity) { _, state in
+        let selection = state.library.selectedCollectionIdentity
+        return .run { _ in await self.libraryLastSelection.save(selection) }
+      }
+  }
+
+  @ReducerBuilder<State, Action>
+  private var features: some ReducerOf<Self> {
     Scope(\.killSwitch, action: \.killSwitch) {
       KillSwitchFeature(app: .music) {
         guard let deviceId = await self.device.vendorId() else {
@@ -284,9 +293,6 @@ struct AppFeature: Sendable {
 
       case .tabSelected(let tab):
         state.selectedTab = tab
-        if tab == .search {
-          state.search.applyLibraryStatus(state.library.status)
-        }
         return .none
 
       #if DEBUG
@@ -425,9 +431,8 @@ struct AppFeature: Sendable {
         self.synchronizeDetailPlayback(state: &state)
         return .send(.playback(.saveCachedSession))
 
-      case .search(.delegate(.browseLibrary)):
-        state.selectedTab = .library
-        return .none
+      case .search(.delegate(.collectionSelected(let selection))):
+        return .send(.library(.selectionChanged(selection)))
 
       case .search(.delegate(.library(let action))):
         return .send(.library(action))
@@ -469,7 +474,6 @@ struct AppFeature: Sendable {
         return .none
 
       case .search:
-        self.synchronizeDetailPlayback(state: &state)
         return .none
 
       case .setup(.delegate(.completed)):
@@ -477,6 +481,10 @@ struct AppFeature: Sendable {
           ? .home
           : .postOnboarding
         return self.presentCrossPromo(&state, for: trigger)
+
+      case .setup(.onAppear):
+        guard state.setup.resumedStoredConnection else { return .none }
+        return .send(.library(.launchRestoreRequested))
 
       case .setup:
         return .none
@@ -680,16 +688,6 @@ struct AppFeature: Sendable {
     )
     state.library.setAlbumDetailPlaybackFailure(state.playback.failure)
     state.library.setPlaylistDetailPlaybackFailure(state.playback.failure)
-    state.search.setAlbumDetailPlaybackSession(
-      state.playback.session,
-      activeContext: state.playback.activePlaybackContext,
-    )
-    state.search.setPlaylistDetailPlaybackSession(
-      state.playback.session,
-      activeContext: state.playback.activePlaybackContext,
-    )
-    state.search.setAlbumDetailPlaybackFailure(state.playback.failure)
-    state.search.setPlaylistDetailPlaybackFailure(state.playback.failure)
   }
 
   private func resolveCurrentPlaybackAlbum(
