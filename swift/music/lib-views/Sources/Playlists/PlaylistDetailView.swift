@@ -195,17 +195,15 @@ public struct PlaylistDetailView: View {
         }
       }
     }
-    .alert("Rename Playlist", isPresented: self.$isRenamePromptPresented) {
-      TextField("Playlist Name", text: self.$renameText)
-        .onSubmit(self.renamePromptSubmitted)
-      Button("Cancel", role: .cancel, action: self.renamePromptCancelled)
-        .tint(.primary)
-      Button("Save", action: self.renamePromptSubmitted)
-        .tint(.white)
-        .keyboardShortcut(.defaultAction)
-        .disabled(!self.renameText.isValidPlaylistName)
-    } message: {
-      Text("Enter a new name for this playlist.")
+    .sheet(isPresented: self.$isRenamePromptPresented) {
+      PlaylistNamePrompt(
+        title: "Rename Playlist",
+        message: "Enter a new name for this playlist.",
+        actionTitle: "Save",
+        name: self.$renameText,
+        onCancel: self.renamePromptCancelled,
+        onSubmit: self.renamePromptSubmitted,
+      )
     }
     .alert("Delete “\(self.playlist.name)”?", isPresented: self.$isDeleteConfirmationPresented) {
       Button("Cancel", role: .cancel) {}
@@ -308,26 +306,13 @@ public struct PlaylistDetailView: View {
   }
 
   private var emptyContent: some View {
-    VStack(spacing: 12) {
-      Image(systemName: "music.note.list")
-        .font(.system(size: 28, weight: .semibold))
-        .foregroundStyle(.secondary)
-
-      Text("This playlist is empty")
-        .font(.headline)
-
-      Text("Add approved songs or albums from your library.")
-        .font(.subheadline)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(.center)
-
-      Button("Add Music", action: self.onAddMusicTap)
-        .buttonStyle(.borderedProminent)
-        .tint(Color.gertrudeBrandAccent)
-    }
-    .padding(28)
-    .frame(maxWidth: .infinity)
-    .background(.primary.opacity(0.05), in: .rect(cornerRadius: 24, style: .continuous))
+    MusicEmptyState(
+      "This playlist is empty",
+      message: "Add approved songs or albums from your library.",
+      buttonTitle: "Add Music",
+      onButtonTap: self.onAddMusicTap,
+    )
+    .padding(.vertical, 32)
   }
 
   private var trackCountText: String {

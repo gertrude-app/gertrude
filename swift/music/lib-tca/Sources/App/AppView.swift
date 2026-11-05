@@ -107,15 +107,14 @@ struct AppView: View {
     @ViewBuilder
     private var iOSContent: some View {
       if !self.store.identity.available {
-        ContentUnavailableView {
-          Label("Connecting Gertrude Music", systemImage: "music.note")
-        } description: {
-          Text(self.store.identity.migrationPending
+        MusicEmptyState(
+          "Connecting Gertrude Music",
+          message: self.store.identity.migrationPending
             ? "We’re connecting this phone to your account. Connect to the internet and try again."
-            : "We couldn’t prepare this device. Please try again.")
-        } actions: {
-          Button("Try Again") { self.store.send(.identityRetryTapped) }
-        }
+            : "We couldn’t prepare this device. Please try again.",
+          buttonTitle: "Try Again",
+        ) { self.store.send(.identityRetryTapped) }
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else {
         Group {
           if self.store.setup.isReady {
@@ -259,17 +258,13 @@ struct AppView: View {
             },
           )
         } else {
-          ContentUnavailableView {
-            Label("Your queue is empty", systemImage: "music.note.list")
-          } description: {
-            Text("Choose an approved album, artist, or song to start listening.")
-          } actions: {
-            Button("Browse Library") {
-              self.store.send(.queueBrowseLibraryButtonTapped)
-            }
-            .buttonStyle(.borderedProminent)
-          }
-          .navigationTitle("Queue")
+          MusicEmptyState(
+            "Your queue is empty",
+            message: "Choose an approved album, artist, or song to start listening.",
+            buttonTitle: "Browse Library",
+          ) { self.store.send(.queueBrowseLibraryButtonTapped) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle("Queue")
         }
       }
     }

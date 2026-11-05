@@ -112,17 +112,15 @@ public struct LibraryView: View {
       .overlay(alignment: .top) {
         LibraryRefreshAtmosphere(isActive: self.isRefreshing)
       }
-      .alert("New Playlist", isPresented: self.$isCreatePlaylistPromptPresented) {
-        TextField("Playlist Name", text: self.$createPlaylistName)
-          .onSubmit(self.createPlaylistPromptSubmitted)
-        Button("Cancel", role: .cancel, action: self.createPlaylistPromptCancelled)
-          .tint(.primary)
-        Button("Create", action: self.createPlaylistPromptSubmitted)
-          .tint(.white)
-          .keyboardShortcut(.defaultAction)
-          .disabled(!self.createPlaylistName.isValidPlaylistName)
-      } message: {
-        Text("Enter a name for your playlist.")
+      .sheet(isPresented: self.$isCreatePlaylistPromptPresented) {
+        PlaylistNamePrompt(
+          title: "New Playlist",
+          message: "Enter a name for your playlist.",
+          actionTitle: "Create",
+          name: self.$createPlaylistName,
+          onCancel: self.createPlaylistPromptCancelled,
+          onSubmit: self.createPlaylistPromptSubmitted,
+        )
       }
   }
 
@@ -202,7 +200,6 @@ public struct LibraryView: View {
       self.messageContent(
         title: "No music yet",
         message: "Approved artists, albums, and your playlists will appear here.",
-        systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
 
@@ -210,15 +207,13 @@ public struct LibraryView: View {
       self.messageContent(
         title: "Couldn’t load library",
         message: "Check your connection and try again.",
-        systemImage: "wifi.exclamationmark",
         buttonTitle: "Try again",
       )
 
     case .musicAccessUnavailable:
       self.messageContent(
-        title: LibraryMessageCard.musicAccessUnavailableTitle,
-        message: LibraryMessageCard.musicAccessUnavailableMessage,
-        systemImage: "music.note",
+        title: "Subscription needs attention",
+        message: "Gertrude Music requires at least an active $5/month Medium subscription. Ask the parent or accountability partner who manages the connected account to check its subscription or payment method.",
         buttonTitle: "Check again",
       )
     }
@@ -227,19 +222,16 @@ public struct LibraryView: View {
   private func messageContent(
     title: String,
     message: String,
-    systemImage: String,
     buttonTitle: String,
   ) -> some View {
     ScrollView {
       VStack(spacing: 14) {
-        LibraryMessageCard(
-          title: title,
+        MusicEmptyState(
+          title,
           message: message,
-          systemImage: systemImage,
           buttonTitle: buttonTitle,
           onButtonTap: self.onRetryTap,
         )
-        .frame(maxWidth: 600)
 
         #if DEBUG
           if let onDebugResetTap = self.onDebugResetTap {

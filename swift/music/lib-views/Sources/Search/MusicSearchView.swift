@@ -100,7 +100,6 @@ public struct MusicSearchView: View {
       self.messageContent(
         title: "No music yet",
         message: "Approved artists, albums, and your playlists will appear here.",
-        systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
 
@@ -108,15 +107,13 @@ public struct MusicSearchView: View {
       self.messageContent(
         title: "Couldn’t load library",
         message: "Check your connection and try again.",
-        systemImage: "wifi.exclamationmark",
         buttonTitle: "Try again",
       )
 
     case .musicAccessUnavailable:
       self.messageContent(
-        title: LibraryMessageCard.musicAccessUnavailableTitle,
-        message: LibraryMessageCard.musicAccessUnavailableMessage,
-        systemImage: "music.note",
+        title: "Subscription needs attention",
+        message: "Gertrude Music requires at least an active $5/month Medium subscription. Ask the parent or accountability partner who manages the connected account to check its subscription or payment method.",
         buttonTitle: "Check again",
       )
     }
@@ -125,18 +122,15 @@ public struct MusicSearchView: View {
   private func messageContent(
     title: String,
     message: String,
-    systemImage: String,
     buttonTitle: String,
   ) -> some View {
     ScrollView {
-      LibraryMessageCard(
-        title: title,
+      MusicEmptyState(
+        title,
         message: message,
-        systemImage: systemImage,
         buttonTitle: buttonTitle,
         onButtonTap: self.onRetryTap,
       )
-      .frame(maxWidth: 600)
       .padding(.horizontal, 20)
       .padding(.top, 48)
       .padding(.bottom, 96)
