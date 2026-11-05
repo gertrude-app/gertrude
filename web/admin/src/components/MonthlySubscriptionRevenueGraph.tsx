@@ -51,7 +51,7 @@ const formatTickMonth = (month: string): string =>
   dateForMonth(month).toLocaleDateString(`en-US`, { month: `short` });
 
 const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphProps> = ({
-  months,
+  months: revenueMonths,
 }) => {
   const [range, setRange] = useState<RangeOption>(`all`);
   const [showProjections, setShowProjections] = useState(
@@ -59,6 +59,10 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
   );
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
+  const months = revenueMonths.map((month) => ({
+    ...month,
+    centsCollected: month.fullPlanCents + month.mediumPlanCents + month.lightPlanCents,
+  }));
   const now = new Date();
   const forecast = monthlyRevenueGrowthForecast(months, now);
   const currentMonth = forecast.currentMonth;
@@ -170,10 +174,6 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
             <span className="w-2.5 h-2.5 rounded-sm bg-sky-500" />
             Light Plan
           </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-slate-300" />
-            Other
-          </span>
           {showProjections && (
             <span className="inline-flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-sm bg-slate-200" />
@@ -227,13 +227,6 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
                 month.centsCollected > 0
                   ? (month.lightPlanCents / month.centsCollected) * barHeight
                   : 0;
-              const otherHeight =
-                month.centsCollected > 0
-                  ? Math.max(
-                      0,
-                      barHeight - fullPlanHeight - mediumPlanHeight - lightPlanHeight,
-                    )
-                  : barHeight;
 
               return (
                 <div
@@ -272,12 +265,6 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
                           <div
                             className="w-full bg-sky-500"
                             style={{ height: lightPlanHeight }}
-                          />
-                        )}
-                        {month.otherCents > 0 && (
-                          <div
-                            className="w-full bg-slate-300"
-                            style={{ height: otherHeight }}
                           />
                         )}
                       </>
@@ -391,15 +378,6 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
                     </span>
                     <span className="font-medium text-slate-700">
                       {formatDollars(hoveredMonth.lightPlanCents)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-sm bg-slate-300" />
-                      Other
-                    </span>
-                    <span className="font-medium text-slate-700">
-                      {formatDollars(hoveredMonth.otherCents)}
                     </span>
                   </div>
                 </div>
