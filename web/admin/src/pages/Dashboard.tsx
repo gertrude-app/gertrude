@@ -229,7 +229,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({
     data.lightPlanCount -
     data.trialingCount;
   // monthly compensation from living room
-  const LIVING_ROOM_MONTHLY = 150;
+  const LIVING_ROOM_MONTHLY = 225;
   const stats = [
     {
       label: `Protected People`,

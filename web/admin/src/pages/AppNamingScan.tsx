@@ -3,6 +3,8 @@ import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import { CheckIcon, LoadingSpinner } from '../components/Icons';
 
+import { normalizedBundleId, toSlug } from '../lib/appNaming';
+
 type UnidentifiedApp = T.GetUnidentifiedApps.Output[`apps`][number];
 type IdentifiedApp = T.GetIdentifiedAppsForAdmin.Output[number];
 
@@ -51,23 +53,6 @@ interface ItunesHit {
   promoted: boolean;
   upgradedKeyCount: number;
   error: string | null;
-}
-
-function normalizedBundleId(bundleId: string): string {
-  const stripped = bundleId.startsWith(`.`) ? bundleId.slice(1) : bundleId;
-  const parts = stripped.split(`.`);
-  const first = parts[0] ?? ``;
-  if (parts.length > 1 && /^[A-Z0-9]{10}$/.test(first)) {
-    return parts.slice(1).join(`.`);
-  }
-  return stripped;
-}
-
-function toSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, `-`)
-    .replace(/^-|-$/g, ``);
 }
 
 const AppNamingScan: React.FC = () => {
