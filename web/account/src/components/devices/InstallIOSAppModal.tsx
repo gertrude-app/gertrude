@@ -1,13 +1,10 @@
 import { AppIcon, Button, Modal, Text, VStack } from '@gertrude/ui';
 import { CheckIcon, CopyIcon, DownloadIcon, LinkIcon, ShareIcon } from 'lucide-react';
 import React from 'react';
+import type { IOSSetupApp } from '#/components/onboarding/setupApps';
 import InstructionStep from './InstructionStep';
 import QrCode from '#/components/QrCode';
-import {
-  type IOSSetupApp,
-  appStoreUrls,
-  setupApps,
-} from '#/components/onboarding/setupApps';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 export type ShareLinkMethod = `share` | `copy`;
 
@@ -43,8 +40,7 @@ const InstallIOSAppModal: React.FC<Props> = ({
   copied = false,
   onShareLink,
 }) => {
-  const details = setupApps.find((candidate) => candidate.id === app);
-  if (!details) return null;
+  const details = gertrudeApps[app];
   const device = personName ? `${personName}’s iPhone or iPad` : `their iPhone or iPad`;
   const note = appNotes[app];
 
@@ -68,7 +64,7 @@ const InstallIOSAppModal: React.FC<Props> = ({
             <VStack align="center" gap={3} className="mt-4">
               <div className="rounded-2xl border border-stone-200 bg-white p-3 shadow-sm">
                 <QrCode
-                  value={appStoreUrls[app]}
+                  value={details.appStoreUrl}
                   label={`QR code for ${details.name} on the App Store`}
                   center={
                     <AppIcon

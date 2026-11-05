@@ -480,30 +480,6 @@
     }
   },
   {
-    "id": "account-design-references-people--default",
-    "iframePath": "/iframe.html?id=account-design-references-people--default&viewMode=story",
-    "name": "Default",
-    "path": "screenshots/mobile/account-design-references-people--default.png",
-    "title": "Account/Design References/People",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-design-references-people--default",
-    "iframePath": "/iframe.html?id=account-design-references-people--default&viewMode=story",
-    "name": "Default",
-    "path": "screenshots/desktop/account-design-references-people--default.png",
-    "title": "Account/Design References/People",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
     "id": "account-devices-connect-mac-modal--connection-code",
     "iframePath": "/iframe.html?id=account-devices-connect-mac-modal--connection-code&viewMode=story",
     "name": "Connection code",
@@ -2020,6 +1996,30 @@
     "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--multiple-apps-selected&viewMode=story",
     "name": "Multiple apps selected",
     "path": "screenshots/desktop/account-pages-onboarding-choose-apps--multiple-apps-selected.png",
+    "title": "Account/Pages/Onboarding/Choose Apps",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-choose-apps--saving",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--saving&viewMode=story",
+    "name": "Saving",
+    "path": "screenshots/mobile/account-pages-onboarding-choose-apps--saving.png",
+    "title": "Account/Pages/Onboarding/Choose Apps",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-onboarding-choose-apps--saving",
+    "iframePath": "/iframe.html?id=account-pages-onboarding-choose-apps--saving&viewMode=story",
+    "name": "Saving",
+    "path": "screenshots/desktop/account-pages-onboarding-choose-apps--saving.png",
     "title": "Account/Pages/Onboarding/Choose Apps",
     "viewport": {
       "width": 1440,

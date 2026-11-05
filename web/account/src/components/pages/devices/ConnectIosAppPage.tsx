@@ -5,15 +5,15 @@ import React from 'react';
 import type { PersonRelationship } from '#/components/types';
 import PairingPageLayout, { PairingHeaderBackground } from './PairingPageLayout';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
+import { type IOSConnectFlow, appForConnectFlow, gertrudeApps } from '#/lib/gertrudeApps';
 import { selfRelationshipUnavailableMessage } from '#/lib/people';
 
-type Flow = `blockerConnect` | `blockerSupervise` | `podcasts` | `music`;
 type Selection =
   | { type: `existing`; id: string }
   | { type: `new`; name: string; relationship: PersonRelationship };
 
 interface Props {
-  flow: Flow;
+  flow: IOSConnectFlow;
   device: {
     type: `iPhone` | `iPad`;
     modelName: string;
@@ -30,36 +30,6 @@ interface Props {
   onCancel: () => void;
 }
 
-const flowDetails: Record<
-  Flow,
-  { appName: string; shortName: string; icon: string; supervision: boolean }
-> = {
-  blockerConnect: {
-    appName: `Gertrude Blocker`,
-    shortName: `Blocker`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-    supervision: false,
-  },
-  blockerSupervise: {
-    appName: `Gertrude Blocker`,
-    shortName: `Blocker`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-    supervision: true,
-  },
-  podcasts: {
-    appName: `Gertrude Podcasts`,
-    shortName: `Podcasts`,
-    icon: `/gertrude-app-icons/podcasts.webp`,
-    supervision: false,
-  },
-  music: {
-    appName: `Gertrude Music`,
-    shortName: `Music`,
-    icon: `/gertrude-app-icons/music.webp`,
-    supervision: false,
-  },
-};
-
 const NEW_PERSON = `__new_person__`;
 
 const ConnectIosAppPage: React.FC<Props> = ({
@@ -73,7 +43,8 @@ const ConnectIosAppPage: React.FC<Props> = ({
   onSubmit,
   onCancel,
 }) => {
-  const details = flowDetails[flow];
+  const details = gertrudeApps[appForConnectFlow(flow)];
+  const supervision = flow === `blockerSupervise`;
   const [selected, setSelected] = React.useState<string | null>(
     initialSelection?.type === `existing`
       ? initialSelection.id
@@ -103,13 +74,13 @@ const ConnectIosAppPage: React.FC<Props> = ({
       (relationship !== null &&
         !(relationship === `self` && selfRelationshipUnavailable))) &&
     !submitting;
-  const action = details.supervision
+  const action = supervision
     ? selectedName
       ? `Continue setup for ${selectedName}`
       : `Continue setup`
     : selectedName
       ? `Connect ${details.shortName} for ${selectedName}`
-      : `Connect ${details.appName}`;
+      : `Connect ${details.name}`;
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -128,11 +99,11 @@ const ConnectIosAppPage: React.FC<Props> = ({
           <PairingHeaderBackground />
           <div
             className="relative flex items-center justify-center gap-4"
-            aria-label={`${details.appName} on ${device.modelName}`}
+            aria-label={`${details.name} on ${device.modelName}`}
           >
             <img
               src={details.icon}
-              alt={details.appName}
+              alt={details.name}
               className="h-10 w-10 rounded-xl shadow-sm"
             />
             <svg

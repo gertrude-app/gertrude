@@ -8,7 +8,7 @@ import { useMutation } from '#/pairql/mutation';
 
 type Person = { id: string; name: string };
 
-export function useConnectMac(): {
+export function useConnectMac(closeOnChange?: unknown): {
   connectMac: (people: Person[]) => void;
   modalProps: React.ComponentProps<typeof ConnectMacModal>;
 } {
@@ -17,6 +17,10 @@ export function useConnectMac(): {
   const [choices, setChoices] = React.useState<Person[]>([]);
   const [person, setPerson] = React.useState<Person>();
   const [trialStarted, setTrialStarted] = React.useState(false);
+
+  React.useEffect(() => {
+    setOpen(false);
+  }, [closeOnChange]);
   const createCode = useMutation(liveClient.createMacConnectionCode);
   const startTrial = useMutation(liveClient.startAccountFullTrial, {
     invalidating: [Key.accountBilling],

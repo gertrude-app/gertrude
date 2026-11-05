@@ -28,3 +28,17 @@ export const MultipleAppsSelected = {
     </StoryScreen>
   ),
 };
+
+export const Saving = {
+  render: () => (
+    <StoryScreen>
+      <ChooseAppsPage
+        selectedApps={[`mac`, `music`]}
+        onSelectedAppsChange={noop}
+        onContinue={noop}
+        onSkip={noop}
+        saving="continue"
+      />
+    </StoryScreen>
+  ),
+};

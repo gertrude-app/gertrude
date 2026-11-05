@@ -40,6 +40,13 @@ const WelcomeRoute: React.FC = () => {
       onSelectedAppsChange={setSelectedApps}
       onContinue={save}
       onSkip={() => save([])}
+      saving={
+        saveApps.isPending
+          ? saveApps.variables.apps.length > 0
+            ? `continue`
+            : `skip`
+          : undefined
+      }
     />
   );
 };

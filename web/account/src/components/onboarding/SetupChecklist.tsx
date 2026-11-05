@@ -1,6 +1,6 @@
-import { Button, Card, HStack, Text, VStack } from '@gertrude/ui';
+import { Button, Card, HStack, Text, VStack, useSidebarContext } from '@gertrude/ui';
 import cx from 'clsx';
-import { ArrowRightIcon, CheckIcon, ChevronDownIcon } from 'lucide-react';
+import { ArrowRightIcon, CheckIcon, SettingsIcon } from 'lucide-react';
 import React from 'react';
 import {
   type SetupApp,
@@ -13,6 +13,7 @@ interface Props {
   includeNotifications?: boolean;
   completedSteps: SetupStepId[];
   onSelectStep: (step: SetupStepId) => void;
+  onChangeApps?: () => void;
   defaultExpanded?: boolean;
 }
 
@@ -21,8 +22,14 @@ const SetupChecklist: React.FC<Props> = ({
   includeNotifications,
   completedSteps,
   onSelectStep,
+  onChangeApps,
   defaultExpanded = true,
 }) => {
+  const { close } = useSidebarContext();
+  const selectStep = (step: SetupStepId): void => {
+    close();
+    onSelectStep(step);
+  };
   const headingId = React.useId();
   const listId = React.useId();
   const [expanded, setExpanded] = React.useState(defaultExpanded);
@@ -37,44 +44,55 @@ const SetupChecklist: React.FC<Props> = ({
       padding={0}
       className="-mx-2.5 overflow-hidden shadow-sm"
     >
-      <button
-        type="button"
-        aria-expanded={expanded}
-        aria-controls={listId}
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full cursor-pointer flex-col gap-2 rounded-t-[inherit] px-2.5 pt-3 pb-2.5 text-left outline-none transition-colors duration-100 hover:bg-stone-50 focus-visible:bg-stone-50"
-      >
-        <HStack as="span" justify="between" gap={2} className="w-full">
-          <Text id={headingId} variant="captionStrong">
-            Getting started
-          </Text>
-          <HStack as="span" gap={1}>
-            <Text variant="captionMuted">
-              {completedCount} of {steps.length}
+      <div className="relative">
+        <button
+          type="button"
+          aria-expanded={expanded}
+          aria-controls={listId}
+          aria-labelledby={headingId}
+          onClick={() => setExpanded(!expanded)}
+          className="absolute inset-0 cursor-pointer rounded-t-[inherit] outline-none transition-colors duration-100 hover:bg-stone-50 focus-visible:bg-stone-50"
+        />
+        <VStack gap={2} className="pointer-events-none relative px-2.5 pt-2.5 pb-2.5">
+          <HStack justify="between" gap={2} className="w-full">
+            <Text id={headingId} variant="captionStrong">
+              Getting started
             </Text>
-            <ChevronDownIcon
-              aria-hidden="true"
-              className={cx(
-                `size-3.5 text-stone-400 transition-transform duration-200 motion-reduce:transition-none`,
-                !expanded && `-rotate-90`,
+            <HStack gap={1}>
+              <Text variant="captionMuted">
+                {completedCount} of {steps.length}
+              </Text>
+              {onChangeApps && (
+                <button
+                  type="button"
+                  aria-label="Change apps"
+                  title="Change apps"
+                  onClick={() => {
+                    close();
+                    onChangeApps();
+                  }}
+                  className="pointer-events-auto -my-1.5 -mr-1.5 flex size-7 cursor-pointer items-center justify-center rounded-[7px] text-stone-400 outline-none transition-colors duration-100 hover:bg-stone-200/70 hover:text-stone-700 focus-visible:ring-2 focus-visible:ring-violet-300"
+                >
+                  <SettingsIcon aria-hidden="true" className="size-3.5" />
+                </button>
               )}
-            />
+            </HStack>
           </HStack>
-        </HStack>
-        <span
-          role="progressbar"
-          aria-label="Setup progress"
-          aria-valuemin={0}
-          aria-valuemax={steps.length}
-          aria-valuenow={completedCount}
-          className="block h-1 w-full overflow-hidden rounded-full bg-stone-100"
-        >
           <span
-            className="block h-full rounded-full bg-violet-500 transition-[width] duration-300 motion-reduce:transition-none"
-            style={{ width: `${(completedCount / steps.length) * 100}%` }}
-          />
-        </span>
-      </button>
+            role="progressbar"
+            aria-label="Setup progress"
+            aria-valuemin={0}
+            aria-valuemax={steps.length}
+            aria-valuenow={completedCount}
+            className="block h-1 w-full overflow-hidden rounded-full bg-stone-100"
+          >
+            <span
+              className="block h-full rounded-full bg-violet-500 transition-[width] duration-300 motion-reduce:transition-none"
+              style={{ width: `${(completedCount / steps.length) * 100}%` }}
+            />
+          </span>
+        </VStack>
+      </div>
       <div
         id={listId}
         inert={!expanded}
@@ -161,7 +179,7 @@ const SetupChecklist: React.FC<Props> = ({
                           size="small"
                           icon={ArrowRightIcon}
                           iconPosition="right"
-                          onClick={() => onSelectStep(step.id)}
+                          onClick={() => selectStep(step.id)}
                           className="self-start"
                         >
                           Continue
@@ -176,7 +194,7 @@ const SetupChecklist: React.FC<Props> = ({
                 <li key={step.id}>
                   <button
                     type="button"
-                    onClick={() => onSelectStep(step.id)}
+                    onClick={() => selectStep(step.id)}
                     className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-1.5 py-1.5 text-left outline-none transition-colors duration-100 hover:bg-stone-100/70 focus-visible:ring-2 focus-visible:ring-violet-300"
                   >
                     {marker}

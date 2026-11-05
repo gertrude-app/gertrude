@@ -8,7 +8,7 @@ import {
   Text,
   VStack,
 } from '@gertrude/ui';
-import { MonitorSmartphoneIcon, PlusIcon, ScanEyeIcon, SettingsIcon } from 'lucide-react';
+import { MonitorSmartphoneIcon, ScanEyeIcon, SettingsIcon } from 'lucide-react';
 import React from 'react';
 import type { Device, PersonCardPerson } from '#/components/types';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
@@ -18,15 +18,9 @@ interface Props {
   person: PersonCardPerson;
   settingsHref?: string;
   monitorHref?: string;
-  addDeviceHref?: string;
 }
 
-const PersonCard: React.FC<Props> = ({
-  person,
-  settingsHref,
-  monitorHref,
-  addDeviceHref,
-}) => {
+const PersonCard: React.FC<Props> = ({ person, settingsHref, monitorHref }) => {
   const canMonitor =
     monitorHref !== undefined && person.devices.some((device) => device.type === `mac`);
   const hasActions = settingsHref !== undefined || canMonitor;
@@ -48,17 +42,6 @@ const PersonCard: React.FC<Props> = ({
                 icon={MonitorSmartphoneIcon}
                 title="No Devices"
                 description={`Add a device to get started protecting ${person.name}.`}
-                button={
-                  addDeviceHref
-                    ? {
-                        text: `Add Device`,
-                        type: `link`,
-                        href: addDeviceHref,
-                        icon: PlusIcon,
-                        variant: `primary`,
-                      }
-                    : undefined
-                }
               />
             )}
           </VStack>

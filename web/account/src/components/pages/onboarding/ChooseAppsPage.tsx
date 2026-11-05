@@ -21,8 +21,6 @@ import OnboardingScreen from '#/components/onboarding/OnboardingScreen';
 import { type SetupApp, setupApps } from '#/components/onboarding/setupApps';
 import './ChooseAppsPage.css';
 
-export type { SetupApp } from '#/components/onboarding/setupApps';
-
 const question = `What would you like to set up?`;
 
 const platforms = {
@@ -36,6 +34,7 @@ interface Props {
   onSelectedAppsChange: (apps: SetupApp[]) => void;
   onContinue: (apps: SetupApp[]) => void;
   onSkip: () => void;
+  saving?: `continue` | `skip`;
 }
 
 const ChooseAppsPage: React.FC<Props> = ({
@@ -43,6 +42,7 @@ const ChooseAppsPage: React.FC<Props> = ({
   onSelectedAppsChange,
   onContinue,
   onSkip,
+  saving,
 }) => {
   const id = React.useId();
 
@@ -54,7 +54,7 @@ const ChooseAppsPage: React.FC<Props> = ({
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          if (selectedApps.length > 0) onContinue(selectedApps);
+          if (selectedApps.length > 0 && !saving) onContinue(selectedApps);
         }}
       >
         <VStack align="center" gap={3} className="mb-7 text-center @2xl/main:mb-9">
@@ -90,6 +90,7 @@ const ChooseAppsPage: React.FC<Props> = ({
         <fieldset
           aria-labelledby={`${id}-heading`}
           aria-describedby={`${id}-description`}
+          disabled={!!saving}
           className="grid min-w-0 grid-cols-1 gap-3 @2xl/main:grid-cols-2 @2xl/main:gap-4"
         >
           {setupApps.map((app, index) => {
@@ -98,7 +99,10 @@ const ChooseAppsPage: React.FC<Props> = ({
             return (
               <label
                 key={app.id}
-                className="choose-apps-option choose-apps-reveal flex cursor-pointer"
+                className={cx(
+                  `choose-apps-option choose-apps-reveal flex`,
+                  saving ? `pointer-events-none` : `cursor-pointer`,
+                )}
                 style={{ animationDelay: `${1400 + index * 60}ms` }}
               >
                 <input
@@ -203,7 +207,14 @@ const ChooseAppsPage: React.FC<Props> = ({
           </Text>
           <HStack justify="end" gap={3} className="shrink-0">
             <span className="choose-apps-skip choose-apps-reveal">
-              <Button type="button" variant="default" size="large" onClick={onSkip}>
+              <Button
+                type="button"
+                variant="default"
+                size="large"
+                onClick={onSkip}
+                loading={saving === `skip`}
+                disabled={saving === `continue`}
+              >
                 I’ll decide later
               </Button>
             </span>
@@ -214,7 +225,8 @@ const ChooseAppsPage: React.FC<Props> = ({
                 size="large"
                 icon={ArrowRightIcon}
                 iconPosition="right"
-                disabled={selectedApps.length === 0}
+                loading={saving === `continue`}
+                disabled={selectedApps.length === 0 || saving === `skip`}
               >
                 Continue
               </Button>

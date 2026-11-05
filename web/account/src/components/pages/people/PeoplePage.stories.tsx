@@ -123,6 +123,7 @@ const renderGettingStarted = (
           selectedApps={selectedApps}
           completedSteps={completedSteps}
           onSelectStep={noop}
+          onChangeApps={noop}
         />
       )
     }
@@ -132,7 +133,6 @@ const renderGettingStarted = (
       unlockRequestSummary: { totalCount: 0, people: [] },
       suspensionRequestsState: { status: `success`, data: [] },
       securityEventsState: { status: `success`, data: [] },
-      addDeviceHrefForPerson: (personId) => `/people/${personId}/devices/new`,
       gettingStarted: { selectedApps, onAddPerson: noop, onChangeApps: noop },
     })}
   </AuthedAppLayout>

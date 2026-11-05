@@ -25,6 +25,7 @@ export const States = {
             selectedApps={[`mac`, `music`]}
             completedSteps={[`person`]}
             onSelectStep={noop}
+            onChangeApps={noop}
           />
         </div>
       </StorySection>
@@ -34,6 +35,7 @@ export const States = {
             selectedApps={[`mac`, `music`]}
             completedSteps={[`person`, `mac`]}
             onSelectStep={noop}
+            onChangeApps={noop}
           />
         </div>
       </StorySection>
@@ -43,6 +45,7 @@ export const States = {
             selectedApps={[`mac`, `music`]}
             completedSteps={[`person`]}
             onSelectStep={noop}
+            onChangeApps={noop}
             defaultExpanded={false}
           />
         </div>
@@ -53,6 +56,7 @@ export const States = {
             selectedApps={[]}
             completedSteps={[`person`]}
             onSelectStep={noop}
+            onChangeApps={noop}
           />
         </div>
       </StorySection>

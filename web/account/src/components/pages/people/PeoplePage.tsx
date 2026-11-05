@@ -51,7 +51,6 @@ interface Props {
   monitorHref: string;
   settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
-  addDeviceHrefForPerson?: (personId: string) => string;
 }
 
 interface LoadErrorProps {
@@ -98,7 +97,6 @@ interface PeopleContentProps {
   addPersonHref: string;
   settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
-  addDeviceHrefForPerson?: (personId: string) => string;
 }
 
 const PeopleContent: React.FC<PeopleContentProps> = ({
@@ -106,7 +104,6 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
   addPersonHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
-  addDeviceHrefForPerson,
 }) => {
   if (state.status === `loading`) {
     return <PeopleLoadingState />;
@@ -146,7 +143,6 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
       person={person}
       settingsHref={settingsHrefForPerson(person.id)}
       monitorHref={monitorHrefForPerson(person.id)}
-      addDeviceHref={addDeviceHrefForPerson?.(person.id)}
     />
   ));
 };
@@ -205,7 +201,6 @@ const PeoplePage: React.FC<Props> = ({
   monitorHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
-  addDeviceHrefForPerson,
 }) => {
   if (
     gettingStarted &&
@@ -266,7 +261,6 @@ const PeoplePage: React.FC<Props> = ({
             addPersonHref={addPersonHref}
             settingsHrefForPerson={settingsHrefForPerson}
             monitorHrefForPerson={monitorHrefForPerson}
-            addDeviceHrefForPerson={addDeviceHrefForPerson}
           />
         </CardContainer>
         <VStack gap={6} className="shrink-0 @5xl/main:w-72">

@@ -1,14 +1,9 @@
 import type { SetupApp } from '@shared/pairql/src/account';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 export type { SetupApp };
 
 export type IOSSetupApp = Exclude<SetupApp, `mac`>;
-
-export const appStoreUrls: Record<IOSSetupApp, string> = {
-  blocker: `https://apps.apple.com/app/id6736368820`,
-  music: `https://apps.apple.com/app/id6782194077`,
-  podcasts: `https://apps.apple.com/app/id6753187429`,
-};
 
 export const setupApps: {
   id: SetupApp;
@@ -20,46 +15,38 @@ export const setupApps: {
   iconOutlined: boolean;
 }[] = [
   {
+    ...gertrudeApps.mac,
     id: `mac`,
-    name: `Gertrude for Mac`,
     platforms: [`mac`],
     description: `Deny-by-default filtering and activity monitoring.`,
     instructions: `Install Gertrude on their Mac and connect it to your account.`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-    iconOutlined: true,
   },
   {
+    ...gertrudeApps.blocker,
     id: `blocker`,
-    name: `Gertrude Blocker`,
     platforms: [`iphone`, `ipad`],
     description: `Close the gaps in Apple’s Screen Time protections.`,
     instructions: `Install it on their iPhone or iPad and connect it to your account. Then choose what to block.`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-    iconOutlined: true,
   },
   {
+    ...gertrudeApps.music,
     id: `music`,
-    name: `Gertrude Music`,
     platforms: [`iphone`, `ipad`],
     description: `Parent-approved music, without open-ended browsing.`,
     instructions: `Install it on their iPhone or iPad and connect it to your account. Then choose the music they can play.`,
-    icon: `/gertrude-app-icons/music.webp`,
-    iconOutlined: false,
   },
   {
+    ...gertrudeApps.podcasts,
     id: `podcasts`,
-    name: `Gertrude Podcasts`,
     platforms: [`iphone`, `ipad`],
     description: `Approved podcasts, with a PIN to add new shows.`,
     instructions: `Install it on their iPhone or iPad, connect it to your account, and set a PIN for adding new shows.`,
-    icon: `/gertrude-app-icons/podcasts.webp`,
-    iconOutlined: false,
   },
 ];
 
 export type SetupStepId = `person` | `choose-apps` | `notifications` | SetupApp;
 
-export type SetupStep = {
+type SetupStep = {
   id: SetupStepId;
   title: string;
   description: string;
@@ -73,7 +60,7 @@ export const personSetupStep: SetupStep = {
   description: `Create a profile for your child, yourself, or someone you’re helping protect.`,
 };
 
-export const notificationsSetupStep: SetupStep = {
+const notificationsSetupStep: SetupStep = {
   id: `notifications`,
   title: `Set up notifications`,
   description: `Choose how Gertrude alerts you about requests and security events.`,

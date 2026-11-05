@@ -3,7 +3,7 @@ import type { ShareLinkMethod } from '#/components/devices/InstallIOSAppModal';
 
 type ShareLinkData = { title: string; text: string; url: string };
 
-export function shareLinkMethod(): ShareLinkMethod {
+function shareLinkMethod(): ShareLinkMethod {
   return `share` in navigator ? `share` : `copy`;
 }
 

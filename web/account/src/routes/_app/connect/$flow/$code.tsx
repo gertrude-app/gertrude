@@ -12,12 +12,14 @@ import ConnectIosAppResultPage from '#/components/pages/devices/ConnectIosAppRes
 import SupervisionSetupPage from '#/components/pages/devices/SupervisionSetupPage';
 import { podcastsSubscriptionRunway } from '#/components/person-settings/podcastsSubscriptionRunway';
 import { planGateLabel } from '#/lib/billing';
+import { appForConnectFlow, gertrudeApps } from '#/lib/gertrudeApps';
 import { apiEndpoint, liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useMutation } from '#/pairql/mutation';
 import { useQuery } from '#/pairql/query';
 
 type Flow = GetAccountIOSClaimData.Input[`flow`];
+const connectFlows: Flow[] = [`blockerConnect`, `blockerSupervise`, `podcasts`, `music`];
 type ManualStage =
   | `result`
   | `plan`
@@ -26,16 +28,6 @@ type ManualStage =
   | `launch`
   | `connect`
   | `supervise`;
-
-const appDetails: Record<Flow, { name: string; icon: string }> = {
-  blockerConnect: { name: `Gertrude Blocker`, icon: `/gertrude-app-icons/blocker.webp` },
-  blockerSupervise: {
-    name: `Gertrude Blocker`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-  },
-  podcasts: { name: `Gertrude Podcasts`, icon: `/gertrude-app-icons/podcasts.webp` },
-  music: { name: `Gertrude Music`, icon: `/gertrude-app-icons/music.webp` },
-};
 
 type ConnectSearch = {
   checkout?: `success` | `canceled`;
@@ -80,7 +72,7 @@ const ConnectFlow: React.FC<{
 }> = ({ flow, code, initialStage, checkoutCanceled, checkoutError }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const validFlow = flow in appDetails ? (flow as Flow) : undefined;
+  const validFlow = connectFlows.includes(flow as Flow) ? (flow as Flow) : undefined;
   const validCode = /^\d{6}$/.test(code) ? Number(code) : undefined;
   const queryKey = Key.iosClaim(flow, code);
   const query = useQuery(
@@ -153,7 +145,7 @@ const ConnectFlow: React.FC<{
     );
   }
 
-  const app = appDetails[validFlow];
+  const app = gertrudeApps[appForConnectFlow(validFlow)];
   if (!data && query.isError) {
     const errorState = query.error.userMessage?.toLowerCase().includes(`expired`)
       ? (`expired` as const)
