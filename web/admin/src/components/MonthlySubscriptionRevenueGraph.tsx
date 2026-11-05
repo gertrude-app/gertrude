@@ -5,7 +5,11 @@ import {
   projectedMonthlyRevenue,
 } from '../lib/monthlyRevenueProjection';
 
+import Toggle from './Toggle';
+
 type RangeOption = `6m` | `12m` | `all`;
+
+const projectionsStorageKey = `admin_subscription_revenue_show_projections`;
 
 type MonthData = T.SubscriptionsOverview.Output[`monthlySubscriptionRevenue`][number];
 
@@ -50,12 +54,15 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
   months,
 }) => {
   const [range, setRange] = useState<RangeOption>(`all`);
+  const [showProjections, setShowProjections] = useState(
+    () => localStorage.getItem(projectionsStorageKey) !== `false`,
+  );
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const now = new Date();
   const forecast = monthlyRevenueGrowthForecast(months, now);
   const currentMonth = forecast.currentMonth;
-  const trends = trendOptions.flatMap((option) => {
+  const trends = (showProjections ? trendOptions : []).flatMap((option) => {
     const trendForecast =
       option.lookbackMonths === 6
         ? forecast
@@ -74,17 +81,21 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
   const chartMonths =
     months.length === 0
       ? []
-      : [
-          ...visibleMonths
-            .filter((month) => month.month < currentMonth)
-            .map((month) => ({ month: month.month, actual: month })),
-          ...forecast.months.map((month) => ({
-            month: month.month,
-            actual: visibleMonths.find((actual) => actual.month === month.month),
-          })),
-        ];
+      : !showProjections
+        ? visibleMonths.map((month) => ({ month: month.month, actual: month }))
+        : [
+            ...visibleMonths
+              .filter((month) => month.month < currentMonth)
+              .map((month) => ({ month: month.month, actual: month })),
+            ...forecast.months.map((month) => ({
+              month: month.month,
+              actual: visibleMonths.find((actual) => actual.month === month.month),
+            })),
+          ];
   const projections = chartMonths.map(({ actual }) =>
-    actual ? projectedMonthlyRevenue(actual.month, actual.centsCollected, now) : null,
+    showProjections && actual
+      ? projectedMonthlyRevenue(actual.month, actual.centsCollected, now)
+      : null,
   );
   const maxCents = Math.max(
     ...chartMonths.flatMap(({ actual }, index) => [
@@ -97,7 +108,7 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
     1,
   );
   const graphHeight = 180;
-  const plotHeight = graphHeight + 56;
+  const plotHeight = graphHeight + (showProjections ? 56 : 0);
   const baselineIndex = chartMonths.findIndex(
     (month) => month.month === trends[0]?.forecast.baseline?.month,
   );
@@ -163,10 +174,12 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
             <span className="w-2.5 h-2.5 rounded-sm bg-slate-300" />
             Other
           </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-slate-200" />
-            Current pace
-          </span>
+          {showProjections && (
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-slate-200" />
+              Current pace
+            </span>
+          )}
           {plottedTrends.map((trend) => (
             <span
               key={trend.lookbackMonths}
@@ -441,6 +454,17 @@ const MonthlySubscriptionRevenueGraph: React.FC<MonthlySubscriptionRevenueGraphP
           </span>
         </div>
         <div className="flex flex-wrap gap-1 items-center">
+          <Toggle
+            checked={showProjections}
+            onChange={(checked) => {
+              setShowProjections(checked);
+              setHoveredIndex(null);
+              localStorage.setItem(projectionsStorageKey, String(checked));
+            }}
+            label="Show projections"
+            color="emerald"
+            className="mr-3"
+          />
           {(
             [
               [`6m`, `6m`],

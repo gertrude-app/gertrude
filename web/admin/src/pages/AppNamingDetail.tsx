@@ -3,6 +3,9 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import type { T } from '@shared/pairql/admin';
 import client from '../api/client';
 import { ExternalLinkIcon, LoadingSpinner } from '../components/Icons';
+import Toggle from '../components/Toggle';
+
+import { normalizedBundleId, toSlug } from '../lib/appNaming';
 
 type UnidentifiedApp = T.GetUnidentifiedApps.Output[`apps`][number];
 type IdentifiedApp = T.GetIdentifiedAppsForAdmin.Output[number];
@@ -25,16 +28,6 @@ interface ItunesResult {
   developer: string;
   iconUrl: string;
   primaryGenre: string;
-}
-
-function normalizedBundleId(bundleId: string): string {
-  const stripped = bundleId.startsWith(`.`) ? bundleId.slice(1) : bundleId;
-  const parts = stripped.split(`.`);
-  const first = parts[0] ?? ``;
-  if (parts.length > 1 && /^[A-Z0-9]{10}$/.test(first)) {
-    return parts.slice(1).join(`.`);
-  }
-  return stripped;
 }
 
 function companySegment(bundleId: string): string | null {
@@ -78,13 +71,6 @@ function findPossibleMatches(
     }
   }
   return matches.sort((a, b) => b.score - a.score).map((m) => m.app);
-}
-
-function toSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, `-`)
-    .replace(/^-|-$/g, ``);
 }
 
 const AppNamingDetail: React.FC = () => {
@@ -517,22 +503,12 @@ const AppNamingDetail: React.FC = () => {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <label className="text-xs font-medium text-slate-600">Launchable</label>
-                  <button
-                    type="button"
-                    onClick={() => setFormLaunchable((v) => !v)}
-                    className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                      formLaunchable ? `bg-brand-violet` : `bg-slate-200`
-                    }`}
-                  >
-                    <span
-                      className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition-transform duration-200 ease-in-out ${
-                        formLaunchable ? `translate-x-4` : `translate-x-0`
-                      }`}
-                    />
-                  </button>
-                </div>
+                <Toggle
+                  checked={formLaunchable}
+                  onChange={setFormLaunchable}
+                  label="Launchable"
+                  labelPosition="before"
+                />
               </div>
             )}
 
