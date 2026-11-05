@@ -69,79 +69,19 @@ public struct PlaylistDetailView: View {
   }
 
   public var body: some View {
-    GeometryReader { proxy in
-      List {
-        self.heroContent(containerWidth: proxy.size.width)
-          .frame(maxWidth: .infinity)
-          .padding(.top, proxy.safeAreaInsets.top + 18)
-          .padding(.bottom, 30)
-          .listRowInsets(EdgeInsets())
-          .listRowSeparator(.hidden)
-          .listRowBackground(Color.clear)
-
-        if self.playlist.entries.isEmpty {
-          self.emptyContent
-            .frame(maxWidth: 600)
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 20)
-            .listRowInsets(EdgeInsets())
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-        } else {
-          ForEach(Array(self.playlist.entries.enumerated()), id: \.element.id) { index, entry in
-            TrackRowView(
-              number: String(index + 1),
-              track: entry.track,
-              showsArtwork: true,
-              isCurrent: entry.id == self.currentEntryID,
-              isPlaying: self.isCurrentTrackPlaying && entry.id == self.currentEntryID,
-              palette: nil,
-              onTap: { self.onTrackTap(entry.id) },
-            )
-            .frame(maxWidth: 800)
-            .frame(maxWidth: .infinity)
-            .playbackQueueContextMenu(
-              onPlayNext: { self.onTrackPlayNext(entry.id) },
-              onAddToQueue: { self.onTrackAddToQueue(entry.id) },
-              onAddToPlaylist: { self.onTrackAddToPlaylist(entry.id) },
-              onRemoveFromPlaylist: { self.onRemoveEntry(entry.id) },
-              isRemoveFromPlaylistDisabled: self.isMutating,
-            )
-            .swipeActions(edge: .trailing) {
-              Button(role: .destructive) {
-                self.onRemoveEntry(entry.id)
-              } label: {
-                Label("Remove from Playlist", systemImage: "trash")
-                  .labelStyle(.iconOnly)
-              }
-              .tint(.red)
-              .disabled(self.isMutating)
-              .accessibilityLabel("Remove from Playlist")
-            }
-            .moveDisabled(self.isMutating)
-            .listRowInsets(EdgeInsets())
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.clear)
-          }
-          .onMove(perform: self.move)
-        }
-
-        Color.clear
-          .frame(height: 112)
-          .listRowInsets(EdgeInsets())
-          .listRowSeparator(.hidden)
-          .listRowBackground(Color.clear)
-          .accessibilityHidden(true)
+    DetailContentLayout { proxy, bookGeometry in
+      self.scrollingContent(proxy: proxy, bookGeometry: bookGeometry)
+    } hero: { width, maximumArtworkSize in
+      self.heroContent(containerWidth: width, maximumArtworkSize: maximumArtworkSize)
+    } content: {
+      DetailTrackList {
+        self.trackRows(bookGeometry: nil)
       }
-      .listStyle(.plain)
-      .scrollContentBackground(.hidden)
-      .background(.background)
-      .ignoresSafeArea(edges: .top)
     }
     .navigationTitle("")
     .detailNavigationBarBackground()
     .toolbar {
-      ToolbarItem(placement: self.menuPlacement) {
+      ToolbarItem(placement: .detailActions) {
         Button(action: self.onAddMusicTap) {
           Label("Add Music", systemImage: "plus")
         }
@@ -149,7 +89,7 @@ public struct PlaylistDetailView: View {
         .disabled(self.isMutating)
       }
 
-      ToolbarItem(placement: self.menuPlacement) {
+      ToolbarItem(placement: .detailActions) {
         if self.isMutating {
           ProgressView()
             .controlSize(.small)
@@ -213,12 +153,93 @@ public struct PlaylistDetailView: View {
     }
   }
 
-  private var menuPlacement: ToolbarItemPlacement {
-    #if os(iOS)
-      .topBarTrailing
-    #else
-      .automatic
-    #endif
+  private func scrollingContent(
+    proxy: GeometryProxy,
+    bookGeometry: FoldedContentGeometry?,
+  ) -> some View {
+    DetailTrackList {
+      Group {
+        if let bookGeometry {
+          BookDetailHero(geometry: bookGeometry) { size in
+            PlaylistArtworkView(playlist: self.playlist, size: size, cornerRadius: 16)
+          } metadata: {
+            DetailHeroMetadata {
+              self.metadata
+            } playButton: {
+              self.playButton
+            }
+            .padding(.horizontal, 24)
+          }
+        } else {
+          self.heroContent(containerWidth: proxy.size.width)
+        }
+      }
+      .detailHeroRow(topInset: proxy.safeAreaInsets.top)
+
+      self.trackRows(bookGeometry: bookGeometry)
+    }
+    .ignoresSafeArea(edges: .top)
+  }
+
+  @ViewBuilder
+  private func trackRows(bookGeometry: FoldedContentGeometry?) -> some View {
+    if self.playlist.entries.isEmpty {
+      Group {
+        if let bookGeometry {
+          HStack(spacing: bookGeometry.spacing) {
+            Color.clear
+              .frame(width: bookGeometry.primarySize.width, height: 1)
+            self.emptyContent
+              .frame(width: bookGeometry.secondarySize.width)
+          }
+        } else {
+          self.emptyContent
+            .frame(maxWidth: 600)
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 20)
+        }
+      }
+      .listRowInsets(EdgeInsets())
+      .listRowSeparator(.hidden)
+      .listRowBackground(Color.clear)
+    } else {
+      ForEach(Array(self.playlist.entries.enumerated()), id: \.element.id) { index, entry in
+        TrackRowView(
+          number: String(index + 1),
+          track: entry.track,
+          showsArtwork: true,
+          isCurrent: entry.id == self.currentEntryID,
+          isPlaying: self.isCurrentTrackPlaying && entry.id == self.currentEntryID,
+          palette: nil,
+          onTap: { self.onTrackTap(entry.id) },
+        )
+        .frame(maxWidth: 800)
+        .frame(maxWidth: .infinity)
+        .playbackQueueContextMenu(
+          onPlayNext: { self.onTrackPlayNext(entry.id) },
+          onAddToQueue: { self.onTrackAddToQueue(entry.id) },
+          onAddToPlaylist: { self.onTrackAddToPlaylist(entry.id) },
+          onRemoveFromPlaylist: { self.onRemoveEntry(entry.id) },
+          isRemoveFromPlaylistDisabled: self.isMutating,
+        )
+        .swipeActions(edge: .trailing) {
+          Button(role: .destructive) {
+            self.onRemoveEntry(entry.id)
+          } label: {
+            Label("Remove from Playlist", systemImage: "trash")
+              .labelStyle(.iconOnly)
+          }
+          .tint(.red)
+          .disabled(self.isMutating)
+          .accessibilityLabel("Remove from Playlist")
+        }
+        .moveDisabled(self.isMutating)
+        .listRowInsets(EdgeInsets())
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
+      }
+      .onMove(perform: self.move)
+    }
   }
 
   private func renameButtonTapped() {
@@ -236,43 +257,16 @@ public struct PlaylistDetailView: View {
     self.onRename(self.renameText)
   }
 
-  @ViewBuilder
-  private func heroContent(containerWidth: CGFloat) -> some View {
-    if containerWidth >= 800 {
-      let artworkSize = min(300, max(220, (containerWidth - 96) * 0.38))
-      HStack(spacing: 36) {
-        PlaylistArtworkView(
-          playlist: self.playlist,
-          size: artworkSize,
-          cornerRadius: 16,
-        )
-
-        VStack(spacing: 18) {
-          self.metadata
-          self.playButton
-            .frame(maxWidth: 440)
-        }
-        .frame(maxWidth: 440)
-      }
-      .frame(maxWidth: 900)
-      .padding(.horizontal, 32)
-    } else {
-      VStack(spacing: 16) {
-        PlaylistArtworkView(
-          playlist: self.playlist,
-          size: max(1, min(320, containerWidth - 64)),
-          cornerRadius: 16,
-        )
-
-        self.metadata
-          .frame(maxWidth: 560)
-          .padding(.horizontal, 28)
-
-        self.playButton
-          .frame(maxWidth: 520)
-          .padding(.horizontal, 20)
-          .padding(.top, 4)
-      }
+  private func heroContent(
+    containerWidth: CGFloat,
+    maximumArtworkSize: CGFloat = 320,
+  ) -> some View {
+    DetailHero(containerWidth: containerWidth, maximumArtworkSize: maximumArtworkSize) { size in
+      PlaylistArtworkView(playlist: self.playlist, size: size, cornerRadius: 16)
+    } metadata: {
+      self.metadata
+    } playButton: {
+      self.playButton
     }
   }
 
