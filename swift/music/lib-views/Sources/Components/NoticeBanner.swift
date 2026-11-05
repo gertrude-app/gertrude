@@ -98,7 +98,7 @@ public struct NoticeBanner: View {
       self.bannerLayout
         .padding(12)
         .glassEffect(
-          .regular.tint(self.glassTint).interactive(),
+          .regular.interactive(),
           in: RoundedRectangle(cornerRadius: 20, style: .continuous),
         )
     } else {
@@ -211,14 +211,6 @@ public struct NoticeBanner: View {
           }
         }
       }
-  }
-
-  private var glassTint: Color {
-    Color(
-      self.cs,
-      light: .white.opacity(0.72),
-      dark: .black.opacity(0.72),
-    )
   }
 
   private var tint: Color {

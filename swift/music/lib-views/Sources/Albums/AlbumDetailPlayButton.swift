@@ -1,3 +1,4 @@
+import GertieUI
 import SwiftUI
 
 struct AlbumDetailPlayButton: View {
@@ -49,7 +50,7 @@ struct AlbumDetailPlayButton: View {
       .background(colors.background, in: Capsule())
       .contentShape(Capsule())
     }
-    .buttonStyle(.plain)
+    .buttonStyle(.gertiePressable)
     .disabled(self.isLoading)
   }
 
