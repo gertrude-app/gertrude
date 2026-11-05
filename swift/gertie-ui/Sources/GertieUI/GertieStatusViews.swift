@@ -19,53 +19,47 @@ public struct GertieLoadingScreen: View {
         .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
-      GeometryReader { proxy in
-        ScrollView {
-          VStack(spacing: 20) {
-            Spacer(minLength: 0)
-
-            ProgressView {
-              Text(verbatim: self.message)
-            }
-            .labelsHidden()
-            .scaleEffect(1.5)
-            .tint(Color(self.colorScheme, light: .violet500, dark: .violet400))
-
-            Text(verbatim: self.message)
-              .font(.system(size: self.messageSize, weight: .medium))
-              .foregroundStyle(
-                Color(self.colorScheme, light: .violet900, dark: .violet100),
-              )
-              .multilineTextAlignment(.center)
-              .fixedSize(horizontal: false, vertical: true)
-              .accessibilityHidden(true)
-
-            Spacer(minLength: 0)
-          }
-          .frame(
-            minHeight: max(0, proxy.size.height - 60),
-            alignment: .center,
-          )
-          .padding(30)
-          .frame(maxWidth: 500)
-          .frame(maxWidth: .infinity)
+      GertieScreenGeometryReader { proxy, geometry in
+        GertieScreenContentLayout(
+          containerSize: proxy.size,
+          geometry: geometry,
+          configuration: .loading,
+          hasActions: false,
+        ) {
+          self.progressView
+        } message: {
+          self.messageView
+        } actions: {
+          EmptyView()
         }
-        .scrollBounceBehavior(.basedOnSize)
-        .scrollIndicators(.hidden)
       }
     }
     .onAppear(perform: self.beginEntranceAnimation)
   }
 
-  @MainActor private func beginEntranceAnimation() {
-    guard !self.reduceMotion else {
-      self.showBackground = true
-      return
+  private var progressView: some View {
+    ProgressView {
+      Text(verbatim: self.message)
     }
+    .labelsHidden()
+    .scaleEffect(1.5)
+    .tint(Color(self.colorScheme, light: .violet500, dark: .violet400))
+    .frame(maxWidth: .infinity)
+  }
 
-    withAnimation(.smooth(duration: 0.4)) {
-      self.showBackground = true
-    }
+  private var messageView: some View {
+    Text(verbatim: self.message)
+      .font(.system(size: self.messageSize, weight: .medium))
+      .foregroundStyle(
+        Color(self.colorScheme, light: .violet900, dark: .violet100),
+      )
+      .multilineTextAlignment(.center)
+      .fixedSize(horizontal: false, vertical: true)
+      .accessibilityHidden(true)
+  }
+
+  @MainActor private func beginEntranceAnimation() {
+    revealGertieScreenBackground(self.$showBackground, skippingMotion: self.reduceMotion)
   }
 }
 
@@ -78,10 +72,16 @@ public struct GertieWaitingStatus: View {
 
   private let label: String
   private let delay: Duration
+  private let startedAt: ContinuousClock.Instant?
 
-  public init(label: String, delay: Duration) {
+  public init(
+    label: String,
+    delay: Duration,
+    startedAt: ContinuousClock.Instant? = nil,
+  ) {
     self.label = label
     self.delay = delay
+    self.startedAt = startedAt
   }
 
   public var body: some View {
@@ -112,7 +112,7 @@ public struct GertieWaitingStatus: View {
 
   @MainActor private func revealLabel() async {
     do {
-      try await Task.sleep(for: self.delay)
+      try await Task.sleep(for: self.remainingDelay())
     } catch {
       return
     }
@@ -126,6 +126,11 @@ public struct GertieWaitingStatus: View {
     withAnimation(.smooth(duration: 0.3)) {
       self.showLabel = true
     }
+  }
+
+  func remainingDelay(at instant: ContinuousClock.Instant = .now) -> Duration {
+    guard let startedAt else { return self.delay }
+    return max(.zero, self.delay - startedAt.duration(to: instant))
   }
 }
 

@@ -22,6 +22,17 @@ public struct GertieSecondaryButtonStyle: PrimitiveButtonStyle {
   }
 }
 
+public struct GertiePressableButtonStyle: PrimitiveButtonStyle {
+  @Environment(\.isEnabled) private var isEnabled
+
+  public func makeBody(configuration: Configuration) -> some View {
+    GertieButtonInteraction(isEnabled: self.isEnabled) { pressState in
+      Button(configuration)
+        .buttonStyle(GertiePressableButtonAppearance(pressState: pressState))
+    }
+  }
+}
+
 private enum GertieButtonPressState: Equatable {
   case standard
   case pressing
@@ -152,6 +163,34 @@ private struct GertieSecondaryButtonAppearance: ButtonStyle {
       ) { wasPressed, isPressed in
         self.isEnabled && !wasPressed && isPressed
       }
+  }
+}
+
+private struct GertiePressableButtonAppearance: ButtonStyle {
+  @Environment(\.isEnabled) private var isEnabled
+
+  let pressState: GertieButtonPressState
+
+  func makeBody(configuration: Configuration) -> some View {
+    let isPressed = self.pressState.resolve(
+      configurationIsPressed: configuration.isPressed,
+    )
+
+    configuration.label
+      .scaleEffect(isPressed ? 0.96 : 1)
+      .animation(.spring(duration: 0.25, bounce: 0.35), value: isPressed)
+      .sensoryFeedback(
+        .impact(weight: .medium, intensity: 0.7),
+        trigger: isPressed,
+      ) { wasPressed, isPressed in
+        self.isEnabled && !wasPressed && isPressed
+      }
+  }
+}
+
+public extension PrimitiveButtonStyle where Self == GertiePressableButtonStyle {
+  static var gertiePressable: GertiePressableButtonStyle {
+    GertiePressableButtonStyle()
   }
 }
 

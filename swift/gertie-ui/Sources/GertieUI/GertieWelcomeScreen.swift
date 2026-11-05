@@ -33,57 +33,58 @@ public struct GertieWelcomeScreen: View {
         .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
-      GeometryReader { proxy in
-        let usesCenteredLayout = proxy.size.width >= 600
-
-        ScrollView {
-          VStack(alignment: usesCenteredLayout ? .center : .leading, spacing: 12) {
-            self.greetingView
-
-            Text(verbatim: self.message)
-              .font(.system(size: 16, weight: .medium))
-              .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
-              .multilineTextAlignment(usesCenteredLayout ? .center : .leading)
-              .fixedSize(horizontal: false, vertical: true)
-              .accessibilityIdentifier("onboarding-screen-hi-there")
-              .swooshIn(
-                fromYOffset: 20,
-                after: .seconds(1.0),
-              )
-              .modifier(GertieWelcomeExitModifier(
-                isExiting: self.isLeaving,
-                delay: 0.1,
-              ))
-
-            Button(action: self.handleAction) {
-              Text(verbatim: self.actionTitle)
-            }
-            .buttonStyle(.gertiePrimary)
-            .accessibilityIdentifier("btn-primary")
-            .allowsHitTesting(!self.isLeaving)
-            .swooshIn(
-              fromYOffset: 20,
-              after: .seconds(1.3),
-            )
-            .modifier(GertieWelcomeExitModifier(isExiting: self.isLeaving))
-            .padding(.top, 20)
-          }
-          .frame(
-            minHeight: max(0, proxy.size.height - 60),
-            alignment: usesCenteredLayout ? .center : .bottomLeading,
-          )
-          .padding(30)
-          .frame(maxWidth: 500)
-          .frame(maxWidth: .infinity)
+      GertieScreenGeometryReader { proxy, geometry in
+        GertieWelcomeContentLayout(
+          containerSize: proxy.size,
+          geometry: geometry,
+          isPad: GertieScreenDevice.isPad,
+        ) { usesCenteredLayout in
+          self.introduction(usesCenteredLayout: usesCenteredLayout)
+        } action: {
+          self.actionButton
         }
-        .scrollBounceBehavior(.basedOnSize)
-        .scrollIndicators(.hidden)
       }
     }
     .onAppear(perform: self.beginEntranceAnimations)
     .task(id: self.isLeaving) {
       await self.finishExitIfNeeded()
     }
+  }
+
+  private func introduction(usesCenteredLayout: Bool) -> some View {
+    VStack(alignment: usesCenteredLayout ? .center : .leading, spacing: 12) {
+      self.greetingView
+
+      Text(verbatim: self.message)
+        .font(.system(size: 16, weight: .medium))
+        .foregroundStyle(Color(self.colorScheme, light: .violet950, dark: .violet100))
+        .multilineTextAlignment(usesCenteredLayout ? .center : .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityIdentifier("onboarding-screen-hi-there")
+        .swooshIn(
+          fromYOffset: 20,
+          after: .seconds(1.0),
+        )
+        .modifier(GertieWelcomeExitModifier(
+          isExiting: self.isLeaving,
+          delay: 0.1,
+        ))
+    }
+    .frame(maxWidth: .infinity, alignment: usesCenteredLayout ? .center : .leading)
+  }
+
+  private var actionButton: some View {
+    Button(action: self.handleAction) {
+      Text(verbatim: self.actionTitle)
+    }
+    .buttonStyle(.gertiePrimary)
+    .accessibilityIdentifier("btn-primary")
+    .allowsHitTesting(!self.isLeaving)
+    .swooshIn(
+      fromYOffset: 20,
+      after: .seconds(1.3),
+    )
+    .modifier(GertieWelcomeExitModifier(isExiting: self.isLeaving))
   }
 
   @ViewBuilder private var greetingView: some View {
@@ -163,6 +164,61 @@ public struct GertieWelcomeScreen: View {
     guard !Task.isCancelled else { return }
     self.didInvokeAction = true
     self.onAction()
+  }
+}
+
+struct GertieWelcomeContentLayout<Introduction: View, Action: View>: View {
+  let containerSize: CGSize
+  let geometry: FoldedContentGeometry?
+  let isPad: Bool
+  private let introduction: Introduction
+  private let action: Action
+
+  init(
+    containerSize: CGSize,
+    geometry: FoldedContentGeometry?,
+    isPad: Bool = false,
+    @ViewBuilder introduction: (Bool) -> Introduction,
+    @ViewBuilder action: () -> Action,
+  ) {
+    self.containerSize = containerSize
+    self.geometry = geometry
+    self.isPad = isPad
+    self.introduction = introduction(geometry != nil || isPad)
+    self.action = action()
+  }
+
+  var body: some View {
+    let tabletop = self.geometry?.axis == .vertical ? self.geometry : nil
+    let book = self.geometry?.axis == .horizontal ? self.geometry : nil
+    let size = book?.secondarySize ?? self.containerSize
+    let usesCenteredLayout = self.geometry != nil || self.isPad
+
+    ScrollView {
+      VStack(
+        alignment: usesCenteredLayout ? .center : .leading,
+        spacing: tabletop?.spacing ?? 32,
+      ) {
+        GertieScreenRegion(size: tabletop?.primarySize, fadesBottom: tabletop != nil) {
+          self.introduction
+        }
+
+        GertieScreenRegion(size: tabletop?.secondarySize, alignment: .bottom) {
+          self.action
+        }
+      }
+      .frame(
+        minHeight: tabletop == nil ? max(0, size.height - 60) : nil,
+        alignment: usesCenteredLayout ? .center : .bottomLeading,
+      )
+      .padding(tabletop == nil ? 30 : 0)
+      .frame(maxWidth: tabletop == nil ? 500 : .infinity)
+      .frame(maxWidth: .infinity)
+    }
+    .scrollBounceBehavior(.basedOnSize)
+    .scrollIndicators(.hidden)
+    .frame(width: size.width, height: size.height)
+    .offset(x: book?.division.maxX ?? 0)
   }
 }
 
