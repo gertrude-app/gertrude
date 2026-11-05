@@ -10,12 +10,12 @@ struct MusicLibrarySearch: Equatable, Sendable {
     self.library = library
   }
 
-  func artistDiscographyPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
-    self.library?.artistDiscographyPlaybackItems(for: artistID) ?? []
+  func isBuilt(from library: ApprovedMusicLibrary?) -> Bool {
+    self.library == library
   }
 
-  func artistTopSongsPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
-    self.library?.artistTopSongsPlaybackItems(for: artistID) ?? []
+  func artistDiscographyPlaybackItems(for artistID: ApprovedArtist.ID) -> [PlaybackItem] {
+    self.library?.artistDiscographyPlaybackItems(for: artistID) ?? []
   }
 
   func result(id: MusicSearchResult.ID) -> MusicSearchResult? {

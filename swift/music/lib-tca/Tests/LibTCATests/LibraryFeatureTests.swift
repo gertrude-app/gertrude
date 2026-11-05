@@ -435,7 +435,7 @@ struct LibraryFeatureTests {
     await store.send(.addToPlaylistCancelled) {
       $0.addToPlaylist = nil
     }
-    await store.send(.artistTapped(artist.id)) {
+    await store.send(.selectionChanged(.artist(artist.id))) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
     await store.send(.path(.element(id: 0, action: .artist(.addToPlaylistTapped))))
@@ -474,7 +474,7 @@ struct LibraryFeatureTests {
     await store.send(.addToPlaylistCancelled) {
       $0.addToPlaylist = nil
     }
-    await store.send(.playlistTapped(playlist.id)) {
+    await store.send(.selectionChanged(.playlist(playlist.id))) {
       $0.path.append(.playlist(.init(playlist: playlist)))
     }
     await store.send(.path(.element(
@@ -553,7 +553,7 @@ struct LibraryFeatureTests {
     await store.receive(.delegate(.playNext(items: discographyItems)))
     await store.send(.artistAddToQueueTapped(artist.id))
     await store.receive(.delegate(.addToQueue(items: discographyItems)))
-    await store.send(.artistTapped(artist.id)) {
+    await store.send(.selectionChanged(.artist(artist.id))) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
     await store.send(.path(.element(id: 0, action: .artist(.playNextTapped))))
@@ -599,20 +599,75 @@ struct LibraryFeatureTests {
     await store.send(.albumPlayNextTapped(album.id))
   }
 
-  @Test
-  func albumTapNavigatesToAlbumScreen() async {
-    let library = ApprovedMusicLibrary.mock
-    let album = library.albums[0]
-    let store = TestStore(initialState: .init(status: .loaded(library))) {
+  @Test(arguments: [
+    LibraryCollectionIdentity.Kind.album,
+    .artist,
+    .playlist,
+  ])
+  func selectingLibraryItemReplacesDetailHistoryWithoutPlaying(
+    kind: LibraryCollectionIdentity.Kind,
+  ) async {
+    let library = self.playlistLibrary()
+    let selection: LibraryCollectionIdentity
+    let destination: LibraryPath.State
+    switch kind {
+    case .album:
+      let album = library.albums[0]
+      selection = .album(album.id)
+      destination = .album(.init(album: album, transitionSourceID: album.id.rawValue))
+    case .artist:
+      let artist = library.artists[0]
+      selection = .artist(artist.id)
+      destination = .artist(.init(artistID: artist.id))
+    case .playlist:
+      let playlist = library.playlists[0]
+      selection = .playlist(playlist.id)
+      destination = .playlist(.init(playlist: playlist))
+    }
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushAlbumDetail(albumID: library.albums[1].id)
+    state.pushArtistDetail(artistID: library.artists[0].id)
+    let store = TestStore(initialState: state) {
       LibraryFeature()
     }
 
-    await store.send(.albumTapped(album.id)) {
-      $0.path.append(.album(.init(
-        album: album,
-        transitionSourceID: album.id.rawValue,
-      )))
+    await store.send(.selectionChanged(selection)) {
+      $0.path.removeAll()
+      $0.path.append(destination)
     }
+    #expect(store.state.selectedCollectionIdentity == selection)
+    #expect(store.state.detailPath.isEmpty)
+  }
+
+  @Test
+  func selectingUnavailableLibraryItemPreservesCurrentDetail() async {
+    let library = ApprovedMusicLibrary.mock
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushAlbumDetail(albumID: library.albums[0].id)
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(.album("unavailable-album")))
+  }
+
+  @Test
+  func detailNavigationKeepsSelectionSeparateAndPreservesStackIDs() {
+    let library = ApprovedMusicLibrary.mock
+    let artist = library.artists[0]
+    let album = library.albums[0]
+    var state = LibraryFeature.State(status: .loaded(library))
+    #expect(state.detailPath.isEmpty)
+    #expect(state.selectedCollectionIdentity == nil)
+
+    state.pushArtistDetail(artistID: artist.id)
+    #expect(state.detailPath.isEmpty)
+    #expect(state.selectedCollectionIdentity == .artist(artist.id))
+
+    state.pushAlbumDetail(albumID: album.id)
+    #expect(Array(state.detailPath.ids) == Array(state.path.ids.dropFirst()))
+    #expect(state.detailPath.first == .album(.init(album: album)))
+    #expect(state.selectedCollectionIdentity == .artist(artist.id))
   }
 
   @Test
@@ -629,7 +684,7 @@ struct LibraryFeatureTests {
       LibraryFeature()
     }
 
-    await store.send(.artistTapped(artist.id)) {
+    await store.send(.selectionChanged(.artist(artist.id))) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
     await store.send(.path(.element(
@@ -647,6 +702,24 @@ struct LibraryFeatureTests {
   }
 
   @Test
+  func reselectingArtistReturnsToItFromPushedAlbum() async {
+    let library = ApprovedMusicLibrary.mock
+    let artist = library.artists[0]
+    var state = LibraryFeature.State(status: .loaded(library))
+    state.pushArtistDetail(artistID: artist.id)
+    state.pushAlbumDetail(albumID: library.albums[0].id)
+    let store = TestStore(initialState: state) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(.artist(artist.id))) {
+      $0.path.removeAll()
+      $0.path.append(.artist(.init(artistID: artist.id)))
+    }
+    await store.send(.selectionChanged(.artist(artist.id))) // already showing on its own
+  }
+
+  @Test
   func artistReleaseTapPushesAlbumAfterArtist() async {
     let album = ApprovedMusicLibrary.mock.albums[0]
     let artist = ApprovedArtist(
@@ -659,7 +732,7 @@ struct LibraryFeatureTests {
       LibraryFeature()
     }
 
-    await store.send(.artistTapped(artist.id)) {
+    await store.send(.selectionChanged(.artist(artist.id))) {
       $0.path.append(.artist(.init(artistID: artist.id)))
     }
     await store.send(.path(.element(
@@ -688,28 +761,6 @@ struct LibraryFeatureTests {
 
     await store.send(.path(.popFrom(id: 0))) {
       $0.path.removeAll()
-    }
-  }
-
-  @Test
-  func albumTapReplacesCurrentAlbumDetail() async {
-    let library = ApprovedMusicLibrary.mock
-    let oldAlbum = library.albums[0]
-    let newAlbum = library.albums[1]
-    var state = LibraryFeature.State(status: .loaded(library))
-    state.albumDetail = .init(
-      album: oldAlbum,
-      transitionSourceID: oldAlbum.id.rawValue,
-    )
-    let store = TestStore(initialState: state) {
-      LibraryFeature()
-    }
-
-    await store.send(.albumTapped(newAlbum.id)) {
-      $0.albumDetail = .init(
-        album: newAlbum,
-        transitionSourceID: newAlbum.id.rawValue,
-      )
     }
   }
 
@@ -792,7 +843,7 @@ struct LibraryFeatureTests {
   }
 
   @Test
-  func newlyCreatedPlaylistSortsAbovePreviouslyPlayedCollection() async {
+  func newlyCreatedPlaylistReplacesTheOpenAlbumAndSortsAboveIt() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     let playlist = self.playlistLibrary().playlists[0]
@@ -807,6 +858,7 @@ struct LibraryFeatureTests {
       observedAddedAt: album.addedAt,
       at: Date(timeIntervalSince1970: 90),
     )
+    state.path.append(.album(.init(album: album)))
     let now = Date(timeIntervalSince1970: 100)
     let store = TestStore(initialState: state) {
       LibraryFeature()
@@ -832,7 +884,8 @@ struct LibraryFeatureTests {
         observedAddedAt: playlist.createdAt,
         at: now,
       )
-      $0.path[id: 0] = .playlist(.init(playlist: playlist))
+      $0.path.removeAll()
+      $0.path[id: 1] = .playlist(.init(playlist: playlist)) // replaces the album, not pushed on top
       $0.playlistMusicPicker = .init(playlist: playlist, library: updatedLibrary)
       $0.shouldPresentCreatedPlaylist = false
     }
@@ -911,42 +964,6 @@ struct LibraryFeatureTests {
       $0.addToPlaylist = nil
       $0.isPlaylistMutationInFlight = false
       $0.status = .loaded(updatedLibrary)
-    }
-    await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
-  }
-
-  @Test
-  func directPlaylistRenameUsesTheAuthoritativeMutationPipeline() async {
-    let library = self.playlistLibrary()
-    let playlist = library.playlists[0]
-    let updatedLibrary = {
-      var updatedLibrary = library
-      updatedLibrary.playlists[0].name = "Road Trip"
-      updatedLibrary.playlists[0].revision = 2
-      return updatedLibrary
-    }()
-    let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
-      LibraryFeature()
-    } withDependencies: {
-      $0.approvedMusic.renamePlaylist = { _ in .updated(updatedLibrary) }
-    }
-
-    var optimisticLibrary = library
-    optimisticLibrary.playlists[0].name = "Road Trip"
-    await store.send(.playlistRenameSubmitted(
-      playlistID: playlist.id,
-      expectedRevision: playlist.revision,
-      name: "  Road Trip  ",
-    )) {
-      $0.isPlaylistMutationInFlight = true
-      $0.applyLibrary(optimisticLibrary)
-    }
-    await store.receive(.playlistMutationResponse(
-      .updated(updatedLibrary),
-      rollback: library,
-    )) {
-      $0.isPlaylistMutationInFlight = false
-      $0.applyLibrary(updatedLibrary)
     }
     await store.receive(.delegate(.approvedTrackIDsUpdated(updatedLibrary.approvedTrackIDs)))
   }
@@ -1179,6 +1196,119 @@ private actor PlaylistMutationResultSequence {
 
   func next() -> MusicPlaylistMutationResult {
     self.results.removeFirst()
+  }
+}
+
+@MainActor
+struct LibrarySelectionMemoryTests {
+  @Test
+  func launchRestoreOpensTheSavedItemBeforeTheLibraryAppears() async {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[0]
+    let store = TestStore(initialState: LibraryFeature.State(generation: 2)) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic.loadCachedApprovedLibrary = { library }
+      $0.continuousClock = TestClock()
+      $0.libraryLastSelection.load = { .album(album.id) }
+    }
+
+    await store.send(.launchRestoreRequested) {
+      $0.isRestoringLaunchState = true
+    }
+    await store
+      .receive(.response(2, .cachedApprovedLibraryLoaded(library))) {
+        // tagged so a stale identity's data is dropped
+        $0.status = .loaded(library)
+      }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
+    await store.receive(.response(2, .lastSelectionLoaded(.album(album.id)))) {
+      $0.path[id: 0] = .album(.init(album: album, transitionSourceID: album.id.rawValue))
+    }
+    await store.receive(.launchRestoreFinished) {
+      $0.isRestoringLaunchState = false
+    }
+  }
+
+  @Test
+  func launchRestoreStopsWaitingAfterOneSecondAndDropsALateSavedLibrary() async {
+    let clock = TestClock()
+    let store = TestStore(initialState: LibraryFeature.State()) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.approvedMusic.loadCachedApprovedLibrary = {
+        try? await clock.sleep(for: .seconds(2))
+        return .mock
+      }
+      $0.libraryLastSelection.load = { nil }
+      $0.continuousClock = clock
+    }
+
+    await store.send(.launchRestoreRequested) {
+      $0.isRestoringLaunchState = true
+    }
+    await clock.advance(by: .seconds(1))
+    await store.receive(.launchRestoreFinished) {
+      $0.isRestoringLaunchState = false
+    }
+    await clock.advance(by: .seconds(1)) // the saved library would land here if not cancelled
+  }
+
+  @Test
+  func waitsForTheCachedLibraryBeforeRestoring() async {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[1]
+    let store = TestStore(initialState: LibraryFeature.State()) {
+      LibraryFeature()
+    }
+
+    await store.send(.lastSelectionLoaded(.album(album.id))) {
+      $0.selectionToRestore = .album(album.id)
+    }
+    await store.send(.cachedApprovedLibraryLoaded(library)) {
+      $0.status = .loaded(library)
+      $0.selectionToRestore = nil
+      $0.path[id: 0] = .album(.init(album: album, transitionSourceID: album.id.rawValue))
+    }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
+  }
+
+  @Test
+  func forgetsASelectionThatIsNoLongerApproved() async {
+    let library = ApprovedMusicLibrary.mock
+    let missing = LibraryCollectionIdentity.album(.init("missing-album"))
+    let saved = LockIsolated<[LibraryCollectionIdentity?]>([])
+    let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
+      LibraryFeature()
+    } withDependencies: {
+      $0.libraryLastSelection.save = { selection in saved.withValue { $0.append(selection) } }
+    }
+
+    await store.send(.lastSelectionLoaded(missing)) {
+      $0.selectionToRestore = missing
+    }
+    await store.send(.approvedLibraryLoaded(library)) {
+      $0.selectionToRestore = nil
+    }
+    await store.receive(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
+    await store.finish()
+
+    #expect(saved.value == [nil])
+    #expect(store.state.path.isEmpty)
+  }
+
+  @Test
+  func doesNotReplaceWhatTheUserAlreadyOpened() async {
+    let library = ApprovedMusicLibrary.mock
+    let opened = library.albums[0]
+    let store = TestStore(initialState: LibraryFeature.State(status: .loaded(library))) {
+      LibraryFeature()
+    }
+
+    await store.send(.selectionChanged(.album(opened.id))) {
+      $0.path[id: 0] = .album(.init(album: opened, transitionSourceID: opened.id.rawValue))
+    }
+    await store.send(.lastSelectionLoaded(.album(library.albums[1].id)))
   }
 }
 

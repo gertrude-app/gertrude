@@ -97,6 +97,7 @@ struct AppView: View {
   private var libraryView: some View {
     LibraryViewContainer(
       store: self.store.scope(\.library, action: \.library),
+      searchStore: self.store.scope(\.search, action: \.search),
       currentTrackID: self.store.playback.session?.currentTrackID,
       activePlaybackContext: self.store.playback.activePlaybackContext,
       isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
@@ -118,7 +119,7 @@ struct AppView: View {
           .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else {
         Group {
-          if self.store.setup.isReady {
+          if self.store.setup.isReady, !self.store.library.isRestoringLaunchState {
             self.iOSLibraryContent
           } else {
             MusicSetupViewContainer(store: self.store.scope(\.setup, action: \.setup))
@@ -133,6 +134,7 @@ struct AppView: View {
 
     private var iOSLibraryContent: some View {
       self.iOSTabView
+        .coversTabLayoutUntilSettled()
         .nowPlayingPresentation(
           isPresented: self.nowPlayingPresented,
           zoomNamespace: self.nowPlayingNamespace,
@@ -175,12 +177,6 @@ struct AppView: View {
               Label("Queue", systemImage: "list.bullet")
             }
             .tag(AppFeature.Tab.queue)
-
-          self.iOSTabContent(self.searchView)
-            .tabItem {
-              Label("Search", systemImage: "magnifyingglass")
-            }
-            .tag(AppFeature.Tab.search)
         }
       }
     }
@@ -194,15 +190,6 @@ struct AppView: View {
 
         Tab("Queue", systemImage: "list.bullet", value: AppFeature.Tab.queue) {
           self.iOSTabContent(self.queueView)
-        }
-
-        Tab(
-          "Search",
-          systemImage: "magnifyingglass",
-          value: AppFeature.Tab.search,
-          role: .search,
-        ) {
-          self.iOSTabContent(self.searchView)
         }
       }
     }
@@ -270,23 +257,6 @@ struct AppView: View {
             .navigationTitle("Queue")
         }
       }
-    }
-
-    private var searchView: some View {
-      SearchViewContainer(
-        store: self.store.scope(\.search, action: \.search),
-        library: self.approvedLibrary,
-        currentTrackID: self.store.playback.session?.currentTrackID,
-        activePlaybackContext: self.store.playback.activePlaybackContext,
-        isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
-        isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
-        isPlaylistMutationInFlight: self.store.library.isPlaylistMutationInFlight,
-      )
-    }
-
-    private var approvedLibrary: ApprovedMusicLibrary? {
-      guard case .loaded(let library) = self.store.library.status else { return nil }
-      return library
     }
 
     private func nowPlayingBarInset(
@@ -550,9 +520,6 @@ struct AppView: View {
         || self.store.library.playlistDetail != nil
     case .queue:
       false
-    case .search:
-      self.store.search.albumDetail != nil
-        || self.store.search.playlistDetail != nil
     }
   }
 

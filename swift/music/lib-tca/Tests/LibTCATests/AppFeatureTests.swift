@@ -35,10 +35,15 @@ struct AppFeatureTests {
   func updatesNowPlayingPresentation() async {
     let store = TestStore(initialState: .init()) {
       AppFeature()
+    } withDependencies: {
+      $0.date = .constant(.distantPast)
     }
 
     await store.send(.nowPlayingPresentationChanged(true)) {
       $0.isNowPlayingPresented = true
+    }
+    await store.send(.nowPlayingPresentationChanged(false)) {
+      $0.isNowPlayingPresented = false
     }
   }
 
@@ -202,7 +207,7 @@ struct AppFeatureTests {
     state.isNowPlayingPresented = true
     state.library.status = .loaded(library)
     state.playback.session = .init(playStatus: .playing, currentItem: item)
-    state.selectedTab = .search
+    state.selectedTab = .queue
     let store = TestStore(initialState: state) {
       AppFeature()
     }
@@ -216,6 +221,37 @@ struct AppFeatureTests {
         currentTrackPlayStatus: .playing,
       )
     }
+  }
+
+  @Test
+  func remembersTheOpenCollectionFromTheLibraryAndNowPlaying() async {
+    let library = ApprovedMusicLibrary.mock
+    let pickedAlbum = library.albums[0]
+    let playingAlbum = library.albums[1]
+    var state = AppFeature.State()
+    state.library.status = .loaded(library)
+    state.playback.session = .init(
+      playStatus: .playing,
+      currentItem: PlaybackItem(
+        track: playingAlbum.tracks[0],
+        artworkURL: playingAlbum.artworkURL,
+        albumID: playingAlbum.id,
+      ),
+    )
+    let saved = LockIsolated<[LibraryCollectionIdentity?]>([])
+    let store = TestStore(initialState: state) {
+      AppFeature()
+    } withDependencies: {
+      $0.libraryLastSelection.save = { selection in saved.withValue { $0.append(selection) } }
+    }
+    store.exhaustivity = .off
+
+    await store.send(.library(.selectionChanged(.album(pickedAlbum.id))))
+    await store.send(.library(.selectionChanged(nil)))
+    await store.send(.nowPlayingViewAlbumTapped) // changes the path from AppFeature, not Library
+    await store.finish()
+
+    #expect(saved.value == [.album(pickedAlbum.id), nil, .album(playingAlbum.id)])
   }
 
   @Test
@@ -323,7 +359,7 @@ struct AppFeatureTests {
     state.isNowPlayingPresented = true
     state.library.status = .loaded(library)
     state.playback.session = .init(playStatus: .playing, currentItem: item)
-    state.selectedTab = .search
+    state.selectedTab = .queue
     #expect(state.nowPlayingArtistID == artist.id)
     let store = TestStore(initialState: state) {
       AppFeature()
@@ -835,7 +871,7 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.library(.albumTapped(album.id))) {
+    await store.send(.library(.selectionChanged(.album(album.id)))) {
       $0.library.albumDetail = .init(
         album: album,
         transitionSourceID: album.id.rawValue,
@@ -864,7 +900,7 @@ struct AppFeatureTests {
       AppFeature()
     }
 
-    await store.send(.library(.playlistTapped(playlist.id))) {
+    await store.send(.library(.selectionChanged(.playlist(playlist.id)))) {
       $0.library.playlistDetail = .init(
         playlist: playlist,
         playbackFailure: .musicAccessDenied,
@@ -972,20 +1008,19 @@ struct AppFeatureTests {
   }
 
   @Test
-  func selectingSearchSynchronizesTheAuthoritativeLibrary() async {
+  func searchUsesTheLoadedLibrary() async {
     let library = ApprovedMusicLibrary.mock
-    var state = AppFeature.State()
-    state.library.status = .loaded(library)
-    let store = TestStore(initialState: state) {
+    let store = TestStore(initialState: AppFeature.State()) {
       AppFeature()
     }
+    store.exhaustivity = .off
 
-    var expectedSearch = SearchFeature.State()
-    expectedSearch.applyLibraryStatus(.loaded(library))
-    await store.send(.tabSelected(.search)) {
-      $0.selectedTab = .search
-      $0.search = expectedSearch
-    }
+    await store.send(.library(.cachedApprovedLibraryLoaded(library)))
+    await store.send(.search(.queryChanged("brewed")))
+
+    #expect(store.state.search.results.map(\.id).contains(.song(library.albums[2].tracks[0].id)))
+    #expect(store.state.search.results.map(\.id).contains(.album(library.albums[2].id)))
+    await store.finish()
   }
 
   @Test
@@ -1085,16 +1120,45 @@ struct AppFeatureTests {
   }
 
   @Test
-  func searchBrowseLibrarySwitchesTabs() async {
+  func libraryNavigationWorksFromSearchAndAfterClearingTheQuery() async throws {
+    let library = ApprovedMusicLibrary.mock
+    let album = library.albums[0]
+    let selection = LibraryCollectionIdentity.album(album.id)
+    let destination = LibraryPath.State.album(.init(
+      album: album,
+      transitionSourceID: album.id.rawValue,
+    ))
     var state = AppFeature.State()
-    state.selectedTab = .search
+    state.library.status = .loaded(library)
+    state.library.pushAlbumDetail(albumID: library.albums[1].id)
+    state.search.query = album.title
+    state.search.applyLibraryStatus(.loaded(library))
     let store = TestStore(initialState: state) {
       AppFeature()
     }
 
-    await store.send(.search(.delegate(.browseLibrary))) {
-      $0.selectedTab = .library
+    await store.send(.search(.resultTapped(.album(album.id))))
+    await store.receive(.search(.delegate(.collectionSelected(selection))))
+    await store.withExhaustivity(.off) { // compare destinations below, not generated stack IDs
+      await store.receive(.library(.selectionChanged(selection)))
     }
+
+    #expect(Array(store.state.library.path) == [destination])
+    #expect(store.state.search.query == album.title)
+    #expect(store.state.library.detailPath.isEmpty)
+
+    let searchDestinationID = try #require(store.state.library.path.ids.first)
+    await store.send(.library(.path(.popFrom(id: searchDestinationID)))) {
+      $0.library.path.removeAll()
+    }
+    await store.send(.search(.queryChanged(""))) {
+      $0.search.query = ""
+      $0.search.results = []
+    }
+    await store.withExhaustivity(.off) {
+      _ = await store.send(.library(.selectionChanged(selection)))
+    }
+    #expect(Array(store.state.library.path) == [destination])
   }
 }
 

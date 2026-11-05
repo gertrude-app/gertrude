@@ -8,6 +8,14 @@ struct TestError: Error {}
 let childId = UUID(1)
 let otherChildId = UUID(2)
 
+let favoriteMusicPlaylist = MusicPlaylist(
+  id: .init(rawValue: UUID(1)),
+  name: "Favorites",
+  revision: 1,
+  createdAt: Date(timeIntervalSince1970: 1),
+  updatedAt: Date(timeIntervalSince1970: 1),
+)
+
 let cachedApprovedMusicLibrary = ApprovedMusicLibrary(
   albums: [
     .init(
