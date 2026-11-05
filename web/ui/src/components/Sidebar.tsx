@@ -1,9 +1,6 @@
 import cx from 'clsx';
-import { type LucideIcon } from 'lucide-react';
 import React from 'react';
-import HStack from '../primitives/HStack';
 import VStack from '../primitives/VStack';
-import Button from './Button';
 
 interface Props {
   children: React.ReactNode;
@@ -11,11 +8,6 @@ interface Props {
   logoWidth: number;
   bottomContent?: React.ReactNode;
   footer?: React.ReactNode;
-  bottomButton?: {
-    text: string;
-    href: string;
-    icon: LucideIcon;
-  };
 }
 
 const Sidebar: React.FC<Props> = ({
@@ -24,7 +16,6 @@ const Sidebar: React.FC<Props> = ({
   logoWidth,
   bottomContent,
   footer,
-  bottomButton,
 }) => {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [moreBelow, setMoreBelow] = React.useState(false);
@@ -65,21 +56,9 @@ const Sidebar: React.FC<Props> = ({
           {bottomContent && <VStack gap={4}>{bottomContent}</VStack>}
         </VStack>
       </div>
-      {(footer || bottomButton) && (
+      {footer && (
         <VStack gap={4} className="shrink-0 px-5 pt-1 pb-5">
           {footer}
-          {bottomButton && (
-            <HStack>
-              <Button
-                type="link"
-                href={bottomButton.href}
-                size="small"
-                icon={bottomButton.icon}
-              >
-                {bottomButton.text}
-              </Button>
-            </HStack>
-          )}
         </VStack>
       )}
     </div>

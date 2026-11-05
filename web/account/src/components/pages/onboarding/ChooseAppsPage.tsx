@@ -47,10 +47,7 @@ const ChooseAppsPage: React.FC<Props> = ({
   const id = React.useId();
 
   return (
-    <OnboardingScreen
-      brandClassName="choose-apps-brand choose-apps-reveal"
-      contentClassName="max-w-3xl"
-    >
+    <OnboardingScreen brandClassName="choose-apps-reveal" contentClassName="max-w-3xl">
       <form
         onSubmit={(event) => {
           event.preventDefault();
@@ -100,7 +97,7 @@ const ChooseAppsPage: React.FC<Props> = ({
               <label
                 key={app.id}
                 className={cx(
-                  `choose-apps-option choose-apps-reveal flex`,
+                  `choose-apps-reveal flex`,
                   saving ? `pointer-events-none` : `cursor-pointer`,
                 )}
                 style={{ animationDelay: `${1400 + index * 60}ms` }}

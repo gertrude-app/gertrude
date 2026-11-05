@@ -71,6 +71,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
       Key.suspensionRequests,
       Key.securityEvents,
       Key.accountBilling,
+      Key.accountSetup,
     ],
     toast: {
       loading: `Disconnecting Mac…`,

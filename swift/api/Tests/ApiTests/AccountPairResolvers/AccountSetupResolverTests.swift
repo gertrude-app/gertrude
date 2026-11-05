@@ -67,6 +67,19 @@ final class AccountSetupResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output.completedApps).toEqual([.mac])
   }
 
+  func testMacFirstConnectedToAnotherAccountCompletesMacSetup() async throws {
+    let otherFamily = try await self.childWithComputer()
+    let child = try await self.child()
+    _ = try await self.db.create(ComputerUser.random {
+      $0.childId = child.model.id
+      $0.computerId = otherFamily.computer.id // computer record stays with the other account
+    })
+
+    let output = try await GetAccountSetup.resolve(in: self.accountContext(child.parent))
+
+    expect(output.completedApps).toEqual([.mac])
+  }
+
   func testConnectedBlockerCompletesBlockerSetup() async throws {
     let child = try await self.childWithIOSDevice()
 

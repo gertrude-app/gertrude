@@ -27,8 +27,8 @@ extension GetAccountSetup: NoInputResolver {
       )
     }
 
-    async let computerCountAsync = Computer.query()
-      .where(.parentId == context.accountOwner.id)
+    async let computerUserCountAsync = ComputerUser.query()
+      .where(.childId |=| people.map(\.id))
       .count(in: context.db)
     let deviceIds = try await IOSDevice.query()
       .where(.childId |=| people.map(\.id))
@@ -42,7 +42,7 @@ extension GetAccountSetup: NoInputResolver {
     )
 
     let completed: [Parent.SetupApp: Bool] = try await [
-      .mac: computerCountAsync > 0,
+      .mac: computerUserCountAsync > 0,
       .blocker: !blockerAsync.isEmpty,
       .music: !musicAsync.isEmpty,
       .podcasts: !podcastsAsync.isEmpty,

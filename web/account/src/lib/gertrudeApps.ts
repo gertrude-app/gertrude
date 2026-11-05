@@ -1,4 +1,4 @@
-import type { SetupApp } from '@shared/pairql/src/account';
+import type { GetAccountIOSClaimData, SetupApp } from '@shared/pairql/src/account';
 
 type AppDetails = {
   name: string;
@@ -38,7 +38,7 @@ export const gertrudeApps = {
   },
 } as const satisfies Record<SetupApp, AppDetails>;
 
-export type IOSConnectFlow = `blockerConnect` | `blockerSupervise` | `podcasts` | `music`;
+export type IOSConnectFlow = GetAccountIOSClaimData.Input[`flow`];
 
 export const appForConnectFlow = (
   flow: IOSConnectFlow,
