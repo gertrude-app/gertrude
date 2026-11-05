@@ -16,9 +16,9 @@ const InstructionStep: React.FC<{
         <Text as="div" variant="proseSubtle">
           {children}
         </Text>
+        {media}
       </VStack>
     </HStack>
-    {media}
   </div>
 );
 

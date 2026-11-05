@@ -1,3 +1,5 @@
+import { clearSavedSetup } from './savedSetup';
+
 const ACCOUNT_ID_KEY = `account_id`;
 const ACCOUNT_TOKEN_KEY = `account_token`;
 
@@ -21,4 +23,5 @@ export function setAuth(accountId: UUID, token: UUID): void {
 export function clearAuth(): void {
   localStorage.removeItem(ACCOUNT_ID_KEY);
   localStorage.removeItem(ACCOUNT_TOKEN_KEY);
+  clearSavedSetup();
 }

@@ -58,7 +58,9 @@ const BasicSettingsStory: React.FC<BasicSettingsStoryProps> = ({
             setRelationship(relationshipDraft);
           }}
           onDeletePerson={() => {}}
-          onConnectMac={() => setConnectMacOpen(true)}
+          onAddDevice={(app) => {
+            if (app === `mac`) setConnectMacOpen(true);
+          }}
           onDisconnectMac={async (connectionId) => {
             setConnectedDevices((current) =>
               current.filter((device) => device.id !== connectionId),

@@ -35,6 +35,12 @@ export const Music = {
   render: () => renderModal(`music`),
 };
 
+export const QrCodeShown = {
+  name: 'QR code shown',
+  parameters: galleryParameters,
+  render: () => renderModal(`music`, { defaultShowQrCode: true }),
+};
+
 export const Blocker = {
   parameters: galleryParameters,
   render: () => renderModal(`blocker`),

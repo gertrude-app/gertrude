@@ -1,17 +1,18 @@
 import { toast } from '@gertrude/ui';
 import { useNavigate } from '@tanstack/react-router';
 import React from 'react';
-import type { IOSSetupApp, SetupStepId } from '#/components/onboarding/setupApps';
+import type { SetupStepId } from '#/components/onboarding/setupApps';
 import ConnectMacModal from '#/components/devices/ConnectMacModal';
 import InstallIOSAppModal from '#/components/devices/InstallIOSAppModal';
 import { useConnectMac } from '#/components/devices/useConnectMac';
+import { useInstallIOSApp } from '#/components/devices/useInstallIOSApp';
 import SetupChecklist from '#/components/onboarding/SetupChecklist';
 import { setupChecklist, setupProgress } from '#/lib/accountSetup';
-import { gertrudeApps } from '#/lib/gertrudeApps';
-import { useShareLink } from '#/lib/shareLink';
+import { getAccountId } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
 import { useQuery } from '#/pairql/query';
+import { readSavedSetup, saveSetup } from '#/pairql/savedSetup';
 
 export function useSetupChecklist(pathname: string): {
   sidebarContent: React.ReactNode;
@@ -20,11 +21,18 @@ export function useSetupChecklist(pathname: string): {
   modals: React.ReactNode;
 } {
   const navigate = useNavigate();
+  const [savedSetup] = React.useState(() => readSavedSetup(getAccountId()));
   const setupQuery = useQuery(Key.accountSetup, () => liveClient.getAccountSetup(), {
+    placeholderData: savedSetup,
     refetchInterval: ({ state }) =>
       state.data && setupChecklist(state.data) ? 30_000 : false,
   });
   const checklist = setupQuery.data && setupChecklist(setupQuery.data);
+  React.useEffect(() => {
+    if (setupQuery.data && !setupQuery.isPlaceholderData) {
+      saveSetup(getAccountId(), setupQuery.data);
+    }
+  }, [setupQuery.data, setupQuery.isPlaceholderData]);
   const peopleQuery = useQuery(Key.people, () => liveClient.getPeople(), {
     enabled: !!checklist,
   });
@@ -34,13 +42,11 @@ export function useSetupChecklist(pathname: string): {
     if (!data) throw new Error(`people unavailable`);
     return data;
   };
-  const [installApp, setInstallApp] = React.useState<IOSSetupApp>(`blocker`);
-  const [installOpen, setInstallOpen] = React.useState(false);
-  const shareLink = useShareLink();
+  const { installIOSApp, modalProps: installModalProps } = useInstallIOSApp(
+    onlyPerson?.name,
+    pathname,
+  );
   const { connectMac, modalProps: connectMacModalProps } = useConnectMac(pathname);
-  React.useEffect(() => {
-    setInstallOpen(false);
-  }, [pathname]);
 
   const selectStep = (step: SetupStepId): void => {
     switch (step) {
@@ -60,14 +66,14 @@ export function useSetupChecklist(pathname: string): {
         );
         return;
       default:
-        shareLink.reset();
-        setInstallApp(step);
-        setInstallOpen(true);
+        installIOSApp(step);
     }
   };
 
   return {
-    showMacSection: setupQuery.data?.completedApps.includes(`mac`) ?? true,
+    showMacSection: setupQuery.data
+      ? setupQuery.data.completedApps.includes(`mac`)
+      : setupQuery.isError,
     menuProgress: checklist ? setupProgress(checklist) : undefined,
     sidebarContent: checklist && (
       <SetupChecklist
@@ -81,22 +87,7 @@ export function useSetupChecklist(pathname: string): {
     modals: (
       <>
         <ConnectMacModal {...connectMacModalProps} />
-        <InstallIOSAppModal
-          open={installOpen}
-          onOpenChange={setInstallOpen}
-          app={installApp}
-          personName={onlyPerson?.name}
-          shareMethod={shareLink.method}
-          copied={shareLink.copied}
-          onShareLink={() => {
-            const { name, appStoreUrl } = gertrudeApps[installApp];
-            shareLink.share({
-              title: name,
-              text: `Install ${name} from the App Store`,
-              url: appStoreUrl,
-            });
-          }}
-        />
+        <InstallIOSAppModal {...installModalProps} />
       </>
     ),
   };

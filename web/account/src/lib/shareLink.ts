@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ShareLinkMethod } from '#/components/devices/InstallIOSAppModal';
 
-type ShareLinkData = { title: string; text: string; url: string };
+type ShareLinkData = { title: string; url: string };
 
 function shareLinkMethod(): ShareLinkMethod {
   return `share` in navigator ? `share` : `copy`;

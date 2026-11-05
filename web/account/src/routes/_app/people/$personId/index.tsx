@@ -3,7 +3,9 @@ import React from 'react';
 import type { PersonRelationship } from '#/components/types';
 import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
 import ConnectMacModal from '#/components/devices/ConnectMacModal';
+import InstallIOSAppModal from '#/components/devices/InstallIOSAppModal';
 import { useConnectMac } from '#/components/devices/useConnectMac';
+import { useInstallIOSApp } from '#/components/devices/useInstallIOSApp';
 import PersonBasicSettingsPage from '#/components/pages/people/PersonBasicSettingsPage';
 import { toPersonCardPerson } from '#/lib/people';
 import { liveClient } from '#/pairql/client';
@@ -77,6 +79,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
     },
   });
   const { connectMac, modalProps: connectMacModalProps } = useConnectMac();
+  const { installIOSApp, modalProps: installModalProps } = useInstallIOSApp(person?.name);
 
   React.useEffect(() => {
     if (
@@ -124,7 +127,11 @@ const PersonBasicSettingsRoute: React.FC = () => {
             () => setAllowNavigation(false),
           );
         }}
-        onConnectMac={() => connectMac([{ id: person.id, name: person.name }])}
+        onAddDevice={(app) =>
+          app === `mac`
+            ? connectMac([{ id: person.id, name: person.name }])
+            : installIOSApp(app)
+        }
         onDisconnectMac={(connectionId) =>
           disconnectMac.mutateAsync({ connectionId }).then(
             () => true,
@@ -133,6 +140,7 @@ const PersonBasicSettingsRoute: React.FC = () => {
         }
       />
       <ConnectMacModal {...connectMacModalProps} />
+      <InstallIOSAppModal {...installModalProps} />
       <UnsavedChangesGuard
         hasUnsavedChanges={hasUnsavedChanges && !allowNavigation}
         description="Your basic settings haven't been saved."

@@ -75,7 +75,7 @@ const SidebarLayout: React.FC<Props> = ({
         />
         <div
           className={cx(
-            `fixed left-0 top-0 z-100 h-dvh w-68 overflow-y-auto overscroll-contain bg-white shadow-xl transition-transform duration-150 min-[940px]:hidden`,
+            `fixed left-0 top-0 z-100 h-dvh w-68 overflow-y-auto overscroll-none bg-white shadow-xl transition-transform duration-150 min-[940px]:hidden`,
             open ? `translate-x-0` : `-translate-x-68`,
           )}
         >

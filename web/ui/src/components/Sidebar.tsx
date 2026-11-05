@@ -50,7 +50,7 @@ const Sidebar: React.FC<Props> = ({
       <div
         ref={scrollRef}
         className={cx(
-          `relative z-10 min-h-0 flex-grow overflow-y-auto overscroll-contain pt-5 pb-3 pl-5 pr-5 [scrollbar-width:none] min-[940px]:-mr-[3px] min-[940px]:pr-[23px] [&::-webkit-scrollbar]:hidden`,
+          `relative z-10 min-h-0 flex-grow overflow-y-auto overscroll-none pt-5 pb-3 pl-5 pr-5 [scrollbar-width:none] min-[940px]:-mr-[3px] min-[940px]:pr-[23px] [&::-webkit-scrollbar]:hidden`,
           moreBelow &&
             `[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)]`,
         )}
