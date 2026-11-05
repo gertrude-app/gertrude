@@ -77,126 +77,126 @@ public struct GertieResultScreen: View {
         .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
-      GeometryReader { proxy in
-        ScrollView {
-          VStack(spacing: 24) {
-            Spacer(minLength: 0)
-
-            Image(systemName: self.icon)
-              .font(.system(size: self.iconSize, weight: .regular))
-              .foregroundStyle(self.iconColor)
-              .accessibilityHidden(true)
-              .swooshIn(
-                fromYOffset: 20,
-                animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-              )
-              .modifier(
-                GertieResultScreenExitModifier(
-                  isExiting: self.isExiting,
-                  yOffset: -20,
-                ),
-              )
-
-            VStack(spacing: 8) {
-              Text(verbatim: self.title)
-                .font(.system(size: self.titleSize, weight: .bold))
-                .foregroundStyle(
-                  Color(self.colorScheme, light: .violet950, dark: .violet100),
-                )
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-
-              if let message = self.message {
-                Text(verbatim: message)
-                  .font(.system(size: self.messageSize, weight: .medium))
-                  .foregroundStyle(
-                    Color(self.colorScheme, light: .violet950, dark: .violet100).opacity(0.8),
-                  )
-                  .multilineTextAlignment(.center)
-                  .fixedSize(horizontal: false, vertical: true)
-              }
-            }
-            .modifier(GertieResultScreenAccessibilityIdentifier(
-              identifier: self.accessibilityIdentifier,
-            ))
-            .swooshIn(
-              fromYOffset: 20,
-              after: .milliseconds(100),
-              animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-            )
-            .modifier(
-              GertieResultScreenExitModifier(
-                isExiting: self.isExiting,
-                yOffset: 20,
-                delay: 0.06,
-              ),
-            )
-
-            if self.action != nil || self.secondaryAction != nil {
-              VStack(spacing: 12) {
-                if let action = self.action {
-                  Button(action.title) {
-                    self.actionTriggered(action)
-                  }
-                  .buttonStyle(.gertiePrimary)
-                  .accessibilityIdentifier("btn-primary")
-                  .disabled(self.isResponding)
-                  .swooshIn(
-                    fromYOffset: 20,
-                    after: .milliseconds(200),
-                    animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-                  )
-                  .modifier(
-                    GertieResultScreenExitModifier(
-                      isExiting: self.isExiting,
-                      yOffset: 20,
-                      delay: 0.06,
-                    ),
-                  )
-                }
-
-                if let secondaryAction = self.secondaryAction {
-                  Button(secondaryAction.title) {
-                    self.actionTriggered(secondaryAction)
-                  }
-                  .buttonStyle(.gertieSecondary)
-                  .accessibilityIdentifier("btn-secondary")
-                  .disabled(self.isResponding)
-                  .swooshIn(
-                    fromYOffset: 20,
-                    after: self.action == nil
-                      ? .milliseconds(200)
-                      : .milliseconds(280),
-                    animation: .bouncy(duration: 0.6, extraBounce: 0.3),
-                  )
-                  .modifier(
-                    GertieResultScreenExitModifier(
-                      isExiting: self.isExiting,
-                      yOffset: 20,
-                    ),
-                  )
-                }
-              }
-              .padding(.horizontal, 30)
-            }
-
-            Spacer(minLength: 0)
-          }
-          .frame(
-            minHeight: max(0, proxy.size.height - 60),
-            alignment: .center,
-          )
-          .padding(30)
-          .frame(maxWidth: 500)
-          .frame(maxWidth: .infinity)
+      GertieScreenGeometryReader { proxy, geometry in
+        GertieScreenContentLayout(
+          containerSize: proxy.size,
+          geometry: geometry,
+          configuration: .result,
+          hasActions: self.action != nil || self.secondaryAction != nil,
+        ) {
+          self.iconView
+        } message: {
+          self.messageView
+        } actions: {
+          self.actionsView
         }
-        .scrollBounceBehavior(.basedOnSize)
-        .scrollIndicators(.hidden)
       }
     }
     .onAppear(perform: self.beginEntranceAnimation)
     .task(id: self.exitTaskID) {
       await self.invokeExitActionIfNeeded()
+    }
+  }
+
+  private var iconView: some View {
+    Image(systemName: self.icon)
+      .font(.system(size: self.iconSize, weight: .regular))
+      .foregroundStyle(self.iconColor)
+      .frame(maxWidth: .infinity)
+      .accessibilityHidden(true)
+      .swooshIn(
+        fromYOffset: 20,
+        animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+      )
+      .modifier(
+        GertieResultScreenExitModifier(
+          isExiting: self.isExiting,
+          yOffset: -20,
+        ),
+      )
+  }
+
+  private var messageView: some View {
+    VStack(spacing: 8) {
+      Text(verbatim: self.title)
+        .font(.system(size: self.titleSize, weight: .bold))
+        .foregroundStyle(
+          Color(self.colorScheme, light: .violet950, dark: .violet100),
+        )
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+
+      if let message = self.message {
+        Text(verbatim: message)
+          .font(.system(size: self.messageSize, weight: .medium))
+          .foregroundStyle(
+            Color(self.colorScheme, light: .violet950, dark: .violet100).opacity(0.8),
+          )
+          .multilineTextAlignment(.center)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+    }
+    .modifier(GertieOptionalAccessibilityIdentifier(
+      identifier: self.accessibilityIdentifier,
+    ))
+    .swooshIn(
+      fromYOffset: 20,
+      after: .milliseconds(100),
+      animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+    )
+    .modifier(
+      GertieResultScreenExitModifier(
+        isExiting: self.isExiting,
+        yOffset: 20,
+        delay: 0.06,
+      ),
+    )
+  }
+
+  private var actionsView: some View {
+    VStack(spacing: 12) {
+      if let action = self.action {
+        Button(action.title) {
+          self.actionTriggered(action)
+        }
+        .buttonStyle(.gertiePrimary)
+        .accessibilityIdentifier("btn-primary")
+        .disabled(self.isResponding)
+        .swooshIn(
+          fromYOffset: 20,
+          after: .milliseconds(200),
+          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+        )
+        .modifier(
+          GertieResultScreenExitModifier(
+            isExiting: self.isExiting,
+            yOffset: 20,
+            delay: 0.06,
+          ),
+        )
+      }
+
+      if let secondaryAction = self.secondaryAction {
+        Button(secondaryAction.title) {
+          self.actionTriggered(secondaryAction)
+        }
+        .buttonStyle(.gertieSecondary)
+        .accessibilityIdentifier("btn-secondary")
+        .disabled(self.isResponding)
+        .swooshIn(
+          fromYOffset: 20,
+          after: self.action == nil
+            ? .milliseconds(200)
+            : .milliseconds(280),
+          animation: .bouncy(duration: 0.6, extraBounce: 0.3),
+        )
+        .modifier(
+          GertieResultScreenExitModifier(
+            isExiting: self.isExiting,
+            yOffset: 20,
+          ),
+        )
+      }
     }
   }
 
@@ -235,14 +235,7 @@ public struct GertieResultScreen: View {
   }
 
   @MainActor private func beginEntranceAnimation() {
-    guard !self.reduceMotion else {
-      self.showBackground = true
-      return
-    }
-
-    withAnimation(.smooth(duration: 0.4)) {
-      self.showBackground = true
-    }
+    revealGertieScreenBackground(self.$showBackground, skippingMotion: self.reduceMotion)
   }
 
   @MainActor private func actionTriggered(_ action: Action) {
@@ -296,18 +289,6 @@ public struct GertieResultScreen: View {
   private struct ExitTaskID: Equatable {
     let id: UUID?
     let skipsMotion: Bool
-  }
-}
-
-private struct GertieResultScreenAccessibilityIdentifier: ViewModifier {
-  let identifier: String?
-
-  @ViewBuilder func body(content: Content) -> some View {
-    if let identifier {
-      content.accessibilityIdentifier(identifier)
-    } else {
-      content
-    }
   }
 }
 

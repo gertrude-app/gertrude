@@ -123,13 +123,14 @@ public struct PlaylistMusicPickerSheet: View {
   @ViewBuilder
   private var content: some View {
     if self.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-      ContentUnavailableView(
+      MusicEmptyState(
         "Search your music",
-        systemImage: "magnifyingglass",
-        description: Text("Find approved songs and albums to add to \(self.playlistName)."),
+        message: "Find approved songs and albums to add to \(self.playlistName).",
       )
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     } else if self.results.isEmpty {
-      ContentUnavailableView("No results", systemImage: "magnifyingglass")
+      MusicEmptyState("No results")
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     } else {
       List {
         Section {

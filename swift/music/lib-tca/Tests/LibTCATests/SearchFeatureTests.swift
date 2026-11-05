@@ -56,7 +56,7 @@ struct SearchFeatureTests {
   }
 
   @Test
-  func collectionTapsOpenExistingDetailDomains() async {
+  func collectionTapsDelegateToLibrarySelection() async {
     let library = ApprovedMusicLibrary.mock
     let album = library.albums[0]
     let artist = library.artists[0]
@@ -68,86 +68,16 @@ struct SearchFeatureTests {
       SearchFeature()
     }
 
-    await store.send(.resultTapped(.album(album.id))) {
-      $0.path.append(.album(.init(
-        album: album,
-        transitionSourceID: album.id.rawValue,
-      )))
-    }
-    await store.send(.path(.popFrom(id: 0))) {
-      $0.path.removeAll()
-    }
+    await store.send(.resultTapped(.album(album.id)))
+    await store.receive(.delegate(.collectionSelected(.album(album.id))))
     await store.send(.queryChanged("vasen")) {
       $0.query = "vasen"
       $0.results = $0.librarySearch.results(query: "vasen")
     }
     await store.send(.resultAddToPlaylistTapped(.artist(artist.id)))
     await store.receive(.delegate(.library(.addArtistToPlaylistTapped(artist.id))))
-    await store.send(.resultTapped(.artist(artist.id))) {
-      $0.path.append(.artist(.init(artistID: artist.id)))
-    }
-  }
-
-  @Test
-  func artistDetailKeepsDiscographyAndTopSongsPlaybackSourcesDistinct() async {
-    let album = ApprovedAlbum(
-      id: "album",
-      title: "Album",
-      artistName: "Artist",
-      releaseDate: "2025-06-01",
-      tracks: [
-        ApprovedTrack(id: "song-1", title: "First", artistName: "Artist"),
-        ApprovedTrack(id: "song-2", title: "Second", artistName: "Artist"),
-      ],
-    )
-    let topSongs = [album.tracks[1]]
-    let artist = ApprovedArtist(
-      id: "artist",
-      name: "Artist",
-      releaseAlbumIds: [album.id],
-      topSongs: topSongs,
-    )
-    let library = ApprovedMusicLibrary(albums: [album], artists: [artist])
-    var state = SearchFeature.State()
-    state.applyLibraryStatus(.loaded(library))
-    state.path.append(.artist(.init(artistID: artist.id)))
-    let pathID = state.path.ids.last!
-    let discographyItems = playbackItems(album: album)
-    let topSongItems = topSongs.map {
-      PlaybackItem(track: $0, artworkURL: $0.artworkURL)
-    }
-    let discographyContext = PlaybackContext(
-      identity: .artist(artist.id),
-      title: artist.name,
-      artistSource: .discography,
-    )
-    let topSongsContext = PlaybackContext(
-      identity: .artist(artist.id),
-      title: artist.name,
-      artistSource: .topSongs,
-    )
-    let store = TestStore(initialState: state) {
-      SearchFeature()
-    }
-
-    await store.send(.path(.element(id: pathID, action: .artist(.addToPlaylistTapped))))
-    await store.receive(.delegate(.library(.addArtistToPlaylistTapped(artist.id))))
-
-    await store.send(.path(.element(id: pathID, action: .artist(.playButtonTapped))))
-    await store.receive(.delegate(.playback(.artistPlaybackButtonTapped(
-      items: discographyItems,
-      context: discographyContext,
-    ))))
-
-    await store.send(.path(.element(
-      id: pathID,
-      action: .artist(.topSongTapped(topSongs[0].id)),
-    )))
-    await store.receive(.delegate(.playback(.playNow(
-      items: topSongItems,
-      start: .selectedEntry(index: 0),
-      context: topSongsContext,
-    ))))
+    await store.send(.resultTapped(.artist(artist.id)))
+    await store.receive(.delegate(.collectionSelected(.artist(artist.id))))
   }
 
   @Test
@@ -226,49 +156,12 @@ struct SearchFeatureTests {
   }
 
   @Test
-  func playlistDetailActionsUseAuthoritativeMutationPipeline() async {
-    let playlist = self.playlist()
-    var state = SearchFeature.State()
-    state.applyLibraryStatus(.loaded(.init(playlists: [playlist])))
-    state.path.append(.playlist(.init(playlist: playlist)))
-    let pathID = state.path.ids.last!
-    let store = TestStore(initialState: state) {
-      SearchFeature()
-    }
-
-    await store.send(.path(.element(
-      id: pathID,
-      action: .playlist(.delegate(.addToPlaylist)),
-    )))
-    await store.receive(.delegate(.library(.addPlaylistToPlaylistTapped(playlist.id))))
-
-    await store.send(.path(.element(
-      id: pathID,
-      action: .playlist(.delegate(.rename("Renamed"))),
-    )))
-    await store.receive(.delegate(.library(.playlistRenameSubmitted(
-      playlistID: playlist.id,
-      expectedRevision: playlist.revision,
-      name: "Renamed",
-    ))))
-
-    await store.send(.path(.element(
-      id: pathID,
-      action: .playlist(.delegate(.addMusic)),
-    )))
-    await store.receive(.delegate(.library(.playlistMusicPickerRequested(
-      playlist.id,
-    ))))
-  }
-
-  @Test
-  func libraryReplacementReranksAndReconcilesDetail() {
-    let playlist = self.playlist()
+  func libraryReplacementReranksSearchResults() {
+    let playlist = favoriteMusicPlaylist
     var state = SearchFeature.State()
     state.applyLibraryStatus(.loaded(.init(playlists: [playlist])))
     state.query = "favorites"
     state.results = state.librarySearch.results(query: state.query)
-    state.path.append(.playlist(.init(playlist: playlist)))
 
     var renamed = playlist
     renamed.name = "Road Trip"
@@ -276,21 +169,25 @@ struct SearchFeatureTests {
     state.applyLibraryStatus(.loaded(.init(playlists: [renamed])))
 
     #expect(state.results.isEmpty)
-    #expect(state.playlistDetail?.playlist == renamed)
+    #expect(state.librarySearch.result(id: .playlist(playlist.id))?.source == .playlist(renamed))
 
     state.applyLibraryStatus(.loaded(.init()))
 
-    #expect(state.path.isEmpty)
-    #expect(state.availability == .ready)
+    #expect(state.results.isEmpty)
+    #expect(state.librarySearch.result(id: .playlist(playlist.id)) == nil)
   }
 
-  private func playlist() -> MusicPlaylist {
-    MusicPlaylist(
-      id: .init(rawValue: UUID(1)),
-      name: "Favorites",
-      revision: 1,
-      createdAt: Date(timeIntervalSince1970: 1),
-      updatedAt: Date(timeIntervalSince1970: 1),
-    )
+  @Test
+  func unavailableLibraryClearsTheSearchIndex() {
+    var state = SearchFeature.State()
+    state.applyLibraryStatus(.loaded(.mock))
+    state.query = "brewed"
+    state.results = state.librarySearch.results(query: state.query)
+
+    state.applyLibraryStatus(.loading)
+
+    #expect(state.query == "brewed")
+    #expect(state.results.isEmpty)
+    #expect(state.librarySearch.results(query: "brewed").isEmpty)
   }
 }

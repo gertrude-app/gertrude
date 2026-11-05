@@ -1,38 +1,65 @@
 import SwiftUI
 
 #if os(iOS)
+  private let nowPlayingZoomSourceID = "now-playing"
+
   public extension View {
     func nowPlayingPresentation(
       isPresented: Binding<Bool>,
+      zoomNamespace: Namespace.ID? = nil,
       @ViewBuilder background: @escaping () -> some View,
       @ViewBuilder content: @escaping () -> some View,
     ) -> some View {
       self.fullScreenCover(isPresented: isPresented) {
-        NowPlayingPresentationContent(
-          isPresented: isPresented,
-          content: content(),
-        )
-        .presentationBackground {
-          background()
-        }
+        content()
+          .presentationBackground {
+            background()
+          }
+          .nowPlayingZoomTransition(in: zoomNamespace)
+      }
+    }
+
+    @ViewBuilder
+    func nowPlayingZoomSource(in namespace: Namespace.ID) -> some View {
+      if #available(iOS 26.0, *) {
+        self.matchedTransitionSource(id: nowPlayingZoomSourceID, in: namespace)
+      } else {
+        self
       }
     }
   }
 
-  private struct NowPlayingPresentationContent<Content: View>: View {
-    @Binding var isPresented: Bool
-    @State private var dragOffset: CGFloat = 0
-    let content: Content
+  private extension View {
+    @ViewBuilder
+    func nowPlayingZoomTransition(in namespace: Namespace.ID?) -> some View {
+      if #available(iOS 26.0, *), let namespace {
+        self
+          .navigationTransition(.zoom(sourceID: nowPlayingZoomSourceID, in: namespace))
+          .environment(\.nowPlayingUsesSystemDismiss, true)
+      } else {
+        self
+      }
+    }
+  }
 
-    var body: some View {
-      self.content
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .contentShape(Rectangle())
-        .offset(y: self.dragOffset)
-        .simultaneousGesture(self.dismissGesture)
-        .accessibilityAction(.escape) {
-          self.isPresented = false
-        }
+  private extension EnvironmentValues {
+    @Entry var nowPlayingUsesSystemDismiss = false
+  }
+
+  struct NowPlayingDismissGesture: ViewModifier {
+    @Environment(\.nowPlayingUsesSystemDismiss) private var usesSystemDismiss
+    @Binding var dragOffset: CGFloat
+    let onDismiss: @MainActor @Sendable () -> Void
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+      if self.usesSystemDismiss {
+        content
+      } else {
+        content
+          .contentShape(Rectangle())
+          .simultaneousGesture(self.dismissGesture)
+      }
     }
 
     private var dismissGesture: some Gesture {
@@ -49,7 +76,7 @@ import SwiftUI
             return
           }
           if value.translation.height > 90 || value.predictedEndTranslation.height > 180 {
-            self.isPresented = false
+            self.onDismiss()
           } else {
             self.resetDrag()
           }

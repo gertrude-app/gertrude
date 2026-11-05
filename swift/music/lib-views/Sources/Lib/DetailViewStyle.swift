@@ -12,3 +12,13 @@ extension View {
     #endif
   }
 }
+
+extension ToolbarItemPlacement {
+  static var detailActions: Self {
+    #if os(iOS)
+      .topBarTrailing
+    #else
+      .automatic
+    #endif
+  }
+}

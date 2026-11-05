@@ -8,18 +8,18 @@ building projects, checking Xcode navigator issues, rendering SwiftUI previews, 
 build logs, and inspecting project structure. Prefer it over shell-only checks when the
 user's issue is visible in Xcode or previews.
 
-For command-line Swift builds/tests using this repo's pinned Swift 6.3.1 toolchain,
-select Xcode 26.6 per command:
+For command-line Swift builds/tests using this repo's pinned Swift 6.3.1 toolchain, select
+Xcode 26.6 per command:
 
 ```bash
 DEVELOPER_DIR='/Applications/Xcode 26.6.app/Contents/Developer' just api-test
 ```
 
 On Kiah's macOS 27 machine, Xcode 26.6's GUI is blocked, but its command-line tools and
-SDK work; API builds and targeted tests have passed with this override. Command Line
-Tools alone lack XCTest, while Xcode 27 RC's SDK is incompatible with the pinned
-compiler. Keep Xcode 27 RC for native Xcode work. Do not change the global Xcode selection
-or the repo's Swift version just to fix local builds.
+SDK work; API builds and targeted tests have passed with this override. Command Line Tools
+alone lack XCTest, while Xcode 27 RC's SDK is incompatible with the pinned compiler. Keep
+Xcode 27 RC for native Xcode work. Do not change the global Xcode selection or the repo's
+Swift version just to fix local builds.
 
 Do not take over or disrupt Kiah's visible desktop unless Kiah explicitly asks you to
 perform the specific visible interaction. Without that explicit request, do not bring apps
@@ -30,16 +30,6 @@ manipulate visible UI merely to facilitate a test or screenshot. Screenshots and
 are allowed when they can be captured entirely in the background without changing visible
 UI or stealing focus; otherwise ask Kiah to perform the interaction or provide the
 screenshot unless Kiah explicitly asks you to handle it.
-
-For physical-device Gertrude Music debug builds, generate the Xcode project with Kiah's
-personal development team and temporary bundle identifier. Keep these as generation-time
-overrides rather than changing the checked-in project defaults:
-
-```bash
-GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM=Y63PLK783B \
-GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER=com.innocencelabs.gertrude-fm-temp-dev \
-just music gen
-```
 
 If I refer to Jared, he's my boss and coworker, we're the only two full-time developers
 working on Gertrude.

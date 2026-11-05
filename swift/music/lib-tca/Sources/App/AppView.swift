@@ -10,6 +10,7 @@ struct AppView: View {
   @Environment(\.colorScheme) private var colorScheme
   @Environment(\.scenePhase) private var scenePhase
   @Dependency(\.musicIdentity) private var identity
+  @Namespace private var nowPlayingNamespace
 
   var body: some View {
     Group {
@@ -96,6 +97,7 @@ struct AppView: View {
   private var libraryView: some View {
     LibraryViewContainer(
       store: self.store.scope(\.library, action: \.library),
+      searchStore: self.store.scope(\.search, action: \.search),
       currentTrackID: self.store.playback.session?.currentTrackID,
       activePlaybackContext: self.store.playback.activePlaybackContext,
       isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
@@ -107,18 +109,17 @@ struct AppView: View {
     @ViewBuilder
     private var iOSContent: some View {
       if !self.store.identity.available {
-        ContentUnavailableView {
-          Label("Connecting Gertrude Music", systemImage: "music.note")
-        } description: {
-          Text(self.store.identity.migrationPending
+        MusicEmptyState(
+          "Connecting Gertrude Music",
+          message: self.store.identity.migrationPending
             ? "We’re connecting this phone to your account. Connect to the internet and try again."
-            : "We couldn’t prepare this device. Please try again.")
-        } actions: {
-          Button("Try Again") { self.store.send(.identityRetryTapped) }
-        }
+            : "We couldn’t prepare this device. Please try again.",
+          buttonTitle: "Try Again",
+        ) { self.store.send(.identityRetryTapped) }
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else {
         Group {
-          if self.store.setup.isReady {
+          if self.store.setup.isReady, !self.store.library.isRestoringLaunchState {
             self.iOSLibraryContent
           } else {
             MusicSetupViewContainer(store: self.store.scope(\.setup, action: \.setup))
@@ -133,8 +134,10 @@ struct AppView: View {
 
     private var iOSLibraryContent: some View {
       self.iOSTabView
+        .coversTabLayoutUntilSettled()
         .nowPlayingPresentation(
           isPresented: self.nowPlayingPresented,
+          zoomNamespace: self.nowPlayingNamespace,
           background: {
             NowPlayingBackgroundView(
               artworkURL: self.store.playback.session?.currentItem.artworkURL,
@@ -156,6 +159,7 @@ struct AppView: View {
                 showsBackground: false,
               )
             }
+            .nowPlayingZoomSource(in: self.nowPlayingNamespace)
           }
           .tabBarMinimizeBehavior(.onScrollDown)
       } else if #available(iOS 18.0, *) {
@@ -173,12 +177,6 @@ struct AppView: View {
               Label("Queue", systemImage: "list.bullet")
             }
             .tag(AppFeature.Tab.queue)
-
-          self.iOSTabContent(self.searchView)
-            .tabItem {
-              Label("Search", systemImage: "magnifyingglass")
-            }
-            .tag(AppFeature.Tab.search)
         }
       }
     }
@@ -192,15 +190,6 @@ struct AppView: View {
 
         Tab("Queue", systemImage: "list.bullet", value: AppFeature.Tab.queue) {
           self.iOSTabContent(self.queueView)
-        }
-
-        Tab(
-          "Search",
-          systemImage: "magnifyingglass",
-          value: AppFeature.Tab.search,
-          role: .search,
-        ) {
-          self.iOSTabContent(self.searchView)
         }
       }
     }
@@ -259,36 +248,15 @@ struct AppView: View {
             },
           )
         } else {
-          ContentUnavailableView {
-            Label("Your queue is empty", systemImage: "music.note.list")
-          } description: {
-            Text("Choose an approved album, artist, or song to start listening.")
-          } actions: {
-            Button("Browse Library") {
-              self.store.send(.queueBrowseLibraryButtonTapped)
-            }
-            .buttonStyle(.borderedProminent)
-          }
-          .navigationTitle("Queue")
+          MusicEmptyState(
+            "Your queue is empty",
+            message: "Choose an approved album, artist, or song to start listening.",
+            buttonTitle: "Browse Library",
+          ) { self.store.send(.queueBrowseLibraryButtonTapped) }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationTitle("Queue")
         }
       }
-    }
-
-    private var searchView: some View {
-      SearchViewContainer(
-        store: self.store.scope(\.search, action: \.search),
-        library: self.approvedLibrary,
-        currentTrackID: self.store.playback.session?.currentTrackID,
-        activePlaybackContext: self.store.playback.activePlaybackContext,
-        isPlaybackLoading: self.store.playback.session?.isLoading ?? false,
-        isPlaybackPlaying: self.store.playback.session?.isPlaying ?? false,
-        isPlaylistMutationInFlight: self.store.library.isPlaylistMutationInFlight,
-      )
-    }
-
-    private var approvedLibrary: ApprovedMusicLibrary? {
-      guard case .loaded(let library) = self.store.library.status else { return nil }
-      return library
     }
 
     private func nowPlayingBarInset(
@@ -552,9 +520,6 @@ struct AppView: View {
         || self.store.library.playlistDetail != nil
     case .queue:
       false
-    case .search:
-      self.store.search.albumDetail != nil
-        || self.store.search.playlistDetail != nil
     }
   }
 
