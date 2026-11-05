@@ -66,10 +66,7 @@ struct DailyReviewEmailJob: AsyncScheduledJob {
     let userToChild: [ComputerUser.Id: Child.Id] = computerUsers
       .reduce(into: [:]) { $0[$1.id] = $1.childId }
     let newSince = self.now.addingTimeInterval(-26 * 60 * 60)
-    let dashboardUrl = self.env.dashboardUrl.withoutTrailingSlashes
-    let activityBaseUrl = parent.accountSiteBetaEnabled
-      ? self.env.accountDashboardUrl.withoutTrailingSlashes
-      : dashboardUrl
+    let accountUrl = self.env.accountDashboardUrl.withoutTrailingSlashes
 
     var rows: [ChildRow] = []
     for child in children {
@@ -77,12 +74,9 @@ struct DailyReviewEmailJob: AsyncScheduledJob {
       let backlog = childShots.filter(\.notDeleted).count
       let newCount = childShots.count(where: { $0.createdAt >= newSince && $0.notDeleted })
       if newCount > 0 || backlog > 0 {
-        let activityPath = parent.accountSiteBetaEnabled
-          ? "/activity/person/\(child.id.lowercased)"
-          : "/children/\(child.id.lowercased)/activity"
         rows.append(ChildRow(
           name: child.name,
-          activityUrl: "\(activityBaseUrl)\(activityPath)",
+          activityUrl: "\(accountUrl)/activity/person/\(child.id.lowercased)",
           newCount: newCount,
           backlog: backlog,
         ))
@@ -98,10 +92,8 @@ struct DailyReviewEmailJob: AsyncScheduledJob {
       intro: "Gertrude has new screenshots of \(joinChildNames(activeNames))’s "
         + "activity, ready for your review:",
       childRows: rows.map(\.html).joined(separator: "\n"),
-      reviewUrl: parent.accountSiteBetaEnabled
-        ? "\(activityBaseUrl)/activity"
-        : "\(activityBaseUrl)/children/activity",
-      manageUrl: "\(dashboardUrl)/settings",
+      reviewUrl: "\(accountUrl)/activity",
+      manageUrl: "\(accountUrl)/settings/notifications",
     )
   }
 }

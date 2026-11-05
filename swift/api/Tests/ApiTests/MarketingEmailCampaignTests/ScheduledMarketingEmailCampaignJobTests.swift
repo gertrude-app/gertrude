@@ -35,8 +35,9 @@ final class ScheduledMarketingEmailCampaignJobTests: ApiTestCase, @unchecked Sen
   func testTickSendsMacSetupCampaignAndRecordsSuccessfulSend() async throws {
     var env = Env.fromProcess(mode: .testing)
     env.dashboardUrl = "https://dash.test/"
+    env.accountDashboardUrl = "https://account.test/"
     try await self.markCurrentAudienceAsAlreadySent(
-      MacSetup24hEmailCampaign(dashboardUrl: env.dashboardUrl),
+      MacSetup24hEmailCampaign(accountUrl: env.accountDashboardUrl),
     )
 
     let now = Date()
@@ -54,9 +55,10 @@ final class ScheduledMarketingEmailCampaignJobTests: ApiTestCase, @unchecked Sen
         return .success(emails.map { _ in .success(()) })
       }
     } operation: {
-      try await ScheduledMarketingEmailCampaignJob().tick(campaigns: [
-        MacSetup24hEmailCampaign(dashboardUrl: env.dashboardUrl),
-      ])
+      try await ScheduledMarketingEmailCampaignJob().tick(
+        campaigns: scheduledMarketingEmailCampaigns(env: env)
+          .filter { $0.slug == "mac_setup_24h" },
+      )
     }
 
     let result = try XCTUnwrap(results.first { $0.campaign == "mac_setup_24h" })
@@ -71,9 +73,9 @@ final class ScheduledMarketingEmailCampaignJobTests: ApiTestCase, @unchecked Sen
     expect(self.sent.emails.map(\.messageStream)).toEqual(["broadcast"])
     expect(self.sent.emails.map(\.tag)).toEqual(["mac_setup_24h"])
     expect(self.sent.emails[0].templateModel["childName"]).toEqual("Sarah")
-    expect(self.sent.emails[0].templateModel["dashboardUrl"]).toEqual("https://dash.test")
+    expect(self.sent.emails[0].templateModel["dashboardUrl"]).toEqual("https://account.test")
     expect(self.sent.emails[0].templateModel["primaryCtaUrl"]).toEqual(
-      "https://dash.test/children/\(child.model.id.lowercased)/mac",
+      "https://account.test/people/\(child.model.id.lowercased)",
     )
 
     let sends = try await MarketingEmailSend.query()

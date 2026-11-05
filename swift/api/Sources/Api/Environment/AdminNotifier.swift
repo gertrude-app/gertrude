@@ -22,9 +22,7 @@ extension AdminNotifier: DependencyKey {
       @Dependency(\.slack) var slack
       do {
         let parent = try await db.find(parentId)
-        let event = parent.accountSiteBetaEnabled
-          ? event.routingNotifications(toAccountSiteAt: env.accountDashboardUrl)
-          : event
+        let event = event.routingNotifications(toAccountSiteAt: env.accountDashboardUrl)
         let notifications = try await parent.notifications(in: db)
 
         // happy path: they have at least one notification for this event

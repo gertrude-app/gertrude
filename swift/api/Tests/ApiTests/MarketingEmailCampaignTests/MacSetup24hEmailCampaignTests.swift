@@ -33,7 +33,7 @@ final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     try await expiredTrial.model.modifyCreatedAt(.exact(now - .days(23)))
     try await tooRecent.model.modifyCreatedAt(.exact(now - .hours(30)))
 
-    let audience = try await MacSetup24hEmailCampaign(dashboardUrl: "https://dash.test")
+    let audience = try await MacSetup24hEmailCampaign(accountUrl: "https://account.test")
       .audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 
@@ -59,7 +59,7 @@ final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     try await dueWithoutMac.model.modifyCreatedAt(.exact(now - .hours(30)))
     try await dueWithMac.model.modifyCreatedAt(.exact(now - .hours(30)))
 
-    let audience = try await MacSetup24hEmailCampaign(dashboardUrl: "https://dash.test")
+    let audience = try await MacSetup24hEmailCampaign(accountUrl: "https://account.test")
       .audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 
@@ -67,7 +67,7 @@ final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     expect(audienceParentIds.contains(dueWithMac.parent.model.id)).toEqual(false)
   }
 
-  func testAudienceTemplateModelUsesChildNameAndMacUrlForOneChild() async throws {
+  func testAudienceTemplateModelUsesChildNameAndAccountPersonUrlForOneChild() async throws {
     let now = Date()
     let child = try await self.child(with: \.name, of: "Sarah")
     _ = try await self.db.create(BillingIdentity(
@@ -77,18 +77,18 @@ final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     try await child.model.modifyCreatedAt(.exact(now - .hours(30)))
 
     let audience = try await MacSetup24hEmailCampaign(
-      dashboardUrl: "https://dash.test/",
+      accountUrl: "https://account.test/",
     ).audience(in: self.db)
     let recipient = try XCTUnwrap(audience.first { $0.parentId == child.parent.model.id })
 
     expect(recipient.templateModel).toEqual([
       "childName": "Sarah",
-      "dashboardUrl": "https://dash.test",
-      "primaryCtaUrl": "https://dash.test/children/\(child.model.id.lowercased)/mac",
+      "dashboardUrl": "https://account.test",
+      "primaryCtaUrl": "https://account.test/people/\(child.model.id.lowercased)",
     ])
   }
 
-  func testAudienceTemplateModelUsesGenericCopyAndChildrenUrlForMultipleChildren() async throws {
+  func testAudienceTemplateModelUsesGenericCopyAndPeopleUrlForMultipleChildren() async throws {
     let now = Date()
     let parent = try await self.parent()
     var child1 = try await self.db.create(Child(parentId: parent.id, name: "Sarah"))
@@ -101,14 +101,14 @@ final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     try await child2.modifyCreatedAt(.exact(now - .hours(29)))
 
     let audience = try await MacSetup24hEmailCampaign(
-      dashboardUrl: "https://dash.test",
+      accountUrl: "https://account.test",
     ).audience(in: self.db)
     let recipient = try XCTUnwrap(audience.first { $0.parentId == parent.id })
 
     expect(recipient.templateModel).toEqual([
       "childName": "your child",
-      "dashboardUrl": "https://dash.test",
-      "primaryCtaUrl": "https://dash.test/children",
+      "dashboardUrl": "https://account.test",
+      "primaryCtaUrl": "https://account.test/people",
     ])
   }
 
@@ -128,7 +128,7 @@ final class MacSetup24hEmailCampaignTests: ApiTestCase, @unchecked Sendable {
     try await due.model.modifyCreatedAt(.exact(now - .hours(25)))
     try await notDue.model.modifyCreatedAt(.exact(now - .hours(23)))
 
-    let audience = try await MacSetup24hEmailCampaign(dashboardUrl: "https://dash.test")
+    let audience = try await MacSetup24hEmailCampaign(accountUrl: "https://account.test")
       .audience(in: self.db)
     let audienceParentIds = Set(audience.map(\.parentId))
 

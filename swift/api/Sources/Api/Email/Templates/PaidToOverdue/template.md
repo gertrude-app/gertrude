@@ -4,11 +4,10 @@ This is Jared from Gertrude, writing to let you know that we did not receive pay
 your Gertrude account, and it is now considered OVERDUE. This can happen for a number of
 reasons, but the most common is that your credit card expired, or your bank declined the
 charge for some reason. To resolve the issue and guarantee uninterrupted protection of
-your children, please login to the parents website here:
+your children, open Billing in the Gertrude account website and update your payment
+method:
 
-https://parents.gertrude.app/settings
-
-And click the "Manage subscription" button, then resolve the payment issue from there.
+https://account.gertrude.app/settings/billing
 
 If we don't receive a payment within 2 weeks, any Gertrude Mac apps connected to your
 account will lose SOME functionality. They will continue blocking the internet according

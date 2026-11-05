@@ -80,21 +80,11 @@ final class DailyReviewEmailJobTests: ApiTestCase, @unchecked Sendable {
     expect(row.html.contains("&lt;b&gt;x&lt;/b&gt;")).toEqual(true)
   }
 
-  func testNonBetaDigestLinksToLegacyActivity() async throws {
-    let (model, childId) = try await self.digest(accountSiteBetaEnabled: false)
-
-    expect(model.reviewUrl).toEqual("https://dashboard.example/children/activity")
-    expect(model.manageUrl).toEqual("https://dashboard.example/settings")
-    expect(model.childRows.contains(
-      "href=\"https://dashboard.example/children/\(childId.lowercased)/activity\"",
-    )).toEqual(true)
-  }
-
-  func testBetaDigestLinksToAccountActivityAndLegacySettings() async throws {
-    let (model, childId) = try await self.digest(accountSiteBetaEnabled: true)
+  func testDigestLinksToAccountActivityAndNotifications() async throws {
+    let (model, childId) = try await self.digest()
 
     expect(model.reviewUrl).toEqual("https://account.example/activity")
-    expect(model.manageUrl).toEqual("https://dashboard.example/settings")
+    expect(model.manageUrl).toEqual("https://account.example/settings/notifications")
     expect(model.childRows.contains(
       "href=\"https://account.example/activity/person/\(childId.lowercased)\"",
     )).toEqual(true)
@@ -102,12 +92,8 @@ final class DailyReviewEmailJobTests: ApiTestCase, @unchecked Sendable {
 
   // MARK: - helpers
 
-  private func digest(
-    accountSiteBetaEnabled: Bool,
-  ) async throws -> (DailyReviewDigest, Child.Id) {
-    let child = try await self.child(withParent: {
-      $0.accountSiteBetaEnabled = accountSiteBetaEnabled
-    })
+  private func digest() async throws -> (DailyReviewDigest, Child.Id) {
+    let child = try await self.child()
     let connectedChild = try await child.withDevice()
     _ = try await self.db.create(Screenshot(
       computerUserId: connectedChild.computerUser.id,

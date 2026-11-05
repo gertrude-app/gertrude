@@ -6,29 +6,16 @@ import XCTest
 @testable import Api
 
 final class UnlockRequestNotificationTests: ApiTestCase, @unchecked Sendable {
-  func testNonBetaParentReceivesLegacyFallbackEmail() async throws {
-    try await self.assertNotificationLinks(accountSiteBetaEnabled: false, configured: false)
+  func testParentReceivesAccountFallbackEmail() async throws {
+    try await self.assertNotificationLinks(configured: false)
   }
 
-  func testBetaParentReceivesAccountFallbackEmail() async throws {
-    try await self.assertNotificationLinks(accountSiteBetaEnabled: true, configured: false)
+  func testParentReceivesAccountLinksAcrossConfiguredChannels() async throws {
+    try await self.assertNotificationLinks(configured: true)
   }
 
-  func testNonBetaParentReceivesLegacyLinksAcrossConfiguredChannels() async throws {
-    try await self.assertNotificationLinks(accountSiteBetaEnabled: false, configured: true)
-  }
-
-  func testBetaParentReceivesAccountLinksAcrossConfiguredChannels() async throws {
-    try await self.assertNotificationLinks(accountSiteBetaEnabled: true, configured: true)
-  }
-
-  private func assertNotificationLinks(
-    accountSiteBetaEnabled: Bool,
-    configured: Bool,
-  ) async throws {
-    let child = try await self.child(withParent: {
-      $0.accountSiteBetaEnabled = accountSiteBetaEnabled
-    })
+  private func assertNotificationLinks(configured: Bool) async throws {
+    let child = try await self.child()
     if configured {
       let configs: [Parent.NotificationMethod.Config] = [
         .email(email: "notifications@example.com"),
@@ -67,9 +54,7 @@ final class UnlockRequestNotificationTests: ApiTestCase, @unchecked Sendable {
       await AdminNotifier.liveValue.notify(child.parent.id, event)
     }
 
-    let expectedUrl = accountSiteBetaEnabled
-      ? "https://account.example/requests/unlock/\(child.id.lowercased)"
-      : "https://dashboard.example/children/\(child.id.lowercased)/unlock-requests"
+    let expectedUrl = "https://account.example/requests/unlock/\(child.id.lowercased)"
     expectNoDifference(self.sent.emails.count, 1)
     let email = try XCTUnwrap(self.sent.emails.first)
     expectNoDifference(email.templateModel["url"], expectedUrl)

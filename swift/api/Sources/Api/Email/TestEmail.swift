@@ -131,8 +131,8 @@ import Vapor
           to: to,
           model: .init(
             childName: "Franny",
-            dashboardUrl: localDash,
-            primaryCtaUrl: "\(localDash)/children/abc/mac",
+            dashboardUrl: env.accountDashboardUrl.withoutTrailingSlashes,
+            primaryCtaUrl: "\(env.accountDashboardUrl.withoutTrailingSlashes)/people/abc",
           ),
         ))
 
