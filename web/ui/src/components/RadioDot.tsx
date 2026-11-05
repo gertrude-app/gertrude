@@ -20,7 +20,7 @@ const RadioDot: React.FC<{ checked: boolean; className?: string }> = ({
   >
     <span
       className={cx(
-        `h-2.25 w-2.25 rounded-full bg-violet-500 transition-[opacity,scale] duration-150`,
+        `h-2 w-2 rounded-full bg-violet-500 transition-[opacity,scale] duration-150`,
         checked ? `scale-100 opacity-100` : `scale-50 opacity-0`,
       )}
     />
