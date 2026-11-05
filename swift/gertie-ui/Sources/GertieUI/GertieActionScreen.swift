@@ -195,50 +195,105 @@ public struct GertieActionScreen<Supplement: View>: View {
         .opacity(self.showBackground ? 1 : 0)
         .ignoresSafeArea()
 
-      GeometryReader { proxy in
-        let metrics = proxy.size.height <= 700 || self.dynamicTypeSize.isAccessibilitySize
-          ? Metrics.compact
-          : Metrics.regular
+      GertieScreenGeometryReader { proxy, geometry in
+        let metrics = GertieActionScreenMetrics.resolve(
+          containerSize: proxy.size,
+          geometry: geometry,
+          usesAccessibilitySize: self.dynamicTypeSize.isAccessibilitySize,
+        )
 
-        ScrollView {
-          VStack(alignment: .leading, spacing: metrics.spacing) {
-            Image(systemName: self.icon.systemName)
-              .font(.system(size: metrics.iconSize * self.iconScale, weight: .regular))
-              .foregroundStyle(
-                Color(
-                  self.cs,
-                  light: .violet500,
-                  dark: .violet400,
-                ),
-              )
-              .accessibilityHidden(true)
-              .frame(maxWidth: .infinity, alignment: .center)
-              .modifier(
-                GertieActionScreenEntranceModifier(
-                  motion: self.motion,
-                  yOffset: -20,
-                ),
-              )
-              .modifier(
-                GertieActionScreenExitModifier(
-                  isExiting: self.isExiting,
-                  motion: self.motion,
-                  yOffset: -20,
-                ),
-              )
+        GertieScreenContentLayout(
+          containerSize: proxy.size,
+          geometry: geometry,
+          configuration: metrics.layoutConfiguration,
+          hasActions: !self.actions.isEmpty,
+        ) {
+          self.iconView(metrics: metrics)
+            .disabled(self.isResponding)
+        } message: {
+          self.messageView(metrics: metrics)
+            .disabled(self.isResponding)
+        } actions: {
+          self.actionsView(metrics: metrics)
+            .disabled(self.isResponding)
+        }
+      }
+    }
+    .onAppear(perform: self.beginEntranceAnimations)
+    .task(id: self.exitTaskID) {
+      await self.invokeExitActionIfNeeded()
+    }
+  }
 
-            Spacer(minLength: metrics.spacerMinLength)
+  private func iconView(metrics: GertieActionScreenMetrics) -> some View {
+    Image(systemName: self.icon.systemName)
+      .font(.system(size: metrics.iconSize * self.iconScale, weight: .regular))
+      .foregroundStyle(
+        Color(
+          self.cs,
+          light: .violet500,
+          dark: .violet400,
+        ),
+      )
+      .accessibilityHidden(true)
+      .frame(maxWidth: .infinity, alignment: .center)
+      .modifier(
+        GertieActionScreenEntranceModifier(
+          motion: self.motion,
+          yOffset: -20,
+        ),
+      )
+      .modifier(
+        GertieActionScreenExitModifier(
+          isExiting: self.isExiting,
+          motion: self.motion,
+          yOffset: -20,
+        ),
+      )
+  }
 
-            VStack(alignment: .leading, spacing: metrics.spacing) {
-              if self.supplementPlacement == .beforeMessage {
-                self.supplement
-                  .environment(\.gertieActionScreenLayout, metrics.layout)
-              }
+  private func messageView(metrics: GertieActionScreenMetrics) -> some View {
+    VStack(alignment: .leading, spacing: metrics.spacing) {
+      if self.supplementPlacement == .beforeMessage {
+        self.supplement
+          .environment(\.gertieActionScreenLayout, metrics.layout)
+      }
 
-              Text(verbatim: self.message)
+      self.messageText
+
+      if self.supplementPlacement == .afterMessage {
+        self.supplement
+          .environment(\.gertieActionScreenLayout, metrics.layout)
+      }
+
+      if !self.bullets.isEmpty {
+        VStack(alignment: .leading, spacing: 8) {
+          ForEach(self.bullets.indices, id: \.self) {
+            index in
+            HStack(alignment: .top, spacing: 12) {
+              Image(systemName: "circle.fill")
                 .font(
                   .system(
-                    size: self.messageSize,
+                    size: self.bulletDotSize,
+                  ),
+                )
+                .foregroundStyle(
+                  Color(
+                    self.cs,
+                    light: .violet500,
+                    dark: .violet400,
+                  ),
+                )
+                .padding(
+                  .top,
+                  self.bulletDotTopPadding,
+                )
+                .accessibilityHidden(true)
+
+              Text(verbatim: self.bullets[index])
+                .font(
+                  .system(
+                    size: self.bulletSize,
                     weight: .medium,
                   ),
                 )
@@ -249,177 +304,100 @@ public struct GertieActionScreen<Supplement: View>: View {
                     dark: .violet100,
                   ),
                 )
-                .fixedSize(horizontal: false, vertical: true)
-                .modifier(GertieOptionalAccessibilityIdentifier(
-                  identifier: self.accessibilityIdentifier,
-                ))
-
-              if self.supplementPlacement == .afterMessage {
-                self.supplement
-                  .environment(\.gertieActionScreenLayout, metrics.layout)
-              }
-
-              if !self.bullets.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                  ForEach(self.bullets.indices, id: \.self) {
-                    index in
-                    HStack(alignment: .top, spacing: 12) {
-                      Image(systemName: "circle.fill")
-                        .font(
-                          .system(
-                            size: self.bulletDotSize,
-                          ),
-                        )
-                        .foregroundStyle(
-                          Color(
-                            self.cs,
-                            light: .violet500,
-                            dark: .violet400,
-                          ),
-                        )
-                        .padding(
-                          .top,
-                          self.bulletDotTopPadding,
-                        )
-                        .accessibilityHidden(true)
-
-                      Text(verbatim: self.bullets[index])
-                        .font(
-                          .system(
-                            size: self.bulletSize,
-                            weight: .medium,
-                          ),
-                        )
-                        .foregroundStyle(
-                          Color(
-                            self.cs,
-                            light: .violet950,
-                            dark: .violet100,
-                          ),
-                        )
-                        .fixedSize(
-                          horizontal: false,
-                          vertical: true,
-                        )
-                        .opacity(0.8)
-                    }
-                    .padding(.leading, self.bulletIndent)
-                  }
-                }
-                .padding(.bottom, metrics.listPadBottom)
-              }
+                .fixedSize(
+                  horizontal: false,
+                  vertical: true,
+                )
+                .opacity(0.8)
             }
-            .modifier(
-              GertieActionScreenEntranceModifier(
-                motion: self.motion,
-                yOffset: 20,
-              ),
-            )
-            .modifier(
-              GertieActionScreenExitModifier(
-                isExiting: self.isExiting,
-                motion: self.motion,
-                yOffset: 20,
-                delay: self.bodyExitDelay,
-              ),
-            )
-
-            if !self.actions.isEmpty {
-              VStack(spacing: metrics.spacing) {
-                ForEach(self.actions.indices, id: \.self) {
-                  index in
-                  GertieScreenActionView(
-                    action: self.actions[index],
-                    isPrimary: self.isPrimaryAction(
-                      at: index,
-                    ),
-                    isResponding: self.isResponding,
-                    isShowingProgress: self
-                      .progressActionIndex == index,
-                  ) {
-                    self.actionTriggered(
-                      self.actions[index],
-                      at: index,
-                    )
-                  }
-                  .accessibilityIdentifier(self.actionAccessibilityIdentifier(at: index))
-                  .modifier(
-                    GertieActionScreenEntranceModifier(
-                      motion: self.motion,
-                      yOffset: 20,
-                      delay: .seconds(
-                        Double(index + 1) * 0.08,
-                      ),
-                    ),
-                  )
-                  .modifier(
-                    GertieActionScreenExitModifier(
-                      isExiting: self.isExiting,
-                      motion: self.motion,
-                      yOffset: 20,
-                      delay: self.actionExitDelay(
-                        at: index,
-                      ),
-                    ),
-                  )
-                }
-              }
-              .padding(.top, metrics.buttonPadTop)
-            }
+            .padding(.leading, self.bulletIndent)
           }
-          .disabled(self.isResponding)
-          .frame(
-            minHeight: max(
-              0,
-              proxy.size.height - metrics.insets.top - metrics.insets.bottom,
-            ),
-            alignment: .top,
-          )
-          .padding(metrics.insets)
-          .frame(maxWidth: 500)
-          .frame(maxWidth: .infinity)
         }
-        .scrollBounceBehavior(.basedOnSize)
-        .scrollIndicators(.hidden)
+        .padding(.bottom, metrics.listPadBottom)
       }
     }
-    .onAppear(perform: self.beginEntranceAnimations)
-    .task(id: self.exitTaskID) {
-      await self.invokeExitActionIfNeeded()
-    }
+    .modifier(
+      GertieActionScreenEntranceModifier(
+        motion: self.motion,
+        yOffset: 20,
+      ),
+    )
+    .modifier(
+      GertieActionScreenExitModifier(
+        isExiting: self.isExiting,
+        motion: self.motion,
+        yOffset: 20,
+        delay: self.bodyExitDelay,
+      ),
+    )
   }
 
-  private struct Metrics {
-    let layout: GertieActionScreenLayout
-    let spacing: CGFloat
-    let iconSize: CGFloat
-    let spacerMinLength: CGFloat?
-    let listPadBottom: CGFloat
-    let buttonPadTop: CGFloat
-    let insets: EdgeInsets
-
-    static var regular: Self {
-      Self(
-        layout: .regular,
-        spacing: 16,
-        iconSize: 40,
-        spacerMinLength: nil,
-        listPadBottom: 20,
-        buttonPadTop: 12,
-        insets: EdgeInsets(top: 80, leading: 30, bottom: 30, trailing: 30),
+  private var messageText: some View {
+    Text(verbatim: self.message)
+      .font(
+        .system(
+          size: self.messageSize,
+          weight: .medium,
+        ),
       )
-    }
-
-    static var compact: Self {
-      Self(
-        layout: .compact,
-        spacing: 12,
-        iconSize: 34,
-        spacerMinLength: 10,
-        listPadBottom: 8,
-        buttonPadTop: 8,
-        insets: EdgeInsets(top: 42, leading: 22, bottom: 22, trailing: 22),
+      .foregroundStyle(
+        Color(
+          self.cs,
+          light: .violet950,
+          dark: .violet100,
+        ),
       )
+      .fixedSize(horizontal: false, vertical: true)
+      .modifier(GertieOptionalAccessibilityIdentifier(
+        identifier: self.accessibilityIdentifier,
+      ))
+      .modifier(GertieScreenTextAlignmentModifier(
+        isPad: GertieScreenDevice.isPad,
+        hasList: !self.bullets.isEmpty,
+      ))
+  }
+
+  @ViewBuilder private func actionsView(metrics: GertieActionScreenMetrics) -> some View {
+    if !self.actions.isEmpty {
+      VStack(spacing: metrics.spacing) {
+        ForEach(self.actions.indices, id: \.self) {
+          index in
+          GertieScreenActionView(
+            action: self.actions[index],
+            isPrimary: self.isPrimaryAction(
+              at: index,
+            ),
+            isResponding: self.isResponding,
+            isShowingProgress: self
+              .progressActionIndex == index,
+          ) {
+            self.actionTriggered(
+              self.actions[index],
+              at: index,
+            )
+          }
+          .accessibilityIdentifier(self.actionAccessibilityIdentifier(at: index))
+          .modifier(
+            GertieActionScreenEntranceModifier(
+              motion: self.motion,
+              yOffset: 20,
+              delay: .seconds(
+                Double(index + 1) * 0.08,
+              ),
+            ),
+          )
+          .modifier(
+            GertieActionScreenExitModifier(
+              isExiting: self.isExiting,
+              motion: self.motion,
+              yOffset: 20,
+              delay: self.actionExitDelay(
+                at: index,
+              ),
+            ),
+          )
+        }
+      }
     }
   }
 
@@ -494,14 +472,7 @@ public struct GertieActionScreen<Supplement: View>: View {
   }
 
   @MainActor private func beginEntranceAnimations() {
-    guard !self.skipsMotion else {
-      self.showBackground = true
-      return
-    }
-
-    withAnimation(.smooth(duration: 0.4)) {
-      self.showBackground = true
-    }
+    revealGertieScreenBackground(self.$showBackground, skippingMotion: self.skipsMotion)
   }
 
   @MainActor private func actionTriggered(
@@ -607,18 +578,6 @@ public extension GertieActionScreen where Supplement == EmptyView {
       accessibilityIdentifier: accessibilityIdentifier,
       motion: motion,
     )
-  }
-}
-
-private struct GertieOptionalAccessibilityIdentifier: ViewModifier {
-  let identifier: String?
-
-  @ViewBuilder func body(content: Content) -> some View {
-    if let identifier {
-      content.accessibilityIdentifier(identifier)
-    } else {
-      content
-    }
   }
 }
 
