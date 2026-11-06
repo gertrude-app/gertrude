@@ -168,7 +168,8 @@ private final class Player: Sendable {
     if let duration = episode.duration {
       nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = TimeInterval(duration)
     }
-    let artworkImage = show.localArtworkImage ?? UIImage(named: "artwork")
+    let artworkImage = (show.showArtwork ? show.localArtworkImage : nil)
+      ?? UIImage(named: "artwork")
     if let artwork = artworkImage {
       nowPlayingInfo[MPMediaItemPropertyArtwork] = artwork.mediaItemArtwork
     }

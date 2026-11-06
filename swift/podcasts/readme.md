@@ -2,6 +2,10 @@
 
 ## Releases
 
+- `1.7.0` (11/6/26)
+  - add sleep timer feature
+  - replace radio fallback image with new app icon image
+  - fixed bug where artwork that had been disabled would show on lock screen
 - `1.6.5` (11/2/26)
   - fix device migration bug and identity correlation with other Gertrude apps
 - `1.6.4` (8/12/26)

@@ -57,6 +57,7 @@ struct AppView: View {
           episode: .init(nowPlaying: nowPlaying),
           show: .init(from: nowPlaying.show),
           minimized: nowPlaying.minimized,
+          sleepTimer: self.store.nowPlaying.sleepTimer,
           emit: { event in
             let animation: Animation? = event == .miniPlayerTapped || event == .dismissed
               ? .nowPlayingSpring : nil

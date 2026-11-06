@@ -9,6 +9,12 @@ struct NowPlayingFeature {
   struct State: Equatable {
     @Fetch(NowPlaying()) var data: NowPlaying.Value = nil
     @Shared(.appInForeground) var appInForeground
+    var sleepTimer: NowPlayingView.SleepTimer?
+  }
+
+  enum CancelID {
+    case sleepTimer
+    case autoAdvance
   }
 
   enum Action: Equatable {
@@ -20,9 +26,11 @@ struct NowPlayingFeature {
     case view(NowPlayingView.Event)
     case system(AudioPlayer.SystemEvent)
     case episodePlayPauseTapped(Episode, Show)
+    case sleepTimerFired
     case delegate(DelegateAction)
   }
 
+  @Dependency(\.date.now) var now
   @Dependency(\.db) var database
   @Dependency(\.audio) var audio
   @Dependency(\.haptics) var haptics
@@ -69,6 +77,8 @@ struct NowPlayingFeature {
           return self.skip(nowPlaying, .forward, amount: 30)
         case .speedButtonTapped(let rate):
           return self.setPlaybackRate(rate, for: nowPlaying.show)
+        case .sleepTimerSelected(let option):
+          return self.setSleepTimer(option, state: &state)
         }
       case .system(let event):
         guard let nowPlaying = state.data else {
@@ -109,19 +119,34 @@ struct NowPlayingFeature {
           return self.skip(nowPlaying, .forward, amount: amount, from: location)
         case .completed:
           NowPlaying.updateSyncingProgress { $0.isPlaying = false }
+          let sleepAfterEpisode = state.sleepTimer == .endOfEpisode
+          if sleepAfterEpisode {
+            state.sleepTimer = nil
+          }
           guard let next = AutoQueue.nextDownloadedEpisode(after: nowPlaying),
                 self.fileSystem.fileExists(at: next.episode.localAudioUrl) else {
             NowPlaying.delete()
+            state.sleepTimer = nil
+            return .cancel(id: CancelID.sleepTimer)
+          }
+          if sleepAfterEpisode {
+            self.audio.reset()
+            NowPlaying.set(.init(
+              episodeId: next.episode.id,
+              isPlaying: false,
+              minimized: nowPlaying.minimized,
+            ))
             return .none
           }
           return .run { _ in
-            try? await self.clock.sleep(for: .seconds(3))
+            try await self.clock.sleep(for: .seconds(3))
             NowPlaying.set(.init(
               episodeId: next.episode.id,
               isPlaying: true,
               minimized: nowPlaying.minimized,
             ))
           }
+          .cancellable(id: CancelID.autoAdvance, cancelInFlight: true)
         case .headphonesDoubleClickReceived(let position):
           return self.skip(nowPlaying, .forward, amount: 30, from: position)
         case .headphonesTripleClickReceived(let position):
@@ -145,8 +170,26 @@ struct NowPlayingFeature {
         if let nowPlaying = state.data {
           return self.updateNowPlaying(episode, nowPlaying)
         } else {
-          return self.play(episode: episode, previous: nil)
+          state.sleepTimer = nil
+          return .merge(
+            .cancel(id: CancelID.sleepTimer),
+            self.play(episode: episode, previous: nil),
+          )
         }
+      case .sleepTimerFired:
+        state.sleepTimer = nil
+        guard let nowPlaying = state.data, nowPlaying.isPlaying else {
+          return .cancel(id: CancelID.autoAdvance)
+        }
+        return .merge(
+          .cancel(id: CancelID.autoAdvance),
+          .run { _ in
+            if let time = await self.audio.getPlayingPosition() {
+              nowPlaying.setProgress(time)
+            }
+            NowPlaying.updateSyncingProgress { $0.isPlaying = false }
+          },
+        )
       case .delegate:
         return .none
       }
@@ -220,6 +263,28 @@ struct NowPlayingFeature {
       }
       await self.audio.seek(to: newTime)
       nowPlaying.setProgress(newTime)
+    }
+  }
+
+  func setSleepTimer(
+    _ option: NowPlayingView.SleepTimerOption,
+    state: inout State,
+  ) -> EffectOf<NowPlayingFeature> {
+    switch option {
+    case .off:
+      state.sleepTimer = nil
+      return .cancel(id: CancelID.sleepTimer)
+    case .endOfEpisode:
+      state.sleepTimer = .endOfEpisode
+      return .cancel(id: CancelID.sleepTimer)
+    case .minutes(let minutes):
+      let seconds = minutes * 60
+      state.sleepTimer = .endsAt(self.now.addingTimeInterval(TimeInterval(seconds)))
+      return .run { send in
+        try await self.clock.sleep(for: .seconds(seconds))
+        await send(.sleepTimerFired)
+      }
+      .cancellable(id: CancelID.sleepTimer, cancelInFlight: true)
     }
   }
 
