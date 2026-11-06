@@ -9,7 +9,7 @@ final class AccountReferralSourceResolverTests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
 
     _ = try await SaveAccountReferralSource.resolve(
-      with: .init(source: .communityGroup, otherText: nil),
+      with: .init(source: .communityGroup),
       in: self.accountContext(parent),
     )
 
@@ -28,7 +28,7 @@ final class AccountReferralSourceResolverTests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
 
     _ = try await SaveAccountReferralSource.resolve(
-      with: .init(source: .other, otherText: "  a podcast  "),
+      with: .init(source: .other(text: "  a podcast  ")),
       in: self.accountContext(parent),
     )
 
@@ -43,7 +43,7 @@ final class AccountReferralSourceResolverTests: ApiTestCase, @unchecked Sendable
     let parent = try await self.parent()
 
     _ = try await SaveAccountReferralSource.resolve(
-      with: .init(source: .other, otherText: "   "),
+      with: .init(source: .other(text: "   ")),
       in: self.accountContext(parent),
     )
 

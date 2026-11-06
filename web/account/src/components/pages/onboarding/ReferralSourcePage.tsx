@@ -16,36 +16,38 @@ import React from 'react';
 import type { ReferralSource } from '@shared/pairql/src/account';
 import OnboardingScreen from '#/components/onboarding/OnboardingScreen';
 
+type ListedSource = Exclude<ReferralSource, { case: `other` }>;
+
 const sources: {
-  id: Exclude<ReferralSource, `other`>;
+  id: ListedSource[`case`];
   label: string;
   icon: LucideIcon;
 }[] = [
-  { id: `friend_family`, label: `A friend or family member`, icon: UsersIcon },
+  { id: `friendFamily`, label: `A friend or family member`, icon: UsersIcon },
   {
-    id: `community_group`,
+    id: `communityGroup`,
     label: `Church, homeschool, or community group`,
     icon: ChurchIcon,
   },
-  { id: `search_engine`, label: `Search engine (Google, etc.)`, icon: SearchIcon },
+  { id: `searchEngine`, label: `Search engine (Google, etc.)`, icon: SearchIcon },
   {
-    id: `ai_chat`,
+    id: `aiChat`,
     label: `AI chat (ChatGPT, Claude, Gemini, Grok, etc.)`,
     icon: BotIcon,
   },
-  { id: `app_store`, label: `App Store`, icon: SmartphoneIcon },
+  { id: `appStore`, label: `App Store`, icon: SmartphoneIcon },
   {
-    id: `social_media`,
+    id: `socialMedia`,
     label: `Social media (Reddit, YouTube, Facebook, etc.)`,
     icon: Share2Icon,
   },
-  { id: `article_news`, label: `A blog, article, or the news`, icon: NewspaperIcon },
+  { id: `articleNews`, label: `A blog, article, or the news`, icon: NewspaperIcon },
 ];
 
 interface Props {
   otherText: string | null;
   onOtherTextChange: (text: string | null) => void;
-  onChoose: (source: Exclude<ReferralSource, `other`>) => void;
+  onChoose: (source: ListedSource) => void;
   onSubmitOther: () => void;
   onSkip: () => void;
 }
@@ -94,7 +96,7 @@ const ReferralSourcePage: React.FC<Props> = ({
           icon={source.icon}
           label={source.label}
           trackConversion
-          onClick={() => onChoose(source.id)}
+          onClick={() => onChoose({ case: source.id })}
         />
       ))}
       {otherText === null ? (

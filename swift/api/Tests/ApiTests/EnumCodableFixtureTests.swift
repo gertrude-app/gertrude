@@ -66,6 +66,19 @@ final class EnumCodableFixtureTests: XCTestCase {
     expect(text).toEqual(.text(phoneNumber: "+18005551234"))
   }
 
+  func testReferralSource() throws {
+    let cases: [(SaveAccountReferralSource.Source, String)] = [
+      (.searchEngine, #"{"case":"searchEngine"}"#),
+      (.other(text: "a podcast"), #"{"case":"other","text":"a podcast"}"#),
+    ]
+    for (value, expected) in cases {
+      let data = try encoder.encode(value)
+      expect(String(data: data, encoding: .utf8)!).toEqual(expected)
+      expect(try self.decoder.decode(SaveAccountReferralSource.Source.self, from: data))
+        .toEqual(value)
+    }
+  }
+
   func testSecurityEventsFeedEvent() throws {
     let date = Date(timeIntervalSince1970: 1_700_000_000)
     let childEvent = SecurityEventsFeed.FeedEvent.child(.init(

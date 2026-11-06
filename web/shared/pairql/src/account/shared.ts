@@ -136,14 +136,14 @@ export type PlanStatus =
   | { case: 'complimentary' };
 
 export type ReferralSource =
-  | 'friend_family'
-  | 'community_group'
-  | 'search_engine'
-  | 'ai_chat'
-  | 'app_store'
-  | 'social_media'
-  | 'article_news'
-  | 'other';
+  | { case: 'other'; text: string }
+  | { case: 'friendFamily' }
+  | { case: 'communityGroup' }
+  | { case: 'searchEngine' }
+  | { case: 'aiChat' }
+  | { case: 'appStore' }
+  | { case: 'socialMedia' }
+  | { case: 'articleNews' };
 
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
 

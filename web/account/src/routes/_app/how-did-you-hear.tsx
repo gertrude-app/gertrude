@@ -24,7 +24,7 @@ const HowDidYouHearRoute: React.FC = () => {
       otherText={otherText}
       onOtherTextChange={setOtherText}
       onChoose={(source) => save({ source })}
-      onSubmitOther={() => save({ source: `other`, otherText: otherText ?? undefined })}
+      onSubmitOther={() => save({ source: { case: `other`, text: otherText ?? `` } })}
       onSkip={next}
     />
   );
