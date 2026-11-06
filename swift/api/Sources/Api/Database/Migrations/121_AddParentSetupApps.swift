@@ -4,7 +4,7 @@ struct AddParentSetupApps: GertieMigration {
   func up(sql: SQLDatabase) async throws {
     try await sql.execute("""
       ALTER TABLE parent.parents
-      ADD COLUMN setup_apps jsonb;
+      ADD COLUMN setup_apps text[];
     """)
   }
 

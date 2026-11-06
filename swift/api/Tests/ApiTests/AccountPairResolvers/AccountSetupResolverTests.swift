@@ -36,14 +36,14 @@ final class AccountSetupResolverTests: ApiTestCase, @unchecked Sendable {
     var parent = try await self.parent()
 
     _ = try await SetAccountSetupApps.resolve(
-      with: .init(apps: [.music, .mac, .music]),
+      with: .init(apps: [.music, .podcasts, .mac, .blocker, .music]),
       in: self.accountContext(parent),
     )
 
     parent.model = try await self.db.find(parent.id)
-    expect(parent.model.setupApps).toEqual([.mac, .music])
+    expect(parent.model.setupApps).toEqual([.mac, .blocker, .music, .podcasts])
     let output = try await GetAccountSetup.resolve(in: self.accountContext(parent))
-    expect(output.selectedApps).toEqual([.mac, .music])
+    expect(output.selectedApps).toEqual([.mac, .blocker, .music, .podcasts])
   }
 
   func testDecidingLaterStoresEmptyChoiceRatherThanNil() async throws {
