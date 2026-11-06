@@ -29,7 +29,7 @@ const NewPersonRoute: React.FC = () => {
       success: `Person added`,
       error: `Failed to add person`,
     },
-    invalidating: [Key.people],
+    invalidating: [Key.people, Key.accountSetup],
     onSuccess: (person) => {
       queryClient.setQueryData<GetPeople.Output>(Key.people.segments, (people) =>
         people

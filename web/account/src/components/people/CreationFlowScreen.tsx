@@ -25,10 +25,21 @@ const CreationFlowScreen: React.FC<Props> = ({
   const stepRefs = React.useRef<Array<HTMLDivElement | null>>([]);
   const currentStepConfig = steps[currentStep];
 
+  const focusOnStepChange = React.useRef(false);
+
   const goToStep = (step: number): void => {
     setStepHeightTransitioning(true);
+    focusOnStepChange.current = true;
     setCurrentStep(step);
   };
+
+  React.useEffect(() => {
+    if (!focusOnStepChange.current) return;
+    focusOnStepChange.current = false;
+    stepRefs.current[currentStep]
+      ?.querySelector<HTMLElement>(`input:not([type="hidden"]), textarea`)
+      ?.focus({ preventScroll: true });
+  }, [currentStep]);
 
   React.useLayoutEffect(() => {
     const currentStepElement = stepRefs.current[currentStep];
@@ -63,7 +74,10 @@ const CreationFlowScreen: React.FC<Props> = ({
         <Text as="h1" variant="title" className="relative">
           {title}
         </Text>
-        <VStack justify="center" className="flex-grow relative p-3 self-stretch">
+        <VStack
+          justify={{ default: `start`, sm: `center` }}
+          className="flex-grow relative p-3 self-stretch"
+        >
           <VStack
             as="form"
             align="center"

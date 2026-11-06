@@ -16,6 +16,7 @@ interface Props {
   };
   bottomLinkExplanation?: string;
   disclaimer?: React.ReactNode;
+  sideWordmark?: boolean;
 }
 
 const UnauthedForm: React.FC<Props> = ({
@@ -28,6 +29,7 @@ const UnauthedForm: React.FC<Props> = ({
   bottomLink,
   bottomLinkExplanation,
   disclaimer,
+  sideWordmark,
 }) => (
   <VStack
     as="form"
@@ -36,7 +38,7 @@ const UnauthedForm: React.FC<Props> = ({
   >
     <VStack
       align={Icon ? `center` : `stretch`}
-      className={cx(`px-6 pb-5 pt-18 xs:pt-5`, Icon && `text-center`)}
+      className={cx(`px-6 pb-4 pt-18 xs:pt-4.25`, Icon && `text-center`)}
       gap={0.5}
     >
       {Icon && (
@@ -69,8 +71,19 @@ const UnauthedForm: React.FC<Props> = ({
     </VStack>
     <Spacer hideAbove="xs" />
     {bottomLink && (
-      <HStack justify="between" className="py-3.5 px-6">
-        <img src="/logo-icon.svg" alt="" className="w-6 grayscale opacity-20" />
+      <HStack justify="between" className="px-6 pt-2.5 pb-4">
+        <img
+          src="/logo-wordmark.svg"
+          alt="Gertrude"
+          className={cx(`w-24`, sideWordmark && `xl:hidden`)}
+        />
+        {sideWordmark && (
+          <img
+            src="/logo-icon.svg"
+            alt=""
+            className="hidden w-6 opacity-20 grayscale xl:block"
+          />
+        )}
         <VStack align="end">
           <Text variant="captionMuted">{bottomLinkExplanation}</Text>
           <HStack

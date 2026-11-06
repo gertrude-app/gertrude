@@ -135,7 +135,19 @@ export type PlanStatus =
   | { case: 'free' }
   | { case: 'complimentary' };
 
+export type ReferralSource =
+  | { case: 'other'; text: string }
+  | { case: 'friendFamily' }
+  | { case: 'communityGroup' }
+  | { case: 'searchEngine' }
+  | { case: 'aiChat' }
+  | { case: 'appStore' }
+  | { case: 'socialMedia' }
+  | { case: 'articleNews' };
+
 export type ReleaseChannel = 'stable' | 'beta' | 'canary';
+
+export type SetupApp = 'mac' | 'blocker' | 'music' | 'podcasts';
 
 export type SharedKey =
   | { type: 'anySubdomain'; domain: string; scope: AppScope }

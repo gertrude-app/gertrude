@@ -353,6 +353,7 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
     <span className={cx(`inline-flex items-stretch`, props.className)}>
       {renderMainAction()}
       <DropdownMenu
+        align="end"
         disabled={isDisabled}
         searchable={props.dropdownSearchable}
         trigger={

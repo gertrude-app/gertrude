@@ -1,6 +1,6 @@
 import { Card, Text, VStack } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
-import { ArrowRightIcon, InboxIcon } from 'lucide-react';
+import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
 import RightColumnCard from './RightColumnCard';
@@ -8,8 +8,6 @@ import MessageBubble from '#/components/MessageBubble';
 
 interface Props {
   suspensionRequests: SuspensionRequest[];
-  onRefresh: () => void;
-  refreshing?: boolean;
   viewAllHref?: string;
   responseHrefForRequest: (id: string) => string;
 }
@@ -40,21 +38,11 @@ const RequestPreview: React.FC<RequestPreviewProps> = ({ request, href }) => (
 
 const SuspensionRequestsPreviewCard: React.FC<Props> = ({
   suspensionRequests,
-  onRefresh,
-  refreshing,
   viewAllHref,
   responseHrefForRequest,
 }) => {
   if (suspensionRequests.length === 0) {
-    return (
-      <RightColumnCard
-        variant="empty"
-        icon={InboxIcon}
-        text="No pending suspension requests"
-        onRefresh={onRefresh}
-        refreshing={refreshing}
-      />
-    );
+    return null;
   }
 
   return (

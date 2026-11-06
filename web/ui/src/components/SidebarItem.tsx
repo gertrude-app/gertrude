@@ -60,12 +60,7 @@ const SidebarItem: React.FC<Props> = ({
   );
 
   return (
-    <div
-      className={cx(
-        `relative -mx-2.5 transition-[margin] duration-150`,
-        selected ? `my-2 z-0` : `z-10`,
-      )}
-    >
+    <div className={cx(`relative -mx-2.5`, selected ? `z-0` : `z-10`)}>
       {selected && (
         <>
           <div className="absolute w-full h-full shadow-md shadow-stone-300/30 rounded-xl" />

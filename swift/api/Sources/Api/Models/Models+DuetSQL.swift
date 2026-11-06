@@ -28,6 +28,12 @@ extension GertieBlocker.BlockRule: @retroactive PostgresJsonable {}
 
 extension BlockerApp.ProfileSettings.Bookmark: PostgresJsonable, PostgresArrayBindable {}
 
+extension Parent.SetupApp: PostgresArrayBindable {
+  static func postgresData(_ array: [Self]?) -> Postgres.Data {
+    .textArray(array?.map(\.rawValue))
+  }
+}
+
 extension Parent.NotificationMethod.Config: PostgresJsonable {}
 
 extension Gertie.Key: @retroactive PostgresJsonable {}

@@ -1,4 +1,5 @@
 import { PageHeading } from '@gertrude/ui';
+import { LogOutIcon } from 'lucide-react';
 import React from 'react';
 import DashboardPage from '#/components/layout/DashboardPage';
 import SegmentedTabLinks from '#/components/navigation/SegmentedTabLinks';
@@ -29,6 +30,11 @@ const SettingsShellPage: React.FC<Props> = ({
           {
             text: `Change password`,
             onClick: onChangePassword,
+          },
+          {
+            text: `Sign out`,
+            href: `/signout`,
+            icon: LogOutIcon,
           },
         ]}
       />

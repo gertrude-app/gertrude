@@ -108,6 +108,7 @@ const LoginPage: React.FC<Props> = ({
           href: signupHref,
         }}
         bottomLinkExplanation="Don't have an account?"
+        sideWordmark
       />
     }
     rightDisplay={<LoginAppsDisplay />}

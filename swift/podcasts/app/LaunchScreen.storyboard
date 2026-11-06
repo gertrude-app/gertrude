@@ -52,9 +52,9 @@
             </subviews>
             <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY" />
             <color key="backgroundColor"
-              red="0.77254901960784317"
-              green="0.22352941176470589"
-              blue="0.9882352941176471"
+              red="0.67450980392156867"
+              green="0.31764705882352939"
+              blue="0.94901960784313721"
               alpha="1"
               colorSpace="custom"
               customColorSpace="sRGB" />

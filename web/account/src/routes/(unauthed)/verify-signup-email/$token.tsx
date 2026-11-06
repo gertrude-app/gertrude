@@ -3,7 +3,7 @@ import React from 'react';
 import VerifySignupEmailPage, {
   type VerificationState,
 } from '#/components/pages/unauthed/VerifySignupEmailPage';
-import { authRedirectForPath, postAuthLocation } from '#/lib/authRedirect';
+import { authRedirectForPath } from '#/lib/authRedirect';
 import { setAuth } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 
@@ -32,8 +32,10 @@ const VerifySignupEmailRoute: React.FC = () => {
       result.with({
         success: ({ accountId, token: authToken, redirect }) => {
           setAuth(accountId, authToken);
+          const next = redirect ? authRedirectForPath(redirect) : undefined;
           void navigate({
-            ...postAuthLocation(redirect ? authRedirectForPath(redirect) : undefined),
+            to: `/how-did-you-hear`,
+            search: next ? { redirect: next } : {},
             replace: true,
           });
         },

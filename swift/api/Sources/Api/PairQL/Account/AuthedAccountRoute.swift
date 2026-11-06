@@ -12,6 +12,9 @@ enum AuthedAccountRoute: PairRoute {
   case getMacDevice(GetMacDevice.Input)
   case updateMacDevice(UpdateMacDevice.Input)
   case getAccountSettings
+  case getAccountSetup
+  case setAccountSetupApps(SetAccountSetupApps.Input)
+  case saveAccountReferralSource(SaveAccountReferralSource.Input)
   case createAccountNotificationMethod(CreateAccountNotificationMethod.Input)
   case confirmAccountNotificationMethod(ConfirmAccountNotificationMethod.Input)
   case saveAccountNotification(SaveAccountNotification.Input)
@@ -101,6 +104,17 @@ enum AuthedAccountRoute: PairRoute {
     }
     Route(.case(Self.getAccountSettings)) {
       Operation(GetAccountSettings.self)
+    }
+    Route(.case(Self.getAccountSetup)) {
+      Operation(GetAccountSetup.self)
+    }
+    Route(.case(Self.setAccountSetupApps)) {
+      Operation(SetAccountSetupApps.self)
+      Body(.accountInput(SetAccountSetupApps.self))
+    }
+    Route(.case(Self.saveAccountReferralSource)) {
+      Operation(SaveAccountReferralSource.self)
+      Body(.accountInput(SaveAccountReferralSource.self))
     }
     Route(.case(Self.createAccountNotificationMethod)) {
       Operation(CreateAccountNotificationMethod.self)
@@ -352,6 +366,15 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getAccountSettings:
       let output = try await GetAccountSettings.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getAccountSetup:
+      let output = try await GetAccountSetup.resolve(in: context)
+      return try await self.respond(with: output)
+    case .setAccountSetupApps(let input):
+      let output = try await SetAccountSetupApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveAccountReferralSource(let input):
+      let output = try await SaveAccountReferralSource.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .createAccountNotificationMethod(let input):
       let output = try await CreateAccountNotificationMethod.resolve(with: input, in: context)

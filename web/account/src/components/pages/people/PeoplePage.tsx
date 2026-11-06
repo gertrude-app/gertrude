@@ -1,4 +1,12 @@
-import { Card, EmptyState, PageHeading, Skeleton, Stack, VStack } from '@gertrude/ui';
+import {
+  Card,
+  EmptyState,
+  PageHeading,
+  Skeleton,
+  Stack,
+  Text,
+  VStack,
+} from '@gertrude/ui';
 import {
   CircleAlertIcon,
   PlusIcon,
@@ -16,6 +24,9 @@ import type {
 import type { GetAccountUnlockRequestSummary } from '@shared/pairql/src/account';
 import CardContainer from '#/components/layout/CardContainer';
 import DashboardPage from '#/components/layout/DashboardPage';
+import PeopleGettingStarted, {
+  type PeopleGettingStartedProps,
+} from '#/components/people/PeopleGettingStarted';
 import PersonCard from '#/components/people/PersonCard';
 import RightColumnCard from '#/components/requests/RightColumnCard';
 import SecurityEventsPreviewCard from '#/components/requests/SecurityEventsPreviewCard';
@@ -23,13 +34,12 @@ import SuspensionRequestsPreviewCard from '#/components/requests/SuspensionReque
 import UnlockRequestsPreviewCard from '#/components/requests/UnlockRequestsPreviewCard';
 
 interface Props {
+  gettingStarted?: PeopleGettingStartedProps;
   announcement?: React.ReactNode;
   peopleState: LoadableState<PersonCardPerson[]>;
   unlockRequestSummary?: GetAccountUnlockRequestSummary.Output;
   suspensionRequestsState: LoadableState<SuspensionRequest[]>;
   securityEventsState: LoadableState<SecurityEvent[]>;
-  onRefreshSuspensionRequests: () => void;
-  refreshingSuspensionRequests?: boolean;
   onRefreshSecurityEvents: () => void;
   refreshingSecurityEvents?: boolean;
   addPersonHref: string;
@@ -137,37 +147,19 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
   ));
 };
 
-const SuspensionRequestsLoadingState: React.FC = () => (
-  <RightColumnCard title="Suspension Requests">
-    <Card padding={3}>
-      <span role="status" className="sr-only">
-        Loading suspension requests
-      </span>
-      <VStack gap={3}>
-        <Skeleton className="h-4 w-28" />
-        <Skeleton radius="large" className="h-20 w-full" />
-      </VStack>
-    </Card>
-  </RightColumnCard>
-);
-
 interface SuspensionRequestsContentProps {
   state: LoadableState<SuspensionRequest[]>;
-  onRefresh: () => void;
-  refreshing?: boolean;
   viewAllHref: string;
   responseHrefForRequest: (id: string) => string;
 }
 
 const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
   state,
-  onRefresh,
-  refreshing,
   viewAllHref,
   responseHrefForRequest,
 }) => {
   if (state.status === `loading`) {
-    return <SuspensionRequestsLoadingState />;
+    return null;
   }
 
   if (state.status === `error`) {
@@ -185,8 +177,6 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
   return (
     <SuspensionRequestsPreviewCard
       suspensionRequests={state.data}
-      onRefresh={onRefresh}
-      refreshing={refreshing}
       viewAllHref={viewAllHref}
       responseHrefForRequest={responseHrefForRequest}
     />
@@ -194,13 +184,12 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
 };
 
 const PeoplePage: React.FC<Props> = ({
+  gettingStarted,
   announcement,
   peopleState,
   unlockRequestSummary,
   suspensionRequestsState,
   securityEventsState,
-  onRefreshSuspensionRequests,
-  refreshingSuspensionRequests,
   onRefreshSecurityEvents,
   refreshingSecurityEvents,
   addPersonHref,
@@ -212,62 +201,91 @@ const PeoplePage: React.FC<Props> = ({
   monitorHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
-}) => (
-  <DashboardPage
-    heading={
-      <PageHeading
-        title="Protected People"
-        buttons={[
-          {
-            text: `Add Person`,
-            href: addPersonHref,
-            variant: `secondary`,
-            icon: PlusIcon,
-          },
-          {
-            text: `Monitor`,
-            href: monitorHref,
-            variant: `primary`,
-            icon: ScanEyeIcon,
-          },
-        ]}
-      />
-    }
-  >
-    {announcement}
-    <Stack direction={{ default: `vertical`, '@5xl/main': `horizontal` }} gap={12}>
-      <CardContainer className="flex flex-grow flex-col gap-4 @xl/main:gap-6">
-        <PeopleContent
-          state={peopleState}
-          addPersonHref={addPersonHref}
-          settingsHrefForPerson={settingsHrefForPerson}
-          monitorHrefForPerson={monitorHrefForPerson}
+}) => {
+  if (
+    gettingStarted &&
+    peopleState.status === `success` &&
+    peopleState.data.length === 0
+  ) {
+    return (
+      <div className="relative isolate flex min-h-screen flex-col justify-start overflow-hidden px-4 py-8 sm:justify-center sm:px-6 sm:py-12">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-3/4 -z-10 h-[150%] w-full rounded-[100%] [background-image:radial-gradient(ellipse_at_center,oklch(60.6%_0.25_292.717_/_0.2)_0%,rgba(255,255,255,1.0)_65%),url(/dot-noise-pattern.svg),url(/bg.svg)]"
         />
-      </CardContainer>
-      <VStack gap={6} className="shrink-0 @5xl/main:w-72">
-        {unlockRequestSummary && (
-          <UnlockRequestsPreviewCard
-            summary={unlockRequestSummary}
-            viewAllHref={unlockRequestsHref}
-            reviewHrefForPerson={unlockRequestHrefForPerson}
+        <VStack gap={5} className="@container/main mx-auto w-full max-w-xl">
+          <VStack align="center" gap={2} className="text-center">
+            <Text as="h1" variant="title" className="sm:text-2xl">
+              Let’s get you set up
+            </Text>
+            <Text as="p" variant="bodyMuted" className="max-w-sm text-pretty">
+              {gettingStarted.selectedApps.length > 0
+                ? `Start with a person. Then we’ll help you set up the apps you chose.`
+                : `Start with a person. You can decide which Gertrude apps to use along the way.`}
+            </Text>
+          </VStack>
+          {announcement}
+          <PeopleGettingStarted {...gettingStarted} />
+        </VStack>
+      </div>
+    );
+  }
+
+  return (
+    <DashboardPage
+      heading={
+        <PageHeading
+          title="Protected People"
+          buttons={[
+            {
+              text: `Add Person`,
+              href: addPersonHref,
+              variant: `secondary`,
+              icon: PlusIcon,
+            },
+            {
+              text: `Monitor`,
+              href: monitorHref,
+              variant: `primary`,
+              icon: ScanEyeIcon,
+            },
+          ]}
+        />
+      }
+    >
+      {announcement}
+      <Stack direction={{ default: `vertical`, '@5xl/main': `horizontal` }} gap={12}>
+        <CardContainer className="flex flex-grow flex-col gap-4 @xl/main:gap-6">
+          <PeopleContent
+            state={peopleState}
+            addPersonHref={addPersonHref}
+            settingsHrefForPerson={settingsHrefForPerson}
+            monitorHrefForPerson={monitorHrefForPerson}
           />
-        )}
-        <SuspensionRequestsContent
-          state={suspensionRequestsState}
-          onRefresh={onRefreshSuspensionRequests}
-          refreshing={refreshingSuspensionRequests}
-          viewAllHref={suspensionRequestsHref}
-          responseHrefForRequest={suspensionRequestHrefForRequest}
-        />
-        <SecurityEventsPreviewCard
-          state={securityEventsState}
-          onRefresh={onRefreshSecurityEvents}
-          refreshing={refreshingSecurityEvents}
-          viewAllHref={securityEventsHref}
-        />
-      </VStack>
-    </Stack>
-  </DashboardPage>
-);
+        </CardContainer>
+        <VStack gap={6} className="shrink-0 @5xl/main:w-72">
+          {unlockRequestSummary && (
+            <UnlockRequestsPreviewCard
+              summary={unlockRequestSummary}
+              viewAllHref={unlockRequestsHref}
+              reviewHrefForPerson={unlockRequestHrefForPerson}
+            />
+          )}
+          <SuspensionRequestsContent
+            state={suspensionRequestsState}
+            viewAllHref={suspensionRequestsHref}
+            responseHrefForRequest={suspensionRequestHrefForRequest}
+          />
+          <SecurityEventsPreviewCard
+            state={securityEventsState}
+            onRefresh={onRefreshSecurityEvents}
+            refreshing={refreshingSecurityEvents}
+            viewAllHref={securityEventsHref}
+          />
+        </VStack>
+      </Stack>
+    </DashboardPage>
+  );
+};
 
 export default PeoplePage;

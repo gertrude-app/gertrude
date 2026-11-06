@@ -49,6 +49,7 @@ const AssignedKeychainCard: React.FC<Props> = ({
             <ScheduleButton schedule={schedule} setSchedule={setSchedule} />
           )}
           <DropdownMenu
+            align="end"
             trigger={
               <Button type="button" onClick={() => {}} size="small" icon={EllipsisIcon} />
             }

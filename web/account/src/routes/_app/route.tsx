@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute, redirect, useLocation } from '@tanstack/react-router';
 import React from 'react';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
+import { useSetupChecklist } from '#/components/onboarding/useSetupChecklist';
 import { authRedirectForPath } from '#/lib/authRedirect';
 import { isAuthed } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
@@ -19,6 +20,7 @@ const AuthedLayout: React.FC = () => {
     () => liveClient.getSuspensionRequests(),
     { refetchInterval: 30_000 },
   );
+  const setup = useSetupChecklist(pathname);
   const requestCount =
     (unlockRequests.data?.totalCount ?? 0) + (suspensionRequests.data?.length ?? 0);
   React.useEffect(() => {
@@ -26,11 +28,23 @@ const AuthedLayout: React.FC = () => {
       sessionStorage.removeItem(`pairingReturnPath`);
     }
   }, [pathname]);
-  if (pathname.startsWith(`/connect/`)) return <Outlet />;
+  if (
+    pathname.startsWith(`/connect/`) ||
+    pathname === `/welcome` ||
+    pathname === `/how-did-you-hear`
+  )
+    return <Outlet />;
 
   return (
-    <AuthedAppLayout pathname={pathname} requestCount={requestCount}>
+    <AuthedAppLayout
+      pathname={pathname}
+      requestCount={requestCount}
+      showMacSection={setup.showMacSection}
+      menuProgress={setup.menuProgress}
+      sidebarContent={setup.sidebarContent}
+    >
       <Outlet />
+      {setup.modals}
     </AuthedAppLayout>
   );
 };
