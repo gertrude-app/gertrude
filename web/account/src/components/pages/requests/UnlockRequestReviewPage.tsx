@@ -158,7 +158,6 @@ const AppRequestSection: React.FC<{
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 @2xl/main:justify-end">
           <DropdownMenu
-            align="end"
             contentClassName="w-72"
             trigger={
               <Button

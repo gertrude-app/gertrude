@@ -70,7 +70,6 @@ const KeychainAssignmentMenu: React.FC<Props> = ({
     <HStack gap={1} align="center">
       {hasAssignments && <Text variant="label">Assigned to</Text>}
       <DropdownMenu
-        align="end"
         searchable={people.length > 7}
         disabled={people.length === 0}
         contentClassName="w-64"

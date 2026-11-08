@@ -86,7 +86,6 @@ const ConfiguredAppRow: React.FC<Props> = ({
         </HStack>
         <div className="sm:hidden">
           <DropdownMenu
-            align="end"
             contentClassName="w-82"
             trigger={
               <Button

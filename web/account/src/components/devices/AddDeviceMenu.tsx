@@ -14,18 +14,11 @@ const apps: { app: SetupApp; platform: string }[] = [
 interface Props {
   onSelect: (app: SetupApp) => void;
   variant?: `primary` | `default`;
-  align?: `start` | `center` | `end`;
   disabled?: boolean;
 }
 
-const AddDeviceMenu: React.FC<Props> = ({
-  onSelect,
-  variant = `primary`,
-  align = `start`,
-  disabled,
-}) => (
+const AddDeviceMenu: React.FC<Props> = ({ onSelect, variant = `primary`, disabled }) => (
   <DropdownMenu
-    align={align}
     disabled={disabled}
     contentClassName="w-64"
     trigger={

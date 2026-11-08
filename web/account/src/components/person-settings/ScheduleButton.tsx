@@ -155,7 +155,6 @@ const ScheduleButton: React.FC<ScheduleButtonProps> = ({
   defaultOpen,
 }) => (
   <DropdownMenu
-    align="end"
     contentClassName="w-82"
     defaultOpen={defaultOpen}
     trigger={

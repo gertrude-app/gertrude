@@ -134,12 +134,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
           }
           buttons={
             devices.length > 0 ? (
-              <AddDeviceMenu
-                variant="default"
-                align="end"
-                disabled={busy}
-                onSelect={onAddDevice}
-              />
+              <AddDeviceMenu variant="default" disabled={busy} onSelect={onAddDevice} />
             ) : undefined
           }
         >

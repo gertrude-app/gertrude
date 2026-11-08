@@ -9,7 +9,6 @@ interface Props {
   searchable?: boolean;
   disabled?: boolean;
   contentClassName?: string;
-  align?: `start` | `center` | `end`;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -50,7 +49,6 @@ const DropdownMenu: React.FC<Props> = ({
   searchable,
   disabled,
   contentClassName = `w-60`,
-  align = `start`,
   open,
   defaultOpen = false,
   onOpenChange,
@@ -168,7 +166,7 @@ const DropdownMenu: React.FC<Props> = ({
         <Menu.Trigger disabled={disabled}>{trigger}</Menu.Trigger>
       )}
       <Menu.Portal container={overlayPortalContainer ?? undefined}>
-        <Menu.Positioner sideOffset={4} align={align} className="z-[60]">
+        <Menu.Positioner sideOffset={4} align="start" className="z-[60]">
           <Menu.Popup
             className={cx(
               `z-[60] flex flex-col gap-1 rounded-xl border border-stone-200 bg-white p-1 shadow-md shadow-stone-300/50 outline-none select-none`,

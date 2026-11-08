@@ -96,7 +96,6 @@ const AllowedAlbumCard: React.FC<Props> = ({
         </VStack>
         {(onToggleAlbumArt || onRemove) && (
           <DropdownMenu
-            align="end"
             trigger={
               <Button type="button" onClick={() => {}} icon={EllipsisIcon} size="small" />
             }

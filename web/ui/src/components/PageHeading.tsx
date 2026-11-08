@@ -112,7 +112,6 @@ const PageHeading: React.FC<Props> = ({
               <>
                 <HStack hideAbove="@2xl/main">
                   <DropdownMenu
-                    align="end"
                     trigger={
                       <Button
                         type="button"
