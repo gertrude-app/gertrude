@@ -1,6 +1,6 @@
-import { Button, Card, HStack, Text, VStack, useSidebarContext } from '@gertrude/ui';
+import { Card, HStack, Text, VStack, useSidebarContext } from '@gertrude/ui';
 import cx from 'clsx';
-import { ArrowRightIcon, CheckIcon, SettingsIcon } from 'lucide-react';
+import { CheckIcon, SettingsIcon } from 'lucide-react';
 import React from 'react';
 import {
   type SetupApp,
@@ -15,6 +15,7 @@ interface Props {
   onSelectStep: (step: SetupStepId) => void;
   onChangeApps?: () => void;
   defaultExpanded?: boolean;
+  className?: string;
 }
 
 const SetupChecklist: React.FC<Props> = ({
@@ -24,6 +25,7 @@ const SetupChecklist: React.FC<Props> = ({
   onSelectStep,
   onChangeApps,
   defaultExpanded = true,
+  className,
 }) => {
   const { close } = useSidebarContext();
   const selectStep = (step: SetupStepId): void => {
@@ -33,16 +35,19 @@ const SetupChecklist: React.FC<Props> = ({
   const headingId = React.useId();
   const listId = React.useId();
   const [expanded, setExpanded] = React.useState(defaultExpanded);
-  const steps = getChecklistSteps(selectedApps, includeNotifications);
+  const allSteps = getChecklistSteps(selectedApps, includeNotifications);
+  const steps = [
+    ...allSteps.filter((step) => completedSteps.includes(step.id)),
+    ...allSteps.filter((step) => !completedSteps.includes(step.id)),
+  ];
   const completedCount = steps.filter((step) => completedSteps.includes(step.id)).length;
-  const currentStep = steps.find((step) => !completedSteps.includes(step.id));
 
   return (
     <Card
       as="section"
       aria-labelledby={headingId}
       padding={0}
-      className="-mx-2.5 overflow-hidden shadow-sm"
+      className={cx(`overflow-hidden shadow-sm`, className)}
     >
       <div className="relative">
         <button
@@ -60,7 +65,7 @@ const SetupChecklist: React.FC<Props> = ({
             </Text>
             <HStack gap={1}>
               <Text variant="captionMuted">
-                {completedCount} of {steps.length}
+                {completedCount} of {steps.length} done
               </Text>
               {onChangeApps && (
                 <button
@@ -111,31 +116,16 @@ const SetupChecklist: React.FC<Props> = ({
             )}
           >
             {steps.map((step, index) => {
-              const completed = completedSteps.includes(step.id);
-              const current = step.id === currentStep?.id;
-              const marker = (
-                <span
-                  aria-hidden="true"
-                  className={cx(
-                    `flex size-5 shrink-0 items-center justify-center rounded-full text-[11px]`,
-                    completed && `bg-violet-100 text-violet-600`,
-                    current && `bg-violet-500 font-medium text-white`,
-                    !completed && !current && `bg-stone-100 text-stone-500`,
-                  )}
-                >
-                  {completed ? (
-                    <CheckIcon className="size-3" strokeWidth={3} />
-                  ) : (
-                    index + 1
-                  )}
-                </span>
-              );
-
-              if (completed) {
+              if (completedSteps.includes(step.id)) {
                 return (
                   <li key={step.id}>
                     <HStack gap={2.5} className="px-1.5 py-1.5">
-                      {marker}
+                      <span
+                        aria-hidden="true"
+                        className="flex size-5 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-600"
+                      >
+                        <CheckIcon className="size-3" strokeWidth={3} />
+                      </span>
                       <Text
                         variant="captionMuted"
                         className="min-w-0 text-[13px] !text-stone-400 line-through"
@@ -148,59 +138,32 @@ const SetupChecklist: React.FC<Props> = ({
                 );
               }
 
-              if (current) {
-                return (
-                  <li key={step.id} aria-current="step">
-                    <HStack
-                      align="start"
-                      gap={2.5}
-                      className={cx(
-                        `bg-stone-100/70 p-1.5 pb-2.5`,
-                        index === steps.length - 1
-                          ? `rounded-t-2xl rounded-b-[7px]`
-                          : `rounded-2xl`,
-                      )}
-                    >
-                      {marker}
-                      <VStack gap={2} className="min-w-0 flex-grow">
-                        <VStack gap={0.5}>
-                          <Text variant="bodyStrong" className="text-[13px] leading-5">
-                            {step.title}
-                          </Text>
-                          {step.description && (
-                            <Text variant="captionMuted" className="leading-4">
-                              {step.description}
-                            </Text>
-                          )}
-                        </VStack>
-                        <Button
-                          type="button"
-                          variant="primary"
-                          size="small"
-                          icon={ArrowRightIcon}
-                          iconPosition="right"
-                          onClick={() => selectStep(step.id)}
-                          className="self-start"
-                        >
-                          Continue
-                        </Button>
-                      </VStack>
-                    </HStack>
-                  </li>
-                );
-              }
-
               return (
                 <li key={step.id}>
                   <button
                     type="button"
                     onClick={() => selectStep(step.id)}
-                    className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-1.5 py-1.5 text-left outline-none transition-colors duration-100 hover:bg-stone-100/70 focus-visible:ring-2 focus-visible:ring-violet-300"
+                    className={cx(
+                      `flex w-full cursor-pointer items-start gap-2.5 p-1.5 pb-2.5 text-left outline-none transition-colors duration-100 hover:bg-stone-100/70 focus-visible:ring-2 focus-visible:ring-violet-300`,
+                      index === steps.length - 1
+                        ? `rounded-t-2xl rounded-b-[7px]`
+                        : `rounded-2xl`,
+                    )}
                   >
-                    {marker}
-                    <Text variant="bodySubtle" className="min-w-0 text-[13px] leading-5">
-                      {step.title}
-                    </Text>
+                    <span
+                      aria-hidden="true"
+                      className="size-5 shrink-0 rounded-full border-[1.5px] border-stone-300 bg-white"
+                    />
+                    <span className="flex min-w-0 flex-grow flex-col gap-0.5">
+                      <Text variant="bodyStrong" className="text-[13px] leading-5">
+                        {step.title}
+                      </Text>
+                      {step.description && (
+                        <Text variant="captionMuted" className="leading-4">
+                          {step.description}
+                        </Text>
+                      )}
+                    </span>
                   </button>
                 </li>
               );

@@ -6,7 +6,6 @@ import PeoplePage from './PeoplePage';
 import AnnouncementBanner from '#/components/announcements/AnnouncementBanner';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
 import SetupChecklist from '#/components/onboarding/SetupChecklist';
-import { getChecklistSteps } from '#/components/onboarding/setupApps';
 import {
   macDevice,
   people,
@@ -106,37 +105,37 @@ const renderGettingStarted = (
   selectedApps: SetupApp[],
   person?: PersonCardPerson,
   completedSteps: SetupStepId[] = [`person`],
-): ReactElement => (
-  <AuthedAppLayout
-    pathname="/people"
-    requestCount={0}
-    showMacSection={person?.devices.some((device) => device.type === `mac`) ?? false}
-    menuProgress={
-      person && {
-        completed: completedSteps.length,
-        total: getChecklistSteps(selectedApps).length,
+): ReactElement => {
+  const checklistProps = {
+    selectedApps,
+    completedSteps,
+    onSelectStep: noop,
+    onChangeApps: noop,
+  };
+  return (
+    <AuthedAppLayout
+      pathname="/people"
+      requestCount={0}
+      showMacSection={person?.devices.some((device) => device.type === `mac`) ?? false}
+      sidebarContent={
+        person && (
+          <div className="hidden min-[940px]:block">
+            <SetupChecklist {...checklistProps} className="-mx-2.5" />
+          </div>
+        )
       }
-    }
-    sidebarContent={
-      person && (
-        <SetupChecklist
-          selectedApps={selectedApps}
-          completedSteps={completedSteps}
-          onSelectStep={noop}
-          onChangeApps={noop}
-        />
-      )
-    }
-  >
-    {renderPage({
-      peopleState: { status: `success`, data: person ? [person] : [] },
-      unlockRequestSummary: { totalCount: 0, people: [] },
-      suspensionRequestsState: { status: `success`, data: [] },
-      securityEventsState: { status: `success`, data: [] },
-      gettingStarted: { selectedApps, onAddPerson: noop, onChangeApps: noop },
-    })}
-  </AuthedAppLayout>
-);
+    >
+      {renderPage({
+        peopleState: { status: `success`, data: person ? [person] : [] },
+        unlockRequestSummary: { totalCount: 0, people: [] },
+        suspensionRequestsState: { status: `success`, data: [] },
+        securityEventsState: { status: `success`, data: [] },
+        gettingStarted: { selectedApps, onAddPerson: noop, onChangeApps: noop },
+        setupChecklist: person && <SetupChecklist {...checklistProps} />,
+      })}
+    </AuthedAppLayout>
+  );
+};
 
 export const GettingStarted = {
   name: 'Getting started / Mac and Music',

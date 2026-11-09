@@ -7,6 +7,7 @@ import type {
   SuspensionRequest,
 } from '#/components/types';
 import AccountAnnouncement from '#/components/announcements/AccountAnnouncement';
+import { SetupChecklistContext } from '#/components/onboarding/useSetupChecklist';
 import PeoplePage from '#/components/pages/people/PeoplePage';
 import { needsOnboarding } from '#/lib/accountSetup';
 import { toPersonCardPerson } from '#/lib/people';
@@ -20,6 +21,7 @@ const NINE_MINUTES = 9 * 60 * 1000;
 
 const PeopleRoute: React.FC = () => {
   const navigate = useNavigate();
+  const setupChecklist = React.useContext(SetupChecklistContext);
   const setupQuery = useQuery(Key.accountSetup, () => liveClient.getAccountSetup());
   const peopleQuery = useQuery(Key.people, () => liveClient.getPeople(), {
     refetchInterval: NINE_MINUTES,
@@ -96,6 +98,7 @@ const PeopleRoute: React.FC = () => {
           onChangeApps: () => void navigate({ to: `/welcome` }),
         }
       }
+      setupChecklist={setupChecklist}
       announcement={<AccountAnnouncement />}
       peopleState={peopleState}
       unlockRequestSummary={unlockRequestsQuery.data}

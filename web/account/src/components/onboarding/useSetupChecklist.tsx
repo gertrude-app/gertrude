@@ -14,8 +14,11 @@ import { Key } from '#/pairql/keys';
 import { useQuery } from '#/pairql/query';
 import { readSavedSetup, saveSetup } from '#/pairql/savedSetup';
 
+export const SetupChecklistContext = React.createContext<React.ReactNode>(null);
+
 export function useSetupChecklist(pathname: string): {
   sidebarContent: React.ReactNode;
+  pageContent: React.ReactNode;
   menuProgress?: { completed: number; total: number };
   showMacSection: boolean;
   modals: React.ReactNode;
@@ -70,20 +73,30 @@ export function useSetupChecklist(pathname: string): {
     }
   };
 
-  return {
-    showMacSection: setupQuery.data
-      ? setupQuery.data.completedApps.includes(`mac`)
-      : setupQuery.isError,
-    menuProgress: checklist ? setupProgress(checklist) : undefined,
-    sidebarContent: checklist && (
+  const onPeoplePage = pathname.replace(/\/$/, ``) === `/people`;
+  const renderChecklist = (className?: string): React.ReactNode =>
+    checklist && (
       <SetupChecklist
         selectedApps={checklist.selectedApps}
         includeNotifications={checklist.includeNotifications}
         completedSteps={checklist.completedSteps}
         onSelectStep={selectStep}
         onChangeApps={() => void navigate({ to: `/welcome` })}
+        className={className}
       />
+    );
+
+  return {
+    showMacSection: setupQuery.data
+      ? setupQuery.data.completedApps.includes(`mac`)
+      : setupQuery.isError,
+    menuProgress: checklist && !onPeoplePage ? setupProgress(checklist) : undefined,
+    sidebarContent: checklist && (
+      <div className={onPeoplePage ? `hidden min-[940px]:block` : undefined}>
+        {renderChecklist(`-mx-2.5`)}
+      </div>
     ),
+    pageContent: renderChecklist(),
     modals: (
       <>
         <ConnectMacModal {...connectMacModalProps} />

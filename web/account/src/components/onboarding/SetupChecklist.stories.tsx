@@ -39,6 +39,16 @@ export const States = {
           />
         </div>
       </StorySection>
+      <StorySection title="Finished out of order" contentClassName="items-start">
+        <div className="w-58">
+          <SetupChecklist
+            selectedApps={[`mac`, `music`]}
+            completedSteps={[`person`, `notifications`]}
+            onSelectStep={noop}
+            onChangeApps={noop}
+          />
+        </div>
+      </StorySection>
       <StorySection title="Collapsed" contentClassName="items-start">
         <div className="w-58">
           <SetupChecklist

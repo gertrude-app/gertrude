@@ -35,6 +35,7 @@ import UnlockRequestsPreviewCard from '#/components/requests/UnlockRequestsPrevi
 
 interface Props {
   gettingStarted?: PeopleGettingStartedProps;
+  setupChecklist?: React.ReactNode;
   announcement?: React.ReactNode;
   peopleState: LoadableState<PersonCardPerson[]>;
   unlockRequestSummary?: GetAccountUnlockRequestSummary.Output;
@@ -185,6 +186,7 @@ const SuspensionRequestsContent: React.FC<SuspensionRequestsContentProps> = ({
 
 const PeoplePage: React.FC<Props> = ({
   gettingStarted,
+  setupChecklist,
   announcement,
   peopleState,
   unlockRequestSummary,
@@ -253,6 +255,7 @@ const PeoplePage: React.FC<Props> = ({
         />
       }
     >
+      {setupChecklist && <div className="min-[940px]:hidden">{setupChecklist}</div>}
       {announcement}
       <Stack direction={{ default: `vertical`, '@5xl/main': `horizontal` }} gap={12}>
         <CardContainer className="flex flex-grow flex-col gap-4 @xl/main:gap-6">

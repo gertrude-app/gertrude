@@ -1,7 +1,10 @@
 import { Outlet, createFileRoute, redirect, useLocation } from '@tanstack/react-router';
 import React from 'react';
 import AuthedAppLayout from '#/components/layout/AuthedAppLayout';
-import { useSetupChecklist } from '#/components/onboarding/useSetupChecklist';
+import {
+  SetupChecklistContext,
+  useSetupChecklist,
+} from '#/components/onboarding/useSetupChecklist';
 import { authRedirectForPath } from '#/lib/authRedirect';
 import { isAuthed } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
@@ -43,7 +46,9 @@ const AuthedLayout: React.FC = () => {
       menuProgress={setup.menuProgress}
       sidebarContent={setup.sidebarContent}
     >
-      <Outlet />
+      <SetupChecklistContext.Provider value={setup.pageContent}>
+        <Outlet />
+      </SetupChecklistContext.Provider>
       {setup.modals}
     </AuthedAppLayout>
   );
