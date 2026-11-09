@@ -305,6 +305,20 @@ jobs:
       - name: test
         run: cd swift/device-identity && SWIFT_WARNINGS_AS_ERRORS=1 swift test
 
+  gertie-ui-lib:
+    needs: files-changed
+    if: needs.files-changed.outputs.gertie_ui == 'true'
+    runs-on: macos-15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: 26.1.1
+      - name: test
+        run: cd swift/gertie-ui && SWIFT_DETERMINISTIC_HASHING=1 swift test
+
   iosapp-lib:
     needs: files-changed
     if: needs.files-changed.outputs.iosapp == 'true'
@@ -436,6 +450,7 @@ jobs:
       macapp: ${{ steps.changes.outputs.macapp }}
       iosapp: ${{ steps.changes.outputs.iosapp }}
       device_identity: ${{ steps.changes.outputs.device_identity }}
+      gertie_ui: ${{ steps.changes.outputs.gertie_ui }}
       podcasts: ${{ steps.changes.outputs.podcasts }}
       music: ${{ steps.changes.outputs.music }}
       libs: ${{ steps.changes.outputs.libs }}
@@ -464,6 +479,9 @@ jobs:
               - swift/gertie/**
               - swift/x-kit/**
               - swift/ts-codable-macro/**
+              - .github/workflows/swift-ci.yml
+            gertie_ui:
+              - swift/gertie-ui/**
               - .github/workflows/swift-ci.yml
             iosapp:
               - swift/iosapp/**
