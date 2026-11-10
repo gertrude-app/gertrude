@@ -62,7 +62,7 @@ check:
 fix:
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist app/Info.Debug.plist app/LaunchScreen.storyboard
-  @prettier --write '**/*.json' '!**/.build/**'
+  @prettier --write '**/*.json' '!**/.build/**' '!**/*.icon/**'
 
 build-app: sim-build
 

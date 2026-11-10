@@ -8,28 +8,29 @@ building projects, checking Xcode navigator issues, rendering SwiftUI previews, 
 build logs, and inspecting project structure. Prefer it over shell-only checks when the
 user's issue is visible in Xcode or previews.
 
-For command-line Swift builds/tests using this repo's pinned Swift 6.3.1 toolchain,
-select Xcode 26.6 per command:
+Xcode 27.1 beta is the selected Xcode (`xcode-select`), so plain `xcodebuild`,
+`xcrun simctl` and native work use it. The exception is command-line Swift package
+builds/tests with the repo's pinned Swift 6.3.1, which need Xcode 26.6's SDK per command:
 
 ```bash
 DEVELOPER_DIR='/Applications/Xcode 26.6.app/Contents/Developer' just api-test
 ```
 
-On Kiah's macOS 27 machine, Xcode 26.6's GUI is blocked, but its command-line tools and
-SDK work; API builds and targeted tests have passed with this override. Command Line
-Tools alone lack XCTest, while Xcode 27 RC's SDK is incompatible with the pinned
-compiler. Keep Xcode 27 RC for native Xcode work. Do not change the global Xcode selection
-or the repo's Swift version just to fix local builds.
+Xcode 26.6's GUI doesn't open on macOS 27, but its command-line tools work. Don't change
+the repo's Swift version just to fix local builds.
 
-Do not take over or disrupt Kiah's visible desktop unless Kiah explicitly asks you to
-perform the specific visible interaction. Without that explicit request, do not bring apps
-or windows to the foreground, move the pointer, synthesize mouse, keyboard, or touch
-input, or run UI automation that controls the host screen. An explicit request permits
-only the requested interaction; do not infer broader or ongoing permission. Never
-manipulate visible UI merely to facilitate a test or screenshot. Screenshots and previews
-are allowed when they can be captured entirely in the background without changing visible
-UI or stealing focus; otherwise ask Kiah to perform the interaction or provide the
-screenshot unless Kiah explicitly asks you to handle it.
+For simulators, claim your own with `simple claim` (see the `simple` skill) and release it
+when done. Never use Kiah's simulators unless asked, and never quit Device Hub: that shuts
+down every simulator.
+
+Read app logs yourself: Xcode MCP `GetConsoleOutput` for apps run from Xcode, or
+`log stream --predicate 'process == "<App>"'` for simulators. Don't ask Kiah to paste
+them.
+
+Kiah's desktop: background work is fine without asking, including your own simulators,
+Xcode MCP builds and previews, background screenshots, and headless browsers. Ask first
+before bringing apps or windows to the front, moving the pointer, sending keyboard or
+mouse input to the host screen, or quitting apps.
 
 For physical-device Gertrude Music debug builds, generate the Xcode project with Kiah's
 personal development team and temporary bundle identifier. Keep these as generation-time
