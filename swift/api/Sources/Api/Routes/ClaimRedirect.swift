@@ -7,7 +7,7 @@ enum ClaimRedirectRoute {
     _ request: Request,
     intent urlIntent: ClaimIntent,
   ) async throws -> Response {
-    let dashboardUrl = request.env.dashboardUrl
+    let dashboardUrl = request.env.accountDashboardUrl.withoutTrailingSlashes
 
     guard let code = Int(request.parameters.get("code") ?? ""),
           code >= 100_000, code <= 999_999 else {
@@ -33,10 +33,7 @@ enum ClaimRedirectRoute {
 
     var components = URLComponents()
     components.queryItems = [
-      .init(name: intent.claimPendingQueryKey, value: "\(code)"),
-      .init(name: "modelName", value: device.modelName),
-      .init(name: "iosVersion", value: device.iosVersion),
-      .init(name: "redirect", value: intent.claimFunnelPath(code: code)),
+      .init(name: "redirect", value: intent.accountClaimPath(code: code)),
     ]
     return request.redirect(
       to: "\(landing)\(components.string ?? "")",

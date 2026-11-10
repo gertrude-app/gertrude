@@ -189,6 +189,6 @@ let EMAIL_NOTIFICATION_FALLBACK = """
   account address because you currently <b>don’t have any notifications set up.</b> If
   you’d rather receive events like these delivered as <b>text</b> or
   <b>Slack</b> messages, or to a different email address, you can configure all of that in
-  the <a href="https://parents.gertrude.app/settings">Settings</a> screen.
+  the <a href="https://account.gertrude.app/settings/notifications">Settings</a> screen.
 </p>
 """
