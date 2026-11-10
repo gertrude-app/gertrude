@@ -19,14 +19,6 @@ DEVELOPER_DIR='/Applications/Xcode 26.6.app/Contents/Developer' just api-test
 Xcode 26.6's GUI doesn't open on macOS 27, but its command-line tools work. Don't change
 the repo's Swift version just to fix local builds.
 
-For simulators, claim your own with `simple claim` (see the `simple` skill) and release it
-when done. Never use Kiah's simulators unless asked, and never quit Device Hub: that shuts
-down every simulator.
-
-Read app logs yourself: Xcode MCP `GetConsoleOutput` for apps run from Xcode, or
-`log stream --predicate 'process == "<App>"'` for simulators. Don't ask Kiah to paste
-them.
-
 Kiah's desktop: background work is fine without asking, including your own simulators,
 Xcode MCP builds and previews, background screenshots, and headless browsers. Ask first
 before bringing apps or windows to the front, moving the pointer, sending keyboard or
