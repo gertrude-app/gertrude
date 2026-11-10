@@ -23,13 +23,8 @@ Run all codegen: `just codegen`
 
 ### PairQL TypeScript Clients (`codegen-pairql-ts-clients`)
 
-Builds the API's `Run` executable and runs its `ts-codegen` command, which writes route
-specs to `/tmp/codegen` without starting the server or touching a database. Then generates
-type-safe TypeScript clients in `web/shared/pairql/src/` for Dashboard, Admin, and Account
-web apps, and runs `just web fix`.
-
-The API doesn't need to be running. `/tmp/codegen` is shared, so don't run this in two
-checkouts at once.
+Generates type-safe TypeScript clients in `web/shared/pairql/src/` for Dashboard, Admin,
+and Account web apps.
 
 ### Macapp TypeScript Store Types (`codegen-typescript`)
 
