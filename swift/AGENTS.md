@@ -12,7 +12,7 @@ Never run raw `swift build` or `swift test` commands, to ensure toolchain and en
 consistency. If there is something you can't do with the `just` commands, ask for
 permission to modify and improve the justfile and agent docs.
 
-Never run `xcodebuild` for any reason.
+Never run `xcodebuild` directly for any reason.
 
 If you need a UUID, use bash to invoke `uuid --llm` to get one, instead of making one
 yourself. Many places in this codebase we use partial identifiers (especially for
@@ -31,7 +31,7 @@ files when a file grows too large or when a clear organizational seam emerges.
 
 ## Quick Reference
 
-- **Swift Version:** 6.2.1 via Swiftly
+- **Swift Version:** 6.3.1 via Swiftly (see `.swift-version`)
 - **Build System:** Swift Package Manager + Nx + Just
 - **State Management:** The Composable Architecture (TCA)
 - **API Pattern:** PairQL (type-safe RPC over HTTP)

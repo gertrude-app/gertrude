@@ -16,17 +16,15 @@ Run all codegen: `just codegen`
 | `just codegen`                   | Run all codegen tasks                                         |
 | `just codegen-macapp`            | All mac app codegen (Swift + TypeScript + appviews build)     |
 | `just codegen-typescript`        | All TypeScript codegen (appview store types + pairql clients) |
-| `just codegen-pairql-ts-clients` | PairQL TypeScript clients (requires API running)              |
+| `just codegen-pairql-ts-clients` | PairQL TypeScript clients                                     |
 | `just codegen-macapp-appviews`   | Build React appviews and copy to Xcode project                |
 
 ## What Gets Generated
 
 ### PairQL TypeScript Clients (`codegen-pairql-ts-clients`)
 
-Fetches route specs from running local API and generates type-safe TypeScript clients in
-`web/shared/pairql/src/` for Dashboard, Admin, and Account web apps.
-
-NB: requires local API to be running
+Generates type-safe TypeScript clients in `web/shared/pairql/src/` for Dashboard, Admin,
+and Account web apps.
 
 ### Macapp TypeScript Store Types (`codegen-typescript`)
 

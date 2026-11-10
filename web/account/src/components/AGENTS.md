@@ -2,6 +2,9 @@
 
 ## Stories
 
+- Stories are for design review, not behavior review: show static states, not clickable
+  journeys. Add a story only for a distinct design worth comparing, not every prop
+  combination.
 - Co-locate stories with the component they cover.
 - Keep granular component stories simple and isolated; show the component itself, not a
   recreated page/header/parent layout. hooks, or app containers.
