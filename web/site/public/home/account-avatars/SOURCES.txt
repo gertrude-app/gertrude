@@ -1,0 +1,17 @@
+USER-SUPPLIED AVATARS FOR THE HOMEPAGE ACCOUNT ILLUSTRATION
+
+Kiah supplied these replacement portraits from the Desktop. They replace the
+previous temporary Unsplash portraits. The images illustrate example profiles,
+not customer endorsements. Jude, Mabel, and Caleb remain fictional internal
+labels, not claims about the identities of the people pictured.
+
+Source files and distributed images:
+~/Desktop/Rectangle.png -> jude.webp
+~/Desktop/Rectangle-1.png -> mabel.webp
+~/Desktop/Rectangle-2.png -> caleb.webp
+
+Each 512 x 512 source was resized to 256 x 256 and converted to WebP at quality
+90, without cropping or retouching. The page displays the images inside circular
+masks with small static rotations. Their clockwise entrance fades, sharpens,
+and moves outward after the heading highlight; reduced motion shows the final
+arrangement immediately.

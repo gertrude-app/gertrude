@@ -1,0 +1,114 @@
+GERTRUDE MUSIC HOMEPAGE SCREENSHOTS
+
+Captured by Kiah on 2026-11-09 from a Gertrude Music development build running
+in iOS Simulator. Playback status, time, and controls have not been retouched.
+
+Source captures and distributed compositions:
+Screenshot Music iPad Pro 13 11-09-2026 at 3.25.54 PM.png -> ipad-1200.webp, ipad-2000.webp
+Screenshot iPhone Duo 11-09-2026 at 3.26.16 PM.png -> duo-480.webp, duo-900.webp
+Screenshot iPhone 18 Pro 11-09-2026 at 3.26.52 PM.png -> iphone-420.webp, iphone-810.webp
+
+Each capture exactly matches its device frame's screen opening and is placed
+inside it without scaling or cropping. The complete device composition is
+resized and converted to WebP. Device images are not tilted, cropped, or
+altered; the homepage adds a soft drop shadow beneath the two phones and
+overlaps them in front of the iPad. The compositions enter with a staggered
+fade and translation.
+
+APPLE DEVICE ARTWORK
+
+iPad: iPad Pro (M5) 13" - Space Black - Landscape.png
+Source: https://devimages-cdn.apple.com/design/resources/download/Bezel-iPad-Pro-(M5).dmg
+
+iPhone Duo: iPhone Duo - Night Sky - Outer Closed Portrait.png
+Source: https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-Duo.dmg
+
+iPhone: iPhone 18 Pro - Black - Portrait.png
+Source: https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-18.dmg
+
+All downloaded on 2026-11-09 from Apple's Product Bezels collection:
+https://developer.apple.com/design/resources/#product-bezels
+
+Apple device artwork is used to depict Gertrude Music for iOS and iPadOS, under
+Apple's Design Resources License and App Store Marketing Guidelines. It is not
+licensed under Creative Commons or offered as a standalone resource.
+https://developer.apple.com/app-store/marketing/guidelines/
+
+BACKGROUND ARTWORK
+
+background.webp comes from image 10.png, supplied by Kiah on 2026-10-01.
+The 1800 x 1230 original is converted to WebP without resizing. The page masks
+the texture from invisible at the top to 5% opacity at the bottom, over a
+stone-colored background that transitions smoothly between dark and light.
+
+OPENLY LICENSED ALBUM COVER ARTWORK
+
+The captures display these covers, each used under the license shown with
+copyright-holder permission recorded by Wikimedia's Volunteer Response Team:
+
+The Seasons - Ben Wendel
+Cover credited to Ben Wendel. CC BY-SA 4.0 International.
+https://commons.wikimedia.org/wiki/File:The_Seasons_Ben_Wendel_Album_Cover.jpg
+Permission ticket: 2023092910007451
+
+All One - Ben Wendel
+Cover credited to Ben Wendel. CC BY-SA 4.0 International.
+https://commons.wikimedia.org/wiki/File:All_One_Ben_Wendel_Album_Cover.jpg
+Permission ticket: 2023092910007451
+
+High Heart - Ben Wendel
+Cover credited to Ben Wendel. CC BY-SA 4.0 International.
+https://commons.wikimedia.org/wiki/File:High_Heart_Ben_Wendel_Album_Cover.jpg
+Permission ticket: 2023092910007451
+
+What We Bring - Ben Wendel
+Cover credited to Ben Wendel. CC BY-SA 4.0 International.
+https://commons.wikimedia.org/wiki/File:What_We_Bring_Album_Cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=908575221
+Permission ticket: 2023092910007451
+
+Frame - Ben Wendel
+Cover credited to Ben Wendel. CC BY-SA 4.0 International.
+https://commons.wikimedia.org/wiki/File:Ben_Wendel_Frame_Album_Cover.jpg
+Reviewed revision: https://commons.wikimedia.org/w/index.php?oldid=1003686718
+Permission ticket: 2023100610007643
+
+Capsule - The Brian Landrus Kaleidoscope
+Cover credited to Brian Landrus. CC BY-SA 3.0 Unported.
+https://commons.wikimedia.org/wiki/File:Landrus_Kaleidoscope_Capsule_Cover.JPG
+Permission ticket: 2013032610005943
+
+Dinas - Calan
+Cover credited to Sain (Recordiau) Cyf. CC BY-SA 3.0 Unported.
+https://commons.wikimedia.org/wiki/File:Dinas,_album_cover.jpg
+Permission ticket: 2017050910011681
+
+Hyn - Carreg Lafar
+Cover credited to Sain (Recordiau) Cyf. CC BY-SA 3.0 Unported.
+https://commons.wikimedia.org/wiki/File:Hyn,_album_cover.jpg
+Permission ticket: 2017050910011681
+
+Iaith Enaid - Robin Huw Bowen
+Cover credited to Sain (Recordiau) Cyf. CC BY-SA 3.0 Unported.
+https://commons.wikimedia.org/wiki/File:Iaith_Enaid_-_The_Language_Of_The_Soul,_album_cover.jpg
+Permission ticket: 2017050910011681
+
+The app displays rounded album tiles and playlist-cover mosaics. Gertrude's
+adaptations of cover artwork are offered under each cover's original license.
+Those licenses do not cover Gertrude's branding, application code, or Apple's
+device artwork. Artist and label endorsement is not implied.
+
+https://creativecommons.org/licenses/by-sa/4.0/
+https://creativecommons.org/licenses/by-sa/3.0/
+
+OTHER ARTWORK SHOWN AS PROVIDED BY APPLE MUSIC
+
+The iPad capture shows Ben Wendel's artist page. Its artist photo, and the
+artwork for BaRcoDe, Understory: Live at the Village Vanguard, Proof (Live),
+Speak Joy, and Lullaby, appear as Apple Music provides them. They belong to
+their respective owners and are not covered by the licenses above. Rights
+holders may contact Gertrude to request removal.
+
+The full cover-art source review, revisions, and permission records for the
+homepage album artwork remain at:
+/music/licensed-artwork/LICENSE.txt
