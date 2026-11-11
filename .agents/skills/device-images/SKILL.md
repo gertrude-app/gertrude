@@ -67,6 +67,13 @@ magick "$src" -crop "$bbox" +repage "$dest"
 
 This trims excess transparent space around the actual device art.
 
+Then compress with `pngquant` (Homebrew) to match the rest of the committed artwork,
+which shrinks each file ~4x:
+
+```bash
+pngquant --quality=80-95 --speed 1 --strip --force --ext .png "$dest"
+```
+
 ## Audit missing images
 
 Run this from the repo root to list identifiers present on ipsw.dev but missing locally.
@@ -91,10 +98,10 @@ root = Path('web/account/public/devices')
 
 def items(product):
     text = (work / f'{product}.html').read_text(errors='replace')
-    for match in re.finditer(r"<a class='product group' href='/product/version/([^']+)'>.*?</a>", text, flags=re.S):
+    for match in re.finditer(r"<a class='product group'[^>]*href='/(?:product/version/)?([^'/]+)'>.*?</a>", text, flags=re.S):
         identifier = html.unescape(match.group(1))
         block = match.group(0)
-        name_match = re.search(r"<div class='product-name[^']*'>(.*?)</div>", block, flags=re.S)
+        name_match = re.search(r"<(?:div|h2) class='product-name[^']*'>(.*?)</(?:div|h2)>", block, flags=re.S)
         year_match = re.findall(r"group-hover:-translate-y-full'>(.*?)</div>", block, flags=re.S)
         name = html.unescape(re.sub('<.*?>', '', name_match.group(1))).strip() if name_match else ''
         year = html.unescape(re.sub('<.*?>', '', year_match[0])).strip() if year_match else ''
@@ -111,8 +118,11 @@ def include(product, identifier):
 
 for product, folder in [('Mac', 'macs'), ('iPhone', 'iphones'), ('iPad', 'ipads')]:
     local = {path.stem for path in (root / folder).glob('*.png')}
-    missing = [item for item in items(product) if include(product, item[0]) and item[0] not in local]
-    print(f'\n{product}: {len(missing)} missing')
+    listed = [item for item in items(product) if include(product, item[0])]
+    if not listed:
+        sys.exit(f'{product}: parsed 0 devices; ipsw.dev markup likely changed, fix the regex')
+    missing = [item for item in listed if item[0] not in local]
+    print(f'\n{product}: {len(listed)} listed, {len(missing)} missing')
     for identifier, name, year in missing:
         print(f'{identifier}\t{name}\t{year}')
 PY
@@ -147,10 +157,10 @@ work = Path(sys.argv[1])
 
 def items(product):
     text = (work / f'{product}.html').read_text(errors='replace')
-    for match in re.finditer(r"<a class='product group' href='/product/version/([^']+)'>.*?</a>", text, flags=re.S):
+    for match in re.finditer(r"<a class='product group'[^>]*href='/(?:product/version/)?([^'/]+)'>.*?</a>", text, flags=re.S):
         identifier = html.unescape(match.group(1))
         block = match.group(0)
-        name_match = re.search(r"<div class='product-name[^']*'>(.*?)</div>", block, flags=re.S)
+        name_match = re.search(r"<(?:div|h2) class='product-name[^']*'>(.*?)</(?:div|h2)>", block, flags=re.S)
         year_match = re.findall(r"group-hover:-translate-y-full'>(.*?)</div>", block, flags=re.S)
         name = html.unescape(re.sub('<.*?>', '', name_match.group(1))).strip() if name_match else ''
         year = html.unescape(re.sub('<.*?>', '', year_match[0])).strip() if year_match else ''
@@ -182,6 +192,7 @@ while IFS=$'\t' read -r product folder identifier name year; do
   before=$(magick identify -format '%wx%h' "$src")
   bbox=$(magick "$src" -alpha extract -format '%@' info:)
   magick "$src" -crop "$bbox" +repage "$dest"
+  pngquant --quality=80-95 --speed 1 --strip --force --ext .png "$dest"
   after=$(magick identify -format '%wx%h' "$dest")
   echo "$identifier $before -> $after ($bbox)"
 done < "$work_dir/devices.tsv"
@@ -203,6 +214,15 @@ curl -s -o /dev/null -w '%{http_code} %{content_type} %{size_download}\n' \
 ```bash
 bun run --cwd web/account typecheck
 ```
+
+## Register new models in the API
+
+New artwork usually means a new model the API doesn't know about yet:
+
+- iPhone/iPad: add a marketing name to `swift/api/Sources/Api/Lib/ModelIdentifier.swift`
+  (unknown identifiers trigger an "Unknown iOS model identifier" Slack alert).
+- Mac: add an entry to `swift/api/Sources/Api/Models/Parent/Computer+Model.swift`, and
+  copy the same PNG into `web/dash/app/public/macs/` (Dashboard's separate Mac art).
 
 ## UI/API wiring notes
 

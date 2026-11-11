@@ -69,6 +69,9 @@ enum ModelIdentifier {
     "iPhone19,3": "iPhone 18 Pro Max",
     "iPhone19,7": "iPhone 18 Pro Max",
 
+    // iPhone Duo (2026)
+    "iPhone19,4": "iPhone Duo",
+
     // iPhone 17e (March 2026)
     "iPhone18,5": "iPhone 17e",
 
@@ -242,6 +245,10 @@ enum ModelIdentifier {
     // iPad Air 2 (2014)
     "iPad5,3": "iPad Air 2",
     "iPad5,4": "iPad Air 2",
+
+    // iPad mini (8th gen, 2026)
+    "iPad19,1": "iPad mini (8th gen)",
+    "iPad19,2": "iPad mini (8th gen)",
 
     // iPad mini (7th gen, 2024)
     "iPad16,1": "iPad mini (7th gen)",
