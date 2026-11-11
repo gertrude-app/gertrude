@@ -17,7 +17,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -32,7 +32,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -59,7 +59,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -72,7 +72,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.libs == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -96,7 +96,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -203,7 +203,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.api == 'true'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     env:
       DATABASE_HOST: postgres
       AUTO_INCLUDED_KEYCHAIN_ID: 77777777-7777-7777-7777-777777777777
@@ -235,19 +235,19 @@ jobs:
   macapp-lib:
     needs: files-changed
     if: needs.files-changed.outputs.macapp == 'true'
-    runs-on: macos-15
+    runs-on: xcode-27
     steps:
       - name: checkout
         uses: actions/checkout@v4
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 27.1
       - uses: actions/cache@v4
         with:
           path: swift/macapp/App/.build
-          key: macapp-xc26.1.1--${{ hashFiles('swift/macapp/App/Package.resolved') }}
-          restore-keys: macapp-xc26.1.1--
+          key: macapp-xc27.1--${{ hashFiles('swift/macapp/App/Package.resolved') }}
+          restore-keys: macapp-xc27.1--
       - name: build
         run: cd swift/macapp/App && swift build
       - name: test
@@ -271,14 +271,14 @@ jobs:
   macapp-build:
     needs: files-changed
     if: needs.files-changed.outputs.macapp == 'true' && github.event_name == 'pull_request'
-    runs-on: macos-15
+    runs-on: xcode-27
     steps:
       - name: checkout
         uses: actions/checkout@v4
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 27.1
       - name: build
         run: |
           cd swift/macapp/Xcode
@@ -289,38 +289,38 @@ jobs:
   device-identity-lib:
     needs: files-changed
     if: needs.files-changed.outputs.device_identity == 'true'
-    runs-on: macos-15
+    runs-on: xcode-27
     steps:
       - name: checkout
         uses: actions/checkout@v4
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 27.1
       - uses: actions/cache@v4
         with:
           path: swift/device-identity/.build
-          key: device-identity-xc26.1.1--${{ hashFiles('swift/device-identity/Package.resolved') }}
-          restore-keys: device-identity-xc26.1.1--
+          key: device-identity-xc27.1--${{ hashFiles('swift/device-identity/Package.resolved') }}
+          restore-keys: device-identity-xc27.1--
       - name: test
         run: cd swift/device-identity && SWIFT_WARNINGS_AS_ERRORS=1 swift test
 
   iosapp-lib:
     needs: files-changed
     if: needs.files-changed.outputs.iosapp == 'true'
-    runs-on: macos-15
+    runs-on: xcode-27
     steps:
       - name: checkout
         uses: actions/checkout@v4
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 27.1
       - uses: actions/cache@v4
         with:
           path: swift/iosapp/lib-ios/.build
-          key: iosapp-xc26.1.1-b--${{ hashFiles('swift/iosapp/lib-ios/Package.resolved') }}
-          restore-keys: iosapp-xc26.1.1-b--
+          key: iosapp-xc27.1-b--${{ hashFiles('swift/iosapp/lib-ios/Package.resolved') }}
+          restore-keys: iosapp-xc27.1-b--
       - name: build
         run: cd swift/iosapp/lib-ios && swift build
       - name: test
@@ -347,7 +347,7 @@ jobs:
   podcasts-lib:
     needs: files-changed
     if: needs.files-changed.outputs.podcasts == 'true'
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 20
     steps:
       - name: checkout
@@ -355,15 +355,15 @@ jobs:
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.6
+          xcode-version: 27.1
       - uses: actions/cache@v4
         with:
           path: |
             swift/podcasts/lib-tca/.build
             swift/podcasts/lib-core/.build
             swift/podcasts/lib-views/.build
-          key: podcasts-xc26.6-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
-          restore-keys: podcasts-xc26.6-
+          key: podcasts-xc27.1-${{ hashFiles('swift/podcasts/lib-tca/Package.resolved', 'swift/podcasts/lib-core/Package.resolved', 'swift/podcasts/lib-views/Package.resolved') }}
+          restore-keys: podcasts-xc27.1-
       - name: build
         run: |
           cd swift/podcasts/lib-tca && swift build
@@ -378,7 +378,7 @@ jobs:
   music-lib:
     needs: files-changed
     if: needs.files-changed.outputs.music == 'true'
-    runs-on: macos-15
+    runs-on: xcode-27
     timeout-minutes: 20
     steps:
       - name: checkout
@@ -386,14 +386,14 @@ jobs:
       - name: setup xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 26.1.1
+          xcode-version: 27.1
       - uses: actions/cache@v4
         with:
           path: |
             swift/music/lib-tca/.build
             swift/music/lib-views/.build
-          key: music-xc26.1.1-${{ hashFiles('swift/music/lib-tca/Package.resolved') }}
-          restore-keys: music-xc26.1.1-
+          key: music-xc27.1-${{ hashFiles('swift/music/lib-tca/Package.resolved') }}
+          restore-keys: music-xc27.1-
       - name: build
         run: |
           cd swift/music/lib-views && swift build
@@ -408,7 +408,7 @@ jobs:
     needs: files-changed
     if: needs.files-changed.outputs.swift == 'true' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    container: ghcr.io/gertrude-app/api-ci-build:6.3.1
+    container: ghcr.io/gertrude-app/api-ci-build:6.4.2
     steps:
       - name: checkout
         uses: actions/checkout@v4
