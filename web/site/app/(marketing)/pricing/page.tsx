@@ -3,12 +3,13 @@ import { CheckIcon, MinusIcon, RocketIcon } from 'lucide-react';
 import React from 'react';
 import type { NextPage } from 'next';
 import Button from '@/components/Button';
+import { freeTrialDays, lightMonthlyEquivalentCents, pricingPlans } from '@/lib/pricing';
 import { createMetadata } from '@/lib/seo';
 import { PARENTS_APP_URL } from '@/lib/urls';
 
 export const metadata = createMetadata(
   `Pricing | One Gertrude Account for Your Whole Family`,
-  `Simple, layered plans for your whole family. Start free, add Gertrude Podcasts and iOS supervision with Light ($10/year), add parent-curated music with Medium ($5/month), or get everything including the Mac app with Full ($10/month).`,
+  `Simple, layered plans for your whole family. Start free, add Gertrude Podcasts and iOS supervision with Light ($${pricingPlans.light.priceDollars}/year), add parent-curated music with Medium ($${pricingPlans.medium.priceDollars}/month), or get everything including the Mac app with Full ($${pricingPlans.full.priceDollars}/month).`,
 );
 
 const SIGNUP_URL = `${PARENTS_APP_URL}/signup?v=new_site`;
@@ -37,16 +38,16 @@ const TIERS: Tier[] = [
     blurb: `Basic protection to get started.`,
     includes: [
       `Basic iOS blocking: GIFs, Spotlight & Maps loopholes`,
-      `30-day Gertrude Podcasts trial`,
+      `${freeTrialDays.podcasts}-day Gertrude Podcasts trial`,
     ],
     cta: { label: `Create free account`, variant: `secondary` },
   },
   {
     name: `Light`,
-    priceMain: `83`,
+    priceMain: `${lightMonthlyEquivalentCents}`,
     priceAccent: `¢`,
     pricePeriod: `/mo`,
-    billing: `Just $10 a year · billed yearly`,
+    billing: `Just $${pricingPlans.light.priceDollars} a year · billed yearly`,
     blurb: `Safe podcasts and supervision for iOS families.`,
     inheritsFrom: `Free`,
     includes: [`Gertrude Podcasts: kid-safe podcast app`, `iOS device supervision`],
@@ -54,7 +55,7 @@ const TIERS: Tier[] = [
   },
   {
     name: `Medium`,
-    priceMain: `$5`,
+    priceMain: `$${pricingPlans.medium.priceDollars}`,
     pricePeriod: `/mo`,
     billing: `Billed monthly`,
     blurb: `Adds safe, parent-curated music for your kids.`,
@@ -64,13 +65,13 @@ const TIERS: Tier[] = [
   },
   {
     name: `Full`,
-    priceMain: `$10`,
+    priceMain: `$${pricingPlans.full.priceDollars}`,
     pricePeriod: `/mo`,
     billing: `Billed monthly`,
     blurb: `Everything Gertrude makes, including Mac.`,
     inheritsFrom: `Medium`,
     includes: [`Gertrude for Mac: full web filtering & monitoring`],
-    trial: `21-day free trial`,
+    trial: `${freeTrialDays.mac}-day free trial`,
     cta: { label: `Start free trial`, variant: `primary` },
     featured: true,
   },
@@ -90,7 +91,7 @@ const MATRIX: FeatureRow[] = [
   { label: `Basic iOS blocking`, free: true, light: true, medium: true, full: true },
   {
     label: `Gertrude Podcasts`,
-    free: `30-day trial`,
+    free: `${freeTrialDays.podcasts}-day trial`,
     light: true,
     medium: true,
     full: true,

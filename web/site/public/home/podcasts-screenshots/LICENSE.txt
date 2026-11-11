@@ -1,0 +1,120 @@
+GERTRUDE PODCASTS HOMEPAGE SCREENSHOTS
+
+Captured by Kiah in Dark Mode from a local Gertrude Podcasts development build
+on an iPhone 15. The original captures are 1179 x 2556 pixels. App content,
+status-bar time, battery status, and controls have not been retouched.
+
+Source captures and distributed compositions:
+IMG_0611.PNG -> shows-810.webp, shows-1350.webp
+IMG_0612.PNG -> show-details-810.webp, show-details-1350.webp
+IMG_0613.PNG -> pin-810.webp, pin-1350.webp
+
+Each capture is proportionally fitted to the device's display opening, with a
+small edge crop to match its aspect ratio, and masked beneath the Apple bezel.
+The complete composition is resized and converted to WebP. The page applies a
+staggered fade and vertical entrance to each composition.
+
+APPLE DEVICE ARTWORK
+
+All three compositions use iPhone 18 Pro - Black - Portrait.png from Apple's
+Product Bezels collection, downloaded on 2026-10-01.
+https://developer.apple.com/design/resources/#product-bezels
+https://devimages-cdn.apple.com/design/resources/download/Bezel-iPhone-18.dmg
+
+The device artwork is not tilted, cropped, or given added shadows. Apple's device
+artwork is not licensed under Creative Commons or offered as a standalone
+resource. Its use is subject to Apple's Design Resources License and App Store
+Marketing Guidelines.
+https://developer.apple.com/app-store/marketing/guidelines/
+
+BACKGROUND ARTWORK
+
+The page reuses /home/music-screenshots/background.webp, converted from
+image 10.png supplied by Kiah on 2026-10-01. The texture is masked from
+invisible at the top to 5% opacity at the bottom, over a stone-colored
+background that transitions smoothly between dark and light.
+
+PODCAST AND AUDIOBOOK COVER ARTWORK
+
+The library capture displays the four LibriVox covers below and New Rustacean.
+The show-details capture also displays New Rustacean. Were You Raised By Wolves?
+is shown with Gertrude's built-in generic radio illustration, not that
+publisher's cover art. The PIN capture contains no podcast artwork.
+
+The shows illustrate a family-chosen library, not endorsements by their
+publishers or recommendations that every episode is suitable for every child.
+No audio is redistributed. Names identify their respective shows and books;
+they are not Gertrude branding.
+
+1. TREASURE ISLAND
+
+Credit: cover design by Scott Carpenter / LibriVox; artwork from the 1911 edition.
+Source: https://librivox.org/treasure-island-by-robert-louis-stevenson/
+Feed: https://librivox.org/rss/449
+Cover: https://archive.org/download/treasureisland_librivox/treasure_island_1.jpg
+Cover insert: https://archive.org/download/treasureisland_librivox/treasure_island_1.pdf
+The insert credits Scott Carpenter's cover design and artwork from the 1911
+edition. LibriVox's catalog policy below explicitly includes its cover art in
+its public-domain release.
+
+2. ALICE'S ADVENTURES IN WONDERLAND
+
+Credit: John Tenniel; cover design by Seth Jones / LibriVox.
+Source: https://librivox.org/alices-adventures-in-wonderland-by-lewis-carroll/
+Feed: https://librivox.org/rss/200
+Cover: https://archive.org/download/alice_in_wonderland_librivox/Alice_in_Wonderland.jpg
+Cover insert: https://archive.org/download/alice_in_wonderland_librivox/Alice_in_Wonderland.pdf
+The insert identifies Tenniel's 1865 illustration of Alice and a flamingo,
+states the illustration's copyright has expired in the listed jurisdictions,
+and explicitly releases Seth Jones's cover design into the public domain.
+
+3. THE VELVETEEN RABBIT
+
+Credit: William Nicholson; cover design by Janette Brown / LibriVox.
+Source: https://librivox.org/the-velveteen-rabbit-by-margery-williams/
+Feed: https://librivox.org/rss/432
+Cover: https://archive.org/download/velveteen_rabbit_librivox/Velveteen_Rabbit_1104.jpg
+Cover insert: https://archive.org/download/velveteen_rabbit_librivox/Velveteen_Rabbit_1104.pdf
+The insert identifies Nicholson's 1922 illustrations, states their copyright
+has expired in the listed jurisdictions, and releases Brown's cover design
+into the public domain.
+
+4. THE GREAT BIG TREASURY OF BEATRIX POTTER, VERSION 2
+
+Credit: Beatrix Potter; cover design by Bart de Leeuw / LibriVox.
+Source: https://librivox.org/the-great-big-treasury-of-beatrix-potter-by-beatrix-potter/
+Feed: https://librivox.org/rss/2990
+Cover: https://archive.org/download/LibrivoxCdCoverArt18/potter_1205.jpg
+Cover insert: https://archive.org/download/LibrivoxCdCoverArt18/potter_1205.pdf
+The insert credits Potter's 1902 artwork and de Leeuw's cover design and bears
+a NO RIGHTS RESERVED notice.
+
+LIBRIVOX COVER-ART POLICY
+
+https://librivox.org/pages/public-domain/
+"In addition, book summaries, CD cover art, and any other material that goes into
+our catalog with the audio recordings are in the public domain."
+
+This applies to these specific LibriVox catalog covers, not unrelated
+commercial editions. Public-domain status can vary by jurisdiction; no claim
+of universal clearance in every jurisdiction is made.
+
+5. NEW RUSTACEAN
+
+Credit: Chris Krycho; incorporated Rust logo by the Rust Foundation.
+Cover: https://newrustacean.com/podcast.png
+Feed: https://newrustacean.com/feed.xml
+Source and permission: https://newrustacean.com/
+The publisher displays the cover and states:
+"All content licensed under a Creative Commons Attribution license: do whatever
+you like with this; just credit me!"
+
+The publisher does not specify a license version; none is invented here.
+The finished cover incorporates a modified Rust logo. Gertrude did not create
+that modification. The Rust Foundation's logo artwork attribution license
+and trademark policy are at:
+https://foundation.rust-lang.org/policies/logo-policy-and-media-guide/
+
+The Rust Foundation and Rust Project are not affiliated with Gertrude.
+Artwork permissions do not cover Gertrude's branding, application code, generic
+radio illustration, or Apple's device artwork.

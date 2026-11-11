@@ -7,6 +7,7 @@ interface Props {
   size?: number;
   iconOnly?: boolean;
   className?: string;
+  wordmarkSrc?: string;
   type?: `default` | `inverted`;
   product?: LogoProduct;
   badge?: string;
@@ -42,6 +43,7 @@ const Logo: React.FC<Props> = ({
   size = 32,
   iconOnly,
   className,
+  wordmarkSrc,
   type = `default`,
   product,
   badge,
@@ -49,6 +51,7 @@ const Logo: React.FC<Props> = ({
   const productLogo = product ? PRODUCT_LOGOS[product] : undefined;
   const src =
     productLogo?.src ??
+    wordmarkSrc ??
     (type === `inverted` ? `/gertrude-logo-white.svg` : `/gertrude-logo.svg`);
   const width = size * ((productLogo?.width ?? 640) / BASE_LOGO_HEIGHT);
   const height = size * ((productLogo?.height ?? BASE_LOGO_HEIGHT) / BASE_LOGO_HEIGHT);
@@ -56,7 +59,7 @@ const Logo: React.FC<Props> = ({
   if (iconOnly) {
     return (
       <img
-        src="/logo-icon.svg"
+        src={type === `inverted` ? `/logo-icon-dark.svg` : `/logo-icon.svg`}
         alt="Gertrude"
         className={cx(`block`, className)}
         style={{ width: size, height: size }}
