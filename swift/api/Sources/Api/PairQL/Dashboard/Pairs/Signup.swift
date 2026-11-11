@@ -53,10 +53,6 @@ extension Signup: Resolver {
         return .init(admin: creds)
       }
 
-      if context.env.mode == .prod, !isTestAddress(email) {
-        postmark.toSuperAdmin("signup [exists]", email)
-      }
-
       if !existingParent.emailVerified {
         try await sendVerificationEmail(
           to: existingParent,

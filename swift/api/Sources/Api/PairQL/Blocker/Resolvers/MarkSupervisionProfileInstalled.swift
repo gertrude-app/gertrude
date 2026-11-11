@@ -33,14 +33,6 @@ extension MarkSupervisionProfileInstalled: NoInputResolver {
           Claim code: `\(claimCodeText)`
           """,
         )
-        get(dependency: \.postmark).toSuperAdmin(
-          "iOS Supervision Complete",
-          """
-          Supervision profile installed and filter confirmed running.<br/>
-          Parent: \(parent.adminSiteLink(.email))<br/>
-          Claim code: \(claimCodeText)
-          """,
-        )
       }
     }
 
