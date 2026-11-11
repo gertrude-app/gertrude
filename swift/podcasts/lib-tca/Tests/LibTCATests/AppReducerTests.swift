@@ -1,5 +1,6 @@
 import Combine
 import ComposableArchitecture
+import CustomDump
 import Dependencies
 import Foundation
 import GertieTcaFeatures
@@ -10,6 +11,70 @@ import Testing
 @testable import LibTCA
 
 @MainActor struct AppReducerTests {
+  @Test(arguments: [false, true])
+  func `connection recognition preserves uninterrupted onboarding`(foreground: Bool) async throws {
+    let keychain = dictKeychain(installDate: .reference, deviceId: UUID(1))
+    let connection = PodcastConnection(token: UUID(2), deviceId: UUID(1), childId: UUID(3))
+    try await withDependencies {
+      $0.defaultInMemoryStorage = .init()
+      $0.defaultDatabase = try appDatabase()
+      $0.date = .constant(.reference)
+      $0.keychain = keychain
+      $0.podcastIdentity.resolve = {
+        .init(deviceId: UUID(1), connection: try? keychain.readConnection())
+      }
+      $0.podcastIdentity.current = {
+        .init(deviceId: UUID(1), connection: try? keychain.readConnection())
+      }
+      $0.podcastIdentity.saveToken = { _, _ in try keychain.writeConnection(connection) }
+      $0.api.getTrialStatus = {
+        .connected(
+          token: UUID(2),
+          childId: UUID(3),
+          childName: "Child",
+          subscription: .active(expiresAt: .distantFuture),
+        )
+      }
+      $0.api.getAccountStatus = {
+        .init(
+          childId: UUID(3),
+          childName: "Child",
+          subscription: .active(expiresAt: .distantFuture),
+        )
+      }
+      $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
+      $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
+      $0.mainQueue = .immediate
+    } operation: {
+      let store = TestStore(
+        initialState: foreground
+          ? .init(
+            mode: .onboarding(.init(screen: .strongPasscode)),
+            identity: .init(deviceId: UUID(1)),
+          )
+          : .init(),
+        reducer: AppReducer.init,
+      )
+      store.exhaustivity = .off
+      if foreground {
+        try keychain.writeConnection(connection) // claim polling saved the connection
+      }
+      await store.send(foreground ? .appInForegroundChanged(true) : .appDidLaunch)
+      await store.receive(\.identityResolved)
+      await store.receive(\.identityResolved)
+      await store.finish()
+      expectNoDifference(
+        store.state.mode?.onboarding?.screen,
+        foreground ? .strongPasscode : .hiThere,
+      )
+      expectNoDifference(store.state.mode?.onboarding?.resumedAfterClaim, false)
+      await store.send(.mode(.presented(.onboarding(.finished(123_456)))))
+      await store.finish()
+      await Task.yield()
+      #expect(!loggedEventIds().contains("c3e9a1f4"))
+    }
+  }
+
   @Test func `reinstall with preserved db does not false onboard`() async {
     await withDependencies {
       $0.api.getTrialStatus = {
