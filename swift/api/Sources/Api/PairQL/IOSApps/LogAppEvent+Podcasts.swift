@@ -64,10 +64,6 @@ extension LogAppEvent {
           "*Podcasts Cross Promo Image Failed* \(device)\n\(input.detail ?? "(no detail)")",
         )
       }
-
-      if input.eventId == midClaimPinSetEventId, let deviceId {
-        try await alertSuperAdminOfMidClaimPinSet(input, deviceId: deviceId, in: context)
-      }
     }
 
     return .success
@@ -105,22 +101,6 @@ private func isPodcastFirstFamilyShareForDevice(
     withBindings: [.uuid(deviceId)],
   )
   return count == 1
-}
-
-private func alertSuperAdminOfMidClaimPinSet(
-  _ input: LogEventRequest,
-  deviceId: IOSDevice.Id,
-  in ctx: Context,
-) async throws {
-  let device = try await ctx.db.find(deviceId)
-  guard let child = try await device.child(in: ctx.db) else { return }
-  let parent = try await child.parent(in: ctx.db)
-  get(dependency: \.postmark).toSuperAdmin(
-    "Podcasts PIN set after mid-claim relaunch",
-    "device: \(input.modelName), child: \(child.name), parent: \(parent.email.rawValue) — "
-      + "the Podcasts PIN may have been set by someone other than the parent (app killed between "
-      + "claim and PIN setup). Consider emailing the parent about a dashboard PIN reset.",
-  )
 }
 
 private let podcastCrossPromoImageFailedEventId = "af5b46ca"

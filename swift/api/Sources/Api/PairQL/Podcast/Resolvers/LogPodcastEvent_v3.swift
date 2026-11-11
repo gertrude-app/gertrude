@@ -39,8 +39,6 @@ func isPodcastLegacyIAPPaymentEvent(_ eventId: String) -> Bool {
   ["af0a338f", "a72104d7"].contains(eventId)
 }
 
-let midClaimPinSetEventId = "c3e9a1f4"
-
 /// We don't record StoreKit.AppStore.Environment or inAppOwnershipType, so we
 /// use originalID length as a proxy (verified against Apple's App Store Server
 /// API for every logged originalID as of 2026-05-12):
