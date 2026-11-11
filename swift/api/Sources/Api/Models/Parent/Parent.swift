@@ -15,6 +15,7 @@ struct Parent: Codable, Sendable {
   var accountSiteBetaEnabled = false
   var dailyReviewEmail = false
   var lastReviewEmailAt: Date?
+  var setupApps: [SetupApp]?
   var createdAt = Date()
   var updatedAt = Date()
 
@@ -42,6 +43,15 @@ struct Parent: Codable, Sendable {
     self.referralCode = referralCode
     self.referredByParentId = referredByParentId
     self.createdAt = createdAt
+  }
+}
+
+extension Parent {
+  enum SetupApp: String, Codable, Sendable, Equatable, CaseIterable {
+    case mac
+    case blocker
+    case music
+    case podcasts
   }
 }
 

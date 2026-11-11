@@ -2,6 +2,7 @@ import { Button, HStack, Text, Tooltip } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
 import React from 'react';
 import type { ConnectedIOSApp } from '#/components/devices/types';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 interface Props {
   apps: ConnectedIOSApp[];
@@ -9,27 +10,6 @@ interface Props {
   deviceId: string;
   supervisionSetupPath?: string;
 }
-
-const appDetails: Record<
-  ConnectedIOSApp,
-  { name: string; shortName: string; iconUrl: string }
-> = {
-  blocker: {
-    name: `Gertrude Blocker`,
-    shortName: `Blocker`,
-    iconUrl: `/gertrude-app-icons/blocker.webp`,
-  },
-  podcasts: {
-    name: `Gertrude Podcasts`,
-    shortName: `Podcasts`,
-    iconUrl: `/gertrude-app-icons/podcasts.webp`,
-  },
-  music: {
-    name: `Gertrude Music`,
-    shortName: `Music`,
-    iconUrl: `/gertrude-app-icons/music.webp`,
-  },
-};
 
 const ConnectedAppList: React.FC<Props> = ({
   apps,
@@ -52,7 +32,7 @@ const ConnectedAppList: React.FC<Props> = ({
         </Button>
       )}
       {displayedApps.map((app) => {
-        const details = appDetails[app];
+        const details = gertrudeApps[app];
         return (
           <Tooltip key={app} content={`Open ${details.name} settings`} side="top">
             <Link
@@ -68,7 +48,7 @@ const ConnectedAppList: React.FC<Props> = ({
                 className="rounded-xl border border-stone-200 bg-white p-1.5 pr-2 shadow shadow-stone-300/30 transition-[border-color,box-shadow] group-hover:border-stone-300 group-hover:shadow-stone-300/60"
               >
                 <img
-                  src={details.iconUrl}
+                  src={details.icon}
                   alt=""
                   className="h-5 w-5 rounded-[6.5px] object-cover shadow-sm shadow-violet-800/10"
                 />

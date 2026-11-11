@@ -26,15 +26,10 @@ export const States = {
           person={people[0]!}
           settingsHref="/people/person-1"
           monitorHref="/activity/person/person-1"
-          addDeviceHref="/people/person-1/devices/new"
         />
       </StorySection>
       <StorySection title="No devices" contentClassName="flex-col items-stretch">
-        <PersonCard
-          person={people[2]!}
-          settingsHref="/people/person-3"
-          addDeviceHref="/people/person-3/devices/new"
-        />
+        <PersonCard person={people[2]!} settingsHref="/people/person-3" />
       </StorySection>
     </StoryCanvas>
   ),

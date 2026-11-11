@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppWelcomeRouteImport } from './routes/_app/welcome'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
+import { Route as AppHowDidYouHearRouteImport } from './routes/_app/how-did-you-hear'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
 import { Route as unauthedLinkExpiredRouteImport } from './routes/(unauthed)/link-expired'
@@ -60,6 +62,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppWelcomeRoute = AppWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppSignoutRoute = AppSignoutRouteImport.update({
   id: '/signout',
   path: '/signout',
@@ -68,6 +75,11 @@ const AppSignoutRoute = AppSignoutRouteImport.update({
 const AppSecurityEventsRoute = AppSecurityEventsRouteImport.update({
   id: '/security-events',
   path: '/security-events',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppHowDidYouHearRoute = AppHowDidYouHearRouteImport.update({
+  id: '/how-did-you-hear',
+  path: '/how-did-you-hear',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const unauthedSignupRoute = unauthedSignupRouteImport.update({
@@ -276,8 +288,10 @@ export interface FileRoutesByFullPath {
   '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
+  '/welcome': typeof AppWelcomeRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
@@ -315,8 +329,10 @@ export interface FileRoutesByTo {
   '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
+  '/welcome': typeof AppWelcomeRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
@@ -356,8 +372,10 @@ export interface FileRoutesById {
   '/(unauthed)/link-expired': typeof unauthedLinkExpiredRoute
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
+  '/_app/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
+  '/_app/welcome': typeof AppWelcomeRoute
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/_app/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
@@ -401,8 +419,10 @@ export interface FileRouteTypes {
     | '/link-expired'
     | '/login'
     | '/signup'
+    | '/how-did-you-hear'
     | '/security-events'
     | '/signout'
+    | '/welcome'
     | '/people/$personId'
     | '/settings/billing'
     | '/otp/$token'
@@ -440,8 +460,10 @@ export interface FileRouteTypes {
     | '/link-expired'
     | '/login'
     | '/signup'
+    | '/how-did-you-hear'
     | '/security-events'
     | '/signout'
+    | '/welcome'
     | '/'
     | '/otp/$token'
     | '/reset-password/$token'
@@ -480,8 +502,10 @@ export interface FileRouteTypes {
     | '/(unauthed)/link-expired'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
+    | '/_app/how-did-you-hear'
     | '/_app/security-events'
     | '/_app/signout'
+    | '/_app/welcome'
     | '/_app/'
     | '/_app/people/$personId'
     | '/_app/settings/billing'
@@ -544,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/welcome': {
+      id: '/_app/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AppWelcomeRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/signout': {
       id: '/_app/signout'
       path: '/signout'
@@ -556,6 +587,13 @@ declare module '@tanstack/react-router' {
       path: '/security-events'
       fullPath: '/security-events'
       preLoaderRoute: typeof AppSecurityEventsRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/how-did-you-hear': {
+      id: '/_app/how-did-you-hear'
+      path: '/how-did-you-hear'
+      fullPath: '/how-did-you-hear'
+      preLoaderRoute: typeof AppHowDidYouHearRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/(unauthed)/signup': {
@@ -919,8 +957,10 @@ const AppRequestsUnlockRouteWithChildren =
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
+  AppHowDidYouHearRoute: typeof AppHowDidYouHearRoute
   AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
+  AppWelcomeRoute: typeof AppWelcomeRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDevicesDeviceIdRoute: typeof AppDevicesDeviceIdRoute
   AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
@@ -940,8 +980,10 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
+  AppHowDidYouHearRoute: AppHowDidYouHearRoute,
   AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
+  AppWelcomeRoute: AppWelcomeRoute,
   AppIndexRoute: AppIndexRoute,
   AppDevicesDeviceIdRoute: AppDevicesDeviceIdRoute,
   AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,

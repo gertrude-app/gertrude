@@ -1,4 +1,4 @@
-import { Badge, Divider, HStack, Text, VStack } from '@gertrude/ui';
+import { AppIcon, Badge, Divider, HStack, Text, VStack } from '@gertrude/ui';
 import cx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
 import React, { useState } from 'react';
@@ -15,6 +15,7 @@ export type PersonSettingsExpandableSectionProps = {
   title: string;
   previewChips: PersonSettingsPreviewChip[];
   appIconUrl?: string;
+  appIconOutlined?: boolean;
   headingLevel?: PersonSettingsHeadingLevel;
   defaultExpanded?: boolean;
   hasUnsavedChanges?: boolean;
@@ -25,6 +26,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
   title,
   previewChips,
   appIconUrl,
+  appIconOutlined = false,
   headingLevel = `h2`,
   defaultExpanded = false,
   hasUnsavedChanges = false,
@@ -49,20 +51,7 @@ const PersonSettingsExpandableSection: React.FC<PersonSettingsExpandableSectionP
           onClick={() => setExpanded(!expanded)}
         >
           <HStack gap={4} wrap className={appIconUrl ? `gap-y-2` : `gap-y-0.5`}>
-            {appIconUrl && (
-              <div className="relative">
-                <img
-                  className="w-8 h-8 rounded-[9px] absolute blur-xs opacity-40"
-                  src={appIconUrl}
-                  alt=""
-                />
-                <img
-                  className="w-8 h-8 shadow rounded-[9px] shadow-stone-300/30 relative"
-                  src={appIconUrl}
-                  alt=""
-                />
-              </div>
-            )}
+            {appIconUrl && <AppIcon src={appIconUrl} outlined={appIconOutlined} />}
             <Text as="span" variant="heading">
               {title}
             </Text>

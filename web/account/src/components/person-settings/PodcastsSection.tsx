@@ -11,6 +11,7 @@ import PersonSettingsExpandableSection from './PersonSettingsExpandableSection';
 import PodcastsPinResetModal from './PodcastsPinResetModal';
 import SettingsRow from './SettingsRow';
 import { podcastsSubscriptionRunway } from './podcastsSubscriptionRunway';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 interface Props {
   subscription: IosPodcastsSubscription;
@@ -76,8 +77,8 @@ const PodcastsSection: React.FC<Props> = ({
   return (
     <>
       <PersonSettingsExpandableSection
-        appIconUrl="/gertrude-app-icons/podcasts.webp"
-        title="Gertrude Podcasts"
+        appIconUrl={gertrudeApps.podcasts.icon}
+        title={gertrudeApps.podcasts.name}
         headingLevel={headingLevel}
         defaultExpanded={defaultExpanded}
         previewChips={previewChips}

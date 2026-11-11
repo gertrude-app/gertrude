@@ -1,4 +1,5 @@
 // components
+export { default as AppIcon } from './components/AppIcon';
 export { default as Badge } from './components/Badge';
 export { default as CountBadge } from './components/CountBadge';
 export { default as Banner } from './components/Banner';
@@ -22,12 +23,16 @@ export { default as Modal } from './components/Modal';
 export type { ModalProps } from './components/Modal';
 export { default as PageHeading } from './components/PageHeading';
 export { default as RadioGroup } from './components/RadioGroup';
+export { default as ProgressRing } from './components/ProgressRing';
+export { default as RadioList } from './components/RadioList';
+export type { RadioListOption } from './components/RadioList';
 export { default as Select } from './components/Select';
 export { default as SegmentedTabs } from './components/SegmentedTabs';
 export { default as Sidebar } from './components/Sidebar';
 export { default as SidebarItem } from './components/SidebarItem';
 export { default as SidebarLayout } from './components/SidebarLayout';
 export { default as SidebarSection } from './components/SidebarSection';
+export { useSidebarContext } from './components/SidebarContext';
 export { default as Skeleton } from './components/Skeleton';
 export type { SkeletonProps, SkeletonRadius } from './components/Skeleton';
 export { default as SlideOver } from './components/SlideOver';

@@ -1,19 +1,19 @@
-import { Banner, Button, Input } from '@gertrude/ui';
+import { Banner, Button, Input, RadioList } from '@gertrude/ui';
 import cx from 'clsx';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
 import type { PersonRelationship } from '#/components/types';
 import PairingPageLayout, { PairingHeaderBackground } from './PairingPageLayout';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
+import { type IOSConnectFlow, appForConnectFlow, gertrudeApps } from '#/lib/gertrudeApps';
 import { selfRelationshipUnavailableMessage } from '#/lib/people';
 
-type Flow = `blockerConnect` | `blockerSupervise` | `podcasts` | `music`;
 type Selection =
   | { type: `existing`; id: string }
   | { type: `new`; name: string; relationship: PersonRelationship };
 
 interface Props {
-  flow: Flow;
+  flow: IOSConnectFlow;
   device: {
     type: `iPhone` | `iPad`;
     modelName: string;
@@ -30,80 +30,7 @@ interface Props {
   onCancel: () => void;
 }
 
-const flowDetails: Record<
-  Flow,
-  { appName: string; shortName: string; icon: string; supervision: boolean }
-> = {
-  blockerConnect: {
-    appName: `Gertrude Blocker`,
-    shortName: `Blocker`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-    supervision: false,
-  },
-  blockerSupervise: {
-    appName: `Gertrude Blocker`,
-    shortName: `Blocker`,
-    icon: `/gertrude-app-icons/blocker.webp`,
-    supervision: true,
-  },
-  podcasts: {
-    appName: `Gertrude Podcasts`,
-    shortName: `Podcasts`,
-    icon: `/gertrude-app-icons/podcasts.webp`,
-    supervision: false,
-  },
-  music: {
-    appName: `Gertrude Music`,
-    shortName: `Music`,
-    icon: `/gertrude-app-icons/music.webp`,
-    supervision: false,
-  },
-};
-
 const NEW_PERSON = `__new_person__`;
-
-interface ChoiceRowProps {
-  group: string;
-  value: string;
-  label: string;
-  selected: boolean;
-  onSelect: () => void;
-  disabled?: boolean;
-  disabledMessage?: string;
-}
-
-const ChoiceRow: React.FC<ChoiceRowProps> = ({
-  group,
-  value,
-  label,
-  selected,
-  onSelect,
-  disabled = false,
-  disabledMessage,
-}) => (
-  <label
-    title={disabledMessage}
-    className={cx(
-      `flex min-h-10 items-center gap-2.5 rounded-lg border px-3 py-2 text-sm transition-colors focus-within:ring-2 focus-within:ring-violet-300`,
-      selected ? `border-violet-400 bg-violet-50` : `border-stone-200 bg-white`,
-      disabled
-        ? `cursor-not-allowed opacity-50`
-        : `cursor-pointer hover:border-stone-300`,
-    )}
-  >
-    <input
-      type="radio"
-      name={group}
-      value={value}
-      checked={selected}
-      onChange={onSelect}
-      disabled={disabled}
-      aria-label={disabledMessage ? `${label}. ${disabledMessage}` : undefined}
-      className="h-4 w-4 shrink-0 accent-violet-600"
-    />
-    <span className="font-medium text-stone-900">{label}</span>
-  </label>
-);
 
 const ConnectIosAppPage: React.FC<Props> = ({
   flow,
@@ -116,7 +43,8 @@ const ConnectIosAppPage: React.FC<Props> = ({
   onSubmit,
   onCancel,
 }) => {
-  const details = flowDetails[flow];
+  const details = gertrudeApps[appForConnectFlow(flow)];
+  const supervision = flow === `blockerSupervise`;
   const [selected, setSelected] = React.useState<string | null>(
     initialSelection?.type === `existing`
       ? initialSelection.id
@@ -146,13 +74,13 @@ const ConnectIosAppPage: React.FC<Props> = ({
       (relationship !== null &&
         !(relationship === `self` && selfRelationshipUnavailable))) &&
     !submitting;
-  const action = details.supervision
+  const action = supervision
     ? selectedName
       ? `Continue setup for ${selectedName}`
       : `Continue setup`
     : selectedName
       ? `Connect ${details.shortName} for ${selectedName}`
-      : `Connect ${details.appName}`;
+      : `Connect ${details.name}`;
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
@@ -171,11 +99,11 @@ const ConnectIosAppPage: React.FC<Props> = ({
           <PairingHeaderBackground />
           <div
             className="relative flex items-center justify-center gap-4"
-            aria-label={`${details.appName} on ${device.modelName}`}
+            aria-label={`${details.name} on ${device.modelName}`}
           >
             <img
               src={details.icon}
-              alt={details.appName}
+              alt={details.name}
               className="h-10 w-10 rounded-xl shadow-sm"
             />
             <svg
@@ -208,25 +136,16 @@ const ConnectIosAppPage: React.FC<Props> = ({
           </legend>
           <div className="clear-both pt-3">
             {people.length > 0 && (
-              <div className="flex flex-col gap-1.5">
-                {people.map((person) => (
-                  <ChoiceRow
-                    key={person.id}
-                    group="device-person"
-                    value={person.id}
-                    label={person.name}
-                    selected={selected === person.id}
-                    onSelect={() => setSelected(person.id)}
-                  />
-                ))}
-                <ChoiceRow
-                  group="device-person"
-                  value={NEW_PERSON}
-                  label="Add someone new"
-                  selected={selected === NEW_PERSON}
-                  onSelect={() => setSelected(NEW_PERSON)}
-                />
-              </div>
+              <RadioList
+                name="device-person"
+                ariaLabel={`Who uses this ${device.modelName}?`}
+                options={[
+                  ...people.map((person) => ({ value: person.id, label: person.name })),
+                  { value: NEW_PERSON, label: `Add someone new` },
+                ]}
+                selected={selected}
+                onSelect={setSelected}
+              />
             )}
 
             {selected === NEW_PERSON && (
@@ -238,39 +157,24 @@ const ConnectIosAppPage: React.FC<Props> = ({
                   >
                     What is their relationship to you?
                   </h2>
-                  <div
-                    role="radiogroup"
-                    aria-labelledby={relationshipLabelId}
-                    className="flex flex-col gap-1.5"
-                  >
-                    <ChoiceRow
-                      group="new-person-relationship"
-                      value="child"
-                      label="Your child"
-                      selected={relationship === `child`}
-                      onSelect={() => setRelationship(`child`)}
-                    />
-                    <ChoiceRow
-                      group="new-person-relationship"
-                      value="peer"
-                      label="A spouse, friend, or peer"
-                      selected={relationship === `peer`}
-                      onSelect={() => setRelationship(`peer`)}
-                    />
-                    <ChoiceRow
-                      group="new-person-relationship"
-                      value="self"
-                      label="Yourself"
-                      selected={relationship === `self`}
-                      onSelect={() => setRelationship(`self`)}
-                      disabled={selfRelationshipUnavailable}
-                      disabledMessage={
-                        selfRelationshipUnavailable
+                  <RadioList
+                    name="new-person-relationship"
+                    ariaLabelledBy={relationshipLabelId}
+                    options={[
+                      { value: `child`, label: `Your child` },
+                      { value: `peer`, label: `A spouse, friend, or peer` },
+                      {
+                        value: `self`,
+                        label: `Yourself`,
+                        disabled: selfRelationshipUnavailable,
+                        disabledMessage: selfRelationshipUnavailable
                           ? selfRelationshipUnavailableMessage
-                          : undefined
-                      }
-                    />
-                  </div>
+                          : undefined,
+                      },
+                    ]}
+                    selected={relationship}
+                    onSelect={(value) => setRelationship(value as PersonRelationship)}
+                  />
                   {relationship === `self` && (
                     <Banner variant="warning" className="mt-4">
                       Gertrude works best when someone you trust manages your settings and

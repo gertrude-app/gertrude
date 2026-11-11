@@ -33,6 +33,7 @@ import ExtendedSupervisionControls from '#/components/person-settings/ExtendedSu
 import PersonSettingsExpandableSection from '#/components/person-settings/PersonSettingsExpandableSection';
 import PodcastsSection from '#/components/person-settings/PodcastsSection';
 import SettingsRow from '#/components/person-settings/SettingsRow';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 interface Props {
   state: LoadableState<IosDeviceSettingsConfiguration>;
@@ -354,8 +355,9 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
         </span>
       )}
       <PersonSettingsExpandableSection
-        appIconUrl="/gertrude-app-icons/blocker.webp"
-        title="Gertrude Blocker"
+        appIconUrl={gertrudeApps.blocker.icon}
+        appIconOutlined={gertrudeApps.blocker.iconOutlined}
+        title={gertrudeApps.blocker.name}
         headingLevel="h4"
         defaultExpanded={defaultExpanded}
         hasUnsavedChanges={hasUnsavedChanges}
@@ -447,8 +449,9 @@ const IosSettingsPage: React.FC<Props> = ({
         />
       ) : (
         <PersonSettingsExpandableSection
-          appIconUrl="/gertrude-app-icons/blocker.webp"
-          title="Gertrude Blocker"
+          appIconUrl={gertrudeApps.blocker.icon}
+          appIconOutlined={gertrudeApps.blocker.iconOutlined}
+          title={gertrudeApps.blocker.name}
           headingLevel="h4"
           defaultExpanded={defaultExpandedSection === `blocker`}
           previewChips={[
@@ -477,13 +480,13 @@ const IosSettingsPage: React.FC<Props> = ({
         />
       ) : (
         <AppNotInstalledSection
-          appIconUrl="/gertrude-app-icons/podcasts.webp"
+          appIconUrl={gertrudeApps.podcasts.icon}
           headingLevel="h4"
           defaultExpanded={defaultExpandedSection === `podcasts`}
-          appName="Gertrude Podcasts"
+          appName={gertrudeApps.podcasts.name}
           icon={PodcastIcon}
           description="Gertrude Podcasts plays only the shows you’ve approved, with a PIN you control so the lineup can’t be changed."
-          appStoreUrl="https://apps.apple.com/us/app/gertrude-podcasts/id6753187429"
+          appStoreUrl={gertrudeApps.podcasts.appStoreUrl}
         />
       )}
     </VStack>

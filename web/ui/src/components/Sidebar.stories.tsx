@@ -3,7 +3,6 @@ import {
   HomeIcon,
   KeyIcon,
   LifeBuoyIcon,
-  LogOutIcon,
   MonitorSmartphoneIcon,
   SettingsIcon,
   UsersIcon,
@@ -23,11 +22,7 @@ const logoUrl = `/logo-wordmark.svg`;
 const NavigationSidebar: React.FC<
   Pick<React.ComponentProps<typeof Sidebar>, `logoWidth`>
 > = ({ logoWidth }) => (
-  <Sidebar
-    logoUrl={logoUrl}
-    logoWidth={logoWidth}
-    bottomButton={{ text: `Sign out`, href: `https://gertrude.app`, icon: LogOutIcon }}
-  >
+  <Sidebar logoUrl={logoUrl} logoWidth={logoWidth}>
     <SidebarSection title="Platform">
       <SidebarItem title="Dashboard" icon={HomeIcon} href="/dashboard" selected />
       <SidebarItem title="Children" icon={UsersIcon} href="/people" badgeCount={3} />
@@ -90,7 +85,6 @@ const meta = {
   },
   argTypes: {
     logoWidth: { control: { type: `number`, min: 80, max: 180, step: 4 } },
-    bottomButton: { control: false },
     children: { control: false },
     logoUrl: { control: false },
   },

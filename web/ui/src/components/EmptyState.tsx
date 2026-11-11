@@ -27,6 +27,7 @@ interface Props {
         onClick: () => void;
       }
   );
+  action?: React.ReactNode;
   className?: string;
 }
 
@@ -35,6 +36,7 @@ const EmptyState: React.FC<Props> = ({
   title,
   description,
   button,
+  action,
   className,
 }) => (
   <VStack
@@ -49,7 +51,7 @@ const EmptyState: React.FC<Props> = ({
     <Text variant="bodyStrong" className="mt-2 text-base">
       {title}
     </Text>
-    <Text variant="bodyMuted" className={cx(`mt-0.5`, button && `mb-4`)}>
+    <Text variant="bodyMuted" className={cx(`mt-0.5`, (button || action) && `mb-4`)}>
       {description}
     </Text>
     {button &&
@@ -78,6 +80,7 @@ const EmptyState: React.FC<Props> = ({
           {button.text}
         </Button>
       ))}
+    {action}
   </VStack>
 );
 

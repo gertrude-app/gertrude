@@ -8,9 +8,11 @@ import {
   VStack,
   inflect,
 } from '@gertrude/ui';
-import { LaptopIcon, MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
+import { MonitorSmartphoneIcon, TrashIcon } from 'lucide-react';
 import React from 'react';
+import type { SetupApp } from '#/components/onboarding/setupApps';
 import type { Device, PersonRelationship } from '#/components/types';
+import AddDeviceMenu from '#/components/devices/AddDeviceMenu';
 import CardContainer from '#/components/layout/CardContainer';
 import DeviceListRow from '#/components/people/DeviceListRow';
 import { deviceTitle } from '#/components/utils';
@@ -30,7 +32,7 @@ interface Props {
   selfRelationshipUnavailable?: boolean;
   onSaveDetails: () => void;
   onDeletePerson: () => void | Promise<void>;
-  onConnectMac: () => void;
+  onAddDevice: (app: SetupApp) => void;
   onDisconnectMac: (connectionId: string) => Promise<boolean>;
 }
 
@@ -48,7 +50,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
   selfRelationshipUnavailable = false,
   onSaveDetails,
   onDeletePerson,
-  onConnectMac,
+  onAddDevice,
   onDisconnectMac,
 }) => {
   const [disconnectDevice, setDisconnectDevice] = React.useState<Extract<
@@ -132,15 +134,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
           }
           buttons={
             devices.length > 0 ? (
-              <Button
-                type="button"
-                variant="default"
-                icon={LaptopIcon}
-                disabled={busy}
-                onClick={onConnectMac}
-              >
-                Connect a Mac
-              </Button>
+              <AddDeviceMenu variant="default" disabled={busy} onSelect={onAddDevice} />
             ) : undefined
           }
         >
@@ -172,14 +166,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
               icon={MonitorSmartphoneIcon}
               title="No Devices"
               description={`No devices are connected to ${personName} yet.`}
-              button={{
-                type: `button`,
-                text: `Connect a Mac`,
-                icon: LaptopIcon,
-                variant: `primary`,
-                disabled: busy,
-                onClick: onConnectMac,
-              }}
+              action={<AddDeviceMenu disabled={busy} onSelect={onAddDevice} />}
             />
           )}
         </CardContainer>

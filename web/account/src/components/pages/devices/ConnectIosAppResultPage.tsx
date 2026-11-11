@@ -4,6 +4,7 @@ import React from 'react';
 import PairingPageLayout, { PairingHeaderBackground } from './PairingPageLayout';
 import { burstConfetti } from './burstConfetti';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
+import { appForConnectFlow, gertrudeApps } from '#/lib/gertrudeApps';
 
 type Device = {
   type: `iPhone` | `iPad`;
@@ -29,18 +30,7 @@ type Props = {
 
 const ConnectIosAppResultPage: React.FC<Props> = (props) => {
   const { device, personName } = props;
-  const appName =
-    props.flow === `podcasts`
-      ? `Gertrude Podcasts`
-      : props.flow === `music`
-        ? `Gertrude Music`
-        : `Gertrude Blocker`;
-  const icon =
-    props.flow === `podcasts`
-      ? `/gertrude-app-icons/podcasts.webp`
-      : props.flow === `music`
-        ? `/gertrude-app-icons/music.webp`
-        : `/gertrude-app-icons/blocker.webp`;
+  const { name: appName, icon } = gertrudeApps[appForConnectFlow(props.flow)];
   const needsPlan =
     (props.flow === `podcasts` && props.access === `lapsed`) ||
     (props.flow === `music` && props.access === `unavailable`);
