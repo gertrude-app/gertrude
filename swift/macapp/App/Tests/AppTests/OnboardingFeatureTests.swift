@@ -36,6 +36,16 @@ final class OnboardingFeatureTests: XCTestCase {
     let extSetup = mock(always: FilterExtensionState.notInstalled)
     store.deps.filterExtension.setup = extSetup.fn
 
+    // ✅ section: app key selection (discovery starts on the welcome screen)
+
+    let fakeApps: [DiscoveredApp] = [
+      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+      .init(name: "Launchpad", bundleId: "com.apple.apps.launcher", iconPath: "", category: nil),
+    ]
+    let discoverApps: Mock<[DiscoveredApp]> = mock(always: fakeApps)
+    store.deps.device.discoverInstalledApps = discoverApps.fn
+
     await store.send(.application(.didFinishLaunching))
 
     // ✅ section: welcome
@@ -47,6 +57,20 @@ final class OnboardingFeatureTests: XCTestCase {
 
     await store.receive(.filter(.receivedState(.notInstalled))) {
       $0.filter.extension = .notInstalled
+    }
+
+    await store.receive(.onboarding(.discoverApps)) {
+      $0.onboarding.discoveringApps = true
+    }
+    // app discovery fires on the welcome screen
+    await expect(discoverApps.calls.count).toEqual(1)
+    let expectedApps: [DiscoveredApp] = [
+      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
+    ]
+    await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
+      $0.onboarding.discoveredApps = expectedApps
+      $0.onboarding.discoveringApps = false
     }
 
     await expect(extSetup.calls.count).toEqual(1)
@@ -97,6 +121,7 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.api.connectUser = connectUser.fn
     store.deps.app.installedVersion = { "1.0.0" }
     store.deps.device = .mock // lots of data used by connect user request
+    store.deps.device.discoverInstalledApps = discoverApps.fn
     let setUserToken = spy(on: UUID.self, returning: ())
     store.deps.api.setUserToken = setUserToken.fn
 
@@ -211,8 +236,14 @@ final class OnboardingFeatureTests: XCTestCase {
     // we have other tests testing the resume from persisted state flow.
     await store.send(.onboarding(.resume(.checkingFullDiskAccessPermission(upgrade: false))))
 
+    await store.receive(.onboarding(.discoverApps)) {
+      $0.onboarding.discoveringApps = true
+    }
     await store.receive(.onboarding(.setStep(.allowFullDiskAccess_success))) {
       $0.onboarding.step = .allowFullDiskAccess_success
+    }
+    await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
+      $0.onboarding.discoveringApps = false
     }
 
     // ✅ section: screenshots
@@ -257,8 +288,14 @@ final class OnboardingFeatureTests: XCTestCase {
     // we have other tests testing the resume from persisted state flow.
     await store.send(.onboarding(.resume(.checkingScreenRecordingPermission)))
 
+    await store.receive(.onboarding(.discoverApps)) {
+      $0.onboarding.discoveringApps = true
+    }
     await store.receive(.onboarding(.setStep(.allowScreenshots_success))) {
       $0.onboarding.step = .allowScreenshots_success
+    }
+    await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
+      $0.onboarding.discoveringApps = false
     }
 
     // we've come back from restart with good permissions, so we proactively
@@ -337,16 +374,6 @@ final class OnboardingFeatureTests: XCTestCase {
     )
     store.deps.filterXpc.requestUserTypes = getUserTypes.fn
 
-    // ✅ section: app key selection (discovery preloaded during sysext install)
-
-    let fakeApps: [DiscoveredApp] = [
-      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
-      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
-      .init(name: "Launchpad", bundleId: "com.apple.apps.launcher", iconPath: "", category: nil),
-    ]
-    let discoverApps: Mock<[DiscoveredApp]> = mock(always: fakeApps)
-    store.deps.device.discoverInstalledApps = discoverApps.fn
-
     // they click "Got it" on the install sys ext trick screen...
     await store.send(.onboarding(.webview(.primaryBtnClicked))) {
       $0.onboarding.step = .installSysExt_allow // ...and go to sys ext allow...
@@ -358,16 +385,6 @@ final class OnboardingFeatureTests: XCTestCase {
     // because filterExtension.install is mocked to return success, we go to success
     await store.receive(.onboarding(.setStep(.installSysExt_success_configPivot))) {
       $0.onboarding.step = .installSysExt_success_configPivot
-    }
-
-    // app discovery fires during sysext install success (preloaded)
-    await expect(discoverApps.calls.count).toEqual(1)
-    let expectedApps: [DiscoveredApp] = [
-      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
-      .init(name: "Zoom", bundleId: "us.zoom.xos", iconPath: "", category: nil),
-    ]
-    await store.receive(.onboarding(.receivedDiscoveredApps(fakeApps))) {
-      $0.onboarding.discoveredApps = expectedApps
     }
 
     // we clear the exempted state for the current user proactively as safeguard
@@ -984,6 +1001,7 @@ final class OnboardingFeatureTests: XCTestCase {
   func testResumingFromAdminUserDemotion() async {
     let (store, _) = AppReducer.testStore(mockDeps: true)
     store.deps.device = .testValue
+    store.deps.device.discoverInstalledApps = { [] }
     store.deps.device.currentUserId = { 502 }
     store.deps.device.listMacOSUsers = { [
       .init(id: 501, name: "jared", type: .admin),
@@ -1447,6 +1465,105 @@ final class OnboardingFeatureTests: XCTestCase {
     store.deps.api.getOnboardingConfig = { .empty }
     await store.send(.webview(.secondaryBtnClicked))
     await store.receive(.setStep(.optOutOfFiltering))
+  }
+
+  @MainActor
+  func testSecondUserLoadsAppsOnWelcomeWhenSystemExtensionAlreadyRunning() async {
+    let (store, _) = AppReducer.testStore()
+    store.deps.monitoring.keystrokeRecordingPermissionGranted = { true }
+    store.deps.filterExtension.state = { .installedAndRunning }
+    store.deps.api.getOnboardingConfig = { .empty }
+    let apps: [DiscoveredApp] = [
+      .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+    ]
+    store.deps.device.discoverInstalledApps = { apps }
+
+    await store.send(.loadedPersistentState(nil)) {
+      $0.onboarding.windowOpen = true
+    }
+    await store.receive(.onboarding(.discoverApps)) {
+      $0.onboarding.discoveringApps = true
+    }
+    await store.receive(.onboarding(.receivedDiscoveredApps(apps))) {
+      $0.onboarding.discoveringApps = false
+      $0.onboarding.discoveredApps = apps
+    }
+    await store.send(.onboarding(.setStep(.allowKeylogging_required)))
+    await store.send(.onboarding(.webview(.primaryBtnClicked)))
+    await store.receive(.onboarding(.setStep(.optOutOfFiltering)))
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .configureDowntime
+    }
+    await store.send(.onboarding(.webview(.primaryBtnClicked))) {
+      $0.onboarding.step = .appKeySelection_intro
+    }
+  }
+
+  @MainActor
+  func testResumingOnboardingRestartsAppDiscovery() async {
+    for resume: OnboardingFeature.Resume in [
+      .at(step: .confirmGertrudeAccount),
+      .checkingFullDiskAccessPermission(upgrade: false),
+      .checkingScreenRecordingPermission,
+    ] {
+      let (store, _) = AppReducer.testStore()
+      let apps: [DiscoveredApp] = [
+        .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      ]
+      store.deps.device.discoverInstalledApps = { apps }
+      await store.send(.onboarding(.resume(resume)))
+      await store.receive(.onboarding(.discoverApps)) {
+        $0.onboarding.discoveringApps = true
+      }
+      await store.receive(.onboarding(.receivedDiscoveredApps(apps))) {
+        $0.onboarding.discoveringApps = false
+        $0.onboarding.discoveredApps = apps
+      }
+    }
+  }
+
+  @MainActor
+  func testDowntimeWaitsForSlowAppDiscovery() async {
+    for filteringDisabled in [false, true] {
+      let store = onboardingFeatureStore {
+        $0.step = .configureDowntime
+        $0.discoveringApps = true
+        $0.filteringDisabled = filteringDisabled
+      }
+      let apps: [DiscoveredApp] = [
+        .init(name: "Slack", bundleId: "com.tinyspeck.slackmacgap", iconPath: "", category: nil),
+      ]
+      await store.send(.webview(.primaryBtnClicked)) {
+        $0.waitingForDiscoveredApps = true
+      }
+      expect(store.state.step).toEqual(.configureDowntime)
+      expect(store.state.discoveredApps).toEqual([])
+      await store.send(.receivedDiscoveredApps(apps)) {
+        $0.discoveringApps = false
+        $0.waitingForDiscoveredApps = false
+        $0.discoveredApps = apps
+        $0.step = filteringDisabled ? .appKeySelection_blockApps : .appKeySelection_intro
+      }
+    }
+  }
+
+  @MainActor
+  func testDowntimeSkipsAppSelectionOnlyAfterEmptyDiscoveryCompletes() async {
+    let store = onboardingFeatureStore {
+      $0.step = .configureDowntime
+      $0.discoveringApps = true
+    }
+    await store.send(.webview(.primaryBtnClicked)) {
+      $0.waitingForDiscoveredApps = true
+    }
+    expect(store.state.step).toEqual(.configureDowntime)
+    expect(store.state.discoveredApps).toEqual([])
+    await store.send(.receivedDiscoveredApps([])) {
+      $0.discoveringApps = false
+      $0.waitingForDiscoveredApps = false
+    }
+    await store.receive(.delegate(.onboardingConfigComplete))
+    await store.receive(.setStep(.exemptUsers))
   }
 
   @MainActor
@@ -2555,6 +2672,7 @@ func onboardingFeatureStore(
   store.deps.app.installLocation = { .inApplicationsDir }
   store.deps.device.osVersion = { .sequoia }
   store.deps.device.currentUserId = { 502 }
+  store.deps.device.discoverInstalledApps = { [] }
   store.deps.device.listMacOSUsers = { [
     .init(id: 501, name: "Dad", type: .admin),
     .init(id: 502, name: "liljimmy", type: .standard),

@@ -49,6 +49,8 @@ struct OnboardingFeature: Feature {
     var connectChildRequest: PayloadRequestState<String, String> = .idle
     var users: [MacUser] = []
     var discoveredApps: [DiscoveredApp] = []
+    var discoveringApps = false
+    var waitingForDiscoveredApps = false
     var publicKeychains: [GetOnboardingConfig.PublicKeychain] = []
     var alwaysBlocked: GetOnboardingConfig.AlwaysBlocked = .init(groups: [], preselected: [])
     var customKeychainDomains: [String] = []
@@ -110,6 +112,7 @@ struct OnboardingFeature: Feature {
     case delegate(Delegate)
     case resume(Resume)
     case receivedDeviceData(currentUserId: uid_t, users: [MacOSUser])
+    case discoverApps
     case receivedDiscoveredApps([DiscoveredApp])
     case receivedOnboardingConfig(GetOnboardingConfig.Output)
     case receivedFilterUsers(FilterUserTypes)
@@ -141,6 +144,13 @@ struct OnboardingFeature: Feature {
       let step = state.step
       let userIsAdmin = state.currentUser?.isAdmin != false
       switch action {
+
+      case .discoverApps:
+        guard !state.discoveringApps else { return .none }
+        state.discoveringApps = true
+        return .exec { send in
+          await send(.receivedDiscoveredApps(self.device.discoverInstalledApps()))
+        }
 
       case .resume(.at(let step)):
         log("resuming at \(step)", "711355aa")
@@ -646,8 +656,6 @@ struct OnboardingFeature: Feature {
           switch installResult {
           case .installedSuccessfully:
             await send(.setStep(.installSysExt_success_configPivot))
-            let apps = await self.device.discoverInstalledApps()
-            await send(.receivedDiscoveredApps(apps))
             // NB: the two xpc calls below also implicitly establish the XPC connection
             // so if they are ever removed, we should call requestAck() or similar here
             // NB: safeguard, make sure onboarding user not exempted
@@ -751,15 +759,11 @@ struct OnboardingFeature: Feature {
 
       case .webview(.primaryBtnClicked) where step == .configureDowntime:
         log(step, action, "5449cfc0")
-        if state.discoveredApps.isEmpty {
-          return .exec { send in
-            await self.finishOnboardingConfig(send)
-          }
+        if state.discoveringApps {
+          state.waitingForDiscoveredApps = true
+          return .none
         }
-        state.step = state.filteringDisabled
-          ? .appKeySelection_blockApps
-          : .appKeySelection_intro
-        return .none
+        return self.advanceToAppSelection(&state)
 
       case .webview(.setDowntimeSchedule(let window)):
         log("setDowntimeSchedule window=\(window)", "34921fbf")
@@ -768,8 +772,15 @@ struct OnboardingFeature: Feature {
         }
 
       case .receivedDiscoveredApps(let apps):
+        state.discoveringApps = false
         state.discoveredApps = apps.filter { app in
           !ONBOARDING_HIDDEN_BUNDLE_IDS.contains { app.bundleId.contains($0) }
+        }
+        if state.waitingForDiscoveredApps {
+          state.waitingForDiscoveredApps = false
+          if state.step == .configureDowntime {
+            return self.advanceToAppSelection(&state)
+          }
         }
         return .none
 
@@ -1145,6 +1156,18 @@ struct OnboardingFeature: Feature {
       log("sys ext already installed and running, skipping to opt out", "b0e6e683")
       await send(.setStep(.optOutOfFiltering))
       await self.loadOnboardingConfig(send)
+    }
+
+    func advanceToAppSelection(_ state: inout State) -> Effect<Action> {
+      if state.discoveredApps.isEmpty {
+        return .exec { send in
+          await self.finishOnboardingConfig(send)
+        }
+      }
+      state.step = state.filteringDisabled
+        ? .appKeySelection_blockApps
+        : .appKeySelection_intro
+      return .none
     }
 
     func loadOnboardingConfig(_ send: Send<Action>) async {

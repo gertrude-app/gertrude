@@ -2,6 +2,10 @@
 
 ## Release notes
 
+- `2.9.8` (stable, 11/11/26)
+  - fix an issue onboarding a second user causing skip of app configuration
+  - some documentation updates for Golden Gate
+  - hostname block rules case-insensitive
 - `2.9.7` (canary, 7/17/26)
   - no changes, just testing xpc upgrade reboot reconnect fix again
 - `2.9.6` (canary, 7/16/26)
