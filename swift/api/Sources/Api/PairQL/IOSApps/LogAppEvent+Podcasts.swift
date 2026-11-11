@@ -65,15 +65,6 @@ extension LogAppEvent {
         )
       }
 
-      if try await isPodcastFirstPayment(input, in: context) {
-        await slack.internal(.info, "*FIRST Podcast Subscription* `\(input.modelName)`")
-        await slack.internal(.podcasts, "*FIRST Podcast Subscription* `\(input.modelName)`")
-        get(dependency: \.postmark).toSuperAdmin(
-          "FIRST Podcast Subscription",
-          "device: \(input.modelName)",
-        )
-      }
-
       if input.eventId == midClaimPinSetEventId, let deviceId {
         try await alertSuperAdminOfMidClaimPinSet(input, deviceId: deviceId, in: context)
       }
