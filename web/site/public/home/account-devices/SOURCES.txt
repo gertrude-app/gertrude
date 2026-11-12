@@ -1,0 +1,41 @@
+APPLE DEVICE ARTWORK FOR THE FAMILY ACCOUNT ILLUSTRATION
+
+These images reuse the existing Account site artwork. No new downloads or
+changes to the Account device collection were made. Model names/generations
+are checked against the repository's Computer.Model and ModelIdentifier maps.
+
+macbook.webp - MacBook Pro 16-inch, M5 (2026)
+Source: web/account/public/devices/macs/Mac17,8.png
+https://ipsw.dev/img/devices/Mac17,8.png
+
+iphone.webp - iPhone 18 Pro (2026)
+Source: web/account/public/devices/iphones/iPhone19,2.png
+https://ipsw.dev/img/devices/iPhone19,2.png
+
+ipad-air.webp - iPad Air 13-inch, M4 (2026)
+Source: web/account/public/devices/ipads/iPad16,10.png
+https://ipsw.dev/img/devices/iPad16,10.png
+
+imac.webp - iMac, M4 (latest iMac artwork in Account)
+Source: web/account/public/devices/macs/Mac16,2.png
+https://ipsw.dev/img/devices/Mac16,2.png
+
+iphone-air.webp - iPhone Air (latest Air artwork in Account)
+Source: web/account/public/devices/iphones/iPhone18,4.png
+https://ipsw.dev/img/devices/iPhone18,4.png
+
+ipad-pro.webp - iPad Pro 13-inch, M5 (latest Pro artwork in Account)
+Source: web/account/public/devices/ipads/iPad17,3.png
+https://ipsw.dev/img/devices/iPad17,3.png
+
+mac-studio.webp - Mac Studio, M5 (2026)
+Source: web/account/public/devices/macs/Mac17,15.png
+https://ipsw.dev/img/devices/Mac17,15.png
+
+The already-cropped PNG files are converted to WebP at their original
+resolution, with quality 94 and alpha quality 100. The page displays the
+complete artwork with small static rotations, without added device shadows
+or altered screens. A clockwise entrance fades, sharpens, and moves the
+compositions outward after the heading highlight. Reduced motion shows the
+final arrangement immediately. These images are not covered by any license
+for Gertrude's own artwork.

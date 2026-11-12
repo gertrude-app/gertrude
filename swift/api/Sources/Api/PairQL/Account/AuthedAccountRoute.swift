@@ -12,6 +12,9 @@ enum AuthedAccountRoute: PairRoute {
   case getMacDevice(GetMacDevice.Input)
   case updateMacDevice(UpdateMacDevice.Input)
   case getAccountSettings
+  case getAccountSetup
+  case setAccountSetupApps(SetAccountSetupApps.Input)
+  case saveAccountReferralSource(SaveAccountReferralSource.Input)
   case createAccountNotificationMethod(CreateAccountNotificationMethod.Input)
   case confirmAccountNotificationMethod(ConfirmAccountNotificationMethod.Input)
   case saveAccountNotification(SaveAccountNotification.Input)
@@ -27,6 +30,7 @@ enum AuthedAccountRoute: PairRoute {
   case handleAccountCheckoutCancel(HandleAccountCheckoutCancel.Input)
   case createPerson(CreatePerson.Input)
   case createMacConnectionCode(CreateMacConnectionCode.Input)
+  case disconnectMacConnection(DisconnectMacConnection.Input)
   case updatePersonBasicDetails(UpdatePersonBasicDetails.Input)
   case deletePerson(DeletePerson.Input)
   case getAccountKeychains
@@ -101,6 +105,17 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.getAccountSettings)) {
       Operation(GetAccountSettings.self)
     }
+    Route(.case(Self.getAccountSetup)) {
+      Operation(GetAccountSetup.self)
+    }
+    Route(.case(Self.setAccountSetupApps)) {
+      Operation(SetAccountSetupApps.self)
+      Body(.accountInput(SetAccountSetupApps.self))
+    }
+    Route(.case(Self.saveAccountReferralSource)) {
+      Operation(SaveAccountReferralSource.self)
+      Body(.accountInput(SaveAccountReferralSource.self))
+    }
     Route(.case(Self.createAccountNotificationMethod)) {
       Operation(CreateAccountNotificationMethod.self)
       Body(.accountInput(CreateAccountNotificationMethod.self))
@@ -158,6 +173,10 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.createMacConnectionCode)) {
       Operation(CreateMacConnectionCode.self)
       Body(.accountInput(CreateMacConnectionCode.self))
+    }
+    Route(.case(Self.disconnectMacConnection)) {
+      Operation(DisconnectMacConnection.self)
+      Body(.accountInput(DisconnectMacConnection.self))
     }
     Route(.case(Self.updatePersonBasicDetails)) {
       Operation(UpdatePersonBasicDetails.self)
@@ -348,6 +367,15 @@ extension AuthedAccountRoute: RouteResponder {
     case .getAccountSettings:
       let output = try await GetAccountSettings.resolve(in: context)
       return try await self.respond(with: output)
+    case .getAccountSetup:
+      let output = try await GetAccountSetup.resolve(in: context)
+      return try await self.respond(with: output)
+    case .setAccountSetupApps(let input):
+      let output = try await SetAccountSetupApps.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .saveAccountReferralSource(let input):
+      let output = try await SaveAccountReferralSource.resolve(with: input, in: context)
+      return try await self.respond(with: output)
     case .createAccountNotificationMethod(let input):
       let output = try await CreateAccountNotificationMethod.resolve(with: input, in: context)
       return try await self.respond(with: output)
@@ -392,6 +420,9 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .createMacConnectionCode(let input):
       let output = try await CreateMacConnectionCode.resolve(with: input, in: context)
+      return try await self.respond(with: output)
+    case .disconnectMacConnection(let input):
+      let output = try await DisconnectMacConnection.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .updatePersonBasicDetails(let input):
       let output = try await UpdatePersonBasicDetails.resolve(with: input, in: context)

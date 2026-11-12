@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { Navigate, createFileRoute, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import type {
   LoadableState,
@@ -7,7 +7,9 @@ import type {
   SuspensionRequest,
 } from '#/components/types';
 import AccountAnnouncement from '#/components/announcements/AccountAnnouncement';
+import { SetupChecklistContext } from '#/components/onboarding/useSetupChecklist';
 import PeoplePage from '#/components/pages/people/PeoplePage';
+import { needsOnboarding } from '#/lib/accountSetup';
 import { toPersonCardPerson } from '#/lib/people';
 import { toSecurityEvent } from '#/lib/securityEvents';
 import { toSuspensionRequest } from '#/lib/suspensionRequests';
@@ -18,6 +20,9 @@ import { useQuery } from '#/pairql/query';
 const NINE_MINUTES = 9 * 60 * 1000;
 
 const PeopleRoute: React.FC = () => {
+  const navigate = useNavigate();
+  const setupChecklist = React.useContext(SetupChecklistContext);
+  const setupQuery = useQuery(Key.accountSetup, () => liveClient.getAccountSetup());
   const peopleQuery = useQuery(Key.people, () => liveClient.getPeople(), {
     refetchInterval: NINE_MINUTES,
   });
@@ -32,7 +37,7 @@ const PeopleRoute: React.FC = () => {
   );
 
   const peopleState: LoadableState<PersonCardPerson[]> =
-    peopleQuery.data !== undefined
+    peopleQuery.data !== undefined && !setupQuery.isPending
       ? {
           status: `success`,
           data: peopleQuery.data.map(toPersonCardPerson),
@@ -78,15 +83,27 @@ const PeopleRoute: React.FC = () => {
           }
         : { status: `loading` };
 
+  if (setupQuery.data && needsOnboarding(setupQuery.data)) {
+    return <Navigate to="/welcome" replace />;
+  }
+
+  const selectedApps = setupQuery.data?.selectedApps;
+
   return (
     <PeoplePage
+      gettingStarted={
+        selectedApps && {
+          selectedApps,
+          onAddPerson: () => void navigate({ to: `/people/new` }),
+          onChangeApps: () => void navigate({ to: `/welcome` }),
+        }
+      }
+      setupChecklist={setupChecklist}
       announcement={<AccountAnnouncement />}
       peopleState={peopleState}
       unlockRequestSummary={unlockRequestsQuery.data}
       suspensionRequestsState={suspensionRequestsState}
       securityEventsState={securityEventsState}
-      onRefreshSuspensionRequests={() => void suspensionRequestsQuery.refetch()}
-      refreshingSuspensionRequests={suspensionRequestsQuery.isFetching}
       onRefreshSecurityEvents={() => void securityEventsQuery.refetch()}
       refreshingSecurityEvents={securityEventsQuery.isFetching}
       addPersonHref="/people/new"

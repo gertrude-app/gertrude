@@ -36,8 +36,8 @@ extension StartCheckoutSession: Resolver {
 
     let customerId = account.stripeCustomerId?.rawValue
     let sessionData = Stripe.CheckoutSessionData(
-      successUrl: "\(context.dashboardUrl)\(input.successPath)?session_id={CHECKOUT_SESSION_ID}",
-      cancelUrl: "\(context.dashboardUrl)\(input.cancelPath)?session_id={CHECKOUT_SESSION_ID}",
+      successUrl: checkoutReturnUrl(context.dashboardUrl, input.successPath),
+      cancelUrl: checkoutReturnUrl(context.dashboardUrl, input.cancelPath),
       lineItems: [.init(quantity: 1, priceId: input.tier.checkoutStripePriceId)],
       mode: .subscription,
       clientReferenceId: context.parent.id.lowercased,
@@ -79,4 +79,9 @@ extension StartCheckoutSession: Resolver {
 
     return .init(url: url)
   }
+}
+
+func checkoutReturnUrl(_ baseUrl: String, _ path: String) -> String {
+  let separator = path.contains("?") ? "&" : "?"
+  return "\(baseUrl)\(path)\(separator)session_id={CHECKOUT_SESSION_ID}"
 }

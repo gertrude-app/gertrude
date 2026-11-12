@@ -13,6 +13,8 @@ interface Props {
   breadcrumbs: Array<{ text: string; href: string }>;
   onToggleFlag?: (id: string) => void;
   onDelete?: (id: string) => void;
+  onDeleteItems?: (ids: string[]) => void;
+  chunkSize?: number;
   onDeletePersonActivity?: (personId: string) => void;
 }
 
@@ -24,6 +26,8 @@ const ActivityFeedPage: React.FC<Props> = ({
   breadcrumbs,
   onToggleFlag,
   onDelete,
+  onDeleteItems,
+  chunkSize,
   onDeletePersonActivity,
 }) => (
   <DashboardPage
@@ -35,6 +39,8 @@ const ActivityFeedPage: React.FC<Props> = ({
       showPersonHeading={showPersonHeading}
       onToggleFlag={onToggleFlag}
       onDelete={onDelete}
+      onDeleteItems={onDeleteItems}
+      chunkSize={chunkSize}
       onDeletePersonActivity={onDeletePersonActivity}
     />
   </DashboardPage>

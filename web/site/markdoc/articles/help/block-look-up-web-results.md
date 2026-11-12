@@ -7,54 +7,40 @@ products: [blocker]
 platforms: [ios, ipados]
 ---
 
-{% callout type="warning" title="These instructions are outdated" %}
-
-This article preserves instructions written in 2023 for an older version of iOS. Current
-setting names, screenshots, and steps may differ. We’re working on an updated version.
-
-{% /callout %}
+## The Loophole
 
 Most apps that deal with text (like ebook readers, Bible apps, Notes, and **many more**)
 allow the user to _highlight a search term and **"Look Up"**_.
 
-{% image src="lockdown-iphone/lookup-books.png" caption="Most apps let you highlight a word, then tap 'Look Up'" alt="five things you forgot locking down your kids iPhone: highlight a word and tap 'Look Up'" /%}
+{% image src="lockdown-iphone/lookup-selection.png" width=450 caption="Select a word, then tap 'Look Up'" alt="The word 'goats' selected in a book, with a purple arrow pointing to Look Up" /%}
 
-Which brings up this:
+_Look Up_ can display images and other results **from the web,** right inside the app.
+This includes showing images that many parents and individuals would consider
+inappropriate or suggestive.
 
-{% image src="lockdown-iphone/look-up-results.png" caption="An example of images pulled from the web in response to a 'Look Up'" alt="five things you forgot locking down your kids iPhone: Look Up on iOS can access and display to your child images from the web" /%}
+{% image src="lockdown-iphone/lookup-results.png" width=450 caption="Look Up results can include images from the web" alt="Look Up results for 'goats', showing Siri Knowledge and two rows of images from the web" /%}
 
-{% click-to-reveal title="Show me how to fix it" %}
+## How to Block It
 
-{% callout alt=true %}
+Start by going to the main Settings app once again, and this time choose **Search**:
 
-These steps are nearly identical to the fix for _Internet Content in Searches_, except for
-what setting to disable in step 2.
+{% image src="lockdown-iphone/search-settings-ios26.png" width=450 caption="Tap Search" alt="locking down an iPhone: Search settings" /%}
+
+Then disable these two settings:
+
+{% image src="lockdown-iphone/disable-spotlight-ios26.png" width=450 caption="Disable both of these" alt="locking down an iPhone: Keep your child from looking up images and other internet content" /%}
+
+After changing those settings, _Look Up_ will no longer display any results or images from
+the web.
+
+{% callout type="warning" title="" %}
+
+Sadly, there is no Screen Time setting to prevent this setting from being toggled back on.
+But we've found because it is so strangely labeled and unintuitive, most kids don't know
+where to toggle it, and so it's still fairly effective.
+
+To completely block these web results, you can install the
+[Gertrude Blocker app](/iphone-and-ipad), which will prevent Look Up web content from
+loading no matter what the settings are.
 
 {% /callout %}
-
-**Step 1.** Temporarily _allow_ the use of Siri by going to: Settings > Screen Time >
-Content & Privacy Restrictions > Allowed Apps. (We need Siri enabled to get to the
-settings shown below.)
-
-{% image src="lockdown-iphone/allowed-apps.png" caption="Go to 'Allowed Apps'" alt="five things you forgot locking down your kids iPhone: Screen Time -> Content & Privacy Restrictions > Allowed Apps" /%}
-
-Tap to **temporarily enable** Siri & Dictation.
-
-{% image src="lockdown-iphone/enable-siri-dictation.png" caption="Temporarily <b>enable</b> Siri" alt="five things you forgot locking down your kids iPhone: temporarily enable Siri to fix the other settings" /%}
-
-**Step 2.** Go back to the _main settings screen_, where you should now be able to see an
-option for **Siri & Search**
-
-{% image src="lockdown-iphone/siri-search-main.png" caption="Now you can go back to 'Settings > Siri & Search'" alt="five things you forgot locking down your kids iPhone: now you can find 'Siri & Search' under the main Settings screen" /%}
-
-Click to **disable "Show in Look Up"**:
-
-{% image src="lockdown-iphone/disable-show-in-lookup.png" caption="DISABLE 'Show in Look Up'" alt="five things you forgot locking down your kids iPhone: disable 'Show in Look Up' to prevent showing your child images and content from the internet" /%}
-
-**Step 3.** Finally, now that Siri can no longer provide results to "Look Up", you need to
-_reverse step 1_ by disabling Siri & Dictation. Go to Settings > Screen Time > Content &
-Privacy Restrictions, and disallow Siri & Dictation.
-
-{% image src="lockdown-iphone/disable-siri-dictation.png" caption="<b>Disable</b> Siri again (same location as step 1)" alt="five things you forgot locking down your kids iPhone: re-disable Siri in Screen Time after fixing the other settings" /%}
-
-{% /click-to-reveal %}

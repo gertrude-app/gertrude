@@ -61,7 +61,6 @@ export const Cards = {
       >
         <SuspensionRequestsPreviewCard
           suspensionRequests={suspensionRequests}
-          onRefresh={noop}
           viewAllHref="/requests/suspension"
           responseHrefForRequest={responseHrefForRequest}
         />
@@ -80,11 +79,6 @@ export const Cards = {
         title="Empty preview cards"
         contentClassName="grid grid-cols-1 gap-6 @3xl/main:grid-cols-3"
       >
-        <SuspensionRequestsPreviewCard
-          suspensionRequests={[]}
-          onRefresh={noop}
-          responseHrefForRequest={responseHrefForRequest}
-        />
         <SecurityEventsPreviewCard
           state={{ status: `success`, data: [] }}
           onRefresh={noop}

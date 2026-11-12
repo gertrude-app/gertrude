@@ -335,7 +335,15 @@ extension Computer {
         newestCompatibleOS: .catalina,
       )
     // Macbook Pro @link https://support.apple.com/en-us/HT201300
-    case "Mac17,7", "Mac17,9":
+    case "Mac18,1":
+      .init(
+        type: .macBookPro,
+        identifier: modelIdentifier,
+        chip: .m6,
+        manufactureDates: [2026],
+        screenSizeInInches: 14.0,
+      )
+    case "Mac17,7", "Mac17,9", "Mac17,11", "Mac17,13":
       .init(
         type: .macBookPro,
         identifier: modelIdentifier,
@@ -343,7 +351,7 @@ extension Computer {
         manufactureDates: [2026],
         screenSizeInInches: 14.0,
       )
-    case "Mac17,6", "Mac17,8":
+    case "Mac17,6", "Mac17,8", "Mac17,10", "Mac17,12":
       .init(
         type: .macBookPro,
         identifier: modelIdentifier,
@@ -612,6 +620,14 @@ extension Computer {
         newestCompatibleOS: .catalina,
       )
     // iMac @link https://support.apple.com/en-us/HT201634
+    case "Mac18,2":
+      .init(
+        type: .iMac,
+        identifier: modelIdentifier,
+        chip: .m6,
+        manufactureDates: [2026],
+        screenSizeInInches: 24.0,
+      )
     case "Mac16,3", "Mac16,2":
       .init(
         type: .iMac,

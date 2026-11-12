@@ -6,6 +6,7 @@ export namespace StartAccountCheckout {
     tier: SubscriptionTier;
     successPath: string;
     cancelPath: string;
+    associatedIosDeviceId?: UUID;
   }
 
   export interface Output {

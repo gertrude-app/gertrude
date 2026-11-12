@@ -358,4 +358,11 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
       }.toContain("active subscription already exists")
     }
   }
+
+  func testCheckoutReturnUrlAppendsSessionIdToExistingQuery() {
+    expect(checkoutReturnUrl("https://a.com", "/settings"))
+      .toEqual("https://a.com/settings?session_id={CHECKOUT_SESSION_ID}")
+    expect(checkoutReturnUrl("https://a.com", "/connect/x/123456?checkout=success"))
+      .toEqual("https://a.com/connect/x/123456?checkout=success&session_id={CHECKOUT_SESSION_ID}")
+  }
 }

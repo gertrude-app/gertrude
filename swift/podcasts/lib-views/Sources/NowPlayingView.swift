@@ -9,6 +9,7 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
   let episode: EpisodeData
   let show: ShowData
   let minimized: Bool
+  let sleepTimer: SleepTimer?
   let emit: @MainActor @Sendable (Event) -> Void
 
   public enum Event: Equatable {
@@ -19,17 +20,20 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
     case miniPlayerTapped
     case scrubbed(to: Double)
     case speedButtonTapped(Double)
+    case sleepTimerSelected(SleepTimerOption)
   }
 
   public init(
     episode: EpisodeData,
     show: ShowData,
     minimized: Bool = true,
+    sleepTimer: SleepTimer? = nil,
     emit: @MainActor @Sendable @escaping (Event) -> Void,
   ) {
     self.episode = episode
     self.minimized = minimized
     self.show = show
+    self.sleepTimer = sleepTimer
     self.emit = emit
   }
 
@@ -71,6 +75,59 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
               : Color(self.cs, light: .violet200, dark: .violet800),
           ),
         )
+    }
+  }
+
+  private var sleepTimerButton: some View {
+    HStack(spacing: 4) {
+      self.sleepTimerMenu
+      if case .endsAt(let endsAt) = self.sleepTimer {
+        Text(timerInterval: Date.now ... max(endsAt, .now), countsDown: true)
+          .font(.system(size: 13, weight: .semibold, design: .rounded))
+          .monospacedDigit()
+          .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+      }
+    }
+  }
+
+  private var sleepTimerMenu: some View {
+    Menu {
+      Section(lstr(.nowPlayingSleepTimerTitle)) {
+        ForEach(SleepTimerOption.allCases, id: \.self) { option in
+          Button { self.emit(.sleepTimerSelected(option)) } label: {
+            if self.sleepTimerSelected(option) {
+              Label(self.sleepTimerLabel(option), systemImage: "checkmark")
+            } else {
+              Text(self.sleepTimerLabel(option))
+            }
+          }
+        }
+      }
+    } label: {
+      Image(systemName: self.sleepTimer == nil ? "moon.zzz" : "moon.zzz.fill")
+        .font(.system(size: 18, weight: .medium))
+        .foregroundStyle(Color(self.cs, light: .violet500, dark: .violet400))
+        .frame(width: 24, height: 24)
+    }
+  }
+
+  private func sleepTimerSelected(_ option: SleepTimerOption) -> Bool {
+    switch (option, self.sleepTimer) {
+    case (.off, nil), (.endOfEpisode, .endOfEpisode):
+      true
+    default:
+      false
+    }
+  }
+
+  private func sleepTimerLabel(_ option: SleepTimerOption) -> String {
+    switch option {
+    case .off:
+      lstr(.nowPlayingSleepTimerOff)
+    case .minutes(let minutes):
+      String(format: lstr(.nowPlayingSleepTimerMinutes), minutes)
+    case .endOfEpisode:
+      lstr(.nowPlayingSleepTimerEndOfEpisode)
     }
   }
 
@@ -327,17 +384,41 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
         }
       }
       .padding(.top, 32)
-      .padding(.bottom, 12)
+      .padding(.bottom, 28)
 
       HStack {
         self.speedMenu
-        Spacer()
+          .frame(maxWidth: .infinity, alignment: .leading)
+        self.sleepTimerButton
         self.airplayPicker
           .frame(width: 24, height: 24)
+          .frame(maxWidth: .infinity, alignment: .trailing)
       }
       .padding(.horizontal, 40)
       .padding(.bottom, 12)
     }
+  }
+
+  public enum SleepTimer: Equatable, Sendable {
+    case endsAt(Date)
+    case endOfEpisode
+  }
+
+  public enum SleepTimerOption: Hashable, Sendable, CaseIterable {
+    case off
+    case minutes(Int)
+    case endOfEpisode
+
+    public static let allCases: [SleepTimerOption] = [
+      .off,
+      .minutes(1),
+      .minutes(5),
+      .minutes(15),
+      .minutes(30),
+      .minutes(45),
+      .minutes(60),
+      .endOfEpisode,
+    ]
   }
 
   private func speedLabel(_ rate: Double) -> String {
@@ -388,6 +469,29 @@ public struct NowPlayingView: View, EpisodeArtworkProvider {
       playbackRate: 1.4,
     ),
     minimized: false,
+    emit: { _ in },
+  )
+}
+
+#Preview("Expanded Player - Sleep Timer") {
+  NowPlayingView(
+    episode: episode {
+      $0.title = "Understanding SwiftUI State Management"
+      $0.description = "Deep dive into @State, @Binding, and @ObservableObject"
+      $0.durationSeconds = 2700
+      $0.progress = 760
+      $0.isPlaying = true
+    },
+    show: ShowData(
+      id: 1,
+      name: "Swift Talk",
+      author: "objc.io",
+      description: "Weekly Swift discussions",
+      showArtwork: true,
+      artworkUrl: nil,
+    ),
+    minimized: false,
+    sleepTimer: .endsAt(.now + 25 * 60),
     emit: { _ in },
   )
 }

@@ -15,6 +15,7 @@ export function toPersonCardPerson(person: GetPeople.Output[number]): PersonCard
             id: device.id,
             personId: person.id,
             type: `mac`,
+            username: device.username,
             name: device.name,
             macOSVersion: device.macOSVersion,
             modelName: device.modelName,

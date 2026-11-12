@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppWelcomeRouteImport } from './routes/_app/welcome'
 import { Route as AppSignoutRouteImport } from './routes/_app/signout'
 import { Route as AppSecurityEventsRouteImport } from './routes/_app/security-events'
+import { Route as AppHowDidYouHearRouteImport } from './routes/_app/how-did-you-hear'
 import { Route as unauthedSignupRouteImport } from './routes/(unauthed)/signup'
 import { Route as unauthedLoginRouteImport } from './routes/(unauthed)/login'
+import { Route as unauthedLinkExpiredRouteImport } from './routes/(unauthed)/link-expired'
 import { Route as AppSettingsRouteRouteImport } from './routes/_app/settings/route'
 import { Route as AppPeopleRouteRouteImport } from './routes/_app/people/route'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
@@ -59,6 +62,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppWelcomeRoute = AppWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppSignoutRoute = AppSignoutRouteImport.update({
   id: '/signout',
   path: '/signout',
@@ -69,6 +77,11 @@ const AppSecurityEventsRoute = AppSecurityEventsRouteImport.update({
   path: '/security-events',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppHowDidYouHearRoute = AppHowDidYouHearRouteImport.update({
+  id: '/how-did-you-hear',
+  path: '/how-did-you-hear',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const unauthedSignupRoute = unauthedSignupRouteImport.update({
   id: '/(unauthed)/signup',
   path: '/signup',
@@ -77,6 +90,11 @@ const unauthedSignupRoute = unauthedSignupRouteImport.update({
 const unauthedLoginRoute = unauthedLoginRouteImport.update({
   id: '/(unauthed)/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const unauthedLinkExpiredRoute = unauthedLinkExpiredRouteImport.update({
+  id: '/(unauthed)/link-expired',
+  path: '/link-expired',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppSettingsRouteRoute = AppSettingsRouteRouteImport.update({
@@ -267,10 +285,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/people': typeof AppPeopleRouteRouteWithChildren
   '/settings': typeof AppSettingsRouteRouteWithChildren
+  '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
+  '/welcome': typeof AppWelcomeRoute
   '/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
   '/otp/$token': typeof unauthedOtpTokenRoute
@@ -305,10 +326,13 @@ export interface FileRoutesByFullPath {
   '/activity/person/$personId/day/$day': typeof AppActivityPersonPersonIdDayDayRoute
 }
 export interface FileRoutesByTo {
+  '/link-expired': typeof unauthedLinkExpiredRoute
   '/login': typeof unauthedLoginRoute
   '/signup': typeof unauthedSignupRoute
+  '/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/security-events': typeof AppSecurityEventsRoute
   '/signout': typeof AppSignoutRoute
+  '/welcome': typeof AppWelcomeRoute
   '/': typeof AppIndexRoute
   '/otp/$token': typeof unauthedOtpTokenRoute
   '/reset-password/$token': typeof unauthedResetPasswordTokenRoute
@@ -345,10 +369,13 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_app/people': typeof AppPeopleRouteRouteWithChildren
   '/_app/settings': typeof AppSettingsRouteRouteWithChildren
+  '/(unauthed)/link-expired': typeof unauthedLinkExpiredRoute
   '/(unauthed)/login': typeof unauthedLoginRoute
   '/(unauthed)/signup': typeof unauthedSignupRoute
+  '/_app/how-did-you-hear': typeof AppHowDidYouHearRoute
   '/_app/security-events': typeof AppSecurityEventsRoute
   '/_app/signout': typeof AppSignoutRoute
+  '/_app/welcome': typeof AppWelcomeRoute
   '/_app/': typeof AppIndexRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRouteRouteWithChildren
   '/_app/settings/billing': typeof AppSettingsBillingRouteRouteWithChildren
@@ -389,10 +416,13 @@ export interface FileRouteTypes {
     | '/'
     | '/people'
     | '/settings'
+    | '/link-expired'
     | '/login'
     | '/signup'
+    | '/how-did-you-hear'
     | '/security-events'
     | '/signout'
+    | '/welcome'
     | '/people/$personId'
     | '/settings/billing'
     | '/otp/$token'
@@ -427,10 +457,13 @@ export interface FileRouteTypes {
     | '/activity/person/$personId/day/$day'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/link-expired'
     | '/login'
     | '/signup'
+    | '/how-did-you-hear'
     | '/security-events'
     | '/signout'
+    | '/welcome'
     | '/'
     | '/otp/$token'
     | '/reset-password/$token'
@@ -466,10 +499,13 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/people'
     | '/_app/settings'
+    | '/(unauthed)/link-expired'
     | '/(unauthed)/login'
     | '/(unauthed)/signup'
+    | '/_app/how-did-you-hear'
     | '/_app/security-events'
     | '/_app/signout'
+    | '/_app/welcome'
     | '/_app/'
     | '/_app/people/$personId'
     | '/_app/settings/billing'
@@ -507,6 +543,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  unauthedLinkExpiredRoute: typeof unauthedLinkExpiredRoute
   unauthedLoginRoute: typeof unauthedLoginRoute
   unauthedSignupRoute: typeof unauthedSignupRoute
   unauthedOtpTokenRoute: typeof unauthedOtpTokenRoute
@@ -531,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/welcome': {
+      id: '/_app/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof AppWelcomeRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/_app/signout': {
       id: '/_app/signout'
       path: '/signout'
@@ -545,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSecurityEventsRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/_app/how-did-you-hear': {
+      id: '/_app/how-did-you-hear'
+      path: '/how-did-you-hear'
+      fullPath: '/how-did-you-hear'
+      preLoaderRoute: typeof AppHowDidYouHearRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/(unauthed)/signup': {
       id: '/(unauthed)/signup'
       path: '/signup'
@@ -557,6 +608,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof unauthedLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(unauthed)/link-expired': {
+      id: '/(unauthed)/link-expired'
+      path: '/link-expired'
+      fullPath: '/link-expired'
+      preLoaderRoute: typeof unauthedLinkExpiredRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/settings': {
@@ -899,8 +957,10 @@ const AppRequestsUnlockRouteWithChildren =
 interface AppRouteRouteChildren {
   AppPeopleRouteRoute: typeof AppPeopleRouteRouteWithChildren
   AppSettingsRouteRoute: typeof AppSettingsRouteRouteWithChildren
+  AppHowDidYouHearRoute: typeof AppHowDidYouHearRoute
   AppSecurityEventsRoute: typeof AppSecurityEventsRoute
   AppSignoutRoute: typeof AppSignoutRoute
+  AppWelcomeRoute: typeof AppWelcomeRoute
   AppIndexRoute: typeof AppIndexRoute
   AppDevicesDeviceIdRoute: typeof AppDevicesDeviceIdRoute
   AppKeychainsKeychainIdRoute: typeof AppKeychainsKeychainIdRoute
@@ -920,8 +980,10 @@ interface AppRouteRouteChildren {
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppPeopleRouteRoute: AppPeopleRouteRouteWithChildren,
   AppSettingsRouteRoute: AppSettingsRouteRouteWithChildren,
+  AppHowDidYouHearRoute: AppHowDidYouHearRoute,
   AppSecurityEventsRoute: AppSecurityEventsRoute,
   AppSignoutRoute: AppSignoutRoute,
+  AppWelcomeRoute: AppWelcomeRoute,
   AppIndexRoute: AppIndexRoute,
   AppDevicesDeviceIdRoute: AppDevicesDeviceIdRoute,
   AppKeychainsKeychainIdRoute: AppKeychainsKeychainIdRoute,
@@ -945,6 +1007,7 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
+  unauthedLinkExpiredRoute: unauthedLinkExpiredRoute,
   unauthedLoginRoute: unauthedLoginRoute,
   unauthedSignupRoute: unauthedSignupRoute,
   unauthedOtpTokenRoute: unauthedOtpTokenRoute,

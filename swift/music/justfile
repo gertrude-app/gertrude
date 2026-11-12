@@ -80,7 +80,7 @@ check:
 fix:
   @swiftformat --exclude '**/.build' .
   @xml-lint --fix app/Info.plist app/Info.Debug.plist
-  @prettier --write '**/*.json' '!**/.build/**'
+  @prettier --write '**/*.json' '!**/.build/**' '!**/*.icon/**'
 
 clean:
   @rm -rf lib-views/.build lib-tca/.build

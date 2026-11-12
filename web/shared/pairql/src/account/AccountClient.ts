@@ -222,6 +222,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.DeletePerson.Output>(input, `DeletePerson`, `parent`);
   };
 
+  public disconnectMacConnection = (
+    input: P.DisconnectMacConnection.Input,
+  ): Promise<Result<P.DisconnectMacConnection.Output>> => {
+    return this.query<P.DisconnectMacConnection.Output>(
+      input,
+      `DisconnectMacConnection`,
+      `parent`,
+    );
+  };
+
   public dismissAccountAnnouncement = (
     input: P.DismissAccountAnnouncement.Input,
   ): Promise<Result<P.DismissAccountAnnouncement.Output>> => {
@@ -278,6 +288,12 @@ export default class AccountClient extends Client<Auth> {
     input: P.GetAccountSettings.Input,
   ): Promise<Result<P.GetAccountSettings.Output>> => {
     return this.query<P.GetAccountSettings.Output>(input, `GetAccountSettings`, `parent`);
+  };
+
+  public getAccountSetup = (
+    input: P.GetAccountSetup.Input,
+  ): Promise<Result<P.GetAccountSetup.Output>> => {
+    return this.query<P.GetAccountSetup.Output>(input, `GetAccountSetup`, `parent`);
   };
 
   public getAccountUnlockRequestSummary = (
@@ -500,6 +516,16 @@ export default class AccountClient extends Client<Auth> {
     );
   };
 
+  public saveAccountReferralSource = (
+    input: P.SaveAccountReferralSource.Input,
+  ): Promise<Result<P.SaveAccountReferralSource.Output>> => {
+    return this.query<P.SaveAccountReferralSource.Output>(
+      input,
+      `SaveAccountReferralSource`,
+      `parent`,
+    );
+  };
+
   public saveExtendedSupervisionControls = (
     input: P.SaveExtendedSupervisionControls.Input,
   ): Promise<Result<P.SaveExtendedSupervisionControls.Output>> => {
@@ -546,6 +572,16 @@ export default class AccountClient extends Client<Auth> {
     return this.query<P.SetAccountKeychainAssignment.Output>(
       input,
       `SetAccountKeychainAssignment`,
+      `parent`,
+    );
+  };
+
+  public setAccountSetupApps = (
+    input: P.SetAccountSetupApps.Input,
+  ): Promise<Result<P.SetAccountSetupApps.Output>> => {
+    return this.query<P.SetAccountSetupApps.Output>(
+      input,
+      `SetAccountSetupApps`,
       `parent`,
     );
   };

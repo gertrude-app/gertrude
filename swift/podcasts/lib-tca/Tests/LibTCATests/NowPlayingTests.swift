@@ -723,6 +723,186 @@ import Testing
       #expect(playInvocations.value.isEmpty)
     }
   }
+
+  @Test func `sleep timer pauses playback and saves position when it fires`() async throws {
+    let clock = TestClock()
+    let pauseInvocations = LockIsolated(0)
+    await withDependencies {
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+      $0.audio.pause = { pauseInvocations.withValue { $0 += 1 } }
+      $0.audio.getPlayingPosition = { 100 }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      await store.send(.view(.sleepTimerSelected(.minutes(15)))) {
+        $0.sleepTimer = .endsAt(.reference + 15 * 60)
+      }
+
+      await clock.advance(by: .seconds(15 * 60 - 1))
+      #expect(dep(\.db).nowPlaying().isPlaying(episodeId: 3) == true)
+
+      await clock.advance(by: .seconds(1))
+      await store.receive(.sleepTimerFired) {
+        $0.sleepTimer = nil
+      }
+      await store.finish()
+
+      let nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.isPlaying == false)
+      #expect(nowPlaying?.bufferedProgress == 100)
+      #expect(pauseInvocations.value == 1)
+    }
+  }
+
+  @Test func `sleep timer off cancels pending timer`() async throws {
+    let clock = TestClock()
+    await withDependencies {
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase {
+        try fixtures($0)
+        try NowPlayingModel.insert {
+          NowPlayingModel(episodeId: 3, isPlaying: true)
+        }.execute($0)
+      }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      await store.send(.view(.sleepTimerSelected(.minutes(5)))) {
+        $0.sleepTimer = .endsAt(.reference + 5 * 60)
+      }
+      await store.send(.view(.sleepTimerSelected(.off))) {
+        $0.sleepTimer = nil
+      }
+
+      await clock.advance(by: .seconds(60 * 60)) // <- exhaustive store fails if timer fires
+      #expect(dep(\.db).nowPlaying().isPlaying(episodeId: 3) == true)
+    }
+  }
+
+  @Test func `sleep timer end of episode queues next episode paused`() async throws {
+    let pauseInvocations = LockIsolated(0)
+    let resetInvocations = LockIsolated(0)
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase(beforeTriggersHook: endOfEpisodeFixtures)
+      $0.audio.play = { _, _ in fatalError() } // <- next episode must not auto-play
+      $0.audio.pause = { pauseInvocations.withValue { $0 += 1 } }
+      $0.audio.reset = { resetInvocations.withValue { $0 += 1 } }
+      $0.fileSystem.fileExists = { _ in true }
+    } operation: {
+      var state = NowPlayingFeature.State()
+      state.sleepTimer = .endOfEpisode
+      let store = TestStore(initialState: state, reducer: NowPlayingFeature.init)
+
+      await store.send(.system(.completed)) {
+        $0.sleepTimer = nil
+      }
+      await store.finish()
+
+      let nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 6)
+      #expect(nowPlaying?.isPlaying == false)
+      #expect(pauseInvocations.value == 1)
+      #expect(resetInvocations.value == 1) // <- unloads finished episode from player
+    }
+  }
+
+  @Test func `resuming after end of episode sleep keeps next episode progress`() async throws {
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    let playerLoaded = LockIsolated(true)
+    await withDependencies {
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase(beforeTriggersHook: endOfEpisodeFixtures)
+      $0.audio.play = { ep, _ in playInvocations.withValue { $0.append(ep.id) } }
+      $0.audio.pause = {}
+      $0.audio.reset = { playerLoaded.setValue(false) }
+      $0.audio.getPlayingPosition = {
+        playerLoaded.value ? 3600 : nil // <- finished episode's end position while loaded
+      }
+      $0.fileSystem.fileExists = { _ in true }
+      $0.fileSystem.fileSize = { _ in 1 }
+      $0.haptics.impact = { _ in }
+    } operation: {
+      var state = NowPlayingFeature.State()
+      state.sleepTimer = .endOfEpisode
+      let store = TestStore(initialState: state, reducer: NowPlayingFeature.init)
+
+      await store.send(.system(.completed)) {
+        $0.sleepTimer = nil
+      }
+      await store.send(.view(.playPauseTapped))
+      await store.finish()
+
+      let nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying.isPlaying(episodeId: 6) == true)
+      #expect(playInvocations.value == [.init(6)])
+      let (episode, _) = dep(\.db).episodeWithShow(6)!
+      #expect(episode.progress == 0) // <- not clobbered with previous episode's position
+    }
+  }
+}
+
+extension NowPlayingTests {
+  @Test func `sleep timer firing during auto-advance delay prevents next episode`() async throws {
+    let clock = TestClock()
+    let playInvocations = LockIsolated<[Episode.ID]>([])
+    await withDependencies {
+      $0.continuousClock = clock
+      $0.date = .constant(.reference)
+      $0.defaultDatabase = try! appDatabase(beforeTriggersHook: endOfEpisodeFixtures)
+      $0.audio.play = { ep, _ in playInvocations.withValue { $0.append(ep.id) } }
+      $0.audio.pause = {}
+      $0.fileSystem.fileExists = { _ in true }
+      $0.fileSystem.fileSize = { _ in 1 }
+    } operation: {
+      let store = TestStore(initialState: .init(), reducer: NowPlayingFeature.init)
+
+      await store.send(.view(.sleepTimerSelected(.minutes(5)))) {
+        $0.sleepTimer = .endsAt(.reference + 5 * 60)
+      }
+      await clock.advance(by: .seconds(5 * 60 - 1))
+
+      await store.send(.system(.completed)) // <- starts 3s auto-advance delay
+      await clock.advance(by: .seconds(1))
+      await store.receive(.sleepTimerFired) {
+        $0.sleepTimer = nil
+      }
+
+      await clock.advance(by: .seconds(5)) // <- well past the auto-advance delay
+      await store.finish()
+
+      let nowPlaying = dep(\.db).nowPlaying()
+      #expect(nowPlaying?.episode.id == 3)
+      #expect(nowPlaying?.isPlaying == false)
+      #expect(playInvocations.value.isEmpty)
+    }
+  }
+}
+
+func endOfEpisodeFixtures(_ db: Database) throws {
+  try Show.insert { .mock(1) }.execute(db)
+  try Episode.insert { [
+    .mock(3, showId: 1) {
+      $0.pubDate = .reference
+      $0.downloadedAt = .reference
+    },
+    .mock(6, showId: 1) {
+      $0.pubDate = .reference + .days(1)
+      $0.downloadedAt = .reference
+      $0.progress = 0
+    },
+  ] }.execute(db)
+  try NowPlayingModel.insert {
+    NowPlayingModel(episodeId: 3, isPlaying: true)
+  }.execute(db)
 }
 
 func fixtures(_ db: Database) throws {

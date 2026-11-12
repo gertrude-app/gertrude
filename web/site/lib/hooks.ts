@@ -34,6 +34,7 @@ export function useWindowDimensions(): { width: number; height: number } {
   return { width, height };
 }
 
+// dup-ok: site does not depend on @shared/ts-utils; not worth a new dependency for this helper
 function debounce(fn: () => unknown, ms: number): () => void {
   let timer: ReturnType<typeof setTimeout> | undefined = undefined;
   return () => {
@@ -107,17 +108,18 @@ export function useScrollY(): number {
 export function useIntersectionVisibility(
   ref: React.RefObject<HTMLElement | null>,
   threshold = 0.5,
+  rootMargin?: string,
 ): boolean {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) {
-          setIsVisible(true);
-        }
+        if (!entry?.isIntersecting) return;
+        setIsVisible(true);
+        observer.disconnect();
       },
-      { threshold },
+      { threshold, rootMargin },
     );
 
     if (ref.current) {
@@ -125,45 +127,7 @@ export function useIntersectionVisibility(
     }
 
     return () => observer.disconnect();
-  }, [ref, threshold]);
-
-  return isVisible;
-}
-
-export function useScrollProgress(
-  wrapperRef: React.RefObject<HTMLElement | null>,
-): number {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const handleScroll = (): void => {
-      if (!wrapperRef.current) return;
-      const rect = wrapperRef.current.getBoundingClientRect();
-      const wrapperHeight = wrapperRef.current.offsetHeight;
-      const viewportHeight = window.innerHeight;
-      const scrollableDistance = wrapperHeight - viewportHeight;
-      const scrolled = -rect.top;
-      const newProgress = Math.max(0, Math.min(1, scrolled / scrollableDistance));
-      setProgress(newProgress);
-    };
-
-    window.addEventListener(`scroll`, handleScroll);
-    return () => window.removeEventListener(`scroll`, handleScroll);
-  }, [wrapperRef]);
-
-  return progress;
-}
-
-export function useDelayedVisibility(delay: number): boolean {
-  const [isVisible, setIsVisible] = useState(delay === 0);
-
-  useEffect(() => {
-    if (delay > 0) {
-      const timer = setTimeout(() => setIsVisible(true), delay);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [delay]);
+  }, [ref, threshold, rootMargin]);
 
   return isVisible;
 }

@@ -1,5 +1,9 @@
 // auto-generated, do not edit
-import type { MusicSubscriptionState, PersonRelationship } from '../shared';
+import type {
+  MusicSubscriptionState,
+  PersonRelationship,
+  SubscriptionPanelAction,
+} from '../shared';
 
 export namespace ClaimAccountIOSDevice {
   export interface Input {
@@ -65,6 +69,7 @@ export namespace ClaimAccountIOSDevice {
       musicSubscription?: MusicSubscriptionState;
       supervisionStatus?: 'pendingClaim' | 'claimed' | 'supervised' | 'complete';
       requiresPayment: boolean;
+      paymentAction?: SubscriptionPanelAction;
     };
   }
 }

@@ -104,9 +104,16 @@ struct AppReducer: Reducer, Sendable {
       switch action {
       case .loadedPersistentState(.none):
         state.onboarding.windowOpen = true
-        return .exec { [new = state.persistent] _ in
-          try await self.storage.savePersistentState(new)
-        }
+        return .merge(
+          .exec { send in await send(.onboarding(.discoverApps)) },
+          .exec { [new = state.persistent] _ in
+            try await self.storage.savePersistentState(new)
+          },
+        )
+
+      case .onboarding(.resume(let resume)):
+        guard resume != .checkingFullDiskAccessPermission(upgrade: true) else { return .none }
+        return .exec { send in await send(.onboarding(.discoverApps)) }
 
       case .loadedPersistentState(.some(let persisted)):
         state.appUpdates.releaseChannel = persisted.appUpdateReleaseChannel

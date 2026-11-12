@@ -7,6 +7,7 @@ struct StartAccountCheckout: Pair {
     let tier: StripeSubscription.Tier
     let successPath: String
     let cancelPath: String
+    var associatedIosDeviceId: IOSDevice.Id?
   }
 
   typealias Output = StartCheckoutSession.Output
@@ -22,7 +23,7 @@ extension StartAccountCheckout: Resolver {
         tier: input.tier,
         successPath: input.successPath,
         cancelPath: input.cancelPath,
-        associatedIosDeviceId: nil,
+        associatedIosDeviceId: input.associatedIosDeviceId,
       ),
       in: context.legacyContext,
     )

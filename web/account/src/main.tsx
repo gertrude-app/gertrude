@@ -1,4 +1,5 @@
 import './styles.css';
+import { Toaster } from '@gertrude/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 import React from 'react';
@@ -30,6 +31,7 @@ if (rootElement && !rootElement.innerHTML) {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <Toaster />
       </QueryClientProvider>
     </React.StrictMode>,
   );

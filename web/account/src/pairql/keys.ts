@@ -5,6 +5,7 @@ import type {
   GetAccountKeychain,
   GetAccountKeychains,
   GetAccountSettings,
+  GetAccountSetup,
   GetAccountUnlockRequestSummary,
   GetActivitySummaries,
   GetDayActivity,
@@ -38,6 +39,10 @@ export class Key extends QueryKey<never> {
 
   static get people(): QueryKey<GetPeople.Output> {
     return new QueryKey([`people`]);
+  }
+
+  static get accountSetup(): QueryKey<GetAccountSetup.Output> {
+    return new QueryKey([`setup`]);
   }
 
   static get devices(): QueryKey<GetDevices.Output> {

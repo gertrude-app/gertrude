@@ -161,6 +161,7 @@ const SignupPage: React.FC<Props> = ({
           )
         }
         bottomLink={{ text: `Log in instead`, href: loginHref }}
+        sideWordmark
         bottomLinkExplanation="Already have an account?"
       />
     }

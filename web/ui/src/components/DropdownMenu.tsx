@@ -166,10 +166,10 @@ const DropdownMenu: React.FC<Props> = ({
         <Menu.Trigger disabled={disabled}>{trigger}</Menu.Trigger>
       )}
       <Menu.Portal container={overlayPortalContainer ?? undefined}>
-        <Menu.Positioner sideOffset={4} align="center" className="z-[60]">
+        <Menu.Positioner sideOffset={4} align="start" className="z-[60]">
           <Menu.Popup
             className={cx(
-              `z-[60] mx-1 flex flex-col gap-1 rounded-xl border border-stone-200 bg-white p-1 shadow-md shadow-stone-300/50 outline-none select-none`,
+              `z-[60] flex flex-col gap-1 rounded-xl border border-stone-200 bg-white p-1 shadow-md shadow-stone-300/50 outline-none select-none`,
               contentClassName,
             )}
           >

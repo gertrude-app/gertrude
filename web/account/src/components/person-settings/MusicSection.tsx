@@ -10,6 +10,7 @@ import type { PersonSettingsPreviewChip } from './PersonSettingsExpandableSectio
 import PersonSettingsExpandableSection from './PersonSettingsExpandableSection';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
 import { deviceSubtitle, deviceTitle } from '#/components/utils';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 interface Props {
   connections: MusicDeviceConnection[];
@@ -65,8 +66,8 @@ const MusicSection: React.FC<Props> = ({ connections, children, defaultExpanded 
 
   return (
     <PersonSettingsExpandableSection
-      appIconUrl="/gertrude-app-icons/music.webp"
-      title="Gertrude Music"
+      appIconUrl={gertrudeApps.music.icon}
+      title={gertrudeApps.music.name}
       headingLevel="h3"
       defaultExpanded={defaultExpanded}
       previewChips={previewChips}

@@ -1,3 +1,4 @@
+import DuetSQL
 import PairQL
 import Vapor
 
@@ -17,6 +18,17 @@ extension LogEvent: Resolver {
     if isTestAddress(context.parent.email.rawValue) {
       return .success
     }
+
+    if input.eventId == referralSurveyEventId {
+      try await recordReferralSurveyAnswer(
+        input.detail,
+        parent: context.parent,
+        context: "dash",
+        in: context.db,
+      )
+      return .success
+    }
+
     try await context.db.create(InterestingEvent(
       eventId: input.eventId,
       kind: "event",
@@ -25,19 +37,34 @@ extension LogEvent: Resolver {
       parentId: context.parent.id,
       detail: input.detail,
     ))
-
-    let slack = get(dependency: \.slack)
-    if input.eventId == "e7b3a1c9" {
-      await slack.internal(.signups, """
-        *How did you hear about us?*
-        parent: `\(context.parent.email)`
-        \(input.detail)
-      """)
-    } else {
-      let msg = "Dash interesting event: \(input.eventId)  \(input.detail)"
-      await slack.internal(.info, msg)
-    }
+    let msg = "Dash interesting event: \(input.eventId)  \(input.detail)"
+    await get(dependency: \.slack).internal(.info, msg)
 
     return .success
   }
+}
+
+// helpers
+
+let referralSurveyEventId = "e7b3a1c9"
+
+func recordReferralSurveyAnswer(
+  _ detail: String,
+  parent: Parent,
+  context eventContext: String,
+  in db: any DuetSQL.Client,
+) async throws {
+  try await db.create(InterestingEvent(
+    eventId: referralSurveyEventId,
+    kind: "event",
+    context: eventContext,
+    computerUserId: nil,
+    parentId: parent.id,
+    detail: detail,
+  ))
+  await get(dependency: \.slack).internal(.signups, """
+    *How did you hear about us?*
+    parent: `\(parent.email)`
+    \(detail)
+  """)
 }

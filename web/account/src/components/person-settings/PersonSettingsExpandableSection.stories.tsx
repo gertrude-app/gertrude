@@ -102,6 +102,7 @@ export const States = {
         <PersonSettingsExpandableSection
           title="Safari"
           appIconUrl="/gertrude-blocker-app-icon.webp"
+          appIconOutlined
           previewChips={
             [
               {
@@ -129,6 +130,7 @@ export const States = {
         <PersonSettingsExpandableSection
           title="Minecraft"
           appIconUrl="/gertrude-blocker-app-icon.webp"
+          appIconOutlined
           previewChips={manyPreviewChips}
         >
           <p className="text-sm text-stone-600">Lots of app preview chips go here.</p>

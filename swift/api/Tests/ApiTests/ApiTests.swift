@@ -166,6 +166,19 @@ final class ApiTests: ApiTestCase, @unchecked Sendable {
     )
   }
 
+  func testShortUrlRedirectNotFoundGoesToAccountLinkExpired() async throws {
+    try await app.test(
+      .GET,
+      "short-url/nope\(Int.random(in: 1000 ... 9999))",
+      afterResponse: { (res: XCTHTTPResponse) async throws in
+        expect(res.status).toEqual(.temporaryRedirect)
+        let location = res.headers.first(name: .location)!
+        expect(location)
+          .toEqual("\(self.env.accountDashboardUrl.withoutTrailingSlashes)/link-expired")
+      },
+    )
+  }
+
   func testChildContextCreated() async throws {
     let child = try await self.childWithComputer()
 

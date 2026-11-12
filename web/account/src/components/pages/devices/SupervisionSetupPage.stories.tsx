@@ -33,7 +33,20 @@ export default meta;
 export const SubscriptionRequired = {
   name: 'Subscription required',
   parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => renderPage({ ...shared, stage: `plan` }),
+  render: () =>
+    renderPage({ ...shared, stage: `plan`, actionLabel: `Subscribe to Light` }),
+};
+
+export const SubscriptionCheckoutCanceled = {
+  name: 'Subscription checkout canceled',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () =>
+    renderPage({
+      ...shared,
+      stage: `plan`,
+      actionLabel: `Subscribe to Light`,
+      checkoutCanceled: true,
+    }),
 };
 
 export const ComputerRequired = {

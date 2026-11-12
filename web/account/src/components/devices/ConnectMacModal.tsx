@@ -1,16 +1,11 @@
-import { Banner, Button, HStack, Modal, Text, VStack } from '@gertrude/ui';
-import {
-  CheckIcon,
-  CopyIcon,
-  DownloadIcon,
-  ExternalLinkIcon,
-  LinkIcon,
-  type LucideIcon,
-} from 'lucide-react';
+import { Banner, Button, Modal, RadioList, Text, VStack } from '@gertrude/ui';
+import { DownloadIcon, LinkIcon } from 'lucide-react';
 import React from 'react';
+import InstructionStep from './InstructionStep';
 import PromoCard from '#/components/PromoCard';
 
 export type ConnectMacState =
+  | { case: `choosePerson`; people: { id: string; name: string }[] }
   | { case: `instructions`; requesting?: boolean }
   | { case: `error`; message: string }
   | { case: `trialRequired`; startingTrial?: boolean }
@@ -23,6 +18,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   personName: string;
   state: ConnectMacState;
+  onChoosePerson?: (personId: string) => void;
   onRequestCode: () => void;
   onStartTrial: () => void;
 };
@@ -32,10 +28,11 @@ const ConnectMacModal: React.FC<Props> = ({
   onOpenChange,
   personName,
   state,
+  onChoosePerson,
   onRequestCode,
   onStartTrial,
 }) => {
-  const [copied, setCopied] = React.useState(false);
+  const [chosenPersonId, setChosenPersonId] = React.useState<string>();
   const busy =
     (state.case === `instructions` && state.requesting === true) ||
     (state.case === `trialRequired` && state.startingTrial === true);
@@ -43,17 +40,8 @@ const ConnectMacModal: React.FC<Props> = ({
     state.case === `trialRequired` || state.case === `planUpgradeRequired`;
 
   React.useEffect(() => {
-    setCopied(false);
+    setChosenPersonId(undefined);
   }, [open, state.case]);
-
-  const handleCopy = async (code: string): Promise<void> => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  };
 
   let title = `Connect a Mac for ${personName}`;
   let description = `Install Gertrude on the Mac, then connect it with a one-time code.`;
@@ -61,6 +49,36 @@ const ConnectMacModal: React.FC<Props> = ({
   let footer: React.ReactNode;
 
   switch (state.case) {
+    case `choosePerson`:
+      title = `Connect a Mac`;
+      description = `Who will use this Mac?`;
+      body = (
+        <RadioList
+          ariaLabel="Who will use this Mac?"
+          options={state.people.map((person) => ({
+            value: person.id,
+            label: person.name,
+          }))}
+          selected={chosenPersonId}
+          onSelect={setChosenPersonId}
+        />
+      );
+      footer = (
+        <>
+          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            disabled={chosenPersonId === undefined}
+            onClick={() => chosenPersonId && onChoosePerson?.(chosenPersonId)}
+          >
+            Continue
+          </Button>
+        </>
+      );
+      break;
     case `instructions`:
       body = <ConnectionInstructions personName={personName} />;
       footer = (
@@ -180,17 +198,6 @@ const ConnectMacModal: React.FC<Props> = ({
               </React.Fragment>
             ))}
           </div>
-          <HStack justify="center">
-            <Button
-              type="button"
-              variant="default"
-              size="small"
-              icon={copied ? CheckIcon : CopyIcon}
-              onClick={() => void handleCopy(code)}
-            >
-              {copied ? `Copied` : `Copy code`}
-            </Button>
-          </HStack>
           <Text variant="bodyMuted" className="text-center">
             This code works once and expires in two days.
           </Text>
@@ -231,43 +238,14 @@ export function formatConnectionCode(code: number): string {
 const ConnectionInstructions: React.FC<{ personName: string }> = ({ personName }) => (
   <VStack gap={3}>
     <InstructionStep icon={DownloadIcon} title="Install Gertrude">
-      On {personName}&rsquo;s Mac, download and open the Gertrude app.
-      <div className="mt-3">
-        <Button
-          type="link"
-          href="https://gertrude.app/download"
-          target="_blank"
-          rel="noreferrer"
-          size="small"
-          icon={ExternalLinkIcon}
-          iconPosition="right"
-        >
-          Download Gertrude
-        </Button>
-      </div>
+      On {personName}&rsquo;s Mac, go to{` `}
+      <span className="font-medium text-stone-900">gertrude.app/download</span>, then
+      download and open the Gertrude app.
     </InstructionStep>
     <InstructionStep icon={LinkIcon} title="Get a connection code">
       When the welcome screen asks for a code, return here and get one below.
     </InstructionStep>
   </VStack>
-);
-
-const InstructionStep: React.FC<{
-  icon: LucideIcon;
-  title: string;
-  children: React.ReactNode;
-}> = ({ icon: Icon, title, children }) => (
-  <div className="rounded-xl border border-stone-200 bg-stone-50/70 p-3.5">
-    <HStack align="start" gap={3}>
-      <Icon className="mt-1 h-5 w-5 shrink-0 text-stone-600" />
-      <VStack gap={1} className="min-w-0">
-        <Text variant="bodyStrong">{title}</Text>
-        <Text as="div" variant="proseSubtle">
-          {children}
-        </Text>
-      </VStack>
-    </HStack>
-  </div>
 );
 
 const TrialRequiredContent: React.FC = () => (

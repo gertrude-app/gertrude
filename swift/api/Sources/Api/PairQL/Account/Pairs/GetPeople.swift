@@ -27,6 +27,7 @@ struct GetPeople: Pair {
 
   struct MacDevice: PairNestable {
     let id: ComputerUser.Id
+    let username: String
     let name: String?
     let macOSVersion: String?
     let modelName: String
@@ -110,6 +111,7 @@ extension GetPeople: NoInputResolver {
         computerUser.childId,
         .mac(.init(
           id: computerUser.id,
+          username: computerUser.username,
           name: computer.customName,
           macOSVersion: computer.osVersion?.description,
           modelName: computer.model.shortDescription,

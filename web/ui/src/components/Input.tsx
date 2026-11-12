@@ -26,6 +26,7 @@ type Props = {
   name?: string;
   required?: boolean;
   autoComplete?: string;
+  autoFocus?: boolean;
   min?: number;
   max?: number;
   step?: number;
@@ -109,6 +110,7 @@ const Input: React.FC<Props> = ({ ...props }) => {
           disabled={props.disabled}
           required={props.required}
           autoComplete={props.autoComplete}
+          autoFocus={props.autoFocus}
           aria-label={props.ariaLabel}
           aria-invalid={props.error ? true : undefined}
           aria-describedby={descriptionId}

@@ -181,8 +181,9 @@ Supports all 3 apps, plus dashboard and admin websites
   first — most duplication here comes from not knowing a helper already existed
 - read `./.agents/skills/duplication/SKILL.md` when adding shared helpers, reviewing a
   diff for reuse, or asked to deduplicate/extract/consolidate
-- `just dup` reports clones across the repo; `just dup --diff` reports only the ones
-  the current branch introduces, and is what CI gates on
+- `just dup` reports clones across the repo; `just dup --diff` reports the ones the
+  current branch touches. CI runs it as an advisory check that doesn't block merging, and
+  its report can include older clones in code you touched, not only new copies
 
 ## Continuous Improvement
 
