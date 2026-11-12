@@ -1,3 +1,5 @@
+import Foundation
+
 #if canImport(Darwin)
   import Darwin
 #elseif canImport(Glibc)
@@ -6,6 +8,12 @@
 
 public enum IOSDeviceInfo {
   public static func modelIdentifier() -> String {
+    #if targetEnvironment(simulator)
+      if let identifier = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"],
+         !identifier.isEmpty {
+        return identifier
+      }
+    #endif
     var systemInfo = utsname()
     uname(&systemInfo)
     let mirror = Mirror(reflecting: systemInfo.machine)

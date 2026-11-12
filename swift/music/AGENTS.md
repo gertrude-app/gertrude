@@ -14,3 +14,8 @@ device.
 ```bash
 just music gen
 ```
+
+## Library sidebar and iPad tab layout
+
+Before changing the Library's split view, the iPad/iPhone/Duo tab shell, or the iPad
+launch cover (`coversTabLayoutUntilSettled()`), read `docs/music-sidebar-findings.md`.

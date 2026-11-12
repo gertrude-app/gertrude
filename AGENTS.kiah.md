@@ -24,16 +24,6 @@ Xcode MCP builds and previews, background screenshots, and headless browsers. As
 before bringing apps or windows to the front, moving the pointer, sending keyboard or
 mouse input to the host screen, or quitting apps.
 
-For physical-device Gertrude Music debug builds, generate the Xcode project with Kiah's
-personal development team and temporary bundle identifier. Keep these as generation-time
-overrides rather than changing the checked-in project defaults:
-
-```bash
-GERTRUDE_MUSIC_DEBUG_DEVELOPMENT_TEAM=Y63PLK783B \
-GERTRUDE_MUSIC_DEBUG_BUNDLE_IDENTIFIER=com.innocencelabs.gertrude-fm-temp-dev \
-just music gen
-```
-
 If I refer to Jared, he's my boss and coworker, we're the only two full-time developers
 working on Gertrude.
 

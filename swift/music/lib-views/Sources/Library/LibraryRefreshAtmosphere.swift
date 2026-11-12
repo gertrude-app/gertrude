@@ -19,7 +19,7 @@ struct LibraryRefreshAtmosphere: View {
           .opacity(0.86)
           .blur(radius: 28)
           .mask(self.fade)
-          .ignoresSafeArea(edges: .top)
+          .ignoresSafeArea(edges: [.top, .horizontal])
           .allowsHitTesting(false)
           .accessibilityHidden(true)
       }

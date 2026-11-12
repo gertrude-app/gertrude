@@ -12,78 +12,6 @@ public enum PlaylistDuplicateChoice: Equatable, Sendable {
   case addOnlyNew
 }
 
-struct PlaylistNamePrompt: View {
-  @Binding private var name: String
-  @FocusState private var isNameFocused: Bool
-
-  private let title: String
-  private let actionTitle: String
-  private let onCancel: @MainActor @Sendable () -> Void
-  private let onSubmit: @MainActor @Sendable () -> Void
-
-  init(
-    title: String,
-    actionTitle: String,
-    name: Binding<String>,
-    onCancel: @MainActor @escaping @Sendable () -> Void,
-    onSubmit: @MainActor @escaping @Sendable () -> Void,
-  ) {
-    self.title = title
-    self.actionTitle = actionTitle
-    self._name = name
-    self.onCancel = onCancel
-    self.onSubmit = onSubmit
-  }
-
-  var body: some View {
-    #if os(iOS)
-      self.promptContent
-        .presentationDetents([.height(240)])
-        .presentationDragIndicator(.visible)
-    #else
-      self.promptContent
-        .frame(minWidth: 380, minHeight: 190)
-    #endif
-  }
-
-  private var promptContent: some View {
-    VStack(alignment: .leading, spacing: 20) {
-      Text(self.title)
-        .font(.title2.bold())
-
-      TextField("Playlist Name", text: self.$name)
-        .textFieldStyle(.roundedBorder)
-        .focused(self.$isNameFocused)
-        .onSubmit(self.submitButtonTapped)
-
-      HStack(spacing: 12) {
-        Button(action: self.onCancel) {
-          Text("Cancel")
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.bordered)
-        .tint(.primary)
-
-        Button(action: self.submitButtonTapped) {
-          Text(self.actionTitle)
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(.gertrudeBrandAccent)
-        .disabled(!self.name.isValidPlaylistName)
-      }
-      .controlSize(.large)
-    }
-    .padding(24)
-    .onAppear { self.isNameFocused = true }
-  }
-
-  private func submitButtonTapped() {
-    guard self.name.isValidPlaylistName else { return }
-    self.onSubmit()
-  }
-}
-
 public struct AddToPlaylistSheet: View {
   private let playlists: [PlaylistData]
   private let duplicatePrompt: PlaylistDuplicatePrompt?
@@ -209,6 +137,7 @@ public struct AddToPlaylistSheet: View {
       .sheet(isPresented: self.$isNamePromptPresented) {
         PlaylistNamePrompt(
           title: "New Playlist",
+          message: "Enter a name for your playlist.",
           actionTitle: "Create",
           name: self.$newPlaylistName,
           onCancel: self.namePromptCancelled,
@@ -320,17 +249,5 @@ public struct AddToPlaylistSheet: View {
       playlists: [.init(id: "favorites", name: "Favorites")],
       duplicatePrompt: .album(playlistName: "Favorites", duplicateCount: 3),
     )
-  }
-
-  #Preview("Playlist name prompt") {
-    @Previewable @State var name = "Road Trip"
-    PlaylistNamePrompt(
-      title: "Rename Playlist",
-      actionTitle: "Save",
-      name: $name,
-      onCancel: {},
-      onSubmit: {},
-    )
-    .preferredColorScheme(.dark)
   }
 #endif

@@ -30,6 +30,18 @@ public extension View {
   }
 }
 
+@MainActor
+func revealGertieScreenBackground(_ isVisible: Binding<Bool>, skippingMotion: Bool) {
+  guard !skippingMotion else {
+    isVisible.wrappedValue = true
+    return
+  }
+
+  withAnimation(.smooth(duration: 0.4)) {
+    isVisible.wrappedValue = true
+  }
+}
+
 private struct SwooshInModifier: ViewModifier {
   @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var isVisible = false

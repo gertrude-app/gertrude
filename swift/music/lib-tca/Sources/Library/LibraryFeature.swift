@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import GertieApp
 import MusicRoute
+import SwiftUI
 
 @Reducer
 struct LibraryFeature: Sendable {
@@ -14,12 +15,35 @@ struct LibraryFeature: Sendable {
     var isLibraryRefreshFailurePresented = false
     var isRefreshingRemoteLibrary = false
     var hasStartedInitialLibraryLoad = false
+    var isRestoringLaunchState = false
     var isPlaylistMutationInFlight = false
     var playlistMutationFailure: PlaylistMutationFailure?
     var playlistIDsBeforeCreate: Set<MusicPlaylist.ID>?
     @Presents var playlistMusicPicker: PlaylistMusicPickerFeature.State?
     var path = StackState<LibraryPath.State>()
+    var selectionToRestore: LibraryCollectionIdentity?
     var shouldPresentCreatedPlaylist = false
+
+    var selectedCollectionIdentity: LibraryCollectionIdentity? {
+      switch self.path.first {
+      case .album(let detail):
+        .album(detail.album.id)
+      case .artist(let detail):
+        .artist(detail.artistID)
+      case .playlist(let detail):
+        .playlist(detail.playlist.id)
+      case nil:
+        nil
+      }
+    }
+
+    var detailPath: StackState<LibraryPath.State> {
+      var path = self.path
+      if !path.isEmpty {
+        path.removeFirst()
+      }
+      return path
+    }
 
     var albumDetail: AlbumDetailFeature.State? {
       get { self.path.albumDetail }
@@ -80,6 +104,8 @@ struct LibraryFeature: Sendable {
   enum CancelID: Hashable, Sendable {
     case approvedLibraryRefresh
     case playlistMutation
+    case launchRestore
+    case launchRestoreTimeout
   }
 
   enum DelegateAction: Equatable {
@@ -115,14 +141,12 @@ struct LibraryFeature: Sendable {
     case addTrackToPlaylistTapped(trackID: ApprovedTrack.ID, albumID: ApprovedAlbum.ID)
     case albumAddToQueueTapped(ApprovedAlbum.ID)
     case albumPlayNextTapped(ApprovedAlbum.ID)
-    case albumTapped(ApprovedAlbum.ID)
     case approvedLibraryLoaded(ApprovedMusicLibrary)
     case approvedLibraryLoadFailed
     case approvedLibraryMusicAccessUnavailable
     case artistAddToQueueTapped(ApprovedArtist.ID)
     case artistPlayNextTapped(ApprovedArtist.ID)
     case artistPlayTapped(ApprovedArtist.ID)
-    case artistTapped(ApprovedArtist.ID)
     case artistTopSongTapped(artistID: ApprovedArtist.ID, trackID: ApprovedTrack.ID)
     case cachedApprovedLibraryLoaded(ApprovedMusicLibrary)
     case collectionPlayNowSucceeded(LibraryCollectionIdentity)
@@ -130,48 +154,32 @@ struct LibraryFeature: Sendable {
     case debugResetOnboardingButtonTapped
     case delegate(DelegateAction)
     case createPlaylistSubmitted(String)
+    case lastSelectionLoaded(LibraryCollectionIdentity)
+    case launchRestoreFinished
+    case launchRestoreRequested
     case libraryRefreshFailureDismissed
     case onAppear
     case path(StackActionOf<LibraryPath>)
     case playlistAddToQueueTapped(MusicPlaylist.ID)
-    case playlistDeleteConfirmed(
-      playlistID: MusicPlaylist.ID,
-      expectedRevision: Int64,
-    )
-    case playlistEntryRemoveTapped(
-      playlistID: MusicPlaylist.ID,
-      expectedRevision: Int64,
-      entryID: MusicPlaylistEntry.ID,
-    )
     case playlistMusicPicker(PresentationAction<PlaylistMusicPickerFeature.Action>)
     case playlistMusicPickerMutationResponse(PlaylistMusicPickerMutationOutcome)
-    case playlistMusicPickerRequested(MusicPlaylist.ID)
     case playlistMutationFailureDismissed
     case playlistMutationResponse(
       PlaylistMutationOutcome,
       rollback: ApprovedMusicLibrary?,
     )
     case playlistPlayNextTapped(MusicPlaylist.ID)
-    case playlistRenameSubmitted(
-      playlistID: MusicPlaylist.ID,
-      expectedRevision: Int64,
-      name: String,
-    )
-    case playlistReorderSubmitted(
-      playlistID: MusicPlaylist.ID,
-      expectedRevision: Int64,
-      entryIDs: [MusicPlaylistEntry.ID],
-    )
-    case playlistTapped(MusicPlaylist.ID)
     case refreshPresentationFinished
     case refreshPulled
     case retryButtonTapped
+    case selectionChanged(LibraryCollectionIdentity?)
   }
 
   @Dependency(\.approvedMusic) var approvedMusic
   @Dependency(\.continuousClock) var clock
   @Dependency(\.date.now) var now
   @Dependency(\.libraryCollectionRecency) var libraryCollectionRecency
+  @Dependency(\.libraryLastSelection) var libraryLastSelection
 
   var body: some Reducer<State, Action> {
     Reduce { state, action in
@@ -294,7 +302,7 @@ struct LibraryFeature: Sendable {
              let playlist = state.createdPlaylist(in: library, at: self.now) {
             recencyToSave = state.collectionRecency
             if state.shouldPresentCreatedPlaylist {
-              state.presentPlaylistDetail(playlistID: playlist.id)
+              state.showCollection(.playlist(playlist.id))
               state.playlistMusicPicker = .init(playlist: playlist, library: library)
             }
           }
@@ -319,6 +327,17 @@ struct LibraryFeature: Sendable {
         }
         return .merge(effects)
 
+      case .selectionChanged(let selection):
+        guard let selection else {
+          state.path.removeAll()
+          return .none
+        }
+        guard selection != state.selectedCollectionIdentity || state.path.count > 1 else {
+          return .none
+        }
+        state.showCollection(selection)
+        return .none
+
       case .albumAddToQueueTapped(let albumID):
         return self.queueAlbum(
           albumID: albumID,
@@ -332,13 +351,6 @@ struct LibraryFeature: Sendable {
           position: .next,
           status: state.status,
         )
-
-      case .albumTapped(let albumID):
-        state.presentAlbumDetail(
-          albumID: albumID,
-          transitionSourceID: albumID.rawValue,
-        )
-        return .none
 
       case .createPlaylistSubmitted(let rawName):
         guard !state.isPlaylistMutationInFlight,
@@ -358,47 +370,12 @@ struct LibraryFeature: Sendable {
           status: state.status,
         )
 
-      case .playlistDeleteConfirmed(let playlistID, let expectedRevision):
-        return self.deletePlaylist(
-          playlistID: playlistID,
-          expectedRevision: expectedRevision,
-          state: &state,
-        )
-
-      case .playlistEntryRemoveTapped(let playlistID, let expectedRevision, let entryID):
-        return self.removePlaylistEntry(
-          playlistID: playlistID,
-          expectedRevision: expectedRevision,
-          entryID: entryID,
-          state: &state,
-        )
-
-      case .playlistRenameSubmitted(let playlistID, let expectedRevision, let name):
-        return self.renamePlaylist(
-          playlistID: playlistID,
-          expectedRevision: expectedRevision,
-          rawName: name,
-          state: &state,
-        )
-
-      case .playlistReorderSubmitted(let playlistID, let expectedRevision, let entryIDs):
-        return self.reorderPlaylist(
-          playlistID: playlistID,
-          expectedRevision: expectedRevision,
-          entryIDs: entryIDs,
-          state: &state,
-        )
-
       case .playlistPlayNextTapped(let playlistID):
         return self.queuePlaylist(
           playlistID: playlistID,
           position: .next,
           status: state.status,
         )
-
-      case .playlistTapped(let playlistID):
-        state.presentPlaylistDetail(playlistID: playlistID)
-        return .none
 
       case .artistAddToQueueTapped(let artistID):
         guard let items = self.artistDiscographyPlaybackItems(
@@ -413,13 +390,6 @@ struct LibraryFeature: Sendable {
           in: state.status,
         ) else { return .none }
         return .send(.delegate(.playNext(items: items)))
-
-      case .artistTapped(let artistID):
-        guard case .loaded(let library) = state.status,
-              library.artist(id: artistID) != nil
-        else { return .none }
-        state.path.append(.artist(.init(artistID: artistID)))
-        return .none
 
       case .artistPlayTapped(let artistID):
         guard let items = self.artistDiscographyPlaybackItems(
@@ -615,6 +585,7 @@ struct LibraryFeature: Sendable {
         return .merge(
           self.refreshRemoteApprovedLibrary(loadCache: true, generation: state.generation),
           self.loadCollectionRecency(),
+          self.loadLastSelection(generation: state.generation),
         )
 
       case .approvedLibraryLoaded(let library):
@@ -622,7 +593,10 @@ struct LibraryFeature: Sendable {
         if library.isEmpty {
           log(.debug, .library, "e24738fc")
         }
-        return self.applyAuthoritativeLibrary(library, to: &state)
+        let effect = self.applyAuthoritativeLibrary(library, to: &state)
+        let abandonedRestore = state.restorePendingSelection(isFinalAttempt: true)
+        guard abandonedRestore else { return effect }
+        return .merge(effect, self.saveLastSelection(nil))
 
       case .approvedLibraryLoadFailed:
         log(.err, .library, "cd55459e")
@@ -648,6 +622,7 @@ struct LibraryFeature: Sendable {
 
       case .cachedApprovedLibraryLoaded(let library):
         state.applyLibrary(library)
+        state.restorePendingSelection(isFinalAttempt: false)
         return .send(.delegate(.approvedTrackIDsUpdated(library.approvedTrackIDs)))
 
       case .collectionPlayNowSucceeded(let identity):
@@ -665,16 +640,46 @@ struct LibraryFeature: Sendable {
         state.collectionRecency = recency
         return .none
 
-      case .libraryRefreshFailureDismissed:
-        state.isLibraryRefreshFailurePresented = false
+      case .launchRestoreRequested:
+        guard !state.hasStartedInitialLibraryLoad, !state.isRestoringLaunchState else {
+          return .none
+        }
+        state.isRestoringLaunchState = true
+        let generation = state.generation
+        return .merge(
+          .run { send in
+            if let cachedLibrary = await self.approvedMusic.loadCachedApprovedLibrary() {
+              await send(Self.response(generation, .cachedApprovedLibraryLoaded(cachedLibrary)))
+            }
+            if let selection = await self.libraryLastSelection.load() {
+              await send(Self.response(generation, .lastSelectionLoaded(selection)))
+            }
+            await send(.launchRestoreFinished)
+          }
+          .cancellable(id: CancelID.launchRestore),
+          .run { send in
+            try await self.clock.sleep(for: .seconds(1))
+            await send(.launchRestoreFinished)
+          }
+          .cancellable(id: CancelID.launchRestoreTimeout),
+        )
+
+      case .launchRestoreFinished:
+        guard state.isRestoringLaunchState else { return .none }
+        state.isRestoringLaunchState = false
+        return .merge(
+          .cancel(id: CancelID.launchRestore),
+          .cancel(id: CancelID.launchRestoreTimeout),
+        )
+
+      case .lastSelectionLoaded(let selection):
+        guard state.path.isEmpty else { return .none }
+        state.selectionToRestore = selection
+        state.restorePendingSelection(isFinalAttempt: false)
         return .none
 
-      case .playlistMusicPickerRequested(let playlistID):
-        guard !state.isPlaylistMutationInFlight,
-              case .loaded(let library) = state.status,
-              let playlist = library.playlist(id: playlistID) else { return .none }
-        state.playlistMusicPicker = .init(playlist: playlist, library: library)
-        state.playlistMutationFailure = nil
+      case .libraryRefreshFailureDismissed:
+        state.isLibraryRefreshFailurePresented = false
         return .none
 
       case .playlistMusicPicker(.presented(.delegate(.addRequested(
@@ -739,7 +744,7 @@ struct LibraryFeature: Sendable {
              let playlist = state.createdPlaylist(in: library, at: self.now) {
             recencyToSave = state.collectionRecency
             if state.shouldPresentCreatedPlaylist {
-              state.presentPlaylistDetail(playlistID: playlist.id)
+              state.showCollection(.playlist(playlist.id))
               state.playlistMusicPicker = .init(playlist: playlist, library: library)
             }
           }
@@ -1144,6 +1149,24 @@ struct LibraryFeature: Sendable {
     }
   }
 
+  private func saveLastSelection(_ selection: LibraryCollectionIdentity?) -> EffectOf<Self> {
+    .run { _ in
+      await self.libraryLastSelection.save(selection)
+    }
+  }
+
+  private func loadLastSelection(generation: Int?) -> EffectOf<Self> {
+    .run { send in
+      guard let selection = await self.libraryLastSelection.load() else { return }
+      var transaction = Transaction()
+      transaction.disablesAnimations = true
+      await send(
+        Self.response(generation, .lastSelectionLoaded(selection)),
+        transaction: transaction,
+      )
+    }
+  }
+
   private func loadCollectionRecency() -> EffectOf<Self> {
     .run { send in
       guard let recency = await self.libraryCollectionRecency.load(),
@@ -1198,6 +1221,44 @@ private extension LibraryFeature.Status {
 }
 
 extension LibraryFeature.State {
+  @discardableResult
+  mutating func restorePendingSelection(isFinalAttempt: Bool) -> Bool {
+    guard let selection = self.selectionToRestore else { return false }
+    guard self.path.isEmpty else {
+      self.selectionToRestore = nil
+      return false
+    }
+    if self.showCollection(selection) {
+      self.selectionToRestore = nil
+      return false
+    }
+    guard isFinalAttempt else { return false }
+    self.selectionToRestore = nil
+    return true
+  }
+
+  @discardableResult
+  mutating func showCollection(_ selection: LibraryCollectionIdentity) -> Bool {
+    guard case .loaded(let library) = self.status else { return false }
+    let destination: LibraryPath.State
+    switch selection.kind {
+    case .album:
+      guard let album = library.album(id: .init(rawValue: selection.id)) else { return false }
+      destination = .album(.init(album: album, transitionSourceID: album.id.rawValue))
+    case .artist:
+      let artistID = ApprovedArtist.ID(rawValue: selection.id)
+      guard library.artist(id: artistID) != nil else { return false }
+      destination = .artist(.init(artistID: artistID))
+    case .playlist:
+      guard let id = UUID(uuidString: selection.id),
+            let playlist = library.playlist(id: .init(rawValue: id)) else { return false }
+      destination = .playlist(.init(playlist: playlist))
+    }
+    self.path.removeAll()
+    self.path.append(destination)
+    return true
+  }
+
   mutating func applyLibrary(_ library: ApprovedMusicLibrary) {
     self.status = library.isEmpty ? .empty : .loaded(library)
     self.path.reconcile(with: library)
@@ -1270,17 +1331,6 @@ extension LibraryFeature.State {
       album: album,
       transitionSourceID: transitionSourceID,
     )
-    return true
-  }
-
-  @discardableResult
-  mutating func presentPlaylistDetail(playlistID: MusicPlaylist.ID) -> Bool {
-    guard case .loaded(let library) = self.status,
-          let playlist = library.playlist(id: playlistID) else { return false }
-    if self.playlistDetail?.playlist.id == playlistID {
-      return true
-    }
-    self.playlistDetail = PlaylistDetailFeature.State(playlist: playlist)
     return true
   }
 

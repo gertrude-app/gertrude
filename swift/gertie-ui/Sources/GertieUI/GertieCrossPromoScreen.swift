@@ -59,65 +59,95 @@ public struct GertieCrossPromoScreen: View {
   }
 
   public var body: some View {
-    GeometryReader { proxy in
-      let metrics = proxy.size.height <= 700 || self.dynamicTypeSize.isAccessibilitySize
+    GertieScreenGeometryReader { proxy, geometry in
+      let height = geometry.map {
+        $0.axis == .vertical ? $0.primarySize.height : $0.secondarySize.height
+      } ?? proxy.size.height
+      let metrics = height <= 700 || self.dynamicTypeSize.isAccessibilitySize
         ? Metrics.compact
         : Metrics.regular
 
-      ScrollView {
-        VStack(alignment: .leading, spacing: metrics.spacing) {
-          Spacer(minLength: metrics.isCompact ? 0 : nil)
-
-          GertieCrossPromoVisual(
-            image: self.image,
-            imageHeight: metrics.imageHeight,
-          )
-          .padding(.bottom, metrics.imagePadBottom)
-
-          Text(verbatim: self.headline)
-            .font(.system(size: metrics.headlineSize * self.titleScale, weight: .bold))
-            .foregroundStyle(
-              Color(self.colorScheme, light: .violet950, dark: .violet100),
+      ZStack(alignment: .topLeading) {
+        if let geometry, geometry.axis == .horizontal {
+          GertieScreenRegion(size: geometry.primarySize) {
+            GertieCrossPromoVisual(
+              image: self.image,
+              imageHeight: metrics.imageHeight,
             )
-            .fixedSize(horizontal: false, vertical: true)
-            .swooshIn(fromYOffset: 20)
-
-          Text(verbatim: self.bodyText)
-            .font(.system(size: metrics.bodySize * self.bodyScale, weight: .medium))
-            .foregroundStyle(
-              Color(self.colorScheme, light: .violet950, dark: .violet100).opacity(0.85),
-            )
-            .fixedSize(horizontal: false, vertical: true)
-            .swooshIn(fromYOffset: 20)
-
-          Button(self.primaryAction.title, action: self.primaryAction.callback)
-            .buttonStyle(.gertiePrimary)
-            .accessibilityIdentifier("btn-primary")
-            .padding(.top, metrics.buttonPadTop)
-            .swooshIn(fromYOffset: 20, after: .milliseconds(150))
-
-          if let secondaryAction = self.secondaryAction {
-            Button(secondaryAction.title, action: secondaryAction.callback)
-              .buttonStyle(.gertieSecondary)
-              .accessibilityIdentifier("btn-secondary")
-              .swooshIn(fromYOffset: 20, after: .milliseconds(300))
           }
-
-          if let tertiaryAction = self.tertiaryAction {
-            Button(tertiaryAction.title, action: tertiaryAction.callback)
-              .buttonStyle(.gertieSecondary)
-              .accessibilityIdentifier("onboarding-tertiary-button")
-              .swooshIn(fromYOffset: 20, after: .milliseconds(450))
-          }
+          .frame(width: geometry.primarySize.width)
         }
-        .frame(maxWidth: 500, alignment: .leading)
-        .padding(metrics.insets)
-        .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+
+        GertieScreenContentLayout(
+          containerSize: proxy.size,
+          geometry: geometry,
+          configuration: metrics.layoutConfiguration,
+          hasActions: true,
+        ) {
+          EmptyView()
+        } message: {
+          self.introduction(metrics: metrics, showsArtwork: geometry?.axis != .horizontal)
+        } actions: {
+          self.actions(metrics: metrics)
+        }
       }
-      .scrollBounceBehavior(.basedOnSize)
-      .scrollIndicators(.hidden)
+      .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
     }
     .gertieScreenBackground()
+  }
+
+  private func introduction(metrics: Metrics, showsArtwork: Bool) -> some View {
+    VStack(alignment: .leading, spacing: metrics.spacing) {
+      if showsArtwork {
+        GertieCrossPromoVisual(
+          image: self.image,
+          imageHeight: metrics.imageHeight,
+        )
+        .padding(.bottom, metrics.imagePadBottom)
+      }
+
+      Text(verbatim: self.headline)
+        .font(.system(size: metrics.headlineSize * self.titleScale, weight: .bold))
+        .foregroundStyle(
+          Color(self.colorScheme, light: .violet950, dark: .violet100),
+        )
+        .fixedSize(horizontal: false, vertical: true)
+        .gertieScreenTextAlignment()
+        .swooshIn(fromYOffset: 20)
+
+      Text(verbatim: self.bodyText)
+        .font(.system(size: metrics.bodySize * self.bodyScale, weight: .medium))
+        .foregroundStyle(
+          Color(self.colorScheme, light: .violet950, dark: .violet100).opacity(0.85),
+        )
+        .fixedSize(horizontal: false, vertical: true)
+        .gertieScreenTextAlignment()
+        .swooshIn(fromYOffset: 20)
+    }
+  }
+
+  private func actions(metrics: Metrics) -> some View {
+    VStack(spacing: metrics.spacing) {
+      Button(self.primaryAction.title, action: self.primaryAction.callback)
+        .buttonStyle(.gertiePrimary)
+        .accessibilityIdentifier("btn-primary")
+        .padding(.top, metrics.buttonPadTop)
+        .swooshIn(fromYOffset: 20, after: .milliseconds(150))
+
+      if let secondaryAction = self.secondaryAction {
+        Button(secondaryAction.title, action: secondaryAction.callback)
+          .buttonStyle(.gertieSecondary)
+          .accessibilityIdentifier("btn-secondary")
+          .swooshIn(fromYOffset: 20, after: .milliseconds(300))
+      }
+
+      if let tertiaryAction = self.tertiaryAction {
+        Button(tertiaryAction.title, action: tertiaryAction.callback)
+          .buttonStyle(.gertieSecondary)
+          .accessibilityIdentifier("onboarding-tertiary-button")
+          .swooshIn(fromYOffset: 20, after: .milliseconds(450))
+      }
+    }
   }
 
   private struct Metrics {
@@ -129,6 +159,18 @@ public struct GertieCrossPromoScreen: View {
     let imagePadBottom: CGFloat
     let buttonPadTop: CGFloat
     let insets: EdgeInsets
+
+    var layoutConfiguration: GertieScreenLayoutConfiguration {
+      GertieScreenLayoutConfiguration(
+        spacing: 0,
+        spacerMinLength: self.isCompact ? 0 : nil,
+        actionTopPadding: self.spacing,
+        insets: self.insets,
+        alignment: .leading,
+        flatPlacement: .distributed,
+        maxWidth: 500 + self.insets.leading + self.insets.trailing,
+      )
+    }
 
     static let regular = Self(
       isCompact: false,
@@ -169,16 +211,18 @@ private struct GertieCrossPromoVisual: View {
           loadedImage
             .resizable()
             .scaledToFit()
+            .fixedSize(horizontal: false, vertical: true)
             .accessibilityLabel(Text(verbatim: image.accessibilityLabel ?? ""))
             .transition(.opacity)
         } placeholder: {
           ProgressView()
+            .frame(height: self.imageHeight)
         } failure: {
           GertieCrossPromoFallback()
+            .frame(height: self.imageHeight)
         }
         .id(image.url)
         .frame(maxWidth: .infinity)
-        .frame(height: self.imageHeight)
         .swooshIn(fromYOffset: -20)
       } else {
         GertieCrossPromoFallback()

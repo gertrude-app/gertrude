@@ -1,147 +1,38 @@
 import GertieUI
 import SwiftUI
 
-public enum MusicSearchViewState: Equatable, Sendable {
-  case emptyLibrary
-  case failed
-  case loading
-  case ready([MusicSearchResultData])
-  case musicAccessUnavailable
-}
+struct MusicSearchResultsView: View {
+  let results: [MusicSearchResultData]
+  let currentTrackID: String?
+  let isPlaybackPlaying: Bool
+  let selectedItemID: String?
+  let transitionNamespace: Namespace.ID?
+  let actions: LibraryItemActions
 
-public struct MusicSearchView: View {
-  @Binding private var query: String
-
-  private let state: MusicSearchViewState
-  private let currentTrackID: String?
-  private let isPlaybackPlaying: Bool
-  private let transitionNamespace: Namespace.ID?
-  private let onAddToPlaylist: @MainActor @Sendable (String) -> Void
-  private let onAddToQueue: @MainActor @Sendable (String) -> Void
-  private let onPlayNext: @MainActor @Sendable (String) -> Void
-  private let onResultTap: @MainActor @Sendable (String) -> Void
-  private let onRetryTap: @MainActor @Sendable () -> Void
-
-  public init(
-    state: MusicSearchViewState,
-    query: Binding<String>,
-    currentTrackID: String? = nil,
-    isPlaybackPlaying: Bool = false,
-    transitionNamespace: Namespace.ID? = nil,
-    onAddToPlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onAddToQueue: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onPlayNext: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onResultTap: @MainActor @escaping @Sendable (String) -> Void = { _ in },
-    onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
-  ) {
-    self.state = state
-    self._query = query
-    self.currentTrackID = currentTrackID
-    self.isPlaybackPlaying = isPlaybackPlaying
-    self.transitionNamespace = transitionNamespace
-    self.onAddToPlaylist = onAddToPlaylist
-    self.onAddToQueue = onAddToQueue
-    self.onPlayNext = onPlayNext
-    self.onResultTap = onResultTap
-    self.onRetryTap = onRetryTap
-  }
-
-  public var body: some View {
-    #if os(iOS)
-      self.searchContent
-        .navigationBarTitleDisplayMode(.large)
-    #else
-      self.searchContent
-    #endif
-  }
-
-  private var searchContent: some View {
-    self.content
-      .navigationTitle("Search")
-      .searchable(
-        text: self.$query,
-        prompt: "Search your music",
-      )
-  }
-
-  @ViewBuilder private var content: some View {
-    switch self.state {
-    case .loading:
-      ProgressView("Loading music")
+  var body: some View {
+    if self.results.isEmpty {
+      MusicEmptyState("No results")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-    case .ready(let results):
-      if self.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-        ContentUnavailableView(
-          "Search your music",
-          systemImage: "magnifyingglass",
-          description: Text("Find songs, albums, artists, and playlists."),
+    } else {
+      List(self.results) { result in
+        MusicSearchResultRow(
+          result: result,
+          isCurrent: result.kind == .song && result.collectionID == self.currentTrackID,
+          isPlaying: self.isPlaybackPlaying,
+          transitionNamespace: self.transitionNamespace,
+          onAddToPlaylist: { self.actions.onAddToPlaylist(result.id) },
+          onAddToQueue: { self.actions.onAddToQueue(result.id) },
+          onPlayNext: { self.actions.onPlayNext(result.id) },
+          onTap: { self.actions.onTap(result.id) },
         )
-      } else if results.isEmpty {
-        ContentUnavailableView("No results", systemImage: "magnifyingglass")
-      } else {
-        List(results) { result in
-          MusicSearchResultRow(
-            result: result,
-            isCurrent: result.kind == .song && result.collectionID == self.currentTrackID,
-            isPlaying: self.isPlaybackPlaying,
-            transitionNamespace: self.transitionNamespace,
-            onAddToPlaylist: { self.onAddToPlaylist(result.id) },
-            onAddToQueue: { self.onAddToQueue(result.id) },
-            onPlayNext: { self.onPlayNext(result.id) },
-            onTap: { self.onResultTap(result.id) },
-          )
-        }
-        .listStyle(.plain)
-        .scrollDismissesKeyboard(.interactively)
+        .listRowBackground(
+          result.id == self.selectedItemID ? Color.primary.opacity(0.1) : .clear,
+        )
+        .accessibilityAddTraits(result.id == self.selectedItemID ? .isSelected : [])
       }
-
-    case .emptyLibrary:
-      self.messageContent(
-        title: "No music yet",
-        message: "Approved artists, albums, and your playlists will appear here.",
-        systemImage: "rectangle.stack",
-        buttonTitle: "Check again",
-      )
-
-    case .failed:
-      self.messageContent(
-        title: "Couldn’t load library",
-        message: "Check your connection and try again.",
-        systemImage: "wifi.exclamationmark",
-        buttonTitle: "Try again",
-      )
-
-    case .musicAccessUnavailable:
-      self.messageContent(
-        title: LibraryMessageCard.musicAccessUnavailableTitle,
-        message: LibraryMessageCard.musicAccessUnavailableMessage,
-        systemImage: "music.note",
-        buttonTitle: "Check again",
-      )
+      .listStyle(.plain)
+      .scrollDismissesKeyboard(.interactively)
     }
-  }
-
-  private func messageContent(
-    title: String,
-    message: String,
-    systemImage: String,
-    buttonTitle: String,
-  ) -> some View {
-    ScrollView {
-      LibraryMessageCard(
-        title: title,
-        message: message,
-        systemImage: systemImage,
-        buttonTitle: buttonTitle,
-        onButtonTap: self.onRetryTap,
-      )
-      .frame(maxWidth: 600)
-      .padding(.horizontal, 20)
-      .padding(.top, 48)
-      .padding(.bottom, 96)
-    }
-    .background(.background)
   }
 }
 
@@ -320,11 +211,14 @@ private struct MusicSearchArtistArtwork: View {
 }
 
 #if DEBUG
-  #Preview("Search results") {
+  #Preview("Library search results") {
     @Previewable @State var query = "queen"
-    NavigationStack {
-      MusicSearchView(
-        state: .ready([
+    @Previewable @State var isSearchPresented = true
+    NavigationSplitView {
+      LibraryView(
+        state: .loaded(items: [AlbumData].previewAlbums.map(LibraryCollectionItemData.album)),
+        searchQuery: query,
+        searchResults: [
           .init(
             id: "artist-queen",
             kind: .artist,
@@ -345,21 +239,33 @@ private struct MusicSearchArtistArtwork: View {
             title: "Queen II",
             detail: "Queen",
           ),
-        ]),
-        query: $query,
+        ],
         currentTrackID: "killer-queen",
         isPlaybackPlaying: true,
+        selectedItemID: "album-queen-ii",
       )
+      .searchable(
+        text: $query,
+        isPresented: $isSearchPresented,
+        prompt: "Search your music",
+      )
+    } detail: {
+      LibraryNoSelectionView()
     }
+    .navigationSplitViewStyle(.balanced)
   }
 
   #Preview("Search empty") {
-    @Previewable @State var query = ""
     NavigationStack {
-      MusicSearchView(
-        state: .ready([]),
-        query: $query,
+      MusicSearchResultsView(
+        results: [],
+        currentTrackID: nil,
+        isPlaybackPlaying: false,
+        selectedItemID: nil,
+        transitionNamespace: nil,
+        actions: .init(),
       )
+      .navigationTitle("Library")
     }
   }
 #endif

@@ -1,4 +1,5 @@
 import Foundation
+import GertieUI
 import SwiftUI
 
 public struct LibraryItemActions: Sendable {
@@ -29,47 +30,71 @@ public enum LibraryViewState: Equatable, Sendable {
 }
 
 public struct LibraryView: View {
+  @Environment(\.isSearching) private var isSearching
+
   private let state: LibraryViewState
+  private let searchQuery: String
+  private let searchResults: [MusicSearchResultData]
+  private let currentTrackID: String?
+  private let isPlaybackPlaying: Bool
   private let playingItemID: String?
+  private let selectedItemID: String?
   private let isRefreshing: Bool
   private let isPlaylistMutationInFlight: Bool
   private let transitionNamespace: Namespace.ID?
+  private let onSearchTap: (@MainActor @Sendable () -> Void)?
   private let onRetryTap: @MainActor @Sendable () -> Void
   private let onRefresh: @MainActor @Sendable () async -> Void
   private let onCreatePlaylist: @MainActor @Sendable (String) -> Void
   private let albumActions: LibraryItemActions
   private let artistActions: LibraryItemActions
   private let playlistActions: LibraryItemActions
+  private let searchActions: LibraryItemActions
   private let onDebugResetTap: (@MainActor @Sendable () -> Void)?
 
   @State private var createPlaylistName = ""
   @State private var isCreatePlaylistPromptPresented = false
+  @State private var filter: LibraryFilter?
 
   public init(
     state: LibraryViewState,
+    searchQuery: String = "",
+    searchResults: [MusicSearchResultData] = [],
+    currentTrackID: String? = nil,
+    isPlaybackPlaying: Bool = false,
     playingItemID: String? = nil,
+    selectedItemID: String? = nil,
     isRefreshing: Bool = false,
     isPlaylistMutationInFlight: Bool = false,
     transitionNamespace: Namespace.ID? = nil,
+    onSearchTap: (@MainActor @Sendable () -> Void)? = nil,
     onRetryTap: @MainActor @escaping @Sendable () -> Void = {},
     onRefresh: @MainActor @escaping @Sendable () async -> Void = {},
     onCreatePlaylist: @MainActor @escaping @Sendable (String) -> Void = { _ in },
     albumActions: LibraryItemActions = .init(),
     artistActions: LibraryItemActions = .init(),
     playlistActions: LibraryItemActions = .init(),
+    searchActions: LibraryItemActions = .init(),
     onDebugResetTap: (@MainActor @Sendable () -> Void)? = nil,
   ) {
     self.state = state
+    self.searchQuery = searchQuery
+    self.searchResults = searchResults
+    self.currentTrackID = currentTrackID
+    self.isPlaybackPlaying = isPlaybackPlaying
     self.playingItemID = playingItemID
+    self.selectedItemID = selectedItemID
     self.isRefreshing = isRefreshing
     self.isPlaylistMutationInFlight = isPlaylistMutationInFlight
     self.transitionNamespace = transitionNamespace
+    self.onSearchTap = onSearchTap
     self.onRetryTap = onRetryTap
     self.onRefresh = onRefresh
     self.onCreatePlaylist = onCreatePlaylist
     self.albumActions = albumActions
     self.artistActions = artistActions
     self.playlistActions = playlistActions
+    self.searchActions = searchActions
     self.onDebugResetTap = onDebugResetTap
   }
 
@@ -83,6 +108,7 @@ public struct LibraryView: View {
             if self.showsRefreshIndicator {
               self.refreshToolbarContent
             }
+            self.searchButton
             if self.showsCreateButton {
               self.createPlaylistButton
             }
@@ -96,6 +122,7 @@ public struct LibraryView: View {
             if self.showsRefreshIndicator {
               self.refreshToolbarContent
             }
+            self.searchButton
             if self.showsCreateButton {
               self.createPlaylistButton
             }
@@ -112,17 +139,15 @@ public struct LibraryView: View {
       .overlay(alignment: .top) {
         LibraryRefreshAtmosphere(isActive: self.isRefreshing)
       }
-      .alert("New Playlist", isPresented: self.$isCreatePlaylistPromptPresented) {
-        TextField("Playlist Name", text: self.$createPlaylistName)
-          .onSubmit(self.createPlaylistPromptSubmitted)
-        Button("Cancel", role: .cancel, action: self.createPlaylistPromptCancelled)
-          .tint(.primary)
-        Button("Create", action: self.createPlaylistPromptSubmitted)
-          .tint(.white)
-          .keyboardShortcut(.defaultAction)
-          .disabled(!self.createPlaylistName.isValidPlaylistName)
-      } message: {
-        Text("Enter a name for your playlist.")
+      .sheet(isPresented: self.$isCreatePlaylistPromptPresented) {
+        PlaylistNamePrompt(
+          title: "New Playlist",
+          message: "Enter a name for your playlist.",
+          actionTitle: "Create",
+          name: self.$createPlaylistName,
+          onCancel: self.createPlaylistPromptCancelled,
+          onSubmit: self.createPlaylistPromptSubmitted,
+        )
       }
   }
 
@@ -132,6 +157,16 @@ public struct LibraryView: View {
       .tint(.primary)
       .accessibilityLabel("Refreshing library")
       .allowsHitTesting(false)
+  }
+
+  @ViewBuilder
+  private var searchButton: some View {
+    if let onSearchTap {
+      Button(action: onSearchTap) {
+        Label("Search Library", systemImage: "magnifyingglass")
+      }
+      .tint(.primary)
+    }
   }
 
   @ViewBuilder
@@ -185,24 +220,37 @@ public struct LibraryView: View {
   private var content: some View {
     switch self.state {
     case .loading:
-      LibraryGridView(items: [], isLoading: true)
+      LibraryGridView(items: [], filter: self.$filter, isLoading: true)
 
     case .loaded(let items):
-      LibraryGridView(
-        items: items,
-        playingItemID: self.playingItemID,
-        transitionNamespace: self.transitionNamespace,
-        albumActions: self.albumActions,
-        artistActions: self.artistActions,
-        playlistActions: self.playlistActions,
-        onDebugResetTap: self.onDebugResetTap,
-      )
+      if self.isSearching,
+         !self.searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        MusicSearchResultsView(
+          results: self.searchResults,
+          currentTrackID: self.currentTrackID,
+          isPlaybackPlaying: self.isPlaybackPlaying,
+          selectedItemID: self.selectedItemID,
+          transitionNamespace: self.transitionNamespace,
+          actions: self.searchActions,
+        )
+      } else {
+        LibraryGridView(
+          items: items,
+          filter: self.$filter,
+          playingItemID: self.playingItemID,
+          selectedItemID: self.selectedItemID,
+          transitionNamespace: self.transitionNamespace,
+          albumActions: self.albumActions,
+          artistActions: self.artistActions,
+          playlistActions: self.playlistActions,
+          onDebugResetTap: self.onDebugResetTap,
+        )
+      }
 
     case .empty:
       self.messageContent(
         title: "No music yet",
         message: "Approved artists, albums, and your playlists will appear here.",
-        systemImage: "rectangle.stack",
         buttonTitle: "Check again",
       )
 
@@ -210,15 +258,13 @@ public struct LibraryView: View {
       self.messageContent(
         title: "Couldn’t load library",
         message: "Check your connection and try again.",
-        systemImage: "wifi.exclamationmark",
         buttonTitle: "Try again",
       )
 
     case .musicAccessUnavailable:
       self.messageContent(
-        title: LibraryMessageCard.musicAccessUnavailableTitle,
-        message: LibraryMessageCard.musicAccessUnavailableMessage,
-        systemImage: "music.note",
+        title: "Subscription needs attention",
+        message: "Gertrude Music requires at least an active $5/month Medium subscription. Ask the parent or accountability partner who manages the connected account to check its subscription or payment method.",
         buttonTitle: "Check again",
       )
     }
@@ -227,19 +273,16 @@ public struct LibraryView: View {
   private func messageContent(
     title: String,
     message: String,
-    systemImage: String,
     buttonTitle: String,
   ) -> some View {
     ScrollView {
       VStack(spacing: 14) {
-        LibraryMessageCard(
-          title: title,
+        MusicEmptyState(
+          title,
           message: message,
-          systemImage: systemImage,
           buttonTitle: buttonTitle,
           onButtonTap: self.onRetryTap,
         )
-        .frame(maxWidth: 600)
 
         #if DEBUG
           if let onDebugResetTap = self.onDebugResetTap {
@@ -252,6 +295,40 @@ public struct LibraryView: View {
       .padding(.bottom, 96)
     }
     .background(.background)
+  }
+}
+
+public struct LibraryNoSelectionView: View {
+  public init() {}
+
+  public var body: some View {
+    GeometryReader { proxy in
+      if let geometry = FoldedContentGeometry.resolve(in: proxy) {
+        FoldedContentLayout(geometry: geometry) { _ in
+          if geometry.axis == .vertical {
+            self.unavailable
+          } else {
+            Color.clear
+          }
+        } secondary: {
+          if geometry.axis == .horizontal {
+            self.unavailable
+          } else {
+            Color.clear
+          }
+        }
+      } else {
+        self.unavailable
+      }
+    }
+  }
+
+  private var unavailable: some View {
+    MusicEmptyState(
+      "Choose some music",
+      message: "Select an album, artist, or playlist from your library.",
+    )
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
 }
 
