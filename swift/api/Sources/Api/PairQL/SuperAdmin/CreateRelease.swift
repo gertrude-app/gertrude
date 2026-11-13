@@ -30,6 +30,11 @@ extension CreateRelease: Resolver {
       throw InvalidSemver()
     }
 
+    guard Release.parseMinVersion(input.minVersion) != nil else {
+      struct InvalidMinVersion: Error {}
+      throw InvalidMinVersion()
+    }
+
     // allow overwriting existing release, identified by semver string
     let existing = try? await Release.query()
       .where(.semver == .string(input.semver))
