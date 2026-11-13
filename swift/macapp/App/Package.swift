@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
   name: "App",
-  platforms: [.macOS(.v10_15)],
+  platforms: [.macOS(.v12)],
   products: [
     .library(name: "App", targets: ["App"]),
     .library(name: "ClientInterfaces", targets: ["ClientInterfaces"]),
@@ -19,8 +19,9 @@ let package = Package(
     .library(name: "TestSupport", targets: ["TestSupport"]),
   ],
   dependencies: [
-    // NB: we can only update TCA to 1.23.2, last version to support macOS 11 (Big Sur)
-    // because TCA raised their min deploy target in Feb 2026, may not be worth it
+    // NB: we can only update TCA to 1.23.x (1.23.3 as of 11/26), the last line to support
+    // macOS 12 (Monterey), because TCA 1.24.0 raised their min deploy target to macOS 13
+    // in Feb 2026, may not be worth it
     // as there would need to be some decent architecture changes, and we'd still be behind
     .github("pointfreeco/swift-composable-architecture", from: "1.2.0"),
     .github("pointfreeco/swift-dependencies", from: "1.0.0"),

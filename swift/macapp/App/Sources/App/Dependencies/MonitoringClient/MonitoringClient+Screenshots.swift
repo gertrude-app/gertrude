@@ -3,6 +3,7 @@ import Core
 import CoreGraphics
 import Dependencies
 import Foundation
+import UniformTypeIdentifiers
 
 typealias ScreenshotData = (data: Data, width: Int, height: Int, createdAt: Date)
 
@@ -106,7 +107,12 @@ private func diskUrl(filename: String) -> URL {
 
 private func writeCGImage(_ image: CGImage, to destinationURL: URL) -> Bool {
   guard
-    let destination = CGImageDestinationCreateWithURL(destinationURL as CFURL, kUTTypePNG, 1, nil)
+    let destination = CGImageDestinationCreateWithURL(
+      destinationURL as CFURL,
+      UTType.png.identifier as CFString,
+      1,
+      nil,
+    )
   else {
     return false
   }
