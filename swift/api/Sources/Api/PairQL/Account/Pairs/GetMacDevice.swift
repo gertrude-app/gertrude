@@ -70,16 +70,19 @@ extension GetMacDevice: Resolver {
     async let stableTarget = self.targetVersion(
       for: .stable,
       currentVersion: appVersion,
+      osVersion: computer.osVersion,
       in: context,
     )
     async let betaTarget = self.targetVersion(
       for: .beta,
       currentVersion: appVersion,
+      osVersion: computer.osVersion,
       in: context,
     )
     async let canaryTarget = self.targetVersion(
       for: .canary,
       currentVersion: appVersion,
+      osVersion: computer.osVersion,
       in: context,
     )
     let targetVersions = try await TargetVersions(
@@ -104,12 +107,14 @@ extension GetMacDevice: Resolver {
   private static func targetVersion(
     for channel: ReleaseChannel,
     currentVersion: Semver?,
+    osVersion: Semver?,
     in context: AccountOwnerContext,
   ) async throws -> String? {
     guard let currentVersion else { return nil }
     return try await resolveLatestRelease(
       channel,
       currentVersion.description,
+      osVersion,
       context.db,
     ).semver
   }
