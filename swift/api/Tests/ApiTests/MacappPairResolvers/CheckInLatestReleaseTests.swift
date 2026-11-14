@@ -142,26 +142,26 @@ final class CheckInLatestReleaseTests: ApiTestCase, @unchecked Sendable {
 
   func testSkipsReleasesRequiringNewerMacOs() async throws {
     try await self.replaceAllReleases(with: [
-      Release("2.9.8", pace: 10, minVersion: "11.0", createdAt: .epoch),
-      Release("3.0.0", pace: 10, minVersion: "12.0", createdAt: .epoch.advanced(by: .days(10))),
+      Release("2.9.8", pace: nil, minVersion: "11.0", createdAt: .epoch),
+      Release("2.10.0", pace: 10, minVersion: "12.0", createdAt: .epoch.advanced(by: .days(10))),
     ])
 
     let bigSur = try await test(
       releaseChannel: .stable,
-      currentVersion: "2.9.8",
+      currentVersion: "2.9.7",
       osVersion: "11.7.10",
     )
     expect(bigSur).toEqual(.init(semver: "2.9.8")) // no pace, so never nagged or locked
 
     let monterey = try await test(
       releaseChannel: .stable,
-      currentVersion: "2.9.8",
+      currentVersion: "2.9.7",
       osVersion: "12.7.6",
     )
-    expect(monterey.semver).toEqual("3.0.0")
+    expect(monterey.semver).toEqual("2.10.0") // not 2.9.8, which sorts last as text
 
-    let unknown = try await test(releaseChannel: .stable, currentVersion: "2.9.8", osVersion: nil)
-    expect(unknown.semver).toEqual("3.0.0")
+    let unknown = try await test(releaseChannel: .stable, currentVersion: "2.9.7", osVersion: nil)
+    expect(unknown.semver).toEqual("2.10.0")
   }
 }
 
