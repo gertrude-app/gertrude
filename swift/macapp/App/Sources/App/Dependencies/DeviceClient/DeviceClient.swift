@@ -189,7 +189,7 @@ private enum Format { case data, string }
 
 private func platform(_ key: String, format: Format) -> String? {
   let service = IOServiceGetMatchingService(
-    kIOMasterPortDefault,
+    kIOMainPortDefault,
     IOServiceMatching("IOPlatformExpertDevice"),
   )
 

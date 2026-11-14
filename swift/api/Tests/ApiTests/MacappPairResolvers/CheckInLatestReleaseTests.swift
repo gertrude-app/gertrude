@@ -11,12 +11,13 @@ final class CheckInLatestReleaseTests: ApiTestCase, @unchecked Sendable {
   func test(
     releaseChannel: ReleaseChannel,
     currentVersion: String,
+    osVersion: String? = nil,
   ) async throws -> CheckIn_v2.LatestRelease {
     let child = try await self.child().withDevice(computer: {
       $0.appReleaseChannel = releaseChannel
     })
     let output = try await CheckIn_v2.resolve(
-      with: .init(appVersion: currentVersion, filterVersion: currentVersion),
+      with: .init(appVersion: currentVersion, filterVersion: currentVersion, osVersion: osVersion),
       in: child.context,
     )
     return output.latestRelease
@@ -138,6 +139,30 @@ final class CheckInLatestReleaseTests: ApiTestCase, @unchecked Sendable {
     expect(output.updateReleaseChannel).toEqual(.canary) // they still are on canary...
     expect(output.latestRelease.semver).toEqual("2.1.1") // ...but we pull them up to latest/stable
   }
+
+  func testSkipsReleasesRequiringNewerMacOs() async throws {
+    try await self.replaceAllReleases(with: [
+      Release("2.9.8", pace: nil, minVersion: "11.0", createdAt: .epoch),
+      Release("2.10.0", pace: 10, minVersion: "12.0", createdAt: .epoch.advanced(by: .days(10))),
+    ])
+
+    let bigSur = try await test(
+      releaseChannel: .stable,
+      currentVersion: "2.9.7",
+      osVersion: "11.7.10",
+    )
+    expect(bigSur).toEqual(.init(semver: "2.9.8")) // no pace, so never nagged or locked
+
+    let monterey = try await test(
+      releaseChannel: .stable,
+      currentVersion: "2.9.7",
+      osVersion: "12.7.6",
+    )
+    expect(monterey.semver).toEqual("2.10.0") // not 2.9.8, which sorts last as text
+
+    let unknown = try await test(releaseChannel: .stable, currentVersion: "2.9.7", osVersion: nil)
+    expect(unknown.semver).toEqual("2.10.0")
+  }
 }
 
 // extensions, helpers
@@ -157,6 +182,7 @@ extension Release {
     _ semver: String,
     channel: ReleaseChannel = .stable,
     pace requirementPace: Int? = nil,
+    minVersion: String = "11.0",
     createdAt: Date = .init(),
   ) {
     self.init(
@@ -165,7 +191,7 @@ extension Release {
       signature: "signature-123",
       length: 123_456_789,
       revision: "somesha-123",
-      minVersion: "11.0",
+      minVersion: minVersion,
       requirementPace: requirementPace,
     )
     self.createdAt = createdAt

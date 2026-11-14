@@ -17,7 +17,12 @@ extension CheckIn_v2: Resolver {
     let computer = try await syncComputer(from: input, for: computerUser, in: context)
 
     let channel = computer.appReleaseChannel
-    async let latestRelease = resolveLatestRelease(channel, input.appVersion, context.db)
+    async let latestRelease = resolveLatestRelease(
+      channel,
+      input.appVersion,
+      computer.osVersion,
+      context.db,
+    )
 
     async let resolvedFilterSuspension = resolveFilterSuspension(input, computerUser, context)
 
@@ -538,9 +543,10 @@ func ruleKeychains(
 func resolveLatestRelease(
   _ channel: ReleaseChannel,
   _ currentAppVersion: String,
+  _ osVersion: Semver?,
   _ db: any Client,
 ) async throws -> CheckIn_v2.LatestRelease {
-  var query = Release.query().orderBy(.semver, .asc)
+  var query = Release.query()
 
   // special case, bug in 2.7.0/1 was fixed by a db change
   // to screenshot rate, so don't force them to update
@@ -550,7 +556,7 @@ func resolveLatestRelease(
     query = query.where(.semver != "2.7.2")
   }
 
-  let releases = try await query.all(in: db)
+  let releases = try await query.all(in: db).sorted { Semver($0) < Semver($1) }
   let hidden = AppcastRoute.hiddenReleases(forRequestingAppVersion: currentAppVersion)
 
   let currentSemver = Semver(currentAppVersion)!
@@ -559,6 +565,7 @@ func resolveLatestRelease(
   for release in releases {
     if currentSemver.isBehind(release),
        release.channel.isAtLeastAsStable(as: channel),
+       osVersion.map(release.supports) ?? true,
        !hidden.contains(release.semver) {
       latest.semver = release.semver
       if let pace = release.requirementPace, latest.pace == nil {
