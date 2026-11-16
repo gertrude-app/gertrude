@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   VStack,
+  toast,
 } from '@gertrude/ui';
 import { parseE164 } from '@shared/phone-numbers';
 import {
@@ -60,6 +61,7 @@ type DefaultState = Partial<{
   slackChannelId: string;
   slackBotToken: string;
   confirmationCode: string;
+  ntfyTopic: string;
 }>;
 
 type Props = {
@@ -68,7 +70,6 @@ type Props = {
   onCreatePending: (draft: NotificationMethodDraft) => Promise<PendingNotificationMethod>;
   onConfirm: (methodId: string, code: number) => Promise<void>;
   onComplete?: (methodId: string) => void;
-  defaultNtfyTopic?: string;
   defaultState?: DefaultState;
 };
 
@@ -110,7 +111,6 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   onCreatePending,
   onConfirm,
   onComplete,
-  defaultNtfyTopic = `gertrude-family-alerts-8k4tq9`,
   defaultState,
 }) => {
   const [methodType, setMethodType] = React.useState<NotificationMethodType>(
@@ -138,7 +138,7 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
   const [confirmationCode, setConfirmationCode] = React.useState(
     defaultState?.confirmationCode ?? ``,
   );
-  const [ntfyTopic, setNtfyTopic] = React.useState(defaultNtfyTopic);
+  const [ntfyTopic, setNtfyTopic] = React.useState(defaultState?.ntfyTopic ?? ``);
   const [submitting, setSubmitting] = React.useState(false);
   const primaryButtonLabel = getPrimaryButtonLabel(methodType, flowState);
   const primaryButtonDisabled = getPrimaryButtonDisabled({
@@ -163,7 +163,7 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
     setSlackChannelId(defaultState?.slackChannelId ?? ``);
     setSlackBotToken(defaultState?.slackBotToken ?? ``);
     setConfirmationCode(defaultState?.confirmationCode ?? ``);
-    setNtfyTopic(defaultNtfyTopic);
+    setNtfyTopic(defaultState?.ntfyTopic ?? ``);
     setSubmitting(false);
   };
 
@@ -196,7 +196,11 @@ const AddNotificationMethodSlideOver: React.FC<Props> = ({
       setPendingMethodId(pending.methodId);
       setConfirmationCode(``);
       if (methodType === `ntfy`) {
-        setNtfyTopic(pending.ntfyTopic ?? defaultNtfyTopic);
+        if (!pending.ntfyTopic) {
+          toast.error(`Couldn't set up ntfy. Try again.`);
+          return;
+        }
+        setNtfyTopic(pending.ntfyTopic);
         setFlowState(`ntfyCreated`);
       } else {
         setFlowState(`codeSent`);
@@ -475,6 +479,7 @@ const NtfyIntro: React.FC = () => {
 
 const NtfySuccess: React.FC<{ topic: string }> = ({ topic }) => {
   const [copied, setCopied] = React.useState(false);
+  const platform = detectPlatform();
   const webUrl = `https://ntfy.sh/${topic}`;
   const copyTopic = (): void => {
     if (!navigator.clipboard) {
@@ -513,10 +518,17 @@ const NtfySuccess: React.FC<{ topic: string }> = ({ topic }) => {
               icon={copied ? CheckIcon : CopyIcon}
             />
           </HStack>
+          {platform === `android` && (
+            <Button type="link" href={`ntfy://ntfy.sh/${topic}`} variant="primary">
+              Open in ntfy app
+            </Button>
+          )}
         </VStack>
       </Banner>
       <Text as="p" variant="bodyMuted">
-        You can also view the topic in a browser at{` `}
+        Open the ntfy app, tap <strong className="font-semibold">+</strong>, and paste the
+        topic. We sent a test notification, which you&rsquo;ll see once you&rsquo;re
+        subscribed. You can also view the topic in a browser at{` `}
         <a
           href={webUrl}
           target="_blank"
