@@ -3,7 +3,7 @@ import React from 'react';
 import type { LoadableState } from '#/components/types';
 import type { InstalledMacApp, MacSettingsConfiguration } from './MacSettingsPage.types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
-import MacSettingsPage, { type InstalledAppsStatus } from './MacSettingsPage';
+import MacSettingsPage from './MacSettingsPage';
 
 const meta = {
   title: 'Account/Pages/People/Person Mac Settings',
@@ -16,7 +16,7 @@ export default meta;
 interface MacSettingsStoryProps {
   initialState: LoadableState<MacSettingsConfiguration>;
   savingMonitoring?: boolean;
-  installedAppsStatus?: InstalledAppsStatus;
+  installedAppsState?: LoadableState<InstalledMacApp[]>;
 }
 
 const defaultSettings: MacSettingsConfiguration = {
@@ -213,7 +213,7 @@ const expandSection = (canvasElement: HTMLElement, title: string): void => {
 const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
   initialState,
   savingMonitoring,
-  installedAppsStatus,
+  installedAppsState,
 }) => {
   const [state, setState] = React.useState(initialState);
 
@@ -226,9 +226,9 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
         selectedHref="/people/person-1/mac-settings"
       >
         <MacSettingsPage
+          personName="Jude"
           state={state}
-          installedApps={installedAppsStatus ? [] : installedApps}
-          installedAppsStatus={installedAppsStatus}
+          installedApps={installedAppsState ?? { status: `success`, data: installedApps }}
           savingMonitoring={savingMonitoring}
           onRequestPublicKeychain={async () => {}}
           onSaveMonitoring={(configuration) => {
@@ -385,7 +385,7 @@ export const InstalledAppsLoading = {
           apps: { ...defaultSettings.apps, blocked: [], unrestricted: [] },
         },
       }}
-      installedAppsStatus={{ status: `loading` }}
+      installedAppsState={{ status: `loading` }}
     />
   ),
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -405,7 +405,11 @@ export const InstalledAppsError = {
           apps: { ...defaultSettings.apps, blocked: [], unrestricted: [] },
         },
       }}
-      installedAppsStatus={{ status: `error`, onRetry: () => {} }}
+      installedAppsState={{
+        status: `error`,
+        message: `Check your connection and try again.`,
+        onRetry: () => {},
+      }}
     />
   ),
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {

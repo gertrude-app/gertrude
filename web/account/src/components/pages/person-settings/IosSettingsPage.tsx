@@ -323,6 +323,7 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
     profile.preventProtectionRemoval,
     !profile.allowDeletingApps,
     !profile.allowFactoryReset,
+    !profile.allowInstallingApps,
   ].filter(Boolean).length;
   const previewChips: PersonSettingsPreviewChip[] = [
     {
@@ -339,8 +340,8 @@ const IosSettingsEditor: React.FC<EditorProps> = ({
           title: `Protections`,
           values: [
             {
-              text: `${protections} of 3`,
-              color: protections === 3 ? `violet` : `neutral`,
+              text: `${protections} of 4`,
+              color: protections === 4 ? `violet` : `neutral`,
             },
           ],
         }

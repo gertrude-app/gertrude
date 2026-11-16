@@ -58,14 +58,29 @@ const MacSettingsRoute: React.FC = () => {
     },
   });
   const requestPublicKeychain = useMutation(liveClient.requestAccountPublicKeychain);
-  const installedApps: InstalledMacApp[] =
-    installedAppsQuery.data?.map((app) => ({
-      id: app.bundleId,
-      name: app.name,
-      bundleId: app.bundleId,
-      identifiedAppSlug: app.identifiedAppSlug,
-      appIconUrl: app.iconHash ? `${apiEndpoint}/app-icon/${app.iconHash}` : undefined,
-    })) ?? [];
+  const installedApps: LoadableState<InstalledMacApp[]> =
+    installedAppsQuery.data !== undefined
+      ? {
+          status: `success`,
+          data: installedAppsQuery.data.map((app) => ({
+            id: app.bundleId,
+            name: app.name,
+            bundleId: app.bundleId,
+            identifiedAppSlug: app.identifiedAppSlug,
+            appIconUrl: app.iconHash
+              ? `${apiEndpoint}/app-icon/${app.iconHash}`
+              : undefined,
+          })),
+        }
+      : installedAppsQuery.isError
+        ? {
+            status: `error`,
+            message:
+              installedAppsQuery.error.userMessage ??
+              `Check your connection and try again.`,
+            onRetry: () => void installedAppsQuery.refetch(),
+          }
+        : { status: `loading` };
 
   const state: LoadableState<MacSettingsConfiguration> =
     settingsQuery.data !== undefined
@@ -91,13 +106,6 @@ const MacSettingsRoute: React.FC = () => {
         personName={person?.name}
         onConnectMac={
           person ? () => connectMac([{ id: person.id, name: person.name }]) : undefined
-        }
-        installedAppsStatus={
-          installedAppsQuery.data !== undefined
-            ? { status: `ready` }
-            : installedAppsQuery.isError
-              ? { status: `error`, onRetry: () => void installedAppsQuery.refetch() }
-              : { status: `loading` }
         }
         savingMonitoring={updateMonitoring.isPending}
         savingInternetFiltering={updateInternetFiltering.isPending}

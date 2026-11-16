@@ -5,7 +5,6 @@ import type {
 } from '#/components/pages/person-settings/IosSettingsPage.types';
 import type { InstalledMacApp } from '#/components/pages/person-settings/MacSettingsPage.types';
 import type {
-  AllowedAlbum,
   Device,
   IOSDevice,
   Keychain,
@@ -157,33 +156,6 @@ export const installedMacApps: InstalledMacApp[] = [
     name: `Scratch`,
     bundleId: `edu.mit.scratch`,
     appIconUrl: `/example-app-icons/scratch.webp`,
-  },
-];
-
-export const albums: AllowedAlbum[] = [
-  {
-    title: `Midnight Signals`,
-    artist: `Nova Vale`,
-    artworkUrl: `/example-album-art/midnight-signals.webp`,
-    showAlbumArt: true,
-  },
-  {
-    title: `Orange Light`,
-    artist: `Lumen Fields`,
-    artworkUrl: `/example-album-art/orange-light.webp`,
-    showAlbumArt: true,
-  },
-  {
-    title: `Echoes & Pines`,
-    artist: `Hollow Pines`,
-    artworkUrl: `/example-album-art/echoes-and-pines.webp`,
-    showAlbumArt: false,
-  },
-  {
-    title: `Tide Bloom`,
-    artist: `Mira Saint`,
-    artworkUrl: `/example-album-art/tide-bloom.webp`,
-    showAlbumArt: true,
   },
 ];
 

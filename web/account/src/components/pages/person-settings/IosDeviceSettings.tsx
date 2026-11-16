@@ -59,9 +59,9 @@ const IosDeviceSettings: React.FC<Props> = ({
     {
       invalidating: [settingsKey],
       toast: {
-        loading: `Updating iOS device...`,
-        success: `IOS device updated!`,
-        error: `Failed to update iOS device`,
+        loading: `Saving restrictions…`,
+        success: `Restrictions saved`,
+        error: `Couldn't save restrictions`,
       },
     },
   );

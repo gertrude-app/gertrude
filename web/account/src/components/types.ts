@@ -153,13 +153,6 @@ export type KeychainsPageData = {
 export type CustomAlwaysBlockedRule =
   MacSettings[`internetFiltering`][`customAlwaysBlockedRules`][number];
 
-export type AllowedAlbum = {
-  title: string;
-  artist: string;
-  artworkUrl: string;
-  showAlbumArt: boolean;
-};
-
 export type NotificationMethod = {
   id: string;
 } & (
