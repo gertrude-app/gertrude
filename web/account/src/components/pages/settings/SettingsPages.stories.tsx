@@ -123,6 +123,11 @@ const fullCurrent = billingFixture({
   lastPaidTier: `full`,
 });
 
+const fullCanceling = billingFixture({
+  ...fullCurrent,
+  cancelsAt: inDays(24),
+});
+
 const fullCurrentSwitchable = billingFixture({
   ...fullCurrent,
   secondary: [
@@ -337,6 +342,11 @@ export const BillingMediumPastDue = {
 export const BillingFullCurrent = {
   name: 'Billing — Full, current',
   ...billingStory(fullCurrent),
+};
+
+export const BillingFullCanceling = {
+  name: 'Billing — Full, canceling',
+  ...billingStory(fullCanceling),
 };
 
 export const BillingFullCurrentSwitchable = {

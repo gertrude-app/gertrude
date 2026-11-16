@@ -359,6 +359,24 @@ final class BillingActionResolverTests: ApiTestCase, @unchecked Sendable {
     }
   }
 
+  func testStartCheckoutSessionRejectsNonLocalReturnPaths() async throws {
+    let parent = try await self.parent()
+    for path in ["@evil.com/x", "//evil.com", "https://evil.com", "/\\evil.com", "/a b"] {
+      try await expectErrorFrom { [self] in
+        try await StartCheckoutSession.resolve(
+          with: .init(
+            tier: .full,
+            successPath: path,
+            cancelPath: "/settings",
+            associatedIosDeviceId: nil,
+          ),
+          in: context(parent.model),
+        )
+      }.toContain("invalid checkout return path")
+    }
+    expect("/connect/blockerSupervise/123456?checkout=success".isLocalAppPath).toBeTrue()
+  }
+
   func testCheckoutReturnUrlAppendsSessionIdToExistingQuery() {
     expect(checkoutReturnUrl("https://a.com", "/settings"))
       .toEqual("https://a.com/settings?session_id={CHECKOUT_SESSION_ID}")

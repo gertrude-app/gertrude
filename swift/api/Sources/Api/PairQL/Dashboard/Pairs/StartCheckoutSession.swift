@@ -23,6 +23,14 @@ extension StartCheckoutSession: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     @Dependency(\.stripe) var stripe
 
+    guard input.successPath.isLocalAppPath, input.cancelPath.isLocalAppPath else {
+      throw context.error(
+        "73644504",
+        .badRequest,
+        "invalid checkout return path: \(input.successPath) \(input.cancelPath)",
+      )
+    }
+
     let account = try await context.currentBillingAccount()
     if let sub = account.stripeSubscription, sub.stripeStatus.isLive {
       throw context.error(

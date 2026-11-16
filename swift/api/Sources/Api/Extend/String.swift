@@ -15,6 +15,20 @@ extension String {
     regexReplace("ies$", "y").regexReplace("s$", "")
   }
 
+  var isLocalAppPath: Bool {
+    guard
+      hasPrefix("/"),
+      !hasPrefix("//"),
+      !contains("\\"),
+      !unicodeScalars.contains(where: { CharacterSet.whitespacesAndNewlines.contains($0) }),
+      rangeOfCharacter(from: .controlCharacters) == nil,
+      let components = URLComponents(string: self),
+      components.scheme == nil,
+      components.host == nil
+    else { return false }
+    return true
+  }
+
   var withoutTrailingSlashes: String {
     var copy = self
     while copy.hasSuffix("/") {
