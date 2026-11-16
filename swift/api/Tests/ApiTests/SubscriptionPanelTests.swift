@@ -31,6 +31,18 @@ final class SubscriptionPanelTests: DependencyTestCase {
     ])
   }
 
+  func testLiveSubscriptionExposesScheduledCancellation() {
+    let cancelAt = Date.reference + .days(30)
+    let canceling = self.billing(sub: (.full, .active), cancelAt: cancelAt)
+    expect(panelOutput_v2(billing: canceling).cancelsAt).toEqual(cancelAt)
+
+    let renewing = self.billing(sub: (.full, .active))
+    expect(panelOutput_v2(billing: renewing).cancelsAt).toBeNil()
+
+    let ended = self.billing(sub: (.full, .canceled), cancelAt: cancelAt)
+    expect(panelOutput_v2(billing: ended).cancelsAt).toBeNil() // no live sub, nothing to cancel
+  }
+
   // MARK: - free, lapsed
 
   func testFreeLapsedLightReactivatesEitherTier() {
@@ -383,6 +395,7 @@ extension SubscriptionPanelTests {
     sub: (tier: StripeSubscription.Tier, status: StripeSubscription.StripeStatus)? = nil,
     lastSubId: String? = nil,
     lastPaidTier: StripeSubscription.Tier? = nil,
+    cancelAt: Date? = nil,
     date: Date = .reference,
   ) -> BillingAccountSnapshot {
     let identity = BillingIdentity(
@@ -402,6 +415,7 @@ extension SubscriptionPanelTests {
         currentPeriodEnd: .reference + .days(30),
       )
       s.isLegacyPrice = false
+      s.cancelAt = cancelAt
       return s
     }
     return BillingAccountSnapshot(

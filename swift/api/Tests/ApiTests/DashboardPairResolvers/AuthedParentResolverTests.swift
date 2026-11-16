@@ -60,6 +60,50 @@ final class AuthedParentResolverTests: ApiTestCase, @unchecked Sendable {
     expect(alarms.count).toEqual(0)
   }
 
+  func testHandleCheckoutSuccessReplacingCanceledSubClearsCancelAt() async throws {
+    let sessionId = "cs_\("".random)"
+    let oldSubId = "sub_old_\("".random)"
+    let newSubId = "sub_new_\("".random)"
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.stripeId = .init(oldSubId)
+      sub.tier = .light
+      sub.cancelAt = .reference
+    }
+    let periodEnd = Date.reference + .days(30)
+
+    let output = try await withDependencies {
+      $0.stripe.getCheckoutSession = { _ in
+        .init(
+          id: sessionId,
+          url: nil,
+          subscription: newSubId,
+          clientReferenceId: parent.id.lowercased,
+        )
+      }
+      $0.stripe.getSubscription = { id in
+        id == oldSubId
+          ? .init(id: id, status: .canceled, customer: "cus_x", currentPeriodEnd: 0)
+          : .init(
+            id: id,
+            status: .active,
+            customer: "cus_x",
+            currentPeriodEnd: Int(periodEnd.timeIntervalSince1970),
+            items: [.init(id: "si_test", price: .init(id: self.env.stripe.priceIdFull))],
+          )
+      }
+    } operation: {
+      try await HandleCheckoutSuccess.resolve(
+        with: .init(stripeCheckoutSessionId: sessionId),
+        in: context(parent.model),
+      )
+    }
+
+    expect(output).toEqual(.success)
+    let sub = try await parent.model.subscription(in: self.db)!
+    expect(sub.stripeId.rawValue).toEqual(newSubId)
+    expect(sub.cancelAt).toBeNil() // old sub's scheduled cancellation doesn't carry over
+  }
+
   func testGetParentWithNotifications() async throws {
     let parent = try await self.parent()
     let method = Parent.NotificationMethod(

@@ -10,6 +10,7 @@ struct StripeSubscription: Codable, Sendable {
   var stripeId: StripeId
   var stripeStatus: StripeStatus
   var currentPeriodEnd: Date
+  var cancelAt: Date?
   var isLegacyPrice: Bool
   var createdAt = Date()
   var updatedAt = Date()

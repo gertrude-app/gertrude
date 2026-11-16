@@ -60,6 +60,9 @@ extension HandleCheckoutSuccess: Resolver {
         // duplication will alert us for manual reconciliation/cleanup
         guard allow else { return .success }
       }
+      if model.stripeId.rawValue != subscriptionId {
+        model.cancelAt = nil
+      }
       model.tier = tier
       model.stripeId = .init(subscriptionId)
       model.stripeStatus = .active
