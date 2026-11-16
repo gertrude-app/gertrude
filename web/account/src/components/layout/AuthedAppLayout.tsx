@@ -1,7 +1,9 @@
 import { Sidebar, SidebarItem, SidebarLayout, SidebarSection } from '@gertrude/ui';
 import {
+  BookOpenTextIcon,
   InboxIcon,
   KeyIcon,
+  LifeBuoyIcon,
   MonitorSmartphoneIcon,
   ScanEyeIcon,
   SettingsIcon,
@@ -49,7 +51,7 @@ const AuthedAppLayout: React.FC<Props> = ({
           />
         }
       >
-        <SidebarSection title={showMacSection ? `Platform` : undefined}>
+        <SidebarSection title="Platform">
           <SidebarItem
             title="People"
             icon={UsersIcon}
@@ -92,6 +94,18 @@ const AuthedAppLayout: React.FC<Props> = ({
             />
           </SidebarSection>
         )}
+        <SidebarSection title="Help">
+          <SidebarItem
+            title="Help center"
+            icon={BookOpenTextIcon}
+            href="https://gertrude.app/help"
+          />
+          <SidebarItem
+            title="Contact support"
+            icon={LifeBuoyIcon}
+            href="https://gertrude.app/contact"
+          />
+        </SidebarSection>
       </Sidebar>
     </SidebarLayout>
   );

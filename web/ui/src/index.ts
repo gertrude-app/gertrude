@@ -27,7 +27,6 @@ export { default as ProgressRing } from './components/ProgressRing';
 export { default as RadioList } from './components/RadioList';
 export type { RadioListOption } from './components/RadioList';
 export { default as Select } from './components/Select';
-export { default as SegmentedTabs } from './components/SegmentedTabs';
 export { default as Sidebar } from './components/Sidebar';
 export { default as SidebarItem } from './components/SidebarItem';
 export { default as SidebarLayout } from './components/SidebarLayout';

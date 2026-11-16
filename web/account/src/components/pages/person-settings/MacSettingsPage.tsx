@@ -58,13 +58,9 @@ import {
   timeOfDayToInputValue,
 } from '#/components/utils';
 
-export type InstalledAppsStatus =
-  { status: `ready` } | { status: `loading` } | { status: `error`; onRetry: () => void };
-
 interface Props {
   state: LoadableState<MacSettingsConfiguration>;
-  installedApps?: InstalledMacApp[];
-  installedAppsStatus?: InstalledAppsStatus;
+  installedApps?: LoadableState<InstalledMacApp[]>;
   personName?: string;
   onConnectMac?: () => void;
   savingMonitoring?: boolean;
@@ -143,7 +139,7 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
               text: draft.screenshotsEnabled
                 ? frequency === undefined
                   ? `On`
-                  : `Every ${frequency}s`
+                  : `Every ${frequency % 60 === 0 ? `${frequency / 60}m` : `${frequency}s`}`
                 : `Off`,
               color: draft.screenshotsEnabled ? `violet` : `neutral`,
             },
@@ -250,6 +246,7 @@ const MonitoringSettings: React.FC<MonitoringSettingsProps> = ({
 };
 
 interface InternetFilteringSettingsProps {
+  personName: string;
   settings: MacSettingsConfiguration;
   state: InternetFilteringFormState;
   dispatch: React.Dispatch<MacSettingsAction>;
@@ -262,6 +259,7 @@ interface InternetFilteringSettingsProps {
 }
 
 const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
+  personName,
   settings,
   state,
   dispatch,
@@ -538,7 +536,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
       <AddKeychainSlideOver
         open={addKeychainSlideOverOpen}
         onOpenChange={setAddKeychainSlideOverOpen}
-        personName="this person"
+        personName={personName}
         keychains={settings.internetFiltering.availableKeychains}
         assignedKeychainIds={draft.keychains.map((keychain) => keychain.id)}
         onRequestPublicKeychain={onRequestPublicKeychain}
@@ -556,18 +554,18 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
 };
 
 interface AppsSettingsProps {
+  personName: string;
   state: AppsFormState;
-  installedApps: InstalledMacApp[];
-  installedAppsStatus: InstalledAppsStatus;
+  installedApps: LoadableState<InstalledMacApp[]>;
   dispatch: React.Dispatch<MacSettingsAction>;
   saving: boolean;
   onSave: (configuration: MacAppsConfiguration) => void | Promise<void>;
 }
 
 const AppsSettings: React.FC<AppsSettingsProps> = ({
+  personName,
   state,
-  installedApps,
-  installedAppsStatus,
+  installedApps: installedAppsState,
   dispatch,
   saving,
   onSave,
@@ -577,14 +575,16 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
   >(null);
   const { draft } = state;
   const hasUnsavedChanges = appsHaveUnsavedChanges(state);
-  const canAddApps = installedAppsStatus.status === `ready` && installedApps.length > 0;
+  const installedApps =
+    installedAppsState.status === `success` ? installedAppsState.data : [];
+  const canAddApps = installedAppsState.status === `success` && installedApps.length > 0;
   const emptyAppsDescription = (readyDescription: string): string => {
-    switch (installedAppsStatus.status) {
+    switch (installedAppsState.status) {
       case `loading`:
         return `Loading installed apps…`;
       case `error`:
         return `Couldn't load installed apps.`;
-      case `ready`:
+      case `success`:
         return installedApps.length > 0
           ? readyDescription
           : `No installed apps have been reported yet.`;
@@ -594,11 +594,11 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
     type: `blocked` | `unrestricted`,
     text: string,
   ): React.ComponentProps<typeof EmptyState>[`button`] => {
-    if (installedAppsStatus.status === `error`) {
+    if (installedAppsState.status === `error`) {
       return {
         text: `Try again`,
         type: `button`,
-        onClick: installedAppsStatus.onRetry,
+        onClick: installedAppsState.onRetry,
         icon: RefreshCwIcon,
       };
     }
@@ -813,7 +813,7 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
         <AddMacAppSlideOver
           open
           type={addAppSlideOverType}
-          personName="this person"
+          personName={personName}
           installedApps={installedApps}
           blockedApps={draft.blocked}
           unrestrictedApps={draft.unrestricted}
@@ -858,9 +858,9 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
 };
 
 interface MacSettingsEditorProps {
+  personName?: string;
   settings: MacSettingsConfiguration;
-  installedApps: InstalledMacApp[];
-  installedAppsStatus: InstalledAppsStatus;
+  installedApps: LoadableState<InstalledMacApp[]>;
   savingMonitoring: boolean;
   savingInternetFiltering: boolean;
   savingApps: boolean;
@@ -877,9 +877,9 @@ interface MacSettingsEditorProps {
 }
 
 const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
+  personName,
   settings,
-  installedApps,
-  installedAppsStatus,
+  installedApps: installedAppsState,
   savingMonitoring,
   savingInternetFiltering,
   savingApps,
@@ -889,6 +889,10 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
   onRequestPublicKeychain,
   onUnsavedChangesChange,
 }) => {
+  const installedApps = React.useMemo(
+    () => (installedAppsState.status === `success` ? installedAppsState.data : []),
+    [installedAppsState],
+  );
   const hydratedSettings = React.useMemo<MacSettingsConfiguration>(
     () => ({
       ...settings,
@@ -991,6 +995,7 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
         onSave={onSaveMonitoring}
       />
       <InternetFilteringSettings
+        personName={personName ?? `this person`}
         settings={settings}
         state={formState.internetFiltering}
         dispatch={dispatch}
@@ -999,9 +1004,9 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
         onRequestPublicKeychain={onRequestPublicKeychain}
       />
       <AppsSettings
+        personName={personName ?? `this person`}
         state={formState.apps}
-        installedApps={installedApps}
-        installedAppsStatus={installedAppsStatus}
+        installedApps={installedAppsState}
         dispatch={dispatch}
         saving={savingApps}
         onSave={onSaveApps}
@@ -1012,8 +1017,7 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
 
 const MacSettingsPage: React.FC<Props> = ({
   state,
-  installedApps = [],
-  installedAppsStatus = { status: `ready` },
+  installedApps = { status: `success`, data: [] },
   personName,
   onConnectMac,
   savingMonitoring = false,
@@ -1084,9 +1088,9 @@ const MacSettingsPage: React.FC<Props> = ({
 
   return (
     <MacSettingsEditor
+      personName={personName}
       settings={state.data}
       installedApps={installedApps}
-      installedAppsStatus={installedAppsStatus}
       savingMonitoring={savingMonitoring}
       savingInternetFiltering={savingInternetFiltering}
       savingApps={savingApps}
