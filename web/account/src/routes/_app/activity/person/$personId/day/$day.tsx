@@ -1,6 +1,6 @@
 import { PageHeading } from '@gertrude/ui';
 import { formatDate } from '@shared/datetime';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import React from 'react';
 import ActivityFeed from '#/components/activity/ActivityFeed';
 import { ActivityFeedLoadingState } from '#/components/activity/ActivityLoadingStates';
@@ -8,6 +8,7 @@ import DashboardPage from '#/components/layout/DashboardPage';
 import {
   dateFromDayParam,
   dayRange,
+  isValidDayParam,
   prepareDelete,
   prepareToggleFlag,
   toActivityItems,
@@ -117,5 +118,8 @@ const PersonDayActivityPage: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/_app/activity/person/$personId/day/$day`)({
+  beforeLoad: ({ params }) => {
+    if (!isValidDayParam(params.day)) throw notFound();
+  },
   component: PersonDayActivityPage,
 });

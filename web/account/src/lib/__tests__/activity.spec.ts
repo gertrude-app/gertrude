@@ -4,6 +4,7 @@ import {
   type ActivityItem,
   chunkActivityBySuspension,
   chunkActivityForDeletion,
+  isValidDayParam,
   prepareDelete,
   prepareDeleteCombined,
   toActivityItems,
@@ -270,5 +271,22 @@ describe(`suspension keystroke heuristic`, () => {
     ]);
     expect(batches[0]!.previousItems.map((item) => item.id)).toEqual([`before`, `stray`]);
     expect(batches[1]!.chunks).toEqual([{ type: `duringSuspension`, items: [after] }]);
+  });
+});
+
+describe(`isValidDayParam`, () => {
+  test(`accepts real YYYY-MM-DD dates and rejects everything else`, () => {
+    expect(isValidDayParam(`2026-11-10`)).toBe(true);
+    expect(isValidDayParam(`2024-02-29`)).toBe(true);
+    for (const day of [
+      `11-10-2026`,
+      `2026-02-30`,
+      `2026-13-01`,
+      `2026-1-5`,
+      `today`,
+      ``,
+    ]) {
+      expect(isValidDayParam(day)).toBe(false);
+    }
   });
 });

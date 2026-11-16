@@ -12,8 +12,10 @@ struct FlagActivityItems: Pair {
 extension FlagActivityItems: Resolver {
   static func resolve(with ids: [UUID], in ctx: ParentContext) async throws -> Output {
     @Dependency(\.date.now) var now
+    let computerUserIds = try await ctx.computerUsers().map(\.id)
 
     var screenshots = try await Screenshot.query()
+      .where(.computerUserId |=| computerUserIds)
       .where(.id |=| ids.map { .uuid($0) })
       .all(in: ctx.db)
     for i in 0 ..< screenshots.count {
@@ -25,6 +27,7 @@ extension FlagActivityItems: Resolver {
     }
 
     var keystrokes = try await KeystrokeLine.query()
+      .where(.computerUserId |=| computerUserIds)
       .where(.id |=| ids.map { .uuid($0) })
       .all(in: ctx.db)
     for i in 0 ..< keystrokes.count {

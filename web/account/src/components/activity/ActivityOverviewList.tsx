@@ -1,5 +1,6 @@
 import { Badge, Card, HStack, Text, VStack, inflect } from '@gertrude/ui';
 import { formatDate } from '@shared/datetime';
+import { Link } from '@tanstack/react-router';
 import React from 'react';
 import type { ActivityReviewStats, DaySummary } from '#/lib/activity';
 import CardContainer from '#/components/layout/CardContainer';
@@ -70,8 +71,8 @@ const ActivityOverviewDayCard: React.FC<ActivityOverviewDayCardProps> = ({
 
   return (
     <Card
-      as="a"
-      href={href}
+      as={Link}
+      to={href}
       padding={3}
       className="relative transition-[border-color,box-shadow] duration-100 hover:border-stone-300 hover:shadow-stone-400/60"
     >
