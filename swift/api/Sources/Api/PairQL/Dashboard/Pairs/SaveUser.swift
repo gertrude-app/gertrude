@@ -64,7 +64,7 @@ extension SaveUser: Resolver {
     } else {
       user = try await context.db.find(input.id)
       if let details = monitoringDecreased(user: user, input: input) {
-        let detail = "for child: \(user.name), \(details)"
+        let detail = "for person: \(user.name), \(details)"
         dashSecurityEvent(.monitoringDecreased, detail, in: context)
       }
       user.name = input.name
@@ -80,7 +80,7 @@ extension SaveUser: Resolver {
       if let blockedApps = input.blockedApps {
         let existing = try await user.blockedMacApps(in: context.db).map(\.dto)
         if !existing.elementsEqual(blockedApps) {
-          dashSecurityEvent(.blockedAppsChanged, "child: \(user.name)", in: context)
+          dashSecurityEvent(.blockedAppsChanged, "person: \(user.name)", in: context)
           try await BlockedMacApp.query()
             .where(.childId == user.id)
             .delete(in: context.db)
@@ -93,7 +93,7 @@ extension SaveUser: Resolver {
         .summaries
         .map(\.userKeychain)
       if !existing.elementsEqual(input.keychains) {
-        dashSecurityEvent(.keychainsChanged, "child: \(user.name)", in: context)
+        dashSecurityEvent(.keychainsChanged, "person: \(user.name)", in: context)
 
         try await ChildKeychain.query()
           .where(.childId == user.id)
@@ -118,7 +118,7 @@ extension SaveUser: Resolver {
         if Set(existing) != Set(groupIds) {
           dashSecurityEvent(
             .alwaysBlockedGroupsChanged,
-            "child: \(user.name)",
+            "person: \(user.name)",
             in: context,
           )
           try await ChildAlwaysBlockedGroup.query()
@@ -140,7 +140,7 @@ extension SaveUser: Resolver {
         if existing != customRules {
           dashSecurityEvent(
             .alwaysBlockedRulesChanged,
-            "child: \(user.name)",
+            "person: \(user.name)",
             in: context,
           )
           try await ChildAlwaysBlockedRule.query()

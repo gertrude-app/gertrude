@@ -42,7 +42,7 @@ extension SaveMacappFiltering: Resolver {
       )
     }
     if !child.filteringDisabled, input.filteringDisabled {
-      let detail = "for child: \(child.name), internet filtering disabled"
+      let detail = "for person: \(child.name), internet filtering disabled"
       dashSecurityEvent(.monitoringDecreased, detail, in: context)
     }
     child.filteringDisabled = input.filteringDisabled
@@ -53,7 +53,7 @@ extension SaveMacappFiltering: Resolver {
       .summaries
       .map(\.saveMacappFilteringPersonKeychain)
     if !existingKeychains.elementsEqual(input.keychains) {
-      dashSecurityEvent(.keychainsChanged, "child: \(child.name)", in: context)
+      dashSecurityEvent(.keychainsChanged, "person: \(child.name)", in: context)
 
       try await ChildKeychain.query()
         .where(.childId == child.id)
@@ -74,7 +74,7 @@ extension SaveMacappFiltering: Resolver {
       .all(in: context.db)
       .map(\.groupId)
     if Set(existingGroupIds) != Set(input.alwaysBlockedGroupIds) {
-      dashSecurityEvent(.alwaysBlockedGroupsChanged, "child: \(child.name)", in: context)
+      dashSecurityEvent(.alwaysBlockedGroupsChanged, "person: \(child.name)", in: context)
       try await ChildAlwaysBlockedGroup.query()
         .where(.childId == child.id)
         .delete(in: context.db)
@@ -90,7 +90,7 @@ extension SaveMacappFiltering: Resolver {
       .all(in: context.db)
       .map { ChildCustomBlockRule(id: $0.id, rule: $0.rule, comment: $0.comment) }
     if existingRules != input.customAlwaysBlockedRules {
-      dashSecurityEvent(.alwaysBlockedRulesChanged, "child: \(child.name)", in: context)
+      dashSecurityEvent(.alwaysBlockedRulesChanged, "person: \(child.name)", in: context)
       try await ChildAlwaysBlockedRule.query()
         .where(.childId == child.id)
         .delete(in: context.db)

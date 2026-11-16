@@ -28,7 +28,7 @@ extension SaveMacappMonitoring: Resolver {
       )
     }
     if let details = monitoringDecreased(child: child, input: input) {
-      let detail = "for child: \(child.name), \(details)"
+      let detail = "for person: \(child.name), \(details)"
       dashSecurityEvent(.monitoringDecreased, detail, in: context)
     }
     child.keyloggingEnabled = input.keyloggingEnabled

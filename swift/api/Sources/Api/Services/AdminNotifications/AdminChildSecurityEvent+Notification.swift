@@ -35,9 +35,9 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
   var context: String {
     switch source {
     case .macApp(let childName, _):
-      "for child \(childName)"
+      "for \(childName)"
     case .dashboard:
-      "in parent website"
+      "in your Gertrude account"
     }
   }
 
@@ -59,7 +59,7 @@ extension AdminEvent.SecurityEventPayload: AdminNotifying {
     case .macApp(let childName, _):
       "for \(childName.sanitizedForSms())"
     case .dashboard:
-      "in parent website"
+      "in your Gertrude account"
     }
     let linkUrl = switch self.notificationDestination {
     case .legacyDashboard:

@@ -296,7 +296,7 @@ extension DecideUnlockRequests: Resolver {
       await sendUnlockEvent(.userUpdated, to: .user(person.id))
       await recordDashSecurityEvent(
         .unrestrictedAppsChanged,
-        "child: \(person.name)",
+        "person: \(person.name)",
         in: context,
       )
     }

@@ -18,7 +18,7 @@ extension SaveMacappApps: Resolver {
 
     let existingBlocked = try await child.blockedMacApps(in: context.db).map(\.dto)
     if !existingBlocked.elementsEqual(input.blockedApps) {
-      dashSecurityEvent(.blockedAppsChanged, "child: \(child.name)", in: context)
+      dashSecurityEvent(.blockedAppsChanged, "person: \(child.name)", in: context)
       try await BlockedMacApp.query()
         .where(.childId == child.id)
         .delete(in: context.db)
@@ -28,7 +28,7 @@ extension SaveMacappApps: Resolver {
 
     let existingUnrestricted = try await child.unrestrictedMacApps(in: context.db).map(\.dto)
     if !existingUnrestricted.elementsEqual(input.unrestrictedApps) {
-      dashSecurityEvent(.unrestrictedAppsChanged, "child: \(child.name)", in: context)
+      dashSecurityEvent(.unrestrictedAppsChanged, "person: \(child.name)", in: context)
       try await UnrestrictedMacApp.query()
         .where(.childId == child.id)
         .delete(in: context.db)

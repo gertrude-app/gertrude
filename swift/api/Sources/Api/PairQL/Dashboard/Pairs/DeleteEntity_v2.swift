@@ -75,7 +75,7 @@ extension DeleteEntity_v2: Resolver {
       }
       dashSecurityEvent(
         .childComputerDeleted,
-        "child: \(child.name), computer serial: \(computer.serialNumber)",
+        "person: \(child.name), computer serial: \(computer.serialNumber)",
         in: context,
       )
       do {
@@ -123,7 +123,7 @@ extension DeleteEntity_v2: Resolver {
         throw Abort(.unauthorized)
       }
       try await context.db.delete(blockRule)
-      dashSecurityEvent(.iosBlockRuleDeleted, "child: \(child.name)", in: context)
+      dashSecurityEvent(.iosBlockRuleDeleted, "person: \(child.name)", in: context)
 
     case .child:
       let computerIds = try await context.computerUsers().map(\.computerId)

@@ -1,4 +1,4 @@
-Child {{userName}} submitted a new suspend filter request.
+{{userName}} submitted a new suspend filter request.
 
 Click here to view the details and approve or deny:
 

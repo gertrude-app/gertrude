@@ -39,7 +39,7 @@ extension SetAccountKeychainAssignment: Resolver {
 
     dashSecurityEvent(
       .keychainsChanged,
-      "child: \(person.name)",
+      "person: \(person.name)",
       in: context.legacyContext,
     )
     try await with(dependency: \.websockets)

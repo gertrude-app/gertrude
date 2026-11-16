@@ -43,7 +43,7 @@ extension SaveKey: Resolver {
         id: "d2f81a9c",
         type: .badRequest,
         debugMessage: "rejected skeleton key for non-public keychain",
-        userMessage: "App keys can no longer be created here — manage app internet access from the child's Mac Apps screen instead.",
+        userMessage: "App keys can no longer be created here — manage app internet access in the person's Mac settings instead.",
         showContactSupport: false,
       )
     }

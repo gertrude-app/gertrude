@@ -70,25 +70,25 @@ public extension SecurityEvent.Dashboard {
   var toWords: String {
     switch self {
     case .childAdded:
-      "New child added"
+      "Person added"
     case .childDeleted:
-      "Child deleted"
+      "Person deleted"
     case .childComputerDeleted:
-      "Child computer deleted"
+      "Mac disconnected from person"
     case .keyCreated:
       "Key created"
     case .keychainCreated:
       "Keychain created"
     case .keychainsChanged:
-      "Child keychains changed"
+      "Keychains changed"
     case .login:
       "Successful login"
     case .loginFailed:
       "Failed login"
     case .monitoringDecreased:
-      "Child monitoring decreased"
+      "Monitoring decreased"
     case .notificationDeleted:
-      "Admin notification deleted"
+      "Notification deleted"
     case .passwordChanged:
       "Password changed"
     case .passwordResetRequested:
@@ -109,39 +109,39 @@ public extension SecurityEvent.Dashboard {
   var explanation: String {
     switch self {
     case .childAdded:
-      "This event occurs when an parent creates a new child from the Gertrude parents admin site. It should occur very rarely, usually during account setup or when starting protection for a child. Should be investigated if it happened without your knowledge."
+      "This event occurs when someone adds a person to your Gertrude account. It should occur very rarely, usually during account setup or when starting protection for someone new. Investigate it if it happened without your knowledge."
     case .childDeleted:
-      "This event occurs when a parent deletes a child from the Gertrude parents admin site. It should occur very rarely, when a child is no longer being protected. Should be investigated if it happened without your knowledge."
+      "This event occurs when someone deletes a person from your Gertrude account. It should occur very rarely, when someone no longer needs protection. Investigate it if it happened without your knowledge."
     case .childComputerDeleted:
-      "This event occurs when a parent deletes a child's computer from the Gertrude parents admin site. It should occur very rarely, usually when a child is no longer using a computer, or no longer being protected. Should be investigated if it happened without your knowledge."
+      "This event occurs when someone disconnects a person's Mac from your Gertrude account. It should occur very rarely, usually when the person no longer uses that Mac or no longer needs protection. Investigate it if it happened without your knowledge."
     case .keyCreated:
-      "This event occurs when a new key is created and added to a keychain by a parent, either manually or by accepting an unlock request."
+      "This event occurs when a new key is added to a keychain, either directly or by accepting an unlock request."
     case .keychainCreated:
-      "This event occurs when a parent creates a new keychain."
+      "This event occurs when a new keychain is created."
     case .keychainsChanged:
-      "This event occurs when a parent changes which keychains are assigned to a child. Should be investigated if the change was not made by you."
+      "This event occurs when someone changes which keychains are assigned to a person. Investigate it if you didn't make the change."
     case .login:
-      "This event occurs whenever a parent successfully logs into the parents admin website. Should be investigated if you do not recognize the successful login as your own."
+      "This event occurs whenever someone logs in to your Gertrude account. Investigate it if you don't recognize the login as your own."
     case .loginFailed:
-      "This event occurs whenever a parent fails to log into the parents admin website, usually from an incorrect password. Should be investigated if you do not recognize the failed attempt as your own."
+      "This event occurs whenever someone fails to log in to your Gertrude account, usually because of an incorrect password. Investigate it if you don't recognize the attempt as your own."
     case .monitoringDecreased:
-      "This event occurs when the monitoring level for a child is decreased by a parent. It should be investigated if the monitoring level is decreased without your knowledge."
+      "This event occurs when someone decreases the monitoring level for a person. Investigate it if it happened without your knowledge."
     case .notificationDeleted:
-      "This event occurs when a parent deletes a notification from the parents admin site. It should be investigated if a notification was deleted without your knowledge."
+      "This event occurs when someone deletes a notification from your Gertrude account. Investigate it if it happened without your knowledge."
     case .passwordChanged:
-      "This event occurs when a parent changes their password for the parents admin site. Should be investigated if you did not change your password."
+      "This event occurs when the password for your Gertrude account is changed. Investigate it if you didn't change your password."
     case .passwordResetRequested:
-      "This event occurs when a parent requests a password reset for the parents admin site. Should be investigated if you did not request a password reset."
+      "This event occurs when someone requests a password reset for your Gertrude account. Investigate it if you didn't request it."
     case .blockedAppsChanged:
-      "This event occurs when a parent changes which apps are blocked for a child. Should be investigated if the change was not made by you."
+      "This event occurs when someone changes which apps are blocked for a person. Investigate it if you didn't make the change."
     case .unrestrictedAppsChanged:
-      "This event occurs when a parent changes which apps have unrestricted internet access for a child. Should be investigated if the change was not made by you."
+      "This event occurs when someone changes which apps have unrestricted internet access for a person. Investigate it if you didn't make the change."
     case .iosBlockRuleDeleted:
-      "This event occurs when a parent deletes an iOS block rule from the parents admin site. Should be investigated if the change was not made by you."
+      "This event occurs when someone deletes an iOS block rule from your Gertrude account. Investigate it if you didn't make the change."
     case .alwaysBlockedGroupsChanged:
-      "This event occurs when a parent changes which Always Blocked groups are assigned to a child. Should be investigated if the change was not made by you."
+      "This event occurs when someone changes which Always Blocked groups apply to a person. Investigate it if you didn't make the change."
     case .alwaysBlockedRulesChanged:
-      "This event occurs when a parent changes a child's custom Always Blocked rules. Should be investigated if the change was not made by you."
+      "This event occurs when someone changes a person's custom Always Blocked rules. Investigate it if you didn't make the change."
     }
   }
 
@@ -185,7 +185,7 @@ public extension SecurityEvent.MacApp {
     case .appUpdateSucceeded:
       "App update succeeded"
     case .childDisconnected:
-      "Child disconnected"
+      "Mac app disconnected"
     case .filterSuspendedRemotely:
       "Filter suspended remotely"
     case .filterSuspensionEndedEarly:
@@ -193,7 +193,7 @@ public extension SecurityEvent.MacApp {
     case .filterSuspensionExpired:
       "Filter suspension expired"
     case .filterSuspensionGrantedByAdmin:
-      "Filter suspension granted by admin"
+      "Filter suspended on the Mac"
     case .macosUserExempted:
       "macOS user exempted"
     case .newMacOsUserCreated:
@@ -214,27 +214,27 @@ public extension SecurityEvent.MacApp {
   var explanation: String {
     switch self {
     case .advancedSettingsOpened:
-      "This event occurs when an admin-privileged user opens a hidden, advanced settings area in the Administrate screen. This is an unexpected event that usually only occurs when a parent is instructed by Gertrude support to access this area. It should be investigated."
+      "This event occurs when a macOS admin user opens a hidden, advanced settings area in the Administrate screen. This is unexpected, and usually only happens when Gertrude support has asked you to open it. It should be investigated."
     case .appLaunched:
       "This event occurs when the Gertrude app is launched. Only investigate it if seems to be occuring more than expected."
     case .appQuit:
-      "This event occurs when an admin-privileged user quits the Gertrude app. For a protected child, this should not occur and should be investigated."
+      "This event occurs when a macOS admin user quits the Gertrude app. On a protected person's Mac this shouldn't happen, and it should be investigated."
     case .appUpdateFailedToReplaceSystemExtension:
-      "This is a rare event that occurs when a Gertrude update fails. It does not represent any attempt by the protected child to bypass Gertrude, but should be investigated to make sure the filter is functioning correctly."
+      "This is a rare event that occurs when a Gertrude update fails. It isn't an attempt by the protected person to bypass Gertrude, but should be investigated to make sure the filter is working correctly."
     case .appUpdateSucceeded:
       "This event occurs when an upgrade to the Gertrude app finishes successfully. It is normal, but should be infrequent."
     case .childDisconnected:
-      "This event occurs when the Gertrude macOS app is disconnected from protecting a child. It should not occur unless the app is being uninstalled, or a different child is connected soon after."
+      "This event occurs when the Gertrude macOS app is disconnected from the person it was protecting. It shouldn't happen unless the app is being uninstalled, or a different person is connected soon after."
     case .filterSuspendedRemotely:
-      "This event occurs when a parent account accepts a request to suspend the filter. As long as the parent accepted the request, this event is normal."
+      "This event occurs when a request to suspend the filter is accepted from your Gertrude account. As long as you accepted the request, this event is normal."
     case .filterSuspensionEndedEarly:
-      "This event occurs when the child ends a filter suspension early. It does not represent a safety risk."
+      "This event occurs when the protected person ends a filter suspension early. It isn't a safety risk."
     case .filterSuspensionExpired:
-      "This event occurs when a filter suspension ends after the scheduled time. It does not represent a safety risk."
+      "This event occurs when a filter suspension ends at its scheduled time. It isn't a safety risk."
     case .filterSuspensionGrantedByAdmin:
-      "This event occurs when a filter suspension is granted from the computer by a admin-privileged user. If a parent did not authenticate, this represents the child suspending the filter themselves."
+      "This event occurs when a macOS admin user suspends the filter directly on the Mac. If you didn't do this, it means the protected person suspended the filter themselves."
     case .macosUserExempted:
-      "This event occurs when a admin-privileged user exempts another macOS user from being filtered by Gertrude. Unless the parent is responsible for this action, it should be investigated."
+      "This event occurs when a macOS admin user exempts another macOS user from being filtered by Gertrude. Unless you did this, it should be investigated."
     case .newMacOsUserCreated:
       "This event occurs when a new macOS user is created on the computer. It could represent an attempt to bypass Gertrude, but could also be normal."
     case .systemClockOrTimeZoneChanged:
@@ -244,9 +244,9 @@ public extension SecurityEvent.MacApp {
     case .systemExtensionStateChanged:
       "This event occurs when the system extension (filter) state has changed. It should be investigated if the state remains uninstalled or stopped."
     case .blockedAppLaunchAttempted:
-      "This event occurs when a child tries to launch an app designated blocked by the parent. There is no security risk as Gertrude will not allow the app to open, but repeated events do represent an attempt by the child to launch forbidden apps."
+      "This event occurs when the protected person tries to open an app you've blocked. It isn't a security risk, since Gertrude won't let the app open, but repeated events show repeated attempts to open blocked apps."
     case .filteringDisabledDuringOnboarding:
-      "This event occurs when internet filtering is disabled for a child during the onboarding process. This is a legitimate option offered during setup, but should be investigated if the parent did not intend for filtering to be disabled."
+      "This event occurs when internet filtering is turned off for a person during setup. This is a legitimate setup option, but should be investigated if you didn't intend to turn filtering off."
     }
   }
 
