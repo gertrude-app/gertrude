@@ -38,6 +38,17 @@ struct Release: Codable, Sendable {
   }
 }
 
+extension Release {
+  static func parseMinVersion(_ minVersion: String) -> Semver? {
+    Semver(minVersion) ?? Semver(minVersion + ".0")
+  }
+
+  func supports(_ osVersion: Semver) -> Bool {
+    guard let minOsVersion = Self.parseMinVersion(self.minVersion) else { return true }
+    return osVersion >= minOsVersion
+  }
+}
+
 extension Semver {
   init(_ release: Release) {
     // releases are guaranteed to have a valid semver
