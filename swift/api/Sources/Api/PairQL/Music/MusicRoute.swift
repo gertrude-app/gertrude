@@ -12,7 +12,7 @@ extension MusicRoute: RouteResponder {
         .first(in: context.db, orThrow: context.error(
           id: "2b2a110a",
           type: .loggedOut,
-          debugMessage: "music app token not found",
+          debugMessage: "music app token not found \(uuid)",
         ))
 
       let install = try await token.install(in: context.db)
@@ -21,7 +21,7 @@ extension MusicRoute: RouteResponder {
         throw context.error(
           id: "364b4b8d",
           type: .loggedOut,
-          debugMessage: "music device has no associated child",
+          debugMessage: "music device has no associated child, \(uuid)",
         )
       }
 
