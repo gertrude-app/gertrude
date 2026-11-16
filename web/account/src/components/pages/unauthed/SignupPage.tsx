@@ -1,6 +1,8 @@
 import { Banner, Button, Input, Text, VStack } from '@gertrude/ui';
 import { ArrowRightIcon } from 'lucide-react';
 import React from 'react';
+import type { ConnectingDevice } from '#/lib/authRedirect';
+import ConnectingSubheading from '#/components/unauthed/ConnectingSubheading';
 import RotatingTestimonials, {
   type Testimonial,
 } from '#/components/unauthed/RotatingTestimonials';
@@ -23,6 +25,7 @@ interface Props {
   onChangeEmail: () => void;
   securityCheck?: React.ReactNode;
   securityReady?: boolean;
+  connecting?: ConnectingDevice;
 }
 
 const SignupPage: React.FC<Props> = ({
@@ -41,6 +44,7 @@ const SignupPage: React.FC<Props> = ({
   onChangeEmail,
   securityCheck,
   securityReady = true,
+  connecting,
 }) => (
   <UnauthedPageLayout
     form={
@@ -140,9 +144,13 @@ const SignupPage: React.FC<Props> = ({
         }
         heading={sent ? `Check your email` : `Create your account`}
         subheading={
-          sent
-            ? `One last step to get started.`
-            : `One account for all your Gertrude apps.`
+          sent ? (
+            `One last step to get started.`
+          ) : connecting ? (
+            <ConnectingSubheading device={connecting} />
+          ) : (
+            `One account for all your Gertrude apps.`
+          )
         }
         disclaimer={
           !sent && (
