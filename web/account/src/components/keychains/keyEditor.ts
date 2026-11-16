@@ -36,7 +36,6 @@ export type KeyEditorSaveData = {
 
 export type DomainDetails = {
   hostname: string;
-  registrableDomain: string;
   hasSubdomain: boolean;
 };
 
@@ -163,10 +162,31 @@ const hostnameFromInput = (input: string): string | null => {
   }
 };
 
+const localNetworkSuffixes = [`local`, `lan`, `home.arpa`, `internal`];
+
+const localNetworkDetails = (hostname: string): DomainDetails | null => {
+  const suffix = localNetworkSuffixes.find((suffix) => hostname.endsWith(`.${suffix}`));
+  if (!suffix) {
+    return null;
+  }
+
+  const labels = hostname.slice(0, -(suffix.length + 1)).split(`.`);
+  if (labels.some((label) => !/^[a-z\d]([a-z\d-]*[a-z\d])?$/.test(label))) {
+    return null;
+  }
+
+  return { hostname, hasSubdomain: labels.length > 1 };
+};
+
 export const domainDetails = (input: string): DomainDetails | null => {
   const hostname = hostnameFromInput(input);
   if (!hostname) {
     return null;
+  }
+
+  const localNetwork = localNetworkDetails(hostname);
+  if (localNetwork) {
+    return localNetwork;
   }
 
   const parsed = parseDomain(hostname);
@@ -184,7 +204,6 @@ export const domainDetails = (input: string): DomainDetails | null => {
       .filter(Boolean)
       .join(`.`)
       .toLowerCase(),
-    registrableDomain: `${domain}.${topLevelDomains.join(`.`)}`.toLowerCase(),
     hasSubdomain: subDomains.length > 0,
   };
 };
@@ -252,8 +271,11 @@ export const domainRegexError = (pattern: string): string | null => {
   let regex: RegExp;
   try {
     regex = new RegExp(pattern, `i`);
-  } catch {
-    return `Enter a valid regular expression.`;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message.split(`: `).pop() : undefined;
+    return reason
+      ? `Enter a valid regular expression (${reason}).`
+      : `Enter a valid regular expression.`;
   }
 
   if (regex.test(``)) {
@@ -308,7 +330,7 @@ export const keyFromEditorState = (state: KeyEditorState): SharedKey | null => {
         return null;
       }
       return state.domainMatch === `standard`
-        ? { type: `anySubdomain`, domain: details.registrableDomain, scope }
+        ? { type: `anySubdomain`, domain: details.hostname, scope }
         : { type: `domain`, domain: details.hostname, scope };
     }
     case `ipAddress`: {
@@ -331,6 +353,9 @@ export const keyEditorError = (state: KeyEditorState): string | null => {
 
   if (state.targetType === `website`) {
     const details = domainDetails(state.address);
+    if (!details && isIpAddress(state.address)) {
+      return `This looks like an IP address. Change the type to “IP address” instead.`;
+    }
     if (!details) {
       return `Enter a complete website address, such as example.com.`;
     }

@@ -1,6 +1,8 @@
 import {
   Badge,
+  Button,
   Card,
+  ConfirmationDialog,
   EmptyState,
   HStack,
   Input,
@@ -22,6 +24,7 @@ import {
   RegexIcon,
   RouteIcon,
   SearchXIcon,
+  TrashIcon,
 } from 'lucide-react';
 import React from 'react';
 import type { KeychainKey, SharedKey } from '#/components/types';
@@ -53,6 +56,7 @@ interface Props {
   keys: KeychainKey[];
   onAdd?: () => void;
   onEdit?: (key: KeychainKey) => void;
+  onDelete?: (keyId: string) => Promise<void>;
 }
 
 const targetPresentation = (key: SharedKey): KeyTargetPresentation => {
@@ -269,14 +273,48 @@ export const KeyDisplay: React.FC<{
 const KeyRow: React.FC<{
   record: KeychainKey;
   onEdit?: (key: KeychainKey) => void;
-}> = ({ record, onEdit }) => {
+  onDelete?: (keyId: string) => Promise<void>;
+}> = ({ record, onEdit, onDelete }) => {
   const presentation = keyPresentation(record);
-  const editable =
-    onEdit !== undefined && record.key.type !== `path` && record.key.type !== `skeleton`;
-  const content = <KeyDisplay record={record} />;
+  const legacy = record.key.type === `path` || record.key.type === `skeleton`;
+  const editable = onEdit !== undefined && !legacy;
+  const deletable = onDelete !== undefined && legacy;
+  const content = (
+    <KeyDisplay
+      record={record}
+      className={deletable ? `pr-12 @2xl/main:pr-14` : undefined}
+    />
+  );
 
   return (
-    <li className="border-b border-stone-200/70 last:border-b-0">
+    <li className="relative border-b border-stone-200/70 last:border-b-0">
+      {deletable && (
+        <div className="absolute right-2 top-1 @2xl/main:right-3 @2xl/main:top-1/2 @2xl/main:-translate-y-1/2">
+          <ConfirmationDialog
+            confirmationQuestion="Delete this key?"
+            description="This older key type can't be edited, only deleted. Assigned Macs will stop allowing it."
+            trigger={
+              <Button
+                type="button"
+                variant="ghost"
+                size="small"
+                icon={TrashIcon}
+                onClick={() => {}}
+                ariaLabel={`Delete key for ${presentation.target.target}`}
+              />
+            }
+            actions={[
+              { text: `Cancel`, variant: `ghost` },
+              {
+                text: `Delete key`,
+                variant: `destructive`,
+                icon: TrashIcon,
+                onClick: () => onDelete(record.id).catch(() => undefined),
+              },
+            ]}
+          />
+        </div>
+      )}
       {editable ? (
         <button
           type="button"
@@ -308,7 +346,7 @@ const searchableText = (record: KeychainKey): string => {
     .toLowerCase();
 };
 
-const KeyList: React.FC<Props> = ({ keys, onAdd, onEdit }) => {
+const KeyList: React.FC<Props> = ({ keys, onAdd, onEdit, onDelete }) => {
   const [searchQuery, setSearchQuery] = React.useState(``);
   const searchInputId = React.useId();
   const normalizedSearchQuery = searchQuery.trim().toLowerCase();
@@ -389,7 +427,7 @@ const KeyList: React.FC<Props> = ({ keys, onAdd, onEdit }) => {
       {filteredKeys.length > 0 ? (
         <ul>
           {filteredKeys.map((key) => (
-            <KeyRow key={key.id} record={key} onEdit={onEdit} />
+            <KeyRow key={key.id} record={key} onEdit={onEdit} onDelete={onDelete} />
           ))}
         </ul>
       ) : (

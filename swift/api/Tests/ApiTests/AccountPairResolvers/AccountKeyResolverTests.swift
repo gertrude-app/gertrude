@@ -101,12 +101,13 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
     }.toContain("notFound")
   }
 
-  func testRejectsKeychainOwnedByAnotherAccount() async throws {
+  func testRejectsPublicKeychainOwnedByAnotherAccount() async throws {
     let parent = try await self.parent()
     let otherParent = try await self.parent()
     let keychain = try await self.db.create(Keychain(
       parentId: otherParent.id,
       name: "Other Account",
+      isPublic: true,
     ))
     let key = try await self.db.create(Key(
       keychainId: keychain.id,
@@ -134,7 +135,7 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
     }.toContain("notFound")
   }
 
-  func testRejectsEditsToPublicAndLegacyKeys() async throws {
+  func testOwnerCanEditPublicKeysButNotLegacyKeys() async throws {
     let parent = try await self.parent()
     let publicKeychain = try await self.db.create(Keychain(
       parentId: parent.id,
@@ -151,25 +152,23 @@ final class AccountKeyResolverTests: ApiTestCase, @unchecked Sendable {
     ))
     let context = self.accountContext(parent)
 
-    try await expectErrorFrom {
-      try await SaveAccountKey.resolve(
-        with: .init(
-          keychainId: publicKeychain.id,
-          keyId: nil,
-          key: .domain(domain: "example.com", scope: .webBrowsers),
-          comment: nil,
-          expiration: nil,
-        ),
-        in: context,
-      )
-    }.toContain("serverError")
-
-    try await expectErrorFrom {
-      try await DeleteAccountKey.resolve(
-        with: .init(keychainId: publicKeychain.id, keyId: publicKey.id),
-        in: context,
-      )
-    }.toContain("serverError")
+    _ = try await SaveAccountKey.resolve(
+      with: .init(
+        keychainId: publicKeychain.id,
+        keyId: nil,
+        key: .domain(domain: "public.example.com", scope: .webBrowsers),
+        comment: nil,
+        expiration: nil,
+      ),
+      in: context,
+    )
+    _ = try await DeleteAccountKey.resolve(
+      with: .init(keychainId: publicKeychain.id, keyId: publicKey.id),
+      in: context,
+    )
+    let publicKeys = try await publicKeychain.keys(in: self.db)
+    expect(publicKeys.map(\.key))
+      .toEqual([.domain(domain: "public.example.com", scope: .webBrowsers)])
 
     try await expectErrorFrom {
       try await SaveAccountKey.resolve(

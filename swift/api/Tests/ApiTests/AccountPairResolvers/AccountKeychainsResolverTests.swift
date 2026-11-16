@@ -85,19 +85,22 @@ final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
     expect(sent.websocketMessages).toBeEmpty()
   }
 
-  func testRejectsMetadataChangesAndDeletionOfPublicKeychains() async throws {
+  func testOwnerCanEditPublicKeychainMetadataButNotDeleteIt() async throws {
     let parent = try await self.parent()
     let owned = try await parent.withKeychain { keychain, _ in
       keychain.isPublic = true
     }
     let context = self.accountContext(parent)
 
-    try await expectErrorFrom {
-      try await SaveAccountKeychain.resolve(
-        with: .init(keychainId: owned.keychain.id, name: "Changed", description: nil),
-        in: context,
-      )
-    }.toContain("badRequest")
+    _ = try await SaveAccountKeychain.resolve(
+      with: .init(keychainId: owned.keychain.id, name: "Changed", description: "New"),
+      in: context,
+    )
+    let saved = try await self.db.find(owned.keychain.id)
+    expect(saved.name).toEqual("Changed")
+    expect(saved.description).toEqual("New")
+    expect(saved.isPublic).toBeTrue()
+
     try await expectErrorFrom {
       try await DeleteAccountKeychain.resolve(
         with: .init(keychainId: owned.keychain.id),
@@ -105,11 +108,8 @@ final class AccountKeychainsResolverTests: ApiTestCase, @unchecked Sendable {
       )
     }.toContain("badRequest")
 
-    await expect(try self.db.find(owned.keychain.id).name).toEqual(owned.keychain.name)
-    await expect(try self.db.find(owned.keychain.id).description)
-      .toEqual(owned.keychain.description)
+    await expect(try self.db.find(owned.keychain.id).id).toEqual(owned.keychain.id)
     await expect(try self.db.find(owned.key.id).key).toEqual(owned.key.key)
-    expect(sent.websocketMessages).toBeEmpty()
   }
 
   func testDetailsIncludeOnlyAssignedPeopleFromTheOwningAccount() async throws {

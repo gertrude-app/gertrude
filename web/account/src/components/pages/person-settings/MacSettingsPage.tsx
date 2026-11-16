@@ -58,9 +58,13 @@ import {
   timeOfDayToInputValue,
 } from '#/components/utils';
 
+export type InstalledAppsStatus =
+  { status: `ready` } | { status: `loading` } | { status: `error`; onRetry: () => void };
+
 interface Props {
   state: LoadableState<MacSettingsConfiguration>;
   installedApps?: InstalledMacApp[];
+  installedAppsStatus?: InstalledAppsStatus;
   savingMonitoring?: boolean;
   savingInternetFiltering?: boolean;
   savingApps?: boolean;
@@ -431,6 +435,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
                       description={keychain.description}
                       numKeys={keychain.numKeys}
                       isPublic={keychain.isPublic}
+                      isOwn={keychain.isOwn}
                       schedule={keychain.schedule}
                       setSchedule={(schedule) =>
                         dispatch({
@@ -551,6 +556,7 @@ const InternetFilteringSettings: React.FC<InternetFilteringSettingsProps> = ({
 interface AppsSettingsProps {
   state: AppsFormState;
   installedApps: InstalledMacApp[];
+  installedAppsStatus: InstalledAppsStatus;
   dispatch: React.Dispatch<MacSettingsAction>;
   saving: boolean;
   onSave: (configuration: MacAppsConfiguration) => void | Promise<void>;
@@ -559,6 +565,7 @@ interface AppsSettingsProps {
 const AppsSettings: React.FC<AppsSettingsProps> = ({
   state,
   installedApps,
+  installedAppsStatus,
   dispatch,
   saving,
   onSave,
@@ -568,6 +575,41 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
   >(null);
   const { draft } = state;
   const hasUnsavedChanges = appsHaveUnsavedChanges(state);
+  const canAddApps = installedAppsStatus.status === `ready` && installedApps.length > 0;
+  const emptyAppsDescription = (readyDescription: string): string => {
+    switch (installedAppsStatus.status) {
+      case `loading`:
+        return `Loading installed apps…`;
+      case `error`:
+        return `Couldn't load installed apps.`;
+      case `ready`:
+        return installedApps.length > 0
+          ? readyDescription
+          : `No installed apps have been reported yet.`;
+    }
+  };
+  const emptyAppsButton = (
+    type: `blocked` | `unrestricted`,
+    text: string,
+  ): React.ComponentProps<typeof EmptyState>[`button`] => {
+    if (installedAppsStatus.status === `error`) {
+      return {
+        text: `Try again`,
+        type: `button`,
+        onClick: installedAppsStatus.onRetry,
+        icon: RefreshCwIcon,
+      };
+    }
+    return canAddApps
+      ? {
+          text,
+          type: `button`,
+          onClick: () => setAddAppSlideOverType(type),
+          icon: PlusIcon,
+          variant: `primary`,
+        }
+      : undefined;
+  };
   const isAlwaysBlocked = (scope: UnrestrictedMacApp[`scope`]): boolean => {
     const installedApp = installedApps.find((app) =>
       scope.type === `identifiedAppSlug`
@@ -663,7 +705,7 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
                     type="button"
                     onClick={() => setAddAppSlideOverType(`blocked`)}
                     icon={PlusIcon}
-                    disabled={saving || installedApps.length === 0}
+                    disabled={saving || !canAddApps}
                   >
                     Add Blocked App
                   </Button>
@@ -673,22 +715,10 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
               <EmptyState
                 icon={SquareDashedIcon}
                 title="No Blocked Apps"
-                description={
-                  installedApps.length > 0
-                    ? `Choose apps that shouldn't be able to open.`
-                    : `No installed apps have been reported yet.`
-                }
-                button={
-                  installedApps.length > 0
-                    ? {
-                        text: `Add Blocked App`,
-                        type: `button`,
-                        onClick: () => setAddAppSlideOverType(`blocked`),
-                        icon: PlusIcon,
-                        variant: `primary`,
-                      }
-                    : undefined
-                }
+                description={emptyAppsDescription(
+                  `Choose apps that shouldn't be able to open.`,
+                )}
+                button={emptyAppsButton(`blocked`, `Add Blocked App`)}
               />
             )}
           </SettingsRow>
@@ -747,7 +777,7 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
                     type="button"
                     onClick={() => setAddAppSlideOverType(`unrestricted`)}
                     icon={PlusIcon}
-                    disabled={saving || installedApps.length === 0}
+                    disabled={saving || !canAddApps}
                   >
                     Add Unrestricted App
                   </Button>
@@ -757,22 +787,10 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
               <EmptyState
                 icon={SquareDashedIcon}
                 title="No Unrestricted Apps"
-                description={
-                  installedApps.length > 0
-                    ? `Choose apps that should have unrestricted internet access.`
-                    : `No installed apps have been reported yet.`
-                }
-                button={
-                  installedApps.length > 0
-                    ? {
-                        text: `Add Unrestricted App`,
-                        type: `button`,
-                        onClick: () => setAddAppSlideOverType(`unrestricted`),
-                        icon: PlusIcon,
-                        variant: `primary`,
-                      }
-                    : undefined
-                }
+                description={emptyAppsDescription(
+                  `Choose apps that should have unrestricted internet access.`,
+                )}
+                button={emptyAppsButton(`unrestricted`, `Add Unrestricted App`)}
               />
             )}
           </SettingsRow>
@@ -840,6 +858,7 @@ const AppsSettings: React.FC<AppsSettingsProps> = ({
 interface MacSettingsEditorProps {
   settings: MacSettingsConfiguration;
   installedApps: InstalledMacApp[];
+  installedAppsStatus: InstalledAppsStatus;
   savingMonitoring: boolean;
   savingInternetFiltering: boolean;
   savingApps: boolean;
@@ -858,6 +877,7 @@ interface MacSettingsEditorProps {
 const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
   settings,
   installedApps,
+  installedAppsStatus,
   savingMonitoring,
   savingInternetFiltering,
   savingApps,
@@ -979,6 +999,7 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
       <AppsSettings
         state={formState.apps}
         installedApps={installedApps}
+        installedAppsStatus={installedAppsStatus}
         dispatch={dispatch}
         saving={savingApps}
         onSave={onSaveApps}
@@ -990,6 +1011,7 @@ const MacSettingsEditor: React.FC<MacSettingsEditorProps> = ({
 const MacSettingsPage: React.FC<Props> = ({
   state,
   installedApps = [],
+  installedAppsStatus = { status: `ready` },
   savingMonitoring = false,
   savingInternetFiltering = false,
   savingApps = false,
@@ -1049,6 +1071,7 @@ const MacSettingsPage: React.FC<Props> = ({
     <MacSettingsEditor
       settings={state.data}
       installedApps={installedApps}
+      installedAppsStatus={installedAppsStatus}
       savingMonitoring={savingMonitoring}
       savingInternetFiltering={savingInternetFiltering}
       savingApps={savingApps}

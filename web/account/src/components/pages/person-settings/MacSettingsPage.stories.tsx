@@ -3,7 +3,7 @@ import React from 'react';
 import type { LoadableState } from '#/components/types';
 import type { InstalledMacApp, MacSettingsConfiguration } from './MacSettingsPage.types';
 import PersonSettingsShellPage from '../people/PersonSettingsShellPage';
-import MacSettingsPage from './MacSettingsPage';
+import MacSettingsPage, { type InstalledAppsStatus } from './MacSettingsPage';
 
 const meta = {
   title: 'Account/Pages/People/Person Mac Settings',
@@ -16,6 +16,7 @@ export default meta;
 interface MacSettingsStoryProps {
   initialState: LoadableState<MacSettingsConfiguration>;
   savingMonitoring?: boolean;
+  installedAppsStatus?: InstalledAppsStatus;
 }
 
 const defaultSettings: MacSettingsConfiguration = {
@@ -212,6 +213,7 @@ const expandSection = (canvasElement: HTMLElement, title: string): void => {
 const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
   initialState,
   savingMonitoring,
+  installedAppsStatus,
 }) => {
   const [state, setState] = React.useState(initialState);
 
@@ -225,7 +227,8 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
       >
         <MacSettingsPage
           state={state}
-          installedApps={installedApps}
+          installedApps={installedAppsStatus ? [] : installedApps}
+          installedAppsStatus={installedAppsStatus}
           savingMonitoring={savingMonitoring}
           onRequestPublicKeychain={async () => {}}
           onSaveMonitoring={(configuration) => {
@@ -363,6 +366,46 @@ export const NoUnrestrictedApps = {
           apps: { ...defaultSettings.apps, unrestricted: [] },
         },
       }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const InstalledAppsLoading = {
+  name: 'Installed apps loading',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          apps: { ...defaultSettings.apps, blocked: [], unrestricted: [] },
+        },
+      }}
+      installedAppsStatus={{ status: `loading` }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const InstalledAppsError = {
+  name: 'Installed apps failed to load',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          apps: { ...defaultSettings.apps, blocked: [], unrestricted: [] },
+        },
+      }}
+      installedAppsStatus={{ status: `error`, onRetry: () => {} }}
     />
   ),
   play: ({ canvasElement }: { canvasElement: HTMLElement }) => {

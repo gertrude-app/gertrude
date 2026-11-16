@@ -119,6 +119,7 @@ export type {
 
 // utils
 export { inflect, normalizePath } from './lib/utils';
+export { useRouteOpenState } from './lib/useRouteOpenState';
 export { toast } from './lib/toast';
 export type {
   ToastAsyncFunction,

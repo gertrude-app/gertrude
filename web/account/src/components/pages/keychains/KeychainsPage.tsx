@@ -11,6 +11,8 @@ import DashboardPage from '#/components/layout/DashboardPage';
 
 interface Props {
   state: LoadableState<KeychainsPageData>;
+  createOpen: boolean;
+  onCreateOpenChange: (open: boolean) => void;
   creatingKeychain?: boolean;
   onCreateKeychain: (data: KeychainMetadata) => Promise<void>;
   onAssignmentChange: (
@@ -117,57 +119,55 @@ const KeychainsContent: React.FC<
 
 const KeychainsPage: React.FC<Props> = ({
   state,
+  createOpen,
+  onCreateOpenChange,
   creatingKeychain = false,
   onCreateKeychain,
   onAssignmentChange,
-}) => {
-  const [creating, setCreating] = React.useState(false);
-
-  return (
-    <>
-      <DashboardPage
-        heading={
-          <PageHeading
-            title="Keychains"
-            subtitle="Group allowed websites and apps, then choose who can use them."
-            buttons={
-              state.status === `success` && state.data.keychains.length === 0
-                ? undefined
-                : [
-                    {
-                      text: `Create keychain`,
-                      variant: `primary`,
-                      icon: PlusIcon,
-                      onClick: () => setCreating(true),
-                    },
-                  ]
-            }
-          />
-        }
-      >
-        <VStack gap={4}>
-          <Text variant="bodyMuted" className="max-w-3xl">
-            Each keychain holds related keys that unlock parts of the internet on
-            protected Macs.
-          </Text>
-          <CardContainer>
-            <KeychainsContent
-              state={state}
-              onAssignmentChange={onAssignmentChange}
-              onCreate={() => setCreating(true)}
-            />
-          </CardContainer>
-        </VStack>
-      </DashboardPage>
-      {creating && (
-        <KeychainEditorModal
-          saving={creatingKeychain}
-          onClose={() => setCreating(false)}
-          onSave={onCreateKeychain}
+}) => (
+  <>
+    <DashboardPage
+      heading={
+        <PageHeading
+          title="Keychains"
+          subtitle="Group allowed websites and apps, then choose who can use them."
+          buttons={
+            state.status === `success` && state.data.keychains.length === 0
+              ? undefined
+              : [
+                  {
+                    text: `Create keychain`,
+                    variant: `primary`,
+                    icon: PlusIcon,
+                    onClick: () => onCreateOpenChange(true),
+                  },
+                ]
+          }
         />
-      )}
-    </>
-  );
-};
+      }
+    >
+      <VStack gap={4}>
+        <Text variant="bodyMuted" className="max-w-3xl">
+          Each keychain holds related keys that unlock parts of the internet on protected
+          Macs.
+        </Text>
+        <CardContainer>
+          <KeychainsContent
+            state={state}
+            onAssignmentChange={onAssignmentChange}
+            onCreate={() => onCreateOpenChange(true)}
+          />
+        </CardContainer>
+      </VStack>
+    </DashboardPage>
+    {createOpen && (
+      <KeychainEditorModal
+        saving={creatingKeychain}
+        onClose={() => onCreateOpenChange(false)}
+        onSave={onCreateKeychain}
+      />
+    )}
+  </>
+);
 
 export default KeychainsPage;
