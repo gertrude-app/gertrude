@@ -41,7 +41,8 @@ export const PodcastsConnected = {
 export const PodcastsTrial = {
   name: 'Podcasts trial',
   parameters: galleryParameters,
-  render: () => renderPage({ ...shared, flow: `podcasts`, access: `trial` }),
+  render: () =>
+    renderPage({ ...shared, flow: `podcasts`, access: `trial`, trialDaysRemaining: 12 }),
 };
 
 export const PodcastsEnding = {
