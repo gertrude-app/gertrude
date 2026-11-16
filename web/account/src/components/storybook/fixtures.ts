@@ -38,13 +38,14 @@ export const weekdaySchedule: Schedule = {
 export const macDevice: Extract<Device, { type: `mac` }> = {
   id: `mac-1`,
   personId: `person-1`,
+  computerId: `computer-1`,
   type: `mac`,
   username: `jude`,
   name: `Jude's MacBook`,
   macOSVersion: `15.6`,
   modelName: `MacBook Air`,
   modelIdentifier: `MacBookAir10,1`,
-  online: true,
+  status: { case: `filterOn` },
 };
 
 export const iphoneDevice: IOSDevice = {

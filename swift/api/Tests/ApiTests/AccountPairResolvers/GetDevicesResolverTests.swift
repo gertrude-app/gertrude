@@ -76,7 +76,7 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await withDependencies {
       $0.websockets.status = { id in
-        id == computerUsers[1].id ? .filterOn : .offline
+        id == computerUsers[1].id ? .filterSuspended(resuming: .reference) : .offline
       }
     } operation: {
       try await GetDevices.resolve(in: self.accountContext(parent))
@@ -91,7 +91,7 @@ final class GetDevicesResolverTests: ApiTestCase, @unchecked Sendable {
     expect(mac.macOSVersion).toEqual("26.0.0")
     expect(mac.people.map(\.id)).toEqual([jude.id, mabel.id])
     expect(mac.people.map(\.name)).toEqual(["Jude", "Mabel"])
-    expect(mac.people.map(\.online)).toEqual([true, false])
+    expect(mac.people.map(\.status)).toEqual([.filterSuspended(resuming: .reference), .offline])
 
     expect(output.mobileDevices).toHaveCount(1)
     let mobile = try XCTUnwrap(output.mobileDevices.first)

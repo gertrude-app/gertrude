@@ -7,6 +7,8 @@ import type {
 } from '#/components/pages/person-settings/MacSettingsPage.types';
 import type { LoadableState } from '#/components/types';
 import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
+import ConnectMacModal from '#/components/devices/ConnectMacModal';
+import { useConnectMac } from '#/components/devices/useConnectMac';
 import MacSettingsPage from '#/components/pages/person-settings/MacSettingsPage';
 import { apiEndpoint, liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -23,6 +25,11 @@ const MacSettingsRoute: React.FC = () => {
   const installedAppsQuery = useQuery(Key.personInstalledMacApps(personId), () =>
     liveClient.getPersonInstalledMacApps({ personId }),
   );
+  const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
+  const person = peopleQuery.data?.find(
+    (candidate) => candidate.id.toLowerCase() === personId.toLowerCase(),
+  );
+  const { connectMac, modalProps: connectMacModalProps } = useConnectMac();
   const updateMonitoring = useMutation(liveClient.updatePersonMacMonitoringSettings, {
     invalidating: [settingsKey, Key.activity],
     toast: {
@@ -81,6 +88,10 @@ const MacSettingsRoute: React.FC = () => {
         key={personId}
         state={state}
         installedApps={installedApps}
+        personName={person?.name}
+        onConnectMac={
+          person ? () => connectMac([{ id: person.id, name: person.name }]) : undefined
+        }
         installedAppsStatus={
           installedAppsQuery.data !== undefined
             ? { status: `ready` }
@@ -131,6 +142,7 @@ const MacSettingsRoute: React.FC = () => {
             .then(() => undefined)
         }
       />
+      <ConnectMacModal {...connectMacModalProps} />
       <UnsavedChangesGuard
         hasUnsavedChanges={hasUnsavedChanges}
         description="Your Mac settings haven't been saved."

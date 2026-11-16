@@ -48,15 +48,6 @@ extension GetDevice: Resolver {
       }
     }
 
-    if computer.model.identifier == "unknown", computer.modelIdentifier != "VirtualMac2,1" {
-      await with(dependency: \.slack)
-        .error(
-          "unknown mac model identifier `\(computer.modelIdentifier)`, "
-            + "add to `Computer+Model.swift` and grab a PNG "
-            + "(see `web/dash/app/public/macs/readme.md`)",
-        )
-    }
-
     @Dependency(\.websockets) var websockets
 
     return try await .init(

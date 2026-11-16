@@ -4,25 +4,48 @@ import cx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
 import React from 'react';
 import type { Device } from '#/components/types';
+import { MacStatusBadge } from '#/components/devices/MacPersonStatus';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
 import { deviceSubtitle, deviceTitle } from '#/components/utils';
 
+export const DeviceLink: React.FC<{ device: Device }> = ({ device }) => {
+  const className = `absolute inset-0 z-10 rounded-[inherit] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-300`;
+  const label = `Open ${deviceTitle(device)}`;
+  return device.type === `mac` ? (
+    <Link
+      to="/devices/$deviceId"
+      params={{ deviceId: device.computerId }}
+      aria-label={label}
+      className={className}
+    />
+  ) : (
+    <Link
+      to="/people/$personId/ios-settings"
+      params={{ personId: device.personId }}
+      hash={device.id}
+      aria-label={label}
+      className={className}
+    />
+  );
+};
+
 interface Props {
   device: Device;
-  href?: string;
+  linked?: boolean;
   action?: React.ReactNode;
 }
 
-const DeviceListRow: React.FC<Props> = ({ device, href, action }) => {
+const DeviceListRow: React.FC<Props> = ({ device, linked = false, action }) => {
   const isMac = device.type === `mac`;
-  const card = (
+  return (
     <Card
       padding={0}
       className={cx(
-        `@container/device overflow-hidden`,
-        href && `group-hover:border-stone-300`,
+        `group relative @container/device overflow-hidden`,
+        linked && `hover:border-stone-300`,
       )}
     >
+      {linked && <DeviceLink device={device} />}
       <div
         className={cx(`flex`, isMac ? `flex-col @md/device:flex-row` : `items-center`)}
       >
@@ -33,11 +56,7 @@ const DeviceListRow: React.FC<Props> = ({ device, href, action }) => {
               <Text variant="bodyLargeStrong" truncate>
                 {deviceTitle(device)}
               </Text>
-              {isMac && (
-                <Badge size="xsmall" color={device.online ? `green` : `neutral`}>
-                  {device.online ? `Online` : `Offline`}
-                </Badge>
-              )}
+              {isMac && <MacStatusBadge status={device.status} size="xsmall" />}
             </HStack>
             <Text variant="bodyMuted" truncate>
               {deviceSubtitle(device)}
@@ -60,33 +79,25 @@ const DeviceListRow: React.FC<Props> = ({ device, href, action }) => {
                 Mac user:{` `}
                 <Text variant="captionStrong">{device.username}</Text>
               </Text>
-              {href && (
+              {linked && (
                 <ChevronRightIcon className="w-5 h-5 text-stone-400 shrink-0 group-hover:text-stone-600" />
               )}
             </HStack>
-            {action && <div className="shrink-0">{action}</div>}
+            {action && <div className="relative z-20 shrink-0">{action}</div>}
           </div>
         ) : (
           <HStack gap={2} className="shrink-0 pr-3">
             <Badge size="small" color="neutral">
               {device.type === `iphone` ? `iPhone` : `iPad`}
             </Badge>
-            {action}
-            {href && (
+            {action && <div className="relative z-20">{action}</div>}
+            {linked && (
               <ChevronRightIcon className="w-5 h-5 text-stone-400 shrink-0 group-hover:text-stone-600" />
             )}
           </HStack>
         )}
       </div>
     </Card>
-  );
-
-  return href ? (
-    <Link to={href} className="group block">
-      {card}
-    </Link>
-  ) : (
-    card
   );
 };
 

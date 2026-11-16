@@ -56,6 +56,18 @@ const statusDescription = (status: ChildComputerStatus): StatusDescription => {
   }
 };
 
+export const MacStatusBadge: React.FC<{
+  status: ChildComputerStatus;
+  size: `xsmall` | `small`;
+}> = ({ status, size }) => {
+  const description = statusDescription(status);
+  return (
+    <Badge size={size} color={description.color} icon={description.icon}>
+      {description.label}
+    </Badge>
+  );
+};
+
 interface Props {
   person: MacDeviceDetails[`people`][number];
 }

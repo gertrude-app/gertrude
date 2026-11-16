@@ -15,6 +15,7 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import React from 'react';
+import type { SetupApp } from '#/components/onboarding/setupApps';
 import type {
   LoadableState,
   PersonCardPerson,
@@ -52,6 +53,7 @@ interface Props {
   monitorHref: string;
   settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
+  onAddDevice?: (person: PersonCardPerson, app: SetupApp) => void;
 }
 
 interface LoadErrorProps {
@@ -98,6 +100,7 @@ interface PeopleContentProps {
   addPersonHref: string;
   settingsHrefForPerson: (personId: string) => string;
   monitorHrefForPerson: (personId: string) => string;
+  onAddDevice?: (person: PersonCardPerson, app: SetupApp) => void;
 }
 
 const PeopleContent: React.FC<PeopleContentProps> = ({
@@ -105,6 +108,7 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
   addPersonHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
+  onAddDevice,
 }) => {
   if (state.status === `loading`) {
     return <PeopleLoadingState />;
@@ -144,6 +148,7 @@ const PeopleContent: React.FC<PeopleContentProps> = ({
       person={person}
       settingsHref={settingsHrefForPerson(person.id)}
       monitorHref={monitorHrefForPerson(person.id)}
+      onAddDevice={onAddDevice && ((app) => onAddDevice(person, app))}
     />
   ));
 };
@@ -203,6 +208,7 @@ const PeoplePage: React.FC<Props> = ({
   monitorHref,
   settingsHrefForPerson,
   monitorHrefForPerson,
+  onAddDevice,
 }) => {
   if (
     gettingStarted &&
@@ -264,6 +270,7 @@ const PeoplePage: React.FC<Props> = ({
             addPersonHref={addPersonHref}
             settingsHrefForPerson={settingsHrefForPerson}
             monitorHrefForPerson={monitorHrefForPerson}
+            onAddDevice={onAddDevice}
           />
         </CardContainer>
         <VStack gap={6} className="shrink-0 @5xl/main:w-72">

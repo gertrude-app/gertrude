@@ -144,6 +144,7 @@ const PersonBasicSettingsPage: React.FC<Props> = ({
                 <DeviceListRow
                   key={device.id}
                   device={device}
+                  linked
                   action={
                     device.type === `mac` ? (
                       <Button
