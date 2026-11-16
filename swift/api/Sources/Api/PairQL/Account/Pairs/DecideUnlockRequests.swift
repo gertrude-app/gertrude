@@ -234,9 +234,26 @@ extension DecideUnlockRequests: Resolver {
           if existingKeys == nil {
             existingKeys = try await keychain.keys(in: tx)
           }
-          if existingKeys?
-            .contains(where: { $0.key == key && $0.deletedAt == expiration && $0.comment == comment
-            }) != true {
+          if let index = existingKeys?.firstIndex(where: { $0.key == key }),
+             var existing = existingKeys?[index] {
+            var changed = false
+            if let currentExpiration = existing.deletedAt {
+              let extended = expiration.map { max($0, currentExpiration) }
+              if extended != currentExpiration {
+                existing.deletedAt = extended
+                changed = true
+              }
+            }
+            if let comment, comment != existing.comment {
+              existing.comment = comment
+              changed = true
+            }
+            if changed {
+              try await tx.update(existing)
+              existingKeys?[index] = existing
+              updatedKeychainIds.insert(keychain.id)
+            }
+          } else {
             let created = try await tx.create(Key(
               keychainId: keychain.id,
               key: key,

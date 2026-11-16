@@ -93,6 +93,7 @@ export type SuspensionRequest = {
   duration: string;
   reason?: string;
   extraMonitoringOptions: Record<string, string>;
+  requestedAt: string;
 };
 
 export type TimeOfDay = NonNullable<

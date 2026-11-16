@@ -48,6 +48,30 @@ final class ChildActivityResolverTests: ApiTestCase, @unchecked Sendable {
     expect(retrievedScreenshot3.flagged).toBeNil()
   }
 
+  func testCannotFlagAnotherParentsActivityItems() async throws {
+    let child = try await self.childWithComputer()
+    let otherParent = try await self.parent()
+    var screenshot = Screenshot.random
+    screenshot.computerUserId = child.computerUser.id
+    screenshot.flagged = nil
+    var keystrokeLine = KeystrokeLine.random
+    keystrokeLine.computerUserId = child.computerUser.id
+    keystrokeLine.flagged = nil
+    try await self.db.create(screenshot)
+    try await self.db.create(keystrokeLine)
+
+    for id in [screenshot.id.rawValue, keystrokeLine.id.rawValue] {
+      try await expectErrorFrom { [self] in
+        try await FlagActivityItems.resolve(with: [id], in: self.context(otherParent))
+      }.toContain("404")
+    }
+
+    let unchangedScreenshot = try await self.db.find(screenshot.id)
+    let unchangedKeystrokeLine = try await self.db.find(keystrokeLine.id)
+    expect(unchangedScreenshot.flagged).toBeNil()
+    expect(unchangedKeystrokeLine.flagged).toBeNil()
+  }
+
   func testGetActivityDay() async throws {
     let child = try await self.childWithComputer()
     var screenshot = Screenshot.random

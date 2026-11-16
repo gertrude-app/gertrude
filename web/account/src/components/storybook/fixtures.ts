@@ -381,6 +381,7 @@ export const suspensionRequests: SuspensionRequest[] = [
     requestedDurationInSeconds: 30 * 60,
     duration: `30 minutes`,
     reason: `I need to download a school project from Google Drive.`,
+    requestedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
     extraMonitoringOptions: {
       k: `keylogging`,
       '@90': `1.5x screenshots`,
@@ -398,6 +399,7 @@ export const suspensionRequests: SuspensionRequest[] = [
     requestedDurationInSeconds: 5 * 60,
     duration: `5 minutes`,
     extraMonitoringOptions: {},
+    requestedAt: new Date(Date.now() - 20 * 1000).toISOString(),
   },
 ];
 

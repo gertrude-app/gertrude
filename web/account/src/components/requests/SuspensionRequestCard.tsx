@@ -2,6 +2,7 @@ import { Button, Card, HStack, Text, VStack } from '@gertrude/ui';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
 import MessageBubble from '#/components/MessageBubble';
+import { requestAge } from '#/lib/suspensionRequests';
 
 interface Props {
   request: SuspensionRequest;
@@ -12,9 +13,14 @@ const SuspensionRequestCard: React.FC<Props> = ({ request, responseHref }) => (
   <Card preset="big" padding={4} className="flex flex-col justify-between">
     <VStack>
       <VStack>
-        <Text as="h2" variant="heading">
-          {request.personName}
-        </Text>
+        <HStack justify="between" align="baseline" gap={2}>
+          <Text as="h2" variant="heading">
+            {request.personName}
+          </Text>
+          <Text variant="captionSubtle" className="shrink-0">
+            {requestAge(request.requestedAt)}
+          </Text>
+        </HStack>
         <Text variant="bodySubtle" className="-mt-0.5">
           {request.deviceName
             ? `${request.deviceName} · ${request.duration}`
