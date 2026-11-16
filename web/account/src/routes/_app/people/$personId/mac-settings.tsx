@@ -81,6 +81,13 @@ const MacSettingsRoute: React.FC = () => {
         key={personId}
         state={state}
         installedApps={installedApps}
+        installedAppsStatus={
+          installedAppsQuery.data !== undefined
+            ? { status: `ready` }
+            : installedAppsQuery.isError
+              ? { status: `error`, onRetry: () => void installedAppsQuery.refetch() }
+              : { status: `loading` }
+        }
         savingMonitoring={updateMonitoring.isPending}
         savingInternetFiltering={updateInternetFiltering.isPending}
         savingApps={updateApps.isPending}

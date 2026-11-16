@@ -40,6 +40,7 @@ const ScheduledKeychainCard: React.FC = () => {
       description={keychains[0]!.description}
       numKeys={keychains[0]!.numKeys}
       isPublic={keychains[0]!.isPublic}
+      isOwn={!keychains[0]!.isPublic}
       schedule={schedule}
       setSchedule={setSchedule}
       onRemove={noop}
@@ -62,6 +63,7 @@ export const Cards = {
           description={keychains[2]!.description}
           numKeys={keychains[2]!.numKeys}
           isPublic={keychains[2]!.isPublic}
+          isOwn={!keychains[2]!.isPublic}
           setSchedule={noop}
           onRemove={noop}
         />
@@ -155,6 +157,23 @@ export const AddKeychains = {
         personName="Jude"
         keychains={keychains}
         assignedKeychainIds={[`keychain-school`]}
+        onAdd={noop}
+      />
+    </StoryCanvas>
+  ),
+};
+
+export const AddKeychainsNoneOwned = {
+  name: 'Add keychains slide-over (none owned)',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddKeychainSlideOver
+        open
+        onOpenChange={noop}
+        personName="Jude"
+        keychains={keychains.filter((keychain) => keychain.isPublic)}
+        assignedKeychainIds={[]}
         onAdd={noop}
       />
     </StoryCanvas>
