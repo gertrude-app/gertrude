@@ -4,7 +4,12 @@ import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import SignupPage from '#/components/pages/unauthed/SignupPage';
 import { testimonials } from '#/components/unauthed/testimonials';
-import { postAuthLocation, validateAuthRedirectSearch } from '#/lib/authRedirect';
+import {
+  authPageHref,
+  connectingDeviceFor,
+  postAuthLocation,
+  validateAuthSearch,
+} from '#/lib/authRedirect';
 import { signupAttribution } from '#/lib/signup';
 import { isAuthed, setAuth } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
@@ -13,7 +18,8 @@ const sitekey = import.meta.env.DEV ? undefined : import.meta.env.VITE_TURNSTILE
 const missingSecurityConfig = !sitekey && !import.meta.env.DEV;
 
 const SignupRoute: React.FC = () => {
-  const { redirect: authRedirect } = Route.useSearch();
+  const search = Route.useSearch();
+  const authRedirect = search.redirect;
   const navigate = useNavigate();
   const [email, setEmail] = React.useState(``);
   const [password, setPassword] = React.useState(``);
@@ -102,9 +108,8 @@ const SignupRoute: React.FC = () => {
         setError(null);
       }}
       testimonials={testimonials}
-      loginHref={
-        authRedirect ? `/login?redirect=${encodeURIComponent(authRedirect)}` : `/login`
-      }
+      loginHref={authPageHref(`/login`, search)}
+      connecting={connectingDeviceFor(search)}
       submitting={submitting}
       sent={sent}
       error={
@@ -186,7 +191,7 @@ const SignupRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/(unauthed)/signup`)({
-  validateSearch: validateAuthRedirectSearch,
+  validateSearch: validateAuthSearch,
   beforeLoad: ({ search }) => {
     if (isAuthed()) throw redirect(postAuthLocation(search.redirect));
   },
