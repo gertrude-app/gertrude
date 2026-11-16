@@ -152,6 +152,7 @@ const NotificationSettingsPage: React.FC<Props> = ({
                   deletable={deletable}
                   deleteBlockedReason={deleteBlockedReason}
                   onDelete={() => deleteNotificationMethod(method.id)}
+                  unused={notificationCount === 0}
                 />
               );
             })}

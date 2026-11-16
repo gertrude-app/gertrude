@@ -1,4 +1,4 @@
-import { Button, ConfirmationDialog, HStack, Text } from '@gertrude/ui';
+import { Badge, Button, ConfirmationDialog, HStack, Text } from '@gertrude/ui';
 import { XIcon } from 'lucide-react';
 import React from 'react';
 import type { NotificationMethod } from '#/components/types';
@@ -13,6 +13,7 @@ type Props = {
   deletable: boolean;
   deleteBlockedReason?: string;
   onDelete: () => void;
+  unused?: boolean;
 };
 
 const NotificationMethodChip: React.FC<Props> = ({
@@ -20,10 +21,16 @@ const NotificationMethodChip: React.FC<Props> = ({
   deletable,
   deleteBlockedReason,
   onDelete,
+  unused = false,
 }) => (
   <HStack className="rounded-xl border border-stone-200 bg-white p-1.5 pl-3 shadow shadow-stone-300/30">
     {notificationMethodIcon(method)}
     {methodLabel(method)}
+    {unused && (
+      <Badge size="small" color="yellow" className="ml-2">
+        Not used
+      </Badge>
+    )}
     {deletable ? (
       <ConfirmationDialog
         confirmationQuestion="Delete notification method?"

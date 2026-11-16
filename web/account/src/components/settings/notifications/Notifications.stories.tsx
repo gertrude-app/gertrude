@@ -111,6 +111,7 @@ export const AddMethodNtfySuccess = {
           methodType: `ntfy`,
           flowState: `ntfyCreated`,
           pendingMethodId: `method-preview`,
+          ntfyTopic: `gertrude-family-alerts-8k4tq9`,
         }}
       />
     </StoryCanvas>
