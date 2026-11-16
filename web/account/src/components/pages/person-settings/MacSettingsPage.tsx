@@ -65,6 +65,8 @@ interface Props {
   state: LoadableState<MacSettingsConfiguration>;
   installedApps?: InstalledMacApp[];
   installedAppsStatus?: InstalledAppsStatus;
+  personName?: string;
+  onConnectMac?: () => void;
   savingMonitoring?: boolean;
   savingInternetFiltering?: boolean;
   savingApps?: boolean;
@@ -1012,6 +1014,8 @@ const MacSettingsPage: React.FC<Props> = ({
   state,
   installedApps = [],
   installedAppsStatus = { status: `ready` },
+  personName,
+  onConnectMac,
   savingMonitoring = false,
   savingInternetFiltering = false,
   savingApps = false,
@@ -1060,7 +1064,18 @@ const MacSettingsPage: React.FC<Props> = ({
         <EmptyState
           icon={LaptopIcon}
           title="No Mac connected"
-          description="Connect a Mac to configure its monitoring settings."
+          description={`Connect a Mac to set up monitoring, filtering, and app settings for ${personName ?? `this person`}.`}
+          button={
+            onConnectMac
+              ? {
+                  text: `Connect a Mac`,
+                  type: `button`,
+                  variant: `primary`,
+                  icon: PlusIcon,
+                  onClick: onConnectMac,
+                }
+              : undefined
+          }
           className="bg-white"
         />
       </CardContainer>

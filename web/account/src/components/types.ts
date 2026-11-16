@@ -1,5 +1,6 @@
 import type {
   BlockRule,
+  ChildComputerStatus,
   GetAccountAnnouncement,
   GetPersonMacSettings,
   PersonRelationship,
@@ -23,13 +24,14 @@ export type Device =
   | {
       id: string;
       personId: string;
+      computerId: string;
       type: `mac`;
       username: string;
       name?: string;
       macOSVersion?: string;
       modelName: string;
       modelIdentifier: string;
-      online: boolean;
+      status: ChildComputerStatus;
     }
   | {
       id: string;

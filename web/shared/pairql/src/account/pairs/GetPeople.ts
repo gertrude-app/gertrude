@@ -1,5 +1,5 @@
 // auto-generated, do not edit
-import type { PersonRelationship } from '../shared';
+import type { ChildComputerStatus, PersonRelationship } from '../shared';
 
 export namespace GetPeople {
   export type Input = void;
@@ -12,12 +12,13 @@ export namespace GetPeople {
       | {
           case: 'mac';
           id: UUID;
+          computerId: UUID;
           username: string;
           name?: string;
           macOSVersion?: string;
           modelName: string;
           modelIdentifier: string;
-          online: boolean;
+          status: ChildComputerStatus;
         }
       | {
           case: 'ios';

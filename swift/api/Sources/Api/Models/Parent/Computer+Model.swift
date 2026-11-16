@@ -159,9 +159,22 @@ extension Computer.Model.ManufactureDate {
   }
 }
 
+extension Computer {
+  func alertIfUnknownModel() async {
+    guard self.model.identifier == "unknown", self.modelIdentifier != "VirtualMac2,1" else {
+      return
+    }
+    await with(dependency: \.slack).error(
+      "unknown mac model identifier `\(self.modelIdentifier)`, "
+        + "add to `Computer+Model.swift` and grab a PNG "
+        + "(see `web/account/public/devices/readme.md`)",
+    )
+  }
+}
+
 // derive the model from the identifier
 // NB: when adding a new entry, also add a matching PNG to
-// `web/dash/app/public/macs/<modelIdentifier>.png` — see that dir's readme.md
+// `web/account/public/devices/macs/<modelIdentifier>.png` — see `devices/readme.md`
 
 extension Computer {
   var model: Model {
