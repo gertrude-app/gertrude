@@ -141,10 +141,14 @@ struct AppReducer: Sendable {
       case .identityResolved(let resolution):
         let previous = state.identity
         state.identity = resolution
-        let changed = previous.deviceId != resolution.deviceId
+        let gainedConnection = previous.available && resolution.available
+          && previous.deviceId == resolution.deviceId
+          && previous.connection == nil && resolution.connection != nil
+          && previous.migrationPending == resolution.migrationPending
+        let changed = !gainedConnection && (previous.deviceId != resolution.deviceId
           || previous.connection != resolution.connection
           || previous.migrationPending != resolution.migrationPending
-          || previous.available != resolution.available
+          || previous.available != resolution.available)
         if changed {
           state.$identityGeneration.withLock { $0 += 1 }
           state.crossPromo = nil
