@@ -8,9 +8,10 @@ building projects, checking Xcode navigator issues, rendering SwiftUI previews, 
 build logs, and inspecting project structure. Prefer it over shell-only checks when the
 user's issue is visible in Xcode or previews.
 
-Xcode 27.1 beta is the selected Xcode (`xcode-select`), so plain `xcodebuild`,
-`xcrun simctl` and native work use it. The exception is command-line Swift package
-builds/tests with the repo's pinned Swift 6.3.1, which need Xcode 26.6's SDK per command:
+Xcode 27.2 is the selected Xcode (`xcode-select`), so plain `xcodebuild`, `xcrun simctl`
+and native work use it. Archive App Store builds with it, not a beta: beta-built uploads
+can't be submitted for review. The exception is command-line Swift package builds/tests
+with the repo's pinned Swift 6.3.1, which need Xcode 26.6's SDK per command:
 
 ```bash
 DEVELOPER_DIR='/Applications/Xcode 26.6.app/Contents/Developer' just api-test
@@ -18,6 +19,10 @@ DEVELOPER_DIR='/Applications/Xcode 26.6.app/Contents/Developer' just api-test
 
 Xcode 26.6's GUI doesn't open on macOS 27, but its command-line tools work. Don't change
 the repo's Swift version just to fix local builds.
+
+If Organizer's Distribute App fails with "Copy failed", Xcode inherited a shell `PATH`
+with Homebrew's `rsync` first (e.g. launched via `just music xcode`). Quit Xcode, reopen
+it from the Dock, and distribute the existing archive again.
 
 Kiah's desktop: background work is fine without asking, including your own simulators,
 Xcode MCP builds and previews, background screenshots, and headless browsers. Ask first
