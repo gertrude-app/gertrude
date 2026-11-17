@@ -1,3 +1,4 @@
+import Combine
 import ComposableArchitecture
 import CustomDump
 import DeviceIdentity
@@ -11,6 +12,64 @@ import Testing
 
 @MainActor
 struct PodcastIdentityTests {
+  @Test func returningStoreResolvesLocalIdentityBeforeFirstAppearance() {
+    let fixture = PodcastIdentityFixture()
+    fixture.set(.identity, UUID(1))
+    fixture.set(.canary, UUID(1))
+    fixture.keychain.save(pincode: 123_456)
+    let identity = fixture.identity()
+    withDependencies {
+      $0.defaultInMemoryStorage = .init()
+      $0.keychain = fixture.keychain
+      $0.podcastIdentity.resolve = { identity.resolve() }
+    } operation: {
+      let app = AppStore()
+      expectNoDifference(app.inner.identity.available, true)
+      expectNoDifference(app.inner.identity.migrationPending, false)
+      #expect(app.inner.mode?.podcasts != nil)
+      #expect(fixture.requests.isEmpty)
+    }
+  }
+
+  @Test(arguments: [false, true])
+  func offlineLaunchOnlyBlocksForPendingMigration(migrationPending: Bool) async throws {
+    let fixture = PodcastIdentityFixture()
+    fixture.set(.identity, UUID(1))
+    fixture.set(.canary, UUID(1))
+    fixture.keychain.save(pincode: 123_456)
+    fixture.keychain.save(installDate: .reference)
+    if migrationPending {
+      try fixture.keychain._save(.migration, Data([1]))
+    }
+    let identity = fixture.identity()
+    try await withDependencies {
+      $0.defaultInMemoryStorage = .init()
+      $0.defaultDatabase = try appDatabase()
+      $0.date = .constant(.reference)
+      $0.keychain = fixture.keychain
+      $0.podcastIdentity.resolve = { identity.resolve() }
+      $0.podcastIdentity.current = { identity.resolution() }
+      $0.api.getAccountStatus = { throw URLError(.notConnectedToInternet) }
+      $0.api.appConfig = { throw URLError(.notConnectedToInternet) }
+      $0.api.crossPromos = { throw URLError(.notConnectedToInternet) }
+      $0.audio.systemEvents = { Empty().eraseToAnyPublisher() }
+      $0.notificationCenter.appForegroundingEvents = { Empty().eraseToAnyPublisher() }
+      $0.mainQueue = .immediate
+    } operation: {
+      let store = TestStore(initialState: AppReducer.State()) { AppReducer() }
+      store.exhaustivity = .off
+      await store.send(.appDidLaunch)
+      await store.receive(\.identityResolved)
+      expectNoDifference(store.state.identity.available, true)
+      expectNoDifference(store.state.identity.migrationPending, migrationPending)
+      #expect((store.state.mode?.podcasts != nil) == !migrationPending)
+      await store.receive(\.identityResolved)
+      await store.finish()
+      expectNoDifference(store.state.identity.migrationPending, migrationPending)
+      #expect((store.state.mode?.podcasts != nil) == !migrationPending)
+    }
+  }
+
   @Test(arguments: [false, true])
   func missingDeviceIdPreservesOrphanTokenAcrossRestart(hasLegacyInstallId: Bool) async throws {
     let fixture = PodcastIdentityFixture()

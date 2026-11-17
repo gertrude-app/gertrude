@@ -31,6 +31,8 @@ public struct AppStore {
       initialState: .init(),
       reducer: { AppReducer()._printChanges(.custom) },
     )
+    @Dependency(\.podcastIdentity) var identity
+    self.inner.send(.identityResolved(identity.resolve()))
   }
 
   public func setupBackgroundTasks() {

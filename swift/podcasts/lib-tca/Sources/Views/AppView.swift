@@ -13,27 +13,23 @@ struct AppView: View {
 
   var body: some View {
     NavigationStack {
-      EmptyView()
-        .navigationDestination(
-          item: self.$store.scope(
-            \.mode?.onboarding,
-            action: \.mode.onboarding,
-          ),
-        ) { store in
+      ZStack {
+        if let store = self.store.scope(
+          state: \.mode?.onboarding,
+          action: \.mode.presented.onboarding,
+        ) {
           OnboardingView(store: store)
-        }
-        .navigationDestination(
-          item: self.$store.scope(
-            \.mode?.podcasts,
-            action: \.mode.podcasts,
-          ),
-        ) { store in
+        } else if let store = self.store.scope(
+          state: \.mode?.podcasts,
+          action: \.mode.presented.podcasts,
+        ) {
           PodcastsView(store: store)
         }
-        .crossPromoPresentations(
-          store: self.$store.scope(\.crossPromo, action: \.crossPromo),
-          onImageLoadFailure: Self.crossPromoImageLoadFailed,
-        )
+      }
+      .crossPromoPresentations(
+        store: self.$store.scope(\.crossPromo, action: \.crossPromo),
+        onImageLoadFailure: Self.crossPromoImageLoadFailed,
+      )
     }
     .overlay {
       if !self.store.identity.available || self.store.identity.migrationPending {
