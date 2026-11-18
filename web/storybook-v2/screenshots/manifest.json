@@ -108,30 +108,6 @@
     }
   },
   {
-    "id": "account-components-person-settings-cards-and-pickers--add-allowed-albums",
-    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-allowed-albums&viewMode=story",
-    "name": "Add allowed albums slide-over",
-    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--add-allowed-albums.png",
-    "title": "Account/Components/Person Settings/Cards and Pickers",
-    "viewport": {
-      "width": 390,
-      "height": 844,
-      "name": "mobile"
-    }
-  },
-  {
-    "id": "account-components-person-settings-cards-and-pickers--add-allowed-albums",
-    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-allowed-albums&viewMode=story",
-    "name": "Add allowed albums slide-over",
-    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-allowed-albums.png",
-    "title": "Account/Components/Person Settings/Cards and Pickers",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
     "id": "account-components-person-settings-cards-and-pickers--add-blocked-domain",
     "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-blocked-domain&viewMode=story",
     "name": "Add blocked domain modal",
@@ -172,6 +148,30 @@
     "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-keychains&viewMode=story",
     "name": "Add keychains slide-over",
     "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-keychains.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-keychains-none-owned",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-keychains-none-owned&viewMode=story",
+    "name": "Add keychains slide-over (none owned)",
+    "path": "screenshots/mobile/account-components-person-settings-cards-and-pickers--add-keychains-none-owned.png",
+    "title": "Account/Components/Person Settings/Cards and Pickers",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-components-person-settings-cards-and-pickers--add-keychains-none-owned",
+    "iframePath": "/iframe.html?id=account-components-person-settings-cards-and-pickers--add-keychains-none-owned&viewMode=story",
+    "name": "Add keychains slide-over (none owned)",
+    "path": "screenshots/desktop/account-components-person-settings-cards-and-pickers--add-keychains-none-owned.png",
     "title": "Account/Components/Person Settings/Cards and Pickers",
     "viewport": {
       "width": 1440,
@@ -1716,6 +1716,30 @@
     }
   },
   {
+    "id": "account-pages-error--default",
+    "iframePath": "/iframe.html?id=account-pages-error--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/mobile/account-pages-error--default.png",
+    "title": "Account/Pages/Error",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-error--default",
+    "iframePath": "/iframe.html?id=account-pages-error--default&viewMode=story",
+    "name": "Default",
+    "path": "screenshots/desktop/account-pages-error--default.png",
+    "title": "Account/Pages/Error",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-keychain-detail--default",
     "iframePath": "/iframe.html?id=account-pages-keychain-detail--default&viewMode=story",
     "name": "Default",
@@ -2596,6 +2620,30 @@
     "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--filtering-requires-update&viewMode=story",
     "name": "Internet filtering requires Mac update",
     "path": "screenshots/desktop/account-pages-people-person-mac-settings--filtering-requires-update.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--installed-apps-error",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--installed-apps-error&viewMode=story",
+    "name": "Installed apps failed to load",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--installed-apps-error.png",
+    "title": "Account/Pages/People/Person Mac Settings",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-people-person-mac-settings--installed-apps-loading",
+    "iframePath": "/iframe.html?id=account-pages-people-person-mac-settings--installed-apps-loading&viewMode=story",
+    "name": "Installed apps loading",
+    "path": "screenshots/desktop/account-pages-people-person-mac-settings--installed-apps-loading.png",
     "title": "Account/Pages/People/Person Mac Settings",
     "viewport": {
       "width": 1440,
@@ -4152,6 +4200,30 @@
     }
   },
   {
+    "id": "account-pages-unauthed--login-connecting-app",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--login-connecting-app&viewMode=story",
+    "name": "Login (connecting an app)",
+    "path": "screenshots/mobile/account-pages-unauthed--login-connecting-app.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--login-connecting-app",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--login-connecting-app&viewMode=story",
+    "name": "Login (connecting an app)",
+    "path": "screenshots/desktop/account-pages-unauthed--login-connecting-app.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
     "id": "account-pages-unauthed--login-error",
     "iframePath": "/iframe.html?id=account-pages-unauthed--login-error&viewMode=story",
     "name": "Login Error",
@@ -4216,6 +4288,54 @@
     "iframePath": "/iframe.html?id=account-pages-unauthed--signup&viewMode=story",
     "name": "Signup",
     "path": "screenshots/desktop/account-pages-unauthed--signup.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-connecting-app",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-connecting-app&viewMode=story",
+    "name": "Signup (connecting an app)",
+    "path": "screenshots/mobile/account-pages-unauthed--signup-connecting-app.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-connecting-app",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-connecting-app&viewMode=story",
+    "name": "Signup (connecting an app)",
+    "path": "screenshots/desktop/account-pages-unauthed--signup-connecting-app.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 1440,
+      "height": 900,
+      "name": "desktop"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-connecting-device",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-connecting-device&viewMode=story",
+    "name": "Signup (connecting an app, device known)",
+    "path": "screenshots/mobile/account-pages-unauthed--signup-connecting-device.png",
+    "title": "Account/Pages/Unauthed",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "name": "mobile"
+    }
+  },
+  {
+    "id": "account-pages-unauthed--signup-connecting-device",
+    "iframePath": "/iframe.html?id=account-pages-unauthed--signup-connecting-device&viewMode=story",
+    "name": "Signup (connecting an app, device known)",
+    "path": "screenshots/desktop/account-pages-unauthed--signup-connecting-device.png",
     "title": "Account/Pages/Unauthed",
     "viewport": {
       "width": 1440,
@@ -4685,18 +4805,6 @@
     "name": "Assortment",
     "path": "screenshots/desktop/ui-components-radiolist--assortment.png",
     "title": "UI/Components/RadioList",
-    "viewport": {
-      "width": 1440,
-      "height": 900,
-      "name": "desktop"
-    }
-  },
-  {
-    "id": "ui-components-segmentedtabs--assortment",
-    "iframePath": "/iframe.html?id=ui-components-segmentedtabs--assortment&viewMode=story",
-    "name": "Assortment",
-    "path": "screenshots/desktop/ui-components-segmentedtabs--assortment.png",
-    "title": "UI/Components/SegmentedTabs",
     "viewport": {
       "width": 1440,
       "height": 900,
