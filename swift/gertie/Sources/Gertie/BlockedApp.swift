@@ -10,6 +10,12 @@ public struct BlockedApp {
   }
 }
 
+public enum SiriBundleId: String, CaseIterable, Sendable {
+  case launcher = "com.apple.siri.launcher"
+  case app = "com.apple.Siri"
+  case uiService = "com.apple.SiriNCService"
+}
+
 public extension BlockedApp {
   func blocks(app: RunningApp, at date: Date, in calendar: Calendar = .current) -> Bool {
     let id = self.identifier.trimmingCharacters(in: .whitespaces)
@@ -21,6 +27,8 @@ public extension BlockedApp {
     } else if app.bundleName == id {
       return true
     } else if app.bundleId == id {
+      return true
+    } else if SiriBundleId(rawValue: id) != nil, SiriBundleId(rawValue: app.bundleId) != nil {
       return true
     } else if id.contains("."), app.bundleId.contains(id) {
       return true

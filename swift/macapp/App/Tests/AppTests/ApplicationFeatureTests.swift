@@ -119,4 +119,59 @@ final class ApplicationFeatureTests: XCTestCase {
     await store.send(.application(.didWake))
     await expect(alive.called).toEqual(true)
   }
+
+  @MainActor
+  func testSiriUIPresentationEnforcesLauncherRuleEvenDuringSuspension() async {
+    let host = RunningApp(pid: 123, bundleId: SiriBundleId.app.rawValue, localizedName: "Siri")
+    for suspended in [false, true] {
+      let (store, _) = AppReducer.testStore {
+        $0.user.data = .mock {
+          $0.blockedApps = [.init(identifier: SiriBundleId.launcher.rawValue)]
+        }
+        $0.filter.currentSuspensionExpiration = suspended ? Date.reference
+          .addingTimeInterval(60) : nil
+      }
+      store.deps.date = .constant(.reference)
+      store.deps.device.runningAppFromPid = { $0 == host.pid ? host : nil }
+      let terminateApp = spy(on: RunningApp.self, returning: ())
+      store.deps.device.terminateApp = terminateApp.fn
+      let notification = spy2(on: (String.self, String.self), returning: ())
+      store.deps.device.showNotification = notification.fn
+      let securityEvent = spy2(on: (LogSecurityEvent.Input.self, UUID?.self), returning: ())
+      store.deps.api.logSecurityEvent = securityEvent.fn
+
+      await store.send(.application(.siriUIPresented(pid: host.pid)))
+
+      await expect(terminateApp.calls).toEqual([host])
+      await expect(notification.calls)
+        .toEqual([.init("Application blocked", "The app “Siri” is not allowed")])
+      await expect(securityEvent.calls)
+        .toEqual([Both(.init(.blockedAppLaunchAttempted, "app: Siri"), nil)])
+    }
+  }
+
+  @MainActor
+  func testSiriUIPresentationDoesNotBlockWithoutAnActiveRule() async {
+    let host = RunningApp(pid: 123, bundleId: SiriBundleId.app.rawValue, localizedName: "Siri")
+    let cases: [[BlockedApp]] = [
+      [],
+      [.init(
+        identifier: SiriBundleId.launcher.rawValue,
+        schedule: .init(mode: .active, days: .all, window: "09:00-17:00"),
+      )],
+    ]
+    for rules in cases {
+      let (store, _) = AppReducer.testStore {
+        $0.user.data = .mock { $0.blockedApps = rules }
+      }
+      store.deps.date = .constant(.day(.monday, at: "18:00"))
+      store.deps.device.runningAppFromPid = { $0 == host.pid ? host : nil }
+      let terminateApp = spy(on: RunningApp.self, returning: ())
+      store.deps.device.terminateApp = terminateApp.fn
+
+      await store.send(.application(.siriUIPresented(pid: host.pid)))
+
+      await expect(terminateApp.called).toEqual(false)
+    }
+  }
 }
