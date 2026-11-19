@@ -4,6 +4,7 @@ import Foundation
 import GertieApp
 import GertieTcaFeatures
 import LibClients
+import LibCore
 import os.log
 
 @_exported import GertieBlocker
@@ -1095,6 +1096,7 @@ extension IOSReducer {
         // controller proxy also tries to migrate, but we do it here as safeguard
         if await deps.sharedStorage.migrateLegacyData() {
           deps.log("migration performed by app", "5258e97c")
+          Witness.appMigrated.emit()
         }
 
         let launchState = await deps.launchState()
