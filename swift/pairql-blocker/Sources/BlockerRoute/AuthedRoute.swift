@@ -5,7 +5,6 @@ public enum AuthedRoute: PairRoute {
   case createSuspendFilterRequest(CreateSuspendFilterRequest.Input)
   case markSupervisionProfileInstalled
   case pollFilterSuspensionDecision(PollFilterSuspensionDecision.Input)
-  case selfReportSupervision(SelfReportSupervision.Input)
 }
 
 public extension AuthedRoute {
@@ -24,10 +23,6 @@ public extension AuthedRoute {
     Route(.case(Self.pollFilterSuspensionDecision)) {
       Operation(PollFilterSuspensionDecision.self)
       Body(.json(PollFilterSuspensionDecision.Input.self))
-    }
-    Route(.case(Self.selfReportSupervision)) {
-      Operation(SelfReportSupervision.self)
-      Body(.json(SelfReportSupervision.Input.self))
     }
   }
   .eraseToAnyParserPrinter()

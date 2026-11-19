@@ -47,9 +47,9 @@ phone reboots**. After reboot, parent verifies supervision in Settings and tool 
 supervision code + no active filter = needs profile. App calls
 `CheckSupervisionFlowStatus` which returns `.missingProfile` with auth token. If status is
 `.claimed` but supervision isn't confirmed, user can self-report via
-`SelfReportSupervision`. App opens an embedded Safari view download the supervision
-profile, guides user through Settings to install it. Once the content filter activates,
-setup is complete.
+`SelfReportSupervision` (edit, this functionality was removed as it only caused problems).
+App opens an embedded Safari view download the supervision profile, guides user through
+Settings to install it. Once the content filter activates, setup is complete.
 
 ## PairQL Endpoints by Domain
 
@@ -59,7 +59,6 @@ setup is complete.
 | --------------------------------- | ----- | ------------------------------------------------ |
 | `CreateSupervisionClaimCode`      | None  | Phone generates 6-digit claim code               |
 | `CheckSupervisionFlowStatus`      | None  | Phone polls for claim/supervision/profile status |
-| `SelfReportSupervision`           | Child | User manually confirms supervision worked        |
 | `MarkSupervisionProfileInstalled` | Child | Phone confirms profile installed, setup complete |
 
 ### Dashboard Domain (`pairql-dashboard`)
@@ -108,5 +107,4 @@ Rust/Tauri backend in a private repo.
 ## Planning Archive
 
 Detailed planning documents, task specs (36 tasks), decision logs, and design analysis for
-this feature are archived at
-https://github.com/gertrude-app/ios-supervision-planning
+this feature are archived at https://github.com/gertrude-app/ios-supervision-planning
