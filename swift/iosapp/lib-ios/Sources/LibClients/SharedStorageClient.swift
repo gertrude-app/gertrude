@@ -52,7 +52,7 @@ public struct SharedStorageReaderClient: Sendable {
   public var loadDebugLogs: @Sendable () -> [String]?
 }
 
-private enum Key: String {
+package enum Key: String {
   case deviceIdentity = "v1.10.0--device-id"
   case migrationPending = "v1.10.0--migration-pending"
   case accountConnection_v2 = "v1.7.0--account-connection-v2"
@@ -77,14 +77,14 @@ extension SharedStorageClient: DependencyKey {
       saveDeviceIdentity: {
         if let id = $0 { saveCodable(id, forKey: .deviceIdentity) }
         else {
-          UserDefaults.gertrude.set(true, forKey: Key.migrationPending.rawValue)
+          saveBool(true, forKey: .migrationPending)
           removeKey(.deviceIdentity)
         }
       },
-      migrationPending: { UserDefaults.gertrude.bool(forKey: Key.migrationPending.rawValue) },
-      setMigrationPending: { UserDefaults.gertrude.set($0, forKey: Key.migrationPending.rawValue) },
+      migrationPending: { loadBool(forKey: .migrationPending) },
+      setMigrationPending: { saveBool($0, forKey: .migrationPending) },
       clearDeviceBoundState: {
-        UserDefaults.gertrude.set(true, forKey: Key.migrationPending.rawValue)
+        saveBool(true, forKey: .migrationPending)
         for key in [
           Key.deviceIdentity,
           .accountConnection_v2,
@@ -152,11 +152,12 @@ extension SharedStorageReaderClient: TestDependencyKey {
 }
 
 func migrateLegacyStorage() async -> Bool {
-  guard !UserDefaults.gertrude.bool(forKey: Key.migrationPending.rawValue) else { return false }
-  if UserDefaults.gertrude.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
+  @Dependency(\.groupDefaults) var defaults
+  guard !loadBool(forKey: .migrationPending) else { return false }
+  if defaults.data(forKey: Key.disabledBlockGroupIds.rawValue) == nil {
     let legacyGroups: [BlockGroup]? = loadCodable(forKey: .disabledBlockGroups)
     let isUpgrader = legacyGroups != nil
-      || UserDefaults.gertrude.data(forKey: Key.legacyV1StorageKey.rawValue) != nil
+      || defaults.data(forKey: Key.legacyV1StorageKey.rawValue) != nil
     if isUpgrader {
       var uuids = (legacyGroups ?? []).map(\.legacyUUID)
       // don't auto opt-in upgraders to new Apple Music group released March 2026
@@ -166,7 +167,7 @@ func migrateLegacyStorage() async -> Bool {
     }
   }
 
-  if UserDefaults.gertrude.data(forKey: Key.protectionMode.rawValue) != nil {
+  if defaults.data(forKey: Key.protectionMode.rawValue) != nil {
     return false // fast path, they have current data, we're done
   }
 
@@ -185,12 +186,12 @@ func migrateLegacyStorage() async -> Bool {
     return true
   }
 
-  if UserDefaults.gertrude.data(forKey: Key.legacyProtectionMode.rawValue) != nil {
+  if defaults.data(forKey: Key.legacyProtectionMode.rawValue) != nil {
     log(.warn, .storage, "fdab6cff")
     return false
   }
 
-  if UserDefaults.gertrude.data(forKey: Key.legacyV1StorageKey.rawValue) == nil {
+  if defaults.data(forKey: Key.legacyV1StorageKey.rawValue) == nil {
     // no data, nothing to migrate, probably initial launch
     return false
   }
@@ -213,26 +214,41 @@ func migrateLegacyStorage() async -> Bool {
 }
 
 private func saveCodable(_ value: some Codable, forKey key: Key) {
+  @Dependency(\.groupDefaults) var defaults
   if let data = try? JSONEncoder().encode(value) {
-    UserDefaults.gertrude.set(data, forKey: key.rawValue)
+    defaults.setData(data: data, forKey: key.rawValue)
   }
 }
 
 private func loadCodable<T: Codable>(forKey key: Key) -> T? {
-  guard let data = UserDefaults.gertrude.data(forKey: key.rawValue) else { return nil }
+  @Dependency(\.groupDefaults) var defaults
+  guard let data = defaults.data(forKey: key.rawValue) else { return nil }
   return try? JSONDecoder().decode(T.self, from: data)
 }
 
 private func saveDate(_ date: Date, forKey key: Key) {
-  UserDefaults.gertrude.set(date, forKey: key.rawValue)
+  @Dependency(\.groupDefaults) var defaults
+  defaults.setDate(date: date, forKey: key.rawValue)
 }
 
 private func loadDate(forKey key: Key) -> Date? {
-  UserDefaults.gertrude.object(forKey: key.rawValue) as? Date
+  @Dependency(\.groupDefaults) var defaults
+  return defaults.date(forKey: key.rawValue)
+}
+
+private func saveBool(_ bool: Bool, forKey key: Key) {
+  @Dependency(\.groupDefaults) var defaults
+  defaults.setBool(bool: bool, forKey: key.rawValue)
+}
+
+private func loadBool(forKey key: Key) -> Bool {
+  @Dependency(\.groupDefaults) var defaults
+  return defaults.bool(forKey: key.rawValue)
 }
 
 private func removeKey(_ key: Key) {
-  UserDefaults.gertrude.removeObject(forKey: key.rawValue)
+  @Dependency(\.groupDefaults) var defaults
+  defaults.remove(forKey: key.rawValue)
 }
 
 public extension DependencyValues {
@@ -263,7 +279,7 @@ extension SharedStorageClient {
   }
 }
 
-extension ProtectionMode {
+package extension ProtectionMode {
   enum Legacy: Codable {
     case onboarding([BlockRule.Legacy])
     case normal([BlockRule.Legacy])

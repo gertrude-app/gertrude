@@ -156,7 +156,7 @@ extension DeviceClient: TestDependencyKey {
   }
 #endif
 
-@Sendable func extensionDeviceId() -> UUID? {
+@Sendable package func extensionDeviceId() -> UUID? {
   @Dependency(\.sharedStorage) var storage
   @Dependency(\.keychain) var keychain
   if let id = storage.loadDeviceIdentity() {

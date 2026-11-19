@@ -11,11 +11,16 @@ let package = Package(
     .library(name: "LibClients", targets: ["LibClients"]),
     .library(name: "LibApp", targets: ["LibApp"]),
     .library(name: "LibViews", targets: ["LibViews"]),
+    .library(name: "LibSim", targets: ["LibSim"]),
   ],
   dependencies: [
     .package(
       url: "https://github.com/pointfreeco/swift-dependencies",
       from: "1.8.1",
+    ),
+    .package(
+      url: "https://github.com/pointfreeco/swift-clocks",
+      from: "1.0.0",
     ),
     .package(
       url: "https://github.com/pointfreeco/swift-concurrency-extras",
@@ -98,6 +103,37 @@ let package = Package(
         .product(name: "PairQLClient", package: "pairql"),
         .product(name: "Dependencies", package: "swift-dependencies"),
         .product(name: "DependenciesMacros", package: "swift-dependencies"),
+      ],
+    ),
+    .target(
+      name: "LibSim",
+      dependencies: [
+        "LibApp",
+        "LibClients",
+        "LibController",
+        "LibCore",
+        "LibFilter",
+        .product(name: "AppEvents", package: "gertie-tca-features"),
+        .product(name: "BlockerRoute", package: "pairql-blocker"),
+        .product(name: "Clocks", package: "swift-clocks"),
+        .product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+        .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
+        .product(name: "Dependencies", package: "swift-dependencies"),
+        .product(name: "GertieBlocker", package: "gertie"),
+        .product(name: "GertieTcaFeatures", package: "gertie-tca-features"),
+        .product(name: "XCore", package: "x-kit"),
+      ],
+    ),
+    .testTarget(
+      name: "LibSimTests",
+      dependencies: [
+        "LibSim",
+        "LibApp",
+        "LibClients",
+        "LibCore",
+        .product(name: "BlockerRoute", package: "pairql-blocker"),
+        .product(name: "GertieBlocker", package: "gertie"),
+        .product(name: "XExpect", package: "x-expect"),
       ],
     ),
     .testTarget(

@@ -1,0 +1,525 @@
+import AppEvents
+import BlockerRoute
+import Clocks
+import ComposableArchitecture
+import ConcurrencyExtras
+import Dependencies
+import Foundation
+import GertieBlocker
+import GertieTcaFeatures
+import LibApp
+import LibClients
+import LibController
+import LibCore
+import LibFilter
+import XCore
+
+/// An in-process simulation of one physical iOS device running the blocker:
+/// the durable world (app-group storage, clock, API) plus up to three live
+/// "processes" (app, controller extension, filter extension) built from the
+/// real production types, each wired to the world through its own dependency
+/// scope. The conductor methods model the OS behaviors that connect them; every
+/// modeled OS behavior is documented inline as an `OS RULE` with its evidence,
+/// because the harness tests our code against this model of iOS, not iOS itself.
+@MainActor
+public final class VirtualDevice {
+  public let disk: LockIsolated<[String: GroupDefaultsClient.Entry]>
+  public let api: ScriptedApi
+  public let clock = TestClock<Duration>()
+  public let currentDate: LockIsolated<Date>
+  public let deviceId: UUID
+  public let keychainVendorId: LockIsolated<UUID?>
+  public let filterInstalled: LockIsolated<Bool>
+  public let trace = LockIsolated<[TraceEvent]>([])
+  public let loggedEvents = LockIsolated<[String]>([])
+
+  public private(set) var filter: FilterProcess?
+  public private(set) var controller: ControllerProcess?
+  public private(set) var app: AppProcess?
+
+  private let pendingRulesChanged = LockIsolated<[RulesChangedTrigger]>([])
+
+  public init(
+    disk: [String: GroupDefaultsClient.Entry] = [:],
+    api: ScriptedApi.Config = .init(),
+    filterInstalled: Bool = false,
+    deviceId: UUID = SimDisk.deviceId,
+    keychainVendorId: UUID? = nil,
+    now: Date = Date(timeIntervalSinceReferenceDate: 0),
+  ) {
+    self.disk = LockIsolated(disk)
+    self.api = ScriptedApi(api)
+    self.filterInstalled = LockIsolated(filterInstalled)
+    self.deviceId = deviceId
+    self.keychainVendorId = LockIsolated(keychainVendorId)
+    self.currentDate = LockIsolated(now)
+  }
+}
+
+// process lifecycle
+
+public extension VirtualDevice {
+  /// OS RULE R1 (extension launch): the system spawns the data provider process
+  /// (proxy constructed → `filter-proxy-init` witness) and calls `startFilter`
+  /// (`filter-start` witness). Device-verified 2026-07-03 (collect campaign
+  /// `witnesses-20260703-120635.ndjson`): on a JOINT launch (install/reboot) both
+  /// proxy-inits precede both *-start witnesses — the OS spawns both processes
+  /// first, then starts both (controller-init interleaves between filter-init
+  /// and filter-start). For on-demand single launches (a flow arrives with the
+  /// filter dead) init and start are adjacent for that one process, so
+  /// `launchFilter` bundles them; `osStartsProviders`/`reboot` use the split
+  /// `initFilter` + `startFilterProcess` to model the joint sequence.
+  @discardableResult
+  func launchFilter() -> FilterProcess {
+    let process = self.initFilter()
+    self.startFilterProcess()
+    return process
+  }
+
+  @discardableResult
+  func initFilter() -> FilterProcess {
+    let process = FilterProcess(dependencies: self.dependencies(for: .filter))
+    self.filter = process
+    self.trace.withValue { $0.append(.launched(.filter)) }
+    return process
+  }
+
+  func startFilterProcess() {
+    self.filter?.osStartFilter()
+  }
+
+  /// OS RULE R2 (extension launch): same spawn-then-start shape as the filter.
+  /// The controller proxy's init kicks off legacy-data migration as a
+  /// fire-and-forget Task (production code, `ControllerProxy.init`);
+  /// `startFilter` is called separately and does NOT await it — migration runs
+  /// concurrently with the startup refresh-rules loop. Device-verified
+  /// 2026-07-03: controller-init interleaves between filter-init and
+  /// filter-start on a joint launch. The sim previously serialized migration
+  /// before start (`awaitMigration()`); it no longer does — `quiesce` awaits
+  /// both the startup and migration tasks so assertions read a settled world
+  /// while the interleaving during the run is real.
+  @discardableResult
+  func launchController() async -> ControllerProcess {
+    let process = self.initController()
+    self.startControllerProcess()
+    return process
+  }
+
+  @discardableResult
+  func initController() -> ControllerProcess {
+    let pending = self.pendingRulesChanged
+    let process = ControllerProcess(
+      dependencies: self.dependencies(for: .controller),
+      notifyRulesChanged: {
+        pending.withValue { $0.append(.notifyRulesChanged) }
+      },
+    )
+    self.controller = process
+    self.trace.withValue { $0.append(.launched(.controller)) }
+    return process
+  }
+
+  func startControllerProcess() {
+    self.controller?.osStartFilter()
+  }
+
+  /// The host app only ever launches when a user opens it; the OS never
+  /// launches it on boot or on filter activity.
+  @discardableResult
+  func launchApp() async -> AppProcess {
+    let process = AppProcess(dependencies: self.dependencies(for: .app))
+    self.app = process
+    self.trace.withValue { $0.append(.launched(.app)) }
+    await process.store.send(.programmatic(.appDidLaunch))
+    return process
+  }
+
+  /// OS RULE R9 (process death): a process can be killed at any moment (memory
+  /// pressure, reboot, update) losing all in-memory state; durable world state
+  /// (app-group storage) survives. In-flight work dies with the process —
+  /// modeled by task cancellation plus cancellation checks at the scripted API
+  /// boundary, which is imperfect: a task between its last API call and a
+  /// storage write can still perform that write after "death".
+  func kill(_ target: SimTarget) async {
+    self.trace.withValue { $0.append(.killed(target)) }
+    switch target {
+    case .filter:
+      self.filter = nil
+    case .controller:
+      self.controller?.osKill()
+      self.controller = nil
+    case .app:
+      await self.app?.osKill()
+      self.app = nil
+    }
+  }
+
+  /// OS RULE R6 (reboot): after a device restart the system relaunches both
+  /// providers of an enabled filter configuration on its own schedule. The host
+  /// app never relaunches automatically. Device-verified 2026-07-03: the OS
+  /// spawns both provider processes (init) before starting either; the START
+  /// order is the indeterminate part the `order` parameter exercises. Scenarios
+  /// should be run with both start orders. NOTE: across 6 observed launches
+  /// (2 onboarding + 4 reboots) the filter (data provider) has ALWAYS
+  /// initialized first (160-574ms before the controller), never controller-
+  /// first — the "indeterminate" claim is unverified and may be deterministically
+  /// filter-first. Both orders are still tested conservatively.
+  func reboot(order: [SimTarget] = [.filter, .controller]) async {
+    for target in [SimTarget.app, .controller, .filter] where self.isRunning(target) {
+      await self.kill(target)
+    }
+    self.trace.withValue { $0.append(.rebooted) }
+    self.initFilter()
+    self.initController()
+    for target in order {
+      switch target {
+      case .filter: self.startFilterProcess()
+      case .controller: self.startControllerProcess()
+      case .app: await self.launchApp()
+      }
+    }
+  }
+
+  func isRunning(_ target: SimTarget) -> Bool {
+    switch target {
+    case .filter: self.filter != nil
+    case .controller: self.controller != nil
+    case .app: self.app != nil
+    }
+  }
+}
+
+// os event delivery
+
+public extension VirtualDevice {
+  /// OS RULE R3 (flow delivery): every new network flow on the device goes to the
+  /// filter data provider's `handleNewFlow` while the filter configuration is
+  /// installed & enabled; with no configuration, traffic flows unfiltered. If
+  /// the provider process is not running, the system starts it on demand.
+  ///
+  /// OS RULE R3/R4 (needRules): when the data provider verdicts `.needRules()`, the
+  /// system delivers the same flow to the control provider's `handleNewFlow`
+  /// (starting that process if needed); the control verdict decides the flow,
+  /// and `withUpdateRules: true` causes the system to call the data provider's
+  /// `handleRulesChanged()`. Evidence: Apple NEFilterProvider docs + the
+  /// production convention documented in `ControllerProxy.handleNewFlow`.
+  /// SIMPLIFICATION: the sim models this as 1:1 (every needRules gets a
+  /// controller delivery). Device-verified 2026-07-03: 72/73 paired in a
+  /// 40-min session; the one miss was a 35ms burst of 4 needRules verdicts
+  /// where the OS coalesced them into a single controller delivery. This is
+  /// an OS-level flow-batching optimization, not a correctness issue — the
+  /// steady-state 1:1 model is correct and the burst edge is not modeled.
+  @discardableResult
+  func flow(_ flow: FilterFlow) async -> FlowVerdict {
+    guard self.filterInstalled.value else {
+      self.trace.withValue { $0.append(.unfilteredFlow(target: flow.target)) }
+      return .allow
+    }
+    if self.filter == nil {
+      self.trace.withValue { $0.append(.launchedOnDemand(.filter)) }
+      self.launchFilter()
+    }
+    let verdict = self.filter!.decide(flow)
+    self.trace.withValue {
+      $0.append(.flowDecided(target: flow.target, verdict: verdict.description))
+    }
+    guard verdict == .needRules else {
+      self.drainRulesChanged()
+      return verdict
+    }
+    if self.controller == nil {
+      self.trace.withValue { $0.append(.launchedOnDemand(.controller)) }
+      await self.launchController()
+    }
+    let control = await self.controller!.handleNewFlow(flow)
+    let (allowed, updateRules) = interpret(control)
+    self.trace.withValue {
+      $0.append(.controlVerdict(target: flow.target, verdict: allowed ? "ALLOW" : "DROP"))
+    }
+    if updateRules {
+      self.deliverRulesChanged(.withUpdateRules)
+    }
+    self.drainRulesChanged()
+    return allowed ? .allow : .drop
+  }
+
+  @discardableResult
+  func browse(_ hostname: String, from bundleId: String = "com.apple.mobilesafari") async
+    -> FlowVerdict {
+    await self.flow(FilterFlow(hostname: hostname, bundleId: bundleId, flowType: .socket))
+  }
+
+  /// OS RULE R7 (sentinel channel): `FilterClient.send` fires a real HTTPS request
+  /// to a magic hostname from the app process; it reaches the filter as an
+  /// ordinary socket flow, subject to the same delivery rules as any flow.
+  /// SIMPLIFICATION: modeled as one send → one flow. Device-verified 2026-07-03
+  /// (collect campaign `witnesses-20260703-142112.ndjson`): each single send
+  /// produced 6-8 `filter-sentinel` flow deliveries (one HTTPS request fans out
+  /// into multiple flows — retries/connection attempts). Harmless for rule
+  /// semantics (sentinel handling is idempotent per notification kind); the
+  /// fan-out is not modeled.
+  func deliverSentinel(_ notification: FilterClient.Notification) async {
+    self.trace.withValue { $0.append(.sentinelSent(notification)) }
+    let hostname = switch notification {
+    case .rulesChanged: MagicStrings.readRulesSentinalHostname
+    case .refreshRules: MagicStrings.refreshRulesSentinalHostname
+    case .dumpLogs: MagicStrings.dumpLogsSentinalHostname
+    }
+    await self.flow(FilterFlow(
+      hostname: hostname,
+      bundleId: .gertrudeBundleIdShort,
+      flowType: .socket,
+    ))
+  }
+
+  /// OS RULE R5 (notifyRulesChanged): the control provider's
+  /// `notifyRulesChanged()` causes the system to call the data provider's
+  /// `handleRulesChanged()` asynchronously; if the data provider is not
+  /// running, the notification is lost. Modeled as a queue drained by the
+  /// conductor on the next flow or quiesce.
+  private func drainRulesChanged() {
+    let triggers = self.pendingRulesChanged.withValue { queued in
+      let drained = queued
+      queued = []
+      return drained
+    }
+    for trigger in triggers {
+      self.deliverRulesChanged(trigger)
+    }
+  }
+
+  private func deliverRulesChanged(_ trigger: RulesChangedTrigger) {
+    if let filter = self.filter {
+      filter.osHandleRulesChanged()
+      self.trace.withValue { $0.append(.rulesChangedDelivered(trigger)) }
+    } else {
+      self.trace.withValue { $0.append(.rulesChangedDropped(trigger)) }
+    }
+  }
+
+  /// OS RULE R8 (install): once the app successfully saves an enabled filter
+  /// configuration (`saveToPreferences`), the system starts both providers
+  /// without further user interaction. Device-verified 2026-07-03: both
+  /// processes are spawned (init) before either is started.
+  private func osStartsProviders() async {
+    let needFilter = self.filter == nil
+    let needController = self.controller == nil
+    if needFilter { self.initFilter() }
+    if needController { self.initController() }
+    if needFilter { self.startFilterProcess() }
+    if needController { self.startControllerProcess() }
+  }
+
+  /// Drains all pending async work deterministically: unstructured tasks,
+  /// queued OS deliveries, and every sleep scheduled on the shared test clock.
+  func quiesce() async {
+    for _ in 0 ..< 10 {
+      await Task.megaYield()
+      self.drainRulesChanged()
+      await self.clock.run(timeout: .seconds(10))
+    }
+    if let task = self.controller?.startupTask {
+      await task.value
+    }
+    await self.controller?.awaitMigration()
+    if let app = self.app {
+      await app.store.finish()
+      await app.store.skipReceivedActions(strict: false)
+    }
+    await Task.megaYield()
+    self.drainRulesChanged()
+  }
+
+  /// Advances wall-clock time and the shared test clock together, keeping
+  /// `Date`-based logic (debounce intervals) and `Clock`-based logic (sleeps)
+  /// on one timeline.
+  func advanceTime(minutes: Int) async {
+    self.currentDate.withValue { $0 += TimeInterval(minutes * 60) }
+    await self.clock.advance(by: .minutes(minutes))
+  }
+}
+
+// dependency wiring
+
+extension VirtualDevice {
+  private func dependencies(for target: SimTarget) -> @Sendable (inout DependencyValues)
+    -> Void {
+    let clock = self.clock
+    let currentDate = self.currentDate
+    let disk = self.disk
+    let trace = self.trace
+    let deviceId = self.deviceId
+    let keychainVendorId = self.keychainVendorId
+    let loggedEvents = self.loggedEvents
+    let filterInstalled = self.filterInstalled
+    let apiClient = self.api.client(for: target)
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "UTC")!
+    let fixedCalendar = calendar
+    let sendSentinel: @Sendable (FilterClient.Notification) async throws -> Void =
+      { [weak self] notification in
+        await self?.deliverSentinel(notification)
+      }
+    let providersStarted: @Sendable () async -> Void = { [weak self] in
+      await self?.osStartsProviders()
+    }
+
+    return { deps in
+      deps.date = DateGenerator { currentDate.value }
+      deps.calendar = fixedCalendar
+      deps.locale = Locale(identifier: "en_US")
+      deps.continuousClock = clock
+      deps.suspendingClock = clock
+      deps.groupDefaults = .inMemory(disk)
+      deps.osLog = .noop
+      deps.osLog.log = { message in trace.withValue { $0.append(.log(target, message)) } }
+      deps.api = apiClient
+      deps.appEvent.record = { event in
+        loggedEvents.withValue { $0.append(event.eventId) }
+      }
+      deps.keychain = .inMemory(vendorId: keychainVendorId)
+
+      switch target {
+      case .filter:
+        deps.sharedStorageReader = .liveValue
+
+      case .controller:
+        deps.sharedStorage = .liveValue
+        deps.device.deviceId = { extensionDeviceId() }
+
+      case .app:
+        deps.sharedStorage = .liveValue
+        deps.device
+          .deviceId = { simResolvedIdentity(fallback: deviceId, keychain: keychainVendorId) }
+        deps.blockerIdentity.resolve = {
+          @Dependency(\.sharedStorage) var storage
+          let id = simResolvedIdentity(fallback: deviceId, keychain: keychainVendorId)
+          storage.saveDeviceIdentity(id)
+          return .init()
+        }
+        deps.blockerIdentity.report = { .init() }
+        deps.device.installedVersion = { "1.10.0" }
+        deps.device.deleteCacheFillDir = {}
+        deps.device.data = { .init(
+          type: .iPhone,
+          iOSVersion: "26.0.1",
+          deviceId: deviceId,
+          modelIdentifier: "iPhone15,2",
+        ) }
+        deps.appStore.requestRating = {}
+        deps.appStore.requestReview = { _ in }
+        deps.mainQueue = .immediate
+        deps.systemExtension.requestAuthorization = { .success(()) }
+        deps.systemExtension.requestIndividualAuthorization = { .success(()) }
+        deps.systemExtension.installFilter = {
+          filterInstalled.setValue(true)
+          await providersStarted()
+          return .success(())
+        }
+        deps.systemExtension.filterRunning = { filterInstalled.value }
+        deps.systemExtension.cleanupForRetry = { filterInstalled.setValue(false) }
+        deps.filter.send = sendSentinel
+      }
+    }
+  }
+}
+
+/// SIMPLIFICATION (app identity): stands in for `BlockerIdentity`'s resolver on
+/// its steady-state path only. It keeps an already-published identity, else
+/// adopts the legacy keychain vendor id (the real resolver reads the same
+/// keychain account), else uses `VirtualDevice.deviceId`, then publishes it and
+/// reports available, no migration pending, nothing to report. NOT modeled:
+/// deferred/unavailable resolution, `.identityUnavailable`, pending-transition
+/// reporting, hardware migration (`markMigration`, `clearDeviceBoundState`).
+/// Scenarios needing those must swap in the real resolver with isolated storage.
+private func simResolvedIdentity(fallback: UUID, keychain: LockIsolated<UUID?>) -> UUID {
+  @Dependency(\.sharedStorage) var storage
+  return storage.loadDeviceIdentity() ?? keychain.value ?? fallback
+}
+
+private func interpret(_ verdict: NEFilterControlVerdict) -> (allowed: Bool, updateRules: Bool) {
+  if verdict == .allow(withUpdateRules: true) { return (true, true) }
+  if verdict == .allow(withUpdateRules: false) { return (true, false) }
+  if verdict == .drop(withUpdateRules: true) { return (false, true) }
+  if verdict == .drop(withUpdateRules: false) { return (false, false) }
+  return (false, true)
+}
+
+// world inspection
+
+public extension VirtualDevice {
+  var diskProtectionMode: ProtectionMode? {
+    guard case .data(let data) = self.disk.value[Key.protectionMode.rawValue] else {
+      return nil
+    }
+    return try? JSONDecoder().decode(ProtectionMode.self, from: data)
+  }
+
+  func logs(for target: SimTarget) -> [String] {
+    self.trace.value.compactMap { event in
+      if case .log(let logTarget, let message) = event, logTarget == target {
+        message
+      } else {
+        nil
+      }
+    }
+  }
+
+  var traceDescription: String {
+    self.trace.value.map(\.description).joined(separator: "\n")
+  }
+}
+
+// disk seeding
+
+public enum SimDisk {
+  public static let deviceId = UUID(1)
+
+  /// A device already running a v1.10.0+ build: the app's identity resolver has
+  /// published `deviceIdentity` to the app group, which is where the extensions
+  /// read their device id from (`extensionDeviceId()`).
+  public static func current(
+    protectionMode: ProtectionMode? = nil,
+    connection: ChildIOSDeviceData_v2? = nil,
+    disabledBlockGroupIds: [UUID]? = nil,
+    allBlockGroups: [GetBlockGroups.BlockGroupInfo]? = nil,
+    firstLaunch: Date? = Date(timeIntervalSinceReferenceDate: 0),
+    deviceIdentity: UUID? = SimDisk.deviceId,
+  ) -> [String: GroupDefaultsClient.Entry] {
+    var disk: [String: GroupDefaultsClient.Entry] = [:]
+    if let deviceIdentity {
+      disk[Key.deviceIdentity.rawValue] = .data(try! JSONEncoder().encode(deviceIdentity))
+    }
+    if let protectionMode {
+      disk[Key.protectionMode.rawValue] = .data(try! JSONEncoder().encode(protectionMode))
+    }
+    if let connection {
+      disk[Key.accountConnection_v2.rawValue] = .data(try! JSONEncoder().encode(connection))
+    }
+    if let disabledBlockGroupIds {
+      disk[Key.disabledBlockGroupIds.rawValue] =
+        .data(try! JSONEncoder().encode(disabledBlockGroupIds))
+    }
+    if let allBlockGroups {
+      disk[Key.allBlockGroups.rawValue] = .data(try! JSONEncoder().encode(allBlockGroups))
+    }
+    if let firstLaunch {
+      disk[Key.firstLaunchDate.rawValue] = .date(firstLaunch)
+    }
+    return disk
+  }
+
+  /// Pre-v1.10.0 upgraders have no published `deviceIdentity`; their extensions
+  /// fall back to the legacy keychain vendor id (`VirtualDevice.keychainVendorId`).
+  package static func v1_3_upgrader(
+    legacyMode: ProtectionMode.Legacy,
+    disabledGroups: [BlockGroup],
+    firstLaunch: Date = Date(timeIntervalSinceReferenceDate: 0),
+  ) -> [String: GroupDefaultsClient.Entry] {
+    [
+      Key.legacyProtectionMode.rawValue: .data(try! JSONEncoder().encode(legacyMode)),
+      Key.disabledBlockGroups.rawValue: .data(try! JSONEncoder().encode(disabledGroups)),
+      Key.firstLaunchDate.rawValue: .date(firstLaunch),
+    ]
+  }
+}

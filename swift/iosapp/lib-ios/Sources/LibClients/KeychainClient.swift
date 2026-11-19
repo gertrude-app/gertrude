@@ -87,6 +87,18 @@ public extension DependencyValues {
   }
 }
 
+package extension KeychainClient {
+  static func inMemory(vendorId: LockIsolated<UUID?>) -> KeychainClient {
+    .init(
+      _load: { _ in vendorId.value.map { Data($0.uuidString.utf8) } },
+      _save: { _, data in
+        vendorId.setValue(String(data: data, encoding: .utf8).flatMap(UUID.init(uuidString:)))
+      },
+      delete: { _ in vendorId.setValue(nil) },
+    )
+  }
+}
+
 #if DEBUG
   public extension KeychainClient {
     static let mock = KeychainClient(
