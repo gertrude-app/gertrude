@@ -19,7 +19,11 @@ extension RequestMagicLink: Resolver {
     let postmark = get(dependency: \.postmark)
     let email = input.email.lowercased()
     guard email.isValidEmail else {
-      throw Abort(.badRequest)
+      throw context.error(
+        "c12c1065",
+        .badRequest,
+        "Invalid email address: \(String(reflecting: input.email))",
+      )
     }
 
     let parent = try? await Parent.query()

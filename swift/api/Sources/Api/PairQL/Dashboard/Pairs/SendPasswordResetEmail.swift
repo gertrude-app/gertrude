@@ -18,7 +18,11 @@ extension SendPasswordResetEmail: Resolver {
     let postmark = get(dependency: \.postmark)
     let email = input.email.lowercased()
     guard email.isValidEmail else {
-      throw Abort(.badRequest)
+      throw context.error(
+        "f599e2fb",
+        .badRequest,
+        "Invalid email address: \(String(reflecting: input.email))",
+      )
     }
 
     if let parent = try? await Parent.query()
