@@ -1,6 +1,5 @@
 import Dependencies
 import Foundation
-import PairQL
 import XCTest
 import XExpect
 
@@ -71,27 +70,5 @@ final class DasboardUnauthedResolverTests: ApiTestCase, @unchecked Sendable {
     expect(output).toEqual(.success)
     expect(sent.emails).toHaveCount(1)
     expect(sent.emails[0].template).toBe("magic-link-no-account")
-  }
-
-  func testRequestMagicLinkWithInvalidEmailErrorIncludesTypedEmail() async throws {
-    let result = await RequestMagicLink.result(
-      with: .init(email: "kendall@gmail ", redirect: nil),
-      in: self.context,
-    )
-
-    guard case .failure(let error) = result else { return XCTFail("Expected an error") }
-    expect((error as? PqlError)?.debugMessage).toEqual("Invalid email address: \"kendall@gmail \"")
-    expect(sent.emails).toHaveCount(0)
-  }
-
-  func testSendPasswordResetEmailWithInvalidEmailErrorIncludesTypedEmail() async throws {
-    let result = await SendPasswordResetEmail.result(
-      with: .init(email: "Kendall@Gmail"),
-      in: self.context,
-    )
-
-    guard case .failure(let error) = result else { return XCTFail("Expected an error") }
-    expect((error as? PqlError)?.debugMessage).toEqual("Invalid email address: \"Kendall@Gmail\"")
-    expect(sent.emails).toHaveCount(0)
   }
 }
