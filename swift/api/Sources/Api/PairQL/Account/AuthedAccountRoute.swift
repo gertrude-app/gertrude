@@ -72,269 +72,283 @@ enum AuthedAccountRoute: PairRoute {
   case toggleActivityFlag(ToggleActivityFlag.Input)
   case deleteActivity(DeleteActivity.Input)
 
-  nonisolated(unsafe) static let router = OneOf {
-    Route(.case(Self.getPeople)) {
-      Operation(GetPeople.self)
-    }
-    Route(.case(Self.getAccountAnnouncement)) {
-      Operation(GetAccountAnnouncement.self)
-    }
-    Route(.case(Self.dismissAccountAnnouncement)) {
-      Operation(DismissAccountAnnouncement.self)
-      Body(.accountInput(DismissAccountAnnouncement.self))
-    }
-    Route(.case(Self.getDevices)) {
-      Operation(GetDevices.self)
-    }
-    Route(.case(Self.getAccountIOSClaimData)) {
-      Operation(GetAccountIOSClaimData.self)
-      Body(.accountInput(GetAccountIOSClaimData.self))
-    }
-    Route(.case(Self.claimAccountIOSDevice)) {
-      Operation(ClaimAccountIOSDevice.self)
-      Body(.accountInput(ClaimAccountIOSDevice.self))
-    }
-    Route(.case(Self.getMacDevice)) {
-      Operation(GetMacDevice.self)
-      Body(.accountInput(GetMacDevice.self))
-    }
-    Route(.case(Self.updateMacDevice)) {
-      Operation(UpdateMacDevice.self)
-      Body(.accountInput(UpdateMacDevice.self))
-    }
-    Route(.case(Self.getAccountSettings)) {
-      Operation(GetAccountSettings.self)
-    }
-    Route(.case(Self.getAccountSetup)) {
-      Operation(GetAccountSetup.self)
-    }
-    Route(.case(Self.setAccountSetupApps)) {
-      Operation(SetAccountSetupApps.self)
-      Body(.accountInput(SetAccountSetupApps.self))
-    }
-    Route(.case(Self.saveAccountReferralSource)) {
-      Operation(SaveAccountReferralSource.self)
-      Body(.accountInput(SaveAccountReferralSource.self))
-    }
-    Route(.case(Self.createAccountNotificationMethod)) {
-      Operation(CreateAccountNotificationMethod.self)
-      Body(.accountInput(CreateAccountNotificationMethod.self))
-    }
-    Route(.case(Self.confirmAccountNotificationMethod)) {
-      Operation(ConfirmAccountNotificationMethod.self)
-      Body(.accountInput(ConfirmAccountNotificationMethod.self))
-    }
-    Route(.case(Self.saveAccountNotification)) {
-      Operation(SaveAccountNotification.self)
-      Body(.accountInput(SaveAccountNotification.self))
-    }
-    Route(.case(Self.deleteAccountNotification)) {
-      Operation(DeleteAccountNotification.self)
-      Body(.accountInput(DeleteAccountNotification.self))
-    }
-    Route(.case(Self.deleteAccountNotificationMethod)) {
-      Operation(DeleteAccountNotificationMethod.self)
-      Body(.accountInput(DeleteAccountNotificationMethod.self))
-    }
-    Route(.case(Self.setAccountDailyReviewEmail)) {
-      Operation(SetAccountDailyReviewEmail.self)
-      Body(.accountInput(SetAccountDailyReviewEmail.self))
-    }
-    Route(.case(Self.getAccountBilling)) {
-      Operation(GetAccountBilling.self)
-    }
-    Route(.case(Self.startAccountCheckout)) {
-      Operation(StartAccountCheckout.self)
-      Body(.accountInput(StartAccountCheckout.self))
-    }
-    Route(.case(Self.openAccountBillingPortal)) {
-      Operation(OpenAccountBillingPortal.self)
-      Body(.accountInput(OpenAccountBillingPortal.self))
-    }
-    Route(.case(Self.changeAccountSubscriptionTier)) {
-      Operation(ChangeAccountSubscriptionTier.self)
-      Body(.accountInput(ChangeAccountSubscriptionTier.self))
-    }
-    Route(.case(Self.startAccountFullTrial)) {
-      Operation(StartAccountFullTrial.self)
-    }
-    Route(.case(Self.handleAccountCheckoutSuccess)) {
-      Operation(HandleAccountCheckoutSuccess.self)
-      Body(.accountInput(HandleAccountCheckoutSuccess.self))
-    }
-    Route(.case(Self.handleAccountCheckoutCancel)) {
-      Operation(HandleAccountCheckoutCancel.self)
-      Body(.accountInput(HandleAccountCheckoutCancel.self))
-    }
-    Route(.case(Self.createPerson)) {
-      Operation(CreatePerson.self)
-      Body(.accountInput(CreatePerson.self))
-    }
-    Route(.case(Self.createMacConnectionCode)) {
-      Operation(CreateMacConnectionCode.self)
-      Body(.accountInput(CreateMacConnectionCode.self))
-    }
-    Route(.case(Self.disconnectMacConnection)) {
-      Operation(DisconnectMacConnection.self)
-      Body(.accountInput(DisconnectMacConnection.self))
-    }
-    Route(.case(Self.updatePersonBasicDetails)) {
-      Operation(UpdatePersonBasicDetails.self)
-      Body(.accountInput(UpdatePersonBasicDetails.self))
-    }
-    Route(.case(Self.deletePerson)) {
-      Operation(DeletePerson.self)
-      Body(.accountInput(DeletePerson.self))
-    }
-    Route(.case(Self.getAccountKeychains)) {
-      Operation(GetAccountKeychains.self)
-    }
-    Route(.case(Self.getAccountKeychain)) {
-      Operation(GetAccountKeychain.self)
-      Body(.accountInput(GetAccountKeychain.self))
-    }
-    Route(.case(Self.saveAccountKeychain)) {
-      Operation(SaveAccountKeychain.self)
-      Body(.accountInput(SaveAccountKeychain.self))
-    }
-    Route(.case(Self.deleteAccountKeychain)) {
-      Operation(DeleteAccountKeychain.self)
-      Body(.accountInput(DeleteAccountKeychain.self))
-    }
-    Route(.case(Self.saveAccountKey)) {
-      Operation(SaveAccountKey.self)
-      Body(.accountInput(SaveAccountKey.self))
-    }
-    Route(.case(Self.deleteAccountKey)) {
-      Operation(DeleteAccountKey.self)
-      Body(.accountInput(DeleteAccountKey.self))
-    }
-    Route(.case(Self.setAccountKeychainAssignment)) {
-      Operation(SetAccountKeychainAssignment.self)
-      Body(.accountInput(SetAccountKeychainAssignment.self))
-    }
-    Route(.case(Self.getPersonMacSettings)) {
-      Operation(GetPersonMacSettings.self)
-      Body(.accountInput(GetPersonMacSettings.self))
-    }
-    Route(.case(Self.getPersonInstalledMacApps)) {
-      Operation(GetPersonInstalledMacApps.self)
-      Body(.accountInput(GetPersonInstalledMacApps.self))
-    }
-    Route(.case(Self.updatePersonMacMonitoringSettings)) {
-      Operation(UpdatePersonMacMonitoringSettings.self)
-      Body(.accountInput(UpdatePersonMacMonitoringSettings.self))
-    }
-    Route(.case(Self.updatePersonMacInternetFiltering)) {
-      Operation(UpdatePersonMacInternetFiltering.self)
-      Body(.accountInput(UpdatePersonMacInternetFiltering.self))
-    }
-    Route(.case(Self.updatePersonMacApps)) {
-      Operation(UpdatePersonMacApps.self)
-      Body(.accountInput(UpdatePersonMacApps.self))
-    }
-    Route(.case(Self.getIosDeviceSettings)) {
-      Operation(GetIosDeviceSettings.self)
-      Body(.accountInput(GetIosDeviceSettings.self))
-    }
-    Route(.case(Self.updateIosDeviceBlockedGroups)) {
-      Operation(UpdateIosDeviceBlockedGroups.self)
-      Body(.accountInput(UpdateIosDeviceBlockedGroups.self))
-    }
-    Route(.case(Self.updateIosDeviceProfileSettings)) {
-      Operation(UpdateIosDeviceProfileSettings.self)
-      Body(.accountInput(UpdateIosDeviceProfileSettings.self))
-    }
-    Route(.case(Self.saveExtendedSupervisionControls)) {
-      Operation(SaveExtendedSupervisionControls.self)
-      Body(.accountInput(SaveExtendedSupervisionControls.self))
-    }
-    Route(.case(Self.requestPodcastsPinReset)) {
-      Operation(RequestPodcastsPinReset.self)
-      Body(.accountInput(RequestPodcastsPinReset.self))
-    }
-    Route(.case(Self.getMusicCuration)) {
-      Operation(GetMusicCuration.self)
-      Body(.accountInput(GetMusicCuration.self))
-    }
-    Route(.case(Self.getMusicAlbumCuration)) {
-      Operation(GetMusicAlbumCuration.self)
-      Body(.accountInput(GetMusicAlbumCuration.self))
-    }
-    Route(.case(Self.searchMusicCatalog_v2)) {
-      Operation(SearchMusicCatalog_v2.self)
-      Body(.accountInput(SearchMusicCatalog_v2.self))
-    }
-    Route(.case(Self.approveMusicTrack)) {
-      Operation(ApproveMusicTrack.self)
-      Body(.accountInput(ApproveMusicTrack.self))
-    }
-    Route(.case(Self.approveMusicAlbum_v2)) {
-      Operation(ApproveMusicAlbum_v2.self)
-      Body(.accountInput(ApproveMusicAlbum_v2.self))
-    }
-    Route(.case(Self.approveMusicArtist_v2)) {
-      Operation(ApproveMusicArtist_v2.self)
-      Body(.accountInput(ApproveMusicArtist_v2.self))
-    }
-    Route(.case(Self.removeApprovedMusicArtist)) {
-      Operation(RemoveApprovedMusicArtist.self)
-      Body(.accountInput(RemoveApprovedMusicArtist.self))
-    }
-    Route(.case(Self.saveMusicAlbumCuration)) {
-      Operation(SaveMusicAlbumCuration.self)
-      Body(.accountInput(SaveMusicAlbumCuration.self))
-    }
-    Route(.case(Self.requestAccountPublicKeychain)) {
-      Operation(RequestAccountPublicKeychain.self)
-      Body(.accountInput(RequestAccountPublicKeychain.self))
-    }
-    Route(.case(Self.getSuspensionRequests)) {
-      Operation(GetSuspensionRequests.self)
-    }
-    Route(.case(Self.decideSuspensionRequest)) {
-      Operation(DecideSuspensionRequest.self)
-      Body(.accountInput(DecideSuspensionRequest.self))
-    }
-    Route(.case(Self.getAccountUnlockRequestSummary)) {
-      Operation(GetAccountUnlockRequestSummary.self)
-    }
-    Route(.case(Self.getPersonUnlockRequests)) {
-      Operation(GetPersonUnlockRequests.self)
-      Body(.accountInput(GetPersonUnlockRequests.self))
-    }
-    Route(.case(Self.decideUnlockRequests)) {
-      Operation(DecideUnlockRequests.self)
-      Body(.accountInput(DecideUnlockRequests.self))
-    }
-    Route(.case(Self.getSecurityEvents)) {
-      Operation(GetSecurityEvents.self)
-    }
-    Route(.case(Self.getActivitySummaries)) {
-      Operation(GetActivitySummaries.self)
-      Body(.accountInput(GetActivitySummaries.self))
-    }
-    Route(.case(Self.getDayActivity)) {
-      Operation(GetDayActivity.self)
-      Body(.accountInput(GetDayActivity.self))
-    }
-    Route(.case(Self.getPersonActivitySummaries)) {
-      Operation(GetPersonActivitySummaries.self)
-      Body(.accountInput(GetPersonActivitySummaries.self))
-    }
-    Route(.case(Self.getPersonDayActivity)) {
-      Operation(GetPersonDayActivity.self)
-      Body(.accountInput(GetPersonDayActivity.self))
-    }
-    Route(.case(Self.toggleActivityFlag)) {
-      Operation(ToggleActivityFlag.self)
-      Body(.accountInput(ToggleActivityFlag.self))
-    }
-    Route(.case(Self.deleteActivity)) {
-      Operation(DeleteActivity.self)
-      Body(.accountInput(DeleteActivity.self))
-    }
-  }
+  nonisolated(unsafe) static let router: AnyParserPrinter<URLRequestData, AuthedAccountRoute> =
+    OneOf {
+      OneOf {
+        Route(.case(Self.getPeople)) {
+          Operation(GetPeople.self)
+        }
+        Route(.case(Self.getAccountAnnouncement)) {
+          Operation(GetAccountAnnouncement.self)
+        }
+        Route(.case(Self.dismissAccountAnnouncement)) {
+          Operation(DismissAccountAnnouncement.self)
+          Body(.accountInput(DismissAccountAnnouncement.self))
+        }
+        Route(.case(Self.getDevices)) {
+          Operation(GetDevices.self)
+        }
+        Route(.case(Self.getAccountIOSClaimData)) {
+          Operation(GetAccountIOSClaimData.self)
+          Body(.accountInput(GetAccountIOSClaimData.self))
+        }
+        Route(.case(Self.claimAccountIOSDevice)) {
+          Operation(ClaimAccountIOSDevice.self)
+          Body(.accountInput(ClaimAccountIOSDevice.self))
+        }
+        Route(.case(Self.getMacDevice)) {
+          Operation(GetMacDevice.self)
+          Body(.accountInput(GetMacDevice.self))
+        }
+        Route(.case(Self.updateMacDevice)) {
+          Operation(UpdateMacDevice.self)
+          Body(.accountInput(UpdateMacDevice.self))
+        }
+        Route(.case(Self.getAccountSettings)) {
+          Operation(GetAccountSettings.self)
+        }
+        Route(.case(Self.getAccountSetup)) {
+          Operation(GetAccountSetup.self)
+        }
+        Route(.case(Self.setAccountSetupApps)) {
+          Operation(SetAccountSetupApps.self)
+          Body(.accountInput(SetAccountSetupApps.self))
+        }
+        Route(.case(Self.saveAccountReferralSource)) {
+          Operation(SaveAccountReferralSource.self)
+          Body(.accountInput(SaveAccountReferralSource.self))
+        }
+      }
+      OneOf {
+        Route(.case(Self.createAccountNotificationMethod)) {
+          Operation(CreateAccountNotificationMethod.self)
+          Body(.accountInput(CreateAccountNotificationMethod.self))
+        }
+        Route(.case(Self.confirmAccountNotificationMethod)) {
+          Operation(ConfirmAccountNotificationMethod.self)
+          Body(.accountInput(ConfirmAccountNotificationMethod.self))
+        }
+        Route(.case(Self.saveAccountNotification)) {
+          Operation(SaveAccountNotification.self)
+          Body(.accountInput(SaveAccountNotification.self))
+        }
+        Route(.case(Self.deleteAccountNotification)) {
+          Operation(DeleteAccountNotification.self)
+          Body(.accountInput(DeleteAccountNotification.self))
+        }
+        Route(.case(Self.deleteAccountNotificationMethod)) {
+          Operation(DeleteAccountNotificationMethod.self)
+          Body(.accountInput(DeleteAccountNotificationMethod.self))
+        }
+        Route(.case(Self.setAccountDailyReviewEmail)) {
+          Operation(SetAccountDailyReviewEmail.self)
+          Body(.accountInput(SetAccountDailyReviewEmail.self))
+        }
+        Route(.case(Self.getAccountBilling)) {
+          Operation(GetAccountBilling.self)
+        }
+        Route(.case(Self.startAccountCheckout)) {
+          Operation(StartAccountCheckout.self)
+          Body(.accountInput(StartAccountCheckout.self))
+        }
+        Route(.case(Self.openAccountBillingPortal)) {
+          Operation(OpenAccountBillingPortal.self)
+          Body(.accountInput(OpenAccountBillingPortal.self))
+        }
+        Route(.case(Self.changeAccountSubscriptionTier)) {
+          Operation(ChangeAccountSubscriptionTier.self)
+          Body(.accountInput(ChangeAccountSubscriptionTier.self))
+        }
+        Route(.case(Self.startAccountFullTrial)) {
+          Operation(StartAccountFullTrial.self)
+        }
+        Route(.case(Self.handleAccountCheckoutSuccess)) {
+          Operation(HandleAccountCheckoutSuccess.self)
+          Body(.accountInput(HandleAccountCheckoutSuccess.self))
+        }
+      }
+      OneOf {
+        Route(.case(Self.handleAccountCheckoutCancel)) {
+          Operation(HandleAccountCheckoutCancel.self)
+          Body(.accountInput(HandleAccountCheckoutCancel.self))
+        }
+        Route(.case(Self.createPerson)) {
+          Operation(CreatePerson.self)
+          Body(.accountInput(CreatePerson.self))
+        }
+        Route(.case(Self.createMacConnectionCode)) {
+          Operation(CreateMacConnectionCode.self)
+          Body(.accountInput(CreateMacConnectionCode.self))
+        }
+        Route(.case(Self.disconnectMacConnection)) {
+          Operation(DisconnectMacConnection.self)
+          Body(.accountInput(DisconnectMacConnection.self))
+        }
+        Route(.case(Self.updatePersonBasicDetails)) {
+          Operation(UpdatePersonBasicDetails.self)
+          Body(.accountInput(UpdatePersonBasicDetails.self))
+        }
+        Route(.case(Self.deletePerson)) {
+          Operation(DeletePerson.self)
+          Body(.accountInput(DeletePerson.self))
+        }
+        Route(.case(Self.getAccountKeychains)) {
+          Operation(GetAccountKeychains.self)
+        }
+        Route(.case(Self.getAccountKeychain)) {
+          Operation(GetAccountKeychain.self)
+          Body(.accountInput(GetAccountKeychain.self))
+        }
+        Route(.case(Self.saveAccountKeychain)) {
+          Operation(SaveAccountKeychain.self)
+          Body(.accountInput(SaveAccountKeychain.self))
+        }
+        Route(.case(Self.deleteAccountKeychain)) {
+          Operation(DeleteAccountKeychain.self)
+          Body(.accountInput(DeleteAccountKeychain.self))
+        }
+        Route(.case(Self.saveAccountKey)) {
+          Operation(SaveAccountKey.self)
+          Body(.accountInput(SaveAccountKey.self))
+        }
+        Route(.case(Self.deleteAccountKey)) {
+          Operation(DeleteAccountKey.self)
+          Body(.accountInput(DeleteAccountKey.self))
+        }
+      }
+      OneOf {
+        Route(.case(Self.setAccountKeychainAssignment)) {
+          Operation(SetAccountKeychainAssignment.self)
+          Body(.accountInput(SetAccountKeychainAssignment.self))
+        }
+        Route(.case(Self.getPersonMacSettings)) {
+          Operation(GetPersonMacSettings.self)
+          Body(.accountInput(GetPersonMacSettings.self))
+        }
+        Route(.case(Self.getPersonInstalledMacApps)) {
+          Operation(GetPersonInstalledMacApps.self)
+          Body(.accountInput(GetPersonInstalledMacApps.self))
+        }
+        Route(.case(Self.updatePersonMacMonitoringSettings)) {
+          Operation(UpdatePersonMacMonitoringSettings.self)
+          Body(.accountInput(UpdatePersonMacMonitoringSettings.self))
+        }
+        Route(.case(Self.updatePersonMacInternetFiltering)) {
+          Operation(UpdatePersonMacInternetFiltering.self)
+          Body(.accountInput(UpdatePersonMacInternetFiltering.self))
+        }
+        Route(.case(Self.updatePersonMacApps)) {
+          Operation(UpdatePersonMacApps.self)
+          Body(.accountInput(UpdatePersonMacApps.self))
+        }
+        Route(.case(Self.getIosDeviceSettings)) {
+          Operation(GetIosDeviceSettings.self)
+          Body(.accountInput(GetIosDeviceSettings.self))
+        }
+        Route(.case(Self.updateIosDeviceBlockedGroups)) {
+          Operation(UpdateIosDeviceBlockedGroups.self)
+          Body(.accountInput(UpdateIosDeviceBlockedGroups.self))
+        }
+        Route(.case(Self.updateIosDeviceProfileSettings)) {
+          Operation(UpdateIosDeviceProfileSettings.self)
+          Body(.accountInput(UpdateIosDeviceProfileSettings.self))
+        }
+        Route(.case(Self.saveExtendedSupervisionControls)) {
+          Operation(SaveExtendedSupervisionControls.self)
+          Body(.accountInput(SaveExtendedSupervisionControls.self))
+        }
+        Route(.case(Self.requestPodcastsPinReset)) {
+          Operation(RequestPodcastsPinReset.self)
+          Body(.accountInput(RequestPodcastsPinReset.self))
+        }
+        Route(.case(Self.getMusicCuration)) {
+          Operation(GetMusicCuration.self)
+          Body(.accountInput(GetMusicCuration.self))
+        }
+      }
+      OneOf {
+        Route(.case(Self.getMusicAlbumCuration)) {
+          Operation(GetMusicAlbumCuration.self)
+          Body(.accountInput(GetMusicAlbumCuration.self))
+        }
+        Route(.case(Self.searchMusicCatalog_v2)) {
+          Operation(SearchMusicCatalog_v2.self)
+          Body(.accountInput(SearchMusicCatalog_v2.self))
+        }
+        Route(.case(Self.approveMusicTrack)) {
+          Operation(ApproveMusicTrack.self)
+          Body(.accountInput(ApproveMusicTrack.self))
+        }
+        Route(.case(Self.approveMusicAlbum_v2)) {
+          Operation(ApproveMusicAlbum_v2.self)
+          Body(.accountInput(ApproveMusicAlbum_v2.self))
+        }
+        Route(.case(Self.approveMusicArtist_v2)) {
+          Operation(ApproveMusicArtist_v2.self)
+          Body(.accountInput(ApproveMusicArtist_v2.self))
+        }
+        Route(.case(Self.removeApprovedMusicArtist)) {
+          Operation(RemoveApprovedMusicArtist.self)
+          Body(.accountInput(RemoveApprovedMusicArtist.self))
+        }
+        Route(.case(Self.saveMusicAlbumCuration)) {
+          Operation(SaveMusicAlbumCuration.self)
+          Body(.accountInput(SaveMusicAlbumCuration.self))
+        }
+        Route(.case(Self.requestAccountPublicKeychain)) {
+          Operation(RequestAccountPublicKeychain.self)
+          Body(.accountInput(RequestAccountPublicKeychain.self))
+        }
+        Route(.case(Self.getSuspensionRequests)) {
+          Operation(GetSuspensionRequests.self)
+        }
+        Route(.case(Self.decideSuspensionRequest)) {
+          Operation(DecideSuspensionRequest.self)
+          Body(.accountInput(DecideSuspensionRequest.self))
+        }
+        Route(.case(Self.getAccountUnlockRequestSummary)) {
+          Operation(GetAccountUnlockRequestSummary.self)
+        }
+        Route(.case(Self.getPersonUnlockRequests)) {
+          Operation(GetPersonUnlockRequests.self)
+          Body(.accountInput(GetPersonUnlockRequests.self))
+        }
+      }
+      OneOf {
+        Route(.case(Self.decideUnlockRequests)) {
+          Operation(DecideUnlockRequests.self)
+          Body(.accountInput(DecideUnlockRequests.self))
+        }
+        Route(.case(Self.getSecurityEvents)) {
+          Operation(GetSecurityEvents.self)
+        }
+        Route(.case(Self.getActivitySummaries)) {
+          Operation(GetActivitySummaries.self)
+          Body(.accountInput(GetActivitySummaries.self))
+        }
+        Route(.case(Self.getDayActivity)) {
+          Operation(GetDayActivity.self)
+          Body(.accountInput(GetDayActivity.self))
+        }
+        Route(.case(Self.getPersonActivitySummaries)) {
+          Operation(GetPersonActivitySummaries.self)
+          Body(.accountInput(GetPersonActivitySummaries.self))
+        }
+        Route(.case(Self.getPersonDayActivity)) {
+          Operation(GetPersonDayActivity.self)
+          Body(.accountInput(GetPersonDayActivity.self))
+        }
+        Route(.case(Self.toggleActivityFlag)) {
+          Operation(ToggleActivityFlag.self)
+          Body(.accountInput(ToggleActivityFlag.self))
+        }
+        Route(.case(Self.deleteActivity)) {
+          Operation(DeleteActivity.self)
+          Body(.accountInput(DeleteActivity.self))
+        }
+      }
+    }
+    .eraseToAnyParserPrinter()
 }
 
 extension AuthedAccountRoute: RouteResponder {
