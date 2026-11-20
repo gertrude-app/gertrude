@@ -1,4 +1,4 @@
-import { PageHeading } from '@gertrude/ui';
+import { PageHeading, Skeleton, VStack } from '@gertrude/ui';
 import { LogOutIcon } from 'lucide-react';
 import React from 'react';
 import DashboardPage from '#/components/layout/DashboardPage';
@@ -53,3 +53,14 @@ const SettingsShellPage: React.FC<Props> = ({
 );
 
 export default SettingsShellPage;
+
+export const SettingsTabLoading: React.FC<{ label: string }> = ({ label }) => (
+  <VStack gap={4} className="mt-4">
+    <span role="status" className="sr-only">
+      {label}
+    </span>
+    <Skeleton className="h-6 w-40" />
+    <Skeleton radius="large" className="h-28 w-full" />
+    <Skeleton radius="large" className="h-48 w-full" />
+  </VStack>
+);

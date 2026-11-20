@@ -18,10 +18,7 @@ extension SetAccountKeychainAssignment: Resolver {
     in context: AccountOwnerContext,
   ) async throws -> Output {
     let person = try await context.person(input.personId)
-    _ = try await Keychain.query()
-      .where(.id == input.keychainId)
-      .where(.parentId == context.accountOwner.id)
-      .first(in: context.db)
+    _ = try await context.keychain(input.keychainId)
     let assignment = ChildKeychain.query()
       .where(.keychainId == input.keychainId)
       .where(.childId == person.id)

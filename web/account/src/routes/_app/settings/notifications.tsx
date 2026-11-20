@@ -3,6 +3,7 @@ import React from 'react';
 import type { NotificationMethodDraft } from '#/components/settings/notifications/AddNotificationMethodSlideOver';
 import type { NotificationDraft } from '#/components/settings/notifications/NotificationEditorSlideOver';
 import NotificationSettingsPage from '#/components/pages/settings/NotificationSettingsPage';
+import { SettingsTabLoading } from '#/components/pages/settings/SettingsShellPage';
 import { notificationMethodInput, notificationSettingsViewModel } from '#/lib/settings';
 import { liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -60,7 +61,7 @@ const NotificationSettingsRoute: React.FC = () => {
   });
 
   if (!query.data) {
-    return null;
+    return <SettingsTabLoading label="Loading notification settings" />;
   }
 
   const viewModel = notificationSettingsViewModel(query.data);

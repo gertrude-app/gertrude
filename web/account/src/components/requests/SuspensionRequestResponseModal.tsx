@@ -12,6 +12,7 @@ import { time } from '@shared/datetime';
 import React from 'react';
 import type { SuspensionRequest } from '#/components/types';
 import MessageBubble from '#/components/MessageBubble';
+import { requestAge } from '#/lib/suspensionRequests';
 
 interface Props {
   request: SuspensionRequest;
@@ -27,6 +28,9 @@ interface Props {
 }
 
 type DurationUnit = `minutes` | `hours`;
+
+const MIN_DURATION_SECONDS = 60;
+const MAX_DURATION_SECONDS = 7 * 24 * 60 * 60;
 
 const durationUnits: DurationUnit[] = [`minutes`, `hours`];
 
@@ -100,12 +104,15 @@ const SuspensionRequestResponseModal: React.FC<Props> = ({
     return stored && request.extraMonitoringOptions[stored] ? stored : `off`;
   });
   const numericCustomDuration = Number(customDurationAmount);
+  const customDurationInSeconds = Math.round(
+    numericCustomDuration * (customDurationUnit === `hours` ? 3600 : 60),
+  );
   const canGrantCustomDuration =
-    Number.isFinite(numericCustomDuration) && numericCustomDuration > 0;
+    Number.isFinite(customDurationInSeconds) &&
+    customDurationInSeconds >= MIN_DURATION_SECONDS &&
+    customDurationInSeconds <= MAX_DURATION_SECONDS;
   const durationInSeconds =
-    selectedDuration === `custom`
-      ? Math.round(numericCustomDuration * (customDurationUnit === `hours` ? 3600 : 60))
-      : Number(selectedDuration);
+    selectedDuration === `custom` ? customDurationInSeconds : Number(selectedDuration);
   const canGrant = selectedDuration !== `custom` || canGrantCustomDuration;
   const grantedDuration = canGrant
     ? time.humanDuration(durationInSeconds)
@@ -138,7 +145,7 @@ const SuspensionRequestResponseModal: React.FC<Props> = ({
       open={open}
       onOpenChange={onOpenChange}
       title={`Respond to ${request.personName}'s request`}
-      description={`${request.personName} asked to pause filtering for ${request.duration}${request.deviceName ? ` on ${request.deviceName}` : ``}.`}
+      description={`${request.personName} asked ${requestAge(request.requestedAt)} to pause filtering for ${request.duration}${request.deviceName ? ` on ${request.deviceName}` : ``}.`}
       size="medium"
       dismissible={!isResponding}
       footer={
@@ -189,6 +196,11 @@ const SuspensionRequestResponseModal: React.FC<Props> = ({
                 label="Custom duration"
                 value={customDurationAmount}
                 setValue={setCustomDurationAmount}
+                error={
+                  customDurationAmount.trim() && !canGrantCustomDuration
+                    ? `Choose between 1 minute and 7 days.`
+                    : undefined
+                }
                 className="sm:flex-1"
                 disabled={isResponding}
               />

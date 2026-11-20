@@ -29,10 +29,13 @@ type ManualStage =
   | `connect`
   | `supervise`;
 
+type SetupStep = `download` | `launch` | `connect` | `supervise`;
+const setupSteps: SetupStep[] = [`download`, `launch`, `connect`, `supervise`];
+
 type ConnectSearch = {
   checkout?: `success` | `canceled`;
   session_id?: string;
-  step?: `download`;
+  step?: SetupStep;
 };
 
 const computerStage = (): ManualStage =>
@@ -53,9 +56,11 @@ const ConnectRoute: React.FC = () => {
       initialStage={
         step === `download`
           ? computerStage()
-          : checkout === `canceled` || checkoutError
-            ? `plan`
-            : undefined
+          : step
+            ? step
+            : checkout === `canceled` || checkoutError
+              ? `plan`
+              : undefined
       }
       checkoutCanceled={checkout === `canceled`}
       checkoutError={checkoutError}
@@ -101,6 +106,16 @@ const ConnectFlow: React.FC<{
   const startCheckout = useMutation(liveClient.startAccountCheckout);
   const openPortal = useMutation(liveClient.openAccountBillingPortal);
   const [stage, setStage] = React.useState<ManualStage | undefined>(initialStage);
+  const goToStage = (next: ManualStage): void => {
+    setStage(next);
+    const step = next === `computerRequired` ? `download` : next;
+    void navigate({
+      to: `/connect/$flow/$code`,
+      params: { flow, code },
+      search: { step: setupSteps.find((candidate) => candidate === step) },
+      replace: true,
+    });
+  };
   const [downloaded, setDownloaded] = React.useState(false);
   const [platform, setPlatform] = React.useState<`mac` | `windows`>();
   const [copied, setCopied] = React.useState(false);
@@ -240,8 +255,9 @@ const ConnectFlow: React.FC<{
           personName={assignment.personName}
           access={access}
           accessEndsAt={runway?.accessEndsAt}
+          trialDaysRemaining={runway?.trialDaysRemaining}
           onPrimary={access === `lapsed` ? goToBilling : goToSettings}
-          onSecondary={access === `lapsed` ? goToSettings : undefined}
+          onSecondary={access === `lapsed` ? goToSettings : goToBilling}
         />
       );
     }
@@ -266,7 +282,7 @@ const ConnectFlow: React.FC<{
   }
 
   const onContinue = (): void => {
-    setStage(assignment.requiresPayment ? `plan` : computerStage());
+    goToStage(assignment.requiresPayment ? `plan` : computerStage());
   };
   const flowPath = `/connect/${validFlow}/${code}`;
   const handlePlanAction = async (): Promise<void> => {
@@ -310,9 +326,7 @@ const ConnectFlow: React.FC<{
     assignment.supervisionStatus === `complete`
       ? `complete`
       : assignment.supervisionStatus === `supervised`
-        ? assignment.requiresPayment
-          ? `plan`
-          : `finishOnDevice`
+        ? `finishOnDevice`
         : assignment.requiresPayment && requestedStage !== `result`
           ? `plan`
           : requestedStage;
@@ -359,7 +373,7 @@ const ConnectFlow: React.FC<{
           {...common}
           stage="computerRequired"
           onPrimary={goToDevices}
-          onThisIsComputer={() => setStage(`download`)}
+          onThisIsComputer={() => goToStage(`download`)}
         />
       );
     case `download`:
@@ -378,7 +392,7 @@ const ConnectFlow: React.FC<{
             document.body.appendChild(iframe);
             setTimeout(() => iframe.remove(), 5000);
           }}
-          onPrimary={() => setStage(`launch`)}
+          onPrimary={() => goToStage(`launch`)}
         />
       );
     case `launch`:
@@ -386,7 +400,7 @@ const ConnectFlow: React.FC<{
         <SupervisionSetupPage
           {...common}
           stage="launch"
-          onPrimary={() => setStage(`connect`)}
+          onPrimary={() => goToStage(`connect`)}
         />
       );
     case `connect`:
@@ -399,7 +413,7 @@ const ConnectFlow: React.FC<{
           onCopy={() => {
             void navigator.clipboard.writeText(code).then(() => setCopied(true));
           }}
-          onPrimary={() => setStage(`supervise`)}
+          onPrimary={() => goToStage(`supervise`)}
         />
       );
     case `supervise`:
@@ -433,7 +447,7 @@ export const Route = createFileRoute(`/_app/connect/$flow/$code`)({
         : undefined,
     session_id:
       typeof search[`session_id`] === `string` ? search[`session_id`] : undefined,
-    step: search[`step`] === `download` ? `download` : undefined,
+    step: setupSteps.find((step) => step === search[`step`]),
   }),
   loaderDeps: ({ search }) => ({
     checkout: search.checkout,

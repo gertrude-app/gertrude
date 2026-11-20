@@ -21,7 +21,7 @@ extension SaveAccountKeychain: Resolver {
     in context: AccountOwnerContext,
   ) async throws -> Output {
     if let keychainId = input.keychainId {
-      _ = try await context.privateKeychain(keychainId)
+      _ = try await context.keychain(keychainId)
     }
     let name = input.name.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !name.isEmpty else {

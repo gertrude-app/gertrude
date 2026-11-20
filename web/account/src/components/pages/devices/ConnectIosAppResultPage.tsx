@@ -1,4 +1,4 @@
-import { Banner, Button } from '@gertrude/ui';
+import { Banner, Button, inflect } from '@gertrude/ui';
 import { ArrowRightIcon, LaptopIcon } from 'lucide-react';
 import React from 'react';
 import PairingPageLayout, { PairingHeaderBackground } from './PairingPageLayout';
@@ -23,6 +23,7 @@ type Props = {
       flow: `podcasts`;
       access: `active` | `trial` | `ending` | `lapsed`;
       accessEndsAt?: string;
+      trialDaysRemaining?: number;
     }
   | { flow: `music`; access: `active` | `trialReady` | `trial` | `unavailable` }
   | { flow: `blockerSupervise`; nextStep: `plan` | `computer` }
@@ -35,6 +36,8 @@ const ConnectIosAppResultPage: React.FC<Props> = (props) => {
     (props.flow === `podcasts` && props.access === `lapsed`) ||
     (props.flow === `music` && props.access === `unavailable`);
   const supervision = props.flow === `blockerSupervise`;
+  const canSubscribe =
+    props.flow === `podcasts` && (props.access === `trial` || props.access === `ending`);
   const heading = supervision
     ? `Device assigned to ${personName}`
     : needsPlan
@@ -94,8 +97,12 @@ const ConnectIosAppResultPage: React.FC<Props> = (props) => {
             </p>
             {props.access === `trial` && (
               <p className="mt-3 font-medium text-stone-900">
-                Your free trial is active. Subscribe to Gertrude Light before it ends to
-                keep listening.
+                {props.trialDaysRemaining === undefined
+                  ? `Your free trial is active.`
+                  : props.trialDaysRemaining === 0
+                    ? `Your free trial ends today.`
+                    : `Your free trial has ${props.trialDaysRemaining} ${inflect(`day`, props.trialDaysRemaining)} left.`}
+                {` `}Subscribe to Gertrude Light before it ends to keep listening.
               </p>
             )}
             {props.access === `ending` && (
@@ -167,9 +174,13 @@ const ConnectIosAppResultPage: React.FC<Props> = (props) => {
         >
           {primaryLabel}
         </Button>
-        {(supervision || needsPlan) && props.onSecondary && (
+        {(supervision || needsPlan || canSubscribe) && props.onSecondary && (
           <Button type="button" variant="ghost" onClick={props.onSecondary}>
-            {supervision ? `Finish later` : `${device.type} settings`}
+            {supervision
+              ? `Finish later`
+              : canSubscribe
+                ? `Subscribe`
+                : `${device.type} settings`}
           </Button>
         )}
       </div>

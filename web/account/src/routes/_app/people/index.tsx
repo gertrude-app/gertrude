@@ -7,6 +7,10 @@ import type {
   SuspensionRequest,
 } from '#/components/types';
 import AccountAnnouncement from '#/components/announcements/AccountAnnouncement';
+import ConnectMacModal from '#/components/devices/ConnectMacModal';
+import InstallIOSAppModal from '#/components/devices/InstallIOSAppModal';
+import { useConnectMac } from '#/components/devices/useConnectMac';
+import { useInstallIOSApp } from '#/components/devices/useInstallIOSApp';
 import { SetupChecklistContext } from '#/components/onboarding/useSetupChecklist';
 import PeoplePage from '#/components/pages/people/PeoplePage';
 import { needsOnboarding } from '#/lib/accountSetup';
@@ -34,6 +38,11 @@ const PeopleRoute: React.FC = () => {
   );
   const securityEventsQuery = useQuery(Key.securityEvents, () =>
     liveClient.getSecurityEvents(),
+  );
+  const [addDevicePerson, setAddDevicePerson] = React.useState<PersonCardPerson>();
+  const { connectMac, modalProps: connectMacModalProps } = useConnectMac();
+  const { installIOSApp, modalProps: installModalProps } = useInstallIOSApp(
+    addDevicePerson?.name,
   );
 
   const peopleState: LoadableState<PersonCardPerson[]> =
@@ -90,32 +99,44 @@ const PeopleRoute: React.FC = () => {
   const selectedApps = setupQuery.data?.selectedApps;
 
   return (
-    <PeoplePage
-      gettingStarted={
-        selectedApps && {
-          selectedApps,
-          onAddPerson: () => void navigate({ to: `/people/new` }),
-          onChangeApps: () => void navigate({ to: `/welcome` }),
+    <>
+      <PeoplePage
+        gettingStarted={
+          selectedApps && {
+            selectedApps,
+            onAddPerson: () => void navigate({ to: `/people/new` }),
+            onChangeApps: () => void navigate({ to: `/welcome` }),
+          }
         }
-      }
-      setupChecklist={setupChecklist}
-      announcement={<AccountAnnouncement />}
-      peopleState={peopleState}
-      unlockRequestSummary={unlockRequestsQuery.data}
-      suspensionRequestsState={suspensionRequestsState}
-      securityEventsState={securityEventsState}
-      onRefreshSecurityEvents={() => void securityEventsQuery.refetch()}
-      refreshingSecurityEvents={securityEventsQuery.isFetching}
-      addPersonHref="/people/new"
-      unlockRequestsHref="/requests/unlock"
-      unlockRequestHrefForPerson={(personId) => `/requests/unlock/${personId}`}
-      suspensionRequestsHref="/requests/suspension"
-      suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
-      securityEventsHref="/security-events"
-      monitorHref="/activity"
-      settingsHrefForPerson={(personId) => `/people/${personId}`}
-      monitorHrefForPerson={(personId) => `/activity/person/${personId}`}
-    />
+        setupChecklist={setupChecklist}
+        announcement={<AccountAnnouncement />}
+        peopleState={peopleState}
+        unlockRequestSummary={unlockRequestsQuery.data}
+        suspensionRequestsState={suspensionRequestsState}
+        securityEventsState={securityEventsState}
+        onRefreshSecurityEvents={() => void securityEventsQuery.refetch()}
+        refreshingSecurityEvents={securityEventsQuery.isFetching}
+        addPersonHref="/people/new"
+        unlockRequestsHref="/requests/unlock"
+        unlockRequestHrefForPerson={(personId) => `/requests/unlock/${personId}`}
+        suspensionRequestsHref="/requests/suspension"
+        suspensionRequestHrefForRequest={(id) => `/requests/suspension/${id}`}
+        securityEventsHref="/security-events"
+        monitorHref="/activity"
+        settingsHrefForPerson={(personId) => `/people/${personId}`}
+        monitorHrefForPerson={(personId) => `/activity/person/${personId}`}
+        onAddDevice={(person, app) => {
+          setAddDevicePerson(person);
+          if (app === `mac`) {
+            connectMac([{ id: person.id, name: person.name }]);
+          } else {
+            installIOSApp(app);
+          }
+        }}
+      />
+      <ConnectMacModal {...connectMacModalProps} />
+      <InstallIOSAppModal {...installModalProps} />
+    </>
   );
 };
 

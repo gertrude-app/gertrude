@@ -1,26 +1,32 @@
+import { Button, Card, EmptyState, HStack, Stack, Text, VStack } from '@gertrude/ui';
 import {
-  Badge,
-  Button,
-  Card,
-  EmptyState,
-  HStack,
-  Stack,
-  Text,
-  VStack,
-} from '@gertrude/ui';
-import { MonitorSmartphoneIcon, ScanEyeIcon, SettingsIcon } from 'lucide-react';
+  ChevronRightIcon,
+  MonitorSmartphoneIcon,
+  ScanEyeIcon,
+  SettingsIcon,
+} from 'lucide-react';
 import React from 'react';
+import type { SetupApp } from '#/components/onboarding/setupApps';
 import type { Device, PersonCardPerson } from '#/components/types';
+import AddDeviceMenu from '#/components/devices/AddDeviceMenu';
+import { MacStatusBadge } from '#/components/devices/MacPersonStatus';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
+import { DeviceLink } from '#/components/people/DeviceListRow';
 import { deviceSubtitle, deviceTitle } from '#/components/utils';
 
 interface Props {
   person: PersonCardPerson;
   settingsHref?: string;
   monitorHref?: string;
+  onAddDevice?: (app: SetupApp) => void;
 }
 
-const PersonCard: React.FC<Props> = ({ person, settingsHref, monitorHref }) => {
+const PersonCard: React.FC<Props> = ({
+  person,
+  settingsHref,
+  monitorHref,
+  onAddDevice,
+}) => {
   const canMonitor =
     monitorHref !== undefined && person.devices.some((device) => device.type === `mac`);
   const hasActions = settingsHref !== undefined || canMonitor;
@@ -42,6 +48,7 @@ const PersonCard: React.FC<Props> = ({ person, settingsHref, monitorHref }) => {
                 icon={MonitorSmartphoneIcon}
                 title="No Devices"
                 description={`Add a device to get started protecting ${person.name}.`}
+                action={onAddDevice && <AddDeviceMenu onSelect={onAddDevice} />}
               />
             )}
           </VStack>
@@ -95,18 +102,20 @@ interface DeviceRowProps {
 }
 
 const DeviceRow: React.FC<DeviceRowProps> = ({ device }) => (
-  <Card variant="subtle" padding={0}>
-    <HStack align="center" gap={2.5} className="py-1.5 pl-2.5 pr-4">
+  <Card
+    variant="subtle"
+    padding={0}
+    className="group relative transition-colors hover:border-stone-300"
+  >
+    <DeviceLink device={device} />
+    <HStack align="center" gap={2.5} className="py-1.5 pl-2.5 pr-2">
       <DeviceArtwork device={device} />
       <VStack className="flex-grow">
         <Text variant="bodyStrong">{deviceTitle(device)}</Text>
         <Text variant="captionMuted">{deviceSubtitle(device)}</Text>
       </VStack>
-      {device.type === `mac` && (
-        <Badge size="small" color={device.online ? `green` : `neutral`}>
-          {device.online ? `Online` : `Offline`}
-        </Badge>
-      )}
+      {device.type === `mac` && <MacStatusBadge status={device.status} size="small" />}
+      <ChevronRightIcon className="h-4 w-4 shrink-0 text-stone-400 group-hover:text-stone-600" />
     </HStack>
   </Card>
 );

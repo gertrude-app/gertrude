@@ -6,7 +6,8 @@ import { isAuthed } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 
 const RequestPasswordResetRoute: React.FC = () => {
-  const [email, setEmail] = React.useState(``);
+  const { email: initialEmail } = Route.useSearch();
+  const [email, setEmail] = React.useState(initialEmail ?? ``);
   const [submitting, setSubmitting] = React.useState(false);
   const [sent, setSent] = React.useState(false);
 
@@ -43,5 +44,9 @@ const RequestPasswordResetRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute(`/(unauthed)/reset-password/`)({
+  validateSearch: (search): { email?: string } =>
+    typeof search[`email`] === `string` && search[`email`].includes(`@`)
+      ? { email: search[`email`].slice(0, 254) }
+      : {},
   component: RequestPasswordResetRoute,
 });

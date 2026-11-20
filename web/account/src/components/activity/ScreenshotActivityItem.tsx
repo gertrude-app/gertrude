@@ -30,6 +30,8 @@ const ScreenshotActivityItem: React.FC<Props> = ({
         src={screenshotUrl}
         width={width}
         height={height}
+        loading="lazy"
+        decoding="async"
         alt="screenshot"
         className="block w-full h-auto rounded-t-xl"
       />

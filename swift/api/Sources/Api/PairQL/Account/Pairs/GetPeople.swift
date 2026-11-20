@@ -27,12 +27,13 @@ struct GetPeople: Pair {
 
   struct MacDevice: PairNestable {
     let id: ComputerUser.Id
+    let computerId: Computer.Id
     let username: String
     let name: String?
     let macOSVersion: String?
     let modelName: String
     let modelIdentifier: String
-    let online: Bool
+    let status: ChildComputerStatus
   }
 
   struct IOSDevice: PairNestable {
@@ -106,17 +107,18 @@ extension GetPeople: NoInputResolver {
     let macDevices = try await computerUsers.concurrentMap {
       computerUser -> (Child.Id, Device)? in
       guard let computer = computersById[computerUser.computerId] else { return nil }
-      let online = await computerUser.status() != .offline
+      let status = await computerUser.status()
       return (
         computerUser.childId,
         .mac(.init(
           id: computerUser.id,
+          computerId: computer.id,
           username: computerUser.username,
           name: computer.customName,
           macOSVersion: computer.osVersion?.description,
           modelName: computer.model.shortDescription,
           modelIdentifier: computer.modelIdentifier,
-          online: online,
+          status: status,
         )),
       )
     }.compactMap(\.self)

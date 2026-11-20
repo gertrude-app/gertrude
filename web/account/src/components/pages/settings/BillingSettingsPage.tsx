@@ -142,13 +142,20 @@ const BillingSettingsPage: React.FC<Props> = ({
                                   key={key}
                                   type="button"
                                   variant={
-                                    key === primaryActionKey ? `primary` : `default`
+                                    key === primaryActionKey
+                                      ? `primary`
+                                      : action.case === `startFullTrial`
+                                        ? `promo`
+                                        : `default`
                                   }
                                   className="w-full justify-center"
                                   disabled={pendingAction !== undefined}
                                   loading={key === pendingActionKey}
                                   onClick={() => {
-                                    if (action.case !== `startFullTrial`) {
+                                    if (
+                                      action.case !== `startFullTrial` &&
+                                      action.case !== `changeSubscriptionTier`
+                                    ) {
                                       void onAction(action);
                                     }
                                   }}
@@ -168,6 +175,25 @@ const BillingSettingsPage: React.FC<Props> = ({
                                       { text: `Cancel`, variant: `ghost` },
                                       {
                                         text: `Start free trial`,
+                                        variant: `primary`,
+                                        onClick: () => onAction(action),
+                                      },
+                                    ]}
+                                  />
+                                );
+                              }
+
+                              if (action.case === `changeSubscriptionTier`) {
+                                return (
+                                  <ConfirmationDialog
+                                    key={key}
+                                    confirmationQuestion={`${label}?`}
+                                    description="Your new plan starts today. Your card is charged for it now, minus a credit for unused time on your current plan."
+                                    trigger={button}
+                                    actions={[
+                                      { text: `Cancel`, variant: `ghost` },
+                                      {
+                                        text: label,
                                         variant: `primary`,
                                         onClick: () => onAction(action),
                                       },

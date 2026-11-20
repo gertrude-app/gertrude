@@ -41,6 +41,8 @@ extension MacApp {
 // loaders
 
 extension MacApp.SuspendFilterRequest {
+  static let answerableFor: TimeInterval = .hours(2)
+
   func computerUser(in db: any DuetSQL.Client) async throws -> ComputerUser {
     try await ComputerUser.query()
       .where(.id == self.computerUserId)

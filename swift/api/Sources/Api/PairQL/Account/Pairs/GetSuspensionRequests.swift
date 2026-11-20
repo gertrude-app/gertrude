@@ -44,7 +44,7 @@ extension GetSuspensionRequests: NoInputResolver {
     ) { result, computerUser in
       result[computerUser.childId, default: []].insert(computerUser.computerId)
     }
-    let cutoff = get(dependency: \.date.now) - .hours(2)
+    let cutoff = get(dependency: \.date.now) - MacApp.SuspendFilterRequest.answerableFor
     let requests = try await MacApp.SuspendFilterRequest.query()
       .where(.computerUserId |=| computerUsers.map(\.id))
       .where(.status == RequestStatus.pending)

@@ -346,6 +346,70 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     expect(alarms.count).toEqual(0)
   }
 
+  func testSubscriptionUpdatedRecordsAndClearsScheduledCancellation() async throws {
+    let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
+    let parent = try await self.parentWithSubscription { _, sub in
+      sub.tier = .full
+      sub.stripeId = subscriptionId
+    }
+    let periodEnd = 1_704_050_627
+    let explicitCancelAt = 1_703_000_000
+
+    func updatedEvent(_ cancellationFields: String) -> String {
+      """
+        {
+          "id": "evt_\("".random)",
+          "type": "customer.subscription.updated",
+          "data": {
+            "object": {
+              "id": "\(subscriptionId.rawValue)",
+              "status": "active",
+              "current_period_end": \(periodEnd),
+              \(cancellationFields)
+              "items": {
+                "data": [
+                  { "price": { "id": "\(self.env.stripe.priceIdFull)" } }
+                ]
+              }
+            }
+          }
+        }
+      """
+    }
+
+    try await app.test(
+      .POST,
+      "stripe-events",
+      body: .init(string: updatedEvent(#""cancel_at_period_end": true,"#)),
+      afterResponse: { _ in
+        let retrieved = try await parent.model.subscription(in: self.db)!
+        expect(retrieved.stripeStatus).toEqual(.active) // still live until the period ends
+        expect(retrieved.cancelAt).toEqual(Date(timeIntervalSince1970: TimeInterval(periodEnd)))
+      },
+    )
+
+    try await app.test(
+      .POST,
+      "stripe-events",
+      body: .init(string: updatedEvent(#""cancel_at": \#(explicitCancelAt),"#)),
+      afterResponse: { _ in
+        let retrieved = try await parent.model.subscription(in: self.db)!
+        expect(retrieved.cancelAt)
+          .toEqual(Date(timeIntervalSince1970: TimeInterval(explicitCancelAt)))
+      },
+    )
+
+    try await app.test(
+      .POST,
+      "stripe-events",
+      body: .init(string: updatedEvent(#""cancel_at": null, "cancel_at_period_end": false,"#)),
+      afterResponse: { _ in
+        let retrieved = try await parent.model.subscription(in: self.db)!
+        expect(retrieved.cancelAt).toBeNil() // renewal turned back on
+      },
+    )
+  }
+
   func testSubscriptionUpdatedTrialingDoesNotMirrorBillingStatus() async throws {
     let subscriptionId: StripeSubscription.StripeId = .init("subId_".random)
     let parent = try await self.parentWithSubscription { _, sub in
@@ -461,6 +525,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
     let parent = try await self.parentWithSubscription { _, sub in
       sub.stripeId = .init(existingSubId)
       sub.tier = .light
+      sub.cancelAt = .reference
     }
 
     let json = invoicePaidJson(
@@ -479,6 +544,7 @@ final class StripeEventTests: ApiTestCase, @unchecked Sendable {
         let retrieved = try await parent.model.subscription(in: self.db)!
         expect(retrieved.stripeId.rawValue).toEqual(incomingSubId)
         expect(retrieved.tier).toEqual(.full)
+        expect(retrieved.cancelAt).toBeNil() // old sub's scheduled cancellation doesn't carry over
       })
     }
 

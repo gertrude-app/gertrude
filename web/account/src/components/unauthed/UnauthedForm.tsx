@@ -7,7 +7,7 @@ interface Props {
   inputs: React.ReactNode[];
   buttons: React.ReactNode[];
   heading: string;
-  subheading: string;
+  subheading: React.ReactNode;
   icon?: LucideIcon;
   onSubmit?: (event: React.FormEvent) => void;
   bottomLink?: {

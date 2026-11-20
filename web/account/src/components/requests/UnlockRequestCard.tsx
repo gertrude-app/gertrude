@@ -17,13 +17,19 @@ import {
   BanIcon,
   CheckIcon,
   ChevronRightIcon,
+  ExternalLinkIcon,
   GlobeIcon,
   LayoutGridIcon,
   MonitorIcon,
   SettingsIcon,
 } from 'lucide-react';
 import React from 'react';
-import type { UnlockDomainGroup, UnlockKey, UnlockRowState } from '#/lib/unlockRequests';
+import type {
+  UnlockDomainGroup,
+  UnlockKey,
+  UnlockRequestRow,
+  UnlockRowState,
+} from '#/lib/unlockRequests';
 import type { SelectOption } from '@gertrude/ui';
 import type { AppScope, GetPersonUnlockRequests } from '@shared/pairql/src/account';
 import MessageBubble from '#/components/MessageBubble';
@@ -33,6 +39,7 @@ import {
   groupAddressMatch,
   keyForUnlockRequest,
   permissionLabel,
+  requestedAddressLink,
   sanitizeRequestedAddress,
   updateGroupDecision,
   updateGroupKeyAddressMatch,
@@ -207,6 +214,12 @@ const UnlockRequestCard: React.FC<Props> = ({
     ),
   );
   const visibleRisk = group.risk;
+  const headingLink =
+    group.requests.length === 1 && group.requests[0]
+      ? requestedAddressLink(group.requests[0])
+      : group.key.type === `ipAddress`
+        ? undefined
+        : `https://${group.target}`;
   const domainHeadingRef = React.useRef<HTMLHeadingElement>(null);
   const [domainOverflowing, setDomainOverflowing] = React.useState(false);
   React.useLayoutEffect(() => {
@@ -272,6 +285,17 @@ const UnlockRequestCard: React.FC<Props> = ({
                 {requestCount(group) > 1 && (
                   <CountBadge size="compact">{requestCount(group)}</CountBadge>
                 )}
+                {headingLink && (
+                  <a
+                    href={headingLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Open ${group.target} in a new tab`}
+                    className="shrink-0 rounded text-stone-400 transition-colors hover:text-violet-600 outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
+                  >
+                    <ExternalLinkIcon className="size-4" aria-hidden="true" />
+                  </a>
+                )}
               </HStack>
               {canCustomize && (
                 <Button
@@ -312,7 +336,7 @@ const UnlockRequestCard: React.FC<Props> = ({
                 <ul className="mt-2 space-y-2">
                   {group.requests.map((request) => (
                     <li key={request.id} className="break-all">
-                      {sanitizeRequestedAddress(request)}
+                      <RequestedAddress request={request} />
                     </li>
                   ))}
                 </ul>
@@ -480,3 +504,22 @@ const KeychainDetails: React.FC<{
 );
 
 export default UnlockRequestCard;
+
+const RequestedAddress: React.FC<{ request: UnlockRequestRow }> = ({ request }) => {
+  const link = requestedAddressLink(request);
+  const address = sanitizeRequestedAddress(request);
+  return link ? (
+    <a
+      href={link}
+      target="_blank"
+      rel="noreferrer"
+      className="inline-flex items-baseline gap-1 underline decoration-stone-300 underline-offset-2 hover:text-violet-700 hover:decoration-violet-300"
+    >
+      {address}
+      <ExternalLinkIcon className="size-3 shrink-0 self-center" aria-hidden="true" />
+      <span className="sr-only">(opens in a new tab)</span>
+    </a>
+  ) : (
+    address
+  );
+};

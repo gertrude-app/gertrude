@@ -48,6 +48,32 @@ final class ConnectUserResolversTests: ApiTestCase, @unchecked Sendable {
     expect(token.childId).toEqual(child.id)
   }
 
+  func testConnectUser_alertsOnlyForUnknownMacModels() async throws {
+    let unknownModelAlerts = {
+      self.sent.slacks.filter { $0.message.text.contains("unknown mac model identifier") }
+    }
+
+    let knownChild = try await self.child()
+    try await self.addFullPaidSubscription(for: knownChild.parent.id)
+    let knownCode = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(knownChild.id)
+    var knownInput = self.input(knownCode)
+    knownInput.serialNumber = "KNOWN-".random // avoid clashing w/ other tests
+    _ = try await ConnectUser.resolve(with: knownInput, in: self.context)
+    expect(unknownModelAlerts()).toHaveCount(0)
+
+    let unknownChild = try await self.child()
+    try await self.addFullPaidSubscription(for: unknownChild.parent.id)
+    let unknownCode = await with(dependency: \.ephemeral)
+      .createPendingAppConnection(unknownChild.id)
+    var unknownInput = self.input(unknownCode)
+    unknownInput.modelIdentifier = "Mac99,9"
+    unknownInput.serialNumber = "UNKNOWN-".random
+    _ = try await ConnectUser.resolve(with: unknownInput, in: self.context)
+    expect(unknownModelAlerts()).toHaveCount(1)
+    expect(unknownModelAlerts().first?.message.text ?? "").toContain("`Mac99,9`")
+  }
+
   func testConnectUser_twoUsersSameComputer() async throws {
     try await self.db.delete(all: Computer.self)
     let child1 = try await self.child()

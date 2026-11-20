@@ -147,6 +147,9 @@ private func handleInvoicePaid(
       )
       guard allow else { return }
     }
+    if subscription.stripeId.rawValue != eventSubscriptionId {
+      subscription.cancelAt = nil
+    }
     subscription.tier = eventTier
     subscription.stripeId = .init(eventSubscriptionId)
     subscription.stripeStatus = .active
@@ -272,6 +275,13 @@ private func handleSubscriptionUpdated(
   subscription.stripeStatus = stripeStatus
   if let periodEnd = event?.data?.object?.current_period_end {
     subscription.currentPeriodEnd = Date(timeIntervalSince1970: TimeInterval(periodEnd))
+  }
+  if let cancelAt = event?.data?.object?.cancel_at {
+    subscription.cancelAt = Date(timeIntervalSince1970: TimeInterval(cancelAt))
+  } else if event?.data?.object?.cancel_at_period_end == true {
+    subscription.cancelAt = subscription.currentPeriodEnd
+  } else {
+    subscription.cancelAt = nil
   }
   try await db.update(subscription)
 
@@ -432,6 +442,8 @@ struct EventInfo: Decodable {
       var subscription: String?
       var status: String?
       var current_period_end: Int?
+      var cancel_at: Int?
+      var cancel_at_period_end: Bool?
     }
 
     struct PreviousAttributes: Decodable {

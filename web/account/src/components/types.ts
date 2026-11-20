@@ -1,5 +1,6 @@
 import type {
   BlockRule,
+  ChildComputerStatus,
   GetAccountAnnouncement,
   GetPersonMacSettings,
   PersonRelationship,
@@ -23,13 +24,14 @@ export type Device =
   | {
       id: string;
       personId: string;
+      computerId: string;
       type: `mac`;
       username: string;
       name?: string;
       macOSVersion?: string;
       modelName: string;
       modelIdentifier: string;
-      online: boolean;
+      status: ChildComputerStatus;
     }
   | {
       id: string;
@@ -91,6 +93,7 @@ export type SuspensionRequest = {
   duration: string;
   reason?: string;
   extraMonitoringOptions: Record<string, string>;
+  requestedAt: string;
 };
 
 export type TimeOfDay = NonNullable<
@@ -149,13 +152,6 @@ export type KeychainsPageData = {
 
 export type CustomAlwaysBlockedRule =
   MacSettings[`internetFiltering`][`customAlwaysBlockedRules`][number];
-
-export type AllowedAlbum = {
-  title: string;
-  artist: string;
-  artworkUrl: string;
-  showAlbumArt: boolean;
-};
 
 export type NotificationMethod = {
   id: string;

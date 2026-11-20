@@ -2,13 +2,19 @@ import { toast } from '@gertrude/ui';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import LoginPage from '#/components/pages/unauthed/LoginPage';
-import { postAuthLocation, validateAuthRedirectSearch } from '#/lib/authRedirect';
+import {
+  authPageHref,
+  connectingDeviceFor,
+  postAuthLocation,
+  validateAuthSearch,
+} from '#/lib/authRedirect';
 import { isAuthed, setAuth } from '#/pairql/auth';
 import { liveClient } from '#/pairql/client';
 
 const LoginRoute: React.FC = () => {
   const navigate = useNavigate();
-  const { redirect: authRedirect } = Route.useSearch();
+  const search = Route.useSearch();
+  const authRedirect = search.redirect;
   const [email, setEmail] = React.useState(``);
   const [password, setPassword] = React.useState(``);
   const [submitting, setSubmitting] = React.useState(false);
@@ -70,15 +76,14 @@ const LoginRoute: React.FC = () => {
       sendingLink={sendingLink}
       onSubmit={handleSubmit}
       onMagicLink={handleMagicLink}
-      signupHref={
-        authRedirect ? `/signup?redirect=${encodeURIComponent(authRedirect)}` : `/signup`
-      }
+      signupHref={authPageHref(`/signup`, search)}
+      connecting={connectingDeviceFor(search)}
     />
   );
 };
 
 export const Route = createFileRoute(`/(unauthed)/login`)({
-  validateSearch: validateAuthRedirectSearch,
+  validateSearch: validateAuthSearch,
   beforeLoad: ({ search }) => {
     if (isAuthed()) {
       throw redirect(postAuthLocation(search.redirect));

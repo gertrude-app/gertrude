@@ -1,3 +1,4 @@
+import { useRouteOpenState } from '@gertrude/ui';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import type { KeychainsPageData, LoadableState } from '#/components/types';
@@ -13,6 +14,10 @@ const KeychainsRoute: React.FC = () => {
   const queryKey = Key.keychains;
   const query = useQuery(queryKey, () => liveClient.getAccountKeychains());
   const handleAssignmentChange = useKeychainAssignments(query.data?.people ?? []);
+  const createModal = useRouteOpenState({
+    path: `/keychains/new`,
+    closeTo: `/keychains`,
+  });
   const createKeychain = useMutation(liveClient.saveAccountKeychain, {
     invalidating: [queryKey, Key.people, Key.securityEvents],
     toast: {
@@ -35,16 +40,22 @@ const KeychainsRoute: React.FC = () => {
   return (
     <KeychainsPage
       state={state}
+      createOpen={createModal.open === true}
+      onCreateOpenChange={createModal.setOpen}
       creatingKeychain={createKeychain.isPending}
       onCreateKeychain={async (data) => {
         const { id } = await createKeychain.mutateAsync(data);
-        await navigate({ to: `/keychains/$keychainId`, params: { keychainId: id } });
+        await navigate({
+          to: `/keychains/$keychainId`,
+          params: { keychainId: id },
+          replace: true,
+        });
       }}
       onAssignmentChange={handleAssignmentChange}
     />
   );
 };
 
-export const Route = createFileRoute(`/_app/keychains/`)({
+export const Route = createFileRoute(`/_app/keychains/_list`)({
   component: KeychainsRoute,
 });

@@ -1,4 +1,4 @@
-import { time } from '@shared/datetime';
+import { relativeTime, time } from '@shared/datetime';
 import type { SuspensionRequest } from '#/components/types';
 import type { GetSuspensionRequests } from '@shared/pairql/src/account';
 
@@ -14,5 +14,12 @@ export function toSuspensionRequest(
     duration: time.humanDuration(request.requestedDurationInSeconds),
     reason: request.reason,
     extraMonitoringOptions: request.extraMonitoringOptions,
+    requestedAt: request.createdAt,
   };
+}
+
+export function requestAge(requestedAt: string): string {
+  return Date.now() - new Date(requestedAt).getTime() < 60_000
+    ? `just now`
+    : relativeTime(requestedAt);
 }

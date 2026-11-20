@@ -20,13 +20,7 @@ extension SaveAccountKey: Resolver {
     with input: Input,
     in context: AccountOwnerContext,
   ) async throws -> Output {
-    let keychain = try await Keychain.query()
-      .where(.id == input.keychainId)
-      .where(.parentId == context.accountOwner.id)
-      .first(in: context.db)
-    guard !keychain.isPublic else {
-      throw context.unexpectedError("68c0a4fb", "account public keychain edit \(keychain.id)")
-    }
+    let keychain = try await context.keychain(input.keychainId)
 
     switch input.key {
     case .path:

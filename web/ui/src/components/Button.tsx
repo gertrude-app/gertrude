@@ -6,7 +6,8 @@ import DropdownMenu from './DropdownMenu';
 import DropdownMenuItem, { type DropdownMenuItemIcon } from './DropdownMenuItem';
 import LoadingDots from './LoadingDots';
 
-type ButtonVariant = `primary` | `default` | `ghost` | `destructive` | `selected`;
+type ButtonVariant =
+  `primary` | `default` | `promo` | `ghost` | `destructive` | `selected`;
 type ButtonSize = `small` | `medium` | `large`;
 
 type DropdownItem = {
@@ -189,6 +190,8 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           props.variant === `primary`,
         'border-stone-300/80 bg-white text-stone-800 shadow-stone-300/30 focus-visible:ring-stone-400/70':
           props.variant === `default` || props.variant === undefined,
+        'border-pink-950/12 bg-white text-violet-950 shadow-violet-400/20 focus-visible:ring-violet-400/70 [background-image:linear-gradient(rgb(255_255_255/0.9),rgb(255_255_255/0.9)),url(/promo/grainy-gradient.webp)] [background-size:100%_100%] [background-repeat:no-repeat] [background-origin:border-box] isolate before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:[background-image:radial-gradient(rgb(76_29_149/0.16)_0.35px,transparent_0.6px)] before:[background-size:3px_3px] before:[mask-image:linear-gradient(transparent,black)] before:content-[""]':
+          props.variant === `promo`,
         'border-transparent bg-transparent text-stone-600 shadow-transparent focus-visible:ring-stone-400/70':
           props.variant === `ghost`,
         'border-[#E9C8C7] bg-[#FCF6F5] text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
@@ -201,6 +204,8 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           props.variant === `primary`,
         'hover:z-10 hover:border-stone-400/70 hover:shadow-stone-300/80':
           props.variant === `default` || props.variant === undefined,
+        'hover:z-10 hover:border-pink-950/18 hover:shadow-violet-400/40':
+          props.variant === `promo`,
         'hover:bg-stone-200/70': props.variant === `ghost`,
         'hover:z-10 hover:border-red-600/35 hover:shadow-red-700/20':
           props.variant === `destructive`,

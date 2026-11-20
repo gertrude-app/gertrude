@@ -116,6 +116,10 @@ extension ConnectUser: Resolver {
       ))
     }
 
+    if let computer {
+      await computer.alertIfUnknownModel()
+    }
+
     let token = try await context.db.create(MacAppToken(
       childId: child.id,
       computerUserId: computerUser.id,

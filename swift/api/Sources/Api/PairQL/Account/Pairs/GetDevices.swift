@@ -9,7 +9,7 @@ struct GetDevices: Pair {
     struct Person: PairNestable {
       let id: Child.Id
       let name: String
-      let online: Bool
+      let status: ChildComputerStatus
     }
 
     let id: Computer.Id
@@ -128,29 +128,22 @@ extension GetDevices: NoInputResolver {
       }
     }
 
-    let onlineComputerUsers = try await computerUsers.concurrentMap {
-      computerUser -> ComputerUser? in
-      await computerUser.status() == .offline ? nil : computerUser
-    }.compactMap(\.self)
-
-    let macs = computers.map { computer in
+    let macs = try await computers.concurrentMap { computer in
+      let computerUsersOnMac = computerUsers.filter { $0.computerId == computer.id }
       var seenPersonIds = Set<Child.Id>()
-      let connectedPeople = computerUsers
-        .filter { $0.computerId == computer.id }
-        .compactMap { computerUser -> Mac.Person? in
-          guard seenPersonIds.insert(computerUser.childId).inserted,
-                let person = peopleById[computerUser.childId]
-          else {
-            return nil
-          }
-          return .init(
-            id: person.id,
-            name: person.name,
-            online: onlineComputerUsers.contains {
-              $0.computerId == computer.id && $0.childId == person.id
-            },
-          )
+      var connectedPeople: [Mac.Person] = []
+      for computerUser in computerUsersOnMac {
+        guard seenPersonIds.insert(computerUser.childId).inserted,
+              let person = peopleById[computerUser.childId]
+        else {
+          continue
         }
+        try await connectedPeople.append(.init(
+          id: person.id,
+          name: person.name,
+          status: consolidatedChildComputerStatus(person.id, computerUsersOnMac),
+        ))
+      }
 
       return Mac(
         id: computer.id,

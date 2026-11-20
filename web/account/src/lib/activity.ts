@@ -1,3 +1,4 @@
+import { formatDate } from '@shared/datetime';
 import type { GetDayActivity, GetPersonDayActivity } from '@shared/pairql/src/account';
 
 type ActivityWireItem = GetPersonDayActivity.Output[`items`][number];
@@ -182,6 +183,12 @@ export function dateFromDayParam(day: string): Date {
     .split(`-`)
     .map(Number);
   return new Date(year, month - 1, date);
+}
+
+export function isValidDayParam(day: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+  const date = dateFromDayParam(day);
+  return formatDate(date, `dateInput`) === day;
 }
 
 export function dayRange(day: string): { start: string; end: string } {

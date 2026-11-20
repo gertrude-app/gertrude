@@ -98,7 +98,16 @@ export function planSubtext(input: Input): string {
 }
 
 export function manageBlurb(input: Input): string | undefined {
-  const { planStatus, fullTrialStartedAt, lastPaidTier } = input;
+  const { planStatus, fullTrialStartedAt, lastPaidTier, cancelsAt } = input;
+  if (
+    cancelsAt &&
+    (planStatus.case === `light` ||
+      planStatus.case === `medium` ||
+      planStatus.case === `full`) &&
+    planStatus.status.case === `current`
+  ) {
+    return `Your ${tierName(planStatus.case)} plan is canceled and ends on ${long(cancelsAt)}. You’ll keep access until then. To keep your plan, choose Manage subscription and renew it.`;
+  }
   switch (planStatus.case) {
     case `complimentary`:
       return undefined;
@@ -211,9 +220,9 @@ export function actionsByPlan(
   for (const action of actions) {
     grouped[actionPlan(action)].push(action);
   }
-  if (grouped.full.some((action) => action.case === `startFullTrial`)) {
-    grouped.full = grouped.full.filter((action) => action.case === `startFullTrial`);
-  }
+  grouped.full.sort(
+    (a, b) => Number(b.case === `startFullTrial`) - Number(a.case === `startFullTrial`),
+  );
   return grouped;
 }
 
@@ -279,8 +288,11 @@ export function planBadge(input: Input): {
     case `light`:
     case `medium`:
     case `full`:
-      return planStatus.status.case === `pastDue`
-        ? { text: `Past due`, color: `red` }
+      if (planStatus.status.case === `pastDue`) {
+        return { text: `Past due`, color: `red` };
+      }
+      return input.cancelsAt
+        ? { text: `Cancels ${monthDay(input.cancelsAt)}`, color: `yellow` }
         : { text: `Paid`, color: `green` };
   }
 }
@@ -384,4 +396,8 @@ function tierName(tier: SubscriptionTier): string {
 
 function long(iso: string): string {
   return formatDate(new Date(iso), `long`);
+}
+
+function monthDay(iso: string): string {
+  return new Date(iso).toLocaleDateString(`en-US`, { month: `short`, day: `numeric` });
 }

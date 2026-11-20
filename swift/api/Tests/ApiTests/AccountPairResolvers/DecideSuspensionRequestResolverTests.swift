@@ -75,6 +75,51 @@ final class DecideSuspensionRequestResolverTests: ApiTestCase, @unchecked Sendab
     ])
   }
 
+  func testRejectsGrantDurationsOutsideOneMinuteToSevenDays() async throws {
+    let child = try await self.child().withDevice()
+    let request = try await self.db.create(MacApp.SuspendFilterRequest.random {
+      $0.computerUserId = child.computerUser.id
+      $0.status = .pending
+    })
+
+    for seconds in [59, 7 * 24 * 60 * 60 + 1] {
+      try await expectErrorFrom {
+        try await DecideSuspensionRequest.resolve(
+          with: .init(
+            id: request.id,
+            decision: .accepted(durationInSeconds: seconds, extraMonitoring: nil),
+            responseComment: nil,
+          ),
+          in: self.accountContext(child.parent),
+        )
+      }.toContain("between 1 minute and 7 days")
+    }
+
+    let unchanged = try await self.db.find(request.id)
+    expect(unchanged.status).toEqual(.pending)
+    expect(sent.websocketMessages).toEqual([])
+  }
+
+  func testAllowsGrantDurationsAtBothLimits() async throws {
+    let child = try await self.child().withDevice()
+    for seconds in [60, 7 * 24 * 60 * 60] {
+      let request = try await self.db.create(MacApp.SuspendFilterRequest.random {
+        $0.computerUserId = child.computerUser.id
+        $0.status = .pending
+      })
+      let output = try await DecideSuspensionRequest.resolve(
+        with: .init(
+          id: request.id,
+          decision: .accepted(durationInSeconds: seconds, extraMonitoring: nil),
+          responseComment: nil,
+        ),
+        in: self.accountContext(child.parent),
+      )
+      expect(output).toEqual(.success)
+      await expect(try self.db.find(request.id).duration.rawValue).toEqual(seconds)
+    }
+  }
+
   func testCannotDecideRequestFromAnotherAccount() async throws {
     let child = try await self.child().withDevice()
     let request = try await self.db.create(MacApp.SuspendFilterRequest.random {

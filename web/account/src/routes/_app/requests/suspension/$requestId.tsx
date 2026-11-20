@@ -1,3 +1,4 @@
+import { time } from '@shared/datetime';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import React from 'react';
 import SuspensionRequestResponseModal from '#/components/requests/SuspensionRequestResponseModal';
@@ -45,6 +46,11 @@ const SuspensionRequestResponseRoute: React.FC = () => {
     (request) => request.id.toLowerCase() === requestId.toLowerCase(),
   );
   const request = requestData ? toSuspensionRequest(requestData) : undefined;
+  const statusQuery = useQuery(
+    Key.suspensionRequestStatus(requestId),
+    () => liveClient.getSuspensionRequestStatus({ id: requestId }),
+    { enabled: query.isSuccess && !requestData, retry: false },
+  );
 
   if (!request && query.isFetching) {
     return (
@@ -64,6 +70,40 @@ const SuspensionRequestResponseRoute: React.FC = () => {
         description={query.error.userMessage ?? `Check your connection and try again.`}
         onClose={close}
         onRetry={() => void query.refetch()}
+      />
+    );
+  }
+
+  if (!request && statusQuery.isLoading) {
+    return (
+      <SuspensionRequestStatusModal
+        title="Loading request"
+        description="Getting the latest details before you respond."
+        loading
+        onClose={close}
+      />
+    );
+  }
+
+  const decided = statusQuery.data;
+  if (!request && decided && decided.status !== `pending`) {
+    return (
+      <SuspensionRequestStatusModal
+        title={
+          decided.status === `accepted`
+            ? `Already granted`
+            : decided.status === `rejected`
+              ? `Already denied`
+              : `Request expired`
+        }
+        description={
+          decided.status === `accepted`
+            ? `${decided.personName}’s request was already granted for ${time.humanDuration(decided.durationInSeconds)}.`
+            : decided.status === `rejected`
+              ? `${decided.personName}’s request was already denied.`
+              : `${decided.personName}’s request is more than two hours old, so it can no longer be answered. They can send a new one from their Mac.`
+        }
+        onClose={close}
       />
     );
   }

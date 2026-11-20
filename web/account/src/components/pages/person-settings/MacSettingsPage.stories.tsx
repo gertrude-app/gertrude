@@ -16,6 +16,7 @@ export default meta;
 interface MacSettingsStoryProps {
   initialState: LoadableState<MacSettingsConfiguration>;
   savingMonitoring?: boolean;
+  installedAppsState?: LoadableState<InstalledMacApp[]>;
 }
 
 const defaultSettings: MacSettingsConfiguration = {
@@ -212,6 +213,7 @@ const expandSection = (canvasElement: HTMLElement, title: string): void => {
 const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
   initialState,
   savingMonitoring,
+  installedAppsState,
 }) => {
   const [state, setState] = React.useState(initialState);
 
@@ -224,8 +226,9 @@ const MacSettingsStory: React.FC<MacSettingsStoryProps> = ({
         selectedHref="/people/person-1/mac-settings"
       >
         <MacSettingsPage
+          personName="Jude"
           state={state}
-          installedApps={installedApps}
+          installedApps={installedAppsState ?? { status: `success`, data: installedApps }}
           savingMonitoring={savingMonitoring}
           onRequestPublicKeychain={async () => {}}
           onSaveMonitoring={(configuration) => {
@@ -362,6 +365,50 @@ export const NoUnrestrictedApps = {
           ...defaultSettings,
           apps: { ...defaultSettings.apps, unrestricted: [] },
         },
+      }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const InstalledAppsLoading = {
+  name: 'Installed apps loading',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          apps: { ...defaultSettings.apps, blocked: [], unrestricted: [] },
+        },
+      }}
+      installedAppsState={{ status: `loading` }}
+    />
+  ),
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    expandSection(canvasElement, `Apps`);
+  },
+};
+
+export const InstalledAppsError = {
+  name: 'Installed apps failed to load',
+  parameters: { ...galleryParameters, screenshotsAt: ['desktop'] },
+  render: () => (
+    <MacSettingsStory
+      initialState={{
+        status: `success`,
+        data: {
+          ...defaultSettings,
+          apps: { ...defaultSettings.apps, blocked: [], unrestricted: [] },
+        },
+      }}
+      installedAppsState={{
+        status: `error`,
+        message: `Check your connection and try again.`,
+        onRetry: () => {},
       }}
     />
   ),

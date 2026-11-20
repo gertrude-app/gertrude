@@ -3,7 +3,7 @@ import React from 'react';
 import type { GetAccountBilling } from '@shared/pairql/src/account';
 import BillingSettingsPage from './BillingSettingsPage';
 import NotificationSettingsPage from './NotificationSettingsPage';
-import SettingsShellPage from './SettingsShellPage';
+import SettingsShellPage, { SettingsTabLoading } from './SettingsShellPage';
 import { notificationMethods, notifications } from '#/components/storybook/fixtures';
 
 const noop = (): void => {};
@@ -121,6 +121,11 @@ const fullCurrent = billingFixture({
   },
   primary: { case: `openBillingPortal`, config: `default` },
   lastPaidTier: `full`,
+});
+
+const fullCanceling = billingFixture({
+  ...fullCurrent,
+  cancelsAt: inDays(24),
 });
 
 const fullCurrentSwitchable = billingFixture({
@@ -339,6 +344,11 @@ export const BillingFullCurrent = {
   ...billingStory(fullCurrent),
 };
 
+export const BillingFullCanceling = {
+  name: 'Billing — Full, canceling',
+  ...billingStory(fullCanceling),
+};
+
 export const BillingFullCurrentSwitchable = {
   name: 'Billing — Full, no Macs',
   ...billingStory(fullCurrentSwitchable),
@@ -382,4 +392,22 @@ export const BillingFullTrialGrace = {
 export const BillingFullTrialGraceFromMedium = {
   name: 'Billing — Full trial grace from Medium',
   ...billingStory(fullTrialGraceFromMedium),
+};
+
+export const BillingLoading = {
+  name: 'Billing — loading',
+  parameters: galleryParameters,
+  render: () => (
+    <StoryScreen>
+      <SettingsShellPage
+        email="parent@example.com"
+        selectedHref="/settings/billing"
+        notificationsHref="/settings/notifications"
+        billingHref="/settings/billing"
+        onChangePassword={noop}
+      >
+        <SettingsTabLoading label="Loading billing" />
+      </SettingsShellPage>
+    </StoryScreen>
+  ),
 };

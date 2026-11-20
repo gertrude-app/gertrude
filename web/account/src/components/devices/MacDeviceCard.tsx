@@ -1,9 +1,9 @@
 import { Button, Card, HStack, Text, VStack } from '@gertrude/ui';
 import { Link } from '@tanstack/react-router';
-import cx from 'clsx';
 import { PencilIcon } from 'lucide-react';
 import React from 'react';
 import type { MacDevice } from '#/components/devices/types';
+import { MacStatusBadge } from '#/components/devices/MacPersonStatus';
 import DeviceArtwork from '#/components/people/DeviceArtwork';
 
 interface Props {
@@ -63,18 +63,7 @@ const MacDeviceCard: React.FC<Props> = ({ device }) => {
                   >
                     <Text variant="bodyStrong">{person.name}</Text>
                   </Link>
-                  <HStack gap={1.5} className="shrink-0">
-                    <span
-                      aria-hidden="true"
-                      className={cx(
-                        `size-1.5 shrink-0 rounded-full`,
-                        person.online ? `bg-green-500` : `bg-stone-300`,
-                      )}
-                    />
-                    <Text variant="captionMuted">
-                      {person.online ? `Online` : `Offline`}
-                    </Text>
-                  </HStack>
+                  <MacStatusBadge status={person.status} size="xsmall" />
                 </HStack>
               ))}
             </VStack>

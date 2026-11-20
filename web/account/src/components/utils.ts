@@ -1,4 +1,4 @@
-import type { AllowedAlbum, Device, Schedule, TimeOfDay } from './types';
+import type { Device, Schedule, TimeOfDay } from './types';
 
 export const withResetOnClose =
   (reset: () => void, onOpenChange: (open: boolean) => void): ((open: boolean) => void) =>
@@ -124,6 +124,3 @@ export const inputValueToTimeOfDay = (value: string): TimeOfDay | null => {
 
   return { hour, minute };
 };
-
-export const albumKey = (album: AllowedAlbum): string =>
-  `${album.title}::${album.artist}`;
