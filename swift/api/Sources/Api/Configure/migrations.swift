@@ -127,6 +127,7 @@ extension Configure {
     app.migrations.add(CreateSiteFormSubmissions())
     app.migrations.add(CreateIOSDeviceTransitions())
     app.migrations.add(AddParentSetupApps())
+    app.migrations.add(AddClaimLinkOpens())
   }
 }
 

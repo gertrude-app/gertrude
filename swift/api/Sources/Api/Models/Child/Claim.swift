@@ -9,6 +9,8 @@ struct Claim: Codable, Sendable, Equatable {
   var childId: Child.Id?
   var expiresAt: Date
   var claimedAt: Date?
+  var linkFirstOpenedAt: Date?
+  var linkOpenCount = 0
   var createdAt = Date()
   var updatedAt = Date()
 
