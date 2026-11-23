@@ -15,13 +15,7 @@ extension DeleteAccountKey: Resolver {
     with input: Input,
     in context: AccountOwnerContext,
   ) async throws -> Output {
-    let keychain = try await Keychain.query()
-      .where(.id == input.keychainId)
-      .where(.parentId == context.accountOwner.id)
-      .first(in: context.db)
-    guard !keychain.isPublic else {
-      throw context.unexpectedError("4addf574", "account public keychain delete \(keychain.id)")
-    }
+    let keychain = try await context.keychain(input.keychainId)
     _ = try await Key.query()
       .where(.id == input.keyId)
       .where(.keychainId == keychain.id)

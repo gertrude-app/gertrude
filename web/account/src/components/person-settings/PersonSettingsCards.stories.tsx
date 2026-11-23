@@ -4,16 +4,13 @@ import {
   galleryParameters,
 } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
-import AddAllowedAlbumsSlideOver from './AddAllowedAlbumsSlideOver';
 import AddBlockedDomainModal from './AddBlockedDomainModal';
 import AddKeychainSlideOver from './AddKeychainSlideOver';
 import AddMacAppSlideOver from './AddMacAppSlideOver';
-import AllowedAlbumCard from './AllowedAlbumCard';
 import AssignedKeychainCard from './AssignedKeychainCard';
 import ConfiguredAppRow from './ConfiguredAppRow';
 import ScheduleButton from './ScheduleButton';
 import {
-  albums,
   installedMacApps,
   keychains,
   weekdaySchedule,
@@ -40,6 +37,7 @@ const ScheduledKeychainCard: React.FC = () => {
       description={keychains[0]!.description}
       numKeys={keychains[0]!.numKeys}
       isPublic={keychains[0]!.isPublic}
+      isOwn={!keychains[0]!.isPublic}
       schedule={schedule}
       setSchedule={setSchedule}
       onRemove={noop}
@@ -62,23 +60,9 @@ export const Cards = {
           description={keychains[2]!.description}
           numKeys={keychains[2]!.numKeys}
           isPublic={keychains[2]!.isPublic}
+          isOwn={!keychains[2]!.isPublic}
           setSchedule={noop}
           onRemove={noop}
-        />
-      </StorySection>
-      <StorySection
-        title="Albums"
-        contentClassName="grid grid-cols-2 gap-4 @3xl/main:grid-cols-4"
-      >
-        <AllowedAlbumCard album={albums[0]!} onToggleAlbumArt={noop} onRemove={noop} />
-        <AllowedAlbumCard album={albums[2]!} onToggleAlbumArt={noop} onRemove={noop} />
-        <AllowedAlbumCard album={albums[1]!} selected onSelect={noop} forceShowArtwork />
-        <AllowedAlbumCard
-          album={albums[3]!}
-          disabled
-          disabledLabel="Already added"
-          onSelect={noop}
-          forceShowArtwork
         />
       </StorySection>
       <StorySection title="Configured apps" contentClassName="flex-col items-stretch">
@@ -155,6 +139,23 @@ export const AddKeychains = {
         personName="Jude"
         keychains={keychains}
         assignedKeychainIds={[`keychain-school`]}
+        onAdd={noop}
+      />
+    </StoryCanvas>
+  ),
+};
+
+export const AddKeychainsNoneOwned = {
+  name: 'Add keychains slide-over (none owned)',
+  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
+  render: () => (
+    <StoryCanvas>
+      <AddKeychainSlideOver
+        open
+        onOpenChange={noop}
+        personName="Jude"
+        keychains={keychains.filter((keychain) => keychain.isPublic)}
+        assignedKeychainIds={[]}
         onAdd={noop}
       />
     </StoryCanvas>
@@ -256,22 +257,6 @@ export const AddUnrestrictedMacApps = {
           },
         ]}
         onOpenChange={noop}
-        onAdd={noop}
-      />
-    </StoryCanvas>
-  ),
-};
-
-export const AddAllowedAlbums = {
-  name: 'Add allowed albums slide-over',
-  parameters: { ...galleryParameters, screenshotsAt: ['mobile', 'desktop'] },
-  render: () => (
-    <StoryCanvas>
-      <AddAllowedAlbumsSlideOver
-        open
-        onOpenChange={noop}
-        catalog={albums}
-        allowedAlbums={[albums[0]!]}
         onAdd={noop}
       />
     </StoryCanvas>

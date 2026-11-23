@@ -169,27 +169,23 @@ const KeychainDetailPage: React.FC<Props> = ({
             title={keychain.name}
             subtitle={keychain.description}
             breadcrumbs={breadcrumbs}
-            buttons={
-              keychain.isPublic
-                ? undefined
-                : [
+            buttons={[
+              {
+                text: `Edit keychain`,
+                icon: PencilIcon,
+                onClick: () => setMetadataOpen(true),
+              },
+              ...(keychain.keys.length > 0
+                ? [
                     {
-                      text: `Edit keychain`,
-                      icon: PencilIcon,
-                      onClick: () => setMetadataOpen(true),
+                      text: `Add key`,
+                      variant: `primary` as const,
+                      icon: PlusIcon,
+                      onClick: openNewKeyEditor,
                     },
-                    ...(keychain.keys.length > 0
-                      ? [
-                          {
-                            text: `Add key`,
-                            variant: `primary` as const,
-                            icon: PlusIcon,
-                            onClick: openNewKeyEditor,
-                          },
-                        ]
-                      : []),
                   ]
-            }
+                : []),
+            ]}
           />
         }
       >
@@ -206,75 +202,86 @@ const KeychainDetailPage: React.FC<Props> = ({
               onAssignmentChange={onAssignmentChange}
             />
           </HStack>
+          {keychain.isPublic && (
+            <Banner variant="warning">
+              This is a public keychain. Changes affect every Gertrude account that uses
+              it.
+            </Banner>
+          )}
           {keychain.warning && <Banner variant="warning">{keychain.warning}</Banner>}
           <CardContainer>
             <KeyList
               keys={keychain.keys}
-              onAdd={keychain.isPublic ? undefined : openNewKeyEditor}
-              onEdit={keychain.isPublic ? undefined : openExistingKeyEditor}
+              onAdd={openNewKeyEditor}
+              onEdit={openExistingKeyEditor}
+              onDelete={onDeleteKey}
             />
           </CardContainer>
-          {!keychain.isPublic && (
-            <CardContainer
-              heading="Danger zone"
-              subheading="Permanently delete this keychain and all of its keys."
-              dangerZone
-              className="max-w-xl"
-            >
-              <ConfirmationDialog
-                open={deleteOpen}
-                onOpenChange={(open) => {
-                  if (deletingKeychain) return;
-                  setDeleteOpen(open);
-                }}
-                confirmationQuestion={`Delete ${keychain.name}?`}
-                description={
-                  <VStack gap={3}>
+          <CardContainer
+            heading="Danger zone"
+            subheading="Permanently delete this keychain and all of its keys."
+            dangerZone
+            className="max-w-xl"
+          >
+            <ConfirmationDialog
+              open={deleteOpen}
+              onOpenChange={(open) => {
+                if (deletingKeychain) return;
+                setDeleteOpen(open);
+              }}
+              confirmationQuestion={`Delete ${keychain.name}?`}
+              description={
+                <VStack gap={3}>
+                  <Text variant="proseSubtle">
+                    This will permanently delete the keychain and all its keys. This
+                    cannot be undone.
+                  </Text>
+                  {keychain.isPublic && (
                     <Text variant="proseSubtle">
-                      This will permanently delete the keychain and all its keys. This
-                      cannot be undone.
+                      This is a public keychain, so it will also be removed from every
+                      Gertrude account that uses it.
                     </Text>
-                    {keychain.assignedPeople.length > 0 && (
-                      <Text variant="proseSubtle">
-                        It will be removed from the Mac settings for{` `}
-                        {keychain.assignedPeople.map(({ name }) => name).join(`, `)}.
-                        Websites and apps allowed only by this keychain will stop being
-                        allowed.
-                      </Text>
-                    )}
-                  </VStack>
-                }
-                trigger={
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    icon={TrashIcon}
-                    className="mt-4"
-                    onClick={() => {}}
-                    disabled={savingKeychain || savingKey || deletingKey}
-                    loading={deletingKeychain}
-                  >
-                    Delete keychain
-                  </Button>
-                }
-                actions={[
-                  { text: `Cancel` },
-                  {
-                    text: `Delete keychain`,
-                    variant: `destructive`,
-                    icon: TrashIcon,
-                    disabled: savingKeychain || savingKey || deletingKey,
-                    loading: deletingKeychain,
-                    autoClose: false,
-                    onClick: deleteKeychain,
-                  },
-                ]}
-              />
-            </CardContainer>
-          )}
+                  )}
+                  {keychain.assignedPeople.length > 0 && (
+                    <Text variant="proseSubtle">
+                      It will be removed from the Mac settings for{` `}
+                      {keychain.assignedPeople.map(({ name }) => name).join(`, `)}.
+                      Websites and apps allowed only by this keychain will stop being
+                      allowed.
+                    </Text>
+                  )}
+                </VStack>
+              }
+              trigger={
+                <Button
+                  type="button"
+                  variant="destructive"
+                  icon={TrashIcon}
+                  className="mt-4"
+                  onClick={() => {}}
+                  disabled={savingKeychain || savingKey || deletingKey}
+                  loading={deletingKeychain}
+                >
+                  Delete keychain
+                </Button>
+              }
+              actions={[
+                { text: `Cancel` },
+                {
+                  text: `Delete keychain`,
+                  variant: `destructive`,
+                  icon: TrashIcon,
+                  disabled: savingKeychain || savingKey || deletingKey,
+                  loading: deletingKeychain,
+                  autoClose: false,
+                  onClick: deleteKeychain,
+                },
+              ]}
+            />
+          </CardContainer>
         </VStack>
       </DashboardPage>
-      {!keychain.isPublic && metadataOpen && (
+      {metadataOpen && (
         <KeychainEditorModal
           keychain={keychain}
           saving={savingKeychain}
@@ -282,27 +289,26 @@ const KeychainDetailPage: React.FC<Props> = ({
           onSave={onSaveKeychain}
         />
       )}
-      {!keychain.isPublic &&
-        (editingKey ? (
-          <EditKeySlideOver
-            open={editorOpen}
-            keyRecord={editingKey}
-            apps={keychain.apps}
-            saving={savingKey}
-            deleting={deletingKey}
-            onOpenChange={handleEditorOpenChange}
-            onSave={(data) => onSaveKey(editingKey.id, data)}
-            onDelete={() => onDeleteKey(editingKey.id)}
-          />
-        ) : (
-          <CreateKeySlideOver
-            open={editorOpen}
-            apps={keychain.apps}
-            saving={savingKey}
-            onOpenChange={handleEditorOpenChange}
-            onSave={(data) => onSaveKey(undefined, data)}
-          />
-        ))}
+      {editingKey ? (
+        <EditKeySlideOver
+          open={editorOpen}
+          keyRecord={editingKey}
+          apps={keychain.apps}
+          saving={savingKey}
+          deleting={deletingKey}
+          onOpenChange={handleEditorOpenChange}
+          onSave={(data) => onSaveKey(editingKey.id, data)}
+          onDelete={() => onDeleteKey(editingKey.id)}
+        />
+      ) : (
+        <CreateKeySlideOver
+          open={editorOpen}
+          apps={keychain.apps}
+          saving={savingKey}
+          onOpenChange={handleEditorOpenChange}
+          onSave={(data) => onSaveKey(undefined, data)}
+        />
+      )}
     </>
   );
 };

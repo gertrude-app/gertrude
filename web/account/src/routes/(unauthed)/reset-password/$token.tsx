@@ -46,6 +46,11 @@ const ChooseNewPasswordRoute: React.FC = () => {
           ? { text: `Back to settings`, href: `/settings` }
           : { text: `Back to login`, href: `/login` }
       }
+      continueLink={
+        isAuthed()
+          ? { text: `Continue to Gertrude`, href: `/people` }
+          : { text: `Log in`, href: `/login` }
+      }
       onSubmit={(event) => void submit(event)}
     />
   );

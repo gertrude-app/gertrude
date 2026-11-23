@@ -88,6 +88,7 @@ interface ChooseProps {
   succeeded: boolean;
   invalidToken: boolean;
   backLink: BackLink;
+  continueLink: BackLink;
   onSubmit: (event: React.FormEvent) => void;
 }
 
@@ -98,6 +99,7 @@ export const ChooseNewPasswordPage: React.FC<ChooseProps> = ({
   succeeded,
   invalidToken,
   backLink,
+  continueLink,
   onSubmit,
 }) => (
   <UnauthedPageLayout
@@ -110,8 +112,8 @@ export const ChooseNewPasswordPage: React.FC<ChooseProps> = ({
             </Banner>,
           ]}
           buttons={[
-            <Button key="continue" type="link" href="/people" variant="primary">
-              Continue to Gertrude
+            <Button key="continue" type="link" href={continueLink.href} variant="primary">
+              {continueLink.text}
             </Button>,
           ]}
           heading="Password updated"

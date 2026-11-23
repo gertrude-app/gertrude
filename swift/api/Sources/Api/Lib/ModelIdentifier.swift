@@ -51,7 +51,8 @@ enum ModelIdentifier {
     Task {
       await get(dependency: \.slack).internal(
         .info,
-        "Unknown iOS *model identifier:* `\(modelIdentifier)`, add name to `ModelIdentifier.swift`",
+        "Unknown iOS *model identifier:* `\(modelIdentifier)`, add name to `ModelIdentifier.swift` "
+          + "and artwork to `web/account/public/devices/` (see its readme.md)",
       )
     }
   }

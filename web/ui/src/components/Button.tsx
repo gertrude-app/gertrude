@@ -6,7 +6,8 @@ import DropdownMenu from './DropdownMenu';
 import DropdownMenuItem, { type DropdownMenuItemIcon } from './DropdownMenuItem';
 import LoadingDots from './LoadingDots';
 
-type ButtonVariant = `primary` | `default` | `ghost` | `destructive` | `selected`;
+type ButtonVariant =
+  `primary` | `default` | `promo` | `ghost` | `destructive` | `selected`;
 type ButtonSize = `small` | `medium` | `large`;
 
 type DropdownItem = {
@@ -182,13 +183,15 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
     splitPart?: `main` | `dropdown`,
   ): string =>
     cx(
-      `relative inline-flex items-center justify-center border font-[450] shadow outline-none transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 select-none`,
+      `relative inline-flex items-center justify-center overflow-hidden border font-[450] shadow outline-none transition-[background-color,border-color,box-shadow,opacity] duration-150 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-50 select-none`,
       isDisabled ? `cursor-not-allowed opacity-50` : `cursor-pointer`,
       {
         'border-violet-800 bg-violet-500 text-white shadow-violet-500/30 focus-visible:ring-violet-400/70':
           props.variant === `primary`,
         'border-stone-300/80 bg-white text-stone-800 shadow-stone-300/30 focus-visible:ring-stone-400/70':
           props.variant === `default` || props.variant === undefined,
+        'border-pink-950/12 bg-white text-violet-950 shadow-violet-400/20 focus-visible:ring-violet-400/70 [background-image:linear-gradient(rgb(255_255_255/0.9),rgb(255_255_255/0.9)),url(/promo/grainy-gradient.webp)] [background-size:100%_100%] [background-repeat:no-repeat] [background-origin:border-box] isolate before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit] before:[background-image:radial-gradient(rgb(76_29_149/0.16)_0.35px,transparent_0.6px)] before:[background-size:3px_3px] before:[mask-image:linear-gradient(transparent,black)] before:content-[""]':
+          props.variant === `promo`,
         'border-transparent bg-transparent text-stone-600 shadow-transparent focus-visible:ring-stone-400/70':
           props.variant === `ghost`,
         'border-[#E9C8C7] bg-[#FCF6F5] text-red-900/80 shadow-red-700/10 focus-visible:ring-red-400/70':
@@ -201,12 +204,28 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
           props.variant === `primary`,
         'hover:z-10 hover:border-stone-400/70 hover:shadow-stone-300/80':
           props.variant === `default` || props.variant === undefined,
+        'hover:z-10 hover:border-pink-950/18 hover:shadow-violet-400/40':
+          props.variant === `promo`,
         'hover:bg-stone-200/70': props.variant === `ghost`,
         'hover:z-10 hover:border-red-600/35 hover:shadow-red-700/20':
           props.variant === `destructive`,
         'hover:z-10 hover:border-amber-400 hover:bg-amber-200/70 hover:shadow-amber-700/20':
           props.variant === `selected`,
       },
+      !isDisabled &&
+        splitPart === `dropdown` && {
+          'data-[popup-open]:z-10 data-[popup-open]:border-violet-900 data-[popup-open]:bg-violet-600 data-[popup-open]:shadow-violet-500/50':
+            props.variant === `primary`,
+          'data-[popup-open]:z-10 data-[popup-open]:border-stone-400/70 data-[popup-open]:shadow-stone-300/80':
+            props.variant === `default` || props.variant === undefined,
+          'data-[popup-open]:z-10 data-[popup-open]:border-pink-950/18 data-[popup-open]:shadow-violet-400/40':
+            props.variant === `promo`,
+          'data-[popup-open]:bg-stone-200/70': props.variant === `ghost`,
+          'data-[popup-open]:z-10 data-[popup-open]:border-red-600/35 data-[popup-open]:shadow-red-700/20':
+            props.variant === `destructive`,
+          'data-[popup-open]:z-10 data-[popup-open]:border-amber-400 data-[popup-open]:bg-amber-200/70 data-[popup-open]:shadow-amber-700/20':
+            props.variant === `selected`,
+        },
       getSizeClasses(props.size, contentHasLabel, splitPart),
       splitPart === undefined && props.className,
     );
@@ -262,10 +281,19 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
     );
   };
 
+  const glint =
+    props.variant === `ghost` ? null : (
+      <span
+        className="pointer-events-none absolute -inset-px rounded-[inherit] shadow-[inset_0_4px_3px_-2px_rgb(255_255_255/0.4)]"
+        aria-hidden="true"
+      />
+    );
+
   const content = (
     <>
+      {glint}
       {iconPosition === `left` && iconSlot()}
-      {hasLabel && <span>{props.children}</span>}
+      {hasLabel && <span className="relative">{props.children}</span>}
       {iconPosition === `right` && iconSlot()}
     </>
   );
@@ -363,10 +391,11 @@ const Button = React.forwardRef<HTMLElement, Props>((props, ref) => {
             aria-label={props.dropdownAriaLabel ?? `More actions`}
             aria-busy={props.loading ? true : undefined}
           >
+            {glint}
             <ChevronDownIcon
               className={cx(
                 iconClasses,
-                `transition-transform duration-150 group-hover:translate-y-0.5`,
+                `relative transition-transform duration-150 group-hover:translate-y-px group-data-[popup-open]:translate-y-px`,
               )}
               aria-hidden="true"
             />

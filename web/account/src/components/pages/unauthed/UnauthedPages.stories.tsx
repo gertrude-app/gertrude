@@ -1,5 +1,6 @@
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
 import React from 'react';
+import type { ConnectingDevice } from '#/lib/authRedirect';
 import LinkExpiredPage from './LinkExpiredPage';
 import LoginPage from './LoginPage';
 import { ChooseNewPasswordPage, RequestPasswordResetPage } from './PasswordResetPages';
@@ -17,7 +18,10 @@ const meta = {
 
 export default meta;
 
-const LoginStory: React.FC<{ error?: string }> = ({ error }) => {
+const LoginStory: React.FC<{ error?: string; connecting?: ConnectingDevice }> = ({
+  error,
+  connecting,
+}) => {
   const [email, setEmail] = React.useState(`parent@example.com`);
   const [password, setPassword] = React.useState(``);
 
@@ -30,6 +34,7 @@ const LoginStory: React.FC<{ error?: string }> = ({ error }) => {
       error={error}
       onSubmit={preventSubmit}
       onMagicLink={noop}
+      connecting={connecting}
     />
   );
 };
@@ -60,12 +65,17 @@ const ChooseNewPasswordStory: React.FC = () => {
       succeeded={false}
       invalidToken={false}
       backLink={{ text: `Back to login`, href: `/login` }}
+      continueLink={{ text: `Log in`, href: `/login` }}
       onSubmit={preventSubmit}
     />
   );
 };
 
-const SignupStory: React.FC<{ sent?: boolean; error?: string }> = ({ sent, error }) => {
+const SignupStory: React.FC<{
+  sent?: boolean;
+  error?: string;
+  connecting?: ConnectingDevice;
+}> = ({ sent, error, connecting }) => {
   const [email, setEmail] = React.useState(sent ? `parent@example.com` : ``);
   const [password, setPassword] = React.useState(``);
 
@@ -81,6 +91,7 @@ const SignupStory: React.FC<{ sent?: boolean; error?: string }> = ({ sent, error
       onSubmit={preventSubmit}
       onResend={noop}
       onChangeEmail={noop}
+      connecting={connecting}
     />
   );
 };
@@ -126,6 +137,41 @@ export const Signup = {
   render: () => (
     <StoryScreen>
       <SignupStory />
+    </StoryScreen>
+  ),
+};
+
+export const SignupConnectingApp = {
+  name: 'Signup (connecting an app)',
+  parameters: galleryParameters,
+  render: () => (
+    <StoryScreen>
+      <SignupStory connecting={{ app: `podcasts` }} />
+    </StoryScreen>
+  ),
+};
+
+export const SignupConnectingDevice = {
+  name: 'Signup (connecting an app, device known)',
+  parameters: galleryParameters,
+  render: () => (
+    <StoryScreen>
+      <SignupStory
+        connecting={{
+          app: `blocker`,
+          deviceName: `iPhone Duo`,
+          modelIdentifier: `iPhone19,4`,
+        }}
+      />
+    </StoryScreen>
+  ),
+};
+
+export const LoginConnectingApp = {
+  name: 'Login (connecting an app)',
+  render: () => (
+    <StoryScreen>
+      <LoginStory connecting={{ app: `music` }} />
     </StoryScreen>
   ),
 };

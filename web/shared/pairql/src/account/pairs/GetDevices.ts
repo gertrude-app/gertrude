@@ -1,4 +1,6 @@
 // auto-generated, do not edit
+import type { ChildComputerStatus } from '../shared';
+
 export namespace GetDevices {
   export type Input = void;
 
@@ -12,7 +14,7 @@ export namespace GetDevices {
       people: Array<{
         id: UUID;
         name: string;
-        online: boolean;
+        status: ChildComputerStatus;
       }>;
     }>;
     mobileDevices: Array<{

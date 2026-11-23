@@ -49,6 +49,7 @@ export * from './pairs/GetPersonMacSettings';
 export * from './pairs/GetPersonUnlockRequests';
 export * from './pairs/GetSecurityEvents';
 export * from './pairs/GetSuspensionRequests';
+export * from './pairs/GetSuspensionRequestStatus';
 export * from './pairs/HandleAccountCheckoutCancel';
 export * from './pairs/HandleAccountCheckoutSuccess';
 export * from './pairs/OpenAccountBillingPortal';

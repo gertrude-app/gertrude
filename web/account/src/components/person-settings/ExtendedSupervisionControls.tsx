@@ -22,7 +22,7 @@ import {
 import { Trash2Icon } from 'lucide-react';
 import React from 'react';
 import type { ExtendedControlsDraft } from '#/components/pages/person-settings/IosSettingsPage.reducer';
-import type { RestrictionControl } from '@shared/pairql/supervision';
+import type { RestrictionControl, RestrictionGroup } from '@shared/pairql/supervision';
 import SettingsRow from './SettingsRow';
 
 interface RestrictionProps {
@@ -258,41 +258,55 @@ const ExtendedSupervisionControls: React.FC<Props> = ({
         }
       />
     </SettingsRow>
-    {EXTENDED_RESTRICTION_GROUPS.map((group) => {
-      const onCount = group.controls.filter((control) =>
-        isControlOn(draft, control),
-      ).length;
-      return (
-        <SettingsRow
-          key={group.id}
-          type="toggle"
-          title={group.title}
-          description={group.description}
-          enabled={onCount > 0}
-          setEnabled={(enabled) => onChange(groupValues(group, enabled))}
-          toggleLabel={`${group.title}: all restrictions`}
-          badge={
-            onCount > 0 && (
-              <Badge size="small" color="violet">
-                {onCount} of {group.controls.length}
-              </Badge>
-            )
-          }
-        >
-          <Card padding={0} className="overflow-hidden">
-            {group.controls.map((control) => (
-              <RestrictionRow
-                key={control.field}
-                control={control}
-                draft={draft}
-                onChange={onChange}
-              />
-            ))}
-          </Card>
-        </SettingsRow>
-      );
-    })}
+    {EXTENDED_RESTRICTION_GROUPS.map((group) => (
+      <RestrictionGroupRow
+        key={group.id}
+        group={group}
+        draft={draft}
+        onChange={onChange}
+      />
+    ))}
   </VStack>
 );
+
+const RestrictionGroupRow: React.FC<RestrictionProps & { group: RestrictionGroup }> = ({
+  group,
+  draft,
+  onChange,
+}) => {
+  const onCount = group.controls.filter((control) => isControlOn(draft, control)).length;
+  const [manualExpanded, setManualExpanded] = React.useState<boolean | null>(null);
+  const expanded = manualExpanded ?? (onCount > 0 && onCount < group.controls.length);
+  return (
+    <SettingsRow
+      type="toggle"
+      title={group.title}
+      description={group.description}
+      enabled={onCount > 0}
+      setEnabled={(enabled) => onChange(groupValues(group, enabled))}
+      toggleLabel={`${group.title}: all restrictions`}
+      expanded={expanded}
+      onExpandedChange={setManualExpanded}
+      badge={
+        onCount > 0 && (
+          <Badge size="small" color="violet">
+            {onCount} of {group.controls.length}
+          </Badge>
+        )
+      }
+    >
+      <Card padding={0} className="overflow-hidden">
+        {group.controls.map((control) => (
+          <RestrictionRow
+            key={control.field}
+            control={control}
+            draft={draft}
+            onChange={onChange}
+          />
+        ))}
+      </Card>
+    </SettingsRow>
+  );
+};
 
 export default ExtendedSupervisionControls;

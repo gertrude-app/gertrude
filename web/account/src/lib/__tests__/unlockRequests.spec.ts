@@ -7,6 +7,7 @@ import {
   keyForUnlockRequest,
   planUnlockReview,
   reconcileUnlockReview,
+  requestedAddressLink,
   sanitizeRequestedAddress,
   updateGroupDecision,
   updateGroupKeyAddressMatch,
@@ -311,5 +312,29 @@ describe(`unlock review decisions`, () => {
         }),
       ),
     ).toBe(`school.example.com/lesson`);
+  });
+
+  test(`links to requested addresses without credentials, query, or fragment`, () => {
+    expect(
+      requestedAddressLink(
+        request(`one`, undefined, {
+          url: `https://user:secret@school.example.com:8443/lesson?secret=yes#token`,
+        }),
+      ),
+    ).toBe(`https://school.example.com:8443/lesson`);
+    expect(requestedAddressLink(request(`two`))).toBe(`https://two.example.com`);
+    expect(
+      requestedAddressLink(
+        request(`three`, undefined, {
+          url: `ftp://files.example.com/lesson.pdf`,
+          domain: undefined,
+        }),
+      ),
+    ).toBeUndefined();
+    expect(
+      requestedAddressLink(
+        request(`four`, undefined, { ipAddress: `192.0.2.1`, domain: undefined }),
+      ),
+    ).toBeUndefined();
   });
 });

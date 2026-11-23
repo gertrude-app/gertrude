@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import cx from 'clsx';
-import { type LucideIcon } from 'lucide-react';
+import { ExternalLinkIcon, type LucideIcon } from 'lucide-react';
 import React from 'react';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
@@ -52,6 +52,15 @@ const SidebarItem: React.FC<Props> = ({
         >
           {title}
         </Text>
+        {!isInternalLink && (
+          <>
+            <ExternalLinkIcon
+              className="size-3.5 shrink-0 text-stone-400"
+              aria-hidden="true"
+            />
+            <span className="sr-only">(opens in a new tab)</span>
+          </>
+        )}
         {badgeCount !== undefined && (
           <CountBadge shade={selected ? `light` : `dark`}>{badgeCount}</CountBadge>
         )}
@@ -79,8 +88,9 @@ const SidebarItem: React.FC<Props> = ({
       ) : (
         <a
           href={href}
+          target="_blank"
+          rel="noreferrer"
           className={linkClassName}
-          aria-current={selected ? `page` : undefined}
           onClick={close}
         >
           {content}

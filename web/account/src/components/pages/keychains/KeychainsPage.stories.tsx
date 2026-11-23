@@ -22,6 +22,8 @@ type KeychainsPageProps = ComponentProps<typeof KeychainsPage>;
 
 const defaultProps: KeychainsPageProps = {
   state: { status: `success`, data },
+  createOpen: false,
+  onCreateOpenChange: () => {},
   onCreateKeychain: noop,
   onAssignmentChange: noop,
 };

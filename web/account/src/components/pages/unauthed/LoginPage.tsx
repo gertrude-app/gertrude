@@ -1,9 +1,14 @@
 import { Banner, Button, HStack, Input, Text, VStack } from '@gertrude/ui';
-import { ArrowRightIcon } from 'lucide-react';
+import { ArrowRightIcon, LaptopIcon, SmartphoneIcon, TabletIcon } from 'lucide-react';
 import React from 'react';
+import type { AppAdTag } from '#/components/unauthed/AppAd';
+import type { ConnectingDevice } from '#/lib/authRedirect';
+import { type SetupApp, setupApps } from '#/components/onboarding/setupApps';
 import AppAd from '#/components/unauthed/AppAd';
+import ConnectingSubheading from '#/components/unauthed/ConnectingSubheading';
 import UnauthedForm from '#/components/unauthed/UnauthedForm';
 import UnauthedPageLayout from '#/components/unauthed/UnauthedPageLayout';
+import { gertrudeApps } from '#/lib/gertrudeApps';
 
 interface Props {
   email: string;
@@ -16,6 +21,7 @@ interface Props {
   onSubmit: (event: React.FormEvent) => void;
   onMagicLink: () => void;
   signupHref?: string;
+  connecting?: ConnectingDevice;
 }
 
 const LoginPage: React.FC<Props> = ({
@@ -29,6 +35,7 @@ const LoginPage: React.FC<Props> = ({
   onSubmit,
   onMagicLink,
   signupHref = `/signup`,
+  connecting,
 }) => (
   <UnauthedPageLayout
     form={
@@ -102,7 +109,13 @@ const LoginPage: React.FC<Props> = ({
           </HStack>,
         ]}
         heading="Log in"
-        subheading="Sign in with your password or a magic link."
+        subheading={
+          connecting ? (
+            <ConnectingSubheading device={connecting} />
+          ) : (
+            `Sign in with your password or a magic link.`
+          )
+        }
         bottomLink={{
           text: `Signup instead`,
           href: signupHref,
@@ -117,6 +130,28 @@ const LoginPage: React.FC<Props> = ({
 
 export default LoginPage;
 
+const platformTags: Record<(typeof setupApps)[number][`platforms`][number], AppAdTag> = {
+  mac: { text: `macOS`, icon: LaptopIcon },
+  iphone: { text: `iOS`, icon: SmartphoneIcon },
+  ipad: { text: `iPadOS`, icon: TabletIcon },
+};
+
+const subheadings: Record<SetupApp, string> = {
+  mac: `Allow only approved websites, with screenshots, keystroke monitoring, app blocking, and downtime.`,
+  blocker: `Close the gaps Screen Time leaves on iPhone and iPad.`,
+  music: `Music from an approved library, without open-ended browsing.`,
+  podcasts: `Approved shows, with a PIN required to add new podcasts.`,
+};
+
+const appAds = setupApps.map((app) => ({
+  app: app.id,
+  subheading: subheadings[app.id],
+  tags: [
+    ...app.platforms.map((platform) => platformTags[platform]),
+    ...(app.id === `mac` ? [{ text: `21-day free trial` }] : []),
+  ],
+}));
+
 const LoginAppsDisplay: React.FC = () => (
   <VStack align="center" className="h-full pt-20 relative overflow-scroll bg-stone-50">
     <img src="/logo-wordmark.svg" alt="Gertrude" className="w-36 relative" />
@@ -127,27 +162,15 @@ const LoginAppsDisplay: React.FC = () => (
       We're biased, but we think they're pretty great.
     </Text>
     <div className="grid grid-cols-2 gap-6 px-12 py-12">
-      <AppAd
-        screenshot="/mac-app-screenshot.png"
-        appIcon="/gertrude-blocker-app-icon.webp"
-        heading="Gertrude for macOS"
-        subheading="Internet whitelisting, screenshot and keystroke monitoring, app blocking, downtime, and more"
-        badges={[`macOS`, `30-day free trial`]}
-      />
-      <AppAd
-        screenshot="/mac-app-screenshot.png"
-        appIcon="/gertrude-blocker-app-icon.webp"
-        heading="Gertrude Blocker"
-        subheading="Filling in the gaps that Apple's ScreenTime leaves behind, making your iPhones and iPads truly safe"
-        badges={[`iOS`, `iPadOS`]}
-      />
-      <AppAd
-        screenshot="/mac-app-screenshot.png"
-        appIcon="/gertrude-am-app-icon.webp"
-        heading="Gertrude AM"
-        subheading="Parent-curated & pin-protected podcasts"
-        badges={[`iOS`, `iPadOS`]}
-      />
+      {appAds.map((ad) => (
+        <AppAd
+          key={ad.app}
+          visual={`/gertrude-app-visuals/${ad.app}.webp`}
+          heading={gertrudeApps[ad.app].name}
+          subheading={ad.subheading}
+          tags={ad.tags}
+        />
+      ))}
     </div>
   </VStack>
 );

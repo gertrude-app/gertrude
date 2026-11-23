@@ -14,8 +14,15 @@ const macs: DevicesPageData[`macs`] = [
     modelIdentifier: `Mac14,9`,
     macOSVersion: `26.0`,
     people: [
-      { id: `person-jude`, name: `Jude`, online: true },
-      { id: `person-mabel`, name: `Mabel`, online: false },
+      { id: `person-jude`, name: `Jude`, status: { case: `filterOn` } },
+      {
+        id: `person-mabel`,
+        name: `Mabel`,
+        status: {
+          case: `filterSuspended`,
+          resuming: new Date(Date.now() + 25 * 60 * 1000).toISOString(),
+        },
+      },
     ],
   },
   {
@@ -24,7 +31,7 @@ const macs: DevicesPageData[`macs`] = [
     modelName: `13-inch MacBook Air (2024)`,
     modelIdentifier: `Mac15,12`,
     macOSVersion: `15.6`,
-    people: [{ id: `person-jude`, name: `Jude`, online: false }],
+    people: [{ id: `person-jude`, name: `Jude`, status: { case: `offline` } }],
   },
 ];
 

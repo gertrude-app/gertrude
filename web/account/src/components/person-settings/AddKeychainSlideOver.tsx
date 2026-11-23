@@ -14,7 +14,7 @@ import {
   inflect,
 } from '@gertrude/ui';
 import cx from 'clsx';
-import { CheckIcon, KeyIcon, ShieldAlertIcon } from 'lucide-react';
+import { CheckIcon, KeyIcon, PlusIcon, ShieldAlertIcon } from 'lucide-react';
 import React from 'react';
 import type { Keychain } from '#/components/types';
 import { withResetOnClose } from '#/components/utils';
@@ -305,6 +305,19 @@ const AddKeychainSlideOver: React.FC<Props> = ({
                 </HStack>
               </VStack>
             )
+          ) : tab === `own` && ownKeychainCount === 0 ? (
+            <EmptyState
+              icon={KeyIcon}
+              title="No keychains yet"
+              description="You haven't created any keychains yet."
+              button={{
+                type: `link`,
+                href: `/keychains/new`,
+                text: `Create keychain`,
+                icon: PlusIcon,
+                variant: `primary`,
+              }}
+            />
           ) : (
             <EmptyState
               icon={KeyIcon}

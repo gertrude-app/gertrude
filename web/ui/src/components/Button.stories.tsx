@@ -13,7 +13,14 @@ import { StoryCanvas, StorySection, galleryParameters } from '#/storybook/StoryL
 
 const buttonAction = fn();
 
-const variants = [`primary`, `default`, `ghost`, `destructive`, `selected`] as const;
+const variants = [
+  `primary`,
+  `default`,
+  `promo`,
+  `ghost`,
+  `destructive`,
+  `selected`,
+] as const;
 const sizes = [`small`, `medium`, `large`] as const;
 const meta = {
   title: 'UI/Components/Button',

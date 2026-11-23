@@ -14,7 +14,7 @@ export const testimonials: Testimonial[] = [
     name: `HAAS1988`,
   },
   {
-    quote: `We are giving out 16-year-old son his first phone, and we feel comfortable doing so with Gertrude, knowing how trustworthy it is. We couldn’t rely on any other blocker.`,
+    quote: `We are giving our 16-year-old son his first phone, and we feel comfortable doing so with Gertrude, knowing how trustworthy it is. We couldn’t rely on any other blocker.`,
     name: `Josue & Keren`,
   },
   {

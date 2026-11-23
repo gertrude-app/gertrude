@@ -11,6 +11,7 @@ interface Props extends Pick<
   Keychain,
   `id` | `name` | `description` | `numKeys` | `isPublic`
 > {
+  isOwn: boolean;
   onRemove: () => void;
   schedule?: Schedule;
   setSchedule: (schedule?: Schedule) => void;
@@ -20,6 +21,7 @@ interface Props extends Pick<
 const AssignedKeychainCard: React.FC<Props> = ({
   id,
   isPublic,
+  isOwn,
   name,
   description,
   numKeys,
@@ -53,16 +55,18 @@ const AssignedKeychainCard: React.FC<Props> = ({
               <Button type="button" onClick={() => {}} size="small" icon={EllipsisIcon} />
             }
           >
-            <DropdownMenuItem
-              title="Edit"
-              icon={PencilIcon}
-              onSelect={() =>
-                void navigate({
-                  to: `/keychains/$keychainId`,
-                  params: { keychainId: id },
-                })
-              }
-            />
+            {isOwn && (
+              <DropdownMenuItem
+                title="Edit"
+                icon={PencilIcon}
+                onSelect={() =>
+                  void navigate({
+                    to: `/keychains/$keychainId`,
+                    params: { keychainId: id },
+                  })
+                }
+              />
+            )}
             <DropdownMenuItem
               title="Remove"
               icon={TrashIcon}

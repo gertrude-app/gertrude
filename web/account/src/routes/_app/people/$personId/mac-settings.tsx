@@ -7,6 +7,8 @@ import type {
 } from '#/components/pages/person-settings/MacSettingsPage.types';
 import type { LoadableState } from '#/components/types';
 import UnsavedChangesGuard from '#/components/UnsavedChangesGuard';
+import ConnectMacModal from '#/components/devices/ConnectMacModal';
+import { useConnectMac } from '#/components/devices/useConnectMac';
 import MacSettingsPage from '#/components/pages/person-settings/MacSettingsPage';
 import { apiEndpoint, liveClient } from '#/pairql/client';
 import { Key } from '#/pairql/keys';
@@ -23,6 +25,11 @@ const MacSettingsRoute: React.FC = () => {
   const installedAppsQuery = useQuery(Key.personInstalledMacApps(personId), () =>
     liveClient.getPersonInstalledMacApps({ personId }),
   );
+  const peopleQuery = useQuery(Key.people, () => liveClient.getPeople());
+  const person = peopleQuery.data?.find(
+    (candidate) => candidate.id.toLowerCase() === personId.toLowerCase(),
+  );
+  const { connectMac, modalProps: connectMacModalProps } = useConnectMac();
   const updateMonitoring = useMutation(liveClient.updatePersonMacMonitoringSettings, {
     invalidating: [settingsKey, Key.activity],
     toast: {
@@ -51,14 +58,29 @@ const MacSettingsRoute: React.FC = () => {
     },
   });
   const requestPublicKeychain = useMutation(liveClient.requestAccountPublicKeychain);
-  const installedApps: InstalledMacApp[] =
-    installedAppsQuery.data?.map((app) => ({
-      id: app.bundleId,
-      name: app.name,
-      bundleId: app.bundleId,
-      identifiedAppSlug: app.identifiedAppSlug,
-      appIconUrl: app.iconHash ? `${apiEndpoint}/app-icon/${app.iconHash}` : undefined,
-    })) ?? [];
+  const installedApps: LoadableState<InstalledMacApp[]> =
+    installedAppsQuery.data !== undefined
+      ? {
+          status: `success`,
+          data: installedAppsQuery.data.map((app) => ({
+            id: app.bundleId,
+            name: app.name,
+            bundleId: app.bundleId,
+            identifiedAppSlug: app.identifiedAppSlug,
+            appIconUrl: app.iconHash
+              ? `${apiEndpoint}/app-icon/${app.iconHash}`
+              : undefined,
+          })),
+        }
+      : installedAppsQuery.isError
+        ? {
+            status: `error`,
+            message:
+              installedAppsQuery.error.userMessage ??
+              `Check your connection and try again.`,
+            onRetry: () => void installedAppsQuery.refetch(),
+          }
+        : { status: `loading` };
 
   const state: LoadableState<MacSettingsConfiguration> =
     settingsQuery.data !== undefined
@@ -81,6 +103,10 @@ const MacSettingsRoute: React.FC = () => {
         key={personId}
         state={state}
         installedApps={installedApps}
+        personName={person?.name}
+        onConnectMac={
+          person ? () => connectMac([{ id: person.id, name: person.name }]) : undefined
+        }
         savingMonitoring={updateMonitoring.isPending}
         savingInternetFiltering={updateInternetFiltering.isPending}
         savingApps={updateApps.isPending}
@@ -124,6 +150,7 @@ const MacSettingsRoute: React.FC = () => {
             .then(() => undefined)
         }
       />
+      <ConnectMacModal {...connectMacModalProps} />
       <UnsavedChangesGuard
         hasUnsavedChanges={hasUnsavedChanges}
         description="Your Mac settings haven't been saved."

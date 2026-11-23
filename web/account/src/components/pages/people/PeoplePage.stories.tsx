@@ -42,6 +42,7 @@ const defaultProps: PeoplePageProps = {
   monitorHref: `/activity`,
   settingsHrefForPerson: (personId) => `/people/${personId}`,
   monitorHrefForPerson: (personId) => `/activity/person/${personId}`,
+  onAddDevice: noop,
 };
 
 const renderPage = (overrides: Partial<PeoplePageProps> = {}): ReactElement => (

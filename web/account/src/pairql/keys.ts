@@ -21,6 +21,7 @@ import type {
   GetPersonMacSettings,
   GetPersonUnlockRequests,
   GetSecurityEvents,
+  GetSuspensionRequestStatus,
   GetSuspensionRequests,
 } from '@shared/pairql/src/account';
 
@@ -85,6 +86,12 @@ export class Key extends QueryKey<never> {
 
   static get suspensionRequests(): QueryKey<GetSuspensionRequests.Output> {
     return new QueryKey([`requests`, `suspension`]);
+  }
+
+  static suspensionRequestStatus(
+    requestId: string,
+  ): QueryKey<GetSuspensionRequestStatus.Output> {
+    return new QueryKey([`requests`, `suspension`, requestId, `status`]);
   }
 
   static get securityEvents(): QueryKey<GetSecurityEvents.Output> {

@@ -13,7 +13,7 @@ extension DeleteAccountKeychain: Resolver {
     with input: Input,
     in context: AccountOwnerContext,
   ) async throws -> Output {
-    let keychain = try await context.privateKeychain(input.keychainId)
+    let keychain = try await context.keychain(input.keychainId)
     return try await DeleteEntity_v2.resolve(
       with: .init(id: keychain.id.rawValue, type: .keychain),
       in: context.legacyContext,

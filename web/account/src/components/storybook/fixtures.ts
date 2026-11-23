@@ -5,7 +5,6 @@ import type {
 } from '#/components/pages/person-settings/IosSettingsPage.types';
 import type { InstalledMacApp } from '#/components/pages/person-settings/MacSettingsPage.types';
 import type {
-  AllowedAlbum,
   Device,
   IOSDevice,
   Keychain,
@@ -38,13 +37,14 @@ export const weekdaySchedule: Schedule = {
 export const macDevice: Extract<Device, { type: `mac` }> = {
   id: `mac-1`,
   personId: `person-1`,
+  computerId: `computer-1`,
   type: `mac`,
   username: `jude`,
   name: `Jude's MacBook`,
   macOSVersion: `15.6`,
   modelName: `MacBook Air`,
   modelIdentifier: `MacBookAir10,1`,
-  online: true,
+  status: { case: `filterOn` },
 };
 
 export const iphoneDevice: IOSDevice = {
@@ -156,33 +156,6 @@ export const installedMacApps: InstalledMacApp[] = [
     name: `Scratch`,
     bundleId: `edu.mit.scratch`,
     appIconUrl: `/example-app-icons/scratch.webp`,
-  },
-];
-
-export const albums: AllowedAlbum[] = [
-  {
-    title: `Midnight Signals`,
-    artist: `Nova Vale`,
-    artworkUrl: `/example-album-art/midnight-signals.webp`,
-    showAlbumArt: true,
-  },
-  {
-    title: `Orange Light`,
-    artist: `Lumen Fields`,
-    artworkUrl: `/example-album-art/orange-light.webp`,
-    showAlbumArt: true,
-  },
-  {
-    title: `Echoes & Pines`,
-    artist: `Hollow Pines`,
-    artworkUrl: `/example-album-art/echoes-and-pines.webp`,
-    showAlbumArt: false,
-  },
-  {
-    title: `Tide Bloom`,
-    artist: `Mira Saint`,
-    artworkUrl: `/example-album-art/tide-bloom.webp`,
-    showAlbumArt: true,
   },
 ];
 
@@ -380,6 +353,7 @@ export const suspensionRequests: SuspensionRequest[] = [
     requestedDurationInSeconds: 30 * 60,
     duration: `30 minutes`,
     reason: `I need to download a school project from Google Drive.`,
+    requestedAt: new Date(Date.now() - 12 * 60 * 1000).toISOString(),
     extraMonitoringOptions: {
       k: `keylogging`,
       '@90': `1.5x screenshots`,
@@ -397,6 +371,7 @@ export const suspensionRequests: SuspensionRequest[] = [
     requestedDurationInSeconds: 5 * 60,
     duration: `5 minutes`,
     extraMonitoringOptions: {},
+    requestedAt: new Date(Date.now() - 20 * 1000).toISOString(),
   },
 ];
 

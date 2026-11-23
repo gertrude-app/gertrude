@@ -1,5 +1,4 @@
 import { Dialog } from '@base-ui/react/dialog';
-import { useLocation, useNavigate } from '@tanstack/react-router';
 import cx from 'clsx';
 import React from 'react';
 import { Drawer } from 'vaul';
@@ -7,7 +6,8 @@ import type {
   ResponsiveStackGap,
   ResponsiveStackJustify,
 } from '../primitives/stack-utils';
-import { normalizePath, useMediaQuery } from '../lib/utils';
+import { useRouteOpenState } from '../lib/useRouteOpenState';
+import { useMediaQuery } from '../lib/utils';
 import HStack from '../primitives/HStack';
 import Text from '../primitives/Text';
 import VStack from '../primitives/VStack';
@@ -57,13 +57,6 @@ const sizeClasses = {
 
 const horizontalPaddingClasses = `px-4 @lg/slide:px-6`;
 
-const getParentPath = (path: string): string => {
-  const normalizedPath = normalizePath(path);
-  const parentPath = normalizedPath.split(`/`).slice(0, -1).join(`/`);
-
-  return parentPath || `/`;
-};
-
 const SlideOverRoot: React.FC<SlideOverProps> = ({
   children,
   trigger,
@@ -82,37 +75,14 @@ const SlideOverRoot: React.FC<SlideOverProps> = ({
   overlayClassName,
 }) => {
   const isDesktop = useMediaQuery(`(min-width: 768px)`);
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
+  const routeState = useRouteOpenState({ path, closeTo, open, onOpenChange });
   const triggerElement = React.isValidElement(trigger) ? trigger : undefined;
-  const normalizedPath = path ? normalizePath(path) : undefined;
-  const resolvedCloseTo = normalizedPath
-    ? normalizePath(closeTo ?? getParentPath(normalizedPath))
-    : undefined;
-  const pathOpen = normalizedPath
-    ? pathname === normalizedPath || pathname.startsWith(`${normalizedPath}/`)
-    : undefined;
-  const resolvedOpen = normalizedPath ? pathOpen : open;
   const hasHeading = heading !== undefined || subheading !== undefined;
   const [overlayPortalContainer, setOverlayPortalContainer] =
     React.useState<HTMLElement | null>(null);
   const setContentRef = React.useCallback((node: HTMLDivElement | null) => {
     setOverlayPortalContainer(node);
   }, []);
-
-  const handleOpenChange = (nextOpen: boolean): void => {
-    if (normalizedPath && resolvedCloseTo) {
-      if (nextOpen && !pathOpen) {
-        void navigate({ to: normalizedPath });
-      }
-
-      if (!nextOpen && pathOpen) {
-        void navigate({ to: resolvedCloseTo });
-      }
-    }
-
-    onOpenChange?.(nextOpen);
-  };
 
   const Title = isDesktop ? Dialog.Title : Drawer.Title;
   const content = (
@@ -174,8 +144,8 @@ const SlideOverRoot: React.FC<SlideOverProps> = ({
   if (isDesktop) {
     return (
       <Dialog.Root
-        open={resolvedOpen}
-        defaultOpen={normalizedPath ? undefined : defaultOpen}
+        open={routeState.open}
+        defaultOpen={routeState.routed ? undefined : defaultOpen}
         onOpenChange={(nextOpen, eventDetails) => {
           if (
             !dismissible &&
@@ -187,7 +157,7 @@ const SlideOverRoot: React.FC<SlideOverProps> = ({
             return;
           }
 
-          handleOpenChange(nextOpen);
+          routeState.setOpen(nextOpen);
         }}
         disablePointerDismissal={!dismissible}
       >
@@ -220,9 +190,9 @@ const SlideOverRoot: React.FC<SlideOverProps> = ({
 
   return (
     <Drawer.Root
-      open={resolvedOpen}
-      defaultOpen={normalizedPath ? undefined : defaultOpen}
-      onOpenChange={handleOpenChange}
+      open={routeState.open}
+      defaultOpen={routeState.routed ? undefined : defaultOpen}
+      onOpenChange={routeState.setOpen}
       dismissible={dismissible}
       direction="bottom"
       autoFocus

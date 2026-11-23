@@ -8,6 +8,9 @@ import XExpect
 @testable import Api
 
 final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
+  private let wholeSecondNow = Date(timeIntervalSince1970: Date().timeIntervalSince1970
+    .rounded(.down))
+
   func testSummaryAndPersonDetailReturnOnlyAccountRequests() async throws {
     let child = try await self.child(with: { $0.name = "Jude" }).withDevice()
     let keychain = try await self.db.create(Keychain(
@@ -393,8 +396,8 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
     expectNoDifference(option.otherPeople, ["Lucy"])
   }
 
-  func testExplicitKeySettingsArePreservedAndIdenticalApprovalsAreReused() async throws {
-    let (child, request) = try await self.reviewFixture()
+  func testApprovalsReuseAnExistingKeyAndNeverShortenIt() async throws {
+    let child = try await self.reviewChild()
     let keychain = try await self.db.create(Keychain(parentId: child.parentId, name: "School"))
     try await self.db.create(ChildKeychain(childId: child.id, keychainId: keychain.id))
     let key = Gertie.Key.domain(domain: "example.com", scope: .webBrowsers)
@@ -402,51 +405,66 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
       keychainId: keychain.id,
       key: key,
       comment: "Existing",
-      deletedAt: .distantFuture,
+      deletedAt: self.hoursFromNow(3),
     ))
-    let action = DecideUnlockRequests.Action.acceptedKey(
-      keychainId: keychain.id,
-      key: key,
-      comment: "Permanent school access",
-      expiration: nil,
-    )
-    _ = try await DecideUnlockRequests.resolve(
-      with: .init(
-        personId: child.id,
-        decisions: [.init(requestIds: [request.id], action: action)],
-        responseComment: nil,
-      ),
-      in: self.accountContext(child.parent),
-    )
-    let second = try await self.db.create(UnlockRequest(
-      computerUserId: child.computerUser.id,
-      appBundleId: ".com.apple.Safari",
-      hostname: "example.com",
-    ))
-    _ = try await DecideUnlockRequests.resolve(
-      with: .init(
-        personId: child.id,
-        decisions: [.init(requestIds: [second.id], action: action)],
-        responseComment: nil,
-      ),
-      in: self.accountContext(child.parent),
-    )
-    let keys = try await keychain.keys(in: self.db)
-    expectNoDifference(keys.count, 2)
-    expectNoDifference(
-      keys.filter { $0.comment == "Permanent school access" }.first?.deletedAt,
-      nil,
-    )
-    let events = try await Api.SecurityEvent.query().where(.parentId == child.parentId)
-      .all(in: self.db)
-    let keyCreatedEvents = events.filter {
-      $0.event == Gertie.SecurityEvent.Dashboard.keyCreated.rawValue
+    let keyAfterApproving: (Date?, String?) async throws -> Api.Key = { expiration, comment in
+      try await self.approve(
+        key,
+        in: keychain,
+        for: child,
+        comment: comment,
+        expiration: expiration,
+      )
+      let keys = try await keychain.keys(in: self.db)
+      expectNoDifference(keys.count, 1) // reused, never duplicated
+      return keys[0]
     }
-    expectNoDifference(keyCreatedEvents.count, 1)
-    expectNoDifference(
-      keyCreatedEvents.first?.detail,
-      "key opening \(key.simpleDescription) added to keychain 'School'",
+
+    var current = try await keyAfterApproving(self.hoursFromNow(1), nil)
+    expectNoDifference(current.deletedAt, self.hoursFromNow(3)) // shorter grant doesn't shorten it
+    expectNoDifference(current.comment, "Existing") // no new note, keep the old one
+
+    current = try await keyAfterApproving(self.hoursFromNow(5), nil)
+    expectNoDifference(current.deletedAt, self.hoursFromNow(5))
+
+    current = try await keyAfterApproving(nil, "Permanent")
+    expectNoDifference(current.deletedAt, nil)
+    expectNoDifference(current.comment, "Permanent")
+
+    current = try await keyAfterApproving(self.hoursFromNow(1), nil)
+    expectNoDifference(current.deletedAt, nil) // permanent stays permanent
+  }
+
+  private func approve(
+    _ key: Gertie.Key,
+    in keychain: Keychain,
+    for child: ChildWithComputerEntities,
+    comment: String?,
+    expiration: Date?,
+  ) async throws {
+    let request = try await self.pendingRequest(for: child)
+    _ = try await DecideUnlockRequests.resolve(
+      with: .init(
+        personId: child.id,
+        decisions: [.init(
+          requestIds: [request.id],
+          action: .acceptedKey(
+            keychainId: keychain.id,
+            key: key,
+            comment: comment,
+            expiration: expiration,
+          ),
+        )],
+        responseComment: nil,
+      ),
+      in: self.accountContext(child.parent),
     )
+    let resolved = try await self.db.find(request.id)
+    expectNoDifference(resolved.status, .accepted)
+  }
+
+  private func hoursFromNow(_ hours: Int) -> Date {
+    self.wholeSecondNow.addingTimeInterval(Double(hours * 3600))
   }
 
   func testFullAppApprovalRemovesExistingScheduleAndLogsTheChange() async throws {
@@ -546,13 +564,20 @@ final class UnlockRequestsResolverTests: ApiTestCase, @unchecked Sendable {
   }
 
   private func reviewFixture() async throws -> (ChildWithComputerEntities, UnlockRequest) {
-    let child = try await self.child().withDevice { $0.appVersion = "2.9.0" }
-    let request = try await self.db.create(UnlockRequest(
+    let child = try await self.reviewChild()
+    return try await (child, self.pendingRequest(for: child))
+  }
+
+  private func reviewChild() async throws -> ChildWithComputerEntities {
+    try await self.child().withDevice { $0.appVersion = "2.9.0" }
+  }
+
+  private func pendingRequest(for child: ChildWithComputerEntities) async throws -> UnlockRequest {
+    try await self.db.create(UnlockRequest(
       computerUserId: child.computerUser.id,
       appBundleId: ".com.apple.Safari",
       hostname: "example.com",
     ))
-    return (child, request)
   }
 
   func testRejectsRequestFromAnotherAccountPerson() async throws {

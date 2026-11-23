@@ -21,15 +21,6 @@ extension AccountRequestMagicLink: Resolver {
 }
 
 private func validatedAccountRedirect(_ redirect: String?) -> String? {
-  guard
-    let redirect,
-    redirect.hasPrefix("/"),
-    !redirect.hasPrefix("//"),
-    !redirect.contains("\\"),
-    redirect.rangeOfCharacter(from: .controlCharacters) == nil,
-    let components = URLComponents(string: redirect),
-    components.scheme == nil,
-    components.host == nil
-  else { return nil }
+  guard let redirect, redirect.isLocalAppPath else { return nil }
   return redirect
 }

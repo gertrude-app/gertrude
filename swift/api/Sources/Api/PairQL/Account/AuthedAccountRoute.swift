@@ -60,6 +60,7 @@ enum AuthedAccountRoute: PairRoute {
   case saveMusicAlbumCuration(SaveMusicAlbumCuration.Input)
   case requestAccountPublicKeychain(RequestAccountPublicKeychain.Input)
   case getSuspensionRequests
+  case getSuspensionRequestStatus(GetSuspensionRequestStatus.Input)
   case decideSuspensionRequest(DecideSuspensionRequest.Input)
   case getAccountUnlockRequestSummary
   case getPersonUnlockRequests(GetPersonUnlockRequests.Input)
@@ -292,6 +293,10 @@ enum AuthedAccountRoute: PairRoute {
     Route(.case(Self.getSuspensionRequests)) {
       Operation(GetSuspensionRequests.self)
     }
+    Route(.case(Self.getSuspensionRequestStatus)) {
+      Operation(GetSuspensionRequestStatus.self)
+      Body(.accountInput(GetSuspensionRequestStatus.self))
+    }
     Route(.case(Self.decideSuspensionRequest)) {
       Operation(DecideSuspensionRequest.self)
       Body(.accountInput(DecideSuspensionRequest.self))
@@ -516,6 +521,9 @@ extension AuthedAccountRoute: RouteResponder {
       return try await self.respond(with: output)
     case .getSuspensionRequests:
       let output = try await GetSuspensionRequests.resolve(in: context)
+      return try await self.respond(with: output)
+    case .getSuspensionRequestStatus(let input):
+      let output = try await GetSuspensionRequestStatus.resolve(with: input, in: context)
       return try await self.respond(with: output)
     case .decideSuspensionRequest(let input):
       let output = try await DecideSuspensionRequest.resolve(with: input, in: context)

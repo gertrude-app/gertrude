@@ -1,11 +1,12 @@
 import { PageHeading } from '@gertrude/ui';
 import { StoryScreen, galleryParameters } from '@gertrude/ui/src/storybook/StoryLayout';
-import ActivityFeedPage from './ActivityFeedPage';
-import ActivityOverviewPage from './ActivityOverviewPage';
+import { formatDate } from '@shared/datetime';
+import ActivityFeed from '#/components/activity/ActivityFeed';
 import {
   ActivityFeedLoadingState,
   ActivityOverviewLoadingState,
 } from '#/components/activity/ActivityLoadingStates';
+import ActivityOverviewList from '#/components/activity/ActivityOverviewList';
 import DashboardPage from '#/components/layout/DashboardPage';
 import { activityItems, daySummaries } from '#/components/storybook/fixtures';
 
@@ -48,12 +49,16 @@ export const Overview = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <ActivityOverviewPage
-        title="All Activity"
-        subtitle="Items are automatically deleted after 14 days."
-        days={daySummaries}
-        dayLink={{ scope: `all` }}
-      />
+      <DashboardPage
+        heading={
+          <PageHeading
+            title="All Activity"
+            subtitle="Items are automatically deleted after 14 days."
+          />
+        }
+      >
+        <ActivityOverviewList days={daySummaries} dayLink={{ scope: `all` }} />
+      </DashboardPage>
     </StoryScreen>
   ),
 };
@@ -63,13 +68,20 @@ export const PersonOverview = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <ActivityOverviewPage
-        title="Jude's Activity"
-        subtitle="Items are automatically deleted after 14 days."
-        days={daySummaries}
-        dayLink={{ scope: `person`, personId: `person-1` }}
-        breadcrumbs={[{ text: `All Activity`, href: `/activity` }]}
-      />
+      <DashboardPage
+        heading={
+          <PageHeading
+            title="Jude's Activity"
+            subtitle="Items are automatically deleted after 14 days."
+            breadcrumbs={[{ text: `All Activity`, href: `/activity` }]}
+          />
+        }
+      >
+        <ActivityOverviewList
+          days={daySummaries}
+          dayLink={{ scope: `person`, personId: `person-1` }}
+        />
+      </DashboardPage>
     </StoryScreen>
   ),
 };
@@ -78,14 +90,21 @@ export const Day = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <ActivityFeedPage
-        date={new Date(2026, 6, 3)}
-        items={dayActivityItems}
-        breadcrumbs={[{ text: `All Activity`, href: `/activity` }]}
-        onToggleFlag={noop}
-        onDelete={noop}
-        onDeletePersonActivity={noop}
-      />
+      <DashboardPage
+        heading={
+          <PageHeading
+            title={formatDate(new Date(2026, 6, 3), `long`)}
+            breadcrumbs={[{ text: `All Activity`, href: `/activity` }]}
+          />
+        }
+      >
+        <ActivityFeed
+          items={dayActivityItems}
+          onToggleFlag={noop}
+          onDelete={noop}
+          onDeletePersonActivity={noop}
+        />
+      </DashboardPage>
     </StoryScreen>
   ),
 };
@@ -95,19 +114,26 @@ export const PersonDay = {
   parameters: galleryParameters,
   render: () => (
     <StoryScreen>
-      <ActivityFeedPage
-        date={new Date(2026, 6, 3)}
-        items={dayActivityItems.filter((item) => item.personName === `Jude`)}
-        personName="Jude"
-        showPersonHeading={false}
-        breadcrumbs={[
-          { text: `All Activity`, href: `/activity` },
-          { text: `Jude's Activity`, href: `/activity/person/person-1` },
-        ]}
-        onToggleFlag={noop}
-        onDelete={noop}
-        onDeletePersonActivity={noop}
-      />
+      <DashboardPage
+        heading={
+          <PageHeading
+            title={formatDate(new Date(2026, 6, 3), `long`)}
+            breadcrumbs={[
+              { text: `All Activity`, href: `/activity` },
+              { text: `Jude's Activity`, href: `/activity/person/person-1` },
+            ]}
+          />
+        }
+      >
+        <ActivityFeed
+          items={dayActivityItems.filter((item) => item.personName === `Jude`)}
+          personName="Jude"
+          showPersonHeading={false}
+          onToggleFlag={noop}
+          onDelete={noop}
+          onDeletePersonActivity={noop}
+        />
+      </DashboardPage>
     </StoryScreen>
   ),
 };

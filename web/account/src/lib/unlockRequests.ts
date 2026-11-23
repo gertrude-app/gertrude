@@ -308,6 +308,20 @@ export const sanitizeRequestedAddress = (request: UnlockRequestRow): string => {
   return request.domain ?? request.ipAddress ?? `Unknown address`;
 };
 
+export const requestedAddressLink = (request: UnlockRequestRow): string | undefined => {
+  if (request.url) {
+    try {
+      const url = new URL(request.url);
+      if (url.protocol === `http:` || url.protocol === `https:`) {
+        return `${url.protocol}//${url.host}${url.pathname}`;
+      }
+    } catch {
+      return request.domain ? `https://${request.domain}` : undefined;
+    }
+  }
+  return request.domain ? `https://${request.domain}` : undefined;
+};
+
 const requestCountForEntry = (entry: UnlockReviewEntry): number =>
   entry.kind === `web`
     ? entry.group.requestIds.length

@@ -114,6 +114,7 @@ enum AccountTsCodegenRoute: PairQLTsCodegenRoute {
       SaveMusicAlbumCuration.self,
       RequestAccountPublicKeychain.self,
       GetSuspensionRequests.self,
+      GetSuspensionRequestStatus.self,
       DecideSuspensionRequest.self,
       GetAccountUnlockRequestSummary.self,
       GetPersonUnlockRequests.self,

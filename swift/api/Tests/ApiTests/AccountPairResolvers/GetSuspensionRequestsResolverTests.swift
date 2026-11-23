@@ -135,4 +135,57 @@ final class GetSuspensionRequestsResolverTests: ApiTestCase, @unchecked Sendable
     let output = try await GetSuspensionRequests.resolve(in: self.accountContext(parent))
     expect(output).toBeEmpty()
   }
+
+  func testStatusReportsPendingDecidedAndExpiredRequests() async throws {
+    let child = try await self.child(with: { $0.name = "Jude" }).withDevice()
+    let context = self.accountContext(child.parent)
+    let status = { (id: MacApp.SuspendFilterRequest.Id) in
+      try await GetSuspensionRequestStatus.resolve(with: .init(id: id), in: context)
+    }
+
+    let pending = try await self.db.create(MacApp.SuspendFilterRequest(
+      computerUserId: child.computerUser.id,
+      scope: .unrestricted,
+    ))
+    let accepted = try await self.db.create(MacApp.SuspendFilterRequest(
+      computerUserId: child.computerUser.id,
+      status: .accepted,
+      scope: .unrestricted,
+      duration: .init(1800),
+    ))
+    let rejected = try await self.db.create(MacApp.SuspendFilterRequest(
+      computerUserId: child.computerUser.id,
+      status: .rejected,
+      scope: .unrestricted,
+    ))
+    var expired = try await self.db.create(MacApp.SuspendFilterRequest(
+      computerUserId: child.computerUser.id,
+      scope: .unrestricted,
+    ))
+    try await expired.modifyCreatedAt(.exact(.reference - .hours(2) - 1))
+
+    await expect(try status(pending.id).status).toEqual(.pending)
+    let acceptedStatus = try await status(accepted.id)
+    expect(acceptedStatus.status).toEqual(.accepted)
+    expect(acceptedStatus.durationInSeconds).toEqual(1800)
+    expect(acceptedStatus.personName).toEqual("Jude")
+    await expect(try status(rejected.id).status).toEqual(.rejected)
+    await expect(try status(expired.id).status).toEqual(.expired)
+  }
+
+  func testStatusRejectsRequestsFromAnotherAccount() async throws {
+    let parent = try await self.parent()
+    let otherChild = try await self.child().withDevice()
+    let request = try await self.db.create(MacApp.SuspendFilterRequest(
+      computerUserId: otherChild.computerUser.id,
+      scope: .unrestricted,
+    ))
+
+    try await expectErrorFrom {
+      try await GetSuspensionRequestStatus.resolve(
+        with: .init(id: request.id),
+        in: self.accountContext(parent),
+      )
+    }.toContain("notFound")
+  }
 }

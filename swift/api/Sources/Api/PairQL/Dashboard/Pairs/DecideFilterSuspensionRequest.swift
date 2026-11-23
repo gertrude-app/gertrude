@@ -31,6 +31,14 @@ extension DecideFilterSuspensionRequest: Resolver {
 
     switch decision {
     case .accepted(let duration, let extraMonitoring):
+      guard (60 ... 7 * 24 * 60 * 60).contains(duration.rawValue) else {
+        throw context.error(
+          id: "9212fa5e",
+          type: .badRequest,
+          debugMessage: "suspension duration out of range: \(duration.rawValue)s",
+          userMessage: "Choose a suspension between 1 minute and 7 days.",
+        )
+      }
       suspendFilterRequest.duration = duration
       suspendFilterRequest.status = .accepted
       suspendFilterRequest.extraMonitoring = extraMonitoring?.magicString

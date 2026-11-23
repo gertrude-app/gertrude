@@ -59,7 +59,9 @@ const SettingsRoute: React.FC = () => {
       }
       notificationsHref="/settings/notifications"
       billingHref="/settings/billing"
-      onChangePassword={() => void navigate({ to: `/reset-password` })}
+      onChangePassword={() =>
+        void navigate({ to: `/reset-password`, search: { email: query.data?.email } })
+      }
     >
       <Outlet />
     </SettingsShellPage>

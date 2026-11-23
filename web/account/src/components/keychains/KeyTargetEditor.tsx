@@ -44,7 +44,7 @@ const targetInputCopy = (
       return {
         label: `Domain pattern`,
         placeholder: `^.*\\.edu$`,
-        helperText: `Case-insensitive regular expression matched against the hostname only.`,
+        helperText: `Case-insensitive regular expression matched against the hostname only. Use ^ and $ to match the whole hostname. Without them, \\.edu also matches school.edu.example.com.`,
       };
   }
 };
@@ -66,14 +66,7 @@ const subdomainExamples = (state: KeyEditorState): string[] => {
     return [];
   }
 
-  const examples = details.hasSubdomain ? [details.hostname] : [];
-  for (const prefix of [`images`, `api`, `docs`]) {
-    const example = `${prefix}.${details.registrableDomain}`;
-    if (!examples.includes(example)) {
-      examples.push(example);
-    }
-  }
-  return examples.slice(0, 3);
+  return [`images`, `api`, `docs`].map((prefix) => `${prefix}.${details.hostname}`);
 };
 
 const MatchingEditor: React.FC<{
@@ -91,7 +84,8 @@ const MatchingEditor: React.FC<{
         <VStack gap={0.5} className="min-w-0">
           <Text variant="bodyStrong">Include subdomains</Text>
           <Text variant="captionSubtle" className="leading-5">
-            {`Allow any hostname underneath ${details?.registrableDomain ?? `this website`}, like `}
+            {`Also allow any hostname underneath ${details?.hostname ?? `this website`}`}
+            {examples.length > 0 && `, like `}
             {examples.map((example, index) => (
               <React.Fragment key={example}>
                 {index > 0 && (index === examples.length - 1 ? `, or ` : `, `)}
