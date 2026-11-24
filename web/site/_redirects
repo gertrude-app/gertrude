@@ -60,8 +60,8 @@
 ###################
 # temp conference #
 ###################
-/ghc https://parents.gertrude.app/conf-booth 302
-/workshop https://parents.gertrude.app/conf-workshop 302
+/ghc https://account.gertrude.app/signup 302
+/workshop https://account.gertrude.app/signup 302
 
 ########
 # misc #
@@ -92,7 +92,7 @@
 ##############
 # onboarding #
 ##############
-/start https://parents.gertrude.app/signup 302
+/start https://account.gertrude.app/signup 302
 
 # CREATE MACOS USER (current: 2.5.0+)
 # catalina, big sur, and monterey are same
@@ -137,7 +137,7 @@
 /su-gg https://youtu.be/mjI6l_Hx-CU 302
 
 # edit children
-/a-c https://parents.gertrude.app/children 302
+/a-c https://account.gertrude.app/people 302
 
 ####################
 # supervision tool #
