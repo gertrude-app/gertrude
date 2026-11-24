@@ -41,7 +41,7 @@ const BlockApps: React.FC<Props> = ({ apps, childName }) => {
           be able to open at all.
         </Onboarding.Text>
         <Onboarding.Text className="mt-3 text-sm !text-slate-400">
-          You can always change this later from the parent dashboard.
+          You can always change this later from the Gertrude account site.
         </Onboarding.Text>
         <div className="mt-8">
           <Button

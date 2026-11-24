@@ -27,7 +27,7 @@ const CustomKeychains: React.FC<Props> = ({ unlocked, request }) => {
       <Onboarding.Text centered className="mt-5 mb-8 max-w-xl">
         If you already know sites your child will need to reach&mdash;a school portal,
         family site, sports team, etc.&mdash;add them here and Gertrude will unlock them.
-        You can always add more later from the parents website.
+        You can always add more later from the Gertrude account site.
       </Onboarding.Text>
 
       <form

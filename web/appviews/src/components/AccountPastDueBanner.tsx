@@ -14,7 +14,7 @@ const AccountPastDueBanner: React.FC<{
     Gertrude account is past due!{` `}
     {!small && (
       <>
-        Login to the Gertrude parent site before the app
+        Login to the Gertrude account site before the app
         {` `}
         <b>loses functionality.</b>
       </>

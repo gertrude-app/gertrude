@@ -61,7 +61,7 @@ const AlwaysBlockedGroups: React.FC<Props> = ({ groups, preselected }) => {
           Most parents want a few things to stay blocked <b>no matter what</b>&mdash;even
           {` `}
           <b>during a filter suspension.</b> These are our recommendations, but you can
-          customize or add custom blocks later from the parent website.
+          customize or add custom blocks later from the Gertrude account site.
         </Onboarding.Text>
 
         <div className="mt-8 space-y-2 w-full">

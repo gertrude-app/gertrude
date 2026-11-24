@@ -15,15 +15,13 @@ const GetConnectionCode: React.FC = () => {
         <div className="flex">
           <div className="space-y-4">
             <p>
-              The first time you logged in to your Gertrude parent account, you were
-              instructed to create a <b>Child</b>&mdash;that is, someone who will be
-              protected by Gertrude. From the parent site, you can click a button to get a
-              one-time six-digit <b>connection code</b> that connects that child to this
-              computer.
+              Everyone protected by Gertrude is listed under <b>People</b> on the Gertrude
+              account site. From there, you can get a one-time six-digit{` `}
+              <b>connection code</b> that connects that person to this computer.
             </p>
             <p>
               Aim your phone’s camera at the QR code to navigate to the right screen to
-              get this code, or to create a child if you haven’t already.
+              get this code, or to add a person if you haven’t already.
             </p>
           </div>
           <QRCode url="gertrude.app/a-c" />
@@ -32,10 +30,10 @@ const GetConnectionCode: React.FC = () => {
       <div className="!ml-0">
         <Onboarding.Heading>Get Connection Code</Onboarding.Heading>
         <Onboarding.Text className="mt-4 mb-6 max-w-2xl">
-          On your <b>phone,</b> open the Gertrude parents website at{` `}
-          <span className="text-pink-500 font-medium">https://parents.gertrude.app</span>,
-          and select the child you want to connect to. Then, click the{` `}
-          <b>Get Connection Code</b> button.
+          On your <b>phone,</b> open the Gertrude account site at{` `}
+          <span className="text-pink-500 font-medium">https://account.gertrude.app</span>.
+          Find the person who will use this computer, click <b>Add a device</b>, and
+          choose <b>Mac</b>. Then, click the <b>Get connection code</b> button.
         </Onboarding.Text>
         <Onboarding.ButtonGroup
           primary="Got it, next"

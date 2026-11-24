@@ -29,7 +29,7 @@ const OptOutOfFiltering: React.FC = () => {
           </p>
           <p>
             If you’re not sure what to do, keep filtering <b>enabled.</b> You can always
-            change this later from the Gertrude parents account website.
+            change this later from the Gertrude account site.
           </p>
         </div>
       </InformationModal>

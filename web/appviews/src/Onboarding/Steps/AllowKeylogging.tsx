@@ -25,12 +25,12 @@ const AllowKeylogging: React.FC<Props> = ({ step }) => {
             <b>
               <i>use </i>
             </b>
-            this permission if you enable it from the parents website, but it’s important
-            that we <i>have the permission ready,</i> so that at any time and from
-            anywhere you can turn it on. For example, if your child requests a temporary
-            filter suspension, you can instruct Gertrude from wherever you are to record
-            their typing <i>only during the filter suspension,</i> provided the permission
-            has already been granted.
+            this permission if you enable it from the Gertrude account site, but it’s
+            important that we <i>have the permission ready,</i> so that at any time and
+            from anywhere you can turn it on. For example, if your child requests a
+            temporary filter suspension, you can instruct Gertrude from wherever you are
+            to record their typing <i>only during the filter suspension,</i> provided the
+            permission has already been granted.
           </InformationModal>
           <Onboarding.Heading>Now let’s allow keylogging</Onboarding.Heading>
           <Onboarding.Text className="mt-4 mb-8 max-w-3xl" centered>
