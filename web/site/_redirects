@@ -60,8 +60,8 @@
 ###################
 # temp conference #
 ###################
-/ghc https://account.gertrude.app/signup 302
-/workshop https://account.gertrude.app/signup 302
+/ghc https://parents.gertrude.app/conf-booth 302
+/workshop https://parents.gertrude.app/conf-workshop 302
 
 ########
 # misc #
