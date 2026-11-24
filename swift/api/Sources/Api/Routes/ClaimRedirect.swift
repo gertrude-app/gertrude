@@ -21,9 +21,12 @@ enum ClaimRedirectRoute {
     let intent = claim?.intent ?? urlIntent
     let landing = "\(dashboardUrl)/\(intent.unauthedLandingRoute)"
 
-    guard let claim else {
+    guard var claim else {
       return request.redirect(to: "\(landing)?error=missing_code", redirectType: .temporary)
     }
+    claim.linkFirstOpenedAt = claim.linkFirstOpenedAt ?? get(dependency: \.date.now)
+    claim.linkOpenCount += 1
+    _ = try? await request.context.db.update(claim)
     let device = try await claim.device(in: request.context.db)
 
     if device.childId == nil,
