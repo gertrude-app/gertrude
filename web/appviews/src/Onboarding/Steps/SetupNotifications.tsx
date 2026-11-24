@@ -172,7 +172,7 @@ export const SetupNotificationsSuccess: React.FC = () => (
     <Header />
     <Onboarding.Heading centered>Notifications are on</Onboarding.Heading>
     <Onboarding.Text centered className="mt-3 mb-8 max-w-xl">
-      You can change these any time from the parents website.
+      You can change these any time from the Gertrude account site.
     </Onboarding.Text>
     <Onboarding.PrimaryButton icon="fa-solid fa-arrow-right">
       Continue

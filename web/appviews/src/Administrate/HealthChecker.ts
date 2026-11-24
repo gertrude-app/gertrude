@@ -256,13 +256,13 @@ export default class HealthChecker {
         return {
           title: `Gertrude account status`,
           state: `warn`,
-          message: `Needs attention: log in to the Gertrude parents website for more details`,
+          message: `Needs attention: log in to the Gertrude account site for more details`,
         };
       default:
         return {
           title: `Gertrude account status`,
           state: `fail`,
-          message: `Log in to the Gertrude parents website to resolve`,
+          message: `Log in to the Gertrude account site to resolve`,
         };
     }
   }

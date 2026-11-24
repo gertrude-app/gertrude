@@ -84,7 +84,7 @@ const SelectPublicKeychains: React.FC<Props> = ({ keychains }) => {
         <Onboarding.Text className="mt-4">
           Public keychains are created by Gertrude, and each one unlocks a widely-used
           website or service. Choose any that look useful. You can always add or remove
-          keychains later from the parent dashboard.
+          keychains later from the Gertrude account site.
         </Onboarding.Text>
         <div className="mt-8">
           <Button

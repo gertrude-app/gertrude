@@ -36,8 +36,8 @@ const InactiveAccountScreen: React.FC<Props> = ({ short, onRecheck, onDisconnect
             </p>
           )}
           <p>
-            To <strong>restore the account,</strong> login to the Gertrude parent site and
-            resolve the payment issue, then click the <strong>Recheck</strong>
+            To <strong>restore the account,</strong> login to the Gertrude account site
+            and resolve the payment issue, then click the <strong>Recheck</strong>
             {` `}
             button below.
           </p>

@@ -36,7 +36,7 @@ const EnteringConnectionCode: React.FC<Props> = ({ emit, connectionCode, dispatc
             Enter connection code
           </h3>
           <h4 className="text-black/50 font-medium dark:text-white/60">
-            from Gertrude parent site
+            from the Gertrude account site
           </h4>
         </div>
         <div className="flex justify-center rounded-2xl space-x-1 bg-white/20 p-4">

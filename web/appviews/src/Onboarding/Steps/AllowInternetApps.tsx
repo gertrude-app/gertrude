@@ -40,7 +40,7 @@ const AllowInternetApps: React.FC<Props> = ({ apps }) => {
         </Onboarding.Text>
         <Onboarding.Text className="mt-3 text-sm !text-slate-400">
           Unsure? Leave it without access. You can always grant internet later from the
-          parent dashboard.
+          Gertrude account site.
         </Onboarding.Text>
         <div className="mt-8">
           <Button

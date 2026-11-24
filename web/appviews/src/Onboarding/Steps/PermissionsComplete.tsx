@@ -37,7 +37,7 @@ const PermissionsComplete: React.FC = () => {
             )}
           >
             Don’t worry if you’re unsure about anything&mdash;you can always change them
-            later from the Gertrude parent’s website.
+            later from the Gertrude account site.
           </p>
           <div
             className={cx(

@@ -27,7 +27,7 @@ const ConnectChild: React.FC<Props> = ({ connectionCode, request }) => {
       >
         <h1 className="text-3xl font-bold">Connect a child</h1>
         <p className="text-lg text-slate-500 mt-4">
-          Enter the 6-digit connection code from the Gertrude parent’s site:
+          Enter the 6-digit connection code from the Gertrude account site:
         </p>
         <div className="flex mt-8 space-x-4">
           <CodeInput

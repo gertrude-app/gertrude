@@ -31,7 +31,7 @@ const ConfigureDowntime: React.FC = () => {
       <Onboarding.Heading centered>Set up downtime?</Onboarding.Heading>
       <Onboarding.Text centered className="mt-3 mb-6 max-w-lg">
         Downtime blocks <b>all internet access</b> during a daily window&mdash;like
-        nighttime hours. This can also be set up later from the parents website.
+        nighttime hours. This can also be set up later from the Gertrude account site.
       </Onboarding.Text>
       {saved && (
         <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl px-4 py-2 mb-4 text-sm font-medium">
