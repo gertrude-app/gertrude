@@ -33,6 +33,8 @@ enum ClaimRedirectRoute {
 
     var components = URLComponents()
     components.queryItems = [
+      .init(name: "modelName", value: device.modelName),
+      .init(name: "modelIdentifier", value: device.modelIdentifier),
       .init(name: "redirect", value: intent.accountClaimPath(code: code)),
     ]
     return request.redirect(

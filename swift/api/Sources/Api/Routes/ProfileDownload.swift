@@ -301,7 +301,7 @@ private let SUBSCRIPTION_REQUIRED_HTML = noticePageHtml(
   paragraphs: [
     """
     Gertrude supervision requires a paid subscription ($10/year). Subscribe at \
-    <span class="url">https://parents.gertrude.app</span> and then try again.
+    <span class="url">https://account.gertrude.app</span> and then try again.
     """,
   ],
 )

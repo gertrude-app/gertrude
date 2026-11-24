@@ -11,8 +11,28 @@ extension GetAccountStatus: NoInputResolver {
     return Output(
       childId: ctx.child.id.rawValue,
       childName: ctx.child.name,
-      subscription: account.amSubscriptionState(forInstall: ctx.install),
+      subscription: account.amSubscriptionState(forInstall: ctx.install)
+        .withRemediationUrl(ctx.env.accountBillingUrl),
     )
+  }
+}
+
+extension AmSubscriptionState {
+  func withRemediationUrl(_ url: URL?) -> Self {
+    switch self {
+    case .unpaid:
+      .unpaid(remediationUrl: url)
+    case .legacyExpired(let paidAt, _):
+      .legacyExpired(paidAt: paidAt, remediationUrl: url)
+    case .complimentary, .active, .fullTrial, .amTrial, .legacyGrandfathered:
+      self
+    }
+  }
+}
+
+extension Env {
+  var accountBillingUrl: URL? {
+    URL(string: "\(self.accountDashboardUrl.withoutTrailingSlashes)/settings/billing")
   }
 }
 

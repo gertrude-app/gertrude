@@ -28,7 +28,8 @@ extension GetTrialStatus: Resolver {
         token: token.value.rawValue,
         childId: child.id.rawValue,
         childName: child.name,
-        subscription: account.amSubscriptionState(forInstall: install),
+        subscription: account.amSubscriptionState(forInstall: install)
+          .withRemediationUrl(ctx.env.accountBillingUrl),
       )
     }
 

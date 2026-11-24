@@ -67,7 +67,7 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await self.resolveStatus(for: child)
 
-    expect(output.subscription).toEqual(.unpaid(remediationUrl: nil))
+    expect(output.subscription).toEqual(.unpaid(remediationUrl: self.env.accountBillingUrl))
   }
 
   func testActivePaidSubscriptionReturnsActive() async throws {
@@ -159,7 +159,10 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await self.resolveStatus(for: child)
 
-    expect(output.subscription).toEqual(.legacyExpired(paidAt: paidAt, remediationUrl: nil))
+    expect(output.subscription).toEqual(.legacyExpired(
+      paidAt: paidAt,
+      remediationUrl: self.env.accountBillingUrl,
+    ))
   }
 
   func testActiveSubscriptionOutranksLegacyFloor() async throws {
@@ -226,7 +229,7 @@ final class GetAccountStatusResolverTests: ApiTestCase, @unchecked Sendable {
 
     let output = try await self.resolveStatus(for: child, installedDaysAgo: 30)
 
-    expect(output.subscription).toEqual(.unpaid(remediationUrl: nil))
+    expect(output.subscription).toEqual(.unpaid(remediationUrl: self.env.accountBillingUrl))
   }
 
   func testAmTrialOutranksLegacyExpired() async throws {

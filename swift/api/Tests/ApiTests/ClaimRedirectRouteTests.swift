@@ -24,9 +24,13 @@ final class ClaimRedirectRouteTests: ApiTestCase, @unchecked Sendable {
       afterResponse: { (res: XCTHTTPResponse) async throws in
         expect(res.status).toEqual(.temporaryRedirect)
         let location = res.headers.first(name: .location)!
-        expect(location).toEqual(
-          "\(self.env.accountDashboardUrl.withoutTrailingSlashes)/signup?redirect=/connect/blockerSupervise/\(code)",
-        )
+        expect(location).toContain("\(self.env.accountDashboardUrl.withoutTrailingSlashes)/signup?")
+        let query = URLComponents(string: location)?.queryItems ?? []
+        expect(query).toEqual([
+          .init(name: "modelName", value: device.modelName),
+          .init(name: "modelIdentifier", value: "iPad14,1"),
+          .init(name: "redirect", value: "/connect/blockerSupervise/\(code)"),
+        ])
       },
     )
   }
