@@ -128,6 +128,7 @@ extension Configure {
     app.migrations.add(CreateIOSDeviceTransitions())
     app.migrations.add(AddParentSetupApps())
     app.migrations.add(AddStripeSubscriptionCancelAt())
+    app.migrations.add(AddClaimLinkOpens())
   }
 }
 
