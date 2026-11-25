@@ -139,6 +139,7 @@ const albumCuration: GetMusicAlbumCuration.Output = {
   catalogTrackCount: 3,
   selectedTrackCount: 1,
   canEdit: true,
+  isUnavailableInStorefront: false,
   tracks: [
     {
       id: `track-1`,

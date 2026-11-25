@@ -71,7 +71,7 @@ export class Key extends QueryKey<never> {
   ): QueryKey<GetMusicAlbumCuration.Output> {
     return new QueryKey(
       `children/:id/music-curation/:album-id`,
-      [`children`, childId, `music`, `curation`, albumId],
+      [`children`, childId, `music`, `album-curation`, albumId],
       childId,
     );
   }

@@ -277,6 +277,7 @@ describe(`children screen`, () => {
         selectedTrackCount: 1,
         catalogTrackCount: 3,
         canEdit: true,
+        isUnavailableInStorefront: false,
         tracks: [
           {
             id: `track-1`,
@@ -345,6 +346,7 @@ describe(`children screen`, () => {
           selectedTrackCount: 2,
           catalogTrackCount: 3,
           canEdit: true,
+          isUnavailableInStorefront: false,
           tracks: [
             {
               id: `track-1`,

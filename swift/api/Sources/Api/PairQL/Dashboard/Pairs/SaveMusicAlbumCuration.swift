@@ -18,14 +18,18 @@ struct SaveMusicAlbumCuration: Pair {
 extension SaveMusicAlbumCuration: Resolver {
   static func resolve(with input: Input, in context: ParentContext) async throws -> Output {
     let child = try await context.verifiedChildWithConnectedMusicApp(from: input.childId)
-    let album = try await get(dependency: \.appleMusic).resolveAlbum(.init(
-      storefront: child.appleMusicStorefront,
-      albumId: input.appleMusicAlbumId,
-    ))
+    let catalogAlbum = try await resolveMusicCurationCatalogAlbum(
+      input.appleMusicAlbumId,
+      for: child,
+    )
     let now = get(dependency: \.date.now)
     return try await context.db.withTransaction { db in
       try await Music.LibrarySnapshotRepository.lock(childId: child.id, in: db)
       let policy = try await Music.CatalogPolicy.load(childId: child.id, in: db)
+      let source = try policy.albumCurationSource(
+        input.appleMusicAlbumId,
+        catalogAlbum: catalogAlbum,
+      )
       let revision = try await musicCurationRevision(
         childId: child.id,
         policy: policy,
@@ -36,14 +40,14 @@ extension SaveMusicAlbumCuration: Resolver {
         return .init(
           status: .conflict,
           curation: policy.curation(revision: revision),
-          album: policy.albumCuration(album: album, revision: revision),
+          album: policy.albumCuration(source, revision: revision),
         )
       }
 
       let plan: Music.CatalogPolicy.AlbumSelectionPlan
       do {
-        plan = try policy.coverage.planAlbumSelection(
-          for: album,
+        plan = try policy.planAlbumSelection(
+          for: source,
           selectedTrackIds: input.selectedTrackIds,
         )
       } catch let error as Music.CatalogPolicy.AlbumSelectionError {
@@ -62,14 +66,14 @@ extension SaveMusicAlbumCuration: Resolver {
         return .init(
           status: .coveredByArtist,
           curation: policy.curation(revision: revision),
-          album: policy.albumCuration(album: album, revision: revision),
+          album: policy.albumCuration(source, revision: revision),
         )
       }
 
       let changed = try await Music.CatalogPolicy.applyAlbumSelection(
         plan,
         childId: child.id,
-        album: album,
+        album: source.album,
         policy: policy,
         resolvedAt: now,
         in: db,
@@ -84,10 +88,7 @@ extension SaveMusicAlbumCuration: Resolver {
       return .init(
         status: .updated,
         curation: updatedPolicy.curation(revision: snapshot.revision),
-        album: updatedPolicy.albumCuration(
-          album: album,
-          revision: snapshot.revision,
-        ),
+        album: updatedPolicy.albumCuration(source, revision: snapshot.revision),
       )
     }
   }
