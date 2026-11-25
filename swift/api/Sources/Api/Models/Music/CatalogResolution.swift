@@ -90,6 +90,22 @@ extension Music {
       self.tracks = tracks
     }
 
+    init(_ summary: ResolvedAlbumSummary, tracks: [ResolvedTrack]) {
+      self.init(
+        id: summary.id,
+        title: summary.title,
+        artistName: summary.artistName,
+        artistIds: summary.artistIds,
+        artworkUrl: summary.artworkUrl,
+        artwork: summary.artwork,
+        trackCount: summary.trackCount,
+        releaseDate: summary.releaseDate,
+        releaseType: summary.releaseType,
+        appleMusicUrl: summary.appleMusicUrl,
+        tracks: tracks,
+      )
+    }
+
     var summary: ResolvedAlbumSummary {
       .init(
         id: self.id,
@@ -388,19 +404,7 @@ extension Music {
         let metadataGrant = grants.min(by: self.trackMetadataOrder)!
         let summary = metadataGrant.resolution.preferredAlbum
         let orderedGrants = grants.sorted(by: self.trackOutputOrder)
-        let partialAlbum = ResolvedAlbum(
-          id: summary.id,
-          title: summary.title,
-          artistName: summary.artistName,
-          artistIds: summary.artistIds,
-          artworkUrl: summary.artworkUrl,
-          artwork: summary.artwork,
-          trackCount: summary.trackCount,
-          releaseDate: summary.releaseDate,
-          releaseType: summary.releaseType,
-          appleMusicUrl: summary.appleMusicUrl,
-          tracks: orderedGrants.map(\.resolution.track),
-        )
+        let partialAlbum = ResolvedAlbum(summary, tracks: orderedGrants.map(\.resolution.track))
         var positions = trackPositionsByAlbumId[albumId] ?? [:]
         for grant in orderedGrants {
           positions[grant.appleMusicTrackId] = grant.resolution.catalogPosition

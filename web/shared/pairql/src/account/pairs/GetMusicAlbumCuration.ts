@@ -30,6 +30,7 @@ export namespace GetMusicAlbumCuration {
     canEdit: boolean;
     governingArtistId?: string;
     governingArtistName?: string;
+    isUnavailableInStorefront: boolean;
     tracks: Array<{
       id: string;
       title: string;

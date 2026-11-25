@@ -771,6 +771,12 @@ const AlbumCurationModal: React.FC<{
               )}
             </div>
           )}
+          {detail.isUnavailableInStorefront && (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              This album isn't available in this child's Apple Music region, so these
+              songs won't play.
+            </div>
+          )}
           {message && (
             <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
               {message}

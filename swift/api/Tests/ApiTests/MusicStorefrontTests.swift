@@ -253,6 +253,140 @@ final class MusicStorefrontTests: ApiTestCase, @unchecked Sendable {
     expect(saved.album.scope).toEqual(.selectedTracks)
   }
 
+  func testAlbumCurationFallsBackToStoredTracksMissingFromStorefront() async throws {
+    let child = try await self.musicChild(with: { $0.appleMusicStorefront = "ca" })
+    let album = storefrontAlbum(
+      id: "album-us",
+      trackIds: ["track-1", "track-2", "track-3", "track-4"],
+    )
+    for position in [0, 1, 3] { // track-3 was never approved
+      _ = try await self.db.create(Music.ApprovedTrack(
+        childId: child.id,
+        appleMusicTrackId: album.tracks[position].id,
+        preferredAlbumId: album.id,
+        resolution: album.trackGrant(at: position),
+        resolvedAt: .reference,
+      ))
+    }
+    let published = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+
+    let curation = try await withDependencies {
+      $0.appleMusic.resolveAlbum = missingStorefrontAlbum
+    } operation: {
+      try await GetMusicAlbumCuration.resolve(
+        with: .init(childId: child.id, appleMusicAlbumId: album.id),
+        in: child.parent.context,
+      )
+    }
+
+    expect(curation.revision).toEqual(published.revision)
+    expect(curation.isUnavailableInStorefront).toEqual(true)
+    expect(curation.scope).toEqual(.selectedTracks)
+    expect(curation.tracks.map(\.id)).toEqual(["track-1", "track-2", "track-4"])
+    expect(curation.tracks.map(\.isSelected)).toEqual([true, true, true])
+
+    let unchanged = try await withDependencies {
+      $0.date.now = .reference + 100
+      $0.appleMusic.resolveAlbum = missingStorefrontAlbum
+    } operation: {
+      try await SaveMusicAlbumCuration.resolve(
+        with: .init(
+          childId: child.id,
+          appleMusicAlbumId: album.id,
+          expectedRevision: curation.revision,
+          selectedTrackIds: ["track-1", "track-2", "track-4"],
+        ),
+        in: child.parent.context,
+      )
+    }
+
+    expect(unchanged.status).toEqual(.updated)
+    expect(unchanged.curation.revision).toEqual(published.revision)
+    await expect(try Music.ApprovedAlbum.query() // all stored tracks != whole album
+      .where(.childId == child.id)
+      .count(in: self.db)).toEqual(0)
+
+    let saved = try await withDependencies {
+      $0.date.now = .reference + 200
+      $0.appleMusic.resolveAlbum = missingStorefrontAlbum
+    } operation: {
+      try await SaveMusicAlbumCuration.resolve(
+        with: .init(
+          childId: child.id,
+          appleMusicAlbumId: album.id,
+          expectedRevision: curation.revision,
+          selectedTrackIds: ["track-4"],
+        ),
+        in: child.parent.context,
+      )
+    }
+
+    expect(saved.status).toEqual(.updated)
+    expect(saved.curation.revision).toEqual(published.revision + 1)
+    expect(saved.album.isUnavailableInStorefront).toEqual(true)
+    expect(saved.album.tracks.filter(\.isSelected).map(\.id)).toEqual(["track-4"])
+    let remaining = try await Music.ApprovedTrack.query()
+      .where(.childId == child.id)
+      .all(in: self.db)
+    expect(remaining.map(\.appleMusicTrackId)).toEqual(["track-4"])
+    expect(remaining.first?.resolution).toEqual(album.trackGrant(at: 3))
+  }
+
+  func testAlbumCurationFallsBackToStoredWholeAlbum() async throws {
+    let child = try await self.musicChild(with: { $0.appleMusicStorefront = "ca" })
+    let album = storefrontAlbum(id: "album-us", trackIds: ["track-1", "track-2"])
+    _ = try await self.db.create(Music.ApprovedAlbum(
+      childId: child.id,
+      appleMusicAlbumId: album.id,
+      title: album.title,
+      artistName: album.artistName,
+      trackCount: album.trackCount,
+      resolution: album,
+      resolvedAt: .reference,
+    ))
+    _ = try await Music.LibrarySnapshotRepository.publish(
+      childId: child.id,
+      generatedAt: .reference,
+      in: self.db,
+    )
+
+    let curation = try await withDependencies {
+      $0.appleMusic.resolveAlbum = missingStorefrontAlbum
+    } operation: {
+      try await GetMusicAlbumCuration.resolve(
+        with: .init(childId: child.id, appleMusicAlbumId: album.id),
+        in: child.parent.context,
+      )
+    }
+
+    expect(curation.isUnavailableInStorefront).toEqual(true)
+    expect(curation.scope).toEqual(.wholeAlbum)
+    expect(curation.tracks.map(\.id)).toEqual(["track-1", "track-2"])
+  }
+
+  func testAlbumCurationRethrowsOtherStorefrontResolutionErrors() async throws {
+    let child = try await self.musicChild(with: { $0.appleMusicStorefront = "ca" })
+    do {
+      _ = try await withDependencies {
+        $0.appleMusic.resolveAlbum = { _ in
+          throw AppleMusicError.httpError(statusCode: 500, body: "")
+        }
+      } operation: {
+        try await GetMusicAlbumCuration.resolve(
+          with: .init(childId: child.id, appleMusicAlbumId: "album-us"),
+          in: child.parent.context,
+        )
+      }
+      XCTFail("expected get to fail")
+    } catch AppleMusicError.httpError(let code, _) {
+      expect(code).toEqual(500)
+    }
+  }
+
   func testCatalogRefreshResolvesEachChildInItsOwnStorefront() async throws {
     let german = try await self.child(with: { $0.appleMusicStorefront = "de" })
     let american = try await self.child()
@@ -288,6 +422,12 @@ final class MusicStorefrontTests: ApiTestCase, @unchecked Sendable {
       .init(storefront: "us", albumId: "album-us"),
     ])
   }
+}
+
+@Sendable private func missingStorefrontAlbum(
+  _ lookup: AppleMusicAlbumResolutionLookup,
+) async throws -> Music.ResolvedAlbum {
+  throw AppleMusicResolutionError.missingResource(type: "album", id: lookup.albumId.rawValue)
 }
 
 private func storefrontAlbum(

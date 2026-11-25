@@ -86,6 +86,7 @@ export namespace SaveMusicAlbumCuration {
       canEdit: boolean;
       governingArtistId?: string;
       governingArtistName?: string;
+      isUnavailableInStorefront: boolean;
       tracks: Array<{
         id: string;
         title: string;

@@ -137,6 +137,12 @@ const MusicAlbumEditor: React.FC<Props> = ({
               )}
             </Banner>
           )}
+          {album.isUnavailableInStorefront && (
+            <Banner variant="warning">
+              This album isn't available in this person's Apple Music region, so these
+              songs won't play.
+            </Banner>
+          )}
           {message && (
             <div role="status">
               <Banner variant="warning">{message}</Banner>
